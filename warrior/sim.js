@@ -8,6 +8,7 @@ import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
+import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as WarriorInputs from './inputs.js';
 import * as Presets from './presets.js';
 export class WarriorSimUI extends IndividualSimUI {
@@ -132,7 +133,9 @@ export class WarriorSimUI extends IndividualSimUI {
             rotationInputs: WarriorInputs.WarriorRotationConfig,
             // Inputs to include in the 'Other' section on the settings tab.
             otherInputs: {
-                inputs: [],
+                inputs: [
+                    OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
+                ],
             },
             encounterPicker: {
                 // Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.

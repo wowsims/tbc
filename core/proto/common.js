@@ -1112,6 +1112,7 @@ class PartyBuffs$Type extends MessageType {
             { no: 25, name: "snapshot_improved_wrath_of_air_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 15, name: "grace_of_air_totem", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 16, name: "strength_of_earth_totem", kind: "enum", T: () => ["proto.StrengthOfEarthType", StrengthOfEarthType] },
+            { no: 31, name: "snapshot_improved_strength_of_earth_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 26, name: "tranquil_air_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 23, name: "windfury_totem_rank", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 24, name: "windfury_totem_iwt", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -1122,7 +1123,7 @@ class PartyBuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { bloodlust: 0, ferociousInspiration: 0, battleChickens: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, tranquilAirTotem: false, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0, bsSolarianSapphire: false, snapshotBsSolarianSapphire: false, snapshotBsT2: false };
+        const message = { bloodlust: 0, ferociousInspiration: 0, battleChickens: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, snapshotImprovedStrengthOfEarthTotem: false, tranquilAirTotem: false, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0, bsSolarianSapphire: false, snapshotBsSolarianSapphire: false, snapshotBsT2: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1201,6 +1202,9 @@ class PartyBuffs$Type extends MessageType {
                     break;
                 case /* proto.StrengthOfEarthType strength_of_earth_totem */ 16:
                     message.strengthOfEarthTotem = reader.int32();
+                    break;
+                case /* bool snapshot_improved_strength_of_earth_totem */ 31:
+                    message.snapshotImprovedStrengthOfEarthTotem = reader.bool();
                     break;
                 case /* bool tranquil_air_totem */ 26:
                     message.tranquilAirTotem = reader.bool();
@@ -1304,6 +1308,9 @@ class PartyBuffs$Type extends MessageType {
         /* proto.StrengthOfEarthType strength_of_earth_totem = 16; */
         if (message.strengthOfEarthTotem !== 0)
             writer.tag(16, WireType.Varint).int32(message.strengthOfEarthTotem);
+        /* bool snapshot_improved_strength_of_earth_totem = 31; */
+        if (message.snapshotImprovedStrengthOfEarthTotem !== false)
+            writer.tag(31, WireType.Varint).bool(message.snapshotImprovedStrengthOfEarthTotem);
         /* bool tranquil_air_totem = 26; */
         if (message.tranquilAirTotem !== false)
             writer.tag(26, WireType.Varint).bool(message.tranquilAirTotem);

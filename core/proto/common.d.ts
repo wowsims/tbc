@@ -128,6 +128,10 @@ export interface PartyBuffs {
      */
     strengthOfEarthTotem: StrengthOfEarthType;
     /**
+     * @generated from protobuf field: bool snapshot_improved_strength_of_earth_totem = 31;
+     */
+    snapshotImprovedStrengthOfEarthTotem: boolean;
+    /**
      * @generated from protobuf field: bool tranquil_air_totem = 26;
      */
     tranquilAirTotem: boolean;

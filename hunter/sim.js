@@ -175,6 +175,7 @@ export class HunterSimUI extends IndividualSimUI {
                     OtherInputs.NumStartingPotions,
                     OtherInputs.ExposeWeaknessUptime,
                     OtherInputs.ExposeWeaknessHunterAgility,
+                    OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
                     OtherInputs.SnapshotBsSolarianSapphire,
                     OtherInputs.SnapshotBsT2,
                 ],

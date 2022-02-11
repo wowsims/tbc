@@ -897,11 +897,12 @@ class EnhancementShaman_Options$Type extends MessageType {
             { no: 2, name: "bloodlust", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "delay_offhand_swings", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "main_hand_imbue", kind: "enum", T: () => ["proto.ShamanWeaponImbue", ShamanWeaponImbue] },
-            { no: 4, name: "off_hand_imbue", kind: "enum", T: () => ["proto.ShamanWeaponImbue", ShamanWeaponImbue] }
+            { no: 4, name: "off_hand_imbue", kind: "enum", T: () => ["proto.ShamanWeaponImbue", ShamanWeaponImbue] },
+            { no: 6, name: "snapshot_t4_2pc", kind: "scalar", jsonName: "snapshotT42pc", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { waterShield: false, bloodlust: false, delayOffhandSwings: false, mainHandImbue: 0, offHandImbue: 0 };
+        const message = { waterShield: false, bloodlust: false, delayOffhandSwings: false, mainHandImbue: 0, offHandImbue: 0, snapshotT42Pc: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -926,6 +927,9 @@ class EnhancementShaman_Options$Type extends MessageType {
                     break;
                 case /* proto.ShamanWeaponImbue off_hand_imbue */ 4:
                     message.offHandImbue = reader.int32();
+                    break;
+                case /* bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"];*/ 6:
+                    message.snapshotT42Pc = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -954,6 +958,9 @@ class EnhancementShaman_Options$Type extends MessageType {
         /* proto.ShamanWeaponImbue off_hand_imbue = 4; */
         if (message.offHandImbue !== 0)
             writer.tag(4, WireType.Varint).int32(message.offHandImbue);
+        /* bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"]; */
+        if (message.snapshotT42Pc !== false)
+            writer.tag(6, WireType.Varint).bool(message.snapshotT42Pc);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

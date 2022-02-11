@@ -1,4 +1,4 @@
-import { EnhancementShaman_Rotation_PrimaryShock as PrimaryShock, ShamanWeaponImbue, } from '/tbc/core/proto/shaman.js';
+import { EarthTotem, EnhancementShaman_Rotation_PrimaryShock as PrimaryShock, ShamanWeaponImbue, } from '/tbc/core/proto/shaman.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
@@ -51,6 +51,25 @@ export const DelayOffhandSwings = {
             newOptions.delayOffhandSwings = newValue;
             player.setSpecOptions(eventID, newOptions);
         },
+    },
+};
+export const SnapshotT42Pc = {
+    type: 'boolean',
+    getModObject: (simUI) => simUI.player,
+    config: {
+        extraCssClasses: [
+            'snapshot-t4-2pc-picker',
+        ],
+        label: 'Snapshot T4 2pc',
+        labelTooltip: 'Snapshots the improved Strength of Earth totem bonus from T4 2pc (+12 strength) for the first 1:50s of the fight. Only works if the selected Earth totem is Strength of Earth Totem.',
+        changedEvent: (player) => player.changeEmitter,
+        getValue: (player) => player.getSpecOptions().snapshotT42Pc,
+        setValue: (eventID, player, newValue) => {
+            const newOptions = player.getSpecOptions();
+            newOptions.snapshotT42Pc = newValue;
+            player.setSpecOptions(eventID, newOptions);
+        },
+        enableWhen: (player) => player.getRotation().totems?.earth == EarthTotem.StrengthOfEarthTotem,
     },
 };
 export const EnhancementShamanRotationConfig = {

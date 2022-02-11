@@ -396,6 +396,13 @@ export interface EnhancementShaman_Options {
      * @generated from protobuf field: proto.ShamanWeaponImbue off_hand_imbue = 4;
      */
     offHandImbue: ShamanWeaponImbue;
+    /**
+     * Indicates the shaman will be dropping an improved strength of earth totem before
+     * the fight by snapshotting the T4 2pc bonus.
+     *
+     * @generated from protobuf field: bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"];
+     */
+    snapshotT42Pc: boolean;
 }
 /**
  * @generated from protobuf enum proto.EarthTotem

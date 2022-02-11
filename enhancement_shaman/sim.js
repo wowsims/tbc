@@ -179,6 +179,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                     OtherInputs.NumStartingPotions,
                     OtherInputs.ExposeWeaknessUptime,
                     OtherInputs.ExposeWeaknessHunterAgility,
+                    ShamanInputs.SnapshotT42Pc,
                     OtherInputs.SnapshotBsSolarianSapphire,
                     OtherInputs.SnapshotBsT2,
                 ],

@@ -21,6 +21,19 @@ export declare const DelayOffhandSwings: {
         setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => void;
     };
 };
+export declare const SnapshotT42Pc: {
+    type: "boolean";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => TypedEvent<void>;
+        getValue: (player: Player<Spec.SpecEnhancementShaman>) => boolean;
+        setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => void;
+        enableWhen: (player: Player<Spec.SpecEnhancementShaman>) => boolean;
+    };
+};
 export declare const EnhancementShamanRotationConfig: {
     inputs: ({
         type: "enum";
