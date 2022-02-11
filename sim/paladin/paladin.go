@@ -10,13 +10,13 @@ type Paladin struct {
 	core.Character
 
 	Talents proto.PaladinTalents
-	
+
 	// maybe I should make this a pointer instead so I can nil check for no active seal
 	currentSeal core.Aura
 
-	sealOfBlood            core.SimpleCast
-	sealOfCommand          core.SimpleCast
-	sealOfTheCrusader      core.SimpleCast
+	sealOfBlood       core.SimpleCast
+	sealOfCommand     core.SimpleCast
+	sealOfTheCrusader core.SimpleCast
 
 	crusaderStrikeTemplate core.MeleeAbilityTemplate
 	crusaderStrikeSpell    core.ActiveMeleeAbility
@@ -94,52 +94,54 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 	paladin.setupSealOfCommand()
 	paladin.setupSealOfTheCrusader()
 
+	paladin.applyTalents()
+
 	return paladin
 }
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassPaladin}] = stats.Stats{
-		stats.Stamina:   118,
-		stats.Intellect: 87,
-		stats.Mana:      2953,
-		stats.Spirit:    88,
-		stats.Strength:  123,
+		stats.Stamina:     118,
+		stats.Intellect:   87,
+		stats.Mana:        2953,
+		stats.Spirit:      88,
+		stats.Strength:    123,
 		stats.AttackPower: 190,
-		stats.Agility:   79,
+		stats.Agility:     79,
 		stats.MeleeCrit:   14.35,
-		stats.SpellCrit:   73.69, 
+		stats.SpellCrit:   73.69,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassPaladin}] = stats.Stats{
-		stats.Stamina:   119,
-		stats.Intellect: 84,
-		stats.Mana:      2953,
-		stats.Spirit:    91,
-		stats.Strength:  127,
+		stats.Stamina:     119,
+		stats.Intellect:   84,
+		stats.Mana:        2953,
+		stats.Spirit:      91,
+		stats.Strength:    127,
 		stats.AttackPower: 190,
-		stats.Agility:   74,
+		stats.Agility:     74,
 		stats.MeleeCrit:   14.35,
-		stats.SpellCrit:   73.69, 
+		stats.SpellCrit:   73.69,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassPaladin}] = stats.Stats{
-		stats.Stamina:   120,
-		stats.Intellect: 83,
-		stats.Mana:      2953,
-		stats.Spirit:    97,
-		stats.Strength:  126,
+		stats.Stamina:     120,
+		stats.Intellect:   83,
+		stats.Mana:        2953,
+		stats.Spirit:      97,
+		stats.Strength:    126,
 		stats.AttackPower: 190,
-		stats.Agility:   77,
+		stats.Agility:     77,
 		stats.MeleeCrit:   14.35,
-		stats.SpellCrit:   73.69, 
+		stats.SpellCrit:   73.69,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassPaladin}] = stats.Stats{
-		stats.Stamina:   123,
-		stats.Intellect: 82,
-		stats.Mana:      2953,
-		stats.Spirit:    88,
-		stats.Strength:  128,
+		stats.Stamina:     123,
+		stats.Intellect:   82,
+		stats.Mana:        2953,
+		stats.Spirit:      88,
+		stats.Strength:    128,
 		stats.AttackPower: 190,
-		stats.Agility:   73,
+		stats.Agility:     73,
 		stats.MeleeCrit:   14.35,
-		stats.SpellCrit:   73.69, 
+		stats.SpellCrit:   73.69,
 	}
 }

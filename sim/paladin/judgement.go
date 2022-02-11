@@ -7,6 +7,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+const JudgementManaCost = 147.0
+
 var JudgementCD = core.NewCooldownID()
 var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: JudgementCD}
 
@@ -17,9 +19,7 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 				ActionID:       JudgementOfBloodActionID,
 				Character:      &paladin.Character,
 				SpellSchool:    stats.HolySpellPower,
-				BaseManaCost:   147,
-				ManaCost:       147,
-				Cooldown: 	    time.Second * 10,
+				Cooldown:       time.Second * 10,
 				CritMultiplier: paladin.SpellCritMultiplier(1, 0.25), // no idea what the math is for judgment crits
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					currentSeal := &paladin.currentSeal
@@ -39,10 +39,14 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage:    295,
 				MaxBaseDamage:    325,
-				SpellCoefficient: 1,   
+				SpellCoefficient: 1,
 			},
 		},
 	}
+
+	// Reduce mana cost if we have Benediction Talent
+	job.ManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
+	job.BaseManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)) // Is it necessary to define both these lines?
 
 	return core.NewSimpleSpellTemplate(job)
 }
@@ -63,12 +67,12 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 	jotc := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       JudgementOfTheCrusaderActionID,
-				Character:      &paladin.Character,
-				SpellSchool:    stats.HolySpellPower,
-				BaseManaCost:   147,
-				ManaCost:       147,
-				Cooldown: 	    time.Second * 10,
+				ActionID:     JudgementOfTheCrusaderActionID,
+				Character:    &paladin.Character,
+				SpellSchool:  stats.HolySpellPower,
+				BaseManaCost: JudgementManaCost,
+				ManaCost:     JudgementManaCost,
+				Cooldown:     time.Second * 10,
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					currentSeal := &paladin.currentSeal
 					currentSeal.Expires = sim.CurrentTime
@@ -87,6 +91,10 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 		},
 	}
 
+	// Reduce mana cost if we have Benediction Talent
+	jotc.ManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
+	jotc.BaseManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)) // Is it necessary to define both these lines?
+
 	return core.NewSimpleSpellTemplate(jotc)
 }
 
@@ -104,10 +112,14 @@ func (paladin *Paladin) NewJudgement(sim *core.Simulation, target *core.Target) 
 	currentSeal := &paladin.currentSeal
 
 	// No seal has even been active, so we can't cast judgement
-	if(currentSeal == nil) { return nil }
+	if currentSeal == nil {
+		return nil
+	}
 
 	// Most recent seal has expired so we can't cast judgement
-	if(currentSeal.Expires <= sim.CurrentTime) { return nil }
+	if currentSeal.Expires <= sim.CurrentTime {
+		return nil
+	}
 
 	// Switch on Seal IDs to return the right judgement
 	switch currentSeal.ID {
