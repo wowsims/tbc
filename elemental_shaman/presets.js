@@ -8,6 +8,7 @@ import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { ElementalShaman_Rotation as ElementalShamanRotation, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
+import { AirTotem, EarthTotem, FireTotem, WaterTotem, ShamanTotems, } from '/tbc/core/proto/shaman.js';
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
@@ -21,6 +22,12 @@ export const StandardTalents = {
     data: '55003105100213351051--05105301005',
 };
 export const DefaultRotation = ElementalShamanRotation.create({
+    totems: ShamanTotems.create({
+        earth: EarthTotem.TremorTotem,
+        air: AirTotem.WrathOfAirTotem,
+        fire: FireTotem.TotemOfWrath,
+        water: WaterTotem.ManaSpringTotem,
+    }),
     type: RotationType.Adaptive,
 });
 export const DefaultOptions = ElementalShamanOptions.create({
