@@ -73,7 +73,7 @@ var frenchRotation = &proto.Hunter_Rotation{
 }
 var meleeWeaveRotation = &proto.Hunter_Rotation{
 	UseMultiShot:    true,
-	UseArcaneShot:   false,
+	UseArcaneShot:   true,
 	MeleeWeave:      true,
 	UseRaptorStrike: true,
 	TimeToWeaveMs:   500,
