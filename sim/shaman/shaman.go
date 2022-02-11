@@ -27,8 +27,11 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, totems pro
 	if totems.Fire == proto.FireTotem_TotemOfWrath && !talents.TotemOfWrath {
 		totems.Fire = proto.FireTotem_NoFireTotem
 	}
-	if totems.Air != proto.AirTotem_WrathOfAirTotem && selfBuffs.SnapshotT42Pc {
-		selfBuffs.SnapshotT42Pc = false
+	if totems.Air != proto.AirTotem_WrathOfAirTotem && selfBuffs.SnapshotWOAT42Pc {
+		selfBuffs.SnapshotWOAT42Pc = false
+	}
+	if totems.Earth != proto.EarthTotem_StrengthOfEarthTotem && selfBuffs.SnapshotSOET42Pc {
+		selfBuffs.SnapshotSOET42Pc = false
 	}
 
 	shaman := &Shaman{
@@ -76,9 +79,10 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, totems pro
 
 // Which buffs this shaman is using.
 type SelfBuffs struct {
-	Bloodlust     bool
-	WaterShield   bool
-	SnapshotT42Pc bool
+	Bloodlust        bool
+	WaterShield      bool
+	SnapshotWOAT42Pc bool
+	SnapshotSOET42Pc bool
 }
 
 // Indexes into NextTotemDrops for self buffs
@@ -182,7 +186,7 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		woaValue := proto.TristateEffect_TristateEffectRegular
 		if ItemSetCycloneRegalia.CharacterHasSetBonus(shaman.GetCharacter(), 2) {
 			woaValue = proto.TristateEffect_TristateEffectImproved
-		} else if shaman.SelfBuffs.SnapshotT42Pc {
+		} else if shaman.SelfBuffs.SnapshotWOAT42Pc {
 			partyBuffs.SnapshotImprovedWrathOfAirTotem = true
 		}
 		partyBuffs.WrathOfAirTotem = core.MaxTristate(partyBuffs.WrathOfAirTotem, woaValue)
@@ -215,6 +219,8 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 			} else {
 				value = proto.StrengthOfEarthType_CycloneBonus
 			}
+		} else if shaman.SelfBuffs.SnapshotSOET42Pc {
+			partyBuffs.SnapshotImprovedStrengthOfEarthTotem = true
 		}
 		if value > partyBuffs.StrengthOfEarthTotem {
 			partyBuffs.StrengthOfEarthTotem = value

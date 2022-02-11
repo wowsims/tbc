@@ -275,3 +275,25 @@ func (auraMetrics *AuraMetrics) ToProto(numIterations int32) *proto.AuraMetrics 
 		UptimeSecondsStdev: math.Sqrt((auraMetrics.uptimeSumSquared.Seconds() / float64(numIterations)) - (uptimeAvg * uptimeAvg)),
 	}
 }
+
+// Calculates DPS for an action.
+func GetActionDPS(playerMetrics proto.PlayerMetrics, iterations int32, duration time.Duration, actionID ActionID, ignoreTag bool) float64 {
+	totalDPS := 0.0
+	for _, action := range playerMetrics.Actions {
+		metricsActionID := ProtoToActionID(*action.Id)
+		if actionID.SameAction(metricsActionID) || (ignoreTag && actionID.SameActionIgnoreTag(metricsActionID)) {
+			totalDPS += action.Damage / float64(iterations) / duration.Seconds()
+		}
+	}
+	return totalDPS
+}
+
+// Calculates average cast damage for an action.
+func GetActionAvgCast(playerMetrics proto.PlayerMetrics, actionID ActionID) float64 {
+	for _, action := range playerMetrics.Actions {
+		if actionID.SameAction(ProtoToActionID(*action.Id)) {
+			return action.Damage / float64(action.Casts)
+		}
+	}
+	return 0
+}

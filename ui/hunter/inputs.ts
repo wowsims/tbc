@@ -104,9 +104,9 @@ export const PetTypeInput = {
 			{ name: 'None', value: PetType.PetNone },
 			{ name: 'Ravager', value: PetType.Ravager },
 			{ name: 'Wind Serpent', value: PetType.WindSerpent },
-			//{ name: 'Bat', value: PetType.Bat },
+			{ name: 'Bat', value: PetType.Bat },
 			{ name: 'Cat', value: PetType.Cat },
-			//{ name: 'Owl', value: PetType.Owl },
+			{ name: 'Owl', value: PetType.Owl },
 			{ name: 'Raptor', value: PetType.Raptor },
 		],
 		changedEvent: (player: Player<Spec.SpecHunter>) => player.specOptionsChangeEmitter,
@@ -176,7 +176,7 @@ export const HunterRotationConfig = {
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Lazy Rotation',
-				labelTooltip: 'Allows no more than 1 shot cast between each auto.',
+				labelTooltip: 'Uses GCD immediately, even if it will clip the next auto.',
 				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().lazyRotation,
 				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {

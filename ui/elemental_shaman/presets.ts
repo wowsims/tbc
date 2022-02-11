@@ -12,6 +12,15 @@ import { Player } from '/tbc/core/player.js';
 import { ElementalShaman, ElementalShaman_Rotation as ElementalShamanRotation, ElementalShaman_Options as ElementalShamanOptions } from '/tbc/core/proto/shaman.js';
 import { ElementalShaman_Rotation_RotationType as RotationType } from '/tbc/core/proto/shaman.js';
 
+import {
+	AirTotem,
+	EarthTotem,
+	FireTotem,
+	WaterTotem,
+	ShamanTotems,
+} from '/tbc/core/proto/shaman.js';
+
+
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
@@ -28,6 +37,12 @@ export const StandardTalents = {
 };
 
 export const DefaultRotation = ElementalShamanRotation.create({
+	totems: ShamanTotems.create({
+		earth: EarthTotem.TremorTotem,
+		air: AirTotem.WrathOfAirTotem,
+		fire: FireTotem.TotemOfWrath,
+		water: WaterTotem.ManaSpringTotem,
+	}),
 	type: RotationType.Adaptive,
 });
 

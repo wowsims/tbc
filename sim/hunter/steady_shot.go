@@ -22,8 +22,16 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 			GCD:         core.GCDDefault,
 			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				target := sim.GetPrimaryTarget()
+				ss := &hunter.steadyShotAbility
+				hunter.steadyShotAbilityTemplate.Apply(ss)
+				ss.Effect.Target = target
+				ss.Attack(sim)
+
 				hunter.killCommandBlocked = false
-				hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
+				hunter.TryKillCommand(sim, target)
+
+				hunter.rotation(sim, false)
 			},
 		},
 		DisableMetrics: true,
@@ -70,29 +78,11 @@ func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.Me
 	return core.NewMeleeAbilityTemplate(ama)
 }
 
-func (hunter *Hunter) NewSteadyShot(sim *core.Simulation, target *core.Target, canWeave bool) core.SimpleCast {
+func (hunter *Hunter) NewSteadyShot(sim *core.Simulation, target *core.Target) core.SimpleCast {
 	hunter.steadyShotCast = hunter.steadyShotCastTemplate
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	hunter.steadyShotCast.CastTime = time.Duration(float64(time.Millisecond*1500) / hunter.RangedSwingSpeed())
-
-	// Might be able to fill the gap between SS complete and GCD ready with a melee weave.
-	leftoverGCDTime := core.GCDDefault - hunter.steadyShotCast.CastTime
-	wouldClipAuto := hunter.steadyShotCast.CastTime+hunter.timeToWeave > hunter.AutoAttacks.TimeBeforeClippingRanged(sim)
-	canWeaveAfterSS := canWeave &&
-		hunter.timeToWeave < leftoverGCDTime &&
-		!wouldClipAuto
-
-	hunter.steadyShotCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		ss := &hunter.steadyShotAbility
-		hunter.steadyShotAbilityTemplate.Apply(ss)
-		ss.Effect.Target = target
-		ss.Attack(sim)
-
-		if canWeaveAfterSS {
-			hunter.doMeleeWeave(sim)
-		}
-	}
 
 	hunter.steadyShotCast.Init(sim)
 	return hunter.steadyShotCast

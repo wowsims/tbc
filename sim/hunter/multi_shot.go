@@ -23,6 +23,12 @@ func (hunter *Hunter) newMultiShotCastTemplate(sim *core.Simulation) core.Simple
 			GCD:         core.GCDDefault,
 			Cooldown:    time.Second * 10,
 			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				ms := &hunter.multiShotAbility
+				hunter.multiShotAbilityTemplate.Apply(ms)
+				ms.Attack(sim)
+				hunter.rotation(sim, false)
+			},
 		},
 		DisableMetrics: true,
 	}
@@ -84,11 +90,6 @@ func (hunter *Hunter) NewMultiShot(sim *core.Simulation) core.SimpleCast {
 	hunter.multiShotCast = hunter.multiShotCastTemplate
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hunter.multiShotCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		ms := &hunter.multiShotAbility
-		hunter.multiShotAbilityTemplate.Apply(ms)
-		ms.Attack(sim)
-	}
 	hunter.multiShotCast.CastTime = time.Duration(float64(time.Millisecond*500) / hunter.RangedSwingSpeed())
 
 	hunter.multiShotCast.Init(sim)
