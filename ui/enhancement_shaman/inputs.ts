@@ -76,6 +76,26 @@ export const DelayOffhandSwings = {
 	},
 };
 
+export const SnapshotT42Pc = {
+	type: 'boolean' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'snapshot-t4-2pc-picker',
+		],
+		label: 'Snapshot T4 2pc',
+		labelTooltip: 'Snapshots the improved Strength of Earth totem bonus from T4 2pc (+12 strength) for the first 1:50s of the fight. Only works if the selected Earth totem is Strength of Earth Totem.',
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.changeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getSpecOptions().snapshotT42Pc,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
+			const newOptions = player.getSpecOptions();
+			newOptions.snapshotT42Pc = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+		enableWhen: (player: Player<Spec.SpecEnhancementShaman>) => player.getRotation().totems?.earth == EarthTotem.StrengthOfEarthTotem,
+	},
+};
+
 export const EnhancementShamanRotationConfig = {
 	inputs: [
 		{

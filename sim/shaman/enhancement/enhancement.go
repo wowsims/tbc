@@ -26,8 +26,9 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 	enhOptions := options.GetEnhancementShaman()
 
 	selfBuffs := shaman.SelfBuffs{
-		Bloodlust:   enhOptions.Options.Bloodlust,
-		WaterShield: enhOptions.Options.WaterShield,
+		Bloodlust:        enhOptions.Options.Bloodlust,
+		WaterShield:      enhOptions.Options.WaterShield,
+		SnapshotSOET42Pc: enhOptions.Options.SnapshotT4_2Pc,
 	}
 
 	totems := proto.ShamanTotems{}

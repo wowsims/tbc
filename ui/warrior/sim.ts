@@ -154,6 +154,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
 				],
 			},
 			encounterPicker: {
