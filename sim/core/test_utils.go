@@ -29,7 +29,7 @@ var AverageDefaultSimTestOptions = &proto.SimOptions{
 }
 
 const ShortDuration = 60
-const LongDuration = 20
+const LongDuration = 300
 
 func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
 	var NoDebuffTarget = &proto.Target{
