@@ -6,6 +6,7 @@ import (
 	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/shaman"
 )
 
@@ -57,6 +58,7 @@ func NewElementalShaman(character core.Character, options proto.Player) *Element
 	return &ElementalShaman{
 		Shaman:   shaman.NewShaman(character, *eleShamOptions.Talents, totems, selfBuffs),
 		rotation: rotation,
+		has4pT6:  shaman.ItemSetSkyshatterRegalia.CharacterHasSetBonus(&character, 4),
 	}
 }
 
@@ -64,6 +66,8 @@ type ElementalShaman struct {
 	*shaman.Shaman
 
 	rotation Rotation
+
+	has4pT6 bool
 }
 
 func (eleShaman *ElementalShaman) GetShaman() *shaman.Shaman {
@@ -249,6 +253,17 @@ type AdaptiveRotation struct {
 }
 
 func (rotation *AdaptiveRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
+	sp := eleShaman.GetStat(stats.NatureSpellPower) + eleShaman.GetStat(stats.SpellPower)
+	castSpeed := eleShaman.CastSpeed()
+	lb := ((612 + (sp * 0.794)) * 1.2) / (2 / castSpeed)
+	cl := ((786 + (sp * 0.651)) * 1.0666) / core.MaxFloat((1.5/castSpeed), 1)
+	if eleShaman.has4pT6 {
+		lb *= 1.05
+	}
+	if lb+10 >= cl {
+		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
+	}
+
 	// If we have enough mana to burn, use the surplus rotation.
 	if rotation.manaTracker.ProjectedManaSurplus(sim, eleShaman.GetCharacter()) {
 		return rotation.surplusRotation.ChooseAction(eleShaman, sim)
