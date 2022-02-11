@@ -2,6 +2,7 @@ import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
+import { StrengthOfEarthType } from '/tbc/core/proto/common.js';
 import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
@@ -193,6 +194,27 @@ export const ExposeWeaknessHunterAgility = {
 			newDebuffs.exposeWeaknessHunterAgility = newValue;
 			target.setDebuffs(eventID, newDebuffs);
 		},
+	},
+};
+
+export const SnapshotImprovedStrengthOfEarthTotem = {
+	type: 'boolean' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player.getParty()!,
+	config: {
+		extraCssClasses: [
+			'snapshot-improved-strength-of-earth-totem-picker',
+			'within-raid-sim-hide',
+		],
+		label: 'Snapshot Imp Strength of Earth',
+		labelTooltip: 'An enhancement shaman in your party is snapshotting their improved Strength of Earth totem bonus from T4 2pc (+12 Strength) for the first 1:50s of the fight.',
+		changedEvent: (party: Party) => party.buffsChangeEmitter,
+		getValue: (party: Party) => party.getBuffs().snapshotImprovedStrengthOfEarthTotem,
+		setValue: (eventID: EventID, party: Party, newValue: boolean) => {
+			const buffs = party.getBuffs();
+			buffs.snapshotImprovedStrengthOfEarthTotem = newValue;
+			party.setBuffs(eventID, buffs);
+		},
+		enableWhen: (party: Party) => party.getBuffs().strengthOfEarthTotem == StrengthOfEarthType.Basic || party.getBuffs().strengthOfEarthTotem == StrengthOfEarthType.EnhancingTotems,
 	},
 };
 

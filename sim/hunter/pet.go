@@ -118,6 +118,15 @@ func (hp *HunterPet) Reset(sim *core.Simulation) {
 
 func (hp *HunterPet) OnGCDReady(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
+	if hp.config.RandomSelection {
+		if sim.RandomFloat("Hunter Pet Ability") < 0.5 {
+			hp.primaryAbility.TryCast(sim, target, hp)
+		} else {
+			hp.secondaryAbility.TryCast(sim, target, hp)
+		}
+		return
+	}
+
 	if !hp.primaryAbility.TryCast(sim, target, hp) {
 		if hp.secondaryAbility.Type != Unknown {
 			hp.secondaryAbility.TryCast(sim, target, hp)
@@ -125,7 +134,6 @@ func (hp *HunterPet) OnGCDReady(sim *core.Simulation) {
 	}
 }
 
-// These numbers are just rough guesses based on looking at some logs.
 var hunterPetBaseStats = stats.Stats{
 	stats.Agility:     127,
 	stats.Strength:    162,
@@ -172,6 +180,9 @@ type PetConfig struct {
 	SecondaryAbility PetAbilityType
 
 	IsCaster bool // Caster pets have a melee penalty
+
+	// Randomly select between abilities instead of using a prio.
+	RandomSelection bool
 }
 
 var PetConfigs = map[proto.Hunter_Options_PetType]PetConfig{
@@ -192,6 +203,7 @@ var PetConfigs = map[proto.Hunter_Options_PetType]PetConfig{
 		DamageMultiplier: 1.07,
 		PrimaryAbility:   Claw,
 		SecondaryAbility: Screech,
+		RandomSelection:  true,
 	},
 	proto.Hunter_Options_Raptor: PetConfig{
 		Name:             "Raptor",

@@ -165,6 +165,12 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	case proto.StrengthOfEarthType_EnhancingAndCyclone:
 		character.AddStat(stats.Strength, 110.9)
 	}
+	if (partyBuffs.StrengthOfEarthTotem == proto.StrengthOfEarthType_Basic || partyBuffs.StrengthOfEarthTotem == proto.StrengthOfEarthType_EnhancingTotems) && partyBuffs.SnapshotImprovedStrengthOfEarthTotem {
+		character.AddPermanentAuraWithOptions(PermanentAura{
+			AuraFactory:       SnapshotImprovedStrengthOfEarthTotemAura(character),
+			RespectExpiration: true,
+		})
+	}
 	character.AddStats(stats.Stats{
 		stats.MP5: GetTristateValueFloat(partyBuffs.ManaSpringTotem, 50, 62.5),
 	})
@@ -240,6 +246,14 @@ func applyPetBuffEffects(petAgent PetAgent, raidBuffs proto.RaidBuffs, partyBuff
 	partyBuffs.BraidedEterniumChain = false
 
 	applyBuffEffects(petAgent, raidBuffs, partyBuffs, individualBuffs)
+}
+
+var SnapshotImprovedStrengthOfEarthTotemAuraID = NewAuraID()
+
+func SnapshotImprovedStrengthOfEarthTotemAura(character *Character) AuraFactory {
+	return func(sim *Simulation) Aura {
+		return character.NewAuraWithTemporaryStats(sim, SnapshotImprovedStrengthOfEarthTotemAuraID, ActionID{SpellID: 37223}, stats.Strength, 12, time.Second*110)
+	}
 }
 
 var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
