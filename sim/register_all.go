@@ -6,6 +6,7 @@ import (
 	"github.com/wowsims/tbc/sim/druid/balance"
 	"github.com/wowsims/tbc/sim/hunter"
 	"github.com/wowsims/tbc/sim/mage"
+	"github.com/wowsims/tbc/sim/paladin/retribution"
 	"github.com/wowsims/tbc/sim/priest/shadow"
 	"github.com/wowsims/tbc/sim/shaman/elemental"
 	"github.com/wowsims/tbc/sim/shaman/enhancement"
@@ -26,4 +27,5 @@ func RegisterAll() {
 	mage.RegisterMage()
 	shadow.RegisterShadowPriest()
 	warrior.RegisterWarrior()
+	retribution.RegisterRetributionPaladin()
 }

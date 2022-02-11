@@ -235,6 +235,7 @@ func (simpleCast *SimpleCast) StartCast(sim *Simulation) bool {
 		if simpleCast.OnCastComplete != nil {
 			simpleCast.OnCastComplete(sim, cast)
 		}
+		simpleCast.objectInUse = false
 	})
 }
 

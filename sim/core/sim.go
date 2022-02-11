@@ -138,7 +138,7 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	logsBuffer := &strings.Builder{}
 	if sim.Options.Debug || sim.Options.DebugFirstIteration {
 		sim.Log = func(message string, vals ...interface{}) {
-			logsBuffer.WriteString(fmt.Sprintf("[%0.05f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+			logsBuffer.WriteString(fmt.Sprintf("[%0.2f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
 		}
 	}
 
