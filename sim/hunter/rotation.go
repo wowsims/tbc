@@ -152,7 +152,11 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 		-10000.0,
 	}
 
-	canWeave := hunter.Rotation.MeleeWeave && sim.GetRemainingDurationPercent() < hunter.Rotation.PercentWeaved
+	// Only allow weaving if autos and GCD will both be on CD.
+	canWeave := hunter.Rotation.MeleeWeave &&
+		sim.GetRemainingDurationPercent() < hunter.Rotation.PercentWeaved &&
+		weaveAt < shootAt &&
+		weaveAt < gcdAt
 
 	// DPS from choosing to auto next.
 	rangedWindup := hunter.AutoAttacks.RangedSwingWindup()
