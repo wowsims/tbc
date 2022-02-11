@@ -151,7 +151,7 @@ export const HunterRotationConfig = {
             getModObject: (simUI) => simUI.player,
             config: {
                 label: 'Lazy Rotation',
-                labelTooltip: 'Allows no more than 1 shot cast between each auto.',
+                labelTooltip: 'Uses GCD immediately, even if it will clip the next auto.',
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getRotation().lazyRotation,
                 setValue: (eventID, player, newValue) => {
