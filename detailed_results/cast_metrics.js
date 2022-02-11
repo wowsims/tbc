@@ -30,7 +30,10 @@ export class CastMetrics extends ResultComponent {
             'content': 'Casts / (Encounter Duration / 60 Seconds)',
             'allowHTML': true,
         });
-        $(this.tableElem).tablesorter({ sortList: [[1, 1]] });
+        $(this.tableElem).tablesorter({
+            sortList: [[1, 1]],
+            cssChildRow: 'child-metric',
+        });
     }
     onSimResult(resultData) {
         this.bodyElem.textContent = '';

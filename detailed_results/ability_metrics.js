@@ -45,9 +45,12 @@ export class AbilityMetrics extends ResultComponent {
                 addRow(actionGroup[0], false, namePrefix, actionGroup[0].name);
                 return;
             }
+            // Sort by DPS because tablesorter doesn't let us apply sorting to child rows.
+            actionGroup.sort((a, b) => b.dps - a.dps);
             const mergedMetrics = ActionMetrics.merge(actionGroup, true, namePrefix ? ActionId.fromPetName(namePrefix) : undefined);
             const parentRow = addRow(mergedMetrics, false, '', namePrefix || mergedMetrics.name);
             const childRows = actionGroup.map(meleeMetric => addRow(meleeMetric, true, namePrefix, meleeMetric.name));
+            childRows.forEach(childRow => childRow.classList.add('child-metric'));
             const defaultDisplay = childRows[0].style.display;
             let expand = true;
             parentRow.classList.add('parent-metric', 'expand');

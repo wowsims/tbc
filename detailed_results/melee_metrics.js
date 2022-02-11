@@ -70,7 +70,10 @@ export class MeleeMetrics extends AbilityMetrics {
             'content': 'Glances / Swings',
             'allowHTML': true,
         });
-        $(tableElem).tablesorter({ sortList: [[1, 1]] });
+        $(tableElem).tablesorter({
+            sortList: [[1, 1]],
+            cssChildRow: 'child-metric',
+        });
     }
     getPlayerActions(player) {
         return player.getMeleeActions();
