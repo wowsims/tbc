@@ -136,7 +136,7 @@ input, select {
   display: flex;
   flex-direction: column;
 	background-image:
-		linear-gradient(rgba(var(--theme-color-background-raw), 0.8), rgba(var(--theme-color-background-raw), 0.9)),
+		linear-gradient(rgba(var(--theme-color-background-raw), 0.82), rgba(var(--theme-color-background-raw), 0.9)),
 		var(--theme-background-image);
 	background-size: cover;
 	background-position: center center;
