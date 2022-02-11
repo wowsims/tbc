@@ -12,7 +12,7 @@ import (
 var DefaultSimTestOptions = &proto.SimOptions{
 	Iterations: 1,
 	IsTest:     true,
-	Debug:      true,
+	Debug:      false,
 	RandomSeed: 101,
 }
 var StatWeightsDefaultSimTestOptions = &proto.SimOptions{
