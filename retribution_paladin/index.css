@@ -418,7 +418,7 @@
 
 .item-picker-labels-container {
   padding: 3px;
-  text-shadow: 2px 2px 3px black;
+  text-shadow: 2px 2px 4px black;
   flex: 1;
 }
 
@@ -1726,7 +1726,7 @@ input, select {
   width: 80%;
   display: flex;
   flex-direction: column;
-  background-image: linear-gradient(rgba(var(--theme-color-background-raw), 0.9), rgba(var(--theme-color-background-raw), 0.9)), var(--theme-background-image);
+  background-image: linear-gradient(rgba(var(--theme-color-background-raw), 0.8), rgba(var(--theme-color-background-raw), 0.9)), var(--theme-background-image);
   background-size: cover;
   background-position: center center;
   color: var(--main-text-color);
@@ -2243,9 +2243,9 @@ input, select {
 }
 
 .retribution-paladin-sim-ui {
-  --theme-color-primary: #d1b401;
-  --theme-color-background: #461f00;
-  --theme-color-background-raw: 70, 31, 0;
+  --theme-color-primary: rgb(190, 59, 207);
+  --theme-color-background: rgb(58, 38, 48);
+  --theme-color-background-raw: 58, 38, 48;
   --theme-background-image: url("/tbc/assets/retribution_paladin.jpg");
   --main-text-color: White;
 }
