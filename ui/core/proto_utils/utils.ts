@@ -162,7 +162,7 @@ export const titleIcons: Record<Spec, string> = {
   [Spec.SpecHunter]: '/tbc/assets/hunter_icon.png',
   [Spec.SpecMage]: '/tbc/assets/mage_icon.png',
   [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/ability_rogue_eviscerate.jpg',
-  [Spec.SpecRetributionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_auraoflight.jpg',
+  [Spec.SpecRetributionPaladin]: '/tbc/assets/retribution_icon.png',
   [Spec.SpecShadowPriest]: '/tbc/assets/shadow_priest_icon.png',
   [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
   [Spec.SpecWarrior]: '/tbc/assets/warrior_icon.png',
