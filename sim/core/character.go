@@ -444,8 +444,8 @@ func (character *Character) advance(sim *Simulation, elapsedTime time.Duration) 
 	character.auraTracker.advance(sim)
 
 	if character.Hardcast.Expires != 0 && character.Hardcast.Expires <= sim.CurrentTime {
-		character.Hardcast.OnExpire(sim)
 		character.Hardcast.Expires = 0
+		character.Hardcast.OnExpire(sim)
 	}
 
 	if len(character.Pets) > 0 {
