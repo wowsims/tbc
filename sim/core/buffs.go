@@ -252,7 +252,19 @@ var SnapshotImprovedStrengthOfEarthTotemAuraID = NewAuraID()
 
 func SnapshotImprovedStrengthOfEarthTotemAura(character *Character) AuraFactory {
 	return func(sim *Simulation) Aura {
-		return character.NewAuraWithTemporaryStats(sim, SnapshotImprovedStrengthOfEarthTotemAuraID, ActionID{SpellID: 37223}, stats.Strength, 12, time.Second*110)
+		bonus := character.ApplyStatDependencies(stats.Stats{stats.Strength: 12})
+		bonus[stats.Mana] = 0 // mana is wierd
+		negBonus := bonus.Multiply(-1)
+		character.AddStats(bonus)
+
+		return Aura{
+			ID:       SnapshotImprovedStrengthOfEarthTotemAuraID,
+			ActionID: ActionID{SpellID: 37223},
+			Expires:  sim.CurrentTime + (time.Second * 110),
+			OnExpire: func(sim *Simulation) {
+				character.AddStats(negBonus)
+			},
+		}
 	}
 }
 
