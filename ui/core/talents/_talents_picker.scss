@@ -2,7 +2,10 @@
 
 .talents-picker-root {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  overflow-y: auto;
+  min-width: 33vh;
 }
 
 .talent-tree-picker-root {
@@ -10,6 +13,8 @@
   padding: 4px;
   border-radius: 6px;
   margin: 1px;
+  flex: 1;
+  max-width: calc(32vh + 8px);
 }
 
 .talent-tree-header {
