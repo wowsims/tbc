@@ -1,6 +1,10 @@
+import { Class } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 export declare const raceNames: Record<Race, string>;
+export declare function nameToRace(name: string): Race;
+export declare const classNames: Record<Class, string>;
+export declare function nameToClass(name: string): Class;
 export declare const statNames: Record<Stat, string>;
 export declare const slotNames: Record<ItemSlot, string>;

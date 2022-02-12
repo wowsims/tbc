@@ -14,6 +14,7 @@ import { GearPicker } from '/tbc/core/components/gear_picker.js';
 import { IconPicker } from '/tbc/core/components/icon_picker.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
+import { IndividualImporter } from '/tbc/core/components/individual_importer.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
@@ -72,6 +73,7 @@ export class IndividualSimUI extends SimUI {
         this.individualConfig = config;
         this.raidSimResultsManager = null;
         this.settingsMuuri = null;
+        this.debug = new URLSearchParams(window.location.search).has('debug');
         if (!launchedSpecs.includes(this.player.spec)) {
             this.addWarning({
                 updateOn: new TypedEvent(),
@@ -178,6 +180,18 @@ export class IndividualSimUI extends SimUI {
         const characterStats = new CharacterStats(this.rootElem.getElementsByClassName('sim-sidebar-footer')[0], this.player, this.individualConfig.displayStats, this.individualConfig.modifyDisplayStats);
     }
     addTopbarComponents() {
+        const importSettings = document.createElement('span');
+        importSettings.classList.add('import-settings', 'fa', 'fa-upload');
+        tippy(importSettings, {
+            'content': 'Import',
+            'allowHTML': true,
+        });
+        importSettings.addEventListener('click', event => {
+            new IndividualImporter(this.rootElem, this);
+        });
+        if (this.debug) {
+            this.addToolbarItem(importSettings);
+        }
         const shareLink = document.createElement('span');
         shareLink.classList.add('share-link', 'fa', 'fa-link', 'within-raid-sim-hide');
         tippy(shareLink, {

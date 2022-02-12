@@ -1,3 +1,4 @@
+import { Class } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -15,6 +16,41 @@ export const raceNames = {
     [Race.RaceTroll30]: 'Troll (+30% Haste)',
     [Race.RaceUndead]: 'Undead',
 };
+export function nameToRace(name) {
+    const lower = name.toLowerCase();
+    if (lower.includes('troll')) {
+        return Race.RaceTroll10;
+    }
+    for (const key in raceNames) {
+        const race = parseInt(key);
+        if (raceNames[race].toLowerCase() == lower) {
+            return race;
+        }
+    }
+    return Race.RaceUnknown;
+}
+export const classNames = {
+    [Class.ClassUnknown]: 'None',
+    [Class.ClassDruid]: 'Druid',
+    [Class.ClassHunter]: 'Hunter',
+    [Class.ClassMage]: 'Mage',
+    [Class.ClassPaladin]: 'Paladin',
+    [Class.ClassPriest]: 'Priest',
+    [Class.ClassRogue]: 'Rogue',
+    [Class.ClassShaman]: 'Shaman',
+    [Class.ClassWarlock]: 'Warlock',
+    [Class.ClassWarrior]: 'Warrior',
+};
+export function nameToClass(name) {
+    const lower = name.toLowerCase();
+    for (const key in classNames) {
+        const charClass = parseInt(key);
+        if (classNames[charClass].toLowerCase() == lower) {
+            return charClass;
+        }
+    }
+    return Class.ClassUnknown;
+}
 export const statNames = {
     [Stat.StatStrength]: 'Strength',
     [Stat.StatAgility]: 'Agility',
