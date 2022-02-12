@@ -172,6 +172,10 @@ export interface RetributionPaladin {
  * @generated from protobuf message proto.RetributionPaladin.Rotation
  */
 export interface RetributionPaladin_Rotation {
+    /**
+     * @generated from protobuf field: bool consecration = 1;
+     */
+    consecration: boolean;
 }
 /**
  * @generated from protobuf message proto.RetributionPaladin.Options
