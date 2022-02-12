@@ -13,6 +13,8 @@ type Paladin struct {
 
 	currentSeal core.Aura
 
+	consecrationTemplate   core.SimpleSpellTemplate
+	ConsecrationSpell      core.SimpleSpell
 	crusaderStrikeTemplate core.MeleeAbilityTemplate
 	crusaderStrikeSpell    core.ActiveMeleeAbility
 	sealOfBlood            core.SimpleCast
@@ -39,6 +41,7 @@ func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (paladin *Paladin) Init(sim *core.Simulation) {
 	paladin.crusaderStrikeTemplate = paladin.newCrusaderStrikeTemplate(sim)
+	paladin.consecrationTemplate = paladin.newConsecrationTemplate(sim)
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {

@@ -18,5 +18,21 @@ import { SimUI } from '../core/sim_ui.js';
 // These don't need to be in a separate file but it keeps things cleaner.
 
 export const RetributionPaladinRotationConfig = {
-	inputs: [],
+	inputs: [
+		{
+			type: 'boolean' as const, cssClass: 'consecration-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Use Consecration',
+				labelTooltip: 'Use consecration whenever the target does not already have the DoT.',
+				changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getRotation().consecration,
+				setValue: (eventID: EventID, player: Player<Spec.SpecRetributionPaladin>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.consecration = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		}
+	],
 }

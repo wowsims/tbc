@@ -63,8 +63,12 @@ func (ret *RetributionPaladin) OnManaTick(sim *core.Simulation) {
 }
 
 func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
+	if ret.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime) > 0 {
+		return /// wtf?
+	}
+
 	target := sim.GetPrimaryTarget()
-	
+
 	// check if we can use crusader strike
 	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
 		cs := ret.NewCrusaderStrike(sim, target)
@@ -87,7 +91,8 @@ func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 			}
 			return
 		} else {
-			ret.WaitUntil(sim, ret.AutoAttacks.MainhandSwingAt - paladin.TwistWindow)
+			ret.WaitUntil(sim, ret.AutoAttacks.MainhandSwingAt-paladin.TwistWindow)
+			return
 		}
 	} else if tts > ret.SpellGCD() {
 		soc := ret.NewSealOfCommand(sim)
@@ -103,6 +108,18 @@ func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 		return
 	}
 
+	if ret.Rotation.Consecration && (len(ret.ConsecrationSpell.Effects) == 0 || !ret.ConsecrationSpell.Effects[0].DotInput.IsTicking(sim)) {
+		consc := ret.NewConsecration(sim)
+
+		// if we dont have the mana.. do we just wait for regen?
+		// Probably should have logic earlier on to decide if we can even cast this.
+		//  Maybe we should have some pre-logic like elemental shaman to decide how much mana we have to spend ahead of time.
+		if success := consc.Cast(sim); !success {
+			ret.WaitForMana(sim, consc.GetManaCost())
+		}
+
+		return
+	}
 
 	// probably should check for the min of crusader strike CD or SoB expiration
 	nextEventAt := ret.CDReadyAt(paladin.CrusaderStrikeCD)
