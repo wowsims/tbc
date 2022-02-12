@@ -155,13 +155,12 @@ class TalentPicker<SpecType extends Spec> extends Component {
   private readonly tree: TalentTreePicker<SpecType>;
   private readonly pointsDisplay: HTMLElement;
 
-  private longTouchTimer: number;
+  private longTouchTimer?: number;
 
   constructor(parent: HTMLElement, player: Player<SpecType>, config: TalentConfig<SpecType>, tree: TalentTreePicker<SpecType>) {
     super(parent, 'talent-picker-root', document.createElement('a'));
     this.config = config;
     this.tree = tree;
-    this.longTouchTimer = 0;
 
     this.rootElem.style.gridRow = String(this.config.location.rowIdx + 1);
     this.rootElem.style.gridColumn = String(this.config.location.colIdx + 1);
@@ -181,18 +180,25 @@ class TalentPicker<SpecType extends Spec> extends Component {
     });
     this.rootElem.addEventListener('touchstart', event => {
       event.preventDefault();
-      this.longTouchTimer = new Date().getTime();
+      this.longTouchTimer = setTimeout(()=>{
+        this.setPoints(0, true);
+        this.tree.picker.update(TypedEvent.nextEventID());  
+        this.longTouchTimer = undefined;
+      }, 750);
     });
     this.rootElem.addEventListener('touchend', event => {
       event.preventDefault();
-     
-			if (this.tree.picker.frozen)
-				return;
+      if (this.tree.picker.frozen)
+        return;
 
-      let elapsed = new Date().getTime() - this.longTouchTimer;
-
+      if (this.longTouchTimer != undefined) {
+        clearTimeout(this.longTouchTimer);
+        this.longTouchTimer = undefined;
+      } else {
+        return;
+      }
       var newPoints = this.getPoints() + 1;
-      if (elapsed > 1000 || this.config.maxPoints < newPoints) {
+      if (this.config.maxPoints < newPoints) {
         newPoints = 0;
       }
       this.setPoints(newPoints, true);
