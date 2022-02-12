@@ -32,6 +32,7 @@ declare class TalentPicker<SpecType extends Spec> extends Component {
     readonly config: TalentConfig<SpecType>;
     private readonly tree;
     private readonly pointsDisplay;
+    private longTouchTimer?;
     constructor(parent: HTMLElement, player: Player<SpecType>, config: TalentConfig<SpecType>, tree: TalentTreePicker<SpecType>);
     getRow(): number;
     getCol(): number;
