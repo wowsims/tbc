@@ -47,6 +47,7 @@ message PaladinTalents {
 
 message RetributionPaladin {
     message Rotation {
+		bool consecration = 1;
     }
     Rotation rotation = 1;
 

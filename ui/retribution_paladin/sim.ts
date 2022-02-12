@@ -96,7 +96,6 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfMight: TristateEffect.TristateEffectImproved,
-					innervates: 1,
 				}),
 				debuffs: Debuffs.create({
 					bloodFrenzy: true,
@@ -108,32 +107,46 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
 				IconInputs.DrumsOfBattleConsume,
+				IconInputs.BattleChicken,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
+				IconInputs.ArcaneBrilliance,
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
-				IconInputs.LeaderOfThePack,
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.Bloodlust,
-				// IconInputs.WindfuryTotem,
-				// IconInputs.StrengthOfEarthTotem,
-				// IconInputs.UnleashedRage,
-				IconInputs.FerociousInspiration,
+				IconInputs.ManaSpringTotem,
+				IconInputs.WrathOfAirTotem,
+				IconInputs.TotemOfWrath,
+				IconInputs.BattleShout,
 				IconInputs.DraeneiRacialMelee,
-				IconInputs.BraidedEterniumChain
+				IconInputs.LeaderOfThePack,
+				IconInputs.MoonkinAura,
+				IconInputs.FerociousInspiration,
+				IconInputs.TrueshotAura,
+				IconInputs.SanctityAura,
+				IconInputs.BattleChickens,
+				IconInputs.BraidedEterniumChain,
+				IconInputs.EyeOfTheNight,
+				IconInputs.ChainOfTheTwilightOwl,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
+				IconInputs.BlessingOfWisdom,
 				IconInputs.BlessingOfMight,
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
-				// IconInputs.ImprovedHuntersMark,
 				IconInputs.BloodFrenzy,
-				IconInputs.ImprovedSealOfTheCrusader,
+				IconInputs.JudgementOfWisdom,
+				IconInputs.HuntersMark,
+				IconInputs.FaerieFire,
+				IconInputs.SunderArmor,
+				IconInputs.ExposeArmor,
 				IconInputs.CurseOfRecklessness,
+				IconInputs.Misery,
 			],
 			// IconInputs to include in the 'Consumes' section on the settings tab.
 			consumeInputs: [
