@@ -1041,11 +1041,12 @@ class RaidSimResult$Type extends MessageType {
         super("proto.RaidSimResult", [
             { no: 1, name: "raid_metrics", kind: "message", T: () => RaidMetrics },
             { no: 2, name: "encounter_metrics", kind: "message", T: () => EncounterMetrics },
-            { no: 3, name: "logs", kind: "scalar", T: 9 /*ScalarType.STRING*/ }
+            { no: 3, name: "logs", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
+            { no: 4, name: "first_iteration_duration", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { logs: "" };
+        const message = { logs: "", firstIterationDuration: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1064,6 +1065,9 @@ class RaidSimResult$Type extends MessageType {
                     break;
                 case /* string logs */ 3:
                     message.logs = reader.string();
+                    break;
+                case /* double first_iteration_duration */ 4:
+                    message.firstIterationDuration = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1086,6 +1090,9 @@ class RaidSimResult$Type extends MessageType {
         /* string logs = 3; */
         if (message.logs !== "")
             writer.tag(3, WireType.LengthDelimited).string(message.logs);
+        /* double first_iteration_duration = 4; */
+        if (message.firstIterationDuration !== 0)
+            writer.tag(4, WireType.Bit64).double(message.firstIterationDuration);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

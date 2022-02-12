@@ -423,6 +423,13 @@ export interface RaidSimResult {
      * @generated from protobuf field: string logs = 3;
      */
     logs: string;
+    /**
+     * Needed for displaying the timeline properly when the duration +/- option
+     * is used.
+     *
+     * @generated from protobuf field: double first_iteration_duration = 4;
+     */
+    firstIterationDuration: number;
 }
 /**
  * RPC GearList

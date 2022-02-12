@@ -84,7 +84,7 @@ export class Timeline extends ResultComponent {
             return;
         }
         const player = players[0];
-        const duration = this.resultData.result.request.encounter.duration || 1;
+        const duration = this.resultData.result.result.firstIterationDuration || 1;
         let manaLogs = player.manaChangedLogs;
         let dpsLogs = player.dpsLogs;
         let mcdLogs = player.majorCooldownLogs;
