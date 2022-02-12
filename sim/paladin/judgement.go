@@ -21,11 +21,6 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 				SpellSchool:    stats.HolySpellPower,
 				Cooldown:       time.Second * 10,
 				CritMultiplier: paladin.SpellCritMultiplier(1, 0.25), // no idea what the math is for judgment crits
-				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					currentSeal := &paladin.currentSeal
-					currentSeal.Expires = sim.CurrentTime
-					paladin.RemoveAura(sim, currentSeal.ID)
-				},
 			},
 		},
 		// need to do some research on the effects and inputs
@@ -73,19 +68,15 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 				BaseManaCost: JudgementManaCost,
 				ManaCost:     JudgementManaCost,
 				Cooldown:     time.Second * 10,
-				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					currentSeal := &paladin.currentSeal
-					currentSeal.Expires = sim.CurrentTime
-					paladin.RemoveAura(sim, currentSeal.ID)
-				},
 			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				IgnoreHitCheck: true,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					// Need to modify implementation of JudgementOfTheCrusader debuff in core
-					spellEffect.Target.AddAura(sim, core.ImprovedSealOfTheCrusaderAura())
+					aura := core.JudgementOfTheCrusaderAura(sim, float64(paladin.Talents.ImprovedSealOfTheCrusader))
+					spellEffect.Target.AddAura(sim, aura)
+					paladin.currentJudgement = aura
 				},
 			},
 		},
@@ -93,7 +84,6 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 
 	// Reduce mana cost if we have Benediction Talent
 	jotc.ManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
-	jotc.BaseManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)) // Is it necessary to define both these lines?
 
 	return core.NewSimpleSpellTemplate(jotc)
 }
@@ -109,25 +99,31 @@ func (paladin *Paladin) NewJudgementOfTheCrusader(sim *core.Simulation, target *
 }
 
 func (paladin *Paladin) NewJudgement(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	currentSeal := &paladin.currentSeal
-
 	// No seal has even been active, so we can't cast judgement
-	if currentSeal == nil {
+	if paladin.currentSeal.ID == 0 {
 		return nil
 	}
 
 	// Most recent seal has expired so we can't cast judgement
-	if currentSeal.Expires <= sim.CurrentTime {
+	if paladin.currentSeal.Expires <= sim.CurrentTime {
 		return nil
 	}
 
 	// Switch on Seal IDs to return the right judgement
-	switch currentSeal.ID {
+	var spell *core.SimpleSpell
+	switch paladin.currentSeal.ID {
 	case SealOfBloodAuraID:
-		return paladin.NewJudgementOfBlood(sim, target)
+		spell = paladin.NewJudgementOfBlood(sim, target)
 	case SealOfTheCrusaderAuraID:
-		return paladin.NewJudgementOfTheCrusader(sim, target)
+		spell = paladin.NewJudgementOfTheCrusader(sim, target)
 	default:
 		return nil // case if for some reason judgement type isn't programmed yet
 	}
+
+	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		paladin.RemoveAura(sim, paladin.currentSeal.ID)
+		paladin.currentSeal = core.Aura{}
+	}
+
+	return spell
 }

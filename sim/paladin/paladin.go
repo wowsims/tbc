@@ -1,6 +1,8 @@
 package paladin
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -11,8 +13,8 @@ type Paladin struct {
 
 	Talents proto.PaladinTalents
 
-	// maybe I should make this a pointer instead so I can nil check for no active seal
-	currentSeal core.Aura
+	currentSeal      core.Aura
+	currentJudgement core.Aura
 
 	sealOfBlood       core.SimpleCast
 	sealOfCommand     core.SimpleCast
@@ -56,6 +58,14 @@ func (paladin *Paladin) Reset(sim *core.Simulation) {
 	paladin.currentSeal.Expires = sim.CurrentTime
 }
 
+func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
+	if paladin.currentJudgement.ID == 0 || paladin.currentJudgement.Expires >= sim.CurrentTime {
+		return
+	}
+	paladin.currentJudgement.Expires = sim.CurrentTime + time.Second*20
+	ability.Effect.Target.ReplaceAura(sim, paladin.currentJudgement)
+}
+
 // maybe need to add stat dependencies
 func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin {
 	paladin := &Paladin{
@@ -93,7 +103,6 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 	paladin.setupSealOfBlood()
 	paladin.setupSealOfCommand()
 	paladin.setupSealOfTheCrusader()
-
 	paladin.applyTalents()
 
 	return paladin
