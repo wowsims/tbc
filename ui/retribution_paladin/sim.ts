@@ -119,6 +119,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				IconInputs.Bloodlust,
 				IconInputs.ManaSpringTotem,
 				IconInputs.WrathOfAirTotem,
+				IconInputs.WindfuryTotem,
 				IconInputs.TotemOfWrath,
 				IconInputs.BattleShout,
 				IconInputs.DraeneiRacialMelee,
