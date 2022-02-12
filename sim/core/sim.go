@@ -172,6 +172,7 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	}
 
 	sim.runOnce()
+	firstIterationDuration := sim.Duration
 
 	if !sim.Options.Debug {
 		sim.Log = nil
@@ -192,7 +193,8 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 		RaidMetrics:      sim.Raid.GetMetrics(sim.Options.Iterations),
 		EncounterMetrics: sim.encounter.GetMetricsProto(sim.Options.Iterations),
 
-		Logs: logsBuffer.String(),
+		Logs:                   logsBuffer.String(),
+		FirstIterationDuration: firstIterationDuration.Seconds(),
 	}
 
 	// Final progress report
