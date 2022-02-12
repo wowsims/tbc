@@ -145,7 +145,7 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	}
 
 	// Weapon Imbues
-	if character.HasMHWeapon() && !character.HasMHWeaponImbue {
+	if character.HasMHWeapon() && !character.HasMHWeaponImbue && partyBuffs.WindfuryTotemRank == 0 {
 		addImbueStats(character, consumes.MainHandImbue)
 	}
 	if character.HasOHWeapon() {
