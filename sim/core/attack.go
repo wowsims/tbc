@@ -589,26 +589,24 @@ type AutoAttacks struct {
 
 // Options for initializing auto attacks.
 type AutoAttackOptions struct {
-	MainHand        Weapon
-	OffHand         Weapon
-	Ranged          Weapon
-	AutoSwingMelee  bool // If true, core engine will handle calling SwingMelee() for you.
-	AutoSwingRanged bool // If true, core engine will handle calling SwingRanged() for you.
-	DelayOHSwings   bool
-	ReplaceMHSwing  ReplaceMHSwing
+	MainHand       Weapon
+	OffHand        Weapon
+	Ranged         Weapon
+	AutoSwingMelee bool // If true, core engine will handle calling SwingMelee() for you.
+	DelayOHSwings  bool
+	ReplaceMHSwing ReplaceMHSwing
 }
 
 func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOptions) {
 	aa := AutoAttacks{
-		agent:           agent,
-		character:       character,
-		MH:              options.MainHand,
-		OH:              options.OffHand,
-		Ranged:          options.Ranged,
-		AutoSwingMelee:  options.AutoSwingMelee,
-		AutoSwingRanged: options.AutoSwingRanged,
-		DelayOHSwings:   options.DelayOHSwings,
-		ReplaceMHSwing:  options.ReplaceMHSwing,
+		agent:          agent,
+		character:      character,
+		MH:             options.MainHand,
+		OH:             options.OffHand,
+		Ranged:         options.Ranged,
+		AutoSwingMelee: options.AutoSwingMelee,
+		DelayOHSwings:  options.DelayOHSwings,
+		ReplaceMHSwing: options.ReplaceMHSwing,
 		ActiveMeleeAbility: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
 				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack},
@@ -656,10 +654,6 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 			},
 			DisableMetrics: true,
 		},
-	}
-
-	if options.AutoSwingMelee && options.AutoSwingRanged {
-		panic("Cant auto swing both melee and ranged!")
 	}
 
 	aa.IsDualWielding = aa.MH.SwingSpeed != 0 && aa.OH.SwingSpeed != 0
@@ -715,7 +709,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 }
 
 func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
-	if aa.autoSwingCancelled || !aa.AutoSwingMelee && !aa.AutoSwingRanged {
+	if aa.autoSwingCancelled || !aa.AutoSwingMelee {
 		return
 	}
 
@@ -728,13 +722,8 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 	pa.NextActionAt = 0 // First auto is always at 0
 
 	pa.OnAction = func(sim *Simulation) {
-		if aa.AutoSwingMelee {
-			aa.SwingMelee(sim, sim.GetPrimaryTarget())
-			pa.NextActionAt = aa.NextAttackAt()
-		} else {
-			aa.SwingRanged(sim, sim.GetPrimaryTarget())
-			pa.NextActionAt = aa.RangedSwingAt
-		}
+		aa.SwingMelee(sim, sim.GetPrimaryTarget())
+		pa.NextActionAt = aa.NextAttackAt()
 
 		// Cancelled means we made a new one because of a swing speed change.
 		if !pa.cancelled {
@@ -743,11 +732,7 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 			sim.pendingActionPool.Put(pa)
 		}
 	}
-	if aa.AutoSwingMelee {
-		pa.NextActionAt = aa.NextAttackAt()
-	} else {
-		pa.NextActionAt = aa.RangedSwingAt
-	}
+	pa.NextActionAt = aa.NextAttackAt()
 
 	aa.autoSwingAction = pa
 	sim.AddPendingAction(pa)
@@ -920,9 +905,6 @@ func (aa *AutoAttacks) DelayAllUntil(sim *Simulation, readyAt time.Duration) {
 			panic("Ranged swing already in progress!")
 		}
 		aa.RangedSwingAt = readyAt
-		if aa.AutoSwingRanged {
-			autoChanged = true
-		}
 	}
 
 	if autoChanged {
@@ -936,7 +918,6 @@ func (aa *AutoAttacks) DelayRangedUntil(sim *Simulation, readyAt time.Duration) 
 	}
 	if readyAt > aa.RangedSwingAt {
 		aa.RangedSwingAt = readyAt
-		aa.resetAutoSwing(sim)
 	}
 }
 
