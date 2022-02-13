@@ -35,7 +35,6 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			cssClass: 'hunter-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
-				'This sim is newly released and there are likely still bugs. Take the DPS values with a grain of salt and let us know if you spot any issues!',
 			],
 			warnings: [
 				(simUI: IndividualSimUI<Spec.SpecHunter>) => {
