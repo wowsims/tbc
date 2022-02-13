@@ -664,7 +664,7 @@ class Hunter_Options$Type extends MessageType {
             { no: 2, name: "ammo", kind: "enum", T: () => ["proto.Hunter.Options.Ammo", Hunter_Options_Ammo] },
             { no: 3, name: "pet_type", kind: "enum", T: () => ["proto.Hunter.Options.PetType", Hunter_Options_PetType] },
             { no: 4, name: "pet_uptime", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 5, name: "latency_ms", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 5, name: "latency_ms", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
@@ -691,8 +691,8 @@ class Hunter_Options$Type extends MessageType {
                 case /* double pet_uptime */ 4:
                     message.petUptime = reader.double();
                     break;
-                case /* double latency_ms */ 5:
-                    message.latencyMs = reader.double();
+                case /* int32 latency_ms */ 5:
+                    message.latencyMs = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -718,9 +718,9 @@ class Hunter_Options$Type extends MessageType {
         /* double pet_uptime = 4; */
         if (message.petUptime !== 0)
             writer.tag(4, WireType.Bit64).double(message.petUptime);
-        /* double latency_ms = 5; */
+        /* int32 latency_ms = 5; */
         if (message.latencyMs !== 0)
-            writer.tag(5, WireType.Bit64).double(message.latencyMs);
+            writer.tag(5, WireType.Varint).int32(message.latencyMs);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

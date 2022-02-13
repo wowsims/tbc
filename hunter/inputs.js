@@ -58,7 +58,7 @@ export const LatencyMs = {
             'latency-ms-picker',
         ],
         label: 'Latency',
-        labelTooltip: 'Player latency, used for TODO',
+        labelTooltip: 'Player latency, in milliseconds. Adds a delay to actions other than auto shot.',
         changedEvent: (player) => player.specOptionsChangeEmitter,
         getValue: (player) => player.getSpecOptions().latencyMs,
         setValue: (eventID, player, newValue) => {
@@ -90,6 +90,24 @@ export const PetTypeInput = {
         setValue: (eventID, player, newValue) => {
             const newOptions = player.getSpecOptions();
             newOptions.petType = newValue;
+            player.setSpecOptions(eventID, newOptions);
+        },
+    },
+};
+export const PetUptime = {
+    type: 'number',
+    getModObject: (simUI) => simUI.player,
+    config: {
+        extraCssClasses: [
+            'pet-uptime-picker',
+        ],
+        label: 'Pet Uptime (%)',
+        labelTooltip: 'Percent of the fight duration for which your pet will be alive.',
+        changedEvent: (player) => player.specOptionsChangeEmitter,
+        getValue: (player) => player.getSpecOptions().petUptime * 100,
+        setValue: (eventID, player, newValue) => {
+            const newOptions = player.getSpecOptions();
+            newOptions.petUptime = newValue / 100;
             player.setSpecOptions(eventID, newOptions);
         },
     },

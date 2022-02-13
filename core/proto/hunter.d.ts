@@ -307,7 +307,7 @@ export interface Hunter_Options {
      */
     petUptime: number;
     /**
-     * @generated from protobuf field: double latency_ms = 5;
+     * @generated from protobuf field: int32 latency_ms = 5;
      */
     latencyMs: number;
 }

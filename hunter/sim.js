@@ -187,7 +187,8 @@ export class HunterSimUI extends IndividualSimUI {
             otherInputs: {
                 inputs: [
                     HunterInputs.PetTypeInput,
-                    //HunterInputs.LatencyMs,
+                    HunterInputs.PetUptime,
+                    HunterInputs.LatencyMs,
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,
                     OtherInputs.ExposeWeaknessUptime,

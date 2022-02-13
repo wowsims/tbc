@@ -67,6 +67,18 @@ export declare const PetTypeInput: {
         setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => void;
     };
 };
+export declare const PetUptime: {
+    type: "number";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (player: Player<Spec.SpecHunter>) => TypedEvent<void>;
+        getValue: (player: Player<Spec.SpecHunter>) => number;
+        setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => void;
+    };
+};
 export declare const HunterRotationConfig: {
     inputs: ({
         type: "boolean";

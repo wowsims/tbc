@@ -40,6 +40,8 @@ export const DefaultOptions = HunterOptions.create({
     quiverBonus: QuiverBonus.Speed15,
     ammo: Ammo.AdamantiteStinger,
     petType: PetType.Ravager,
+    petUptime: 1,
+    latencyMs: 30,
 });
 export const DefaultConsumes = Consumes.create({
     defaultPotion: Potions.HastePotion,
