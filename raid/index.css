@@ -1890,6 +1890,22 @@ input, select {
   font-weight: 900;
 }
 
+.downbin {
+  mask: url(/tbc/assets/gauge.svg);
+  mask-size: cover;
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+}
+
+.downbinnorm {
+  background-color: white;
+}
+
+.downbinalert {
+  background-color: red;
+}
+
 :root {
   --theme-color-primary: DarkSlateGrey;
   --theme-color-background: DarkSlateGrey;

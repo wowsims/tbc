@@ -62,6 +62,34 @@ export class SimUI extends Component {
                 }
             });
         }
+        const downloadBinary = document.createElement('span');
+        // downloadBinary.src = "/tbc/assets/gauge.svg"
+        downloadBinary.classList.add('downbin');
+        downloadBinary.addEventListener('click', event => {
+            window.open('https://github.com/wowsims/tbc/releases', '_blank');
+        });
+        if (document.location.href.includes("localhost")) {
+            fetch(document.location.protocol + "//" + document.location.host + "/version").then(resp => {
+                resp.json().then((versionInfo) => {
+                    if (versionInfo.outdated == 2) {
+                        tippy(downloadBinary, {
+                            'content': 'Newer version of simulator available for download',
+                            'allowHTML': true,
+                        });
+                        downloadBinary.classList.add('downbinalert');
+                        this.addToolbarItem(downloadBinary);
+                    }
+                });
+            });
+        }
+        else {
+            tippy(downloadBinary, {
+                'content': 'Download simulator for faster simulating',
+                'allowHTML': true,
+            });
+            downloadBinary.classList.add('downbinnorm');
+            this.addToolbarItem(downloadBinary);
+        }
     }
     addAction(name, cssClass, actFn) {
         const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0];
