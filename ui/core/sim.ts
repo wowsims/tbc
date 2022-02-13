@@ -275,6 +275,11 @@ export class Sim {
 		return enchants;
 	}
 
+	// ID can be the formula ID OR the effect ID.
+	getEnchantFlexible(id: number): Enchant | null {
+		return Object.values(this.enchants).find(enchant => enchant.id == id || enchant.effectId == id) || null;
+	}
+
 	getGems(socketColor: GemColor | undefined): Array<Gem> {
 		let gems = Object.values(this.gems);
 		if (socketColor) {
