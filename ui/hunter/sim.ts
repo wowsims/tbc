@@ -170,15 +170,16 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
-				IconInputs.SunderArmor,
-				IconInputs.ExposeArmor,
-				IconInputs.CurseOfRecklessness,
-				IconInputs.FaerieFire,
+				IconInputs.BloodFrenzy,
 				IconInputs.ImprovedSealOfTheCrusader,
 				IconInputs.JudgementOfWisdom,
 				IconInputs.HuntersMark,
-				IconInputs.BloodFrenzy,
+				IconInputs.FaerieFire,
+				IconInputs.SunderArmor,
+				IconInputs.ExposeArmor,
+				IconInputs.CurseOfRecklessness,
 				IconInputs.CurseOfElements,
+				IconInputs.Misery,
 			],
 			// IconInputs to include in the 'Consumes' section on the settings tab.
 			consumeInputs: [
