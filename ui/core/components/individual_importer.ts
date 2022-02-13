@@ -91,8 +91,24 @@ export class IndividualImporter<SpecType extends Spec> extends Component {
 
 				const talentsStr = (importJson['talents'] as string) || '';
 
+				const missingEnchants: Array<number> = [];
+
 				const equipmentSpec = EquipmentSpec.fromJson(importJson['gear']);
+				equipmentSpec.items.forEach(item => {
+					if (item.enchant) {
+						const enchant = this.simUI.sim.getEnchantFlexible(item.enchant);
+						if (enchant) {
+							item.enchant = enchant.id;
+						} else {
+							missingEnchants.push(item.enchant);
+						}
+					}
+				});
 				const gear = this.simUI.sim.lookupEquipmentSpec(equipmentSpec);
+
+				const expectedItemIds = (importJson['gear'].items as Array<any>).map(item => item.id) as Array<number>;
+				const foundItemIds = gear.asSpec().items.map(item => item.id);
+				const missingItems = expectedItemIds.filter(expectedId => !foundItemIds.includes(expectedId));
 
 				// Now update settings using the parsed values.
 				const eventID = TypedEvent.nextEventID();
@@ -103,6 +119,14 @@ export class IndividualImporter<SpecType extends Spec> extends Component {
 				});
 
 				$('#individualImporter').bPopup().close();
+
+				if (missingItems.length == 0 && missingEnchants.length == 0) {
+					alert('Import successful!');
+				} else {
+					alert('Import successful, but the following IDs were not found in the sim database:' + 
+							(missingItems.length == 0 ? '' : '\n\nItems: ' + missingItems.join(', ')) +
+							(missingEnchants.length == 0 ? '' : '\n\nEnchants: ' + missingEnchants.join(', ')));
+				}
 			} catch (error) {
 				alert('Error importing from addon: ' + error);
 			}
