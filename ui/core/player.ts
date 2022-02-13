@@ -713,23 +713,32 @@ export class Player<SpecType extends Spec> {
 			}
 
 			let rotation = this.specTypeFunctions.rotationFromPlayer(proto);
+			let options = this.specTypeFunctions.optionsFromPlayer(proto);
 			// TODO: Remove this on 2/17/2022 (1 month).
 			if (this.spec == Spec.SpecElementalShaman) {
 				const eleRotation = rotation as SpecRotation<Spec.SpecElementalShaman>;
-				const options = this.specTypeFunctions.optionsFromPlayer(proto) as SpecOptions<Spec.SpecElementalShaman>;
+				const eleOptions = options as SpecOptions<Spec.SpecElementalShaman>;
 				if (!eleRotation.totems) {
 					eleRotation.totems = ShamanTotems.create();
 				}
-				if (options.manaSpringTotem) {
+				if (eleOptions.manaSpringTotem) {
 					eleRotation.totems!.water = WaterTotem.ManaSpringTotem;
 				}
-				if (options.totemOfWrath) {
+				if (eleOptions.totemOfWrath) {
 					eleRotation.totems!.fire = FireTotem.TotemOfWrath;
 				}
-				if (options.wrathOfAirTotem) {
+				if (eleOptions.wrathOfAirTotem) {
 					eleRotation.totems!.air = AirTotem.WrathOfAirTotem;
 				}
 				rotation = eleRotation as SpecRotation<SpecType>;
+			}
+
+			if (this.spec == Spec.SpecHunter) {
+				const hunterOptions = options as SpecOptions<Spec.SpecHunter>;
+				if (hunterOptions.petUptime == 0) {
+					hunterOptions.petUptime = 1;
+				}
+				options = hunterOptions as SpecOptions<SpecType>;
 			}
 
 			this.setName(eventID, proto.name);
@@ -742,7 +751,7 @@ export class Player<SpecType extends Spec> {
 			this.setTalentsString(eventID, proto.talentsString);
 			this.setRotation(eventID, rotation);
 			this.setTalents(eventID, this.specTypeFunctions.talentsFromPlayer(proto));
-			this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
+			this.setSpecOptions(eventID, options);
 		});
 	}
 

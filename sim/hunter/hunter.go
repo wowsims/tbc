@@ -46,8 +46,10 @@ type Hunter struct {
 	killCommandBlocked      bool                // True while Steady Shot is casting, to prevent KC.
 	killCommandAction       *core.PendingAction // Action to use KC when its comes off CD.
 
+	latency     time.Duration
 	timeToWeave time.Duration
 
+	weaveStartTime   time.Duration
 	raptorStrikeCost float64 // Cached mana cost of raptor strike.
 
 	nextAction   int
@@ -72,6 +74,7 @@ type Hunter struct {
 	steadyDPS          float64
 	steadyShotCastTime float64
 	multiShotCastTime  float64
+	arcaneShotCastTime float64
 	useMultiForCatchup bool
 
 	aimedShotTemplate core.MeleeAbilityTemplate
@@ -169,6 +172,7 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.rangedSwingSpeed = 0
 	hunter.manaSpentPerSecondAtFirstAspectSwap = 0
 	hunter.permaHawk = false
+	hunter.weaveStartTime = time.Duration(float64(sim.Duration) * hunter.Rotation.PercentWeaved)
 
 	target := sim.GetPrimaryTarget()
 	impHuntersMark := hunter.Talents.ImprovedHuntersMark
@@ -186,7 +190,8 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		Options:   *hunterOptions.Options,
 		Rotation:  *hunterOptions.Rotation,
 
-		timeToWeave: time.Millisecond * time.Duration(hunterOptions.Rotation.TimeToWeaveMs),
+		latency:     time.Millisecond * time.Duration(hunterOptions.Options.LatencyMs),
+		timeToWeave: time.Millisecond * time.Duration(hunterOptions.Rotation.TimeToWeaveMs+hunterOptions.Options.LatencyMs),
 	}
 	hunter.hasGronnstalker2Pc = ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 2)
 

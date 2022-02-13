@@ -90,8 +90,12 @@ func (hunter *Hunter) NewMultiShot(sim *core.Simulation) core.SimpleCast {
 	hunter.multiShotCast = hunter.multiShotCastTemplate
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hunter.multiShotCast.CastTime = time.Duration(float64(time.Millisecond*500) / hunter.RangedSwingSpeed())
+	hunter.multiShotCast.CastTime = hunter.MultiShotCastTime()
 
 	hunter.multiShotCast.Init(sim)
 	return hunter.multiShotCast
+}
+
+func (hunter *Hunter) MultiShotCastTime() time.Duration {
+	return time.Duration(float64(time.Millisecond*500)/hunter.RangedSwingSpeed()) + hunter.latency
 }

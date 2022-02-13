@@ -583,7 +583,8 @@ type AutoAttacks struct {
 	previousMHSwingAt time.Duration
 
 	// PendingAction which handles auto attacks.
-	autoSwingAction *PendingAction
+	autoSwingAction    *PendingAction
+	autoSwingCancelled bool
 }
 
 // Options for initializing auto attacks.
@@ -696,6 +697,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 	}
 
 	aa.autoSwingAction = nil
+	aa.autoSwingCancelled = false
 	aa.resetAutoSwing(sim)
 
 	// Can precompute this.
@@ -713,7 +715,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 }
 
 func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
-	if !aa.AutoSwingMelee && !aa.AutoSwingRanged {
+	if aa.autoSwingCancelled || !aa.AutoSwingMelee && !aa.AutoSwingRanged {
 		return
 	}
 
@@ -749,6 +751,16 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 
 	aa.autoSwingAction = pa
 	sim.AddPendingAction(pa)
+}
+
+// Stops the auto swing action for the rest of the iteration. Used for pets
+// after being disabled.
+func (aa *AutoAttacks) CancelAutoSwing(sim *Simulation) {
+	if aa.autoSwingAction != nil {
+		aa.autoSwingAction.Cancel(sim)
+		aa.autoSwingAction = nil
+		aa.autoSwingCancelled = true
+	}
 }
 
 // The amount of time between two MH swings.

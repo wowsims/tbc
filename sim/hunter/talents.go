@@ -374,6 +374,9 @@ func (hunter *Hunter) applyGoForTheThroat() {
 				if !hitEffect.IsRanged() || hitEffect.HitType != core.MeleeHitTypeCrit {
 					return
 				}
+				if !hunter.pet.IsEnabled() {
+					return
+				}
 				hunter.pet.AddFocus(sim, amount, core.ActionID{SpellID: 34954})
 			},
 		}
