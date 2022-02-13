@@ -166,6 +166,10 @@ message RaidSimResult {
 		EncounterMetrics encounter_metrics = 2;
 
 		string logs = 3;
+
+		// Needed for displaying the timeline properly when the duration +/- option
+		// is used.
+		double first_iteration_duration = 4;
 }
 
 // RPC GearList
