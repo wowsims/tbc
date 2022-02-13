@@ -4,14 +4,18 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const JudgementManaCost = 147.0
+const JudgementCDTime = time.Second * 10
 
 var JudgementCD = core.NewCooldownID()
 var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: JudgementCD}
 
+// apparently this uses physical hit mechanics and/or ranged hit mechanics?
+// should gain from 2hand specialization damage, but doesn't until we refactor it to melee/ranged physical ability
 func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	job := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -19,7 +23,6 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 				ActionID:       JudgementOfBloodActionID,
 				Character:      &paladin.Character,
 				SpellSchool:    stats.HolySpellPower,
-				Cooldown:       time.Second * 10,
 				CritMultiplier: paladin.SpellCritMultiplier(1, 0.25), // no idea what the math is for judgment crits
 			},
 		},
@@ -41,7 +44,9 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 
 	// Reduce mana cost if we have Benediction Talent
 	job.ManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
-	job.BaseManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)) // Is it necessary to define both these lines?
+
+	// Reduce CD if we have Improved Judgement Talent
+	job.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
 	return core.NewSimpleSpellTemplate(job)
 }
@@ -51,6 +56,13 @@ func (paladin *Paladin) NewJudgementOfBlood(sim *core.Simulation, target *core.T
 	paladin.judgementOfBloodTemplate.Apply(job)
 
 	job.Effect.Target = target
+
+	// Check if target is satisfies Crusade Talent criteria and add % dmg increase
+	if target.MobType == proto.MobType_MobTypeDemon || target.MobType == proto.MobType_MobTypeHumanoid ||
+		target.MobType == proto.MobType_MobTypeUndead || target.MobType == proto.MobType_MobTypeElemental {
+		job.Effect.StaticDamageMultiplier += (0.01 * float64(paladin.Talents.Crusade))
+	}
+
 	job.Init(sim)
 
 	return job
@@ -84,6 +96,9 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 
 	// Reduce mana cost if we have Benediction Talent
 	jotc.ManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
+
+	// Reduce CD if we have Improved Judgement Talent
+	jotc.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
 	return core.NewSimpleSpellTemplate(jotc)
 }

@@ -55,5 +55,13 @@ func (paladin *Paladin) NewCrusaderStrike(sim *core.Simulation, target *core.Tar
 	paladin.crusaderStrikeTemplate.Apply(cs)
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	cs.Effects[0].Target = target
+
+	// Maybe this is faster in the future? But we need to check target everytime so permanent aura might work just as well
+	// Check if target is satisfies Crusade Talent criteria and add % dmg increase
+	// if target.MobType == proto.MobType_MobTypeDemon || target.MobType == proto.MobType_MobTypeHumanoid ||
+	// 	target.MobType == proto.MobType_MobTypeUndead || target.MobType == proto.MobType_MobTypeElemental {
+	// 	cs.Effects[0].StaticDamageMultiplier += (0.01 * float64(paladin.Talents.Crusade))
+	// }
+
 	return cs
 }
