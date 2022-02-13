@@ -57,9 +57,8 @@ func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 	}
 
 	// Swap aspects or keep up sting if needed.
-	// TODO: Remove the return here
-	if hunter.tryUsePrioGCD(sim) {
-		return
+	if hunter.nextActionAt == OptionNone {
+		hunter.tryUsePrioGCD(sim)
 	}
 
 	hunter.rotation(sim, false)
@@ -267,14 +266,26 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 	// First prio is swapping aspect if necessary.
 	currentMana := hunter.CurrentManaPercent()
-	if hunter.aspectOfTheViper && currentMana > hunter.Rotation.ViperStopManaPercent {
-		aspect := hunter.NewAspectOfTheHawk(sim)
-		aspect.StartCast(sim)
-		return true
-	} else if !hunter.aspectOfTheViper && currentMana < hunter.Rotation.ViperStartManaPercent {
-		aspect := hunter.NewAspectOfTheViper(sim)
-		aspect.StartCast(sim)
-		return true
+	if hunter.aspectOfTheViper {
+		if !hunter.permaHawk && hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
+			hunter.permaHawk = true
+		}
+		if hunter.permaHawk || currentMana > hunter.Rotation.ViperStopManaPercent {
+			aspect := hunter.NewAspectOfTheHawk(sim)
+			aspect.StartCast(sim)
+			return true
+		}
+	} else if !hunter.aspectOfTheViper && !hunter.permaHawk && currentMana < hunter.Rotation.ViperStartManaPercent {
+		if hunter.manaSpentPerSecondAtFirstAspectSwap == 0 {
+			hunter.manaSpentPerSecondAtFirstAspectSwap = (hunter.Metrics.ManaSpent - hunter.Metrics.ManaGained) / sim.CurrentTime.Seconds()
+		}
+		if !hunter.permaHawk && hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
+			hunter.permaHawk = true
+		} else {
+			aspect := hunter.NewAspectOfTheViper(sim)
+			aspect.StartCast(sim)
+			return true
+		}
 	}
 
 	target := sim.GetPrimaryTarget()

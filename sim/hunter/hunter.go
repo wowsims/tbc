@@ -60,6 +60,10 @@ type Hunter struct {
 	avgMultiDmg  float64
 	avgArcaneDmg float64
 
+	// Used for deciding when we can use hawk for the rest of the fight.
+	manaSpentPerSecondAtFirstAspectSwap float64
+	permaHawk                           bool
+
 	// Cached values for adaptive rotation calcs.
 	rangedSwingSpeed   float64
 	rangedWindup       float64
@@ -163,6 +167,8 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.nextAction = OptionNone
 	hunter.nextActionAt = 0
 	hunter.rangedSwingSpeed = 0
+	hunter.manaSpentPerSecondAtFirstAspectSwap = 0
+	hunter.permaHawk = false
 
 	target := sim.GetPrimaryTarget()
 	impHuntersMark := hunter.Talents.ImprovedHuntersMark
