@@ -172,7 +172,7 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.rangedSwingSpeed = 0
 	hunter.manaSpentPerSecondAtFirstAspectSwap = 0
 	hunter.permaHawk = false
-	hunter.weaveStartTime = time.Duration(float64(sim.Duration) * hunter.Rotation.PercentWeaved)
+	hunter.weaveStartTime = time.Duration(float64(sim.Duration) * (1 - hunter.Rotation.PercentWeaved))
 
 	target := sim.GetPrimaryTarget()
 	impHuntersMark := hunter.Talents.ImprovedHuntersMark
