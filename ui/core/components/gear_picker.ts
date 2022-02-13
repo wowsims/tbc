@@ -17,8 +17,8 @@ import { Player } from '/tbc/core/player.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
-import { Component } from './component.js';
 import { CloseButton } from './close_button.js';
+import { Component } from './component.js';
 import { makePhaseSelector } from './other_inputs.js';
 import { makeShow1hWeaponsSelector } from './other_inputs.js';
 import { makeShow2hWeaponsSelector } from './other_inputs.js';
@@ -192,6 +192,12 @@ class SelectorModal extends Component {
 
     this.tabsElem = this.rootElem.getElementsByClassName('selector-modal-tabs')[0] as HTMLElement;
     this.contentElem = this.rootElem.getElementsByClassName('selector-modal-tab-content')[0] as HTMLElement;
+
+		const computedStyles = window.getComputedStyle(parent);
+		this.rootElem.style.setProperty('--main-text-color', computedStyles.getPropertyValue('--main-text-color').trim());
+		this.rootElem.style.setProperty('--theme-color-primary', computedStyles.getPropertyValue('--theme-color-primary').trim());
+		this.rootElem.style.setProperty('--theme-color-background', computedStyles.getPropertyValue('--theme-color-background').trim());
+		this.rootElem.style.setProperty('--theme-color-background-raw', computedStyles.getPropertyValue('--theme-color-background-raw').trim());
 
 		this.setData(slot, equippedItem, eligibleItems, eligibleEnchants);
   }

@@ -13,10 +13,12 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { StrengthOfEarthType } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js'
+import { WeaponImbue } from '/tbc/core/proto/common.js'
 import { Player } from '/tbc/core/player.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Hunter, Hunter_Rotation as HunterRotation, Hunter_Options as HunterOptions } from '/tbc/core/proto/hunter.js';
 
@@ -34,6 +36,22 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
 				'This sim is newly released and there are likely still bugs. Take the DPS values with a grain of salt and let us know if you spot any issues!',
+			],
+			warnings: [
+				(simUI: IndividualSimUI<Spec.SpecHunter>) => {
+					return {
+						updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter, simUI.player.consumesChangeEmitter, simUI.player.getParty()!.buffsChangeEmitter]),
+						shouldDisplay: () => {
+							const rotation = simUI.player.getRotation();
+							const isMeleeWeaving = rotation.meleeWeave && rotation.percentWeaved > 0;
+
+							return !isMeleeWeaving &&
+									simUI.player.getConsumes().mainHandImbue != WeaponImbue.WeaponImbueUnknown &&
+									(simUI.player.getParty() != null && simUI.player.getParty()!.getBuffs().windfuryTotemRank > 0);
+						},
+						getContent: () => 'Melee weaving is off but Windfury Totem is on, so your main hand imbue is being ignored without any benefit.',
+					};
+				},
 			],
 
 			// All stats for which EP should be calculated.

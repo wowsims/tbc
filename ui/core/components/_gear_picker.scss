@@ -75,7 +75,8 @@
 	@include vertical-horizontal-center;
 	min-width: 50%;
 	padding: 8px;
-	background-color: #666;
+	background-color: #111218;
+	border: 1px solid var(--theme-color-primary);
 	border-radius: 6px;
   max-width: 100%;
 }
@@ -141,13 +142,13 @@
   align-items: center;
   padding: 2px;
 	text-shadow: 2px 2px 3px black;
-  background: #666;
+	background-color: #111218;
 }
 .selector-modal-list-item.hidden {
 	display: none;
 }
 .selector-modal-list-item.odd {
-  background: #444;
+  background: #222;
 }
 .selector-modal-list-item:hover {
   background: #333;
