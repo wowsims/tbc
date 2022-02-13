@@ -112,7 +112,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 
 	if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectImproved {
 		character.AddPermanentAura(func(sim *Simulation) Aura {
-			return ImprovedSanctityAura()
+			return ImprovedSanctityAura(sim, 2)
 		})
 	}
 
@@ -350,18 +350,30 @@ func FerociousInspirationAura(numBMHunters int32) Aura {
 
 var ImprovedSanctityAuraID = NewAuraID()
 
-func ImprovedSanctityAura() Aura {
+func ImprovedSanctityAura(sim *Simulation, level float64) Aura {
 	return Aura{
 		ID:       ImprovedSanctityAuraID,
 		ActionID: ActionID{SpellID: 31870},
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-			hitEffect.DamageMultiplier *= 1.02
+			// unsure if this scaling should be additive or multiplicative
+			// scale 10% for holy damange
+			if ability.SpellSchool == stats.HolySpellPower {
+				hitEffect.DamageMultiplier *= 1.1
+			}
+			// scale additional 2% for all damage
+			hitEffect.DamageMultiplier *= 1 + 0.01*level
 		},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			spellEffect.DamageMultiplier *= 1.02
+			if spellCast.SpellSchool == stats.HolySpellPower {
+				spellEffect.DamageMultiplier *= 1.1
+			}
+			spellEffect.DamageMultiplier *= 1 + 0.01*level
 		},
 		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			*tickDamage *= 1.02
+			if spellCast.SpellSchool == stats.HolySpellPower {
+				*tickDamage *= 1.1
+			}
+			*tickDamage *= 1 + 0.01*level
 		},
 	}
 }

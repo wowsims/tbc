@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -48,6 +47,9 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 	// Reduce CD if we have Improved Judgement Talent
 	job.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
+	// Increase Judgement Crit Chance if we have Fanaticism talent
+	job.Effect.BonusSpellCritRating = 3 * core.SpellCritRatingPerCritChance * float64(paladin.Talents.Fanaticism)
+
 	return core.NewSimpleSpellTemplate(job)
 }
 
@@ -56,12 +58,6 @@ func (paladin *Paladin) NewJudgementOfBlood(sim *core.Simulation, target *core.T
 	paladin.judgementOfBloodTemplate.Apply(job)
 
 	job.Effect.Target = target
-
-	// Check if target is satisfies Crusade Talent criteria and add % dmg increase
-	if target.MobType == proto.MobType_MobTypeDemon || target.MobType == proto.MobType_MobTypeHumanoid ||
-		target.MobType == proto.MobType_MobTypeUndead || target.MobType == proto.MobType_MobTypeElemental {
-		job.Effect.StaticDamageMultiplier += (0.01 * float64(paladin.Talents.Crusade))
-	}
 
 	job.Init(sim)
 
@@ -136,9 +132,28 @@ func (paladin *Paladin) NewJudgement(sim *core.Simulation, target *core.Target) 
 	}
 
 	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		paladin.sanctifiedJudgement(sim, cast)
 		paladin.RemoveAura(sim, paladin.currentSeal.ID)
 		paladin.currentSeal = core.Aura{}
 	}
 
 	return spell
+}
+
+// Helper function to implement Sanctified Seals talent
+func (paladin *Paladin) sanctifiedJudgement(sim *core.Simulation, cast *core.Cast) {
+	if paladin.Talents.SanctifiedJudgement == 0 {
+		return
+	}
+
+	var proc float64
+	if paladin.Talents.SanctifiedJudgement == 3 {
+		proc = 1
+	} else {
+		proc = 0.33 * float64(paladin.Talents.SanctifiedJudgement)
+	}
+
+	if sim.RandomFloat("Sanctified Judgement") < proc {
+		paladin.AddMana(sim, 0.8*cast.ManaCost, cast.ActionID, false)
+	}
 }

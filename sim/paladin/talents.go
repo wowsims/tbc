@@ -12,6 +12,7 @@ func (paladin *Paladin) applyTalents() {
 	paladin.applyConviction()
 	paladin.applyCrusade()
 	paladin.applyTwoHandedWeaponSpecialization()
+	paladin.applySanctityAura()
 	paladin.applyVengeance()
 	paladin.applySanctifiedSeals()
 	paladin.applyPrecision()
@@ -81,6 +82,19 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
 			}
 		})
 	}
+}
+
+// Apply as permanent aura only to self for now
+// Maybe should put this in the partybuff section instead at some point
+func (paladin *Paladin) applySanctityAura() {
+	if !paladin.Talents.SanctityAura {
+		return
+	}
+
+	paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.ImprovedSanctityAura(sim, float64(paladin.Talents.ImprovedSanctityAura))
+	})
+
 }
 
 var VengeanceAuraID = core.NewAuraID()
