@@ -92,7 +92,7 @@ func (hunter *Hunter) lazyRotation(sim *core.Simulation, followsRangedAuto bool)
 	gcdReady := gcdAt <= sim.CurrentTime
 
 	canWeave := hunter.Rotation.MeleeWeave &&
-		sim.GetRemainingDurationPercent() < hunter.Rotation.PercentWeaved &&
+		sim.CurrentTime >= hunter.weaveStartTime &&
 		hunter.AutoAttacks.MeleeSwingsReady(sim)
 	if canWeave && !shootReady && !gcdReady {
 		hunter.nextAction = OptionWeave
@@ -119,7 +119,7 @@ func (hunter *Hunter) lazyRotation(sim *core.Simulation, followsRangedAuto bool)
 	canArcane := hunter.Rotation.UseArcaneShot && !hunter.IsOnCD(ArcaneShotCooldownID, sim.CurrentTime)
 	if canArcane && ssWouldClip {
 		hunter.nextAction = OptionArcane
-		hunter.nextActionAt = gcdAt
+		hunter.nextActionAt = gcdAt + hunter.latency
 		return
 	}
 
@@ -151,8 +151,9 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 		hunter.weaveDPS = hunter.avgWeaveDmg * weaveRate
 		hunter.steadyDPS = hunter.avgSteadyDmg * gcdRate
 
-		hunter.steadyShotCastTime = 1.5 / rangedSwingSpeed
-		hunter.multiShotCastTime = 0.5 / rangedSwingSpeed
+		hunter.steadyShotCastTime = hunter.SteadyShotCastTime().Seconds()
+		hunter.multiShotCastTime = hunter.MultiShotCastTime().Seconds()
+		hunter.arcaneShotCastTime = hunter.latency.Seconds()
 
 		// https://diziet559.github.io/rotationtools/#rotation-details
 		// When off CD, multi always has higher DPS than SS. Sometimes we want to
@@ -202,14 +203,14 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 	// Dmg from choosing Arcane Shot next.
 	canArcane := hunter.Rotation.UseArcaneShot && hunter.CDReadyAt(ArcaneShotCooldownID) <= hunter.NextGCDAt()
 	if canArcane {
-		arcaneShootDelay := core.MaxFloat(0, gcdAt-shootAt)
+		arcaneShootDelay := core.MaxFloat(0, (gcdAt+hunter.arcaneShotCastTime)-shootAt)
 		dmgResults[OptionArcane] = hunter.avgArcaneDmg - (hunter.shootDPS * arcaneShootDelay)
 	}
 
 	// Only allow weaving if autos and GCD will both be on CD. Otherwise it will
 	// get used even when it would cause delays to them.
 	canWeave := hunter.Rotation.MeleeWeave &&
-		sim.GetRemainingDurationPercent() < hunter.Rotation.PercentWeaved &&
+		sim.CurrentTime >= hunter.weaveStartTime &&
 		weaveAt < shootAt &&
 		weaveAt < gcdAt
 	if canWeave {
@@ -239,7 +240,7 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 		weaveAtDuration,
 		gcdAtDuration,
 		gcdAtDuration,
-		gcdAtDuration,
+		gcdAtDuration + hunter.latency,
 	}
 
 	bestOption := 0

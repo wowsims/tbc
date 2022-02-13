@@ -124,7 +124,7 @@ message Hunter {
 
 			double pet_uptime = 4;
 
-			double latency_ms = 5;
+			int32 latency_ms = 5;
     }
     Options options = 3;
 }
