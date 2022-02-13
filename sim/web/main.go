@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -29,14 +30,44 @@ func init() {
 	sim.RegisterAll()
 }
 
+var (
+	Version string
+)
+
 func main() {
+	if Version == "" {
+		Version = "development"
+	}
 	var useFS = flag.Bool("usefs", false, "Use local file system for client files. Set to true during development.")
 	var wasm = flag.Bool("wasm", false, "Use wasm for sim instead of web server apis. Can only be used with usefs=true")
 	var simName = flag.String("sim", "", "Name of simulator to launch (ex: balance_druid, elemental_shaman, etc)")
 	var host = flag.String("host", ":3333", "URL to host the interface on.")
 	var launch = flag.Bool("launch", true, "auto launch browser")
+	var skipVersionCheck = flag.Bool("nvc", false, "set true to skip version check")
 
 	flag.Parse()
+
+	fmt.Printf("Version: %s\n", Version)
+	if !*skipVersionCheck {
+		go func() {
+			resp, err := http.Get("https://api.github.com/repos/wowsims/tbc/releases/latest")
+			if err != nil {
+				return
+			}
+
+			body, err := ioutil.ReadAll(resp.Body)
+
+			result := struct {
+				Tag string `json:"tag_name"`
+				URL string `json:"html_url"`
+			}{}
+			json.Unmarshal(body, &result)
+
+			if result.Tag != Version {
+				fmt.Printf("New version of simulator available: %s\n", result.URL)
+			}
+		}()
+	}
 
 	setupAsyncServer()
 	runServer(*useFS, *host, *launch, *simName, *wasm, bufio.NewReader(os.Stdin))
