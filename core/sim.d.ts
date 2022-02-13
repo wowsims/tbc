@@ -60,6 +60,7 @@ export declare class Sim {
     statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult>;
     getItems(slot: ItemSlot | undefined): Array<Item>;
     getEnchants(slot: ItemSlot | undefined): Array<Enchant>;
+    getEnchantFlexible(id: number): Enchant | null;
     getGems(socketColor: GemColor | undefined): Array<Gem>;
     getMatchingGems(socketColor: GemColor): Array<Gem>;
     getPhase(): number;
