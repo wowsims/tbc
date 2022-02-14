@@ -174,7 +174,7 @@ func JudgementOfWisdomAura(sim *Simulation) Aura {
 		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 			if ability.ActionID.SpellID == 35395 {
 				aura.Expires = sim.CurrentTime + time.Second*20
-				ability.Effect.Target.ReplaceAura(sim, aura)
+				hitEffect.Target.ReplaceAura(sim, aura)
 			}
 			if ability.IsPhantom {
 				return
@@ -207,7 +207,7 @@ func JudgementOfTheCrusaderAura(sim *Simulation, level float64) Aura {
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 			if ability.ActionID.SpellID == 35395 {
 				aura.Expires = sim.CurrentTime + time.Second*20
-				ability.Effect.Target.ReplaceAura(sim, aura)
+				hitEffect.Target.ReplaceAura(sim, aura)
 			}
 			hitEffect.BonusCritRating += bonusMCrit
 		},
