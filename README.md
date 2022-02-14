@@ -12,6 +12,8 @@ Live sims:
 This project has dependencies on Go >=1.16, protobuf-compiler and the corresponding Go plugins, and node >= 14.0.
 
 ## Ubuntu
+Do not use apt to install any dependencies, the versions they install are all too old.
+Script below will curl latest versions and install them.
 ```sh
 # Standard Go installation script
 curl -O https://dl.google.com/go/go1.16.10.linux-amd64.tar.gz
