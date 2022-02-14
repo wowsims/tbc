@@ -192,8 +192,13 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 
 		latency:     time.Millisecond * time.Duration(hunterOptions.Options.LatencyMs),
 		timeToWeave: time.Millisecond * time.Duration(hunterOptions.Rotation.TimeToWeaveMs+hunterOptions.Options.LatencyMs),
+
+		hasGronnstalker2Pc: ItemSetGronnstalker.CharacterHasSetBonus(&character, 2),
 	}
-	hunter.hasGronnstalker2Pc = ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 2)
+
+	if hunter.Rotation.PercentWeaved <= 0 {
+		hunter.Rotation.Weave = proto.Hunter_Rotation_WeaveNone
+	}
 
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
 	hunter.EnableManaBar()

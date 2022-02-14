@@ -91,7 +91,8 @@ func (hunter *Hunter) lazyRotation(sim *core.Simulation, followsRangedAuto bool)
 	gcdAt := hunter.NextGCDAt()
 	gcdReady := gcdAt <= sim.CurrentTime
 
-	canWeave := hunter.Rotation.MeleeWeave &&
+	canWeave := hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveNone &&
+		(hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveRaptorOnly || !hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime)) &&
 		sim.CurrentTime >= hunter.weaveStartTime &&
 		hunter.AutoAttacks.MeleeSwingsReady(sim)
 	if canWeave && !shootReady && !gcdReady {
@@ -129,11 +130,15 @@ func (hunter *Hunter) lazyRotation(sim *core.Simulation, followsRangedAuto bool)
 
 func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto bool) {
 	gcdAtDuration := core.MaxDuration(sim.CurrentTime, hunter.NextGCDAt())
-	weaveAtDuration := core.MaxDuration(sim.CurrentTime, hunter.AutoAttacks.MeleeSwingsReadyAt())
 	shootAtDuration := core.MaxDuration(sim.CurrentTime, hunter.AutoAttacks.RangedSwingAt)
+	weaveAtDuration := core.MaxDuration(sim.CurrentTime, hunter.AutoAttacks.MeleeSwingsReadyAt())
+	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveRaptorOnly {
+		weaveAtDuration = core.MaxDuration(weaveAtDuration, hunter.CDReadyAt(RaptorStrikeCooldownID))
+	}
+
 	gcdAt := gcdAtDuration.Seconds()
-	weaveAt := weaveAtDuration.Seconds()
 	shootAt := shootAtDuration.Seconds()
+	weaveAt := weaveAtDuration.Seconds()
 
 	rangedSwingSpeed := hunter.RangedSwingSpeed()
 	if rangedSwingSpeed != hunter.rangedSwingSpeed {
@@ -209,7 +214,7 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 
 	// Only allow weaving if autos and GCD will both be on CD. Otherwise it will
 	// get used even when it would cause delays to them.
-	canWeave := hunter.Rotation.MeleeWeave &&
+	canWeave := hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveNone &&
 		sim.CurrentTime >= hunter.weaveStartTime &&
 		weaveAt < shootAt &&
 		weaveAt < gcdAt

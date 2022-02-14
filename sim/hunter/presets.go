@@ -55,7 +55,6 @@ var basicRotation = &proto.Hunter_Rotation{
 	UseArcaneShot:    false,
 	Sting:            proto.Hunter_Rotation_SerpentSting,
 	PrecastAimedShot: true,
-	MeleeWeave:       false,
 	LazyRotation:     true,
 
 	ViperStartManaPercent: 0.2,
@@ -66,18 +65,16 @@ var frenchRotation = &proto.Hunter_Rotation{
 	UseArcaneShot:    true,
 	Sting:            proto.Hunter_Rotation_SerpentSting,
 	PrecastAimedShot: false,
-	MeleeWeave:       false,
 
 	ViperStartManaPercent: 0.3,
 	ViperStopManaPercent:  0.5,
 }
 var meleeWeaveRotation = &proto.Hunter_Rotation{
-	UseMultiShot:    true,
-	UseArcaneShot:   true,
-	MeleeWeave:      true,
-	UseRaptorStrike: true,
-	TimeToWeaveMs:   500,
-	PercentWeaved:   0.8,
+	UseMultiShot:  true,
+	UseArcaneShot: true,
+	Weave:         proto.Hunter_Rotation_WeaveFull,
+	TimeToWeaveMs: 500,
+	PercentWeaved: 0.8,
 
 	ViperStartManaPercent: 0.3,
 	ViperStopManaPercent:  0.5,
@@ -92,11 +89,12 @@ var basicOptions = &proto.Hunter_Options{
 }
 
 var windSerpentOptions = &proto.Hunter_Options{
-	QuiverBonus: proto.Hunter_Options_Speed15,
-	Ammo:        proto.Hunter_Options_AdamantiteStinger,
-	PetType:     proto.Hunter_Options_WindSerpent,
-	PetUptime:   0.9,
-	LatencyMs:   15,
+	QuiverBonus:      proto.Hunter_Options_Speed15,
+	Ammo:             proto.Hunter_Options_AdamantiteStinger,
+	PetType:          proto.Hunter_Options_WindSerpent,
+	PetUptime:        0.9,
+	PetSingleAbility: true,
+	LatencyMs:        15,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{

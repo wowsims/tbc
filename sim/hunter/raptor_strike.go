@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -56,7 +57,7 @@ func (hunter *Hunter) NewRaptorStrike(sim *core.Simulation, target *core.Target)
 
 // Returns true if the regular melee swing should be used, false otherwise.
 func (hunter *Hunter) TryRaptorStrike(sim *core.Simulation) *core.ActiveMeleeAbility {
-	if !hunter.Rotation.UseRaptorStrike || hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime) || hunter.CurrentMana() < hunter.raptorStrikeCost {
+	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveAutosOnly || hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime) || hunter.CurrentMana() < hunter.raptorStrikeCost {
 		return nil
 	}
 

@@ -104,8 +104,14 @@ func (hp *HunterPet) GetPet() *core.Pet {
 
 func (hp *HunterPet) Init(sim *core.Simulation) {
 	hp.killCommandTemplate = hp.newKillCommandTemplate(sim)
-	hp.primaryAbility = hp.NewPetAbility(sim, hp.config.PrimaryAbility, true)
-	hp.secondaryAbility = hp.NewPetAbility(sim, hp.config.SecondaryAbility, false)
+
+	if hp.hunterOwner.Options.PetSingleAbility {
+		hp.primaryAbility = hp.NewPetAbility(sim, hp.config.SecondaryAbility, true)
+		hp.config.RandomSelection = false
+	} else {
+		hp.primaryAbility = hp.NewPetAbility(sim, hp.config.PrimaryAbility, true)
+		hp.secondaryAbility = hp.NewPetAbility(sim, hp.config.SecondaryAbility, false)
+	}
 }
 
 func (hp *HunterPet) Reset(sim *core.Simulation) {
@@ -193,8 +199,6 @@ type PetConfig struct {
 	PrimaryAbility   PetAbilityType
 	SecondaryAbility PetAbilityType
 
-	IsCaster bool // Caster pets have a melee penalty
-
 	// Randomly select between abilities instead of using a prio.
 	RandomSelection bool
 }
@@ -236,6 +240,5 @@ var PetConfigs = map[proto.Hunter_Options_PetType]PetConfig{
 		DamageMultiplier: 1.07,
 		PrimaryAbility:   Bite,
 		SecondaryAbility: LightningBreath,
-		IsCaster:         true,
 	},
 }
