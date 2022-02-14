@@ -42,9 +42,8 @@ type Hunter struct {
 
 	hasGronnstalker2Pc bool
 
-	killCommandEnabledUntil time.Duration       // Time that KC enablement expires.
-	killCommandBlocked      bool                // True while Steady Shot is casting, to prevent KC.
-	killCommandAction       *core.PendingAction // Action to use KC when its comes off CD.
+	killCommandEnabledUntil time.Duration // Time that KC enablement expires.
+	killCommandBlocked      bool          // True while Steady Shot is casting, to prevent KC.
 
 	latency     time.Duration
 	timeToWeave time.Duration
@@ -86,7 +85,8 @@ type Hunter struct {
 	aspectOfTheHawkTemplate  core.SimpleCast
 	aspectOfTheViperTemplate core.SimpleCast
 
-	killCommandTemplate core.SimpleCast
+	killCommandTemplate core.SimpleSpellTemplate
+	killCommand         core.SimpleSpell
 
 	multiShotCastTemplate core.SimpleCast
 	multiShotCast         core.SimpleCast
@@ -166,7 +166,6 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.aspectOfTheViper = false
 	hunter.killCommandEnabledUntil = 0
 	hunter.killCommandBlocked = false
-	hunter.killCommandAction.NextActionAt = 0
 	hunter.nextAction = OptionNone
 	hunter.nextActionAt = 0
 	hunter.rangedSwingSpeed = 0
@@ -192,8 +191,18 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 
 		latency:     time.Millisecond * time.Duration(hunterOptions.Options.LatencyMs),
 		timeToWeave: time.Millisecond * time.Duration(hunterOptions.Rotation.TimeToWeaveMs+hunterOptions.Options.LatencyMs),
+
+		hasGronnstalker2Pc: ItemSetGronnstalker.CharacterHasSetBonus(&character, 2),
 	}
-	hunter.hasGronnstalker2Pc = ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 2)
+
+	if hunter.Rotation.PercentWeaved <= 0 {
+		hunter.Rotation.Weave = proto.Hunter_Rotation_WeaveNone
+	}
+	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveNone {
+		// Forces override of WF. When not weaving we'll be standing far back so weapon
+		// stone can be used.
+		hunter.HasMHWeaponImbue = true
+	}
 
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
 	hunter.EnableManaBar()

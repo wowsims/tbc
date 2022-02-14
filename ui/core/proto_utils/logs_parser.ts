@@ -244,15 +244,15 @@ export class DamageDealtLog extends SimLog {
 		const match = params.raw.match(/] (.*?) ((Miss)|(Hit)|(Crit)|(Glance)|(Dodge)|(Parry)|(Block)|(ticked))( for (\d+\.\d+) damage( \((\d+)% Resist\))?)?/);
 		if (match) {
 			return ActionId.fromLogString(match[1]).fill(params.source?.index).then(cause => {
-				if (match[2] == 'Miss' || match[2] == 'Dodge' || match[2] == 'Parry') {
-					return new DamageDealtLog(params, 0, true, false, false, false, false, false, false, false, false, false, cause);
+				let amount = 0;
+				if (match[2] != 'Miss' && match[2] != 'Dodge' && match[2] != 'Parry') {
+					amount = parseFloat(match[12]);
 				}
 
-				const amount = parseFloat(match[12]);
 				return new DamageDealtLog(
 						params,
 						amount,
-						false,
+						match[2] == 'Miss',
 						match[2] == 'Crit',
 						match[2] == 'Glance',
 						match[2] == 'Dodge',
