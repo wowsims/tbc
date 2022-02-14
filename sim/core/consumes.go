@@ -145,7 +145,7 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	}
 
 	// Weapon Imbues
-	if character.HasMHWeapon() && !character.HasMHWeaponImbue && partyBuffs.WindfuryTotemRank == 0 {
+	if character.HasMHWeapon() && (character.HasMHWeaponImbue || partyBuffs.WindfuryTotemRank == 0) {
 		addImbueStats(character, consumes.MainHandImbue)
 	}
 	if character.HasOHWeapon() {
@@ -172,6 +172,10 @@ func ApplyPetConsumeEffects(pet *Character, ownerConsumes proto.Consumes) {
 }
 
 func addImbueStats(character *Character, imbue proto.WeaponImbue) {
+	if imbue == proto.WeaponImbue_WeaponImbueUnknown {
+		return
+	}
+
 	if imbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
 		character.PseudoStats.BonusMeleeDamage += 12
 		character.PseudoStats.BonusRangedDamage += 12
