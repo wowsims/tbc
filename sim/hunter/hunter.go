@@ -86,7 +86,8 @@ type Hunter struct {
 	aspectOfTheHawkTemplate  core.SimpleCast
 	aspectOfTheViperTemplate core.SimpleCast
 
-	killCommandTemplate core.SimpleCast
+	killCommandTemplate core.SimpleSpellTemplate
+	killCommand         core.SimpleSpell
 
 	multiShotCastTemplate core.SimpleCast
 	multiShotCast         core.SimpleCast
