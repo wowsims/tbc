@@ -36,22 +36,6 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
 			],
-			warnings: [
-				(simUI: IndividualSimUI<Spec.SpecHunter>) => {
-					return {
-						updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter, simUI.player.consumesChangeEmitter, simUI.player.getParty()!.buffsChangeEmitter]),
-						shouldDisplay: () => {
-							const rotation = simUI.player.getRotation();
-							const isMeleeWeaving = rotation.meleeWeave && rotation.percentWeaved > 0;
-
-							return !isMeleeWeaving &&
-									simUI.player.getConsumes().mainHandImbue != WeaponImbue.WeaponImbueUnknown &&
-									(simUI.player.getParty() != null && simUI.player.getParty()!.getBuffs().windfuryTotemRank > 0);
-						},
-						getContent: () => 'Melee weaving is off but Windfury Totem is on, so your main hand imbue is being ignored without any benefit.',
-					};
-				},
-			],
 
 			// All stats for which EP should be calculated.
 			epStats: [
@@ -208,6 +192,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				inputs: [
 					HunterInputs.PetTypeInput,
 					HunterInputs.PetUptime,
+					HunterInputs.PetSingleAbility,
 					HunterInputs.LatencyMs,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,

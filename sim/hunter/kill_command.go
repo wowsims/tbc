@@ -31,28 +31,26 @@ func (hunter *Hunter) applyKillCommand() {
 }
 
 // ActiveMeleeAbility doesn't support cast times, so we wrap it in a SimpleCast.
-func (hunter *Hunter) newKillCommandTemplate(sim *core.Simulation) core.SimpleCast {
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:     KillCommandActionID,
-			Character:    hunter.GetCharacter(),
-			BaseManaCost: 75,
-			ManaCost:     75,
-			Cooldown:     time.Second * 5,
+func (hunter *Hunter) newKillCommandTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	spell := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:     KillCommandActionID,
+				Character:    hunter.GetCharacter(),
+				BaseManaCost: 75,
+				ManaCost:     75,
+				Cooldown:     time.Second * 5,
+			},
+		},
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
+				ThreatMultiplier: 1,
+				IgnoreHitCheck:   true,
+			},
 		},
 	}
 
-	pa := &core.PendingAction{
-		Priority:     core.ActionPriorityRegen,
-		NextActionAt: 0,
-	}
-	pa.OnAction = func(sim *core.Simulation) {
-		hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
-		hunter.killCommandAction.NextActionAt = 0
-	}
-	hunter.killCommandAction = pa
-
-	return template
+	return core.NewSimpleSpellTemplate(spell)
 }
 
 func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
@@ -89,10 +87,12 @@ func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.MeleeAbil
 	return core.NewMeleeAbilityTemplate(ama)
 }
 
-func (hunter *Hunter) NewKillCommand(sim *core.Simulation, target *core.Target) core.SimpleCast {
-	killCommand := hunter.killCommandTemplate
+func (hunter *Hunter) NewKillCommand(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+	killCommand := &hunter.killCommand
+	hunter.killCommandTemplate.Apply(killCommand)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
+	killCommand.Effect.Target = target
 	killCommand.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
 		hunter.killCommandEnabledUntil = 0
 
@@ -121,17 +121,6 @@ func (hunter *Hunter) TryKillCommand(sim *core.Simulation, target *core.Target) 
 
 	if !hunter.IsOnCD(KillCommandCooldownID, sim.CurrentTime) {
 		kc := hunter.NewKillCommand(sim, target)
-		kc.StartCast(sim)
-		return
+		kc.Cast(sim)
 	}
-
-	// Kill Command is on CD, so set up an event to use it when its ready.
-
-	if hunter.killCommandAction.NextActionAt != 0 {
-		// An event is already set up from a previous crit.
-		return
-	}
-
-	hunter.killCommandAction.NextActionAt = hunter.CDReadyAt(KillCommandCooldownID)
-	sim.AddPendingAction(hunter.killCommandAction)
 }
