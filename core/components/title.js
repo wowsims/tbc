@@ -62,7 +62,8 @@ export class Title extends Component {
         return option;
     }
     static makeOptionElem(data) {
-        const optionContainer = document.createElement('div');
+        const optionContainer = document.createElement('a');
+        optionContainer.href = data.href;
         optionContainer.classList.add('sim-title-dropdown-option-container', 'dropdown-option-container');
         const option = document.createElement('div');
         option.classList.add('sim-title-option', 'dropdown-option');

@@ -317,6 +317,10 @@
   display: block !important;
 }
 
+.dropdown-option-container:hover {
+  text-decoration: none;
+}
+
 .dropdown-option-container {
   background-color: gray;
 }
@@ -704,6 +708,10 @@
   display: block !important;
 }
 
+.dropdown-option-container:hover {
+  text-decoration: none;
+}
+
 .dropdown-option-container {
   background-color: gray;
 }
@@ -1012,6 +1020,10 @@
   display: block !important;
 }
 
+.dropdown-option-container:hover {
+  text-decoration: none;
+}
+
 .dropdown-option-container {
   background-color: gray;
 }
@@ -1288,6 +1300,10 @@
 
 .dropdown-root:hover .dropdown-panel {
   display: block !important;
+}
+
+.dropdown-option-container:hover {
+  text-decoration: none;
 }
 
 .dropdown-option-container {
@@ -1592,6 +1608,10 @@
 
 .dropdown-root:hover .dropdown-panel {
   display: block !important;
+}
+
+.dropdown-option-container:hover {
+  text-decoration: none;
 }
 
 .dropdown-option-container {
@@ -1971,6 +1991,10 @@ input, select {
 
 .dropdown-root:hover .dropdown-panel {
   display: block !important;
+}
+
+.dropdown-option-container:hover {
+  text-decoration: none;
 }
 
 .dropdown-option-container {

@@ -156,14 +156,14 @@ export function getTalentTreeIcon(spec, talentsString) {
     return talentTreeIcons[specToClass[spec]][talentTreeIdx];
 }
 // Gets the URL for the individual sim corresponding to the given spec.
-const specSiteUrlTemplate = new URL(`${window.location.protocol}//${window.location.host}/${REPO_NAME}/SPEC/index.html`);
+const specSiteUrlTemplate = new URL(`${window.location.protocol}//${window.location.host}/${REPO_NAME}/SPEC/`);
 export function getSpecSiteUrl(spec) {
     let specString = Spec[spec]; // Returns 'SpecBalanceDruid' for BalanceDruid.
     specString = specString.substring('Spec'.length); // 'BalanceDruid'
     specString = camelToSnakeCase(specString); // 'balance_druid'
     return specSiteUrlTemplate.toString().replace('SPEC', specString);
 }
-export const raidSimSiteUrl = new URL(`${window.location.protocol}//${window.location.host}/${REPO_NAME}/raid/index.html`).toString();
+export const raidSimSiteUrl = new URL(`${window.location.protocol}//${window.location.host}/${REPO_NAME}/raid/`).toString();
 export const specTypeFunctions = {
     [Spec.SpecBalanceDruid]: {
         rotationCreate: () => BalanceDruidRotation.create(),
