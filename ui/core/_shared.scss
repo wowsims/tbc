@@ -163,6 +163,10 @@ $sim-transitions: .2s ease-in;
 	display: block !important;
 }
 
+.dropdown-option-container:hover {
+	text-decoration: none;
+}
+
 .dropdown-option-container {
 	background-color: gray;
 }
