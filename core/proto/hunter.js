@@ -22,6 +22,28 @@ export var Hunter_Rotation_StingType;
     Hunter_Rotation_StingType[Hunter_Rotation_StingType["SerpentSting"] = 2] = "SerpentSting";
 })(Hunter_Rotation_StingType || (Hunter_Rotation_StingType = {}));
 /**
+ * @generated from protobuf enum proto.Hunter.Rotation.WeaveType
+ */
+export var Hunter_Rotation_WeaveType;
+(function (Hunter_Rotation_WeaveType) {
+    /**
+     * @generated from protobuf enum value: WeaveNone = 0;
+     */
+    Hunter_Rotation_WeaveType[Hunter_Rotation_WeaveType["WeaveNone"] = 0] = "WeaveNone";
+    /**
+     * @generated from protobuf enum value: WeaveAutosOnly = 1;
+     */
+    Hunter_Rotation_WeaveType[Hunter_Rotation_WeaveType["WeaveAutosOnly"] = 1] = "WeaveAutosOnly";
+    /**
+     * @generated from protobuf enum value: WeaveRaptorOnly = 2;
+     */
+    Hunter_Rotation_WeaveType[Hunter_Rotation_WeaveType["WeaveRaptorOnly"] = 2] = "WeaveRaptorOnly";
+    /**
+     * @generated from protobuf enum value: WeaveFull = 3;
+     */
+    Hunter_Rotation_WeaveType[Hunter_Rotation_WeaveType["WeaveFull"] = 3] = "WeaveFull";
+})(Hunter_Rotation_WeaveType || (Hunter_Rotation_WeaveType = {}));
+/**
  * @generated from protobuf enum proto.Hunter.Options.QuiverBonus
  */
 export var Hunter_Options_QuiverBonus;
@@ -550,6 +572,7 @@ class Hunter_Rotation$Type extends MessageType {
             { no: 5, name: "sting", kind: "enum", T: () => ["proto.Hunter.Rotation.StingType", Hunter_Rotation_StingType] },
             { no: 6, name: "viper_start_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 7, name: "viper_stop_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 11, name: "weave", kind: "enum", T: () => ["proto.Hunter.Rotation.WeaveType", Hunter_Rotation_WeaveType] },
             { no: 4, name: "melee_weave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 8, name: "use_raptor_strike", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 9, name: "time_to_weave_ms", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -557,7 +580,7 @@ class Hunter_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { useMultiShot: false, useArcaneShot: false, precastAimedShot: false, lazyRotation: false, sting: 0, viperStartManaPercent: 0, viperStopManaPercent: 0, meleeWeave: false, useRaptorStrike: false, timeToWeaveMs: 0, percentWeaved: 0 };
+        const message = { useMultiShot: false, useArcaneShot: false, precastAimedShot: false, lazyRotation: false, sting: 0, viperStartManaPercent: 0, viperStopManaPercent: 0, weave: 0, meleeWeave: false, useRaptorStrike: false, timeToWeaveMs: 0, percentWeaved: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -588,6 +611,9 @@ class Hunter_Rotation$Type extends MessageType {
                     break;
                 case /* double viper_stop_mana_percent */ 7:
                     message.viperStopManaPercent = reader.double();
+                    break;
+                case /* proto.Hunter.Rotation.WeaveType weave */ 11:
+                    message.weave = reader.int32();
                     break;
                 case /* bool melee_weave */ 4:
                     message.meleeWeave = reader.bool();
@@ -634,6 +660,9 @@ class Hunter_Rotation$Type extends MessageType {
         /* double viper_stop_mana_percent = 7; */
         if (message.viperStopManaPercent !== 0)
             writer.tag(7, WireType.Bit64).double(message.viperStopManaPercent);
+        /* proto.Hunter.Rotation.WeaveType weave = 11; */
+        if (message.weave !== 0)
+            writer.tag(11, WireType.Varint).int32(message.weave);
         /* bool melee_weave = 4; */
         if (message.meleeWeave !== false)
             writer.tag(4, WireType.Varint).bool(message.meleeWeave);
@@ -664,11 +693,12 @@ class Hunter_Options$Type extends MessageType {
             { no: 2, name: "ammo", kind: "enum", T: () => ["proto.Hunter.Options.Ammo", Hunter_Options_Ammo] },
             { no: 3, name: "pet_type", kind: "enum", T: () => ["proto.Hunter.Options.PetType", Hunter_Options_PetType] },
             { no: 4, name: "pet_uptime", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 6, name: "pet_single_ability", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "latency_ms", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { quiverBonus: 0, ammo: 0, petType: 0, petUptime: 0, latencyMs: 0 };
+        const message = { quiverBonus: 0, ammo: 0, petType: 0, petUptime: 0, petSingleAbility: false, latencyMs: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -690,6 +720,9 @@ class Hunter_Options$Type extends MessageType {
                     break;
                 case /* double pet_uptime */ 4:
                     message.petUptime = reader.double();
+                    break;
+                case /* bool pet_single_ability */ 6:
+                    message.petSingleAbility = reader.bool();
                     break;
                 case /* int32 latency_ms */ 5:
                     message.latencyMs = reader.int32();
@@ -718,6 +751,9 @@ class Hunter_Options$Type extends MessageType {
         /* double pet_uptime = 4; */
         if (message.petUptime !== 0)
             writer.tag(4, WireType.Bit64).double(message.petUptime);
+        /* bool pet_single_ability = 6; */
+        if (message.petSingleAbility !== false)
+            writer.tag(6, WireType.Varint).bool(message.petSingleAbility);
         /* int32 latency_ms = 5; */
         if (message.latencyMs !== 0)
             writer.tag(5, WireType.Varint).int32(message.latencyMs);

@@ -14,6 +14,7 @@ import { WeaponType } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { ShamanTotems, AirTotem, FireTotem, WaterTotem } from '/tbc/core/proto/shaman.js';
+import { Hunter_Rotation_WeaveType as WeaveType } from '/tbc/core/proto/hunter.js';
 import { getWeaponDPS } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { gemMatchesSocket, } from '/tbc/core/proto_utils/gems.js';
@@ -586,10 +587,20 @@ export class Player {
                 }
                 rotation = eleRotation;
             }
+            // TODO: Remove this on 3/14/2022 (1 month).
             if (this.spec == Spec.SpecHunter) {
+                const hunterRotation = rotation;
                 const hunterOptions = options;
                 if (hunterOptions.petUptime == 0) {
                     hunterOptions.petUptime = 1;
+                }
+                if (hunterRotation.meleeWeave) {
+                    if (hunterRotation.useRaptorStrike) {
+                        hunterRotation.weave = WeaveType.WeaveFull;
+                    }
+                    else {
+                        hunterRotation.weave = WeaveType.WeaveAutosOnly;
+                    }
                 }
                 options = hunterOptions;
             }

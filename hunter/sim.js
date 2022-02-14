@@ -5,10 +5,8 @@ import { Debuffs } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { StrengthOfEarthType } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
-import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
-import { TypedEvent } from '/tbc/core/typed_event.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as HunterInputs from './inputs.js';
@@ -19,21 +17,6 @@ export class HunterSimUI extends IndividualSimUI {
             cssClass: 'hunter-sim-ui',
             // List any known bugs / issues here and they'll be shown on the site.
             knownIssues: [],
-            warnings: [
-                (simUI) => {
-                    return {
-                        updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter, simUI.player.consumesChangeEmitter, simUI.player.getParty().buffsChangeEmitter]),
-                        shouldDisplay: () => {
-                            const rotation = simUI.player.getRotation();
-                            const isMeleeWeaving = rotation.meleeWeave && rotation.percentWeaved > 0;
-                            return !isMeleeWeaving &&
-                                simUI.player.getConsumes().mainHandImbue != WeaponImbue.WeaponImbueUnknown &&
-                                (simUI.player.getParty() != null && simUI.player.getParty().getBuffs().windfuryTotemRank > 0);
-                        },
-                        getContent: () => 'Melee weaving is off but Windfury Totem is on, so your main hand imbue is being ignored without any benefit.',
-                    };
-                },
-            ],
             // All stats for which EP should be calculated.
             epStats: [
                 Stat.StatIntellect,
@@ -187,6 +170,7 @@ export class HunterSimUI extends IndividualSimUI {
                 inputs: [
                     HunterInputs.PetTypeInput,
                     HunterInputs.PetUptime,
+                    HunterInputs.PetSingleAbility,
                     HunterInputs.LatencyMs,
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,

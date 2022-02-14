@@ -5,7 +5,7 @@ import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
-import { Hunter_Rotation as HunterRotation, Hunter_Options as HunterOptions, Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Options_PetType as PetType, } from '/tbc/core/proto/hunter.js';
+import { Hunter_Rotation as HunterRotation, Hunter_Rotation_WeaveType as WeaveType, Hunter_Options as HunterOptions, Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Options_PetType as PetType, } from '/tbc/core/proto/hunter.js';
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
@@ -31,8 +31,7 @@ export const DefaultRotation = HunterRotation.create({
     useArcaneShot: true,
     viperStartManaPercent: 0.1,
     viperStopManaPercent: 0.3,
-    meleeWeave: true,
-    useRaptorStrike: true,
+    weave: WeaveType.WeaveFull,
     timeToWeaveMs: 500,
     percentWeaved: 0.8,
 });

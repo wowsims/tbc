@@ -249,6 +249,12 @@ export interface Hunter_Rotation {
      */
     viperStopManaPercent: number;
     /**
+     * @generated from protobuf field: proto.Hunter.Rotation.WeaveType weave = 11;
+     */
+    weave: Hunter_Rotation_WeaveType;
+    /**
+     * Deprecate these options on 3/14 (1 month).
+     *
      * @generated from protobuf field: bool melee_weave = 4;
      */
     meleeWeave: boolean;
@@ -287,6 +293,27 @@ export declare enum Hunter_Rotation_StingType {
     SerpentSting = 2
 }
 /**
+ * @generated from protobuf enum proto.Hunter.Rotation.WeaveType
+ */
+export declare enum Hunter_Rotation_WeaveType {
+    /**
+     * @generated from protobuf enum value: WeaveNone = 0;
+     */
+    WeaveNone = 0,
+    /**
+     * @generated from protobuf enum value: WeaveAutosOnly = 1;
+     */
+    WeaveAutosOnly = 1,
+    /**
+     * @generated from protobuf enum value: WeaveRaptorOnly = 2;
+     */
+    WeaveRaptorOnly = 2,
+    /**
+     * @generated from protobuf enum value: WeaveFull = 3;
+     */
+    WeaveFull = 3
+}
+/**
  * @generated from protobuf message proto.Hunter.Options
  */
 export interface Hunter_Options {
@@ -306,6 +333,10 @@ export interface Hunter_Options {
      * @generated from protobuf field: double pet_uptime = 4;
      */
     petUptime: number;
+    /**
+     * @generated from protobuf field: bool pet_single_ability = 6;
+     */
+    petSingleAbility: boolean;
     /**
      * @generated from protobuf field: int32 latency_ms = 5;
      */

@@ -1,5 +1,5 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { Hunter_Rotation_StingType as StingType, Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Options_PetType as PetType, } from '/tbc/core/proto/hunter.js';
+import { Hunter_Rotation_StingType as StingType, Hunter_Rotation_WeaveType as WeaveType, Hunter_Options_Ammo as Ammo, Hunter_Options_QuiverBonus as QuiverBonus, Hunter_Options_PetType as PetType, } from '/tbc/core/proto/hunter.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 export const Quiver = {
@@ -112,6 +112,24 @@ export const PetUptime = {
         },
     },
 };
+export const PetSingleAbility = {
+    type: 'boolean',
+    getModObject: (simUI) => simUI.player,
+    config: {
+        extraCssClasses: [
+            'pet-single-ability-picker',
+        ],
+        label: 'Single Pet Ability',
+        labelTooltip: 'Pet will only use its primary ability.',
+        changedEvent: (player) => player.specOptionsChangeEmitter,
+        getValue: (player) => player.getSpecOptions().petSingleAbility,
+        setValue: (eventID, player, newValue) => {
+            const newOptions = player.getSpecOptions();
+            newOptions.petSingleAbility = newValue;
+            player.setSpecOptions(eventID, newOptions);
+        },
+    },
+};
 export const HunterRotationConfig = {
     inputs: [
         {
@@ -210,35 +228,24 @@ export const HunterRotationConfig = {
             },
         },
         {
-            type: 'boolean', cssClass: 'melee-weave-picker',
-            getModObject: (simUI) => simUI,
-            config: {
-                label: 'Melee Weave',
-                labelTooltip: 'Uses melee weaving in the rotation.',
-                changedEvent: (simUI) => simUI.player.rotationChangeEmitter,
-                getValue: (simUI) => simUI.player.getRotation().meleeWeave,
-                setValue: (eventID, simUI, newValue) => {
-                    const newRotation = simUI.player.getRotation();
-                    newRotation.meleeWeave = newValue;
-                    simUI.player.setRotation(eventID, newRotation);
-                    simUI.recomputeSettingsLayout();
-                },
-            },
-        },
-        {
-            type: 'boolean', cssClass: 'use-raptor-strike-picker',
+            type: 'enum', cssClass: 'weave-picker',
             getModObject: (simUI) => simUI.player,
             config: {
-                label: 'Use Raptor Strike',
-                labelTooltip: 'Uses Raptor Strike instead of regular melee hits while weaving.',
+                label: 'Melee Weaving',
+                labelTooltip: 'Uses melee weaving in the rotation.',
+                values: [
+                    { name: 'None', value: WeaveType.WeaveNone },
+                    { name: 'Autos Only', value: WeaveType.WeaveAutosOnly },
+                    { name: 'Raptor Only', value: WeaveType.WeaveRaptorOnly },
+                    { name: 'Full', value: WeaveType.WeaveFull },
+                ],
                 changedEvent: (player) => player.rotationChangeEmitter,
-                getValue: (player) => player.getRotation().useRaptorStrike,
+                getValue: (player) => player.getRotation().weave,
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
-                    newRotation.useRaptorStrike = newValue;
+                    newRotation.weave = newValue;
                     player.setRotation(eventID, newRotation);
                 },
-                showWhen: (player) => player.getRotation().meleeWeave,
             },
         },
         {
@@ -254,7 +261,7 @@ export const HunterRotationConfig = {
                     newRotation.timeToWeaveMs = newValue;
                     player.setRotation(eventID, newRotation);
                 },
-                showWhen: (player) => player.getRotation().meleeWeave,
+                showWhen: (player) => player.getRotation().weave != WeaveType.WeaveNone,
             },
         },
         {
@@ -270,7 +277,7 @@ export const HunterRotationConfig = {
                     newRotation.percentWeaved = newValue / 100;
                     player.setRotation(eventID, newRotation);
                 },
-                showWhen: (player) => player.getRotation().meleeWeave,
+                showWhen: (player) => player.getRotation().weave != WeaveType.WeaveNone,
             },
         },
         {
