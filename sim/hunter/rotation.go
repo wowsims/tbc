@@ -37,6 +37,7 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 }
 
 func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
+	hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
 	if !ability.Effect.IsRanged() {
 		return
 	}
@@ -55,6 +56,8 @@ func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 	if hunter.AutoAttacks.RangedSwingInProgress {
 		return
 	}
+
+	hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
 
 	// Swap aspects or keep up sting if needed.
 	if hunter.nextActionAt == OptionNone {

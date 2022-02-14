@@ -50,16 +50,6 @@ func (hunter *Hunter) newKillCommandTemplate(sim *core.Simulation) core.SimpleSp
 		},
 	}
 
-	pa := &core.PendingAction{
-		Priority:     core.ActionPriorityRegen,
-		NextActionAt: 0,
-	}
-	pa.OnAction = func(sim *core.Simulation) {
-		hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
-		hunter.killCommandAction.NextActionAt = 0
-	}
-	hunter.killCommandAction = pa
-
 	return core.NewSimpleSpellTemplate(spell)
 }
 
@@ -132,16 +122,5 @@ func (hunter *Hunter) TryKillCommand(sim *core.Simulation, target *core.Target) 
 	if !hunter.IsOnCD(KillCommandCooldownID, sim.CurrentTime) {
 		kc := hunter.NewKillCommand(sim, target)
 		kc.Cast(sim)
-		return
 	}
-
-	// Kill Command is on CD, so set up an event to use it when its ready.
-
-	if hunter.killCommandAction.NextActionAt != 0 {
-		// An event is already set up from a previous crit.
-		return
-	}
-
-	hunter.killCommandAction.NextActionAt = hunter.CDReadyAt(KillCommandCooldownID)
-	sim.AddPendingAction(hunter.killCommandAction)
 }

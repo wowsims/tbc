@@ -42,9 +42,8 @@ type Hunter struct {
 
 	hasGronnstalker2Pc bool
 
-	killCommandEnabledUntil time.Duration       // Time that KC enablement expires.
-	killCommandBlocked      bool                // True while Steady Shot is casting, to prevent KC.
-	killCommandAction       *core.PendingAction // Action to use KC when its comes off CD.
+	killCommandEnabledUntil time.Duration // Time that KC enablement expires.
+	killCommandBlocked      bool          // True while Steady Shot is casting, to prevent KC.
 
 	latency     time.Duration
 	timeToWeave time.Duration
@@ -167,7 +166,6 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.aspectOfTheViper = false
 	hunter.killCommandEnabledUntil = 0
 	hunter.killCommandBlocked = false
-	hunter.killCommandAction.NextActionAt = 0
 	hunter.nextAction = OptionNone
 	hunter.nextActionAt = 0
 	hunter.rangedSwingSpeed = 0
