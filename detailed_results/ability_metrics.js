@@ -41,6 +41,9 @@ export class AbilityMetrics extends ResultComponent {
             return rowElem;
         };
         const addGroup = (actionGroup, namePrefix) => {
+            if (actionGroup.length == 0) {
+                return;
+            }
             if (actionGroup.length == 1) {
                 addRow(actionGroup[0], false, namePrefix, actionGroup[0].name);
                 return;
