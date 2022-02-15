@@ -13,6 +13,21 @@ var BasicIndividualBuffs = &proto.IndividualBuffs{
 
 // Need to create a standard Retribution talents
 var StandardTalents = &proto.PaladinTalents{
+	Benediction:               5,
+	ImprovedSealOfTheCrusader: 3,
+	ImprovedJudgement:         2,
+	Conviction:                5,
+	SealOfCommand:             true,
+	Crusade:                   3,
+	SanctityAura:              true,
+	ImprovedSanctityAura:      2,
+	Vengeance:                 5,
+	SanctifiedJudgement:       2,
+	SanctifiedSeals:           0,
+	Fanaticism:                5,
+	CrusaderStrike:            true,
+	Precision:                 3,
+	DivineStrength:            5,
 }
 
 var PlayerOptionsBasic = &proto.Player_RetributionPaladin{
@@ -23,12 +38,9 @@ var PlayerOptionsBasic = &proto.Player_RetributionPaladin{
 	},
 }
 
-var retPalRotation = &proto.RetributionPaladin_Rotation{
-}
+var retPalRotation = &proto.RetributionPaladin_Rotation{}
 
-var retPalOptions = &proto.RetributionPaladin_Options{
-
-}
+var retPalOptions = &proto.RetributionPaladin_Options{}
 
 var FullRaidBuffs = &proto.RaidBuffs{
 	ArcaneBrilliance: true,
@@ -155,4 +167,3 @@ var Phase2Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Name: "Libram of Avengement",
 	},
 })
-

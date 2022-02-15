@@ -20,8 +20,12 @@ type Paladin struct {
 	sealOfCommand     core.SimpleCast
 	sealOfTheCrusader core.SimpleCast
 
-	consecrationTemplate   core.SimpleSpellTemplate
-	ConsecrationSpell      core.SimpleSpell
+	consecrationTemplate core.SimpleSpellTemplate
+	ConsecrationSpell    core.SimpleSpell
+
+	exorcismTemplate core.SimpleSpellTemplate
+	exorcismSpell    core.SimpleSpell
+
 	crusaderStrikeTemplate core.MeleeAbilityTemplate
 	crusaderStrikeSpell    core.ActiveMeleeAbility
 
@@ -55,6 +59,7 @@ func (paladin *Paladin) Init(sim *core.Simulation) {
 	paladin.judgementOfBloodTemplate = paladin.newJudgementOfBloodTemplate(sim)
 	paladin.judgementOfTheCrusaderTemplate = paladin.newJudgementOfTheCrusaderTemplate(sim)
 	paladin.consecrationTemplate = paladin.newConsecrationTemplate(sim)
+	paladin.exorcismTemplate = paladin.newExorcismTemplate(sim)
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {
