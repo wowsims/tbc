@@ -53,5 +53,8 @@ const ProcMaskMeleeAttack = ProcMaskMeleeMHAutoAttack | ProcMaskMeleeOHAutoAttac
 // Equivalent to in-game mask of 320.
 const ProcMaskRangedAttack = ProcMaskRangedAutoAttack | ProcMaskRangedSpecialAttack
 
+// Equivalent to in-game mask of 68.
+const ProcMaskWhiteHit = ProcMaskMeleeMHAutoAttack | ProcMaskMeleeOHAutoAttack | ProcMaskRangedAutoAttack
+
 // Equivalent to in-game mask of 340.
 const ProcMaskMeleeOrRangedAttack = ProcMaskMeleeAttack | ProcMaskRangedAttack
