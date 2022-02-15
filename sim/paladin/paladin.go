@@ -16,9 +16,10 @@ type Paladin struct {
 	currentSeal      core.Aura
 	currentJudgement core.Aura
 
-	sealOfBlood       core.SimpleCast
-	sealOfCommand     core.SimpleCast
-	sealOfTheCrusader core.SimpleCast
+	sealOfBlood           core.SimpleCast
+	sealOfCommand         core.SimpleCast
+	sealOfTheCrusader     core.SimpleCast
+	sealOfTheCrusaderAura core.Aura
 
 	consecrationTemplate core.SimpleSpellTemplate
 	ConsecrationSpell    core.SimpleSpell
@@ -29,8 +30,8 @@ type Paladin struct {
 	crusaderStrikeTemplate core.MeleeAbilityTemplate
 	crusaderStrikeSpell    core.ActiveMeleeAbility
 
-	judgementOfBloodTemplate core.SimpleSpellTemplate
-	judgementOfBloodSpell    core.SimpleSpell
+	judgementOfBloodTemplate core.MeleeAbilityTemplate
+	judgementOfBloodSpell    core.ActiveMeleeAbility
 
 	judgementOfTheCrusaderTemplate core.SimpleSpellTemplate
 	judgementOfTheCrusaderSpell    core.SimpleSpell

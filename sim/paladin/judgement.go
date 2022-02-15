@@ -15,51 +15,65 @@ var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: Judgeme
 
 // apparently this uses physical hit mechanics and/or ranged hit mechanics?
 // should gain from 2hand specialization damage, but doesn't until we refactor it to melee/ranged physical ability
-func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	job := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:       JudgementOfBloodActionID,
-				Character:      &paladin.Character,
-				SpellSchool:    stats.HolySpellPower,
-				CritMultiplier: paladin.SpellCritMultiplier(1, 0.25), // no idea what the math is for judgment crits
-			},
+func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
+	job := core.ActiveMeleeAbility{
+		MeleeAbility: core.MeleeAbility{
+			ActionID:       JudgementOfBloodActionID,
+			Character:      &paladin.Character,
+			SpellSchool:    stats.HolySpellPower,
+			CritMultiplier: paladin.DefaultMeleeCritMultiplier(),
+			IsPhantom:      true,
 		},
-		// need to do some research on the effects and inputs
-		// unsure if seal of blood scales with spell damage, weapon damage, both?
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
+		Effect: core.AbilityHitEffect{
+			AbilityEffect: core.AbilityEffect{
+				DamageMultiplier:       1, // Need to review to make sure I set these properly
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
+				IgnoreArmor:            true,
 			},
 			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    295,
-				MaxBaseDamage:    325,
-				SpellCoefficient: 1,
+				MinBaseDamage: 295,
+				MaxBaseDamage: 325,
 			},
 		},
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.ManaCost)
+			paladin.RemoveAura(sim, SealOfBloodAuraID)
+			paladin.currentSeal = core.Aura{}
+		},
 	}
-
 	// Reduce mana cost if we have Benediction Talent
-	job.ManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
+	job.Cost = core.ResourceCost{
+		Type:  stats.Mana,
+		Value: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+	}
 
 	// Reduce CD if we have Improved Judgement Talent
 	job.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
 	// Increase Judgement Crit Chance if we have Fanaticism talent
-	job.Effect.BonusSpellCritRating = 3 * core.SpellCritRatingPerCritChance * float64(paladin.Talents.Fanaticism)
+	job.Effect.BonusCritRating = 3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism)
 
-	return core.NewSimpleSpellTemplate(job)
+	//
+
+	return core.NewMeleeAbilityTemplate(job)
 }
 
-func (paladin *Paladin) NewJudgementOfBlood(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (paladin *Paladin) NewJudgementOfBlood(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
+	// No seal has even been active, so we can't cast judgement
+	if paladin.currentSeal.ID != SealOfBloodAuraID {
+		return nil
+	}
+
+	// Most recent seal has expired so we can't cast judgement
+	if paladin.currentSeal.Expires <= sim.CurrentTime {
+		return nil
+	}
+
 	job := &paladin.judgementOfBloodSpell
 	paladin.judgementOfBloodTemplate.Apply(job)
 
 	job.Effect.Target = target
-
-	job.Init(sim)
 
 	return job
 }
@@ -76,6 +90,11 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 				BaseManaCost: JudgementManaCost,
 				ManaCost:     JudgementManaCost,
 				Cooldown:     time.Second * 10,
+				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.ManaCost)
+					paladin.RemoveAura(sim, SealOfTheCrusaderAuraID)
+					paladin.currentSeal = core.Aura{}
+				},
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -100,6 +119,16 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 }
 
 func (paladin *Paladin) NewJudgementOfTheCrusader(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+	// No seal has even been active, so we can't cast judgement
+	if paladin.currentSeal.ID != SealOfTheCrusaderAuraID {
+		return nil
+	}
+
+	// Most recent seal has expired so we can't cast judgement
+	if paladin.currentSeal.Expires <= sim.CurrentTime {
+		return nil
+	}
+
 	jotc := &paladin.judgementOfTheCrusaderSpell
 	paladin.judgementOfTheCrusaderTemplate.Apply(jotc)
 
@@ -109,39 +138,10 @@ func (paladin *Paladin) NewJudgementOfTheCrusader(sim *core.Simulation, target *
 	return jotc
 }
 
-func (paladin *Paladin) NewJudgement(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// No seal has even been active, so we can't cast judgement
-	if paladin.currentSeal.ID == 0 {
-		return nil
-	}
-
-	// Most recent seal has expired so we can't cast judgement
-	if paladin.currentSeal.Expires <= sim.CurrentTime {
-		return nil
-	}
-
-	// Switch on Seal IDs to return the right judgement
-	var spell *core.SimpleSpell
-	switch paladin.currentSeal.ID {
-	case SealOfBloodAuraID:
-		spell = paladin.NewJudgementOfBlood(sim, target)
-	case SealOfTheCrusaderAuraID:
-		spell = paladin.NewJudgementOfTheCrusader(sim, target)
-	default:
-		return nil // case if for some reason judgement type isn't programmed yet
-	}
-
-	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		paladin.sanctifiedJudgement(sim, cast)
-		paladin.RemoveAura(sim, paladin.currentSeal.ID)
-		paladin.currentSeal = core.Aura{}
-	}
-
-	return spell
-}
+var SanctifiedJudgementActionID = core.ActionID{SpellID: 31930}
 
 // Helper function to implement Sanctified Seals talent
-func (paladin *Paladin) sanctifiedJudgement(sim *core.Simulation, cast *core.Cast) {
+func (paladin *Paladin) sanctifiedJudgement(sim *core.Simulation, mana float64) {
 	if paladin.Talents.SanctifiedJudgement == 0 {
 		return
 	}
@@ -154,6 +154,6 @@ func (paladin *Paladin) sanctifiedJudgement(sim *core.Simulation, cast *core.Cas
 	}
 
 	if sim.RandomFloat("Sanctified Judgement") < proc {
-		paladin.AddMana(sim, 0.8*cast.ManaCost, cast.ActionID, false)
+		paladin.AddMana(sim, 0.8*mana, SanctifiedJudgementActionID, false)
 	}
 }

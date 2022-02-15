@@ -30,11 +30,6 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 		Rotation: *retOptions.Rotation,
 	}
 
-	ret.EnableAutoAttacks(ret, core.AutoAttackOptions{
-		MainHand:       ret.WeaponFromMainHand(ret.DefaultMeleeCritMultiplier()),
-		AutoSwingMelee: true,
-	})
-
 	return ret
 }
 
@@ -71,10 +66,10 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 
 	// judge blood whenever we can
 	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
-		judge := ret.NewJudgement(sim, target)
+		judge := ret.NewJudgementOfBlood(sim, target)
 		if judge != nil {
-			if success := judge.Cast(sim); !success {
-				ret.WaitForMana(sim, judge.GetManaCost())
+			if success := judge.Attack(sim); !success {
+				ret.WaitForMana(sim, judge.Cost.Value)
 			}
 		}
 	}
@@ -103,6 +98,16 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	nextEventAt = core.MinDuration(nextEventAt, sobExpiration)
 	nextEventAt = core.MinDuration(nextEventAt, ret.CDReadyAt(paladin.JudgementCD))
 	ret.WaitUntil(sim, nextEventAt)
+}
+
+func (ret *RetributionPaladin) Opener(sim *core.Simulation) {
+
+	// Enable autos and twist blood
+	ret.EnableAutoAttacks(ret, core.AutoAttackOptions{
+		MainHand:       ret.WeaponFromMainHand(ret.DefaultMeleeCritMultiplier()),
+		AutoSwingMelee: true,
+	})
+
 }
 
 func (ret *RetributionPaladin) testingMechanics(sim *core.Simulation) {

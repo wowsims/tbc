@@ -27,17 +27,15 @@ func (paladin *Paladin) newCrusaderStrikeTemplate(sim *core.Simulation) core.Mel
 				Value: 236,
 			},
 		},
-		Effects: []core.AbilityHitEffect{
-			core.AbilityHitEffect{
-				AbilityEffect: core.AbilityEffect{
-					DamageMultiplier:       1, // Need to review to make sure I set these properly
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-				},
-				WeaponInput: core.WeaponDamageInput{
-					IsOH:             false,
-					DamageMultiplier: 1.1, // maybe this isn't the one that should be set to 1.1
-				},
+		Effect: core.AbilityHitEffect{
+			AbilityEffect: core.AbilityEffect{
+				DamageMultiplier:       1, // Need to review to make sure I set these properly
+				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
+			},
+			WeaponInput: core.WeaponDamageInput{
+				IsOH:             false,
+				DamageMultiplier: 1.1, // maybe this isn't the one that should be set to 1.1
 			},
 		},
 		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
@@ -54,7 +52,7 @@ func (paladin *Paladin) NewCrusaderStrike(sim *core.Simulation, target *core.Tar
 	cs := &paladin.crusaderStrikeSpell
 	paladin.crusaderStrikeTemplate.Apply(cs)
 
-	cs.Effects[0].Target = target
+	cs.Effect.Target = target
 
 	return cs
 }

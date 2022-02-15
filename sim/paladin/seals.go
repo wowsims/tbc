@@ -60,14 +60,15 @@ func (paladin *Paladin) setupSealOfBlood() {
 		Cast: core.Cast{
 			ActionID:  SealOfBloodCastActionID,
 			Character: paladin.GetCharacter(),
-			ManaCost:  210,
 			GCD:       core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			sobAura.Expires = sim.CurrentTime + time.Second * 30
+			sobAura.Expires = sim.CurrentTime + time.Second*30
 			paladin.UpdateSeal(sim, sobAura)
 		},
 	}
+
+	sob.ManaCost = 210 * (1 - 0.03*float64(paladin.Talents.Benediction))
 
 	paladin.sealOfBlood = sob
 }
@@ -141,18 +142,18 @@ func (paladin *Paladin) setupSealOfCommand() {
 		Cast: core.Cast{
 			ActionID:  SealOfCommandCastActionID,
 			Character: paladin.GetCharacter(),
-			ManaCost:  65,
 			GCD:       core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			socAura.Expires = sim.CurrentTime + time.Second * 30
+			socAura.Expires = sim.CurrentTime + time.Second*30
 			paladin.UpdateSeal(sim, socAura)
 		},
 	}
 
+	soc.ManaCost = 65 * (1 - 0.03*float64(paladin.Talents.Benediction))
+
 	paladin.sealOfCommand = soc
 }
-
 
 func (paladin *Paladin) NewSealOfCommand(sim *core.Simulation) *core.SimpleCast {
 	soc := &paladin.sealOfCommand
@@ -175,16 +176,18 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 		Cast: core.Cast{
 			ActionID:  SealOfTheCrusaderActionID,
 			Character: paladin.GetCharacter(),
-			ManaCost:  210,
 			GCD:       core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			sotcAura.Expires = sim.CurrentTime + time.Second * 30
+			sotcAura.Expires = sim.CurrentTime + time.Second*30
 			paladin.UpdateSeal(sim, sotcAura)
 		},
 	}
 
+	sotc.ManaCost = 210 * (1 - 0.03*float64(paladin.Talents.Benediction))
+
 	paladin.sealOfTheCrusader = sotc
+	paladin.sealOfTheCrusaderAura = sotcAura
 }
 
 func (paladin *Paladin) NewSealOfTheCrusader(sim *core.Simulation) *core.SimpleCast {
@@ -192,7 +195,6 @@ func (paladin *Paladin) NewSealOfTheCrusader(sim *core.Simulation) *core.SimpleC
 	sotc.Init(sim)
 	return sotc
 }
-
 
 func (paladin *Paladin) UpdateSeal(sim *core.Simulation, newSeal core.Aura) {
 	oldSeal := paladin.currentSeal
@@ -203,14 +205,14 @@ func (paladin *Paladin) UpdateSeal(sim *core.Simulation, newSeal core.Aura) {
 		if oldSeal.ID == SealOfCommandAuraID {
 			// Technically the current expiration could be shorter than 0.4 seconds
 			// TO-DO: Lookup behavior when seal of command is twisted at shorter than 0.4 seconds duration
-			oldSeal.Expires = sim.CurrentTime + TwistWindow 
+			oldSeal.Expires = sim.CurrentTime + TwistWindow
 			paladin.ReplaceAura(sim, oldSeal)
 
 			// This is a hack to get the sim to process and log the SoC aura expiring at the right time
-			if (sim.Options.Iterations == 1) {
+			if sim.Options.Iterations == 1 {
 				sim.AddPendingAction(&core.PendingAction{
-					NextActionAt:sim.CurrentTime + TwistWindow, 
-					OnAction: func(_ *core.Simulation) {},
+					NextActionAt: sim.CurrentTime + TwistWindow,
+					OnAction:     func(_ *core.Simulation) {},
 				})
 			}
 		} else {
