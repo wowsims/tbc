@@ -323,6 +323,9 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		Cooldown:   cooldown,
 		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			if hunter.CurrentMana() < manaCost {
+				return false
+			}
 			return true
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
