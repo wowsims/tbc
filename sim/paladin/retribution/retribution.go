@@ -1,6 +1,8 @@
 package retribution
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/paladin"
@@ -30,11 +32,18 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 		Rotation: *retOptions.Rotation,
 	}
 
+	ret.EnableAutoAttacks(ret, core.AutoAttackOptions{
+		MainHand:       ret.WeaponFromMainHand(ret.DefaultMeleeCritMultiplier()),
+		AutoSwingMelee: true,
+	})
+
 	return ret
 }
 
 type RetributionPaladin struct {
 	*paladin.Paladin
+
+	openerCompleted bool
 
 	Rotation proto.RetributionPaladin_Rotation
 }
@@ -45,6 +54,14 @@ func (ret *RetributionPaladin) GetPaladin() *paladin.Paladin {
 
 func (ret *RetributionPaladin) Reset(sim *core.Simulation) {
 	ret.Paladin.Reset(sim)
+	ret.UpdateSeal(sim, ret.SealOfTheCrusaderAura)
+
+	// Defer main attack delay logic to the opening rotation code
+	// But delay on Reset as well so we don't just auto off the rip before other delay code can be called
+	// Kinda hacky
+	ret.AutoAttacks.DelayAllUntil(sim, sim.CurrentTime+time.Second*1)
+
+	ret.openerCompleted = false
 }
 
 func (ret *RetributionPaladin) OnGCDReady(sim *core.Simulation) {
@@ -58,6 +75,10 @@ func (ret *RetributionPaladin) OnManaTick(sim *core.Simulation) {
 }
 
 func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
+	if !ret.openerCompleted {
+		ret.openingRotation(sim)
+		return
+	}
 	ret._2007Rotation(sim)
 }
 
@@ -100,14 +121,37 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	ret.WaitUntil(sim, nextEventAt)
 }
 
-func (ret *RetributionPaladin) Opener(sim *core.Simulation) {
+func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
+	target := sim.GetPrimaryTarget()
 
-	// Enable autos and twist blood
-	ret.EnableAutoAttacks(ret, core.AutoAttackOptions{
-		MainHand:       ret.WeaponFromMainHand(ret.DefaultMeleeCritMultiplier()),
-		AutoSwingMelee: true,
-	})
+	// Cast Judgement of the Crusader
+	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
+		judge := ret.NewJudgementOfTheCrusader(sim, target)
+		if judge != nil {
+			if success := judge.Cast(sim); !success {
+				ret.WaitForMana(sim, judge.GetManaCost())
+			}
+		}
+	}
 
+	// Cast Seal of Command
+	if !ret.HasAura(paladin.SealOfCommandAuraID) {
+		soc := ret.NewSealOfCommand(sim)
+		if success := soc.StartCast(sim); !success {
+			ret.WaitForMana(sim, soc.GetManaCost())
+		}
+		ret.AutoAttacks.DelayAllUntil(sim, ret.NextGCDAt()) // wait until GCD is cleared
+		return
+	}
+
+	// Cast Seal of Blood and enable attacks to twist
+	if !ret.HasAura(paladin.SealOfBloodAuraID) {
+		sob := ret.NewSealOfBlood(sim)
+		if success := sob.StartCast(sim); !success {
+			ret.WaitForMana(sim, sob.GetManaCost())
+		}
+		ret.openerCompleted = true
+	}
 }
 
 func (ret *RetributionPaladin) testingMechanics(sim *core.Simulation) {

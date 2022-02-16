@@ -13,8 +13,8 @@ const JudgementCDTime = time.Second * 10
 var JudgementCD = core.NewCooldownID()
 var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: JudgementCD}
 
-// apparently this uses physical hit mechanics and/or ranged hit mechanics?
-// should gain from 2hand specialization damage, but doesn't until we refactor it to melee/ranged physical ability
+// refactored Judgement of Blood as an ActiveMeleeAbility which is most similar to actual behavior with a typical ret build
+// but still has a few differences (differences are: does not scale off spell power, cannot be partially resisted, can be missed or dodged)
 func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	job := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
@@ -53,8 +53,6 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.M
 
 	// Increase Judgement Crit Chance if we have Fanaticism talent
 	job.Effect.BonusCritRating = 3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism)
-
-	//
 
 	return core.NewMeleeAbilityTemplate(job)
 }

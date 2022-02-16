@@ -63,7 +63,6 @@ func (paladin *Paladin) setupSealOfBlood() {
 			GCD:       core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			sobAura.Expires = sim.CurrentTime + time.Second*30
 			paladin.UpdateSeal(sim, sobAura)
 		},
 	}
@@ -145,7 +144,6 @@ func (paladin *Paladin) setupSealOfCommand() {
 			GCD:       core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			socAura.Expires = sim.CurrentTime + time.Second*30
 			paladin.UpdateSeal(sim, socAura)
 		},
 	}
@@ -179,7 +177,6 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 			GCD:       core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			sotcAura.Expires = sim.CurrentTime + time.Second*30
 			paladin.UpdateSeal(sim, sotcAura)
 		},
 	}
@@ -187,7 +184,7 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 	sotc.ManaCost = 210 * (1 - 0.03*float64(paladin.Talents.Benediction))
 
 	paladin.sealOfTheCrusader = sotc
-	paladin.sealOfTheCrusaderAura = sotcAura
+	paladin.SealOfTheCrusaderAura = sotcAura
 }
 
 func (paladin *Paladin) NewSealOfTheCrusader(sim *core.Simulation) *core.SimpleCast {
@@ -198,6 +195,7 @@ func (paladin *Paladin) NewSealOfTheCrusader(sim *core.Simulation) *core.SimpleC
 
 func (paladin *Paladin) UpdateSeal(sim *core.Simulation, newSeal core.Aura) {
 	oldSeal := paladin.currentSeal
+	newSeal.Expires = sim.CurrentTime + time.Second*30
 
 	// Check if oldSeal has expired. If it already expired, we don't need to handle removal logic
 	if oldSeal.Expires > sim.CurrentTime {

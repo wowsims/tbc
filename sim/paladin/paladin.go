@@ -19,7 +19,7 @@ type Paladin struct {
 	sealOfBlood           core.SimpleCast
 	sealOfCommand         core.SimpleCast
 	sealOfTheCrusader     core.SimpleCast
-	sealOfTheCrusaderAura core.Aura
+	SealOfTheCrusaderAura core.Aura
 
 	consecrationTemplate core.SimpleSpellTemplate
 	ConsecrationSpell    core.SimpleSpell
