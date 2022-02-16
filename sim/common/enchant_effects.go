@@ -12,8 +12,11 @@ func init() {
 	// Keep these in order by item ID.
 	core.AddItemEffect(16250, ApplyWeaponSuperiorStriking)
 	core.AddItemEffect(16252, ApplyCrusader)
+	core.AddItemEffect(18283, ApplyBiznicksScope)
 	core.AddItemEffect(22535, ApplyRingStriking)
 	core.AddItemEffect(22559, ApplyMongoose)
+	core.AddItemEffect(23765, ApplyKhoriumScope)
+	core.AddItemEffect(23766, ApplyStabilizedEterniumScope)
 	core.AddItemEffect(33150, ApplyBackSubtlety)
 	core.AddItemEffect(33153, ApplyGlovesThreat)
 	core.AddItemEffect(33307, ApplyExecutioner)
@@ -90,6 +93,26 @@ func ApplyCrusader(agent core.Agent) {
 	})
 }
 
+var BiznicksScopeAuraID = core.NewAuraID()
+
+func ApplyBiznicksScope(agent core.Agent) {
+	character := agent.GetCharacter()
+	if character.Class != proto.Class_ClassHunter {
+		return
+	}
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: BiznicksScopeAuraID,
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if hitEffect.IsRanged() {
+					hitEffect.BonusHitRating += 30
+				}
+			},
+		}
+	})
+}
+
 func ApplyRingStriking(agent core.Agent) {
 	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 2
 	agent.GetCharacter().PseudoStats.BonusRangedDamage += 2
@@ -158,6 +181,30 @@ func ApplyMongoose(agent core.Agent) {
 				isMH := hitEffect.IsMH()
 				if ppmm.Proc(sim, isMH, false, "mongoose") {
 					applyLightningSpeed(sim, character, isMH)
+				}
+			},
+		}
+	})
+}
+
+func ApplyKhoriumScope(agent core.Agent) {
+	agent.GetCharacter().PseudoStats.BonusRangedDamage += 12
+}
+
+var StabilizedEterniumScopeAuraID = core.NewAuraID()
+
+func ApplyStabilizedEterniumScope(agent core.Agent) {
+	character := agent.GetCharacter()
+	if character.Class != proto.Class_ClassHunter {
+		return
+	}
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: StabilizedEterniumScopeAuraID,
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if hitEffect.IsRanged() {
+					hitEffect.BonusCritRating += 28
 				}
 			},
 		}

@@ -48,7 +48,7 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 		),
 		config:           petConfig,
 		hunterOwner:      hunter,
-		damageMultiplier: petConfig.DamageMultiplier,
+		damageMultiplier: 1.0,
 	}
 
 	// Happiness
@@ -73,6 +73,7 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 
 	// Cobra reflexes
 	hp.PseudoStats.MeleeSpeedMultiplier *= 1.3
+	hp.AutoAttacks.ActiveMeleeAbility.Effect.DamageMultiplier *= petConfig.DamageMultiplier
 	hp.AutoAttacks.ActiveMeleeAbility.Effect.DamageMultiplier *= 0.85
 
 	hp.AddStatDependency(stats.StatDependency{
@@ -203,6 +204,8 @@ type PetConfig struct {
 	RandomSelection bool
 }
 
+// Abilities reference: https://tbc.wowhead.com/hunter-pets
+// https://tbc.wowhead.com/guides/hunter-dps-best-pets-taming-loyalty-burning-crusade-classic
 var PetConfigs = map[proto.Hunter_Options_PetType]PetConfig{
 	proto.Hunter_Options_Bat: PetConfig{
 		Name:             "Bat",
@@ -210,11 +213,22 @@ var PetConfigs = map[proto.Hunter_Options_PetType]PetConfig{
 		PrimaryAbility:   Bite,
 		SecondaryAbility: Screech,
 	},
+	proto.Hunter_Options_Bear: PetConfig{
+		Name:             "Bear",
+		DamageMultiplier: 0.91,
+		PrimaryAbility:   Bite,
+		SecondaryAbility: Claw,
+	},
 	proto.Hunter_Options_Cat: PetConfig{
 		Name:             "Cat",
 		DamageMultiplier: 1.1,
 		PrimaryAbility:   Bite,
 		SecondaryAbility: Claw,
+	},
+	proto.Hunter_Options_Crab: PetConfig{
+		Name:             "Crab",
+		DamageMultiplier: 0.95,
+		PrimaryAbility:   Claw,
 	},
 	proto.Hunter_Options_Owl: PetConfig{
 		Name:             "Owl",
