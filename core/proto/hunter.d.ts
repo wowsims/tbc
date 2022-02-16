@@ -417,25 +417,33 @@ export declare enum Hunter_Options_PetType {
      */
     PetNone = 0,
     /**
-     * @generated from protobuf enum value: Ravager = 1;
+     * @generated from protobuf enum value: Bat = 5;
      */
-    Ravager = 1,
+    Bat = 5,
+    /**
+     * @generated from protobuf enum value: Bear = 7;
+     */
+    Bear = 7,
     /**
      * @generated from protobuf enum value: Cat = 2;
      */
     Cat = 2,
     /**
-     * @generated from protobuf enum value: Raptor = 3;
+     * @generated from protobuf enum value: Crab = 8;
      */
-    Raptor = 3,
+    Crab = 8,
     /**
      * @generated from protobuf enum value: Owl = 4;
      */
     Owl = 4,
     /**
-     * @generated from protobuf enum value: Bat = 5;
+     * @generated from protobuf enum value: Raptor = 3;
      */
-    Bat = 5,
+    Raptor = 3,
+    /**
+     * @generated from protobuf enum value: Ravager = 1;
+     */
+    Ravager = 1,
     /**
      * @generated from protobuf enum value: WindSerpent = 6;
      */

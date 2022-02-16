@@ -121,25 +121,33 @@ export var Hunter_Options_PetType;
      */
     Hunter_Options_PetType[Hunter_Options_PetType["PetNone"] = 0] = "PetNone";
     /**
-     * @generated from protobuf enum value: Ravager = 1;
+     * @generated from protobuf enum value: Bat = 5;
      */
-    Hunter_Options_PetType[Hunter_Options_PetType["Ravager"] = 1] = "Ravager";
+    Hunter_Options_PetType[Hunter_Options_PetType["Bat"] = 5] = "Bat";
+    /**
+     * @generated from protobuf enum value: Bear = 7;
+     */
+    Hunter_Options_PetType[Hunter_Options_PetType["Bear"] = 7] = "Bear";
     /**
      * @generated from protobuf enum value: Cat = 2;
      */
     Hunter_Options_PetType[Hunter_Options_PetType["Cat"] = 2] = "Cat";
     /**
-     * @generated from protobuf enum value: Raptor = 3;
+     * @generated from protobuf enum value: Crab = 8;
      */
-    Hunter_Options_PetType[Hunter_Options_PetType["Raptor"] = 3] = "Raptor";
+    Hunter_Options_PetType[Hunter_Options_PetType["Crab"] = 8] = "Crab";
     /**
      * @generated from protobuf enum value: Owl = 4;
      */
     Hunter_Options_PetType[Hunter_Options_PetType["Owl"] = 4] = "Owl";
     /**
-     * @generated from protobuf enum value: Bat = 5;
+     * @generated from protobuf enum value: Raptor = 3;
      */
-    Hunter_Options_PetType[Hunter_Options_PetType["Bat"] = 5] = "Bat";
+    Hunter_Options_PetType[Hunter_Options_PetType["Raptor"] = 3] = "Raptor";
+    /**
+     * @generated from protobuf enum value: Ravager = 1;
+     */
+    Hunter_Options_PetType[Hunter_Options_PetType["Ravager"] = 1] = "Ravager";
     /**
      * @generated from protobuf enum value: WindSerpent = 6;
      */
