@@ -35,7 +35,6 @@ func (paladin *Paladin) newCrusaderStrikeTemplate(sim *core.Simulation) core.Mel
 					ThreatMultiplier:       1,
 				},
 				WeaponInput: core.WeaponDamageInput{
-					IsOH:             false,
 					DamageMultiplier: 1.1, // maybe this isn't the one that should be set to 1.1
 				},
 			},

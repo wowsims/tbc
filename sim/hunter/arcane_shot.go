@@ -26,13 +26,13 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.MeleeAbil
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
+				ProcMask:               core.ProcMaskRangedSpecial,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 				IgnoreArmor:            true,
 			},
 			WeaponInput: core.WeaponDamageInput{
-				IsRanged: true,
 				CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
 					return attackPower*0.15 + 273
 				},

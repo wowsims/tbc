@@ -50,26 +50,22 @@ const (
 const ProcMaskMH = ProcMaskMeleeMHAuto | ProcMaskMeleeMHSpecial
 const ProcMaskOH = ProcMaskMeleeOHAuto | ProcMaskMeleeOHSpecial
 
-// Equivalent to in-game mask of 4.
-const ProcMaskMeleeWhiteHit = ProcMaskMeleeMHAuto | ProcMaskMeleeOHAuto
-
-// Equivalent to in-game mask of 68.
-const ProcMaskWhiteHit = ProcMaskMeleeMHAuto | ProcMaskMeleeOHAuto | ProcMaskRangedAuto
-
-// Equivalent to in-game mask of 16.
-const ProcMaskMeleeSpecial = ProcMaskMeleeMHSpecial | ProcMaskMeleeOHSpecial
-
-// Equivalent to in-game mask of 272.
-const ProcMaskMeleeOrRangedSpecial = ProcMaskMeleeSpecial | ProcMaskRangedSpecial
-
-// Equivalent to in-game mask of 20.
-const ProcMaskMelee = ProcMaskMeleeWhiteHit | ProcMaskMeleeSpecial
-
-// Equivalent to in-game mask of 320.
-const ProcMaskRanged = ProcMaskRangedAuto | ProcMaskRangedSpecial
-
-// Equivalent to in-game mask of 340.
-const ProcMaskMeleeOrRanged = ProcMaskMelee | ProcMaskRanged
+const (
+	// Equivalent to in-game mask of 4.
+	ProcMaskMeleeWhiteHit = ProcMaskMeleeMHAuto | ProcMaskMeleeOHAuto
+	// Equivalent to in-game mask of 68.
+	ProcMaskWhiteHit = ProcMaskMeleeMHAuto | ProcMaskMeleeOHAuto | ProcMaskRangedAuto
+	// Equivalent to in-game mask of 16.
+	ProcMaskMeleeSpecial = ProcMaskMeleeMHSpecial | ProcMaskMeleeOHSpecial
+	// Equivalent to in-game mask of 272.
+	ProcMaskMeleeOrRangedSpecial = ProcMaskMeleeSpecial | ProcMaskRangedSpecial
+	// Equivalent to in-game mask of 20.
+	ProcMaskMelee = ProcMaskMeleeWhiteHit | ProcMaskMeleeSpecial
+	// Equivalent to in-game mask of 320.
+	ProcMaskRanged = ProcMaskRangedAuto | ProcMaskRangedSpecial
+	// Equivalent to in-game mask of 340.
+	ProcMaskMeleeOrRanged = ProcMaskMelee | ProcMaskRanged
+)
 
 func GetMeleeProcMaskForHands(mh bool, oh bool) ProcMask {
 	mask := ProcMaskEmpty

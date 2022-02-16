@@ -409,7 +409,8 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 
 // Returns whether this hit effect is associated with the main-hand weapon.
 func (ahe *AbilityHitEffect) IsMH() bool {
-	return !ahe.ProcMask.Matches(ProcMaskOH | ProcMaskRanged)
+	const mhmask = ProcMaskMH | ProcMaskRanged
+	return !ahe.ProcMask.Matches(mhmask)
 }
 
 // Returns whether this hit effect is associated with the off-hand weapon.
@@ -429,7 +430,7 @@ func (ahe *AbilityHitEffect) IsRanged() bool {
 
 // Returns whether this hit effect matches the hand in which a weapon is equipped.
 func (ahe *AbilityHitEffect) IsEquippedHand(mh bool, oh bool) bool {
-	return (ahe.IsMH() && mh) || (ahe.IsOH() && oh)
+	return (mh && ahe.IsMH()) || (oh && ahe.IsOH())
 }
 
 // It appears that TBC does not do hasted GCD for abilities.

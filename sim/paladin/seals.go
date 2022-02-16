@@ -46,7 +46,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 		ActionID: SealOfBloodProcActionID,
 
 		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
+			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 				return
 			}
 
@@ -64,7 +64,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 			GCD:       core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			sobAura.Expires = sim.CurrentTime + time.Second * 30
+			sobAura.Expires = sim.CurrentTime + time.Second*30
 			paladin.UpdateSeal(sim, sobAura)
 		},
 	}
@@ -117,7 +117,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 		ActionID: SealOfCommandProcActionID,
 
 		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
+			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 				return
 			}
 
@@ -145,14 +145,13 @@ func (paladin *Paladin) setupSealOfCommand() {
 			GCD:       core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			socAura.Expires = sim.CurrentTime + time.Second * 30
+			socAura.Expires = sim.CurrentTime + time.Second*30
 			paladin.UpdateSeal(sim, socAura)
 		},
 	}
 
 	paladin.sealOfCommand = soc
 }
-
 
 func (paladin *Paladin) NewSealOfCommand(sim *core.Simulation) *core.SimpleCast {
 	soc := &paladin.sealOfCommand
@@ -167,14 +166,14 @@ func (paladin *Paladin) UpdateSeal(sim *core.Simulation, newSeal core.Aura) {
 	if oldSeal.ID == SealOfCommandAuraID {
 		// Technically the current expiration could be shorter than 0.4 seconds
 		// TO-DO: Lookup behavior when seal of command is twisted at shorter than 0.4 seconds duration
-		oldSeal.Expires = sim.CurrentTime + TwistWindow 
+		oldSeal.Expires = sim.CurrentTime + TwistWindow
 		paladin.ReplaceAura(sim, oldSeal)
 
 		// This is a hack to get the sim to process and log the SoC aura expiring at the right time
-		if (sim.Options.Iterations == 1) {
+		if sim.Options.Iterations == 1 {
 			sim.AddPendingAction(&core.PendingAction{
-				NextActionAt:sim.CurrentTime + TwistWindow, 
-				OnAction: func(_ *core.Simulation) {},
+				NextActionAt: sim.CurrentTime + TwistWindow,
+				OnAction:     func(_ *core.Simulation) {},
 			})
 		}
 	} else {

@@ -117,7 +117,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 				return core.Aura{
 					ID: FistsOfFuryAuraID,
 					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-						if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+						if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 							return
 						}
 						if !ppmm.Proc(sim, hitEffect.IsMH(), false, "The Fists of Fury") {

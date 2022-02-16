@@ -68,12 +68,12 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: WFImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}
 
 				isMHHit := hitEffect.IsMH()
-				if (isMHHit && !mh) || (!isMHHit && !oh) {
+				if (!mh && isMHHit) || (!oh && !isMHHit) {
 					return // cant proc if not enchanted
 				}
 				if icd.IsOnCD(sim) {
@@ -92,7 +92,11 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 					wfAtk.ActionID.Tag = 2
 				}
 				for i := 0; i < 2; i++ {
-					wfAtk.Effects[i].WeaponInput.IsOH = !isMHHit
+					if isMHHit {
+						wfAtk.Effects[i].ProcMask = core.ProcMaskMeleeMHSpecial
+					} else {
+						wfAtk.Effects[i].ProcMask = core.ProcMaskMeleeOHSpecial
+					}
 					wfAtk.Effects[i].Target = hitEffect.Target
 
 					if !isMHHit {
@@ -160,7 +164,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: FTImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}
 
@@ -223,7 +227,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: FBImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}
 

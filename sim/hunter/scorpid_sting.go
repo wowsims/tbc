@@ -25,11 +25,12 @@ func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.MeleeAb
 			},
 		},
 		Effect: core.AbilityHitEffect{
-			WeaponInput: core.WeaponDamageInput{
-				IsRanged: true,
+			AbilityEffect: core.AbilityEffect{
+				ProcMask: core.ProcMaskRangedSpecial,
 			},
 		},
 		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			// TODO: does this need a ranged mask check since hunters can melee weave?
 			if !hitEffect.Landed() {
 				return
 			}

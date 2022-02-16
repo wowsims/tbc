@@ -26,12 +26,12 @@ func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.MeleeAbili
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
+				ProcMask:               core.ProcMaskRangedSpecial,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
 			WeaponInput: core.WeaponDamageInput{
-				IsRanged: true,
 				CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
 					return attackPower*0.2 +
 						hunter.AmmoDamageBonus +
