@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"strings"
 	"time"
@@ -448,7 +447,7 @@ func (ability *ActiveMeleeAbility) CalculatedGCD(char *Character) time.Duration 
 //  Returns false if unable to attack (due to resource lacking)
 func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 	if ability.GCD != 0 && ability.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime) > 0 {
-		log.Fatalf("Ability used while on GCD\n-------\nAbility %s: %#v\n", ability.ActionID, ability)
+		panic(fmt.Sprintf("Ability used while on GCD\n-------\nAbility %s: %#v\n", ability.ActionID, ability))
 	}
 
 	ability.Character.OnBeforeMelee(sim, ability)

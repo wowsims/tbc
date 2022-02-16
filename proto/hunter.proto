@@ -122,11 +122,13 @@ message Hunter {
 
 			enum PetType {
 					PetNone = 0;
-					Ravager = 1;
-					Cat = 2;
-					Raptor = 3;
-					Owl = 4;
 					Bat = 5;
+					Bear = 7;
+					Cat = 2;
+					Crab = 8;
+					Owl = 4;
+					Raptor = 3;
+					Ravager = 1;
 					WindSerpent = 6;
 			}
 
