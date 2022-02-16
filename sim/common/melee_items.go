@@ -74,7 +74,7 @@ func ApplyStormGauntlets(agent core.Agent) {
 			ID: StormGauntletsAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				// https://tbc.wowhead.com/spell=16615/add-lightning-dam-weap-03, proc mask = 20.
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}
 
@@ -123,7 +123,7 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 			ID: BlazefuryMedallionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				// https://tbc.wowhead.com/spell=7711/add-fire-dam-weap-02, proc mask = 20.
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}
 
@@ -151,7 +151,7 @@ func ApplyKhoriumChampion(agent core.Agent) {
 			ID: KhoriumChampionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				// https://tbc.wowhead.com/spell=16916/strength-of-the-champion, proc mask = 0. Handled in-game via script.
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("KhoriumChampion") > procChance {
@@ -186,7 +186,7 @@ func ApplyBlackoutTruncheon(agent core.Agent) {
 			ID: BlackoutTruncheonAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				// https://tbc.wowhead.com/spell=33489/blinding-speed, proc mask = 0. Handled in-game via script.
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) || ability.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("BlackoutTruncheon") > procChance {
