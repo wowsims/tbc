@@ -103,7 +103,7 @@ func (hunter *Hunter) lazyRotation(sim *core.Simulation, followsRangedAuto bool)
 	canWeave := hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveNone &&
 		(hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveRaptorOnly || !hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime)) &&
 		sim.CurrentTime >= hunter.weaveStartTime &&
-		hunter.AutoAttacks.MeleeSwingsReady(sim)
+		hunter.AutoAttacks.MainhandSwingAt <= sim.CurrentTime
 	if canWeave && !shootReady && (!gcdReady || (waitingForMana && hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveRaptorOnly)) {
 		hunter.nextAction = OptionWeave
 		hunter.nextActionAt = sim.CurrentTime
@@ -140,7 +140,7 @@ func (hunter *Hunter) lazyRotation(sim *core.Simulation, followsRangedAuto bool)
 func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto bool) {
 	gcdAtDuration := core.MaxDuration(sim.CurrentTime, hunter.NextGCDAt())
 	shootAtDuration := core.MaxDuration(sim.CurrentTime, hunter.AutoAttacks.RangedSwingAt)
-	weaveAtDuration := core.MaxDuration(sim.CurrentTime, hunter.AutoAttacks.MeleeSwingsReadyAt())
+	weaveAtDuration := core.MaxDuration(sim.CurrentTime, hunter.AutoAttacks.MainhandSwingAt)
 	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveRaptorOnly {
 		weaveAtDuration = core.MaxDuration(weaveAtDuration, hunter.CDReadyAt(RaptorStrikeCooldownID))
 	}
@@ -158,7 +158,7 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 
 		// Use the inverse (1 / x) because multiplication is faster than division.
 		gcdRate := 1.0 / 1.5
-		weaveRate := 1.0 / core.MaxDuration(hunter.AutoAttacks.MainhandSwingSpeed(), hunter.AutoAttacks.OffhandSwingSpeed()).Seconds()
+		weaveRate := 1.0 / hunter.AutoAttacks.MainhandSwingSpeed().Seconds()
 		shootRate := 1.0 / hunter.AutoAttacks.RangedSwingSpeed().Seconds()
 
 		hunter.shootDPS = hunter.avgShootDmg * shootRate
@@ -365,7 +365,7 @@ func (hunter *Hunter) doMeleeWeave(sim *core.Simulation) {
 		hunter.SetGCDTimer(sim, doneWeavingAt)
 	}
 
-	hunter.AutoAttacks.SwingMelee(sim, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.TrySwingMH(sim, sim.GetPrimaryTarget())
 	hunter.HardcastWaitUntil(sim, doneWeavingAt, &hunter.fakeHardcast)
 }
 
