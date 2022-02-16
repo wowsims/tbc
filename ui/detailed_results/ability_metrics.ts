@@ -58,6 +58,10 @@ export abstract class AbilityMetrics extends ResultComponent {
 			return rowElem;
 		};
 		const addGroup = (actionGroup: Array<ActionMetrics>, namePrefix: string) => {
+			if (actionGroup.length == 0) {
+				return;
+			}
+
 			if (actionGroup.length == 1) {
 				addRow(actionGroup[0], false, namePrefix, actionGroup[0].name);
 				return;

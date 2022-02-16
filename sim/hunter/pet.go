@@ -19,6 +19,9 @@ type HunterPet struct {
 	// Combines a few static effects.
 	damageMultiplier float64
 
+	// Time when pet should die, as per petUptime.
+	deathTime time.Duration
+
 	killCommandTemplate core.MeleeAbilityTemplate
 	killCommand         core.ActiveMeleeAbility
 
@@ -28,6 +31,9 @@ type HunterPet struct {
 
 func (hunter *Hunter) NewHunterPet() *HunterPet {
 	if hunter.Options.PetType == proto.Hunter_Options_PetNone {
+		return nil
+	}
+	if hunter.Options.PetUptime <= 0 {
 		return nil
 	}
 	petConfig := PetConfigs[hunter.Options.PetType]
@@ -54,15 +60,10 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 		}
 	})
 
-	casterPenalty := 0.0
-	//if petConfig.IsCaster {
-	//	casterPenalty = 2
-	//}
-
 	hp.EnableAutoAttacks(hp, core.AutoAttackOptions{
 		MainHand: core.Weapon{
-			BaseDamageMin:  42 - casterPenalty,
-			BaseDamageMax:  68 - casterPenalty,
+			BaseDamageMin:  42,
+			BaseDamageMax:  68,
 			SwingSpeed:     2,
 			SwingDuration:  time.Second * 2,
 			CritMultiplier: 2,
@@ -103,8 +104,14 @@ func (hp *HunterPet) GetPet() *core.Pet {
 
 func (hp *HunterPet) Init(sim *core.Simulation) {
 	hp.killCommandTemplate = hp.newKillCommandTemplate(sim)
-	hp.primaryAbility = hp.NewPetAbility(sim, hp.config.PrimaryAbility, true)
-	hp.secondaryAbility = hp.NewPetAbility(sim, hp.config.SecondaryAbility, false)
+
+	if hp.hunterOwner.Options.PetSingleAbility {
+		hp.primaryAbility = hp.NewPetAbility(sim, hp.config.SecondaryAbility, true)
+		hp.config.RandomSelection = false
+	} else {
+		hp.primaryAbility = hp.NewPetAbility(sim, hp.config.PrimaryAbility, true)
+		hp.secondaryAbility = hp.NewPetAbility(sim, hp.config.SecondaryAbility, false)
+	}
 }
 
 func (hp *HunterPet) Reset(sim *core.Simulation) {
@@ -114,9 +121,18 @@ func (hp *HunterPet) Reset(sim *core.Simulation) {
 		inheritedStats := hunterPetStatInheritance(hp.hunterOwner.GetStats())
 		hp.Log(sim, "Inherited Pet stats: %s", inheritedStats)
 	}
+
+	uptime := core.MinFloat(1, core.MaxFloat(0, hp.hunterOwner.Options.PetUptime))
+	hp.deathTime = time.Duration(float64(sim.Duration) * uptime)
 }
 
 func (hp *HunterPet) OnGCDReady(sim *core.Simulation) {
+	if sim.CurrentTime > hp.deathTime {
+		hp.Disable(sim)
+		hp.focusBar.Cancel(sim)
+		return
+	}
+
 	target := sim.GetPrimaryTarget()
 	if hp.config.RandomSelection {
 		if sim.RandomFloat("Hunter Pet Ability") < 0.5 {
@@ -183,8 +199,6 @@ type PetConfig struct {
 	PrimaryAbility   PetAbilityType
 	SecondaryAbility PetAbilityType
 
-	IsCaster bool // Caster pets have a melee penalty
-
 	// Randomly select between abilities instead of using a prio.
 	RandomSelection bool
 }
@@ -226,6 +240,5 @@ var PetConfigs = map[proto.Hunter_Options_PetType]PetConfig{
 		DamageMultiplier: 1.07,
 		PrimaryAbility:   Bite,
 		SecondaryAbility: LightningBreath,
-		IsCaster:         true,
 	},
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -29,14 +30,48 @@ func init() {
 	sim.RegisterAll()
 }
 
+var (
+	Version  string
+	outdated int
+)
+
 func main() {
+	if Version == "" {
+		Version = "development"
+	}
 	var useFS = flag.Bool("usefs", false, "Use local file system for client files. Set to true during development.")
 	var wasm = flag.Bool("wasm", false, "Use wasm for sim instead of web server apis. Can only be used with usefs=true")
 	var simName = flag.String("sim", "", "Name of simulator to launch (ex: balance_druid, elemental_shaman, etc)")
 	var host = flag.String("host", ":3333", "URL to host the interface on.")
 	var launch = flag.Bool("launch", true, "auto launch browser")
+	var skipVersionCheck = flag.Bool("nvc", false, "set true to skip version check")
 
 	flag.Parse()
+
+	fmt.Printf("Version: %s\n", Version)
+	if !*skipVersionCheck && Version != "development" {
+		go func() {
+			resp, err := http.Get("https://api.github.com/repos/wowsims/tbc/releases/latest")
+			if err != nil {
+				return
+			}
+
+			body, err := ioutil.ReadAll(resp.Body)
+
+			result := struct {
+				Tag string `json:"tag_name"`
+				URL string `json:"html_url"`
+			}{}
+			json.Unmarshal(body, &result)
+
+			if result.Tag != Version {
+				outdated = 2
+				fmt.Printf("New version of simulator available: %s\n", result.URL)
+			} else {
+				outdated = 1
+			}
+		}()
+	}
 
 	setupAsyncServer()
 	runServer(*useFS, *host, *launch, *simName, *wasm, bufio.NewReader(os.Stdin))
@@ -144,7 +179,6 @@ func setupAsyncServer() {
 	http.HandleFunc("/asyncProgress", func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
-
 			return
 		}
 		msg := &proto.AsyncAPIResult{}
@@ -190,6 +224,10 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 		fs = http.FileServer(http.FS(dist.FS))
 	}
 
+	http.HandleFunc("/version", func(resp http.ResponseWriter, req *http.Request) {
+		msg := fmt.Sprintf(`{"version": "%s", "outdated": %d}`, Version, outdated)
+		resp.Write([]byte(msg))
+	})
 	http.HandleFunc("/statWeights", handleAPI)
 	http.HandleFunc("/computeStats", handleAPI)
 	http.HandleFunc("/individualSim", handleAPI)
@@ -202,7 +240,7 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 				<html><body><a href="/tbc/elemental_shaman">Elemental Shaman Sim</a"><br>
 				<html><body><a href="/tbc/enhancement_shaman">Enhancement Shaman Sim</a"><br>
 				<a href="/tbc/balance_druid">Balance Druid Sim</a"><br>
-				<a href="/tbc/hunter">Hunter Sim</a"></body></html>
+				<a href="/tbc/hunter">Hunter Sim</a"></body><br>
 				<a href="/tbc/mage">Mage Sim</a"><br>
 				<a href="/tbc/shadow_priest">Shadow Priest Sim</a"></body></html>
 		    `))

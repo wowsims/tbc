@@ -118,9 +118,9 @@ binary_dist: $(OUT_DIR)
 	rm -rf binary_dist/tbc/assets/item_data
 
 # Builds the web server with the compiled client.
-wowsimtbc: sim/web/main.go  binary_dist devserver
+wowsimtbc: binary_dist devserver
 
-devserver: binary_dist/dist.go
+devserver: sim/web/main.go binary_dist/dist.go
 	@echo "Starting server compile now..."
 	@if go build -o wowsimtbc ./sim/web/main.go; then \
 		echo "\033[1;32mBuild Completed Succeessfully\033[0m"; \
@@ -130,9 +130,9 @@ devserver: binary_dist/dist.go
 	fi
 
 release: wowsimtbc
-	GOOS=windows GOARCH=amd64 go build -o wowsimtbc-windows.exe ./sim/web/main.go
-	GOOS=darwin GOARCH=amd64 go build -o wowsimtbc-amd64-darwin ./sim/web/main.go
-	GOOS=linux GOARCH=amd64 go build -o wowsimtbc-amd64-linux ./sim/web/main.go
+	GOOS=windows GOARCH=amd64 go build -o wowsimtbc-windows.exe -ldflags="-X 'main.Version=$(VERSION)'" ./sim/web/main.go
+	GOOS=darwin GOARCH=amd64 go build -o wowsimtbc-amd64-darwin -ldflags="-X 'main.Version=$(VERSION)'" ./sim/web/main.go
+	GOOS=linux GOARCH=amd64 go build -o wowsimtbc-amd64-linux   -ldflags="-X 'main.Version=$(VERSION)'" ./sim/web/main.go
 
 sim/core/proto/api.pb.go: proto/*.proto
 	protoc -I=./proto --go_out=./sim/core ./proto/*.proto

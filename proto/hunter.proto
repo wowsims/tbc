@@ -75,6 +75,15 @@ message Hunter {
 			// Switch back to Aspect of the Hawk when mana goes above this percent.
 			double viper_stop_mana_percent = 7;
 
+			enum WeaveType {
+					WeaveNone = 0;
+					WeaveAutosOnly = 1;
+					WeaveRaptorOnly = 2;
+					WeaveFull = 3;
+			}
+			WeaveType weave = 11;
+
+			// Deprecate these options on 3/14 (1 month).
 			bool melee_weave = 4;
 			bool use_raptor_strike = 8;
 
@@ -120,11 +129,12 @@ message Hunter {
 					Bat = 5;
 					WindSerpent = 6;
 			}
+
 			PetType pet_type = 3;
-
 			double pet_uptime = 4;
+			bool pet_single_ability = 6;
 
-			double latency_ms = 5;
+			int32 latency_ms = 5;
     }
     Options options = 3;
 }

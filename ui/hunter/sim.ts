@@ -35,23 +35,6 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			cssClass: 'hunter-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
-				'This sim is newly released and there are likely still bugs. Take the DPS values with a grain of salt and let us know if you spot any issues!',
-			],
-			warnings: [
-				(simUI: IndividualSimUI<Spec.SpecHunter>) => {
-					return {
-						updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter, simUI.player.consumesChangeEmitter, simUI.player.getParty()!.buffsChangeEmitter]),
-						shouldDisplay: () => {
-							const rotation = simUI.player.getRotation();
-							const isMeleeWeaving = rotation.meleeWeave && rotation.percentWeaved > 0;
-
-							return !isMeleeWeaving &&
-									simUI.player.getConsumes().mainHandImbue != WeaponImbue.WeaponImbueUnknown &&
-									(simUI.player.getParty() != null && simUI.player.getParty()!.getBuffs().windfuryTotemRank > 0);
-						},
-						getContent: () => 'Melee weaving is off but Windfury Totem is on, so your main hand imbue is being ignored without any benefit.',
-					};
-				},
 			],
 
 			// All stats for which EP should be calculated.
@@ -170,15 +153,16 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
-				IconInputs.SunderArmor,
-				IconInputs.ExposeArmor,
-				IconInputs.CurseOfRecklessness,
-				IconInputs.FaerieFire,
+				IconInputs.BloodFrenzy,
 				IconInputs.ImprovedSealOfTheCrusader,
 				IconInputs.JudgementOfWisdom,
 				IconInputs.HuntersMark,
-				IconInputs.BloodFrenzy,
+				IconInputs.FaerieFire,
+				IconInputs.SunderArmor,
+				IconInputs.ExposeArmor,
+				IconInputs.CurseOfRecklessness,
 				IconInputs.CurseOfElements,
+				IconInputs.Misery,
 			],
 			// IconInputs to include in the 'Consumes' section on the settings tab.
 			consumeInputs: [
@@ -207,7 +191,9 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			otherInputs: {
 				inputs: [
 					HunterInputs.PetTypeInput,
-					//HunterInputs.LatencyMs,
+					HunterInputs.PetUptime,
+					HunterInputs.PetSingleAbility,
+					HunterInputs.LatencyMs,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
 					OtherInputs.ExposeWeaknessUptime,

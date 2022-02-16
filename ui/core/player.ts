@@ -29,6 +29,7 @@ import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { StatWeightsResult } from '/tbc/core/proto/api.js';
 import { ShamanTotems, EarthTotem, AirTotem, FireTotem, WaterTotem } from '/tbc/core/proto/shaman.js';
+import { Hunter_Rotation_WeaveType as WeaveType } from '/tbc/core/proto/hunter.js';
 
 import { EquippedItem, getWeaponDPS } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
@@ -713,23 +714,41 @@ export class Player<SpecType extends Spec> {
 			}
 
 			let rotation = this.specTypeFunctions.rotationFromPlayer(proto);
+			let options = this.specTypeFunctions.optionsFromPlayer(proto);
 			// TODO: Remove this on 2/17/2022 (1 month).
 			if (this.spec == Spec.SpecElementalShaman) {
 				const eleRotation = rotation as SpecRotation<Spec.SpecElementalShaman>;
-				const options = this.specTypeFunctions.optionsFromPlayer(proto) as SpecOptions<Spec.SpecElementalShaman>;
+				const eleOptions = options as SpecOptions<Spec.SpecElementalShaman>;
 				if (!eleRotation.totems) {
 					eleRotation.totems = ShamanTotems.create();
 				}
-				if (options.manaSpringTotem) {
+				if (eleOptions.manaSpringTotem) {
 					eleRotation.totems!.water = WaterTotem.ManaSpringTotem;
 				}
-				if (options.totemOfWrath) {
+				if (eleOptions.totemOfWrath) {
 					eleRotation.totems!.fire = FireTotem.TotemOfWrath;
 				}
-				if (options.wrathOfAirTotem) {
+				if (eleOptions.wrathOfAirTotem) {
 					eleRotation.totems!.air = AirTotem.WrathOfAirTotem;
 				}
 				rotation = eleRotation as SpecRotation<SpecType>;
+			}
+
+			// TODO: Remove this on 3/14/2022 (1 month).
+			if (this.spec == Spec.SpecHunter) {
+				const hunterRotation = rotation as SpecRotation<Spec.SpecHunter>;
+				const hunterOptions = options as SpecOptions<Spec.SpecHunter>;
+				if (hunterOptions.petUptime == 0) {
+					hunterOptions.petUptime = 1;
+				}
+				if (hunterRotation.meleeWeave) {
+					if (hunterRotation.useRaptorStrike) {
+						hunterRotation.weave = WeaveType.WeaveFull;
+					} else {
+						hunterRotation.weave = WeaveType.WeaveAutosOnly;
+					}
+				}
+				options = hunterOptions as SpecOptions<SpecType>;
 			}
 
 			this.setName(eventID, proto.name);
@@ -742,7 +761,7 @@ export class Player<SpecType extends Spec> {
 			this.setTalentsString(eventID, proto.talentsString);
 			this.setRotation(eventID, rotation);
 			this.setTalents(eventID, this.specTypeFunctions.talentsFromPlayer(proto));
-			this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
+			this.setSpecOptions(eventID, options);
 		});
 	}
 

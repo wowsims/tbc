@@ -12,6 +12,7 @@ import { Player } from '/tbc/core/player.js';
 import {
 	Hunter,
 	Hunter_Rotation as HunterRotation,
+	Hunter_Rotation_WeaveType as WeaveType,
 	Hunter_Options as HunterOptions,
 	Hunter_Options_Ammo as Ammo,
 	Hunter_Options_QuiverBonus as QuiverBonus,
@@ -49,8 +50,7 @@ export const DefaultRotation = HunterRotation.create({
 	viperStartManaPercent: 0.1,
 	viperStopManaPercent: 0.3,
 
-	meleeWeave: true,
-	useRaptorStrike: true,
+	weave: WeaveType.WeaveFull,
 	timeToWeaveMs: 500,
 	percentWeaved: 0.8,
 });
@@ -59,6 +59,8 @@ export const DefaultOptions = HunterOptions.create({
 	quiverBonus: QuiverBonus.Speed15,
 	ammo: Ammo.AdamantiteStinger,
 	petType: PetType.Ravager,
+	petUptime: 1,
+	latencyMs: 30,
 });
 
 export const DefaultConsumes = Consumes.create({

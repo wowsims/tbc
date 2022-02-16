@@ -42,12 +42,13 @@ type Hunter struct {
 
 	hasGronnstalker2Pc bool
 
-	killCommandEnabledUntil time.Duration       // Time that KC enablement expires.
-	killCommandBlocked      bool                // True while Steady Shot is casting, to prevent KC.
-	killCommandAction       *core.PendingAction // Action to use KC when its comes off CD.
+	killCommandEnabledUntil time.Duration // Time that KC enablement expires.
+	killCommandBlocked      bool          // True while Steady Shot is casting, to prevent KC.
 
+	latency     time.Duration
 	timeToWeave time.Duration
 
+	weaveStartTime   time.Duration
 	raptorStrikeCost float64 // Cached mana cost of raptor strike.
 
 	nextAction   int
@@ -60,6 +61,10 @@ type Hunter struct {
 	avgMultiDmg  float64
 	avgArcaneDmg float64
 
+	// Used for deciding when we can use hawk for the rest of the fight.
+	manaSpentPerSecondAtFirstAspectSwap float64
+	permaHawk                           bool
+
 	// Cached values for adaptive rotation calcs.
 	rangedSwingSpeed   float64
 	rangedWindup       float64
@@ -68,6 +73,7 @@ type Hunter struct {
 	steadyDPS          float64
 	steadyShotCastTime float64
 	multiShotCastTime  float64
+	arcaneShotCastTime float64
 	useMultiForCatchup bool
 
 	aimedShotTemplate core.MeleeAbilityTemplate
@@ -79,7 +85,8 @@ type Hunter struct {
 	aspectOfTheHawkTemplate  core.SimpleCast
 	aspectOfTheViperTemplate core.SimpleCast
 
-	killCommandTemplate core.SimpleCast
+	killCommandTemplate core.SimpleSpellTemplate
+	killCommand         core.SimpleSpell
 
 	multiShotCastTemplate core.SimpleCast
 	multiShotCast         core.SimpleCast
@@ -159,10 +166,12 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.aspectOfTheViper = false
 	hunter.killCommandEnabledUntil = 0
 	hunter.killCommandBlocked = false
-	hunter.killCommandAction.NextActionAt = 0
 	hunter.nextAction = OptionNone
 	hunter.nextActionAt = 0
 	hunter.rangedSwingSpeed = 0
+	hunter.manaSpentPerSecondAtFirstAspectSwap = 0
+	hunter.permaHawk = false
+	hunter.weaveStartTime = time.Duration(float64(sim.Duration) * (1 - hunter.Rotation.PercentWeaved))
 
 	target := sim.GetPrimaryTarget()
 	impHuntersMark := hunter.Talents.ImprovedHuntersMark
@@ -180,9 +189,20 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		Options:   *hunterOptions.Options,
 		Rotation:  *hunterOptions.Rotation,
 
-		timeToWeave: time.Millisecond * time.Duration(hunterOptions.Rotation.TimeToWeaveMs),
+		latency:     time.Millisecond * time.Duration(hunterOptions.Options.LatencyMs),
+		timeToWeave: time.Millisecond * time.Duration(hunterOptions.Rotation.TimeToWeaveMs+hunterOptions.Options.LatencyMs),
+
+		hasGronnstalker2Pc: ItemSetGronnstalker.CharacterHasSetBonus(&character, 2),
 	}
-	hunter.hasGronnstalker2Pc = ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 2)
+
+	if hunter.Rotation.PercentWeaved <= 0 {
+		hunter.Rotation.Weave = proto.Hunter_Rotation_WeaveNone
+	}
+	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveNone {
+		// Forces override of WF. When not weaving we'll be standing far back so weapon
+		// stone can be used.
+		hunter.HasMHWeaponImbue = true
+	}
 
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
 	hunter.EnableManaBar()

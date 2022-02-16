@@ -90,3 +90,10 @@ func (fb *focusBar) reset(sim *core.Simulation) {
 	fb.tickAction = pa
 	sim.AddPendingAction(pa)
 }
+
+func (fb *focusBar) Cancel(sim *core.Simulation) {
+	if fb.tickAction != nil {
+		fb.tickAction.Cancel(sim)
+		fb.tickAction = nil
+	}
+}

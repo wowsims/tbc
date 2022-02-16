@@ -14,6 +14,7 @@ import {
 	Hunter,
 	Hunter_Rotation as HunterRotation,
 	Hunter_Rotation_StingType as StingType,
+	Hunter_Rotation_WeaveType as WeaveType,
 	Hunter_Options as HunterOptions,
 	Hunter_Options_Ammo as Ammo,
 	Hunter_Options_QuiverBonus as QuiverBonus,
@@ -81,7 +82,7 @@ export const LatencyMs = {
 			'latency-ms-picker',
 		],
 		label: 'Latency',
-		labelTooltip: 'Player latency, used for TODO',
+		labelTooltip: 'Player latency, in milliseconds. Adds a delay to actions other than auto shot.',
 		changedEvent: (player: Player<Spec.SpecHunter>) => player.specOptionsChangeEmitter,
 		getValue: (player: Player<Spec.SpecHunter>) => player.getSpecOptions().latencyMs,
 		setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
@@ -114,6 +115,44 @@ export const PetTypeInput = {
 		setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
 			const newOptions = player.getSpecOptions();
 			newOptions.petType = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+	},
+};
+
+export const PetUptime = {
+	type: 'number' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'pet-uptime-picker',
+		],
+		label: 'Pet Uptime (%)',
+		labelTooltip: 'Percent of the fight duration for which your pet will be alive.',
+		changedEvent: (player: Player<Spec.SpecHunter>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecHunter>) => player.getSpecOptions().petUptime * 100,
+		setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
+			const newOptions = player.getSpecOptions();
+			newOptions.petUptime = newValue / 100;
+			player.setSpecOptions(eventID, newOptions);
+		},
+	},
+};
+
+export const PetSingleAbility = {
+	type: 'boolean' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'pet-single-ability-picker',
+		],
+		label: 'Single Pet Ability',
+		labelTooltip: 'Pet will only use its primary ability.',
+		changedEvent: (player: Player<Spec.SpecHunter>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecHunter>) => player.getSpecOptions().petSingleAbility,
+		setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
+			const newOptions = player.getSpecOptions();
+			newOptions.petSingleAbility = newValue;
 			player.setSpecOptions(eventID, newOptions);
 		},
 	},
@@ -217,35 +256,24 @@ export const HunterRotationConfig = {
 			},
 		},
 		{
-			type: 'boolean' as const, cssClass: 'melee-weave-picker',
-			getModObject: (simUI: IndividualSimUI<any>) => simUI,
-			config: {
-				label: 'Melee Weave',
-				labelTooltip: 'Uses melee weaving in the rotation.',
-				changedEvent: (simUI: IndividualSimUI<Spec.SpecHunter>) => simUI.player.rotationChangeEmitter,
-				getValue: (simUI: IndividualSimUI<Spec.SpecHunter>) => simUI.player.getRotation().meleeWeave,
-				setValue: (eventID: EventID, simUI: IndividualSimUI<Spec.SpecHunter>, newValue: boolean) => {
-					const newRotation = simUI.player.getRotation();
-					newRotation.meleeWeave = newValue;
-					simUI.player.setRotation(eventID, newRotation);
-					simUI.recomputeSettingsLayout();
-				},
-			},
-		},
-		{
-			type: 'boolean' as const, cssClass: 'use-raptor-strike-picker',
+			type: 'enum' as const, cssClass: 'weave-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
-				label: 'Use Raptor Strike',
-				labelTooltip: 'Uses Raptor Strike instead of regular melee hits while weaving.',
+				label: 'Melee Weaving',
+				labelTooltip: 'Uses melee weaving in the rotation.',
+				values: [
+					{ name: 'None', value: WeaveType.WeaveNone },
+					{ name: 'Autos Only', value: WeaveType.WeaveAutosOnly },
+					{ name: 'Raptor Only', value: WeaveType.WeaveRaptorOnly },
+					{ name: 'Full', value: WeaveType.WeaveFull },
+				],
 				changedEvent: (player: Player<Spec.SpecHunter>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().useRaptorStrike,
-				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: boolean) => {
+				getValue: (player: Player<Spec.SpecHunter>) => player.getRotation().weave,
+				setValue: (eventID: EventID, player: Player<Spec.SpecHunter>, newValue: number) => {
 					const newRotation = player.getRotation();
-					newRotation.useRaptorStrike = newValue;
+					newRotation.weave = newValue;
 					player.setRotation(eventID, newRotation);
 				},
-				showWhen: (player: Player<Spec.SpecHunter>) => player.getRotation().meleeWeave,
 			},
 		},
 		{
@@ -261,7 +289,7 @@ export const HunterRotationConfig = {
 					newRotation.timeToWeaveMs = newValue;
 					player.setRotation(eventID, newRotation);
 				},
-				showWhen: (player: Player<Spec.SpecHunter>) => player.getRotation().meleeWeave,
+				showWhen: (player: Player<Spec.SpecHunter>) => player.getRotation().weave != WeaveType.WeaveNone,
 			},
 		},
 		{
@@ -277,7 +305,7 @@ export const HunterRotationConfig = {
 					newRotation.percentWeaved = newValue / 100;
 					player.setRotation(eventID, newRotation);
 				},
-				showWhen: (player: Player<Spec.SpecHunter>) => player.getRotation().meleeWeave,
+				showWhen: (player: Player<Spec.SpecHunter>) => player.getRotation().weave != WeaveType.WeaveNone,
 			},
 		},
 		{

@@ -82,8 +82,12 @@ func (hunter *Hunter) NewSteadyShot(sim *core.Simulation, target *core.Target) c
 	hunter.steadyShotCast = hunter.steadyShotCastTemplate
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hunter.steadyShotCast.CastTime = time.Duration(float64(time.Millisecond*1500) / hunter.RangedSwingSpeed())
+	hunter.steadyShotCast.CastTime = hunter.SteadyShotCastTime()
 
 	hunter.steadyShotCast.Init(sim)
 	return hunter.steadyShotCast
+}
+
+func (hunter *Hunter) SteadyShotCastTime() time.Duration {
+	return time.Duration(float64(time.Millisecond*1500)/hunter.RangedSwingSpeed()) + hunter.latency
 }

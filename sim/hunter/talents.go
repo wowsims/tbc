@@ -17,7 +17,9 @@ func (hunter *Hunter) applyTalents() {
 
 		hunter.pet.damageMultiplier *= 1 + 0.04*float64(hunter.Talents.UnleashedFury)
 		hunter.pet.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*2*float64(hunter.Talents.Ferocity))
+		hunter.pet.AddStat(stats.SpellCrit, core.SpellCritRatingPerCritChance*2*float64(hunter.Talents.Ferocity))
 		hunter.pet.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*2*float64(hunter.Talents.AnimalHandler))
+		hunter.pet.AddStat(stats.SpellHit, core.SpellHitRatingPerHitChance*2*float64(hunter.Talents.AnimalHandler))
 		hunter.pet.PseudoStats.MeleeSpeedMultiplier *= 1 + 0.04*float64(hunter.Talents.SerpentsSwiftness)
 	}
 
@@ -372,6 +374,9 @@ func (hunter *Hunter) applyGoForTheThroat() {
 			ID: GoForTheThroatAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				if !hitEffect.IsRanged() || hitEffect.HitType != core.MeleeHitTypeCrit {
+					return
+				}
+				if !hunter.pet.IsEnabled() {
 					return
 				}
 				hunter.pet.AddFocus(sim, amount, core.ActionID{SpellID: 34954})
