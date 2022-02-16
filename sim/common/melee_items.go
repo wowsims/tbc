@@ -73,7 +73,8 @@ func ApplyStormGauntlets(agent core.Agent) {
 		return core.Aura{
 			ID: StormGauntletsAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
+				// https://tbc.wowhead.com/spell=16615/add-lightning-dam-weap-03, proc mask = 20.
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 
@@ -121,7 +122,8 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 		return core.Aura{
 			ID: BlazefuryMedallionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() || ability.IsPhantom {
+				// https://tbc.wowhead.com/spell=7711/add-fire-dam-weap-02, proc mask = 20.
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 
@@ -148,7 +150,8 @@ func ApplyKhoriumChampion(agent core.Agent) {
 		return core.Aura{
 			ID: KhoriumChampionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				// https://tbc.wowhead.com/spell=16916/strength-of-the-champion, proc mask = 0. Handled in-game via script.
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 				if sim.RandomFloat("KhoriumChampion") > procChance {
@@ -172,6 +175,7 @@ var BlackoutTruncheonProcAuraID = core.NewAuraID()
 func ApplyBlackoutTruncheon(agent core.Agent) {
 	character := agent.GetCharacter()
 	mh, oh := character.GetWeaponHands(27901)
+	procMask := core.GetMeleeProcMaskForHands(mh, oh)
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const hasteBonus = 132.0
@@ -181,7 +185,8 @@ func ApplyBlackoutTruncheon(agent core.Agent) {
 		return core.Aura{
 			ID: BlackoutTruncheonAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsEquippedHand(mh, oh) {
+				// https://tbc.wowhead.com/spell=33489/blinding-speed, proc mask = 0. Handled in-game via script.
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) {
 					return
 				}
 				if sim.RandomFloat("BlackoutTruncheon") > procChance {
@@ -207,7 +212,8 @@ func ApplyLionheartChampion(agent core.Agent) {
 		return core.Aura{
 			ID: LionheartChampionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMelee() {
+				// https://tbc.wowhead.com/spell=34513/lionheart, proc mask = 0. Handled in-game via script.
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 				if sim.RandomFloat("LionheartChampion") > procChance {

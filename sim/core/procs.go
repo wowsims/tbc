@@ -36,25 +36,48 @@ func (pm ProcMask) Matches(other ProcMask) bool {
 
 // Single-bit masks. These don't need to match Blizzard's values.
 const (
-	ProcMaskEmpty             ProcMask = 0
-	ProcMaskMeleeMHAutoAttack ProcMask = 1 << iota
-	ProcMaskMeleeOHAutoAttack
-	ProcMaskMeleeMHSpecialAttack
-	ProcMaskMeleeOHSpecialAttack
-	ProcMaskRangedAutoAttack
-	ProcMaskRangedSpecialAttack
+	ProcMaskEmpty       ProcMask = 0
+	ProcMaskMeleeMHAuto ProcMask = 1 << iota
+	ProcMaskMeleeOHAuto
+	ProcMaskMeleeMHSpecial
+	ProcMaskMeleeOHSpecial
+	ProcMaskRangedAuto
+	ProcMaskRangedSpecial
 	ProcMaskSpellDamage
 	ProcMaskPeriodicDamage
 )
 
-// Equivalent to in-game mask of 20.
-const ProcMaskMeleeAttack = ProcMaskMeleeMHAutoAttack | ProcMaskMeleeOHAutoAttack | ProcMaskMeleeSpecialAttack
+const ProcMaskMH = ProcMaskMeleeMHAuto | ProcMaskMeleeMHSpecial
+const ProcMaskOH = ProcMaskMeleeOHAuto | ProcMaskMeleeOHSpecial
 
-// Equivalent to in-game mask of 320.
-const ProcMaskRangedAttack = ProcMaskRangedAutoAttack | ProcMaskRangedSpecialAttack
+// Equivalent to in-game mask of 4.
+const ProcMaskMeleeWhiteHit = ProcMaskMeleeMHAuto | ProcMaskMeleeOHAuto
 
 // Equivalent to in-game mask of 68.
-const ProcMaskWhiteHit = ProcMaskMeleeMHAutoAttack | ProcMaskMeleeOHAutoAttack | ProcMaskRangedAutoAttack
+const ProcMaskWhiteHit = ProcMaskMeleeMHAuto | ProcMaskMeleeOHAuto | ProcMaskRangedAuto
+
+// Equivalent to in-game mask of 16.
+const ProcMaskMeleeSpecial = ProcMaskMeleeMHSpecial | ProcMaskMeleeOHSpecial
+
+// Equivalent to in-game mask of 272.
+const ProcMaskMeleeOrRangedSpecial = ProcMaskMeleeSpecial | ProcMaskRangedSpecial
+
+// Equivalent to in-game mask of 20.
+const ProcMaskMelee = ProcMaskMeleeWhiteHit | ProcMaskMeleeSpecial
+
+// Equivalent to in-game mask of 320.
+const ProcMaskRanged = ProcMaskRangedAuto | ProcMaskRangedSpecial
 
 // Equivalent to in-game mask of 340.
-const ProcMaskMeleeOrRangedAttack = ProcMaskMeleeAttack | ProcMaskRangedAttack
+const ProcMaskMeleeOrRanged = ProcMaskMelee | ProcMaskRanged
+
+func GetMeleeProcMaskForHands(mh bool, oh bool) ProcMask {
+	mask := ProcMaskEmpty
+	if mh {
+		mask |= ProcMaskMH
+	}
+	if oh {
+		mask |= ProcMaskOH
+	}
+	return mask
+}
