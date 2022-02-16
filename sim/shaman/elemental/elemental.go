@@ -253,15 +253,17 @@ type AdaptiveRotation struct {
 }
 
 func (rotation *AdaptiveRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
-	sp := eleShaman.GetStat(stats.NatureSpellPower) + eleShaman.GetStat(stats.SpellPower)
-	castSpeed := eleShaman.CastSpeed()
-	lb := ((612 + (sp * 0.794)) * 1.2) / (2 / castSpeed)
-	cl := ((786 + (sp * 0.651)) * 1.0666) / core.MaxFloat((1.5/castSpeed), 1)
-	if eleShaman.has4pT6 {
-		lb *= 1.05
-	}
-	if lb+10 >= cl {
-		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
+	if sim.GetNumTargets() == 1 {
+		sp := eleShaman.GetStat(stats.NatureSpellPower) + eleShaman.GetStat(stats.SpellPower)
+		castSpeed := eleShaman.CastSpeed()
+		lb := ((612 + (sp * 0.794)) * 1.2) / (2 / castSpeed)
+		cl := ((786 + (sp * 0.651)) * 1.0666) / core.MaxFloat((1.5/castSpeed), 1)
+		if eleShaman.has4pT6 {
+			lb *= 1.05
+		}
+		if lb+10 >= cl {
+			return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
+		}
 	}
 
 	// If we have enough mana to burn, use the surplus rotation.
