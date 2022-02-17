@@ -1865,8 +1865,8 @@ input, select {
 .downbin {
   mask: url(/tbc/assets/gauge.svg);
   mask-size: cover;
-  --webkit-mask: url(/tbc/assets/gauge.svg);
-  --webkit-mask-size: cover;
+  -webkit-mask: url(/tbc/assets/gauge.svg);
+  -webkit-mask-size: cover;
   display: inline-block;
   width: 22px;
   height: 22px;

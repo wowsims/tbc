@@ -702,11 +702,12 @@ class Hunter_Options$Type extends MessageType {
             { no: 3, name: "pet_type", kind: "enum", T: () => ["proto.Hunter.Options.PetType", Hunter_Options_PetType] },
             { no: 4, name: "pet_uptime", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 6, name: "pet_single_ability", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 5, name: "latency_ms", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 5, name: "latency_ms", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 7, name: "remove_randomness", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { quiverBonus: 0, ammo: 0, petType: 0, petUptime: 0, petSingleAbility: false, latencyMs: 0 };
+        const message = { quiverBonus: 0, ammo: 0, petType: 0, petUptime: 0, petSingleAbility: false, latencyMs: 0, removeRandomness: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -734,6 +735,9 @@ class Hunter_Options$Type extends MessageType {
                     break;
                 case /* int32 latency_ms */ 5:
                     message.latencyMs = reader.int32();
+                    break;
+                case /* bool remove_randomness */ 7:
+                    message.removeRandomness = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -765,6 +769,9 @@ class Hunter_Options$Type extends MessageType {
         /* int32 latency_ms = 5; */
         if (message.latencyMs !== 0)
             writer.tag(5, WireType.Varint).int32(message.latencyMs);
+        /* bool remove_randomness = 7; */
+        if (message.removeRandomness !== false)
+            writer.tag(7, WireType.Varint).bool(message.removeRandomness);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

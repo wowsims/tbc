@@ -341,6 +341,14 @@ export interface Hunter_Options {
      * @generated from protobuf field: int32 latency_ms = 5;
      */
     latencyMs: number;
+    /**
+     * For internal use only.
+     * Used for hunter presims to avoid artifacts caused by randomness when
+     * calculating average ability damage from a low sample size.
+     *
+     * @generated from protobuf field: bool remove_randomness = 7;
+     */
+    removeRandomness: boolean;
 }
 /**
  * @generated from protobuf enum proto.Hunter.Options.QuiverBonus
