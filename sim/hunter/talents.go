@@ -323,6 +323,9 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		Cooldown:   cooldown,
 		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			if hunter.CurrentMana() < manaCost {
+				return false
+			}
 			return true
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
@@ -537,11 +540,11 @@ func (hunter *Hunter) registerReadinessCD() {
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:    actionID,
-			Character:   hunter.GetCharacter(),
-			Cooldown:    cooldown,
-			GCD:         time.Second * 1,
-			IgnoreHaste: true, // Hunter GCD is locked
+			ActionID:  actionID,
+			Character: hunter.GetCharacter(),
+			Cooldown:  cooldown,
+			//GCD:         time.Second * 1, TODO: GCD causes panic
+			//IgnoreHaste: true, // Hunter GCD is locked
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.SetCD(RapidFireCooldownID, 0)
 				hunter.SetCD(MultiShotCooldownID, 0)
@@ -557,8 +560,8 @@ func (hunter *Hunter) registerReadinessCD() {
 		ActionID:   actionID,
 		CooldownID: ReadinessCooldownID,
 		Cooldown:   cooldown,
-		UsesGCD:    true,
-		Type:       core.CooldownTypeDPS,
+		//UsesGCD:    true,
+		Type: core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Don't use if there are no cooldowns to reset.
 			if !character.IsOnCD(RapidFireCooldownID, sim.CurrentTime) {

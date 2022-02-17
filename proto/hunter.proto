@@ -122,11 +122,13 @@ message Hunter {
 
 			enum PetType {
 					PetNone = 0;
-					Ravager = 1;
-					Cat = 2;
-					Raptor = 3;
-					Owl = 4;
 					Bat = 5;
+					Bear = 7;
+					Cat = 2;
+					Crab = 8;
+					Owl = 4;
+					Raptor = 3;
+					Ravager = 1;
 					WindSerpent = 6;
 			}
 
@@ -135,6 +137,11 @@ message Hunter {
 			bool pet_single_ability = 6;
 
 			int32 latency_ms = 5;
+
+			// For internal use only.
+			// Used for hunter presims to avoid artifacts caused by randomness when
+			// calculating average ability damage from a low sample size.
+			bool remove_randomness = 7;
     }
     Options options = 3;
 }

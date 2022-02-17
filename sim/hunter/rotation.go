@@ -60,11 +60,6 @@ func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 
 	hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
 
-	// Swap aspects or keep up sting if needed.
-	if hunter.nextActionAt == OptionNone {
-		hunter.tryUsePrioGCD(sim)
-	}
-
 	hunter.rotation(sim, false)
 }
 
@@ -103,7 +98,7 @@ func (hunter *Hunter) lazyRotation(sim *core.Simulation, followsRangedAuto bool)
 	canWeave := hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveNone &&
 		(hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveRaptorOnly || !hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime)) &&
 		sim.CurrentTime >= hunter.weaveStartTime &&
-		hunter.AutoAttacks.MeleeSwingsReady(sim)
+		hunter.AutoAttacks.MainhandSwingAt <= sim.CurrentTime
 	if canWeave && !shootReady && (!gcdReady || (waitingForMana && hunter.Rotation.Weave != proto.Hunter_Rotation_WeaveRaptorOnly)) {
 		hunter.nextAction = OptionWeave
 		hunter.nextActionAt = sim.CurrentTime
@@ -140,7 +135,7 @@ func (hunter *Hunter) lazyRotation(sim *core.Simulation, followsRangedAuto bool)
 func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto bool) {
 	gcdAtDuration := core.MaxDuration(sim.CurrentTime, hunter.NextGCDAt())
 	shootAtDuration := core.MaxDuration(sim.CurrentTime, hunter.AutoAttacks.RangedSwingAt)
-	weaveAtDuration := core.MaxDuration(sim.CurrentTime, hunter.AutoAttacks.MeleeSwingsReadyAt())
+	weaveAtDuration := core.MaxDuration(sim.CurrentTime, hunter.AutoAttacks.MainhandSwingAt)
 	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveRaptorOnly {
 		weaveAtDuration = core.MaxDuration(weaveAtDuration, hunter.CDReadyAt(RaptorStrikeCooldownID))
 	}
@@ -158,7 +153,7 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 
 		// Use the inverse (1 / x) because multiplication is faster than division.
 		gcdRate := 1.0 / 1.5
-		weaveRate := 1.0 / core.MaxDuration(hunter.AutoAttacks.MainhandSwingSpeed(), hunter.AutoAttacks.OffhandSwingSpeed()).Seconds()
+		weaveRate := 1.0 / hunter.AutoAttacks.MainhandSwingSpeed().Seconds()
 		shootRate := 1.0 / hunter.AutoAttacks.RangedSwingSpeed().Seconds()
 
 		hunter.shootDPS = hunter.avgShootDmg * shootRate
@@ -279,13 +274,53 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 	hunter.nextActionAt = bestOptionAt
 }
 
+func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
+	hunter.nextAction = OptionNone
+	target := sim.GetPrimaryTarget()
+	switch option {
+	case OptionShoot:
+		hunter.AutoAttacks.SwingRanged(sim, target)
+	case OptionWeave:
+		hunter.doMeleeWeave(sim)
+	case OptionSteady:
+		if !hunter.tryUsePrioGCD(sim) {
+			ss := hunter.NewSteadyShot(sim, target)
+			if success := ss.StartCast(sim); success {
+				// Can't use kill command while casting steady shot.
+				hunter.killCommandBlocked = true
+			} else {
+				hunter.WaitForMana(sim, ss.GetManaCost())
+			}
+		}
+	case OptionMulti:
+		if !hunter.tryUsePrioGCD(sim) {
+			ms := hunter.NewMultiShot(sim)
+			if success := ms.StartCast(sim); success {
+			} else {
+				hunter.WaitForMana(sim, ms.GetManaCost())
+			}
+		}
+	case OptionArcane:
+		if !hunter.tryUsePrioGCD(sim) {
+			as := hunter.NewArcaneShot(sim, target)
+			if success := as.Attack(sim); success {
+				// Arcane is instant, so we can try another action immediately.
+				hunter.rotation(sim, false)
+			} else {
+				hunter.WaitForMana(sim, as.Cost.Value)
+			}
+		}
+	}
+}
+
 // Decides whether to use an instant-cast GCD spell.
 // Returns true if any of these spells was selected.
 func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 	// First prio is swapping aspect if necessary.
 	currentMana := hunter.CurrentManaPercent()
 	if hunter.aspectOfTheViper {
-		if !hunter.permaHawk && hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
+		if !hunter.permaHawk &&
+			hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
 			hunter.permaHawk = true
 		}
 		if hunter.permaHawk || currentMana > hunter.Rotation.ViperStopManaPercent {
@@ -297,7 +332,8 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 		if hunter.manaSpentPerSecondAtFirstAspectSwap == 0 {
 			hunter.manaSpentPerSecondAtFirstAspectSwap = (hunter.Metrics.ManaSpent - hunter.Metrics.ManaGained) / sim.CurrentTime.Seconds()
 		}
-		if !hunter.permaHawk && hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
+		if !hunter.permaHawk &&
+			hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
 			hunter.permaHawk = true
 		} else {
 			aspect := hunter.NewAspectOfTheViper(sim)
@@ -324,39 +360,6 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 	return false
 }
 
-func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
-	hunter.nextAction = OptionNone
-	target := sim.GetPrimaryTarget()
-	switch option {
-	case OptionShoot:
-		hunter.AutoAttacks.SwingRanged(sim, target)
-	case OptionWeave:
-		hunter.doMeleeWeave(sim)
-	case OptionSteady:
-		ss := hunter.NewSteadyShot(sim, target)
-		if success := ss.StartCast(sim); success {
-			// Can't use kill command while casting steady shot.
-			hunter.killCommandBlocked = true
-		} else {
-			hunter.WaitForMana(sim, ss.GetManaCost())
-		}
-	case OptionMulti:
-		ms := hunter.NewMultiShot(sim)
-		if success := ms.StartCast(sim); success {
-		} else {
-			hunter.WaitForMana(sim, ms.GetManaCost())
-		}
-	case OptionArcane:
-		as := hunter.NewArcaneShot(sim, target)
-		if success := as.Attack(sim); success {
-			// Arcane is instant, so we can try another action immediately.
-			hunter.rotation(sim, false)
-		} else {
-			hunter.WaitForMana(sim, as.Cost.Value)
-		}
-	}
-}
-
 func (hunter *Hunter) doMeleeWeave(sim *core.Simulation) {
 	// Delay gcd and ranged autos until the weaving is done.
 	doneWeavingAt := sim.CurrentTime + hunter.timeToWeave
@@ -365,7 +368,7 @@ func (hunter *Hunter) doMeleeWeave(sim *core.Simulation) {
 		hunter.SetGCDTimer(sim, doneWeavingAt)
 	}
 
-	hunter.AutoAttacks.SwingMelee(sim, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.TrySwingMH(sim, sim.GetPrimaryTarget())
 	hunter.HardcastWaitUntil(sim, doneWeavingAt, &hunter.fakeHardcast)
 }
 
@@ -377,16 +380,14 @@ func (hunter *Hunter) GetPresimOptions() *core.PresimOptions {
 
 	return &core.PresimOptions{
 		SetPresimPlayerOptions: func(player *proto.Player) {
-			rotation := hunter.Rotation
-			rotation.LazyRotation = true
-			*player.Spec.(*proto.Player_Hunter).Hunter.Rotation = rotation
+			player.Spec.(*proto.Player_Hunter).Hunter.Rotation.LazyRotation = true
+			player.Spec.(*proto.Player_Hunter).Hunter.Options.RemoveRandomness = true
 		},
 
 		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32, duration time.Duration) bool {
 			hunter.avgShootDmg = core.GetActionAvgCast(presimResult, core.ActionID{OtherID: proto.OtherAction_OtherActionShoot})
 			hunter.avgWeaveDmg = core.GetActionAvgCast(presimResult, RaptorStrikeActionID) +
-				core.GetActionAvgCast(presimResult, core.ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1}) +
-				core.GetActionAvgCast(presimResult, core.ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2})
+				core.GetActionAvgCast(presimResult, core.ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1})
 			hunter.avgSteadyDmg = core.GetActionAvgCast(presimResult, SteadyShotActionID)
 			hunter.avgMultiDmg = core.GetActionAvgCast(presimResult, MultiShotActionID)
 			hunter.avgArcaneDmg = core.GetActionAvgCast(presimResult, ArcaneShotActionID)

@@ -284,6 +284,7 @@ var allowList = map[int]bool{
 	20966: true, // Jade Pendant of Blasting
 	22395: true, // Totem of Rage
 	27947: true, // Totem of Impact
+	32508: true, // Necklace of the Deep
 	33135: true, // Falling Star
 	33140: true, // Blood of Amber
 	33143: true, // Stone of Blades

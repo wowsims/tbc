@@ -26,6 +26,30 @@ var BMTalents = &proto.HunterTalents{
 	MortalShots:    5,
 }
 
+var SVTalents = &proto.HunterTalents{
+	ImprovedAspectOfTheHawk: 5,
+	FocusedFire:             2,
+
+	LethalShots:         5,
+	ImprovedHuntersMark: 5,
+	GoForTheThroat:      2,
+	RapidKilling:        1,
+
+	MonsterSlaying:    3,
+	HumanoidSlaying:   3,
+	SavageStrikes:     2,
+	CleverTraps:       2,
+	Survivalist:       2,
+	Surefooted:        3,
+	SurvivalInstincts: 2,
+	KillerInstinct:    3,
+	LightningReflexes: 5,
+	ThrillOfTheHunt:   2,
+	ExposeWeakness:    3,
+	MasterTactician:   5,
+	Readiness:         true,
+}
+
 var PlayerOptionsBasic = &proto.Player_Hunter{
 	Hunter: &proto.Hunter{
 		Talents:  BMTalents,
@@ -45,6 +69,14 @@ var PlayerOptionsFrench = &proto.Player_Hunter{
 var PlayerOptionsMeleeWeave = &proto.Player_Hunter{
 	Hunter: &proto.Hunter{
 		Talents:  BMTalents,
+		Options:  windSerpentOptions,
+		Rotation: meleeWeaveRotation,
+	},
+}
+
+var PlayerOptionsSV = &proto.Player_Hunter{
+	Hunter: &proto.Hunter{
+		Talents:  SVTalents,
 		Options:  windSerpentOptions,
 		Rotation: meleeWeaveRotation,
 	},

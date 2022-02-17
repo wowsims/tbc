@@ -178,6 +178,10 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	if !target.HasAura(core.HuntersMarkDebuffID) || target.NumStacks(core.HuntersMarkDebuffID) < impHuntersMark {
 		target.AddAura(sim, core.HuntersMarkAura(impHuntersMark, false))
 	}
+
+	if sim.Log != nil && !hunter.Rotation.LazyRotation {
+		hunter.Log(sim, "Average damage values for adaptive rotation: shoot=%0.02f, weave=%0.02f, steady=%0.02f, multi=%0.02f, arcane=%0.02f", hunter.avgShootDmg, hunter.avgWeaveDmg, hunter.avgSteadyDmg, hunter.avgMultiDmg, hunter.avgArcaneDmg)
+	}
 }
 
 func NewHunter(character core.Character, options proto.Player) *Hunter {
@@ -216,6 +220,14 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 			return hunter.TryRaptorStrike(sim)
 		},
 	})
+	if hunter.Options.RemoveRandomness {
+		weaponAvg := (hunter.AutoAttacks.Ranged.BaseDamageMin + hunter.AutoAttacks.Ranged.BaseDamageMax) / 2
+		hunter.AutoAttacks.Ranged.BaseDamageMin = weaponAvg
+		hunter.AutoAttacks.Ranged.BaseDamageMax = weaponAvg
+
+		hunter.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*100)
+		hunter.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*-100)
+	}
 
 	hunter.pet = hunter.NewHunterPet()
 
