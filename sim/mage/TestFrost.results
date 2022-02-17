@@ -93,6 +93,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFrost-AllItems-Bladefist'sBreadth-28041"
+ value: {
+  dps: 1554.3738417620436
+ }
+}
+dps_results: {
  key: "TestFrost-AllItems-BlazefuryMedallion-17111"
  value: {
   dps: 1589.640959471183
