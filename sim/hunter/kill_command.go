@@ -82,6 +82,7 @@ func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.MeleeAbil
 		},
 	}
 
+	ama.Effect.DamageMultiplier *= hp.config.DamageMultiplier
 	ama.Effect.BonusCritRating += float64(hp.hunterOwner.Talents.FocusedFire) * 10 * core.MeleeCritRatingPerCritChance
 
 	return core.NewMeleeAbilityTemplate(ama)
