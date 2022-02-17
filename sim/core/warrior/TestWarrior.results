@@ -149,7 +149,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-Despair-28573"
  value: {
-  dps: 225.92135214508758
+  dps: 226.02945472335648
  }
 }
 dps_results: {
@@ -161,7 +161,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-Devastation-30316"
  value: {
-  dps: 318.5239876307958
+  dps: 321.3141095103685
  }
 }
 dps_results: {
@@ -299,13 +299,13 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-LionheartChampion-28429"
  value: {
-  dps: 237.13231342104046
+  dps: 238.82042374749645
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 244.44617349867184
+  dps: 246.19241492786935
  }
 }
 dps_results: {
@@ -425,7 +425,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-SingingCrystalAxe-31318"
  value: {
-  dps: 217.79233186646093
+  dps: 217.90043444472983
  }
 }
 dps_results: {
@@ -575,7 +575,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-WorldBreaker-30090"
  value: {
-  dps: 247.80400885816698
+  dps: 248.12241394777496
  }
 }
 dps_results: {
