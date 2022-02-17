@@ -675,18 +675,20 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 	aa.MainhandSwingAt = 0
 	aa.OffhandSwingAt = 0
 
-	// Set a fake value for previousMHSwing so that offhand swing delay works
-	// properly at the start.
-	aa.previousMHSwingAt = time.Second * -1
+	// Apply random delay of 0 - 50% swing time, to one of the weapons if dual wielding
+	if aa.IsDualWielding {
+		// Set a fake value for previousMHSwing so that offhand swing delay works
+		// properly at the start.
+		aa.previousMHSwingAt = time.Second * -1
 
-	// Apply random delay of 0 - 50% swing time, to one of the weapons.
-	delay := time.Duration(sim.RandomFloat("SwingResetDelay") * float64(aa.MH.SwingDuration/2))
-	isMHDelay := sim.RandomFloat("SwingResetWeapon") < 0.5
+		delay := time.Duration(sim.RandomFloat("SwingResetDelay") * float64(aa.MH.SwingDuration/2))
+		isMHDelay := sim.RandomFloat("SwingResetWeapon") < 0.5
 
-	if isMHDelay {
-		aa.MainhandSwingAt = delay
-	} else if aa.IsDualWielding {
-		aa.OffhandSwingAt = delay
+		if isMHDelay {
+			aa.MainhandSwingAt = delay
+		} else {
+			aa.OffhandSwingAt = delay
+		}
 	}
 
 	aa.autoSwingAction = nil
@@ -718,7 +720,6 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 
 	pa := sim.pendingActionPool.Get()
 	pa.Priority = ActionPriorityAuto
-	pa.NextActionAt = 0 // First auto is always at 0
 
 	pa.OnAction = func(sim *Simulation) {
 		aa.SwingMelee(sim, sim.GetPrimaryTarget())
@@ -745,6 +746,30 @@ func (aa *AutoAttacks) CancelAutoSwing(sim *Simulation) {
 		aa.autoSwingAction = nil
 		aa.autoSwingCancelled = true
 	}
+}
+
+// Renables the auto swing action for the iteration
+func (aa *AutoAttacks) EnableAutoSwing(sim *Simulation) {
+	// Already enabled so nothing to do
+	if aa.autoSwingAction != nil {
+		return
+	}
+
+	if aa.MainhandSwingAt < sim.CurrentTime {
+		aa.MainhandSwingAt = sim.CurrentTime
+	}
+	if aa.OffhandSwingAt < sim.CurrentTime {
+		aa.OffhandSwingAt = sim.CurrentTime
+	}
+	if aa.RangedSwingAt < sim.CurrentTime {
+		if aa.RangedSwingInProgress {
+			panic("Ranged swing already in progress!")
+		}
+		aa.RangedSwingAt = sim.CurrentTime
+	}
+
+	aa.autoSwingCancelled = false
+	aa.resetAutoSwing(sim)
 }
 
 // The amount of time between two MH swings.
