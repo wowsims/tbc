@@ -1,8 +1,7 @@
-import { RaidBuffs, StrengthOfEarthType } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
-import { Drums } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
@@ -15,7 +14,9 @@ export class RetributionPaladinSimUI extends IndividualSimUI {
         super(parentElem, player, {
             cssClass: 'retribution-paladin-sim-ui',
             // List any known bugs / issues here and they'll be shown on the site.
-            knownIssues: [],
+            knownIssues: [
+                "Basically everything is WIP"
+            ],
             // All stats for which EP should be calculated.
             epStats: [
                 Stat.StatStrength,
@@ -34,12 +35,18 @@ export class RetributionPaladinSimUI extends IndividualSimUI {
                 Stat.StatStamina,
                 Stat.StatStrength,
                 Stat.StatAgility,
+                Stat.StatIntellect,
                 Stat.StatAttackPower,
-                Stat.StatExpertise,
                 Stat.StatMeleeHit,
                 Stat.StatMeleeCrit,
                 Stat.StatMeleeHaste,
+                Stat.StatExpertise,
                 Stat.StatArmorPenetration,
+                Stat.StatSpellPower,
+                Stat.StatNatureSpellPower,
+                Stat.StatSpellHit,
+                Stat.StatSpellCrit,
+                Stat.StatSpellHaste,
             ],
             defaults: {
                 // Default equipped gear.
@@ -64,24 +71,13 @@ export class RetributionPaladinSimUI extends IndividualSimUI {
                 // Default spec-specific settings.
                 specOptions: Presets.DefaultOptions,
                 // Default raid/party buffs settings.
-                raidBuffs: RaidBuffs.create({
-                    giftOfTheWild: TristateEffect.TristateEffectImproved,
-                }),
-                partyBuffs: PartyBuffs.create({
-                    drums: Drums.DrumsOfBattle,
-                    bloodlust: 1,
-                    strengthOfEarthTotem: StrengthOfEarthType.EnhancingAndCyclone,
-                    windfuryTotemRank: 5,
-                }),
+                raidBuffs: RaidBuffs.create({}),
+                partyBuffs: PartyBuffs.create({}),
                 individualBuffs: IndividualBuffs.create({
                     blessingOfKings: true,
                     blessingOfMight: TristateEffect.TristateEffectImproved,
                 }),
-                debuffs: Debuffs.create({
-                    bloodFrenzy: true,
-                    curseOfRecklessness: true,
-                    exposeArmor: TristateEffect.TristateEffectRegular
-                }),
+                debuffs: Debuffs.create({}),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
             selfBuffInputs: [
