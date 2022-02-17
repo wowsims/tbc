@@ -87,6 +87,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestEnhancement-AllItems-Bladefist'sBreadth-28041"
+ value: {
+  dps: 1869.8442492822896
+ }
+}
+dps_results: {
  key: "TestEnhancement-AllItems-BlazefuryMedallion-17111"
  value: {
   dps: 1814.096690248262
@@ -179,7 +185,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Despair-28573"
  value: {
-  dps: 1306.7683565386503
+  dps: 1281.8214579638782
  }
 }
 dps_results: {
@@ -191,7 +197,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Devastation-30316"
  value: {
-  dps: 1716.2127269544653
+  dps: 1681.6892412799448
  }
 }
 dps_results: {
@@ -293,7 +299,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-GlaiveofthePit-28774"
  value: {
-  dps: 1308.027252124276
+  dps: 1291.9048039982888
  }
 }
 dps_results: {
@@ -335,7 +341,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-KhoriumChampion-23541"
  value: {
-  dps: 1286.856689982547
+  dps: 1278.503727755768
  }
 }
 dps_results: {
@@ -347,13 +353,13 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-LionheartChampion-28429"
  value: {
-  dps: 1322.4233857424242
+  dps: 1332.0170089881922
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 1366.9439810977922
+  dps: 1346.1135810994401
  }
 }
 dps_results: {
@@ -473,7 +479,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-SingingCrystalAxe-31318"
  value: {
-  dps: 1255.6300861812413
+  dps: 1261.2094437612136
  }
 }
 dps_results: {
@@ -659,7 +665,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-WorldBreaker-30090"
  value: {
-  dps: 1393.589737753976
+  dps: 1365.33058549313
  }
 }
 dps_results: {
