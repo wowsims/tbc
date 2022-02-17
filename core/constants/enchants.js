@@ -9,7 +9,7 @@ enchantDescriptions.set(GLYPH_OF_FEROCITY, '+34 Attack Power and +16 Hit Rating'
 export const GREATER_INSCRIPTION_OF_DISCIPLINE = 28886;
 enchantDescriptions.set(GREATER_INSCRIPTION_OF_DISCIPLINE, '+18 Spell Damage and +10 Spell Crit Rating');
 export const GREATER_INSCRIPTION_OF_THE_ORB = 28909;
-enchantDescriptions.set(GREATER_INSCRIPTION_OF_THE_ORB, '+15 Spell Damage and +12 Spell Crit Rating');
+enchantDescriptions.set(GREATER_INSCRIPTION_OF_THE_ORB, '+15 Spell Crit Rating and +12 Spell Damage');
 export const POWER_OF_THE_SCOURGE = 23545;
 enchantDescriptions.set(POWER_OF_THE_SCOURGE, '+15 Spell Damage and +14 Spell Crit Rating');
 export const GREATER_INSCRIPTION_OF_VENGEANCE = 28888;
