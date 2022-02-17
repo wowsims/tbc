@@ -428,7 +428,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 		ID:       WindfuryTotemAuraID,
 		ActionID: actionID,
 		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(ProcMaskMH) || ability.IsPhantom {
+			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(ProcMaskMeleeMH) || ability.IsPhantom {
 				return
 			}
 			if icd.IsOnCD(sim) {

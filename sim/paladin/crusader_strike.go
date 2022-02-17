@@ -28,8 +28,9 @@ func (paladin *Paladin) newCrusaderStrikeTemplate(sim *core.Simulation) core.Mel
 			},
 		},
 		Effects: []core.AbilityHitEffect{
-			core.AbilityHitEffect{
+			{
 				AbilityEffect: core.AbilityEffect{
+					ProcMask:               core.ProcMaskMeleeMHSpecial,
 					DamageMultiplier:       1, // Need to review to make sure I set these properly
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,

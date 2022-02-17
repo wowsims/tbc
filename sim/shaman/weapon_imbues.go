@@ -86,19 +86,16 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 				wfTemplate.Apply(&wfAtk)
 				// Set so only the proc'd hand attacks
+				attackProc := core.ProcMaskMeleeMHSpecial
 				if isMHHit {
 					wfAtk.ActionID.Tag = 1
 				} else {
 					wfAtk.ActionID.Tag = 2
+					attackProc = core.ProcMaskMeleeOHSpecial
 				}
 				for i := 0; i < 2; i++ {
-					if isMHHit {
-						wfAtk.Effects[i].ProcMask = core.ProcMaskMeleeMHSpecial
-					} else {
-						wfAtk.Effects[i].ProcMask = core.ProcMaskMeleeOHSpecial
-					}
 					wfAtk.Effects[i].Target = hitEffect.Target
-
+					wfAtk.Effects[i].ProcMask = attackProc
 					if !isMHHit {
 						// For whatever reason, OH penalty does not apply to the bonus AP from WF OH
 						// hits. Implement this by doubling the AP bonus we provide.

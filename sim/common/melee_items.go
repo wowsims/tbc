@@ -186,7 +186,7 @@ func ApplyBlackoutTruncheon(agent core.Agent) {
 			ID: BlackoutTruncheonAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				// https://tbc.wowhead.com/spell=33489/blinding-speed, proc mask = 0. Handled in-game via script.
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) || ability.IsPhantom {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) {
 					return
 				}
 				if sim.RandomFloat("BlackoutTruncheon") > procChance {
@@ -543,7 +543,7 @@ func ApplyTheBladefist(agent core.Agent) {
 		return core.Aura{
 			ID: TheBladefistAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || !hitEffect.IsMH() {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMeleeMH) {
 					return
 				}
 				if sim.RandomFloat("The Bladefist") > procChance {

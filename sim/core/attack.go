@@ -377,10 +377,8 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	dmg += ahe.DirectInput.FlatDamageBonus
 
 	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
-	if !ahe.ProcMask.Matches(ProcMaskWhiteHit) || ahe.ProcMask.Matches(ProcMaskRanged) {
-		skill := 350.0
-		level := float64(ahe.Target.Level)
-		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) + ((skill - (level * 5)) * 0.002) - 0.018
+	if ahe.ProcMask.Matches(ProcMaskTwoRoll) {
+		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
 
 		roll := sim.RandomFloat("weapon swing")
 		if roll < critChance {
@@ -409,13 +407,13 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 
 // Returns whether this hit effect is associated with the main-hand weapon.
 func (ahe *AbilityHitEffect) IsMH() bool {
-	const mhmask = ProcMaskMH | ProcMaskRanged
+	const mhmask = ProcMaskMeleeMH | ProcMaskRanged
 	return !ahe.ProcMask.Matches(mhmask)
 }
 
 // Returns whether this hit effect is associated with the off-hand weapon.
 func (ahe *AbilityHitEffect) IsOH() bool {
-	return ahe.ProcMask.Matches(ProcMaskOH)
+	return ahe.ProcMask.Matches(ProcMaskMeleeOH)
 }
 
 // Returns whether this hit effect is associated with either melee weapon.

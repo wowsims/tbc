@@ -47,10 +47,9 @@ const (
 	ProcMaskPeriodicDamage
 )
 
-const ProcMaskMH = ProcMaskMeleeMHAuto | ProcMaskMeleeMHSpecial
-const ProcMaskOH = ProcMaskMeleeOHAuto | ProcMaskMeleeOHSpecial
-
 const (
+	ProcMaskMeleeMH = ProcMaskMeleeMHAuto | ProcMaskMeleeMHSpecial
+	ProcMaskMeleeOH = ProcMaskMeleeOHAuto | ProcMaskMeleeOHSpecial
 	// Equivalent to in-game mask of 4.
 	ProcMaskMeleeWhiteHit = ProcMaskMeleeMHAuto | ProcMaskMeleeOHAuto
 	// Equivalent to in-game mask of 68.
@@ -65,15 +64,17 @@ const (
 	ProcMaskRanged = ProcMaskRangedAuto | ProcMaskRangedSpecial
 	// Equivalent to in-game mask of 340.
 	ProcMaskMeleeOrRanged = ProcMaskMelee | ProcMaskRanged
+
+	ProcMaskTwoRoll = ProcMaskRanged | ProcMaskMeleeSpecial
 )
 
 func GetMeleeProcMaskForHands(mh bool, oh bool) ProcMask {
 	mask := ProcMaskEmpty
 	if mh {
-		mask |= ProcMaskMH
+		mask |= ProcMaskMeleeMH
 	}
 	if oh {
-		mask |= ProcMaskOH
+		mask |= ProcMaskMeleeOH
 	}
 	return mask
 }
