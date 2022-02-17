@@ -16,13 +16,13 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 
 	if debuffs.JudgementOfWisdom {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return JudgementOfWisdomAura()
+			return JudgementOfWisdomAura(sim)
 		})
 	}
 
 	if debuffs.ImprovedSealOfTheCrusader {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return ImprovedSealOfTheCrusaderAura()
+			return JudgementOfTheCrusaderAura(sim, 3)
 		})
 	}
 
@@ -153,12 +153,14 @@ func ShadowWeavingAura(sim *Simulation, numStacks int32) Aura {
 
 var JudgementOfWisdomDebuffID = NewDebuffID()
 
-func JudgementOfWisdomAura() Aura {
+func JudgementOfWisdomAura(sim *Simulation) Aura {
 	const mana = 74 / 2 // 50% proc
 	actionID := ActionID{SpellID: 27164}
-	return Aura{
+	var aura Aura
+	aura = Aura{
 		ID:       JudgementOfWisdomDebuffID,
 		ActionID: actionID,
+		Expires:  sim.CurrentTime + time.Second*20,
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.IsPhantom {
 				return // Phantom spells (Romulo's, Lightning Capacitor, etc) don't proc JoW.
@@ -170,31 +172,47 @@ func JudgementOfWisdomAura() Aura {
 			}
 		},
 		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+			if ability.ActionID.SpellID == 35395 {
+				aura.Expires = sim.CurrentTime + time.Second*20
+				hitEffect.Target.ReplaceAura(sim, aura)
+			}
 			if ability.IsPhantom {
 				return
 			}
-
 			character := ability.Character
 			if character.HasManaBar() {
 				character.AddMana(sim, mana, actionID, false)
 			}
 		},
 	}
+	return aura
 }
 
 var ImprovedSealOfTheCrusaderDebuffID = NewDebuffID()
 
-func ImprovedSealOfTheCrusaderAura() Aura {
-	return Aura{
+func JudgementOfTheCrusaderAura(sim *Simulation, level float64) Aura {
+	bonusSPCrit := level * SpellCritRatingPerCritChance
+	bonusMCrit := level * MeleeCritRatingPerCritChance
+	var aura Aura
+	aura = Aura{
 		ID:       ImprovedSealOfTheCrusaderDebuffID,
-		ActionID: ActionID{SpellID: 20337},
+		ActionID: ActionID{SpellID: 27159},
+		Expires:  sim.CurrentTime + time.Second*20,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			spellEffect.BonusSpellCritRating += 3 * SpellCritRatingPerCritChance
+			if spellCast.SpellSchool == stats.HolySpellPower {
+				spellEffect.BonusSpellPower += 219
+			}
+			spellEffect.BonusSpellCritRating += bonusSPCrit
 		},
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-			hitEffect.BonusCritRating += 3 * MeleeCritRatingPerCritChance
+			if ability.ActionID.SpellID == 35395 {
+				aura.Expires = sim.CurrentTime + time.Second*20
+				hitEffect.Target.ReplaceAura(sim, aura)
+			}
+			hitEffect.BonusCritRating += bonusMCrit
 		},
 	}
+	return aura
 }
 
 var CurseOfElementsDebuffID = NewDebuffID()

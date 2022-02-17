@@ -54,7 +54,6 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 }
 
 func (paladin *Paladin) NewConsecration(sim *core.Simulation) *core.SimpleSpell {
-	// Cancel the current flamestrike dot.
 	paladin.ConsecrationSpell.Cancel(sim)
 
 	consecration := &paladin.ConsecrationSpell
