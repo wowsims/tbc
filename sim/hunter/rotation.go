@@ -377,9 +377,8 @@ func (hunter *Hunter) GetPresimOptions() *core.PresimOptions {
 
 	return &core.PresimOptions{
 		SetPresimPlayerOptions: func(player *proto.Player) {
-			rotation := hunter.Rotation
-			rotation.LazyRotation = true
-			*player.Spec.(*proto.Player_Hunter).Hunter.Rotation = rotation
+			player.Spec.(*proto.Player_Hunter).Hunter.Rotation.LazyRotation = true
+			player.Spec.(*proto.Player_Hunter).Hunter.Options.RemoveRandomness = true
 		},
 
 		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32, duration time.Duration) bool {
