@@ -318,9 +318,6 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 	// First prio is swapping aspect if necessary.
 	currentMana := hunter.CurrentManaPercent()
-	if sim.Log != nil {
-		hunter.Log(sim, "Current mana percent: %0.02f, viper start: %0.02f", currentMana, hunter.Rotation.ViperStartManaPercent)
-	}
 	if hunter.aspectOfTheViper {
 		if !hunter.permaHawk &&
 			hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
@@ -334,12 +331,6 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 	} else if !hunter.aspectOfTheViper && !hunter.permaHawk && currentMana < hunter.Rotation.ViperStartManaPercent {
 		if hunter.manaSpentPerSecondAtFirstAspectSwap == 0 {
 			hunter.manaSpentPerSecondAtFirstAspectSwap = (hunter.Metrics.ManaSpent - hunter.Metrics.ManaGained) / sim.CurrentTime.Seconds()
-			if sim.Log != nil {
-				hunter.Log(sim, "MSPS: %0.02f", hunter.manaSpentPerSecondAtFirstAspectSwap)
-			}
-		}
-		if sim.Log != nil {
-			hunter.Log(sim, "Trying to swap: current mana: %0.02f, remaining: %s, msps: %0.02f", hunter.CurrentMana(), sim.GetRemainingDuration(), hunter.manaSpentPerSecondAtFirstAspectSwap)
 		}
 		if !hunter.permaHawk &&
 			hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
