@@ -1,6 +1,9 @@
 package enhancement
 
 import (
+	"time"
+
+	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/shaman"
@@ -77,14 +80,89 @@ type EnhancementShaman struct {
 	*shaman.Shaman
 
 	Rotation proto.EnhancementShaman_Rotation
+
+	scheduler common.GCDScheduler
 }
 
 func (enh *EnhancementShaman) GetShaman() *shaman.Shaman {
 	return enh.Shaman
 }
 
+func (enh *EnhancementShaman) Init(sim *core.Simulation) {
+	enh.Shaman.Init(sim)
+
+	// Fill the GCD schedule based on our settings.
+	maxDuration := sim.GetMaxDuration()
+
+	var curTime time.Duration
+
+	ssAction := common.ScheduledAbility{
+		Duration: core.GCDDefault,
+		TryCast: func(sim *core.Simulation) bool {
+			ss := enh.NewStormstrike(sim, sim.GetPrimaryTarget())
+			success := ss.Attack(sim)
+			if !success {
+				enh.WaitForMana(sim, ss.Cost.Value)
+			}
+			return success
+		},
+	}
+	curTime = 0
+	for curTime <= maxDuration {
+		ability := ssAction
+		ability.DesiredCastAt = curTime
+		castAt := enh.scheduler.Schedule(ability)
+		curTime = castAt + time.Second*10
+	}
+
+	shockCD := enh.ShockCD()
+	shockAction := common.ScheduledAbility{
+		Duration: core.GCDDefault,
+		TryCast: func(sim *core.Simulation) bool {
+			var shock *core.SimpleSpell
+			target := sim.GetPrimaryTarget()
+			if enh.Rotation.WeaveFlameShock && !enh.FlameShockSpell.IsInUse() {
+				shock = enh.NewFlameShock(sim, target)
+			} else if enh.Rotation.PrimaryShock == proto.EnhancementShaman_Rotation_Earth {
+				shock = enh.NewEarthShock(sim, target)
+			} else if enh.Rotation.PrimaryShock == proto.EnhancementShaman_Rotation_Frost {
+				shock = enh.NewFrostShock(sim, target)
+			}
+
+			success := shock.Cast(sim)
+			if !success {
+				enh.WaitForMana(sim, shock.ManaCost)
+			}
+			return success
+		},
+	}
+	if enh.Rotation.PrimaryShock != proto.EnhancementShaman_Rotation_None {
+		curTime = 0
+		for curTime <= maxDuration {
+			ability := shockAction
+			ability.DesiredCastAt = curTime
+			ability.MinCastAt = curTime
+			ability.MaxCastAt = curTime + time.Second*10
+			castAt := enh.scheduler.Schedule(ability)
+			curTime = castAt + shockCD
+		}
+	} else if enh.Rotation.WeaveFlameShock {
+		// Flame shock but no regular shock, so only use it once every 12s.
+		curTime = 0
+		for curTime <= maxDuration {
+			ability := shockAction
+			ability.DesiredCastAt = curTime
+			ability.MinCastAt = curTime
+			ability.MaxCastAt = curTime + time.Second*10
+			castAt := enh.scheduler.Schedule(ability)
+			curTime = castAt + time.Second*12
+		}
+	}
+}
+
 func (enh *EnhancementShaman) Reset(sim *core.Simulation) {
 	enh.Shaman.Reset(sim)
+	enh.scheduler.Reset(sim, enh.GetCharacter())
 }
 
 func (enh *EnhancementShaman) OnGCDReady(sim *core.Simulation) {
@@ -92,8 +170,8 @@ func (enh *EnhancementShaman) OnGCDReady(sim *core.Simulation) {
 }
 
 func (enh *EnhancementShaman) OnManaTick(sim *core.Simulation) {
-	if enh.FinishedWaitingForManaAndGCDReady(sim) {
-		enh.tryUseGCD(sim)
+	if enh.IsWaitingForMana() && !enh.DoneWaitingForMana(sim) {
+		// Do nothing, just need to check so metrics get updated.
 	}
 }
 

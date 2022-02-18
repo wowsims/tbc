@@ -298,6 +298,11 @@ func (sim *Simulation) GetRemainingDurationPercent() float64 {
 	return float64(sim.Duration-sim.CurrentTime) / float64(sim.Duration)
 }
 
+// The maximum possible duration for any iteration.
+func (sim *Simulation) GetMaxDuration() time.Duration {
+	return sim.BaseDuration + sim.DurationVariation
+}
+
 func (sim *Simulation) GetNumTargets() int32 {
 	return int32(len(sim.encounter.Targets))
 }
