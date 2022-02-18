@@ -30,6 +30,15 @@ func TestEnhancement(t *testing.T) {
 		Debuffs:     FullDebuffs,
 
 		ItemFilter: core.ItemFilter{
+			WeaponTypes: []proto.WeaponType{
+				proto.WeaponType_WeaponTypeAxe,
+				proto.WeaponType_WeaponTypeDagger,
+				proto.WeaponType_WeaponTypeFist,
+				proto.WeaponType_WeaponTypeMace,
+				proto.WeaponType_WeaponTypeOffHand,
+				proto.WeaponType_WeaponTypeShield,
+				proto.WeaponType_WeaponTypeStaff,
+			},
 			ArmorType: proto.ArmorType_ArmorTypeMail,
 			RangedWeaponTypes: []proto.RangedWeaponType{
 				proto.RangedWeaponType_RangedWeaponTypeTotem,

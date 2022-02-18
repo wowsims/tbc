@@ -351,10 +351,13 @@ func ApplyDespair(agent core.Agent) {
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
+				// TODO: What is this supposed to trigger? My guess is that this is supposed to not have a proc mask, but only an attack/defense mask.
 				ProcMask:               core.ProcMaskMeleeMHSpecial,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
+				// TODO: This should ignore armor.
+				// IgnoreArmor:            true,
 			},
 			DirectInput: core.DirectDamageInput{
 				FlatDamageBonus: 600,
@@ -371,7 +374,9 @@ func ApplyDespair(agent core.Agent) {
 		return core.Aura{
 			ID: DespairAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				// ProcMask: 20
+				// TODO: Make this work correctly once we have initial PR in.
+				if !hitEffect.Landed() || hitEffect.WeaponInput.DamageMultiplier == 0 {
 					return
 				}
 				if sim.RandomFloat("Despair") > procChance {
@@ -407,6 +412,8 @@ func ApplyTheDecapitator(agent core.Agent) {
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
+				// TODO: Fix this to correctly ignore armor.
+				// IgnoreArmor:            true,
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage: 513,

@@ -68,6 +68,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: WFImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				// ProcMask: 20
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}

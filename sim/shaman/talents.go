@@ -214,7 +214,7 @@ func (shaman *Shaman) applyWeaponMastery() {
 		return core.Aura{
 			ID: WeaponMasteryAuraID,
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				if hitEffect.WeaponInput.DamageMultiplier == 0 {
 					return
 				}
 				hitEffect.DamageMultiplier *= multiplier
@@ -240,7 +240,9 @@ func (shaman *Shaman) applyUnleashedRage() {
 		return core.Aura{
 			ID: UnleashedRageTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.HitType != core.MeleeHitTypeCrit || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				// proc mask = 20
+				// TODO: Fix this to allow any 'melee crit' to count.
+				if hitEffect.HitType != core.MeleeHitTypeCrit || hitEffect.WeaponInput.DamageMultiplier == 0 {
 					return
 				}
 				for i, playerOrPet := range shaman.Party.PlayersAndPets {
