@@ -9,6 +9,18 @@ export declare const IconBloodlust: IconPickerConfig<Player<any>, boolean>;
 export declare const IconWaterShield: IconPickerConfig<Player<any>, boolean>;
 export declare const MainHandImbue: IconEnumPickerConfig<Player<Spec.SpecEnhancementShaman>, ShamanWeaponImbue>;
 export declare const OffHandImbue: IconEnumPickerConfig<Player<Spec.SpecEnhancementShaman>, ShamanWeaponImbue>;
+export declare const DelayStormstrike: {
+    type: "number";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => TypedEvent<void>;
+        getValue: (player: Player<Spec.SpecEnhancementShaman>) => number;
+        setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => void;
+    };
+};
 export declare const DelayOffhandSwings: {
     type: "boolean";
     getModObject: (simUI: IndividualSimUI<any>) => Player<any>;

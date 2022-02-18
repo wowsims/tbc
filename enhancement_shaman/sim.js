@@ -175,6 +175,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
             otherInputs: {
                 inputs: [
                     ShamanInputs.DelayOffhandSwings,
+                    ShamanInputs.DelayStormstrike,
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,
                     OtherInputs.ExposeWeaknessUptime,
