@@ -233,23 +233,45 @@ func (shaman *Shaman) applyUnleashedRage() {
 	level := shaman.Talents.UnleashedRage
 
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		dur := time.Second * 10
+		const dur = time.Second * 10
 		bonusCoeff := 0.02 * float64(level)
 
 		currentAPBonuses := make([]float64, len(shaman.Party.PlayersAndPets))
+		currentAuras := make([]core.Aura, len(shaman.Party.PlayersAndPets))
 		return core.Aura{
 			ID: UnleashedRageTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				if hitEffect.HitType != core.MeleeHitTypeCrit || !hitEffect.IsWeaponHit() {
 					return
 				}
+
+				// TODO: what if # pets changes?
 				for i, playerOrPet := range shaman.Party.PlayersAndPets {
 					char := playerOrPet.GetCharacter()
 					prevBonus := currentAPBonuses[i]
 					newBonus := (char.GetStat(stats.AttackPower) - prevBonus) * bonusCoeff
-					aura := char.NewAuraWithTemporaryStats(sim, UnleashedRageProcAuraID, core.ActionID{SpellID: 30811}, stats.AttackPower, newBonus, dur)
-					char.AddAura(sim, aura)
-					currentAPBonuses[i] = newBonus
+
+					if prevBonus != newBonus {
+						buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: newBonus})
+						buffs[stats.Mana] = 0 // mana is weird
+						unbuffs := buffs.Multiply(-1)
+
+						char.AddStats(buffs)
+						currentAuras[i] = core.Aura{
+							ID:       UnleashedRageProcAuraID,
+							ActionID: core.ActionID{SpellID: 30811},
+							Expires:  sim.CurrentTime + dur,
+							OnExpire: func(sim *core.Simulation) {
+								char.AddStats(unbuffs)
+							},
+						}
+						currentAPBonuses[i] = newBonus
+						char.AddAura(sim, currentAuras[i])
+					} else {
+						// If the bonus is the same, we can just update.
+						currentAuras[i].Expires = sim.CurrentTime + dur
+						char.ReplaceAura(sim, currentAuras[i])
+					}
 				}
 			},
 		}
