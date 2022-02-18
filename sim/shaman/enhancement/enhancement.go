@@ -1,8 +1,6 @@
 package enhancement
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/shaman"
@@ -40,7 +38,6 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 	enh := &EnhancementShaman{
 		Shaman:   shaman.NewShaman(character, *enhOptions.Talents, totems, selfBuffs),
 		Rotation: *enhOptions.Rotation,
-		delaySS:  int(enhOptions.Options.DelayStormstrike),
 	}
 	// Enable Auto Attacks for this spec
 	enh.EnableAutoAttacks(enh, core.AutoAttackOptions{
@@ -80,7 +77,6 @@ type EnhancementShaman struct {
 	*shaman.Shaman
 
 	Rotation proto.EnhancementShaman_Rotation
-	delaySS  int
 }
 
 func (enh *EnhancementShaman) GetShaman() *shaman.Shaman {
@@ -89,9 +85,6 @@ func (enh *EnhancementShaman) GetShaman() *shaman.Shaman {
 
 func (enh *EnhancementShaman) Reset(sim *core.Simulation) {
 	enh.Shaman.Reset(sim)
-
-	// Set SS on CD until after delay
-	enh.SetCD(shaman.StormstrikeCD, time.Second*time.Duration(enh.delaySS))
 }
 
 func (enh *EnhancementShaman) OnGCDReady(sim *core.Simulation) {
@@ -105,6 +98,7 @@ func (enh *EnhancementShaman) OnManaTick(sim *core.Simulation) {
 }
 
 func (enh *EnhancementShaman) tryUseGCD(sim *core.Simulation) {
+
 	target := sim.GetPrimaryTarget()
 
 	if enh.Talents.Stormstrike && !enh.IsOnCD(shaman.StormstrikeCD, sim.CurrentTime) {
