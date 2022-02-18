@@ -57,6 +57,25 @@ function makeShamanWeaponImbueInput(isOffHand: boolean): IconEnumPickerConfig<Pl
 	};
 }
 
+export const DelayStormstrike = {
+	type: 'number' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'delay-stormstrike-picker',
+		],
+		label: 'Delay Stormstrike',
+		labelTooltip: 'Delays using SS as part of rotation until X seconds have passed.',
+		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getSpecOptions().delayStormstrike,
+		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
+			const newOptions = player.getSpecOptions();
+			newOptions.delayStormstrike = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+	},
+};
+
 export const DelayOffhandSwings = {
 	type: 'boolean' as const,
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,

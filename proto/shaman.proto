@@ -178,6 +178,8 @@ message EnhancementShaman {
 		// Indicates the shaman will be dropping an improved strength of earth totem before
 		// the fight by snapshotting the T4 2pc bonus.
 		bool snapshot_t4_2pc = 6;
+
+    int32 delay_stormstrike = 7; // Don't SS before number seconds
   }
 
   Rotation rotation = 1;
