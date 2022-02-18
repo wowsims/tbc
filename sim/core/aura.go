@@ -707,16 +707,22 @@ func (character *Character) NewTempStatAuraApplier(sim *Simulation, auraID AuraI
 		if sim.Log != nil {
 			character.Log(sim, "Gained %0.02f %s from %s.", amount, stat.StatName(), actionID)
 		}
-		if stat == stats.MeleeHaste {
-			character.AddMeleeHaste(sim, amount)
-		} else {
-			character.AddStat(stat, amount)
-			if stat == stats.AttackPower {
-				character.AddStat(stats.RangedAttackPower, amount)
-			}
-		}
 		aura.Expires = sim.CurrentTime + duration
-		character.AddAura(sim, aura)
+
+		if !character.HasAura(auraID) {
+			if stat == stats.MeleeHaste {
+				character.AddMeleeHaste(sim, amount)
+			} else {
+				character.AddStat(stat, amount)
+				if stat == stats.AttackPower {
+					character.AddStat(stats.RangedAttackPower, amount)
+				}
+			}
+			character.AddAura(sim, aura)
+		} else {
+			character.ReplaceAura(sim, aura)
+		}
+
 	}
 }
 
