@@ -403,10 +403,6 @@ export interface EnhancementShaman_Options {
      * @generated from protobuf field: bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"];
      */
     snapshotT42Pc: boolean;
-    /**
-     * @generated from protobuf field: int32 delay_stormstrike = 7;
-     */
-    delayStormstrike: number;
 }
 /**
  * @generated from protobuf enum proto.EarthTotem

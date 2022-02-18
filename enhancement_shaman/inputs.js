@@ -35,24 +35,6 @@ function makeShamanWeaponImbueInput(isOffHand) {
         },
     };
 }
-export const DelayStormstrike = {
-    type: 'number',
-    getModObject: (simUI) => simUI.player,
-    config: {
-        extraCssClasses: [
-            'delay-stormstrike-picker',
-        ],
-        label: 'Delay Stormstrike',
-        labelTooltip: 'Delays using SS as part of rotation until X seconds have passed.',
-        changedEvent: (player) => player.specOptionsChangeEmitter,
-        getValue: (player) => player.getSpecOptions().delayStormstrike,
-        setValue: (eventID, player, newValue) => {
-            const newOptions = player.getSpecOptions();
-            newOptions.delayStormstrike = newValue;
-            player.setSpecOptions(eventID, newOptions);
-        },
-    },
-};
 export const DelayOffhandSwings = {
     type: 'boolean',
     getModObject: (simUI) => simUI.player,
