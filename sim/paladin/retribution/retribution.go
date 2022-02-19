@@ -32,13 +32,13 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 	ret := &RetributionPaladin{
 		Paladin:     paladin.NewPaladin(character, *retOptions.Talents),
 		Rotation:    *retOptions.Rotation,
-		csDelay:     time.Duration(retOptions.Options.CsDelay),
-		hasteLeeway: time.Duration(retOptions.Options.HasteLeeway),
+		csDelay:     time.Duration(retOptions.Options.CrusaderStrikeDelayMs),
+		hasteLeeway: time.Duration(retOptions.Options.HasteLeewayMs),
 		judgement:   retOptions.Options.Judgement,
 	}
 
 	// Convert DTPS option to bonus MP5
-	spAtt := float64(retOptions.Options.DamageTaken) * 5.0 / 10.0
+	spAtt := retOptions.Options.DamageTakenPerSecond * 5.0 / 10.0
 	ret.AddStat(stats.MP5, spAtt)
 
 	ret.EnableAutoAttacks(ret, core.AutoAttackOptions{

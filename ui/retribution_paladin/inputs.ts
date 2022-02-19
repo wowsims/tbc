@@ -3,37 +3,37 @@ import { Player } from '/tbc/core/player.js';
 import { EventID } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { RetributionPaladin_Rotation_ConsecrateRank as ConsecrateRank,  RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
+import { RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank,  RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 export const RetributionPaladinRotationConfig = {
 	inputs: [
 		{
-			type: 'enum' as const, cssClass: 'consecrate-rank-picker',
+			type: 'enum' as const, cssClass: 'consecration-rank-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
-				label: 'Consecrate Rank',
-				labelTooltip: 'Use specified rank of Consecrate during filler spell windows.',
+				label: 'Consecration Rank',
+				labelTooltip: 'Use specified rank of Consecration during filler spell windows.',
 				values: [
 					{
-						name: 'None', value: ConsecrateRank.None,
+						name: 'None', value: ConsecrationRank.None,
 					},
 					{
-						name: 'Rank 1', value: ConsecrateRank.Rank1,
+						name: 'Rank 1', value: ConsecrationRank.Rank1,
 					},
 					{
-						name: 'Rank 4', value: ConsecrateRank.Rank4,
+						name: 'Rank 4', value: ConsecrationRank.Rank4,
 					},
 					{
-						name: 'Rank 6', value: ConsecrateRank.Rank6,
+						name: 'Rank 6', value: ConsecrationRank.Rank6,
 					},
 				],
 				changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getRotation().consecrateRank,
+				getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getRotation().consecrationRank,
 				setValue: (eventID: EventID, player: Player<Spec.SpecRetributionPaladin>, newValue: number) => {
 					const newRotation = player.getRotation();
-					newRotation.consecrateRank = newValue;
+					newRotation.consecrationRank = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},
@@ -43,12 +43,12 @@ export const RetributionPaladinRotationConfig = {
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Use Exorcism',
-				labelTooltip: 'Use exorcism during filler spell windows. Will only be used if the boss mob type is Undead or Demon.',
+				labelTooltip: 'Use Exorcism during filler spell windows. Will only be used if the boss mob type is Undead or Demon.',
 				changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getRotation().exorcism,
+				getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getRotation().useExorcism,
 				setValue: (eventID: EventID, player: Player<Spec.SpecRetributionPaladin>, newValue: boolean) => {
 					const newRotation = player.getRotation();
-					newRotation.exorcism = newValue;
+					newRotation.useExorcism = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},
@@ -83,49 +83,49 @@ export const JudgementSelection = {
 	},
 }
 
-export const CSDelay = {
+export const CrusaderStrikeDelayMS = {
 	type: 'number' as const, cssClass: 'cs-delay-picker',
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
 		label: 'Crusader Strike Delay',
 		labelTooltip: 'Maximum time (in miliseconds) Crusader Strike will be delayed in order to seal twist. Experiment with values between 0 - 3000 miliseconds.',
 		changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.specOptionsChangeEmitter,
-		getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getSpecOptions().csDelay,
+		getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getSpecOptions().crusaderStrikeDelayMs,
 		setValue: (eventID: EventID, player: Player<Spec.SpecRetributionPaladin>, newValue: number) => {
 			const newOptions = player.getSpecOptions();
-			newOptions.csDelay = newValue;
+			newOptions.crusaderStrikeDelayMs = newValue;
 			player.setSpecOptions(eventID, newOptions);
 		},
 	},
 }
 
-export const HasteLeeway = {
+export const HasteLeewayMS = {
 	type: 'number' as const, cssClass: 'haste-leeway-picker',
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
 		label: 'Haste Leeway',
 		labelTooltip: "Arbitrary value used to account for haste procs preventing seal twists. Experiment with values between 100 - 200 miliseconds.\nDo not modify this value if you do not understand it's use.",
 		changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.specOptionsChangeEmitter,
-		getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getSpecOptions().hasteLeeway,
+		getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getSpecOptions().hasteLeewayMs,
 		setValue: (eventID: EventID, player: Player<Spec.SpecRetributionPaladin>, newValue: number) => {
 			const newOptions = player.getSpecOptions();
-			newOptions.hasteLeeway = newValue;
+			newOptions.hasteLeewayMs = newValue;
 			player.setSpecOptions(eventID, newOptions);
 		},
 	},
 }
 
-export const DamgeTaken = {
+export const DamgeTakenPerSecond = {
 	type: 'number' as const, cssClass: 'damage-taken-picker',
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
 		label: 'Damage Taken',
 		labelTooltip: "Damage taken per second across the encounter. Used to model mana regeneration from Spiritual Attunement. This value should NOT include damage taken from Seal of Blood / Judgement of Blood. Leave at 0 if you do not take damage during the encounter.",
 		changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.specOptionsChangeEmitter,
-		getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getSpecOptions().damageTaken,
+		getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getSpecOptions().damageTakenPerSecond,
 		setValue: (eventID: EventID, player: Player<Spec.SpecRetributionPaladin>, newValue: number) => {
 			const newOptions = player.getSpecOptions();
-			newOptions.damageTaken = newValue;
+			newOptions.damageTakenPerSecond = newValue;
 			player.setSpecOptions(eventID, newOptions);
 		},
 	},

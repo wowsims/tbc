@@ -198,9 +198,9 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			otherInputs: {
 				inputs: [
 					RetributionPaladinInputs.JudgementSelection,
-					RetributionPaladinInputs.CSDelay,
-					RetributionPaladinInputs.HasteLeeway,
-					RetributionPaladinInputs.DamgeTaken,
+					RetributionPaladinInputs.CrusaderStrikeDelayMS,
+					RetributionPaladinInputs.HasteLeewayMS,
+					RetributionPaladinInputs.DamgeTakenPerSecond,
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.ISBUptime,
