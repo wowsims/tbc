@@ -90,7 +90,7 @@ func TestRangedAutoSwing(t *testing.T) {
 		value float64
 	}{
 		{name: "main hand attack", key: NewActionKey(ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1}), value: 448.937683},
-		{name: "ranged attack", key: NewActionKey(ActionID{OtherID: proto.OtherAction_OtherActionShoot}), value: 382.724571},
+		{name: "ranged attack", key: NewActionKey(ActionID{OtherID: proto.OtherAction_OtherActionShoot}), value: 191.362286},
 	}
 	tolerance := 0.0001
 
