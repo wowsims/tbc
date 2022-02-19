@@ -42,9 +42,11 @@ message RogueTalents {
 
 	// Subtlety
 	int32 opportunity = 33;
+	int32 sleight_of_hand = 46;
 	int32 initiative = 34;
 	bool ghostly_strike = 35;
 	int32 improved_ambush = 36;
+	int32 elusiveness = 47;
 	int32 serrated_blades = 37;
 	bool preparation = 38;
 	int32 dirty_deeds = 39;
@@ -52,12 +54,13 @@ message RogueTalents {
 	int32 master_of_subtlety = 41;
 	int32 deadliness = 42;
 	bool premeditation = 43;
-	int32 sinister_calling = 44;
+	bool sinister_calling = 44;
 	bool shadowstep = 45;
 }
 
 message Rogue {
     message Rotation {
+			bool maintain_expose_armor = 1;
     }
     Rotation rotation = 1;
 

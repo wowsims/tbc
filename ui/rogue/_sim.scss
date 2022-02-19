@@ -1,0 +1,43 @@
+@import "../core/components/totem_inputs";
+
+// Set color variables which control the site theme.
+.rogue-sim-ui {
+	--theme-color-primary: #adad2e;
+	--theme-color-background: #19190c;
+	--theme-color-background-raw: 25, 25, 12;
+	--theme-background-image: url('/tbc/assets/rogue_background.jpg');
+}
+
+// Set grid width for icon sections based on how many buffs we configured.
+.rogue-sim-ui .self-buffs-section {
+  grid-template-columns: repeat(4, 1fr);
+}
+.rogue-sim-ui .consumes-section {
+  grid-template-columns: repeat(6, 1fr);
+}
+.rogue-sim-ui .buffs-section {
+  grid-template-columns: repeat(7, 1fr);
+}
+.rogue-sim-ui .debuffs-section {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+// Enhancement has a lot of EP stats, so make the text smaller so it fits vertically.
+.rogue-sim-ui .character-stats-table-row {
+  font-size: 11px;
+}
+.rogue-sim-ui .results-ep-table tr td:nth-child(1) {
+  font-size: 11px;
+}
+.rogue-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
+  font-size: 11px;
+}
+.rogue-sim-ui .results-ep-table tr td:nth-child(2):after {
+  font-size: 11px;
+}
+.rogue-sim-ui .results-ep-table tr td:nth-child(4):after {
+  font-size: 11px;
+}
+.rogue-sim-ui .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
+  font-size: 10px;
+}
