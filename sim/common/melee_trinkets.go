@@ -386,7 +386,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 			ID: DragonspineTrophyAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				// mask: 340
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || ability.IsPhantom {
+				if !hitEffect.Landed() || (hitEffect.WeaponInput.DamageMultiplier == 0 && hitEffect.WeaponInput.CalculateDamage == nil) || !hitEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || ability.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
