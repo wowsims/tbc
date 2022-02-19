@@ -87,7 +87,7 @@ export const CrusaderStrikeDelayMS = {
 	type: 'number' as const, cssClass: 'cs-delay-picker',
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
-		label: 'Crusader Strike Delay',
+		label: 'Crusader Strike Delay (MS)',
 		labelTooltip: 'Maximum time (in miliseconds) Crusader Strike will be delayed in order to seal twist. Experiment with values between 0 - 3000 miliseconds.',
 		changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.specOptionsChangeEmitter,
 		getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getSpecOptions().crusaderStrikeDelayMs,
@@ -103,7 +103,7 @@ export const HasteLeewayMS = {
 	type: 'number' as const, cssClass: 'haste-leeway-picker',
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
-		label: 'Haste Leeway',
+		label: 'Haste Leeway (MS)',
 		labelTooltip: "Arbitrary value used to account for haste procs preventing seal twists. Experiment with values between 100 - 200 miliseconds.\nDo not modify this value if you do not understand it's use.",
 		changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.specOptionsChangeEmitter,
 		getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getSpecOptions().hasteLeewayMs,
@@ -119,7 +119,7 @@ export const DamgeTakenPerSecond = {
 	type: 'number' as const, cssClass: 'damage-taken-picker',
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
-		label: 'Damage Taken',
+		label: 'Damage Taken Per Second',
 		labelTooltip: "Damage taken per second across the encounter. Used to model mana regeneration from Spiritual Attunement. This value should NOT include damage taken from Seal of Blood / Judgement of Blood. Leave at 0 if you do not take damage during the encounter.",
 		changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.specOptionsChangeEmitter,
 		getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getSpecOptions().damageTakenPerSecond,
