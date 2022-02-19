@@ -292,4 +292,5 @@ var allowList = map[int]bool{
 	31139: true, // Fist of Reckoning
 	19808: true, // Rockhide Strongfish
 	6360:  true, // Steelscale Crushfish
+	28041: true, // Bladefist's Breadth
 }

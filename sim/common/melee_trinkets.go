@@ -64,6 +64,20 @@ func init() {
 		},
 	))
 
+	var BladefistsBreadthCooldownID = core.NewCooldownID()
+	core.AddItemEffect(28041, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.OffensiveTrinketActiveAuraID,
+		stats.AttackPower,
+		200,
+		time.Second*15,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 28041},
+			CooldownID:       BladefistsBreadthCooldownID,
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
 	var IconOfUnyieldingCourageCooldownID = core.NewCooldownID()
 	core.AddItemEffect(28121, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,

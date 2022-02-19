@@ -1,0 +1,56 @@
+package paladin
+
+import (
+	"time"
+
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
+)
+
+var ExorcismCD = core.NewCooldownID()
+var ExorcismActionID = core.ActionID{SpellID: 10314, CooldownID: ExorcismCD}
+
+func (paladin *Paladin) newExorcismTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	exo := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:       ExorcismActionID,
+				Character:      &paladin.Character,
+				SpellSchool:    stats.HolySpellPower,
+				ManaCost:       295,
+				Cooldown:       time.Second * 15,
+				CritMultiplier: paladin.SpellCritMultiplier(1, 0.25), // look up crit multiplier in the future
+			},
+		},
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
+				DamageMultiplier:       1,
+				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
+			},
+			DirectInput: core.DirectDamageInput{
+				MinBaseDamage:    521,
+				MaxBaseDamage:    579,
+				SpellCoefficient: 1,
+			},
+		},
+	}
+
+	return core.NewSimpleSpellTemplate(exo)
+}
+
+func (paladin *Paladin) NewExorcism(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+	if target.MobType != proto.MobType_MobTypeUndead && target.MobType != proto.MobType_MobTypeDemon {
+		return nil
+	}
+
+	exo := &paladin.exorcismSpell
+	paladin.exorcismTemplate.Apply(exo)
+
+	exo.Effect.Target = target
+
+	exo.Init(sim)
+
+	return exo
+}

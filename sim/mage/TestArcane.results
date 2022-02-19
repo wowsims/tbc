@@ -93,6 +93,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestArcane-AllItems-Bladefist'sBreadth-28041"
+ value: {
+  dps: 1337.6801744740305
+ }
+}
+dps_results: {
  key: "TestArcane-AllItems-BlazefuryMedallion-17111"
  value: {
   dps: 1334.3347668695385
