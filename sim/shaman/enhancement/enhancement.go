@@ -189,12 +189,15 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 			ability.DesiredCastAt = curTime
 			if prioritizeEarlier {
 				ability.MinCastAt = curTime - time.Second*10
-				ability.MaxCastAt = curTime + time.Second*5
+				ability.MaxCastAt = curTime + time.Second*10
 			} else {
 				ability.MinCastAt = curTime
 				ability.MaxCastAt = curTime + time.Second*10
 			}
 			castAt := enh.scheduler.Schedule(ability)
+			if castAt == common.Unresolved {
+				panic("No timeslot found for totem")
+			}
 			curTime = castAt + duration
 		}
 	}
@@ -362,13 +365,13 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 			}
 
 			curTime := time.Second * 10
-			for curTime <= time.Second*20 {
-				//for curTime <= maxDuration {
+			for curTime <= maxDuration {
 				ability := wfAction
 				ability.DesiredCastAt = curTime
 				ability.MinCastAt = curTime - time.Second*8
 				ability.MaxCastAt = curTime + time.Second*4
-				castAt := enh.scheduler.ScheduleGroup(sim, []common.ScheduledAbility{ability, defaultAction})
+				defaultAbility := defaultAction
+				castAt := enh.scheduler.ScheduleGroup(sim, []common.ScheduledAbility{ability, defaultAbility})
 				if castAt == common.Unresolved {
 					panic("No timeslot found for air totem")
 				}

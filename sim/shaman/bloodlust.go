@@ -41,6 +41,7 @@ func (shaman *Shaman) registerBloodlustCD() {
 
 	bloodlustTemplate.ManaCost -= bloodlustTemplate.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
 	manaCost := bloodlustTemplate.ManaCost
+	var bloodlustMCD *core.MajorCooldown
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -67,8 +68,15 @@ func (shaman *Shaman) registerBloodlustCD() {
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			bloodlustMCD = shaman.GetMajorCooldown(actionID)
 			return func(sim *core.Simulation, character *core.Character) {
 				cast := bloodlustTemplate
+
+				// Needed because of the interaction between enhance GCD scheduler and other bloodlusts.
+				if !bloodlustMCD.UsesGCD {
+					cast.GCD = 0
+				}
+
 				cast.Init(sim)
 				cast.StartCast(sim)
 			}

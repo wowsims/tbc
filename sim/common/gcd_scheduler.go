@@ -168,13 +168,14 @@ func (gs *GCDScheduler) ScheduleGroup(sim *core.Simulation, newAbilities []Sched
 		totalDuration += newAbility.Duration
 	}
 
-	if sim.Log != nil {
-		sim.Log("Length before: %d", len(gs.schedule))
-	}
-
 	// Schedule a 'group ability' which is just a fake ability for reserving the time slots.
-	groupAbility := newAbilities[0]
-	groupAbility.Duration = totalDuration
+	groupAbility := ScheduledAbility{
+		DesiredCastAt:                 newAbilities[0].DesiredCastAt,
+		MinCastAt:                     newAbilities[0].MinCastAt,
+		MaxCastAt:                     newAbilities[0].MaxCastAt,
+		PrioritizeEarlierForConflicts: newAbilities[0].PrioritizeEarlierForConflicts,
+		Duration:                      totalDuration,
+	}
 	groupCastAt := gs.Schedule(groupAbility)
 
 	if groupCastAt == Unresolved {
@@ -189,19 +190,20 @@ func (gs *GCDScheduler) ScheduleGroup(sim *core.Simulation, newAbilities []Sched
 		nextCastAt = newAbilities[i].doneAt
 	}
 
-	if sim.Log != nil {
-		sim.Log("Length with group: %d", len(gs.schedule))
-	}
-
 	// Replace the group ability with the individual abilities.
 	for i, ability := range gs.schedule {
 		if ability.castAt == groupCastAt {
-			before := gs.schedule[:i]
-			after := gs.schedule[i+1:]
-			gs.schedule = append(append(before, newAbilities...), after...)
-			if sim.Log != nil {
-				sim.Log("Group at index %d, new length: %d", i, len(gs.schedule))
+			temp := make([]ScheduledAbility, len(gs.schedule)+len(newAbilities)-1)
+			for j := 0; j < i; j++ {
+				temp[j] = gs.schedule[j]
 			}
+			for j := 0; j < len(newAbilities); j++ {
+				temp[i+j] = newAbilities[j]
+			}
+			for j := i + 1; j < len(gs.schedule); j++ {
+				temp[j+len(newAbilities)-1] = gs.schedule[j]
+			}
+			gs.schedule = temp
 			break
 		}
 	}
@@ -224,7 +226,12 @@ func (gs *GCDScheduler) ScheduleMCD(sim *core.Simulation, character *core.Charac
 	mcdAction := ScheduledAbility{
 		Duration: core.GCDDefault,
 		TryCast: func(sim *core.Simulation) bool {
-			return gs.managedMCDs[mcdIdx].TryActivate(sim, character)
+			success := gs.managedMCDs[mcdIdx].TryActivate(sim, character)
+			if !success {
+				character.EnableMajorCooldown(gs.managedMCDIDs[mcdIdx])
+				gs.managedMCDs[mcdIdx].UsesGCD = false
+			}
+			return success
 		},
 	}
 	timings := mcd.GetTimings()
