@@ -94,6 +94,7 @@ metaGemActiveConditions.set(THUNDERING_SKYFIRE_DIAMOND, (numRed, numYellow, numB
 
 // Orange
 export const GLINTING_NOBLE_TOPAZ = 24061;
+export const GLINTING_PYRESTONE = 32220;
 export const INSCRIBED_NOBLE_TOPAZ = 24058;
 export const INSCRIBED_PYRESTONE = 32217;
 export const POTENT_NOBLE_TOPAZ = 24059;
@@ -107,6 +108,7 @@ export const WICKED_PYRESTONE = 32222;
 export const GLOWING_NIGHTSEYE = 24056;
 export const GLOWING_SHADOWSONG_AMETHYST = 32215;
 export const SHIFTING_NIGHTSEYE = 24055;
+export const SHIFTING_SHADOWSONG_AMETHYST = 32212;
 export const SOVEREIGN_NIGHTSEYE = 24054;
 export const SOVEREIGN_SHADOWSONG_AMETHYST = 32211;
 
@@ -122,6 +124,8 @@ export const RUNED_ORNATE_RUBY = 28118;
 // Yellow
 export const BRILLIANT_DAWNSTONE = 24047;
 export const BRILLIANT_LIONSEYE = 32204;
+export const RIGID_DAWNSTONE = 24051;
+export const RIGID_LIONSEYE = 32206;
 
 // Green
 export const JAGGED_SEASPRAY_EMERALD = 32226;
