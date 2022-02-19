@@ -1467,7 +1467,11 @@ export declare enum Potions {
     /**
      * @generated from protobuf enum value: MightyRagePotion = 4;
      */
-    MightyRagePotion = 4
+    MightyRagePotion = 4,
+    /**
+     * @generated from protobuf enum value: FelManaPotion = 5;
+     */
+    FelManaPotion = 5
 }
 /**
  * @generated from protobuf enum proto.Conjured

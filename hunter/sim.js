@@ -150,6 +150,7 @@ export class HunterSimUI extends IndividualSimUI {
                 IconInputs.OffHandAdamantiteWeightstone,
                 IconInputs.DefaultHastePotion,
                 IconInputs.DefaultSuperManaPotion,
+                IconInputs.DefaultFelManaPotion,
                 IconInputs.DefaultDarkRune,
                 IconInputs.FlaskOfRelentlessAssault,
                 IconInputs.ElixirOfDemonslaying,

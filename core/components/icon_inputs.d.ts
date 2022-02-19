@@ -84,6 +84,7 @@ export declare const DefaultDestructionPotion: IndividualSimIconPickerConfig<Pla
 export declare const DefaultHastePotion: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultMightyRagePotion: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultSuperManaPotion: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const DefaultFelManaPotion: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultDarkRune: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultFlameCap: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfAgilityV: IndividualSimIconPickerConfig<Player<any>, boolean>;

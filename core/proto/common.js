@@ -688,6 +688,10 @@ export var Potions;
      * @generated from protobuf enum value: MightyRagePotion = 4;
      */
     Potions[Potions["MightyRagePotion"] = 4] = "MightyRagePotion";
+    /**
+     * @generated from protobuf enum value: FelManaPotion = 5;
+     */
+    Potions[Potions["FelManaPotion"] = 5] = "FelManaPotion";
 })(Potions || (Potions = {}));
 /**
  * @generated from protobuf enum proto.Conjured
