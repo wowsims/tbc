@@ -147,6 +147,10 @@ export interface RogueTalents {
      */
     opportunity: number;
     /**
+     * @generated from protobuf field: int32 sleight_of_hand = 46;
+     */
+    sleightOfHand: number;
+    /**
      * @generated from protobuf field: int32 initiative = 34;
      */
     initiative: number;
@@ -158,6 +162,10 @@ export interface RogueTalents {
      * @generated from protobuf field: int32 improved_ambush = 36;
      */
     improvedAmbush: number;
+    /**
+     * @generated from protobuf field: int32 elusiveness = 47;
+     */
+    elusiveness: number;
     /**
      * @generated from protobuf field: int32 serrated_blades = 37;
      */
@@ -187,9 +195,9 @@ export interface RogueTalents {
      */
     premeditation: boolean;
     /**
-     * @generated from protobuf field: int32 sinister_calling = 44;
+     * @generated from protobuf field: bool sinister_calling = 44;
      */
-    sinisterCalling: number;
+    sinisterCalling: boolean;
     /**
      * @generated from protobuf field: bool shadowstep = 45;
      */
@@ -216,6 +224,10 @@ export interface Rogue {
  * @generated from protobuf message proto.Rogue.Rotation
  */
 export interface Rogue_Rotation {
+    /**
+     * @generated from protobuf field: bool maintain_expose_armor = 1;
+     */
+    maintainExposeArmor: boolean;
 }
 /**
  * @generated from protobuf message proto.Rogue.Options

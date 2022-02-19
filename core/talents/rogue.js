@@ -97,7 +97,7 @@ export class RogueTalentsPicker extends TalentsPicker {
                             rowIdx: 3,
                             colIdx: 1,
                         },
-                        spellIds: [16513],
+                        spellIds: [16513, 16514, 16515, 16719],
                         maxPoints: 5,
                     },
                     {
@@ -470,7 +470,7 @@ export class RogueTalentsPicker extends TalentsPicker {
                         maxPoints: 5,
                     },
                     {
-                        //fieldName: 'sleightOfHand',
+                        fieldName: 'sleightOfHand',
                         location: {
                             rowIdx: 1,
                             colIdx: 0,
@@ -533,7 +533,7 @@ export class RogueTalentsPicker extends TalentsPicker {
                         maxPoints: 3,
                     },
                     {
-                        //fieldName: 'elusiveness',
+                        fieldName: 'elusiveness',
                         location: {
                             rowIdx: 3,
                             colIdx: 1,

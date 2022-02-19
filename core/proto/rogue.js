@@ -40,9 +40,11 @@ class RogueTalents$Type extends MessageType {
             { no: 31, name: "combat_potency", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 32, name: "surprise_attacks", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 33, name: "opportunity", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 46, name: "sleight_of_hand", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 34, name: "initiative", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 35, name: "ghostly_strike", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 36, name: "improved_ambush", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 47, name: "elusiveness", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 37, name: "serrated_blades", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 38, name: "preparation", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 39, name: "dirty_deeds", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -50,12 +52,12 @@ class RogueTalents$Type extends MessageType {
             { no: 41, name: "master_of_subtlety", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 42, name: "deadliness", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 43, name: "premeditation", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 44, name: "sinister_calling", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 44, name: "sinister_calling", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 45, name: "shadowstep", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { improvedEviscerate: 0, malice: 0, ruthlessness: 0, murder: 0, puncturingWounds: 0, relentlessStrikes: false, improvedExposeArmor: 0, lethality: 0, vilePoisons: 0, improvedPoisons: 0, coldBlood: false, quickRecovery: 0, sealFate: 0, masterPoisoner: 0, vigor: false, findWeakness: 0, mutilate: false, improvedSinisterStrike: 0, improvedSliceAndDice: 0, precision: 0, daggerSpecialization: 0, dualWieldSpecialization: 0, maceSpecialization: 0, bladeFlurry: false, swordSpecialization: 0, fistWeaponSpecialization: 0, weaponExpertise: 0, aggression: 0, vitality: 0, adrenalineRush: false, combatPotency: 0, surpriseAttacks: false, opportunity: 0, initiative: 0, ghostlyStrike: false, improvedAmbush: 0, serratedBlades: 0, preparation: false, dirtyDeeds: 0, hemorrhage: false, masterOfSubtlety: 0, deadliness: 0, premeditation: false, sinisterCalling: 0, shadowstep: false };
+        const message = { improvedEviscerate: 0, malice: 0, ruthlessness: 0, murder: 0, puncturingWounds: 0, relentlessStrikes: false, improvedExposeArmor: 0, lethality: 0, vilePoisons: 0, improvedPoisons: 0, coldBlood: false, quickRecovery: 0, sealFate: 0, masterPoisoner: 0, vigor: false, findWeakness: 0, mutilate: false, improvedSinisterStrike: 0, improvedSliceAndDice: 0, precision: 0, daggerSpecialization: 0, dualWieldSpecialization: 0, maceSpecialization: 0, bladeFlurry: false, swordSpecialization: 0, fistWeaponSpecialization: 0, weaponExpertise: 0, aggression: 0, vitality: 0, adrenalineRush: false, combatPotency: 0, surpriseAttacks: false, opportunity: 0, sleightOfHand: 0, initiative: 0, ghostlyStrike: false, improvedAmbush: 0, elusiveness: 0, serratedBlades: 0, preparation: false, dirtyDeeds: 0, hemorrhage: false, masterOfSubtlety: 0, deadliness: 0, premeditation: false, sinisterCalling: false, shadowstep: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -165,6 +167,9 @@ class RogueTalents$Type extends MessageType {
                 case /* int32 opportunity */ 33:
                     message.opportunity = reader.int32();
                     break;
+                case /* int32 sleight_of_hand */ 46:
+                    message.sleightOfHand = reader.int32();
+                    break;
                 case /* int32 initiative */ 34:
                     message.initiative = reader.int32();
                     break;
@@ -173,6 +178,9 @@ class RogueTalents$Type extends MessageType {
                     break;
                 case /* int32 improved_ambush */ 36:
                     message.improvedAmbush = reader.int32();
+                    break;
+                case /* int32 elusiveness */ 47:
+                    message.elusiveness = reader.int32();
                     break;
                 case /* int32 serrated_blades */ 37:
                     message.serratedBlades = reader.int32();
@@ -195,8 +203,8 @@ class RogueTalents$Type extends MessageType {
                 case /* bool premeditation */ 43:
                     message.premeditation = reader.bool();
                     break;
-                case /* int32 sinister_calling */ 44:
-                    message.sinisterCalling = reader.int32();
+                case /* bool sinister_calling */ 44:
+                    message.sinisterCalling = reader.bool();
                     break;
                 case /* bool shadowstep */ 45:
                     message.shadowstep = reader.bool();
@@ -312,6 +320,9 @@ class RogueTalents$Type extends MessageType {
         /* int32 opportunity = 33; */
         if (message.opportunity !== 0)
             writer.tag(33, WireType.Varint).int32(message.opportunity);
+        /* int32 sleight_of_hand = 46; */
+        if (message.sleightOfHand !== 0)
+            writer.tag(46, WireType.Varint).int32(message.sleightOfHand);
         /* int32 initiative = 34; */
         if (message.initiative !== 0)
             writer.tag(34, WireType.Varint).int32(message.initiative);
@@ -321,6 +332,9 @@ class RogueTalents$Type extends MessageType {
         /* int32 improved_ambush = 36; */
         if (message.improvedAmbush !== 0)
             writer.tag(36, WireType.Varint).int32(message.improvedAmbush);
+        /* int32 elusiveness = 47; */
+        if (message.elusiveness !== 0)
+            writer.tag(47, WireType.Varint).int32(message.elusiveness);
         /* int32 serrated_blades = 37; */
         if (message.serratedBlades !== 0)
             writer.tag(37, WireType.Varint).int32(message.serratedBlades);
@@ -342,9 +356,9 @@ class RogueTalents$Type extends MessageType {
         /* bool premeditation = 43; */
         if (message.premeditation !== false)
             writer.tag(43, WireType.Varint).bool(message.premeditation);
-        /* int32 sinister_calling = 44; */
-        if (message.sinisterCalling !== 0)
-            writer.tag(44, WireType.Varint).int32(message.sinisterCalling);
+        /* bool sinister_calling = 44; */
+        if (message.sinisterCalling !== false)
+            writer.tag(44, WireType.Varint).bool(message.sinisterCalling);
         /* bool shadowstep = 45; */
         if (message.shadowstep !== false)
             writer.tag(45, WireType.Varint).bool(message.shadowstep);
@@ -422,19 +436,40 @@ export const Rogue = new Rogue$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Rogue_Rotation$Type extends MessageType {
     constructor() {
-        super("proto.Rogue.Rotation", []);
+        super("proto.Rogue.Rotation", [
+            { no: 1, name: "maintain_expose_armor", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { maintainExposeArmor: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bool maintain_expose_armor */ 1:
+                    message.maintainExposeArmor = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* bool maintain_expose_armor = 1; */
+        if (message.maintainExposeArmor !== false)
+            writer.tag(1, WireType.Varint).bool(message.maintainExposeArmor);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
