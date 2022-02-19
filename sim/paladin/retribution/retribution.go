@@ -161,7 +161,6 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 		if success := soc.StartCast(sim); !success {
 			ret.WaitForMana(sim, soc.GetManaCost())
 		}
-		ret.AutoAttacks.DelayAllUntil(sim, ret.NextGCDAt()) // wait until GCD is cleared
 		return
 	}
 
