@@ -297,11 +297,12 @@ class Raid$Type extends MessageType {
     constructor() {
         super("proto.Raid", [
             { no: 1, name: "parties", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Party },
-            { no: 2, name: "buffs", kind: "message", T: () => RaidBuffs }
+            { no: 2, name: "buffs", kind: "message", T: () => RaidBuffs },
+            { no: 3, name: "stagger_stormstrikes", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { parties: [] };
+        const message = { parties: [], staggerStormstrikes: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -317,6 +318,9 @@ class Raid$Type extends MessageType {
                     break;
                 case /* proto.RaidBuffs buffs */ 2:
                     message.buffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.buffs);
+                    break;
+                case /* bool stagger_stormstrikes */ 3:
+                    message.staggerStormstrikes = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -336,6 +340,9 @@ class Raid$Type extends MessageType {
         /* proto.RaidBuffs buffs = 2; */
         if (message.buffs)
             RaidBuffs.internalBinaryWrite(message.buffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* bool stagger_stormstrikes = 3; */
+        if (message.staggerStormstrikes !== false)
+            writer.tag(3, WireType.Varint).bool(message.staggerStormstrikes);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

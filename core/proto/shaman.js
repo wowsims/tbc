@@ -834,11 +834,12 @@ class EnhancementShaman_Rotation$Type extends MessageType {
         super("proto.EnhancementShaman.Rotation", [
             { no: 1, name: "totems", kind: "message", T: () => ShamanTotems },
             { no: 2, name: "primary_shock", kind: "enum", T: () => ["proto.EnhancementShaman.Rotation.PrimaryShock", EnhancementShaman_Rotation_PrimaryShock] },
-            { no: 3, name: "weave_flame_shock", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 3, name: "weave_flame_shock", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "first_stormstrike_delay", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { primaryShock: 0, weaveFlameShock: false };
+        const message = { primaryShock: 0, weaveFlameShock: false, firstStormstrikeDelay: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -857,6 +858,9 @@ class EnhancementShaman_Rotation$Type extends MessageType {
                     break;
                 case /* bool weave_flame_shock */ 3:
                     message.weaveFlameShock = reader.bool();
+                    break;
+                case /* double first_stormstrike_delay */ 4:
+                    message.firstStormstrikeDelay = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -879,6 +883,9 @@ class EnhancementShaman_Rotation$Type extends MessageType {
         /* bool weave_flame_shock = 3; */
         if (message.weaveFlameShock !== false)
             writer.tag(3, WireType.Varint).bool(message.weaveFlameShock);
+        /* double first_stormstrike_delay = 4; */
+        if (message.firstStormstrikeDelay !== 0)
+            writer.tag(4, WireType.Bit64).double(message.firstStormstrikeDelay);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

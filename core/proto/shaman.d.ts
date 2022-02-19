@@ -354,6 +354,13 @@ export interface EnhancementShaman_Rotation {
      * @generated from protobuf field: bool weave_flame_shock = 3;
      */
     weaveFlameShock: boolean;
+    /**
+     * For internal use only. Use to stagger SS casts between multiple Enhance
+     * Shaman to optimize SS charge usage.
+     *
+     * @generated from protobuf field: double first_stormstrike_delay = 4;
+     */
+    firstStormstrikeDelay: number;
 }
 /**
  * @generated from protobuf enum proto.EnhancementShaman.Rotation.PrimaryShock

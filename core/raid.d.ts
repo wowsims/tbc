@@ -9,8 +9,10 @@ import { Sim } from './sim.js';
 export declare const MAX_NUM_PARTIES = 5;
 export declare class Raid {
     private buffs;
+    private staggerStormstrikes;
     readonly compChangeEmitter: TypedEvent<void>;
     readonly buffsChangeEmitter: TypedEvent<void>;
+    readonly staggerStormstrikesChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     private parties;
     readonly sim: Sim;
@@ -26,6 +28,8 @@ export declare class Raid {
     getClassCount(playerClass: Class): number;
     getBuffs(): RaidBuffs;
     setBuffs(eventID: EventID, newBuffs: RaidBuffs): void;
+    getStaggerStormstrikes(): boolean;
+    setStaggerStormstrikes(eventID: EventID, newValue: boolean): void;
     toProto(): RaidProto;
     fromProto(eventID: EventID, proto: RaidProto): void;
 }

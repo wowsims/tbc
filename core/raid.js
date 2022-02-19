@@ -9,9 +9,11 @@ export const MAX_NUM_PARTIES = 5;
 export class Raid {
     constructor(sim) {
         this.buffs = RaidBuffs.create();
+        this.staggerStormstrikes = false;
         // Emits when a raid member is added/removed/moved.
         this.compChangeEmitter = new TypedEvent();
         this.buffsChangeEmitter = new TypedEvent();
+        this.staggerStormstrikesChangeEmitter = new TypedEvent();
         this.sim = sim;
         this.parties = [...Array(MAX_NUM_PARTIES).keys()].map(i => {
             const newParty = new Party(this, sim);
@@ -70,15 +72,26 @@ export class Raid {
         this.buffs = RaidBuffs.clone(newBuffs);
         this.buffsChangeEmitter.emit(eventID);
     }
+    getStaggerStormstrikes() {
+        return this.staggerStormstrikes;
+    }
+    setStaggerStormstrikes(eventID, newValue) {
+        if (this.staggerStormstrikes == newValue)
+            return;
+        this.staggerStormstrikes = newValue;
+        this.staggerStormstrikesChangeEmitter.emit(eventID);
+    }
     toProto() {
         return RaidProto.create({
             parties: this.parties.map(party => party.toProto()),
             buffs: this.buffs,
+            staggerStormstrikes: this.staggerStormstrikes,
         });
     }
     fromProto(eventID, proto) {
         TypedEvent.freezeAllAndDo(() => {
             this.setBuffs(eventID, proto.buffs || RaidBuffs.create());
+            this.setStaggerStormstrikes(eventID, proto.staggerStormstrikes);
             for (let i = 0; i < MAX_NUM_PARTIES; i++) {
                 if (proto.parties[i]) {
                     this.parties[i].fromProto(eventID, proto.parties[i]);

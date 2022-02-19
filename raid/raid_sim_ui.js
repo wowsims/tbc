@@ -11,6 +11,7 @@ import { Class } from '/tbc/core/proto/common.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
+import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { EncounterPicker } from '/tbc/core/components/encounter_picker.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
@@ -176,6 +177,11 @@ export class RaidSimUI extends SimUI {
 				</div>
 				<div class="assignments-section-container">
 				</div>
+				<div class="raid-settings-section-container">
+					<fieldset class="settings-section other-options-section">
+						<legend>Other Options</legend>
+					</fieldset>
+				</div>
 			</div>
 			<div class="settings-bottom-bar">
 				<div class="saved-encounter-manager">
@@ -203,6 +209,16 @@ export class RaidSimUI extends SimUI {
         });
         this.blessingsPicker = new BlessingsPicker(this.rootElem.getElementsByClassName('blessings-section')[0], this);
         const assignmentsPicker = new AssignmentsPicker(this.rootElem.getElementsByClassName('assignments-section-container')[0], this);
+        const otherOptionsSectionElem = this.rootElem.getElementsByClassName('other-options-section')[0];
+        new BooleanPicker(otherOptionsSectionElem, this.sim.raid, {
+            label: 'Stagger Stormstrikes',
+            labelTooltip: 'When there are multiple Enhancement Shaman in the raid, causes them to coordinate their Stormstrike casts for optimal SS charge usage.',
+            changedEvent: (raid) => raid.staggerStormstrikesChangeEmitter,
+            getValue: (raid) => raid.getStaggerStormstrikes(),
+            setValue: (eventID, raid, newValue) => {
+                raid.setStaggerStormstrikes(eventID, newValue);
+            },
+        });
     }
     addDetailedResultsTab() {
         this.addTab('DETAILED RESULTS', 'detailed-results-tab', `

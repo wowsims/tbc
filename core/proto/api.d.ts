@@ -164,6 +164,12 @@ export interface Raid {
      * @generated from protobuf field: proto.RaidBuffs buffs = 2;
      */
     buffs?: RaidBuffs;
+    /**
+     * Staggers Stormstrike casts across Enhance Shaman to maximize charge usage.
+     *
+     * @generated from protobuf field: bool stagger_stormstrikes = 3;
+     */
+    staggerStormstrikes: boolean;
 }
 /**
  * @generated from protobuf message proto.SimOptions
