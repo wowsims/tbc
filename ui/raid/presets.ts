@@ -339,6 +339,30 @@ export const implementedSpecs: Array<Spec> = [...new Set(playerPresets.map(prese
 export const buffBotPresets: Array<BuffBotSettings> = [
 	{
 		// The value of this field must never change, to preserve local storage data.
+		buffBotId: 'Bear',
+		spec: Spec.SpecBalanceDruid,
+		name: 'Bear',
+		tooltip: 'Bear: Adds Gift of the Wild, an Innervate, and Leader of the Pack.',
+		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/ability_racial_bearform.jpg',
+		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
+			raidProto.buffs!.giftOfTheWild = Math.max(raidProto.buffs!.giftOfTheWild, TristateEffect.TristateEffectRegular);
+			partyProto.buffs!.leaderOfThePack = Math.max(partyProto.buffs!.leaderOfThePack, TristateEffect.TristateEffectRegular);
+
+			const innervateIndex = buffBot.getInnervateAssignment().targetIndex;
+			if (innervateIndex != NO_TARGET) {
+				const partyIndex = Math.floor(innervateIndex / 5);
+				const playerIndex = innervateIndex % 5;
+				const playerProto = raidProto.parties[partyIndex].players[playerIndex];
+				if (playerProto.buffs) {
+					playerProto.buffs.innervates++;
+				}
+			}
+		},
+		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+		},
+	},
+	{
+		// The value of this field must never change, to preserve local storage data.
 		buffBotId: 'Resto Druid',
 		spec: Spec.SpecBalanceDruid,
 		name: 'Resto Druid',
@@ -495,6 +519,51 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 			const debuffs = encounterProto.targets[0].debuffs!;
 			debuffs.curseOfElements = TristateEffect.TristateEffectImproved;
 			debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
+		},
+	},
+	{
+		// The value of this field must never change, to preserve local storage data.
+		buffBotId: 'Arms Warrior',
+		spec: Spec.SpecWarrior,
+		name: 'Arms Warrior',
+		tooltip: 'Arms Warrior: Adds Sunder Armor, Blood Frenzy, and Improved Battle Shout.',
+		iconUrl: 'https://wow.zamimg.com/images/wow/icons/medium/ability_warrior_savageblow.jpg',
+		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
+			partyProto.buffs!.battleShout = TristateEffect.TristateEffectImproved;
+		},
+		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+			const debuffs = encounterProto.targets[0].debuffs!;
+			debuffs.sunderArmor = true;
+			debuffs.bloodFrenzy = true;
+		},
+	},
+	{
+		// The value of this field must never change, to preserve local storage data.
+		buffBotId: 'Fury Warrior',
+		spec: Spec.SpecWarrior,
+		name: 'Fury Warrior',
+		tooltip: 'Fury Warrior: Adds Sunder Armor and Improved Battle Shout.',
+		iconUrl: 'https://wow.zamimg.com/images/wow/icons/medium/ability_warrior_innerrage.jpg',
+		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
+			partyProto.buffs!.battleShout = TristateEffect.TristateEffectImproved;
+		},
+		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+			const debuffs = encounterProto.targets[0].debuffs!;
+			debuffs.sunderArmor = true;
+		},
+	},
+	{
+		// The value of this field must never change, to preserve local storage data.
+		buffBotId: 'Prot Warrior',
+		spec: Spec.SpecWarrior,
+		name: 'Prot Warrior',
+		tooltip: 'Prot Warrior: Adds Sunder Armor.',
+		iconUrl: 'https://wow.zamimg.com/images/wow/icons/medium/inv_shield_06.jpg',
+		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
+		},
+		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+			const debuffs = encounterProto.targets[0].debuffs!;
+			debuffs.sunderArmor = true;
 		},
 	},
 ];

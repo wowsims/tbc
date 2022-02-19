@@ -809,49 +809,49 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-SV-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1744.8243832422972
+  dps: 1791.6683119813908
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-SV-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1572.3152500631547
+  dps: 1638.4696702126894
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-SV-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1201.3398460114101
+  dps: 1260.3719219665152
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-SV-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1850.8983113635238
+  dps: 1931.0990740727148
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-SV-NoBuffs-LongMultiTarget"
  value: {
-  dps: 954.7538398444757
+  dps: 985.7627689735618
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-SV-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 879.6377335981588
+  dps: 878.7279492958986
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-SV-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 641.9966025784632
+  dps: 637.5769346688352
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-SV-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1191.1203771400221
+  dps: 1202.8096396102114
  }
 }
 dps_results: {
@@ -1001,48 +1001,48 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1744.434281985645
+  dps: 1768.011222087285
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1612.766992554242
+  dps: 1668.152033169453
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1240.081132899055
+  dps: 1255.7003124889877
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1945.4172090041745
+  dps: 1990.3438237522857
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-NoBuffs-LongMultiTarget"
  value: {
-  dps: 962.1909731350925
+  dps: 1006.9744150071539
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 872.7992376774799
+  dps: 917.7303134366241
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 638.496161545054
+  dps: 655.1295114415863
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1218.108026339702
+  dps: 1229.8013607064343
  }
 }
