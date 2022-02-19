@@ -124,6 +124,7 @@ export const DefaultDestructionPotion = makeEnumValueConsumeInput(ActionId.fromI
 export const DefaultHastePotion = makeEnumValueConsumeInput(ActionId.fromItemId(22838), 'defaultPotion', Potions.HastePotion, ['Potion']);
 export const DefaultMightyRagePotion = makeEnumValueConsumeInput(ActionId.fromItemId(13442), 'defaultPotion', Potions.MightyRagePotion, ['Potion']);
 export const DefaultSuperManaPotion = makeEnumValueConsumeInput(ActionId.fromItemId(22832), 'defaultPotion', Potions.SuperManaPotion, ['Potion']);
+export const DefaultFelManaPotion = makeEnumValueConsumeInput(ActionId.fromItemId(31677), 'defaultPotion', Potions.FelManaPotion, ['Potion']);
 
 export const DefaultDarkRune = makeEnumValueConsumeInput(ActionId.fromItemId(12662), 'defaultConjured', Conjured.ConjuredDarkRune, ['Conjured']);
 export const DefaultFlameCap = makeEnumValueConsumeInput(ActionId.fromItemId(22788), 'defaultConjured', Conjured.ConjuredFlameCap, ['Conjured']);
