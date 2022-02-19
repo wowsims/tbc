@@ -7,7 +7,8 @@ import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
 import { RetributionPaladin, RetributionPaladin_Rotation as RetributionPaladinRotation, PaladinTalents as PaladinTalents, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
-import { RetributionPaladin_Rotation as RotationType } from '/tbc/core/proto/paladin.js';
+import { RetributionPaladin_Rotation_ConsecrateRank as ConsecrateRank,  RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
+
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
@@ -32,9 +33,15 @@ export const RetNoKingsPaladinTalents = {
 };
 
 export const DefaultRotation = RetributionPaladinRotation.create({
+	consecrateRank: ConsecrateRank.None,
+	exorcism: false,
 });
 
 export const DefaultOptions = RetributionPaladinOptions.create({
+	judgement: Judgement.Crusader,
+	csDelay: 1700,
+	hasteLeeway: 100,
+	damageTaken: 0,
 });
 
 export const DefaultConsumes = Consumes.create({

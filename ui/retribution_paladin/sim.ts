@@ -26,6 +26,7 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 import * as RetributionPaladinInputs from './inputs.js';
 import * as Presets from './presets.js';
+import { DruidTalents } from '../core/proto/druid.js';
 
 export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributionPaladin> {
   constructor(parentElem: HTMLElement, player: Player<Spec.SpecRetributionPaladin>) {
@@ -40,12 +41,16 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			epStats: [
 				Stat.StatStrength,
 				Stat.StatAgility,
+				Stat.StatIntellect,
 				Stat.StatAttackPower,
-				Stat.StatExpertise,
 				Stat.StatMeleeHit,
 				Stat.StatMeleeCrit,
+				Stat.StatExpertise,
 				Stat.StatMeleeHaste,
 				Stat.StatArmorPenetration,
+				Stat.StatSpellPower,
+				Stat.StatSpellCrit,
+				Stat.StatSpellHit,
 			],
 			// Reference stat against which to calculate EP. I think all classes use either spell power or attack power.
 			epReferenceStat: Stat.StatAttackPower,
@@ -67,20 +72,23 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				Stat.StatSpellCrit,
 				Stat.StatSpellHaste,
 			],
-
 			defaults: {
 				// Default equipped gear.
 				gear: Presets.P3_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
-					[Stat.StatStrength]: 2.5,
-					[Stat.StatAgility]: 1.75,
+					[Stat.StatStrength]: 2.42,
+					[Stat.StatAgility]: 1.88,
+					[Stat.StatIntellect]: 0,
 					[Stat.StatAttackPower]: 1,
-					[Stat.StatExpertise]: 3.75,
-					[Stat.StatMeleeHit]: 1.5,
-					[Stat.StatMeleeCrit]: 2.5,
-					[Stat.StatMeleeHaste]: 3,
-					[Stat.StatArmorPenetration]: 0.5,
+					[Stat.StatMeleeHit]: 5.38,
+					[Stat.StatMeleeCrit]: 1.98,
+					[Stat.StatExpertise]: 4.70,
+					[Stat.StatMeleeHaste]: 3.27,
+					[Stat.StatArmorPenetration]: 0.24,
+					[Stat.StatSpellPower]: 0.35,
+					[Stat.StatSpellCrit]: 0,
+					[Stat.StatSpellHit]: 0,
 				}),
 				// Default consumes settings.
 				consumes: Presets.DefaultConsumes,
@@ -92,14 +100,37 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				specOptions: Presets.DefaultOptions,
 				// Default raid/party buffs settings.
 				raidBuffs: RaidBuffs.create({
+					arcaneBrilliance: true,
+					divineSpirit: TristateEffect.TristateEffectImproved,
+					giftOfTheWild: TristateEffect.TristateEffectImproved,
 				}),
 				partyBuffs: PartyBuffs.create({
+					bloodlust: 1,
+					drums: Drums.DrumsOfBattle,
+					braidedEterniumChain: true,
+					manaSpringTotem: TristateEffect.TristateEffectRegular,
+					strengthOfEarthTotem: StrengthOfEarthType.EnhancingTotems,
+					windfuryTotemRank: 5,
+					battleShout: TristateEffect.TristateEffectImproved,
+					windfuryTotemIwt: 2,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfMight: TristateEffect.TristateEffectImproved,
+					unleashedRage: true,
 				}),
 				debuffs: Debuffs.create({
+					judgementOfWisdom: true,
+					misery: true,
+					curseOfElements: TristateEffect.TristateEffectImproved,
+					isbUptime: 1,
+					bloodFrenzy: true,
+					exposeArmor: TristateEffect.TristateEffectImproved,
+					faerieFire: TristateEffect.TristateEffectImproved,
+					curseOfRecklessness: true,
+					huntersMark: TristateEffect.TristateEffectImproved,
+					exposeWeaknessUptime: 1,
+					exposeWeaknessHunterAgility: 800,
 				}),
 			},
 
@@ -112,14 +143,15 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			raidBuffInputs: [
 				IconInputs.ArcaneBrilliance,
 				IconInputs.GiftOfTheWild,
+				IconInputs.DivineSpirit,
 			],
 			partyBuffInputs: [
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.Bloodlust,
 				IconInputs.ManaSpringTotem,
-				IconInputs.WrathOfAirTotem,
 				IconInputs.WindfuryTotem,
-				IconInputs.TotemOfWrath,
+				IconInputs.StrengthOfEarthTotem,
+				IconInputs.GraceOfAirTotem,
 				IconInputs.BattleShout,
 				IconInputs.DraeneiRacialMelee,
 				IconInputs.LeaderOfThePack,
@@ -129,22 +161,22 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				IconInputs.SanctityAura,
 				IconInputs.BattleChickens,
 				IconInputs.BraidedEterniumChain,
-				IconInputs.EyeOfTheNight,
-				IconInputs.ChainOfTheTwilightOwl,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
 				IconInputs.BlessingOfMight,
+				IconInputs.UnleashedRage,
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
-				IconInputs.BloodFrenzy,
 				IconInputs.JudgementOfWisdom,
+				IconInputs.ImprovedSealOfTheCrusader,
+				IconInputs.ExposeArmor,
+				IconInputs.SunderArmor,
+				IconInputs.BloodFrenzy,
 				IconInputs.HuntersMark,
 				IconInputs.FaerieFire,
-				IconInputs.SunderArmor,
-				IconInputs.ExposeArmor,
 				IconInputs.CurseOfRecklessness,
 				IconInputs.Misery,
 			],
@@ -169,12 +201,21 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				IconInputs.SpicyHotTalbuk,
 				IconInputs.GrilledMudfish,
 				IconInputs.BlackenedBasilisk,
+				IconInputs.ScrollOfStrengthV,
+				IconInputs.ScrollOfStrengthV,
 			],
 			// Inputs to include in the 'Rotation' section on the settings tab.
 			rotationInputs: RetributionPaladinInputs.RetributionPaladinRotationConfig,
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					RetributionPaladinInputs.JudgementSelection,
+					RetributionPaladinInputs.CSDelay,
+					RetributionPaladinInputs.HasteLeeway,
+					RetributionPaladinInputs.DamgeTaken,
+					OtherInputs.ExposeWeaknessUptime,
+					OtherInputs.ExposeWeaknessHunterAgility,
+					OtherInputs.ISBUptime,
 				],
 			},
 			encounterPicker: {

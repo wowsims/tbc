@@ -155,18 +155,5 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 }
 
 func (ret *RetributionPaladin) testingMechanics(sim *core.Simulation) {
-	// target := sim.GetPrimaryTarget()
 
-	if ret.Rotation.Consecration && (len(ret.ConsecrationSpell.Effects) == 0 || !ret.ConsecrationSpell.Effects[0].DotInput.IsTicking(sim)) {
-		consc := ret.NewConsecration(sim)
-
-		// if we dont have the mana.. do we just wait for regen?
-		// Probably should have logic earlier on to decide if we can even cast this.
-		//  Maybe we should have some pre-logic like elemental shaman to decide how much mana we have to spend ahead of time.
-		if success := consc.Cast(sim); !success {
-			ret.WaitForMana(sim, consc.GetManaCost())
-		}
-
-		return
-	}
 }
