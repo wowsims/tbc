@@ -505,7 +505,6 @@ func (hunter *Hunter) applyMasterTactician() {
 		procAura := core.Aura{
 			ID:       MasterTacticianProcAuraID,
 			ActionID: core.ActionID{SpellID: 34839},
-			Expires:  sim.CurrentTime + time.Second*8,
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				hitEffect.BonusCritRating += critBonus
 			},
@@ -522,7 +521,9 @@ func (hunter *Hunter) applyMasterTactician() {
 					return
 				}
 
-				hunter.AddAura(sim, procAura)
+				aura := procAura
+				aura.Expires = sim.CurrentTime + time.Second*8
+				hunter.AddAura(sim, aura)
 			},
 		}
 	})
