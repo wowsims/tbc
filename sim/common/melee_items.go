@@ -351,7 +351,8 @@ func ApplyDespair(agent core.Agent) {
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
-				// TODO: What is this supposed to trigger? My guess is that this is supposed to not have a proc mask, but only an attack/defense mask.
+				// TODO: This should be removed once we have an attack mask.
+				//  This is only set here to correctly calculate damage.
 				ProcMask:               core.ProcMaskMeleeMHSpecial,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
@@ -522,7 +523,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 		return core.Aura{
 			ID: BandOfTheEternalChampionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
+				if !hitEffect.IsWeaponHit() || !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || ability.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
