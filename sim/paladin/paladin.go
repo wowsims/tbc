@@ -16,10 +16,13 @@ type Paladin struct {
 	currentSeal      core.Aura
 	currentJudgement core.Aura
 
-	sealOfBlood           core.SimpleCast
-	sealOfCommand         core.SimpleCast
-	sealOfTheCrusader     core.SimpleCast
+	sealOfBlood       core.SimpleCast
+	sealOfCommand     core.SimpleCast
+	sealOfTheCrusader core.SimpleCast
+	sealOfWisdom      core.SimpleCast
+
 	SealOfTheCrusaderAura core.Aura
+	SealOfWisdomAura      core.Aura
 
 	consecrationTemplate core.SimpleSpellTemplate
 	ConsecrationSpell    core.SimpleSpell
@@ -35,6 +38,9 @@ type Paladin struct {
 
 	judgementOfTheCrusaderTemplate core.SimpleSpellTemplate
 	judgementOfTheCrusaderSpell    core.SimpleSpell
+
+	judgementOfWisdomTemplate core.SimpleSpellTemplate
+	judgementOfWisdomSpell    core.SimpleSpell
 }
 
 // Implemented by each Paladin spec.
@@ -59,6 +65,7 @@ func (paladin *Paladin) Init(sim *core.Simulation) {
 	paladin.crusaderStrikeTemplate = paladin.newCrusaderStrikeTemplate(sim)
 	paladin.judgementOfBloodTemplate = paladin.newJudgementOfBloodTemplate(sim)
 	paladin.judgementOfTheCrusaderTemplate = paladin.newJudgementOfTheCrusaderTemplate(sim)
+	paladin.judgementOfWisdomTemplate = paladin.newJudgementOfWisdomTemplate(sim)
 	paladin.consecrationTemplate = paladin.newConsecrationTemplate(sim)
 	paladin.exorcismTemplate = paladin.newExorcismTemplate(sim)
 }
@@ -112,6 +119,7 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 	paladin.setupSealOfBlood()
 	paladin.setupSealOfCommand()
 	paladin.setupSealOfTheCrusader()
+	paladin.setupSealOfWisdom()
 
 	paladin.applyTalents()
 

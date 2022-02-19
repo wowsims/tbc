@@ -48,6 +48,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				Stat.StatStrength,
 				Stat.StatAgility,
 				Stat.StatIntellect,
+				Stat.StatMP5,
 				Stat.StatAttackPower,
 				Stat.StatMeleeHit,
 				Stat.StatMeleeCrit,

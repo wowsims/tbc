@@ -193,6 +193,40 @@ func (paladin *Paladin) NewSealOfTheCrusader(sim *core.Simulation) *core.SimpleC
 	return sotc
 }
 
+// Didn't encode all the functionality of seal of wisdom
+// For now, we'll just use it as a setup to casting Judgement of Wisdom
+var SealOfWisdomAuraID = core.NewAuraID()
+var SealOfWisdomActionID = core.ActionID{SpellID: 27166}
+
+func (paladin *Paladin) setupSealOfWisdom() {
+	sowAura := core.Aura{
+		ID:       SealOfWisdomAuraID,
+		ActionID: SealOfWisdomActionID,
+	}
+
+	sow := core.SimpleCast{
+		Cast: core.Cast{
+			ActionID:  SealOfWisdomActionID,
+			Character: paladin.GetCharacter(),
+			GCD:       core.GCDDefault,
+		},
+		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			paladin.UpdateSeal(sim, sowAura)
+		},
+	}
+
+	sow.ManaCost = 270 * (1 - 0.03*float64(paladin.Talents.Benediction))
+
+	paladin.sealOfWisdom = sow
+	paladin.SealOfWisdomAura = sowAura
+}
+
+func (paladin *Paladin) NewSealOfWisdom(sim *core.Simulation) *core.SimpleCast {
+	sow := &paladin.sealOfWisdom
+	sow.Init(sim)
+	return sow
+}
+
 func (paladin *Paladin) UpdateSeal(sim *core.Simulation, newSeal core.Aura) {
 	oldSeal := paladin.currentSeal
 	newSeal.Expires = sim.CurrentTime + time.Second*30

@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/paladin"
 )
 
@@ -28,9 +29,16 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 	retOptions := options.GetRetributionPaladin()
 
 	ret := &RetributionPaladin{
-		Paladin:  paladin.NewPaladin(character, *retOptions.Talents),
-		Rotation: *retOptions.Rotation,
+		Paladin:     paladin.NewPaladin(character, *retOptions.Talents),
+		Rotation:    *retOptions.Rotation,
+		csDelay:     time.Duration(retOptions.Options.CsDelay),
+		hasteLeeway: time.Duration(retOptions.Options.HasteLeeway),
+		judgement:   retOptions.Options.Judgement,
 	}
+
+	// Convert DTPS option to bonus MP5
+	spAtt := float64(retOptions.Options.DamageTaken) * 5.0 / 10.0
+	ret.AddStat(stats.MP5, spAtt)
 
 	ret.EnableAutoAttacks(ret, core.AutoAttackOptions{
 		MainHand:       ret.WeaponFromMainHand(ret.DefaultMeleeCritMultiplier()),
@@ -45,6 +53,11 @@ type RetributionPaladin struct {
 
 	openerCompleted bool
 
+	hasteLeeway time.Duration
+	csDelay     time.Duration
+
+	judgement proto.RetributionPaladin_Options_Judgement
+
 	Rotation proto.RetributionPaladin_Rotation
 }
 
@@ -54,13 +67,15 @@ func (ret *RetributionPaladin) GetPaladin() *paladin.Paladin {
 
 func (ret *RetributionPaladin) Reset(sim *core.Simulation) {
 	ret.Paladin.Reset(sim)
-	ret.UpdateSeal(sim, ret.SealOfTheCrusaderAura)
 
-	// Defer main attack delay logic to the opening rotation code
-	// But delay on Reset as well so we don't just auto off the rip before other delay code can be called
-	// Kinda hacky
-	ret.AutoAttacks.DelayAllUntil(sim, sim.CurrentTime+time.Second*1)
+	switch ret.judgement {
+	case proto.RetributionPaladin_Options_Wisdom:
+		ret.UpdateSeal(sim, ret.SealOfWisdomAura)
+	case proto.RetributionPaladin_Options_Crusader:
+		ret.UpdateSeal(sim, ret.SealOfTheCrusaderAura)
+	}
 
+	ret.AutoAttacks.CancelAutoSwing(sim)
 	ret.openerCompleted = false
 }
 
@@ -124,9 +139,15 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
-	// Cast Judgement of the Crusader
+	// Cast selected judgement to keep on the boss
 	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
-		judge := ret.NewJudgementOfTheCrusader(sim, target)
+		var judge *core.SimpleSpell
+		switch ret.judgement {
+		case proto.RetributionPaladin_Options_Wisdom:
+			judge = ret.NewJudgementOfWisdom(sim, target)
+		case proto.RetributionPaladin_Options_Crusader:
+			judge = ret.NewJudgementOfTheCrusader(sim, target)
+		}
 		if judge != nil {
 			if success := judge.Cast(sim); !success {
 				ret.WaitForMana(sim, judge.GetManaCost())
@@ -150,6 +171,7 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 		if success := sob.StartCast(sim); !success {
 			ret.WaitForMana(sim, sob.GetManaCost())
 		}
+		ret.AutoAttacks.EnableAutoSwing(sim)
 		ret.openerCompleted = true
 	}
 }
