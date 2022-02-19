@@ -56,6 +56,9 @@ message Raid {
     repeated Party parties = 1; 
 
 		RaidBuffs buffs = 2;
+
+		// Staggers Stormstrike casts across Enhance Shaman to maximize charge usage.
+		bool stagger_stormstrikes = 3;
 }
 
 message SimOptions {

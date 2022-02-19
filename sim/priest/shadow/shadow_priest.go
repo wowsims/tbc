@@ -13,6 +13,7 @@ import (
 func RegisterShadowPriest() {
 	core.RegisterAgentFactory(
 		proto.Player_ShadowPriest{},
+		proto.Spec_SpecShadowPriest,
 		func(character core.Character, options proto.Player) core.Agent {
 			return NewShadowPriest(character, options)
 		},

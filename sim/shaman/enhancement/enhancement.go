@@ -12,6 +12,7 @@ import (
 func RegisterEnhancementShaman() {
 	core.RegisterAgentFactory(
 		proto.Player_EnhancementShaman{},
+		proto.Spec_SpecEnhancementShaman,
 		func(character core.Character, options proto.Player) core.Agent {
 			return NewEnhancementShaman(character, options)
 		},
@@ -107,7 +108,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 			return success
 		},
 	}
-	curTime = 0
+	curTime = core.DurationFromSeconds(enh.Rotation.FirstStormstrikeDelay)
 	for curTime <= maxDuration {
 		ability := ssAction
 		ability.DesiredCastAt = curTime

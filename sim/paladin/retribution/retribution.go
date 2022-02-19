@@ -11,6 +11,7 @@ import (
 func RegisterRetributionPaladin() {
 	core.RegisterAgentFactory(
 		proto.Player_RetributionPaladin{},
+		proto.Spec_SpecRetributionPaladin,
 		func(character core.Character, options proto.Player) core.Agent {
 			return NewRetributionPaladin(character, options)
 		},
