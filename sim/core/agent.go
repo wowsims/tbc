@@ -128,8 +128,14 @@ type SpecSetter func(*proto.Player, interface{})
 
 var agentFactories map[string]AgentFactory = make(map[string]AgentFactory)
 var specSetters map[string]SpecSetter = make(map[string]SpecSetter)
+var configSpecs map[string]proto.Spec = make(map[string]proto.Spec)
 
-func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory, specSetter SpecSetter) {
+func PlayerProtoToSpec(player proto.Player) proto.Spec {
+	typeName := reflect.TypeOf(player.GetSpec()).Elem().Name()
+	return configSpecs[typeName]
+}
+
+func RegisterAgentFactory(emptyOptions interface{}, spec proto.Spec, factory AgentFactory, specSetter SpecSetter) {
 	typeName := reflect.TypeOf(emptyOptions).Name()
 	if _, ok := agentFactories[typeName]; ok {
 		panic("Aleady registered agent factory: " + typeName)
@@ -138,6 +144,7 @@ func RegisterAgentFactory(emptyOptions interface{}, factory AgentFactory, specSe
 
 	agentFactories[typeName] = factory
 	specSetters[typeName] = specSetter
+	configSpecs[typeName] = spec
 }
 
 // Constructs a new Agent.

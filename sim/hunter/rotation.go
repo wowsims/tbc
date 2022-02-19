@@ -33,7 +33,9 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 
 	if hunter.IsWaitingForMana() && hunter.DoneWaitingForMana(sim) {
 		hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
-		hunter.rotation(sim, false)
+		if hunter.nextAction == OptionNone && hunter.Hardcast.Expires <= sim.CurrentTime {
+			hunter.rotation(sim, false)
+		}
 	}
 }
 

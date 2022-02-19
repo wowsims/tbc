@@ -72,6 +72,7 @@ var BasicRaid = &proto.Raid{
 			},
 		},
 	},
+	StaggerStormstrikes: true,
 }
 
 // Tests that we don't crash with various combinations of empty parties / blank players.
@@ -93,6 +94,7 @@ func TestSparseRaid(t *testing.T) {
 				},
 			},
 		},
+		StaggerStormstrikes: true,
 	}
 
 	rsr := &proto.RaidSimRequest{

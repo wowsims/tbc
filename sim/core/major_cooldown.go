@@ -112,13 +112,27 @@ func (mcd *MajorCooldown) IsEnabled() bool {
 	return !mcd.disabled
 }
 
-// Activates this MCD, if all the conditions pass.
-// Returns whether the MCD was activated.
-func (mcd *MajorCooldown) tryActivate(sim *Simulation, character *Character) bool {
+func (mcd *MajorCooldown) GetTimings() []time.Duration {
+	return mcd.timings[:]
+}
+
+// Public version of TryActivate for manual activation by Agent code.
+// Note that this version will work even if the MCD is disabled.
+func (mcd *MajorCooldown) TryActivate(sim *Simulation, character *Character) bool {
+	return mcd.tryActivateHelper(sim, character)
+}
+
+func (mcd *MajorCooldown) tryActivateInternal(sim *Simulation, character *Character) bool {
 	if mcd.disabled {
 		return false
 	}
 
+	return mcd.tryActivateHelper(sim, character)
+}
+
+// Activates this MCD, if all the conditions pass.
+// Returns whether the MCD was activated.
+func (mcd *MajorCooldown) tryActivateHelper(sim *Simulation, character *Character) bool {
 	if mcd.UsesGCD && character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
 		return false
 	}
@@ -249,6 +263,16 @@ func (mcdm *majorCooldownManager) AddMajorCooldown(mcd MajorCooldown) {
 	mcdm.initialMajorCooldowns = append(mcdm.initialMajorCooldowns, mcd)
 }
 
+func (mcdm *majorCooldownManager) GetInitialMajorCooldown(actionID ActionID) MajorCooldown {
+	for _, mcd := range mcdm.initialMajorCooldowns {
+		if mcd.SameAction(actionID) {
+			return mcd
+		}
+	}
+
+	return MajorCooldown{}
+}
+
 func (mcdm *majorCooldownManager) GetMajorCooldown(actionID ActionID) *MajorCooldown {
 	for _, mcd := range mcdm.majorCooldowns {
 		if mcd.SameAction(actionID) {
@@ -294,7 +318,7 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 	anyCooldownsUsed := false
 	for curIdx := 0; curIdx < len(mcdm.majorCooldowns) && !mcdm.majorCooldowns[curIdx].IsOnCD(sim, mcdm.character); curIdx++ {
 		mcd := mcdm.majorCooldowns[curIdx]
-		if mcd.tryActivate(sim, mcdm.character) {
+		if mcd.tryActivateInternal(sim, mcdm.character) {
 			anyCooldownsUsed = true
 
 			if mcd.UsesGCD {

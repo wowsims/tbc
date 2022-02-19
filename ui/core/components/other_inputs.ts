@@ -87,6 +87,7 @@ export const StartingPotion = {
 			{ name: 'Destruction', value: Potions.DestructionPotion },
 			{ name: 'Haste', value: Potions.HastePotion },
 			{ name: 'Super Mana', value: Potions.SuperManaPotion },
+			{ name: 'Fel Mana', value: Potions.FelManaPotion },
 		],
 		changedEvent: (player: Player<any>) => player.consumesChangeEmitter,
 		getValue: (player: Player<any>) => player.getConsumes().startingPotion,

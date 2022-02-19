@@ -10,6 +10,7 @@ import (
 func RegisterMage() {
 	core.RegisterAgentFactory(
 		proto.Player_Mage{},
+		proto.Spec_SpecMage,
 		func(character core.Character, options proto.Player) core.Agent {
 			return NewMage(character, options)
 		},

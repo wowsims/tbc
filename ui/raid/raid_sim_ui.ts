@@ -15,6 +15,7 @@ import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
+import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
@@ -213,6 +214,11 @@ export class RaidSimUI extends SimUI {
 				</div>
 				<div class="assignments-section-container">
 				</div>
+				<div class="raid-settings-section-container">
+					<fieldset class="settings-section other-options-section">
+						<legend>Other Options</legend>
+					</fieldset>
+				</div>
 			</div>
 			<div class="settings-bottom-bar">
 				<div class="saved-encounter-manager">
@@ -242,6 +248,17 @@ export class RaidSimUI extends SimUI {
 
 		this.blessingsPicker = new BlessingsPicker(this.rootElem.getElementsByClassName('blessings-section')[0] as HTMLElement, this);
 		const assignmentsPicker = new AssignmentsPicker(this.rootElem.getElementsByClassName('assignments-section-container')[0] as HTMLElement, this);
+
+    const otherOptionsSectionElem = this.rootElem.getElementsByClassName('other-options-section')[0] as HTMLElement;
+    new BooleanPicker(otherOptionsSectionElem, this.sim.raid, {
+      label: 'Stagger Stormstrikes',
+			labelTooltip: 'When there are multiple Enhancement Shaman in the raid, causes them to coordinate their Stormstrike casts for optimal SS charge usage.',
+      changedEvent: (raid: Raid) => raid.staggerStormstrikesChangeEmitter,
+      getValue: (raid: Raid) => raid.getStaggerStormstrikes(),
+      setValue: (eventID: EventID, raid: Raid, newValue: boolean) => {
+				raid.setStaggerStormstrikes(eventID, newValue);
+      },
+    });
 	}
 
 	private addDetailedResultsTab() {

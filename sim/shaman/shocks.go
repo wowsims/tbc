@@ -15,6 +15,10 @@ const SpellIDFrostShock int32 = 25464
 var ShockCooldownID = core.NewCooldownID() // shared CD for all shocks
 var FlameShockDebuffID = core.NewDebuffID()
 
+func (shaman *Shaman) ShockCD() time.Duration {
+	return time.Second*6 - time.Millisecond*200*time.Duration(shaman.Talents.Reverberation)
+}
+
 // Shared logic for all shocks.
 func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32, spellSchool stats.Stat, baseManaCost float64) core.SimpleSpell {
 	spell := core.SimpleSpell{
@@ -29,7 +33,7 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 				BaseManaCost:   baseManaCost,
 				ManaCost:       baseManaCost,
 				GCD:            core.GCDDefault,
-				Cooldown:       time.Second * 6,
+				Cooldown:       shaman.ShockCD(),
 				Binary:         true,
 				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 			},
@@ -50,7 +54,6 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
 	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
-	spell.Cooldown -= time.Millisecond * 200 * time.Duration(shaman.Talents.Reverberation)
 	if shaman.Talents.ElementalFury {
 		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
