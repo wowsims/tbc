@@ -6,15 +6,19 @@ import (
 
 var BloodlustCooldownID = core.NewCooldownID()
 
-func (shaman *Shaman) registerBloodlustCD() {
-	if !shaman.SelfBuffs.Bloodlust {
-		return
-	}
-	actionID := core.ActionID{
+func (shaman *Shaman) BloodlustActionID() core.ActionID {
+	return core.ActionID{
 		SpellID:    2825,
 		CooldownID: BloodlustCooldownID,
 		Tag:        int32(shaman.RaidIndex),
 	}
+}
+
+func (shaman *Shaman) registerBloodlustCD() {
+	if !shaman.SelfBuffs.Bloodlust {
+		return
+	}
+	actionID := shaman.BloodlustActionID()
 
 	bloodlustTemplate := core.SimpleCast{
 		Cast: core.Cast{

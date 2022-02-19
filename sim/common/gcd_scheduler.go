@@ -156,6 +156,59 @@ func (gs *GCDScheduler) scheduleAfter(newAbility ScheduledAbility, desiredIndex 
 	return Unresolved
 }
 
+// Schedules a group of abilities that must be cast back-to-back.
+// Most settings are taken from the first ability.
+func (gs *GCDScheduler) ScheduleGroup(sim *core.Simulation, newAbilities []ScheduledAbility) time.Duration {
+	if len(newAbilities) == 0 {
+		panic("Empty ability group!")
+	}
+
+	totalDuration := time.Duration(0)
+	for _, newAbility := range newAbilities {
+		totalDuration += newAbility.Duration
+	}
+
+	if sim.Log != nil {
+		sim.Log("Length before: %d", len(gs.schedule))
+	}
+
+	// Schedule a 'group ability' which is just a fake ability for reserving the time slots.
+	groupAbility := newAbilities[0]
+	groupAbility.Duration = totalDuration
+	groupCastAt := gs.Schedule(groupAbility)
+
+	if groupCastAt == Unresolved {
+		return Unresolved
+	}
+
+	// Update internals for the individual abilities, now that we know when they'll be cast.
+	nextCastAt := groupCastAt
+	for i, _ := range newAbilities {
+		newAbilities[i].castAt = nextCastAt
+		newAbilities[i].doneAt = nextCastAt + newAbilities[i].Duration
+		nextCastAt = newAbilities[i].doneAt
+	}
+
+	if sim.Log != nil {
+		sim.Log("Length with group: %d", len(gs.schedule))
+	}
+
+	// Replace the group ability with the individual abilities.
+	for i, ability := range gs.schedule {
+		if ability.castAt == groupCastAt {
+			before := gs.schedule[:i]
+			after := gs.schedule[i+1:]
+			gs.schedule = append(append(before, newAbilities...), after...)
+			if sim.Log != nil {
+				sim.Log("Group at index %d, new length: %d", i, len(gs.schedule))
+			}
+			break
+		}
+	}
+
+	return groupCastAt
+}
+
 // Takes ownership of a MCD, adding it to the schedule and removing it from the
 // character's managed cooldowns.
 func (gs *GCDScheduler) ScheduleMCD(sim *core.Simulation, character *core.Character, mcdID core.ActionID) {
@@ -208,6 +261,12 @@ func (gs *GCDScheduler) Reset(sim *core.Simulation, character *core.Character) {
 
 // Returns whether the cast was a success.
 func (gs *GCDScheduler) DoNextAbility(sim *core.Simulation, character *core.Character) bool {
+	if gs.nextAbilityIndex >= len(gs.schedule) {
+		// It's possible for this function to get called near the end of the iteration,
+		// after the final scheduled ability.
+		return true
+	}
+
 	success := gs.schedule[gs.nextAbilityIndex].TryCast(sim)
 	gs.nextAbilityIndex++
 
