@@ -73,6 +73,8 @@ func (ret *RetributionPaladin) Reset(sim *core.Simulation) {
 		ret.UpdateSeal(sim, ret.SealOfWisdomAura)
 	case proto.RetributionPaladin_Options_Crusader:
 		ret.UpdateSeal(sim, ret.SealOfTheCrusaderAura)
+	case proto.RetributionPaladin_Options_None:
+		ret.UpdateSeal(sim, ret.SealOfCommandAura)
 	}
 
 	ret.AutoAttacks.CancelAutoSwing(sim)
@@ -140,7 +142,8 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
 	// Cast selected judgement to keep on the boss
-	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
+	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) &&
+		ret.judgement != proto.RetributionPaladin_Options_None {
 		var judge *core.SimpleSpell
 		switch ret.judgement {
 		case proto.RetributionPaladin_Options_Wisdom:

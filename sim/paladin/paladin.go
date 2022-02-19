@@ -23,6 +23,7 @@ type Paladin struct {
 
 	SealOfTheCrusaderAura core.Aura
 	SealOfWisdomAura      core.Aura
+	SealOfCommandAura     core.Aura
 
 	consecrationTemplate core.SimpleSpellTemplate
 	ConsecrationSpell    core.SimpleSpell

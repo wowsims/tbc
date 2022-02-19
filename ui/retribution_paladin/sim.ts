@@ -144,10 +144,8 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				IconInputs.BattleShout,
 				IconInputs.DraeneiRacialMelee,
 				IconInputs.LeaderOfThePack,
-				IconInputs.MoonkinAura,
 				IconInputs.FerociousInspiration,
 				IconInputs.TrueshotAura,
-				IconInputs.SanctityAura,
 				IconInputs.BattleChickens,
 				IconInputs.BraidedEterniumChain,
 			],
@@ -167,6 +165,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				IconInputs.HuntersMark,
 				IconInputs.FaerieFire,
 				IconInputs.CurseOfRecklessness,
+				IconInputs.CurseOfElements,
 				IconInputs.Misery,
 			],
 			// IconInputs to include in the 'Consumes' section on the settings tab.

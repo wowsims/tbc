@@ -151,6 +151,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 	soc.ManaCost = 65 * (1 - 0.03*float64(paladin.Talents.Benediction))
 
 	paladin.sealOfCommand = soc
+	paladin.SealOfCommandAura = socAura
 }
 
 func (paladin *Paladin) NewSealOfCommand(sim *core.Simulation) *core.SimpleCast {
