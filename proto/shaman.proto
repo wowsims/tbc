@@ -165,6 +165,10 @@ message EnhancementShaman {
     PrimaryShock primary_shock = 2;
 
 		bool weave_flame_shock = 3;
+
+		// For internal use only. Use to stagger SS casts between multiple Enhance
+		// Shaman to optimize SS charge usage.
+		double first_stormstrike_delay = 4;
   }
 
   message Options {

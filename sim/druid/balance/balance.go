@@ -12,6 +12,7 @@ import (
 func RegisterBalanceDruid() {
 	core.RegisterAgentFactory(
 		proto.Player_BalanceDruid{},
+		proto.Spec_SpecBalanceDruid,
 		func(character core.Character, options proto.Player) core.Agent {
 			return NewBalanceDruid(character, options)
 		},

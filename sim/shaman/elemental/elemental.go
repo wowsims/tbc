@@ -13,6 +13,7 @@ import (
 func RegisterElementalShaman() {
 	core.RegisterAgentFactory(
 		proto.Player_ElementalShaman{},
+		proto.Spec_SpecElementalShaman,
 		func(character core.Character, options proto.Player) core.Agent {
 			return NewElementalShaman(character, options)
 		},

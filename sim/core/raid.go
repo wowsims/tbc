@@ -135,6 +135,17 @@ func NewRaid(raidConfig proto.Raid) *Raid {
 		dpsMetrics: NewDistributionMetrics(),
 	}
 
+	if raidConfig.StaggerStormstrikes {
+		enhanceShaman := RaidPlayersWithSpec(raidConfig, proto.Spec_SpecEnhancementShaman)
+		if len(enhanceShaman) > 1 {
+			stagger := time.Duration(float64(time.Second*10) / float64(len(enhanceShaman)))
+			for i, shaman := range enhanceShaman {
+				delay := stagger * time.Duration(i)
+				shaman.Spec.(*proto.Player_EnhancementShaman).EnhancementShaman.Rotation.FirstStormstrikeDelay = delay.Seconds()
+			}
+		}
+	}
+
 	for partyIndex, partyConfig := range raidConfig.Parties {
 		if partyConfig != nil {
 			raid.Parties = append(raid.Parties, NewParty(partyIndex, *partyConfig))
@@ -297,4 +308,16 @@ func SinglePlayerRaidProto(player *proto.Player, partyBuffs *proto.PartyBuffs, r
 		},
 		Buffs: raidBuffs,
 	}
+}
+
+func RaidPlayersWithSpec(raid proto.Raid, spec proto.Spec) []*proto.Player {
+	var specPlayers []*proto.Player
+	for _, party := range raid.Parties {
+		for _, player := range party.Players {
+			if player != nil && player.GetSpec() != nil && PlayerProtoToSpec(*player) == spec {
+				specPlayers = append(specPlayers, player)
+			}
+		}
+	}
+	return specPlayers
 }
