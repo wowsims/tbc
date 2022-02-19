@@ -440,7 +440,8 @@ func (hunter *Hunter) applyThrillOfTheHunt() {
 		return core.Aura{
 			ID: ThrillOfTheHuntAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.ProcMask.Matches(core.ProcMaskRangedSpecial) {
+				// mask 256
+				if !hitEffect.ProcMask.Matches(core.ProcMaskRangedSpecial) {
 					return
 				}
 
