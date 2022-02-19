@@ -407,7 +407,7 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 
 // Returns whether this hit effect is associated with the main-hand weapon.
 func (ahe *AbilityHitEffect) IsMH() bool {
-	const mhmask = ProcMaskMeleeMH | ProcMaskRanged
+	const mhmask = ProcMaskMeleeMH
 	return ahe.ProcMask.Matches(mhmask)
 }
 
