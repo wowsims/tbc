@@ -1,4 +1,4 @@
-import { Consumes } from '/tbc/core/proto/common.js';
+import { Conjured, Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
@@ -43,6 +43,7 @@ export const DefaultOptions = RetributionPaladinOptions.create({
 
 export const DefaultConsumes = Consumes.create({
 	defaultPotion: Potions.HastePotion,
+	defaultConjured: Conjured.ConjuredDarkRune,
 	flaskOfRelentlessAssault: true,
 	roastedClefthoof: true,
 });

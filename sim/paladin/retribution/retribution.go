@@ -134,7 +134,8 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	nextEventAt := ret.CDReadyAt(paladin.CrusaderStrikeCD)
 	sobExpiration := sim.CurrentTime + ret.RemainingAuraDuration(sim, paladin.SealOfBloodAuraID)
 	nextEventAt = core.MinDuration(nextEventAt, sobExpiration)
-	nextEventAt = core.MinDuration(nextEventAt, ret.CDReadyAt(paladin.JudgementCD))
+	// Waiting for judgement CD causes a bug that infinite loops for some reason
+	// nextEventAt = core.MinDuration(nextEventAt, ret.CDReadyAt(paladin.JudgementCD))
 	ret.WaitUntil(sim, nextEventAt)
 }
 
