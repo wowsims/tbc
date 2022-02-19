@@ -9,6 +9,7 @@ import (
 func RegisterWarrior() {
 	core.RegisterAgentFactory(
 		proto.Player_Warrior{},
+		proto.Spec_SpecWarrior,
 		func(character core.Character, options proto.Player) core.Agent {
 			return NewWarrior(character, options)
 		},

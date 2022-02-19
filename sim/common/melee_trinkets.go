@@ -531,11 +531,13 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 
 						if stacks < 10 {
 							character.AddStat(stats.AttackPower, apBonus)
+							character.AddStat(stats.RangedAttackPower, apBonus)
 							stacks++
 						}
 					},
 					OnExpire: func(sim *core.Simulation) {
 						character.AddStat(stats.AttackPower, -apBonus*float64(stacks))
+						character.AddStat(stats.RangedAttackPower, -apBonus*float64(stacks))
 						stacks = 0
 					},
 				})

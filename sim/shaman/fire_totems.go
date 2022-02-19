@@ -7,8 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// TODO: magma and nova totems need to apply to all targets probably instead of just the primary target.
-
 const SpellIDSearingTotem int32 = 25533
 
 func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
@@ -22,6 +20,7 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 				ManaCost:       205,
 				GCD:            time.Second,
 				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
+				IsPhantom:      true,
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -88,6 +87,7 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 				ManaCost:       800,
 				GCD:            time.Second,
 				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
+				IsPhantom:      true,
 			},
 		},
 		AOECap: 1600,
@@ -146,6 +146,10 @@ const SpellIDNovaTotem int32 = 25537
 
 var CooldownIDNovaTotem = core.NewCooldownID()
 
+func (shaman *Shaman) FireNovaTickLength() time.Duration {
+	return time.Second * time.Duration(4-shaman.Talents.ImprovedFireTotems)
+}
+
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
 func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
@@ -158,11 +162,12 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 				},
 				Character:      &shaman.Character,
 				SpellSchool:    stats.FireSpellPower,
-				BaseManaCost:   800,
-				ManaCost:       800,
+				BaseManaCost:   765,
+				ManaCost:       765,
 				GCD:            time.Second,
 				Cooldown:       time.Second * 15,
 				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
+				IsPhantom:      true,
 			},
 		},
 		AOECap: 9975,
@@ -181,7 +186,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        1,
-			TickLength:           time.Second * 5,
+			TickLength:           shaman.FireNovaTickLength(),
 			TickBaseDamage:       692,
 			TickSpellCoefficient: 0.214,
 			TicksCanMissAndCrit:  true,
@@ -189,7 +194,6 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 	}
 	baseEffect.StaticDamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
 	baseEffect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
-	baseEffect.DotInput.TickLength -= time.Duration(shaman.Talents.ImprovedFireTotems) * time.Second
 
 	tickLength := baseEffect.DotInput.TickLength
 	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {

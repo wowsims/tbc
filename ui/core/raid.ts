@@ -17,11 +17,13 @@ export const MAX_NUM_PARTIES = 5;
 // Manages all the settings for a single Raid.
 export class Raid {
   private buffs: RaidBuffs = RaidBuffs.create();
+	private staggerStormstrikes: boolean = false;
 
 	// Emits when a raid member is added/removed/moved.
   readonly compChangeEmitter = new TypedEvent<void>();
 
   readonly buffsChangeEmitter = new TypedEvent<void>();
+  readonly staggerStormstrikesChangeEmitter = new TypedEvent<void>();
 
   // Emits when anything in the raid changes.
   readonly changeEmitter: TypedEvent<void>;
@@ -104,16 +106,30 @@ export class Raid {
     this.buffsChangeEmitter.emit(eventID);
   }
 
+	getStaggerStormstrikes(): boolean {
+		return this.staggerStormstrikes;
+	}
+
+	setStaggerStormstrikes(eventID: EventID, newValue: boolean) {
+		if (this.staggerStormstrikes == newValue)
+			return;
+
+		this.staggerStormstrikes = newValue;
+		this.staggerStormstrikesChangeEmitter.emit(eventID);
+	}
+
 	toProto(): RaidProto {
 		return RaidProto.create({
 			parties: this.parties.map(party => party.toProto()),
 			buffs: this.buffs,
+			staggerStormstrikes: this.staggerStormstrikes,
 		});
 	}
 
 	fromProto(eventID: EventID, proto: RaidProto) {
 		TypedEvent.freezeAllAndDo(() => {
 			this.setBuffs(eventID, proto.buffs || RaidBuffs.create());
+			this.setStaggerStormstrikes(eventID, proto.staggerStormstrikes);
 
 			for (let i = 0; i < MAX_NUM_PARTIES; i++) {
 				if (proto.parties[i]) {

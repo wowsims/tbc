@@ -106,7 +106,9 @@ func (character *Character) HardcastWaitUntil(sim *Simulation, readyTime time.Du
 }
 
 func (character *Character) WaitForMana(sim *Simulation, desiredMana float64) {
-	character.waitStartTime = sim.CurrentTime
+	if !character.IsWaitingForMana() {
+		character.waitStartTime = sim.CurrentTime
+	}
 	character.waitingForMana = desiredMana
 	if sim.Log != nil {
 		character.Log(sim, "Not enough mana to cast, pausing GCD until mana >= %0.01f.", desiredMana)

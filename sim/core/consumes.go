@@ -668,10 +668,53 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
 				character.Metrics.AddInstantCast(actionID)
 			}
+	} else if potionType == proto.Potions_FelManaPotion {
+		alchStoneEquipped := character.HasTrinketEquipped(AlchStoneItemID)
+		actionID := ActionID{ItemID: 31677}
+		return MajorCooldown{
+				ActionID: actionID,
+				Type:     CooldownTypeMana,
+				CanActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+				ShouldActivate: func(sim *Simulation, character *Character) bool {
+					// Only pop if we have low enough mana. The potion takes effect over 24
+					// seconds so we can pop it a little earlier than the full value.
+					if character.MaxMana()-character.CurrentMana() < 2000 {
+						return false
+					}
+
+					return true
+				},
+			},
+			func(sim *Simulation, character *Character) {
+				// Restores 3200 mana over 24 seconds.
+				manaGain := 3200.0
+				if alchStoneEquipped {
+					manaGain *= 1.4
+				}
+				mp5 := manaGain / 24 * 5
+				character.AddAuraWithTemporaryStats(sim, FelManaPotionAuraID, actionID, stats.MP5, mp5, time.Second*24)
+
+				if !character.HasAura(FelManaPotionDebuffAuraID) {
+					character.AddStat(stats.SpellPower, -25)
+					character.AddAura(sim, Aura{
+						ID:       FelManaPotionDebuffAuraID,
+						ActionID: ActionID{SpellID: 38927},
+						Expires:  NeverExpires,
+					})
+				}
+
+				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
+				character.Metrics.AddInstantCast(actionID)
+			}
 	} else {
 		return MajorCooldown{}, nil
 	}
 }
+
+var FelManaPotionAuraID = NewAuraID()
+var FelManaPotionDebuffAuraID = NewAuraID()
 
 var ConjuredAuraID = NewAuraID()
 var ConjuredCooldownID = NewCooldownID()

@@ -195,6 +195,7 @@ enum Potions {
 	SuperManaPotion = 2;
 	HastePotion = 3;
 	MightyRagePotion = 4;
+	FelManaPotion = 5;
 }
 
 enum Conjured {
