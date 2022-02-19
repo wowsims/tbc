@@ -1,32 +1,20 @@
 import { RaidBuffs, StrengthOfEarthType } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
-import { Class } from '/tbc/core/proto/common.js';
-import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
-import { Encounter } from '/tbc/core/proto/common.js';
-import { ItemSlot } from '/tbc/core/proto/common.js';
-import { MobType } from '/tbc/core/proto/common.js';
-import { Potions } from '/tbc/core/proto/common.js';
-import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js'
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
-import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
-
-import { RetributionPaladin, RetributionPaladin_Rotation as RetributionPaladinRotation, PaladinTalents as PaladinTalents, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
-import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 import * as RetributionPaladinInputs from './inputs.js';
 import * as Presets from './presets.js';
-import { DruidTalents } from '../core/proto/druid.js';
 
 export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributionPaladin> {
   constructor(parentElem: HTMLElement, player: Player<Spec.SpecRetributionPaladin>) {

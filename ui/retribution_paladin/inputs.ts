@@ -1,19 +1,9 @@
-import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
-import { MobType, RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
-import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
-import { Sim } from '/tbc/core/sim.js';
-import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
+import { EventID } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
-import { Target } from '/tbc/core/target.js';
 
 import { RetributionPaladin_Rotation_ConsecrateRank as ConsecrateRank,  RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
-import { RetributionPaladin, RetributionPaladin_Rotation as RetributionPaladinRotation, PaladinTalents as PaladinTalents, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
-
-import * as Presets from './presets.js';
-import { SimUI } from '../core/sim_ui.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
@@ -53,7 +43,7 @@ export const RetributionPaladinRotationConfig = {
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Use Exorcism',
-				labelTooltip: 'Use exorcism during filler spell windows.',
+				labelTooltip: 'Use exorcism during filler spell windows. Will only be used if the boss mob type is Undead or Demon.',
 				changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getRotation().exorcism,
 				setValue: (eventID: EventID, player: Player<Spec.SpecRetributionPaladin>, newValue: boolean) => {
@@ -61,7 +51,6 @@ export const RetributionPaladinRotationConfig = {
 					newRotation.exorcism = newValue;
 					player.setRotation(eventID, newRotation);
 				},
-				// enableWhen: (target: Target) => target.getMobType() == MobType.MobTypeDemon,
 			},
 		}
 	],
@@ -99,7 +88,7 @@ export const CSDelay = {
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
 		label: 'Crusader Strike Delay',
-		labelTooltip: "Maximum of time (in miliseconds) we will delay Crusader Strike in order to seal twist. Experiment with values between 0 - 3000 miliseconds.",
+		labelTooltip: 'Maximum time (in miliseconds) Crusader Strike will be delayed in order to seal twist. Experiment with values between 0 - 3000 miliseconds.',
 		changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.specOptionsChangeEmitter,
 		getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getSpecOptions().csDelay,
 		setValue: (eventID: EventID, player: Player<Spec.SpecRetributionPaladin>, newValue: number) => {

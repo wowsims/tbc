@@ -1,7 +1,7 @@
 import { Spec } from '/tbc/core/proto/common.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Player } from '/tbc/core/player.js';
-import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { RetributionPaladinSimUI } from './sim.js';
 
