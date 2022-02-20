@@ -16,11 +16,17 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDArcaneMissiles},
-				Character:      &mage.Character,
-				SpellSchool:    stats.ArcaneSpellPower,
-				BaseManaCost:   740,
-				ManaCost:       740,
+				ActionID:    core.ActionID{SpellID: SpellIDArcaneMissiles},
+				Character:   &mage.Character,
+				SpellSchool: stats.ArcaneSpellPower,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 740,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 740,
+				},
 				GCD:            core.GCDDefault,
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
@@ -47,7 +53,7 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 	}
 
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance
-	spell.ManaCost += spell.BaseManaCost * float64(mage.Talents.EmpoweredArcaneMissiles) * 0.02
+	spell.Cost.Value += spell.BaseCost.Value * float64(mage.Talents.EmpoweredArcaneMissiles) * 0.02
 	spell.Effect.DotInput.TickSpellCoefficient += 0.15 * float64(mage.Talents.EmpoweredArcaneMissiles)
 
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {

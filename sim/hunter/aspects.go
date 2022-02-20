@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var AspectOfTheHawkActionID = core.ActionID{SpellID: 27044}
@@ -58,12 +59,18 @@ func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.Simp
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     AspectOfTheHawkActionID,
-			Character:    hunter.GetCharacter(),
-			BaseManaCost: 140,
-			ManaCost:     140,
-			GCD:          core.GCDDefault,
-			IgnoreHaste:  true, // Hunter GCD is locked at 1.5s
+			ActionID:  AspectOfTheHawkActionID,
+			Character: hunter.GetCharacter(),
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 140,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 140,
+			},
+			GCD:         core.GCDDefault,
+			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.aspectOfTheViper = false
 				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheHawkAuraID)
@@ -89,12 +96,18 @@ func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.Sim
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     core.ActionID{SpellID: 34074},
-			Character:    hunter.GetCharacter(),
-			BaseManaCost: 40,
-			ManaCost:     40,
-			GCD:          core.GCDDefault,
-			IgnoreHaste:  true, // Hunter GCD is locked at 1.5s
+			ActionID:  core.ActionID{SpellID: 34074},
+			Character: hunter.GetCharacter(),
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 40,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 40,
+			},
+			GCD:         core.GCDDefault,
+			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.aspectOfTheViper = true
 				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheHawkAuraID)

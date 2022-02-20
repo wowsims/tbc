@@ -640,8 +640,10 @@ func AddPowerInfusionAura(sim *Simulation, character *Character, actionTag int32
 		ActionID: ActionID{SpellID: 10060, Tag: actionTag},
 		Expires:  sim.CurrentTime + PowerInfusionDuration,
 		OnCast: func(sim *Simulation, cast *Cast) {
-			// TODO: Double-check this is how the calculation works.
-			cast.ManaCost = MaxFloat(0, cast.ManaCost-cast.BaseManaCost*0.2)
+			if cast.Cost.Type == stats.Mana {
+				// TODO: Double-check this is how the calculation works.
+				cast.Cost.Value = MaxFloat(0, cast.Cost.Value-cast.BaseCost.Value*0.2)
+			}
 		},
 		OnExpire: func(sim *Simulation) {
 			if !character.HasAura(BloodlustAuraID) {

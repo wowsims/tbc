@@ -17,13 +17,19 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 			SpellID:    SpellIDDevouringPlague,
 			CooldownID: DevouringPlagueCooldownID,
 		},
-		Character:    &priest.Character,
-		SpellSchool:  stats.ShadowSpellPower,
-		BaseManaCost: 1145,
-		ManaCost:     1145,
-		CastTime:     0,
-		GCD:          core.GCDDefault,
-		Cooldown:     time.Minute * 3,
+		Character:   &priest.Character,
+		SpellSchool: stats.ShadowSpellPower,
+		BaseCost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 1145,
+		},
+		Cost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 1145,
+		},
+		CastTime: 0,
+		GCD:      core.GCDDefault,
+		Cooldown: time.Minute * 3,
 	}
 
 	effect := core.SpellHitEffect{

@@ -133,7 +133,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 
 			success := shock.Cast(sim)
 			if !success {
-				enh.WaitForMana(sim, shock.ManaCost)
+				enh.WaitForMana(sim, shock.Cost.Value)
 			}
 			return success
 		},
@@ -206,13 +206,13 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 	scheduleSpellTotem := func(duration time.Duration, castFactory func(sim *core.Simulation) *core.SimpleSpell) {
 		scheduleTotem(duration, false, false, func(sim *core.Simulation) (bool, float64) {
 			cast := castFactory(sim)
-			return cast.Cast(sim), cast.ManaCost
+			return cast.Cast(sim), cast.Cost.Value
 		})
 	}
 	schedule2MTotem := func(castFactory func(sim *core.Simulation) *core.SimpleCast) {
 		scheduleTotem(time.Minute*2, true, true, func(sim *core.Simulation) (bool, float64) {
 			cast := castFactory(sim)
-			return cast.StartCast(sim), cast.ManaCost
+			return cast.StartCast(sim), cast.Cost.Value
 		})
 	}
 
@@ -228,7 +228,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.NewMagmaTotem(sim)
 				success := cast.Cast(sim)
 				if !success {
-					enh.WaitForMana(sim, cast.ManaCost)
+					enh.WaitForMana(sim, cast.Cost.Value)
 				}
 			}
 		case proto.FireTotem_SearingTotem:
@@ -240,7 +240,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.NewSearingTotem(sim, sim.GetPrimaryTarget())
 				success := cast.Cast(sim)
 				if !success {
-					enh.WaitForMana(sim, cast.ManaCost)
+					enh.WaitForMana(sim, cast.Cost.Value)
 				}
 			}
 		case proto.FireTotem_TotemOfWrath:
@@ -253,7 +253,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.NewTotemOfWrath(sim)
 				success := cast.StartCast(sim)
 				if !success {
-					enh.WaitForMana(sim, cast.ManaCost)
+					enh.WaitForMana(sim, cast.Cost.Value)
 				}
 			}
 		}
@@ -268,7 +268,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.NewNovaTotem(sim)
 				success := cast.Cast(sim)
 				if !success {
-					enh.WaitForMana(sim, cast.ManaCost)
+					enh.WaitForMana(sim, cast.Cost.Value)
 				}
 				return success
 			},
@@ -343,7 +343,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 					cast := enh.NewWindfuryTotem(sim)
 					success := cast.StartCast(sim)
 					if !success {
-						enh.WaitForMana(sim, cast.ManaCost)
+						enh.WaitForMana(sim, cast.Cost.Value)
 					}
 					return success
 				},
@@ -360,7 +360,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 					cast := defaultCastFactory(sim)
 					success := cast.StartCast(sim)
 					if !success {
-						enh.WaitForMana(sim, cast.ManaCost)
+						enh.WaitForMana(sim, cast.Cost.Value)
 					}
 					return success
 				},

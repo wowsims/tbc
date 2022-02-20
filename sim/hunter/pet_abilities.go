@@ -227,7 +227,6 @@ func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) Pe
 				ActionID:       core.ActionID{SpellID: 25011},
 				Character:      &hp.Character,
 				SpellSchool:    stats.NatureSpellPower,
-				IgnoreManaCost: true,
 				GCD:            core.GCDDefault,
 				CritMultiplier: 1.5,
 			},

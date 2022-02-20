@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var InnervateCooldownID = core.NewCooldownID()
@@ -75,12 +76,18 @@ func (druid *Druid) registerInnervateCD() {
 
 			castTemplate := core.SimpleCast{
 				Cast: core.Cast{
-					ActionID:     actionID,
-					Character:    druid.GetCharacter(),
-					BaseManaCost: baseManaCost,
-					ManaCost:     baseManaCost,
-					GCD:          core.GCDDefault,
-					Cooldown:     innervateCD,
+					ActionID:  actionID,
+					Character: druid.GetCharacter(),
+					BaseCost: core.ResourceCost{
+						Type:  stats.Mana,
+						Value: baseManaCost,
+					},
+					Cost: core.ResourceCost{
+						Type:  stats.Mana,
+						Value: baseManaCost,
+					},
+					GCD:      core.GCDDefault,
+					Cooldown: innervateCD,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						// Update expected bonus mana
 						newRemainingUsages := int(sim.GetRemainingDuration() / innervateCD)

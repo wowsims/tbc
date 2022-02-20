@@ -13,11 +13,17 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				SpellSchool:  stats.FrostSpellPower,
-				Character:    &mage.Character,
-				BaseManaCost: 1645,
-				ManaCost:     1645,
-				GCD:          core.GCDDefault,
+				SpellSchool: stats.FrostSpellPower,
+				Character:   &mage.Character,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 1645,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 1645,
+				},
+				GCD: core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDBlizzard,
 				},
@@ -43,8 +49,8 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 		},
 	}
 
-	spell.ManaCost -= spell.BaseManaCost * float64(mage.Talents.FrostChanneling) * 0.05
-	spell.ManaCost *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
+	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.FrostChanneling) * 0.05
+	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
 	baseEffect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 	baseEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.PiercingIce)
 	baseEffect.StaticDamageMultiplier *= 1 + 0.01*float64(mage.Talents.ArcticWinds)

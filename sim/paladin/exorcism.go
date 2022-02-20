@@ -15,10 +15,17 @@ func (paladin *Paladin) newExorcismTemplate(sim *core.Simulation) core.SimpleSpe
 	exo := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       ExorcismActionID,
-				Character:      &paladin.Character,
-				SpellSchool:    stats.HolySpellPower,
-				ManaCost:       295,
+				ActionID:    ExorcismActionID,
+				Character:   &paladin.Character,
+				SpellSchool: stats.HolySpellPower,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 295,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 295,
+				},
 				Cooldown:       time.Second * 15,
 				CritMultiplier: paladin.SpellCritMultiplier(1, 0.25), // look up crit multiplier in the future
 			},

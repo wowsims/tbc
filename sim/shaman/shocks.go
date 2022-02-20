@@ -28,10 +28,16 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 					SpellID:    spellID,
 					CooldownID: ShockCooldownID,
 				},
-				Character:      &shaman.Character,
-				SpellSchool:    spellSchool,
-				BaseManaCost:   baseManaCost,
-				ManaCost:       baseManaCost,
+				Character:   &shaman.Character,
+				SpellSchool: spellSchool,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: baseManaCost,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: baseManaCost,
+				},
 				GCD:            core.GCDDefault,
 				Cooldown:       shaman.ShockCD(),
 				Binary:         true,
@@ -47,8 +53,8 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 		},
 	}
 
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.Convection) * 0.02
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
 	if shaman.Talents.ElementalFury {
 		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
@@ -60,7 +66,7 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 
 	// TODO: confirm this is how it reduces mana cost.
 	if ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 2) {
-		spell.ManaCost -= spell.BaseManaCost * 0.1
+		spell.Cost.Value -= spell.BaseCost.Value * 0.1
 	}
 
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfRage {
@@ -89,7 +95,7 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 func (shaman *Shaman) applyShockInitModifiers(spellCast *core.SpellCast) {
 	if shaman.ElementalFocusStacks > 0 {
 		// Reduces mana cost by 40%
-		spellCast.Cast.ManaCost -= spellCast.Cast.BaseManaCost * 0.4
+		spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.4
 	}
 }
 

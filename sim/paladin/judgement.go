@@ -37,7 +37,7 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.M
 			},
 		},
 		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.ManaCost)
+			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
 			paladin.RemoveAura(sim, SealOfBloodAuraID)
 			paladin.currentSeal = core.Aura{}
 		},
@@ -82,14 +82,20 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 	jotc := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:     JudgementOfTheCrusaderActionID,
-				Character:    &paladin.Character,
-				SpellSchool:  stats.HolySpellPower,
-				BaseManaCost: JudgementManaCost,
-				ManaCost:     JudgementManaCost,
-				Cooldown:     time.Second * 10,
+				ActionID:    JudgementOfTheCrusaderActionID,
+				Character:   &paladin.Character,
+				SpellSchool: stats.HolySpellPower,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: JudgementManaCost,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: JudgementManaCost,
+				},
+				Cooldown: time.Second * 10,
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.ManaCost)
+					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.Cost.Value)
 					paladin.RemoveAura(sim, SealOfTheCrusaderAuraID)
 					paladin.currentSeal = core.Aura{}
 				},
@@ -108,7 +114,7 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 	}
 
 	// Reduce mana cost if we have Benediction Talent
-	jotc.ManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
+	jotc.Cost.Value = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
 
 	// Reduce CD if we have Improved Judgement Talent
 	jotc.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))

@@ -19,20 +19,27 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 		OnExpire: func(sim *core.Simulation) {
 			// Reset the mana cost on expiration.
 			if mage.arcaneBlastSpell.IsInUse() {
-				mage.arcaneBlastSpell.ManaCost = core.MaxFloat(0, mage.arcaneBlastSpell.ManaCost-3.0*ArcaneBlastBaseManaCost*0.75)
+				mage.arcaneBlastSpell.Cost.Value = core.MaxFloat(0, mage.arcaneBlastSpell.Cost.Value-3.0*ArcaneBlastBaseManaCost*0.75)
 				mage.arcaneBlastSpell.ActionID.Tag = 1
 			}
 		},
 	}
 	const abAuraDuration = time.Second * 8
+
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDArcaneBlast},
-				Character:      &mage.Character,
-				SpellSchool:    stats.ArcaneSpellPower,
-				BaseManaCost:   ArcaneBlastBaseManaCost,
-				ManaCost:       ArcaneBlastBaseManaCost,
+				ActionID:    core.ActionID{SpellID: SpellIDArcaneBlast},
+				Character:   &mage.Character,
+				SpellSchool: stats.ArcaneSpellPower,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: ArcaneBlastBaseManaCost,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: ArcaneBlastBaseManaCost,
+				},
 				CastTime:       ArcaneBlastBaseCastTime,
 				GCD:            core.GCDDefault,
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
@@ -62,7 +69,7 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 
 	if mage.hasTristfal {
 		spell.Effect.StaticDamageMultiplier *= 1.2
-		spell.ManaCost += 0.2 * ArcaneBlastBaseManaCost
+		spell.Cost.Value += 0.2 * ArcaneBlastBaseManaCost
 	}
 
 	return core.NewSimpleSpellTemplate(spell)
@@ -75,7 +82,7 @@ func (mage *Mage) NewArcaneBlast(sim *core.Simulation, target *core.Target) (*co
 
 	numStacks := mage.NumStacks(ArcaneBlastAuraID)
 	arcaneBlast.CastTime -= time.Duration(numStacks) * time.Second / 3
-	arcaneBlast.ManaCost += float64(numStacks) * ArcaneBlastBaseManaCost * 0.75
+	arcaneBlast.Cost.Value += float64(numStacks) * ArcaneBlastBaseManaCost * 0.75
 	arcaneBlast.ActionID.Tag = numStacks + 1
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
@@ -86,22 +93,6 @@ func (mage *Mage) NewArcaneBlast(sim *core.Simulation, target *core.Target) (*co
 }
 
 var ArcaneBlastAuraID = core.NewAuraID()
-
-func (mage *Mage) ArcaneBlastAura(sim *core.Simulation, numStacks int32) core.Aura {
-	return core.Aura{
-		ID:       ArcaneBlastAuraID,
-		ActionID: core.ActionID{SpellID: 36032},
-		Expires:  sim.CurrentTime + time.Second*8,
-		Stacks:   numStacks,
-		OnExpire: func(sim *core.Simulation) {
-			// Reset the mana cost on expiration.
-			if mage.arcaneBlastSpell.IsInUse() {
-				mage.arcaneBlastSpell.ManaCost = core.MaxFloat(0, mage.arcaneBlastSpell.ManaCost-3.0*ArcaneBlastBaseManaCost*0.75)
-				mage.arcaneBlastSpell.ActionID.Tag = 1
-			}
-		},
-	}
-}
 
 // Whether Arcane Blast stacks will fall off before a new blast could finish casting.
 func (mage *Mage) willDropArcaneBlastStacks(sim *core.Simulation, curArcaneBlast *core.SimpleSpell, numStacks int32) bool {
@@ -127,7 +118,7 @@ func (mage *Mage) canBlast(sim *core.Simulation, curArcaneBlast *core.SimpleSpel
 	}
 
 	// First cast, which is curArcaneBlast
-	projectedRemainingMana -= curArcaneBlast.ManaCost
+	projectedRemainingMana -= curArcaneBlast.Cost.Value
 	remainingDuration -= curArcaneBlast.CastTime
 	if projectedRemainingMana < 0 {
 		return false

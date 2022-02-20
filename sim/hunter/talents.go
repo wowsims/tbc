@@ -277,7 +277,7 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		ID:       BestialWrathAuraID,
 		ActionID: actionID,
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			cast.ManaCost -= cast.BaseManaCost * 0.2
+			cast.Cost.Value -= cast.BaseCost.Value * 0.2
 		},
 		OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
 			ability.Cost.Value *= 0.8
@@ -298,11 +298,17 @@ func (hunter *Hunter) registerBestialWrathCD() {
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     actionID,
-			Character:    hunter.GetCharacter(),
-			Cooldown:     cooldown,
-			BaseManaCost: manaCost,
-			ManaCost:     manaCost,
+			ActionID:  actionID,
+			Character: hunter.GetCharacter(),
+			Cooldown:  cooldown,
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				petAura := bestialWrathPetAura
 				petAura.Expires = sim.CurrentTime + time.Second*18

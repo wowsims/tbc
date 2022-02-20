@@ -13,13 +13,19 @@ var VampiricTouchDebuffID = core.NewDebuffID()
 
 func (priest *Priest) newVampiricTouchTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		ActionID:     VampiricTouchActionID,
-		Character:    &priest.Character,
-		SpellSchool:  stats.ShadowSpellPower,
-		BaseManaCost: 425,
-		ManaCost:     425,
-		CastTime:     time.Millisecond * 1500,
-		GCD:          core.GCDDefault,
+		ActionID:    VampiricTouchActionID,
+		Character:   &priest.Character,
+		SpellSchool: stats.ShadowSpellPower,
+		BaseCost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 425,
+		},
+		Cost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 425,
+		},
+		CastTime: time.Millisecond * 1500,
+		GCD:      core.GCDDefault,
 	}
 
 	effect := core.SpellHitEffect{
