@@ -1027,6 +1027,12 @@ export var OtherAction;
      * @generated from protobuf enum value: OtherActionPet = 7;
      */
     OtherAction[OtherAction["OtherActionPet"] = 7] = "OtherActionPet";
+    /**
+     * Refund of a resource like Energy or Rage, when the ability didn't land.
+     *
+     * @generated from protobuf enum value: OtherActionRefund = 8;
+     */
+    OtherAction[OtherAction["OtherActionRefund"] = 8] = "OtherActionRefund";
 })(OtherAction || (OtherAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class RaidBuffs$Type extends MessageType {

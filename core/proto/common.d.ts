@@ -1794,7 +1794,13 @@ export declare enum OtherAction {
      *
      * @generated from protobuf enum value: OtherActionPet = 7;
      */
-    OtherActionPet = 7
+    OtherActionPet = 7,
+    /**
+     * Refund of a resource like Energy or Rage, when the ability didn't land.
+     *
+     * @generated from protobuf enum value: OtherActionRefund = 8;
+     */
+    OtherActionRefund = 8
 }
 declare class RaidBuffs$Type extends MessageType<RaidBuffs> {
     constructor();
