@@ -64,6 +64,7 @@ type MeleeAbility struct {
 
 	// Whether this is a phantom attack. Phantom attacks are usually triggered by some effect,
 	// like Windfury. Many on-hit effects do not proc from phantom attacks, only regular attacks.
+	// TODO: Remove this and use proc masks instead.
 	IsPhantom bool
 
 	// Internal field only, used to prevent pool objects from being used by
@@ -95,7 +96,8 @@ type AbilityEffect struct {
 	BonusArmorPenetration float64
 	BonusWeaponDamage     float64
 
-	IsWhiteHit bool
+	// Controls which effects can proc from this effect.
+	ProcMask ProcMask
 
 	// Causes the first roll for this hit to be copied from ActiveMeleeAbility.Effects[0].HitType.
 	// This is only used by Shaman Stormstrike.
@@ -195,15 +197,6 @@ type MeleeDamageCalculator func(attackPower float64, bonusWeaponDamage float64) 
 
 // If MainHand or Offhand is non-zero the associated ability will create a weapon swing.
 type WeaponDamageInput struct {
-	// Whether this input corresponds to the OH weapon.
-	// It's important that this be 'IsOH' instead of 'IsMH' so that MH is the default.
-	// This should be mutually exclusive with isRanged.
-	IsOH bool
-
-	// Whether this input corresponds to the ranged weapon.
-	// This should be mutually exclusive with isOH.
-	IsRanged bool
-
 	DamageMultiplier float64 // Damage multiplier on weapon damage.
 	FlatDamageBonus  float64 // Flat bonus added to swing.
 
@@ -283,7 +276,7 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 
 	// Miss
 	missChance := ahe.Target.MissChance
-	if ahe.IsWhiteHit && !ahe.IsRanged() && character.AutoAttacks.IsDualWielding {
+	if ahe.ProcMask.Matches(ProcMaskMeleeWhiteHit) && character.AutoAttacks.IsDualWielding {
 		missChance += 0.19
 	}
 	hitBonus := ((character.stats[stats.MeleeHit] + ahe.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - ahe.Target.HitSuppression
@@ -296,7 +289,7 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 		return MeleeHitTypeMiss
 	}
 
-	if !ahe.IsRanged() { // Ranged hits can't be dodged/glance, and are always 2-roll
+	if !ahe.ProcMask.Matches(ProcMaskRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
 		// Dodge
 		dodge := ahe.Target.Dodge
 		expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
@@ -350,7 +343,7 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 
 	var attackPower float64
 	var bonusWeaponDamage float64
-	if ahe.IsRanged() {
+	if ahe.ProcMask.Matches(ProcMaskRanged) {
 		attackPower = character.stats[stats.RangedAttackPower] + ahe.BonusAttackPower
 		bonusWeaponDamage = character.PseudoStats.BonusRangedDamage + ahe.BonusWeaponDamage
 	} else {
@@ -359,21 +352,19 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	}
 
 	dmg := 0.0
-	if ahe.IsWeaponHit() {
-		if ahe.WeaponInput.CalculateDamage != nil {
-			dmg += ahe.WeaponInput.CalculateDamage(attackPower, bonusWeaponDamage)
+	if ahe.WeaponInput.CalculateDamage != nil {
+		dmg += ahe.WeaponInput.CalculateDamage(attackPower, bonusWeaponDamage)
+	} else if ahe.WeaponInput.DamageMultiplier != 0 {
+		// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
+		if ahe.IsRanged() {
+			dmg += character.AutoAttacks.Ranged.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
+		} else if ahe.IsMH() {
+			dmg += character.AutoAttacks.MH.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
 		} else {
-			// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
-			if ahe.IsRanged() {
-				dmg += character.AutoAttacks.Ranged.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
-			} else if ahe.IsMH() {
-				dmg += character.AutoAttacks.MH.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
-			} else {
-				dmg += character.AutoAttacks.OH.calculateSwingDamage(sim, attackPower)*0.5 + bonusWeaponDamage
-			}
-			dmg *= ahe.WeaponInput.DamageMultiplier
-			dmg += ahe.WeaponInput.FlatDamageBonus
+			dmg += character.AutoAttacks.OH.calculateSwingDamage(sim, attackPower)*0.5 + bonusWeaponDamage
 		}
+		dmg *= ahe.WeaponInput.DamageMultiplier
+		dmg += ahe.WeaponInput.FlatDamageBonus
 	}
 
 	//if sim.Log != nil {
@@ -388,10 +379,8 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	dmg += ahe.DirectInput.FlatDamageBonus
 
 	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
-	if !ahe.AbilityEffect.IsWhiteHit || ahe.IsRanged() {
-		skill := 350.0
-		level := float64(ahe.Target.Level)
-		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) + ((skill - (level * 5)) * 0.002) - 0.018
+	if ahe.ProcMask.Matches(ProcMaskTwoRoll) {
+		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
 
 		roll := sim.RandomFloat("weapon swing")
 		if roll < critChance {
@@ -418,35 +407,34 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	ahe.Damage = dmg
 }
 
-// Returns whether this hit effect is associated with one of the character's
-// weapons. This check is necessary to decide whether certains effects are eligible.
 func (ahe *AbilityHitEffect) IsWeaponHit() bool {
 	return ahe.WeaponInput.DamageMultiplier != 0 || ahe.WeaponInput.CalculateDamage != nil
 }
 
 // Returns whether this hit effect is associated with the main-hand weapon.
 func (ahe *AbilityHitEffect) IsMH() bool {
-	return !ahe.WeaponInput.IsOH && !ahe.WeaponInput.IsRanged
+	const mhmask = ProcMaskMeleeMH
+	return ahe.ProcMask.Matches(mhmask)
 }
 
 // Returns whether this hit effect is associated with the off-hand weapon.
 func (ahe *AbilityHitEffect) IsOH() bool {
-	return ahe.WeaponInput.IsOH
+	return ahe.ProcMask.Matches(ProcMaskMeleeOH)
 }
 
 // Returns whether this hit effect is associated with either melee weapon.
 func (ahe *AbilityHitEffect) IsMelee() bool {
-	return !ahe.WeaponInput.IsRanged
+	return ahe.ProcMask.Matches(ProcMaskMelee)
 }
 
 // Returns whether this hit effect is associated with the ranged weapon.
 func (ahe *AbilityHitEffect) IsRanged() bool {
-	return ahe.WeaponInput.IsRanged
+	return ahe.ProcMask.Matches(ProcMaskRanged)
 }
 
 // Returns whether this hit effect matches the hand in which a weapon is equipped.
 func (ahe *AbilityHitEffect) IsEquippedHand(mh bool, oh bool) bool {
-	return (ahe.IsMH() && mh) || (ahe.IsOH() && oh)
+	return (mh && ahe.IsMH()) || (oh && ahe.IsOH())
 }
 
 // It appears that TBC does not do hasted GCD for abilities.
@@ -617,7 +605,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{
-					IsWhiteHit:             true,
+					ProcMask:               ProcMaskMeleeMHAuto,
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
@@ -636,13 +624,12 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{
-					IsWhiteHit:             true,
+					ProcMask:               ProcMaskRangedAuto,
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
 				},
 				WeaponInput: WeaponDamageInput{
-					IsRanged:         true,
 					DamageMultiplier: 1,
 				},
 			},
@@ -831,8 +818,8 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		aa.cachedMelee = aa.ActiveMeleeAbility
 		aa.cachedMelee.ActionID.Tag = 1
 		aa.cachedMelee.CritMultiplier = aa.MH.CritMultiplier
+		aa.cachedMelee.Effect.ProcMask = ProcMaskMeleeMHAuto
 		aa.cachedMelee.Effect.Target = target
-		aa.cachedMelee.Effect.WeaponInput.IsOH = false
 	} else {
 		aa.cachedMelee = *replaceAMA
 	}
@@ -861,8 +848,8 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 	aa.cachedMelee = aa.ActiveMeleeAbility
 	aa.cachedMelee.ActionID.Tag = 2
 	aa.cachedMelee.CritMultiplier = aa.OH.CritMultiplier
+	aa.cachedMelee.Effect.ProcMask = ProcMaskMeleeOHAuto
 	aa.cachedMelee.Effect.Target = target
-	aa.cachedMelee.Effect.WeaponInput.IsOH = true
 	aa.cachedMelee.Attack(sim)
 	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
 	aa.agent.OnAutoAttack(sim, &aa.cachedMelee)

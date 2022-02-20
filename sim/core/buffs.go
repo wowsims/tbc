@@ -420,6 +420,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 				DamageMultiplier:       1.0,
 				StaticDamageMultiplier: 1.0,
 				BonusAttackPower:       apBonus,
+				ProcMask:               ProcMaskMeleeMHSpecial,
 			},
 			WeaponInput: WeaponDamageInput{
 				DamageMultiplier: 1.0,
@@ -439,7 +440,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 		ID:       WindfuryTotemAuraID,
 		ActionID: actionID,
 		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.IsMH() || ability.IsPhantom {
+			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.ProcMask.Matches(ProcMaskMeleeMH) || ability.IsPhantom {
 				return
 			}
 			if icd.IsOnCD(sim) {

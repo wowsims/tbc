@@ -50,26 +50,26 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 			CritMultiplier: shaman.DefaultMeleeCritMultiplier(),
 		},
 		Effects: []core.AbilityHitEffect{
-			core.AbilityHitEffect{
+			{
 				AbilityEffect: core.AbilityEffect{
+					ProcMask:               core.ProcMaskMeleeMHSpecial,
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
 				},
 				WeaponInput: core.WeaponDamageInput{
-					IsOH:             false,
 					DamageMultiplier: 1,
 				},
 			},
-			core.AbilityHitEffect{
+			{
 				AbilityEffect: core.AbilityEffect{
+					ProcMask:               core.ProcMaskMeleeOHSpecial,
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
 					ReuseMainHitRoll:       true,
 				},
 				WeaponInput: core.WeaponDamageInput{
-					IsOH:             true,
 					DamageMultiplier: 1,
 				},
 			},

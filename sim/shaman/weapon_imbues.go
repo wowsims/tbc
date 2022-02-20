@@ -68,12 +68,13 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: WFImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
+				// ProcMask: 20
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}
 
 				isMHHit := hitEffect.IsMH()
-				if (isMHHit && !mh) || (!isMHHit && !oh) {
+				if (!mh && isMHHit) || (!oh && !isMHHit) {
 					return // cant proc if not enchanted
 				}
 				if icd.IsOnCD(sim) {
@@ -86,15 +87,16 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 				wfTemplate.Apply(&wfAtk)
 				// Set so only the proc'd hand attacks
+				attackProc := core.ProcMaskMeleeMHSpecial
 				if isMHHit {
 					wfAtk.ActionID.Tag = 1
 				} else {
 					wfAtk.ActionID.Tag = 2
+					attackProc = core.ProcMaskMeleeOHSpecial
 				}
 				for i := 0; i < 2; i++ {
-					wfAtk.Effects[i].WeaponInput.IsOH = !isMHHit
 					wfAtk.Effects[i].Target = hitEffect.Target
-
+					wfAtk.Effects[i].ProcMask = attackProc
 					if !isMHHit {
 						// For whatever reason, OH penalty does not apply to the bonus AP from WF OH
 						// hits. Implement this by doubling the AP bonus we provide.
@@ -160,7 +162,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: FTImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}
 
@@ -223,7 +225,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: FBImbueAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}
 

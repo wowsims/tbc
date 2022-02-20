@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -92,7 +93,8 @@ func (character *Character) WaitUntil(sim *Simulation, readyTime time.Duration) 
 
 func (character *Character) HardcastWaitUntil(sim *Simulation, readyTime time.Duration, cast *Cast) {
 	if character.Hardcast.Expires > sim.CurrentTime {
-		panic("Hardcast already in use, will finish at: " + character.Hardcast.Expires.String())
+		fmt.Printf("Sim current time: %0.2f\n", sim.CurrentTime.Seconds())
+		panic(fmt.Sprintf("Hardcast already in use, will finish at: %0.2f", character.Hardcast.Expires.Seconds()))
 	}
 
 	character.Hardcast.Expires = readyTime

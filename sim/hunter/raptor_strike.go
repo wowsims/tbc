@@ -26,6 +26,7 @@ func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.MeleeAb
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
+				ProcMask:               core.ProcMaskMeleeMHSpecial,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,

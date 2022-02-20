@@ -46,7 +46,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 		ActionID: SealOfBloodProcActionID,
 
 		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
+			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 				return
 			}
 
@@ -117,7 +117,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 		ActionID: SealOfCommandProcActionID,
 
 		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || ability.IsPhantom {
+			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 				return
 			}
 

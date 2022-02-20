@@ -55,8 +55,8 @@ func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.MeleeAb
 			},
 		},
 		Effect: core.AbilityHitEffect{
-			WeaponInput: core.WeaponDamageInput{
-				IsRanged: true,
+			AbilityEffect: core.AbilityEffect{
+				ProcMask: core.ProcMaskRangedSpecial,
 			},
 		},
 		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {

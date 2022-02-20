@@ -18,7 +18,7 @@ func (character *Character) EnableRageBar(startingRage float64) {
 		return Aura{
 			ID: RageBarAuraID,
 			OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-				if !hitEffect.IsWhiteHit {
+				if !hitEffect.ProcMask.Matches(ProcMaskWhiteHit) {
 					return
 				}
 
