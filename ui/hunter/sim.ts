@@ -174,6 +174,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				IconInputs.DefaultSuperManaPotion,
 				IconInputs.DefaultFelManaPotion,
 				IconInputs.DefaultDarkRune,
+				IconInputs.DefaultFlameCap,
 				IconInputs.FlaskOfRelentlessAssault,
 				IconInputs.ElixirOfDemonslaying,
 				IconInputs.ElixirOfMajorAgility,
