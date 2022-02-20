@@ -191,6 +191,8 @@ func (weapon Weapon) calculateSwingDamage(sim *Simulation, attackPower float64) 
 	return weapon.BaseDamage(sim) + (weapon.SwingSpeed*attackPower)/MeleeAttackRatingPerDamage
 }
 
+type MeleeDamageCalculator func(attackPower float64, bonusWeaponDamage float64) float64
+
 // If MainHand or Offhand is non-zero the associated ability will create a weapon swing.
 type WeaponDamageInput struct {
 	// Whether this input corresponds to the OH weapon.
@@ -206,7 +208,7 @@ type WeaponDamageInput struct {
 	FlatDamageBonus  float64 // Flat bonus added to swing.
 
 	// If set, skips the normal calc for weapon damage and uses this function instead.
-	CalculateDamage func(attackPower float64, bonusWeaponDamage float64) float64
+	CalculateDamage MeleeDamageCalculator
 }
 
 type AbilityHitEffect struct {
