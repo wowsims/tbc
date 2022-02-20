@@ -21,7 +21,7 @@ func (hunter *Hunter) applyKillCommand() {
 		return core.Aura{
 			ID: KillCommandAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.HitType == core.MeleeHitTypeCrit {
+				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					hunter.killCommandEnabledUntil = sim.CurrentTime + time.Second*5
 					hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
 				}

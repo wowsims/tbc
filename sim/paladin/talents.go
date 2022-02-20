@@ -137,14 +137,14 @@ func (paladin *Paladin) applyVengeance() {
 				}
 			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellEffect.Crit {
+				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					vng.Stacks = core.MinInt32(3, paladin.NumStacks(VengeanceAuraID)+1)
 					vng.Expires = sim.CurrentTime + VengeanceDuration
 					paladin.ReplaceAura(sim, vng)
 				}
 			},
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.HitType == core.MeleeHitTypeCrit {
+				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					vng.Stacks = core.MinInt32(3, paladin.NumStacks(VengeanceAuraID)+1)
 					vng.Expires = sim.CurrentTime + VengeanceDuration
 					paladin.ReplaceAura(sim, vng)

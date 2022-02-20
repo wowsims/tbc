@@ -169,7 +169,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			hitEffect := &spell.Effect
 			hitEffect.beforeCalculations(sim, &spell.SpellCast)
 
-			if hitEffect.Hit {
+			if hitEffect.Landed() {
 				// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
 				if hitEffect.DirectInput.MaxBaseDamage != 0 {
 					hitEffect.calculateDirectDamage(sim, &spell.SpellCast)
@@ -227,7 +227,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 
 			for effectIdx := range spell.Effects {
 				hitEffect := &spell.Effects[effectIdx]
-				if hitEffect.Hit {
+				if hitEffect.Landed() {
 					// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
 					if hitEffect.DirectInput.MaxBaseDamage != 0 {
 						hitEffect.calculateDirectDamage(sim, &spell.SpellCast)

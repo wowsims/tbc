@@ -72,18 +72,6 @@ type MeleeAbility struct {
 	objectInUse bool
 }
 
-type MeleeHitType byte
-
-const (
-	MeleeHitTypeMiss MeleeHitType = iota
-	MeleeHitTypeDodge
-	MeleeHitTypeParry
-	MeleeHitTypeGlance
-	MeleeHitTypeBlock
-	MeleeHitTypeCrit
-	MeleeHitTypeHit
-)
-
 type AbilityEffect struct {
 	// Target of the spell.
 	Target *Target
@@ -121,7 +109,7 @@ type AbilityEffect struct {
 	IgnoreArmor bool
 
 	// The type of hit this was, i.e. miss/dodge/block/crit/hit.
-	HitType MeleeHitType
+	Outcome HitOutcome
 
 	// The damage done by this effect.
 	Damage float64
@@ -215,7 +203,7 @@ type ActiveMeleeAbility struct {
 
 	OnMeleeAttack OnMeleeAttack
 
-	HitType     MeleeHitType // Hit roll result
+	Outcome     HitOutcome // Hit roll result
 	Hits        int32
 	Misses      int32
 	Crits       int32
@@ -234,37 +222,24 @@ type ActiveMeleeAbility struct {
 }
 
 func (effect *AbilityEffect) Landed() bool {
-	return effect.HitType != MeleeHitTypeMiss && effect.HitType != MeleeHitTypeDodge && effect.HitType != MeleeHitTypeParry
+	return effect.Outcome.Matches(OutcomeLanded)
 }
 
 func (effect *AbilityEffect) String() string {
-	if effect.HitType == MeleeHitTypeMiss {
-		return "Miss"
-	} else if effect.HitType == MeleeHitTypeDodge {
-		return "Dodge"
-	} else if effect.HitType == MeleeHitTypeParry {
-		return "Parry"
+	outcomeStr := effect.Outcome.String()
+	if !effect.Outcome.Matches(OutcomeLanded) {
+		return outcomeStr
 	}
 
 	var sb strings.Builder
 
-	if effect.HitType == MeleeHitTypeHit {
-		sb.WriteString("Hit")
-	} else if effect.HitType == MeleeHitTypeCrit {
-		sb.WriteString("Crit")
-	} else if effect.HitType == MeleeHitTypeGlance {
-		sb.WriteString("Glance")
-	} else { // Block
-		sb.WriteString("Block")
-	}
-
-	fmt.Fprintf(&sb, " for %0.3f damage", effect.Damage)
+	fmt.Fprintf(&sb, "%s for %0.3f damage", outcomeStr, effect.Damage)
 
 	return sb.String()
 }
 
 // Computes an attack result using the white-hit table formula (single roll).
-func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *ActiveMeleeAbility) MeleeHitType {
+func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *ActiveMeleeAbility) HitOutcome {
 	// 1. Single roll -> Miss				Dodge	Parry	Glance	Block	Crit / Hit
 	// 3 				8.0%(9.0% hit cap)	6.5%	14.0%	24% 	5%		-4.8%
 
@@ -286,7 +261,7 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 
 	chance := missChance
 	if roll < chance {
-		return MeleeHitTypeMiss
+		return OutcomeMiss
 	}
 
 	if !ahe.ProcMask.Matches(ProcMaskRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
@@ -295,7 +270,7 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 		expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
 		chance += dodge - expertisePercentage
 		if roll < chance {
-			return MeleeHitTypeDodge
+			return OutcomeDodge
 		}
 
 		// Parry (if in front)
@@ -313,27 +288,27 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 		// Glance
 		chance += ahe.Target.Glance
 		if roll < chance {
-			return MeleeHitTypeGlance
+			return OutcomeGlance
 		}
 
 		// Crit
 		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
 		chance += critChance
 		if roll < chance {
-			return MeleeHitTypeCrit
+			return OutcomeCrit
 		}
 	}
 
-	return MeleeHitTypeHit
+	return OutcomeHit
 }
 
 func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMeleeAbility) {
 	character := ability.Character
 
 	if ahe.AbilityEffect.ReuseMainHitRoll {
-		ahe.HitType = ability.Effects[0].HitType
+		ahe.Outcome = ability.Effects[0].Outcome
 	} else {
-		ahe.HitType = ahe.WhiteHitTableResult(sim, ability)
+		ahe.Outcome = ahe.WhiteHitTableResult(sim, ability)
 	}
 
 	if !ahe.Landed() {
@@ -384,15 +359,15 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 
 		roll := sim.RandomFloat("weapon swing")
 		if roll < critChance {
-			ahe.HitType = MeleeHitTypeCrit
+			ahe.Outcome = OutcomeCrit
 		} else {
-			ahe.HitType = MeleeHitTypeHit
+			ahe.Outcome = OutcomeHit
 		}
 	}
 
-	if ahe.HitType == MeleeHitTypeCrit {
+	if ahe.Outcome == OutcomeCrit {
 		dmg *= ability.CritMultiplier
-	} else if ahe.HitType == MeleeHitTypeGlance {
+	} else if ahe.Outcome == OutcomeGlance {
 		dmg *= 0.75
 	}
 
@@ -503,19 +478,19 @@ func (ahe *AbilityHitEffect) performAttack(sim *Simulation, ability *ActiveMelee
 
 	ahe.calculateDamage(sim, ability)
 
-	if ahe.HitType == MeleeHitTypeMiss {
+	if ahe.Outcome == OutcomeMiss {
 		ability.Misses++
-	} else if ahe.HitType == MeleeHitTypeDodge {
+	} else if ahe.Outcome == OutcomeDodge {
 		ability.Dodges++
-	} else if ahe.HitType == MeleeHitTypeGlance {
+	} else if ahe.Outcome == OutcomeGlance {
 		ability.Glances++
-	} else if ahe.HitType == MeleeHitTypeCrit {
+	} else if ahe.Outcome == OutcomeCrit {
 		ability.Crits++
-	} else if ahe.HitType == MeleeHitTypeHit {
+	} else if ahe.Outcome == OutcomeHit {
 		ability.Hits++
-	} else if ahe.HitType == MeleeHitTypeParry {
+	} else if ahe.Outcome == OutcomeParry {
 		ability.Parries++
-	} else if ahe.HitType == MeleeHitTypeBlock {
+	} else if ahe.Outcome.Matches(OutcomeBlock) {
 		ability.Blocks++
 	}
 	ability.TotalDamage += ahe.Damage

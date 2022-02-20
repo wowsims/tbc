@@ -218,7 +218,7 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
-				if icd.IsOnCD(sim) || spellEffect.Crit && sim.RandomFloat("Shiffar's Nexus-Horn") > 0.2 {
+				if icd.IsOnCD(sim) || spellEffect.Outcome.Matches(core.OutcomeCrit) && sim.RandomFloat("Shiffar's Nexus-Horn") > 0.2 {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + dur)
@@ -263,7 +263,7 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
 					return // TLC can't proc Sextant
 				}
-				if !spellEffect.Crit || icd.IsOnCD(sim) || sim.RandomFloat("Sextant of Unstable Currents") > 0.2 {
+				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || icd.IsOnCD(sim) || sim.RandomFloat("Sextant of Unstable Currents") > 0.2 {
 					return // if not crit, or on cd, or didn't proc, dont activate
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
