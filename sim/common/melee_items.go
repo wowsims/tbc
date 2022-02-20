@@ -377,7 +377,7 @@ func ApplyDespair(agent core.Agent) {
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				// ProcMask: 20
 				// TODO: Make this work correctly once we have initial PR in.
-				if !hitEffect.Landed() || hitEffect.WeaponInput.DamageMultiplier == 0 {
+				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 				if sim.RandomFloat("Despair") > procChance {
