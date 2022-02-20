@@ -403,24 +403,23 @@ export class MajorCooldownUsedLog extends SimLog {
     }
 }
 export class CastBeganLog extends SimLog {
-    constructor(params, castId, currentMana, manaCost, castTime) {
+    constructor(params, castId, manaCost, castTime) {
         super(params);
         this.castId = castId;
-        this.currentMana = currentMana;
         this.manaCost = manaCost;
         this.castTime = castTime;
     }
     toString() {
-        return `${this.toStringPrefix()} Casting ${this.castId.name} (Cast time = ${this.castTime.toFixed(2)}s, Mana cost = ${this.manaCost.toFixed(1)}).`;
+        return `${this.toStringPrefix()} Casting ${this.castId.name} (Cast time = ${this.castTime.toFixed(2)}s, Cost = ${this.manaCost.toFixed(1)}).`;
     }
     static parse(params) {
-        const match = params.raw.match(/Casting (.*) \(Current Mana = (\d+\.?\d*), Mana Cost = (\d+\.?\d*), Cast Time = (\d+\.?\d*)(m?s)\)/);
+        const match = params.raw.match(/Casting (.*) \(Cost = (\d+\.?\d*), Cast Time = (\d+\.?\d*)(m?s)\)/);
         if (match) {
-            let castTime = parseFloat(match[4]);
-            if (match[5] == 'ms') {
+            let castTime = parseFloat(match[3]);
+            if (match[4] == 'ms') {
                 castTime /= 1000;
             }
-            return ActionId.fromLogString(match[1]).fill(params.source?.index).then(castId => new CastBeganLog(params, castId, parseFloat(match[2]), parseFloat(match[3]), castTime));
+            return ActionId.fromLogString(match[1]).fill(params.source?.index).then(castId => new CastBeganLog(params, castId, parseFloat(match[2]), castTime));
         }
         else {
             return null;

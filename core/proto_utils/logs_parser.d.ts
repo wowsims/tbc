@@ -112,10 +112,9 @@ export declare class MajorCooldownUsedLog extends SimLog {
 }
 export declare class CastBeganLog extends SimLog {
     readonly castId: ActionId;
-    readonly currentMana: number;
     readonly manaCost: number;
     readonly castTime: number;
-    constructor(params: SimLogParams, castId: ActionId, currentMana: number, manaCost: number, castTime: number);
+    constructor(params: SimLogParams, castId: ActionId, manaCost: number, castTime: number);
     toString(): string;
     static parse(params: SimLogParams): Promise<CastBeganLog> | null;
 }
