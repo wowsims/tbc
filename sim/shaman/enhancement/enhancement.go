@@ -1,6 +1,7 @@
 package enhancement
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/common"
@@ -370,11 +371,11 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				ability := wfAction
 				ability.DesiredCastAt = curTime
 				ability.MinCastAt = curTime - time.Second*8
-				ability.MaxCastAt = curTime + time.Second*4
+				ability.MaxCastAt = curTime + time.Second*8
 				defaultAbility := defaultAction
 				castAt := enh.scheduler.ScheduleGroup(sim, []common.ScheduledAbility{ability, defaultAbility})
 				if castAt == common.Unresolved {
-					panic("No timeslot found for air totem")
+					panic(fmt.Sprintf("No timeslot found for air totem, desired: %s", curTime))
 				}
 				curTime = castAt + time.Second*10
 			}
