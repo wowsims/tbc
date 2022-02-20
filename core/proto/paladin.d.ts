@@ -173,14 +173,72 @@ export interface RetributionPaladin {
  */
 export interface RetributionPaladin_Rotation {
     /**
-     * @generated from protobuf field: bool consecration = 1;
+     * @generated from protobuf field: proto.RetributionPaladin.Rotation.ConsecrationRank consecration_rank = 1;
      */
-    consecration: boolean;
+    consecrationRank: RetributionPaladin_Rotation_ConsecrationRank;
+    /**
+     * @generated from protobuf field: bool use_exorcism = 2;
+     */
+    useExorcism: boolean;
+}
+/**
+ * @generated from protobuf enum proto.RetributionPaladin.Rotation.ConsecrationRank
+ */
+export declare enum RetributionPaladin_Rotation_ConsecrationRank {
+    /**
+     * @generated from protobuf enum value: None = 0;
+     */
+    None = 0,
+    /**
+     * @generated from protobuf enum value: Rank1 = 1;
+     */
+    Rank1 = 1,
+    /**
+     * @generated from protobuf enum value: Rank4 = 2;
+     */
+    Rank4 = 2,
+    /**
+     * @generated from protobuf enum value: Rank6 = 3;
+     */
+    Rank6 = 3
 }
 /**
  * @generated from protobuf message proto.RetributionPaladin.Options
  */
 export interface RetributionPaladin_Options {
+    /**
+     * @generated from protobuf field: proto.RetributionPaladin.Options.Judgement judgement = 1;
+     */
+    judgement: RetributionPaladin_Options_Judgement;
+    /**
+     * @generated from protobuf field: int32 crusader_strike_delay_ms = 2;
+     */
+    crusaderStrikeDelayMs: number;
+    /**
+     * @generated from protobuf field: int32 haste_leeway_ms = 3;
+     */
+    hasteLeewayMs: number;
+    /**
+     * @generated from protobuf field: double damage_taken_per_second = 4;
+     */
+    damageTakenPerSecond: number;
+}
+/**
+ * @generated from protobuf enum proto.RetributionPaladin.Options.Judgement
+ */
+export declare enum RetributionPaladin_Options_Judgement {
+    /**
+     * @generated from protobuf enum value: None = 0;
+     */
+    None = 0,
+    /**
+     * @generated from protobuf enum value: Wisdom = 1;
+     */
+    Wisdom = 1,
+    /**
+     * @generated from protobuf enum value: Crusader = 2;
+     */
+    Crusader = 2
 }
 declare class PaladinTalents$Type extends MessageType<PaladinTalents> {
     constructor();

@@ -3,6 +3,46 @@ import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
+/**
+ * @generated from protobuf enum proto.RetributionPaladin.Rotation.ConsecrationRank
+ */
+export var RetributionPaladin_Rotation_ConsecrationRank;
+(function (RetributionPaladin_Rotation_ConsecrationRank) {
+    /**
+     * @generated from protobuf enum value: None = 0;
+     */
+    RetributionPaladin_Rotation_ConsecrationRank[RetributionPaladin_Rotation_ConsecrationRank["None"] = 0] = "None";
+    /**
+     * @generated from protobuf enum value: Rank1 = 1;
+     */
+    RetributionPaladin_Rotation_ConsecrationRank[RetributionPaladin_Rotation_ConsecrationRank["Rank1"] = 1] = "Rank1";
+    /**
+     * @generated from protobuf enum value: Rank4 = 2;
+     */
+    RetributionPaladin_Rotation_ConsecrationRank[RetributionPaladin_Rotation_ConsecrationRank["Rank4"] = 2] = "Rank4";
+    /**
+     * @generated from protobuf enum value: Rank6 = 3;
+     */
+    RetributionPaladin_Rotation_ConsecrationRank[RetributionPaladin_Rotation_ConsecrationRank["Rank6"] = 3] = "Rank6";
+})(RetributionPaladin_Rotation_ConsecrationRank || (RetributionPaladin_Rotation_ConsecrationRank = {}));
+/**
+ * @generated from protobuf enum proto.RetributionPaladin.Options.Judgement
+ */
+export var RetributionPaladin_Options_Judgement;
+(function (RetributionPaladin_Options_Judgement) {
+    /**
+     * @generated from protobuf enum value: None = 0;
+     */
+    RetributionPaladin_Options_Judgement[RetributionPaladin_Options_Judgement["None"] = 0] = "None";
+    /**
+     * @generated from protobuf enum value: Wisdom = 1;
+     */
+    RetributionPaladin_Options_Judgement[RetributionPaladin_Options_Judgement["Wisdom"] = 1] = "Wisdom";
+    /**
+     * @generated from protobuf enum value: Crusader = 2;
+     */
+    RetributionPaladin_Options_Judgement[RetributionPaladin_Options_Judgement["Crusader"] = 2] = "Crusader";
+})(RetributionPaladin_Options_Judgement || (RetributionPaladin_Options_Judgement = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class PaladinTalents$Type extends MessageType {
     constructor() {
@@ -346,11 +386,12 @@ export const RetributionPaladin = new RetributionPaladin$Type();
 class RetributionPaladin_Rotation$Type extends MessageType {
     constructor() {
         super("proto.RetributionPaladin.Rotation", [
-            { no: 1, name: "consecration", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 1, name: "consecration_rank", kind: "enum", T: () => ["proto.RetributionPaladin.Rotation.ConsecrationRank", RetributionPaladin_Rotation_ConsecrationRank] },
+            { no: 2, name: "use_exorcism", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { consecration: false };
+        const message = { consecrationRank: 0, useExorcism: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -361,8 +402,11 @@ class RetributionPaladin_Rotation$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bool consecration */ 1:
-                    message.consecration = reader.bool();
+                case /* proto.RetributionPaladin.Rotation.ConsecrationRank consecration_rank */ 1:
+                    message.consecrationRank = reader.int32();
+                    break;
+                case /* bool use_exorcism */ 2:
+                    message.useExorcism = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -376,9 +420,12 @@ class RetributionPaladin_Rotation$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* bool consecration = 1; */
-        if (message.consecration !== false)
-            writer.tag(1, WireType.Varint).bool(message.consecration);
+        /* proto.RetributionPaladin.Rotation.ConsecrationRank consecration_rank = 1; */
+        if (message.consecrationRank !== 0)
+            writer.tag(1, WireType.Varint).int32(message.consecrationRank);
+        /* bool use_exorcism = 2; */
+        if (message.useExorcism !== false)
+            writer.tag(2, WireType.Varint).bool(message.useExorcism);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -392,19 +439,61 @@ export const RetributionPaladin_Rotation = new RetributionPaladin_Rotation$Type(
 // @generated message type with reflection information, may provide speed optimized methods
 class RetributionPaladin_Options$Type extends MessageType {
     constructor() {
-        super("proto.RetributionPaladin.Options", []);
+        super("proto.RetributionPaladin.Options", [
+            { no: 1, name: "judgement", kind: "enum", T: () => ["proto.RetributionPaladin.Options.Judgement", RetributionPaladin_Options_Judgement] },
+            { no: 2, name: "crusader_strike_delay_ms", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "haste_leeway_ms", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "damage_taken_per_second", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { judgement: 0, crusaderStrikeDelayMs: 0, hasteLeewayMs: 0, damageTakenPerSecond: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.RetributionPaladin.Options.Judgement judgement */ 1:
+                    message.judgement = reader.int32();
+                    break;
+                case /* int32 crusader_strike_delay_ms */ 2:
+                    message.crusaderStrikeDelayMs = reader.int32();
+                    break;
+                case /* int32 haste_leeway_ms */ 3:
+                    message.hasteLeewayMs = reader.int32();
+                    break;
+                case /* double damage_taken_per_second */ 4:
+                    message.damageTakenPerSecond = reader.double();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* proto.RetributionPaladin.Options.Judgement judgement = 1; */
+        if (message.judgement !== 0)
+            writer.tag(1, WireType.Varint).int32(message.judgement);
+        /* int32 crusader_strike_delay_ms = 2; */
+        if (message.crusaderStrikeDelayMs !== 0)
+            writer.tag(2, WireType.Varint).int32(message.crusaderStrikeDelayMs);
+        /* int32 haste_leeway_ms = 3; */
+        if (message.hasteLeewayMs !== 0)
+            writer.tag(3, WireType.Varint).int32(message.hasteLeewayMs);
+        /* double damage_taken_per_second = 4; */
+        if (message.damageTakenPerSecond !== 0)
+            writer.tag(4, WireType.Bit64).double(message.damageTakenPerSecond);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

@@ -132,7 +132,8 @@ export const ISBUptime = {
             'isb-uptime-picker',
             'within-raid-sim-hide',
         ],
-        label: 'ISB Uptime %',
+        label: 'Improved Shadowbolt Uptime %',
+        labelTooltip: "Uptime for the Improved Shadowbolt debuff, applied by 1 or more warlocks in your raid.",
         changedEvent: (target) => target.debuffsChangeEmitter,
         getValue: (target) => Math.round(target.getDebuffs().isbUptime * 100),
         setValue: (eventID, target, newValue) => {
