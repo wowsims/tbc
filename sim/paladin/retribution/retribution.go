@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/paladin"
 )
 
@@ -29,9 +30,16 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 	retOptions := options.GetRetributionPaladin()
 
 	ret := &RetributionPaladin{
-		Paladin:  paladin.NewPaladin(character, *retOptions.Talents),
-		Rotation: *retOptions.Rotation,
+		Paladin:     paladin.NewPaladin(character, *retOptions.Talents),
+		Rotation:    *retOptions.Rotation,
+		csDelay:     time.Duration(retOptions.Options.CrusaderStrikeDelayMs),
+		hasteLeeway: time.Duration(retOptions.Options.HasteLeewayMs),
+		judgement:   retOptions.Options.Judgement,
 	}
+
+	// Convert DTPS option to bonus MP5
+	spAtt := retOptions.Options.DamageTakenPerSecond * 5.0 / 10.0
+	ret.AddStat(stats.MP5, spAtt)
 
 	ret.EnableAutoAttacks(ret, core.AutoAttackOptions{
 		MainHand:       ret.WeaponFromMainHand(ret.DefaultMeleeCritMultiplier()),
@@ -46,6 +54,11 @@ type RetributionPaladin struct {
 
 	openerCompleted bool
 
+	hasteLeeway time.Duration
+	csDelay     time.Duration
+
+	judgement proto.RetributionPaladin_Options_Judgement
+
 	Rotation proto.RetributionPaladin_Rotation
 }
 
@@ -55,13 +68,17 @@ func (ret *RetributionPaladin) GetPaladin() *paladin.Paladin {
 
 func (ret *RetributionPaladin) Reset(sim *core.Simulation) {
 	ret.Paladin.Reset(sim)
-	ret.UpdateSeal(sim, ret.SealOfTheCrusaderAura)
 
-	// Defer main attack delay logic to the opening rotation code
-	// But delay on Reset as well so we don't just auto off the rip before other delay code can be called
-	// Kinda hacky
-	ret.AutoAttacks.DelayAllUntil(sim, sim.CurrentTime+time.Second*1)
+	switch ret.judgement {
+	case proto.RetributionPaladin_Options_Wisdom:
+		ret.UpdateSeal(sim, ret.SealOfWisdomAura)
+	case proto.RetributionPaladin_Options_Crusader:
+		ret.UpdateSeal(sim, ret.SealOfTheCrusaderAura)
+	case proto.RetributionPaladin_Options_None:
+		ret.UpdateSeal(sim, ret.SealOfCommandAura)
+	}
 
+	ret.AutoAttacks.CancelAutoSwing(sim)
 	ret.openerCompleted = false
 }
 
@@ -118,16 +135,24 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	nextEventAt := ret.CDReadyAt(paladin.CrusaderStrikeCD)
 	sobExpiration := sim.CurrentTime + ret.RemainingAuraDuration(sim, paladin.SealOfBloodAuraID)
 	nextEventAt = core.MinDuration(nextEventAt, sobExpiration)
-	nextEventAt = core.MinDuration(nextEventAt, ret.CDReadyAt(paladin.JudgementCD))
+	// Waiting for judgement CD causes a bug that infinite loops for some reason
+	// nextEventAt = core.MinDuration(nextEventAt, ret.CDReadyAt(paladin.JudgementCD))
 	ret.WaitUntil(sim, nextEventAt)
 }
 
 func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
-	// Cast Judgement of the Crusader
-	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
-		judge := ret.NewJudgementOfTheCrusader(sim, target)
+	// Cast selected judgement to keep on the boss
+	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) &&
+		ret.judgement != proto.RetributionPaladin_Options_None {
+		var judge *core.SimpleSpell
+		switch ret.judgement {
+		case proto.RetributionPaladin_Options_Wisdom:
+			judge = ret.NewJudgementOfWisdom(sim, target)
+		case proto.RetributionPaladin_Options_Crusader:
+			judge = ret.NewJudgementOfTheCrusader(sim, target)
+		}
 		if judge != nil {
 			if success := judge.Cast(sim); !success {
 				ret.WaitForMana(sim, judge.GetManaCost())
@@ -141,7 +166,6 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 		if success := soc.StartCast(sim); !success {
 			ret.WaitForMana(sim, soc.GetManaCost())
 		}
-		ret.AutoAttacks.DelayAllUntil(sim, ret.NextGCDAt()) // wait until GCD is cleared
 		return
 	}
 
@@ -151,23 +175,11 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 		if success := sob.StartCast(sim); !success {
 			ret.WaitForMana(sim, sob.GetManaCost())
 		}
+		ret.AutoAttacks.EnableAutoSwing(sim)
 		ret.openerCompleted = true
 	}
 }
 
 func (ret *RetributionPaladin) testingMechanics(sim *core.Simulation) {
-	// target := sim.GetPrimaryTarget()
 
-	if ret.Rotation.Consecration && (len(ret.ConsecrationSpell.Effects) == 0 || !ret.ConsecrationSpell.Effects[0].DotInput.IsTicking(sim)) {
-		consc := ret.NewConsecration(sim)
-
-		// if we dont have the mana.. do we just wait for regen?
-		// Probably should have logic earlier on to decide if we can even cast this.
-		//  Maybe we should have some pre-logic like elemental shaman to decide how much mana we have to spend ahead of time.
-		if success := consc.Cast(sim); !success {
-			ret.WaitForMana(sim, consc.GetManaCost())
-		}
-
-		return
-	}
 }

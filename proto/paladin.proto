@@ -47,13 +47,29 @@ message PaladinTalents {
 
 message RetributionPaladin {
     message Rotation {
-		bool consecration = 1;
+		enum ConsecrationRank {
+			None = 0;
+			Rank1 = 1;
+			Rank4 = 2;
+			Rank6 = 3;
+		}
+		ConsecrationRank consecration_rank = 1;
+		bool use_exorcism = 2;
     }
     Rotation rotation = 1;
 
     PaladinTalents talents = 2;
     
     message Options {
+		enum Judgement {
+			None = 0;
+			Wisdom = 1;
+			Crusader = 2;
+		};
+		Judgement judgement = 1;
+		int32 crusader_strike_delay_ms = 2;
+		int32 haste_leeway_ms = 3;
+		double damage_taken_per_second = 4;
     }
     Options options = 3;
 }

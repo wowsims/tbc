@@ -374,10 +374,6 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	ahe.Damage = dmg
 }
 
-func (ahe *AbilityHitEffect) IsWeaponHit() bool {
-	return ahe.WeaponInput.DamageMultiplier != 0 || ahe.WeaponInput.CalculateDamage != nil
-}
-
 // Returns whether this hit effect is associated with the main-hand weapon.
 func (ahe *AbilityHitEffect) IsMH() bool {
 	const mhmask = ProcMaskMeleeMH

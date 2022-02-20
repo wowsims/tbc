@@ -149,7 +149,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Despair-28573"
  value: {
-  dps: 772.8174151131016
+  dps: 775.0885662063331
  }
 }
 dps_results: {
@@ -485,7 +485,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-TheDecapitator-28767"
  value: {
-  dps: 811.135098508441
+  dps: 813.6847263810157
  }
 }
 dps_results: {
@@ -527,7 +527,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-ThunderingSkyfireDiamond"
  value: {
-  dps: 832.2925442152704
+  dps: 842.1183485194713
  }
 }
 dps_results: {

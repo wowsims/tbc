@@ -183,12 +183,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestEnhancement-AllItems-Despair-28573"
- value: {
-  dps: 1274.7535296139424
- }
-}
-dps_results: {
  key: "TestEnhancement-AllItems-DestructiveSkyfireDiamond"
  value: {
   dps: 1806.378361826184
@@ -297,12 +291,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestEnhancement-AllItems-GlaiveofthePit-28774"
- value: {
-  dps: 1320.1679677613777
- }
-}
-dps_results: {
  key: "TestEnhancement-AllItems-HexShrunkenHead-33829"
  value: {
   dps: 1828.0379445769072
@@ -339,27 +327,9 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestEnhancement-AllItems-KhoriumChampion-23541"
- value: {
-  dps: 1292.1776833298957
- }
-}
-dps_results: {
  key: "TestEnhancement-AllItems-KissoftheSpider-22954"
  value: {
   dps: 1833.434390935992
- }
-}
-dps_results: {
- key: "TestEnhancement-AllItems-LionheartChampion-28429"
- value: {
-  dps: 1378.0651501182112
- }
-}
-dps_results: {
- key: "TestEnhancement-AllItems-LionheartExecutioner-28430"
- value: {
-  dps: 1416.5643035196683
  }
 }
 dps_results: {
@@ -575,7 +545,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TheDecapitator-28767"
  value: {
-  dps: 1739.8434990785343
+  dps: 1749.5351665660323
  }
 }
 dps_results: {
@@ -617,7 +587,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-ThunderingSkyfireDiamond"
  value: {
-  dps: 1868.3456851341052
+  dps: 1834.8749359958927
  }
 }
 dps_results: {
@@ -642,12 +612,6 @@ dps_results: {
  key: "TestEnhancement-AllItems-TsunamiTalisman-30627"
  value: {
   dps: 1862.653249510952
- }
-}
-dps_results: {
- key: "TestEnhancement-AllItems-WarpSlicer-30311"
- value: {
-  dps: 1839.395843198923
  }
 }
 dps_results: {

@@ -93,7 +93,6 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 					Type:  stats.Mana,
 					Value: JudgementManaCost,
 				},
-				Cooldown: time.Second * 10,
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.Cost.Value)
 					paladin.RemoveAura(sim, SealOfTheCrusaderAuraID)
@@ -140,6 +139,71 @@ func (paladin *Paladin) NewJudgementOfTheCrusader(sim *core.Simulation, target *
 	jotc.Init(sim)
 
 	return jotc
+}
+
+var JudgementOfWisdomActionID = core.ActionID{SpellID: 27164, CooldownID: JudgementCD}
+
+func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	jow := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:    JudgementOfWisdomActionID,
+				Character:   &paladin.Character,
+				SpellSchool: stats.HolySpellPower,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: JudgementManaCost,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: JudgementManaCost,
+				},
+				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+					paladin.sanctifiedJudgement(sim, paladin.sealOfWisdom.Cost.Value)
+					paladin.RemoveAura(sim, SealOfWisdomAuraID)
+					paladin.currentSeal = core.Aura{}
+				},
+			},
+		},
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
+				IgnoreHitCheck: true,
+				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					aura := core.JudgementOfWisdomAura(sim)
+					spellEffect.Target.AddAura(sim, aura)
+					paladin.currentJudgement = aura
+				},
+			},
+		},
+	}
+
+	// Reduce mana cost if we have Benediction Talent
+	jow.Cost.Value = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
+
+	// Reduce CD if we have Improved Judgement Talent
+	jow.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
+
+	return core.NewSimpleSpellTemplate(jow)
+}
+
+func (paladin *Paladin) NewJudgementOfWisdom(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+	// No seal has even been active, so we can't cast judgement
+	if paladin.currentSeal.ID != SealOfWisdomAuraID {
+		return nil
+	}
+
+	// Most recent seal has expired so we can't cast judgement
+	if paladin.currentSeal.Expires <= sim.CurrentTime {
+		return nil
+	}
+
+	jow := &paladin.judgementOfWisdomSpell
+	paladin.judgementOfWisdomTemplate.Apply(jow)
+
+	jow.Effect.Target = target
+	jow.Init(sim)
+
+	return jow
 }
 
 var SanctifiedJudgementActionID = core.ActionID{SpellID: 31930}

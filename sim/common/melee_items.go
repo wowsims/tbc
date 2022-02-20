@@ -354,8 +354,7 @@ func ApplyDespair(agent core.Agent) {
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				// TODO: This should ignore armor.
-				// IgnoreArmor:            true,
+				IgnoreArmor:            true,
 			},
 			DirectInput: core.DirectDamageInput{
 				FlatDamageBonus: 600,
@@ -373,8 +372,7 @@ func ApplyDespair(agent core.Agent) {
 			ID: DespairAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				// ProcMask: 20
-				// TODO: Make this work correctly once we have initial PR in.
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 				if sim.RandomFloat("Despair") > procChance {
@@ -409,8 +407,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				// TODO: Fix this to correctly ignore armor.
-				// IgnoreArmor:            true,
+				IgnoreArmor:            true,
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage: 513,
@@ -518,7 +515,8 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 		return core.Aura{
 			ID: BandOfTheEternalChampionAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.IsWeaponHit() || !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || ability.IsPhantom {
+				// mask 340
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || ability.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
