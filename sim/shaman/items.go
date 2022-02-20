@@ -66,7 +66,7 @@ var ItemSetCycloneRegalia = core.ItemSet{
 				return core.Aura{
 					ID: Cyclone4PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if !spellEffect.Crit || sim.RandomFloat("cycl4p") > 0.11 {
+						if !spellEffect.Outcome.Matches(core.OutcomeCrit) || sim.RandomFloat("cycl4p") > 0.11 {
 							return // if not a crit or didn't proc, don't activate
 						}
 						character.AddAura(sim, core.Aura{
@@ -97,7 +97,7 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 				return core.Aura{
 					ID: Cataclysm4PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if !spellEffect.Crit || sim.RandomFloat("cata4p") > 0.25 {
+						if !spellEffect.Outcome.Matches(core.OutcomeCrit) || sim.RandomFloat("cata4p") > 0.25 {
 							return
 						}
 						character.AddMana(sim, 120, core.ActionID{SpellID: 37237}, false)

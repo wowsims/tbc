@@ -76,20 +76,17 @@ type SpellEffect struct {
 	OnSpellMiss OnSpellMiss
 
 	// Results
-
-	Hit  bool // True = hit, False = resisted
-	Crit bool // Whether this cast was a critical strike.
-
-	PartialResist_1_4 bool // 1/4 of the spell was resisted
-	PartialResist_2_4 bool // 2/4 of the spell was resisted
-	PartialResist_3_4 bool // 3/4 of the spell was resisted
-
-	Damage float64 // Damage done by this cast.
+	Outcome HitOutcome
+	Damage  float64 // Damage done by this cast.
 
 	// Certain damage multiplier, such as target debuffs and crit multipliers, do
 	// not count towards the AOE cap. Store them here to they can be subtracted
 	// later when calculating AOE cap.
 	BeyondAOECapMultiplier float64
+}
+
+func (spellEffect *SpellEffect) Landed() bool {
+	return spellEffect.Outcome.Matches(OutcomeLanded)
 }
 
 func (spellEffect *SpellEffect) TotalThreatMultiplier(spellCast *SpellCast) float64 {
@@ -104,11 +101,13 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *S
 	spellEffect.Target.OnBeforeSpellHit(sim, spellCast, spellEffect)
 	spellEffect.BeyondAOECapMultiplier *= spellEffect.DamageMultiplier / multiplierBeforeTargetEffects
 
-	spellEffect.Hit = spellEffect.IgnoreHitCheck || spellEffect.hitCheck(sim, spellCast)
+	if spellEffect.IgnoreHitCheck || spellEffect.hitCheck(sim, spellCast) {
+		spellEffect.Outcome = OutcomeHit
+	}
 }
 
 func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spellCast *SpellCast) {
-	if spellEffect.Hit {
+	if spellEffect.Landed() {
 		if spellEffect.OnSpellHit != nil {
 			spellEffect.OnSpellHit(sim, spellCast, spellEffect)
 		}
@@ -127,7 +126,7 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *Sp
 	if sim.Log != nil && !spellEffect.IgnoreHitCheck {
 		spellCast.Character.Log(sim, "%s %s.", spellCast.ActionID, spellEffect)
 	}
-	if spellEffect.Hit && spellEffect.FlatThreatBonus > 0 {
+	if spellEffect.Landed() && spellEffect.FlatThreatBonus > 0 {
 		spellCast.TotalThreat += spellEffect.FlatThreatBonus * spellEffect.TotalThreatMultiplier(spellCast)
 	}
 
@@ -149,21 +148,21 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast)
 }
 
 func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
-	if spellEffect.Hit {
+	if spellEffect.Landed() {
 		spellCast.Hits++
-		if spellEffect.Crit {
+		if spellEffect.Outcome.Matches(OutcomeCrit) {
 			spellCast.Crits++
+		}
+
+		if spellEffect.Outcome.Matches(OutcomePartial1_4) {
+			spellCast.PartialResists_1_4++
+		} else if spellEffect.Outcome.Matches(OutcomePartial2_4) {
+			spellCast.PartialResists_2_4++
+		} else if spellEffect.Outcome.Matches(OutcomePartial3_4) {
+			spellCast.PartialResists_3_4++
 		}
 	} else {
 		spellCast.Misses++
-	}
-
-	if spellEffect.PartialResist_1_4 {
-		spellCast.PartialResists_1_4++
-	} else if spellEffect.PartialResist_2_4 {
-		spellCast.PartialResists_2_4++
-	} else if spellEffect.PartialResist_3_4 {
-		spellCast.PartialResists_3_4++
 	}
 
 	spellCast.TotalDamage += spellEffect.Damage
@@ -173,21 +172,21 @@ func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
 // Only applies the results from the ticks, not the initial dot application.
 func (hitEffect *SpellHitEffect) applyDotTickResultsToCast(spellCast *SpellCast) {
 	if hitEffect.DotInput.TicksCanMissAndCrit {
-		if hitEffect.Hit {
+		if hitEffect.Landed() {
 			spellCast.Hits++
-			if hitEffect.Crit {
+			if hitEffect.Outcome.Matches(OutcomeCrit) {
 				spellCast.Crits++
+			}
+
+			if hitEffect.Outcome.Matches(OutcomePartial1_4) {
+				spellCast.PartialResists_1_4++
+			} else if hitEffect.Outcome.Matches(OutcomePartial2_4) {
+				spellCast.PartialResists_2_4++
+			} else if hitEffect.Outcome.Matches(OutcomePartial3_4) {
+				spellCast.PartialResists_3_4++
 			}
 		} else {
 			spellCast.Misses++
-		}
-
-		if hitEffect.PartialResist_1_4 {
-			spellCast.PartialResists_1_4++
-		} else if hitEffect.PartialResist_2_4 {
-			spellCast.PartialResists_2_4++
-		} else if hitEffect.PartialResist_2_4 {
-			spellCast.PartialResists_3_4++
 		}
 	}
 
@@ -210,7 +209,7 @@ func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCas
 	}
 
 	if hitEffect.SpellEffect.critCheck(sim, spellCast) {
-		hitEffect.SpellEffect.Crit = true
+		hitEffect.Outcome |= OutcomeCrit
 		damage *= spellCast.CritMultiplier
 		hitEffect.SpellEffect.BeyondAOECapMultiplier *= spellCast.CritMultiplier
 	}
@@ -246,19 +245,18 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 		damage = hitEffect.DotInput.damagePerTick
 	}
 
-	hitEffect.Hit = !hitEffect.DotInput.TicksCanMissAndCrit || hitEffect.hitCheck(sim, spellCast)
-	hitEffect.Crit = false
+	hitEffect.Outcome = OutcomeEmpty
+	if !hitEffect.DotInput.TicksCanMissAndCrit || hitEffect.hitCheck(sim, spellCast) {
+		hitEffect.Outcome = OutcomeHit
+	}
 
-	if hitEffect.Hit {
+	if hitEffect.Outcome == OutcomeHit {
 		if !spellCast.Binary {
-			hitEffect.PartialResist_1_4 = false
-			hitEffect.PartialResist_2_4 = false
-			hitEffect.PartialResist_3_4 = false
 			damage = calculateResists(sim, damage, &hitEffect.SpellEffect)
 		}
 
 		if hitEffect.DotInput.TicksCanMissAndCrit && hitEffect.critCheck(sim, spellCast) {
-			hitEffect.Crit = true
+			hitEffect.Outcome |= OutcomeCrit
 			damage *= spellCast.CritMultiplier
 			hitEffect.SpellEffect.BeyondAOECapMultiplier *= spellCast.CritMultiplier
 		}
@@ -301,53 +299,18 @@ func (hitEffect *SpellHitEffect) onDotComplete(sim *Simulation, spellCast *Spell
 }
 
 func (spellEffect *SpellEffect) String() string {
-	if !spellEffect.Hit {
-		return "Miss"
+	outcomeStr := spellEffect.Outcome.String()
+	if !spellEffect.Landed() {
+		return outcomeStr
 	}
 
 	var sb strings.Builder
-
-	if spellEffect.Crit {
-		sb.WriteString("Crit")
-	} else {
-		sb.WriteString("Hit")
-	}
-
-	fmt.Fprintf(&sb, " for %0.3f damage", spellEffect.Damage)
-
-	if spellEffect.PartialResist_1_4 {
-		sb.WriteString(" (25% Resist)")
-	} else if spellEffect.PartialResist_2_4 {
-		sb.WriteString(" (50% Resist)")
-	} else if spellEffect.PartialResist_3_4 {
-		sb.WriteString(" (75% Resist)")
-	}
-
+	fmt.Fprintf(&sb, "%s for %0.3f damage", outcomeStr, spellEffect.Damage)
 	return sb.String()
 }
 
 func (spellEffect *SpellEffect) DotResultString() string {
-	if !spellEffect.Hit {
-		return "tick Missed"
-	}
-
-	var sb strings.Builder
-
-	fmt.Fprintf(&sb, "ticked for %0.3f damage", spellEffect.Damage)
-
-	if spellEffect.PartialResist_1_4 {
-		sb.WriteString(" (25% Resist)")
-	} else if spellEffect.PartialResist_2_4 {
-		sb.WriteString(" (50% Resist)")
-	} else if spellEffect.PartialResist_3_4 {
-		sb.WriteString(" (75% Resist)")
-	}
-
-	if spellEffect.Crit {
-		sb.WriteString(" (Crit)")
-	}
-
-	return sb.String()
+	return "tick " + spellEffect.String()
 }
 
 // Return value is (newDamage, resistMultiplier)
@@ -365,13 +328,13 @@ func calculateResists(sim *Simulation, damage float64, spellEffect *SpellEffect)
 
 	var multiplier float64
 	if resVal < 0.01 {
-		spellEffect.PartialResist_3_4 = true
+		spellEffect.Outcome |= OutcomePartial3_4
 		multiplier = 0.25
 	} else if resVal < 0.05 {
-		spellEffect.PartialResist_2_4 = true
+		spellEffect.Outcome |= OutcomePartial2_4
 		multiplier = 0.5
 	} else {
-		spellEffect.PartialResist_1_4 = true
+		spellEffect.Outcome |= OutcomePartial1_4
 		multiplier = 0.75
 	}
 

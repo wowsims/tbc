@@ -87,7 +87,7 @@ func (druid *Druid) Act(sim *core.Simulation) time.Duration {
 }
 
 func (druid *Druid) applyOnHitTalents(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-	if druid.Talents.NaturesGrace && spellEffect.Crit {
+	if druid.Talents.NaturesGrace && spellEffect.Outcome.Matches(core.OutcomeCrit) {
 		druid.NaturesGrace = true
 	}
 }

@@ -247,7 +247,7 @@ func (mage *Mage) applyMasterOfElements() {
 		return core.Aura{
 			ID: MasterOfElementsAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellEffect.Crit {
+				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					mage.AddMana(sim, spellCast.BaseManaCost*refundCoeff, core.ActionID{SpellID: 29076}, false)
 				}
 			},
@@ -294,7 +294,7 @@ func (mage *Mage) registerCombustionCD() {
 					},
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						numHits++
-						if spellEffect.Crit {
+						if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 							numCrits++
 							if numCrits == 3 {
 								character.RemoveAuraOnNextAdvance(sim, CombustionAuraID)

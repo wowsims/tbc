@@ -33,7 +33,7 @@ func (character *Character) EnableRageBar(startingRage float64) {
 					BaseSwingSpeed = character.AutoAttacks.OH.SwingSpeed
 				}
 
-				if hitEffect.HitType == MeleeHitTypeCrit {
+				if hitEffect.Outcome.Matches(OutcomeCrit) {
 					HitFactor *= 2
 				}
 

@@ -177,12 +177,12 @@ func (hunter *Hunter) applyFrenzy() {
 		return core.Aura{
 			ID: FrenzyAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.HitType == core.MeleeHitTypeCrit {
+				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					tryProcAura()
 				}
 			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellEffect.Crit {
+				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					tryProcAura()
 				}
 			},
@@ -235,12 +235,12 @@ func (hunter *Hunter) applyFerociousInspiration() {
 		return core.Aura{
 			ID: FerociousInspirationAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.HitType == core.MeleeHitTypeCrit {
+				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					applyAura()
 				}
 			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellEffect.Crit {
+				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					applyAura()
 				}
 			},
@@ -376,7 +376,7 @@ func (hunter *Hunter) applyGoForTheThroat() {
 		return core.Aura{
 			ID: GoForTheThroatAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.IsRanged() || hitEffect.HitType != core.MeleeHitTypeCrit {
+				if !hitEffect.IsRanged() || !hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
 				if !hunter.pet.IsEnabled() {
@@ -445,7 +445,7 @@ func (hunter *Hunter) applyThrillOfTheHunt() {
 					return
 				}
 
-				if hitEffect.HitType != core.MeleeHitTypeCrit {
+				if !hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
 
@@ -474,7 +474,7 @@ func (hunter *Hunter) applyExposeWeakness() {
 					return
 				}
 
-				if hitEffect.HitType != core.MeleeHitTypeCrit {
+				if !hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
 

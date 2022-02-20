@@ -76,7 +76,7 @@ func (mage *Mage) applyIgnite() {
 		return core.Aura{
 			ID: IgniteAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.SpellSchool == stats.FireSpellPower && spellEffect.Crit {
+				if spellCast.SpellSchool == stats.FireSpellPower && spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					mage.procIgnite(sim, spellEffect.Target, spellEffect.Damage)
 				}
 			},

@@ -78,3 +78,63 @@ func GetMeleeProcMaskForHands(mh bool, oh bool) ProcMask {
 	}
 	return mask
 }
+
+// Possible outcomes of any hit/damage roll.
+type HitOutcome uint16
+
+// Returns whether there is any overlap between the given masks.
+func (ho HitOutcome) Matches(other HitOutcome) bool {
+	return (ho & other) != 0
+}
+
+// Single-bit outcomes.
+const (
+	OutcomeEmpty HitOutcome = 0
+	OutcomeMiss  HitOutcome = 1 << iota
+	OutcomeHit
+	OutcomeCrit
+	OutcomeDodge
+	OutcomeGlance
+	OutcomeParry
+	OutcomeBlock
+	OutcomePartial1_4 // 1/4 of the spell was resisted.
+	OutcomePartial2_4 // 2/4 of the spell was resisted.
+	OutcomePartial3_4 // 3/4 of the spell was resisted.
+)
+
+const (
+	OutcomePartial = OutcomePartial1_4 | OutcomePartial2_4 | OutcomePartial3_4
+	OutcomeLanded  = OutcomeHit | OutcomeCrit | OutcomeGlance | OutcomeBlock | OutcomePartial
+)
+
+func (ho HitOutcome) String() string {
+	if ho.Matches(OutcomeMiss) {
+		return "Miss"
+	} else if ho.Matches(OutcomeDodge) {
+		return "Dodge"
+	} else if ho.Matches(OutcomeParry) {
+		return "Parry"
+	} else if ho.Matches(OutcomeGlance) {
+		return "Glance"
+	} else if ho.Matches(OutcomeBlock) {
+		return "Block"
+	} else if ho.Matches(OutcomeCrit) {
+		return "Crit" + ho.PartialResistString()
+	} else if ho.Matches(OutcomeHit) {
+		return "Hit" + ho.PartialResistString()
+	} else {
+		return "Empty"
+	}
+}
+
+func (ho HitOutcome) PartialResistString() string {
+	if ho.Matches(OutcomePartial1_4) {
+		return " (25% Resist)"
+	} else if ho.Matches(OutcomePartial2_4) {
+		return " (50% Resist)"
+	} else if ho.Matches(OutcomePartial3_4) {
+		return " (75% Resist)"
+	} else {
+		return ""
+	}
+}

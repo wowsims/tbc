@@ -93,7 +93,7 @@ func (shaman *Shaman) applyElementalDevastation() {
 				if spellCast.IsPhantom {
 					return
 				}
-				if !spellEffect.Crit {
+				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
 				spellCast.Character.AddAuraWithTemporaryStats(sim, ElementalDevastationAuraID, core.ActionID{ItemID: 30160}, stats.MeleeCrit, critBonus, dur)
@@ -243,7 +243,7 @@ func (shaman *Shaman) applyUnleashedRage() {
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 				// proc mask = 20
 				// TODO: Fix this to allow any 'melee crit' to count.
-				if hitEffect.HitType != core.MeleeHitTypeCrit || hitEffect.WeaponInput.DamageMultiplier == 0 {
+				if !hitEffect.Outcome.Matches(core.OutcomeCrit) || hitEffect.WeaponInput.DamageMultiplier == 0 {
 					return
 				}
 
@@ -310,7 +310,7 @@ func (shaman *Shaman) applyShamanisticFocus() {
 		return core.Aura{
 			ID: ShamanisticFocusTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.HitType != core.MeleeHitTypeCrit {
+				if !hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
 				ability.Character.ReplaceAura(sim, focusedAura)
@@ -341,7 +341,7 @@ func (shaman *Shaman) applyFlurry() {
 		return core.Aura{
 			ID: FlurryTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.HitType == core.MeleeHitTypeCrit {
+				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					if flurryStacks == 0 {
 						shaman.MultiplyMeleeSpeed(sim, bonus)
 						shaman.AddAura(sim, core.Aura{
