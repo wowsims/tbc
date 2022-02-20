@@ -5,7 +5,7 @@ OUT_DIR=dist/tbc
 GOROOT:=$(shell go env GOROOT)
 
 # Make everything. Keep this first so it's the default rule.
-$(OUT_DIR): ui_shared balance_druid elemental_shaman enhancement_shaman hunter mage shadow_priest warrior retribution_paladin raid
+$(OUT_DIR): ui_shared balance_druid elemental_shaman enhancement_shaman hunter mage rogue shadow_priest warrior retribution_paladin raid
 
 # Add new sim rules here! Don't forget to add it as a dependency to the default rule above.
 balance_druid: $(OUT_DIR)/balance_druid/index.js $(OUT_DIR)/balance_druid/index.css $(OUT_DIR)/balance_druid/index.html
@@ -13,6 +13,7 @@ elemental_shaman: $(OUT_DIR)/elemental_shaman/index.js $(OUT_DIR)/elemental_sham
 enhancement_shaman: $(OUT_DIR)/enhancement_shaman/index.js $(OUT_DIR)/enhancement_shaman/index.css $(OUT_DIR)/enhancement_shaman/index.html
 hunter: $(OUT_DIR)/hunter/index.js $(OUT_DIR)/hunter/index.css $(OUT_DIR)/hunter/index.html
 mage: $(OUT_DIR)/mage/index.js $(OUT_DIR)/mage/index.css $(OUT_DIR)/mage/index.html
+rogue: $(OUT_DIR)/rogue/index.js $(OUT_DIR)/rogue/index.css $(OUT_DIR)/rogue/index.html
 shadow_priest: $(OUT_DIR)/shadow_priest/index.js $(OUT_DIR)/shadow_priest/index.css $(OUT_DIR)/shadow_priest/index.html
 warrior: $(OUT_DIR)/warrior/index.js $(OUT_DIR)/warrior/index.css $(OUT_DIR)/warrior/index.html
 retribution_paladin: $(OUT_DIR)/retribution_paladin/index.js $(OUT_DIR)/retribution_paladin/index.css $(OUT_DIR)/retribution_paladin/index.html

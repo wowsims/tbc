@@ -51,6 +51,9 @@ export class ActionId {
 				break;
 			case OtherAction.OtherActionPet:
 				break;
+			case OtherAction.OtherActionRefund:
+				baseName = 'Refund';
+				break;
 		}
 		this.baseName = baseName;
 		this.name = name || baseName;
@@ -136,6 +139,10 @@ export class ActionId {
 				} else if (this.tag == 3) {
 					name += ' (3 Tick)';
 				}
+				break;
+			case 'Eviscerate':
+			case 'Slice and Dice':
+				if (this.tag) name += ` (${this.tag} Combo Points)`;
 				break;
 			case 'Chain Lightning':
 			case 'Lightning Bolt':
