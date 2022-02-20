@@ -52,11 +52,18 @@ func (priest *Priest) registerShadowfiendCD() {
 
 func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		ActionID:       ShadowfiendActionID,
-		Character:      &priest.Character,
-		SpellSchool:    stats.ShadowSpellPower,
-		BaseManaCost:   575,
-		ManaCost:       575,
+		ActionID:    ShadowfiendActionID,
+		Character:   &priest.Character,
+		SpellSchool: stats.ShadowSpellPower,
+		// TODO: Should be 6% of base mana
+		BaseCost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 575,
+		},
+		Cost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 575,
+		},
 		CastTime:       0,
 		GCD:            core.GCDDefault,
 		Cooldown:       time.Minute * 5,

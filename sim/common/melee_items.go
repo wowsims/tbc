@@ -51,7 +51,6 @@ func ApplyStormGauntlets(agent core.Agent) {
 				Cast: core.Cast{
 					ActionID:       core.ActionID{ItemID: 12632},
 					Character:      character,
-					IgnoreManaCost: true,
 					IsPhantom:      true,
 					SpellSchool:    stats.NatureSpellPower,
 					CritMultiplier: character.DefaultSpellCritMultiplier(),
@@ -100,7 +99,6 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 				Cast: core.Cast{
 					ActionID:       core.ActionID{ItemID: 17111},
 					Character:      character,
-					IgnoreManaCost: true,
 					IsPhantom:      true,
 					SpellSchool:    stats.FireSpellPower,
 					CritMultiplier: character.DefaultSpellCritMultiplier(),
@@ -346,7 +344,6 @@ func ApplyDespair(agent core.Agent) {
 			Character:      character,
 			SpellSchool:    stats.AttackPower,
 			CritMultiplier: character.DefaultMeleeCritMultiplier(),
-			IgnoreCost:     true,
 			IsPhantom:      true,
 		},
 		Effect: core.AbilityHitEffect{
@@ -402,7 +399,6 @@ func ApplyTheDecapitator(agent core.Agent) {
 			Character:      character,
 			SpellSchool:    stats.AttackPower,
 			CritMultiplier: character.DefaultMeleeCritMultiplier(),
-			IgnoreCost:     true,
 			IsPhantom:      true,
 		},
 		Effect: core.AbilityHitEffect{
@@ -465,7 +461,6 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 				Cast: core.Cast{
 					ActionID:       core.ActionID{SpellID: 34696},
 					Character:      character,
-					IgnoreManaCost: true,
 					IsPhantom:      true,
 					SpellSchool:    stats.ShadowSpellPower,
 					CritMultiplier: character.DefaultSpellCritMultiplier(),
@@ -783,7 +778,6 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 				Cast: core.Cast{
 					ActionID:       core.ActionID{SpellID: 40291},
 					Character:      character,
-					IgnoreManaCost: true,
 					IsPhantom:      true,
 					SpellSchool:    stats.ShadowSpellPower,
 					CritMultiplier: character.DefaultSpellCritMultiplier(),

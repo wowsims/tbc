@@ -35,11 +35,17 @@ const (
 func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellCast {
 	spellCast := core.SpellCast{
 		Cast: core.Cast{
-			ActionID:       actionID,
-			Character:      shaman.GetCharacter(),
-			SpellSchool:    stats.NatureSpellPower,
-			BaseManaCost:   baseManaCost,
-			ManaCost:       baseManaCost,
+			ActionID:    actionID,
+			Character:   shaman.GetCharacter(),
+			SpellSchool: stats.NatureSpellPower,
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: baseManaCost,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: baseManaCost,
+			},
 			CastTime:       baseCastTime,
 			GCD:            core.GCDDefault,
 			CritMultiplier: shaman.DefaultSpellCritMultiplier(),
@@ -53,12 +59,11 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 	if isLightningOverload {
 		spellCast.ActionID.Tag = CastTagLightningOverload
 		spellCast.CastTime = 0
-		spellCast.ManaCost = 0
 		spellCast.GCD = 0
-		spellCast.IgnoreManaCost = true
+		spellCast.Cost.Value = 0
 	} else if shaman.Talents.LightningMastery > 0 {
 		// Convection applies against the base cost of the spell.
-		spellCast.ManaCost -= spellCast.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
+		spellCast.Cost.Value -= spellCast.BaseCost.Value * float64(shaman.Talents.Convection) * 0.02
 		spellCast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
 	}
 
@@ -116,6 +121,6 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 func (shaman *Shaman) applyElectricSpellCastInitModifiers(spellCast *core.SpellCast) {
 	if shaman.ElementalFocusStacks > 0 {
 		// Reduces mana cost by 40%
-		spellCast.Cast.ManaCost -= spellCast.Cast.BaseManaCost * 0.4
+		spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.4
 	}
 }

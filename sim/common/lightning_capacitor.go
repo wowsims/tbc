@@ -60,7 +60,6 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 					ItemID: core.ItemIDTheLightningCapacitor,
 				},
 				Character:      character,
-				IgnoreManaCost: true,
 				IsPhantom:      true,
 				SpellSchool:    stats.NatureSpellPower,
 				CritMultiplier: character.DefaultSpellCritMultiplier(),

@@ -13,11 +13,17 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDFrostbolt},
-				Character:      &mage.Character,
-				SpellSchool:    stats.FrostSpellPower,
-				BaseManaCost:   330,
-				ManaCost:       330,
+				ActionID:    core.ActionID{SpellID: SpellIDFrostbolt},
+				Character:   &mage.Character,
+				SpellSchool: stats.FrostSpellPower,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 330,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 330,
+				},
 				CastTime:       time.Millisecond * 3000,
 				GCD:            core.GCDDefault,
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)+0.2*float64(mage.Talents.IceShards)),
@@ -39,8 +45,8 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 	}
 
 	spell.CastTime -= time.Millisecond * 100 * time.Duration(mage.Talents.ImprovedFrostbolt)
-	spell.ManaCost -= spell.BaseManaCost * float64(mage.Talents.FrostChanneling) * 0.05
-	spell.ManaCost *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
+	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.FrostChanneling) * 0.05
+	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.EmpoweredFrostbolt) * 1 * core.SpellCritRatingPerCritChance
 	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.PiercingIce)

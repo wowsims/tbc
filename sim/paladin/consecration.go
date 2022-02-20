@@ -17,11 +17,17 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 				ActionID: core.ActionID{
 					SpellID: SpellIDConsecration,
 				},
-				Character:    &paladin.Character,
-				SpellSchool:  stats.HolySpellPower,
-				BaseManaCost: 660,
-				ManaCost:     660,
-				GCD:          core.GCDDefault,
+				Character:   &paladin.Character,
+				SpellSchool: stats.HolySpellPower,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 660,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 660,
+				},
+				GCD: core.GCDDefault,
 			},
 		},
 	}

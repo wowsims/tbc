@@ -30,11 +30,6 @@ type OnBeforeMeleeHit func(sim *Simulation, ability *ActiveMeleeAbility, hitEffe
 //  This should be used for any on-hit procs.
 type OnMeleeAttack func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect)
 
-type ResourceCost struct {
-	Type  stats.Stat // stats.Mana, stats.Energy, stats.Rage
-	Value float64
-}
-
 type MeleeAbility struct {
 	// ID for the action.
 	ActionID
@@ -48,9 +43,6 @@ type MeleeAbility struct {
 
 	// The amount of GCD time incurred by this cast. This is almost always 0, 1s, or 1.5s.
 	GCD time.Duration
-
-	// If set, this spell will have its resource cost ignored.
-	IgnoreCost bool
 
 	Cost ResourceCost
 
@@ -572,7 +564,6 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack},
 				Character:   character,
 				SpellSchool: stats.AttackPower,
-				IgnoreCost:  true,
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{
@@ -591,7 +582,6 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
 				Character:   character,
 				SpellSchool: stats.AttackPower,
-				IgnoreCost:  true,
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{

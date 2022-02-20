@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // Right now, add the additional GCD + mana cost for shifting back to Moonkin form as a hack
@@ -14,12 +15,18 @@ func (druid *Druid) NewRebirth(sim *core.Simulation) *core.SimpleCast {
 
 	rb := &core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     core.ActionID{SpellID: 26994},
-			Character:    druid.GetCharacter(),
-			BaseManaCost: manaCost,
-			ManaCost:     manaCost,
-			CastTime:     time.Second*3 + time.Millisecond*500,
-			GCD:          core.GCDDefault,
+			ActionID:  core.ActionID{SpellID: 26994},
+			Character: druid.GetCharacter(),
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
+			CastTime: time.Second*3 + time.Millisecond*500,
+			GCD:      core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) { druid.RebirthUsed = true },
 	}

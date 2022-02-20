@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func (shaman *Shaman) newTotemCastTemplate(sim *core.Simulation, baseManaCost float64, spellID int32) core.SimpleCast {
@@ -13,11 +14,17 @@ func (shaman *Shaman) newTotemCastTemplate(sim *core.Simulation, baseManaCost fl
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     core.ActionID{SpellID: spellID},
-			Character:    shaman.GetCharacter(),
-			BaseManaCost: baseManaCost,
-			ManaCost:     manaCost,
-			GCD:          time.Second,
+			ActionID:  core.ActionID{SpellID: spellID},
+			Character: shaman.GetCharacter(),
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: baseManaCost,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
+			GCD: time.Second,
 		},
 	}
 
@@ -263,12 +270,12 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 
 	if cast != nil {
 		if success := cast.StartCast(sim); !success {
-			shaman.WaitForMana(sim, cast.ManaCost)
+			shaman.WaitForMana(sim, cast.Cost.Value)
 		}
 		return true
 	} else if attackCast != nil {
 		if success := attackCast.Cast(sim); !success {
-			shaman.WaitForMana(sim, attackCast.ManaCost)
+			shaman.WaitForMana(sim, attackCast.Cost.Value)
 		}
 		return true
 	}

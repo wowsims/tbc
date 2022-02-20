@@ -13,11 +13,17 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDSearingTotem},
-				Character:      &shaman.Character,
-				SpellSchool:    stats.FireSpellPower,
-				BaseManaCost:   205,
-				ManaCost:       205,
+				ActionID:    core.ActionID{SpellID: SpellIDSearingTotem},
+				Character:   &shaman.Character,
+				SpellSchool: stats.FireSpellPower,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 205,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 205,
+				},
 				GCD:            time.Second,
 				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 				IsPhantom:      true,
@@ -45,8 +51,8 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 		},
 	}
 	spell.Effect.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.TotemicFocus) * 0.05
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
 	if shaman.Talents.ElementalFury {
 		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
@@ -80,11 +86,17 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDMagmaTotem},
-				Character:      &shaman.Character,
-				SpellSchool:    stats.FireSpellPower,
-				BaseManaCost:   800,
-				ManaCost:       800,
+				ActionID:    core.ActionID{SpellID: SpellIDMagmaTotem},
+				Character:   &shaman.Character,
+				SpellSchool: stats.FireSpellPower,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 800,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 800,
+				},
 				GCD:            time.Second,
 				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
 				IsPhantom:      true,
@@ -92,8 +104,8 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 		},
 		AOECap: 1600,
 	}
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.TotemicFocus) * 0.05
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
 	if shaman.Talents.ElementalFury {
 		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
@@ -160,10 +172,16 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 					SpellID:    SpellIDNovaTotem,
 					CooldownID: CooldownIDNovaTotem,
 				},
-				Character:      &shaman.Character,
-				SpellSchool:    stats.FireSpellPower,
-				BaseManaCost:   765,
-				ManaCost:       765,
+				Character:   &shaman.Character,
+				SpellSchool: stats.FireSpellPower,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 765,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 765,
+				},
 				GCD:            time.Second,
 				Cooldown:       time.Second * 15,
 				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
@@ -172,8 +190,8 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 		},
 		AOECap: 9975,
 	}
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.TotemicFocus) * 0.05
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
 	if shaman.Talents.ElementalFury {
 		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}

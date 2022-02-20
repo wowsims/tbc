@@ -95,7 +95,6 @@ var ItemSetFistsOfFury = core.ItemSet{
 						Cast: core.Cast{
 							ActionID:       core.ActionID{SpellID: 41989},
 							Character:      character,
-							IgnoreManaCost: true,
 							IsPhantom:      true,
 							SpellSchool:    stats.FireSpellPower,
 							CritMultiplier: character.DefaultSpellCritMultiplier(),

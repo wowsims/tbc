@@ -17,11 +17,17 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDFireball},
-				Character:      &mage.Character,
-				SpellSchool:    stats.FireSpellPower,
-				BaseManaCost:   425,
-				ManaCost:       425,
+				ActionID:    core.ActionID{SpellID: SpellIDFireball},
+				Character:   &mage.Character,
+				SpellSchool: stats.FireSpellPower,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 425,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 425,
+				},
 				CastTime:       time.Millisecond * 3500,
 				GCD:            core.GCDDefault,
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
@@ -46,8 +52,8 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	}
 
 	spell.CastTime -= time.Millisecond * 100 * time.Duration(mage.Talents.ImprovedFireball)
-	spell.ManaCost -= spell.BaseManaCost * float64(mage.Talents.Pyromaniac) * 0.01
-	spell.ManaCost *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
+	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
+	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
@@ -71,9 +77,8 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 					SpellID: SpellIDFireball,
 					Tag:     CastTagFireballDot,
 				},
-				Character:      &mage.Character,
-				SpellSchool:    stats.FireSpellPower,
-				IgnoreManaCost: true,
+				Character:   &mage.Character,
+				SpellSchool: stats.FireSpellPower,
 			},
 		},
 		Effect: core.SpellHitEffect{

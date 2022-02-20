@@ -17,13 +17,11 @@ func (priest *Priest) newStarshardsTemplate(sim *core.Simulation) core.SimpleSpe
 			SpellID:    SpellIDStarshards,
 			CooldownID: SSCooldownID,
 		},
-		Character:    &priest.Character,
-		SpellSchool:  stats.ArcaneSpellPower,
-		BaseManaCost: 0,
-		ManaCost:     0,
-		CastTime:     0,
-		GCD:          core.GCDDefault,
-		Cooldown:     time.Second * 30,
+		Character:   &priest.Character,
+		SpellSchool: stats.ArcaneSpellPower,
+		CastTime:    0,
+		GCD:         core.GCDDefault,
+		Cooldown:    time.Second * 30,
 	}
 
 	effect := core.SpellHitEffect{

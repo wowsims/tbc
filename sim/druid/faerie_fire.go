@@ -3,17 +3,24 @@ package druid
 import (
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:     core.ActionID{SpellID: 26993},
-				Character:    druid.GetCharacter(),
-				BaseManaCost: 145,
-				ManaCost:     145,
-				GCD:          core.GCDDefault,
+				ActionID:  core.ActionID{SpellID: 26993},
+				Character: druid.GetCharacter(),
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 145,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 145,
+				},
+				GCD: core.GCDDefault,
 			},
 		},
 		Effect: core.SpellHitEffect{

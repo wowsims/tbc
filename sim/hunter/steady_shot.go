@@ -13,10 +13,16 @@ var SteadyShotActionID = core.ActionID{SpellID: 34120}
 func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.SimpleCast {
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     SteadyShotActionID,
-			Character:    hunter.GetCharacter(),
-			BaseManaCost: 110,
-			ManaCost:     110,
+			ActionID:  SteadyShotActionID,
+			Character: hunter.GetCharacter(),
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 110,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 110,
+			},
 			// Cast time is affected by ranged attack speed so set it later.
 			//CastTime:     time.Millisecond * 1500,
 			GCD:         core.GCDDefault,
@@ -37,7 +43,7 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 		DisableMetrics: true,
 	}
 
-	template.ManaCost *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+	template.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 
 	return template
 }
@@ -48,7 +54,6 @@ func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.Me
 			ActionID:       SteadyShotActionID,
 			Character:      &hunter.Character,
 			SpellSchool:    stats.AttackPower,
-			IgnoreCost:     true,
 			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 		Effect: core.AbilityHitEffect{
