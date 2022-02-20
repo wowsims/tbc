@@ -179,14 +179,14 @@ export class DamageDealtLog extends SimLog {
         return `${this.toStringPrefix()} ${this.cause.name} ${this.resultString()}`;
     }
     static parse(params) {
-        const match = params.raw.match(/] (.*?) ((Miss)|(Hit)|(Crit)|(Glance)|(Dodge)|(Parry)|(Block)|(ticked))( for (\d+\.\d+) damage( \((\d+)% Resist\))?)?/);
+        const match = params.raw.match(/] (.*?) (tick )?((Miss)|(Hit)|(Crit)|(Glance)|(Dodge)|(Parry)|(Block))( \((\d+)% Resist\))?( for (\d+\.\d+) damage)?/);
         if (match) {
             return ActionId.fromLogString(match[1]).fill(params.source?.index).then(cause => {
                 let amount = 0;
-                if (match[2] != 'Miss' && match[2] != 'Dodge' && match[2] != 'Parry') {
-                    amount = parseFloat(match[12]);
+                if (match[14]) {
+                    amount = parseFloat(match[14]);
                 }
-                return new DamageDealtLog(params, amount, match[2] == 'Miss', match[2] == 'Crit', match[2] == 'Glance', match[2] == 'Dodge', match[2] == 'Parry', match[2] == 'Block', match[2] == 'ticked', match[14] == '25', match[14] == '50', match[14] == '75', cause);
+                return new DamageDealtLog(params, amount, match[3] == 'Miss', match[3] == 'Crit', match[3] == 'Glance', match[3] == 'Dodge', match[3] == 'Parry', match[3] == 'Block', Boolean(match[2]) && match[2].includes('tick'), match[12] == '25', match[12] == '50', match[12] == '75', cause);
             });
         }
         else {
