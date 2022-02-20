@@ -29,6 +29,20 @@ type Rogue struct {
 	Talents  proto.RogueTalents
 	Options  proto.Rogue_Options
 	Rotation proto.Rogue_Rotation
+
+	comboPoints int32
+
+	builderEnergyCost float64
+	newBuilder        func(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility
+
+	sinisterStrikeTemplate core.MeleeAbilityTemplate
+	sinisterStrike         core.ActiveMeleeAbility
+
+	applySliceAndDiceAura func(numPoints int32)
+
+	eviscerateDamageCalcs []core.MeleeDamageCalculator
+	eviscerateTemplate    core.MeleeAbilityTemplate
+	eviscerate            core.ActiveMeleeAbility
 }
 
 func (rogue *Rogue) GetCharacter() *core.Character {
@@ -43,9 +57,35 @@ func (rogue *Rogue) AddRaidBuffs(raidBuffs *proto.RaidBuffs)    {}
 func (rogue *Rogue) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {}
 
 func (rogue *Rogue) Init(sim *core.Simulation) {
+	// Precompute all the spell templates.
+	rogue.sinisterStrikeTemplate = rogue.newSinisterStrikeTemplate(sim)
+
+	rogue.initSliceAndDice(sim)
+	rogue.eviscerateTemplate = rogue.newEviscerateTemplate(sim)
 }
 
 func (rogue *Rogue) Reset(sim *core.Simulation) {
+	rogue.comboPoints = 0
+}
+
+func (rogue *Rogue) AddComboPoint(sim *core.Simulation) {
+	if rogue.comboPoints == 5 {
+		if sim.Log != nil {
+			rogue.Log(sim, "Failed to gain 1 combo point, already full")
+		}
+	} else {
+		if sim.Log != nil {
+			rogue.Log(sim, "Gained 1 combo point (%d --> %d)", rogue.comboPoints, rogue.comboPoints+1)
+		}
+		rogue.comboPoints++
+	}
+}
+
+func (rogue *Rogue) SpendComboPoints(sim *core.Simulation) {
+	if sim.Log != nil {
+		rogue.Log(sim, "Spent all combo points.")
+	}
+	rogue.comboPoints = 0
 }
 
 func NewRogue(character core.Character, options proto.Player) *Rogue {
@@ -58,7 +98,15 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		Rotation:  *rogueOptions.Rotation,
 	}
 
+	rogue.builderEnergyCost = rogue.SinisterStrikeEnergyCost()
+	rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
+		return rogue.NewSinisterStrike(sim, target)
+	}
+
 	rogue.EnableEnergyBar(100, func(sim *core.Simulation) {
+		if !rogue.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+			rogue.doRotation(sim)
+		}
 	})
 	rogue.EnableAutoAttacks(rogue, core.AutoAttackOptions{
 		// TODO: Crit multiplier
