@@ -773,7 +773,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-Settings-Draenei-P3-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 657.8598783981422
+  dps: 668.5563175745464
  }
 }
 dps_results: {
@@ -1061,7 +1061,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-Settings-NightElf-P3-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 663.6580180960657
+  dps: 664.1807063295831
  }
 }
 dps_results: {
@@ -1349,7 +1349,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-Settings-Undead-P3-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 657.1506019745171
+  dps: 667.8040653756518
  }
 }
 dps_results: {
