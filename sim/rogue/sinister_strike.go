@@ -31,12 +31,12 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.MeleeAb
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
+				ProcMask:               core.ProcMaskMeleeMHSpecial,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
 			WeaponInput: core.WeaponDamageInput{
-				IsOH:             false,
 				DamageMultiplier: 1,
 				FlatDamageBonus:  98,
 			},
