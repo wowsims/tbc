@@ -127,7 +127,7 @@ export class ActionId {
             case 'Eviscerate':
             case 'Slice and Dice':
                 if (this.tag)
-                    name += ` (${this.tag} Combo Points)`;
+                    name += ` (${this.tag} CP)`;
                 break;
             case 'Chain Lightning':
             case 'Lightning Bolt':
