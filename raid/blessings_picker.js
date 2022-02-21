@@ -5,7 +5,7 @@ import { Class } from '/tbc/core/proto/common.js';
 import { Blessings } from '/tbc/core/proto/ui.js';
 import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { makeDefaultBlessings, classColors, naturalSpecOrder, specIconsLarge, specNames, } from '/tbc/core/proto_utils/utils.js';
+import { makeDefaultBlessings, classColors, naturalSpecOrder, specNames, titleIcons, } from '/tbc/core/proto_utils/utils.js';
 import { implementedSpecs } from './presets.js';
 const MAX_PALADINS = 4;
 export class BlessingsPicker extends Component {
@@ -35,7 +35,7 @@ export class BlessingsPicker extends Component {
             cell.classList.add('blessings-table-header-cell');
             headerRow.appendChild(cell);
             const icon = document.createElement('img');
-            icon.src = specIconsLarge[spec];
+            icon.src = titleIcons[spec];
             cell.appendChild(icon);
             tippy(icon, {
                 'content': specNames[spec],
