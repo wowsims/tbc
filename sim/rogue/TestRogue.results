@@ -87,6 +87,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-BladeofUnquenchedThirst-31193"
+ value: {
+  dps: 1370.4714561847777
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-BlazefuryMedallion-17111"
  value: {
   dps: 1334.7412051914946

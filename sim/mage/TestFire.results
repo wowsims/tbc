@@ -99,6 +99,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFire-AllItems-BladeofUnquenchedThirst-31193"
+ value: {
+  dps: 1897.0570244226992
+ }
+}
+dps_results: {
  key: "TestFire-AllItems-BlazefuryMedallion-17111"
  value: {
   dps: 1755.9113435819854
