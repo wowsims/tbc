@@ -13,17 +13,24 @@ const SliceAndDiceEnergyCost = 25.0
 
 func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 	durationMultiplier := 1.0 + 0.15*float64(rogue.Talents.ImprovedSliceAndDice)
+	durationBonus := time.Duration(0)
+	if ItemSetNetherblade.CharacterHasSetBonus(&rogue.Character, 2) {
+		durationBonus = time.Second * 3
+	}
 	sliceAndDiceDurations := []time.Duration{
 		0,
-		time.Duration(float64(time.Second*9) * durationMultiplier),
-		time.Duration(float64(time.Second*12) * durationMultiplier),
-		time.Duration(float64(time.Second*15) * durationMultiplier),
-		time.Duration(float64(time.Second*18) * durationMultiplier),
-		time.Duration(float64(time.Second*21) * durationMultiplier),
+		time.Duration(float64(time.Second*9+durationBonus) * durationMultiplier),
+		time.Duration(float64(time.Second*12+durationBonus) * durationMultiplier),
+		time.Duration(float64(time.Second*15+durationBonus) * durationMultiplier),
+		time.Duration(float64(time.Second*18+durationBonus) * durationMultiplier),
+		time.Duration(float64(time.Second*21+durationBonus) * durationMultiplier),
 	}
 
 	hasteBonus := 1.3
-	inverseHasteBonus := 1.0 / 1.3
+	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 2) {
+		hasteBonus += 0.05
+	}
+	inverseHasteBonus := 1.0 / hasteBonus
 	sliceAndDiceAura := core.Aura{
 		ID:       SliceAndDiceAuraID,
 		ActionID: SliceAndDiceActionID,
@@ -32,7 +39,7 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 		},
 	}
 
-	finishingMoveEffects := rogue.makeFinishingMoveEffectApplier()
+	finishingMoveEffects := rogue.makeFinishingMoveEffectApplier(sim)
 
 	rogue.castSliceAndDice = func() {
 		if rogue.comboPoints == 0 {
@@ -42,7 +49,11 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 		actionID := SliceAndDiceActionID
 		actionID.Tag = rogue.comboPoints
 
-		rogue.SpendEnergy(sim, SliceAndDiceEnergyCost, actionID)
+		if rogue.deathmantle4pcProc {
+			rogue.deathmantle4pcProc = false
+		} else {
+			rogue.SpendEnergy(sim, SliceAndDiceEnergyCost, actionID)
+		}
 		rogue.SetGCDTimer(sim, sim.CurrentTime+time.Second*1)
 		rogue.Metrics.AddInstantCast(actionID)
 

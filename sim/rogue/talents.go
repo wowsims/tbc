@@ -71,7 +71,7 @@ func (rogue *Rogue) critMultiplier(isMH bool, applyLethality bool) float64 {
 
 var FindWeaknessAuraID = core.NewAuraID()
 
-func (rogue *Rogue) makeFinishingMoveEffectApplier() func(sim *core.Simulation, numPoints int32) {
+func (rogue *Rogue) makeFinishingMoveEffectApplier(sim *core.Simulation) func(sim *core.Simulation, numPoints int32) {
 	ruthlessnessChance := 0.2 * float64(rogue.Talents.Ruthlessness)
 	relentlessStrikes := rogue.Talents.RelentlessStrikes
 
@@ -88,8 +88,16 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier() func(sim *core.Simulation, 
 		},
 	}
 
+	netherblade4pc := ItemSetNetherblade.CharacterHasSetBonus(&rogue.Character, 4)
+
+	ashtongueTalisman := rogue.HasTrinketEquipped(32492)
+	ashtongueStatApplier := rogue.NewTempStatAuraApplier(sim, AshtongueTalismanOfLethalityProcAuraID, core.ActionID{ItemID: 32492}, stats.MeleeCrit, 145, time.Second*10)
+
 	return func(sim *core.Simulation, numPoints int32) {
 		if ruthlessnessChance > 0 && sim.RandomFloat("Ruthlessness") < ruthlessnessChance {
+			rogue.AddComboPoint(sim)
+		}
+		if netherblade4pc && sim.RandomFloat("Netherblade 4pc") < 0.15 {
 			rogue.AddComboPoint(sim)
 		}
 		if relentlessStrikes {
@@ -101,6 +109,11 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier() func(sim *core.Simulation, 
 			aura := findWeaknessAura
 			aura.Expires = sim.CurrentTime + time.Second*10
 			rogue.AddAura(sim, aura)
+		}
+		if ashtongueTalisman {
+			if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
+				ashtongueStatApplier(sim)
+			}
 		}
 	}
 }

@@ -9,27 +9,35 @@ import (
 
 var EviscerateActionID = core.ActionID{SpellID: 26865}
 
-const EviscerateEnergyCost = 35.0
+func (rogue *Rogue) makeEviscerateDamageCalcFn(sim *core.Simulation, numPoints int) core.MeleeDamageCalculator {
+	base := 60.0 + 185.0*float64(numPoints)
+	if ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2) {
+		base += 40.0 * float64(numPoints)
+	}
 
-func makeEviscerateDamageCalcFn(sim *core.Simulation, numPoints int) core.MeleeDamageCalculator {
 	return func(attackPower float64, bonusWeaponDamage float64) float64 {
-		base := 60.0 + sim.RandomFloat("Eviscerate")*120.0
-		return base + (185.0+attackPower*0.03)*float64(numPoints)
+		roll := sim.RandomFloat("Eviscerate") * 120.0
+		return base + roll + (attackPower*0.03)*float64(numPoints) + bonusWeaponDamage
 	}
 }
 
 func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
-	rogue.eviscerateDamageCalcs = []core.MeleeDamageCalculator{
-		nil,
-		makeEviscerateDamageCalcFn(sim, 1),
-		makeEviscerateDamageCalcFn(sim, 2),
-		makeEviscerateDamageCalcFn(sim, 3),
-		makeEviscerateDamageCalcFn(sim, 4),
-		makeEviscerateDamageCalcFn(sim, 5),
+	rogue.eviscerateEnergyCost = 35
+	if ItemSetAssassination.CharacterHasSetBonus(&rogue.Character, 4) {
+		rogue.eviscerateEnergyCost -= 10
 	}
 
-	finishingMoveEffects := rogue.makeFinishingMoveEffectApplier()
-	refundAmount := EviscerateEnergyCost * 0.4 * float64(rogue.Talents.QuickRecovery)
+	rogue.eviscerateDamageCalcs = []core.MeleeDamageCalculator{
+		nil,
+		rogue.makeEviscerateDamageCalcFn(sim, 1),
+		rogue.makeEviscerateDamageCalcFn(sim, 2),
+		rogue.makeEviscerateDamageCalcFn(sim, 3),
+		rogue.makeEviscerateDamageCalcFn(sim, 4),
+		rogue.makeEviscerateDamageCalcFn(sim, 5),
+	}
+
+	finishingMoveEffects := rogue.makeFinishingMoveEffectApplier(sim)
+	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	ability := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
@@ -39,7 +47,7 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilit
 			GCD:         time.Second * 1,
 			Cost: core.ResourceCost{
 				Type:  stats.Energy,
-				Value: EviscerateEnergyCost,
+				Value: rogue.eviscerateEnergyCost,
 			},
 			CritMultiplier: rogue.critMultiplier(true, false),
 		},
@@ -58,7 +66,7 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilit
 				finishingMoveEffects(sim, numPoints)
 			} else {
 				if refundAmount > 0 {
-					rogue.AddEnergy(sim, refundAmount, core.ActionID{SpellID: 31245})
+					rogue.AddEnergy(sim, ability.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
 				}
 			}
 		},
@@ -85,6 +93,10 @@ func (rogue *Rogue) NewEviscerate(sim *core.Simulation, target *core.Target) *co
 	ev.ActionID.Tag = rogue.comboPoints
 	ev.Effect.WeaponInput.CalculateDamage = rogue.eviscerateDamageCalcs[rogue.comboPoints]
 	ev.Effect.Target = target
+	if rogue.deathmantle4pcProc {
+		ev.Cost.Value = 0
+		rogue.deathmantle4pcProc = false
+	}
 
 	return ev
 }

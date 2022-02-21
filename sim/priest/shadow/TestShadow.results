@@ -285,6 +285,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestShadow-AllItems-Heartrazor-29962"
+ value: {
+  dps: 1503.281126093247
+ }
+}
+dps_results: {
  key: "TestShadow-AllItems-HexShrunkenHead-33829"
  value: {
   dps: 1515.4513583733417
