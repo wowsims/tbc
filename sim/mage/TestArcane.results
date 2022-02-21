@@ -111,6 +111,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestArcane-AllItems-Blinkstrike-31332"
+ value: {
+  dps: 1387.262464362527
+ }
+}
+dps_results: {
  key: "TestArcane-AllItems-BloodlustBrooch-29383"
  value: {
   dps: 1337.6801744740305
@@ -120,6 +126,12 @@ dps_results: {
  key: "TestArcane-AllItems-BracingEarthstormDiamond"
  value: {
   dps: 1362.5218863256193
+ }
+}
+dps_results: {
+ key: "TestArcane-AllItems-BraidedEterniumChain-24114"
+ value: {
+  dps: 1334.3347668695385
  }
 }
 dps_results: {
@@ -276,6 +288,12 @@ dps_results: {
  key: "TestArcane-AllItems-GlaiveofthePit-28774"
  value: {
   dps: 1197.924946236815
+ }
+}
+dps_results: {
+ key: "TestArcane-AllItems-HandofJustice-11815"
+ value: {
+  dps: 1325.0198484394093
  }
 }
 dps_results: {

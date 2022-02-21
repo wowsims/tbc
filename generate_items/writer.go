@@ -279,10 +279,12 @@ var denyListNameRegexes = []*regexp.Regexp{
 
 // allowList allows overriding to allow an item
 var allowList = map[int]bool{
+	11815: true, // Hand of Justice
 	12632: true, // Storm Gauntlets
 	17111: true, // Blazefury Medallion
 	20966: true, // Jade Pendant of Blasting
 	22395: true, // Totem of Rage
+	24114: true, // Braided Eternium Chain
 	27947: true, // Totem of Impact
 	31193: true, // Blade of Unquenched Thirst
 	32508: true, // Necklace of the Deep
