@@ -11,8 +11,8 @@ import {
 	makeDefaultBlessings,
 	classColors,
 	naturalSpecOrder,
-	specIconsLarge,
 	specNames,
+	titleIcons,
 } from '/tbc/core/proto_utils/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
@@ -61,7 +61,7 @@ export class BlessingsPicker extends Component {
 			headerRow.appendChild(cell);
 
 			const icon = document.createElement('img');
-			icon.src = specIconsLarge[spec];
+			icon.src = titleIcons[spec];
 			cell.appendChild(icon);
 
 			tippy(icon, {
