@@ -99,9 +99,21 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestWarrior-AllItems-Blinkstrike-31332"
+ value: {
+  dps: 259.1443935504925
+ }
+}
+dps_results: {
  key: "TestWarrior-AllItems-BracingEarthstormDiamond"
  value: {
   dps: 254.4528071955675
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-BraidedEterniumChain-24114"
+ value: {
+  dps: 258.1770003900725
  }
 }
 dps_results: {
@@ -179,19 +191,19 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-Dragonstrike-28439"
  value: {
-  dps: 257.00492040012085
+  dps: 259.2742960659987
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-DragonstrikeP5--23"
  value: {
-  dps: 264.32521919191436
+  dps: 262.1867710609627
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 240.29460934160133
+  dps: 242.41091686996936
  }
 }
 dps_results: {
@@ -258,6 +270,12 @@ dps_results: {
  key: "TestWarrior-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
   dps: 259.7368787839575
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-HandofJustice-11815"
+ value: {
+  dps: 255.42066361058204
  }
 }
 dps_results: {
@@ -509,13 +527,13 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-TheBladefist-29348"
  value: {
-  dps: 239.4633268094759
+  dps: 242.12042775401738
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-TheDecapitator-28767"
  value: {
-  dps: 246.64267720269015
+  dps: 250.0843911163912
  }
 }
 dps_results: {

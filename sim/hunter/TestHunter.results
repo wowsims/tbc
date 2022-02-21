@@ -123,9 +123,21 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestHunter-AllItems-Blinkstrike-31332"
+ value: {
+  dps: 1625.5609462048342
+ }
+}
+dps_results: {
  key: "TestHunter-AllItems-BracingEarthstormDiamond"
  value: {
   dps: 1623.1743035332945
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-BraidedEterniumChain-24114"
+ value: {
+  dps: 1619.1987644385802
  }
 }
 dps_results: {
@@ -306,6 +318,12 @@ dps_results: {
  key: "TestHunter-AllItems-Gronnstalker'sArmor"
  value: {
   dps: 1674.416788462406
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-HandofJustice-11815"
+ value: {
+  dps: 1591.0397042356208
  }
 }
 dps_results: {

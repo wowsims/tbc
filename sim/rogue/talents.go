@@ -286,7 +286,6 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 
 			mhAttack := rogue.AutoAttacks.MHAuto
 			mhAttack.ActionID = core.ActionID{SpellID: 13964}
-
 			cachedAttack := core.ActiveMeleeAbility{}
 
 			return core.Aura{

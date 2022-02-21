@@ -44,10 +44,10 @@ func ApplyCrusader(agent core.Agent) {
 		return
 	}
 	if !mh {
-		ppmm.SetProcChance(false, 0)
+		ppmm.SetProcChance(true, 0)
 	}
 	if !oh {
-		ppmm.SetProcChance(true, 0)
+		ppmm.SetProcChance(false, 0)
 	}
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -135,10 +135,10 @@ func ApplyMongoose(agent core.Agent) {
 		return
 	}
 	if !mh {
-		ppmm.SetProcChance(false, 0)
+		ppmm.SetProcChance(true, 0)
 	}
 	if !oh {
-		ppmm.SetProcChance(true, 0)
+		ppmm.SetProcChance(false, 0)
 	}
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -232,10 +232,10 @@ func ApplyExecutioner(agent core.Agent) {
 		return
 	}
 	if !mh {
-		ppmm.SetProcChance(false, 0)
+		ppmm.SetProcChance(true, 0)
 	}
 	if !oh {
-		ppmm.SetProcChance(true, 0)
+		ppmm.SetProcChance(false, 0)
 	}
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {

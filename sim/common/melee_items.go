@@ -33,12 +33,10 @@ func init() {
 	core.AddItemEffect(30316, ApplyDevastation)
 	core.AddItemEffect(31193, ApplyBladeOfUnquenchedThirst)
 	core.AddItemEffect(31318, ApplySingingCrystalAxe)
+	core.AddItemEffect(31332, ApplyBlinkstrike)
 	core.AddItemEffect(31331, ApplyTheNightBlade)
 	core.AddItemEffect(32262, ApplySyphonOfTheNathrezim)
 	core.AddItemEffect(33122, ApplyCloakOfDarkness)
-
-	// TODO:
-	// blinkstrike
 }
 
 var StormGauntletsAuraID = core.NewAuraID()
@@ -814,6 +812,53 @@ func ApplySingingCrystalAxe(agent core.Agent) {
 	})
 }
 
+var BlinkstrikeAuraID = core.NewAuraID()
+
+func ApplyBlinkstrike(agent core.Agent) {
+	character := agent.GetCharacter()
+	mh, oh := character.GetWeaponHands(31332)
+	procMask := core.GetMeleeProcMaskForHands(mh, oh)
+
+	ppmm := character.AutoAttacks.NewPPMManager(1.0)
+	if !mh {
+		ppmm.SetProcChance(true, 0)
+	}
+	if !oh {
+		ppmm.SetProcChance(false, 0)
+	}
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		var icd core.InternalCD
+		icdDur := time.Millisecond * 1
+
+		mhAttack := character.AutoAttacks.MHAuto
+		mhAttack.ActionID = core.ActionID{ItemID: 31332}
+		cachedAttack := core.ActiveMeleeAbility{}
+
+		return core.Aura{
+			ID: BlinkstrikeAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) || ability.IsPhantom {
+					return
+				}
+
+				if icd.IsOnCD(sim) {
+					return
+				}
+
+				if !ppmm.Proc(sim, hitEffect.IsMH(), false, "Blinkstrike") {
+					return
+				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+
+				cachedAttack = mhAttack
+				cachedAttack.Effect.Target = hitEffect.Target
+				cachedAttack.Attack(sim)
+			},
+		}
+	})
+}
+
 var TheNightBladeAuraID = core.NewAuraID()
 var TheNightBladeProcAuraID = core.NewAuraID()
 
@@ -861,10 +906,10 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 	ppmm := character.AutoAttacks.NewPPMManager(1.0)
 	mh, oh := character.GetWeaponHands(32262)
 	if !mh {
-		ppmm.SetProcChance(false, 0)
+		ppmm.SetProcChance(true, 0)
 	}
 	if !oh {
-		ppmm.SetProcChance(true, 0)
+		ppmm.SetProcChance(false, 0)
 	}
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {

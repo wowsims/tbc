@@ -10,6 +10,7 @@ import (
 
 func init() {
 	// Proc effects. Keep these in order by item ID.
+	core.AddItemEffect(11815, ApplyHandOfJustice)
 	core.AddItemEffect(21670, ApplyBadgeOfTheSwarmguard)
 	core.AddItemEffect(23206, ApplyMarkOfTheChampionMelee)
 	core.AddItemEffect(28034, ApplyHourglassUnraveller)
@@ -191,6 +192,44 @@ func init() {
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
+}
+
+var HandOfJusticeAuraID = core.NewAuraID()
+
+func ApplyHandOfJustice(agent core.Agent) {
+	character := agent.GetCharacter()
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		procChance := 0.013333
+		var icd core.InternalCD
+		icdDur := time.Second * 2
+
+		mhAttack := character.AutoAttacks.MHAuto
+		mhAttack.ActionID = core.ActionID{ItemID: 11815}
+		cachedAttack := core.ActiveMeleeAbility{}
+
+		return core.Aura{
+			ID: HandOfJusticeAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				// https://tbc.wowhead.com/spell=15600/hand-of-justice, proc mask = 20.
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
+					return
+				}
+
+				if icd.IsOnCD(sim) {
+					return
+				}
+
+				if sim.RandomFloat("HandOfJustice") > procChance {
+					return
+				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+
+				cachedAttack = mhAttack
+				cachedAttack.Effect.Target = hitEffect.Target
+				cachedAttack.Attack(sim)
+			},
+		}
+	})
 }
 
 var CrystalforgedTrinketCooldownID = core.NewCooldownID()

@@ -111,6 +111,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestEnhancement-AllItems-BraidedEterniumChain-24114"
+ value: {
+  dps: 1845.9500200191292
+ }
+}
+dps_results: {
  key: "TestEnhancement-AllItems-BrutalEarthstormDiamond"
  value: {
   dps: 1809.5634422389414
@@ -203,25 +209,25 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Dragonmaw-28438"
  value: {
-  dps: 1870.945733470951
+  dps: 1836.1965754213115
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-Dragonstrike-28439"
  value: {
-  dps: 1842.3345971948008
+  dps: 1814.981698484231
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-DragonstrikeP5--23"
  value: {
-  dps: 1860.7051439322947
+  dps: 1850.3422417226066
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 1816.4442988923868
+  dps: 1789.953630047351
  }
 }
 dps_results: {
@@ -294,6 +300,12 @@ dps_results: {
  key: "TestEnhancement-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
   dps: 1851.0946821024124
+ }
+}
+dps_results: {
+ key: "TestEnhancement-AllItems-HandofJustice-11815"
+ value: {
+  dps: 1823.3181703103796
  }
 }
 dps_results: {
@@ -551,13 +563,13 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TheBladefist-29348"
  value: {
-  dps: 1752.9347720611984
+  dps: 1684.1680589301156
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-TheDecapitator-28767"
  value: {
-  dps: 1749.5351665660323
+  dps: 1753.5521989979036
  }
 }
 dps_results: {

@@ -111,9 +111,21 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-Blinkstrike-31332"
+ value: {
+  dps: 1376.5993497591055
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-BracingEarthstormDiamond"
  value: {
   dps: 1345.5311392450396
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-BraidedEterniumChain-24114"
+ value: {
+  dps: 1380.1456376997478
  }
 }
 dps_results: {
@@ -191,25 +203,25 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Dragonmaw-28438"
  value: {
-  dps: 1349.3504985714121
+  dps: 1339.815579343884
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-Dragonstrike-28439"
  value: {
-  dps: 1329.560802871382
+  dps: 1338.304631715543
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-DragonstrikeP5--23"
  value: {
-  dps: 1181.0932510696855
+  dps: 1210.3509985632254
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 1325.8797191361261
+  dps: 1303.0673056857108
  }
 }
 dps_results: {
@@ -270,6 +282,12 @@ dps_results: {
  key: "TestRogue-AllItems-GlaiveofthePit-28774"
  value: {
   dps: 965.6398876696685
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-HandofJustice-11815"
+ value: {
+  dps: 1366.3426716865222
  }
 }
 dps_results: {
@@ -521,13 +539,13 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-TheBladefist-29348"
  value: {
-  dps: 1259.7772509007375
+  dps: 1257.6392916259372
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-TheDecapitator-28767"
  value: {
-  dps: 1301.0270339796962
+  dps: 1262.8068471675751
  }
 }
 dps_results: {
