@@ -261,6 +261,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestWarrior-AllItems-Heartrazor-29962"
+ value: {
+  dps: 259.1443935504925
+ }
+}
+dps_results: {
  key: "TestWarrior-AllItems-HexShrunkenHead-33829"
  value: {
   dps: 252.596962357754
@@ -540,6 +546,12 @@ dps_results: {
  key: "TestWarrior-AllItems-TheSkullofGul'dan-32483"
  value: {
   dps: 252.596962357754
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-TheTwinBladesofAzzinoth"
+ value: {
+  dps: 295.8919625058559
  }
 }
 dps_results: {

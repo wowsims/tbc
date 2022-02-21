@@ -32,6 +32,8 @@ type Rogue struct {
 
 	comboPoints int32
 
+	deathmantle4pcProc bool
+
 	builderEnergyCost float64
 	newBuilder        func(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility
 
@@ -40,6 +42,7 @@ type Rogue struct {
 
 	castSliceAndDice func()
 
+	eviscerateEnergyCost  float64
 	eviscerateDamageCalcs []core.MeleeDamageCalculator
 	eviscerateTemplate    core.MeleeAbilityTemplate
 	eviscerate            core.ActiveMeleeAbility
@@ -66,6 +69,7 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 
 func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.comboPoints = 0
+	rogue.deathmantle4pcProc = false
 }
 
 func (rogue *Rogue) AddComboPoint(sim *core.Simulation) {
@@ -233,6 +237,6 @@ func init() {
 }
 
 // Agent is a generic way to access underlying rogue on any of the agents.
-type Agent interface {
+type RogueAgent interface {
 	GetRogue() *Rogue
 }

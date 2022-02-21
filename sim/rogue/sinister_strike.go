@@ -54,6 +54,9 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.MeleeAb
 	if rogue.Talents.SurpriseAttacks {
 		ability.Effect.StaticDamageMultiplier *= 1.1
 	}
+	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
+		ability.Effect.StaticDamageMultiplier *= 1.06
+	}
 
 	return core.NewMeleeAbilityTemplate(ability)
 }
