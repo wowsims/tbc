@@ -28,6 +28,9 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilit
 		makeEviscerateDamageCalcFn(sim, 5),
 	}
 
+	finishingMoveEffects := rogue.makeFinishingMoveEffectApplier()
+	refundAmount := EviscerateEnergyCost * 0.4 * float64(rogue.Talents.QuickRecovery)
+
 	ability := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
 			ActionID:    EviscerateActionID,
@@ -38,7 +41,7 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilit
 				Type:  stats.Energy,
 				Value: EviscerateEnergyCost,
 			},
-			CritMultiplier: rogue.DefaultMeleeCritMultiplier(),
+			CritMultiplier: rogue.critMultiplier(true, false),
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -50,9 +53,21 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilit
 		},
 		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
 			if hitEffect.Landed() {
+				numPoints := rogue.comboPoints
 				rogue.SpendComboPoints(sim)
+				finishingMoveEffects(sim, numPoints)
+			} else {
+				if refundAmount > 0 {
+					rogue.AddEnergy(sim, refundAmount, core.ActionID{SpellID: 31245})
+				}
 			}
 		},
+	}
+
+	ability.Effect.StaticDamageMultiplier *= 1 + 0.05*float64(rogue.Talents.ImprovedEviscerate)
+	ability.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(rogue.Talents.Aggression)
+	if rogue.Talents.SurpriseAttacks {
+		ability.Effect.CannotBeDodged = true
 	}
 
 	return core.NewMeleeAbilityTemplate(ability)

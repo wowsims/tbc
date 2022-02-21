@@ -14,7 +14,7 @@ func (rogue *Rogue) doRotation(sim *core.Simulation) {
 	sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
 	if sndTimeRemaining <= 0 && rogue.comboPoints > 0 {
 		if energy >= SliceAndDiceEnergyCost {
-			rogue.CastSliceAndDice(sim)
+			rogue.castSliceAndDice()
 		}
 		return
 	}
