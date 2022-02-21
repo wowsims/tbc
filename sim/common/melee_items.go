@@ -30,6 +30,7 @@ func init() {
 	core.AddItemEffect(30090, ApplyWorldBreaker)
 	core.AddItemEffect(30311, ApplyWarpSlicer)
 	core.AddItemEffect(30316, ApplyDevastation)
+	core.AddItemEffect(31193, ApplyBladeOfUnquenchedThirst)
 	core.AddItemEffect(31318, ApplySingingCrystalAxe)
 	core.AddItemEffect(31331, ApplyTheNightBlade)
 	core.AddItemEffect(32262, ApplySyphonOfTheNathrezim)
@@ -689,6 +690,61 @@ func ApplyDevastation(agent core.Agent) {
 						character.MultiplyMeleeSpeed(sim, inverseBonus)
 					},
 				})
+			},
+		}
+	})
+}
+
+var BladeOfUnquenchedThirstAuraID = core.NewAuraID()
+
+func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
+	character := agent.GetCharacter()
+	mh, oh := character.GetWeaponHands(31193)
+	procMask := core.GetMeleeProcMaskForHands(mh, oh)
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const procChance = 0.02
+
+		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+			SpellCast: core.SpellCast{
+				Cast: core.Cast{
+					ActionID:       core.ActionID{ItemID: 31193},
+					Character:      character,
+					IsPhantom:      true,
+					SpellSchool:    stats.ShadowSpellPower,
+					CritMultiplier: character.DefaultSpellCritMultiplier(),
+				},
+			},
+			Effect: core.SpellHitEffect{
+				SpellEffect: core.SpellEffect{
+					DamageMultiplier:       1,
+					StaticDamageMultiplier: 1,
+					ThreatMultiplier:       1,
+				},
+				DirectInput: core.DirectDamageInput{
+					MinBaseDamage:    48,
+					MaxBaseDamage:    54,
+					SpellCoefficient: 1,
+				},
+			},
+		})
+		spellObj := core.SimpleSpell{}
+
+		return core.Aura{
+			ID: BladeOfUnquenchedThirstAuraID,
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) {
+					return
+				}
+				if sim.RandomFloat("BladeOfUnquenchedThirst") > procChance {
+					return
+				}
+
+				castAction := &spellObj
+				castTemplate.Apply(castAction)
+				castAction.Effect.Target = hitEffect.Target
+				castAction.Init(sim)
+				castAction.Cast(sim)
 			},
 		}
 	})
