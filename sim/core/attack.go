@@ -100,6 +100,9 @@ type AbilityEffect struct {
 	// Ignores reduction from target armor.
 	IgnoreArmor bool
 
+	// Skips dodge check.
+	CannotBeDodged bool
+
 	// The type of hit this was, i.e. miss/dodge/block/crit/hit.
 	Outcome HitOutcome
 
@@ -258,11 +261,13 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 
 	if !ahe.ProcMask.Matches(ProcMaskRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
 		// Dodge
-		dodge := ahe.Target.Dodge
-		expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
-		chance += dodge - expertisePercentage
-		if roll < chance {
-			return OutcomeDodge
+		if !ahe.CannotBeDodged {
+			dodge := ahe.Target.Dodge
+			expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
+			chance += dodge - expertisePercentage
+			if roll < chance {
+				return OutcomeDodge
+			}
 		}
 
 		// Parry (if in front)
@@ -522,8 +527,9 @@ type AutoAttacks struct {
 	OffhandSwingAt  time.Duration
 	RangedSwingAt   time.Duration
 
-	ActiveMeleeAbility                    // Parameters for auto attacks.
-	cachedMelee        ActiveMeleeAbility // reuse to save memory allocations
+	MHAuto      ActiveMeleeAbility // Parameters for MH auto attacks.
+	OHAuto      ActiveMeleeAbility // Parameters for OH auto attacks.
+	cachedMelee ActiveMeleeAbility // reuse to save memory allocations
 
 	RangedAuto            ActiveMeleeAbility // Parameters for ranged auto attacks.
 	RangedCast            SimpleCast         // Used for the 0.5s cast time on ranged autos.
@@ -559,15 +565,35 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		AutoSwingMelee: options.AutoSwingMelee,
 		DelayOHSwings:  options.DelayOHSwings,
 		ReplaceMHSwing: options.ReplaceMHSwing,
-		ActiveMeleeAbility: ActiveMeleeAbility{
+		MHAuto: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
-				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack},
-				Character:   character,
-				SpellSchool: stats.AttackPower,
+				ActionID:       ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
+				Character:      character,
+				SpellSchool:    stats.AttackPower,
+				CritMultiplier: options.MainHand.CritMultiplier,
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{
 					ProcMask:               ProcMaskMeleeMHAuto,
+					DamageMultiplier:       1,
+					StaticDamageMultiplier: 1,
+					ThreatMultiplier:       1,
+				},
+				WeaponInput: WeaponDamageInput{
+					DamageMultiplier: 1,
+				},
+			},
+		},
+		OHAuto: ActiveMeleeAbility{
+			MeleeAbility: MeleeAbility{
+				ActionID:       ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
+				Character:      character,
+				SpellSchool:    stats.AttackPower,
+				CritMultiplier: options.OffHand.CritMultiplier,
+			},
+			Effect: AbilityHitEffect{
+				AbilityEffect: AbilityEffect{
+					ProcMask:               ProcMaskMeleeOHAuto,
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
@@ -776,10 +802,7 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 	}
 
 	if replaceAMA == nil {
-		aa.cachedMelee = aa.ActiveMeleeAbility
-		aa.cachedMelee.ActionID.Tag = 1
-		aa.cachedMelee.CritMultiplier = aa.MH.CritMultiplier
-		aa.cachedMelee.Effect.ProcMask = ProcMaskMeleeMHAuto
+		aa.cachedMelee = aa.MHAuto
 		aa.cachedMelee.Effect.Target = target
 	} else {
 		aa.cachedMelee = *replaceAMA
@@ -806,10 +829,7 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 		return
 	}
 
-	aa.cachedMelee = aa.ActiveMeleeAbility
-	aa.cachedMelee.ActionID.Tag = 2
-	aa.cachedMelee.CritMultiplier = aa.OH.CritMultiplier
-	aa.cachedMelee.Effect.ProcMask = ProcMaskMeleeOHAuto
+	aa.cachedMelee = aa.OHAuto
 	aa.cachedMelee.Effect.Target = target
 	aa.cachedMelee.Attack(sim)
 	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
@@ -830,8 +850,8 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 	// It's important that we update the GCD timer AFTER starting the ranged auto.
 	// Otherwise the hardcast action won't be created separately.
 	nextGCD := sim.CurrentTime + aa.RangedCast.CastTime
-	if nextGCD > aa.Character.NextGCDAt() {
-		aa.Character.SetGCDTimer(sim, nextGCD)
+	if nextGCD > aa.character.NextGCDAt() {
+		aa.character.SetGCDTimer(sim, nextGCD)
 	}
 }
 
@@ -921,7 +941,7 @@ func (aa *AutoAttacks) NextEventAt(sim *Simulation) time.Duration {
 		panic(fmt.Sprintf("Returned 0 from next attack at %s, mh: %s, oh: %s", sim.CurrentTime, aa.MainhandSwingAt, aa.OffhandSwingAt))
 	}
 	return MinDuration(
-		sim.CurrentTime+aa.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime),
+		sim.CurrentTime+aa.character.GetRemainingCD(GCDCooldownID, sim.CurrentTime),
 		aa.NextAttackAt())
 }
 

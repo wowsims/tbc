@@ -134,8 +134,8 @@ func (hunter *Hunter) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (hunter *Hunter) Init(sim *core.Simulation) {
 	// Update auto crit multipliers now that we have the targets.
-	hunter.AutoAttacks.MH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
-	hunter.AutoAttacks.OH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.MHAuto.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.OHAuto.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
 	hunter.AutoAttacks.Ranged.CritMultiplier = hunter.critMultiplier(true, sim.GetPrimaryTarget())
 
 	// Precompute all the spell templates.

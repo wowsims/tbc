@@ -38,7 +38,7 @@ type Rogue struct {
 	sinisterStrikeTemplate core.MeleeAbilityTemplate
 	sinisterStrike         core.ActiveMeleeAbility
 
-	applySliceAndDiceAura func(numPoints int32)
+	castSliceAndDice func()
 
 	eviscerateDamageCalcs []core.MeleeDamageCalculator
 	eviscerateTemplate    core.MeleeAbilityTemplate
@@ -103,15 +103,18 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		return rogue.NewSinisterStrike(sim, target)
 	}
 
-	rogue.EnableEnergyBar(100, func(sim *core.Simulation) {
+	maxEnergy := 100.0
+	if rogue.Talents.Vigor {
+		maxEnergy = 110
+	}
+	rogue.EnableEnergyBar(maxEnergy, func(sim *core.Simulation) {
 		if !rogue.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
 			rogue.doRotation(sim)
 		}
 	})
 	rogue.EnableAutoAttacks(rogue, core.AutoAttackOptions{
-		// TODO: Crit multiplier
-		MainHand:       rogue.WeaponFromMainHand(rogue.DefaultMeleeCritMultiplier()),
-		OffHand:        rogue.WeaponFromOffHand(rogue.DefaultMeleeCritMultiplier()),
+		MainHand:       rogue.WeaponFromMainHand(rogue.critMultiplier(true, false)),
+		OffHand:        rogue.WeaponFromOffHand(rogue.critMultiplier(false, false)),
 		AutoSwingMelee: true,
 	})
 
@@ -139,7 +142,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		},
 	})
 
-	//rogue.applyTalents()
+	rogue.applyTalents()
 
 	return rogue
 }
