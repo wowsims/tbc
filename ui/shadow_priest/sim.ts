@@ -4,11 +4,9 @@ import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
-import { Drums } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
-import { Potions } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -17,6 +15,17 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+
+import { Alchohol} from '/tbc/core/proto/common.js';
+import { BattleElixir } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
+import { Conjured } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
+import { PetFood } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 
 import { ShadowPriest, ShadowPriest_Rotation as Rotation, ShadowPriest_Options as Options, ShadowPriest_Rotation, ShadowPriest_Rotation_RotationType } from '/tbc/core/proto/priest.js';
 
@@ -114,8 +123,6 @@ export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
 
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
-				IconInputs.DrumsOfBattleConsume,
-				IconInputs.DrumsOfRestorationConsume,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
@@ -151,23 +158,43 @@ export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
 				IconInputs.ImprovedSealOfTheCrusader,
 				IconInputs.CurseOfElements,
 			],
-			// IconInputs to include in the 'Consumes' section on the settings tab.
-			consumeInputs: [
-				IconInputs.DefaultSuperManaPotion,
-				IconInputs.DefaultDestructionPotion,
-				IconInputs.DefaultDarkRune,
-				IconInputs.FlaskOfPureDeath,
-				IconInputs.FlaskOfSupremePower,
-				IconInputs.ElixirOfMajorShadowPower,
-				IconInputs.AdeptsElixir,
-				IconInputs.ElixirOfMajorMageblood,
-				IconInputs.ElixirOfDraenicWisdom,
-				IconInputs.MainHandBrilliantWizardOil,
-				IconInputs.MainHandSuperiorWizardOil,
-				IconInputs.BlackenedBasilisk,
-				IconInputs.SkullfishSoup,
-				IconInputs.KreegsStoutBeatdown,
-			],
+			// Which options are selectable in the 'Consumes' section.
+			consumeOptions: {
+				potions: [
+					Potions.SuperManaPotion,
+					Potions.DestructionPotion,
+				],
+				conjured: [
+					Conjured.ConjuredDarkRune,
+				],
+				flasks: [
+					Flask.FlaskOfPureDeath,
+					Flask.FlaskOfSupremePower,
+				],
+				battleElixirs: [
+					BattleElixir.ElixirOfMajorShadowPower,
+					BattleElixir.AdeptsElixir,
+				],
+				guardianElixirs: [
+					GuardianElixir.ElixirOfDraenicWisdom,
+					GuardianElixir.ElixirOfMajorMageblood,
+				],
+				food: [
+					Food.FoodBlackenedBasilisk,
+					Food.FoodSkullfishSoup,
+				],
+				alcohol: [
+					Alchohol.AlchoholKreegsStoutBeatdown,
+				],
+				weaponImbues: [
+					WeaponImbue.WeaponImbueBrilliantWizardOil,
+					WeaponImbue.WeaponImbueSuperiorWizardOil,
+				],
+				other: [
+					IconInputs.DrumsOfBattleConsume,
+					IconInputs.DrumsOfRestorationConsume,
+				],
+			},
 			// Inputs to include in the 'Rotation' section on the settings tab.
 			rotationInputs: ShadowPriestInputs.ShadowPriestRotationConfig,
 			// Inputs to include in the 'Other' section on the settings tab.

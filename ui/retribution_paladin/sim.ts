@@ -2,13 +2,23 @@ import { RaidBuffs, StrengthOfEarthType } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
-import { Drums } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js'
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+
+import { Alchohol} from '/tbc/core/proto/common.js';
+import { BattleElixir } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
+import { Conjured } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
+import { PetFood } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
@@ -168,30 +178,51 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				IconInputs.CurseOfElements,
 				IconInputs.Misery,
 			],
-			// IconInputs to include in the 'Consumes' section on the settings tab.
-			consumeInputs: [
-				IconInputs.DefaultHastePotion,
-				IconInputs.DefaultSuperManaPotion,
-				IconInputs.DefaultDarkRune,
-				IconInputs.DefaultFlameCap,
-				IconInputs.FlaskOfRelentlessAssault,
-				IconInputs.ElixirOfDemonslaying,
-				IconInputs.ElixirOfMajorAgility,
-				IconInputs.ElixirOfMajorStrength,
-				IconInputs.ElixirOfTheMongoose,
-				IconInputs.ElixirOfMajorMageblood,
-				IconInputs.ElixirOfDraenicWisdom,
-				IconInputs.MainHandAdamantiteSharpeningStone,
-				IconInputs.MainHandElementalSharpeningStone,
-				IconInputs.MainHandSuperiorWizardOil,
-				IconInputs.MainHandBrilliantWizardOil,
-				IconInputs.RoastedClefthoof,
-				IconInputs.SpicyHotTalbuk,
-				IconInputs.GrilledMudfish,
-				IconInputs.BlackenedBasilisk,
-				IconInputs.ScrollOfStrengthV,
-				IconInputs.ScrollOfStrengthV,
-			],
+			// Which options are selectable in the 'Consumes' section.
+			consumeOptions: {
+				potions: [
+					Potions.HastePotion,
+					Potions.SuperManaPotion,
+				],
+				conjured: [
+					Conjured.ConjuredDarkRune,
+					Conjured.ConjuredFlameCap,
+				],
+				flasks: [
+					Flask.FlaskOfRelentlessAssault,
+				],
+				battleElixirs: [
+					BattleElixir.ElixirOfDemonslaying,
+					BattleElixir.ElixirOfMajorStrength,
+					BattleElixir.ElixirOfMajorAgility,
+					BattleElixir.ElixirOfTheMongoose,
+				],
+				guardianElixirs: [
+					GuardianElixir.ElixirOfDraenicWisdom,
+					GuardianElixir.ElixirOfMajorMageblood,
+				],
+				food: [
+					Food.FoodRoastedClefthoof,
+					Food.FoodGrilledMudfish,
+					Food.FoodSpicyHotTalbuk,
+					Food.FoodBlackenedBasilisk,
+				],
+				alcohol: [
+					Alchohol.AlchoholKreegsStoutBeatdown,
+				],
+				weaponImbues: [
+					WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
+					WeaponImbue.WeaponImbueAdamantiteWeightstone,
+					WeaponImbue.WeaponImbueBrilliantWizardOil,
+					WeaponImbue.WeaponImbueSuperiorWizardOil,
+				],
+				other: [
+					IconInputs.DrumsOfBattleConsume,
+					IconInputs.BattleChicken,
+					IconInputs.ScrollOfStrengthV,
+					IconInputs.ScrollOfAgilityV,
+				],
+			},
 			// Inputs to include in the 'Rotation' section on the settings tab.
 			rotationInputs: RetributionPaladinInputs.RetributionPaladinRotationConfig,
 			// Inputs to include in the 'Other' section on the settings tab.
