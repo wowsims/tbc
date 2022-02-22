@@ -224,6 +224,7 @@ func CurseOfElementsAura(coe proto.TristateEffect) Aura {
 		mult = 1.13
 		level = 3
 	}
+
 	return Aura{
 		ID:       CurseOfElementsDebuffID,
 		ActionID: ActionID{SpellID: 27228},

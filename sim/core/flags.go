@@ -90,13 +90,17 @@ func (ho HitOutcome) Matches(other HitOutcome) bool {
 // Single-bit outcomes.
 const (
 	OutcomeEmpty HitOutcome = 0
-	OutcomeMiss  HitOutcome = 1 << iota
+
+	// These bits are set by the hit roll
+	OutcomeMiss HitOutcome = 1 << iota
 	OutcomeHit
-	OutcomeCrit
 	OutcomeDodge
 	OutcomeGlance
 	OutcomeParry
 	OutcomeBlock
+
+	// These bits are set by the crit and damage rolls.
+	OutcomeCrit
 	OutcomePartial1_4 // 1/4 of the spell was resisted.
 	OutcomePartial2_4 // 2/4 of the spell was resisted.
 	OutcomePartial3_4 // 3/4 of the spell was resisted.
@@ -138,3 +142,78 @@ func (ho HitOutcome) PartialResistString() string {
 		return ""
 	}
 }
+
+// Other flags
+// Ignore Resistance (armor or magical, use school)
+// Always Hits
+
+type SpellExtras uint16
+
+const (
+	SpellExtrasNone          SpellExtras = 0
+	SpellExtrasIgnoreResists SpellExtras = 1 << iota
+	SpellExtrasAlwaysHits
+	SpellExtrasBinary
+)
+
+// OutcomeRollCategory is the mask for what kind of hit roll to perform
+type OutcomeRollCategory uint16
+
+// Returns whether there is any overlap between the given masks.
+func (at OutcomeRollCategory) Matches(other OutcomeRollCategory) bool {
+	return (at & other) != 0
+}
+
+const (
+	OutcomeRollCategoryNone    OutcomeRollCategory = 0         // Cannot miss
+	OutcomeRollCategoryWhite   OutcomeRollCategory = 1 << iota // White hit roll rules
+	OutcomeRollCategorySpecial                                 // Melee special attack
+	OutcomeRollCategoryRanged                                  // Ranged attack roll
+	OutcomeRollCategoryMagic                                   // Spell Hit roll
+)
+
+type CritRollCategory uint16
+
+const (
+	CritRollCategoryNone     CritRollCategory    = 0         // cannot crit
+	CritRollCategoryPhysical OutcomeRollCategory = 1 << iota // uses MeleeCrit for roll
+	CritRollCategoryMagical                                  // Uses SpellCrit for crit roll
+)
+
+/*
+outcome roll hit/miss/crit/glance (assigns Outcome mask) -> If Hit, Crit Roll -> damage (applies metrics) -> trigger proc
+
+So in TBC it looks like they just gave it the cannot miss flag even though they also switched its defense type to physical (??)
+the damage type is holy, which ignores armor and as it is magic so it can be partially resisted (due to level resistance).
+however it also gains the physical bit mask as I explain in a post above
+
+so there is no hit roll, there is a melee crit roll, a spell damage roll, and melee "on hit"
+
+ok so I did some more testing on this.
+Judgement of Blood correctly gets the "always hit" (aka cannot miss flag applied to it) --
+its only mitigation events are partial resists at the correct rates
+however Judgement of Command is broken. even though it has the "always hit" flag it seems to
+be ignored because it is procced by an intermediary dummy spell which does not have the "cannot miss" flag applied to it lmao.
+for some god forsaken reason Judgement of Command is ALSO a dummy which then casts the correct Judgement of Command
+which deals damage, and this dummy can miss, lmao
+I got ~16.4% resists in about almost 96 casts which suggests it uses the spell hit check,
+which makes sense because its defensetype is set to 1, Magic
+
+arcane shot - ranged hit, spell dmg, procs special ranged
+	OutcomeRollRanged, School Arcane, ProcMask - RangedSpecial
+
+judgement of blood - physical hit/crit, spell damage, "cannot miss", procs special melee and ranged
+	Damage is (weapon damage + spell power)*0.7*(bonus holy damage against target)+flat bonus damage
+	OtherFlagCannotMiss, OutcomeRollSpecial, School Holy (base damage = weapon damage range), Multiplier 70%
+
+judgement of command - spell hit, melee crit, spell damage, procs special melee and ranged
+	OutcomeRollSpell, School Holy
+
+
+moonfire - spell hit, spell dmg, dot dmg, procs spell hit
+stormstrike - melee hit, melee dmg, procs special melee
+rupture -
+
+wotlk
+shadowflame - requires each 'effect' to have its own school.
+*/
