@@ -49,11 +49,13 @@ func ApplyStormGauntlets(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:       core.ActionID{ItemID: 12632},
-					Character:      character,
-					IsPhantom:      true,
-					SpellSchool:    stats.NatureSpellPower,
-					CritMultiplier: character.DefaultSpellCritMultiplier(),
+					ActionID:            core.ActionID{ItemID: 12632},
+					Character:           character,
+					IsPhantom:           true,
+					CritRollCategory:    core.CritRollCategoryMagical,
+					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+					SpellSchool:         core.SpellSchoolNature,
+					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -97,11 +99,13 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:       core.ActionID{ItemID: 17111},
-					Character:      character,
-					IsPhantom:      true,
-					SpellSchool:    stats.FireSpellPower,
-					CritMultiplier: character.DefaultSpellCritMultiplier(),
+					ActionID:            core.ActionID{ItemID: 17111},
+					Character:           character,
+					IsPhantom:           true,
+					CritRollCategory:    core.CritRollCategoryMagical,
+					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+					SpellSchool:         core.SpellSchoolFire,
+					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -343,11 +347,13 @@ func ApplyDespair(agent core.Agent) {
 
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       actionID,
-			Character:      character,
-			SpellSchool:    stats.AttackPower,
-			CritMultiplier: character.DefaultMeleeCritMultiplier(),
-			IsPhantom:      true,
+			ActionID:            actionID,
+			Character:           character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			CritMultiplier:      character.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -398,11 +404,13 @@ func ApplyTheDecapitator(agent core.Agent) {
 
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       actionID,
-			Character:      character,
-			SpellSchool:    stats.AttackPower,
-			CritMultiplier: character.DefaultMeleeCritMultiplier(),
-			IsPhantom:      true,
+			ActionID:            actionID,
+			Character:           character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			CritMultiplier:      character.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -462,11 +470,13 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:       core.ActionID{SpellID: 34696},
-					Character:      character,
-					IsPhantom:      true,
-					SpellSchool:    stats.ShadowSpellPower,
-					CritMultiplier: character.DefaultSpellCritMultiplier(),
+					ActionID:            core.ActionID{SpellID: 34696},
+					Character:           character,
+					IsPhantom:           true,
+					CritRollCategory:    core.CritRollCategoryMagical,
+					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+					SpellSchool:         core.SpellSchoolShadow,
+					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -525,7 +535,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "Band of the Eternal Champion") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Band of the Eternal Champion") {
 					return
 				}
 
@@ -744,11 +754,13 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:       core.ActionID{ItemID: 31193},
-					Character:      character,
-					IsPhantom:      true,
-					SpellSchool:    stats.ShadowSpellPower,
-					CritMultiplier: character.DefaultSpellCritMultiplier(),
+					ActionID:            core.ActionID{ItemID: 31193},
+					Character:           character,
+					IsPhantom:           true,
+					CritRollCategory:    core.CritRollCategoryMagical,
+					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+					SpellSchool:         core.SpellSchoolShadow,
+					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -916,11 +928,13 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:       core.ActionID{SpellID: 40291},
-					Character:      character,
-					IsPhantom:      true,
-					SpellSchool:    stats.ShadowSpellPower,
-					CritMultiplier: character.DefaultSpellCritMultiplier(),
+					ActionID:            core.ActionID{SpellID: 40291},
+					Character:           character,
+					IsPhantom:           true,
+					CritRollCategory:    core.CritRollCategoryMagical,
+					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+					SpellSchool:         core.SpellSchoolShadow,
+					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -986,7 +1000,7 @@ func ApplyCloakOfDarkness(agent core.Agent) {
 		return core.Aura{
 			ID: CloakOfDarknessAuraID,
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.IsRanged() {
+				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					hitEffect.BonusCritRating += 24
 				}
 			},

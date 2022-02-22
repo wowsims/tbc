@@ -13,8 +13,10 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				SpellSchool: stats.FrostSpellPower,
-				Character:   &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFrost,
+				Character:           &mage.Character,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 1645,

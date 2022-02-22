@@ -15,10 +15,12 @@ func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.MeleeAb
 
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:    actionID,
-			Character:   &hunter.Character,
-			SpellSchool: stats.NatureSpellPower,
-			GCD:         core.GCDDefault,
+			ActionID:            actionID,
+			Character:           &hunter.Character,
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolNature,
+			GCD:                 core.GCDDefault,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: manaCost,

@@ -33,22 +33,19 @@ const (
 
 // Shared precomputation logic for LB and CL.
 func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellCast {
+	cost := core.ResourceCost{Type: stats.Mana, Value: baseManaCost}
 	spellCast := core.SpellCast{
 		Cast: core.Cast{
-			ActionID:    actionID,
-			Character:   shaman.GetCharacter(),
-			SpellSchool: stats.NatureSpellPower,
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: baseManaCost,
-			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: baseManaCost,
-			},
-			CastTime:       baseCastTime,
-			GCD:            core.GCDDefault,
-			CritMultiplier: shaman.DefaultSpellCritMultiplier(),
+			ActionID:            actionID,
+			Character:           shaman.GetCharacter(),
+			CritRollCategory:    core.CritRollCategoryMagical,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			SpellSchool:         core.SpellSchoolNature,
+			BaseCost:            cost,
+			Cost:                cost,
+			CastTime:            baseCastTime,
+			GCD:                 core.GCDDefault,
+			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 		},
 	}
 

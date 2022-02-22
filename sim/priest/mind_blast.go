@@ -17,8 +17,10 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 			SpellID:    SpellIDMindBlast,
 			CooldownID: MBCooldownID,
 		},
-		Character:   &priest.Character,
-		SpellSchool: stats.ShadowSpellPower,
+		Character:           &priest.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolShadow,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 450,

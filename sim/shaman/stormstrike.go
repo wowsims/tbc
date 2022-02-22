@@ -21,7 +21,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 		Stacks:   2,
 	}
 	ssDebuffAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-		if spellCast.SpellSchool != stats.NatureSpellPower {
+		if spellCast.SpellSchool != core.SpellSchoolNature {
 			return
 		}
 		spellEffect.DamageMultiplier *= 1.2
@@ -38,11 +38,13 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 	const skyshatterDur = time.Second * 12
 	ss := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:    StormstrikeActionID,
-			Character:   &shaman.Character,
-			SpellSchool: stats.AttackPower,
-			GCD:         core.GCDDefault,
-			Cooldown:    time.Second * 10,
+			ActionID:            StormstrikeActionID,
+			Character:           &shaman.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			GCD:                 core.GCDDefault,
+			Cooldown:            time.Second * 10,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: 237,

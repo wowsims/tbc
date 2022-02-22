@@ -18,11 +18,13 @@ var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: Judgeme
 func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	job := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       JudgementOfBloodActionID,
-			Character:      &paladin.Character,
-			SpellSchool:    stats.HolySpellPower,
-			CritMultiplier: paladin.DefaultMeleeCritMultiplier(),
-			IsPhantom:      true,
+			ActionID:            JudgementOfBloodActionID,
+			Character:           &paladin.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolHoly,
+			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -82,9 +84,12 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 	jotc := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    JudgementOfTheCrusaderActionID,
-				Character:   &paladin.Character,
-				SpellSchool: stats.HolySpellPower,
+				ActionID:            JudgementOfTheCrusaderActionID,
+				Character:           &paladin.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolHoly,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: JudgementManaCost,
@@ -147,9 +152,11 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 	jow := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    JudgementOfWisdomActionID,
-				Character:   &paladin.Character,
-				SpellSchool: stats.HolySpellPower,
+				ActionID:            JudgementOfWisdomActionID,
+				Character:           &paladin.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolHoly,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: JudgementManaCost,

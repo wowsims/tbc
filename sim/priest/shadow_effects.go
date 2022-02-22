@@ -2,7 +2,6 @@ package priest
 
 import (
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellHitEffect) {
@@ -13,7 +12,7 @@ func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.Sp
 	if cast.ActionID.SpellID == SpellIDMindFlay || cast.ActionID.SpellID == SpellIDMindBlast {
 		cast.Cost.Value -= cast.BaseCost.Value * float64(priest.Talents.FocusedMind) * 0.05
 	}
-	if cast.SpellSchool == stats.ShadowSpellPower {
+	if cast.SpellSchool == core.SpellSchoolShadow {
 		effect.StaticDamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
 
 		if priest.Talents.Shadowform {

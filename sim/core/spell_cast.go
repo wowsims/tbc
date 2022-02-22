@@ -69,7 +69,7 @@ type SpellEffect struct {
 
 	// Skips the hit check, i.e. this effect will always hit.
 	// This is generally used only for proc effects, like Mage Ignite.
-	IgnoreHitCheck bool
+	IgnoreHitCheck bool // TODO: move this to be part of SpellExtras
 
 	// Callbacks for providing additional custom behavior.
 	OnSpellHit  OnSpellHit
@@ -101,8 +101,14 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *S
 	spellEffect.Target.OnBeforeSpellHit(sim, spellCast, spellEffect)
 	spellEffect.BeyondAOECapMultiplier *= spellEffect.DamageMultiplier / multiplierBeforeTargetEffects
 
-	if spellEffect.IgnoreHitCheck || spellEffect.hitCheck(sim, spellCast) {
+	if spellCast.OutcomeRollCategory == OutcomeRollCategoryNone {
 		spellEffect.Outcome = OutcomeHit
+	} else if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryMagic) {
+		if spellEffect.IgnoreHitCheck || spellEffect.hitCheck(sim, spellCast) {
+			spellEffect.Outcome = OutcomeHit
+		}
+	} else {
+		panic("shouldn't have non-magic casts using casts yet....")
 	}
 }
 
@@ -197,14 +203,14 @@ func (hitEffect *SpellHitEffect) applyDotTickResultsToCast(spellCast *SpellCast)
 func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCast *SpellCast) {
 	baseDamage := hitEffect.DirectInput.MinBaseDamage + sim.RandomFloat("DirectSpell Base Damage")*(hitEffect.DirectInput.MaxBaseDamage-hitEffect.DirectInput.MinBaseDamage)
 
-	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + hitEffect.SpellEffect.BonusSpellPower
+	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool.Stat()) + hitEffect.SpellEffect.BonusSpellPower
 	damageFromSpellPower := (totalSpellPower * hitEffect.DirectInput.SpellCoefficient)
 
 	damage := baseDamage + damageFromSpellPower + hitEffect.DirectInput.FlatDamageBonus
 
 	damage *= hitEffect.SpellEffect.DamageMultiplier * hitEffect.SpellEffect.StaticDamageMultiplier
 
-	if !spellCast.Binary {
+	if !spellCast.SpellExtras.Matches(SpellExtrasBinary) {
 		damage = calculateResists(sim, damage, &hitEffect.SpellEffect)
 	}
 
@@ -219,7 +225,7 @@ func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCas
 
 // Snapshots a few values at the start of a dot.
 func (hitEffect *SpellHitEffect) takeDotSnapshot(sim *Simulation, spellCast *SpellCast) {
-	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool) + hitEffect.BonusSpellPower
+	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool.Stat()) + hitEffect.BonusSpellPower
 
 	// snapshot total damage per tick, including any static damage multipliers
 	hitEffect.DotInput.startTime = sim.CurrentTime
@@ -251,7 +257,7 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 	}
 
 	if hitEffect.Outcome == OutcomeHit {
-		if !spellCast.Binary {
+		if !spellCast.SpellExtras.Matches(SpellExtrasBinary) {
 			damage = calculateResists(sim, damage, &hitEffect.SpellEffect)
 		}
 

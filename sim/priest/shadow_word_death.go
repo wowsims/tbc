@@ -17,8 +17,10 @@ func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.Simp
 			SpellID:    SpellIDShadowWordDeath,
 			CooldownID: SWDCooldownID,
 		},
-		Character:   &priest.Character,
-		SpellSchool: stats.ShadowSpellPower,
+		Character:           &priest.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolShadow,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 309,

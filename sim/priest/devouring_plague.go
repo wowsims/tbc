@@ -12,24 +12,21 @@ const SpellIDDevouringPlague int32 = 25467
 var DevouringPlagueCooldownID = core.NewCooldownID()
 
 func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 1145}
 	baseCast := core.Cast{
 		ActionID: core.ActionID{
 			SpellID:    SpellIDDevouringPlague,
 			CooldownID: DevouringPlagueCooldownID,
 		},
-		Character:   &priest.Character,
-		SpellSchool: stats.ShadowSpellPower,
-		BaseCost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 1145,
-		},
-		Cost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 1145,
-		},
-		CastTime: 0,
-		GCD:      core.GCDDefault,
-		Cooldown: time.Minute * 3,
+		Character:           &priest.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolShadow,
+		BaseCost:            cost,
+		Cost:                cost,
+		CastTime:            0,
+		GCD:                 core.GCDDefault,
+		Cooldown:            time.Minute * 3,
 	}
 
 	effect := core.SpellHitEffect{

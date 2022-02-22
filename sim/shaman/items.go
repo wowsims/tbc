@@ -195,7 +195,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if cast.SpellSchool != stats.NatureSpellPower {
+				if cast.SpellSchool != core.SpellSchoolNature {
 					return
 				}
 				if sim.RandomFloat("Fathom-Brooch of the Tidewalker") > 0.15 {

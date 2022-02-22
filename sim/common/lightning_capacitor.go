@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func init() {
@@ -59,10 +58,12 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 				ActionID: core.ActionID{
 					ItemID: core.ItemIDTheLightningCapacitor,
 				},
-				Character:      character,
-				IsPhantom:      true,
-				SpellSchool:    stats.NatureSpellPower,
-				CritMultiplier: character.DefaultSpellCritMultiplier(),
+				Character:           character,
+				IsPhantom:           true, // TODO: replace with ProcMask
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolNature,
+				CritMultiplier:      character.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{

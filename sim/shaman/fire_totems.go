@@ -10,23 +10,20 @@ import (
 const SpellIDSearingTotem int32 = 25533
 
 func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 205}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDSearingTotem},
-				Character:   &shaman.Character,
-				SpellSchool: stats.FireSpellPower,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 205,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 205,
-				},
-				GCD:            time.Second,
-				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
-				IsPhantom:      true,
+				ActionID:            core.ActionID{SpellID: SpellIDSearingTotem},
+				Character:           &shaman.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				BaseCost:            cost,
+				Cost:                cost,
+				GCD:                 time.Second,
+				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+				IsPhantom:           true,
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -83,23 +80,20 @@ const SpellIDMagmaTotem int32 = 25552
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
 func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 800}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDMagmaTotem},
-				Character:   &shaman.Character,
-				SpellSchool: stats.FireSpellPower,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 800,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 800,
-				},
-				GCD:            time.Second,
-				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
-				IsPhantom:      true,
+				ActionID:            core.ActionID{SpellID: SpellIDMagmaTotem},
+				Character:           &shaman.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				BaseCost:            cost,
+				Cost:                cost,
+				GCD:                 time.Second,
+				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+				IsPhantom:           true,
 			},
 		},
 		AOECap: 1600,
@@ -165,6 +159,7 @@ func (shaman *Shaman) FireNovaTickLength() time.Duration {
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
 func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 765}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -172,20 +167,16 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 					SpellID:    SpellIDNovaTotem,
 					CooldownID: CooldownIDNovaTotem,
 				},
-				Character:   &shaman.Character,
-				SpellSchool: stats.FireSpellPower,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 765,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 765,
-				},
-				GCD:            time.Second,
-				Cooldown:       time.Second * 15,
-				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
-				IsPhantom:      true,
+				Character:           &shaman.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				BaseCost:            cost,
+				Cost:                cost,
+				GCD:                 time.Second,
+				Cooldown:            time.Second * 15,
+				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+				IsPhantom:           true,
 			},
 		},
 		AOECap: 9975,

@@ -18,11 +18,13 @@ func (paladin *Paladin) setupSealOfBlood() {
 	// The proc behaviour
 	sobProc := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       SealOfBloodProcActionID,
-			Character:      &paladin.Character,
-			SpellSchool:    stats.HolySpellPower,
-			CritMultiplier: paladin.DefaultMeleeCritMultiplier(),
-			IsPhantom:      true,
+			ActionID:            SealOfBloodProcActionID,
+			Character:           &paladin.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolHoly,
+			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -92,10 +94,12 @@ var SealOfCommandProcActionID = core.ActionID{SpellID: 20424}
 func (paladin *Paladin) setupSealOfCommand() {
 	socProc := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       SealOfCommandProcActionID,
-			Character:      &paladin.Character,
-			SpellSchool:    stats.HolySpellPower,
-			CritMultiplier: paladin.DefaultMeleeCritMultiplier(),
+			ActionID:            SealOfCommandProcActionID,
+			Character:           &paladin.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolHoly,
+			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{

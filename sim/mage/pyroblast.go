@@ -17,9 +17,11 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDPyroblast},
-				Character:   &mage.Character,
-				SpellSchool: stats.FireSpellPower,
+				ActionID:            core.ActionID{SpellID: SpellIDPyroblast},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 500,
@@ -71,8 +73,10 @@ func (mage *Mage) newPyroblastDotTemplate(sim *core.Simulation) core.SimpleSpell
 					SpellID: SpellIDPyroblast,
 					Tag:     CastTagPyroblastDot,
 				},
-				Character:   &mage.Character,
-				SpellSchool: stats.FireSpellPower,
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
 			},
 		},
 		Effect: core.SpellHitEffect{

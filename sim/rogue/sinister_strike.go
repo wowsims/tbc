@@ -19,10 +19,12 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.MeleeAb
 	refundAmount := energyCost * 0.8
 	ability := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:    SinisterStrikeActionID,
-			Character:   &rogue.Character,
-			SpellSchool: stats.AttackPower,
-			GCD:         time.Second * 1,
+			ActionID:            SinisterStrikeActionID,
+			Character:           &rogue.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			GCD:                 time.Second * 1,
 			Cost: core.ResourceCost{
 				Type:  stats.Energy,
 				Value: energyCost,

@@ -17,9 +17,11 @@ const IvoryMoongoddess int32 = 27518
 
 func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		ActionID:    core.ActionID{SpellID: SpellIDSF8},
-		Character:   &druid.Character,
-		SpellSchool: stats.ArcaneSpellPower,
+		ActionID:            core.ActionID{SpellID: SpellIDSF8},
+		Character:           &druid.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolArcane,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 370,

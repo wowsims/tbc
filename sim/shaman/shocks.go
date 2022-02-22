@@ -20,7 +20,8 @@ func (shaman *Shaman) ShockCD() time.Duration {
 }
 
 // Shared logic for all shocks.
-func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32, spellSchool stats.Stat, baseManaCost float64) core.SimpleSpell {
+func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32, spellSchool core.SpellSchool, baseManaCost float64) core.SimpleSpell {
+	cost := core.ResourceCost{Type: stats.Mana, Value: baseManaCost}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -28,20 +29,16 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 					SpellID:    spellID,
 					CooldownID: ShockCooldownID,
 				},
-				Character:   &shaman.Character,
-				SpellSchool: spellSchool,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: baseManaCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: baseManaCost,
-				},
-				GCD:            core.GCDDefault,
-				Cooldown:       shaman.ShockCD(),
-				Binary:         true,
-				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
+				Character:           &shaman.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         spellSchool,
+				SpellExtras:         core.SpellExtrasBinary,
+				BaseCost:            cost,
+				Cost:                cost,
+				GCD:                 core.GCDDefault,
+				Cooldown:            shaman.ShockCD(),
+				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -100,7 +97,7 @@ func (shaman *Shaman) applyShockInitModifiers(spellCast *core.SpellCast) {
 }
 
 func (shaman *Shaman) newEarthShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := shaman.newShockTemplateSpell(sim, SpellIDEarthShock, stats.NatureSpellPower, 535.0)
+	spell := shaman.newShockTemplateSpell(sim, SpellIDEarthShock, core.SpellSchoolNature, 535.0)
 
 	spell.Effect.DirectInput = core.DirectDamageInput{
 		MinBaseDamage:    661,
@@ -123,7 +120,7 @@ func (shaman *Shaman) NewEarthShock(sim *core.Simulation, target *core.Target) *
 }
 
 func (shaman *Shaman) newFlameShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := shaman.newShockTemplateSpell(sim, SpellIDFlameShock, stats.FireSpellPower, 500.0)
+	spell := shaman.newShockTemplateSpell(sim, SpellIDFlameShock, core.SpellSchoolFire, 500.0)
 
 	spell.Effect.DirectInput = core.DirectDamageInput{
 		MinBaseDamage:    377,
@@ -158,7 +155,7 @@ func (shaman *Shaman) NewFlameShock(sim *core.Simulation, target *core.Target) *
 }
 
 func (shaman *Shaman) newFrostShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := shaman.newShockTemplateSpell(sim, SpellIDFrostShock, stats.FrostSpellPower, 525.0)
+	spell := shaman.newShockTemplateSpell(sim, SpellIDFrostShock, core.SpellSchoolFrost, 525.0)
 
 	spell.Effect.DirectInput = core.DirectDamageInput{
 		MinBaseDamage:    647,

@@ -17,8 +17,10 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 				ActionID: core.ActionID{
 					SpellID: SpellIDConsecration,
 				},
-				Character:   &paladin.Character,
-				SpellSchool: stats.HolySpellPower,
+				Character:           &paladin.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolHoly,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 660,

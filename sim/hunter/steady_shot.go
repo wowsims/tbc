@@ -51,10 +51,12 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       SteadyShotActionID,
-			Character:      &hunter.Character,
-			SpellSchool:    stats.AttackPower,
-			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+			ActionID:            SteadyShotActionID,
+			Character:           &hunter.Character,
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{

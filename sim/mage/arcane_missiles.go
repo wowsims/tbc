@@ -16,9 +16,11 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDArcaneMissiles},
-				Character:   &mage.Character,
-				SpellSchool: stats.ArcaneSpellPower,
+				ActionID:            core.ActionID{SpellID: SpellIDArcaneMissiles},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolArcane,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 740,

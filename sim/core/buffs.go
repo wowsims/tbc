@@ -357,20 +357,20 @@ func ImprovedSanctityAura(sim *Simulation, level float64) Aura {
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
 			// unsure if this scaling should be additive or multiplicative
 			// scale 10% for holy damange
-			if ability.SpellSchool == stats.HolySpellPower {
+			if ability.SpellSchool.Matches(SpellSchoolHoly) {
 				hitEffect.DamageMultiplier *= 1.1
 			}
 			// scale additional 2% for all damage
 			hitEffect.DamageMultiplier *= 1 + 0.01*level
 		},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if spellCast.SpellSchool == stats.HolySpellPower {
+			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
 				spellEffect.DamageMultiplier *= 1.1
 			}
 			spellEffect.DamageMultiplier *= 1 + 0.01*level
 		},
 		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			if spellCast.SpellSchool == stats.HolySpellPower {
+			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
 				*tickDamage *= 1.1
 			}
 			*tickDamage *= 1 + 0.01*level
@@ -412,7 +412,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 		MeleeAbility: MeleeAbility{
 			ActionID:       actionID,
 			Character:      character,
-			SpellSchool:    stats.AttackPower,
+			SpellSchool:    SpellSchoolPhysical,
 			CritMultiplier: character.AutoAttacks.MHAuto.CritMultiplier,
 		},
 		Effect: AbilityHitEffect{

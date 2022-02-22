@@ -42,7 +42,7 @@ func applyRaceEffects(agent Agent) {
 				return Aura{
 					ID: DwarfGunSpecializationAuraID,
 					OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-						if hitEffect.IsRanged() {
+						if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 							hitEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
 						}
 					},
@@ -209,7 +209,7 @@ func applyRaceEffects(agent Agent) {
 				return Aura{
 					ID: TrollBowSpecializationAuraID,
 					OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-						if hitEffect.IsRanged() {
+						if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 							hitEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
 						}
 					},

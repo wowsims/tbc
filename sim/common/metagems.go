@@ -103,7 +103,7 @@ func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "Thundering Skyfire Diamond") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Thundering Skyfire Diamond") {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)

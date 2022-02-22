@@ -14,9 +14,11 @@ var RaptorStrikeActionID = core.ActionID{SpellID: 27014, CooldownID: RaptorStrik
 func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:    RaptorStrikeActionID,
-			Character:   &hunter.Character,
-			SpellSchool: stats.AttackPower,
+			ActionID:            RaptorStrikeActionID,
+			Character:           &hunter.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: 120,

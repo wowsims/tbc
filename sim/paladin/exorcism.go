@@ -15,9 +15,11 @@ func (paladin *Paladin) newExorcismTemplate(sim *core.Simulation) core.SimpleSpe
 	exo := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    ExorcismActionID,
-				Character:   &paladin.Character,
-				SpellSchool: stats.HolySpellPower,
+				ActionID:            ExorcismActionID,
+				Character:           &paladin.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolHoly,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 295,

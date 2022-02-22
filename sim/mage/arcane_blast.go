@@ -29,9 +29,11 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDArcaneBlast},
-				Character:   &mage.Character,
-				SpellSchool: stats.ArcaneSpellPower,
+				ActionID:            core.ActionID{SpellID: SpellIDArcaneBlast},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolArcane,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: ArcaneBlastBaseManaCost,

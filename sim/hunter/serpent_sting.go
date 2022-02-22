@@ -17,9 +17,11 @@ func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.Simp
 	dotSpell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    SerpentStingActionID,
-				SpellSchool: stats.NatureSpellPower,
-				Character:   &hunter.Character,
+				ActionID:            SerpentStingActionID,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolNature,
+				Character:           &hunter.Character,
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -44,10 +46,12 @@ func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.Simp
 func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:    SerpentStingActionID,
-			Character:   &hunter.Character,
-			SpellSchool: stats.NatureSpellPower,
-			GCD:         core.GCDDefault,
+			ActionID:            SerpentStingActionID,
+			Character:           &hunter.Character,
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolNature,
+			GCD:                 core.GCDDefault,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: 275,

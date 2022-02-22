@@ -167,9 +167,11 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDWaterbolt},
-				Character:   &we.Character,
-				SpellSchool: stats.FrostSpellPower,
+				ActionID:            core.ActionID{SpellID: SpellIDWaterbolt},
+				Character:           &we.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFrost,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: baseManaCost,

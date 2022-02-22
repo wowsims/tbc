@@ -15,13 +15,15 @@ var CrusaderStrikeActionID = core.ActionID{SpellID: 35395, CooldownID: CrusaderS
 func (paladin *Paladin) newCrusaderStrikeTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	cs := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       CrusaderStrikeActionID,
-			Character:      &paladin.Character,
-			SpellSchool:    stats.AttackPower,
-			GCD:            core.GCDDefault,
-			Cooldown:       time.Second * 6,
-			CritMultiplier: paladin.DefaultMeleeCritMultiplier(),
-			IsPhantom:      true,
+			ActionID:            CrusaderStrikeActionID,
+			Character:           &paladin.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			GCD:                 core.GCDDefault,
+			Cooldown:            time.Second * 6,
+			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: 236,

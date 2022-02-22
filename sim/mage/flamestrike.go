@@ -17,9 +17,11 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDFlamestrike},
-				Character:   &mage.Character,
-				SpellSchool: stats.FireSpellPower,
+				ActionID:            core.ActionID{SpellID: SpellIDFlamestrike},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 1175,
@@ -80,8 +82,10 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 					SpellID: SpellIDFlamestrike,
 					Tag:     CastTagFlamestrikeDot,
 				},
-				Character:   &mage.Character,
-				SpellSchool: stats.FireSpellPower,
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
 			},
 		},
 	}

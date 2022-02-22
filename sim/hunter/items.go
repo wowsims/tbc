@@ -127,7 +127,7 @@ func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 		return core.Aura{
 			ID: BlackBowOfTheBetrayerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsRanged() {
+				if !hitEffect.Landed() || !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
 				character.AddMana(sim, manaGain, core.ActionID{SpellID: 46939}, false)

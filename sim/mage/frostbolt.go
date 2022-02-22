@@ -13,9 +13,12 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDFrostbolt},
-				Character:   &mage.Character,
-				SpellSchool: stats.FrostSpellPower,
+				ActionID:            core.ActionID{SpellID: SpellIDFrostbolt},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFrost,
+				SpellExtras:         core.SpellExtrasBinary,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 330,
@@ -27,7 +30,6 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 				CastTime:       time.Millisecond * 3000,
 				GCD:            core.GCDDefault,
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)+0.2*float64(mage.Talents.IceShards)),
-				Binary:         true,
 			},
 		},
 		Effect: core.SpellHitEffect{

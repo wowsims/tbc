@@ -287,7 +287,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 							return
 						}
 
-						if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "Badge of the Swarmguard") {
+						if !ppmm.Proc(sim, hitEffect.IsMH(), ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Badge of the Swarmguard") {
 							return
 						}
 
@@ -367,11 +367,13 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:       core.ActionID{ItemID: 28579},
-					Character:      character,
-					IsPhantom:      true,
-					SpellSchool:    stats.NatureSpellPower,
-					CritMultiplier: character.DefaultSpellCritMultiplier(),
+					ActionID:            core.ActionID{ItemID: 28579},
+					Character:           character,
+					IsPhantom:           true,
+					CritRollCategory:    core.CritRollCategoryMagical,
+					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+					SpellSchool:         core.SpellSchoolNature,
+					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -394,7 +396,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || ability.IsPhantom {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "RomulosPoisonVial") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "RomulosPoisonVial") {
 					return
 				}
 
@@ -430,7 +432,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "dragonspine") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "dragonspine") {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
@@ -522,7 +524,7 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || ability.IsPhantom {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "Madness of the Betrayer") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Madness of the Betrayer") {
 					return
 				}
 

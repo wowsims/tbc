@@ -13,9 +13,11 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDScorch},
-				Character:   &mage.Character,
-				SpellSchool: stats.FireSpellPower,
+				ActionID:            core.ActionID{SpellID: SpellIDScorch},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 180,

@@ -17,9 +17,11 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDFireball},
-				Character:   &mage.Character,
-				SpellSchool: stats.FireSpellPower,
+				ActionID:            core.ActionID{SpellID: SpellIDFireball},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 425,
@@ -77,8 +79,10 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 					SpellID: SpellIDFireball,
 					Tag:     CastTagFireballDot,
 				},
-				Character:   &mage.Character,
-				SpellSchool: stats.FireSpellPower,
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
 			},
 		},
 		Effect: core.SpellHitEffect{

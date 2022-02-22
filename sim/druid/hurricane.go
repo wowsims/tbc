@@ -21,8 +21,10 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 					SpellID:    SpellIDHurricane,
 					CooldownID: HurricaneCooldownID,
 				},
-				Character:   &druid.Character,
-				SpellSchool: stats.NatureSpellPower,
+				Character:           &druid.Character,
+				SpellSchool:         core.SpellSchoolNature,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 1905,

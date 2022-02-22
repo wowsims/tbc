@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDStarshards int32 = 25446
@@ -17,11 +16,13 @@ func (priest *Priest) newStarshardsTemplate(sim *core.Simulation) core.SimpleSpe
 			SpellID:    SpellIDStarshards,
 			CooldownID: SSCooldownID,
 		},
-		Character:   &priest.Character,
-		SpellSchool: stats.ArcaneSpellPower,
-		CastTime:    0,
-		GCD:         core.GCDDefault,
-		Cooldown:    time.Second * 30,
+		Character:           &priest.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolArcane,
+		CastTime:            0,
+		GCD:                 core.GCDDefault,
+		Cooldown:            time.Second * 30,
 	}
 
 	effect := core.SpellHitEffect{
