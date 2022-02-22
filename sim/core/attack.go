@@ -56,8 +56,10 @@ type MeleeAbility struct {
 
 	CastTime time.Duration // most melee skills are instant... are there any with a cast time?
 
-	// E.g. for nature spells, set to stats.NatureSpellPower.
-	SpellSchool stats.Stat
+	OutcomeRollCategory OutcomeRollCategory
+	CritRollCategory    CritRollCategory
+	SpellSchool         SpellSchool
+	SpellExtras         SpellExtras
 
 	// How much to multiply damage by, if this cast crits.
 	CritMultiplier float64
@@ -251,7 +253,7 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 
 	// Miss
 	missChance := ahe.Target.MissChance
-	if ahe.ProcMask.Matches(ProcMaskMeleeWhiteHit) && character.AutoAttacks.IsDualWielding {
+	if character.AutoAttacks.IsDualWielding && ability.OutcomeRollCategory.Matches(OutcomeRollCategoryWhite) {
 		missChance += 0.19
 	}
 	hitBonus := ((character.stats[stats.MeleeHit] + ahe.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - ahe.Target.HitSuppression
@@ -264,7 +266,7 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 		return OutcomeMiss
 	}
 
-	if !ahe.ProcMask.Matches(ProcMaskRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
+	if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
 		// Dodge
 		dodge := ahe.Target.Dodge
 		expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
@@ -289,6 +291,11 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 		chance += ahe.Target.Glance
 		if roll < chance {
 			return OutcomeGlance
+		}
+
+		// No need to crit roll if we are a special attack.
+		if ability.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial) {
+			return OutcomeHit
 		}
 
 		// Crit
@@ -318,10 +325,10 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 
 	var attackPower float64
 	var bonusWeaponDamage float64
-	if ahe.ProcMask.Matches(ProcMaskRanged) {
+	if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 		attackPower = character.stats[stats.RangedAttackPower] + ahe.BonusAttackPower
 		bonusWeaponDamage = character.PseudoStats.BonusRangedDamage + ahe.BonusWeaponDamage
-	} else {
+	} else if ability.SpellSchool == SpellSchoolPhysical { // any physical attack gains from AP
 		attackPower = character.stats[stats.AttackPower] + ahe.BonusAttackPower
 		bonusWeaponDamage = character.PseudoStats.BonusMeleeDamage + ahe.BonusWeaponDamage
 	}
@@ -331,7 +338,7 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		dmg += ahe.WeaponInput.CalculateDamage(attackPower, bonusWeaponDamage)
 	} else if ahe.WeaponInput.DamageMultiplier != 0 {
 		// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
-		if ahe.IsRanged() {
+		if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 			dmg += character.AutoAttacks.Ranged.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
 		} else if ahe.IsMH() {
 			dmg += character.AutoAttacks.MH.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
@@ -354,7 +361,7 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	dmg += ahe.DirectInput.FlatDamageBonus
 
 	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
-	if ahe.ProcMask.Matches(ProcMaskTwoRoll) {
+	if ability.OutcomeRollCategory != OutcomeRollCategoryWhite {
 		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
 
 		roll := sim.RandomFloat("weapon swing")
@@ -363,6 +370,8 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		} else {
 			ahe.Outcome = OutcomeHit
 		}
+	} else if ability.ActionID.OtherID != 3 {
+		panic("ability not critting right..." + ability.ActionID.String())
 	}
 
 	if ahe.Outcome == OutcomeCrit {
@@ -372,7 +381,7 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	}
 
 	// Apply armor reduction.
-	if !ahe.IgnoreArmor {
+	if !ahe.IgnoreArmor { // TODO: replace with SpellExtras
 		dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
 	}
 
@@ -432,23 +441,22 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 
 	ability.Character.OnBeforeMelee(sim, ability)
 
-	if ability.MeleeAbility.Cost.Type != 0 {
-		if ability.MeleeAbility.Cost.Type == stats.Mana {
-			if ability.Character.CurrentMana() < ability.MeleeAbility.Cost.Value {
-				return false
-			}
-			ability.Character.SpendMana(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
-		} else if ability.MeleeAbility.Cost.Type == stats.Rage {
-			if ability.Character.CurrentRage() < ability.MeleeAbility.Cost.Value {
-				return false
-			}
-			ability.Character.SpendRage(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
-		} else {
-			if ability.Character.CurrentEnergy() < ability.MeleeAbility.Cost.Value {
-				return false
-			}
-			ability.Character.SpendEnergy(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
+	switch ability.MeleeAbility.Cost.Type {
+	case stats.Mana:
+		if ability.Character.CurrentMana() < ability.MeleeAbility.Cost.Value {
+			return false
 		}
+		ability.Character.SpendMana(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
+	case stats.Rage:
+		if ability.Character.CurrentRage() < ability.MeleeAbility.Cost.Value {
+			return false
+		}
+		ability.Character.SpendRage(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
+	case stats.Energy:
+		if ability.Character.CurrentEnergy() < ability.MeleeAbility.Cost.Value {
+			return false
+		}
+		ability.Character.SpendEnergy(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
 	}
 
 	if len(ability.Effects) == 0 {
@@ -573,10 +581,12 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		ReplaceMHSwing: options.ReplaceMHSwing,
 		ActiveMeleeAbility: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
-				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack},
-				Character:   character,
-				SpellSchool: stats.AttackPower,
-				IgnoreCost:  true,
+				ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack},
+				Character:           character,
+				OutcomeRollCategory: OutcomeRollCategoryWhite,
+				CritRollCategory:    CritRollCategoryPhysical,
+				SpellSchool:         SpellSchoolPhysical,
+				IgnoreCost:          true,
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{
@@ -592,10 +602,12 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		},
 		RangedAuto: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
-				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
-				Character:   character,
-				SpellSchool: stats.AttackPower,
-				IgnoreCost:  true,
+				ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionShoot},
+				Character:           character,
+				SpellSchool:         SpellSchoolPhysical,
+				OutcomeRollCategory: OutcomeRollCategoryRanged, // TODO: & OutcomeCategoryWhite?
+				CritRollCategory:    CritRollCategoryPhysical,
+				IgnoreCost:          true,
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{

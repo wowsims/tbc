@@ -18,11 +18,13 @@ var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: Judgeme
 func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	job := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       JudgementOfBloodActionID,
-			Character:      &paladin.Character,
-			SpellSchool:    stats.HolySpellPower,
-			CritMultiplier: paladin.DefaultMeleeCritMultiplier(),
-			IsPhantom:      true,
+			ActionID:            JudgementOfBloodActionID,
+			Character:           &paladin.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolHoly,
+			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{

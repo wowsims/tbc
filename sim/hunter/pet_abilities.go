@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 type PetAbilityType int
@@ -81,12 +80,14 @@ func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 	cooldown := time.Second * 10
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       core.ActionID{SpellID: 27050},
-			Character:      &hp.Character,
-			SpellSchool:    stats.AttackPower,
-			Cooldown:       cooldown,
-			GCD:            core.GCDDefault,
-			CritMultiplier: 2,
+			ActionID:            core.ActionID{SpellID: 27050},
+			Character:           &hp.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			Cooldown:            cooldown,
+			GCD:                 core.GCDDefault,
+			CritMultiplier:      2,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -134,11 +135,13 @@ func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       core.ActionID{SpellID: 27049},
-			Character:      &hp.Character,
-			SpellSchool:    stats.AttackPower,
-			GCD:            core.GCDDefault,
-			CritMultiplier: 2,
+			ActionID:            core.ActionID{SpellID: 27049},
+			Character:           &hp.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			GCD:                 core.GCDDefault,
+			CritMultiplier:      2,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -177,11 +180,13 @@ func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
 func (hp *HunterPet) newGore(sim *core.Simulation, isPrimary bool) PetAbility {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       core.ActionID{SpellID: 35298},
-			Character:      &hp.Character,
-			SpellSchool:    stats.AttackPower,
-			GCD:            core.GCDDefault,
-			CritMultiplier: 2,
+			ActionID:            core.ActionID{SpellID: 35298},
+			Character:           &hp.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			GCD:                 core.GCDDefault,
+			CritMultiplier:      2,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -272,11 +277,13 @@ func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) Pe
 func (hp *HunterPet) newScreech(sim *core.Simulation, isPrimary bool) PetAbility {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       core.ActionID{SpellID: 27051},
-			Character:      &hp.Character,
-			SpellSchool:    stats.AttackPower,
-			GCD:            core.GCDDefault,
-			CritMultiplier: 2,
+			ActionID:            core.ActionID{SpellID: 27051},
+			Character:           &hp.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			GCD:                 core.GCDDefault,
+			CritMultiplier:      2,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{

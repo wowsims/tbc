@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var SteadyShotActionID = core.ActionID{SpellID: 34120}
@@ -45,11 +44,13 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       SteadyShotActionID,
-			Character:      &hunter.Character,
-			SpellSchool:    stats.AttackPower,
-			IgnoreCost:     true,
-			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+			ActionID:            SteadyShotActionID,
+			Character:           &hunter.Character,
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			IgnoreCost:          true,
+			CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{

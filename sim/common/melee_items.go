@@ -346,12 +346,14 @@ func ApplyDespair(agent core.Agent) {
 
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       actionID,
-			Character:      character,
-			SpellSchool:    stats.AttackPower,
-			CritMultiplier: character.DefaultMeleeCritMultiplier(),
-			IgnoreCost:     true,
-			IsPhantom:      true,
+			ActionID:            actionID,
+			Character:           character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			CritMultiplier:      character.DefaultMeleeCritMultiplier(),
+			IgnoreCost:          true,
+			IsPhantom:           true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -404,12 +406,14 @@ func ApplyTheDecapitator(agent core.Agent) {
 
 	templ := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       actionID,
-			Character:      character,
-			SpellSchool:    stats.AttackPower,
-			CritMultiplier: character.DefaultMeleeCritMultiplier(),
-			IgnoreCost:     true,
-			IsPhantom:      true,
+			ActionID:            actionID,
+			Character:           character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			CritMultiplier:      character.DefaultMeleeCritMultiplier(),
+			IgnoreCost:          true,
+			IsPhantom:           true,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{

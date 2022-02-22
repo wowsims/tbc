@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
@@ -271,7 +270,7 @@ func BloodFrenzyAura() Aura {
 		ID:       BloodFrenzyDebuffID,
 		ActionID: ActionID{SpellID: 29859},
 		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-			if ability.SpellSchool != stats.AttackPower {
+			if !ability.SpellSchool.Matches(SpellSchoolPhysical) {
 				return
 			}
 			hitEffect.DamageMultiplier *= 1.04

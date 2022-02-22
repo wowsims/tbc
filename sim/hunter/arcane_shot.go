@@ -13,11 +13,13 @@ var ArcaneShotActionID = core.ActionID{SpellID: 27019, CooldownID: ArcaneShotCoo
 func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:    ArcaneShotActionID,
-			Character:   &hunter.Character,
-			SpellSchool: stats.ArcaneSpellPower,
-			GCD:         core.GCDDefault,
-			Cooldown:    time.Second * 6,
+			ActionID:            ArcaneShotActionID,
+			Character:           &hunter.Character,
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolArcane,
+			GCD:                 core.GCDDefault,
+			Cooldown:            time.Second * 6,
 			Cost: core.ResourceCost{
 				Type:  stats.Mana,
 				Value: 230,

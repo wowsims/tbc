@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var MultiShotCooldownID = core.NewCooldownID()
@@ -44,10 +43,12 @@ func (hunter *Hunter) newMultiShotCastTemplate(sim *core.Simulation) core.Simple
 func (hunter *Hunter) newMultiShotAbilityTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:    MultiShotActionID,
-			Character:   &hunter.Character,
-			SpellSchool: stats.AttackPower,
-			IgnoreCost:  true,
+			ActionID:            MultiShotActionID,
+			Character:           &hunter.Character,
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			IgnoreCost:          true,
 			// TODO: If we ever allow multiple targets to have their own type, need to
 			// update this.
 			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),

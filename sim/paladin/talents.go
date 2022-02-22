@@ -127,7 +127,7 @@ func (paladin *Paladin) applyVengeance() {
 				}
 			},
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if ability.SpellSchool == stats.HolySpellPower || ability.SpellSchool == stats.AttackPower {
+				if ability.SpellSchool.Matches(core.SpellSchoolHoly | core.SpellSchoolPhysical) {
 					hitEffect.DamageMultiplier *= 1 + (0.01*float64(paladin.Talents.Vengeance))*float64(paladin.NumStacks(VengeanceAuraID))
 				}
 			},

@@ -30,10 +30,12 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilit
 
 	ability := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:    EviscerateActionID,
-			Character:   &rogue.Character,
-			SpellSchool: stats.AttackPower,
-			GCD:         time.Second * 1,
+			ActionID:            EviscerateActionID,
+			Character:           &rogue.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			GCD:                 time.Second * 1,
 			Cost: core.ResourceCost{
 				Type:  stats.Energy,
 				Value: EviscerateEnergyCost,

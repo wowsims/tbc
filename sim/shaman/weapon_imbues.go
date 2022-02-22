@@ -6,7 +6,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var TotemOfTheAstralWinds int32 = 27815
@@ -30,11 +29,13 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 	wftempl := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       core.ActionID{SpellID: 25505},
-			Character:      &shaman.Character,
-			SpellSchool:    stats.AttackPower,
-			CritMultiplier: shaman.DefaultMeleeCritMultiplier(),
-			IsPhantom:      true,
+			ActionID:            core.ActionID{SpellID: 25505},
+			Character:           &shaman.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
 		},
 	}
 

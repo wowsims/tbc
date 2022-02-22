@@ -59,10 +59,12 @@ func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.MeleeAbil
 
 	ama := core.ActiveMeleeAbility{
 		MeleeAbility: core.MeleeAbility{
-			ActionID:       core.ActionID{SpellID: 34027},
-			Character:      &hp.Character,
-			SpellSchool:    stats.AttackPower,
-			CritMultiplier: 2,
+			ActionID:            core.ActionID{SpellID: 34027},
+			Character:           &hp.Character,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			SpellSchool:         core.SpellSchoolPhysical,
+			CritMultiplier:      2,
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
