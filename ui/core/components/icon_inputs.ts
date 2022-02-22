@@ -128,6 +128,7 @@ export const DefaultFelManaPotion = makeEnumValueConsumeInput(ActionId.fromItemI
 
 export const DefaultDarkRune = makeEnumValueConsumeInput(ActionId.fromItemId(12662), 'defaultConjured', Conjured.ConjuredDarkRune, ['Conjured']);
 export const DefaultFlameCap = makeEnumValueConsumeInput(ActionId.fromItemId(22788), 'defaultConjured', Conjured.ConjuredFlameCap, ['Conjured']);
+export const DefaultMageManaEmerald = makeEnumValueConsumeInput(ActionId.fromItemId(22044), 'defaultConjured', Conjured.ConjuredMageManaEmerald, ['Conjured']);
 
 export const ScrollOfAgilityV = makeEnumValueConsumeInput(ActionId.fromItemId(27498), 'scrollOfAgility', 5);
 export const ScrollOfSpiritV = makeEnumValueConsumeInput(ActionId.fromItemId(27501), 'scrollOfSpirit', 5, ['Spirit']);

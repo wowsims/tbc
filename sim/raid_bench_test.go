@@ -91,11 +91,8 @@ var castersWithElemental = &proto.Party{
 						Type: proto.ElementalShaman_Rotation_Adaptive,
 					},
 					Options: &proto.ElementalShaman_Options{
-						WaterShield:     true,
-						Bloodlust:       true,
-						ManaSpringTotem: true,
-						TotemOfWrath:    true,
-						WrathOfAirTotem: true,
+						WaterShield: true,
+						Bloodlust:   true,
 					},
 				},
 			},

@@ -73,8 +73,7 @@ var ArcaneTalents = &proto.MageTalents{
 }
 
 var fireMageOptions = &proto.Mage_Options{
-	Armor:           proto.Mage_Options_MageArmor,
-	UseManaEmeralds: true,
+	Armor: proto.Mage_Options_MageArmor,
 }
 var PlayerOptionsFire = &proto.Player_Mage{
 	Mage: &proto.Mage{
@@ -92,8 +91,7 @@ var PlayerOptionsFire = &proto.Player_Mage{
 }
 
 var frostMageOptions = &proto.Mage_Options{
-	Armor:           proto.Mage_Options_MageArmor,
-	UseManaEmeralds: true,
+	Armor: proto.Mage_Options_MageArmor,
 }
 var PlayerOptionsFrost = &proto.Player_Mage{
 	Mage: &proto.Mage{
@@ -107,8 +105,7 @@ var PlayerOptionsFrost = &proto.Player_Mage{
 }
 
 var arcaneMageOptions = &proto.Mage_Options{
-	Armor:           proto.Mage_Options_MageArmor,
-	UseManaEmeralds: true,
+	Armor: proto.Mage_Options_MageArmor,
 }
 var PlayerOptionsArcane = &proto.Player_Mage{
 	Mage: &proto.Mage{
@@ -169,7 +166,7 @@ var FullFrostConsumes = &proto.Consumes{
 	Flask:           proto.Flask_FlaskOfPureDeath,
 	Food:            proto.Food_FoodBlackenedBasilisk,
 	DefaultPotion:   proto.Potions_SuperManaPotion,
-	DefaultConjured: proto.Conjured_ConjuredDarkRune,
+	DefaultConjured: proto.Conjured_ConjuredMageManaEmerald,
 	MainHandImbue:   proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
 }
 
@@ -177,7 +174,7 @@ var FullArcaneConsumes = &proto.Consumes{
 	Flask:           proto.Flask_FlaskOfBlindingLight,
 	Food:            proto.Food_FoodBlackenedBasilisk,
 	DefaultPotion:   proto.Potions_SuperManaPotion,
-	DefaultConjured: proto.Conjured_ConjuredDarkRune,
+	DefaultConjured: proto.Conjured_ConjuredMageManaEmerald,
 	MainHandImbue:   proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
 }
 

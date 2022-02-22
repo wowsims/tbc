@@ -49,9 +49,6 @@ export const DefaultRotation = ElementalShamanRotation.create({
 export const DefaultOptions = ElementalShamanOptions.create({
 	waterShield: true,
 	bloodlust: true,
-	totemOfWrath: true,
-	manaSpringTotem: true,
-	wrathOfAirTotem: true,
 });
 
 export const DefaultConsumes = Consumes.create({
