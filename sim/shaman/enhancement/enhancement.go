@@ -193,7 +193,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 			ability := totemAction
 			ability.DesiredCastAt = curTime
 			if prioritizeEarlier {
-				ability.MinCastAt = curTime - time.Second*10
+				ability.MinCastAt = curTime - time.Second*20
 				ability.MaxCastAt = curTime + time.Second*10
 			} else {
 				ability.MinCastAt = curTime

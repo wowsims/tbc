@@ -332,17 +332,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			if (!loadedSettings) {
 				this.applyDefaults(initEventID);
 			}
-
-			// Fix some bad defaults we used to have to enhance.
-			if (this.player.spec == Spec.SpecEnhancementShaman) {
-				const consumes = this.player.getConsumes();
-				if (consumes.flask == Flask.FlaskOfBlindingLight) {
-					consumes.flask = Flask.FlaskUnknown;
-				}
-				consumes.mainHandImbue = 0;
-				this.player.setConsumes(initEventID, consumes);
-			}
-
 			this.player.setName(initEventID, 'Player');
 
 			// This needs to go last so it doesn't re-store things as they are initialized.
