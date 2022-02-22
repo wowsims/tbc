@@ -27,15 +27,6 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 export const IconBloodlust = makeBooleanShamanBuffInput(ActionId.fromSpellId(2825), 'bloodlust');
 export const IconWaterShield = makeBooleanShamanBuffInput(ActionId.fromSpellId(33736), 'waterShield');
 
-const imbueOptions = [
-	WeaponImbue.WeaponImbueShamanWindfury,
-	WeaponImbue.WeaponImbueShamanFlametongue,
-	WeaponImbue.WeaponImbueShamanFrostbrand,
-	WeaponImbue.WeaponImbueShamanRockbiter,
-];
-export const MainHandImbue = makeWeaponImbueInput(true, imbueOptions);
-export const OffHandImbue = makeWeaponImbueInput(false, imbueOptions);
-
 export const DelayOffhandSwings = {
 	type: 'boolean' as const,
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,

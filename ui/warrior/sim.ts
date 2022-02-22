@@ -4,11 +4,9 @@ import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
-import { Drums } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
-import { Potions } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -17,6 +15,17 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+
+import { Alchohol} from '/tbc/core/proto/common.js';
+import { BattleElixir } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
+import { Conjured } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
+import { PetFood } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 
 import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents as WarriorTalents, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
 
@@ -109,7 +118,6 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 			selfBuffInputs: [
 				// TODO: Move reck to cooldown tabs
 				WarriorInputs.Recklessness ,
-				IconInputs.DrumsOfBattleConsume,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
@@ -137,18 +145,44 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 				IconInputs.ImprovedSealOfTheCrusader,
 				IconInputs.CurseOfRecklessness,
 			],
-			// IconInputs to include in the 'Consumes' section on the settings tab.
-			consumeInputs: [
-				IconInputs.DefaultHastePotion,
-				// IconInputs.DefaultMightyRagePotion,
-				IconInputs.ElixirOfMajorAgility,
-				// IconInputs.ElixirOfTheMongoose,
-				IconInputs.ElixirOfDemonslaying,
-				// IconInputs.AdamantiteStone,
-				// IconInputs.ElementalStone,
-				IconInputs.RoastedClefthoof,
-				// IconInputs.SpicyHotTalbuk,
-			],
+			// Which options are selectable in the 'Consumes' section.
+			consumeOptions: {
+				potions: [
+					Potions.HastePotion,
+				],
+				conjured: [
+					Conjured.ConjuredFlameCap,
+				],
+				flasks: [
+					Flask.FlaskOfRelentlessAssault,
+				],
+				battleElixirs: [
+					BattleElixir.ElixirOfDemonslaying,
+					BattleElixir.ElixirOfMajorStrength,
+					BattleElixir.ElixirOfMajorAgility,
+					BattleElixir.ElixirOfTheMongoose,
+				],
+				guardianElixirs: [
+				],
+				food: [
+					Food.FoodRoastedClefthoof,
+					Food.FoodGrilledMudfish,
+					Food.FoodSpicyHotTalbuk,
+					Food.FoodRavagerDog,
+				],
+				alcohol: [
+				],
+				weaponImbues: [
+					WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
+					WeaponImbue.WeaponImbueAdamantiteWeightstone,
+				],
+				other: [
+					IconInputs.DrumsOfBattleConsume,
+					IconInputs.BattleChicken,
+					IconInputs.ScrollOfAgilityV,
+					IconInputs.ScrollOfStrengthV,
+				],
+			},
 			// Inputs to include in the 'Rotation' section on the settings tab.
 			rotationInputs: WarriorInputs.WarriorRotationConfig,
 			// Inputs to include in the 'Other' section on the settings tab.

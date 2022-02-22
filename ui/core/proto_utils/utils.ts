@@ -728,6 +728,9 @@ const dualWieldSpecs: Array<Spec> = [
 	Spec.SpecRogue,
 	Spec.SpecWarrior,
 ];
+export function isDualWieldSpec(spec: Spec): boolean {
+	return dualWieldSpecs.includes(spec);
+}
 
 // Prefixes used for storing browser data for each site. Even if a Spec is
 // renamed, DO NOT change these values or people will lose their saved data.

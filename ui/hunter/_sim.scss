@@ -10,7 +10,7 @@
 
 // Set grid width for icon sections based on how many buffs we configured.
 .hunter-sim-ui .self-buffs-section {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }
 .hunter-sim-ui .consumes-section {
   grid-template-columns: repeat(6, 1fr);

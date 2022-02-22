@@ -80,7 +80,7 @@ export class CooldownsPicker extends Component {
 			numColumns: 3,
 			values: ([
 				{ color: '#grey', value: ActionIdProto.create() },
-			] as Array<IconEnumValueConfig<ActionIdProto>>).concat(availableCooldowns.map(cooldownAction => {
+			] as Array<IconEnumValueConfig<Player<any>, ActionIdProto>>).concat(availableCooldowns.map(cooldownAction => {
 				return { actionId: ActionId.fromProto(cooldownAction), value: cooldownAction };
 			})),
 			equals: (a: ActionIdProto, b: ActionIdProto) => ActionIdProto.equals(a, b),
