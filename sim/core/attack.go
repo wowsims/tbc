@@ -577,7 +577,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionShoot},
 				Character:           character,
 				SpellSchool:         SpellSchoolPhysical,
-				OutcomeRollCategory: OutcomeRollCategoryRanged, // TODO: & OutcomeCategoryWhite?
+				OutcomeRollCategory: OutcomeRollCategoryRanged | OutcomeRollCategoryWhite,
 				CritRollCategory:    CritRollCategoryPhysical,
 			},
 			Effect: AbilityHitEffect{

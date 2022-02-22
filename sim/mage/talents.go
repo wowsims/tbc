@@ -76,9 +76,7 @@ func (mage *Mage) applyArcaneConcentration() {
 			ActionID: core.ActionID{SpellID: 12536},
 			OnCast: func(sim *core.Simulation, cast *core.Cast) {
 				cast.Cost.Value = 0
-			},
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-
+				cast.BonusCritRating += bonusCrit
 			},
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				mage.RemoveAura(sim, ClearcastingAuraID)
@@ -100,13 +98,8 @@ func (mage *Mage) applyArcaneConcentration() {
 				}
 
 				mage.AddAura(sim, ccAura)
-			},
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.IsSpellAction(SpellIDArcaneMissiles) {
-					return
-				}
 				// Also has special interaction with AM, gets the benefit of CC crit bonus on its own cast.
-				spellEffect.BonusSpellCritRating += bonusCrit
+				cast.BonusCritRating += bonusCrit
 			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellCast.IsSpellAction(SpellIDArcaneMissiles) {
@@ -296,8 +289,8 @@ func (mage *Mage) registerCombustionCD() {
 					ID:       CombustionAuraID,
 					ActionID: actionID,
 					Expires:  core.NeverExpires,
-					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						spellEffect.BonusSpellCritRating += float64(numHits) * 10 * core.SpellCritRatingPerCritChance
+					OnCast: func(sim *core.Simulation, cast *core.Cast) {
+						cast.BonusCritRating += float64(numHits) * 10 * core.SpellCritRatingPerCritChance
 					},
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						numHits++
