@@ -402,11 +402,6 @@ func (ahe *AbilityHitEffect) IsMelee() bool {
 	return ahe.ProcMask.Matches(ProcMaskMelee)
 }
 
-// Returns whether this hit effect is associated with the ranged weapon.
-func (ahe *AbilityHitEffect) IsRanged() bool {
-	return ahe.ProcMask.Matches(ProcMaskRanged)
-}
-
 // Returns whether this hit effect matches the hand in which a weapon is equipped.
 func (ahe *AbilityHitEffect) IsEquippedHand(mh bool, oh bool) bool {
 	return (mh && ahe.IsMH()) || (oh && ahe.IsOH())

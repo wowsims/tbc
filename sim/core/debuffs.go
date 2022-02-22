@@ -439,7 +439,7 @@ func HuntersMarkAura(points int32, fullyStacked bool) Aura {
 			}
 		},
 		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-			if !hitEffect.IsRanged() || !hitEffect.Landed() {
+			if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || !hitEffect.Landed() {
 				return
 			}
 			if stacks < maxStacks {

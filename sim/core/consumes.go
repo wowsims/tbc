@@ -227,7 +227,7 @@ func applyAdamantiteSharpeningStoneAura(character *Character, consumes proto.Con
 		return Aura{
 			ID: AdamantiteSharpeningStoneMeleeCritAuraID,
 			OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-				if !hitEffect.IsRanged() {
+				if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 					hitEffect.BonusCritRating += critBonus
 				}
 			},

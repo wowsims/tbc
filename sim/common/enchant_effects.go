@@ -105,7 +105,7 @@ func ApplyBiznicksScope(agent core.Agent) {
 		return core.Aura{
 			ID: BiznicksScopeAuraID,
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.IsRanged() {
+				if ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					hitEffect.BonusHitRating += 30
 				}
 			},
@@ -203,7 +203,7 @@ func ApplyStabilizedEterniumScope(agent core.Agent) {
 		return core.Aura{
 			ID: StabilizedEterniumScopeAuraID,
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.IsRanged() {
+				if ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					hitEffect.BonusCritRating += 28
 				}
 			},

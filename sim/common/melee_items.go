@@ -535,7 +535,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), hitEffect.IsRanged(), "Band of the Eternal Champion") {
+				if !ppmm.Proc(sim, hitEffect.IsMH(), ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Band of the Eternal Champion") {
 					return
 				}
 
@@ -1000,7 +1000,7 @@ func ApplyCloakOfDarkness(agent core.Agent) {
 		return core.Aura{
 			ID: CloakOfDarknessAuraID,
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.IsRanged() {
+				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					hitEffect.BonusCritRating += 24
 				}
 			},
