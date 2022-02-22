@@ -13,6 +13,9 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
+				ActionID: core.ActionID{
+					SpellID: SpellIDBlizzard,
+				},
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFrost,
@@ -26,9 +29,6 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 					Value: 1645,
 				},
 				GCD: core.GCDDefault,
-				ActionID: core.ActionID{
-					SpellID: SpellIDBlizzard,
-				},
 			},
 		},
 		IsChannel: true,

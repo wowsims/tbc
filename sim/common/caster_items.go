@@ -74,9 +74,9 @@ func ApplyTimbals(agent core.Agent) {
 	timbalsTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
+				ActionID:            core.ActionID{SpellID: 45055},
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				CritRollCategory:    core.CritRollCategoryMagical,
-				ActionID:            core.ActionID{SpellID: 45055},
 				SpellSchool:         core.SpellSchoolShadow,
 				CritMultiplier:      agent.GetCharacter().DefaultSpellCritMultiplier(),
 			},
