@@ -13,7 +13,7 @@ var RaptorStrikeActionID = core.ActionID{SpellID: 27014, CooldownID: RaptorStrik
 
 func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            RaptorStrikeActionID,
 			Character:           &hunter.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,

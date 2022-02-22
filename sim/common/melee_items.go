@@ -346,7 +346,7 @@ func ApplyDespair(agent core.Agent) {
 	actionID := core.ActionID{SpellID: 34580}
 
 	templ := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            actionID,
 			Character:           character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
@@ -403,7 +403,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 	actionID := core.ActionID{ItemID: 28767}
 
 	templ := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            actionID,
 			Character:           character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,

@@ -17,7 +17,7 @@ var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: Judgeme
 // but still has a few differences (differences are: does not scale off spell power, cannot be partially resisted, can be missed or dodged)
 func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	job := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            JudgementOfBloodActionID,
 			Character:           &paladin.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,

@@ -40,7 +40,7 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilit
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	ability := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            EviscerateActionID,
 			Character:           &rogue.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,

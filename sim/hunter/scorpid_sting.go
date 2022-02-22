@@ -14,7 +14,7 @@ func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.MeleeAb
 	actionID := core.ActionID{SpellID: 3043}
 
 	ama := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            actionID,
 			Character:           &hunter.Character,
 			OutcomeRollCategory: core.OutcomeRollCategoryRanged,

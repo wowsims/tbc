@@ -30,42 +30,6 @@ type OnBeforeMeleeHit func(sim *Simulation, ability *ActiveMeleeAbility, hitEffe
 //  This should be used for any on-hit procs.
 type OnMeleeAttack func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect)
 
-type MeleeAbility struct {
-	// ID for the action.
-	ActionID
-
-	// The character performing this action.
-	Character *Character
-
-	// If set, this action will start a cooldown using its cooldown ID.
-	// Note that the GCD CD will be activated even if this is not set.
-	Cooldown time.Duration
-
-	// The amount of GCD time incurred by this cast. This is almost always 0, 1s, or 1.5s.
-	GCD time.Duration
-
-	Cost ResourceCost
-
-	CastTime time.Duration // most melee skills are instant... are there any with a cast time?
-
-	OutcomeRollCategory OutcomeRollCategory
-	CritRollCategory    CritRollCategory
-	SpellSchool         SpellSchool
-	SpellExtras         SpellExtras
-
-	// How much to multiply damage by, if this cast crits.
-	CritMultiplier float64
-
-	// Whether this is a phantom attack. Phantom attacks are usually triggered by some effect,
-	// like Windfury. Many on-hit effects do not proc from phantom attacks, only regular attacks.
-	// TODO: Remove this and use proc masks instead.
-	IsPhantom bool
-
-	// Internal field only, used to prevent pool objects from being used by
-	// multiple attacks simultaneously.
-	objectInUse bool
-}
-
 type AbilityEffect struct {
 	// Target of the spell.
 	Target *Target
@@ -196,7 +160,7 @@ type AbilityHitEffect struct {
 }
 
 type ActiveMeleeAbility struct {
-	MeleeAbility
+	Cast
 
 	OnMeleeAttack OnMeleeAttack
 
@@ -427,22 +391,22 @@ func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
 
 	ability.Character.OnBeforeMelee(sim, ability)
 
-	switch ability.MeleeAbility.Cost.Type {
+	switch ability.Cast.Cost.Type {
 	case stats.Mana:
-		if ability.Character.CurrentMana() < ability.MeleeAbility.Cost.Value {
+		if ability.Character.CurrentMana() < ability.Cast.Cost.Value {
 			return false
 		}
-		ability.Character.SpendMana(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
+		ability.Character.SpendMana(sim, ability.Cast.Cost.Value, ability.Cast.ActionID)
 	case stats.Rage:
-		if ability.Character.CurrentRage() < ability.MeleeAbility.Cost.Value {
+		if ability.Character.CurrentRage() < ability.Cast.Cost.Value {
 			return false
 		}
-		ability.Character.SpendRage(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
+		ability.Character.SpendRage(sim, ability.Cast.Cost.Value, ability.Cast.ActionID)
 	case stats.Energy:
-		if ability.Character.CurrentEnergy() < ability.MeleeAbility.Cost.Value {
+		if ability.Character.CurrentEnergy() < ability.Cast.Cost.Value {
 			return false
 		}
-		ability.Character.SpendEnergy(sim, ability.MeleeAbility.Cost.Value, ability.MeleeAbility.ActionID)
+		ability.Character.SpendEnergy(sim, ability.Cast.Cost.Value, ability.Cast.ActionID)
 	}
 
 	if len(ability.Effects) == 0 {
@@ -567,7 +531,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		DelayOHSwings:  options.DelayOHSwings,
 		ReplaceMHSwing: options.ReplaceMHSwing,
 		MHAuto: ActiveMeleeAbility{
-			MeleeAbility: MeleeAbility{
+			Cast: Cast{
 				ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
 				Character:           character,
 				OutcomeRollCategory: OutcomeRollCategoryWhite,
@@ -588,7 +552,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 			},
 		},
 		OHAuto: ActiveMeleeAbility{
-			MeleeAbility: MeleeAbility{
+			Cast: Cast{
 				ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
 				Character:           character,
 				OutcomeRollCategory: OutcomeRollCategoryWhite,
@@ -609,7 +573,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 			},
 		},
 		RangedAuto: ActiveMeleeAbility{
-			MeleeAbility: MeleeAbility{
+			Cast: Cast{
 				ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionShoot},
 				Character:           character,
 				SpellSchool:         SpellSchoolPhysical,

@@ -17,7 +17,7 @@ var SealOfBloodProcActionID = core.ActionID{SpellID: 31893}
 func (paladin *Paladin) setupSealOfBlood() {
 	// The proc behaviour
 	sobProc := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            SealOfBloodProcActionID,
 			Character:           &paladin.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
@@ -93,7 +93,7 @@ var SealOfCommandProcActionID = core.ActionID{SpellID: 20424}
 
 func (paladin *Paladin) setupSealOfCommand() {
 	socProc := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            SealOfCommandProcActionID,
 			Character:           &paladin.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,

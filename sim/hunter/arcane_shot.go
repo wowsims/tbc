@@ -12,7 +12,7 @@ var ArcaneShotActionID = core.ActionID{SpellID: 27019, CooldownID: ArcaneShotCoo
 
 func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            ArcaneShotActionID,
 			Character:           &hunter.Character,
 			OutcomeRollCategory: core.OutcomeRollCategoryRanged,

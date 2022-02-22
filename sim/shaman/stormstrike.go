@@ -37,7 +37,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 	hasSkyshatter4p := ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4)
 	const skyshatterDur = time.Second * 12
 	ss := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            StormstrikeActionID,
 			Character:           &shaman.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
@@ -90,7 +90,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 	}
 
 	if shaman.Equip[items.ItemSlotRanged].ID == StormfuryTotem {
-		ss.MeleeAbility.Cost.Value -= 22
+		ss.Cast.Cost.Value -= 22
 	}
 
 	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {

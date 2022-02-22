@@ -28,7 +28,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 	}
 
 	wftempl := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            core.ActionID{SpellID: 25505},
 			Character:           &shaman.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
