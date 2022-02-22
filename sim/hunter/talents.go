@@ -357,7 +357,7 @@ func (hunter *Hunter) applyRangedEffects() {
 		return core.Aura{
 			ID: RangedEffectsAuraID,
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if hitEffect.IsRanged() {
+				if ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					hitEffect.BonusCritRating += critBonus
 					hitEffect.DamageMultiplier *= damageBonus
 				}
@@ -382,7 +382,7 @@ func (hunter *Hunter) applyGoForTheThroat() {
 		return core.Aura{
 			ID: GoForTheThroatAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.IsRanged() || !hitEffect.Outcome.Matches(core.OutcomeCrit) {
+				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
 				if !hunter.pet.IsEnabled() {
@@ -476,7 +476,7 @@ func (hunter *Hunter) applyExposeWeakness() {
 		return core.Aura{
 			ID: ExposeWeaknessAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.IsRanged() {
+				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
 
@@ -520,7 +520,7 @@ func (hunter *Hunter) applyMasterTactician() {
 		return core.Aura{
 			ID: MasterTacticianAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.IsRanged() || !hitEffect.Landed() {
+				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !hitEffect.Landed() {
 					return
 				}
 

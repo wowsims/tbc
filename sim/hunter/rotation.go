@@ -41,7 +41,7 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 
 func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
 	hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
-	if !ability.Effect.IsRanged() {
+	if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 		return
 	}
 	hunter.rotation(sim, true)
