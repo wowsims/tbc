@@ -212,7 +212,7 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 
 	// Miss
 	missChance := ahe.Target.MissChance
-	if character.AutoAttacks.IsDualWielding && ability.OutcomeRollCategory.Matches(OutcomeRollCategoryWhite) {
+	if character.AutoAttacks.IsDualWielding && ability.OutcomeRollCategory == OutcomeRollCategoryWhite {
 		missChance += 0.19
 	}
 	hitBonus := ((character.stats[stats.MeleeHit] + ahe.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - ahe.Target.HitSuppression
