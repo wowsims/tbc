@@ -49,7 +49,7 @@ func (hunter *Hunter) newMultiShotCastTemplate(sim *core.Simulation) core.Simple
 
 func (hunter *Hunter) newMultiShotAbilityTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            MultiShotActionID,
 			Character:           &hunter.Character,
 			OutcomeRollCategory: core.OutcomeRollCategoryRanged,

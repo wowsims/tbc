@@ -45,7 +45,7 @@ func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.Simp
 
 func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            SerpentStingActionID,
 			Character:           &hunter.Character,
 			OutcomeRollCategory: core.OutcomeRollCategoryRanged,

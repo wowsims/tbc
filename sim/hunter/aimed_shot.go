@@ -10,7 +10,7 @@ var AimedShotActionID = core.ActionID{SpellID: 27065, CooldownID: AimedShotCoold
 
 func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            AimedShotActionID,
 			Character:           &hunter.Character,
 			OutcomeRollCategory: core.OutcomeRollCategoryRanged,

@@ -409,7 +409,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	apBonus *= 1 + 0.15*float64(iwtTalentPoints)
 
 	wftempl := ActiveMeleeAbility{
-		MeleeAbility: MeleeAbility{
+		Cast: Cast{
 			ActionID:       actionID,
 			Character:      character,
 			SpellSchool:    SpellSchoolPhysical,

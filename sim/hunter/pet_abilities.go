@@ -79,7 +79,7 @@ var PetSecondaryCooldownID = core.NewCooldownID()
 func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 	cooldown := time.Second * 10
 	ama := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            core.ActionID{SpellID: 27050},
 			Character:           &hp.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
@@ -134,7 +134,7 @@ func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 
 func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
 	ama := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            core.ActionID{SpellID: 27049},
 			Character:           &hp.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
@@ -179,7 +179,7 @@ func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
 
 func (hp *HunterPet) newGore(sim *core.Simulation, isPrimary bool) PetAbility {
 	ama := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            core.ActionID{SpellID: 35298},
 			Character:           &hp.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
@@ -275,7 +275,7 @@ func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) Pe
 
 func (hp *HunterPet) newScreech(sim *core.Simulation, isPrimary bool) PetAbility {
 	ama := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            core.ActionID{SpellID: 27051},
 			Character:           &hp.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,

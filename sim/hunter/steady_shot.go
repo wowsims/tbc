@@ -50,7 +50,7 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 
 func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	ama := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            SteadyShotActionID,
 			Character:           &hunter.Character,
 			OutcomeRollCategory: core.OutcomeRollCategoryRanged,

@@ -14,7 +14,7 @@ var CrusaderStrikeActionID = core.ActionID{SpellID: 35395, CooldownID: CrusaderS
 // Need to add in judgement debuff refreshing feature at some point
 func (paladin *Paladin) newCrusaderStrikeTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
 	cs := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            CrusaderStrikeActionID,
 			Character:           &paladin.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,

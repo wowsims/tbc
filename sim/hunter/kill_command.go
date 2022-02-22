@@ -64,7 +64,7 @@ func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.MeleeAbil
 	beastLordApplier := hp.hunterOwner.NewTempStatAuraApplier(sim, BeastLord4PcAuraID, core.ActionID{SpellID: 37483}, stats.ArmorPenetration, 600, time.Second*15)
 
 	ama := core.ActiveMeleeAbility{
-		MeleeAbility: core.MeleeAbility{
+		Cast: core.Cast{
 			ActionID:            core.ActionID{SpellID: 34027},
 			Character:           &hp.Character,
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
