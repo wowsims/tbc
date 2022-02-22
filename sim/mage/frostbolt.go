@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDFrostbolt int32 = 27072
@@ -13,15 +12,17 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDFrostbolt},
-				Character:      &mage.Character,
-				SpellSchool:    stats.FrostSpellPower,
-				BaseManaCost:   330,
-				ManaCost:       330,
-				CastTime:       time.Millisecond * 3000,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)+0.2*float64(mage.Talents.IceShards)),
-				Binary:         true,
+				ActionID:            core.ActionID{SpellID: SpellIDFrostbolt},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFrost,
+				SpellExtras:         core.SpellExtrasBinary,
+				BaseManaCost:        330,
+				ManaCost:            330,
+				CastTime:            time.Millisecond * 3000,
+				GCD:                 core.GCDDefault,
+				CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)+0.2*float64(mage.Talents.IceShards)),
 			},
 		},
 		Effect: core.SpellHitEffect{

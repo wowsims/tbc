@@ -1,5 +1,7 @@
 package core
 
+import "github.com/wowsims/tbc/sim/core/stats"
+
 type ProcMask uint32
 
 // Returns whether there is any overlap between the given masks.
@@ -147,17 +149,22 @@ func (ho HitOutcome) PartialResistString() string {
 // Ignore Resistance (armor or magical, use school)
 // Always Hits
 
-type SpellExtras uint16
+type SpellExtras byte
+
+// Returns whether there is any overlap between the given masks.
+func (se SpellExtras) Matches(other SpellExtras) bool {
+	return (se & other) != 0
+}
 
 const (
 	SpellExtrasNone          SpellExtras = 0
-	SpellExtrasIgnoreResists SpellExtras = 1 << iota
-	SpellExtrasAlwaysHits
-	SpellExtrasBinary
+	SpellExtrasIgnoreResists SpellExtras = 1 << iota // skip spell resist/armor
+	SpellExtrasAlwaysHits                            // Can't miss the hit roll
+	SpellExtrasBinary                                // Does not do partial resists and could need a different hit roll.
 )
 
 // OutcomeRollCategory is the mask for what kind of hit roll to perform
-type OutcomeRollCategory uint16
+type OutcomeRollCategory byte
 
 // Returns whether there is any overlap between the given masks.
 func (at OutcomeRollCategory) Matches(other OutcomeRollCategory) bool {
@@ -165,19 +172,65 @@ func (at OutcomeRollCategory) Matches(other OutcomeRollCategory) bool {
 }
 
 const (
-	OutcomeRollCategoryNone    OutcomeRollCategory = 0         // Cannot miss
+	OutcomeRollCategoryNone    OutcomeRollCategory = 0         // No outcome roll needed
 	OutcomeRollCategoryWhite   OutcomeRollCategory = 1 << iota // White hit roll rules
 	OutcomeRollCategorySpecial                                 // Melee special attack
 	OutcomeRollCategoryRanged                                  // Ranged attack roll
 	OutcomeRollCategoryMagic                                   // Spell Hit roll
 )
 
-type CritRollCategory uint16
+type CritRollCategory byte
+
+// Returns whether there is any overlap between the given masks.
+func (at CritRollCategory) Matches(other CritRollCategory) bool {
+	return (at & other) != 0
+}
 
 const (
-	CritRollCategoryNone     CritRollCategory    = 0         // cannot crit
-	CritRollCategoryPhysical OutcomeRollCategory = 1 << iota // uses MeleeCrit for roll
-	CritRollCategoryMagical                                  // Uses SpellCrit for crit roll
+	CritRollCategoryNone     CritRollCategory = 0         // cannot crit
+	CritRollCategoryPhysical CritRollCategory = 1 << iota // uses MeleeCrit for roll
+	CritRollCategoryMagical                               // Uses SpellCrit for crit roll
+)
+
+type SpellSchool byte
+
+func (ss SpellSchool) Stat() stats.Stat {
+	switch ss {
+	case SpellSchoolArcane:
+		return stats.ArcaneSpellPower
+	case SpellSchoolFire:
+		return stats.FireSpellPower
+	case SpellSchoolFrost:
+		return stats.FrostSpellPower
+	case SpellSchoolHoly:
+		return stats.HolySpellPower
+	case SpellSchoolNature:
+		return stats.NatureSpellPower
+	case SpellSchoolShadow:
+		return stats.ShadowSpellPower
+	case SpellSchoolPhysical:
+		return stats.AttackPower
+	}
+
+	return 0
+}
+
+// Returns whether there is any overlap between the given masks.
+func (ss SpellSchool) Matches(other SpellSchool) bool {
+	return (ss & other) != 0
+}
+
+const (
+	SpellSchoolNone     SpellSchool = 0
+	SpellSchoolPhysical SpellSchool = 1 << iota
+	SpellSchoolArcane
+	SpellSchoolFire
+	SpellSchoolFrost
+	SpellSchoolHoly
+	SpellSchoolNature
+	SpellSchoolShadow
+
+	SpellSchoolMagic = SpellSchoolArcane | SpellSchoolFire | SpellSchoolFrost | SpellSchoolHoly | SpellSchoolNature | SpellSchoolShadow
 )
 
 /*

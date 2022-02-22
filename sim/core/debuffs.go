@@ -139,12 +139,12 @@ func ShadowWeavingAura(sim *Simulation, numStacks int32) Aura {
 		Expires:  sim.CurrentTime + time.Second*15,
 		Stacks:   numStacks,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if spellCast.SpellSchool == stats.ShadowSpellPower {
+			if spellCast.SpellSchool.Matches(SpellSchoolShadow) {
 				spellEffect.DamageMultiplier *= multiplier
 			}
 		},
 		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			if spellCast.SpellSchool == stats.ShadowSpellPower {
+			if spellCast.SpellSchool.Matches(SpellSchoolShadow) {
 				*tickDamage *= multiplier
 			}
 		},
@@ -199,7 +199,7 @@ func JudgementOfTheCrusaderAura(sim *Simulation, level float64) Aura {
 		ActionID: ActionID{SpellID: 27159},
 		Expires:  sim.CurrentTime + time.Second*20,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if spellCast.SpellSchool == stats.HolySpellPower {
+			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
 				spellEffect.BonusSpellPower += 219
 			}
 			spellEffect.BonusSpellCritRating += bonusSPCrit
@@ -230,20 +230,14 @@ func CurseOfElementsAura(coe proto.TristateEffect) Aura {
 		ActionID: ActionID{SpellID: 27228},
 		Stacks:   level, // Use stacks to store talent level for detection by other code.
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if spellCast.SpellSchool == stats.NatureSpellPower ||
-				spellCast.SpellSchool == stats.HolySpellPower ||
-				spellCast.SpellSchool == stats.AttackPower {
-				return // does not apply to these schools
+			if spellCast.SpellSchool.Matches(SpellSchoolArcane | SpellSchoolFire | SpellSchoolFrost | SpellSchoolShadow) {
+				spellEffect.DamageMultiplier *= mult
 			}
-			spellEffect.DamageMultiplier *= mult
 		},
 		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			if spellCast.SpellSchool == stats.NatureSpellPower ||
-				spellCast.SpellSchool == stats.HolySpellPower ||
-				spellCast.SpellSchool == stats.AttackPower {
-				return // does not apply to these schools
+			if spellCast.SpellSchool.Matches(SpellSchoolArcane | SpellSchoolFire | SpellSchoolFrost | SpellSchoolShadow) {
+				*tickDamage *= mult
 			}
-			*tickDamage *= mult
 		},
 	}
 }
@@ -256,13 +250,13 @@ func ImprovedShadowBoltAura(uptime float64) Aura {
 		ID:       ImprovedShadowBoltID,
 		ActionID: ActionID{SpellID: 17803},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if spellCast.SpellSchool != stats.ShadowSpellPower {
+			if !spellCast.SpellSchool.Matches(SpellSchoolShadow) {
 				return // does not apply to these schools
 			}
 			spellEffect.DamageMultiplier *= mult
 		},
 		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			if spellCast.SpellSchool != stats.ShadowSpellPower {
+			if !spellCast.SpellSchool.Matches(SpellSchoolShadow) {
 				return // does not apply to these schools
 			}
 			*tickDamage *= mult
@@ -296,12 +290,12 @@ func ImprovedScorchAura(sim *Simulation, numStacks int32) Aura {
 		Expires:  sim.CurrentTime + time.Second*30,
 		Stacks:   numStacks,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if spellCast.SpellSchool == stats.FireSpellPower {
+			if spellCast.SpellSchool.Matches(SpellSchoolFire) {
 				spellEffect.DamageMultiplier *= multiplier
 			}
 		},
 		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			if spellCast.SpellSchool == stats.FireSpellPower {
+			if spellCast.SpellSchool.Matches(SpellSchoolFire) {
 				*tickDamage *= multiplier
 			}
 		},
@@ -319,7 +313,7 @@ func WintersChillAura(sim *Simulation, numStacks int32) Aura {
 		Expires:  sim.CurrentTime + time.Second*15,
 		Stacks:   numStacks,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if spellCast.SpellSchool == stats.FrostSpellPower {
+			if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
 				spellEffect.BonusSpellCritRating += bonusCrit
 			}
 		},

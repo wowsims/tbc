@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDMindFlay int32 = 25387
@@ -18,13 +17,15 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 			SpellID: SpellIDMindFlay,
 			Tag:     3, // default to 3 tick mf
 		},
-		Character:    &priest.Character,
-		SpellSchool:  stats.ShadowSpellPower,
-		BaseManaCost: 230,
-		ManaCost:     230,
-		CastTime:     0,
-		GCD:          core.GCDDefault,
-		Binary:       true,
+		Character:           &priest.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolShadow,
+		SpellExtras:         core.SpellExtrasBinary,
+		BaseManaCost:        230,
+		ManaCost:            230,
+		CastTime:            0,
+		GCD:                 core.GCDDefault,
 	}
 
 	effect := core.SpellHitEffect{

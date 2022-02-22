@@ -5,7 +5,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // Starfire spell IDs
@@ -15,14 +14,16 @@ const IdolAvenger int32 = 31025
 
 func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		ActionID:       core.ActionID{SpellID: SpellIDWrath},
-		Character:      &druid.Character,
-		SpellSchool:    stats.NatureSpellPower,
-		BaseManaCost:   255,
-		ManaCost:       255,
-		CastTime:       time.Millisecond * 2000,
-		GCD:            core.GCDDefault,
-		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
+		ActionID:            core.ActionID{SpellID: SpellIDWrath},
+		Character:           &druid.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolNature,
+		BaseManaCost:        255,
+		ManaCost:            255,
+		CastTime:            time.Millisecond * 2000,
+		GCD:                 core.GCDDefault,
+		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
 	effect := core.SpellHitEffect{

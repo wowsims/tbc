@@ -82,9 +82,12 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 	jotc := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    JudgementOfTheCrusaderActionID,
-				Character:   &paladin.Character,
-				SpellSchool: stats.HolySpellPower,
+				ActionID:            JudgementOfTheCrusaderActionID,
+				Character:           &paladin.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolHoly,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.ManaCost)
 					paladin.RemoveAura(sim, SealOfTheCrusaderAuraID)
@@ -139,9 +142,11 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 	jow := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    JudgementOfWisdomActionID,
-				Character:   &paladin.Character,
-				SpellSchool: stats.HolySpellPower,
+				ActionID:            JudgementOfWisdomActionID,
+				Character:           &paladin.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolHoly,
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfWisdom.ManaCost)
 					paladin.RemoveAura(sim, SealOfWisdomAuraID)

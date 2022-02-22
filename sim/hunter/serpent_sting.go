@@ -17,10 +17,12 @@ func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.Simp
 	dotSpell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       SerpentStingActionID,
-				SpellSchool:    stats.NatureSpellPower,
-				Character:      &hunter.Character,
-				IgnoreManaCost: true,
+				ActionID:            SerpentStingActionID,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolNature,
+				Character:           &hunter.Character,
+				IgnoreManaCost:      true,
 			},
 		},
 		Effect: core.SpellHitEffect{

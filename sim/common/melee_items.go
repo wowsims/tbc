@@ -49,12 +49,14 @@ func ApplyStormGauntlets(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:       core.ActionID{ItemID: 12632},
-					Character:      character,
-					IgnoreManaCost: true,
-					IsPhantom:      true,
-					SpellSchool:    stats.NatureSpellPower,
-					CritMultiplier: character.DefaultSpellCritMultiplier(),
+					ActionID:            core.ActionID{ItemID: 12632},
+					Character:           character,
+					IgnoreManaCost:      true,
+					IsPhantom:           true,
+					CritRollCategory:    core.CritRollCategoryMagical,
+					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+					SpellSchool:         core.SpellSchoolNature,
+					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -98,12 +100,14 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:       core.ActionID{ItemID: 17111},
-					Character:      character,
-					IgnoreManaCost: true,
-					IsPhantom:      true,
-					SpellSchool:    stats.FireSpellPower,
-					CritMultiplier: character.DefaultSpellCritMultiplier(),
+					ActionID:            core.ActionID{ItemID: 17111},
+					Character:           character,
+					IgnoreManaCost:      true,
+					IsPhantom:           true,
+					CritRollCategory:    core.CritRollCategoryMagical,
+					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+					SpellSchool:         core.SpellSchoolFire,
+					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -466,12 +470,14 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:       core.ActionID{SpellID: 34696},
-					Character:      character,
-					IgnoreManaCost: true,
-					IsPhantom:      true,
-					SpellSchool:    stats.ShadowSpellPower,
-					CritMultiplier: character.DefaultSpellCritMultiplier(),
+					ActionID:            core.ActionID{SpellID: 34696},
+					Character:           character,
+					IgnoreManaCost:      true,
+					IsPhantom:           true,
+					CritRollCategory:    core.CritRollCategoryMagical,
+					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+					SpellSchool:         core.SpellSchoolShadow,
+					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{
@@ -783,12 +789,14 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:       core.ActionID{SpellID: 40291},
-					Character:      character,
-					IgnoreManaCost: true,
-					IsPhantom:      true,
-					SpellSchool:    stats.ShadowSpellPower,
-					CritMultiplier: character.DefaultSpellCritMultiplier(),
+					ActionID:            core.ActionID{SpellID: 40291},
+					Character:           character,
+					IgnoreManaCost:      true,
+					IsPhantom:           true,
+					CritRollCategory:    core.CritRollCategoryMagical,
+					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+					SpellSchool:         core.SpellSchoolShadow,
+					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
 			Effect: core.SpellHitEffect{

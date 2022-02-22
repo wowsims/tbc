@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDShadowWordDeath int32 = 32996
@@ -17,14 +16,16 @@ func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.Simp
 			SpellID:    SpellIDShadowWordDeath,
 			CooldownID: SWDCooldownID,
 		},
-		Character:      &priest.Character,
-		SpellSchool:    stats.ShadowSpellPower,
-		BaseManaCost:   309,
-		ManaCost:       309,
-		CastTime:       0,
-		GCD:            core.GCDDefault,
-		Cooldown:       time.Second * 12,
-		CritMultiplier: priest.DefaultSpellCritMultiplier(),
+		Character:           &priest.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolShadow,
+		BaseManaCost:        309,
+		ManaCost:            309,
+		CastTime:            0,
+		GCD:                 core.GCDDefault,
+		Cooldown:            time.Second * 12,
+		CritMultiplier:      priest.DefaultSpellCritMultiplier(),
 	}
 
 	effect := core.SpellHitEffect{

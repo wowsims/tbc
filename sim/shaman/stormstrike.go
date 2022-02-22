@@ -21,7 +21,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 		Stacks:   2,
 	}
 	ssDebuffAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-		if spellCast.SpellSchool != stats.NatureSpellPower {
+		if spellCast.SpellSchool != core.SpellSchoolNature {
 			return
 		}
 		spellEffect.DamageMultiplier *= 1.2

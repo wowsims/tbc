@@ -2,7 +2,6 @@ package mage
 
 import (
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDWintersChill int32 = 28595
@@ -12,8 +11,10 @@ func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpell
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				SpellSchool: stats.FrostSpellPower,
-				Character:   &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFrost,
+				Character:           &mage.Character,
 				ActionID: core.ActionID{
 					SpellID: SpellIDWintersChill,
 				},
@@ -64,7 +65,7 @@ func (mage *Mage) applyWintersChill() {
 		return core.Aura{
 			ID: WintersChillAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.SpellSchool == stats.FrostSpellPower && spellCast.ActionID.SpellID != SpellIDWintersChill {
+				if spellCast.SpellSchool == core.SpellSchoolFrost && spellCast.ActionID.SpellID != SpellIDWintersChill {
 					if procChance != 1.0 && sim.RandomFloat("Winters Chill") > procChance {
 						return
 					}

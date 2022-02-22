@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDArcaneMissiles int32 = 38699
@@ -16,13 +15,15 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDArcaneMissiles},
-				Character:      &mage.Character,
-				SpellSchool:    stats.ArcaneSpellPower,
-				BaseManaCost:   740,
-				ManaCost:       740,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				ActionID:            core.ActionID{SpellID: SpellIDArcaneMissiles},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolArcane,
+				BaseManaCost:        740,
+				ManaCost:            740,
+				GCD:                 core.GCDDefault,
+				CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
 		Effect: core.SpellHitEffect{

@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDBlizzard int32 = 27085
@@ -13,11 +12,13 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				SpellSchool:  stats.FrostSpellPower,
-				Character:    &mage.Character,
-				BaseManaCost: 1645,
-				ManaCost:     1645,
-				GCD:          core.GCDDefault,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFrost,
+				Character:           &mage.Character,
+				BaseManaCost:        1645,
+				ManaCost:            1645,
+				GCD:                 core.GCDDefault,
 				ActionID: core.ActionID{
 					SpellID: SpellIDBlizzard,
 				},

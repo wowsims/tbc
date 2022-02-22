@@ -2,7 +2,6 @@ package mage
 
 import (
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDArcaneExplosion int32 = 10202
@@ -11,13 +10,15 @@ func (mage *Mage) newArcaneExplosionTemplate(sim *core.Simulation) core.SimpleSp
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDArcaneExplosion},
-				Character:      &mage.Character,
-				SpellSchool:    stats.ArcaneSpellPower,
-				BaseManaCost:   390,
-				ManaCost:       390,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				ActionID:            core.ActionID{SpellID: SpellIDArcaneExplosion},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolArcane,
+				BaseManaCost:        390,
+				ManaCost:            390,
+				GCD:                 core.GCDDefault,
+				CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
 		AOECap: 10180,

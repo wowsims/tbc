@@ -3,8 +3,6 @@ package core
 import (
 	"fmt"
 	"time"
-
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // A cast corresponds to any action which causes the in-game castbar to be
@@ -41,6 +39,11 @@ type Cast struct {
 	// proc from phantom casts, only regular casts.
 	IsPhantom bool
 
+	OutcomeRollCategory OutcomeRollCategory
+	CritRollCategory    CritRollCategory
+	SpellSchool         SpellSchool
+	SpellExtras         SpellExtras
+
 	// Base mana cost. Many effects in the game which 'reduce mana cost by X%'
 	// are calculated using the base mana cost. Any effects which reduce the base
 	// mana cost should be applied before setting this value, and OnCast()
@@ -56,9 +59,6 @@ type Cast struct {
 	// used for adding latency following the cast.
 	AfterCastDelay time.Duration
 
-	// E.g. for nature spells, set to stats.NatureSpellPower.
-	SpellSchool stats.Stat
-
 	// How much to multiply damage by, if this cast crits.
 	CritMultiplier float64
 
@@ -67,8 +67,6 @@ type Cast struct {
 
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete OnCastComplete
-
-	Binary bool // if spell is binary it ignores partial resists
 
 	// Ignores haste when calculating the GCD and cast time for this cast.
 	IgnoreHaste bool

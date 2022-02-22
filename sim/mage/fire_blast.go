@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDFireBlast int32 = 27079
@@ -19,14 +18,16 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 					SpellID:    SpellIDFireBlast,
 					CooldownID: FireBlastCooldownID,
 				},
-				Character:      &mage.Character,
-				SpellSchool:    stats.FireSpellPower,
-				BaseManaCost:   465,
-				ManaCost:       465,
-				CastTime:       0,
-				GCD:            core.GCDDefault,
-				Cooldown:       time.Second * 8,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				BaseManaCost:        465,
+				ManaCost:            465,
+				CastTime:            0,
+				GCD:                 core.GCDDefault,
+				Cooldown:            time.Second * 8,
+				CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
 		Effect: core.SpellHitEffect{

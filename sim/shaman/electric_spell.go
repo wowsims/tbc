@@ -5,7 +5,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // Totem Item IDs
@@ -35,14 +34,16 @@ const (
 func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellCast {
 	spellCast := core.SpellCast{
 		Cast: core.Cast{
-			ActionID:       actionID,
-			Character:      shaman.GetCharacter(),
-			SpellSchool:    stats.NatureSpellPower,
-			BaseManaCost:   baseManaCost,
-			ManaCost:       baseManaCost,
-			CastTime:       baseCastTime,
-			GCD:            core.GCDDefault,
-			CritMultiplier: shaman.DefaultSpellCritMultiplier(),
+			ActionID:            actionID,
+			Character:           shaman.GetCharacter(),
+			CritRollCategory:    core.CritRollCategoryMagical,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			SpellSchool:         core.SpellSchoolNature,
+			BaseManaCost:        baseManaCost,
+			ManaCost:            baseManaCost,
+			CastTime:            baseCastTime,
+			GCD:                 core.GCDDefault,
+			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 		},
 	}
 

@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const (
@@ -17,14 +16,16 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDPyroblast},
-				Character:      &mage.Character,
-				SpellSchool:    stats.FireSpellPower,
-				BaseManaCost:   500,
-				ManaCost:       500,
-				CastTime:       time.Millisecond * 6000,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				ActionID:            core.ActionID{SpellID: SpellIDPyroblast},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				BaseManaCost:        500,
+				ManaCost:            500,
+				CastTime:            time.Millisecond * 6000,
+				GCD:                 core.GCDDefault,
+				CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -65,9 +66,11 @@ func (mage *Mage) newPyroblastDotTemplate(sim *core.Simulation) core.SimpleSpell
 					SpellID: SpellIDPyroblast,
 					Tag:     CastTagPyroblastDot,
 				},
-				Character:      &mage.Character,
-				SpellSchool:    stats.FireSpellPower,
-				IgnoreManaCost: true,
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				IgnoreManaCost:      true,
 			},
 		},
 		Effect: core.SpellHitEffect{

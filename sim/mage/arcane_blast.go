@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDArcaneBlast int32 = 30451
@@ -28,14 +27,16 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDArcaneBlast},
-				Character:      &mage.Character,
-				SpellSchool:    stats.ArcaneSpellPower,
-				BaseManaCost:   ArcaneBlastBaseManaCost,
-				ManaCost:       ArcaneBlastBaseManaCost,
-				CastTime:       ArcaneBlastBaseCastTime,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				ActionID:            core.ActionID{SpellID: SpellIDArcaneBlast},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolArcane,
+				BaseManaCost:        ArcaneBlastBaseManaCost,
+				ManaCost:            ArcaneBlastBaseManaCost,
+				CastTime:            ArcaneBlastBaseCastTime,
+				GCD:                 core.GCDDefault,
+				CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					abAura.Stacks = core.MinInt32(3, mage.NumStacks(ArcaneBlastAuraID)+1)
 					abAura.Expires = sim.CurrentTime + abAuraDuration

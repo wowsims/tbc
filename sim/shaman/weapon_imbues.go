@@ -119,12 +119,14 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	ftTmpl := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: 25489},
-				Character:      &shaman.Character,
-				SpellSchool:    stats.FireSpellPower,
-				IgnoreManaCost: true,
-				IsPhantom:      true,
-				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
+				ActionID:            core.ActionID{SpellID: 25489},
+				Character:           &shaman.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				IgnoreManaCost:      true,
+				IsPhantom:           true,
+				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -194,12 +196,14 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 	fbTmpl := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: 25500},
-				Character:      &shaman.Character,
-				SpellSchool:    stats.FrostSpellPower,
-				IgnoreManaCost: true,
-				IsPhantom:      true,
-				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
+				ActionID:            core.ActionID{SpellID: 25500},
+				Character:           &shaman.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFrost,
+				IgnoreManaCost:      true,
+				IsPhantom:           true,
+				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{

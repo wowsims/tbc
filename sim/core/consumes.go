@@ -804,7 +804,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 					Character:      character,
 					IgnoreManaCost: true,
 					IsPhantom:      true,
-					SpellSchool:    stats.FireSpellPower,
+					SpellSchool:    SpellSchoolFire,
 					CritMultiplier: 1.5,
 				},
 			},

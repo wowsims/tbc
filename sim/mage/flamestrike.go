@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const (
@@ -17,14 +16,16 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDFlamestrike},
-				Character:      &mage.Character,
-				SpellSchool:    stats.FireSpellPower,
-				BaseManaCost:   1175,
-				ManaCost:       1175,
-				CastTime:       time.Second * 3,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				ActionID:            core.ActionID{SpellID: SpellIDFlamestrike},
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				BaseManaCost:        1175,
+				ManaCost:            1175,
+				CastTime:            time.Second * 3,
+				GCD:                 core.GCDDefault,
+				CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					flamestrikeDot := mage.newFlamestrikeDot(sim)
 					flamestrikeDot.Cast(sim)
@@ -74,9 +75,11 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 					SpellID: SpellIDFlamestrike,
 					Tag:     CastTagFlamestrikeDot,
 				},
-				Character:      &mage.Character,
-				SpellSchool:    stats.FireSpellPower,
-				IgnoreManaCost: true,
+				Character:           &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				IgnoreManaCost:      true,
 			},
 		},
 	}

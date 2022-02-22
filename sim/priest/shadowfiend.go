@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // https://web.archive.org/web/20071201221602/http://www.shadowpriest.com/viewtopic.php?t=7616
@@ -52,15 +51,17 @@ func (priest *Priest) registerShadowfiendCD() {
 
 func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		ActionID:       ShadowfiendActionID,
-		Character:      &priest.Character,
-		SpellSchool:    stats.ShadowSpellPower,
-		BaseManaCost:   575,
-		ManaCost:       575,
-		CastTime:       0,
-		GCD:            core.GCDDefault,
-		Cooldown:       time.Minute * 5,
-		CritMultiplier: priest.DefaultSpellCritMultiplier(),
+		ActionID:            ShadowfiendActionID,
+		Character:           &priest.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolShadow,
+		BaseManaCost:        575,
+		ManaCost:            575,
+		CastTime:            0,
+		GCD:                 core.GCDDefault,
+		Cooldown:            time.Minute * 5,
+		CritMultiplier:      priest.DefaultSpellCritMultiplier(),
 	}
 
 	// Dmg over 15 sec = shadow_dmg*.6 + 1191

@@ -5,7 +5,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // Starfire spell IDs
@@ -17,14 +16,16 @@ const IvoryMoongoddess int32 = 27518
 
 func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		ActionID:       core.ActionID{SpellID: SpellIDSF8},
-		Character:      &druid.Character,
-		SpellSchool:    stats.ArcaneSpellPower,
-		BaseManaCost:   370,
-		ManaCost:       370,
-		CastTime:       time.Millisecond * 3500,
-		GCD:            core.GCDDefault,
-		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
+		ActionID:            core.ActionID{SpellID: SpellIDSF8},
+		Character:           &druid.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolArcane,
+		BaseManaCost:        370,
+		ManaCost:            370,
+		CastTime:            time.Millisecond * 3500,
+		GCD:                 core.GCDDefault,
+		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
 	effect := core.SpellHitEffect{

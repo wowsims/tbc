@@ -224,12 +224,14 @@ func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) Pe
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: 25011},
-				Character:      &hp.Character,
-				SpellSchool:    stats.NatureSpellPower,
-				IgnoreManaCost: true,
-				GCD:            core.GCDDefault,
-				CritMultiplier: 1.5,
+				ActionID:            core.ActionID{SpellID: 25011},
+				Character:           &hp.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolNature,
+				IgnoreManaCost:      true,
+				GCD:                 core.GCDDefault,
+				CritMultiplier:      1.5,
 			},
 		},
 		Effect: core.SpellHitEffect{

@@ -5,7 +5,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDMoonfire int32 = 26988
@@ -14,13 +13,15 @@ var MoonfireDebuffID = core.NewDebuffID()
 
 func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		ActionID:       core.ActionID{SpellID: SpellIDMoonfire},
-		Character:      &druid.Character,
-		SpellSchool:    stats.ArcaneSpellPower,
-		BaseManaCost:   495,
-		ManaCost:       495,
-		GCD:            core.GCDDefault,
-		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
+		ActionID:            core.ActionID{SpellID: SpellIDMoonfire},
+		Character:           &druid.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolArcane,
+		BaseManaCost:        495,
+		ManaCost:            495,
+		GCD:                 core.GCDDefault,
+		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
 	effect := core.SpellHitEffect{

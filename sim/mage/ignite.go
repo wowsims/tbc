@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDIgnite int32 = 12848
@@ -15,13 +14,15 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				SpellSchool: stats.FireSpellPower,
-				Character:   &mage.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				SpellExtras:         core.SpellExtrasBinary,
+				Character:           &mage.Character,
 				ActionID: core.ActionID{
 					SpellID: SpellIDIgnite,
 				},
 				IgnoreManaCost: true,
-				Binary:         true,
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -76,7 +77,7 @@ func (mage *Mage) applyIgnite() {
 		return core.Aura{
 			ID: IgniteAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.SpellSchool == stats.FireSpellPower && spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				if spellCast.SpellSchool == core.SpellSchoolFire && spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					mage.procIgnite(sim, spellEffect.Target, spellEffect.Damage)
 				}
 			},

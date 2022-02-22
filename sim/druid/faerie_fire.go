@@ -9,11 +9,13 @@ func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpell
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:     core.ActionID{SpellID: 26993},
-				Character:    druid.GetCharacter(),
-				BaseManaCost: 145,
-				ManaCost:     145,
-				GCD:          core.GCDDefault,
+				ActionID:            core.ActionID{SpellID: 26993},
+				SpellSchool:         core.SpellSchoolNature,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				Character:           druid.GetCharacter(),
+				BaseManaCost:        145,
+				ManaCost:            145,
+				GCD:                 core.GCDDefault,
 			},
 		},
 		Effect: core.SpellHitEffect{

@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDDevouringPlague int32 = 25467
@@ -17,13 +16,15 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 			SpellID:    SpellIDDevouringPlague,
 			CooldownID: DevouringPlagueCooldownID,
 		},
-		Character:    &priest.Character,
-		SpellSchool:  stats.ShadowSpellPower,
-		BaseManaCost: 1145,
-		ManaCost:     1145,
-		CastTime:     0,
-		GCD:          core.GCDDefault,
-		Cooldown:     time.Minute * 3,
+		Character:           &priest.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolShadow,
+		BaseManaCost:        1145,
+		ManaCost:            1145,
+		CastTime:            0,
+		GCD:                 core.GCDDefault,
+		Cooldown:            time.Minute * 3,
 	}
 
 	effect := core.SpellHitEffect{

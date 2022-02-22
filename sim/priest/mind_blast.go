@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDMindBlast int32 = 25375
@@ -17,14 +16,16 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 			SpellID:    SpellIDMindBlast,
 			CooldownID: MBCooldownID,
 		},
-		Character:      &priest.Character,
-		SpellSchool:    stats.ShadowSpellPower,
-		BaseManaCost:   450,
-		ManaCost:       450,
-		CastTime:       time.Millisecond * 1500,
-		GCD:            core.GCDDefault,
-		Cooldown:       time.Second * 8,
-		CritMultiplier: priest.DefaultSpellCritMultiplier(),
+		Character:           &priest.Character,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		SpellSchool:         core.SpellSchoolShadow,
+		BaseManaCost:        450,
+		ManaCost:            450,
+		CastTime:            time.Millisecond * 1500,
+		GCD:                 core.GCDDefault,
+		Cooldown:            time.Second * 8,
+		CritMultiplier:      priest.DefaultSpellCritMultiplier(),
 	}
 
 	effect := core.SpellHitEffect{

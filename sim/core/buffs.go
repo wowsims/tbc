@@ -364,13 +364,13 @@ func ImprovedSanctityAura(sim *Simulation, level float64) Aura {
 			hitEffect.DamageMultiplier *= 1 + 0.01*level
 		},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if spellCast.SpellSchool == stats.HolySpellPower {
+			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
 				spellEffect.DamageMultiplier *= 1.1
 			}
 			spellEffect.DamageMultiplier *= 1 + 0.01*level
 		},
 		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			if spellCast.SpellSchool == stats.HolySpellPower {
+			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
 				*tickDamage *= 1.1
 			}
 			*tickDamage *= 1 + 0.01*level

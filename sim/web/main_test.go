@@ -41,7 +41,6 @@ var basicSpec = &proto.Player_ElementalShaman{
 var basicConsumes = &proto.Consumes{
 	FlaskOfBlindingLight: true,
 	BlackenedBasilisk:    true,
-	BrilliantWizardOil:   true,
 	DefaultPotion:        proto.Potions_SuperManaPotion,
 }
 

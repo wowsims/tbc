@@ -122,7 +122,7 @@ func (paladin *Paladin) applyVengeance() {
 		return core.Aura{
 			ID: VengeancePermAuraID,
 			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.SpellSchool == stats.HolySpellPower || spellCast.SpellSchool == stats.AttackPower {
+				if spellCast.SpellSchool.Matches(core.SpellSchoolHoly | core.SpellSchoolPhysical) {
 					spellEffect.DamageMultiplier *= 1 + (0.01*float64(paladin.Talents.Vengeance))*float64(paladin.NumStacks(VengeanceAuraID))
 				}
 			},
@@ -132,7 +132,7 @@ func (paladin *Paladin) applyVengeance() {
 				}
 			},
 			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				if spellCast.SpellSchool == stats.HolySpellPower || spellCast.SpellSchool == stats.AttackPower {
+				if spellCast.SpellSchool.Matches(core.SpellSchoolHoly | core.SpellSchoolPhysical) {
 					*tickDamage *= 1 + (0.01*float64(paladin.Talents.Vengeance))*float64(paladin.NumStacks(VengeanceAuraID))
 				}
 			},

@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDSearingTotem int32 = 25533
@@ -13,14 +12,16 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDSearingTotem},
-				Character:      &shaman.Character,
-				SpellSchool:    stats.FireSpellPower,
-				BaseManaCost:   205,
-				ManaCost:       205,
-				GCD:            time.Second,
-				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
-				IsPhantom:      true,
+				ActionID:            core.ActionID{SpellID: SpellIDSearingTotem},
+				Character:           &shaman.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				BaseManaCost:        205,
+				ManaCost:            205,
+				GCD:                 time.Second,
+				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+				IsPhantom:           true,
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -80,14 +81,16 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       core.ActionID{SpellID: SpellIDMagmaTotem},
-				Character:      &shaman.Character,
-				SpellSchool:    stats.FireSpellPower,
-				BaseManaCost:   800,
-				ManaCost:       800,
-				GCD:            time.Second,
-				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
-				IsPhantom:      true,
+				ActionID:            core.ActionID{SpellID: SpellIDMagmaTotem},
+				Character:           &shaman.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				BaseManaCost:        800,
+				ManaCost:            800,
+				GCD:                 time.Second,
+				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+				IsPhantom:           true,
 			},
 		},
 		AOECap: 1600,
@@ -160,14 +163,16 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 					SpellID:    SpellIDNovaTotem,
 					CooldownID: CooldownIDNovaTotem,
 				},
-				Character:      &shaman.Character,
-				SpellSchool:    stats.FireSpellPower,
-				BaseManaCost:   765,
-				ManaCost:       765,
-				GCD:            time.Second,
-				Cooldown:       time.Second * 15,
-				CritMultiplier: shaman.DefaultSpellCritMultiplier(),
-				IsPhantom:      true,
+				Character:           &shaman.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolFire,
+				BaseManaCost:        765,
+				ManaCost:            765,
+				GCD:                 time.Second,
+				Cooldown:            time.Second * 15,
+				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+				IsPhantom:           true,
 			},
 		},
 		AOECap: 9975,

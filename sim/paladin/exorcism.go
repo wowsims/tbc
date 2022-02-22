@@ -5,7 +5,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var ExorcismCD = core.NewCooldownID()
@@ -15,12 +14,14 @@ func (paladin *Paladin) newExorcismTemplate(sim *core.Simulation) core.SimpleSpe
 	exo := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:       ExorcismActionID,
-				Character:      &paladin.Character,
-				SpellSchool:    stats.HolySpellPower,
-				ManaCost:       295,
-				Cooldown:       time.Second * 15,
-				CritMultiplier: paladin.SpellCritMultiplier(1, 0.25), // look up crit multiplier in the future
+				ActionID:            ExorcismActionID,
+				Character:           &paladin.Character,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellSchool:         core.SpellSchoolHoly,
+				ManaCost:            295,
+				Cooldown:            time.Second * 15,
+				CritMultiplier:      paladin.SpellCritMultiplier(1, 0.25), // look up crit multiplier in the future
 			},
 		},
 		Effect: core.SpellHitEffect{
