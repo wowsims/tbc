@@ -19,6 +19,7 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFrost,
+				SpellExtras:         core.SpellExtrasChanneled,
 				Character:           &mage.Character,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
@@ -31,8 +32,7 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				GCD: core.GCDDefault,
 			},
 		},
-		IsChannel: true,
-		AOECap:    3620,
+		AOECap: 3620,
 	}
 
 	baseEffect := core.SpellHitEffect{

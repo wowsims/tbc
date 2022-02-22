@@ -66,9 +66,6 @@ type Cast struct {
 	// How much to multiply damage by, if this cast crits.
 	CritMultiplier float64
 
-	// Bonus crit to be applied to all effects resulting from this cast.
-	BonusCritRating float64
-
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete OnCastComplete
 

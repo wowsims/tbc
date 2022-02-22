@@ -159,8 +159,10 @@ func (se SpellExtras) Matches(other SpellExtras) bool {
 const (
 	SpellExtrasNone          SpellExtras = 0
 	SpellExtrasIgnoreResists SpellExtras = 1 << iota // skip spell resist/armor
+	SpelLExtrasIgnoreDodge                           // Ignores dodge in physical hit rolls
 	SpellExtrasAlwaysHits                            // Can't miss the hit roll
 	SpellExtrasBinary                                // Does not do partial resists and could need a different hit roll.
+	SpellExtrasChanneled                             // Spell is channeled
 )
 
 // OutcomeRollCategory is the mask for what kind of hit roll to perform

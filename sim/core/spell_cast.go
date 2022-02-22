@@ -72,8 +72,9 @@ type SpellEffect struct {
 	IgnoreHitCheck bool // TODO: move this to be part of SpellExtras
 
 	// Callbacks for providing additional custom behavior.
-	OnSpellHit  OnSpellHit
-	OnSpellMiss OnSpellMiss
+	OnSpellHit    OnSpellHit
+	OnSpellMiss   OnSpellMiss
+	OnMeleeAttack OnMeleeAttack
 
 	// Results
 	Outcome HitOutcome
@@ -149,7 +150,7 @@ func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spellCast *SpellCast) 
 
 // Calculates a crit check using the stats from this spell.
 func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast) bool {
-	critChance := (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
+	critChance := (spellCast.Character.GetStat(stats.SpellCrit) + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
 	return sim.RandomFloat("DirectSpell Crit") < critChance
 }
 

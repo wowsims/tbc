@@ -116,8 +116,6 @@ type SimpleSpell struct {
 	// multiple effects, like Arcane Explosion, Chain Lightning, or Consecrate.
 	Effects []SpellHitEffect
 
-	IsChannel bool
-
 	// Maximum amount of pre-crit damage this spell is allowed to do.
 	AOECap float64
 
@@ -142,7 +140,7 @@ func (spell *SimpleSpell) Init(sim *Simulation) {
 		}
 	}
 
-	if spell.IsChannel {
+	if spell.SpellExtras.Matches(SpellExtrasChanneled) {
 		spell.AfterCastDelay += spell.GetChannelDuration()
 	}
 }
@@ -156,7 +154,7 @@ func (spell *SimpleSpell) GetChannelDuration() time.Duration {
 }
 
 func (spell *SimpleSpell) GetDuration() time.Duration {
-	if spell.IsChannel {
+	if spell.SpellExtras.Matches(SpellExtrasChanneled) {
 		return spell.CastTime + spell.GetChannelDuration()
 	} else {
 		return spell.CastTime
