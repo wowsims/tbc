@@ -170,6 +170,7 @@ message EnhancementShaman {
 		bool bloodlust = 2;
 		bool delay_offhand_swings = 5;
 
+		// TODO: Deprecate on 3/21 (1 month). Use consumes main_hand_imbue and off_hand_imbue instead.
 		ShamanWeaponImbue main_hand_imbue = 3;
 		ShamanWeaponImbue off_hand_imbue = 4;
 

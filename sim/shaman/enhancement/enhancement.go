@@ -53,25 +53,28 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 	})
 
 	if !enh.HasMHWeapon() {
-		enhOptions.Options.MainHandImbue = proto.ShamanWeaponImbue_ImbueNone
+		enh.Consumes.MainHandImbue = proto.WeaponImbue_WeaponImbueUnknown
 	}
 	if !enh.HasOHWeapon() {
-		enhOptions.Options.OffHandImbue = proto.ShamanWeaponImbue_ImbueNone
+		enh.Consumes.OffHandImbue = proto.WeaponImbue_WeaponImbueUnknown
 	}
 	enh.ApplyWindfuryImbue(
-		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueWindfury,
-		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueWindfury)
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanWindfury,
+		enh.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueShamanWindfury)
 	enh.ApplyFlametongueImbue(
-		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueFlametongue,
-		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueFlametongue)
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanFlametongue,
+		enh.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueShamanFlametongue)
 	enh.ApplyFrostbrandImbue(
-		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueFrostbrand,
-		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueFrostbrand)
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanFrostbrand,
+		enh.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueShamanFrostbrand)
 	enh.ApplyRockbiterImbue(
-		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueRockbiter,
-		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueRockbiter)
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanRockbiter,
+		enh.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueShamanRockbiter)
 
-	if enhOptions.Options.MainHandImbue != proto.ShamanWeaponImbue_ImbueNone {
+	if enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanWindfury ||
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanFlametongue ||
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanFrostbrand ||
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanRockbiter {
 		enh.HasMHWeaponImbue = true
 	}
 

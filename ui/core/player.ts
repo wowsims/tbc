@@ -732,6 +732,17 @@ export class Player<SpecType extends Spec> {
 				}
 			}
 
+			// TODO: Remove this on 3/21 (1 month).
+			if (this.spec == Spec.SpecEnhancementShaman) {
+				const enhOptions = options as SpecOptions<Spec.SpecEnhancementShaman>;
+				if (proto.consumes && enhOptions.mainHandImbue != 0) {
+					proto.consumes.mainHandImbue = 5 + enhOptions.mainHandImbue;
+				}
+				if (proto.consumes && enhOptions.offHandImbue != 0) {
+					proto.consumes.offHandImbue = 5 + enhOptions.offHandImbue;
+				}
+			}
+
 			this.setName(eventID, proto.name);
 			this.setRace(eventID, proto.race);
 			this.setGear(eventID, proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));

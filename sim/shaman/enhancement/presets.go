@@ -61,8 +61,6 @@ var enhShamOptions = &proto.EnhancementShaman_Options{
 	WaterShield:        true,
 	Bloodlust:          true,
 	DelayOffhandSwings: true,
-	MainHandImbue:      proto.ShamanWeaponImbue_ImbueWindfury,
-	OffHandImbue:       proto.ShamanWeaponImbue_ImbueWindfury,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{
@@ -85,6 +83,8 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 var FullConsumes = &proto.Consumes{
 	Drums:         proto.Drums_DrumsOfBattle,
 	BattleChicken: true,
+	MainHandImbue: proto.WeaponImbue_WeaponImbueShamanWindfury,
+	OffHandImbue:  proto.WeaponImbue_WeaponImbueShamanWindfury,
 }
 
 var NoDebuffTarget = &proto.Target{
