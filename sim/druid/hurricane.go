@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDHurricane int32 = 27012
@@ -24,10 +25,16 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 				SpellSchool:         core.SpellSchoolNature,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				BaseManaCost:        1905,
-				ManaCost:            1905,
-				GCD:                 core.GCDDefault,
-				Cooldown:            time.Second * 60,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 1905,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 1905,
+				},
+				GCD:      core.GCDDefault,
+				Cooldown: time.Second * 60,
 			},
 		},
 		IsChannel: true,

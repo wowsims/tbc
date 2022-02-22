@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDMindFlay int32 = 25387
@@ -22,10 +23,16 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		SpellSchool:         core.SpellSchoolShadow,
 		SpellExtras:         core.SpellExtrasBinary,
-		BaseManaCost:        230,
-		ManaCost:            230,
-		CastTime:            0,
-		GCD:                 core.GCDDefault,
+		BaseCost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 230,
+		},
+		Cost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 230,
+		},
+		CastTime: 0,
+		GCD:      core.GCDDefault,
 	}
 
 	effect := core.SpellHitEffect{

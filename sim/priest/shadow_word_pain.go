@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDShadowWordPain int32 = 25368
@@ -13,13 +14,14 @@ var ShadowWordPainActionID = core.ActionID{SpellID: SpellIDShadowWordPain}
 var ShadowWordPainDebuffID = core.NewDebuffID()
 
 func (priest *Priest) newShadowWordPainTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 575}
 	baseCast := core.Cast{
 		ActionID:            ShadowWordPainActionID,
 		Character:           &priest.Character,
 		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		SpellSchool:         core.SpellSchoolShadow,
-		BaseManaCost:        575,
-		ManaCost:            575,
+		BaseCost:            cost,
+		Cost:                cost,
 		CastTime:            0,
 		GCD:                 core.GCDDefault,
 	}

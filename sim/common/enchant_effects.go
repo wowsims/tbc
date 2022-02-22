@@ -44,10 +44,10 @@ func ApplyCrusader(agent core.Agent) {
 		return
 	}
 	if !mh {
-		ppmm.SetProcChance(false, 0)
+		ppmm.SetProcChance(true, 0)
 	}
 	if !oh {
-		ppmm.SetProcChance(true, 0)
+		ppmm.SetProcChance(false, 0)
 	}
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -80,7 +80,7 @@ func ApplyCrusader(agent core.Agent) {
 		return core.Aura{
 			ID: CrusaderAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 
@@ -135,10 +135,10 @@ func ApplyMongoose(agent core.Agent) {
 		return
 	}
 	if !mh {
-		ppmm.SetProcChance(false, 0)
+		ppmm.SetProcChance(true, 0)
 	}
 	if !oh {
-		ppmm.SetProcChance(true, 0)
+		ppmm.SetProcChance(false, 0)
 	}
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -174,7 +174,7 @@ func ApplyMongoose(agent core.Agent) {
 		return core.Aura{
 			ID: MongooseAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 
@@ -232,10 +232,10 @@ func ApplyExecutioner(agent core.Agent) {
 		return
 	}
 	if !mh {
-		ppmm.SetProcChance(false, 0)
+		ppmm.SetProcChance(true, 0)
 	}
 	if !oh {
-		ppmm.SetProcChance(true, 0)
+		ppmm.SetProcChance(false, 0)
 	}
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
@@ -244,7 +244,7 @@ func ApplyExecutioner(agent core.Agent) {
 		return core.Aura{
 			ID: ExecutionerAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-				if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 

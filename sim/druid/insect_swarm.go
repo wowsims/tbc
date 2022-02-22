@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDInsectSwarm int32 = 27013
@@ -18,9 +19,15 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpel
 		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		SpellSchool:         core.SpellSchoolNature,
 		Character:           &druid.Character,
-		BaseManaCost:        175,
-		ManaCost:            175,
-		GCD:                 core.GCDDefault,
+		BaseCost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 175,
+		},
+		Cost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 175,
+		},
+		GCD: core.GCDDefault,
 	}
 
 	effect := core.SpellHitEffect{

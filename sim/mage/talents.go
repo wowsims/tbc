@@ -75,7 +75,7 @@ func (mage *Mage) applyArcaneConcentration() {
 			ID:       ClearcastingAuraID,
 			ActionID: core.ActionID{SpellID: 12536},
 			OnCast: func(sim *core.Simulation, cast *core.Cast) {
-				cast.ManaCost = 0
+				cast.Cost.Value = 0
 				cast.BonusCritRating += bonusCrit
 			},
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
@@ -218,7 +218,7 @@ func (mage *Mage) registerArcanePowerCD() {
 					ActionID: actionID,
 					Expires:  sim.CurrentTime + time.Second*15,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.ManaCost *= 1.3
+						cast.Cost.Value *= 1.3
 					},
 					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						spellEffect.DamageMultiplier *= 1.3
@@ -248,7 +248,7 @@ func (mage *Mage) applyMasterOfElements() {
 			ID: MasterOfElementsAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					mage.AddMana(sim, spellCast.BaseManaCost*refundCoeff, core.ActionID{SpellID: 29076}, false)
+					mage.AddMana(sim, spellCast.BaseCost.Value*refundCoeff, core.ActionID{SpellID: 29076}, false)
 				}
 			},
 		}

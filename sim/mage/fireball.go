@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const (
@@ -21,11 +22,17 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
-				BaseManaCost:        425,
-				ManaCost:            425,
-				CastTime:            time.Millisecond * 3500,
-				GCD:                 core.GCDDefault,
-				CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 425,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 425,
+				},
+				CastTime:       time.Millisecond * 3500,
+				GCD:            core.GCDDefault,
+				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -47,8 +54,8 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	}
 
 	spell.CastTime -= time.Millisecond * 100 * time.Duration(mage.Talents.ImprovedFireball)
-	spell.ManaCost -= spell.BaseManaCost * float64(mage.Talents.Pyromaniac) * 0.01
-	spell.ManaCost *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
+	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
+	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
@@ -76,7 +83,6 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
-				IgnoreManaCost:      true,
 			},
 		},
 		Effect: core.SpellHitEffect{

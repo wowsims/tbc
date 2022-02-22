@@ -29,7 +29,7 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.MeleeAb
 				Type:  stats.Energy,
 				Value: energyCost,
 			},
-			CritMultiplier: rogue.DefaultMeleeCritMultiplier(),
+			CritMultiplier: rogue.critMultiplier(true, true),
 		},
 		Effect: core.AbilityHitEffect{
 			AbilityEffect: core.AbilityEffect{
@@ -50,6 +50,14 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.MeleeAb
 				rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 			}
 		},
+	}
+
+	ability.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(rogue.Talents.Aggression)
+	if rogue.Talents.SurpriseAttacks {
+		ability.Effect.StaticDamageMultiplier *= 1.1
+	}
+	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
+		ability.Effect.StaticDamageMultiplier *= 1.06
 	}
 
 	return core.NewMeleeAbilityTemplate(ability)

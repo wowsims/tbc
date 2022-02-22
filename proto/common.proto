@@ -203,8 +203,7 @@ enum Conjured {
 	ConjuredDarkRune = 1;
 	ConjuredFlameCap = 2;
 
-	// Mage's mana emerald is in this category too, but it is handled seperately
-	// because there is always a max of 3 per encounter.
+	ConjuredMageManaEmerald = 3;
 }
 
 enum WeaponImbue {
@@ -214,6 +213,11 @@ enum WeaponImbue {
 	WeaponImbueElementalSharpeningStone = 2;
 	WeaponImbueBrilliantWizardOil = 3;
 	WeaponImbueSuperiorWizardOil = 4;
+
+	WeaponImbueShamanFlametongue = 6;
+	WeaponImbueShamanFrostbrand = 7;
+	WeaponImbueShamanRockbiter = 8;
+	WeaponImbueShamanWindfury = 9;
 }
 
 enum Flask {
@@ -366,11 +370,6 @@ message Consumes {
     bool elixir_of_draenic_wisdom = 9;
     bool elixir_of_major_mageblood = 10;
 		GuardianElixir guardian_elixir = 40;
-
-		// Deprecated, use main_hand_imbue instead.
-		// Remove on 2/18/2022 (1 month).
-    bool brilliant_wizard_oil = 11; 
-    bool superior_wizard_oil = 12; 
 
 		WeaponImbue main_hand_imbue = 32;
 		WeaponImbue off_hand_imbue = 33;

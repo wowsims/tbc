@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // https://web.archive.org/web/20071201221602/http://www.shadowpriest.com/viewtopic.php?t=7616
@@ -50,14 +51,15 @@ func (priest *Priest) registerShadowfiendCD() {
 }
 
 func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: priest.BaseMana() * 0.06}
 	baseCast := core.Cast{
 		ActionID:            ShadowfiendActionID,
 		Character:           &priest.Character,
 		CritRollCategory:    core.CritRollCategoryMagical,
 		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		SpellSchool:         core.SpellSchoolShadow,
-		BaseManaCost:        575,
-		ManaCost:            575,
+		BaseCost:            cost,
+		Cost:                cost,
 		CastTime:            0,
 		GCD:                 core.GCDDefault,
 		Cooldown:            time.Minute * 5,

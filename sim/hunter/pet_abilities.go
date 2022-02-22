@@ -234,7 +234,6 @@ func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) Pe
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolNature,
-				IgnoreManaCost:      true,
 				GCD:                 core.GCDDefault,
 				CritMultiplier:      1.5,
 			},

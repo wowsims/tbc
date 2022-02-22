@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // Totem Item IDs
@@ -32,6 +33,7 @@ const (
 
 // Shared precomputation logic for LB and CL.
 func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellCast {
+	cost := core.ResourceCost{Type: stats.Mana, Value: baseManaCost}
 	spellCast := core.SpellCast{
 		Cast: core.Cast{
 			ActionID:            actionID,
@@ -39,8 +41,8 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 			CritRollCategory:    core.CritRollCategoryMagical,
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			SpellSchool:         core.SpellSchoolNature,
-			BaseManaCost:        baseManaCost,
-			ManaCost:            baseManaCost,
+			BaseCost:            cost,
+			Cost:                cost,
 			CastTime:            baseCastTime,
 			GCD:                 core.GCDDefault,
 			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
@@ -54,12 +56,11 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 	if isLightningOverload {
 		spellCast.ActionID.Tag = CastTagLightningOverload
 		spellCast.CastTime = 0
-		spellCast.ManaCost = 0
 		spellCast.GCD = 0
-		spellCast.IgnoreManaCost = true
+		spellCast.Cost.Value = 0
 	} else if shaman.Talents.LightningMastery > 0 {
 		// Convection applies against the base cost of the spell.
-		spellCast.ManaCost -= spellCast.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
+		spellCast.Cost.Value -= spellCast.BaseCost.Value * float64(shaman.Talents.Convection) * 0.02
 		spellCast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
 	}
 
@@ -117,6 +118,6 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 func (shaman *Shaman) applyElectricSpellCastInitModifiers(spellCast *core.SpellCast) {
 	if shaman.ElementalFocusStacks > 0 {
 		// Reduces mana cost by 40%
-		spellCast.Cast.ManaCost -= spellCast.Cast.BaseManaCost * 0.4
+		spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.4
 	}
 }

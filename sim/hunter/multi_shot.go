@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var MultiShotCooldownID = core.NewCooldownID()
@@ -13,10 +14,16 @@ var MultiShotActionID = core.ActionID{SpellID: 27021, CooldownID: MultiShotCoold
 func (hunter *Hunter) newMultiShotCastTemplate(sim *core.Simulation) core.SimpleCast {
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     MultiShotActionID,
-			Character:    hunter.GetCharacter(),
-			BaseManaCost: 275,
-			ManaCost:     275,
+			ActionID:  MultiShotActionID,
+			Character: hunter.GetCharacter(),
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 275,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 275,
+			},
 			// Cast time is affected by ranged attack speed so set it later.
 			//CastTime:     time.Millisecond * 500,
 			GCD:         core.GCDDefault,
@@ -32,9 +39,9 @@ func (hunter *Hunter) newMultiShotCastTemplate(sim *core.Simulation) core.Simple
 		DisableMetrics: true,
 	}
 
-	template.ManaCost *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+	template.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 	if ItemSetDemonStalker.CharacterHasSetBonus(&hunter.Character, 4) {
-		template.ManaCost -= 275.0 * 0.1
+		template.Cost.Value -= 275.0 * 0.1
 	}
 
 	return template
@@ -48,7 +55,6 @@ func (hunter *Hunter) newMultiShotAbilityTemplate(sim *core.Simulation) core.Mel
 			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			SpellSchool:         core.SpellSchoolPhysical,
-			IgnoreCost:          true,
 			// TODO: If we ever allow multiple targets to have their own type, need to
 			// update this.
 			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),

@@ -1,22 +1,29 @@
+import { Alchohol} from '/tbc/core/proto/common.js';
+import { BattleElixir } from '/tbc/core/proto/common.js';
 import { BonusStatsPicker } from '/tbc/core/components/bonus_stats_picker.js';
 import { BooleanPicker, BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
 import { CharacterStats } from '/tbc/core/components/character_stats.js';
 import { Class } from '/tbc/core/proto/common.js';
-import { CooldownsPicker } from '/tbc/core/components/cooldowns_picker.js';
+import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Cooldowns } from '/tbc/core/proto/common.js';
+import { CooldownsPicker } from '/tbc/core/components/cooldowns_picker.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
+import { Drums } from '/tbc/core/proto/common.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Encounter } from './encounter.js';
 import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
 import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { EventID, TypedEvent } from './typed_event.js';
 import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
-import { IconPicker, IconPickerConfig } from '/tbc/core/components/icon_picker.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { IconEnumPicker, IconEnumPickerConfig } from '/tbc/core/components/icon_enum_picker.js';
+import { IconPicker, IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { IndividualImporter } from '/tbc/core/components/individual_importer.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
@@ -25,8 +32,10 @@ import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { NumberPicker, NumberPickerConfig } from '/tbc/core/components/number_picker.js';
 import { Party } from './party.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
-import { Player } from './player.js';
+import { PetFood } from '/tbc/core/proto/common.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
+import { Player } from './player.js';
+import { Potions } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Raid } from './raid.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
@@ -39,24 +48,26 @@ import { Sim } from './sim.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
 import { SimUI, SimWarning } from './sim_ui.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
 import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
-import { launchedSpecs } from '/tbc/core/launched_sims.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { StatWeightsRequest } from '/tbc/core/proto/api.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Target } from './target.js';
-import { EventID, TypedEvent } from './typed_event.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { addRaidSimAction, RaidSimResultsManager } from '/tbc/core/components/raid_sim_action.js';
 import { addStatWeightsAction } from '/tbc/core/components/stat_weights_action.js';
 import { equalsOrBothNull } from '/tbc/core/utils.js';
+import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
+import { isDualWieldSpec } from '/tbc/core/proto_utils/utils.js';
+import { launchedSpecs } from '/tbc/core/launched_sims.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
 import { specNames } from '/tbc/core/proto_utils/utils.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 
+import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 declare var Muuri: any;
@@ -94,28 +105,45 @@ class IndividualSimIconPicker<ModObject, ValueType> {
 	}
 }
 
+export type InputConfig = {
+	type: 'boolean',
+	getModObject: (simUI: IndividualSimUI<any>) => any,
+	config: BooleanPickerConfig<any>,
+} |
+{
+	type: 'number',
+	getModObject: (simUI: IndividualSimUI<any>) => any,
+	config: NumberPickerConfig<any>,
+} |
+{
+	type: 'enum',
+	getModObject: (simUI: IndividualSimUI<any>) => any,
+	config: EnumPickerConfig<any>,
+} |
+{
+	type: 'iconEnum',
+	getModObject: (simUI: IndividualSimUI<any>) => any,
+	config: IconEnumPickerConfig<any, any>,
+};
+
+
 export interface InputSection {
 	tooltip?: string,
-	inputs: Array<{
-		type: 'boolean',
-		getModObject: (simUI: IndividualSimUI<any>) => any,
-		config: BooleanPickerConfig<any>,
-	} |
-	{
-		type: 'number',
-		getModObject: (simUI: IndividualSimUI<any>) => any,
-		config: NumberPickerConfig<any>,
-	} |
-	{
-		type: 'enum',
-		getModObject: (simUI: IndividualSimUI<any>) => any,
-		config: EnumPickerConfig<any>,
-	} |
-	{
-		type: 'iconEnum',
-		getModObject: (simUI: IndividualSimUI<any>) => any,
-		config: IconEnumPickerConfig<any, any>,
-	}>,
+	inputs: Array<InputConfig>,
+}
+
+export interface ConsumeOptions {
+	potions: Array<Potions>,
+	conjured: Array<Conjured>,
+	flasks: Array<Flask>,
+	battleElixirs: Array<BattleElixir>,
+	guardianElixirs: Array<GuardianElixir>,
+	food: Array<Food>,
+	alcohol: Array<Alchohol>,
+	weaponImbues: Array<WeaponImbue>,
+
+	pet?: Array<IndividualSimIconPickerConfig<Player<any>, any>>,
+	other?: Array<IndividualSimIconPickerConfig<Player<any>, any>>,
 }
 
 export interface IndividualSimUIConfig<SpecType extends Spec> {
@@ -150,9 +178,9 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
 	partyBuffInputs: Array<IndividualSimIconPickerConfig<Party, any>>,
 	playerBuffInputs: Array<IndividualSimIconPickerConfig<Player<any>, any>>,
 	debuffInputs: Array<IndividualSimIconPickerConfig<Target, any>>;
-	consumeInputs: Array<IndividualSimIconPickerConfig<Player<any>, any>>;
 	rotationInputs: InputSection;
 	otherInputs?: InputSection;
+	consumeOptions?: ConsumeOptions;
 
 	// Extra UI sections with the same input config as other sections.
   additionalSections?: Record<string, InputSection>;
@@ -304,17 +332,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			if (!loadedSettings) {
 				this.applyDefaults(initEventID);
 			}
-
-			// Fix some bad defaults we used to have to enhance.
-			if (this.player.spec == Spec.SpecEnhancementShaman) {
-				const consumes = this.player.getConsumes();
-				if (consumes.flask == Flask.FlaskOfBlindingLight) {
-					consumes.flask = Flask.FlaskUnknown;
-				}
-				consumes.mainHandImbue = 0;
-				this.player.setConsumes(initEventID, consumes);
-			}
-
 			this.player.setName(initEventID, 'Player');
 
 			// This needs to go last so it doesn't re-store things as they are initialized.
@@ -459,8 +476,47 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 					</fieldset>
 				</div>
 				<div class="settings-section-container">
-					<fieldset class="settings-section consumes-section">
+					<fieldset class="settings-section new-consumes-section">
 						<legend>Consumes</legend>
+						<div class="consumes-row">
+							<span>Potions</span>
+							<div class="consumes-row-inputs">
+								<div class="consumes-potions"></div>
+								<div class="consumes-conjured"></div>
+							</div>
+						</div>
+						<div class="consumes-row">
+							<span>Elixirs</span>
+							<div class="consumes-row-inputs">
+								<div class="consumes-flasks"></div>
+								<span>OR</span>
+								<div class="consumes-battle-elixirs"></div>
+								<div class="consumes-guardian-elixirs"></div>
+							</div>
+						</div>
+						<div class="consumes-row">
+							<span>Imbues</span>
+							<div class="consumes-row-inputs">
+								<div class="consumes-imbue-mh"></div>
+								<div class="consumes-imbue-oh"></div>
+							</div>
+						</div>
+						<div class="consumes-row">
+							<span>Food</span>
+							<div class="consumes-row-inputs">
+								<div class="consumes-food"></div>
+								<div class="consumes-alcohol"></div>
+							</div>
+						</div>
+						<div class="consumes-row consumes-row-pet">
+							<span>Pet</span>
+							<div class="consumes-row-inputs consumes-pet">
+							</div>
+						</div>
+						<div class="consumes-row">
+							<div class="consumes-row-inputs consumes-other">
+							</div>
+						</div>
 					</fieldset>
 				</div>
 				<div class="settings-section-container cooldowns-section-container">
@@ -526,10 +582,65 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				this.individualConfig.debuffInputs.map(iconInput => new IndividualSimIconPicker(debuffsSection, this.sim.encounter.primaryTarget, iconInput, this)),
 				Tooltips.DEBUFFS_SECTION);
 
-		const consumesSection = this.rootElem.getElementsByClassName('consumes-section')[0] as HTMLElement;
-    configureIconSection(
-				consumesSection,
-				this.individualConfig.consumeInputs.map(iconInput => new IndividualSimIconPicker(consumesSection, this.player, iconInput, this)));
+		if (this.individualConfig.consumeOptions?.potions.length) {
+			const elem = this.rootElem.getElementsByClassName('consumes-potions')[0] as HTMLElement;
+			new IconEnumPicker(elem, this.player,
+					IconInputs.makePotionsInput(this.individualConfig.consumeOptions.potions));
+		}
+		if (this.individualConfig.consumeOptions?.conjured.length) {
+			const elem = this.rootElem.getElementsByClassName('consumes-conjured')[0] as HTMLElement;
+			new IconEnumPicker(elem, this.player,
+					IconInputs.makeConjuredInput(this.individualConfig.consumeOptions.conjured));
+		}
+		if (this.individualConfig.consumeOptions?.flasks.length) {
+			const elem = this.rootElem.getElementsByClassName('consumes-flasks')[0] as HTMLElement;
+			new IconEnumPicker(elem, this.player,
+					IconInputs.makeFlasksInput(this.individualConfig.consumeOptions.flasks));
+		}
+		if (this.individualConfig.consumeOptions?.battleElixirs.length) {
+			const elem = this.rootElem.getElementsByClassName('consumes-battle-elixirs')[0] as HTMLElement;
+			new IconEnumPicker(elem, this.player,
+					IconInputs.makeBattleElixirsInput(this.individualConfig.consumeOptions.battleElixirs));
+		}
+		if (this.individualConfig.consumeOptions?.guardianElixirs.length) {
+			const elem = this.rootElem.getElementsByClassName('consumes-guardian-elixirs')[0] as HTMLElement;
+			new IconEnumPicker(elem, this.player,
+					IconInputs.makeGuardianElixirsInput(this.individualConfig.consumeOptions.guardianElixirs));
+		}
+		if (this.individualConfig.consumeOptions?.food.length) {
+			const elem = this.rootElem.getElementsByClassName('consumes-food')[0] as HTMLElement;
+			new IconEnumPicker(elem, this.player,
+					IconInputs.makeFoodInput(this.individualConfig.consumeOptions.food));
+		}
+		if (this.individualConfig.consumeOptions?.alcohol.length) {
+			const elem = this.rootElem.getElementsByClassName('consumes-alcohol')[0] as HTMLElement;
+			new IconEnumPicker(elem, this.player,
+					IconInputs.makeAlcoholInput(this.individualConfig.consumeOptions.alcohol));
+		}
+
+		if (this.individualConfig.consumeOptions?.weaponImbues.length) {
+			const mhImbueElem = this.rootElem.getElementsByClassName('consumes-imbue-mh')[0] as HTMLElement;
+			const ohImbueElem = this.rootElem.getElementsByClassName('consumes-imbue-oh')[0] as HTMLElement;
+			new IconEnumPicker(mhImbueElem, this.player,
+					IconInputs.makeWeaponImbueInput(true, this.individualConfig.consumeOptions.weaponImbues));
+			if (isDualWieldSpec(this.player.spec)) {
+				new IconEnumPicker(ohImbueElem, this.player,
+						IconInputs.makeWeaponImbueInput(false, this.individualConfig.consumeOptions.weaponImbues));
+			}
+		}
+
+		if (this.individualConfig.consumeOptions?.pet?.length) {
+			const petConsumesElem = this.rootElem.getElementsByClassName('consumes-pet')[0] as HTMLElement;
+			this.individualConfig.consumeOptions.pet.map(iconInput => new IndividualSimIconPicker(petConsumesElem, this.player, iconInput, this));
+		} else {
+			const petRowElem = this.rootElem.getElementsByClassName('consumes-row-pet')[0] as HTMLElement;
+			petRowElem.style.display = 'none';
+		}
+
+		if (this.individualConfig.consumeOptions?.other?.length) {
+			const containerElem = this.rootElem.getElementsByClassName('consumes-other')[0] as HTMLElement;
+			this.individualConfig.consumeOptions.other.map(iconInput => new IndividualSimIconPicker(containerElem, this.player, iconInput, this));
+		}
 
 		const configureInputSection = (sectionElem: HTMLElement, sectionConfig: InputSection) => {
 			if (sectionConfig.tooltip) {
@@ -540,16 +651,16 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			}
 
       sectionConfig.inputs.forEach(inputConfig => {
-        if (inputConfig.type == 'number') {
-          const picker = new NumberPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
-        } else if (inputConfig.type == 'boolean') {
-          const picker = new BooleanPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
-        } else if (inputConfig.type == 'enum') {
-          const picker = new EnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
-        } else if (inputConfig.type == 'iconEnum') {
-          const picker = new IconEnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
-        }
-      });
+				if (inputConfig.type == 'number') {
+					new NumberPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
+				} else if (inputConfig.type == 'boolean') {
+					new BooleanPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
+				} else if (inputConfig.type == 'enum') {
+					new EnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
+				} else if (inputConfig.type == 'iconEnum') {
+					new IconEnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
+				}
+			});
 		};
     configureInputSection(this.rootElem.getElementsByClassName('rotation-section')[0] as HTMLElement, this.individualConfig.rotationInputs);
 		if (this.individualConfig.otherInputs?.inputs.length) {

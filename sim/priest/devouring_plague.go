@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDDevouringPlague int32 = 25467
@@ -11,6 +12,7 @@ const SpellIDDevouringPlague int32 = 25467
 var DevouringPlagueCooldownID = core.NewCooldownID()
 
 func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 1145}
 	baseCast := core.Cast{
 		ActionID: core.ActionID{
 			SpellID:    SpellIDDevouringPlague,
@@ -20,8 +22,8 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 		CritRollCategory:    core.CritRollCategoryMagical,
 		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		SpellSchool:         core.SpellSchoolShadow,
-		BaseManaCost:        1145,
-		ManaCost:            1145,
+		BaseCost:            cost,
+		Cost:                cost,
 		CastTime:            0,
 		GCD:                 core.GCDDefault,
 		Cooldown:            time.Minute * 3,

@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // Starfire spell IDs
@@ -21,11 +22,17 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 		CritRollCategory:    core.CritRollCategoryMagical,
 		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		SpellSchool:         core.SpellSchoolArcane,
-		BaseManaCost:        370,
-		ManaCost:            370,
-		CastTime:            time.Millisecond * 3500,
-		GCD:                 core.GCDDefault,
-		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
+		BaseCost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 370,
+		},
+		Cost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 370,
+		},
+		CastTime:       time.Millisecond * 3500,
+		GCD:            core.GCDDefault,
+		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
 	effect := core.SpellHitEffect{
@@ -42,8 +49,8 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 	}
 
 	if rank == 6 {
-		baseCast.BaseManaCost = 315
-		baseCast.ManaCost = 315
+		baseCast.BaseCost.Value = 315
+		baseCast.Cost.Value = 315
 		baseCast.ActionID = core.ActionID{
 			SpellID: SpellIDSF6,
 		}
@@ -52,7 +59,7 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 		effect.DirectInput.SpellCoefficient = 0.99
 	}
 
-	baseCast.ManaCost -= baseCast.BaseManaCost * 0.03 * float64(druid.Talents.Moonglow)
+	baseCast.Cost.Value -= baseCast.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
 	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
 
 	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)

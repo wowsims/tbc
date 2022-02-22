@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDScorch int32 = 27074
@@ -17,11 +18,17 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
-				BaseManaCost:        180,
-				ManaCost:            180,
-				CastTime:            time.Millisecond * 1500,
-				GCD:                 core.GCDDefault,
-				CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 180,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 180,
+				},
+				CastTime:       time.Millisecond * 1500,
+				GCD:            core.GCDDefault,
+				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -38,8 +45,8 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 		},
 	}
 
-	spell.ManaCost -= spell.BaseManaCost * float64(mage.Talents.Pyromaniac) * 0.01
-	spell.ManaCost *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
+	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
+	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Incineration) * 2 * core.SpellCritRatingPerCritChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance

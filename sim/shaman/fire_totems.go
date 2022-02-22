@@ -4,11 +4,13 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDSearingTotem int32 = 25533
 
 func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 205}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -17,8 +19,8 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
-				BaseManaCost:        205,
-				ManaCost:            205,
+				BaseCost:            cost,
+				Cost:                cost,
 				GCD:                 time.Second,
 				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 				IsPhantom:           true,
@@ -46,8 +48,8 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 		},
 	}
 	spell.Effect.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.TotemicFocus) * 0.05
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
 	if shaman.Talents.ElementalFury {
 		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
@@ -78,6 +80,7 @@ const SpellIDMagmaTotem int32 = 25552
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
 func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 800}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -86,8 +89,8 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
-				BaseManaCost:        800,
-				ManaCost:            800,
+				BaseCost:            cost,
+				Cost:                cost,
 				GCD:                 time.Second,
 				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 				IsPhantom:           true,
@@ -95,8 +98,8 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 		},
 		AOECap: 1600,
 	}
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.TotemicFocus) * 0.05
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
 	if shaman.Talents.ElementalFury {
 		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
@@ -156,6 +159,7 @@ func (shaman *Shaman) FireNovaTickLength() time.Duration {
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
 func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 765}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -167,8 +171,8 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
-				BaseManaCost:        765,
-				ManaCost:            765,
+				BaseCost:            cost,
+				Cost:                cost,
 				GCD:                 time.Second,
 				Cooldown:            time.Second * 15,
 				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
@@ -177,8 +181,8 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 		},
 		AOECap: 9975,
 	}
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.TotemicFocus) * 0.05
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.TotemicFocus) * 0.05
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
 	if shaman.Talents.ElementalFury {
 		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDConsecration int32 = 27173
@@ -20,9 +21,15 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolHoly,
-				BaseManaCost:        660,
-				ManaCost:            660,
-				GCD:                 core.GCDDefault,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 660,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 660,
+				},
+				GCD: core.GCDDefault,
 			},
 		},
 	}

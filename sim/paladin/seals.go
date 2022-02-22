@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const TwistWindow = time.Millisecond * 400
@@ -57,18 +58,25 @@ func (paladin *Paladin) setupSealOfBlood() {
 		},
 	}
 
+	manaCost := 210 * (1 - 0.03*float64(paladin.Talents.Benediction))
 	sob := core.SimpleCast{
 		Cast: core.Cast{
 			ActionID:  SealOfBloodCastActionID,
 			Character: paladin.GetCharacter(),
-			GCD:       core.GCDDefault,
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
+			GCD: core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			paladin.UpdateSeal(sim, sobAura)
 		},
 	}
-
-	sob.ManaCost = 210 * (1 - 0.03*float64(paladin.Talents.Benediction))
 
 	paladin.sealOfBlood = sob
 }
@@ -140,18 +148,25 @@ func (paladin *Paladin) setupSealOfCommand() {
 		},
 	}
 
+	manaCost := 65 * (1 - 0.03*float64(paladin.Talents.Benediction))
 	soc := core.SimpleCast{
 		Cast: core.Cast{
 			ActionID:  SealOfCommandCastActionID,
 			Character: paladin.GetCharacter(),
-			GCD:       core.GCDDefault,
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
+			GCD: core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			paladin.UpdateSeal(sim, socAura)
 		},
 	}
-
-	soc.ManaCost = 65 * (1 - 0.03*float64(paladin.Talents.Benediction))
 
 	paladin.sealOfCommand = soc
 	paladin.SealOfCommandAura = socAura
@@ -174,18 +189,25 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 		ActionID: SealOfTheCrusaderActionID,
 	}
 
+	manaCost := 210 * (1 - 0.03*float64(paladin.Talents.Benediction))
 	sotc := core.SimpleCast{
 		Cast: core.Cast{
 			ActionID:  SealOfTheCrusaderActionID,
 			Character: paladin.GetCharacter(),
-			GCD:       core.GCDDefault,
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
+			GCD: core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			paladin.UpdateSeal(sim, sotcAura)
 		},
 	}
-
-	sotc.ManaCost = 210 * (1 - 0.03*float64(paladin.Talents.Benediction))
 
 	paladin.sealOfTheCrusader = sotc
 	paladin.SealOfTheCrusaderAura = sotcAura
@@ -208,18 +230,25 @@ func (paladin *Paladin) setupSealOfWisdom() {
 		ActionID: SealOfWisdomActionID,
 	}
 
+	manaCost := 270 * (1 - 0.03*float64(paladin.Talents.Benediction))
 	sow := core.SimpleCast{
 		Cast: core.Cast{
 			ActionID:  SealOfWisdomActionID,
 			Character: paladin.GetCharacter(),
-			GCD:       core.GCDDefault,
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: manaCost,
+			},
+			GCD: core.GCDDefault,
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			paladin.UpdateSeal(sim, sowAura)
 		},
 	}
-
-	sow.ManaCost = 270 * (1 - 0.03*float64(paladin.Talents.Benediction))
 
 	paladin.sealOfWisdom = sow
 	paladin.SealOfWisdomAura = sowAura

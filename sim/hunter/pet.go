@@ -73,8 +73,8 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 
 	// Cobra reflexes
 	hp.PseudoStats.MeleeSpeedMultiplier *= 1.3
-	hp.AutoAttacks.ActiveMeleeAbility.Effect.DamageMultiplier *= petConfig.DamageMultiplier
-	hp.AutoAttacks.ActiveMeleeAbility.Effect.DamageMultiplier *= 0.85
+	hp.AutoAttacks.MHAuto.Effect.DamageMultiplier *= petConfig.DamageMultiplier
+	hp.AutoAttacks.MHAuto.Effect.DamageMultiplier *= 0.85
 
 	hp.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Strength,

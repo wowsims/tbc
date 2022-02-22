@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDEarthShock int32 = 25454
@@ -20,6 +21,7 @@ func (shaman *Shaman) ShockCD() time.Duration {
 
 // Shared logic for all shocks.
 func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32, spellSchool core.SpellSchool, baseManaCost float64) core.SimpleSpell {
+	cost := core.ResourceCost{Type: stats.Mana, Value: baseManaCost}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -32,8 +34,8 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         spellSchool,
 				SpellExtras:         core.SpellExtrasBinary,
-				BaseManaCost:        baseManaCost,
-				ManaCost:            baseManaCost,
+				BaseCost:            cost,
+				Cost:                cost,
 				GCD:                 core.GCDDefault,
 				Cooldown:            shaman.ShockCD(),
 				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
@@ -48,8 +50,8 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 		},
 	}
 
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.Convection) * 0.02
-	spell.ManaCost -= spell.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.Convection) * 0.02
+	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
 	if shaman.Talents.ElementalFury {
 		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
@@ -61,7 +63,7 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 
 	// TODO: confirm this is how it reduces mana cost.
 	if ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 2) {
-		spell.ManaCost -= spell.BaseManaCost * 0.1
+		spell.Cost.Value -= spell.BaseCost.Value * 0.1
 	}
 
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfRage {
@@ -90,7 +92,7 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 func (shaman *Shaman) applyShockInitModifiers(spellCast *core.SpellCast) {
 	if shaman.ElementalFocusStacks > 0 {
 		// Reduces mana cost by 40%
-		spellCast.Cast.ManaCost -= spellCast.Cast.BaseManaCost * 0.4
+		spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.4
 	}
 }
 

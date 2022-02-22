@@ -2,6 +2,7 @@ import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { IconEnumPicker, IconEnumPickerConfig } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
+import { makeWeaponImbueInput } from '/tbc/core/components/icon_inputs.js';
 import {
 	AirTotem,
 	EarthTotem,
@@ -9,10 +10,10 @@ import {
 	WaterTotem,
 	EnhancementShaman_Rotation_PrimaryShock as PrimaryShock,
 	ShamanTotems,
-	ShamanWeaponImbue,
 } from '/tbc/core/proto/shaman.js';
 import { EnhancementShaman_Options as ShamanOptions } from '/tbc/core/proto/shaman.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
@@ -25,37 +26,6 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 export const IconBloodlust = makeBooleanShamanBuffInput(ActionId.fromSpellId(2825), 'bloodlust');
 export const IconWaterShield = makeBooleanShamanBuffInput(ActionId.fromSpellId(33736), 'waterShield');
-export const MainHandImbue = makeShamanWeaponImbueInput(false);
-export const OffHandImbue = makeShamanWeaponImbueInput(true);
-
-function makeShamanWeaponImbueInput(isOffHand: boolean): IconEnumPickerConfig<Player<Spec.SpecEnhancementShaman>, ShamanWeaponImbue> {
-	return {
-		extraCssClasses: [
-			'shaman-weapon-imbue-picker',
-		],
-		numColumns: 1,
-		values: [
-			{ color: 'grey', value: ShamanWeaponImbue.ImbueNone },
-			{ actionId: ActionId.fromSpellId(25505), value: ShamanWeaponImbue.ImbueWindfury },
-			{ actionId: ActionId.fromSpellId(25489), value: ShamanWeaponImbue.ImbueFlametongue },
-			{ actionId: ActionId.fromSpellId(25500), value: ShamanWeaponImbue.ImbueFrostbrand },
-			{ actionId: ActionId.fromSpellId(25485), value: ShamanWeaponImbue.ImbueRockbiter },
-		],
-		equals: (a: ShamanWeaponImbue, b: ShamanWeaponImbue) => a == b,
-		zeroValue: ShamanWeaponImbue.ImbueNone,
-		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.specOptionsChangeEmitter,
-		getValue: (player: Player<Spec.SpecEnhancementShaman>) => (!isOffHand ? player.getSpecOptions().mainHandImbue : player.getSpecOptions().offHandImbue) || ShamanWeaponImbue.ImbueNone,
-		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: number) => {
-			const newOptions = player.getSpecOptions();
-			if (!isOffHand) {
-				newOptions.mainHandImbue = newValue;
-			} else {
-				newOptions.offHandImbue = newValue;
-			}
-			player.setSpecOptions(eventID, newOptions);
-		},
-	};
-}
 
 export const DelayOffhandSwings = {
 	type: 'boolean' as const,

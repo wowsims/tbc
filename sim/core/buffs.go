@@ -413,7 +413,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			ActionID:       actionID,
 			Character:      character,
 			SpellSchool:    SpellSchoolPhysical,
-			CritMultiplier: character.AutoAttacks.MH.CritMultiplier,
+			CritMultiplier: character.AutoAttacks.MHAuto.CritMultiplier,
 		},
 		Effect: AbilityHitEffect{
 			AbilityEffect: AbilityEffect{
@@ -440,7 +440,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 		ID:       WindfuryTotemAuraID,
 		ActionID: actionID,
 		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
-			if !hitEffect.Landed() || !hitEffect.IsWeaponHit() || !hitEffect.ProcMask.Matches(ProcMaskMeleeMH) || ability.IsPhantom {
+			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(ProcMaskMeleeMH) || ability.IsPhantom {
 				return
 			}
 			if icd.IsOnCD(sim) {
@@ -640,8 +640,10 @@ func AddPowerInfusionAura(sim *Simulation, character *Character, actionTag int32
 		ActionID: ActionID{SpellID: 10060, Tag: actionTag},
 		Expires:  sim.CurrentTime + PowerInfusionDuration,
 		OnCast: func(sim *Simulation, cast *Cast) {
-			// TODO: Double-check this is how the calculation works.
-			cast.ManaCost = MaxFloat(0, cast.ManaCost-cast.BaseManaCost*0.2)
+			if cast.Cost.Type == stats.Mana {
+				// TODO: Double-check this is how the calculation works.
+				cast.Cost.Value = MaxFloat(0, cast.Cost.Value-cast.BaseCost.Value*0.2)
+			}
 		},
 		OnExpire: func(sim *Simulation) {
 			if !character.HasAura(BloodlustAuraID) {

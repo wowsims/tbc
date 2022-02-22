@@ -42,12 +42,18 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 			baseManaCost := mage.BaseMana() * 0.16
 			castTemplate := core.SimpleCast{
 				Cast: core.Cast{
-					ActionID:     actionID,
-					Character:    mage.GetCharacter(),
-					BaseManaCost: baseManaCost,
-					ManaCost:     baseManaCost,
-					GCD:          core.GCDDefault,
-					Cooldown:     time.Minute * 3,
+					ActionID:  actionID,
+					Character: mage.GetCharacter(),
+					BaseCost: core.ResourceCost{
+						Type:  stats.Mana,
+						Value: baseManaCost,
+					},
+					Cost: core.ResourceCost{
+						Type:  stats.Mana,
+						Value: baseManaCost,
+					},
+					GCD:      core.GCDDefault,
+					Cooldown: time.Minute * 3,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
 
@@ -56,9 +62,9 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 					},
 				},
 			}
-			castTemplate.ManaCost -= castTemplate.BaseManaCost * float64(mage.Talents.FrostChanneling) * 0.05
-			castTemplate.ManaCost *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
-			manaCost = castTemplate.ManaCost
+			castTemplate.Cost.Value -= castTemplate.BaseCost.Value * float64(mage.Talents.FrostChanneling) * 0.05
+			castTemplate.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
+			manaCost = castTemplate.Cost.Value
 
 			return func(sim *core.Simulation, character *core.Character) {
 				cast := castTemplate
@@ -166,11 +172,17 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFrost,
-				BaseManaCost:        baseManaCost,
-				ManaCost:            baseManaCost,
-				CastTime:            time.Millisecond * 3000,
-				GCD:                 core.GCDDefault,
-				CritMultiplier:      we.DefaultSpellCritMultiplier(),
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: baseManaCost,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: baseManaCost,
+				},
+				CastTime:       time.Millisecond * 3000,
+				GCD:            core.GCDDefault,
+				CritMultiplier: we.DefaultSpellCritMultiplier(),
 			},
 		},
 		Effect: core.SpellHitEffect{

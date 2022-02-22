@@ -4,11 +4,12 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func (mage *Mage) registerManaGemsCD() {
-	if !mage.Options.UseManaEmeralds {
+	if mage.Consumes.DefaultConjured != proto.Conjured_ConjuredMageManaEmerald {
 		return
 	}
 
@@ -75,8 +76,7 @@ func (mage *Mage) registerManaGemsCD() {
 
 				mage.remainingManaGems--
 				if mage.remainingManaGems == 0 {
-					// Disable this cooldown so other mana consumes (potions / runes) know
-					// they're free to activate.
+					// Disable this cooldown since we're out of emeralds.
 					character.DisableMajorCooldown(core.MageManaGemMCDActionID)
 				}
 			}

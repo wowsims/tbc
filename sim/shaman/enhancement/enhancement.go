@@ -53,25 +53,28 @@ func NewEnhancementShaman(character core.Character, options proto.Player) *Enhan
 	})
 
 	if !enh.HasMHWeapon() {
-		enhOptions.Options.MainHandImbue = proto.ShamanWeaponImbue_ImbueNone
+		enh.Consumes.MainHandImbue = proto.WeaponImbue_WeaponImbueUnknown
 	}
 	if !enh.HasOHWeapon() {
-		enhOptions.Options.OffHandImbue = proto.ShamanWeaponImbue_ImbueNone
+		enh.Consumes.OffHandImbue = proto.WeaponImbue_WeaponImbueUnknown
 	}
 	enh.ApplyWindfuryImbue(
-		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueWindfury,
-		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueWindfury)
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanWindfury,
+		enh.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueShamanWindfury)
 	enh.ApplyFlametongueImbue(
-		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueFlametongue,
-		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueFlametongue)
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanFlametongue,
+		enh.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueShamanFlametongue)
 	enh.ApplyFrostbrandImbue(
-		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueFrostbrand,
-		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueFrostbrand)
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanFrostbrand,
+		enh.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueShamanFrostbrand)
 	enh.ApplyRockbiterImbue(
-		enhOptions.Options.MainHandImbue == proto.ShamanWeaponImbue_ImbueRockbiter,
-		enhOptions.Options.OffHandImbue == proto.ShamanWeaponImbue_ImbueRockbiter)
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanRockbiter,
+		enh.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueShamanRockbiter)
 
-	if enhOptions.Options.MainHandImbue != proto.ShamanWeaponImbue_ImbueNone {
+	if enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanWindfury ||
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanFlametongue ||
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanFrostbrand ||
+		enh.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueShamanRockbiter {
 		enh.HasMHWeaponImbue = true
 	}
 
@@ -133,7 +136,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 
 			success := shock.Cast(sim)
 			if !success {
-				enh.WaitForMana(sim, shock.ManaCost)
+				enh.WaitForMana(sim, shock.Cost.Value)
 			}
 			return success
 		},
@@ -190,7 +193,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 			ability := totemAction
 			ability.DesiredCastAt = curTime
 			if prioritizeEarlier {
-				ability.MinCastAt = curTime - time.Second*10
+				ability.MinCastAt = curTime - time.Second*20
 				ability.MaxCastAt = curTime + time.Second*10
 			} else {
 				ability.MinCastAt = curTime
@@ -206,13 +209,13 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 	scheduleSpellTotem := func(duration time.Duration, castFactory func(sim *core.Simulation) *core.SimpleSpell) {
 		scheduleTotem(duration, false, false, func(sim *core.Simulation) (bool, float64) {
 			cast := castFactory(sim)
-			return cast.Cast(sim), cast.ManaCost
+			return cast.Cast(sim), cast.Cost.Value
 		})
 	}
 	schedule2MTotem := func(castFactory func(sim *core.Simulation) *core.SimpleCast) {
 		scheduleTotem(time.Minute*2, true, true, func(sim *core.Simulation) (bool, float64) {
 			cast := castFactory(sim)
-			return cast.StartCast(sim), cast.ManaCost
+			return cast.StartCast(sim), cast.Cost.Value
 		})
 	}
 
@@ -228,7 +231,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.NewMagmaTotem(sim)
 				success := cast.Cast(sim)
 				if !success {
-					enh.WaitForMana(sim, cast.ManaCost)
+					enh.WaitForMana(sim, cast.Cost.Value)
 				}
 			}
 		case proto.FireTotem_SearingTotem:
@@ -240,7 +243,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.NewSearingTotem(sim, sim.GetPrimaryTarget())
 				success := cast.Cast(sim)
 				if !success {
-					enh.WaitForMana(sim, cast.ManaCost)
+					enh.WaitForMana(sim, cast.Cost.Value)
 				}
 			}
 		case proto.FireTotem_TotemOfWrath:
@@ -253,7 +256,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.NewTotemOfWrath(sim)
 				success := cast.StartCast(sim)
 				if !success {
-					enh.WaitForMana(sim, cast.ManaCost)
+					enh.WaitForMana(sim, cast.Cost.Value)
 				}
 			}
 		}
@@ -268,7 +271,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.NewNovaTotem(sim)
 				success := cast.Cast(sim)
 				if !success {
-					enh.WaitForMana(sim, cast.ManaCost)
+					enh.WaitForMana(sim, cast.Cost.Value)
 				}
 				return success
 			},
@@ -343,7 +346,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 					cast := enh.NewWindfuryTotem(sim)
 					success := cast.StartCast(sim)
 					if !success {
-						enh.WaitForMana(sim, cast.ManaCost)
+						enh.WaitForMana(sim, cast.Cost.Value)
 					}
 					return success
 				},
@@ -360,7 +363,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 					cast := defaultCastFactory(sim)
 					success := cast.StartCast(sim)
 					if !success {
-						enh.WaitForMana(sim, cast.ManaCost)
+						enh.WaitForMana(sim, cast.Cost.Value)
 					}
 					return success
 				},

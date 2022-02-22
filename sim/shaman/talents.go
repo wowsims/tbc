@@ -131,7 +131,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 					ActionID: actionID,
 					Expires:  core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.ManaCost = 0
+						cast.Cost.Value = 0
 						cast.BonusCritRating = 100.0 * core.SpellCritRatingPerCritChance
 					},
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
@@ -297,7 +297,7 @@ func (shaman *Shaman) applyShamanisticFocus() {
 				return
 			}
 
-			cast.ManaCost -= cast.BaseManaCost * 0.6
+			cast.Cost.Value -= cast.BaseCost.Value * 0.6
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			if cast.IsSpellAction(SpellIDEarthShock) || cast.IsSpellAction(SpellIDFlameShock) || cast.IsSpellAction(SpellIDFrostShock) {

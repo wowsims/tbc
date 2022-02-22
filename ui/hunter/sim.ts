@@ -4,21 +4,29 @@ import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
-import { Drums } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
-import { Potions } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { StrengthOfEarthType } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js'
-import { WeaponImbue } from '/tbc/core/proto/common.js'
 import { Player } from '/tbc/core/player.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
+
+import { Alchohol} from '/tbc/core/proto/common.js';
+import { BattleElixir } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
+import { Conjured } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
+import { PetFood } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 
 import { Hunter, Hunter_Rotation as HunterRotation, Hunter_Options as HunterOptions } from '/tbc/core/proto/hunter.js';
 
@@ -120,8 +128,6 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 			selfBuffInputs: [
 				HunterInputs.Quiver,
 				HunterInputs.WeaponAmmo,
-				IconInputs.DrumsOfBattleConsume,
-				IconInputs.BattleChicken,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
@@ -164,29 +170,53 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				IconInputs.CurseOfElements,
 				IconInputs.Misery,
 			],
-			// IconInputs to include in the 'Consumes' section on the settings tab.
-			consumeInputs: [
-				IconInputs.MainHandAdamantiteSharpeningStone,
-				IconInputs.MainHandAdamantiteWeightstone,
-				IconInputs.OffHandAdamantiteSharpeningStone,
-				IconInputs.OffHandAdamantiteWeightstone,
-				IconInputs.DefaultHastePotion,
-				IconInputs.DefaultSuperManaPotion,
-				IconInputs.DefaultFelManaPotion,
-				IconInputs.DefaultDarkRune,
-				IconInputs.DefaultFlameCap,
-				IconInputs.FlaskOfRelentlessAssault,
-				IconInputs.ElixirOfDemonslaying,
-				IconInputs.ElixirOfMajorAgility,
-				IconInputs.ElixirOfTheMongoose,
-				IconInputs.ElixirOfDraenicWisdom,
-				IconInputs.ElixirOfMajorMageblood,
-				IconInputs.RavagerDog,
-				IconInputs.GrilledMudfish,
-				IconInputs.SpicyHotTalbuk,
-				IconInputs.ScrollOfAgilityV,
-				IconInputs.ScrollOfStrengthV,
-			],
+			// Which options are selectable in the 'Consumes' section.
+			consumeOptions: {
+				potions: [
+					Potions.HastePotion,
+					Potions.SuperManaPotion,
+					Potions.FelManaPotion,
+				],
+				conjured: [
+					Conjured.ConjuredDarkRune,
+					Conjured.ConjuredFlameCap,
+				],
+				flasks: [
+					Flask.FlaskOfRelentlessAssault,
+				],
+				battleElixirs: [
+					BattleElixir.ElixirOfDemonslaying,
+					BattleElixir.ElixirOfMajorAgility,
+					BattleElixir.ElixirOfTheMongoose,
+				],
+				guardianElixirs: [
+					GuardianElixir.ElixirOfDraenicWisdom,
+					GuardianElixir.ElixirOfMajorMageblood,
+				],
+				food: [
+					Food.FoodGrilledMudfish,
+					Food.FoodRavagerDog,
+					Food.FoodSpicyHotTalbuk,
+					Food.FoodRoastedClefthoof,
+				],
+				alcohol: [
+				],
+				weaponImbues: [
+					WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
+					WeaponImbue.WeaponImbueAdamantiteWeightstone,
+				],
+				pet: [
+					IconInputs.KiblersBits,
+					IconInputs.PetScrollOfAgilityV,
+					IconInputs.PetScrollOfStrengthV,
+				],
+				other: [
+					IconInputs.DrumsOfBattleConsume,
+					IconInputs.BattleChicken,
+					IconInputs.ScrollOfAgilityV,
+					IconInputs.ScrollOfStrengthV,
+				],
+			},
 			// Inputs to include in the 'Rotation' section on the settings tab.
 			rotationInputs: HunterInputs.HunterRotationConfig,
 			// Inputs to include in the 'Other' section on the settings tab.
@@ -203,13 +233,6 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
 					OtherInputs.SnapshotBsSolarianSapphire,
 					OtherInputs.SnapshotBsT2,
-				],
-			},
-			additionalIconSections: {
-				'Pet Buffs': [
-					IconInputs.KiblersBits,
-					IconInputs.PetScrollOfAgilityV,
-					IconInputs.PetScrollOfStrengthV,
 				],
 			},
 			encounterPicker: {

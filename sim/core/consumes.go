@@ -321,11 +321,10 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 			character := agent.GetCharacter()
 			drumsTemplate := SimpleCast{
 				Cast: Cast{
-					ActionID:       actionID,
-					Character:      character,
-					IgnoreManaCost: true,
-					CastTime:       time.Second * 1,
-					GCD:            GCDDefault,
+					ActionID:  actionID,
+					Character: character,
+					CastTime:  time.Second * 1,
+					GCD:       GCDDefault,
 					OnCastComplete: func(sim *Simulation, cast *Cast) {
 						// When a real player is using drums, their cast applies to the whole party.
 						for _, agent := range character.Party.Players {
@@ -727,8 +726,6 @@ func registerConjuredCD(agent Agent, consumes proto.Consumes) {
 		return
 	}
 
-	var mageManaGemMCD *MajorCooldown
-
 	character.AddMajorCooldown(MajorCooldown{
 		ActionID:    mcd.ActionID,
 		CooldownID:  ConjuredCooldownID,
@@ -736,16 +733,9 @@ func registerConjuredCD(agent Agent, consumes proto.Consumes) {
 		CanActivate: mcd.CanActivate,
 		Type:        mcd.Type,
 		ShouldActivate: func(sim *Simulation, character *Character) bool {
-			if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune &&
-				mageManaGemMCD != nil &&
-				mageManaGemMCD.IsEnabled() &&
-				!mageManaGemMCD.IsOnCD(sim, character) {
-				return false
-			}
 			return mcd.ShouldActivate(sim, character)
 		},
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			mageManaGemMCD = character.GetMajorCooldown(MageManaGemMCDActionID)
 			expectedManaPerUsage := float64((900 + 600) / 2)
 
 			remainingUsages := int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
@@ -802,7 +792,6 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				Cast: Cast{
 					ActionID:       actionID,
 					Character:      character,
-					IgnoreManaCost: true,
 					IsPhantom:      true,
 					SpellSchool:    SpellSchoolFire,
 					CritMultiplier: 1.5,

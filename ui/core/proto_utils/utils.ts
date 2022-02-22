@@ -99,7 +99,7 @@ export const specIconsLarge: Record<Spec, string> = {
   [Spec.SpecEnhancementShaman]: 'https://wow.zamimg.com/images/wow/icons/large/ability_shaman_stormstrike.jpg', // TODO: Fix enh icon?
   [Spec.SpecHunter]: 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg',
   [Spec.SpecMage]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_magicalsentry.jpg',
-  [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/ability_rogue_eviscerate.jpg',
+  [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/classicon_rogue.jpg',
   [Spec.SpecRetributionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_auraoflight.jpg',
   [Spec.SpecShadowPriest]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_shadowwordpain.jpg',
   [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
@@ -161,7 +161,7 @@ export const titleIcons: Record<Spec, string> = {
   [Spec.SpecEnhancementShaman]: '/tbc/assets/enhancement_shaman_icon.png',
   [Spec.SpecHunter]: '/tbc/assets/hunter_icon.png',
   [Spec.SpecMage]: '/tbc/assets/mage_icon.png',
-  [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/ability_rogue_eviscerate.jpg',
+  [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/classicon_rogue.jpg',
   [Spec.SpecRetributionPaladin]: '/tbc/assets/retribution_icon.png',
   [Spec.SpecShadowPriest]: '/tbc/assets/shadow_priest_icon.png',
   [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
@@ -728,6 +728,9 @@ const dualWieldSpecs: Array<Spec> = [
 	Spec.SpecRogue,
 	Spec.SpecWarrior,
 ];
+export function isDualWieldSpec(spec: Spec): boolean {
+	return dualWieldSpecs.includes(spec);
+}
 
 // Prefixes used for storing browser data for each site. Even if a Spec is
 // renamed, DO NOT change these values or people will lose their saved data.

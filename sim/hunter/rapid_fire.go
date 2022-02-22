@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var RapidFireCooldownID = core.NewCooldownID()
@@ -15,11 +16,17 @@ func (hunter *Hunter) registerRapidFireCD() {
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     actionID,
-			Character:    hunter.GetCharacter(),
-			Cooldown:     cooldown,
-			BaseManaCost: 100,
-			ManaCost:     100,
+			ActionID:  actionID,
+			Character: hunter.GetCharacter(),
+			Cooldown:  cooldown,
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 100,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 100,
+			},
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				hunter.PseudoStats.RangedSpeedMultiplier *= 1.4
 				hunter.AddAura(sim, core.Aura{

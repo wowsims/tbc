@@ -25,6 +25,7 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { ExclusivityTag } from '/tbc/core/individual_sim_ui.js';
 import { IconPickerConfig } from './icon_picker.js';
+import { IconEnumPicker, IconEnumPickerConfig, IconEnumValueConfig } from './icon_enum_picker.js';
 
 // Keep each section in alphabetical order.
 
@@ -82,52 +83,9 @@ export const WintersChill = makeBooleanDebuffInput(ActionId.fromSpellId(28595), 
 // Consumes
 export const BattleChicken = makeBooleanConsumeInput(ActionId.fromItemId(10725), 'battleChicken');
 
-export const FlaskOfBlindingLight = makeEnumValueConsumeInput(ActionId.fromItemId(22861), 'flask', Flask.FlaskOfBlindingLight, ['Battle Elixir', 'Guardian Elixir']);
-export const FlaskOfMightyRestoration = makeEnumValueConsumeInput(ActionId.fromItemId(22853), 'flask', Flask.FlaskOfMightyRestoration, ['Battle Elixir', 'Guardian Elixir']);
-export const FlaskOfPureDeath = makeEnumValueConsumeInput(ActionId.fromItemId(22866), 'flask', Flask.FlaskOfPureDeath, ['Battle Elixir', 'Guardian Elixir']);
-export const FlaskOfRelentlessAssault = makeEnumValueConsumeInput(ActionId.fromItemId(22854), 'flask', Flask.FlaskOfRelentlessAssault, ['Battle Elixir', 'Guardian Elixir']);
-export const FlaskOfSupremePower = makeEnumValueConsumeInput(ActionId.fromItemId(13512), 'flask', Flask.FlaskOfSupremePower, ['Battle Elixir', 'Guardian Elixir']);
-
-export const AdeptsElixir = makeEnumValueConsumeInput(ActionId.fromItemId(28103), 'battleElixir', BattleElixir.AdeptsElixir, ['Battle Elixir']);
-export const ElixirOfDemonslaying = makeEnumValueConsumeInput(ActionId.fromItemId(9224), 'battleElixir', BattleElixir.ElixirOfDemonslaying, ['Battle Elixir']);
-export const ElixirOfMajorAgility = makeEnumValueConsumeInput(ActionId.fromItemId(22831), 'battleElixir', BattleElixir.ElixirOfMajorAgility, ['Battle Elixir']);
-export const ElixirOfMajorFirePower = makeEnumValueConsumeInput(ActionId.fromItemId(22833), 'battleElixir', BattleElixir.ElixirOfMajorFirePower, ['Battle Elixir']);
-export const ElixirOfMajorFrostPower = makeEnumValueConsumeInput(ActionId.fromItemId(22827), 'battleElixir', BattleElixir.ElixirOfMajorFrostPower, ['Battle Elixir']);
-export const ElixirOfMajorShadowPower = makeEnumValueConsumeInput(ActionId.fromItemId(22835), 'battleElixir', BattleElixir.ElixirOfMajorShadowPower, ['Battle Elixir']);
-export const ElixirOfMajorStrength = makeEnumValueConsumeInput(ActionId.fromItemId(22824), 'battleElixir', BattleElixir.ElixirOfMajorStrength, ['Battle Elixir']);
-export const ElixirOfTheMongoose = makeEnumValueConsumeInput(ActionId.fromItemId(13452), 'battleElixir', BattleElixir.ElixirOfTheMongoose, ['Battle Elixir']);
-
-export const ElixirOfDraenicWisdom = makeEnumValueConsumeInput(ActionId.fromItemId(32067), 'guardianElixir', GuardianElixir.ElixirOfDraenicWisdom, ['Guardian Elixir']);
-export const ElixirOfMajorMageblood = makeEnumValueConsumeInput(ActionId.fromItemId(22840), 'guardianElixir', GuardianElixir.ElixirOfMajorMageblood, ['Guardian Elixir']);
-
-export const MainHandElementalSharpeningStone = makeEnumValueConsumeInput(ActionId.fromItemId(18262), 'mainHandImbue', WeaponImbue.WeaponImbueElementalSharpeningStone, ['MH Weapon Imbue']);
-export const MainHandBrilliantWizardOil = makeEnumValueConsumeInput(ActionId.fromItemId(20749), 'mainHandImbue', WeaponImbue.WeaponImbueBrilliantWizardOil, ['MH Weapon Imbue']);
-export const MainHandSuperiorWizardOil = makeEnumValueConsumeInput(ActionId.fromItemId(22522), 'mainHandImbue', WeaponImbue.WeaponImbueSuperiorWizardOil, ['MH Weapon Imbue']);
-export const OffHandElementalSharpeningStone = makeEnumValueConsumeInput(ActionId.fromItemId(18262), 'offHandImbue', WeaponImbue.WeaponImbueElementalSharpeningStone, ['OH Weapon Imbue']);
-export const MainHandAdamantiteSharpeningStone = makeAdamantiteStoneInput(ActionId.fromItemId(23529), true, true, WeaponImbue.WeaponImbueAdamantiteSharpeningStone);
-export const MainHandAdamantiteWeightstone = makeAdamantiteStoneInput(ActionId.fromItemId(28421), false, true, WeaponImbue.WeaponImbueAdamantiteWeightstone);
-export const OffHandAdamantiteSharpeningStone = makeAdamantiteStoneInput(ActionId.fromItemId(23529), true, false, WeaponImbue.WeaponImbueAdamantiteSharpeningStone);
-export const OffHandAdamantiteWeightstone = makeAdamantiteStoneInput(ActionId.fromItemId(28421), false, false, WeaponImbue.WeaponImbueAdamantiteWeightstone);
-
-export const BlackenedBasilisk = makeEnumValueConsumeInput(ActionId.fromItemId(27657), 'food', Food.FoodBlackenedBasilisk, ['Food']);
-export const GrilledMudfish = makeEnumValueConsumeInput(ActionId.fromItemId(27664), 'food', Food.FoodGrilledMudfish, ['Food']);
-export const RavagerDog = makeEnumValueConsumeInput(ActionId.fromItemId(27655), 'food', Food.FoodRavagerDog, ['Food']);
-export const RoastedClefthoof = makeEnumValueConsumeInput(ActionId.fromItemId(27658), 'food', Food.FoodRoastedClefthoof, ['Food']);
-export const SpicyHotTalbuk = makeEnumValueConsumeInput(ActionId.fromItemId(33872), 'food', Food.FoodSpicyHotTalbuk, ['Food']);
-export const SkullfishSoup = makeEnumValueConsumeInput(ActionId.fromItemId(33825), 'food', Food.FoodSkullfishSoup, ['Food']);
-
 export const KiblersBits = makeEnumValueConsumeInput(ActionId.fromItemId(33874), 'petFood', PetFood.PetFoodKiblersBits, ['Pet Food']);
 
 export const KreegsStoutBeatdown = makeEnumValueConsumeInput(ActionId.fromItemId(18284), 'alchohol', Alchohol.AlchoholKreegsStoutBeatdown, ['Alchohol']);
-
-export const DefaultDestructionPotion = makeEnumValueConsumeInput(ActionId.fromItemId(22839), 'defaultPotion', Potions.DestructionPotion, ['Potion']);
-export const DefaultHastePotion = makeEnumValueConsumeInput(ActionId.fromItemId(22838), 'defaultPotion', Potions.HastePotion, ['Potion']);
-export const DefaultMightyRagePotion = makeEnumValueConsumeInput(ActionId.fromItemId(13442), 'defaultPotion', Potions.MightyRagePotion, ['Potion']);
-export const DefaultSuperManaPotion = makeEnumValueConsumeInput(ActionId.fromItemId(22832), 'defaultPotion', Potions.SuperManaPotion, ['Potion']);
-export const DefaultFelManaPotion = makeEnumValueConsumeInput(ActionId.fromItemId(31677), 'defaultPotion', Potions.FelManaPotion, ['Potion']);
-
-export const DefaultDarkRune = makeEnumValueConsumeInput(ActionId.fromItemId(12662), 'defaultConjured', Conjured.ConjuredDarkRune, ['Conjured']);
-export const DefaultFlameCap = makeEnumValueConsumeInput(ActionId.fromItemId(22788), 'defaultConjured', Conjured.ConjuredFlameCap, ['Conjured']);
 
 export const ScrollOfAgilityV = makeEnumValueConsumeInput(ActionId.fromItemId(27498), 'scrollOfAgility', 5);
 export const ScrollOfSpiritV = makeEnumValueConsumeInput(ActionId.fromItemId(27501), 'scrollOfSpirit', 5, ['Spirit']);
@@ -436,21 +394,124 @@ export const BattleShout = {
 	},
 };
 
-function makeAdamantiteStoneInput(id: ActionId, isSharp: boolean, isMH: boolean, enumValue: number): IndividualSimIconPickerConfig<Player<any>, boolean> {
-	const exclusivityTags: Array<ExclusivityTag> = isMH ? ['MH Weapon Imbue'] : ['OH Weapon Imbue'];
-	const consumesFieldName: keyof Consumes = isMH ? 'mainHandImbue' : 'offHandImbue';
+export const makePotionsInput = makeConsumeInputFactory('defaultPotion', [
+	{ actionId: ActionId.fromItemId(22839), value: Potions.DestructionPotion },
+	{ actionId: ActionId.fromItemId(22838), value: Potions.HastePotion },
+	{ actionId: ActionId.fromItemId(13442), value: Potions.MightyRagePotion },
+	{ actionId: ActionId.fromItemId(22832), value: Potions.SuperManaPotion },
+	{ actionId: ActionId.fromItemId(31677), value: Potions.FelManaPotion },
+] as Array<IconEnumValueConfig<Player<any>, Potions>>);
 
-  return {
-    id: id,
-    states: 2,
-    exclusivityTags: exclusivityTags,
-    changedEvent: (player: Player<any>) => TypedEvent.onAny([player.consumesChangeEmitter, player.gearChangeEmitter]),
-    getValue: (player: Player<any>) => player.getConsumes()[consumesFieldName] == enumValue,
-    setValue: (eventID: EventID, player: Player<any>, newValue: boolean) => {
-			const newConsumes = player.getConsumes();
-			(newConsumes[consumesFieldName] as number) = newValue ? enumValue : 0;
-			player.setConsumes(eventID, newConsumes);
-    },
-		showWhen: (player: Player<any>) => (isMH ? player.getGear().hasBluntMHWeapon() : player.getGear().hasBluntOHWeapon()) != isSharp,
-  }
+export const makeConjuredInput = makeConsumeInputFactory('defaultConjured', [
+	{ actionId: ActionId.fromItemId(12662), value: Conjured.ConjuredDarkRune },
+	{ actionId: ActionId.fromItemId(22788), value: Conjured.ConjuredFlameCap },
+	{ actionId: ActionId.fromItemId(22044), value: Conjured.ConjuredMageManaEmerald },
+] as Array<IconEnumValueConfig<Player<any>, Conjured>>);
+
+export const makeFlasksInput = makeConsumeInputFactory('flask', [
+	{ actionId: ActionId.fromItemId(22861), value: Flask.FlaskOfBlindingLight },
+	{ actionId: ActionId.fromItemId(22853), value: Flask.FlaskOfMightyRestoration },
+	{ actionId: ActionId.fromItemId(22866), value: Flask.FlaskOfPureDeath },
+	{ actionId: ActionId.fromItemId(22854), value: Flask.FlaskOfRelentlessAssault },
+	{ actionId: ActionId.fromItemId(13512), value: Flask.FlaskOfSupremePower },
+] as Array<IconEnumValueConfig<Player<any>, Flask>>, (eventID: EventID, player: Player<any>, newValue: Flask) => {
+	if (newValue) {
+		const newConsumes = player.getConsumes();
+		newConsumes.battleElixir = BattleElixir.BattleElixirUnknown;
+		newConsumes.guardianElixir = GuardianElixir.GuardianElixirUnknown;
+		player.setConsumes(eventID, newConsumes);
+	}
+});
+
+export const makeBattleElixirsInput = makeConsumeInputFactory('battleElixir', [
+	{ actionId: ActionId.fromItemId(28103), value: BattleElixir.AdeptsElixir },
+	{ actionId: ActionId.fromItemId(9224),  value: BattleElixir.ElixirOfDemonslaying },
+	{ actionId: ActionId.fromItemId(22831), value: BattleElixir.ElixirOfMajorAgility },
+	{ actionId: ActionId.fromItemId(22833), value: BattleElixir.ElixirOfMajorFirePower },
+	{ actionId: ActionId.fromItemId(22827), value: BattleElixir.ElixirOfMajorFrostPower },
+	{ actionId: ActionId.fromItemId(22835), value: BattleElixir.ElixirOfMajorShadowPower },
+	{ actionId: ActionId.fromItemId(22824), value: BattleElixir.ElixirOfMajorStrength },
+	{ actionId: ActionId.fromItemId(13452), value: BattleElixir.ElixirOfTheMongoose },
+] as Array<IconEnumValueConfig<Player<any>, BattleElixir>>, (eventID: EventID, player: Player<any>, newValue: BattleElixir) => {
+	if (newValue) {
+		const newConsumes = player.getConsumes();
+		newConsumes.flask = Flask.FlaskUnknown;
+		player.setConsumes(eventID, newConsumes);
+	}
+});
+
+export const makeGuardianElixirsInput = makeConsumeInputFactory('guardianElixir', [
+	{ actionId: ActionId.fromItemId(32067), value: GuardianElixir.ElixirOfDraenicWisdom },
+	{ actionId: ActionId.fromItemId(22840), value: GuardianElixir.ElixirOfMajorMageblood },
+] as Array<IconEnumValueConfig<Player<any>, GuardianElixir>>, (eventID: EventID, player: Player<any>, newValue: GuardianElixir) => {
+	if (newValue) {
+		const newConsumes = player.getConsumes();
+		newConsumes.flask = Flask.FlaskUnknown;
+		player.setConsumes(eventID, newConsumes);
+	}
+});
+
+export const makeFoodInput = makeConsumeInputFactory('food', [
+	{ actionId: ActionId.fromItemId(27657), value: Food.FoodBlackenedBasilisk },
+	{ actionId: ActionId.fromItemId(27664), value: Food.FoodGrilledMudfish },
+	{ actionId: ActionId.fromItemId(27655), value: Food.FoodRavagerDog },
+	{ actionId: ActionId.fromItemId(27658), value: Food.FoodRoastedClefthoof },
+	{ actionId: ActionId.fromItemId(33872), value: Food.FoodSpicyHotTalbuk },
+	{ actionId: ActionId.fromItemId(33825), value: Food.FoodSkullfishSoup },
+] as Array<IconEnumValueConfig<Player<any>, Food>>);
+
+export const makeAlcoholInput = makeConsumeInputFactory('alchohol', [
+	{ actionId: ActionId.fromItemId(18284), value: Alchohol.AlchoholKreegsStoutBeatdown },
+] as Array<IconEnumValueConfig<Player<any>, Alchohol>>);
+
+export const makePetFoodInput = makeConsumeInputFactory('petFood', [
+	{ actionId: ActionId.fromItemId(33874), value: PetFood.PetFoodKiblersBits },
+] as Array<IconEnumValueConfig<Player<any>, PetFood>>);
+
+export function makeWeaponImbueInput(isMainHand: boolean, options: Array<WeaponImbue>): IconEnumPickerConfig<Player<any>, WeaponImbue> {
+	const allOptions = [
+		{ actionId: ActionId.fromItemId(18262), value: WeaponImbue.WeaponImbueElementalSharpeningStone },
+		{ actionId: ActionId.fromItemId(20749), value: WeaponImbue.WeaponImbueBrilliantWizardOil },
+		{ actionId: ActionId.fromItemId(22522), value: WeaponImbue.WeaponImbueSuperiorWizardOil },
+		{ actionId: ActionId.fromItemId(23529), value: WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
+			showWhen: (player: Player<any>) => !(isMainHand ? player.getGear().hasBluntMHWeapon() : player.getGear().hasBluntOHWeapon()),
+		},
+		{ actionId: ActionId.fromItemId(28421), value: WeaponImbue.WeaponImbueAdamantiteWeightstone,
+			showWhen: (player: Player<any>) => (isMainHand ? player.getGear().hasBluntMHWeapon() : player.getGear().hasBluntOHWeapon()),
+		},
+		{ actionId: ActionId.fromSpellId(25505), value: WeaponImbue.WeaponImbueShamanWindfury },
+		{ actionId: ActionId.fromSpellId(25489), value: WeaponImbue.WeaponImbueShamanFlametongue },
+		{ actionId: ActionId.fromSpellId(25500), value: WeaponImbue.WeaponImbueShamanFrostbrand },
+		{ actionId: ActionId.fromSpellId(25485), value: WeaponImbue.WeaponImbueShamanRockbiter },
+	];
+	if (isMainHand) {
+		return makeConsumeInputFactory('mainHandImbue', allOptions)(options);
+	} else {
+		return makeConsumeInputFactory('offHandImbue', allOptions)(options);
+	}
+}
+
+function makeConsumeInputFactory<T extends number>(consumesFieldName: keyof Consumes, allOptions: Array<IconEnumValueConfig<Player<any>, T>>, onSet?: (eventID: EventID, player: Player<any>, newValue: T) => void): (options: Array<T>) => IconEnumPickerConfig<Player<any>, T> {
+	return (options: Array<T>) => {
+		return {
+			numColumns: 1,
+			values: [
+				{ color: 'grey', value: 0 } as unknown as IconEnumValueConfig<Player<any>, T>,
+			].concat(options.map(option => allOptions.find(allOption => allOption.value == option)!)),
+			equals: (a: T, b: T) => a == b,
+			zeroValue: 0 as T,
+			changedEvent: (player: Player<any>) => player.consumesChangeEmitter,
+			getValue: (player: Player<any>) => player.getConsumes()[consumesFieldName] as T,
+			setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
+				const newConsumes = player.getConsumes();
+				(newConsumes[consumesFieldName] as number) = newValue;
+				TypedEvent.freezeAllAndDo(() => {
+					player.setConsumes(eventID, newConsumes);
+					if (onSet) {
+						onSet(eventID, player, newValue as T);
+					}
+				});
+			},
+		};
+	};
 }

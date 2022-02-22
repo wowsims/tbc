@@ -30,11 +30,6 @@ type OnBeforeMeleeHit func(sim *Simulation, ability *ActiveMeleeAbility, hitEffe
 //  This should be used for any on-hit procs.
 type OnMeleeAttack func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect)
 
-type ResourceCost struct {
-	Type  stats.Stat // stats.Mana, stats.Energy, stats.Rage
-	Value float64
-}
-
 type MeleeAbility struct {
 	// ID for the action.
 	ActionID
@@ -48,9 +43,6 @@ type MeleeAbility struct {
 
 	// The amount of GCD time incurred by this cast. This is almost always 0, 1s, or 1.5s.
 	GCD time.Duration
-
-	// If set, this spell will have its resource cost ignored.
-	IgnoreCost bool
 
 	Cost ResourceCost
 
@@ -109,6 +101,9 @@ type AbilityEffect struct {
 
 	// Ignores reduction from target armor.
 	IgnoreArmor bool
+
+	// Skips dodge check.
+	CannotBeDodged bool
 
 	// The type of hit this was, i.e. miss/dodge/block/crit/hit.
 	Outcome HitOutcome
@@ -268,11 +263,13 @@ func (ahe *AbilityHitEffect) WhiteHitTableResult(sim *Simulation, ability *Activ
 
 	if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
 		// Dodge
-		dodge := ahe.Target.Dodge
-		expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
-		chance += dodge - expertisePercentage
-		if roll < chance {
-			return OutcomeDodge
+		if !ahe.CannotBeDodged {
+			dodge := ahe.Target.Dodge
+			expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
+			chance += dodge - expertisePercentage
+			if roll < chance {
+				return OutcomeDodge
+			}
 		}
 
 		// Parry (if in front)
@@ -370,8 +367,6 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 		} else {
 			ahe.Outcome = OutcomeHit
 		}
-	} else if ability.ActionID.OtherID != 3 {
-		panic("ability not critting right..." + ability.ActionID.String())
 	}
 
 	if ahe.Outcome == OutcomeCrit {
@@ -389,10 +384,6 @@ func (ahe *AbilityHitEffect) calculateDamage(sim *Simulation, ability *ActiveMel
 	dmg *= ahe.DamageMultiplier * ahe.StaticDamageMultiplier
 
 	ahe.Damage = dmg
-}
-
-func (ahe *AbilityHitEffect) IsWeaponHit() bool {
-	return ahe.WeaponInput.DamageMultiplier != 0 || ahe.WeaponInput.CalculateDamage != nil
 }
 
 // Returns whether this hit effect is associated with the main-hand weapon.
@@ -542,8 +533,9 @@ type AutoAttacks struct {
 	OffhandSwingAt  time.Duration
 	RangedSwingAt   time.Duration
 
-	ActiveMeleeAbility                    // Parameters for auto attacks.
-	cachedMelee        ActiveMeleeAbility // reuse to save memory allocations
+	MHAuto      ActiveMeleeAbility // Parameters for MH auto attacks.
+	OHAuto      ActiveMeleeAbility // Parameters for OH auto attacks.
+	cachedMelee ActiveMeleeAbility // reuse to save memory allocations
 
 	RangedAuto            ActiveMeleeAbility // Parameters for ranged auto attacks.
 	RangedCast            SimpleCast         // Used for the 0.5s cast time on ranged autos.
@@ -579,18 +571,39 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		AutoSwingMelee: options.AutoSwingMelee,
 		DelayOHSwings:  options.DelayOHSwings,
 		ReplaceMHSwing: options.ReplaceMHSwing,
-		ActiveMeleeAbility: ActiveMeleeAbility{
+		MHAuto: ActiveMeleeAbility{
 			MeleeAbility: MeleeAbility{
-				ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack},
+				ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
 				Character:           character,
 				OutcomeRollCategory: OutcomeRollCategoryWhite,
 				CritRollCategory:    CritRollCategoryPhysical,
 				SpellSchool:         SpellSchoolPhysical,
-				IgnoreCost:          true,
+				CritMultiplier:      options.MainHand.CritMultiplier,
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{
 					ProcMask:               ProcMaskMeleeMHAuto,
+					DamageMultiplier:       1,
+					StaticDamageMultiplier: 1,
+					ThreatMultiplier:       1,
+				},
+				WeaponInput: WeaponDamageInput{
+					DamageMultiplier: 1,
+				},
+			},
+		},
+		OHAuto: ActiveMeleeAbility{
+			MeleeAbility: MeleeAbility{
+				ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
+				Character:           character,
+				OutcomeRollCategory: OutcomeRollCategoryWhite,
+				CritRollCategory:    CritRollCategoryPhysical,
+				SpellSchool:         SpellSchoolPhysical,
+				CritMultiplier:      options.OffHand.CritMultiplier,
+			},
+			Effect: AbilityHitEffect{
+				AbilityEffect: AbilityEffect{
+					ProcMask:               ProcMaskMeleeOHAuto,
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
@@ -607,7 +620,6 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				SpellSchool:         SpellSchoolPhysical,
 				OutcomeRollCategory: OutcomeRollCategoryRanged, // TODO: & OutcomeCategoryWhite?
 				CritRollCategory:    CritRollCategoryPhysical,
-				IgnoreCost:          true,
 			},
 			Effect: AbilityHitEffect{
 				AbilityEffect: AbilityEffect{
@@ -802,10 +814,7 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 	}
 
 	if replaceAMA == nil {
-		aa.cachedMelee = aa.ActiveMeleeAbility
-		aa.cachedMelee.ActionID.Tag = 1
-		aa.cachedMelee.CritMultiplier = aa.MH.CritMultiplier
-		aa.cachedMelee.Effect.ProcMask = ProcMaskMeleeMHAuto
+		aa.cachedMelee = aa.MHAuto
 		aa.cachedMelee.Effect.Target = target
 	} else {
 		aa.cachedMelee = *replaceAMA
@@ -832,10 +841,7 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 		return
 	}
 
-	aa.cachedMelee = aa.ActiveMeleeAbility
-	aa.cachedMelee.ActionID.Tag = 2
-	aa.cachedMelee.CritMultiplier = aa.OH.CritMultiplier
-	aa.cachedMelee.Effect.ProcMask = ProcMaskMeleeOHAuto
+	aa.cachedMelee = aa.OHAuto
 	aa.cachedMelee.Effect.Target = target
 	aa.cachedMelee.Attack(sim)
 	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
@@ -856,8 +862,8 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 	// It's important that we update the GCD timer AFTER starting the ranged auto.
 	// Otherwise the hardcast action won't be created separately.
 	nextGCD := sim.CurrentTime + aa.RangedCast.CastTime
-	if nextGCD > aa.Character.NextGCDAt() {
-		aa.Character.SetGCDTimer(sim, nextGCD)
+	if nextGCD > aa.character.NextGCDAt() {
+		aa.character.SetGCDTimer(sim, nextGCD)
 	}
 }
 
@@ -947,7 +953,7 @@ func (aa *AutoAttacks) NextEventAt(sim *Simulation) time.Duration {
 		panic(fmt.Sprintf("Returned 0 from next attack at %s, mh: %s, oh: %s", sim.CurrentTime, aa.MainhandSwingAt, aa.OffhandSwingAt))
 	}
 	return MinDuration(
-		sim.CurrentTime+aa.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime),
+		sim.CurrentTime+aa.character.GetRemainingCD(GCDCooldownID, sim.CurrentTime),
 		aa.NextAttackAt())
 }
 

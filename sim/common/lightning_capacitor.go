@@ -59,7 +59,6 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 					ItemID: core.ItemIDTheLightningCapacitor,
 				},
 				Character:           character,
-				IgnoreManaCost:      true,
 				IsPhantom:           true, // TODO: replace with ProcMask
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,

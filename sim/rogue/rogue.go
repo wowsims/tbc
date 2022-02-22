@@ -32,14 +32,17 @@ type Rogue struct {
 
 	comboPoints int32
 
+	deathmantle4pcProc bool
+
 	builderEnergyCost float64
 	newBuilder        func(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility
 
 	sinisterStrikeTemplate core.MeleeAbilityTemplate
 	sinisterStrike         core.ActiveMeleeAbility
 
-	applySliceAndDiceAura func(numPoints int32)
+	castSliceAndDice func()
 
+	eviscerateEnergyCost  float64
 	eviscerateDamageCalcs []core.MeleeDamageCalculator
 	eviscerateTemplate    core.MeleeAbilityTemplate
 	eviscerate            core.ActiveMeleeAbility
@@ -66,6 +69,7 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 
 func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.comboPoints = 0
+	rogue.deathmantle4pcProc = false
 }
 
 func (rogue *Rogue) AddComboPoint(sim *core.Simulation) {
@@ -103,15 +107,18 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		return rogue.NewSinisterStrike(sim, target)
 	}
 
-	rogue.EnableEnergyBar(100, func(sim *core.Simulation) {
+	maxEnergy := 100.0
+	if rogue.Talents.Vigor {
+		maxEnergy = 110
+	}
+	rogue.EnableEnergyBar(maxEnergy, func(sim *core.Simulation) {
 		if !rogue.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
 			rogue.doRotation(sim)
 		}
 	})
 	rogue.EnableAutoAttacks(rogue, core.AutoAttackOptions{
-		// TODO: Crit multiplier
-		MainHand:       rogue.WeaponFromMainHand(rogue.DefaultMeleeCritMultiplier()),
-		OffHand:        rogue.WeaponFromOffHand(rogue.DefaultMeleeCritMultiplier()),
+		MainHand:       rogue.WeaponFromMainHand(rogue.critMultiplier(true, false)),
+		OffHand:        rogue.WeaponFromOffHand(rogue.critMultiplier(false, false)),
 		AutoSwingMelee: true,
 	})
 
@@ -139,7 +146,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		},
 	})
 
-	//rogue.applyTalents()
+	rogue.applyTalents()
 
 	return rogue
 }
@@ -230,6 +237,6 @@ func init() {
 }
 
 // Agent is a generic way to access underlying rogue on any of the agents.
-type Agent interface {
+type RogueAgent interface {
 	GetRogue() *Rogue
 }

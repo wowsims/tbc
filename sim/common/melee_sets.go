@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -14,6 +15,7 @@ func init() {
 	core.AddItemSet(ItemSetFelstalker)
 	core.AddItemSet(ItemSetFistsOfFury)
 	core.AddItemSet(ItemSetPrimalstrike)
+	core.AddItemSet(ItemSetTwinBladesOfAzzinoth)
 	core.AddItemSet(ItemSetWastewalkerArmor)
 }
 
@@ -95,7 +97,6 @@ var ItemSetFistsOfFury = core.ItemSet{
 						Cast: core.Cast{
 							ActionID:            core.ActionID{SpellID: 41989},
 							Character:           character,
-							IgnoreManaCost:      true,
 							IsPhantom:           true,
 							CritRollCategory:    core.CritRollCategoryMagical,
 							OutcomeRollCategory: core.OutcomeRollCategoryMagic,
@@ -145,6 +146,56 @@ var ItemSetPrimalstrike = core.ItemSet{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.AttackPower, 40)
 			agent.GetCharacter().AddStat(stats.RangedAttackPower, 40)
+		},
+	},
+}
+
+var TwinBladesOfAzzinothAuraID = core.NewAuraID()
+var TwinBladesOfAzzinothProcAuraID = core.NewAuraID()
+var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
+	Name:  "The Twin Blades of Azzinoth",
+	Items: map[int32]struct{}{32837: {}, 32838: {}},
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+				const hasteBonus = 450.0
+				const duration = time.Second * 10
+				statApplier := character.NewTempStatAuraApplier(sim, TwinBladesOfAzzinothProcAuraID, core.ActionID{SpellID: 41435}, stats.MeleeHaste, hasteBonus, duration)
+				ppmm := character.AutoAttacks.NewPPMManager(1.0)
+
+				icd := core.NewICD()
+				const icdDur = time.Second * 45
+
+				return core.Aura{
+					ID: TwinBladesOfAzzinothAuraID,
+					OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+						if hitEffect.Target.MobType == proto.MobType_MobTypeDemon {
+							hitEffect.BonusAttackPower += 200
+						}
+					},
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+						if !hitEffect.Landed() {
+							return
+						}
+
+						// https://tbc.wowhead.com/spell=41434/the-twin-blades-of-azzinoth, proc mask = 20.
+						if !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
+							return
+						}
+
+						if icd.IsOnCD(sim) {
+							return
+						}
+
+						if !ppmm.Proc(sim, hitEffect.IsMH(), false, "Twin Blades of Azzinoth") {
+							return
+						}
+						icd = core.InternalCD(sim.CurrentTime + icdDur)
+						statApplier(sim)
+					},
+				}
+			})
 		},
 	},
 }

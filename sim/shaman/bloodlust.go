@@ -2,6 +2,7 @@ package shaman
 
 import (
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var BloodlustCooldownID = core.NewCooldownID()
@@ -22,12 +23,18 @@ func (shaman *Shaman) registerBloodlustCD() {
 
 	bloodlustTemplate := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:     actionID,
-			Character:    shaman.GetCharacter(),
-			BaseManaCost: 750,
-			ManaCost:     750,
-			GCD:          core.GCDDefault,
-			Cooldown:     core.BloodlustCD,
+			ActionID:  actionID,
+			Character: shaman.GetCharacter(),
+			BaseCost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 750,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Mana,
+				Value: 750,
+			},
+			GCD:      core.GCDDefault,
+			Cooldown: core.BloodlustCD,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				for _, partyMember := range shaman.Party.Players {
 					core.AddBloodlustAura(sim, partyMember.GetCharacter(), actionID.Tag)
@@ -39,8 +46,8 @@ func (shaman *Shaman) registerBloodlustCD() {
 		},
 	}
 
-	bloodlustTemplate.ManaCost -= bloodlustTemplate.BaseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
-	manaCost := bloodlustTemplate.ManaCost
+	bloodlustTemplate.Cost.Value -= bloodlustTemplate.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
+	manaCost := bloodlustTemplate.Cost.Value
 	var bloodlustMCD *core.MajorCooldown
 
 	shaman.AddMajorCooldown(core.MajorCooldown{

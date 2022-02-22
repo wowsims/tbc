@@ -20,8 +20,6 @@ func (priest *Priest) newStarshardsTemplate(sim *core.Simulation) core.SimpleSpe
 		CritRollCategory:    core.CritRollCategoryMagical,
 		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		SpellSchool:         core.SpellSchoolArcane,
-		BaseManaCost:        0,
-		ManaCost:            0,
 		CastTime:            0,
 		GCD:                 core.GCDDefault,
 		Cooldown:            time.Second * 30,

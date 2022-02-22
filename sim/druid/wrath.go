@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // Starfire spell IDs
@@ -19,11 +20,17 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 		CritRollCategory:    core.CritRollCategoryMagical,
 		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		SpellSchool:         core.SpellSchoolNature,
-		BaseManaCost:        255,
-		ManaCost:            255,
-		CastTime:            time.Millisecond * 2000,
-		GCD:                 core.GCDDefault,
-		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
+		BaseCost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 255,
+		},
+		Cost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 255,
+		},
+		CastTime:       time.Millisecond * 2000,
+		GCD:            core.GCDDefault,
+		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
 	effect := core.SpellHitEffect{
@@ -40,7 +47,7 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 	}
 
 	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
-	baseCast.ManaCost -= baseCast.BaseManaCost * 0.03 * float64(druid.Talents.Moonglow)
+	baseCast.Cost.Value -= baseCast.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
 
 	effect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
 	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)

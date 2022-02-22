@@ -4,19 +4,21 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { Component } from './component.js';
 import { Input, InputConfig } from './input.js';
 
-export interface IconEnumValueConfig<T> {
+export interface IconEnumValueConfig<ModObject, T> {
 	// One of these should be set. If actionId is set, shows the icon for that id. If
 	// color is set, shows that color.
   actionId?: ActionId,
 	color?: string,
 
 	value: T,
+
+	showWhen?: (obj: ModObject) => boolean,
 }
 
 export interface IconEnumPickerConfig<ModObject, T> extends InputConfig<ModObject, T> {
 	numColumns: number,
 
-	values: Array<IconEnumValueConfig<T>>;
+	values: Array<IconEnumValueConfig<ModObject, T>>;
 
 	// Function for comparing two values.
 	equals: (a: T, b: T) => boolean,
@@ -89,6 +91,17 @@ export class IconEnumPicker<ModObject, T> extends Input<ModObject, T> {
 			optionContainer.appendChild(option);
 			this.setImage(option, valueConfig);
 
+			if (valueConfig.showWhen) {
+				config.changedEvent(this.modObject).on(eventID => {
+					const show = valueConfig.showWhen && valueConfig.showWhen(this.modObject);
+					if (show) {
+						optionContainer.classList.remove('hide');
+					} else {
+						optionContainer.classList.add('hide');
+					}
+				});
+			}
+
 			option.addEventListener('click', event => {
 				event.preventDefault();
 				this.currentValue = valueConfig.value;
@@ -117,7 +130,7 @@ export class IconEnumPicker<ModObject, T> extends Input<ModObject, T> {
 		actionId.fillAndSet(elem, true, true);
 	}
 
-	private setImage(elem: HTMLAnchorElement, valueConfig: IconEnumValueConfig<T>) {
+	private setImage(elem: HTMLAnchorElement, valueConfig: IconEnumValueConfig<ModObject, T>) {
 		if (valueConfig.actionId) {
 			this.setActionImage(elem, valueConfig.actionId);
 		} else {

@@ -22,7 +22,6 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				ActionID: core.ActionID{
 					SpellID: SpellIDIgnite,
 				},
-				IgnoreManaCost: true,
 			},
 		},
 		Effect: core.SpellHitEffect{

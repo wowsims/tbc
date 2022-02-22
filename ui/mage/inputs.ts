@@ -21,8 +21,6 @@ import * as Presets from './presets.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 
-export const ManaEmerald = makeBooleanMageBuffInput(ActionId.fromItemId(22044), 'useManaEmeralds');
-
 export const MageArmor = {
 	id: ActionId.fromSpellId(27125),
 	states: 2,

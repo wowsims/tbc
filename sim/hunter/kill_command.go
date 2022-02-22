@@ -35,11 +35,17 @@ func (hunter *Hunter) newKillCommandTemplate(sim *core.Simulation) core.SimpleSp
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:     KillCommandActionID,
-				Character:    hunter.GetCharacter(),
-				BaseManaCost: 75,
-				ManaCost:     75,
-				Cooldown:     time.Second * 5,
+				ActionID:  KillCommandActionID,
+				Character: hunter.GetCharacter(),
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 75,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 75,
+				},
+				Cooldown: time.Second * 5,
 			},
 		},
 		Effect: core.SpellHitEffect{

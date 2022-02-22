@@ -127,9 +127,21 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestElemental-AllItems-BladeofUnquenchedThirst-31193"
+ value: {
+  dps: 1545.0374464688805
+ }
+}
+dps_results: {
  key: "TestElemental-AllItems-BlazefuryMedallion-17111"
  value: {
   dps: 1527.891704619674
+ }
+}
+dps_results: {
+ key: "TestElemental-AllItems-Blinkstrike-31332"
+ value: {
+  dps: 1545.0374464688805
  }
 }
 dps_results: {
@@ -142,6 +154,12 @@ dps_results: {
  key: "TestElemental-AllItems-BracingEarthstormDiamond"
  value: {
   dps: 1511.0735357230515
+ }
+}
+dps_results: {
+ key: "TestElemental-AllItems-BraidedEterniumChain-24114"
+ value: {
+  dps: 1527.891704619674
  }
 }
 dps_results: {
@@ -346,6 +364,18 @@ dps_results: {
  key: "TestElemental-AllItems-GlaiveofthePit-28774"
  value: {
   dps: 1340.5699116153576
+ }
+}
+dps_results: {
+ key: "TestElemental-AllItems-HandofJustice-11815"
+ value: {
+  dps: 1488.7156873493793
+ }
+}
+dps_results: {
+ key: "TestElemental-AllItems-Heartrazor-29962"
+ value: {
+  dps: 1545.0374464688805
  }
 }
 dps_results: {
@@ -621,7 +651,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-TheDecapitator-28767"
  value: {
-  dps: 1378.1941799287424
+  dps: 1379.7272845062687
  }
 }
 dps_results: {

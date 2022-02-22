@@ -22,7 +22,6 @@ func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.Simp
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolNature,
 				Character:           &hunter.Character,
-				IgnoreManaCost:      true,
 			},
 		},
 		Effect: core.SpellHitEffect{

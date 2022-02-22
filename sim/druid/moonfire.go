@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SpellIDMoonfire int32 = 26988
@@ -18,10 +19,16 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 		CritRollCategory:    core.CritRollCategoryMagical,
 		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		SpellSchool:         core.SpellSchoolArcane,
-		BaseManaCost:        495,
-		ManaCost:            495,
-		GCD:                 core.GCDDefault,
-		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
+		BaseCost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 495,
+		},
+		Cost: core.ResourceCost{
+			Type:  stats.Mana,
+			Value: 495,
+		},
+		GCD:            core.GCDDefault,
+		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
 	effect := core.SpellHitEffect{
@@ -44,7 +51,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 		},
 	}
 
-	baseCast.ManaCost -= baseCast.BaseManaCost * 0.03 * float64(druid.Talents.Moonglow)
+	baseCast.Cost.Value -= baseCast.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
 
 	effect.StaticDamageMultiplier *= 1 + 0.05*float64(druid.Talents.ImprovedMoonfire)
 	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)

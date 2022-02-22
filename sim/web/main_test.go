@@ -38,12 +38,6 @@ var basicSpec = &proto.Player_ElementalShaman{
 	},
 }
 
-var basicConsumes = &proto.Consumes{
-	FlaskOfBlindingLight: true,
-	BlackenedBasilisk:    true,
-	DefaultPotion:        proto.Potions_SuperManaPotion,
-}
-
 var p1Equip = &proto.EquipmentSpec{
 	Items: []*proto.ItemSpec{
 		{Id: 29035, Gems: []int32{34220, 24059}, Enchant: 29191},
@@ -83,7 +77,6 @@ func TestIndividualSim(t *testing.T) {
 				Race:      proto.Race_RaceTroll10,
 				Class:     proto.Class_ClassShaman,
 				Equipment: p1Equip,
-				Consumes:  basicConsumes,
 				Spec:      basicSpec,
 			},
 			&proto.PartyBuffs{},

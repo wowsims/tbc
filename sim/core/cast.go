@@ -3,7 +3,14 @@ package core
 import (
 	"fmt"
 	"time"
+
+	"github.com/wowsims/tbc/sim/core/stats"
 )
+
+type ResourceCost struct {
+	Type  stats.Stat // stats.Mana, stats.Energy, stats.Rage
+	Value float64
+}
 
 // A cast corresponds to any action which causes the in-game castbar to be
 // shown, and activates the GCD. Note that a cast can also be instant, i.e.
@@ -31,9 +38,6 @@ type Cast struct {
 	// The amount of GCD time incurred by this cast. This is almost always 0, 1s, or 1.5s.
 	GCD time.Duration
 
-	// If set, this spell will have its mana cost ignored.
-	IgnoreManaCost bool
-
 	// Whether this is a phantom cast. Phantom casts are usually casts triggered by some effect,
 	// like The Lightning Capacitor or Shaman Flametongue Weapon. Many on-hit effects do not
 	// proc from phantom casts, only regular casts.
@@ -44,14 +48,14 @@ type Cast struct {
 	SpellSchool         SpellSchool
 	SpellExtras         SpellExtras
 
-	// Base mana cost. Many effects in the game which 'reduce mana cost by X%'
+	// Base cost. Many effects in the game which 'reduce mana cost by X%'
 	// are calculated using the base mana cost. Any effects which reduce the base
 	// mana cost should be applied before setting this value, and OnCast()
 	// callbacks should not modify it.
-	BaseManaCost float64
+	BaseCost ResourceCost
 
 	// Actual mana cost of the spell.
-	ManaCost float64
+	Cost ResourceCost
 
 	CastTime time.Duration
 
@@ -87,7 +91,7 @@ func (cast *Cast) GetCharacter() *Character {
 }
 
 func (cast *Cast) GetManaCost() float64 {
-	return cast.ManaCost
+	return cast.Cost.Value
 }
 
 func (cast *Cast) GetDuration() time.Duration {
@@ -136,20 +140,35 @@ func (cast *Cast) init(sim *Simulation) {
 // Start casting the spell. Return value indicates whether the spell successfully
 // started casting.
 func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) bool {
-	if !cast.IgnoreManaCost && cast.ManaCost > 0 {
-		if cast.Character.CurrentMana() < cast.ManaCost {
-			if sim.Log != nil {
-				cast.Character.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.03f, Mana Cost = %0.03f)",
-					cast.ActionID, cast.Character.CurrentMana(), cast.ManaCost)
+	if cast.Cost.Type != 0 {
+		if cast.Cost.Type == stats.Mana {
+			if cast.Character.CurrentMana() < cast.Cost.Value {
+				if sim.Log != nil {
+					cast.Character.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.03f, Mana Cost = %0.03f)",
+						cast.ActionID, cast.Character.CurrentMana(), cast.Cost.Value)
+				}
+				cast.objectInUse = false
+				return false
 			}
-			cast.objectInUse = false // cast failed and we aren't using it
-			return false
+			// Mana spells dont spend the mana until the cast is completed.
+		} else if cast.Cost.Type == stats.Rage {
+			if cast.Character.CurrentRage() < cast.Cost.Value {
+				cast.objectInUse = false
+				return false
+			}
+			cast.Character.SpendRage(sim, cast.Cost.Value, cast.ActionID)
+		} else {
+			if cast.Character.CurrentEnergy() < cast.Cost.Value {
+				cast.objectInUse = false
+				return false
+			}
+			cast.Character.SpendEnergy(sim, cast.Cost.Value, cast.ActionID)
 		}
 	}
 
 	if sim.Log != nil {
-		cast.Character.Log(sim, "Casting %s (Current Mana = %0.03f, Mana Cost = %0.03f, Cast Time = %s)",
-			cast.ActionID, cast.Character.CurrentMana(), MaxFloat(0, cast.ManaCost), cast.CastTime)
+		cast.Character.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
+			cast.ActionID, MaxFloat(0, cast.Cost.Value), cast.CastTime)
 	}
 
 	// This needs to come before the internalOnComplete() call so that changes to
@@ -197,8 +216,8 @@ func (cast *Cast) CalculatedGCD(char *Character) time.Duration {
 
 // Cast has finished, activate the effects of the cast.
 func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastComplete) {
-	if !cast.IgnoreManaCost && cast.ManaCost > 0 {
-		cast.Character.SpendMana(sim, cast.ManaCost, cast.ActionID)
+	if cast.Cost.Value > 0 && cast.Cost.Type == stats.Mana {
+		cast.Character.SpendMana(sim, cast.Cost.Value, cast.ActionID)
 		cast.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 	}
 

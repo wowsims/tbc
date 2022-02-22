@@ -73,7 +73,7 @@ var ItemSetCycloneRegalia = core.ItemSet{
 							ID: Cyclone4PcManaRegainAuraID,
 							OnCast: func(sim *core.Simulation, cast *core.Cast) {
 								// TODO: how to make sure this goes in before clearcasting?
-								cast.ManaCost -= 270
+								cast.Cost.Value -= 270
 							},
 							OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 								character.RemoveAura(sim, Cyclone4PcManaRegainAuraID)
@@ -168,7 +168,7 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 					ActionID: actionID,
 					Expires:  sim.CurrentTime + dur,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.ManaCost += cast.BaseManaCost * 0.2
+						cast.Cost.Value += cast.BaseCost.Value * 0.2
 					},
 					OnExpire: func(sim *core.Simulation) {
 						character.AddStat(stats.SpellPower, -sp)

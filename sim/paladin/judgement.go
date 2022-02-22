@@ -39,7 +39,7 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.M
 			},
 		},
 		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
-			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.ManaCost)
+			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
 			paladin.RemoveAura(sim, SealOfBloodAuraID)
 			paladin.currentSeal = core.Aura{}
 		},
@@ -90,8 +90,16 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolHoly,
 				SpellExtras:         core.SpellExtrasAlwaysHits,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: JudgementManaCost,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: JudgementManaCost,
+				},
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.ManaCost)
+					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.Cost.Value)
 					paladin.RemoveAura(sim, SealOfTheCrusaderAuraID)
 					paladin.currentSeal = core.Aura{}
 				},
@@ -110,7 +118,7 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 	}
 
 	// Reduce mana cost if we have Benediction Talent
-	jotc.ManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
+	jotc.Cost.Value = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
 
 	// Reduce CD if we have Improved Judgement Talent
 	jotc.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
@@ -149,8 +157,16 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolHoly,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: JudgementManaCost,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: JudgementManaCost,
+				},
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					paladin.sanctifiedJudgement(sim, paladin.sealOfWisdom.ManaCost)
+					paladin.sanctifiedJudgement(sim, paladin.sealOfWisdom.Cost.Value)
 					paladin.RemoveAura(sim, SealOfWisdomAuraID)
 					paladin.currentSeal = core.Aura{}
 				},
@@ -169,7 +185,7 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 	}
 
 	// Reduce mana cost if we have Benediction Talent
-	jow.ManaCost = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
+	jow.Cost.Value = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
 
 	// Reduce CD if we have Improved Judgement Talent
 	jow.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))

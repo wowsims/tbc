@@ -5,6 +5,7 @@ import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
@@ -16,7 +17,6 @@ import {
 	WaterTotem,
 	EnhancementShaman_Rotation_PrimaryShock as PrimaryShock,
 	ShamanTotems,
-	ShamanWeaponImbue,
 } from '/tbc/core/proto/shaman.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
@@ -56,8 +56,6 @@ export const DefaultOptions = EnhancementShamanOptions.create({
 	waterShield: true,
 	bloodlust: true,
 	delayOffhandSwings: true,
-	mainHandImbue: ShamanWeaponImbue.ImbueWindfury,
-	offHandImbue: ShamanWeaponImbue.ImbueWindfury,
 });
 
 export const DefaultConsumes = Consumes.create({
@@ -65,6 +63,8 @@ export const DefaultConsumes = Consumes.create({
 	defaultPotion: Potions.SuperManaPotion,
 	flask: Flask.FlaskOfRelentlessAssault,
 	food: Food.FoodRoastedClefthoof,
+	mainHandImbue: WeaponImbue.WeaponImbueShamanWindfury,
+	offHandImbue: WeaponImbue.WeaponImbueShamanWindfury,
 });
 
 export const P1_PRESET = {
