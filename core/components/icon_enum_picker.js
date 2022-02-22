@@ -48,6 +48,17 @@ export class IconEnumPicker extends Input {
             option.classList.add('dropdown-option', 'icon-enum-picker-option');
             optionContainer.appendChild(option);
             this.setImage(option, valueConfig);
+            if (valueConfig.showWhen) {
+                config.changedEvent(this.modObject).on(eventID => {
+                    const show = valueConfig.showWhen && valueConfig.showWhen(this.modObject);
+                    if (show) {
+                        optionContainer.classList.remove('hide');
+                    }
+                    else {
+                        optionContainer.classList.add('hide');
+                    }
+                });
+            }
             option.addEventListener('click', event => {
                 event.preventDefault();
                 this.currentValue = valueConfig.value;

@@ -1,18 +1,26 @@
+import { Alchohol } from '/tbc/core/proto/common.js';
+import { BattleElixir } from '/tbc/core/proto/common.js';
 import { BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
+import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { EncounterPickerConfig } from '/tbc/core/components/encounter_picker.js';
 import { EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { EventID, TypedEvent } from './typed_event.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
-import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { IconEnumPickerConfig } from '/tbc/core/components/icon_enum_picker.js';
+import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { NumberPickerConfig } from '/tbc/core/components/number_picker.js';
 import { Party } from './party.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { Player } from './player.js';
+import { Potions } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Raid } from './raid.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
@@ -24,29 +32,42 @@ import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Target } from './target.js';
-import { EventID, TypedEvent } from './typed_event.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 export declare type IndividualSimIconPickerConfig<ModObject, ValueType> = (IconPickerConfig<ModObject, ValueType> | IconEnumPickerConfig<ModObject, ValueType>) & {
     exclusivityTags?: Array<ExclusivityTag>;
 };
+export declare type InputConfig = {
+    type: 'boolean';
+    getModObject: (simUI: IndividualSimUI<any>) => any;
+    config: BooleanPickerConfig<any>;
+} | {
+    type: 'number';
+    getModObject: (simUI: IndividualSimUI<any>) => any;
+    config: NumberPickerConfig<any>;
+} | {
+    type: 'enum';
+    getModObject: (simUI: IndividualSimUI<any>) => any;
+    config: EnumPickerConfig<any>;
+} | {
+    type: 'iconEnum';
+    getModObject: (simUI: IndividualSimUI<any>) => any;
+    config: IconEnumPickerConfig<any, any>;
+};
 export interface InputSection {
     tooltip?: string;
-    inputs: Array<{
-        type: 'boolean';
-        getModObject: (simUI: IndividualSimUI<any>) => any;
-        config: BooleanPickerConfig<any>;
-    } | {
-        type: 'number';
-        getModObject: (simUI: IndividualSimUI<any>) => any;
-        config: NumberPickerConfig<any>;
-    } | {
-        type: 'enum';
-        getModObject: (simUI: IndividualSimUI<any>) => any;
-        config: EnumPickerConfig<any>;
-    } | {
-        type: 'iconEnum';
-        getModObject: (simUI: IndividualSimUI<any>) => any;
-        config: IconEnumPickerConfig<any, any>;
-    }>;
+    inputs: Array<InputConfig>;
+}
+export interface ConsumeOptions {
+    potions: Array<Potions>;
+    conjured: Array<Conjured>;
+    flasks: Array<Flask>;
+    battleElixirs: Array<BattleElixir>;
+    guardianElixirs: Array<GuardianElixir>;
+    food: Array<Food>;
+    alcohol: Array<Alchohol>;
+    weaponImbues: Array<WeaponImbue>;
+    pet?: Array<IndividualSimIconPickerConfig<Player<any>, any>>;
+    other?: Array<IndividualSimIconPickerConfig<Player<any>, any>>;
 }
 export interface IndividualSimUIConfig<SpecType extends Spec> {
     cssClass: string;
@@ -73,9 +94,9 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
     partyBuffInputs: Array<IndividualSimIconPickerConfig<Party, any>>;
     playerBuffInputs: Array<IndividualSimIconPickerConfig<Player<any>, any>>;
     debuffInputs: Array<IndividualSimIconPickerConfig<Target, any>>;
-    consumeInputs: Array<IndividualSimIconPickerConfig<Player<any>, any>>;
     rotationInputs: InputSection;
     otherInputs?: InputSection;
+    consumeOptions?: ConsumeOptions;
     additionalSections?: Record<string, InputSection>;
     additionalIconSections?: Record<string, Array<IndividualSimIconPickerConfig<Player<any>, any>>>;
     customSections?: Array<(simUI: IndividualSimUI<SpecType>, parentElem: HTMLElement) => string>;

@@ -1,13 +1,14 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Input, InputConfig } from './input.js';
-export interface IconEnumValueConfig<T> {
+export interface IconEnumValueConfig<ModObject, T> {
     actionId?: ActionId;
     color?: string;
     value: T;
+    showWhen?: (obj: ModObject) => boolean;
 }
 export interface IconEnumPickerConfig<ModObject, T> extends InputConfig<ModObject, T> {
     numColumns: number;
-    values: Array<IconEnumValueConfig<T>>;
+    values: Array<IconEnumValueConfig<ModObject, T>>;
     equals: (a: T, b: T) => boolean;
     zeroValue: T;
     backupIconUrl?: (value: T) => ActionId;

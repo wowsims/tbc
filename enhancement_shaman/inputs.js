@@ -1,19 +1,9 @@
-import { makeWeaponImbueInput } from '/tbc/core/components/icon_inputs.js';
 import { EarthTotem, EnhancementShaman_Rotation_PrimaryShock as PrimaryShock, } from '/tbc/core/proto/shaman.js';
-import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 export const IconBloodlust = makeBooleanShamanBuffInput(ActionId.fromSpellId(2825), 'bloodlust');
 export const IconWaterShield = makeBooleanShamanBuffInput(ActionId.fromSpellId(33736), 'waterShield');
-const imbueOptions = [
-    WeaponImbue.WeaponImbueShamanWindfury,
-    WeaponImbue.WeaponImbueShamanFlametongue,
-    WeaponImbue.WeaponImbueShamanFrostbrand,
-    WeaponImbue.WeaponImbueShamanRockbiter,
-];
-export const MainHandImbue = makeWeaponImbueInput(true, imbueOptions);
-export const OffHandImbue = makeWeaponImbueInput(false, imbueOptions);
 export const DelayOffhandSwings = {
     type: 'boolean',
     getModObject: (simUI) => simUI.player,

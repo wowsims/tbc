@@ -7,6 +7,12 @@ import { StrengthOfEarthType } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { BattleElixir } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
+import { Conjured } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as RogueInputs from './inputs.js';
@@ -88,10 +94,7 @@ export class RogueSimUI extends IndividualSimUI {
                 }),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
-            selfBuffInputs: [
-                IconInputs.DrumsOfBattleConsume,
-                IconInputs.BattleChicken,
-            ],
+            selfBuffInputs: [],
             // IconInputs to include in the 'Other Buffs' section on the settings tab.
             raidBuffInputs: [
                 IconInputs.GiftOfTheWild,
@@ -127,25 +130,41 @@ export class RogueSimUI extends IndividualSimUI {
                 IconInputs.CurseOfRecklessness,
                 IconInputs.Misery,
             ],
-            // IconInputs to include in the 'Consumes' section on the settings tab.
-            consumeInputs: [
-                IconInputs.MainHandAdamantiteSharpeningStone,
-                IconInputs.MainHandAdamantiteWeightstone,
-                IconInputs.OffHandAdamantiteSharpeningStone,
-                IconInputs.OffHandAdamantiteWeightstone,
-                IconInputs.DefaultHastePotion,
-                IconInputs.FlaskOfRelentlessAssault,
-                IconInputs.ElixirOfDemonslaying,
-                IconInputs.ElixirOfMajorAgility,
-                IconInputs.ElixirOfTheMongoose,
-                IconInputs.ElixirOfDraenicWisdom,
-                IconInputs.ElixirOfMajorMageblood,
-                IconInputs.RavagerDog,
-                IconInputs.GrilledMudfish,
-                IconInputs.SpicyHotTalbuk,
-                IconInputs.ScrollOfAgilityV,
-                IconInputs.ScrollOfStrengthV,
-            ],
+            // Which options are selectable in the 'Consumes' section.
+            consumeOptions: {
+                potions: [
+                    Potions.HastePotion,
+                ],
+                conjured: [
+                    Conjured.ConjuredFlameCap,
+                ],
+                flasks: [
+                    Flask.FlaskOfRelentlessAssault,
+                ],
+                battleElixirs: [
+                    BattleElixir.ElixirOfDemonslaying,
+                    BattleElixir.ElixirOfMajorAgility,
+                    BattleElixir.ElixirOfTheMongoose,
+                ],
+                guardianElixirs: [],
+                food: [
+                    Food.FoodGrilledMudfish,
+                    Food.FoodSpicyHotTalbuk,
+                    Food.FoodRavagerDog,
+                    Food.FoodRoastedClefthoof,
+                ],
+                alcohol: [],
+                weaponImbues: [
+                    WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
+                    WeaponImbue.WeaponImbueAdamantiteWeightstone,
+                ],
+                other: [
+                    IconInputs.DrumsOfBattleConsume,
+                    IconInputs.BattleChicken,
+                    IconInputs.ScrollOfAgilityV,
+                    IconInputs.ScrollOfStrengthV,
+                ],
+            },
             // Inputs to include in the 'Rotation' section on the settings tab.
             rotationInputs: RogueInputs.RogueRotationConfig,
             // Inputs to include in the 'Other' section on the settings tab.

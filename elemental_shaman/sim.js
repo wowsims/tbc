@@ -8,6 +8,14 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { TotemsSection } from '/tbc/core/components/totem_inputs.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
+import { BattleElixir } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
+import { Conjured } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as Mechanics from '/tbc/core/constants/mechanics.js';
@@ -105,8 +113,6 @@ export class ElementalShamanSimUI extends IndividualSimUI {
             selfBuffInputs: [
                 ShamanInputs.IconWaterShield,
                 ShamanInputs.IconBloodlust,
-                IconInputs.DrumsOfBattleConsume,
-                IconInputs.DrumsOfRestorationConsume,
             ],
             // IconInputs to include in the 'Other Buffs' section on the settings tab.
             raidBuffInputs: [
@@ -141,21 +147,43 @@ export class ElementalShamanSimUI extends IndividualSimUI {
                 IconInputs.ImprovedSealOfTheCrusader,
                 IconInputs.Misery,
             ],
-            // IconInputs to include in the 'Consumes' section on the settings tab.
-            consumeInputs: [
-                IconInputs.DefaultSuperManaPotion,
-                IconInputs.DefaultDestructionPotion,
-                IconInputs.DefaultDarkRune,
-                IconInputs.FlaskOfBlindingLight,
-                IconInputs.FlaskOfSupremePower,
-                IconInputs.AdeptsElixir,
-                IconInputs.ElixirOfMajorMageblood,
-                IconInputs.ElixirOfDraenicWisdom,
-                IconInputs.MainHandBrilliantWizardOil,
-                IconInputs.MainHandSuperiorWizardOil,
-                IconInputs.BlackenedBasilisk,
-                IconInputs.SkullfishSoup,
-            ],
+            // Which options are selectable in the 'Consumes' section.
+            consumeOptions: {
+                potions: [
+                    Potions.SuperManaPotion,
+                    Potions.DestructionPotion,
+                ],
+                conjured: [
+                    Conjured.ConjuredDarkRune,
+                    Conjured.ConjuredFlameCap,
+                ],
+                flasks: [
+                    Flask.FlaskOfBlindingLight,
+                    Flask.FlaskOfSupremePower,
+                ],
+                battleElixirs: [
+                    BattleElixir.AdeptsElixir,
+                ],
+                guardianElixirs: [
+                    GuardianElixir.ElixirOfDraenicWisdom,
+                    GuardianElixir.ElixirOfMajorMageblood,
+                ],
+                food: [
+                    Food.FoodBlackenedBasilisk,
+                    Food.FoodSkullfishSoup,
+                ],
+                alcohol: [
+                    Alchohol.AlchoholKreegsStoutBeatdown,
+                ],
+                weaponImbues: [
+                    WeaponImbue.WeaponImbueBrilliantWizardOil,
+                    WeaponImbue.WeaponImbueSuperiorWizardOil,
+                ],
+                other: [
+                    IconInputs.DrumsOfBattleConsume,
+                    IconInputs.DrumsOfRestorationConsume,
+                ],
+            },
             // Inputs to include in the 'Rotation' section on the settings tab.
             rotationInputs: ShamanInputs.ElementalShamanRotationConfig,
             // Inputs to include in the 'Other' section on the settings tab.

@@ -595,6 +595,10 @@
   background-size: cover;
 }
 
+.dropdown-option-container.hide {
+  display: none;
+}
+
 :root {
   --theme-color-primary: DarkSlateGrey;
   --theme-color-background: DarkSlateGrey;
@@ -2296,6 +2300,26 @@ input, select {
   display: grid;
 }
 
+.consumes-row {
+  display: flex;
+  align-items: center;
+}
+
+.consumes-row > span {
+  margin: 5px;
+}
+
+.consumes-row-inputs {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-grow: 1;
+}
+
+.consumes-row-inputs > * {
+  margin: 2px;
+}
+
 .debuffs-section > div {
   display: grid;
 }
@@ -2346,7 +2370,7 @@ input, select {
 }
 
 .enhancement-shaman-sim-ui .self-buffs-section {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .enhancement-shaman-sim-ui .consumes-section {

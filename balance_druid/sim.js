@@ -2,12 +2,20 @@ import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
-import { Drums } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
+import { BattleElixir } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
+import { Conjured } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
+import { Potions } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
@@ -97,8 +105,6 @@ export class BalanceDruidSimUI extends IndividualSimUI {
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
             selfBuffInputs: [
                 DruidInputs.SelfInnervate,
-                IconInputs.DrumsOfBattleConsume,
-                IconInputs.DrumsOfRestorationConsume,
             ],
             // IconInputs to include in the 'Other Buffs' section on the settings tab.
             raidBuffInputs: [
@@ -133,23 +139,44 @@ export class BalanceDruidSimUI extends IndividualSimUI {
                 IconInputs.CurseOfElements,
                 IconInputs.Misery,
             ],
-            // IconInputs to include in the 'Consumes' section on the settings tab.
-            consumeInputs: [
-                IconInputs.DefaultSuperManaPotion,
-                IconInputs.DefaultDestructionPotion,
-                IconInputs.DefaultDarkRune,
-                IconInputs.FlaskOfBlindingLight,
-                IconInputs.FlaskOfSupremePower,
-                IconInputs.AdeptsElixir,
-                IconInputs.ElixirOfMajorMageblood,
-                IconInputs.ElixirOfDraenicWisdom,
-                IconInputs.MainHandBrilliantWizardOil,
-                IconInputs.MainHandSuperiorWizardOil,
-                IconInputs.BlackenedBasilisk,
-                IconInputs.SkullfishSoup,
-                IconInputs.ScrollOfSpiritV,
-                IconInputs.KreegsStoutBeatdown,
-            ],
+            // Which options are selectable in the 'Consumes' section.
+            consumeOptions: {
+                potions: [
+                    Potions.SuperManaPotion,
+                    Potions.DestructionPotion,
+                ],
+                conjured: [
+                    Conjured.ConjuredDarkRune,
+                    Conjured.ConjuredFlameCap,
+                ],
+                flasks: [
+                    Flask.FlaskOfBlindingLight,
+                    Flask.FlaskOfSupremePower,
+                ],
+                battleElixirs: [
+                    BattleElixir.AdeptsElixir,
+                ],
+                guardianElixirs: [
+                    GuardianElixir.ElixirOfDraenicWisdom,
+                    GuardianElixir.ElixirOfMajorMageblood,
+                ],
+                food: [
+                    Food.FoodBlackenedBasilisk,
+                    Food.FoodSkullfishSoup,
+                ],
+                alcohol: [
+                    Alchohol.AlchoholKreegsStoutBeatdown,
+                ],
+                weaponImbues: [
+                    WeaponImbue.WeaponImbueBrilliantWizardOil,
+                    WeaponImbue.WeaponImbueSuperiorWizardOil,
+                ],
+                other: [
+                    IconInputs.DrumsOfBattleConsume,
+                    IconInputs.DrumsOfRestorationConsume,
+                    IconInputs.ScrollOfSpiritV,
+                ],
+            },
             // Inputs to include in the 'Rotation' section on the settings tab.
             rotationInputs: DruidInputs.BalanceDruidRotationConfig,
             // Inputs to include in the 'Other' section on the settings tab.

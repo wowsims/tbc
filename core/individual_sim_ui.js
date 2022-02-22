@@ -1,18 +1,19 @@
 import { BonusStatsPicker } from '/tbc/core/components/bonus_stats_picker.js';
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { CharacterStats } from '/tbc/core/components/character_stats.js';
-import { CooldownsPicker } from '/tbc/core/components/cooldowns_picker.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Cooldowns } from '/tbc/core/proto/common.js';
+import { CooldownsPicker } from '/tbc/core/components/cooldowns_picker.js';
 import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { EncounterPicker } from '/tbc/core/components/encounter_picker.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { TypedEvent } from './typed_event.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
-import { IconPicker } from '/tbc/core/components/icon_picker.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
+import { IconPicker } from '/tbc/core/components/icon_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { IndividualImporter } from '/tbc/core/components/individual_importer.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
@@ -27,16 +28,17 @@ import { SavedSettings } from '/tbc/core/proto/ui.js';
 import { SavedTalents } from '/tbc/core/proto/ui.js';
 import { SimUI } from './sim_ui.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
-import { launchedSpecs } from '/tbc/core/launched_sims.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { TypedEvent } from './typed_event.js';
 import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
 import { addStatWeightsAction } from '/tbc/core/components/stat_weights_action.js';
+import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
+import { isDualWieldSpec } from '/tbc/core/proto_utils/utils.js';
+import { launchedSpecs } from '/tbc/core/launched_sims.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
+import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 const SAVED_GEAR_STORAGE_KEY = '__savedGear__';
 const SAVED_ROTATION_STORAGE_KEY = '__savedRotation__';
@@ -295,8 +297,47 @@ export class IndividualSimUI extends SimUI {
 					</fieldset>
 				</div>
 				<div class="settings-section-container">
-					<fieldset class="settings-section consumes-section">
+					<fieldset class="settings-section new-consumes-section">
 						<legend>Consumes</legend>
+						<div class="consumes-row">
+							<span>Potions</span>
+							<div class="consumes-row-inputs">
+								<div class="consumes-potions"></div>
+								<div class="consumes-conjured"></div>
+							</div>
+						</div>
+						<div class="consumes-row">
+							<span>Elixirs</span>
+							<div class="consumes-row-inputs">
+								<div class="consumes-flasks"></div>
+								<span>OR</span>
+								<div class="consumes-battle-elixirs"></div>
+								<div class="consumes-guardian-elixirs"></div>
+							</div>
+						</div>
+						<div class="consumes-row">
+							<span>Imbues</span>
+							<div class="consumes-row-inputs">
+								<div class="consumes-imbue-mh"></div>
+								<div class="consumes-imbue-oh"></div>
+							</div>
+						</div>
+						<div class="consumes-row">
+							<span>Food</span>
+							<div class="consumes-row-inputs">
+								<div class="consumes-food"></div>
+								<div class="consumes-alcohol"></div>
+							</div>
+						</div>
+						<div class="consumes-row consumes-row-pet">
+							<span>Pet</span>
+							<div class="consumes-row-inputs consumes-pet">
+							</div>
+						</div>
+						<div class="consumes-row">
+							<div class="consumes-row-inputs consumes-other">
+							</div>
+						</div>
 					</fieldset>
 				</div>
 				<div class="settings-section-container cooldowns-section-container">
@@ -346,8 +387,54 @@ export class IndividualSimUI extends SimUI {
         ].flat(), Tooltips.OTHER_BUFFS_SECTION);
         const debuffsSection = this.rootElem.getElementsByClassName('debuffs-section')[0];
         configureIconSection(debuffsSection, this.individualConfig.debuffInputs.map(iconInput => new IndividualSimIconPicker(debuffsSection, this.sim.encounter.primaryTarget, iconInput, this)), Tooltips.DEBUFFS_SECTION);
-        const consumesSection = this.rootElem.getElementsByClassName('consumes-section')[0];
-        configureIconSection(consumesSection, this.individualConfig.consumeInputs.map(iconInput => new IndividualSimIconPicker(consumesSection, this.player, iconInput, this)));
+        if (this.individualConfig.consumeOptions?.potions.length) {
+            const elem = this.rootElem.getElementsByClassName('consumes-potions')[0];
+            new IconEnumPicker(elem, this.player, IconInputs.makePotionsInput(this.individualConfig.consumeOptions.potions));
+        }
+        if (this.individualConfig.consumeOptions?.conjured.length) {
+            const elem = this.rootElem.getElementsByClassName('consumes-conjured')[0];
+            new IconEnumPicker(elem, this.player, IconInputs.makeConjuredInput(this.individualConfig.consumeOptions.conjured));
+        }
+        if (this.individualConfig.consumeOptions?.flasks.length) {
+            const elem = this.rootElem.getElementsByClassName('consumes-flasks')[0];
+            new IconEnumPicker(elem, this.player, IconInputs.makeFlasksInput(this.individualConfig.consumeOptions.flasks));
+        }
+        if (this.individualConfig.consumeOptions?.battleElixirs.length) {
+            const elem = this.rootElem.getElementsByClassName('consumes-battle-elixirs')[0];
+            new IconEnumPicker(elem, this.player, IconInputs.makeBattleElixirsInput(this.individualConfig.consumeOptions.battleElixirs));
+        }
+        if (this.individualConfig.consumeOptions?.guardianElixirs.length) {
+            const elem = this.rootElem.getElementsByClassName('consumes-guardian-elixirs')[0];
+            new IconEnumPicker(elem, this.player, IconInputs.makeGuardianElixirsInput(this.individualConfig.consumeOptions.guardianElixirs));
+        }
+        if (this.individualConfig.consumeOptions?.food.length) {
+            const elem = this.rootElem.getElementsByClassName('consumes-food')[0];
+            new IconEnumPicker(elem, this.player, IconInputs.makeFoodInput(this.individualConfig.consumeOptions.food));
+        }
+        if (this.individualConfig.consumeOptions?.alcohol.length) {
+            const elem = this.rootElem.getElementsByClassName('consumes-alcohol')[0];
+            new IconEnumPicker(elem, this.player, IconInputs.makeAlcoholInput(this.individualConfig.consumeOptions.alcohol));
+        }
+        if (this.individualConfig.consumeOptions?.weaponImbues.length) {
+            const mhImbueElem = this.rootElem.getElementsByClassName('consumes-imbue-mh')[0];
+            const ohImbueElem = this.rootElem.getElementsByClassName('consumes-imbue-oh')[0];
+            new IconEnumPicker(mhImbueElem, this.player, IconInputs.makeWeaponImbueInput(true, this.individualConfig.consumeOptions.weaponImbues));
+            if (isDualWieldSpec(this.player.spec)) {
+                new IconEnumPicker(ohImbueElem, this.player, IconInputs.makeWeaponImbueInput(false, this.individualConfig.consumeOptions.weaponImbues));
+            }
+        }
+        if (this.individualConfig.consumeOptions?.pet?.length) {
+            const petConsumesElem = this.rootElem.getElementsByClassName('consumes-pet')[0];
+            this.individualConfig.consumeOptions.pet.map(iconInput => new IndividualSimIconPicker(petConsumesElem, this.player, iconInput, this));
+        }
+        else {
+            const petRowElem = this.rootElem.getElementsByClassName('consumes-row-pet')[0];
+            petRowElem.style.display = 'none';
+        }
+        if (this.individualConfig.consumeOptions?.other?.length) {
+            const containerElem = this.rootElem.getElementsByClassName('consumes-other')[0];
+            this.individualConfig.consumeOptions.other.map(iconInput => new IndividualSimIconPicker(containerElem, this.player, iconInput, this));
+        }
         const configureInputSection = (sectionElem, sectionConfig) => {
             if (sectionConfig.tooltip) {
                 tippy(sectionElem, {
@@ -357,16 +444,16 @@ export class IndividualSimUI extends SimUI {
             }
             sectionConfig.inputs.forEach(inputConfig => {
                 if (inputConfig.type == 'number') {
-                    const picker = new NumberPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
+                    new NumberPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
                 }
                 else if (inputConfig.type == 'boolean') {
-                    const picker = new BooleanPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
+                    new BooleanPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
                 }
                 else if (inputConfig.type == 'enum') {
-                    const picker = new EnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
+                    new EnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
                 }
                 else if (inputConfig.type == 'iconEnum') {
-                    const picker = new IconEnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
+                    new IconEnumPicker(sectionElem, inputConfig.getModObject(this), inputConfig.config);
                 }
             });
         };
