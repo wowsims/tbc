@@ -582,17 +582,22 @@ export class Player {
                 const mageOptions = options;
                 if (mageOptions.useManaEmeralds && proto.consumes) {
                     proto.consumes.defaultConjured = Conjured.ConjuredMageManaEmerald;
+                    mageOptions.useManaEmeralds = false;
                 }
+                options = mageOptions;
             }
             // TODO: Remove this on 3/21 (1 month).
             if (this.spec == Spec.SpecEnhancementShaman) {
                 const enhOptions = options;
                 if (proto.consumes && enhOptions.mainHandImbue != 0) {
                     proto.consumes.mainHandImbue = 5 + enhOptions.mainHandImbue;
+                    enhOptions.mainHandImbue = 0;
                 }
                 if (proto.consumes && enhOptions.offHandImbue != 0) {
                     proto.consumes.offHandImbue = 5 + enhOptions.offHandImbue;
+                    enhOptions.offHandImbue = 0;
                 }
+                options = enhOptions;
             }
             this.setName(eventID, proto.name);
             this.setRace(eventID, proto.race);
