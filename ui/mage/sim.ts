@@ -1,5 +1,3 @@
-import { RaidBuffs } from '/tbc/core/proto/common.js';
-import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
@@ -8,7 +6,9 @@ import { Drums } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -159,7 +159,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 			consumeInputs: [
 				IconInputs.DefaultSuperManaPotion,
 				IconInputs.DefaultDestructionPotion,
-				MageInputs.ManaEmerald,
+				IconInputs.DefaultMageManaEmerald,
 				IconInputs.DefaultDarkRune,
 				IconInputs.DefaultFlameCap,
 				IconInputs.FlaskOfBlindingLight,

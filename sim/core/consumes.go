@@ -726,8 +726,6 @@ func registerConjuredCD(agent Agent, consumes proto.Consumes) {
 		return
 	}
 
-	var mageManaGemMCD *MajorCooldown
-
 	character.AddMajorCooldown(MajorCooldown{
 		ActionID:    mcd.ActionID,
 		CooldownID:  ConjuredCooldownID,
@@ -735,16 +733,9 @@ func registerConjuredCD(agent Agent, consumes proto.Consumes) {
 		CanActivate: mcd.CanActivate,
 		Type:        mcd.Type,
 		ShouldActivate: func(sim *Simulation, character *Character) bool {
-			if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune &&
-				mageManaGemMCD != nil &&
-				mageManaGemMCD.IsEnabled() &&
-				!mageManaGemMCD.IsOnCD(sim, character) {
-				return false
-			}
 			return mcd.ShouldActivate(sim, character)
 		},
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			mageManaGemMCD = character.GetMajorCooldown(MageManaGemMCDActionID)
 			expectedManaPerUsage := float64((900 + 600) / 2)
 
 			remainingUsages := int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
