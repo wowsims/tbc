@@ -547,17 +547,19 @@ class SelectorModal extends Component {
 					return false;
 				}
 
-				const searchQuery = searchInput.value.toLowerCase();
-				if (!listItemData.name.toLowerCase().includes(searchQuery)) {
-					return false;
-				}
-
-				// If not a trinket slot, filter out items without EP values.
-				if ((slot != ItemSlot.ItemSlotTrinket1 && slot != ItemSlot.ItemSlotTrinket2 && slot != ItemSlot.ItemSlotRanged)) {
-					if (!listItemData.ignoreEPFilter && !listItemData.baseEP) {
-						return false;
-					}
-				}
+        if (searchInput.value.length > 0) {
+          const searchQuery = searchInput.value.toLowerCase().split(" ");
+          const name = listItemData.name.toLowerCase();
+  
+          var include = true;
+          searchQuery.forEach(v => {
+            if (!name.includes(v))
+              include = false;
+            });
+          if (!include) {
+            return false;
+          }  
+        }
 
 				return true;
 			});
@@ -580,6 +582,18 @@ class SelectorModal extends Component {
 
     const searchInput = tabContent.getElementsByClassName('selector-modal-search')[0] as HTMLInputElement;
     searchInput.addEventListener('input', applyFilters);
+    searchInput.addEventListener("keyup", ev => {
+      if (ev.key == "Enter") {
+        listItemElems.find(ele => {
+          if (ele.classList.contains("hidden")) {
+            return false; 
+          }
+          const nameElem = ele.getElementsByClassName('selector-modal-list-item-name')[0] as HTMLElement;
+          nameElem.click();
+          return true;
+        });
+      }
+    });
 
 		this.player.sim.phaseChangeEmitter.on(() => {
 			applyFilters();
