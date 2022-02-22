@@ -53,8 +53,8 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilit
 			},
 			CritMultiplier: rogue.critMultiplier(true, false),
 		},
-		Effect: core.AbilityHitEffect{
-			AbilityEffect: core.AbilityEffect{
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
 				ProcMask:               core.ProcMaskMeleeMHSpecial,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
@@ -62,7 +62,7 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilit
 			},
 			WeaponInput: core.WeaponDamageInput{},
 		},
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 			if hitEffect.Landed() {
 				numPoints := rogue.comboPoints
 				rogue.SpendComboPoints(sim)

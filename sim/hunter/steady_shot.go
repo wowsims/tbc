@@ -58,8 +58,8 @@ func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.Me
 			SpellSchool:         core.SpellSchoolPhysical,
 			CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
-		Effect: core.AbilityHitEffect{
-			AbilityEffect: core.AbilityEffect{
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
 				ProcMask:               core.ProcMaskRangedSpecial,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,

@@ -44,7 +44,7 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 					ID:       ShamanisticRageAuraID,
 					ActionID: ShamanisticRageActionID,
 					Expires:  sim.CurrentTime + dur,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 						if !hitEffect.Landed() || hitEffect.WeaponInput.DamageMultiplier == 0 {
 							return
 						}

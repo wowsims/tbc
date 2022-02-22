@@ -31,8 +31,8 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.MeleeAb
 			},
 			CritMultiplier: rogue.critMultiplier(true, true),
 		},
-		Effect: core.AbilityHitEffect{
-			AbilityEffect: core.AbilityEffect{
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
 				ProcMask:               core.ProcMaskMeleeMHSpecial,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
@@ -43,7 +43,7 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.MeleeAb
 				FlatDamageBonus:  98,
 			},
 		},
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 			if hitEffect.Landed() {
 				rogue.AddComboPoint(sim)
 			} else {

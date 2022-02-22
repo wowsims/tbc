@@ -39,8 +39,8 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		},
 	}
 
-	baseEffect := core.AbilityHitEffect{
-		AbilityEffect: core.AbilityEffect{
+	baseEffect := core.SpellHitEffect{
+		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1.0,
 			StaticDamageMultiplier: 1.0,
 			ThreatMultiplier:       1.0,
@@ -54,7 +54,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		baseEffect.WeaponInput.DamageMultiplier *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
 	}
 
-	wftempl.Effects = []core.AbilityHitEffect{
+	wftempl.Effects = []core.SpellHitEffect{
 		baseEffect,
 		baseEffect,
 	}
@@ -68,7 +68,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 		return core.Aura{
 			ID: WFImbueAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				// ProcMask: 20
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
@@ -163,7 +163,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: FTImbueAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}
@@ -227,7 +227,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 		ppmm := shaman.AutoAttacks.NewPPMManager(9.0)
 		return core.Aura{
 			ID: FBImbueAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}

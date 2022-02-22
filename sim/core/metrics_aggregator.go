@@ -172,6 +172,10 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 	actionMetrics.Hits += spellCast.Hits
 	actionMetrics.Misses += spellCast.Misses
 	actionMetrics.Crits += spellCast.Crits
+	actionMetrics.Dodges += spellCast.Dodges
+	actionMetrics.Parries += spellCast.Parries
+	actionMetrics.Blocks += spellCast.Blocks
+	actionMetrics.Glances += spellCast.Glances
 	actionMetrics.Damage += spellCast.TotalDamage
 	characterMetrics.dps.Total += spellCast.TotalDamage
 	characterMetrics.threat.Total += spellCast.TotalThreat

@@ -26,8 +26,8 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.MeleeAbil
 			},
 			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
-		Effect: core.AbilityHitEffect{
-			AbilityEffect: core.AbilityEffect{
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
 				ProcMask:               core.ProcMaskRangedSpecial,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,

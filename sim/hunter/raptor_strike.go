@@ -26,8 +26,8 @@ func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.MeleeAb
 			Cooldown:       time.Second * 6,
 			CritMultiplier: hunter.critMultiplier(false, sim.GetPrimaryTarget()),
 		},
-		Effect: core.AbilityHitEffect{
-			AbilityEffect: core.AbilityEffect{
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
 				ProcMask:               core.ProcMaskMeleeMHSpecial,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,

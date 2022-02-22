@@ -61,8 +61,8 @@ func (hunter *Hunter) newMultiShotAbilityTemplate(sim *core.Simulation) core.Mel
 		},
 	}
 
-	baseEffect := core.AbilityHitEffect{
-		AbilityEffect: core.AbilityEffect{
+	baseEffect := core.SpellHitEffect{
+		SpellEffect: core.SpellEffect{
 			ProcMask:               core.ProcMaskRangedSpecial,
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
@@ -83,7 +83,7 @@ func (hunter *Hunter) newMultiShotAbilityTemplate(sim *core.Simulation) core.Mel
 	baseEffect.BonusCritRating += float64(hunter.Talents.ImprovedBarrage) * 4 * core.MeleeCritRatingPerCritChance
 
 	numHits := core.MinInt32(3, sim.GetNumTargets())
-	effects := make([]core.AbilityHitEffect, 0, numHits)
+	effects := make([]core.SpellHitEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)

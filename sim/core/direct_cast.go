@@ -99,6 +99,7 @@ type SpellHitEffect struct {
 	SpellEffect
 	DotInput    DotDamageInput
 	DirectInput DirectDamageInput
+	WeaponInput WeaponDamageInput
 }
 
 // SimpleSpell has a single cast and could have a dot or direct effect (or no effect)
