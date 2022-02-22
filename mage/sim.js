@@ -1,8 +1,8 @@
-import { RaidBuffs } from '/tbc/core/proto/common.js';
-import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
@@ -139,7 +139,7 @@ export class MageSimUI extends IndividualSimUI {
             consumeInputs: [
                 IconInputs.DefaultSuperManaPotion,
                 IconInputs.DefaultDestructionPotion,
-                MageInputs.ManaEmerald,
+                IconInputs.DefaultMageManaEmerald,
                 IconInputs.DefaultDarkRune,
                 IconInputs.DefaultFlameCap,
                 IconInputs.FlaskOfBlindingLight,

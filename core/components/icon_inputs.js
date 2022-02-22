@@ -98,6 +98,7 @@ export const DefaultSuperManaPotion = makeEnumValueConsumeInput(ActionId.fromIte
 export const DefaultFelManaPotion = makeEnumValueConsumeInput(ActionId.fromItemId(31677), 'defaultPotion', Potions.FelManaPotion, ['Potion']);
 export const DefaultDarkRune = makeEnumValueConsumeInput(ActionId.fromItemId(12662), 'defaultConjured', Conjured.ConjuredDarkRune, ['Conjured']);
 export const DefaultFlameCap = makeEnumValueConsumeInput(ActionId.fromItemId(22788), 'defaultConjured', Conjured.ConjuredFlameCap, ['Conjured']);
+export const DefaultMageManaEmerald = makeEnumValueConsumeInput(ActionId.fromItemId(22044), 'defaultConjured', Conjured.ConjuredMageManaEmerald, ['Conjured']);
 export const ScrollOfAgilityV = makeEnumValueConsumeInput(ActionId.fromItemId(27498), 'scrollOfAgility', 5);
 export const ScrollOfSpiritV = makeEnumValueConsumeInput(ActionId.fromItemId(27501), 'scrollOfSpirit', 5, ['Spirit']);
 export const ScrollOfStrengthV = makeEnumValueConsumeInput(ActionId.fromItemId(27503), 'scrollOfStrength', 5);
@@ -403,5 +404,41 @@ function makeAdamantiteStoneInput(id, isSharp, isMH, enumValue) {
             player.setConsumes(eventID, newConsumes);
         },
         showWhen: (player) => (isMH ? player.getGear().hasBluntMHWeapon() : player.getGear().hasBluntOHWeapon()) != isSharp,
+    };
+}
+export function makeWeaponImbueInput(isMainHand, options) {
+    const allOptions = [
+        { actionId: ActionId.fromItemId(18262), value: WeaponImbue.WeaponImbueElementalSharpeningStone },
+        { actionId: ActionId.fromItemId(20749), value: WeaponImbue.WeaponImbueBrilliantWizardOil },
+        { actionId: ActionId.fromItemId(22522), value: WeaponImbue.WeaponImbueSuperiorWizardOil },
+        { actionId: ActionId.fromItemId(23529), value: WeaponImbue.WeaponImbueAdamantiteSharpeningStone },
+        { actionId: ActionId.fromItemId(28421), value: WeaponImbue.WeaponImbueAdamantiteWeightstone },
+        { actionId: ActionId.fromSpellId(25505), value: WeaponImbue.WeaponImbueShamanWindfury },
+        { actionId: ActionId.fromSpellId(25489), value: WeaponImbue.WeaponImbueShamanFlametongue },
+        { actionId: ActionId.fromSpellId(25500), value: WeaponImbue.WeaponImbueShamanFrostbrand },
+        { actionId: ActionId.fromSpellId(25485), value: WeaponImbue.WeaponImbueShamanRockbiter },
+    ];
+    return {
+        extraCssClasses: [
+            'weapon-imbue-picker',
+        ],
+        numColumns: 1,
+        values: [
+            { color: 'grey', value: WeaponImbue.WeaponImbueUnknown },
+        ].concat(options.map(option => allOptions.find(allOption => allOption.value == option))),
+        equals: (a, b) => a == b,
+        zeroValue: WeaponImbue.WeaponImbueUnknown,
+        changedEvent: (player) => player.consumesChangeEmitter,
+        getValue: (player) => (isMainHand ? player.getConsumes().mainHandImbue : player.getConsumes().offHandImbue) || WeaponImbue.WeaponImbueUnknown,
+        setValue: (eventID, player, newValue) => {
+            const newConsumes = player.getConsumes();
+            if (isMainHand) {
+                newConsumes.mainHandImbue = newValue;
+            }
+            else {
+                newConsumes.offHandImbue = newValue;
+            }
+            player.setConsumes(eventID, newConsumes);
+        },
     };
 }

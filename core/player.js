@@ -1,6 +1,7 @@
 import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Cooldowns } from '/tbc/core/proto/common.js';
+import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -13,7 +14,6 @@ import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { WeaponType } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
-import { ShamanTotems, AirTotem, FireTotem, WaterTotem } from '/tbc/core/proto/shaman.js';
 import { Hunter_Rotation_WeaveType as WeaveType } from '/tbc/core/proto/hunter.js';
 import { getWeaponDPS } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
@@ -457,15 +457,6 @@ export class Player {
     }
     fromProto(eventID, proto) {
         TypedEvent.freezeAllAndDo(() => {
-            // TODO: Remove this on 2/18/2022 (1 month).
-            if (proto.consumes && proto.consumes.brilliantWizardOil) {
-                proto.consumes.brilliantWizardOil = false;
-                proto.consumes.mainHandImbue = WeaponImbue.WeaponImbueBrilliantWizardOil;
-            }
-            if (proto.consumes && proto.consumes.superiorWizardOil) {
-                proto.consumes.superiorWizardOil = false;
-                proto.consumes.mainHandImbue = WeaponImbue.WeaponImbueSuperiorWizardOil;
-            }
             // TODO: Remove this on 3/4/2022 (1 month).
             if (proto.consumes && proto.consumes.flaskOfBlindingLight) {
                 proto.consumes.flaskOfBlindingLight = false;
@@ -569,24 +560,6 @@ export class Player {
             }
             let rotation = this.specTypeFunctions.rotationFromPlayer(proto);
             let options = this.specTypeFunctions.optionsFromPlayer(proto);
-            // TODO: Remove this on 2/17/2022 (1 month).
-            if (this.spec == Spec.SpecElementalShaman) {
-                const eleRotation = rotation;
-                const eleOptions = options;
-                if (!eleRotation.totems) {
-                    eleRotation.totems = ShamanTotems.create();
-                }
-                if (eleOptions.manaSpringTotem) {
-                    eleRotation.totems.water = WaterTotem.ManaSpringTotem;
-                }
-                if (eleOptions.totemOfWrath) {
-                    eleRotation.totems.fire = FireTotem.TotemOfWrath;
-                }
-                if (eleOptions.wrathOfAirTotem) {
-                    eleRotation.totems.air = AirTotem.WrathOfAirTotem;
-                }
-                rotation = eleRotation;
-            }
             // TODO: Remove this on 3/14/2022 (1 month).
             if (this.spec == Spec.SpecHunter) {
                 const hunterRotation = rotation;
@@ -603,6 +576,23 @@ export class Player {
                     }
                 }
                 options = hunterOptions;
+            }
+            // TODO: Remove this on 3/21 (1 month).
+            if (this.spec == Spec.SpecMage) {
+                const mageOptions = options;
+                if (mageOptions.useManaEmeralds && proto.consumes) {
+                    proto.consumes.defaultConjured = Conjured.ConjuredMageManaEmerald;
+                }
+            }
+            // TODO: Remove this on 3/21 (1 month).
+            if (this.spec == Spec.SpecEnhancementShaman) {
+                const enhOptions = options;
+                if (proto.consumes && enhOptions.mainHandImbue != 0) {
+                    proto.consumes.mainHandImbue = 5 + enhOptions.mainHandImbue;
+                }
+                if (proto.consumes && enhOptions.offHandImbue != 0) {
+                    proto.consumes.offHandImbue = 5 + enhOptions.offHandImbue;
+                }
             }
             this.setName(eventID, proto.name);
             this.setRace(eventID, proto.race);

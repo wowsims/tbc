@@ -300,20 +300,6 @@ export interface ElementalShaman_Options {
      */
     bloodlust: boolean;
     /**
-     * Deprecate these totem options after 1 month (2/17/2022).
-     *
-     * @generated from protobuf field: bool mana_spring_totem = 3;
-     */
-    manaSpringTotem: boolean;
-    /**
-     * @generated from protobuf field: bool totem_of_wrath = 4;
-     */
-    totemOfWrath: boolean;
-    /**
-     * @generated from protobuf field: bool wrath_of_air_totem = 5;
-     */
-    wrathOfAirTotem: boolean;
-    /**
      * Indicates the shaman will be dropping an improved wrath of air totem before
      * the fight by snapshotting the T4 2pc bonus.
      *
@@ -396,6 +382,8 @@ export interface EnhancementShaman_Options {
      */
     delayOffhandSwings: boolean;
     /**
+     * TODO: Deprecate on 3/21 (1 month). Use consumes main_hand_imbue and off_hand_imbue instead.
+     *
      * @generated from protobuf field: proto.ShamanWeaponImbue main_hand_imbue = 3;
      */
     mainHandImbue: ShamanWeaponImbue;

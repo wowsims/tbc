@@ -1,4 +1,3 @@
-import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
@@ -8,7 +7,6 @@ import { Mage_Rotation_Type as RotationType } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_FireRotation_PrimarySpell as PrimaryFireSpell } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_AoeRotation_Rotation as AoeRotationSpells } from '/tbc/core/proto/mage.js';
 import { Mage_Rotation_ArcaneRotation_Filler as ArcaneFiller } from '/tbc/core/proto/mage.js';
-export declare const ManaEmerald: IconPickerConfig<Player<any>, boolean>;
 export declare const MageArmor: {
     id: ActionId;
     states: number;

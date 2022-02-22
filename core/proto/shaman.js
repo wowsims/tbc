@@ -691,14 +691,11 @@ class ElementalShaman_Options$Type extends MessageType {
         super("proto.ElementalShaman.Options", [
             { no: 1, name: "water_shield", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "bloodlust", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "mana_spring_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "totem_of_wrath", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 5, name: "wrath_of_air_totem", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 6, name: "snapshot_t4_2pc", kind: "scalar", jsonName: "snapshotT42pc", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { waterShield: false, bloodlust: false, manaSpringTotem: false, totemOfWrath: false, wrathOfAirTotem: false, snapshotT42Pc: false };
+        const message = { waterShield: false, bloodlust: false, snapshotT42Pc: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -714,15 +711,6 @@ class ElementalShaman_Options$Type extends MessageType {
                     break;
                 case /* bool bloodlust */ 2:
                     message.bloodlust = reader.bool();
-                    break;
-                case /* bool mana_spring_totem */ 3:
-                    message.manaSpringTotem = reader.bool();
-                    break;
-                case /* bool totem_of_wrath */ 4:
-                    message.totemOfWrath = reader.bool();
-                    break;
-                case /* bool wrath_of_air_totem */ 5:
-                    message.wrathOfAirTotem = reader.bool();
                     break;
                 case /* bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"];*/ 6:
                     message.snapshotT42Pc = reader.bool();
@@ -745,15 +733,6 @@ class ElementalShaman_Options$Type extends MessageType {
         /* bool bloodlust = 2; */
         if (message.bloodlust !== false)
             writer.tag(2, WireType.Varint).bool(message.bloodlust);
-        /* bool mana_spring_totem = 3; */
-        if (message.manaSpringTotem !== false)
-            writer.tag(3, WireType.Varint).bool(message.manaSpringTotem);
-        /* bool totem_of_wrath = 4; */
-        if (message.totemOfWrath !== false)
-            writer.tag(4, WireType.Varint).bool(message.totemOfWrath);
-        /* bool wrath_of_air_totem = 5; */
-        if (message.wrathOfAirTotem !== false)
-            writer.tag(5, WireType.Varint).bool(message.wrathOfAirTotem);
         /* bool snapshot_t4_2pc = 6 [json_name = "snapshotT42pc"]; */
         if (message.snapshotT42Pc !== false)
             writer.tag(6, WireType.Varint).bool(message.snapshotT42Pc);

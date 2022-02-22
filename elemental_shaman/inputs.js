@@ -4,10 +4,7 @@ import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 export const IconBloodlust = makeBooleanShamanBuffInput(ActionId.fromSpellId(2825), 'bloodlust');
-export const IconManaSpringTotem = makeBooleanShamanBuffInput(ActionId.fromSpellId(25570), 'manaSpringTotem');
-export const IconTotemOfWrath = makeBooleanShamanBuffInput(ActionId.fromSpellId(30706), 'totemOfWrath');
 export const IconWaterShield = makeBooleanShamanBuffInput(ActionId.fromSpellId(33736), 'waterShield');
-export const IconWrathOfAirTotem = makeBooleanShamanBuffInput(ActionId.fromSpellId(3738), 'wrathOfAirTotem');
 export const SnapshotT42Pc = {
     type: 'boolean',
     getModObject: (simUI) => simUI.player,

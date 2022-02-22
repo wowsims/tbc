@@ -1,11 +1,13 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { IndividualSimIconPickerConfig } from '/tbc/core/individual_sim_ui.js';
 import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
 import { Raid } from '/tbc/core/raid.js';
 import { Target } from '/tbc/core/target.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
+import { IconEnumPickerConfig } from './icon_enum_picker.js';
 export declare const ArcaneBrilliance: IndividualSimIconPickerConfig<Raid, boolean>;
 export declare const DivineSpirit: IndividualSimIconPickerConfig<Raid, number>;
 export declare const GiftOfTheWild: IndividualSimIconPickerConfig<Raid, number>;
@@ -87,6 +89,7 @@ export declare const DefaultSuperManaPotion: IndividualSimIconPickerConfig<Playe
 export declare const DefaultFelManaPotion: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultDarkRune: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const DefaultFlameCap: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const DefaultMageManaEmerald: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfAgilityV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfSpiritV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfStrengthV: IndividualSimIconPickerConfig<Player<any>, boolean>;
@@ -128,3 +131,4 @@ export declare const BattleShout: {
     getValue: (party: Party) => number;
     setValue: (eventID: EventID, party: Party, newValue: number) => void;
 };
+export declare function makeWeaponImbueInput(isMainHand: boolean, options: Array<WeaponImbue>): IconEnumPickerConfig<Player<any>, WeaponImbue>;

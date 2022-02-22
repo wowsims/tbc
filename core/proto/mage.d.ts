@@ -419,6 +419,8 @@ export interface Mage_Options {
      */
     evocationTicks: number;
     /**
+     * Deprecated, use ConjuredMageManaEmerald instead.
+     *
      * @generated from protobuf field: bool use_mana_emeralds = 3;
      */
     useManaEmeralds: boolean;

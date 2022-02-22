@@ -5,10 +5,7 @@ import { Player } from '/tbc/core/player.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 export declare const IconBloodlust: IconPickerConfig<Player<any>, boolean>;
-export declare const IconManaSpringTotem: IconPickerConfig<Player<any>, boolean>;
-export declare const IconTotemOfWrath: IconPickerConfig<Player<any>, boolean>;
 export declare const IconWaterShield: IconPickerConfig<Player<any>, boolean>;
-export declare const IconWrathOfAirTotem: IconPickerConfig<Player<any>, boolean>;
 export declare const SnapshotT42Pc: {
     type: "boolean";
     getModObject: (simUI: IndividualSimUI<any>) => Player<any>;

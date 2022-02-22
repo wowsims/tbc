@@ -288,17 +288,6 @@ export interface Consumes {
      */
     guardianElixir: GuardianElixir;
     /**
-     * Deprecated, use main_hand_imbue instead.
-     * Remove on 2/18/2022 (1 month).
-     *
-     * @generated from protobuf field: bool brilliant_wizard_oil = 11;
-     */
-    brilliantWizardOil: boolean;
-    /**
-     * @generated from protobuf field: bool superior_wizard_oil = 12;
-     */
-    superiorWizardOil: boolean;
-    /**
      * @generated from protobuf field: proto.WeaponImbue main_hand_imbue = 32;
      */
     mainHandImbue: WeaponImbue;
@@ -1488,7 +1477,11 @@ export declare enum Conjured {
     /**
      * @generated from protobuf enum value: ConjuredFlameCap = 2;
      */
-    ConjuredFlameCap = 2
+    ConjuredFlameCap = 2,
+    /**
+     * @generated from protobuf enum value: ConjuredMageManaEmerald = 3;
+     */
+    ConjuredMageManaEmerald = 3
 }
 /**
  * @generated from protobuf enum proto.WeaponImbue
@@ -1517,7 +1510,23 @@ export declare enum WeaponImbue {
     /**
      * @generated from protobuf enum value: WeaponImbueSuperiorWizardOil = 4;
      */
-    WeaponImbueSuperiorWizardOil = 4
+    WeaponImbueSuperiorWizardOil = 4,
+    /**
+     * @generated from protobuf enum value: WeaponImbueShamanFlametongue = 6;
+     */
+    WeaponImbueShamanFlametongue = 6,
+    /**
+     * @generated from protobuf enum value: WeaponImbueShamanFrostbrand = 7;
+     */
+    WeaponImbueShamanFrostbrand = 7,
+    /**
+     * @generated from protobuf enum value: WeaponImbueShamanRockbiter = 8;
+     */
+    WeaponImbueShamanRockbiter = 8,
+    /**
+     * @generated from protobuf enum value: WeaponImbueShamanWindfury = 9;
+     */
+    WeaponImbueShamanWindfury = 9
 }
 /**
  * @generated from protobuf enum proto.Flask

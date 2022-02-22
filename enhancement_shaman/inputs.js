@@ -1,40 +1,19 @@
-import { EarthTotem, EnhancementShaman_Rotation_PrimaryShock as PrimaryShock, ShamanWeaponImbue, } from '/tbc/core/proto/shaman.js';
+import { makeWeaponImbueInput } from '/tbc/core/components/icon_inputs.js';
+import { EarthTotem, EnhancementShaman_Rotation_PrimaryShock as PrimaryShock, } from '/tbc/core/proto/shaman.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 export const IconBloodlust = makeBooleanShamanBuffInput(ActionId.fromSpellId(2825), 'bloodlust');
 export const IconWaterShield = makeBooleanShamanBuffInput(ActionId.fromSpellId(33736), 'waterShield');
-export const MainHandImbue = makeShamanWeaponImbueInput(false);
-export const OffHandImbue = makeShamanWeaponImbueInput(true);
-function makeShamanWeaponImbueInput(isOffHand) {
-    return {
-        extraCssClasses: [
-            'shaman-weapon-imbue-picker',
-        ],
-        numColumns: 1,
-        values: [
-            { color: 'grey', value: ShamanWeaponImbue.ImbueNone },
-            { actionId: ActionId.fromSpellId(25505), value: ShamanWeaponImbue.ImbueWindfury },
-            { actionId: ActionId.fromSpellId(25489), value: ShamanWeaponImbue.ImbueFlametongue },
-            { actionId: ActionId.fromSpellId(25500), value: ShamanWeaponImbue.ImbueFrostbrand },
-            { actionId: ActionId.fromSpellId(25485), value: ShamanWeaponImbue.ImbueRockbiter },
-        ],
-        equals: (a, b) => a == b,
-        zeroValue: ShamanWeaponImbue.ImbueNone,
-        changedEvent: (player) => player.specOptionsChangeEmitter,
-        getValue: (player) => (!isOffHand ? player.getSpecOptions().mainHandImbue : player.getSpecOptions().offHandImbue) || ShamanWeaponImbue.ImbueNone,
-        setValue: (eventID, player, newValue) => {
-            const newOptions = player.getSpecOptions();
-            if (!isOffHand) {
-                newOptions.mainHandImbue = newValue;
-            }
-            else {
-                newOptions.offHandImbue = newValue;
-            }
-            player.setSpecOptions(eventID, newOptions);
-        },
-    };
-}
+const imbueOptions = [
+    WeaponImbue.WeaponImbueShamanWindfury,
+    WeaponImbue.WeaponImbueShamanFlametongue,
+    WeaponImbue.WeaponImbueShamanFrostbrand,
+    WeaponImbue.WeaponImbueShamanRockbiter,
+];
+export const MainHandImbue = makeWeaponImbueInput(true, imbueOptions);
+export const OffHandImbue = makeWeaponImbueInput(false, imbueOptions);
 export const DelayOffhandSwings = {
     type: 'boolean',
     getModObject: (simUI) => simUI.player,

@@ -710,6 +710,10 @@ export var Conjured;
      * @generated from protobuf enum value: ConjuredFlameCap = 2;
      */
     Conjured[Conjured["ConjuredFlameCap"] = 2] = "ConjuredFlameCap";
+    /**
+     * @generated from protobuf enum value: ConjuredMageManaEmerald = 3;
+     */
+    Conjured[Conjured["ConjuredMageManaEmerald"] = 3] = "ConjuredMageManaEmerald";
 })(Conjured || (Conjured = {}));
 /**
  * @generated from protobuf enum proto.WeaponImbue
@@ -740,6 +744,22 @@ export var WeaponImbue;
      * @generated from protobuf enum value: WeaponImbueSuperiorWizardOil = 4;
      */
     WeaponImbue[WeaponImbue["WeaponImbueSuperiorWizardOil"] = 4] = "WeaponImbueSuperiorWizardOil";
+    /**
+     * @generated from protobuf enum value: WeaponImbueShamanFlametongue = 6;
+     */
+    WeaponImbue[WeaponImbue["WeaponImbueShamanFlametongue"] = 6] = "WeaponImbueShamanFlametongue";
+    /**
+     * @generated from protobuf enum value: WeaponImbueShamanFrostbrand = 7;
+     */
+    WeaponImbue[WeaponImbue["WeaponImbueShamanFrostbrand"] = 7] = "WeaponImbueShamanFrostbrand";
+    /**
+     * @generated from protobuf enum value: WeaponImbueShamanRockbiter = 8;
+     */
+    WeaponImbue[WeaponImbue["WeaponImbueShamanRockbiter"] = 8] = "WeaponImbueShamanRockbiter";
+    /**
+     * @generated from protobuf enum value: WeaponImbueShamanWindfury = 9;
+     */
+    WeaponImbue[WeaponImbue["WeaponImbueShamanWindfury"] = 9] = "WeaponImbueShamanWindfury";
 })(WeaponImbue || (WeaponImbue = {}));
 /**
  * @generated from protobuf enum proto.Flask
@@ -1470,8 +1490,6 @@ class Consumes$Type extends MessageType {
             { no: 9, name: "elixir_of_draenic_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 10, name: "elixir_of_major_mageblood", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 40, name: "guardian_elixir", kind: "enum", T: () => ["proto.GuardianElixir", GuardianElixir] },
-            { no: 11, name: "brilliant_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 12, name: "superior_wizard_oil", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 32, name: "main_hand_imbue", kind: "enum", T: () => ["proto.WeaponImbue", WeaponImbue] },
             { no: 33, name: "off_hand_imbue", kind: "enum", T: () => ["proto.WeaponImbue", WeaponImbue] },
             { no: 13, name: "blackened_basilisk", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -1501,7 +1519,7 @@ class Consumes$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, flask: 0, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, battleElixir: 0, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, guardianElixir: 0, brilliantWizardOil: false, superiorWizardOil: false, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, grilledMudfish: false, ravagerDog: false, food: 0, petFood: 0, kreegsStoutBeatdown: false, alchohol: 0, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, scrollOfAgility: 0, scrollOfStrength: 0, scrollOfSpirit: 0, petScrollOfAgility: 0, petScrollOfStrength: 0, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, drums: 0, battleChicken: false };
+        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, flask: 0, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, battleElixir: 0, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, guardianElixir: 0, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, grilledMudfish: false, ravagerDog: false, food: 0, petFood: 0, kreegsStoutBeatdown: false, alchohol: 0, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, scrollOfAgility: 0, scrollOfStrength: 0, scrollOfSpirit: 0, petScrollOfAgility: 0, petScrollOfStrength: 0, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, drums: 0, battleChicken: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1565,12 +1583,6 @@ class Consumes$Type extends MessageType {
                     break;
                 case /* proto.GuardianElixir guardian_elixir */ 40:
                     message.guardianElixir = reader.int32();
-                    break;
-                case /* bool brilliant_wizard_oil */ 11:
-                    message.brilliantWizardOil = reader.bool();
-                    break;
-                case /* bool superior_wizard_oil */ 12:
-                    message.superiorWizardOil = reader.bool();
                     break;
                 case /* proto.WeaponImbue main_hand_imbue */ 32:
                     message.mainHandImbue = reader.int32();
@@ -1716,12 +1728,6 @@ class Consumes$Type extends MessageType {
         /* proto.GuardianElixir guardian_elixir = 40; */
         if (message.guardianElixir !== 0)
             writer.tag(40, WireType.Varint).int32(message.guardianElixir);
-        /* bool brilliant_wizard_oil = 11; */
-        if (message.brilliantWizardOil !== false)
-            writer.tag(11, WireType.Varint).bool(message.brilliantWizardOil);
-        /* bool superior_wizard_oil = 12; */
-        if (message.superiorWizardOil !== false)
-            writer.tag(12, WireType.Varint).bool(message.superiorWizardOil);
         /* proto.WeaponImbue main_hand_imbue = 32; */
         if (message.mainHandImbue !== 0)
             writer.tag(32, WireType.Varint).int32(message.mainHandImbue);
