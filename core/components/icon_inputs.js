@@ -387,6 +387,7 @@ export const makeBattleElixirsInput = makeConsumeInputFactory('battleElixir', [
     { actionId: ActionId.fromItemId(22835), value: BattleElixir.ElixirOfMajorShadowPower },
     { actionId: ActionId.fromItemId(22824), value: BattleElixir.ElixirOfMajorStrength },
     { actionId: ActionId.fromItemId(13452), value: BattleElixir.ElixirOfTheMongoose },
+    { actionId: ActionId.fromItemId(31679), value: BattleElixir.FelStrengthElixir },
 ], (eventID, player, newValue) => {
     if (newValue) {
         const newConsumes = player.getConsumes();

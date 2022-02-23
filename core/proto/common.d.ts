@@ -1596,7 +1596,11 @@ export declare enum BattleElixir {
     /**
      * @generated from protobuf enum value: ElixirOfTheMongoose = 8;
      */
-    ElixirOfTheMongoose = 8
+    ElixirOfTheMongoose = 8,
+    /**
+     * @generated from protobuf enum value: FelStrengthElixir = 9;
+     */
+    FelStrengthElixir = 9
 }
 /**
  * @generated from protobuf enum proto.GuardianElixir
