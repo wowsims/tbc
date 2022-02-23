@@ -2363,7 +2363,7 @@ input, select {
 }
 
 .rogue-sim-ui {
-  --theme-color-primary: #adad2e;
+  --theme-color-primary: #a7ba27;
   --theme-color-background: #19190c;
   --theme-color-background-raw: 25, 25, 12;
   --theme-background-image: url("/tbc/assets/rogue_background.jpg");
