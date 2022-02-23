@@ -715,6 +715,7 @@ export class Player<SpecType extends Spec> {
 					hunterOptions.petUptime = 1;
 				}
 				if (hunterRotation.meleeWeave) {
+					hunterRotation.meleeWeave = false;
 					if (hunterRotation.useRaptorStrike) {
 						hunterRotation.weave = WeaveType.WeaveFull;
 					} else {
@@ -722,6 +723,7 @@ export class Player<SpecType extends Spec> {
 					}
 				}
 				options = hunterOptions as SpecOptions<SpecType>;
+				rotation = hunterRotation as SpecRotation<SpecType>;
 			}
 
 			// TODO: Remove this on 3/21 (1 month).
