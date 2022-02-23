@@ -79,7 +79,7 @@ func ApplyTalonOfAlar(agent core.Agent) {
 		procAura := core.Aura{
 			ID:       TalonOfAlarAuraID,
 			ActionID: core.ActionID{ItemID: 30448},
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if !ability.SameAction(SteadyShotActionID) &&
 					!ability.SameAction(MultiShotActionID) &&
 					!ability.SameAction(ArcaneShotActionID) &&
@@ -92,7 +92,7 @@ func ApplyTalonOfAlar(agent core.Agent) {
 
 		return core.Aura{
 			ID: TalonOfAlarAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if !ability.SameAction(ArcaneShotActionID) {
 					return
 				}
@@ -126,7 +126,7 @@ func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: BlackBowOfTheBetrayerAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if !hitEffect.Landed() || !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
@@ -147,7 +147,7 @@ func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
 
 		return core.Aura{
 			ID: AshtongueTalismanOfSwiftnessAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if !ability.SameAction(SteadyShotActionID) {
 					return
 				}

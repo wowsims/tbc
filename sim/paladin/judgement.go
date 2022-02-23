@@ -26,8 +26,8 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.M
 			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 			IsPhantom:           true,
 		},
-		Effect: core.AbilityHitEffect{
-			AbilityEffect: core.AbilityEffect{
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1, // Need to review to make sure I set these properly
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
@@ -38,7 +38,7 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.M
 				MaxBaseDamage: 325,
 			},
 		},
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
 			paladin.RemoveAura(sim, SealOfBloodAuraID)
 			paladin.currentSeal = core.Aura{}

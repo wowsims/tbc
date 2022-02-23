@@ -13,9 +13,13 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
+				ActionID: core.ActionID{
+					SpellID: SpellIDBlizzard,
+				},
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFrost,
+				SpellExtras:         core.SpellExtrasChanneled,
 				Character:           &mage.Character,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
@@ -26,13 +30,9 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 					Value: 1645,
 				},
 				GCD: core.GCDDefault,
-				ActionID: core.ActionID{
-					SpellID: SpellIDBlizzard,
-				},
 			},
 		},
-		IsChannel: true,
-		AOECap:    3620,
+		AOECap: 3620,
 	}
 
 	baseEffect := core.SpellHitEffect{

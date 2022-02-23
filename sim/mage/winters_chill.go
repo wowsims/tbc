@@ -11,13 +11,11 @@ func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpell
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
+				ActionID:            core.ActionID{SpellID: SpellIDWintersChill},
+				Character:           &mage.Character,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFrost,
-				Character:           &mage.Character,
-				ActionID: core.ActionID{
-					SpellID: SpellIDWintersChill,
-				},
 			},
 		},
 		Effect: core.SpellHitEffect{

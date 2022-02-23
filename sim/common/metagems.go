@@ -95,7 +95,7 @@ func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 
 		return core.Aura{
 			ID: ThunderingSkyfireDiamondAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				// Mask 68, melee or ranged auto attacks.
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskWhiteHit) || ability.IsPhantom {
 					return

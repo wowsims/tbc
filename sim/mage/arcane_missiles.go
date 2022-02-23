@@ -21,6 +21,7 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolArcane,
+				SpellExtras:         core.SpellExtrasChanneled,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 740,
@@ -51,7 +52,6 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 				TicksProcSpellHitEffects: true,
 			},
 		},
-		IsChannel: true,
 	}
 
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance

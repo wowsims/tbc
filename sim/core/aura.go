@@ -630,7 +630,7 @@ func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, s
 	}
 }
 
-func (at *auraTracker) OnMeleeAttack(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+func (at *auraTracker) OnMeleeAttack(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
 	for _, id := range at.onMeleeAttackIDs {
 		at.auras[id].OnMeleeAttack(sim, ability, hitEffect)
 	}
@@ -642,7 +642,7 @@ func (at *auraTracker) OnBeforeMelee(sim *Simulation, ability *ActiveMeleeAbilit
 	}
 }
 
-func (at *auraTracker) OnBeforeMeleeHit(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+func (at *auraTracker) OnBeforeMeleeHit(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
 	for _, id := range at.onBeforeMeleeHitIDs {
 		at.auras[id].OnBeforeMeleeHit(sim, ability, hitEffect)
 	}

@@ -336,7 +336,7 @@ func FerociousInspirationAura(numBMHunters int32) Aura {
 	return Aura{
 		ID:       FerociousInspirationAuraID,
 		ActionID: ActionID{SpellID: 34460, Tag: -1},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
 			hitEffect.DamageMultiplier *= multiplier
 		},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
@@ -354,7 +354,7 @@ func ImprovedSanctityAura(sim *Simulation, level float64) Aura {
 	return Aura{
 		ID:       ImprovedSanctityAuraID,
 		ActionID: ActionID{SpellID: 31870},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
 			// unsure if this scaling should be additive or multiplicative
 			// scale 10% for holy damange
 			if ability.SpellSchool.Matches(SpellSchoolHoly) {
@@ -415,8 +415,8 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			SpellSchool:    SpellSchoolPhysical,
 			CritMultiplier: character.AutoAttacks.MHAuto.CritMultiplier,
 		},
-		Effect: AbilityHitEffect{
-			AbilityEffect: AbilityEffect{
+		Effect: SpellHitEffect{
+			SpellEffect: SpellEffect{
 				DamageMultiplier:       1.0,
 				StaticDamageMultiplier: 1.0,
 				BonusAttackPower:       apBonus,
@@ -439,7 +439,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	return Aura{
 		ID:       WindfuryTotemAuraID,
 		ActionID: actionID,
-		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *AbilityHitEffect) {
+		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
 			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(ProcMaskMeleeMH) || ability.IsPhantom {
 				return
 			}

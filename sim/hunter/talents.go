@@ -133,7 +133,7 @@ func (hunter *Hunter) applyFocusedFire() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: FocusedFireAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				hitEffect.DamageMultiplier *= multiplier
 			},
 			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -176,7 +176,7 @@ func (hunter *Hunter) applyFrenzy() {
 
 		return core.Aura{
 			ID: FrenzyAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					tryProcAura()
 				}
@@ -211,7 +211,7 @@ func (hunter *Hunter) applyFerociousInspiration() {
 	procAura := core.Aura{
 		ID:       FerociousInspirationAuraIDs[hunter.PartyIndex],
 		ActionID: core.ActionID{SpellID: 34460, Tag: int32(hunter.RaidIndex)},
-		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 			hitEffect.DamageMultiplier *= multiplier
 		},
 		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -234,7 +234,7 @@ func (hunter *Hunter) applyFerociousInspiration() {
 
 		return core.Aura{
 			ID: FerociousInspirationAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					applyAura()
 				}
@@ -262,7 +262,7 @@ func (hunter *Hunter) registerBestialWrathCD() {
 	bestialWrathPetAura := core.Aura{
 		ID:       BestialWrathPetAuraID,
 		ActionID: actionID,
-		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 			hitEffect.DamageMultiplier *= 1.5
 		},
 		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -282,7 +282,7 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
 			ability.Cost.Value *= 0.8
 		},
-		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 			hitEffect.DamageMultiplier *= 1.1
 		},
 		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -356,7 +356,7 @@ func (hunter *Hunter) applyRangedEffects() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: RangedEffectsAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					hitEffect.BonusCritRating += critBonus
 					hitEffect.DamageMultiplier *= damageBonus
@@ -381,7 +381,7 @@ func (hunter *Hunter) applyGoForTheThroat() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: GoForTheThroatAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
@@ -407,7 +407,7 @@ func (hunter *Hunter) applySlaying() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: SlayingAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if hitEffect.Target.MobType == proto.MobType_MobTypeBeast || hitEffect.Target.MobType == proto.MobType_MobTypeGiant || hitEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
 					hitEffect.DamageMultiplier *= monsterMultiplier
 				} else if hitEffect.Target.MobType == proto.MobType_MobTypeHumanoid {
@@ -445,7 +445,7 @@ func (hunter *Hunter) applyThrillOfTheHunt() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ThrillOfTheHuntAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				// mask 256
 				if !hitEffect.ProcMask.Matches(core.ProcMaskRangedSpecial) {
 					return
@@ -475,7 +475,7 @@ func (hunter *Hunter) applyExposeWeakness() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ExposeWeaknessAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
@@ -512,14 +512,14 @@ func (hunter *Hunter) applyMasterTactician() {
 		procAura := core.Aura{
 			ID:       MasterTacticianProcAuraID,
 			ActionID: core.ActionID{SpellID: 34839},
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				hitEffect.BonusCritRating += critBonus
 			},
 		}
 
 		return core.Aura{
 			ID: MasterTacticianAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !hitEffect.Landed() {
 					return
 				}

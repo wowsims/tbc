@@ -99,6 +99,7 @@ type SpellHitEffect struct {
 	SpellEffect
 	DotInput    DotDamageInput
 	DirectInput DirectDamageInput
+	WeaponInput WeaponDamageInput
 }
 
 // SimpleSpell has a single cast and could have a dot or direct effect (or no effect)
@@ -115,8 +116,6 @@ type SimpleSpell struct {
 	// Individual direct damage effects of this spell. Use this for spells with
 	// multiple effects, like Arcane Explosion, Chain Lightning, or Consecrate.
 	Effects []SpellHitEffect
-
-	IsChannel bool
 
 	// Maximum amount of pre-crit damage this spell is allowed to do.
 	AOECap float64
@@ -142,7 +141,7 @@ func (spell *SimpleSpell) Init(sim *Simulation) {
 		}
 	}
 
-	if spell.IsChannel {
+	if spell.SpellExtras.Matches(SpellExtrasChanneled) {
 		spell.AfterCastDelay += spell.GetChannelDuration()
 	}
 }
@@ -156,7 +155,7 @@ func (spell *SimpleSpell) GetChannelDuration() time.Duration {
 }
 
 func (spell *SimpleSpell) GetDuration() time.Duration {
-	if spell.IsChannel {
+	if spell.SpellExtras.Matches(SpellExtrasChanneled) {
 		return spell.CastTime + spell.GetChannelDuration()
 	} else {
 		return spell.CastTime
