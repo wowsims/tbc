@@ -204,6 +204,9 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 }
 
 func (cast *Cast) CalculatedGCD(char *Character) time.Duration {
+	// TODO: switch on melee or physical, to apply spell haste to GCD or not?
+	//   Or does spell haste always decrease GCD (its just most non-casters dont have spell haste?)
+
 	if cast.IgnoreHaste {
 		return cast.GCD
 	} else {

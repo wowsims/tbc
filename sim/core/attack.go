@@ -21,6 +21,8 @@ type ReplaceMHSwing func(sim *Simulation) *SimpleSpell
 //  This should be used for any effects that adjust the stats / multipliers of the attack.
 type OnBeforeMeleeHit func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect)
 
+// TODO: we should combine OnMeleeAttack and OnCastComplete probably
+
 // OnMeleeAttack is invoked on auto attacks and abilities.
 //  This should be used for any on-hit procs.
 type OnMeleeAttack func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect)
