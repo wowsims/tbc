@@ -20,6 +20,7 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpe
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical, // TODO: Fix this once we have everything working correctly.
 				GCD:                 core.GCDDefault,
+				IgnoreHaste:         true,
 				Cooldown:            time.Second * 6,
 				Cost: core.ResourceCost{
 					Type:  stats.Mana,

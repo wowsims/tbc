@@ -45,6 +45,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical,
 				GCD:                 core.GCDDefault,
+				IgnoreHaste:         true,
 				Cooldown:            time.Second * 10,
 				Cost: core.ResourceCost{
 					Type:  stats.Mana,

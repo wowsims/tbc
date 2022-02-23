@@ -143,9 +143,9 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	}
 
 	// Uncomment this to print logs directly to console.
-	//sim.Log = func(message string, vals ...interface{}) {
-	//	fmt.Printf(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
-	//}
+	// sim.Log = func(message string, vals ...interface{}) {
+	// 	fmt.Printf(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+	// }
 
 	for _, party := range sim.Raid.Parties {
 		for _, player := range party.Players {
