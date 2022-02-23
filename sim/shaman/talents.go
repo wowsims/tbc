@@ -292,7 +292,8 @@ func (shaman *Shaman) applyShamanisticFocus() {
 		ActionID: core.ActionID{SpellID: 43338},
 		Expires:  core.NeverExpires,
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			if !cast.IsSpellAction(SpellIDEarthShock) && !cast.IsSpellAction(SpellIDFlameShock) && !cast.IsSpellAction(SpellIDFrostShock) {
+			// Shaman use spell extras agent reserved for shamanistic rage checking.
+			if !cast.SpellExtras.Matches(core.SpellExtrasAgentReserved) {
 				return
 			}
 

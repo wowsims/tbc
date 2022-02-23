@@ -163,6 +163,7 @@ const (
 	SpellExtrasAlwaysHits                            // Can't miss the hit roll
 	SpellExtrasBinary                                // Does not do partial resists and could need a different hit roll.
 	SpellExtrasChanneled                             // Spell is channeled
+	SpellExtrasAgentReserved                         // Used to let agents flag a spell
 )
 
 // OutcomeRollCategory is the mask for what kind of hit roll to perform

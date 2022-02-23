@@ -153,10 +153,10 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 		// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
 		// If we actually implement blocks, ranged hits can be blocked.
 
-		// No need to crit/glance roll if we are a special attack.
-		// if ability.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial) {
-		// 	return OutcomeHit
-		// }
+		// No need to crit/glance roll if we are not a white hit
+		if ability.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial | OutcomeRollCategoryRanged) {
+			return OutcomeHit
+		}
 
 		// Glance
 		chance += ahe.Target.Glance
