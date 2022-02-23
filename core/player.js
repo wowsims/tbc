@@ -568,6 +568,7 @@ export class Player {
                     hunterOptions.petUptime = 1;
                 }
                 if (hunterRotation.meleeWeave) {
+                    hunterRotation.meleeWeave = false;
                     if (hunterRotation.useRaptorStrike) {
                         hunterRotation.weave = WeaveType.WeaveFull;
                     }
@@ -576,6 +577,7 @@ export class Player {
                     }
                 }
                 options = hunterOptions;
+                rotation = hunterRotation;
             }
             // TODO: Remove this on 3/21 (1 month).
             if (this.spec == Spec.SpecMage) {
