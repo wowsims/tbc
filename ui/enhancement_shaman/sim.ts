@@ -193,6 +193,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				],
 				battleElixirs: [
 					BattleElixir.ElixirOfDemonslaying,
+					BattleElixir.FelStrengthElixir,
 					BattleElixir.ElixirOfMajorStrength,
 					BattleElixir.ElixirOfMajorAgility,
 					BattleElixir.ElixirOfTheMongoose,
