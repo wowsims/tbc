@@ -615,7 +615,7 @@ func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, s
 	}
 }
 
-func (at *auraTracker) OnMeleeAttack(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
+func (at *auraTracker) OnMeleeAttack(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
 	for _, id := range at.onMeleeAttackIDs {
 		at.auras[id].OnMeleeAttack(sim, ability, hitEffect)
 	}

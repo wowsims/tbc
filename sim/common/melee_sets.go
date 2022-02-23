@@ -40,7 +40,7 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 
 				return core.Aura{
 					ID: DesolationBattlegearAuraID,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 						if !hitEffect.Landed() {
 							return
 						}
@@ -119,7 +119,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 
 				return core.Aura{
 					ID: FistsOfFuryAuraID,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 						if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 							return
 						}
@@ -174,7 +174,7 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 							hitEffect.BonusAttackPower += 200
 						}
 					},
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 						if !hitEffect.Landed() {
 							return
 						}
@@ -221,7 +221,7 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 
 				return core.Aura{
 					ID: WastewalkerArmorAuraID,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 						if !hitEffect.Landed() {
 							return
 						}

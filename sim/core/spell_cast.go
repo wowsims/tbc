@@ -116,13 +116,17 @@ func (spellEffect *SpellEffect) TotalThreatMultiplier(spellCast *SpellCast) floa
 	return spellEffect.ThreatMultiplier * spellCast.Character.PseudoStats.ThreatMultiplier
 }
 
-func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell) {
+func (she *SpellHitEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell) {
+	she.SpellEffect.beforeCalculations(sim, spell, she)
+}
+
+func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell, she *SpellHitEffect) {
 	spellEffect.BeyondAOECapMultiplier = 1
 	multiplierBeforeTargetEffects := spellEffect.DamageMultiplier
 
 	if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
-		spell.Character.OnBeforeMeleeHit(sim, spell, &spell.Effect)
-		spellEffect.Target.OnBeforeMeleeHit(sim, spell, &spell.Effect)
+		spell.Character.OnBeforeMeleeHit(sim, spell, she)
+		spellEffect.Target.OnBeforeMeleeHit(sim, spell, she)
 	} else if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryMagic) {
 		spell.Character.OnBeforeSpellHit(sim, &spell.SpellCast, spellEffect)
 		spellEffect.Target.OnBeforeSpellHit(sim, &spell.SpellCast, spellEffect)
@@ -143,39 +147,42 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *Simpl
 	}
 }
 
-func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spellCast *SpellCast) {
+func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spell *SimpleSpell) {
 
 	// TODO: physical callbacks
-	// ability.Character.OnMeleeAttack(sim, ability, ahe)
-	// ahe.Target.OnMeleeAttack(sim, ability, ahe)
-	// if ahe.OnMeleeAttack != nil {
-	// 	ahe.OnMeleeAttack(sim, ability, ahe)
-	// }
 
-	if spellEffect.Landed() {
-		if spellEffect.OnSpellHit != nil {
-			spellEffect.OnSpellHit(sim, spellCast, spellEffect)
+	if spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) {
+		spell.Character.OnMeleeAttack(sim, spell, spellEffect)
+		spellEffect.Target.OnMeleeAttack(sim, spell, spellEffect)
+		if spellEffect.OnMeleeAttack != nil {
+			spellEffect.OnMeleeAttack(sim, spell, spellEffect)
 		}
-		spellCast.Character.OnSpellHit(sim, spellCast, spellEffect)
-		spellEffect.Target.OnSpellHit(sim, spellCast, spellEffect)
 	} else {
-		if spellEffect.OnSpellMiss != nil {
-			spellEffect.OnSpellMiss(sim, spellCast, spellEffect)
+		if spellEffect.Landed() {
+			if spellEffect.OnSpellHit != nil {
+				spellEffect.OnSpellHit(sim, &spell.SpellCast, spellEffect)
+			}
+			spell.Character.OnSpellHit(sim, &spell.SpellCast, spellEffect)
+			spellEffect.Target.OnSpellHit(sim, &spell.SpellCast, spellEffect)
+		} else {
+			if spellEffect.OnSpellMiss != nil {
+				spellEffect.OnSpellMiss(sim, &spell.SpellCast, spellEffect)
+			}
+			spell.Character.OnSpellMiss(sim, &spell.SpellCast, spellEffect)
+			spellEffect.Target.OnSpellMiss(sim, &spell.SpellCast, spellEffect)
 		}
-		spellCast.Character.OnSpellMiss(sim, spellCast, spellEffect)
-		spellEffect.Target.OnSpellMiss(sim, spellCast, spellEffect)
 	}
 }
 
-func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
-	if sim.Log != nil && !spellCast.SpellExtras.Matches(SpellExtrasAlwaysHits) {
-		spellCast.Character.Log(sim, "%s %s.", spellCast.ActionID, spellEffect)
+func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *SimpleSpell) {
+	if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasAlwaysHits) {
+		spell.Character.Log(sim, "%s %s.", spell.ActionID, spellEffect)
 	}
 	if spellEffect.Landed() && spellEffect.FlatThreatBonus > 0 {
-		spellCast.TotalThreat += spellEffect.FlatThreatBonus * spellEffect.TotalThreatMultiplier(spellCast)
+		spell.TotalThreat += spellEffect.FlatThreatBonus * spellEffect.TotalThreatMultiplier(&spell.SpellCast)
 	}
 
-	spellEffect.triggerSpellProcs(sim, spellCast)
+	spellEffect.triggerSpellProcs(sim, spell)
 }
 
 // Calculates a hit check using the stats from this spell.
@@ -195,30 +202,20 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast)
 func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
 	// TODO: Apply melee outcomes correctly.
 
-	// if ahe.Outcome == OutcomeMiss {
-	// 	ability.Misses++
-	// } else if ahe.Outcome == OutcomeDodge {
-	// 	ability.Dodges++
-	// } else if ahe.Outcome == OutcomeGlance {
-	// 	ability.Glances++
-	// } else if ahe.Outcome == OutcomeCrit {
-	// 	ability.Crits++
-	// } else if ahe.Outcome == OutcomeHit {
-	// 	ability.Hits++
-	// } else if ahe.Outcome == OutcomeParry {
-	// 	ability.Parries++
-	// } else if ahe.Outcome.Matches(OutcomeBlock) {
-	// 	ability.Blocks++
-	// }
-	// ability.TotalDamage += ahe.Damage
-	// ability.TotalThreat += (ahe.Damage + ahe.FlatThreatBonus) * ahe.ThreatMultiplier * ability.Character.PseudoStats.ThreatMultiplier
+	if spellEffect.Outcome.Matches(OutcomeHit) {
+		spellCast.Hits++
+	}
+	if spellEffect.Outcome.Matches(OutcomeGlance) {
+		spellCast.Glances++
+	}
+	if spellEffect.Outcome.Matches(OutcomeCrit) {
+		spellCast.Crits++
+	}
+	if spellEffect.Outcome.Matches(OutcomeBlock) {
+		spellCast.Blocks++
+	}
 
 	if spellEffect.Landed() {
-		spellCast.Hits++
-		if spellEffect.Outcome.Matches(OutcomeCrit) {
-			spellCast.Crits++
-		}
-
 		if spellEffect.Outcome.Matches(OutcomePartial1_4) {
 			spellCast.PartialResists_1_4++
 		} else if spellEffect.Outcome.Matches(OutcomePartial2_4) {
@@ -227,7 +224,13 @@ func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
 			spellCast.PartialResists_3_4++
 		}
 	} else {
-		spellCast.Misses++
+		if spellEffect.Outcome == OutcomeMiss {
+			spellCast.Misses++
+		} else if spellEffect.Outcome == OutcomeDodge {
+			spellCast.Dodges++
+		} else if spellEffect.Outcome == OutcomeParry {
+			spellCast.Parries++
+		}
 	}
 
 	spellCast.TotalDamage += spellEffect.Damage
@@ -333,21 +336,21 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 }
 
 // This should be called on each dot tick.
-func (hitEffect *SpellHitEffect) afterDotTick(sim *Simulation, spellCast *SpellCast) {
+func (hitEffect *SpellHitEffect) afterDotTick(sim *Simulation, spell *SimpleSpell) {
 	if sim.Log != nil {
-		spellCast.Character.Log(sim, "%s %s.", spellCast.ActionID, hitEffect.SpellEffect.DotResultString())
+		spell.Character.Log(sim, "%s %s.", spell.ActionID, hitEffect.SpellEffect.DotResultString())
 	}
 
-	hitEffect.applyDotTickResultsToCast(spellCast)
+	hitEffect.applyDotTickResultsToCast(&spell.SpellCast)
 
 	if hitEffect.DotInput.TicksProcSpellHitEffects {
-		hitEffect.SpellEffect.triggerSpellProcs(sim, spellCast)
+		hitEffect.SpellEffect.triggerSpellProcs(sim, spell)
 	}
 
-	spellCast.Character.OnPeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, hitEffect.Damage)
-	hitEffect.Target.OnPeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, hitEffect.Damage)
+	spell.Character.OnPeriodicDamage(sim, &spell.SpellCast, &hitEffect.SpellEffect, hitEffect.Damage)
+	hitEffect.Target.OnPeriodicDamage(sim, &spell.SpellCast, &hitEffect.SpellEffect, hitEffect.Damage)
 	if hitEffect.DotInput.OnPeriodicDamage != nil {
-		hitEffect.DotInput.OnPeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, hitEffect.Damage)
+		hitEffect.DotInput.OnPeriodicDamage(sim, &spell.SpellCast, &hitEffect.SpellEffect, hitEffect.Damage)
 	}
 
 	hitEffect.DotInput.tickIndex++

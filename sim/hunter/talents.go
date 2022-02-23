@@ -176,7 +176,7 @@ func (hunter *Hunter) applyFrenzy() {
 
 		return core.Aura{
 			ID: FrenzyAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					tryProcAura()
 				}
@@ -234,7 +234,7 @@ func (hunter *Hunter) applyFerociousInspiration() {
 
 		return core.Aura{
 			ID: FerociousInspirationAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					applyAura()
 				}
@@ -378,7 +378,7 @@ func (hunter *Hunter) applyGoForTheThroat() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: GoForTheThroatAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
@@ -405,6 +405,11 @@ func (hunter *Hunter) applySlaying() {
 		return core.Aura{
 			ID: SlayingAuraID,
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+				if hitEffect == nil {
+					panic("null hit effect")
+				} else if hitEffect.Target == nil {
+					panic("nil target")
+				}
 				if hitEffect.Target.MobType == proto.MobType_MobTypeBeast || hitEffect.Target.MobType == proto.MobType_MobTypeGiant || hitEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
 					hitEffect.DamageMultiplier *= monsterMultiplier
 				} else if hitEffect.Target.MobType == proto.MobType_MobTypeHumanoid {
@@ -442,7 +447,7 @@ func (hunter *Hunter) applyThrillOfTheHunt() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ThrillOfTheHuntAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				// mask 256
 				if !hitEffect.ProcMask.Matches(core.ProcMaskRangedSpecial) {
 					return
@@ -472,7 +477,7 @@ func (hunter *Hunter) applyExposeWeakness() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ExposeWeaknessAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
@@ -516,7 +521,7 @@ func (hunter *Hunter) applyMasterTactician() {
 
 		return core.Aura{
 			ID: MasterTacticianAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !hitEffect.Landed() {
 					return
 				}

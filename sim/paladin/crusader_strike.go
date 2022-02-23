@@ -37,7 +37,7 @@ func (paladin *Paladin) newCrusaderStrikeTemplate(sim *core.Simulation) core.Sim
 				DamageMultiplier:       1, // Need to review to make sure I set these properly
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 					if !hitEffect.Landed() {
 						return
 					}

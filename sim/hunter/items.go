@@ -92,7 +92,7 @@ func ApplyTalonOfAlar(agent core.Agent) {
 
 		return core.Aura{
 			ID: TalonOfAlarAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !ability.SameAction(ArcaneShotActionID) {
 					return
 				}
@@ -126,7 +126,7 @@ func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: BlackBowOfTheBetrayerAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
@@ -147,7 +147,7 @@ func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
 
 		return core.Aura{
 			ID: AshtongueTalismanOfSwiftnessAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !ability.SameAction(SteadyShotActionID) {
 					return
 				}

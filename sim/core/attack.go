@@ -25,7 +25,7 @@ type OnBeforeMeleeHit func(sim *Simulation, ability *SimpleSpell, hitEffect *Spe
 
 // OnMeleeAttack is invoked on auto attacks and abilities.
 //  This should be used for any on-hit procs.
-type OnMeleeAttack func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect)
+type OnMeleeAttack func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect)
 
 // Represents a generic weapon. Pets / unarmed / various other cases dont use
 // actual weapon items so this is an abstraction of a Weapon.
@@ -250,23 +250,23 @@ func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell
 }
 
 // Returns whether this hit effect is associated with the main-hand weapon.
-func (ahe *SpellHitEffect) IsMH() bool {
+func (ahe *SpellEffect) IsMH() bool {
 	const mhmask = ProcMaskMeleeMH
 	return ahe.ProcMask.Matches(mhmask)
 }
 
 // Returns whether this hit effect is associated with the off-hand weapon.
-func (ahe *SpellHitEffect) IsOH() bool {
+func (ahe *SpellEffect) IsOH() bool {
 	return ahe.ProcMask.Matches(ProcMaskMeleeOH)
 }
 
 // Returns whether this hit effect is associated with either melee weapon.
-func (ahe *SpellHitEffect) IsMelee() bool {
+func (ahe *SpellEffect) IsMelee() bool {
 	return ahe.ProcMask.Matches(ProcMaskMelee)
 }
 
 // Returns whether this hit effect matches the hand in which a weapon is equipped.
-func (ahe *SpellHitEffect) IsEquippedHand(mh bool, oh bool) bool {
+func (ahe *SpellEffect) IsEquippedHand(mh bool, oh bool) bool {
 	return (mh && ahe.IsMH()) || (oh && ahe.IsOH())
 }
 

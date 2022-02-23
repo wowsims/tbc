@@ -32,7 +32,7 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 				ss := &hunter.steadyShotAbility
 				hunter.steadyShotAbilityTemplate.Apply(ss)
 				ss.Effect.Target = target
-				ss.Attack(sim)
+				ss.Cast(sim)
 
 				hunter.killCommandBlocked = false
 				hunter.TryKillCommand(sim, target)

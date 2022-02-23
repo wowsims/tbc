@@ -32,7 +32,7 @@ func (hunter *Hunter) newMultiShotCastTemplate(sim *core.Simulation) core.Simple
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				ms := &hunter.multiShotAbility
 				hunter.multiShotAbilityTemplate.Apply(ms)
-				ms.Attack(sim)
+				ms.Cast(sim)
 				hunter.rotation(sim, false)
 			},
 		},

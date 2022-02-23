@@ -73,7 +73,7 @@ func ApplyStormGauntlets(agent core.Agent) {
 
 		return core.Aura{
 			ID: StormGauntletsAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				// https://tbc.wowhead.com/spell=16615/add-lightning-dam-weap-03, proc mask = 20.
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
@@ -123,7 +123,7 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 
 		return core.Aura{
 			ID: BlazefuryMedallionAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				// https://tbc.wowhead.com/spell=7711/add-fire-dam-weap-02, proc mask = 20.
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
@@ -151,7 +151,7 @@ func ApplyKhoriumChampion(agent core.Agent) {
 
 		return core.Aura{
 			ID: KhoriumChampionAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				// https://tbc.wowhead.com/spell=16916/strength-of-the-champion, proc mask = 0. Handled in-game via script.
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
@@ -186,7 +186,7 @@ func ApplyBlackoutTruncheon(agent core.Agent) {
 
 		return core.Aura{
 			ID: BlackoutTruncheonAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				// https://tbc.wowhead.com/spell=33489/blinding-speed, proc mask = 0. Handled in-game via script.
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) {
 					return
@@ -213,7 +213,7 @@ func ApplyLionheartChampion(agent core.Agent) {
 
 		return core.Aura{
 			ID: LionheartChampionAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				// https://tbc.wowhead.com/spell=34513/lionheart, proc mask = 0. Handled in-game via script.
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
@@ -240,7 +240,7 @@ func ApplyLionheartExecutioner(agent core.Agent) {
 
 		return core.Aura{
 			ID: LionheartExecutionerAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
@@ -268,7 +268,7 @@ func ApplyDrakefistHammer(agent core.Agent) {
 
 		return core.Aura{
 			ID: DrakefistHammerAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) {
 					return
 				}
@@ -296,7 +296,7 @@ func ApplyDragonmaw(agent core.Agent) {
 
 		return core.Aura{
 			ID: DragonmawAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) {
 					return
 				}
@@ -325,7 +325,7 @@ func ApplyDragonstrike(agent core.Agent) {
 
 		return core.Aura{
 			ID: DragonstrikeAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) {
 					return
 				}
@@ -381,7 +381,7 @@ func ApplyDespair(agent core.Agent) {
 
 		return core.Aura{
 			ID: DespairAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				// ProcMask: 20
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
@@ -392,7 +392,7 @@ func ApplyDespair(agent core.Agent) {
 
 				abilityTemplate.Apply(&cast)
 				cast.Effect.Target = sim.GetPrimaryTarget()
-				cast.Attack(sim)
+				cast.Cast(sim)
 			},
 		}
 	})
@@ -452,7 +452,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 			return func(sim *core.Simulation, character *core.Character) {
 				abilityTemplate.Apply(&ability)
 				ability.Effect.Target = sim.GetPrimaryTarget()
-				ability.Attack(sim)
+				ability.Cast(sim)
 
 				character.SetCD(TheDecapitatorCooldownID, sim.CurrentTime+time.Minute*3)
 				character.SetCD(core.OffensiveTrinketSharedCooldownID, sim.CurrentTime+time.Second*10)
@@ -498,7 +498,7 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 
 		return core.Aura{
 			ID: GlaiveOfThePitAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
@@ -531,7 +531,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 
 		return core.Aura{
 			ID: BandOfTheEternalChampionAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				// mask 340
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || ability.IsPhantom {
 					return
@@ -562,7 +562,7 @@ func ApplyTheBladefist(agent core.Agent) {
 
 		return core.Aura{
 			ID: TheBladefistAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMeleeMH) {
 					return
 				}
@@ -593,7 +593,7 @@ func ApplyHeartrazor(agent core.Agent) {
 
 		return core.Aura{
 			ID: HeartrazorAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) || ability.IsPhantom {
 					return
 				}
@@ -620,7 +620,7 @@ func ApplyRodOfTheSunKing(agent core.Agent) {
 
 		return core.Aura{
 			ID: RodOfTheSunKingAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) {
 					return
 				}
@@ -653,7 +653,7 @@ func ApplyWorldBreaker(agent core.Agent) {
 
 		return core.Aura{
 			ID: WorldBreakerAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					if character.HasAura(WorldBreakerProcAuraID) {
 						character.RemoveAura(sim, WorldBreakerProcAuraID)
@@ -688,7 +688,7 @@ func ApplyWarpSlicer(agent core.Agent) {
 
 		return core.Aura{
 			ID: WarpSlicerAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) {
 					return
 				}
@@ -723,7 +723,7 @@ func ApplyDevastation(agent core.Agent) {
 
 		return core.Aura{
 			ID: DevastationAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
@@ -784,7 +784,7 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 
 		return core.Aura{
 			ID: BladeOfUnquenchedThirstAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) {
 					return
 				}
@@ -814,7 +814,7 @@ func ApplySingingCrystalAxe(agent core.Agent) {
 
 		return core.Aura{
 			ID: SingingCrystalAxeAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
@@ -853,7 +853,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 
 		return core.Aura{
 			ID: BlinkstrikeAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) || ability.IsPhantom {
 					return
 				}
@@ -869,7 +869,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 
 				cachedAttack = mhAttack
 				cachedAttack.Effect.Target = hitEffect.Target
-				cachedAttack.Attack(sim)
+				cachedAttack.Cast(sim)
 			},
 		}
 	})
@@ -889,7 +889,7 @@ func ApplyTheNightBlade(agent core.Agent) {
 
 		return core.Aura{
 			ID: TheNightBladeAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(procMask) {
 					return
 				}
@@ -958,7 +958,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		procAura := core.Aura{
 			ID:       SiphonEssenceAuraID,
 			ActionID: core.ActionID{SpellID: 40291},
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}
@@ -973,7 +973,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 
 		return core.Aura{
 			ID: SyphonOfTheNathrezimAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}

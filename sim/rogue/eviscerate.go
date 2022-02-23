@@ -61,7 +61,7 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 					if hitEffect.Landed() {
 						numPoints := rogue.comboPoints
 						rogue.SpendComboPoints(sim)

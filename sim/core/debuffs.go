@@ -170,7 +170,7 @@ func JudgementOfWisdomAura(sim *Simulation) Aura {
 				character.AddMana(sim, mana, actionID, false)
 			}
 		},
-		OnMeleeAttack: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
+		OnMeleeAttack: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
 			if ability.ActionID.SpellID == 35395 {
 				aura.Expires = sim.CurrentTime + time.Second*20
 				hitEffect.Target.ReplaceAura(sim, aura)
@@ -438,7 +438,7 @@ func HuntersMarkAura(points int32, fullyStacked bool) Aura {
 				hitEffect.BonusAttackPower += rangedBonus
 			}
 		},
-		OnMeleeAttack: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
+		OnMeleeAttack: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
 			if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || !hitEffect.Landed() {
 				return
 			}

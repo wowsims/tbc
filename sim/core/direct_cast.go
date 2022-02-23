@@ -174,7 +174,6 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 					if sim.Log != nil {
 						spell.Character.Log(sim, "%s %s", spell.ActionID, hitEffect)
 					}
-					// TODO: confirm GCD is set, cooldowns are set,
 				} else {
 					// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
 					if hitEffect.DirectInput.MaxBaseDamage != 0 {
@@ -189,7 +188,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 						pa.NextActionAt = sim.CurrentTime + hitEffect.DotInput.TickLength
 						pa.OnAction = func(sim *Simulation) {
 							hitEffect.calculateDotDamage(sim, &spell.SpellCast)
-							hitEffect.afterDotTick(sim, &spell.SpellCast)
+							hitEffect.afterDotTick(sim, spell)
 
 							if hitEffect.DotInput.tickIndex < hitEffect.DotInput.NumberOfTicks {
 								// Refresh action.
@@ -222,7 +221,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			}
 
 			hitEffect.applyResultsToCast(&spell.SpellCast)
-			hitEffect.afterCalculations(sim, &spell.SpellCast)
+			hitEffect.afterCalculations(sim, spell)
 		} else {
 			// Use a separate loop for the beforeCalculations() calls so that they all
 			// come before the first afterCalculations() call. This prevents proc effects
@@ -235,13 +234,20 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			for effectIdx := range spell.Effects {
 				hitEffect := &spell.Effects[effectIdx]
 				if hitEffect.Landed() {
-					// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
-					if hitEffect.DirectInput.MaxBaseDamage != 0 {
-						hitEffect.calculateDirectDamage(sim, &spell.SpellCast)
-					}
+					if spell.SpellSchool == SpellSchoolPhysical {
+						hitEffect.calculateDamage(sim, spell)
+						if sim.Log != nil {
+							spell.Character.Log(sim, "%s %s", spell.ActionID, hitEffect)
+						}
+					} else {
+						// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
+						if hitEffect.DirectInput.MaxBaseDamage != 0 {
+							hitEffect.calculateDirectDamage(sim, &spell.SpellCast)
+						}
 
-					if hitEffect.DotInput.NumberOfTicks != 0 {
-						hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
+						if hitEffect.DotInput.NumberOfTicks != 0 {
+							hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
+						}
 					}
 				}
 			}
@@ -253,7 +259,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			for effectIdx := range spell.Effects {
 				hitEffect := &spell.Effects[effectIdx]
 				hitEffect.applyResultsToCast(&spell.SpellCast)
-				hitEffect.afterCalculations(sim, &spell.SpellCast)
+				hitEffect.afterCalculations(sim, spell)
 			}
 
 			// This assumes that the effects either all have dots, or none of them do.
@@ -271,7 +277,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 					spell.applyAOECap()
 
 					for i := range spell.Effects {
-						spell.Effects[i].afterDotTick(sim, &spell.SpellCast)
+						spell.Effects[i].afterDotTick(sim, spell)
 					}
 
 					// This assumes that all the dots have the same # of ticks and tick length.

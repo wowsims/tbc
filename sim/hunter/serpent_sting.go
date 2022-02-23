@@ -20,6 +20,7 @@ func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.Simp
 				ActionID:            SerpentStingActionID,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
 				SpellSchool:         core.SpellSchoolNature,
 				Character:           &hunter.Character,
 			},
@@ -29,7 +30,6 @@ func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.Simp
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				IgnoreHitCheck:         true,
 			},
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:  5,
@@ -62,7 +62,7 @@ func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleS
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				ProcMask: core.ProcMaskRangedSpecial,
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 					if !hitEffect.Landed() {
 						return
 					}

@@ -833,7 +833,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				const procChance = 0.185
 
 				aura := character.NewAuraWithTemporaryStats(sim, ConjuredAuraID, actionID, stats.FireSpellPower, fireBonus, dur)
-				aura.OnMeleeAttack = func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
+				aura.OnMeleeAttack = func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
 					if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || ability.IsPhantom {
 						return
 					}

@@ -129,7 +129,7 @@ func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 		// Set dynamic fields, i.e. the stuff we couldn't precompute.
 		cast.Effect.Target = target
 
-		cast.Attack(sim)
+		cast.Cast(sim)
 	}
 	return pa
 }
@@ -176,7 +176,7 @@ func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
 		// Set dynamic fields, i.e. the stuff we couldn't precompute.
 		cast.Effect.Target = target
 
-		cast.Attack(sim)
+		cast.Cast(sim)
 	}
 	return pa
 }
@@ -226,7 +226,7 @@ func (hp *HunterPet) newGore(sim *core.Simulation, isPrimary bool) PetAbility {
 			cast.Effect.DamageMultiplier *= 2
 		}
 
-		cast.Attack(sim)
+		cast.Cast(sim)
 	}
 	return pa
 }
@@ -321,7 +321,7 @@ func (hp *HunterPet) newScreech(sim *core.Simulation, isPrimary bool) PetAbility
 		// Set dynamic fields, i.e. the stuff we couldn't precompute.
 		cast.Effect.Target = target
 
-		cast.Attack(sim)
+		cast.Cast(sim)
 	}
 	return pa
 }

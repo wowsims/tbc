@@ -218,7 +218,7 @@ func (rogue *Rogue) applySealFate() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: SealFateAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !ability.ActionID.SameAction(SinisterStrikeActionID) {
 					return
 				}
@@ -290,7 +290,7 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 
 			return core.Aura{
 				ID: SwordSpecializationAuraID,
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 					if !hitEffect.Landed() {
 						return
 					}
@@ -311,7 +311,7 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 					// Got a proc
 					cachedAttack = mhAttack
 					cachedAttack.Effect.Target = hitEffect.Target
-					cachedAttack.Attack(sim)
+					cachedAttack.Cast(sim)
 				},
 			}
 		})
@@ -331,7 +331,7 @@ func (rogue *Rogue) applyCombatPotency() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: CombatPotencyAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() {
 					return
 				}

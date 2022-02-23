@@ -49,14 +49,14 @@ func (paladin *Paladin) setupSealOfBlood() {
 		ID:       SealOfBloodAuraID,
 		ActionID: SealOfBloodProcActionID,
 
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 				return
 			}
 
 			sobTemplate.Apply(&sobAtk)
 			sobAtk.Effect.Target = hitEffect.Target
-			sobAtk.Attack(sim)
+			sobAtk.Cast(sim)
 		},
 	}
 
@@ -131,7 +131,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 		ID:       SealOfCommandAuraID,
 		ActionID: SealOfCommandProcActionID,
 
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 				return
 			}
@@ -148,7 +148,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 
 			socTemplate.Apply(&socAtk)
 			socAtk.Effect.Target = hitEffect.Target
-			socAtk.Attack(sim)
+			socAtk.Cast(sim)
 		},
 	}
 

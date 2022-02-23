@@ -60,7 +60,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 						if !hitEffect.Landed() {
 							return
 						}

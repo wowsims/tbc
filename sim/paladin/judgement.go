@@ -34,7 +34,7 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 				IgnoreArmor:            true,
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
 					paladin.RemoveAura(sim, SealOfBloodAuraID)
 					paladin.currentSeal = core.Aura{}
@@ -109,7 +109,6 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				IgnoreHitCheck: true,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					aura := core.JudgementOfTheCrusaderAura(sim, float64(paladin.Talents.ImprovedSealOfTheCrusader))
 					spellEffect.Target.AddAura(sim, aura)
@@ -159,6 +158,7 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolHoly,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: JudgementManaCost,
@@ -176,7 +176,6 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				IgnoreHitCheck: true,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					aura := core.JudgementOfWisdomAura(sim)
 					spellEffect.Target.AddAura(sim, aura)
