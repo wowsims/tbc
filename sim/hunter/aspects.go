@@ -83,7 +83,9 @@ func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.Simp
 }
 
 func (hunter *Hunter) NewAspectOfTheHawk(sim *core.Simulation) core.SimpleCast {
-	return hunter.aspectOfTheHawkTemplate
+	v := hunter.aspectOfTheHawkTemplate
+	v.Init(sim)
+	return v
 }
 
 func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.SimpleCast {
@@ -120,5 +122,7 @@ func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.Sim
 }
 
 func (hunter *Hunter) NewAspectOfTheViper(sim *core.Simulation) core.SimpleCast {
-	return hunter.aspectOfTheViperTemplate
+	v := hunter.aspectOfTheViperTemplate
+	v.Init(sim)
+	return v
 }

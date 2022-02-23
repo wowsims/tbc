@@ -44,6 +44,7 @@ func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.Simp
 }
 
 func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 275}
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -53,10 +54,8 @@ func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleS
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolNature,
 				GCD:                 core.GCDDefault,
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 275,
-				},
+				Cost:                cost,
+				BaseCost:            cost,
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -94,6 +93,6 @@ func (hunter *Hunter) NewSerpentSting(sim *core.Simulation, target *core.Target)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	ss.Effect.Target = target
-
+	ss.Init(sim)
 	return ss
 }

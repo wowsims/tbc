@@ -9,6 +9,7 @@ var AimedShotCooldownID = core.NewCooldownID()
 var AimedShotActionID = core.ActionID{SpellID: 27065, CooldownID: AimedShotCooldownID}
 
 func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 370}
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -21,10 +22,8 @@ func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.SimpleSpel
 				//CastTime:       time.Millisecond * 2500,
 				//Cooldown:       time.Second * 6,
 				//GCD:            core.GCDDefault,
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 370,
-				},
+				Cost:           cost,
+				BaseCost:       cost,
 				CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 			},
 		},
@@ -58,6 +57,6 @@ func (hunter *Hunter) NewAimedShot(sim *core.Simulation, target *core.Target) *c
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	as.Effect.Target = target
-
+	as.Init(sim)
 	return as
 }

@@ -110,6 +110,7 @@ func (hunter *Hunter) NewKillCommand(sim *core.Simulation, target *core.Target) 
 		kc := &hunter.pet.killCommand
 		hunter.pet.killCommandTemplate.Apply(kc)
 		kc.Effect.Target = target
+		kc.Init(sim)
 		kc.Cast(sim)
 	}
 

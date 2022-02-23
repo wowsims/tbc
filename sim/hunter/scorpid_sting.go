@@ -10,9 +10,8 @@ import (
 var ScorpidStingDebuffID = core.NewDebuffID()
 
 func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	manaCost := hunter.BaseMana() * 0.09
 	actionID := core.ActionID{SpellID: 3043}
-
+	cost := core.ResourceCost{Type: stats.Mana, Value: hunter.BaseMana() * 0.09}
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -22,10 +21,8 @@ func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.SimpleS
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolNature,
 				GCD:                 core.GCDDefault,
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: manaCost,
-				},
+				Cost:                cost,
+				BaseCost:            cost,
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -58,6 +55,8 @@ func (hunter *Hunter) NewScorpidSting(sim *core.Simulation, target *core.Target)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	as.Effect.Target = target
+
+	as.Init(sim)
 
 	return as
 }

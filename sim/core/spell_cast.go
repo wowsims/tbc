@@ -141,6 +141,8 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *Simpl
 	} else if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryMagic) {
 		if spellEffect.hitCheck(sim, &spell.SpellCast) {
 			spellEffect.Outcome = OutcomeHit
+		} else {
+			spellEffect.Outcome = OutcomeMiss
 		}
 	} else if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
 		spellEffect.Outcome = spellEffect.WhiteHitTableResult(sim, spell)

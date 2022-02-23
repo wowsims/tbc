@@ -596,17 +596,18 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		replaceAMA = aa.ReplaceMHSwing(sim)
 	}
 
+	ptr := &aa.cachedMelee
 	if replaceAMA == nil {
 		aa.cachedMelee = aa.MHAuto
 		aa.cachedMelee.Effect.Target = target
 	} else {
-		aa.cachedMelee = *replaceAMA
+		ptr = replaceAMA
 	}
 
-	aa.cachedMelee.Cast(sim)
+	ptr.Cast(sim)
 	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	aa.previousMHSwingAt = sim.CurrentTime
-	aa.agent.OnAutoAttack(sim, &aa.cachedMelee)
+	aa.agent.OnAutoAttack(sim, ptr)
 }
 
 // Performs an autoattack using the main hand weapon, if the OH CD is ready.

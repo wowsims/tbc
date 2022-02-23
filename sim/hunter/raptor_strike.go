@@ -12,6 +12,7 @@ var RaptorStrikeCooldownID = core.NewCooldownID()
 var RaptorStrikeActionID = core.ActionID{SpellID: 27014, CooldownID: RaptorStrikeCooldownID}
 
 func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 120}
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -20,12 +21,10 @@ func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.SimpleS
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical,
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 120,
-				},
-				Cooldown:       time.Second * 6,
-				CritMultiplier: hunter.critMultiplier(false, sim.GetPrimaryTarget()),
+				Cost:                cost,
+				BaseCost:            cost,
+				Cooldown:            time.Second * 6,
+				CritMultiplier:      hunter.critMultiplier(false, sim.GetPrimaryTarget()),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -57,6 +56,7 @@ func (hunter *Hunter) NewRaptorStrike(sim *core.Simulation, target *core.Target)
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	rs.Effect.Target = target
 
+	rs.Init(sim)
 	return rs
 }
 

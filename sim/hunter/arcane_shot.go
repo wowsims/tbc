@@ -11,6 +11,7 @@ var ArcaneShotCooldownID = core.NewCooldownID()
 var ArcaneShotActionID = core.ActionID{SpellID: 27019, CooldownID: ArcaneShotCooldownID}
 
 func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 230}
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -22,11 +23,9 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpe
 				GCD:                 core.GCDDefault,
 				IgnoreHaste:         true,
 				Cooldown:            time.Second * 6,
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 230,
-				},
-				CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+				Cost:                cost,
+				BaseCost:            cost,
+				CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -68,6 +67,8 @@ func (hunter *Hunter) NewArcaneShot(sim *core.Simulation, target *core.Target) *
 		level := target.NumStacks(core.CurseOfElementsDebuffID)
 		as.Effect.DamageMultiplier *= 1.1 + 0.01*float64(level)
 	}
+
+	as.Init(sim)
 
 	return as
 }
