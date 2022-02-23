@@ -166,6 +166,7 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 
 	if !ok {
 		actionMetrics.ActionID = actionID
+		actionMetrics.IsMelee = spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical)
 	}
 
 	actionMetrics.Casts++

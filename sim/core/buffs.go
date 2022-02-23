@@ -411,10 +411,12 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	wftempl := SimpleSpell{
 		SpellCast: SpellCast{
 			Cast: Cast{
-				ActionID:       actionID,
-				Character:      character,
-				SpellSchool:    SpellSchoolPhysical,
-				CritMultiplier: character.AutoAttacks.MHAuto.CritMultiplier,
+				ActionID:            actionID,
+				Character:           character,
+				OutcomeRollCategory: OutcomeRollCategorySpecial,
+				CritMultiplier:      character.AutoAttacks.MHAuto.CritMultiplier,
+				SpellSchool:         SpellSchoolPhysical,
+				// SpellExtras: ,
 			},
 		},
 		Effect: SpellHitEffect{
