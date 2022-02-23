@@ -239,6 +239,7 @@ enum BattleElixir {
 	ElixirOfMajorShadowPower = 6;
 	ElixirOfMajorStrength = 7;
 	ElixirOfTheMongoose = 8;
+	FelStrengthElixir = 9;
 }
 
 enum GuardianElixir {
