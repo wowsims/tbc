@@ -149,8 +149,6 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *Simpl
 
 func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spell *SimpleSpell) {
 
-	// TODO: physical callbacks
-
 	if spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) {
 		spell.Character.OnMeleeAttack(sim, spell, spellEffect)
 		spellEffect.Target.OnMeleeAttack(sim, spell, spellEffect)
@@ -200,7 +198,6 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast)
 }
 
 func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
-	// TODO: Apply melee outcomes correctly.
 
 	if spellEffect.Outcome.Matches(OutcomeHit) {
 		spellCast.Hits++
