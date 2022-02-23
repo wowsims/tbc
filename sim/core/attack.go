@@ -153,15 +153,15 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 		// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
 		// If we actually implement blocks, ranged hits can be blocked.
 
+		// No need to crit/glance roll if we are a special attack.
+		// if ability.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial) {
+		// 	return OutcomeHit
+		// }
+
 		// Glance
 		chance += ahe.Target.Glance
 		if roll < chance {
 			return OutcomeGlance
-		}
-
-		// No need to crit roll if we are a special attack.
-		if ability.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial) {
-			return OutcomeHit
 		}
 
 		// Crit
@@ -225,6 +225,8 @@ func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell
 		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
 
 		roll := sim.RandomFloat("weapon swing")
+
+		// TODO: should we |= with crit/hit?
 		if roll < critChance {
 			ahe.Outcome = OutcomeCrit
 		} else {

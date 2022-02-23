@@ -171,9 +171,6 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			if hitEffect.Landed() {
 				if spell.SpellSchool == SpellSchoolPhysical {
 					hitEffect.calculateDamage(sim, spell)
-					if sim.Log != nil {
-						spell.Character.Log(sim, "%s %s", spell.ActionID, hitEffect)
-					}
 				} else {
 					// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
 					if hitEffect.DirectInput.MaxBaseDamage != 0 {
@@ -236,9 +233,6 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 				if hitEffect.Landed() {
 					if spell.SpellSchool == SpellSchoolPhysical {
 						hitEffect.calculateDamage(sim, spell)
-						if sim.Log != nil {
-							spell.Character.Log(sim, "%s %s", spell.ActionID, hitEffect)
-						}
 					} else {
 						// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
 						if hitEffect.DirectInput.MaxBaseDamage != 0 {

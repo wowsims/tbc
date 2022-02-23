@@ -273,6 +273,7 @@ func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCas
 		damage = calculateResists(sim, damage, &hitEffect.SpellEffect)
 	}
 
+	// TODO: move crit checks to a more general place so we can fork the crit roll.
 	if hitEffect.SpellEffect.critCheck(sim, spellCast) {
 		hitEffect.Outcome |= OutcomeCrit
 		damage *= spellCast.CritMultiplier
