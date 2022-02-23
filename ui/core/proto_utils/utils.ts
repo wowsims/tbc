@@ -161,7 +161,7 @@ export const titleIcons: Record<Spec, string> = {
   [Spec.SpecEnhancementShaman]: '/tbc/assets/enhancement_shaman_icon.png',
   [Spec.SpecHunter]: '/tbc/assets/hunter_icon.png',
   [Spec.SpecMage]: '/tbc/assets/mage_icon.png',
-  [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/classicon_rogue.jpg',
+  [Spec.SpecRogue]: '/tbc/assets/rogue_icon.png',
   [Spec.SpecRetributionPaladin]: '/tbc/assets/retribution_icon.png',
   [Spec.SpecShadowPriest]: '/tbc/assets/shadow_priest_icon.png',
   [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
