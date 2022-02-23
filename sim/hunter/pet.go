@@ -22,8 +22,8 @@ type HunterPet struct {
 	// Time when pet should die, as per petUptime.
 	deathTime time.Duration
 
-	killCommandTemplate core.MeleeAbilityTemplate
-	killCommand         core.ActiveMeleeAbility
+	killCommandTemplate core.SimpleSpellTemplate
+	killCommand         core.SimpleSpell
 
 	primaryAbility   PetAbility
 	secondaryAbility PetAbility
@@ -179,7 +179,7 @@ func (hp *HunterPet) applyPetEffects() {
 	hp.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: PetEffectsAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				hitEffect.DamageMultiplier *= hp.damageMultiplier
 			},
 			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {

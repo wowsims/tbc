@@ -48,15 +48,17 @@ func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.Simpl
 	return template
 }
 
-func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
-	ama := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            SteadyShotActionID,
-			Character:           &hunter.Character,
-			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolPhysical,
-			CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	ama := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:            SteadyShotActionID,
+				Character:           &hunter.Character,
+				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				SpellSchool:         core.SpellSchoolPhysical,
+				CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
@@ -82,7 +84,7 @@ func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.Me
 		ama.Effect.DamageMultiplier *= 1.1
 	}
 
-	return core.NewMeleeAbilityTemplate(ama)
+	return core.NewSimpleSpellTemplate(ama)
 }
 
 func (hunter *Hunter) NewSteadyShot(sim *core.Simulation, target *core.Target) core.SimpleCast {

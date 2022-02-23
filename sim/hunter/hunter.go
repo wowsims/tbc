@@ -77,11 +77,11 @@ type Hunter struct {
 	arcaneShotCastTime float64
 	useMultiForCatchup bool
 
-	aimedShotTemplate core.MeleeAbilityTemplate
-	aimedShot         core.ActiveMeleeAbility
+	aimedShotTemplate core.SimpleSpellTemplate
+	aimedShot         core.SimpleSpell
 
-	arcaneShotTemplate core.MeleeAbilityTemplate
-	arcaneShot         core.ActiveMeleeAbility
+	arcaneShotTemplate core.SimpleSpellTemplate
+	arcaneShot         core.SimpleSpell
 
 	aspectOfTheHawkTemplate  core.SimpleCast
 	aspectOfTheViperTemplate core.SimpleCast
@@ -92,17 +92,17 @@ type Hunter struct {
 	multiShotCastTemplate core.SimpleCast
 	multiShotCast         core.SimpleCast
 
-	multiShotAbilityTemplate core.MeleeAbilityTemplate
-	multiShotAbility         core.ActiveMeleeAbility
+	multiShotAbilityTemplate core.SimpleSpellTemplate
+	multiShotAbility         core.SimpleSpell
 
-	raptorStrikeTemplate core.MeleeAbilityTemplate
-	raptorStrike         core.ActiveMeleeAbility
+	raptorStrikeTemplate core.SimpleSpellTemplate
+	raptorStrike         core.SimpleSpell
 
-	scorpidStingTemplate core.MeleeAbilityTemplate
-	scorpidSting         core.ActiveMeleeAbility
+	scorpidStingTemplate core.SimpleSpellTemplate
+	scorpidSting         core.SimpleSpell
 
-	serpentStingTemplate core.MeleeAbilityTemplate
-	serpentSting         core.ActiveMeleeAbility
+	serpentStingTemplate core.SimpleSpellTemplate
+	serpentSting         core.SimpleSpell
 
 	serpentStingDotTemplate core.SimpleSpellTemplate
 	serpentStingDot         core.SimpleSpell
@@ -110,8 +110,8 @@ type Hunter struct {
 	steadyShotCastTemplate core.SimpleCast
 	steadyShotCast         core.SimpleCast
 
-	steadyShotAbilityTemplate core.MeleeAbilityTemplate
-	steadyShotAbility         core.ActiveMeleeAbility
+	steadyShotAbilityTemplate core.SimpleSpellTemplate
+	steadyShotAbility         core.SimpleSpell
 
 	fakeHardcast core.Cast
 }
@@ -217,7 +217,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		MainHand: hunter.WeaponFromMainHand(0),
 		OffHand:  hunter.WeaponFromOffHand(0),
 		Ranged:   hunter.WeaponFromRanged(0),
-		ReplaceMHSwing: func(sim *core.Simulation) *core.ActiveMeleeAbility {
+		ReplaceMHSwing: func(sim *core.Simulation) *core.SimpleSpell {
 			return hunter.TryRaptorStrike(sim)
 		},
 	})

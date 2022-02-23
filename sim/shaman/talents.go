@@ -213,7 +213,7 @@ func (shaman *Shaman) applyWeaponMastery() {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: WeaponMasteryAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				if hitEffect.WeaponInput.DamageMultiplier == 0 {
 					return
 				}
@@ -240,7 +240,7 @@ func (shaman *Shaman) applyUnleashedRage() {
 		currentAuras := make([]core.Aura, len(shaman.Party.PlayersAndPets))
 		return core.Aura{
 			ID: UnleashedRageTalentAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				// proc mask = 20
 				// TODO: Fix this to allow any 'melee crit' to count.
 				if !hitEffect.Outcome.Matches(core.OutcomeCrit) || hitEffect.WeaponInput.DamageMultiplier == 0 {
@@ -309,7 +309,7 @@ func (shaman *Shaman) applyShamanisticFocus() {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ShamanisticFocusTalentAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				if !hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
@@ -340,7 +340,7 @@ func (shaman *Shaman) applyFlurry() {
 
 		return core.Aura{
 			ID: FlurryTalentAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					if flurryStacks == 0 {
 						shaman.MultiplyMeleeSpeed(sim, bonus)

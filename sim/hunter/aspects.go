@@ -22,10 +22,10 @@ func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
 		ID:       AspectOfTheHawkAuraID,
 		ActionID: AspectOfTheHawkActionID,
 		Expires:  core.NeverExpires,
-		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 			hitEffect.BonusAttackPower += 155
 		},
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 			// TODO: ranged white hits only
 			if !hitEffect.ProcMask.Matches(core.ProcMaskWhiteHit) {
 				return

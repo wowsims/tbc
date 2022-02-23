@@ -166,50 +166,58 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		if len(spell.Effects) == 0 {
 			hitEffect := &spell.Effect
-			hitEffect.beforeCalculations(sim, &spell.SpellCast)
+			hitEffect.beforeCalculations(sim, spell)
 
 			if hitEffect.Landed() {
-				// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
-				if hitEffect.DirectInput.MaxBaseDamage != 0 {
-					hitEffect.calculateDirectDamage(sim, &spell.SpellCast)
-				}
-
-				if hitEffect.DotInput.NumberOfTicks != 0 {
-					hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
-
-					pa := sim.pendingActionPool.Get()
-					pa.Priority = ActionPriorityDOT
-					pa.NextActionAt = sim.CurrentTime + hitEffect.DotInput.TickLength
-					pa.OnAction = func(sim *Simulation) {
-						hitEffect.calculateDotDamage(sim, &spell.SpellCast)
-						hitEffect.afterDotTick(sim, &spell.SpellCast)
-
-						if hitEffect.DotInput.tickIndex < hitEffect.DotInput.NumberOfTicks {
-							// Refresh action.
-							pa.NextActionAt = sim.CurrentTime + hitEffect.DotInput.TickLength
-							sim.AddPendingAction(pa)
-						} else {
-							pa.CleanUp(sim)
-						}
+				if spell.SpellSchool == SpellSchoolPhysical {
+					hitEffect.calculateDamage(sim, spell)
+					if sim.Log != nil {
+						spell.Character.Log(sim, "%s %s", spell.ActionID, hitEffect)
 					}
-					pa.CleanUp = func(sim *Simulation) {
-						if pa.cancelled {
-							return
-						}
-						pa.cancelled = true
-						if spell.currentDotAction != nil {
-							spell.currentDotAction.cancelled = true
-							spell.currentDotAction = nil
-						}
-
-						hitEffect.onDotComplete(sim, &spell.SpellCast)
-
-						spell.Character.Metrics.AddSpellCast(&spell.SpellCast)
-						spell.objectInUse = false
+					// TODO: confirm GCD is set, cooldowns are set,
+				} else {
+					// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
+					if hitEffect.DirectInput.MaxBaseDamage != 0 {
+						hitEffect.calculateDirectDamage(sim, &spell.SpellCast)
 					}
 
-					spell.currentDotAction = pa
-					sim.AddPendingAction(pa)
+					if hitEffect.DotInput.NumberOfTicks != 0 {
+						hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
+
+						pa := sim.pendingActionPool.Get()
+						pa.Priority = ActionPriorityDOT
+						pa.NextActionAt = sim.CurrentTime + hitEffect.DotInput.TickLength
+						pa.OnAction = func(sim *Simulation) {
+							hitEffect.calculateDotDamage(sim, &spell.SpellCast)
+							hitEffect.afterDotTick(sim, &spell.SpellCast)
+
+							if hitEffect.DotInput.tickIndex < hitEffect.DotInput.NumberOfTicks {
+								// Refresh action.
+								pa.NextActionAt = sim.CurrentTime + hitEffect.DotInput.TickLength
+								sim.AddPendingAction(pa)
+							} else {
+								pa.CleanUp(sim)
+							}
+						}
+						pa.CleanUp = func(sim *Simulation) {
+							if pa.cancelled {
+								return
+							}
+							pa.cancelled = true
+							if spell.currentDotAction != nil {
+								spell.currentDotAction.cancelled = true
+								spell.currentDotAction = nil
+							}
+
+							hitEffect.onDotComplete(sim, &spell.SpellCast)
+
+							spell.Character.Metrics.AddSpellCast(&spell.SpellCast)
+							spell.objectInUse = false
+						}
+
+						spell.currentDotAction = pa
+						sim.AddPendingAction(pa)
+					}
 				}
 			}
 
@@ -221,7 +229,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			// on the first hit from benefitting other hits of the same spell.
 			for effectIdx := range spell.Effects {
 				hitEffect := &spell.Effects[effectIdx]
-				hitEffect.beforeCalculations(sim, &spell.SpellCast)
+				hitEffect.beforeCalculations(sim, spell)
 			}
 
 			for effectIdx := range spell.Effects {

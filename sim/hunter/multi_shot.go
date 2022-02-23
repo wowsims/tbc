@@ -47,17 +47,19 @@ func (hunter *Hunter) newMultiShotCastTemplate(sim *core.Simulation) core.Simple
 	return template
 }
 
-func (hunter *Hunter) newMultiShotAbilityTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
-	ama := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            MultiShotActionID,
-			Character:           &hunter.Character,
-			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolPhysical,
-			// TODO: If we ever allow multiple targets to have their own type, need to
-			// update this.
-			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+func (hunter *Hunter) newMultiShotAbilityTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	ama := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:            MultiShotActionID,
+				Character:           &hunter.Character,
+				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				SpellSchool:         core.SpellSchoolPhysical,
+				// TODO: If we ever allow multiple targets to have their own type, need to
+				// update this.
+				CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+			},
 		},
 	}
 
@@ -90,7 +92,7 @@ func (hunter *Hunter) newMultiShotAbilityTemplate(sim *core.Simulation) core.Mel
 	}
 	ama.Effects = effects
 
-	return core.NewMeleeAbilityTemplate(ama)
+	return core.NewSimpleSpellTemplate(ama)
 }
 
 func (hunter *Hunter) NewMultiShot(sim *core.Simulation) core.SimpleCast {

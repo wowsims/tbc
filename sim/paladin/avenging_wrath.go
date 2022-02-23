@@ -33,7 +33,7 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 					ID:       AvengingWrathAuraID,
 					ActionID: AvengingWrathActionID,
 					Expires:  sim.CurrentTime + dur,
-					OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+					OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 						hitEffect.DamageMultiplier *= 1.3
 					},
 					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {

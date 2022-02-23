@@ -287,7 +287,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 
 		return core.Aura{
 			ID: DarkmoonCardCrusadeAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				if ability.IsPhantom {
 					return
 				}

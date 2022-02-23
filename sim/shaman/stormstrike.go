@@ -13,7 +13,7 @@ var StormstrikeDebuffID = core.NewDebuffID()
 var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeCD}
 var SkyshatterAPBonusAuraID = core.NewAuraID()
 
-func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
+func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 
 	ssDebuffAura := core.Aura{
 		ID:       StormstrikeDebuffID,
@@ -36,20 +36,22 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 
 	hasSkyshatter4p := ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4)
 	const skyshatterDur = time.Second * 12
-	ss := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            StormstrikeActionID,
-			Character:           &shaman.Character,
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolPhysical,
-			GCD:                 core.GCDDefault,
-			Cooldown:            time.Second * 10,
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 237,
+	ss := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:            StormstrikeActionID,
+				Character:           &shaman.Character,
+				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				SpellSchool:         core.SpellSchoolPhysical,
+				GCD:                 core.GCDDefault,
+				Cooldown:            time.Second * 10,
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 237,
+				},
+				CritMultiplier: shaman.DefaultMeleeCritMultiplier(),
 			},
-			CritMultiplier: shaman.DefaultMeleeCritMultiplier(),
 		},
 		Effects: []core.SpellHitEffect{
 			{
@@ -58,6 +60,17 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
+						if !hitEffect.Landed() {
+							return
+						}
+
+						ssDebuffAura.Stacks = 2
+						hitEffect.Target.ReplaceAura(sim, ssDebuffAura)
+						if hasSkyshatter4p {
+							shaman.Character.AddAuraWithTemporaryStats(sim, SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.AttackPower, 70, skyshatterDur)
+						}
+					},
 				},
 				WeaponInput: core.WeaponDamageInput{
 					DamageMultiplier: 1,
@@ -76,21 +89,10 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 				},
 			},
 		},
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
-			if !hitEffect.Landed() {
-				return
-			}
-
-			ssDebuffAura.Stacks = 2
-			hitEffect.Target.ReplaceAura(sim, ssDebuffAura)
-			if hasSkyshatter4p {
-				shaman.Character.AddAuraWithTemporaryStats(sim, SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.AttackPower, 70, skyshatterDur)
-			}
-		},
 	}
 
 	if shaman.Equip[items.ItemSlotRanged].ID == StormfuryTotem {
-		ss.Cast.Cost.Value -= 22
+		ss.Cost.Value -= 22
 	}
 
 	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {
@@ -98,10 +100,10 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 		ss.Effects[1].WeaponInput.FlatDamageBonus += 30
 	}
 
-	return core.NewMeleeAbilityTemplate(ss)
+	return core.NewSimpleSpellTemplate(ss)
 }
 
-func (shaman *Shaman) NewStormstrike(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
+func (shaman *Shaman) NewStormstrike(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	ss := &shaman.stormstrikeSpell
 	shaman.stormstrikeTemplate.Apply(ss)
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.

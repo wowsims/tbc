@@ -83,10 +83,6 @@ type SpellEffect struct {
 	// Controls which effects can proc from this effect.
 	ProcMask ProcMask
 
-	// Skips the hit check, i.e. this effect will always hit.
-	// This is generally used only for proc effects, like Mage Ignite.
-	IgnoreHitCheck bool // TODO: move this to be part of SpellExtras
-
 	// Causes the first roll for this hit to be copied from ActiveMeleeAbility.Effects[0].HitType.
 	// This is only used by Shaman Stormstrike.
 	ReuseMainHitRoll bool
@@ -120,26 +116,42 @@ func (spellEffect *SpellEffect) TotalThreatMultiplier(spellCast *SpellCast) floa
 	return spellEffect.ThreatMultiplier * spellCast.Character.PseudoStats.ThreatMultiplier
 }
 
-func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spellCast *SpellCast) {
+func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell) {
 	spellEffect.BeyondAOECapMultiplier = 1
-	spellCast.Character.OnBeforeSpellHit(sim, spellCast, spellEffect)
-
 	multiplierBeforeTargetEffects := spellEffect.DamageMultiplier
-	spellEffect.Target.OnBeforeSpellHit(sim, spellCast, spellEffect)
+
+	if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
+		spell.Character.OnBeforeMeleeHit(sim, spell, &spell.Effect)
+		spellEffect.Target.OnBeforeMeleeHit(sim, spell, &spell.Effect)
+	} else if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryMagic) {
+		spell.Character.OnBeforeSpellHit(sim, &spell.SpellCast, spellEffect)
+		spellEffect.Target.OnBeforeSpellHit(sim, &spell.SpellCast, spellEffect)
+	}
+
 	spellEffect.BeyondAOECapMultiplier *= spellEffect.DamageMultiplier / multiplierBeforeTargetEffects
 
-	if spellCast.OutcomeRollCategory == OutcomeRollCategoryNone {
+	if spell.OutcomeRollCategory == OutcomeRollCategoryNone || spell.SpellExtras.Matches(SpellExtrasAlwaysHits) {
 		spellEffect.Outcome = OutcomeHit
-	} else if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryMagic) {
-		if spellEffect.IgnoreHitCheck || spellEffect.hitCheck(sim, spellCast) {
+	} else if spellEffect.ReuseMainHitRoll { // TODO: can we remove this.
+		spellEffect.Outcome = spell.Effects[0].Outcome
+	} else if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryMagic) {
+		if spellEffect.hitCheck(sim, &spell.SpellCast) {
 			spellEffect.Outcome = OutcomeHit
 		}
-	} else {
-		panic("shouldn't have non-magic casts using casts yet....")
+	} else if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
+		spellEffect.Outcome = spellEffect.WhiteHitTableResult(sim, spell)
 	}
 }
 
 func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spellCast *SpellCast) {
+
+	// TODO: physical callbacks
+	// ability.Character.OnMeleeAttack(sim, ability, ahe)
+	// ahe.Target.OnMeleeAttack(sim, ability, ahe)
+	// if ahe.OnMeleeAttack != nil {
+	// 	ahe.OnMeleeAttack(sim, ability, ahe)
+	// }
+
 	if spellEffect.Landed() {
 		if spellEffect.OnSpellHit != nil {
 			spellEffect.OnSpellHit(sim, spellCast, spellEffect)
@@ -156,7 +168,7 @@ func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spellCast *Sp
 }
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
-	if sim.Log != nil && !spellEffect.IgnoreHitCheck {
+	if sim.Log != nil && !spellCast.SpellExtras.Matches(SpellExtrasAlwaysHits) {
 		spellCast.Character.Log(sim, "%s %s.", spellCast.ActionID, spellEffect)
 	}
 	if spellEffect.Landed() && spellEffect.FlatThreatBonus > 0 {
@@ -181,6 +193,26 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast)
 }
 
 func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
+	// TODO: Apply melee outcomes correctly.
+
+	// if ahe.Outcome == OutcomeMiss {
+	// 	ability.Misses++
+	// } else if ahe.Outcome == OutcomeDodge {
+	// 	ability.Dodges++
+	// } else if ahe.Outcome == OutcomeGlance {
+	// 	ability.Glances++
+	// } else if ahe.Outcome == OutcomeCrit {
+	// 	ability.Crits++
+	// } else if ahe.Outcome == OutcomeHit {
+	// 	ability.Hits++
+	// } else if ahe.Outcome == OutcomeParry {
+	// 	ability.Parries++
+	// } else if ahe.Outcome.Matches(OutcomeBlock) {
+	// 	ability.Blocks++
+	// }
+	// ability.TotalDamage += ahe.Damage
+	// ability.TotalThreat += (ahe.Damage + ahe.FlatThreatBonus) * ahe.ThreatMultiplier * ability.Character.PseudoStats.ThreatMultiplier
+
 	if spellEffect.Landed() {
 		spellCast.Hits++
 		if spellEffect.Outcome.Matches(OutcomeCrit) {

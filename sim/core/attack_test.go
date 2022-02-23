@@ -82,7 +82,7 @@ func TestRangedAutoSwing(t *testing.T) {
 	// Ranged autos require a windup, so we just skip that here.
 	ama := c.AutoAttacks.RangedAuto
 	ama.Effect.Target = sim.GetPrimaryTarget()
-	ama.Attack(sim)
+	ama.Cast(sim)
 
 	metricTests := []struct {
 		name  string

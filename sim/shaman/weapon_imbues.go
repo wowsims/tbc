@@ -27,15 +27,17 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		apBonus += 80
 	}
 
-	wftempl := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            core.ActionID{SpellID: 25505},
-			Character:           &shaman.Character,
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolPhysical,
-			CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
-			IsPhantom:           true,
+	wftempl := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:            core.ActionID{SpellID: 25505},
+				Character:           &shaman.Character,
+				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				SpellSchool:         core.SpellSchoolPhysical,
+				CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
+				IsPhantom:           true,
+			},
 		},
 	}
 
@@ -59,16 +61,16 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		baseEffect,
 	}
 
-	wfTemplate := core.NewMeleeAbilityTemplate(wftempl)
+	wfTemplate := core.NewSimpleSpellTemplate(wftempl)
 
-	wfAtk := core.ActiveMeleeAbility{}
+	wfAtk := core.SimpleSpell{}
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		var icd core.InternalCD
 		const icdDur = time.Second * 3
 
 		return core.Aura{
 			ID: WFImbueAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				// ProcMask: 20
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
@@ -163,7 +165,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: FTImbueAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}
@@ -227,7 +229,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 		ppmm := shaman.AutoAttacks.NewPPMManager(9.0)
 		return core.Aura{
 			ID: FBImbueAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 					return
 				}

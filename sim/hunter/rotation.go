@@ -39,7 +39,7 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 	}
 }
 
-func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
+func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.SimpleSpell) {
 	hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
 	if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 		return

@@ -35,17 +35,17 @@ type Rogue struct {
 	deathmantle4pcProc bool
 
 	builderEnergyCost float64
-	newBuilder        func(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility
+	newBuilder        func(sim *core.Simulation, target *core.Target) *core.SimpleSpell
 
-	sinisterStrikeTemplate core.MeleeAbilityTemplate
-	sinisterStrike         core.ActiveMeleeAbility
+	sinisterStrikeTemplate core.SimpleSpellTemplate
+	sinisterStrike         core.SimpleSpell
 
 	castSliceAndDice func()
 
 	eviscerateEnergyCost  float64
 	eviscerateDamageCalcs []core.MeleeDamageCalculator
-	eviscerateTemplate    core.MeleeAbilityTemplate
-	eviscerate            core.ActiveMeleeAbility
+	eviscerateTemplate    core.SimpleSpellTemplate
+	eviscerate            core.SimpleSpell
 }
 
 func (rogue *Rogue) GetCharacter() *core.Character {
@@ -103,7 +103,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 	}
 
 	rogue.builderEnergyCost = rogue.SinisterStrikeEnergyCost()
-	rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
+	rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 		return rogue.NewSinisterStrike(sim, target)
 	}
 

@@ -80,7 +80,7 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(sim *core.Simulation) func(si
 	findWeaknessAura := core.Aura{
 		ID:       FindWeaknessAuraID,
 		ActionID: core.ActionID{SpellID: 31242},
-		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 			// TODO: This should be rogue abilities only, not all specials.
 			if hitEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
 				hitEffect.DamageMultiplier *= findWeaknessMultiplier
@@ -130,7 +130,7 @@ func (rogue *Rogue) applyMurder() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: MurderAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				if hitEffect.Target.MobType == proto.MobType_MobTypeHumanoid || hitEffect.Target.MobType == proto.MobType_MobTypeBeast || hitEffect.Target.MobType == proto.MobType_MobTypeGiant || hitEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
 					hitEffect.DamageMultiplier *= damageMultiplier
 				}
@@ -163,7 +163,7 @@ func (rogue *Rogue) registerColdBloodCD() {
 		ID:       ColdBloodAuraID,
 		ActionID: actionID,
 		Expires:  core.NeverExpires,
-		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 			// TODO: This should be rogue abilities only, not all specials.
 			if hitEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
 				hitEffect.BonusCritRating += 100 * core.MeleeCritRatingPerCritChance
@@ -218,7 +218,7 @@ func (rogue *Rogue) applySealFate() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: SealFateAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				if !ability.ActionID.SameAction(SinisterStrikeActionID) {
 					return
 				}
@@ -259,7 +259,7 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 		rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 			return core.Aura{
 				ID: DaggerAndFistSpecializationsAuraID,
-				OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+				OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 					if hitEffect.ProcMask.Matches(core.ProcMaskMeleeMH) {
 						hitEffect.BonusCritRating += mhCritBonus
 					} else if hitEffect.ProcMask.Matches(core.ProcMaskMeleeOH) {
@@ -286,11 +286,11 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 
 			mhAttack := rogue.AutoAttacks.MHAuto
 			mhAttack.ActionID = core.ActionID{SpellID: 13964}
-			cachedAttack := core.ActiveMeleeAbility{}
+			cachedAttack := core.SimpleSpell{}
 
 			return core.Aura{
 				ID: SwordSpecializationAuraID,
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 					if !hitEffect.Landed() {
 						return
 					}
@@ -331,7 +331,7 @@ func (rogue *Rogue) applyCombatPotency() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: CombatPotencyAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				if !hitEffect.Landed() {
 					return
 				}
