@@ -107,7 +107,7 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
 		judge := ret.NewJudgementOfBlood(sim, target)
 		if judge != nil {
-			if success := judge.Attack(sim); !success {
+			if success := judge.Cast(sim); !success {
 				ret.WaitForMana(sim, judge.Cost.Value)
 			}
 		}
@@ -125,7 +125,7 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	// Crusader strike if we can
 	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
 		cs := ret.NewCrusaderStrike(sim, target)
-		if success := cs.Attack(sim); !success {
+		if success := cs.Cast(sim); !success {
 			ret.WaitForMana(sim, cs.Cost.Value)
 		}
 		return

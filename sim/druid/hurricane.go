@@ -25,7 +25,7 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 				SpellSchool:         core.SpellSchoolNature,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellExtras:         core.SpellExtrasChanneled,
+				SpellExtras:         core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 1905,
@@ -45,7 +45,6 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
 			ThreatMultiplier:       1,
-			IgnoreHitCheck:         true,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        10,

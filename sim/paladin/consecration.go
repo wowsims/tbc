@@ -21,6 +21,7 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolHoly,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 660,
@@ -38,7 +39,6 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
-			IgnoreHitCheck:         true,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        8,

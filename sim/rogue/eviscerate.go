@@ -21,7 +21,7 @@ func (rogue *Rogue) makeEviscerateDamageCalcFn(sim *core.Simulation, numPoints i
 	}
 }
 
-func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
+func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	rogue.eviscerateEnergyCost = 35
 	if ItemSetAssassination.CharacterHasSetBonus(&rogue.Character, 4) {
 		rogue.eviscerateEnergyCost -= 10
@@ -39,19 +39,21 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilit
 	finishingMoveEffects := rogue.makeFinishingMoveEffectApplier(sim)
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
-	ability := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            EviscerateActionID,
-			Character:           &rogue.Character,
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolPhysical,
-			GCD:                 time.Second * 1,
-			Cost: core.ResourceCost{
-				Type:  stats.Energy,
-				Value: rogue.eviscerateEnergyCost,
+	ability := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:            EviscerateActionID,
+				Character:           &rogue.Character,
+				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				SpellSchool:         core.SpellSchoolPhysical,
+				GCD:                 time.Second * 1,
+				Cost: core.ResourceCost{
+					Type:  stats.Energy,
+					Value: rogue.eviscerateEnergyCost,
+				},
+				CritMultiplier: rogue.critMultiplier(true, false),
 			},
-			CritMultiplier: rogue.critMultiplier(true, false),
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
@@ -59,19 +61,19 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilit
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
+				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
+					if hitEffect.Landed() {
+						numPoints := rogue.comboPoints
+						rogue.SpendComboPoints(sim)
+						finishingMoveEffects(sim, numPoints)
+					} else {
+						if refundAmount > 0 {
+							rogue.AddEnergy(sim, ability.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
+						}
+					}
+				},
 			},
 			WeaponInput: core.WeaponDamageInput{},
-		},
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
-			if hitEffect.Landed() {
-				numPoints := rogue.comboPoints
-				rogue.SpendComboPoints(sim)
-				finishingMoveEffects(sim, numPoints)
-			} else {
-				if refundAmount > 0 {
-					rogue.AddEnergy(sim, ability.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
-				}
-			}
 		},
 	}
 
@@ -81,10 +83,10 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.MeleeAbilit
 		ability.Effect.CannotBeDodged = true
 	}
 
-	return core.NewMeleeAbilityTemplate(ability)
+	return core.NewSimpleSpellTemplate(ability)
 }
 
-func (rogue *Rogue) NewEviscerate(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
+func (rogue *Rogue) NewEviscerate(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	if rogue.comboPoints == 0 {
 		panic("Eviscerate requires combo points!")
 	}

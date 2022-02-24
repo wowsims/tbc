@@ -113,9 +113,6 @@ type Aura struct {
 	// Invoked after a melee hit has occured (could be auto or skill).
 	OnMeleeAttack OnMeleeAttack
 
-	// Invoked before melee of any kind (swing or ability)
-	OnBeforeMelee OnBeforeMelee
-
 	// Invoked before melee hit of any kind (swing or ability)
 	OnBeforeMeleeHit OnBeforeMeleeHit
 }
@@ -396,11 +393,6 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		at.onMeleeAttackIDs = append(at.onMeleeAttackIDs, newAura.ID)
 	}
 
-	if newAura.OnBeforeMelee != nil {
-		at.auras[newAura.ID].OnBeforeMeleeIndex = int32(len(at.onBeforeMeleeIDs))
-		at.onBeforeMeleeIDs = append(at.onBeforeMeleeIDs, newAura.ID)
-	}
-
 	if newAura.OnBeforeMeleeHit != nil {
 		at.auras[newAura.ID].OnBeforeMeleeHitIndex = int32(len(at.onBeforeMeleeHitIDs))
 		at.onBeforeMeleeHitIDs = append(at.onBeforeMeleeHitIDs, newAura.ID)
@@ -492,13 +484,6 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 		at.onMeleeAttackIDs = removeBySwappingToBack(at.onMeleeAttackIDs, removeOnMeleeAttack)
 		if removeOnMeleeAttack < int32(len(at.onMeleeAttackIDs)) {
 			at.auras[at.onMeleeAttackIDs[removeOnMeleeAttack]].OnMeleeAttackIndex = removeOnMeleeAttack
-		}
-	}
-	if at.auras[id].OnBeforeMelee != nil {
-		removeOnBeforeMelee := at.auras[id].OnBeforeMeleeIndex
-		at.onBeforeMeleeIDs = removeBySwappingToBack(at.onBeforeMeleeIDs, removeOnBeforeMelee)
-		if removeOnBeforeMelee < int32(len(at.onBeforeMeleeIDs)) {
-			at.auras[at.onBeforeMeleeIDs[removeOnBeforeMelee]].OnBeforeMeleeIndex = removeOnBeforeMelee
 		}
 	}
 	if at.auras[id].OnBeforeMeleeHit != nil {
@@ -630,19 +615,13 @@ func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, s
 	}
 }
 
-func (at *auraTracker) OnMeleeAttack(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+func (at *auraTracker) OnMeleeAttack(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
 	for _, id := range at.onMeleeAttackIDs {
 		at.auras[id].OnMeleeAttack(sim, ability, hitEffect)
 	}
 }
 
-func (at *auraTracker) OnBeforeMelee(sim *Simulation, ability *ActiveMeleeAbility) {
-	for _, id := range at.onBeforeMeleeIDs {
-		at.auras[id].OnBeforeMelee(sim, ability)
-	}
-}
-
-func (at *auraTracker) OnBeforeMeleeHit(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+func (at *auraTracker) OnBeforeMeleeHit(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
 	for _, id := range at.onBeforeMeleeHitIDs {
 		at.auras[id].OnBeforeMeleeHit(sim, ability, hitEffect)
 	}

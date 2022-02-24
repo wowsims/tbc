@@ -12,6 +12,34 @@ func init() {
 	RegisterHunter()
 }
 
+func TestBestialWrath(t *testing.T) {
+	defaultRaid := core.SinglePlayerRaidProto(&proto.Player{
+		Class:     proto.Class_ClassHunter,
+		Spec:      PlayerOptionsBasic,
+		Race:      proto.Race_RaceTroll10,
+		Equipment: P1Gear,
+	}, FullPartyBuffs, FullRaidBuffs)
+	sim := core.NewSim(proto.RaidSimRequest{
+		Raid:      defaultRaid,
+		Encounter: core.MakeSingleTargetFullDebuffEncounter(FullDebuffs, 5),
+		SimOptions: &proto.SimOptions{
+			Iterations: 1,
+			IsTest:     true,
+			Debug:      false,
+			RandomSeed: 101,
+		},
+	})
+	h := sim.Raid.Parties[0].Players[0].(*Hunter)
+	h.Init(sim)
+
+	sim.Reset()
+	h.TryUseCooldowns(sim)
+	as := h.NewAimedShot(sim, sim.GetPrimaryTarget())
+	if as.Cost.Value != 259 {
+		t.Logf("cost is wrong, expected: %0.1f, actual: %0.1f", 259.0, as.Cost.Value)
+	}
+}
+
 func TestHunter(t *testing.T) {
 	core.RunTestSuite(t, t.Name(), core.FullCharacterTestSuiteGenerator(core.CharacterSuiteConfig{
 		Class: proto.Class_ClassHunter,

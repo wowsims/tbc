@@ -1,7 +1,6 @@
 package shaman
 
 import (
-	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -44,17 +43,15 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 					ID:       ShamanisticRageAuraID,
 					ActionID: ShamanisticRageActionID,
 					Expires:  sim.CurrentTime + dur,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
-						if !hitEffect.Landed() || hitEffect.WeaponInput.DamageMultiplier == 0 {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
+						// proc mask: 20
+						if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 							return
 						}
 						if sim.RandomFloat("shamanistic rage") > proc {
 							return
 						}
 						mana := character.GetStat(stats.AttackPower) * 0.3
-						if mana < 0 {
-							log.Printf("Attack power!? %0.1f", character.GetStat(stats.AttackPower))
-						}
 						character.AddMana(sim, mana, ShamanisticRageActionID, true)
 					},
 				})

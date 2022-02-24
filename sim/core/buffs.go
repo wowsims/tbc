@@ -336,7 +336,7 @@ func FerociousInspirationAura(numBMHunters int32) Aura {
 	return Aura{
 		ID:       FerociousInspirationAuraID,
 		ActionID: ActionID{SpellID: 34460, Tag: -1},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+		OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
 			hitEffect.DamageMultiplier *= multiplier
 		},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
@@ -354,7 +354,7 @@ func ImprovedSanctityAura(sim *Simulation, level float64) Aura {
 	return Aura{
 		ID:       ImprovedSanctityAuraID,
 		ActionID: ActionID{SpellID: 31870},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+		OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
 			// unsure if this scaling should be additive or multiplicative
 			// scale 10% for holy damange
 			if ability.SpellSchool.Matches(SpellSchoolHoly) {
@@ -408,12 +408,16 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	apBonus := windfuryAPBonuses[rank-1]
 	apBonus *= 1 + 0.15*float64(iwtTalentPoints)
 
-	wftempl := ActiveMeleeAbility{
-		Cast: Cast{
-			ActionID:       actionID,
-			Character:      character,
-			SpellSchool:    SpellSchoolPhysical,
-			CritMultiplier: character.AutoAttacks.MHAuto.CritMultiplier,
+	wftempl := SimpleSpell{
+		SpellCast: SpellCast{
+			Cast: Cast{
+				ActionID:            actionID,
+				Character:           character,
+				OutcomeRollCategory: OutcomeRollCategorySpecial,
+				CritMultiplier:      character.AutoAttacks.MHAuto.CritMultiplier,
+				SpellSchool:         SpellSchoolPhysical,
+				// SpellExtras: ,
+			},
 		},
 		Effect: SpellHitEffect{
 			SpellEffect: SpellEffect{
@@ -428,8 +432,8 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 		},
 	}
 
-	wfTemplate := NewMeleeAbilityTemplate(wftempl)
-	wfAtk := ActiveMeleeAbility{}
+	wfTemplate := NewSimpleSpellTemplate(wftempl)
+	wfAtk := SimpleSpell{}
 
 	const procChance = 0.2
 
@@ -439,7 +443,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	return Aura{
 		ID:       WindfuryTotemAuraID,
 		ActionID: actionID,
-		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+		OnMeleeAttack: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
 			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(ProcMaskMeleeMH) || ability.IsPhantom {
 				return
 			}
@@ -453,7 +457,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 
 			wfTemplate.Apply(&wfAtk)
 			wfAtk.Effect.Target = hitEffect.Target
-			wfAtk.Attack(sim)
+			wfAtk.Cast(sim)
 		},
 	}
 }

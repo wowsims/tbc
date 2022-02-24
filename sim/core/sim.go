@@ -40,7 +40,7 @@ type Simulation struct {
 }
 
 func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) *proto.RaidSimResult {
-	sim := newSim(rsr)
+	sim := NewSim(rsr)
 	sim.runPresims(rsr)
 	if progress != nil {
 		sim.ProgressReport = func(progMetric *proto.ProgressMetrics) {
@@ -50,7 +50,7 @@ func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) *pro
 	return sim.run()
 }
 
-func newSim(rsr proto.RaidSimRequest) *Simulation {
+func NewSim(rsr proto.RaidSimRequest) *Simulation {
 	raid := NewRaid(*rsr.Raid)
 	encounter := NewEncounter(*rsr.Encounter)
 	simOptions := *rsr.SimOptions
@@ -107,6 +107,10 @@ func (sim *Simulation) RandomFloat(label string) float64 {
 	return labelRand.Float64()
 }
 
+func (sim *Simulation) Reset() {
+	sim.reset()
+}
+
 // Reset will set sim back and erase all current state.
 // This is automatically called before every 'Run'.
 func (sim *Simulation) reset() {
@@ -143,9 +147,9 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	}
 
 	// Uncomment this to print logs directly to console.
-	//sim.Log = func(message string, vals ...interface{}) {
-	//	fmt.Printf(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
-	//}
+	// sim.Log = func(message string, vals ...interface{}) {
+	// 	fmt.Printf(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+	// }
 
 	for _, party := range sim.Raid.Parties {
 		for _, player := range party.Players {

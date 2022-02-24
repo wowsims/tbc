@@ -21,7 +21,7 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolArcane,
-				SpellExtras:         core.SpellExtrasChanneled,
+				SpellExtras:         core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 740,
@@ -39,7 +39,6 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
 				ThreatMultiplier:       1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
-				IgnoreHitCheck:         true,
 			},
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:        5,

@@ -86,6 +86,7 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
 			},
 		},
 	}
@@ -94,7 +95,6 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: mage.spellDamageMultiplier,
-			IgnoreHitCheck:         true,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        4,

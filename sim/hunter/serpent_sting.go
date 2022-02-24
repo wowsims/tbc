@@ -20,6 +20,7 @@ func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.Simp
 				ActionID:            SerpentStingActionID,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
 				SpellSchool:         core.SpellSchoolNature,
 				Character:           &hunter.Character,
 			},
@@ -29,7 +30,6 @@ func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.Simp
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				IgnoreHitCheck:         true,
 			},
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:  5,
@@ -43,55 +43,56 @@ func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.Simp
 	return core.NewSimpleSpellTemplate(dotSpell)
 }
 
-func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
-	ama := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            SerpentStingActionID,
-			Character:           &hunter.Character,
-			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolNature,
-			GCD:                 core.GCDDefault,
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 275,
+func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 275}
+	ama := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:            SerpentStingActionID,
+				Character:           &hunter.Character,
+				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				SpellSchool:         core.SpellSchoolNature,
+				GCD:                 core.GCDDefault,
+				Cost:                cost,
+				BaseCost:            cost,
 			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				ProcMask: core.ProcMaskRangedSpecial,
+				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
+					if !hitEffect.Landed() {
+						return
+					}
+
+					dot := &hunter.serpentStingDot
+					hunter.serpentStingDotTemplate.Apply(dot)
+
+					// Set dynamic fields, i.e. the stuff we couldn't precompute.
+					dot.Effect.Target = hitEffect.Target
+					// TODO: This should probably include AP from mark of the champion / elixir of demonslaying / target debuffs
+					dot.Effect.DotInput.TickBaseDamage = 132 + hunter.GetStat(stats.RangedAttackPower)*0.02
+
+					dot.Init(sim)
+					dot.Cast(sim)
+				},
 			},
-		},
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
-			if !hitEffect.Landed() {
-				return
-			}
-
-			dot := &hunter.serpentStingDot
-			hunter.serpentStingDotTemplate.Apply(dot)
-
-			// Set dynamic fields, i.e. the stuff we couldn't precompute.
-			dot.Effect.Target = hitEffect.Target
-			// TODO: This should probably include AP from mark of the champion / elixir of demonslaying / target debuffs
-			dot.Effect.DotInput.TickBaseDamage = 132 + hunter.GetStat(stats.RangedAttackPower)*0.02
-
-			dot.Init(sim)
-			dot.Cast(sim)
 		},
 	}
 
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 	ama.Effect.BonusCritRating = -100 * core.MeleeCritRatingPerCritChance // Prevent crits
 
-	return core.NewMeleeAbilityTemplate(ama)
+	return core.NewSimpleSpellTemplate(ama)
 }
 
-func (hunter *Hunter) NewSerpentSting(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
+func (hunter *Hunter) NewSerpentSting(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	ss := &hunter.serpentSting
 	hunter.serpentStingTemplate.Apply(ss)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	ss.Effect.Target = target
-
+	ss.Init(sim)
 	return ss
 }

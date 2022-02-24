@@ -31,11 +31,11 @@ type Paladin struct {
 	exorcismTemplate core.SimpleSpellTemplate
 	exorcismSpell    core.SimpleSpell
 
-	crusaderStrikeTemplate core.MeleeAbilityTemplate
-	crusaderStrikeSpell    core.ActiveMeleeAbility
+	crusaderStrikeTemplate core.SimpleSpellTemplate
+	crusaderStrikeSpell    core.SimpleSpell
 
-	judgementOfBloodTemplate core.MeleeAbilityTemplate
-	judgementOfBloodSpell    core.ActiveMeleeAbility
+	judgementOfBloodTemplate core.SimpleSpellTemplate
+	judgementOfBloodSpell    core.SimpleSpell
 
 	judgementOfTheCrusaderTemplate core.SimpleSpellTemplate
 	judgementOfTheCrusaderSpell    core.SimpleSpell
@@ -75,7 +75,7 @@ func (paladin *Paladin) Reset(sim *core.Simulation) {
 	paladin.currentSeal.Expires = sim.CurrentTime
 }
 
-func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
+func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, ability *core.SimpleSpell) {
 	if paladin.currentJudgement.ID == 0 || paladin.currentJudgement.Expires >= sim.CurrentTime {
 		return
 	}

@@ -179,6 +179,8 @@ const (
 	OutcomeRollCategorySpecial                                 // Melee special attack
 	OutcomeRollCategoryRanged                                  // Ranged attack roll
 	OutcomeRollCategoryMagic                                   // Spell Hit roll
+
+	OutcomeRollCategoryPhysical = OutcomeRollCategoryWhite | OutcomeRollCategorySpecial | OutcomeRollCategoryRanged
 )
 
 type CritRollCategory byte

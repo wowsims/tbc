@@ -166,6 +166,7 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 
 	if !ok {
 		actionMetrics.ActionID = actionID
+		actionMetrics.IsMelee = spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical)
 	}
 
 	actionMetrics.Casts++
@@ -184,7 +185,7 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 }
 
 // Adds the results of a melee action to the aggregated metrics.
-func (characterMetrics *CharacterMetrics) AddMeleeAbility(ability *ActiveMeleeAbility) {
+func (characterMetrics *CharacterMetrics) AddMeleeAbility(ability *SimpleSpell) {
 	actionID := ability.ActionID
 	actionKey := NewActionKey(actionID)
 	actionMetrics, ok := characterMetrics.actions[actionKey]
