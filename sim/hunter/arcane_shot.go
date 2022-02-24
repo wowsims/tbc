@@ -19,7 +19,7 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpe
 				Character:           &hunter.Character,
 				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
 				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical, // TODO: Fix this once we have everything working correctly.
+				SpellSchool:         core.SpellSchoolArcane,
 				GCD:                 core.GCDDefault,
 				IgnoreHaste:         true,
 				Cooldown:            time.Second * 6,
@@ -60,6 +60,7 @@ func (hunter *Hunter) NewArcaneShot(sim *core.Simulation, target *core.Target) *
 	// Arcane shot is super weird, because its a melee ability but it uses arcane
 	// modifiers instead of physical. Luckily, CoE and Misery are the only modifiers
 	// for arcane in the game so we can hardcode them here.
+	// TODO: Remove this once auras are combined and we can get this automatically.
 	if target.HasAura(core.MiseryDebuffID) {
 		as.Effect.DamageMultiplier *= 1.05
 	}

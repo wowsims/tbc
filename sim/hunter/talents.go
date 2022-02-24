@@ -277,7 +277,12 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		ID:       BestialWrathAuraID,
 		ActionID: actionID,
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			cast.Cost.Value -= cast.BaseCost.Value * 0.2
+			if cast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryPhysical) {
+				cast.Cost.Value *= 0.8
+			} else {
+				// TODO: Remove this 'if' block and only keep this case.
+				cast.Cost.Value -= cast.BaseCost.Value * 0.2
+			}
 		},
 		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 			hitEffect.DamageMultiplier *= 1.1

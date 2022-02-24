@@ -169,7 +169,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			hitEffect.beforeCalculations(sim, spell)
 
 			if hitEffect.Landed() {
-				if spell.SpellSchool == SpellSchoolPhysical {
+				if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
 					hitEffect.calculateDamage(sim, spell)
 				} else {
 					// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
@@ -231,7 +231,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			for effectIdx := range spell.Effects {
 				hitEffect := &spell.Effects[effectIdx]
 				if hitEffect.Landed() {
-					if spell.SpellSchool == SpellSchoolPhysical {
+					if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
 						hitEffect.calculateDamage(sim, spell)
 					} else {
 						// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
