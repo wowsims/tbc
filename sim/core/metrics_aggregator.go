@@ -184,32 +184,6 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 	characterMetrics.actions[actionKey] = actionMetrics
 }
 
-// Adds the results of a melee action to the aggregated metrics.
-func (characterMetrics *CharacterMetrics) AddMeleeAbility(ability *SimpleSpell) {
-	actionID := ability.ActionID
-	actionKey := NewActionKey(actionID)
-	actionMetrics, ok := characterMetrics.actions[actionKey]
-
-	if !ok {
-		actionMetrics.ActionID = actionID
-		actionMetrics.IsMelee = true
-	}
-
-	actionMetrics.Casts++
-	actionMetrics.Hits += ability.Hits
-	actionMetrics.Misses += ability.Misses
-	actionMetrics.Crits += ability.Crits
-	actionMetrics.Dodges += ability.Dodges
-	actionMetrics.Parries += ability.Parries
-	actionMetrics.Blocks += ability.Blocks
-	actionMetrics.Glances += ability.Glances
-	actionMetrics.Damage += ability.TotalDamage
-	characterMetrics.dps.Total += ability.TotalDamage
-	characterMetrics.threat.Total += ability.TotalThreat
-
-	characterMetrics.actions[actionKey] = actionMetrics
-}
-
 // This should be called at the end of each iteration, to include metrics from Pets in
 // those of their owner.
 // Assumes that doneIteration() has already been called on the pet metrics.
