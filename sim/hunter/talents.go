@@ -280,6 +280,7 @@ func (hunter *Hunter) registerBestialWrathCD() {
 			if cast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryPhysical) {
 				cast.Cost.Value *= 0.8
 			} else {
+				// TODO: Remove this 'if' block and only keep this case.
 				cast.Cost.Value -= cast.BaseCost.Value * 0.2
 			}
 		},
