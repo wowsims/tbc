@@ -89,10 +89,9 @@ export class Timeline extends ResultComponent {
         let dpsLogs = player.dpsLogs;
         let mcdLogs = player.majorCooldownLogs;
         let mcdAuraLogs = player.majorCooldownAuraUptimeLogs;
-        if (manaLogs.length == 0) {
+        if (dpsLogs.length == 0) {
             return;
         }
-        const maxMana = manaLogs[0].valueBefore;
         const maxDps = dpsLogs[maxIndex(dpsLogs.map(l => l.dps))].dps;
         const dpsAxisMax = (Math.floor(maxDps / 100) + 1) * 100;
         // Figure out how much to vertically offset cooldown icons, for cooldowns
@@ -103,9 +102,10 @@ export class Timeline extends ResultComponent {
         // Sort by name so auras keep their same colors even if timings change.
         distinctMcdAuras.sort((a, b) => stringComparator(a.aura.name, b.aura.name));
         const mcdAuraColors = mcdAuraLogs.map(mcdAuraLog => actionColors[distinctMcdAuras.findIndex(dAura => dAura.aura.equalsIgnoringTag(mcdAuraLog.aura))]);
-        this.dpsResourcesPlot.updateOptions({
-            series: [
-                {
+        const showMana = manaLogs.length > 0;
+        const maxMana = showMana ? manaLogs[0].valueBefore : 0;
+        let options = {
+            series: [{
                     name: 'DPS',
                     type: 'line',
                     data: dpsLogs.map(log => {
@@ -114,18 +114,7 @@ export class Timeline extends ResultComponent {
                             y: log.dps,
                         };
                     }),
-                },
-                {
-                    name: 'Mana',
-                    type: 'line',
-                    data: manaLogs.map(log => {
-                        return {
-                            x: this.toDatetime(log.timestamp),
-                            y: log.valueAfter,
-                        };
-                    }),
-                },
-            ],
+                }],
             xaxis: {
                 min: this.toDatetime(0).getTime(),
                 max: this.toDatetime(duration).getTime(),
@@ -167,36 +156,6 @@ export class Timeline extends ResultComponent {
                         minWidth: 30,
                         style: {
                             colors: [dpsColor],
-                        },
-                    },
-                },
-                {
-                    seriesName: 'Mana',
-                    opposite: true,
-                    min: 0,
-                    max: maxMana,
-                    tickAmount: 10,
-                    title: {
-                        text: 'Mana',
-                        style: {
-                            color: manaColor,
-                        },
-                    },
-                    axisBorder: {
-                        show: true,
-                        color: manaColor,
-                    },
-                    axisTicks: {
-                        color: manaColor,
-                    },
-                    labels: {
-                        minWidth: 30,
-                        style: {
-                            colors: [manaColor],
-                        },
-                        formatter: (val) => {
-                            const v = parseFloat(val);
-                            return `${v.toFixed(0)} (${(v / maxMana * 100).toFixed(0)}%)`;
                         },
                     },
                 },
@@ -337,7 +296,50 @@ export class Timeline extends ResultComponent {
                     },
                 },
             },
-        });
+        };
+        if (showMana) {
+            options.series.push({
+                name: 'Mana',
+                type: 'line',
+                data: manaLogs.map(log => {
+                    return {
+                        x: this.toDatetime(log.timestamp),
+                        y: log.valueAfter,
+                    };
+                }),
+            });
+            options.yaxis.push({
+                seriesName: 'Mana',
+                opposite: true,
+                min: 0,
+                max: maxMana,
+                tickAmount: 10,
+                title: {
+                    text: 'Mana',
+                    style: {
+                        color: manaColor,
+                    },
+                },
+                axisBorder: {
+                    show: true,
+                    color: manaColor,
+                },
+                axisTicks: {
+                    color: manaColor,
+                },
+                labels: {
+                    minWidth: 30,
+                    style: {
+                        colors: [manaColor],
+                    },
+                    formatter: (val) => {
+                        const v = parseFloat(val);
+                        return `${v.toFixed(0)} (${(v / maxMana * 100).toFixed(0)}%)`;
+                    },
+                },
+            });
+        }
+        this.dpsResourcesPlot.updateOptions(options);
         //this.cooldownsPlot.updateOptions({
         //	series: [
         //		{
