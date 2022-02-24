@@ -754,10 +754,6 @@ func ManaTideTotemAmount(character *Character) float64 {
 }
 
 func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
-	if !agent.GetCharacter().HasManaBar() {
-		return
-	}
-
 	expectedManaPerManaTideTotem := 0.0
 	remainingManaTideTotemUsages := 0
 	initialDelay := time.Duration(0)
@@ -810,6 +806,10 @@ func AddManaTideTotemAura(sim *Simulation, character *Character, actionTag int32
 		ActionID: actionID,
 		Expires:  sim.CurrentTime + ManaTideTotemDuration,
 		OnCast: func(sim *Simulation, cast *Cast) {
+			if !character.HasManaBar() {
+				return
+			}
+
 			timeDelta := sim.CurrentTime - lastUpdateTime
 			lastUpdateTime = sim.CurrentTime
 			progressRatio := float64(timeDelta) / float64(ManaTideTotemDuration)
@@ -821,6 +821,10 @@ func AddManaTideTotemAura(sim *Simulation, character *Character, actionTag int32
 			bonusManaSubtracted += amount
 		},
 		OnExpire: func(sim *Simulation) {
+			if !character.HasManaBar() {
+				return
+			}
+
 			remainder := totalBonusMana - bonusManaSubtracted
 			character.AddMana(sim, remainder, actionID, true)
 			character.ExpectedBonusMana -= remainder
