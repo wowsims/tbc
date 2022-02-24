@@ -754,6 +754,10 @@ func ManaTideTotemAmount(character *Character) float64 {
 }
 
 func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
+	if !agent.GetCharacter().HasManaBar() {
+		return
+	}
+
 	expectedManaPerManaTideTotem := 0.0
 	remainingManaTideTotemUsages := 0
 	initialDelay := time.Duration(0)

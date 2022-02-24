@@ -269,7 +269,7 @@ func (shaman *Shaman) applyUnleashedRage() {
 						}
 						currentAPBonuses[i] = newBonus
 						char.AddAura(sim, currentAuras[i])
-					} else {
+					} else if newBonus != 0 {
 						// If the bonus is the same, we can just update.
 						currentAuras[i].Expires = sim.CurrentTime + dur
 						char.ReplaceAura(sim, currentAuras[i])

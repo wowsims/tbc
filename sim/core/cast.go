@@ -193,6 +193,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) b
 
 		// If hardcast and GCD happen at the same time then we don't need a separate action.
 		if cast.Character.Hardcast.Expires != cast.Character.NextGCDAt() {
+			cast.Character.hardcastAction = cast.Character.newHardcastAction(sim)
 			cast.Character.hardcastAction.NextActionAt = cast.Character.Hardcast.Expires
 			sim.AddPendingAction(cast.Character.hardcastAction)
 		}

@@ -20,6 +20,9 @@ func (character *Character) newGCDAction(sim *Simulation, agent Agent) *PendingA
 
 // Note that this is only used when the hardcast and GCD actions
 func (character *Character) newHardcastAction(sim *Simulation) *PendingAction {
+	if character.hardcastAction != nil {
+		character.hardcastAction.Cancel(sim)
+	}
 	pa := sim.pendingActionPool.Get()
 	pa.OnAction = func(sim *Simulation) {
 		// Don't need to do anything, the Advance() call will take care of the hardcast.
@@ -92,7 +95,7 @@ func (character *Character) WaitUntil(sim *Simulation, readyTime time.Duration) 
 }
 
 func (character *Character) HardcastWaitUntil(sim *Simulation, readyTime time.Duration, cast *Cast) {
-	if character.Hardcast.Expires > sim.CurrentTime {
+	if character.Hardcast.Expires >= sim.CurrentTime {
 		fmt.Printf("Sim current time: %0.2f\n", sim.CurrentTime.Seconds())
 		panic(fmt.Sprintf("Hardcast already in use, will finish at: %0.2f", character.Hardcast.Expires.Seconds()))
 	}
@@ -101,6 +104,7 @@ func (character *Character) HardcastWaitUntil(sim *Simulation, readyTime time.Du
 	character.Hardcast.Cast = cast
 	character.Hardcast.OnComplete = cast.OnCastComplete
 
+	character.hardcastAction = character.newHardcastAction(sim)
 	character.hardcastAction.NextActionAt = character.Hardcast.Expires
 	sim.AddPendingAction(character.hardcastAction)
 }
