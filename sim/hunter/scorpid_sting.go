@@ -23,6 +23,7 @@ func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.SimpleS
 				GCD:                 core.GCDDefault,
 				Cost:                cost,
 				BaseCost:            cost,
+				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
 			},
 		},
 		Effect: core.SpellHitEffect{
