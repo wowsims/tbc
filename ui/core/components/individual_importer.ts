@@ -102,10 +102,6 @@ export class IndividualImporter<SpecType extends Spec> extends Component {
 				if (charClass == Class.ClassUnknown) {
 					throw new Error('Could not parse Class!');
 				}
-				const playerClass = this.simUI.player.getClass();
-				if (charClass != playerClass) {
-					throw new Error(`Wrong Class! Expected ${classNames[playerClass]} but found ${classNames[charClass]}!`);
-				}
 
 				const race = nameToRace((importJson.character.race as string) || '');
 				if (race == Race.RaceUnknown) {
@@ -115,7 +111,7 @@ export class IndividualImporter<SpecType extends Spec> extends Component {
 				let talentsStr = '';
 				if (importJson.talents && importJson.talents.length > 0) {
 					const talentIds = (importJson.talents as Array<any>).map(talentJson => talentJson.spellId);
-					talentsStr = talentSpellIdsToTalentString(playerClass, talentIds);
+					talentsStr = talentSpellIdsToTalentString(charClass, talentIds);
 				}
 
 				let equipmentSpec = EquipmentSpec.create();
@@ -133,7 +129,7 @@ export class IndividualImporter<SpecType extends Spec> extends Component {
 
 				const gear = this.simUI.sim.lookupEquipmentSpec(equipmentSpec);
 
-				this.finishImport(race, equipmentSpec, talentsStr);
+				this.finishImport(charClass, race, equipmentSpec, talentsStr);
 			} catch (error) {
 				alert('Error importing from seventyUpgrades: ' + error);
 			}
@@ -156,10 +152,6 @@ export class IndividualImporter<SpecType extends Spec> extends Component {
 				if (charClass == Class.ClassUnknown) {
 					throw new Error('Could not parse Class!');
 				}
-				const playerClass = this.simUI.player.getClass();
-				if (charClass != playerClass) {
-					throw new Error(`Wrong Class! Expected ${classNames[playerClass]} but found ${classNames[charClass]}!`);
-				}
 
 				const race = nameToRace((importJson['race'] as string) || '');
 				if (race == Race.RaceUnknown) {
@@ -169,14 +161,19 @@ export class IndividualImporter<SpecType extends Spec> extends Component {
 				const talentsStr = (importJson['talents'] as string) || '';
 				const equipmentSpec = EquipmentSpec.fromJson(importJson['gear']);
 
-				this.finishImport(race, equipmentSpec, talentsStr);
+				this.finishImport(charClass, race, equipmentSpec, talentsStr);
 			} catch (error) {
 				alert('Error importing from addon: ' + error);
 			}
 		});
 	}
 
-	private finishImport(race: Race, equipmentSpec: EquipmentSpec, talentsStr: string) {
+	private finishImport(charClass: Class, race: Race, equipmentSpec: EquipmentSpec, talentsStr: string) {
+		const playerClass = this.simUI.player.getClass();
+		if (charClass != playerClass) {
+			throw new Error(`Wrong Class! Expected ${classNames[playerClass]} but found ${classNames[charClass]}!`);
+		}
+
 		equipmentSpec.items.forEach(item => {
 			if (item.enchant) {
 				const dbEnchant = this.simUI.sim.getEnchantFlexible(item.enchant);
