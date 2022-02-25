@@ -16,7 +16,7 @@ export abstract class TalentsPicker<SpecType extends Spec> extends Component {
 	frozen: boolean;
   readonly trees: Array<TalentTreePicker<SpecType>>;
 
-  constructor(parent: HTMLElement, player: Player<SpecType>, treeConfigs: Array<TalentTreeConfig<SpecType>>) {
+  constructor(parent: HTMLElement, player: Player<SpecType>, treeConfigs: TalentsConfig<SpecType>) {
     super(parent, 'talents-picker-root');
     this.player = player;
 		this.frozen = false;
@@ -328,6 +328,8 @@ class TalentPicker<SpecType extends Spec> extends Component {
     }
   }
 }
+
+export type TalentsConfig<SpecType extends Spec> = Array<TalentTreeConfig<SpecType>>;
 
 export type TalentTreeConfig<SpecType extends Spec> = {
   name: string;

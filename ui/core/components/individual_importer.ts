@@ -6,6 +6,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Player } from '/tbc/core/player.js';
 import { classNames, nameToClass, nameToRace } from '/tbc/core/proto_utils/names.js';
+import { talentSpellIdsToTalentString } from '/tbc/core/talents/factory.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { CloseButton } from './close_button.js';
@@ -111,7 +112,11 @@ export class IndividualImporter<SpecType extends Spec> extends Component {
 					throw new Error('Could not parse Race!');
 				}
 
-				//const talentsStr = (importJson['talents'] as string) || '';
+				let talentsStr = '';
+				if (importJson.talents && importJson.talents.length > 0) {
+					const talentIds = (importJson.talents as Array<any>).map(talentJson => talentJson.spellId);
+					talentsStr = talentSpellIdsToTalentString(playerClass, talentIds);
+				}
 
 				let equipmentSpec = EquipmentSpec.create();
 				(importJson.items as Array<any>).forEach(itemJson => {
@@ -128,7 +133,7 @@ export class IndividualImporter<SpecType extends Spec> extends Component {
 
 				const gear = this.simUI.sim.lookupEquipmentSpec(equipmentSpec);
 
-				this.finishImport(race, equipmentSpec, '');
+				this.finishImport(race, equipmentSpec, talentsStr);
 			} catch (error) {
 				alert('Error importing from seventyUpgrades: ' + error);
 			}
