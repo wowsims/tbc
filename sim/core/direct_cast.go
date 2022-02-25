@@ -220,43 +220,46 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			hitEffect.applyResultsToCast(&spell.SpellCast)
 			hitEffect.afterCalculations(sim, spell)
 		} else {
-			// Use a separate loop for the beforeCalculations() calls so that they all
-			// come before the first afterCalculations() call. This prevents proc effects
-			// on the first hit from benefitting other hits of the same spell.
-			for effectIdx := range spell.Effects {
-				hitEffect := &spell.Effects[effectIdx]
-				hitEffect.beforeCalculations(sim, spell)
-			}
 
-			for effectIdx := range spell.Effects {
-				hitEffect := &spell.Effects[effectIdx]
-				if hitEffect.Landed() {
-					if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
+			if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
+				for effectIdx := range spell.Effects {
+					hitEffect := &spell.Effects[effectIdx]
+
+					hitEffect.beforeCalculations(sim, spell)
+					if hitEffect.Landed() {
 						hitEffect.calculateDamage(sim, spell)
-					} else {
-						// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
-						if hitEffect.DirectInput.MaxBaseDamage != 0 {
-							hitEffect.calculateDirectDamage(sim, &spell.SpellCast)
-						}
-
-						if hitEffect.DotInput.NumberOfTicks != 0 {
-							hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
-						}
 					}
-				}
-				if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
-					// TODO: REMOVE THIS ONCE EVERYTHING WORKS
 					hitEffect.applyResultsToCast(&spell.SpellCast)
 					hitEffect.afterCalculations(sim, spell)
 				}
-			}
+			} else {
+				// Use a separate loop for the beforeCalculations() calls so that they all
+				// come before the first afterCalculations() call. This prevents proc effects
+				// on the first hit from benefitting other hits of the same spell.
+				for effectIdx := range spell.Effects {
+					hitEffect := &spell.Effects[effectIdx]
+					hitEffect.beforeCalculations(sim, spell)
+				}
+				for effectIdx := range spell.Effects {
+					hitEffect := &spell.Effects[effectIdx]
+					if hitEffect.Landed() {
+						if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
+							hitEffect.calculateDamage(sim, spell)
+						} else {
+							// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
+							if hitEffect.DirectInput.MaxBaseDamage != 0 {
+								hitEffect.calculateDirectDamage(sim, &spell.SpellCast)
+							}
 
-			spell.applyAOECap()
-
-			// Use a separate loop for the afterCalculations() calls so all effect damage
-			// is fully calculated before invoking proc callbacks.
-			if !spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
-				// TODO: REMOVE IF STATEMENT ONCE WORKING
+							if hitEffect.DotInput.NumberOfTicks != 0 {
+								hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
+							}
+						}
+					}
+				}
+				spell.applyAOECap()
+				// Use a separate loop for the afterCalculations() calls so all effect damage
+				// is fully calculated before invoking proc callbacks.
 				for effectIdx := range spell.Effects {
 					hitEffect := &spell.Effects[effectIdx]
 					hitEffect.applyResultsToCast(&spell.SpellCast)
