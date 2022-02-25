@@ -25,6 +25,7 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 				SpellSchool:         core.SpellSchoolNature,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				SpellExtras:         core.SpellExtrasChanneled,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 1905,
@@ -37,7 +38,6 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 				Cooldown: time.Second * 60,
 			},
 		},
-		IsChannel: true,
 	}
 
 	baseEffect := core.SpellHitEffect{

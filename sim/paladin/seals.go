@@ -26,8 +26,8 @@ func (paladin *Paladin) setupSealOfBlood() {
 			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 			IsPhantom:           true,
 		},
-		Effect: core.AbilityHitEffect{
-			AbilityEffect: core.AbilityEffect{
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
@@ -47,7 +47,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 		ID:       SealOfBloodAuraID,
 		ActionID: SealOfBloodProcActionID,
 
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 				return
 			}
@@ -101,8 +101,8 @@ func (paladin *Paladin) setupSealOfCommand() {
 			SpellSchool:         core.SpellSchoolHoly,
 			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 		},
-		Effect: core.AbilityHitEffect{
-			AbilityEffect: core.AbilityEffect{
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
@@ -127,7 +127,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 		ID:       SealOfCommandAuraID,
 		ActionID: SealOfCommandProcActionID,
 
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 				return
 			}

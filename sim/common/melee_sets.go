@@ -40,7 +40,7 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 
 				return core.Aura{
 					ID: DesolationBattlegearAuraID,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 						if !hitEffect.Landed() {
 							return
 						}
@@ -119,7 +119,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 
 				return core.Aura{
 					ID: FistsOfFuryAuraID,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 						if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 							return
 						}
@@ -169,12 +169,12 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 
 				return core.Aura{
 					ID: TwinBladesOfAzzinothAuraID,
-					OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+					OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 						if hitEffect.Target.MobType == proto.MobType_MobTypeDemon {
 							hitEffect.BonusAttackPower += 200
 						}
 					},
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 						if !hitEffect.Landed() {
 							return
 						}
@@ -221,7 +221,7 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 
 				return core.Aura{
 					ID: WastewalkerArmorAuraID,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 						if !hitEffect.Landed() {
 							return
 						}

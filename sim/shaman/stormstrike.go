@@ -51,9 +51,9 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 			},
 			CritMultiplier: shaman.DefaultMeleeCritMultiplier(),
 		},
-		Effects: []core.AbilityHitEffect{
+		Effects: []core.SpellHitEffect{
 			{
-				AbilityEffect: core.AbilityEffect{
+				SpellEffect: core.SpellEffect{
 					ProcMask:               core.ProcMaskMeleeMHSpecial,
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
@@ -64,7 +64,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 				},
 			},
 			{
-				AbilityEffect: core.AbilityEffect{
+				SpellEffect: core.SpellEffect{
 					ProcMask:               core.ProcMaskMeleeOHSpecial,
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
@@ -76,7 +76,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.MeleeAbi
 				},
 			},
 		},
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.AbilityHitEffect) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
 			if !hitEffect.Landed() {
 				return
 			}

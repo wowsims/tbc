@@ -22,7 +22,7 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 		CritRollCategory:    core.CritRollCategoryMagical,
 		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		SpellSchool:         core.SpellSchoolShadow,
-		SpellExtras:         core.SpellExtrasBinary,
+		SpellExtras:         core.SpellExtrasBinary | core.SpellExtrasChanneled,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 230,
@@ -60,8 +60,7 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
 		},
-		Effect:    effect,
-		IsChannel: true,
+		Effect: effect,
 	})
 }
 
