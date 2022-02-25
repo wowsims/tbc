@@ -233,9 +233,6 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 				if hitEffect.Landed() {
 					if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
 						hitEffect.calculateDamage(sim, spell)
-						// TODO: REMOVE THIS ONCE EVERYTHING WORKS
-						hitEffect.applyResultsToCast(&spell.SpellCast)
-						hitEffect.afterCalculations(sim, spell)
 					} else {
 						// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
 						if hitEffect.DirectInput.MaxBaseDamage != 0 {
@@ -246,6 +243,11 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 							hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
 						}
 					}
+				}
+				if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
+					// TODO: REMOVE THIS ONCE EVERYTHING WORKS
+					hitEffect.applyResultsToCast(&spell.SpellCast)
+					hitEffect.afterCalculations(sim, spell)
 				}
 			}
 
