@@ -151,13 +151,14 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	}
 
 	// Weapon Imbues
-	if character.HasMHWeapon() && (character.HasMHWeaponImbue || partyBuffs.WindfuryTotemRank == 0) {
+	allowMHImbue := character.HasMHWeapon() && (character.HasMHWeaponImbue || partyBuffs.WindfuryTotemRank == 0)
+	if allowMHImbue {
 		addImbueStats(character, consumes.MainHandImbue)
 	}
 	if character.HasOHWeapon() {
 		addImbueStats(character, consumes.OffHandImbue)
 	}
-	applyAdamantiteSharpeningStoneAura(character, consumes)
+	applyAdamantiteSharpeningStoneAura(character, consumes, allowMHImbue)
 
 	registerDrumsCD(agent, partyBuffs, consumes)
 	registerPotionCD(agent, consumes)
@@ -212,13 +213,17 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 
 var AdamantiteSharpeningStoneMeleeCritAuraID = NewAuraID()
 
-func applyAdamantiteSharpeningStoneAura(character *Character, consumes proto.Consumes) {
+func applyAdamantiteSharpeningStoneAura(character *Character, consumes proto.Consumes, allowMHImbue bool) {
 	critBonus := 0.0
-	if consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
+	if consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone && allowMHImbue {
 		critBonus += 14
 	}
 	if consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
 		critBonus += 14
+	}
+
+	if critBonus == 0 {
+		return
 	}
 
 	// Crit rating for sharpening stone applies to melee only.
