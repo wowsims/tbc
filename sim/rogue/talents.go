@@ -42,31 +42,8 @@ func (rogue *Rogue) applyTalents() {
 	}
 
 	rogue.registerColdBloodCD()
-}
-
-func (rogue *Rogue) critMultiplier(isMH bool, applyLethality bool) float64 {
-	primaryModifier := 1.0
-	secondaryModifier := 0.0
-
-	isMace := false
-	if weapon := rogue.Equip[proto.ItemSlot_ItemSlotMainHand]; isMH && weapon.ID != 0 {
-		if weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
-			isMace = true
-		}
-	} else if weapon := rogue.Equip[proto.ItemSlot_ItemSlotOffHand]; !isMH && weapon.ID != 0 {
-		if weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
-			isMace = true
-		}
-	}
-	if isMace {
-		primaryModifier *= 1 + 0.01*float64(rogue.Talents.MaceSpecialization)
-	}
-
-	if applyLethality {
-		secondaryModifier += 0.06 * float64(rogue.Talents.Lethality)
-	}
-
-	return rogue.MeleeCritMultiplier(primaryModifier, secondaryModifier)
+	rogue.registerBladeFlurryCD()
+	rogue.registerAdrenalineRushCD()
 }
 
 var FindWeaknessAuraID = core.NewAuraID()
@@ -348,5 +325,142 @@ func (rogue *Rogue) applyCombatPotency() {
 				rogue.AddEnergy(sim, energyBonus, core.ActionID{SpellID: 35553})
 			},
 		}
+	})
+}
+
+var BladeFlurryAuraID = core.NewAuraID()
+var BladeFlurryCooldownID = core.NewCooldownID()
+
+func (rogue *Rogue) registerBladeFlurryCD() {
+	if !rogue.Talents.BladeFlurry {
+		return
+	}
+
+	actionID := core.ActionID{SpellID: 13877, CooldownID: BladeFlurryCooldownID}
+	const hasteBonus = 1.2
+	const inverseHasteBonus = 1 / 1.2
+	const energyCost = 25.0
+
+	bladeFlurryAura := core.Aura{
+		ID:       BladeFlurryAuraID,
+		ActionID: actionID,
+		OnExpire: func(sim *core.Simulation) {
+			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
+		},
+	}
+
+	cooldown := time.Minute * 2
+
+	template := core.SimpleCast{
+		Cast: core.Cast{
+			ActionID:  actionID,
+			Character: rogue.GetCharacter(),
+			Cooldown:  cooldown,
+			GCD:       time.Second * 1,
+			Cost: core.ResourceCost{
+				Type:  stats.Energy,
+				Value: energyCost,
+			},
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				rogue.MultiplyMeleeSpeed(sim, hasteBonus)
+				aura := bladeFlurryAura
+				aura.Expires = sim.CurrentTime + time.Second*15
+				rogue.AddAura(sim, aura)
+			},
+		},
+	}
+
+	rogue.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   actionID,
+		CooldownID: BladeFlurryCooldownID,
+		Cooldown:   cooldown,
+		UsesGCD:    true,
+		Type:       core.CooldownTypeDPS,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			if rogue.CurrentEnergy() < energyCost {
+				return false
+			}
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			return func(sim *core.Simulation, character *core.Character) {
+				cast := template
+				cast.Init(sim)
+				cast.StartCast(sim)
+			}
+		},
+	})
+}
+
+var AdrenalineRushAuraID = core.NewAuraID()
+var AdrenalineRushCooldownID = core.NewCooldownID()
+
+func (rogue *Rogue) registerAdrenalineRushCD() {
+	if !rogue.Talents.AdrenalineRush {
+		return
+	}
+
+	actionID := core.ActionID{SpellID: 13750, CooldownID: AdrenalineRushCooldownID}
+
+	adrenalineRushAura := core.Aura{
+		ID:       AdrenalineRushAuraID,
+		ActionID: actionID,
+		OnExpire: func(sim *core.Simulation) {
+			rogue.EnergyTickMultiplier = 1
+		},
+	}
+
+	cooldown := time.Minute * 5
+
+	template := core.SimpleCast{
+		Cast: core.Cast{
+			ActionID:  actionID,
+			Character: rogue.GetCharacter(),
+			Cooldown:  cooldown,
+			GCD:       time.Second * 1,
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				rogue.EnergyTickMultiplier = 2
+				const halfTick = core.EnergyPerTick / 2
+				if rogue.NextEnergyTickAt() < sim.CurrentTime+time.Second*1 {
+					// There will be 8 ticks during the 15s duration, so we need to subtract half a tick.
+					rogue.NextEnergyTickAdjustment = -halfTick
+				} else {
+					// There will be 7 ticks during the 15s duration, so we need to add half a tick.
+					rogue.AddEnergy(sim, halfTick, core.ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
+				}
+
+				aura := adrenalineRushAura
+				aura.Expires = sim.CurrentTime + time.Second*15
+				rogue.AddAura(sim, aura)
+			},
+		},
+	}
+
+	rogue.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   actionID,
+		CooldownID: AdrenalineRushCooldownID,
+		Cooldown:   cooldown,
+		UsesGCD:    true,
+		Type:       core.CooldownTypeDPS,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Make sure we have plenty of room so the big ticks dont get wasted.
+			if rogue.CurrentEnergy() > 40 {
+				return false
+			}
+			return true
+		},
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			return func(sim *core.Simulation, character *core.Character) {
+				cast := template
+				cast.Init(sim)
+				cast.StartCast(sim)
+			}
+		},
 	})
 }
