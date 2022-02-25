@@ -5,5 +5,7 @@ export declare class IndividualImporter<SpecType extends Spec> extends Component
     private readonly simUI;
     private readonly importButton;
     constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>);
+    private setup70UpgradesImport;
     private setupAddonImport;
+    private finishImport;
 }

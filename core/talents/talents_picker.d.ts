@@ -7,7 +7,7 @@ export declare abstract class TalentsPicker<SpecType extends Spec> extends Compo
     private readonly player;
     frozen: boolean;
     readonly trees: Array<TalentTreePicker<SpecType>>;
-    constructor(parent: HTMLElement, player: Player<SpecType>, treeConfigs: Array<TalentTreeConfig<SpecType>>);
+    constructor(parent: HTMLElement, player: Player<SpecType>, treeConfigs: TalentsConfig<SpecType>);
     get numPoints(): number;
     isFull(): boolean;
     update(eventID: EventID): void;
@@ -43,6 +43,7 @@ declare class TalentPicker<SpecType extends Spec> extends Component {
     getSpellIdForPoints(numPoints: number): number;
     update(): void;
 }
+export declare type TalentsConfig<SpecType extends Spec> = Array<TalentTreeConfig<SpecType>>;
 export declare type TalentTreeConfig<SpecType extends Spec> = {
     name: string;
     backgroundUrl: string;
