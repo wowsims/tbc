@@ -218,7 +218,11 @@ func (cast *Cast) CalculatedGCD(char *Character) time.Duration {
 func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastComplete) {
 	if cast.Cost.Value > 0 && cast.Cost.Type == stats.Mana {
 		cast.Character.SpendMana(sim, cast.Cost.Value, cast.ActionID)
-		cast.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
+
+		// TODO: REMOVE THIS, TEMP HACK
+		if !cast.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
+			cast.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
+		}
 	}
 
 	cast.Character.OnCastComplete(sim, cast)
