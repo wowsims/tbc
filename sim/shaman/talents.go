@@ -241,7 +241,7 @@ func (shaman *Shaman) applyUnleashedRage() {
 		return core.Aura{
 			ID: UnleashedRageTalentAuraID,
 			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				// proc mask = 20
+				// proc mask = 20 (melee auto & special)
 				if !hitEffect.Outcome.Matches(core.OutcomeCrit) || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
