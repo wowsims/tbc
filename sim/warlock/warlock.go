@@ -28,15 +28,3 @@ func (warlock *Warlock) Reset(sim *core.Simulation) {}
 func (warlock *Warlock) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // makes the bot wait forever and do nothing.
 }
-
-var CurseOfElementsAuraID = core.NewAuraID()
-func CurseOfElementsAura(malediction int) core.Aura {
-	multiplier := 1.10 + 0.1*float64(malediction)
-	return core.Aura{
-		ID:      CurseOfElementsAuraID,
-		Expires: core.NeverExpires,
-		OnBeforeSpellHit:  func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-			spellEffect.DamageMultiplier *= multiplier
-		},
-	}
-}

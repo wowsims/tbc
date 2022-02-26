@@ -25,7 +25,7 @@ func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
 			cast.Cost.Value = 0
 		},
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 			spellEffect.BonusSpellCritRating += 25 * core.SpellCritRatingPerCritChance
 		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {

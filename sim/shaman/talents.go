@@ -213,11 +213,14 @@ func (shaman *Shaman) applyWeaponMastery() {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: WeaponMasteryAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-				if hitEffect.WeaponInput.DamageMultiplier == 0 {
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
+				if !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryPhysical) {
 					return
 				}
-				hitEffect.DamageMultiplier *= multiplier
+				if spellEffect.WeaponInput.DamageMultiplier == 0 {
+					return
+				}
+				spellEffect.DamageMultiplier *= multiplier
 			},
 		}
 	})
@@ -246,7 +249,6 @@ func (shaman *Shaman) applyUnleashedRage() {
 					return
 				}
 
-				// TODO: what if # pets changes?
 				for i, playerOrPet := range shaman.Party.PlayersAndPets {
 					char := playerOrPet.GetCharacter()
 					prevBonus := currentAPBonuses[i]

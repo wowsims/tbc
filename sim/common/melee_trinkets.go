@@ -313,9 +313,9 @@ func ApplyMarkOfTheChampionMelee(agent core.Agent) {
 	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: MarkOfTheChampionMeleeAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-				if hitEffect.Target.MobType == proto.MobType_MobTypeDemon || hitEffect.Target.MobType == proto.MobType_MobTypeUndead {
-					hitEffect.BonusAttackPower += 150
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
+				if spellEffect.Target.MobType == proto.MobType_MobTypeDemon || spellEffect.Target.MobType == proto.MobType_MobTypeUndead {
+					spellEffect.BonusAttackPower += 150
 				}
 			},
 		}

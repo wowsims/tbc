@@ -904,8 +904,8 @@ func ApplyTheNightBlade(agent core.Agent) {
 					ActionID: core.ActionID{ItemID: 31331},
 					Expires:  sim.CurrentTime + dur,
 					Stacks:   stacks,
-					OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-						hitEffect.BonusArmorPenetration += newBonus
+					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
+						spellEffect.BonusArmorPenetration += newBonus
 					},
 				})
 			},
@@ -1003,9 +1003,9 @@ func ApplyCloakOfDarkness(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: CloakOfDarknessAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
-					hitEffect.BonusCritRating += 24
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
+				if !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
+					spellEffect.BonusCritRating += 24
 				}
 			},
 		}

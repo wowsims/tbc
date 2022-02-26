@@ -237,9 +237,9 @@ func applyAdamantiteSharpeningStoneAura(character *Character, consumes proto.Con
 	character.AddPermanentAura(func(sim *Simulation) Aura {
 		return Aura{
 			ID: AdamantiteSharpeningStoneMeleeCritAuraID,
-			OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-				if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-					hitEffect.BonusCritRating += critBonus
+			OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
+				if !spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+					spellEffect.BonusCritRating += critBonus
 				}
 			},
 		}
@@ -252,9 +252,9 @@ func ElixirOfDemonslayingAura() Aura {
 	return Aura{
 		ID:       ElixirOfDemonslayingAuraID,
 		ActionID: ActionID{ItemID: 9224},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-			if hitEffect.Target.MobType == proto.MobType_MobTypeDemon {
-				hitEffect.BonusAttackPower += 265
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
+			if spellEffect.Target.MobType == proto.MobType_MobTypeDemon {
+				spellEffect.BonusAttackPower += 265
 			}
 		},
 	}

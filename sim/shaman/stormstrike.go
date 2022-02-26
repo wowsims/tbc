@@ -20,7 +20,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 		ActionID: StormstrikeActionID,
 		Stacks:   2,
 	}
-	ssDebuffAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ssDebuffAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 		if spellCast.SpellSchool != core.SpellSchoolNature {
 			return
 		}

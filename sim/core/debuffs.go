@@ -118,11 +118,15 @@ func MiseryAura(sim *Simulation, numPoints int32) Aura {
 		ActionID: ActionID{SpellID: 33195},
 		Expires:  sim.CurrentTime + time.Second*24,
 		Stacks:   numPoints,
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			spellEffect.DamageMultiplier *= multiplier
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
+			if spellCast.SpellSchool.Matches(SpellSchoolMagic) {
+				spellEffect.DamageMultiplier *= multiplier
+			}
 		},
 		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			*tickDamage *= multiplier
+			if spellCast.SpellSchool.Matches(SpellSchoolMagic) {
+				*tickDamage *= multiplier
+			}
 		},
 	}
 }
@@ -137,7 +141,7 @@ func ShadowWeavingAura(sim *Simulation, numStacks int32) Aura {
 		ActionID: ActionID{SpellID: 15334},
 		Expires:  sim.CurrentTime + time.Second*15,
 		Stacks:   numStacks,
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellCast.SpellSchool.Matches(SpellSchoolShadow) {
 				spellEffect.DamageMultiplier *= multiplier
 			}
@@ -197,18 +201,17 @@ func JudgementOfTheCrusaderAura(sim *Simulation, level float64) Aura {
 		ID:       ImprovedSealOfTheCrusaderDebuffID,
 		ActionID: ActionID{SpellID: 27159},
 		Expires:  sim.CurrentTime + time.Second*20,
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
 				spellEffect.BonusSpellPower += 219
 			}
 			spellEffect.BonusSpellCritRating += bonusSPCrit
-		},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-			if ability.ActionID.SpellID == 35395 {
+			spellEffect.BonusCritRating += bonusMCrit
+
+			if spellCast.ActionID.SpellID == 35395 {
 				aura.Expires = sim.CurrentTime + time.Second*20
-				hitEffect.Target.ReplaceAura(sim, aura)
+				spellEffect.Target.ReplaceAura(sim, aura)
 			}
-			hitEffect.BonusCritRating += bonusMCrit
 		},
 	}
 	return aura
@@ -228,7 +231,7 @@ func CurseOfElementsAura(coe proto.TristateEffect) Aura {
 		ID:       CurseOfElementsDebuffID,
 		ActionID: ActionID{SpellID: 27228},
 		Stacks:   level, // Use stacks to store talent level for detection by other code.
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellCast.SpellSchool.Matches(SpellSchoolArcane | SpellSchoolFire | SpellSchoolFrost | SpellSchoolShadow) {
 				spellEffect.DamageMultiplier *= mult
 			}
@@ -248,7 +251,7 @@ func ImprovedShadowBoltAura(uptime float64) Aura {
 	return Aura{
 		ID:       ImprovedShadowBoltID,
 		ActionID: ActionID{SpellID: 17803},
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if !spellCast.SpellSchool.Matches(SpellSchoolShadow) {
 				return // does not apply to these schools
 			}
@@ -269,11 +272,11 @@ func BloodFrenzyAura() Aura {
 	return Aura{
 		ID:       BloodFrenzyDebuffID,
 		ActionID: ActionID{SpellID: 29859},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-			if !ability.SpellSchool.Matches(SpellSchoolPhysical) {
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
+			if !spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
 				return
 			}
-			hitEffect.DamageMultiplier *= 1.04
+			spellEffect.DamageMultiplier *= 1.04
 		},
 	}
 }
@@ -288,7 +291,7 @@ func ImprovedScorchAura(sim *Simulation, numStacks int32) Aura {
 		ActionID: ActionID{SpellID: 12873},
 		Expires:  sim.CurrentTime + time.Second*30,
 		Stacks:   numStacks,
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellCast.SpellSchool.Matches(SpellSchoolFire) {
 				spellEffect.DamageMultiplier *= multiplier
 			}
@@ -311,7 +314,7 @@ func WintersChillAura(sim *Simulation, numStacks int32) Aura {
 		ActionID: ActionID{SpellID: 28595},
 		Expires:  sim.CurrentTime + time.Second*15,
 		Stacks:   numStacks,
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
 				spellEffect.BonusSpellCritRating += bonusCrit
 			}
@@ -333,8 +336,8 @@ func FaerieFireAura(currentTime time.Duration, target *Target, improved bool) Au
 		},
 	}
 	if improved {
-		aura.OnBeforeMeleeHit = func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-			hitEffect.BonusHitRating += hitBonus
+		aura.OnBeforeSpellHit = func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
+			spellEffect.BonusHitRating += hitBonus
 		}
 	}
 
@@ -406,8 +409,8 @@ func ExposeWeaknessAura(currentTime time.Duration, hunterAgility float64, multip
 		ID:       ExposeWeaknessDebuffID,
 		ActionID: ActionID{SpellID: 34503},
 		Expires:  currentTime + time.Second*7,
-		OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-			hitEffect.BonusAttackPower += apBonus
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
+			spellEffect.BonusAttackPower += apBonus
 		},
 	}
 }
@@ -431,11 +434,11 @@ func HuntersMarkAura(points int32, fullyStacked bool) Aura {
 		ID:       HuntersMarkDebuffID,
 		ActionID: ActionID{SpellID: 14325},
 		Stacks:   points, // Use this to check whether to override in hunter/hunter.go
-		OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-			if hitEffect.IsMelee() {
-				hitEffect.BonusAttackPower += meleeBonus
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
+			if spellEffect.ProcMask.Matches(ProcMaskMelee) {
+				spellEffect.BonusAttackPower += meleeBonus
 			} else {
-				hitEffect.BonusAttackPower += rangedBonus
+				spellEffect.BonusAttackPower += rangedBonus
 			}
 		},
 		OnMeleeAttack: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {

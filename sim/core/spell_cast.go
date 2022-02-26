@@ -10,7 +10,7 @@ import (
 
 // Callback for after a spell hits the target, before damage has been calculated.
 // Use it to modify the spell damage or results.
-type OnBeforeSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect)
+type OnBeforeSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect)
 
 // Callback for after a spell hits the target and after damage is calculated. Use it for proc effects
 // or anything that comes from the final result of the spell.
@@ -124,13 +124,8 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *Simpl
 	spellEffect.BeyondAOECapMultiplier = 1
 	multiplierBeforeTargetEffects := spellEffect.DamageMultiplier
 
-	if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
-		spell.Character.OnBeforeMeleeHit(sim, spell, she)
-		spellEffect.Target.OnBeforeMeleeHit(sim, spell, she)
-	} else if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryMagic) {
-		spell.Character.OnBeforeSpellHit(sim, &spell.SpellCast, spellEffect)
-		spellEffect.Target.OnBeforeSpellHit(sim, &spell.SpellCast, spellEffect)
-	}
+	spell.Character.OnBeforeSpellHit(sim, &spell.SpellCast, she)
+	spellEffect.Target.OnBeforeSpellHit(sim, &spell.SpellCast, she)
 
 	spellEffect.BeyondAOECapMultiplier *= spellEffect.DamageMultiplier / multiplierBeforeTargetEffects
 

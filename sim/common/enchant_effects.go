@@ -104,9 +104,9 @@ func ApplyBiznicksScope(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: BiznicksScopeAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-				if ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
-					hitEffect.BonusHitRating += 30
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
+				if spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
+					spellEffect.BonusHitRating += 30
 				}
 			},
 		}
@@ -202,9 +202,9 @@ func ApplyStabilizedEterniumScope(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: StabilizedEterniumScopeAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-				if ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
-					hitEffect.BonusCritRating += 28
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
+				if spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
+					spellEffect.BonusCritRating += 28
 				}
 			},
 		}

@@ -169,9 +169,9 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 
 				return core.Aura{
 					ID: TwinBladesOfAzzinothAuraID,
-					OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-						if hitEffect.Target.MobType == proto.MobType_MobTypeDemon {
-							hitEffect.BonusAttackPower += 200
+					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
+						if spellEffect.Target.MobType == proto.MobType_MobTypeDemon {
+							spellEffect.BonusAttackPower += 200
 						}
 					},
 					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
