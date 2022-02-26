@@ -119,7 +119,7 @@ func (hunter *Hunter) NewKillCommand(sim *core.Simulation, target *core.Target) 
 }
 
 func (hunter *Hunter) TryKillCommand(sim *core.Simulation, target *core.Target) {
-	if !hunter.pet.IsEnabled() {
+	if hunter.pet == nil || !hunter.pet.IsEnabled() {
 		return
 	}
 
