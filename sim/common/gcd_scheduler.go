@@ -3,6 +3,7 @@ package common
 // Helper module for planning GCD-bound actions in advance.
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -272,6 +273,14 @@ func (gs *GCDScheduler) DoNextAbility(sim *core.Simulation, character *core.Char
 		// It's possible for this function to get called near the end of the iteration,
 		// after the final scheduled ability.
 		return true
+	}
+
+	expectedCastAt := gs.schedule[gs.nextAbilityIndex].castAt
+	if expectedCastAt > sim.CurrentTime {
+		character.SetGCDTimer(sim, expectedCastAt)
+		return true
+	} else if expectedCastAt < sim.CurrentTime {
+		panic(fmt.Sprintf("Missed scheduled cast! Expected %s but is now %s", expectedCastAt, sim.CurrentTime))
 	}
 
 	success := gs.schedule[gs.nextAbilityIndex].TryCast(sim)

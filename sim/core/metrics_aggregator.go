@@ -17,6 +17,11 @@ func NewActionKey(actionID ActionID) ActionKey {
 	return ActionKey(float64((int32(actionID.OtherID) + actionID.SpellID - actionID.ItemID)) + (float64(actionID.Tag) / 256))
 }
 
+type ResourceKey struct {
+	ActionKey ActionKey
+	Type      proto.ResourceType
+}
+
 type DistributionMetrics struct {
 	// Values for the current iteration. These are cleared after each iteration.
 	Total float64
@@ -70,6 +75,7 @@ type CharacterMetrics struct {
 	// Aggregate values. These are updated after each iteration.
 	oomTimeSum float64
 	actions    map[ActionKey]ActionMetrics
+	resources  map[ResourceKey]ResourceMetrics
 }
 
 // Metrics for the current iteration, for 1 agent. Keep this as a separate
@@ -130,9 +136,30 @@ func (actionMetrics *ActionMetrics) ToProto() *proto.ActionMetrics {
 
 func NewCharacterMetrics() CharacterMetrics {
 	return CharacterMetrics{
-		dps:     NewDistributionMetrics(),
-		threat:  NewDistributionMetrics(),
-		actions: make(map[ActionKey]ActionMetrics),
+		dps:       NewDistributionMetrics(),
+		threat:    NewDistributionMetrics(),
+		actions:   make(map[ActionKey]ActionMetrics),
+		resources: make(map[ResourceKey]ResourceMetrics),
+	}
+}
+
+type ResourceMetrics struct {
+	ActionID ActionID
+	Type     proto.ResourceType
+
+	Events     int32
+	Gain       float64
+	ActualGain float64
+}
+
+func (resourceMetrics *ResourceMetrics) ToProto() *proto.ResourceMetrics {
+	return &proto.ResourceMetrics{
+		Id:   resourceMetrics.ActionID.ToProto(),
+		Type: resourceMetrics.Type,
+
+		Events:     resourceMetrics.Events,
+		Gain:       resourceMetrics.Gain,
+		ActualGain: resourceMetrics.ActualGain,
 	}
 }
 
@@ -147,6 +174,26 @@ func (characterMetrics *CharacterMetrics) addCastInternal(actionID ActionID) {
 	actionMetrics.Casts++
 
 	characterMetrics.actions[actionKey] = actionMetrics
+}
+
+func (characterMetrics *CharacterMetrics) AddResourceEvent(actionID ActionID, resourceType proto.ResourceType, gain float64, actualGain float64) {
+	actionKey := NewActionKey(actionID)
+	resourceKey := ResourceKey{
+		ActionKey: actionKey,
+		Type:      resourceType,
+	}
+	resourceMetrics, ok := characterMetrics.resources[resourceKey]
+
+	if !ok {
+		resourceMetrics.ActionID = actionID
+		resourceMetrics.Type = resourceType
+	}
+
+	resourceMetrics.Events++
+	resourceMetrics.Gain += gain
+	resourceMetrics.ActualGain += actualGain
+
+	characterMetrics.resources[resourceKey] = resourceMetrics
 }
 
 func (characterMetrics *CharacterMetrics) AddInstantCast(actionID ActionID) {
@@ -218,6 +265,9 @@ func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.Pl
 
 	for _, action := range characterMetrics.actions {
 		protoMetrics.Actions = append(protoMetrics.Actions, action.ToProto())
+	}
+	for _, resource := range characterMetrics.resources {
+		protoMetrics.Resources = append(protoMetrics.Resources, resource.ToProto())
 	}
 
 	return protoMetrics

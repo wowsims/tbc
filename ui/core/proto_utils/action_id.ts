@@ -26,15 +26,24 @@ export class ActionId {
 				break;
 			case OtherAction.OtherActionWait:
 				baseName = 'Wait';
+				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/inv_misc_pocketwatch_01.jpg';
 				break;
 			case OtherAction.OtherActionManaRegen:
-				baseName = 'Mana Tick';
+				name = 'Mana Tick';
+				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg';
+				if (tag == 1) {
+					name += ' (Casting)';
+				} else if (tag == 2) {
+					name += ' (Not Casting)';
+				}
 				break;
 			case OtherAction.OtherActionEnergyRegen:
 				baseName = 'Energy Tick';
+				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg';
 				break;
 			case OtherAction.OtherActionFocusRegen:
 				baseName = 'Focus Tick';
+				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg';
 				break;
 			case OtherAction.OtherActionAttack:
 				name = 'Attack';
@@ -53,6 +62,7 @@ export class ActionId {
 				break;
 			case OtherAction.OtherActionRefund:
 				baseName = 'Refund';
+				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/inv_misc_coin_01.jpg';
 				break;
 		}
 		this.baseName = baseName;

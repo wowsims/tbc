@@ -92,6 +92,31 @@ func (rogue *Rogue) SpendComboPoints(sim *core.Simulation) {
 	rogue.comboPoints = 0
 }
 
+func (rogue *Rogue) critMultiplier(isMH bool, applyLethality bool) float64 {
+	primaryModifier := 1.0
+	secondaryModifier := 0.0
+
+	isMace := false
+	if weapon := rogue.Equip[proto.ItemSlot_ItemSlotMainHand]; isMH && weapon.ID != 0 {
+		if weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
+			isMace = true
+		}
+	} else if weapon := rogue.Equip[proto.ItemSlot_ItemSlotOffHand]; !isMH && weapon.ID != 0 {
+		if weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
+			isMace = true
+		}
+	}
+	if isMace {
+		primaryModifier *= 1 + 0.01*float64(rogue.Talents.MaceSpecialization)
+	}
+
+	if applyLethality {
+		secondaryModifier += 0.06 * float64(rogue.Talents.Lethality)
+	}
+
+	return rogue.MeleeCritMultiplier(primaryModifier, secondaryModifier)
+}
+
 func NewRogue(character core.Character, options proto.Player) *Rogue {
 	rogueOptions := options.GetRogue()
 

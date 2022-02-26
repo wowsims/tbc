@@ -435,7 +435,6 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 		sim.pendingActionPool.Put(character.gcdAction)
 	}
 	character.gcdAction = character.newGCDAction(sim, agent)
-	character.hardcastAction = character.newHardcastAction(sim)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc

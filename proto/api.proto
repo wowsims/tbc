@@ -111,6 +111,29 @@ message AuraMetrics {
 		double uptime_seconds_stdev = 3;
 }
 
+enum ResourceType {
+	ResourceTypeNone = 0;
+	ResourceTypeMana = 1;
+	ResourceTypeEnergy = 2;
+	ResourceTypeRage = 3;
+	ResourceTypeComboPoints = 4;
+}
+
+message ResourceMetrics {
+		ActionID id = 1;
+
+		ResourceType type = 2;
+
+		// # of times this action was used by the agent.
+		int32 events = 3;
+
+		// Total resource gain from this action. Will be negative for spend actions.
+		double gain = 4;
+
+		// Like gain, but doesn't include gains over resource cap.
+		double actual_gain = 5;
+}
+
 message DistributionMetrics {
     double avg   = 1;
     double stdev = 2;
@@ -130,6 +153,7 @@ message PlayerMetrics {
 
     repeated ActionMetrics actions = 5;
 		repeated AuraMetrics auras = 6;
+		repeated ResourceMetrics resources = 10;
 
 		repeated PlayerMetrics pets = 7;
 }
