@@ -336,10 +336,7 @@ func FerociousInspirationAura(numBMHunters int32) Aura {
 	return Aura{
 		ID:       FerociousInspirationAuraID,
 		ActionID: ActionID{SpellID: 34460, Tag: -1},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-			hitEffect.DamageMultiplier *= multiplier
-		},
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			spellEffect.DamageMultiplier *= multiplier
 		},
 		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
@@ -354,19 +351,13 @@ func ImprovedSanctityAura(sim *Simulation, level float64) Aura {
 	return Aura{
 		ID:       ImprovedSanctityAuraID,
 		ActionID: ActionID{SpellID: 31870},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
+		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			// unsure if this scaling should be additive or multiplicative
 			// scale 10% for holy damange
-			if ability.SpellSchool.Matches(SpellSchoolHoly) {
-				hitEffect.DamageMultiplier *= 1.1
-			}
-			// scale additional 2% for all damage
-			hitEffect.DamageMultiplier *= 1 + 0.01*level
-		},
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
 				spellEffect.DamageMultiplier *= 1.1
 			}
+			// scale additional 2% for all damage
 			spellEffect.DamageMultiplier *= 1 + 0.01*level
 		},
 		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {

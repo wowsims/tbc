@@ -169,7 +169,7 @@ func ApplyMarkOfTheChampionCaster(agent core.Agent) {
 	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: MarkOfTheChampionCasterAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 				if spellEffect.Target.MobType == proto.MobType_MobTypeDemon || spellEffect.Target.MobType == proto.MobType_MobTypeUndead {
 					spellEffect.BonusSpellPower += 85
 				}

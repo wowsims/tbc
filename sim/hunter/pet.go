@@ -179,10 +179,7 @@ func (hp *HunterPet) applyPetEffects() {
 	hp.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: PetEffectsAuraID,
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-				hitEffect.DamageMultiplier *= hp.damageMultiplier
-			},
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 				spellEffect.DamageMultiplier *= hp.damageMultiplier
 			},
 			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {

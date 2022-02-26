@@ -57,18 +57,6 @@ func (hunter *Hunter) NewArcaneShot(sim *core.Simulation, target *core.Target) *
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	as.Effect.Target = target
 
-	// Arcane shot is super weird, because its a melee ability but it uses arcane
-	// modifiers instead of physical. Luckily, CoE and Misery are the only modifiers
-	// for arcane in the game so we can hardcode them here.
-	// TODO: Remove this once auras are combined and we can get this automatically.
-	if target.HasAura(core.MiseryDebuffID) {
-		as.Effect.DamageMultiplier *= 1.05
-	}
-	if target.HasAura(core.CurseOfElementsDebuffID) {
-		level := target.NumStacks(core.CurseOfElementsDebuffID)
-		as.Effect.DamageMultiplier *= 1.1 + 0.01*float64(level)
-	}
-
 	as.Init(sim)
 
 	return as

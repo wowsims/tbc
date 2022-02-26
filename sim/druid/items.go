@@ -54,7 +54,7 @@ var ItemSetNordrassil = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: Nordrassil4pAuraID,
-					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 						agent, ok := agent.(Agent)
 						if !ok {
 							panic("why is a non-druid using nordassil regalia")

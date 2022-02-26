@@ -41,9 +41,9 @@ func applyRaceEffects(agent Agent) {
 			character.AddPermanentAura(func(sim *Simulation) Aura {
 				return Aura{
 					ID: DwarfGunSpecializationAuraID,
-					OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-						if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-							hitEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
+					OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
+						if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+							spellEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
 						}
 					},
 				}
@@ -79,20 +79,17 @@ func applyRaceEffects(agent Agent) {
 				ohMatches = true
 			}
 		}
+		procMask := GetMeleeProcMaskForHands(mhMatches, ohMatches)
 
-		if mhMatches || ohMatches {
+		if procMask != ProcMaskEmpty {
 			character.AddPermanentAura(func(sim *Simulation) Aura {
 				return Aura{
 					ID: HumanWeaponSpecializationAuraID,
-					OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-						if hitEffect.IsMH() {
-							if !mhMatches {
-								return
-							}
-						} else if !ohMatches {
+					OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
+						if !spellEffect.ProcMask.Matches(procMask) {
 							return
 						}
-						hitEffect.BonusExpertiseRating += expertiseBonus
+						spellEffect.BonusExpertiseRating += expertiseBonus
 					},
 				}
 			})
@@ -107,10 +104,7 @@ func applyRaceEffects(agent Agent) {
 				pet.AddPermanentAura(func(sim *Simulation) Aura {
 					return Aura{
 						ID: OrcCommandAuraID,
-						OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-							hitEffect.DamageMultiplier *= multiplier
-						},
-						OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+						OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 							spellEffect.DamageMultiplier *= multiplier
 						},
 						OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
@@ -175,20 +169,17 @@ func applyRaceEffects(agent Agent) {
 				ohMatches = true
 			}
 		}
+		procMask := GetMeleeProcMaskForHands(mhMatches, ohMatches)
 
-		if mhMatches || ohMatches {
+		if procMask != ProcMaskEmpty {
 			character.AddPermanentAura(func(sim *Simulation) Aura {
 				return Aura{
 					ID: OrcWeaponSpecializationAuraID,
-					OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-						if hitEffect.IsMH() {
-							if !mhMatches {
-								return
-							}
-						} else if !ohMatches {
+					OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
+						if !spellEffect.ProcMask.Matches(procMask) {
 							return
 						}
-						hitEffect.BonusExpertiseRating += expertiseBonus
+						spellEffect.BonusExpertiseRating += expertiseBonus
 					},
 				}
 			})
@@ -208,9 +199,9 @@ func applyRaceEffects(agent Agent) {
 			character.AddPermanentAura(func(sim *Simulation) Aura {
 				return Aura{
 					ID: TrollBowSpecializationAuraID,
-					OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-						if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-							hitEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
+					OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
+						if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+							spellEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
 						}
 					},
 				}
@@ -221,12 +212,7 @@ func applyRaceEffects(agent Agent) {
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return Aura{
 				ID: TrollBeastSlayingAuraID,
-				OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
-					if hitEffect.Target.MobType == proto.MobType_MobTypeBeast {
-						hitEffect.DamageMultiplier *= 1.05
-					}
-				},
-				OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+				OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 					if spellEffect.Target.MobType == proto.MobType_MobTypeBeast {
 						spellEffect.DamageMultiplier *= 1.05
 					}

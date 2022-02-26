@@ -35,20 +35,12 @@ func (paladin *Paladin) applyCrusade() {
 	paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: CrusadeAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 				target := spellEffect.Target
 
 				if target.MobType == proto.MobType_MobTypeDemon || target.MobType == proto.MobType_MobTypeHumanoid ||
 					target.MobType == proto.MobType_MobTypeUndead || target.MobType == proto.MobType_MobTypeElemental {
 					spellEffect.DamageMultiplier *= 1 + (0.01 * float64(paladin.Talents.Crusade)) // assume multiplicative scaling
-				}
-			},
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-				target := hitEffect.Target
-
-				if target.MobType == proto.MobType_MobTypeDemon || target.MobType == proto.MobType_MobTypeHumanoid ||
-					target.MobType == proto.MobType_MobTypeUndead || target.MobType == proto.MobType_MobTypeElemental {
-					hitEffect.DamageMultiplier *= 1 + (0.01 * float64(paladin.Talents.Crusade))
 				}
 			},
 			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
@@ -76,8 +68,10 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
 		paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 			return core.Aura{
 				ID: TwoHandedWeaponSpecializationAuraID,
-				OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-					hitEffect.StaticDamageMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization)) // assume multiplicative scaling
+				OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
+					if spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryPhysical) {
+						spellEffect.StaticDamageMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization)) // assume multiplicative scaling
+					}
 				},
 			}
 		})
@@ -121,14 +115,9 @@ func (paladin *Paladin) applyVengeance() {
 	paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: VengeancePermAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 				if spellCast.SpellSchool.Matches(core.SpellSchoolHoly | core.SpellSchoolPhysical) {
 					spellEffect.DamageMultiplier *= 1 + (0.01*float64(paladin.Talents.Vengeance))*float64(paladin.NumStacks(VengeanceAuraID))
-				}
-			},
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-				if ability.SpellSchool.Matches(core.SpellSchoolHoly | core.SpellSchoolPhysical) {
-					hitEffect.DamageMultiplier *= 1 + (0.01*float64(paladin.Talents.Vengeance))*float64(paladin.NumStacks(VengeanceAuraID))
 				}
 			},
 			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {

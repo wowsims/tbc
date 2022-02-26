@@ -77,16 +77,16 @@ func ApplyTalonOfAlar(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		procAura := core.Aura{
-			ID:       TalonOfAlarAuraID,
+			ID:       TalonOfAlarProcAuraID,
 			ActionID: core.ActionID{ItemID: 30448},
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-				if !ability.SameAction(SteadyShotActionID) &&
-					!ability.SameAction(MultiShotActionID) &&
-					!ability.SameAction(ArcaneShotActionID) &&
-					!ability.SameAction(AimedShotActionID) {
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
+				if !spellCast.SameAction(SteadyShotActionID) &&
+					!spellCast.SameAction(MultiShotActionID) &&
+					!spellCast.SameAction(ArcaneShotActionID) &&
+					!spellCast.SameAction(AimedShotActionID) {
 					return
 				}
-				hitEffect.DirectInput.FlatDamageBonus += 40
+				spellEffect.DirectInput.FlatDamageBonus += 40
 			},
 		}
 
@@ -101,7 +101,7 @@ func ApplyTalonOfAlar(agent core.Agent) {
 				// Add 1 in case we use arcane shot exactly off CD.
 				aura.Expires = sim.CurrentTime + time.Second*6 + 1
 
-				character.AddAuraOnNextAdvance(sim, aura)
+				character.AddAura(sim, aura)
 			},
 		}
 	})
