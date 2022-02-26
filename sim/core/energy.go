@@ -57,6 +57,7 @@ func (eb *energyBar) AddEnergy(sim *Simulation, amount float64, actionID ActionI
 	}
 
 	newEnergy := MinFloat(eb.currentEnergy+amount, eb.maxEnergy)
+	eb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeEnergy, amount, newEnergy-eb.currentEnergy)
 
 	if sim.Log != nil {
 		eb.character.Log(sim, "Gained %0.3f energy from %s (%0.3f --> %0.3f).", amount, actionID, eb.currentEnergy, newEnergy)
@@ -71,6 +72,7 @@ func (eb *energyBar) SpendEnergy(sim *Simulation, amount float64, actionID Actio
 	}
 
 	newEnergy := eb.currentEnergy - amount
+	eb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeEnergy, -amount, -amount)
 
 	if sim.Log != nil {
 		eb.character.Log(sim, "Spent %0.3f energy from %s (%0.3f --> %0.3f).", amount, actionID, eb.currentEnergy, newEnergy)

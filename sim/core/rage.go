@@ -1,5 +1,9 @@
 package core
 
+import (
+	"github.com/wowsims/tbc/sim/core/proto"
+)
+
 const MaxRage = 100.0
 
 const RageFactor = 3.75 / 274.7
@@ -63,6 +67,7 @@ func (rb *rageBar) AddRage(sim *Simulation, amount float64, actionID ActionID) {
 	}
 
 	newRage := MinFloat(rb.currentRage+amount, MaxRage)
+	rb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeRage, amount, newRage-rb.currentRage)
 
 	if sim.Log != nil {
 		rb.character.Log(sim, "Gained %0.3f rage from %s (%0.3f --> %0.3f).", amount, actionID, rb.currentRage, newRage)
@@ -77,6 +82,7 @@ func (rb *rageBar) SpendRage(sim *Simulation, amount float64, actionID ActionID)
 	}
 
 	newRage := rb.currentRage - amount
+	rb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeRage, -amount, -amount)
 
 	if sim.Log != nil {
 		rb.character.Log(sim, "Spent %0.3f rage from %s (%0.3f --> %0.3f).", amount, actionID, rb.currentRage, newRage)

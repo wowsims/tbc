@@ -48,6 +48,7 @@ func (character *Character) AddMana(sim *Simulation, amount float64, actionID Ac
 
 	oldMana := character.CurrentMana()
 	newMana := MinFloat(oldMana+amount, character.MaxMana())
+	character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeMana, amount, newMana-oldMana)
 
 	if sim.Log != nil {
 		character.Log(sim, "Gained %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, oldMana, newMana)
@@ -66,6 +67,7 @@ func (character *Character) SpendMana(sim *Simulation, amount float64, actionID 
 	}
 
 	newMana := character.CurrentMana() - amount
+	character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeMana, -amount, -amount)
 
 	if sim.Log != nil {
 		character.Log(sim, "Spent %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, character.CurrentMana(), newMana)
@@ -119,13 +121,13 @@ func (character *Character) UpdateManaRegenRates() {
 
 // Applies 1 'tick' of mana regen, which worth 2s of regeneration based on mp5/int/spirit/etc.
 func (character *Character) ManaTick(sim *Simulation) {
-	var regen float64
 	if sim.CurrentTime < character.PseudoStats.FiveSecondRuleRefreshTime {
-		regen = character.manaTickWhileCasting
+		regen := character.manaTickWhileCasting
+		character.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: 1}, false)
 	} else {
-		regen = character.manaTickWhileNotCasting
+		regen := character.manaTickWhileNotCasting
+		character.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: 2}, false)
 	}
-	character.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: 2000}, false)
 }
 
 // Returns the amount of time this Character would need to wait in order to reach

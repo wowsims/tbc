@@ -9,6 +9,7 @@ import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { PlayerMetrics as PlayerMetricsProto } from '/tbc/core/proto/api.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidMetrics as RaidMetricsProto } from '/tbc/core/proto/api.js';
+import { ResourceMetrics as ResourceMetricsProto } from '/tbc/core/proto/api.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
@@ -107,6 +108,10 @@ export class SimResult {
 
 	getMeleeMetrics(filter: SimResultFilter): Array<ActionMetrics> {
 		return this.getActionMetrics(filter).filter(e => e.hitAttempts != 0 && e.isMeleeAction);
+	}
+
+	getResourceMetrics(filter: SimResultFilter): Array<ResourceMetrics> {
+		return ResourceMetrics.joinById(this.getPlayers(filter).map(player => player.resources).flat());
 	}
 
 	getBuffMetrics(filter: SimResultFilter): Array<AuraMetrics> {
@@ -224,6 +229,7 @@ export class PlayerMetrics {
 	readonly dps: DistributionMetricsProto;
 	readonly actions: Array<ActionMetrics>;
 	readonly auras: Array<AuraMetrics>;
+	readonly resources: Array<ResourceMetrics>;
 	readonly pets: Array<PlayerMetrics>;
 	private readonly iterations: number;
 	private readonly duration: number;
@@ -246,6 +252,7 @@ export class PlayerMetrics {
 			raidIndex: number,
 			actions: Array<ActionMetrics>,
 			auras: Array<AuraMetrics>,
+			resources: Array<ResourceMetrics>,
 			pets: Array<PlayerMetrics>,
 			logs: Array<SimLog>,
 			iterations: number,
@@ -262,6 +269,7 @@ export class PlayerMetrics {
 		this.dps = this.metrics.dps!;
 		this.actions = actions;
 		this.auras = auras;
+		this.resources = resources;
 		this.pets = pets;
 		this.logs = logs;
 		this.iterations = iterations;
@@ -309,12 +317,14 @@ export class PlayerMetrics {
 
 		const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(iterations, duration, actionMetrics, raidIndex)));
 		const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(iterations, duration, auraMetrics, raidIndex)));
+		const resourcesPromise = Promise.all(metrics.resources.map(resourceMetrics => ResourceMetrics.makeNew(iterations, duration, resourceMetrics, raidIndex)));
 		const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(iterations, duration, player, petMetrics, raidIndex, true, playerLogs)));
 
 		const actions = await actionsPromise;
 		const auras = await aurasPromise;
+		const resources = await resourcesPromise;
 		const pets = await petsPromise;
-		return new PlayerMetrics(player, isPet, metrics, raidIndex, actions, auras, pets, playerLogs, iterations, duration);
+		return new PlayerMetrics(player, isPet, metrics, raidIndex, actions, auras, resources, pets, playerLogs, iterations, duration);
 	}
 }
 
@@ -414,6 +424,67 @@ export class AuraMetrics {
 	static joinById(auras: Array<AuraMetrics>): Array<AuraMetrics> {
 		const joinedById = bucket(auras, aura => aura.actionId.toString());
 		return Object.values(joinedById).map(aurasToJoin => AuraMetrics.merge(aurasToJoin));
+	}
+};
+
+export class ResourceMetrics {
+	readonly actionId: ActionId;
+	readonly name: string;
+	readonly iconUrl: string;
+	private readonly iterations: number;
+	private readonly duration: number;
+	private readonly data: ResourceMetricsProto;
+
+	private constructor(actionId: ActionId, iterations: number, duration: number, data: ResourceMetricsProto) {
+		this.actionId = actionId;
+		this.name = actionId.name;
+		this.iconUrl = actionId.iconUrl;
+		this.iterations = iterations;
+		this.duration = duration;
+		this.data = data;
+	}
+
+	get events() {
+		return this.data.events / this.iterations;
+	}
+
+	get gain() {
+		return this.data.gain / this.iterations;
+	}
+
+	get gainPerSecond() {
+		return this.data.gain / this.iterations / this.duration;
+	}
+
+	get avgGain() {
+		return this.data.gain / this.data.events;
+	}
+
+	get avgActualGain() {
+		return this.data.actualGain / this.data.events;
+	}
+
+	static async makeNew(iterations: number, duration: number, resourceMetrics: ResourceMetricsProto, playerIndex?: number): Promise<ResourceMetrics> {
+		const actionId = await ActionId.fromProto(resourceMetrics.id!).fill(playerIndex);
+		return new ResourceMetrics(actionId, iterations, duration, resourceMetrics);
+	}
+
+	// Merges an array of metrics into a single metrics.
+	static merge(resources: Array<ResourceMetrics>): ResourceMetrics {
+		const firstResource = resources[0];
+		return new ResourceMetrics(
+				firstResource.actionId, firstResource.iterations, firstResource.duration,
+				ResourceMetricsProto.create({
+					events: sum(resources.map(a => a.data.events)),
+					gain: sum(resources.map(a => a.data.gain)),
+					actualGain: sum(resources.map(a => a.data.actualGain)),
+				}));
+	}
+
+	// Merges aura metrics that have the same name/ID, adding their stats together.
+	static joinById(resources: Array<ResourceMetrics>): Array<ResourceMetrics> {
+		const joinedById = bucket(resources, aura => aura.actionId.toString());
+		return Object.values(joinedById).map(resourcesToJoin => ResourceMetrics.merge(resourcesToJoin));
 	}
 };
 
