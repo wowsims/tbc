@@ -15,16 +15,18 @@ var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: Judgeme
 
 // refactored Judgement of Blood as an ActiveMeleeAbility which is most similar to actual behavior with a typical ret build
 // but still has a few differences (differences are: does not scale off spell power, cannot be partially resisted, can be missed or dodged)
-func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
-	job := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            JudgementOfBloodActionID,
-			Character:           &paladin.Character,
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolHoly,
-			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
-			IsPhantom:           true,
+func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	job := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:            JudgementOfBloodActionID,
+				Character:           &paladin.Character,
+				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				SpellSchool:         core.SpellSchoolHoly,
+				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+				IsPhantom:           true,
+			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
@@ -32,16 +34,16 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.M
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 				IgnoreArmor:            true,
+				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
+					paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
+					paladin.RemoveAura(sim, SealOfBloodAuraID)
+					paladin.currentSeal = core.Aura{}
+				},
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage: 295,
 				MaxBaseDamage: 325,
 			},
-		},
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
-			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
-			paladin.RemoveAura(sim, SealOfBloodAuraID)
-			paladin.currentSeal = core.Aura{}
 		},
 	}
 	// Reduce mana cost if we have Benediction Talent
@@ -56,10 +58,10 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.M
 	// Increase Judgement Crit Chance if we have Fanaticism talent
 	job.Effect.BonusCritRating = 3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism)
 
-	return core.NewMeleeAbilityTemplate(job)
+	return core.NewSimpleSpellTemplate(job)
 }
 
-func (paladin *Paladin) NewJudgementOfBlood(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
+func (paladin *Paladin) NewJudgementOfBlood(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// No seal has even been active, so we can't cast judgement
 	if paladin.currentSeal.ID != SealOfBloodAuraID {
 		return nil
@@ -107,7 +109,6 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				IgnoreHitCheck: true,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					aura := core.JudgementOfTheCrusaderAura(sim, float64(paladin.Talents.ImprovedSealOfTheCrusader))
 					spellEffect.Target.AddAura(sim, aura)
@@ -157,6 +158,7 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolHoly,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: JudgementManaCost,
@@ -174,7 +176,6 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				IgnoreHitCheck: true,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					aura := core.JudgementOfWisdomAura(sim)
 					spellEffect.Target.AddAura(sim, aura)

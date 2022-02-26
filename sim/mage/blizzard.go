@@ -19,7 +19,7 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFrost,
-				SpellExtras:         core.SpellExtrasChanneled,
+				SpellExtras:         core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
 				Character:           &mage.Character,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
@@ -40,7 +40,6 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: mage.spellDamageMultiplier,
 			ThreatMultiplier:       1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
-			IgnoreHitCheck:         true,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        8,

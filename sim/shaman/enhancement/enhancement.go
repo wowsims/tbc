@@ -105,7 +105,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 		Duration: core.GCDDefault,
 		TryCast: func(sim *core.Simulation) bool {
 			ss := enh.NewStormstrike(sim, sim.GetPrimaryTarget())
-			success := ss.Attack(sim)
+			success := ss.Cast(sim)
 			if !success {
 				enh.WaitForMana(sim, ss.Cost.Value)
 			}

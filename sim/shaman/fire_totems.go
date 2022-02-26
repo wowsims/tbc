@@ -16,9 +16,10 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 			Cast: core.Cast{
 				ActionID:            core.ActionID{SpellID: SpellIDSearingTotem},
 				Character:           &shaman.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				CritRollCategory:    core.CritRollCategoryMagical,
 				SpellSchool:         core.SpellSchoolFire,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
 				BaseCost:            cost,
 				Cost:                cost,
 				GCD:                 time.Second,
@@ -30,7 +31,6 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
-				IgnoreHitCheck:         true,
 			},
 			DotInput: core.DotDamageInput{
 				// These are the real tick values, but searing totem doesn't start its next
@@ -86,9 +86,10 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 			Cast: core.Cast{
 				ActionID:            core.ActionID{SpellID: SpellIDMagmaTotem},
 				Character:           &shaman.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				CritRollCategory:    core.CritRollCategoryMagical,
 				SpellSchool:         core.SpellSchoolFire,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
 				BaseCost:            cost,
 				Cost:                cost,
 				GCD:                 time.Second,
@@ -108,7 +109,6 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
-			IgnoreHitCheck:         true,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        10,
@@ -168,9 +168,10 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 					CooldownID: CooldownIDNovaTotem,
 				},
 				Character:           &shaman.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				CritRollCategory:    core.CritRollCategoryMagical,
 				SpellSchool:         core.SpellSchoolFire,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
 				BaseCost:            cost,
 				Cost:                cost,
 				GCD:                 time.Second,
@@ -191,7 +192,6 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
-			IgnoreHitCheck:         true,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:        1,

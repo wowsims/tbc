@@ -16,15 +16,17 @@ var SealOfBloodProcActionID = core.ActionID{SpellID: 31893}
 // Handles the cast, gcd, deducts the mana cost
 func (paladin *Paladin) setupSealOfBlood() {
 	// The proc behaviour
-	sobProc := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            SealOfBloodProcActionID,
-			Character:           &paladin.Character,
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolHoly,
-			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
-			IsPhantom:           true,
+	sobProc := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:            SealOfBloodProcActionID,
+				Character:           &paladin.Character,
+				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				SpellSchool:         core.SpellSchoolHoly,
+				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+				IsPhantom:           true,
+			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
@@ -39,22 +41,22 @@ func (paladin *Paladin) setupSealOfBlood() {
 		},
 	}
 
-	sobTemplate := core.NewMeleeAbilityTemplate(sobProc)
-	sobAtk := core.ActiveMeleeAbility{}
+	sobTemplate := core.NewSimpleSpellTemplate(sobProc)
+	sobAtk := core.SimpleSpell{}
 
 	// Define the aura
 	sobAura := core.Aura{
 		ID:       SealOfBloodAuraID,
 		ActionID: SealOfBloodProcActionID,
 
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 				return
 			}
 
 			sobTemplate.Apply(&sobAtk)
 			sobAtk.Effect.Target = hitEffect.Target
-			sobAtk.Attack(sim)
+			sobAtk.Cast(sim)
 		},
 	}
 
@@ -92,14 +94,16 @@ var SealOfCommandCastActionID = core.ActionID{SpellID: 20375}
 var SealOfCommandProcActionID = core.ActionID{SpellID: 20424}
 
 func (paladin *Paladin) setupSealOfCommand() {
-	socProc := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            SealOfCommandProcActionID,
-			Character:           &paladin.Character,
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolHoly,
-			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+	socProc := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:            SealOfCommandProcActionID,
+				Character:           &paladin.Character,
+				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				SpellSchool:         core.SpellSchoolHoly,
+				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
@@ -114,8 +118,8 @@ func (paladin *Paladin) setupSealOfCommand() {
 		},
 	}
 
-	socTemplate := core.NewMeleeAbilityTemplate(socProc)
-	socAtk := core.ActiveMeleeAbility{}
+	socTemplate := core.NewSimpleSpellTemplate(socProc)
+	socAtk := core.SimpleSpell{}
 
 	ppmm := paladin.AutoAttacks.NewPPMManager(7.0)
 
@@ -127,7 +131,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 		ID:       SealOfCommandAuraID,
 		ActionID: SealOfCommandProcActionID,
 
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
 				return
 			}
@@ -144,7 +148,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 
 			socTemplate.Apply(&socAtk)
 			socAtk.Effect.Target = hitEffect.Target
-			socAtk.Attack(sim)
+			socAtk.Cast(sim)
 		},
 	}
 

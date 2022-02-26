@@ -22,10 +22,10 @@ func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
 		ID:       AspectOfTheHawkAuraID,
 		ActionID: AspectOfTheHawkActionID,
 		Expires:  core.NeverExpires,
-		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 			hitEffect.BonusAttackPower += 155
 		},
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+		OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 			// TODO: ranged white hits only
 			if !hitEffect.ProcMask.Matches(core.ProcMaskWhiteHit) {
 				return
@@ -83,7 +83,9 @@ func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.Simp
 }
 
 func (hunter *Hunter) NewAspectOfTheHawk(sim *core.Simulation) core.SimpleCast {
-	return hunter.aspectOfTheHawkTemplate
+	v := hunter.aspectOfTheHawkTemplate
+	v.Init(sim)
+	return v
 }
 
 func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.SimpleCast {
@@ -120,5 +122,7 @@ func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.Sim
 }
 
 func (hunter *Hunter) NewAspectOfTheViper(sim *core.Simulation) core.SimpleCast {
-	return hunter.aspectOfTheViperTemplate
+	v := hunter.aspectOfTheViperTemplate
+	v.Init(sim)
+	return v
 }

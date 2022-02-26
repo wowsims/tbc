@@ -41,7 +41,7 @@ func applyRaceEffects(agent Agent) {
 			character.AddPermanentAura(func(sim *Simulation) Aura {
 				return Aura{
 					ID: DwarfGunSpecializationAuraID,
-					OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+					OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
 						if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 							hitEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
 						}
@@ -84,7 +84,7 @@ func applyRaceEffects(agent Agent) {
 			character.AddPermanentAura(func(sim *Simulation) Aura {
 				return Aura{
 					ID: HumanWeaponSpecializationAuraID,
-					OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+					OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
 						if hitEffect.IsMH() {
 							if !mhMatches {
 								return
@@ -107,7 +107,7 @@ func applyRaceEffects(agent Agent) {
 				pet.AddPermanentAura(func(sim *Simulation) Aura {
 					return Aura{
 						ID: OrcCommandAuraID,
-						OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+						OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
 							hitEffect.DamageMultiplier *= multiplier
 						},
 						OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
@@ -180,7 +180,7 @@ func applyRaceEffects(agent Agent) {
 			character.AddPermanentAura(func(sim *Simulation) Aura {
 				return Aura{
 					ID: OrcWeaponSpecializationAuraID,
-					OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+					OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
 						if hitEffect.IsMH() {
 							if !mhMatches {
 								return
@@ -208,7 +208,7 @@ func applyRaceEffects(agent Agent) {
 			character.AddPermanentAura(func(sim *Simulation) Aura {
 				return Aura{
 					ID: TrollBowSpecializationAuraID,
-					OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+					OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
 						if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 							hitEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
 						}
@@ -221,7 +221,7 @@ func applyRaceEffects(agent Agent) {
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return Aura{
 				ID: TrollBeastSlayingAuraID,
-				OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+				OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
 					if hitEffect.Target.MobType == proto.MobType_MobTypeBeast {
 						hitEffect.DamageMultiplier *= 1.05
 					}

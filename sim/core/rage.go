@@ -21,7 +21,7 @@ func (character *Character) EnableRageBar(startingRage float64) {
 	character.AddPermanentAura(func(sim *Simulation) Aura {
 		return Aura{
 			ID: RageBarAuraID,
-			OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+			OnMeleeAttack: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
 				if !hitEffect.ProcMask.Matches(ProcMaskWhiteHit) {
 					return
 				}

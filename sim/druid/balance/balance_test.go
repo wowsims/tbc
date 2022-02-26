@@ -36,6 +36,12 @@ func TestBalance(t *testing.T) {
 		Debuffs:     FullDebuffs,
 
 		ItemFilter: core.ItemFilter{
+			WeaponTypes: []proto.WeaponType{
+				proto.WeaponType_WeaponTypeDagger,
+				proto.WeaponType_WeaponTypeMace,
+				proto.WeaponType_WeaponTypeOffHand,
+				proto.WeaponType_WeaponTypeStaff,
+			},
 			ArmorType: proto.ArmorType_ArmorTypeLeather,
 			RangedWeaponTypes: []proto.RangedWeaponType{
 				proto.RangedWeaponType_RangedWeaponTypeIdol,
