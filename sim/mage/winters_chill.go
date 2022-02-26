@@ -66,6 +66,10 @@ func (mage *Mage) applyWintersChill() {
 		return core.Aura{
 			ID: WintersChillAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+
 				if spellCast.SpellSchool == core.SpellSchoolFrost && spellCast.ActionID.SpellID != SpellIDWintersChill {
 					if procChance != 1.0 && sim.RandomFloat("Winters Chill") > procChance {
 						return

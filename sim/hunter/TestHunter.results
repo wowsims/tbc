@@ -749,7 +749,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-French-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1589.300931876451
+  dps: 1589.3009318764507
  }
 }
 dps_results: {
@@ -761,7 +761,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-French-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1922.0655648482946
+  dps: 1922.0655648482943
  }
 }
 dps_results: {
@@ -785,7 +785,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-French-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1191.4031495925124
+  dps: 1191.4031495925121
  }
 }
 dps_results: {
@@ -935,13 +935,13 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-French-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1845.4639702504562
+  dps: 1845.463970250456
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-French-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1642.465449029546
+  dps: 1642.4654490295457
  }
 }
 dps_results: {
