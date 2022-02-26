@@ -285,6 +285,37 @@ export interface AuraMetrics {
     uptimeSecondsStdev: number;
 }
 /**
+ * @generated from protobuf message proto.ResourceMetrics
+ */
+export interface ResourceMetrics {
+    /**
+     * @generated from protobuf field: proto.ActionID id = 1;
+     */
+    id?: ActionID;
+    /**
+     * @generated from protobuf field: proto.ResourceType type = 2;
+     */
+    type: ResourceType;
+    /**
+     * # of times this action was used by the agent.
+     *
+     * @generated from protobuf field: int32 events = 3;
+     */
+    events: number;
+    /**
+     * Total resource gain from this action. Will be negative for spend actions.
+     *
+     * @generated from protobuf field: double gain = 4;
+     */
+    gain: number;
+    /**
+     * Like gain, but doesn't include gains over resource cap.
+     *
+     * @generated from protobuf field: double actual_gain = 5;
+     */
+    actualGain: number;
+}
+/**
  * @generated from protobuf message proto.DistributionMetrics
  */
 export interface DistributionMetrics {
@@ -339,6 +370,10 @@ export interface PlayerMetrics {
      * @generated from protobuf field: repeated proto.AuraMetrics auras = 6;
      */
     auras: AuraMetrics[];
+    /**
+     * @generated from protobuf field: repeated proto.ResourceMetrics resources = 10;
+     */
+    resources: ResourceMetrics[];
     /**
      * @generated from protobuf field: repeated proto.PlayerMetrics pets = 7;
      */
@@ -628,6 +663,31 @@ export interface ProgressMetrics {
      */
     finalWeightResult?: StatWeightsResult;
 }
+/**
+ * @generated from protobuf enum proto.ResourceType
+ */
+export declare enum ResourceType {
+    /**
+     * @generated from protobuf enum value: ResourceTypeNone = 0;
+     */
+    ResourceTypeNone = 0,
+    /**
+     * @generated from protobuf enum value: ResourceTypeMana = 1;
+     */
+    ResourceTypeMana = 1,
+    /**
+     * @generated from protobuf enum value: ResourceTypeEnergy = 2;
+     */
+    ResourceTypeEnergy = 2,
+    /**
+     * @generated from protobuf enum value: ResourceTypeRage = 3;
+     */
+    ResourceTypeRage = 3,
+    /**
+     * @generated from protobuf enum value: ResourceTypeComboPoints = 4;
+     */
+    ResourceTypeComboPoints = 4
+}
 declare class Player$Type extends MessageType<Player> {
     constructor();
     create(value?: PartialMessage<Player>): Player;
@@ -688,6 +748,16 @@ declare class AuraMetrics$Type extends MessageType<AuraMetrics> {
  * @generated MessageType for protobuf message proto.AuraMetrics
  */
 export declare const AuraMetrics: AuraMetrics$Type;
+declare class ResourceMetrics$Type extends MessageType<ResourceMetrics> {
+    constructor();
+    create(value?: PartialMessage<ResourceMetrics>): ResourceMetrics;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ResourceMetrics): ResourceMetrics;
+    internalBinaryWrite(message: ResourceMetrics, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.ResourceMetrics
+ */
+export declare const ResourceMetrics: ResourceMetrics$Type;
 declare class DistributionMetrics$Type extends MessageType<DistributionMetrics> {
     constructor();
     create(value?: PartialMessage<DistributionMetrics>): DistributionMetrics;

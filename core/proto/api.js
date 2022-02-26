@@ -27,6 +27,32 @@ import { Consumes } from './common.js';
 import { EquipmentSpec } from './common.js';
 import { Class } from './common.js';
 import { Race } from './common.js';
+/**
+ * @generated from protobuf enum proto.ResourceType
+ */
+export var ResourceType;
+(function (ResourceType) {
+    /**
+     * @generated from protobuf enum value: ResourceTypeNone = 0;
+     */
+    ResourceType[ResourceType["ResourceTypeNone"] = 0] = "ResourceTypeNone";
+    /**
+     * @generated from protobuf enum value: ResourceTypeMana = 1;
+     */
+    ResourceType[ResourceType["ResourceTypeMana"] = 1] = "ResourceTypeMana";
+    /**
+     * @generated from protobuf enum value: ResourceTypeEnergy = 2;
+     */
+    ResourceType[ResourceType["ResourceTypeEnergy"] = 2] = "ResourceTypeEnergy";
+    /**
+     * @generated from protobuf enum value: ResourceTypeRage = 3;
+     */
+    ResourceType[ResourceType["ResourceTypeRage"] = 3] = "ResourceTypeRage";
+    /**
+     * @generated from protobuf enum value: ResourceTypeComboPoints = 4;
+     */
+    ResourceType[ResourceType["ResourceTypeComboPoints"] = 4] = "ResourceTypeComboPoints";
+})(ResourceType || (ResourceType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class Player$Type extends MessageType {
     constructor() {
@@ -607,6 +633,81 @@ class AuraMetrics$Type extends MessageType {
  */
 export const AuraMetrics = new AuraMetrics$Type();
 // @generated message type with reflection information, may provide speed optimized methods
+class ResourceMetrics$Type extends MessageType {
+    constructor() {
+        super("proto.ResourceMetrics", [
+            { no: 1, name: "id", kind: "message", T: () => ActionID },
+            { no: 2, name: "type", kind: "enum", T: () => ["proto.ResourceType", ResourceType] },
+            { no: 3, name: "events", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "gain", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 5, name: "actual_gain", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
+    }
+    create(value) {
+        const message = { type: 0, events: 0, gain: 0, actualGain: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.ActionID id */ 1:
+                    message.id = ActionID.internalBinaryRead(reader, reader.uint32(), options, message.id);
+                    break;
+                case /* proto.ResourceType type */ 2:
+                    message.type = reader.int32();
+                    break;
+                case /* int32 events */ 3:
+                    message.events = reader.int32();
+                    break;
+                case /* double gain */ 4:
+                    message.gain = reader.double();
+                    break;
+                case /* double actual_gain */ 5:
+                    message.actualGain = reader.double();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.ActionID id = 1; */
+        if (message.id)
+            ActionID.internalBinaryWrite(message.id, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.ResourceType type = 2; */
+        if (message.type !== 0)
+            writer.tag(2, WireType.Varint).int32(message.type);
+        /* int32 events = 3; */
+        if (message.events !== 0)
+            writer.tag(3, WireType.Varint).int32(message.events);
+        /* double gain = 4; */
+        if (message.gain !== 0)
+            writer.tag(4, WireType.Bit64).double(message.gain);
+        /* double actual_gain = 5; */
+        if (message.actualGain !== 0)
+            writer.tag(5, WireType.Bit64).double(message.actualGain);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.ResourceMetrics
+ */
+export const ResourceMetrics = new ResourceMetrics$Type();
+// @generated message type with reflection information, may provide speed optimized methods
 class DistributionMetrics$Type extends MessageType {
     constructor() {
         super("proto.DistributionMetrics", [
@@ -700,11 +801,12 @@ class PlayerMetrics$Type extends MessageType {
             { no: 3, name: "seconds_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 5, name: "actions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionMetrics },
             { no: 6, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics },
+            { no: 10, name: "resources", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ResourceMetrics },
             { no: 7, name: "pets", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PlayerMetrics }
         ]);
     }
     create(value) {
-        const message = { name: "", secondsOomAvg: 0, actions: [], auras: [], pets: [] };
+        const message = { name: "", secondsOomAvg: 0, actions: [], auras: [], resources: [], pets: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -732,6 +834,9 @@ class PlayerMetrics$Type extends MessageType {
                     break;
                 case /* repeated proto.AuraMetrics auras */ 6:
                     message.auras.push(AuraMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                    break;
+                case /* repeated proto.ResourceMetrics resources */ 10:
+                    message.resources.push(ResourceMetrics.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* repeated proto.PlayerMetrics pets */ 7:
                     message.pets.push(PlayerMetrics.internalBinaryRead(reader, reader.uint32(), options));
@@ -766,6 +871,9 @@ class PlayerMetrics$Type extends MessageType {
         /* repeated proto.AuraMetrics auras = 6; */
         for (let i = 0; i < message.auras.length; i++)
             AuraMetrics.internalBinaryWrite(message.auras[i], writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* repeated proto.ResourceMetrics resources = 10; */
+        for (let i = 0; i < message.resources.length; i++)
+            ResourceMetrics.internalBinaryWrite(message.resources[i], writer.tag(10, WireType.LengthDelimited).fork(), options).join();
         /* repeated proto.PlayerMetrics pets = 7; */
         for (let i = 0; i < message.pets.length; i++)
             PlayerMetrics.internalBinaryWrite(message.pets[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();

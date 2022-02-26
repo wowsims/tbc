@@ -9,6 +9,7 @@ import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { PlayerMetrics as PlayerMetricsProto } from '/tbc/core/proto/api.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidMetrics as RaidMetricsProto } from '/tbc/core/proto/api.js';
+import { ResourceMetrics as ResourceMetricsProto } from '/tbc/core/proto/api.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
@@ -35,6 +36,7 @@ export declare class SimResult {
     getActionMetrics(filter: SimResultFilter): Array<ActionMetrics>;
     getSpellMetrics(filter: SimResultFilter): Array<ActionMetrics>;
     getMeleeMetrics(filter: SimResultFilter): Array<ActionMetrics>;
+    getResourceMetrics(filter: SimResultFilter): Array<ResourceMetrics>;
     getBuffMetrics(filter: SimResultFilter): Array<AuraMetrics>;
     getDebuffMetrics(filter: SimResultFilter): Array<AuraMetrics>;
     toJson(): any;
@@ -70,6 +72,7 @@ export declare class PlayerMetrics {
     readonly dps: DistributionMetricsProto;
     readonly actions: Array<ActionMetrics>;
     readonly auras: Array<AuraMetrics>;
+    readonly resources: Array<ResourceMetrics>;
     readonly pets: Array<PlayerMetrics>;
     private readonly iterations;
     private readonly duration;
@@ -118,6 +121,23 @@ export declare class AuraMetrics {
     static makeNew(iterations: number, duration: number, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics>;
     static merge(auras: Array<AuraMetrics>): AuraMetrics;
     static joinById(auras: Array<AuraMetrics>): Array<AuraMetrics>;
+}
+export declare class ResourceMetrics {
+    readonly actionId: ActionId;
+    readonly name: string;
+    readonly iconUrl: string;
+    private readonly iterations;
+    private readonly duration;
+    private readonly data;
+    private constructor();
+    get events(): number;
+    get gain(): number;
+    get gainPerSecond(): number;
+    get avgGain(): number;
+    get avgActualGain(): number;
+    static makeNew(iterations: number, duration: number, resourceMetrics: ResourceMetricsProto, playerIndex?: number): Promise<ResourceMetrics>;
+    static merge(resources: Array<ResourceMetrics>): ResourceMetrics;
+    static joinById(resources: Array<ResourceMetrics>): Array<ResourceMetrics>;
 }
 export declare class ActionMetrics {
     readonly actionId: ActionId;

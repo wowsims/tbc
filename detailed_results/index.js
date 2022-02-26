@@ -4,6 +4,7 @@ import { ResultsFilter } from './results_filter.js';
 import { CastMetrics } from './cast_metrics.js';
 import { MeleeMetrics } from './melee_metrics.js';
 import { SpellMetrics } from './spell_metrics.js';
+import { ResourceMetrics } from './resource_metrics.js';
 import { PlayerDamageMetrics } from './player_damage.js';
 import { AuraMetrics } from './aura_metrics.js';
 import { DpsHistogram } from './dps_histogram.js';
@@ -49,6 +50,7 @@ const layoutHTML = `
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#buffsTab">BUFFS</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#debuffsTab">DEBUFFS</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#castsTab">CASTS</a></li>
+		<li class="dr-tab-tab"><a data-toggle="tab" href="#resourcesTab">RESOURCES</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#timelineTab" id="timelineTabTab">TIMELINE</a></li>
 	</ul>
 	<div class="tab-content">
@@ -88,6 +90,12 @@ const layoutHTML = `
 				</div>
 			</div>
 		</div>
+		<div id="resourcesTab" class="tab-pane dr-tab-content resources-content fade">
+			<div class="dr-row">
+				<div class="resource-metrics">
+				</div>
+			</div>
+		</div>
 		<div id="timelineTab" class="tab-pane dr-tab-content timeline-content fade">
 			<div class="dr-row">
 				<div class="timeline">
@@ -110,6 +118,7 @@ const percentOom = new PercentOom({ parent: toplineResultsDiv, resultsEmitter: r
 const castMetrics = new CastMetrics({ parent: document.body.getElementsByClassName('cast-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const meleeMetrics = new MeleeMetrics({ parent: document.body.getElementsByClassName('melee-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const spellMetrics = new SpellMetrics({ parent: document.body.getElementsByClassName('spell-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const resourceMetrics = new ResourceMetrics({ parent: document.body.getElementsByClassName('resource-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const playerDamageMetrics = new PlayerDamageMetrics({ parent: document.body.getElementsByClassName('player-damage-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings }, resultsFilter);
 const buffAuraMetrics = new AuraMetrics({
     parent: document.body.getElementsByClassName('buff-aura-metrics')[0],
