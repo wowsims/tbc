@@ -215,10 +215,10 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 		return core.Aura{
 			ID: ShiffarsNexusHornAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
-					return // TLC can't proc Sextant
+				if icd.IsOnCD(sim) || !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellCast.IsPhantom {
+					return
 				}
-				if icd.IsOnCD(sim) || spellEffect.Outcome.Matches(core.OutcomeCrit) && sim.RandomFloat("Shiffar's Nexus-Horn") > 0.2 {
+				if sim.RandomFloat("Shiffar's Nexus-Horn") > 0.2 {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + dur)
@@ -239,7 +239,10 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 
 		return core.Aura{
 			ID: EyeOfMagtheridonAuraID,
-			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Outcome.Matches(core.OutcomeMiss) {
+					return
+				}
 				character.AddAuraWithTemporaryStats(sim, RecurringPowerAuraID, core.ActionID{ItemID: 28789}, stats.SpellPower, spellBonus, dur)
 			},
 		}
@@ -260,11 +263,11 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 		return core.Aura{
 			ID: SextantOfUnstableCurrentsAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.ActionID.ItemID == core.ItemIDTheLightningCapacitor {
-					return // TLC can't proc Sextant
+				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || icd.IsOnCD(sim) || spellCast.IsPhantom {
+					return
 				}
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || icd.IsOnCD(sim) || sim.RandomFloat("Sextant of Unstable Currents") > 0.2 {
-					return // if not crit, or on cd, or didn't proc, dont activate
+				if sim.RandomFloat("Sextant of Unstable Currents") > 0.2 {
+					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				character.AddAuraWithTemporaryStats(sim, UnstableCurrentsAuraID, core.ActionID{ItemID: 30626}, stats.SpellPower, spellBonus, dur)
@@ -312,6 +315,9 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 				})
 			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
 				if spellStacks < 10 {
 					spellStacks++
 					character.AddStat(stats.SpellPower, spellBonus)

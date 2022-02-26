@@ -29,6 +29,9 @@ var ItemSetMalorne = core.ItemSet{
 				return core.Aura{
 					ID: Malorne2PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if !spellEffect.Landed() {
+							return
+						}
 						if sim.RandomFloat("malorne 2p") > 0.05 {
 							return
 						}
@@ -134,14 +137,6 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, actionID, stats.SpellPower, spellBonus, dur)
 				}
 			},
-			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.ActionID.SpellID == SpellIDMoonfire {
-					if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
-						return
-					}
-					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, actionID, stats.SpellPower, spellBonus, dur)
-				}
-			},
 		}
 	})
 }
@@ -162,14 +157,6 @@ func ApplyAshtongueTalisman(agent core.Agent) {
 		return core.Aura{
 			ID: AshtongueTalismanItemAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
-					if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
-						return
-					}
-					char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, actionID, stats.SpellPower, spellBonus, dur)
-				}
-			},
-			OnSpellMiss: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
 					if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
 						return

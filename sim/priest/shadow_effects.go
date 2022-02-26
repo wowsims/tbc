@@ -72,6 +72,9 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 				}
 			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
 				priest.ApplyShadowWeaving(sim, spellEffect.Target)
 				if spellEffect.Damage > 0 && priest.VTSpell.Effect.DotInput.IsTicking(sim) {
 					amount := spellEffect.Damage * 0.05

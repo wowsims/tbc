@@ -74,7 +74,6 @@ type Aura struct {
 	onCastCompleteIndex         int32 // Position of this aura's index in the sim.onCastCompleteIDs array.
 	onBeforeSpellHitIndex       int32 // Position of this aura's index in the sim.onBeforeSpellHitIDs array.
 	onSpellHitIndex             int32 // Position of this aura's index in the sim.onSpellHitIDs array.
-	onSpellMissIndex            int32 // Position of this aura's index in the sim.onSpellMissIDs array.
 	onBeforePeriodicDamageIndex int32 // Position of this aura's index in the sim.onBeforePeriodicDamageIDs array.
 	onPeriodicDamageIndex       int32 // Position of this aura's index in the sim.onPeriodicDamageIDs array.
 	OnMeleeAttackIndex          int32 // Position of this aura's index in the sim.OnMeleeAttack array.
@@ -95,9 +94,6 @@ type Aura struct {
 	// Invoked when a spell hits, after results are calculated. Results can be modified by changing
 	// properties of result.
 	OnSpellHit OnSpellHit
-
-	// Invoked when a spell is fully resisted.
-	OnSpellMiss OnSpellMiss
 
 	// Invoked when this Aura expires.
 	OnExpire OnExpire
@@ -159,7 +155,6 @@ type auraTracker struct {
 	onCastCompleteIDs         []AuraID
 	onBeforeSpellHitIDs       []AuraID
 	onSpellHitIDs             []AuraID
-	onSpellMissIDs            []AuraID
 	onBeforePeriodicDamageIDs []AuraID
 	onPeriodicDamageIDs       []AuraID
 	onMeleeAttackIDs          []AuraID
@@ -183,7 +178,6 @@ func newAuraTracker(useDebuffIDs bool) auraTracker {
 		onCastCompleteIDs:         make([]AuraID, 0, 16),
 		onBeforeSpellHitIDs:       make([]AuraID, 0, 16),
 		onSpellHitIDs:             make([]AuraID, 0, 16),
-		onSpellMissIDs:            make([]AuraID, 0, 16),
 		onBeforePeriodicDamageIDs: make([]AuraID, 0, 16),
 		onPeriodicDamageIDs:       make([]AuraID, 0, 16),
 		onMeleeAttackIDs:          make([]AuraID, 0, 16),
@@ -229,7 +223,6 @@ func (at *auraTracker) reset(sim *Simulation) {
 	at.onCastCompleteIDs = at.onCastCompleteIDs[:0]
 	at.onBeforeSpellHitIDs = at.onBeforeSpellHitIDs[:0]
 	at.onSpellHitIDs = at.onSpellHitIDs[:0]
-	at.onSpellMissIDs = at.onSpellMissIDs[:0]
 	at.onBeforePeriodicDamageIDs = at.onBeforePeriodicDamageIDs[:0]
 	at.onPeriodicDamageIDs = at.onPeriodicDamageIDs[:0]
 	at.onMeleeAttackIDs = at.onMeleeAttackIDs[:0]
@@ -314,7 +307,6 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 	newAura.onCastCompleteIndex = old.onCastCompleteIndex
 	newAura.onBeforeSpellHitIndex = old.onBeforeSpellHitIndex
 	newAura.onSpellHitIndex = old.onSpellHitIndex
-	newAura.onSpellMissIndex = old.onSpellMissIndex
 	newAura.onBeforePeriodicDamageIndex = old.onBeforePeriodicDamageIndex
 	newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
 	newAura.OnMeleeAttackIndex = old.OnMeleeAttackIndex
@@ -358,11 +350,6 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 	if newAura.OnSpellHit != nil {
 		at.auras[newAura.ID].onSpellHitIndex = int32(len(at.onSpellHitIDs))
 		at.onSpellHitIDs = append(at.onSpellHitIDs, newAura.ID)
-	}
-
-	if newAura.OnSpellMiss != nil {
-		at.auras[newAura.ID].onSpellMissIndex = int32(len(at.onSpellMissIDs))
-		at.onSpellMissIDs = append(at.onSpellMissIDs, newAura.ID)
 	}
 
 	if newAura.OnBeforePeriodicDamage != nil {
@@ -434,14 +421,6 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 		at.onSpellHitIDs = removeBySwappingToBack(at.onSpellHitIDs, removeOnSpellHitIndex)
 		if removeOnSpellHitIndex < int32(len(at.onSpellHitIDs)) {
 			at.auras[at.onSpellHitIDs[removeOnSpellHitIndex]].onSpellHitIndex = removeOnSpellHitIndex
-		}
-	}
-
-	if at.auras[id].OnSpellMiss != nil {
-		removeOnSpellMissIndex := at.auras[id].onSpellMissIndex
-		at.onSpellMissIDs = removeBySwappingToBack(at.onSpellMissIDs, removeOnSpellMissIndex)
-		if removeOnSpellMissIndex < int32(len(at.onSpellMissIDs)) {
-			at.auras[at.onSpellMissIDs[removeOnSpellMissIndex]].onSpellMissIndex = removeOnSpellMissIndex
 		}
 	}
 
@@ -555,13 +534,6 @@ func (at *auraTracker) OnCastComplete(sim *Simulation, cast *Cast) {
 func (at *auraTracker) OnBeforeSpellHit(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 	for _, id := range at.onBeforeSpellHitIDs {
 		at.auras[id].OnBeforeSpellHit(sim, spellCast, spellEffect)
-	}
-}
-
-// Invokes the OnSpellMiss event for all tracked Auras.
-func (at *auraTracker) OnSpellMiss(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-	for _, id := range at.onSpellMissIDs {
-		at.auras[id].OnSpellMiss(sim, spellCast, spellEffect)
 	}
 }
 

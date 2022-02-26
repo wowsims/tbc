@@ -32,6 +32,9 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 		return core.Aura{
 			ID: RobeOfTheElderScribeAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
 				if icd.IsOnCD(sim) || sim.RandomFloat("Robe of the Elder Scribe") > proc { // can't activate if on CD or didn't proc
 					return
 				}
@@ -58,6 +61,9 @@ func ApplyEternalSage(agent core.Agent) {
 		return core.Aura{
 			ID: EternalSageItemAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
 				if icd.IsOnCD(sim) || sim.RandomFloat("Band of the Eternal Sage") > proc { // can't activate if on CD or didn't proc
 					return
 				}

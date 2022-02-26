@@ -56,6 +56,10 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 	if mage.Talents.ImprovedScorch > 0 {
 		procChance := float64(mage.Talents.ImprovedScorch) / 3.0
 		spell.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() {
+				return
+			}
+
 			// Don't overwrite the permanent version.
 			if spellEffect.Target.RemainingAuraDuration(sim, core.ImprovedScorchDebuffID) == core.NeverExpires {
 				return

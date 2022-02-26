@@ -16,9 +16,6 @@ type OnBeforeSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *S
 // or anything that comes from the final result of the spell.
 type OnSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect)
 
-// Callback for after a spell is fully resisted on a target.
-type OnSpellMiss func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect)
-
 // OnBeforePeriodicDamage is called when dots tick, before damage is calculated.
 // Use it to modify the spell damage or results.
 type OnBeforePeriodicDamage func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64)
@@ -95,7 +92,6 @@ type SpellEffect struct {
 
 	// Callbacks for providing additional custom behavior.
 	OnSpellHit    OnSpellHit
-	OnSpellMiss   OnSpellMiss
 	OnMeleeAttack OnMeleeAttack
 
 	// Results
@@ -145,7 +141,6 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *Simpl
 }
 
 func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spell *SimpleSpell) {
-
 	if spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) {
 		spell.Character.OnMeleeAttack(sim, spell, spellEffect)
 		spellEffect.Target.OnMeleeAttack(sim, spell, spellEffect)
@@ -153,19 +148,11 @@ func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spell *Simple
 			spellEffect.OnMeleeAttack(sim, spell, spellEffect)
 		}
 	} else {
-		if spellEffect.Landed() {
-			if spellEffect.OnSpellHit != nil {
-				spellEffect.OnSpellHit(sim, &spell.SpellCast, spellEffect)
-			}
-			spell.Character.OnSpellHit(sim, &spell.SpellCast, spellEffect)
-			spellEffect.Target.OnSpellHit(sim, &spell.SpellCast, spellEffect)
-		} else {
-			if spellEffect.OnSpellMiss != nil {
-				spellEffect.OnSpellMiss(sim, &spell.SpellCast, spellEffect)
-			}
-			spell.Character.OnSpellMiss(sim, &spell.SpellCast, spellEffect)
-			spellEffect.Target.OnSpellMiss(sim, &spell.SpellCast, spellEffect)
+		if spellEffect.OnSpellHit != nil {
+			spellEffect.OnSpellHit(sim, &spell.SpellCast, spellEffect)
 		}
+		spell.Character.OnSpellHit(sim, &spell.SpellCast, spellEffect)
+		spellEffect.Target.OnSpellHit(sim, &spell.SpellCast, spellEffect)
 	}
 }
 
@@ -363,7 +350,7 @@ func (hitEffect *SpellHitEffect) onDotComplete(sim *Simulation, spellCast *Spell
 
 func (spellEffect *SpellEffect) String() string {
 	outcomeStr := spellEffect.Outcome.String()
-	if !spellEffect.Outcome.Matches(OutcomeLanded) {
+	if !spellEffect.Landed() {
 		return outcomeStr
 	}
 
