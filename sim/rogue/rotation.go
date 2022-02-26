@@ -21,9 +21,9 @@ func (rogue *Rogue) doRotation(sim *core.Simulation) {
 
 	if rogue.comboPoints == 5 {
 		if energy >= rogue.eviscerateEnergyCost {
-			rogue.NewEviscerate(sim, sim.GetPrimaryTarget()).Attack(sim)
+			rogue.NewEviscerate(sim, sim.GetPrimaryTarget()).Cast(sim)
 		}
 	} else if energy >= rogue.builderEnergyCost {
-		rogue.newBuilder(sim, sim.GetPrimaryTarget()).Attack(sim)
+		rogue.newBuilder(sim, sim.GetPrimaryTarget()).Cast(sim)
 	}
 }

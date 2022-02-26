@@ -37,7 +37,7 @@ type Agent interface {
 	// This is different from Aura.OnMeleeAttack in that it is invoked fully after
 	// everything related to the attack is complete, and it is only invoked for
 	// auto attacks (white hits or white-hit-replacers).
-	OnAutoAttack(sim *Simulation, ability *ActiveMeleeAbility)
+	OnAutoAttack(sim *Simulation, ability *SimpleSpell)
 }
 
 type ActionID struct {

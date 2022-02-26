@@ -21,7 +21,7 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         core.SpellExtrasBinary,
+				SpellExtras:         core.SpellExtrasBinary | core.SpellExtrasAlwaysHits,
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -29,7 +29,6 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
-				IgnoreHitCheck:         true,
 			},
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:         2,

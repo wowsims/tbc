@@ -68,7 +68,7 @@ var ItemSetDeathmantle = core.ItemSet{
 			rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: Deathmantle4PcAuraID,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 						if !hitEffect.Landed() {
 							return
 						}
@@ -119,7 +119,7 @@ func ApplyWarpSpringCoil(agent core.Agent) {
 
 		return core.Aura{
 			ID: WarpSpringCoilAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if !hitEffect.Landed() {
 					return
 				}

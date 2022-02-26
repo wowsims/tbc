@@ -79,17 +79,15 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 					SpellID: SpellIDFireball,
 					Tag:     CastTagFireballDot,
 				},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
+				Character:        &mage.Character,
+				CritRollCategory: core.CritRollCategoryMagical,
+				SpellSchool:      core.SpellSchoolFire,
 			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
-				IgnoreHitCheck:         true,
 			},
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:        4,

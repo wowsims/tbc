@@ -43,7 +43,7 @@ func (paladin *Paladin) applyCrusade() {
 					spellEffect.DamageMultiplier *= 1 + (0.01 * float64(paladin.Talents.Crusade)) // assume multiplicative scaling
 				}
 			},
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				target := hitEffect.Target
 
 				if target.MobType == proto.MobType_MobTypeDemon || target.MobType == proto.MobType_MobTypeHumanoid ||
@@ -76,7 +76,7 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
 		paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 			return core.Aura{
 				ID: TwoHandedWeaponSpecializationAuraID,
-				OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+				OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 					hitEffect.StaticDamageMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization)) // assume multiplicative scaling
 				},
 			}
@@ -126,7 +126,7 @@ func (paladin *Paladin) applyVengeance() {
 					spellEffect.DamageMultiplier *= 1 + (0.01*float64(paladin.Talents.Vengeance))*float64(paladin.NumStacks(VengeanceAuraID))
 				}
 			},
-			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 				if ability.SpellSchool.Matches(core.SpellSchoolHoly | core.SpellSchoolPhysical) {
 					hitEffect.DamageMultiplier *= 1 + (0.01*float64(paladin.Talents.Vengeance))*float64(paladin.NumStacks(VengeanceAuraID))
 				}
@@ -143,7 +143,7 @@ func (paladin *Paladin) applyVengeance() {
 					paladin.ReplaceAura(sim, vng)
 				}
 			},
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
 				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
 					vng.Stacks = core.MinInt32(3, paladin.NumStacks(VengeanceAuraID)+1)
 					vng.Expires = sim.CurrentTime + VengeanceDuration

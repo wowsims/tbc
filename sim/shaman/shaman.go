@@ -126,8 +126,8 @@ type Shaman struct {
 	chainLightningCastTemplate    core.SimpleSpellTemplate
 	chainLightningLOCastTemplates []core.SimpleSpellTemplate
 
-	stormstrikeTemplate core.MeleeAbilityTemplate
-	stormstrikeSpell    core.ActiveMeleeAbility
+	stormstrikeTemplate core.SimpleSpellTemplate
+	stormstrikeSpell    core.SimpleSpell
 
 	// Shocks
 	shockSpell         core.SimpleSpell

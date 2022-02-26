@@ -232,7 +232,7 @@ func applyAdamantiteSharpeningStoneAura(character *Character, consumes proto.Con
 	character.AddPermanentAura(func(sim *Simulation) Aura {
 		return Aura{
 			ID: AdamantiteSharpeningStoneMeleeCritAuraID,
-			OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+			OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
 				if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 					hitEffect.BonusCritRating += critBonus
 				}
@@ -247,7 +247,7 @@ func ElixirOfDemonslayingAura() Aura {
 	return Aura{
 		ID:       ElixirOfDemonslayingAuraID,
 		ActionID: ActionID{ItemID: 9224},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+		OnBeforeMeleeHit: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect) {
 			if hitEffect.Target.MobType == proto.MobType_MobTypeDemon {
 				hitEffect.BonusAttackPower += 265
 			}
@@ -833,7 +833,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				const procChance = 0.185
 
 				aura := character.NewAuraWithTemporaryStats(sim, ConjuredAuraID, actionID, stats.FireSpellPower, fireBonus, dur)
-				aura.OnMeleeAttack = func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
+				aura.OnMeleeAttack = func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
 					if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || ability.IsPhantom {
 						return
 					}

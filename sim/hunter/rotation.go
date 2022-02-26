@@ -39,7 +39,7 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 	}
 }
 
-func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
+func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.SimpleSpell) {
 	hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
 	if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 		return
@@ -50,7 +50,7 @@ func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.ActiveMel
 func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 	if sim.CurrentTime == 0 {
 		if hunter.Rotation.PrecastAimedShot && hunter.Talents.AimedShot {
-			hunter.NewAimedShot(sim, sim.GetPrimaryTarget()).Attack(sim)
+			hunter.NewAimedShot(sim, sim.GetPrimaryTarget()).Cast(sim)
 		}
 		hunter.AutoAttacks.SwingRanged(sim, sim.GetPrimaryTarget())
 		return
@@ -305,7 +305,7 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 	case OptionArcane:
 		if !hunter.tryUsePrioGCD(sim) {
 			as := hunter.NewArcaneShot(sim, target)
-			if success := as.Attack(sim); success {
+			if success := as.Cast(sim); success {
 				// Arcane is instant, so we can try another action immediately.
 				hunter.rotation(sim, false)
 			} else {
@@ -348,13 +348,13 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 
 	if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !target.HasAura(ScorpidStingDebuffID) {
 		ss := hunter.NewScorpidSting(sim, target)
-		if success := ss.Attack(sim); !success {
+		if success := ss.Cast(sim); !success {
 			hunter.WaitForMana(sim, ss.Cost.Value)
 		}
 		return true
 	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_SerpentSting && !hunter.serpentStingDot.IsInUse() {
 		ss := hunter.NewSerpentSting(sim, target)
-		if success := ss.Attack(sim); !success {
+		if success := ss.Cast(sim); !success {
 			hunter.WaitForMana(sim, ss.Cost.Value)
 		}
 		return true

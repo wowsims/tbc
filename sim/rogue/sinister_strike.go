@@ -14,22 +14,24 @@ func (rogue *Rogue) SinisterStrikeEnergyCost() float64 {
 	return 45.0 - 2.5*float64(rogue.Talents.ImprovedSinisterStrike)
 }
 
-func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
+func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	energyCost := rogue.SinisterStrikeEnergyCost()
 	refundAmount := energyCost * 0.8
-	ability := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            SinisterStrikeActionID,
-			Character:           &rogue.Character,
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolPhysical,
-			GCD:                 time.Second * 1,
-			Cost: core.ResourceCost{
-				Type:  stats.Energy,
-				Value: energyCost,
+	ability := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:            SinisterStrikeActionID,
+				Character:           &rogue.Character,
+				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				SpellSchool:         core.SpellSchoolPhysical,
+				GCD:                 time.Second * 1,
+				Cost: core.ResourceCost{
+					Type:  stats.Energy,
+					Value: energyCost,
+				},
+				CritMultiplier: rogue.critMultiplier(true, true),
 			},
-			CritMultiplier: rogue.critMultiplier(true, true),
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
@@ -37,18 +39,18 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.MeleeAb
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
+				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
+					if hitEffect.Landed() {
+						rogue.AddComboPoint(sim)
+					} else {
+						rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+					}
+				},
 			},
 			WeaponInput: core.WeaponDamageInput{
 				DamageMultiplier: 1,
 				FlatDamageBonus:  98,
 			},
-		},
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
-			if hitEffect.Landed() {
-				rogue.AddComboPoint(sim)
-			} else {
-				rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
-			}
 		},
 	}
 
@@ -60,10 +62,10 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.MeleeAb
 		ability.Effect.StaticDamageMultiplier *= 1.06
 	}
 
-	return core.NewMeleeAbilityTemplate(ability)
+	return core.NewSimpleSpellTemplate(ability)
 }
 
-func (rogue *Rogue) NewSinisterStrike(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
+func (rogue *Rogue) NewSinisterStrike(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	ss := &rogue.sinisterStrike
 	rogue.sinisterStrikeTemplate.Apply(ss)
 

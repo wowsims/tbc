@@ -220,7 +220,7 @@ func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 
 		return core.Aura{
 			ID: AshtongueTalismanOfVisionAuraID,
-			OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
+			OnCast: func(sim *core.Simulation, ability *core.Cast) {
 				if !ability.SameAction(StormstrikeActionID) {
 					return
 				}
