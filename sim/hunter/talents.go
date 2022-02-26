@@ -277,12 +277,7 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		ID:       BestialWrathAuraID,
 		ActionID: actionID,
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			if cast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryPhysical) {
-				cast.Cost.Value *= 0.8
-			} else {
-				// TODO: Remove this 'if' block and only keep this case.
-				cast.Cost.Value -= cast.BaseCost.Value * 0.2
-			}
+			cast.Cost.Value -= cast.BaseCost.Value * 0.2
 		},
 		OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
 			hitEffect.DamageMultiplier *= 1.1
@@ -410,11 +405,6 @@ func (hunter *Hunter) applySlaying() {
 		return core.Aura{
 			ID: SlayingAuraID,
 			OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellHitEffect) {
-				if hitEffect == nil {
-					panic("null hit effect")
-				} else if hitEffect.Target == nil {
-					panic("nil target")
-				}
 				if hitEffect.Target.MobType == proto.MobType_MobTypeBeast || hitEffect.Target.MobType == proto.MobType_MobTypeGiant || hitEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
 					hitEffect.DamageMultiplier *= monsterMultiplier
 				} else if hitEffect.Target.MobType == proto.MobType_MobTypeHumanoid {
