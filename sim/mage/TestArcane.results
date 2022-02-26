@@ -263,7 +263,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-EyeofMagtheridon-28789"
  value: {
-  dps: 1131.6320249857602
+  dps: 1130.5170669807603
  }
 }
 dps_results: {
@@ -455,7 +455,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
-  dps: 1139.8197949495416
+  dps: 1131.8499133186044
  }
 }
 dps_results: {

@@ -26,6 +26,10 @@ func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpell
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 
 	spell.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		if !spellEffect.Landed() {
+			return
+		}
+
 		// Don't overwrite the permanent version.
 		if spellEffect.Target.RemainingAuraDuration(sim, core.WintersChillDebuffID) == core.NeverExpires {
 			return
@@ -62,6 +66,10 @@ func (mage *Mage) applyWintersChill() {
 		return core.Aura{
 			ID: WintersChillAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+
 				if spellCast.SpellSchool == core.SpellSchoolFrost && spellCast.ActionID.SpellID != SpellIDWintersChill {
 					if procChance != 1.0 && sim.RandomFloat("Winters Chill") > procChance {
 						return

@@ -102,6 +102,9 @@ func (mage *Mage) applyArcaneConcentration() {
 				cast.BonusCritRating += bonusCrit
 			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
 				if spellCast.IsSpellAction(SpellIDArcaneMissiles) {
 					// Arcane missle bolts shouldn't proc clearcasting.
 					return
@@ -299,6 +302,9 @@ func (mage *Mage) registerCombustionCD() {
 						cast.BonusCritRating += float64(numHits) * 10 * core.SpellCritRatingPerCritChance
 					},
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if !spellEffect.Landed() {
+							return
+						}
 						numHits++
 						if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 							numCrits++

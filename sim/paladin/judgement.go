@@ -110,6 +110,9 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if !spellEffect.Landed() {
+						return
+					}
 					aura := core.JudgementOfTheCrusaderAura(sim, float64(paladin.Talents.ImprovedSealOfTheCrusader))
 					spellEffect.Target.AddAura(sim, aura)
 					paladin.currentJudgement = aura
@@ -177,6 +180,9 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if !spellEffect.Landed() {
+						return
+					}
 					aura := core.JudgementOfWisdomAura(sim)
 					spellEffect.Target.AddAura(sim, aura)
 					paladin.currentJudgement = aura

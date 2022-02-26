@@ -165,6 +165,10 @@ func JudgementOfWisdomAura(sim *Simulation) Aura {
 		ActionID: actionID,
 		Expires:  sim.CurrentTime + time.Second*20,
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			// TODO: This check is purely to maintain behavior during refactoring. Should be removed when possible.
+			if !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) && !spellEffect.Landed() {
+				return
+			}
 			if spellCast.IsPhantom {
 				return // Phantom spells (Romulo's, Lightning Capacitor, etc) don't proc JoW.
 			}

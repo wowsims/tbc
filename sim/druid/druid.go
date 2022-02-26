@@ -86,12 +86,6 @@ func (druid *Druid) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // does nothing
 }
 
-func (druid *Druid) applyOnHitTalents(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-	if druid.Talents.NaturesGrace && spellEffect.Outcome.Matches(core.OutcomeCrit) {
-		druid.NaturesGrace = true
-	}
-}
-
 func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
 	if druid.NaturesGrace {
 		spellCast.CastTime -= time.Millisecond * 500

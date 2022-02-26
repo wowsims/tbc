@@ -41,6 +41,9 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
 				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if !spellEffect.Landed() {
+						return
+					}
 					fireballDot := mage.newFireballDot(sim, spellEffect.Target)
 					fireballDot.Cast(sim)
 				},
