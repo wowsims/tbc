@@ -1512,6 +1512,14 @@ export declare enum WeaponImbue {
      */
     WeaponImbueSuperiorWizardOil = 4,
     /**
+     * @generated from protobuf enum value: WeaponImbueRogueDeadlyPoison = 10;
+     */
+    WeaponImbueRogueDeadlyPoison = 10,
+    /**
+     * @generated from protobuf enum value: WeaponImbueRogueInstantPoison = 11;
+     */
+    WeaponImbueRogueInstantPoison = 11,
+    /**
      * @generated from protobuf enum value: WeaponImbueShamanFlametongue = 6;
      */
     WeaponImbueShamanFlametongue = 6,

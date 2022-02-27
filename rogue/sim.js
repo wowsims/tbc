@@ -155,6 +155,8 @@ export class RogueSimUI extends IndividualSimUI {
                 ],
                 alcohol: [],
                 weaponImbues: [
+                    WeaponImbue.WeaponImbueRogueDeadlyPoison,
+                    WeaponImbue.WeaponImbueRogueInstantPoison,
                     WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
                     WeaponImbue.WeaponImbueAdamantiteWeightstone,
                 ],
