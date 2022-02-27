@@ -353,6 +353,7 @@ func ApplyDespair(agent core.Agent) {
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical,
+				SpellExtras:         core.SpellExtrasIgnoreResists,
 				CritMultiplier:      character.DefaultMeleeCritMultiplier(),
 				IsPhantom:           true,
 			},
@@ -365,7 +366,6 @@ func ApplyDespair(agent core.Agent) {
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				IgnoreArmor:            true,
 			},
 			DirectInput: core.DirectDamageInput{
 				FlatDamageBonus: 600,
@@ -412,6 +412,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical,
+				SpellExtras:         core.SpellExtrasIgnoreResists,
 				CritMultiplier:      character.DefaultMeleeCritMultiplier(),
 				IsPhantom:           true,
 			},
@@ -422,7 +423,6 @@ func ApplyTheDecapitator(agent core.Agent) {
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				IgnoreArmor:            true,
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage: 513,

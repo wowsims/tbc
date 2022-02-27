@@ -121,7 +121,7 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 
 	if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
 		// Dodge
-		if !ahe.CannotBeDodged {
+		if !ability.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
 			dodge := ahe.Target.Dodge
 			expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
 			chance += dodge - expertisePercentage
@@ -230,7 +230,7 @@ func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell
 	}
 
 	// Apply armor reduction.
-	if !ahe.IgnoreArmor { // TODO: replace with SpellExtras
+	if !ability.SpellExtras.Matches(SpellExtrasIgnoreResists) {
 		dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
 	}
 

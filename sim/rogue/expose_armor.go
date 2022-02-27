@@ -52,7 +52,7 @@ func (rogue *Rogue) newExposeArmorTemplate(sim *core.Simulation) core.SimpleSpel
 	}
 
 	if rogue.Talents.SurpriseAttacks {
-		ability.Effect.CannotBeDodged = true
+		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}
 
 	return core.NewSimpleSpellTemplate(ability)

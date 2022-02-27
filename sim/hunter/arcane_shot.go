@@ -20,6 +20,7 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpe
 				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolArcane,
+				SpellExtras:         core.SpellExtrasIgnoreResists,
 				GCD:                 core.GCDDefault,
 				IgnoreHaste:         true,
 				Cooldown:            time.Second * 6,
@@ -34,7 +35,6 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpe
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				IgnoreArmor:            true,
 			},
 			WeaponInput: core.WeaponDamageInput{
 				CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
