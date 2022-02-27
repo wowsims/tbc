@@ -85,11 +85,11 @@ func (pet *Pet) addOwnerStat(stat stats.Stat, addedAmount float64) {
 
 // This needs to be called after owner stats are finalized so we can inherit the
 // final values.
-func (pet *Pet) Finalize() {
+func (pet *Pet) Finalize(raid *Raid) {
 	inheritedStats := pet.statInheritance(pet.Owner.GetStats())
 	pet.AddStats(inheritedStats)
 	pet.currentStatInheritance = pet.statInheritance
-	pet.Character.Finalize()
+	pet.Character.Finalize(raid)
 }
 
 func (pet *Pet) reset(sim *Simulation, agent Agent) {

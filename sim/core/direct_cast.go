@@ -95,6 +95,18 @@ func (ddi DotDamageInput) IsTicking(sim *Simulation) bool {
 	return (ddi.finalTickTime != 0 && ddi.tickIndex < ddi.NumberOfTicks)
 }
 
+func (ddi *DotDamageInput) SetTickDamage(newDamage float64) {
+	ddi.damagePerTick = newDamage
+}
+
+// Restarts the dot with the same number of ticks / duration as it started with.
+// TODO: This should allow the dot 'debuff' to continue for the partial tick time
+// after the last tick, based on refresh time. This matters for stack refreshers.
+func (ddi *DotDamageInput) RefreshDot() {
+	ddi.finalTickTime += time.Duration(ddi.tickIndex) * ddi.TickLength
+	ddi.tickIndex = 0
+}
+
 type SpellHitEffect struct {
 	SpellEffect
 	DotInput    DotDamageInput

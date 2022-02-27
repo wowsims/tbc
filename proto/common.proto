@@ -214,6 +214,9 @@ enum WeaponImbue {
 	WeaponImbueBrilliantWizardOil = 3;
 	WeaponImbueSuperiorWizardOil = 4;
 
+	WeaponImbueRogueDeadlyPoison = 10;
+	WeaponImbueRogueInstantPoison = 11;
+
 	WeaponImbueShamanFlametongue = 6;
 	WeaponImbueShamanFrostbrand = 7;
 	WeaponImbueShamanRockbiter = 8;

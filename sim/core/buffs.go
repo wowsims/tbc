@@ -175,6 +175,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		stats.MP5: GetTristateValueFloat(partyBuffs.ManaSpringTotem, 50, 62.5),
 	})
 	if partyBuffs.WindfuryTotemRank > 0 && IsEligibleForWindfuryTotem(character) {
+		character.HasWFTotem = true
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return WindfuryTotemAura(character, partyBuffs.WindfuryTotemRank, partyBuffs.WindfuryTotemIwt)
 		})
