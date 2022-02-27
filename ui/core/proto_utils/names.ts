@@ -2,6 +2,7 @@ import { Class } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
+import { ResourceType } from '/tbc/core/proto/api.js';
 
 export const raceNames: Record<Race, string> = {
   [Race.RaceUnknown]: 'None',
@@ -109,4 +110,12 @@ export const slotNames: Record<ItemSlot, string> = {
   [ItemSlot.ItemSlotMainHand]: 'Main Hand',
   [ItemSlot.ItemSlotOffHand]: 'Off Hand',
   [ItemSlot.ItemSlotRanged]: 'Ranged',
+};
+
+export const resourceNames: Record<ResourceType, string> = {
+  [ResourceType.ResourceTypeNone]: 'None',
+  [ResourceType.ResourceTypeMana]: 'Mana',
+  [ResourceType.ResourceTypeEnergy]: 'Energy',
+  [ResourceType.ResourceTypeRage]: 'Rage',
+  [ResourceType.ResourceTypeComboPoints]: 'Combo Points',
 };

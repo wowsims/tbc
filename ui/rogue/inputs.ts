@@ -19,6 +19,8 @@ import {
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 
+export const ThistleTea = makeBooleanRogueBuffInput(ActionId.fromItemId(7676), 'useThistleTea');
+
 export const RogueRotationConfig = {
 	inputs: [
 		{
@@ -53,3 +55,17 @@ export const RogueRotationConfig = {
 		},
 	],
 };
+
+function makeBooleanRogueBuffInput(id: ActionId, optionsFieldName: keyof RogueOptions): IconPickerConfig<Player<any>, boolean> {
+	return {
+	  id: id,
+	  states: 2,
+		changedEvent: (player: Player<Spec.SpecRogue>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecRogue>) => player.getSpecOptions()[optionsFieldName] as boolean,
+		setValue: (eventID: EventID, player: Player<Spec.SpecRogue>, newValue: boolean) => {
+			const newOptions = player.getSpecOptions();
+			(newOptions[optionsFieldName] as boolean) = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+	};
+}

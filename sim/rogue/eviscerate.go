@@ -65,7 +65,7 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					if spellEffect.Landed() {
 						numPoints := rogue.comboPoints
-						rogue.SpendComboPoints(sim)
+						rogue.SpendComboPoints(sim, spellCast.ActionID)
 						finishingMoveEffects(sim, numPoints)
 					} else {
 						if refundAmount > 0 {

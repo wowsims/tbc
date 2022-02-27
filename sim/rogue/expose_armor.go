@@ -39,7 +39,7 @@ func (rogue *Rogue) newExposeArmorTemplate(sim *core.Simulation) core.SimpleSpel
 					if spellEffect.Landed() {
 						spellEffect.Target.AddAura(sim, core.ExposeArmorAura(sim, spellEffect.Target, rogue.Talents.ImprovedExposeArmor))
 						numPoints := rogue.comboPoints
-						rogue.SpendComboPoints(sim)
+						rogue.SpendComboPoints(sim, spellCast.ActionID)
 						finishingMoveEffects(sim, numPoints)
 					} else {
 						if refundAmount > 0 {

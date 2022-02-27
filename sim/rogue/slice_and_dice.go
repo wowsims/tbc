@@ -68,7 +68,7 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 					rogue.AddAura(sim, aura)
 				}
 
-				rogue.SpendComboPoints(sim)
+				rogue.SpendComboPoints(sim, cast.ActionID)
 				finishingMoveEffects(sim, numPoints)
 			},
 		},

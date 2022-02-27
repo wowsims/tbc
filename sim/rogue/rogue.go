@@ -100,12 +100,14 @@ func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.deadlyPoisonStacks = 0
 }
 
-func (rogue *Rogue) AddComboPoint(sim *core.Simulation) {
+func (rogue *Rogue) AddComboPoint(sim *core.Simulation, actionID core.ActionID) {
 	if rogue.comboPoints == 5 {
+		rogue.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, 1, 0)
 		if sim.Log != nil {
 			rogue.Log(sim, "Failed to gain 1 combo point, already full")
 		}
 	} else {
+		rogue.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, 1, 1)
 		if sim.Log != nil {
 			rogue.Log(sim, "Gained 1 combo point (%d --> %d)", rogue.comboPoints, rogue.comboPoints+1)
 		}
@@ -113,10 +115,11 @@ func (rogue *Rogue) AddComboPoint(sim *core.Simulation) {
 	}
 }
 
-func (rogue *Rogue) SpendComboPoints(sim *core.Simulation) {
+func (rogue *Rogue) SpendComboPoints(sim *core.Simulation, actionID core.ActionID) {
 	if sim.Log != nil {
 		rogue.Log(sim, "Spent all combo points.")
 	}
+	rogue.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, float64(-rogue.comboPoints), float64(-rogue.comboPoints))
 	rogue.comboPoints = 0
 }
 

@@ -42,7 +42,7 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.SimpleS
 				ThreatMultiplier:       1,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					if spellEffect.Landed() {
-						rogue.AddComboPoint(sim)
+						rogue.AddComboPoint(sim, SinisterStrikeActionID)
 					} else {
 						rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 					}

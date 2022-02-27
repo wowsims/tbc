@@ -69,10 +69,10 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(sim *core.Simulation) func(si
 
 	return func(sim *core.Simulation, numPoints int32) {
 		if ruthlessnessChance > 0 && sim.RandomFloat("Ruthlessness") < ruthlessnessChance {
-			rogue.AddComboPoint(sim)
+			rogue.AddComboPoint(sim, core.ActionID{SpellID: 14161})
 		}
 		if netherblade4pc && sim.RandomFloat("Netherblade 4pc") < 0.15 {
-			rogue.AddComboPoint(sim)
+			rogue.AddComboPoint(sim, core.ActionID{SpellID: 37168})
 		}
 		if relentlessStrikes {
 			if numPoints == 5 || sim.RandomFloat("RelentlessStrikes") < 0.2*float64(numPoints) {
@@ -192,7 +192,7 @@ func (rogue *Rogue) applySealFate() {
 				}
 
 				if procChance == 1 || sim.RandomFloat("Seal Fate") < procChance {
-					rogue.AddComboPoint(sim)
+					rogue.AddComboPoint(sim, core.ActionID{SpellID: 14195})
 				}
 			},
 		}
