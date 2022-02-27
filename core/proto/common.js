@@ -1840,6 +1840,7 @@ class Debuffs$Type extends MessageType {
             { no: 6, name: "improved_scorch", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 7, name: "winters_chill", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 8, name: "blood_frenzy", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 16, name: "mangle", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 9, name: "expose_armor", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 10, name: "faerie_fire", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 11, name: "sunder_armor", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -1850,7 +1851,7 @@ class Debuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, improvedScorch: false, wintersChill: false, bloodFrenzy: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false, huntersMark: 0, exposeWeaknessUptime: 0, exposeWeaknessHunterAgility: 0 };
+        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, improvedScorch: false, wintersChill: false, bloodFrenzy: false, mangle: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false, huntersMark: 0, exposeWeaknessUptime: 0, exposeWeaknessHunterAgility: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1884,6 +1885,9 @@ class Debuffs$Type extends MessageType {
                     break;
                 case /* bool blood_frenzy */ 8:
                     message.bloodFrenzy = reader.bool();
+                    break;
+                case /* bool mangle */ 16:
+                    message.mangle = reader.bool();
                     break;
                 case /* proto.TristateEffect expose_armor */ 9:
                     message.exposeArmor = reader.int32();
@@ -1942,6 +1946,9 @@ class Debuffs$Type extends MessageType {
         /* bool blood_frenzy = 8; */
         if (message.bloodFrenzy !== false)
             writer.tag(8, WireType.Varint).bool(message.bloodFrenzy);
+        /* bool mangle = 16; */
+        if (message.mangle !== false)
+            writer.tag(16, WireType.Varint).bool(message.mangle);
         /* proto.TristateEffect expose_armor = 9; */
         if (message.exposeArmor !== 0)
             writer.tag(9, WireType.Varint).int32(message.exposeArmor);

@@ -136,6 +136,7 @@ export class ActionId {
                 }
                 break;
             case 'Eviscerate':
+            case 'Rupture':
             case 'Slice and Dice':
                 if (this.tag)
                     name += ` (${this.tag} CP)`;

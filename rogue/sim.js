@@ -87,10 +87,12 @@ export class RogueSimUI extends IndividualSimUI {
                     blessingOfMight: TristateEffect.TristateEffectImproved,
                 }),
                 debuffs: Debuffs.create({
+                    mangle: true,
                     sunderArmor: true,
                     curseOfRecklessness: true,
                     faerieFire: TristateEffect.TristateEffectImproved,
                     improvedSealOfTheCrusader: true,
+                    misery: true,
                 }),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
@@ -122,6 +124,7 @@ export class RogueSimUI extends IndividualSimUI {
             // IconInputs to include in the 'Debuffs' section on the settings tab.
             debuffInputs: [
                 IconInputs.BloodFrenzy,
+                IconInputs.Mangle,
                 IconInputs.ImprovedSealOfTheCrusader,
                 IconInputs.HuntersMark,
                 IconInputs.FaerieFire,

@@ -437,11 +437,12 @@ export const Rogue = new Rogue$Type();
 class Rogue_Rotation$Type extends MessageType {
     constructor() {
         super("proto.Rogue.Rotation", [
-            { no: 1, name: "maintain_expose_armor", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 1, name: "maintain_expose_armor", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "use_rupture", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { maintainExposeArmor: false };
+        const message = { maintainExposeArmor: false, useRupture: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -454,6 +455,9 @@ class Rogue_Rotation$Type extends MessageType {
             switch (fieldNo) {
                 case /* bool maintain_expose_armor */ 1:
                     message.maintainExposeArmor = reader.bool();
+                    break;
+                case /* bool use_rupture */ 2:
+                    message.useRupture = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -470,6 +474,9 @@ class Rogue_Rotation$Type extends MessageType {
         /* bool maintain_expose_armor = 1; */
         if (message.maintainExposeArmor !== false)
             writer.tag(1, WireType.Varint).bool(message.maintainExposeArmor);
+        /* bool use_rupture = 2; */
+        if (message.useRupture !== false)
+            writer.tag(2, WireType.Varint).bool(message.useRupture);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

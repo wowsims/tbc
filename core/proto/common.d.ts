@@ -441,6 +441,10 @@ export interface Debuffs {
      */
     bloodFrenzy: boolean;
     /**
+     * @generated from protobuf field: bool mangle = 16;
+     */
+    mangle: boolean;
+    /**
      * @generated from protobuf field: proto.TristateEffect expose_armor = 9;
      */
     exposeArmor: TristateEffect;

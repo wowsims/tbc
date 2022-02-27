@@ -17,5 +17,20 @@ export const RogueRotationConfig = {
                 },
             },
         },
+        {
+            type: 'boolean', cssClass: 'use-rupture-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Use Rupture',
+                labelTooltip: 'Uses Rupture over Eviscerate when appropriate.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().useRupture,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.useRupture = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
     ],
 };

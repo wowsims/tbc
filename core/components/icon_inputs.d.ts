@@ -51,6 +51,7 @@ export declare const HuntersMark: IndividualSimIconPickerConfig<Target, number>;
 export declare const ImprovedScorch: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const ImprovedSealOfTheCrusader: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const JudgementOfWisdom: IndividualSimIconPickerConfig<Target, boolean>;
+export declare const Mangle: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const Misery: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const CurseOfElements: IndividualSimIconPickerConfig<Target, number>;
 export declare const CurseOfRecklessness: IndividualSimIconPickerConfig<Target, boolean>;

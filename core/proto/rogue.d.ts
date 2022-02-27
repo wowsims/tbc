@@ -228,6 +228,12 @@ export interface Rogue_Rotation {
      * @generated from protobuf field: bool maintain_expose_armor = 1;
      */
     maintainExposeArmor: boolean;
+    /**
+     * Allows use of rupture when sensible.
+     *
+     * @generated from protobuf field: bool use_rupture = 2;
+     */
+    useRupture: boolean;
 }
 /**
  * @generated from protobuf message proto.Rogue.Options
