@@ -1,9 +1,34 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
+import { Rogue_Rotation_Builder as Builder, } from '/tbc/core/proto/rogue.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 export const ThistleTea = makeBooleanRogueBuffInput(ActionId.fromItemId(7676), 'useThistleTea');
 export const RogueRotationConfig = {
     inputs: [
+        {
+            type: 'enum', cssClass: 'builder-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Builder',
+                values: [
+                    {
+                        name: 'Auto', value: Builder.Auto,
+                        tooltip: 'Automatically selects a builder based on weapons/talents.',
+                    },
+                    { name: 'Sinister Strike', value: Builder.SinisterStrike },
+                    { name: 'Backstab', value: Builder.Backstab },
+                    { name: 'Hemorrhage', value: Builder.Hemorrhage },
+                    { name: 'Mutilate', value: Builder.Mutilate },
+                ],
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().builder,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.builder = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
         {
             type: 'boolean', cssClass: 'maintain-expose-armor-picker',
             getModObject: (simUI) => simUI.player,

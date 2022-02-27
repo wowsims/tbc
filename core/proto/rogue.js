@@ -3,6 +3,36 @@ import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
+/**
+ * @generated from protobuf enum proto.Rogue.Rotation.Builder
+ */
+export var Rogue_Rotation_Builder;
+(function (Rogue_Rotation_Builder) {
+    /**
+     * @generated from protobuf enum value: Unknown = 0;
+     */
+    Rogue_Rotation_Builder[Rogue_Rotation_Builder["Unknown"] = 0] = "Unknown";
+    /**
+     * @generated from protobuf enum value: Auto = 1;
+     */
+    Rogue_Rotation_Builder[Rogue_Rotation_Builder["Auto"] = 1] = "Auto";
+    /**
+     * @generated from protobuf enum value: SinisterStrike = 2;
+     */
+    Rogue_Rotation_Builder[Rogue_Rotation_Builder["SinisterStrike"] = 2] = "SinisterStrike";
+    /**
+     * @generated from protobuf enum value: Backstab = 3;
+     */
+    Rogue_Rotation_Builder[Rogue_Rotation_Builder["Backstab"] = 3] = "Backstab";
+    /**
+     * @generated from protobuf enum value: Hemorrhage = 4;
+     */
+    Rogue_Rotation_Builder[Rogue_Rotation_Builder["Hemorrhage"] = 4] = "Hemorrhage";
+    /**
+     * @generated from protobuf enum value: Mutilate = 5;
+     */
+    Rogue_Rotation_Builder[Rogue_Rotation_Builder["Mutilate"] = 5] = "Mutilate";
+})(Rogue_Rotation_Builder || (Rogue_Rotation_Builder = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class RogueTalents$Type extends MessageType {
     constructor() {
@@ -52,12 +82,12 @@ class RogueTalents$Type extends MessageType {
             { no: 41, name: "master_of_subtlety", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 42, name: "deadliness", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 43, name: "premeditation", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 44, name: "sinister_calling", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 44, name: "sinister_calling", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 45, name: "shadowstep", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { improvedEviscerate: 0, malice: 0, ruthlessness: 0, murder: 0, puncturingWounds: 0, relentlessStrikes: false, improvedExposeArmor: 0, lethality: 0, vilePoisons: 0, improvedPoisons: 0, coldBlood: false, quickRecovery: 0, sealFate: 0, masterPoisoner: 0, vigor: false, findWeakness: 0, mutilate: false, improvedSinisterStrike: 0, improvedSliceAndDice: 0, precision: 0, daggerSpecialization: 0, dualWieldSpecialization: 0, maceSpecialization: 0, bladeFlurry: false, swordSpecialization: 0, fistWeaponSpecialization: 0, weaponExpertise: 0, aggression: 0, vitality: 0, adrenalineRush: false, combatPotency: 0, surpriseAttacks: false, opportunity: 0, sleightOfHand: 0, initiative: 0, ghostlyStrike: false, improvedAmbush: 0, elusiveness: 0, serratedBlades: 0, preparation: false, dirtyDeeds: 0, hemorrhage: false, masterOfSubtlety: 0, deadliness: 0, premeditation: false, sinisterCalling: false, shadowstep: false };
+        const message = { improvedEviscerate: 0, malice: 0, ruthlessness: 0, murder: 0, puncturingWounds: 0, relentlessStrikes: false, improvedExposeArmor: 0, lethality: 0, vilePoisons: 0, improvedPoisons: 0, coldBlood: false, quickRecovery: 0, sealFate: 0, masterPoisoner: 0, vigor: false, findWeakness: 0, mutilate: false, improvedSinisterStrike: 0, improvedSliceAndDice: 0, precision: 0, daggerSpecialization: 0, dualWieldSpecialization: 0, maceSpecialization: 0, bladeFlurry: false, swordSpecialization: 0, fistWeaponSpecialization: 0, weaponExpertise: 0, aggression: 0, vitality: 0, adrenalineRush: false, combatPotency: 0, surpriseAttacks: false, opportunity: 0, sleightOfHand: 0, initiative: 0, ghostlyStrike: false, improvedAmbush: 0, elusiveness: 0, serratedBlades: 0, preparation: false, dirtyDeeds: 0, hemorrhage: false, masterOfSubtlety: 0, deadliness: 0, premeditation: false, sinisterCalling: 0, shadowstep: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -203,8 +233,8 @@ class RogueTalents$Type extends MessageType {
                 case /* bool premeditation */ 43:
                     message.premeditation = reader.bool();
                     break;
-                case /* bool sinister_calling */ 44:
-                    message.sinisterCalling = reader.bool();
+                case /* int32 sinister_calling */ 44:
+                    message.sinisterCalling = reader.int32();
                     break;
                 case /* bool shadowstep */ 45:
                     message.shadowstep = reader.bool();
@@ -356,9 +386,9 @@ class RogueTalents$Type extends MessageType {
         /* bool premeditation = 43; */
         if (message.premeditation !== false)
             writer.tag(43, WireType.Varint).bool(message.premeditation);
-        /* bool sinister_calling = 44; */
-        if (message.sinisterCalling !== false)
-            writer.tag(44, WireType.Varint).bool(message.sinisterCalling);
+        /* int32 sinister_calling = 44; */
+        if (message.sinisterCalling !== 0)
+            writer.tag(44, WireType.Varint).int32(message.sinisterCalling);
         /* bool shadowstep = 45; */
         if (message.shadowstep !== false)
             writer.tag(45, WireType.Varint).bool(message.shadowstep);
@@ -437,12 +467,13 @@ export const Rogue = new Rogue$Type();
 class Rogue_Rotation$Type extends MessageType {
     constructor() {
         super("proto.Rogue.Rotation", [
+            { no: 3, name: "builder", kind: "enum", T: () => ["proto.Rogue.Rotation.Builder", Rogue_Rotation_Builder] },
             { no: 1, name: "maintain_expose_armor", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "use_rupture", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { maintainExposeArmor: false, useRupture: false };
+        const message = { builder: 0, maintainExposeArmor: false, useRupture: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -453,6 +484,9 @@ class Rogue_Rotation$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
+                case /* proto.Rogue.Rotation.Builder builder */ 3:
+                    message.builder = reader.int32();
+                    break;
                 case /* bool maintain_expose_armor */ 1:
                     message.maintainExposeArmor = reader.bool();
                     break;
@@ -471,6 +505,9 @@ class Rogue_Rotation$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* proto.Rogue.Rotation.Builder builder = 3; */
+        if (message.builder !== 0)
+            writer.tag(3, WireType.Varint).int32(message.builder);
         /* bool maintain_expose_armor = 1; */
         if (message.maintainExposeArmor !== false)
             writer.tag(1, WireType.Varint).bool(message.maintainExposeArmor);

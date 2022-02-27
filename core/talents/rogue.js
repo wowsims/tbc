@@ -653,7 +653,7 @@ export const rogueTalentsConfig = [
                     colIdx: 1,
                 },
                 spellIds: [31216],
-                maxPoints: 1,
+                maxPoints: 5,
             },
             {
                 fieldName: 'shadowstep',

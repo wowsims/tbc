@@ -5,7 +5,7 @@ import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
-import { Rogue_Rotation as RogueRotation, Rogue_Options as RogueOptions, } from '/tbc/core/proto/rogue.js';
+import { Rogue_Rotation as RogueRotation, Rogue_Rotation_Builder as Builder, Rogue_Options as RogueOptions, } from '/tbc/core/proto/rogue.js';
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
@@ -22,7 +22,12 @@ export const CombatMaceTalents = {
     name: 'Combat Maces',
     data: '005320123-023305002005515002321051',
 };
+export const MutilateTalents = {
+    name: 'Mutilate',
+    data: '305323125500100501051-005305001-05',
+};
 export const DefaultRotation = RogueRotation.create({
+    builder: Builder.Auto,
     maintainExposeArmor: true,
     useRupture: true,
 });

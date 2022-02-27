@@ -195,9 +195,9 @@ export interface RogueTalents {
      */
     premeditation: boolean;
     /**
-     * @generated from protobuf field: bool sinister_calling = 44;
+     * @generated from protobuf field: int32 sinister_calling = 44;
      */
-    sinisterCalling: boolean;
+    sinisterCalling: number;
     /**
      * @generated from protobuf field: bool shadowstep = 45;
      */
@@ -225,6 +225,10 @@ export interface Rogue {
  */
 export interface Rogue_Rotation {
     /**
+     * @generated from protobuf field: proto.Rogue.Rotation.Builder builder = 3;
+     */
+    builder: Rogue_Rotation_Builder;
+    /**
      * @generated from protobuf field: bool maintain_expose_armor = 1;
      */
     maintainExposeArmor: boolean;
@@ -234,6 +238,35 @@ export interface Rogue_Rotation {
      * @generated from protobuf field: bool use_rupture = 2;
      */
     useRupture: boolean;
+}
+/**
+ * @generated from protobuf enum proto.Rogue.Rotation.Builder
+ */
+export declare enum Rogue_Rotation_Builder {
+    /**
+     * @generated from protobuf enum value: Unknown = 0;
+     */
+    Unknown = 0,
+    /**
+     * @generated from protobuf enum value: Auto = 1;
+     */
+    Auto = 1,
+    /**
+     * @generated from protobuf enum value: SinisterStrike = 2;
+     */
+    SinisterStrike = 2,
+    /**
+     * @generated from protobuf enum value: Backstab = 3;
+     */
+    Backstab = 3,
+    /**
+     * @generated from protobuf enum value: Hemorrhage = 4;
+     */
+    Hemorrhage = 4,
+    /**
+     * @generated from protobuf enum value: Mutilate = 5;
+     */
+    Mutilate = 5
 }
 /**
  * @generated from protobuf message proto.Rogue.Options

@@ -9,6 +9,10 @@ export declare const CombatMaceTalents: {
     name: string;
     data: string;
 };
+export declare const MutilateTalents: {
+    name: string;
+    data: string;
+};
 export declare const DefaultRotation: RogueRotation;
 export declare const DefaultOptions: RogueOptions;
 export declare const DefaultConsumes: Consumes;
