@@ -11,6 +11,11 @@ import (
 // Start looking to refresh 2 minute totems at 1:55.
 const TotemRefreshTime2M = time.Second * 115
 
+const (
+	SpellFlagShock    = core.SpellExtrasAgentReserved1
+	SpellFlagElectric = core.SpellExtrasAgentReserved2
+)
+
 func NewShaman(character core.Character, talents proto.ShamanTalents, totems proto.ShamanTotems, selfBuffs SelfBuffs) *Shaman {
 	if totems.WindfuryTotemRank == 0 {
 		// If rank is 0, disable windfury options.

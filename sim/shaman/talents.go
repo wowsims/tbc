@@ -298,7 +298,7 @@ func (shaman *Shaman) applyShamanisticFocus() {
 		Expires:  core.NeverExpires,
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
 			// Shaman use spell extras agent reserved for shamanistic rage checking.
-			if !cast.SpellExtras.Matches(core.SpellExtrasAgentReserved) {
+			if !cast.SpellExtras.Matches(SpellFlagShock) {
 				return
 			}
 

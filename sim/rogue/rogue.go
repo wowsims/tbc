@@ -23,6 +23,11 @@ func RegisterRogue() {
 	)
 }
 
+const (
+	SpellFlagBuilder  = core.SpellExtrasAgentReserved1
+	SpellFlagFinisher = core.SpellExtrasAgentReserved2
+)
+
 type Rogue struct {
 	core.Character
 

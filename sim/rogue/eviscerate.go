@@ -53,6 +53,7 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 					Value: rogue.eviscerateEnergyCost,
 				},
 				CritMultiplier: rogue.critMultiplier(true, false),
+				SpellExtras:    SpellFlagFinisher,
 			},
 		},
 		Effect: core.SpellHitEffect{

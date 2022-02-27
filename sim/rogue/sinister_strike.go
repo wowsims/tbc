@@ -31,6 +31,7 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.SimpleS
 					Value: energyCost,
 				},
 				CritMultiplier: rogue.critMultiplier(true, true),
+				SpellExtras:    SpellFlagBuilder,
 			},
 		},
 		Effect: core.SpellHitEffect{

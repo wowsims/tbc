@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var SliceAndDiceActionID = core.ActionID{SpellID: 6774}
@@ -41,33 +42,53 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 
 	finishingMoveEffects := rogue.makeFinishingMoveEffectApplier(sim)
 
+	template := core.SimpleCast{
+		Cast: core.Cast{
+			ActionID:  SliceAndDiceActionID,
+			Character: rogue.GetCharacter(),
+			BaseCost: core.ResourceCost{
+				Type:  stats.Energy,
+				Value: SliceAndDiceEnergyCost,
+			},
+			Cost: core.ResourceCost{
+				Type:  stats.Energy,
+				Value: SliceAndDiceEnergyCost,
+			},
+			GCD:         time.Second,
+			IgnoreHaste: true,
+			SpellExtras: SpellFlagFinisher,
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				numPoints := rogue.comboPoints
+				aura := sliceAndDiceAura
+				aura.Expires = sim.CurrentTime + sliceAndDiceDurations[numPoints]
+				if rogue.HasAura(SliceAndDiceAuraID) {
+					rogue.ReplaceAura(sim, aura)
+				} else {
+					rogue.MultiplyMeleeSpeed(sim, hasteBonus)
+					rogue.AddAura(sim, aura)
+				}
+
+				rogue.SpendComboPoints(sim)
+				finishingMoveEffects(sim, numPoints)
+			},
+		},
+	}
+
+	var cast core.SimpleCast
+
 	rogue.castSliceAndDice = func() {
 		if rogue.comboPoints == 0 {
 			panic("SliceAndDice requires combo points!")
 		}
 
-		actionID := SliceAndDiceActionID
-		actionID.Tag = rogue.comboPoints
+		cast = template
+		cast.ActionID.Tag = rogue.comboPoints
 
 		if rogue.deathmantle4pcProc {
+			cast.Cost.Value = 0
 			rogue.deathmantle4pcProc = false
-		} else {
-			rogue.SpendEnergy(sim, SliceAndDiceEnergyCost, actionID)
-		}
-		rogue.SetGCDTimer(sim, sim.CurrentTime+time.Second*1)
-		rogue.Metrics.AddInstantCast(actionID)
-
-		numPoints := rogue.comboPoints
-		aura := sliceAndDiceAura
-		aura.Expires = sim.CurrentTime + sliceAndDiceDurations[numPoints]
-		if rogue.HasAura(SliceAndDiceAuraID) {
-			rogue.ReplaceAura(sim, aura)
-		} else {
-			rogue.MultiplyMeleeSpeed(sim, hasteBonus)
-			rogue.AddAura(sim, aura)
 		}
 
-		rogue.SpendComboPoints(sim)
-		finishingMoveEffects(sim, numPoints)
+		cast.StartCast(sim)
 	}
 }

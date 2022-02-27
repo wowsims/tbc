@@ -67,9 +67,6 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(sim *core.Simulation) func(si
 
 	netherblade4pc := ItemSetNetherblade.CharacterHasSetBonus(&rogue.Character, 4)
 
-	ashtongueTalisman := rogue.HasTrinketEquipped(32492)
-	ashtongueStatApplier := rogue.NewTempStatAuraApplier(sim, AshtongueTalismanOfLethalityProcAuraID, core.ActionID{ItemID: 32492}, stats.MeleeCrit, 145, time.Second*10)
-
 	return func(sim *core.Simulation, numPoints int32) {
 		if ruthlessnessChance > 0 && sim.RandomFloat("Ruthlessness") < ruthlessnessChance {
 			rogue.AddComboPoint(sim)
@@ -86,11 +83,6 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(sim *core.Simulation) func(si
 			aura := findWeaknessAura
 			aura.Expires = sim.CurrentTime + time.Second*10
 			rogue.AddAura(sim, aura)
-		}
-		if ashtongueTalisman {
-			if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
-				ashtongueStatApplier(sim)
-			}
 		}
 	}
 }
@@ -191,7 +183,7 @@ func (rogue *Rogue) applySealFate() {
 		return core.Aura{
 			ID: SealFateAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.ActionID.SameAction(SinisterStrikeActionID) {
+				if !spellCast.SpellExtras.Matches(SpellFlagBuilder) {
 					return
 				}
 
