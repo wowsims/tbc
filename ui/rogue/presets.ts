@@ -36,6 +36,7 @@ export const CombatMaceTalents = {
 
 export const DefaultRotation = RogueRotation.create({
 	maintainExposeArmor: true,
+	useRupture: true,
 });
 
 export const DefaultOptions = RogueOptions.create({
@@ -46,7 +47,7 @@ export const DefaultConsumes = Consumes.create({
 	flask: Flask.FlaskOfRelentlessAssault,
 	food: Food.FoodGrilledMudfish,
 	mainHandImbue: WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
-	offHandImbue: WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
+	offHandImbue: WeaponImbue.WeaponImbueRogueDeadlyPoison,
 });
 
 export const P1_PRESET = {

@@ -38,6 +38,7 @@ var PlayerOptionsBasic = &proto.Player_Rogue{
 
 var basicRotation = &proto.Rogue_Rotation{
 	MaintainExposeArmor: true,
+	UseRupture:          true,
 }
 
 var basicOptions = &proto.Rogue_Options{}
@@ -68,6 +69,7 @@ var FullConsumes = &proto.Consumes{
 
 var FullDebuffs = &proto.Debuffs{
 	BloodFrenzy:               true,
+	Mangle:                    true,
 	SunderArmor:               true,
 	FaerieFire:                proto.TristateEffect_TristateEffectImproved,
 	ImprovedSealOfTheCrusader: true,

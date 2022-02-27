@@ -59,6 +59,12 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		})
 	}
 
+	if debuffs.Mangle {
+		target.AddPermanentAura(func(sim *Simulation) Aura {
+			return MangleAura()
+		})
+	}
+
 	if debuffs.ExposeArmor != proto.TristateEffect_TristateEffectMissing {
 		points := 0
 		if debuffs.ExposeArmor == proto.TristateEffect_TristateEffectImproved {
@@ -273,6 +279,27 @@ func BloodFrenzyAura() Aura {
 				return
 			}
 			spellEffect.DamageMultiplier *= 1.04
+		},
+		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+			if !spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
+				return
+			}
+			*tickDamage *= 1.04
+		},
+	}
+}
+
+var MangleDebuffID = NewDebuffID()
+
+func MangleAura() Aura {
+	return Aura{
+		ID:       MangleDebuffID,
+		ActionID: ActionID{SpellID: 33876},
+		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
+			if !spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
+				return
+			}
+			*tickDamage *= 1.3
 		},
 	}
 }
