@@ -51,6 +51,13 @@ type Rogue struct {
 	eviscerateDamageCalcs []core.MeleeDamageCalculator
 	eviscerateTemplate    core.SimpleSpellTemplate
 	eviscerate            core.SimpleSpell
+
+	deadlyPoisonStacks   int
+	deadlyPoisonTemplate core.SimpleSpellTemplate
+	deadlyPoison         core.SimpleSpell
+
+	deadlyPoisonRefreshTemplate core.SimpleSpellTemplate
+	deadlyPoisonRefresh         core.SimpleSpell
 }
 
 func (rogue *Rogue) GetCharacter() *core.Character {
@@ -64,17 +71,25 @@ func (rogue *Rogue) GetRogue() *Rogue {
 func (rogue *Rogue) AddRaidBuffs(raidBuffs *proto.RaidBuffs)    {}
 func (rogue *Rogue) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {}
 
+func (rogue *Rogue) Finalize(raid *core.Raid) {
+	// Need to apply poisons now so we can check for WF totem.
+	rogue.applyPoisons()
+}
+
 func (rogue *Rogue) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
 	rogue.sinisterStrikeTemplate = rogue.newSinisterStrikeTemplate(sim)
 
 	rogue.initSliceAndDice(sim)
 	rogue.eviscerateTemplate = rogue.newEviscerateTemplate(sim)
+	rogue.deadlyPoisonTemplate = rogue.newDeadlyPoisonTemplate(sim)
+	rogue.deadlyPoisonRefreshTemplate = rogue.newDeadlyPoisonRefreshTemplate(sim)
 }
 
 func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.comboPoints = 0
 	rogue.deathmantle4pcProc = false
+	rogue.deadlyPoisonStacks = 0
 }
 
 func (rogue *Rogue) AddComboPoint(sim *core.Simulation) {

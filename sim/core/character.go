@@ -99,6 +99,7 @@ type Character struct {
 	// a MH imbue.
 	// TODO: Figure out a cleaner way to do this.
 	HasMHWeaponImbue bool
+	HasWFTotem       bool
 
 	// GCD-related PendingActions for this character.
 	gcdAction      *PendingAction
@@ -384,7 +385,7 @@ func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	}
 }
 
-func (character *Character) Finalize() {
+func (character *Character) Finalize(raid *Raid) {
 	if character.finalized {
 		return
 	}
@@ -408,7 +409,7 @@ func (character *Character) Finalize() {
 	character.majorCooldownManager.finalize(character)
 
 	for _, petAgent := range character.Pets {
-		petAgent.GetPet().Finalize()
+		petAgent.GetPet().Finalize(raid)
 	}
 }
 

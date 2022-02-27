@@ -232,7 +232,8 @@ func (raid *Raid) finalize(raidConfig proto.Raid) {
 
 	for _, party := range raid.Parties {
 		for _, player := range party.Players {
-			player.GetCharacter().Finalize()
+			player.Finalize(raid)
+			player.GetCharacter().Finalize(raid)
 		}
 	}
 }
