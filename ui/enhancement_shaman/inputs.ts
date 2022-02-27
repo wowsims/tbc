@@ -119,7 +119,7 @@ function makeBooleanShamanBuffInput(id: ActionId, optionsFieldName: keyof Shaman
 		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getSpecOptions()[optionsFieldName] as boolean,
 		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
 			const newOptions = player.getSpecOptions();
-	(newOptions[optionsFieldName] as boolean) = newValue;
+			(newOptions[optionsFieldName] as boolean) = newValue;
 			player.setSpecOptions(eventID, newOptions);
 		},
 	};

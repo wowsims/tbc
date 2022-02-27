@@ -7,27 +7,26 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var RuptureActionID = core.ActionID{SpellID: 26867}
-var RuptureDebuffID = core.NewDebuffID()
-var RuptureEnergyCost = 25.0
+var ExposeArmorActionID = core.ActionID{SpellID: 26866, Tag: 5}
+var ExposeArmorEnergyCost = 25.0
 
-func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) newExposeArmorTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	finishingMoveEffects := rogue.makeFinishingMoveEffectApplier(sim)
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            RuptureActionID,
+				ActionID:            ExposeArmorActionID,
 				Character:           &rogue.Character,
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				SpellSchool:         core.SpellSchoolPhysical,
 				GCD:                 time.Second * 1,
 				Cost: core.ResourceCost{
 					Type:  stats.Energy,
-					Value: RuptureEnergyCost,
+					Value: ExposeArmorEnergyCost,
 				},
-				SpellExtras: core.SpellExtrasBinary | SpellFlagFinisher,
+				SpellExtras: SpellFlagFinisher,
 			},
 		},
 		Effect: core.SpellHitEffect{
@@ -38,6 +37,7 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 				ThreatMultiplier:       1,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					if spellEffect.Landed() {
+						spellEffect.Target.AddAura(sim, core.ExposeArmorAura(sim, spellEffect.Target, rogue.Talents.ImprovedExposeArmor))
 						numPoints := rogue.comboPoints
 						rogue.SpendComboPoints(sim, spellCast.ActionID)
 						finishingMoveEffects(sim, numPoints)
@@ -48,16 +48,9 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 					}
 				},
 			},
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:  0, // Set dynamically.
-				TickLength:     time.Second * 2,
-				TickBaseDamage: 0, // Set dynamically.
-				DebuffID:       DeadlyPoisonDebuffID,
-			},
 		},
 	}
 
-	ability.Effect.StaticDamageMultiplier *= 1 + 0.1*float64(rogue.Talents.SerratedBlades)
 	if rogue.Talents.SurpriseAttacks {
 		ability.Effect.CannotBeDodged = true
 	}
@@ -65,24 +58,21 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 	return core.NewSimpleSpellTemplate(ability)
 }
 
-func (rogue *Rogue) NewRupture(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	if rogue.comboPoints == 0 {
-		panic("Rupture requires combo points!")
+func (rogue *Rogue) NewExposeArmor(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+	if rogue.comboPoints != 5 {
+		panic("Expose Armor requires 5 combo points!")
 	}
 
-	rp := &rogue.rupture
-	rogue.ruptureTemplate.Apply(rp)
+	ea := &rogue.exposeArmor
+	rogue.exposeArmorTemplate.Apply(ea)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	rp.ActionID.Tag = rogue.comboPoints
-	rp.Effect.Target = target
-	rp.Effect.DotInput.NumberOfTicks = int(rogue.comboPoints) + 3
-	rp.Effect.DotInput.TickBaseDamage = 70 + float64(rogue.comboPoints)*11
+	ea.Effect.Target = target
 
 	if rogue.deathmantle4pcProc {
-		rp.Cost.Value = 0
+		ea.Cost.Value = 0
 		rogue.deathmantle4pcProc = false
 	}
 
-	return rp
+	return ea
 }

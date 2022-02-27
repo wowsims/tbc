@@ -40,6 +40,7 @@ export const DefaultRotation = RogueRotation.create({
 });
 
 export const DefaultOptions = RogueOptions.create({
+	useThistleTea: true,
 });
 
 export const DefaultConsumes = Consumes.create({

@@ -66,12 +66,12 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	}
 
 	if debuffs.ExposeArmor != proto.TristateEffect_TristateEffectMissing {
-		points := 0
+		points := int32(0)
 		if debuffs.ExposeArmor == proto.TristateEffect_TristateEffectImproved {
 			points = 2
 		}
 		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return ExposeArmorAura(0, target, points)
+			return ExposeArmorAura(sim, target, points)
 		})
 	} else if debuffs.SunderArmor {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
@@ -387,15 +387,18 @@ func SunderArmorAura(currentTime time.Duration, target *Target, stacks int) Aura
 
 var ExposeArmorDebuffID = NewDebuffID()
 
-func ExposeArmorAura(currentTime time.Duration, target *Target, talentPoints int) Aura {
-	// TODO: Make this override sunder, not add
+func ExposeArmorAura(sim *Simulation, target *Target, talentPoints int32) Aura {
 	armorReduction := 2050.0 * (1.0 + 0.25*float64(talentPoints))
 	target.AddArmor(-armorReduction)
+
+	if target.HasAura(SunderArmorDebuffID) {
+		target.RemoveAura(sim, SunderArmorDebuffID)
+	}
 
 	aura := Aura{
 		ID:       ExposeArmorDebuffID,
 		ActionID: ActionID{SpellID: 26866},
-		Expires:  currentTime + time.Second*30,
+		Expires:  sim.CurrentTime + time.Second*30,
 		OnExpire: func(sim *Simulation) {
 			target.AddArmor(armorReduction)
 		},
