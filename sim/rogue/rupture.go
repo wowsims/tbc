@@ -38,7 +38,7 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 				ThreatMultiplier:       1,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					if spellEffect.Landed() {
-						numPoints := rogue.comboPoints
+						numPoints := rogue.ComboPoints()
 						rogue.SpendComboPoints(sim, spellCast.ActionID)
 						finishingMoveEffects(sim, numPoints)
 					} else {
@@ -66,7 +66,8 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 }
 
 func (rogue *Rogue) NewRupture(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	if rogue.comboPoints == 0 {
+	comboPoints := rogue.ComboPoints()
+	if comboPoints == 0 {
 		panic("Rupture requires combo points!")
 	}
 
@@ -74,10 +75,10 @@ func (rogue *Rogue) NewRupture(sim *core.Simulation, target *core.Target) *core.
 	rogue.ruptureTemplate.Apply(rp)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	rp.ActionID.Tag = rogue.comboPoints
+	rp.ActionID.Tag = comboPoints
 	rp.Effect.Target = target
-	rp.Effect.DotInput.NumberOfTicks = int(rogue.comboPoints) + 3
-	rp.Effect.DotInput.TickBaseDamage = 70 + float64(rogue.comboPoints)*11
+	rp.Effect.DotInput.NumberOfTicks = int(comboPoints) + 3
+	rp.Effect.DotInput.TickBaseDamage = 70 + float64(comboPoints)*11
 
 	if rogue.deathmantle4pcProc {
 		rp.Cost.Value = 0

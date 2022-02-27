@@ -21,8 +21,10 @@ func TestRogue(t *testing.T) {
 
 		GearSet: core.GearSetCombo{Label: "P1", GearSet: P1Gear},
 
-		SpecOptions:      core.SpecOptionsCombo{Label: "Basic", SpecOptions: PlayerOptionsBasic},
-		OtherSpecOptions: []core.SpecOptionsCombo{},
+		SpecOptions: core.SpecOptionsCombo{Label: "Basic", SpecOptions: PlayerOptionsBasic},
+		OtherSpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "Mutilate", SpecOptions: PlayerOptionsMutilate},
+		},
 
 		RaidBuffs:   FullRaidBuffs,
 		PartyBuffs:  FullPartyBuffs,

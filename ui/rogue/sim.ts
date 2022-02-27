@@ -232,6 +232,7 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 				talents: [
 					Presets.CombatTalents,
 					Presets.CombatMaceTalents,
+					Presets.MutilateTalents,
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [

@@ -21,6 +21,8 @@ type energyBar struct {
 	maxEnergy     float64
 	currentEnergy float64
 
+	comboPoints int32
+
 	onEnergyTick OnEnergyTick
 	tickAction   *PendingAction
 
@@ -81,12 +83,36 @@ func (eb *energyBar) SpendEnergy(sim *Simulation, amount float64, actionID Actio
 	eb.currentEnergy = newEnergy
 }
 
+func (eb *energyBar) ComboPoints() int32 {
+	return eb.comboPoints
+}
+
+func (eb *energyBar) AddComboPoints(sim *Simulation, pointsToAdd int32, actionID ActionID) {
+	newComboPoints := MinInt32(eb.comboPoints+pointsToAdd, 5)
+	eb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, float64(pointsToAdd), float64(newComboPoints-eb.comboPoints))
+
+	if sim.Log != nil {
+		eb.character.Log(sim, "Gained %d combo points from %s (%d --> %d)", pointsToAdd, actionID, eb.comboPoints, newComboPoints)
+	}
+
+	eb.comboPoints = newComboPoints
+}
+
+func (eb *energyBar) SpendComboPoints(sim *Simulation, actionID ActionID) {
+	if sim.Log != nil {
+		eb.character.Log(sim, "Spent all combo points.")
+	}
+	eb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, float64(-eb.comboPoints), float64(-eb.comboPoints))
+	eb.comboPoints = 0
+}
+
 func (eb *energyBar) reset(sim *Simulation) {
 	if eb.character == nil {
 		return
 	}
 
 	eb.currentEnergy = eb.maxEnergy
+	eb.comboPoints = 0
 	eb.EnergyTickMultiplier = 1
 	eb.NextEnergyTickAdjustment = 0
 

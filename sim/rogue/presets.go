@@ -28,6 +28,28 @@ var CombatTalents = &proto.RogueTalents{
 	SurpriseAttacks:         true,
 }
 
+var MutilateTalents = &proto.RogueTalents{
+	ImprovedEviscerate:  3,
+	Malice:              5,
+	Ruthlessness:        3,
+	Murder:              2,
+	PuncturingWounds:    3,
+	RelentlessStrikes:   true,
+	ImprovedExposeArmor: 2,
+	Lethality:           5,
+	VilePoisons:         5,
+	ColdBlood:           true,
+	SealFate:            5,
+	Vigor:               true,
+	FindWeakness:        5,
+	Mutilate:            true,
+
+	ImprovedSliceAndDice: 3,
+	Precision:            5,
+
+	Opportunity: 5,
+}
+
 var PlayerOptionsBasic = &proto.Player_Rogue{
 	Rogue: &proto.Rogue{
 		Talents:  CombatTalents,
@@ -36,7 +58,16 @@ var PlayerOptionsBasic = &proto.Player_Rogue{
 	},
 }
 
+var PlayerOptionsMutilate = &proto.Player_Rogue{
+	Rogue: &proto.Rogue{
+		Talents:  MutilateTalents,
+		Options:  basicOptions,
+		Rotation: basicRotation,
+	},
+}
+
 var basicRotation = &proto.Rogue_Rotation{
+	Builder:             proto.Rogue_Rotation_Auto,
 	MaintainExposeArmor: true,
 	UseRupture:          true,
 }

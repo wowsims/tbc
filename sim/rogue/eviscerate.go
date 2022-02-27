@@ -64,7 +64,7 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 				ThreatMultiplier:       1,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					if spellEffect.Landed() {
-						numPoints := rogue.comboPoints
+						numPoints := rogue.ComboPoints()
 						rogue.SpendComboPoints(sim, spellCast.ActionID)
 						finishingMoveEffects(sim, numPoints)
 					} else {
@@ -88,7 +88,8 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 }
 
 func (rogue *Rogue) NewEviscerate(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	if rogue.comboPoints == 0 {
+	comboPoints := rogue.ComboPoints()
+	if comboPoints == 0 {
 		panic("Eviscerate requires combo points!")
 	}
 
@@ -96,8 +97,8 @@ func (rogue *Rogue) NewEviscerate(sim *core.Simulation, target *core.Target) *co
 	rogue.eviscerateTemplate.Apply(ev)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ev.ActionID.Tag = rogue.comboPoints
-	ev.Effect.WeaponInput.CalculateDamage = rogue.eviscerateDamageCalcs[rogue.comboPoints]
+	ev.ActionID.Tag = comboPoints
+	ev.Effect.WeaponInput.CalculateDamage = rogue.eviscerateDamageCalcs[comboPoints]
 	ev.Effect.Target = target
 	if rogue.deathmantle4pcProc {
 		ev.Cost.Value = 0

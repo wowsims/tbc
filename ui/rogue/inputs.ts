@@ -13,6 +13,7 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import {
 	Rogue,
 	Rogue_Rotation as RogueRotation,
+	Rogue_Rotation_Builder as Builder,
 	Rogue_Options as RogueOptions,
 } from '/tbc/core/proto/rogue.js';
 
@@ -23,6 +24,30 @@ export const ThistleTea = makeBooleanRogueBuffInput(ActionId.fromItemId(7676), '
 
 export const RogueRotationConfig = {
 	inputs: [
+		{
+			type: 'enum' as const, cssClass: 'builder-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Builder',
+				values: [
+					{
+						name: 'Auto', value: Builder.Auto,
+						tooltip: 'Automatically selects a builder based on weapons/talents.',
+					},
+					{ name: 'Sinister Strike', value: Builder.SinisterStrike },
+					{ name: 'Backstab', value: Builder.Backstab },
+					{ name: 'Hemorrhage', value: Builder.Hemorrhage },
+					{ name: 'Mutilate', value: Builder.Mutilate },
+				],
+				changedEvent: (player: Player<Spec.SpecRogue>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecRogue>) => player.getRotation().builder,
+				setValue: (eventID: EventID, player: Player<Spec.SpecRogue>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.builder = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
 		{
 			type: 'boolean' as const, cssClass: 'maintain-expose-armor-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
