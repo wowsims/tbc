@@ -144,8 +144,46 @@ func ApplyWarpSpringCoil(agent core.Agent) {
 	})
 }
 
+var AshtongueTalismanOfLethalityAuraID = core.NewAuraID()
 var AshtongueTalismanOfLethalityProcAuraID = core.NewAuraID()
 
 func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
-	// TODO: Add a 'finisher' bit flag so we can put the logic here instead of talents.go.
+	rogueAgent, ok := agent.(RogueAgent)
+	if !ok {
+		log.Fatalf("Non-rogue attempted to activate Ashtongue Talisman of Lethality.")
+	}
+	rogue := rogueAgent.GetRogue()
+
+	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		statApplier := rogue.NewTempStatAuraApplier(sim, AshtongueTalismanOfLethalityProcAuraID, core.ActionID{ItemID: 32492}, stats.MeleeCrit, 145, time.Second*10)
+		numPoints := int32(0)
+
+		return core.Aura{
+			ID: AshtongueTalismanOfLethalityAuraID,
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				if !cast.SpellExtras.Matches(SpellFlagFinisher) {
+					return
+				}
+
+				// Need to store the points because they get spent before OnSpellHit is called.
+				numPoints = rogue.comboPoints
+
+				if cast.SameActionIgnoreTag(SliceAndDiceActionID) {
+					// SND won't call OnSpellHit so we have to add the effect now.
+					if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
+						statApplier(sim)
+					}
+				}
+			},
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellCast.SpellExtras.Matches(SpellFlagFinisher) {
+					return
+				}
+
+				if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
+					statApplier(sim)
+				}
+			},
+		}
+	})
 }

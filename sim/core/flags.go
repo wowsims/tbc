@@ -149,7 +149,7 @@ func (ho HitOutcome) PartialResistString() string {
 // Ignore Resistance (armor or magical, use school)
 // Always Hits
 
-type SpellExtras byte
+type SpellExtras uint16
 
 // Returns whether there is any overlap between the given masks.
 func (se SpellExtras) Matches(other SpellExtras) bool {
@@ -163,7 +163,12 @@ const (
 	SpellExtrasAlwaysHits                            // Can't miss the hit roll
 	SpellExtrasBinary                                // Does not do partial resists and could need a different hit roll.
 	SpellExtrasChanneled                             // Spell is channeled
-	SpellExtrasAgentReserved                         // Used to let agents flag a spell
+
+	// Used to let agents categorize their spells.
+	SpellExtrasAgentReserved1
+	SpellExtrasAgentReserved2
+	SpellExtrasAgentReserved3
+	SpellExtrasAgentReserved4
 )
 
 // OutcomeRollCategory is the mask for what kind of hit roll to perform

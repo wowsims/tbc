@@ -46,6 +46,7 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 			CastTime:            baseCastTime,
 			GCD:                 core.GCDDefault,
 			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+			SpellExtras:         SpellFlagElectric,
 		},
 	}
 
