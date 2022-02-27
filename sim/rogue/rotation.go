@@ -21,10 +21,17 @@ func (rogue *Rogue) doRotation(sim *core.Simulation) {
 		return
 	}
 
+	target := sim.GetPrimaryTarget()
 	if rogue.comboPoints == 5 {
-		rogue.tryUseDamageFinisher(sim, energy)
+		if rogue.Rotation.MaintainExposeArmor && !target.HasAura(core.ExposeArmorDebuffID) {
+			if energy >= ExposeArmorEnergyCost {
+				rogue.NewExposeArmor(sim, target).Cast(sim)
+			}
+		} else {
+			rogue.tryUseDamageFinisher(sim, energy)
+		}
 	} else if energy >= rogue.builderEnergyCost {
-		rogue.newBuilder(sim, sim.GetPrimaryTarget()).Cast(sim)
+		rogue.newBuilder(sim, target).Cast(sim)
 	}
 }
 

@@ -41,7 +41,9 @@ var basicRotation = &proto.Rogue_Rotation{
 	UseRupture:          true,
 }
 
-var basicOptions = &proto.Rogue_Options{}
+var basicOptions = &proto.Rogue_Options{
+	UseThistleTea: true,
+}
 
 var FullRaidBuffs = &proto.RaidBuffs{
 	GiftOfTheWild: proto.TristateEffect_TristateEffectImproved,

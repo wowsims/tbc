@@ -52,6 +52,9 @@ type Rogue struct {
 	eviscerateTemplate    core.SimpleSpellTemplate
 	eviscerate            core.SimpleSpell
 
+	exposeArmorTemplate core.SimpleSpellTemplate
+	exposeArmor         core.SimpleSpell
+
 	ruptureTemplate core.SimpleSpellTemplate
 	rupture         core.SimpleSpell
 
@@ -85,6 +88,7 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 
 	rogue.initSliceAndDice(sim)
 	rogue.eviscerateTemplate = rogue.newEviscerateTemplate(sim)
+	rogue.exposeArmorTemplate = rogue.newExposeArmorTemplate(sim)
 	rogue.ruptureTemplate = rogue.newRuptureTemplate(sim)
 	rogue.deadlyPoisonTemplate = rogue.newDeadlyPoisonTemplate(sim)
 	rogue.deadlyPoisonRefreshTemplate = rogue.newDeadlyPoisonRefreshTemplate(sim)
@@ -196,6 +200,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 	})
 
 	rogue.applyTalents()
+	rogue.registerThistleTeaCD()
 
 	return rogue
 }
