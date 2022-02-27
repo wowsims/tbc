@@ -61,6 +61,9 @@ message RogueTalents {
 message Rogue {
     message Rotation {
 			bool maintain_expose_armor = 1;
+
+			// Allows use of rupture when sensible.
+			bool use_rupture = 2;
     }
     Rotation rotation = 1;
 

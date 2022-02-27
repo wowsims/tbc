@@ -52,6 +52,9 @@ type Rogue struct {
 	eviscerateTemplate    core.SimpleSpellTemplate
 	eviscerate            core.SimpleSpell
 
+	ruptureTemplate core.SimpleSpellTemplate
+	rupture         core.SimpleSpell
+
 	deadlyPoisonStacks   int
 	deadlyPoisonTemplate core.SimpleSpellTemplate
 	deadlyPoison         core.SimpleSpell
@@ -82,6 +85,7 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 
 	rogue.initSliceAndDice(sim)
 	rogue.eviscerateTemplate = rogue.newEviscerateTemplate(sim)
+	rogue.ruptureTemplate = rogue.newRuptureTemplate(sim)
 	rogue.deadlyPoisonTemplate = rogue.newDeadlyPoisonTemplate(sim)
 	rogue.deadlyPoisonRefreshTemplate = rogue.newDeadlyPoisonRefreshTemplate(sim)
 }
