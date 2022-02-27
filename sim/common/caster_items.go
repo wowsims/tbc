@@ -32,6 +32,9 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 		return core.Aura{
 			ID: RobeOfTheElderScribeAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
+				}
 				if !spellEffect.Landed() {
 					return
 				}
@@ -61,6 +64,9 @@ func ApplyEternalSage(agent core.Agent) {
 		return core.Aura{
 			ID: EternalSageItemAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
+				}
 				if !spellEffect.Landed() {
 					return
 				}

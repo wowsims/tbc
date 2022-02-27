@@ -61,13 +61,13 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 					DamageMultiplier:       1,
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-						if !hitEffect.Landed() {
+					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if !spellEffect.Landed() {
 							return
 						}
 
 						ssDebuffAura.Stacks = 2
-						hitEffect.Target.ReplaceAura(sim, ssDebuffAura)
+						spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
 						if hasSkyshatter4p {
 							shaman.Character.AddAuraWithTemporaryStats(sim, SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.AttackPower, 70, skyshatterDur)
 						}

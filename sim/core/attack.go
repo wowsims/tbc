@@ -16,17 +16,6 @@ import (
 //  This allows for abilities that convert a white attack into yellow attack.
 type ReplaceMHSwing func(sim *Simulation) *SimpleSpell
 
-// OnBeforeMelee is invoked before the hit/dmg rolls are made.
-//  This is invoked on both auto attacks and melee abilities.
-//  This should be used for any effects that adjust the stats / multipliers of the attack.
-type OnBeforeMeleeHit func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellHitEffect)
-
-// TODO: we should combine OnMeleeAttack and OnCastComplete probably
-
-// OnMeleeAttack is invoked on auto attacks and abilities.
-//  This should be used for any on-hit procs.
-type OnMeleeAttack func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect)
-
 // Represents a generic weapon. Pets / unarmed / various other cases dont use
 // actual weapon items so this is an abstraction of a Weapon.
 type Weapon struct {

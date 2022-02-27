@@ -30,6 +30,10 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 					return
 				}
 
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
+				}
+
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}

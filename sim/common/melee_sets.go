@@ -40,8 +40,11 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 
 				return core.Aura{
 					ID: DesolationBattlegearAuraID,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-						if !hitEffect.Landed() {
+					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if !spellEffect.Landed() {
+							return
+						}
+						if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 							return
 						}
 						if icd.IsOnCD(sim) {
@@ -119,17 +122,17 @@ var ItemSetFistsOfFury = core.ItemSet{
 
 				return core.Aura{
 					ID: FistsOfFuryAuraID,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-						if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 							return
 						}
-						if !ppmm.Proc(sim, hitEffect.IsMH(), false, "The Fists of Fury") {
+						if !ppmm.Proc(sim, spellEffect.IsMH(), false, "The Fists of Fury") {
 							return
 						}
 
 						castAction := &spellObj
 						castTemplate.Apply(castAction)
-						castAction.Effect.Target = hitEffect.Target
+						castAction.Effect.Target = spellEffect.Target
 						castAction.Init(sim)
 						castAction.Cast(sim)
 					},
@@ -174,13 +177,13 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 							spellEffect.BonusAttackPower += 200
 						}
 					},
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-						if !hitEffect.Landed() {
+					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if !spellEffect.Landed() {
 							return
 						}
 
 						// https://tbc.wowhead.com/spell=41434/the-twin-blades-of-azzinoth, proc mask = 20.
-						if !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
+						if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
 							return
 						}
 
@@ -188,7 +191,7 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 							return
 						}
 
-						if !ppmm.Proc(sim, hitEffect.IsMH(), false, "Twin Blades of Azzinoth") {
+						if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Twin Blades of Azzinoth") {
 							return
 						}
 						icd = core.InternalCD(sim.CurrentTime + icdDur)
@@ -221,8 +224,11 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 
 				return core.Aura{
 					ID: WastewalkerArmorAuraID,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-						if !hitEffect.Landed() {
+					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if !spellEffect.Landed() {
+							return
+						}
+						if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 							return
 						}
 						if icd.IsOnCD(sim) {

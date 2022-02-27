@@ -838,8 +838,8 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				const procChance = 0.185
 
 				aura := character.NewAuraWithTemporaryStats(sim, ConjuredAuraID, actionID, stats.FireSpellPower, fireBonus, dur)
-				aura.OnMeleeAttack = func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
-					if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || ability.IsPhantom {
+				aura.OnSpellHit = func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+					if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
 						return
 					}
 					if sim.RandomFloat("Flame Cap Melee") > procChance {
@@ -848,7 +848,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 
 					castAction := &spellObj
 					castTemplate.Apply(castAction)
-					castAction.Effect.Target = hitEffect.Target
+					castAction.Effect.Target = spellEffect.Target
 					castAction.Init(sim)
 					castAction.Cast(sim)
 				}

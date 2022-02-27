@@ -59,7 +59,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-BandoftheEternalChampion-29301"
  value: {
-  dps: 1650.352542668054
+  dps: 1650.299886596054
  }
 }
 dps_results: {
@@ -95,7 +95,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-BlackenedNaaruSliver-34427"
  value: {
-  dps: 1659.2661409006714
+  dps: 1659.2051451658713
  }
 }
 dps_results: {
@@ -179,7 +179,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 1633.333667883998
+  dps: 1633.331483686598
  }
 }
 dps_results: {
@@ -197,7 +197,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-DesolationBattlegear"
  value: {
-  dps: 1445.4828072994505
+  dps: 1445.4298570594506
  }
 }
 dps_results: {

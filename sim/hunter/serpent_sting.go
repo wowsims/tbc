@@ -62,8 +62,8 @@ func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleS
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				ProcMask: core.ProcMaskRangedSpecial,
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-					if !hitEffect.Landed() {
+				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if !spellEffect.Landed() {
 						return
 					}
 
@@ -71,7 +71,7 @@ func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleS
 					hunter.serpentStingDotTemplate.Apply(dot)
 
 					// Set dynamic fields, i.e. the stuff we couldn't precompute.
-					dot.Effect.Target = hitEffect.Target
+					dot.Effect.Target = spellEffect.Target
 					// TODO: This should probably include AP from mark of the champion / elixir of demonslaying / target debuffs
 					dot.Effect.DotInput.TickBaseDamage = 132 + hunter.GetStat(stats.RangedAttackPower)*0.02
 

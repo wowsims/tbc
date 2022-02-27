@@ -66,6 +66,9 @@ var ItemSetCycloneRegalia = core.ItemSet{
 				return core.Aura{
 					ID: Cyclone4PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+							return
+						}
 						if !spellEffect.Outcome.Matches(core.OutcomeCrit) || sim.RandomFloat("cycl4p") > 0.11 {
 							return // if not a crit or didn't proc, don't activate
 						}
@@ -97,6 +100,9 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 				return core.Aura{
 					ID: Cataclysm4PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+							return
+						}
 						if !spellEffect.Outcome.Matches(core.OutcomeCrit) || sim.RandomFloat("cata4p") > 0.25 {
 							return
 						}

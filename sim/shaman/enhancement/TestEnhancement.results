@@ -437,7 +437,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 1880.8458896245222
+  dps: 1879.6015766902726
  }
 }
 dps_results: {
@@ -485,7 +485,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-SkyshatterHarness"
  value: {
-  dps: 1783.0272370512046
+  dps: 1783.396118131642
  }
 }
 dps_results: {
@@ -527,7 +527,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-StormGauntlets-12632"
  value: {
-  dps: 1756.7815844413328
+  dps: 1753.5446798654727
  }
 }
 dps_results: {
@@ -653,7 +653,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-WorldBreaker-30090"
  value: {
-  dps: 1452.894789148784
+  dps: 1383.8767698614108
  }
 }
 dps_results: {

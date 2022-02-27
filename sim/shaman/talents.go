@@ -90,6 +90,9 @@ func (shaman *Shaman) applyElementalDevastation() {
 		return core.Aura{
 			ID: ElementalDevastationTalentAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
+				}
 				if spellCast.IsPhantom {
 					return
 				}
@@ -243,9 +246,9 @@ func (shaman *Shaman) applyUnleashedRage() {
 		currentAuras := make([]core.Aura, len(shaman.Party.PlayersAndPets))
 		return core.Aura{
 			ID: UnleashedRageTalentAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// proc mask = 20 (melee auto & special)
-				if !hitEffect.Outcome.Matches(core.OutcomeCrit) || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 
@@ -311,11 +314,14 @@ func (shaman *Shaman) applyShamanisticFocus() {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ShamanisticFocusTalentAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if !hitEffect.Outcome.Matches(core.OutcomeCrit) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
-				ability.Character.ReplaceAura(sim, focusedAura)
+				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+					return
+				}
+				spellCast.Character.ReplaceAura(sim, focusedAura)
 			},
 		}
 	})
@@ -342,8 +348,12 @@ func (shaman *Shaman) applyFlurry() {
 
 		return core.Aura{
 			ID: FlurryTalentAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+					return
+				}
+
+				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					if flurryStacks == 0 {
 						shaman.MultiplyMeleeSpeed(sim, bonus)
 						shaman.AddAura(sim, core.Aura{
@@ -361,7 +371,7 @@ func (shaman *Shaman) applyFlurry() {
 				}
 
 				// Remove a stack.
-				if flurryStacks > 0 && !ability.SameAction(StormstrikeActionID) && !icd.IsOnCD(sim) {
+				if flurryStacks > 0 && !spellCast.SameAction(StormstrikeActionID) && !icd.IsOnCD(sim) {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 					flurryStacks--
 					if flurryStacks == 0 {

@@ -190,12 +190,12 @@ func (rogue *Rogue) applySealFate() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: SealFateAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if !ability.ActionID.SameAction(SinisterStrikeActionID) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellCast.ActionID.SameAction(SinisterStrikeActionID) {
 					return
 				}
 
-				if !hitEffect.Outcome.Matches(core.OutcomeCrit) {
+				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
 
@@ -262,12 +262,12 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 
 			return core.Aura{
 				ID: SwordSpecializationAuraID,
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-					if !hitEffect.Landed() {
+				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if !spellEffect.Landed() {
 						return
 					}
 
-					if !hitEffect.ProcMask.Matches(swordSpecMask) {
+					if !spellEffect.ProcMask.Matches(swordSpecMask) {
 						return
 					}
 
@@ -282,7 +282,7 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 
 					// Got a proc
 					cachedAttack = mhAttack
-					cachedAttack.Effect.Target = hitEffect.Target
+					cachedAttack.Effect.Target = spellEffect.Target
 					cachedAttack.Cast(sim)
 				},
 			}
@@ -303,13 +303,13 @@ func (rogue *Rogue) applyCombatPotency() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: CombatPotencyAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if !hitEffect.Landed() {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
 					return
 				}
 
 				// https://tbc.wowhead.com/spell=35553/combat-potency, proc mask = 8838608.
-				if !hitEffect.ProcMask.Matches(core.ProcMaskMeleeOHAuto) {
+				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOHAuto) {
 					return
 				}
 
