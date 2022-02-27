@@ -24,6 +24,7 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolHoly,
+				SpellExtras:         core.SpellExtrasIgnoreResists,
 				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 				IsPhantom:           true,
 			},
@@ -33,7 +34,6 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 				DamageMultiplier:       1, // Need to review to make sure I set these properly
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				IgnoreArmor:            true,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
 					paladin.RemoveAura(sim, SealOfBloodAuraID)

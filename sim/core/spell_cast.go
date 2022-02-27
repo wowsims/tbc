@@ -84,12 +84,6 @@ type SpellEffect struct {
 	// This is only used by Shaman Stormstrike.
 	ReuseMainHitRoll bool
 
-	// Ignores reduction from target armor.
-	IgnoreArmor bool
-
-	// Skips dodge check.
-	CannotBeDodged bool
-
 	// Callbacks for providing additional custom behavior.
 	OnSpellHit OnSpellHit
 

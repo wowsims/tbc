@@ -59,7 +59,7 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 
 	ability.Effect.StaticDamageMultiplier *= 1 + 0.1*float64(rogue.Talents.SerratedBlades)
 	if rogue.Talents.SurpriseAttacks {
-		ability.Effect.CannotBeDodged = true
+		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}
 
 	return core.NewSimpleSpellTemplate(ability)

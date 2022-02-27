@@ -24,6 +24,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolHoly,
+				SpellExtras:         core.SpellExtrasIgnoreResists,
 				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 				IsPhantom:           true,
 			},
@@ -33,7 +34,6 @@ func (paladin *Paladin) setupSealOfBlood() {
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				IgnoreArmor:            true,
 			},
 			WeaponInput: core.WeaponDamageInput{
 				DamageMultiplier: 0.35, // should deal 35% weapon deamage
@@ -102,6 +102,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolHoly,
+				SpellExtras:         core.SpellExtrasIgnoreResists,
 				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 			},
 		},
@@ -110,7 +111,6 @@ func (paladin *Paladin) setupSealOfCommand() {
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				IgnoreArmor:            true,
 			},
 			WeaponInput: core.WeaponDamageInput{
 				DamageMultiplier: 0.70, // should deal 70% weapon deamage
