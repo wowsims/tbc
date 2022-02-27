@@ -26,7 +26,9 @@ export const DefaultRotation = RogueRotation.create({
     maintainExposeArmor: true,
     useRupture: true,
 });
-export const DefaultOptions = RogueOptions.create({});
+export const DefaultOptions = RogueOptions.create({
+    useThistleTea: true,
+});
 export const DefaultConsumes = Consumes.create({
     defaultPotion: Potions.HastePotion,
     flask: Flask.FlaskOfRelentlessAssault,

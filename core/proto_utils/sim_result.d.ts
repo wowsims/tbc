@@ -9,7 +9,7 @@ import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { PlayerMetrics as PlayerMetricsProto } from '/tbc/core/proto/api.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidMetrics as RaidMetricsProto } from '/tbc/core/proto/api.js';
-import { ResourceMetrics as ResourceMetricsProto } from '/tbc/core/proto/api.js';
+import { ResourceMetrics as ResourceMetricsProto, ResourceType } from '/tbc/core/proto/api.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
@@ -36,7 +36,7 @@ export declare class SimResult {
     getActionMetrics(filter: SimResultFilter): Array<ActionMetrics>;
     getSpellMetrics(filter: SimResultFilter): Array<ActionMetrics>;
     getMeleeMetrics(filter: SimResultFilter): Array<ActionMetrics>;
-    getResourceMetrics(filter: SimResultFilter): Array<ResourceMetrics>;
+    getResourceMetrics(filter: SimResultFilter, resourceType: ResourceType): Array<ResourceMetrics>;
     getBuffMetrics(filter: SimResultFilter): Array<AuraMetrics>;
     getDebuffMetrics(filter: SimResultFilter): Array<AuraMetrics>;
     toJson(): any;
@@ -126,6 +126,7 @@ export declare class ResourceMetrics {
     readonly actionId: ActionId;
     readonly name: string;
     readonly iconUrl: string;
+    readonly type: ResourceType;
     private readonly iterations;
     private readonly duration;
     private readonly data;

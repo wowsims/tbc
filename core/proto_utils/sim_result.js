@@ -65,8 +65,8 @@ export class SimResult {
     getMeleeMetrics(filter) {
         return this.getActionMetrics(filter).filter(e => e.hitAttempts != 0 && e.isMeleeAction);
     }
-    getResourceMetrics(filter) {
-        return ResourceMetrics.joinById(this.getPlayers(filter).map(player => player.resources).flat());
+    getResourceMetrics(filter, resourceType) {
+        return ResourceMetrics.joinById(this.getPlayers(filter).map(player => player.resources.filter(resource => resource.type == resourceType)).flat());
     }
     getBuffMetrics(filter) {
         return AuraMetrics.joinById(this.getPlayers(filter).map(player => player.auras).flat());
@@ -249,6 +249,7 @@ export class ResourceMetrics {
         this.actionId = actionId;
         this.name = actionId.name;
         this.iconUrl = actionId.iconUrl;
+        this.type = data.type;
         this.iterations = iterations;
         this.duration = duration;
         this.data = data;

@@ -1,24 +1,44 @@
+import { ResourceType } from '/tbc/core/proto/api.js';
+import { resourceNames } from '/tbc/core/proto_utils/names.js';
+import { getEnumValues } from '/tbc/core/utils.js';
 import { ResultComponent } from './result_component.js';
-// For the no-damage casts
 export class ResourceMetrics extends ResultComponent {
     constructor(config) {
         config.rootCssClass = 'resource-metrics-root';
         super(config);
+        const resourceTypes = getEnumValues(ResourceType).filter(val => val != ResourceType.ResourceTypeNone);
+        resourceTypes.forEach(resourceType => {
+            const childConfig = config;
+            childConfig.parent = this.rootElem;
+            new ResourceMetricsTable(childConfig, resourceType);
+        });
+    }
+    onSimResult(resultData) {
+    }
+}
+export class ResourceMetricsTable extends ResultComponent {
+    constructor(config, resourceType) {
+        config.rootCssClass = 'resource-metrics-table-root';
+        super(config);
+        this.resourceType = resourceType;
         this.rootElem.innerHTML = `
-		<table class="metrics-table tablesorter">
-			<thead class="metrics-table-header">
-				<tr class="metrics-table-header-row">
-					<th class="metrics-table-header-cell"><span>Name</span></th>
-					<th class="metrics-table-header-cell"><span>Casts</span></th>
-					<th class="metrics-table-header-cell"><span>Gain</span></th>
-					<th class="metrics-table-header-cell"><span>Gain / s</span></th>
-					<th class="metrics-table-header-cell"><span>Avg Gain</span></th>
-					<th class="metrics-table-header-cell"><span>Avg Actual Gain</span></th>
-				</tr>
-			</thead>
-			<tbody class="metrics-table-body">
-			</tbody>
-		</table>
+		<div class="resource-metrics-table-container">
+			<span class="resource-metrics-table-title">${resourceNames[this.resourceType]}</span>
+			<table class="metrics-table tablesorter">
+				<thead class="metrics-table-header">
+					<tr class="metrics-table-header-row">
+						<th class="metrics-table-header-cell"><span>Name</span></th>
+						<th class="metrics-table-header-cell"><span>Casts</span></th>
+						<th class="metrics-table-header-cell"><span>Gain</span></th>
+						<th class="metrics-table-header-cell"><span>Gain / s</span></th>
+						<th class="metrics-table-header-cell"><span>Avg Gain</span></th>
+						<th class="metrics-table-header-cell"><span>Avg Actual Gain</span></th>
+					</tr>
+				</thead>
+				<tbody class="metrics-table-body">
+				</tbody>
+			</table>
+		</div>
 		`;
         this.tableElem = this.rootElem.getElementsByClassName('metrics-table')[0];
         this.bodyElem = this.rootElem.getElementsByClassName('metrics-table-body')[0];
@@ -34,17 +54,17 @@ export class ResourceMetrics extends ResultComponent {
             'allowHTML': true,
         });
         // GPS
-        tippy(headerElems[2], {
+        tippy(headerElems[3], {
             'content': 'Gain / Second',
             'allowHTML': true,
         });
         // Avg Gain
-        tippy(headerElems[3], {
+        tippy(headerElems[4], {
             'content': 'Gain / Event',
             'allowHTML': true,
         });
         // Avg Actual Gain
-        tippy(headerElems[4], {
+        tippy(headerElems[5], {
             'content': 'Actual Gain / Event',
             'allowHTML': true,
         });
@@ -55,7 +75,13 @@ export class ResourceMetrics extends ResultComponent {
     }
     onSimResult(resultData) {
         this.bodyElem.textContent = '';
-        const resourceMetrics = resultData.result.getResourceMetrics(resultData.filter);
+        const resourceMetrics = resultData.result.getResourceMetrics(resultData.filter, this.resourceType);
+        if (resourceMetrics.length == 0) {
+            this.rootElem.classList.add('hide');
+        }
+        else {
+            this.rootElem.classList.remove('hide');
+        }
         resourceMetrics.forEach(resourceMetric => {
             const rowElem = document.createElement('tr');
             this.bodyElem.appendChild(rowElem);

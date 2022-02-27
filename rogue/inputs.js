@@ -1,5 +1,7 @@
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
+export const ThistleTea = makeBooleanRogueBuffInput(ActionId.fromItemId(7676), 'useThistleTea');
 export const RogueRotationConfig = {
     inputs: [
         {
@@ -34,3 +36,16 @@ export const RogueRotationConfig = {
         },
     ],
 };
+function makeBooleanRogueBuffInput(id, optionsFieldName) {
+    return {
+        id: id,
+        states: 2,
+        changedEvent: (player) => player.specOptionsChangeEmitter,
+        getValue: (player) => player.getSpecOptions()[optionsFieldName],
+        setValue: (eventID, player, newValue) => {
+            const newOptions = player.getSpecOptions();
+            newOptions[optionsFieldName] = newValue;
+            player.setSpecOptions(eventID, newOptions);
+        },
+    };
+}

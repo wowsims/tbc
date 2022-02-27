@@ -164,6 +164,7 @@ export class RogueSimUI extends IndividualSimUI {
                     WeaponImbue.WeaponImbueAdamantiteWeightstone,
                 ],
                 other: [
+                    RogueInputs.ThistleTea,
                     IconInputs.DrumsOfBattleConsume,
                     IconInputs.BattleChicken,
                     IconInputs.ScrollOfAgilityV,

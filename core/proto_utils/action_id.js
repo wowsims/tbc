@@ -135,7 +135,9 @@ export class ActionId {
                     name += ' (3 Tick)';
                 }
                 break;
+            case 'Envenom':
             case 'Eviscerate':
+            case 'Expose Armor':
             case 'Rupture':
             case 'Slice and Dice':
                 if (this.tag)

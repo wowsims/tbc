@@ -239,6 +239,10 @@ export interface Rogue_Rotation {
  * @generated from protobuf message proto.Rogue.Options
  */
 export interface Rogue_Options {
+    /**
+     * @generated from protobuf field: bool use_thistle_tea = 1;
+     */
+    useThistleTea: boolean;
 }
 declare class RogueTalents$Type extends MessageType<RogueTalents> {
     constructor();
