@@ -21,10 +21,6 @@ func (hunter *Hunter) applyKillCommand() {
 		return core.Aura{
 			ID: KillCommandAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				// TODO: Remove this check, just here for preserving old behavior.
-				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					hunter.killCommandEnabledUntil = sim.CurrentTime + time.Second*5
 					hunter.TryKillCommand(sim, sim.GetPrimaryTarget())

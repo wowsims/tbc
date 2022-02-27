@@ -26,8 +26,7 @@ func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
 			spellEffect.BonusAttackPower += 155
 		},
 		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-			// TODO: ranged white hits only
-			if !spellEffect.ProcMask.Matches(core.ProcMaskWhiteHit) {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskRangedAuto) {
 				return
 			}
 

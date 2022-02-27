@@ -287,7 +287,7 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 	case OptionSteady:
 		if !hunter.tryUsePrioGCD(sim) {
 			ss := hunter.NewSteadyShot(sim, target)
-			if success := ss.StartCast(sim); success {
+			if success := ss.Cast(sim); success {
 				// Can't use kill command while casting steady shot.
 				hunter.killCommandBlocked = true
 			} else {
@@ -297,7 +297,7 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 	case OptionMulti:
 		if !hunter.tryUsePrioGCD(sim) {
 			ms := hunter.NewMultiShot(sim)
-			if success := ms.StartCast(sim); success {
+			if success := ms.Cast(sim); success {
 			} else {
 				hunter.WaitForMana(sim, ms.GetManaCost())
 			}
@@ -352,7 +352,7 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 			hunter.WaitForMana(sim, ss.Cost.Value)
 		}
 		return true
-	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_SerpentSting && !hunter.serpentStingDot.IsInUse() {
+	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_SerpentSting && !hunter.serpentSting.IsInUse() {
 		ss := hunter.NewSerpentSting(sim, target)
 		if success := ss.Cast(sim); !success {
 			hunter.WaitForMana(sim, ss.Cost.Value)

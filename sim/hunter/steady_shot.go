@@ -9,51 +9,24 @@ import (
 
 var SteadyShotActionID = core.ActionID{SpellID: 34120}
 
-// ActiveMeleeAbility doesn't support cast times, so we wrap it in a SimpleCast.
-func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.SimpleCast {
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  SteadyShotActionID,
-			Character: hunter.GetCharacter(),
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 110,
-			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 110,
-			},
-			// Cast time is affected by ranged attack speed so set it later.
-			//CastTime:     time.Millisecond * 1500,
-			GCD:         core.GCDDefault,
-			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				target := sim.GetPrimaryTarget()
-				ss := &hunter.steadyShotAbility
-				hunter.steadyShotAbilityTemplate.Apply(ss)
-				ss.Effect.Target = target
-				ss.Cast(sim)
-
-				hunter.killCommandBlocked = false
-				hunter.TryKillCommand(sim, target)
-
-				hunter.rotation(sim, false)
-			},
-		},
-		DisableMetrics: true,
-	}
-
-	template.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
-
-	return template
-}
-
-func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (hunter *Hunter) newSteadyShotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            SteadyShotActionID,
-				Character:           &hunter.Character,
+				ActionID:  SteadyShotActionID,
+				Character: hunter.GetCharacter(),
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 110,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 110,
+				},
+				// Cast time is affected by ranged attack speed so set it later.
+				//CastTime:     time.Millisecond * 1500,
+				GCD:                 core.GCDDefault,
+				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
 				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical,
@@ -66,6 +39,11 @@ func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.Si
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
+				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					hunter.killCommandBlocked = false
+					hunter.TryKillCommand(sim, spellEffect.Target)
+					hunter.rotation(sim, false)
+				},
 			},
 			WeaponInput: core.WeaponDamageInput{
 				CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
@@ -77,6 +55,8 @@ func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.Si
 		},
 	}
 
+	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+
 	if ItemSetRiftStalker.CharacterHasSetBonus(&hunter.Character, 4) {
 		ama.Effect.BonusCritRating += 5 * core.MeleeCritRatingPerCritChance
 	}
@@ -87,14 +67,16 @@ func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.Si
 	return core.NewSimpleSpellTemplate(ama)
 }
 
-func (hunter *Hunter) NewSteadyShot(sim *core.Simulation, target *core.Target) core.SimpleCast {
-	hunter.steadyShotCast = hunter.steadyShotCastTemplate
+func (hunter *Hunter) NewSteadyShot(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+	ss := &hunter.steadyShot
+	hunter.steadyShotTemplate.Apply(ss)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hunter.steadyShotCast.CastTime = hunter.SteadyShotCastTime()
+	ss.CastTime = hunter.SteadyShotCastTime()
+	ss.Effect.Target = target
 
-	hunter.steadyShotCast.Init(sim)
-	return hunter.steadyShotCast
+	ss.Init(sim)
+	return ss
 }
 
 func (hunter *Hunter) SteadyShotCastTime() time.Duration {

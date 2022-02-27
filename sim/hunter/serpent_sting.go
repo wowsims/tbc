@@ -10,23 +10,25 @@ import (
 var SerpentStingDebuffID = core.NewDebuffID()
 var SerpentStingActionID = core.ActionID{SpellID: 27016}
 
-// Serpent sting uses the melee hit table for checking hit, but otherwise acts like
-// a spell. So we have to wrap the Dot spell within a melee ability.
-// TODO: Figure out a way to simplify this, and remove the metrics hack in core/metrics_aggregator.go.
-func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	dotSpell := core.SimpleSpell{
+func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 275}
+	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				ActionID:            SerpentStingActionID,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellExtras:         core.SpellExtrasAlwaysHits,
-				SpellSchool:         core.SpellSchoolNature,
 				Character:           &hunter.Character,
+				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+				CritRollCategory:    core.CritRollCategoryNone,
+				SpellSchool:         core.SpellSchoolNature,
+				GCD:                 core.GCDDefault,
+				Cost:                cost,
+				BaseCost:            cost,
+				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
 			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
+				ProcMask:               core.ProcMaskRangedSpecial,
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
@@ -39,51 +41,9 @@ func (hunter *Hunter) newSerpentStingDotTemplate(sim *core.Simulation) core.Simp
 			},
 		},
 	}
-	dotSpell.Effect.StaticDamageMultiplier *= 1 + 0.06*float64(hunter.Talents.ImprovedStings)
-	return core.NewSimpleSpellTemplate(dotSpell)
-}
-
-func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 275}
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            SerpentStingActionID,
-				Character:           &hunter.Character,
-				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolNature,
-				GCD:                 core.GCDDefault,
-				Cost:                cost,
-				BaseCost:            cost,
-				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask: core.ProcMaskRangedSpecial,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						return
-					}
-
-					dot := &hunter.serpentStingDot
-					hunter.serpentStingDotTemplate.Apply(dot)
-
-					// Set dynamic fields, i.e. the stuff we couldn't precompute.
-					dot.Effect.Target = spellEffect.Target
-					// TODO: This should probably include AP from mark of the champion / elixir of demonslaying / target debuffs
-					dot.Effect.DotInput.TickBaseDamage = 132 + hunter.GetStat(stats.RangedAttackPower)*0.02
-
-					dot.Init(sim)
-					dot.Cast(sim)
-				},
-			},
-		},
-	}
 
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
-	ama.Effect.BonusCritRating = -100 * core.MeleeCritRatingPerCritChance // Prevent crits
+	ama.Effect.StaticDamageMultiplier *= 1 + 0.06*float64(hunter.Talents.ImprovedStings)
 
 	return core.NewSimpleSpellTemplate(ama)
 }
@@ -94,6 +54,9 @@ func (hunter *Hunter) NewSerpentSting(sim *core.Simulation, target *core.Target)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	ss.Effect.Target = target
+	// TODO: This should probably include AP from mark of the champion / elixir of demonslaying / target debuffs
+	ss.Effect.DotInput.TickBaseDamage = 132 + hunter.GetStat(stats.RangedAttackPower)*0.02
+
 	ss.Init(sim)
 	return ss
 }
