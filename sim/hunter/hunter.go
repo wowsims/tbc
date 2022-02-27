@@ -89,11 +89,8 @@ type Hunter struct {
 	killCommandTemplate core.SimpleSpellTemplate
 	killCommand         core.SimpleSpell
 
-	multiShotCastTemplate core.SimpleCast
-	multiShotCast         core.SimpleCast
-
-	multiShotAbilityTemplate core.SimpleSpellTemplate
-	multiShotAbility         core.SimpleSpell
+	multiShotTemplate core.SimpleSpellTemplate
+	multiShot         core.SimpleSpell
 
 	raptorStrikeTemplate core.SimpleSpellTemplate
 	raptorStrike         core.SimpleSpell
@@ -104,14 +101,8 @@ type Hunter struct {
 	serpentStingTemplate core.SimpleSpellTemplate
 	serpentSting         core.SimpleSpell
 
-	serpentStingDotTemplate core.SimpleSpellTemplate
-	serpentStingDot         core.SimpleSpell
-
-	steadyShotCastTemplate core.SimpleCast
-	steadyShotCast         core.SimpleCast
-
-	steadyShotAbilityTemplate core.SimpleSpellTemplate
-	steadyShotAbility         core.SimpleSpell
+	steadyShotTemplate core.SimpleSpellTemplate
+	steadyShot         core.SimpleSpell
 
 	fakeHardcast core.Cast
 }
@@ -144,14 +135,11 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.aspectOfTheHawkTemplate = hunter.newAspectOfTheHawkTemplate(sim)
 	hunter.aspectOfTheViperTemplate = hunter.newAspectOfTheViperTemplate(sim)
 	hunter.killCommandTemplate = hunter.newKillCommandTemplate(sim)
-	hunter.multiShotCastTemplate = hunter.newMultiShotCastTemplate(sim)
-	hunter.multiShotAbilityTemplate = hunter.newMultiShotAbilityTemplate(sim)
+	hunter.multiShotTemplate = hunter.newMultiShotTemplate(sim)
 	hunter.raptorStrikeTemplate = hunter.newRaptorStrikeTemplate(sim)
 	hunter.scorpidStingTemplate = hunter.newScorpidStingTemplate(sim)
 	hunter.serpentStingTemplate = hunter.newSerpentStingTemplate(sim)
-	hunter.serpentStingDotTemplate = hunter.newSerpentStingDotTemplate(sim)
-	hunter.steadyShotCastTemplate = hunter.newSteadyShotCastTemplate(sim)
-	hunter.steadyShotAbilityTemplate = hunter.newSteadyShotAbilityTemplate(sim)
+	hunter.steadyShotTemplate = hunter.newSteadyShotTemplate(sim)
 
 	hunter.fakeHardcast = core.Cast{
 		Character:   &hunter.Character,

@@ -10,49 +10,25 @@ import (
 var MultiShotCooldownID = core.NewCooldownID()
 var MultiShotActionID = core.ActionID{SpellID: 27021, CooldownID: MultiShotCooldownID}
 
-// ActiveMeleeAbility doesn't support cast times, so we wrap it in a SimpleCast.
-func (hunter *Hunter) newMultiShotCastTemplate(sim *core.Simulation) core.SimpleCast {
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  MultiShotActionID,
-			Character: hunter.GetCharacter(),
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 275,
-			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 275,
-			},
-			// Cast time is affected by ranged attack speed so set it later.
-			//CastTime:     time.Millisecond * 500,
-			GCD:         core.GCDDefault,
-			Cooldown:    time.Second * 10,
-			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				ms := &hunter.multiShotAbility
-				hunter.multiShotAbilityTemplate.Apply(ms)
-				ms.Cast(sim)
-				hunter.rotation(sim, false)
-			},
-		},
-		DisableMetrics: true,
-	}
-
-	template.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
-	if ItemSetDemonStalker.CharacterHasSetBonus(&hunter.Character, 4) {
-		template.Cost.Value -= 275.0 * 0.1
-	}
-
-	return template
-}
-
-func (hunter *Hunter) newMultiShotAbilityTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            MultiShotActionID,
-				Character:           &hunter.Character,
+				ActionID:  MultiShotActionID,
+				Character: hunter.GetCharacter(),
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 275,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 275,
+				},
+				// Cast time is affected by ranged attack speed so set it later.
+				//CastTime:     time.Millisecond * 500,
+				GCD:                 core.GCDDefault,
+				Cooldown:            time.Second * 10,
+				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
 				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical,
@@ -63,12 +39,20 @@ func (hunter *Hunter) newMultiShotAbilityTemplate(sim *core.Simulation) core.Sim
 		},
 	}
 
+	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+	if ItemSetDemonStalker.CharacterHasSetBonus(&hunter.Character, 4) {
+		ama.Cost.Value -= 275.0 * 0.1
+	}
+
 	baseEffect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
 			ProcMask:               core.ProcMaskRangedSpecial,
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
 			ThreatMultiplier:       1,
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				hunter.rotation(sim, false)
+			},
 		},
 		WeaponInput: core.WeaponDamageInput{
 			CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
@@ -95,14 +79,15 @@ func (hunter *Hunter) newMultiShotAbilityTemplate(sim *core.Simulation) core.Sim
 	return core.NewSimpleSpellTemplate(ama)
 }
 
-func (hunter *Hunter) NewMultiShot(sim *core.Simulation) core.SimpleCast {
-	hunter.multiShotCast = hunter.multiShotCastTemplate
+func (hunter *Hunter) NewMultiShot(sim *core.Simulation) *core.SimpleSpell {
+	ms := &hunter.multiShot
+	hunter.multiShotTemplate.Apply(ms)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hunter.multiShotCast.CastTime = hunter.MultiShotCastTime()
+	ms.CastTime = hunter.MultiShotCastTime()
 
-	hunter.multiShotCast.Init(sim)
-	return hunter.multiShotCast
+	ms.Init(sim)
+	return ms
 }
 
 func (hunter *Hunter) MultiShotCastTime() time.Duration {
