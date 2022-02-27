@@ -49,13 +49,13 @@ func (paladin *Paladin) setupSealOfBlood() {
 		ID:       SealOfBloodAuraID,
 		ActionID: SealOfBloodProcActionID,
 
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
+		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
 				return
 			}
 
 			sobTemplate.Apply(&sobAtk)
-			sobAtk.Effect.Target = hitEffect.Target
+			sobAtk.Effect.Target = spellEffect.Target
 			sobAtk.Cast(sim)
 		},
 	}
@@ -131,8 +131,8 @@ func (paladin *Paladin) setupSealOfCommand() {
 		ID:       SealOfCommandAuraID,
 		ActionID: SealOfCommandProcActionID,
 
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
+		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
 				return
 			}
 
@@ -147,7 +147,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 			icd = core.InternalCD(sim.CurrentTime + icdDur)
 
 			socTemplate.Apply(&socAtk)
-			socAtk.Effect.Target = hitEffect.Target
+			socAtk.Effect.Target = spellEffect.Target
 			socAtk.Cast(sim)
 		},
 	}

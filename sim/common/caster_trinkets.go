@@ -215,6 +215,9 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 		return core.Aura{
 			ID: ShiffarsNexusHornAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
+				}
 				if icd.IsOnCD(sim) || !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellCast.IsPhantom {
 					return
 				}
@@ -240,6 +243,9 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 		return core.Aura{
 			ID: EyeOfMagtheridonAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
+				}
 				if !spellEffect.Outcome.Matches(core.OutcomeMiss) {
 					return
 				}
@@ -263,6 +269,9 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 		return core.Aura{
 			ID: SextantOfUnstableCurrentsAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
+				}
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || icd.IsOnCD(sim) || spellCast.IsPhantom {
 					return
 				}
@@ -290,50 +299,51 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 
 		return core.Aura{
 			ID: DarkmoonCardCrusadeAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if ability.IsPhantom {
-					return
-				}
-
-				if meleeStacks < 20 {
-					meleeStacks++
-					character.AddStat(stats.AttackPower, meleeBonus)
-					character.AddStat(stats.RangedAttackPower, meleeBonus)
-				}
-
-				// Removal aura will refresh with new total spellpower based on stacks.
-				//  This will remove the old stack removal buff.
-				character.ReplaceAura(sim, core.Aura{
-					ID:       AuraOfTheCrusadeMeleeAuraID,
-					ActionID: core.ActionID{ItemID: 31856, Tag: 1},
-					Expires:  sim.CurrentTime + time.Second*10,
-					OnExpire: func(sim *core.Simulation) {
-						character.AddStat(stats.AttackPower, -meleeBonus*float64(meleeStacks))
-						character.AddStat(stats.RangedAttackPower, -meleeBonus*float64(meleeStacks))
-						meleeStacks = 0
-					},
-				})
-			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
-					return
-				}
-				if spellStacks < 10 {
-					spellStacks++
-					character.AddStat(stats.SpellPower, spellBonus)
-				}
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					if spellCast.IsPhantom {
+						return
+					}
 
-				// Removal aura will refresh with new total spellpower based on stacks.
-				//  This will remove the old stack removal buff.
-				character.ReplaceAura(sim, core.Aura{
-					ID:       AuraOfTheCrusadeSpellAuraID,
-					ActionID: core.ActionID{ItemID: 31856, Tag: 2},
-					Expires:  sim.CurrentTime + time.Second*10,
-					OnExpire: func(sim *core.Simulation) {
-						character.AddStat(stats.SpellPower, -spellBonus*float64(spellStacks))
-						spellStacks = 0
-					},
-				})
+					if meleeStacks < 20 {
+						meleeStacks++
+						character.AddStat(stats.AttackPower, meleeBonus)
+						character.AddStat(stats.RangedAttackPower, meleeBonus)
+					}
+
+					// Removal aura will refresh with new total spellpower based on stacks.
+					//  This will remove the old stack removal buff.
+					character.ReplaceAura(sim, core.Aura{
+						ID:       AuraOfTheCrusadeMeleeAuraID,
+						ActionID: core.ActionID{ItemID: 31856, Tag: 1},
+						Expires:  sim.CurrentTime + time.Second*10,
+						OnExpire: func(sim *core.Simulation) {
+							character.AddStat(stats.AttackPower, -meleeBonus*float64(meleeStacks))
+							character.AddStat(stats.RangedAttackPower, -meleeBonus*float64(meleeStacks))
+							meleeStacks = 0
+						},
+					})
+				} else {
+					if !spellEffect.Landed() {
+						return
+					}
+					if spellStacks < 10 {
+						spellStacks++
+						character.AddStat(stats.SpellPower, spellBonus)
+					}
+
+					// Removal aura will refresh with new total spellpower based on stacks.
+					//  This will remove the old stack removal buff.
+					character.ReplaceAura(sim, core.Aura{
+						ID:       AuraOfTheCrusadeSpellAuraID,
+						ActionID: core.ActionID{ItemID: 31856, Tag: 2},
+						Expires:  sim.CurrentTime + time.Second*10,
+						OnExpire: func(sim *core.Simulation) {
+							character.AddStat(stats.SpellPower, -spellBonus*float64(spellStacks))
+							spellStacks = 0
+						},
+					})
+				}
 			},
 		}
 	})

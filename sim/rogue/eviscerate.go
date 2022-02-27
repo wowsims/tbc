@@ -61,14 +61,14 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-					if hitEffect.Landed() {
+				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if spellEffect.Landed() {
 						numPoints := rogue.comboPoints
 						rogue.SpendComboPoints(sim)
 						finishingMoveEffects(sim, numPoints)
 					} else {
 						if refundAmount > 0 {
-							rogue.AddEnergy(sim, ability.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
+							rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
 						}
 					}
 				},

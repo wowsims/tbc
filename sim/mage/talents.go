@@ -102,6 +102,9 @@ func (mage *Mage) applyArcaneConcentration() {
 				cast.BonusCritRating += bonusCrit
 			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
+				}
 				if !spellEffect.Landed() {
 					return
 				}
@@ -256,6 +259,9 @@ func (mage *Mage) applyMasterOfElements() {
 		return core.Aura{
 			ID: MasterOfElementsAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
+				}
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					mage.AddMana(sim, spellCast.BaseCost.Value*refundCoeff, core.ActionID{SpellID: 29076}, false)
 				}
@@ -302,6 +308,9 @@ func (mage *Mage) registerCombustionCD() {
 						cast.BonusCritRating += float64(numHits) * 10 * core.SpellCritRatingPerCritChance
 					},
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+							return
+						}
 						if !spellEffect.Landed() {
 							return
 						}

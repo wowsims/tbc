@@ -91,8 +91,7 @@ type SpellEffect struct {
 	CannotBeDodged bool
 
 	// Callbacks for providing additional custom behavior.
-	OnSpellHit    OnSpellHit
-	OnMeleeAttack OnMeleeAttack
+	OnSpellHit OnSpellHit
 
 	// Results
 	Outcome HitOutcome
@@ -141,19 +140,19 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *Simpl
 }
 
 func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spell *SimpleSpell) {
-	if spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) {
-		spell.Character.OnMeleeAttack(sim, spell, spellEffect)
-		spellEffect.Target.OnMeleeAttack(sim, spell, spellEffect)
-		if spellEffect.OnMeleeAttack != nil {
-			spellEffect.OnMeleeAttack(sim, spell, spellEffect)
-		}
-	} else {
-		if spellEffect.OnSpellHit != nil {
-			spellEffect.OnSpellHit(sim, &spell.SpellCast, spellEffect)
-		}
-		spell.Character.OnSpellHit(sim, &spell.SpellCast, spellEffect)
-		spellEffect.Target.OnSpellHit(sim, &spell.SpellCast, spellEffect)
+	//if spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) {
+	//	spell.Character.OnMeleeAttack(sim, spell, spellEffect)
+	//	spellEffect.Target.OnMeleeAttack(sim, spell, spellEffect)
+	//	if spellEffect.OnMeleeAttack != nil {
+	//		spellEffect.OnMeleeAttack(sim, spell, spellEffect)
+	//	}
+	//} else {
+	if spellEffect.OnSpellHit != nil {
+		spellEffect.OnSpellHit(sim, &spell.SpellCast, spellEffect)
 	}
+	spell.Character.OnSpellHit(sim, &spell.SpellCast, spellEffect)
+	spellEffect.Target.OnSpellHit(sim, &spell.SpellCast, spellEffect)
+	//}
 }
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *SimpleSpell) {

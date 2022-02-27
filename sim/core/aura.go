@@ -76,7 +76,6 @@ type Aura struct {
 	onSpellHitIndex             int32 // Position of this aura's index in the sim.onSpellHitIDs array.
 	onBeforePeriodicDamageIndex int32 // Position of this aura's index in the sim.onBeforePeriodicDamageIDs array.
 	onPeriodicDamageIndex       int32 // Position of this aura's index in the sim.onPeriodicDamageIDs array.
-	OnMeleeAttackIndex          int32 // Position of this aura's index in the sim.OnMeleeAttack array.
 
 	// The number of stacks, or charges, of this aura. If this aura doesn't care
 	// about charges, is just 0.
@@ -103,9 +102,6 @@ type Aura struct {
 
 	// Invoked when a dot tick occurs, after damage is calculated.
 	OnPeriodicDamage OnPeriodicDamage
-
-	// Invoked after a melee hit has occured (could be auto or skill).
-	OnMeleeAttack OnMeleeAttack
 }
 
 type AuraFactory func(*Simulation) Aura
@@ -309,7 +305,6 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 	newAura.onSpellHitIndex = old.onSpellHitIndex
 	newAura.onBeforePeriodicDamageIndex = old.onBeforePeriodicDamageIndex
 	newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
-	newAura.OnMeleeAttackIndex = old.OnMeleeAttackIndex
 	newAura.startTime = old.startTime
 
 	at.auras[newAura.ID] = newAura
@@ -360,11 +355,6 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 	if newAura.OnPeriodicDamage != nil {
 		at.auras[newAura.ID].onPeriodicDamageIndex = int32(len(at.onPeriodicDamageIDs))
 		at.onPeriodicDamageIDs = append(at.onPeriodicDamageIDs, newAura.ID)
-	}
-
-	if newAura.OnMeleeAttack != nil {
-		at.auras[newAura.ID].OnMeleeAttackIndex = int32(len(at.onMeleeAttackIDs))
-		at.onMeleeAttackIDs = append(at.onMeleeAttackIDs, newAura.ID)
 	}
 
 	if sim.Log != nil && !newAura.ActionID.IsEmptyAction() {
@@ -437,14 +427,6 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 		at.onPeriodicDamageIDs = removeBySwappingToBack(at.onPeriodicDamageIDs, removeOnPeriodicDamage)
 		if removeOnPeriodicDamage < int32(len(at.onPeriodicDamageIDs)) {
 			at.auras[at.onPeriodicDamageIDs[removeOnPeriodicDamage]].onPeriodicDamageIndex = removeOnPeriodicDamage
-		}
-	}
-
-	if at.auras[id].OnMeleeAttack != nil {
-		removeOnMeleeAttack := at.auras[id].OnMeleeAttackIndex
-		at.onMeleeAttackIDs = removeBySwappingToBack(at.onMeleeAttackIDs, removeOnMeleeAttack)
-		if removeOnMeleeAttack < int32(len(at.onMeleeAttackIDs)) {
-			at.auras[at.onMeleeAttackIDs[removeOnMeleeAttack]].OnMeleeAttackIndex = removeOnMeleeAttack
 		}
 	}
 
@@ -559,12 +541,6 @@ func (at *auraTracker) OnBeforePeriodicDamage(sim *Simulation, spellCast *SpellC
 func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage float64) {
 	for _, id := range at.onPeriodicDamageIDs {
 		at.auras[id].OnPeriodicDamage(sim, spellCast, spellEffect, tickDamage)
-	}
-}
-
-func (at *auraTracker) OnMeleeAttack(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
-	for _, id := range at.onMeleeAttackIDs {
-		at.auras[id].OnMeleeAttack(sim, ability, hitEffect)
 	}
 }
 

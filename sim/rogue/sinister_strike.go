@@ -39,8 +39,8 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.SimpleS
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-					if hitEffect.Landed() {
+				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if spellEffect.Landed() {
 						rogue.AddComboPoint(sim)
 					} else {
 						rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})

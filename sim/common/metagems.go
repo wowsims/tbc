@@ -95,15 +95,15 @@ func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 
 		return core.Aura{
 			ID: ThunderingSkyfireDiamondAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// Mask 68, melee or ranged auto attacks.
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskWhiteHit) || ability.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskWhiteHit) || spellCast.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Thundering Skyfire Diamond") {
+				if !ppmm.Proc(sim, spellEffect.IsMH(), spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Thundering Skyfire Diamond") {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)

@@ -34,7 +34,7 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 				IgnoreArmor:            true,
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
+				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
 					paladin.RemoveAura(sim, SealOfBloodAuraID)
 					paladin.currentSeal = core.Aura{}

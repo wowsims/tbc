@@ -177,18 +177,10 @@ func JudgementOfWisdomAura(sim *Simulation) Aura {
 			if character.HasManaBar() {
 				character.AddMana(sim, mana, actionID, false)
 			}
-		},
-		OnMeleeAttack: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
-			if ability.ActionID.SpellID == 35395 {
+
+			if spellCast.ActionID.SpellID == 35395 {
 				aura.Expires = sim.CurrentTime + time.Second*20
-				hitEffect.Target.ReplaceAura(sim, aura)
-			}
-			if ability.IsPhantom {
-				return
-			}
-			character := ability.Character
-			if character.HasManaBar() {
-				character.AddMana(sim, mana, actionID, false)
+				spellEffect.Target.ReplaceAura(sim, aura)
 			}
 		},
 	}
@@ -445,8 +437,8 @@ func HuntersMarkAura(points int32, fullyStacked bool) Aura {
 				spellEffect.BonusAttackPower += rangedBonus
 			}
 		},
-		OnMeleeAttack: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
-			if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || !hitEffect.Landed() {
+		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			if !spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || !spellEffect.Landed() {
 				return
 			}
 			if stacks < maxStacks {

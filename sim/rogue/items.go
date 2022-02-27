@@ -68,17 +68,17 @@ var ItemSetDeathmantle = core.ItemSet{
 			rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: Deathmantle4PcAuraID,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-						if !hitEffect.Landed() {
+					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if !spellEffect.Landed() {
 							return
 						}
 
 						// https://tbc.wowhead.com/spell=37170/free-finisher-chance, proc mask = 20.
-						if !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+						if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 							return
 						}
 
-						if !ppmm.Proc(sim, hitEffect.IsMH(), false, "Deathmantle 4pc") {
+						if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Deathmantle 4pc") {
 							return
 						}
 
@@ -119,13 +119,13 @@ func ApplyWarpSpringCoil(agent core.Agent) {
 
 		return core.Aura{
 			ID: WarpSpringCoilAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if !hitEffect.Landed() {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
 					return
 				}
 
 				// https://tbc.wowhead.com/spell=37173/armor-penetration, proc mask = 16.
-				if !hitEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
+				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
 					return
 				}
 

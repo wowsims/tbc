@@ -67,6 +67,9 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 				return core.Aura{
 					ID: Tirisfal4PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+							return
+						}
 						if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 							statApplier(sim)
 						}
@@ -109,6 +112,9 @@ func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
 		return core.Aura{
 			ID: AshtongueTalismanOfInsightAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
+				}
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}

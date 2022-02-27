@@ -21,15 +21,15 @@ func (character *Character) EnableRageBar(startingRage float64) {
 	character.AddPermanentAura(func(sim *Simulation) Aura {
 		return Aura{
 			ID: RageBarAuraID,
-			OnMeleeAttack: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
-				if !hitEffect.ProcMask.Matches(ProcMaskWhiteHit) {
+			OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+				if !spellEffect.ProcMask.Matches(ProcMaskWhiteHit) {
 					return
 				}
 
 				var HitFactor float64
 				var BaseSwingSpeed float64
 
-				if hitEffect.IsMH() {
+				if spellEffect.IsMH() {
 					HitFactor = 3.5 / 2
 					BaseSwingSpeed = character.AutoAttacks.MH.SwingSpeed
 				} else {
@@ -37,13 +37,13 @@ func (character *Character) EnableRageBar(startingRage float64) {
 					BaseSwingSpeed = character.AutoAttacks.OH.SwingSpeed
 				}
 
-				if hitEffect.Outcome.Matches(OutcomeCrit) {
+				if spellEffect.Outcome.Matches(OutcomeCrit) {
 					HitFactor *= 2
 				}
 
-				generatedRage := hitEffect.Damage*RageFactor + HitFactor*BaseSwingSpeed
+				generatedRage := spellEffect.Damage*RageFactor + HitFactor*BaseSwingSpeed
 
-				character.AddRage(sim, generatedRage, ability.ActionID)
+				character.AddRage(sim, generatedRage, spellCast.ActionID)
 			},
 		}
 	})

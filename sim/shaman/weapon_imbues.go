@@ -70,13 +70,13 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 		return core.Aura{
 			ID: WFImbueAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// ProcMask: 20
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
 					return
 				}
 
-				isMHHit := hitEffect.IsMH()
+				isMHHit := spellEffect.IsMH()
 				if (!mh && isMHHit) || (!oh && !isMHHit) {
 					return // cant proc if not enchanted
 				}
@@ -98,7 +98,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 					attackProc = core.ProcMaskMeleeOHSpecial
 				}
 				for i := 0; i < 2; i++ {
-					wfAtk.Effects[i].Target = hitEffect.Target
+					wfAtk.Effects[i].Target = spellEffect.Target
 					wfAtk.Effects[i].ProcMask = attackProc
 					if !isMHHit {
 						// For whatever reason, OH penalty does not apply to the bonus AP from WF OH
@@ -165,12 +165,12 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: FTImbueAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
 					return
 				}
 
-				isMHHit := hitEffect.IsMH()
+				isMHHit := spellEffect.IsMH()
 				if (isMHHit && !mh) || (!isMHHit && !oh) {
 					return // cant proc if not enchanted
 				}
@@ -180,7 +180,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 				} else {
 					ohTemplate.Apply(&ftSpell)
 				}
-				ftSpell.Effect.Target = hitEffect.Target
+				ftSpell.Effect.Target = spellEffect.Target
 				ftSpell.Init(sim)
 				ftSpell.Cast(sim)
 			},
@@ -229,12 +229,12 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 		ppmm := shaman.AutoAttacks.NewPPMManager(9.0)
 		return core.Aura{
 			ID: FBImbueAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) || ability.IsPhantom {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
 					return
 				}
 
-				isMHHit := hitEffect.IsMH()
+				isMHHit := spellEffect.IsMH()
 				if (isMHHit && !mh) || (!isMHHit && !oh) {
 					return // cant proc if not enchanted
 				}
@@ -244,7 +244,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 				}
 
 				fbTemplate.Apply(&fbSpell)
-				fbSpell.Effect.Target = hitEffect.Target
+				fbSpell.Effect.Target = spellEffect.Target
 				fbSpell.Init(sim)
 				fbSpell.Cast(sim)
 			},

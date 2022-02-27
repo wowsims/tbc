@@ -79,12 +79,12 @@ func ApplyCrusader(agent core.Agent) {
 
 		return core.Aura{
 			ID: CrusaderAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 
-				isMH := hitEffect.IsMH()
+				isMH := spellEffect.IsMH()
 				if ppmm.Proc(sim, isMH, false, "Crusader") {
 					applyCrusaderStrength(sim, character, isMH)
 				}
@@ -173,12 +173,12 @@ func ApplyMongoose(agent core.Agent) {
 
 		return core.Aura{
 			ID: MongooseAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 
-				isMH := hitEffect.IsMH()
+				isMH := spellEffect.IsMH()
 				if ppmm.Proc(sim, isMH, false, "mongoose") {
 					applyLightningSpeed(sim, character, isMH)
 				}
@@ -243,12 +243,12 @@ func ApplyExecutioner(agent core.Agent) {
 		const dur = time.Second * 15
 		return core.Aura{
 			ID: ExecutionerAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskMelee) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 
-				if ppmm.Proc(sim, hitEffect.IsMH(), false, "Executioner") {
+				if ppmm.Proc(sim, spellEffect.IsMH(), false, "Executioner") {
 					character.AddAuraWithTemporaryStats(sim, ExecutionerProcAuraID, core.ActionID{SpellID: 42976}, stats.ArmorPenetration, arPenBonus, dur)
 				}
 			},

@@ -434,8 +434,8 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	return Aura{
 		ID:       WindfuryTotemAuraID,
 		ActionID: actionID,
-		OnMeleeAttack: func(sim *Simulation, ability *SimpleSpell, hitEffect *SpellEffect) {
-			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(ProcMaskMeleeMH) || ability.IsPhantom {
+		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeMH) || spellCast.IsPhantom {
 				return
 			}
 			if icd.IsOnCD(sim) {
@@ -447,7 +447,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			icd = InternalCD(sim.CurrentTime + icdDur)
 
 			wfTemplate.Apply(&wfAtk)
-			wfAtk.Effect.Target = hitEffect.Target
+			wfAtk.Effect.Target = spellEffect.Target
 			wfAtk.Cast(sim)
 		},
 	}

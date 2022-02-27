@@ -29,6 +29,9 @@ var ItemSetMalorne = core.ItemSet{
 				return core.Aura{
 					ID: Malorne2PcAuraID,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+							return
+						}
 						if !spellEffect.Landed() {
 							return
 						}

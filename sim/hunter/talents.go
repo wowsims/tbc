@@ -173,11 +173,6 @@ func (hunter *Hunter) applyFrenzy() {
 
 		return core.Aura{
 			ID: FrenzyAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
-					tryProcAura()
-				}
-			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					tryProcAura()
@@ -228,11 +223,6 @@ func (hunter *Hunter) applyFerociousInspiration() {
 
 		return core.Aura{
 			ID: FerociousInspirationAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if hitEffect.Outcome.Matches(core.OutcomeCrit) {
-					applyAura()
-				}
-			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					applyAura()
@@ -366,8 +356,8 @@ func (hunter *Hunter) applyGoForTheThroat() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: GoForTheThroatAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !hitEffect.Outcome.Matches(core.OutcomeCrit) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
 				if !hunter.pet.IsEnabled() {
@@ -423,18 +413,18 @@ func (hunter *Hunter) applyThrillOfTheHunt() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ThrillOfTheHuntAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// mask 256
-				if !hitEffect.ProcMask.Matches(core.ProcMaskRangedSpecial) {
+				if !spellEffect.ProcMask.Matches(core.ProcMaskRangedSpecial) {
 					return
 				}
 
-				if !hitEffect.Outcome.Matches(core.OutcomeCrit) {
+				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
 
 				if procChance == 1 || sim.RandomFloat("ThrillOfTheHunt") < procChance {
-					hunter.AddMana(sim, ability.Cost.Value*0.4, actionID, false)
+					hunter.AddMana(sim, spellCast.Cost.Value*0.4, actionID, false)
 				}
 			},
 		}
@@ -453,22 +443,22 @@ func (hunter *Hunter) applyExposeWeakness() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ExposeWeaknessAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
 
-				if !hitEffect.Outcome.Matches(core.OutcomeCrit) {
+				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
 
-				if hitEffect.Target.RemainingAuraDuration(sim, core.ExposeWeaknessDebuffID) == core.NeverExpires {
+				if spellEffect.Target.RemainingAuraDuration(sim, core.ExposeWeaknessDebuffID) == core.NeverExpires {
 					// Don't overwrite permanent version
 					return
 				}
 
 				if procChance == 1 || sim.RandomFloat("ExposeWeakness") < procChance {
-					hitEffect.Target.AddAura(sim, core.ExposeWeaknessAura(sim.CurrentTime, hunter.GetStat(stats.Agility), 1.0))
+					spellEffect.Target.AddAura(sim, core.ExposeWeaknessAura(sim.CurrentTime, hunter.GetStat(stats.Agility), 1.0))
 				}
 			},
 		}
@@ -497,8 +487,8 @@ func (hunter *Hunter) applyMasterTactician() {
 
 		return core.Aura{
 			ID: MasterTacticianAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-				if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !hitEffect.Landed() {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !spellEffect.Landed() {
 					return
 				}
 

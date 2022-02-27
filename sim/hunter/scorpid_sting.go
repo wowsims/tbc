@@ -29,13 +29,12 @@ func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.SimpleS
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
 				ProcMask: core.ProcMaskRangedSpecial,
-				OnMeleeAttack: func(sim *core.Simulation, ability *core.SimpleSpell, hitEffect *core.SpellEffect) {
-					// TODO: does this need a ranged mask check since hunters can melee weave?
-					if !hitEffect.Landed() {
+				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if !spellEffect.Landed() {
 						return
 					}
 
-					hitEffect.Target.AddAura(sim, core.Aura{
+					spellEffect.Target.AddAura(sim, core.Aura{
 						ID:       ScorpidStingDebuffID,
 						ActionID: actionID,
 						Expires:  sim.CurrentTime + time.Second*20,
