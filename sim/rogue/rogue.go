@@ -35,8 +35,6 @@ type Rogue struct {
 	Options  proto.Rogue_Options
 	Rotation proto.Rogue_Rotation
 
-	comboPoints int32
-
 	deathmantle4pcProc bool
 
 	builderEnergyCost float64
@@ -44,6 +42,18 @@ type Rogue struct {
 
 	sinisterStrikeTemplate core.SimpleSpellTemplate
 	sinisterStrike         core.SimpleSpell
+
+	backstabTemplate core.SimpleSpellTemplate
+	backstab         core.SimpleSpell
+
+	hemorrhageTemplate core.SimpleSpellTemplate
+	hemorrhage         core.SimpleSpell
+
+	mutilateTemplate core.SimpleSpellTemplate
+	mutilate         core.SimpleSpell
+
+	mutilateDamageTemplate core.SimpleSpellTemplate
+	mutilateDamage         core.SimpleSpell
 
 	castSliceAndDice func()
 
@@ -85,6 +95,9 @@ func (rogue *Rogue) Finalize(raid *core.Raid) {
 func (rogue *Rogue) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
 	rogue.sinisterStrikeTemplate = rogue.newSinisterStrikeTemplate(sim)
+	rogue.backstabTemplate = rogue.newBackstabTemplate(sim)
+	rogue.hemorrhageTemplate = rogue.newHemorrhageTemplate(sim)
+	rogue.mutilateTemplate = rogue.newMutilateTemplate(sim)
 
 	rogue.initSliceAndDice(sim)
 	rogue.eviscerateTemplate = rogue.newEviscerateTemplate(sim)
@@ -95,32 +108,8 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 }
 
 func (rogue *Rogue) Reset(sim *core.Simulation) {
-	rogue.comboPoints = 0
 	rogue.deathmantle4pcProc = false
 	rogue.deadlyPoisonStacks = 0
-}
-
-func (rogue *Rogue) AddComboPoint(sim *core.Simulation, actionID core.ActionID) {
-	if rogue.comboPoints == 5 {
-		rogue.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, 1, 0)
-		if sim.Log != nil {
-			rogue.Log(sim, "Failed to gain 1 combo point, already full")
-		}
-	} else {
-		rogue.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, 1, 1)
-		if sim.Log != nil {
-			rogue.Log(sim, "Gained 1 combo point (%d --> %d)", rogue.comboPoints, rogue.comboPoints+1)
-		}
-		rogue.comboPoints++
-	}
-}
-
-func (rogue *Rogue) SpendComboPoints(sim *core.Simulation, actionID core.ActionID) {
-	if sim.Log != nil {
-		rogue.Log(sim, "Spent all combo points.")
-	}
-	rogue.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, float64(-rogue.comboPoints), float64(-rogue.comboPoints))
-	rogue.comboPoints = 0
 }
 
 func (rogue *Rogue) critMultiplier(isMH bool, applyLethality bool) float64 {
@@ -158,9 +147,50 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		Rotation:  *rogueOptions.Rotation,
 	}
 
-	rogue.builderEnergyCost = rogue.SinisterStrikeEnergyCost()
-	rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-		return rogue.NewSinisterStrike(sim, target)
+	daggerMH := rogue.Equip[proto.ItemSlot_ItemSlotMainHand].WeaponType == proto.WeaponType_WeaponTypeDagger
+	if rogue.Rotation.Builder == proto.Rogue_Rotation_Unknown {
+		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
+	}
+	if rogue.Rotation.Builder == proto.Rogue_Rotation_Backstab && !daggerMH {
+		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
+	} else if rogue.Rotation.Builder == proto.Rogue_Rotation_Hemorrhage && !rogue.Talents.Hemorrhage {
+		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
+	} else if rogue.Rotation.Builder == proto.Rogue_Rotation_Mutilate && !rogue.Talents.Mutilate {
+		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
+	}
+	if rogue.Rotation.Builder == proto.Rogue_Rotation_Auto {
+		if rogue.Talents.Mutilate {
+			rogue.Rotation.Builder = proto.Rogue_Rotation_Mutilate
+		} else if rogue.Talents.Hemorrhage {
+			rogue.Rotation.Builder = proto.Rogue_Rotation_Hemorrhage
+		} else if daggerMH {
+			rogue.Rotation.Builder = proto.Rogue_Rotation_Backstab
+		} else {
+			rogue.Rotation.Builder = proto.Rogue_Rotation_SinisterStrike
+		}
+	}
+
+	switch rogue.Rotation.Builder {
+	case proto.Rogue_Rotation_SinisterStrike:
+		rogue.builderEnergyCost = rogue.SinisterStrikeEnergyCost()
+		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+			return rogue.NewSinisterStrike(sim, target)
+		}
+	case proto.Rogue_Rotation_Backstab:
+		rogue.builderEnergyCost = BackstabEnergyCost
+		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+			return rogue.NewBackstab(sim, target)
+		}
+	case proto.Rogue_Rotation_Hemorrhage:
+		rogue.builderEnergyCost = HemorrhageEnergyCost
+		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+			return rogue.NewHemorrhage(sim, target)
+		}
+	case proto.Rogue_Rotation_Mutilate:
+		rogue.builderEnergyCost = MutilateEnergyCost
+		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+			return rogue.NewMutilate(sim, target)
+		}
 	}
 
 	maxEnergy := 100.0

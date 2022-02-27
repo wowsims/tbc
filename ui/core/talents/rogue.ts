@@ -660,7 +660,7 @@ export const rogueTalentsConfig: TalentsConfig<Spec.SpecRogue> = [
 					colIdx: 1,
 				},
 				spellIds: [31216],
-				maxPoints: 1,
+				maxPoints: 5,
 			},
 			{
 				fieldName: 'shadowstep',

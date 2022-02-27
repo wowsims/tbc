@@ -54,12 +54,22 @@ message RogueTalents {
 	int32 master_of_subtlety = 41;
 	int32 deadliness = 42;
 	bool premeditation = 43;
-	bool sinister_calling = 44;
+	int32 sinister_calling = 44;
 	bool shadowstep = 45;
 }
 
 message Rogue {
     message Rotation {
+      enum Builder {
+          Unknown = 0;
+          Auto = 1;
+          SinisterStrike = 2;
+          Backstab = 3;
+          Hemorrhage = 4;
+          Mutilate = 5;
+      }
+			Builder builder = 3;
+
 			bool maintain_expose_armor = 1;
 
 			// Allows use of rupture when sensible.

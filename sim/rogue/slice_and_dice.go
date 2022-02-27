@@ -58,7 +58,7 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 			IgnoreHaste: true,
 			SpellExtras: SpellFlagFinisher,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				numPoints := rogue.comboPoints
+				numPoints := rogue.ComboPoints()
 				aura := sliceAndDiceAura
 				aura.Expires = sim.CurrentTime + sliceAndDiceDurations[numPoints]
 				if rogue.HasAura(SliceAndDiceAuraID) {
@@ -77,12 +77,13 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 	var cast core.SimpleCast
 
 	rogue.castSliceAndDice = func() {
-		if rogue.comboPoints == 0 {
+		comboPoints := rogue.ComboPoints()
+		if comboPoints == 0 {
 			panic("SliceAndDice requires combo points!")
 		}
 
 		cast = template
-		cast.ActionID.Tag = rogue.comboPoints
+		cast.ActionID.Tag = comboPoints
 
 		if rogue.deathmantle4pcProc {
 			cast.Cost.Value = 0

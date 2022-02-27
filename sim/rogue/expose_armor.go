@@ -38,7 +38,7 @@ func (rogue *Rogue) newExposeArmorTemplate(sim *core.Simulation) core.SimpleSpel
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					if spellEffect.Landed() {
 						spellEffect.Target.AddAura(sim, core.ExposeArmorAura(sim, spellEffect.Target, rogue.Talents.ImprovedExposeArmor))
-						numPoints := rogue.comboPoints
+						numPoints := rogue.ComboPoints()
 						rogue.SpendComboPoints(sim, spellCast.ActionID)
 						finishingMoveEffects(sim, numPoints)
 					} else {
@@ -59,7 +59,7 @@ func (rogue *Rogue) newExposeArmorTemplate(sim *core.Simulation) core.SimpleSpel
 }
 
 func (rogue *Rogue) NewExposeArmor(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	if rogue.comboPoints != 5 {
+	if rogue.ComboPoints() != 5 {
 		panic("Expose Armor requires 5 combo points!")
 	}
 

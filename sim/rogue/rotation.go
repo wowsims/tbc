@@ -12,9 +12,10 @@ func (rogue *Rogue) OnGCDReady(sim *core.Simulation) {
 
 func (rogue *Rogue) doRotation(sim *core.Simulation) {
 	energy := rogue.CurrentEnergy()
+	comboPoints := rogue.ComboPoints()
 
 	sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
-	if sndTimeRemaining <= 0 && rogue.comboPoints > 0 {
+	if sndTimeRemaining <= 0 && comboPoints > 0 {
 		if energy >= SliceAndDiceEnergyCost {
 			rogue.castSliceAndDice()
 		}
@@ -22,7 +23,7 @@ func (rogue *Rogue) doRotation(sim *core.Simulation) {
 	}
 
 	target := sim.GetPrimaryTarget()
-	if rogue.comboPoints == 5 {
+	if comboPoints == 5 {
 		if rogue.Rotation.MaintainExposeArmor && !target.HasAura(core.ExposeArmorDebuffID) {
 			if energy >= ExposeArmorEnergyCost {
 				rogue.NewExposeArmor(sim, target).Cast(sim)

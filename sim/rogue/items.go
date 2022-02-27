@@ -166,7 +166,7 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 				}
 
 				// Need to store the points because they get spent before OnSpellHit is called.
-				numPoints = rogue.comboPoints
+				numPoints = rogue.ComboPoints()
 
 				if cast.SameActionIgnoreTag(SliceAndDiceActionID) {
 					// SND won't call OnSpellHit so we have to add the effect now.
