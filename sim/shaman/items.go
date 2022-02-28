@@ -226,7 +226,7 @@ func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 
 		return core.Aura{
 			ID: AshtongueTalismanOfVisionAuraID,
-			OnCast: func(sim *core.Simulation, ability *core.Cast) {
+			OnCastComplete: func(sim *core.Simulation, ability *core.Cast) {
 				if !ability.SameAction(StormstrikeActionID) {
 					return
 				}

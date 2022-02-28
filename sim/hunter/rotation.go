@@ -154,7 +154,7 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 		hunter.rangedWindup = rangedWindupDuration.Seconds()
 
 		// Use the inverse (1 / x) because multiplication is faster than division.
-		gcdRate := 1.0 / 1.5
+		gcdRate := 1.0 / (1.5 + hunter.latency.Seconds())
 		weaveRate := 1.0 / hunter.AutoAttacks.MainhandSwingSpeed().Seconds()
 		shootRate := 1.0 / hunter.AutoAttacks.RangedSwingSpeed().Seconds()
 
@@ -320,7 +320,7 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 	// First prio is swapping aspect if necessary.
 	currentMana := hunter.CurrentManaPercent()
-	if hunter.aspectOfTheViper {
+	if hunter.aspectOfTheViper && hunter.Rotation.ViperStartManaPercent < 1 {
 		if !hunter.permaHawk &&
 			hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
 			hunter.permaHawk = true

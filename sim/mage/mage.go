@@ -131,9 +131,7 @@ func (mage *Mage) Init(sim *core.Simulation) {
 }
 
 func (mage *Mage) Reset(newsim *core.Simulation) {
-	if mage.Options.UseManaEmeralds {
-		mage.remainingManaGems = 4
-	}
+	mage.remainingManaGems = 4
 	mage.isDoingRegenRotation = false
 	mage.tryingToDropStacks = false
 	mage.numCastsDone = 0

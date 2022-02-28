@@ -379,7 +379,7 @@ export class AuraUptimeLog extends SimLog {
 		this.aura = aura;
 	}
 
-	static fromLogs(logs: Array<SimLog>, entity: Entity): Array<AuraUptimeLog> {
+	static fromLogs(logs: Array<SimLog>, entity: Entity, encounterDuration: number): Array<AuraUptimeLog> {
 		let unmatchedGainedLogs: Array<AuraGainedLog> = [];
 		const uptimeLogs: Array<AuraUptimeLog> = [];
 
@@ -409,6 +409,17 @@ export class AuraUptimeLog extends SimLog {
 				target: log.target,
 			}, log.timestamp, gainedLog.aura));
 		});
+
+		// Auras active at the end won't have a faded log, so need to add them separately.
+		unmatchedGainedLogs.forEach(gainedLog => {
+			uptimeLogs.push(new AuraUptimeLog({
+				raw: gainedLog.raw,
+				timestamp: gainedLog.timestamp,
+				source: gainedLog.source,
+				target: gainedLog.target,
+			}, encounterDuration, gainedLog.aura));
+		});
+
 		uptimeLogs.sort((a, b) => a.gainedAt - b.gainedAt);
 		return uptimeLogs;
 	}
