@@ -342,7 +342,9 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 func (mcdm *majorCooldownManager) UpdateMajorCooldowns() {
 	sort.Slice(mcdm.majorCooldowns, func(i, j int) bool {
 		// Since we're just comparing and don't actually care about the remaining CD, ok to use 0 instead of sim.CurrentTime.
-		return mcdm.majorCooldowns[i].GetRemainingCD(0, mcdm.character) < mcdm.majorCooldowns[j].GetRemainingCD(0, mcdm.character)
+		cdA := mcdm.majorCooldowns[i].GetRemainingCD(0, mcdm.character)
+		cdB := mcdm.majorCooldowns[j].GetRemainingCD(0, mcdm.character)
+		return cdA < cdB || (cdA == cdB && mcdm.majorCooldowns[i].Priority > mcdm.majorCooldowns[j].Priority)
 	})
 }
 
