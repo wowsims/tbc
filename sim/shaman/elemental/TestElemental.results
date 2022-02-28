@@ -651,7 +651,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-TheDecapitator-28767"
  value: {
-  dps: 1379.7272845062687
+  dps: 1385.5876621653304
  }
 }
 dps_results: {
@@ -747,7 +747,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Average-Default"
  value: {
-  dps: 1539.3133797704565
+  dps: 1539.3132018137696
  }
 }
 dps_results: {

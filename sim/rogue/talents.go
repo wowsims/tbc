@@ -386,6 +386,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 		Cooldown:   cooldown,
 		UsesGCD:    true,
 		Type:       core.CooldownTypeDPS,
+		Priority:   core.CooldownPriorityLow,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if rogue.CurrentEnergy() < energyCost {
 				return false
@@ -455,6 +456,7 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 		Cooldown:   cooldown,
 		UsesGCD:    true,
 		Type:       core.CooldownTypeDPS,
+		Priority:   core.CooldownPriorityBloodlust,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return true
 		},
