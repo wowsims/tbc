@@ -21,7 +21,7 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpe
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolArcane,
 				SpellExtras:         core.SpellExtrasIgnoreResists,
-				GCD:                 core.GCDDefault,
+				GCD:                 core.GCDDefault + hunter.latency,
 				IgnoreHaste:         true,
 				Cooldown:            time.Second * 6,
 				Cost:                cost,

@@ -26,7 +26,7 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpel
 				},
 				// Cast time is affected by ranged attack speed so set it later.
 				//CastTime:     time.Millisecond * 500,
-				GCD:                 core.GCDDefault,
+				GCD:                 core.GCDDefault + hunter.latency,
 				Cooldown:            time.Second * 10,
 				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
 				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
