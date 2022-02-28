@@ -44,6 +44,16 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
 			],
+			warnings: [
+				// Warning to use all 4 totems if T6 2pc bonus is active.
+				(simUI: IndividualSimUI<Spec.SpecRogue>) => {
+					return {
+						updateOn: simUI.player.changeEmitter,
+						shouldDisplay: () => simUI.player.getRotation().maintainExposeArmor && simUI.player.getTalents().improvedExposeArmor < 2,
+						getContent: () => '\'Maintain Expose Armor\' selected, but missing points in Improved Expose Armor!',
+					};
+				},
+			],
 
 			// All stats for which EP should be calculated.
 			epStats: [

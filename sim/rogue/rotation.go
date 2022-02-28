@@ -24,7 +24,7 @@ func (rogue *Rogue) doRotation(sim *core.Simulation) {
 
 	target := sim.GetPrimaryTarget()
 	if comboPoints == 5 {
-		if rogue.Rotation.MaintainExposeArmor && !target.HasAura(core.ExposeArmorDebuffID) {
+		if rogue.CanExpose(target) && !target.HasAura(core.ExposeArmorDebuffID) {
 			if energy >= ExposeArmorEnergyCost {
 				rogue.NewExposeArmor(sim, target).Cast(sim)
 			}

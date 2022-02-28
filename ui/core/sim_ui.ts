@@ -38,6 +38,7 @@ export abstract class SimUI extends Component {
 	readonly resultsContentElem: HTMLElement;
 
 	private warnings: Array<SimWarning>;
+	private warningsTippy: any;
 
   constructor(parentElem: HTMLElement, sim: Sim, config: SimUIConfig) {
 		super(parentElem, 'sim-ui');
@@ -50,6 +51,11 @@ export abstract class SimUI extends Component {
 		], 'SimUIChange');
 
 		this.warnings = [];
+		const warningsElem = document.getElementsByClassName('warnings')[0] as HTMLElement;
+		this.warningsTippy = tippy(warningsElem, {
+			content: '',
+			allowHTML: true,
+		});
 		this.updateWarnings();
 
 		if (config.knownIssues && config.knownIssues.length) {
@@ -203,20 +209,18 @@ export abstract class SimUI extends Component {
 			warningsElem.style.display = 'none';
 		} else {
 			warningsElem.style.display = 'initial';
-			tippy(warningsElem, {
-				content: `
+			this.warningsTippy.setContent(`
 				<ul class="known-issues-tooltip">
 					${activeWarnings.map(warning => '<li>' + warning.getContent() + '</li>').join('')}
-				</ul>
-				`,
-				allowHTML: true,
-			});
+				</ul>`
+			);
 		}
 	}
 
 	addWarning(warning: SimWarning) {
 		this.warnings.push(warning);
 		warning.updateOn.on(() => this.updateWarnings());
+		this.updateWarnings();
 	}
 
 	// Returns a key suitable for the browser's localStorage feature.

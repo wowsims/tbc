@@ -46,8 +46,10 @@ export abstract class TalentsPicker<SpecType extends Spec> extends Component {
 
     this.trees.forEach(tree => tree.update());
 
-    this.player.setTalentsString(eventID, this.getTalentsString());
-    this.player.setTalents(eventID, this.getTalents());
+		TypedEvent.freezeAllAndDo(() => {
+			this.player.setTalentsString(eventID, this.getTalentsString());
+			this.player.setTalents(eventID, this.getTalents());
+		});
   }
 
   getTalents(): SpecTalents<SpecType> {

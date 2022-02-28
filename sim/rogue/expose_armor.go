@@ -76,3 +76,7 @@ func (rogue *Rogue) NewExposeArmor(sim *core.Simulation, target *core.Target) *c
 
 	return ea
 }
+
+func (rogue *Rogue) CanExpose(target *core.Target) bool {
+	return rogue.Rotation.MaintainExposeArmor && (rogue.Talents.ImprovedExposeArmor == 2 || !target.HasAura(core.SunderArmorDebuffID))
+}

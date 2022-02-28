@@ -68,6 +68,7 @@ func (rogue *Rogue) newBackstabTemplate(sim *core.Simulation) core.SimpleSpellTe
 
 	ability.Effect.BonusCritRating += 10 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.PuncturingWounds)
 	ability.Effect.WeaponInput.DamageMultiplier += 0.01 * float64(rogue.Talents.SinisterCalling)
+	ability.Effect.WeaponInput.FlatDamageBonus *= (1.5 + 0.01*float64(rogue.Talents.SinisterCalling)) / 1.5
 
 	return core.NewSimpleSpellTemplate(ability)
 }
