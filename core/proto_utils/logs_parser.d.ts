@@ -80,7 +80,7 @@ export declare class AuraUptimeLog extends SimLog {
     readonly fadedAt: number;
     readonly aura: ActionId;
     constructor(params: SimLogParams, fadedAt: number, aura: ActionId);
-    static fromLogs(logs: Array<SimLog>, entity: Entity): Array<AuraUptimeLog>;
+    static fromLogs(logs: Array<SimLog>, entity: Entity, encounterDuration: number): Array<AuraUptimeLog>;
     static populateActiveAuras(logs: Array<SimLog>, auraLogs: Array<AuraUptimeLog>): void;
 }
 export declare type Resource = 'mana' | 'energy' | 'focus' | 'rage';

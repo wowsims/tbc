@@ -146,7 +146,7 @@ export class PlayerMetrics {
         this.duration = duration;
         this.damageDealtLogs = this.logs.filter((log) => log.isDamageDealt());
         this.dpsLogs = DpsLog.fromLogs(this.damageDealtLogs);
-        this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet));
+        this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet), duration);
         this.majorCooldownLogs = this.logs.filter((log) => log.isMajorCooldownUsed());
         this.manaChangedLogs = ResourceChangedLogGroup.fromLogs(this.logs, 'mana');
         AuraUptimeLog.populateActiveAuras(this.dpsLogs, this.auraUptimeLogs);
