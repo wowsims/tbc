@@ -320,7 +320,7 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 	// First prio is swapping aspect if necessary.
 	currentMana := hunter.CurrentManaPercent()
-	if hunter.aspectOfTheViper {
+	if hunter.aspectOfTheViper && hunter.Rotation.ViperStartManaPercent < 1 {
 		if !hunter.permaHawk &&
 			hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
 			hunter.permaHawk = true

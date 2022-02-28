@@ -46,13 +46,6 @@ func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
 	return aura
 }
 
-func (hunter *Hunter) applyAspectOfTheHawk() {
-	aura := hunter.aspectOfTheHawkAura()
-	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return aura
-	})
-}
-
 func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.SimpleCast {
 	aura := hunter.aspectOfTheHawkAura()
 
@@ -87,13 +80,18 @@ func (hunter *Hunter) NewAspectOfTheHawk(sim *core.Simulation) core.SimpleCast {
 	return v
 }
 
-func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.SimpleCast {
+func (hunter *Hunter) aspectOfTheViperAura() core.Aura {
 	aura := core.Aura{
 		ID:       AspectOfTheViperAuraID,
 		ActionID: AspectOfTheViperActionID,
 		Expires:  core.NeverExpires,
 		// Mana gain from viper is handled in rotation.go
 	}
+	return aura
+}
+
+func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.SimpleCast {
+	aura := hunter.aspectOfTheViperAura()
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
@@ -124,4 +122,15 @@ func (hunter *Hunter) NewAspectOfTheViper(sim *core.Simulation) core.SimpleCast 
 	v := hunter.aspectOfTheViperTemplate
 	v.Init(sim)
 	return v
+}
+
+func (hunter *Hunter) applyInitialAspect() {
+	aura := hunter.aspectOfTheHawkAura()
+	if hunter.Rotation.ViperStartManaPercent >= 1 {
+		aura = hunter.aspectOfTheViperAura()
+	}
+
+	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return aura
+	})
 }

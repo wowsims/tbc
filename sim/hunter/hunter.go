@@ -288,7 +288,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 
 	hunter.applyTalents()
 	hunter.registerRapidFireCD()
-	hunter.applyAspectOfTheHawk()
+	hunter.applyInitialAspect()
 	hunter.applyKillCommand()
 
 	return hunter
