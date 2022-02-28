@@ -32,8 +32,10 @@ export class TalentsPicker extends Component {
             this.rootElem.classList.remove('talents-full');
         }
         this.trees.forEach(tree => tree.update());
-        this.player.setTalentsString(eventID, this.getTalentsString());
-        this.player.setTalents(eventID, this.getTalents());
+        TypedEvent.freezeAllAndDo(() => {
+            this.player.setTalentsString(eventID, this.getTalentsString());
+            this.player.setTalents(eventID, this.getTalents());
+        });
     }
     getTalents() {
         const talents = this.player.specTypeFunctions.talentsCreate();

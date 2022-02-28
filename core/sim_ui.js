@@ -13,6 +13,11 @@ export class SimUI extends Component {
             this.sim.changeEmitter,
         ], 'SimUIChange');
         this.warnings = [];
+        const warningsElem = document.getElementsByClassName('warnings')[0];
+        this.warningsTippy = tippy(warningsElem, {
+            content: '',
+            allowHTML: true,
+        });
         this.updateWarnings();
         if (config.knownIssues && config.knownIssues.length) {
             const knownIssuesContainer = document.getElementsByClassName('known-issues')[0];
@@ -146,19 +151,16 @@ export class SimUI extends Component {
         }
         else {
             warningsElem.style.display = 'initial';
-            tippy(warningsElem, {
-                content: `
+            this.warningsTippy.setContent(`
 				<ul class="known-issues-tooltip">
 					${activeWarnings.map(warning => '<li>' + warning.getContent() + '</li>').join('')}
-				</ul>
-				`,
-                allowHTML: true,
-            });
+				</ul>`);
         }
     }
     addWarning(warning) {
         this.warnings.push(warning);
         warning.updateOn.on(() => this.updateWarnings());
+        this.updateWarnings();
     }
     getSettingsStorageKey() {
         return this.getStorageKey('__currentSettings__');

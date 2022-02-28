@@ -18,6 +18,7 @@ export declare abstract class SimUI extends Component {
     readonly resultsPendingElem: HTMLElement;
     readonly resultsContentElem: HTMLElement;
     private warnings;
+    private warningsTippy;
     constructor(parentElem: HTMLElement, sim: Sim, config: SimUIConfig);
     addAction(name: string, cssClass: string, actFn: () => void): void;
     addTab(title: string, cssClass: string, innerHTML: string): void;
