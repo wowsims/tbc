@@ -167,8 +167,10 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast,
 	// switch spellCast.CritRollCategory {
 	// case CritRollCategoryMagical:
 
+	randStr := "DirectSpell Crit"
 	if melee {
 		critChance = ((spellCast.Character.stats[stats.MeleeCrit] + spellCast.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
+		randStr = "weapon swing"
 	} else {
 		critChance = (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
 	}
@@ -179,7 +181,7 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast,
 	// 	panic(spellCast.ActionID.String())
 	// }
 
-	return sim.RandomFloat("DirectSpell Crit") < critChance
+	return sim.RandomFloat(randStr) < critChance
 }
 
 func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
