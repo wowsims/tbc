@@ -26,14 +26,14 @@ func (rogue *Rogue) doRotation(sim *core.Simulation) {
 		rogue.doPlanNone(sim)
 	case PlanSliceASAP:
 		rogue.doPlanSliceASAP(sim)
+	case PlanMaximalSlice:
+		rogue.doPlanMaximalSlice(sim)
 	case PlanExposeArmor:
 		rogue.doPlanExposeArmor(sim)
 	case PlanFillBeforeEA:
 		rogue.doPlanFillBeforeEA(sim)
 	case PlanFillBeforeSND:
 		rogue.doPlanFillBeforeSND(sim)
-	case PlanMaximalSlice:
-		rogue.doPlanMaximalSlice(sim)
 	case PlanOpener:
 		rogue.doPlanOpener(sim)
 	}
@@ -51,16 +51,81 @@ func (rogue *Rogue) doPlanSliceASAP(sim *core.Simulation) {
 	energy := rogue.CurrentEnergy()
 	comboPoints := rogue.ComboPoints()
 	target := sim.GetPrimaryTarget()
+	sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
 
 	if comboPoints > 0 {
-		// TODO: Pool energy if there's extra time
 		if energy >= SliceAndDiceEnergyCost || rogue.deathmantle4pcProc {
+			if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
+				return
+			}
 			rogue.castSliceAndDice()
 			rogue.plan = PlanNone
 		}
 		return
 	} else {
 		if energy >= rogue.builderEnergyCost {
+			rogue.newBuilder(sim, target).Cast(sim)
+		}
+	}
+}
+
+// Get the biggest Slice we can, but still leaving time for EA if necessary.
+func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
+	energy := rogue.CurrentEnergy()
+	comboPoints := rogue.ComboPoints()
+	target := sim.GetPrimaryTarget()
+	sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
+
+	if sndTimeRemaining <= time.Second && comboPoints > 0 {
+		if energy >= SliceAndDiceEnergyCost || rogue.deathmantle4pcProc {
+			rogue.castSliceAndDice()
+			rogue.plan = PlanNone
+		}
+		return
+	}
+
+	if rogue.MaintainingExpose(target) {
+		eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
+		if rogue.eaBuildTime+time.Second*2 > eaTimeRemaining {
+			// Cast our slice and start prepping for EA.
+			if comboPoints == 0 {
+				rogue.plan = PlanExposeArmor
+				rogue.doPlanExposeArmor(sim)
+				return
+			}
+			if energy >= SliceAndDiceEnergyCost || rogue.deathmantle4pcProc {
+				if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
+					return
+				}
+				rogue.castSliceAndDice()
+				rogue.plan = PlanExposeArmor
+				return
+			}
+		} else {
+			if comboPoints == 5 {
+				if energy >= SliceAndDiceEnergyCost || rogue.deathmantle4pcProc {
+					if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
+						return
+					}
+					rogue.castSliceAndDice()
+					rogue.plan = PlanFillBeforeEA
+					return
+				}
+			} else if energy >= rogue.builderEnergyCost {
+				rogue.newBuilder(sim, target).Cast(sim)
+			}
+		}
+	} else {
+		if comboPoints == 5 {
+			if energy >= SliceAndDiceEnergyCost || rogue.deathmantle4pcProc {
+				if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
+					return
+				}
+				rogue.castSliceAndDice()
+				rogue.plan = PlanFillBeforeEA
+				return
+			}
+		} else if energy >= rogue.builderEnergyCost {
 			rogue.newBuilder(sim, target).Cast(sim)
 		}
 	}
@@ -73,8 +138,11 @@ func (rogue *Rogue) doPlanExposeArmor(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
 	if comboPoints == 5 {
-		// TODO: Pool energy if there's extra time
 		if energy >= ExposeArmorEnergyCost || rogue.deathmantle4pcProc {
+			eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
+			if rogue.canPoolEnergy(sim, energy) && eaTimeRemaining > time.Second*2 {
+				return
+			}
 			rogue.NewExposeArmor(sim, target).Cast(sim)
 			rogue.plan = PlanNone
 		}
@@ -138,61 +206,6 @@ func (rogue *Rogue) doPlanFillBeforeSND(sim *core.Simulation) {
 	}
 }
 
-// Get the biggest Slice we can, but still leaving time for EA if necessary.
-func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
-	energy := rogue.CurrentEnergy()
-	comboPoints := rogue.ComboPoints()
-	target := sim.GetPrimaryTarget()
-	sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
-
-	if sndTimeRemaining <= time.Second && comboPoints > 0 {
-		if energy >= SliceAndDiceEnergyCost || rogue.deathmantle4pcProc {
-			rogue.castSliceAndDice()
-			rogue.plan = PlanNone
-		}
-		return
-	}
-
-	if rogue.MaintainingExpose(target) {
-		eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
-		if rogue.eaBuildTime+time.Second*2 > eaTimeRemaining {
-			// Cast our slice and start prepping for EA.
-			if comboPoints == 0 {
-				rogue.plan = PlanExposeArmor
-				rogue.doPlanExposeArmor(sim)
-				return
-			}
-			if energy >= SliceAndDiceEnergyCost || rogue.deathmantle4pcProc {
-				rogue.castSliceAndDice()
-				rogue.plan = PlanExposeArmor
-				return
-			}
-		} else {
-			if comboPoints == 5 {
-				// TODO: Pool
-				if energy >= SliceAndDiceEnergyCost || rogue.deathmantle4pcProc {
-					rogue.castSliceAndDice()
-					rogue.plan = PlanFillBeforeEA
-					return
-				}
-			} else if energy >= rogue.builderEnergyCost {
-				rogue.newBuilder(sim, target).Cast(sim)
-			}
-		}
-	} else {
-		if comboPoints == 5 {
-			// TODO: Pool
-			if energy >= SliceAndDiceEnergyCost || rogue.deathmantle4pcProc {
-				rogue.castSliceAndDice()
-				rogue.plan = PlanFillBeforeEA
-				return
-			}
-		} else if energy >= rogue.builderEnergyCost {
-			rogue.newBuilder(sim, target).Cast(sim)
-		}
-	}
-}
-
 func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 	energy := rogue.CurrentEnergy()
 	if energy < 25 {
@@ -248,6 +261,10 @@ func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 
 	rogue.plan = PlanMaximalSlice
 	rogue.doPlanMaximalSlice(sim)
+}
+
+func (rogue *Rogue) canPoolEnergy(sim *core.Simulation, energy float64) bool {
+	return sim.GetRemainingDuration() >= time.Second*6 && energy <= 70 && (!rogue.HasAura(AdrenalineRushAuraID) || energy <= 50)
 }
 
 func (rogue *Rogue) tryUseDamageFinisher(sim *core.Simulation, energy float64) bool {
