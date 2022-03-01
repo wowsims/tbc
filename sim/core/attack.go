@@ -212,7 +212,7 @@ func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell
 	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
 	if ability.OutcomeRollCategory != OutcomeRollCategoryWhite {
 		// TODO: should we |= with crit/hit?
-		if ahe.critCheck(sim, &ability.SpellCast) {
+		if ahe.critCheck(sim, &ability.SpellCast, true) {
 			ahe.Outcome = OutcomeCrit
 		} else {
 			ahe.Outcome = OutcomeHit

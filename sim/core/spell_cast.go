@@ -161,17 +161,23 @@ func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spellCast *SpellCast) 
 }
 
 // Calculates a crit check using the stats from this spell.
-func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast) bool {
+func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast, melee bool) bool {
 	critChance := 0.0
 
-	switch spellCast.CritRollCategory {
-	case CritRollCategoryMagical:
-		critChance = (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
-	case CritRollCategoryPhysical:
+	// switch spellCast.CritRollCategory {
+	// case CritRollCategoryMagical:
+
+	if melee {
 		critChance = ((spellCast.Character.stats[stats.MeleeCrit] + spellCast.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
-	default:
-		panic(spellCast.ActionID.String())
+	} else {
+		critChance = (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
 	}
+
+	// case CritRollCategoryPhysical:
+	// critChance = ((spellCast.Character.stats[stats.MeleeCrit] + spellCast.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
+	// default:
+	// 	panic(spellCast.ActionID.String())
+	// }
 
 	return sim.RandomFloat("DirectSpell Crit") < critChance
 }
@@ -253,7 +259,7 @@ func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCas
 	}
 
 	// TODO: move crit checks to a more general place so we can fork the crit roll.
-	if hitEffect.SpellEffect.critCheck(sim, spellCast) {
+	if hitEffect.SpellEffect.critCheck(sim, spellCast, false) {
 		hitEffect.Outcome |= OutcomeCrit
 		damage *= spellCast.CritMultiplier
 		hitEffect.SpellEffect.BeyondAOECapMultiplier *= spellCast.CritMultiplier
@@ -300,7 +306,7 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 			damage = calculateResists(sim, damage, &hitEffect.SpellEffect)
 		}
 
-		if hitEffect.DotInput.TicksCanMissAndCrit && hitEffect.critCheck(sim, spellCast) {
+		if hitEffect.DotInput.TicksCanMissAndCrit && hitEffect.critCheck(sim, spellCast, false) {
 			hitEffect.Outcome |= OutcomeCrit
 			damage *= spellCast.CritMultiplier
 			hitEffect.SpellEffect.BeyondAOECapMultiplier *= spellCast.CritMultiplier
