@@ -162,7 +162,17 @@ func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spellCast *SpellCast) 
 
 // Calculates a crit check using the stats from this spell.
 func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast) bool {
-	critChance := (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
+	critChance := 0.0
+
+	switch spellCast.CritRollCategory {
+	case CritRollCategoryMagical:
+		critChance = (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
+	case CritRollCategoryPhysical:
+		critChance = ((spellCast.Character.stats[stats.MeleeCrit] + spellCast.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
+	default:
+		panic(spellCast.ActionID.String())
+	}
+
 	return sim.RandomFloat("DirectSpell Crit") < critChance
 }
 

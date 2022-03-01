@@ -211,12 +211,8 @@ func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell
 
 	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
 	if ability.OutcomeRollCategory != OutcomeRollCategoryWhite {
-		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
-
-		roll := sim.RandomFloat("weapon swing")
-
 		// TODO: should we |= with crit/hit?
-		if roll < critChance {
+		if ahe.critCheck(sim, &ability.SpellCast) {
 			ahe.Outcome = OutcomeCrit
 		} else {
 			ahe.Outcome = OutcomeHit
