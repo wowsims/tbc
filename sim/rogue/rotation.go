@@ -264,7 +264,7 @@ func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 }
 
 func (rogue *Rogue) canPoolEnergy(sim *core.Simulation, energy float64) bool {
-	return sim.GetRemainingDuration() >= time.Second*6 && energy <= 70 && (!rogue.HasAura(AdrenalineRushAuraID) || energy <= 50)
+	return sim.GetRemainingDuration() >= time.Second*6 && energy <= 50 && (!rogue.HasAura(AdrenalineRushAuraID) || energy <= 30)
 }
 
 func (rogue *Rogue) tryUseDamageFinisher(sim *core.Simulation, energy float64) bool {
