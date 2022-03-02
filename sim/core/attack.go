@@ -213,10 +213,13 @@ func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell
 	if ability.OutcomeRollCategory != OutcomeRollCategoryWhite {
 		crit := false
 		switch ability.CritRollCategory {
-		case CritRollCategoryMagical:
+		case CritRollCategoryMagical, CritRollCategoryPhysical:
 			crit = ahe.critCheck(sim, &ability.SpellCast)
 		default:
-			critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
+			// TODO: several abilities should not matter if crit is rolled but is still impacting
+			//  dps right now. Remove this default case whenever we can solve those.
+			baseCrit := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100))
+			critChance := baseCrit - ahe.Target.CritSuppression
 			roll := sim.RandomFloat("weapon swing")
 			crit = roll < critChance
 		}

@@ -169,7 +169,7 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast)
 	case CritRollCategoryMagical:
 		critChance = (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
 	case CritRollCategoryPhysical:
-		critChance = ((spellCast.Character.stats[stats.MeleeCrit] + spellCast.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
+		critChance = (spellCast.Character.stats[stats.MeleeCrit]+spellCast.BonusCritRating+spellEffect.BonusCritRating)/(MeleeCritRatingPerCritChance*100) - spellEffect.Target.CritSuppression
 		randStr = "weapon swing"
 	}
 
