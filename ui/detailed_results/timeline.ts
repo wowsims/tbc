@@ -19,9 +19,9 @@ const manaColor = '#2E93fA';
 
 export class Timeline extends ResultComponent {
 	private readonly dpsResourcesPlotElem: HTMLElement;
-	private readonly cooldownsPlotElem: HTMLElement;
+	private readonly rotationPlotElem: HTMLElement;
 	private dpsResourcesPlot: any;
-	private cooldownsPlot: any;
+	private rotationPlot: any;
 
 	private resultData: SimResultData | null;
 	private rendered: boolean;
@@ -40,7 +40,7 @@ export class Timeline extends ResultComponent {
 		</div>
 		<div class="timeline-plots-container">
 			<div class="timeline-plot dps-resources-plot"></div>
-			<div class="timeline-plot cooldowns-plot"></div>
+			<div class="timeline-plot rotation-plot"></div>
 		</div>
 		`;
 
@@ -82,22 +82,22 @@ export class Timeline extends ResultComponent {
 			},
 		});
 
-		this.cooldownsPlotElem = this.rootElem.getElementsByClassName('cooldowns-plot')[0] as HTMLElement;
-		//this.cooldownsPlot = new ApexCharts(this.cooldownsPlotElem, {
-		//	chart: {
-		//		type: 'rangeBar',
-		//		foreColor: 'white',
-		//		id: 'cooldowns',
-		//		animations: {
-		//			enabled: false,
-		//		},
-		//		height: '50%',
-		//	},
-		//	series: [], // Set dynamically
-		//	noData: {
-		//		text: 'Waiting for data...',
-		//	},
-		//});
+		this.rotationPlotElem = this.rootElem.getElementsByClassName('rotation-plot')[0] as HTMLElement;
+		this.rotationPlot = new ApexCharts(this.rotationPlotElem, {
+			chart: {
+				type: 'rangeBar',
+				foreColor: 'white',
+				id: 'rotation',
+				animations: {
+					enabled: false,
+				},
+				height: '50%',
+			},
+			series: [], // Set dynamically
+			noData: {
+				text: 'Waiting for data...',
+			},
+		});
 	}
 
 	onSimResult(resultData: SimResultData) {
@@ -381,113 +381,95 @@ export class Timeline extends ResultComponent {
 
 		this.dpsResourcesPlot.updateOptions(options);
 
-		//this.cooldownsPlot.updateOptions({
-		//	series: [
-		//		{
-		//			name: 'Lightning Bolt',
-		//			data: [
-		//				{
-		//					x: 'GCD',
-		//					y: [0, 40],
-		//				},
-		//				{
-		//					x: 'GCD',
-		//					y: [60, 100],
-		//				},
-		//			],
-		//		},
-		//		{
-		//			name: 'Chain Lightning',
-		//			data: [
-		//				{
-		//					x: 'GCD',
-		//					y: [0, 40],
-		//				},
-		//				{
-		//					x: 'GCD',
-		//					y: [60, 100],
-		//				},
-		//			],
-		//		},
-		//		{
-		//			name: 'Bloodlust',
-		//			data: [
-		//				{
-		//					x: 'Cooldowns',
-		//					y: [0, 40],
-		//				},
-		//				{
-		//					x: 'Cooldowns',
-		//					y: [60, 100],
-		//				},
-		//			],
-		//		},
-		//		{
-		//			name: 'Innervate',
-		//			data: [
-		//				{
-		//					x: 'Cooldowns',
-		//					y: [30, 70],
-		//				},
-		//				{
-		//					x: 'Cooldowns',
-		//					y: [150, 200],
-		//				},
-		//			],
-		//		},
-		//	],
-		//	xaxis: {
-		//		min: this.toDatetime(0),
-		//		max: this.toDatetime(duration),
-		//		tickAmount: 10,
-		//		decimalsInFloat: 1,
-		//		labels: {
-		//			show: true,
-		//		},
-		//	},
-		//	yaxis: {
-		//		title: {
-		//			text: 'Cooldowns',
-		//		},
-		//		labels: {
-		//			minWidth: 30,
-		//		},
-		//	},
-		//	plotOptions: {
-		//		bar: {
-		//			horizontal: true,
-		//			barHeight: '80%',
-		//		},
-		//	},
-		//	stroke: {
-		//		width: 1,
-		//	},
-		//	fill: {
-		//		type: 'solid',
-		//		opacity: 0.6,
-		//	},
-		//	tooltip: {
-		//		enabled: true,
-		//	},
-		//	chart: {
-		//		events: {
-		//			beforeResetZoom: () => {
-		//				return {
-		//					xaxis: {
-		//						min: this.toDatetime(0),
-		//						max: this.toDatetime(duration),
-		//					},
-		//				};
-		//			},
-		//		},
-		//	},
-		//});
+		this.rotationPlot.updateOptions({
+			series: [
+				{
+					name: 'Abilities',
+					data: [
+						{
+							x: 'Lightning Bolt',
+							y: [0, 40],
+						},
+						{
+							x: 'Lightning Bolt',
+							y: [60, 100],
+						},
+						{
+							x: 'Chain Lightning',
+							y: [0, 40],
+						},
+						{
+							x: 'Chain Lightning',
+							y: [60, 100],
+						},
+						{
+							x: 'Bloodlust',
+							y: [0, 40],
+						},
+						{
+							x: 'Bloodlust',
+							y: [60, 100],
+						},
+						{
+							x: 'Innervate',
+							y: [30, 70],
+						},
+						{
+							x: 'Innervate',
+							y: [150, 200],
+						},
+					],
+				},
+			],
+			xaxis: {
+				min: this.toDatetime(0),
+				max: this.toDatetime(duration),
+				tickAmount: 10,
+				decimalsInFloat: 1,
+				labels: {
+					show: true,
+				},
+			},
+			yaxis: {
+				labels: {
+					minWidth: 30,
+				},
+			},
+			plotOptions: {
+				bar: {
+					horizontal: true,
+					barHeight: '80%',
+				},
+			},
+			stroke: {
+				width: 1,
+			},
+			fill: {
+				type: 'solid',
+				opacity: 0.6,
+			},
+			tooltip: {
+				enabled: true,
+			},
+			chart: {
+				events: {
+					beforeResetZoom: () => {
+						return {
+							xaxis: {
+								min: this.toDatetime(0),
+								max: this.toDatetime(duration),
+							},
+						};
+					},
+				},
+			},
+		});
 	}
 
 	render() {
 		setTimeout(() => {
 			this.dpsResourcesPlot.render();
-			//this.cooldownsPlot.render();
+			this.rotationPlot.render();
 			this.rendered = true;
 			if (this.resultData != null) {
 				this.updatePlot();
