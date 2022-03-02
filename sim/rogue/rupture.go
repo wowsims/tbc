@@ -21,6 +21,7 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 				ActionID:            RuptureActionID,
 				Character:           &rogue.Character,
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical,
 				GCD:                 time.Second * 1,
 				Cost: core.ResourceCost{

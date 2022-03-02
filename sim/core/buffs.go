@@ -406,6 +406,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 				ActionID:            actionID,
 				Character:           character,
 				OutcomeRollCategory: OutcomeRollCategorySpecial,
+				CritRollCategory:    CritRollCategoryPhysical,
 				CritMultiplier:      character.AutoAttacks.MHAuto.CritMultiplier,
 				SpellSchool:         SpellSchoolPhysical,
 				// SpellExtras: ,
