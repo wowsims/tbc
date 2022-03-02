@@ -18,7 +18,7 @@ func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleS
 				ActionID:            SerpentStingActionID,
 				Character:           &hunter.Character,
 				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-				CritRollCategory:    core.CritRollCategoryNone,
+				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolNature,
 				GCD:                 core.GCDDefault,
 				Cost:                cost,

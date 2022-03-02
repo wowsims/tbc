@@ -163,7 +163,6 @@ func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spellCast *SpellCast) 
 // Calculates a crit check using the stats from this spell.
 func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast) bool {
 	critChance := 0.0
-
 	randStr := "DirectSpell Crit"
 	switch spellCast.CritRollCategory {
 	case CritRollCategoryMagical:
@@ -171,6 +170,8 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast)
 	case CritRollCategoryPhysical:
 		critChance = (spellCast.Character.stats[stats.MeleeCrit]+spellCast.BonusCritRating+spellEffect.BonusCritRating)/(MeleeCritRatingPerCritChance*100) - spellEffect.Target.CritSuppression
 		randStr = "weapon swing"
+	default:
+		return false
 	}
 
 	return sim.RandomFloat(randStr) < critChance
@@ -252,7 +253,6 @@ func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCas
 		damage = calculateResists(sim, damage, &hitEffect.SpellEffect)
 	}
 
-	// TODO: move crit checks to a more general place so we can fork the crit roll.
 	if hitEffect.SpellEffect.critCheck(sim, spellCast) {
 		hitEffect.Outcome |= OutcomeCrit
 		damage *= spellCast.CritMultiplier
