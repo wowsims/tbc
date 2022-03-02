@@ -85,5 +85,6 @@ func (rogue *Rogue) NewRupture(sim *core.Simulation, target *core.Target) *core.
 		rogue.deathmantle4pcProc = false
 	}
 
+	rp.Init(sim)
 	return rp
 }
