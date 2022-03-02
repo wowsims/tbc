@@ -20,7 +20,7 @@ func (rogue *Rogue) newExposeArmorTemplate(sim *core.Simulation) core.SimpleSpel
 				ActionID:            ExposeArmorActionID,
 				Character:           &rogue.Character,
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
+				CritRollCategory:    core.CritRollCategoryNone,
 				SpellSchool:         core.SpellSchoolPhysical,
 				GCD:                 time.Second * 1,
 				Cost: core.ResourceCost{

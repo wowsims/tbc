@@ -53,6 +53,7 @@ func (rogue *Rogue) newDeadlyPoisonRefreshTemplate(sim *core.Simulation) core.Si
 				Character:           rogue.GetCharacter(),
 				IsPhantom:           true,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				CritRollCategory:    core.CritRollCategoryNone,
 				SpellSchool:         core.SpellSchoolNature,
 			},
 		},
