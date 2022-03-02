@@ -213,6 +213,7 @@ export class RogueSimUI extends IndividualSimUI {
                     Presets.CombatTalents,
                     Presets.CombatMaceTalents,
                     Presets.MutilateTalents,
+                    Presets.HemoTalents,
                 ],
                 // Preset gear configurations that the user can quickly select.
                 gear: [
