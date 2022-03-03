@@ -38,6 +38,10 @@ export const MutilateTalents = {
 	name: 'Mutilate',
 	data: '305323125500100501051-005305001-05',
 };
+export const HemoTalents = {
+	name: 'Hemo',
+	data: '-02330520100501500232105-500252100230001',
+};
 
 export const DefaultRotation = RogueRotation.create({
 	builder: Builder.Auto,

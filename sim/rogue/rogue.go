@@ -1,6 +1,8 @@
 package rogue
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -34,6 +36,13 @@ type Rogue struct {
 	Talents  proto.RogueTalents
 	Options  proto.Rogue_Options
 	Rotation proto.Rogue_Rotation
+
+	// Current rotation plan.
+	plan int
+
+	// Cached values for calculating rotation.
+	energyPerSecondAvg float64
+	eaBuildTime        time.Duration // Time to build EA following a finisher at ~35 energy
 
 	deathmantle4pcProc bool
 
@@ -105,9 +114,19 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 	rogue.ruptureTemplate = rogue.newRuptureTemplate(sim)
 	rogue.deadlyPoisonTemplate = rogue.newDeadlyPoisonTemplate(sim)
 	rogue.deadlyPoisonRefreshTemplate = rogue.newDeadlyPoisonRefreshTemplate(sim)
+
+	rogue.energyPerSecondAvg = core.EnergyPerTick / core.EnergyTickDuration.Seconds()
+
+	// TODO: Currently assumes default combat spec.
+	expectedComboPointsAfterFinisher := 0
+	expectedEnergyAfterFinisher := 25.0
+	comboPointsNeeded := 5 - expectedComboPointsAfterFinisher
+	energyForEA := rogue.builderEnergyCost*float64(comboPointsNeeded) + ExposeArmorEnergyCost
+	rogue.eaBuildTime = time.Duration(((energyForEA - expectedEnergyAfterFinisher) / rogue.energyPerSecondAvg) * float64(time.Second))
 }
 
 func (rogue *Rogue) Reset(sim *core.Simulation) {
+	rogue.plan = PlanOpener
 	rogue.deathmantle4pcProc = false
 	rogue.deadlyPoisonStacks = 0
 }

@@ -7,10 +7,10 @@ import (
 )
 
 // Time between energy ticks.
-const tickDuration = time.Second * 2
+const EnergyTickDuration = time.Second * 2
 
 // Extra 0.2 because Blizzard
-const EnergyPerTick = 20.2
+const EnergyPerTick = 20
 
 // OnEnergyTick is called each time an energy tick occurs, after the energy has been updated.
 type OnEnergyTick func(sim *Simulation)
@@ -119,14 +119,14 @@ func (eb *energyBar) reset(sim *Simulation) {
 	pa := &PendingAction{
 		Name:         "Energy Tick",
 		Priority:     ActionPriorityRegen,
-		NextActionAt: tickDuration,
+		NextActionAt: EnergyTickDuration,
 	}
 	pa.OnAction = func(sim *Simulation) {
 		eb.AddEnergy(sim, EnergyPerTick*eb.EnergyTickMultiplier+eb.NextEnergyTickAdjustment, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
 		eb.NextEnergyTickAdjustment = 0
 		eb.onEnergyTick(sim)
 
-		pa.NextActionAt = sim.CurrentTime + tickDuration
+		pa.NextActionAt = sim.CurrentTime + EnergyTickDuration
 		sim.AddPendingAction(pa)
 	}
 	eb.tickAction = pa
