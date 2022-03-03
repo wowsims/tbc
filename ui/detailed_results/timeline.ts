@@ -1,5 +1,6 @@
 import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
-import { distinct, maxIndex, stringComparator, sum } from '/tbc/core/utils.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
+import { bucket, distinct, maxIndex, stringComparator, sum } from '/tbc/core/utils.js';
 
 import {
 	DamageDealtLog,
@@ -19,9 +20,11 @@ const manaColor = '#2E93fA';
 
 export class Timeline extends ResultComponent {
 	private readonly dpsResourcesPlotElem: HTMLElement;
-	private readonly rotationPlotElem: HTMLElement;
 	private dpsResourcesPlot: any;
-	private rotationPlot: any;
+
+	private readonly rotationPlotElem: HTMLElement;
+	private readonly rotationLabels: HTMLElement;
+	private readonly rotationTimeline: HTMLElement;
 
 	private resultData: SimResultData | null;
 	private rendered: boolean;
@@ -36,17 +39,39 @@ export class Timeline extends ResultComponent {
 		<div class="timeline-disclaimer">
 			<span class="timeline-warning fa fa-exclamation-triangle"></span>
 			<span class="timeline-warning-description">Timeline data visualizes only 1 sim iteration.</span>
-			<div class="timeline-run-again-button sim-button">SIM 1 ITERATION</span>
+			<div class="timeline-run-again-button sim-button">SIM 1 ITERATION</div>
+			<select class="timeline-chart-picker">
+				<option value="dps">DPS</option>
+				<option value="rotation">Rotation</option>
+			</select>
 		</div>
 		<div class="timeline-plots-container">
 			<div class="timeline-plot dps-resources-plot"></div>
-			<div class="timeline-plot rotation-plot"></div>
+			<div class="timeline-plot rotation-plot hide">
+				<div class="rotation-container">
+					<div class="rotation-labels">
+					</div>
+					<div class="rotation-timeline">
+					</div>
+				</div>
+			</div>
 		</div>
 		`;
 
 		const runAgainButton = this.rootElem.getElementsByClassName('timeline-run-again-button')[0] as HTMLElement;
 		runAgainButton.addEventListener('click', event => {
 			(window.opener || window.parent)!.postMessage('runOnce', '*');
+		});
+
+		const chartPicker = this.rootElem.getElementsByClassName('timeline-chart-picker')[0] as HTMLSelectElement;
+		chartPicker.addEventListener('change', event => {
+			if (chartPicker.value == 'rotation') {
+				this.dpsResourcesPlotElem.classList.add('hide');
+				this.rotationPlotElem.classList.remove('hide');
+			} else {
+				this.dpsResourcesPlotElem.classList.remove('hide');
+				this.rotationPlotElem.classList.add('hide');
+			}
 		});
 
 		this.dpsResourcesPlotElem = this.rootElem.getElementsByClassName('dps-resources-plot')[0] as HTMLElement;
@@ -83,21 +108,8 @@ export class Timeline extends ResultComponent {
 		});
 
 		this.rotationPlotElem = this.rootElem.getElementsByClassName('rotation-plot')[0] as HTMLElement;
-		this.rotationPlot = new ApexCharts(this.rotationPlotElem, {
-			chart: {
-				type: 'rangeBar',
-				foreColor: 'white',
-				id: 'rotation',
-				animations: {
-					enabled: false,
-				},
-				height: '50%',
-			},
-			series: [], // Set dynamically
-			noData: {
-				text: 'Waiting for data...',
-			},
-		});
+		this.rotationLabels = this.rootElem.getElementsByClassName('rotation-labels')[0] as HTMLElement;
+		this.rotationTimeline = this.rootElem.getElementsByClassName('rotation-timeline')[0] as HTMLElement;
 	}
 
 	onSimResult(resultData: SimResultData) {
@@ -381,95 +393,72 @@ export class Timeline extends ResultComponent {
 
 		this.dpsResourcesPlot.updateOptions(options);
 
-		this.rotationPlot.updateOptions({
-			series: [
-				{
-					name: 'Abilities',
-					data: [
-						{
-							x: 'Lightning Bolt',
-							y: [0, 40],
-						},
-						{
-							x: 'Lightning Bolt',
-							y: [60, 100],
-						},
-						{
-							x: 'Chain Lightning',
-							y: [0, 40],
-						},
-						{
-							x: 'Chain Lightning',
-							y: [60, 100],
-						},
-						{
-							x: 'Bloodlust',
-							y: [0, 40],
-						},
-						{
-							x: 'Bloodlust',
-							y: [60, 100],
-						},
-						{
-							x: 'Innervate',
-							y: [30, 70],
-						},
-						{
-							x: 'Innervate',
-							y: [150, 200],
-						},
-					],
-				},
-			],
-			xaxis: {
-				min: this.toDatetime(0),
-				max: this.toDatetime(duration),
-				tickAmount: 10,
-				decimalsInFloat: 1,
-				labels: {
-					show: true,
-				},
-			},
-			yaxis: {
-				labels: {
-					minWidth: 30,
-				},
-			},
-			plotOptions: {
-				bar: {
-					horizontal: true,
-					barHeight: '80%',
-				},
-			},
-			stroke: {
-				width: 1,
-			},
-			fill: {
-				type: 'solid',
-				opacity: 0.6,
-			},
-			tooltip: {
-				enabled: true,
-			},
-			chart: {
-				events: {
-					beforeResetZoom: () => {
-						return {
-							xaxis: {
-								min: this.toDatetime(0),
-								max: this.toDatetime(duration),
-							},
-						};
-					},
-				},
-			},
+		const meleeActionIds = player.getMeleeActions().map(action => action.actionId);
+		const spellActionIds = player.getSpellActions().map(action => action.actionId);
+		const getActionCategory = (actionId: ActionId): number => {
+			if (actionId.otherId) {
+				return 0;
+			} else if (meleeActionIds.find(meleeActionId => meleeActionId.equals(actionId))) {
+				return 1;
+			} else if (spellActionIds.find(spellActionId => spellActionId.equals(actionId))) {
+				return 2;
+			} else {
+				return 3;
+			}
+		};
+
+		const castsByAbility = Object.values(bucket(player.castBeganLogs, log => log.castId.toString()));
+		castsByAbility.sort((a, b) => {
+			const categoryA = getActionCategory(a[0].castId);
+			const categoryB = getActionCategory(b[0].castId);
+			if (categoryA != categoryB) {
+				return categoryA - categoryB;
+			} else {
+				return stringComparator(a[0].castId.name, b[0].castId.name);
+			}
+		});
+
+		this.rotationLabels.innerHTML = '';
+		this.rotationTimeline.innerHTML = '';
+
+		const timeToPx = (time: number) => {
+			return (time * 60) + 'px';
+		};
+
+		castsByAbility.forEach(abilityCasts => {
+			const actionId = abilityCasts[0].castId;
+
+			const labelElem = document.createElement('div');
+			labelElem.classList.add('rotation-label', 'rotation-row');
+			labelElem.innerHTML = `
+				<a class="rotation-label-icon"></a>
+				<span class="rotation-label-text">${actionId.name}</span>
+			`;
+			const labelIcon = labelElem.getElementsByClassName('rotation-label-icon')[0] as HTMLElement;
+			actionId.setBackground(labelIcon);
+			this.rotationLabels.appendChild(labelElem);
+
+			const rowElem = document.createElement('div');
+			rowElem.classList.add('rotation-timeline-row', 'rotation-row');
+			rowElem.style.width = timeToPx(duration);
+			abilityCasts.forEach(castLog => {
+				const castElem = document.createElement('div');
+				castElem.classList.add('rotation-timeline-cast');
+				castElem.style.left = timeToPx(castLog.timestamp);
+				rowElem.appendChild(castElem);
+
+				const iconElem = document.createElement('a');
+				iconElem.classList.add('rotation-timeline-cast-icon');
+				actionId.setBackground(iconElem);
+				castElem.appendChild(iconElem);
+			});
+			this.rotationTimeline.appendChild(rowElem);
 		});
 	}
 
 	render() {
 		setTimeout(() => {
 			this.dpsResourcesPlot.render();
-			this.rotationPlot.render();
 			this.rendered = true;
 			if (this.resultData != null) {
 				this.updatePlot();
