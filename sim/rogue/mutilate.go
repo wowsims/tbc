@@ -60,7 +60,7 @@ func (rogue *Rogue) newMutilateTemplate(sim *core.Simulation) core.SimpleSpellTe
 				ActionID:            MutilateActionID,
 				Character:           &rogue.Character,
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
+				CritRollCategory:    core.CritRollCategoryNone,
 				SpellSchool:         core.SpellSchoolPhysical,
 				GCD:                 time.Second * 1,
 				BaseCost: core.ResourceCost{
