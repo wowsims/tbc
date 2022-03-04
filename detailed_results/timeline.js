@@ -415,6 +415,7 @@ export class Timeline extends ResultComponent {
                 const castElem = document.createElement('div');
                 castElem.classList.add('rotation-timeline-cast');
                 castElem.style.left = this.timeToPx(castLog.timestamp);
+                castElem.style.minWidth = this.timeToPx(castLog.castTime);
                 rowElem.appendChild(castElem);
                 const iconElem = document.createElement('a');
                 iconElem.classList.add('rotation-timeline-cast-icon');
