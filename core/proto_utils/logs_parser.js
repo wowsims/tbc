@@ -1,5 +1,5 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { stringComparator } from '/tbc/core/utils.js';
+import { bucket, stringComparator } from '/tbc/core/utils.js';
 export class Entity {
     constructor(name, ownerName, index, isTarget, isPet) {
         this.name = name;
@@ -433,6 +433,62 @@ export class CastBeganLog extends SimLog {
         else {
             return null;
         }
+    }
+}
+export class CastLog extends SimLog {
+    constructor(castBeganLog, damageDealtLogs) {
+        super({
+            raw: castBeganLog.raw,
+            timestamp: castBeganLog.timestamp,
+            source: castBeganLog.source,
+            target: castBeganLog.target,
+        });
+        this.castId = castBeganLog.castId;
+        this.castTime = castBeganLog.castTime;
+        this.castBeganLog = castBeganLog;
+        this.damageDealtLogs = damageDealtLogs;
+    }
+    toString() {
+        return `${this.toStringPrefix()} Casting ${this.castId.name} (Cast time = ${this.castTime.toFixed(2)}s).`;
+    }
+    static fromLogs(logs) {
+        const castBeganLogs = logs.filter((log) => log.isCastBegan());
+        const damageDealtLogs = logs.filter((log) => log.isDamageDealt());
+        const castBeganLogsByAbility = Object.values(bucket(castBeganLogs, log => log.castId.toString()));
+        const damageDealtLogsByAbility = Object.values(bucket(damageDealtLogs, log => log.cause.toString()));
+        const castLogs = [];
+        castBeganLogsByAbility.forEach(abilityCastsBegan => {
+            const actionId = abilityCastsBegan[0].castId;
+            const abilityDamageDealt = damageDealtLogsByAbility.find(ddl => ddl[0].cause.equals(actionId));
+            if (!abilityDamageDealt) {
+                abilityCastsBegan.forEach(castBegan => castLogs.push(new CastLog(castBegan, [])));
+                return;
+            }
+            const getCastEndTime = (cbIndex) => {
+                return cbIndex < abilityCastsBegan.length
+                    ? abilityCastsBegan[cbIndex].timestamp + abilityCastsBegan[cbIndex].castTime
+                    : null;
+            };
+            let curDamageDealtLogs = [];
+            let curCbIndex = -1;
+            let nextCastEndTime = getCastEndTime(0);
+            abilityDamageDealt.forEach(ddLog => {
+                if (nextCastEndTime == null || ddLog.timestamp < nextCastEndTime) {
+                    curDamageDealtLogs.push(ddLog);
+                }
+                else {
+                    if (curCbIndex != -1) {
+                        castLogs.push(new CastLog(abilityCastsBegan[curCbIndex], curDamageDealtLogs));
+                    }
+                    curDamageDealtLogs = [ddLog];
+                    curCbIndex++;
+                    nextCastEndTime = getCastEndTime(curCbIndex + 1);
+                }
+            });
+            castLogs.push(new CastLog(abilityCastsBegan[curCbIndex], curDamageDealtLogs));
+        });
+        castLogs.sort((a, b) => a.timestamp - b.timestamp);
+        return castLogs;
     }
 }
 export class StatChangeLog extends SimLog {

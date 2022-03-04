@@ -15,7 +15,7 @@ import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { AuraUptimeLog, CastBeganLog, DamageDealtLog, DpsLog, MajorCooldownUsedLog, ResourceChangedLogGroup, SimLog } from './logs_parser.js';
+import { AuraUptimeLog, CastLog, DamageDealtLog, DpsLog, MajorCooldownUsedLog, ResourceChangedLogGroup, SimLog } from './logs_parser.js';
 export interface SimResultFilter {
     player?: number | null;
     target?: number | null;
@@ -82,7 +82,7 @@ export declare class PlayerMetrics {
     readonly dpsLogs: Array<DpsLog>;
     readonly auraUptimeLogs: Array<AuraUptimeLog>;
     readonly majorCooldownLogs: Array<MajorCooldownUsedLog>;
-    readonly castBeganLogs: Array<CastBeganLog>;
+    readonly castLogs: Array<CastLog>;
     readonly majorCooldownAuraUptimeLogs: Array<AuraUptimeLog>;
     private constructor();
     get label(): string;

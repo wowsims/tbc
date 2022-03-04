@@ -118,6 +118,15 @@ export declare class CastBeganLog extends SimLog {
     toString(): string;
     static parse(params: SimLogParams): Promise<CastBeganLog> | null;
 }
+export declare class CastLog extends SimLog {
+    readonly castId: ActionId;
+    readonly castTime: number;
+    readonly castBeganLog: CastBeganLog;
+    readonly damageDealtLogs: Array<DamageDealtLog>;
+    constructor(castBeganLog: CastBeganLog, damageDealtLogs: Array<DamageDealtLog>);
+    toString(): string;
+    static fromLogs(logs: Array<SimLog>): Array<CastLog>;
+}
 export declare class StatChangeLog extends SimLog {
     readonly effectId: ActionId;
     readonly amount: number;

@@ -11,7 +11,7 @@ import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { bucket } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
-import { AuraUptimeLog, DpsLog, Entity, ResourceChangedLogGroup, SimLog, } from './logs_parser.js';
+import { AuraUptimeLog, CastLog, DpsLog, Entity, ResourceChangedLogGroup, SimLog, } from './logs_parser.js';
 // Holds all the data from a simulation call, and provides helper functions
 // for parsing it.
 export class SimResult {
@@ -144,9 +144,9 @@ export class PlayerMetrics {
         this.logs = logs;
         this.iterations = iterations;
         this.duration = duration;
-        this.castBeganLogs = this.logs.filter((log) => log.isCastBegan());
         this.damageDealtLogs = this.logs.filter((log) => log.isDamageDealt());
         this.dpsLogs = DpsLog.fromLogs(this.damageDealtLogs);
+        this.castLogs = CastLog.fromLogs(this.logs);
         this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet), duration);
         this.majorCooldownLogs = this.logs.filter((log) => log.isMajorCooldownUsed());
         this.manaChangedLogs = ResourceChangedLogGroup.fromLogs(this.logs, 'mana');
