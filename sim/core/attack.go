@@ -292,10 +292,10 @@ type AutoAttacks struct {
 
 	MHAuto      SimpleSpell // Parameters for MH auto attacks.
 	OHAuto      SimpleSpell // Parameters for OH auto attacks.
-	cachedMelee SimpleSpell // reuse to save memory allocations
+	cachedMelee SimpleSpell // Reuse to save memory allocations.
 
 	RangedAuto            SimpleSpell // Parameters for ranged auto attacks.
-	RangedCast            SimpleCast  // Used for the 0.5s cast time on ranged autos.
+	cachedRanged          SimpleSpell // Reuse to save memory allocations.
 	RangedSwingInProgress bool
 
 	ReplaceMHSwing ReplaceMHSwing
@@ -380,6 +380,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					SpellSchool:         SpellSchoolPhysical,
 					OutcomeRollCategory: OutcomeRollCategoryRanged,
 					CritRollCategory:    CritRollCategoryPhysical,
+					IgnoreHaste:         true, // Affected by ranged haste, not spell haste.
 				},
 			},
 			Effect: SpellHitEffect{
@@ -393,14 +394,6 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					DamageMultiplier: 1,
 				},
 			},
-		},
-		RangedCast: SimpleCast{
-			Cast: Cast{
-				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
-				Character:   character,
-				IgnoreHaste: true, // Affected by ranged haste, not spell haste.
-			},
-			DisableMetrics: true,
 		},
 	}
 
@@ -449,12 +442,9 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 
 	aa.RangedSwingAt = 0
 	aa.RangedSwingInProgress = false
-	aa.RangedCast.OnCastComplete = func(sim *Simulation, cast *Cast) {
-		ama := aa.RangedAuto
-		ama.Effect.Target = sim.GetPrimaryTarget()
-		ama.Cast(sim)
+	aa.RangedAuto.AfterCast = func(sim *Simulation, cast *Cast) {
 		aa.RangedSwingInProgress = false
-		aa.agent.OnAutoAttack(sim, &ama)
+		aa.agent.OnAutoAttack(sim, &aa.cachedRanged)
 	}
 }
 
@@ -616,14 +606,16 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 		return
 	}
 
-	aa.RangedCast.CastTime = aa.RangedSwingWindup()
-	aa.RangedCast.StartCast(sim)
+	aa.cachedRanged = aa.RangedAuto
+	aa.cachedRanged.Effect.Target = target
+	aa.cachedRanged.CastTime = aa.RangedSwingWindup()
+	aa.cachedRanged.Cast(sim)
 	aa.RangedSwingAt = sim.CurrentTime + aa.RangedSwingSpeed()
 	aa.RangedSwingInProgress = true
 
 	// It's important that we update the GCD timer AFTER starting the ranged auto.
 	// Otherwise the hardcast action won't be created separately.
-	nextGCD := sim.CurrentTime + aa.RangedCast.CastTime
+	nextGCD := sim.CurrentTime + aa.cachedRanged.CastTime
 	if nextGCD > aa.character.NextGCDAt() {
 		aa.character.SetGCDTimer(sim, nextGCD)
 	}

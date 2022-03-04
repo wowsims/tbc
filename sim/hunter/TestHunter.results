@@ -791,7 +791,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-MeleeWeave-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1996.6221773743225
+  dps: 1981.6111214425518
  }
 }
 dps_results: {
@@ -803,7 +803,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-MeleeWeave-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1396.214999487913
+  dps: 1388.27081895551
  }
 }
 dps_results: {
@@ -839,13 +839,13 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-SV-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1845.1745262795912
+  dps: 1817.9023294314266
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-SV-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1678.2426161778544
+  dps: 1642.5026550370178
  }
 }
 dps_results: {
@@ -983,7 +983,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-MeleeWeave-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2043.6757877339128
+  dps: 2032.5628144003902
  }
 }
 dps_results: {
@@ -995,7 +995,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-MeleeWeave-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1417.5962320051547
+  dps: 1419.9254154223208
  }
 }
 dps_results: {
@@ -1031,7 +1031,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1885.3596510030866
+  dps: 1857.3031281822075
  }
 }
 dps_results: {

@@ -22,6 +22,9 @@ type OnCast func(sim *Simulation, cast *Cast)
 // Callback for when a cast is finished, i.e. when the in-game castbar reaches full.
 type OnCastComplete func(sim *Simulation, cast *Cast)
 
+// Callback for when a cast is finished and all its immediate effects have taken effect.
+type AfterCast func(sim *Simulation, cast *Cast)
+
 // A basic cast that costs mana and performs a callback when complete.
 // Manages cooldowns and the GCD.
 type Cast struct {
@@ -71,6 +74,9 @@ type Cast struct {
 
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete OnCastComplete
+
+	// Callbacks for providing additional custom behavior.
+	AfterCast AfterCast
 
 	// Ignores haste when calculating the GCD and cast time for this cast.
 	IgnoreHaste bool
@@ -225,6 +231,9 @@ func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastCompl
 		cast.OnCastComplete(sim, cast)
 	}
 	onCastComplete(sim, cast)
+	if cast.AfterCast != nil {
+		cast.AfterCast(sim, cast)
+	}
 }
 
 // A simple cast is just a cast with a callback, no calculations or damage.
