@@ -21,6 +21,7 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 				ActionID:            RuptureActionID,
 				Character:           &rogue.Character,
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryNone,
 				SpellSchool:         core.SpellSchoolPhysical,
 				GCD:                 time.Second * 1,
 				Cost: core.ResourceCost{
@@ -85,5 +86,6 @@ func (rogue *Rogue) NewRupture(sim *core.Simulation, target *core.Target) *core.
 		rogue.deathmantle4pcProc = false
 	}
 
+	rp.Init(sim)
 	return rp
 }

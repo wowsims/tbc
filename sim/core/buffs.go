@@ -400,32 +400,10 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	apBonus := windfuryAPBonuses[rank-1]
 	apBonus *= 1 + 0.15*float64(iwtTalentPoints)
 
-	wftempl := SimpleSpell{
-		SpellCast: SpellCast{
-			Cast: Cast{
-				ActionID:            actionID,
-				Character:           character,
-				OutcomeRollCategory: OutcomeRollCategorySpecial,
-				CritMultiplier:      character.AutoAttacks.MHAuto.CritMultiplier,
-				SpellSchool:         SpellSchoolPhysical,
-				// SpellExtras: ,
-			},
-		},
-		Effect: SpellHitEffect{
-			SpellEffect: SpellEffect{
-				DamageMultiplier:       1.0,
-				StaticDamageMultiplier: 1.0,
-				BonusAttackPower:       apBonus,
-				ProcMask:               ProcMaskMeleeMHSpecial,
-			},
-			WeaponInput: WeaponDamageInput{
-				DamageMultiplier: 1.0,
-			},
-		},
-	}
-
-	wfTemplate := NewSimpleSpellTemplate(wftempl)
-	wfAtk := SimpleSpell{}
+	mhAttack := character.AutoAttacks.MHAuto
+	mhAttack.ActionID = actionID
+	mhAttack.Effect.BonusAttackPower += apBonus
+	cachedAttack := SimpleSpell{}
 
 	const procChance = 0.2
 
@@ -436,7 +414,11 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 		ID:       WindfuryTotemAuraID,
 		ActionID: actionID,
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeMH) || spellCast.IsPhantom {
+			// TODO: Figure out which masks to actually use for auto-replacers instead of hard-coding raptor strike here.
+			if (!spellEffect.Landed() ||
+				!spellEffect.ProcMask.Matches(ProcMaskMeleeMHAuto) ||
+				spellCast.IsPhantom) &&
+				!spellCast.SameAction(ActionID{SpellID: 27014}) {
 				return
 			}
 			if icd.IsOnCD(sim) {
@@ -447,9 +429,9 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			}
 			icd = InternalCD(sim.CurrentTime + icdDur)
 
-			wfTemplate.Apply(&wfAtk)
-			wfAtk.Effect.Target = spellEffect.Target
-			wfAtk.Cast(sim)
+			cachedAttack = mhAttack
+			cachedAttack.Effect.Target = spellEffect.Target
+			cachedAttack.Cast(sim)
 		},
 	}
 }

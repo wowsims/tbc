@@ -210,17 +210,8 @@ func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell
 	dmg += ahe.DirectInput.FlatDamageBonus
 
 	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
-	if ability.OutcomeRollCategory != OutcomeRollCategoryWhite {
-		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
-
-		roll := sim.RandomFloat("weapon swing")
-
-		// TODO: should we |= with crit/hit?
-		if roll < critChance {
-			ahe.Outcome = OutcomeCrit
-		} else {
-			ahe.Outcome = OutcomeHit
-		}
+	if ahe.critCheck(sim, &ability.SpellCast) {
+		ahe.Outcome = OutcomeCrit
 	}
 
 	if ahe.Outcome == OutcomeCrit {
@@ -343,7 +334,6 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
 					Character:           character,
 					OutcomeRollCategory: OutcomeRollCategoryWhite,
-					CritRollCategory:    CritRollCategoryPhysical,
 					SpellSchool:         SpellSchoolPhysical,
 					CritMultiplier:      options.MainHand.CritMultiplier,
 				},
@@ -366,7 +356,6 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
 					Character:           character,
 					OutcomeRollCategory: OutcomeRollCategoryWhite,
-					CritRollCategory:    CritRollCategoryPhysical,
 					SpellSchool:         SpellSchoolPhysical,
 					CritMultiplier:      options.OffHand.CritMultiplier,
 				},
@@ -389,7 +378,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionShoot},
 					Character:           character,
 					SpellSchool:         SpellSchoolPhysical,
-					OutcomeRollCategory: OutcomeRollCategoryRanged | OutcomeRollCategoryWhite,
+					OutcomeRollCategory: OutcomeRollCategoryRanged,
 					CritRollCategory:    CritRollCategoryPhysical,
 				},
 			},

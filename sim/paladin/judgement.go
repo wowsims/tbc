@@ -24,13 +24,13 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolHoly,
-				SpellExtras:         core.SpellExtrasIgnoreResists,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
 				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
-				IsPhantom:           true,
 			},
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
+				ProcMask:               core.ProcMaskMeleeOrRangedSpecial,
 				DamageMultiplier:       1, // Need to review to make sure I set these properly
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
@@ -41,8 +41,11 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 				},
 			},
 			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 295,
-				MaxBaseDamage: 325,
+				// MinBaseDamage: 295,
+				// MaxBaseDamage: 325,
+				SpellCoefficient: 0.7,
+				MinBaseDamage:    paladin.GetMHWeapon().WeaponDamageMin,
+				MaxBaseDamage:    paladin.GetMHWeapon().WeaponDamageMax,
 			},
 		},
 	}

@@ -20,6 +20,7 @@ func (rogue *Rogue) newExposeArmorTemplate(sim *core.Simulation) core.SimpleSpel
 				ActionID:            ExposeArmorActionID,
 				Character:           &rogue.Character,
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryNone,
 				SpellSchool:         core.SpellSchoolPhysical,
 				GCD:                 time.Second * 1,
 				Cost: core.ResourceCost{
@@ -78,5 +79,8 @@ func (rogue *Rogue) NewExposeArmor(sim *core.Simulation, target *core.Target) *c
 }
 
 func (rogue *Rogue) MaintainingExpose(target *core.Target) bool {
-	return rogue.Rotation.MaintainExposeArmor && (rogue.Talents.ImprovedExposeArmor == 2 || !target.HasAura(core.SunderArmorDebuffID))
+	permaEA := target.AuraExpiresAt(core.ExposeArmorDebuffID) == core.NeverExpires
+	return rogue.Rotation.MaintainExposeArmor &&
+		!permaEA &&
+		(rogue.Talents.ImprovedExposeArmor == 2 || !target.HasAura(core.SunderArmorDebuffID))
 }

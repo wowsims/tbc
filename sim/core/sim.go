@@ -94,17 +94,17 @@ func (sim *Simulation) RandomFloat(label string) float64 {
 		return sim.rand.Float64()
 	}
 
-	// if sim.Log != nil {
-	// 	sim.Log("FLOAT64 FROM: %s", label)
-	// }
-
 	labelHash := hash(label)
 	labelRand, isPresent := sim.testRands[labelHash]
 	if !isPresent {
 		labelRand = rand.New(rand.NewSource(int64(labelHash)))
 		sim.testRands[labelHash] = labelRand
 	}
-	return labelRand.Float64()
+	v := labelRand.Float64()
+	// if sim.Log != nil {
+	// 	sim.Log("FLOAT64 '%s': %0.5f", label, v)
+	// }
+	return v
 }
 
 func (sim *Simulation) Reset() {

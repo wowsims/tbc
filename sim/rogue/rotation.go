@@ -122,7 +122,7 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 					return
 				}
 				rogue.castSliceAndDice()
-				rogue.plan = PlanFillBeforeEA
+				rogue.plan = PlanFillBeforeSND
 				return
 			}
 		} else if energy >= rogue.builderEnergyCost {
@@ -185,9 +185,9 @@ func (rogue *Rogue) doPlanFillBeforeSND(sim *core.Simulation) {
 	energy := rogue.CurrentEnergy()
 	comboPoints := rogue.ComboPoints()
 	target := sim.GetPrimaryTarget()
-	eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
+	sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
 
-	if rogue.eaBuildTime+time.Second*2 > eaTimeRemaining {
+	if rogue.eaBuildTime+time.Second*2 > sndTimeRemaining {
 		// Cast our finisher and start prepping for SND.
 		if comboPoints == 0 {
 			rogue.plan = PlanMaximalSlice
