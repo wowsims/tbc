@@ -801,11 +801,13 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 		castTemplate := NewSimpleSpellTemplate(SimpleSpell{
 			SpellCast: SpellCast{
 				Cast: Cast{
-					ActionID:       actionID,
-					Character:      character,
-					IsPhantom:      true,
-					SpellSchool:    SpellSchoolFire,
-					CritMultiplier: 1.5,
+					ActionID:            actionID,
+					Character:           character,
+					IsPhantom:           true,
+					OutcomeRollCategory: OutcomeRollCategoryMagic,
+					CritRollCategory:    CritRollCategoryMagical,
+					SpellSchool:         SpellSchoolFire,
+					CritMultiplier:      1.5,
 				},
 			},
 			Effect: SpellHitEffect{
