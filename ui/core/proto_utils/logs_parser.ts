@@ -1,6 +1,6 @@
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { stringComparator, sum } from '/tbc/core/utils.js';
+import { bucket, stringComparator, sum } from '/tbc/core/utils.js';
 
 export class Entity {
 	readonly name: string;
@@ -575,6 +575,77 @@ export class CastBeganLog extends SimLog {
 		} else {
 			return null;
 		}
+	}
+}
+
+export class CastLog extends SimLog {
+	readonly castId: ActionId;
+	readonly castTime: number;
+
+	readonly castBeganLog: CastBeganLog;
+
+	// All instances of damage dealt from the completion of this cast until the completion of the next cast.
+	readonly damageDealtLogs: Array<DamageDealtLog>;
+
+	constructor(castBeganLog: CastBeganLog, damageDealtLogs: Array<DamageDealtLog>) {
+		super({
+			raw: castBeganLog.raw,
+			timestamp: castBeganLog.timestamp,
+			source: castBeganLog.source,
+			target: castBeganLog.target,
+		});
+		this.castId = castBeganLog.castId;
+		this.castTime = castBeganLog.castTime;
+		this.castBeganLog = castBeganLog;
+		this.damageDealtLogs = damageDealtLogs;
+	}
+
+	toString(): string {
+		return `${this.toStringPrefix()} Casting ${this.castId.name} (Cast time = ${this.castTime.toFixed(2)}s).`;
+	}
+
+	static fromLogs(logs: Array<SimLog>): Array<CastLog> {
+		const castBeganLogs = logs.filter((log): log is CastBeganLog => log.isCastBegan());
+		const damageDealtLogs = logs.filter((log): log is DamageDealtLog => log.isDamageDealt());
+
+		const castBeganLogsByAbility = Object.values(bucket(castBeganLogs, log => log.castId.toString()));
+		const damageDealtLogsByAbility = Object.values(bucket(damageDealtLogs, log => log.cause.toString()));
+
+		const castLogs: Array<CastLog> = [];
+		castBeganLogsByAbility.forEach(abilityCastsBegan => {
+			const actionId = abilityCastsBegan[0].castId;
+			const abilityDamageDealt = damageDealtLogsByAbility.find(ddl => ddl[0].cause.equals(actionId));
+			if (!abilityDamageDealt) {
+				abilityCastsBegan.forEach(castBegan => castLogs.push(new CastLog(castBegan, [])));
+				return;
+			}
+
+			const getCastEndTime = (cbIndex: number) => {
+				return cbIndex < abilityCastsBegan.length
+						? abilityCastsBegan[cbIndex].timestamp + abilityCastsBegan[cbIndex].castTime
+						: null;
+			};
+
+			let curDamageDealtLogs: Array<DamageDealtLog> = [];
+			let curCbIndex = -1;
+			let nextCastEndTime = getCastEndTime(0);
+			abilityDamageDealt.forEach(ddLog => {
+				if (nextCastEndTime == null || ddLog.timestamp < nextCastEndTime) {
+					curDamageDealtLogs.push(ddLog);
+				} else {
+					if (curCbIndex != -1) {
+						castLogs.push(new CastLog(abilityCastsBegan[curCbIndex], curDamageDealtLogs));
+					}
+					curDamageDealtLogs = [ddLog];
+					curCbIndex++;
+					nextCastEndTime = getCastEndTime(curCbIndex + 1);
+				}
+			});
+			castLogs.push(new CastLog(abilityCastsBegan[curCbIndex], curDamageDealtLogs));
+		});
+
+		castLogs.sort((a, b) => a.timestamp - b.timestamp);
+		return castLogs;
 	}
 }
 
