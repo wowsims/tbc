@@ -126,12 +126,16 @@ $mana-color: #2E93fA;
 .rotation-label-text {
 	margin: 2px;
 }
+.rotation-label-header, .rotation-timeline-header {
+	height: 30px;
+}
 .rotation-timeline {
 	display: inline-block;
 	overflow-x: scroll;
 }
 .rotation-timeline-row {
 	position: relative;
+	border-bottom: 1px solid grey;
 }
 .rotation-timeline-cast {
 	position: absolute;

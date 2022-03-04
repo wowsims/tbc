@@ -396,7 +396,10 @@ export class Timeline extends ResultComponent {
 		const meleeActionIds = player.getMeleeActions().map(action => action.actionId);
 		const spellActionIds = player.getSpellActions().map(action => action.actionId);
 		const getActionCategory = (actionId: ActionId): number => {
-			if (actionId.otherId) {
+			const fixedCategory = idToCategoryMap[actionId.spellId];
+			if (fixedCategory) {
+				return fixedCategory;
+			} else if (actionId.otherId) {
 				return 0;
 			} else if (meleeActionIds.find(meleeActionId => meleeActionId.equals(actionId))) {
 				return 1;
@@ -407,7 +410,13 @@ export class Timeline extends ResultComponent {
 			}
 		};
 
-		const castsByAbility = Object.values(bucket(player.castBeganLogs, log => log.castId.toString()));
+		const castsByAbility = Object.values(bucket(player.castBeganLogs, log => {
+			if (idsToGroupForRotation.includes(log.castId.spellId)) {
+				return log.castId.toStringIgnoringTag();
+			} else {
+				return log.castId.toString();
+			}
+		}));
 		castsByAbility.sort((a, b) => {
 			const categoryA = getActionCategory(a[0].castId);
 			const categoryB = getActionCategory(b[0].castId);
@@ -418,42 +427,105 @@ export class Timeline extends ResultComponent {
 			}
 		});
 
-		this.rotationLabels.innerHTML = '';
-		this.rotationTimeline.innerHTML = '';
+		this.rotationLabels.innerHTML = `
+			<div class="rotation-label-header"></div>
+		`;
+		this.rotationTimeline.innerHTML = `
+			<div class="rotation-timeline-header">
+				<canvas class="rotation-timeline-canvas"></canvas>
+			</div>
+		`;
 
-		const timeToPx = (time: number) => {
-			return (time * 60) + 'px';
-		};
+		this.drawRotationTimeRuler(this.rotationTimeline.getElementsByClassName('rotation-timeline-canvas')[0] as HTMLCanvasElement, duration);
 
 		castsByAbility.forEach(abilityCasts => {
 			const actionId = abilityCasts[0].castId;
 
 			const labelElem = document.createElement('div');
 			labelElem.classList.add('rotation-label', 'rotation-row');
+			const labelText = idsToGroupForRotation.includes(actionId.spellId) ? actionId.baseName : actionId.name;
 			labelElem.innerHTML = `
 				<a class="rotation-label-icon"></a>
-				<span class="rotation-label-text">${actionId.name}</span>
+				<span class="rotation-label-text">${labelText}</span>
 			`;
-			const labelIcon = labelElem.getElementsByClassName('rotation-label-icon')[0] as HTMLElement;
-			actionId.setBackground(labelIcon);
+			const labelIcon = labelElem.getElementsByClassName('rotation-label-icon')[0] as HTMLAnchorElement;
+			actionId.setBackgroundAndHref(labelIcon);
 			this.rotationLabels.appendChild(labelElem);
 
 			const rowElem = document.createElement('div');
 			rowElem.classList.add('rotation-timeline-row', 'rotation-row');
-			rowElem.style.width = timeToPx(duration);
+			rowElem.style.width = this.timeToPx(duration);
 			abilityCasts.forEach(castLog => {
 				const castElem = document.createElement('div');
 				castElem.classList.add('rotation-timeline-cast');
-				castElem.style.left = timeToPx(castLog.timestamp);
+				castElem.style.left = this.timeToPx(castLog.timestamp);
 				rowElem.appendChild(castElem);
 
 				const iconElem = document.createElement('a');
 				iconElem.classList.add('rotation-timeline-cast-icon');
 				actionId.setBackground(iconElem);
 				castElem.appendChild(iconElem);
+				tippy(castElem, {
+					content: `${castLog.castId.name}: ${castLog.castTime.toFixed(2)}s (${castLog.timestamp.toFixed(2)}s - ${(castLog.timestamp + castLog.castTime).toFixed(2)}s)`,
+					allowHTML: true,
+				});
 			});
 			this.rotationTimeline.appendChild(rowElem);
 		});
+	}
+
+	private timeToPxValue(time: number): number {
+		return time * 100;
+	}
+	private timeToPx(time: number): string {
+		return this.timeToPxValue(time) + 'px';
+	}
+
+	private drawRotationTimeRuler(canvas: HTMLCanvasElement, duration: number) {
+		const height = 30;
+		canvas.width = this.timeToPxValue(duration);
+		canvas.height = height;
+
+		const ctx = canvas.getContext('2d')!;
+		ctx.strokeStyle = 'white'
+
+		ctx.font = 'bold 14px SimDefaultFont';
+		ctx.fillStyle = 'white';
+		ctx.lineWidth = 2;
+		ctx.beginPath();
+
+		// Bottom border line
+		ctx.moveTo(0, height);
+		ctx.lineTo(canvas.width, height);
+
+		// Tick lines
+		const numTicks = 1 + Math.floor(duration * 10);
+		for (let i = 0; i <= numTicks; i++) {
+			const time = i * 0.1;
+			let x = this.timeToPxValue(time);
+			if (i == 0) {
+				ctx.textAlign = 'left';
+				x++;
+			} else if (time == duration) {
+				ctx.textAlign = 'right';
+				x--;
+			} else {
+				ctx.textAlign = 'center';
+			}
+
+			let lineHeight = 0;
+			if (i % 10 == 0) {
+				lineHeight = height * 0.5;
+				ctx.fillText(time + 's', x, height - height * 0.6);
+			} else if (i % 5 == 0) {
+				lineHeight = height * 0.25;
+			} else {
+				lineHeight = height * 0.125;
+			}
+			ctx.moveTo(x, height);
+			ctx.lineTo(x, height - lineHeight);
+		}
+		ctx.stroke();
 	}
 
 	render() {
@@ -470,3 +542,18 @@ export class Timeline extends ResultComponent {
 		return new Date(timestamp * 1000);
 	}
 }
+
+// Hard-coded spell categories for controlling rotation ordering.
+const idToCategoryMap: Record<number, number> = {
+	[6774]: 1.1,  // Slice and Dice
+	[26866]: 1.2, // Expose Armor
+	[26865]: 1.3, // Eviscerate
+	[26867]: 1.3, // Rupture
+};
+
+const idsToGroupForRotation: Array<number> = [
+	6774,  // Slice and Dice
+	26866, // Expose Armor
+	26865, // Eviscerate
+	26867, // Rupture
+];
