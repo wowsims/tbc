@@ -414,11 +414,9 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 		ID:       WindfuryTotemAuraID,
 		ActionID: actionID,
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			// TODO: Figure out which masks to actually use for auto-replacers instead of hard-coding raptor strike here.
-			if (!spellEffect.Landed() ||
+			if !spellEffect.Landed() ||
 				!spellEffect.ProcMask.Matches(ProcMaskMeleeMHAuto) ||
-				spellCast.IsPhantom) &&
-				!spellCast.SameAction(ActionID{SpellID: 27014}) {
+				spellCast.IsPhantom {
 				return
 			}
 			if icd.IsOnCD(sim) {
