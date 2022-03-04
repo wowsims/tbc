@@ -410,7 +410,7 @@ export class Timeline extends ResultComponent {
 			}
 		};
 
-		const castsByAbility = Object.values(bucket(player.castBeganLogs, log => {
+		const castsByAbility = Object.values(bucket(player.castLogs, log => {
 			if (idsToGroupForRotation.includes(log.castId.spellId)) {
 				return log.castId.toStringIgnoringTag();
 			} else {
@@ -467,7 +467,12 @@ export class Timeline extends ResultComponent {
 				actionId.setBackground(iconElem);
 				castElem.appendChild(iconElem);
 				tippy(castElem, {
-					content: `${castLog.castId.name}: ${castLog.castTime.toFixed(2)}s (${castLog.timestamp.toFixed(2)}s - ${(castLog.timestamp + castLog.castTime).toFixed(2)}s)`,
+					content: `
+						<span>${castLog.castId.name}: ${castLog.castTime.toFixed(2)}s (${castLog.timestamp.toFixed(2)}s - ${(castLog.timestamp + castLog.castTime).toFixed(2)}s)</span>
+						<ul class="rotation-timeline-cast-damage-list">
+							${castLog.damageDealtLogs.map(ddl => `<li>${ddl.timestamp.toFixed(2)}s - ${ddl.resultString()}</li>`).join('')}
+						</ul>
+					`,
 					allowHTML: true,
 				});
 			});
