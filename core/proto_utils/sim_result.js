@@ -144,6 +144,7 @@ export class PlayerMetrics {
         this.logs = logs;
         this.iterations = iterations;
         this.duration = duration;
+        this.castBeganLogs = this.logs.filter((log) => log.isCastBegan());
         this.damageDealtLogs = this.logs.filter((log) => log.isDamageDealt());
         this.dpsLogs = DpsLog.fromLogs(this.damageDealtLogs);
         this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet), duration);

@@ -265,6 +265,10 @@
   --sidebar-highlight-color: Blue;
 }
 
+.hide {
+  display: none;
+}
+
 @font-face {
   font-family: SimDefaultFont;
   src: url(/tbc/assets/PlusJakartaSans-Regular.woff2);
@@ -660,6 +664,10 @@
   --sidebar-highlight-color: Blue;
 }
 
+.hide {
+  display: none;
+}
+
 @font-face {
   font-family: SimDefaultFont;
   src: url(/tbc/assets/PlusJakartaSans-Regular.woff2);
@@ -972,6 +980,10 @@
   --sidebar-highlight-color: Blue;
 }
 
+.hide {
+  display: none;
+}
+
 @font-face {
   font-family: SimDefaultFont;
   src: url(/tbc/assets/PlusJakartaSans-Regular.woff2);
@@ -1252,6 +1264,10 @@
   --sidebar-bg-color: DarkKhaki;
   --sidebar-text-color: White;
   --sidebar-highlight-color: Blue;
+}
+
+.hide {
+  display: none;
 }
 
 @font-face {
@@ -1560,6 +1576,10 @@
   --sidebar-bg-color: DarkKhaki;
   --sidebar-text-color: White;
   --sidebar-highlight-color: Blue;
+}
+
+.hide {
+  display: none;
 }
 
 @font-face {
@@ -1943,6 +1963,10 @@ input, select {
   --sidebar-bg-color: DarkKhaki;
   --sidebar-text-color: White;
   --sidebar-highlight-color: Blue;
+}
+
+.hide {
+  display: none;
 }
 
 @font-face {
