@@ -25,6 +25,7 @@ import { sum } from '/tbc/core/utils.js';
 
 import {
 	AuraUptimeLog,
+	CastBeganLog,
 	DamageDealtLog,
 	DpsLog,
 	Entity,
@@ -240,6 +241,7 @@ export class PlayerMetrics {
 	readonly dpsLogs: Array<DpsLog>;
 	readonly auraUptimeLogs: Array<AuraUptimeLog>;
 	readonly majorCooldownLogs: Array<MajorCooldownUsedLog>;
+	readonly castBeganLogs: Array<CastBeganLog>;
 
 	// Aura uptime logs, filtered to include only auras that correspond to a
 	// major cooldown.
@@ -275,6 +277,7 @@ export class PlayerMetrics {
 		this.iterations = iterations;
 		this.duration = duration;
 
+		this.castBeganLogs = this.logs.filter((log): log is CastBeganLog => log.isCastBegan());
 		this.damageDealtLogs = this.logs.filter((log): log is DamageDealtLog => log.isDamageDealt());
 		this.dpsLogs = DpsLog.fromLogs(this.damageDealtLogs);
 

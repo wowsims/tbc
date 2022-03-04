@@ -24,6 +24,10 @@ $mana-color: #2E93fA;
 	cursor: pointer;
 }
 
+.timeline-chart-picker {
+	float: right;
+}
+
 .timeline-plots-container {
 	margin: 5px;
 	margin-top: 15px;
@@ -35,10 +39,6 @@ $mana-color: #2E93fA;
 }
 
 .dps-resources-plot {
-}
-
-.cooldowns-plot {
-	display: none;
 }
 
 .timeline-tooltip {
@@ -94,4 +94,54 @@ $mana-color: #2E93fA;
 }
 .timeline-tooltip-auras ul li::before {
 	color: black;
+}
+
+.rotation-plot {
+	margin-top: 40px;
+}
+.rotation-container {
+	color: white;
+	display: flex;
+}
+.rotation-row {
+	height: 28px;
+	margin: 2px 0;
+}
+.rotation-labels {
+	display: inline-block;
+	white-space: nowrap;
+}
+.rotation-label {
+	font-size: 13px;
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+}
+.rotation-label-icon {
+	@include wowhead-background-icon;
+	height: 24px;
+	width: 24px;
+	margin: 2px;
+}
+.rotation-label-text {
+	margin: 2px;
+}
+.rotation-label-header, .rotation-timeline-header {
+	height: 30px;
+}
+.rotation-timeline {
+	display: inline-block;
+	overflow-x: scroll;
+}
+.rotation-timeline-row {
+	position: relative;
+	border-bottom: 1px solid grey;
+}
+.rotation-timeline-cast {
+	position: absolute;
+}
+.rotation-timeline-cast-icon {
+	@include wowhead-background-icon;
+	height: 24px;
+	width: 24px;
 }
