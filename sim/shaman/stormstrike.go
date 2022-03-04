@@ -25,6 +25,15 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 			return
 		}
 		spellEffect.DamageMultiplier *= 1.2
+	}
+	ssDebuffAura.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		if spellCast.SpellSchool != core.SpellSchoolNature {
+			return
+		}
+		if !spellEffect.Landed() || spellEffect.Damage == 0 {
+			return
+		}
+
 		stacks := spellEffect.Target.NumStacks(StormstrikeDebuffID) - 1
 		if stacks == 0 {
 			spellEffect.Target.RemoveAura(sim, StormstrikeDebuffID)

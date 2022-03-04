@@ -152,7 +152,7 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 var FullConsumes = &proto.Consumes{
 	Flask:           proto.Flask_FlaskOfRelentlessAssault,
 	DefaultPotion:   proto.Potions_HastePotion,
-	DefaultConjured: proto.Conjured_ConjuredDarkRune,
+	DefaultConjured: proto.Conjured_ConjuredFlameCap,
 	PetFood:         proto.PetFood_PetFoodKiblersBits,
 }
 
