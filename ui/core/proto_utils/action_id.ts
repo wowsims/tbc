@@ -70,6 +70,10 @@ export class ActionId {
 		this.iconUrl = iconUrl;
 	}
 
+	anyId(): number {
+		return this.itemId || this.spellId || this.otherId;
+	}
+
 	equals(other: ActionId): boolean {
 		return this.equalsIgnoringTag(other) && this.tag == other.tag;
 	}

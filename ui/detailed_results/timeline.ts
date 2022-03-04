@@ -1,3 +1,4 @@
+import { OtherAction } from '/tbc/core/proto/common.js';
 import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { bucket, distinct, maxIndex, stringComparator, sum } from '/tbc/core/utils.js';
@@ -396,17 +397,15 @@ export class Timeline extends ResultComponent {
 		const meleeActionIds = player.getMeleeActions().map(action => action.actionId);
 		const spellActionIds = player.getSpellActions().map(action => action.actionId);
 		const getActionCategory = (actionId: ActionId): number => {
-			const fixedCategory = idToCategoryMap[actionId.spellId];
-			if (fixedCategory) {
+			const fixedCategory = idToCategoryMap[actionId.anyId()];
+			if (fixedCategory != null) {
 				return fixedCategory;
-			} else if (actionId.otherId) {
-				return 0;
 			} else if (meleeActionIds.find(meleeActionId => meleeActionId.equals(actionId))) {
-				return 1;
+				return MELEE_ACTION_CATEGORY;
 			} else if (spellActionIds.find(spellActionId => spellActionId.equals(actionId))) {
-				return 2;
+				return SPELL_ACTION_CATEGORY;
 			} else {
-				return 3;
+				return DEFAULT_ACTION_CATEGORY;
 			}
 		};
 
@@ -549,12 +548,21 @@ export class Timeline extends ResultComponent {
 	}
 }
 
+const MELEE_ACTION_CATEGORY = 1;
+const SPELL_ACTION_CATEGORY = 2;
+const DEFAULT_ACTION_CATEGORY = 3;
+
 // Hard-coded spell categories for controlling rotation ordering.
 const idToCategoryMap: Record<number, number> = {
-	[6774]: 1.1,  // Slice and Dice
-	[26866]: 1.2, // Expose Armor
-	[26865]: 1.3, // Eviscerate
-	[26867]: 1.3, // Rupture
+	[OtherAction.OtherActionAttack]: 0,
+	[OtherAction.OtherActionShoot]:  0.5,
+
+	[27014]: 0.1, // Raptor Strike
+
+	[6774]:  MELEE_ACTION_CATEGORY + 0.1, // Slice and Dice
+	[26866]: MELEE_ACTION_CATEGORY + 0.2, // Expose Armor
+	[26865]: MELEE_ACTION_CATEGORY + 0.3, // Eviscerate
+	[26867]: MELEE_ACTION_CATEGORY + 0.3, // Rupture
 };
 
 const idsToGroupForRotation: Array<number> = [

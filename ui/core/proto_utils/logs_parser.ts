@@ -58,6 +58,7 @@ export class Entity {
 
 interface SimLogParams {
 	raw: string,
+	logIndex: number,
 	timestamp: number,
 	source: Entity | null,
 	target: Entity | null,
@@ -65,6 +66,11 @@ interface SimLogParams {
 
 export class SimLog {
 	readonly raw: string;
+
+	// Index of this log within the full log output.
+	// When comparing timestamps this should be used instead of timestamp, because
+	// timestamp is scraped from log text and doesn't have enough precision.
+	readonly logIndex: number;
 
 	// Time in seconds from the encounter start.
 	readonly timestamp: number;
@@ -78,6 +84,7 @@ export class SimLog {
 
 	constructor(params: SimLogParams) {
 		this.raw = params.raw;
+		this.logIndex = params.logIndex;
 		this.timestamp = params.timestamp;
 		this.source = params.source;
 		this.target = params.target;
@@ -100,9 +107,10 @@ export class SimLog {
 	static async parseAll(result: RaidSimResult): Promise<Array<SimLog>> {
 		const lines = result.logs.split('\n');
 
-		return Promise.all(lines.map(line => {
+		return Promise.all(lines.map((line, lineIndex) => {
 			const params: SimLogParams = {
 				raw: line,
+				logIndex: lineIndex,
 				timestamp: 0,
 				source: null,
 				target: null,
@@ -315,6 +323,7 @@ export class DpsLog extends SimLog {
 
 			return new DpsLog({
 				raw: '',
+				logIndex: ddLogGroup[0].logIndex,
 				timestamp: ddLogGroup[0].timestamp,
 				source: ddLogGroup[0].source,
 				target: null,
@@ -404,6 +413,7 @@ export class AuraUptimeLog extends SimLog {
 
 			uptimeLogs.push(new AuraUptimeLog({
 				raw: log.raw,
+				logIndex: gainedLog.logIndex,
 				timestamp: gainedLog.timestamp,
 				source: log.source,
 				target: log.target,
@@ -414,6 +424,7 @@ export class AuraUptimeLog extends SimLog {
 		unmatchedGainedLogs.forEach(gainedLog => {
 			uptimeLogs.push(new AuraUptimeLog({
 				raw: gainedLog.raw,
+				logIndex: gainedLog.logIndex,
 				timestamp: gainedLog.timestamp,
 				source: gainedLog.source,
 				target: gainedLog.target,
@@ -515,6 +526,7 @@ export class ResourceChangedLogGroup extends SimLog {
 		return groupedLogs.map(logGroup => new ResourceChangedLogGroup(
 				{
 					raw: '',
+					logIndex: logGroup[0].logIndex,
 					timestamp: logGroup[0].timestamp,
 					source: logGroup[0].source,
 					target: logGroup[0].target,
@@ -590,6 +602,7 @@ export class CastLog extends SimLog {
 	constructor(castBeganLog: CastBeganLog, damageDealtLogs: Array<DamageDealtLog>) {
 		super({
 			raw: castBeganLog.raw,
+			logIndex: castBeganLog.logIndex,
 			timestamp: castBeganLog.timestamp,
 			source: castBeganLog.source,
 			target: castBeganLog.target,
