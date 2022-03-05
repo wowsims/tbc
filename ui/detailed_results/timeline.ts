@@ -1,5 +1,5 @@
 import { OtherAction } from '/tbc/core/proto/common.js';
-import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
+import { PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { bucket, distinct, maxIndex, stringComparator, sum } from '/tbc/core/utils.js';
 
@@ -129,6 +129,7 @@ export class Timeline extends ResultComponent {
 		const player = players[0];
 
 		const duration = this.resultData!.result.result.firstIterationDuration || 1;
+		this.updateRotationChart(player, duration);
 
 		let manaLogs = player.manaChangedLogs;
 		let dpsLogs = player.dpsLogs;
@@ -393,7 +394,9 @@ export class Timeline extends ResultComponent {
 		}
 
 		this.dpsResourcesPlot.updateOptions(options);
+	}
 
+	private updateRotationChart(player: PlayerMetrics, duration: number) {
 		const meleeActionIds = player.getMeleeActions().map(action => action.actionId);
 		const spellActionIds = player.getSpellActions().map(action => action.actionId);
 		const getActionCategory = (actionId: ActionId): number => {
@@ -437,9 +440,7 @@ export class Timeline extends ResultComponent {
 
 		this.drawRotationTimeRuler(this.rotationTimeline.getElementsByClassName('rotation-timeline-canvas')[0] as HTMLCanvasElement, duration);
 
-		castsByAbility.forEach(abilityCasts => {
-			const actionId = abilityCasts[0].castId;
-
+		const makeLabelElem = (actionId: ActionId) => {
 			const labelElem = document.createElement('div');
 			labelElem.classList.add('rotation-label', 'rotation-row');
 			const labelText = idsToGroupForRotation.includes(actionId.spellId) ? actionId.baseName : actionId.name;
@@ -449,11 +450,22 @@ export class Timeline extends ResultComponent {
 			`;
 			const labelIcon = labelElem.getElementsByClassName('rotation-label-icon')[0] as HTMLAnchorElement;
 			actionId.setBackgroundAndHref(labelIcon);
-			this.rotationLabels.appendChild(labelElem);
+			return labelElem;
+		};
 
+		const makeRowElem = (duration: number) => {
 			const rowElem = document.createElement('div');
 			rowElem.classList.add('rotation-timeline-row', 'rotation-row');
 			rowElem.style.width = this.timeToPx(duration);
+			return rowElem;
+		};
+
+		const castRowElems = castsByAbility.map(abilityCasts => {
+			const actionId = abilityCasts[0].castId;
+
+			this.rotationLabels.appendChild(makeLabelElem(actionId));
+
+			const rowElem = makeRowElem(duration);
 			abilityCasts.forEach(castLog => {
 				const castElem = document.createElement('div');
 				castElem.classList.add('rotation-timeline-cast');
@@ -489,6 +501,38 @@ export class Timeline extends ResultComponent {
 				});
 			});
 			this.rotationTimeline.appendChild(rowElem);
+			return rowElem;
+		});
+
+		const aurasById = Object.values(bucket(player.auraUptimeLogs, log => log.aura.toString()));
+		aurasById.sort((a, b) => stringComparator(a[0].aura.name, b[0].aura.name));
+		aurasById.forEach(auraUptimeLogs => {
+			const actionId = auraUptimeLogs[0].aura;
+
+			// If there is already a corresponding row from the casts, use that one. Otherwise make a new one.
+			let rowElem = makeRowElem(duration);
+			const castRowIndex = castsByAbility.findIndex(casts => casts[0].castId.equalsIgnoringTag(actionId));
+			if (castRowIndex != -1) {
+				rowElem = castRowElems[castRowIndex];
+			} else {
+				this.rotationLabels.appendChild(makeLabelElem(actionId));
+				this.rotationTimeline.appendChild(rowElem);
+			}
+
+			auraUptimeLogs.forEach(aul => {
+				const auraElem = document.createElement('div');
+				auraElem.classList.add('rotation-timeline-aura');
+				auraElem.style.left = this.timeToPx(aul.gainedAt);
+				auraElem.style.minWidth = this.timeToPx((aul.fadedAt || duration) - aul.gainedAt);
+				rowElem.appendChild(auraElem);
+
+				tippy(auraElem, {
+					content: `
+						<span>${aul.aura.name}: ${aul.gainedAt.toFixed(2)}s - ${(aul.fadedAt || duration).toFixed(2)}s</span>
+					`,
+					allowHTML: true,
+				});
+			});
 		});
 	}
 
