@@ -221,6 +221,10 @@ func (cast *Cast) CalculatedGCD(char *Character) time.Duration {
 
 // Cast has finished, activate the effects of the cast.
 func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastComplete) {
+	if sim.Log != nil {
+		cast.Character.Log(sim, "Completed cast %s", cast.ActionID)
+	}
+
 	if cast.Cost.Value > 0 && cast.Cost.Type == stats.Mana {
 		cast.Character.SpendMana(sim, cast.Cost.Value, cast.ActionID)
 		cast.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5

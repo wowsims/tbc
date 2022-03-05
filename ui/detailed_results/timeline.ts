@@ -461,6 +461,19 @@ export class Timeline extends ResultComponent {
 				castElem.style.minWidth = this.timeToPx(castLog.castTime);
 				rowElem.appendChild(castElem);
 
+				if (castLog.damageDealtLogs.length > 0) {
+					const ddl = castLog.damageDealtLogs[0];
+					if (ddl.miss || ddl.dodge || ddl.parry) {
+						castElem.classList.add('outcome-miss');
+					} else if (ddl.glance || ddl.block || ddl.partialResist1_4 || ddl.partialResist2_4 || ddl.partialResist3_4) {
+						castElem.classList.add('outcome-partial');
+					} else if (ddl.crit) {
+						castElem.classList.add('outcome-crit');
+					} else {
+						castElem.classList.add('outcome-hit');
+					}
+				}
+
 				const iconElem = document.createElement('a');
 				iconElem.classList.add('rotation-timeline-cast-icon');
 				actionId.setBackground(iconElem);
