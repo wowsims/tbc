@@ -142,12 +142,25 @@ $mana-color: #2E93fA;
 	background-color: #e5cc80;
 	z-index: 1;
 }
+.rotation-timeline-tick {
+	position: absolute;
+	width: 5px;
+	background-color: maroon;
+	height: 20px;
+	top: 2px;
+	z-index: 2;
+}
 .rotation-timeline-aura {
 	position: absolute;
 	background-color: blue;
 	opacity: 0.5;
 	height: 20px;
 	top: 2px;
+}
+.rotation-timeline-separator {
+	width: 100%;
+	border: 2px solid white;
+	margin: 10px 0;
 }
 .rotation-timeline-cast-icon {
 	@include wowhead-background-icon;
