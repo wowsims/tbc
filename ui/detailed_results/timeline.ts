@@ -655,12 +655,30 @@ const idToCategoryMap: Record<number, number> = {
 	[OtherAction.OtherActionAttack]: 0,
 	[OtherAction.OtherActionShoot]:  0.5,
 
+	// Hunter
 	[27014]: 0.1, // Raptor Strike
 
+	// Rogue
 	[6774]:  MELEE_ACTION_CATEGORY + 0.1, // Slice and Dice
 	[26866]: MELEE_ACTION_CATEGORY + 0.2, // Expose Armor
 	[26865]: MELEE_ACTION_CATEGORY + 0.3, // Eviscerate
 	[26867]: MELEE_ACTION_CATEGORY + 0.3, // Rupture
+
+	// Shaman
+	[17364]: MELEE_ACTION_CATEGORY + 0.1, // Stormstrike
+	[25454]: MELEE_ACTION_CATEGORY + 0.2, // Earth Shock
+	[25457]: MELEE_ACTION_CATEGORY + 0.2, // Flame Shock
+	[25464]: MELEE_ACTION_CATEGORY + 0.2, // Frost Shock
+	[25533]: SPELL_ACTION_CATEGORY + 0.2, // Searing Totem
+	[25552]: SPELL_ACTION_CATEGORY + 0.2, // Magma Totem
+	[25537]: SPELL_ACTION_CATEGORY + 0.2, // Fire Nova Totem
+	[25359]: SPELL_ACTION_CATEGORY + 0.3, // Grace of Air Totem
+	[8512]:  SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r1
+	[10613]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r2
+	[10614]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r3
+	[25585]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r4
+	[25587]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r5
+	[2825]:  DEFAULT_ACTION_CATEGORY + 0.1, // Bloodlust
 };
 
 const idsToGroupForRotation: Array<number> = [
