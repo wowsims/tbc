@@ -308,6 +308,10 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 	newAura.startTime = old.startTime
 
 	at.auras[newAura.ID] = newAura
+
+	if sim.Log != nil && !at.auras[newAura.ID].ActionID.IsEmptyAction() {
+		at.logFn("Aura refreshed: %s", at.auras[newAura.ID].ActionID)
+	}
 }
 
 // Adds a new aura to the simulation. If an aura with the same ID already

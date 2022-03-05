@@ -133,6 +133,7 @@ export class SimLog {
 					|| ResourceChangedLog.parse(params)
 					|| AuraGainedLog.parse(params)
 					|| AuraFadedLog.parse(params)
+					|| AuraRefreshedLog.parse(params)
 					|| MajorCooldownUsedLog.parse(params)
 					|| CastBeganLog.parse(params)
 					|| CastCompletedLog.parse(params)
@@ -155,6 +156,10 @@ export class SimLog {
 
 	isAuraFaded(): this is AuraFadedLog {
 		return this instanceof AuraFadedLog;
+	}
+
+	isAuraRefreshed(): this is AuraRefreshedLog {
+		return this instanceof AuraRefreshedLog;
 	}
 
 	isMajorCooldownUsed(): this is MajorCooldownUsedLog {
@@ -381,6 +386,28 @@ export class AuraFadedLog extends SimLog {
 	}
 }
 
+export class AuraRefreshedLog extends SimLog {
+	readonly aura: ActionId;
+
+	constructor(params: SimLogParams, aura: ActionId) {
+		super(params);
+		this.aura = aura;
+	}
+
+	toString(): string {
+		return `${this.toStringPrefix()} Aura refreshed: ${this.aura.name}.`;
+	}
+
+	static parse(params: SimLogParams): Promise<AuraRefreshedLog> | null {
+		const match = params.raw.match(/Aura refreshed: (.*)/);
+		if (match && match[1]) {
+			return ActionId.fromLogString(match[1]).fill(params.source?.index).then(aura => new AuraRefreshedLog(params, aura));
+		} else {
+			return null;
+		}
+	}
+}
+
 export class AuraUptimeLog extends SimLog {
 	readonly gainedAt: number;
 	readonly fadedAt: number;
@@ -394,7 +421,7 @@ export class AuraUptimeLog extends SimLog {
 	}
 
 	static fromLogs(logs: Array<SimLog>, entity: Entity, encounterDuration: number): Array<AuraUptimeLog> {
-		let unmatchedGainedLogs: Array<AuraGainedLog> = [];
+		let unmatchedGainedLogs: Array<AuraGainedLog | AuraRefreshedLog> = [];
 		const uptimeLogs: Array<AuraUptimeLog> = [];
 
 		logs.forEach(log => {
@@ -405,7 +432,7 @@ export class AuraUptimeLog extends SimLog {
 				unmatchedGainedLogs.push(log);
 				return;
 			}
-			if (!log.isAuraFaded()) {
+			if (!log.isAuraFaded() && !log.isAuraRefreshed()) {
 				return;
 			}
 
@@ -423,6 +450,10 @@ export class AuraUptimeLog extends SimLog {
 				source: log.source,
 				target: log.target,
 			}, log.timestamp, gainedLog.aura));
+			
+			if (log.isAuraRefreshed()) {
+				unmatchedGainedLogs.push(log);
+			}
 		});
 
 		// Auras active at the end won't have a faded log, so need to add them separately.

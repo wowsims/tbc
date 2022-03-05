@@ -129,7 +129,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 }
 
 func (target *Target) Log(sim *Simulation, message string, vals ...interface{}) {
-	sim.Log("%s: "+message, append([]interface{}{target.Name}, vals...)...)
+	sim.Log("[%s] "+message, append([]interface{}{target.Name}, vals...)...)
 }
 
 func (target *Target) finalize() {
