@@ -672,7 +672,7 @@ export class CastLog extends SimLog {
 			source: castBeganLog.source,
 			target: castBeganLog.target,
 		});
-		this.castId = castBeganLog.castId;
+		this.castId = castCompletedLog?.castId || castBeganLog.castId; // Use completed log because of arcane blast
 		this.castTime = castBeganLog.castTime;
 		this.castBeganLog = castBeganLog;
 		this.castCompletedLog = castCompletedLog;
@@ -688,23 +688,38 @@ export class CastLog extends SimLog {
 		const castCompletedLogs = logs.filter((log): log is CastCompletedLog => log.isCastCompleted());
 		const damageDealtLogs = logs.filter((log): log is DamageDealtLog => log.isDamageDealt());
 
-		const castBeganLogsByAbility = Object.values(bucket(castBeganLogs, log => log.castId.toString()));
-		const damageDealtLogsByAbility = Object.values(bucket(damageDealtLogs, log => log.cause.toString()));
+		const toBucketKey = (actionId: ActionId) => {
+			if (actionId.spellId == 30451) {
+				// Arcane Blast is unique because it can finish its cast as a different
+				// spell than it started (if stacks drop).
+				return actionId.toStringIgnoringTag();
+			} else {
+				return actionId.toString();
+			}
+		};
+		const castBeganLogsByAbility = bucket(castBeganLogs, log => toBucketKey(log.castId));
+		const castCompletedLogsByAbility = bucket(castCompletedLogs, log => toBucketKey(log.castId));
+		const damageDealtLogsByAbility = bucket(damageDealtLogs, log => toBucketKey(log.cause));
 
 		const castLogs: Array<CastLog> = [];
-		castBeganLogsByAbility.forEach(abilityCastsBegan => {
+		Object.keys(castBeganLogsByAbility).forEach(bucketKey => {
+			const abilityCastsBegan = castBeganLogsByAbility[bucketKey]!;
+			const abilityCastsCompleted = castCompletedLogsByAbility[bucketKey];
+			const abilityDamageDealt = damageDealtLogsByAbility[bucketKey];
 			const actionId = abilityCastsBegan[0].castId;
-			const abilityDamageDealt = damageDealtLogsByAbility.find(ddl => ddl[0].cause.equals(actionId));
 
 			const getCastCompleted = (cbIndex: number) => {
+				if (!abilityCastsCompleted) {
+					return null;
+				}
 				if (cbIndex >= abilityCastsBegan.length) {
 					return null;
 				}
 				const nextBeganIndex = abilityCastsBegan[cbIndex + 1]?.logIndex || null;
-				return castCompletedLogs.find(ccl => 
+				return abilityCastsCompleted.find(ccl => 
 						ccl.logIndex > abilityCastsBegan[cbIndex].logIndex
 						&& (nextBeganIndex == null || ccl.logIndex < nextBeganIndex)
-						&& ccl.castId.equals(actionId)) || null;
+						&& toBucketKey(ccl.castId) == toBucketKey(actionId)) || null;
 			};
 
 			if (!abilityDamageDealt) {
@@ -718,7 +733,7 @@ export class CastLog extends SimLog {
 			let curCbIndex = -1;
 			abilityDamageDealt.forEach(ddLog => {
 				if (curCbIndex >= abilityCastsBegan.length) {
-					return
+					return;
 				}
 				if (nextCCL == null || ddLog.logIndex < nextCCL.logIndex) {
 					curDamageDealtLogs.push(ddLog);
@@ -729,7 +744,7 @@ export class CastLog extends SimLog {
 					curDamageDealtLogs = [ddLog];
 					curCbIndex++;
 					if (curCbIndex >= abilityCastsBegan.length) {
-						return
+						return;
 					}
 					curCCL = nextCCL;
 					nextCCL = getCastCompleted(curCbIndex + 1);

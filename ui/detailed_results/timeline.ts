@@ -46,13 +46,13 @@ export class Timeline extends ResultComponent {
 			<span class="timeline-warning-description">Timeline data visualizes only 1 sim iteration.</span>
 			<div class="timeline-run-again-button sim-button">SIM 1 ITERATION</div>
 			<select class="timeline-chart-picker">
-				<option value="dps">DPS</option>
 				<option value="rotation">Rotation</option>
+				<option value="dps">DPS</option>
 			</select>
 		</div>
 		<div class="timeline-plots-container">
-			<div class="timeline-plot dps-resources-plot"></div>
-			<div class="timeline-plot rotation-plot hide">
+			<div class="timeline-plot dps-resources-plot hide"></div>
+			<div class="timeline-plot rotation-plot">
 				<div class="rotation-container">
 					<div class="rotation-labels">
 					</div>
@@ -399,6 +399,8 @@ export class Timeline extends ResultComponent {
 			const categoryB = getActionCategory(b[0].castId);
 			if (categoryA != categoryB) {
 				return categoryA - categoryB;
+			} else if (a[0].castId.anyId() == b[0].castId.anyId()) {
+				return a[0].castId.tag - b[0].castId.tag;
 			} else {
 				return stringComparator(a[0].castId.name, b[0].castId.name);
 			}
