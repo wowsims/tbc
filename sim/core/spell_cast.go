@@ -293,6 +293,8 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 	hitEffect.Outcome = OutcomeEmpty
 	if !hitEffect.DotInput.TicksCanMissAndCrit || hitEffect.hitCheck(sim, spellCast) {
 		hitEffect.Outcome = OutcomeHit
+	} else {
+		hitEffect.Outcome = OutcomeMiss
 	}
 
 	if hitEffect.Outcome == OutcomeHit {
