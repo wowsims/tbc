@@ -102,12 +102,16 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		MobType:      options.MobType,
 		auraTracker:  newAuraTracker(true),
 		Name:         "Target " + strconv.Itoa(int(targetIndex)+1),
-		Level:        73,
+		Level:        options.Level,
+	}
+	if target.Level == 0 {
+		target.Level = 73
 	}
 	if target.currentArmor == 0 {
 		target.currentArmor = 7700
 	}
 	target.calculateReduction()
+
 	const skill = 350.0
 	skillDifference := float64(target.Level*5) - skill
 
@@ -116,10 +120,6 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	target.CritSuppression = (skillDifference * 0.002) + 0.018
 	target.Dodge = 0.05 + skillDifference*0.001
 	target.Glance = math.Max(0.06+skillDifference*0.012, 0)
-
-	if options.Level > 0 {
-		target.Level = options.Level
-	}
 
 	if options.Debuffs != nil {
 		applyDebuffEffects(target, *options.Debuffs)
