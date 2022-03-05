@@ -14,12 +14,14 @@ export declare class Entity {
 }
 interface SimLogParams {
     raw: string;
+    logIndex: number;
     timestamp: number;
     source: Entity | null;
     target: Entity | null;
 }
 export declare class SimLog {
     readonly raw: string;
+    readonly logIndex: number;
     readonly timestamp: number;
     readonly source: Entity | null;
     readonly target: Entity | null;
@@ -34,6 +36,7 @@ export declare class SimLog {
     isAuraFaded(): this is AuraFadedLog;
     isMajorCooldownUsed(): this is MajorCooldownUsedLog;
     isCastBegan(): this is CastBeganLog;
+    isCastCompleted(): this is CastCompletedLog;
     isStatChange(): this is StatChangeLog;
     static groupDuplicateTimestamps<LogType extends SimLog>(logs: Array<LogType>): Array<Array<LogType>>;
 }
@@ -118,12 +121,19 @@ export declare class CastBeganLog extends SimLog {
     toString(): string;
     static parse(params: SimLogParams): Promise<CastBeganLog> | null;
 }
+export declare class CastCompletedLog extends SimLog {
+    readonly castId: ActionId;
+    constructor(params: SimLogParams, castId: ActionId);
+    toString(): string;
+    static parse(params: SimLogParams): Promise<CastCompletedLog> | null;
+}
 export declare class CastLog extends SimLog {
     readonly castId: ActionId;
     readonly castTime: number;
     readonly castBeganLog: CastBeganLog;
+    readonly castCompletedLog: CastCompletedLog | null;
     readonly damageDealtLogs: Array<DamageDealtLog>;
-    constructor(castBeganLog: CastBeganLog, damageDealtLogs: Array<DamageDealtLog>);
+    constructor(castBeganLog: CastBeganLog, castCompletedLog: CastCompletedLog | null, damageDealtLogs: Array<DamageDealtLog>);
     toString(): string;
     static fromLogs(logs: Array<SimLog>): Array<CastLog>;
 }

@@ -1,3 +1,4 @@
+import { OtherAction } from '/tbc/core/proto/common.js';
 import { bucket, distinct, maxIndex, stringComparator } from '/tbc/core/utils.js';
 import { actionColors } from './color_settings.js';
 import { ResultComponent } from './result_component.js';
@@ -352,21 +353,18 @@ export class Timeline extends ResultComponent {
         const meleeActionIds = player.getMeleeActions().map(action => action.actionId);
         const spellActionIds = player.getSpellActions().map(action => action.actionId);
         const getActionCategory = (actionId) => {
-            const fixedCategory = idToCategoryMap[actionId.spellId];
-            if (fixedCategory) {
+            const fixedCategory = idToCategoryMap[actionId.anyId()];
+            if (fixedCategory != null) {
                 return fixedCategory;
             }
-            else if (actionId.otherId) {
-                return 0;
-            }
             else if (meleeActionIds.find(meleeActionId => meleeActionId.equals(actionId))) {
-                return 1;
+                return MELEE_ACTION_CATEGORY;
             }
             else if (spellActionIds.find(spellActionId => spellActionId.equals(actionId))) {
-                return 2;
+                return SPELL_ACTION_CATEGORY;
             }
             else {
-                return 3;
+                return DEFAULT_ACTION_CATEGORY;
             }
         };
         const castsByAbility = Object.values(bucket(player.castLogs, log => {
@@ -417,6 +415,21 @@ export class Timeline extends ResultComponent {
                 castElem.style.left = this.timeToPx(castLog.timestamp);
                 castElem.style.minWidth = this.timeToPx(castLog.castTime);
                 rowElem.appendChild(castElem);
+                if (castLog.damageDealtLogs.length > 0) {
+                    const ddl = castLog.damageDealtLogs[0];
+                    if (ddl.miss || ddl.dodge || ddl.parry) {
+                        castElem.classList.add('outcome-miss');
+                    }
+                    else if (ddl.glance || ddl.block || ddl.partialResist1_4 || ddl.partialResist2_4 || ddl.partialResist3_4) {
+                        castElem.classList.add('outcome-partial');
+                    }
+                    else if (ddl.crit) {
+                        castElem.classList.add('outcome-crit');
+                    }
+                    else {
+                        castElem.classList.add('outcome-hit');
+                    }
+                }
                 const iconElem = document.createElement('a');
                 iconElem.classList.add('rotation-timeline-cast-icon');
                 actionId.setBackground(iconElem);
@@ -498,12 +511,18 @@ export class Timeline extends ResultComponent {
         return new Date(timestamp * 1000);
     }
 }
+const MELEE_ACTION_CATEGORY = 1;
+const SPELL_ACTION_CATEGORY = 2;
+const DEFAULT_ACTION_CATEGORY = 3;
 // Hard-coded spell categories for controlling rotation ordering.
 const idToCategoryMap = {
-    [6774]: 1.1,
-    [26866]: 1.2,
-    [26865]: 1.3,
-    [26867]: 1.3, // Rupture
+    [OtherAction.OtherActionAttack]: 0,
+    [OtherAction.OtherActionShoot]: 0.5,
+    [27014]: 0.1,
+    [6774]: MELEE_ACTION_CATEGORY + 0.1,
+    [26866]: MELEE_ACTION_CATEGORY + 0.2,
+    [26865]: MELEE_ACTION_CATEGORY + 0.3,
+    [26867]: MELEE_ACTION_CATEGORY + 0.3, // Rupture
 };
 const idsToGroupForRotation = [
     6774,

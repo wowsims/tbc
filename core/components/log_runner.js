@@ -16,7 +16,11 @@ export class LogRunner extends Component {
         simUI.sim.simResultEmitter.on((eventID, simResult) => {
             const logs = simResult.logs;
             logsDiv.textContent = '';
-            logs.forEach(log => {
+            logs
+                .filter(log => {
+                return !log.isCastCompleted();
+            })
+                .forEach(log => {
                 const lineElem = document.createElement('span');
                 lineElem.textContent = log.toString();
                 logsDiv.appendChild(lineElem);

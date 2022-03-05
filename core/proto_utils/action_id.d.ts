@@ -10,6 +10,7 @@ export declare class ActionId {
     readonly name: string;
     readonly iconUrl: string;
     private constructor();
+    anyId(): number;
     equals(other: ActionId): boolean;
     equalsIgnoringTag(other: ActionId): boolean;
     setBackground(elem: HTMLElement): void;

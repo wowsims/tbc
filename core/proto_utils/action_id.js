@@ -59,6 +59,9 @@ export class ActionId {
         this.name = name || baseName;
         this.iconUrl = iconUrl;
     }
+    anyId() {
+        return this.itemId || this.spellId || this.otherId;
+    }
     equals(other) {
         return this.equalsIgnoringTag(other) && this.tag == other.tag;
     }

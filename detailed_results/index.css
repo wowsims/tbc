@@ -1605,6 +1605,23 @@ input, select {
   display: inline-block;
   height: 24px;
   width: 24px;
+  border: 1px solid grey;
+}
+
+.rotation-timeline-cast.outcome-miss .rotation-timeline-cast-icon {
+  border-color: red;
+}
+
+.rotation-timeline-cast.outcome-partial .rotation-timeline-cast-icon {
+  border-color: yellow;
+}
+
+.rotation-timeline-cast.outcome-hit .rotation-timeline-cast-icon {
+  border-color: green;
+}
+
+.rotation-timeline-cast.outcome-crit .rotation-timeline-cast-icon {
+  border-color: blue;
 }
 
 body {
