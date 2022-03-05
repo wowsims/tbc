@@ -1595,6 +1595,15 @@ input, select {
 .rotation-timeline-cast {
   position: absolute;
   background-color: #e5cc80;
+  z-index: 1;
+}
+
+.rotation-timeline-aura {
+  position: absolute;
+  background-color: blue;
+  opacity: 0.5;
+  height: 20px;
+  top: 2px;
 }
 
 .rotation-timeline-cast-icon {
