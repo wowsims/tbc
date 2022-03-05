@@ -10,3 +10,5 @@ export declare function nameToClass(name: string): Class;
 export declare const statNames: Record<Stat, string>;
 export declare const slotNames: Record<ItemSlot, string>;
 export declare const resourceNames: Record<ResourceType, string>;
+export declare const resourceColors: Record<ResourceType, string>;
+export declare function stringToResourceType(str: string): ResourceType;

@@ -1447,6 +1447,26 @@ input, select {
   font-weight: bold;
 }
 
+.mana .series-color, .mana.series-color {
+  color: #2E93fA;
+}
+
+.energy .series-color, .energy.series-color {
+  color: #ffd700;
+}
+
+.rage .series-color, .rage.series-color {
+  color: #ff0000;
+}
+
+.focus .series-color, .focus.series-color {
+  color: #cd853f;
+}
+
+.combo-points .series-color, .combo-points.series-color {
+  color: #ffa07a;
+}
+
 .timeline-warning {
   color: yellow;
   margin: 0 10px;
@@ -1518,14 +1538,24 @@ input, select {
   color: #2E93fA;
 }
 
-.timeline-tooltip.dps .series-color {
-  font-weight: bold;
-  color: #ed5653;
+.timeline-tooltip.energy ul li::before {
+  color: #ffd700;
 }
 
-.timeline-tooltip.mana .series-color {
+.timeline-tooltip.rage ul li::before {
+  color: #ff0000;
+}
+
+.timeline-tooltip.focus ul li::before {
+  color: #cd853f;
+}
+
+.timeline-tooltip.combo-points ul li::before {
+  color: #ffa07a;
+}
+
+.series-color {
   font-weight: bold;
-  color: #2E93fA;
 }
 
 .timeline-tooltip-auras {
@@ -1590,6 +1620,16 @@ input, select {
 .rotation-timeline-row {
   position: relative;
   border-bottom: 1px solid grey;
+}
+
+.rotation-timeline-resource {
+  position: absolute;
+  height: 100%;
+  border-left: 1px solid grey;
+  border-right: 1px solid grey;
+  display: flex;
+  align-items: center;
+  font-weight: bold;
 }
 
 .rotation-timeline-cast {

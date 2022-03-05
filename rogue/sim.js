@@ -149,6 +149,7 @@ export class RogueSimUI extends IndividualSimUI {
                     Potions.HastePotion,
                 ],
                 conjured: [
+                    Conjured.ConjuredRogueThistleTea,
                     Conjured.ConjuredFlameCap,
                 ],
                 flasks: [
@@ -174,7 +175,6 @@ export class RogueSimUI extends IndividualSimUI {
                     WeaponImbue.WeaponImbueAdamantiteWeightstone,
                 ],
                 other: [
-                    RogueInputs.ThistleTea,
                     IconInputs.DrumsOfBattleConsume,
                     IconInputs.BattleChicken,
                     IconInputs.ScrollOfAgilityV,

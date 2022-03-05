@@ -86,7 +86,7 @@ export declare class PlayerMetrics {
     private readonly duration;
     readonly logs: Array<SimLog>;
     readonly damageDealtLogs: Array<DamageDealtLog>;
-    readonly manaChangedLogs: Array<ResourceChangedLogGroup>;
+    readonly groupedResourceLogs: Record<ResourceType, Array<ResourceChangedLogGroup>>;
     readonly dpsLogs: Array<DpsLog>;
     readonly auraUptimeLogs: Array<AuraUptimeLog>;
     readonly majorCooldownLogs: Array<MajorCooldownUsedLog>;

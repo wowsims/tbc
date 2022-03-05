@@ -364,6 +364,7 @@ export const makeConjuredInput = makeConsumeInputFactory('defaultConjured', [
     { actionId: ActionId.fromItemId(12662), value: Conjured.ConjuredDarkRune },
     { actionId: ActionId.fromItemId(22788), value: Conjured.ConjuredFlameCap },
     { actionId: ActionId.fromItemId(22044), value: Conjured.ConjuredMageManaEmerald },
+    { actionId: ActionId.fromItemId(7676), value: Conjured.ConjuredRogueThistleTea },
 ]);
 export const makeFlasksInput = makeConsumeInputFactory('flask', [
     { actionId: ActionId.fromItemId(22861), value: Flask.FlaskOfBlindingLight },

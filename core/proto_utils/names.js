@@ -108,4 +108,21 @@ export const resourceNames = {
     [ResourceType.ResourceTypeEnergy]: 'Energy',
     [ResourceType.ResourceTypeRage]: 'Rage',
     [ResourceType.ResourceTypeComboPoints]: 'Combo Points',
+    [ResourceType.ResourceTypeFocus]: 'Focus',
 };
+export const resourceColors = {
+    [ResourceType.ResourceTypeNone]: '#ffffff',
+    [ResourceType.ResourceTypeMana]: '#2e93fa',
+    [ResourceType.ResourceTypeEnergy]: '#ffd700',
+    [ResourceType.ResourceTypeRage]: '#ff0000',
+    [ResourceType.ResourceTypeComboPoints]: '#ffa07a',
+    [ResourceType.ResourceTypeFocus]: '#cd853f',
+};
+export function stringToResourceType(str) {
+    for (const [key, val] of Object.entries(resourceNames)) {
+        if (val.toLowerCase() == str.toLowerCase()) {
+            return Number(key);
+        }
+    }
+    return ResourceType.ResourceTypeNone;
+}

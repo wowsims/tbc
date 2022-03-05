@@ -1485,7 +1485,11 @@ export declare enum Conjured {
     /**
      * @generated from protobuf enum value: ConjuredMageManaEmerald = 3;
      */
-    ConjuredMageManaEmerald = 3
+    ConjuredMageManaEmerald = 3,
+    /**
+     * @generated from protobuf enum value: ConjuredRogueThistleTea = 4;
+     */
+    ConjuredRogueThistleTea = 4
 }
 /**
  * @generated from protobuf enum proto.WeaponImbue

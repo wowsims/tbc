@@ -714,6 +714,10 @@ export var Conjured;
      * @generated from protobuf enum value: ConjuredMageManaEmerald = 3;
      */
     Conjured[Conjured["ConjuredMageManaEmerald"] = 3] = "ConjuredMageManaEmerald";
+    /**
+     * @generated from protobuf enum value: ConjuredRogueThistleTea = 4;
+     */
+    Conjured[Conjured["ConjuredRogueThistleTea"] = 4] = "ConjuredRogueThistleTea";
 })(Conjured || (Conjured = {}));
 /**
  * @generated from protobuf enum proto.WeaponImbue

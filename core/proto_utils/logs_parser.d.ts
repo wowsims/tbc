@@ -1,4 +1,5 @@
 import { RaidSimResult } from '/tbc/core/proto/api.js';
+import { ResourceType } from '/tbc/core/proto/api.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 export declare class Entity {
     readonly name: string;
@@ -93,26 +94,25 @@ export declare class AuraUptimeLog extends SimLog {
     static fromLogs(logs: Array<SimLog>, entity: Entity, encounterDuration: number): Array<AuraUptimeLog>;
     static populateActiveAuras(logs: Array<SimLog>, auraLogs: Array<AuraUptimeLog>): void;
 }
-export declare type Resource = 'mana' | 'energy' | 'focus' | 'rage';
 export declare class ResourceChangedLog extends SimLog {
-    readonly resource: Resource;
+    readonly resourceType: ResourceType;
     readonly valueBefore: number;
     readonly valueAfter: number;
     readonly isSpend: boolean;
     readonly cause: ActionId;
-    constructor(params: SimLogParams, resource: Resource, valueBefore: number, valueAfter: number, isSpend: boolean, cause: ActionId);
+    constructor(params: SimLogParams, resourceType: ResourceType, valueBefore: number, valueAfter: number, isSpend: boolean, cause: ActionId);
     toString(): string;
     resultString(): string;
     static parse(params: SimLogParams): Promise<ResourceChangedLog> | null;
 }
 export declare class ResourceChangedLogGroup extends SimLog {
-    readonly resource: Resource;
+    readonly resourceType: ResourceType;
     readonly valueBefore: number;
     readonly valueAfter: number;
     readonly logs: Array<ResourceChangedLog>;
-    constructor(params: SimLogParams, resource: Resource, valueBefore: number, valueAfter: number, logs: Array<ResourceChangedLog>);
+    constructor(params: SimLogParams, resourceType: ResourceType, valueBefore: number, valueAfter: number, logs: Array<ResourceChangedLog>);
     toString(): string;
-    static fromLogs(logs: Array<SimLog>, resource: Resource): Array<ResourceChangedLogGroup>;
+    static fromLogs(logs: Array<SimLog>): Record<ResourceType, Array<ResourceChangedLogGroup>>;
 }
 export declare class MajorCooldownUsedLog extends SimLog {
     readonly cooldownId: ActionId;

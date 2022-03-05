@@ -1,7 +1,7 @@
 import { ActionMetrics as ActionMetricsProto } from '/tbc/core/proto/api.js';
 import { AuraMetrics as AuraMetricsProto } from '/tbc/core/proto/api.js';
 import { DistributionMetrics as DistributionMetricsProto } from '/tbc/core/proto/api.js';
-import { ResourceMetrics as ResourceMetricsProto } from '/tbc/core/proto/api.js';
+import { ResourceMetrics as ResourceMetricsProto, ResourceType } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
@@ -163,9 +163,9 @@ export class PlayerMetrics {
         this.castLogs = CastLog.fromLogs(this.logs);
         this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet), resultData.firstIterationDuration);
         this.majorCooldownLogs = this.logs.filter((log) => log.isMajorCooldownUsed());
-        this.manaChangedLogs = ResourceChangedLogGroup.fromLogs(this.logs, 'mana');
+        this.groupedResourceLogs = ResourceChangedLogGroup.fromLogs(this.logs);
         AuraUptimeLog.populateActiveAuras(this.dpsLogs, this.auraUptimeLogs);
-        AuraUptimeLog.populateActiveAuras(this.manaChangedLogs, this.auraUptimeLogs);
+        AuraUptimeLog.populateActiveAuras(this.groupedResourceLogs[ResourceType.ResourceTypeMana], this.auraUptimeLogs);
         this.majorCooldownAuraUptimeLogs = this.auraUptimeLogs.filter(auraLog => this.majorCooldownLogs.find(mcdLog => mcdLog.cooldownId.equals(auraLog.aura)));
     }
     get label() {

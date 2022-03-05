@@ -1,4 +1,5 @@
 import { ActionID as ActionIdProto } from '/tbc/core/proto/common.js';
+import { ResourceType } from '/tbc/core/proto/api.js';
 import { OtherAction } from '/tbc/core/proto/common.js';
 import { getWowheadItemId } from '/tbc/core/proto_utils/equipped_item.js';
 import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
@@ -18,7 +19,7 @@ export class ActionId {
                 break;
             case OtherAction.OtherActionManaRegen:
                 name = 'Mana Tick';
-                iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg';
+                iconUrl = resourceTypeToIcon[ResourceType.ResourceTypeMana];
                 if (tag == 1) {
                     name += ' (Casting)';
                 }
@@ -28,11 +29,11 @@ export class ActionId {
                 break;
             case OtherAction.OtherActionEnergyRegen:
                 baseName = 'Energy Tick';
-                iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg';
+                iconUrl = resourceTypeToIcon[ResourceType.ResourceTypeEnergy];
                 break;
             case OtherAction.OtherActionFocusRegen:
                 baseName = 'Focus Tick';
-                iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg';
+                iconUrl = resourceTypeToIcon[ResourceType.ResourceTypeFocus];
                 break;
             case OtherAction.OtherActionAttack:
                 name = 'Attack';
@@ -344,4 +345,12 @@ const petNameToIcon = {
     'Warp Stalker': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_warpstalker.jpg',
     'Wind Serpent': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_windserpent.jpg',
     'Wolf': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_wolf.jpg',
+};
+export const resourceTypeToIcon = {
+    [ResourceType.ResourceTypeNone]: '',
+    [ResourceType.ResourceTypeMana]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
+    [ResourceType.ResourceTypeEnergy]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
+    [ResourceType.ResourceTypeRage]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
+    [ResourceType.ResourceTypeComboPoints]: 'https://wow.zamimg.com/images/wow/icons/large/inv_mace_2h_pvp410_c_01.jpg',
+    [ResourceType.ResourceTypeFocus]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
 };

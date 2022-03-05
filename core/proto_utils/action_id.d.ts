@@ -1,4 +1,5 @@
 import { ActionID as ActionIdProto } from '/tbc/core/proto/common.js';
+import { ResourceType } from '/tbc/core/proto/api.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { OtherAction } from '/tbc/core/proto/common.js';
 export declare class ActionId {
@@ -34,3 +35,4 @@ export declare class ActionId {
     private static getTooltipDataHelper;
     private static getTooltipData;
 }
+export declare const resourceTypeToIcon: Record<ResourceType, string>;

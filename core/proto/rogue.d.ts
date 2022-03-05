@@ -238,6 +238,12 @@ export interface Rogue_Rotation {
      * @generated from protobuf field: bool use_rupture = 2;
      */
     useRupture: boolean;
+    /**
+     * Don't use damage finishers (eviscerate, rupture) unless >= this many CPs.
+     *
+     * @generated from protobuf field: int32 min_combo_points_for_damage_finisher = 4;
+     */
+    minComboPointsForDamageFinisher: number;
 }
 /**
  * @generated from protobuf enum proto.Rogue.Rotation.Builder
@@ -272,10 +278,6 @@ export declare enum Rogue_Rotation_Builder {
  * @generated from protobuf message proto.Rogue.Options
  */
 export interface Rogue_Options {
-    /**
-     * @generated from protobuf field: bool use_thistle_tea = 1;
-     */
-    useThistleTea: boolean;
 }
 declare class RogueTalents$Type extends MessageType<RogueTalents> {
     constructor();

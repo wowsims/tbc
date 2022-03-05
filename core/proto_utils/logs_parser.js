@@ -1,5 +1,7 @@
+import { ResourceType } from '/tbc/core/proto/api.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { bucket, stringComparator } from '/tbc/core/utils.js';
+import { resourceNames, stringToResourceType } from '/tbc/core/proto_utils/names.js';
+import { bucket, getEnumValues, stringComparator } from '/tbc/core/utils.js';
 export class Entity {
     constructor(name, ownerName, index, isTarget, isPet) {
         this.name = name;
@@ -369,9 +371,9 @@ export class AuraUptimeLog extends SimLog {
     }
 }
 export class ResourceChangedLog extends SimLog {
-    constructor(params, resource, valueBefore, valueAfter, isSpend, cause) {
+    constructor(params, resourceType, valueBefore, valueAfter, isSpend, cause) {
         super(params);
-        this.resource = resource;
+        this.resourceType = resourceType;
         this.valueBefore = valueBefore;
         this.valueAfter = valueAfter;
         this.isSpend = isSpend;
@@ -379,7 +381,7 @@ export class ResourceChangedLog extends SimLog {
     }
     toString() {
         const signedDiff = (this.valueAfter - this.valueBefore) * (this.isSpend ? -1 : 1);
-        return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} ${this.resource} from ${this.cause.name}. (${this.valueBefore.toFixed(1)} --> ${this.valueAfter.toFixed(1)})`;
+        return `${this.toStringPrefix()} ${this.isSpend ? 'Spent' : 'Gained'} ${signedDiff.toFixed(1)} ${resourceNames[this.resourceType]} from ${this.cause.name}. (${this.valueBefore.toFixed(1)} --> ${this.valueAfter.toFixed(1)})`;
     }
     resultString() {
         const delta = this.valueAfter - this.valueBefore;
@@ -391,10 +393,11 @@ export class ResourceChangedLog extends SimLog {
         }
     }
     static parse(params) {
-        const match = params.raw.match(/((Gained)|(Spent)) \d+\.?\d* ((mana)|(energy)|(focus)|(rage)) from (.*) \((\d+\.?\d*) --> (\d+\.?\d*)\)/);
+        const match = params.raw.match(/((Gained)|(Spent)) \d+\.?\d* ((mana)|(energy)|(focus)|(rage)|(combo points)) from (.*) \((\d+\.?\d*) --> (\d+\.?\d*)\)/);
         if (match) {
-            return ActionId.fromLogString(match[9]).fill(params.source?.index).then(cause => {
-                return new ResourceChangedLog(params, match[4], parseFloat(match[10]), parseFloat(match[11]), match[1] == 'Spent', cause);
+            const resourceType = stringToResourceType(match[4]);
+            return ActionId.fromLogString(match[10]).fill(params.source?.index).then(cause => {
+                return new ResourceChangedLog(params, resourceType, parseFloat(match[11]), parseFloat(match[12]), match[1] == 'Spent', cause);
             });
         }
         else {
@@ -403,29 +406,32 @@ export class ResourceChangedLog extends SimLog {
     }
 }
 export class ResourceChangedLogGroup extends SimLog {
-    constructor(params, resource, valueBefore, valueAfter, logs) {
+    constructor(params, resourceType, valueBefore, valueAfter, logs) {
         super(params);
-        this.resource = resource;
+        this.resourceType = resourceType;
         this.valueBefore = valueBefore;
         this.valueAfter = valueAfter;
         this.logs = logs;
     }
     toString() {
-        const capitalizedResource = this.resource.charAt(0).toUpperCase() + this.resource.slice(1);
-        return `${this.toStringPrefix()} ${capitalizedResource}: ${this.valueBefore.toFixed(1)} --> ${this.valueAfter.toFixed(1)}`;
+        return `${this.toStringPrefix()} ${resourceNames[this.resourceType]}: ${this.valueBefore.toFixed(1)} --> ${this.valueAfter.toFixed(1)}`;
     }
-    static fromLogs(logs, resource) {
-        const resourceChangedLogs = logs
-            .filter((log) => log.isResourceChanged())
-            .filter(log => log.resource == resource);
-        const groupedLogs = SimLog.groupDuplicateTimestamps(resourceChangedLogs);
-        return groupedLogs.map(logGroup => new ResourceChangedLogGroup({
-            raw: '',
-            logIndex: logGroup[0].logIndex,
-            timestamp: logGroup[0].timestamp,
-            source: logGroup[0].source,
-            target: logGroup[0].target,
-        }, resource, logGroup[0].valueBefore, logGroup[logGroup.length - 1].valueAfter, logGroup));
+    static fromLogs(logs) {
+        const allResourceChangedLogs = logs.filter((log) => log.isResourceChanged());
+        const results = {};
+        const resourceTypes = getEnumValues(ResourceType).filter(val => val != ResourceType.ResourceTypeNone);
+        resourceTypes.forEach(resourceType => {
+            const resourceChangedLogs = allResourceChangedLogs.filter(log => log.resourceType == resourceType);
+            const groupedLogs = SimLog.groupDuplicateTimestamps(resourceChangedLogs);
+            results[resourceType] = groupedLogs.map(logGroup => new ResourceChangedLogGroup({
+                raw: '',
+                logIndex: logGroup[0].logIndex,
+                timestamp: logGroup[0].timestamp,
+                source: logGroup[0].source,
+                target: logGroup[0].target,
+            }, resourceType, logGroup[0].valueBefore, logGroup[logGroup.length - 1].valueAfter, logGroup));
+        });
+        return results;
     }
 }
 export class MajorCooldownUsedLog extends SimLog {

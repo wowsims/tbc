@@ -1,8 +1,6 @@
-import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Rogue_Rotation_Builder as Builder, } from '/tbc/core/proto/rogue.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
-export const ThistleTea = makeBooleanRogueBuffInput(ActionId.fromItemId(7676), 'useThistleTea');
 export const RogueRotationConfig = {
     inputs: [
         {
@@ -55,6 +53,21 @@ export const RogueRotationConfig = {
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.useRupture = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
+        {
+            type: 'number', cssClass: 'min-combo-points-for-dps-finisher-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Min CPs for Damage Finisher',
+                labelTooltip: 'Will not use Eviscerate or Rupture unless the Rogue has at least this many Combo Points.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().minComboPointsForDamageFinisher,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.minComboPointsForDamageFinisher = newValue;
                     player.setRotation(eventID, newRotation);
                 },
             },
