@@ -4,16 +4,15 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var ThistleTeaCooldownID = core.NewCooldownID()
-
 func (rogue *Rogue) registerThistleTeaCD() {
-	if !rogue.Options.UseThistleTea {
+	if rogue.Consumes.DefaultConjured != proto.Conjured_ConjuredRogueThistleTea {
 		return
 	}
 
-	actionID := core.ActionID{ItemID: 7676, CooldownID: ThistleTeaCooldownID}
+	actionID := core.ActionID{ItemID: 7676, CooldownID: core.ConjuredCooldownID}
 
 	const energyRegen = 40.0
 	cooldown := time.Minute * 5
@@ -31,7 +30,7 @@ func (rogue *Rogue) registerThistleTeaCD() {
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
-		CooldownID: ThistleTeaCooldownID,
+		CooldownID: core.ConjuredCooldownID,
 		Cooldown:   cooldown,
 		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {

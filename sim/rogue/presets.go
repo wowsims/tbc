@@ -70,11 +70,11 @@ var basicRotation = &proto.Rogue_Rotation{
 	Builder:             proto.Rogue_Rotation_Auto,
 	MaintainExposeArmor: true,
 	UseRupture:          true,
+
+	MinComboPointsForDamageFinisher: 3,
 }
 
-var basicOptions = &proto.Rogue_Options{
-	UseThistleTea: true,
-}
+var basicOptions = &proto.Rogue_Options{}
 
 var FullRaidBuffs = &proto.RaidBuffs{
 	GiftOfTheWild: proto.TristateEffect_TristateEffectImproved,
@@ -94,10 +94,11 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var FullConsumes = &proto.Consumes{
-	MainHandImbue: proto.WeaponImbue_WeaponImbueRogueInstantPoison,
-	OffHandImbue:  proto.WeaponImbue_WeaponImbueRogueDeadlyPoison,
-	Flask:         proto.Flask_FlaskOfRelentlessAssault,
-	DefaultPotion: proto.Potions_HastePotion,
+	MainHandImbue:   proto.WeaponImbue_WeaponImbueRogueInstantPoison,
+	OffHandImbue:    proto.WeaponImbue_WeaponImbueRogueDeadlyPoison,
+	Flask:           proto.Flask_FlaskOfRelentlessAssault,
+	DefaultPotion:   proto.Potions_HastePotion,
+	DefaultConjured: proto.Conjured_ConjuredRogueThistleTea,
 }
 
 var FullDebuffs = &proto.Debuffs{

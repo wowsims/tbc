@@ -462,7 +462,7 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Make sure we have plenty of room so the big ticks dont get wasted.
-			if rogue.CurrentEnergy() > 40 {
+			if rogue.CurrentEnergy() > 60 {
 				return false
 			}
 			return true

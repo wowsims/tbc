@@ -6,6 +6,8 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
+const buildTimeBuffer = time.Second * 0
+
 const (
 	PlanNone = iota
 	PlanOpener
@@ -59,6 +61,10 @@ func (rogue *Rogue) doPlanSliceASAP(sim *core.Simulation) {
 				return
 			}
 			rogue.castSliceAndDice()
+			if rogue.disabledMCDs != nil {
+				rogue.EnableAllCooldowns(rogue.disabledMCDs)
+				rogue.disabledMCDs = nil
+			}
 			rogue.plan = PlanNone
 		}
 		return
@@ -86,7 +92,7 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 
 	if rogue.MaintainingExpose(target) {
 		eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
-		if rogue.eaBuildTime+time.Second*2 > eaTimeRemaining {
+		if rogue.eaBuildTime+buildTimeBuffer > eaTimeRemaining {
 			// Cast our slice and start prepping for EA.
 			if comboPoints == 0 {
 				rogue.plan = PlanExposeArmor
@@ -161,15 +167,21 @@ func (rogue *Rogue) doPlanFillBeforeEA(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
 
-	if rogue.eaBuildTime+time.Second*2 > eaTimeRemaining {
+	if rogue.eaBuildTime+buildTimeBuffer > eaTimeRemaining {
 		// Cast our finisher and start prepping for EA.
 		if comboPoints == 0 {
 			rogue.plan = PlanExposeArmor
 			rogue.doPlanExposeArmor(sim)
 			return
-		} else if rogue.tryUseDamageFinisher(sim, energy) {
-			rogue.plan = PlanExposeArmor
-			return
+		} else {
+			if comboPoints < rogue.Rotation.MinComboPointsForDamageFinisher {
+				rogue.plan = PlanExposeArmor
+				return
+			}
+			if rogue.tryUseDamageFinisher(sim, energy) {
+				rogue.plan = PlanExposeArmor
+				return
+			}
 		}
 	} else {
 		if comboPoints == 5 {
@@ -187,15 +199,21 @@ func (rogue *Rogue) doPlanFillBeforeSND(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
 
-	if rogue.eaBuildTime+time.Second*2 > sndTimeRemaining {
+	if rogue.eaBuildTime+buildTimeBuffer > sndTimeRemaining {
 		// Cast our finisher and start prepping for SND.
 		if comboPoints == 0 {
 			rogue.plan = PlanMaximalSlice
 			rogue.doPlanMaximalSlice(sim)
 			return
-		} else if rogue.tryUseDamageFinisher(sim, energy) {
-			rogue.plan = PlanMaximalSlice
-			return
+		} else {
+			if comboPoints < rogue.Rotation.MinComboPointsForDamageFinisher {
+				rogue.plan = PlanMaximalSlice
+				return
+			}
+			if rogue.tryUseDamageFinisher(sim, energy) {
+				rogue.plan = PlanMaximalSlice
+				return
+			}
 		}
 	} else {
 		if comboPoints == 5 {
@@ -227,7 +245,7 @@ func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 	sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
 
 	if !rogue.MaintainingExpose(target) {
-		if sndTimeRemaining > rogue.eaBuildTime+time.Second*2 {
+		if sndTimeRemaining > rogue.eaBuildTime+buildTimeBuffer {
 			rogue.plan = PlanFillBeforeSND
 			rogue.doPlanFillBeforeSND(sim)
 		} else {

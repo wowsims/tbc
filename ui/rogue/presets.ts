@@ -1,3 +1,4 @@
+import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
@@ -47,14 +48,15 @@ export const DefaultRotation = RogueRotation.create({
 	builder: Builder.Auto,
 	maintainExposeArmor: true,
 	useRupture: true,
+	minComboPointsForDamageFinisher: 3,
 });
 
 export const DefaultOptions = RogueOptions.create({
-	useThistleTea: true,
 });
 
 export const DefaultConsumes = Consumes.create({
 	defaultPotion: Potions.HastePotion,
+	defaultConjured: Conjured.ConjuredRogueThistleTea,
 	flask: Flask.FlaskOfRelentlessAssault,
 	food: Food.FoodGrilledMudfish,
 	mainHandImbue: WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
