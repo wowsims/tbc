@@ -20,6 +20,14 @@ export interface SimResultFilter {
     player?: number | null;
     target?: number | null;
 }
+declare class SimResultData {
+    readonly request: RaidSimRequest;
+    readonly result: RaidSimResult;
+    constructor(request: RaidSimRequest, result: RaidSimResult);
+    get iterations(): number;
+    get duration(): number;
+    get firstIterationDuration(): number;
+}
 export declare class SimResult {
     readonly request: RaidSimRequest;
     readonly result: RaidSimResult;
@@ -49,7 +57,7 @@ export declare class RaidMetrics {
     readonly dps: DistributionMetricsProto;
     readonly parties: Array<PartyMetrics>;
     private constructor();
-    static makeNew(iterations: number, duration: number, raid: RaidProto, metrics: RaidMetricsProto, logs: Array<SimLog>): Promise<RaidMetrics>;
+    static makeNew(resultData: SimResultData, raid: RaidProto, metrics: RaidMetricsProto, logs: Array<SimLog>): Promise<RaidMetrics>;
 }
 export declare class PartyMetrics {
     private readonly party;
@@ -58,7 +66,7 @@ export declare class PartyMetrics {
     readonly dps: DistributionMetricsProto;
     readonly players: Array<PlayerMetrics>;
     private constructor();
-    static makeNew(iterations: number, duration: number, party: PartyProto, metrics: PartyMetricsProto, partyIndex: number, logs: Array<SimLog>): Promise<PartyMetrics>;
+    static makeNew(resultData: SimResultData, party: PartyProto, metrics: PartyMetricsProto, partyIndex: number, logs: Array<SimLog>): Promise<PartyMetrics>;
 }
 export declare class PlayerMetrics {
     private readonly player;
@@ -91,14 +99,14 @@ export declare class PlayerMetrics {
     getPlayerAndPetActions(): Array<ActionMetrics>;
     getMeleeActions(): Array<ActionMetrics>;
     getSpellActions(): Array<ActionMetrics>;
-    static makeNew(iterations: number, duration: number, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<PlayerMetrics>;
+    static makeNew(resultData: SimResultData, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<PlayerMetrics>;
 }
 export declare class EncounterMetrics {
     private readonly encounter;
     private readonly metrics;
     readonly targets: Array<TargetMetrics>;
     private constructor();
-    static makeNew(iterations: number, duration: number, encounter: EncounterProto, metrics: EncounterMetricsProto, logs: Array<SimLog>): Promise<EncounterMetrics>;
+    static makeNew(resultData: SimResultData, encounter: EncounterProto, metrics: EncounterMetricsProto, logs: Array<SimLog>): Promise<EncounterMetrics>;
     get durationSeconds(): number;
 }
 export declare class TargetMetrics {
@@ -107,19 +115,21 @@ export declare class TargetMetrics {
     readonly index: number;
     readonly auras: Array<AuraMetrics>;
     readonly logs: Array<SimLog>;
+    readonly auraUptimeLogs: Array<AuraUptimeLog>;
     private constructor();
-    static makeNew(iterations: number, duration: number, target: TargetProto, metrics: TargetMetricsProto, index: number, logs: Array<SimLog>): Promise<TargetMetrics>;
+    static makeNew(resultData: SimResultData, target: TargetProto, metrics: TargetMetricsProto, index: number, logs: Array<SimLog>): Promise<TargetMetrics>;
 }
 export declare class AuraMetrics {
     readonly actionId: ActionId;
     readonly name: string;
     readonly iconUrl: string;
+    private readonly resultData;
     private readonly iterations;
     private readonly duration;
     private readonly data;
     private constructor();
     get uptimePercent(): number;
-    static makeNew(iterations: number, duration: number, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics>;
+    static makeNew(resultData: SimResultData, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics>;
     static merge(auras: Array<AuraMetrics>): AuraMetrics;
     static joinById(auras: Array<AuraMetrics>): Array<AuraMetrics>;
 }
@@ -128,6 +138,7 @@ export declare class ResourceMetrics {
     readonly name: string;
     readonly iconUrl: string;
     readonly type: ResourceType;
+    private readonly resultData;
     private readonly iterations;
     private readonly duration;
     private readonly data;
@@ -137,7 +148,7 @@ export declare class ResourceMetrics {
     get gainPerSecond(): number;
     get avgGain(): number;
     get avgActualGain(): number;
-    static makeNew(iterations: number, duration: number, resourceMetrics: ResourceMetricsProto, playerIndex?: number): Promise<ResourceMetrics>;
+    static makeNew(resultData: SimResultData, resourceMetrics: ResourceMetricsProto, playerIndex?: number): Promise<ResourceMetrics>;
     static merge(resources: Array<ResourceMetrics>): ResourceMetrics;
     static joinById(resources: Array<ResourceMetrics>): Array<ResourceMetrics>;
 }
@@ -145,6 +156,7 @@ export declare class ActionMetrics {
     readonly actionId: ActionId;
     readonly name: string;
     readonly iconUrl: string;
+    private readonly resultData;
     private readonly iterations;
     private readonly duration;
     private readonly data;
@@ -171,8 +183,9 @@ export declare class ActionMetrics {
     get blockPercent(): number;
     get glances(): number;
     get glancePercent(): number;
-    static makeNew(iterations: number, duration: number, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics>;
+    static makeNew(resultData: SimResultData, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics>;
     static merge(actions: Array<ActionMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ActionMetrics;
     static joinById(actions: Array<ActionMetrics>): Array<ActionMetrics>;
     static groupById(actions: Array<ActionMetrics>): Array<Array<ActionMetrics>>;
 }
+export {};

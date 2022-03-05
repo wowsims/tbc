@@ -90,6 +90,7 @@ export class SimLog {
                 || ResourceChangedLog.parse(params)
                 || AuraGainedLog.parse(params)
                 || AuraFadedLog.parse(params)
+                || AuraRefreshedLog.parse(params)
                 || MajorCooldownUsedLog.parse(params)
                 || CastBeganLog.parse(params)
                 || CastCompletedLog.parse(params)
@@ -108,6 +109,9 @@ export class SimLog {
     }
     isAuraFaded() {
         return this instanceof AuraFadedLog;
+    }
+    isAuraRefreshed() {
+        return this instanceof AuraRefreshedLog;
     }
     isMajorCooldownUsed() {
         return this instanceof MajorCooldownUsedLog;
@@ -279,6 +283,24 @@ export class AuraFadedLog extends SimLog {
         }
     }
 }
+export class AuraRefreshedLog extends SimLog {
+    constructor(params, aura) {
+        super(params);
+        this.aura = aura;
+    }
+    toString() {
+        return `${this.toStringPrefix()} Aura refreshed: ${this.aura.name}.`;
+    }
+    static parse(params) {
+        const match = params.raw.match(/Aura refreshed: (.*)/);
+        if (match && match[1]) {
+            return ActionId.fromLogString(match[1]).fill(params.source?.index).then(aura => new AuraRefreshedLog(params, aura));
+        }
+        else {
+            return null;
+        }
+    }
+}
 export class AuraUptimeLog extends SimLog {
     constructor(params, fadedAt, aura) {
         super(params);
@@ -297,7 +319,7 @@ export class AuraUptimeLog extends SimLog {
                 unmatchedGainedLogs.push(log);
                 return;
             }
-            if (!log.isAuraFaded()) {
+            if (!log.isAuraFaded() && !log.isAuraRefreshed()) {
                 return;
             }
             const matchingGainedIdx = unmatchedGainedLogs.findIndex(gainedLog => gainedLog.aura.equals(log.aura));
@@ -313,6 +335,9 @@ export class AuraUptimeLog extends SimLog {
                 source: log.source,
                 target: log.target,
             }, log.timestamp, gainedLog.aura));
+            if (log.isAuraRefreshed()) {
+                unmatchedGainedLogs.push(log);
+            }
         });
         // Auras active at the end won't have a faded log, so need to add them separately.
         unmatchedGainedLogs.forEach(gainedLog => {

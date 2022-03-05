@@ -353,6 +353,11 @@ export class Timeline extends ResultComponent {
         this.dpsResourcesPlot.updateOptions(options);
     }
     updateRotationChart(player, duration) {
+        const targets = this.resultData.result.getTargets(this.resultData.filter);
+        if (targets.length == 0) {
+            return;
+        }
+        const target = targets[0];
         const meleeActionIds = player.getMeleeActions().map(action => action.actionId);
         const spellActionIds = player.getSpellActions().map(action => action.actionId);
         const getActionCategory = (actionId) => {
@@ -453,38 +458,67 @@ export class Timeline extends ResultComponent {
 					`,
                     allowHTML: true,
                 });
+                castLog.damageDealtLogs.filter(ddl => ddl.tick).forEach(ddl => {
+                    const tickElem = document.createElement('div');
+                    tickElem.classList.add('rotation-timeline-tick');
+                    tickElem.style.left = this.timeToPx(ddl.timestamp);
+                    rowElem.appendChild(tickElem);
+                    tippy(tickElem, {
+                        content: `
+							<span>${ddl.timestamp.toFixed(2)}s - ${ddl.cause.name} ${ddl.resultString()}</span>
+						`,
+                        allowHTML: true,
+                    });
+                });
             });
             this.rotationTimeline.appendChild(rowElem);
             return rowElem;
         });
-        const aurasById = Object.values(bucket(player.auraUptimeLogs, log => log.aura.toString()));
-        aurasById.sort((a, b) => stringComparator(a[0].aura.name, b[0].aura.name));
-        aurasById.forEach(auraUptimeLogs => {
-            const actionId = auraUptimeLogs[0].aura;
-            // If there is already a corresponding row from the casts, use that one. Otherwise make a new one.
-            let rowElem = makeRowElem(duration);
-            const castRowIndex = castsByAbility.findIndex(casts => casts[0].castId.equalsIgnoringTag(actionId));
-            if (castRowIndex != -1) {
-                rowElem = castRowElems[castRowIndex];
-            }
-            else {
-                this.rotationLabels.appendChild(makeLabelElem(actionId));
-                this.rotationTimeline.appendChild(rowElem);
-            }
-            auraUptimeLogs.forEach(aul => {
-                const auraElem = document.createElement('div');
-                auraElem.classList.add('rotation-timeline-aura');
-                auraElem.style.left = this.timeToPx(aul.gainedAt);
-                auraElem.style.minWidth = this.timeToPx((aul.fadedAt || duration) - aul.gainedAt);
-                rowElem.appendChild(auraElem);
-                tippy(auraElem, {
-                    content: `
-						<span>${aul.aura.name}: ${aul.gainedAt.toFixed(2)}s - ${(aul.fadedAt || duration).toFixed(2)}s</span>
-					`,
-                    allowHTML: true,
+        const buffsById = Object.values(bucket(player.auraUptimeLogs, log => log.aura.toString()));
+        buffsById.sort((a, b) => stringComparator(a[0].aura.name, b[0].aura.name));
+        const debuffsById = Object.values(bucket(target.auraUptimeLogs, log => log.aura.toString()));
+        debuffsById.sort((a, b) => stringComparator(a[0].aura.name, b[0].aura.name));
+        const addAurasSection = (aurasById) => {
+            let addedRow = false;
+            aurasById.forEach(auraUptimeLogs => {
+                const actionId = auraUptimeLogs[0].aura;
+                // If there is already a corresponding row from the casts, use that one. Otherwise make a new one.
+                let rowElem = makeRowElem(duration);
+                const castRowIndex = castsByAbility.findIndex(casts => casts[0].castId.equalsIgnoringTag(actionId));
+                if (castRowIndex != -1) {
+                    rowElem = castRowElems[castRowIndex];
+                }
+                else {
+                    if (!addedRow) {
+                        addedRow = true;
+                        let separatorElem = document.createElement('div');
+                        separatorElem.classList.add('rotation-timeline-separator');
+                        this.rotationLabels.appendChild(separatorElem);
+                        separatorElem = document.createElement('div');
+                        separatorElem.classList.add('rotation-timeline-separator');
+                        separatorElem.style.width = this.timeToPx(duration);
+                        this.rotationTimeline.appendChild(separatorElem);
+                    }
+                    this.rotationLabels.appendChild(makeLabelElem(actionId));
+                    this.rotationTimeline.appendChild(rowElem);
+                }
+                auraUptimeLogs.forEach(aul => {
+                    const auraElem = document.createElement('div');
+                    auraElem.classList.add('rotation-timeline-aura');
+                    auraElem.style.left = this.timeToPx(aul.gainedAt);
+                    auraElem.style.minWidth = this.timeToPx((aul.fadedAt || duration) - aul.gainedAt);
+                    rowElem.appendChild(auraElem);
+                    tippy(auraElem, {
+                        content: `
+							<span>${aul.aura.name}: ${aul.gainedAt.toFixed(2)}s - ${(aul.fadedAt || duration).toFixed(2)}s</span>
+						`,
+                        allowHTML: true,
+                    });
                 });
             });
-        });
+        };
+        addAurasSection(buffsById);
+        addAurasSection(debuffsById);
     }
     timeToPxValue(time) {
         return time * 100;
@@ -514,7 +548,7 @@ export class Timeline extends ResultComponent {
                 ctx.textAlign = 'left';
                 x++;
             }
-            else if (time == duration) {
+            else if (i % 10 == 0 && time + 1 > duration) {
                 ctx.textAlign = 'right';
                 x--;
             }
