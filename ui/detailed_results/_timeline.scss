@@ -2,6 +2,26 @@
 
 $dps-color: #ed5653;
 $mana-color: #2E93fA;
+$energy-color: #ffd700;
+$rage-color: #ff0000;
+$focus-color: #cd853f;
+$combo-points-color: #ffa07a;
+
+.mana .series-color, .mana.series-color {
+	color: $mana-color;
+}
+.energy .series-color, .energy.series-color {
+	color: $energy-color;
+}
+.rage .series-color, .rage.series-color {
+	color: $rage-color;
+}
+.focus .series-color, .focus.series-color {
+	color: $focus-color;
+}
+.combo-points .series-color, .combo-points.series-color {
+	color: $combo-points-color;
+}
 
 .timeline-root {
 }
@@ -78,14 +98,21 @@ $mana-color: #2E93fA;
 .timeline-tooltip.mana ul li::before {
 	color: $mana-color;
 }
-
-.timeline-tooltip.dps .series-color {
-	font-weight: bold;
-	color: $dps-color;
+.timeline-tooltip.energy ul li::before {
+	color: $energy-color;
 }
-.timeline-tooltip.mana .series-color {
+.timeline-tooltip.rage ul li::before {
+	color: $rage-color;
+}
+.timeline-tooltip.focus ul li::before {
+	color: $focus-color;
+}
+.timeline-tooltip.combo-points ul li::before {
+	color: $combo-points-color;
+}
+
+.series-color {
 	font-weight: bold;
-	color: $mana-color;
 }
 
 .timeline-tooltip-auras {
@@ -136,6 +163,15 @@ $mana-color: #2E93fA;
 .rotation-timeline-row {
 	position: relative;
 	border-bottom: 1px solid grey;
+}
+.rotation-timeline-resource {
+	position: absolute;
+	height: 100%;
+	border-left: 1px solid grey;
+	border-right: 1px solid grey;
+	display: flex;
+	align-items: center;
+	font-weight: bold;
 }
 .rotation-timeline-cast {
 	position: absolute;

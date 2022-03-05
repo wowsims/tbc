@@ -45,6 +45,7 @@ type Rogue struct {
 	eaBuildTime        time.Duration // Time to build EA following a finisher at ~35 energy
 
 	deathmantle4pcProc bool
+	disabledMCDs       []*core.MajorCooldown
 
 	builderEnergyCost float64
 	newBuilder        func(sim *core.Simulation, target *core.Target) *core.SimpleSpell
@@ -129,6 +130,8 @@ func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.plan = PlanOpener
 	rogue.deathmantle4pcProc = false
 	rogue.deadlyPoisonStacks = 0
+
+	rogue.disabledMCDs = rogue.DisableAllEnabledCooldowns(core.CooldownTypeUnknown)
 }
 
 func (rogue *Rogue) critMultiplier(isMH bool, applyLethality bool) float64 {

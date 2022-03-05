@@ -100,7 +100,7 @@ func (eb *energyBar) AddComboPoints(sim *Simulation, pointsToAdd int32, actionID
 
 func (eb *energyBar) SpendComboPoints(sim *Simulation, actionID ActionID) {
 	if sim.Log != nil {
-		eb.character.Log(sim, "Spent all combo points.")
+		eb.character.Log(sim, "Spent %d combo points from %s (%d --> %d).", eb.comboPoints, actionID, eb.comboPoints, 0)
 	}
 	eb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, float64(-eb.comboPoints), float64(-eb.comboPoints))
 	eb.comboPoints = 0
@@ -124,6 +124,7 @@ func (eb *energyBar) reset(sim *Simulation) {
 	pa.OnAction = func(sim *Simulation) {
 		eb.AddEnergy(sim, EnergyPerTick*eb.EnergyTickMultiplier+eb.NextEnergyTickAdjustment, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
 		eb.NextEnergyTickAdjustment = 0
+		eb.character.TryUseCooldowns(sim)
 		eb.onEnergyTick(sim)
 
 		pa.NextActionAt = sim.CurrentTime + EnergyTickDuration

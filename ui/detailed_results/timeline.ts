@@ -1,11 +1,14 @@
+import { ResourceType } from '/tbc/core/proto/api.js';
 import { OtherAction } from '/tbc/core/proto/common.js';
 import { PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
-import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { bucket, distinct, maxIndex, stringComparator, sum } from '/tbc/core/utils.js';
+import { ActionId, resourceTypeToIcon } from '/tbc/core/proto_utils/action_id.js';
+import { resourceColors, resourceNames } from '/tbc/core/proto_utils/names.js';
+import { bucket, distinct, getEnumValues, maxIndex, stringComparator, sum } from '/tbc/core/utils.js';
 
 import {
 	AuraUptimeLog,
 	DamageDealtLog,
+	ResourceChangedLogGroup,
 	DpsLog,
 	SimLog,
 } from '/tbc/core/proto_utils/logs_parser.js';
@@ -132,7 +135,7 @@ export class Timeline extends ResultComponent {
 		const duration = this.resultData!.result.result.firstIterationDuration || 1;
 		this.updateRotationChart(player, duration);
 
-		let manaLogs = player.manaChangedLogs;
+		let manaLogs = player.groupedResourceLogs[ResourceType.ResourceTypeMana];
 		let dpsLogs = player.dpsLogs;
 		let mcdLogs = player.majorCooldownLogs;
 		let mcdAuraLogs = player.majorCooldownAuraUptimeLogs;
@@ -287,53 +290,7 @@ export class Timeline extends ResultComponent {
 					} else if (data.seriesIndex == 1) {
 						// Mana
 						const log = manaLogs[data.dataPointIndex];
-						return `<div class="timeline-tooltip mana">
-							<div class="timeline-tooltip-header">
-								<span class="bold">${log.timestamp.toFixed(2)}s</span>
-							</div>
-							<div class="timeline-tooltip-body">
-								<div class="timeline-tooltip-body-row">
-									<span class="series-color">Before: ${log.valueBefore.toFixed(1)} (${(log.valueBefore/maxMana*100).toFixed(0)}%)</span>
-								</div>
-								<ul class="timeline-mana-events">
-									${log.logs.map(manaChangedLog => {
-										let iconElem = '';
-										if (manaChangedLog.cause.iconUrl) {
-											iconElem = `<img class="timeline-tooltip-icon" src="${manaChangedLog.cause.iconUrl}">`;
-										}
-										return `
-										<li>
-											${iconElem}
-											<span>${manaChangedLog.cause.name}:</span>
-											<span class="series-color">${manaChangedLog.resultString()}</span>
-										</li>`;
-									}).join('')}
-								</ul>
-								<div class="timeline-tooltip-body-row">
-									<span class="series-color">After: ${log.valueAfter.toFixed(1)} (${(log.valueAfter/maxMana*100).toFixed(0)}%)</span>
-								</div>
-							</div>
-							${log.activeAuras.length == 0 ? '' : `
-								<div class="timeline-tooltip-auras">
-									<div class="timeline-tooltip-body-row">
-										<span class="bold">Active Auras</span>
-									</div>
-									<ul class="timeline-active-auras">
-										${log.activeAuras.map(auraLog => {
-											let iconElem = '';
-											if (auraLog.aura.iconUrl) {
-												iconElem = `<img class="timeline-tooltip-icon" src="${auraLog.aura.iconUrl}">`;
-											}
-											return `
-											<li>
-												${iconElem}
-												<span>${auraLog.aura.name}</span>
-											</li>`;
-										}).join('')}
-									</ul>
-								</div>`
-							}
-						</div>`;
+						return this.resourceTooltip(log, maxMana, true);
 					}
 				}
 			},
@@ -404,6 +361,17 @@ export class Timeline extends ResultComponent {
 		}
 		const target = targets[0];
 
+		this.rotationLabels.innerHTML = `
+			<div class="rotation-label-header"></div>
+		`;
+		this.rotationTimeline.innerHTML = `
+			<div class="rotation-timeline-header">
+				<canvas class="rotation-timeline-canvas"></canvas>
+			</div>
+		`;
+
+		this.drawRotationTimeRuler(this.rotationTimeline.getElementsByClassName('rotation-timeline-canvas')[0] as HTMLCanvasElement, duration);
+
 		const meleeActionIds = player.getMeleeActions().map(action => action.actionId);
 		const spellActionIds = player.getSpellActions().map(action => action.actionId);
 		const getActionCategory = (actionId: ActionId): number => {
@@ -436,17 +404,6 @@ export class Timeline extends ResultComponent {
 			}
 		});
 
-		this.rotationLabels.innerHTML = `
-			<div class="rotation-label-header"></div>
-		`;
-		this.rotationTimeline.innerHTML = `
-			<div class="rotation-timeline-header">
-				<canvas class="rotation-timeline-canvas"></canvas>
-			</div>
-		`;
-
-		this.drawRotationTimeRuler(this.rotationTimeline.getElementsByClassName('rotation-timeline-canvas')[0] as HTMLCanvasElement, duration);
-
 		const makeLabelElem = (actionId: ActionId) => {
 			const labelElem = document.createElement('div');
 			labelElem.classList.add('rotation-label', 'rotation-row');
@@ -466,6 +423,43 @@ export class Timeline extends ResultComponent {
 			rowElem.style.width = this.timeToPx(duration);
 			return rowElem;
 		};
+
+		const resourceTypes = (getEnumValues(ResourceType) as Array<ResourceType>).filter(val => val != ResourceType.ResourceTypeNone);
+		resourceTypes.forEach(resourceType => {
+			const resourceLogs = player.groupedResourceLogs[resourceType];
+			if (resourceLogs.length == 0) {
+				return;
+			}
+			const startValue = resourceLogs[0].valueBefore;
+
+			const labelElem = document.createElement('div');
+			labelElem.classList.add('rotation-label', 'rotation-row');
+			labelElem.innerHTML = `
+				<a class="rotation-label-icon" style="background-image:url('${resourceTypeToIcon[resourceType]}')"></a>
+				<span class="rotation-label-text">${resourceNames[resourceType]}</span>
+			`;
+			this.rotationLabels.appendChild(labelElem);
+
+			const rowElem = makeRowElem(duration);
+			resourceLogs.forEach((resourceLogGroup, i) => {
+				const resourceElem = document.createElement('div');
+				resourceElem.classList.add('rotation-timeline-resource', 'series-color', resourceNames[resourceType].toLowerCase().replaceAll(' ', '-'));
+				resourceElem.style.left = this.timeToPx(resourceLogGroup.timestamp);
+				resourceElem.style.minWidth = this.timeToPx((resourceLogs[i+1]?.timestamp || duration) - resourceLogGroup.timestamp);
+				if (resourceType == ResourceType.ResourceTypeMana) {
+					resourceElem.textContent = (resourceLogGroup.valueAfter / startValue * 100).toFixed(0) + '%';
+				} else {
+					resourceElem.textContent = resourceLogGroup.valueAfter.toFixed(0);
+				}
+				rowElem.appendChild(resourceElem);
+
+				tippy(resourceElem, {
+					content: this.resourceTooltip(resourceLogGroup, startValue, false),
+					allowHTML: true,
+				});
+			});
+			this.rotationTimeline.appendChild(rowElem);
+		});
 
 		const castRowElems = castsByAbility.map(abilityCasts => {
 			const actionId = abilityCasts[0].castId;
@@ -629,6 +623,60 @@ export class Timeline extends ResultComponent {
 			ctx.lineTo(x, height - lineHeight);
 		}
 		ctx.stroke();
+	}
+
+	private resourceTooltip(log: ResourceChangedLogGroup, maxValue: number, includeAuras: boolean): string {
+		const valToDisplayString = log.resourceType == ResourceType.ResourceTypeMana
+				? (val: number) => `${val.toFixed(1)} (${(val/maxValue*100).toFixed(0)}%)`
+				: (val: number) => `${val.toFixed(1)}`;
+			
+		return `<div class="timeline-tooltip ${resourceNames[log.resourceType].toLowerCase().replaceAll(' ', '-')}">
+			<div class="timeline-tooltip-header">
+				<span class="bold">${log.timestamp.toFixed(2)}s</span>
+			</div>
+			<div class="timeline-tooltip-body">
+				<div class="timeline-tooltip-body-row">
+					<span class="series-color">Before: ${valToDisplayString(log.valueBefore)}</span>
+				</div>
+				<ul class="timeline-mana-events">
+					${log.logs.map(manaChangedLog => {
+						let iconElem = '';
+						if (manaChangedLog.cause.iconUrl) {
+							iconElem = `<img class="timeline-tooltip-icon" src="${manaChangedLog.cause.iconUrl}">`;
+						}
+						return `
+						<li>
+							${iconElem}
+							<span>${manaChangedLog.cause.name}:</span>
+							<span class="series-color">${manaChangedLog.resultString()}</span>
+						</li>`;
+					}).join('')}
+				</ul>
+				<div class="timeline-tooltip-body-row">
+					<span class="series-color">After: ${valToDisplayString(log.valueAfter)}</span>
+				</div>
+			</div>
+			${!includeAuras || log.activeAuras.length == 0 ? '' : `
+				<div class="timeline-tooltip-auras">
+					<div class="timeline-tooltip-body-row">
+						<span class="bold">Active Auras</span>
+					</div>
+					<ul class="timeline-active-auras">
+						${log.activeAuras.map(auraLog => {
+							let iconElem = '';
+							if (auraLog.aura.iconUrl) {
+								iconElem = `<img class="timeline-tooltip-icon" src="${auraLog.aura.iconUrl}">`;
+							}
+							return `
+							<li>
+								${iconElem}
+								<span>${auraLog.aura.name}</span>
+							</li>`;
+						}).join('')}
+					</ul>
+				</div>`
+			}
+		</div>`;
 	}
 
 	render() {

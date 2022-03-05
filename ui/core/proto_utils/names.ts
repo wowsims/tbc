@@ -118,4 +118,23 @@ export const resourceNames: Record<ResourceType, string> = {
   [ResourceType.ResourceTypeEnergy]: 'Energy',
   [ResourceType.ResourceTypeRage]: 'Rage',
   [ResourceType.ResourceTypeComboPoints]: 'Combo Points',
+  [ResourceType.ResourceTypeFocus]: 'Focus',
 };
+
+export const resourceColors: Record<ResourceType, string> = {
+  [ResourceType.ResourceTypeNone]: '#ffffff',
+  [ResourceType.ResourceTypeMana]: '#2e93fa',
+  [ResourceType.ResourceTypeEnergy]: '#ffd700',
+  [ResourceType.ResourceTypeRage]: '#ff0000',
+  [ResourceType.ResourceTypeComboPoints]: '#ffa07a',
+  [ResourceType.ResourceTypeFocus]: '#cd853f',
+};
+
+export function stringToResourceType(str: string): ResourceType {
+	for (const [key, val] of Object.entries(resourceNames)) {
+		if (val.toLowerCase() == str.toLowerCase()) {
+			return Number(key) as ResourceType;
+		}
+	}
+	return ResourceType.ResourceTypeNone;
+}

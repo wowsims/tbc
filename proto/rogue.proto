@@ -74,13 +74,15 @@ message Rogue {
 
 			// Allows use of rupture when sensible.
 			bool use_rupture = 2;
+
+			// Don't use damage finishers (eviscerate, rupture) unless >= this many CPs.
+			int32 min_combo_points_for_damage_finisher = 4;
     }
     Rotation rotation = 1;
 
     RogueTalents talents = 2;
     
     message Options {
-			bool use_thistle_tea = 1;
     }
     Options options = 3;
 }

@@ -76,9 +76,7 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
 		if currentManaPercent > mage.ArcaneRotation.StopRegenRotationPercent && willDropStacks {
 			mage.isDoingRegenRotation = false
 			if mage.disabledMCDs != nil {
-				for _, mcd := range mage.disabledMCDs {
-					mage.EnableMajorCooldown(mcd.ActionID)
-				}
+				mage.EnableAllCooldowns(mage.disabledMCDs)
 				mage.disabledMCDs = nil
 			}
 		}
@@ -95,14 +93,7 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
 			mage.numCastsDone = 0
 
 			if mage.ArcaneRotation.DisableDpsCooldownsDuringRegen {
-				disabledMCDs := []*core.MajorCooldown{}
-				for _, mcd := range mage.GetMajorCooldowns() {
-					if mcd.IsEnabled() && mcd.Type == core.CooldownTypeDPS {
-						mage.DisableMajorCooldown(mcd.ActionID)
-						disabledMCDs = append(disabledMCDs, mcd)
-					}
-				}
-				mage.disabledMCDs = disabledMCDs
+				mage.disabledMCDs = mage.DisableAllEnabledCooldowns(core.CooldownTypeDPS)
 			}
 		}
 	}

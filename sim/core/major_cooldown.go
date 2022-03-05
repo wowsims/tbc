@@ -201,11 +201,6 @@ func (mcdm *majorCooldownManager) finalize(character *Character) {
 		mcdm.initialMajorCooldowns = []MajorCooldown{}
 	}
 
-	// Sort major cooldowns by descending priority so they get used in the correct order.
-	sort.SliceStable(mcdm.initialMajorCooldowns, func(i, j int) bool {
-		return mcdm.initialMajorCooldowns[i].Priority > mcdm.initialMajorCooldowns[j].Priority
-	})
-
 	// Match user-specified cooldown configs to existing cooldowns.
 	for i, _ := range mcdm.initialMajorCooldowns {
 		mcd := &mcdm.initialMajorCooldowns[i]
@@ -243,6 +238,9 @@ func (mcdm *majorCooldownManager) reset(sim *Simulation) {
 			panic("Nil cooldown activation returned!")
 		}
 	}
+
+	// For initial sorting.
+	mcdm.UpdateMajorCooldowns()
 }
 
 // Registers a major cooldown to the Character, which will be automatically
@@ -311,6 +309,26 @@ func (mcdm *majorCooldownManager) EnableMajorCooldown(actionID ActionID) {
 	mcd := mcdm.GetMajorCooldown(actionID)
 	if mcd != nil {
 		mcd.disabled = false
+	}
+}
+
+// Disabled all MCDs that are currently enabled, and returns a list of the MCDs
+// which were disabled by this call.
+// If cooldownType is not CooldownTypeUnknown, then will be restricted to cooldowns of that type.
+func (mcdm *majorCooldownManager) DisableAllEnabledCooldowns(cooldownType int32) []*MajorCooldown {
+	disabledMCDs := []*MajorCooldown{}
+	for _, mcd := range mcdm.majorCooldowns {
+		if mcd.IsEnabled() && (cooldownType == CooldownTypeUnknown || mcd.Type == cooldownType) {
+			mcdm.DisableMajorCooldown(mcd.ActionID)
+			disabledMCDs = append(disabledMCDs, mcd)
+		}
+	}
+	return disabledMCDs
+}
+
+func (mcdm *majorCooldownManager) EnableAllCooldowns(mcdsToEnable []*MajorCooldown) {
+	for _, mcd := range mcdsToEnable {
+		mcdm.EnableMajorCooldown(mcd.ActionID)
 	}
 }
 

@@ -20,8 +20,6 @@ import {
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 
-export const ThistleTea = makeBooleanRogueBuffInput(ActionId.fromItemId(7676), 'useThistleTea');
-
 export const RogueRotationConfig = {
 	inputs: [
 		{
@@ -74,6 +72,21 @@ export const RogueRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecRogue>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					newRotation.useRupture = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'number' as const, cssClass: 'min-combo-points-for-dps-finisher-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Min CPs for Damage Finisher',
+				labelTooltip: 'Will not use Eviscerate or Rupture unless the Rogue has at least this many Combo Points.',
+				changedEvent: (player: Player<Spec.SpecRogue>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecRogue>) => player.getRotation().minComboPointsForDamageFinisher,
+				setValue: (eventID: EventID, player: Player<Spec.SpecRogue>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.minComboPointsForDamageFinisher = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},

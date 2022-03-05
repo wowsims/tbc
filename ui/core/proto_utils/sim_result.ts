@@ -256,7 +256,7 @@ export class PlayerMetrics {
 
 	readonly logs: Array<SimLog>;
 	readonly damageDealtLogs: Array<DamageDealtLog>;
-	readonly manaChangedLogs: Array<ResourceChangedLogGroup>;
+	readonly groupedResourceLogs: Record<ResourceType, Array<ResourceChangedLogGroup>>;
 	readonly dpsLogs: Array<DpsLog>;
 	readonly auraUptimeLogs: Array<AuraUptimeLog>;
 	readonly majorCooldownLogs: Array<MajorCooldownUsedLog>;
@@ -302,9 +302,9 @@ export class PlayerMetrics {
 		this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet), resultData.firstIterationDuration);
 		this.majorCooldownLogs = this.logs.filter((log): log is MajorCooldownUsedLog => log.isMajorCooldownUsed());
 
-		this.manaChangedLogs = ResourceChangedLogGroup.fromLogs(this.logs, 'mana');
+		this.groupedResourceLogs = ResourceChangedLogGroup.fromLogs(this.logs);
 		AuraUptimeLog.populateActiveAuras(this.dpsLogs, this.auraUptimeLogs);
-		AuraUptimeLog.populateActiveAuras(this.manaChangedLogs, this.auraUptimeLogs);
+		AuraUptimeLog.populateActiveAuras(this.groupedResourceLogs[ResourceType.ResourceTypeMana], this.auraUptimeLogs);
 
 		this.majorCooldownAuraUptimeLogs = this.auraUptimeLogs.filter(auraLog => this.majorCooldownLogs.find(mcdLog => mcdLog.cooldownId.equals(auraLog.aura)));
 	}
