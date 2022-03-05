@@ -511,7 +511,7 @@ export class Timeline extends ResultComponent {
 
 			// If there is already a corresponding row from the casts, use that one. Otherwise make a new one.
 			let rowElem = makeRowElem(duration);
-			const castRowIndex = castsByAbility.findIndex(casts => casts[0].castId.equals(actionId));
+			const castRowIndex = castsByAbility.findIndex(casts => casts[0].castId.equalsIgnoringTag(actionId));
 			if (castRowIndex != -1) {
 				rowElem = castRowElems[castRowIndex];
 			} else {
