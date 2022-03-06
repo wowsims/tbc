@@ -424,6 +424,9 @@ func registerPotionCD(agent Agent, consumes proto.Consumes) {
 	if consumes.StartingPotion == proto.Potions_UnknownPotion {
 		consumes.NumStartingPotions = 0
 	}
+	if consumes.NumStartingPotions == 0 {
+		consumes.StartingPotion = proto.Potions_UnknownPotion
+	}
 
 	character := agent.GetCharacter()
 	defaultPotion := consumes.DefaultPotion
@@ -730,43 +733,89 @@ var ConjuredAuraID = NewAuraID()
 var ConjuredCooldownID = NewCooldownID()
 
 func registerConjuredCD(agent Agent, consumes proto.Consumes) {
+	if consumes.DefaultConjured == consumes.StartingConjured {
+		// Starting conjured is redundant in this case.
+		consumes.StartingConjured = proto.Conjured_ConjuredUnknown
+	}
+	if consumes.StartingConjured == proto.Conjured_ConjuredUnknown {
+		consumes.NumStartingConjured = 0
+	}
+	if consumes.NumStartingConjured == 0 {
+		consumes.StartingConjured = proto.Conjured_ConjuredUnknown
+	}
 	character := agent.GetCharacter()
 
-	mcd, activationFn := makeConjuredActivation(consumes.DefaultConjured, character)
-	if activationFn == nil {
+	defaultMCD, defaultActivationFn := makeConjuredActivation(consumes.DefaultConjured, character)
+	startingMCD, startingActivationFn := makeConjuredActivation(consumes.StartingConjured, character)
+	numStartingConjured := int(consumes.NumStartingConjured)
+	if defaultActivationFn == nil && startingActivationFn == nil {
 		return
 	}
 
-	character.AddMajorCooldown(MajorCooldown{
-		ActionID:    mcd.ActionID,
-		CooldownID:  ConjuredCooldownID,
-		Cooldown:    mcd.Cooldown,
-		CanActivate: mcd.CanActivate,
-		Type:        mcd.Type,
-		ShouldActivate: func(sim *Simulation, character *Character) bool {
-			return mcd.ShouldActivate(sim, character)
-		},
-		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			expectedManaPerUsage := float64((900 + 600) / 2)
+	numStartingConjuredUsed := 0
 
-			remainingUsages := int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
+	if startingActivationFn != nil {
+		character.AddMajorCooldown(MajorCooldown{
+			ActionID:   startingMCD.ActionID,
+			CooldownID: ConjuredCooldownID,
+			Cooldown:   startingMCD.Cooldown,
+			Type:       startingMCD.Type,
+			CanActivate: func(sim *Simulation, character *Character) bool {
+				if numStartingConjuredUsed >= numStartingConjured {
+					return false
+				}
+				return startingMCD.CanActivate(sim, character)
+			},
+			ShouldActivate: func(sim *Simulation, character *Character) bool {
+				return startingMCD.ShouldActivate(sim, character)
+			},
+			ActivationFactory: func(sim *Simulation) CooldownActivation {
+				numStartingConjuredUsed = 0
+				return func(sim *Simulation, character *Character) {
+					startingActivationFn(sim, character)
+					numStartingConjuredUsed++
+				}
+			},
+		})
+	}
 
-			if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune {
-				character.ExpectedBonusMana += expectedManaPerUsage * float64(remainingUsages)
-			}
+	if defaultActivationFn != nil {
+		character.AddMajorCooldown(MajorCooldown{
+			ActionID:   defaultMCD.ActionID,
+			CooldownID: ConjuredCooldownID,
+			Cooldown:   defaultMCD.Cooldown,
+			Type:       defaultMCD.Type,
+			CanActivate: func(sim *Simulation, character *Character) bool {
+				if numStartingConjuredUsed < numStartingConjured {
+					return false
+				}
+				return defaultMCD.CanActivate(sim, character)
+			},
+			ShouldActivate: func(sim *Simulation, character *Character) bool {
+				return defaultMCD.ShouldActivate(sim, character)
+			},
+			ActivationFactory: func(sim *Simulation) CooldownActivation {
+				expectedManaPerUsage := float64((900 + 600) / 2)
 
-			return func(sim *Simulation, character *Character) {
-				activationFn(sim, character)
+				remainingUsages := int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
 
 				if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune {
-					// Update expected bonus mana
-					newRemainingUsages := int(sim.GetRemainingDuration() / (time.Minute * 2))
-					character.ExpectedBonusMana -= expectedManaPerUsage * float64(remainingUsages-newRemainingUsages)
-					remainingUsages = newRemainingUsages
+					character.ExpectedBonusMana += expectedManaPerUsage * float64(remainingUsages)
 				}
-			}
-		},
-	})
+
+				return func(sim *Simulation, character *Character) {
+					defaultActivationFn(sim, character)
+
+					if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune {
+						// Update expected bonus mana
+						newRemainingUsages := int(sim.GetRemainingDuration() / (time.Minute * 2))
+						character.ExpectedBonusMana -= expectedManaPerUsage * float64(remainingUsages-newRemainingUsages)
+						remainingUsages = newRemainingUsages
+					}
+				}
+			},
+		})
+	}
 }
 
 func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (MajorCooldown, CooldownActivation) {

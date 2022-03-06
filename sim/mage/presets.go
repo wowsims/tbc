@@ -155,12 +155,11 @@ var FullArcaneIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var FullFireConsumes = &proto.Consumes{
-	Flask:            proto.Flask_FlaskOfPureDeath,
-	Food:             proto.Food_FoodBlackenedBasilisk,
-	FlaskOfPureDeath: true,
-	DefaultPotion:    proto.Potions_SuperManaPotion,
-	DefaultConjured:  proto.Conjured_ConjuredFlameCap,
-	MainHandImbue:    proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
+	Flask:           proto.Flask_FlaskOfPureDeath,
+	Food:            proto.Food_FoodBlackenedBasilisk,
+	DefaultPotion:   proto.Potions_SuperManaPotion,
+	DefaultConjured: proto.Conjured_ConjuredFlameCap,
+	MainHandImbue:   proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
 }
 var FullFrostConsumes = &proto.Consumes{
 	Flask:           proto.Flask_FlaskOfPureDeath,
