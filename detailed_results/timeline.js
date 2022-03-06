@@ -331,7 +331,6 @@ export class Timeline extends ResultComponent {
 			</div>
 		`;
         this.rotationHiddenIdsContainer.innerHTML = '';
-        this.hiddenIds = [];
         this.hiddenIdsChangeEmitter = new TypedEvent();
         this.drawRotationTimeRuler(this.rotationTimeline.getElementsByClassName('rotation-timeline-canvas')[0], duration);
         const meleeActionIds = player.getMeleeActions().map(action => action.actionId);
@@ -376,7 +375,7 @@ export class Timeline extends ResultComponent {
             const labelElem = document.createElement('div');
             labelElem.classList.add('rotation-label', 'rotation-row');
             if (isHiddenLabel) {
-                labelElem.classList.add('rotation-label-hidden', 'hide');
+                labelElem.classList.add('rotation-label-hidden');
             }
             const labelText = idsToGroupForRotation.includes(actionId.spellId) ? actionId.baseName : actionId.name;
             labelElem.innerHTML = `
@@ -401,14 +400,16 @@ export class Timeline extends ResultComponent {
                 content: isHiddenLabel ? 'Show Row' : 'Hide Row',
                 allowHTML: true,
             });
-            this.hiddenIdsChangeEmitter.on(() => {
+            const updateHidden = () => {
                 if (isHiddenLabel == Boolean(this.hiddenIds.find(hiddenId => hiddenId.equals(actionId)))) {
                     labelElem.classList.remove('hide');
                 }
                 else {
                     labelElem.classList.add('hide');
                 }
-            });
+            };
+            this.hiddenIdsChangeEmitter.on(updateHidden);
+            updateHidden();
             const labelIcon = labelElem.getElementsByClassName('rotation-label-icon')[0];
             actionId.setBackgroundAndHref(labelIcon);
             return labelElem;
@@ -417,14 +418,16 @@ export class Timeline extends ResultComponent {
             const rowElem = document.createElement('div');
             rowElem.classList.add('rotation-timeline-row', 'rotation-row');
             rowElem.style.width = this.timeToPx(duration);
-            this.hiddenIdsChangeEmitter.on(() => {
+            const updateHidden = () => {
                 if (this.hiddenIds.find(hiddenId => hiddenId.equals(actionId))) {
                     rowElem.classList.add('hide');
                 }
                 else {
                     rowElem.classList.remove('hide');
                 }
-            });
+            };
+            this.hiddenIdsChangeEmitter.on(updateHidden);
+            updateHidden();
             return rowElem;
         };
         const resourceTypes = getEnumValues(ResourceType).filter(val => val != ResourceType.ResourceTypeNone);
