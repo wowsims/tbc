@@ -501,7 +501,7 @@ export class Timeline extends ResultComponent {
 				const resourceElem = document.createElement('div');
 				resourceElem.classList.add('rotation-timeline-resource', 'series-color', resourceNames[resourceType].toLowerCase().replaceAll(' ', '-'));
 				resourceElem.style.left = this.timeToPx(resourceLogGroup.timestamp);
-				resourceElem.style.minWidth = this.timeToPx((resourceLogs[i+1]?.timestamp || duration) - resourceLogGroup.timestamp);
+				resourceElem.style.width = this.timeToPx((resourceLogs[i+1]?.timestamp || duration) - resourceLogGroup.timestamp);
 				if (resourceType == ResourceType.ResourceTypeMana) {
 					resourceElem.textContent = (resourceLogGroup.valueAfter / startValue * 100).toFixed(0) + '%';
 				} else {
@@ -512,6 +512,7 @@ export class Timeline extends ResultComponent {
 				tippy(resourceElem, {
 					content: this.resourceTooltip(resourceLogGroup, startValue, false),
 					allowHTML: true,
+					placement: 'bottom',
 				});
 			});
 			this.rotationTimeline.appendChild(rowElem);
@@ -556,6 +557,7 @@ export class Timeline extends ResultComponent {
 						</ul>
 					`,
 					allowHTML: true,
+					placement: 'bottom',
 				});
 
 				castLog.damageDealtLogs.filter(ddl => ddl.tick).forEach(ddl => {
@@ -569,6 +571,7 @@ export class Timeline extends ResultComponent {
 							<span>${ddl.timestamp.toFixed(2)}s - ${ddl.cause.name} ${ddl.resultString()}</span>
 						`,
 						allowHTML: true,
+						placement: 'bottom',
 					});
 				});
 			});
