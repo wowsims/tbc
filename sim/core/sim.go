@@ -24,7 +24,7 @@ type Simulation struct {
 
 	// Used for testing only, see RandomFloat().
 	isTest    bool
-	testRands map[uint32]*rand.Rand
+	testRands map[string]*rand.Rand
 
 	// Current Simulation State
 	pendingActions    []*PendingAction
@@ -75,7 +75,7 @@ func NewSim(rsr proto.RaidSimRequest) *Simulation {
 		rand: rand.New(rand.NewSource(rseed)),
 
 		isTest:    simOptions.IsTest,
-		testRands: make(map[uint32]*rand.Rand),
+		testRands: make(map[string]*rand.Rand),
 
 		emptyAuras: make([]Aura, numAuraIDs),
 
@@ -94,11 +94,10 @@ func (sim *Simulation) RandomFloat(label string) float64 {
 		return sim.rand.Float64()
 	}
 
-	labelHash := hash(label)
-	labelRand, isPresent := sim.testRands[labelHash]
+	labelRand, isPresent := sim.testRands[label]
 	if !isPresent {
-		labelRand = rand.New(rand.NewSource(int64(labelHash)))
-		sim.testRands[labelHash] = labelRand
+		labelRand = rand.New(rand.NewSource(int64(hash(label))))
+		sim.testRands[label] = labelRand
 	}
 	v := labelRand.Float64()
 	// if sim.Log != nil {

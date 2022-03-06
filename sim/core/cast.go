@@ -146,7 +146,6 @@ func (cast *Cast) init(sim *Simulation) {
 // Start casting the spell. Return value indicates whether the spell successfully
 // started casting.
 func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) bool {
-
 	switch cast.Cost.Type {
 	case stats.Mana:
 		if cast.Character.CurrentMana() < cast.Cost.Value {

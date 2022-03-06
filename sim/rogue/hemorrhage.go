@@ -77,6 +77,7 @@ func (rogue *Rogue) newHemorrhageTemplate(sim *core.Simulation) core.SimpleSpell
 				},
 			},
 			WeaponInput: core.WeaponDamageInput{
+				Normalized:       true,
 				DamageMultiplier: 1.1,
 			},
 		},

@@ -24,7 +24,7 @@ func TestAutoSwing(t *testing.T) {
 			Targets: []*Target{{}},
 		},
 		isTest:            true,
-		testRands:         make(map[uint32]*rand.Rand),
+		testRands:         make(map[string]*rand.Rand),
 		emptyAuras:        make([]Aura, numAuraIDs),
 		pendingActionPool: newPAPool(),
 	}
@@ -67,7 +67,7 @@ func TestRangedAutoSwing(t *testing.T) {
 			Targets: []*Target{{}},
 		},
 		isTest:            true,
-		testRands:         make(map[uint32]*rand.Rand),
+		testRands:         make(map[string]*rand.Rand),
 		emptyAuras:        make([]Aura, numAuraIDs),
 		pendingActionPool: newPAPool(),
 	}

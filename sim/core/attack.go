@@ -19,31 +19,43 @@ type ReplaceMHSwing func(sim *Simulation) *SimpleSpell
 // Represents a generic weapon. Pets / unarmed / various other cases dont use
 // actual weapon items so this is an abstraction of a Weapon.
 type Weapon struct {
-	BaseDamageMin  float64
-	BaseDamageMax  float64
-	SwingSpeed     float64
-	SwingDuration  time.Duration // Duration between 2 swings.
-	CritMultiplier float64
+	BaseDamageMin        float64
+	BaseDamageMax        float64
+	SwingSpeed           float64
+	NormalizedSwingSpeed float64
+	SwingDuration        time.Duration // Duration between 2 swings.
+	CritMultiplier       float64
 }
 
 func newWeaponFromUnarmed(critMultiplier float64) Weapon {
 	// These numbers are probably wrong but nobody cares.
 	return Weapon{
-		BaseDamageMin:  0,
-		BaseDamageMax:  0,
-		SwingSpeed:     1,
-		SwingDuration:  time.Second,
-		CritMultiplier: critMultiplier,
+		BaseDamageMin:        0,
+		BaseDamageMax:        0,
+		SwingSpeed:           1,
+		NormalizedSwingSpeed: 1,
+		SwingDuration:        time.Second,
+		CritMultiplier:       critMultiplier,
 	}
 }
 
 func newWeaponFromItem(item items.Item, critMultiplier float64) Weapon {
+	normalizedWeaponSpeed := 2.4
+	if item.WeaponType == proto.WeaponType_WeaponTypeDagger {
+		normalizedWeaponSpeed = 1.7
+	} else if item.HandType == proto.HandType_HandTypeTwoHand {
+		normalizedWeaponSpeed = 3.3
+	} else if item.RangedWeaponType != proto.RangedWeaponType_RangedWeaponTypeUnknown {
+		normalizedWeaponSpeed = 2.8
+	}
+
 	return Weapon{
-		BaseDamageMin:  item.WeaponDamageMin,
-		BaseDamageMax:  item.WeaponDamageMax,
-		SwingSpeed:     item.SwingSpeed,
-		SwingDuration:  time.Duration(item.SwingSpeed * float64(time.Second)),
-		CritMultiplier: critMultiplier,
+		BaseDamageMin:        item.WeaponDamageMin,
+		BaseDamageMax:        item.WeaponDamageMax,
+		SwingSpeed:           item.SwingSpeed,
+		NormalizedSwingSpeed: normalizedWeaponSpeed,
+		SwingDuration:        time.Duration(item.SwingSpeed * float64(time.Second)),
+		CritMultiplier:       critMultiplier,
 	}
 }
 
@@ -78,14 +90,20 @@ func (weapon Weapon) BaseDamage(sim *Simulation) float64 {
 	return weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("melee")
 }
 
-func (weapon Weapon) calculateSwingDamage(sim *Simulation, attackPower float64) float64 {
+func (weapon Weapon) calculateWeaponDamage(sim *Simulation, attackPower float64) float64 {
 	return weapon.BaseDamage(sim) + (weapon.SwingSpeed*attackPower)/MeleeAttackRatingPerDamage
+}
+
+func (weapon Weapon) calculateNormalizedWeaponDamage(sim *Simulation, attackPower float64) float64 {
+	return weapon.BaseDamage(sim) + (weapon.NormalizedSwingSpeed*attackPower)/MeleeAttackRatingPerDamage
 }
 
 type MeleeDamageCalculator func(attackPower float64, bonusWeaponDamage float64) float64
 
 // If MainHand or Offhand is non-zero the associated ability will create a weapon swing.
 type WeaponDamageInput struct {
+	Normalized bool // If set, uses normalized damage
+
 	DamageMultiplier float64 // Damage multiplier on weapon damage.
 	FlatDamageBonus  float64 // Flat bonus added to swing.
 
@@ -187,15 +205,27 @@ func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell
 		dmg += ahe.WeaponInput.CalculateDamage(attackPower, bonusWeaponDamage)
 	} else if ahe.WeaponInput.DamageMultiplier != 0 {
 		// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
-		if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-			dmg += character.AutoAttacks.Ranged.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
-		} else if ahe.IsMH() {
-			dmg += character.AutoAttacks.MH.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
+		// TODO not all weapon damage based attacks "scale" with +bonusWeaponDamage (e.g. Devastate, Shiv, Mutilate don't)
+		if ahe.WeaponInput.Normalized {
+			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+				dmg += character.AutoAttacks.Ranged.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
+			} else if ahe.IsMH() {
+				dmg += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
+			} else {
+				dmg += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower)*0.5 + bonusWeaponDamage
+			}
 		} else {
-			dmg += character.AutoAttacks.OH.calculateSwingDamage(sim, attackPower)*0.5 + bonusWeaponDamage
+			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+				dmg += character.AutoAttacks.Ranged.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
+			} else if ahe.IsMH() {
+				dmg += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
+			} else {
+				dmg += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower)*0.5 + bonusWeaponDamage
+			}
 		}
-		dmg *= ahe.WeaponInput.DamageMultiplier
+
 		dmg += ahe.WeaponInput.FlatDamageBonus
+		dmg *= ahe.WeaponInput.DamageMultiplier
 	}
 
 	//if sim.Log != nil {
@@ -217,6 +247,7 @@ func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell
 	if ahe.Outcome == OutcomeCrit {
 		dmg *= ability.CritMultiplier
 	} else if ahe.Outcome == OutcomeGlance {
+		// TODO glancing blow damage reduction is actually a range ([65%, 85%] vs. 73)
 		dmg *= 0.75
 	}
 
