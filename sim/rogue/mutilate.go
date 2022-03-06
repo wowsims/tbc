@@ -33,8 +33,9 @@ func (rogue *Rogue) newMutilateTemplate(sim *core.Simulation) core.SimpleSpellTe
 			ThreatMultiplier:       1,
 		},
 		WeaponInput: core.WeaponDamageInput{
-			DamageMultiplier: 1,
+			Normalized:       true,
 			FlatDamageBonus:  101,
+			DamageMultiplier: 1,
 		},
 	}
 

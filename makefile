@@ -4,6 +4,12 @@ rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(su
 OUT_DIR=dist/tbc
 GOROOT:=$(shell go env GOROOT)
 
+ifeq ($(shell go env GOOS),darwin)
+    SED:=sed -i "" -E -e
+else
+    SED:=sed -i -E -e
+endif
+
 # Make everything. Keep this first so it's the default rule.
 $(OUT_DIR): ui_shared balance_druid elemental_shaman enhancement_shaman hunter mage rogue shadow_priest warrior retribution_paladin raid
 
@@ -47,8 +53,8 @@ host: $(OUT_DIR)
 ui/core/proto/api.ts: proto/*.proto node_modules
 	mkdir -p $(OUT_DIR)/protobuf-ts
 	cp -r node_modules/@protobuf-ts/runtime/build/es2015/* $(OUT_DIR)/protobuf-ts
-	sed -i -E "s/from '(.*)';/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*
-	sed -i -E "s/from \"(.*)\";/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*
+	$(SED) "s/from '(.*)';/from '\1.js';/g" $(OUT_DIR)/protobuf-ts/*.js
+	$(SED) "s/from \"(.*)\";/from '\1.js';/g" $(OUT_DIR)/protobuf-ts/*.js
 	npx protoc --ts_opt generate_dependencies --ts_out ui/core/proto --proto_path proto proto/api.proto
 	npx protoc --ts_out ui/core/proto --proto_path proto proto/test.proto
 	npx protoc --ts_out ui/core/proto --proto_path proto proto/ui.proto
@@ -58,8 +64,8 @@ node_modules: package-lock.json
 
 $(OUT_DIR)/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/proto/api.ts
 	npx tsc -p ui/core
-	sed -i 's/@protobuf-ts\/runtime/\/tbc\/protobuf-ts\/index/g' $(OUT_DIR)/core/proto/*.js
-	sed -i -E "s/from \"(.*?)(\.js)?\";/from '\1\.js';/g" $(OUT_DIR)/core/proto/*.js
+	$(SED) 's#@protobuf-ts/runtime#/tbc/protobuf-ts/index#g' $(OUT_DIR)/core/proto/*.js
+	$(SED) "s/from \"(.*)\";/from '\1.js';/g" $(OUT_DIR)/core/proto/*.js
 
 # Generic rule for hosting any class directory
 host_%: ui_shared %

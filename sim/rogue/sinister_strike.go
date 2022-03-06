@@ -53,8 +53,9 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.SimpleS
 				},
 			},
 			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 1,
+				Normalized:       true,
 				FlatDamageBonus:  98,
+				DamageMultiplier: 1,
 			},
 		},
 	}

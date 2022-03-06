@@ -146,27 +146,28 @@ func (cast *Cast) init(sim *Simulation) {
 // Start casting the spell. Return value indicates whether the spell successfully
 // started casting.
 func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) bool {
-
-	switch cast.Cost.Type {
-	case stats.Mana:
-		if cast.Character.CurrentMana() < cast.Cost.Value {
-			if sim.Log != nil {
-				cast.Character.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.03f, Mana Cost = %0.03f)",
-					cast.ActionID, cast.Character.CurrentMana(), cast.Cost.Value)
+	if cast.Cost.Value > 0 {
+		switch cast.Cost.Type {
+		case stats.Mana:
+			if cast.Character.CurrentMana() < cast.Cost.Value {
+				if sim.Log != nil {
+					cast.Character.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.03f, Mana Cost = %0.03f)",
+						cast.ActionID, cast.Character.CurrentMana(), cast.Cost.Value)
+				}
+				cast.objectInUse = false
+				return false
 			}
-			cast.objectInUse = false
-			return false
+		case stats.Rage:
+			if cast.Character.CurrentRage() < cast.Cost.Value {
+				return false
+			}
+			cast.Character.SpendRage(sim, cast.Cost.Value, cast.ActionID)
+		case stats.Energy:
+			if cast.Character.CurrentEnergy() < cast.Cost.Value {
+				return false
+			}
+			cast.Character.SpendEnergy(sim, cast.Cost.Value, cast.ActionID)
 		}
-	case stats.Rage:
-		if cast.Character.CurrentRage() < cast.Cost.Value {
-			return false
-		}
-		cast.Character.SpendRage(sim, cast.Cost.Value, cast.ActionID)
-	case stats.Energy:
-		if cast.Character.CurrentEnergy() < cast.Cost.Value {
-			return false
-		}
-		cast.Character.SpendEnergy(sim, cast.Cost.Value, cast.ActionID)
 	}
 
 	if sim.Log != nil {
