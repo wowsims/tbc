@@ -130,6 +130,9 @@ $combo-points-color: #ffa07a;
 	color: white;
 	display: flex;
 }
+.rotation-hidden-ids {
+	margin: 10px !important;
+}
 .rotation-row {
 	height: 28px;
 	margin: 2px 0;
@@ -143,6 +146,20 @@ $combo-points-color: #ffa07a;
 	font-weight: bold;
 	display: flex;
 	align-items: center;
+	color: white;
+}
+.rotation-label .fas {
+	margin: 1px;
+	cursor: pointer;
+	color: #ffefd5;
+}
+.rotation-label .fas:hover {
+	color: yellow;
+}
+.rotation-label-hidden {
+	display: inline-flex;
+	border: 1px solid white;
+	margin: 3px;
 }
 .rotation-label-icon {
 	@include wowhead-background-icon;
