@@ -1,5 +1,6 @@
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
+import { Conjured } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
@@ -28,6 +29,35 @@ export declare const StartingPotion: {
     };
 };
 export declare const NumStartingPotions: {
+    type: "number";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (player: Player<any>) => TypedEvent<void>;
+        getValue: (player: Player<any>) => number;
+        setValue: (eventID: EventID, player: Player<any>, newValue: number) => void;
+        enableWhen: (player: Player<any>) => boolean;
+    };
+};
+export declare const StartingConjured: {
+    type: "enum";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        values: {
+            name: string;
+            value: Conjured;
+        }[];
+        changedEvent: (player: Player<any>) => TypedEvent<void>;
+        getValue: (player: Player<any>) => Conjured;
+        setValue: (eventID: EventID, player: Player<any>, newValue: number) => void;
+    };
+};
+export declare const NumStartingConjured: {
     type: "number";
     getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
     config: {

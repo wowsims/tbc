@@ -1,5 +1,6 @@
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
+import { Conjured } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { StrengthOfEarthType } from '/tbc/core/proto/common.js';
@@ -103,6 +104,50 @@ export const NumStartingPotions = {
             player.setConsumes(eventID, newConsumes);
         },
         enableWhen: (player) => player.getConsumes().startingPotion != Potions.UnknownPotion,
+    },
+};
+export const StartingConjured = {
+    type: 'enum',
+    getModObject: (simUI) => simUI.player,
+    config: {
+        extraCssClasses: [
+            'starting-conjured-picker',
+        ],
+        label: 'Starting Conjured',
+        labelTooltip: 'If set, this conjured will be used instead of the default conjured for the first few uses.',
+        values: [
+            { name: 'None', value: Conjured.ConjuredUnknown },
+            { name: 'Dark Rune', value: Conjured.ConjuredDarkRune },
+            { name: 'Flame Cap', value: Conjured.ConjuredFlameCap },
+            { name: 'Mana Gem', value: Conjured.ConjuredMageManaEmerald },
+            { name: 'Thistle Tea', value: Conjured.ConjuredRogueThistleTea },
+        ],
+        changedEvent: (player) => player.consumesChangeEmitter,
+        getValue: (player) => player.getConsumes().startingConjured,
+        setValue: (eventID, player, newValue) => {
+            const newConsumes = player.getConsumes();
+            newConsumes.startingConjured = newValue;
+            player.setConsumes(eventID, newConsumes);
+        },
+    },
+};
+export const NumStartingConjured = {
+    type: 'number',
+    getModObject: (simUI) => simUI.player,
+    config: {
+        extraCssClasses: [
+            'num-starting-conjureds-picker',
+        ],
+        label: '# to use',
+        labelTooltip: 'The number of starting conjured items to use before going back to the default conjured.',
+        changedEvent: (player) => player.consumesChangeEmitter,
+        getValue: (player) => player.getConsumes().numStartingConjured,
+        setValue: (eventID, player, newValue) => {
+            const newConsumes = player.getConsumes();
+            newConsumes.numStartingConjured = newValue;
+            player.setConsumes(eventID, newConsumes);
+        },
+        enableWhen: (player) => player.getConsumes().startingConjured != Conjured.ConjuredUnknown,
     },
 };
 export const ShadowPriestDPS = {

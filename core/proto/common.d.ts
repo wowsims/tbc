@@ -207,82 +207,13 @@ export interface IndividualBuffs {
  */
 export interface Consumes {
     /**
-     * Deprecated in favor of flask.
-     * Remove on 3/4/2022 (1 month).
-     *
-     * @generated from protobuf field: bool flask_of_blinding_light = 1;
-     */
-    flaskOfBlindingLight: boolean;
-    /**
-     * @generated from protobuf field: bool flask_of_mighty_restoration = 2;
-     */
-    flaskOfMightyRestoration: boolean;
-    /**
-     * @generated from protobuf field: bool flask_of_pure_death = 3;
-     */
-    flaskOfPureDeath: boolean;
-    /**
-     * @generated from protobuf field: bool flask_of_supreme_power = 4;
-     */
-    flaskOfSupremePower: boolean;
-    /**
-     * @generated from protobuf field: bool flask_of_relentless_assault = 21;
-     */
-    flaskOfRelentlessAssault: boolean;
-    /**
      * @generated from protobuf field: proto.Flask flask = 38;
      */
     flask: Flask;
     /**
-     * Deprecated in favor of battle_elixir.
-     * Remove on 3/4/2022 (1 month).
-     *
-     * @generated from protobuf field: bool adepts_elixir = 5;
-     */
-    adeptsElixir: boolean;
-    /**
-     * @generated from protobuf field: bool elixir_of_major_fire_power = 6;
-     */
-    elixirOfMajorFirePower: boolean;
-    /**
-     * @generated from protobuf field: bool elixir_of_major_frost_power = 7;
-     */
-    elixirOfMajorFrostPower: boolean;
-    /**
-     * @generated from protobuf field: bool elixir_of_major_shadow_power = 8;
-     */
-    elixirOfMajorShadowPower: boolean;
-    /**
-     * @generated from protobuf field: bool elixir_of_major_agility = 22;
-     */
-    elixirOfMajorAgility: boolean;
-    /**
-     * @generated from protobuf field: bool elixir_of_major_strength = 31;
-     */
-    elixirOfMajorStrength: boolean;
-    /**
-     * @generated from protobuf field: bool elixir_of_demonslaying = 23;
-     */
-    elixirOfDemonslaying: boolean;
-    /**
-     * @generated from protobuf field: bool elixir_of_the_mongoose = 30;
-     */
-    elixirOfTheMongoose: boolean;
-    /**
      * @generated from protobuf field: proto.BattleElixir battle_elixir = 39;
      */
     battleElixir: BattleElixir;
-    /**
-     * Deprecated in favor of guardian_elixir.
-     * Remove on 3/4/2022 (1 month).
-     *
-     * @generated from protobuf field: bool elixir_of_draenic_wisdom = 9;
-     */
-    elixirOfDraenicWisdom: boolean;
-    /**
-     * @generated from protobuf field: bool elixir_of_major_mageblood = 10;
-     */
-    elixirOfMajorMageblood: boolean;
     /**
      * @generated from protobuf field: proto.GuardianElixir guardian_elixir = 40;
      */
@@ -296,33 +227,6 @@ export interface Consumes {
      */
     offHandImbue: WeaponImbue;
     /**
-     * Deprecated in favor of food.
-     * Remove on 3/4/2022 (1 month).
-     *
-     * @generated from protobuf field: bool blackened_basilisk = 13;
-     */
-    blackenedBasilisk: boolean;
-    /**
-     * @generated from protobuf field: bool skullfish_soup = 14;
-     */
-    skullfishSoup: boolean;
-    /**
-     * @generated from protobuf field: bool roasted_clefthoof = 24;
-     */
-    roastedClefthoof: boolean;
-    /**
-     * @generated from protobuf field: bool spicy_hot_talbuk = 29;
-     */
-    spicyHotTalbuk: boolean;
-    /**
-     * @generated from protobuf field: bool grilled_mudfish = 35;
-     */
-    grilledMudfish: boolean;
-    /**
-     * @generated from protobuf field: bool ravager_dog = 36;
-     */
-    ravagerDog: boolean;
-    /**
      * @generated from protobuf field: proto.Food food = 41;
      */
     food: Food;
@@ -331,31 +235,9 @@ export interface Consumes {
      */
     petFood: PetFood;
     /**
-     * Deprecated in favor of alchohol.
-     * Remove on 3/4/2022 (1 month).
-     *
-     * @generated from protobuf field: bool kreegsStoutBeatdown = 20;
-     */
-    kreegsStoutBeatdown: boolean;
-    /**
      * @generated from protobuf field: proto.Alchohol alchohol = 42;
      */
     alchohol: Alchohol;
-    /**
-     * Deprecated in favor of int32 versions below.
-     * Remove on 3/4/2022 (1 month).
-     *
-     * @generated from protobuf field: bool scroll_of_strength_v = 25;
-     */
-    scrollOfStrengthV: boolean;
-    /**
-     * @generated from protobuf field: bool scroll_of_agility_v = 26;
-     */
-    scrollOfAgilityV: boolean;
-    /**
-     * @generated from protobuf field: bool scroll_of_spirit_v = 28;
-     */
-    scrollOfSpiritV: boolean;
     /**
      * 0 means no scroll, otherwise value is the scroll level.
      * E.g. 5 indicates Scroll of Agility V.
@@ -395,6 +277,14 @@ export interface Consumes {
      * @generated from protobuf field: proto.Conjured default_conjured = 27;
      */
     defaultConjured: Conjured;
+    /**
+     * @generated from protobuf field: proto.Conjured starting_conjured = 48;
+     */
+    startingConjured: Conjured;
+    /**
+     * @generated from protobuf field: int32 num_starting_conjured = 49;
+     */
+    numStartingConjured: number;
     /**
      * @generated from protobuf field: proto.Drums drums = 19;
      */

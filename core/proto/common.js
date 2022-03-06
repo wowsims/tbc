@@ -1488,39 +1488,14 @@ export const IndividualBuffs = new IndividualBuffs$Type();
 class Consumes$Type extends MessageType {
     constructor() {
         super("proto.Consumes", [
-            { no: 1, name: "flask_of_blinding_light", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "flask_of_mighty_restoration", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "flask_of_pure_death", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "flask_of_supreme_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 21, name: "flask_of_relentless_assault", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 38, name: "flask", kind: "enum", T: () => ["proto.Flask", Flask] },
-            { no: 5, name: "adepts_elixir", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 6, name: "elixir_of_major_fire_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 7, name: "elixir_of_major_frost_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 8, name: "elixir_of_major_shadow_power", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 22, name: "elixir_of_major_agility", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 31, name: "elixir_of_major_strength", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 23, name: "elixir_of_demonslaying", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 30, name: "elixir_of_the_mongoose", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 39, name: "battle_elixir", kind: "enum", T: () => ["proto.BattleElixir", BattleElixir] },
-            { no: 9, name: "elixir_of_draenic_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 10, name: "elixir_of_major_mageblood", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 40, name: "guardian_elixir", kind: "enum", T: () => ["proto.GuardianElixir", GuardianElixir] },
             { no: 32, name: "main_hand_imbue", kind: "enum", T: () => ["proto.WeaponImbue", WeaponImbue] },
             { no: 33, name: "off_hand_imbue", kind: "enum", T: () => ["proto.WeaponImbue", WeaponImbue] },
-            { no: 13, name: "blackened_basilisk", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 14, name: "skullfish_soup", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 24, name: "roasted_clefthoof", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 29, name: "spicy_hot_talbuk", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 35, name: "grilled_mudfish", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 36, name: "ravager_dog", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 41, name: "food", kind: "enum", T: () => ["proto.Food", Food] },
             { no: 37, name: "pet_food", kind: "enum", T: () => ["proto.PetFood", PetFood] },
-            { no: 20, name: "kreegsStoutBeatdown", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 42, name: "alchohol", kind: "enum", T: () => ["proto.Alchohol", Alchohol] },
-            { no: 25, name: "scroll_of_strength_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 26, name: "scroll_of_agility_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 28, name: "scroll_of_spirit_v", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 44, name: "scroll_of_agility", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 43, name: "scroll_of_strength", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 45, name: "scroll_of_spirit", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -1530,12 +1505,14 @@ class Consumes$Type extends MessageType {
             { no: 16, name: "starting_potion", kind: "enum", T: () => ["proto.Potions", Potions] },
             { no: 17, name: "num_starting_potions", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 27, name: "default_conjured", kind: "enum", T: () => ["proto.Conjured", Conjured] },
+            { no: 48, name: "starting_conjured", kind: "enum", T: () => ["proto.Conjured", Conjured] },
+            { no: 49, name: "num_starting_conjured", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 19, name: "drums", kind: "enum", T: () => ["proto.Drums", Drums] },
             { no: 34, name: "battle_chicken", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { flaskOfBlindingLight: false, flaskOfMightyRestoration: false, flaskOfPureDeath: false, flaskOfSupremePower: false, flaskOfRelentlessAssault: false, flask: 0, adeptsElixir: false, elixirOfMajorFirePower: false, elixirOfMajorFrostPower: false, elixirOfMajorShadowPower: false, elixirOfMajorAgility: false, elixirOfMajorStrength: false, elixirOfDemonslaying: false, elixirOfTheMongoose: false, battleElixir: 0, elixirOfDraenicWisdom: false, elixirOfMajorMageblood: false, guardianElixir: 0, mainHandImbue: 0, offHandImbue: 0, blackenedBasilisk: false, skullfishSoup: false, roastedClefthoof: false, spicyHotTalbuk: false, grilledMudfish: false, ravagerDog: false, food: 0, petFood: 0, kreegsStoutBeatdown: false, alchohol: 0, scrollOfStrengthV: false, scrollOfAgilityV: false, scrollOfSpiritV: false, scrollOfAgility: 0, scrollOfStrength: 0, scrollOfSpirit: 0, petScrollOfAgility: 0, petScrollOfStrength: 0, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, drums: 0, battleChicken: false };
+        const message = { flask: 0, battleElixir: 0, guardianElixir: 0, mainHandImbue: 0, offHandImbue: 0, food: 0, petFood: 0, alchohol: 0, scrollOfAgility: 0, scrollOfStrength: 0, scrollOfSpirit: 0, petScrollOfAgility: 0, petScrollOfStrength: 0, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, startingConjured: 0, numStartingConjured: 0, drums: 0, battleChicken: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1546,56 +1523,11 @@ class Consumes$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* bool flask_of_blinding_light */ 1:
-                    message.flaskOfBlindingLight = reader.bool();
-                    break;
-                case /* bool flask_of_mighty_restoration */ 2:
-                    message.flaskOfMightyRestoration = reader.bool();
-                    break;
-                case /* bool flask_of_pure_death */ 3:
-                    message.flaskOfPureDeath = reader.bool();
-                    break;
-                case /* bool flask_of_supreme_power */ 4:
-                    message.flaskOfSupremePower = reader.bool();
-                    break;
-                case /* bool flask_of_relentless_assault */ 21:
-                    message.flaskOfRelentlessAssault = reader.bool();
-                    break;
                 case /* proto.Flask flask */ 38:
                     message.flask = reader.int32();
                     break;
-                case /* bool adepts_elixir */ 5:
-                    message.adeptsElixir = reader.bool();
-                    break;
-                case /* bool elixir_of_major_fire_power */ 6:
-                    message.elixirOfMajorFirePower = reader.bool();
-                    break;
-                case /* bool elixir_of_major_frost_power */ 7:
-                    message.elixirOfMajorFrostPower = reader.bool();
-                    break;
-                case /* bool elixir_of_major_shadow_power */ 8:
-                    message.elixirOfMajorShadowPower = reader.bool();
-                    break;
-                case /* bool elixir_of_major_agility */ 22:
-                    message.elixirOfMajorAgility = reader.bool();
-                    break;
-                case /* bool elixir_of_major_strength */ 31:
-                    message.elixirOfMajorStrength = reader.bool();
-                    break;
-                case /* bool elixir_of_demonslaying */ 23:
-                    message.elixirOfDemonslaying = reader.bool();
-                    break;
-                case /* bool elixir_of_the_mongoose */ 30:
-                    message.elixirOfTheMongoose = reader.bool();
-                    break;
                 case /* proto.BattleElixir battle_elixir */ 39:
                     message.battleElixir = reader.int32();
-                    break;
-                case /* bool elixir_of_draenic_wisdom */ 9:
-                    message.elixirOfDraenicWisdom = reader.bool();
-                    break;
-                case /* bool elixir_of_major_mageblood */ 10:
-                    message.elixirOfMajorMageblood = reader.bool();
                     break;
                 case /* proto.GuardianElixir guardian_elixir */ 40:
                     message.guardianElixir = reader.int32();
@@ -1606,44 +1538,14 @@ class Consumes$Type extends MessageType {
                 case /* proto.WeaponImbue off_hand_imbue */ 33:
                     message.offHandImbue = reader.int32();
                     break;
-                case /* bool blackened_basilisk */ 13:
-                    message.blackenedBasilisk = reader.bool();
-                    break;
-                case /* bool skullfish_soup */ 14:
-                    message.skullfishSoup = reader.bool();
-                    break;
-                case /* bool roasted_clefthoof */ 24:
-                    message.roastedClefthoof = reader.bool();
-                    break;
-                case /* bool spicy_hot_talbuk */ 29:
-                    message.spicyHotTalbuk = reader.bool();
-                    break;
-                case /* bool grilled_mudfish */ 35:
-                    message.grilledMudfish = reader.bool();
-                    break;
-                case /* bool ravager_dog */ 36:
-                    message.ravagerDog = reader.bool();
-                    break;
                 case /* proto.Food food */ 41:
                     message.food = reader.int32();
                     break;
                 case /* proto.PetFood pet_food */ 37:
                     message.petFood = reader.int32();
                     break;
-                case /* bool kreegsStoutBeatdown */ 20:
-                    message.kreegsStoutBeatdown = reader.bool();
-                    break;
                 case /* proto.Alchohol alchohol */ 42:
                     message.alchohol = reader.int32();
-                    break;
-                case /* bool scroll_of_strength_v */ 25:
-                    message.scrollOfStrengthV = reader.bool();
-                    break;
-                case /* bool scroll_of_agility_v */ 26:
-                    message.scrollOfAgilityV = reader.bool();
-                    break;
-                case /* bool scroll_of_spirit_v */ 28:
-                    message.scrollOfSpiritV = reader.bool();
                     break;
                 case /* int32 scroll_of_agility */ 44:
                     message.scrollOfAgility = reader.int32();
@@ -1672,6 +1574,12 @@ class Consumes$Type extends MessageType {
                 case /* proto.Conjured default_conjured */ 27:
                     message.defaultConjured = reader.int32();
                     break;
+                case /* proto.Conjured starting_conjured */ 48:
+                    message.startingConjured = reader.int32();
+                    break;
+                case /* int32 num_starting_conjured */ 49:
+                    message.numStartingConjured = reader.int32();
+                    break;
                 case /* proto.Drums drums */ 19:
                     message.drums = reader.int32();
                     break;
@@ -1690,57 +1598,12 @@ class Consumes$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* bool flask_of_blinding_light = 1; */
-        if (message.flaskOfBlindingLight !== false)
-            writer.tag(1, WireType.Varint).bool(message.flaskOfBlindingLight);
-        /* bool flask_of_mighty_restoration = 2; */
-        if (message.flaskOfMightyRestoration !== false)
-            writer.tag(2, WireType.Varint).bool(message.flaskOfMightyRestoration);
-        /* bool flask_of_pure_death = 3; */
-        if (message.flaskOfPureDeath !== false)
-            writer.tag(3, WireType.Varint).bool(message.flaskOfPureDeath);
-        /* bool flask_of_supreme_power = 4; */
-        if (message.flaskOfSupremePower !== false)
-            writer.tag(4, WireType.Varint).bool(message.flaskOfSupremePower);
-        /* bool flask_of_relentless_assault = 21; */
-        if (message.flaskOfRelentlessAssault !== false)
-            writer.tag(21, WireType.Varint).bool(message.flaskOfRelentlessAssault);
         /* proto.Flask flask = 38; */
         if (message.flask !== 0)
             writer.tag(38, WireType.Varint).int32(message.flask);
-        /* bool adepts_elixir = 5; */
-        if (message.adeptsElixir !== false)
-            writer.tag(5, WireType.Varint).bool(message.adeptsElixir);
-        /* bool elixir_of_major_fire_power = 6; */
-        if (message.elixirOfMajorFirePower !== false)
-            writer.tag(6, WireType.Varint).bool(message.elixirOfMajorFirePower);
-        /* bool elixir_of_major_frost_power = 7; */
-        if (message.elixirOfMajorFrostPower !== false)
-            writer.tag(7, WireType.Varint).bool(message.elixirOfMajorFrostPower);
-        /* bool elixir_of_major_shadow_power = 8; */
-        if (message.elixirOfMajorShadowPower !== false)
-            writer.tag(8, WireType.Varint).bool(message.elixirOfMajorShadowPower);
-        /* bool elixir_of_major_agility = 22; */
-        if (message.elixirOfMajorAgility !== false)
-            writer.tag(22, WireType.Varint).bool(message.elixirOfMajorAgility);
-        /* bool elixir_of_major_strength = 31; */
-        if (message.elixirOfMajorStrength !== false)
-            writer.tag(31, WireType.Varint).bool(message.elixirOfMajorStrength);
-        /* bool elixir_of_demonslaying = 23; */
-        if (message.elixirOfDemonslaying !== false)
-            writer.tag(23, WireType.Varint).bool(message.elixirOfDemonslaying);
-        /* bool elixir_of_the_mongoose = 30; */
-        if (message.elixirOfTheMongoose !== false)
-            writer.tag(30, WireType.Varint).bool(message.elixirOfTheMongoose);
         /* proto.BattleElixir battle_elixir = 39; */
         if (message.battleElixir !== 0)
             writer.tag(39, WireType.Varint).int32(message.battleElixir);
-        /* bool elixir_of_draenic_wisdom = 9; */
-        if (message.elixirOfDraenicWisdom !== false)
-            writer.tag(9, WireType.Varint).bool(message.elixirOfDraenicWisdom);
-        /* bool elixir_of_major_mageblood = 10; */
-        if (message.elixirOfMajorMageblood !== false)
-            writer.tag(10, WireType.Varint).bool(message.elixirOfMajorMageblood);
         /* proto.GuardianElixir guardian_elixir = 40; */
         if (message.guardianElixir !== 0)
             writer.tag(40, WireType.Varint).int32(message.guardianElixir);
@@ -1750,45 +1613,15 @@ class Consumes$Type extends MessageType {
         /* proto.WeaponImbue off_hand_imbue = 33; */
         if (message.offHandImbue !== 0)
             writer.tag(33, WireType.Varint).int32(message.offHandImbue);
-        /* bool blackened_basilisk = 13; */
-        if (message.blackenedBasilisk !== false)
-            writer.tag(13, WireType.Varint).bool(message.blackenedBasilisk);
-        /* bool skullfish_soup = 14; */
-        if (message.skullfishSoup !== false)
-            writer.tag(14, WireType.Varint).bool(message.skullfishSoup);
-        /* bool roasted_clefthoof = 24; */
-        if (message.roastedClefthoof !== false)
-            writer.tag(24, WireType.Varint).bool(message.roastedClefthoof);
-        /* bool spicy_hot_talbuk = 29; */
-        if (message.spicyHotTalbuk !== false)
-            writer.tag(29, WireType.Varint).bool(message.spicyHotTalbuk);
-        /* bool grilled_mudfish = 35; */
-        if (message.grilledMudfish !== false)
-            writer.tag(35, WireType.Varint).bool(message.grilledMudfish);
-        /* bool ravager_dog = 36; */
-        if (message.ravagerDog !== false)
-            writer.tag(36, WireType.Varint).bool(message.ravagerDog);
         /* proto.Food food = 41; */
         if (message.food !== 0)
             writer.tag(41, WireType.Varint).int32(message.food);
         /* proto.PetFood pet_food = 37; */
         if (message.petFood !== 0)
             writer.tag(37, WireType.Varint).int32(message.petFood);
-        /* bool kreegsStoutBeatdown = 20; */
-        if (message.kreegsStoutBeatdown !== false)
-            writer.tag(20, WireType.Varint).bool(message.kreegsStoutBeatdown);
         /* proto.Alchohol alchohol = 42; */
         if (message.alchohol !== 0)
             writer.tag(42, WireType.Varint).int32(message.alchohol);
-        /* bool scroll_of_strength_v = 25; */
-        if (message.scrollOfStrengthV !== false)
-            writer.tag(25, WireType.Varint).bool(message.scrollOfStrengthV);
-        /* bool scroll_of_agility_v = 26; */
-        if (message.scrollOfAgilityV !== false)
-            writer.tag(26, WireType.Varint).bool(message.scrollOfAgilityV);
-        /* bool scroll_of_spirit_v = 28; */
-        if (message.scrollOfSpiritV !== false)
-            writer.tag(28, WireType.Varint).bool(message.scrollOfSpiritV);
         /* int32 scroll_of_agility = 44; */
         if (message.scrollOfAgility !== 0)
             writer.tag(44, WireType.Varint).int32(message.scrollOfAgility);
@@ -1816,6 +1649,12 @@ class Consumes$Type extends MessageType {
         /* proto.Conjured default_conjured = 27; */
         if (message.defaultConjured !== 0)
             writer.tag(27, WireType.Varint).int32(message.defaultConjured);
+        /* proto.Conjured starting_conjured = 48; */
+        if (message.startingConjured !== 0)
+            writer.tag(48, WireType.Varint).int32(message.startingConjured);
+        /* int32 num_starting_conjured = 49; */
+        if (message.numStartingConjured !== 0)
+            writer.tag(49, WireType.Varint).int32(message.numStartingConjured);
         /* proto.Drums drums = 19; */
         if (message.drums !== 0)
             writer.tag(19, WireType.Varint).int32(message.drums);

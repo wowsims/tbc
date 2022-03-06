@@ -186,8 +186,8 @@ export class RogueSimUI extends IndividualSimUI {
             // Inputs to include in the 'Other' section on the settings tab.
             otherInputs: {
                 inputs: [
-                    OtherInputs.StartingPotion,
-                    OtherInputs.NumStartingPotions,
+                    OtherInputs.StartingConjured,
+                    OtherInputs.NumStartingConjured,
                     OtherInputs.ExposeWeaknessUptime,
                     OtherInputs.ExposeWeaknessHunterAgility,
                     OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
