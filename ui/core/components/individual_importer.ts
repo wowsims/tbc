@@ -73,6 +73,7 @@ export class IndividualImporter<SpecType extends Spec> extends Component {
 
 		new CloseButton(this.rootElem, () => {
 			$('#individualImporter').bPopup().close();
+			this.rootElem.remove();
 		});
 
 		$('#individualImporter').bPopup({

@@ -1,0 +1,20 @@
+.settings-menu {
+	@include vertical-horizontal-center;
+	min-width: 50%;
+	padding: 8px;
+	background-color: #111218;
+	border: 1px solid var(--theme-color-primary);
+	border-radius: 6px;
+  max-width: 100%;
+	color: white;
+}
+
+.settings-menu-title {
+	text-align: center;
+	margin: 20px;
+	font-size: 24px;
+}
+
+.settings-menu-content {
+	margin: 20px;
+}

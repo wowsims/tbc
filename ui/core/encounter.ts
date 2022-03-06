@@ -8,8 +8,8 @@ import { EventID, TypedEvent } from './typed_event.js';
 export class Encounter {
 	private readonly sim: Sim;
 
-  private duration: number = 300;
-  private durationVariation: number = 0;
+  private duration: number = 180;
+  private durationVariation: number = 5;
   private numTargets: number = 1;
   private executeProportion: number = 0.2;
 	readonly primaryTarget: Target;

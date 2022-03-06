@@ -63,6 +63,7 @@ export class Sim {
 
 	private iterations: number = 3000;
   private phase: number = OtherConstants.CURRENT_PHASE;
+	private fixedRngSeed: number = 0;
   private show1hWeapons: boolean = true;
   private show2hWeapons: boolean = true;
   private showMatchingGems: boolean = true;
@@ -77,6 +78,8 @@ export class Sim {
 
   readonly iterationsChangeEmitter = new TypedEvent<void>();
   readonly phaseChangeEmitter = new TypedEvent<void>();
+  readonly fixedRngSeedChangeEmitter = new TypedEvent<void>();
+  readonly lastUsedRngSeedChangeEmitter = new TypedEvent<void>();
   readonly show1hWeaponsChangeEmitter = new TypedEvent<void>();
   readonly show2hWeaponsChangeEmitter = new TypedEvent<void>();
   readonly showMatchingGemsChangeEmitter = new TypedEvent<void>();
@@ -88,6 +91,7 @@ export class Sim {
   readonly simResultEmitter = new TypedEvent<SimResult>();
 
 	private readonly _initPromise: Promise<void>;
+	private lastUsedRngSeed: number = 0;
 
 	// These callbacks are needed so we can apply BuffBot modifications automatically before sending requests.
 	private modifyRaidProto: ((raidProto: RaidProto) => void) = () => {};
@@ -109,6 +113,7 @@ export class Sim {
 		this.changeEmitter = TypedEvent.onAny([
       this.iterationsChangeEmitter,
       this.phaseChangeEmitter,
+      this.fixedRngSeedChangeEmitter,
       this.show1hWeaponsChangeEmitter,
       this.show2hWeaponsChangeEmitter,
       this.showMatchingGemsChangeEmitter,
@@ -162,6 +167,7 @@ export class Sim {
 			encounter: this.getModifiedEncounterProto(),
 			simOptions: SimOptions.create({
 				iterations: debug ? 1 : this.getIterations(),
+				randomSeed: BigInt(this.nextRngSeed()),
 				debugFirstIteration: true,
 			}),
 		});
@@ -248,6 +254,7 @@ export class Sim {
 				encounter: this.encounter.toProto(),
 				simOptions: SimOptions.create({
 					iterations: this.getIterations(),
+					randomSeed: BigInt(this.nextRngSeed()),
 					debug: false,
 				}),
 
@@ -301,6 +308,33 @@ export class Sim {
       this.phaseChangeEmitter.emit(eventID);
     }
   }
+  
+  getFixedRngSeed(): number {
+    return this.fixedRngSeed;
+  }
+  setFixedRngSeed(eventID: EventID, newFixedRngSeed: number) {
+    if (newFixedRngSeed != this.fixedRngSeed) {
+      this.fixedRngSeed = newFixedRngSeed;
+      this.fixedRngSeedChangeEmitter.emit(eventID);
+    }
+  }
+
+	private nextRngSeed(): number {
+		let rngSeed = 0;
+		if (this.fixedRngSeed) {
+			rngSeed = this.fixedRngSeed;
+		} else {
+			rngSeed = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+		}
+
+		this.lastUsedRngSeed = rngSeed;
+		this.lastUsedRngSeedChangeEmitter.emit(TypedEvent.nextEventID());
+		return rngSeed;
+	}
+	getLastUsedRngSeed(): number {
+		return this.lastUsedRngSeed;
+	}
+	
   
   getShow1hWeapons(): boolean {
     return this.show1hWeapons;
