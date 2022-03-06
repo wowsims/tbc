@@ -17,6 +17,7 @@ import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { IndividualImporter } from '/tbc/core/components/individual_importer.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
+import { MobType } from '/tbc/core/proto/common.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
@@ -25,8 +26,10 @@ import { SavedEncounter } from '/tbc/core/proto/ui.js';
 import { SavedGearSet } from '/tbc/core/proto/ui.js';
 import { SavedSettings } from '/tbc/core/proto/ui.js';
 import { SavedTalents } from '/tbc/core/proto/ui.js';
+import { SettingsMenu } from '/tbc/core/components/settings_menu.js';
 import { SimUI } from './sim_ui.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
 import { addStatWeightsAction } from '/tbc/core/components/stat_weights_action.js';
 import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
@@ -204,6 +207,16 @@ export class IndividualSimUI extends SimUI {
             }
         });
         this.addToolbarItem(shareLink);
+        const settingsMenu = document.createElement('span');
+        settingsMenu.classList.add('fas', 'fa-cog');
+        tippy(settingsMenu, {
+            'content': 'Settings',
+            'allowHTML': true,
+        });
+        settingsMenu.addEventListener('click', event => {
+            new SettingsMenu(this.rootElem, this);
+        });
+        this.addToolbarItem(settingsMenu);
     }
     addGearTab() {
         this.addTab('GEAR', 'gear-tab', `
@@ -634,15 +647,30 @@ export class IndividualSimUI extends SimUI {
         const logRunner = new LogRunner(this.rootElem.getElementsByClassName('log-runner')[0], this);
     }
     applyDefaults(eventID) {
-        this.player.setGear(eventID, this.sim.lookupEquipmentSpec(this.individualConfig.defaults.gear));
-        this.player.setConsumes(eventID, this.individualConfig.defaults.consumes);
-        this.player.setRotation(eventID, this.individualConfig.defaults.rotation);
-        this.player.setTalentsString(eventID, this.individualConfig.defaults.talents);
-        this.player.setSpecOptions(eventID, this.individualConfig.defaults.specOptions);
-        this.player.setBuffs(eventID, this.individualConfig.defaults.individualBuffs);
-        this.player.getParty().setBuffs(eventID, this.individualConfig.defaults.partyBuffs);
-        this.player.getRaid().setBuffs(eventID, this.individualConfig.defaults.raidBuffs);
-        this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
+        TypedEvent.freezeAllAndDo(() => {
+            this.player.setGear(eventID, this.sim.lookupEquipmentSpec(this.individualConfig.defaults.gear));
+            this.player.setConsumes(eventID, this.individualConfig.defaults.consumes);
+            this.player.setRotation(eventID, this.individualConfig.defaults.rotation);
+            this.player.setTalentsString(eventID, this.individualConfig.defaults.talents);
+            this.player.setSpecOptions(eventID, this.individualConfig.defaults.specOptions);
+            this.player.setBuffs(eventID, this.individualConfig.defaults.individualBuffs);
+            this.player.setCooldowns(eventID, Cooldowns.create());
+            this.player.getParty().setBuffs(eventID, this.individualConfig.defaults.partyBuffs);
+            this.player.getRaid().setBuffs(eventID, this.individualConfig.defaults.raidBuffs);
+            this.player.setEpWeights(this.individualConfig.defaults.epWeights);
+            this.sim.encounter.fromProto(eventID, EncounterProto.create({
+                duration: 180,
+                durationVariation: 5,
+                executeProportion: 0.2,
+                targets: [TargetProto.create({
+                        level: 73,
+                        armor: 7700,
+                        mobType: MobType.MobTypeDemon,
+                        debuffs: this.individualConfig.defaults.debuffs,
+                    })],
+            }));
+            this.sim.setIterations(eventID, 3000);
+        });
     }
     registerExclusiveEffect(effect) {
         effect.tags.forEach(tag => {

@@ -140,7 +140,7 @@ export declare abstract class IndividualSimUI<SpecType extends Spec> extends Sim
     private addTalentsTab;
     private addDetailedResultsTab;
     private addLogTab;
-    private applyDefaults;
+    applyDefaults(eventID: EventID): void;
     registerExclusiveEffect(effect: ExclusiveEffect): void;
     getSavedGearStorageKey(): string;
     getSavedRotationStorageKey(): string;

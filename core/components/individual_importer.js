@@ -59,6 +59,7 @@ export class IndividualImporter extends Component {
         this.rootElem.style.setProperty('--theme-color-background-raw', computedStyles.getPropertyValue('--theme-color-background-raw').trim());
         new CloseButton(this.rootElem, () => {
             $('#individualImporter').bPopup().close();
+            this.rootElem.remove();
         });
         $('#individualImporter').bPopup({
             closeClass: 'item-picker-close',

@@ -4,8 +4,8 @@ import { TypedEvent } from './typed_event.js';
 // Manages all the settings for an Encounter.
 export class Encounter {
     constructor(sim) {
-        this.duration = 300;
-        this.durationVariation = 0;
+        this.duration = 180;
+        this.durationVariation = 5;
         this.numTargets = 1;
         this.executeProportion = 0.2;
         this.durationChangeEmitter = new TypedEvent();

@@ -23,6 +23,7 @@ export class Sim {
     constructor() {
         this.iterations = 3000;
         this.phase = OtherConstants.CURRENT_PHASE;
+        this.fixedRngSeed = 0;
         this.show1hWeapons = true;
         this.show2hWeapons = true;
         this.showMatchingGems = true;
@@ -32,11 +33,14 @@ export class Sim {
         this.gems = {};
         this.iterationsChangeEmitter = new TypedEvent();
         this.phaseChangeEmitter = new TypedEvent();
+        this.fixedRngSeedChangeEmitter = new TypedEvent();
+        this.lastUsedRngSeedChangeEmitter = new TypedEvent();
         this.show1hWeaponsChangeEmitter = new TypedEvent();
         this.show2hWeaponsChangeEmitter = new TypedEvent();
         this.showMatchingGemsChangeEmitter = new TypedEvent();
         // Fires when a raid sim API call completes.
         this.simResultEmitter = new TypedEvent();
+        this.lastUsedRngSeed = 0;
         // These callbacks are needed so we can apply BuffBot modifications automatically before sending requests.
         this.modifyRaidProto = () => { };
         this.modifyEncounterProto = () => { };
@@ -51,6 +55,7 @@ export class Sim {
         this.changeEmitter = TypedEvent.onAny([
             this.iterationsChangeEmitter,
             this.phaseChangeEmitter,
+            this.fixedRngSeedChangeEmitter,
             this.show1hWeaponsChangeEmitter,
             this.show2hWeaponsChangeEmitter,
             this.showMatchingGemsChangeEmitter,
@@ -96,6 +101,7 @@ export class Sim {
             encounter: this.getModifiedEncounterProto(),
             simOptions: SimOptions.create({
                 iterations: debug ? 1 : this.getIterations(),
+                randomSeed: BigInt(this.nextRngSeed()),
                 debugFirstIteration: true,
             }),
         });
@@ -167,6 +173,7 @@ export class Sim {
                 encounter: this.encounter.toProto(),
                 simOptions: SimOptions.create({
                     iterations: this.getIterations(),
+                    randomSeed: BigInt(this.nextRngSeed()),
                     debug: false,
                 }),
                 statsToWeigh: epStats,
@@ -212,6 +219,30 @@ export class Sim {
             this.phase = newPhase;
             this.phaseChangeEmitter.emit(eventID);
         }
+    }
+    getFixedRngSeed() {
+        return this.fixedRngSeed;
+    }
+    setFixedRngSeed(eventID, newFixedRngSeed) {
+        if (newFixedRngSeed != this.fixedRngSeed) {
+            this.fixedRngSeed = newFixedRngSeed;
+            this.fixedRngSeedChangeEmitter.emit(eventID);
+        }
+    }
+    nextRngSeed() {
+        let rngSeed = 0;
+        if (this.fixedRngSeed) {
+            rngSeed = this.fixedRngSeed;
+        }
+        else {
+            rngSeed = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+        }
+        this.lastUsedRngSeed = rngSeed;
+        this.lastUsedRngSeedChangeEmitter.emit(TypedEvent.nextEventID());
+        return rngSeed;
+    }
+    getLastUsedRngSeed() {
+        return this.lastUsedRngSeed;
     }
     getShow1hWeapons() {
         return this.show1hWeapons;

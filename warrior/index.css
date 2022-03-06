@@ -1205,6 +1205,31 @@
   color: black;
 }
 
+.settings-menu {
+  margin: 0 !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  min-width: 50%;
+  padding: 8px;
+  background-color: #111218;
+  border: 1px solid var(--theme-color-primary);
+  border-radius: 6px;
+  max-width: 100%;
+  color: white;
+}
+
+.settings-menu-title {
+  text-align: center;
+  margin: 20px;
+  font-size: 24px;
+}
+
+.settings-menu-content {
+  margin: 20px;
+}
+
 :root {
   --theme-color-primary: DarkSlateGrey;
   --theme-color-background: DarkSlateGrey;

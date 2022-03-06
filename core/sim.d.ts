@@ -29,6 +29,7 @@ export declare class Sim {
     private readonly workerPool;
     private iterations;
     private phase;
+    private fixedRngSeed;
     private show1hWeapons;
     private show2hWeapons;
     private showMatchingGems;
@@ -39,12 +40,15 @@ export declare class Sim {
     private gems;
     readonly iterationsChangeEmitter: TypedEvent<void>;
     readonly phaseChangeEmitter: TypedEvent<void>;
+    readonly fixedRngSeedChangeEmitter: TypedEvent<void>;
+    readonly lastUsedRngSeedChangeEmitter: TypedEvent<void>;
     readonly show1hWeaponsChangeEmitter: TypedEvent<void>;
     readonly show2hWeaponsChangeEmitter: TypedEvent<void>;
     readonly showMatchingGemsChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     readonly simResultEmitter: TypedEvent<SimResult>;
     private readonly _initPromise;
+    private lastUsedRngSeed;
     private modifyRaidProto;
     private modifyEncounterProto;
     constructor();
@@ -65,6 +69,10 @@ export declare class Sim {
     getMatchingGems(socketColor: GemColor): Array<Gem>;
     getPhase(): number;
     setPhase(eventID: EventID, newPhase: number): void;
+    getFixedRngSeed(): number;
+    setFixedRngSeed(eventID: EventID, newFixedRngSeed: number): void;
+    private nextRngSeed;
+    getLastUsedRngSeed(): number;
     getShow1hWeapons(): boolean;
     setShow1hWeapons(eventID: EventID, newShow1hWeapons: boolean): void;
     getShow2hWeapons(): boolean;
