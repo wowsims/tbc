@@ -3,6 +3,7 @@ import { OtherAction } from '/tbc/core/proto/common.js';
 import { PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { ActionId, resourceTypeToIcon } from '/tbc/core/proto_utils/action_id.js';
 import { resourceColors, resourceNames } from '/tbc/core/proto_utils/names.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { bucket, distinct, getEnumValues, maxIndex, stringComparator, sum } from '/tbc/core/utils.js';
 
 import {
@@ -30,15 +31,21 @@ export class Timeline extends ResultComponent {
 	private readonly rotationPlotElem: HTMLElement;
 	private readonly rotationLabels: HTMLElement;
 	private readonly rotationTimeline: HTMLElement;
+	private readonly rotationHiddenIdsContainer: HTMLElement;
 
 	private resultData: SimResultData | null;
 	private rendered: boolean;
+
+	private hiddenIds: Array<ActionId>;
+  private hiddenIdsChangeEmitter;
 
   constructor(config: ResultComponentConfig) {
 		config.rootCssClass = 'timeline-root';
     super(config);
 		this.resultData = null;
 		this.rendered = false;
+		this.hiddenIds = [];
+		this.hiddenIdsChangeEmitter = new TypedEvent<void>();
 
 		this.rootElem.innerHTML = `
 		<div class="timeline-disclaimer">
@@ -58,6 +65,8 @@ export class Timeline extends ResultComponent {
 					</div>
 					<div class="rotation-timeline">
 					</div>
+				</div>
+				<div class="rotation-hidden-ids">
 				</div>
 			</div>
 		</div>
@@ -115,6 +124,7 @@ export class Timeline extends ResultComponent {
 		this.rotationPlotElem = this.rootElem.getElementsByClassName('rotation-plot')[0] as HTMLElement;
 		this.rotationLabels = this.rootElem.getElementsByClassName('rotation-labels')[0] as HTMLElement;
 		this.rotationTimeline = this.rootElem.getElementsByClassName('rotation-timeline')[0] as HTMLElement;
+		this.rotationHiddenIdsContainer = this.rootElem.getElementsByClassName('rotation-hidden-ids')[0] as HTMLElement;
 	}
 
 	onSimResult(resultData: SimResultData) {
@@ -369,6 +379,9 @@ export class Timeline extends ResultComponent {
 				<canvas class="rotation-timeline-canvas"></canvas>
 			</div>
 		`;
+		this.rotationHiddenIdsContainer.innerHTML = '';
+		this.hiddenIds = [];
+		this.hiddenIdsChangeEmitter = new TypedEvent<void>();
 
 		this.drawRotationTimeRuler(this.rotationTimeline.getElementsByClassName('rotation-timeline-canvas')[0] as HTMLCanvasElement, duration);
 
@@ -406,23 +419,57 @@ export class Timeline extends ResultComponent {
 			}
 		});
 
-		const makeLabelElem = (actionId: ActionId) => {
+		const makeLabelElem = (actionId: ActionId, isHiddenLabel: boolean) => {
 			const labelElem = document.createElement('div');
 			labelElem.classList.add('rotation-label', 'rotation-row');
+			if (isHiddenLabel) {
+				labelElem.classList.add('rotation-label-hidden', 'hide');
+			}
 			const labelText = idsToGroupForRotation.includes(actionId.spellId) ? actionId.baseName : actionId.name;
 			labelElem.innerHTML = `
+				<span class="fas fa-eye${isHiddenLabel ? '' : '-slash'}"></span>
 				<a class="rotation-label-icon"></a>
 				<span class="rotation-label-text">${labelText}</span>
 			`;
+			const hideElem = labelElem.getElementsByClassName('fas')[0] as HTMLElement;
+			hideElem.addEventListener('click', event => {
+				if (isHiddenLabel) {
+					const index = this.hiddenIds.findIndex(hiddenId => hiddenId.equals(actionId));
+					if (index != -1) {
+						this.hiddenIds.splice(index, 1);
+					}
+				} else {
+					this.hiddenIds.push(actionId);
+				}
+				this.hiddenIdsChangeEmitter.emit(TypedEvent.nextEventID());
+			});
+			tippy(hideElem, {
+				content: isHiddenLabel ? 'Show Row' : 'Hide Row',
+				allowHTML: true,
+			});
+			this.hiddenIdsChangeEmitter.on(() => {
+				if (isHiddenLabel == Boolean(this.hiddenIds.find(hiddenId => hiddenId.equals(actionId)))) {
+					labelElem.classList.remove('hide');
+				} else {
+					labelElem.classList.add('hide');
+				}
+			});
 			const labelIcon = labelElem.getElementsByClassName('rotation-label-icon')[0] as HTMLAnchorElement;
 			actionId.setBackgroundAndHref(labelIcon);
 			return labelElem;
 		};
 
-		const makeRowElem = (duration: number) => {
+		const makeRowElem = (actionId: ActionId, duration: number) => {
 			const rowElem = document.createElement('div');
 			rowElem.classList.add('rotation-timeline-row', 'rotation-row');
 			rowElem.style.width = this.timeToPx(duration);
+			this.hiddenIdsChangeEmitter.on(() => {
+				if (this.hiddenIds.find(hiddenId => hiddenId.equals(actionId))) {
+					rowElem.classList.add('hide');
+				} else {
+					rowElem.classList.remove('hide');
+				}
+			});
 			return rowElem;
 		};
 
@@ -442,7 +489,10 @@ export class Timeline extends ResultComponent {
 			`;
 			this.rotationLabels.appendChild(labelElem);
 
-			const rowElem = makeRowElem(duration);
+			const rowElem = document.createElement('div');
+			rowElem.classList.add('rotation-timeline-row', 'rotation-row');
+			rowElem.style.width = this.timeToPx(duration);
+
 			resourceLogs.forEach((resourceLogGroup, i) => {
 				const resourceElem = document.createElement('div');
 				resourceElem.classList.add('rotation-timeline-resource', 'series-color', resourceNames[resourceType].toLowerCase().replaceAll(' ', '-'));
@@ -466,9 +516,10 @@ export class Timeline extends ResultComponent {
 		const castRowElems = castsByAbility.map(abilityCasts => {
 			const actionId = abilityCasts[0].castId;
 
-			this.rotationLabels.appendChild(makeLabelElem(actionId));
+			this.rotationLabels.appendChild(makeLabelElem(actionId, false));
+			this.rotationHiddenIdsContainer.appendChild(makeLabelElem(actionId, true));
 
-			const rowElem = makeRowElem(duration);
+			const rowElem = makeRowElem(actionId, duration);
 			abilityCasts.forEach(castLog => {
 				const castElem = document.createElement('div');
 				castElem.classList.add('rotation-timeline-cast');
@@ -533,7 +584,7 @@ export class Timeline extends ResultComponent {
 				const actionId = auraUptimeLogs[0].aura;
 
 				// If there is already a corresponding row from the casts, use that one. Otherwise make a new one.
-				let rowElem = makeRowElem(duration);
+				let rowElem = makeRowElem(actionId, duration);
 				const castRowIndex = castsByAbility.findIndex(casts => casts[0].castId.equalsIgnoringTag(actionId));
 				if (castRowIndex != -1) {
 					rowElem = castRowElems[castRowIndex];
@@ -548,7 +599,8 @@ export class Timeline extends ResultComponent {
 						separatorElem.style.width = this.timeToPx(duration);
 						this.rotationTimeline.appendChild(separatorElem);
 					}
-					this.rotationLabels.appendChild(makeLabelElem(actionId));
+					this.rotationLabels.appendChild(makeLabelElem(actionId, false));
+					this.rotationHiddenIdsContainer.appendChild(makeLabelElem(actionId, true));
 					this.rotationTimeline.appendChild(rowElem);
 				}
 
