@@ -1651,6 +1651,7 @@ input, select {
   display: flex;
   align-items: center;
   font-weight: bold;
+  overflow-x: hidden;
 }
 
 .rotation-timeline-cast {
