@@ -374,6 +374,8 @@ message Consumes {
     int32 num_starting_potions = 17;
 
     Conjured default_conjured = 27;
+    Conjured starting_conjured = 48;
+    int32 num_starting_conjured = 49;
 
 		Drums drums = 19;
 		bool battle_chicken = 34;
