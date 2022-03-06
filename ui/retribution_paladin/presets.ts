@@ -1,8 +1,12 @@
 import { Conjured, Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
+import { Flask } from '/tbc/core/proto/common.js';
+import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
+import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
 import { RetributionPaladin_Rotation as RetributionPaladinRotation, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
@@ -44,8 +48,8 @@ export const DefaultOptions = RetributionPaladinOptions.create({
 export const DefaultConsumes = Consumes.create({
 	defaultPotion: Potions.HastePotion,
 	defaultConjured: Conjured.ConjuredDarkRune,
-	flaskOfRelentlessAssault: true,
-	roastedClefthoof: true,
+	flask: Flask.FlaskOfRelentlessAssault,
+	food: Food.FoodRoastedClefthoof,
 });
 
 // Maybe use this later if I can figure out the interactive tooltips from tippy
