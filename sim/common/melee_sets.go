@@ -93,8 +93,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 			spellObj := core.SimpleSpell{}
 
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				// TODO: Get real numbers for this.
-				ppmm := character.AutoAttacks.NewPPMManager(1.0)
+				ppmm := character.AutoAttacks.NewPPMManager(2)
 
 				castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 					SpellCast: core.SpellCast{
