@@ -118,8 +118,8 @@ func applyRaceEffects(agent Agent) {
 		// Blood Fury
 		const cd = time.Minute * 2
 		const dur = time.Second * 15
-		const apBonus = 282 // level * 4 + 2
-		const spBonus = 143 // level * 2 + 3
+		const apBonus = float64(CharacterLevel)*4 + 2
+		const spBonus = float64(CharacterLevel)*2 + 3
 		actionID := ActionID{SpellID: 33697}
 
 		character.AddMajorCooldown(MajorCooldown{
@@ -134,21 +134,9 @@ func applyRaceEffects(agent Agent) {
 				return true
 			},
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
+				applyStatAura := character.NewTemporaryStatsAuraApplier(OrcBloodFuryAuraID, actionID, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus, stats.SpellPower: spBonus}, dur)
 				return func(sim *Simulation, character *Character) {
-					character.AddStat(stats.AttackPower, apBonus)
-					character.AddStat(stats.RangedAttackPower, apBonus)
-					character.AddStat(stats.SpellPower, spBonus)
-
-					character.AddAura(sim, Aura{
-						ID:       OrcBloodFuryAuraID,
-						ActionID: actionID,
-						Expires:  sim.CurrentTime + dur,
-						OnExpire: func(sim *Simulation) {
-							character.AddStat(stats.AttackPower, -apBonus)
-							character.AddStat(stats.RangedAttackPower, -apBonus)
-							character.AddStat(stats.SpellPower, -spBonus)
-						},
-					})
+					applyStatAura(sim)
 					character.SetCD(OrcBloodFuryCooldownID, sim.CurrentTime+cd)
 					character.Metrics.AddInstantCast(actionID)
 				}

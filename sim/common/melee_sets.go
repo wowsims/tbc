@@ -34,6 +34,7 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 				const apBonus = 160.0
 				const duration = time.Second * 15
 				const procChance = 0.01
+				applyStatAura := character.NewTemporaryStatsAuraApplier(DesolationBattlegearProcAuraID, core.ActionID{SpellID: 37617}, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus}, duration)
 
 				icd := core.NewICD()
 				const icdDur = time.Second * 20
@@ -54,7 +55,7 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 							return
 						}
 						icd = core.InternalCD(sim.CurrentTime + icdDur)
-						character.AddAuraWithTemporaryStats(sim, DesolationBattlegearProcAuraID, core.ActionID{ItemID: 28192}, stats.AttackPower, apBonus, duration)
+						applyStatAura(sim)
 					},
 				}
 			})
@@ -163,7 +164,7 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				const hasteBonus = 450.0
 				const duration = time.Second * 10
-				statApplier := character.NewTempStatAuraApplier(sim, TwinBladesOfAzzinothProcAuraID, core.ActionID{SpellID: 41435}, stats.MeleeHaste, hasteBonus, duration)
+				applyStatAura := character.NewTemporaryStatsAuraApplier(TwinBladesOfAzzinothProcAuraID, core.ActionID{SpellID: 41435}, stats.Stats{stats.MeleeHaste: hasteBonus}, duration)
 				ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
 				icd := core.NewICD()
@@ -194,7 +195,7 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 							return
 						}
 						icd = core.InternalCD(sim.CurrentTime + icdDur)
-						statApplier(sim)
+						applyStatAura(sim)
 					},
 				}
 			})
@@ -217,6 +218,7 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 				const apBonus = 160.0
 				const duration = time.Second * 15
 				const procChance = 0.02
+				applyStatAura := character.NewTemporaryStatsAuraApplier(WastewalkerArmorProcAuraID, core.ActionID{SpellID: 37618}, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus}, duration)
 
 				icd := core.NewICD()
 				const icdDur = time.Second * 20
@@ -237,7 +239,7 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 							return
 						}
 						icd = core.InternalCD(sim.CurrentTime + icdDur)
-						character.AddAuraWithTemporaryStats(sim, WastewalkerArmorProcAuraID, core.ActionID{ItemID: 28192}, stats.AttackPower, apBonus, duration)
+						applyStatAura(sim)
 					},
 				}
 			})

@@ -148,6 +148,7 @@ func ApplyKhoriumChampion(agent core.Agent) {
 		const strBonus = 120.0
 		const dur = time.Second * 30
 		const procChance = 0.5 * 3.3 / 60.0
+		applyStatAura := character.NewTemporaryStatsAuraApplier(KhoriumChampionProcAuraID, core.ActionID{ItemID: 23541}, stats.Stats{stats.Strength: strBonus}, dur)
 
 		return core.Aura{
 			ID: KhoriumChampionAuraID,
@@ -160,7 +161,7 @@ func ApplyKhoriumChampion(agent core.Agent) {
 					return
 				}
 
-				character.AddAuraWithTemporaryStats(sim, KhoriumChampionProcAuraID, core.ActionID{ItemID: 23541}, stats.Strength, strBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -183,6 +184,7 @@ func ApplyBlackoutTruncheon(agent core.Agent) {
 		const hasteBonus = 132.0
 		const dur = time.Second * 10
 		const procChance = 1.5 * 0.8 / 60.0
+		applyStatAura := character.NewTemporaryStatsAuraApplier(BlackoutTruncheonProcAuraID, core.ActionID{ItemID: 27901}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
 
 		return core.Aura{
 			ID: BlackoutTruncheonAuraID,
@@ -195,7 +197,7 @@ func ApplyBlackoutTruncheon(agent core.Agent) {
 					return
 				}
 
-				character.AddAuraWithTemporaryStats(sim, BlackoutTruncheonProcAuraID, core.ActionID{ItemID: 27901}, stats.MeleeHaste, hasteBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -210,6 +212,7 @@ func ApplyLionheartChampion(agent core.Agent) {
 		const strBonus = 100.0
 		const dur = time.Second * 10
 		const procChance = 3.6 / 60.0
+		applyStatAura := character.NewTemporaryStatsAuraApplier(LionheartChampionProcAuraID, core.ActionID{ItemID: 28429}, stats.Stats{stats.Strength: strBonus}, dur)
 
 		return core.Aura{
 			ID: LionheartChampionAuraID,
@@ -222,7 +225,7 @@ func ApplyLionheartChampion(agent core.Agent) {
 					return
 				}
 
-				character.AddAuraWithTemporaryStats(sim, LionheartChampionProcAuraID, core.ActionID{ItemID: 28429}, stats.Strength, strBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -237,6 +240,7 @@ func ApplyLionheartExecutioner(agent core.Agent) {
 		const strBonus = 100.0
 		const dur = time.Second * 10
 		const procChance = 3.6 / 60.0
+		applyStatAura := character.NewTemporaryStatsAuraApplier(LionheartExecutionerProcAuraID, core.ActionID{ItemID: 28430}, stats.Stats{stats.Strength: strBonus}, dur)
 
 		return core.Aura{
 			ID: LionheartExecutionerAuraID,
@@ -248,7 +252,7 @@ func ApplyLionheartExecutioner(agent core.Agent) {
 					return
 				}
 
-				character.AddAuraWithTemporaryStats(sim, LionheartExecutionerProcAuraID, core.ActionID{ItemID: 28430}, stats.Strength, strBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -265,6 +269,7 @@ func ApplyDrakefistHammer(agent core.Agent) {
 		const hasteBonus = 212.0
 		const dur = time.Second * 10
 		const procChance = 2.7 / 60.0
+		applyStatAura := character.NewTemporaryStatsAuraApplier(DrakefistHammerProcAuraID, core.ActionID{ItemID: 28437}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
 
 		return core.Aura{
 			ID: DrakefistHammerAuraID,
@@ -276,7 +281,7 @@ func ApplyDrakefistHammer(agent core.Agent) {
 					return
 				}
 
-				character.AddAuraWithTemporaryStats(sim, DrakefistHammerProcAuraID, core.ActionID{ItemID: 28437}, stats.MeleeHaste, hasteBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -293,6 +298,7 @@ func ApplyDragonmaw(agent core.Agent) {
 		const hasteBonus = 212.0
 		const dur = time.Second * 10
 		const procChance = 2.7 / 60.0
+		applyStatAura := character.NewTemporaryStatsAuraApplier(DragonmawProcAuraID, core.ActionID{ItemID: 28438}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
 
 		return core.Aura{
 			ID: DragonmawAuraID,
@@ -304,7 +310,7 @@ func ApplyDragonmaw(agent core.Agent) {
 					return
 				}
 
-				character.AddAuraWithTemporaryStats(sim, DragonmawProcAuraID, core.ActionID{ItemID: 28438}, stats.MeleeHaste, hasteBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -322,6 +328,7 @@ func ApplyDragonstrike(agent core.Agent) {
 		const hasteBonus = 212.0
 		const dur = time.Second * 10
 		const procChance = 2.7 / 60.0
+		applyStatAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcAuraID, core.ActionID{ItemID: 28439}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
 
 		return core.Aura{
 			ID: DragonstrikeAuraID,
@@ -333,7 +340,7 @@ func ApplyDragonstrike(agent core.Agent) {
 					return
 				}
 
-				character.AddAuraWithTemporaryStats(sim, DragonstrikeProcAuraID, core.ActionID{ItemID: 28439}, stats.MeleeHaste, hasteBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -525,6 +532,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 		const apBonus = 160
 		const dur = time.Second * 10
 		ppmm := character.AutoAttacks.NewPPMManager(1.0)
+		applyStatAura := character.NewTemporaryStatsAuraApplier(BandOfTheEternalChampionProcAuraID, core.ActionID{ItemID: 29301}, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus}, dur)
 
 		icd := core.NewICD()
 		const icdDur = time.Second * 60
@@ -544,7 +552,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 				}
 
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, BandOfTheEternalChampionProcAuraID, core.ActionID{ItemID: 29301}, stats.AttackPower, apBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -559,6 +567,7 @@ func ApplyTheBladefist(agent core.Agent) {
 		const hasteBonus = 180.0
 		const dur = time.Second * 10
 		const procChance = 2.7 / 60.0
+		applyStatAura := character.NewTemporaryStatsAuraApplier(TheBladefistProcAuraID, core.ActionID{ItemID: 29348}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
 
 		return core.Aura{
 			ID: TheBladefistAuraID,
@@ -570,7 +579,7 @@ func ApplyTheBladefist(agent core.Agent) {
 					return
 				}
 
-				character.AddAuraWithTemporaryStats(sim, TheBladefistProcAuraID, core.ActionID{ItemID: 29348}, stats.MeleeHaste, hasteBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -587,7 +596,7 @@ func ApplyHeartrazor(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const apBonus = 270
 		const dur = time.Second * 10
-		statApplier := character.NewTempStatAuraApplier(sim, HeartrazorProcAuraID, core.ActionID{ItemID: 29962}, stats.AttackPower, apBonus, dur)
+		applyStatAura := character.NewTemporaryStatsAuraApplier(HeartrazorProcAuraID, core.ActionID{ItemID: 29962}, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus}, dur)
 
 		ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
@@ -602,7 +611,7 @@ func ApplyHeartrazor(agent core.Agent) {
 					return
 				}
 
-				statApplier(sim)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -650,6 +659,7 @@ func ApplyWorldBreaker(agent core.Agent) {
 		const critBonus = 900.0
 		const dur = time.Second * 4
 		const procChance = 3.7 / 60.0
+		applyStatAura := character.NewTemporaryStatsAuraApplier(WorldBreakerProcAuraID, core.ActionID{ItemID: 30090}, stats.Stats{stats.MeleeCrit: critBonus}, dur)
 
 		return core.Aura{
 			ID: WorldBreakerAuraID,
@@ -667,7 +677,7 @@ func ApplyWorldBreaker(agent core.Agent) {
 					return
 				}
 
-				character.AddAuraWithTemporaryStats(sim, WorldBreakerProcAuraID, core.ActionID{ItemID: 30090}, stats.MeleeCrit, critBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -811,6 +821,7 @@ func ApplySingingCrystalAxe(agent core.Agent) {
 		const hasteBonus = 400.0
 		const dur = time.Second * 10
 		const procChance = 3.5 / 60.0
+		applyStatAura := character.NewTemporaryStatsAuraApplier(SingingCrystalAxeProcAuraID, core.ActionID{ItemID: 31318}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
 
 		return core.Aura{
 			ID: SingingCrystalAxeAuraID,
@@ -822,7 +833,7 @@ func ApplySingingCrystalAxe(agent core.Agent) {
 					return
 				}
 
-				character.AddAuraWithTemporaryStats(sim, SingingCrystalAxeProcAuraID, core.ActionID{ItemID: 31318}, stats.MeleeHaste, hasteBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})

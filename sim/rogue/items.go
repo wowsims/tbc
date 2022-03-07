@@ -111,7 +111,7 @@ var WarpSpringCoilProcAuraID = core.NewAuraID()
 func ApplyWarpSpringCoil(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		statApplier := character.NewTempStatAuraApplier(sim, WarpSpringCoilProcAuraID, core.ActionID{ItemID: 30450}, stats.ArmorPenetration, 1000, time.Second*15)
+		applyStatAura := character.NewTemporaryStatsAuraApplier(WarpSpringCoilProcAuraID, core.ActionID{ItemID: 30450}, stats.Stats{stats.ArmorPenetration: 1000}, time.Second*15)
 		const procChance = 0.25
 
 		const icdDur = time.Second * 30
@@ -138,7 +138,7 @@ func ApplyWarpSpringCoil(agent core.Agent) {
 				}
 
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				statApplier(sim)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -155,7 +155,7 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 	rogue := rogueAgent.GetRogue()
 
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		statApplier := rogue.NewTempStatAuraApplier(sim, AshtongueTalismanOfLethalityProcAuraID, core.ActionID{ItemID: 32492}, stats.MeleeCrit, 145, time.Second*10)
+		applyStatAura := rogue.NewTemporaryStatsAuraApplier(AshtongueTalismanOfLethalityProcAuraID, core.ActionID{ItemID: 32492}, stats.Stats{stats.MeleeCrit: 145}, time.Second*10)
 		numPoints := int32(0)
 
 		return core.Aura{
@@ -171,7 +171,7 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 				if cast.SameActionIgnoreTag(SliceAndDiceActionID) {
 					// SND won't call OnSpellHit so we have to add the effect now.
 					if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
-						statApplier(sim)
+						applyStatAura(sim)
 					}
 				}
 			},
@@ -181,7 +181,7 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 				}
 
 				if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
-					statApplier(sim)
+					applyStatAura(sim)
 				}
 			},
 		}

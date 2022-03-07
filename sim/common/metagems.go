@@ -35,6 +35,7 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 		const dur = time.Second * 4
 		const icdDur = time.Second * 35
 		icd := core.NewICD()
+		applyStatAura := character.NewTemporaryStatsAuraApplier(MysticFocusAuraID, core.ActionID{ItemID: 25893}, stats.Stats{stats.SpellHaste: hasteBonus}, dur)
 
 		return core.Aura{
 			ID: MysticalSkyfireDiamondAuraID,
@@ -43,7 +44,7 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, MysticFocusAuraID, core.ActionID{ItemID: 25893}, stats.SpellHaste, hasteBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -90,6 +91,7 @@ func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 		const dur = time.Second * 6
 		const icdDur = time.Second * 40
 		icd := core.NewICD()
+		applyStatAura := character.NewTemporaryStatsAuraApplier(SkyfireSwiftnessAuraID, core.ActionID{ItemID: 32410}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
 
 		ppmm := character.AutoAttacks.NewPPMManager(1.5)
 
@@ -107,7 +109,7 @@ func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, SkyfireSwiftnessAuraID, core.ActionID{ItemID: 32410}, stats.MeleeHaste, hasteBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})

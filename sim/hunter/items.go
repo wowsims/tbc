@@ -142,7 +142,7 @@ var AshtongueTalismanOfSwiftnessProcAuraID = core.NewAuraID()
 func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		statApplier := character.NewTempStatAuraApplier(sim, AshtongueTalismanOfSwiftnessProcAuraID, core.ActionID{ItemID: 32487}, stats.AttackPower, 275, time.Second*8)
+		applyStatAura := character.NewTemporaryStatsAuraApplier(AshtongueTalismanOfSwiftnessProcAuraID, core.ActionID{ItemID: 32487}, stats.Stats{stats.AttackPower: 275, stats.RangedAttackPower: 275}, time.Second*8)
 		const procChance = 0.15
 
 		return core.Aura{
@@ -154,7 +154,7 @@ func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
 				if sim.RandomFloat("Ashtongue Talisman of Swiftness") > procChance {
 					return
 				}
-				statApplier(sim)
+				applyStatAura(sim)
 			},
 		}
 	})

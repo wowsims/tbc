@@ -53,7 +53,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-BadgeofTenacity-32658"
  value: {
-  dps: 1347.5099246367345
+  dps: 1381.8555993807108
  }
 }
 dps_results: {
@@ -335,7 +335,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-KhoriumChampion-23541"
  value: {
-  dps: 937.7292083133128
+  dps: 947.9952097305172
  }
 }
 dps_results: {
@@ -347,13 +347,13 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-LionheartChampion-28429"
  value: {
-  dps: 987.8240553234207
+  dps: 991.7578288459264
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 1013.6268301788742
+  dps: 1026.0687908681039
  }
 }
 dps_results: {

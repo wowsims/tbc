@@ -110,6 +110,7 @@ func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
 
 	char := agent.GetCharacter()
 	char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		applyStatAura := char.NewTemporaryStatsAuraApplier(AshtongueTalismanOfAcumenAuraID, core.ActionID{ItemID: 32490}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 		return core.Aura{
 			ID: AshtongueTalismanOfAcumenItemAuraID,
 			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
@@ -121,7 +122,7 @@ func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
 					return
 				}
 
-				char.AddAuraWithTemporaryStats(sim, AshtongueTalismanOfAcumenAuraID, core.ActionID{ItemID: 32490}, stats.SpellPower, spellBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})

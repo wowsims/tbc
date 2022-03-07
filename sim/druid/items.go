@@ -104,6 +104,7 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 	druidAgent := agent.(Agent)
 	druid := druidAgent.GetDruid()
 	druid.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		applyStatAura := agent.GetCharacter().NewTemporaryStatsAuraApplier(LunarBlessingAuraID, core.ActionID{ItemID: 30664}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 		return core.Aura{
 			ID: LivingRootoftheWildheartAuraID,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
@@ -112,7 +113,7 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 					if sim.RandomFloat("Living Root of the Wildheart") > 0.03 {
 						return
 					}
-					druid.AddAuraWithTemporaryStats(sim, LunarBlessingAuraID, core.ActionID{ItemID: 30664}, stats.SpellPower, spellBonus, dur)
+					applyStatAura(sim)
 				}
 			},
 		}
@@ -130,6 +131,7 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 	druidAgent := agent.(Agent)
 	druid := druidAgent.GetDruid()
 	druid.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		applyStatAura := agent.GetCharacter().NewTemporaryStatsAuraApplier(LunarGraceAuraID, actionID, stats.Stats{stats.SpellPower: spellBonus}, dur)
 		return core.Aura{
 			ID: IdoloftheUnseenMoonAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -137,7 +139,7 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 					if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
 						return
 					}
-					druid.AddAuraWithTemporaryStats(sim, LunarGraceAuraID, actionID, stats.SpellPower, spellBonus, dur)
+					applyStatAura(sim)
 				}
 			},
 		}
@@ -157,6 +159,7 @@ func ApplyAshtongueTalisman(agent core.Agent) {
 
 	char := agent.GetCharacter()
 	char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		applyStatAura := agent.GetCharacter().NewTemporaryStatsAuraApplier(AshtongueTalismanAuraID, actionID, stats.Stats{stats.SpellPower: spellBonus}, dur)
 		return core.Aura{
 			ID: AshtongueTalismanItemAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -164,7 +167,7 @@ func ApplyAshtongueTalisman(agent core.Agent) {
 					if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
 						return
 					}
-					char.AddAuraWithTemporaryStats(sim, AshtongueTalismanAuraID, actionID, stats.SpellPower, spellBonus, dur)
+					applyStatAura(sim)
 				}
 			},
 		}

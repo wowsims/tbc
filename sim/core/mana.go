@@ -10,13 +10,16 @@ import (
 
 // TODO: Make this into an object like rageBar or energyBar.
 func (character *Character) EnableManaBar() {
+	// Assumes all characters have >= 20 intellect.
+	// See https://wowwiki-archive.fandom.com/wiki/Base_mana.
+	// Subtract out the non-linear part of the formula separately, so that weird
+	// mana values are not included when using the stat dependency manager.
+	character.AddStat(stats.Mana, 20-15*20)
 	character.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.Mana,
 		Modifier: func(intellect float64, mana float64) float64 {
-			// Assumes all characters have >= 20 intellect.
-			// See https://wowwiki-archive.fandom.com/wiki/Base_mana.
-			return mana + (20 + 15*(intellect-20))
+			return mana + intellect*15
 		},
 	})
 }

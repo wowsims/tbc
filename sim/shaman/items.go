@@ -223,6 +223,7 @@ func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 		const apBonus = 275
 		const dur = time.Second * 10
 		const procChance = 0.5
+		applyStatAura := character.NewTemporaryStatsAuraApplier(AshtongueTalismanOfVisionProcAuraID, core.ActionID{ItemID: 32491}, stats.Stats{stats.AttackPower: apBonus}, dur)
 
 		return core.Aura{
 			ID: AshtongueTalismanOfVisionAuraID,
@@ -233,7 +234,7 @@ func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 				if sim.RandomFloat("Ashtongue Talisman of Vision") > procChance {
 					return
 				}
-				character.AddAuraWithTemporaryStats(sim, AshtongueTalismanOfVisionProcAuraID, core.ActionID{ItemID: 32491}, stats.AttackPower, apBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -247,6 +248,7 @@ func ApplySkycallTotem(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const hasteBonus = 101
 		const dur = time.Second * 10
+		applyStatAura := character.NewTemporaryStatsAuraApplier(EnergizedAuraID, core.ActionID{ItemID: 33506}, stats.Stats{stats.SpellHaste: hasteBonus}, dur)
 
 		return core.Aura{
 			ID:      SkycallTotemAuraID,
@@ -255,7 +257,7 @@ func ApplySkycallTotem(agent core.Agent) {
 				if cast.ActionID.SpellID != SpellIDLB12 || sim.RandomFloat("Skycall Totem") > 0.15 {
 					return
 				}
-				character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, core.ActionID{ItemID: 33506}, stats.SpellHaste, hasteBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -270,6 +272,7 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 		const apBonus = 110
 		const dur = time.Second * 10
 		const procChance = 0.5
+		applyStatAura := character.NewTemporaryStatsAuraApplier(ElementalStrengthAuraID, core.ActionID{ItemID: 33507}, stats.Stats{stats.AttackPower: apBonus}, dur)
 
 		return core.Aura{
 			ID:      StonebreakersTotemAuraID,
@@ -283,7 +286,7 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 					return
 				}
 
-				cast.Character.AddAuraWithTemporaryStats(sim, ElementalStrengthAuraID, core.ActionID{ItemID: 33507}, stats.AttackPower, apBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})

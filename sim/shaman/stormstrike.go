@@ -44,7 +44,8 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 	}
 
 	hasSkyshatter4p := ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4)
-	const skyshatterDur = time.Second * 12
+	skyshatterAuraApplier := shaman.NewTemporaryStatsAuraApplier(SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.Stats{stats.AttackPower: 70}, time.Second*12)
+
 	ss := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -78,7 +79,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 						ssDebuffAura.Stacks = 2
 						spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
 						if hasSkyshatter4p {
-							shaman.Character.AddAuraWithTemporaryStats(sim, SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.AttackPower, 70, skyshatterDur)
+							skyshatterAuraApplier(sim)
 						}
 					},
 				},

@@ -87,6 +87,7 @@ func (shaman *Shaman) applyElementalDevastation() {
 	const dur = time.Second * 10
 
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		applyStatAura := shaman.NewTemporaryStatsAuraApplier(ElementalDevastationAuraID, core.ActionID{SpellID: 30160}, stats.Stats{stats.MeleeCrit: critBonus}, dur)
 		return core.Aura{
 			ID: ElementalDevastationTalentAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -99,7 +100,7 @@ func (shaman *Shaman) applyElementalDevastation() {
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
-				spellCast.Character.AddAuraWithTemporaryStats(sim, ElementalDevastationAuraID, core.ActionID{ItemID: 30160}, stats.MeleeCrit, critBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -259,7 +260,6 @@ func (shaman *Shaman) applyUnleashedRage() {
 
 					if prevBonus != newBonus {
 						buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: newBonus})
-						buffs[stats.Mana] = 0 // mana is weird
 						unbuffs := buffs.Multiply(-1)
 
 						char.AddStats(buffs)
