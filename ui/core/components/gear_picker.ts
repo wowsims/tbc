@@ -17,8 +17,8 @@ import { Player } from '/tbc/core/player.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
-import { CloseButton } from './close_button.js';
 import { Component } from './component.js';
+import { Popup } from './popup.js';
 import { makePhaseSelector } from './other_inputs.js';
 import { makeShow1hWeaponsSelector } from './other_inputs.js';
 import { makeShow2hWeaponsSelector } from './other_inputs.js';
@@ -168,16 +168,16 @@ class ItemPicker extends Component {
   }
 }
 
-class SelectorModal extends Component {
+class SelectorModal extends Popup {
   private player: Player<any>;
   private readonly tabsElem: HTMLElement;
   private readonly contentElem: HTMLElement;
 
   constructor(parent: HTMLElement, player: Player<any>, slot: ItemSlot, equippedItem: EquippedItem | null, eligibleItems: Array<Item>, eligibleEnchants: Array<Enchant>) {
-    super(parent, 'selector-modal');
+    super(parent);
     this.player = player;
 
-		this.rootElem.id = 'selectorModal';
+		this.rootElem.classList.add('selector-modal');
 		this.rootElem.innerHTML = `
 			<ul class="nav nav-tabs selector-modal-tabs">
 			</ul>
@@ -185,19 +185,9 @@ class SelectorModal extends Component {
 			</div>
 		`;
 
-		new CloseButton(this.rootElem, () => {
-			$('#selectorModal').bPopup().close();
-			this.rootElem.remove();
-		});
-
+		this.addCloseButton();
     this.tabsElem = this.rootElem.getElementsByClassName('selector-modal-tabs')[0] as HTMLElement;
     this.contentElem = this.rootElem.getElementsByClassName('selector-modal-tab-content')[0] as HTMLElement;
-
-		const computedStyles = window.getComputedStyle(parent);
-		this.rootElem.style.setProperty('--main-text-color', computedStyles.getPropertyValue('--main-text-color').trim());
-		this.rootElem.style.setProperty('--theme-color-primary', computedStyles.getPropertyValue('--theme-color-primary').trim());
-		this.rootElem.style.setProperty('--theme-color-background', computedStyles.getPropertyValue('--theme-color-background').trim());
-		this.rootElem.style.setProperty('--theme-color-background-raw', computedStyles.getPropertyValue('--theme-color-background-raw').trim());
 
 		this.setData(slot, equippedItem, eligibleItems, eligibleEnchants);
   }
@@ -389,7 +379,7 @@ class SelectorModal extends Component {
     this.contentElem.appendChild(tabContent);
     tabContent.innerHTML = `
     <div class="selector-modal-tab-content-header">
-      <button class="selector-modal-remove-button">Remove</button>
+      <button class="selector-modal-remove-button sim-button">Remove</button>
       <input class="selector-modal-search" type="text" placeholder="Search...">
       <div class="selector-modal-filter-bar-filler"></div>
       <div class="sim-input selector-modal-boolean-option selector-modal-show-1h-weapons"></div>
