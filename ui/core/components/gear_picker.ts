@@ -258,13 +258,6 @@ class SelectorModal extends Popup {
         });
 
     this.addGemTabs(slot, equippedItem);
-
-		$('#selectorModal').bPopup({
-			closeClass: 'item-picker-close',
-			onClose: () => {
-				this.rootElem.remove();
-			},
-		});
   }
 
   private addGemTabs(slot: ItemSlot, equippedItem: EquippedItem | null) {

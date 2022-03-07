@@ -187,7 +187,7 @@ export class IndividualImporter<SpecType extends Spec> extends Popup {
 			}
 		});
 
-		$('#individualImporter').bPopup().close();
+		this.close();
 
 		if (missingItems.length == 0 && missingEnchants.length == 0) {
 			alert('Import successful!');

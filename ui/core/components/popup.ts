@@ -15,16 +15,16 @@ export class Popup extends Component {
 		this.rootElem.style.setProperty('--theme-color-background-raw', computedStyles.getPropertyValue('--theme-color-background-raw').trim());
 
 		$(this.rootElem).bPopup({
-			onClose: () => {
-				this.rootElem.remove();
-			},
+			onClose: () => this.rootElem.remove(),
 		});
   }
 
 	protected addCloseButton() {
-		new CloseButton(this.rootElem, () => {
-			$(this.rootElem).bPopup().close();
-			this.rootElem.remove();
-		});
+		new CloseButton(this.rootElem, () => this.close());
+	}
+
+	close() {
+		$(this.rootElem).bPopup().close();
+		this.rootElem.remove();
 	}
 }
