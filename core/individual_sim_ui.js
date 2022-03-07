@@ -175,7 +175,7 @@ export class IndividualSimUI extends SimUI {
     }
     addTopbarComponents() {
         const importSettings = document.createElement('span');
-        importSettings.classList.add('import-settings', 'fa', 'fa-upload');
+        importSettings.classList.add('import-settings', 'fas', 'fa-upload');
         tippy(importSettings, {
             'content': 'Import',
             'allowHTML': true,
@@ -187,7 +187,7 @@ export class IndividualSimUI extends SimUI {
             this.addToolbarItem(importSettings);
         }
         const shareLink = document.createElement('span');
-        shareLink.classList.add('share-link', 'fa', 'fa-link', 'within-raid-sim-hide');
+        shareLink.classList.add('share-link', 'fas', 'fa-link', 'within-raid-sim-hide');
         tippy(shareLink, {
             'content': 'Shareable link',
             'allowHTML': true,
