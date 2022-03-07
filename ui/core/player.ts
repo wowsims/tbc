@@ -111,6 +111,7 @@ export class Player<SpecType extends Spec> {
   readonly talentsStringChangeEmitter = new TypedEvent<void>('PlayerTalentsString');
   readonly specOptionsChangeEmitter = new TypedEvent<void>('PlayerSpecOptions');
   readonly cooldownsChangeEmitter = new TypedEvent<void>('PlayerCooldowns');
+  readonly epWeightsChangeEmitter = new TypedEvent<void>('PlayerEpWeights');
 
   readonly currentStatsEmitter = new TypedEvent<void>('PlayerCurrentStats');
 
@@ -141,6 +142,7 @@ export class Player<SpecType extends Spec> {
       this.talentsStringChangeEmitter,
       this.specOptionsChangeEmitter,
 			this.cooldownsChangeEmitter,
+			this.epWeightsChangeEmitter,
 		], 'PlayerChange');
   }
 
@@ -220,18 +222,19 @@ export class Player<SpecType extends Spec> {
 		return this.epWeights;
 	}
 
-	setEpWeights(newEpWeights: Stats) {
+	setEpWeights(eventID: EventID, newEpWeights: Stats) {
 		this.epWeights = newEpWeights;
 		this.epWeightsForCalc = specEPTransforms[this.spec](this.epWeights);
+		this.epWeightsChangeEmitter.emit(eventID);
 
 		this.gemEPCache = new Map();
 		this.itemEPCache = new Map();
 		this.enchantEPCache = new Map();
 	}
 
-  async computeStatWeights(epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
+  async computeStatWeights(eventID: EventID, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
 		const result = await this.sim.statWeights(this, epStats, epReferenceStat, onProgress);
-		this.setEpWeights(new Stats(result.epValues));
+		this.setEpWeights(eventID, new Stats(result.epValues));
 		return result;
 	}
 
