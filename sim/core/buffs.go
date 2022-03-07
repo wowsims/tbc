@@ -251,13 +251,19 @@ func applyPetBuffEffects(petAgent PetAgent, raidBuffs proto.RaidBuffs, partyBuff
 var SnapshotImprovedStrengthOfEarthTotemAuraID = NewAuraID()
 
 func SnapshotImprovedStrengthOfEarthTotemAura(character *Character) AuraFactory {
-	return character.NewTemporaryStatsAuraFactory(SnapshotImprovedStrengthOfEarthTotemAuraID, ActionID{SpellID: 37223}, stats.Stats{stats.Strength: 12}, time.Second*110)
+	return func(sim *Simulation) Aura {
+		factory := character.NewTemporaryStatsAuraFactory(SnapshotImprovedStrengthOfEarthTotemAuraID, ActionID{SpellID: 37223}, stats.Stats{stats.Strength: 12}, time.Second*110)
+		return factory(sim)
+	}
 }
 
 var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
 
 func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
-	return character.NewTemporaryStatsAuraFactory(SnapshotImprovedWrathOfAirTotemAuraID, ActionID{SpellID: 37212}, stats.Stats{stats.SpellPower: 20}, time.Second*110)
+	return func(sim *Simulation) Aura {
+		factory := character.NewTemporaryStatsAuraFactory(SnapshotImprovedWrathOfAirTotemAuraID, ActionID{SpellID: 37212}, stats.Stats{stats.SpellPower: 20}, time.Second*110)
+		return factory(sim)
+	}
 }
 
 var SnapshotBattleShoutAuraID = NewAuraID()
@@ -271,7 +277,10 @@ func SnapshotBattleShoutAura(character *Character, snapshotSapphire bool, snapsh
 		amount += 30
 	}
 
-	return character.NewTemporaryStatsAuraFactory(SnapshotBattleShoutAuraID, ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: amount}, time.Second*110)
+	return func(sim *Simulation) Aura {
+		factory := character.NewTemporaryStatsAuraFactory(SnapshotBattleShoutAuraID, ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: amount}, time.Second*110)
+		return factory(sim)
+	}
 }
 
 var BattleChickenAuraID = NewAuraID()
