@@ -55,6 +55,7 @@ export declare class Player<SpecType extends Spec> {
     readonly talentsStringChangeEmitter: TypedEvent<void>;
     readonly specOptionsChangeEmitter: TypedEvent<void>;
     readonly cooldownsChangeEmitter: TypedEvent<void>;
+    readonly epWeightsChangeEmitter: TypedEvent<void>;
     readonly currentStatsEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     constructor(spec: Spec, sim: Sim);
@@ -71,8 +72,8 @@ export declare class Player<SpecType extends Spec> {
     getEnchants(slot: ItemSlot | undefined): Array<Enchant>;
     getGems(socketColor: GemColor | undefined): Array<Gem>;
     getEpWeights(): Stats;
-    setEpWeights(newEpWeights: Stats): void;
-    computeStatWeights(epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult>;
+    setEpWeights(eventID: EventID, newEpWeights: Stats): void;
+    computeStatWeights(eventID: EventID, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult>;
     getCurrentStats(): PlayerStats;
     setCurrentStats(eventID: EventID, newStats: PlayerStats): void;
     getName(): string;

@@ -4,4 +4,5 @@ import { Component } from './component.js';
 export declare class SettingsMenu<SpecType extends Spec> extends Component {
     private readonly simUI;
     constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>);
+    private setupEpWeightsSettings;
 }

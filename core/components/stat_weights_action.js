@@ -1,12 +1,13 @@
 import { Stat } from '/tbc/core/proto/common.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { stDevToConf90 } from '/tbc/core/utils.js';
 export function addStatWeightsAction(simUI, epStats, epReferenceStat) {
     const resultsManager = new StatWeightsResultsManager(simUI);
     simUI.addAction('EP WEIGHTS', 'ep-weights-action', async () => {
         simUI.setResultsPending();
         const iterations = simUI.sim.getIterations();
-        const result = await simUI.player.computeStatWeights(epStats, epReferenceStat, (progress) => {
+        const result = await simUI.player.computeStatWeights(TypedEvent.nextEventID(), epStats, epReferenceStat, (progress) => {
             resultsManager.setSimProgress(progress);
         });
         resultsManager.setSimResult(iterations, epStats, epReferenceStat, result);

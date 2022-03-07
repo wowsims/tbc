@@ -1,5 +1,8 @@
+import { Stat } from '/tbc/core/proto/common.js';
+import { statNames } from '/tbc/core/proto_utils/names.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
+import { getEnumValues } from '/tbc/core/utils.js';
 import { CloseButton } from './close_button.js';
 import { Component } from './component.js';
 export class SettingsMenu extends Component {
@@ -12,12 +15,18 @@ export class SettingsMenu extends Component {
 				<span>SETTINGS</span>
 			</div>
 			<div class="settings-menu-content">
-				<button class="restore-defaults-button sim-button">RESTORE DEFAULTS</button>
-				<div class="settings-menu-section">
-					<div class="fixed-rng-seed">
+				<div class="settings-menu-content-left">
+					<button class="restore-defaults-button sim-button">RESTORE DEFAULTS</button>
+					<div class="settings-menu-section">
+						<div class="fixed-rng-seed">
+						</div>
+						<div class="last-used-rng-seed-container">
+							<span>Last used RNG seed:</span><span class="last-used-rng-seed">0</span>
+						</div>
 					</div>
-					<div>
-						<span>Last used RNG seed:</span><span class="last-used-rng-seed">0</span>
+				</div>
+				<div class="settings-menu-content-right">
+					<div class="settings-menu-section settings-menu-ep-weights">
 					</div>
 				</div>
 			</div>
@@ -57,5 +66,28 @@ export class SettingsMenu extends Component {
         const lastUsedRngSeed = this.rootElem.getElementsByClassName('last-used-rng-seed')[0];
         lastUsedRngSeed.textContent = String(this.simUI.sim.getLastUsedRngSeed());
         this.simUI.sim.lastUsedRngSeedChangeEmitter.on(() => lastUsedRngSeed.textContent = String(this.simUI.sim.getLastUsedRngSeed()));
+        this.setupEpWeightsSettings();
+    }
+    setupEpWeightsSettings() {
+        const sectionRoot = this.rootElem.getElementsByClassName('settings-menu-ep-weights')[0];
+        const label = document.createElement('span');
+        label.classList.add('ep-weights-label');
+        label.textContent = 'EP Weights';
+        tippy(label, {
+            'content': 'EP Weights for sorting the item selector.',
+            'allowHTML': true,
+        });
+        sectionRoot.appendChild(label);
+        //const epStats = this.simUI.individualConfig.epStats;
+        const epStats = getEnumValues(Stat).filter(stat => ![Stat.StatMana, Stat.StatEnergy, Stat.StatRage].includes(stat));
+        const weightPickers = epStats.map(stat => new NumberPicker(sectionRoot, this.simUI.player, {
+            label: statNames[stat],
+            changedEvent: (player) => player.epWeightsChangeEmitter,
+            getValue: (player) => player.getEpWeights().getStat(stat),
+            setValue: (eventID, player, newValue) => {
+                const epWeights = player.getEpWeights().withStat(stat, newValue);
+                player.setEpWeights(eventID, epWeights);
+            },
+        }));
     }
 }

@@ -46,6 +46,7 @@ export class Player {
         this.talentsStringChangeEmitter = new TypedEvent('PlayerTalentsString');
         this.specOptionsChangeEmitter = new TypedEvent('PlayerSpecOptions');
         this.cooldownsChangeEmitter = new TypedEvent('PlayerCooldowns');
+        this.epWeightsChangeEmitter = new TypedEvent('PlayerEpWeights');
         this.currentStatsEmitter = new TypedEvent('PlayerCurrentStats');
         this.sim = sim;
         this.party = null;
@@ -68,6 +69,7 @@ export class Player {
             this.talentsStringChangeEmitter,
             this.specOptionsChangeEmitter,
             this.cooldownsChangeEmitter,
+            this.epWeightsChangeEmitter,
         ], 'PlayerChange');
     }
     getSpecIcon() {
@@ -131,16 +133,17 @@ export class Player {
     getEpWeights() {
         return this.epWeights;
     }
-    setEpWeights(newEpWeights) {
+    setEpWeights(eventID, newEpWeights) {
         this.epWeights = newEpWeights;
         this.epWeightsForCalc = specEPTransforms[this.spec](this.epWeights);
+        this.epWeightsChangeEmitter.emit(eventID);
         this.gemEPCache = new Map();
         this.itemEPCache = new Map();
         this.enchantEPCache = new Map();
     }
-    async computeStatWeights(epStats, epReferenceStat, onProgress) {
+    async computeStatWeights(eventID, epStats, epReferenceStat, onProgress) {
         const result = await this.sim.statWeights(this, epStats, epReferenceStat, onProgress);
-        this.setEpWeights(new Stats(result.epValues));
+        this.setEpWeights(eventID, new Stats(result.epValues));
         return result;
     }
     getCurrentStats() {
