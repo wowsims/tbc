@@ -12,7 +12,7 @@ var HemorrhageActionID = core.ActionID{SpellID: 26864}
 var HemorrhageDebuffID = core.NewDebuffID()
 var HemorrhageEnergyCost = 35.0
 
-func (rogue *Rogue) newHemorrhageTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
 	hemoDuration := time.Second * 15
 	hemoAura := core.Aura{
 		ID:       HemorrhageDebuffID,
@@ -45,11 +45,8 @@ func (rogue *Rogue) newHemorrhageTemplate(sim *core.Simulation) core.SimpleSpell
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second * 1,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: HemorrhageEnergyCost,
-				},
+				GCD:                 time.Second,
+				IgnoreHaste:         true,
 				Cost: core.ResourceCost{
 					Type:  stats.Energy,
 					Value: HemorrhageEnergyCost,
@@ -83,8 +80,9 @@ func (rogue *Rogue) newHemorrhageTemplate(sim *core.Simulation) core.SimpleSpell
 		},
 	}
 
+	// cp. backstab
 	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
-		ability.Effect.StaticDamageMultiplier *= 1.06
+		ability.Effect.StaticDamageMultiplier += 0.06
 	}
 
 	ability.Effect.WeaponInput.DamageMultiplier += 0.01 * float64(rogue.Talents.SinisterCalling)
@@ -92,7 +90,7 @@ func (rogue *Rogue) newHemorrhageTemplate(sim *core.Simulation) core.SimpleSpell
 	return core.NewSimpleSpellTemplate(ability)
 }
 
-func (rogue *Rogue) NewHemorrhage(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (rogue *Rogue) NewHemorrhage(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
 	hm := &rogue.hemorrhage
 	rogue.hemorrhageTemplate.Apply(hm)
 

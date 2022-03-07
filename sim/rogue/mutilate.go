@@ -9,50 +9,62 @@ import (
 )
 
 var MutilateActionID = core.ActionID{SpellID: 34413}
+var MutilateMHActionID = core.ActionID{SpellID: 34419}
+var MutilateOHActionID = core.ActionID{SpellID: 34418}
 var MutilateEnergyCost = 60.0
 
-func (rogue *Rogue) newMutilateTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	damageCast := core.SimpleSpell{
+func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+	bonusCritRating := 5 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.PuncturingWounds)
+
+	mhDamageAbility := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            MutilateActionID,
+				ActionID:            MutilateMHActionID,
 				Character:           &rogue.Character,
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical,
 				CritMultiplier:      rogue.critMultiplier(true, true),
-				SpellExtras:         core.SpellExtrasAlwaysHits | SpellFlagBuilder,
+				SpellExtras:         core.SpellExtrasAlwaysHits,
+			},
+		},
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
+				ProcMask:               core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier:       1,
+				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
+				BonusCritRating:        bonusCritRating,
+			},
+			WeaponInput: core.WeaponDamageInput{
+				Normalized:       true,
+				FlatDamageBonus:  101,
+				DamageMultiplier: 1,
 			},
 		},
 	}
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			ProcMask:               core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
-		WeaponInput: core.WeaponDamageInput{
-			Normalized:       true,
-			FlatDamageBonus:  101,
-			DamageMultiplier: 1,
-		},
-	}
 
-	if true { // TODO: This is only from behind.
-		baseEffect.StaticDamageMultiplier *= 1 + 0.04*float64(rogue.Talents.Opportunity)
-	}
+	// cp. backstab
+	mhDamageAbility.Effect.StaticDamageMultiplier += 0.04 * float64(rogue.Talents.Opportunity)
+
 	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
-		baseEffect.StaticDamageMultiplier *= 1.06
+		mhDamageAbility.Effect.StaticDamageMultiplier += 0.06
 	}
-	baseEffect.BonusCritRating += 5 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.PuncturingWounds)
-	damageCast.Effects = []core.SpellHitEffect{
-		baseEffect,
-		baseEffect,
-	}
-	damageCast.Effects[1].ProcMask = core.ProcMaskMeleeOHSpecial
 
-	rogue.mutilateDamageTemplate = core.NewSimpleSpellTemplate(damageCast)
+	ohDamageAbility := mhDamageAbility
+	ohDamageAbility.SpellCast.Cast.ActionID = MutilateOHActionID
+	ohDamageAbility.SpellCast.Cast.CritMultiplier = rogue.critMultiplier(false, true)
+	ohDamageAbility.Effect.SpellEffect.ProcMask = core.ProcMaskMeleeOHSpecial
+
+	if rogue.Talents.DualWieldSpecialization > 0 {
+		ohDamageAbility.Effect.WeaponInput.DamageMultiplier *= 1 + 0.1*float64(rogue.Talents.DualWieldSpecialization)
+	}
+
+	mhTemplate := core.NewSimpleSpellTemplate(mhDamageAbility)
+	ohTemplate := core.NewSimpleSpellTemplate(ohDamageAbility)
+
+	mhAtk := core.SimpleSpell{}
+	ohAtk := core.SimpleSpell{}
 
 	refundAmount := MutilateEnergyCost * 0.8
 	ability := core.SimpleSpell{
@@ -63,11 +75,8 @@ func (rogue *Rogue) newMutilateTemplate(sim *core.Simulation) core.SimpleSpellTe
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryNone,
 				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second * 1,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: MutilateEnergyCost,
-				},
+				GCD:                 time.Second,
+				IgnoreHaste:         true,
 				Cost: core.ResourceCost{
 					Type:  stats.Energy,
 					Value: MutilateEnergyCost,
@@ -77,30 +86,38 @@ func (rogue *Rogue) newMutilateTemplate(sim *core.Simulation) core.SimpleSpellTe
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				ProcMask: core.ProcMaskMeleeMHSpecial,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					// TODO: Need to adjust cast/hit metrics because of the 2-cast behavior.
-					if spellEffect.Landed() {
-						rogue.AddComboPoints(sim, 2, MutilateActionID)
-
-						spell := &rogue.mutilateDamage
-						rogue.mutilateDamageTemplate.Apply(spell)
-						spell.Effects[0].Target = spellEffect.Target
-						spell.Effects[1].Target = spellEffect.Target
-						if rogue.deadlyPoison.IsInUse() {
-							spell.Effect.DamageMultiplier *= 1.5
-						}
-						spell.Cast(sim)
-					} else {
+					if !spellEffect.Landed() {
 						rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+						return
+					}
+
+					rogue.AddComboPoints(sim, 2, MutilateActionID)
+
+					mhTemplate.Apply(&mhAtk)
+					mhAtk.Effect.Target = spellEffect.Target
+
+					ohTemplate.Apply(&ohAtk)
+					ohAtk.Effect.Target = spellEffect.Target
+
+					if rogue.deadlyPoisonStacks > 0 {
+						mhAtk.Effect.DamageMultiplier *= 1.5
+						ohAtk.Effect.DamageMultiplier *= 1.5
+					}
+
+					// TODO: while this is the most natural handling, the oh attack might have effects
+					//  from the mh attack applied
+					mhAtk.Cast(sim)
+					ohAtk.Cast(sim)
+
+					// applyResultsToCast() has already been done here, so we have to update the spell statistics, too
+					if mhAtk.Effect.Outcome == core.OutcomeCrit || ohAtk.Effect.Outcome == core.OutcomeCrit {
+						spellEffect.Outcome = core.OutcomeCrit
+						spellCast.Hits--
+						spellCast.Crits++
 					}
 				},
-			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 1,
 			},
 		},
 	}
@@ -108,7 +125,7 @@ func (rogue *Rogue) newMutilateTemplate(sim *core.Simulation) core.SimpleSpellTe
 	return core.NewSimpleSpellTemplate(ability)
 }
 
-func (rogue *Rogue) NewMutilate(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (rogue *Rogue) NewMutilate(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
 	mt := &rogue.mutilate
 	rogue.mutilateTemplate.Apply(mt)
 

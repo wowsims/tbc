@@ -183,12 +183,17 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 }
 
 func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell) {
-	character := ability.Character
+	if ahe.StaticDamageMultiplier == 0 {
+		ahe.Damage = 0
+		return
+	}
 
 	if !ahe.Landed() {
 		ahe.Damage = 0
 		return
 	}
+
+	character := ability.Character
 
 	var attackPower float64
 	var bonusWeaponDamage float64

@@ -46,10 +46,6 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 		Cast: core.Cast{
 			ActionID:  SliceAndDiceActionID,
 			Character: rogue.GetCharacter(),
-			BaseCost: core.ResourceCost{
-				Type:  stats.Energy,
-				Value: SliceAndDiceEnergyCost,
-			},
 			Cost: core.ResourceCost{
 				Type:  stats.Energy,
 				Value: SliceAndDiceEnergyCost,

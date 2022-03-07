@@ -47,7 +47,8 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second * 1,
+				GCD:                 time.Second,
+				IgnoreHaste:         true,
 				Cost: core.ResourceCost{
 					Type:  stats.Energy,
 					Value: rogue.eviscerateEnergyCost,
@@ -78,8 +79,9 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 		},
 	}
 
-	ability.Effect.StaticDamageMultiplier *= 1 + 0.05*float64(rogue.Talents.ImprovedEviscerate)
-	ability.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(rogue.Talents.Aggression)
+	// cp. backstab
+	ability.Effect.StaticDamageMultiplier += 0.05 * float64(rogue.Talents.ImprovedEviscerate)
+	ability.Effect.StaticDamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
 	if rogue.Talents.SurpriseAttacks {
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}
@@ -87,7 +89,7 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 	return core.NewSimpleSpellTemplate(ability)
 }
 
-func (rogue *Rogue) NewEviscerate(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (rogue *Rogue) NewEviscerate(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
 	comboPoints := rogue.ComboPoints()
 	if comboPoints == 0 {
 		panic("Eviscerate requires combo points!")

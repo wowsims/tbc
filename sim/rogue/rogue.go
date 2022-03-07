@@ -62,8 +62,8 @@ type Rogue struct {
 	mutilateTemplate core.SimpleSpellTemplate
 	mutilate         core.SimpleSpell
 
-	mutilateDamageTemplate core.SimpleSpellTemplate
-	mutilateDamage         core.SimpleSpell
+	shivTemplate core.SimpleSpellTemplate
+	shiv         core.SimpleSpell
 
 	castSliceAndDice func()
 
@@ -84,6 +84,9 @@ type Rogue struct {
 
 	deadlyPoisonRefreshTemplate core.SimpleSpellTemplate
 	deadlyPoisonRefresh         core.SimpleSpell
+
+	instantPoisonTemplate core.SimpleSpellTemplate
+	instantPoison         core.SimpleSpell
 }
 
 func (rogue *Rogue) GetCharacter() *core.Character {
@@ -115,6 +118,7 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 	rogue.ruptureTemplate = rogue.newRuptureTemplate(sim)
 	rogue.deadlyPoisonTemplate = rogue.newDeadlyPoisonTemplate(sim)
 	rogue.deadlyPoisonRefreshTemplate = rogue.newDeadlyPoisonRefreshTemplate(sim)
+	rogue.instantPoisonTemplate = rogue.newInstantPoisonTemplate(sim)
 
 	rogue.energyPerSecondAvg = core.EnergyPerTick / core.EnergyTickDuration.Seconds()
 

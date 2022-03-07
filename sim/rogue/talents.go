@@ -71,7 +71,7 @@ func (rogue *Rogue) applyTalents() {
 
 var FindWeaknessAuraID = core.NewAuraID()
 
-func (rogue *Rogue) makeFinishingMoveEffectApplier(sim *core.Simulation) func(sim *core.Simulation, numPoints int32) {
+func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim *core.Simulation, numPoints int32) {
 	ruthlessnessChance := 0.2 * float64(rogue.Talents.Ruthlessness)
 	relentlessStrikes := rogue.Talents.RelentlessStrikes
 
@@ -324,7 +324,7 @@ func (rogue *Rogue) applyCombatPotency() {
 				}
 
 				// https://tbc.wowhead.com/spell=35553/combat-potency, proc mask = 8838608.
-				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOHAuto) {
+				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOH) {
 					return
 				}
 
@@ -363,10 +363,11 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: rogue.GetCharacter(),
-			Cooldown:  cooldown,
-			GCD:       time.Second * 1,
+			ActionID:    actionID,
+			Character:   rogue.GetCharacter(),
+			Cooldown:    cooldown,
+			GCD:         time.Second,
+			IgnoreHaste: true,
 			Cost: core.ResourceCost{
 				Type:  stats.Energy,
 				Value: energyCost,
@@ -428,10 +429,11 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: rogue.GetCharacter(),
-			Cooldown:  cooldown,
-			GCD:       time.Second * 1,
+			ActionID:    actionID,
+			Character:   rogue.GetCharacter(),
+			Cooldown:    cooldown,
+			GCD:         time.Second,
+			IgnoreHaste: true,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				rogue.EnergyTickMultiplier = 2
 				const halfTick = core.EnergyPerTick / 2

@@ -23,7 +23,8 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryNone,
 				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second * 1,
+				GCD:                 time.Second,
+				IgnoreHaste:         true,
 				Cost: core.ResourceCost{
 					Type:  stats.Energy,
 					Value: RuptureEnergyCost,

@@ -14,7 +14,7 @@ func (rogue *Rogue) SinisterStrikeEnergyCost() float64 {
 	return 45.0 - 2.5*float64(rogue.Talents.ImprovedSinisterStrike)
 }
 
-func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) newSinisterStrikeTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
 	energyCost := rogue.SinisterStrikeEnergyCost()
 	refundAmount := energyCost * 0.8
 	ability := core.SimpleSpell{
@@ -25,11 +25,8 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.SimpleS
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second * 1,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: energyCost,
-				},
+				GCD:                 time.Second,
+				IgnoreHaste:         true,
 				Cost: core.ResourceCost{
 					Type:  stats.Energy,
 					Value: energyCost,
@@ -60,18 +57,19 @@ func (rogue *Rogue) newSinisterStrikeTemplate(sim *core.Simulation) core.SimpleS
 		},
 	}
 
-	ability.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(rogue.Talents.Aggression)
+	// cp. backstab
+	ability.Effect.StaticDamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
 	if rogue.Talents.SurpriseAttacks {
-		ability.Effect.StaticDamageMultiplier *= 1.1
+		ability.Effect.StaticDamageMultiplier += 0.1
 	}
 	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
-		ability.Effect.StaticDamageMultiplier *= 1.06
+		ability.Effect.StaticDamageMultiplier += 0.06
 	}
 
 	return core.NewSimpleSpellTemplate(ability)
 }
 
-func (rogue *Rogue) NewSinisterStrike(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (rogue *Rogue) NewSinisterStrike(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
 	ss := &rogue.sinisterStrike
 	rogue.sinisterStrikeTemplate.Apply(ss)
 

@@ -22,7 +22,8 @@ func (rogue *Rogue) newExposeArmorTemplate(sim *core.Simulation) core.SimpleSpel
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryNone,
 				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second * 1,
+				GCD:                 time.Second,
+				IgnoreHaste:         true,
 				Cost: core.ResourceCost{
 					Type:  stats.Energy,
 					Value: ExposeArmorEnergyCost,
@@ -59,7 +60,7 @@ func (rogue *Rogue) newExposeArmorTemplate(sim *core.Simulation) core.SimpleSpel
 	return core.NewSimpleSpellTemplate(ability)
 }
 
-func (rogue *Rogue) NewExposeArmor(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (rogue *Rogue) NewExposeArmor(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
 	if rogue.ComboPoints() != 5 {
 		panic("Expose Armor requires 5 combo points!")
 	}
