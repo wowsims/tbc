@@ -281,7 +281,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			// first callback invoked from waitForInit().
 			this.sim.waitForInit().then(() => this.loadSettings());
 		}
-		this.player.setEpWeights(this.individualConfig.defaults.epWeights);
 
 		this.addSidebarComponents();
 		this.addTopbarComponents();
@@ -332,7 +331,9 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				}
 			}
 
-			if (!loadedSettings) {
+			if (loadedSettings) {
+				this.player.setEpWeights(initEventID, this.individualConfig.defaults.epWeights);
+			} else {
 				this.applyDefaults(initEventID);
 			}
 			this.player.setName(initEventID, 'Player');
@@ -893,7 +894,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			this.player.setCooldowns(eventID, Cooldowns.create());
 			this.player.getParty()!.setBuffs(eventID, this.individualConfig.defaults.partyBuffs);
 			this.player.getRaid()!.setBuffs(eventID, this.individualConfig.defaults.raidBuffs);
-			this.player.setEpWeights(this.individualConfig.defaults.epWeights);
+			this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
 
 			this.sim.encounter.fromProto(eventID, EncounterProto.create({
 				duration: 180,
@@ -908,6 +909,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			}));
 
 			this.sim.setIterations(eventID, 3000);
+			this.sim.setFixedRngSeed(eventID, 0);
 		});
 	}
 

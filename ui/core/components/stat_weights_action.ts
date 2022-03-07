@@ -2,6 +2,7 @@ import { StatWeightsRequest, StatWeightsResult, ProgressMetrics } from '/tbc/cor
 import { Stat } from '/tbc/core/proto/common.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { stDevToConf90 } from '/tbc/core/utils.js';
 
 import { Component } from './component.js';
@@ -13,7 +14,7 @@ export function addStatWeightsAction(simUI: IndividualSimUI<any>, epStats: Array
 	simUI.addAction('EP WEIGHTS', 'ep-weights-action', async () => {
 		simUI.setResultsPending();
 		const iterations = simUI.sim.getIterations();
-		const result = await simUI.player.computeStatWeights(epStats, epReferenceStat, (progress: ProgressMetrics) =>{
+		const result = await simUI.player.computeStatWeights(TypedEvent.nextEventID(), epStats, epReferenceStat, (progress: ProgressMetrics) =>{
 			resultsManager.setSimProgress(progress);
 		});
 		resultsManager.setSimResult(iterations, epStats, epReferenceStat, result);
