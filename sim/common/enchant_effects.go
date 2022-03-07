@@ -52,30 +52,9 @@ func ApplyCrusader(agent core.Agent) {
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		// -4 str per level over 60
-		buffs := character.ApplyStatDependencies(stats.Stats{stats.Strength: 60})
-		buffs[stats.Mana] = 0 // mana is wierd
-		unbuffs := buffs.Multiply(-1)
-
-		applyCrusaderStrength := func(sim *core.Simulation, character *core.Character, isMH bool) {
-			character.AddStats(buffs)
-			var tag int32
-			var auraID core.AuraID
-			if isMH {
-				tag = 1
-				auraID = CrusaderStrengthMHAuraID
-			} else {
-				tag = 2
-				auraID = CrusaderStrengthOHAuraID
-			}
-			character.AddAura(sim, core.Aura{
-				ID:       auraID,
-				ActionID: core.ActionID{ItemID: 16252, Tag: tag},
-				Expires:  sim.CurrentTime + (time.Second * 15),
-				OnExpire: func(sim *core.Simulation) {
-					character.AddStats(unbuffs)
-				},
-			})
-		}
+		const strBonus = 100.0 - 4.0*float64(core.CharacterLevel-60)
+		applyStatAuraMH := character.NewTemporaryStatsAuraApplier(CrusaderStrengthMHAuraID, core.ActionID{ItemID: 16252, Tag: 1}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
+		applyStatAuraOH := character.NewTemporaryStatsAuraApplier(CrusaderStrengthOHAuraID, core.ActionID{ItemID: 16252, Tag: 2}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
 
 		return core.Aura{
 			ID: CrusaderAuraID,
@@ -86,7 +65,11 @@ func ApplyCrusader(agent core.Agent) {
 
 				isMH := spellEffect.IsMH()
 				if ppmm.Proc(sim, isMH, false, "Crusader") {
-					applyCrusaderStrength(sim, character, isMH)
+					if isMH {
+						applyStatAuraMH(sim)
+					} else {
+						applyStatAuraOH(sim)
+					}
 				}
 			},
 		}
@@ -142,34 +125,10 @@ func ApplyMongoose(agent core.Agent) {
 	}
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		buffs := character.ApplyStatDependencies(stats.Stats{stats.Agility: 120})
-		buffs[stats.Mana] = 0 // mana is weird
-		unbuffs := buffs.Multiply(-1)
-		haste := 2 * core.HasteRatingPerHastePercent
-
-		applyLightningSpeed := func(sim *core.Simulation, character *core.Character, isMH bool) {
-			// https://tbc.wowhead.com/spell=28093/lightning-speed
-			character.AddStats(buffs)
-			character.AddMeleeHaste(sim, haste)
-			var tag int32
-			var auraID core.AuraID
-			if isMH {
-				tag = 1
-				auraID = LightningSpeedMHAuraID
-			} else {
-				tag = 2
-				auraID = LightningSpeedOHAuraID
-			}
-			character.AddAura(sim, core.Aura{
-				ID:       auraID,
-				ActionID: core.ActionID{SpellID: 28093, Tag: tag},
-				Expires:  sim.CurrentTime + (time.Second * 15),
-				OnExpire: func(sim *core.Simulation) {
-					character.AddStats(unbuffs)
-					character.AddMeleeHaste(sim, -haste)
-				},
-			})
-		}
+		agiBonus := 120.0
+		hasteBonus := 2 * core.HasteRatingPerHastePercent
+		applyStatAuraMH := character.NewTemporaryStatsAuraApplier(LightningSpeedMHAuraID, core.ActionID{SpellID: 28093, Tag: 1}, stats.Stats{stats.Agility: agiBonus, stats.MeleeHaste: hasteBonus}, time.Second*15)
+		applyStatAuraOH := character.NewTemporaryStatsAuraApplier(LightningSpeedOHAuraID, core.ActionID{SpellID: 28093, Tag: 2}, stats.Stats{stats.Agility: agiBonus, stats.MeleeHaste: hasteBonus}, time.Second*15)
 
 		return core.Aura{
 			ID: MongooseAuraID,
@@ -180,7 +139,11 @@ func ApplyMongoose(agent core.Agent) {
 
 				isMH := spellEffect.IsMH()
 				if ppmm.Proc(sim, isMH, false, "mongoose") {
-					applyLightningSpeed(sim, character, isMH)
+					if isMH {
+						applyStatAuraMH(sim)
+					} else {
+						applyStatAuraOH(sim)
+					}
 				}
 			},
 		}
@@ -241,6 +204,8 @@ func ApplyExecutioner(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const arPenBonus = 840.0
 		const dur = time.Second * 15
+		applyStatAura := character.NewTemporaryStatsAuraApplier(ExecutionerProcAuraID, core.ActionID{SpellID: 42976}, stats.Stats{stats.ArmorPenetration: arPenBonus}, dur)
+
 		return core.Aura{
 			ID: ExecutionerAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -249,7 +214,7 @@ func ApplyExecutioner(agent core.Agent) {
 				}
 
 				if ppmm.Proc(sim, spellEffect.IsMH(), false, "Executioner") {
-					character.AddAuraWithTemporaryStats(sim, ExecutionerProcAuraID, core.ActionID{SpellID: 42976}, stats.ArmorPenetration, arPenBonus, dur)
+					applyStatAura(sim)
 				}
 			},
 		}

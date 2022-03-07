@@ -21,8 +21,7 @@ func init() {
 	var RestrainedEssenceOfSapphironCooldownID = core.NewCooldownID()
 	core.AddItemEffect(23046, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.SpellPower,
-		130,
+		stats.Stats{stats.SpellPower: 130},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 23046},
@@ -35,8 +34,7 @@ func init() {
 	var LivingRubySerpentCooldownID = core.NewCooldownID()
 	core.AddItemEffect(24126, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.SpellPower,
-		150,
+		stats.Stats{stats.SpellPower: 150},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 24126},
@@ -49,8 +47,7 @@ func init() {
 	var ScryersBloodgemCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29132, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.SpellPower,
-		150,
+		stats.Stats{stats.SpellPower: 150},
 		time.Second*15,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 29132},
@@ -63,8 +60,7 @@ func init() {
 	var XirisGiftCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29179, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.SpellPower,
-		150,
+		stats.Stats{stats.SpellPower: 150},
 		time.Second*15,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 29179},
@@ -77,8 +73,7 @@ func init() {
 	var IconOfTheSilverCrescentCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29370, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.SpellPower,
-		155,
+		stats.Stats{stats.SpellPower: 155},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 29370},
@@ -91,8 +86,7 @@ func init() {
 	var EssenceOfTheMartyrCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29376, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.DefensiveTrinketActiveAuraID,
-		stats.SpellPower,
-		99,
+		stats.Stats{stats.SpellPower: 99},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 29376},
@@ -105,8 +99,7 @@ func init() {
 	var SkullOfGuldanCooldownID = core.NewCooldownID()
 	core.AddItemEffect(32483, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.SpellHaste,
-		175,
+		stats.Stats{stats.SpellHaste: 175},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 32483},
@@ -119,8 +112,7 @@ func init() {
 	var HexShrunkenHeadCooldownID = core.NewCooldownID()
 	core.AddItemEffect(33829, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.SpellPower,
-		211,
+		stats.Stats{stats.SpellPower: 211},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 33829},
@@ -133,8 +125,7 @@ func init() {
 	var ShiftingNaaruSliverCooldownID = core.NewCooldownID()
 	core.AddItemEffect(34429, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.SpellPower,
-		320,
+		stats.Stats{stats.SpellPower: 320},
 		time.Second*15,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 34429},
@@ -147,8 +138,7 @@ func init() {
 	var DarkIronSmokingPipeCooldownID = core.NewCooldownID()
 	core.AddItemEffect(38290, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.SpellPower,
-		155,
+		stats.Stats{stats.SpellPower: 155},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 38290},
@@ -188,7 +178,7 @@ func ApplyQuagmirransEye(agent core.Agent) {
 		const dur = time.Second * 45
 		icd := core.NewICD()
 
-		applyStatAura := character.NewTempStatAuraApplier(sim, FungalFrenzyAuraID, core.ActionID{ItemID: 27683}, stats.SpellHaste, hasteBonus, time.Second*6)
+		applyStatAura := character.NewTemporaryStatsAuraApplier(FungalFrenzyAuraID, core.ActionID{ItemID: 27683}, stats.Stats{stats.SpellHaste: hasteBonus}, time.Second*6)
 		return core.Aura{
 			ID: QuagmirransEyeAuraID,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
@@ -211,6 +201,7 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 		icd := core.NewICD()
 		const spellBonus = 225.0
 		const dur = time.Second * 45
+		applyStatAura := character.NewTemporaryStatsAuraApplier(CallOfTheNexusAuraID, core.ActionID{ItemID: 28418}, stats.Stats{stats.SpellPower: spellBonus}, time.Second*10)
 
 		return core.Aura{
 			ID: ShiffarsNexusHornAuraID,
@@ -225,7 +216,7 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + dur)
-				character.AddAuraWithTemporaryStats(sim, CallOfTheNexusAuraID, core.ActionID{ItemID: 28418}, stats.SpellPower, spellBonus, time.Second*10)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -239,6 +230,7 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const spellBonus = 170.0
 		const dur = time.Second * 10
+		applyStatAura := character.NewTemporaryStatsAuraApplier(RecurringPowerAuraID, core.ActionID{ItemID: 28789}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 
 		return core.Aura{
 			ID: EyeOfMagtheridonAuraID,
@@ -249,7 +241,7 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 				if !spellEffect.Outcome.Matches(core.OutcomeMiss) {
 					return
 				}
-				character.AddAuraWithTemporaryStats(sim, RecurringPowerAuraID, core.ActionID{ItemID: 28789}, stats.SpellPower, spellBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -265,6 +257,7 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 		const spellBonus = 190.0
 		const dur = time.Second * 15
 		const icdDur = time.Second * 45
+		applyStatAura := character.NewTemporaryStatsAuraApplier(UnstableCurrentsAuraID, core.ActionID{ItemID: 30626}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 
 		return core.Aura{
 			ID: SextantOfUnstableCurrentsAuraID,
@@ -279,7 +272,7 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, UnstableCurrentsAuraID, core.ActionID{ItemID: 30626}, stats.SpellPower, spellBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})

@@ -31,8 +31,7 @@ var ItemSetManaEtched = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				const spellBonus = 110.0
 				const duration = time.Second * 15
-
-				applyStatAura := character.NewTempStatAuraApplier(sim, ManaEtchedInsightAuraID, core.ActionID{SpellID: 37619}, stats.SpellPower, spellBonus, duration)
+				applyStatAura := character.NewTemporaryStatsAuraApplier(ManaEtchedInsightAuraID, core.ActionID{SpellID: 37619}, stats.Stats{stats.SpellPower: spellBonus}, duration)
 				return core.Aura{
 					ID: ManaEtchedAuraID,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
@@ -68,6 +67,7 @@ var ItemSetSpellstrike = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				const spellBonus = 92.0
 				const duration = time.Second * 10
+				applyStatAura := character.NewTemporaryStatsAuraApplier(SpellstrikeInfusionAuraID, core.ActionID{SpellID: 32106}, stats.Stats{stats.SpellPower: spellBonus}, duration)
 
 				return core.Aura{
 					ID: SpellstrikeAuraID,
@@ -75,7 +75,7 @@ var ItemSetSpellstrike = core.ItemSet{
 						if sim.RandomFloat("spellstrike") > 0.05 {
 							return
 						}
-						character.AddAuraWithTemporaryStats(sim, SpellstrikeInfusionAuraID, core.ActionID{SpellID: 32106}, stats.SpellPower, spellBonus, duration)
+						applyStatAura(sim)
 					},
 				}
 			})

@@ -590,83 +590,39 @@ func NewICD() InternalCD {
 	return InternalCD(0)
 }
 
-// NewTempStatAuraApplier creates an application function for applying temp stats. This is higher performance because it creates a cached Aura object in its closure.
-//  You can replace most calls of 'AddAuraWithTemporaryStats' whenever a perf issue is discovered.
-func (character *Character) NewTempStatAuraApplier(sim *Simulation, auraID AuraID, actionID ActionID, stat stats.Stat, amount float64, duration time.Duration) func(sim *Simulation) {
+// NewTemporaryStatsAuraApplier creates an application function for applying temp stats.
+//  This is higher performance because it creates a cached Aura object in its closure.
+func (character *Character) NewTemporaryStatsAuraApplier(auraID AuraID, actionID ActionID, tempStats stats.Stats, duration time.Duration) func(sim *Simulation) {
+	factory := character.NewTemporaryStatsAuraFactory(auraID, actionID, tempStats, duration)
+
+	return func(sim *Simulation) {
+		character.ReplaceAura(sim, factory(sim))
+	}
+}
+
+func (character *Character) NewTemporaryStatsAuraFactory(auraID AuraID, actionID ActionID, tempStats stats.Stats, duration time.Duration) func(sim *Simulation) Aura {
+	buffs := character.ApplyStatDependencies(tempStats)
+	unbuffs := buffs.Multiply(-1)
+
 	aura := Aura{
 		ID:       auraID,
 		ActionID: actionID,
 		OnExpire: func(sim *Simulation) {
 			if sim.Log != nil {
-				character.Log(sim, "Lost %0.02f %s from fading %s.", amount, stat.StatName(), actionID)
+				character.Log(sim, "Lost %s from fading %s.", buffs, actionID)
 			}
-			if stat == stats.MeleeHaste {
-				character.AddMeleeHaste(sim, -amount)
-			} else {
-				character.AddStat(stat, -amount)
-				if stat == stats.AttackPower {
-					character.AddStat(stats.RangedAttackPower, -amount)
-				}
-			}
+			character.AddStatsDynamic(sim, unbuffs)
 		},
 	}
 
-	return func(sim *Simulation) {
-		if sim.Log != nil {
-			character.Log(sim, "Gained %0.02f %s from %s.", amount, stat.StatName(), actionID)
+	return func(sim *Simulation) Aura {
+		if !character.HasAura(auraID) {
+			character.AddStatsDynamic(sim, buffs)
+			if sim.Log != nil {
+				character.Log(sim, "Gained %s from %s.", buffs, actionID)
+			}
 		}
 		aura.Expires = sim.CurrentTime + duration
-
-		if !character.HasAura(auraID) {
-			if stat == stats.MeleeHaste {
-				character.AddMeleeHaste(sim, amount)
-			} else {
-				character.AddStat(stat, amount)
-				if stat == stats.AttackPower {
-					character.AddStat(stats.RangedAttackPower, amount)
-				}
-			}
-			character.AddAura(sim, aura)
-		} else {
-			character.ReplaceAura(sim, aura)
-		}
-
-	}
-}
-
-// Helper for the common case of adding an Aura that gives a temporary stat boost.
-func (character *Character) AddAuraWithTemporaryStats(sim *Simulation, auraID AuraID, actionID ActionID, stat stats.Stat, amount float64, duration time.Duration) {
-	character.AddAura(sim, character.NewAuraWithTemporaryStats(sim, auraID, actionID, stat, amount, duration))
-}
-func (character *Character) NewAuraWithTemporaryStats(sim *Simulation, auraID AuraID, actionID ActionID, stat stats.Stat, amount float64, duration time.Duration) Aura {
-	if sim.Log != nil {
-		character.Log(sim, "Gained %0.02f %s from %s.", amount, stat.StatName(), actionID)
-	}
-	if stat == stats.MeleeHaste {
-		character.AddMeleeHaste(sim, amount)
-	} else {
-		character.AddStat(stat, amount)
-		if stat == stats.AttackPower {
-			character.AddStat(stats.RangedAttackPower, amount)
-		}
-	}
-
-	return Aura{
-		ID:       auraID,
-		ActionID: actionID,
-		Expires:  sim.CurrentTime + duration,
-		OnExpire: func(sim *Simulation) {
-			if sim.Log != nil {
-				character.Log(sim, "Lost %0.02f %s from fading %s.", amount, stat.StatName(), actionID)
-			}
-			if stat == stats.MeleeHaste {
-				character.AddMeleeHaste(sim, -amount)
-			} else {
-				character.AddStat(stat, -amount)
-				if stat == stats.AttackPower {
-					character.AddStat(stats.RangedAttackPower, -amount)
-				}
-			}
-		},
+		return aura
 	}
 }

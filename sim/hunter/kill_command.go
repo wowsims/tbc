@@ -60,7 +60,7 @@ func (hunter *Hunter) newKillCommandTemplate(sim *core.Simulation) core.SimpleSp
 
 func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	hasBeastLord4Pc := ItemSetBeastLord.CharacterHasSetBonus(&hp.hunterOwner.Character, 4)
-	beastLordApplier := hp.hunterOwner.NewTempStatAuraApplier(sim, BeastLord4PcAuraID, core.ActionID{SpellID: 37483}, stats.ArmorPenetration, 600, time.Second*15)
+	beastLordStatApplier := hp.hunterOwner.NewTemporaryStatsAuraApplier(BeastLord4PcAuraID, core.ActionID{SpellID: 37483}, stats.Stats{stats.ArmorPenetration: 600}, time.Second*15)
 
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -81,7 +81,7 @@ func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.SimpleSpe
 				ThreatMultiplier:       1,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					if hasBeastLord4Pc {
-						beastLordApplier(sim)
+						beastLordStatApplier(sim)
 					}
 				},
 			},

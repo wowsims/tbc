@@ -211,6 +211,23 @@ func (character *Character) AddStats(stat stats.Stats) {
 		}
 	}
 }
+func (character *Character) AddStatsDynamic(sim *Simulation, stat stats.Stats) {
+	directStats := stat
+	directStats[stats.Mana] = 0 // TODO: Mana needs special treatment
+
+	if directStats[stats.MeleeHaste] != 0 {
+		character.AddMeleeHaste(sim, directStats[stats.MeleeHaste])
+		directStats[stats.MeleeHaste] = 0
+	}
+
+	character.stats = character.stats.Add(directStats)
+
+	if len(character.Pets) > 0 {
+		for _, petAgent := range character.Pets {
+			petAgent.GetPet().addOwnerStats(stat)
+		}
+	}
+}
 func (character *Character) AddStat(stat stats.Stat, amount float64) {
 	if character.finalized {
 		if stat == stats.Mana {

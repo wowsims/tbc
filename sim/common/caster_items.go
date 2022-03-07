@@ -28,7 +28,7 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 		const icdDur = time.Second * 50
 		const proc = 0.2
 
-		applyStatAura := character.NewTempStatAuraApplier(sim, PowerOfArcanagosAuraID, core.ActionID{ItemID: 28602}, stats.SpellPower, spellBonus, dur)
+		applyStatAura := character.NewTemporaryStatsAuraApplier(PowerOfArcanagosAuraID, core.ActionID{ItemID: 28602}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 		return core.Aura{
 			ID: RobeOfTheElderScribeAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -49,7 +49,7 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 }
 
 var EternalSageItemAuraID = core.NewAuraID()
-var BandoftheEternalSageAuraID = core.NewAuraID()
+var BandOfTheEternalSageAuraID = core.NewAuraID()
 
 func ApplyEternalSage(agent core.Agent) {
 	character := agent.GetCharacter()
@@ -60,6 +60,7 @@ func ApplyEternalSage(agent core.Agent) {
 		const dur = time.Second * 10
 		const icdDur = time.Second * 60
 		const proc = 0.1
+		applyStatAura := character.NewTemporaryStatsAuraApplier(BandOfTheEternalSageAuraID, core.ActionID{ItemID: 29305}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 
 		return core.Aura{
 			ID: EternalSageItemAuraID,
@@ -74,7 +75,7 @@ func ApplyEternalSage(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, BandoftheEternalSageAuraID, core.ActionID{ItemID: 29305}, stats.SpellPower, spellBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})

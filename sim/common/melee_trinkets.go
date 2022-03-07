@@ -26,8 +26,7 @@ func init() {
 	var KissOfTheSpiderCooldownID = core.NewCooldownID()
 	core.AddItemEffect(22954, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.MeleeHaste,
-		200,
+		stats.Stats{stats.MeleeHaste: 200},
 		time.Second*15,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 22954},
@@ -40,8 +39,7 @@ func init() {
 	var SlayersCrestCooldownID = core.NewCooldownID()
 	core.AddItemEffect(23041, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.AttackPower,
-		260,
+		stats.Stats{stats.AttackPower: 260, stats.RangedAttackPower: 260},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 23041},
@@ -54,8 +52,7 @@ func init() {
 	var FigurineNightseyePantherCooldownID = core.NewCooldownID()
 	core.AddItemEffect(24128, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.AttackPower,
-		320,
+		stats.Stats{stats.AttackPower: 320, stats.RangedAttackPower: 320},
 		time.Second*12,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 24128},
@@ -68,8 +65,7 @@ func init() {
 	var BladefistsBreadthCooldownID = core.NewCooldownID()
 	core.AddItemEffect(28041, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.AttackPower,
-		200,
+		stats.Stats{stats.AttackPower: 200, stats.RangedAttackPower: 200},
 		time.Second*15,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 28041},
@@ -82,8 +78,7 @@ func init() {
 	var IconOfUnyieldingCourageCooldownID = core.NewCooldownID()
 	core.AddItemEffect(28121, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.ArmorPenetration,
-		600,
+		stats.Stats{stats.ArmorPenetration: 600},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 28121},
@@ -96,8 +91,7 @@ func init() {
 	var AbacusViolentOddsCooldownID = core.NewCooldownID()
 	core.AddItemEffect(28288, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.MeleeHaste,
-		260,
+		stats.Stats{stats.MeleeHaste: 260},
 		time.Second*10,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 28288},
@@ -110,8 +104,7 @@ func init() {
 	var BloodlustBroochCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29383, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.AttackPower,
-		278,
+		stats.Stats{stats.AttackPower: 278, stats.RangedAttackPower: 278},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 29383},
@@ -124,8 +117,7 @@ func init() {
 	var CoreOfArkelosCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29776, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.AttackPower,
-		200,
+		stats.Stats{stats.AttackPower: 200, stats.RangedAttackPower: 200},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 29776},
@@ -140,8 +132,7 @@ func init() {
 	var BadgeOfTenacityCooldownID = core.NewCooldownID()
 	core.AddItemEffect(32658, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.Agility,
-		150,
+		stats.Stats{stats.Agility: 150},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 32658},
@@ -154,8 +145,7 @@ func init() {
 	var BerserkersCallCooldownID = core.NewCooldownID()
 	core.AddItemEffect(33831, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.AttackPower,
-		360,
+		stats.Stats{stats.AttackPower: 360, stats.RangedAttackPower: 360},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 33831},
@@ -168,8 +158,7 @@ func init() {
 	var FigurineShadowsongPantherCooldownID = core.NewCooldownID()
 	core.AddItemEffect(35702, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.AttackPower,
-		320,
+		stats.Stats{stats.AttackPower: 320, stats.RangedAttackPower: 320},
 		time.Second*15,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 35702},
@@ -182,8 +171,7 @@ func init() {
 	var EmptyDirebrewMugCooldownID = core.NewCooldownID()
 	core.AddItemEffect(38287, core.MakeTemporaryStatsOnUseCDRegistration(
 		core.OffensiveTrinketActiveAuraID,
-		stats.AttackPower,
-		278,
+		stats.Stats{stats.AttackPower: 278, stats.RangedAttackPower: 278},
 		time.Second*20,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 38287},
@@ -240,8 +228,7 @@ func ApplyCrystalforgedTrinket(agent core.Agent) {
 	core.RegisterTemporaryStatsOnUseCD(
 		agent,
 		core.OffensiveTrinketActiveAuraID,
-		stats.AttackPower,
-		216,
+		stats.Stats{stats.AttackPower: 216, stats.RangedAttackPower: 216},
 		time.Second*10,
 		core.MajorCooldown{
 			ActionID:         core.ActionID{ItemID: 32654},
@@ -334,6 +321,7 @@ func ApplyHourglassUnraveller(agent core.Agent) {
 		const statBonus = 300.0
 		const dur = time.Second * 10
 		const procChance = 0.1
+		applyStatAura := character.NewTemporaryStatsAuraApplier(RageOfUnravellerAuraID, core.ActionID{ItemID: 28034}, stats.Stats{stats.AttackPower: statBonus, stats.RangedAttackPower: statBonus}, dur)
 
 		icd := core.NewICD()
 		const icdDur = time.Second * 50
@@ -355,7 +343,7 @@ func ApplyHourglassUnraveller(agent core.Agent) {
 				}
 
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, RageOfUnravellerAuraID, core.ActionID{ItemID: 28034}, stats.AttackPower, statBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -426,6 +414,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 		const hasteBonus = 325.0
 		const dur = time.Second * 10
 		const icdDur = time.Second * 20
+		applyStatAura := character.NewTemporaryStatsAuraApplier(MeleeHasteAuraID, core.ActionID{ItemID: 28830}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
 
 		ppmm := character.AutoAttacks.NewPPMManager(1.0)
 		return core.Aura{
@@ -443,7 +432,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 
-				character.AddAuraWithTemporaryStats(sim, MeleeHasteAuraID, core.ActionID{ItemID: 28830}, stats.MeleeHaste, hasteBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -458,6 +447,7 @@ func ApplyTsunamiTalisman(agent core.Agent) {
 		const apBonus = 340
 		const dur = time.Second * 10
 		const procChance = 0.1
+		applyStatAura := character.NewTemporaryStatsAuraApplier(TsunamiTalismanProcAuraID, core.ActionID{ItemID: 30627}, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus}, dur)
 
 		icd := core.NewICD()
 		const icdDur = time.Second * 45
@@ -479,7 +469,7 @@ func ApplyTsunamiTalisman(agent core.Agent) {
 				}
 
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, TsunamiTalismanProcAuraID, core.ActionID{ItemID: 30627}, stats.AttackPower, apBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -525,6 +515,7 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 		const arPenBonus = 300
 		const dur = time.Second * 10
 		ppmm := character.AutoAttacks.NewPPMManager(1.0)
+		applyStatAura := character.NewTemporaryStatsAuraApplier(MadnessOfTheBetrayerProcAuraID, core.ActionID{ItemID: 32505}, stats.Stats{stats.ArmorPenetration: arPenBonus}, dur)
 
 		return core.Aura{
 			ID: MadnessOfTheBetrayerAuraID,
@@ -537,7 +528,7 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 					return
 				}
 
-				character.AddAuraWithTemporaryStats(sim, MadnessOfTheBetrayerProcAuraID, core.ActionID{ItemID: 32505}, stats.ArmorPenetration, arPenBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -609,6 +600,7 @@ func ApplyShardOfContempt(agent core.Agent) {
 		const apBonus = 230
 		const dur = time.Second * 20
 		const procChance = 0.1
+		applyStatAura := character.NewTemporaryStatsAuraApplier(ShardOfContemptProcAuraID, core.ActionID{ItemID: 34472}, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus}, dur)
 
 		icd := core.NewICD()
 		const icdDur = time.Second * 45
@@ -627,7 +619,7 @@ func ApplyShardOfContempt(agent core.Agent) {
 				}
 
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, ShardOfContemptProcAuraID, core.ActionID{ItemID: 34472}, stats.AttackPower, apBonus, dur)
+				applyStatAura(sim)
 			},
 		}
 	})

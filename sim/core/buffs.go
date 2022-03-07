@@ -185,7 +185,6 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 
 	if individualBuffs.UnleashedRage {
-		// TODO: This implementation won't give the bonus to temporary effects, like trinket actives.
 		character.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.AttackPower,
 			ModifiedStat: stats.AttackPower,
@@ -252,29 +251,13 @@ func applyPetBuffEffects(petAgent PetAgent, raidBuffs proto.RaidBuffs, partyBuff
 var SnapshotImprovedStrengthOfEarthTotemAuraID = NewAuraID()
 
 func SnapshotImprovedStrengthOfEarthTotemAura(character *Character) AuraFactory {
-	return func(sim *Simulation) Aura {
-		bonus := character.ApplyStatDependencies(stats.Stats{stats.Strength: 12})
-		bonus[stats.Mana] = 0 // mana is wierd
-		negBonus := bonus.Multiply(-1)
-		character.AddStats(bonus)
-
-		return Aura{
-			ID:       SnapshotImprovedStrengthOfEarthTotemAuraID,
-			ActionID: ActionID{SpellID: 37223},
-			Expires:  sim.CurrentTime + (time.Second * 110),
-			OnExpire: func(sim *Simulation) {
-				character.AddStats(negBonus)
-			},
-		}
-	}
+	return character.NewTemporaryStatsAuraFactory(SnapshotImprovedStrengthOfEarthTotemAuraID, ActionID{SpellID: 37223}, stats.Stats{stats.Strength: 12}, time.Second*110)
 }
 
 var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
 
 func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
-	return func(sim *Simulation) Aura {
-		return character.NewAuraWithTemporaryStats(sim, SnapshotImprovedWrathOfAirTotemAuraID, ActionID{SpellID: 37212}, stats.SpellPower, 20, time.Second*110)
-	}
+	return character.NewTemporaryStatsAuraFactory(SnapshotImprovedWrathOfAirTotemAuraID, ActionID{SpellID: 37212}, stats.Stats{stats.SpellPower: 20}, time.Second*110)
 }
 
 var SnapshotBattleShoutAuraID = NewAuraID()
@@ -288,27 +271,7 @@ func SnapshotBattleShoutAura(character *Character, snapshotSapphire bool, snapsh
 		amount += 30
 	}
 
-	// Do this manually instead of calling NewAuraWithTemporaryStats so that it
-	// only affects melee AP.
-	return func(sim *Simulation) Aura {
-		actionID := ActionID{SpellID: 2048, Tag: 1}
-		if sim.Log != nil {
-			character.Log(sim, "Gained %0.02f %s from %s.", amount, stats.AttackPower.StatName(), actionID)
-		}
-		character.AddStat(stats.AttackPower, amount)
-
-		return Aura{
-			ID:       SnapshotBattleShoutAuraID,
-			ActionID: actionID,
-			Expires:  sim.CurrentTime + time.Second*110,
-			OnExpire: func(sim *Simulation) {
-				if sim.Log != nil {
-					character.Log(sim, "Lost %0.02f %s from fading %s.", amount, stats.AttackPower.StatName(), actionID)
-				}
-				character.AddStat(stats.AttackPower, -amount)
-			},
-		}
-	}
+	return character.NewTemporaryStatsAuraFactory(SnapshotBattleShoutAuraID, ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: amount}, time.Second*110)
 }
 
 var BattleChickenAuraID = NewAuraID()
