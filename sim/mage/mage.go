@@ -137,6 +137,7 @@ func (mage *Mage) Reset(newsim *core.Simulation) {
 	mage.numCastsDone = 0
 	mage.isBlastSpamming = false
 	mage.manaTracker.Reset()
+	mage.disabledMCDs = nil
 }
 
 func NewMage(character core.Character, options proto.Player) *Mage {
