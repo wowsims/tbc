@@ -35,11 +35,13 @@ import { addStatWeightsAction } from '/tbc/core/components/stat_weights_action.j
 import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
 import { isDualWieldSpec } from '/tbc/core/proto_utils/utils.js';
 import { launchedSpecs } from '/tbc/core/launched_sims.js';
+import { newIndividualExporters } from '/tbc/core/components/exporters.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
+import * as OtherConstants from '/tbc/core/constants/other.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 const SAVED_GEAR_STORAGE_KEY = '__savedGear__';
 const SAVED_ROTATION_STORAGE_KEY = '__savedRotation__';
@@ -156,10 +158,7 @@ export class IndividualSimUI extends SimUI {
                     console.warn('Failed to parse saved settings: ' + e);
                 }
             }
-            if (loadedSettings) {
-                this.player.setEpWeights(initEventID, this.individualConfig.defaults.epWeights);
-            }
-            else {
+            if (!loadedSettings) {
                 this.applyDefaults(initEventID);
             }
             this.player.setName(initEventID, 'Player');
@@ -177,7 +176,7 @@ export class IndividualSimUI extends SimUI {
     }
     addTopbarComponents() {
         const importSettings = document.createElement('span');
-        importSettings.classList.add('import-settings', 'fas', 'fa-upload');
+        importSettings.classList.add('import-settings', 'fas', 'fa-file-import');
         tippy(importSettings, {
             'content': 'Import',
             'allowHTML': true,
@@ -188,27 +187,7 @@ export class IndividualSimUI extends SimUI {
         if (this.debug) {
             this.addToolbarItem(importSettings);
         }
-        const shareLink = document.createElement('span');
-        shareLink.classList.add('share-link', 'fas', 'fa-link', 'within-raid-sim-hide');
-        tippy(shareLink, {
-            'content': 'Shareable link',
-            'allowHTML': true,
-        });
-        shareLink.addEventListener('click', event => {
-            const protoBytes = IndividualSimSettings.toBinary(this.toProto());
-            const deflated = pako.deflate(protoBytes, { to: 'string' });
-            const encoded = btoa(String.fromCharCode(...deflated));
-            const linkUrl = new URL(window.location.href);
-            linkUrl.hash = encoded;
-            if (navigator.clipboard == undefined) {
-                alert(linkUrl.toString());
-            }
-            else {
-                navigator.clipboard.writeText(linkUrl.toString());
-                alert('Current settings copied to clipboard!');
-            }
-        });
-        this.addToolbarItem(shareLink);
+        this.addToolbarItem(newIndividualExporters(this));
         const settingsMenu = document.createElement('span');
         settingsMenu.classList.add('fas', 'fa-cog');
         tippy(settingsMenu, {
@@ -672,6 +651,7 @@ export class IndividualSimUI extends SimUI {
                     })],
             }));
             this.sim.setIterations(eventID, 3000);
+            this.sim.setPhase(eventID, OtherConstants.CURRENT_PHASE);
             this.sim.setFixedRngSeed(eventID, 0);
         });
     }
@@ -719,10 +699,12 @@ export class IndividualSimUI extends SimUI {
     }
     toProto() {
         return IndividualSimSettings.create({
+            settings: this.sim.toProto(),
             player: this.player.toProto(),
             raidBuffs: this.sim.raid.getBuffs(),
             partyBuffs: this.player.getParty()?.getBuffs() || PartyBuffs.create(),
             encounter: this.sim.encounter.toProto(),
+            epWeights: this.player.getEpWeights().asArray(),
         });
     }
     fromProto(eventID, settings) {
@@ -730,7 +712,16 @@ export class IndividualSimUI extends SimUI {
             if (!settings.player) {
                 return;
             }
+            if (settings.settings) {
+                this.sim.fromProto(eventID, settings.settings);
+            }
             this.player.fromProto(eventID, settings.player);
+            if (settings.epWeights?.length > 0) {
+                this.player.setEpWeights(eventID, new Stats(settings.epWeights));
+            }
+            else {
+                this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
+            }
             this.sim.raid.setBuffs(eventID, settings.raidBuffs || RaidBuffs.create());
             const party = this.player.getParty();
             if (party) {

@@ -307,6 +307,7 @@ export class RaidSimUI extends SimUI {
     }
     toProto() {
         return RaidSimSettings.create({
+            settings: this.sim.toProto(),
             raid: this.sim.raid.toProto(),
             buffBots: this.getBuffBots().map(b => b.toProto()),
             blessings: this.blessingsPicker.getAssignments(),
@@ -315,6 +316,9 @@ export class RaidSimUI extends SimUI {
     }
     fromProto(eventID, settings) {
         TypedEvent.freezeAllAndDo(() => {
+            if (settings.settings) {
+                this.sim.fromProto(eventID, settings.settings);
+            }
             this.sim.raid.fromProto(eventID, settings.raid || RaidProto.create());
             this.sim.encounter.fromProto(eventID, settings.encounter || EncounterProto.create());
             this.raidPicker.setBuffBots(eventID, settings.buffBots);

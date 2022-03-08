@@ -16,11 +16,32 @@ import { Player } from "./api";
 import { PartyBuffs } from "./common";
 import { RaidBuffs } from "./common";
 /**
+ * @generated from protobuf message proto.SimSettings
+ */
+export interface SimSettings {
+    /**
+     * @generated from protobuf field: int32 iterations = 1;
+     */
+    iterations: number;
+    /**
+     * @generated from protobuf field: int32 phase = 2;
+     */
+    phase: number;
+    /**
+     * @generated from protobuf field: int64 fixed_rng_seed = 3;
+     */
+    fixedRngSeed: bigint;
+}
+/**
  * Contains all information that is imported/exported from an individual sim.
  *
  * @generated from protobuf message proto.IndividualSimSettings
  */
 export interface IndividualSimSettings {
+    /**
+     * @generated from protobuf field: proto.SimSettings settings = 5;
+     */
+    settings?: SimSettings;
     /**
      * @generated from protobuf field: proto.RaidBuffs raid_buffs = 1;
      */
@@ -37,6 +58,10 @@ export interface IndividualSimSettings {
      * @generated from protobuf field: proto.Encounter encounter = 4;
      */
     encounter?: Encounter;
+    /**
+     * @generated from protobuf field: repeated double ep_weights = 6;
+     */
+    epWeights: number[];
 }
 /**
  * Local storage data for gear settings.
@@ -181,6 +206,10 @@ export interface SavedRaid {
  */
 export interface RaidSimSettings {
     /**
+     * @generated from protobuf field: proto.SimSettings settings = 5;
+     */
+    settings?: SimSettings;
+    /**
      * @generated from protobuf field: proto.Raid raid = 1;
      */
     raid?: Raid;
@@ -222,6 +251,16 @@ export declare enum Blessings {
      */
     BlessingOfWisdom = 4
 }
+declare class SimSettings$Type extends MessageType<SimSettings> {
+    constructor();
+    create(value?: PartialMessage<SimSettings>): SimSettings;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SimSettings): SimSettings;
+    internalBinaryWrite(message: SimSettings, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.SimSettings
+ */
+export declare const SimSettings: SimSettings$Type;
 declare class IndividualSimSettings$Type extends MessageType<IndividualSimSettings> {
     constructor();
     create(value?: PartialMessage<IndividualSimSettings>): IndividualSimSettings;

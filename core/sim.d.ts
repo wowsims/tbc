@@ -10,6 +10,7 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
+import { SimSettings as SimSettingsProto } from '/tbc/core/proto/ui.js';
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
@@ -71,6 +72,7 @@ export declare class Sim {
     setPhase(eventID: EventID, newPhase: number): void;
     getFixedRngSeed(): number;
     setFixedRngSeed(eventID: EventID, newFixedRngSeed: number): void;
+    static MAX_RNG_SEED: number;
     private nextRngSeed;
     getLastUsedRngSeed(): number;
     getShow1hWeapons(): boolean;
@@ -83,5 +85,6 @@ export declare class Sim {
     setIterations(eventID: EventID, newIterations: number): void;
     lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null;
     lookupEquipmentSpec(equipSpec: EquipmentSpec): Gear;
-    toJson(): Object;
+    toProto(): SimSettingsProto;
+    fromProto(eventID: EventID, proto: SimSettingsProto): void;
 }

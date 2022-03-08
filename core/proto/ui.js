@@ -41,17 +41,16 @@ export var Blessings;
     Blessings[Blessings["BlessingOfWisdom"] = 4] = "BlessingOfWisdom";
 })(Blessings || (Blessings = {}));
 // @generated message type with reflection information, may provide speed optimized methods
-class IndividualSimSettings$Type extends MessageType {
+class SimSettings$Type extends MessageType {
     constructor() {
-        super("proto.IndividualSimSettings", [
-            { no: 1, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
-            { no: 2, name: "party_buffs", kind: "message", T: () => PartyBuffs },
-            { no: 3, name: "player", kind: "message", T: () => Player },
-            { no: 4, name: "encounter", kind: "message", T: () => Encounter }
+        super("proto.SimSettings", [
+            { no: 1, name: "iterations", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "fixed_rng_seed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
         ]);
     }
     create(value) {
-        const message = {};
+        const message = { iterations: 0, phase: 0, fixedRngSeed: 0n };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -62,17 +61,14 @@ class IndividualSimSettings$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* proto.RaidBuffs raid_buffs */ 1:
-                    message.raidBuffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.raidBuffs);
+                case /* int32 iterations */ 1:
+                    message.iterations = reader.int32();
                     break;
-                case /* proto.PartyBuffs party_buffs */ 2:
-                    message.partyBuffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.partyBuffs);
+                case /* int32 phase */ 2:
+                    message.phase = reader.int32();
                     break;
-                case /* proto.Player player */ 3:
-                    message.player = Player.internalBinaryRead(reader, reader.uint32(), options, message.player);
-                    break;
-                case /* proto.Encounter encounter */ 4:
-                    message.encounter = Encounter.internalBinaryRead(reader, reader.uint32(), options, message.encounter);
+                case /* int64 fixed_rng_seed */ 3:
+                    message.fixedRngSeed = reader.int64().toBigInt();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -86,6 +82,86 @@ class IndividualSimSettings$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* int32 iterations = 1; */
+        if (message.iterations !== 0)
+            writer.tag(1, WireType.Varint).int32(message.iterations);
+        /* int32 phase = 2; */
+        if (message.phase !== 0)
+            writer.tag(2, WireType.Varint).int32(message.phase);
+        /* int64 fixed_rng_seed = 3; */
+        if (message.fixedRngSeed !== 0n)
+            writer.tag(3, WireType.Varint).int64(message.fixedRngSeed);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.SimSettings
+ */
+export const SimSettings = new SimSettings$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class IndividualSimSettings$Type extends MessageType {
+    constructor() {
+        super("proto.IndividualSimSettings", [
+            { no: 5, name: "settings", kind: "message", T: () => SimSettings },
+            { no: 1, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
+            { no: 2, name: "party_buffs", kind: "message", T: () => PartyBuffs },
+            { no: 3, name: "player", kind: "message", T: () => Player },
+            { no: 4, name: "encounter", kind: "message", T: () => Encounter },
+            { no: 6, name: "ep_weights", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
+    }
+    create(value) {
+        const message = { epWeights: [] };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.SimSettings settings */ 5:
+                    message.settings = SimSettings.internalBinaryRead(reader, reader.uint32(), options, message.settings);
+                    break;
+                case /* proto.RaidBuffs raid_buffs */ 1:
+                    message.raidBuffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.raidBuffs);
+                    break;
+                case /* proto.PartyBuffs party_buffs */ 2:
+                    message.partyBuffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.partyBuffs);
+                    break;
+                case /* proto.Player player */ 3:
+                    message.player = Player.internalBinaryRead(reader, reader.uint32(), options, message.player);
+                    break;
+                case /* proto.Encounter encounter */ 4:
+                    message.encounter = Encounter.internalBinaryRead(reader, reader.uint32(), options, message.encounter);
+                    break;
+                case /* repeated double ep_weights */ 6:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.epWeights.push(reader.double());
+                    else
+                        message.epWeights.push(reader.double());
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.SimSettings settings = 5; */
+        if (message.settings)
+            SimSettings.internalBinaryWrite(message.settings, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         /* proto.RaidBuffs raid_buffs = 1; */
         if (message.raidBuffs)
             RaidBuffs.internalBinaryWrite(message.raidBuffs, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
@@ -98,6 +174,13 @@ class IndividualSimSettings$Type extends MessageType {
         /* proto.Encounter encounter = 4; */
         if (message.encounter)
             Encounter.internalBinaryWrite(message.encounter, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
+        /* repeated double ep_weights = 6; */
+        if (message.epWeights.length) {
+            writer.tag(6, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.epWeights.length; i++)
+                writer.double(message.epWeights[i]);
+            writer.join();
+        }
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -581,6 +664,7 @@ export const SavedRaid = new SavedRaid$Type();
 class RaidSimSettings$Type extends MessageType {
     constructor() {
         super("proto.RaidSimSettings", [
+            { no: 5, name: "settings", kind: "message", T: () => SimSettings },
             { no: 1, name: "raid", kind: "message", T: () => Raid },
             { no: 2, name: "buff_bots", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => BuffBot },
             { no: 3, name: "blessings", kind: "message", T: () => BlessingsAssignments },
@@ -599,6 +683,9 @@ class RaidSimSettings$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
+                case /* proto.SimSettings settings */ 5:
+                    message.settings = SimSettings.internalBinaryRead(reader, reader.uint32(), options, message.settings);
+                    break;
                 case /* proto.Raid raid */ 1:
                     message.raid = Raid.internalBinaryRead(reader, reader.uint32(), options, message.raid);
                     break;
@@ -623,6 +710,9 @@ class RaidSimSettings$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* proto.SimSettings settings = 5; */
+        if (message.settings)
+            SimSettings.internalBinaryWrite(message.settings, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
         /* proto.Raid raid = 1; */
         if (message.raid)
             Raid.internalBinaryWrite(message.raid, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
