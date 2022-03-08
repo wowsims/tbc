@@ -6,12 +6,20 @@ option go_package = "./proto";
 import "api.proto";
 import "common.proto";
 
+message SimSettings {
+	int32 iterations = 1;
+	int32 phase = 2;
+	int64 fixed_rng_seed = 3;
+}
+
 // Contains all information that is imported/exported from an individual sim.
 message IndividualSimSettings {
+	SimSettings settings = 5;
 	RaidBuffs raid_buffs = 1;
 	PartyBuffs party_buffs = 2;
 	Player player = 3;
 	Encounter encounter = 4;
+	repeated double ep_weights = 6;
 }
 
 // Local storage data for gear settings.
@@ -80,6 +88,7 @@ message SavedRaid {
 
 // Contains all information that is imported/exported from a raid sim.
 message RaidSimSettings {
+	SimSettings settings = 5;
 	Raid raid = 1;
 	repeated BuffBot buff_bots = 2;
 	BlessingsAssignments blessings = 3;

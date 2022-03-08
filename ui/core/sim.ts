@@ -19,6 +19,7 @@ import { GearListRequest, GearListResult } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
+import { SimSettings as SimSettingsProto } from '/tbc/core/proto/ui.js';
 
 import { EquippedItem } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
@@ -319,12 +320,13 @@ export class Sim {
     }
   }
 
+	static MAX_RNG_SEED = Math.pow(2, 32) - 1;
 	private nextRngSeed(): number {
 		let rngSeed = 0;
 		if (this.fixedRngSeed) {
 			rngSeed = this.fixedRngSeed;
 		} else {
-			rngSeed = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+			rngSeed = Math.floor(Math.random() * Sim.MAX_RNG_SEED);
 		}
 
 		this.lastUsedRngSeed = rngSeed;
@@ -409,11 +411,19 @@ export class Sim {
     return new Gear(gearMap);
   }
 
-  // Returns JSON representing all the current values.
-  toJson(): Object {
-    return {
-      'raid': RaidProto.toJson(this.raid.toProto()),
-      'encounter': EncounterProto.toJson(this.encounter.toProto()),
-    };
+	toProto(): SimSettingsProto {
+		return SimSettingsProto.create({
+			iterations: this.getIterations(),
+			phase: this.getPhase(),
+			fixedRngSeed: BigInt(this.getFixedRngSeed()),
+		});
+	}
+
+	fromProto(eventID: EventID, proto: SimSettingsProto) {
+		TypedEvent.freezeAllAndDo(() => {
+			this.setIterations(eventID, proto.iterations || 3000);
+			this.setPhase(eventID, proto.phase || OtherConstants.CURRENT_PHASE);
+			this.setFixedRngSeed(eventID, Number(proto.fixedRngSeed));
+		});
 	}
 }

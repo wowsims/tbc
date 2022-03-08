@@ -62,7 +62,10 @@ export class RaidSimResultsManager {
   setSimResult(eventID: EventID, simResult: SimResult) {
 		this.currentData = {
 			simResult: simResult,
-			settings: this.simUI.sim.toJson(),
+			settings: {
+				'raid': RaidProto.toJson(this.simUI.sim.raid.toProto()),
+				'encounter': EncounterProto.toJson(this.simUI.sim.encounter.toProto()),
+			},
 			raidProto: RaidProto.clone(simResult.request.raid || RaidProto.create()),
 			encounterProto: EncounterProto.clone(simResult.request.encounter || EncounterProto.create()),
 		};
