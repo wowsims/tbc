@@ -207,15 +207,15 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestRogue-AllItems-Dragonstrike-28439"
+ key: "TestRogue-AllItems-Dragonstrike(StackingAuras)--23"
  value: {
-  dps: 1387.2421580237585
+  dps: 1393.1135588339957
  }
 }
 dps_results: {
- key: "TestRogue-AllItems-DragonstrikeP5--23"
+ key: "TestRogue-AllItems-Dragonstrike-28439"
  value: {
-  dps: 1231.2038209600112
+  dps: 1393.1135588339957
  }
 }
 dps_results: {
@@ -232,6 +232,12 @@ dps_results: {
 }
 dps_results: {
  key: "TestRogue-AllItems-EmptyMugofDirebrew-38287"
+ value: {
+  dps: 1393.1135588339957
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-EmpyreanDemolisher-17112"
  value: {
   dps: 1393.1135588339957
  }

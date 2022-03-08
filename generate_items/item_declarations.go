@@ -11,7 +11,8 @@ type ItemDeclaration struct {
 	Stats          Stats // Only non-zero values will override
 	ClassAllowlist []proto.Class
 	Phase          int
-	Filter         bool // If true, this item will be omitted from the sim.
+	HandType       proto.HandType // Overrides hand type.
+	Filter         bool           // If true, this item will be omitted from the sim.
 }
 type ItemData struct {
 	Declaration ItemDeclaration
@@ -82,6 +83,7 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	{ID: 18584, Filter: true},
 	{ID: 24265, Filter: true},
 	{ID: 24525, Filter: true},
+	{ID: 28439, HandType: proto.HandType_HandTypeOneHand},
 	{ID: 32384, Filter: true},
 	{ID: 32421, Filter: true},
 	{ID: 32422, Filter: true},
