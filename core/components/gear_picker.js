@@ -12,8 +12,8 @@ import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { slotNames } from '/tbc/core/proto_utils/names.js';
 import { setItemQualityCssClass } from '/tbc/core/css_utils.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
-import { CloseButton } from './close_button.js';
 import { Component } from './component.js';
+import { Popup } from './popup.js';
 import { makePhaseSelector } from './other_inputs.js';
 import { makeShow1hWeaponsSelector } from './other_inputs.js';
 import { makeShow2hWeaponsSelector } from './other_inputs.js';
@@ -129,28 +129,20 @@ class ItemPicker extends Component {
         this._equippedItem = newItem;
     }
 }
-class SelectorModal extends Component {
+class SelectorModal extends Popup {
     constructor(parent, player, slot, equippedItem, eligibleItems, eligibleEnchants) {
-        super(parent, 'selector-modal');
+        super(parent);
         this.player = player;
-        this.rootElem.id = 'selectorModal';
+        this.rootElem.classList.add('selector-modal');
         this.rootElem.innerHTML = `
 			<ul class="nav nav-tabs selector-modal-tabs">
 			</ul>
 			<div class="tab-content selector-modal-tab-content">
 			</div>
 		`;
-        new CloseButton(this.rootElem, () => {
-            $('#selectorModal').bPopup().close();
-            this.rootElem.remove();
-        });
+        this.addCloseButton();
         this.tabsElem = this.rootElem.getElementsByClassName('selector-modal-tabs')[0];
         this.contentElem = this.rootElem.getElementsByClassName('selector-modal-tab-content')[0];
-        const computedStyles = window.getComputedStyle(parent);
-        this.rootElem.style.setProperty('--main-text-color', computedStyles.getPropertyValue('--main-text-color').trim());
-        this.rootElem.style.setProperty('--theme-color-primary', computedStyles.getPropertyValue('--theme-color-primary').trim());
-        this.rootElem.style.setProperty('--theme-color-background', computedStyles.getPropertyValue('--theme-color-background').trim());
-        this.rootElem.style.setProperty('--theme-color-background-raw', computedStyles.getPropertyValue('--theme-color-background-raw').trim());
         this.setData(slot, equippedItem, eligibleItems, eligibleEnchants);
     }
     setData(slot, equippedItem, eligibleItems, eligibleEnchants) {
@@ -201,12 +193,6 @@ class SelectorModal extends Component {
                 this.player.equipItem(eventID, slot, equippedItem.withEnchant(null));
         });
         this.addGemTabs(slot, equippedItem);
-        $('#selectorModal').bPopup({
-            closeClass: 'item-picker-close',
-            onClose: () => {
-                this.rootElem.remove();
-            },
-        });
     }
     addGemTabs(slot, equippedItem) {
         if (equippedItem == undefined) {
@@ -296,7 +282,7 @@ class SelectorModal extends Component {
         this.contentElem.appendChild(tabContent);
         tabContent.innerHTML = `
     <div class="selector-modal-tab-content-header">
-      <button class="selector-modal-remove-button">Remove</button>
+      <button class="selector-modal-remove-button sim-button">Remove</button>
       <input class="selector-modal-search" type="text" placeholder="Search...">
       <div class="selector-modal-filter-bar-filler"></div>
       <div class="sim-input selector-modal-boolean-option selector-modal-show-1h-weapons"></div>

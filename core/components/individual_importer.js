@@ -5,13 +5,12 @@ import { Race } from '/tbc/core/proto/common.js';
 import { classNames, nameToClass, nameToRace } from '/tbc/core/proto_utils/names.js';
 import { talentSpellIdsToTalentString } from '/tbc/core/talents/factory.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
-import { CloseButton } from './close_button.js';
-import { Component } from './component.js';
-export class IndividualImporter extends Component {
+import { Popup } from './popup.js';
+export class IndividualImporter extends Popup {
     constructor(parent, simUI) {
-        super(parent, 'individual-importer');
+        super(parent);
         this.simUI = simUI;
-        this.rootElem.id = 'individualImporter';
+        this.rootElem.classList.add('individual-importer');
         this.rootElem.innerHTML = `
 			<ul class="nav nav-tabs individual-importer-tabs">
 				<li class="individual-importer-tab active"><a data-toggle="tab" href="#70upgradesTab">70 Upgrades</a></li>
@@ -51,22 +50,8 @@ export class IndividualImporter extends Component {
 				</div>
 			</div>
 		`;
+        this.addCloseButton();
         this.importButton = this.rootElem.getElementsByClassName('import-button')[0];
-        const computedStyles = window.getComputedStyle(parent);
-        this.rootElem.style.setProperty('--main-text-color', computedStyles.getPropertyValue('--main-text-color').trim());
-        this.rootElem.style.setProperty('--theme-color-primary', computedStyles.getPropertyValue('--theme-color-primary').trim());
-        this.rootElem.style.setProperty('--theme-color-background', computedStyles.getPropertyValue('--theme-color-background').trim());
-        this.rootElem.style.setProperty('--theme-color-background-raw', computedStyles.getPropertyValue('--theme-color-background-raw').trim());
-        new CloseButton(this.rootElem, () => {
-            $('#individualImporter').bPopup().close();
-            this.rootElem.remove();
-        });
-        $('#individualImporter').bPopup({
-            closeClass: 'item-picker-close',
-            onClose: () => {
-                this.rootElem.remove();
-            },
-        });
         this.setup70UpgradesImport();
         this.setupAddonImport();
     }
@@ -172,7 +157,7 @@ export class IndividualImporter extends Component {
                 this.simUI.player.setTalentsString(eventID, talentsStr);
             }
         });
-        $('#individualImporter').bPopup().close();
+        this.close();
         if (missingItems.length == 0 && missingEnchants.length == 0) {
             alert('Import successful!');
         }

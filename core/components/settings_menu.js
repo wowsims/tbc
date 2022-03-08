@@ -3,13 +3,12 @@ import { statNames } from '/tbc/core/proto_utils/names.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { getEnumValues } from '/tbc/core/utils.js';
-import { CloseButton } from './close_button.js';
-import { Component } from './component.js';
-export class SettingsMenu extends Component {
+import { Popup } from './popup.js';
+export class SettingsMenu extends Popup {
     constructor(parent, simUI) {
-        super(parent, 'settings-menu');
+        super(parent);
+        this.rootElem.classList.add('settings-menu');
         this.simUI = simUI;
-        this.rootElem.id = 'settingsMenu';
         this.rootElem.innerHTML = `
 			<div class="settings-menu-title">
 				<span>SETTINGS</span>
@@ -31,20 +30,7 @@ export class SettingsMenu extends Component {
 				</div>
 			</div>
 		`;
-        const computedStyles = window.getComputedStyle(parent);
-        this.rootElem.style.setProperty('--main-text-color', computedStyles.getPropertyValue('--main-text-color').trim());
-        this.rootElem.style.setProperty('--theme-color-primary', computedStyles.getPropertyValue('--theme-color-primary').trim());
-        this.rootElem.style.setProperty('--theme-color-background', computedStyles.getPropertyValue('--theme-color-background').trim());
-        this.rootElem.style.setProperty('--theme-color-background-raw', computedStyles.getPropertyValue('--theme-color-background-raw').trim());
-        new CloseButton(this.rootElem, () => {
-            $('#settingsMenu').bPopup().close();
-            this.rootElem.remove();
-        });
-        $('#settingsMenu').bPopup({
-            onClose: () => {
-                this.rootElem.remove();
-            },
-        });
+        this.addCloseButton();
         const restoreDefaultsButton = this.rootElem.getElementsByClassName('restore-defaults-button')[0];
         restoreDefaultsButton.addEventListener('click', event => {
             this.simUI.applyDefaults(TypedEvent.nextEventID());
