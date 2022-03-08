@@ -1,10 +1,7 @@
 package rogue
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var EviscerateActionID = core.ActionID{SpellID: 26865}
@@ -39,44 +36,17 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 	finishingMoveEffects := rogue.makeFinishingMoveEffectApplier(sim)
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            EviscerateActionID,
-				Character:           &rogue.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second,
-				IgnoreHaste:         true,
-				Cost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: rogue.eviscerateEnergyCost,
-				},
-				CritMultiplier: rogue.critMultiplier(true, false),
-				SpellExtras:    SpellFlagFinisher,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if spellEffect.Landed() {
-						numPoints := rogue.ComboPoints()
-						rogue.SpendComboPoints(sim, spellCast.ActionID)
-						finishingMoveEffects(sim, numPoints)
-					} else {
-						if refundAmount > 0 {
-							rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
-						}
-					}
-				},
-			},
-			WeaponInput: core.WeaponDamageInput{},
-		},
+	ability := rogue.newAbility(EviscerateActionID, rogue.eviscerateEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		if spellEffect.Landed() {
+			numPoints := rogue.ComboPoints()
+			rogue.SpendComboPoints(sim, spellCast.ActionID)
+			finishingMoveEffects(sim, numPoints)
+		} else {
+			if refundAmount > 0 {
+				rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
+			}
+		}
 	}
 
 	// cp. backstab

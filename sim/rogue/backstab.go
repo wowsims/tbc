@@ -1,11 +1,8 @@
 package rogue
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var BackstabActionID = core.ActionID{SpellID: 26863}
@@ -13,44 +10,19 @@ var BackstabEnergyCost = 60.0
 
 func (rogue *Rogue) newBackstabTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
 	refundAmount := BackstabEnergyCost * 0.8
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            BackstabActionID,
-				Character:           &rogue.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second,
-				IgnoreHaste:         true,
-				Cost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: BackstabEnergyCost,
-				},
-				CritMultiplier: rogue.critMultiplier(true, true),
-				SpellExtras:    SpellFlagBuilder,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if spellEffect.Landed() {
-						rogue.AddComboPoints(sim, 1, BackstabActionID)
-					} else {
-						rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
-					}
-				},
-			},
-			WeaponInput: core.WeaponDamageInput{
-				Normalized:       true,
-				FlatDamageBonus:  170,
-				DamageMultiplier: 1.5,
-			},
-		},
+
+	ability := rogue.newAbility(BackstabActionID, BackstabEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		if spellEffect.Landed() {
+			rogue.AddComboPoints(sim, 1, BackstabActionID)
+		} else {
+			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+		}
+	}
+	ability.Effect.WeaponInput = core.WeaponDamageInput{
+		Normalized:       true,
+		FlatDamageBonus:  170,
+		DamageMultiplier: 1.5,
 	}
 
 	// all these use "Apply Aura: Modifies Damage/Healing Done", and stack additively (up to 142%)

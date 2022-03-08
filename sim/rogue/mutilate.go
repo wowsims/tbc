@@ -1,11 +1,8 @@
 package rogue
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var MutilateActionID = core.ActionID{SpellID: 34413}
@@ -67,59 +64,38 @@ func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemp
 	ohAtk := core.SimpleSpell{}
 
 	refundAmount := MutilateEnergyCost * 0.8
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            MutilateActionID,
-				Character:           &rogue.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryNone,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second,
-				IgnoreHaste:         true,
-				Cost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: MutilateEnergyCost,
-				},
-				SpellExtras: SpellFlagBuilder,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask: core.ProcMaskMeleeMHSpecial,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
-						return
-					}
+	ability := rogue.newAbility(MutilateActionID, MutilateEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
+	ability.SpellCast.CritRollCategory = core.CritRollCategoryNone
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		if !spellEffect.Landed() {
+			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+			return
+		}
 
-					rogue.AddComboPoints(sim, 2, MutilateActionID)
+		rogue.AddComboPoints(sim, 2, MutilateActionID)
 
-					mhTemplate.Apply(&mhAtk)
-					mhAtk.Effect.Target = spellEffect.Target
+		mhTemplate.Apply(&mhAtk)
+		mhAtk.Effect.Target = spellEffect.Target
 
-					ohTemplate.Apply(&ohAtk)
-					ohAtk.Effect.Target = spellEffect.Target
+		ohTemplate.Apply(&ohAtk)
+		ohAtk.Effect.Target = spellEffect.Target
 
-					if rogue.deadlyPoisonStacks > 0 {
-						mhAtk.Effect.DamageMultiplier *= 1.5
-						ohAtk.Effect.DamageMultiplier *= 1.5
-					}
+		if rogue.deadlyPoisonStacks > 0 {
+			mhAtk.Effect.DamageMultiplier *= 1.5
+			ohAtk.Effect.DamageMultiplier *= 1.5
+		}
 
-					// TODO: while this is the most natural handling, the oh attack might have effects
-					//  from the mh attack applied
-					mhAtk.Cast(sim)
-					ohAtk.Cast(sim)
+		// TODO: while this is the most natural handling, the oh attack might have effects
+		//  from the mh attack applied
+		mhAtk.Cast(sim)
+		ohAtk.Cast(sim)
 
-					// applyResultsToCast() has already been done here, so we have to update the spell statistics, too
-					if mhAtk.Effect.Outcome == core.OutcomeCrit || ohAtk.Effect.Outcome == core.OutcomeCrit {
-						spellEffect.Outcome = core.OutcomeCrit
-						spellCast.Hits--
-						spellCast.Crits++
-					}
-				},
-			},
-		},
+		// applyResultsToCast() has already been done here, so we have to update the spell statistics, too
+		if mhAtk.Effect.Outcome == core.OutcomeCrit || ohAtk.Effect.Outcome == core.OutcomeCrit {
+			spellEffect.Outcome = core.OutcomeCrit
+			spellCast.Hits--
+			spellCast.Crits++
+		}
 	}
 
 	return core.NewSimpleSpellTemplate(ability)

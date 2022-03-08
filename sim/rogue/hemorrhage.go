@@ -5,7 +5,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var HemorrhageActionID = core.ActionID{SpellID: 26864}
@@ -37,47 +36,22 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 	}
 
 	refundAmount := HemorrhageEnergyCost * 0.8
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            HemorrhageActionID,
-				Character:           &rogue.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second,
-				IgnoreHaste:         true,
-				Cost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: HemorrhageEnergyCost,
-				},
-				CritMultiplier: rogue.critMultiplier(true, true),
-				SpellExtras:    SpellFlagBuilder,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if spellEffect.Landed() {
-						rogue.AddComboPoints(sim, 1, HemorrhageActionID)
 
-						aura := hemoAura
-						aura.Expires = sim.CurrentTime + hemoDuration
-						spellEffect.Target.ReplaceAura(sim, aura)
-					} else {
-						rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
-					}
-				},
-			},
-			WeaponInput: core.WeaponDamageInput{
-				Normalized:       true,
-				DamageMultiplier: 1.1,
-			},
-		},
+	ability := rogue.newAbility(HemorrhageActionID, HemorrhageEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		if spellEffect.Landed() {
+			rogue.AddComboPoints(sim, 1, HemorrhageActionID)
+
+			aura := hemoAura
+			aura.Expires = sim.CurrentTime + hemoDuration
+			spellEffect.Target.ReplaceAura(sim, aura)
+		} else {
+			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+		}
+	}
+	ability.Effect.WeaponInput = core.WeaponDamageInput{
+		Normalized:       true,
+		DamageMultiplier: 1.1,
 	}
 
 	// cp. backstab
