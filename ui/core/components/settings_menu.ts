@@ -13,20 +13,19 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
-import { CloseButton } from './close_button.js';
-import { Component } from './component.js';
+import { Popup } from './popup.js';
 
 declare var $: any;
 declare var tippy: any;
 
-export class SettingsMenu<SpecType extends Spec> extends Component {
+export class SettingsMenu<SpecType extends Spec> extends Popup {
 	private readonly simUI: IndividualSimUI<SpecType>;
 
   constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-    super(parent, 'settings-menu');
+    super(parent);
+		this.rootElem.classList.add('settings-menu');
 		this.simUI = simUI;
 
-		this.rootElem.id = 'settingsMenu';
 		this.rootElem.innerHTML = `
 			<div class="settings-menu-title">
 				<span>SETTINGS</span>
@@ -48,23 +47,7 @@ export class SettingsMenu<SpecType extends Spec> extends Component {
 				</div>
 			</div>
 		`;
-
-		const computedStyles = window.getComputedStyle(parent);
-		this.rootElem.style.setProperty('--main-text-color', computedStyles.getPropertyValue('--main-text-color').trim());
-		this.rootElem.style.setProperty('--theme-color-primary', computedStyles.getPropertyValue('--theme-color-primary').trim());
-		this.rootElem.style.setProperty('--theme-color-background', computedStyles.getPropertyValue('--theme-color-background').trim());
-		this.rootElem.style.setProperty('--theme-color-background-raw', computedStyles.getPropertyValue('--theme-color-background-raw').trim());
-
-		new CloseButton(this.rootElem, () => {
-			$('#settingsMenu').bPopup().close();
-			this.rootElem.remove();
-		});
-
-		$('#settingsMenu').bPopup({
-			onClose: () => {
-				this.rootElem.remove();
-			},
-		});
+		this.addCloseButton();
 
     const restoreDefaultsButton = this.rootElem.getElementsByClassName('restore-defaults-button')[0] as HTMLElement;
 		restoreDefaultsButton.addEventListener('click', event => {

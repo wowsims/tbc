@@ -186,6 +186,9 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 		itemStr += fmt.Sprintf("WeaponType:proto.WeaponType_%s, ", weaponType.String())
 
 		handType := itemResponse.GetHandType()
+		if itemDeclaration.HandType != proto.HandType_HandTypeUnknown {
+			handType = itemDeclaration.HandType
+		}
 		if handType == proto.HandType_HandTypeUnknown {
 			panic("Unknown hand type for item: " + itemResponse.Tooltip)
 		}
@@ -282,6 +285,7 @@ var allowList = map[int]bool{
 	11815: true, // Hand of Justice
 	12632: true, // Storm Gauntlets
 	17111: true, // Blazefury Medallion
+	17112: true, // Empyrean Demolisher
 	20966: true, // Jade Pendant of Blasting
 	22395: true, // Totem of Rage
 	24114: true, // Braided Eternium Chain
