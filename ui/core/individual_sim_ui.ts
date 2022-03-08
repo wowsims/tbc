@@ -64,6 +64,7 @@ import { equalsOrBothNull } from '/tbc/core/utils.js';
 import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
 import { isDualWieldSpec } from '/tbc/core/proto_utils/utils.js';
 import { launchedSpecs } from '/tbc/core/launched_sims.js';
+import { newIndividualExporters } from '/tbc/core/components/exporters.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
 import { specNames } from '/tbc/core/proto_utils/utils.js';
@@ -359,7 +360,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 	private addTopbarComponents() {
 		const importSettings = document.createElement('span');
-		importSettings.classList.add('import-settings', 'fas', 'fa-upload');
+		importSettings.classList.add('import-settings', 'fas', 'fa-file-import');
 		tippy(importSettings, {
 			'content': 'Import',
 			'allowHTML': true,
@@ -370,6 +371,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		if (this.debug) {
 			this.addToolbarItem(importSettings);
 		}
+
+		this.addToolbarItem(newIndividualExporters(this));
 
 		const shareLink = document.createElement('span');
 		shareLink.classList.add('share-link', 'fas', 'fa-link', 'within-raid-sim-hide');
