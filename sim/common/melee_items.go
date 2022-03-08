@@ -12,6 +12,7 @@ func init() {
 	// Proc effects. Keep these in order by item ID.
 	core.AddItemEffect(12632, ApplyStormGauntlets)
 	core.AddItemEffect(17111, ApplyBlazefuryMedallion)
+	core.AddItemEffect(17112, ApplyEmpyreanDemolisher)
 	core.AddItemEffect(23541, ApplyKhoriumChampion)
 	core.AddItemEffect(24114, ApplyBraidedEterniumChain)
 	core.AddItemEffect(27901, ApplyBlackoutTruncheon)
@@ -20,7 +21,7 @@ func init() {
 	core.AddItemEffect(28437, ApplyDrakefistHammer)
 	core.AddItemEffect(28438, ApplyDragonmaw)
 	core.AddItemEffect(28439, ApplyDragonstrike)
-	core.AddItemEffect(-23, ApplyDragonstrike)
+	core.AddItemEffect(-23, ApplyDragonstrikeStacking)
 	core.AddItemEffect(28573, ApplyDespair)
 	core.AddItemEffect(28767, ApplyTheDecapitator)
 	core.AddItemEffect(28774, ApplyGlaiveOfThePit)
@@ -134,6 +135,35 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 				castAction.Effect.Target = spellEffect.Target
 				castAction.Init(sim)
 				castAction.Cast(sim)
+			},
+		}
+	})
+}
+
+var EmpyreanDemolisherAuraID = core.NewAuraID()
+var EmpyreanDemolisherProcAuraID = core.NewAuraID()
+
+func ApplyEmpyreanDemolisher(agent core.Agent) {
+	character := agent.GetCharacter()
+	mh, oh := character.GetWeaponHands(17112)
+	procMask := core.GetMeleeProcMaskForHands(mh, oh)
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const hasteBonus = 212.0
+		const dur = time.Second * 10
+		const procChance = 2.8 / 60.0
+		applyStatAura := character.NewTemporaryStatsAuraApplier(EmpyreanDemolisherProcAuraID, core.ActionID{ItemID: 17112}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
+
+		return core.Aura{
+			ID: EmpyreanDemolisherAuraID,
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) {
+					return
+				}
+				if sim.RandomFloat("EmpyreanDemolisher") > procChance {
+					return
+				}
+
+				applyStatAura(sim)
 			},
 		}
 	})
@@ -317,18 +347,18 @@ func ApplyDragonmaw(agent core.Agent) {
 }
 
 var DragonstrikeAuraID = core.NewAuraID()
-var DragonstrikeProcAuraID = core.NewAuraID()
+var DragonstrikeProcMHAuraID = core.NewAuraID()
+var DragonstrikeProcOHAuraID = core.NewAuraID()
 
 func ApplyDragonstrike(agent core.Agent) {
 	character := agent.GetCharacter()
-	mh, _ := character.GetWeaponHands(28439)
-	_, oh := character.GetWeaponHands(-23)
+	mh, oh := character.GetWeaponHands(28439)
 	procMask := core.GetMeleeProcMaskForHands(mh, oh)
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const hasteBonus = 212.0
 		const dur = time.Second * 10
 		const procChance = 2.7 / 60.0
-		applyStatAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcAuraID, core.ActionID{ItemID: 28439}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
+		applyStatAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcMHAuraID, core.ActionID{ItemID: 28439}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
 
 		return core.Aura{
 			ID: DragonstrikeAuraID,
@@ -341,6 +371,37 @@ func ApplyDragonstrike(agent core.Agent) {
 				}
 
 				applyStatAura(sim)
+			},
+		}
+	})
+}
+
+func ApplyDragonstrikeStacking(agent core.Agent) {
+	character := agent.GetCharacter()
+	mh, oh := character.GetWeaponHands(-23)
+	procMask := core.GetMeleeProcMaskForHands(mh, oh)
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const hasteBonus = 212.0
+		const dur = time.Second * 10
+		const procChance = 2.7 / 60.0
+		applyStatMHAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcMHAuraID, core.ActionID{ItemID: 28439, Tag: 1}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
+		applyStatOHAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcOHAuraID, core.ActionID{ItemID: 28439, Tag: 2}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
+
+		return core.Aura{
+			ID: DragonstrikeAuraID,
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) {
+					return
+				}
+				if sim.RandomFloat("Dragonstrike") > procChance {
+					return
+				}
+
+				if spellEffect.IsMH() {
+					applyStatMHAura(sim)
+				} else {
+					applyStatOHAura(sim)
+				}
 			},
 		}
 	})

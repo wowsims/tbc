@@ -72,11 +72,6 @@ type Rogue struct {
 	eviscerateTemplate    core.SimpleSpellTemplate
 	eviscerate            core.SimpleSpell
 
-	envenomEnergyCost  float64
-	envenomDamageCalcs []core.MeleeDamageCalculator
-	envenomTemplate    core.SimpleSpellTemplate
-	envenom            core.SimpleSpell
-
 	exposeArmorTemplate core.SimpleSpellTemplate
 	exposeArmor         core.SimpleSpell
 

@@ -10,6 +10,7 @@ import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 import { RaidSimSettings } from '/tbc/core/proto/ui.js';
 import { SavedEncounter } from '/tbc/core/proto/ui.js';
 import { SavedRaid } from '/tbc/core/proto/ui.js';
+import { SimSettings as SimSettingsProto } from '/tbc/core/proto/ui.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
@@ -360,6 +361,7 @@ export class RaidSimUI extends SimUI {
 
 	toProto(): RaidSimSettings {
 		return RaidSimSettings.create({
+			settings: this.sim.toProto(),
 			raid: this.sim.raid.toProto(),
 			buffBots: this.getBuffBots().map(b => b.toProto()),
 			blessings: this.blessingsPicker!.getAssignments(),
@@ -369,6 +371,9 @@ export class RaidSimUI extends SimUI {
 
 	fromProto(eventID: EventID, settings: RaidSimSettings) {
 		TypedEvent.freezeAllAndDo(() => {
+			if (settings.settings) {
+				this.sim.fromProto(eventID, settings.settings);
+			}
 			this.sim.raid.fromProto(eventID, settings.raid || RaidProto.create());
 			this.sim.encounter.fromProto(eventID, settings.encounter || EncounterProto.create());
 			this.raidPicker!.setBuffBots(eventID, settings.buffBots);

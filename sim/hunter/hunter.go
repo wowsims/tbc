@@ -252,7 +252,9 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		},
 	})
 
-	if hunter.HasRangedWeapon() && hunter.GetRangedWeapon().ID != ThoridalTheStarsFuryItemID {
+	if hunter.HasRangedWeapon() && hunter.GetRangedWeapon().ID == ThoridalTheStarsFuryItemID {
+		hunter.PseudoStats.RangedSpeedMultiplier *= 1.15
+	} else {
 		switch hunter.Options.Ammo {
 		case proto.Hunter_Options_TimelessArrow:
 			hunter.AmmoDPS = 53
@@ -269,21 +271,21 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		}
 		hunter.AmmoDamageBonus = hunter.AmmoDPS * hunter.AutoAttacks.Ranged.SwingSpeed
 		hunter.AutoAttacks.RangedAuto.Effect.WeaponInput.FlatDamageBonus += hunter.AmmoDamageBonus
-	}
 
-	switch hunter.Options.QuiverBonus {
-	case proto.Hunter_Options_Speed10:
-		hunter.PseudoStats.RangedSpeedMultiplier *= 1.1
-	case proto.Hunter_Options_Speed11:
-		hunter.PseudoStats.RangedSpeedMultiplier *= 1.11
-	case proto.Hunter_Options_Speed12:
-		hunter.PseudoStats.RangedSpeedMultiplier *= 1.12
-	case proto.Hunter_Options_Speed13:
-		hunter.PseudoStats.RangedSpeedMultiplier *= 1.13
-	case proto.Hunter_Options_Speed14:
-		hunter.PseudoStats.RangedSpeedMultiplier *= 1.14
-	case proto.Hunter_Options_Speed15:
-		hunter.PseudoStats.RangedSpeedMultiplier *= 1.15
+		switch hunter.Options.QuiverBonus {
+		case proto.Hunter_Options_Speed10:
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.1
+		case proto.Hunter_Options_Speed11:
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.11
+		case proto.Hunter_Options_Speed12:
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.12
+		case proto.Hunter_Options_Speed13:
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.13
+		case proto.Hunter_Options_Speed14:
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.14
+		case proto.Hunter_Options_Speed15:
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.15
+		}
 	}
 
 	hunter.applyTalents()
