@@ -48,6 +48,7 @@ import { SavedTalents } from '/tbc/core/proto/ui.js';
 import { SettingsMenu } from '/tbc/core/components/settings_menu.js';
 import { Sim } from './sim.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
+import { SimSettings as SimSettingsProto } from '/tbc/core/proto/ui.js';
 import { SimUI, SimWarning } from './sim_ui.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
@@ -72,6 +73,7 @@ import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
+import * as OtherConstants from '/tbc/core/constants/other.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 declare var Muuri: any;
@@ -332,9 +334,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				}
 			}
 
-			if (loadedSettings) {
-				this.player.setEpWeights(initEventID, this.individualConfig.defaults.epWeights);
-			} else {
+			if (!loadedSettings) {
 				this.applyDefaults(initEventID);
 			}
 			this.player.setName(initEventID, 'Player');
@@ -373,29 +373,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		}
 
 		this.addToolbarItem(newIndividualExporters(this));
-
-		const shareLink = document.createElement('span');
-		shareLink.classList.add('share-link', 'fas', 'fa-link', 'within-raid-sim-hide');
-		tippy(shareLink, {
-			'content': 'Shareable link',
-			'allowHTML': true,
-		});
-		shareLink.addEventListener('click', event => {
-			const protoBytes = IndividualSimSettings.toBinary(this.toProto());
-			const deflated = pako.deflate(protoBytes, { to: 'string' });
-			const encoded = btoa(String.fromCharCode(...deflated));
-
-			const linkUrl = new URL(window.location.href);
-			linkUrl.hash = encoded;
-			
-			if (navigator.clipboard == undefined) {
-				alert(linkUrl.toString());
-			} else {
-				navigator.clipboard.writeText(linkUrl.toString());
-				alert('Current settings copied to clipboard!');
-			}
-		});
-		this.addToolbarItem(shareLink);
 
 		const settingsMenu = document.createElement('span');
 		settingsMenu.classList.add('fas', 'fa-cog');
@@ -912,6 +889,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			}));
 
 			this.sim.setIterations(eventID, 3000);
+			this.sim.setPhase(eventID, OtherConstants.CURRENT_PHASE);
 			this.sim.setFixedRngSeed(eventID, 0);
 		});
 	}
@@ -970,10 +948,12 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 	toProto(): IndividualSimSettings {
 		return IndividualSimSettings.create({
+			settings: this.sim.toProto(),
 			player: this.player.toProto(),
 			raidBuffs: this.sim.raid.getBuffs(),
 			partyBuffs: this.player.getParty()?.getBuffs() || PartyBuffs.create(),
 			encounter: this.sim.encounter.toProto(),
+			epWeights: this.player.getEpWeights().asArray(),
 		});
 	}
 
@@ -982,7 +962,15 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			if (!settings.player) {
 				return;
 			}
+			if (settings.settings) {
+				this.sim.fromProto(eventID, settings.settings);
+			}
 			this.player.fromProto(eventID, settings.player);
+			if (settings.epWeights?.length > 0) {
+				this.player.setEpWeights(eventID, new Stats(settings.epWeights));
+			} else {
+				this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
+			}
 			this.sim.raid.setBuffs(eventID, settings.raidBuffs || RaidBuffs.create());
 			const party = this.player.getParty();
 			if (party) {
