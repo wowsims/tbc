@@ -617,7 +617,7 @@ func InnervateManaThreshold(character *Character) float64 {
 }
 
 func registerInnervateCD(agent Agent, numInnervates int32) {
-	innervateThreshold := InnervateManaThreshold(agent.GetCharacter())
+	innervateThreshold := 0.0
 	expectedManaPerInnervate := 0.0
 	remainingInnervateUsages := 0
 
@@ -632,6 +632,7 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 			AuraCD:           InnervateCD,
 			Type:             CooldownTypeMana,
 			Init: func(sim *Simulation, character *Character) {
+				innervateThreshold = InnervateManaThreshold(character)
 				expectedManaPerInnervate = character.SpiritManaRegenPerSecond() * 5 * 20
 				remainingInnervateUsages = int(1 + (MaxDuration(0, sim.Duration))/InnervateCD)
 				character.ExpectedBonusMana += expectedManaPerInnervate * float64(remainingInnervateUsages)
