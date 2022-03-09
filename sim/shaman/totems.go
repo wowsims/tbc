@@ -24,7 +24,8 @@ func (shaman *Shaman) newTotemCastTemplate(sim *core.Simulation, baseManaCost fl
 				Type:  stats.Mana,
 				Value: manaCost,
 			},
-			GCD: time.Second,
+			GCD:         time.Second,
+			SpellExtras: SpellFlagTotem,
 		},
 	}
 
