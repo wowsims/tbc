@@ -10,6 +10,8 @@ type Priest struct {
 	core.Character
 	SelfBuffs
 	Talents proto.PriestTalents
+	
+	SurgeOfLight		bool
 
 	// cached cast stuff
 	// TODO: aoe multi-target situations will need multiple spells ticking for each target.
@@ -37,6 +39,9 @@ type Priest struct {
 
 	StarshardsSpell    core.SimpleSpell
 	starshardsTemplate core.SimpleSpellTemplate
+	
+	smiteSpell		core.SimpleSpell
+	smiteCastTemplate	core.SimpleSpellTemplate
 }
 
 type SelfBuffs struct {
@@ -70,12 +75,23 @@ func (priest *Priest) Init(sim *core.Simulation) {
 	priest.shadowfiendTemplate = priest.newShadowfiendTemplate(sim)
 	priest.devouringPlagueTemplate = priest.newDevouringPlagueTemplate(sim)
 	priest.starshardsTemplate = priest.newStarshardsTemplate(sim)
+	priest.smiteCastTemplate = priest.newSmiteTemplate(sim)
 }
 
 func (priest *Priest) Reset(newsim *core.Simulation) {
-	// These spells still need special cleanup because they're wierd.
-	priest.VTSpell = &core.SimpleSpell{}
-	priest.VTSpellCasting = &core.SimpleSpell{}
+
+}
+
+func (priest *Priest) applySurgeOfLight(spellCast *core.SpellCast) {
+	if priest.SurgeOfLight {
+		spellCast.CastTime = 0
+		spellCast.Cost.Value = 0
+		// This applies on cast complete, removing the effect.
+		//  if it crits, during 'onspellhit' then it will be reapplied (see func above)
+		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+			priest.SurgeOfLight = false
+		}
+	}
 }
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) *Priest {

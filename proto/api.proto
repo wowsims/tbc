@@ -38,6 +38,7 @@ message Player {
         EnhancementShaman enhancement_shaman = 18;
         Warlock warlock = 13;
         Warrior warrior = 14;
+        SmitePriest smite_priest = 20;
     }
 
 		// Only used by the UI. Sim uses talents within the spec protos.

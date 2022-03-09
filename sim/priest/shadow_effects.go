@@ -4,6 +4,15 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
+func (priest *Priest) applyTalentsToHolySpell(cast *core.Cast, effect *core.SpellHitEffect) {
+	effect.ThreatMultiplier *= 1 - 0.04*float64(priest.Talents.SilentResolve)
+	if cast.ActionID.SpellID == SpellIDSmite {
+		effect.BonusSpellCritRating += float64(priest.Talents.HolySpecialization) * 1 * core.SpellCritRatingPerCritChance
+	}
+
+	effect.BonusSpellCritRating += float64(priest.Talents.ForceOfWill) * 1 * core.SpellCritRatingPerCritChance
+}
+
 func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellHitEffect) {
 	effect.ThreatMultiplier *= 1 - 0.08*float64(priest.Talents.ShadowAffinity)
 	if cast.ActionID.SpellID == SpellIDShadowWordDeath || cast.ActionID.SpellID == SpellIDMindBlast {
@@ -21,6 +30,13 @@ func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.Sp
 
 		// shadow focus gives 2% hit per level
 		effect.BonusSpellHitRating += float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance
+		
+		// TODO should add more instant cast spells here
+		if cast.ActionID.SpellID == SpellIDShadowWordPain {
+			cast.Cost.Value -= cast.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
+		}
+
+		effect.BonusSpellCritRating += float64(priest.Talents.ForceOfWill) * 1 * core.SpellCritRatingPerCritChance
 	}
 }
 

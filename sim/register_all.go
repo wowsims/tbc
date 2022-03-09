@@ -11,6 +11,7 @@ import (
 	"github.com/wowsims/tbc/sim/rogue"
 	"github.com/wowsims/tbc/sim/shaman/elemental"
 	"github.com/wowsims/tbc/sim/shaman/enhancement"
+	"github.com/wowsims/tbc/sim/priest/smite"
 )
 
 var registered = false
@@ -30,4 +31,5 @@ func RegisterAll() {
 	rogue.RegisterRogue()
 	warrior.RegisterWarrior()
 	retribution.RegisterRetributionPaladin()
+	smite.RegisterSmitePriest()
 }
