@@ -22,7 +22,7 @@ export class StringPicker<ModObject> extends Input<ModObject, string> {
 
 		this.init();
 
-    this.inputElem.addEventListener('input', event => {
+    this.inputElem.addEventListener('change', event => {
 			this.inputChanged(TypedEvent.nextEventID());
     });
   }
