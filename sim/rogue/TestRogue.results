@@ -599,7 +599,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-ThunderingSkyfireDiamond"
  value: {
-  dps: 1393.5959403865443
+  dps: 1395.8027757539041
  }
 }
 dps_results: {
@@ -653,7 +653,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Average-Default"
  value: {
-  dps: 1370.3386294851134
+  dps: 1371.6107311925489
  }
 }
 dps_results: {
@@ -689,13 +689,13 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 772.986720994801
+  dps: 772.9867209948011
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 772.986720994801
+  dps: 772.9867209948011
  }
 }
 dps_results: {
@@ -713,13 +713,13 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Mutilate-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1281.135554219693
+  dps: 1283.446971275693
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Mutilate-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1281.135554219693
+  dps: 1283.446971275693
  }
 }
 dps_results: {
@@ -749,7 +749,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Mutilate-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 569.3061967489041
+  dps: 569.306196748904
  }
 }
 dps_results: {
@@ -809,19 +809,19 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Mutilate-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1311.894132227798
+  dps: 1314.313520003798
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Mutilate-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1311.894132227798
+  dps: 1314.313520003798
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Mutilate-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1185.2394361487882
+  dps: 1187.1540659087882
  }
 }
 dps_results: {
@@ -833,13 +833,13 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Mutilate-NoBuffs-LongMultiTarget"
  value: {
-  dps: 655.5596429252474
+  dps: 656.9832989252474
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Mutilate-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 655.5596429252474
+  dps: 656.9832989252474
  }
 }
 dps_results: {

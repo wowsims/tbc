@@ -7,8 +7,7 @@ import (
 var ExposeArmorActionID = core.ActionID{SpellID: 26866, Tag: 5}
 var ExposeArmorEnergyCost = 25.0
 
-func (rogue *Rogue) newExposeArmorTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	finishingMoveEffects := rogue.makeFinishingMoveEffectApplier(sim)
+func (rogue *Rogue) newExposeArmorTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	ability := rogue.newAbility(ExposeArmorActionID, ExposeArmorEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
@@ -16,9 +15,7 @@ func (rogue *Rogue) newExposeArmorTemplate(sim *core.Simulation) core.SimpleSpel
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			spellEffect.Target.AddAura(sim, core.ExposeArmorAura(sim, spellEffect.Target, rogue.Talents.ImprovedExposeArmor))
-			numPoints := rogue.ComboPoints()
-			rogue.SpendComboPoints(sim, spellCast.ActionID)
-			finishingMoveEffects(sim, numPoints)
+			rogue.ApplyFinisher(sim, spellCast.ActionID)
 		} else {
 			if refundAmount > 0 {
 				rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
