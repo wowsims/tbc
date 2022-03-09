@@ -67,6 +67,7 @@ export class SettingsMenu extends Popup {
         //const epStats = this.simUI.individualConfig.epStats;
         const epStats = getEnumValues(Stat).filter(stat => ![Stat.StatMana, Stat.StatEnergy, Stat.StatRage].includes(stat));
         const weightPickers = epStats.map(stat => new NumberPicker(sectionRoot, this.simUI.player, {
+            float: true,
             label: statNames[stat],
             changedEvent: (player) => player.epWeightsChangeEmitter,
             getValue: (player) => player.getEpWeights().getStat(stat),

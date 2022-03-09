@@ -680,6 +680,7 @@ input, select {
   display: block;
   padding: 5px 20px;
   user-select: none;
+  white-space: nowrap;
 }
 
 .sim-dropdown-menu .dropdown-item:hover {

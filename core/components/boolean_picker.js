@@ -9,7 +9,7 @@ export class BooleanPicker extends Input {
         this.inputElem.classList.add('boolean-picker-input');
         this.rootElem.appendChild(this.inputElem);
         this.init();
-        this.inputElem.addEventListener('input', event => {
+        this.inputElem.addEventListener('change', event => {
             this.inputChanged(TypedEvent.nextEventID());
         });
     }

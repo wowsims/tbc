@@ -4,12 +4,13 @@ import { Input } from './input.js';
 export class NumberPicker extends Input {
     constructor(parent, modObject, config) {
         super(parent, 'number-picker-root', modObject, config);
+        this.float = config.float || false;
         this.inputElem = document.createElement('input');
         this.inputElem.type = 'number';
         this.inputElem.classList.add('number-picker-input');
         this.rootElem.appendChild(this.inputElem);
         this.init();
-        this.inputElem.addEventListener('input', event => {
+        this.inputElem.addEventListener('change', event => {
             this.inputChanged(TypedEvent.nextEventID());
         });
     }
@@ -17,7 +18,12 @@ export class NumberPicker extends Input {
         return this.inputElem;
     }
     getInputValue() {
-        return parseInt(this.inputElem.value || '') || 0;
+        if (this.float) {
+            return parseFloat(this.inputElem.value || '') || 0;
+        }
+        else {
+            return parseInt(this.inputElem.value || '') || 0;
+        }
     }
     setInputValue(newValue) {
         this.inputElem.value = String(newValue);
