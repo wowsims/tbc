@@ -14,6 +14,7 @@ const TotemRefreshTime2M = time.Second * 115
 const (
 	SpellFlagShock    = core.SpellExtrasAgentReserved1
 	SpellFlagElectric = core.SpellExtrasAgentReserved2
+	SpellFlagTotem    = core.SpellExtrasAgentReserved3
 )
 
 func NewShaman(character core.Character, talents proto.ShamanTalents, totems proto.ShamanTotems, selfBuffs SelfBuffs) *Shaman {
@@ -294,7 +295,7 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 			}
 			if shaman.NextTotemDropType[i] != int32(proto.FireTotem_NoFireTotem) {
 				shaman.NextTotemDrops[i] = TotemRefreshTime2M
-				if shaman.Totems.Fire != proto.FireTotem_TotemOfWrath {
+				if shaman.NextTotemDropType[i] != int32(proto.FireTotem_TotemOfWrath) {
 					shaman.NextTotemDrops[i] = 0 // attack totems we drop immediately
 				}
 			}
