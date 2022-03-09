@@ -79,6 +79,9 @@ func (priest *Priest) Init(sim *core.Simulation) {
 }
 
 func (priest *Priest) Reset(newsim *core.Simulation) {
+	// These spells still need special cleanup because they're wierd.
+	priest.VTSpell = &core.SimpleSpell{}
+	priest.VTSpellCasting = &core.SimpleSpell{}
 
 }
 
