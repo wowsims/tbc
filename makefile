@@ -54,8 +54,8 @@ host: $(OUT_DIR)
 ui/core/proto/api.ts: proto/*.proto node_modules
 	mkdir -p $(OUT_DIR)/protobuf-ts
 	cp -r node_modules/@protobuf-ts/runtime/build/es2015/* $(OUT_DIR)/protobuf-ts
-	$(SED) "s/from '(.*)';/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*.js
-	$(SED) "s/from \"(.*)\";/from '\1\.js';/g" $(OUT_DIR)/protobuf-ts/*.js
+	$(SED) "s/from '(.*)';/from '\1.js';/g" $(OUT_DIR)/protobuf-ts/*.js
+	$(SED) "s/from \"(.*)\";/from '\1.js';/g" $(OUT_DIR)/protobuf-ts/*.js
 	npx protoc --ts_opt generate_dependencies --ts_out ui/core/proto --proto_path proto proto/api.proto
 	npx protoc --ts_out ui/core/proto --proto_path proto proto/test.proto
 	npx protoc --ts_out ui/core/proto --proto_path proto proto/ui.proto
