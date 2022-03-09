@@ -53,6 +53,7 @@ func (rogue *Rogue) NewRupture(sim *core.Simulation, target *core.Target) *core.
 	rp.ActionID.Tag = comboPoints
 	rp.Effect.Target = target
 	rp.Effect.DotInput.NumberOfTicks = int(comboPoints) + 3
+	// TODO: this is missing BonusAttackPower for snapshotting
 	rp.Effect.DotInput.TickBaseDamage = 70 + float64(comboPoints)*11 + rogue.GetStat(stats.AttackPower)*[]float64{0.01, 0.02, 0.03, 0.03, 0.03}[comboPoints-1]
 
 	if rogue.deathmantle4pcProc {
