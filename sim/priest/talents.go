@@ -49,8 +49,59 @@ func (priest *Priest) applyTalents() {
 }
 
 func (priest *Priest) applyOnHitTalents(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-	if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+
+	roll := sim.RandomFloat("SurgeOfLight")
+	if priest.Talents.SurgeOfLight == 2 && spellEffect.Outcome.Matches(core.OutcomeCrit) && roll > 0.5 {
 		priest.SurgeOfLight = true
+		sim.Log("Surge of Light proc'd")
+	} 
+}
+
+func (priest *Priest) applySurgeOfLight(spellCast *core.SpellCast) {
+	if priest.SurgeOfLight {
+		spellCast.CastTime = 0
+		spellCast.Cost.Value = 0
+		// This applies on cast complete, removing the effect.
+		//  if it crits, during 'onspellhit' then it will be reapplied (see func above)
+		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+			priest.SurgeOfLight = false
+		}
+	}
+}
+
+func (priest *Priest) applyTalentsToHolySpell(cast *core.Cast, effect *core.SpellHitEffect) {
+	effect.ThreatMultiplier *= 1 - 0.04*float64(priest.Talents.SilentResolve)
+	if cast.ActionID.SpellID == SpellIDSmite {
+		effect.BonusSpellCritRating += float64(priest.Talents.HolySpecialization) * 1 * core.SpellCritRatingPerCritChance
+	}
+
+	effect.BonusSpellCritRating += float64(priest.Talents.ForceOfWill) * 1 * core.SpellCritRatingPerCritChance
+}
+
+func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellHitEffect) {
+	effect.ThreatMultiplier *= 1 - 0.08*float64(priest.Talents.ShadowAffinity)
+	if cast.ActionID.SpellID == SpellIDShadowWordDeath || cast.ActionID.SpellID == SpellIDMindBlast {
+		effect.BonusSpellCritRating += float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance
+	}
+	if cast.ActionID.SpellID == SpellIDMindFlay || cast.ActionID.SpellID == SpellIDMindBlast {
+		cast.Cost.Value -= cast.BaseCost.Value * float64(priest.Talents.FocusedMind) * 0.05
+	}
+	if cast.SpellSchool == core.SpellSchoolShadow {
+		effect.StaticDamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
+
+		if priest.Talents.Shadowform {
+			effect.StaticDamageMultiplier *= 1.15
+		}
+
+		// shadow focus gives 2% hit per level
+		effect.BonusSpellHitRating += float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance
+		
+		// TODO should add more instant cast spells here
+		if cast.ActionID.SpellID == SpellIDShadowWordPain {
+			cast.Cost.Value -= cast.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
+		}
+
+		effect.BonusSpellCritRating += float64(priest.Talents.ForceOfWill) * 1 * core.SpellCritRatingPerCritChance
 	}
 }
 

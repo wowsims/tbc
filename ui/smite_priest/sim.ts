@@ -134,7 +134,7 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
-				IconInputs.SanctityAura,
+				
 				IconInputs.MoonkinAura,
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.DrumsOfRestorationBuff,
@@ -149,6 +149,7 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 				IconInputs.JadePendantOfBlasting,
 				IconInputs.AtieshWarlock,
 				IconInputs.AtieshMage,
+				IconInputs.SanctityAura,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,

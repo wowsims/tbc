@@ -85,17 +85,6 @@ func (priest *Priest) Reset(newsim *core.Simulation) {
 
 }
 
-func (priest *Priest) applySurgeOfLight(spellCast *core.SpellCast) {
-	if priest.SurgeOfLight {
-		spellCast.CastTime = 0
-		spellCast.Cost.Value = 0
-		// This applies on cast complete, removing the effect.
-		//  if it crits, during 'onspellhit' then it will be reapplied (see func above)
-		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-			priest.SurgeOfLight = false
-		}
-	}
-}
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) *Priest {
 	priest := &Priest{
