@@ -62,8 +62,8 @@ type Rogue struct {
 	mutilateTemplate core.SimpleSpellTemplate
 	mutilate         core.SimpleSpell
 
-	mutilateDamageTemplate core.SimpleSpellTemplate
-	mutilateDamage         core.SimpleSpell
+	shivTemplate core.SimpleSpellTemplate
+	shiv         core.SimpleSpell
 
 	castSliceAndDice func()
 
@@ -84,6 +84,9 @@ type Rogue struct {
 
 	deadlyPoisonRefreshTemplate core.SimpleSpellTemplate
 	deadlyPoisonRefresh         core.SimpleSpell
+
+	instantPoisonTemplate core.SimpleSpellTemplate
+	instantPoison         core.SimpleSpell
 }
 
 func (rogue *Rogue) GetCharacter() *core.Character {
@@ -102,6 +105,40 @@ func (rogue *Rogue) Finalize(raid *core.Raid) {
 	rogue.applyPoisons()
 }
 
+func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras core.SpellExtras, procMask core.ProcMask) core.SimpleSpell {
+	return core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:            actionID,
+				Character:           &rogue.Character,
+				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				SpellSchool:         core.SpellSchoolPhysical,
+				GCD:                 time.Second,
+				IgnoreHaste:         true,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Energy,
+					Value: cost,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Energy,
+					Value: cost,
+				},
+				CritMultiplier: rogue.critMultiplier(procMask.Matches(core.ProcMaskMeleeMH), spellExtras.Matches(SpellFlagBuilder)),
+				SpellExtras:    spellExtras,
+			},
+		},
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
+				ProcMask:               procMask,
+				DamageMultiplier:       1,
+				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
+			},
+		},
+	}
+}
+
 func (rogue *Rogue) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
 	rogue.sinisterStrikeTemplate = rogue.newSinisterStrikeTemplate(sim)
@@ -115,6 +152,7 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 	rogue.ruptureTemplate = rogue.newRuptureTemplate(sim)
 	rogue.deadlyPoisonTemplate = rogue.newDeadlyPoisonTemplate(sim)
 	rogue.deadlyPoisonRefreshTemplate = rogue.newDeadlyPoisonRefreshTemplate(sim)
+	rogue.instantPoisonTemplate = rogue.newInstantPoisonTemplate(sim)
 
 	rogue.energyPerSecondAvg = core.EnergyPerTick / core.EnergyTickDuration.Seconds()
 
