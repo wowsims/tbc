@@ -25,7 +25,6 @@ import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { IconEnumPicker, IconEnumPickerConfig } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPicker, IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
-import { IndividualImporter } from '/tbc/core/components/individual_importer.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { Input } from '/tbc/core/components/input.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
@@ -66,6 +65,7 @@ import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
 import { isDualWieldSpec } from '/tbc/core/proto_utils/utils.js';
 import { launchedSpecs } from '/tbc/core/launched_sims.js';
 import { newIndividualExporters } from '/tbc/core/components/exporters.js';
+import { newIndividualImporters } from '/tbc/core/components/importers.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
 import { specNames } from '/tbc/core/proto_utils/utils.js';
@@ -359,17 +359,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 	}
 
 	private addTopbarComponents() {
-		const importSettings = document.createElement('span');
-		importSettings.classList.add('import-settings', 'fas', 'fa-file-import');
-		tippy(importSettings, {
-			'content': 'Import',
-			'allowHTML': true,
-		});
-		importSettings.addEventListener('click', event => {
-			new IndividualImporter(this.rootElem, this);
-		});
 		if (this.debug) {
-			this.addToolbarItem(importSettings);
+			this.addToolbarItem(newIndividualImporters(this));
 		}
 
 		this.addToolbarItem(newIndividualExporters(this));
