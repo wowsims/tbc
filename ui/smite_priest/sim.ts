@@ -112,6 +112,7 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 					manaSpringTotem: TristateEffect.TristateEffectRegular,
 					totemOfWrath: 1,
 					wrathOfAirTotem: TristateEffect.TristateEffectRegular,
+					sanctityAura: TristateEffect.TristateEffectImproved,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
@@ -120,6 +121,7 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 				debuffs: Debuffs.create({
 					judgementOfWisdom: true,
 					misery: true,
+					improvedSealOfTheCrusader: true,
 					curseOfElements: TristateEffect.TristateEffectRegular,
 				}),
 			},
@@ -235,6 +237,8 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 					Presets.P1_PRESET,
 					Presets.P2_PRESET,
 					Presets.P3_PRESET,
+					Presets.P4_PRESET,
+					Presets.P5_PRESET,
 				],
 			},
 		});
