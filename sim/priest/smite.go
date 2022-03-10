@@ -54,6 +54,8 @@ func (priest *Priest) newSmiteTemplate(sim *core.Simulation) core.SimpleSpellTem
 	
 	effect.StaticDamageMultiplier *= (1 + (0.05 * float64(priest.Talents.SearingLight)))
 	
+	effect.BonusHitRating += float64(priest.Talents.FocusedPower) * 2 * core.SpellHitRatingPerHitChance // 2% crit per point
+	
 	effect.OnSpellHit = priest.applyOnHitTalents
 	
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
