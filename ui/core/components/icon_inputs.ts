@@ -1,6 +1,7 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Alchohol} from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
+import { Explosive } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { GuardianElixir } from '/tbc/core/proto/common.js';
@@ -37,7 +38,6 @@ export const GiftOfTheWild = makeTristateRaidBuffInput(ActionId.fromSpellId(2699
 // Party Buffs
 export const AtieshMage = makeMultistatePartyBuffInput(ActionId.fromSpellId(28142), 5, 'atieshMage');
 export const AtieshWarlock = makeMultistatePartyBuffInput(ActionId.fromSpellId(28143), 5, 'atieshWarlock');
-export const BattleChickens = makeMultistatePartyBuffInput(ActionId.fromItemId(10725), 5, 'battleChickens');
 export const Bloodlust = makeMultistatePartyBuffInput(ActionId.fromSpellId(2825), 11, 'bloodlust');
 export const BraidedEterniumChain = makeBooleanPartyBuffInput(ActionId.fromSpellId(31025), 'braidedEterniumChain');
 export const ChainOfTheTwilightOwl = makeBooleanPartyBuffInput(ActionId.fromSpellId(31035), 'chainOfTheTwilightOwl');
@@ -82,11 +82,10 @@ export const SunderArmor = makeBooleanDebuffInput(ActionId.fromSpellId(25225), '
 export const WintersChill = makeBooleanDebuffInput(ActionId.fromSpellId(28595), 'wintersChill');
 
 // Consumes
-export const BattleChicken = makeBooleanConsumeInput(ActionId.fromItemId(10725), 'battleChicken');
+export const SuperSapper = makeBooleanConsumeInput(ActionId.fromItemId(23827), 'superSapper');
+export const GoblinSapper = makeBooleanConsumeInput(ActionId.fromItemId(10646), 'goblinSapper');
 
 export const KiblersBits = makeEnumValueConsumeInput(ActionId.fromItemId(33874), 'petFood', PetFood.PetFoodKiblersBits, ['Pet Food']);
-
-export const KreegsStoutBeatdown = makeEnumValueConsumeInput(ActionId.fromItemId(18284), 'alchohol', Alchohol.AlchoholKreegsStoutBeatdown, ['Alchohol']);
 
 export const ScrollOfAgilityV = makeEnumValueConsumeInput(ActionId.fromItemId(27498), 'scrollOfAgility', 5);
 export const ScrollOfSpiritV = makeEnumValueConsumeInput(ActionId.fromItemId(27501), 'scrollOfSpirit', 5, ['Spirit']);
@@ -94,18 +93,6 @@ export const ScrollOfStrengthV = makeEnumValueConsumeInput(ActionId.fromItemId(2
 
 export const PetScrollOfAgilityV = makeEnumValueConsumeInput(ActionId.fromItemId(27498), 'petScrollOfAgility', 5);
 export const PetScrollOfStrengthV = makeEnumValueConsumeInput(ActionId.fromItemId(27503), 'petScrollOfStrength', 5);
-
-function removeOtherPartyMembersDrums(eventID: EventID, player: Player<any>, newValue: boolean) {
-	if (newValue) {
-		player.getOtherPartyMembers().forEach(otherPlayer => {
-			const otherConsumes = otherPlayer.getConsumes();
-			otherConsumes.drums = Drums.DrumsUnknown;
-			otherPlayer.setConsumes(eventID, otherConsumes);
-		});
-	}
-};
-export const DrumsOfBattleConsume = makeEnumValueConsumeInput(ActionId.fromSpellId(35476), 'drums', Drums.DrumsOfBattle, ['Drums'], removeOtherPartyMembersDrums);
-export const DrumsOfRestorationConsume = makeEnumValueConsumeInput(ActionId.fromSpellId(35478), 'drums', Drums.DrumsOfRestoration, ['Drums'], removeOtherPartyMembersDrums);
 
 function makeBooleanRaidBuffInput(id: ActionId, buffsFieldName: keyof RaidBuffs, exclusivityTags?: Array<ExclusivityTag>): IndividualSimIconPickerConfig<Raid, boolean> {
   return {
@@ -471,6 +458,29 @@ export const makePetFoodInput = makeConsumeInputFactory('petFood', [
 	{ actionId: ActionId.fromItemId(33874), value: PetFood.PetFoodKiblersBits },
 ] as Array<IconEnumValueConfig<Player<any>, PetFood>>);
 
+function removeOtherPartyMembersDrums(eventID: EventID, player: Player<any>, newValue: Drums) {
+	if (newValue) {
+		TypedEvent.freezeAllAndDo(() => {
+			player.getOtherPartyMembers().forEach(otherPlayer => {
+				const otherConsumes = otherPlayer.getConsumes();
+				otherConsumes.drums = Drums.DrumsUnknown;
+				otherPlayer.setConsumes(eventID, otherConsumes);
+			});
+		});
+	}
+};
+export const DrumsInput = makeConsumeInput('drums', [
+	{ actionId: ActionId.fromSpellId(35476), value: Drums.DrumsOfBattle },
+	{ actionId: ActionId.fromSpellId(35478), value: Drums.DrumsOfRestoration },
+] as Array<IconEnumValueConfig<Player<any>, Drums>>, removeOtherPartyMembersDrums);
+
+export const FillerExplosiveInput = makeConsumeInput('fillerExplosive', [
+	{ actionId: ActionId.fromItemId(23736), value: Explosive.ExplosiveFelIronBomb },
+	{ actionId: ActionId.fromItemId(23737), value: Explosive.ExplosiveAdamantiteGrenade },
+	{ actionId: ActionId.fromItemId(23841), value: Explosive.ExplosiveGnomishFlameTurret },
+	{ actionId: ActionId.fromItemId(13180), value: Explosive.ExplosiveHolyWater },
+] as Array<IconEnumValueConfig<Player<any>, Explosive>>);
+
 export function makeWeaponImbueInput(isMainHand: boolean, options: Array<WeaponImbue>): IconEnumPickerConfig<Player<any>, WeaponImbue> {
 	const allOptions = [
 		{ actionId: ActionId.fromItemId(18262), value: WeaponImbue.WeaponImbueElementalSharpeningStone },
@@ -519,4 +529,9 @@ function makeConsumeInputFactory<T extends number>(consumesFieldName: keyof Cons
 			},
 		};
 	};
+}
+
+function makeConsumeInput<T extends number>(consumesFieldName: keyof Consumes, allOptions: Array<IconEnumValueConfig<Player<any>, T>>, onSet?: (eventID: EventID, player: Player<any>, newValue: T) => void): IconEnumPickerConfig<Player<any>, T> {
+	const factory = makeConsumeInputFactory(consumesFieldName, allOptions, onSet);
+	return factory(allOptions.map(option => option.value));
 }

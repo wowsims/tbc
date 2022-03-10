@@ -82,7 +82,6 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 
 var FullConsumes = &proto.Consumes{
 	Drums:           proto.Drums_DrumsOfBattle,
-	BattleChicken:   true,
 	MainHandImbue:   proto.WeaponImbue_WeaponImbueShamanWindfury,
 	OffHandImbue:    proto.WeaponImbue_WeaponImbueShamanWindfury,
 	DefaultConjured: proto.Conjured_ConjuredFlameCap,

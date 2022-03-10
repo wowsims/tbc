@@ -163,6 +163,7 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	registerDrumsCD(agent, partyBuffs, consumes)
 	registerPotionCD(agent, consumes)
 	registerConjuredCD(agent, consumes)
+	registerExplosivesCD(agent, consumes)
 }
 
 func ApplyPetConsumeEffects(pet *Character, ownerConsumes proto.Consumes) {
@@ -907,3 +908,146 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 // Mana-related consumes need to know this so they can wait for the Mage to use
 // gems first.
 var MageManaGemMCDActionID = ActionID{ItemID: 22044}
+
+var ExplosivesCooldownID = NewCooldownID()
+var SuperSapperCooldownID = NewCooldownID()
+var GoblinSapperCooldownID = NewCooldownID()
+var SuperSapperActionID = ActionID{ItemID: 23827, CooldownID: SuperSapperCooldownID}
+var GoblinSapperActionID = ActionID{ItemID: 10646, CooldownID: GoblinSapperCooldownID}
+var FelIronBombActionID = ActionID{ItemID: 23736}
+var AdamantiteGrenadeActionID = ActionID{ItemID: 23737}
+var GnomishFlameTurretActionID = ActionID{ItemID: 23841}
+var HolyWaterActionID = ActionID{ItemID: 13180}
+
+func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
+	if !consumes.SuperSapper && !consumes.GoblinSapper && consumes.FillerExplosive == proto.Explosive_ExplosiveUnknown {
+		return
+	}
+
+	character := agent.GetCharacter()
+	character.AddMajorCooldown(MajorCooldown{
+		ActionID:   SuperSapperActionID,
+		CooldownID: ExplosivesCooldownID,
+		Cooldown:   time.Minute,
+		Type:       CooldownTypeDPS,
+		CanActivate: func(sim *Simulation, character *Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *Simulation, character *Character) bool {
+			return true
+		},
+		ActivationFactory: func(sim *Simulation) CooldownActivation {
+			var explosiveSpell SimpleSpell
+			superSapperTemplate := character.newSuperSapperTemplate(sim)
+			goblinSapperTemplate := character.newGoblinSapperTemplate(sim)
+
+			var fillerTemplate SimpleSpellTemplate
+			hasFiller := false
+			switch consumes.FillerExplosive {
+			case proto.Explosive_ExplosiveFelIronBomb:
+				hasFiller = true
+				fillerTemplate = character.newFelIronBombTemplate(sim)
+			case proto.Explosive_ExplosiveAdamantiteGrenade:
+				hasFiller = true
+				fillerTemplate = character.newAdamantiteGrenadeTemplate(sim)
+			case proto.Explosive_ExplosiveHolyWater:
+				hasFiller = true
+				fillerTemplate = character.newHolyWaterTemplate(sim)
+			}
+
+			cdAfterGoblinSapper := time.Minute
+			if !hasFiller {
+				if consumes.SuperSapper {
+					cdAfterGoblinSapper = time.Minute * 4
+				} else {
+					cdAfterGoblinSapper = time.Minute * 5
+				}
+			}
+
+			cdAfterSuperSapper := time.Minute
+			if !hasFiller && !consumes.GoblinSapper {
+				cdAfterSuperSapper = time.Minute * 5
+			}
+
+			return func(sim *Simulation, character *Character) {
+				var cd time.Duration
+				if consumes.SuperSapper && !character.IsOnCD(SuperSapperCooldownID, sim.CurrentTime) {
+					superSapperTemplate.Apply(&explosiveSpell)
+					cd = cdAfterSuperSapper
+				} else if consumes.GoblinSapper && !character.IsOnCD(GoblinSapperCooldownID, sim.CurrentTime) {
+					goblinSapperTemplate.Apply(&explosiveSpell)
+					cd = cdAfterGoblinSapper
+				} else {
+					fillerTemplate.Apply(&explosiveSpell)
+					cd = time.Minute
+				}
+				explosiveSpell.Init(sim)
+				explosiveSpell.Cast(sim)
+				character.SetCD(ExplosivesCooldownID, sim.CurrentTime+cd)
+			}
+		},
+	})
+}
+
+// Creates a spell object for the common explosive case.
+func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID ActionID, minDamage float64, maxDamage float64, cooldown time.Duration) SimpleSpell {
+	spell := SimpleSpell{
+		SpellCast: SpellCast{
+			Cast: Cast{
+				ActionID:            actionID,
+				Character:           character,
+				CritRollCategory:    CritRollCategoryMagical,
+				OutcomeRollCategory: OutcomeRollCategoryMagic,
+				SpellSchool:         SpellSchoolFire,
+				CritMultiplier:      2,
+				Cooldown:            cooldown,
+			},
+		},
+	}
+
+	baseEffect := SpellHitEffect{
+		SpellEffect: SpellEffect{
+			DamageMultiplier:       1,
+			StaticDamageMultiplier: 1,
+			ThreatMultiplier:       1,
+		},
+		DirectInput: DirectDamageInput{
+			MinBaseDamage: minDamage,
+			MaxBaseDamage: maxDamage,
+		},
+	}
+
+	numHits := sim.GetNumTargets()
+	effects := make([]SpellHitEffect, 0, numHits)
+	for i := int32(0); i < numHits; i++ {
+		effects = append(effects, baseEffect)
+		effects[i].Target = sim.GetTarget(i)
+	}
+	spell.Effects = effects
+
+	return spell
+}
+func (character *Character) newSuperSapperTemplate(sim *Simulation) SimpleSpellTemplate {
+	return NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, SuperSapperActionID, 900, 1500, time.Minute*5))
+}
+func (character *Character) newGoblinSapperTemplate(sim *Simulation) SimpleSpellTemplate {
+	return NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, GoblinSapperActionID, 450, 750, time.Minute*5))
+}
+func (character *Character) newFelIronBombTemplate(sim *Simulation) SimpleSpellTemplate {
+	return NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, FelIronBombActionID, 330, 770, 0))
+}
+func (character *Character) newAdamantiteGrenadeTemplate(sim *Simulation) SimpleSpellTemplate {
+	return NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, AdamantiteGrenadeActionID, 450, 750, 0))
+}
+func (character *Character) newHolyWaterTemplate(sim *Simulation) SimpleSpellTemplate {
+	spell := character.newBasicExplosiveSpell(sim, HolyWaterActionID, 438, 562, 0)
+	spell.SpellSchool = SpellSchoolHoly
+	for _, effect := range spell.Effects {
+		if effect.Target.MobType != proto.MobType_MobTypeUndead {
+			effect.StaticDamageMultiplier = 0
+			effect.DirectInput.MinBaseDamage = 0
+			effect.DirectInput.MaxBaseDamage = 0
+		}
+	}
+	return NewSimpleSpellTemplate(spell)
+}

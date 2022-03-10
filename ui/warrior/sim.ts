@@ -177,8 +177,6 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.BattleChicken,
 					IconInputs.ScrollOfAgilityV,
 					IconInputs.ScrollOfStrengthV,
 				],
