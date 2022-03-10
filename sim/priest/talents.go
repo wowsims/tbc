@@ -53,9 +53,6 @@ func (priest *Priest) applyOnHitTalents(sim *core.Simulation, spellCast *core.Sp
 	roll := sim.RandomFloat("SurgeOfLight")
 	if priest.Talents.SurgeOfLight == 2 && spellEffect.Outcome.Matches(core.OutcomeCrit) && roll > 0.5 {
 		priest.SurgeOfLight = true
-		if sim.Log != nil {
-			sim.Log("Surge of Light proc'd")
-		}
 	} 
 }
 
