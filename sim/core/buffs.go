@@ -114,6 +114,10 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		character.AddPermanentAura(func(sim *Simulation) Aura {
 			return ImprovedSanctityAura(sim, 2)
 		})
+	} else if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectRegular {
+		character.AddPermanentAura(func(sim *Simulation) Aura {
+			return ImprovedSanctityAura(sim, 0)
+		})
 	}
 
 	if partyBuffs.BattleShout != proto.TristateEffect_TristateEffectMissing {
