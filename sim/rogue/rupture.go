@@ -1,10 +1,10 @@
 package rogue
 
 import (
+	"github.com/wowsims/tbc/sim/core/stats"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var RuptureActionID = core.ActionID{SpellID: 26867}
@@ -12,53 +12,27 @@ var RuptureDebuffID = core.NewDebuffID()
 var RuptureEnergyCost = 25.0
 
 func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	finishingMoveEffects := rogue.makeFinishingMoveEffectApplier(sim)
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            RuptureActionID,
-				Character:           &rogue.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryNone,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second * 1,
-				Cost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: RuptureEnergyCost,
-				},
-				SpellExtras: core.SpellExtrasBinary | SpellFlagFinisher,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if spellEffect.Landed() {
-						numPoints := rogue.ComboPoints()
-						rogue.SpendComboPoints(sim, spellCast.ActionID)
-						finishingMoveEffects(sim, numPoints)
-					} else {
-						if refundAmount > 0 {
-							rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
-						}
-					}
-				},
-			},
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:  0, // Set dynamically.
-				TickLength:     time.Second * 2,
-				TickBaseDamage: 0, // Set dynamically.
-				DebuffID:       DeadlyPoisonDebuffID,
-			},
-		},
+	ability := rogue.newAbility(RuptureActionID, RuptureEnergyCost, SpellFlagFinisher|core.SpellExtrasBinary, core.ProcMaskMeleeMHSpecial)
+	ability.SpellCast.Cast.CritRollCategory = core.CritRollCategoryNone
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		if spellEffect.Landed() {
+			rogue.ApplyFinisher(sim, spellCast.ActionID)
+		} else {
+			if refundAmount > 0 {
+				rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
+			}
+		}
+	}
+	ability.Effect.DotInput = core.DotDamageInput{
+		NumberOfTicks:  0, // Set dynamically.
+		TickLength:     time.Second * 2,
+		TickBaseDamage: 0, // Set dynamically.
+		DebuffID:       DeadlyPoisonDebuffID,
 	}
 
-	ability.Effect.StaticDamageMultiplier *= 1 + 0.1*float64(rogue.Talents.SerratedBlades)
+	ability.Effect.StaticDamageMultiplier += 0.1 * float64(rogue.Talents.SerratedBlades)
 	if rogue.Talents.SurpriseAttacks {
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}
@@ -79,7 +53,8 @@ func (rogue *Rogue) NewRupture(sim *core.Simulation, target *core.Target) *core.
 	rp.ActionID.Tag = comboPoints
 	rp.Effect.Target = target
 	rp.Effect.DotInput.NumberOfTicks = int(comboPoints) + 3
-	rp.Effect.DotInput.TickBaseDamage = 70 + float64(comboPoints)*11
+	// TODO: this is missing BonusAttackPower for snapshotting
+	rp.Effect.DotInput.TickBaseDamage = 70 + float64(comboPoints)*11 + rogue.GetStat(stats.AttackPower)*[]float64{0.01, 0.02, 0.03, 0.03, 0.03}[comboPoints-1]
 
 	if rogue.deathmantle4pcProc {
 		rp.Cost.Value = 0

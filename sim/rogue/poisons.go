@@ -16,7 +16,7 @@ func (rogue *Rogue) applyPoisons() {
 var DeadlyPoisonAuraID = core.NewAuraID()
 var DeadlyPoisonDebuffID = core.NewDebuffID()
 
-func (rogue *Rogue) newDeadlyPoisonTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) newDeadlyPoisonTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
 	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -45,7 +45,7 @@ func (rogue *Rogue) newDeadlyPoisonTemplate(sim *core.Simulation) core.SimpleSpe
 	return core.NewSimpleSpellTemplate(cast)
 }
 
-func (rogue *Rogue) newDeadlyPoisonRefreshTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) newDeadlyPoisonRefreshTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
 	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -101,39 +101,34 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 					return
 				}
 
-				if rogue.deadlyPoison.IsInUse() {
-					dp := &rogue.deadlyPoisonRefresh
-					rogue.deadlyPoisonRefreshTemplate.Apply(dp)
-					dp.Effect.Target = spellEffect.Target
-					dp.Init(sim)
-					dp.Cast(sim)
-				} else {
-					dp := &rogue.deadlyPoison
-					rogue.deadlyPoisonTemplate.Apply(dp)
-					dp.Effect.Target = spellEffect.Target
-					dp.Init(sim)
-					dp.Cast(sim)
-					rogue.deadlyPoisonStacks = 1
-				}
+				rogue.procDeadlyPoison(sim, spellEffect)
 			},
 		}
 	})
 }
 
-var InstantPoisonAuraID = core.NewAuraID()
-
-func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
-	procMask := core.GetMeleeProcMaskForHands(
-		!hasWFTotem && rogue.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueRogueInstantPoison,
-		rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueInstantPoison)
-
-	if procMask == core.ProcMaskEmpty {
-		return
+func (rogue *Rogue) procDeadlyPoison(sim *core.Simulation, spellEffect *core.SpellEffect) {
+	if rogue.deadlyPoison.IsInUse() {
+		dp := &rogue.deadlyPoisonRefresh
+		rogue.deadlyPoisonRefreshTemplate.Apply(dp)
+		dp.Effect.Target = spellEffect.Target
+		dp.Init(sim)
+		dp.Cast(sim)
+	} else {
+		dp := &rogue.deadlyPoison
+		rogue.deadlyPoisonTemplate.Apply(dp)
+		dp.Effect.Target = spellEffect.Target
+		dp.Init(sim)
+		dp.Cast(sim)
+		rogue.deadlyPoisonStacks = 1
 	}
 
-	procChance := 0.2 + 0.02*float64(rogue.Talents.ImprovedPoisons)
+}
 
-	castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+var InstantPoisonAuraID = core.NewAuraID()
+
+func (rogue *Rogue) newInstantPoisonTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				ActionID:            core.ActionID{SpellID: 26891},
@@ -157,9 +152,20 @@ func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
 				MaxBaseDamage: 194,
 			},
 		},
-	})
+	}
+	return core.NewSimpleSpellTemplate(cast)
+}
 
-	spellObj := core.SimpleSpell{}
+func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
+	procMask := core.GetMeleeProcMaskForHands(
+		!hasWFTotem && rogue.Consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueRogueInstantPoison,
+		rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueInstantPoison)
+
+	if procMask == core.ProcMaskEmpty {
+		return
+	}
+
+	procChance := 0.2 + 0.02*float64(rogue.Talents.ImprovedPoisons)
 
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
@@ -172,12 +178,15 @@ func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
 					return
 				}
 
-				castAction := &spellObj
-				castTemplate.Apply(castAction)
-				castAction.Effect.Target = spellEffect.Target
-				castAction.Init(sim)
-				castAction.Cast(sim)
+				rogue.procInstantPoison(sim, spellEffect)
 			},
 		}
 	})
+}
+
+func (rogue *Rogue) procInstantPoison(sim *core.Simulation, spellEffect *core.SpellEffect) {
+	rogue.instantPoisonTemplate.Apply(&rogue.instantPoison)
+	rogue.instantPoison.Effect.Target = spellEffect.Target
+	rogue.instantPoison.Init(sim)
+	rogue.instantPoison.Cast(sim)
 }

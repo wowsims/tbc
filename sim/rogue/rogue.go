@@ -62,15 +62,20 @@ type Rogue struct {
 	mutilateTemplate core.SimpleSpellTemplate
 	mutilate         core.SimpleSpell
 
-	mutilateDamageTemplate core.SimpleSpellTemplate
-	mutilateDamage         core.SimpleSpell
+	shivTemplate core.SimpleSpellTemplate
+	shiv         core.SimpleSpell
+
+	finishingMoveEffectApplier func(sim *core.Simulation, numPoints int32)
 
 	castSliceAndDice func()
 
-	eviscerateEnergyCost  float64
-	eviscerateDamageCalcs []core.MeleeDamageCalculator
-	eviscerateTemplate    core.SimpleSpellTemplate
-	eviscerate            core.SimpleSpell
+	eviscerateEnergyCost float64
+	eviscerateTemplate   core.SimpleSpellTemplate
+	eviscerate           core.SimpleSpell
+
+	envenomEnergyCost float64
+	envenomTemplate   core.SimpleSpellTemplate
+	envenom           core.SimpleSpell
 
 	exposeArmorTemplate core.SimpleSpellTemplate
 	exposeArmor         core.SimpleSpell
@@ -84,6 +89,9 @@ type Rogue struct {
 
 	deadlyPoisonRefreshTemplate core.SimpleSpellTemplate
 	deadlyPoisonRefresh         core.SimpleSpell
+
+	instantPoisonTemplate core.SimpleSpellTemplate
+	instantPoison         core.SimpleSpell
 }
 
 func (rogue *Rogue) GetCharacter() *core.Character {
@@ -102,6 +110,46 @@ func (rogue *Rogue) Finalize(raid *core.Raid) {
 	rogue.applyPoisons()
 }
 
+func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras core.SpellExtras, procMask core.ProcMask) core.SimpleSpell {
+	return core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:            actionID,
+				Character:           &rogue.Character,
+				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				SpellSchool:         core.SpellSchoolPhysical,
+				GCD:                 time.Second,
+				IgnoreHaste:         true,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Energy,
+					Value: cost,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Energy,
+					Value: cost,
+				},
+				CritMultiplier: rogue.critMultiplier(procMask.Matches(core.ProcMaskMeleeMH), spellExtras.Matches(SpellFlagBuilder)),
+				SpellExtras:    spellExtras,
+			},
+		},
+		Effect: core.SpellHitEffect{
+			SpellEffect: core.SpellEffect{
+				ProcMask:               procMask,
+				DamageMultiplier:       1,
+				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
+			},
+		},
+	}
+}
+
+func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) {
+	numPoints := rogue.ComboPoints()
+	rogue.SpendComboPoints(sim, actionID)
+	rogue.finishingMoveEffectApplier(sim, numPoints)
+}
+
 func (rogue *Rogue) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
 	rogue.sinisterStrikeTemplate = rogue.newSinisterStrikeTemplate(sim)
@@ -109,12 +157,15 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 	rogue.hemorrhageTemplate = rogue.newHemorrhageTemplate(sim)
 	rogue.mutilateTemplate = rogue.newMutilateTemplate(sim)
 
+	rogue.finishingMoveEffectApplier = rogue.makeFinishingMoveEffectApplier(sim)
+
 	rogue.initSliceAndDice(sim)
 	rogue.eviscerateTemplate = rogue.newEviscerateTemplate(sim)
 	rogue.exposeArmorTemplate = rogue.newExposeArmorTemplate(sim)
 	rogue.ruptureTemplate = rogue.newRuptureTemplate(sim)
 	rogue.deadlyPoisonTemplate = rogue.newDeadlyPoisonTemplate(sim)
 	rogue.deadlyPoisonRefreshTemplate = rogue.newDeadlyPoisonRefreshTemplate(sim)
+	rogue.instantPoisonTemplate = rogue.newInstantPoisonTemplate(sim)
 
 	rogue.energyPerSecondAvg = core.EnergyPerTick / core.EnergyTickDuration.Seconds()
 

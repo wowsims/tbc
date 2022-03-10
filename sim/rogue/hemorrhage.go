@@ -5,14 +5,13 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var HemorrhageActionID = core.ActionID{SpellID: 26864}
 var HemorrhageDebuffID = core.NewDebuffID()
 var HemorrhageEnergyCost = 35.0
 
-func (rogue *Rogue) newHemorrhageTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
 	hemoDuration := time.Second * 15
 	hemoAura := core.Aura{
 		ID:       HemorrhageDebuffID,
@@ -37,54 +36,27 @@ func (rogue *Rogue) newHemorrhageTemplate(sim *core.Simulation) core.SimpleSpell
 	}
 
 	refundAmount := HemorrhageEnergyCost * 0.8
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            HemorrhageActionID,
-				Character:           &rogue.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second * 1,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: HemorrhageEnergyCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: HemorrhageEnergyCost,
-				},
-				CritMultiplier: rogue.critMultiplier(true, true),
-				SpellExtras:    SpellFlagBuilder,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if spellEffect.Landed() {
-						rogue.AddComboPoints(sim, 1, HemorrhageActionID)
 
-						aura := hemoAura
-						aura.Expires = sim.CurrentTime + hemoDuration
-						spellEffect.Target.ReplaceAura(sim, aura)
-					} else {
-						rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
-					}
-				},
-			},
-			WeaponInput: core.WeaponDamageInput{
-				Normalized:       true,
-				DamageMultiplier: 1.1,
-			},
-		},
+	ability := rogue.newAbility(HemorrhageActionID, HemorrhageEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		if spellEffect.Landed() {
+			rogue.AddComboPoints(sim, 1, HemorrhageActionID)
+
+			aura := hemoAura
+			aura.Expires = sim.CurrentTime + hemoDuration
+			spellEffect.Target.ReplaceAura(sim, aura)
+		} else {
+			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+		}
+	}
+	ability.Effect.WeaponInput = core.WeaponDamageInput{
+		Normalized:       true,
+		DamageMultiplier: 1.1,
 	}
 
+	// cp. backstab
 	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
-		ability.Effect.StaticDamageMultiplier *= 1.06
+		ability.Effect.StaticDamageMultiplier += 0.06
 	}
 
 	ability.Effect.WeaponInput.DamageMultiplier += 0.01 * float64(rogue.Talents.SinisterCalling)
@@ -92,7 +64,7 @@ func (rogue *Rogue) newHemorrhageTemplate(sim *core.Simulation) core.SimpleSpell
 	return core.NewSimpleSpellTemplate(ability)
 }
 
-func (rogue *Rogue) NewHemorrhage(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+func (rogue *Rogue) NewHemorrhage(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
 	hm := &rogue.hemorrhage
 	rogue.hemorrhageTemplate.Apply(hm)
 
