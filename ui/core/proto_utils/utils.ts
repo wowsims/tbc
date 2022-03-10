@@ -1096,7 +1096,7 @@ export const specEPTransforms: Record<Spec, (epWeights: Stats) => Stats> = {
 		return epWeights;
 	},
   [Spec.SpecSmitePriest]: (epWeights: Stats) => {
-		return epWeights.withStat(Stat.StatSpellHit, 0);
+		return epWeights;
 	},
 };
 
