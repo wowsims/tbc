@@ -29,7 +29,7 @@ import { Hunter, Hunter_Rotation as HunterRotation, HunterTalents, Hunter_Option
 import { Mage, Mage_Rotation as MageRotation, MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
 import { Rogue, Rogue_Rotation as RogueRotation, RogueTalents, Rogue_Options as RogueOptions } from '/tbc/core/proto/rogue.js';
 import { RetributionPaladin, RetributionPaladin_Rotation as RetributionPaladinRotation, PaladinTalents, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
-import { ShadowPriest, ShadowPriest_Rotation as ShadowPriestRotation, PriestTalents, ShadowPriest_Options as ShadowPriestOptions } from '/tbc/core/proto/priest.js';
+import { ShadowPriest, SmitePriest_Rotation as SmitePriestRotation, ShadowPriest_Rotation as ShadowPriestRotation, PriestTalents, ShadowPriest_Options as ShadowPriestOptions, SmitePriest_Options as SmitePriestOptions, SmitePriest } from '/tbc/core/proto/priest.js';
 import { Warlock, Warlock_Rotation as WarlockRotation, WarlockTalents, Warlock_Options as WarlockOptions } from '/tbc/core/proto/warlock.js';
 import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
 export const NUM_SPECS = getEnumValues(Spec).length;
@@ -46,6 +46,7 @@ export const naturalSpecOrder = [
     Spec.SpecEnhancementShaman,
     Spec.SpecWarlock,
     Spec.SpecWarrior,
+    Spec.SpecSmitePriest,
 ];
 export const specNames = {
     [Spec.SpecBalanceDruid]: 'Balance Druid',
@@ -58,6 +59,7 @@ export const specNames = {
     [Spec.SpecShadowPriest]: 'Shadow Priest',
     [Spec.SpecWarlock]: 'Warlock',
     [Spec.SpecWarrior]: 'Warrior',
+    [Spec.SpecSmitePriest]: 'Smite Priest',
 };
 export const classColors = {
     [Class.ClassUnknown]: '#fff',
@@ -82,6 +84,7 @@ export const specIconsLarge = {
     [Spec.SpecShadowPriest]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_shadowwordpain.jpg',
     [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
     [Spec.SpecWarrior]: 'https://wow.zamimg.com/images/wow/icons/large/ability_warrior_innerrage.jpg',
+    [Spec.SpecSmitePriest]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_holysmite.jpg',
 };
 export const talentTreeIcons = {
     [Class.ClassUnknown]: [],
@@ -142,6 +145,7 @@ export const titleIcons = {
     [Spec.SpecShadowPriest]: '/tbc/assets/shadow_priest_icon.png',
     [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
     [Spec.SpecWarrior]: '/tbc/assets/warrior_icon.png',
+    [Spec.SpecSmitePriest]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_holysmite.jpg',
 };
 export const raidSimIcon = '/tbc/assets/raid_icon.png';
 // Returns the index of the talent tree (0, 1, or 2) that has the most points.
@@ -425,6 +429,32 @@ export const specTypeFunctions = {
             ? player.spec.warrior.options || WarriorOptions.create()
             : WarriorOptions.create(),
     },
+    [Spec.SpecSmitePriest]: {
+        rotationCreate: () => SmitePriestRotation.create(),
+        rotationEquals: (a, b) => SmitePriestRotation.equals(a, b),
+        rotationCopy: (a) => SmitePriestRotation.clone(a),
+        rotationToJson: (a) => SmitePriestRotation.toJson(a),
+        rotationFromJson: (obj) => SmitePriestRotation.fromJson(obj),
+        rotationFromPlayer: (player) => player.spec.oneofKind == 'smitePriest'
+            ? player.spec.smitePriest.rotation || SmitePriestRotation.create()
+            : SmitePriestRotation.create(),
+        talentsCreate: () => PriestTalents.create(),
+        talentsEquals: (a, b) => PriestTalents.equals(a, b),
+        talentsCopy: (a) => PriestTalents.clone(a),
+        talentsToJson: (a) => PriestTalents.toJson(a),
+        talentsFromJson: (obj) => PriestTalents.fromJson(obj),
+        talentsFromPlayer: (player) => player.spec.oneofKind == 'smitePriest'
+            ? player.spec.smitePriest.talents || PriestTalents.create()
+            : PriestTalents.create(),
+        optionsCreate: () => SmitePriestOptions.create(),
+        optionsEquals: (a, b) => SmitePriestOptions.equals(a, b),
+        optionsCopy: (a) => SmitePriestOptions.clone(a),
+        optionsToJson: (a) => SmitePriestOptions.toJson(a),
+        optionsFromJson: (obj) => SmitePriestOptions.fromJson(obj),
+        optionsFromPlayer: (player) => player.spec.oneofKind == 'smitePriest'
+            ? player.spec.smitePriest.options || SmitePriestOptions.create()
+            : SmitePriestOptions.create(),
+    },
 };
 export var Faction;
 (function (Faction) {
@@ -457,6 +487,7 @@ export const specToClass = {
     [Spec.SpecShadowPriest]: Class.ClassPriest,
     [Spec.SpecWarlock]: Class.ClassWarlock,
     [Spec.SpecWarrior]: Class.ClassWarrior,
+    [Spec.SpecSmitePriest]: Class.ClassPriest,
 };
 const druidRaces = [
     Race.RaceNightElf,
@@ -547,6 +578,7 @@ export const specToEligibleRaces = {
     [Spec.SpecShadowPriest]: priestRaces,
     [Spec.SpecWarlock]: warlockRaces,
     [Spec.SpecWarrior]: warriorRaces,
+    [Spec.SpecSmitePriest]: priestRaces,
 };
 // Specs that can dual wield. This could be based on class, except that
 // Enhancement Shaman learn dual wield from a talent.
@@ -572,6 +604,7 @@ export const specToLocalStorageKey = {
     [Spec.SpecShadowPriest]: '__shadow_priest',
     [Spec.SpecWarlock]: '__warlock',
     [Spec.SpecWarrior]: '__warrior',
+    [Spec.SpecSmitePriest]: '__smite_priest',
 };
 // Returns a copy of playerOptions, with the class field set.
 export function withSpecProto(spec, player, rotation, talents, specOptions) {
@@ -671,6 +704,16 @@ export function withSpecProto(spec, player, rotation, talents, specOptions) {
             copy.spec = {
                 oneofKind: 'warrior',
                 warrior: Warrior.create({
+                    rotation: rotation,
+                    talents: talents,
+                    options: specOptions,
+                }),
+            };
+            return copy;
+        case Spec.SpecSmitePriest:
+            copy.spec = {
+                oneofKind: 'smitePriest',
+                smitePriest: SmitePriest.create({
                     rotation: rotation,
                     talents: talents,
                     options: specOptions,
@@ -847,6 +890,9 @@ export const specEPTransforms = {
         return epWeights.withStat(Stat.StatSpellHit, 0);
     },
     [Spec.SpecWarrior]: (epWeights) => {
+        return epWeights;
+    },
+    [Spec.SpecSmitePriest]: (epWeights) => {
         return epWeights;
     },
 };
@@ -1030,6 +1076,7 @@ export function makeDefaultBlessings(numPaladins) {
         { spec: Spec.SpecEnhancementShaman, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight, Blessings.BlessingOfWisdom] },
         { spec: Spec.SpecWarlock, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
         { spec: Spec.SpecWarrior, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight] },
+        { spec: Spec.SpecSmitePriest, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
     ]);
 }
 ;

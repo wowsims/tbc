@@ -48,6 +48,10 @@ export var Spec;
      * @generated from protobuf enum value: SpecWarrior = 6;
      */
     Spec[Spec["SpecWarrior"] = 6] = "SpecWarrior";
+    /**
+     * @generated from protobuf enum value: SpecSmitePriest = 10;
+     */
+    Spec[Spec["SpecSmitePriest"] = 10] = "SpecSmitePriest";
 })(Spec || (Spec = {}));
 /**
  * @generated from protobuf enum proto.Race

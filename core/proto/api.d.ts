@@ -13,6 +13,7 @@ import { ActionID } from "./common";
 import { RaidBuffs } from "./common";
 import { PartyBuffs } from "./common";
 import { Cooldowns } from "./common";
+import { SmitePriest } from "./priest";
 import { Warrior } from "./warrior";
 import { Warlock } from "./warlock";
 import { EnhancementShaman } from "./shaman";
@@ -125,6 +126,12 @@ export interface Player {
          * @generated from protobuf field: proto.Warrior warrior = 14;
          */
         warrior: Warrior;
+    } | {
+        oneofKind: "smitePriest";
+        /**
+         * @generated from protobuf field: proto.SmitePriest smite_priest = 20;
+         */
+        smitePriest: SmitePriest;
     } | {
         oneofKind: undefined;
     };

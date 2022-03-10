@@ -12,6 +12,7 @@ import { ActionID } from './common.js';
 import { RaidBuffs } from './common.js';
 import { PartyBuffs } from './common.js';
 import { Cooldowns } from './common.js';
+import { SmitePriest } from './priest.js';
 import { Warrior } from './warrior.js';
 import { Warlock } from './warlock.js';
 import { EnhancementShaman } from './shaman.js';
@@ -78,6 +79,7 @@ class Player$Type extends MessageType {
             { no: 18, name: "enhancement_shaman", kind: "message", oneof: "spec", T: () => EnhancementShaman },
             { no: 13, name: "warlock", kind: "message", oneof: "spec", T: () => Warlock },
             { no: 14, name: "warrior", kind: "message", oneof: "spec", T: () => Warrior },
+            { no: 20, name: "smite_priest", kind: "message", oneof: "spec", T: () => SmitePriest },
             { no: 17, name: "talentsString", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 19, name: "cooldowns", kind: "message", T: () => Cooldowns }
         ]);
@@ -179,6 +181,12 @@ class Player$Type extends MessageType {
                         warrior: Warrior.internalBinaryRead(reader, reader.uint32(), options, message.spec.warrior)
                     };
                     break;
+                case /* proto.SmitePriest smite_priest */ 20:
+                    message.spec = {
+                        oneofKind: "smitePriest",
+                        smitePriest: SmitePriest.internalBinaryRead(reader, reader.uint32(), options, message.spec.smitePriest)
+                    };
+                    break;
                 case /* string talentsString */ 17:
                     message.talentsString = reader.string();
                     break;
@@ -252,6 +260,9 @@ class Player$Type extends MessageType {
         /* proto.Warrior warrior = 14; */
         if (message.spec.oneofKind === "warrior")
             Warrior.internalBinaryWrite(message.spec.warrior, writer.tag(14, WireType.LengthDelimited).fork(), options).join();
+        /* proto.SmitePriest smite_priest = 20; */
+        if (message.spec.oneofKind === "smitePriest")
+            SmitePriest.internalBinaryWrite(message.spec.smitePriest, writer.tag(20, WireType.LengthDelimited).fork(), options).join();
         /* string talentsString = 17; */
         if (message.talentsString !== "")
             writer.tag(17, WireType.LengthDelimited).string(message.talentsString);

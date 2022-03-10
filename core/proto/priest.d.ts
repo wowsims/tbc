@@ -215,6 +215,66 @@ export interface ShadowPriest_Options {
      */
     useShadowfiend: boolean;
 }
+/**
+ * @generated from protobuf message proto.SmitePriest
+ */
+export interface SmitePriest {
+    /**
+     * @generated from protobuf field: proto.SmitePriest.Rotation rotation = 1;
+     */
+    rotation?: SmitePriest_Rotation;
+    /**
+     * @generated from protobuf field: proto.PriestTalents talents = 2;
+     */
+    talents?: PriestTalents;
+    /**
+     * @generated from protobuf field: proto.SmitePriest.Options options = 3;
+     */
+    options?: SmitePriest_Options;
+}
+/**
+ * @generated from protobuf message proto.SmitePriest.Rotation
+ */
+export interface SmitePriest_Rotation {
+    /**
+     * @generated from protobuf field: proto.SmitePriest.Rotation.RotationType rotation_type = 1;
+     */
+    rotationType: SmitePriest_Rotation_RotationType;
+    /**
+     * @generated from protobuf field: bool use_dev_plague = 3;
+     */
+    useDevPlague: boolean;
+    /**
+     * @generated from protobuf field: bool use_starshards = 4;
+     */
+    useStarshards: boolean;
+}
+/**
+ * @generated from protobuf enum proto.SmitePriest.Rotation.RotationType
+ */
+export declare enum SmitePriest_Rotation_RotationType {
+    /**
+     * @generated from protobuf enum value: Unknown = 0;
+     */
+    Unknown = 0,
+    /**
+     * @generated from protobuf enum value: Basic = 1;
+     */
+    Basic = 1,
+    /**
+     * @generated from protobuf enum value: HolyFireWeave = 2;
+     */
+    HolyFireWeave = 2
+}
+/**
+ * @generated from protobuf message proto.SmitePriest.Options
+ */
+export interface SmitePriest_Options {
+    /**
+     * @generated from protobuf field: bool use_shadowfiend = 1;
+     */
+    useShadowfiend: boolean;
+}
 declare class PriestTalents$Type extends MessageType<PriestTalents> {
     constructor();
     create(value?: PartialMessage<PriestTalents>): PriestTalents;
@@ -255,4 +315,34 @@ declare class ShadowPriest_Options$Type extends MessageType<ShadowPriest_Options
  * @generated MessageType for protobuf message proto.ShadowPriest.Options
  */
 export declare const ShadowPriest_Options: ShadowPriest_Options$Type;
+declare class SmitePriest$Type extends MessageType<SmitePriest> {
+    constructor();
+    create(value?: PartialMessage<SmitePriest>): SmitePriest;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SmitePriest): SmitePriest;
+    internalBinaryWrite(message: SmitePriest, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.SmitePriest
+ */
+export declare const SmitePriest: SmitePriest$Type;
+declare class SmitePriest_Rotation$Type extends MessageType<SmitePriest_Rotation> {
+    constructor();
+    create(value?: PartialMessage<SmitePriest_Rotation>): SmitePriest_Rotation;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SmitePriest_Rotation): SmitePriest_Rotation;
+    internalBinaryWrite(message: SmitePriest_Rotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.SmitePriest.Rotation
+ */
+export declare const SmitePriest_Rotation: SmitePriest_Rotation$Type;
+declare class SmitePriest_Options$Type extends MessageType<SmitePriest_Options> {
+    constructor();
+    create(value?: PartialMessage<SmitePriest_Options>): SmitePriest_Options;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SmitePriest_Options): SmitePriest_Options;
+    internalBinaryWrite(message: SmitePriest_Options, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.SmitePriest.Options
+ */
+export declare const SmitePriest_Options: SmitePriest_Options$Type;
 export {};

@@ -25,6 +25,24 @@ export var ShadowPriest_Rotation_RotationType;
      */
     ShadowPriest_Rotation_RotationType[ShadowPriest_Rotation_RotationType["Ideal"] = 3] = "Ideal";
 })(ShadowPriest_Rotation_RotationType || (ShadowPriest_Rotation_RotationType = {}));
+/**
+ * @generated from protobuf enum proto.SmitePriest.Rotation.RotationType
+ */
+export var SmitePriest_Rotation_RotationType;
+(function (SmitePriest_Rotation_RotationType) {
+    /**
+     * @generated from protobuf enum value: Unknown = 0;
+     */
+    SmitePriest_Rotation_RotationType[SmitePriest_Rotation_RotationType["Unknown"] = 0] = "Unknown";
+    /**
+     * @generated from protobuf enum value: Basic = 1;
+     */
+    SmitePriest_Rotation_RotationType[SmitePriest_Rotation_RotationType["Basic"] = 1] = "Basic";
+    /**
+     * @generated from protobuf enum value: HolyFireWeave = 2;
+     */
+    SmitePriest_Rotation_RotationType[SmitePriest_Rotation_RotationType["HolyFireWeave"] = 2] = "HolyFireWeave";
+})(SmitePriest_Rotation_RotationType || (SmitePriest_Rotation_RotationType = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class PriestTalents$Type extends MessageType {
     constructor() {
@@ -472,3 +490,172 @@ class ShadowPriest_Options$Type extends MessageType {
  * @generated MessageType for protobuf message proto.ShadowPriest.Options
  */
 export const ShadowPriest_Options = new ShadowPriest_Options$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SmitePriest$Type extends MessageType {
+    constructor() {
+        super("proto.SmitePriest", [
+            { no: 1, name: "rotation", kind: "message", T: () => SmitePriest_Rotation },
+            { no: 2, name: "talents", kind: "message", T: () => PriestTalents },
+            { no: 3, name: "options", kind: "message", T: () => SmitePriest_Options }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.SmitePriest.Rotation rotation */ 1:
+                    message.rotation = SmitePriest_Rotation.internalBinaryRead(reader, reader.uint32(), options, message.rotation);
+                    break;
+                case /* proto.PriestTalents talents */ 2:
+                    message.talents = PriestTalents.internalBinaryRead(reader, reader.uint32(), options, message.talents);
+                    break;
+                case /* proto.SmitePriest.Options options */ 3:
+                    message.options = SmitePriest_Options.internalBinaryRead(reader, reader.uint32(), options, message.options);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.SmitePriest.Rotation rotation = 1; */
+        if (message.rotation)
+            SmitePriest_Rotation.internalBinaryWrite(message.rotation, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.PriestTalents talents = 2; */
+        if (message.talents)
+            PriestTalents.internalBinaryWrite(message.talents, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.SmitePriest.Options options = 3; */
+        if (message.options)
+            SmitePriest_Options.internalBinaryWrite(message.options, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.SmitePriest
+ */
+export const SmitePriest = new SmitePriest$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SmitePriest_Rotation$Type extends MessageType {
+    constructor() {
+        super("proto.SmitePriest.Rotation", [
+            { no: 1, name: "rotation_type", kind: "enum", T: () => ["proto.SmitePriest.Rotation.RotationType", SmitePriest_Rotation_RotationType] },
+            { no: 3, name: "use_dev_plague", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "use_starshards", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { rotationType: 0, useDevPlague: false, useStarshards: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.SmitePriest.Rotation.RotationType rotation_type */ 1:
+                    message.rotationType = reader.int32();
+                    break;
+                case /* bool use_dev_plague */ 3:
+                    message.useDevPlague = reader.bool();
+                    break;
+                case /* bool use_starshards */ 4:
+                    message.useStarshards = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.SmitePriest.Rotation.RotationType rotation_type = 1; */
+        if (message.rotationType !== 0)
+            writer.tag(1, WireType.Varint).int32(message.rotationType);
+        /* bool use_dev_plague = 3; */
+        if (message.useDevPlague !== false)
+            writer.tag(3, WireType.Varint).bool(message.useDevPlague);
+        /* bool use_starshards = 4; */
+        if (message.useStarshards !== false)
+            writer.tag(4, WireType.Varint).bool(message.useStarshards);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.SmitePriest.Rotation
+ */
+export const SmitePriest_Rotation = new SmitePriest_Rotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SmitePriest_Options$Type extends MessageType {
+    constructor() {
+        super("proto.SmitePriest.Options", [
+            { no: 1, name: "use_shadowfiend", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { useShadowfiend: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* bool use_shadowfiend */ 1:
+                    message.useShadowfiend = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* bool use_shadowfiend = 1; */
+        if (message.useShadowfiend !== false)
+            writer.tag(1, WireType.Varint).bool(message.useShadowfiend);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.SmitePriest.Options
+ */
+export const SmitePriest_Options = new SmitePriest_Options$Type();
