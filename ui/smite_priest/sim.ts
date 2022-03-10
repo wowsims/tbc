@@ -110,7 +110,6 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 					drums: Drums.DrumsOfBattle,
 					bloodlust: 1,
 					manaSpringTotem: TristateEffect.TristateEffectRegular,
-					totemOfWrath: 1,
 					wrathOfAirTotem: TristateEffect.TristateEffectRegular,
 					sanctityAura: TristateEffect.TristateEffectImproved,
 				}),
