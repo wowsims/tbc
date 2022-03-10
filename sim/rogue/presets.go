@@ -29,7 +29,6 @@ var CombatTalents = &proto.RogueTalents{
 }
 
 var MutilateTalents = &proto.RogueTalents{
-	ImprovedEviscerate:  3,
 	Malice:              5,
 	Ruthlessness:        3,
 	Murder:              2,
@@ -37,17 +36,18 @@ var MutilateTalents = &proto.RogueTalents{
 	RelentlessStrikes:   true,
 	ImprovedExposeArmor: 2,
 	Lethality:           5,
-	VilePoisons:         5,
+	ImprovedPoisons:     5,
 	ColdBlood:           true,
+	QuickRecovery:       2,
 	SealFate:            5,
 	Vigor:               true,
 	FindWeakness:        5,
 	Mutilate:            true,
 
-	ImprovedSliceAndDice: 3,
-	Precision:            5,
-
-	Opportunity: 5,
+	ImprovedSinisterStrike:  2,
+	ImprovedSliceAndDice:    3,
+	Precision:               5,
+	DualWieldSpecialization: 5,
 }
 
 var PlayerOptionsBasic = &proto.Player_Rogue{

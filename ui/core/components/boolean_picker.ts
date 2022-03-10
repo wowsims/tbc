@@ -22,7 +22,7 @@ export class BooleanPicker<ModObject> extends Input<ModObject, boolean> {
 
 		this.init();
 
-    this.inputElem.addEventListener('input', event => {
+    this.inputElem.addEventListener('change', event => {
 			this.inputChanged(TypedEvent.nextEventID());
     });
   }

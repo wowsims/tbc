@@ -91,6 +91,7 @@ export class SettingsMenu<SpecType extends Spec> extends Popup {
 		//const epStats = this.simUI.individualConfig.epStats;
 		const epStats = (getEnumValues(Stat) as Array<Stat>).filter(stat => ![Stat.StatMana, Stat.StatEnergy, Stat.StatRage].includes(stat));
     const weightPickers = epStats.map(stat => new NumberPicker(sectionRoot, this.simUI.player, {
+			float: true,
       label: statNames[stat],
       changedEvent: (player: Player<any>) => player.epWeightsChangeEmitter,
       getValue: (player: Player<any>) => player.getEpWeights().getStat(stat),
