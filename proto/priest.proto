@@ -78,7 +78,9 @@ message SmitePriest {
 	  
       RotationType rotation_type = 1;
       bool use_dev_plague = 3; // only undead
-      bool use_starshards = 4; // only nelf3
+      bool use_starshards = 4; // only nelf
+      bool use_mind_blast = 5;
+      bool use_SW_death = 6;
     }
     Rotation rotation = 1;
 
