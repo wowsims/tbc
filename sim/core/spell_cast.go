@@ -249,7 +249,7 @@ func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCas
 
 	damage *= hitEffect.SpellEffect.DamageMultiplier * hitEffect.SpellEffect.StaticDamageMultiplier
 
-	if !spellCast.SpellExtras.Matches(SpellExtrasBinary) {
+	if !spellCast.SpellExtras.Matches(SpellExtrasBinary | SpellExtrasIgnoreResists) {
 		damage = calculateResists(sim, damage, &hitEffect.SpellEffect)
 	}
 
@@ -298,7 +298,7 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 	}
 
 	if hitEffect.Outcome == OutcomeHit {
-		if !spellCast.SpellExtras.Matches(SpellExtrasBinary) {
+		if !spellCast.SpellExtras.Matches(SpellExtrasBinary | SpellExtrasIgnoreResists) {
 			damage = calculateResists(sim, damage, &hitEffect.SpellEffect)
 		}
 
