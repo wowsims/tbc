@@ -73,7 +73,7 @@ func (priest *Priest) applySurgeOfLight(spellCast *core.SpellCast) {
 
 func (priest *Priest) applyTalentsToHolySpell(cast *core.Cast, effect *core.SpellHitEffect) {
 	effect.ThreatMultiplier *= 1 - 0.04*float64(priest.Talents.SilentResolve)
-	if cast.ActionID.SpellID == SpellIDSmite {
+	if cast.ActionID.SpellID == SpellIDSmite || cast.ActionID.SpellID == SpellIDHolyFire {
 		effect.BonusSpellCritRating += float64(priest.Talents.HolySpecialization) * 1 * core.SpellCritRatingPerCritChance
 	}
 

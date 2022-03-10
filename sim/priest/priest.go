@@ -42,6 +42,9 @@ type Priest struct {
 	
 	smiteSpell		core.SimpleSpell
 	smiteCastTemplate	core.SimpleSpellTemplate
+	
+	holyFireSpell		core.SimpleSpell
+	holyFireCastTemplate	core.SimpleSpellTemplate
 }
 
 type SelfBuffs struct {
@@ -76,6 +79,7 @@ func (priest *Priest) Init(sim *core.Simulation) {
 	priest.devouringPlagueTemplate = priest.newDevouringPlagueTemplate(sim)
 	priest.starshardsTemplate = priest.newStarshardsTemplate(sim)
 	priest.smiteCastTemplate = priest.newSmiteTemplate(sim)
+	priest.holyFireCastTemplate = priest.newHolyFireTemplate(sim)
 }
 
 func (priest *Priest) Reset(newsim *core.Simulation) {
