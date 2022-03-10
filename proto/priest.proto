@@ -67,3 +67,25 @@ message ShadowPriest {
     }
     Options options = 3;
 }
+
+message SmitePriest {
+    message Rotation {
+      enum RotationType {
+          Unknown = 0;
+          Basic = 1;
+          HolyFireWeave = 2;
+      }
+	  
+      RotationType rotation_type = 1;
+      bool use_dev_plague = 3; // only undead
+      bool use_starshards = 4; // only nelf3
+    }
+    Rotation rotation = 1;
+
+    PriestTalents talents = 2;
+    
+    message Options {
+		bool use_shadowfiend = 1;
+    }
+    Options options = 3;
+}

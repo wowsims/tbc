@@ -40,8 +40,6 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 		},
 	}
 
-	finishingMoveEffects := rogue.makeFinishingMoveEffectApplier(sim)
-
 	template := core.SimpleCast{
 		Cast: core.Cast{
 			ActionID:  SliceAndDiceActionID,
@@ -64,8 +62,7 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 					rogue.AddAura(sim, aura)
 				}
 
-				rogue.SpendComboPoints(sim, cast.ActionID)
-				finishingMoveEffects(sim, numPoints)
+				rogue.ApplyFinisher(sim, cast.ActionID)
 			},
 		},
 	}

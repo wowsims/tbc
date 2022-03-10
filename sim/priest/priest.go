@@ -10,6 +10,8 @@ type Priest struct {
 	core.Character
 	SelfBuffs
 	Talents proto.PriestTalents
+	
+	SurgeOfLight		bool
 
 	// cached cast stuff
 	// TODO: aoe multi-target situations will need multiple spells ticking for each target.
@@ -37,6 +39,12 @@ type Priest struct {
 
 	StarshardsSpell    core.SimpleSpell
 	starshardsTemplate core.SimpleSpellTemplate
+	
+	smiteSpell		core.SimpleSpell
+	smiteCastTemplate	core.SimpleSpellTemplate
+	
+	holyFireSpell		core.SimpleSpell
+	holyFireCastTemplate	core.SimpleSpellTemplate
 }
 
 type SelfBuffs struct {
@@ -70,13 +78,17 @@ func (priest *Priest) Init(sim *core.Simulation) {
 	priest.shadowfiendTemplate = priest.newShadowfiendTemplate(sim)
 	priest.devouringPlagueTemplate = priest.newDevouringPlagueTemplate(sim)
 	priest.starshardsTemplate = priest.newStarshardsTemplate(sim)
+	priest.smiteCastTemplate = priest.newSmiteTemplate(sim)
+	priest.holyFireCastTemplate = priest.newHolyFireTemplate(sim)
 }
 
 func (priest *Priest) Reset(newsim *core.Simulation) {
 	// These spells still need special cleanup because they're wierd.
 	priest.VTSpell = &core.SimpleSpell{}
 	priest.VTSpellCasting = &core.SimpleSpell{}
+
 }
+
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) *Priest {
 	priest := &Priest{

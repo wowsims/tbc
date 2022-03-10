@@ -65,12 +65,17 @@ type Rogue struct {
 	shivTemplate core.SimpleSpellTemplate
 	shiv         core.SimpleSpell
 
+	finishingMoveEffectApplier func(sim *core.Simulation, numPoints int32)
+
 	castSliceAndDice func()
 
-	eviscerateEnergyCost  float64
-	eviscerateDamageCalcs []core.MeleeDamageCalculator
-	eviscerateTemplate    core.SimpleSpellTemplate
-	eviscerate            core.SimpleSpell
+	eviscerateEnergyCost float64
+	eviscerateTemplate   core.SimpleSpellTemplate
+	eviscerate           core.SimpleSpell
+
+	envenomEnergyCost float64
+	envenomTemplate   core.SimpleSpellTemplate
+	envenom           core.SimpleSpell
 
 	exposeArmorTemplate core.SimpleSpellTemplate
 	exposeArmor         core.SimpleSpell
@@ -139,12 +144,20 @@ func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras
 	}
 }
 
+func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) {
+	numPoints := rogue.ComboPoints()
+	rogue.SpendComboPoints(sim, actionID)
+	rogue.finishingMoveEffectApplier(sim, numPoints)
+}
+
 func (rogue *Rogue) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
 	rogue.sinisterStrikeTemplate = rogue.newSinisterStrikeTemplate(sim)
 	rogue.backstabTemplate = rogue.newBackstabTemplate(sim)
 	rogue.hemorrhageTemplate = rogue.newHemorrhageTemplate(sim)
 	rogue.mutilateTemplate = rogue.newMutilateTemplate(sim)
+
+	rogue.finishingMoveEffectApplier = rogue.makeFinishingMoveEffectApplier(sim)
 
 	rogue.initSliceAndDice(sim)
 	rogue.eviscerateTemplate = rogue.newEviscerateTemplate(sim)

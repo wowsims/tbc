@@ -243,15 +243,6 @@ export const priestTalentsConfig: TalentsConfig<Spec.SpecShadowPriest> = [
 				maxPoints: 2,
 			},
 			{
-				fieldName: 'holySpecialization',
-				location: {
-					rowIdx: 0,
-					colIdx: 2,
-				},
-				spellIds: [14889, 15008],
-				maxPoints: 5,
-			},
-			{
 				//fieldName: 'improvedRenew',
 				location: {
 					rowIdx: 0,
@@ -260,6 +251,16 @@ export const priestTalentsConfig: TalentsConfig<Spec.SpecShadowPriest> = [
 				spellIds: [14908, 15020, 17191],
 				maxPoints: 3,
 			},
+			{
+				fieldName: 'holySpecialization',
+				location: {
+					rowIdx: 0,
+					colIdx: 2,
+				},
+				spellIds: [14889, 15008],
+				maxPoints: 5,
+			},
+			
 			{
 				//fieldName: 'spellWarding',
 				location: {

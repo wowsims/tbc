@@ -4,26 +4,6 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellHitEffect) {
-	effect.ThreatMultiplier *= 1 - 0.08*float64(priest.Talents.ShadowAffinity)
-	if cast.ActionID.SpellID == SpellIDShadowWordDeath || cast.ActionID.SpellID == SpellIDMindBlast {
-		effect.BonusSpellCritRating += float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance
-	}
-	if cast.ActionID.SpellID == SpellIDMindFlay || cast.ActionID.SpellID == SpellIDMindBlast {
-		cast.Cost.Value -= cast.BaseCost.Value * float64(priest.Talents.FocusedMind) * 0.05
-	}
-	if cast.SpellSchool == core.SpellSchoolShadow {
-		effect.StaticDamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
-
-		if priest.Talents.Shadowform {
-			effect.StaticDamageMultiplier *= 1.15
-		}
-
-		// shadow focus gives 2% hit per level
-		effect.BonusSpellHitRating += float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance
-	}
-}
-
 func (priest *Priest) ApplyMisery(sim *core.Simulation, target *core.Target) {
 	if priest.Talents.Misery >= target.NumStacks(core.MiseryDebuffID) {
 		target.ReplaceAura(sim, core.MiseryAura(sim, priest.Talents.Misery))
