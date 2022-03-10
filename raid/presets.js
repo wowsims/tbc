@@ -467,6 +467,21 @@ export const buffBotPresets = [
     },
     {
         // The value of this field must never change, to preserve local storage data.
+        buffBotId: 'CoR Warlock',
+        spec: Spec.SpecWarlock,
+        name: 'CoR Warlock',
+        tooltip: 'CoR Warlock: Adds Curse of Recklessness. Also adds +20% uptime to ISB.',
+        iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_unholystrength.jpg',
+        modifyRaidProto: (buffBot, raidProto, partyProto) => {
+        },
+        modifyEncounterProto: (buffBot, encounterProto) => {
+            const debuffs = encounterProto.targets[0].debuffs;
+            debuffs.curseOfRecklessness = true;
+            debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
+        },
+    },
+    {
+        // The value of this field must never change, to preserve local storage data.
         buffBotId: 'Arms Warrior',
         spec: Spec.SpecWarrior,
         name: 'Arms Warrior',
