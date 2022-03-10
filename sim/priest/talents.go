@@ -2,7 +2,6 @@ package priest
 
 import (
 	"time"
-	//"math/rand"
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
