@@ -39,9 +39,9 @@ func (priest *Priest) registerPowerInfusionCD() {
 			}
 			// How can we determine the target will be able to continue casting 
 			// 	for the next 15s at 20% reduced mana cost? Arbitrary value until then.
-			if powerInfusionTarget.CurrentMana() < 3000 {
-				return false
-			}
+			//if powerInfusionTarget.CurrentMana() < 3000 {
+			//	return false
+			//}
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
