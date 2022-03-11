@@ -45,6 +45,38 @@ export const SmitePriestRotationConfig = {
         },
         {
             type: 'boolean',
+            cssClass: 'mindblast-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Use Mind Blast',
+                labelTooltip: 'Use Mind Blast whenever off CD.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().useMindBlast,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.useMindBlast = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
+        {
+            type: 'boolean',
+            cssClass: 'swd-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Use Shadow Word: Death',
+                labelTooltip: 'Use Shadow Word: Death whenever off CD.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().useShadowWordDeath,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.useShadowWordDeath = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
+        {
+            type: 'boolean',
             cssClass: 'devplague-picker',
             getModObject: (simUI) => simUI.player,
             config: {

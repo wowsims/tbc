@@ -3,6 +3,7 @@ import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
+import { RaidTarget } from './common.js';
 /**
  * @generated from protobuf enum proto.ShadowPriest.Rotation.RotationType
  */
@@ -557,11 +558,13 @@ class SmitePriest_Rotation$Type extends MessageType {
         super("proto.SmitePriest.Rotation", [
             { no: 1, name: "rotation_type", kind: "enum", T: () => ["proto.SmitePriest.Rotation.RotationType", SmitePriest_Rotation_RotationType] },
             { no: 3, name: "use_dev_plague", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "use_starshards", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 4, name: "use_starshards", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "use_mind_blast", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 6, name: "use_shadow_word_death", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { rotationType: 0, useDevPlague: false, useStarshards: false };
+        const message = { rotationType: 0, useDevPlague: false, useStarshards: false, useMindBlast: false, useShadowWordDeath: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -580,6 +583,12 @@ class SmitePriest_Rotation$Type extends MessageType {
                     break;
                 case /* bool use_starshards */ 4:
                     message.useStarshards = reader.bool();
+                    break;
+                case /* bool use_mind_blast */ 5:
+                    message.useMindBlast = reader.bool();
+                    break;
+                case /* bool use_shadow_word_death */ 6:
+                    message.useShadowWordDeath = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -602,6 +611,12 @@ class SmitePriest_Rotation$Type extends MessageType {
         /* bool use_starshards = 4; */
         if (message.useStarshards !== false)
             writer.tag(4, WireType.Varint).bool(message.useStarshards);
+        /* bool use_mind_blast = 5; */
+        if (message.useMindBlast !== false)
+            writer.tag(5, WireType.Varint).bool(message.useMindBlast);
+        /* bool use_shadow_word_death = 6; */
+        if (message.useShadowWordDeath !== false)
+            writer.tag(6, WireType.Varint).bool(message.useShadowWordDeath);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -616,7 +631,8 @@ export const SmitePriest_Rotation = new SmitePriest_Rotation$Type();
 class SmitePriest_Options$Type extends MessageType {
     constructor() {
         super("proto.SmitePriest.Options", [
-            { no: 1, name: "use_shadowfiend", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 1, name: "use_shadowfiend", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "power_infusion_target", kind: "message", T: () => RaidTarget }
         ]);
     }
     create(value) {
@@ -634,6 +650,9 @@ class SmitePriest_Options$Type extends MessageType {
                 case /* bool use_shadowfiend */ 1:
                     message.useShadowfiend = reader.bool();
                     break;
+                case /* proto.RaidTarget power_infusion_target */ 2:
+                    message.powerInfusionTarget = RaidTarget.internalBinaryRead(reader, reader.uint32(), options, message.powerInfusionTarget);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -649,6 +668,9 @@ class SmitePriest_Options$Type extends MessageType {
         /* bool use_shadowfiend = 1; */
         if (message.useShadowfiend !== false)
             writer.tag(1, WireType.Varint).bool(message.useShadowfiend);
+        /* proto.RaidTarget power_infusion_target = 2; */
+        if (message.powerInfusionTarget)
+            RaidTarget.internalBinaryWrite(message.powerInfusionTarget, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

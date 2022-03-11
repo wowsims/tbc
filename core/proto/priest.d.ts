@@ -4,6 +4,7 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { RaidTarget } from "./common";
 /**
  * @generated from protobuf message proto.PriestTalents
  */
@@ -248,6 +249,14 @@ export interface SmitePriest_Rotation {
      * @generated from protobuf field: bool use_starshards = 4;
      */
     useStarshards: boolean;
+    /**
+     * @generated from protobuf field: bool use_mind_blast = 5;
+     */
+    useMindBlast: boolean;
+    /**
+     * @generated from protobuf field: bool use_shadow_word_death = 6;
+     */
+    useShadowWordDeath: boolean;
 }
 /**
  * @generated from protobuf enum proto.SmitePriest.Rotation.RotationType
@@ -274,6 +283,10 @@ export interface SmitePriest_Options {
      * @generated from protobuf field: bool use_shadowfiend = 1;
      */
     useShadowfiend: boolean;
+    /**
+     * @generated from protobuf field: proto.RaidTarget power_infusion_target = 2;
+     */
+    powerInfusionTarget?: RaidTarget;
 }
 declare class PriestTalents$Type extends MessageType<PriestTalents> {
     constructor();
