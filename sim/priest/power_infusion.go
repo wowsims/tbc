@@ -9,13 +9,15 @@ var PowerInfusionCooldownID = core.NewCooldownID()
 
 func (priest *Priest) registerPowerInfusionCD() {
 
+	if !!priest.Talents.PowerInfusion {
+		return
+	}
+
 	actionID := core.ActionID{SpellID: 10060, CooldownID: PowerInfusionCooldownID, Tag: int32(priest.RaidIndex)}
 	
 	baseManaCost := priest.BaseMana() * 0.16
 
 	powerInfusionCD := core.PowerInfusionCD
-	
-	remainingPowerInfusionUsages := 0
 	
 	var powerInfusionTarget *core.Character
 	
@@ -26,7 +28,14 @@ func (priest *Priest) registerPowerInfusionCD() {
 		UsesGCD:    true,
 		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			// Does there need to be logic around this?
+			if powerInfusionTarget == nil {
+				return false
+			}
+			// How can we determine the target will be able to continue casting 
+			// 	for the next 15s at 20% reduced mana cost? Arbitrary value until then.
+			if powerInfusionTarget.CurrentMana() < 3000 {
+				return false
+			}
 			return true
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {

@@ -109,9 +109,9 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) 
 	})
 
 	priest.registerShadowfiendCD()
-	if priest.Talents.PowerInfusion {
-		priest.registerPowerInfusionCD()
-	}
+	
+	priest.registerPowerInfusionCD()
+	
 	priest.applyTalents()
 
 	return priest
