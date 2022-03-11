@@ -12,6 +12,24 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 
+export const SelfPowerInfusion = {
+	id: ActionId.fromSpellId(10060),
+	states: 2,
+	extraCssClasses: [
+		'self-power-infusion-picker',
+		'within-raid-sim-hide',
+	],
+	changedEvent: (player: Player<Spec.SpecSmitePriest>) => player.specOptionsChangeEmitter,
+	getValue: (player: Player<Spec.SpecSmitePriest>) => player.getSpecOptions().powerInfusionTarget?.targetIndex != NO_TARGET,
+	setValue: (eventID: EventID, player: Player<Spec.SpecSmitePriest>, newValue: boolean) => {
+		const newOptions = player.getSpecOptions();
+		newOptions.powerInfusionTarget = RaidTarget.create({
+			targetIndex: newValue ? 0 : NO_TARGET,
+		});
+		player.setSpecOptions(eventID, newOptions);
+	},
+};
+
 export const SmitePriestRotationConfig = {
 	inputs: [
 		{
