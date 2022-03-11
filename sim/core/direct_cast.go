@@ -182,7 +182,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 
 			if hitEffect.Landed() {
 				// Weapon Damage Effects
-				if hitEffect.WeaponInput.DamageMultiplier != 0 {
+				if hitEffect.WeaponInput.HasWeaponDamage() {
 					hitEffect.calculateWeaponDamage(sim, spell)
 				}
 
@@ -204,16 +204,15 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			// Use a separate loop for the beforeCalculations() calls so that they all
 			// come before the first afterCalculations() call. This prevents proc effects
 			// on the first hit from benefitting other hits of the same spell.
-			var hitEffect *SpellHitEffect
 			for effectIdx := range spell.Effects {
-				hitEffect = &spell.Effects[effectIdx]
+				hitEffect := &spell.Effects[effectIdx]
 				hitEffect.beforeCalculations(sim, spell)
 			}
 			for effectIdx := range spell.Effects {
-				hitEffect = &spell.Effects[effectIdx]
+				hitEffect := &spell.Effects[effectIdx]
 				if hitEffect.Landed() {
 					// Weapon Damage Effects
-					if hitEffect.WeaponInput.DamageMultiplier != 0 {
+					if hitEffect.WeaponInput.HasWeaponDamage() {
 						hitEffect.calculateWeaponDamage(sim, spell)
 					}
 					// Direct Damage Effects
@@ -229,7 +228,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			// Use a separate loop for the afterCalculations() calls so all effect damage
 			// is fully calculated before invoking proc callbacks.
 			for effectIdx := range spell.Effects {
-				hitEffect = &spell.Effects[effectIdx]
+				hitEffect := &spell.Effects[effectIdx]
 				hitEffect.applyResultsToCast(&spell.SpellCast)
 				hitEffect.afterCalculations(sim, spell)
 			}

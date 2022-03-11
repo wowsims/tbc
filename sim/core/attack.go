@@ -111,6 +111,10 @@ type WeaponDamageInput struct {
 	CalculateDamage MeleeDamageCalculator
 }
 
+func (wdi WeaponDamageInput) HasWeaponDamage() bool {
+	return wdi.DamageMultiplier != 0 || wdi.CalculateDamage != nil
+}
+
 // Computes an attack result using the white-hit table formula (single roll).
 func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpell) HitOutcome {
 	// 1. Single roll -> Miss				Dodge	Parry	Glance	Block	Crit / Hit

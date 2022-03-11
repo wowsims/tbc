@@ -106,7 +106,8 @@ func (spellEffect *SpellEffect) TotalThreatMultiplier(spellCast *SpellCast) floa
 }
 
 func (she *SpellHitEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell) {
-	she.SpellEffect.beforeCalculations(sim, spell, she)
+	se := &she.SpellEffect
+	se.beforeCalculations(sim, spell, she)
 }
 
 func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell, she *SpellHitEffect) {

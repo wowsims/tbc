@@ -87,12 +87,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestArcane-AllItems-BlackoutTruncheon-27901"
- value: {
-  dps: 1376.8511616085473
- }
-}
-dps_results: {
  key: "TestArcane-AllItems-Bladefist'sBreadth-28041"
  value: {
   dps: 1327.5016357527977
@@ -195,39 +189,9 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestArcane-AllItems-Devastation-30316"
- value: {
-  dps: 1215.0346549471626
- }
-}
-dps_results: {
- key: "TestArcane-AllItems-Dragonmaw-28438"
- value: {
-  dps: 1222.3741585476964
- }
-}
-dps_results: {
  key: "TestArcane-AllItems-DragonspineTrophy-28830"
  value: {
   dps: 1329.4188726660539
- }
-}
-dps_results: {
- key: "TestArcane-AllItems-Dragonstrike(StackingAuras)--23"
- value: {
-  dps: 1376.8511616085473
- }
-}
-dps_results: {
- key: "TestArcane-AllItems-Dragonstrike-28439"
- value: {
-  dps: 1376.8511616085473
- }
-}
-dps_results: {
- key: "TestArcane-AllItems-DrakefistHammer-28437"
- value: {
-  dps: 1222.3741585476964
  }
 }
 dps_results: {
@@ -240,12 +204,6 @@ dps_results: {
  key: "TestArcane-AllItems-EmptyMugofDirebrew-38287"
  value: {
   dps: 1327.5016357527977
- }
-}
-dps_results: {
- key: "TestArcane-AllItems-EmpyreanDemolisher-17112"
- value: {
-  dps: 1376.8511616085473
  }
 }
 dps_results: {
@@ -288,12 +246,6 @@ dps_results: {
  key: "TestArcane-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
   dps: 1327.5016357527977
- }
-}
-dps_results: {
- key: "TestArcane-AllItems-GlaiveofthePit-28774"
- value: {
-  dps: 1215.0346549471626
  }
 }
 dps_results: {
@@ -423,12 +375,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestArcane-AllItems-RodoftheSunKing-29996"
- value: {
-  dps: 1376.8511616085473
- }
-}
-dps_results: {
  key: "TestArcane-AllItems-Romulo'sPoisonVial-28579"
  value: {
   dps: 1329.4188726660539
@@ -468,12 +414,6 @@ dps_results: {
  key: "TestArcane-AllItems-ShiftingNaaruSliver-34429"
  value: {
   dps: 1366.8703266235898
- }
-}
-dps_results: {
- key: "TestArcane-AllItems-SingingCrystalAxe-31318"
- value: {
-  dps: 1215.0346549471626
  }
 }
 dps_results: {
@@ -519,12 +459,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestArcane-AllItems-SyphonoftheNathrezim-32262"
- value: {
-  dps: 1376.8511616085473
- }
-}
-dps_results: {
  key: "TestArcane-AllItems-TempestRegalia"
  value: {
   dps: 1484.0251743030988
@@ -534,24 +468,6 @@ dps_results: {
  key: "TestArcane-AllItems-TenaciousEarthstormDiamond"
  value: {
   dps: 1348.1643547301896
- }
-}
-dps_results: {
- key: "TestArcane-AllItems-TheBladefist-29348"
- value: {
-  dps: 1222.3741585476964
- }
-}
-dps_results: {
- key: "TestArcane-AllItems-TheDecapitator-28767"
- value: {
-  dps: 1219.3328949920133
- }
-}
-dps_results: {
- key: "TestArcane-AllItems-TheFistsofFury"
- value: {
-  dps: 1215.0346549471626
  }
 }
 dps_results: {
@@ -612,12 +528,6 @@ dps_results: {
  key: "TestArcane-AllItems-WarpSlicer-30311"
  value: {
   dps: 1376.8511616085473
- }
-}
-dps_results: {
- key: "TestArcane-AllItems-WorldBreaker-30090"
- value: {
-  dps: 1215.0346549471626
  }
 }
 dps_results: {
