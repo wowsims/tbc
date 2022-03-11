@@ -1,6 +1,8 @@
 package rogue
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 )
 
@@ -16,6 +18,9 @@ func (rogue *Rogue) newExposeArmorTemplate(_ *core.Simulation) core.SimpleSpellT
 		if spellEffect.Landed() {
 			spellEffect.Target.AddAura(sim, core.ExposeArmorAura(sim, spellEffect.Target, rogue.Talents.ImprovedExposeArmor))
 			rogue.ApplyFinisher(sim, spellCast.ActionID)
+			if sim.GetRemainingDuration() <= time.Second*30 {
+				rogue.doneEA = true
+			}
 		} else {
 			if refundAmount > 0 {
 				rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
@@ -50,8 +55,5 @@ func (rogue *Rogue) NewExposeArmor(_ *core.Simulation, target *core.Target) *cor
 }
 
 func (rogue *Rogue) MaintainingExpose(target *core.Target) bool {
-	permaEA := target.AuraExpiresAt(core.ExposeArmorDebuffID) == core.NeverExpires
-	return rogue.Rotation.MaintainExposeArmor &&
-		!permaEA &&
-		(rogue.Talents.ImprovedExposeArmor == 2 || !target.HasAura(core.SunderArmorDebuffID))
+	return !rogue.doneEA && (rogue.Talents.ImprovedExposeArmor == 2 || !target.HasAura(core.SunderArmorDebuffID))
 }
