@@ -1,6 +1,7 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
+import { Explosive } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { GuardianElixir } from '/tbc/core/proto/common.js';
@@ -19,7 +20,6 @@ export const GiftOfTheWild = makeTristateRaidBuffInput(ActionId.fromSpellId(2699
 // Party Buffs
 export const AtieshMage = makeMultistatePartyBuffInput(ActionId.fromSpellId(28142), 5, 'atieshMage');
 export const AtieshWarlock = makeMultistatePartyBuffInput(ActionId.fromSpellId(28143), 5, 'atieshWarlock');
-export const BattleChickens = makeMultistatePartyBuffInput(ActionId.fromItemId(10725), 5, 'battleChickens');
 export const Bloodlust = makeMultistatePartyBuffInput(ActionId.fromSpellId(2825), 11, 'bloodlust');
 export const BraidedEterniumChain = makeBooleanPartyBuffInput(ActionId.fromSpellId(31025), 'braidedEterniumChain');
 export const ChainOfTheTwilightOwl = makeBooleanPartyBuffInput(ActionId.fromSpellId(31035), 'chainOfTheTwilightOwl');
@@ -60,26 +60,14 @@ export const ExposeArmor = makeTristateDebuffInput(ActionId.fromSpellId(26866), 
 export const SunderArmor = makeBooleanDebuffInput(ActionId.fromSpellId(25225), 'sunderArmor');
 export const WintersChill = makeBooleanDebuffInput(ActionId.fromSpellId(28595), 'wintersChill');
 // Consumes
-export const BattleChicken = makeBooleanConsumeInput(ActionId.fromItemId(10725), 'battleChicken');
+export const SuperSapper = makeBooleanConsumeInput(ActionId.fromItemId(23827), 'superSapper', [], onSetExplosives);
+export const GoblinSapper = makeBooleanConsumeInput(ActionId.fromItemId(10646), 'goblinSapper', [], onSetExplosives);
 export const KiblersBits = makeEnumValueConsumeInput(ActionId.fromItemId(33874), 'petFood', PetFood.PetFoodKiblersBits, ['Pet Food']);
-export const KreegsStoutBeatdown = makeEnumValueConsumeInput(ActionId.fromItemId(18284), 'alchohol', Alchohol.AlchoholKreegsStoutBeatdown, ['Alchohol']);
 export const ScrollOfAgilityV = makeEnumValueConsumeInput(ActionId.fromItemId(27498), 'scrollOfAgility', 5);
 export const ScrollOfSpiritV = makeEnumValueConsumeInput(ActionId.fromItemId(27501), 'scrollOfSpirit', 5, ['Spirit']);
 export const ScrollOfStrengthV = makeEnumValueConsumeInput(ActionId.fromItemId(27503), 'scrollOfStrength', 5);
 export const PetScrollOfAgilityV = makeEnumValueConsumeInput(ActionId.fromItemId(27498), 'petScrollOfAgility', 5);
 export const PetScrollOfStrengthV = makeEnumValueConsumeInput(ActionId.fromItemId(27503), 'petScrollOfStrength', 5);
-function removeOtherPartyMembersDrums(eventID, player, newValue) {
-    if (newValue) {
-        player.getOtherPartyMembers().forEach(otherPlayer => {
-            const otherConsumes = otherPlayer.getConsumes();
-            otherConsumes.drums = Drums.DrumsUnknown;
-            otherPlayer.setConsumes(eventID, otherConsumes);
-        });
-    }
-}
-;
-export const DrumsOfBattleConsume = makeEnumValueConsumeInput(ActionId.fromSpellId(35476), 'drums', Drums.DrumsOfBattle, ['Drums'], removeOtherPartyMembersDrums);
-export const DrumsOfRestorationConsume = makeEnumValueConsumeInput(ActionId.fromSpellId(35478), 'drums', Drums.DrumsOfRestoration, ['Drums'], removeOtherPartyMembersDrums);
 function makeBooleanRaidBuffInput(id, buffsFieldName, exclusivityTags) {
     return {
         id: id,
@@ -233,7 +221,7 @@ function makeTristateDebuffInput(id, impId, debuffsFieldName) {
         },
     };
 }
-function makeBooleanConsumeInput(id, consumesFieldName, exclusivityTags) {
+function makeBooleanConsumeInput(id, consumesFieldName, exclusivityTags, onSet) {
     return {
         id: id,
         states: 2,
@@ -241,9 +229,14 @@ function makeBooleanConsumeInput(id, consumesFieldName, exclusivityTags) {
         changedEvent: (player) => player.consumesChangeEmitter,
         getValue: (player) => player.getConsumes()[consumesFieldName],
         setValue: (eventID, player, newValue) => {
-            const newBuffs = player.getConsumes();
-            newBuffs[consumesFieldName] = newValue;
-            player.setConsumes(eventID, newBuffs);
+            const newConsumes = player.getConsumes();
+            newConsumes[consumesFieldName] = newValue;
+            TypedEvent.freezeAllAndDo(() => {
+                player.setConsumes(eventID, newConsumes);
+                if (onSet) {
+                    onSet(eventID, player, newValue);
+                }
+            });
         },
     };
 }
@@ -421,6 +414,39 @@ export const makeAlcoholInput = makeConsumeInputFactory('alchohol', [
 export const makePetFoodInput = makeConsumeInputFactory('petFood', [
     { actionId: ActionId.fromItemId(33874), value: PetFood.PetFoodKiblersBits },
 ]);
+function onSetDrums(eventID, player, newValue) {
+    if (newValue) {
+        const playerConsumes = player.getConsumes();
+        playerConsumes.superSapper = false;
+        playerConsumes.goblinSapper = false;
+        playerConsumes.fillerExplosive = Explosive.ExplosiveUnknown;
+        player.setConsumes(eventID, playerConsumes);
+        player.getOtherPartyMembers().forEach(otherPlayer => {
+            const otherConsumes = otherPlayer.getConsumes();
+            otherConsumes.drums = Drums.DrumsUnknown;
+            otherPlayer.setConsumes(eventID, otherConsumes);
+        });
+    }
+}
+;
+export const DrumsInput = makeConsumeInput('drums', [
+    { actionId: ActionId.fromSpellId(35476), value: Drums.DrumsOfBattle },
+    { actionId: ActionId.fromSpellId(35478), value: Drums.DrumsOfRestoration },
+], onSetDrums);
+function onSetExplosives(eventID, player, newValue) {
+    if (newValue) {
+        const playerConsumes = player.getConsumes();
+        playerConsumes.drums = Drums.DrumsUnknown;
+        player.setConsumes(eventID, playerConsumes);
+    }
+}
+;
+export const FillerExplosiveInput = makeConsumeInput('fillerExplosive', [
+    { actionId: ActionId.fromItemId(23736), value: Explosive.ExplosiveFelIronBomb },
+    { actionId: ActionId.fromItemId(23737), value: Explosive.ExplosiveAdamantiteGrenade },
+    //{ actionId: ActionId.fromItemId(23841), value: Explosive.ExplosiveGnomishFlameTurret },
+    { actionId: ActionId.fromItemId(13180), value: Explosive.ExplosiveHolyWater },
+], onSetExplosives);
 export function makeWeaponImbueInput(isMainHand, options) {
     const allOptions = [
         { actionId: ActionId.fromItemId(18262), value: WeaponImbue.WeaponImbueElementalSharpeningStone },
@@ -469,4 +495,8 @@ function makeConsumeInputFactory(consumesFieldName, allOptions, onSet) {
             },
         };
     };
+}
+function makeConsumeInput(consumesFieldName, allOptions, onSet) {
+    const factory = makeConsumeInputFactory(consumesFieldName, allOptions, onSet);
+    return factory(allOptions.map(option => option.value));
 }

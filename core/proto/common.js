@@ -668,6 +668,32 @@ export var Drums;
     Drums[Drums["DrumsOfRestoration"] = 2] = "DrumsOfRestoration";
 })(Drums || (Drums = {}));
 /**
+ * @generated from protobuf enum proto.Explosive
+ */
+export var Explosive;
+(function (Explosive) {
+    /**
+     * @generated from protobuf enum value: ExplosiveUnknown = 0;
+     */
+    Explosive[Explosive["ExplosiveUnknown"] = 0] = "ExplosiveUnknown";
+    /**
+     * @generated from protobuf enum value: ExplosiveFelIronBomb = 1;
+     */
+    Explosive[Explosive["ExplosiveFelIronBomb"] = 1] = "ExplosiveFelIronBomb";
+    /**
+     * @generated from protobuf enum value: ExplosiveAdamantiteGrenade = 2;
+     */
+    Explosive[Explosive["ExplosiveAdamantiteGrenade"] = 2] = "ExplosiveAdamantiteGrenade";
+    /**
+     * @generated from protobuf enum value: ExplosiveGnomishFlameTurret = 3;
+     */
+    Explosive[Explosive["ExplosiveGnomishFlameTurret"] = 3] = "ExplosiveGnomishFlameTurret";
+    /**
+     * @generated from protobuf enum value: ExplosiveHolyWater = 4;
+     */
+    Explosive[Explosive["ExplosiveHolyWater"] = 4] = "ExplosiveHolyWater";
+})(Explosive || (Explosive = {}));
+/**
  * @generated from protobuf enum proto.Potions
  */
 export var Potions;
@@ -1141,7 +1167,6 @@ class PartyBuffs$Type extends MessageType {
         super("proto.PartyBuffs", [
             { no: 1, name: "bloodlust", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 22, name: "ferocious_inspiration", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 27, name: "battle_chickens", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "moonkin_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 19, name: "leader_of_the_pack", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 20, name: "sanctity_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
@@ -1173,7 +1198,7 @@ class PartyBuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { bloodlust: 0, ferociousInspiration: 0, battleChickens: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, snapshotImprovedStrengthOfEarthTotem: false, tranquilAirTotem: false, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0, bsSolarianSapphire: false, snapshotBsSolarianSapphire: false, snapshotBsT2: false };
+        const message = { bloodlust: 0, ferociousInspiration: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, snapshotImprovedStrengthOfEarthTotem: false, tranquilAirTotem: false, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0, bsSolarianSapphire: false, snapshotBsSolarianSapphire: false, snapshotBsT2: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1189,9 +1214,6 @@ class PartyBuffs$Type extends MessageType {
                     break;
                 case /* int32 ferocious_inspiration */ 22:
                     message.ferociousInspiration = reader.int32();
-                    break;
-                case /* int32 battle_chickens */ 27:
-                    message.battleChickens = reader.int32();
                     break;
                 case /* proto.TristateEffect moonkin_aura */ 2:
                     message.moonkinAura = reader.int32();
@@ -1295,9 +1317,6 @@ class PartyBuffs$Type extends MessageType {
         /* int32 ferocious_inspiration = 22; */
         if (message.ferociousInspiration !== 0)
             writer.tag(22, WireType.Varint).int32(message.ferociousInspiration);
-        /* int32 battle_chickens = 27; */
-        if (message.battleChickens !== 0)
-            writer.tag(27, WireType.Varint).int32(message.battleChickens);
         /* proto.TristateEffect moonkin_aura = 2; */
         if (message.moonkinAura !== 0)
             writer.tag(2, WireType.Varint).int32(message.moonkinAura);
@@ -1512,11 +1531,13 @@ class Consumes$Type extends MessageType {
             { no: 48, name: "starting_conjured", kind: "enum", T: () => ["proto.Conjured", Conjured] },
             { no: 49, name: "num_starting_conjured", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 19, name: "drums", kind: "enum", T: () => ["proto.Drums", Drums] },
-            { no: 34, name: "battle_chicken", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 50, name: "super_sapper", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 51, name: "goblin_sapper", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 52, name: "filler_explosive", kind: "enum", T: () => ["proto.Explosive", Explosive] }
         ]);
     }
     create(value) {
-        const message = { flask: 0, battleElixir: 0, guardianElixir: 0, mainHandImbue: 0, offHandImbue: 0, food: 0, petFood: 0, alchohol: 0, scrollOfAgility: 0, scrollOfStrength: 0, scrollOfSpirit: 0, petScrollOfAgility: 0, petScrollOfStrength: 0, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, startingConjured: 0, numStartingConjured: 0, drums: 0, battleChicken: false };
+        const message = { flask: 0, battleElixir: 0, guardianElixir: 0, mainHandImbue: 0, offHandImbue: 0, food: 0, petFood: 0, alchohol: 0, scrollOfAgility: 0, scrollOfStrength: 0, scrollOfSpirit: 0, petScrollOfAgility: 0, petScrollOfStrength: 0, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, startingConjured: 0, numStartingConjured: 0, drums: 0, superSapper: false, goblinSapper: false, fillerExplosive: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1587,8 +1608,14 @@ class Consumes$Type extends MessageType {
                 case /* proto.Drums drums */ 19:
                     message.drums = reader.int32();
                     break;
-                case /* bool battle_chicken */ 34:
-                    message.battleChicken = reader.bool();
+                case /* bool super_sapper */ 50:
+                    message.superSapper = reader.bool();
+                    break;
+                case /* bool goblin_sapper */ 51:
+                    message.goblinSapper = reader.bool();
+                    break;
+                case /* proto.Explosive filler_explosive */ 52:
+                    message.fillerExplosive = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1662,9 +1689,15 @@ class Consumes$Type extends MessageType {
         /* proto.Drums drums = 19; */
         if (message.drums !== 0)
             writer.tag(19, WireType.Varint).int32(message.drums);
-        /* bool battle_chicken = 34; */
-        if (message.battleChicken !== false)
-            writer.tag(34, WireType.Varint).bool(message.battleChicken);
+        /* bool super_sapper = 50; */
+        if (message.superSapper !== false)
+            writer.tag(50, WireType.Varint).bool(message.superSapper);
+        /* bool goblin_sapper = 51; */
+        if (message.goblinSapper !== false)
+            writer.tag(51, WireType.Varint).bool(message.goblinSapper);
+        /* proto.Explosive filler_explosive = 52; */
+        if (message.fillerExplosive !== 0)
+            writer.tag(52, WireType.Varint).int32(message.fillerExplosive);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

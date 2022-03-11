@@ -125,10 +125,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI {
                 }),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
-            selfBuffInputs: [
-                IconInputs.DrumsOfBattleConsume,
-                IconInputs.BattleChicken,
-            ],
+            selfBuffInputs: [],
             // IconInputs to include in the 'Other Buffs' section on the settings tab.
             raidBuffInputs: [
                 IconInputs.ArcaneBrilliance,
@@ -147,7 +144,6 @@ export class RetributionPaladinSimUI extends IndividualSimUI {
                 IconInputs.LeaderOfThePack,
                 IconInputs.FerociousInspiration,
                 IconInputs.TrueshotAura,
-                IconInputs.BattleChickens,
                 IconInputs.BraidedEterniumChain,
             ],
             playerBuffInputs: [
@@ -208,8 +204,6 @@ export class RetributionPaladinSimUI extends IndividualSimUI {
                     WeaponImbue.WeaponImbueSuperiorWizardOil,
                 ],
                 other: [
-                    IconInputs.DrumsOfBattleConsume,
-                    IconInputs.BattleChicken,
                     IconInputs.ScrollOfStrengthV,
                     IconInputs.ScrollOfAgilityV,
                 ],

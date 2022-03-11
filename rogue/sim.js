@@ -124,7 +124,6 @@ export class RogueSimUI extends IndividualSimUI {
                 IconInputs.TrueshotAura,
                 IconInputs.SanctityAura,
                 IconInputs.BraidedEterniumChain,
-                IconInputs.BattleChickens,
             ],
             playerBuffInputs: [
                 IconInputs.BlessingOfKings,
@@ -175,8 +174,6 @@ export class RogueSimUI extends IndividualSimUI {
                     WeaponImbue.WeaponImbueAdamantiteWeightstone,
                 ],
                 other: [
-                    IconInputs.DrumsOfBattleConsume,
-                    IconInputs.BattleChicken,
                     IconInputs.ScrollOfAgilityV,
                     IconInputs.ScrollOfStrengthV,
                 ],

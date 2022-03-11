@@ -38,10 +38,6 @@ export interface PartyBuffs {
      */
     ferociousInspiration: number;
     /**
-     * @generated from protobuf field: int32 battle_chickens = 27;
-     */
-    battleChickens: number;
-    /**
      * @generated from protobuf field: proto.TristateEffect moonkin_aura = 2;
      */
     moonkinAura: TristateEffect;
@@ -290,9 +286,17 @@ export interface Consumes {
      */
     drums: Drums;
     /**
-     * @generated from protobuf field: bool battle_chicken = 34;
+     * @generated from protobuf field: bool super_sapper = 50;
      */
-    battleChicken: boolean;
+    superSapper: boolean;
+    /**
+     * @generated from protobuf field: bool goblin_sapper = 51;
+     */
+    goblinSapper: boolean;
+    /**
+     * @generated from protobuf field: proto.Explosive filler_explosive = 52;
+     */
+    fillerExplosive: Explosive;
 }
 /**
  * @generated from protobuf message proto.Debuffs
@@ -1330,6 +1334,31 @@ export declare enum Drums {
      * @generated from protobuf enum value: DrumsOfRestoration = 2;
      */
     DrumsOfRestoration = 2
+}
+/**
+ * @generated from protobuf enum proto.Explosive
+ */
+export declare enum Explosive {
+    /**
+     * @generated from protobuf enum value: ExplosiveUnknown = 0;
+     */
+    ExplosiveUnknown = 0,
+    /**
+     * @generated from protobuf enum value: ExplosiveFelIronBomb = 1;
+     */
+    ExplosiveFelIronBomb = 1,
+    /**
+     * @generated from protobuf enum value: ExplosiveAdamantiteGrenade = 2;
+     */
+    ExplosiveAdamantiteGrenade = 2,
+    /**
+     * @generated from protobuf enum value: ExplosiveGnomishFlameTurret = 3;
+     */
+    ExplosiveGnomishFlameTurret = 3,
+    /**
+     * @generated from protobuf enum value: ExplosiveHolyWater = 4;
+     */
+    ExplosiveHolyWater = 4
 }
 /**
  * @generated from protobuf enum proto.Potions
