@@ -198,8 +198,6 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 					WeaponImbue.WeaponImbueSuperiorWizardOil,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.DrumsOfRestorationConsume,
 				],
 			},
 			// Inputs to include in the 'Rotation' section on the settings tab.

@@ -16,7 +16,7 @@ func TestSmite(t *testing.T) {
 	core.RunTestSuite(t, t.Name(), core.FullCharacterTestSuiteGenerator(core.CharacterSuiteConfig{
 		Class: proto.Class_ClassPriest,
 
-		Race:       proto.Race_RaceUndead,
+		Race: proto.Race_RaceUndead,
 
 		GearSet: core.GearSetCombo{Label: "P3", GearSet: P3Gear},
 

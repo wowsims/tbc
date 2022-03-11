@@ -1,10 +1,10 @@
 package smite
 
 import (
-	"time"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/priest"
+	"time"
 )
 
 func RegisterSmitePriest() {
@@ -41,7 +41,7 @@ func NewSmitePriest(character core.Character, options proto.Player) *SmitePriest
 	}
 
 	basePriest := priest.New(character, selfBuffs, *smiteOptions.Talents)
-	
+
 	spriest := &SmitePriest{
 		Priest:   basePriest,
 		rotation: *smiteOptions.Rotation,
@@ -86,15 +86,15 @@ func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 
 	target := sim.GetPrimaryTarget()
 	var spell *core.SimpleSpell
-	
+
 	// Calculate higher SW:P uptime if using HF
 	swpRemaining := spriest.SWPSpell.Effect.DotInput.TimeRemaining(sim)
-	
+
 	castSpeed := spriest.CastSpeed()
 
 	// smite cast time, talent assumed
 	smiteCastTime := time.Duration(float64(time.Millisecond*2000) / castSpeed)
-	
+
 	// holy fire cast time
 	hfCastTime := time.Duration(float64(time.Millisecond*3000) / castSpeed)
 	
@@ -121,9 +121,8 @@ func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 	} else {
 		spell = spriest.NewSmite(sim, target)
 	}
-	
+
 	if success := spell.Cast(sim); !success {
 		spriest.WaitForMana(sim, spell.GetManaCost())
 	}
 }
-

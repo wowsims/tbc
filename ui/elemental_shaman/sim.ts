@@ -206,8 +206,6 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 					WeaponImbue.WeaponImbueSuperiorWizardOil,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.DrumsOfRestorationConsume,
 				],
 			},
 			// Inputs to include in the 'Rotation' section on the settings tab.

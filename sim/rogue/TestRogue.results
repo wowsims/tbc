@@ -689,13 +689,13 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 772.986720994801
+  dps: 772.9867209948011
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 772.986720994801
+  dps: 772.9867209948011
  }
 }
 dps_results: {
@@ -749,7 +749,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Mutilate-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 569.3061967489041
+  dps: 569.306196748904
  }
 }
 dps_results: {

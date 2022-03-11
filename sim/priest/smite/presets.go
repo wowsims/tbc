@@ -6,20 +6,20 @@ import (
 )
 
 var StandardTalents = &proto.PriestTalents{
-	InnerFocus:             true,
-	Meditation:             3,
-	SilentResolve:          1,
-	MentalAgility:          5,
-	MentalStrength:         5,
-	DivineSpirit:           true,
-	ImprovedDivineSpirit:   2,
-	ForceOfWill:            5,
-	PowerInfusion:          true,
-	HolySpecialization:     5,
-	DivineFury:             5,
-	SearingLight:           2,
-	SpiritualGuidance:      5,
-	SurgeOfLight:           2,
+	InnerFocus:           true,
+	Meditation:           3,
+	SilentResolve:        1,
+	MentalAgility:        5,
+	MentalStrength:       5,
+	DivineSpirit:         true,
+	ImprovedDivineSpirit: 2,
+	ForceOfWill:          5,
+	PowerInfusion:        true,
+	HolySpecialization:   5,
+	DivineFury:           5,
+	SearingLight:         2,
+	SpiritualGuidance:    5,
+	SurgeOfLight:         2,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{
@@ -66,7 +66,6 @@ var PlayerOptionsBasic = &proto.Player_SmitePriest{
 		},
 	},
 }
-
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{

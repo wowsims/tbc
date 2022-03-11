@@ -192,8 +192,6 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 					WeaponImbue.WeaponImbueSuperiorWizardOil,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.DrumsOfRestorationConsume,
 					IconInputs.ScrollOfSpiritV,
 				],
 			},

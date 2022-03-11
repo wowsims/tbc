@@ -150,7 +150,6 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				IconInputs.FerociousInspiration,
 				IconInputs.TrueshotAura,
 				IconInputs.SanctityAura,
-				IconInputs.BattleChickens,
 				IconInputs.BraidedEterniumChain,
 				IconInputs.EyeOfTheNight,
 				IconInputs.ChainOfTheTwilightOwl,
@@ -218,9 +217,6 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 					WeaponImbue.WeaponImbueShamanRockbiter,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.DrumsOfRestorationConsume,
-					IconInputs.BattleChicken,
 					IconInputs.ScrollOfStrengthV,
 					IconInputs.ScrollOfAgilityV,
 				],

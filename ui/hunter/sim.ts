@@ -149,7 +149,6 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				IconInputs.TrueshotAura,
 				IconInputs.SanctityAura,
 				IconInputs.BraidedEterniumChain,
-				IconInputs.BattleChickens,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
@@ -211,8 +210,6 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 					IconInputs.PetScrollOfStrengthV,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.BattleChicken,
 					IconInputs.ScrollOfAgilityV,
 					IconInputs.ScrollOfStrengthV,
 				],

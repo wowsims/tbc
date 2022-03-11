@@ -18,7 +18,7 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 	if ItemSetNetherblade.CharacterHasSetBonus(&rogue.Character, 2) {
 		durationBonus = time.Second * 3
 	}
-	sliceAndDiceDurations := []time.Duration{
+	rogue.sliceAndDiceDurations = [6]time.Duration{
 		0,
 		time.Duration(float64(time.Second*9+durationBonus) * durationMultiplier),
 		time.Duration(float64(time.Second*12+durationBonus) * durationMultiplier),
@@ -54,7 +54,7 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				numPoints := rogue.ComboPoints()
 				aura := sliceAndDiceAura
-				aura.Expires = sim.CurrentTime + sliceAndDiceDurations[numPoints]
+				aura.Expires = sim.CurrentTime + rogue.sliceAndDiceDurations[numPoints]
 				if rogue.HasAura(SliceAndDiceAuraID) {
 					rogue.ReplaceAura(sim, aura)
 				} else {
@@ -63,6 +63,10 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 				}
 
 				rogue.ApplyFinisher(sim, cast.ActionID)
+
+				if aura.Expires >= sim.Duration {
+					rogue.doneSND = true
+				}
 			},
 		},
 	}
