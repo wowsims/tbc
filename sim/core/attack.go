@@ -182,7 +182,7 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 	return OutcomeHit
 }
 
-func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell) {
+func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *SimpleSpell) {
 	if ahe.StaticDamageMultiplier == 0 {
 		ahe.Damage = 0
 		return
@@ -228,7 +228,6 @@ func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell
 				dmg += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower)*0.5 + bonusWeaponDamage
 			}
 		}
-
 		dmg += ahe.WeaponInput.FlatDamageBonus
 		dmg *= ahe.WeaponInput.DamageMultiplier
 	}
@@ -236,13 +235,6 @@ func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *SimpleSpell
 	//if sim.Log != nil {
 	//	character.Log(sim, "Melee dmg calcs: AP=%0.1f, bonusWepDmg:%0.1f, dmgMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weaponDmgCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, ahe.DamageMultiplier, ahe.StaticDamageMultiplier, ahe.HitType, dmg, ability.CritMultiplier, ahe.Target.currentArmor)
 	//}
-
-	// Add damage from DirectInput
-	if ahe.DirectInput.MinBaseDamage != 0 {
-		dmg += ahe.DirectInput.MinBaseDamage + (ahe.DirectInput.MaxBaseDamage-ahe.DirectInput.MinBaseDamage)*sim.RandomFloat("Melee Direct Input")
-	}
-	dmg += attackPower * ahe.DirectInput.SpellCoefficient
-	dmg += ahe.DirectInput.FlatDamageBonus
 
 	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
 	if ahe.critCheck(sim, &ability.SpellCast) {

@@ -237,16 +237,32 @@ func (hitEffect *SpellHitEffect) applyDotTickResultsToCast(spellCast *SpellCast)
 }
 
 func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCast *SpellCast) {
+	character := spellCast.Character
+
 	baseDamage := hitEffect.DirectInput.MinBaseDamage + sim.RandomFloat("DirectSpell Base Damage")*(hitEffect.DirectInput.MaxBaseDamage-hitEffect.DirectInput.MinBaseDamage)
 
-	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool.Stat()) + hitEffect.SpellEffect.BonusSpellPower
-	damageFromSpellPower := (totalSpellPower * hitEffect.DirectInput.SpellCoefficient)
-
-	damage := baseDamage + damageFromSpellPower + hitEffect.DirectInput.FlatDamageBonus
-
+	schoolBonus := 0.0
+	// Use outcome roll to decide if it should use AP or spell school for bonus damage.
+	isPhysical := spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical)
+	if isPhysical {
+		if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+			schoolBonus = character.stats[stats.RangedAttackPower]
+		} else if spellCast.SpellSchool == SpellSchoolPhysical {
+			schoolBonus = character.stats[stats.AttackPower]
+		}
+		schoolBonus += hitEffect.BonusAttackPower
+	} else {
+		schoolBonus = character.GetStat(stats.SpellPower) + character.GetStat(spellCast.SpellSchool.Stat()) + hitEffect.SpellEffect.BonusSpellPower
+	}
+	damage := baseDamage + (schoolBonus * hitEffect.DirectInput.SpellCoefficient) + hitEffect.DirectInput.FlatDamageBonus
 	damage *= hitEffect.SpellEffect.DamageMultiplier * hitEffect.SpellEffect.StaticDamageMultiplier
 
-	if !spellCast.SpellExtras.Matches(SpellExtrasBinary | SpellExtrasIgnoreResists) {
+	// Use spell school to determine damage reduction type.
+	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
+		if !spellCast.SpellExtras.Matches(SpellExtrasIgnoreResists) {
+			damage *= 1 - hitEffect.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+hitEffect.BonusArmorPenetration)
+		}
+	} else if !spellCast.SpellExtras.Matches(SpellExtrasBinary | SpellExtrasIgnoreResists) {
 		damage = calculateResists(sim, damage, &hitEffect.SpellEffect)
 	}
 
