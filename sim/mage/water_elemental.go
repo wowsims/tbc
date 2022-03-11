@@ -112,7 +112,7 @@ func (we *WaterElemental) Init(sim *core.Simulation) {
 	we.waterboltCastTemplate = we.newWaterboltTemplate(sim)
 }
 
-func (we *WaterElemental) Reset(newsim *core.Simulation) {
+func (we *WaterElemental) Reset(sim *core.Simulation) {
 }
 
 func (we *WaterElemental) OnGCDReady(sim *core.Simulation) {
@@ -189,6 +189,7 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 			SpellEffect: core.SpellEffect{
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
+				ThreatMultiplier:       1,
 			},
 			DirectInput: core.DirectDamageInput{
 				MinBaseDamage:    256,
