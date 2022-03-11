@@ -609,7 +609,7 @@ func (character *Character) NewTemporaryStatsAuraFactory(auraID AuraID, actionID
 		ActionID: actionID,
 		OnExpire: func(sim *Simulation) {
 			if sim.Log != nil {
-				character.Log(sim, "Lost %s from fading %s.", buffs, actionID)
+				character.Log(sim, "Lost %s from fading %s.", buffs.FlatString(), actionID)
 			}
 			character.AddStatsDynamic(sim, unbuffs)
 		},
@@ -619,7 +619,7 @@ func (character *Character) NewTemporaryStatsAuraFactory(auraID AuraID, actionID
 		if !character.HasAura(auraID) {
 			character.AddStatsDynamic(sim, buffs)
 			if sim.Log != nil {
-				character.Log(sim, "Gained %s from %s.", buffs, actionID)
+				character.Log(sim, "Gained %s from %s.", buffs.FlatString(), actionID)
 			}
 		}
 		aura.Expires = sim.CurrentTime + duration
