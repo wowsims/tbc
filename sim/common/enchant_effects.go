@@ -125,7 +125,7 @@ func newLightningSpeedAuraFactory(character *core.Character, auraID core.AuraID,
 			character.AddStatsDynamic(sim, unbuffs)
 			character.MultiplyMeleeSpeed(sim, 1/1.02)
 			if sim.Log != nil {
-				character.Log(sim, "Lost %s from fading %s", buffs, actionID)
+				character.Log(sim, "Lost %s from fading %s", buffs.FlatString(), actionID)
 			}
 		},
 	}
@@ -135,7 +135,7 @@ func newLightningSpeedAuraFactory(character *core.Character, auraID core.AuraID,
 			character.AddStatsDynamic(sim, buffs)
 			character.MultiplyMeleeSpeed(sim, 1.02)
 			if sim.Log != nil {
-				character.Log(sim, "Gained %s from %s", buffs, actionID)
+				character.Log(sim, "Gained %s from %s", buffs.FlatString(), actionID)
 			}
 		}
 		aura.Expires = sim.CurrentTime + 15*time.Second

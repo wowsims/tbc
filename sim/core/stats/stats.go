@@ -210,6 +210,24 @@ func (stats Stats) String() string {
 	return sb.String()
 }
 
+// Like String() but without the newlines.
+func (stats Stats) FlatString() string {
+	var sb strings.Builder
+	sb.WriteString("{")
+
+	for statIdx, statValue := range stats {
+		name := Stat(statIdx).StatName()
+		if name == "none" || statValue == 0 {
+			continue
+		}
+
+		fmt.Fprintf(&sb, "%s: %0.3f,", name, statValue)
+	}
+
+	sb.WriteString("}")
+	return sb.String()
+}
+
 // Given the current values for source and mod stats, should return the new
 // value for the mod stat.
 type StatModifier func(sourceValue float64, modValue float64) float64
