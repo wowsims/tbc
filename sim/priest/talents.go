@@ -58,16 +58,26 @@ func (priest *Priest) applyTalents() {
 		priest.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Stamina,
 			ModifiedStat: stats.Stamina,
-			Modifier: func(intellect float64, _ float64) float64 {
-				return intellect + intellect*coeff
+			Modifier: func(stamina float64, _ float64) float64 {
+				return stamina + stamina*coeff
 			},
 		})
 		
 		priest.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Spirit,
 			ModifiedStat: stats.Spirit,
-			Modifier: func(intellect float64, _ float64) float64 {
-				return intellect + intellect*coeff
+			Modifier: func(spirit float64, _ float64) float64 {
+				return spirit + spirit*coeff
+			},
+		})
+	}
+	
+	if priest.Talents.SpiritOfRedemption {
+		priest.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Spirit,
+			ModifiedStat: stats.Spirit,
+			Modifier: func(spirit float64, _ float64) float64 {
+				return spirit + spirit*0.05
 			},
 		})
 	}
