@@ -4,6 +4,7 @@
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -267,6 +268,7 @@
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -552,7 +554,7 @@ input, select {
   width: 80%;
   display: flex;
   flex-direction: column;
-  background-image: linear-gradient(rgba(var(--theme-color-background-raw), 0.82), rgba(var(--theme-color-background-raw), 0.9)), var(--theme-background-image);
+  background-image: linear-gradient(rgba(var(--theme-color-background-raw), var(--theme-background-opacity)), rgba(var(--theme-color-background-raw), var(--theme-background-opacity))), var(--theme-background-image);
   background-size: cover;
   background-position: center center;
   color: var(--main-text-color);
@@ -924,6 +926,7 @@ input, select {
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -1323,6 +1326,7 @@ input, select {
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -1656,6 +1660,7 @@ input, select {
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -1998,6 +2003,7 @@ input, select {
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -2202,6 +2208,7 @@ input, select {
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -2684,6 +2691,8 @@ input, select {
   --theme-color-background: #181d2d;
   --theme-color-background-raw: 24, 29, 45;
   --theme-background-image: url("/tbc/assets/enhancement_shaman_background.jpg");
+  --theme-background-opacity: 0.9;
+  --main-text-color: White;
 }
 
 .enhancement-shaman-sim-ui .self-buffs-section {

@@ -4,6 +4,7 @@
   --theme-color-background: #1d1510;
   --theme-color-background-raw: 29, 21, 16;
   --theme-background-image: url("/tbc/assets/balance_druid_background.jpg");
+  --theme-background-opacity: 0.9;
   --main-text-color: White;
 }
 
@@ -52,6 +53,7 @@
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -315,6 +317,7 @@
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -600,7 +603,7 @@ input, select {
   width: 80%;
   display: flex;
   flex-direction: column;
-  background-image: linear-gradient(rgba(var(--theme-color-background-raw), 0.82), rgba(var(--theme-color-background-raw), 0.9)), var(--theme-background-image);
+  background-image: linear-gradient(rgba(var(--theme-color-background-raw), var(--theme-background-opacity)), rgba(var(--theme-color-background-raw), var(--theme-background-opacity))), var(--theme-background-image);
   background-size: cover;
   background-position: center center;
   color: var(--main-text-color);
@@ -972,6 +975,7 @@ input, select {
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -1371,6 +1375,7 @@ input, select {
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -1704,6 +1709,7 @@ input, select {
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -2046,6 +2052,7 @@ input, select {
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -2250,6 +2257,7 @@ input, select {
   --theme-color-background: DarkSlateGrey;
   --theme-color-background-raw: 0, 0, 0;
   --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
   --main-bg-color: DarkSlateGrey;
   --main-text-color: White;
   --main-secondary-color: Black;
@@ -2732,6 +2740,8 @@ input, select {
   --theme-color-background: #0c190f;
   --theme-color-background-raw: 12, 25, 15;
   --theme-background-image: url("/tbc/assets/hunter_background.jpg");
+  --theme-background-opacity: 0.8;
+  --main-text-color: White;
 }
 
 .hunter-sim-ui .self-buffs-section {
@@ -2783,6 +2793,7 @@ input, select {
   --theme-color-background: #101a20;
   --theme-color-background-raw: 16, 26, 32;
   --theme-background-image: url("/tbc/assets/mage_background.jpg");
+  --theme-background-opacity: 0.9;
   --main-text-color: White;
 }
 
@@ -2818,6 +2829,7 @@ input, select {
   --theme-color-background: #181d2d;
   --theme-color-background-raw: 24, 29, 45;
   --theme-background-image: url("/tbc/assets/elemental_shaman_background.jpg");
+  --theme-background-opacity: 0.9;
   --main-text-color: White;
 }
 
@@ -2853,6 +2865,8 @@ input, select {
   --theme-color-background: #181d2d;
   --theme-color-background-raw: 24, 29, 45;
   --theme-background-image: url("/tbc/assets/enhancement_shaman_background.jpg");
+  --theme-background-opacity: 0.9;
+  --main-text-color: White;
 }
 
 .enhancement-shaman-sim-ui .self-buffs-section {
@@ -2900,6 +2914,7 @@ input, select {
   --theme-color-background: #1d1726;
   --theme-color-background-raw: 29, 23, 38;
   --theme-background-image: url("/tbc/assets/shadow_priest_background.jpg");
+  --theme-background-opacity: 0.9;
   --main-text-color: White;
 }
 
