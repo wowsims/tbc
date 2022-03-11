@@ -24,6 +24,7 @@ export class DetailedResults extends Component {
 		url.searchParams.append('themeColorBackground', computedStyles.getPropertyValue('--theme-color-background').trim());
 		url.searchParams.append('themeColorBackgroundRaw', computedStyles.getPropertyValue('--theme-color-background-raw').trim());
 		url.searchParams.append('themeBackgroundImage', computedStyles.getPropertyValue('--theme-background-image').trim());
+		url.searchParams.append('themeBackgroundOpacity', computedStyles.getPropertyValue('--theme-background-opacity').trim());
 		if (simUI.isIndividualSim()) {
 			url.searchParams.append('isIndividualSim', '');
 		}

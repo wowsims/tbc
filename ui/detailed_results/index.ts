@@ -33,6 +33,9 @@ if (urlParams.has('themeColorBackgroundRaw')) {
 if (urlParams.has('themeBackgroundImage')) {
 	document.body.style.setProperty('--theme-background-image', urlParams.get('themeBackgroundImage')!);
 }
+if (urlParams.has('themeBackgroundOpacity')) {
+	document.body.style.setProperty('--theme-background-opacity', urlParams.get('themeBackgroundOpacity')!);
+}
 
 const isIndividualSim = urlParams.has('isIndividualSim');
 if (isIndividualSim) {
