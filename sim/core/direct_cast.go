@@ -204,10 +204,13 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			// Use a separate loop for the beforeCalculations() calls so that they all
 			// come before the first afterCalculations() call. This prevents proc effects
 			// on the first hit from benefitting other hits of the same spell.
-			for _, hitEffect := range spell.Effects {
+			var hitEffect *SpellHitEffect
+			for effectIdx := range spell.Effects {
+				hitEffect = &spell.Effects[effectIdx]
 				hitEffect.beforeCalculations(sim, spell)
 			}
-			for _, hitEffect := range spell.Effects {
+			for effectIdx := range spell.Effects {
+				hitEffect = &spell.Effects[effectIdx]
 				if hitEffect.Landed() {
 					// Weapon Damage Effects
 					if hitEffect.WeaponInput.DamageMultiplier != 0 {
@@ -225,7 +228,8 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			spell.applyAOECap()
 			// Use a separate loop for the afterCalculations() calls so all effect damage
 			// is fully calculated before invoking proc callbacks.
-			for _, hitEffect := range spell.Effects {
+			for effectIdx := range spell.Effects {
+				hitEffect = &spell.Effects[effectIdx]
 				hitEffect.applyResultsToCast(&spell.SpellCast)
 				hitEffect.afterCalculations(sim, spell)
 			}
@@ -246,13 +250,18 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 func (spell *SimpleSpell) ApplyDot(sim *Simulation) {
 	pa := sim.pendingActionPool.Get()
 	pa.Priority = ActionPriorityDOT
-	pa.NextActionAt = sim.CurrentTime + spell.Effects[0].DotInput.TickLength
-
 	multiDot := len(spell.Effects) > 0
+
+	if multiDot {
+		pa.NextActionAt = sim.CurrentTime + spell.Effects[0].DotInput.TickLength
+	} else {
+		pa.NextActionAt = sim.CurrentTime + spell.Effect.DotInput.TickLength
+	}
+
 	pa.OnAction = func(sim *Simulation) {
-		referenceHit := spell.Effect
+		referenceHit := &spell.Effect
 		if multiDot {
-			referenceHit = spell.Effects[0]
+			referenceHit = &spell.Effects[0]
 			for i := range spell.Effects {
 				spell.Effects[i].calculateDotDamage(sim, &spell.SpellCast)
 			}
