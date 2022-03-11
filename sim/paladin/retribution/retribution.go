@@ -46,6 +46,8 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 		AutoSwingMelee: true,
 	})
 
+	ret.SetupSealOfCommand()
+
 	return ret
 }
 
@@ -104,20 +106,20 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
 	// judge blood whenever we can
-	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
-		judge := ret.NewJudgementOfBlood(sim, target)
-		if judge != nil {
-			if success := judge.Cast(sim); !success {
-				ret.WaitForMana(sim, judge.Cost.Value)
-			}
-		}
-	}
+	// if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
+	// 	judge := ret.NewJudgementOfBlood(sim, target)
+	// 	if judge != nil {
+	// 		if success := judge.Cast(sim); !success {
+	// 			ret.WaitForMana(sim, judge.Cost.Value)
+	// 		}
+	// 	}
+	// }
 
-	// roll seal of blood
-	if !ret.HasAura(paladin.SealOfBloodAuraID) {
-		sob := ret.NewSealOfBlood(sim)
-		if success := sob.StartCast(sim); !success {
-			ret.WaitForMana(sim, sob.GetManaCost())
+	// roll seal of command
+	if !ret.HasAura(paladin.SealOfCommandAuraID) {
+		soc := ret.NewSealOfCommand(sim)
+		if success := soc.StartCast(sim); !success {
+			ret.WaitForMana(sim, soc.GetManaCost())
 		}
 		return
 	}
@@ -133,8 +135,8 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 
 	// Proceed until SoB expires, CrusaderStrike comes off GCD, or Judgement comes off GCD
 	nextEventAt := ret.CDReadyAt(paladin.CrusaderStrikeCD)
-	sobExpiration := sim.CurrentTime + ret.RemainingAuraDuration(sim, paladin.SealOfBloodAuraID)
-	nextEventAt = core.MinDuration(nextEventAt, sobExpiration)
+	socExpiration := sim.CurrentTime + ret.RemainingAuraDuration(sim, paladin.SealOfCommandAuraID)
+	nextEventAt = core.MinDuration(nextEventAt, socExpiration)
 	// Waiting for judgement CD causes a bug that infinite loops for some reason
 	// nextEventAt = core.MinDuration(nextEventAt, ret.CDReadyAt(paladin.JudgementCD))
 	ret.WaitUntil(sim, nextEventAt)

@@ -117,10 +117,9 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 		},
 	})
 
-	paladin.setupSealOfBlood()
-	paladin.setupSealOfCommand()
-	paladin.setupSealOfTheCrusader()
-	paladin.setupSealOfWisdom()
+	paladin.SetupSealOfBlood()
+	paladin.SetupSealOfTheCrusader()
+	paladin.SetupSealOfWisdom()
 
 	paladin.applyTalents()
 

@@ -14,7 +14,7 @@ var SealOfBloodCastActionID = core.ActionID{SpellID: 31892}
 var SealOfBloodProcActionID = core.ActionID{SpellID: 31893}
 
 // Handles the cast, gcd, deducts the mana cost
-func (paladin *Paladin) setupSealOfBlood() {
+func (paladin *Paladin) SetupSealOfBlood() {
 	// The proc behaviour
 	sobProc := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -92,7 +92,7 @@ var SealOfCommandAuraID = core.NewAuraID()
 var SealOfCommandCastActionID = core.ActionID{SpellID: 20375}
 var SealOfCommandProcActionID = core.ActionID{SpellID: 20424}
 
-func (paladin *Paladin) setupSealOfCommand() {
+func (paladin *Paladin) SetupSealOfCommand() {
 	socProc := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -187,9 +187,11 @@ func (paladin *Paladin) NewSealOfCommand(sim *core.Simulation) *core.SimpleCast 
 var SealOfTheCrusaderAuraID = core.NewAuraID()
 var SealOfTheCrusaderActionID = core.ActionID{SpellID: 27158}
 
+// TODO: Make a universal setup seals function
+
 // Seal of the crusader has a bunch of effects that we realistically don't care about (bonus AP, faster swing speed)
 // For now, we'll just use it as a setup to casting Judgement of the Crusader
-func (paladin *Paladin) setupSealOfTheCrusader() {
+func (paladin *Paladin) SetupSealOfTheCrusader() {
 	sotcAura := core.Aura{
 		ID:       SealOfTheCrusaderAuraID,
 		ActionID: SealOfTheCrusaderActionID,
@@ -230,7 +232,7 @@ func (paladin *Paladin) NewSealOfTheCrusader(sim *core.Simulation) *core.SimpleC
 var SealOfWisdomAuraID = core.NewAuraID()
 var SealOfWisdomActionID = core.ActionID{SpellID: 27166}
 
-func (paladin *Paladin) setupSealOfWisdom() {
+func (paladin *Paladin) SetupSealOfWisdom() {
 	sowAura := core.Aura{
 		ID:       SealOfWisdomAuraID,
 		ActionID: SealOfWisdomActionID,
