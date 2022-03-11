@@ -111,7 +111,7 @@ func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 	} else if spriest.rotation.UseMindBlast && spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime) == 0 {
 		spell = spriest.NewMindBlast(sim, target)
 	// If setting enabled, cast Shadow Word: Death on cooldown
-	} else if spriest.rotation.Use_SWDeath && spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime) == 0 {
+	} else if spriest.rotation.UseShadowWordDeath && spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime) == 0 {
 		spell = spriest.NewShadowWordDeath(sim, target)
 	// Consider HF if SWP will fall off after 1 smite but before 2 smites from now finishes
 	//	and swp falls off after hf finishes (assumption never worth clipping)

@@ -77,10 +77,10 @@ export const SmitePriestRotationConfig = {
 				label: 'Use Shadow Word: Death',
 				labelTooltip: 'Use Shadow Word: Death whenever off CD.',
 				changedEvent: (player: Player<Spec.SpecSmitePriest>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecSmitePriest>) => player.getRotation().useSWDeath,
+				getValue: (player: Player<Spec.SpecSmitePriest>) => player.getRotation().useShadowWordDeath,
 				setValue: (eventID: EventID, player: Player<Spec.SpecSmitePriest>, newValue: boolean) => {
 					const newRotation = player.getRotation();
-					newRotation.useSWDeath = newValue;
+					newRotation.useShadowWordDeath = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},
