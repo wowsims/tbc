@@ -483,6 +483,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-Slayer'sArmor"
+ value: {
+  dps: 1451.7871866539053
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-Slayer'sCrest-23041"
  value: {
   dps: 1427.2021323789706
