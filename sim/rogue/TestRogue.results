@@ -185,7 +185,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Despair-28573"
  value: {
-  dps: 978.9220232316995
+  dps: 960.0966557625693
  }
 }
 dps_results: {
@@ -551,7 +551,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-TheDecapitator-28767"
  value: {
-  dps: 1315.5076802387582
+  dps: 1315.6454021364482
  }
 }
 dps_results: {

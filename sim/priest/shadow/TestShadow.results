@@ -117,12 +117,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestShadow-AllItems-Blinkstrike-31332"
- value: {
-  dps: 1484.1312507099822
- }
-}
-dps_results: {
  key: "TestShadow-AllItems-BloodlustBrooch-29383"
  value: {
   dps: 1442.8079868275815
@@ -189,21 +183,9 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestShadow-AllItems-Despair-28573"
- value: {
-  dps: 1302.1902819940497
- }
-}
-dps_results: {
  key: "TestShadow-AllItems-DestructiveSkyfireDiamond"
  value: {
   dps: 1470.876407454364
- }
-}
-dps_results: {
- key: "TestShadow-AllItems-Devastation-30316"
- value: {
-  dps: 1302.1902819940497
  }
 }
 dps_results: {
@@ -297,12 +279,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestShadow-AllItems-GlaiveofthePit-28774"
- value: {
-  dps: 1302.1902819940497
- }
-}
-dps_results: {
  key: "TestShadow-AllItems-HandofJustice-11815"
  value: {
   dps: 1442.8079868275815
@@ -351,27 +327,9 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestShadow-AllItems-KhoriumChampion-23541"
- value: {
-  dps: 1302.1902819940497
- }
-}
-dps_results: {
  key: "TestShadow-AllItems-KissoftheSpider-22954"
  value: {
   dps: 1442.8079868275815
- }
-}
-dps_results: {
- key: "TestShadow-AllItems-LionheartChampion-28429"
- value: {
-  dps: 1302.1902819940497
- }
-}
-dps_results: {
- key: "TestShadow-AllItems-LionheartExecutioner-28430"
- value: {
-  dps: 1302.1902819940497
  }
 }
 dps_results: {
@@ -477,12 +435,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestShadow-AllItems-SingingCrystalAxe-31318"
- value: {
-  dps: 1302.1902819940497
- }
-}
-dps_results: {
  key: "TestShadow-AllItems-Slayer'sCrest-23041"
  value: {
   dps: 1442.8079868275815
@@ -537,24 +489,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestShadow-AllItems-TheBladefist-29348"
- value: {
-  dps: 1330.5663963809398
- }
-}
-dps_results: {
- key: "TestShadow-AllItems-TheDecapitator-28767"
- value: {
-  dps: 1334.2015466178468
- }
-}
-dps_results: {
- key: "TestShadow-AllItems-TheFistsofFury"
- value: {
-  dps: 1302.1902819940497
- }
-}
-dps_results: {
  key: "TestShadow-AllItems-TheLightningCapacitor-28785"
  value: {
   dps: 1471.5782428676205
@@ -594,12 +528,6 @@ dps_results: {
  key: "TestShadow-AllItems-TsunamiTalisman-30627"
  value: {
   dps: 1442.8079868275815
- }
-}
-dps_results: {
- key: "TestShadow-AllItems-WarpSlicer-30311"
- value: {
-  dps: 1484.1312507099822
  }
 }
 dps_results: {
@@ -845,13 +773,13 @@ dps_results: {
 dps_results: {
  key: "TestShadow-Settings-Draenei-P3-Clipping-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1088.1898967881336
+  dps: 1070.018693825606
  }
 }
 dps_results: {
  key: "TestShadow-Settings-Draenei-P3-Clipping-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1088.1898967881336
+  dps: 1070.018693825606
  }
 }
 dps_results: {
@@ -1133,13 +1061,13 @@ dps_results: {
 dps_results: {
  key: "TestShadow-Settings-NightElf-P3-Clipping-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1093.047469734369
+  dps: 1070.018693825606
  }
 }
 dps_results: {
  key: "TestShadow-Settings-NightElf-P3-Clipping-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1093.047469734369
+  dps: 1070.018693825606
  }
 }
 dps_results: {
@@ -1421,13 +1349,13 @@ dps_results: {
 dps_results: {
  key: "TestShadow-Settings-Undead-P3-Clipping-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1100.0130514341768
+  dps: 1070.018693825606
  }
 }
 dps_results: {
  key: "TestShadow-Settings-Undead-P3-Clipping-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1100.0130514341768
+  dps: 1070.018693825606
  }
 }
 dps_results: {
