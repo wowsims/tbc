@@ -190,6 +190,14 @@ enum Drums {
 	DrumsOfRestoration = 2;
 }
 
+enum Explosive {
+	ExplosiveUnknown = 0;
+	ExplosiveFelIronBomb = 1;
+	ExplosiveAdamantiteGrenade = 2;
+	ExplosiveGnomishFlameTurret = 3;
+	ExplosiveHolyWater = 4;
+}
+
 enum Potions {
 	UnknownPotion = 0;
 	DestructionPotion = 1;
@@ -284,7 +292,6 @@ message RaidBuffs {
 message PartyBuffs {
     int32 bloodlust = 1;
 		int32 ferocious_inspiration = 22; // Number of BM hunters in party.
-    int32 battle_chickens = 27;
 
     TristateEffect moonkin_aura = 2;
     TristateEffect leader_of_the_pack = 19;
@@ -379,7 +386,10 @@ message Consumes {
     int32 num_starting_conjured = 49;
 
 		Drums drums = 19;
-		bool battle_chicken = 34;
+
+		bool super_sapper = 50;
+		bool goblin_sapper = 51;
+		Explosive filler_explosive = 52;
 }
 
 message Debuffs {

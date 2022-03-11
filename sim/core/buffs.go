@@ -219,12 +219,6 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	if partyBuffs.ChainOfTheTwilightOwl {
 		character.AddStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance})
 	}
-	if partyBuffs.BattleChickens > 0 {
-		character.AddPermanentAuraWithOptions(PermanentAura{
-			AuraFactory:       BattleChickenAura(character, partyBuffs.BattleChickens),
-			RespectExpiration: true,
-		})
-	}
 }
 
 // Applies buffs to pets.
@@ -280,25 +274,6 @@ func SnapshotBattleShoutAura(character *Character, snapshotSapphire bool, snapsh
 	return func(sim *Simulation) Aura {
 		factory := character.NewTemporaryStatsAuraFactory(SnapshotBattleShoutAuraID, ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: amount}, time.Second*110)
 		return factory(sim)
-	}
-}
-
-var BattleChickenAuraID = NewAuraID()
-
-func BattleChickenAura(character *Character, numChickens int32) AuraFactory {
-	bonus := math.Pow(1.05, float64(numChickens))
-	inverseBonus := 1 / bonus
-
-	return func(sim *Simulation) Aura {
-		character.MultiplyMeleeSpeed(sim, bonus)
-
-		return Aura{
-			ID:      BattleChickenAuraID,
-			Expires: sim.CurrentTime + time.Minute*4,
-			OnExpire: func(sim *Simulation) {
-				character.MultiplyMeleeSpeed(sim, inverseBonus)
-			},
-		}
 	}
 }
 

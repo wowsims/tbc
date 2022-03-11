@@ -51,11 +51,11 @@ func (priest *Priest) newSmiteTemplate(sim *core.Simulation) core.SimpleSpellTem
 	priest.applyTalentsToHolySpell(&baseCast, &effect)
 
 	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(priest.Talents.DivineFury)
-	
+
 	effect.StaticDamageMultiplier *= (1 + (0.05 * float64(priest.Talents.SearingLight)))
-	
+
 	effect.OnSpellHit = priest.applyOnHitTalents
-	
+
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: baseCast,
@@ -69,7 +69,7 @@ func (priest *Priest) NewSmite(sim *core.Simulation, target *core.Target) *core.
 	mf := &priest.smiteSpell
 
 	priest.smiteCastTemplate.Apply(mf)
-	
+
 	priest.applySurgeOfLight(&mf.SpellCast)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.

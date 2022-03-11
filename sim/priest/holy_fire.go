@@ -50,11 +50,11 @@ func (priest *Priest) newHolyFireTemplate(sim *core.Simulation) core.SimpleSpell
 			DebuffID:             HolyFireDebuffID,
 		},
 	}
-	
+
 	priest.applyTalentsToHolySpell(&baseCast, &effect)
-	
+
 	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(priest.Talents.DivineFury)
-	
+
 	effect.DamageMultiplier *= (1 + (0.05 * float64(priest.Talents.SearingLight)))
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
@@ -76,4 +76,3 @@ func (priest *Priest) NewHolyFire(sim *core.Simulation, target *core.Target) *co
 
 	return hf
 }
-

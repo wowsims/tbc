@@ -1,10 +1,10 @@
 package smite
 
 import (
-	"time"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/priest"
+	"time"
 )
 
 func RegisterSmitePriest() {
@@ -41,7 +41,7 @@ func NewSmitePriest(character core.Character, options proto.Player) *SmitePriest
 	}
 
 	basePriest := priest.New(character, selfBuffs, *smiteOptions.Talents)
-	
+
 	spriest := &SmitePriest{
 		Priest:   basePriest,
 		rotation: *smiteOptions.Rotation,
@@ -86,35 +86,33 @@ func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 
 	target := sim.GetPrimaryTarget()
 	var spell *core.SimpleSpell
-	
+
 	// Calculate higher SW:P uptime if using HF
 	swpRemaining := spriest.SWPSpell.Effect.DotInput.TimeRemaining(sim)
-	
+
 	castSpeed := spriest.CastSpeed()
 
 	// smite cast time, talent assumed
 	smiteCastTime := time.Duration(float64(time.Millisecond*2000) / castSpeed)
-	
+
 	// holy fire cast time
 	hfCastTime := time.Duration(float64(time.Millisecond*3000) / castSpeed)
-	
-	
+
 	if !spriest.SWPSpell.Effect.DotInput.IsTicking(sim) {
 		spell = spriest.NewShadowWordPain(sim, target)
 	} else if spriest.rotation.UseStarshards && spriest.GetRemainingCD(priest.SSCooldownID, sim.CurrentTime) == 0 {
 		spell = spriest.NewStarshards(sim, target)
 	} else if spriest.rotation.UseDevPlague && spriest.GetRemainingCD(priest.DevouringPlagueCooldownID, sim.CurrentTime) == 0 {
 		spell = spriest.NewDevouringPlague(sim, target)
-	// Consider HF if SWP will fall off after 1 smite but before 2 smites from now finishes
-	//	and swp falls off after hf finishes (assumption never worth clipping)
+		// Consider HF if SWP will fall off after 1 smite but before 2 smites from now finishes
+		//	and swp falls off after hf finishes (assumption never worth clipping)
 	} else if spriest.rotation.RotationType == proto.SmitePriest_Rotation_HolyFireWeave && swpRemaining > smiteCastTime && swpRemaining < hfCastTime {
 		spell = spriest.NewHolyFire(sim, target)
 	} else {
 		spell = spriest.NewSmite(sim, target)
 	}
-	
+
 	if success := spell.Cast(sim); !success {
 		spriest.WaitForMana(sim, spell.GetManaCost())
 	}
 }
-

@@ -494,6 +494,11 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 								<div class="consumes-alcohol"></div>
 							</div>
 						</div>
+						<div class="consumes-row">
+							<span>Trade</span>
+							<div class="consumes-row-inputs consumes-trade">
+							</div>
+						</div>
 						<div class="consumes-row consumes-row-pet">
 							<span>Pet</span>
 							<div class="consumes-row-inputs consumes-pet">
@@ -614,6 +619,12 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 						IconInputs.makeWeaponImbueInput(false, this.individualConfig.consumeOptions.weaponImbues));
 			}
 		}
+
+		const tradeConsumesElem = this.rootElem.getElementsByClassName('consumes-trade')[0] as HTMLElement;
+		new IndividualSimIconPicker(tradeConsumesElem, this.player, IconInputs.DrumsInput, this);
+		new IndividualSimIconPicker(tradeConsumesElem, this.player, IconInputs.SuperSapper, this);
+		new IndividualSimIconPicker(tradeConsumesElem, this.player, IconInputs.GoblinSapper, this);
+		new IndividualSimIconPicker(tradeConsumesElem, this.player, IconInputs.FillerExplosiveInput, this);
 
 		if (this.individualConfig.consumeOptions?.pet?.length) {
 			const petConsumesElem = this.rootElem.getElementsByClassName('consumes-pet')[0] as HTMLElement;

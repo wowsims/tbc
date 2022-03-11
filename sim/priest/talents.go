@@ -11,8 +11,7 @@ func (priest *Priest) applyTalents() {
 	if priest.Talents.Meditation > 0 {
 		priest.PseudoStats.SpiritRegenRateCasting = float64(priest.Talents.Meditation) * 0.1
 	}
-	
-	
+
 	if priest.Talents.SpiritualGuidance > 0 {
 		bonus := (0.25 / 5) * float64(priest.Talents.SpiritualGuidance)
 		priest.AddStatDependency(stats.StatDependency{
@@ -38,8 +37,8 @@ func (priest *Priest) applyTalents() {
 	if priest.Talents.ForceOfWill > 0 {
 		coeff := 0.01 * float64(priest.Talents.ForceOfWill)
 		priest.AddStatDependency(stats.StatDependency{
-			SourceStat:	stats.SpellPower,
-			ModifiedStat:	stats.SpellPower,
+			SourceStat:   stats.SpellPower,
+			ModifiedStat: stats.SpellPower,
 			Modifier: func(spellPower float64, _ float64) float64 {
 				return spellPower + spellPower*coeff
 			},
@@ -52,7 +51,7 @@ func (priest *Priest) applyOnHitTalents(sim *core.Simulation, spellCast *core.Sp
 	roll := sim.RandomFloat("SurgeOfLight")
 	if priest.Talents.SurgeOfLight == 2 && spellEffect.Outcome.Matches(core.OutcomeCrit) && roll > 0.5 {
 		priest.SurgeOfLight = true
-	} 
+	}
 }
 
 func (priest *Priest) applySurgeOfLight(spellCast *core.SpellCast) {
@@ -93,7 +92,7 @@ func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.Sp
 
 		// shadow focus gives 2% hit per level
 		effect.BonusSpellHitRating += float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance
-		
+
 		// TODO should add more instant cast spells here
 		if cast.ActionID.SpellID == SpellIDShadowWordPain {
 			cast.Cost.Value -= cast.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02

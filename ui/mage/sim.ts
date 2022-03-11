@@ -199,8 +199,6 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 					WeaponImbue.WeaponImbueSuperiorWizardOil,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.DrumsOfRestorationConsume,
 					IconInputs.ScrollOfSpiritV,
 				],
 			},

@@ -137,7 +137,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-CoreofAr'kelos-29776"
  value: {
-  dps: 257.8145637527712
+  dps: 257.81456375277116
  }
 }
 dps_results: {
@@ -167,7 +167,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-DesolationBattlegear"
  value: {
-  dps: 214.60678331370582
+  dps: 214.60678331370576
  }
 }
 dps_results: {
@@ -539,7 +539,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-TheDecapitator-28767"
  value: {
-  dps: 250.11918066800297
+  dps: 250.11918066800285
  }
 }
 dps_results: {
