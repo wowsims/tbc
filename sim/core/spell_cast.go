@@ -273,7 +273,7 @@ func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCas
 		hitEffect.SpellEffect.BeyondAOECapMultiplier *= spellCast.CritMultiplier
 	}
 
-	hitEffect.SpellEffect.Damage = damage
+	hitEffect.SpellEffect.Damage += damage
 }
 
 // Snapshots a few values at the start of a dot.

@@ -103,6 +103,7 @@ type MeleeDamageCalculator func(attackPower float64, bonusWeaponDamage float64) 
 // If MainHand or Offhand is non-zero the associated ability will create a weapon swing.
 type WeaponDamageInput struct {
 	Normalized bool // If set, uses normalized damage
+	Offhand    bool // If set, use offhand weapon instead of MH for damage.
 
 	DamageMultiplier float64 // Damage multiplier on weapon damage.
 	FlatDamageBonus  float64 // Flat bonus added to swing.
@@ -218,7 +219,7 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 		if ahe.WeaponInput.Normalized {
 			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 				dmg += character.AutoAttacks.Ranged.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
-			} else if ahe.IsMH() {
+			} else if !ahe.WeaponInput.Offhand {
 				dmg += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
 			} else {
 				dmg += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower)*0.5 + bonusWeaponDamage
@@ -226,7 +227,7 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 		} else {
 			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 				dmg += character.AutoAttacks.Ranged.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
-			} else if ahe.IsMH() {
+			} else if !ahe.WeaponInput.Offhand {
 				dmg += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
 			} else {
 				dmg += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower)*0.5 + bonusWeaponDamage
@@ -264,7 +265,7 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	// Apply all other effect multipliers.
 	dmg *= ahe.DamageMultiplier * ahe.StaticDamageMultiplier
 
-	ahe.Damage = dmg
+	ahe.Damage += dmg
 }
 
 // Returns whether this hit effect is associated with the main-hand weapon.
@@ -281,11 +282,6 @@ func (ahe *SpellEffect) IsOH() bool {
 // Returns whether this hit effect is associated with either melee weapon.
 func (ahe *SpellEffect) IsMelee() bool {
 	return ahe.ProcMask.Matches(ProcMaskMelee)
-}
-
-// Returns whether this hit effect matches the hand in which a weapon is equipped.
-func (ahe *SpellEffect) IsEquippedHand(mh bool, oh bool) bool {
-	return (mh && ahe.IsMH()) || (oh && ahe.IsOH())
 }
 
 // It appears that TBC does not do hasted GCD for abilities.
