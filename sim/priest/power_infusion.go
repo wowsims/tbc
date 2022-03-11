@@ -26,6 +26,7 @@ func (priest *Priest) registerPowerInfusionCD() {
 		CooldownID: PowerInfusionCooldownID,
 		Cooldown:   powerInfusionCD,
 		UsesGCD:    true,
+		Priority:   core.CooldownPriorityBloodlust,
 		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if powerInfusionTarget == nil {
@@ -43,6 +44,9 @@ func (priest *Priest) registerPowerInfusionCD() {
 			//if powerInfusionTarget.CurrentMana() < 3000 {
 			//	return false
 			//}
+			if character.HasAura(core.BloodlustAuraID ) {
+				return false
+			}
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
