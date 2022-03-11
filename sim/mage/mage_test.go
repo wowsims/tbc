@@ -29,6 +29,12 @@ func TestArcane(t *testing.T) {
 		Debuffs:     FullDebuffs,
 
 		ItemFilter: core.ItemFilter{
+			WeaponTypes: []proto.WeaponType{
+				proto.WeaponType_WeaponTypeDagger,
+				proto.WeaponType_WeaponTypeSword,
+				proto.WeaponType_WeaponTypeOffHand,
+				proto.WeaponType_WeaponTypeStaff,
+			},
 			ArmorType: proto.ArmorType_ArmorTypeCloth,
 			RangedWeaponTypes: []proto.RangedWeaponType{
 				proto.RangedWeaponType_RangedWeaponTypeWand,
@@ -54,6 +60,12 @@ func TestFire(t *testing.T) {
 		Debuffs:     FullDebuffs,
 
 		ItemFilter: core.ItemFilter{
+			WeaponTypes: []proto.WeaponType{
+				proto.WeaponType_WeaponTypeDagger,
+				proto.WeaponType_WeaponTypeSword,
+				proto.WeaponType_WeaponTypeOffHand,
+				proto.WeaponType_WeaponTypeStaff,
+			},
 			ArmorType: proto.ArmorType_ArmorTypeCloth,
 			RangedWeaponTypes: []proto.RangedWeaponType{
 				proto.RangedWeaponType_RangedWeaponTypeWand,
@@ -79,6 +91,12 @@ func TestFrost(t *testing.T) {
 		Debuffs:     FullDebuffs,
 
 		ItemFilter: core.ItemFilter{
+			WeaponTypes: []proto.WeaponType{
+				proto.WeaponType_WeaponTypeDagger,
+				proto.WeaponType_WeaponTypeSword,
+				proto.WeaponType_WeaponTypeOffHand,
+				proto.WeaponType_WeaponTypeStaff,
+			},
 			ArmorType: proto.ArmorType_ArmorTypeCloth,
 			RangedWeaponTypes: []proto.RangedWeaponType{
 				proto.RangedWeaponType_RangedWeaponTypeWand,
