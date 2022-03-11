@@ -28,6 +28,11 @@ func TestRetribution(t *testing.T) {
 	// 	Debuffs:     FullDebuffs,
 
 	// 	ItemFilter: core.ItemFilter{
+	// 		WeaponTypes: []proto.WeaponType{
+	// 			proto.WeaponType_WeaponTypeAxe,
+	// 			proto.WeaponType_WeaponTypeSword,
+	// 			proto.WeaponType_WeaponTypePolearm,
+	// 		},
 	// 		ArmorType: proto.ArmorType_ArmorTypePlate,
 	// 		RangedWeaponTypes: []proto.RangedWeaponType{
 	// 			proto.RangedWeaponType_RangedWeaponTypeLibram,

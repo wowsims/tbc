@@ -96,6 +96,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 					ReuseMainHitRoll:       true,
 				},
 				WeaponInput: core.WeaponDamageInput{
+					Offhand:          true,
 					DamageMultiplier: 1,
 				},
 			},
