@@ -205,7 +205,7 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 		attackPower = character.stats[stats.RangedAttackPower] + ahe.BonusAttackPower
 		bonusWeaponDamage = character.PseudoStats.BonusRangedDamage + ahe.BonusWeaponDamage
-	} else if ability.SpellSchool == SpellSchoolPhysical { // any physical attack gains from AP
+	} else {
 		attackPower = character.stats[stats.AttackPower] + ahe.BonusAttackPower
 		bonusWeaponDamage = character.PseudoStats.BonusMeleeDamage + ahe.BonusWeaponDamage
 	}
