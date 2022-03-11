@@ -86,8 +86,9 @@ func (gft *GnomishFlameTurret) newFlameCannonTemplate(sim *Simulation) SimpleSpe
 				// Pretty sure this works the same way as Searing Totem, where the next shot
 				// fires once the previous missile has hit the target. Just give some static
 				// value for now.
-				GCD:            time.Millisecond * 750,
+				GCD:            time.Millisecond * 800,
 				CritMultiplier: gft.DefaultSpellCritMultiplier(),
+				IgnoreHaste:    true,
 			},
 		},
 		Effect: SpellHitEffect{
