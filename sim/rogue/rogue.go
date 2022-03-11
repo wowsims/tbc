@@ -41,12 +41,17 @@ type Rogue struct {
 	plan int
 
 	// Cached values for calculating rotation.
-	energyPerSecondAvg float64
-	eaBuildTime        time.Duration // Time to build EA following a finisher at ~35 energy
+	energyPerSecondAvg    float64
+	eaBuildTime           time.Duration // Time to build EA following a finisher at ~35 energy
+	sliceAndDiceDurations [6]time.Duration
+
+	doneSND bool // Current SND will last for the rest of the iteration
+	doneEA  bool // Current EA will last for the rest of the iteration, or not using EA
 
 	deathmantle4pcProc bool
 	disabledMCDs       []*core.MajorCooldown
 
+	shivEnergyCost    float64
 	builderEnergyCost float64
 	newBuilder        func(sim *core.Simulation, target *core.Target) *core.SimpleSpell
 
@@ -156,6 +161,7 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 	rogue.backstabTemplate = rogue.newBackstabTemplate(sim)
 	rogue.hemorrhageTemplate = rogue.newHemorrhageTemplate(sim)
 	rogue.mutilateTemplate = rogue.newMutilateTemplate(sim)
+	rogue.shivTemplate = rogue.newShivTemplate(sim)
 
 	rogue.finishingMoveEffectApplier = rogue.makeFinishingMoveEffectApplier(sim)
 
@@ -181,6 +187,10 @@ func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.plan = PlanOpener
 	rogue.deathmantle4pcProc = false
 	rogue.deadlyPoisonStacks = 0
+	rogue.doneSND = false
+
+	permaEA := sim.GetPrimaryTarget().AuraExpiresAt(core.ExposeArmorDebuffID) == core.NeverExpires
+	rogue.doneEA = !rogue.Rotation.MaintainExposeArmor || permaEA
 
 	rogue.disabledMCDs = rogue.DisableAllEnabledCooldowns(core.CooldownTypeUnknown)
 }
@@ -243,27 +253,40 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		}
 	}
 
+	var newBuilder func(sim *core.Simulation, target *core.Target) *core.SimpleSpell
 	switch rogue.Rotation.Builder {
 	case proto.Rogue_Rotation_SinisterStrike:
 		rogue.builderEnergyCost = rogue.SinisterStrikeEnergyCost()
-		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+		newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 			return rogue.NewSinisterStrike(sim, target)
 		}
 	case proto.Rogue_Rotation_Backstab:
 		rogue.builderEnergyCost = BackstabEnergyCost
-		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+		newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 			return rogue.NewBackstab(sim, target)
 		}
 	case proto.Rogue_Rotation_Hemorrhage:
 		rogue.builderEnergyCost = HemorrhageEnergyCost
-		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+		newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 			return rogue.NewHemorrhage(sim, target)
 		}
 	case proto.Rogue_Rotation_Mutilate:
 		rogue.builderEnergyCost = MutilateEnergyCost
-		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+		newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 			return rogue.NewMutilate(sim, target)
 		}
+	}
+
+	if rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueDeadlyPoison {
+		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
+			if rogue.deadlyPoison.Effect.DotInput.IsTicking(sim) && rogue.deadlyPoison.Effect.DotInput.TimeRemaining(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.shivEnergyCost {
+				return rogue.NewShiv(sim, target)
+			} else {
+				return newBuilder(sim, target)
+			}
+		}
+	} else {
+		rogue.newBuilder = newBuilder
 	}
 
 	maxEnergy := 100.0

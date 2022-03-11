@@ -1,3 +1,5 @@
+import { RaidBuffs } from '/tbc/core/proto/common.js';
+import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
@@ -5,8 +7,6 @@ import { Debuffs } from '/tbc/core/proto/common.js';
 import { Encounter } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
-import { PartyBuffs } from '/tbc/core/proto/common.js';
-import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -27,19 +27,20 @@ import { PetFood } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 
-import { Mage, Mage_Rotation as MageRotation, MageTalents as MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
+import { SmitePriest, SmitePriest_Rotation as Rotation, SmitePriest_Options as Options, SmitePriest_Rotation, SmitePriest_Rotation_RotationType } from '/tbc/core/proto/priest.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
+import * as Mechanics from '/tbc/core/constants/mechanics.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
-import * as MageInputs from './inputs.js';
+import * as SmitePriestInputs from './inputs.js';
 import * as Presets from './presets.js';
 
-export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecMage>) {
+export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
+  constructor(parentElem: HTMLElement, player: Player<Spec.SpecSmitePriest>) {
 		super(parentElem, player, {
-			cssClass: 'mage-sim-ui',
+			cssClass: 'smite-priest-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
 			],
@@ -49,9 +50,6 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				Stat.StatIntellect,
 				Stat.StatSpirit,
 				Stat.StatSpellPower,
-				Stat.StatArcaneSpellPower,
-				Stat.StatFireSpellPower,
-				Stat.StatFrostSpellPower,
 				Stat.StatSpellHit,
 				Stat.StatSpellCrit,
 				Stat.StatSpellHaste,
@@ -65,54 +63,59 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				Stat.StatIntellect,
 				Stat.StatSpirit,
 				Stat.StatSpellPower,
-				Stat.StatArcaneSpellPower,
-				Stat.StatFireSpellPower,
-				Stat.StatFrostSpellPower,
+				Stat.StatShadowSpellPower,
+				Stat.StatHolySpellPower,
 				Stat.StatSpellHit,
 				Stat.StatSpellCrit,
 				Stat.StatSpellHaste,
 				Stat.StatMP5,
 			],
+			modifyDisplayStats: (player: Player<Spec.SpecSmitePriest>, stats: Stats) => {
+				return stats.withStat(Stat.StatSpellHit,
+						stats.getStat(Stat.StatSpellHit)
+						+ player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE
+						+ player.getTalents().focusedPower * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+			},
 
 			defaults: {
 				// Default equipped gear.
-				gear: Presets.P1_ARCANE_PRESET.gear,
+				gear: Presets.P1_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
-					[Stat.StatIntellect]: 1.29,
-					[Stat.StatSpirit]: 0.89,
+					[Stat.StatIntellect]: 1.38,
+					[Stat.StatSpirit]: 1.18,
 					[Stat.StatSpellPower]: 1,
-					[Stat.StatArcaneSpellPower]: 0.78,
-					[Stat.StatFireSpellPower]: 0,
-					[Stat.StatFrostSpellPower]: 0.21,
-					[Stat.StatSpellHit]: 0.5,
-					[Stat.StatSpellCrit]: 0.77,
-					[Stat.StatSpellHaste]: 0.84,
-					[Stat.StatMP5]: 0.61,
+					[Stat.StatSpellHit]: 2.57,
+					[Stat.StatShadowSpellPower]: 0.05,
+					[Stat.StatHolySpellPower]: 0.95,
+					[Stat.StatSpellCrit]: 0.44,
+					[Stat.StatSpellHaste]: 0.28, // tricky because SP is tricky
+					[Stat.StatMP5]: 2.05,
 				}),
 				// Default consumes settings.
-				consumes: Presets.DefaultArcaneConsumes,
+				consumes: Presets.DefaultConsumes,
 				// Default rotation settings.
-				rotation: Presets.DefaultArcaneRotation,
+				rotation: Presets.DefaultRotation,
 				// Default talents.
-				talents: Presets.ArcaneTalents.data,
+				talents: Presets.StandardTalents.data,
 				// Default spec-specific settings.
-				specOptions: Presets.DefaultArcaneOptions,
+				specOptions: Presets.DefaultOptions,
 				// Default raid/party buffs settings.
 				raidBuffs: RaidBuffs.create({
+					arcaneBrilliance: true,
+					divineSpirit: TristateEffect.TristateEffectImproved,
 					giftOfTheWild: TristateEffect.TristateEffectImproved,
 				}),
 				partyBuffs: PartyBuffs.create({
 					drums: Drums.DrumsOfBattle,
 					bloodlust: 1,
-					manaSpringTotem: TristateEffect.TristateEffectImproved,
-					manaTideTotems: 1,
+					manaSpringTotem: TristateEffect.TristateEffectRegular,
+					totemOfWrath: 1,
 					wrathOfAirTotem: TristateEffect.TristateEffectRegular,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
-					blessingOfWisdom: TristateEffect.TristateEffectImproved,
-					innervates: 1,
+					blessingOfWisdom: 2,
 				}),
 				debuffs: Debuffs.create({
 					judgementOfWisdom: true,
@@ -123,15 +126,15 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
-				MageInputs.MageArmor,
-				MageInputs.MoltenArmor,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
+				IconInputs.ArcaneBrilliance,
 				IconInputs.DivineSpirit,
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
+				
 				IconInputs.MoonkinAura,
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.DrumsOfRestorationBuff,
@@ -146,6 +149,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				IconInputs.JadePendantOfBlasting,
 				IconInputs.AtieshWarlock,
 				IconInputs.AtieshMage,
+				IconInputs.SanctityAura,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
@@ -159,8 +163,6 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				IconInputs.ImprovedSealOfTheCrusader,
 				IconInputs.CurseOfElements,
 				IconInputs.Misery,
-				IconInputs.ImprovedScorch,
-				IconInputs.WintersChill,
 			],
 			// Which options are selectable in the 'Consumes' section.
 			consumeOptions: {
@@ -169,9 +171,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 					Potions.DestructionPotion,
 				],
 				conjured: [
-					Conjured.ConjuredMageManaEmerald,
 					Conjured.ConjuredDarkRune,
-					Conjured.ConjuredFlameCap,
 				],
 				flasks: [
 					Flask.FlaskOfBlindingLight,
@@ -180,8 +180,6 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				],
 				battleElixirs: [
 					BattleElixir.AdeptsElixir,
-					BattleElixir.ElixirOfMajorFirePower,
-					BattleElixir.ElixirOfMajorFrostPower,
 				],
 				guardianElixirs: [
 					GuardianElixir.ElixirOfDraenicWisdom,
@@ -199,15 +197,13 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 					WeaponImbue.WeaponImbueSuperiorWizardOil,
 				],
 				other: [
-					IconInputs.ScrollOfSpiritV,
 				],
 			},
 			// Inputs to include in the 'Rotation' section on the settings tab.
-			rotationInputs: MageInputs.MageRotationConfig,
+			rotationInputs: SmitePriestInputs.SmitePriestRotationConfig,
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
-					MageInputs.EvocationTicks,
 					OtherInputs.ShadowPriestDPS,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
@@ -218,9 +214,9 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
 				showTargetArmor: false,
 				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
-				showExecuteProportion: true,
+				showExecuteProportion: false,
 				// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
-				showNumTargets: true,
+				showNumTargets: false,
 			},
 
 			// If true, the talents on the talents tab will not be individually modifiable by the user.
@@ -230,22 +226,13 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 			presets: {
 				// Preset talents that the user can quickly select.
 				talents: [
-					Presets.ArcaneTalents,
-					Presets.FireTalents,
-					Presets.FrostTalents,
-					Presets.DeepFrostTalents,
+					Presets.StandardTalents,
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
-					Presets.P1_ARCANE_PRESET,
-					Presets.P2_ARCANE_PRESET,
-					Presets.P3_ARCANE_PRESET,
-					Presets.P1_FIRE_PRESET,
-					Presets.P2_FIRE_PRESET,
-					Presets.P3_FIRE_PRESET,
-					Presets.P1_FROST_PRESET,
-					Presets.P2_FROST_PRESET,
-					Presets.P3_FROST_PRESET,
+					Presets.P1_PRESET,
+					Presets.P2_PRESET,
+					Presets.P3_PRESET,
 				],
 			},
 		});

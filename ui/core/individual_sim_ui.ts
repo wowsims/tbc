@@ -25,7 +25,6 @@ import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { IconEnumPicker, IconEnumPickerConfig } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPicker, IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
-import { IndividualImporter } from '/tbc/core/components/individual_importer.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { Input } from '/tbc/core/components/input.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
@@ -66,6 +65,7 @@ import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
 import { isDualWieldSpec } from '/tbc/core/proto_utils/utils.js';
 import { launchedSpecs } from '/tbc/core/launched_sims.js';
 import { newIndividualExporters } from '/tbc/core/components/exporters.js';
+import { newIndividualImporters } from '/tbc/core/components/importers.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
 import { specNames } from '/tbc/core/proto_utils/utils.js';
@@ -359,17 +359,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 	}
 
 	private addTopbarComponents() {
-		const importSettings = document.createElement('span');
-		importSettings.classList.add('import-settings', 'fas', 'fa-file-import');
-		tippy(importSettings, {
-			'content': 'Import',
-			'allowHTML': true,
-		});
-		importSettings.addEventListener('click', event => {
-			new IndividualImporter(this.rootElem, this);
-		});
 		if (this.debug) {
-			this.addToolbarItem(importSettings);
+			this.addToolbarItem(newIndividualImporters(this));
 		}
 
 		this.addToolbarItem(newIndividualExporters(this));
@@ -503,6 +494,11 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 								<div class="consumes-alcohol"></div>
 							</div>
 						</div>
+						<div class="consumes-row">
+							<span>Trade</span>
+							<div class="consumes-row-inputs consumes-trade">
+							</div>
+						</div>
 						<div class="consumes-row consumes-row-pet">
 							<span>Pet</span>
 							<div class="consumes-row-inputs consumes-pet">
@@ -623,6 +619,12 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 						IconInputs.makeWeaponImbueInput(false, this.individualConfig.consumeOptions.weaponImbues));
 			}
 		}
+
+		const tradeConsumesElem = this.rootElem.getElementsByClassName('consumes-trade')[0] as HTMLElement;
+		new IndividualSimIconPicker(tradeConsumesElem, this.player, IconInputs.DrumsInput, this);
+		new IndividualSimIconPicker(tradeConsumesElem, this.player, IconInputs.SuperSapper, this);
+		new IndividualSimIconPicker(tradeConsumesElem, this.player, IconInputs.GoblinSapper, this);
+		new IndividualSimIconPicker(tradeConsumesElem, this.player, IconInputs.FillerExplosiveInput, this);
 
 		if (this.individualConfig.consumeOptions?.pet?.length) {
 			const petConsumesElem = this.rootElem.getElementsByClassName('consumes-pet')[0] as HTMLElement;

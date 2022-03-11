@@ -7,6 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
+// Returns whether any Deadly Poisons are being used.
 func (rogue *Rogue) applyPoisons() {
 	hasWFTotem := rogue.HasWFTotem
 	rogue.applyDeadlyPoison(hasWFTotem)

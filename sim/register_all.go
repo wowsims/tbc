@@ -8,6 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/mage"
 	"github.com/wowsims/tbc/sim/paladin/retribution"
 	"github.com/wowsims/tbc/sim/priest/shadow"
+	"github.com/wowsims/tbc/sim/priest/smite"
 	"github.com/wowsims/tbc/sim/rogue"
 	"github.com/wowsims/tbc/sim/shaman/elemental"
 	"github.com/wowsims/tbc/sim/shaman/enhancement"
@@ -30,4 +31,5 @@ func RegisterAll() {
 	rogue.RegisterRogue()
 	warrior.RegisterWarrior()
 	retribution.RegisterRetributionPaladin()
+	smite.RegisterSmitePriest()
 }

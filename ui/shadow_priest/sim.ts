@@ -191,8 +191,6 @@ export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
 					WeaponImbue.WeaponImbueSuperiorWizardOil,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.DrumsOfRestorationConsume,
 				],
 			},
 			// Inputs to include in the 'Rotation' section on the settings tab.
