@@ -37,8 +37,6 @@ func (priest *Priest) registerPowerInfusionCD() {
 			
 			if powerInfusionTargetAgent != nil {
 				powerInfusionTarget = powerInfusionTargetAgent.GetCharacter()
-				
-				remainingPowerInfusionUsages = int(1 + (core.MaxDuration(0, sim.Duration))/powerInfusionCD)
 			}
 			
 			castTemplate := core.SimpleCast{
@@ -56,10 +54,6 @@ func (priest *Priest) registerPowerInfusionCD() {
 					GCD:      core.GCDDefault,
 					Cooldown: powerInfusionCD,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						
-						remainingPowerInfusionUsages = int(sim.GetRemainingDuration() / powerInfusionCD)
-
-
 						core.AddPowerInfusionAura(sim, powerInfusionTarget, actionID.Tag)
 					},
 				},
