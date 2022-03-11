@@ -1010,6 +1010,9 @@ func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID Act
 			DamageMultiplier:       1,
 			StaticDamageMultiplier: 1,
 			ThreatMultiplier:       1,
+
+			// Explosives always have 1% resist chance, so just give them hit cap.
+			BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,
 		},
 		DirectInput: DirectDamageInput{
 			MinBaseDamage: minDamage,
@@ -1042,11 +1045,10 @@ func (character *Character) newAdamantiteGrenadeTemplate(sim *Simulation) Simple
 func (character *Character) newHolyWaterTemplate(sim *Simulation) SimpleSpellTemplate {
 	spell := character.newBasicExplosiveSpell(sim, HolyWaterActionID, 438, 562, 0)
 	spell.SpellSchool = SpellSchoolHoly
-	for _, effect := range spell.Effects {
+	for i, _ := range spell.Effects {
+		effect := &spell.Effects[i]
 		if effect.Target.MobType != proto.MobType_MobTypeUndead {
 			effect.StaticDamageMultiplier = 0
-			effect.DirectInput.MinBaseDamage = 0
-			effect.DirectInput.MaxBaseDamage = 0
 		}
 	}
 	return NewSimpleSpellTemplate(spell)

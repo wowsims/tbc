@@ -82,8 +82,8 @@ export const SunderArmor = makeBooleanDebuffInput(ActionId.fromSpellId(25225), '
 export const WintersChill = makeBooleanDebuffInput(ActionId.fromSpellId(28595), 'wintersChill');
 
 // Consumes
-export const SuperSapper = makeBooleanConsumeInput(ActionId.fromItemId(23827), 'superSapper');
-export const GoblinSapper = makeBooleanConsumeInput(ActionId.fromItemId(10646), 'goblinSapper');
+export const SuperSapper = makeBooleanConsumeInput(ActionId.fromItemId(23827), 'superSapper', [], onSetExplosives);
+export const GoblinSapper = makeBooleanConsumeInput(ActionId.fromItemId(10646), 'goblinSapper', [], onSetExplosives);
 
 export const KiblersBits = makeEnumValueConsumeInput(ActionId.fromItemId(33874), 'petFood', PetFood.PetFoodKiblersBits, ['Pet Food']);
 
@@ -258,7 +258,7 @@ function makeTristateDebuffInput(id: ActionId, impId: ActionId, debuffsFieldName
   }
 }
 
-function makeBooleanConsumeInput(id: ActionId, consumesFieldName: keyof Consumes, exclusivityTags?: Array<ExclusivityTag>): IndividualSimIconPickerConfig<Player<any>, boolean> {
+function makeBooleanConsumeInput(id: ActionId, consumesFieldName: keyof Consumes, exclusivityTags?: Array<ExclusivityTag>, onSet?: (eventID: EventID, player: Player<any>, newValue: boolean) => void): IndividualSimIconPickerConfig<Player<any>, boolean> {
   return {
     id: id,
     states: 2,
@@ -266,9 +266,14 @@ function makeBooleanConsumeInput(id: ActionId, consumesFieldName: keyof Consumes
     changedEvent: (player: Player<any>) => player.consumesChangeEmitter,
     getValue: (player: Player<any>) => player.getConsumes()[consumesFieldName] as boolean,
     setValue: (eventID: EventID, player: Player<any>, newValue: boolean) => {
-      const newBuffs = player.getConsumes();
-      (newBuffs[consumesFieldName] as boolean) = newValue;
-      player.setConsumes(eventID, newBuffs);
+      const newConsumes = player.getConsumes();
+      (newConsumes[consumesFieldName] as boolean) = newValue;
+			TypedEvent.freezeAllAndDo(() => {
+				player.setConsumes(eventID, newConsumes);
+				if (onSet) {
+					onSet(eventID, player, newValue);
+				}
+			});
     },
   }
 }
@@ -458,28 +463,40 @@ export const makePetFoodInput = makeConsumeInputFactory('petFood', [
 	{ actionId: ActionId.fromItemId(33874), value: PetFood.PetFoodKiblersBits },
 ] as Array<IconEnumValueConfig<Player<any>, PetFood>>);
 
-function removeOtherPartyMembersDrums(eventID: EventID, player: Player<any>, newValue: Drums) {
+function onSetDrums(eventID: EventID, player: Player<any>, newValue: Drums) {
 	if (newValue) {
-		TypedEvent.freezeAllAndDo(() => {
-			player.getOtherPartyMembers().forEach(otherPlayer => {
-				const otherConsumes = otherPlayer.getConsumes();
-				otherConsumes.drums = Drums.DrumsUnknown;
-				otherPlayer.setConsumes(eventID, otherConsumes);
-			});
+		const playerConsumes = player.getConsumes();
+		playerConsumes.superSapper = false;
+		playerConsumes.goblinSapper = false;
+		playerConsumes.fillerExplosive = Explosive.ExplosiveUnknown;
+		player.setConsumes(eventID, playerConsumes);
+
+		player.getOtherPartyMembers().forEach(otherPlayer => {
+			const otherConsumes = otherPlayer.getConsumes();
+			otherConsumes.drums = Drums.DrumsUnknown;
+			otherPlayer.setConsumes(eventID, otherConsumes);
 		});
 	}
 };
 export const DrumsInput = makeConsumeInput('drums', [
 	{ actionId: ActionId.fromSpellId(35476), value: Drums.DrumsOfBattle },
 	{ actionId: ActionId.fromSpellId(35478), value: Drums.DrumsOfRestoration },
-] as Array<IconEnumValueConfig<Player<any>, Drums>>, removeOtherPartyMembersDrums);
+] as Array<IconEnumValueConfig<Player<any>, Drums>>, onSetDrums);
+
+function onSetExplosives(eventID: EventID, player: Player<any>, newValue: Explosive | boolean) {
+	if (newValue) {
+		const playerConsumes = player.getConsumes();
+		playerConsumes.drums = Drums.DrumsUnknown;
+		player.setConsumes(eventID, playerConsumes);
+	}
+};
 
 export const FillerExplosiveInput = makeConsumeInput('fillerExplosive', [
 	{ actionId: ActionId.fromItemId(23736), value: Explosive.ExplosiveFelIronBomb },
 	{ actionId: ActionId.fromItemId(23737), value: Explosive.ExplosiveAdamantiteGrenade },
-	{ actionId: ActionId.fromItemId(23841), value: Explosive.ExplosiveGnomishFlameTurret },
+	//{ actionId: ActionId.fromItemId(23841), value: Explosive.ExplosiveGnomishFlameTurret },
 	{ actionId: ActionId.fromItemId(13180), value: Explosive.ExplosiveHolyWater },
-] as Array<IconEnumValueConfig<Player<any>, Explosive>>);
+] as Array<IconEnumValueConfig<Player<any>, Explosive>>, onSetExplosives);
 
 export function makeWeaponImbueInput(isMainHand: boolean, options: Array<WeaponImbue>): IconEnumPickerConfig<Player<any>, WeaponImbue> {
 	const allOptions = [
