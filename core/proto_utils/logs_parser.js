@@ -582,26 +582,26 @@ export class CastLog extends SimLog {
     }
 }
 export class StatChangeLog extends SimLog {
-    constructor(params, effectId, amount, stat) {
+    constructor(params, effectId, isGain, stats) {
         super(params);
         this.effectId = effectId;
-        this.amount = amount;
-        this.stat = stat;
+        this.isGain = isGain;
+        this.stats = stats;
     }
     toString() {
-        if (this.amount > 0) {
-            return `${this.toStringPrefix()} Gained ${this.amount.toFixed(0)} ${this.stat} from ${this.effectId.name}.`;
+        if (this.isGain) {
+            return `${this.toStringPrefix()} Gained ${this.stats} from ${this.effectId.name}.`;
         }
         else {
-            return `${this.toStringPrefix()} Lost ${(-this.amount).toFixed(0)} ${this.stat} from fading ${this.effectId.name}.`;
+            return `${this.toStringPrefix()} Lost ${this.stats} from fading ${this.effectId.name}.`;
         }
     }
     static parse(params) {
-        const match = params.raw.match(/((Gained)|(Lost)) (\d+\.?\d*) (.*) from (fading )?(.*)/);
+        const match = params.raw.match(/((Gained)|(Lost)) ({.*}) from (fading )?(.*)/);
         if (match) {
-            return ActionId.fromLogString(match[7]).fill(params.source?.index).then(effectId => {
+            return ActionId.fromLogString(match[6]).fill(params.source?.index).then(effectId => {
                 const sign = match[1] == 'Lost' ? -1 : 1;
-                return new StatChangeLog(params, effectId, parseFloat(match[4]) * sign, match[5]);
+                return new StatChangeLog(params, effectId, sign == 1, match[4]);
             });
         }
         else {

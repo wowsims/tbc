@@ -146,9 +146,9 @@ export declare class CastLog extends SimLog {
 }
 export declare class StatChangeLog extends SimLog {
     readonly effectId: ActionId;
-    readonly amount: number;
-    readonly stat: string;
-    constructor(params: SimLogParams, effectId: ActionId, amount: number, stat: string);
+    readonly isGain: boolean;
+    readonly stats: string;
+    constructor(params: SimLogParams, effectId: ActionId, isGain: boolean, stats: string);
     toString(): string;
     static parse(params: SimLogParams): Promise<StatChangeLog> | null;
 }
