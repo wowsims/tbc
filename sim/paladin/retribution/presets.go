@@ -62,7 +62,11 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var FullConsumes = &proto.Consumes{
-	Drums: proto.Drums_DrumsOfBattle,
+	Flask:           proto.Flask_FlaskOfRelentlessAssault,
+	DefaultPotion:   proto.Potions_HastePotion,
+	SuperSapper:     true,
+	GoblinSapper:    true,
+	FillerExplosive: proto.Explosive_ExplosiveFelIronBomb,
 }
 
 var NoDebuffTarget = &proto.Target{
