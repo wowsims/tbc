@@ -444,7 +444,7 @@ function onSetExplosives(eventID, player, newValue) {
 export const FillerExplosiveInput = makeConsumeInput('fillerExplosive', [
     { actionId: ActionId.fromItemId(23736), value: Explosive.ExplosiveFelIronBomb },
     { actionId: ActionId.fromItemId(23737), value: Explosive.ExplosiveAdamantiteGrenade },
-    //{ actionId: ActionId.fromItemId(23841), value: Explosive.ExplosiveGnomishFlameTurret },
+    { actionId: ActionId.fromItemId(23841), value: Explosive.ExplosiveGnomishFlameTurret },
     { actionId: ActionId.fromItemId(13180), value: Explosive.ExplosiveHolyWater },
 ], onSetExplosives);
 export function makeWeaponImbueInput(isMainHand, options) {
