@@ -106,6 +106,11 @@ type ActionMetrics struct {
 	Glances int32
 
 	Damage float64
+
+	// Resists metrics
+	Resists25 int32
+	Resists50 int32
+	Resists75 int32
 }
 
 func (actionMetrics *ActionMetrics) ToProto() *proto.ActionMetrics {
@@ -113,15 +118,18 @@ func (actionMetrics *ActionMetrics) ToProto() *proto.ActionMetrics {
 		Id:      actionMetrics.ActionID.ToProto(),
 		IsMelee: actionMetrics.IsMelee,
 
-		Casts:   actionMetrics.Casts,
-		Hits:    actionMetrics.Hits,
-		Crits:   actionMetrics.Crits,
-		Misses:  actionMetrics.Misses,
-		Dodges:  actionMetrics.Dodges,
-		Parries: actionMetrics.Parries,
-		Blocks:  actionMetrics.Blocks,
-		Glances: actionMetrics.Glances,
-		Damage:  actionMetrics.Damage,
+		Casts:     actionMetrics.Casts,
+		Hits:      actionMetrics.Hits,
+		Crits:     actionMetrics.Crits,
+		Misses:    actionMetrics.Misses,
+		Dodges:    actionMetrics.Dodges,
+		Parries:   actionMetrics.Parries,
+		Blocks:    actionMetrics.Blocks,
+		Glances:   actionMetrics.Glances,
+		Damage:    actionMetrics.Damage,
+		Resists25: actionMetrics.Resists25,
+		Resists50: actionMetrics.Resists50,
+		Resists75: actionMetrics.Resists75,
 	}
 }
 
@@ -216,6 +224,9 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 	actionMetrics.Blocks += spellCast.Blocks
 	actionMetrics.Glances += spellCast.Glances
 	actionMetrics.Damage += spellCast.TotalDamage
+	actionMetrics.Resists25 += spellCast.PartialResists_1_4
+	actionMetrics.Resists50 += spellCast.PartialResists_2_4
+	actionMetrics.Resists75 += spellCast.PartialResists_3_4
 	characterMetrics.dps.Total += spellCast.TotalDamage
 	characterMetrics.threat.Total += spellCast.TotalThreat
 
