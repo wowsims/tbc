@@ -3,6 +3,8 @@ package proto;
 
 option go_package = "./proto";
 
+import "common.proto";
+
 message PriestTalents {
 		// Discipline
 		int32 wand_specialization = 1;
@@ -88,6 +90,7 @@ message SmitePriest {
     
     message Options {
 		bool use_shadowfiend = 1;
+		RaidTarget power_infusion_target = 2;
     }
     Options options = 3;
 }

@@ -45,6 +45,39 @@ func (priest *Priest) applyTalents() {
 			},
 		})
 	}
+	
+	if priest.Talents.Enlightenment > 0 {
+		coeff := 0.01 * float64(priest.Talents.Enlightenment)
+		priest.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Intellect,
+			ModifiedStat: stats.Intellect,
+			Modifier: func(intellect float64, _ float64) float64 {
+				return intellect + intellect*coeff
+			},
+		})
+	}
+	
+	if priest.Talents.Enlightenment > 0 {
+		coeff := 0.01 * float64(priest.Talents.Enlightenment)
+		priest.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Stamina,
+			ModifiedStat: stats.Stamina,
+			Modifier: func(intellect float64, _ float64) float64 {
+				return intellect + intellect*coeff
+			},
+		})
+	}
+	
+	if priest.Talents.Enlightenment > 0 {
+		coeff := 0.01 * float64(priest.Talents.Enlightenment)
+		priest.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Spirit,
+			ModifiedStat: stats.Spirit,
+			Modifier: func(intellect float64, _ float64) float64 {
+				return intellect + intellect*coeff
+			},
+		})
+	}
 }
 
 func (priest *Priest) applyOnHitTalents(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {

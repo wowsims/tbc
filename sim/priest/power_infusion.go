@@ -1,0 +1,75 @@
+package priest
+
+import (
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
+)
+
+var PowerInfusionCooldownID = core.NewCooldownID()
+
+func (priest *Priest) registerPowerInfusionCD() {
+
+	actionID := core.ActionID{SpellID: 10060, CooldownID: PowerInfusionCooldownID, Tag: int32(priest.RaidIndex)}
+	
+	baseManaCost := priest.BaseMana() * 0.16
+
+	powerInfusionCD := core.PowerInfusionCD
+	
+	remainingPowerInfusionUsages := 0
+	
+	var powerInfusionTarget *core.Character
+	
+	priest.AddMajorCooldown(core.MajorCooldown{
+		ActionID:   actionID,
+		CooldownID: PowerInfusionCooldownID,
+		Cooldown:   powerInfusionCD,
+		UsesGCD:    true,
+		Type:       core.CooldownTypeMana,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			// Does there need to be logic around this?
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return true
+		},
+		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			powerInfusionTargetAgent := sim.Raid.GetPlayerFromRaidTarget(priest.SelfBuffs.PowerInfusionTarget)
+			
+			if powerInfusionTargetAgent != nil {
+				powerInfusionTarget = powerInfusionTargetAgent.GetCharacter()
+				
+				remainingPowerInfusionUsages = int(1 + (core.MaxDuration(0, sim.Duration))/powerInfusionCD)
+			}
+			
+			castTemplate := core.SimpleCast{
+				Cast: core.Cast{
+					ActionID:  actionID,
+					Character: priest.GetCharacter(),
+					BaseCost: core.ResourceCost{
+						Type:  stats.Mana,
+						Value: baseManaCost,
+					},
+					Cost: core.ResourceCost{
+						Type:  stats.Mana,
+						Value: baseManaCost,
+					},
+					GCD:      core.GCDDefault,
+					Cooldown: powerInfusionCD,
+					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+						
+						remainingPowerInfusionUsages = int(sim.GetRemainingDuration() / powerInfusionCD)
+
+
+						core.AddPowerInfusionAura(sim, powerInfusionTarget, actionID.Tag)
+					},
+				},
+			}
+			
+			return func(sim *core.Simulation, character *core.Character) {
+				cast := castTemplate
+				cast.Init(sim)
+				cast.StartCast(sim)
+			}
+		},
+	})
+}
