@@ -102,8 +102,8 @@ type MeleeDamageCalculator func(attackPower float64, bonusWeaponDamage float64) 
 
 // If MainHand or Offhand is non-zero the associated ability will create a weapon swing.
 type WeaponDamageInput struct {
-	Normalized bool // If set, uses normalized damage
-
+	Normalized       bool    // If set, uses normalized damage
+	Offhand          bool    // If set, uses offhand weapon instead of main hand for damage.
 	DamageMultiplier float64 // Damage multiplier on weapon damage.
 	FlatDamageBonus  float64 // Flat bonus added to swing.
 
@@ -204,7 +204,7 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 		attackPower = character.stats[stats.RangedAttackPower] + ahe.BonusAttackPower
 		bonusWeaponDamage = character.PseudoStats.BonusRangedDamage + ahe.BonusWeaponDamage
-	} else if ability.SpellSchool == SpellSchoolPhysical { // any physical attack gains from AP
+	} else {
 		attackPower = character.stats[stats.AttackPower] + ahe.BonusAttackPower
 		bonusWeaponDamage = character.PseudoStats.BonusMeleeDamage + ahe.BonusWeaponDamage
 	}
@@ -218,7 +218,7 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 		if ahe.WeaponInput.Normalized {
 			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 				dmg += character.AutoAttacks.Ranged.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
-			} else if ahe.IsMH() {
+			} else if !ahe.WeaponInput.Offhand {
 				dmg += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
 			} else {
 				dmg += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower)*0.5 + bonusWeaponDamage
@@ -226,7 +226,7 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 		} else {
 			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 				dmg += character.AutoAttacks.Ranged.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
-			} else if ahe.IsMH() {
+			} else if !ahe.WeaponInput.Offhand {
 				dmg += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
 			} else {
 				dmg += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower)*0.5 + bonusWeaponDamage
@@ -234,6 +234,11 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 		}
 		dmg += ahe.WeaponInput.FlatDamageBonus
 		dmg *= ahe.WeaponInput.DamageMultiplier
+	}
+
+	if ahe.DirectInput.SpellCoefficient > 0 {
+		bonus := (character.GetStat(stats.SpellPower) + character.GetStat(ability.SpellSchool.Stat())) * ahe.DirectInput.SpellCoefficient * ahe.WeaponInput.DamageMultiplier
+		bonus += ahe.SpellEffect.BonusSpellPower * ahe.DirectInput.SpellCoefficient // does not get changed by weapon input multiplier
 	}
 
 	//if sim.Log != nil {
@@ -264,7 +269,7 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	// Apply all other effect multipliers.
 	dmg *= ahe.DamageMultiplier * ahe.StaticDamageMultiplier
 
-	ahe.Damage = dmg
+	ahe.Damage += dmg
 }
 
 // Returns whether this hit effect is associated with the main-hand weapon.
@@ -281,11 +286,6 @@ func (ahe *SpellEffect) IsOH() bool {
 // Returns whether this hit effect is associated with either melee weapon.
 func (ahe *SpellEffect) IsMelee() bool {
 	return ahe.ProcMask.Matches(ProcMaskMelee)
-}
-
-// Returns whether this hit effect matches the hand in which a weapon is equipped.
-func (ahe *SpellEffect) IsEquippedHand(mh bool, oh bool) bool {
-	return (mh && ahe.IsMH()) || (oh && ahe.IsOH())
 }
 
 // It appears that TBC does not do hasted GCD for abilities.
@@ -404,6 +404,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					ThreatMultiplier:       1,
 				},
 				WeaponInput: WeaponDamageInput{
+					Offhand:          true,
 					DamageMultiplier: 1,
 				},
 			},

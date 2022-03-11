@@ -100,7 +100,10 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 				for i := 0; i < 2; i++ {
 					wfAtk.Effects[i].Target = spellEffect.Target
 					wfAtk.Effects[i].ProcMask = attackProc
-					if !isMHHit {
+					if isMHHit {
+						wfAtk.Effects[i].WeaponInput.Offhand = false
+					} else {
+						wfAtk.Effects[i].WeaponInput.Offhand = true
 						// For whatever reason, OH penalty does not apply to the bonus AP from WF OH
 						// hits. Implement this by doubling the AP bonus we provide.
 						wfAtk.Effects[i].BonusAttackPower += apBonus

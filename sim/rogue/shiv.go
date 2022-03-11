@@ -28,6 +28,7 @@ func (rogue *Rogue) newShivTemplate(_ *core.Simulation) core.SimpleSpellTemplate
 	}
 	ability.Effect.WeaponInput = core.WeaponDamageInput{
 		Normalized:       true,
+		Offhand:          true,
 		DamageMultiplier: 1 + 0.1*float64(rogue.Talents.DualWieldSpecialization),
 	}
 

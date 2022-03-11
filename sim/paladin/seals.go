@@ -24,7 +24,6 @@ func (paladin *Paladin) setupSealOfBlood() {
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolHoly,
-				SpellExtras:         core.SpellExtrasIgnoreResists,
 				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 				IsPhantom:           true,
 			},
@@ -102,7 +101,6 @@ func (paladin *Paladin) setupSealOfCommand() {
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolHoly,
-				SpellExtras:         core.SpellExtrasIgnoreResists,
 				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 			},
 		},
@@ -114,6 +112,10 @@ func (paladin *Paladin) setupSealOfCommand() {
 			},
 			WeaponInput: core.WeaponDamageInput{
 				DamageMultiplier: 0.70, // should deal 70% weapon deamage
+			},
+			// By having no base damage, this will be added to weapon input
+			DirectInput: core.DirectDamageInput{
+				SpellCoefficient: 0.29,
 			},
 		},
 	}
@@ -140,7 +142,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 				return
 			}
 
-			if !ppmm.Proc(sim, true, false, "Frostbrand Weapon") {
+			if !ppmm.Proc(sim, true, false, "seal of command") {
 				return
 			}
 

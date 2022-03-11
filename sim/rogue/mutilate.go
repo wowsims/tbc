@@ -52,6 +52,7 @@ func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemp
 	ohDamageAbility.SpellCast.Cast.ActionID = MutilateOHActionID
 	ohDamageAbility.SpellCast.Cast.CritMultiplier = rogue.critMultiplier(false, true)
 	ohDamageAbility.Effect.SpellEffect.ProcMask = core.ProcMaskMeleeOHSpecial
+	ohDamageAbility.Effect.WeaponInput.Offhand = true
 
 	if rogue.Talents.DualWieldSpecialization > 0 {
 		ohDamageAbility.Effect.WeaponInput.DamageMultiplier *= 1 + 0.1*float64(rogue.Talents.DualWieldSpecialization)
