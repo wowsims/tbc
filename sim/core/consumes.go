@@ -897,9 +897,9 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 	}
 	character := agent.GetCharacter()
 
-	var gnomishFlameTurretTemplate SimpleSpellTemplate
+	var gnomishFlameTurretCaster func(sim *Simulation)
 	if consumes.FillerExplosive == proto.Explosive_ExplosiveGnomishFlameTurret {
-		gnomishFlameTurretTemplate = character.newGnomishFlameTurretTemplate()
+		gnomishFlameTurretCaster = character.newGnomishFlameTurretCaster()
 	}
 
 	character.AddMajorCooldown(MajorCooldown{
@@ -914,25 +914,24 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 			return true
 		},
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			var explosiveSpell SimpleSpell
-			superSapperTemplate := character.newSuperSapperTemplate(sim)
-			goblinSapperTemplate := character.newGoblinSapperTemplate(sim)
+			superSapperCaster := character.newSuperSapperCaster(sim)
+			goblinSapperCaster := character.newGoblinSapperCaster(sim)
 
-			var fillerTemplate SimpleSpellTemplate
+			var castFiller func(sim *Simulation)
 			hasFiller := false
 			switch consumes.FillerExplosive {
 			case proto.Explosive_ExplosiveFelIronBomb:
 				hasFiller = true
-				fillerTemplate = character.newFelIronBombTemplate(sim)
+				castFiller = character.newFelIronBombCaster(sim)
 			case proto.Explosive_ExplosiveAdamantiteGrenade:
 				hasFiller = true
-				fillerTemplate = character.newAdamantiteGrenadeTemplate(sim)
+				castFiller = character.newAdamantiteGrenadeCaster(sim)
 			case proto.Explosive_ExplosiveGnomishFlameTurret:
 				hasFiller = true
-				fillerTemplate = gnomishFlameTurretTemplate
+				castFiller = gnomishFlameTurretCaster
 			case proto.Explosive_ExplosiveHolyWater:
 				hasFiller = true
-				fillerTemplate = character.newHolyWaterTemplate(sim)
+				castFiller = character.newHolyWaterCaster(sim)
 			}
 
 			cdAfterGoblinSapper := time.Minute
@@ -950,19 +949,19 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 			}
 
 			return func(sim *Simulation, character *Character) {
+				var castExplosive func(sim *Simulation)
 				var cd time.Duration
 				if consumes.SuperSapper && !character.IsOnCD(SuperSapperCooldownID, sim.CurrentTime) {
-					superSapperTemplate.Apply(&explosiveSpell)
+					castExplosive = superSapperCaster
 					cd = cdAfterSuperSapper
 				} else if consumes.GoblinSapper && !character.IsOnCD(GoblinSapperCooldownID, sim.CurrentTime) {
-					goblinSapperTemplate.Apply(&explosiveSpell)
+					castExplosive = goblinSapperCaster
 					cd = cdAfterGoblinSapper
 				} else {
-					fillerTemplate.Apply(&explosiveSpell)
+					castExplosive = castFiller
 					cd = time.Minute
 				}
-				explosiveSpell.Init(sim)
-				explosiveSpell.Cast(sim)
+				castExplosive(sim)
 				character.SetCD(ExplosivesCooldownID, sim.CurrentTime+cd)
 			}
 		},
@@ -1010,26 +1009,57 @@ func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID Act
 
 	return spell
 }
-func (character *Character) newSuperSapperTemplate(sim *Simulation) SimpleSpellTemplate {
-	return NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, SuperSapperActionID, 900, 1500, time.Minute*5))
+func (character *Character) newSuperSapperCaster(sim *Simulation) func(sim *Simulation) {
+	template := NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, SuperSapperActionID, 900, 1500, time.Minute*5))
+	var spell SimpleSpell
+	return func(sim *Simulation) {
+		template.Apply(&spell)
+		spell.Init(sim)
+		spell.Cast(sim)
+	}
 }
-func (character *Character) newGoblinSapperTemplate(sim *Simulation) SimpleSpellTemplate {
-	return NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, GoblinSapperActionID, 450, 750, time.Minute*5))
+func (character *Character) newGoblinSapperCaster(sim *Simulation) func(sim *Simulation) {
+	template := NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, GoblinSapperActionID, 450, 750, time.Minute*5))
+	var spell SimpleSpell
+	return func(sim *Simulation) {
+		template.Apply(&spell)
+		spell.Init(sim)
+		spell.Cast(sim)
+	}
 }
-func (character *Character) newFelIronBombTemplate(sim *Simulation) SimpleSpellTemplate {
-	return NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, FelIronBombActionID, 330, 770, 0))
+func (character *Character) newFelIronBombCaster(sim *Simulation) func(sim *Simulation) {
+	template := NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, FelIronBombActionID, 330, 770, 0))
+	var spell SimpleSpell
+	return func(sim *Simulation) {
+		template.Apply(&spell)
+		spell.Init(sim)
+		spell.Cast(sim)
+	}
 }
-func (character *Character) newAdamantiteGrenadeTemplate(sim *Simulation) SimpleSpellTemplate {
-	return NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, AdamantiteGrenadeActionID, 450, 750, 0))
+func (character *Character) newAdamantiteGrenadeCaster(sim *Simulation) func(sim *Simulation) {
+	template := NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, AdamantiteGrenadeActionID, 450, 750, 0))
+	var spell SimpleSpell
+	return func(sim *Simulation) {
+		template.Apply(&spell)
+		spell.Init(sim)
+		spell.Cast(sim)
+	}
 }
-func (character *Character) newHolyWaterTemplate(sim *Simulation) SimpleSpellTemplate {
-	spell := character.newBasicExplosiveSpell(sim, HolyWaterActionID, 438, 562, 0)
-	spell.SpellSchool = SpellSchoolHoly
-	for i, _ := range spell.Effects {
-		effect := &spell.Effects[i]
+func (character *Character) newHolyWaterCaster(sim *Simulation) func(sim *Simulation) {
+	es := character.newBasicExplosiveSpell(sim, HolyWaterActionID, 438, 562, 0)
+	es.SpellSchool = SpellSchoolHoly
+	for i, _ := range es.Effects {
+		effect := &es.Effects[i]
 		if effect.Target.MobType != proto.MobType_MobTypeUndead {
 			effect.StaticDamageMultiplier = 0
 		}
 	}
-	return NewSimpleSpellTemplate(spell)
+	template := NewSimpleSpellTemplate(es)
+
+	var spell SimpleSpell
+	return func(sim *Simulation) {
+		template.Apply(&spell)
+		spell.Init(sim)
+		spell.Cast(sim)
+	}
 }

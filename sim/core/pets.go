@@ -10,21 +10,24 @@ import (
 
 var GnomishFlameTurretActionID = ActionID{ItemID: 23841}
 
-func (character *Character) newGnomishFlameTurretTemplate() SimpleSpellTemplate {
+func (character *Character) newGnomishFlameTurretCaster() func(sim *Simulation) {
 	gft := character.NewGnomishFlameTurret()
 
-	spell := SimpleSpell{
-		SpellCast: SpellCast{
-			Cast: Cast{
-				ActionID:  GnomishFlameTurretActionID,
-				Character: character,
-				OnCastComplete: func(sim *Simulation, cast *Cast) {
-					gft.EnableWithTimeout(sim, gft, time.Second*45)
-				},
+	castTemplate := SimpleCast{
+		Cast: Cast{
+			ActionID:  GnomishFlameTurretActionID,
+			Character: character,
+			OnCastComplete: func(sim *Simulation, cast *Cast) {
+				gft.EnableWithTimeout(sim, gft, time.Second*45)
 			},
 		},
 	}
-	return NewSimpleSpellTemplate(spell)
+
+	return func(sim *Simulation) {
+		cast := castTemplate
+		cast.Init(sim)
+		cast.StartCast(sim)
+	}
 }
 
 type GnomishFlameTurret struct {
