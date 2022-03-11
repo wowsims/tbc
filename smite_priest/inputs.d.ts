@@ -1,8 +1,17 @@
 import { SmitePriest_Rotation_RotationType as RotationType } from '/tbc/core/proto/priest.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
+export declare const SelfPowerInfusion: {
+    id: ActionId;
+    states: number;
+    extraCssClasses: string[];
+    changedEvent: (player: Player<Spec.SpecSmitePriest>) => TypedEvent<void>;
+    getValue: (player: Player<Spec.SpecSmitePriest>) => boolean;
+    setValue: (eventID: EventID, player: Player<Spec.SpecSmitePriest>, newValue: boolean) => void;
+};
 export declare const SmitePriestRotationConfig: {
     inputs: ({
         type: "enum";

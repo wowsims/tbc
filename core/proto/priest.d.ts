@@ -86,6 +86,10 @@ export interface PriestTalents {
      */
     surgeOfLight: number;
     /**
+     * @generated from protobuf field: bool spirit_of_redemption = 33;
+     */
+    spiritOfRedemption: boolean;
+    /**
      * Shadow
      *
      * @generated from protobuf field: int32 shadow_affinity = 32;

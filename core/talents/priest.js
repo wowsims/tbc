@@ -339,7 +339,7 @@ export const priestTalentsConfig = [
                 maxPoints: 2,
             },
             {
-                //fieldName: 'spiritOfRedemption',
+                fieldName: 'spiritOfRedemption',
                 location: {
                     rowIdx: 4,
                     colIdx: 1,

@@ -104,7 +104,9 @@ export class SmitePriestSimUI extends IndividualSimUI {
                 }),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
-            selfBuffInputs: [],
+            selfBuffInputs: [
+                SmitePriestInputs.SelfPowerInfusion,
+            ],
             // IconInputs to include in the 'Other Buffs' section on the settings tab.
             raidBuffInputs: [
                 IconInputs.ArcaneBrilliance,

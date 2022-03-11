@@ -1,7 +1,26 @@
 import { SmitePriest_Rotation_RotationType as RotationType } from '/tbc/core/proto/priest.js';
-import { Race } from '/tbc/core/proto/common.js';
+import { Race, RaidTarget } from '/tbc/core/proto/common.js';
+import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
+export const SelfPowerInfusion = {
+    id: ActionId.fromSpellId(10060),
+    states: 2,
+    extraCssClasses: [
+        'self-power-infusion-picker',
+        'within-raid-sim-hide',
+    ],
+    changedEvent: (player) => player.specOptionsChangeEmitter,
+    getValue: (player) => player.getSpecOptions().powerInfusionTarget?.targetIndex != NO_TARGET,
+    setValue: (eventID, player, newValue) => {
+        const newOptions = player.getSpecOptions();
+        newOptions.powerInfusionTarget = RaidTarget.create({
+            targetIndex: newValue ? 0 : NO_TARGET,
+        });
+        player.setSpecOptions(eventID, newOptions);
+    },
+};
 export const SmitePriestRotationConfig = {
     inputs: [
         {
