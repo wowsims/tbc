@@ -35,9 +35,15 @@ func NewSmitePriest(character core.Character, options proto.Player) *SmitePriest
 	if smiteOptions.Rotation.UseStarshards && options.Race != proto.Race_RaceNightElf {
 		smiteOptions.Rotation.UseStarshards = false
 	}
-
+	
 	selfBuffs := priest.SelfBuffs{
 		UseShadowfiend: smiteOptions.Options.UseShadowfiend,
+	}
+	
+	if smiteOptions.Options.PowerInfusionTarget != nil {
+		selfBuffs.PowerInfusionTarget = *smiteOptions.Options.PowerInfusionTarget
+	} else {
+		selfBuffs.PowerInfusionTarget.TargetIndex = -1
 	}
 
 	basePriest := priest.New(character, selfBuffs, *smiteOptions.Talents)
