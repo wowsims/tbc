@@ -28,6 +28,12 @@ func (priest *Priest) registerPowerInfusionCD() {
 		UsesGCD:    true,
 		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			if character.CurrentMana() < baseManaCost {
+				return false
+			}
+			return true
+		},
+		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if powerInfusionTarget == nil {
 				return false
 			}
@@ -36,9 +42,6 @@ func (priest *Priest) registerPowerInfusionCD() {
 			if powerInfusionTarget.CurrentMana() < 3000 {
 				return false
 			}
-			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
