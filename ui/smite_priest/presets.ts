@@ -43,297 +43,510 @@ export const DefaultConsumes = Consumes.create({
 export const P1_PRESET = {
 	name: 'P1 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-	gear: EquipmentSpec.create({
-		items: [
-			ItemSpec.create({
-				id: 24266, // Spellstrike Hood
-				enchant: Enchants.GLYPH_OF_POWER,
-				gems: [
-					Gems.RUNED_ORNATE_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 30666, // Ritssyn's Lost Pendant
-			}),
-			ItemSpec.create({
-				id: 21869, // Frozen Shadoweave Shoulders
-				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 28570, // Shadow-Cloak of Dalaran
-				enchant: Enchants.SUBTLETY,
-			}),
-			ItemSpec.create({
-				id: 21871, // Frozen Shadoweave Robe
-				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 24250, // Bracers of Havok
-				enchant: Enchants.WRIST_SPELLPOWER,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 28507, // Handwraps of Flowing Thought
-				enchant: Enchants.GLOVES_SPELLPOWER,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 28799, // Belt of Divine Inspiration
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 24262, // Spellstrike Pants
-				enchant: Enchants.RUNIC_SPELLTHREAD,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 21870, // Frozen Shadoweave Boots
-				enchant: Enchants.BOARS_SPEED,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 29352, // Cobalt Band of Tyrigosa
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 28793, // Band of Crimson Fury
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 28789, // Eye of Magtheridon
-			}),
-			ItemSpec.create({
-				id: 29370, // Icon of the Silver Crescent
-			}),
-			ItemSpec.create({
-				id: 29350, // The Black Stalk
-			}),
-			ItemSpec.create({
-				id: 28770, // Nathrezim Mindblade
-				enchant: Enchants.SOULFROST,
-			}),
-			ItemSpec.create({
-				id: 29272, // Orb of the Soul-Eater
-			}),
-		],
-	}),
+	gear: EquipmentSpec.fromJsonString(`{
+      "items": [
+        {
+          "id": 24266,
+          "enchant": 29191,
+          "gems": [
+            28118,
+            24030,
+            24030
+          ]
+        },
+        {
+          "id": 28530
+        },
+        {
+          "id": 29060,
+          "enchant": 28886,
+          "gems": [
+            24030,
+            24030
+          ]
+        },
+        {
+          "id": 28766,
+          "enchant": 33150
+        },
+        {
+          "id": 29056,
+          "enchant": 24003,
+          "gems": [
+            24030,
+            24030,
+            24030
+          ]
+        },
+        {
+          "id": 24250,
+          "enchant": 22534,
+          "gems": [
+            24030
+          ]
+        },
+        {
+          "id": 30725,
+          "enchant": 28272,
+          "gems": [
+            24030,
+            24030
+          ]
+        },
+        {
+          "id": 24256,
+          "gems": [
+            24030,
+            24030
+          ]
+        },
+        {
+          "id": 30734,
+          "enchant": 24274,
+          "gems": [
+            24030,
+            24030,
+            24030
+          ]
+        },
+        {
+          "id": 28517,
+          "enchant": 35297,
+          "gems": [
+            24030,
+            24030
+          ]
+        },
+        {
+          "id": 28793,
+          "enchant": 22536
+        },
+        {
+          "id": 29172,
+          "enchant": 22536
+        },
+        {
+          "id": 27683
+        },
+        {
+          "id": 29370
+        },
+        {
+          "id": 30723,
+          "enchant": 22555,
+          "gems": [
+            30564,
+            31867
+          ]
+        },
+        {
+          "id": 28734
+        },
+        {
+          "id": 28673
+        }
+      ]
+    }`),
 };
 
 export const P2_PRESET = {
 	name: 'P2 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-	gear: EquipmentSpec.create({
-		items: [
-			ItemSpec.create({
-				id: 32494, // Destruction Holo-gogs
-				enchant: Enchants.GLYPH_OF_POWER,
-				gems: [
-					Gems.MYSTICAL_SKYFIRE_DIAMOND,
-					Gems.GLOWING_NIGHTSEYE,
-				],
-			}),
-			ItemSpec.create({
-				id: 30666// ritssyns-lost-pendant
-			}),
-			ItemSpec.create({
-				id: 30163, // wings-of-the-avatar
-				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 29992, // Royal Cloak of the Sunstriders
-				enchant: Enchants.SUBTLETY,
-			}),
-			ItemSpec.create({
-				id: 30107, // vestments-of-the-sea-witch
-				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: -19, // Elementalist Bracelets of Shadow Wrath
-				enchant: Enchants.WRIST_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 28780, // Soul-Eater's Handwraps
-				enchant: Enchants.GLOVES_SPELLPOWER,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 30038, // Belt of Blasting
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 29972, // trousers-of-the-astromancer
-				enchant: Enchants.RUNIC_SPELLTHREAD,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 21870, // Frozen Shadoweave Boots
-				enchant: Enchants.BOARS_SPEED,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 30109, // ring-of-endless-coils
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 29922, // band-of-alar
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 29370, // Icon of the Silver Crescent
-			}),
-			ItemSpec.create({
-				id: 38290, // dark-iron-smoking-pipe
-			}),
-			ItemSpec.create({
-				id: 29982, // wand of forgotten star
-			}),
-			ItemSpec.create({
-				id: 28770, // Nathrezim Mindblade
-				enchant: Enchants.SOULFROST,
-			}),
-			ItemSpec.create({
-				id: 29272, // orb-of-the-soul-eater
-			}),
-		],
-	}),
+	gear: EquipmentSpec.fromJsonString(`{
+      "items": [
+        {
+          "id": 30161,
+          "enchant": 29191,
+          "gems": [
+            34220,
+            30588
+          ]
+        },
+        {
+          "id": 30015
+        },
+        {
+          "id": 30163,
+          "enchant": 28886,
+          "gems": [
+            24059,
+            30600
+          ]
+        },
+        {
+          "id": 28766,
+          "enchant": 33150
+        },
+        {
+          "id": 30107,
+          "enchant": 24003,
+          "gems": [
+            24030,
+            24030,
+            24030
+          ]
+        },
+        {
+          "id": 29918,
+          "enchant": 22534
+        },
+        {
+          "id": 30160,
+          "enchant": 28272
+        },
+        {
+          "id": 30038,
+          "gems": [
+            31116,
+            24059
+          ]
+        },
+        {
+          "id": 30162,
+          "enchant": 24274,
+          "gems": [
+            24030
+          ]
+        },
+        {
+          "id": 30037,
+          "enchant": 35297
+        },
+        {
+          "id": 30109,
+          "enchant": 22536
+        },
+        {
+          "id": 28793,
+          "enchant": 22536
+        },
+        {
+          "id": 27683
+        },
+        {
+          "id": 29370
+        },
+        {
+          "id": 30723,
+          "enchant": 22555,
+          "gems": [
+            24030,
+            24030
+          ]
+        },
+        {
+          "id": 30049
+        },
+        {
+          "id": 29982
+        }
+      ]
+    }`),
 };
 
 export const P3_PRESET = {
 	name: 'P3 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-	gear: EquipmentSpec.create({
-		items: [
-			ItemSpec.create({
-				id: 31064, // Hood of Absolution
-				enchant: Enchants.GLYPH_OF_POWER,
-				gems: [
-					Gems.MYSTICAL_SKYFIRE_DIAMOND,
-					Gems.GLOWING_SHADOWSONG_AMETHYST,
-				],
-			}),
-			ItemSpec.create({
-				id: 30666, // Ritssyn's Lost Pendant
-			}),
-			ItemSpec.create({
-				id: 31070, // Shoulderpads of Absolution
-				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
-				gems: [
-					Gems.RUNED_CRIMSON_SPINEL,
-					Gems.RUNED_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 32590, // Nethervoid Cloak
-				enchant: Enchants.SUBTLETY,
-			}),
-			ItemSpec.create({
-				id: 31065, // Shroud of Absolution
-				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
-				gems: [
-					Gems.RUNED_CRIMSON_SPINEL,
-					Gems.RUNED_CRIMSON_SPINEL,
-					Gems.RUNED_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 32586, // Bracers of Nimble Thought
-				enchant: Enchants.WRIST_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 31061, // Handguards of Absolution
-				enchant: Enchants.GLOVES_SPELLPOWER,
-				gems: [
-					Gems.RUNED_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 32256, // Waistwrap of Infinity
-			}),
-			ItemSpec.create({
-				id: 30916, // Leggings of Channeled Elements
-				enchant: Enchants.RUNIC_SPELLTHREAD,
-				gems: [
-					Gems.RUNED_CRIMSON_SPINEL,
-					Gems.RUNED_CRIMSON_SPINEL,
-					Gems.RUNED_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 32239, // Slippers of the Seacaller
-				enchant: Enchants.BOARS_SPEED,
-				gems: [
-					Gems.RUNED_CRIMSON_SPINEL,
-					Gems.RUNED_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 32527, // Ring Of Ancient Knowledge
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 32527, // Ring Of Ancient Knowledge
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 32483, // The Skull Of Guldan
-			}),
-			ItemSpec.create({
-				id: 29370, // Icon of the Silver Crescent
-			}),
-			ItemSpec.create({
-				id: 29982, // Wand of Forgotten Star
-			}),
-			ItemSpec.create({
-				id: 32374, // Zhar'doom, Greatstaff of the Devourer
-				enchant: Enchants.SOULFROST,
-			}),
-		],
-	}),
+	gear: EquipmentSpec.fromJsonString(`{
+      "items": [
+        {
+          "id": 32525,
+          "enchant": 29191,
+          "gems": [
+            34220,
+            30600
+          ]
+        },
+        {
+          "id": 32349
+        },
+        {
+          "id": 31070,
+          "enchant": 28886,
+          "gems": [
+            32218,
+            32215
+          ]
+        },
+        {
+          "id": 32524,
+          "enchant": 33150
+        },
+        {
+          "id": 30107,
+          "enchant": 33990,
+          "gems": [
+            32196,
+            32196,
+            32196
+          ]
+        },
+        {
+          "id": 32586,
+          "enchant": 22534
+        },
+        {
+          "id": 31061,
+          "enchant": 28272,
+          "gems": [
+            32196
+          ]
+        },
+        {
+          "id": 30038,
+          "gems": [
+            32196,
+            32196
+          ]
+        },
+        {
+          "id": 30916,
+          "enchant": 24274,
+          "gems": [
+            32196,
+            32196,
+            32196
+          ]
+        },
+        {
+          "id": 32239,
+          "enchant": 35297,
+          "gems": [
+            32196,
+            32196
+          ]
+        },
+        {
+          "id": 32527,
+          "enchant": 22536
+        },
+        {
+          "id": 32247,
+          "enchant": 22536
+        },
+        {
+          "id": 29370
+        },
+        {
+          "id": 32483
+        },
+        {
+          "id": 32374,
+          "enchant": 22555
+        },
+        {},
+        {
+          "id": 29982
+        }
+      ]
+    }`),
+
+};
+
+export const P4_PRESET = {
+	name: 'P4 Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.fromJsonString(`{
+      "items": [
+        {
+          "id": 32525,
+          "enchant": 29191,
+          "gems": [
+            34220,
+            30600
+          ]
+        },
+        {
+          "id": 33281
+        },
+        {
+          "id": 31070,
+          "enchant": 28886,
+          "gems": [
+            32210,
+            32215
+          ]
+        },
+        {
+          "id": 32524,
+          "enchant": 33150
+        },
+        {
+          "id": 30107,
+          "enchant": 33990,
+          "gems": [
+            32196,
+            32196,
+            32196
+          ]
+        },
+        {
+          "id": 32586,
+          "enchant": 22534
+        },
+        {
+          "id": 31061,
+          "enchant": 28272,
+          "gems": [
+            32221
+          ]
+        },
+        {
+          "id": 30038,
+          "gems": [
+            32196,
+            32196
+          ]
+        },
+        {
+          "id": 30916,
+          "enchant": 24274,
+          "gems": [
+            32196,
+            32196,
+            32196
+          ]
+        },
+        {
+          "id": 32239,
+          "enchant": 35297,
+          "gems": [
+            32196,
+            32196
+          ]
+        },
+        {
+          "id": 32527,
+          "enchant": 22536
+        },
+        {
+          "id": 33497,
+          "enchant": 22536
+        },
+        {
+          "id": 33829
+        },
+        {
+          "id": 32483
+        },
+        {
+          "id": 32374,
+          "enchant": 22555
+        },
+        {},
+        {
+          "id": 29982
+        }
+      ]
+    }`),
+
+};
+
+export const P5_PRESET = {
+	name: 'P5 Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.fromJsonString(`{
+      "items": [
+        {
+          "id": 34340,
+          "enchant": 29191,
+          "gems": [
+            34220,
+            30600
+          ]
+        },
+        {
+          "id": 34204
+        },
+        {
+          "id": 34210,
+          "enchant": 28886,
+          "gems": [
+            32221,
+            35761
+          ]
+        },
+        {
+          "id": 34242,
+          "enchant": 33150,
+          "gems": [
+            35760
+          ]
+        },
+        {
+          "id": 34364,
+          "enchant": 33990,
+          "gems": [
+            35760,
+            35760,
+            35760
+          ]
+        },
+        {
+          "id": 34434,
+          "enchant": 22534,
+          "gems": [
+            32221
+          ]
+        },
+        {
+          "id": 34344,
+          "enchant": 28272,
+          "gems": [
+            35761,
+            32221
+          ]
+        },
+        {
+          "id": 34528,
+          "gems": [
+            35761
+          ]
+        },
+        {
+          "id": 34181,
+          "enchant": 24274,
+          "gems": [
+            32221,
+            32221,
+            35761
+          ]
+        },
+        {
+          "id": 34563,
+          "enchant": 35297,
+          "gems": [
+            32215
+          ]
+        },
+        {
+          "id": 34362,
+          "enchant": 22536
+        },
+        {
+          "id": 34889,
+          "enchant": 22536
+        },
+        {
+          "id": 34429
+        },
+        {
+          "id": 35749
+        },
+        {
+          "id": 34182,
+          "enchant": 22555,
+          "gems": [
+            35761,
+            35761,
+            35761
+          ]
+        },
+        {},
+        {
+          "id": 29982
+        }
+      ]
+    }`),
+	
 };

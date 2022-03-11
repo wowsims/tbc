@@ -55,6 +55,38 @@ export const SmitePriestRotationConfig = {
 		},
 		{
 			type: 'boolean' as const,
+			cssClass: 'mindblast-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Use Mind Blast',
+				labelTooltip: 'Use Mind Blast whenever off CD.',
+				changedEvent: (player: Player<Spec.SpecSmitePriest>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecSmitePriest>) => player.getRotation().useMindBlast,
+				setValue: (eventID: EventID, player: Player<Spec.SpecSmitePriest>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.useMindBlast = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'boolean' as const,
+			cssClass: 'swd-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Use Shadow Word: Death',
+				labelTooltip: 'Use Shadow Word: Death whenever off CD.',
+				changedEvent: (player: Player<Spec.SpecSmitePriest>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecSmitePriest>) => player.getRotation().useShadowWordDeath,
+				setValue: (eventID: EventID, player: Player<Spec.SpecSmitePriest>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.useShadowWordDeath = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},	
+		{
+			type: 'boolean' as const,
 			cssClass: 'devplague-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
