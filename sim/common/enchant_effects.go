@@ -106,6 +106,43 @@ var MongooseAuraID = core.NewAuraID()
 var LightningSpeedMHAuraID = core.NewAuraID()
 var LightningSpeedOHAuraID = core.NewAuraID()
 
+func newLightningSpeedApplier(character *core.Character, auraID core.AuraID, actionID core.ActionID) func(sim *core.Simulation) {
+	factory := newLightningSpeedAuraFactory(character, auraID, actionID)
+
+	return func(sim *core.Simulation) {
+		character.ReplaceAura(sim, factory(sim))
+	}
+}
+
+func newLightningSpeedAuraFactory(character *core.Character, auraID core.AuraID, actionID core.ActionID) func(sim *core.Simulation) core.Aura {
+	buffs := character.ApplyStatDependencies(stats.Stats{stats.Agility: 120})
+	unbuffs := buffs.Multiply(-1)
+
+	aura := core.Aura{
+		ID:       auraID,
+		ActionID: actionID,
+		OnExpire: func(sim *core.Simulation) {
+			character.AddStatsDynamic(sim, unbuffs)
+			character.MultiplyMeleeSpeed(sim, 1/1.02)
+			if sim.Log != nil {
+				character.Log(sim, "Lost %s from fading %s", buffs, actionID)
+			}
+		},
+	}
+
+	return func(sim *core.Simulation) core.Aura {
+		if !character.HasAura(auraID) {
+			character.AddStatsDynamic(sim, buffs)
+			character.MultiplyMeleeSpeed(sim, 1.02)
+			if sim.Log != nil {
+				character.Log(sim, "Gained %s from %s", buffs, actionID)
+			}
+		}
+		aura.Expires = sim.CurrentTime + 15*time.Second
+		return aura
+	}
+}
+
 // ApplyMongooseEffect will be applied twice if there is two weapons with this enchant.
 //   However it will automatically overwrite one of them so it should be ok.
 //   A single application of the aura will handle both mh and oh procs.
@@ -125,10 +162,8 @@ func ApplyMongoose(agent core.Agent) {
 	}
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		agiBonus := 120.0
-		hasteBonus := 2 * core.HasteRatingPerHastePercent
-		applyStatAuraMH := character.NewTemporaryStatsAuraApplier(LightningSpeedMHAuraID, core.ActionID{SpellID: 28093, Tag: 1}, stats.Stats{stats.Agility: agiBonus, stats.MeleeHaste: hasteBonus}, time.Second*15)
-		applyStatAuraOH := character.NewTemporaryStatsAuraApplier(LightningSpeedOHAuraID, core.ActionID{SpellID: 28093, Tag: 2}, stats.Stats{stats.Agility: agiBonus, stats.MeleeHaste: hasteBonus}, time.Second*15)
+		applyStatAuraMH := newLightningSpeedApplier(character, LightningSpeedMHAuraID, core.ActionID{SpellID: 28093, Tag: 1})
+		applyStatAuraOH := newLightningSpeedApplier(character, LightningSpeedOHAuraID, core.ActionID{SpellID: 28093, Tag: 2})
 
 		return core.Aura{
 			ID: MongooseAuraID,
@@ -150,6 +185,7 @@ func ApplyMongoose(agent core.Agent) {
 	})
 }
 
+// TODO: it's highly likely this works like "Major Striking", only altering the weapon's damage range
 func ApplyKhoriumScope(agent core.Agent) {
 	agent.GetCharacter().PseudoStats.BonusRangedDamage += 12
 }

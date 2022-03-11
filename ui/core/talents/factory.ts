@@ -47,7 +47,7 @@ export function newTalentsPicker<SpecType extends Spec>(parent: HTMLElement, pla
   }
 }
 
-const classTalentsConfig: Record<Spec, TalentsConfig<any>> = {
+const classTalentsConfig: Record<Class, TalentsConfig<any>> = {
   [Class.ClassUnknown]: [],
   [Class.ClassDruid]: druidTalentsConfig,
   [Class.ClassShaman]: shamanTalentsConfig,
