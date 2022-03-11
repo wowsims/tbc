@@ -100,7 +100,7 @@ var FullConsumes = &proto.Consumes{
 	DefaultPotion:   proto.Potions_HastePotion,
 	DefaultConjured: proto.Conjured_ConjuredRogueThistleTea,
 	SuperSapper:     true,
-	FillerExplosive: proto.Explosive_ExplosiveHolyWater,
+	FillerExplosive: proto.Explosive_ExplosiveGnomishFlameTurret,
 }
 
 var FullDebuffs = &proto.Debuffs{

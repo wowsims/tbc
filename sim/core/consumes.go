@@ -565,23 +565,8 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 				},
 			},
 			func(sim *Simulation, character *Character) {
-				const spBonus = 120
-				const critBonus = 2 * SpellCritRatingPerCritChance
-				const dur = time.Second * 15
-
-				character.AddStat(stats.SpellPower, spBonus)
-				character.AddStat(stats.SpellCrit, critBonus)
-
-				character.AddAura(sim, Aura{
-					ID:       PotionAuraID,
-					ActionID: actionID,
-					Expires:  sim.CurrentTime + dur,
-					OnExpire: func(sim *Simulation) {
-						character.AddStat(stats.SpellPower, -spBonus)
-						character.AddStat(stats.SpellCrit, -critBonus)
-					},
-				})
-
+				statsApplier := character.NewTemporaryStatsAuraApplier(PotionAuraID, actionID, stats.Stats{stats.SpellPower: 120, stats.SpellCrit: 2 * SpellCritRatingPerCritChance}, time.Second*15)
+				statsApplier(sim)
 				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
 				character.Metrics.AddInstantCast(actionID)
 			}
@@ -629,20 +614,8 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 				},
 			},
 			func(sim *Simulation, character *Character) {
-				const hasteBonus = 400
-				const dur = time.Second * 15
-
-				character.AddMeleeHaste(sim, hasteBonus)
-
-				character.AddAura(sim, Aura{
-					ID:       PotionAuraID,
-					ActionID: actionID,
-					Expires:  sim.CurrentTime + dur,
-					OnExpire: func(sim *Simulation) {
-						character.AddMeleeHaste(sim, -hasteBonus)
-					},
-				})
-
+				statsApplier := character.NewTemporaryStatsAuraApplier(PotionAuraID, actionID, stats.Stats{stats.MeleeHaste: 400}, time.Second*15)
+				statsApplier(sim)
 				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
 				character.Metrics.AddInstantCast(actionID)
 			}
@@ -916,15 +889,19 @@ var SuperSapperActionID = ActionID{ItemID: 23827, CooldownID: SuperSapperCooldow
 var GoblinSapperActionID = ActionID{ItemID: 10646, CooldownID: GoblinSapperCooldownID}
 var FelIronBombActionID = ActionID{ItemID: 23736}
 var AdamantiteGrenadeActionID = ActionID{ItemID: 23737}
-var GnomishFlameTurretActionID = ActionID{ItemID: 23841}
 var HolyWaterActionID = ActionID{ItemID: 13180}
 
 func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 	if !consumes.SuperSapper && !consumes.GoblinSapper && consumes.FillerExplosive == proto.Explosive_ExplosiveUnknown {
 		return
 	}
-
 	character := agent.GetCharacter()
+
+	var gnomishFlameTurretTemplate SimpleSpellTemplate
+	if consumes.FillerExplosive == proto.Explosive_ExplosiveGnomishFlameTurret {
+		gnomishFlameTurretTemplate = character.newGnomishFlameTurretTemplate()
+	}
+
 	character.AddMajorCooldown(MajorCooldown{
 		ActionID:   SuperSapperActionID,
 		CooldownID: ExplosivesCooldownID,
@@ -950,6 +927,9 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 			case proto.Explosive_ExplosiveAdamantiteGrenade:
 				hasFiller = true
 				fillerTemplate = character.newAdamantiteGrenadeTemplate(sim)
+			case proto.Explosive_ExplosiveGnomishFlameTurret:
+				hasFiller = true
+				fillerTemplate = gnomishFlameTurretTemplate
 			case proto.Explosive_ExplosiveHolyWater:
 				hasFiller = true
 				fillerTemplate = character.newHolyWaterTemplate(sim)
