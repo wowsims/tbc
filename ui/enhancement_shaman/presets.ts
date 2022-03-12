@@ -60,11 +60,13 @@ export const DefaultOptions = EnhancementShamanOptions.create({
 
 export const DefaultConsumes = Consumes.create({
 	drums: Drums.DrumsOfBattle,
-	defaultPotion: Potions.SuperManaPotion,
+	defaultPotion: Potions.HastePotion,
 	flask: Flask.FlaskOfRelentlessAssault,
 	food: Food.FoodRoastedClefthoof,
 	mainHandImbue: WeaponImbue.WeaponImbueShamanWindfury,
 	offHandImbue: WeaponImbue.WeaponImbueShamanWindfury,
+	scrollOfAgility: 5,
+	scrollOfStrength: 5,
 });
 
 export const P1_PRESET = {

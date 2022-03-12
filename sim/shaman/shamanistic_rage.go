@@ -17,7 +17,6 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 		return
 	}
 
-	const proc = 0.3
 	const dur = time.Second * 15
 	const cd = time.Minute * 2
 
@@ -38,6 +37,7 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			ppmm := shaman.AutoAttacks.NewPPMManager(15)
 			return func(sim *core.Simulation, character *core.Character) {
 				character.AddAura(sim, core.Aura{
 					ID:       ShamanisticRageAuraID,
@@ -48,7 +48,7 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 							return
 						}
-						if sim.RandomFloat("shamanistic rage") > proc {
+						if !ppmm.Proc(sim, spellEffect.IsMH(), false, "shamanistic rage") {
 							return
 						}
 						mana := character.GetStat(stats.AttackPower) * 0.3
