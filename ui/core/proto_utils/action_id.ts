@@ -285,7 +285,7 @@ export class ActionId {
 	}
 
 	static fromPetName(petName: string): ActionId {
-		return new ActionId(0, 0, OtherAction.OtherActionPet, 0, petName, petName, petNameToIcon[petName] || '');
+		return petNameToActionId[petName] || new ActionId(0, 0, OtherAction.OtherActionPet, 0, petName, petName, petNameToIcon[petName] || '');
 	}
 
 	static fromItem(item: Item): ActionId {
@@ -350,6 +350,11 @@ idOverrides[ActionId.fromSpellId(37223).toProtoString()] = ActionId.fromItemId(2
 idOverrides[ActionId.fromSpellId(37447).toProtoString()] = ActionId.fromItemId(30720); // Serpent-Coil Braid
 idOverrides[ActionId.fromSpellId(37443).toProtoString()] = ActionId.fromItemId(30196); // Robes of Tirisfal (4pc bonus)
 
+const petNameToActionId: Record<string, ActionId> = {
+	'Gnomish Flame Turret': ActionId.fromItemId(23841),
+	'Water Elemental': ActionId.fromSpellId(31687),
+};
+
 // https://tbc.wowhead.com/hunter-pets
 const petNameToIcon: Record<string, string> = {
 	'Bat': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_bat.jpg',
@@ -372,7 +377,6 @@ const petNameToIcon: Record<string, string> = {
 	'Sporebat': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_sporebat.jpg',
 	'Tallstrider': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_tallstrider.jpg',
 	'Turtle': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_turtle.jpg',
-	'Water Elemental': 'https://wow.zamimg.com/images/wow/icons/medium/spell_frost_summonwaterelemental_2.jpg',
 	'Warp Stalker': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_warpstalker.jpg',
 	'Wind Serpent': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_windserpent.jpg',
 	'Wolf': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_wolf.jpg',

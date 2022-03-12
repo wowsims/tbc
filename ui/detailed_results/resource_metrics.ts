@@ -1,24 +1,37 @@
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
+import { ResourceMetrics, PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { ResourceType } from '/tbc/core/proto/api.js';
 import { resourceNames } from '/tbc/core/proto_utils/names.js';
-import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { getEnumValues } from '/tbc/core/utils.js';
-import { sum } from '/tbc/core/utils.js';
 
+import { ColumnSortType, MetricsTable } from './metrics_table.js';
 import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
 
 declare var $: any;
 declare var tippy: any;
 
-export class ResourceMetrics extends ResultComponent {
+export class ResourceMetricsTable extends ResultComponent {
   constructor(config: ResultComponentConfig) {
 		config.rootCssClass = 'resource-metrics-root';
     super(config);
 
 		const resourceTypes = (getEnumValues(ResourceType) as Array<ResourceType>).filter(val => val != ResourceType.ResourceTypeNone);
 		resourceTypes.forEach(resourceType => {
+			const containerElem = document.createElement('div');
+			containerElem.classList.add('resource-metrics-table-container', 'hide');
+			containerElem.innerHTML = `<span class="resource-metrics-table-title">${resourceNames[resourceType]}</span>`;
+			this.rootElem.appendChild(containerElem);
+
 			const childConfig = config;
-			childConfig.parent = this.rootElem;
-			new ResourceMetricsTable(childConfig, resourceType);
+			childConfig.parent = containerElem;
+			const table = new TypedResourceMetricsTable(childConfig, resourceType);
+			table.onUpdate.on(() => {
+				if (table.rootElem.classList.contains('hide')) {
+					containerElem.classList.add('hide');
+				} else {
+					containerElem.classList.remove('hide');
+				}
+			});
 		});
 	}
 
@@ -26,114 +39,66 @@ export class ResourceMetrics extends ResultComponent {
 	}
 }
 
-export class ResourceMetricsTable extends ResultComponent {
-	private readonly tableElem: HTMLTableSectionElement;
-	private readonly bodyElem: HTMLTableSectionElement;
+export class TypedResourceMetricsTable extends MetricsTable<ResourceMetrics> {
 	readonly resourceType: ResourceType;
 
   constructor(config: ResultComponentConfig, resourceType: ResourceType) {
 		config.rootCssClass = 'resource-metrics-table-root';
-    super(config);
+    super(config, [
+			MetricsTable.nameCellConfig((metric: ResourceMetrics) => {
+				return {
+					name: metric.name,
+					actionId: metric.actionId,
+				};
+			}),
+			{
+				name: 'Casts',
+				tooltip: 'Casts',
+				getValue: (metric: ResourceMetrics) => metric.events,
+				getDisplayString: (metric: ResourceMetrics) => metric.events.toFixed(1),
+			},
+			{
+				name: 'Gain',
+				tooltip: 'Gain',
+				sort: ColumnSortType.Descending,
+				getValue: (metric: ResourceMetrics) => metric.gain,
+				getDisplayString: (metric: ResourceMetrics) => metric.gain.toFixed(1),
+			},
+			{
+				name: 'Gain / s',
+				tooltip: 'Gain / Second',
+				getValue: (metric: ResourceMetrics) => metric.gainPerSecond,
+				getDisplayString: (metric: ResourceMetrics) => metric.gainPerSecond.toFixed(1),
+			},
+			{
+				name: 'Avg Gain',
+				tooltip: 'Gain / Event',
+				getValue: (metric: ResourceMetrics) => metric.avgGain,
+				getDisplayString: (metric: ResourceMetrics) => metric.avgGain.toFixed(1),
+			},
+			{
+				name: 'Avg Actual Gain',
+				tooltip: 'Actual Gain / Event',
+				getValue: (metric: ResourceMetrics) => metric.avgActualGain,
+				getDisplayString: (metric: ResourceMetrics) => metric.avgActualGain.toFixed(1),
+			},
+		]);
 		this.resourceType = resourceType;
-
-		this.rootElem.innerHTML = `
-		<div class="resource-metrics-table-container">
-			<span class="resource-metrics-table-title">${resourceNames[this.resourceType]}</span>
-			<table class="metrics-table tablesorter">
-				<thead class="metrics-table-header">
-					<tr class="metrics-table-header-row">
-						<th class="metrics-table-header-cell"><span>Name</span></th>
-						<th class="metrics-table-header-cell"><span>Casts</span></th>
-						<th class="metrics-table-header-cell"><span>Gain</span></th>
-						<th class="metrics-table-header-cell"><span>Gain / s</span></th>
-						<th class="metrics-table-header-cell"><span>Avg Gain</span></th>
-						<th class="metrics-table-header-cell"><span>Avg Actual Gain</span></th>
-					</tr>
-				</thead>
-				<tbody class="metrics-table-body">
-				</tbody>
-			</table>
-		</div>
-		`;
-
-		this.tableElem = this.rootElem.getElementsByClassName('metrics-table')[0] as HTMLTableSectionElement;
-		this.bodyElem = this.rootElem.getElementsByClassName('metrics-table-body')[0] as HTMLTableSectionElement;
-
-		const headerElems = Array.from(this.tableElem.querySelectorAll('th'));
-
-		// Casts
-		tippy(headerElems[1], {
-			'content': 'Casts',
-			'allowHTML': true,
-		});
-
-		// GPS
-		tippy(headerElems[2], {
-			'content': 'Gain',
-			'allowHTML': true,
-		});
-
-		// GPS
-		tippy(headerElems[3], {
-			'content': 'Gain / Second',
-			'allowHTML': true,
-		});
-
-		// Avg Gain
-		tippy(headerElems[4], {
-			'content': 'Gain / Event',
-			'allowHTML': true,
-		});
-
-		// Avg Actual Gain
-		tippy(headerElems[5], {
-			'content': 'Actual Gain / Event',
-			'allowHTML': true,
-		});
-
-		$(this.tableElem).tablesorter({
-			sortList: [[2, 1]],
-			cssChildRow: 'child-metric',
-		});
 	}
 
-	onSimResult(resultData: SimResultData) {
-		this.bodyElem.textContent = '';
-
-		const resourceMetrics = resultData.result.getResourceMetrics(resultData.filter, this.resourceType);
-		if (resourceMetrics.length == 0) {
-			this.rootElem.classList.add('hide');
-		} else {
-			this.rootElem.classList.remove('hide');
+	getGroupedMetrics(resultData: SimResultData): Array<Array<ResourceMetrics>> {
+		const players = resultData.result.getPlayers(resultData.filter);
+		if (players.length != 1) {
+			return [];
 		}
-		resourceMetrics.forEach(resourceMetric => {
-			const rowElem = document.createElement('tr');
-			this.bodyElem.appendChild(rowElem);
+		const player = players[0];
 
-			const nameCellElem = document.createElement('td');
-			rowElem.appendChild(nameCellElem);
-			nameCellElem.innerHTML = `
-			<a class="metrics-action-icon"></a>
-			<span class="metrics-action-name">${resourceMetric.name}</span>
-			`;
+		const resources = player.getResourceMetrics(this.resourceType);
+		const resourceGroups = ResourceMetrics.groupById(resources);
+		return resourceGroups;
+	}
 
-			const iconElem = nameCellElem.getElementsByClassName('metrics-action-icon')[0] as HTMLAnchorElement;
-			resourceMetric.actionId.setBackgroundAndHref(iconElem);
-
-			const addCell = (value: string | number): HTMLElement => {
-				const cellElem = document.createElement('td');
-				cellElem.textContent = String(value);
-				rowElem.appendChild(cellElem);
-				return cellElem;
-			};
-
-			addCell(resourceMetric.events.toFixed(1)); // Casts
-			addCell(resourceMetric.gain.toFixed(1)); // GPS
-			addCell(resourceMetric.gainPerSecond.toFixed(1)); // GPS
-			addCell(resourceMetric.avgGain.toFixed(1)); // Avg Gain
-			addCell(resourceMetric.avgActualGain.toFixed(1)); // Avg Actual Gain
-		});
-
-		$(this.tableElem).trigger('update');
+	mergeMetrics(metrics: Array<ResourceMetrics>): ResourceMetrics {
+		return ResourceMetrics.merge(metrics, true, metrics[0].player?.petActionId || undefined);
 	}
 }

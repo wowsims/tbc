@@ -1,83 +1,62 @@
-import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
-import { sum } from '/tbc/core/utils.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
+import { AuraMetrics, PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 
+import { ColumnSortType, MetricsTable } from './metrics_table.js';
 import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
 
 declare var $: any;
 declare var tippy: any;
 
-export class AuraMetrics extends ResultComponent {
-	private readonly tableElem: HTMLTableSectionElement;
-	private readonly bodyElem: HTMLTableSectionElement;
+export class AuraMetricsTable extends MetricsTable<AuraMetrics> {
 	private readonly useDebuffs: boolean;
 
   constructor(config: ResultComponentConfig, useDebuffs: boolean) {
 		if (useDebuffs) {
-			config.rootCssClass = 'debuff-aura-metrics-root';
+			config.rootCssClass = 'debuff-metrics-root';
 		} else {
-			config.rootCssClass = 'buff-aura-metrics-root';
+			config.rootCssClass = 'buff-metrics-root';
 		}
-    super(config);
+    super(config, [
+			MetricsTable.nameCellConfig((metric: AuraMetrics) => {
+				return {
+					name: metric.name,
+					actionId: metric.actionId,
+				};
+			}),
+			{
+				name: 'Uptime',
+				tooltip: 'Uptime / Encounter Duration',
+				sort: ColumnSortType.Descending,
+				getValue: (metric: AuraMetrics) => metric.uptimePercent,
+				getDisplayString: (metric: AuraMetrics) => metric.uptimePercent.toFixed(2) + '%',
+			},
+		]);
 		this.useDebuffs = useDebuffs;
-
-		this.rootElem.innerHTML = `
-		<table class="metrics-table tablesorter">
-			<thead class="metrics-table-header">
-				<tr class="metrics-table-header-row">
-					<th class="metrics-table-header-cell"><span>Name</span></th>
-					<th class="metrics-table-header-cell"><span>Uptime</span></th>
-				</tr>
-			</thead>
-			<tbody class="metrics-table-body">
-			</tbody>
-		</table>
-		`;
-
-		this.tableElem = this.rootElem.getElementsByClassName('metrics-table')[0] as HTMLTableSectionElement;
-		this.bodyElem = this.rootElem.getElementsByClassName('metrics-table-body')[0] as HTMLTableSectionElement;
-
-		const headerElems = Array.from(this.tableElem.querySelectorAll('th'));
-
-		// Uptime
-		tippy(headerElems[1], {
-			'content': 'Uptime / Encounter Duration',
-			'allowHTML': true,
-		});
-
-		$(this.tableElem).tablesorter({ sortList: [[1, 1]] });
 	}
 
-	onSimResult(resultData: SimResultData) {
-		this.bodyElem.textContent = '';
+	getGroupedMetrics(resultData: SimResultData): Array<Array<AuraMetrics>> {
+		if (this.useDebuffs) {
+			return AuraMetrics.groupById(resultData.result.getDebuffMetrics(resultData.filter));
+		} else {
+			const players = resultData.result.getPlayers(resultData.filter);
+			if (players.length != 1) {
+				return [];
+			}
+			const player = players[0];
 
-		const auraMetrics = this.useDebuffs
-				? resultData.result.getDebuffMetrics(resultData.filter)
-				: resultData.result.getBuffMetrics(resultData.filter);
+			const auras = player.auras;
+			const actionGroups = AuraMetrics.groupById(auras);
+			const petGroups = player.pets.map(pet => pet.auras);
 
-		auraMetrics.forEach(auraMetric => {
-			const rowElem = document.createElement('tr');
-			this.bodyElem.appendChild(rowElem);
+			return actionGroups.concat(petGroups);
+		}
+	}
 
-			const nameCellElem = document.createElement('td');
-			rowElem.appendChild(nameCellElem);
-			nameCellElem.innerHTML = `
-			<a class="metrics-action-icon"></a>
-			<span class="metrics-action-name">${auraMetric.name}</span>
-			`;
+	mergeMetrics(metrics: Array<AuraMetrics>): AuraMetrics {
+		return AuraMetrics.merge(metrics, true, metrics[0].player?.petActionId || undefined);
+	}
 
-			const iconElem = nameCellElem.getElementsByClassName('metrics-action-icon')[0] as HTMLAnchorElement;
-			auraMetric.actionId.setBackgroundAndHref(iconElem);
-
-			const addCell = (value: string | number): HTMLElement => {
-				const cellElem = document.createElement('td');
-				cellElem.textContent = String(value);
-				rowElem.appendChild(cellElem);
-				return cellElem;
-			};
-
-			addCell(auraMetric.uptimePercent.toFixed(2) + '%'); // Uptime
-		});
-
-		$(this.tableElem).trigger('update');
+	shouldCollapse(metric: AuraMetrics): boolean {
+		return !metric.player?.isPet;
 	}
 }

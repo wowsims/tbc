@@ -1,7 +1,5 @@
 @import "../core/shared";
 @import "../core/sim_ui";
-@import "cast_metrics";
-@import "aura_metrics";
 @import "dps_histogram";
 @import "dps_result";
 @import "percent_oom";
@@ -14,6 +12,7 @@
 body {
 	background-color: transparent;
 	overflow: auto;
+	max-height: 100%;
 }
 body.new-tab {
 	background-image:
