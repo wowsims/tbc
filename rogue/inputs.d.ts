@@ -23,6 +23,7 @@ export declare const RogueRotationConfig: {
             getValue: (player: Player<Spec.SpecRogue>) => Builder;
             setValue: (eventID: EventID, player: Player<Spec.SpecRogue>, newValue: number) => void;
             labelTooltip?: undefined;
+            enableWhen?: undefined;
         };
     } | {
         type: "boolean";
@@ -34,6 +35,20 @@ export declare const RogueRotationConfig: {
             changedEvent: (player: Player<Spec.SpecRogue>) => TypedEvent<void>;
             getValue: (player: Player<Spec.SpecRogue>) => boolean;
             setValue: (eventID: EventID, player: Player<Spec.SpecRogue>, newValue: boolean) => void;
+            values?: undefined;
+            enableWhen?: undefined;
+        };
+    } | {
+        type: "boolean";
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            changedEvent: (player: Player<Spec.SpecRogue>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecRogue>) => boolean;
+            setValue: (eventID: EventID, player: Player<Spec.SpecRogue>, newValue: boolean) => void;
+            enableWhen: (player: Player<Spec.SpecRogue>) => boolean;
             values?: undefined;
         };
     } | {
@@ -47,6 +62,7 @@ export declare const RogueRotationConfig: {
             getValue: (player: Player<Spec.SpecRogue>) => number;
             setValue: (eventID: EventID, player: Player<Spec.SpecRogue>, newValue: number) => void;
             values?: undefined;
+            enableWhen?: undefined;
         };
     })[];
 };

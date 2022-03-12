@@ -239,6 +239,12 @@ export interface Rogue_Rotation {
      */
     useRupture: boolean;
     /**
+     * Shiv instead of regular builder if deadly poison is about to fall.
+     *
+     * @generated from protobuf field: bool use_shiv = 5;
+     */
+    useShiv: boolean;
+    /**
      * Don't use damage finishers (eviscerate, rupture) unless >= this many CPs.
      *
      * @generated from protobuf field: int32 min_combo_points_for_damage_finisher = 4;

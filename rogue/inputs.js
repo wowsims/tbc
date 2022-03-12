@@ -1,3 +1,5 @@
+import { WeaponImbue } from '/tbc/core/proto/common.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Rogue_Rotation_Builder as Builder, } from '/tbc/core/proto/rogue.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
@@ -55,6 +57,22 @@ export const RogueRotationConfig = {
                     newRotation.useRupture = newValue;
                     player.setRotation(eventID, newRotation);
                 },
+            },
+        },
+        {
+            type: 'boolean', cssClass: 'use-shiv-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Use Shiv',
+                labelTooltip: 'Uses Shiv in place of the selected builder if Deadly Poison is about to expire. Requires Deadly Poison in the off-hand.',
+                changedEvent: (player) => TypedEvent.onAny([player.rotationChangeEmitter, player.consumesChangeEmitter]),
+                getValue: (player) => player.getRotation().useShiv,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.useShiv = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+                enableWhen: (player) => player.getConsumes().offHandImbue == WeaponImbue.WeaponImbueRogueDeadlyPoison,
             },
         },
         {

@@ -11,6 +11,7 @@ import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { Conjured } from '/tbc/core/proto/common.js';
+import { Drums } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
@@ -86,23 +87,30 @@ export class RogueSimUI extends IndividualSimUI {
                 }),
                 partyBuffs: PartyBuffs.create({
                     bloodlust: 1,
+                    drums: Drums.DrumsOfBattle,
                     graceOfAirTotem: TristateEffect.TristateEffectImproved,
                     strengthOfEarthTotem: StrengthOfEarthType.EnhancingTotems,
                     windfuryTotemRank: 5,
+                    windfuryTotemIwt: 2,
                     battleShout: TristateEffect.TristateEffectImproved,
                     leaderOfThePack: TristateEffect.TristateEffectImproved,
                 }),
                 individualBuffs: IndividualBuffs.create({
                     blessingOfKings: true,
                     blessingOfMight: TristateEffect.TristateEffectImproved,
+                    unleashedRage: true,
                 }),
                 debuffs: Debuffs.create({
+                    bloodFrenzy: true,
                     mangle: true,
                     sunderArmor: true,
                     curseOfRecklessness: true,
                     faerieFire: TristateEffect.TristateEffectImproved,
                     improvedSealOfTheCrusader: true,
                     misery: true,
+                    huntersMark: TristateEffect.TristateEffectImproved,
+                    exposeWeaknessUptime: 0.8,
+                    exposeWeaknessHunterAgility: 800,
                 }),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
@@ -114,15 +122,15 @@ export class RogueSimUI extends IndividualSimUI {
             partyBuffInputs: [
                 IconInputs.DrumsOfBattleBuff,
                 IconInputs.Bloodlust,
+                IconInputs.StrengthOfEarthTotem,
                 IconInputs.GraceOfAirTotem,
                 IconInputs.WindfuryTotem,
-                IconInputs.StrengthOfEarthTotem,
                 IconInputs.BattleShout,
-                IconInputs.DraeneiRacialMelee,
                 IconInputs.LeaderOfThePack,
                 IconInputs.FerociousInspiration,
                 IconInputs.TrueshotAura,
                 IconInputs.SanctityAura,
+                IconInputs.DraeneiRacialMelee,
                 IconInputs.BraidedEterniumChain,
             ],
             playerBuffInputs: [

@@ -470,11 +470,12 @@ class Rogue_Rotation$Type extends MessageType {
             { no: 3, name: "builder", kind: "enum", T: () => ["proto.Rogue.Rotation.Builder", Rogue_Rotation_Builder] },
             { no: 1, name: "maintain_expose_armor", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "use_rupture", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "use_shiv", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "min_combo_points_for_damage_finisher", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { builder: 0, maintainExposeArmor: false, useRupture: false, minComboPointsForDamageFinisher: 0 };
+        const message = { builder: 0, maintainExposeArmor: false, useRupture: false, useShiv: false, minComboPointsForDamageFinisher: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -493,6 +494,9 @@ class Rogue_Rotation$Type extends MessageType {
                     break;
                 case /* bool use_rupture */ 2:
                     message.useRupture = reader.bool();
+                    break;
+                case /* bool use_shiv */ 5:
+                    message.useShiv = reader.bool();
                     break;
                 case /* int32 min_combo_points_for_damage_finisher */ 4:
                     message.minComboPointsForDamageFinisher = reader.int32();
@@ -518,6 +522,9 @@ class Rogue_Rotation$Type extends MessageType {
         /* bool use_rupture = 2; */
         if (message.useRupture !== false)
             writer.tag(2, WireType.Varint).bool(message.useRupture);
+        /* bool use_shiv = 5; */
+        if (message.useShiv !== false)
+            writer.tag(5, WireType.Varint).bool(message.useShiv);
         /* int32 min_combo_points_for_damage_finisher = 4; */
         if (message.minComboPointsForDamageFinisher !== 0)
             writer.tag(4, WireType.Varint).int32(message.minComboPointsForDamageFinisher);
