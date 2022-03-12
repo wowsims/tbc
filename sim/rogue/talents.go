@@ -354,6 +354,11 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 	bladeFlurryAura := core.Aura{
 		ID:       BladeFlurryAuraID,
 		ActionID: actionID,
+		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
+			if sim.GetNumTargets() > 1 {
+				spellEffect.DamageMultiplier *= 2
+			}
+		},
 		OnExpire: func(sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
 		},

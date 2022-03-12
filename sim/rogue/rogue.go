@@ -277,7 +277,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		}
 	}
 
-	if rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueDeadlyPoison {
+	if rogue.Rotation.UseShiv && rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueDeadlyPoison {
 		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 			if rogue.deadlyPoison.Effect.DotInput.IsTicking(sim) && rogue.deadlyPoison.Effect.DotInput.TimeRemaining(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.shivEnergyCost {
 				return rogue.NewShiv(sim, target)
