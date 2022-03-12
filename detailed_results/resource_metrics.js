@@ -1,110 +1,90 @@
+import { ResourceMetrics } from '/tbc/core/proto_utils/sim_result.js';
 import { ResourceType } from '/tbc/core/proto/api.js';
 import { resourceNames } from '/tbc/core/proto_utils/names.js';
 import { getEnumValues } from '/tbc/core/utils.js';
+import { ColumnSortType, MetricsTable } from './metrics_table.js';
 import { ResultComponent } from './result_component.js';
-export class ResourceMetrics extends ResultComponent {
+export class ResourceMetricsTable extends ResultComponent {
     constructor(config) {
         config.rootCssClass = 'resource-metrics-root';
         super(config);
         const resourceTypes = getEnumValues(ResourceType).filter(val => val != ResourceType.ResourceTypeNone);
         resourceTypes.forEach(resourceType => {
+            const containerElem = document.createElement('div');
+            containerElem.classList.add('resource-metrics-table-container', 'hide');
+            containerElem.innerHTML = `<span class="resource-metrics-table-title">${resourceNames[resourceType]}</span>`;
+            this.rootElem.appendChild(containerElem);
             const childConfig = config;
-            childConfig.parent = this.rootElem;
-            new ResourceMetricsTable(childConfig, resourceType);
+            childConfig.parent = containerElem;
+            const table = new TypedResourceMetricsTable(childConfig, resourceType);
+            table.onUpdate.on(() => {
+                if (table.rootElem.classList.contains('hide')) {
+                    containerElem.classList.add('hide');
+                }
+                else {
+                    containerElem.classList.remove('hide');
+                }
+            });
         });
     }
     onSimResult(resultData) {
     }
 }
-export class ResourceMetricsTable extends ResultComponent {
+export class TypedResourceMetricsTable extends MetricsTable {
     constructor(config, resourceType) {
         config.rootCssClass = 'resource-metrics-table-root';
-        super(config);
+        super(config, [
+            MetricsTable.nameCellConfig((metric) => {
+                return {
+                    name: metric.name,
+                    actionId: metric.actionId,
+                };
+            }),
+            {
+                name: 'Casts',
+                tooltip: 'Casts',
+                getValue: (metric) => metric.events,
+                getDisplayString: (metric) => metric.events.toFixed(1),
+            },
+            {
+                name: 'Gain',
+                tooltip: 'Gain',
+                sort: ColumnSortType.Descending,
+                getValue: (metric) => metric.gain,
+                getDisplayString: (metric) => metric.gain.toFixed(1),
+            },
+            {
+                name: 'Gain / s',
+                tooltip: 'Gain / Second',
+                getValue: (metric) => metric.gainPerSecond,
+                getDisplayString: (metric) => metric.gainPerSecond.toFixed(1),
+            },
+            {
+                name: 'Avg Gain',
+                tooltip: 'Gain / Event',
+                getValue: (metric) => metric.avgGain,
+                getDisplayString: (metric) => metric.avgGain.toFixed(1),
+            },
+            {
+                name: 'Avg Actual Gain',
+                tooltip: 'Actual Gain / Event',
+                getValue: (metric) => metric.avgActualGain,
+                getDisplayString: (metric) => metric.avgActualGain.toFixed(1),
+            },
+        ]);
         this.resourceType = resourceType;
-        this.rootElem.innerHTML = `
-		<div class="resource-metrics-table-container">
-			<span class="resource-metrics-table-title">${resourceNames[this.resourceType]}</span>
-			<table class="metrics-table tablesorter">
-				<thead class="metrics-table-header">
-					<tr class="metrics-table-header-row">
-						<th class="metrics-table-header-cell"><span>Name</span></th>
-						<th class="metrics-table-header-cell"><span>Casts</span></th>
-						<th class="metrics-table-header-cell"><span>Gain</span></th>
-						<th class="metrics-table-header-cell"><span>Gain / s</span></th>
-						<th class="metrics-table-header-cell"><span>Avg Gain</span></th>
-						<th class="metrics-table-header-cell"><span>Avg Actual Gain</span></th>
-					</tr>
-				</thead>
-				<tbody class="metrics-table-body">
-				</tbody>
-			</table>
-		</div>
-		`;
-        this.tableElem = this.rootElem.getElementsByClassName('metrics-table')[0];
-        this.bodyElem = this.rootElem.getElementsByClassName('metrics-table-body')[0];
-        const headerElems = Array.from(this.tableElem.querySelectorAll('th'));
-        // Casts
-        tippy(headerElems[1], {
-            'content': 'Casts',
-            'allowHTML': true,
-        });
-        // GPS
-        tippy(headerElems[2], {
-            'content': 'Gain',
-            'allowHTML': true,
-        });
-        // GPS
-        tippy(headerElems[3], {
-            'content': 'Gain / Second',
-            'allowHTML': true,
-        });
-        // Avg Gain
-        tippy(headerElems[4], {
-            'content': 'Gain / Event',
-            'allowHTML': true,
-        });
-        // Avg Actual Gain
-        tippy(headerElems[5], {
-            'content': 'Actual Gain / Event',
-            'allowHTML': true,
-        });
-        $(this.tableElem).tablesorter({
-            sortList: [[2, 1]],
-            cssChildRow: 'child-metric',
-        });
     }
-    onSimResult(resultData) {
-        this.bodyElem.textContent = '';
-        const resourceMetrics = resultData.result.getResourceMetrics(resultData.filter, this.resourceType);
-        if (resourceMetrics.length == 0) {
-            this.rootElem.classList.add('hide');
+    getGroupedMetrics(resultData) {
+        const players = resultData.result.getPlayers(resultData.filter);
+        if (players.length != 1) {
+            return [];
         }
-        else {
-            this.rootElem.classList.remove('hide');
-        }
-        resourceMetrics.forEach(resourceMetric => {
-            const rowElem = document.createElement('tr');
-            this.bodyElem.appendChild(rowElem);
-            const nameCellElem = document.createElement('td');
-            rowElem.appendChild(nameCellElem);
-            nameCellElem.innerHTML = `
-			<a class="metrics-action-icon"></a>
-			<span class="metrics-action-name">${resourceMetric.name}</span>
-			`;
-            const iconElem = nameCellElem.getElementsByClassName('metrics-action-icon')[0];
-            resourceMetric.actionId.setBackgroundAndHref(iconElem);
-            const addCell = (value) => {
-                const cellElem = document.createElement('td');
-                cellElem.textContent = String(value);
-                rowElem.appendChild(cellElem);
-                return cellElem;
-            };
-            addCell(resourceMetric.events.toFixed(1)); // Casts
-            addCell(resourceMetric.gain.toFixed(1)); // GPS
-            addCell(resourceMetric.gainPerSecond.toFixed(1)); // GPS
-            addCell(resourceMetric.avgGain.toFixed(1)); // Avg Gain
-            addCell(resourceMetric.avgActualGain.toFixed(1)); // Avg Actual Gain
-        });
-        $(this.tableElem).trigger('update');
+        const player = players[0];
+        const resources = player.getResourceMetrics(this.resourceType);
+        const resourceGroups = ResourceMetrics.groupById(resources);
+        return resourceGroups;
+    }
+    mergeMetrics(metrics) {
+        return ResourceMetrics.merge(metrics, true, metrics[0].player?.petActionId || undefined);
     }
 }

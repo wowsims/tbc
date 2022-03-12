@@ -74,7 +74,7 @@ export declare class PlayerMetrics {
     readonly raidIndex: number;
     readonly name: string;
     readonly spec: Spec;
-    readonly isPet: boolean;
+    readonly petActionId: ActionId | null;
     readonly iconUrl: string;
     readonly classColor: string;
     readonly dps: DistributionMetricsProto;
@@ -94,11 +94,13 @@ export declare class PlayerMetrics {
     readonly majorCooldownAuraUptimeLogs: Array<AuraUptimeLog>;
     private constructor();
     get label(): string;
+    get isPet(): boolean;
     get secondsOomAvg(): number;
     get totalDamage(): number;
     getPlayerAndPetActions(): Array<ActionMetrics>;
     getMeleeActions(): Array<ActionMetrics>;
     getSpellActions(): Array<ActionMetrics>;
+    getResourceMetrics(resourceType: ResourceType): Array<ResourceMetrics>;
     static makeNew(resultData: SimResultData, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<PlayerMetrics>;
 }
 export declare class EncounterMetrics {
@@ -120,6 +122,7 @@ export declare class TargetMetrics {
     static makeNew(resultData: SimResultData, target: TargetProto, metrics: TargetMetricsProto, index: number, logs: Array<SimLog>): Promise<TargetMetrics>;
 }
 export declare class AuraMetrics {
+    player: PlayerMetrics | null;
     readonly actionId: ActionId;
     readonly name: string;
     readonly iconUrl: string;
@@ -129,11 +132,13 @@ export declare class AuraMetrics {
     private readonly data;
     private constructor();
     get uptimePercent(): number;
-    static makeNew(resultData: SimResultData, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics>;
-    static merge(auras: Array<AuraMetrics>): AuraMetrics;
-    static joinById(auras: Array<AuraMetrics>): Array<AuraMetrics>;
+    static makeNew(player: PlayerMetrics | null, resultData: SimResultData, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics>;
+    static merge(auras: Array<AuraMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): AuraMetrics;
+    static groupById(auras: Array<AuraMetrics>, useTag?: boolean): Array<Array<AuraMetrics>>;
+    static joinById(auras: Array<AuraMetrics>, useTag?: boolean): Array<AuraMetrics>;
 }
 export declare class ResourceMetrics {
+    player: PlayerMetrics | null;
     readonly actionId: ActionId;
     readonly name: string;
     readonly iconUrl: string;
@@ -148,11 +153,13 @@ export declare class ResourceMetrics {
     get gainPerSecond(): number;
     get avgGain(): number;
     get avgActualGain(): number;
-    static makeNew(resultData: SimResultData, resourceMetrics: ResourceMetricsProto, playerIndex?: number): Promise<ResourceMetrics>;
-    static merge(resources: Array<ResourceMetrics>): ResourceMetrics;
-    static joinById(resources: Array<ResourceMetrics>): Array<ResourceMetrics>;
+    static makeNew(player: PlayerMetrics | null, resultData: SimResultData, resourceMetrics: ResourceMetricsProto, playerIndex?: number): Promise<ResourceMetrics>;
+    static merge(resources: Array<ResourceMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ResourceMetrics;
+    static groupById(resources: Array<ResourceMetrics>, useTag?: boolean): Array<Array<ResourceMetrics>>;
+    static joinById(resources: Array<ResourceMetrics>, useTag?: boolean): Array<ResourceMetrics>;
 }
 export declare class ActionMetrics {
+    player: PlayerMetrics | null;
     readonly actionId: ActionId;
     readonly name: string;
     readonly iconUrl: string;
@@ -183,9 +190,9 @@ export declare class ActionMetrics {
     get blockPercent(): number;
     get glances(): number;
     get glancePercent(): number;
-    static makeNew(resultData: SimResultData, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics>;
+    static makeNew(player: PlayerMetrics | null, resultData: SimResultData, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics>;
     static merge(actions: Array<ActionMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ActionMetrics;
-    static joinById(actions: Array<ActionMetrics>): Array<ActionMetrics>;
-    static groupById(actions: Array<ActionMetrics>): Array<Array<ActionMetrics>>;
+    static groupById(actions: Array<ActionMetrics>, useTag?: boolean): Array<Array<ActionMetrics>>;
+    static joinById(actions: Array<ActionMetrics>, useTag?: boolean): Array<ActionMetrics>;
 }
 export {};

@@ -1,12 +1,12 @@
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { ResultsFilter } from './results_filter.js';
-import { CastMetrics } from './cast_metrics.js';
-import { MeleeMetrics } from './melee_metrics.js';
-import { SpellMetrics } from './spell_metrics.js';
-import { ResourceMetrics } from './resource_metrics.js';
-import { PlayerDamageMetrics } from './player_damage.js';
-import { AuraMetrics } from './aura_metrics.js';
+import { CastMetricsTable } from './cast_metrics.js';
+import { MeleeMetricsTable } from './melee_metrics.js';
+import { SpellMetricsTable } from './spell_metrics.js';
+import { ResourceMetricsTable } from './resource_metrics.js';
+import { PlayerDamageMetricsTable } from './player_damage.js';
+import { AuraMetricsTable } from './aura_metrics.js';
 import { DpsHistogram } from './dps_histogram.js';
 import { DpsResult } from './dps_result.js';
 import { PercentOom } from './percent_oom.js';
@@ -118,17 +118,17 @@ const resultsFilter = new ResultsFilter({
 const toplineResultsDiv = document.body.getElementsByClassName('topline-results')[0];
 const dpsResult = new DpsResult({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const percentOom = new PercentOom({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-const castMetrics = new CastMetrics({ parent: document.body.getElementsByClassName('cast-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-const meleeMetrics = new MeleeMetrics({ parent: document.body.getElementsByClassName('melee-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-const spellMetrics = new SpellMetrics({ parent: document.body.getElementsByClassName('spell-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-const resourceMetrics = new ResourceMetrics({ parent: document.body.getElementsByClassName('resource-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-const playerDamageMetrics = new PlayerDamageMetrics({ parent: document.body.getElementsByClassName('player-damage-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings }, resultsFilter);
-const buffAuraMetrics = new AuraMetrics({
+const castMetrics = new CastMetricsTable({ parent: document.body.getElementsByClassName('cast-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const meleeMetrics = new MeleeMetricsTable({ parent: document.body.getElementsByClassName('melee-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const spellMetrics = new SpellMetricsTable({ parent: document.body.getElementsByClassName('spell-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const resourceMetrics = new ResourceMetricsTable({ parent: document.body.getElementsByClassName('resource-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const playerDamageMetrics = new PlayerDamageMetricsTable({ parent: document.body.getElementsByClassName('player-damage-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings }, resultsFilter);
+const buffAuraMetrics = new AuraMetricsTable({
     parent: document.body.getElementsByClassName('buff-aura-metrics')[0],
     resultsEmitter: resultsEmitter,
     colorSettings: colorSettings,
 }, false);
-const debuffAuraMetrics = new AuraMetrics({
+const debuffAuraMetrics = new AuraMetricsTable({
     parent: document.body.getElementsByClassName('debuff-aura-metrics')[0],
     resultsEmitter: resultsEmitter,
     colorSettings: colorSettings,
