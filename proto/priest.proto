@@ -27,6 +27,7 @@ message PriestTalents {
 		int32 searing_light = 15;
 		int32 spiritual_guidance = 16;
 		int32 surge_of_light = 17;
+		bool spirit_of_redemption = 33;
 
 		// Shadow
 		int32 shadow_affinity = 32;

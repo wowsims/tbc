@@ -41,11 +41,9 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 				},
 			},
 			DirectInput: core.DirectDamageInput{
-				// MinBaseDamage: 295,
-				// MaxBaseDamage: 325,
-				SpellCoefficient: 0.7,
-				MinBaseDamage:    paladin.GetMHWeapon().WeaponDamageMin,
-				MaxBaseDamage:    paladin.GetMHWeapon().WeaponDamageMax,
+				MinBaseDamage:    295,
+				MaxBaseDamage:    325,
+				SpellCoefficient: 0.429,
 			},
 		},
 	}
@@ -91,7 +89,6 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 			Cast: core.Cast{
 				ActionID:            JudgementOfTheCrusaderActionID,
 				Character:           &paladin.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolHoly,
 				SpellExtras:         core.SpellExtrasAlwaysHits,
