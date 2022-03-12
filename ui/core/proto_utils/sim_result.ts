@@ -243,7 +243,7 @@ export class PlayerMetrics {
 	readonly raidIndex: number;
 	readonly name: string;
 	readonly spec: Spec;
-	readonly isPet: boolean;
+	readonly petActionId: ActionId | null;
 	readonly iconUrl: string;
 	readonly classColor: string;
 	readonly dps: DistributionMetricsProto;
@@ -268,7 +268,7 @@ export class PlayerMetrics {
 
 	private constructor(
 			player: PlayerProto,
-			isPet: boolean,
+			petActionId: ActionId | null,
 			metrics: PlayerMetricsProto,
 			raidIndex: number,
 			actions: Array<ActionMetrics>,
@@ -283,7 +283,7 @@ export class PlayerMetrics {
 		this.raidIndex = raidIndex;
 		this.name = metrics.name;
 		this.spec = playerToSpec(player);
-		this.isPet = isPet;
+		this.petActionId = petActionId;
 		this.iconUrl = getTalentTreeIcon(this.spec, player.talentsString);
 		this.classColor = classColors[specToClass[this.spec]];
 		this.dps = this.metrics.dps!;
@@ -313,6 +313,10 @@ export class PlayerMetrics {
 		return `${this.name} (#${this.raidIndex + 1})`;
 	}
 
+	get isPet() {
+		return this.petActionId != null;
+	}
+
 	get secondsOomAvg() {
 		return this.metrics.secondsOomAvg
 	}
@@ -333,19 +337,34 @@ export class PlayerMetrics {
 		return this.actions.filter(e => e.hitAttempts != 0 && !e.isMeleeAction)
 	}
 
+	getResourceMetrics(resourceType: ResourceType): Array<ResourceMetrics> {
+		return this.resources.filter(resource => resource.type == resourceType);
+	}
+
 	static async makeNew(resultData: SimResultData, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<PlayerMetrics> {
 		const playerLogs = logs.filter(log => log.source && (!log.source.isTarget && (isPet == log.source.isPet) && log.source.index == raidIndex));
 
-		const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(resultData, actionMetrics, raidIndex)));
-		const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(resultData, auraMetrics, raidIndex)));
-		const resourcesPromise = Promise.all(metrics.resources.map(resourceMetrics => ResourceMetrics.makeNew(resultData, resourceMetrics, raidIndex)));
+		const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(null, resultData, actionMetrics, raidIndex)));
+		const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(null, resultData, auraMetrics, raidIndex)));
+		const resourcesPromise = Promise.all(metrics.resources.map(resourceMetrics => ResourceMetrics.makeNew(null, resultData, resourceMetrics, raidIndex)));
 		const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(resultData, player, petMetrics, raidIndex, true, playerLogs)));
+
+		let petIdPromise: Promise<ActionId | null> = Promise.resolve(null);
+		if (isPet) {
+			petIdPromise = ActionId.fromPetName(metrics.name).fill(raidIndex);
+		}
 
 		const actions = await actionsPromise;
 		const auras = await aurasPromise;
 		const resources = await resourcesPromise;
 		const pets = await petsPromise;
-		return new PlayerMetrics(player, isPet, metrics, raidIndex, actions, auras, resources, pets, playerLogs, resultData);
+		const petActionId = await petIdPromise;
+
+		const playerMetrics = new PlayerMetrics(player, petActionId, metrics, raidIndex, actions, auras, resources, pets, playerLogs, resultData);
+		actions.forEach(action => action.player = playerMetrics);
+		auras.forEach(aura => aura.player = playerMetrics);
+		resources.forEach(resource => resource.player = playerMetrics);
+		return playerMetrics;
 	}
 }
 
@@ -403,12 +422,13 @@ export class TargetMetrics {
 
 	static async makeNew(resultData: SimResultData, target: TargetProto, metrics: TargetMetricsProto, index: number, logs: Array<SimLog>): Promise<TargetMetrics> {
 		const targetLogs = logs.filter(log => log.source && (log.source.isTarget && log.source.index == index));
-		const auras = await Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(resultData, auraMetrics)));
+		const auras = await Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(null, resultData, auraMetrics)));
 		return new TargetMetrics(target, metrics, index, auras, targetLogs, resultData);
 	}
 }
 
 export class AuraMetrics {
+	player: PlayerMetrics | null;
 	readonly actionId: ActionId;
 	readonly name: string;
 	readonly iconUrl: string;
@@ -417,7 +437,8 @@ export class AuraMetrics {
 	private readonly duration: number;
 	private readonly data: AuraMetricsProto;
 
-	private constructor(actionId: ActionId, data: AuraMetricsProto, resultData: SimResultData) {
+	private constructor(player: PlayerMetrics | null, actionId: ActionId, data: AuraMetricsProto, resultData: SimResultData) {
+		this.player = player;
 		this.actionId = actionId;
 		this.name = actionId.name;
 		this.iconUrl = actionId.iconUrl;
@@ -431,30 +452,46 @@ export class AuraMetrics {
 		return this.data.uptimeSecondsAvg / this.duration * 100;
 	}
 
-	static async makeNew(resultData: SimResultData, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics> {
+	static async makeNew(player: PlayerMetrics | null, resultData: SimResultData, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics> {
 		const actionId = await ActionId.fromProto(auraMetrics.id!).fill(playerIndex);
-		return new AuraMetrics(actionId, auraMetrics, resultData);
+		return new AuraMetrics(player, actionId, auraMetrics, resultData);
 	}
 
 	// Merges an array of metrics into a single metrics.
-	static merge(auras: Array<AuraMetrics>): AuraMetrics {
+	static merge(auras: Array<AuraMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): AuraMetrics {
 		const firstAura = auras[0];
+		const player = auras.every(aura => aura.player == firstAura.player) ? firstAura.player : null;
+		let actionId = actionIdOverride || firstAura.actionId;
+		if (removeTag) {
+			actionId = actionId.withoutTag();
+		}
 		return new AuraMetrics(
-				firstAura.actionId,
+				player,
+				actionId,
 				AuraMetricsProto.create({
 					uptimeSecondsAvg: Math.max(...auras.map(a => a.data.uptimeSecondsAvg)),
 				}),
 				firstAura.resultData);
 	}
 
+	// Groups similar metrics, i.e. metrics with the same item/spell/other ID but
+	// different tags, and returns them as separate arrays.
+	static groupById(auras: Array<AuraMetrics>, useTag?: boolean): Array<Array<AuraMetrics>> {
+		if (useTag) {
+			return Object.values(bucket(auras, aura => aura.actionId.toString()));
+		} else {
+			return Object.values(bucket(auras, aura => aura.actionId.toStringIgnoringTag()));
+		}
+	}
+
 	// Merges aura metrics that have the same name/ID, adding their stats together.
-	static joinById(auras: Array<AuraMetrics>): Array<AuraMetrics> {
-		const joinedById = bucket(auras, aura => aura.actionId.toString());
-		return Object.values(joinedById).map(aurasToJoin => AuraMetrics.merge(aurasToJoin));
+	static joinById(auras: Array<AuraMetrics>, useTag?: boolean): Array<AuraMetrics> {
+		return AuraMetrics.groupById(auras, useTag).map(aurasToJoin => AuraMetrics.merge(aurasToJoin));
 	}
 };
 
 export class ResourceMetrics {
+	player: PlayerMetrics | null;
 	readonly actionId: ActionId;
 	readonly name: string;
 	readonly iconUrl: string;
@@ -464,7 +501,8 @@ export class ResourceMetrics {
 	private readonly duration: number;
 	private readonly data: ResourceMetricsProto;
 
-	private constructor(actionId: ActionId, data: ResourceMetricsProto, resultData: SimResultData) {
+	private constructor(player: PlayerMetrics | null, actionId: ActionId, data: ResourceMetricsProto, resultData: SimResultData) {
+		this.player = player;
 		this.actionId = actionId;
 		this.name = actionId.name;
 		this.iconUrl = actionId.iconUrl;
@@ -495,16 +533,22 @@ export class ResourceMetrics {
 		return this.data.actualGain / this.data.events;
 	}
 
-	static async makeNew(resultData: SimResultData, resourceMetrics: ResourceMetricsProto, playerIndex?: number): Promise<ResourceMetrics> {
+	static async makeNew(player: PlayerMetrics | null, resultData: SimResultData, resourceMetrics: ResourceMetricsProto, playerIndex?: number): Promise<ResourceMetrics> {
 		const actionId = await ActionId.fromProto(resourceMetrics.id!).fill(playerIndex);
-		return new ResourceMetrics(actionId, resourceMetrics, resultData);
+		return new ResourceMetrics(player, actionId, resourceMetrics, resultData);
 	}
 
 	// Merges an array of metrics into a single metrics.
-	static merge(resources: Array<ResourceMetrics>): ResourceMetrics {
+	static merge(resources: Array<ResourceMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ResourceMetrics {
 		const firstResource = resources[0];
+		const player = resources.every(resource => resource.player == firstResource.player) ? firstResource.player : null;
+		let actionId = actionIdOverride || firstResource.actionId;
+		if (removeTag) {
+			actionId = actionId.withoutTag();
+		}
 		return new ResourceMetrics(
-				firstResource.actionId,
+				player,
+				actionId,
 				ResourceMetricsProto.create({
 					events: sum(resources.map(a => a.data.events)),
 					gain: sum(resources.map(a => a.data.gain)),
@@ -513,15 +557,25 @@ export class ResourceMetrics {
 				firstResource.resultData);
 	}
 
-	// Merges aura metrics that have the same name/ID, adding their stats together.
-	static joinById(resources: Array<ResourceMetrics>): Array<ResourceMetrics> {
-		const joinedById = bucket(resources, aura => aura.actionId.toString());
-		return Object.values(joinedById).map(resourcesToJoin => ResourceMetrics.merge(resourcesToJoin));
+	// Groups similar metrics, i.e. metrics with the same item/spell/other ID but
+	// different tags, and returns them as separate arrays.
+	static groupById(resources: Array<ResourceMetrics>, useTag?: boolean): Array<Array<ResourceMetrics>> {
+		if (useTag) {
+			return Object.values(bucket(resources, resource => resource.actionId.toString()));
+		} else {
+			return Object.values(bucket(resources, resource => resource.actionId.toStringIgnoringTag()));
+		}
+	}
+
+	// Merges resource metrics that have the same name/ID, adding their stats together.
+	static joinById(resources: Array<ResourceMetrics>, useTag?: boolean): Array<ResourceMetrics> {
+		return ResourceMetrics.groupById(resources, useTag).map(resourcesToJoin => ResourceMetrics.merge(resourcesToJoin));
 	}
 };
 
 // Manages the metrics for a single player action (e.g. Lightning Bolt).
 export class ActionMetrics {
+	player: PlayerMetrics | null;
 	readonly actionId: ActionId;
 	readonly name: string;
 	readonly iconUrl: string;
@@ -530,7 +584,8 @@ export class ActionMetrics {
 	private readonly duration: number;
 	private readonly data: ActionMetricsProto;
 
-	private constructor(actionId: ActionId, data: ActionMetricsProto, resultData: SimResultData) {
+	private constructor(player: PlayerMetrics | null, actionId: ActionId, data: ActionMetricsProto, resultData: SimResultData) {
+		this.player = player;
 		this.actionId = actionId;
 		this.name = actionId.name;
 		this.iconUrl = actionId.iconUrl;
@@ -641,19 +696,21 @@ export class ActionMetrics {
 		return (this.data.glances / this.hitAttempts) * 100;
 	}
 
-	static async makeNew(resultData: SimResultData, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics> {
+	static async makeNew(player: PlayerMetrics | null, resultData: SimResultData, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics> {
 		const actionId = await ActionId.fromProto(actionMetrics.id!).fill(playerIndex);
-		return new ActionMetrics(actionId, actionMetrics, resultData);
+		return new ActionMetrics(player, actionId, actionMetrics, resultData);
 	}
 
 	// Merges an array of metrics into a single metric.
 	static merge(actions: Array<ActionMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ActionMetrics {
 		const firstAction = actions[0];
+		const player = actions.every(action => action.player == firstAction.player) ? firstAction.player : null;
 		let actionId = actionIdOverride || firstAction.actionId;
 		if (removeTag) {
 			actionId = actionId.withoutTag();
 		}
 		return new ActionMetrics(
+				player,
 				actionId,
 				ActionMetricsProto.create({
 					isMelee: firstAction.isMeleeAction,
@@ -670,15 +727,18 @@ export class ActionMetrics {
 				firstAction.resultData);
 	}
 
-	// Merges action metrics that have the same name/ID, adding their stats together.
-	static joinById(actions: Array<ActionMetrics>): Array<ActionMetrics> {
-		const joinedById = bucket(actions, action => action.actionId.toString());
-		return Object.values(joinedById).map(actionsToJoin => ActionMetrics.merge(actionsToJoin));
-	}
-
 	// Groups similar metrics, i.e. metrics with the same item/spell/other ID but
 	// different tags, and returns them as separate arrays.
-	static groupById(actions: Array<ActionMetrics>): Array<Array<ActionMetrics>> {
-		return Object.values(bucket(actions, action => action.actionId.toStringIgnoringTag()));
+	static groupById(actions: Array<ActionMetrics>, useTag?: boolean): Array<Array<ActionMetrics>> {
+		if (useTag) {
+			return Object.values(bucket(actions, action => action.actionId.toString()));
+		} else {
+			return Object.values(bucket(actions, action => action.actionId.toStringIgnoringTag()));
+		}
+	}
+
+	// Merges action metrics that have the same name/ID, adding their stats together.
+	static joinById(actions: Array<ActionMetrics>, useTag?: boolean): Array<ActionMetrics> {
+		return ActionMetrics.groupById(actions, useTag).map(actionsToJoin => ActionMetrics.merge(actionsToJoin));
 	}
 }
