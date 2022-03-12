@@ -44,7 +44,7 @@ func (priest *Priest) applyTalents() {
 			},
 		})
 	}
-	
+
 	if priest.Talents.Enlightenment > 0 {
 		coeff := 0.01 * float64(priest.Talents.Enlightenment)
 		priest.AddStatDependency(stats.StatDependency{
@@ -54,7 +54,7 @@ func (priest *Priest) applyTalents() {
 				return intellect + intellect*coeff
 			},
 		})
-		
+
 		priest.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Stamina,
 			ModifiedStat: stats.Stamina,
@@ -62,7 +62,7 @@ func (priest *Priest) applyTalents() {
 				return stamina + stamina*coeff
 			},
 		})
-		
+
 		priest.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Spirit,
 			ModifiedStat: stats.Spirit,
@@ -71,7 +71,7 @@ func (priest *Priest) applyTalents() {
 			},
 		})
 	}
-	
+
 	if priest.Talents.SpiritOfRedemption {
 		priest.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Spirit,

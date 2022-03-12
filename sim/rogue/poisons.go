@@ -123,7 +123,6 @@ func (rogue *Rogue) procDeadlyPoison(sim *core.Simulation, spellEffect *core.Spe
 		dp.Cast(sim)
 		rogue.deadlyPoisonStacks = 1
 	}
-
 }
 
 var InstantPoisonAuraID = core.NewAuraID()
