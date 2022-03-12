@@ -91,17 +91,23 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                     divineSpirit: TristateEffect.TristateEffectImproved,
                     giftOfTheWild: TristateEffect.TristateEffectImproved,
                 }),
-                partyBuffs: PartyBuffs.create({}),
+                partyBuffs: PartyBuffs.create({
+                    battleShout: TristateEffect.TristateEffectImproved,
+                    leaderOfThePack: TristateEffect.TristateEffectImproved,
+                }),
                 individualBuffs: IndividualBuffs.create({
                     blessingOfKings: true,
-                    blessingOfWisdom: 2,
-                    blessingOfMight: 2,
+                    blessingOfWisdom: TristateEffect.TristateEffectImproved,
+                    blessingOfMight: TristateEffect.TristateEffectImproved,
                 }),
                 debuffs: Debuffs.create({
-                    faerieFire: 2,
+                    faerieFire: TristateEffect.TristateEffectImproved,
+                    judgementOfWisdom: true,
                     improvedSealOfTheCrusader: true,
                     sunderArmor: true,
                     curseOfRecklessness: true,
+                    curseOfElements: TristateEffect.TristateEffectRegular,
+                    misery: true,
                 }),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
