@@ -18,10 +18,10 @@
   grid-template-columns: repeat(6, 1fr);
 }
 .rogue-sim-ui .buffs-section {
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(6, 1fr);
 }
 .rogue-sim-ui .debuffs-section {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 // Enhancement has a lot of EP stats, so make the text smaller so it fits vertically.

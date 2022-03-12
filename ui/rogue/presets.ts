@@ -48,6 +48,7 @@ export const DefaultRotation = RogueRotation.create({
 	builder: Builder.Auto,
 	maintainExposeArmor: true,
 	useRupture: true,
+	useShiv: true,
 	minComboPointsForDamageFinisher: 3,
 });
 
@@ -61,6 +62,8 @@ export const DefaultConsumes = Consumes.create({
 	food: Food.FoodGrilledMudfish,
 	mainHandImbue: WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
 	offHandImbue: WeaponImbue.WeaponImbueRogueDeadlyPoison,
+	scrollOfAgility: 5,
+	scrollOfStrength: 5,
 });
 
 export const P1_PRESET = {

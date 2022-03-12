@@ -70,6 +70,7 @@ var basicRotation = &proto.Rogue_Rotation{
 	Builder:             proto.Rogue_Rotation_Auto,
 	MaintainExposeArmor: true,
 	UseRupture:          true,
+	UseShiv:             true,
 
 	MinComboPointsForDamageFinisher: 3,
 }
