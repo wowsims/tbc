@@ -101,6 +101,7 @@ func (ddi *DotDamageInput) SetTickDamage(newDamage float64) {
 }
 
 // Restarts the dot with the same number of ticks / duration as it started with.
+// Note that this does NOT change nextTickTime.
 func (ddi *DotDamageInput) RefreshDot(sim *Simulation) {
 	ddi.endTime = sim.CurrentTime + time.Duration(ddi.NumberOfTicks)*ddi.TickLength
 	ddi.tickIndex = 0
