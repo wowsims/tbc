@@ -72,7 +72,7 @@ func (rogue *Rogue) newDeadlyPoisonRefreshTemplate(_ *core.Simulation) core.Simp
 					const tickDamagePerStack = 180.0 / 4.0
 					rogue.deadlyPoisonStacks = core.MinInt(rogue.deadlyPoisonStacks+1, 5)
 					rogue.deadlyPoison.Effect.DotInput.SetTickDamage(tickDamagePerStack * float64(rogue.deadlyPoisonStacks))
-					rogue.deadlyPoison.Effect.DotInput.RefreshDot()
+					rogue.deadlyPoison.Effect.DotInput.RefreshDot(sim)
 				},
 			},
 		},

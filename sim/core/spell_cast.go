@@ -3,7 +3,6 @@ package core
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -281,9 +280,10 @@ func (hitEffect *SpellHitEffect) takeDotSnapshot(sim *Simulation, spellCast *Spe
 	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool.Stat()) + hitEffect.BonusSpellPower
 
 	// snapshot total damage per tick, including any static damage multipliers
-	hitEffect.DotInput.startTime = sim.CurrentTime
-	hitEffect.DotInput.finalTickTime = sim.CurrentTime + time.Duration(hitEffect.DotInput.NumberOfTicks)*hitEffect.DotInput.TickLength
 	hitEffect.DotInput.damagePerTick = (hitEffect.DotInput.TickBaseDamage + totalSpellPower*hitEffect.DotInput.TickSpellCoefficient) * hitEffect.StaticDamageMultiplier
+	hitEffect.DotInput.startTime = sim.CurrentTime
+	hitEffect.DotInput.RefreshDot(sim)
+	hitEffect.DotInput.nextTickTime = sim.CurrentTime + hitEffect.DotInput.TickLength
 	hitEffect.SpellEffect.BeyondAOECapMultiplier = 1
 }
 
@@ -347,12 +347,13 @@ func (hitEffect *SpellHitEffect) afterDotTick(sim *Simulation, spell *SimpleSpel
 	}
 
 	hitEffect.DotInput.tickIndex++
+	hitEffect.DotInput.nextTickTime = sim.CurrentTime + hitEffect.DotInput.TickLength
 }
 
 // This should be called after the final tick of the dot, or when the dot is cancelled.
 func (hitEffect *SpellHitEffect) onDotComplete(sim *Simulation, spellCast *SpellCast) {
 	// Clean up the dot object.
-	hitEffect.DotInput.finalTickTime = 0
+	hitEffect.DotInput.endTime = 0
 
 	if hitEffect.DotInput.DebuffID != 0 {
 		hitEffect.Target.AddAuraUptime(hitEffect.DotInput.DebuffID, spellCast.ActionID, sim.CurrentTime-hitEffect.DotInput.startTime)
