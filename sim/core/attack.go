@@ -239,6 +239,7 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	if ahe.DirectInput.SpellCoefficient > 0 {
 		bonus := (character.GetStat(stats.SpellPower) + character.GetStat(ability.SpellSchool.Stat())) * ahe.DirectInput.SpellCoefficient * ahe.WeaponInput.DamageMultiplier
 		bonus += ahe.SpellEffect.BonusSpellPower * ahe.DirectInput.SpellCoefficient // does not get changed by weapon input multiplier
+		dmg += bonus
 	}
 	dmg += ahe.DirectInput.FlatDamageBonus
 
