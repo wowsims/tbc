@@ -676,6 +676,10 @@ input, select {
   background-color: red;
 }
 
+.hide-threat-metrics .threat-metrics {
+  display: none !important;
+}
+
 .bonus-stats-root {
   margin: 10px;
 }
@@ -2697,10 +2701,6 @@ input, select {
 
 .hunter-sim-ui .self-buffs-section {
   grid-template-columns: repeat(2, 1fr);
-}
-
-.hunter-sim-ui .consumes-section {
-  grid-template-columns: repeat(6, 1fr);
 }
 
 .hunter-sim-ui .buffs-section {

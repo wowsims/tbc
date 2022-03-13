@@ -12,6 +12,16 @@ export class SimUI extends Component {
         this.changeEmitter = TypedEvent.onAny([
             this.sim.changeEmitter,
         ], 'SimUIChange');
+        const updateShowThreatMetrics = () => {
+            if (this.sim.getShowThreatMetrics()) {
+                this.rootElem.classList.remove('hide-threat-metrics');
+            }
+            else {
+                this.rootElem.classList.add('hide-threat-metrics');
+            }
+        };
+        updateShowThreatMetrics();
+        this.sim.showThreatMetricsChangeEmitter.on(updateShowThreatMetrics);
         this.warnings = [];
         const warningsElem = document.getElementsByClassName('warnings')[0];
         this.warningsTippy = tippy(warningsElem, {

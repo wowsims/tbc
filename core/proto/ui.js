@@ -46,11 +46,12 @@ class SimSettings$Type extends MessageType {
         super("proto.SimSettings", [
             { no: 1, name: "iterations", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "fixed_rng_seed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ }
+            { no: 3, name: "fixed_rng_seed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
+            { no: 4, name: "show_threat_metrics", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { iterations: 0, phase: 0, fixedRngSeed: 0n };
+        const message = { iterations: 0, phase: 0, fixedRngSeed: 0n, showThreatMetrics: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -69,6 +70,9 @@ class SimSettings$Type extends MessageType {
                     break;
                 case /* int64 fixed_rng_seed */ 3:
                     message.fixedRngSeed = reader.int64().toBigInt();
+                    break;
+                case /* bool show_threat_metrics */ 4:
+                    message.showThreatMetrics = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -91,6 +95,9 @@ class SimSettings$Type extends MessageType {
         /* int64 fixed_rng_seed = 3; */
         if (message.fixedRngSeed !== 0n)
             writer.tag(3, WireType.Varint).int64(message.fixedRngSeed);
+        /* bool show_threat_metrics = 4; */
+        if (message.showThreatMetrics !== false)
+            writer.tag(4, WireType.Varint).bool(message.showThreatMetrics);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

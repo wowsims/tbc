@@ -273,6 +273,12 @@ export interface ActionMetrics {
      * @generated from protobuf field: double damage = 6;
      */
     damage: number;
+    /**
+     * Total threat done to all targets by this action.
+     *
+     * @generated from protobuf field: double threat = 12;
+     */
+    threat: number;
 }
 /**
  * @generated from protobuf message proto.AuraMetrics

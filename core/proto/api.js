@@ -483,11 +483,12 @@ class ActionMetrics$Type extends MessageType {
             { no: 8, name: "parries", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 9, name: "blocks", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 10, name: "glances", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 6, name: "damage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 6, name: "damage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 12, name: "threat", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { isMelee: false, casts: 0, hits: 0, crits: 0, misses: 0, dodges: 0, parries: 0, blocks: 0, glances: 0, damage: 0 };
+        const message = { isMelee: false, casts: 0, hits: 0, crits: 0, misses: 0, dodges: 0, parries: 0, blocks: 0, glances: 0, damage: 0, threat: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -530,6 +531,9 @@ class ActionMetrics$Type extends MessageType {
                     break;
                 case /* double damage */ 6:
                     message.damage = reader.double();
+                    break;
+                case /* double threat */ 12:
+                    message.threat = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -576,6 +580,9 @@ class ActionMetrics$Type extends MessageType {
         /* double damage = 6; */
         if (message.damage !== 0)
             writer.tag(6, WireType.Bit64).double(message.damage);
+        /* double threat = 12; */
+        if (message.threat !== 0)
+            writer.tag(12, WireType.Bit64).double(message.threat);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

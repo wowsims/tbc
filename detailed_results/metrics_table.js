@@ -30,6 +30,9 @@ export class MetricsTable extends ResultComponent {
             if (columnConfig.headerCellClass) {
                 headerCell.classList.add(columnConfig.headerCellClass);
             }
+            if (columnConfig.columnClass) {
+                headerCell.classList.add(columnConfig.columnClass);
+            }
             headerCell.innerHTML = `<span>${columnConfig.name}</span>`;
             if (columnConfig.tooltip) {
                 tippy(headerCell, {
@@ -65,6 +68,9 @@ export class MetricsTable extends ResultComponent {
         this.bodyElem.appendChild(rowElem);
         this.columnConfigs.forEach(columnConfig => {
             const cellElem = document.createElement('td');
+            if (columnConfig.columnClass) {
+                cellElem.classList.add(columnConfig.columnClass);
+            }
             if (columnConfig.fillCell) {
                 columnConfig.fillCell(metric, cellElem, rowElem);
             }

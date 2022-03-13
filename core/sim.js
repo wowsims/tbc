@@ -26,6 +26,7 @@ export class Sim {
         this.show1hWeapons = true;
         this.show2hWeapons = true;
         this.showMatchingGems = true;
+        this.showThreatMetrics = false;
         // Database
         this.items = {};
         this.enchants = {};
@@ -37,6 +38,7 @@ export class Sim {
         this.show1hWeaponsChangeEmitter = new TypedEvent();
         this.show2hWeaponsChangeEmitter = new TypedEvent();
         this.showMatchingGemsChangeEmitter = new TypedEvent();
+        this.showThreatMetricsChangeEmitter = new TypedEvent();
         // Fires when a raid sim API call completes.
         this.simResultEmitter = new TypedEvent();
         this.lastUsedRngSeed = 0;
@@ -58,6 +60,7 @@ export class Sim {
             this.show1hWeaponsChangeEmitter,
             this.show2hWeaponsChangeEmitter,
             this.showMatchingGemsChangeEmitter,
+            this.showThreatMetricsChangeEmitter,
             this.raid.changeEmitter,
             this.encounter.changeEmitter,
         ]);
@@ -270,6 +273,15 @@ export class Sim {
             this.showMatchingGemsChangeEmitter.emit(eventID);
         }
     }
+    getShowThreatMetrics() {
+        return this.showThreatMetrics;
+    }
+    setShowThreatMetrics(eventID, newShowThreatMetrics) {
+        if (newShowThreatMetrics != this.showThreatMetrics) {
+            this.showThreatMetrics = newShowThreatMetrics;
+            this.showThreatMetricsChangeEmitter.emit(eventID);
+        }
+    }
     getIterations() {
         return this.iterations;
     }
@@ -308,6 +320,7 @@ export class Sim {
             iterations: this.getIterations(),
             phase: this.getPhase(),
             fixedRngSeed: BigInt(this.getFixedRngSeed()),
+            showThreatMetrics: this.getShowThreatMetrics(),
         });
     }
     fromProto(eventID, proto) {
@@ -315,6 +328,7 @@ export class Sim {
             this.setIterations(eventID, proto.iterations || 3000);
             this.setPhase(eventID, proto.phase || OtherConstants.CURRENT_PHASE);
             this.setFixedRngSeed(eventID, Number(proto.fixedRngSeed));
+            this.setShowThreatMetrics(eventID, proto.showThreatMetrics);
         });
     }
 }

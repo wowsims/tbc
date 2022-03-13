@@ -31,6 +31,10 @@ export interface SimSettings {
      * @generated from protobuf field: int64 fixed_rng_seed = 3;
      */
     fixedRngSeed: bigint;
+    /**
+     * @generated from protobuf field: bool show_threat_metrics = 4;
+     */
+    showThreatMetrics: boolean;
 }
 /**
  * Contains all information that is imported/exported from an individual sim.

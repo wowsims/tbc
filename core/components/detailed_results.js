@@ -3,8 +3,10 @@ import { Component } from './component.js';
 export class DetailedResults extends Component {
     constructor(parent, simUI, simResultsManager) {
         super(parent, 'detailed-results-manager-root');
+        this.simUI = simUI;
         this.tabWindow = null;
         this.latestResult = null;
+        this.simUI.sim.showThreatMetricsChangeEmitter.on(() => this.updateSettings());
         const computedStyles = window.getComputedStyle(this.rootElem);
         const url = new URL(`${window.location.protocol}//${window.location.host}/${REPO_NAME}/detailed_results/index.html`);
         url.searchParams.append('mainTextColor', computedStyles.getPropertyValue('--main-text-color').trim());
@@ -29,6 +31,7 @@ export class DetailedResults extends Component {
                 this.tabWindow = window.open(url.href, 'Detailed Results');
                 this.tabWindow.addEventListener('load', event => {
                     if (this.latestResult) {
+                        this.updateSettings();
                         this.setSimResult(this.latestResult);
                     }
                 });
@@ -54,10 +57,20 @@ export class DetailedResults extends Component {
     //}
     setSimResult(simResult) {
         this.latestResult = simResult;
-        const serialized = simResult.toJson();
-        this.iframeElem.contentWindow.postMessage(serialized, '*');
+        this.postMessage(simResult.toJson());
+    }
+    updateSettings() {
+        if (this.simUI.sim.getShowThreatMetrics()) {
+            this.postMessage('showThreatMetrics');
+        }
+        else {
+            this.postMessage('hideThreatMetrics');
+        }
+    }
+    postMessage(data) {
+        this.iframeElem.contentWindow.postMessage(data, '*');
         if (this.tabWindow) {
-            this.tabWindow.postMessage(serialized, '*');
+            this.tabWindow.postMessage(data, '*');
         }
     }
 }

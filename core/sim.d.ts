@@ -34,6 +34,7 @@ export declare class Sim {
     private show1hWeapons;
     private show2hWeapons;
     private showMatchingGems;
+    private showThreatMetrics;
     readonly raid: Raid;
     readonly encounter: Encounter;
     private items;
@@ -46,6 +47,7 @@ export declare class Sim {
     readonly show1hWeaponsChangeEmitter: TypedEvent<void>;
     readonly show2hWeaponsChangeEmitter: TypedEvent<void>;
     readonly showMatchingGemsChangeEmitter: TypedEvent<void>;
+    readonly showThreatMetricsChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     readonly simResultEmitter: TypedEvent<SimResult>;
     private readonly _initPromise;
@@ -81,6 +83,8 @@ export declare class Sim {
     setShow2hWeapons(eventID: EventID, newShow2hWeapons: boolean): void;
     getShowMatchingGems(): boolean;
     setShowMatchingGems(eventID: EventID, newShowMatchingGems: boolean): void;
+    getShowThreatMetrics(): boolean;
+    setShowThreatMetrics(eventID: EventID, newShowThreatMetrics: boolean): void;
     getIterations(): number;
     setIterations(eventID: EventID, newIterations: number): void;
     lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null;

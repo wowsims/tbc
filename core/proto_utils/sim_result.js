@@ -373,6 +373,9 @@ export class ActionMetrics {
     get dps() {
         return this.data.damage / this.iterations / this.duration;
     }
+    get tps() {
+        return this.data.threat / this.iterations / this.duration;
+    }
     get casts() {
         return this.data.casts / this.iterations;
     }
@@ -381,6 +384,9 @@ export class ActionMetrics {
     }
     get avgCast() {
         return this.data.damage / this.data.casts;
+    }
+    get avgCastThreat() {
+        return this.data.threat / this.data.casts;
     }
     get hits() {
         return this.data.hits / this.iterations;
@@ -412,6 +418,9 @@ export class ActionMetrics {
     }
     get avgHit() {
         return this.data.damage / this.landedHitsRaw;
+    }
+    get avgHitThreat() {
+        return this.data.threat / this.landedHitsRaw;
     }
     get critPercent() {
         return (this.data.crits / this.hitAttempts) * 100;
@@ -469,6 +478,7 @@ export class ActionMetrics {
             blocks: sum(actions.map(a => a.data.blocks)),
             glances: sum(actions.map(a => a.data.glances)),
             damage: sum(actions.map(a => a.data.damage)),
+            threat: sum(actions.map(a => a.data.threat)),
         }), firstAction.resultData);
     }
     // Groups similar metrics, i.e. metrics with the same item/spell/other ID but

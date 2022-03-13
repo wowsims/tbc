@@ -676,6 +676,10 @@ input, select {
   background-color: red;
 }
 
+.hide-threat-metrics .threat-metrics {
+  display: none !important;
+}
+
 .dps-histogram-root {
   height: 30vh;
   width: 90vw;

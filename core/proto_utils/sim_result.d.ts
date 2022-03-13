@@ -171,14 +171,17 @@ export declare class ActionMetrics {
     get isMeleeAction(): boolean;
     get damage(): number;
     get dps(): number;
+    get tps(): number;
     get casts(): number;
     get castsPerMinute(): number;
     get avgCast(): number;
+    get avgCastThreat(): number;
     get hits(): number;
     private get landedHitsRaw();
     get landedHits(): number;
     get hitAttempts(): number;
     get avgHit(): number;
+    get avgHitThreat(): number;
     get critPercent(): number;
     get misses(): number;
     get missPercent(): number;
