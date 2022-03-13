@@ -46,7 +46,7 @@ export function newIndividualImporters<SpecType extends Spec>(simUI: IndividualS
 }
 
 abstract class Importer extends Popup {
-  private readonly textElem: HTMLElement;
+  private readonly textElem: HTMLTextAreaElement;
   protected readonly descriptionElem: HTMLElement;
 
   constructor(parent: HTMLElement, title: string) {
@@ -71,7 +71,7 @@ abstract class Importer extends Popup {
 
 		this.addCloseButton();
 
-    this.textElem = this.rootElem.getElementsByClassName('importer-textarea')[0] as HTMLElement;
+    this.textElem = this.rootElem.getElementsByClassName('importer-textarea')[0] as HTMLTextAreaElement;
     this.descriptionElem = this.rootElem.getElementsByClassName('import-description')[0] as HTMLElement;
 
     const uploadInput = this.rootElem.getElementsByClassName('importer-upload-input')[0] as HTMLElement;
@@ -83,7 +83,7 @@ abstract class Importer extends Popup {
     const importButton = this.rootElem.getElementsByClassName('import-button')[0] as HTMLElement;
 		importButton.addEventListener('click', event => {
 			try {
-				this.onImport(this.textElem.textContent || '');
+				this.onImport(this.textElem.value || '');
 			} catch (error) {
 				alert('Import error: ' + error);
 			}

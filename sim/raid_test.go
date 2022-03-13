@@ -23,7 +23,7 @@ var SimOptions = &proto.SimOptions{
 }
 
 var StandardTarget = &proto.Target{
-	Armor:   7700,
+	Armor:   7684,
 	MobType: proto.MobType_MobTypeDemon,
 }
 
@@ -142,5 +142,5 @@ func TestBasicRaid(t *testing.T) {
 		SimOptions: SimOptions,
 	}
 
-	core.RaidSimTest("P1 ST", t, rsr, 6326.02)
+	core.RaidSimTest("P1 ST", t, rsr, 6327.72)
 }
