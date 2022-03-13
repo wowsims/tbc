@@ -7,10 +7,10 @@ import (
 )
 
 // Time between energy ticks.
-const EnergyTickDuration = time.Second * 2
+const EnergyTickDuration = time.Millisecond * 2020
 
 // Extra 0.2 because Blizzard
-const EnergyPerTick = 20
+const EnergyPerTick = 20.2
 
 // OnEnergyTick is called each time an energy tick occurs, after the energy has been updated.
 type OnEnergyTick func(sim *Simulation)

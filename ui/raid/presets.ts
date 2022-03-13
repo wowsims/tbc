@@ -25,6 +25,7 @@ import * as ElementalShamanPresets from '/tbc/elemental_shaman/presets.js';
 import * as EnhancementShamanPresets from '/tbc/enhancement_shaman/presets.js';
 import * as HunterPresets from '/tbc/hunter/presets.js';
 import * as MagePresets from '/tbc/mage/presets.js';
+import * as RoguePresets from '/tbc/rogue/presets.js';
 import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
 
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
@@ -32,6 +33,7 @@ import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
 import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
 import { HunterSimUI } from '/tbc/hunter/sim.js';
 import { MageSimUI } from '/tbc/mage/sim.js';
+import { RogueSimUI } from '/tbc/rogue/sim.js';
 import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
 
 export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, player: Player<any>) => IndividualSimUI<any>>> = {
@@ -40,6 +42,7 @@ export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, pl
 	[Spec.SpecEnhancementShaman]: (parentElem: HTMLElement, player: Player<any>) => new EnhancementShamanSimUI(parentElem, player),
 	[Spec.SpecHunter]: (parentElem: HTMLElement, player: Player<any>) => new HunterSimUI(parentElem, player),
 	[Spec.SpecMage]: (parentElem: HTMLElement, player: Player<any>) => new MageSimUI(parentElem, player),
+	[Spec.SpecRogue]: (parentElem: HTMLElement, player: Player<any>) => new RogueSimUI(parentElem, player),
 	[Spec.SpecShadowPriest]: (parentElem: HTMLElement, player: Player<any>) => new ShadowPriestSimUI(parentElem, player),
 };
 
@@ -247,6 +250,62 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 		},
 		tooltip: 'Frost Mage',
 		iconUrl: talentTreeIcons[Class.ClassMage][2],
+	},
+	{
+		spec: Spec.SpecRogue,
+		rotation: RoguePresets.DefaultRotation,
+		talents: RoguePresets.CombatTalents.data,
+		specOptions: RoguePresets.DefaultOptions,
+		consumes: RoguePresets.DefaultConsumes,
+		defaultName: 'Rogue',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceHuman,
+			[Faction.Horde]: Race.RaceOrc,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: RoguePresets.P1_PRESET.gear,
+				2: RoguePresets.P2_PRESET.gear,
+				3: RoguePresets.P3_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: RoguePresets.P1_PRESET.gear,
+				2: RoguePresets.P2_PRESET.gear,
+				3: RoguePresets.P3_PRESET.gear,
+			},
+		},
+		tooltip: specNames[Spec.SpecRogue],
+		iconUrl: specIconsLarge[Spec.SpecRogue],
+	},
+	{
+		spec: Spec.SpecRogue,
+		rotation: RoguePresets.DefaultRotation,
+		talents: RoguePresets.HemoTalents.data,
+		specOptions: RoguePresets.DefaultOptions,
+		consumes: RoguePresets.DefaultConsumes,
+		defaultName: 'Hemo Rogue',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceHuman,
+			[Faction.Horde]: Race.RaceOrc,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: RoguePresets.P1_PRESET.gear,
+				2: RoguePresets.P2_PRESET.gear,
+				3: RoguePresets.P3_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: RoguePresets.P1_PRESET.gear,
+				2: RoguePresets.P2_PRESET.gear,
+				3: RoguePresets.P3_PRESET.gear,
+			},
+		},
+		tooltip: 'Hemo Rogue',
+		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_lifedrain.jpg',
 	},
 	{
 		spec: Spec.SpecElementalShaman,
