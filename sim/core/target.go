@@ -108,7 +108,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		target.Level = 73
 	}
 	if target.currentArmor == 0 {
-		target.currentArmor = 7700
+		target.currentArmor = 7684
 	}
 	target.calculateReduction()
 

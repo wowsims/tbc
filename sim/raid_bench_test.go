@@ -284,7 +284,7 @@ func BenchmarkSimulate(b *testing.B) {
 			ExecuteProportion: 0.1,
 			Targets: []*proto.Target{
 				{
-					Armor:   7700,
+					Armor:   7684,
 					MobType: proto.MobType_MobTypeDemon,
 					Debuffs: &proto.Debuffs{
 						JudgementOfWisdom:         true,
