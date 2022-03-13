@@ -12,8 +12,8 @@ const EnergyTickDuration = time.Millisecond * 2020
 // Extra 0.2 because Blizzard
 const EnergyPerTick = 20.2
 
-// OnEnergyTick is called each time an energy tick occurs, after the energy has been updated.
-type OnEnergyTick func(sim *Simulation)
+// OnEnergyGain is called any time energy is increased.
+type OnEnergyGain func(sim *Simulation)
 
 type energyBar struct {
 	character *Character
@@ -23,7 +23,7 @@ type energyBar struct {
 
 	comboPoints int32
 
-	onEnergyTick OnEnergyTick
+	onEnergyGain OnEnergyGain
 	tickAction   *PendingAction
 
 	// Multiplies energy regen from ticks.
@@ -33,11 +33,11 @@ type energyBar struct {
 	NextEnergyTickAdjustment float64
 }
 
-func (character *Character) EnableEnergyBar(maxEnergy float64, onEnergyTick OnEnergyTick) {
+func (character *Character) EnableEnergyBar(maxEnergy float64, onEnergyGain OnEnergyGain) {
 	character.energyBar = energyBar{
 		character:    character,
 		maxEnergy:    MaxFloat(100, maxEnergy),
-		onEnergyTick: onEnergyTick,
+		onEnergyGain: onEnergyGain,
 	}
 }
 
@@ -53,7 +53,7 @@ func (eb *energyBar) NextEnergyTickAt() time.Duration {
 	return eb.tickAction.NextActionAt
 }
 
-func (eb *energyBar) AddEnergy(sim *Simulation, amount float64, actionID ActionID) {
+func (eb *energyBar) addEnergyInternal(sim *Simulation, amount float64, actionID ActionID) {
 	if amount < 0 {
 		panic("Trying to add negative energy!")
 	}
@@ -66,6 +66,10 @@ func (eb *energyBar) AddEnergy(sim *Simulation, amount float64, actionID ActionI
 	}
 
 	eb.currentEnergy = newEnergy
+}
+func (eb *energyBar) AddEnergy(sim *Simulation, amount float64, actionID ActionID) {
+	eb.addEnergyInternal(sim, amount, actionID)
+	eb.onEnergyGain(sim)
 }
 
 func (eb *energyBar) SpendEnergy(sim *Simulation, amount float64, actionID ActionID) {
@@ -122,10 +126,10 @@ func (eb *energyBar) reset(sim *Simulation) {
 		NextActionAt: EnergyTickDuration,
 	}
 	pa.OnAction = func(sim *Simulation) {
-		eb.AddEnergy(sim, EnergyPerTick*eb.EnergyTickMultiplier+eb.NextEnergyTickAdjustment, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
+		eb.addEnergyInternal(sim, EnergyPerTick*eb.EnergyTickMultiplier+eb.NextEnergyTickAdjustment, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
 		eb.NextEnergyTickAdjustment = 0
 		eb.character.TryUseCooldowns(sim)
-		eb.onEnergyTick(sim)
+		eb.onEnergyGain(sim)
 
 		pa.NextActionAt = sim.CurrentTime + EnergyTickDuration
 		sim.AddPendingAction(pa)

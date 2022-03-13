@@ -289,7 +289,7 @@ func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 	energyForEANext := rogue.builderEnergyCost*float64(5-comboPoints) + ExposeArmorEnergyCost
 	eaNextBuildTime := core.MaxDuration(0, time.Duration(((energyForEANext-energy)/rogue.energyPerSecondAvg)*float64(time.Second)))
 	spareTime := core.MaxDuration(0, eaTimeRemaining-eaNextBuildTime)
-	if spareTime < buildTimeBuffer {
+	if spareTime <= buildTimeBuffer {
 		rogue.plan = PlanExposeArmor
 		rogue.doPlanExposeArmor(sim)
 		return
