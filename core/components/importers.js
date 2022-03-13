@@ -159,7 +159,7 @@ class Individual70UImporter extends Importer {
             throw new Error('Could not parse Race!');
         }
         let talentsStr = '';
-        if (importJson?.talents.length > 0) {
+        if (importJson?.talents?.length > 0) {
             const talentIds = importJson.talents.map(talentJson => talentJson.spellId);
             talentsStr = talentSpellIdsToTalentString(charClass, talentIds);
         }
