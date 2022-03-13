@@ -1,7 +1,7 @@
 package core
 
 import (
-	"log"
+	"fmt"
 	"math"
 	"time"
 
@@ -239,7 +239,7 @@ func (at *auraTracker) reset(sim *Simulation) {
 		}
 		at.ReplaceAura(sim, aura)
 		if permAura.UptimeMultiplier != 0 && !aura.ActionID.IsEmptyAction() {
-			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(-1*float64(sim.Duration)*(1.0-permAura.UptimeMultiplier)))
+			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(float64(sim.Duration)*permAura.UptimeMultiplier))
 		}
 	}
 }
@@ -264,12 +264,6 @@ func (at *auraTracker) advance(sim *Simulation) {
 
 		for _, aura := range toAdd {
 			at.AddAura(sim, aura)
-		}
-	}
-
-	for i, id := range at.activeAuraIDs {
-		if at.auras[id].activeIndex != int32(i) {
-			panic("activeIndex invalid")
 		}
 	}
 
@@ -321,8 +315,6 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 	}
 }
 
-var alreadyLogged = make(map[ActionID]struct{})
-
 // Adds a new aura to the simulation. If an aura with the same ID already
 // exists it will be replaced with the new one.
 func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
@@ -331,10 +323,7 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 	}
 
 	if aura := at.auras[newAura.ID]; aura.ID != 0 {
-		if _, ok := alreadyLogged[aura.ActionID]; !ok {
-			log.Printf("WARNING - AddAura(%v) at %s - previous has %s left, use ReplaceAura() instead\n", newAura.ActionID, sim.CurrentTime, aura.Expires-sim.CurrentTime)
-			alreadyLogged[aura.ActionID] = struct{}{}
-		}
+		panic(fmt.Sprintf("AddAura(%v) at %s - previous has %s left, use ReplaceAura() instead", newAura.ActionID, sim.CurrentTime, aura.Expires-sim.CurrentTime))
 		at.RemoveAura(sim, newAura.ID)
 	}
 
@@ -581,8 +570,7 @@ func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, s
 
 func (at *auraTracker) AddAuraUptime(auraID AuraID, actionID ActionID, uptime time.Duration) {
 	if uptime < 0 {
-		log.Printf("ERROR - AddAuraUptime(%d, %v, %s) has negative uptime", auraID, actionID, uptime)
-		return
+		panic(fmt.Sprintf("AddAuraUptime(%d, %v, %s) has negative uptime", auraID, actionID, uptime))
 	}
 
 	metrics := &at.metrics[auraID]

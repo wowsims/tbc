@@ -320,33 +320,35 @@ func ImprovedSanctityAura(sim *Simulation, level float64) Aura {
 	}
 }
 
-var windfuryTotemAuraID = NewAuraID()
+var (
+	windfuryTotemAuraID = NewAuraID()
 
-var WindfurySpellRanks = []int32{
-	8512,
-	10613,
-	10614,
-	25585,
-	25587,
-}
+	WindfuryTotemSpellRanks = []int32{
+		8512,
+		10613,
+		10614,
+		25585,
+		25587,
+	}
 
-var windfuryBuffAuraID = NewAuraID()
+	windfuryBuffAuraID = NewAuraID()
 
-var windfuryBuffAuraIDs = []int32{
-	8516,
-	10608,
-	10610,
-	25583,
-	25584,
-}
+	windfuryBuffSpellRanks = []int32{
+		8516,
+		10608,
+		10610,
+		25583,
+		25584,
+	}
 
-var windfuryAPBonuses = []float64{
-	122,
-	229,
-	315,
-	375,
-	445,
-}
+	windfuryAPBonuses = []float64{
+		122,
+		229,
+		315,
+		375,
+		445,
+	}
+)
 
 func IsEligibleForWindfuryTotem(character *Character) bool {
 	return character.AutoAttacks.IsEnabled() &&
@@ -355,7 +357,7 @@ func IsEligibleForWindfuryTotem(character *Character) bool {
 }
 
 func newWindfuryBuffAuraFactory(character *Character, rank int32, iwtTalentPoints int32) func(*Simulation, int32) Aura {
-	buffActionID := ActionID{SpellID: windfuryBuffAuraIDs[rank-1]}
+	buffActionID := ActionID{SpellID: windfuryBuffSpellRanks[rank-1]}
 	apBonus := windfuryAPBonuses[rank-1]
 	apBonus *= 1 + 0.15*float64(iwtTalentPoints)
 
@@ -400,22 +402,16 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	factory := newWindfuryBuffAuraFactory(character, rank, iwtTalentPoints)
 
 	mhAttack := character.AutoAttacks.MHAuto
-	mhAttack.ActionID = ActionID{SpellID: windfuryBuffAuraIDs[rank-1]} // temporary buff ("Windfury Attack") spell id
+	mhAttack.ActionID = ActionID{SpellID: windfuryBuffSpellRanks[rank-1]} // temporary buff ("Windfury Attack") spell id
 	cachedAttack := SimpleSpell{}
 
 	const procChance = 0.2
 
 	return Aura{
 		ID:       windfuryTotemAuraID,
-		ActionID: ActionID{SpellID: WindfurySpellRanks[rank-1]}, // totem spell id ("Windfury Totem")
+		ActionID: ActionID{SpellID: WindfuryTotemSpellRanks[rank-1]}, // totem spell id ("Windfury Totem")
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if !spellEffect.Landed() {
-				return
-			}
-
-			isMeleeAuto := spellEffect.ProcMask.Matches(ProcMaskMeleeMHAuto)
-			isOnNextMelee := spellCast.SpellID == 27014 // Raptor Strike - TODO: need an easier way to identify "on next melee" attacks at some point
-			if !isMeleeAuto && !isOnNextMelee {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeMHAuto) {
 				return
 			}
 
@@ -429,7 +425,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 
 			// TODO: the current proc system adds auras after cast and damage, in game they're added after cast
 			startCharges := int32(2)
-			if isMeleeAuto {
+			if !spellEffect.ProcMask.Matches(ProcMaskMeleeMHSpecial) {
 				startCharges--
 			}
 

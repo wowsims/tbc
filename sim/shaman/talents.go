@@ -278,6 +278,9 @@ func (shaman *Shaman) applyUnleashedRage() {
 							},
 						}
 						currentAPBonuses[i] = newBonus
+						if char.HasAura(UnleashedRageProcAuraID) {
+							char.RemoveAura(sim, UnleashedRageProcAuraID)
+						}
 						char.AddAura(sim, currentAuras[i])
 					} else if newBonus != 0 {
 						// If the bonus is the same, we can just update.
