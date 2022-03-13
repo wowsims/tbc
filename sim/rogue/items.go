@@ -95,7 +95,7 @@ var ItemSetSlayers = core.ItemSet{
 	Items: map[int32]struct{}{31026: {}, 31037: {}, 31028: {}, 31029: {}, 31030: {}, 34558: {}, 34575: {}, 34448: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			// Increases the haste from your Slice and Dice ablity by 5%.
+			// Increases the haste from your Slice and Dice ability by 5%.
 			// Handled in slice_and_dice.go.
 		},
 		4: func(agent core.Agent) {

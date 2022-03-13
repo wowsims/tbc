@@ -198,8 +198,7 @@ func ApplyKhoriumChampion(agent core.Agent) {
 }
 
 func ApplyBraidedEterniumChain(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 5
-	agent.GetCharacter().PseudoStats.BonusRangedDamage += 5
+	agent.GetCharacter().PseudoStats.BonusDamage += 5
 }
 
 var BlackoutTruncheonAuraID = core.NewAuraID()

@@ -203,10 +203,10 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	var bonusWeaponDamage float64
 	if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 		attackPower = character.stats[stats.RangedAttackPower] + ahe.BonusAttackPower
-		bonusWeaponDamage = character.PseudoStats.BonusRangedDamage + ahe.BonusWeaponDamage
+		bonusWeaponDamage = character.PseudoStats.BonusDamage + ahe.BonusWeaponDamage
 	} else {
 		attackPower = character.stats[stats.AttackPower] + ahe.BonusAttackPower
-		bonusWeaponDamage = character.PseudoStats.BonusMeleeDamage + ahe.BonusWeaponDamage
+		bonusWeaponDamage = character.PseudoStats.BonusDamage + ahe.BonusWeaponDamage
 	}
 
 	dmg := 0.0

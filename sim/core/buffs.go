@@ -121,21 +121,28 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 
 	if partyBuffs.BattleShout != proto.TristateEffect_TristateEffectMissing {
+		talentMultiplier := GetTristateValueFloat(partyBuffs.BattleShout, 1, 1.25)
+
 		character.AddStats(stats.Stats{
-			stats.AttackPower: GetTristateValueFloat(partyBuffs.BattleShout, 306, 382.5),
+			stats.AttackPower: 306 * talentMultiplier,
 		})
 		if partyBuffs.BsSolarianSapphire {
 			partyBuffs.SnapshotBsSolarianSapphire = false
 			character.AddStats(stats.Stats{
-				stats.AttackPower: 70,
+				stats.AttackPower: 70 * talentMultiplier,
 			})
 		}
 
-		snapshotSapphire := partyBuffs.SnapshotBsSolarianSapphire
-		snapshotT2 := partyBuffs.SnapshotBsT2
-		if snapshotSapphire || snapshotT2 {
+		snapshotAp := 0.0
+		if partyBuffs.SnapshotBsSolarianSapphire {
+			snapshotAp += 70 * talentMultiplier
+		}
+		if partyBuffs.SnapshotBsT2 {
+			snapshotAp += 30 * talentMultiplier
+		}
+		if snapshotAp > 0 {
 			character.AddPermanentAuraWithOptions(PermanentAura{
-				AuraFactory:       SnapshotBattleShoutAura(character, snapshotSapphire, snapshotT2),
+				AuraFactory:       SnapshotBattleShoutAura(character, snapshotAp),
 				RespectExpiration: true,
 			})
 		}
@@ -266,17 +273,9 @@ func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
 
 var SnapshotBattleShoutAuraID = NewAuraID()
 
-func SnapshotBattleShoutAura(character *Character, snapshotSapphire bool, snapshotT2 bool) AuraFactory {
-	amount := 0.0
-	if snapshotSapphire {
-		amount += 70
-	}
-	if snapshotT2 {
-		amount += 30
-	}
-
+func SnapshotBattleShoutAura(character *Character, snapshotAp float64) AuraFactory {
 	return func(sim *Simulation) Aura {
-		factory := character.NewTemporaryStatsAuraFactory(SnapshotBattleShoutAuraID, ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: amount}, time.Second*110)
+		factory := character.NewTemporaryStatsAuraFactory(SnapshotBattleShoutAuraID, ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: snapshotAp}, time.Second*110)
 		return factory(sim)
 	}
 }
@@ -321,7 +320,7 @@ func ImprovedSanctityAura(sim *Simulation, level float64) Aura {
 	}
 }
 
-var WindfuryTotemAuraID = NewAuraID()
+var windfuryTotemAuraID = NewAuraID()
 
 var WindfurySpellRanks = []int32{
 	8512,
@@ -329,6 +328,16 @@ var WindfurySpellRanks = []int32{
 	10614,
 	25585,
 	25587,
+}
+
+var windfuryBuffAuraID = NewAuraID()
+
+var windfuryBuffAuraIDs = []int32{
+	8516,
+	10608,
+	10610,
+	25583,
+	25584,
 }
 
 var windfuryAPBonuses = []float64{
@@ -345,38 +354,86 @@ func IsEligibleForWindfuryTotem(character *Character) bool {
 		!character.HasMHWeaponImbue
 }
 
-func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) Aura {
-	spellID := WindfurySpellRanks[rank-1]
-	actionID := ActionID{SpellID: spellID}
+func newWindfuryBuffAuraFactory(character *Character, rank int32, iwtTalentPoints int32) func(*Simulation, int32) Aura {
+	buffActionID := ActionID{SpellID: windfuryBuffAuraIDs[rank-1]}
 	apBonus := windfuryAPBonuses[rank-1]
 	apBonus *= 1 + 0.15*float64(iwtTalentPoints)
 
+	buffs := character.ApplyStatDependencies(stats.Stats{stats.AttackPower: apBonus})
+	unbuffs := buffs.Multiply(-1)
+
+	var charges int32
+
+	aura := Aura{
+		ID:       windfuryBuffAuraID,
+		ActionID: buffActionID,
+		OnExpire: func(sim *Simulation) {
+			character.AddStatsDynamic(sim, unbuffs)
+			if sim.Log != nil {
+				character.Log(sim, "Lost %s from fading %s", buffs.FlatString(), buffActionID)
+			}
+		},
+		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			if !spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryWhite) {
+				return
+			}
+			charges--
+			if charges <= 0 {
+				character.UpdateExpires(windfuryBuffAuraID, sim.CurrentTime) // for correct bookkeeping
+				character.RemoveAuraOnNextAdvance(sim, windfuryBuffAuraID)
+			}
+		},
+	}
+
+	return func(sim *Simulation, startCharges int32) Aura {
+		character.AddStatsDynamic(sim, buffs)
+		if sim.Log != nil {
+			character.Log(sim, "Gained %s from %s", buffs.FlatString(), buffActionID)
+		}
+		aura.Expires = sim.CurrentTime + 1500*time.Millisecond
+		charges = startCharges
+		return aura
+	}
+}
+
+func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) Aura {
+	factory := newWindfuryBuffAuraFactory(character, rank, iwtTalentPoints)
+
 	mhAttack := character.AutoAttacks.MHAuto
-	mhAttack.ActionID = actionID
-	mhAttack.Effect.BonusAttackPower += apBonus
+	mhAttack.ActionID = ActionID{SpellID: windfuryBuffAuraIDs[rank-1]} // temporary buff ("Windfury Attack") spell id
 	cachedAttack := SimpleSpell{}
 
 	const procChance = 0.2
 
-	var icd InternalCD
-	const icdDur = time.Duration(1) // No ICD, but only once per frame.
-
 	return Aura{
-		ID:       WindfuryTotemAuraID,
-		ActionID: actionID,
+		ID:       windfuryTotemAuraID,
+		ActionID: ActionID{SpellID: WindfurySpellRanks[rank-1]}, // totem spell id ("Windfury Totem")
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if !spellEffect.Landed() ||
-				!spellEffect.ProcMask.Matches(ProcMaskMeleeMHAuto) ||
-				spellCast.IsPhantom {
+			if !spellEffect.Landed() {
 				return
 			}
-			if icd.IsOnCD(sim) {
+
+			isMeleeAuto := spellEffect.ProcMask.Matches(ProcMaskMeleeMHAuto)
+			isOnNextMelee := spellCast.SpellID == 27014 // Raptor Strike - TODO: need an easier way to identify "on next melee" attacks at some point
+			if !isMeleeAuto && !isOnNextMelee {
 				return
 			}
+
+			if character.HasAura(windfuryBuffAuraID) {
+				return
+			}
+
 			if sim.RandomFloat("Windfury Totem") > procChance {
 				return
 			}
-			icd = InternalCD(sim.CurrentTime + icdDur)
+
+			// TODO: the current proc system adds auras after cast and damage, in game they're added after cast
+			startCharges := int32(2)
+			if isMeleeAuto {
+				startCharges--
+			}
+
+			character.AddAura(sim, factory(sim, startCharges))
 
 			cachedAttack = mhAttack
 			cachedAttack.Effect.Target = spellEffect.Target
@@ -482,10 +539,7 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
 				// Haste portion doesn't stack with Power Infusion, so prefer to wait.
-				if character.HasAura(PowerInfusionAuraID) {
-					return false
-				}
-				return true
+				return !character.HasAura(PowerInfusionAuraID)
 			},
 			AddAura: func(sim *Simulation, character *Character) { AddBloodlustAura(sim, character, -1) },
 		},
@@ -544,10 +598,7 @@ func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
 
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
 				// Haste portion doesn't stack with Bloodlust, so prefer to wait.
-				if character.HasAura(BloodlustAuraID) {
-					return false
-				}
-				return true
+				return !character.HasAura(BloodlustAuraID)
 			},
 			AddAura: func(sim *Simulation, character *Character) { AddPowerInfusionAura(sim, character, -1) },
 		},

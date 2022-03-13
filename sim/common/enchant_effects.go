@@ -1,6 +1,7 @@
 package common
 
 import (
+	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -10,21 +11,52 @@ import (
 
 func init() {
 	// Keep these in order by item ID.
-	core.AddItemEffect(16250, ApplyWeaponSuperiorStriking)
+	core.AddWeaponEffect(16250, ApplyWeaponSuperiorStriking)
+	core.AddWeaponEffect(22552, ApplyWeaponMajorStriking) // TODO: add to frontend, probably replacing Superior Striking
 	core.AddItemEffect(16252, ApplyCrusader)
 	core.AddItemEffect(18283, ApplyBiznicksScope)
 	core.AddItemEffect(22535, ApplyRingStriking)
 	core.AddItemEffect(22559, ApplyMongoose)
-	core.AddItemEffect(23765, ApplyKhoriumScope)
+	core.AddWeaponEffect(23765, ApplyKhoriumScope)
 	core.AddItemEffect(23766, ApplyStabilizedEterniumScope)
 	core.AddItemEffect(33150, ApplyBackSubtlety)
 	core.AddItemEffect(33153, ApplyGlovesThreat)
 	core.AddItemEffect(33307, ApplyExecutioner)
 }
 
-func ApplyWeaponSuperiorStriking(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 5
-	// Melee only, no ranged bonus.
+// TODO: Crusader, Mongoose, and Executioner could also be modelled as AddWeaponEffect instead
+func ApplyWeaponSuperiorStriking(agent core.Agent, slot proto.ItemSlot) {
+	switch slot {
+	case proto.ItemSlot_ItemSlotMainHand:
+		if w := &agent.GetCharacter().AutoAttacks.MH; w.SwingSpeed > 0 {
+			w.BaseDamageMin += 5
+			w.BaseDamageMax += 5
+		}
+	case proto.ItemSlot_ItemSlotOffHand:
+		if w := &agent.GetCharacter().AutoAttacks.OH; w.SwingSpeed > 0 {
+			w.BaseDamageMin += 5
+			w.BaseDamageMax += 5
+		}
+	default:
+		log.Fatalf("Cannot add Superior Striking to %s", slot)
+	}
+}
+
+func ApplyWeaponMajorStriking(agent core.Agent, slot proto.ItemSlot) {
+	switch slot {
+	case proto.ItemSlot_ItemSlotMainHand:
+		if w := &agent.GetCharacter().AutoAttacks.MH; w.SwingSpeed > 0 {
+			w.BaseDamageMin += 7
+			w.BaseDamageMax += 7
+		}
+	case proto.ItemSlot_ItemSlotOffHand:
+		if w := &agent.GetCharacter().AutoAttacks.OH; w.SwingSpeed > 0 {
+			w.BaseDamageMin += 7
+			w.BaseDamageMax += 7
+		}
+	default:
+		log.Fatalf("Cannot add Major Striking to %s", slot)
+	}
 }
 
 var CrusaderAuraID = core.NewAuraID()
@@ -53,8 +85,8 @@ func ApplyCrusader(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		// -4 str per level over 60
 		const strBonus = 100.0 - 4.0*float64(core.CharacterLevel-60)
-		applyStatAuraMH := character.NewTemporaryStatsAuraApplier(CrusaderStrengthMHAuraID, core.ActionID{ItemID: 16252, Tag: 1}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
-		applyStatAuraOH := character.NewTemporaryStatsAuraApplier(CrusaderStrengthOHAuraID, core.ActionID{ItemID: 16252, Tag: 2}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
+		applyStatAuraMH := character.NewTemporaryStatsAuraApplier(CrusaderStrengthMHAuraID, core.ActionID{SpellID: 20007, Tag: 1}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
+		applyStatAuraOH := character.NewTemporaryStatsAuraApplier(CrusaderStrengthOHAuraID, core.ActionID{SpellID: 20007, Tag: 2}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
 
 		return core.Aura{
 			ID: CrusaderAuraID,
@@ -97,8 +129,7 @@ func ApplyBiznicksScope(agent core.Agent) {
 }
 
 func ApplyRingStriking(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 2
-	agent.GetCharacter().PseudoStats.BonusRangedDamage += 2
+	agent.GetCharacter().PseudoStats.BonusDamage += 2
 }
 
 var MongooseAuraID = core.NewAuraID()
@@ -185,9 +216,16 @@ func ApplyMongoose(agent core.Agent) {
 	})
 }
 
-// TODO: it's highly likely this works like "Major Striking", only altering the weapon's damage range
-func ApplyKhoriumScope(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusRangedDamage += 12
+func ApplyKhoriumScope(agent core.Agent, slot proto.ItemSlot) {
+	switch slot {
+	case proto.ItemSlot_ItemSlotRanged:
+		if w := &agent.GetCharacter().AutoAttacks.Ranged; w.SwingSpeed > 0 {
+			w.BaseDamageMin += 12
+			w.BaseDamageMax += 12
+		}
+	default:
+		log.Fatalf("Cannot add Superior Striking to %s", slot)
+	}
 }
 
 var StabilizedEterniumScopeAuraID = core.NewAuraID()
