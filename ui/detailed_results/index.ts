@@ -1,3 +1,4 @@
+import { DetailedResultsUpdate, SimRun, SimRunData } from '/tbc/core/proto/ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 
@@ -171,23 +172,27 @@ function updateResults() {
 
 document.body.classList.add('hide-threat-metrics');
 window.addEventListener('message', async event => {
-	if (event.data == 'showThreatMetrics') {
-		document.body.classList.remove('hide-threat-metrics');
-		return;
-	} else if (event.data == 'hideThreatMetrics') {
-		document.body.classList.add('hide-threat-metrics');
-		return;
+	const data = DetailedResultsUpdate.fromJson(event.data);
+	switch (data.data.oneofKind) {
+	case 'runData':
+		const runData = data.data.runData;
+		currentSimResult = await SimResult.fromProto(runData.run || SimRun.create());
+		updateResults();
+		break;
+	case 'settings':
+		const settings = data.data.settings;
+		if (settings.showThreatMetrics) {
+			document.body.classList.remove('hide-threat-metrics');
+		} else {
+			document.body.classList.add('hide-threat-metrics');
+		}
+		if (settings.showExperimental) {
+			document.body.classList.remove('hide-experimental');
+		} else {
+			document.body.classList.add('hide-experimental');
+		}
+		break;
 	}
-
-	// Null indicates pending results
-	const data: Object | null = event.data;
-
-	if (data) {
-		currentSimResult = await SimResult.fromJson(data);
-	} else {
-		currentSimResult = null;
-	}
-	updateResults();
 });
 
 resultsFilter.changeEmitter.on(() => updateResults());
