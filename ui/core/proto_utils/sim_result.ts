@@ -531,8 +531,8 @@ export class ResourceMetrics {
 		return this.data.gain / this.data.events;
 	}
 
-	get avgActualGain() {
-		return this.data.actualGain / this.data.events;
+	get wastedGain() {
+		return (this.data.gain - this.data.actualGain) / this.iterations;
 	}
 
 	static async makeNew(player: PlayerMetrics | null, resultData: SimResultData, resourceMetrics: ResourceMetricsProto, playerIndex?: number): Promise<ResourceMetrics> {
