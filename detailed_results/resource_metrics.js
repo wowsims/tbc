@@ -66,10 +66,10 @@ export class TypedResourceMetricsTable extends MetricsTable {
                 getDisplayString: (metric) => metric.avgGain.toFixed(1),
             },
             {
-                name: 'Avg Actual Gain',
-                tooltip: 'Actual Gain / Event',
-                getValue: (metric) => metric.avgActualGain,
-                getDisplayString: (metric) => metric.avgActualGain.toFixed(1),
+                name: 'Wasted Gain',
+                tooltip: 'Gain that was wasted because of resource cap.',
+                getValue: (metric) => metric.wastedGain,
+                getDisplayString: (metric) => metric.wastedGain.toFixed(1),
             },
         ]);
         this.resourceType = resourceType;

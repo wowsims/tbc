@@ -5,7 +5,7 @@ import { TypedEvent } from './typed_event.js';
 // Manages all the settings for a single Target.
 export class Target {
     constructor(sim) {
-        this.armor = 7700;
+        this.armor = 7684;
         this.mobType = MobType.MobTypeDemon;
         this.debuffs = Debuffs.create();
         this.armorChangeEmitter = new TypedEvent();

@@ -62,7 +62,7 @@ class Importer extends Popup {
         const importButton = this.rootElem.getElementsByClassName('import-button')[0];
         importButton.addEventListener('click', event => {
             try {
-                this.onImport(this.textElem.textContent || '');
+                this.onImport(this.textElem.value || '');
             }
             catch (error) {
                 alert('Import error: ' + error);

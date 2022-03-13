@@ -316,8 +316,8 @@ export class ResourceMetrics {
     get avgGain() {
         return this.data.gain / this.data.events;
     }
-    get avgActualGain() {
-        return this.data.actualGain / this.data.events;
+    get wastedGain() {
+        return (this.data.gain - this.data.actualGain) / this.iterations;
     }
     static async makeNew(player, resultData, resourceMetrics, playerIndex) {
         const actionId = await ActionId.fromProto(resourceMetrics.id).fill(playerIndex);

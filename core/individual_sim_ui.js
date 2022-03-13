@@ -646,7 +646,7 @@ export class IndividualSimUI extends SimUI {
                 executeProportion: 0.2,
                 targets: [TargetProto.create({
                         level: 73,
-                        armor: 7700,
+                        armor: 7684,
                         mobType: MobType.MobTypeDemon,
                         debuffs: this.individualConfig.defaults.debuffs,
                     })],

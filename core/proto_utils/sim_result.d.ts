@@ -153,7 +153,7 @@ export declare class ResourceMetrics {
     get gain(): number;
     get gainPerSecond(): number;
     get avgGain(): number;
-    get avgActualGain(): number;
+    get wastedGain(): number;
     static makeNew(player: PlayerMetrics | null, resultData: SimResultData, resourceMetrics: ResourceMetricsProto, playerIndex?: number): Promise<ResourceMetrics>;
     static merge(resources: Array<ResourceMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ResourceMetrics;
     static groupById(resources: Array<ResourceMetrics>, useTag?: boolean): Array<Array<ResourceMetrics>>;
