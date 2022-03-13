@@ -230,6 +230,9 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		Rotation:  *rogueOptions.Rotation,
 	}
 
+	// Passive rogue threat reduction: https://tbc.wowhead.com/spell=21184/rogue-passive-dnd
+	rogue.PseudoStats.ThreatMultiplier *= 0.71
+
 	daggerMH := rogue.Equip[proto.ItemSlot_ItemSlotMainHand].WeaponType == proto.WeaponType_WeaponTypeDagger
 	if rogue.Rotation.Builder == proto.Rogue_Rotation_Unknown {
 		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
