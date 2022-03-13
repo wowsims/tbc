@@ -21,7 +21,7 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolArcane,
-				SpellExtras:         core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
+				SpellExtras:         SpellFlagMage | core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 740,

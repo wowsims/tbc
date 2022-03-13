@@ -18,6 +18,7 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
+				SpellExtras:         SpellFlagMage,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 180,

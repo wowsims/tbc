@@ -521,7 +521,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 1602.1435406222683
+  dps: 1602.5216245788679
  }
 }
 dps_results: {
@@ -671,7 +671,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Average-Default"
  value: {
-  dps: 1939.736222323237
+  dps: 1940.1502451088109
  }
 }
 dps_results: {

@@ -12,6 +12,9 @@
 .icon-enum-picker-root.active {
   border-color: lawngreen;
 }
+.icon-enum-picker-root.disabled {
+  border-color: dimgray;
+}
 
 .icon-enum-picker-button {
   background-size: cover;
@@ -19,8 +22,4 @@
 
 .icon-enum-picker-option {
   background-size: cover;
-}
-
-.dropdown-option-container.hide {
-	display: none;
 }
