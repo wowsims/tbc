@@ -24,6 +24,7 @@ func TestRogue(t *testing.T) {
 		SpecOptions: core.SpecOptionsCombo{Label: "Basic", SpecOptions: PlayerOptionsBasic},
 		OtherSpecOptions: []core.SpecOptionsCombo{
 			core.SpecOptionsCombo{Label: "Mutilate", SpecOptions: PlayerOptionsMutilate},
+			core.SpecOptionsCombo{Label: "Hemo", SpecOptions: PlayerOptionsHemo},
 		},
 
 		RaidBuffs:   FullRaidBuffs,

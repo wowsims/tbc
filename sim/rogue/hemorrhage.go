@@ -16,22 +16,28 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 	hemoAura := core.Aura{
 		ID:       HemorrhageDebuffID,
 		ActionID: HemorrhageActionID,
-		Stacks:   10,
 	}
 	hemoAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 		if spellCast.SpellSchool != core.SpellSchoolPhysical {
 			return
 		}
 		spellEffect.DirectInput.FlatDamageBonus += 42
+	}
+	hemoAura.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		if spellCast.SpellSchool != core.SpellSchoolPhysical {
+			return
+		}
+		if !spellEffect.Landed() || spellEffect.Damage == 0 {
+			return
+		}
 
 		stacks := spellEffect.Target.NumStacks(HemorrhageDebuffID) - 1
 		if stacks == 0 {
 			spellEffect.Target.RemoveAura(sim, HemorrhageDebuffID)
 		} else {
-			aura := hemoAura
-			aura.Stacks = stacks
-			aura.Expires = sim.CurrentTime + hemoDuration
-			spellEffect.Target.ReplaceAura(sim, aura)
+			hemoAura.Stacks = stacks
+			hemoAura.Expires = sim.CurrentTime + hemoDuration
+			spellEffect.Target.ReplaceAura(sim, hemoAura)
 		}
 	}
 
@@ -42,9 +48,9 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 		if spellEffect.Landed() {
 			rogue.AddComboPoints(sim, 1, HemorrhageActionID)
 
-			aura := hemoAura
-			aura.Expires = sim.CurrentTime + hemoDuration
-			spellEffect.Target.ReplaceAura(sim, aura)
+			hemoAura.Stacks = 10
+			hemoAura.Expires = sim.CurrentTime + hemoDuration
+			spellEffect.Target.ReplaceAura(sim, hemoAura)
 		} else {
 			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}
