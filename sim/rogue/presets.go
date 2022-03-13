@@ -50,6 +50,23 @@ var MutilateTalents = &proto.RogueTalents{
 	DualWieldSpecialization: 5,
 }
 
+var HemoTalents = &proto.RogueTalents{
+	ImprovedSinisterStrike:  2,
+	ImprovedSliceAndDice:    3,
+	Precision:               5,
+	DualWieldSpecialization: 5,
+	BladeFlurry:             true,
+	SwordSpecialization:     5,
+	WeaponExpertise:         2,
+	Aggression:              3,
+	Vitality:                2,
+	AdrenalineRush:          true,
+	CombatPotency:           5,
+
+	SerratedBlades: 3,
+	Hemorrhage:     true,
+}
+
 var PlayerOptionsBasic = &proto.Player_Rogue{
 	Rogue: &proto.Rogue{
 		Talents:  CombatTalents,
@@ -61,6 +78,14 @@ var PlayerOptionsBasic = &proto.Player_Rogue{
 var PlayerOptionsMutilate = &proto.Player_Rogue{
 	Rogue: &proto.Rogue{
 		Talents:  MutilateTalents,
+		Options:  basicOptions,
+		Rotation: basicRotation,
+	},
+}
+
+var PlayerOptionsHemo = &proto.Player_Rogue{
+	Rogue: &proto.Rogue{
+		Talents:  HemoTalents,
 		Options:  basicOptions,
 		Rotation: basicRotation,
 	},
