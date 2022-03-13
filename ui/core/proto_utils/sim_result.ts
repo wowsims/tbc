@@ -15,6 +15,7 @@ import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { SimRun } from '/tbc/core/proto/ui.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { getTalentTreeIcon } from '/tbc/core/proto_utils/utils.js';
@@ -145,17 +146,15 @@ export class SimResult {
 		return AuraMetrics.joinById(this.getTargets(filter).map(target => target.auras).flat());
 	}
 
-	toJson(): any {
-		return {
-			'request': RaidSimRequest.toJson(this.request),
-			'result': RaidSimResult.toJson(this.result),
-		};
+	toProto(): SimRun {
+		return SimRun.create({
+			request: this.request,
+			result: this.result,
+		});
 	}
 
-	static async fromJson(obj: any): Promise<SimResult> {
-		const request = RaidSimRequest.fromJson(obj['request']);
-		const result = RaidSimResult.fromJson(obj['result']);
-		return SimResult.makeNew(request, result);
+	static async fromProto(proto: SimRun): Promise<SimResult> {
+		return SimResult.makeNew(proto.request || RaidSimRequest.create(), proto.result || RaidSimResult.create());
 	}
 
 	static async makeNew(request: RaidSimRequest, result: RaidSimResult): Promise<SimResult> {

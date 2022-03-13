@@ -1,6 +1,7 @@
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult, ProgressMetrics } from '/tbc/core/proto/api.js';
+import { SimRunData } from '/tbc/core/proto/ui.js';
 import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -161,6 +162,17 @@ export class RaidSimResultsManager {
 			simReferenceDiffElem.classList.remove('positive');
 			simReferenceDiffElem.classList.add('negative');
 		}
+	}
+
+	getRunData(): SimRunData | null {
+		if (this.currentData == null) {
+			return null;
+		}
+
+		return SimRunData.create({
+			run: this.currentData.simResult.toProto(),
+			referenceRun: this.referenceData?.simResult.toProto(),
+		});
 	}
 
 	getCurrentData(): ReferenceData | null {

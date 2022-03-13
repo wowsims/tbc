@@ -229,7 +229,6 @@ export interface Settings {
 export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
   readonly player: Player<SpecType>;
 	readonly individualConfig: IndividualSimUIConfig<SpecType>;
-	readonly debug: boolean;
 
   private readonly exclusivityMap: Record<ExclusivityTag, Array<ExclusiveEffect>>;
 
@@ -247,7 +246,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.individualConfig = config;
 		this.raidSimResultsManager = null;
 		this.settingsMuuri = null;
-		this.debug = new URLSearchParams(window.location.search).has('debug');
 		if (!launchedSpecs.includes(this.player.spec)) {
 			this.addWarning({
 				updateOn: new TypedEvent<void>(),
@@ -359,10 +357,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 	}
 
 	private addTopbarComponents() {
-		if (this.debug) {
-			this.addToolbarItem(newIndividualImporters(this));
-		}
-
+		this.addToolbarItem(newIndividualImporters(this));
 		this.addToolbarItem(newIndividualExporters(this));
 
 		const settingsMenu = document.createElement('span');
@@ -890,10 +885,11 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				})],
 			}));
 
-			this.sim.setIterations(eventID, 3000);
-			this.sim.setPhase(eventID, OtherConstants.CURRENT_PHASE);
-			this.sim.setFixedRngSeed(eventID, 0);
-			this.sim.setShowThreatMetrics(eventID, false); // TODO: true if tank sim
+			this.sim.fromProto(eventID, SimSettingsProto.create({
+				iterations: 3000,
+				phase: OtherConstants.CURRENT_PHASE,
+				showThreatMetrics: false, // TODO: true if tank sim
+			}));
 		});
 	}
 
