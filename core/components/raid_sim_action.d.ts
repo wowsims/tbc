@@ -24,4 +24,5 @@ export declare class RaidSimResultsManager {
     private updateReference;
     getCurrentData(): ReferenceData | null;
     getReferenceData(): ReferenceData | null;
+    static makeToplineResultsContent(simResult: SimResult, isIndividualSim: boolean): string;
 }

@@ -26,15 +26,15 @@ export class RaidSimResultsManager {
     }
     setSimProgress(progress) {
         this.simUI.setResultsContent(`
-  <div class="results-sim">
-			<div class="results-sim-dps">
-				<span class="results-sim-dps-avg">${progress.dps.toFixed(2)}</span>
+			<div class="results-sim">
+					<div class="results-sim-dps">
+						<span class="topline-result-avg">${progress.dps.toFixed(2)}</span>
+					</div>
+					<div class="">
+						${progress.completedIterations} / ${progress.totalIterations}<br>iterations complete
+					</div>
 			</div>
-			<div class="">
-				${progress.completedIterations} / ${progress.totalIterations}<br>iterations complete
-			</div>
-  </div>
-`);
+		`);
     }
     setSimResult(eventID, simResult) {
         this.currentData = {
@@ -50,10 +50,7 @@ export class RaidSimResultsManager {
         const dpsMetrics = simResult.raidMetrics.dps;
         this.simUI.setResultsContent(`
       <div class="results-sim">
-				<div class="results-sim-dps">
-					<span class="results-sim-dps-avg">${dpsMetrics.avg.toFixed(2)}</span>
-					<span class="results-sim-dps-stdev">${dpsMetrics.stdev.toFixed(2)}</span>
-				</div>
+				${RaidSimResultsManager.makeToplineResultsContent(simResult, this.simUI.isIndividualSim())}
 				<div class="results-sim-reference">
 					<span class="results-sim-set-reference fa fa-map-pin"></span>
 					<div class="results-sim-reference-bar">
@@ -155,5 +152,27 @@ export class RaidSimResultsManager {
             raidProto: this.referenceData.raidProto,
             encounterProto: this.referenceData.encounterProto,
         };
+    }
+    static makeToplineResultsContent(simResult, isIndividualSim) {
+        const dpsMetrics = simResult.raidMetrics.dps;
+        const playerMetrics = isIndividualSim
+            ? simResult.raidMetrics.parties[0].players[0]
+            : null;
+        let content = `
+			<div class="results-sim-dps">
+				<span class="topline-result-avg">${dpsMetrics.avg.toFixed(2)}</span>
+				<span class="topline-result-stdev">${dpsMetrics.stdev.toFixed(2)}</span>
+			</div>
+    `;
+        if (playerMetrics) {
+            const tpsMetrics = playerMetrics.tps;
+            content += `
+				<div class="results-sim-tps threat-metrics">
+					<span class="topline-result-avg">${tpsMetrics.avg.toFixed(2)}</span>
+					<span class="topline-result-stdev">${tpsMetrics.stdev.toFixed(2)}</span>
+				</div>
+			`;
+        }
+        return content;
     }
 }

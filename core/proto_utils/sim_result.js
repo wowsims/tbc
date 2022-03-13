@@ -151,6 +151,7 @@ export class PlayerMetrics {
         this.iconUrl = getTalentTreeIcon(this.spec, player.talentsString);
         this.classColor = classColors[specToClass[this.spec]];
         this.dps = this.metrics.dps;
+        this.tps = this.metrics.threat;
         this.actions = actions;
         this.auras = auras;
         this.resources = resources;

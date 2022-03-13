@@ -8,9 +8,8 @@ import { ResourceMetricsTable } from './resource_metrics.js';
 import { PlayerDamageMetricsTable } from './player_damage.js';
 import { AuraMetricsTable } from './aura_metrics.js';
 import { DpsHistogram } from './dps_histogram.js';
-import { DpsResult } from './dps_result.js';
-import { PercentOom } from './percent_oom.js';
 import { Timeline } from './timeline.js';
+import { ToplineResults } from './topline_results.js';
 const urlParams = new URLSearchParams(window.location.search);
 if (urlParams.has('mainTextColor')) {
     document.body.style.setProperty('--main-text-color', urlParams.get('mainTextColor'));
@@ -116,8 +115,7 @@ const resultsFilter = new ResultsFilter({
     colorSettings: colorSettings,
 });
 const toplineResultsDiv = document.body.getElementsByClassName('topline-results')[0];
-const dpsResult = new DpsResult({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-const percentOom = new PercentOom({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const toplineResults = new ToplineResults({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const castMetrics = new CastMetricsTable({ parent: document.body.getElementsByClassName('cast-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const meleeMetrics = new MeleeMetricsTable({ parent: document.body.getElementsByClassName('melee-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 const spellMetrics = new SpellMetricsTable({ parent: document.body.getElementsByClassName('spell-metrics')[0], resultsEmitter: resultsEmitter, colorSettings: colorSettings });

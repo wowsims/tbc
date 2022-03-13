@@ -78,6 +78,7 @@ export declare class PlayerMetrics {
     readonly iconUrl: string;
     readonly classColor: string;
     readonly dps: DistributionMetricsProto;
+    readonly tps: DistributionMetricsProto;
     readonly actions: Array<ActionMetrics>;
     readonly auras: Array<AuraMetrics>;
     readonly resources: Array<ResourceMetrics>;

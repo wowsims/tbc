@@ -143,6 +143,18 @@
   color: red !important;
 }
 
+.safe {
+  color: lawngreen;
+}
+
+.warning {
+  color: yellow;
+}
+
+.danger {
+  color: red;
+}
+
 .bold {
   font-weight: bold;
 }
@@ -405,6 +417,18 @@
 
 .negative {
   color: red !important;
+}
+
+.safe {
+  color: lawngreen;
+}
+
+.warning {
+  color: yellow;
+}
+
+.danger {
+  color: red;
 }
 
 .bold {
@@ -686,56 +710,6 @@ input, select {
   margin: auto;
 }
 
-.dps-result {
-  color: var(--main-text-color);
-}
-
-.results-sim-dps-avg {
-  font-size: 30px;
-  font-weight: 700;
-}
-
-.results-sim-dps-avg:after {
-  content: " DPS";
-  font-size: 18px;
-}
-
-.results-sim-dps-stdev {
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.results-sim-dps-stdev:before {
-  content: " ±";
-  padding: 2px;
-}
-
-.percent-oom {
-  color: var(--main-text-color);
-}
-
-.percent-oom.safe {
-  color: lawngreen;
-}
-
-.percent-oom.warning {
-  color: yellow;
-}
-
-.percent-oom.danger {
-  color: red;
-}
-
-.percent-oom-value {
-  font-size: 30px;
-  font-weight: 700;
-}
-
-.percent-oom-label {
-  font-size: 18px;
-  font-weight: 700;
-}
-
 .player-damage-row {
   cursor: pointer;
 }
@@ -916,6 +890,18 @@ input, select {
 
 .negative {
   color: red !important;
+}
+
+.safe {
+  color: lawngreen;
+}
+
+.warning {
+  color: yellow;
+}
+
+.danger {
+  color: red;
 }
 
 .bold {
@@ -1115,6 +1101,18 @@ input, select {
 
 .negative {
   color: red !important;
+}
+
+.safe {
+  color: lawngreen;
+}
+
+.warning {
+  color: yellow;
+}
+
+.danger {
+  color: red;
 }
 
 .bold {
@@ -1392,10 +1390,256 @@ input, select {
   border-color: blue;
 }
 
+:root {
+  --theme-color-primary: DarkSlateGrey;
+  --theme-color-background: DarkSlateGrey;
+  --theme-color-background-raw: 0, 0, 0;
+  --theme-background-image: linear-gradient(black, black);
+  --theme-background-opacity: 0.9;
+  --main-bg-color: DarkSlateGrey;
+  --main-text-color: White;
+  --main-secondary-color: Black;
+  --sidebar-bg-color: DarkKhaki;
+  --sidebar-text-color: White;
+  --sidebar-highlight-color: Blue;
+}
+
+.hide {
+  display: none;
+}
+
+@font-face {
+  font-family: SimDefaultFont;
+  src: url(/tbc/assets/PlusJakartaSans-Regular.woff2);
+}
+@font-face {
+  font-family: SimDefaultFont;
+  src: url(/tbc/assets/PlusJakartaSans-Bold.woff2);
+  font-weight: bold;
+}
+* {
+  font-family: SimDefaultFont;
+  letter-spacing: 1px;
+}
+
+.loader {
+  border: 16px solid #f3f3f3;
+  /* Light grey */
+  border-top: 16px solid #3498db;
+  /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.item-quality-junk {
+  color: #fff !important;
+}
+
+.item-quality-common {
+  color: white !important;
+}
+
+.item-quality-uncommon {
+  color: #1eff00 !important;
+}
+
+.item-quality-rare {
+  color: #0070dd !important;
+}
+
+.item-quality-epic {
+  color: #a335ee !important;
+}
+
+.item-quality-legendary {
+  color: #ff8000 !important;
+}
+
+#bootstrap-overrides .socket-color-blue {
+  border: 1px solid blue !important;
+}
+
+#bootstrap-overrides .socket-color-meta {
+  border: 1px solid white !important;
+}
+
+#bootstrap-overrides .socket-color-red {
+  border: 1px solid red !important;
+}
+
+#bootstrap-overrides .socket-color-yellow {
+  border: 1px solid yellow !important;
+}
+
+.dropdown-root {
+  position: relative;
+  display: inline-block !important;
+  white-space: nowrap;
+}
+
+.dropdown-button {
+  cursor: pointer;
+  background-color: gray;
+}
+
+.dropdown-panel {
+  display: none;
+  position: absolute;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.dropdown-panel-column {
+  display: inline-flex;
+  flex-direction: column;
+}
+
+.dropdown-root:hover .dropdown-panel {
+  display: block !important;
+}
+
+.dropdown-option-container:hover {
+  text-decoration: none;
+}
+
+.dropdown-option-container {
+  background-color: gray;
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+*:not(.dropdown-button) > * > .dropdown-option:not(:hover) {
+  opacity: 0.7;
+}
+
+.positive {
+  color: lawngreen !important;
+}
+
+.negative {
+  color: red !important;
+}
+
+.safe {
+  color: lawngreen;
+}
+
+.warning {
+  color: yellow;
+}
+
+.danger {
+  color: red;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+.sim-button {
+  color: var(--main-text-color);
+  background-color: var(--theme-color-primary);
+  border: none;
+  padding: 5px;
+  font-weight: bold;
+}
+
+.results-sim {
+  text-align: center;
+}
+
+.results-sim-dps {
+  text-align: center;
+}
+
+.results-sim-tps {
+  text-align: center;
+}
+
+.topline-result-avg {
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.topline-result-avg:after {
+  font-size: 18px;
+}
+
+.results-sim-dps .topline-result-avg:after {
+  content: " DPS";
+}
+
+.results-sim-tps .topline-result-avg:after {
+  content: " TPS";
+}
+
+.topline-result-stdev {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.topline-result-stdev:before {
+  content: " ±";
+  padding: 2px;
+}
+
+.topline-result-label {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.results-sim-reference.has-reference .results-sim-set-reference {
+  display: none;
+}
+
+.results-sim-reference:not(.has-reference) .results-sim-reference-bar {
+  display: none;
+}
+
+.results-sim-set-reference {
+  cursor: pointer;
+  font-size: 24px;
+  color: var(--theme-color-primary);
+}
+
+.results-sim-reference-swap {
+  color: blue;
+  cursor: pointer;
+  user-select: none;
+  margin: 5px;
+}
+
+.results-sim-reference-delete {
+  color: red;
+  cursor: pointer;
+  user-select: none;
+  margin: 5px;
+}
+
+.topline-results-root {
+  display: flex;
+  justify-content: space-around;
+}
+
 body {
   background-color: transparent;
   overflow: auto;
   max-height: 100%;
+  color: var(--main-text-color);
 }
 
 body.new-tab {
@@ -1467,11 +1711,6 @@ body.new-tab {
 .other-metrics {
   display: flex;
   width: 100%;
-}
-
-.topline-results {
-  display: flex;
-  justify-content: space-around;
 }
 
 .metrics-table {

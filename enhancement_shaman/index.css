@@ -143,6 +143,18 @@
   color: red !important;
 }
 
+.safe {
+  color: lawngreen;
+}
+
+.warning {
+  color: yellow;
+}
+
+.danger {
+  color: red;
+}
+
 .bold {
   font-weight: bold;
 }
@@ -405,6 +417,18 @@
 
 .negative {
   color: red !important;
+}
+
+.safe {
+  color: lawngreen;
+}
+
+.warning {
+  color: yellow;
+}
+
+.danger {
+  color: red;
 }
 
 .bold {
@@ -1069,6 +1093,18 @@ input, select {
   color: red !important;
 }
 
+.safe {
+  color: lawngreen;
+}
+
+.warning {
+  color: yellow;
+}
+
+.danger {
+  color: red;
+}
+
 .bold {
   font-weight: bold;
 }
@@ -1469,6 +1505,18 @@ input, select {
   color: red !important;
 }
 
+.safe {
+  color: lawngreen;
+}
+
+.warning {
+  color: yellow;
+}
+
+.danger {
+  color: red;
+}
+
 .bold {
   font-weight: bold;
 }
@@ -1803,6 +1851,18 @@ input, select {
   color: red !important;
 }
 
+.safe {
+  color: lawngreen;
+}
+
+.warning {
+  color: yellow;
+}
+
+.danger {
+  color: red;
+}
+
 .bold {
   font-weight: bold;
 }
@@ -1823,24 +1883,40 @@ input, select {
   text-align: center;
 }
 
-.results-sim-dps-avg {
+.results-sim-tps {
+  text-align: center;
+}
+
+.topline-result-avg {
   font-size: 30px;
   font-weight: 700;
 }
 
-.results-sim-dps-avg:after {
-  content: " DPS";
+.topline-result-avg:after {
   font-size: 18px;
 }
 
-.results-sim-dps-stdev {
+.results-sim-dps .topline-result-avg:after {
+  content: " DPS";
+}
+
+.results-sim-tps .topline-result-avg:after {
+  content: " TPS";
+}
+
+.topline-result-stdev {
   font-size: 18px;
   font-weight: 700;
 }
 
-.results-sim-dps-stdev:before {
+.topline-result-stdev:before {
   content: " ±";
   padding: 2px;
+}
+
+.topline-result-label {
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .results-sim-reference.has-reference .results-sim-set-reference {
@@ -1861,12 +1937,14 @@ input, select {
   color: blue;
   cursor: pointer;
   user-select: none;
+  margin: 5px;
 }
 
 .results-sim-reference-delete {
   color: red;
   cursor: pointer;
   user-select: none;
+  margin: 5px;
 }
 
 .raid-target-picker-root {
@@ -2146,6 +2224,18 @@ input, select {
   color: red !important;
 }
 
+.safe {
+  color: lawngreen;
+}
+
+.warning {
+  color: yellow;
+}
+
+.danger {
+  color: red;
+}
+
 .bold {
   font-weight: bold;
 }
@@ -2349,6 +2439,18 @@ input, select {
 
 .negative {
   color: red !important;
+}
+
+.safe {
+  color: lawngreen;
+}
+
+.warning {
+  color: yellow;
+}
+
+.danger {
+  color: red;
 }
 
 .bold {
