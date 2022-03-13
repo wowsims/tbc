@@ -64,6 +64,7 @@ node_modules: package-lock.json
 	npm install
 
 $(OUT_DIR)/core/tsconfig.tsbuildinfo: $(call rwildcard,ui/core,*.ts) ui/core/proto/api.ts
+	npx tsc -p ui/core
 	$(SED) 's#@protobuf-ts/runtime#/tbc/protobuf-ts/index#g' $(OUT_DIR)/core/proto/*.js
 	$(SED) "s/from \"(.*)\";/from '\1.js';/g" $(OUT_DIR)/core/proto/*.js
 
@@ -73,7 +74,7 @@ host_%: ui_shared %
 
 # Generic rule for building index.js for any class directory
 $(OUT_DIR)/%/index.js: ui/%/index.ts ui/%/*.ts $(OUT_DIR)/core/tsconfig.tsbuildinfo
-	npx tsc -b $(<D) 
+	npx tsc -p $(<D) 
 
 # Generic rule for building index.css for any class directory
 $(OUT_DIR)/%/index.css: ui/%/index.scss ui/%/*.scss $(call rwildcard,ui/core,*.scss)

@@ -10,6 +10,7 @@ message SimSettings {
 	int32 iterations = 1;
 	int32 phase = 2;
 	int64 fixed_rng_seed = 3;
+	bool show_threat_metrics = 4;
 }
 
 // Contains all information that is imported/exported from an individual sim.

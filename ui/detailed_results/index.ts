@@ -171,7 +171,16 @@ function updateResults() {
 	}
 }
 
+document.body.classList.add('hide-threat-metrics');
 window.addEventListener('message', async event => {
+	if (event.data == 'showThreatMetrics') {
+		document.body.classList.remove('hide-threat-metrics');
+		return;
+	} else if (event.data == 'hideThreatMetrics') {
+		document.body.classList.add('hide-threat-metrics');
+		return;
+	}
+
 	// Null indicates pending results
 	const data: Object | null = event.data;
 

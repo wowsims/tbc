@@ -106,6 +106,7 @@ type ActionMetrics struct {
 	Glances int32
 
 	Damage float64
+	Threat float64
 }
 
 func (actionMetrics *ActionMetrics) ToProto() *proto.ActionMetrics {
@@ -122,6 +123,7 @@ func (actionMetrics *ActionMetrics) ToProto() *proto.ActionMetrics {
 		Blocks:  actionMetrics.Blocks,
 		Glances: actionMetrics.Glances,
 		Damage:  actionMetrics.Damage,
+		Threat:  actionMetrics.Threat,
 	}
 }
 
@@ -216,6 +218,7 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 	actionMetrics.Blocks += spellCast.Blocks
 	actionMetrics.Glances += spellCast.Glances
 	actionMetrics.Damage += spellCast.TotalDamage
+	actionMetrics.Threat += spellCast.TotalThreat
 	characterMetrics.dps.Total += spellCast.TotalDamage
 	characterMetrics.threat.Total += spellCast.TotalThreat
 

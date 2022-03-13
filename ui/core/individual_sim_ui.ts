@@ -893,6 +893,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			this.sim.setIterations(eventID, 3000);
 			this.sim.setPhase(eventID, OtherConstants.CURRENT_PHASE);
 			this.sim.setFixedRngSeed(eventID, 0);
+			this.sim.setShowThreatMetrics(eventID, false); // TODO: true if tank sim
 		});
 	}
 

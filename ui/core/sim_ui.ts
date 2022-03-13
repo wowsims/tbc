@@ -50,6 +50,16 @@ export abstract class SimUI extends Component {
       this.sim.changeEmitter,
 		], 'SimUIChange');
 
+		const updateShowThreatMetrics = () => {
+			if (this.sim.getShowThreatMetrics()) {
+				this.rootElem.classList.remove('hide-threat-metrics');
+			} else {
+				this.rootElem.classList.add('hide-threat-metrics');
+			}
+		};
+		updateShowThreatMetrics();
+		this.sim.showThreatMetricsChangeEmitter.on(updateShowThreatMetrics);
+
 		this.warnings = [];
 		const warningsElem = document.getElementsByClassName('warnings')[0] as HTMLElement;
 		this.warningsTippy = tippy(warningsElem, {

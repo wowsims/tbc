@@ -255,3 +255,7 @@ input, select {
 .downbinalert {
 	background-color: red;
 }
+
+.hide-threat-metrics .threat-metrics {
+	display: none !important;
+}

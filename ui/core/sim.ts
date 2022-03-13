@@ -68,6 +68,7 @@ export class Sim {
   private show1hWeapons: boolean = true;
   private show2hWeapons: boolean = true;
   private showMatchingGems: boolean = true;
+	private showThreatMetrics: boolean = false;
 
   readonly raid: Raid;
   readonly encounter: Encounter;
@@ -84,6 +85,7 @@ export class Sim {
   readonly show1hWeaponsChangeEmitter = new TypedEvent<void>();
   readonly show2hWeaponsChangeEmitter = new TypedEvent<void>();
   readonly showMatchingGemsChangeEmitter = new TypedEvent<void>();
+  readonly showThreatMetricsChangeEmitter = new TypedEvent<void>();
 
   // Emits when any of the above emitters emit.
   readonly changeEmitter: TypedEvent<void>;
@@ -118,6 +120,7 @@ export class Sim {
       this.show1hWeaponsChangeEmitter,
       this.show2hWeaponsChangeEmitter,
       this.showMatchingGemsChangeEmitter,
+      this.showThreatMetricsChangeEmitter,
 			this.raid.changeEmitter,
 			this.encounter.changeEmitter,
 		]);
@@ -368,6 +371,16 @@ export class Sim {
     }
   }
   
+  getShowThreatMetrics(): boolean {
+    return this.showThreatMetrics;
+  }
+  setShowThreatMetrics(eventID: EventID, newShowThreatMetrics: boolean) {
+    if (newShowThreatMetrics != this.showThreatMetrics) {
+      this.showThreatMetrics = newShowThreatMetrics;
+      this.showThreatMetricsChangeEmitter.emit(eventID);
+    }
+  }
+  
   getIterations(): number {
     return this.iterations;
   }
@@ -416,6 +429,7 @@ export class Sim {
 			iterations: this.getIterations(),
 			phase: this.getPhase(),
 			fixedRngSeed: BigInt(this.getFixedRngSeed()),
+			showThreatMetrics: this.getShowThreatMetrics(),
 		});
 	}
 
@@ -424,6 +438,7 @@ export class Sim {
 			this.setIterations(eventID, proto.iterations || 3000);
 			this.setPhase(eventID, proto.phase || OtherConstants.CURRENT_PHASE);
 			this.setFixedRngSeed(eventID, Number(proto.fixedRngSeed));
+			this.setShowThreatMetrics(eventID, proto.showThreatMetrics);
 		});
 	}
 }
