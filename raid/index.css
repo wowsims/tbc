@@ -545,7 +545,7 @@ input, select {
 }
 
 .sim-sidebar-title, .sim-toolbar {
-  height: 60px;
+  min-height: 60px;
   border-bottom: 1px solid white;
 }
 
