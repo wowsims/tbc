@@ -801,8 +801,11 @@ func ApplyDevastation(agent core.Agent) {
 					return
 				}
 
-				character.MultiplyMeleeSpeed(sim, bonus)
-				character.AddAura(sim, core.Aura{
+				if !character.HasAura(DevastationProcAuraID) {
+					character.MultiplyMeleeSpeed(sim, bonus)
+				}
+
+				character.ReplaceAura(sim, core.Aura{
 					ID:       DevastationProcAuraID,
 					ActionID: core.ActionID{ItemID: 30316},
 					Expires:  sim.CurrentTime + dur,

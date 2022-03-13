@@ -237,7 +237,7 @@ func (at *auraTracker) reset(sim *Simulation) {
 		if !permAura.RespectExpiration {
 			aura.Expires = NeverExpires
 		}
-		at.AddAura(sim, aura)
+		at.ReplaceAura(sim, aura)
 		if permAura.UptimeMultiplier != 0 && !aura.ActionID.IsEmptyAction() {
 			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(-1*float64(sim.Duration)*(1.0-permAura.UptimeMultiplier)))
 		}
@@ -267,8 +267,14 @@ func (at *auraTracker) advance(sim *Simulation) {
 		}
 	}
 
+	for i, id := range at.activeAuraIDs {
+		if at.auras[id].activeIndex != int32(i) {
+			panic("activeIndex invalid")
+		}
+	}
+
 	for _, id := range at.activeAuraIDs {
-		if at.auras[id].Expires != 0 && at.auras[id].Expires <= sim.CurrentTime {
+		if aura := &at.auras[id]; aura.Expires != 0 && aura.Expires <= sim.CurrentTime {
 			at.RemoveAura(sim, id)
 		}
 	}

@@ -378,7 +378,7 @@ func newWindfuryBuffAuraFactory(character *Character, rank int32, iwtTalentPoint
 				return
 			}
 			charges--
-			if charges <= 0 {
+			if charges == 0 {
 				character.UpdateExpires(windfuryBuffAuraID, sim.CurrentTime) // for correct bookkeeping
 				character.RemoveAuraOnNextAdvance(sim, windfuryBuffAuraID)
 			}
