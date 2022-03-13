@@ -254,6 +254,10 @@
   filter: opacity(0.5);
 }
 
+.input-root.disabled .dropdown-button, .input-root.disabled .dropdown-option {
+  filter: grayscale(1);
+}
+
 .input-root.hide {
   display: none;
 }
@@ -786,6 +790,10 @@ input, select {
   filter: opacity(0.5);
 }
 
+.input-root.disabled .dropdown-button, .input-root.disabled .dropdown-option {
+  filter: grayscale(1);
+}
+
 .input-root.hide {
   display: none;
 }
@@ -830,6 +838,10 @@ input, select {
 
 .input-root.disabled .input-label, .input-root.disabled .input-tooltip {
   filter: opacity(0.5);
+}
+
+.input-root.disabled .dropdown-button, .input-root.disabled .dropdown-option {
+  filter: grayscale(1);
 }
 
 .input-root.hide {
@@ -897,6 +909,10 @@ input, select {
   filter: opacity(0.5);
 }
 
+.input-root.disabled .dropdown-button, .input-root.disabled .dropdown-option {
+  filter: grayscale(1);
+}
+
 .input-root.hide {
   display: none;
 }
@@ -916,6 +932,10 @@ input, select {
 
 .input-root.disabled .input-label, .input-root.disabled .input-tooltip {
   filter: opacity(0.5);
+}
+
+.input-root.disabled .dropdown-button, .input-root.disabled .dropdown-option {
+  filter: grayscale(1);
 }
 
 .input-root.hide {
@@ -984,6 +1004,10 @@ input, select {
 
 .input-root.disabled .input-label, .input-root.disabled .input-tooltip {
   filter: opacity(0.5);
+}
+
+.input-root.disabled .dropdown-button, .input-root.disabled .dropdown-option {
+  filter: grayscale(1);
 }
 
 .input-root.hide {
@@ -1394,16 +1418,16 @@ input, select {
   border-color: lawngreen;
 }
 
+.icon-enum-picker-root.disabled {
+  border-color: dimgray;
+}
+
 .icon-enum-picker-button {
   background-size: cover;
 }
 
 .icon-enum-picker-option {
   background-size: cover;
-}
-
-.dropdown-option-container.hide {
-  display: none;
 }
 
 :root {
@@ -1721,6 +1745,10 @@ input, select {
   filter: opacity(0.5);
 }
 
+.input-root.disabled .dropdown-button, .input-root.disabled .dropdown-option {
+  filter: grayscale(1);
+}
+
 .input-root.hide {
   display: none;
 }
@@ -1741,6 +1769,10 @@ input, select {
 
 .input-root.disabled .input-label, .input-root.disabled .input-tooltip {
   filter: opacity(0.5);
+}
+
+.input-root.disabled .dropdown-button, .input-root.disabled .dropdown-option {
+  filter: grayscale(1);
 }
 
 .input-root.hide {

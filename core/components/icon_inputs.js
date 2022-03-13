@@ -9,9 +9,11 @@ import { Conjured } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { PetFood } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
+import { Hunter_Rotation_WeaveType as WeaveType, } from '/tbc/core/proto/hunter.js';
 // Keep each section in alphabetical order.
 // Raid Buffs
 export const ArcaneBrilliance = makeBooleanRaidBuffInput(ActionId.fromSpellId(27127), 'arcaneBrilliance');
@@ -466,7 +468,12 @@ export function makeWeaponImbueInput(isMainHand, options) {
         { actionId: ActionId.fromSpellId(25485), value: WeaponImbue.WeaponImbueShamanRockbiter },
     ];
     if (isMainHand) {
-        return makeConsumeInputFactory('mainHandImbue', allOptions)(options);
+        const config = makeConsumeInputFactory('mainHandImbue', allOptions)(options);
+        config.enableWhen = (player) => !player.getParty()
+            || player.getParty().getBuffs().windfuryTotemRank == 0
+            || (player.spec == Spec.SpecHunter && player.getRotation().weave == WeaveType.WeaveNone);
+        config.changedEvent = (player) => TypedEvent.onAny([player.getRaid()?.changeEmitter || player.consumesChangeEmitter]);
+        return config;
     }
     else {
         return makeConsumeInputFactory('offHandImbue', allOptions)(options);
