@@ -708,6 +708,10 @@ input, select {
   display: none !important;
 }
 
+.hide-experimental .experimental {
+  display: none !important;
+}
+
 .dps-histogram-root {
   height: 30vh;
   width: 90vw;

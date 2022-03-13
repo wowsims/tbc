@@ -708,6 +708,10 @@ input, select {
   display: none !important;
 }
 
+.hide-experimental .experimental {
+  display: none !important;
+}
+
 .bonus-stats-root {
   margin: 10px;
 }

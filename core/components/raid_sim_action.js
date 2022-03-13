@@ -1,5 +1,6 @@
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
+import { SimRunData } from '/tbc/core/proto/ui.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 export function addRaidSimAction(simUI) {
     simUI.addAction('DPS', 'dps-action', async () => simUI.runSim((progress) => {
@@ -128,6 +129,15 @@ export class RaidSimResultsManager {
             simReferenceDiffElem.classList.remove('positive');
             simReferenceDiffElem.classList.add('negative');
         }
+    }
+    getRunData() {
+        if (this.currentData == null) {
+            return null;
+        }
+        return SimRunData.create({
+            run: this.currentData.simResult.toProto(),
+            referenceRun: this.referenceData?.simResult.toProto(),
+        });
     }
     getCurrentData() {
         if (this.currentData == null) {

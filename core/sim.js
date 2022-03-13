@@ -27,6 +27,7 @@ export class Sim {
         this.show2hWeapons = true;
         this.showMatchingGems = true;
         this.showThreatMetrics = false;
+        this.showExperimental = false;
         // Database
         this.items = {};
         this.enchants = {};
@@ -39,6 +40,7 @@ export class Sim {
         this.show2hWeaponsChangeEmitter = new TypedEvent();
         this.showMatchingGemsChangeEmitter = new TypedEvent();
         this.showThreatMetricsChangeEmitter = new TypedEvent();
+        this.showExperimentalChangeEmitter = new TypedEvent();
         // Fires when a raid sim API call completes.
         this.simResultEmitter = new TypedEvent();
         this.lastUsedRngSeed = 0;
@@ -53,7 +55,7 @@ export class Sim {
         });
         this.raid = new Raid(this);
         this.encounter = new Encounter(this);
-        this.changeEmitter = TypedEvent.onAny([
+        this.settingsChangeEmitter = TypedEvent.onAny([
             this.iterationsChangeEmitter,
             this.phaseChangeEmitter,
             this.fixedRngSeedChangeEmitter,
@@ -61,6 +63,10 @@ export class Sim {
             this.show2hWeaponsChangeEmitter,
             this.showMatchingGemsChangeEmitter,
             this.showThreatMetricsChangeEmitter,
+            this.showExperimentalChangeEmitter,
+        ]);
+        this.changeEmitter = TypedEvent.onAny([
+            this.settingsChangeEmitter,
             this.raid.changeEmitter,
             this.encounter.changeEmitter,
         ]);
@@ -282,6 +288,15 @@ export class Sim {
             this.showThreatMetricsChangeEmitter.emit(eventID);
         }
     }
+    getShowExperimental() {
+        return this.showExperimental;
+    }
+    setShowExperimental(eventID, newShowExperimental) {
+        if (newShowExperimental != this.showExperimental) {
+            this.showExperimental = newShowExperimental;
+            this.showExperimentalChangeEmitter.emit(eventID);
+        }
+    }
     getIterations() {
         return this.iterations;
     }
@@ -321,6 +336,7 @@ export class Sim {
             phase: this.getPhase(),
             fixedRngSeed: BigInt(this.getFixedRngSeed()),
             showThreatMetrics: this.getShowThreatMetrics(),
+            showExperimental: this.getShowExperimental(),
         });
     }
     fromProto(eventID, proto) {
@@ -329,6 +345,7 @@ export class Sim {
             this.setPhase(eventID, proto.phase || OtherConstants.CURRENT_PHASE);
             this.setFixedRngSeed(eventID, Number(proto.fixedRngSeed));
             this.setShowThreatMetrics(eventID, proto.showThreatMetrics);
+            this.setShowExperimental(eventID, proto.showExperimental);
         });
     }
 }

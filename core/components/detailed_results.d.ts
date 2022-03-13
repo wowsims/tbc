@@ -5,9 +5,9 @@ export declare class DetailedResults extends Component {
     private readonly simUI;
     private readonly iframeElem;
     private tabWindow;
-    private latestResult;
+    private latestRun;
     constructor(parent: HTMLElement, simUI: SimUI, simResultsManager: RaidSimResultsManager);
-    private setSimResult;
+    private setSimRunData;
     private updateSettings;
     private postMessage;
 }

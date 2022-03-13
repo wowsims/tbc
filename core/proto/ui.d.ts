@@ -4,6 +4,8 @@ import type { BinaryReadOptions } from "@protobuf-ts/runtime";
 import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
+import { RaidSimResult } from "./api";
+import { RaidSimRequest } from "./api";
 import { Raid } from "./api";
 import { RaidTarget } from "./common";
 import { Cooldowns } from "./common";
@@ -35,6 +37,10 @@ export interface SimSettings {
      * @generated from protobuf field: bool show_threat_metrics = 4;
      */
     showThreatMetrics: boolean;
+    /**
+     * @generated from protobuf field: bool show_experimental = 5;
+     */
+    showExperimental: boolean;
 }
 /**
  * Contains all information that is imported/exported from an individual sim.
@@ -231,6 +237,67 @@ export interface RaidSimSettings {
     encounter?: Encounter;
 }
 /**
+ * All the data related to running the sim once.
+ *
+ * @generated from protobuf message proto.SimRun
+ */
+export interface SimRun {
+    /**
+     * @generated from protobuf field: proto.RaidSimRequest request = 1;
+     */
+    request?: RaidSimRequest;
+    /**
+     * @generated from protobuf field: proto.RaidSimResult result = 2;
+     */
+    result?: RaidSimResult;
+}
+/**
+ * Contains a sim run and also other context data.
+ *
+ * @generated from protobuf message proto.SimRunData
+ */
+export interface SimRunData {
+    /**
+     * @generated from protobuf field: proto.SimRun run = 1;
+     */
+    run?: SimRun;
+    /**
+     * The run stored as a reference, for comparison to the current run.
+     *
+     * @generated from protobuf field: proto.SimRun reference_run = 2;
+     */
+    referenceRun?: SimRun;
+}
+/**
+ * Sent by the sim to the detailed results page.
+ *
+ * @generated from protobuf message proto.DetailedResultsUpdate
+ */
+export interface DetailedResultsUpdate {
+    /**
+     * @generated from protobuf oneof: data
+     */
+    data: {
+        oneofKind: "runData";
+        /**
+         * Show results from a run.
+         *
+         * @generated from protobuf field: proto.SimRunData run_data = 1;
+         */
+        runData: SimRunData;
+    } | {
+        oneofKind: "settings";
+        /**
+         * Update sim settings.
+         *
+         * @generated from protobuf field: proto.SimSettings settings = 2;
+         */
+        settings: SimSettings;
+    } | {
+        oneofKind: undefined;
+    };
+}
+/**
  * @generated from protobuf enum proto.Blessings
  */
 export declare enum Blessings {
@@ -365,4 +432,34 @@ declare class RaidSimSettings$Type extends MessageType<RaidSimSettings> {
  * @generated MessageType for protobuf message proto.RaidSimSettings
  */
 export declare const RaidSimSettings: RaidSimSettings$Type;
+declare class SimRun$Type extends MessageType<SimRun> {
+    constructor();
+    create(value?: PartialMessage<SimRun>): SimRun;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SimRun): SimRun;
+    internalBinaryWrite(message: SimRun, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.SimRun
+ */
+export declare const SimRun: SimRun$Type;
+declare class SimRunData$Type extends MessageType<SimRunData> {
+    constructor();
+    create(value?: PartialMessage<SimRunData>): SimRunData;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: SimRunData): SimRunData;
+    internalBinaryWrite(message: SimRunData, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.SimRunData
+ */
+export declare const SimRunData: SimRunData$Type;
+declare class DetailedResultsUpdate$Type extends MessageType<DetailedResultsUpdate> {
+    constructor();
+    create(value?: PartialMessage<DetailedResultsUpdate>): DetailedResultsUpdate;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: DetailedResultsUpdate): DetailedResultsUpdate;
+    internalBinaryWrite(message: DetailedResultsUpdate, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.DetailedResultsUpdate
+ */
+export declare const DetailedResultsUpdate: DetailedResultsUpdate$Type;
 export {};

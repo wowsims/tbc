@@ -14,6 +14,7 @@ import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { SimRun } from '/tbc/core/proto/ui.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { AuraUptimeLog, CastLog, DamageDealtLog, DpsLog, MajorCooldownUsedLog, ResourceChangedLogGroup, SimLog } from './logs_parser.js';
 export interface SimResultFilter {
@@ -47,8 +48,8 @@ export declare class SimResult {
     getResourceMetrics(filter: SimResultFilter, resourceType: ResourceType): Array<ResourceMetrics>;
     getBuffMetrics(filter: SimResultFilter): Array<AuraMetrics>;
     getDebuffMetrics(filter: SimResultFilter): Array<AuraMetrics>;
-    toJson(): any;
-    static fromJson(obj: any): Promise<SimResult>;
+    toProto(): SimRun;
+    static fromProto(proto: SimRun): Promise<SimResult>;
     static makeNew(request: RaidSimRequest, result: RaidSimResult): Promise<SimResult>;
 }
 export declare class RaidMetrics {

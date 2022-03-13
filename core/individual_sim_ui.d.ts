@@ -127,7 +127,6 @@ export interface Settings {
 export declare abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
     readonly player: Player<SpecType>;
     readonly individualConfig: IndividualSimUIConfig<SpecType>;
-    readonly debug: boolean;
     private readonly exclusivityMap;
     private raidSimResultsManager;
     private settingsMuuri;

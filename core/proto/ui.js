@@ -3,6 +3,8 @@ import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
+import { RaidSimResult } from './api.js';
+import { RaidSimRequest } from './api.js';
 import { Raid } from './api.js';
 import { RaidTarget } from './common.js';
 import { Cooldowns } from './common.js';
@@ -47,11 +49,12 @@ class SimSettings$Type extends MessageType {
             { no: 1, name: "iterations", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "fixed_rng_seed", kind: "scalar", T: 3 /*ScalarType.INT64*/, L: 0 /*LongType.BIGINT*/ },
-            { no: 4, name: "show_threat_metrics", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 4, name: "show_threat_metrics", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "show_experimental", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { iterations: 0, phase: 0, fixedRngSeed: 0n, showThreatMetrics: false };
+        const message = { iterations: 0, phase: 0, fixedRngSeed: 0n, showThreatMetrics: false, showExperimental: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -73,6 +76,9 @@ class SimSettings$Type extends MessageType {
                     break;
                 case /* bool show_threat_metrics */ 4:
                     message.showThreatMetrics = reader.bool();
+                    break;
+                case /* bool show_experimental */ 5:
+                    message.showExperimental = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -98,6 +104,9 @@ class SimSettings$Type extends MessageType {
         /* bool show_threat_metrics = 4; */
         if (message.showThreatMetrics !== false)
             writer.tag(4, WireType.Varint).bool(message.showThreatMetrics);
+        /* bool show_experimental = 5; */
+        if (message.showExperimental !== false)
+            writer.tag(5, WireType.Varint).bool(message.showExperimental);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -742,3 +751,171 @@ class RaidSimSettings$Type extends MessageType {
  * @generated MessageType for protobuf message proto.RaidSimSettings
  */
 export const RaidSimSettings = new RaidSimSettings$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SimRun$Type extends MessageType {
+    constructor() {
+        super("proto.SimRun", [
+            { no: 1, name: "request", kind: "message", T: () => RaidSimRequest },
+            { no: 2, name: "result", kind: "message", T: () => RaidSimResult }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.RaidSimRequest request */ 1:
+                    message.request = RaidSimRequest.internalBinaryRead(reader, reader.uint32(), options, message.request);
+                    break;
+                case /* proto.RaidSimResult result */ 2:
+                    message.result = RaidSimResult.internalBinaryRead(reader, reader.uint32(), options, message.result);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.RaidSimRequest request = 1; */
+        if (message.request)
+            RaidSimRequest.internalBinaryWrite(message.request, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.RaidSimResult result = 2; */
+        if (message.result)
+            RaidSimResult.internalBinaryWrite(message.result, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.SimRun
+ */
+export const SimRun = new SimRun$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class SimRunData$Type extends MessageType {
+    constructor() {
+        super("proto.SimRunData", [
+            { no: 1, name: "run", kind: "message", T: () => SimRun },
+            { no: 2, name: "reference_run", kind: "message", T: () => SimRun }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.SimRun run */ 1:
+                    message.run = SimRun.internalBinaryRead(reader, reader.uint32(), options, message.run);
+                    break;
+                case /* proto.SimRun reference_run */ 2:
+                    message.referenceRun = SimRun.internalBinaryRead(reader, reader.uint32(), options, message.referenceRun);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.SimRun run = 1; */
+        if (message.run)
+            SimRun.internalBinaryWrite(message.run, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.SimRun reference_run = 2; */
+        if (message.referenceRun)
+            SimRun.internalBinaryWrite(message.referenceRun, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.SimRunData
+ */
+export const SimRunData = new SimRunData$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class DetailedResultsUpdate$Type extends MessageType {
+    constructor() {
+        super("proto.DetailedResultsUpdate", [
+            { no: 1, name: "run_data", kind: "message", oneof: "data", T: () => SimRunData },
+            { no: 2, name: "settings", kind: "message", oneof: "data", T: () => SimSettings }
+        ]);
+    }
+    create(value) {
+        const message = { data: { oneofKind: undefined } };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.SimRunData run_data */ 1:
+                    message.data = {
+                        oneofKind: "runData",
+                        runData: SimRunData.internalBinaryRead(reader, reader.uint32(), options, message.data.runData)
+                    };
+                    break;
+                case /* proto.SimSettings settings */ 2:
+                    message.data = {
+                        oneofKind: "settings",
+                        settings: SimSettings.internalBinaryRead(reader, reader.uint32(), options, message.data.settings)
+                    };
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.SimRunData run_data = 1; */
+        if (message.data.oneofKind === "runData")
+            SimRunData.internalBinaryWrite(message.data.runData, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.SimSettings settings = 2; */
+        if (message.data.oneofKind === "settings")
+            SimSettings.internalBinaryWrite(message.data.settings, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.DetailedResultsUpdate
+ */
+export const DetailedResultsUpdate = new DetailedResultsUpdate$Type();

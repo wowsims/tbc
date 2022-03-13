@@ -26,6 +26,7 @@ import { SavedGearSet } from '/tbc/core/proto/ui.js';
 import { SavedSettings } from '/tbc/core/proto/ui.js';
 import { SavedTalents } from '/tbc/core/proto/ui.js';
 import { SettingsMenu } from '/tbc/core/components/settings_menu.js';
+import { SimSettings as SimSettingsProto } from '/tbc/core/proto/ui.js';
 import { SimUI } from './sim_ui.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
@@ -78,7 +79,6 @@ export class IndividualSimUI extends SimUI {
         this.individualConfig = config;
         this.raidSimResultsManager = null;
         this.settingsMuuri = null;
-        this.debug = new URLSearchParams(window.location.search).has('debug');
         if (!launchedSpecs.includes(this.player.spec)) {
             this.addWarning({
                 updateOn: new TypedEvent(),
@@ -175,9 +175,7 @@ export class IndividualSimUI extends SimUI {
         const characterStats = new CharacterStats(this.rootElem.getElementsByClassName('sim-sidebar-footer')[0], this.player, this.individualConfig.displayStats, this.individualConfig.modifyDisplayStats);
     }
     addTopbarComponents() {
-        if (this.debug) {
-            this.addToolbarItem(newIndividualImporters(this));
-        }
+        this.addToolbarItem(newIndividualImporters(this));
         this.addToolbarItem(newIndividualExporters(this));
         const settingsMenu = document.createElement('span');
         settingsMenu.classList.add('fas', 'fa-cog');
@@ -651,10 +649,11 @@ export class IndividualSimUI extends SimUI {
                         debuffs: this.individualConfig.defaults.debuffs,
                     })],
             }));
-            this.sim.setIterations(eventID, 3000);
-            this.sim.setPhase(eventID, OtherConstants.CURRENT_PHASE);
-            this.sim.setFixedRngSeed(eventID, 0);
-            this.sim.setShowThreatMetrics(eventID, false); // TODO: true if tank sim
+            this.sim.fromProto(eventID, SimSettingsProto.create({
+                iterations: 3000,
+                phase: OtherConstants.CURRENT_PHASE,
+                showThreatMetrics: false, // TODO: true if tank sim
+            }));
         });
     }
     registerExclusiveEffect(effect) {

@@ -22,6 +22,16 @@ export class SimUI extends Component {
         };
         updateShowThreatMetrics();
         this.sim.showThreatMetricsChangeEmitter.on(updateShowThreatMetrics);
+        const updateShowExperimental = () => {
+            if (this.sim.getShowExperimental()) {
+                this.rootElem.classList.remove('hide-experimental');
+            }
+            else {
+                this.rootElem.classList.add('hide-experimental');
+            }
+        };
+        updateShowExperimental();
+        this.sim.showExperimentalChangeEmitter.on(updateShowExperimental);
         this.warnings = [];
         const warningsElem = document.getElementsByClassName('warnings')[0];
         this.warningsTippy = tippy(warningsElem, {

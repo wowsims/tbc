@@ -27,9 +27,7 @@ export function newIndividualExporters(simUI) {
     addMenuItem('Link', () => new IndividualLinkExporter(menuElem, simUI));
     addMenuItem('Json', () => new IndividualJsonExporter(menuElem, simUI));
     addMenuItem('70U EP', () => new Individual70UEPExporter(menuElem, simUI));
-    if (simUI.debug) {
-        addMenuItem('Pawn EP', () => new IndividualPawnEPExporter(menuElem, simUI));
-    }
+    addMenuItem('Pawn EP', () => new IndividualPawnEPExporter(menuElem, simUI));
     return exportSettings;
 }
 class Exporter extends Popup {
