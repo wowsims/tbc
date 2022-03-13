@@ -14,6 +14,7 @@ import { Debuffs } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { PetFood } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { IndividualSimIconPickerConfig } from '/tbc/core/individual_sim_ui.js';
@@ -27,6 +28,11 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { ExclusivityTag } from '/tbc/core/individual_sim_ui.js';
 import { IconPickerConfig } from './icon_picker.js';
 import { IconEnumPicker, IconEnumPickerConfig, IconEnumValueConfig } from './icon_enum_picker.js';
+
+import {
+	Hunter_Rotation as HunterRotation,
+	Hunter_Rotation_WeaveType as WeaveType,
+} from '/tbc/core/proto/hunter.js';
 
 // Keep each section in alphabetical order.
 
@@ -517,7 +523,12 @@ export function makeWeaponImbueInput(isMainHand: boolean, options: Array<WeaponI
 		{ actionId: ActionId.fromSpellId(25485), value: WeaponImbue.WeaponImbueShamanRockbiter },
 	];
 	if (isMainHand) {
-		return makeConsumeInputFactory('mainHandImbue', allOptions)(options);
+		const config = makeConsumeInputFactory('mainHandImbue', allOptions)(options);
+		config.enableWhen = (player: Player<any>) => !player.getParty()
+				|| player.getParty()!.getBuffs().windfuryTotemRank == 0
+				|| (player.spec == Spec.SpecHunter && (player.getRotation() as HunterRotation).weave == WeaveType.WeaveNone);
+		config.changedEvent = (player: Player<any>) => TypedEvent.onAny([player.getRaid()?.changeEmitter || player.consumesChangeEmitter]);
+		return config;
 	} else {
 		return makeConsumeInputFactory('offHandImbue', allOptions)(options);
 	}

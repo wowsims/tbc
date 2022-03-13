@@ -411,7 +411,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Mana-EtchedRegalia"
  value: {
-  dps: 1324.3312083019548
+  dps: 1323.162925801955
  }
 }
 dps_results: {
@@ -429,7 +429,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 1531.544178172009
+  dps: 1535.5862842774452
  }
 }
 dps_results: {
@@ -567,7 +567,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 1458.2945855433134
+  dps: 1459.694573118313
  }
 }
 dps_results: {
@@ -1035,7 +1035,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcast-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 776.9793014512063
+  dps: 776.958040120393
  }
 }
 dps_results: {
@@ -1077,19 +1077,19 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcastNoBuffs-NoBuffs-LongMultiTarget"
  value: {
-  dps: 979.0338268382915
+  dps: 971.4210259960237
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcastNoBuffs-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 663.7277047318505
+  dps: 660.0526902717555
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcastNoBuffs-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 530.6625244980337
+  dps: 525.4011733454572
  }
 }
 dps_results: {
@@ -1173,13 +1173,13 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-LBOnly-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1019.0562096379855
+  dps: 1038.7667634051795
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-LBOnly-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1019.0562096379855
+  dps: 1038.7667634051795
  }
 }
 dps_results: {

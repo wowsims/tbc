@@ -21,7 +21,7 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         core.SpellExtrasBinary | core.SpellExtrasAlwaysHits,
+				SpellExtras:         SpellFlagMage | core.SpellExtrasBinary | core.SpellExtrasAlwaysHits,
 			},
 		},
 		Effect: core.SpellHitEffect{

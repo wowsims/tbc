@@ -19,7 +19,7 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFrost,
-				SpellExtras:         core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
+				SpellExtras:         SpellFlagMage | core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
 				Character:           &mage.Character,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,

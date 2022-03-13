@@ -7,6 +7,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+const (
+	SpellFlagMage = core.SpellExtrasAgentReserved1
+)
+
 func RegisterMage() {
 	core.RegisterAgentFactory(
 		proto.Player_Mage{},
