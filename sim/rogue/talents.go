@@ -365,6 +365,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 	}
 
 	cooldown := time.Minute * 2
+	dur := time.Second * 15
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
@@ -380,7 +381,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				rogue.MultiplyMeleeSpeed(sim, hasteBonus)
 				aura := bladeFlurryAura
-				aura.Expires = sim.CurrentTime + time.Second*15
+				aura.Expires = sim.CurrentTime + dur
 				rogue.AddAura(sim, aura)
 			},
 		},
@@ -400,7 +401,20 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 			return true
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
+			if sim.GetRemainingDuration() > cooldown+dur {
+				// We'll have enough time to cast another BF, so use it immediately to make sure we get the 2nd one.
+				return true
+			}
+
+			// Since this is our last BF, wait until we have SND / procs up.
+			sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
+			if sndTimeRemaining >= time.Second {
+				return true
+			}
+
+			// TODO: Wait for dst/mongoose procs
+
+			return false
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {

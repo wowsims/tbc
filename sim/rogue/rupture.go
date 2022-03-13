@@ -64,3 +64,7 @@ func (rogue *Rogue) NewRupture(sim *core.Simulation, target *core.Target) *core.
 	rp.Init(sim)
 	return rp
 }
+
+func (rogue *Rogue) RuptureDuration(comboPoints int32) time.Duration {
+	return time.Second*6 + time.Second*2*time.Duration(comboPoints)
+}
