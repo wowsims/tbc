@@ -198,7 +198,7 @@ class Individual70UImporter<SpecType extends Spec> extends Importer {
 		}
 
 		let talentsStr = '';
-		if (importJson?.talents.length > 0) {
+		if (importJson?.talents?.length > 0) {
 			const talentIds = (importJson.talents as Array<any>).map(talentJson => talentJson.spellId);
 			talentsStr = talentSpellIdsToTalentString(charClass, talentIds);
 		}

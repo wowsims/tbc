@@ -469,7 +469,11 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Make sure we have plenty of room so the big ticks dont get wasted.
-			if rogue.CurrentEnergy() > 60 {
+			thresh := 85.0
+			if rogue.NextEnergyTickAt() < sim.CurrentTime+time.Second*1 {
+				thresh = 60.0
+			}
+			if rogue.CurrentEnergy() > thresh {
 				return false
 			}
 			return true
