@@ -17,6 +17,7 @@ export interface MetricsColumnConfig<T> {
 	name: string,
 	tooltip?: string,
 	headerCellClass?: string,
+	columnClass?: string,
 	sort?: ColumnSortType,
 
   getValue?: (metric: T) => number,
@@ -58,6 +59,9 @@ export abstract class MetricsTable<T> extends ResultComponent {
 			if (columnConfig.headerCellClass) {
 				headerCell.classList.add(columnConfig.headerCellClass);
 			}
+			if (columnConfig.columnClass) {
+				headerCell.classList.add(columnConfig.columnClass);
+			}
 			headerCell.innerHTML = `<span>${columnConfig.name}</span>`;
 			if (columnConfig.tooltip) {
 				tippy(headerCell, {
@@ -96,6 +100,9 @@ export abstract class MetricsTable<T> extends ResultComponent {
 
 		this.columnConfigs.forEach(columnConfig => {
 			const cellElem = document.createElement('td');
+			if (columnConfig.columnClass) {
+				cellElem.classList.add(columnConfig.columnClass);
+			}
 			if (columnConfig.fillCell) {
 				columnConfig.fillCell(metric, cellElem, rowElem);
 			} else if (columnConfig.getDisplayString) {

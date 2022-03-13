@@ -10,6 +10,7 @@ import { Player } from '/tbc/core/player.js';
 import { classNames, nameToClass, nameToRace, statNames } from '/tbc/core/proto_utils/names.js';
 import { talentSpellIdsToTalentString } from '/tbc/core/talents/factory.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
+import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
@@ -38,6 +39,8 @@ export class SettingsMenu<SpecType extends Spec> extends Popup {
 						</div>
 						<div class="last-used-rng-seed-container">
 							<span>Last used RNG seed:</span><span class="last-used-rng-seed">0</span>
+						</div>
+						<div class="show-threat-metrics-picker">
 						</div>
 					</div>
 				</div>
@@ -72,6 +75,16 @@ export class SettingsMenu<SpecType extends Spec> extends Popup {
     const lastUsedRngSeed = this.rootElem.getElementsByClassName('last-used-rng-seed')[0] as HTMLElement;
 		lastUsedRngSeed.textContent = String(this.simUI.sim.getLastUsedRngSeed());
 		this.simUI.sim.lastUsedRngSeedChangeEmitter.on(() => lastUsedRngSeed.textContent = String(this.simUI.sim.getLastUsedRngSeed()));
+
+    const showThreatMetrics = this.rootElem.getElementsByClassName('show-threat-metrics-picker')[0] as HTMLElement;
+    new BooleanPicker(showThreatMetrics, this.simUI.sim, {
+      label: 'Show Threat Metrics',
+      changedEvent: (sim: Sim) => sim.showThreatMetricsChangeEmitter,
+      getValue: (sim: Sim) => sim.getShowThreatMetrics(),
+      setValue: (eventID: EventID, sim: Sim, newValue: boolean) => {
+				sim.setShowThreatMetrics(eventID, newValue);
+      },
+    });
 
 		this.setupEpWeightsSettings();
   }

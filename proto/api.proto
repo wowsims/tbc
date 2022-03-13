@@ -103,6 +103,9 @@ message ActionMetrics {
 
 		// Total damage done to all targets by this action.
     double damage = 6;
+
+		// Total threat done to all targets by this action.
+    double threat = 12;
 }
 
 message AuraMetrics {

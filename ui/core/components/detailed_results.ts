@@ -7,14 +7,18 @@ import { Component } from './component.js';
 import { RaidSimResultsManager } from './raid_sim_action.js';
 
 export class DetailedResults extends Component {
+	private readonly simUI: SimUI;
 	private readonly iframeElem: HTMLIFrameElement;
 	private tabWindow: Window | null;
 	private latestResult: SimResult | null;
 
   constructor(parent: HTMLElement, simUI: SimUI, simResultsManager: RaidSimResultsManager) {
     super(parent, 'detailed-results-manager-root');
+		this.simUI = simUI;
 		this.tabWindow = null;
 		this.latestResult = null;
+
+		this.simUI.sim.showThreatMetricsChangeEmitter.on(() => this.updateSettings());
 
 		const computedStyles = window.getComputedStyle(this.rootElem);
 
@@ -44,6 +48,7 @@ export class DetailedResults extends Component {
 				this.tabWindow = window.open(url.href, 'Detailed Results');
 				this.tabWindow!.addEventListener('load', event => {
 					if (this.latestResult) {
+						this.updateSettings();
 						this.setSimResult(this.latestResult);
 					}
 				});
@@ -71,10 +76,21 @@ export class DetailedResults extends Component {
 
   private setSimResult(simResult: SimResult) {
 		this.latestResult = simResult;
-		const serialized = simResult.toJson();
-		this.iframeElem.contentWindow!.postMessage(serialized, '*');
-		if (this.tabWindow) {
-			this.tabWindow.postMessage(serialized, '*');
-		}
+		this.postMessage(simResult.toJson());
   }
+
+	private updateSettings() {
+		if (this.simUI.sim.getShowThreatMetrics()) {
+			this.postMessage('showThreatMetrics');
+		} else {
+			this.postMessage('hideThreatMetrics');
+		}
+	}
+
+	private postMessage(data: any) {
+		this.iframeElem.contentWindow!.postMessage(data, '*');
+		if (this.tabWindow) {
+			this.tabWindow.postMessage(data, '*');
+		}
+	}
 }
