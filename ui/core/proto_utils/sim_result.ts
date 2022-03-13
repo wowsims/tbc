@@ -247,6 +247,7 @@ export class PlayerMetrics {
 	readonly iconUrl: string;
 	readonly classColor: string;
 	readonly dps: DistributionMetricsProto;
+	readonly tps: DistributionMetricsProto;
 	readonly actions: Array<ActionMetrics>;
 	readonly auras: Array<AuraMetrics>;
 	readonly resources: Array<ResourceMetrics>;
@@ -287,6 +288,7 @@ export class PlayerMetrics {
 		this.iconUrl = getTalentTreeIcon(this.spec, player.talentsString);
 		this.classColor = classColors[specToClass[this.spec]];
 		this.dps = this.metrics.dps!;
+		this.tps = this.metrics.threat!;
 		this.actions = actions;
 		this.auras = auras;
 		this.resources = resources;
