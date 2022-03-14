@@ -135,14 +135,14 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 					ActionID: actionID,
 					Expires:  core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						if cast.SpellExtras.Matches(SpellFlagTotem) {
+						if !cast.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
 							return
 						}
 						cast.Cost.Value = 0
 						cast.BonusCritRating = 100.0 * core.SpellCritRatingPerCritChance
 					},
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						if cast.SpellExtras.Matches(SpellFlagTotem) {
+						if !cast.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
 							return
 						}
 						// Remove the buff and put skill on CD

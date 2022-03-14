@@ -505,7 +505,7 @@ export class Timeline extends ResultComponent {
 				if (resourceType == ResourceType.ResourceTypeMana) {
 					resourceElem.textContent = (resourceLogGroup.valueAfter / startValue * 100).toFixed(0) + '%';
 				} else {
-					resourceElem.textContent = resourceLogGroup.valueAfter.toFixed(0);
+					resourceElem.textContent = Math.floor(resourceLogGroup.valueAfter).toFixed(0);
 				}
 				rowElem.appendChild(resourceElem);
 

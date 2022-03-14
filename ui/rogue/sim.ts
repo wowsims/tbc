@@ -43,6 +43,7 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 			cssClass: 'rogue-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
+				'Rotations are not fully optimized, especially for non-standard setups.',
 			],
 			warnings: [
 				// Warning to use all 4 totems if T6 2pc bonus is active.

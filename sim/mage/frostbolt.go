@@ -18,7 +18,7 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFrost,
-				SpellExtras:         core.SpellExtrasBinary,
+				SpellExtras:         SpellFlagMage | core.SpellExtrasBinary,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 330,

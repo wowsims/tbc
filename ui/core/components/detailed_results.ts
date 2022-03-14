@@ -1,5 +1,6 @@
 import { REPO_NAME } from '/tbc/core/constants/other.js'
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
+import { DetailedResultsUpdate, SimRun, SimRunData } from '/tbc/core/proto/ui.js';
 import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 
@@ -10,15 +11,15 @@ export class DetailedResults extends Component {
 	private readonly simUI: SimUI;
 	private readonly iframeElem: HTMLIFrameElement;
 	private tabWindow: Window | null;
-	private latestResult: SimResult | null;
+	private latestRun: SimRunData | null;
 
   constructor(parent: HTMLElement, simUI: SimUI, simResultsManager: RaidSimResultsManager) {
     super(parent, 'detailed-results-manager-root');
 		this.simUI = simUI;
 		this.tabWindow = null;
-		this.latestResult = null;
+		this.latestRun = null;
 
-		this.simUI.sim.showThreatMetricsChangeEmitter.on(() => this.updateSettings());
+		this.simUI.sim.settingsChangeEmitter.on(() => this.updateSettings());
 
 		const computedStyles = window.getComputedStyle(this.rootElem);
 
@@ -47,9 +48,9 @@ export class DetailedResults extends Component {
 			if (this.tabWindow == null || this.tabWindow.closed) {
 				this.tabWindow = window.open(url.href, 'Detailed Results');
 				this.tabWindow!.addEventListener('load', event => {
-					if (this.latestResult) {
+					if (this.latestRun) {
 						this.updateSettings();
-						this.setSimResult(this.latestResult);
+						this.setSimRunData(this.latestRun);
 					}
 				});
 			} else {
@@ -58,39 +59,45 @@ export class DetailedResults extends Component {
 		});
 
 		simResultsManager.currentChangeEmitter.on(() => {
-			const cur = simResultsManager.getCurrentData();
-			if (cur) {
-				this.setSimResult(cur.simResult);
+			const runData = simResultsManager.getRunData();
+			if (runData) {
+				this.setSimRunData(runData);
 			}
 		});
 	}
 
 	// TODO: Decide whether to continue using this or just remove it.
 	//setPending() {
-	//	this.latestResult = null;
+	//	this.latestRun = null;
 	//	this.iframeElem.contentWindow!.postMessage(null, '*');
 	//	if (this.tabWindow) {
 	//		this.tabWindow.postMessage(null, '*');
 	//	}
 	//}
 
-  private setSimResult(simResult: SimResult) {
-		this.latestResult = simResult;
-		this.postMessage(simResult.toJson());
+  private setSimRunData(simRunData: SimRunData) {
+		this.latestRun = simRunData;
+		this.postMessage(DetailedResultsUpdate.create({
+			data: {
+				oneofKind: 'runData',
+				runData: simRunData,
+			},
+		}));
   }
 
 	private updateSettings() {
-		if (this.simUI.sim.getShowThreatMetrics()) {
-			this.postMessage('showThreatMetrics');
-		} else {
-			this.postMessage('hideThreatMetrics');
-		}
+		this.postMessage(DetailedResultsUpdate.create({
+			data: {
+				oneofKind: 'settings',
+				settings: this.simUI.sim.toProto(),
+			},
+		}));
 	}
 
-	private postMessage(data: any) {
-		this.iframeElem.contentWindow!.postMessage(data, '*');
+	private postMessage(update: DetailedResultsUpdate) {
+		this.iframeElem.contentWindow!.postMessage(DetailedResultsUpdate.toJson(update), '*');
 		if (this.tabWindow) {
-			this.tabWindow.postMessage(data, '*');
+			this.tabWindow.postMessage(DetailedResultsUpdate.toJson(update), '*');
 		}
 	}
 }

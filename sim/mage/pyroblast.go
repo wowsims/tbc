@@ -22,6 +22,7 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
+				SpellExtras:         SpellFlagMage,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 500,
@@ -79,6 +80,7 @@ func (mage *Mage) newPyroblastDotTemplate(sim *core.Simulation) core.SimpleSpell
 				Character:        &mage.Character,
 				CritRollCategory: core.CritRollCategoryMagical,
 				SpellSchool:      core.SpellSchoolFire,
+				SpellExtras:      SpellFlagMage,
 			},
 		},
 		Effect: core.SpellHitEffect{

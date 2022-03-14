@@ -1,7 +1,6 @@
 package common
 
 import (
-	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -26,37 +25,21 @@ func init() {
 
 // TODO: Crusader, Mongoose, and Executioner could also be modelled as AddWeaponEffect instead
 func ApplyWeaponSuperiorStriking(agent core.Agent, slot proto.ItemSlot) {
-	switch slot {
-	case proto.ItemSlot_ItemSlotMainHand:
-		if w := &agent.GetCharacter().AutoAttacks.MH; w.SwingSpeed > 0 {
-			w.BaseDamageMin += 5
-			w.BaseDamageMax += 5
-		}
-	case proto.ItemSlot_ItemSlotOffHand:
-		if w := &agent.GetCharacter().AutoAttacks.OH; w.SwingSpeed > 0 {
-			w.BaseDamageMin += 5
-			w.BaseDamageMax += 5
-		}
-	default:
-		log.Fatalf("Cannot add Superior Striking to %s", slot)
+	w := &agent.GetCharacter().AutoAttacks.MH
+	if slot == proto.ItemSlot_ItemSlotOffHand {
+		w = &agent.GetCharacter().AutoAttacks.OH
 	}
+	w.BaseDamageMin += 5
+	w.BaseDamageMax += 5
 }
 
 func ApplyWeaponMajorStriking(agent core.Agent, slot proto.ItemSlot) {
-	switch slot {
-	case proto.ItemSlot_ItemSlotMainHand:
-		if w := &agent.GetCharacter().AutoAttacks.MH; w.SwingSpeed > 0 {
-			w.BaseDamageMin += 7
-			w.BaseDamageMax += 7
-		}
-	case proto.ItemSlot_ItemSlotOffHand:
-		if w := &agent.GetCharacter().AutoAttacks.OH; w.SwingSpeed > 0 {
-			w.BaseDamageMin += 7
-			w.BaseDamageMax += 7
-		}
-	default:
-		log.Fatalf("Cannot add Major Striking to %s", slot)
+	w := &agent.GetCharacter().AutoAttacks.MH
+	if slot == proto.ItemSlot_ItemSlotOffHand {
+		w = &agent.GetCharacter().AutoAttacks.OH
 	}
+	w.BaseDamageMin += 7
+	w.BaseDamageMax += 7
 }
 
 var CrusaderAuraID = core.NewAuraID()
@@ -216,16 +199,10 @@ func ApplyMongoose(agent core.Agent) {
 	})
 }
 
-func ApplyKhoriumScope(agent core.Agent, slot proto.ItemSlot) {
-	switch slot {
-	case proto.ItemSlot_ItemSlotRanged:
-		if w := &agent.GetCharacter().AutoAttacks.Ranged; w.SwingSpeed > 0 {
-			w.BaseDamageMin += 12
-			w.BaseDamageMax += 12
-		}
-	default:
-		log.Fatalf("Cannot add Superior Striking to %s", slot)
-	}
+func ApplyKhoriumScope(agent core.Agent, _ proto.ItemSlot) {
+	w := &agent.GetCharacter().AutoAttacks.Ranged
+	w.BaseDamageMin += 12
+	w.BaseDamageMax += 12
 }
 
 var StabilizedEterniumScopeAuraID = core.NewAuraID()

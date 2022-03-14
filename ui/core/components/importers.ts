@@ -149,7 +149,7 @@ class IndividualJsonImporter<SpecType extends Spec> extends Importer {
 
 		this.descriptionElem.innerHTML = `
 			<p>
-				Import settings from a JSON text file, which can be created using the JSON Export feature of this site.</a>.
+				Import settings from a JSON text file, which can be created using the JSON Export feature of this site.
 			</p>
 			<p>
 				To import, paste the JSON text below and click, 'Import'.
@@ -230,7 +230,7 @@ class IndividualAddonImporter<SpecType extends Spec> extends Importer {
 
 		this.descriptionElem.innerHTML = `
 			<p>
-				Import settings from the <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">WoWSims Importer In-Game Addon</a>.
+				Import settings from the <a href="https://www.curseforge.com/wow/addons/wowsimsexporter" target="_blank">WoWSims Importer In-Game Addon</a>.
 			</p>
 			<p>
 				This feature imports gear, race, and talents. It does NOT import buffs, debuffs, consumes, rotation, or custom stats.
@@ -256,7 +256,10 @@ class IndividualAddonImporter<SpecType extends Spec> extends Importer {
 		}
 
 		const talentsStr = (importJson['talents'] as string) || '';
-		const equipmentSpec = EquipmentSpec.fromJson(importJson['gear']);
+
+		const gearJson = importJson['gear'];
+		gearJson.items = (gearJson.items as Array<any>).filter(item => item != null);
+		const equipmentSpec = EquipmentSpec.fromJson(gearJson);
 
 		this.finishIndividualImport(this.simUI, charClass, race, equipmentSpec, talentsStr);
 	}

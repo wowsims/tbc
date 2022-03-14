@@ -76,10 +76,16 @@ func (mage *Mage) applyArcaneConcentration() {
 			ActionID: core.ActionID{SpellID: 12536},
 			Expires:  core.NeverExpires, // actually 15s, but that's hardly ever relevant
 			OnCast: func(sim *core.Simulation, cast *core.Cast) {
+				if !cast.SpellExtras.Matches(SpellFlagMage) {
+					return
+				}
 				cast.Cost.Value = 0
 				cast.BonusCritRating += bonusCrit
 			},
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				if !cast.SpellExtras.Matches(SpellFlagMage) {
+					return
+				}
 				mage.RemoveAura(sim, ClearcastingAuraID)
 			},
 		}
