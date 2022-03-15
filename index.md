@@ -6,4 +6,7 @@ Live sims:
  - [Elemental Shaman](https://wowsims.github.io/tbc/elemental_shaman/ "https://wowsims.github.io/tbc/elemental_shaman/")
  - [Enhancement Shaman](https://wowsims.github.io/tbc/enhancement_shaman/ "https://wowsims.github.io/tbc/enhancement_shaman/")
  - [Shadow Priest](https://wowsims.github.io/tbc/shadow_priest/ "https://wowsims.github.io/tbc/shadow_priest/")
+ - [Rogue](https://wowsims.github.io/tbc/rogue/ "https://wowsims.github.io/tbc/rogue/")
+ - [Hunter](https://wowsims.github.io/tbc/hunter/ "https://wowsims.github.io/tbc/hunter/")
+ 
  - [Raid Sim](https://wowsims.github.io/tbc/raid/ "https://wowsims.github.io/tbc/raid/")
