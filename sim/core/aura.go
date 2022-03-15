@@ -230,8 +230,8 @@ func (at *auraTracker) reset(sim *Simulation) {
 		}
 		at.ReplaceAura(sim, aura)
 		if permAura.UptimeMultiplier != 0 && !aura.ActionID.IsEmptyAction() {
-			// We're going to add 100% uptime at the end, so subtract the difference.
-			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(float64(sim.Duration)*(1-permAura.UptimeMultiplier)))
+			// We're going to add 100% uptime at the end, so subtract 1 now.
+			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(float64(sim.Duration)*(permAura.UptimeMultiplier-1)))
 		}
 	}
 }
