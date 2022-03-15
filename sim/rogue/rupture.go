@@ -29,7 +29,7 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 		NumberOfTicks:  0, // Set dynamically.
 		TickLength:     time.Second * 2,
 		TickBaseDamage: 0, // Set dynamically.
-		DebuffID:       DeadlyPoisonDebuffID,
+		DebuffID:       RuptureDebuffID,
 	}
 
 	ability.Effect.StaticDamageMultiplier += 0.1 * float64(rogue.Talents.SerratedBlades)

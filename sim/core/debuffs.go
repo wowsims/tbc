@@ -437,7 +437,7 @@ func ExposeWeaknessAura(currentTime time.Duration, hunterAgility float64, multip
 		ActionID: ActionID{SpellID: 34503},
 		Expires:  currentTime + time.Second*7,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-			spellEffect.BonusAttackPower += apBonus
+			spellEffect.BonusAttackPowerOnTarget += apBonus
 		},
 	}
 }
@@ -463,9 +463,9 @@ func HuntersMarkAura(points int32, fullyStacked bool) Aura {
 		Stacks:   points, // Use this to check whether to override in hunter/hunter.go
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellEffect.ProcMask.Matches(ProcMaskMelee) {
-				spellEffect.BonusAttackPower += meleeBonus
+				spellEffect.BonusAttackPowerOnTarget += meleeBonus
 			} else {
-				spellEffect.BonusAttackPower += rangedBonus
+				spellEffect.BonusAttackPowerOnTarget += rangedBonus
 			}
 		},
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {

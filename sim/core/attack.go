@@ -202,7 +202,8 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	var attackPower float64
 	var bonusWeaponDamage float64
 	if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-		attackPower = character.stats[stats.RangedAttackPower] + ahe.BonusAttackPower
+		// all ranged attacks honor BonusAttackPowerOnTarget...
+		attackPower = character.stats[stats.RangedAttackPower] + ahe.BonusAttackPower + ahe.BonusAttackPowerOnTarget
 		bonusWeaponDamage = character.PseudoStats.BonusDamage + ahe.BonusWeaponDamage
 	} else {
 		attackPower = character.stats[stats.AttackPower] + ahe.BonusAttackPower
@@ -215,21 +216,22 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	} else if ahe.WeaponInput.DamageMultiplier != 0 {
 		// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
 		// TODO not all weapon damage based attacks "scale" with +bonusWeaponDamage (e.g. Devastate, Shiv, Mutilate don't)
+		// ... but for other's, BonusAttackPowerOnTarget only applies to weapon damage based attacks
 		if ahe.WeaponInput.Normalized {
 			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 				dmg += character.AutoAttacks.Ranged.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
 			} else if !ahe.WeaponInput.Offhand {
-				dmg += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
+				dmg += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower+ahe.BonusAttackPowerOnTarget) + bonusWeaponDamage
 			} else {
-				dmg += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower)*0.5 + bonusWeaponDamage
+				dmg += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower+2*ahe.BonusAttackPowerOnTarget)*0.5 + bonusWeaponDamage
 			}
 		} else {
 			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 				dmg += character.AutoAttacks.Ranged.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
 			} else if !ahe.WeaponInput.Offhand {
-				dmg += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
+				dmg += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower+ahe.BonusAttackPowerOnTarget) + bonusWeaponDamage
 			} else {
-				dmg += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower)*0.5 + bonusWeaponDamage
+				dmg += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower+2*ahe.BonusAttackPowerOnTarget)*0.5 + bonusWeaponDamage
 			}
 		}
 		dmg += ahe.WeaponInput.FlatDamageBonus
