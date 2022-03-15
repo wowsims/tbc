@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"math"
 	"time"
 
@@ -562,10 +561,6 @@ func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, s
 }
 
 func (at *auraTracker) AddAuraUptime(auraID AuraID, actionID ActionID, uptime time.Duration) {
-	if uptime < 0 {
-		panic(fmt.Sprintf("AddAuraUptime(%d, %v, %s) has negative uptime", auraID, actionID, uptime))
-	}
-
 	metrics := &at.metrics[auraID]
 
 	metrics.ID = actionID
