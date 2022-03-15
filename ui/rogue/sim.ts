@@ -225,6 +225,7 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					RogueInputs.ARResetsTicks,
 					OtherInputs.StartingConjured,
 					OtherInputs.NumStartingConjured,
 					OtherInputs.ExposeWeaknessUptime,

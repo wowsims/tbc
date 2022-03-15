@@ -442,6 +442,9 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 		ID:       AdrenalineRushAuraID,
 		ActionID: actionID,
 		OnExpire: func(sim *core.Simulation) {
+			if rogue.Options.ArResetsTicks {
+				rogue.ResetEnergyTick(sim)
+			}
 			rogue.EnergyTickMultiplier = 1
 		},
 	}
@@ -456,14 +459,19 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 			GCD:         time.Second,
 			IgnoreHaste: true,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				if rogue.Options.ArResetsTicks {
+					rogue.ResetEnergyTick(sim)
+				}
 				rogue.EnergyTickMultiplier = 2
-				const halfTick = core.EnergyPerTick / 2
-				if rogue.NextEnergyTickAt() < sim.CurrentTime+time.Second*1 {
-					// There will be 8 ticks during the 15s duration, so we need to subtract half a tick.
-					rogue.NextEnergyTickAdjustment = -halfTick
-				} else {
-					// There will be 7 ticks during the 15s duration, so we need to add half a tick.
-					rogue.AddEnergy(sim, halfTick, core.ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
+				if !rogue.Options.ArResetsTicks {
+					const halfTick = core.EnergyPerTick / 2
+					if rogue.NextEnergyTickAt() < sim.CurrentTime+time.Second*1 {
+						// There will be 8 ticks during the 15s duration, so we need to subtract half a tick.
+						rogue.NextEnergyTickAdjustment = -halfTick
+					} else {
+						// There will be 7 ticks during the 15s duration, so we need to add half a tick.
+						rogue.AddEnergy(sim, halfTick, core.ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
+					}
 				}
 
 				aura := adrenalineRushAura

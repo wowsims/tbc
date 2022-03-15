@@ -100,7 +100,9 @@ var basicRotation = &proto.Rogue_Rotation{
 	MinComboPointsForDamageFinisher: 3,
 }
 
-var basicOptions = &proto.Rogue_Options{}
+var basicOptions = &proto.Rogue_Options{
+	ArResetsTicks: true,
+}
 
 var FullRaidBuffs = &proto.RaidBuffs{
 	GiftOfTheWild: proto.TristateEffect_TristateEffectImproved,

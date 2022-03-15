@@ -102,6 +102,18 @@ func (eb *energyBar) AddComboPoints(sim *Simulation, pointsToAdd int32, actionID
 	eb.comboPoints = newComboPoints
 }
 
+// Gives an immediate partial energy tick and restarts the tick timer.
+func (eb *energyBar) ResetEnergyTick(sim *Simulation) {
+	timeSinceLastTick := sim.CurrentTime - (eb.NextEnergyTickAt() - EnergyTickDuration)
+	partialTickAmount := (EnergyPerTick * eb.EnergyTickMultiplier) * (float64(timeSinceLastTick) / float64(EnergyTickDuration))
+
+	eb.addEnergyInternal(sim, partialTickAmount, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
+	eb.character.TryUseCooldowns(sim)
+	eb.onEnergyGain(sim)
+
+	eb.newTickAction(sim, false)
+}
+
 func (eb *energyBar) SpendComboPoints(sim *Simulation, actionID ActionID) {
 	if sim.Log != nil {
 		eb.character.Log(sim, "Spent %d combo points from %s (%d --> %d).", eb.comboPoints, actionID, eb.comboPoints, 0)
@@ -110,20 +122,20 @@ func (eb *energyBar) SpendComboPoints(sim *Simulation, actionID ActionID) {
 	eb.comboPoints = 0
 }
 
-func (eb *energyBar) reset(sim *Simulation) {
-	if eb.character == nil {
-		return
+func (eb *energyBar) newTickAction(sim *Simulation, randomTickTime bool) {
+	if eb.tickAction != nil {
+		eb.tickAction.Cancel(sim)
 	}
 
-	eb.currentEnergy = eb.maxEnergy
-	eb.comboPoints = 0
-	eb.EnergyTickMultiplier = 1
-	eb.NextEnergyTickAdjustment = 0
+	nextTickDuration := EnergyTickDuration
+	if randomTickTime {
+		nextTickDuration = time.Duration(sim.RandomFloat("Energy Tick") * float64(EnergyTickDuration))
+	}
 
 	pa := &PendingAction{
 		Name:         "Energy Tick",
 		Priority:     ActionPriorityRegen,
-		NextActionAt: EnergyTickDuration,
+		NextActionAt: sim.CurrentTime + nextTickDuration,
 	}
 	pa.OnAction = func(sim *Simulation) {
 		eb.addEnergyInternal(sim, EnergyPerTick*eb.EnergyTickMultiplier+eb.NextEnergyTickAdjustment, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
@@ -136,4 +148,16 @@ func (eb *energyBar) reset(sim *Simulation) {
 	}
 	eb.tickAction = pa
 	sim.AddPendingAction(pa)
+}
+
+func (eb *energyBar) reset(sim *Simulation) {
+	if eb.character == nil {
+		return
+	}
+
+	eb.currentEnergy = eb.maxEnergy
+	eb.comboPoints = 0
+	eb.EnergyTickMultiplier = 1
+	eb.NextEnergyTickAdjustment = 0
+	eb.newTickAction(sim, true)
 }
