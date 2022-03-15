@@ -18,13 +18,13 @@ export const raceNames = {
     [Race.RaceUndead]: 'Undead',
 };
 export function nameToRace(name) {
-    const lower = name.toLowerCase();
-    if (lower.includes('troll')) {
+    const normalized = name.toLowerCase().replaceAll(' ', '');
+    if (normalized.includes('troll')) {
         return Race.RaceTroll10;
     }
     for (const key in raceNames) {
         const race = parseInt(key);
-        if (raceNames[race].toLowerCase() == lower) {
+        if (raceNames[race].toLowerCase().replaceAll(' ', '') == normalized) {
             return race;
         }
     }
