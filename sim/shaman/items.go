@@ -274,11 +274,22 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 		const procChance = 0.5
 		applyStatAura := character.NewTemporaryStatsAuraApplier(ElementalStrengthAuraID, core.ActionID{ItemID: 33507}, stats.Stats{stats.AttackPower: apBonus}, dur)
 
+		icd := core.NewICD()
+		const icdDur = time.Second * 10
+
 		return core.Aura{
 			ID:      StonebreakersTotemAuraID,
 			Expires: core.NeverExpires,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if !cast.IsSpellAction(SpellIDEarthShock) && !cast.IsSpellAction(SpellIDFlameShock) && !cast.IsSpellAction(SpellIDFrostShock) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+
+				if !spellCast.SpellExtras.Matches(SpellFlagShock) {
+					return
+				}
+
+				if icd.IsOnCD(sim) {
 					return
 				}
 
@@ -286,6 +297,7 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 					return
 				}
 
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				applyStatAura(sim)
 			},
 		}

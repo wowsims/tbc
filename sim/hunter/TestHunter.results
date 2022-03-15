@@ -167,7 +167,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 1634.3223011708737
+  dps: 1634.3223011708735
  }
 }
 dps_results: {
@@ -269,7 +269,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-EnigmaticSkyfireDiamond"
  value: {
-  dps: 1630.6340667962909
+  dps: 1630.6340667962907
  }
 }
 dps_results: {
@@ -329,7 +329,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-HandofJustice-11815"
  value: {
-  dps: 1622.2460700628185
+  dps: 1622.2460700628183
  }
 }
 dps_results: {
@@ -371,7 +371,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 1668.002180491447
+  dps: 1668.0021804914468
  }
 }
 dps_results: {
@@ -1007,7 +1007,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-MeleeWeave-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2267.246317161687
+  dps: 2267.2463171616864
  }
 }
 dps_results: {

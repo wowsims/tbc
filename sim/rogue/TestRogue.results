@@ -275,7 +275,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Figurine-NightseyePanther-24128"
  value: {
-  dps: 1447.6381505593156
+  dps: 1447.638150559316
  }
 }
 dps_results: {
@@ -527,7 +527,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-SwiftWindfireDiamond"
  value: {
-  dps: 1442.931329236606
+  dps: 1442.9313292366064
  }
 }
 dps_results: {
@@ -659,7 +659,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-SelfDrums-DPS"
  value: {
-  dps: 1433.1703383113193
+  dps: 1433.1703383113195
  }
 }
 dps_results: {
@@ -779,19 +779,19 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Mutilate-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1581.4640486009673
+  dps: 1581.4640486009675
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Mutilate-NoBuffs-LongMultiTarget"
  value: {
-  dps: 651.9362426539398
+  dps: 651.9362426539399
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Mutilate-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 651.9362426539398
+  dps: 651.9362426539399
  }
 }
 dps_results: {
@@ -851,7 +851,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Basic-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 959.2381704874073
+  dps: 959.2381704874074
  }
 }
 dps_results: {
