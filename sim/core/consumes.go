@@ -185,12 +185,10 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 	}
 
 	if imbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
-		character.PseudoStats.BonusMeleeDamage += 12
-		character.PseudoStats.BonusRangedDamage += 12
+		character.PseudoStats.BonusDamage += 12
 		// Melee crit component handled separately because its melee-only.
 	} else if imbue == proto.WeaponImbue_WeaponImbueAdamantiteWeightstone {
-		character.PseudoStats.BonusMeleeDamage += 12
-		character.PseudoStats.BonusRangedDamage += 12
+		character.PseudoStats.BonusDamage += 12
 		character.AddStats(stats.Stats{
 			stats.MeleeCrit: 14,
 		})

@@ -14,7 +14,6 @@ var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeC
 var SkyshatterAPBonusAuraID = core.NewAuraID()
 
 func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-
 	ssDebuffAura := core.Aura{
 		ID:       StormstrikeDebuffID,
 		ActionID: StormstrikeActionID,
@@ -77,6 +76,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 						}
 
 						ssDebuffAura.Stacks = 2
+						ssDebuffAura.Expires = sim.CurrentTime + 12*time.Second
 						spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
 						if hasSkyshatter4p {
 							skyshatterAuraApplier(sim)

@@ -223,8 +223,7 @@ func ApplyHandOfJustice(agent core.Agent) {
 var CrystalforgedTrinketCooldownID = core.NewCooldownID()
 
 func ApplyCrystalforgedTrinket(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 7
-	agent.GetCharacter().PseudoStats.BonusRangedDamage += 7
+	agent.GetCharacter().PseudoStats.BonusDamage += 7
 	core.RegisterTemporaryStatsOnUseCD(
 		agent,
 		core.OffensiveTrinketActiveAuraID,

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"math"
 	"time"
 
@@ -236,9 +237,9 @@ func (at *auraTracker) reset(sim *Simulation) {
 		if !permAura.RespectExpiration {
 			aura.Expires = NeverExpires
 		}
-		at.AddAura(sim, aura)
+		at.ReplaceAura(sim, aura)
 		if permAura.UptimeMultiplier != 0 && !aura.ActionID.IsEmptyAction() {
-			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(-1*float64(sim.Duration)*(1.0-permAura.UptimeMultiplier)))
+			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(float64(sim.Duration)*permAura.UptimeMultiplier))
 		}
 	}
 }
@@ -267,7 +268,7 @@ func (at *auraTracker) advance(sim *Simulation) {
 	}
 
 	for _, id := range at.activeAuraIDs {
-		if at.auras[id].Expires != 0 && at.auras[id].Expires <= sim.CurrentTime {
+		if aura := &at.auras[id]; aura.Expires != 0 && aura.Expires <= sim.CurrentTime {
 			at.RemoveAura(sim, id)
 		}
 	}
@@ -321,7 +322,8 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		panic("Empty aura ID")
 	}
 
-	if at.HasAura(newAura.ID) {
+	if aura := at.auras[newAura.ID]; aura.ID != 0 {
+		panic(fmt.Sprintf("AddAura(%v) at %s - previous has %s left, use ReplaceAura() instead", newAura.ActionID, sim.CurrentTime, aura.Expires-sim.CurrentTime))
 		at.RemoveAura(sim, newAura.ID)
 	}
 
@@ -372,8 +374,12 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 		at.auras[id].OnExpire(sim)
 	}
 
-	if !at.auras[id].ActionID.IsEmptyAction() {
-		at.AddAuraUptime(id, at.auras[id].ActionID, sim.CurrentTime-at.auras[id].startTime)
+	if aura := at.auras[id]; !aura.ActionID.IsEmptyAction() {
+		if sim.CurrentTime > aura.Expires {
+			at.AddAuraUptime(id, aura.ActionID, aura.Expires-aura.startTime)
+		} else {
+			at.AddAuraUptime(id, aura.ActionID, sim.CurrentTime-aura.startTime)
+		}
 	}
 
 	if sim.Log != nil && !at.auras[id].ActionID.IsEmptyAction() {
@@ -470,6 +476,12 @@ func (at *auraTracker) NumStacks(id AuraID) int32 {
 	}
 }
 
+func (at *auraTracker) UpdateExpires(id AuraID, newExpires time.Duration) {
+	if aura := &at.auras[id]; aura.ID != 0 {
+		aura.Expires = newExpires
+	}
+}
+
 func (at *auraTracker) RemainingAuraDuration(sim *Simulation, id AuraID) time.Duration {
 	if at.HasAura(id) {
 		expires := at.auras[id].Expires
@@ -557,6 +569,10 @@ func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, s
 }
 
 func (at *auraTracker) AddAuraUptime(auraID AuraID, actionID ActionID, uptime time.Duration) {
+	if uptime < 0 {
+		panic(fmt.Sprintf("AddAuraUptime(%d, %v, %s) has negative uptime", auraID, actionID, uptime))
+	}
+
 	metrics := &at.metrics[auraID]
 
 	metrics.ID = actionID

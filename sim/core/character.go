@@ -176,7 +176,7 @@ func (character *Character) applyAllEffects(agent Agent) {
 
 // Apply effects from all equipped items.
 func (character *Character) applyItemEffects(agent Agent) {
-	for _, eq := range character.Equip {
+	for slot, eq := range character.Equip {
 		if applyItemEffect, ok := itemEffects[eq.ID]; ok {
 			applyItemEffect(agent)
 		}
@@ -190,6 +190,10 @@ func (character *Character) applyItemEffects(agent Agent) {
 		// TODO: should we use eq.Enchant.EffectID because some enchants use a spellID instead of itemID?
 		if applyEnchantEffect, ok := itemEffects[eq.Enchant.ID]; ok {
 			applyEnchantEffect(agent)
+		}
+
+		if applyWeaponEffect, ok := weaponEffects[eq.Enchant.ID]; ok {
+			applyWeaponEffect(agent, proto.ItemSlot(slot))
 		}
 	}
 }
