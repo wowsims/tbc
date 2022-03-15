@@ -42,6 +42,8 @@ export class SettingsMenu<SpecType extends Spec> extends Popup {
 						</div>
 						<div class="show-threat-metrics-picker">
 						</div>
+						<div class="show-experimental-picker">
+						</div>
 					</div>
 				</div>
 				<div class="settings-menu-content-right">
@@ -86,16 +88,16 @@ export class SettingsMenu<SpecType extends Spec> extends Popup {
       },
     });
 
-		// No experimental features right now
-    //const showExperimental = this.rootElem.getElementsByClassName('show-experimental-picker')[0] as HTMLElement;
-    //new BooleanPicker(showExperimental, this.simUI.sim, {
-    //  label: 'Show Experimental',
-    //  changedEvent: (sim: Sim) => sim.showExperimentalChangeEmitter,
-    //  getValue: (sim: Sim) => sim.getShowExperimental(),
-    //  setValue: (eventID: EventID, sim: Sim, newValue: boolean) => {
-		//		sim.setShowExperimental(eventID, newValue);
-    //  },
-    //});
+		// Comment this out when there are no experiments to show.
+    const showExperimental = this.rootElem.getElementsByClassName('show-experimental-picker')[0] as HTMLElement;
+    new BooleanPicker(showExperimental, this.simUI.sim, {
+      label: 'Show Experimental',
+      changedEvent: (sim: Sim) => sim.showExperimentalChangeEmitter,
+      getValue: (sim: Sim) => sim.getShowExperimental(),
+      setValue: (eventID: EventID, sim: Sim, newValue: boolean) => {
+				sim.setShowExperimental(eventID, newValue);
+      },
+    });
 
 		this.setupEpWeightsSettings();
   }
