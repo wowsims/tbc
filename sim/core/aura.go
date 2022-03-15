@@ -239,7 +239,8 @@ func (at *auraTracker) reset(sim *Simulation) {
 		}
 		at.ReplaceAura(sim, aura)
 		if permAura.UptimeMultiplier != 0 && !aura.ActionID.IsEmptyAction() {
-			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(float64(sim.Duration)*permAura.UptimeMultiplier))
+			// We're going to add 100% uptime at the end, so subtract the difference.
+			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(float64(sim.Duration)*(1-permAura.UptimeMultiplier)))
 		}
 	}
 }
@@ -323,7 +324,8 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 	}
 
 	if aura := at.auras[newAura.ID]; aura.ID != 0 {
-		panic(fmt.Sprintf("AddAura(%v) at %s - previous has %s left, use ReplaceAura() instead", newAura.ActionID, sim.CurrentTime, aura.Expires-sim.CurrentTime))
+		// Getting lots of bug reports, do a grep and catch all cases for this before uncommenting.
+		//panic(fmt.Sprintf("AddAura(%v) at %s - previous has %s left, use ReplaceAura() instead", newAura.ActionID, sim.CurrentTime, aura.Expires-sim.CurrentTime))
 		at.RemoveAura(sim, newAura.ID)
 	}
 
