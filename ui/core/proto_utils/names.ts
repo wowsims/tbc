@@ -27,7 +27,7 @@ export function nameToRace(name: string): Race {
 
 	for (const key in raceNames) {
 		const race = parseInt(key) as Race;
-		if (raceNames[race].toLowerCase().replaceAll(' ', '') == lower) {
+		if (raceNames[race].toLowerCase().replaceAll(' ', '') == normalized) {
 			return race;
 		}
 	}
