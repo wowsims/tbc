@@ -374,7 +374,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				ability := wfAction
 				ability.DesiredCastAt = curTime
 				ability.MinCastAt = curTime - time.Second*8
-				ability.MaxCastAt = curTime + time.Second*8
+				ability.MaxCastAt = curTime + time.Second*20
 				defaultAbility := defaultAction
 				castAt := enh.scheduler.ScheduleGroup(sim, []common.ScheduledAbility{ability, defaultAbility})
 				if castAt == common.Unresolved {
