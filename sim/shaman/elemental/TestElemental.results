@@ -249,7 +249,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Dragonmaw-28438"
  value: {
-  dps: 1381.9525119284233
+  dps: 1545.0374464688805
  }
 }
 dps_results: {
@@ -273,7 +273,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 1381.9525119284233
+  dps: 1545.0374464688805
  }
 }
 dps_results: {
@@ -621,7 +621,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-TheDecapitator-28767"
  value: {
-  dps: 1386.5907047634003
+  dps: 1545.0374464688805
  }
 }
 dps_results: {

@@ -209,7 +209,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Dragonmaw-28438"
  value: {
-  dps: 1852.0613267548852
+  dps: 1851.6815427183326
  }
 }
 dps_results: {
@@ -227,7 +227,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 1777.447127819756
+  dps: 1851.6815427183326
  }
 }
 dps_results: {
@@ -575,7 +575,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TheDecapitator-28767"
  value: {
-  dps: 1728.4203839588042
+  dps: 1851.6815427183326
  }
 }
 dps_results: {

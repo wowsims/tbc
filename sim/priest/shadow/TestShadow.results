@@ -191,7 +191,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-AllItems-Dragonmaw-28438"
  value: {
-  dps: 1348.2225714781341
+  dps: 1503.281126093247
  }
 }
 dps_results: {
@@ -215,7 +215,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 1348.2225714781341
+  dps: 1503.281126093247
  }
 }
 dps_results: {
