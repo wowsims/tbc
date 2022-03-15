@@ -389,13 +389,16 @@ var ExposeArmorDebuffID = NewDebuffID()
 
 func ExposeArmorAura(sim *Simulation, target *Target, talentPoints int32) Aura {
 	armorReduction := 2050.0 * (1.0 + 0.25*float64(talentPoints))
-	target.AddArmor(-armorReduction)
 
-	if target.HasAura(SunderArmorDebuffID) {
-		target.RemoveAura(sim, SunderArmorDebuffID)
+	if !target.HasAura(ExposeArmorDebuffID) {
+		target.AddArmor(-armorReduction)
+
+		if target.HasAura(SunderArmorDebuffID) {
+			target.RemoveAura(sim, SunderArmorDebuffID)
+		}
 	}
 
-	aura := Aura{
+	return Aura{
 		ID:       ExposeArmorDebuffID,
 		ActionID: ActionID{SpellID: 26866},
 		Expires:  sim.CurrentTime + time.Second*30,
@@ -403,8 +406,6 @@ func ExposeArmorAura(sim *Simulation, target *Target, talentPoints int32) Aura {
 			target.AddArmor(armorReduction)
 		},
 	}
-
-	return aura
 }
 
 var CurseOfRecklessnessDebuffID = NewDebuffID()

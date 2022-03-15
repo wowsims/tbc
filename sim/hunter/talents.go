@@ -164,10 +164,12 @@ func (hunter *Hunter) applyFrenzy() {
 
 		tryProcAura := func() {
 			if procChance == 1 || sim.RandomFloat("Frenzy") < procChance {
-				hunter.pet.PseudoStats.MeleeSpeedMultiplier *= 1.3
+				if !hunter.pet.HasAura(FrenzyProcAuraID) {
+					hunter.pet.PseudoStats.MeleeSpeedMultiplier *= 1.3
+				}
 				aura := procAura
 				aura.Expires = sim.CurrentTime + time.Second*8
-				hunter.pet.AddAura(sim, aura)
+				hunter.pet.ReplaceAura(sim, aura)
 			}
 		}
 
@@ -217,7 +219,7 @@ func (hunter *Hunter) applyFerociousInspiration() {
 				char := playerOrPet.GetCharacter()
 				aura := procAura
 				aura.Expires = sim.CurrentTime + time.Second*10
-				char.AddAura(sim, aura)
+				char.ReplaceAura(sim, aura)
 			}
 		}
 
@@ -458,7 +460,7 @@ func (hunter *Hunter) applyExposeWeakness() {
 				}
 
 				if procChance == 1 || sim.RandomFloat("ExposeWeakness") < procChance {
-					spellEffect.Target.AddAura(sim, core.ExposeWeaknessAura(sim.CurrentTime, hunter.GetStat(stats.Agility), 1.0))
+					spellEffect.Target.ReplaceAura(sim, core.ExposeWeaknessAura(sim.CurrentTime, hunter.GetStat(stats.Agility), 1.0))
 				}
 			},
 		}
@@ -498,7 +500,7 @@ func (hunter *Hunter) applyMasterTactician() {
 
 				aura := procAura
 				aura.Expires = sim.CurrentTime + time.Second*8
-				hunter.AddAura(sim, aura)
+				hunter.ReplaceAura(sim, aura)
 			},
 		}
 	})

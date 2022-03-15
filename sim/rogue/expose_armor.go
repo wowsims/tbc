@@ -16,7 +16,7 @@ func (rogue *Rogue) newExposeArmorTemplate(_ *core.Simulation) core.SimpleSpellT
 	ability.SpellCast.Cast.CritRollCategory = core.CritRollCategoryNone
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
-			spellEffect.Target.AddAura(sim, core.ExposeArmorAura(sim, spellEffect.Target, rogue.Talents.ImprovedExposeArmor))
+			spellEffect.Target.ReplaceAura(sim, core.ExposeArmorAura(sim, spellEffect.Target, rogue.Talents.ImprovedExposeArmor))
 			rogue.ApplyFinisher(sim, spellCast.ActionID)
 			if sim.GetRemainingDuration() <= time.Second*30 {
 				rogue.doneEA = true

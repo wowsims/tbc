@@ -198,8 +198,7 @@ func ApplyKhoriumChampion(agent core.Agent) {
 }
 
 func ApplyBraidedEterniumChain(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 5
-	agent.GetCharacter().PseudoStats.BonusRangedDamage += 5
+	agent.GetCharacter().PseudoStats.BonusDamage += 5
 }
 
 var BlackoutTruncheonAuraID = core.NewAuraID()
@@ -802,8 +801,11 @@ func ApplyDevastation(agent core.Agent) {
 					return
 				}
 
-				character.MultiplyMeleeSpeed(sim, bonus)
-				character.AddAura(sim, core.Aura{
+				if !character.HasAura(DevastationProcAuraID) {
+					character.MultiplyMeleeSpeed(sim, bonus)
+				}
+
+				character.ReplaceAura(sim, core.Aura{
 					ID:       DevastationProcAuraID,
 					ActionID: core.ActionID{ItemID: 30316},
 					Expires:  sim.CurrentTime + dur,

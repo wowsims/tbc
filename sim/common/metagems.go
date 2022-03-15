@@ -24,8 +24,7 @@ var MysticalSkyfireDiamondAuraID = core.NewAuraID()
 var MysticFocusAuraID = core.NewAuraID()
 
 func ApplyBrutalEarthstormDiamond(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 3
-	agent.GetCharacter().PseudoStats.BonusRangedDamage += 3
+	agent.GetCharacter().PseudoStats.BonusDamage += 3
 }
 
 func ApplyMysticalSkyfireDiamond(agent core.Agent) {

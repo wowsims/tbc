@@ -360,8 +360,9 @@ type PseudoStats struct {
 	ForceFullSpiritRegen  bool    // If set, automatically uses full spirit regen regardless of FSR refresh time.
 	SpiritRegenMultiplier float64 // Multiplier on spirit portion of mana regen.
 
-	BonusMeleeDamage  float64 // Comes from '+X Weapon Damage' effects, affects melee hits only.
-	BonusRangedDamage float64 // Comes from '+X Weapon Damage' effects, affects ranged hits only.
+	// "Apply Aura: Mod Damage Done (Physical)", applies to abilities with EffectSpellCoefficient > 0.
+	//  This includes almost all "(Normalized) Weapon Damage", but also some "School Damage (Physical)" abilities.
+	BonusDamage float64 // Comes from '+X Weapon Damage' effects
 
 	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
 }
