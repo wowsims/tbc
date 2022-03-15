@@ -767,7 +767,7 @@ func ApplyWarpSlicer(agent core.Agent) {
 				}
 
 				character.MultiplyMeleeSpeed(sim, bonus)
-				character.AddAura(sim, core.Aura{
+				character.ReplaceAura(sim, core.Aura{
 					ID:       WarpSlicerProcAuraID,
 					ActionID: core.ActionID{ItemID: 30311},
 					Expires:  sim.CurrentTime + dur,
@@ -973,7 +973,7 @@ func ApplyTheNightBlade(agent core.Agent) {
 
 				stacks := character.NumStacks(TheNightBladeProcAuraID) + 1
 				newBonus := arPenBonus * float64(stacks)
-				character.AddAura(sim, core.Aura{
+				character.ReplaceAura(sim, core.Aura{
 					ID:       TheNightBladeProcAuraID,
 					ActionID: core.ActionID{ItemID: 31331},
 					Expires:  sim.CurrentTime + dur,
@@ -1055,7 +1055,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 				if ppmm.Proc(sim, spellEffect.IsMH(), false, "Syphon Of The Nathrezim") {
 					aura := procAura
 					aura.Expires = sim.CurrentTime + time.Second*6
-					character.AddAura(sim, aura)
+					character.ReplaceAura(sim, aura)
 				}
 			},
 		}
