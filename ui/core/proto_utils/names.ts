@@ -20,14 +20,14 @@ export const raceNames: Record<Race, string> = {
 };
 
 export function nameToRace(name: string): Race {
-	const lower = name.toLowerCase();
-	if (lower.includes('troll')) {
+	const normalized = name.toLowerCase().replaceAll(' ', '');
+	if (normalized.includes('troll')) {
 		return Race.RaceTroll10;
 	}
 
 	for (const key in raceNames) {
 		const race = parseInt(key) as Race;
-		if (raceNames[race].toLowerCase() == lower) {
+		if (raceNames[race].toLowerCase().replaceAll(' ', '') == lower) {
 			return race;
 		}
 	}
