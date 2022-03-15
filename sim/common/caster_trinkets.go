@@ -18,9 +18,10 @@ func init() {
 	core.AddItemEffect(31856, ApplyDarkmoonCardCrusade)
 
 	// Activatable effects. Keep these in order by item ID.
+	var RestrainedEssenceOfSapphironAuraID = core.NewAuraID()
 	var RestrainedEssenceOfSapphironCooldownID = core.NewCooldownID()
 	core.AddItemEffect(23046, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		RestrainedEssenceOfSapphironAuraID,
 		stats.Stats{stats.SpellPower: 130},
 		time.Second*20,
 		core.MajorCooldown{
@@ -31,9 +32,10 @@ func init() {
 		},
 	))
 
+	var LivingRubySerpentAuraID = core.NewAuraID()
 	var LivingRubySerpentCooldownID = core.NewCooldownID()
 	core.AddItemEffect(24126, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		LivingRubySerpentAuraID,
 		stats.Stats{stats.SpellPower: 150},
 		time.Second*20,
 		core.MajorCooldown{
@@ -44,9 +46,10 @@ func init() {
 		},
 	))
 
+	var ScryersBloodgemAuraID = core.NewAuraID()
 	var ScryersBloodgemCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29132, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		ScryersBloodgemAuraID,
 		stats.Stats{stats.SpellPower: 150},
 		time.Second*15,
 		core.MajorCooldown{
@@ -57,9 +60,10 @@ func init() {
 		},
 	))
 
+	var XirisGiftAuraID = core.NewAuraID()
 	var XirisGiftCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29179, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		XirisGiftAuraID,
 		stats.Stats{stats.SpellPower: 150},
 		time.Second*15,
 		core.MajorCooldown{
@@ -70,9 +74,10 @@ func init() {
 		},
 	))
 
+	var IconOfTheSilverCrescentAuraID = core.NewAuraID()
 	var IconOfTheSilverCrescentCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29370, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		IconOfTheSilverCrescentAuraID,
 		stats.Stats{stats.SpellPower: 155},
 		time.Second*20,
 		core.MajorCooldown{
@@ -83,9 +88,10 @@ func init() {
 		},
 	))
 
+	var EssenceOfTheMartyrAuraID = core.NewAuraID()
 	var EssenceOfTheMartyrCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29376, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.DefensiveTrinketActiveAuraID,
+		EssenceOfTheMartyrAuraID,
 		stats.Stats{stats.SpellPower: 99},
 		time.Second*20,
 		core.MajorCooldown{
@@ -96,9 +102,10 @@ func init() {
 		},
 	))
 
+	var SkullOfGuldanAuraID = core.NewAuraID()
 	var SkullOfGuldanCooldownID = core.NewCooldownID()
 	core.AddItemEffect(32483, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		SkullOfGuldanAuraID,
 		stats.Stats{stats.SpellHaste: 175},
 		time.Second*20,
 		core.MajorCooldown{
@@ -109,9 +116,10 @@ func init() {
 		},
 	))
 
+	var HexShrunkenHeadAuraID = core.NewAuraID()
 	var HexShrunkenHeadCooldownID = core.NewCooldownID()
 	core.AddItemEffect(33829, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		HexShrunkenHeadAuraID,
 		stats.Stats{stats.SpellPower: 211},
 		time.Second*20,
 		core.MajorCooldown{
@@ -122,9 +130,10 @@ func init() {
 		},
 	))
 
+	var ShiftingNaaruSliverAuraID = core.NewAuraID()
 	var ShiftingNaaruSliverCooldownID = core.NewCooldownID()
 	core.AddItemEffect(34429, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		ShiftingNaaruSliverAuraID,
 		stats.Stats{stats.SpellPower: 320},
 		time.Second*15,
 		core.MajorCooldown{
@@ -135,9 +144,10 @@ func init() {
 		},
 	))
 
+	var DarkIronSmokingPipeAuraID = core.NewAuraID()
 	var DarkIronSmokingPipeCooldownID = core.NewCooldownID()
 	core.AddItemEffect(38290, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		DarkIronSmokingPipeAuraID,
 		stats.Stats{stats.SpellPower: 155},
 		time.Second*20,
 		core.MajorCooldown{

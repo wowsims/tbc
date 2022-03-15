@@ -143,6 +143,7 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 	},
 }
 
+var NaturalAlignmentCrystalAuraID = core.NewAuraID()
 var NaturalAlignmentCrystalCooldownID = core.NewCooldownID()
 
 func ApplyNaturalAlignmentCrystal(agent core.Agent) {
@@ -170,7 +171,7 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 				character.Metrics.AddInstantCast(actionID)
 
 				character.AddAura(sim, core.Aura{
-					ID:       core.OffensiveTrinketActiveAuraID,
+					ID:       NaturalAlignmentCrystalAuraID,
 					ActionID: actionID,
 					Expires:  sim.CurrentTime + dur,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {

@@ -24,12 +24,6 @@ func NewAuraID() AuraID {
 	return newAuraID
 }
 
-// Offsensive trinkets put each other on CD, so they can all share 1 aura ID
-var OffensiveTrinketActiveAuraID = NewAuraID()
-
-// Defensive trinkets put each other on CD, so they can all share 1 aura ID
-var DefensiveTrinketActiveAuraID = NewAuraID()
-
 // Reserve the default value so no aura uses it.
 const UnknownDebuffID = AuraID(0)
 
@@ -55,9 +49,6 @@ func NewCooldownID() CooldownID {
 }
 
 var GCDCooldownID = NewCooldownID()
-var MainHandSwingCooldownID = NewCooldownID()
-var OffHandSwingCooldownID = NewCooldownID()
-var RangedSwingCooldownID = NewCooldownID()
 var OffensiveTrinketSharedCooldownID = NewCooldownID()
 var DefensiveTrinketSharedCooldownID = NewCooldownID()
 
@@ -164,7 +155,7 @@ type auraTracker struct {
 }
 
 func newAuraTracker(useDebuffIDs bool) auraTracker {
-	numAura := numAuraIDs
+	numAura := numAuraIDs + 1 // TODO: this +1 shouldn't be needed, probably an aura ID created strangely somewhere.
 	if useDebuffIDs {
 		numAura = numDebuffIDs
 	}
