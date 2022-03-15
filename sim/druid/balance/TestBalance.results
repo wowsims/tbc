@@ -179,7 +179,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-Dragonmaw-28438"
  value: {
-  dps: 1111.5631813066163
+  dps: 1302.1935453964481
  }
 }
 dps_results: {
@@ -203,7 +203,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 1111.5631813066163
+  dps: 1302.1935453964481
  }
 }
 dps_results: {

@@ -203,7 +203,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 242.63089671682988
+  dps: 259.8750458620099
  }
 }
 dps_results: {
@@ -539,7 +539,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-TheDecapitator-28767"
  value: {
-  dps: 250.34615550795908
+  dps: 259.8750458620099
  }
 }
 dps_results: {

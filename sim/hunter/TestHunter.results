@@ -221,7 +221,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-Dragonmaw-28438"
  value: {
-  dps: 1533.4115064763823
+  dps: 1658.777341560049
  }
 }
 dps_results: {
@@ -239,7 +239,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 1533.4115064763823
+  dps: 1658.777341560049
  }
 }
 dps_results: {
@@ -599,7 +599,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-TheDecapitator-28767"
  value: {
-  dps: 1587.6913996451146
+  dps: 1668.755303145335
  }
 }
 dps_results: {

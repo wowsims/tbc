@@ -203,7 +203,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Dragonmaw-28438"
  value: {
-  dps: 1397.7597247974998
+  dps: 1465.5266419039503
  }
 }
 dps_results: {
@@ -221,7 +221,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 1328.674407740444
+  dps: 1465.5266419039503
  }
 }
 dps_results: {
@@ -551,7 +551,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-TheDecapitator-28767"
  value: {
-  dps: 1326.9148702264317
+  dps: 1465.5266419039503
  }
 }
 dps_results: {

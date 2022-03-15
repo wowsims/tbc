@@ -191,7 +191,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-Dragonmaw-28438"
  value: {
-  dps: 894.9828498838489
+  dps: 1053.4024083490394
  }
 }
 dps_results: {
@@ -215,7 +215,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 894.9828498838489
+  dps: 1053.4024083490394
  }
 }
 dps_results: {
