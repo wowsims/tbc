@@ -15,6 +15,7 @@ import { Drums } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
+import * as Mechanics from '/tbc/core/constants/mechanics.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as RogueInputs from './inputs.js';
 import * as Presets from './presets.js';
@@ -68,6 +69,14 @@ export class RogueSimUI extends IndividualSimUI {
                 Stat.StatArmorPenetration,
                 Stat.StatExpertise,
             ],
+            modifyDisplayStats: (player, stats) => {
+                const hasImpFF = player.sim.encounter.primaryTarget.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
+                if (hasImpFF) {
+                    stats = stats.withStat(Stat.StatMeleeHit, stats.getStat(Stat.StatMeleeHit)
+                        + 3 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE);
+                }
+                return stats;
+            },
             defaults: {
                 // Default equipped gear.
                 gear: Presets.P1_PRESET.gear,

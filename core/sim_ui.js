@@ -95,7 +95,8 @@ export class SimUI extends Component {
         });
         if (document.location.href.includes("localhost")) {
             fetch(document.location.protocol + "//" + document.location.host + "/version").then(resp => {
-                resp.json().then((versionInfo) => {
+                resp.json()
+                    .then((versionInfo) => {
                     if (versionInfo.outdated == 2) {
                         tippy(downloadBinary, {
                             'content': 'Newer version of simulator available for download',
@@ -104,6 +105,9 @@ export class SimUI extends Component {
                         downloadBinary.classList.add('downbinalert');
                         this.addToolbarItem(downloadBinary);
                     }
+                })
+                    .catch(error => {
+                    console.warn('No version info found!');
                 });
             });
         }
