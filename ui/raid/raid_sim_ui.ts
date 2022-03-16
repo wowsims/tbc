@@ -188,7 +188,7 @@ export class RaidSimUI extends SimUI {
 					this.blessingsPicker!.setAssignments(eventID, newRaid.blessings || BlessingsAssignments.create());
 				});
 			},
-      changeEmitters: [this.sim.changeEmitter],
+      changeEmitters: [this.changeEmitter],
       equals: (a: SavedRaid, b: SavedRaid) => {
 				return SavedRaid.equals(a, b);
 			},
@@ -248,6 +248,7 @@ export class RaidSimUI extends SimUI {
 		});
 
 		this.blessingsPicker = new BlessingsPicker(this.rootElem.getElementsByClassName('blessings-section')[0] as HTMLElement, this);
+		this.blessingsPicker.changeEmitter.on(eventID => this.changeEmitter.emit(eventID));
 		const assignmentsPicker = new AssignmentsPicker(this.rootElem.getElementsByClassName('assignments-section-container')[0] as HTMLElement, this);
 
     const otherOptionsSectionElem = this.rootElem.getElementsByClassName('other-options-section')[0] as HTMLElement;

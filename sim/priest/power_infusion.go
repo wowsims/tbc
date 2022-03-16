@@ -25,7 +25,6 @@ func (priest *Priest) registerPowerInfusionCD() {
 		ActionID:   actionID,
 		CooldownID: PowerInfusionCooldownID,
 		Cooldown:   powerInfusionCD,
-		UsesGCD:    true,
 		Priority:   core.CooldownPriorityBloodlust,
 		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
@@ -68,7 +67,6 @@ func (priest *Priest) registerPowerInfusionCD() {
 						Type:  stats.Mana,
 						Value: baseManaCost,
 					},
-					GCD:      core.GCDDefault,
 					Cooldown: powerInfusionCD,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						core.AddPowerInfusionAura(sim, powerInfusionTarget, actionID.Tag)

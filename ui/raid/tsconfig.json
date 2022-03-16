@@ -16,5 +16,6 @@
     { "path": "../mage" },
     { "path": "../rogue" },
     { "path": "../shadow_priest" },
+    { "path": "../smite_priest" },
   ],
 }

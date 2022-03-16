@@ -11,8 +11,6 @@ import { getEnumValues } from '/tbc/core/utils.js';
 import { wait } from '/tbc/core/utils.js';
 import { newRaidTarget, emptyRaidTarget, NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 
-import { BalanceDruid_Options as DruidOptions } from '/tbc/core/proto/druid.js';
-
 import { BuffBot } from './buff_bot.js';
 import { RaidSimUI } from './raid_sim_ui.js';
 
@@ -185,13 +183,13 @@ abstract class AssignedBuffPicker extends Component {
 
 				const raidTarget = newRaidTarget(oldPlayerTarget.getRaidIndex());
 
-				if (oldPlayerOrBot instanceof Player) {
-					const newOptions = oldPlayerOrBot.getSpecOptions() as DruidOptions;
-					newOptions.innervateTarget = raidTarget;
-					oldPlayerOrBot.setSpecOptions(eventID, newOptions);
-				} else {
-					oldPlayerOrBot.setInnervateAssignment(eventID, raidTarget);
-				}
+				//if (oldPlayerOrBot instanceof Player) {
+				//	const newOptions = oldPlayerOrBot.getSpecOptions() as DruidOptions;
+				//	newOptions.innervateTarget = raidTarget;
+				//	oldPlayerOrBot.setSpecOptions(eventID, newOptions);
+				//} else {
+				//	oldPlayerOrBot.setInnervateAssignment(eventID, raidTarget);
+				//}
 			});
 		});
 	}
@@ -216,11 +214,11 @@ class InnervatesPicker extends AssignedBuffPicker {
 	}
 
 	getPlayerValue(player: Player<any>): RaidTarget {
-		return (player.getSpecOptions() as DruidOptions).innervateTarget || emptyRaidTarget();
+		return (player as Player<Spec.SpecBalanceDruid>).getSpecOptions().innervateTarget || emptyRaidTarget();
 	}
 
 	setPlayerValue(eventID: EventID, player: Player<any>, newValue: RaidTarget) {
-		const newOptions = player.getSpecOptions() as DruidOptions;
+		const newOptions = (player as Player<Spec.SpecBalanceDruid>).getSpecOptions();
 		newOptions.innervateTarget = newValue;
 		player.setSpecOptions(eventID, newOptions);
 	}
@@ -246,19 +244,25 @@ class PowerInfusionsPicker extends AssignedBuffPicker {
 					if (playerOrBot instanceof BuffBot) {
 						return playerOrBot.settings.buffBotId == 'Divine Spirit Priest';
 					} else {
-						// Only include bots for now, because shadow priest doesn't have a PI field
-						// on its spec proto.
-						return false;
+						const player = playerOrBot as Player<any>;
+						if (!(player as Player<Spec.SpecSmitePriest>).getTalents().powerInfusion) {
+							return false;
+						}
+						// Don't include shadow priests even if they have the talent, because they
+						// don't have a raid target option for this.
+						return player.spec == Spec.SpecSmitePriest;
 					}
 				}) as Array<Player<any> | BuffBot>;
 	}
 
 	getPlayerValue(player: Player<any>): RaidTarget {
-		throw new Error('Unimplemented PowerInfusionsPicker.getPlayerValue');
+		return (player as Player<Spec.SpecSmitePriest>).getSpecOptions().powerInfusionTarget || emptyRaidTarget();
 	}
 
 	setPlayerValue(eventID: EventID, player: Player<any>, newValue: RaidTarget) {
-		throw new Error('Unimplemented PowerInfusionsPicker.setPlayerValue');
+		const newOptions = (player as Player<Spec.SpecSmitePriest>).getSpecOptions();
+		newOptions.powerInfusionTarget = newValue;
+		player.setSpecOptions(eventID, newOptions);
 	}
 
 	getBuffBotValue(buffBot: BuffBot): RaidTarget {
