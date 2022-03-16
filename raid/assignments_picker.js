@@ -3,6 +3,7 @@ import { RaidTargetPicker } from '/tbc/core/components/raid_target_picker.js';
 import { Player } from '/tbc/core/player.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Class } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
 import { newRaidTarget, emptyRaidTarget } from '/tbc/core/proto_utils/utils.js';
 import { BuffBot } from './buff_bot.js';
 export class AssignmentsPicker extends Component {
@@ -138,14 +139,13 @@ class AssignedBuffPicker extends Component {
                 if (!oldPlayerTarget || !newPlayersAndBots.includes(oldPlayerTarget))
                     return;
                 const raidTarget = newRaidTarget(oldPlayerTarget.getRaidIndex());
-                if (oldPlayerOrBot instanceof Player) {
-                    const newOptions = oldPlayerOrBot.getSpecOptions();
-                    newOptions.innervateTarget = raidTarget;
-                    oldPlayerOrBot.setSpecOptions(eventID, newOptions);
-                }
-                else {
-                    oldPlayerOrBot.setInnervateAssignment(eventID, raidTarget);
-                }
+                //if (oldPlayerOrBot instanceof Player) {
+                //	const newOptions = oldPlayerOrBot.getSpecOptions() as DruidOptions;
+                //	newOptions.innervateTarget = raidTarget;
+                //	oldPlayerOrBot.setSpecOptions(eventID, newOptions);
+                //} else {
+                //	oldPlayerOrBot.setInnervateAssignment(eventID, raidTarget);
+                //}
             });
         });
     }
@@ -184,17 +184,23 @@ class PowerInfusionsPicker extends AssignedBuffPicker {
                 return playerOrBot.settings.buffBotId == 'Divine Spirit Priest';
             }
             else {
-                // Only include bots for now, because shadow priest doesn't have a PI field
-                // on its spec proto.
-                return false;
+                const player = playerOrBot;
+                if (!player.getTalents().powerInfusion) {
+                    return false;
+                }
+                // Don't include shadow priests even if they have the talent, because they
+                // don't have a raid target option for this.
+                return player.spec == Spec.SpecSmitePriest;
             }
         });
     }
     getPlayerValue(player) {
-        throw new Error('Unimplemented PowerInfusionsPicker.getPlayerValue');
+        return player.getSpecOptions().powerInfusionTarget || emptyRaidTarget();
     }
     setPlayerValue(eventID, player, newValue) {
-        throw new Error('Unimplemented PowerInfusionsPicker.setPlayerValue');
+        const newOptions = player.getSpecOptions();
+        newOptions.powerInfusionTarget = newValue;
+        player.setSpecOptions(eventID, newOptions);
     }
     getBuffBotValue(buffBot) {
         return buffBot.getPowerInfusionAssignment();

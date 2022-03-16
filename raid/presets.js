@@ -15,6 +15,7 @@ import * as HunterPresets from '/tbc/hunter/presets.js';
 import * as MagePresets from '/tbc/mage/presets.js';
 import * as RoguePresets from '/tbc/rogue/presets.js';
 import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
+import * as SmitePriestPresets from '/tbc/smite_priest/presets.js';
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
 import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
 import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
@@ -22,6 +23,7 @@ import { HunterSimUI } from '/tbc/hunter/sim.js';
 import { MageSimUI } from '/tbc/mage/sim.js';
 import { RogueSimUI } from '/tbc/rogue/sim.js';
 import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
+import { SmitePriestSimUI } from '/tbc/smite_priest/sim.js';
 export const specSimFactories = {
     [Spec.SpecBalanceDruid]: (parentElem, player) => new BalanceDruidSimUI(parentElem, player),
     [Spec.SpecElementalShaman]: (parentElem, player) => new ElementalShamanSimUI(parentElem, player),
@@ -30,6 +32,7 @@ export const specSimFactories = {
     [Spec.SpecMage]: (parentElem, player) => new MageSimUI(parentElem, player),
     [Spec.SpecRogue]: (parentElem, player) => new RogueSimUI(parentElem, player),
     [Spec.SpecShadowPriest]: (parentElem, player) => new ShadowPriestSimUI(parentElem, player),
+    [Spec.SpecSmitePriest]: (parentElem, player) => new SmitePriestSimUI(parentElem, player),
 };
 export const playerPresets = [
     {
@@ -343,6 +346,38 @@ export const playerPresets = [
         },
         tooltip: specNames[Spec.SpecShadowPriest],
         iconUrl: specIconsLarge[Spec.SpecShadowPriest],
+    },
+    {
+        spec: Spec.SpecSmitePriest,
+        rotation: SmitePriestPresets.DefaultRotation,
+        talents: SmitePriestPresets.StandardTalents.data,
+        specOptions: SmitePriestPresets.DefaultOptions,
+        consumes: SmitePriestPresets.DefaultConsumes,
+        defaultName: 'Smite Priest',
+        defaultFactionRaces: {
+            [Faction.Unknown]: Race.RaceUnknown,
+            [Faction.Alliance]: Race.RaceDwarf,
+            [Faction.Horde]: Race.RaceUndead,
+        },
+        defaultGear: {
+            [Faction.Unknown]: {},
+            [Faction.Alliance]: {
+                1: SmitePriestPresets.P1_PRESET.gear,
+                2: SmitePriestPresets.P2_PRESET.gear,
+                3: SmitePriestPresets.P3_PRESET.gear,
+                4: SmitePriestPresets.P4_PRESET.gear,
+                5: SmitePriestPresets.P5_PRESET.gear,
+            },
+            [Faction.Horde]: {
+                1: SmitePriestPresets.P1_PRESET.gear,
+                2: SmitePriestPresets.P2_PRESET.gear,
+                3: SmitePriestPresets.P3_PRESET.gear,
+                4: SmitePriestPresets.P4_PRESET.gear,
+                5: SmitePriestPresets.P5_PRESET.gear,
+            },
+        },
+        tooltip: specNames[Spec.SpecSmitePriest],
+        iconUrl: specIconsLarge[Spec.SpecSmitePriest],
     },
 ];
 export const implementedSpecs = [...new Set(playerPresets.map(preset => preset.spec))];

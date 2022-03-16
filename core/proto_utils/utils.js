@@ -41,12 +41,12 @@ export const naturalSpecOrder = [
     Spec.SpecMage,
     Spec.SpecRetributionPaladin,
     Spec.SpecShadowPriest,
+    Spec.SpecSmitePriest,
     Spec.SpecRogue,
     Spec.SpecElementalShaman,
     Spec.SpecEnhancementShaman,
     Spec.SpecWarlock,
     Spec.SpecWarrior,
-    Spec.SpecSmitePriest,
 ];
 export const specNames = {
     [Spec.SpecBalanceDruid]: 'Balance Druid',
@@ -145,7 +145,7 @@ export const titleIcons = {
     [Spec.SpecShadowPriest]: '/tbc/assets/shadow_priest_icon.png',
     [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
     [Spec.SpecWarrior]: '/tbc/assets/warrior_icon.png',
-    [Spec.SpecSmitePriest]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_holysmite.jpg',
+    [Spec.SpecSmitePriest]: '/tbc/assets/smite_priest_icon.png',
 };
 export const raidSimIcon = '/tbc/assets/raid_icon.png';
 // Returns the index of the talent tree (0, 1, or 2) that has the most points.
@@ -1071,12 +1071,12 @@ export function makeDefaultBlessings(numPaladins) {
         { spec: Spec.SpecMage, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
         { spec: Spec.SpecRetributionPaladin, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfMight, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
         { spec: Spec.SpecShadowPriest, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
+        { spec: Spec.SpecSmitePriest, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
         { spec: Spec.SpecRogue, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight] },
         { spec: Spec.SpecElementalShaman, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
         { spec: Spec.SpecEnhancementShaman, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight, Blessings.BlessingOfWisdom] },
         { spec: Spec.SpecWarlock, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
         { spec: Spec.SpecWarrior, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight] },
-        { spec: Spec.SpecSmitePriest, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
     ]);
 }
 ;
