@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"math"
 	"time"
 
@@ -23,12 +22,6 @@ func NewAuraID() AuraID {
 	numAuraIDs++
 	return newAuraID
 }
-
-// Offsensive trinkets put each other on CD, so they can all share 1 aura ID
-var OffensiveTrinketActiveAuraID = NewAuraID()
-
-// Defensive trinkets put each other on CD, so they can all share 1 aura ID
-var DefensiveTrinketActiveAuraID = NewAuraID()
 
 // Reserve the default value so no aura uses it.
 const UnknownDebuffID = AuraID(0)
@@ -55,9 +48,6 @@ func NewCooldownID() CooldownID {
 }
 
 var GCDCooldownID = NewCooldownID()
-var MainHandSwingCooldownID = NewCooldownID()
-var OffHandSwingCooldownID = NewCooldownID()
-var RangedSwingCooldownID = NewCooldownID()
 var OffensiveTrinketSharedCooldownID = NewCooldownID()
 var DefensiveTrinketSharedCooldownID = NewCooldownID()
 
@@ -164,7 +154,7 @@ type auraTracker struct {
 }
 
 func newAuraTracker(useDebuffIDs bool) auraTracker {
-	numAura := numAuraIDs
+	numAura := numAuraIDs + 1 // TODO: this +1 shouldn't be needed, probably an aura ID created strangely somewhere.
 	if useDebuffIDs {
 		numAura = numDebuffIDs
 	}
@@ -239,8 +229,8 @@ func (at *auraTracker) reset(sim *Simulation) {
 		}
 		at.ReplaceAura(sim, aura)
 		if permAura.UptimeMultiplier != 0 && !aura.ActionID.IsEmptyAction() {
-			// We're going to add 100% uptime at the end, so subtract the difference.
-			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(float64(sim.Duration)*(1-permAura.UptimeMultiplier)))
+			// We're going to add 100% uptime at the end, so subtract 1 now.
+			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(float64(sim.Duration)*(permAura.UptimeMultiplier-1)))
 		}
 	}
 }
@@ -571,10 +561,6 @@ func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spellCast *SpellCast, s
 }
 
 func (at *auraTracker) AddAuraUptime(auraID AuraID, actionID ActionID, uptime time.Duration) {
-	if uptime < 0 {
-		panic(fmt.Sprintf("AddAuraUptime(%d, %v, %s) has negative uptime", auraID, actionID, uptime))
-	}
-
 	metrics := &at.metrics[auraID]
 
 	metrics.ID = actionID

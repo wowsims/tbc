@@ -36,6 +36,7 @@ import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { getEligibleItemSlots } from '/tbc/core/proto_utils/utils.js';
 import { getEligibleEnchantSlots } from '/tbc/core/proto_utils/utils.js';
+import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 
 import { Encounter } from './encounter.js';
 import { Player } from './player.js';
@@ -175,9 +176,20 @@ export class Sim {
 	}
 
   private makeRaidSimRequest(debug: boolean): RaidSimRequest {
+		const raid = this.getModifiedRaidProto();
+		const encounter = this.getModifiedEncounterProto();
+		const hunters = raid.parties.map(party => party.players).flat().filter(player => player.name && playerToSpec(player) == Spec.SpecHunter);
+		if (hunters.some(hunter => (specTypeFunctions[Spec.SpecHunter]!.talentsFromPlayer(hunter) as SpecTalents<Spec.SpecHunter>).exposeWeakness > 0)) {
+			encounter.targets.forEach(target => {
+				if (target.debuffs) {
+					target.debuffs.exposeWeaknessUptime = 0;
+				}
+			});
+		}
+
 		return RaidSimRequest.create({
-			raid: this.getModifiedRaidProto(),
-			encounter: this.getModifiedEncounterProto(),
+			raid: raid,
+			encounter: encounter,
 			simOptions: SimOptions.create({
 				iterations: debug ? 1 : this.getIterations(),
 				randomSeed: BigInt(this.nextRngSeed()),

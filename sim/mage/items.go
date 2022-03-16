@@ -9,10 +9,12 @@ import (
 
 const SerpentCoilBraidID = 30720
 
+var MindQuickeningGemAuraID = core.NewAuraID()
+var MindQuickeningGemCooldownID = core.NewCooldownID()
+
 func init() {
-	var MindQuickeningGemCooldownID = core.NewCooldownID()
 	core.AddItemEffect(19339, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		MindQuickeningGemAuraID,
 		stats.Stats{stats.SpellHaste: 330},
 		time.Second*20,
 		core.MajorCooldown{
