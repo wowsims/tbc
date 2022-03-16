@@ -2,6 +2,7 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import * as Mechanics from '/tbc/core/constants/mechanics.js';
 
@@ -51,7 +52,7 @@ export class CharacterStats extends Component {
     });
 
 		this.updateStats(new Stats(player.getCurrentStats().finalStats));
-		player.currentStatsEmitter.on(() => {
+		TypedEvent.onAny([player.currentStatsEmitter, player.sim.changeEmitter]).on(() => {
 			this.updateStats(new Stats(player.getCurrentStats().finalStats));
 		});
   }
