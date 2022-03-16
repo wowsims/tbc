@@ -1,4 +1,5 @@
 import { Item } from '/tbc/core/proto/common.js';
+import { Spec } from '/tbc/core/proto/common.js';
 import { ComputeStatsRequest } from '/tbc/core/proto/api.js';
 import { GearListRequest } from '/tbc/core/proto/api.js';
 import { RaidSimRequest } from '/tbc/core/proto/api.js';
@@ -10,8 +11,10 @@ import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { SimResult } from '/tbc/core/proto_utils/sim_result.js';
 import { gemEligibleForSocket } from '/tbc/core/proto_utils/gems.js';
 import { gemMatchesSocket } from '/tbc/core/proto_utils/gems.js';
+import { specTypeFunctions } from '/tbc/core/proto_utils/utils.js';
 import { getEligibleItemSlots } from '/tbc/core/proto_utils/utils.js';
 import { getEligibleEnchantSlots } from '/tbc/core/proto_utils/utils.js';
+import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { Encounter } from './encounter.js';
 import { Raid } from './raid.js';
 import { TypedEvent } from './typed_event.js';
@@ -104,9 +107,19 @@ export class Sim {
         return encounterProto;
     }
     makeRaidSimRequest(debug) {
+        const raid = this.getModifiedRaidProto();
+        const encounter = this.getModifiedEncounterProto();
+        const hunters = raid.parties.map(party => party.players).flat().filter(player => player.name && playerToSpec(player) == Spec.SpecHunter);
+        if (hunters.some(hunter => specTypeFunctions[Spec.SpecHunter].talentsFromPlayer(hunter).exposeWeakness > 0)) {
+            encounter.targets.forEach(target => {
+                if (target.debuffs) {
+                    target.debuffs.exposeWeaknessUptime = 0;
+                }
+            });
+        }
         return RaidSimRequest.create({
-            raid: this.getModifiedRaidProto(),
-            encounter: this.getModifiedEncounterProto(),
+            raid: raid,
+            encounter: encounter,
             simOptions: SimOptions.create({
                 iterations: debug ? 1 : this.getIterations(),
                 randomSeed: BigInt(this.nextRngSeed()),
