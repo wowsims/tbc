@@ -31,6 +31,7 @@ import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Rogue, Rogue_Rotation as RogueRotation, Rogue_Options as RogueOptions } from '/tbc/core/proto/rogue.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
+import * as Mechanics from '/tbc/core/constants/mechanics.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
@@ -88,6 +89,15 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 				Stat.StatArmorPenetration,
 				Stat.StatExpertise,
 			],
+			modifyDisplayStats: (player: Player<Spec.SpecRogue>, stats: Stats) => {
+				const hasImpFF = player.sim.encounter.primaryTarget.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
+				if (hasImpFF) {
+					stats = stats.withStat(Stat.StatMeleeHit,
+							stats.getStat(Stat.StatMeleeHit)
+							+ 3 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE);
+				}
+				return stats;
+			},
 
 			defaults: {
 				// Default equipped gear.
