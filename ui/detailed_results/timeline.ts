@@ -23,6 +23,7 @@ declare var ApexCharts: any;
 
 const dpsColor = '#ed5653';
 const manaColor = '#2E93fA';
+const threatColor = '#b56d07';
 
 export class Timeline extends ResultComponent {
 	private readonly dpsResourcesPlotElem: HTMLElement;
@@ -102,6 +103,7 @@ export class Timeline extends ResultComponent {
 			colors: [
 				dpsColor,
 				manaColor,
+				threatColor,
 			],
 			series: [], // Set dynamically
 			xaxis: {
@@ -297,10 +299,13 @@ export class Timeline extends ResultComponent {
 								</div>`
 							}
 						</div>`;
-					} else if (data.seriesIndex == 1) {
+					} else if (showMana && data.seriesIndex == 1) {
 						// Mana
 						const log = manaLogs[data.dataPointIndex];
 						return this.resourceTooltip(log, maxMana, true);
+					} else {
+						// Threat
+						const log = player.threatLogs[data.dataPointIndex];
 					}
 				}
 			},
@@ -359,6 +364,19 @@ export class Timeline extends ResultComponent {
 					},
 				},
 			} as any);
+		}
+
+		if (true) {
+			options.series.push({
+				name: 'Threat',
+				type: 'line',
+				data: player.threatLogs.map(log => {
+					return {
+						x: this.toDatetime(log.timestamp),
+						y: log.threatAfter,
+					};
+				}),
+			});
 		}
 
 		this.dpsResourcesPlot.updateOptions(options);

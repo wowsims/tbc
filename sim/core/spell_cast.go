@@ -89,6 +89,7 @@ type SpellEffect struct {
 	// Results
 	Outcome HitOutcome
 	Damage  float64 // Damage done by this cast.
+	Threat  float64
 
 	// Certain damage multiplier, such as target debuffs and crit multipliers, do
 	// not count towards the AOE cap. Store them here to they can be subtracted
@@ -102,6 +103,14 @@ func (spellEffect *SpellEffect) Landed() bool {
 
 func (spellEffect *SpellEffect) TotalThreatMultiplier(spellCast *SpellCast) float64 {
 	return spellEffect.ThreatMultiplier * spellCast.Character.PseudoStats.ThreatMultiplier
+}
+
+func (spellEffect *SpellEffect) calcThreat(spellCast *SpellCast) float64 {
+	if spellEffect.Landed() {
+		return (spellEffect.Damage + spellEffect.FlatThreatBonus) * spellEffect.TotalThreatMultiplier(spellCast)
+	} else {
+		return 0
+	}
 }
 
 func (she *SpellHitEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell) {
@@ -143,10 +152,7 @@ func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spell *Simple
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *SimpleSpell) {
 	if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasAlwaysHits) {
-		spell.Character.Log(sim, "%s %s.", spell.ActionID, spellEffect)
-	}
-	if spellEffect.Landed() && spellEffect.FlatThreatBonus > 0 {
-		spell.TotalThreat += spellEffect.FlatThreatBonus * spellEffect.TotalThreatMultiplier(&spell.SpellCast)
+		spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(&spell.SpellCast))
 	}
 
 	spellEffect.triggerSpellProcs(sim, spell)
@@ -175,7 +181,6 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast)
 }
 
 func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
-
 	if spellEffect.Outcome.Matches(OutcomeHit) {
 		spellCast.Hits++
 	}
@@ -208,7 +213,7 @@ func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
 	}
 
 	spellCast.TotalDamage += spellEffect.Damage
-	spellCast.TotalThreat += spellEffect.Damage * spellEffect.TotalThreatMultiplier(spellCast)
+	spellCast.TotalThreat += spellEffect.calcThreat(spellCast)
 }
 
 // Only applies the results from the ticks, not the initial dot application.
@@ -331,7 +336,7 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 // This should be called on each dot tick.
 func (hitEffect *SpellHitEffect) afterDotTick(sim *Simulation, spell *SimpleSpell) {
 	if sim.Log != nil {
-		spell.Character.Log(sim, "%s %s.", spell.ActionID, hitEffect.SpellEffect.DotResultString())
+		spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, hitEffect.SpellEffect.DotResultString(), hitEffect.SpellEffect.calcThreat(&spell.SpellCast))
 	}
 
 	hitEffect.applyDotTickResultsToCast(&spell.SpellCast)

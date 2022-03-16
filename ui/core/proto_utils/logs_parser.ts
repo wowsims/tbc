@@ -64,6 +64,7 @@ interface SimLogParams {
 	timestamp: number,
 	source: Entity | null,
 	target: Entity | null,
+	threat: number,
 }
 
 export class SimLog {
@@ -80,6 +81,9 @@ export class SimLog {
 	readonly source: Entity | null;
 	readonly target: Entity | null;
 
+	// Amount of threat generated from this event. Note that not all events generate threat, so this will be 0.
+	readonly threat: number;
+
 	// Logs for auras that were active at this timestamp.
 	// This is only filled if populateActiveAuras() is called.
 	activeAuras: Array<AuraUptimeLog>;
@@ -90,6 +94,7 @@ export class SimLog {
 		this.timestamp = params.timestamp;
 		this.source = params.source;
 		this.target = params.target;
+		this.threat = params.threat;
 		this.activeAuras = [];
 	}
 
@@ -116,7 +121,14 @@ export class SimLog {
 				timestamp: 0,
 				source: null,
 				target: null,
+				threat: 0,
 			};
+
+			const threatMatch = line.match(/ \(Threat: (-?[0-9]+\.[0-9]+)\)/);
+			if (threatMatch) {
+				params.threat = parseFloat(threatMatch[1]);
+				line = line.substring(0, threatMatch.index);
+			}
 
 			let match = line.match(/\[([0-9]+\.[0-9]+)\]\w*(.*)/);
 			if (!match || !match[1]) {
@@ -339,7 +351,44 @@ export class DpsLog extends SimLog {
 				timestamp: ddLogGroup[0].timestamp,
 				source: ddLogGroup[0].source,
 				target: null,
+				threat: 0,
 			}, dps, ddLogGroup);
+		});
+	}
+}
+
+export class ThreatLogGroup extends SimLog {
+	readonly threatBefore: number;
+	readonly threatAfter: number;
+	readonly logs: Array<SimLog>;
+
+	constructor(params: SimLogParams, threatBefore: number, threatAfter: number, logs: Array<SimLog>) {
+		super(params);
+		this.threatBefore = threatBefore;
+		this.threatAfter = threatAfter;
+		this.logs = logs;
+	}
+
+	static fromLogs(logs: Array<SimLog>): Array<ThreatLogGroup> {
+		const groupedLogs = SimLog.groupDuplicateTimestamps(logs.filter(log => log.threat != 0));
+		let curThreat = 0;
+		return groupedLogs.map(logGroup => {
+			const newThreat = sum(logGroup.map(log => log.threat));
+			const threatLog = new ThreatLogGroup(
+				{
+					raw: '',
+					logIndex: logGroup[0].logIndex,
+					timestamp: logGroup[0].timestamp,
+					source: logGroup[0].source,
+					target: logGroup[0].target,
+					threat: newThreat,
+				},
+				curThreat,
+				curThreat + newThreat,
+				logGroup);
+
+			curThreat += newThreat;
+			return threatLog;
 		});
 	}
 }
@@ -451,6 +500,7 @@ export class AuraUptimeLog extends SimLog {
 				timestamp: gainedLog.timestamp,
 				source: log.source,
 				target: log.target,
+				threat: gainedLog.threat,
 			}, log.timestamp, gainedLog.aura));
 			
 			if (log.isAuraRefreshed()) {
@@ -466,6 +516,7 @@ export class AuraUptimeLog extends SimLog {
 				timestamp: gainedLog.timestamp,
 				source: gainedLog.source,
 				target: gainedLog.target,
+				threat: gainedLog.threat,
 			}, encounterDuration, gainedLog.aura));
 		});
 
@@ -569,6 +620,7 @@ export class ResourceChangedLogGroup extends SimLog {
 						timestamp: logGroup[0].timestamp,
 						source: logGroup[0].source,
 						target: logGroup[0].target,
+						threat: 0,
 					},
 					resourceType,
 					logGroup[0].valueBefore,
@@ -671,6 +723,7 @@ export class CastLog extends SimLog {
 			timestamp: castBeganLog.timestamp,
 			source: castBeganLog.source,
 			target: castBeganLog.target,
+			threat: castCompletedLog?.threat || castBeganLog.threat,
 		});
 		this.castId = castCompletedLog?.castId || castBeganLog.castId; // Use completed log because of arcane blast
 		this.castTime = castBeganLog.castTime;

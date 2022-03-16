@@ -33,6 +33,7 @@ import {
 	MajorCooldownUsedLog,
 	ResourceChangedLogGroup,
 	SimLog,
+	ThreatLogGroup,
 } from './logs_parser.js';
 
 export interface SimResultFilter {
@@ -261,6 +262,7 @@ export class PlayerMetrics {
 	readonly auraUptimeLogs: Array<AuraUptimeLog>;
 	readonly majorCooldownLogs: Array<MajorCooldownUsedLog>;
 	readonly castLogs: Array<CastLog>;
+	readonly threatLogs: Array<ThreatLogGroup>;
 
 	// Aura uptime logs, filtered to include only auras that correspond to a
 	// major cooldown.
@@ -299,6 +301,7 @@ export class PlayerMetrics {
 		this.damageDealtLogs = this.logs.filter((log): log is DamageDealtLog => log.isDamageDealt());
 		this.dpsLogs = DpsLog.fromLogs(this.damageDealtLogs);
 		this.castLogs = CastLog.fromLogs(this.logs);
+		this.threatLogs = ThreatLogGroup.fromLogs(this.logs);
 
 		this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet), resultData.firstIterationDuration);
 		this.majorCooldownLogs = this.logs.filter((log): log is MajorCooldownUsedLog => log.isMajorCooldownUsed());
