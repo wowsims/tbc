@@ -140,8 +140,9 @@ export abstract class SimUI extends Component {
 		});
 
 		if (document.location.href.includes("localhost")) {
-			fetch(document.location.protocol+"//"+document.location.host+"/version").then(resp=>{
-				resp.json().then((versionInfo) => {
+			fetch(document.location.protocol+"//"+document.location.host+"/version").then(resp => {
+				resp.json()
+				.then((versionInfo) => {
 					if (versionInfo.outdated == 2) {
 						tippy(downloadBinary, {
 							'content': 'Newer version of simulator available for download',
@@ -151,7 +152,10 @@ export abstract class SimUI extends Component {
 						this.addToolbarItem(downloadBinary);
 					}
 				})
-			})
+				.catch(error => {
+					console.warn('No version info found!');
+				});
+			});
 		} else {
 			tippy(downloadBinary, {
 				'content': 'Download simulator for faster simulating',

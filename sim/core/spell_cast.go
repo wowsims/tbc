@@ -2,8 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strings"
-
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -61,6 +59,8 @@ type SpellEffect struct {
 	BonusExpertiseRating  float64
 	BonusArmorPenetration float64
 	BonusWeaponDamage     float64
+
+	BonusAttackPowerOnTarget float64
 
 	// Additional multiplier that is always applied.
 	DamageMultiplier float64
@@ -370,10 +370,7 @@ func (spellEffect *SpellEffect) String() string {
 	if !spellEffect.Landed() {
 		return outcomeStr
 	}
-
-	var sb strings.Builder
-	fmt.Fprintf(&sb, "%s for %0.3f damage", outcomeStr, spellEffect.Damage)
-	return sb.String()
+	return fmt.Sprintf("%s for %0.3f damage", outcomeStr, spellEffect.Damage)
 }
 
 func (spellEffect *SpellEffect) DotResultString() string {
