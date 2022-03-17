@@ -30,22 +30,25 @@ export function newIndividualImporters<SpecType extends Spec>(simUI: IndividualS
 	});
 
 	const menuElem = importSettings.getElementsByClassName('dropdown-menu')[0] as HTMLElement;
-	const addMenuItem = (label: string, onClick: () => void) => {
+	const addMenuItem = (label: string, onClick: () => void, showInRaidSim: boolean) => {
 		const itemElem = document.createElement('span');
 		itemElem.classList.add('dropdown-item');
+		if (!showInRaidSim) {
+			itemElem.classList.add('within-raid-sim-hide');
+		}
 		itemElem.textContent = label;
 		itemElem.addEventListener('click', onClick);
 		menuElem.appendChild(itemElem);
 	};
 
-	addMenuItem('Json', () => new IndividualJsonImporter(menuElem, simUI));
-	addMenuItem('70U', () => new Individual70UImporter(menuElem, simUI));
-	addMenuItem('Addon', () => new IndividualAddonImporter(menuElem, simUI));
+	addMenuItem('Json', () => new IndividualJsonImporter(menuElem, simUI), true);
+	addMenuItem('70U', () => new Individual70UImporter(menuElem, simUI), true);
+	addMenuItem('Addon', () => new IndividualAddonImporter(menuElem, simUI), true);
 
 	return importSettings;
 }
 
-abstract class Importer extends Popup {
+export abstract class Importer extends Popup {
   private readonly textElem: HTMLTextAreaElement;
   protected readonly descriptionElem: HTMLElement;
 
@@ -159,7 +162,13 @@ class IndividualJsonImporter<SpecType extends Spec> extends Importer {
 
 	onImport(data: string) {
 		const proto = IndividualSimSettings.fromJsonString(data);
-		this.simUI.fromProto(TypedEvent.nextEventID(), proto);
+		if (this.simUI.isWithinRaidSim) {
+			if (proto.player) {
+				this.simUI.player.fromProto(TypedEvent.nextEventID(), proto.player);
+			}
+		} else {
+			this.simUI.fromProto(TypedEvent.nextEventID(), proto);
+		}
 		this.close();
 	}
 }

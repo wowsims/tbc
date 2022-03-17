@@ -4,6 +4,7 @@ import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
+import { SimUI } from '/tbc/core/sim_ui.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Player } from '/tbc/core/player.js';
@@ -19,10 +20,10 @@ import { Popup } from './popup.js';
 declare var $: any;
 declare var tippy: any;
 
-export class SettingsMenu<SpecType extends Spec> extends Popup {
-	private readonly simUI: IndividualSimUI<SpecType>;
+export class SettingsMenu extends Popup {
+	private readonly simUI: SimUI;
 
-  constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
+  constructor(parent: HTMLElement, simUI: SimUI) {
     super(parent);
 		this.rootElem.classList.add('settings-menu');
 		this.simUI = simUI;
@@ -47,7 +48,7 @@ export class SettingsMenu<SpecType extends Spec> extends Popup {
 					</div>
 				</div>
 				<div class="settings-menu-content-right">
-					<div class="settings-menu-section settings-menu-ep-weights">
+					<div class="settings-menu-section settings-menu-ep-weights within-raid-sim-hide">
 					</div>
 				</div>
 			</div>
@@ -105,6 +106,12 @@ export class SettingsMenu<SpecType extends Spec> extends Popup {
 	private setupEpWeightsSettings() {
     const sectionRoot = this.rootElem.getElementsByClassName('settings-menu-ep-weights')[0] as HTMLElement;
 
+		if (!(this.simUI instanceof IndividualSimUI) || this.simUI.isWithinRaidSim) {
+			sectionRoot.classList.add('hide');
+			return;
+		}
+		const individualSimUI = this.simUI as IndividualSimUI<any>;
+
     const label = document.createElement('span');
     label.classList.add('ep-weights-label');
     label.textContent = 'EP Weights';
@@ -116,7 +123,7 @@ export class SettingsMenu<SpecType extends Spec> extends Popup {
 
 		//const epStats = this.simUI.individualConfig.epStats;
 		const epStats = (getEnumValues(Stat) as Array<Stat>).filter(stat => ![Stat.StatMana, Stat.StatEnergy, Stat.StatRage].includes(stat));
-    const weightPickers = epStats.map(stat => new NumberPicker(sectionRoot, this.simUI.player, {
+    const weightPickers = epStats.map(stat => new NumberPicker(sectionRoot, individualSimUI.player, {
 			float: true,
       label: statNames[stat],
       changedEvent: (player: Player<any>) => player.epWeightsChangeEmitter,

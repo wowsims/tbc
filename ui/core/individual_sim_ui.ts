@@ -873,23 +873,9 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			this.player.getRaid()!.setBuffs(eventID, this.individualConfig.defaults.raidBuffs);
 			this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
 
-			this.sim.encounter.fromProto(eventID, EncounterProto.create({
-				duration: 180,
-				durationVariation: 5,
-				executeProportion: 0.2,
-				targets: [TargetProto.create({
-					level: 73,
-					armor: 7684,
-					mobType: MobType.MobTypeDemon,
-					debuffs: this.individualConfig.defaults.debuffs,
-				})],
-			}));
-
-			this.sim.fromProto(eventID, SimSettingsProto.create({
-				iterations: 3000,
-				phase: OtherConstants.CURRENT_PHASE,
-				showThreatMetrics: false, // TODO: true if tank sim
-			}));
+			this.sim.encounter.applyDefaults(eventID);
+			this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
+			this.sim.applyDefaults(eventID);
 		});
 	}
 
