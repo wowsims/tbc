@@ -310,7 +310,7 @@ export class PlayerMetrics {
 		AuraUptimeLog.populateActiveAuras(this.dpsLogs, this.auraUptimeLogs);
 		AuraUptimeLog.populateActiveAuras(this.groupedResourceLogs[ResourceType.ResourceTypeMana], this.auraUptimeLogs);
 
-		this.majorCooldownAuraUptimeLogs = this.auraUptimeLogs.filter(auraLog => this.majorCooldownLogs.find(mcdLog => mcdLog.cooldownId.equals(auraLog.aura)));
+		this.majorCooldownAuraUptimeLogs = this.auraUptimeLogs.filter(auraLog => this.majorCooldownLogs.find(mcdLog => mcdLog.actionId!.equals(auraLog.actionId!)));
 	}
 
 	get label() {
