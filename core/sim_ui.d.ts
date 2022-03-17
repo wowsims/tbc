@@ -1,7 +1,7 @@
 import { Component } from '/tbc/core/components/component.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Sim } from './sim.js';
-import { TypedEvent } from './typed_event.js';
+import { EventID, TypedEvent } from './typed_event.js';
 export interface SimWarning {
     updateOn: TypedEvent<any>;
     shouldDisplay: () => boolean;
@@ -34,4 +34,5 @@ export declare abstract class SimUI extends Component {
     isIndividualSim(): boolean;
     runSim(onProgress: Function): Promise<void>;
     runSimOnce(): Promise<void>;
+    abstract applyDefaults(eventID: EventID): void;
 }

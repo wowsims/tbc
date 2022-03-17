@@ -16,7 +16,6 @@ import { IconPicker } from '/tbc/core/components/icon_picker.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
-import { MobType } from '/tbc/core/proto/common.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
@@ -26,10 +25,8 @@ import { SavedGearSet } from '/tbc/core/proto/ui.js';
 import { SavedSettings } from '/tbc/core/proto/ui.js';
 import { SavedTalents } from '/tbc/core/proto/ui.js';
 import { SettingsMenu } from '/tbc/core/components/settings_menu.js';
-import { SimSettings as SimSettingsProto } from '/tbc/core/proto/ui.js';
 import { SimUI } from './sim_ui.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
 import { addStatWeightsAction } from '/tbc/core/components/stat_weights_action.js';
 import { getMetaGemConditionDescription } from '/tbc/core/proto_utils/gems.js';
@@ -42,7 +39,6 @@ import { raceNames } from '/tbc/core/proto_utils/names.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
-import * as OtherConstants from '/tbc/core/constants/other.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 const SAVED_GEAR_STORAGE_KEY = '__savedGear__';
 const SAVED_ROTATION_STORAGE_KEY = '__savedRotation__';
@@ -638,22 +634,9 @@ export class IndividualSimUI extends SimUI {
             this.player.getParty().setBuffs(eventID, this.individualConfig.defaults.partyBuffs);
             this.player.getRaid().setBuffs(eventID, this.individualConfig.defaults.raidBuffs);
             this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
-            this.sim.encounter.fromProto(eventID, EncounterProto.create({
-                duration: 180,
-                durationVariation: 5,
-                executeProportion: 0.2,
-                targets: [TargetProto.create({
-                        level: 73,
-                        armor: 7684,
-                        mobType: MobType.MobTypeDemon,
-                        debuffs: this.individualConfig.defaults.debuffs,
-                    })],
-            }));
-            this.sim.fromProto(eventID, SimSettingsProto.create({
-                iterations: 3000,
-                phase: OtherConstants.CURRENT_PHASE,
-                showThreatMetrics: false, // TODO: true if tank sim
-            }));
+            this.sim.encounter.applyDefaults(eventID);
+            this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
+            this.sim.applyDefaults(eventID);
         });
     }
     registerExclusiveEffect(effect) {

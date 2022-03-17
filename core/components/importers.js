@@ -21,19 +21,22 @@ export function newIndividualImporters(simUI) {
         'allowHTML': true,
     });
     const menuElem = importSettings.getElementsByClassName('dropdown-menu')[0];
-    const addMenuItem = (label, onClick) => {
+    const addMenuItem = (label, onClick, showInRaidSim) => {
         const itemElem = document.createElement('span');
         itemElem.classList.add('dropdown-item');
+        if (!showInRaidSim) {
+            itemElem.classList.add('within-raid-sim-hide');
+        }
         itemElem.textContent = label;
         itemElem.addEventListener('click', onClick);
         menuElem.appendChild(itemElem);
     };
-    addMenuItem('Json', () => new IndividualJsonImporter(menuElem, simUI));
-    addMenuItem('70U', () => new Individual70UImporter(menuElem, simUI));
-    addMenuItem('Addon', () => new IndividualAddonImporter(menuElem, simUI));
+    addMenuItem('Json', () => new IndividualJsonImporter(menuElem, simUI), true);
+    addMenuItem('70U', () => new Individual70UImporter(menuElem, simUI), true);
+    addMenuItem('Addon', () => new IndividualAddonImporter(menuElem, simUI), true);
     return importSettings;
 }
-class Importer extends Popup {
+export class Importer extends Popup {
     constructor(parent, title) {
         super(parent);
         const uploadInputId = 'upload-input-' + title.toLowerCase().replaceAll(' ', '-');
@@ -127,7 +130,14 @@ class IndividualJsonImporter extends Importer {
     }
     onImport(data) {
         const proto = IndividualSimSettings.fromJsonString(data);
-        this.simUI.fromProto(TypedEvent.nextEventID(), proto);
+        if (this.simUI.isWithinRaidSim) {
+            if (proto.player) {
+                this.simUI.player.fromProto(TypedEvent.nextEventID(), proto.player);
+            }
+        }
+        else {
+            this.simUI.fromProto(TypedEvent.nextEventID(), proto);
+        }
         this.close();
     }
 }

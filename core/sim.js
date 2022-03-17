@@ -361,5 +361,12 @@ export class Sim {
             this.setShowExperimental(eventID, proto.showExperimental);
         });
     }
+    applyDefaults(eventID) {
+        this.fromProto(eventID, SimSettingsProto.create({
+            iterations: 3000,
+            phase: OtherConstants.CURRENT_PHASE,
+            showThreatMetrics: false, // TODO: true if tank sim
+        }));
+    }
 }
 Sim.MAX_RNG_SEED = Math.pow(2, 32) - 1;

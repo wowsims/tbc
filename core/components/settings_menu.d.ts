@@ -1,8 +1,7 @@
-import { Spec } from '/tbc/core/proto/common.js';
-import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { SimUI } from '/tbc/core/sim_ui.js';
 import { Popup } from './popup.js';
-export declare class SettingsMenu<SpecType extends Spec> extends Popup {
+export declare class SettingsMenu extends Popup {
     private readonly simUI;
-    constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>);
+    constructor(parent: HTMLElement, simUI: SimUI);
     private setupEpWeightsSettings;
 }

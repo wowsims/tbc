@@ -96,4 +96,5 @@ export declare class Sim {
     lookupEquipmentSpec(equipSpec: EquipmentSpec): Gear;
     toProto(): SimSettingsProto;
     fromProto(eventID: EventID, proto: SimSettingsProto): void;
+    applyDefaults(eventID: EventID): void;
 }

@@ -1,4 +1,5 @@
 import { Stat } from '/tbc/core/proto/common.js';
+import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
@@ -30,7 +31,7 @@ export class SettingsMenu extends Popup {
 					</div>
 				</div>
 				<div class="settings-menu-content-right">
-					<div class="settings-menu-section settings-menu-ep-weights">
+					<div class="settings-menu-section settings-menu-ep-weights within-raid-sim-hide">
 					</div>
 				</div>
 			</div>
@@ -80,6 +81,11 @@ export class SettingsMenu extends Popup {
     }
     setupEpWeightsSettings() {
         const sectionRoot = this.rootElem.getElementsByClassName('settings-menu-ep-weights')[0];
+        if (!(this.simUI instanceof IndividualSimUI) || this.simUI.isWithinRaidSim) {
+            sectionRoot.classList.add('hide');
+            return;
+        }
+        const individualSimUI = this.simUI;
         const label = document.createElement('span');
         label.classList.add('ep-weights-label');
         label.textContent = 'EP Weights';
@@ -90,7 +96,7 @@ export class SettingsMenu extends Popup {
         sectionRoot.appendChild(label);
         //const epStats = this.simUI.individualConfig.epStats;
         const epStats = getEnumValues(Stat).filter(stat => ![Stat.StatMana, Stat.StatEnergy, Stat.StatRage].includes(stat));
-        const weightPickers = epStats.map(stat => new NumberPicker(sectionRoot, this.simUI.player, {
+        const weightPickers = epStats.map(stat => new NumberPicker(sectionRoot, individualSimUI.player, {
             float: true,
             label: statNames[stat],
             changedEvent: (player) => player.epWeightsChangeEmitter,

@@ -17,20 +17,23 @@ export function newIndividualExporters(simUI) {
         'allowHTML': true,
     });
     const menuElem = exportSettings.getElementsByClassName('dropdown-menu')[0];
-    const addMenuItem = (label, onClick) => {
+    const addMenuItem = (label, onClick, showInRaidSim) => {
         const itemElem = document.createElement('span');
         itemElem.classList.add('dropdown-item');
+        if (!showInRaidSim) {
+            itemElem.classList.add('within-raid-sim-hide');
+        }
         itemElem.textContent = label;
         itemElem.addEventListener('click', onClick);
         menuElem.appendChild(itemElem);
     };
-    addMenuItem('Link', () => new IndividualLinkExporter(menuElem, simUI));
-    addMenuItem('Json', () => new IndividualJsonExporter(menuElem, simUI));
-    addMenuItem('70U EP', () => new Individual70UEPExporter(menuElem, simUI));
-    addMenuItem('Pawn EP', () => new IndividualPawnEPExporter(menuElem, simUI));
+    addMenuItem('Link', () => new IndividualLinkExporter(menuElem, simUI), false);
+    addMenuItem('Json', () => new IndividualJsonExporter(menuElem, simUI), true);
+    addMenuItem('70U EP', () => new Individual70UEPExporter(menuElem, simUI), false);
+    addMenuItem('Pawn EP', () => new IndividualPawnEPExporter(menuElem, simUI), false);
     return exportSettings;
 }
-class Exporter extends Popup {
+export class Exporter extends Popup {
     constructor(parent, title, allowDownload) {
         super(parent);
         this.rootElem.classList.add('exporter');

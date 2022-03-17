@@ -16,12 +16,13 @@ import { DetailedResults } from '/tbc/core/components/detailed_results.js';
 import { EncounterPicker } from '/tbc/core/components/encounter_picker.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
+import { SettingsMenu } from '/tbc/core/components/settings_menu.js';
 import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
-import { downloadJson } from '/tbc/core/utils.js';
 import { AssignmentsPicker } from './assignments_picker.js';
 import { BlessingsPicker } from './blessings_picker.js';
 import { RaidPicker } from './raid_picker.js';
 import { implementedSpecs } from './presets.js';
+import { newRaidExporters, newRaidImporters } from './import_export.js';
 const extraKnownIssues = [
     'We\'re still missing implementations for many specs. If you\'d like to help us out, check out our <a href="https://github.com/wowsims/tbc">Github project</a> or <a href="https://discord.gg/jJMPr9JWwx">join our discord</a>!',
 ];
@@ -71,7 +72,7 @@ export class RaidSimUI extends SimUI {
                 }
             }
             if (!loadedSettings) {
-                // Apply any defaults here.
+                this.applyDefaults(initEventID);
             }
             // This needs to go last so it doesn't re-store things as they are initialized.
             this.changeEmitter.on(eventID => {
@@ -85,46 +86,18 @@ export class RaidSimUI extends SimUI {
         this.raidSimResultsManager.changeEmitter.on(eventID => this.referenceChangeEmitter.emit(eventID));
     }
     addTopbarComponents() {
-        const downloadSettings = document.createElement('span');
-        downloadSettings.classList.add('download-settings', 'fa', 'fa-download');
-        tippy(downloadSettings, {
-            'content': 'Download',
+        this.addToolbarItem(newRaidImporters(this));
+        this.addToolbarItem(newRaidExporters(this));
+        const settingsMenu = document.createElement('span');
+        settingsMenu.classList.add('fas', 'fa-cog');
+        tippy(settingsMenu, {
+            'content': 'Settings',
             'allowHTML': true,
         });
-        downloadSettings.addEventListener('click', event => {
-            const json = RaidSimSettings.toJson(this.toProto());
-            downloadJson(json, 'tbc_raid_sim.json');
+        settingsMenu.addEventListener('click', event => {
+            new SettingsMenu(this.rootElem, this);
         });
-        this.addToolbarItem(downloadSettings);
-        const uploadContainer = document.createElement('div');
-        uploadContainer.classList.add('upload-container');
-        uploadContainer.innerHTML = `
-			<span class="upload-settings fa fa-upload"></span>
-			<input class="upload-input" type="file" accept="application/json" style="display:none">
-		`;
-        const uploadInput = uploadContainer.getElementsByClassName('upload-input')[0];
-        uploadInput.addEventListener('change', event => {
-            const file = (uploadInput.files && uploadInput.files[0]) || null;
-            if (!file) {
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const text = event.target.result;
-                const settings = RaidSimSettings.fromJsonString(text);
-                this.fromProto(TypedEvent.nextEventID(), settings);
-            };
-            reader.readAsText(file, 'UTF-8');
-        });
-        const uploadSettings = uploadContainer.getElementsByClassName('upload-settings')[0];
-        tippy(uploadSettings, {
-            'content': 'Upload',
-            'allowHTML': true,
-        });
-        uploadSettings.addEventListener('click', event => {
-            uploadInput.click();
-        });
-        this.addToolbarItem(uploadSettings);
+        this.addToolbarItem(settingsMenu);
     }
     addRaidTab() {
         this.addTab('RAID', 'raid-tab', `
@@ -305,6 +278,13 @@ export class RaidSimUI extends SimUI {
             playersAndBuffBots[buffBot.getRaidIndex()] = buffBot;
         });
         return playersAndBuffBots;
+    }
+    applyDefaults(eventID) {
+        TypedEvent.freezeAllAndDo(() => {
+            this.sim.raid.fromProto(eventID, RaidProto.create());
+            this.sim.encounter.applyDefaults(eventID);
+            this.sim.applyDefaults(eventID);
+        });
     }
     toProto() {
         return RaidSimSettings.create({
