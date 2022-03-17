@@ -12,7 +12,7 @@ import { playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { bucket } from '/tbc/core/utils.js';
 import { sum } from '/tbc/core/utils.js';
-import { AuraUptimeLog, CastLog, DpsLog, Entity, ResourceChangedLogGroup, SimLog, } from './logs_parser.js';
+import { AuraUptimeLog, CastLog, DpsLog, Entity, ResourceChangedLogGroup, SimLog, ThreatLogGroup, } from './logs_parser.js';
 class SimResultData {
     constructor(request, result) {
         this.request = request;
@@ -161,12 +161,13 @@ export class PlayerMetrics {
         this.damageDealtLogs = this.logs.filter((log) => log.isDamageDealt());
         this.dpsLogs = DpsLog.fromLogs(this.damageDealtLogs);
         this.castLogs = CastLog.fromLogs(this.logs);
+        this.threatLogs = ThreatLogGroup.fromLogs(this.logs);
         this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet), resultData.firstIterationDuration);
         this.majorCooldownLogs = this.logs.filter((log) => log.isMajorCooldownUsed());
         this.groupedResourceLogs = ResourceChangedLogGroup.fromLogs(this.logs);
         AuraUptimeLog.populateActiveAuras(this.dpsLogs, this.auraUptimeLogs);
         AuraUptimeLog.populateActiveAuras(this.groupedResourceLogs[ResourceType.ResourceTypeMana], this.auraUptimeLogs);
-        this.majorCooldownAuraUptimeLogs = this.auraUptimeLogs.filter(auraLog => this.majorCooldownLogs.find(mcdLog => mcdLog.cooldownId.equals(auraLog.aura)));
+        this.majorCooldownAuraUptimeLogs = this.auraUptimeLogs.filter(auraLog => this.majorCooldownLogs.find(mcdLog => mcdLog.actionId.equals(auraLog.actionId)));
     }
     get label() {
         return `${this.name} (#${this.raidIndex + 1})`;

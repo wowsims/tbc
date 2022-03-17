@@ -19,6 +19,8 @@ interface SimLogParams {
     timestamp: number;
     source: Entity | null;
     target: Entity | null;
+    actionId: ActionId | null;
+    threat: number;
 }
 export declare class SimLog {
     readonly raw: string;
@@ -26,6 +28,8 @@ export declare class SimLog {
     readonly timestamp: number;
     readonly source: Entity | null;
     readonly target: Entity | null;
+    readonly actionId: ActionId | null;
+    readonly threat: number;
     activeAuras: Array<AuraUptimeLog>;
     constructor(params: SimLogParams);
     toString(): string;
@@ -33,9 +37,7 @@ export declare class SimLog {
     static parseAll(result: RaidSimResult): Promise<Array<SimLog>>;
     isDamageDealt(): this is DamageDealtLog;
     isResourceChanged(): this is ResourceChangedLog;
-    isAuraGained(): this is AuraGainedLog;
-    isAuraFaded(): this is AuraFadedLog;
-    isAuraRefreshed(): this is AuraRefreshedLog;
+    isAuraEvent(): this is AuraEventLog;
     isMajorCooldownUsed(): this is MajorCooldownUsedLog;
     isCastBegan(): this is CastBeganLog;
     isCastCompleted(): this is CastCompletedLog;
@@ -55,8 +57,7 @@ export declare class DamageDealtLog extends SimLog {
     readonly partialResist1_4: boolean;
     readonly partialResist2_4: boolean;
     readonly partialResist3_4: boolean;
-    readonly cause: ActionId;
-    constructor(params: SimLogParams, amount: number, miss: boolean, crit: boolean, glance: boolean, dodge: boolean, parry: boolean, block: boolean, tick: boolean, partialResist1_4: boolean, partialResist2_4: boolean, partialResist3_4: boolean, cause: ActionId);
+    constructor(params: SimLogParams, amount: number, miss: boolean, crit: boolean, glance: boolean, dodge: boolean, parry: boolean, block: boolean, tick: boolean, partialResist1_4: boolean, partialResist2_4: boolean, partialResist3_4: boolean);
     resultString(): string;
     toString(): string;
     static parse(params: SimLogParams): Promise<DamageDealtLog> | null;
@@ -68,29 +69,25 @@ export declare class DpsLog extends SimLog {
     static DPS_WINDOW: number;
     static fromLogs(damageDealtLogs: Array<DamageDealtLog>): Array<DpsLog>;
 }
-export declare class AuraGainedLog extends SimLog {
-    readonly aura: ActionId;
-    constructor(params: SimLogParams, aura: ActionId);
-    toString(): string;
-    static parse(params: SimLogParams): Promise<AuraGainedLog> | null;
+export declare class ThreatLogGroup extends SimLog {
+    readonly threatBefore: number;
+    readonly threatAfter: number;
+    readonly logs: Array<SimLog>;
+    constructor(params: SimLogParams, threatBefore: number, threatAfter: number, logs: Array<SimLog>);
+    static fromLogs(logs: Array<SimLog>): Array<ThreatLogGroup>;
 }
-export declare class AuraFadedLog extends SimLog {
-    readonly aura: ActionId;
-    constructor(params: SimLogParams, aura: ActionId);
+export declare class AuraEventLog extends SimLog {
+    readonly isGained: boolean;
+    readonly isFaded: boolean;
+    readonly isRefreshed: boolean;
+    constructor(params: SimLogParams, isGained: boolean, isFaded: boolean, isRefreshed: boolean);
     toString(): string;
-    static parse(params: SimLogParams): Promise<AuraFadedLog> | null;
-}
-export declare class AuraRefreshedLog extends SimLog {
-    readonly aura: ActionId;
-    constructor(params: SimLogParams, aura: ActionId);
-    toString(): string;
-    static parse(params: SimLogParams): Promise<AuraRefreshedLog> | null;
+    static parse(params: SimLogParams): Promise<AuraEventLog> | null;
 }
 export declare class AuraUptimeLog extends SimLog {
     readonly gainedAt: number;
     readonly fadedAt: number;
-    readonly aura: ActionId;
-    constructor(params: SimLogParams, fadedAt: number, aura: ActionId);
+    constructor(params: SimLogParams, fadedAt: number);
     static fromLogs(logs: Array<SimLog>, entity: Entity, encounterDuration: number): Array<AuraUptimeLog>;
     static populateActiveAuras(logs: Array<SimLog>, auraLogs: Array<AuraUptimeLog>): void;
 }
@@ -99,8 +96,7 @@ export declare class ResourceChangedLog extends SimLog {
     readonly valueBefore: number;
     readonly valueAfter: number;
     readonly isSpend: boolean;
-    readonly cause: ActionId;
-    constructor(params: SimLogParams, resourceType: ResourceType, valueBefore: number, valueAfter: number, isSpend: boolean, cause: ActionId);
+    constructor(params: SimLogParams, resourceType: ResourceType, valueBefore: number, valueAfter: number, isSpend: boolean);
     toString(): string;
     resultString(): string;
     static parse(params: SimLogParams): Promise<ResourceChangedLog> | null;
@@ -115,27 +111,23 @@ export declare class ResourceChangedLogGroup extends SimLog {
     static fromLogs(logs: Array<SimLog>): Record<ResourceType, Array<ResourceChangedLogGroup>>;
 }
 export declare class MajorCooldownUsedLog extends SimLog {
-    readonly cooldownId: ActionId;
-    constructor(params: SimLogParams, cooldownId: ActionId);
+    constructor(params: SimLogParams);
     toString(): string;
     static parse(params: SimLogParams): Promise<MajorCooldownUsedLog> | null;
 }
 export declare class CastBeganLog extends SimLog {
-    readonly castId: ActionId;
     readonly manaCost: number;
     readonly castTime: number;
-    constructor(params: SimLogParams, castId: ActionId, manaCost: number, castTime: number);
+    constructor(params: SimLogParams, manaCost: number, castTime: number);
     toString(): string;
     static parse(params: SimLogParams): Promise<CastBeganLog> | null;
 }
 export declare class CastCompletedLog extends SimLog {
-    readonly castId: ActionId;
-    constructor(params: SimLogParams, castId: ActionId);
+    constructor(params: SimLogParams);
     toString(): string;
     static parse(params: SimLogParams): Promise<CastCompletedLog> | null;
 }
 export declare class CastLog extends SimLog {
-    readonly castId: ActionId;
     readonly castTime: number;
     readonly castBeganLog: CastBeganLog;
     readonly castCompletedLog: CastCompletedLog | null;
@@ -145,10 +137,9 @@ export declare class CastLog extends SimLog {
     static fromLogs(logs: Array<SimLog>): Array<CastLog>;
 }
 export declare class StatChangeLog extends SimLog {
-    readonly effectId: ActionId;
     readonly isGain: boolean;
     readonly stats: string;
-    constructor(params: SimLogParams, effectId: ActionId, isGain: boolean, stats: string);
+    constructor(params: SimLogParams, isGain: boolean, stats: string);
     toString(): string;
     static parse(params: SimLogParams): Promise<StatChangeLog> | null;
 }

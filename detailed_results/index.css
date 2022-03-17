@@ -1135,6 +1135,10 @@ input, select {
   font-weight: bold;
 }
 
+.threat .series-color, .threat.series-color {
+  color: #b56d07;
+}
+
 .mana .series-color, .mana.series-color {
   color: #2E93fA;
 }
@@ -1186,11 +1190,14 @@ input, select {
 }
 
 .timeline-tooltip {
+  background-color: #333;
+  border: none;
+  color: white;
   padding: 3px;
 }
 
 .timeline-tooltip-header {
-  border-bottom: 1px solid black;
+  border-bottom: 1px solid white;
   margin-bottom: 5px;
 }
 
@@ -1222,6 +1229,10 @@ input, select {
   color: #ed5653;
 }
 
+.timeline-tooltip.threat ul li::before {
+  color: #b56d07;
+}
+
 .timeline-tooltip.mana ul li::before {
   color: #2E93fA;
 }
@@ -1247,12 +1258,12 @@ input, select {
 }
 
 .timeline-tooltip-auras {
-  border-top: 1px solid black;
+  border-top: 1px solid white;
   margin-top: 5px;
 }
 
 .timeline-tooltip-auras ul li::before {
-  color: black;
+  color: white;
 }
 
 .rotation-plot {
