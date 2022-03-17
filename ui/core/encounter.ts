@@ -1,4 +1,6 @@
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
+import { MobType } from '/tbc/core/proto/common.js';
+import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { Target } from '/tbc/core/target.js';
 
 import { Sim } from './sim.js';
@@ -103,5 +105,18 @@ export class Encounter {
 				this.primaryTarget.fromProto(eventID, proto.targets[0]);
 			}
 		});
+	}
+
+	applyDefaults(eventID: EventID) {
+		this.fromProto(eventID, EncounterProto.create({
+			duration: 180,
+			durationVariation: 5,
+			executeProportion: 0.2,
+			targets: [TargetProto.create({
+				level: 73,
+				armor: 7684,
+				mobType: MobType.MobTypeDemon,
+			})],
+		}));
 	}
 }

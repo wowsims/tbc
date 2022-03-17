@@ -22,6 +22,7 @@ import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/enc
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
+import { SettingsMenu } from '/tbc/core/components/settings_menu.js';
 import { addRaidSimAction, RaidSimResultsManager, ReferenceData } from '/tbc/core/components/raid_sim_action.js';
 import { downloadJson } from '/tbc/core/utils.js';
 
@@ -30,6 +31,7 @@ import { BlessingsPicker } from './blessings_picker.js';
 import { BuffBot } from './buff_bot.js';
 import { RaidPicker } from './raid_picker.js';
 import { implementedSpecs } from './presets.js';
+import { newRaidExporters, newRaidImporters } from './import_export.js';
 
 declare var tippy: any;
 
@@ -98,7 +100,7 @@ export class RaidSimUI extends SimUI {
 			}
 
 			if (!loadedSettings) {
-				// Apply any defaults here.
+				this.applyDefaults(initEventID);
 			}
 
 			// This needs to go last so it doesn't re-store things as they are initialized.
@@ -115,50 +117,19 @@ export class RaidSimUI extends SimUI {
 	}
 
 	private addTopbarComponents() {
-		const downloadSettings = document.createElement('span');
-		downloadSettings.classList.add('download-settings', 'fa', 'fa-download');
-		tippy(downloadSettings, {
-			'content': 'Download',
+		this.addToolbarItem(newRaidImporters(this));
+		this.addToolbarItem(newRaidExporters(this));
+
+		const settingsMenu = document.createElement('span');
+		settingsMenu.classList.add('fas', 'fa-cog');
+		tippy(settingsMenu, {
+			'content': 'Settings',
 			'allowHTML': true,
 		});
-		downloadSettings.addEventListener('click', event => {
-			const json = RaidSimSettings.toJson(this.toProto());
-			downloadJson(json, 'tbc_raid_sim.json');
+		settingsMenu.addEventListener('click', event => {
+			new SettingsMenu(this.rootElem, this);
 		});
-		this.addToolbarItem(downloadSettings);
-
-		const uploadContainer = document.createElement('div');
-		uploadContainer.classList.add('upload-container');
-		uploadContainer.innerHTML = `
-			<span class="upload-settings fa fa-upload"></span>
-			<input class="upload-input" type="file" accept="application/json" style="display:none">
-		`;
-
-		const uploadInput = uploadContainer.getElementsByClassName('upload-input')[0] as HTMLInputElement;
-		uploadInput.addEventListener('change', event => {
-			const file = (uploadInput.files && uploadInput.files[0]) || null;
-			if (!file) {
-				return;
-			}
-
-			const reader = new FileReader();
-			reader.onload = (event) => {
-				const text = event.target!.result as string;
-				const settings = RaidSimSettings.fromJsonString(text);
-				this.fromProto(TypedEvent.nextEventID(), settings);
-			};
-			reader.readAsText(file, 'UTF-8');
-		});
-
-		const uploadSettings = uploadContainer.getElementsByClassName('upload-settings')[0] as HTMLSpanElement;
-		tippy(uploadSettings, {
-			'content': 'Upload',
-			'allowHTML': true,
-		});
-		uploadSettings.addEventListener('click', event => {
-			uploadInput.click();
-		});
-		this.addToolbarItem(uploadSettings);
+		this.addToolbarItem(settingsMenu);
 	}
 
 	private addRaidTab() {
@@ -358,6 +329,14 @@ export class RaidSimUI extends SimUI {
 		});
 
 		return playersAndBuffBots;
+	}
+
+	applyDefaults(eventID: EventID) {
+		TypedEvent.freezeAllAndDo(() => {
+			this.sim.raid.fromProto(eventID, RaidProto.create());
+			this.sim.encounter.applyDefaults(eventID);
+			this.sim.applyDefaults(eventID);
+		});
 	}
 
 	toProto(): RaidSimSettings {

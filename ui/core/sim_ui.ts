@@ -283,6 +283,8 @@ export abstract class SimUI extends Component {
 			alert(e);
 		}
 	}
+
+	abstract applyDefaults(eventID: EventID): void;
 }
 
 const simHTML = `
