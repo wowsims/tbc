@@ -1,12 +1,16 @@
 @import "../core/shared";
 
 $dps-color: #ed5653;
+$threat-color: #b56d07;
 $mana-color: #2E93fA;
 $energy-color: #ffd700;
 $rage-color: #ff0000;
 $focus-color: #cd853f;
 $combo-points-color: #ffa07a;
 
+.threat .series-color, .threat.series-color {
+	color: $threat-color;
+}
 .mana .series-color, .mana.series-color {
 	color: $mana-color;
 }
@@ -62,11 +66,14 @@ $combo-points-color: #ffa07a;
 }
 
 .timeline-tooltip {
+	background-color: #333;
+	border: none;
+	color: white;
 	padding: 3px;
 }
 
 .timeline-tooltip-header {
-	border-bottom: 1px solid black;
+	border-bottom: 1px solid white;
 	margin-bottom: 5px;
 }
 
@@ -95,6 +102,9 @@ $combo-points-color: #ffa07a;
 .timeline-tooltip.dps ul li::before {
 	color: $dps-color;
 }
+.timeline-tooltip.threat ul li::before {
+	color: $threat-color;
+}
 .timeline-tooltip.mana ul li::before {
 	color: $mana-color;
 }
@@ -116,11 +126,11 @@ $combo-points-color: #ffa07a;
 }
 
 .timeline-tooltip-auras {
-	border-top: 1px solid black;
+	border-top: 1px solid white;
 	margin-top: 5px;
 }
 .timeline-tooltip-auras ul li::before {
-	color: black;
+	color: white;
 }
 
 .rotation-plot {

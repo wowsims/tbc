@@ -12,6 +12,7 @@ import {
 	ResourceChangedLogGroup,
 	DpsLog,
 	SimLog,
+	ThreatLogGroup,
 } from '/tbc/core/proto_utils/logs_parser.js';
 
 import { actionColors } from './color_settings.js';
@@ -23,6 +24,7 @@ declare var ApexCharts: any;
 
 const dpsColor = '#ed5653';
 const manaColor = '#2E93fA';
+const threatColor = '#b56d07';
 
 export class Timeline extends ResultComponent {
 	private readonly dpsResourcesPlotElem: HTMLElement;
@@ -102,6 +104,7 @@ export class Timeline extends ResultComponent {
 			colors: [
 				dpsColor,
 				manaColor,
+				threatColor,
 			],
 			series: [], // Set dynamically
 			xaxis: {
@@ -161,10 +164,10 @@ export class Timeline extends ResultComponent {
 		const MAX_ALLOWED_DIST = 10;
 		const cooldownIconOffsets = mcdLogs.map((mcdLog, mcdIdx) => mcdLogs.filter((cdLog, cdIdx) => (cdIdx < mcdIdx) && (cdLog.timestamp > mcdLog.timestamp - MAX_ALLOWED_DIST)).length);
 
-		const distinctMcdAuras = distinct(mcdAuraLogs, (a, b) => a.aura.equalsIgnoringTag(b.aura));
+		const distinctMcdAuras = distinct(mcdAuraLogs, (a, b) => a.actionId!.equalsIgnoringTag(b.actionId!));
 		// Sort by name so auras keep their same colors even if timings change.
-		distinctMcdAuras.sort((a, b) => stringComparator(a.aura.name, b.aura.name));
-		const mcdAuraColors = mcdAuraLogs.map(mcdAuraLog => actionColors[distinctMcdAuras.findIndex(dAura => dAura.aura.equalsIgnoringTag(mcdAuraLog.aura))]);
+		distinctMcdAuras.sort((a, b) => stringComparator(a.actionId!.name, b.actionId!.name));
+		const mcdAuraColors = mcdAuraLogs.map(mcdAuraLog => actionColors[distinctMcdAuras.findIndex(dAura => dAura.actionId!.equalsIgnoringTag(mcdAuraLog.actionId!))]);
 
 		const showMana = manaLogs.length > 0;
 		const maxMana = showMana ? manaLogs[0].valueBefore : 0;
@@ -239,7 +242,7 @@ export class Timeline extends ResultComponent {
 						x: this.toDatetime(log.timestamp).getTime(),
 						y: 0,
 						image: {
-							path: log.cooldownId.iconUrl,
+							path: log.actionId!.iconUrl,
 							width: 20,
 							height: 20,
 							offsetY: cooldownIconOffsets[i] * -25,
@@ -259,48 +262,22 @@ export class Timeline extends ResultComponent {
 							</div>
 							<div class="timeline-tooltip-body">
 								<ul class="timeline-dps-events">
-									${log.damageLogs.map(damageLog => {
-										let iconElem = '';
-										if (damageLog.cause.iconUrl) {
-											iconElem = `<img class="timeline-tooltip-icon" src="${damageLog.cause.iconUrl}">`;
-										}
-										return `
-										<li>
-											${iconElem}
-											<span>${damageLog.cause.name}:</span>
-											<span class="series-color">${damageLog.resultString()}</span>
-										</li>`;
-									}).join('')}
+									${log.damageLogs.map(damageLog => this.tooltipLogItem(damageLog, damageLog.resultString())).join('')}
 								</ul>
 								<div class="timeline-tooltip-body-row">
 									<span class="series-color">DPS: ${log.dps.toFixed(2)}</span>
 								</div>
 							</div>
-							${log.activeAuras.length == 0 ? '' : `
-								<div class="timeline-tooltip-auras">
-									<div class="timeline-tooltip-body-row">
-										<span class="bold">Active Auras</span>
-									</div>
-									<ul class="timeline-active-auras">
-										${log.activeAuras.map(auraLog => {
-											let iconElem = '';
-											if (auraLog.aura.iconUrl) {
-												iconElem = `<img class="timeline-tooltip-icon" src="${auraLog.aura.iconUrl}">`;
-											}
-											return `
-											<li>
-												${iconElem}
-												<span>${auraLog.aura.name}</span>
-											</li>`;
-										}).join('')}
-									</ul>
-								</div>`
-							}
+							${this.tooltipAurasSection(log)}
 						</div>`;
-					} else if (data.seriesIndex == 1) {
+					} else if (showMana && data.seriesIndex == 1) {
 						// Mana
 						const log = manaLogs[data.dataPointIndex];
 						return this.resourceTooltip(log, maxMana, true);
+					} else {
+						// Threat
+						const log = player.threatLogs[data.dataPointIndex];
+						return this.threatTooltip(log, true);
 					}
 				}
 			},
@@ -361,6 +338,19 @@ export class Timeline extends ResultComponent {
 			} as any);
 		}
 
+		if (true) {
+			options.series.push({
+				name: 'Threat',
+				type: 'line',
+				data: player.threatLogs.map(log => {
+					return {
+						x: this.toDatetime(log.timestamp),
+						y: log.threatAfter,
+					};
+				}),
+			});
+		}
+
 		this.dpsResourcesPlot.updateOptions(options);
 	}
 
@@ -400,21 +390,21 @@ export class Timeline extends ResultComponent {
 		};
 
 		const castsByAbility = Object.values(bucket(player.castLogs, log => {
-			if (idsToGroupForRotation.includes(log.castId.spellId)) {
-				return log.castId.toStringIgnoringTag();
+			if (idsToGroupForRotation.includes(log.actionId!.spellId)) {
+				return log.actionId!.toStringIgnoringTag();
 			} else {
-				return log.castId.toString();
+				return log.actionId!.toString();
 			}
 		}));
 		castsByAbility.sort((a, b) => {
-			const categoryA = getActionCategory(a[0].castId);
-			const categoryB = getActionCategory(b[0].castId);
+			const categoryA = getActionCategory(a[0].actionId!);
+			const categoryB = getActionCategory(b[0].actionId!);
 			if (categoryA != categoryB) {
 				return categoryA - categoryB;
-			} else if (a[0].castId.anyId() == b[0].castId.anyId()) {
-				return a[0].castId.tag - b[0].castId.tag;
+			} else if (a[0].actionId!.anyId() == b[0].actionId!.anyId()) {
+				return a[0].actionId!.tag - b[0].actionId!.tag;
 			} else {
-				return stringComparator(a[0].castId.name, b[0].castId.name);
+				return stringComparator(a[0].actionId!.name, b[0].actionId!.name);
 			}
 		});
 
@@ -519,7 +509,7 @@ export class Timeline extends ResultComponent {
 		});
 
 		const castRowElems = castsByAbility.map(abilityCasts => {
-			const actionId = abilityCasts[0].castId;
+			const actionId = abilityCasts[0].actionId!;
 
 			this.rotationLabels.appendChild(makeLabelElem(actionId, false));
 			this.rotationHiddenIdsContainer.appendChild(makeLabelElem(actionId, true));
@@ -551,9 +541,9 @@ export class Timeline extends ResultComponent {
 				castElem.appendChild(iconElem);
 				tippy(castElem, {
 					content: `
-						<span>${castLog.castId.name}: ${castLog.castTime.toFixed(2)}s (${castLog.timestamp.toFixed(2)}s - ${(castLog.timestamp + castLog.castTime).toFixed(2)}s)</span>
+						<span>${castLog.actionId!.name}: ${castLog.castTime.toFixed(2)}s (${castLog.timestamp.toFixed(2)}s - ${(castLog.timestamp + castLog.castTime).toFixed(2)}s)</span>
 						<ul class="rotation-timeline-cast-damage-list">
-							${castLog.damageDealtLogs.map(ddl => `<li>${ddl.timestamp.toFixed(2)}s - ${ddl.resultString()}</li>`).join('')}
+							${castLog.damageDealtLogs.map(ddl => `<li><span>${ddl.timestamp.toFixed(2)}s - ${ddl.resultString()}</span><span class="threat-metrics"> (${ddl.threat.toFixed(1)} Threat)</span></li>`).join('')}
 						</ul>
 					`,
 					allowHTML: true,
@@ -568,7 +558,8 @@ export class Timeline extends ResultComponent {
 
 					tippy(tickElem, {
 						content: `
-							<span>${ddl.timestamp.toFixed(2)}s - ${ddl.cause.name} ${ddl.resultString()}</span>
+							<span>${ddl.timestamp.toFixed(2)}s - ${ddl.actionId!.name} ${ddl.resultString()}</span>
+							<span class="threat-metrics"> (${ddl.threat.toFixed(1)} Threat)</span>
 						`,
 						allowHTML: true,
 						placement: 'bottom',
@@ -579,20 +570,20 @@ export class Timeline extends ResultComponent {
 			return rowElem;
 		});
 
-		const buffsById = Object.values(bucket(player.auraUptimeLogs, log => log.aura.toString()));
-		buffsById.sort((a, b) => stringComparator(a[0].aura.name, b[0].aura.name));
+		const buffsById = Object.values(bucket(player.auraUptimeLogs, log => log.actionId!.toString()));
+		buffsById.sort((a, b) => stringComparator(a[0].actionId!.name, b[0].actionId!.name));
 
-		const debuffsById = Object.values(bucket(target.auraUptimeLogs, log => log.aura.toString()));
-		debuffsById.sort((a, b) => stringComparator(a[0].aura.name, b[0].aura.name));
+		const debuffsById = Object.values(bucket(target.auraUptimeLogs, log => log.actionId!.toString()));
+		debuffsById.sort((a, b) => stringComparator(a[0].actionId!.name, b[0].actionId!.name));
 
 		const addAurasSection = (aurasById: Array<Array<AuraUptimeLog>>) => {
 			let addedRow = false;
 			aurasById.forEach(auraUptimeLogs => {
-				const actionId = auraUptimeLogs[0].aura;
+				const actionId = auraUptimeLogs[0].actionId!;
 
 				// If there is already a corresponding row from the casts, use that one. Otherwise make a new one.
 				let rowElem = makeRowElem(actionId, duration);
-				const castRowIndex = castsByAbility.findIndex(casts => casts[0].castId.equalsIgnoringTag(actionId));
+				const castRowIndex = castsByAbility.findIndex(casts => casts[0].actionId!.equalsIgnoringTag(actionId));
 				if (castRowIndex != -1) {
 					rowElem = castRowElems[castRowIndex];
 				} else {
@@ -620,7 +611,7 @@ export class Timeline extends ResultComponent {
 
 					tippy(auraElem, {
 						content: `
-							<span>${aul.aura.name}: ${aul.gainedAt.toFixed(2)}s - ${(aul.fadedAt || duration).toFixed(2)}s</span>
+							<span>${aul.actionId!.name}: ${aul.gainedAt.toFixed(2)}s - ${(aul.fadedAt || duration).toFixed(2)}s</span>
 						`,
 						allowHTML: true,
 					});
@@ -686,6 +677,26 @@ export class Timeline extends ResultComponent {
 		ctx.stroke();
 	}
 
+	private threatTooltip(log: ThreatLogGroup, includeAuras: boolean): string {
+		return `<div class="timeline-tooltip threat">
+			<div class="timeline-tooltip-header">
+				<span class="bold">${log.timestamp.toFixed(2)}s</span>
+			</div>
+			<div class="timeline-tooltip-body">
+				<div class="timeline-tooltip-body-row">
+					<span class="series-color">Before: ${log.threatBefore.toFixed(1)}</span>
+				</div>
+				<ul class="timeline-threat-events">
+					${log.logs.map(log => this.tooltipLogItem(log, `${log.threat.toFixed(1)} Threat`)).join('')}
+				</ul>
+				<div class="timeline-tooltip-body-row">
+					<span class="series-color">After: ${log.threatAfter.toFixed(1)}</span>
+				</div>
+			</div>
+			${includeAuras ? this.tooltipAurasSection(log) : ''}
+		</div>`;
+	}
+
 	private resourceTooltip(log: ResourceChangedLogGroup, maxValue: number, includeAuras: boolean): string {
 		const valToDisplayString = log.resourceType == ResourceType.ResourceTypeMana
 				? (val: number) => `${val.toFixed(1)} (${(val/maxValue*100).toFixed(0)}%)`
@@ -700,44 +711,61 @@ export class Timeline extends ResultComponent {
 					<span class="series-color">Before: ${valToDisplayString(log.valueBefore)}</span>
 				</div>
 				<ul class="timeline-mana-events">
-					${log.logs.map(manaChangedLog => {
-						let iconElem = '';
-						if (manaChangedLog.cause.iconUrl) {
-							iconElem = `<img class="timeline-tooltip-icon" src="${manaChangedLog.cause.iconUrl}">`;
-						}
-						return `
-						<li>
-							${iconElem}
-							<span>${manaChangedLog.cause.name}:</span>
-							<span class="series-color">${manaChangedLog.resultString()}</span>
-						</li>`;
-					}).join('')}
+					${log.logs.map(manaChangedLog => this.tooltipLogItem(manaChangedLog, manaChangedLog.resultString())).join('')}
 				</ul>
 				<div class="timeline-tooltip-body-row">
 					<span class="series-color">After: ${valToDisplayString(log.valueAfter)}</span>
 				</div>
 			</div>
-			${!includeAuras || log.activeAuras.length == 0 ? '' : `
-				<div class="timeline-tooltip-auras">
-					<div class="timeline-tooltip-body-row">
-						<span class="bold">Active Auras</span>
-					</div>
-					<ul class="timeline-active-auras">
-						${log.activeAuras.map(auraLog => {
-							let iconElem = '';
-							if (auraLog.aura.iconUrl) {
-								iconElem = `<img class="timeline-tooltip-icon" src="${auraLog.aura.iconUrl}">`;
-							}
-							return `
-							<li>
-								${iconElem}
-								<span>${auraLog.aura.name}</span>
-							</li>`;
-						}).join('')}
-					</ul>
-				</div>`
-			}
+			${includeAuras ? this.tooltipAurasSection(log) : ''}
 		</div>`;
+	}
+
+	private tooltipLogItem(log: SimLog, value: string): string {
+		const valueElem = `<span class="series-color">${value}</span>`;
+		let actionElem = '';
+		if (log.actionId) {
+			let iconElem = '';
+			if (log.actionId.iconUrl) {
+				iconElem = `<img class="timeline-tooltip-icon" src="${log.actionId.iconUrl}">`;
+			}
+			actionElem = `
+			${iconElem}
+			<span>${log.actionId.name}:</span>
+			`;
+		}
+		return `
+		<li>
+			${actionElem}
+			${valueElem}
+		</li>`;
+	}
+
+	private tooltipAurasSection(log: SimLog): string {
+		if (log.activeAuras.length == 0) {
+			return '';
+		}
+
+		return `
+		<div class="timeline-tooltip-auras">
+			<div class="timeline-tooltip-body-row">
+				<span class="bold">Active Auras</span>
+			</div>
+			<ul class="timeline-active-auras">
+				${log.activeAuras.map(auraLog => {
+					let iconElem = '';
+					if (auraLog.actionId!.iconUrl) {
+						iconElem = `<img class="timeline-tooltip-icon" src="${auraLog.actionId!.iconUrl}">`;
+					}
+					return `
+					<li>
+						${iconElem}
+						<span>${auraLog.actionId!.name}</span>
+					</li>`;
+				}).join('')}
+			</ul>
+		</div>
+		`;
 	}
 
 	render() {
