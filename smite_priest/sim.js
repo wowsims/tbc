@@ -182,6 +182,7 @@ export class SmitePriestSimUI extends IndividualSimUI {
             // Inputs to include in the 'Other' section on the settings tab.
             otherInputs: {
                 inputs: [
+                    OtherInputs.ISBUptime,
                     OtherInputs.ShadowPriestDPS,
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,
