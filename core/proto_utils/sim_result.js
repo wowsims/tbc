@@ -175,6 +175,9 @@ export class PlayerMetrics {
     get isPet() {
         return this.petActionId != null;
     }
+    get maxThreat() {
+        return this.threatLogs[this.threatLogs.length - 1]?.threatAfter || 0;
+    }
     get secondsOomAvg() {
         return this.metrics.secondsOomAvg;
     }

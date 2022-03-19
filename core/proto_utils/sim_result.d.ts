@@ -98,6 +98,7 @@ export declare class PlayerMetrics {
     private constructor();
     get label(): string;
     get isPet(): boolean;
+    get maxThreat(): number;
     get secondsOomAvg(): number;
     get totalDamage(): number;
     getPlayerAndPetActions(): Array<ActionMetrics>;
