@@ -22,6 +22,8 @@ declare var $: any;
 declare var tippy: any;
 declare var ApexCharts: any;
 
+type TooltipHandler = (dataPointIndex: number) => string;
+
 const dpsColor = '#ed5653';
 const manaColor = '#2E93fA';
 const threatColor = '#b56d07';
@@ -34,6 +36,7 @@ export class Timeline extends ResultComponent {
 	private readonly rotationLabels: HTMLElement;
 	private readonly rotationTimeline: HTMLElement;
 	private readonly rotationHiddenIdsContainer: HTMLElement;
+	private readonly chartPicker: HTMLSelectElement;
 
 	private resultData: SimResultData | null;
 	private rendered: boolean;
@@ -55,8 +58,9 @@ export class Timeline extends ResultComponent {
 			<span class="timeline-warning-description">Timeline data visualizes only 1 sim iteration.</span>
 			<div class="timeline-run-again-button sim-button">SIM 1 ITERATION</div>
 			<select class="timeline-chart-picker">
-				<option value="rotation">Rotation</option>
-				<option value="dps">DPS</option>
+				<option class="rotation-option" value="rotation">Rotation</option>
+				<option class="dps-option" value="dps">DPS</option>
+				<option class="threat-option" value="threat">Threat</option>
 			</select>
 		</div>
 		<div class="timeline-plots-container">
@@ -79,15 +83,16 @@ export class Timeline extends ResultComponent {
 			(window.opener || window.parent)!.postMessage('runOnce', '*');
 		});
 
-		const chartPicker = this.rootElem.getElementsByClassName('timeline-chart-picker')[0] as HTMLSelectElement;
-		chartPicker.addEventListener('change', event => {
-			if (chartPicker.value == 'rotation') {
+		this.chartPicker = this.rootElem.getElementsByClassName('timeline-chart-picker')[0] as HTMLSelectElement;
+		this.chartPicker.addEventListener('change', event => {
+			if (this.chartPicker.value == 'rotation') {
 				this.dpsResourcesPlotElem.classList.add('hide');
 				this.rotationPlotElem.classList.remove('hide');
 			} else {
 				this.dpsResourcesPlotElem.classList.remove('hide');
 				this.rotationPlotElem.classList.add('hide');
 			}
+			this.updatePlot();
 		});
 
 		this.dpsResourcesPlotElem = this.rootElem.getElementsByClassName('dps-resources-plot')[0] as HTMLElement;
@@ -101,19 +106,12 @@ export class Timeline extends ResultComponent {
 				},
 				height: '100%',
 			},
-			colors: [
-				dpsColor,
-				manaColor,
-				threatColor,
-			],
 			series: [], // Set dynamically
 			xaxis: {
 				title: {
 					text: 'Time (s)',
 				},
 				type: 'datetime',
-			},
-			yaxis: {
 			},
 			noData: {
 				text: 'Waiting for data...',
@@ -139,50 +137,14 @@ export class Timeline extends ResultComponent {
 	}
 
 	private updatePlot() {
-		const players = this.resultData!.result.getPlayers(this.resultData!.filter);
-		if (players.length != 1) {
+		if (this.resultData == null) {
 			return;
 		}
-		const player = players[0];
 
 		const duration = this.resultData!.result.result.firstIterationDuration || 1;
-		this.updateRotationChart(player, duration);
-
-		let manaLogs = player.groupedResourceLogs[ResourceType.ResourceTypeMana];
-		let dpsLogs = player.dpsLogs;
-		let mcdLogs = player.majorCooldownLogs;
-		let mcdAuraLogs = player.majorCooldownAuraUptimeLogs;
-		if (dpsLogs.length == 0) {
-			return;
-		}
-
-		const maxDps = dpsLogs[maxIndex(dpsLogs.map(l => l.dps))!].dps;
-		const dpsAxisMax = (Math.floor(maxDps / 100) + 1) * 100;
-
-		// Figure out how much to vertically offset cooldown icons, for cooldowns
-		// used very close to each other. This is so the icons don't overlap.
-		const MAX_ALLOWED_DIST = 10;
-		const cooldownIconOffsets = mcdLogs.map((mcdLog, mcdIdx) => mcdLogs.filter((cdLog, cdIdx) => (cdIdx < mcdIdx) && (cdLog.timestamp > mcdLog.timestamp - MAX_ALLOWED_DIST)).length);
-
-		const distinctMcdAuras = distinct(mcdAuraLogs, (a, b) => a.actionId!.equalsIgnoringTag(b.actionId!));
-		// Sort by name so auras keep their same colors even if timings change.
-		distinctMcdAuras.sort((a, b) => stringComparator(a.actionId!.name, b.actionId!.name));
-		const mcdAuraColors = mcdAuraLogs.map(mcdAuraLog => actionColors[distinctMcdAuras.findIndex(dAura => dAura.actionId!.equalsIgnoringTag(mcdAuraLog.actionId!))]);
-
-		const showMana = manaLogs.length > 0;
-		const maxMana = showMana ? manaLogs[0].valueBefore : 0;
-
-		let options = {
-			series: [{
-				name: 'DPS',
-				type: 'line',
-				data: dpsLogs.map(log => {
-					return {
-						x: this.toDatetime(log.timestamp),
-						y: log.dps,
-					};
-				}),
-			}],
+		let options: any = {
+			series: [],
+			colors: [],
 			xaxis: {
 				min: this.toDatetime(0).getTime(),
 				max: this.toDatetime(duration).getTime(),
@@ -199,88 +161,7 @@ export class Timeline extends ResultComponent {
 					text: 'Time (s)',
 				},
 			},
-			yaxis: [
-				{
-					color: dpsColor,
-					seriesName: 'DPS',
-					min: 0,
-					max: dpsAxisMax,
-					tickAmount: 10,
-					decimalsInFloat: 0,
-					title: {
-						text: 'DPS',
-						style: {
-							color: dpsColor,
-						},
-					},
-					axisBorder: {
-						show: true,
-						color: dpsColor,
-					},
-					axisTicks: {
-						color: dpsColor,
-					},
-					labels: {
-						minWidth: 30,
-						style: {
-							colors: [dpsColor],
-						},
-					},
-				},
-			],
-			annotations: {
-				position: 'back',
-				xaxis: mcdAuraLogs.map((log, i) => {
-					return {
-						x: this.toDatetime(log.gainedAt).getTime(),
-						x2: this.toDatetime(log.fadedAt).getTime(),
-						fillColor: mcdAuraColors[i],
-					};
-				}),
-				points: mcdLogs.map((log, i) => {
-					return {
-						x: this.toDatetime(log.timestamp).getTime(),
-						y: 0,
-						image: {
-							path: log.actionId!.iconUrl,
-							width: 20,
-							height: 20,
-							offsetY: cooldownIconOffsets[i] * -25,
-						},
-					};
-				}),
-			},
-			tooltip: {
-				enabled: true,
-				custom: (data: {series: any, seriesIndex: number, dataPointIndex: number, w: any}) => {
-					if (data.seriesIndex == 0) {
-						// DPS
-						const log = dpsLogs[data.dataPointIndex];
-						return `<div class="timeline-tooltip dps">
-							<div class="timeline-tooltip-header">
-								<span class="bold">${log.timestamp.toFixed(2)}s</span>
-							</div>
-							<div class="timeline-tooltip-body">
-								<ul class="timeline-dps-events">
-									${log.damageLogs.map(damageLog => this.tooltipLogItem(damageLog, damageLog.resultString())).join('')}
-								</ul>
-								<div class="timeline-tooltip-body-row">
-									<span class="series-color">DPS: ${log.dps.toFixed(2)}</span>
-								</div>
-							</div>
-							${this.tooltipAurasSection(log)}
-						</div>`;
-					} else if (showMana && data.seriesIndex == 1) {
-						// Mana
-						const log = manaLogs[data.dataPointIndex];
-						return this.resourceTooltip(log, maxMana, true);
-					} else {
-						// Threat
-						const log = player.threatLogs[data.dataPointIndex];
-						return this.threatTooltip(log, true);
-					}
-				}
-			},
+			yaxis: [],
 			chart: {
 				events: {
 					beforeResetZoom: () => {
@@ -295,72 +176,272 @@ export class Timeline extends ResultComponent {
 			},
 		};
 
-		if (showMana) {
-			options.series.push({
-				name: 'Mana',
-				type: 'line',
-				data: manaLogs.map(log => {
-					return {
-						x: this.toDatetime(log.timestamp),
-						y: log.valueAfter,
-					};
-				}),
-			});
-			options.yaxis.push({
-				seriesName: 'Mana',
-				opposite: true, // Appear on right side
-				min: 0,
-				max: maxMana,
-				tickAmount: 10,
-				title: {
-					text: 'Mana',
-					style: {
-						color: manaColor,
-					},
-				},
-				axisBorder: {
-					show: true,
-					color: manaColor,
-				},
-				axisTicks: {
-					color: manaColor,
-				},
-				labels: {
-					minWidth: 30,
-					style: {
-						colors: [manaColor],
-					},
-					formatter: (val: string) => {
-						const v = parseFloat(val);
-						return `${v.toFixed(0)} (${(v/maxMana*100).toFixed(0)}%)`;
-					},
-				},
-			} as any);
-		}
+		let tooltipHandlers: Array<TooltipHandler | null> = [];
+		options.tooltip = {
+			enabled: true,
+			custom: (data: {series: any, seriesIndex: number, dataPointIndex: number, w: any}) => {
+				if (tooltipHandlers[data.seriesIndex]) {
+					return tooltipHandlers[data.seriesIndex]!(data.dataPointIndex);
+				} else {
+					throw new Error('No tooltip handler for series ' + data.seriesIndex);
+				}
+			},
+		};
 
-		if (true) {
-			options.series.push({
-				name: 'Threat',
-				type: 'line',
-				data: player.threatLogs.map(log => {
-					return {
-						x: this.toDatetime(log.timestamp),
-						y: log.threatAfter,
-					};
-				}),
-			});
+		const players = this.resultData!.result.getPlayers(this.resultData!.filter);
+		if (players.length == 1) {
+			const player = players[0];
+
+			const rotationOption = this.rootElem.getElementsByClassName('rotation-option')[0] as HTMLElement;
+			rotationOption.classList.remove('hide');
+			const threatOption = this.rootElem.getElementsByClassName('threat-option')[0] as HTMLElement;
+			threatOption.classList.add('hide');
+
+			this.updateRotationChart(player, duration);
+
+			const dpsData = this.addDpsSeries(player, options, '');
+			this.addDpsYAxis(dpsData.maxDps, options);
+			tooltipHandlers.push(dpsData.tooltipHandler);
+			tooltipHandlers.push(this.addManaSeries(player, options));
+			tooltipHandlers.push(this.addThreatSeries(player, options, ''));
+			tooltipHandlers = tooltipHandlers.filter(handler => handler != null);
+
+			this.addMajorCooldownAnnotations(player, options);
+		} else {
+			if (this.chartPicker.value == 'rotation') {
+				this.chartPicker.value = 'dps';
+				return;
+			}
+			const rotationOption = this.rootElem.getElementsByClassName('rotation-option')[0] as HTMLElement;
+			rotationOption.classList.add('hide');
+			const threatOption = this.rootElem.getElementsByClassName('threat-option')[0] as HTMLElement;
+			threatOption.classList.remove('hide');
+
+			this.clearRotationChart();
+
+			if (this.chartPicker.value == 'dps') {
+				let maxDps = 0;
+				players.forEach(player => {
+					const dpsData = this.addDpsSeries(player, options, player.classColor);
+					maxDps = Math.max(maxDps, dpsData.maxDps);
+					tooltipHandlers.push(dpsData.tooltipHandler);
+				});
+				this.addDpsYAxis(maxDps, options);
+			} else { // threat
+				let maxThreat = 0;
+				players.forEach(player => {
+					tooltipHandlers.push(this.addThreatSeries(player, options, player.classColor));
+					maxThreat = Math.max(maxThreat, player.maxThreat);
+				});
+				this.addThreatYAxis(maxThreat, options);
+			}
 		}
 
 		this.dpsResourcesPlot.updateOptions(options);
 	}
 
-	private updateRotationChart(player: PlayerMetrics, duration: number) {
-		const targets = this.resultData!.result.getTargets(this.resultData!.filter);
-		if (targets.length == 0) {
-			return;
-		}
-		const target = targets[0];
+	private addDpsYAxis(maxDps: number, options: any) {
+		const dpsAxisMax = Math.ceil(maxDps / 100) * 100;
+		options.yaxis.push({
+			color: dpsColor,
+			seriesName: 'DPS',
+			min: 0,
+			max: dpsAxisMax,
+			tickAmount: 10,
+			decimalsInFloat: 0,
+			title: {
+				text: 'DPS',
+				style: {
+					color: dpsColor,
+				},
+			},
+			axisBorder: {
+				show: true,
+				color: dpsColor,
+			},
+			axisTicks: {
+				color: dpsColor,
+			},
+			labels: {
+				minWidth: 30,
+				style: {
+					colors: [dpsColor],
+				},
+			},
+		});
+	}
 
+	private addThreatYAxis(maxThreat: number, options: any) {
+		const axisMax = Math.ceil(maxThreat / 10000) * 10000;
+		options.yaxis.push({
+			color: threatColor,
+			seriesName: 'Threat',
+			min: 0,
+			max: axisMax,
+			tickAmount: 10,
+			decimalsInFloat: 0,
+			title: {
+				text: 'Threat',
+				style: {
+					color: threatColor,
+				},
+			},
+			axisBorder: {
+				show: true,
+				color: threatColor,
+			},
+			axisTicks: {
+				color: threatColor,
+			},
+			labels: {
+				minWidth: 30,
+				style: {
+					colors: [threatColor],
+				},
+			},
+		});
+	}
+
+	// Returns a function for drawing the tooltip, or null if no series was added.
+	private addDpsSeries(player: PlayerMetrics, options: any, colorOverride: string): { maxDps: number, tooltipHandler: TooltipHandler } {
+		const dpsLogs = player.dpsLogs;
+
+		options.colors.push(colorOverride || dpsColor);
+		options.series.push({
+			name: 'DPS',
+			type: 'line',
+			data: dpsLogs.map(log => {
+				return {
+					x: this.toDatetime(log.timestamp),
+					y: log.dps,
+				};
+			}),
+		});
+
+		return {
+			maxDps: dpsLogs[maxIndex(dpsLogs.map(l => l.dps))!].dps,
+			tooltipHandler: (dataPointIndex: number) => {
+				const log = dpsLogs[dataPointIndex];
+				return this.dpsTooltip(log, true, player, colorOverride);
+			},
+		};
+	}
+
+	// Returns a function for drawing the tooltip, or null if no series was added.
+	private addManaSeries(player: PlayerMetrics, options: any): TooltipHandler | null {
+		const manaLogs = player.groupedResourceLogs[ResourceType.ResourceTypeMana];
+		if (manaLogs.length == 0) {
+			return null;
+		}
+		const maxMana = manaLogs[0].valueBefore;
+
+		options.colors.push(manaColor);
+		options.series.push({
+			name: 'Mana',
+			type: 'line',
+			data: manaLogs.map(log => {
+				return {
+					x: this.toDatetime(log.timestamp),
+					y: log.valueAfter,
+				};
+			}),
+		});
+		options.yaxis.push({
+			seriesName: 'Mana',
+			opposite: true, // Appear on right side
+			min: 0,
+			max: maxMana,
+			tickAmount: 10,
+			title: {
+				text: 'Mana',
+				style: {
+					color: manaColor,
+				},
+			},
+			axisBorder: {
+				show: true,
+				color: manaColor,
+			},
+			axisTicks: {
+				color: manaColor,
+			},
+			labels: {
+				minWidth: 30,
+				style: {
+					colors: [manaColor],
+				},
+				formatter: (val: string) => {
+					const v = parseFloat(val);
+					return `${v.toFixed(0)} (${(v/maxMana*100).toFixed(0)}%)`;
+				},
+			},
+		} as any);
+
+		return (dataPointIndex: number) => {
+			const log = manaLogs[dataPointIndex];
+			return this.resourceTooltip(log, maxMana, true);
+		};
+	}
+
+	// Returns a function for drawing the tooltip, or null if no series was added.
+	private addThreatSeries(player: PlayerMetrics, options: any, colorOverride: string): TooltipHandler | null {
+		options.colors.push(colorOverride || threatColor);
+		options.series.push({
+			name: 'Threat',
+			type: 'line',
+			data: player.threatLogs.map(log => {
+				return {
+					x: this.toDatetime(log.timestamp),
+					y: log.threatAfter,
+				};
+			}),
+		});
+
+		return (dataPointIndex: number) => {
+			const log = player.threatLogs[dataPointIndex];
+			return this.threatTooltip(log, true, player, colorOverride);
+		};
+	}
+
+	private addMajorCooldownAnnotations(player: PlayerMetrics, options: any) {
+		const mcdLogs = player.majorCooldownLogs;
+		const mcdAuraLogs = player.majorCooldownAuraUptimeLogs;
+
+		// Figure out how much to vertically offset cooldown icons, for cooldowns
+		// used very close to each other. This is so the icons don't overlap.
+		const MAX_ALLOWED_DIST = 10;
+		const cooldownIconOffsets = mcdLogs.map((mcdLog, mcdIdx) => mcdLogs.filter((cdLog, cdIdx) => (cdIdx < mcdIdx) && (cdLog.timestamp > mcdLog.timestamp - MAX_ALLOWED_DIST)).length);
+
+		const distinctMcdAuras = distinct(mcdAuraLogs, (a, b) => a.actionId!.equalsIgnoringTag(b.actionId!));
+		// Sort by name so auras keep their same colors even if timings change.
+		distinctMcdAuras.sort((a, b) => stringComparator(a.actionId!.name, b.actionId!.name));
+		const mcdAuraColors = mcdAuraLogs.map(mcdAuraLog => actionColors[distinctMcdAuras.findIndex(dAura => dAura.actionId!.equalsIgnoringTag(mcdAuraLog.actionId!))]);
+
+		options.annotations = {
+			position: 'back',
+			xaxis: mcdAuraLogs.map((log, i) => {
+				return {
+					x: this.toDatetime(log.gainedAt).getTime(),
+					x2: this.toDatetime(log.fadedAt).getTime(),
+					fillColor: mcdAuraColors[i],
+				};
+			}),
+			points: mcdLogs.map((log, i) => {
+				return {
+					x: this.toDatetime(log.timestamp).getTime(),
+					y: 0,
+					image: {
+						path: log.actionId!.iconUrl,
+						width: 20,
+						height: 20,
+						offsetY: cooldownIconOffsets[i] * -25,
+					},
+				};
+			}),
+		};
+	}
+
+	private clearRotationChart() {
 		this.rotationLabels.innerHTML = `
 			<div class="rotation-label-header"></div>
 		`;
@@ -371,7 +452,16 @@ export class Timeline extends ResultComponent {
 		`;
 		this.rotationHiddenIdsContainer.innerHTML = '';
 		this.hiddenIdsChangeEmitter = new TypedEvent<void>();
+	}
 
+	private updateRotationChart(player: PlayerMetrics, duration: number) {
+		const targets = this.resultData!.result.getTargets(this.resultData!.filter);
+		if (targets.length == 0) {
+			return;
+		}
+		const target = targets[0];
+
+		this.clearRotationChart();
 		this.drawRotationTimeRuler(this.rotationTimeline.getElementsByClassName('rotation-timeline-canvas')[0] as HTMLCanvasElement, duration);
 
 		const meleeActionIds = player.getMeleeActions().map(action => action.actionId);
@@ -677,9 +767,36 @@ export class Timeline extends ResultComponent {
 		ctx.stroke();
 	}
 
-	private threatTooltip(log: ThreatLogGroup, includeAuras: boolean): string {
+	private dpsTooltip(log: DpsLog, includeAuras: boolean, player: PlayerMetrics, colorOverride: string): string {
+		const showPlayerLabel = colorOverride != '';
+		return `<div class="timeline-tooltip dps">
+			<div class="timeline-tooltip-header">
+				${showPlayerLabel ? `
+				<img class="timeline-tooltip-icon" src="${player.iconUrl}">
+				<span class="" style="color: ${colorOverride}">${player.label}</span></span> - </span>
+				` : ''}
+				<span class="bold">${log.timestamp.toFixed(2)}s</span>
+			</div>
+			<div class="timeline-tooltip-body">
+				<ul class="timeline-dps-events">
+					${log.damageLogs.map(damageLog => this.tooltipLogItem(damageLog, damageLog.resultString())).join('')}
+				</ul>
+				<div class="timeline-tooltip-body-row">
+					<span class="series-color">DPS: ${log.dps.toFixed(2)}</span>
+				</div>
+			</div>
+			${this.tooltipAurasSection(log)}
+		</div>`;
+	}
+
+	private threatTooltip(log: ThreatLogGroup, includeAuras: boolean, player: PlayerMetrics, colorOverride: string): string {
+		const showPlayerLabel = colorOverride != '';
 		return `<div class="timeline-tooltip threat">
 			<div class="timeline-tooltip-header">
+				${showPlayerLabel ? `
+				<img class="timeline-tooltip-icon" src="${player.iconUrl}">
+				<span class="" style="color: ${colorOverride}">${player.label}</span></span> - </span>
+				` : ''}
 				<span class="bold">${log.timestamp.toFixed(2)}s</span>
 			</div>
 			<div class="timeline-tooltip-body">
@@ -772,9 +889,7 @@ export class Timeline extends ResultComponent {
 		setTimeout(() => {
 			this.dpsResourcesPlot.render();
 			this.rendered = true;
-			if (this.resultData != null) {
-				this.updatePlot();
-			}
+			this.updatePlot();
 		}, 300);
 	}
 
