@@ -101,7 +101,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 1835.5560745391133
+  dps: 1835.5560745391142
  }
 }
 dps_results: {
@@ -173,7 +173,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-DarkIronSmokingPipe-38290"
  value: {
-  dps: 1827.9953495408467
+  dps: 1827.995349540847
  }
 }
 dps_results: {
@@ -263,7 +263,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-EssenceoftheMartyr-29376"
  value: {
-  dps: 1824.783788843081
+  dps: 1824.7837888430815
  }
 }
 dps_results: {
@@ -281,13 +281,13 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Fathom-BroochoftheTidewalker-30663"
  value: {
-  dps: 1829.2442878217398
+  dps: 1829.24428782174
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-Felstalker"
  value: {
-  dps: 1735.6321958876401
+  dps: 1735.6321958876397
  }
 }
 dps_results: {
@@ -341,7 +341,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-IconoftheSilverCrescent-29370"
  value: {
-  dps: 1827.9953495408467
+  dps: 1827.995349540847
  }
 }
 dps_results: {
@@ -377,7 +377,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-MarkoftheChampion-23206"
  value: {
-  dps: 1866.1222566353204
+  dps: 1866.1222566353208
  }
 }
 dps_results: {
@@ -395,13 +395,13 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-NaturalAlignmentCrystal-19344"
  value: {
-  dps: 1857.8520266194173
+  dps: 1857.8520266194168
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-NetherstrikeArmor"
  value: {
-  dps: 1642.6849611209584
+  dps: 1642.6849611209586
  }
 }
 dps_results: {
@@ -509,7 +509,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Sorcerer'sAlchemistStone-35749"
  value: {
-  dps: 1826.973347207159
+  dps: 1826.9733472071591
  }
 }
 dps_results: {
@@ -527,7 +527,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Stonebreaker'sTotem-33507"
  value: {
-  dps: 1880.6451987386242
+  dps: 1880.6451987386247
  }
 }
 dps_results: {
@@ -599,7 +599,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TheRestrainedEssenceofSapphiron-23046"
  value: {
-  dps: 1827.034330511409
+  dps: 1827.0343305114095
  }
 }
 dps_results: {
@@ -611,7 +611,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TheTwinStars"
  value: {
-  dps: 1810.818194510553
+  dps: 1810.8181945105534
  }
 }
 dps_results: {
@@ -641,7 +641,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TsunamiTalisman-30627"
  value: {
-  dps: 1900.4413470061259
+  dps: 1900.4413470061256
  }
 }
 dps_results: {
