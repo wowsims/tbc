@@ -23,6 +23,12 @@ func RegisterWarrior() {
 	)
 }
 
+const (
+	BattleStance = iota
+	DefensiveStance
+	BerserkerStance
+)
+
 type Warrior struct {
 	core.Character
 
@@ -32,6 +38,22 @@ type Warrior struct {
 	ArmsSlamRotation proto.Warrior_Rotation_ArmsSlamRotation
 	ArmsDwRotation   proto.Warrior_Rotation_ArmsDWRotation
 	FuryRotation     proto.Warrior_Rotation_FuryRotation
+
+	// Current state
+	stance             int
+	heroicStrikeQueued bool
+
+	// Cached values
+	heroicStrikeCost float64
+
+	bloodthirstTemplate core.SimpleSpellTemplate
+	bloodthirst         core.SimpleSpell
+
+	heroicStrikeTemplate core.SimpleSpellTemplate
+	heroicStrike         core.SimpleSpell
+
+	whirlwindTemplate core.SimpleSpellTemplate
+	whirlwind         core.SimpleSpell
 }
 
 func (warrior *Warrior) GetCharacter() *core.Character {
@@ -42,9 +64,14 @@ func (warrior *Warrior) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (warrior *Warrior) Init(sim *core.Simulation) {
+	warrior.bloodthirstTemplate = warrior.newBloodthirstTemplate(sim)
+	warrior.heroicStrikeTemplate = warrior.newHeroicStrikeTemplate(sim)
+	warrior.whirlwindTemplate = warrior.newWhirlwindTemplate(sim)
 }
 
 func (warrior *Warrior) Reset(newsim *core.Simulation) {
+	warrior.stance = BerserkerStance
+	warrior.heroicStrikeQueued = false
 }
 
 func NewWarrior(character core.Character, options proto.Player) *Warrior {
@@ -57,12 +84,18 @@ func NewWarrior(character core.Character, options proto.Player) *Warrior {
 		RotationType: warriorOptions.Rotation.Type,
 	}
 
-	warrior.PseudoStats.MeleeSpeedMultiplier = 1
-	warrior.EnableRageBar(warriorOptions.Options.StartingRage)
+	warrior.EnableRageBar(warriorOptions.Options.StartingRage, func(sim *core.Simulation) {
+		if !warrior.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+			warrior.doRotation(sim)
+		}
+	})
 	warrior.EnableAutoAttacks(warrior, core.AutoAttackOptions{
 		MainHand:       warrior.WeaponFromMainHand(warrior.DefaultMeleeCritMultiplier()),
 		OffHand:        warrior.WeaponFromOffHand(warrior.DefaultMeleeCritMultiplier()),
 		AutoSwingMelee: true,
+		ReplaceMHSwing: func(sim *core.Simulation) *core.SimpleSpell {
+			return warrior.TryHeroicStrike(sim)
+		},
 	})
 
 	if warrior.RotationType == proto.Warrior_Rotation_ArmsSlam && warriorOptions.Rotation.ArmsSlam != nil {
@@ -92,6 +125,17 @@ func NewWarrior(character core.Character, options proto.Player) *Warrior {
 	//warrior.applyTalents()
 
 	return warrior
+}
+
+func (warrior *Warrior) critMultiplier(applyImpale bool) float64 {
+	primaryModifier := 1.0
+	secondaryModifier := 0.0
+
+	if applyImpale {
+		secondaryModifier += 0.1 * float64(warrior.Talents.Impale)
+	}
+
+	return warrior.MeleeCritMultiplier(primaryModifier, secondaryModifier)
 }
 
 func init() {

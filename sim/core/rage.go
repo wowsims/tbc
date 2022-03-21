@@ -10,14 +10,19 @@ const RageFactor = 3.75 / 274.7
 
 var RageBarAuraID = NewAuraID()
 
+// OnRageGain is called any time rage is increased.
+type OnRageGain func(sim *Simulation)
+
 type rageBar struct {
 	character *Character
 
 	startingRage float64
 	currentRage  float64
+
+	onRageGain OnRageGain
 }
 
-func (character *Character) EnableRageBar(startingRage float64) {
+func (character *Character) EnableRageBar(startingRage float64, onRageGain OnRageGain) {
 	character.AddPermanentAura(func(sim *Simulation) Aura {
 		return Aura{
 			ID: RageBarAuraID,
@@ -50,6 +55,7 @@ func (character *Character) EnableRageBar(startingRage float64) {
 	character.rageBar = rageBar{
 		character:    character,
 		startingRage: MaxFloat(0, MinFloat(startingRage, MaxRage)),
+		onRageGain:   onRageGain,
 	}
 }
 
@@ -74,6 +80,7 @@ func (rb *rageBar) AddRage(sim *Simulation, amount float64, actionID ActionID) {
 	}
 
 	rb.currentRage = newRage
+	rb.onRageGain(sim)
 }
 
 func (rb *rageBar) SpendRage(sim *Simulation, amount float64, actionID ActionID) {
