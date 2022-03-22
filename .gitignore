@@ -1,5 +1,13 @@
+# nodejs modules
 node_modules
+
+# IDE folders
 .vscode
+.idea
+
+# binaries
 dist
 binary_dist
+
+# temporary files
 *.results.tmp
