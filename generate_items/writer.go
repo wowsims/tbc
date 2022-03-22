@@ -286,18 +286,19 @@ var allowList = map[int]bool{
 	12632: true, // Storm Gauntlets
 	17111: true, // Blazefury Medallion
 	17112: true, // Empyrean Demolisher
+	19808: true, // Rockhide Strongfish
 	20966: true, // Jade Pendant of Blasting
 	22395: true, // Totem of Rage
 	24114: true, // Braided Eternium Chain
 	27947: true, // Totem of Impact
+	28041: true, // Bladefist's Breadth
+	31139: true, // Fist of Reckoning
+	31149: true, // Gloves of Pandemonium
 	31193: true, // Blade of Unquenched Thirst
 	32508: true, // Necklace of the Deep
 	33135: true, // Falling Star
 	33140: true, // Blood of Amber
 	33143: true, // Stone of Blades
 	33144: true, // Facet of Eternity
-	31139: true, // Fist of Reckoning
-	19808: true, // Rockhide Strongfish
 	6360:  true, // Steelscale Crushfish
-	28041: true, // Bladefist's Breadth
 }
