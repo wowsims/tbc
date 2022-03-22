@@ -65,6 +65,11 @@ func (shaman *Shaman) applyTalents() {
 		})
 	}
 
+	if shaman.Talents.SpiritWeapons {
+		shaman.AutoAttacks.MHAuto.Effect.ThreatMultiplier *= 0.7
+		shaman.AutoAttacks.OHAuto.Effect.ThreatMultiplier *= 0.7
+	}
+
 	shaman.applyElementalDevastation()
 	shaman.applyFlurry()
 	shaman.applyShamanisticFocus()
