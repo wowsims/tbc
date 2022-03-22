@@ -55,6 +55,9 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 	if shaman.Talents.ElementalWeapons > 0 {
 		baseEffect.WeaponInput.DamageMultiplier *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
 	}
+	if shaman.Talents.SpiritWeapons {
+		baseEffect.ThreatMultiplier *= 0.7
+	}
 
 	wftempl.Effects = []core.SpellHitEffect{
 		baseEffect,

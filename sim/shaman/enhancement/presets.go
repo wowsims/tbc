@@ -25,6 +25,7 @@ var StandardTalents = &proto.ShamanTalents{
 	ShamanisticFocus:        true,
 	Flurry:                  5,
 	ImprovedWeaponTotems:    1,
+	SpiritWeapons:           true,
 	ElementalWeapons:        3,
 	MentalQuickness:         3,
 	WeaponMastery:           5,

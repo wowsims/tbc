@@ -112,6 +112,11 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 		ss.Effects[1].WeaponInput.FlatDamageBonus += 30
 	}
 
+	if shaman.Talents.SpiritWeapons {
+		ss.Effects[0].ThreatMultiplier *= 0.7
+		ss.Effects[1].ThreatMultiplier *= 0.7
+	}
+
 	return core.NewSimpleSpellTemplate(ss)
 }
 

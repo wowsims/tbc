@@ -327,7 +327,7 @@ export const shamanTalentsConfig: TalentsConfig<Spec.SpecElementalShaman> = [
 				maxPoints: 2,
 			},
 			{
-				//fieldName: 'spiritWeapons',
+				fieldName: 'spiritWeapons',
 				location: {
 					rowIdx: 4,
 					colIdx: 1,
