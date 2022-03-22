@@ -8,9 +8,9 @@ declare var $: any;
 declare var tippy: any;
 
 export class CastMetricsTable extends MetricsTable<ActionMetrics> {
-  constructor(config: ResultComponentConfig) {
+	constructor(config: ResultComponentConfig) {
 		config.rootCssClass = 'cast-metrics-root';
-    super(config, [
+		super(config, [
 			MetricsTable.nameCellConfig((metric: ActionMetrics) => {
 				return {
 					name: metric.name,

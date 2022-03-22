@@ -64,71 +64,71 @@ export class Sim {
 	private readonly workerPool: WorkerPool;
 
 	private iterations: number = 3000;
-  private phase: number = OtherConstants.CURRENT_PHASE;
+	private phase: number = OtherConstants.CURRENT_PHASE;
 	private fixedRngSeed: number = 0;
-  private show1hWeapons: boolean = true;
-  private show2hWeapons: boolean = true;
-  private showMatchingGems: boolean = true;
+	private show1hWeapons: boolean = true;
+	private show2hWeapons: boolean = true;
+	private showMatchingGems: boolean = true;
 	private showThreatMetrics: boolean = false;
 	private showExperimental: boolean = false;
 
-  readonly raid: Raid;
-  readonly encounter: Encounter;
+	readonly raid: Raid;
+	readonly encounter: Encounter;
 
-  // Database
-  private items: Record<number, Item> = {};
-  private enchants: Record<number, Enchant> = {};
-  private gems: Record<number, Gem> = {};
+	// Database
+	private items: Record<number, Item> = {};
+	private enchants: Record<number, Enchant> = {};
+	private gems: Record<number, Gem> = {};
 
-  readonly iterationsChangeEmitter = new TypedEvent<void>();
-  readonly phaseChangeEmitter = new TypedEvent<void>();
-  readonly fixedRngSeedChangeEmitter = new TypedEvent<void>();
-  readonly lastUsedRngSeedChangeEmitter = new TypedEvent<void>();
-  readonly show1hWeaponsChangeEmitter = new TypedEvent<void>();
-  readonly show2hWeaponsChangeEmitter = new TypedEvent<void>();
-  readonly showMatchingGemsChangeEmitter = new TypedEvent<void>();
-  readonly showThreatMetricsChangeEmitter = new TypedEvent<void>();
-  readonly showExperimentalChangeEmitter = new TypedEvent<void>();
+	readonly iterationsChangeEmitter = new TypedEvent<void>();
+	readonly phaseChangeEmitter = new TypedEvent<void>();
+	readonly fixedRngSeedChangeEmitter = new TypedEvent<void>();
+	readonly lastUsedRngSeedChangeEmitter = new TypedEvent<void>();
+	readonly show1hWeaponsChangeEmitter = new TypedEvent<void>();
+	readonly show2hWeaponsChangeEmitter = new TypedEvent<void>();
+	readonly showMatchingGemsChangeEmitter = new TypedEvent<void>();
+	readonly showThreatMetricsChangeEmitter = new TypedEvent<void>();
+	readonly showExperimentalChangeEmitter = new TypedEvent<void>();
 
 	// Emits when any of the settings change (but not the raid / encounter).
-  readonly settingsChangeEmitter: TypedEvent<void>;
+	readonly settingsChangeEmitter: TypedEvent<void>;
 
-  // Emits when any of the above emitters emit.
-  readonly changeEmitter: TypedEvent<void>;
+	// Emits when any of the above emitters emit.
+	readonly changeEmitter: TypedEvent<void>;
 
 	// Fires when a raid sim API call completes.
-  readonly simResultEmitter = new TypedEvent<SimResult>();
+	readonly simResultEmitter = new TypedEvent<SimResult>();
 
 	private readonly _initPromise: Promise<void>;
 	private lastUsedRngSeed: number = 0;
 
 	// These callbacks are needed so we can apply BuffBot modifications automatically before sending requests.
-	private modifyRaidProto: ((raidProto: RaidProto) => void) = () => {};
-	private modifyEncounterProto: ((encounterProto: EncounterProto) => void) = () => {};
+	private modifyRaidProto: ((raidProto: RaidProto) => void) = () => { };
+	private modifyEncounterProto: ((encounterProto: EncounterProto) => void) = () => { };
 
-  constructor() {
+	constructor() {
 		this.workerPool = new WorkerPool(3);
 
-    this._initPromise = this.workerPool.getGearList(GearListRequest.create()).then(result => {
+		this._initPromise = this.workerPool.getGearList(GearListRequest.create()).then(result => {
 			result.items.forEach(item => this.items[item.id] = item);
 			result.enchants.forEach(enchant => this.enchants[enchant.id] = enchant);
 			result.gems.forEach(gem => this.gems[gem.id] = gem);
 		});
 
 		this.raid = new Raid(this);
-    this.encounter = new Encounter(this);
+		this.encounter = new Encounter(this);
 
 		this.settingsChangeEmitter = TypedEvent.onAny([
-      this.iterationsChangeEmitter,
-      this.phaseChangeEmitter,
-      this.fixedRngSeedChangeEmitter,
-      this.show1hWeaponsChangeEmitter,
-      this.show2hWeaponsChangeEmitter,
-      this.showMatchingGemsChangeEmitter,
-      this.showThreatMetricsChangeEmitter,
-      this.showExperimentalChangeEmitter,
+			this.iterationsChangeEmitter,
+			this.phaseChangeEmitter,
+			this.fixedRngSeedChangeEmitter,
+			this.show1hWeaponsChangeEmitter,
+			this.show2hWeaponsChangeEmitter,
+			this.showMatchingGemsChangeEmitter,
+			this.showThreatMetricsChangeEmitter,
+			this.showExperimentalChangeEmitter,
 		]);
-		
+
 		this.changeEmitter = TypedEvent.onAny([
 			this.settingsChangeEmitter,
 			this.raid.changeEmitter,
@@ -136,11 +136,11 @@ export class Sim {
 		]);
 
 		this.raid.changeEmitter.on(eventID => this.updateCharacterStats(eventID));
-  }
+	}
 
-  waitForInit(): Promise<void> {
+	waitForInit(): Promise<void> {
 		return this._initPromise;
-  }
+	}
 
 	setModifyRaidProto(newModFn: (raidProto: RaidProto) => void) {
 		this.modifyRaidProto = newModFn;
@@ -175,7 +175,7 @@ export class Sim {
 		return encounterProto;
 	}
 
-  private makeRaidSimRequest(debug: boolean): RaidSimRequest {
+	private makeRaidSimRequest(debug: boolean): RaidSimRequest {
 		const raid = this.getModifiedRaidProto();
 		const encounter = this.getModifiedEncounterProto();
 		const hunters = raid.parties.map(party => party.players).flat().filter(player => player.name && playerToSpec(player) == Spec.SpecHunter);
@@ -196,9 +196,9 @@ export class Sim {
 				debugFirstIteration: true,
 			}),
 		});
-  }
+	}
 
-  async runRaidSim(eventID: EventID, onProgress: Function): Promise<SimResult> {
+	async runRaidSim(eventID: EventID, onProgress: Function): Promise<SimResult> {
 		if (this.raid.isEmpty()) {
 			throw new Error('Raid is empty! Try adding some players first.');
 		} else if (this.encounter.getNumTargets() < 1) {
@@ -208,7 +208,7 @@ export class Sim {
 		await this.waitForInit();
 
 		const request = this.makeRaidSimRequest(false);
-		
+
 		var result = await this.workerPool.raidSimAsync(request, onProgress);
 
 		const simResult = await SimResult.makeNew(request, result);
@@ -216,7 +216,7 @@ export class Sim {
 		return simResult;
 	}
 
-  async runRaidSimWithLogs(eventID: EventID): Promise<SimResult> {
+	async runRaidSimWithLogs(eventID: EventID): Promise<SimResult> {
 		if (this.raid.isEmpty()) {
 			throw new Error('Raid is empty! Try adding some players first.');
 		} else if (this.encounter.getNumTargets() < 1) {
@@ -226,7 +226,7 @@ export class Sim {
 		await this.waitForInit();
 
 		const request = this.makeRaidSimRequest(true);
-		const result = await this.workerPool.raidSimAsync(request, () => {});
+		const result = await this.workerPool.raidSimAsync(request, () => { });
 
 		const simResult = await SimResult.makeNew(request, result);
 		this.simResultEmitter.emit(eventID, simResult);
@@ -253,13 +253,13 @@ export class Sim {
 
 		TypedEvent.freezeAllAndDo(() => {
 			result.raidStats!.parties
-					.forEach((partyStats, partyIndex) =>
-							partyStats.players.forEach((playerStats, playerIndex) =>
-									players[partyIndex*5 + playerIndex]?.setCurrentStats(eventID, playerStats)));
+				.forEach((partyStats, partyIndex) =>
+					partyStats.players.forEach((playerStats, playerIndex) =>
+						players[partyIndex * 5 + playerIndex]?.setCurrentStats(eventID, playerStats)));
 		});
 	}
 
-  async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
+	async statWeights(player: Player<any>, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
 		if (this.raid.isEmpty()) {
 			throw new Error('Raid is empty! Try adding some players first.');
 		} else if (this.encounter.getNumTargets() < 1) {
@@ -321,28 +321,28 @@ export class Sim {
 	}
 
 	getMatchingGems(socketColor: GemColor): Array<Gem> {
-    	return Object.values(this.gems).filter(gem => gemMatchesSocket(gem, socketColor));
+		return Object.values(this.gems).filter(gem => gemMatchesSocket(gem, socketColor));
 	}
-  
-  getPhase(): number {
-    return this.phase;
-  }
-  setPhase(eventID: EventID, newPhase: number) {
-    if (newPhase != this.phase) {
-      this.phase = newPhase;
-      this.phaseChangeEmitter.emit(eventID);
-    }
-  }
-  
-  getFixedRngSeed(): number {
-    return this.fixedRngSeed;
-  }
-  setFixedRngSeed(eventID: EventID, newFixedRngSeed: number) {
-    if (newFixedRngSeed != this.fixedRngSeed) {
-      this.fixedRngSeed = newFixedRngSeed;
-      this.fixedRngSeedChangeEmitter.emit(eventID);
-    }
-  }
+
+	getPhase(): number {
+		return this.phase;
+	}
+	setPhase(eventID: EventID, newPhase: number) {
+		if (newPhase != this.phase) {
+			this.phase = newPhase;
+			this.phaseChangeEmitter.emit(eventID);
+		}
+	}
+
+	getFixedRngSeed(): number {
+		return this.fixedRngSeed;
+	}
+	setFixedRngSeed(eventID: EventID, newFixedRngSeed: number) {
+		if (newFixedRngSeed != this.fixedRngSeed) {
+			this.fixedRngSeed = newFixedRngSeed;
+			this.fixedRngSeedChangeEmitter.emit(eventID);
+		}
+	}
 
 	static MAX_RNG_SEED = Math.pow(2, 32) - 1;
 	private nextRngSeed(): number {
@@ -360,100 +360,100 @@ export class Sim {
 	getLastUsedRngSeed(): number {
 		return this.lastUsedRngSeed;
 	}
-	
-  
-  getShow1hWeapons(): boolean {
-    return this.show1hWeapons;
-  }
-  setShow1hWeapons(eventID: EventID, newShow1hWeapons: boolean) {
-    if (newShow1hWeapons != this.show1hWeapons) {
-      this.show1hWeapons = newShow1hWeapons;
-      this.show1hWeaponsChangeEmitter.emit(eventID);
-    }
-  }
-  
-  getShow2hWeapons(): boolean {
-    return this.show2hWeapons;
-  }
-  setShow2hWeapons(eventID: EventID, newShow2hWeapons: boolean) {
-    if (newShow2hWeapons != this.show2hWeapons) {
-      this.show2hWeapons = newShow2hWeapons;
-      this.show2hWeaponsChangeEmitter.emit(eventID);
-    }
-  }
-  
-  getShowMatchingGems(): boolean {
-    return this.showMatchingGems;
-  }
-  setShowMatchingGems(eventID: EventID, newShowMatchingGems: boolean) {
-    if (newShowMatchingGems != this.showMatchingGems) {
-      this.showMatchingGems = newShowMatchingGems;
-      this.showMatchingGemsChangeEmitter.emit(eventID);
-    }
-  }
-  
-  getShowThreatMetrics(): boolean {
-    return this.showThreatMetrics;
-  }
-  setShowThreatMetrics(eventID: EventID, newShowThreatMetrics: boolean) {
-    if (newShowThreatMetrics != this.showThreatMetrics) {
-      this.showThreatMetrics = newShowThreatMetrics;
-      this.showThreatMetricsChangeEmitter.emit(eventID);
-    }
-  }
-  
-  getShowExperimental(): boolean {
-    return this.showExperimental;
-  }
-  setShowExperimental(eventID: EventID, newShowExperimental: boolean) {
-    if (newShowExperimental != this.showExperimental) {
-      this.showExperimental = newShowExperimental;
-      this.showExperimentalChangeEmitter.emit(eventID);
-    }
-  }
-  
-  getIterations(): number {
-    return this.iterations;
-  }
-  setIterations(eventID: EventID, newIterations: number) {
-    if (newIterations != this.iterations) {
-      this.iterations = newIterations;
-      this.iterationsChangeEmitter.emit(eventID);
-    }
-  }
 
-  lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null {
-    const item = this.items[itemSpec.id];
-    if (!item)
-      return null;
 
-    const enchant = this.enchants[itemSpec.enchant] || null;
-    const gems = itemSpec.gems.map(gemId => this.gems[gemId] || null);
+	getShow1hWeapons(): boolean {
+		return this.show1hWeapons;
+	}
+	setShow1hWeapons(eventID: EventID, newShow1hWeapons: boolean) {
+		if (newShow1hWeapons != this.show1hWeapons) {
+			this.show1hWeapons = newShow1hWeapons;
+			this.show1hWeaponsChangeEmitter.emit(eventID);
+		}
+	}
 
-    return new EquippedItem(item, enchant, gems);
-  }
+	getShow2hWeapons(): boolean {
+		return this.show2hWeapons;
+	}
+	setShow2hWeapons(eventID: EventID, newShow2hWeapons: boolean) {
+		if (newShow2hWeapons != this.show2hWeapons) {
+			this.show2hWeapons = newShow2hWeapons;
+			this.show2hWeaponsChangeEmitter.emit(eventID);
+		}
+	}
 
-  lookupEquipmentSpec(equipSpec: EquipmentSpec): Gear {
-    // EquipmentSpec is supposed to be indexed by slot, but here we assume
-    // it isn't just in case.
-    const gearMap: Partial<Record<ItemSlot, EquippedItem | null>> = {};
+	getShowMatchingGems(): boolean {
+		return this.showMatchingGems;
+	}
+	setShowMatchingGems(eventID: EventID, newShowMatchingGems: boolean) {
+		if (newShowMatchingGems != this.showMatchingGems) {
+			this.showMatchingGems = newShowMatchingGems;
+			this.showMatchingGemsChangeEmitter.emit(eventID);
+		}
+	}
 
-    equipSpec.items.forEach(itemSpec => {
-      const item = this.lookupItemSpec(itemSpec);
-      if (!item)
-        return;
+	getShowThreatMetrics(): boolean {
+		return this.showThreatMetrics;
+	}
+	setShowThreatMetrics(eventID: EventID, newShowThreatMetrics: boolean) {
+		if (newShowThreatMetrics != this.showThreatMetrics) {
+			this.showThreatMetrics = newShowThreatMetrics;
+			this.showThreatMetricsChangeEmitter.emit(eventID);
+		}
+	}
 
-      const itemSlots = getEligibleItemSlots(item.item);
+	getShowExperimental(): boolean {
+		return this.showExperimental;
+	}
+	setShowExperimental(eventID: EventID, newShowExperimental: boolean) {
+		if (newShowExperimental != this.showExperimental) {
+			this.showExperimental = newShowExperimental;
+			this.showExperimentalChangeEmitter.emit(eventID);
+		}
+	}
 
-      const assignedSlot = itemSlots.find(slot => !gearMap[slot]);
-      if (assignedSlot == null)
-        throw new Error('No slots left to equip ' + Item.toJsonString(item.item));
+	getIterations(): number {
+		return this.iterations;
+	}
+	setIterations(eventID: EventID, newIterations: number) {
+		if (newIterations != this.iterations) {
+			this.iterations = newIterations;
+			this.iterationsChangeEmitter.emit(eventID);
+		}
+	}
 
-      gearMap[assignedSlot] = item;
-    });
+	lookupItemSpec(itemSpec: ItemSpec): EquippedItem | null {
+		const item = this.items[itemSpec.id];
+		if (!item)
+			return null;
 
-    return new Gear(gearMap);
-  }
+		const enchant = this.enchants[itemSpec.enchant] || null;
+		const gems = itemSpec.gems.map(gemId => this.gems[gemId] || null);
+
+		return new EquippedItem(item, enchant, gems);
+	}
+
+	lookupEquipmentSpec(equipSpec: EquipmentSpec): Gear {
+		// EquipmentSpec is supposed to be indexed by slot, but here we assume
+		// it isn't just in case.
+		const gearMap: Partial<Record<ItemSlot, EquippedItem | null>> = {};
+
+		equipSpec.items.forEach(itemSpec => {
+			const item = this.lookupItemSpec(itemSpec);
+			if (!item)
+				return;
+
+			const itemSlots = getEligibleItemSlots(item.item);
+
+			const assignedSlot = itemSlots.find(slot => !gearMap[slot]);
+			if (assignedSlot == null)
+				throw new Error('No slots left to equip ' + Item.toJsonString(item.item));
+
+			gearMap[assignedSlot] = item;
+		});
+
+		return new Gear(gearMap);
+	}
 
 	toProto(): SimSettingsProto {
 		return SimSettingsProto.create({

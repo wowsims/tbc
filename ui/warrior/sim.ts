@@ -16,7 +16,7 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -37,7 +37,7 @@ import * as WarriorInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecWarrior>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecWarrior>) {
 		super(parentElem, player, {
 			cssClass: 'warrior-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
@@ -125,7 +125,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
 				// TODO: Move reck to cooldown tabs
-				WarriorInputs.Recklessness ,
+				WarriorInputs.Recklessness,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [

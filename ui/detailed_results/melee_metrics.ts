@@ -8,9 +8,9 @@ declare var $: any;
 declare var tippy: any;
 
 export class MeleeMetricsTable extends MetricsTable<ActionMetrics> {
-  constructor(config: ResultComponentConfig) {
+	constructor(config: ResultComponentConfig) {
 		config.rootCssClass = 'melee-metrics-root';
-    super(config, [
+		super(config, [
 			MetricsTable.nameCellConfig((metric: ActionMetrics) => {
 				return {
 					name: metric.name,

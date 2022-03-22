@@ -148,13 +148,13 @@ export class SimLog {
 
 			// Order from most to least common to reduce number of checks.
 			return DamageDealtLog.parse(params)
-					|| ResourceChangedLog.parse(params)
-					|| AuraEventLog.parse(params)
-					|| MajorCooldownUsedLog.parse(params)
-					|| CastBeganLog.parse(params)
-					|| CastCompletedLog.parse(params)
-					|| StatChangeLog.parse(params)
-					|| Promise.resolve(new SimLog(params));
+				|| ResourceChangedLog.parse(params)
+				|| AuraEventLog.parse(params)
+				|| MajorCooldownUsedLog.parse(params)
+				|| CastBeganLog.parse(params)
+				|| CastCompletedLog.parse(params)
+				|| StatChangeLog.parse(params)
+				|| Promise.resolve(new SimLog(params));
 		}));
 	}
 
@@ -239,13 +239,13 @@ export class DamageDealtLog extends SimLog {
 
 	resultString(): string {
 		let result = this.miss ? 'Miss'
-				: this.dodge ? 'Dodge'
+			: this.dodge ? 'Dodge'
 				: this.parry ? 'Parry'
-				: this.glance ? 'Glance'
-				: this.crit ? 'Crit'
-				: this.block ? 'Block'
-				: this.tick ? 'Tick'
-				: 'Hit';
+					: this.glance ? 'Glance'
+						: this.crit ? 'Crit'
+							: this.block ? 'Block'
+								: this.tick ? 'Tick'
+									: 'Hit';
 		if (!this.miss && !this.dodge && !this.parry) {
 			result += ` for ${this.amount.toFixed(2)}`;
 			if (this.partialResist1_4) {
@@ -276,18 +276,18 @@ export class DamageDealtLog extends SimLog {
 				}
 
 				return new DamageDealtLog(
-						params,
-						amount,
-						match[3] == 'Miss',
-						match[3] == 'Crit',
-						match[3] == 'Glance',
-						match[3] == 'Dodge',
-						match[3] == 'Parry',
-						match[3] == 'Block',
-						Boolean(match[2]) && match[2].includes('tick'),
-						match[12] == '25',
-						match[12] == '50',
-						match[12] == '75');
+					params,
+					amount,
+					match[3] == 'Miss',
+					match[3] == 'Crit',
+					match[3] == 'Glance',
+					match[3] == 'Dodge',
+					match[3] == 'Parry',
+					match[3] == 'Block',
+					Boolean(match[2]) && match[2].includes('tick'),
+					match[12] == '25',
+					match[12] == '50',
+					match[12] == '75');
 			});
 		} else {
 			return null;
@@ -458,7 +458,7 @@ export class AuraUptimeLog extends SimLog {
 				actionId: gainedLog.actionId,
 				threat: gainedLog.threat,
 			}, log.timestamp));
-			
+
 			if (log.isRefreshed) {
 				unmatchedGainedLogs.push(log);
 			}
@@ -570,19 +570,19 @@ export class ResourceChangedLogGroup extends SimLog {
 
 			const groupedLogs = SimLog.groupDuplicateTimestamps(resourceChangedLogs);
 			results[resourceType] = groupedLogs.map(logGroup => new ResourceChangedLogGroup(
-					{
-						raw: '',
-						logIndex: logGroup[0].logIndex,
-						timestamp: logGroup[0].timestamp,
-						source: logGroup[0].source,
-						target: logGroup[0].target,
-						actionId: null,
-						threat: 0,
-					},
-					resourceType,
-					logGroup[0].valueBefore,
-					logGroup[logGroup.length - 1].valueAfter,
-					logGroup));
+				{
+					raw: '',
+					logIndex: logGroup[0].logIndex,
+					timestamp: logGroup[0].timestamp,
+					source: logGroup[0].source,
+					target: logGroup[0].target,
+					actionId: null,
+					threat: 0,
+				},
+				resourceType,
+				logGroup[0].valueBefore,
+				logGroup[logGroup.length - 1].valueAfter,
+				logGroup));
 		});
 
 		return results as Record<ResourceType, Array<ResourceChangedLogGroup>>;
@@ -726,10 +726,10 @@ export class CastLog extends SimLog {
 					return null;
 				}
 				const nextBeganIndex = abilityCastsBegan[cbIndex + 1]?.logIndex || null;
-				return abilityCastsCompleted.find(ccl => 
-						ccl.logIndex > abilityCastsBegan[cbIndex].logIndex
-						&& (nextBeganIndex == null || ccl.logIndex < nextBeganIndex)
-						&& toBucketKey(ccl.actionId!) == toBucketKey(actionId)) || null;
+				return abilityCastsCompleted.find(ccl =>
+					ccl.logIndex > abilityCastsBegan[cbIndex].logIndex
+					&& (nextBeganIndex == null || ccl.logIndex < nextBeganIndex)
+					&& toBucketKey(ccl.actionId!) == toBucketKey(actionId)) || null;
 			};
 
 			if (!abilityDamageDealt) {

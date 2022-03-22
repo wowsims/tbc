@@ -66,8 +66,8 @@ export function newRaidExporters(simUI: RaidSimUI): HTMLElement {
 
 class RaidJsonImporter extends Importer {
 	private readonly simUI: RaidSimUI;
-  constructor(parent: HTMLElement, simUI: RaidSimUI) {
-    super(parent, 'JSON Import');
+	constructor(parent: HTMLElement, simUI: RaidSimUI) {
+		super(parent, 'JSON Import');
 		this.simUI = simUI;
 
 		this.descriptionElem.innerHTML = `
@@ -90,8 +90,8 @@ class RaidJsonImporter extends Importer {
 class RaidJsonExporter extends Exporter {
 	private readonly simUI: RaidSimUI;
 
-  constructor(parent: HTMLElement, simUI: RaidSimUI) {
-    super(parent, 'JSON Export', true);
+	constructor(parent: HTMLElement, simUI: RaidSimUI) {
+		super(parent, 'JSON Export', true);
 		this.simUI = simUI;
 		this.init();
 	}

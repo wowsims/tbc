@@ -13,8 +13,8 @@ export class DetailedResults extends Component {
 	private tabWindow: Window | null;
 	private latestRun: SimRunData | null;
 
-  constructor(parent: HTMLElement, simUI: SimUI, simResultsManager: RaidSimResultsManager) {
-    super(parent, 'detailed-results-manager-root');
+	constructor(parent: HTMLElement, simUI: SimUI, simResultsManager: RaidSimResultsManager) {
+		super(parent, 'detailed-results-manager-root');
 		this.simUI = simUI;
 		this.tabWindow = null;
 		this.latestRun = null;
@@ -75,7 +75,7 @@ export class DetailedResults extends Component {
 	//	}
 	//}
 
-  private setSimRunData(simRunData: SimRunData) {
+	private setSimRunData(simRunData: SimRunData) {
 		this.latestRun = simRunData;
 		this.postMessage(DetailedResultsUpdate.create({
 			data: {
@@ -83,7 +83,7 @@ export class DetailedResults extends Component {
 				runData: simRunData,
 			},
 		}));
-  }
+	}
 
 	private updateSettings() {
 		this.postMessage(DetailedResultsUpdate.create({

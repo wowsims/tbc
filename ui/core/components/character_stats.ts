@@ -18,44 +18,44 @@ const spellPowerTypeStats = [
 ];
 
 export class CharacterStats extends Component {
-  readonly stats: Array<Stat>;
-  readonly valueElems: Array<HTMLTableCellElement>;
+	readonly stats: Array<Stat>;
+	readonly valueElems: Array<HTMLTableCellElement>;
 
 	private readonly player: Player<any>;
 	private readonly modifyDisplayStats?: (player: Player<any>, stats: Stats) => Stats;
 
-  constructor(parent: HTMLElement, player: Player<any>, stats: Array<Stat>, modifyDisplayStats?: (player: Player<any>, stats: Stats) => Stats) {
-    super(parent, 'character-stats-root');
-    this.stats = stats;
+	constructor(parent: HTMLElement, player: Player<any>, stats: Array<Stat>, modifyDisplayStats?: (player: Player<any>, stats: Stats) => Stats) {
+		super(parent, 'character-stats-root');
+		this.stats = stats;
 		this.player = player;
 		this.modifyDisplayStats = modifyDisplayStats;
 
-    const table = document.createElement('table');
-    table.classList.add('character-stats-table');
-    this.rootElem.appendChild(table);
+		const table = document.createElement('table');
+		table.classList.add('character-stats-table');
+		this.rootElem.appendChild(table);
 
-    this.valueElems = [];
-    this.stats.forEach(stat => {
-      const row = document.createElement('tr');
-      row.classList.add('character-stats-table-row');
-      table.appendChild(row);
+		this.valueElems = [];
+		this.stats.forEach(stat => {
+			const row = document.createElement('tr');
+			row.classList.add('character-stats-table-row');
+			table.appendChild(row);
 
-      const label = document.createElement('td');
-      label.classList.add('character-stats-table-label');
-      label.textContent = statNames[stat].toUpperCase();
-      row.appendChild(label);
+			const label = document.createElement('td');
+			label.classList.add('character-stats-table-label');
+			label.textContent = statNames[stat].toUpperCase();
+			row.appendChild(label);
 
-      const value = document.createElement('td');
-      value.classList.add('character-stats-table-value');
-      row.appendChild(value);
-      this.valueElems.push(value);
-    });
+			const value = document.createElement('td');
+			value.classList.add('character-stats-table-value');
+			row.appendChild(value);
+			this.valueElems.push(value);
+		});
 
 		this.updateStats(new Stats(player.getCurrentStats().finalStats));
 		TypedEvent.onAny([player.currentStatsEmitter, player.sim.changeEmitter]).on(() => {
 			this.updateStats(new Stats(player.getCurrentStats().finalStats));
 		});
-  }
+	}
 
 	private updateStats(newStats: Stats) {
 		if (this.modifyDisplayStats) {

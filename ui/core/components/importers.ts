@@ -49,11 +49,11 @@ export function newIndividualImporters<SpecType extends Spec>(simUI: IndividualS
 }
 
 export abstract class Importer extends Popup {
-  private readonly textElem: HTMLTextAreaElement;
-  protected readonly descriptionElem: HTMLElement;
+	private readonly textElem: HTMLTextAreaElement;
+	protected readonly descriptionElem: HTMLElement;
 
-  constructor(parent: HTMLElement, title: string) {
-    super(parent);
+	constructor(parent: HTMLElement, title: string) {
+		super(parent);
 
 		const uploadInputId = 'upload-input-' + title.toLowerCase().replaceAll(' ', '-');
 
@@ -74,16 +74,16 @@ export abstract class Importer extends Popup {
 
 		this.addCloseButton();
 
-    this.textElem = this.rootElem.getElementsByClassName('importer-textarea')[0] as HTMLTextAreaElement;
-    this.descriptionElem = this.rootElem.getElementsByClassName('import-description')[0] as HTMLElement;
+		this.textElem = this.rootElem.getElementsByClassName('importer-textarea')[0] as HTMLTextAreaElement;
+		this.descriptionElem = this.rootElem.getElementsByClassName('import-description')[0] as HTMLElement;
 
-    const uploadInput = this.rootElem.getElementsByClassName('importer-upload-input')[0] as HTMLElement;
+		const uploadInput = this.rootElem.getElementsByClassName('importer-upload-input')[0] as HTMLElement;
 		uploadInput.addEventListener('change', async event => {
 			const data: string = await (event as any).target.files[0].text();
 			this.textElem.textContent = data;
 		});
 
-    const importButton = this.rootElem.getElementsByClassName('import-button')[0] as HTMLElement;
+		const importButton = this.rootElem.getElementsByClassName('import-button')[0] as HTMLElement;
 		importButton.addEventListener('click', event => {
 			try {
 				this.onImport(this.textElem.value || '');
@@ -137,17 +137,17 @@ export abstract class Importer extends Popup {
 		if (missingItems.length == 0 && missingEnchants.length == 0) {
 			alert('Import successful!');
 		} else {
-			alert('Import successful, but the following IDs were not found in the sim database:' + 
-					(missingItems.length == 0 ? '' : '\n\nItems: ' + missingItems.join(', ')) +
-					(missingEnchants.length == 0 ? '' : '\n\nEnchants: ' + missingEnchants.join(', ')));
+			alert('Import successful, but the following IDs were not found in the sim database:' +
+				(missingItems.length == 0 ? '' : '\n\nItems: ' + missingItems.join(', ')) +
+				(missingEnchants.length == 0 ? '' : '\n\nEnchants: ' + missingEnchants.join(', ')));
 		}
 	}
 }
 
 class IndividualJsonImporter<SpecType extends Spec> extends Importer {
 	private readonly simUI: IndividualSimUI<SpecType>;
-  constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-    super(parent, 'JSON Import');
+	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
+		super(parent, 'JSON Import');
 		this.simUI = simUI;
 
 		this.descriptionElem.innerHTML = `
@@ -175,8 +175,8 @@ class IndividualJsonImporter<SpecType extends Spec> extends Importer {
 
 class Individual70UImporter<SpecType extends Spec> extends Importer {
 	private readonly simUI: IndividualSimUI<SpecType>;
-  constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-    super(parent, '70 Upgrades Import');
+	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
+		super(parent, '70 Upgrades Import');
 		this.simUI = simUI;
 
 		this.descriptionElem.innerHTML = `
@@ -233,8 +233,8 @@ class Individual70UImporter<SpecType extends Spec> extends Importer {
 
 class IndividualAddonImporter<SpecType extends Spec> extends Importer {
 	private readonly simUI: IndividualSimUI<SpecType>;
-  constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-    super(parent, 'Addon Import');
+	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
+		super(parent, 'Addon Import');
 		this.simUI = simUI;
 
 		this.descriptionElem.innerHTML = `

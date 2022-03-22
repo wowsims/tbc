@@ -20,10 +20,10 @@ export interface MetricsColumnConfig<T> {
 	columnClass?: string,
 	sort?: ColumnSortType,
 
-  getValue?: (metric: T) => number,
+	getValue?: (metric: T) => number,
 
 	// Either getDisplayString or fillCell must be specified.
-  getDisplayString?: (metric: T) => string,
+	getDisplayString?: (metric: T) => string,
 	fillCell?: (metric: T, cellElem: HTMLElement, rowElem: HTMLElement) => void,
 };
 
@@ -35,8 +35,8 @@ export abstract class MetricsTable<T> extends ResultComponent {
 
 	readonly onUpdate = new TypedEvent<void>('MetricsTableUpdate');
 
-  constructor(config: ResultComponentConfig, columnConfigs: Array<MetricsColumnConfig<T>>) {
-    super(config);
+	constructor(config: ResultComponentConfig, columnConfigs: Array<MetricsColumnConfig<T>>) {
+		super(config);
 		this.columnConfigs = columnConfigs;
 
 		this.rootElem.innerHTML = `
@@ -73,8 +73,8 @@ export abstract class MetricsTable<T> extends ResultComponent {
 		});
 
 		const sortList = this.columnConfigs
-				.map((config, i) => [i, config.sort == ColumnSortType.Ascending ? 0 : 1])
-				.filter(sortData => this.columnConfigs[sortData[0]].sort);
+			.map((config, i) => [i, config.sort == ColumnSortType.Ascending ? 0 : 1])
+			.filter(sortData => this.columnConfigs[sortData[0]].sort);
 		$(this.tableElem).tablesorter({
 			sortList: sortList,
 			cssChildRow: 'child-metric',
@@ -172,7 +172,7 @@ export abstract class MetricsTable<T> extends ResultComponent {
 	}
 
 	// Override this to customize rowElem after it has been populated.
-	protected customizeRowElem(metric: T, rowElem: HTMLElement) {}
+	protected customizeRowElem(metric: T, rowElem: HTMLElement) { }
 
 	// Override this to provide custom merge behavior.
 	protected mergeMetrics(metrics: Array<T>): T {

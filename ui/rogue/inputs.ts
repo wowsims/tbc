@@ -132,8 +132,8 @@ export const RogueRotationConfig = {
 
 function makeBooleanRogueBuffInput(id: ActionId, optionsFieldName: keyof RogueOptions): IconPickerConfig<Player<any>, boolean> {
 	return {
-	  id: id,
-	  states: 2,
+		id: id,
+		states: 2,
 		changedEvent: (player: Player<Spec.SpecRogue>) => player.specOptionsChangeEmitter,
 		getValue: (player: Player<Spec.SpecRogue>) => player.getSpecOptions()[optionsFieldName] as boolean,
 		setValue: (eventID: EventID, player: Player<Spec.SpecRogue>, newValue: boolean) => {

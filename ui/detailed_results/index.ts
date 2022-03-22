@@ -174,24 +174,24 @@ document.body.classList.add('hide-threat-metrics');
 window.addEventListener('message', async event => {
 	const data = DetailedResultsUpdate.fromJson(event.data);
 	switch (data.data.oneofKind) {
-	case 'runData':
-		const runData = data.data.runData;
-		currentSimResult = await SimResult.fromProto(runData.run || SimRun.create());
-		updateResults();
-		break;
-	case 'settings':
-		const settings = data.data.settings;
-		if (settings.showThreatMetrics) {
-			document.body.classList.remove('hide-threat-metrics');
-		} else {
-			document.body.classList.add('hide-threat-metrics');
-		}
-		if (settings.showExperimental) {
-			document.body.classList.remove('hide-experimental');
-		} else {
-			document.body.classList.add('hide-experimental');
-		}
-		break;
+		case 'runData':
+			const runData = data.data.runData;
+			currentSimResult = await SimResult.fromProto(runData.run || SimRun.create());
+			updateResults();
+			break;
+		case 'settings':
+			const settings = data.data.settings;
+			if (settings.showThreatMetrics) {
+				document.body.classList.remove('hide-threat-metrics');
+			} else {
+				document.body.classList.add('hide-threat-metrics');
+			}
+			if (settings.showExperimental) {
+				document.body.classList.remove('hide-experimental');
+			} else {
+				document.body.classList.add('hide-experimental');
+			}
+			break;
 	}
 });
 

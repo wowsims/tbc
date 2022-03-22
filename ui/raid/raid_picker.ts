@@ -44,7 +44,7 @@ enum DragType {
 export class RaidPicker extends Component {
 	readonly raidSimUI: RaidSimUI;
 	readonly raid: Raid;
-  readonly partyPickers: Array<PartyPicker>;
+	readonly partyPickers: Array<PartyPicker>;
 	readonly newPlayerPicker: NewPlayerPicker;
 
 	// Hold data about the player being dragged while the drag is happening.
@@ -52,25 +52,25 @@ export class RaidPicker extends Component {
 	currentDragPlayerFromIndex: number = NEW_PLAYER;
 	currentDragType: DragType = DragType.New;
 
-  constructor(parent: HTMLElement, raidSimUI: RaidSimUI) {
-    super(parent, 'raid-picker-root');
+	constructor(parent: HTMLElement, raidSimUI: RaidSimUI) {
+		super(parent, 'raid-picker-root');
 		this.raidSimUI = raidSimUI;
 		this.raid = raidSimUI.sim.raid;
 
-    const raidViewer = document.createElement('div');
-    raidViewer.classList.add('current-raid-viewer');
-    this.rootElem.appendChild(raidViewer);
+		const raidViewer = document.createElement('div');
+		raidViewer.classList.add('current-raid-viewer');
+		this.rootElem.appendChild(raidViewer);
 		raidViewer.innerHTML = `
 			<div class="parties-container">
 			</div>
 		`;
 
-    const partiesContainer = this.rootElem.getElementsByClassName('parties-container')[0] as HTMLDivElement;
+		const partiesContainer = this.rootElem.getElementsByClassName('parties-container')[0] as HTMLDivElement;
 		this.partyPickers = this.raid.getParties().map((party, i) => new PartyPicker(partiesContainer, party, i, this));
 
-    const newPlayerPickerRoot = document.createElement('div');
-    newPlayerPickerRoot.classList.add('new-player-picker');
-    this.rootElem.appendChild(newPlayerPickerRoot);
+		const newPlayerPickerRoot = document.createElement('div');
+		newPlayerPickerRoot.classList.add('new-player-picker');
+		this.rootElem.appendChild(newPlayerPickerRoot);
 
 		this.newPlayerPicker = new NewPlayerPicker(newPlayerPickerRoot, this);
 
@@ -103,10 +103,10 @@ export class RaidPicker extends Component {
 
 	getBuffBots(): Array<BuffBot> {
 		return this.getPlayerPickers()
-				.filter(picker => picker.player instanceof BuffBot)
-				.map(picker => picker.player as BuffBot);
+			.filter(picker => picker.player instanceof BuffBot)
+			.map(picker => picker.player as BuffBot);
 	}
-	
+
 	setBuffBots(eventID: EventID, newBuffBotProtos: Array<BuffBotProto>) {
 		TypedEvent.freezeAllAndDo(() => {
 			this.getBuffBots().forEach(buffBot => this.getPlayerPicker(buffBot.getRaidIndex()).setPlayer(eventID, null));
@@ -154,10 +154,10 @@ export class PartyPicker extends Component {
 	readonly party: Party;
 	readonly index: number;
 	readonly raidPicker: RaidPicker;
-  readonly playerPickers: Array<PlayerPicker>;
+	readonly playerPickers: Array<PlayerPicker>;
 
-  constructor(parent: HTMLElement, party: Party, index: number, raidPicker: RaidPicker) {
-    super(parent, 'party-picker-root');
+	constructor(parent: HTMLElement, party: Party, index: number, raidPicker: RaidPicker) {
+		super(parent, 'party-picker-root');
 		this.party = party;
 		this.index = index;
 		this.raidPicker = raidPicker;
@@ -174,7 +174,7 @@ export class PartyPicker extends Component {
 			</div>
 		`;
 
-    const playersContainer = this.rootElem.getElementsByClassName('players-container')[0] as HTMLDivElement;
+		const playersContainer = this.rootElem.getElementsByClassName('players-container')[0] as HTMLDivElement;
 		this.playerPickers = [...Array(MAX_PARTY_SIZE).keys()].map(i => new PlayerPicker(playersContainer, this, i));
 
 		const dpsResultElem = this.rootElem.getElementsByClassName('party-results-dps')[0] as HTMLElement;
@@ -234,8 +234,8 @@ export class PlayerPicker extends Component {
 	private readonly dpsResultElem: HTMLElement;
 	private readonly referenceDeltaElem: HTMLElement;
 
-  constructor(parent: HTMLElement, partyPicker: PartyPicker, index: number) {
-    super(parent, 'player-picker-root');
+	constructor(parent: HTMLElement, partyPicker: PartyPicker, index: number) {
+		super(parent, 'player-picker-root');
 		this.index = index;
 		this.raidIndex = partyPicker.index * MAX_PARTY_SIZE + index;
 		this.player = null;
@@ -274,7 +274,7 @@ export class PlayerPicker extends Component {
 		this.dpsResultElem = this.rootElem.getElementsByClassName('player-results-dps')[0] as HTMLElement;
 		this.referenceDeltaElem = this.rootElem.getElementsByClassName('player-results-reference-delta')[0] as HTMLElement;
 
-    this.nameElem.addEventListener('input', event => {
+		this.nameElem.addEventListener('input', event => {
 			if (this.player instanceof Player) {
 				this.player.setName(TypedEvent.nextEventID(), this.nameElem.textContent || '');
 			}
@@ -397,7 +397,7 @@ export class PlayerPicker extends Component {
 					this.raidPicker.clearDragPlayer();
 					return;
 				}
-				
+
 				const dragType = this.raidPicker.currentDragType;
 
 				if (this.raidPicker.currentDragPlayerFromIndex != NEW_PLAYER) {
@@ -427,7 +427,7 @@ export class PlayerPicker extends Component {
 			'content': 'Edit',
 			'allowHTML': true,
 		});
-    editElem.addEventListener('click', event => {
+		editElem.addEventListener('click', event => {
 			if (this.player instanceof Player) {
 				new PlayerEditorModal(this.player);
 			}
@@ -531,8 +531,8 @@ export class PlayerPicker extends Component {
 }
 
 class PlayerEditorModal extends Component {
-  constructor(player: Player<any>) {
-    super(document.body, 'player-editor-modal');
+	constructor(player: Player<any>) {
+		super(document.body, 'player-editor-modal');
 
 		this.rootElem.id = 'playerEditorModal';
 		this.rootElem.innerHTML = `
@@ -561,8 +561,8 @@ class NewPlayerPicker extends Component {
 	readonly raidPicker: RaidPicker;
 	currentFaction: Faction;
 
-  constructor(parent: HTMLElement, raidPicker: RaidPicker) {
-    super(parent, 'new-player-picker-root');
+	constructor(parent: HTMLElement, raidPicker: RaidPicker) {
+		super(parent, 'new-player-picker-root');
 		this.raidPicker = raidPicker;
 		this.currentFaction = Faction.Alliance;
 
@@ -630,8 +630,8 @@ class NewPlayerPicker extends Component {
 				presetElem.classList.add('preset-picker');
 				classPresetsContainer.appendChild(presetElem);
 
-        const presetIconElem = document.createElement('img');
-        presetIconElem.classList.add('preset-picker-icon');
+				const presetIconElem = document.createElement('img');
+				presetIconElem.classList.add('preset-picker-icon');
 				presetElem.appendChild(presetIconElem);
 				presetIconElem.src = matchingPreset.iconUrl;
 				tippy(presetIconElem, {
@@ -665,9 +665,9 @@ class NewPlayerPicker extends Component {
 						// Need to wait because the gear might not be loaded yet.
 						this.raidPicker.raid.sim.waitForInit().then(() => {
 							newPlayer.setGear(
-									eventID,
-									this.raidPicker.raid.sim.lookupEquipmentSpec(
-											matchingPreset.defaultGear[this.raidPicker.getCurrentFaction()][this.raidPicker.getCurrentPhase()]));
+								eventID,
+								this.raidPicker.raid.sim.lookupEquipmentSpec(
+									matchingPreset.defaultGear[this.raidPicker.getCurrentFaction()][this.raidPicker.getCurrentPhase()]));
 						});
 
 						this.raidPicker.setDragPlayer(newPlayer, NEW_PLAYER, DragType.New);
@@ -689,8 +689,8 @@ class NewPlayerPicker extends Component {
 			}
 
 			const matchingBuffBots = buffBotPresets
-					.filter(buffBot => specToClass[buffBot.spec] == wowClass)
-					.filter(buffBot => !buffBot.deprecated);
+				.filter(buffBot => specToClass[buffBot.spec] == wowClass)
+				.filter(buffBot => !buffBot.deprecated);
 			if (matchingBuffBots.length == 0) {
 				return;
 			}
@@ -706,8 +706,8 @@ class NewPlayerPicker extends Component {
 				presetElem.classList.add('preset-picker-buff-bot');
 				classPresetsContainer.appendChild(presetElem);
 
-        const presetIconElem = document.createElement('img');
-        presetIconElem.classList.add('preset-picker-icon');
+				const presetIconElem = document.createElement('img');
+				presetIconElem.classList.add('preset-picker-icon');
 				presetElem.appendChild(presetIconElem);
 				presetIconElem.src = matchingBuffBot.iconUrl;
 				tippy(presetIconElem, {

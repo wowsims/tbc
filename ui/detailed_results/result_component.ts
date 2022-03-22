@@ -23,8 +23,8 @@ export abstract class ResultComponent extends Component {
 
 	private lastSimResult: SimResultData | null;
 
-  constructor(config: ResultComponentConfig) {
-    super(config.parent, config.rootCssClass || '');
+	constructor(config: ResultComponentConfig) {
+		super(config.parent, config.rootCssClass || '');
 		this.colorSettings = config.colorSettings;
 		this.lastSimResult = null;
 

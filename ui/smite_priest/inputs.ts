@@ -102,7 +102,7 @@ export const SmitePriestRotationConfig = {
 					player.setRotation(eventID, newRotation);
 				},
 			},
-		},	
+		},
 		{
 			type: 'boolean' as const,
 			cssClass: 'devplague-picker',
@@ -136,6 +136,6 @@ export const SmitePriestRotationConfig = {
 				},
 				enableWhen: (player: Player<Spec.SpecShadowPriest>) => player.getRace() == Race.RaceNightElf,
 			},
-		},	
+		},
 	],
 };

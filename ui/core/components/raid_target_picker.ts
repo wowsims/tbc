@@ -38,10 +38,10 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 	private readonly buttonElem: HTMLElement;
 	private readonly dropdownElem: HTMLElement;
 
-  constructor(parent: HTMLElement, modObj: ModObject, config: RaidTargetPickerConfig<ModObject>) {
-    super(parent, 'raid-target-picker-root', modObj, config);
+	constructor(parent: HTMLElement, modObj: ModObject, config: RaidTargetPickerConfig<ModObject>) {
+		super(parent, 'raid-target-picker-root', modObj, config);
 		this.rootElem.classList.add('dropdown-root');
-    this.config = config;
+		this.config = config;
 		this.raidTarget = emptyRaidTarget();
 
 		this.noTargetOption = {
@@ -53,7 +53,7 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 		};
 		this.currentOptions = [this.noTargetOption];
 
-    this.rootElem.innerHTML = `
+		this.rootElem.innerHTML = `
 			<div class="dropdown-button raid-target-picker-button"></div>
 			<div class="dropdown-panel raid-target-picker-dropdown"></div>
     `;
@@ -71,7 +71,7 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 		});
 
 		this.init();
-  }
+	}
 
 	private setOptions(eventID: EventID, options: Array<RaidTargetOption>) {
 		this.currentOptions = [this.noTargetOption].concat(options);
@@ -106,7 +106,7 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 		return RaidTarget.clone(this.raidTarget);
 	}
 
-  setInputValue(newValue: RaidTarget) {
+	setInputValue(newValue: RaidTarget) {
 		this.raidTarget = RaidTarget.clone(newValue);
 
 		const optionData = this.currentOptions.find(optionData => RaidTarget.equals(optionData.value, newValue));
@@ -116,7 +116,7 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 
 		this.buttonElem.innerHTML = '';
 		this.buttonElem.appendChild(RaidTargetPicker.makeOptionElem(optionData));
-  }
+	}
 
 	static makeOptionElem(data: RaidTargetElemOption): HTMLElement {
 		const optionContainer = document.createElement('div');

@@ -9,10 +9,10 @@ const STATS_LEN = getEnumValues(Stat).length;
  * This is an immutable type.
  */
 export class Stats {
-  private readonly stats: Array<number>;
+	private readonly stats: Array<number>;
 
-  constructor(stats?: Array<number>) {
-    this.stats = stats?.slice(0, STATS_LEN) || [];
+	constructor(stats?: Array<number>) {
+		this.stats = stats?.slice(0, STATS_LEN) || [];
 
 		if (this.stats.length < STATS_LEN) {
 			this.stats = this.stats.concat(new Array(STATS_LEN - (stats?.length || 0)).fill(0));
@@ -22,21 +22,21 @@ export class Stats {
 			if (this.stats[i] == null)
 				this.stats[i] = 0;
 		}
-  }
+	}
 
-  equals(other: Stats): boolean {
-    return this.stats.every((newStat, statIdx) => newStat == other.getStat(statIdx));
-  }
+	equals(other: Stats): boolean {
+		return this.stats.every((newStat, statIdx) => newStat == other.getStat(statIdx));
+	}
 
-  getStat(stat: Stat): number {
-    return this.stats[stat];
-  }
+	getStat(stat: Stat): number {
+		return this.stats[stat];
+	}
 
-  withStat(stat: Stat, value: number): Stats {
-    const newStats = this.stats.slice();
-    newStats[stat] = value;
-    return new Stats(newStats);
-  }
+	withStat(stat: Stat, value: number): Stats {
+		const newStats = this.stats.slice();
+		newStats[stat] = value;
+		return new Stats(newStats);
+	}
 
 	computeEP(epWeights: Stats): number {
 		let total = 0;
@@ -46,17 +46,17 @@ export class Stats {
 		return total;
 	}
 
-  asArray(): Array<number> {
-    return this.stats.slice();
-  }
+	asArray(): Array<number> {
+		return this.stats.slice();
+	}
 
-  toJson(): Object {
-    return this.asArray();
-  }
+	toJson(): Object {
+		return this.asArray();
+	}
 
-  static fromJson(obj: any): Stats {
-    return new Stats(obj as Array<number>);
-  }
+	static fromJson(obj: any): Stats {
+		return new Stats(obj as Array<number>);
+	}
 
 	static fromMap(statsMap: Partial<Record<Stat, number>>): Stats {
 		const statsArr = new Array(STATS_LEN).fill(0);

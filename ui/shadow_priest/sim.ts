@@ -16,7 +16,7 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -38,7 +38,7 @@ import * as ShadowPriestInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecShadowPriest>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecShadowPriest>) {
 		super(parentElem, player, {
 			cssClass: 'shadow-priest-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
@@ -72,8 +72,8 @@ export class ShadowPriestSimUI extends IndividualSimUI<Spec.SpecShadowPriest> {
 			],
 			modifyDisplayStats: (player: Player<Spec.SpecShadowPriest>, stats: Stats) => {
 				return stats.withStat(Stat.StatSpellHit,
-						stats.getStat(Stat.StatSpellHit)
-						+ player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+					stats.getStat(Stat.StatSpellHit)
+					+ player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
 			},
 
 			defaults: {

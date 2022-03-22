@@ -10,13 +10,13 @@ declare var tippy: any;
 export class AuraMetricsTable extends MetricsTable<AuraMetrics> {
 	private readonly useDebuffs: boolean;
 
-  constructor(config: ResultComponentConfig, useDebuffs: boolean) {
+	constructor(config: ResultComponentConfig, useDebuffs: boolean) {
 		if (useDebuffs) {
 			config.rootCssClass = 'debuff-metrics-root';
 		} else {
 			config.rootCssClass = 'buff-metrics-root';
 		}
-    super(config, [
+		super(config, [
 			MetricsTable.nameCellConfig((metric: AuraMetrics) => {
 				return {
 					name: metric.name,

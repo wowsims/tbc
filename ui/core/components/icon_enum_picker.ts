@@ -7,7 +7,7 @@ import { Input, InputConfig } from './input.js';
 export interface IconEnumValueConfig<ModObject, T> {
 	// One of these should be set. If actionId is set, shows the icon for that id. If
 	// color is set, shows that color.
-  actionId?: ActionId,
+	actionId?: ActionId,
 	color?: string,
 
 	value: T,
@@ -32,19 +32,19 @@ export interface IconEnumPickerConfig<ModObject, T> extends InputConfig<ModObjec
 // Icon-based UI for picking enum values.
 // ModObject is the object being modified (Sim, Player, or Target).
 export class IconEnumPicker<ModObject, T> extends Input<ModObject, T> {
-  private readonly config: IconEnumPickerConfig<ModObject, T>;
+	private readonly config: IconEnumPickerConfig<ModObject, T>;
 
 	private currentValue: T;
 
 	private readonly buttonElem: HTMLAnchorElement;
 
-  constructor(parent: HTMLElement, modObj: ModObject, config: IconEnumPickerConfig<ModObject, T>) {
-    super(parent, 'icon-enum-picker-root', modObj, config);
-    this.config = config;
+	constructor(parent: HTMLElement, modObj: ModObject, config: IconEnumPickerConfig<ModObject, T>) {
+		super(parent, 'icon-enum-picker-root', modObj, config);
+		this.config = config;
 		this.currentValue = this.config.zeroValue;
 		this.rootElem.classList.add('dropdown-root');
 
-    this.rootElem.innerHTML = `
+		this.rootElem.innerHTML = `
 			<a class="dropdown-button icon-enum-picker-button"></a>
 			<div class="dropdown-panel icon-enum-picker-dropdown"></div>
     `;
@@ -124,7 +124,7 @@ export class IconEnumPicker<ModObject, T> extends Input<ModObject, T> {
 		});
 
 		this.init();
-  }
+	}
 
 	private setActionImage(elem: HTMLAnchorElement, actionId: ActionId) {
 		actionId.fillAndSet(elem, true, true);
@@ -147,14 +147,14 @@ export class IconEnumPicker<ModObject, T> extends Input<ModObject, T> {
 		return this.currentValue;
 	}
 
-  setInputValue(newValue: T) {
-    this.currentValue = newValue;
+	setInputValue(newValue: T) {
+		this.currentValue = newValue;
 
-    if (!this.config.equals(this.currentValue, this.config.zeroValue)) {
-      this.rootElem.classList.add('active');
-    } else {
-      this.rootElem.classList.remove('active');
-    }
+		if (!this.config.equals(this.currentValue, this.config.zeroValue)) {
+			this.rootElem.classList.add('active');
+		} else {
+			this.rootElem.classList.remove('active');
+		}
 
 		const valueConfig = this.config.values.find(valueConfig => this.config.equals(valueConfig.value, this.currentValue))!;
 		if (valueConfig) {
@@ -162,7 +162,7 @@ export class IconEnumPicker<ModObject, T> extends Input<ModObject, T> {
 		} else if (this.config.backupIconUrl) {
 			const backupId = this.config.backupIconUrl(this.currentValue);
 			this.setActionImage(this.buttonElem, backupId);
-      this.rootElem.classList.remove('active');
+			this.rootElem.classList.remove('active');
 		}
-  }
+	}
 }

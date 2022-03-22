@@ -76,75 +76,75 @@ export class Player<SpecType extends Spec> {
 	private party: Party | null;
 	private raid: Raid | null;
 
-  readonly spec: Spec;
+	readonly spec: Spec;
 	private name: string = '';
-  private buffs: IndividualBuffs = IndividualBuffs.create();
-  private consumes: Consumes = Consumes.create();
-  private bonusStats: Stats = new Stats();
-  private gear: Gear = new Gear({});
-  private race: Race;
-  private rotation: SpecRotation<SpecType>;
-  private talents: SpecTalents<SpecType>;
-  private talentsString: string = '';
-  private specOptions: SpecOptions<SpecType>;
-  private cooldowns: Cooldowns = Cooldowns.create();
+	private buffs: IndividualBuffs = IndividualBuffs.create();
+	private consumes: Consumes = Consumes.create();
+	private bonusStats: Stats = new Stats();
+	private gear: Gear = new Gear({});
+	private race: Race;
+	private rotation: SpecRotation<SpecType>;
+	private talents: SpecTalents<SpecType>;
+	private talentsString: string = '';
+	private specOptions: SpecOptions<SpecType>;
+	private cooldowns: Cooldowns = Cooldowns.create();
 
-  private itemEPCache: Map<number, number> = new Map<number, number>();
-  private gemEPCache: Map<number, number> = new Map<number, number>();
-  private enchantEPCache: Map<number, number> = new Map<number, number>();
+	private itemEPCache: Map<number, number> = new Map<number, number>();
+	private gemEPCache: Map<number, number> = new Map<number, number>();
+	private enchantEPCache: Map<number, number> = new Map<number, number>();
 
-  readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
+	readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
 
 	private epWeights: Stats = new Stats();
 	private epWeightsForCalc: Stats = new Stats();
 	private currentStats: PlayerStats = PlayerStats.create();
 
-  readonly nameChangeEmitter = new TypedEvent<void>('PlayerName');
-  readonly buffsChangeEmitter = new TypedEvent<void>('PlayerBuffs');
-  readonly consumesChangeEmitter = new TypedEvent<void>('PlayerConsumes');
-  readonly bonusStatsChangeEmitter = new TypedEvent<void>('PlayerBonusStats');
-  readonly gearChangeEmitter = new TypedEvent<void>('PlayerGear');
-  readonly raceChangeEmitter = new TypedEvent<void>('PlayerRace');
-  readonly rotationChangeEmitter = new TypedEvent<void>('PlayerRotation');
-  readonly talentsChangeEmitter = new TypedEvent<void>('PlayerTalents');
-  // Talents dont have all fields so we need this.
-  readonly talentsStringChangeEmitter = new TypedEvent<void>('PlayerTalentsString');
-  readonly specOptionsChangeEmitter = new TypedEvent<void>('PlayerSpecOptions');
-  readonly cooldownsChangeEmitter = new TypedEvent<void>('PlayerCooldowns');
-  readonly epWeightsChangeEmitter = new TypedEvent<void>('PlayerEpWeights');
+	readonly nameChangeEmitter = new TypedEvent<void>('PlayerName');
+	readonly buffsChangeEmitter = new TypedEvent<void>('PlayerBuffs');
+	readonly consumesChangeEmitter = new TypedEvent<void>('PlayerConsumes');
+	readonly bonusStatsChangeEmitter = new TypedEvent<void>('PlayerBonusStats');
+	readonly gearChangeEmitter = new TypedEvent<void>('PlayerGear');
+	readonly raceChangeEmitter = new TypedEvent<void>('PlayerRace');
+	readonly rotationChangeEmitter = new TypedEvent<void>('PlayerRotation');
+	readonly talentsChangeEmitter = new TypedEvent<void>('PlayerTalents');
+	// Talents dont have all fields so we need this.
+	readonly talentsStringChangeEmitter = new TypedEvent<void>('PlayerTalentsString');
+	readonly specOptionsChangeEmitter = new TypedEvent<void>('PlayerSpecOptions');
+	readonly cooldownsChangeEmitter = new TypedEvent<void>('PlayerCooldowns');
+	readonly epWeightsChangeEmitter = new TypedEvent<void>('PlayerEpWeights');
 
-  readonly currentStatsEmitter = new TypedEvent<void>('PlayerCurrentStats');
+	readonly currentStatsEmitter = new TypedEvent<void>('PlayerCurrentStats');
 
-  // Emits when any of the above emitters emit.
-  readonly changeEmitter: TypedEvent<void>;
+	// Emits when any of the above emitters emit.
+	readonly changeEmitter: TypedEvent<void>;
 
-  constructor(spec: Spec, sim: Sim) {
+	constructor(spec: Spec, sim: Sim) {
 		this.sim = sim;
 		this.party = null;
 		this.raid = null;
 
-    this.spec = spec;
-    this.race = specToEligibleRaces[this.spec][0];
-    this.specTypeFunctions = specTypeFunctions[this.spec] as SpecTypeFunctions<SpecType>;
+		this.spec = spec;
+		this.race = specToEligibleRaces[this.spec][0];
+		this.specTypeFunctions = specTypeFunctions[this.spec] as SpecTypeFunctions<SpecType>;
 		this.rotation = this.specTypeFunctions.rotationCreate();
-    this.talents = this.specTypeFunctions.talentsCreate();
+		this.talents = this.specTypeFunctions.talentsCreate();
 		this.specOptions = this.specTypeFunctions.optionsCreate();
 
 		this.changeEmitter = TypedEvent.onAny([
-      this.nameChangeEmitter,
-      this.buffsChangeEmitter,
-      this.consumesChangeEmitter,
-      this.bonusStatsChangeEmitter,
-      this.gearChangeEmitter,
-      this.raceChangeEmitter,
-      this.rotationChangeEmitter,
-      this.talentsChangeEmitter,
-      this.talentsStringChangeEmitter,
-      this.specOptionsChangeEmitter,
+			this.nameChangeEmitter,
+			this.buffsChangeEmitter,
+			this.consumesChangeEmitter,
+			this.bonusStatsChangeEmitter,
+			this.gearChangeEmitter,
+			this.raceChangeEmitter,
+			this.rotationChangeEmitter,
+			this.talentsChangeEmitter,
+			this.talentsStringChangeEmitter,
+			this.specOptionsChangeEmitter,
 			this.cooldownsChangeEmitter,
 			this.epWeightsChangeEmitter,
 		], 'PlayerChange');
-  }
+	}
 
 	getSpecIcon(): string {
 		return getTalentTreeIcon(this.spec, this.getTalentsString());
@@ -232,7 +232,7 @@ export class Player<SpecType extends Spec> {
 		this.enchantEPCache = new Map();
 	}
 
-  async computeStatWeights(eventID: EventID, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
+	async computeStatWeights(eventID: EventID, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
 		const result = await this.sim.statWeights(this, epStats, epReferenceStat, onProgress);
 		this.setEpWeights(eventID, new Stats(result.epValues));
 		return result;
@@ -259,16 +259,16 @@ export class Player<SpecType extends Spec> {
 		//// TODO: Reference the parent event ID
 		//this.setCooldowns(TypedEvent.nextEventID(), newCooldowns);
 	}
-  
-  getName(): string {
-    return this.name;
-  }
-  setName(eventID: EventID, newName: string) {
-    if (newName != this.name) {
-      this.name = newName;
-      this.nameChangeEmitter.emit(eventID);
-    }
-  }
+
+	getName(): string {
+		return this.name;
+	}
+	setName(eventID: EventID, newName: string) {
+		if (newName != this.name) {
+			this.name = newName;
+			this.nameChangeEmitter.emit(eventID);
+		}
+	}
 
 	getLabel(): string {
 		if (this.party) {
@@ -277,78 +277,78 @@ export class Player<SpecType extends Spec> {
 			return this.name;
 		}
 	}
-  
-  getRace(): Race {
-    return this.race;
-  }
-  setRace(eventID: EventID, newRace: Race) {
-    if (newRace != this.race) {
-      this.race = newRace;
-      this.raceChangeEmitter.emit(eventID);
-    }
-  }
+
+	getRace(): Race {
+		return this.race;
+	}
+	setRace(eventID: EventID, newRace: Race) {
+		if (newRace != this.race) {
+			this.race = newRace;
+			this.raceChangeEmitter.emit(eventID);
+		}
+	}
 
 	getFaction(): Faction {
 		return raceToFaction[this.getRace()];
 	}
 
-  getBuffs(): IndividualBuffs {
-    // Make a defensive copy
-    return IndividualBuffs.clone(this.buffs);
-  }
+	getBuffs(): IndividualBuffs {
+		// Make a defensive copy
+		return IndividualBuffs.clone(this.buffs);
+	}
 
-  setBuffs(eventID: EventID, newBuffs: IndividualBuffs) {
-    if (IndividualBuffs.equals(this.buffs, newBuffs))
-      return;
+	setBuffs(eventID: EventID, newBuffs: IndividualBuffs) {
+		if (IndividualBuffs.equals(this.buffs, newBuffs))
+			return;
 
-    // Make a defensive copy
-    this.buffs = IndividualBuffs.clone(newBuffs);
-    this.buffsChangeEmitter.emit(eventID);
-  }
+		// Make a defensive copy
+		this.buffs = IndividualBuffs.clone(newBuffs);
+		this.buffsChangeEmitter.emit(eventID);
+	}
 
-  getConsumes(): Consumes {
-    // Make a defensive copy
-    return Consumes.clone(this.consumes);
-  }
+	getConsumes(): Consumes {
+		// Make a defensive copy
+		return Consumes.clone(this.consumes);
+	}
 
-  setConsumes(eventID: EventID, newConsumes: Consumes) {
-    if (Consumes.equals(this.consumes, newConsumes))
-      return;
+	setConsumes(eventID: EventID, newConsumes: Consumes) {
+		if (Consumes.equals(this.consumes, newConsumes))
+			return;
 
-    // Make a defensive copy
-    this.consumes = Consumes.clone(newConsumes);
-    this.consumesChangeEmitter.emit(eventID);
-  }
+		// Make a defensive copy
+		this.consumes = Consumes.clone(newConsumes);
+		this.consumesChangeEmitter.emit(eventID);
+	}
 
-  getCooldowns(): Cooldowns {
-    // Make a defensive copy
-    return Cooldowns.clone(this.cooldowns);
-  }
+	getCooldowns(): Cooldowns {
+		// Make a defensive copy
+		return Cooldowns.clone(this.cooldowns);
+	}
 
-  setCooldowns(eventID: EventID, newCooldowns: Cooldowns) {
-    if (Cooldowns.equals(this.cooldowns, newCooldowns))
-      return;
+	setCooldowns(eventID: EventID, newCooldowns: Cooldowns) {
+		if (Cooldowns.equals(this.cooldowns, newCooldowns))
+			return;
 
-    // Make a defensive copy
-    this.cooldowns = Cooldowns.clone(newCooldowns);
-    this.cooldownsChangeEmitter.emit(eventID);
-  }
+		// Make a defensive copy
+		this.cooldowns = Cooldowns.clone(newCooldowns);
+		this.cooldownsChangeEmitter.emit(eventID);
+	}
 
-  equipItem(eventID: EventID, slot: ItemSlot, newItem: EquippedItem | null) {
+	equipItem(eventID: EventID, slot: ItemSlot, newItem: EquippedItem | null) {
 		this.setGear(eventID, this.gear.withEquippedItem(slot, newItem));
-  }
+	}
 
-  getEquippedItem(slot: ItemSlot): EquippedItem | null {
-    return this.gear.getEquippedItem(slot);
-  }
+	getEquippedItem(slot: ItemSlot): EquippedItem | null {
+		return this.gear.getEquippedItem(slot);
+	}
 
-  getGear(): Gear {
-    return this.gear;
-  }
+	getGear(): Gear {
+		return this.gear;
+	}
 
-  setGear(eventID: EventID, newGear: Gear) {
-    if (newGear.equals(this.gear))
-      return;
+	setGear(eventID: EventID, newGear: Gear) {
+		if (newGear.equals(this.gear))
+			return;
 
 		// Commented for now because the UI for this is weird.
 		//// If trinkets have changed and there were cooldowns assigned for those trinkets,
@@ -403,55 +403,55 @@ export class Player<SpecType extends Spec> {
 			this.gearChangeEmitter.emit(eventID);
 			//this.setCooldowns(eventID, newCooldowns);
 		});
-  }
+	}
 
-  getBonusStats(): Stats {
-    return this.bonusStats;
-  }
+	getBonusStats(): Stats {
+		return this.bonusStats;
+	}
 
-  setBonusStats(eventID: EventID, newBonusStats: Stats) {
-    if (newBonusStats.equals(this.bonusStats))
-      return;
+	setBonusStats(eventID: EventID, newBonusStats: Stats) {
+		if (newBonusStats.equals(this.bonusStats))
+			return;
 
-    this.bonusStats = newBonusStats;
-    this.bonusStatsChangeEmitter.emit(eventID);
-  }
+		this.bonusStats = newBonusStats;
+		this.bonusStatsChangeEmitter.emit(eventID);
+	}
 
-  getRotation(): SpecRotation<SpecType> {
-    return this.specTypeFunctions.rotationCopy(this.rotation);
-  }
+	getRotation(): SpecRotation<SpecType> {
+		return this.specTypeFunctions.rotationCopy(this.rotation);
+	}
 
-  setRotation(eventID: EventID, newRotation: SpecRotation<SpecType>) {
-    if (this.specTypeFunctions.rotationEquals(newRotation, this.rotation))
-      return;
+	setRotation(eventID: EventID, newRotation: SpecRotation<SpecType>) {
+		if (this.specTypeFunctions.rotationEquals(newRotation, this.rotation))
+			return;
 
-    this.rotation = this.specTypeFunctions.rotationCopy(newRotation);
-    this.rotationChangeEmitter.emit(eventID);
-  }
+		this.rotation = this.specTypeFunctions.rotationCopy(newRotation);
+		this.rotationChangeEmitter.emit(eventID);
+	}
 
-  getTalents(): SpecTalents<SpecType> {
-    return this.specTypeFunctions.talentsCopy(this.talents);
-  }
+	getTalents(): SpecTalents<SpecType> {
+		return this.specTypeFunctions.talentsCopy(this.talents);
+	}
 
-  setTalents(eventID: EventID, newTalents: SpecTalents<SpecType>) {
-    if (this.specTypeFunctions.talentsEquals(newTalents, this.talents))
-      return;
+	setTalents(eventID: EventID, newTalents: SpecTalents<SpecType>) {
+		if (this.specTypeFunctions.talentsEquals(newTalents, this.talents))
+			return;
 
-    this.talents = this.specTypeFunctions.talentsCopy(newTalents);
-    this.talentsChangeEmitter.emit(eventID);
-  }
+		this.talents = this.specTypeFunctions.talentsCopy(newTalents);
+		this.talentsChangeEmitter.emit(eventID);
+	}
 
-  getTalentsString(): string {
-    return this.talentsString;
-  }
+	getTalentsString(): string {
+		return this.talentsString;
+	}
 
-  setTalentsString(eventID: EventID, newTalentsString: string) {
-    if (newTalentsString == this.talentsString)
-      return;
+	setTalentsString(eventID: EventID, newTalentsString: string) {
+		if (newTalentsString == this.talentsString)
+			return;
 
-    this.talentsString = newTalentsString;
-    this.talentsStringChangeEmitter.emit(eventID);
-  }
+		this.talentsString = newTalentsString;
+		this.talentsStringChangeEmitter.emit(eventID);
+	}
 
 	getTalentTree(): number {
 		return getTalentTree(this.getTalentsString());
@@ -461,17 +461,17 @@ export class Player<SpecType extends Spec> {
 		return getTalentTreeIcon(this.spec, this.getTalentsString());
 	}
 
-  getSpecOptions(): SpecOptions<SpecType> {
-    return this.specTypeFunctions.optionsCopy(this.specOptions);
-  }
+	getSpecOptions(): SpecOptions<SpecType> {
+		return this.specTypeFunctions.optionsCopy(this.specOptions);
+	}
 
-  setSpecOptions(eventID: EventID, newSpecOptions: SpecOptions<SpecType>) {
-    if (this.specTypeFunctions.optionsEquals(newSpecOptions, this.specOptions))
-      return;
+	setSpecOptions(eventID: EventID, newSpecOptions: SpecOptions<SpecType>) {
+		if (this.specTypeFunctions.optionsEquals(newSpecOptions, this.specOptions))
+			return;
 
-    this.specOptions = this.specTypeFunctions.optionsCopy(newSpecOptions);
-    this.specOptionsChangeEmitter.emit(eventID);
-  }
+		this.specOptions = this.specTypeFunctions.optionsCopy(newSpecOptions);
+		this.specOptionsChangeEmitter.emit(eventID);
+	}
 
 	computeStatsEP(stats?: Stats): number {
 		if (stats == undefined) {
@@ -534,12 +534,12 @@ export class Player<SpecType extends Spec> {
 			}
 		}
 		let ep = itemStats.computeEP(this.epWeightsForCalc);
-		
+
 		// unique items are slightly worse than non-unique because you can have only one.
 		if (item.unique) {
 			ep -= 0.01;
 		}
-		
+
 		const slot = getEligibleItemSlots(item)[0];
 		const enchants = this.sim.getEnchants(slot);
 		if (enchants.length > 0) {
@@ -571,36 +571,36 @@ export class Player<SpecType extends Spec> {
 		return ep;
 	}
 
-  setWowheadData(equippedItem: EquippedItem, elem: HTMLElement) {
-    let parts = [];
-    if (equippedItem.gems.length > 0) {
-      parts.push('gems=' + equippedItem.gems.map(gem => gem ? gem.id : 0).join(':'));
-    }
-    if (equippedItem.enchant != null) {
-      parts.push('ench=' + equippedItem.enchant.effectId);
-    }
-    parts.push('pcs=' + this.gear.asArray().filter(ei => ei != null).map(ei => ei!.item.id).join(':'));
+	setWowheadData(equippedItem: EquippedItem, elem: HTMLElement) {
+		let parts = [];
+		if (equippedItem.gems.length > 0) {
+			parts.push('gems=' + equippedItem.gems.map(gem => gem ? gem.id : 0).join(':'));
+		}
+		if (equippedItem.enchant != null) {
+			parts.push('ench=' + equippedItem.enchant.effectId);
+		}
+		parts.push('pcs=' + this.gear.asArray().filter(ei => ei != null).map(ei => ei!.item.id).join(':'));
 
-    elem.setAttribute('data-wowhead', parts.join('&'));
-  }
+		elem.setAttribute('data-wowhead', parts.join('&'));
+	}
 
 	toProto(): PlayerProto {
-    return withSpecProto(
-				this.spec,
-				PlayerProto.create({
-					name: this.getName(),
-					race: this.getRace(),
-					class: this.getClass(),
-					equipment: this.getGear().asSpec(),
-					consumes: this.getConsumes(),
-					bonusStats: this.getBonusStats().asArray(),
-					buffs: this.getBuffs(),
-					cooldowns: this.getCooldowns(),
-					talentsString: this.getTalentsString(),
-				}),
-				this.getRotation(),
-				this.getTalents(),
-				this.getSpecOptions());
+		return withSpecProto(
+			this.spec,
+			PlayerProto.create({
+				name: this.getName(),
+				race: this.getRace(),
+				class: this.getClass(),
+				equipment: this.getGear().asSpec(),
+				consumes: this.getConsumes(),
+				bonusStats: this.getBonusStats().asArray(),
+				buffs: this.getBuffs(),
+				cooldowns: this.getCooldowns(),
+				talentsString: this.getTalentsString(),
+			}),
+			this.getRotation(),
+			this.getTalents(),
+			this.getSpecOptions());
 	}
 
 	fromProto(eventID: EventID, proto: PlayerProto) {

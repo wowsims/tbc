@@ -14,7 +14,7 @@ declare var pako: any;
 
 // Config for displaying a warning to the user whenever a condition is met.
 export interface SimWarning {
-  updateOn: TypedEvent<any>,
+	updateOn: TypedEvent<any>,
 	shouldDisplay: () => boolean,
 	getContent: () => string,
 }
@@ -28,11 +28,11 @@ export interface SimUIConfig {
 
 // Shared UI for all individual sims and the raid sim.
 export abstract class SimUI extends Component {
-  readonly sim: Sim;
+	readonly sim: Sim;
 	readonly isWithinRaidSim: boolean;
 
-  // Emits when anything from the sim, raid, or encounter changes.
-  readonly changeEmitter;
+	// Emits when anything from the sim, raid, or encounter changes.
+	readonly changeEmitter;
 
 	readonly resultsPendingElem: HTMLElement;
 	readonly resultsContentElem: HTMLElement;
@@ -40,14 +40,14 @@ export abstract class SimUI extends Component {
 	private warnings: Array<SimWarning>;
 	private warningsTippy: any;
 
-  constructor(parentElem: HTMLElement, sim: Sim, config: SimUIConfig) {
+	constructor(parentElem: HTMLElement, sim: Sim, config: SimUIConfig) {
 		super(parentElem, 'sim-ui');
-    this.sim = sim;
-    this.rootElem.innerHTML = simHTML;
+		this.sim = sim;
+		this.rootElem.innerHTML = simHTML;
 		this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
 
 		this.changeEmitter = TypedEvent.onAny([
-      this.sim.changeEmitter,
+			this.sim.changeEmitter,
 		], 'SimUIChange');
 
 		const updateShowThreatMetrics = () => {
@@ -140,31 +140,31 @@ export abstract class SimUI extends Component {
 		});
 
 		if (document.location.href.includes("localhost")) {
-			fetch(document.location.protocol+"//"+document.location.host+"/version").then(resp => {
+			fetch(document.location.protocol + "//" + document.location.host + "/version").then(resp => {
 				resp.json()
-				.then((versionInfo) => {
-					if (versionInfo.outdated == 2) {
-						tippy(downloadBinary, {
-							'content': 'Newer version of simulator available for download',
-							'allowHTML': true,
-						});
-						downloadBinary.classList.add('downbinalert');
-						this.addToolbarItem(downloadBinary);
-					}
-				})
-				.catch(error => {
-					console.warn('No version info found!');
-				});
+					.then((versionInfo) => {
+						if (versionInfo.outdated == 2) {
+							tippy(downloadBinary, {
+								'content': 'Newer version of simulator available for download',
+								'allowHTML': true,
+							});
+							downloadBinary.classList.add('downbinalert');
+							this.addToolbarItem(downloadBinary);
+						}
+					})
+					.catch(error => {
+						console.warn('No version info found!');
+					});
 			});
 		} else {
 			tippy(downloadBinary, {
 				'content': 'Download simulator for faster simulating',
 				'allowHTML': true,
-			});	
+			});
 			downloadBinary.classList.add('downbinnorm');
 			this.addToolbarItem(downloadBinary);
 		}
-  }
+	}
 
 	addAction(name: string, cssClass: string, actFn: () => void) {
 		const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0] as HTMLElement;
@@ -211,7 +211,7 @@ export abstract class SimUI extends Component {
 
 	hideAllResults() {
 		this.resultsContentElem.style.display = 'none';
-    this.resultsPendingElem.style.display = 'none';
+		this.resultsPendingElem.style.display = 'none';
 	}
 
 	setResultsPending() {
@@ -222,7 +222,7 @@ export abstract class SimUI extends Component {
 	setResultsContent(innerHTML: string) {
 		this.resultsContentElem.innerHTML = innerHTML;
 		this.resultsContentElem.style.display = 'initial';
-    	this.resultsPendingElem.style.display = 'none';
+		this.resultsPendingElem.style.display = 'none';
 	}
 
 	private updateWarnings() {
