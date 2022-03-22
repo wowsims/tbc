@@ -97,6 +97,10 @@ export interface ShamanTalents {
      */
     improvedWeaponTotems: number;
     /**
+     * @generated from protobuf field: bool spirit_weapons = 36;
+     */
+    spiritWeapons: boolean;
+    /**
      * @generated from protobuf field: int32 elemental_weapons = 21;
      */
     elementalWeapons: number;

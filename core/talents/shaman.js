@@ -321,7 +321,7 @@ export const shamanTalentsConfig = [
                 maxPoints: 2,
             },
             {
-                //fieldName: 'spiritWeapons',
+                fieldName: 'spiritWeapons',
                 location: {
                     rowIdx: 4,
                     colIdx: 1,

@@ -186,6 +186,7 @@ class ShamanTalents$Type extends MessageType {
             { no: 18, name: "shamanistic_focus", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 19, name: "flurry", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 20, name: "improved_weapon_totems", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 36, name: "spirit_weapons", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 21, name: "elemental_weapons", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 22, name: "mental_quickness", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 23, name: "weapon_mastery", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -203,7 +204,7 @@ class ShamanTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { convection: 0, concussion: 0, callOfFlame: 0, elementalFocus: false, reverberation: 0, callOfThunder: 0, improvedFireTotems: 0, elementalDevastation: 0, elementalFury: false, unrelentingStorm: 0, elementalPrecision: 0, lightningMastery: 0, elementalMastery: false, lightningOverload: 0, totemOfWrath: false, ancestralKnowledge: 0, thunderingStrikes: 0, enhancingTotems: 0, shamanisticFocus: false, flurry: 0, improvedWeaponTotems: 0, elementalWeapons: 0, mentalQuickness: 0, weaponMastery: 0, dualWieldSpecialization: 0, unleashedRage: 0, stormstrike: false, shamanisticRage: false, totemicFocus: 0, naturesGuidance: 0, restorativeTotems: 0, tidalMastery: 0, naturesSwiftness: false, manaTideTotem: false, naturesBlessing: 0 };
+        const message = { convection: 0, concussion: 0, callOfFlame: 0, elementalFocus: false, reverberation: 0, callOfThunder: 0, improvedFireTotems: 0, elementalDevastation: 0, elementalFury: false, unrelentingStorm: 0, elementalPrecision: 0, lightningMastery: 0, elementalMastery: false, lightningOverload: 0, totemOfWrath: false, ancestralKnowledge: 0, thunderingStrikes: 0, enhancingTotems: 0, shamanisticFocus: false, flurry: 0, improvedWeaponTotems: 0, spiritWeapons: false, elementalWeapons: 0, mentalQuickness: 0, weaponMastery: 0, dualWieldSpecialization: 0, unleashedRage: 0, stormstrike: false, shamanisticRage: false, totemicFocus: 0, naturesGuidance: 0, restorativeTotems: 0, tidalMastery: 0, naturesSwiftness: false, manaTideTotem: false, naturesBlessing: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -276,6 +277,9 @@ class ShamanTalents$Type extends MessageType {
                     break;
                 case /* int32 improved_weapon_totems */ 20:
                     message.improvedWeaponTotems = reader.int32();
+                    break;
+                case /* bool spirit_weapons */ 36:
+                    message.spiritWeapons = reader.bool();
                     break;
                 case /* int32 elemental_weapons */ 21:
                     message.elementalWeapons = reader.int32();
@@ -394,6 +398,9 @@ class ShamanTalents$Type extends MessageType {
         /* int32 improved_weapon_totems = 20; */
         if (message.improvedWeaponTotems !== 0)
             writer.tag(20, WireType.Varint).int32(message.improvedWeaponTotems);
+        /* bool spirit_weapons = 36; */
+        if (message.spiritWeapons !== false)
+            writer.tag(36, WireType.Varint).bool(message.spiritWeapons);
         /* int32 elemental_weapons = 21; */
         if (message.elementalWeapons !== 0)
             writer.tag(21, WireType.Varint).int32(message.elementalWeapons);
