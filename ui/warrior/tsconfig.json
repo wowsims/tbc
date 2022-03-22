@@ -1,13 +1,13 @@
 {
-  "extends": "../tsconfig-base",
-  "compilerOptions": {
-    "composite": true,
-    "outDir": "../../dist/tbc/warrior",
-  },
-  "include": [
-    "**/*.ts",
-  ],
-  "references": [
-    { "path": "../core" },
-  ],
+	"extends": "../tsconfig-base",
+	"compilerOptions": {
+		"composite": true,
+		"outDir": "../../dist/tbc/warrior",
+	},
+	"include": [
+		"**/*.ts",
+	],
+	"references": [
+		{ "path": "../core" },
+	],
 }

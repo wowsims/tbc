@@ -8,67 +8,67 @@ import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { Component } from './component.js';
 
 export interface EncounterPickerConfig {
-  showTargetArmor: boolean;
-  showNumTargets: boolean;
-  showExecuteProportion: boolean;
+	showTargetArmor: boolean;
+	showNumTargets: boolean;
+	showExecuteProportion: boolean;
 }
 
 export class EncounterPicker extends Component {
-  constructor(parent: HTMLElement, modEncounter: Encounter, config: EncounterPickerConfig) {
-    super(parent, 'encounter-picker-root');
+	constructor(parent: HTMLElement, modEncounter: Encounter, config: EncounterPickerConfig) {
+		super(parent, 'encounter-picker-root');
 
-    new NumberPicker(this.rootElem, modEncounter, {
-      label: 'Duration',
-      changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
-      getValue: (encounter: Encounter) => encounter.getDuration(),
-      setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+		new NumberPicker(this.rootElem, modEncounter, {
+			label: 'Duration',
+			changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
+			getValue: (encounter: Encounter) => encounter.getDuration(),
+			setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 				encounter.setDuration(eventID, newValue);
-      },
-    });
-    new NumberPicker(this.rootElem, modEncounter, {
-      label: 'Duration +/-',
-      changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
-      getValue: (encounter: Encounter) => encounter.getDurationVariation(),
-      setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+			},
+		});
+		new NumberPicker(this.rootElem, modEncounter, {
+			label: 'Duration +/-',
+			changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
+			getValue: (encounter: Encounter) => encounter.getDurationVariation(),
+			setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 				encounter.setDurationVariation(eventID, newValue);
-      },
-    });
+			},
+		});
 
-    if (config.showTargetArmor) {
-      new NumberPicker(this.rootElem, modEncounter.primaryTarget, {
-        label: 'Target Armor',
-        changedEvent: (target: Target) => target.armorChangeEmitter,
-        getValue: (target: Target) => target.getArmor(),
-        setValue: (eventID: EventID, target: Target, newValue: number) => {
+		if (config.showTargetArmor) {
+			new NumberPicker(this.rootElem, modEncounter.primaryTarget, {
+				label: 'Target Armor',
+				changedEvent: (target: Target) => target.armorChangeEmitter,
+				getValue: (target: Target) => target.getArmor(),
+				setValue: (eventID: EventID, target: Target, newValue: number) => {
 					target.setArmor(eventID, newValue);
-        },
-      });
-    }
+				},
+			});
+		}
 
 		new EnumPicker(this.rootElem, modEncounter.primaryTarget, MobTypePickerConfig);
 
-    if (config.showNumTargets) {
-      new NumberPicker(this.rootElem, modEncounter, {
-        label: '# of Targets',
-        changedEvent: (encounter: Encounter) => encounter.numTargetsChangeEmitter,
-        getValue: (encounter: Encounter) => encounter.getNumTargets(),
-        setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+		if (config.showNumTargets) {
+			new NumberPicker(this.rootElem, modEncounter, {
+				label: '# of Targets',
+				changedEvent: (encounter: Encounter) => encounter.numTargetsChangeEmitter,
+				getValue: (encounter: Encounter) => encounter.getNumTargets(),
+				setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 					encounter.setNumTargets(eventID, newValue);
-        },
-      });
-    }
+				},
+			});
+		}
 
-    if (config.showExecuteProportion) {
-      new NumberPicker(this.rootElem, modEncounter, {
-        label: 'Execute Duration (%)',
+		if (config.showExecuteProportion) {
+			new NumberPicker(this.rootElem, modEncounter, {
+				label: 'Execute Duration (%)',
 				labelTooltip: 'Percentage of the total encounter duration, for which the targets will be considered to be in execute range (< 20% HP) for the purpose of effects like Warrior Execute or Mage Molten Fury.',
-        changedEvent: (encounter: Encounter) => encounter.executeProportionChangeEmitter,
-        getValue: (encounter: Encounter) => encounter.getExecuteProportion() * 100,
-        setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+				changedEvent: (encounter: Encounter) => encounter.executeProportionChangeEmitter,
+				getValue: (encounter: Encounter) => encounter.getExecuteProportion() * 100,
+				setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
 					encounter.setExecuteProportion(eventID, newValue / 100);
-        },
-      });
-    }
+				},
+			});
+		}
 	}
 }
 

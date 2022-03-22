@@ -121,6 +121,6 @@ export const ShadowPriestRotationConfig = {
 					player.setRotation(eventID, newRotation);
 				},
 			},
-		},		
+		},
 	],
 };

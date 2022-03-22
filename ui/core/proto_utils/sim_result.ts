@@ -188,15 +188,15 @@ export class RaidMetrics {
 
 	static async makeNew(resultData: SimResultData, raid: RaidProto, metrics: RaidMetricsProto, logs: Array<SimLog>): Promise<RaidMetrics> {
 		const numParties = Math.min(raid.parties.length, metrics.parties.length);
-		
+
 		const parties = await Promise.all(
-				[...new Array(numParties).keys()]
-						.map(i => PartyMetrics.makeNew(
-								resultData,
-								raid.parties[i],
-								metrics.parties[i],
-								i,
-								logs)));
+			[...new Array(numParties).keys()]
+				.map(i => PartyMetrics.makeNew(
+					resultData,
+					raid.parties[i],
+					metrics.parties[i],
+					i,
+					logs)));
 
 		return new RaidMetrics(raid, metrics, parties);
 	}
@@ -221,15 +221,15 @@ export class PartyMetrics {
 	static async makeNew(resultData: SimResultData, party: PartyProto, metrics: PartyMetricsProto, partyIndex: number, logs: Array<SimLog>): Promise<PartyMetrics> {
 		const numPlayers = Math.min(party.players.length, metrics.players.length);
 		const players = await Promise.all(
-				[...new Array(numPlayers).keys()]
-						.filter(i => party.players[i].class != Class.ClassUnknown)
-						.map(i => PlayerMetrics.makeNew(
-								resultData,
-								party.players[i],
-								metrics.players[i],
-								partyIndex * 5 + i,
-								false,
-								logs)));
+			[...new Array(numPlayers).keys()]
+				.filter(i => party.players[i].class != Class.ClassUnknown)
+				.map(i => PlayerMetrics.makeNew(
+					resultData,
+					party.players[i],
+					metrics.players[i],
+					partyIndex * 5 + i,
+					false,
+					logs)));
 
 		return new PartyMetrics(party, metrics, partyIndex, players);
 	}
@@ -269,16 +269,16 @@ export class PlayerMetrics {
 	readonly majorCooldownAuraUptimeLogs: Array<AuraUptimeLog>;
 
 	private constructor(
-			player: PlayerProto,
-			petActionId: ActionId | null,
-			metrics: PlayerMetricsProto,
-			raidIndex: number,
-			actions: Array<ActionMetrics>,
-			auras: Array<AuraMetrics>,
-			resources: Array<ResourceMetrics>,
-			pets: Array<PlayerMetrics>,
-			logs: Array<SimLog>,
-			resultData: SimResultData) {
+		player: PlayerProto,
+		petActionId: ActionId | null,
+		metrics: PlayerMetricsProto,
+		raidIndex: number,
+		actions: Array<ActionMetrics>,
+		auras: Array<AuraMetrics>,
+		resources: Array<ResourceMetrics>,
+		pets: Array<PlayerMetrics>,
+		logs: Array<SimLog>,
+		resultData: SimResultData) {
 		this.player = player;
 		this.metrics = metrics;
 
@@ -391,13 +391,13 @@ export class EncounterMetrics {
 	static async makeNew(resultData: SimResultData, encounter: EncounterProto, metrics: EncounterMetricsProto, logs: Array<SimLog>): Promise<EncounterMetrics> {
 		const numTargets = Math.min(encounter.targets.length, metrics.targets.length);
 		const targets = await Promise.all(
-				[...new Array(numTargets).keys()]
-						.map(i => TargetMetrics.makeNew(
-								resultData,
-								encounter.targets[i],
-								metrics.targets[i],
-								i,
-								logs)));
+			[...new Array(numTargets).keys()]
+				.map(i => TargetMetrics.makeNew(
+					resultData,
+					encounter.targets[i],
+					metrics.targets[i],
+					i,
+					logs)));
 
 		return new EncounterMetrics(encounter, metrics, targets);
 	}
@@ -474,12 +474,12 @@ export class AuraMetrics {
 			actionId = actionId.withoutTag();
 		}
 		return new AuraMetrics(
-				player,
-				actionId,
-				AuraMetricsProto.create({
-					uptimeSecondsAvg: Math.max(...auras.map(a => a.data.uptimeSecondsAvg)),
-				}),
-				firstAura.resultData);
+			player,
+			actionId,
+			AuraMetricsProto.create({
+				uptimeSecondsAvg: Math.max(...auras.map(a => a.data.uptimeSecondsAvg)),
+			}),
+			firstAura.resultData);
 	}
 
 	// Groups similar metrics, i.e. metrics with the same item/spell/other ID but
@@ -555,14 +555,14 @@ export class ResourceMetrics {
 			actionId = actionId.withoutTag();
 		}
 		return new ResourceMetrics(
-				player,
-				actionId,
-				ResourceMetricsProto.create({
-					events: sum(resources.map(a => a.data.events)),
-					gain: sum(resources.map(a => a.data.gain)),
-					actualGain: sum(resources.map(a => a.data.actualGain)),
-				}),
-				firstResource.resultData);
+			player,
+			actionId,
+			ResourceMetricsProto.create({
+				events: sum(resources.map(a => a.data.events)),
+				gain: sum(resources.map(a => a.data.gain)),
+				actualGain: sum(resources.map(a => a.data.actualGain)),
+			}),
+			firstResource.resultData);
 	}
 
 	// Groups similar metrics, i.e. metrics with the same item/spell/other ID but
@@ -653,12 +653,12 @@ export class ActionMetrics {
 	get hitAttempts() {
 		if (this.data.isMelee) {
 			return this.data.misses
-					+ this.data.dodges
-					+ this.data.parries
-					+ this.data.blocks
-					+ this.data.glances
-					+ this.data.crits
-					+ this.data.hits;
+				+ this.data.dodges
+				+ this.data.parries
+				+ this.data.blocks
+				+ this.data.glances
+				+ this.data.crits
+				+ this.data.hits;
 		} else {
 			return this.data.hits + this.data.misses;
 		}
@@ -730,22 +730,22 @@ export class ActionMetrics {
 			actionId = actionId.withoutTag();
 		}
 		return new ActionMetrics(
-				player,
-				actionId,
-				ActionMetricsProto.create({
-					isMelee: firstAction.isMeleeAction,
-					casts: sum(actions.map(a => a.data.casts)),
-					hits: sum(actions.map(a => a.data.hits)),
-					crits: sum(actions.map(a => a.data.crits)),
-					misses: sum(actions.map(a => a.data.misses)),
-					dodges: sum(actions.map(a => a.data.dodges)),
-					parries: sum(actions.map(a => a.data.parries)),
-					blocks: sum(actions.map(a => a.data.blocks)),
-					glances: sum(actions.map(a => a.data.glances)),
-					damage: sum(actions.map(a => a.data.damage)),
-					threat: sum(actions.map(a => a.data.threat)),
-				}),
-				firstAction.resultData);
+			player,
+			actionId,
+			ActionMetricsProto.create({
+				isMelee: firstAction.isMeleeAction,
+				casts: sum(actions.map(a => a.data.casts)),
+				hits: sum(actions.map(a => a.data.hits)),
+				crits: sum(actions.map(a => a.data.crits)),
+				misses: sum(actions.map(a => a.data.misses)),
+				dodges: sum(actions.map(a => a.data.dodges)),
+				parries: sum(actions.map(a => a.data.parries)),
+				blocks: sum(actions.map(a => a.data.blocks)),
+				glances: sum(actions.map(a => a.data.glances)),
+				damage: sum(actions.map(a => a.data.damage)),
+				threat: sum(actions.map(a => a.data.threat)),
+			}),
+			firstAction.resultData);
 	}
 
 	// Groups similar metrics, i.e. metrics with the same item/spell/other ID but

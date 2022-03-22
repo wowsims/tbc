@@ -5,9 +5,9 @@ import { ResultComponent, ResultComponentConfig, SimResultData } from './result_
 declare var Chart: any;
 
 export class DpsHistogram extends ResultComponent {
-  constructor(config: ResultComponentConfig) {
+	constructor(config: ResultComponentConfig) {
 		config.rootCssClass = 'dps-histogram-root';
-    super(config);
+		super(config);
 	}
 
 	onSimResult(resultData: SimResultData) {

@@ -1,21 +1,21 @@
 {
-  "extends": "../tsconfig-base",
-  "compilerOptions": {
-    "declaration": false,
-    "outDir": "../../dist/tbc/raid",
-  },
-  "include": [
-    "**/*.ts",
-  ],
-  "references": [
-    { "path": "../core" },
-    { "path": "../balance_druid" },
-    { "path": "../elemental_shaman" },
-    { "path": "../enhancement_shaman" },
-    { "path": "../hunter" },
-    { "path": "../mage" },
-    { "path": "../rogue" },
-    { "path": "../shadow_priest" },
-    { "path": "../smite_priest" },
-  ],
+	"extends": "../tsconfig-base",
+	"compilerOptions": {
+		"declaration": false,
+		"outDir": "../../dist/tbc/raid",
+	},
+	"include": [
+		"**/*.ts",
+	],
+	"references": [
+		{ "path": "../core" },
+		{ "path": "../balance_druid" },
+		{ "path": "../elemental_shaman" },
+		{ "path": "../enhancement_shaman" },
+		{ "path": "../hunter" },
+		{ "path": "../mage" },
+		{ "path": "../rogue" },
+		{ "path": "../shadow_priest" },
+		{ "path": "../smite_priest" },
+	],
 }

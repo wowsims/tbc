@@ -11,9 +11,9 @@ declare var $: any;
 declare var tippy: any;
 
 export class ResourceMetricsTable extends ResultComponent {
-  constructor(config: ResultComponentConfig) {
+	constructor(config: ResultComponentConfig) {
 		config.rootCssClass = 'resource-metrics-root';
-    super(config);
+		super(config);
 
 		const resourceTypes = (getEnumValues(ResourceType) as Array<ResourceType>).filter(val => val != ResourceType.ResourceTypeNone);
 		resourceTypes.forEach(resourceType => {
@@ -42,9 +42,9 @@ export class ResourceMetricsTable extends ResultComponent {
 export class TypedResourceMetricsTable extends MetricsTable<ResourceMetrics> {
 	readonly resourceType: ResourceType;
 
-  constructor(config: ResultComponentConfig, resourceType: ResourceType) {
+	constructor(config: ResultComponentConfig, resourceType: ResourceType) {
 		config.rootCssClass = 'resource-metrics-table-root';
-    super(config, [
+		super(config, [
 			MetricsTable.nameCellConfig((metric: ResourceMetrics) => {
 				return {
 					name: metric.name,

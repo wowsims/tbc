@@ -16,9 +16,9 @@ export class PlayerDamageMetricsTable extends MetricsTable<PlayerMetrics> {
 	private raidDps: number;
 	private maxDps: number;
 
-  constructor(config: ResultComponentConfig, resultsFilter: ResultsFilter) {
+	constructor(config: ResultComponentConfig, resultsFilter: ResultsFilter) {
 		config.rootCssClass = 'player-damage-metrics-root';
-    super(config, [
+		super(config, [
 			MetricsTable.playerNameCellConfig(),
 			{
 				name: 'Amount',
@@ -86,6 +86,6 @@ export class PlayerDamageMetricsTable extends MetricsTable<PlayerMetrics> {
 		const maxDpsIndex = maxIndex(players.map(player => player.dps.avg))!;
 		this.maxDps = players[maxDpsIndex].dps.avg;
 
-		return players.map(player => [ player ]);
+		return players.map(player => [player]);
 	}
 }

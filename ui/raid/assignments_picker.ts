@@ -23,8 +23,8 @@ export class AssignmentsPicker extends Component {
 	private readonly innervatesPicker: InnervatesPicker;
 	private readonly powerInfusionsPicker: PowerInfusionsPicker;
 
-  constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI) {
-    super(parentElem, 'assignments-picker-root');
+	constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI) {
+		super(parentElem, 'assignments-picker-root');
 		this.raidSimUI = raidSimUI;
 		this.innervatesPicker = new InnervatesPicker(this.rootElem, raidSimUI);
 		this.powerInfusionsPicker = new PowerInfusionsPicker(this.rootElem, raidSimUI);
@@ -45,8 +45,8 @@ abstract class AssignedBuffPicker extends Component {
 
 	private targetPickers: Array<AssignmentTargetPicker>;
 
-  constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI) {
-    super(parentElem, 'assigned-buff-picker-root');
+	constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI) {
+		super(parentElem, 'assigned-buff-picker-root');
 		this.raidSimUI = raidSimUI;
 		this.targetPickers = [];
 
@@ -239,20 +239,20 @@ class PowerInfusionsPicker extends AssignedBuffPicker {
 
 	getSourcePlayers(): Array<Player<any> | BuffBot> {
 		return this.raidSimUI.getPlayersAndBuffBots()
-				.filter(playerOrBot => playerOrBot?.getClass() == Class.ClassPriest)
-				.filter(playerOrBot => {
-					if (playerOrBot instanceof BuffBot) {
-						return playerOrBot.settings.buffBotId == 'Divine Spirit Priest';
-					} else {
-						const player = playerOrBot as Player<any>;
-						if (!(player as Player<Spec.SpecSmitePriest>).getTalents().powerInfusion) {
-							return false;
-						}
-						// Don't include shadow priests even if they have the talent, because they
-						// don't have a raid target option for this.
-						return player.spec == Spec.SpecSmitePriest;
+			.filter(playerOrBot => playerOrBot?.getClass() == Class.ClassPriest)
+			.filter(playerOrBot => {
+				if (playerOrBot instanceof BuffBot) {
+					return playerOrBot.settings.buffBotId == 'Divine Spirit Priest';
+				} else {
+					const player = playerOrBot as Player<any>;
+					if (!(player as Player<Spec.SpecSmitePriest>).getTalents().powerInfusion) {
+						return false;
 					}
-				}) as Array<Player<any> | BuffBot>;
+					// Don't include shadow priests even if they have the talent, because they
+					// don't have a raid target option for this.
+					return player.spec == Spec.SpecSmitePriest;
+				}
+			}) as Array<Player<any> | BuffBot>;
 	}
 
 	getPlayerValue(player: Player<any>): RaidTarget {

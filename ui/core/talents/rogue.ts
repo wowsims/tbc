@@ -6,8 +6,8 @@ import { Player } from '/tbc/core/player.js';
 import { TalentsConfig, TalentsPicker } from './talents_picker.js';
 
 export class RogueTalentsPicker extends TalentsPicker<Spec.SpecRogue> {
-  constructor(parent: HTMLElement, player: Player<Spec.SpecRogue>) {
-    super(parent, player, rogueTalentsConfig);
+	constructor(parent: HTMLElement, player: Player<Spec.SpecRogue>) {
+		super(parent, player, rogueTalentsConfig);
 	}
 }
 

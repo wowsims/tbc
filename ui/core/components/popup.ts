@@ -5,8 +5,8 @@ declare var $: any;
 
 export class Popup extends Component {
 
-  constructor(parent: HTMLElement) {
-    super(parent, 'popup');
+	constructor(parent: HTMLElement) {
+		super(parent, 'popup');
 
 		const computedStyles = window.getComputedStyle(parent);
 		this.rootElem.style.setProperty('--main-text-color', computedStyles.getPropertyValue('--main-text-color').trim());
@@ -17,7 +17,7 @@ export class Popup extends Component {
 		$(this.rootElem).bPopup({
 			onClose: () => this.rootElem.remove(),
 		});
-  }
+	}
 
 	protected addCloseButton() {
 		new CloseButton(this.rootElem, () => this.close());

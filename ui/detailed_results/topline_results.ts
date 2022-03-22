@@ -5,10 +5,10 @@ import { ResultComponent, ResultComponentConfig, SimResultData } from './result_
 import { RaidSimResultsManager } from '/tbc/core/components/raid_sim_action.js';
 
 export class ToplineResults extends ResultComponent {
-  constructor(config: ResultComponentConfig) {
+	constructor(config: ResultComponentConfig) {
 		config.rootCssClass = 'topline-results-root';
-    super(config);
-  }
+		super(config);
+	}
 
 	onSimResult(resultData: SimResultData) {
 		const players = resultData.result.getPlayers(resultData.filter);

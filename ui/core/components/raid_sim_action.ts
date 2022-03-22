@@ -9,7 +9,7 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 declare var tippy: any;
 
 export function addRaidSimAction(simUI: SimUI): RaidSimResultsManager {
-	simUI.addAction('DPS', 'dps-action', async () => simUI.runSim((progress: ProgressMetrics) =>{
+	simUI.addAction('DPS', 'dps-action', async () => simUI.runSim((progress: ProgressMetrics) => {
 		resultsManager.setSimProgress(progress);
 	}));
 
@@ -38,16 +38,16 @@ export class RaidSimResultsManager {
 	private currentData: ReferenceData | null = null;
 	private referenceData: ReferenceData | null = null;
 
-  constructor(simUI: SimUI) {
+	constructor(simUI: SimUI) {
 		this.simUI = simUI;
 
 		[
-      this.currentChangeEmitter,
-      this.referenceChangeEmitter,
-    ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
-  }
+			this.currentChangeEmitter,
+			this.referenceChangeEmitter,
+		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+	}
 
-  setSimProgress(progress: ProgressMetrics) {
+	setSimProgress(progress: ProgressMetrics) {
 		this.simUI.setResultsContent(`
 			<div class="results-sim">
 					<div class="results-sim-dps">
@@ -58,9 +58,9 @@ export class RaidSimResultsManager {
 					</div>
 			</div>
 		`);
-  }
+	}
 
-  setSimResult(eventID: EventID, simResult: SimResult) {
+	setSimResult(eventID: EventID, simResult: SimResult) {
 		this.currentData = {
 			simResult: simResult,
 			settings: {
@@ -88,10 +88,10 @@ export class RaidSimResultsManager {
       </div>
     `);
 
-    const simReferenceElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference')[0] as HTMLDivElement;
-    const simReferenceDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-diff')[0] as HTMLSpanElement;
+		const simReferenceElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference')[0] as HTMLDivElement;
+		const simReferenceDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-diff')[0] as HTMLSpanElement;
 
-    const simReferenceSetButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-set-reference')[0] as HTMLSpanElement;
+		const simReferenceSetButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-set-reference')[0] as HTMLSpanElement;
 		simReferenceSetButton.addEventListener('click', event => {
 			this.referenceData = this.currentData;
 			this.referenceChangeEmitter.emit(TypedEvent.nextEventID());
@@ -102,7 +102,7 @@ export class RaidSimResultsManager {
 			'allowHTML': true,
 		});
 
-    const simReferenceSwapButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-swap')[0] as HTMLSpanElement;
+		const simReferenceSwapButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-swap')[0] as HTMLSpanElement;
 		simReferenceSwapButton.addEventListener('click', event => {
 			TypedEvent.freezeAllAndDo(() => {
 				if (this.currentData && this.referenceData) {
@@ -125,7 +125,7 @@ export class RaidSimResultsManager {
 			'allowHTML': true,
 		});
 
-    const simReferenceDeleteButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-delete')[0] as HTMLSpanElement;
+		const simReferenceDeleteButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-delete')[0] as HTMLSpanElement;
 		simReferenceDeleteButton.addEventListener('click', event => {
 			this.referenceData = null;
 			this.referenceChangeEmitter.emit(TypedEvent.nextEventID());
@@ -137,11 +137,11 @@ export class RaidSimResultsManager {
 		});
 
 		this.updateReference();
-  }
+	}
 
 	private updateReference() {
-    const simReferenceElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference')[0] as HTMLDivElement;
-    const simReferenceDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-diff')[0] as HTMLSpanElement;
+		const simReferenceElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference')[0] as HTMLDivElement;
+		const simReferenceDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-diff')[0] as HTMLSpanElement;
 
 		if (!this.referenceData || !this.currentData) {
 			simReferenceElem.classList.remove('has-reference');
@@ -206,8 +206,8 @@ export class RaidSimResultsManager {
 	static makeToplineResultsContent(simResult: SimResult, isIndividualSim: boolean): string {
 		const dpsMetrics = simResult.raidMetrics.dps;
 		const playerMetrics = isIndividualSim
-				? simResult.raidMetrics.parties[0].players[0]
-				: null;
+			? simResult.raidMetrics.parties[0].players[0]
+			: null;
 
 		let content = `
 			<div class="results-sim-dps">

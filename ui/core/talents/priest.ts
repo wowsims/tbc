@@ -7,8 +7,8 @@ import { TalentsConfig, TalentsPicker } from './talents_picker.js';
 
 // Talents are the same for all Priest specs, so its ok to just use ShadowPriest here
 export class PriestTalentsPicker extends TalentsPicker<Spec.SpecShadowPriest> {
-  constructor(parent: HTMLElement, player: Player<Spec.SpecShadowPriest>) {
-    super(parent, player, priestTalentsConfig);
+	constructor(parent: HTMLElement, player: Player<Spec.SpecShadowPriest>) {
+		super(parent, player, priestTalentsConfig);
 	}
 }
 
@@ -260,7 +260,7 @@ export const priestTalentsConfig: TalentsConfig<Spec.SpecShadowPriest> = [
 				spellIds: [14889, 15008],
 				maxPoints: 5,
 			},
-			
+
 			{
 				//fieldName: 'spellWarding',
 				location: {

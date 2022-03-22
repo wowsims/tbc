@@ -6,8 +6,8 @@ import { TalentsConfig, TalentsPicker } from './talents_picker.js';
 
 // Talents are the same for all Shaman specs, so its ok to just use ElementalShaman here
 export class ShamanTalentsPicker extends TalentsPicker<Spec.SpecElementalShaman> {
-  constructor(parent: HTMLElement, player: Player<Spec.SpecElementalShaman>) {
-    super(parent, player, shamanTalentsConfig);
+	constructor(parent: HTMLElement, player: Player<Spec.SpecElementalShaman>) {
+		super(parent, player, shamanTalentsConfig);
 	}
 }
 

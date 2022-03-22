@@ -16,7 +16,7 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -37,7 +37,7 @@ import * as MageInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecMage>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecMage>) {
 		super(parentElem, player, {
 			cssClass: 'mage-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.

@@ -548,5 +548,5 @@ export const P5_PRESET = {
         }
       ]
     }`),
-	
+
 };

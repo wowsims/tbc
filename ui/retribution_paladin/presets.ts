@@ -10,7 +10,7 @@ import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
 import { RetributionPaladin_Rotation as RetributionPaladinRotation, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
-import { RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank,  RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
+import { RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank, RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
@@ -550,7 +550,7 @@ export const P5_PRESET = {
 			ItemSpec.create({
 				id: 34397, // Bladed Chaos Tunic
 				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
-				gems: [	
+				gems: [
 					Gems.SOVEREIGN_SHADOWSONG_AMETHYST,
 					Gems.INSCRIBED_PYRESTONE,
 					Gems.BOLD_CRIMSON_SPINEL,
@@ -559,14 +559,14 @@ export const P5_PRESET = {
 			ItemSpec.create({
 				id: 34431, // Lightbringer Bands
 				enchant: Enchants.WRIST_BRAWN,
-				gems: [	
+				gems: [
 					Gems.BOLD_CRIMSON_SPINEL,
 				],
 			}),
 			ItemSpec.create({
 				id: 34343, // Thal Ranger Gauntlets
 				enchant: Enchants.GLOVES_STRENGTH,
-				gems: [	
+				gems: [
 					Gems.BOLD_CRIMSON_SPINEL,
 					Gems.INSCRIBED_PYRESTONE,
 				],
@@ -580,7 +580,7 @@ export const P5_PRESET = {
 			ItemSpec.create({
 				id: 34180, // Fel Fury Legplates
 				enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
-				gems: [	
+				gems: [
 					Gems.SOVEREIGN_SHADOWSONG_AMETHYST,
 					Gems.BOLD_CRIMSON_SPINEL,
 					Gems.INSCRIBED_PYRESTONE,

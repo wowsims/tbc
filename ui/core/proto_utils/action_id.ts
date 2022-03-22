@@ -81,9 +81,9 @@ export class ActionId {
 
 	equalsIgnoringTag(other: ActionId): boolean {
 		return (
-				this.itemId == other.itemId
-				&& this.spellId == other.spellId
-				&& this.otherId == other.otherId);
+			this.itemId == other.itemId
+			&& this.spellId == other.spellId
+			&& this.otherId == other.otherId);
 	}
 
 	setBackground(elem: HTMLElement) {
@@ -176,7 +176,7 @@ export class ActionId {
 					if (this.tag === playerIndex) {
 						name += ` (self)`;
 					} else {
-						name += ` (from #${this.tag+1})`;
+						name += ` (from #${this.tag + 1})`;
 					}
 				}
 				break;
@@ -310,11 +310,11 @@ export class ActionId {
 			const idType = match[1];
 			const id = parseInt(match[5]);
 			return new ActionId(
-					idType == 'ItemID' ? id : 0,
-					idType == 'SpellID' ? id : 0,
-					idType == 'OtherID' ? id : 0,
-					match[7] ? parseInt(match[7]) : 0,
-					'', '', '');
+				idType == 'ItemID' ? id : 0,
+				idType == 'SpellID' ? id : 0,
+				idType == 'OtherID' ? id : 0,
+				match[7] ? parseInt(match[7]) : 0,
+				'', '', '');
 		} else {
 			console.warn('Failed to parse action id from log: ' + str);
 			return ActionId.fromEmpty();
@@ -324,7 +324,7 @@ export class ActionId {
 	private static async getTooltipDataHelper(id: number, tooltipPostfix: string, cache: Map<number, Promise<any>>): Promise<any> {
 		if (!cache.has(id)) {
 			cache.set(id,
-					fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
+				fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
 					.then(response => response.json()));
 		}
 
@@ -383,10 +383,10 @@ const petNameToIcon: Record<string, string> = {
 };
 
 export const resourceTypeToIcon: Record<ResourceType, string> = {
-  [ResourceType.ResourceTypeNone]: '',
-  [ResourceType.ResourceTypeMana]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
-  [ResourceType.ResourceTypeEnergy]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
-  [ResourceType.ResourceTypeRage]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
-  [ResourceType.ResourceTypeComboPoints]: 'https://wow.zamimg.com/images/wow/icons/large/inv_mace_2h_pvp410_c_01.jpg',
-  [ResourceType.ResourceTypeFocus]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
+	[ResourceType.ResourceTypeNone]: '',
+	[ResourceType.ResourceTypeMana]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
+	[ResourceType.ResourceTypeEnergy]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
+	[ResourceType.ResourceTypeRage]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
+	[ResourceType.ResourceTypeComboPoints]: 'https://wow.zamimg.com/images/wow/icons/large/inv_mace_2h_pvp410_c_01.jpg',
+	[ResourceType.ResourceTypeFocus]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
 };

@@ -76,27 +76,27 @@ func TestStatsEqualsWithTolerance_Failure(t *testing.T) {
 
 func TestStatDependencyManagerApplyStatDependencies_Success(t *testing.T) {
 	stats := Stats{
-		Stamina: 1,
+		Stamina:   1,
 		Intellect: 1,
 	}
 	sdm := StatDependencyManager{}
 	// Add these in the opposite order we expect them to be applied, to test the sorting.
 	sdm.AddStatDependency(StatDependency{
-		SourceStat: Intellect,
+		SourceStat:   Intellect,
 		ModifiedStat: Intellect,
 		Modifier: func(intellect float64, _ float64) float64 {
 			return intellect * 2
 		},
 	})
 	sdm.AddStatDependency(StatDependency{
-		SourceStat: Stamina,
+		SourceStat:   Stamina,
 		ModifiedStat: Intellect,
 		Modifier: func(stamina float64, intellect float64) float64 {
 			return intellect + stamina
 		},
 	})
 	sdm.AddStatDependency(StatDependency{
-		SourceStat: Stamina,
+		SourceStat:   Stamina,
 		ModifiedStat: Stamina,
 		Modifier: func(stamina float64, _ float64) float64 {
 			return stamina + 1
@@ -104,7 +104,7 @@ func TestStatDependencyManagerApplyStatDependencies_Success(t *testing.T) {
 	})
 	sdm.Finalize()
 	expectedResult := Stats{
-		Stamina: 2,
+		Stamina:   2,
 		Intellect: 6,
 	}
 

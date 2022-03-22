@@ -70,7 +70,7 @@ export const DefaultConsumes = Consumes.create({
 export const P1_PRESET = {
 	name: 'P1 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-  gear: EquipmentSpec.fromJsonString(`{"items": [
+	gear: EquipmentSpec.fromJsonString(`{"items": [
 		{
 			"id": 29044,
 			"enchant": 29192,
@@ -164,7 +164,7 @@ export const P1_PRESET = {
 export const P2_PRESET = {
 	name: 'P2 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-  gear: EquipmentSpec.fromJsonString(`{"items": [
+	gear: EquipmentSpec.fromJsonString(`{"items": [
 		{
 			"id": 30146,
 			"enchant": 29192,
@@ -260,7 +260,7 @@ export const P2_PRESET = {
 export const P3_PRESET = {
 	name: 'P3 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-  gear: EquipmentSpec.fromJsonString(`{"items": [
+	gear: EquipmentSpec.fromJsonString(`{"items": [
 		{
 			"id": 32235,
 			"enchant": 29192,
@@ -359,7 +359,7 @@ export const P3_PRESET = {
 export const P4_PRESET = {
 	name: 'P4 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-  gear: EquipmentSpec.fromJsonString(`{"items": [
+	gear: EquipmentSpec.fromJsonString(`{"items": [
 		{
 			"id": 32235,
 			"enchant": 29192,

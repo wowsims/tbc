@@ -18,30 +18,30 @@ export interface EnumPickerConfig<ModObject> extends InputConfig<ModObject, numb
 export class EnumPicker<ModObject> extends Input<ModObject, number> {
 	private readonly selectElem: HTMLSelectElement;
 
-  constructor(parent: HTMLElement, modObject: ModObject, config: EnumPickerConfig<ModObject>) {
-    super(parent, 'enum-picker-root', modObject, config);
+	constructor(parent: HTMLElement, modObject: ModObject, config: EnumPickerConfig<ModObject>) {
+		super(parent, 'enum-picker-root', modObject, config);
 
-    this.selectElem = document.createElement('select');
-    this.selectElem.classList.add('enum-picker-selector');
-    this.rootElem.appendChild(this.selectElem);
+		this.selectElem = document.createElement('select');
+		this.selectElem.classList.add('enum-picker-selector');
+		this.rootElem.appendChild(this.selectElem);
 
-    config.values.forEach((value) => {
-      const option = document.createElement('option');
-      option.value = String(value.value);
-      option.textContent = value.name;
-      this.selectElem.appendChild(option);
+		config.values.forEach((value) => {
+			const option = document.createElement('option');
+			option.value = String(value.value);
+			option.textContent = value.name;
+			this.selectElem.appendChild(option);
 
 			if (value.tooltip) {
 				option.title = value.tooltip;
 			}
-    });
+		});
 
 		this.init();
 
-    this.selectElem.addEventListener('change', event => {
+		this.selectElem.addEventListener('change', event => {
 			this.inputChanged(TypedEvent.nextEventID());
-    });
-  }
+		});
+	}
 
 	getInputElem(): HTMLElement {
 		return this.selectElem;

@@ -7,8 +7,8 @@ import { TalentsConfig, TalentsPicker } from './talents_picker.js';
 
 // Talents are the same for all Druid specs, so its ok to just use BalanceDruid here
 export class DruidTalentsPicker extends TalentsPicker<Spec.SpecBalanceDruid> {
-  constructor(parent: HTMLElement, player: Player<Spec.SpecBalanceDruid>) {
-    super(parent, player, druidTalentsConfig)
+	constructor(parent: HTMLElement, player: Player<Spec.SpecBalanceDruid>) {
+		super(parent, player, druidTalentsConfig)
 	}
 }
 

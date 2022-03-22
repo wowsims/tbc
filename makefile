@@ -159,8 +159,15 @@ update-tests:
 	find . -name "*.results" -type f -delete
 	find . -name "*.results.tmp" -exec bash -c 'cp "$$1" "$${1%.results.tmp}".results' _ {} \;
 
-fmt:
+fmt: tsfmt
 	gofmt -w ./sim
+	gofmt -w ./generate_items
+
+tsfmt:
+	for dir in $$(find ./ui -maxdepth 1 -type d -not -path "./ui" -not -path "./ui/worker"); do \
+		echo $$dir; \
+		npx tsfmt -r --useTsfmt ./tsfmt.json --baseDir $$dir; \
+	done
 
 # one time setup to install pre-commit hook for gofmt and npm install needed packages
 setup:

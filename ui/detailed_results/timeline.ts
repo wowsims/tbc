@@ -42,11 +42,11 @@ export class Timeline extends ResultComponent {
 	private rendered: boolean;
 
 	private hiddenIds: Array<ActionId>;
-  private hiddenIdsChangeEmitter;
+	private hiddenIdsChangeEmitter;
 
-  constructor(config: ResultComponentConfig) {
+	constructor(config: ResultComponentConfig) {
 		config.rootCssClass = 'timeline-root';
-    super(config);
+		super(config);
 		this.resultData = null;
 		this.rendered = false;
 		this.hiddenIds = [];
@@ -154,7 +154,7 @@ export class Timeline extends ResultComponent {
 				labels: {
 					show: true,
 					formatter: (defaultValue: string, timestamp: number) => {
-						return (timestamp/1000).toFixed(1);
+						return (timestamp / 1000).toFixed(1);
 					},
 				},
 				title: {
@@ -179,7 +179,7 @@ export class Timeline extends ResultComponent {
 		let tooltipHandlers: Array<TooltipHandler | null> = [];
 		options.tooltip = {
 			enabled: true,
-			custom: (data: {series: any, seriesIndex: number, dataPointIndex: number, w: any}) => {
+			custom: (data: { series: any, seriesIndex: number, dataPointIndex: number, w: any }) => {
 				if (tooltipHandlers[data.seriesIndex]) {
 					return tooltipHandlers[data.seriesIndex]!(data.dataPointIndex);
 				} else {
@@ -372,7 +372,7 @@ export class Timeline extends ResultComponent {
 				},
 				formatter: (val: string) => {
 					const v = parseFloat(val);
-					return `${v.toFixed(0)} (${(v/maxMana*100).toFixed(0)}%)`;
+					return `${v.toFixed(0)} (${(v / maxMana * 100).toFixed(0)}%)`;
 				},
 			},
 		} as any);
@@ -581,7 +581,7 @@ export class Timeline extends ResultComponent {
 				const resourceElem = document.createElement('div');
 				resourceElem.classList.add('rotation-timeline-resource', 'series-color', resourceNames[resourceType].toLowerCase().replaceAll(' ', '-'));
 				resourceElem.style.left = this.timeToPx(resourceLogGroup.timestamp);
-				resourceElem.style.width = this.timeToPx((resourceLogs[i+1]?.timestamp || duration) - resourceLogGroup.timestamp);
+				resourceElem.style.width = this.timeToPx((resourceLogs[i + 1]?.timestamp || duration) - resourceLogGroup.timestamp);
 				if (resourceType == ResourceType.ResourceTypeMana) {
 					resourceElem.textContent = (resourceLogGroup.valueAfter / startValue * 100).toFixed(0) + '%';
 				} else {
@@ -816,9 +816,9 @@ export class Timeline extends ResultComponent {
 
 	private resourceTooltip(log: ResourceChangedLogGroup, maxValue: number, includeAuras: boolean): string {
 		const valToDisplayString = log.resourceType == ResourceType.ResourceTypeMana
-				? (val: number) => `${val.toFixed(1)} (${(val/maxValue*100).toFixed(0)}%)`
-				: (val: number) => `${val.toFixed(1)}`;
-			
+			? (val: number) => `${val.toFixed(1)} (${(val / maxValue * 100).toFixed(0)}%)`
+			: (val: number) => `${val.toFixed(1)}`;
+
 		return `<div class="timeline-tooltip ${resourceNames[log.resourceType].toLowerCase().replaceAll(' ', '-')}">
 			<div class="timeline-tooltip-header">
 				<span class="bold">${log.timestamp.toFixed(2)}s</span>
@@ -870,16 +870,16 @@ export class Timeline extends ResultComponent {
 			</div>
 			<ul class="timeline-active-auras">
 				${log.activeAuras.map(auraLog => {
-					let iconElem = '';
-					if (auraLog.actionId!.iconUrl) {
-						iconElem = `<img class="timeline-tooltip-icon" src="${auraLog.actionId!.iconUrl}">`;
-					}
-					return `
+			let iconElem = '';
+			if (auraLog.actionId!.iconUrl) {
+				iconElem = `<img class="timeline-tooltip-icon" src="${auraLog.actionId!.iconUrl}">`;
+			}
+			return `
 					<li>
 						${iconElem}
 						<span>${auraLog.actionId!.name}</span>
 					</li>`;
-				}).join('')}
+		}).join('')}
 			</ul>
 		</div>
 		`;
@@ -905,13 +905,13 @@ const DEFAULT_ACTION_CATEGORY = 3;
 // Hard-coded spell categories for controlling rotation ordering.
 const idToCategoryMap: Record<number, number> = {
 	[OtherAction.OtherActionAttack]: 0,
-	[OtherAction.OtherActionShoot]:  0.5,
+	[OtherAction.OtherActionShoot]: 0.5,
 
 	// Hunter
 	[27014]: 0.1, // Raptor Strike
 
 	// Rogue
-	[6774]:  MELEE_ACTION_CATEGORY + 0.1, // Slice and Dice
+	[6774]: MELEE_ACTION_CATEGORY + 0.1, // Slice and Dice
 	[26866]: MELEE_ACTION_CATEGORY + 0.2, // Expose Armor
 	[26865]: MELEE_ACTION_CATEGORY + 0.3, // Eviscerate
 	[26867]: MELEE_ACTION_CATEGORY + 0.3, // Rupture
@@ -925,12 +925,12 @@ const idToCategoryMap: Record<number, number> = {
 	[25552]: SPELL_ACTION_CATEGORY + 0.2, // Magma Totem
 	[25537]: SPELL_ACTION_CATEGORY + 0.2, // Fire Nova Totem
 	[25359]: SPELL_ACTION_CATEGORY + 0.3, // Grace of Air Totem
-	[8512]:  SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r1
+	[8512]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r1
 	[10613]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r2
 	[10614]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r3
 	[25585]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r4
 	[25587]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r5
-	[2825]:  DEFAULT_ACTION_CATEGORY + 0.1, // Bloodlust
+	[2825]: DEFAULT_ACTION_CATEGORY + 0.1, // Bloodlust
 };
 
 const idsToGroupForRotation: Array<number> = [
