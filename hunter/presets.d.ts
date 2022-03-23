@@ -53,3 +53,15 @@ export declare const P3_SV_PRESET: {
     enableWhen: (player: Player<any>) => boolean;
     gear: EquipmentSpec;
 };
+export declare const P4_BM_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<any>) => boolean;
+    gear: EquipmentSpec;
+};
+export declare const P4_SV_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<any>) => boolean;
+    gear: EquipmentSpec;
+};

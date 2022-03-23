@@ -209,6 +209,7 @@ export class BalanceDruidSimUI extends IndividualSimUI {
                     Presets.P1_HORDE_PRESET,
                     Presets.P2_HORDE_PRESET,
                     Presets.P3_PRESET,
+                    Presets.P4_PRESET,
                 ],
             },
         });
