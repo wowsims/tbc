@@ -21,7 +21,6 @@ func init() {
 	core.AddItemEffect(28437, ApplyDrakefistHammer)
 	core.AddItemEffect(28438, ApplyDragonmaw)
 	core.AddItemEffect(28439, ApplyDragonstrike)
-	core.AddItemEffect(-23, ApplyDragonstrikeStacking)
 	core.AddItemEffect(28573, ApplyDespair)
 	core.AddItemEffect(28767, ApplyTheDecapitator)
 	core.AddItemEffect(28774, ApplyGlaiveOfThePit)
@@ -346,8 +345,7 @@ func ApplyDragonmaw(agent core.Agent) {
 }
 
 var DragonstrikeAuraID = core.NewAuraID()
-var DragonstrikeProcMHAuraID = core.NewAuraID()
-var DragonstrikeProcOHAuraID = core.NewAuraID()
+var DragonstrikeProcAuraID = core.NewAuraID()
 
 func ApplyDragonstrike(agent core.Agent) {
 	character := agent.GetCharacter()
@@ -357,7 +355,7 @@ func ApplyDragonstrike(agent core.Agent) {
 		const hasteBonus = 212.0
 		const dur = time.Second * 10
 		const procChance = 2.7 / 60.0
-		applyStatAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcMHAuraID, core.ActionID{ItemID: 28439}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
+		applyStatAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcAuraID, core.ActionID{ItemID: 28439}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
 
 		return core.Aura{
 			ID: DragonstrikeAuraID,
@@ -370,37 +368,6 @@ func ApplyDragonstrike(agent core.Agent) {
 				}
 
 				applyStatAura(sim)
-			},
-		}
-	})
-}
-
-func ApplyDragonstrikeStacking(agent core.Agent) {
-	character := agent.GetCharacter()
-	mh, oh := character.GetWeaponHands(-23)
-	procMask := core.GetMeleeProcMaskForHands(mh, oh)
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const hasteBonus = 212.0
-		const dur = time.Second * 10
-		const procChance = 2.7 / 60.0
-		applyStatMHAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcMHAuraID, core.ActionID{ItemID: 28439, Tag: 1}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
-		applyStatOHAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcOHAuraID, core.ActionID{ItemID: 28439, Tag: 2}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
-
-		return core.Aura{
-			ID: DragonstrikeAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) {
-					return
-				}
-				if sim.RandomFloat("Dragonstrike") > procChance {
-					return
-				}
-
-				if spellEffect.IsMH() {
-					applyStatMHAura(sim)
-				} else {
-					applyStatOHAura(sim)
-				}
 			},
 		}
 	})

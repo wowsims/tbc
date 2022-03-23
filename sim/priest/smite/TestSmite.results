@@ -201,12 +201,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestSmite-AllItems-Dragonstrike(StackingAuras)--23"
- value: {
-  dps: 1053.4024083490394
- }
-}
-dps_results: {
  key: "TestSmite-AllItems-Dragonstrike-28439"
  value: {
   dps: 1053.4024083490394

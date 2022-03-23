@@ -189,12 +189,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestBalance-AllItems-Dragonstrike(StackingAuras)--23"
- value: {
-  dps: 1302.1935453964481
- }
-}
-dps_results: {
  key: "TestBalance-AllItems-Dragonstrike-28439"
  value: {
   dps: 1302.1935453964481
@@ -581,7 +575,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-SelfDrums-DPS"
  value: {
-  dps: 1266.6642674779105
+  dps: 1267.4734604779107
  }
 }
 dps_results: {
