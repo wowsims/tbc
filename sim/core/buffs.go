@@ -433,7 +433,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 
 			cachedAttack = mhAttack
 			cachedAttack.Effect.Target = spellEffect.Target
-			cachedAttack.Cast(sim)
+			cachedAttack.CastAuto(sim)
 		},
 	}
 }

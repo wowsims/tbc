@@ -109,12 +109,12 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 }
 
 func (rogue *Rogue) procDeadlyPoison(sim *core.Simulation, spellEffect *core.SpellEffect) {
+	// TODO: DOTs should be modelled as DOT auras, applying their DebuffID
 	if rogue.deadlyPoison.IsInUse() {
 		dp := &rogue.deadlyPoisonRefresh
 		rogue.deadlyPoisonRefreshTemplate.Apply(dp)
 		dp.Effect.Target = spellEffect.Target
-		dp.Init(sim)
-		dp.Cast(sim)
+		dp.CastRefresh(sim)
 	} else {
 		dp := &rogue.deadlyPoison
 		rogue.deadlyPoisonTemplate.Apply(dp)

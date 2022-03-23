@@ -613,7 +613,7 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		ptr = replaceAMA
 	}
 
-	ptr.Cast(sim)
+	ptr.CastAuto(sim)
 	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	aa.previousMHSwingAt = sim.CurrentTime
 	aa.agent.OnAutoAttack(sim, ptr)
@@ -636,7 +636,7 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 
 	aa.cachedMelee = aa.OHAuto
 	aa.cachedMelee.Effect.Target = target
-	aa.cachedMelee.Cast(sim)
+	aa.cachedMelee.CastAuto(sim)
 	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
 	aa.agent.OnAutoAttack(sim, &aa.cachedMelee)
 }

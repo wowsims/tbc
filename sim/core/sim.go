@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"runtime"
 	"strings"
@@ -138,6 +139,8 @@ func (sim *Simulation) reset() {
 // Run runs the simulation for the configured number of iterations, and
 // collects all the metrics together.
 func (sim *Simulation) run() *proto.RaidSimResult {
+	t := time.Now()
+
 	logsBuffer := &strings.Builder{}
 	if sim.Options.Debug || sim.Options.DebugFirstIteration {
 		sim.Log = func(message string, vals ...interface{}) {
@@ -203,6 +206,10 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	// Final progress report
 	if sim.ProgressReport != nil {
 		sim.ProgressReport(&proto.ProgressMetrics{TotalIterations: sim.Options.Iterations, CompletedIterations: sim.Options.Iterations, Dps: result.RaidMetrics.Dps.Avg, FinalRaidResult: result})
+	}
+
+	if sim.Options.Iterations > 100 {
+		log.Printf("running %d iterations took %d ms", sim.Options.Iterations, time.Since(t).Milliseconds())
 	}
 
 	return result

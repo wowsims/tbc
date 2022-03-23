@@ -300,7 +300,7 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 					// Got a proc
 					cachedAttack = mhAttack
 					cachedAttack.Effect.Target = spellEffect.Target
-					cachedAttack.Cast(sim)
+					cachedAttack.CastAuto(sim)
 				},
 			}
 		})

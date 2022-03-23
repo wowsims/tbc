@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"time"
 )
 
@@ -172,6 +173,74 @@ func (spell *SimpleSpell) GetDuration() time.Duration {
 	} else {
 		return spell.CastTime
 	}
+}
+
+func (spell *SimpleSpell) CastAuto(sim *Simulation) {
+	cast := &spell.SpellCast
+	effect := &spell.Effect
+	character := spell.Character
+
+	character.OnBeforeSpellHit(sim, cast, effect)
+	effect.Target.OnBeforeSpellHit(sim, cast, effect)
+
+	effect.Outcome = effect.WhiteHitTableResult(sim, spell)
+
+	if effect.Landed() {
+		bonusWeaponDamage := character.PseudoStats.BonusDamage + effect.BonusWeaponDamage
+
+		dmg := 0.0
+		if !effect.WeaponInput.Offhand {
+			attackPower := character.stats[stats.AttackPower] + effect.BonusAttackPower + effect.BonusAttackPowerOnTarget
+			dmg += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
+		} else {
+			attackPower := character.stats[stats.AttackPower] + effect.BonusAttackPower + 2*effect.BonusAttackPowerOnTarget
+			dmg += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower)*0.5 + bonusWeaponDamage
+		}
+
+		dmg += effect.WeaponInput.FlatDamageBonus
+		dmg *= effect.WeaponInput.DamageMultiplier
+
+		dmg += effect.DirectInput.FlatDamageBonus
+
+		if effect.Outcome == OutcomeCrit {
+			dmg *= spell.CritMultiplier
+		} else if effect.Outcome == OutcomeGlance {
+			// TODO glancing blow damage reduction is actually a range ([65%, 85%] vs. 73)
+			dmg *= 0.75
+		}
+
+		// Apply damage reduction.
+		dmg *= 1 - effect.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+effect.BonusArmorPenetration)
+
+		// Apply all other effect multipliers.
+		dmg *= effect.DamageMultiplier * effect.StaticDamageMultiplier
+
+		effect.Damage += dmg
+	}
+
+	// since casts are currently temporary objects, this is wasteful
+	effect.applyResultsToCast(cast)
+	effect.afterCalculations(sim, spell)
+
+	character.Metrics.AddSpellCast(cast)
+	spell.objectInUse = false
+}
+
+func (spell *SimpleSpell) CastRefresh(sim *Simulation) {
+	cast := &spell.SpellCast
+	effect := &spell.Effect
+	character := spell.Character
+
+	character.OnBeforeSpellHit(sim, cast, effect)
+	effect.Target.OnBeforeSpellHit(sim, cast, effect)
+
+	if effect.hitCheck(sim, &spell.SpellCast) {
+		effect.Outcome = OutcomeHit
+	} else {
+		effect.Outcome = OutcomeMiss
+	}
+
+	effect.afterCalculations(sim, spell)
 }
 
 func (spell *SimpleSpell) Cast(sim *Simulation) bool {

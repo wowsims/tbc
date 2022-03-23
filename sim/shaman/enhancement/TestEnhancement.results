@@ -347,7 +347,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 1869.7056869536102
+  dps: 1879.9877672606424
  }
 }
 dps_results: {
@@ -365,7 +365,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Mana-EtchedRegalia"
  value: {
-  dps: 1447.6625129445104
+  dps: 1446.1915839481187
  }
 }
 dps_results: {
@@ -515,7 +515,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 1632.1377841945175
+  dps: 1627.3503296751715
  }
 }
 dps_results: {
