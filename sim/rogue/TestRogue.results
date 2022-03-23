@@ -207,12 +207,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestRogue-AllItems-Dragonstrike(StackingAuras)--23"
- value: {
-  dps: 1458.3828694054764
- }
-}
-dps_results: {
  key: "TestRogue-AllItems-Dragonstrike-28439"
  value: {
   dps: 1458.3828694054764
@@ -659,7 +653,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-SelfDrums-DPS"
  value: {
-  dps: 1443.6490878032198
+  dps: 1450.9916112285298
  }
 }
 dps_results: {

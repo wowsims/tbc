@@ -334,7 +334,6 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 				Cast: Cast{
 					ActionID:  actionID,
 					Character: character,
-					CastTime:  time.Second * 1,
 					GCD:       GCDDefault,
 					OnCastComplete: func(sim *Simulation, cast *Cast) {
 						// When a real player is using drums, their cast applies to the whole party.
