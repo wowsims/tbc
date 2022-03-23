@@ -985,3 +985,290 @@ export const P3_FROST_PRESET = {
 		],
 	}),
 };
+
+export const P4_ARCANE_PRESET = {
+	name: 'P4 Arcane Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 30206,
+			"enchant": 29191,
+			"gems": [
+				34220,
+				32204
+			]
+		},
+		{
+			"id": 33281
+		},
+		{
+			"id": 30210,
+			"enchant": 28886,
+			"gems": [
+				32204,
+				32215
+			]
+		},
+		{
+			"id": 32331,
+			"enchant": 33150
+		},
+		{
+			"id": 30196,
+			"enchant": 24003,
+			"gems": [
+				32204,
+				32204,
+				32215
+			]
+		},
+		{
+			"id": 30870,
+			"enchant": 22534,
+			"gems": [
+				32204
+			]
+		},
+		{
+			"id": 30205,
+			"enchant": 28272
+		},
+		{
+			"id": 30888,
+			"gems": [
+				32204,
+				32204
+			]
+		},
+		{
+			"id": 31058,
+			"enchant": 24274,
+			"gems": [
+				32204
+			]
+		},
+		{
+			"id": 32239,
+			"enchant": 35297,
+			"gems": [
+				32204,
+				32204
+			]
+		},
+		{
+			"id": 32527,
+			"enchant": 22536
+		},
+		{
+			"id": 29305,
+			"enchant": 22536
+		},
+		{
+			"id": 32483
+		},
+		{
+			"id": 30720
+		},
+		{
+			"id": 32374,
+			"enchant": 22560
+		},
+		{
+			"id": 33192,
+			"gems": [
+				32204
+			]
+		}
+	]}`),
+};
+
+export const P4_FIRE_PRESET = {
+	name: 'P4 Fire Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Fire,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 31056,
+			"enchant": 29191,
+			"gems": [
+				34220,
+				32196
+			]
+		},
+		{
+			"id": 32589
+		},
+		{
+			"id": 31059,
+			"enchant": 28886,
+			"gems": [
+				32221,
+				32215
+			]
+		},
+		{
+			"id": 32331,
+			"enchant": 33150
+		},
+		{
+			"id": 31057,
+			"enchant": 24003,
+			"gems": [
+				32221,
+				32221,
+				32215
+			]
+		},
+		{
+			"id": 32586,
+			"enchant": 22534
+		},
+		{
+			"id": 31055,
+			"enchant": 28272,
+			"gems": [
+				32196
+			]
+		},
+		{
+			"id": 32256
+		},
+		{
+			"id": 30916,
+			"enchant": 24274,
+			"gems": [
+				32196,
+				32196,
+				32196
+			]
+		},
+		{
+			"id": 32239,
+			"enchant": 35297,
+			"gems": [
+				32196,
+				32196
+			]
+		},
+		{
+			"id": 32527,
+			"enchant": 22536
+		},
+		{
+			"id": 32527,
+			"enchant": 22536
+		},
+		{
+			"id": 32483
+		},
+		{
+			"id": 33829
+		},
+		{
+			"id": 30910,
+			"enchant": 22560
+		},
+		{
+			"id": 30872
+		},
+		{
+			"id": 29982
+		}
+	]}`),
+};
+
+export const P4_FROST_PRESET = {
+	name: 'P4 Frost Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Frost,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 31056,
+			"enchant": 29191,
+			"gems": [
+				34220,
+				32196
+			]
+		},
+		{
+			"id": 33281
+		},
+		{
+			"id": 31059,
+			"enchant": 28886,
+			"gems": [
+				32221,
+				32215
+			]
+		},
+		{
+			"id": 32524,
+			"enchant": 33150
+		},
+		{
+			"id": 31057,
+			"enchant": 24003,
+			"gems": [
+				32221,
+				32221,
+				32215
+			]
+		},
+		{
+			"id": 32586,
+			"enchant": 22534
+		},
+		{
+			"id": 31055,
+			"enchant": 28272,
+			"gems": [
+				32196
+			]
+		},
+		{
+			"id": 32256
+		},
+		{
+			"id": 30916,
+			"enchant": 24274,
+			"gems": [
+				32196,
+				32196,
+				32196
+			]
+		},
+		{
+			"id": 32239,
+			"enchant": 35297,
+			"gems": [
+				32196,
+				32196
+			]
+		},
+		{
+			"id": 32527,
+			"enchant": 22536
+		},
+		{
+			"id": 32527,
+			"enchant": 22536
+		},
+		{
+			"id": 32483
+		},
+		{
+			"id": 33829
+		},
+		{
+			"id": 30910,
+			"enchant": 22560
+		},
+		{
+			"id": 30872
+		},
+		{
+			"id": 29982
+		}
+	]}`),
+};

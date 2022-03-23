@@ -231,6 +231,7 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 					Presets.P1_HORDE_PRESET,
 					Presets.P2_HORDE_PRESET,
 					Presets.P3_PRESET,
+					Presets.P4_PRESET,
 				],
 			},
 		});
