@@ -27,3 +27,13 @@ export declare const P3_PRESET: {
     tooltip: string;
     gear: EquipmentSpec;
 };
+export declare const P4_PRESET: {
+    name: string;
+    tooltip: string;
+    gear: EquipmentSpec;
+};
+export declare const P5_PRESET: {
+    name: string;
+    tooltip: string;
+    gear: EquipmentSpec;
+};
