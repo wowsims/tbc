@@ -51,6 +51,7 @@ var GCDCooldownID = NewCooldownID()
 var OffensiveTrinketSharedCooldownID = NewCooldownID()
 var DefensiveTrinketSharedCooldownID = NewCooldownID()
 
+type OnGain func(sim *Simulation)
 type OnExpire func(sim *Simulation)
 
 type Aura struct {
@@ -85,7 +86,8 @@ type Aura struct {
 	// properties of result.
 	OnSpellHit OnSpellHit
 
-	// Invoked when this Aura expires.
+	// Invoked when this Aura is added/remvoed. Neither is invoked on refresh.
+	OnGain   OnGain
 	OnExpire OnExpire
 
 	// Invoked when a dot tick occurs, before damage is calculated.
@@ -357,6 +359,10 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 
 	if sim.Log != nil && !newAura.ActionID.IsEmptyAction() {
 		at.logFn("Aura gained: %s", newAura.ActionID)
+	}
+
+	if at.auras[newAura.ID].OnGain != nil {
+		at.auras[newAura.ID].OnGain(sim)
 	}
 }
 

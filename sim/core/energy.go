@@ -28,9 +28,6 @@ type energyBar struct {
 
 	// Multiplies energy regen from ticks.
 	EnergyTickMultiplier float64
-
-	// Adds to the next tick. Can also be negative.
-	NextEnergyTickAdjustment float64
 }
 
 func (character *Character) EnableEnergyBar(maxEnergy float64, onEnergyGain OnEnergyGain) {
@@ -138,8 +135,7 @@ func (eb *energyBar) newTickAction(sim *Simulation, randomTickTime bool) {
 		NextActionAt: sim.CurrentTime + nextTickDuration,
 	}
 	pa.OnAction = func(sim *Simulation) {
-		eb.addEnergyInternal(sim, EnergyPerTick*eb.EnergyTickMultiplier+eb.NextEnergyTickAdjustment, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
-		eb.NextEnergyTickAdjustment = 0
+		eb.addEnergyInternal(sim, EnergyPerTick*eb.EnergyTickMultiplier, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
 		eb.character.TryUseCooldowns(sim)
 		eb.onEnergyGain(sim)
 
@@ -158,6 +154,5 @@ func (eb *energyBar) reset(sim *Simulation) {
 	eb.currentEnergy = eb.maxEnergy
 	eb.comboPoints = 0
 	eb.EnergyTickMultiplier = 1
-	eb.NextEnergyTickAdjustment = 0
 	eb.newTickAction(sim, true)
 }
