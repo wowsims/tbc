@@ -73,7 +73,8 @@ var ItemSetCycloneRegalia = core.ItemSet{
 							return // if not a crit or didn't proc, don't activate
 						}
 						character.AddAura(sim, core.Aura{
-							ID: Cyclone4PcManaRegainAuraID,
+							ID:       Cyclone4PcManaRegainAuraID,
+							Duration: time.Second * 15,
 							OnCast: func(sim *core.Simulation, cast *core.Cast) {
 								// TODO: how to make sure this goes in before clearcasting?
 								cast.Cost.Value -= 270

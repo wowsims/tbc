@@ -105,6 +105,9 @@ func (aura *Aura) Refresh(sim *Simulation) {
 	} else {
 		aura.expires = sim.CurrentTime + aura.Duration
 	}
+	if aura.expires == 0 {
+		panic("Aura with 0 duration!")
+	}
 }
 
 type AuraFactory func(*Simulation) Aura
@@ -271,7 +274,7 @@ func (at *auraTracker) advance(sim *Simulation) {
 	}
 
 	for _, id := range at.activeAuraIDs {
-		if aura := &at.auras[id]; aura.expires != 0 && aura.expires <= sim.CurrentTime {
+		if aura := &at.auras[id]; aura.expires <= sim.CurrentTime {
 			at.RemoveAura(sim, id)
 		}
 	}

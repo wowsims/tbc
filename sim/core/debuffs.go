@@ -459,6 +459,7 @@ func HuntersMarkAura(points int32, fullyStacked bool) Aura {
 		ID:       HuntersMarkDebuffID,
 		ActionID: ActionID{SpellID: 14325},
 		Stacks:   points, // Use this to check whether to override in hunter/hunter.go
+		Duration: NeverExpires,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellEffect.ProcMask.Matches(ProcMaskMelee) {
 				spellEffect.BonusAttackPowerOnTarget += meleeBonus
