@@ -114,6 +114,7 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfWisdom: TristateEffect.TristateEffectImproved,
+					blessingOfSalvation: true,
 				}),
 				debuffs: Debuffs.create({
 					judgementOfWisdom: true,
@@ -149,6 +150,7 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
+				IconInputs.BlessingOfSalvation,
 				IconInputs.Innervate,
 				IconInputs.PowerInfusion,
 			],
