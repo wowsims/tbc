@@ -14,15 +14,27 @@ message PaladinTalents {
 	int32 purifying_power = 6;
 	int32 holy_power = 7;
 	bool holy_shock = 8;
+	int32 blessed_life = 51;
 	int32 holy_guidance = 9;
 	bool divine_illumination = 10;
 
 	// Protection
+	int32 improved_devotion_aura = 35;
+	int32 redoubt = 36;
 	int32 precision = 11;
+	int32 toughness = 37;
 	bool blessing_of_kings = 12;
+	int32 improved_righteous_fury = 38;
+	int32 shield_specialization = 39;
+	int32 anticipation = 40;
+	int32 spell_warding = 41;
+	bool blessing_of_sanctuary = 42;
 	int32 reckoning = 13;
 	int32 sacred_duty = 14;
 	int32 one_handed_weapon_specialization = 15;
+	int32 improved_holy_shield = 43;
+	bool holy_shield = 44;
+	int32 ardent_defender = 45;
 	int32 combat_expertise = 16;
 	bool avengers_shield = 17;
 
@@ -31,9 +43,13 @@ message PaladinTalents {
 	int32 benediction = 19;
 	int32 improved_judgement = 20;
 	int32 improved_seal_of_the_crusader = 21;
+	int32 deflection = 46;
 	int32 vindication = 22;
 	int32 conviction = 23;
 	bool seal_of_command = 24;
+	int32 pursuit_of_justice = 47;
+	int32 eye_for_an_eye = 48;
+	int32 improved_retribution_aura = 49;
 	int32 crusade = 25;
 	int32 two_handed_weapon_specialization = 26;
 	bool sanctity_aura = 27;
@@ -41,6 +57,7 @@ message PaladinTalents {
 	int32 vengeance = 29;
 	int32 sanctified_judgement = 30;
 	int32 sanctified_seals = 31;
+	int32 divine_purpose = 50;
 	int32 fanaticism = 32;
 	bool crusader_strike = 33;
 }
