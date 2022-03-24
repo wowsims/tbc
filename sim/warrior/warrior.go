@@ -6,23 +6,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func RegisterWarrior() {
-	core.RegisterAgentFactory(
-		proto.Player_Warrior{},
-		proto.Spec_SpecWarrior,
-		func(character core.Character, options proto.Player) core.Agent {
-			return NewWarrior(character, options)
-		},
-		func(player *proto.Player, spec interface{}) {
-			playerSpec, ok := spec.(*proto.Player_Warrior)
-			if !ok {
-				panic("Invalid spec value for Warrior!")
-			}
-			player.Spec = playerSpec
-		},
-	)
-}
-
 const (
 	BattleStance = iota
 	DefensiveStance
@@ -32,12 +15,7 @@ const (
 type Warrior struct {
 	core.Character
 
-	Talents          proto.WarriorTalents
-	Options          proto.Warrior_Options
-	RotationType     proto.Warrior_Rotation_Type
-	ArmsSlamRotation proto.Warrior_Rotation_ArmsSlamRotation
-	ArmsDwRotation   proto.Warrior_Rotation_ArmsDWRotation
-	FuryRotation     proto.Warrior_Rotation_FuryRotation
+	Talents proto.WarriorTalents
 
 	// Current state
 	stance             int
@@ -74,36 +52,10 @@ func (warrior *Warrior) Reset(newsim *core.Simulation) {
 	warrior.heroicStrikeQueued = false
 }
 
-func NewWarrior(character core.Character, options proto.Player) *Warrior {
-	warriorOptions := options.GetWarrior()
-
+func NewWarrior(character core.Character, talents proto.WarriorTalents) *Warrior {
 	warrior := &Warrior{
-		Character:    character,
-		Talents:      *warriorOptions.Talents,
-		Options:      *warriorOptions.Options,
-		RotationType: warriorOptions.Rotation.Type,
-	}
-
-	warrior.EnableRageBar(warriorOptions.Options.StartingRage, func(sim *core.Simulation) {
-		if !warrior.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-			warrior.doRotation(sim)
-		}
-	})
-	warrior.EnableAutoAttacks(warrior, core.AutoAttackOptions{
-		MainHand:       warrior.WeaponFromMainHand(warrior.DefaultMeleeCritMultiplier()),
-		OffHand:        warrior.WeaponFromOffHand(warrior.DefaultMeleeCritMultiplier()),
-		AutoSwingMelee: true,
-		ReplaceMHSwing: func(sim *core.Simulation) *core.SimpleSpell {
-			return warrior.TryHeroicStrike(sim)
-		},
-	})
-
-	if warrior.RotationType == proto.Warrior_Rotation_ArmsSlam && warriorOptions.Rotation.ArmsSlam != nil {
-		warrior.ArmsSlamRotation = *warriorOptions.Rotation.ArmsSlam
-	} else if warrior.RotationType == proto.Warrior_Rotation_ArmsDW && warriorOptions.Rotation.ArmsDw != nil {
-		warrior.ArmsDwRotation = *warriorOptions.Rotation.ArmsDw
-	} else if warrior.RotationType == proto.Warrior_Rotation_Fury && warriorOptions.Rotation.Fury != nil {
-		warrior.FuryRotation = *warriorOptions.Rotation.Fury
+		Character: character,
+		Talents:   talents,
 	}
 
 	warrior.Character.AddStatDependency(stats.StatDependency{

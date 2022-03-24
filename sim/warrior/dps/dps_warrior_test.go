@@ -1,4 +1,4 @@
-package warrior
+package dps
 
 import (
 	"testing"
@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	RegisterWarrior()
+	RegisterDpsWarrior()
 }
 
 func TestWarrior(t *testing.T) {

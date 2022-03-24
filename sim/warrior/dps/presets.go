@@ -1,4 +1,4 @@
-package warrior
+package dps
 
 import (
 	"github.com/wowsims/tbc/sim/core/items"
