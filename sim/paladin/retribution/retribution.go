@@ -99,47 +99,7 @@ func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 		ret.openingRotation(sim)
 		return
 	}
-	ret._2007Rotation(sim)
-}
-
-func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
-	target := sim.GetPrimaryTarget()
-
-	// judge blood whenever we can
-	// if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
-	// 	judge := ret.NewJudgementOfBlood(sim, target)
-	// 	if judge != nil {
-	// 		if success := judge.Cast(sim); !success {
-	// 			ret.WaitForMana(sim, judge.Cost.Value)
-	// 		}
-	// 	}
-	// }
-
-	// roll seal of command
-	if !ret.HasAura(paladin.SealOfCommandAuraID) {
-		soc := ret.NewSealOfCommand(sim)
-		if success := soc.StartCast(sim); !success {
-			ret.WaitForMana(sim, soc.GetManaCost())
-		}
-		return
-	}
-
-	// Crusader strike if we can
-	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
-		cs := ret.NewCrusaderStrike(sim, target)
-		if success := cs.Cast(sim); !success {
-			ret.WaitForMana(sim, cs.Cost.Value)
-		}
-		return
-	}
-
-	// Proceed until SoB expires, CrusaderStrike comes off GCD, or Judgement comes off GCD
-	nextEventAt := ret.CDReadyAt(paladin.CrusaderStrikeCD)
-	socExpiration := sim.CurrentTime + ret.RemainingAuraDuration(sim, paladin.SealOfCommandAuraID)
-	nextEventAt = core.MinDuration(nextEventAt, socExpiration)
-	// Waiting for judgement CD causes a bug that infinite loops for some reason
-	// nextEventAt = core.MinDuration(nextEventAt, ret.CDReadyAt(paladin.JudgementCD))
-	ret.WaitUntil(sim, nextEventAt)
+	ret.ActRotation(sim)
 }
 
 func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
@@ -182,6 +142,154 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	}
 }
 
-func (ret *RetributionPaladin) testingMechanics(sim *core.Simulation) {
+// TO-DO maybe add low mana logic
+func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
+	target := sim.GetPrimaryTarget()
 
+	gcdCD := ret.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
+	crusaderStrikeCD := ret.GetRemainingCD(paladin.CrusaderStrikeCD, sim.CurrentTime)
+	judgmentCD := ret.GetRemainingCD(paladin.JudgementCD, sim.CurrentTime)
+
+	sobActive := ret.RemainingAuraDuration(sim, paladin.SealOfBloodAuraID) > 0
+	socActive := ret.RemainingAuraDuration(sim, paladin.SealOfCommandAuraID) > 0
+
+	nextSwing := ret.AutoAttacks.NextAttackAt() - sim.CurrentTime - ret.hasteLeeway
+	effWeaponSpeed := ret.AutoAttacks.MainhandSwingSpeed()
+	spellGCD := ret.SpellGCD()
+
+	twistWindow := ret.AutoAttacks.NextAttackAt() - 400*time.Millisecond
+	canTwist := sim.CurrentTime >= twistWindow && sim.CurrentTime <= ret.AutoAttacks.NextAttackAt()
+
+	// Check if we are on GCD
+	if gcdCD > 0 {
+		// Check if Judgement is off CD and Seal of Blood is active
+		if judgmentCD == 0 && sobActive {
+			// Check if Crusader Strike is off CD
+			if crusaderStrikeCD == 0 {
+				// Do nothing
+				return
+			} else {
+				// Check if Crusader Strike will be ready this swing
+				if crusaderStrikeCD < nextSwing {
+					// Do nothing
+					return
+				} else {
+					// Check if we can reseal after casting Crusader Strike
+					if gcdCD < nextSwing {
+						// Cast Judgement of Blood
+						judge := ret.NewJudgementOfBlood(sim, target)
+						if judge != nil {
+							if success := judge.Cast(sim); !success {
+								ret.WaitForMana(sim, judge.Cost.Value)
+							}
+						}
+						return
+					} else {
+						// Do Nothing
+						return
+					}
+				}
+			}
+		} else {
+			// do nothing
+			return
+		}
+	} else {
+		// Check if Seal of Command is active
+		if socActive {
+			// Check if we can use fillers
+			if effWeaponSpeed > spellGCD*2 &&
+				sim.CurrentTime+spellGCD < nextSwing {
+				ret.useFillers(sim)
+			} else {
+				// Check if we are in the twist window
+				if canTwist {
+					// Cast Seal of Blood
+					sob := ret.NewSealOfBlood(sim)
+					if success := sob.StartCast(sim); !success {
+						ret.WaitForMana(sim, sob.GetManaCost())
+					}
+					return
+				} else {
+					// Wait until twist window
+					ret.WaitUntil(sim, twistWindow)
+				}
+			}
+		} else {
+			// Check if Crusader Strike is ready
+			if crusaderStrikeCD == 0 {
+				// Check if Seal of Blood is active
+				if sobActive {
+					// Cast Crusader Strike
+					cs := ret.NewCrusaderStrike(sim, target)
+					if success := cs.Cast(sim); !success {
+						ret.WaitForMana(sim, cs.Cost.Value)
+					}
+					return
+				} else {
+					// Check if we can Crusader Strike and reseal
+					if sim.CurrentTime+crusaderStrikeCD > nextSwing {
+						// Cast Crusader Strike
+						cs := ret.NewCrusaderStrike(sim, target)
+						if success := cs.Cast(sim); !success {
+							ret.WaitForMana(sim, cs.Cost.Value)
+						}
+						return
+					} else {
+						// Cast Seal of Blood
+						sob := ret.NewSealOfBlood(sim)
+						if success := sob.StartCast(sim); !success {
+							ret.WaitForMana(sim, sob.GetManaCost())
+						}
+					}
+				}
+			} else {
+
+			}
+		}
+	}
+}
+
+func (ret *RetributionPaladin) useFillers(sim *core.Simulation) {
+	return
+}
+
+func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
+	target := sim.GetPrimaryTarget()
+
+	// judge blood whenever we can
+	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
+		judge := ret.NewJudgementOfBlood(sim, target)
+		if judge != nil {
+			if success := judge.Cast(sim); !success {
+				ret.WaitForMana(sim, judge.Cost.Value)
+			}
+		}
+	}
+
+	// roll seal of blood
+	if !ret.HasAura(paladin.SealOfBloodAuraID) {
+		sob := ret.NewSealOfBlood(sim)
+		if success := sob.StartCast(sim); !success {
+			ret.WaitForMana(sim, sob.GetManaCost())
+		}
+		return
+	}
+
+	// Crusader strike if we can
+	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
+		cs := ret.NewCrusaderStrike(sim, target)
+		if success := cs.Cast(sim); !success {
+			ret.WaitForMana(sim, cs.Cost.Value)
+		}
+		return
+	}
+
+	// Proceed until SoB expires, CrusaderStrike comes off GCD, or Judgement comes off GCD
+	nextEventAt := ret.CDReadyAt(paladin.CrusaderStrikeCD)
+	sobExpiration := sim.CurrentTime + ret.RemainingAuraDuration(sim, paladin.SealOfBloodAuraID)
+	nextEventAt = core.MinDuration(nextEventAt, sobExpiration)
+	// Waiting for judgement CD causes a bug that infinite loops for some reason
+	// nextEventAt = core.MinDuration(nextEventAt, ret.CDReadyAt(paladin.JudgementCD))
+	ret.WaitUntil(sim, nextEventAt)
 }
