@@ -11,7 +11,7 @@ import (
 	"github.com/wowsims/tbc/sim/rogue"
 	"github.com/wowsims/tbc/sim/shaman/elemental"
 	"github.com/wowsims/tbc/sim/shaman/enhancement"
-	"github.com/wowsims/tbc/sim/warrior"
+	dpsWarrior "github.com/wowsims/tbc/sim/warrior/dps"
 )
 
 var registered = false
@@ -29,7 +29,7 @@ func RegisterAll() {
 	mage.RegisterMage()
 	shadow.RegisterShadowPriest()
 	rogue.RegisterRogue()
-	warrior.RegisterWarrior()
+	dpsWarrior.RegisterDpsWarrior()
 	retribution.RegisterRetributionPaladin()
 	smite.RegisterSmitePriest()
 }
