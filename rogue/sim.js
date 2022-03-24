@@ -28,14 +28,6 @@ export class RogueSimUI extends IndividualSimUI {
                 'Rotations are not fully optimized, especially for non-standard setups.',
             ],
             warnings: [
-                // Warning to use all 4 totems if T6 2pc bonus is active.
-                (simUI) => {
-                    return {
-                        updateOn: simUI.player.changeEmitter,
-                        shouldDisplay: () => true,
-                        getContent: () => 'This sim is newly released, and likely still has some bugs. Please let us know if you spot any!',
-                    };
-                },
                 (simUI) => {
                     return {
                         updateOn: simUI.player.changeEmitter,
@@ -76,6 +68,25 @@ export class RogueSimUI extends IndividualSimUI {
                         + 3 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE);
                 }
                 return stats;
+            },
+            statBreakdowns: (player, stats) => {
+                const totalHit = stats.getStat(Stat.StatMeleeHit);
+                const hasImpFF = player.sim.encounter.primaryTarget.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
+                const debuffsHit = hasImpFF ? 3 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE : 0;
+                const talentsHit = player.getTalents().precision * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE;
+                const consumesHit = player.getConsumes().food == Food.FoodSpicyHotTalbuk ? 20 : 0;
+                const buffsHit = player.getParty()?.getBuffs().draeneiRacialMelee ? 1 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE : 0;
+                const gearHit = totalHit - debuffsHit - buffsHit - consumesHit - talentsHit;
+                return {
+                    [Stat.StatMeleeHit]: [
+                        { label: 'Gear', value: gearHit },
+                        { label: 'Talents', value: talentsHit },
+                        { label: 'Consumes', value: consumesHit },
+                        { label: 'Buffs', value: buffsHit },
+                        { label: 'Debuffs', value: debuffsHit },
+                        { label: 'Total', value: totalHit },
+                    ].filter(b => b.value != 0),
+                };
             },
             defaults: {
                 // Default equipped gear.

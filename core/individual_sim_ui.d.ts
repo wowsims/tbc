@@ -1,6 +1,7 @@
 import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
+import { StatBreakdown } from '/tbc/core/components/character_stats.js';
 import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
@@ -77,6 +78,7 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
     epReferenceStat: Stat;
     displayStats: Array<Stat>;
     modifyDisplayStats?: (player: Player<SpecType>, stats: Stats) => Stats;
+    statBreakdowns?: (player: Player<SpecType>, stats: Stats) => Partial<Record<Stat, StatBreakdown>>;
     defaults: {
         gear: EquipmentSpec;
         epWeights: Stats;
