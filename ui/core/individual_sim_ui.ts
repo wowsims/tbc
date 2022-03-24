@@ -2,7 +2,7 @@ import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { BonusStatsPicker } from '/tbc/core/components/bonus_stats_picker.js';
 import { BooleanPicker, BooleanPickerConfig } from '/tbc/core/components/boolean_picker.js';
-import { CharacterStats } from '/tbc/core/components/character_stats.js';
+import { CharacterStats, StatBreakdown } from '/tbc/core/components/character_stats.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
@@ -163,6 +163,7 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
 	epReferenceStat: Stat;
 	displayStats: Array<Stat>;
 	modifyDisplayStats?: (player: Player<SpecType>, stats: Stats) => Stats,
+	statBreakdowns?: (player: Player<SpecType>, stats: Stats) => Partial<Record<Stat, StatBreakdown>>,
 
 	defaults: {
 		gear: EquipmentSpec,
@@ -353,7 +354,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			this.rootElem.getElementsByClassName('sim-sidebar-footer')[0] as HTMLElement,
 			this.player,
 			this.individualConfig.displayStats,
-			this.individualConfig.modifyDisplayStats);
+			this.individualConfig.modifyDisplayStats,
+			this.individualConfig.statBreakdowns);
 	}
 
 	private addTopbarComponents() {
