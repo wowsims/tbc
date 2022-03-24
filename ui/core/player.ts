@@ -205,7 +205,7 @@ export class Player<SpecType extends Spec> {
 
 	// Returns all items that this player can wear in the given slot.
 	getItems(slot: ItemSlot | undefined): Array<Item> {
-		return this.sim.getItems(slot).filter(item => canEquipItem(item, this.spec));
+		return this.sim.getItems(slot).filter(item => canEquipItem(item, this.spec, slot));
 	}
 
 	// Returns all enchants that this player can wear in the given slot.
