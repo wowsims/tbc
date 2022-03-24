@@ -99,6 +99,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                     blessingOfKings: true,
                     blessingOfWisdom: TristateEffect.TristateEffectImproved,
                     blessingOfMight: TristateEffect.TristateEffectImproved,
+                    blessingOfSalvation: true,
                 }),
                 debuffs: Debuffs.create({
                     bloodFrenzy: true,
@@ -145,6 +146,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI {
                 IconInputs.BlessingOfKings,
                 IconInputs.BlessingOfWisdom,
                 IconInputs.BlessingOfMight,
+                IconInputs.BlessingOfSalvation,
             ],
             // IconInputs to include in the 'Debuffs' section on the settings tab.
             debuffInputs: [

@@ -148,6 +148,12 @@ Individual70UEPExporter.linkNames = {
     [Stat.StatRage]: 'rage',
     [Stat.StatArmor]: 'armor',
     [Stat.StatRangedAttackPower]: 'rangedAttackPower',
+    [Stat.StatDefense]: 'defenseRating',
+    [Stat.StatBlock]: 'blockRating',
+    [Stat.StatBlockValue]: 'blockValue',
+    [Stat.StatDodge]: 'dodgeRating',
+    [Stat.StatParry]: 'parryRating',
+    [Stat.StatResilience]: 'resilienceRating',
 };
 class IndividualPawnEPExporter extends Exporter {
     constructor(parent, simUI) {
@@ -195,4 +201,10 @@ IndividualPawnEPExporter.statNames = {
     [Stat.StatRage]: 'Rage',
     [Stat.StatArmor]: 'Armor',
     [Stat.StatRangedAttackPower]: 'Rap',
+    [Stat.StatDefense]: 'DefenseRating',
+    [Stat.StatBlock]: 'BlockRating',
+    [Stat.StatBlockValue]: 'BlockValue',
+    [Stat.StatDodge]: 'DodgeRating',
+    [Stat.StatParry]: 'ParryRating',
+    [Stat.StatResilience]: 'ResilienceRating',
 };

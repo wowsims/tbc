@@ -274,6 +274,30 @@ export var Stat;
      * @generated from protobuf enum value: StatRangedAttackPower = 28;
      */
     Stat[Stat["StatRangedAttackPower"] = 28] = "StatRangedAttackPower";
+    /**
+     * @generated from protobuf enum value: StatDefense = 29;
+     */
+    Stat[Stat["StatDefense"] = 29] = "StatDefense";
+    /**
+     * @generated from protobuf enum value: StatBlock = 30;
+     */
+    Stat[Stat["StatBlock"] = 30] = "StatBlock";
+    /**
+     * @generated from protobuf enum value: StatBlockValue = 31;
+     */
+    Stat[Stat["StatBlockValue"] = 31] = "StatBlockValue";
+    /**
+     * @generated from protobuf enum value: StatDodge = 32;
+     */
+    Stat[Stat["StatDodge"] = 32] = "StatDodge";
+    /**
+     * @generated from protobuf enum value: StatParry = 33;
+     */
+    Stat[Stat["StatParry"] = 33] = "StatParry";
+    /**
+     * @generated from protobuf enum value: StatResilience = 34;
+     */
+    Stat[Stat["StatResilience"] = 34] = "StatResilience";
 })(Stat || (Stat = {}));
 /**
  * @generated from protobuf enum proto.ItemType

@@ -82,6 +82,12 @@ export const statNames = {
     [Stat.StatRage]: 'Rage',
     [Stat.StatArmor]: 'Armor',
     [Stat.StatRangedAttackPower]: 'Ranged AP',
+    [Stat.StatDefense]: 'Defense',
+    [Stat.StatBlock]: 'Block',
+    [Stat.StatBlockValue]: 'Block Value',
+    [Stat.StatDodge]: 'Dodge',
+    [Stat.StatParry]: 'Parry',
+    [Stat.StatResilience]: 'Resilience',
 };
 export const slotNames = {
     [ItemSlot.ItemSlotHead]: 'Head',

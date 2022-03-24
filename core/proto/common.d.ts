@@ -951,7 +951,31 @@ export declare enum Stat {
     /**
      * @generated from protobuf enum value: StatRangedAttackPower = 28;
      */
-    StatRangedAttackPower = 28
+    StatRangedAttackPower = 28,
+    /**
+     * @generated from protobuf enum value: StatDefense = 29;
+     */
+    StatDefense = 29,
+    /**
+     * @generated from protobuf enum value: StatBlock = 30;
+     */
+    StatBlock = 30,
+    /**
+     * @generated from protobuf enum value: StatBlockValue = 31;
+     */
+    StatBlockValue = 31,
+    /**
+     * @generated from protobuf enum value: StatDodge = 32;
+     */
+    StatDodge = 32,
+    /**
+     * @generated from protobuf enum value: StatParry = 33;
+     */
+    StatParry = 33,
+    /**
+     * @generated from protobuf enum value: StatResilience = 34;
+     */
+    StatResilience = 34
 }
 /**
  * @generated from protobuf enum proto.ItemType

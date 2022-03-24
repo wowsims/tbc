@@ -2943,7 +2943,7 @@ input, select {
 }
 
 .mage-sim-ui .buffs-section {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
 }
 
 .mage-sim-ui .debuffs-section {
@@ -2975,7 +2975,7 @@ input, select {
 }
 
 .elemental-shaman-sim-ui .buffs-section {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
 }
 
 .elemental-shaman-sim-ui .debuffs-section {
@@ -3153,7 +3153,7 @@ input, select {
 }
 
 .smite-priest-sim-ui .buffs-section {
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(6, 1fr);
 }
 
 .smite-priest-sim-ui .debuffs-section {

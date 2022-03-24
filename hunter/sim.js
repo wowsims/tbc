@@ -91,6 +91,7 @@ export class HunterSimUI extends IndividualSimUI {
                     blessingOfKings: true,
                     blessingOfWisdom: 2,
                     blessingOfMight: 2,
+                    blessingOfSalvation: true,
                 }),
                 debuffs: Debuffs.create({
                     sunderArmor: true,
@@ -131,6 +132,7 @@ export class HunterSimUI extends IndividualSimUI {
                 IconInputs.BlessingOfKings,
                 IconInputs.BlessingOfWisdom,
                 IconInputs.BlessingOfMight,
+                IconInputs.BlessingOfSalvation,
                 IconInputs.UnleashedRage,
             ],
             // IconInputs to include in the 'Debuffs' section on the settings tab.

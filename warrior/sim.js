@@ -86,6 +86,7 @@ export class WarriorSimUI extends IndividualSimUI {
                 individualBuffs: IndividualBuffs.create({
                     blessingOfKings: true,
                     blessingOfMight: TristateEffect.TristateEffectImproved,
+                    blessingOfSalvation: true,
                     unleashedRage: true,
                 }),
                 debuffs: Debuffs.create({
@@ -125,6 +126,7 @@ export class WarriorSimUI extends IndividualSimUI {
             playerBuffInputs: [
                 IconInputs.BlessingOfKings,
                 IconInputs.BlessingOfMight,
+                IconInputs.BlessingOfSalvation,
                 IconInputs.UnleashedRage,
             ],
             // IconInputs to include in the 'Debuffs' section on the settings tab.

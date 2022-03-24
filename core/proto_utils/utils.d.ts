@@ -86,7 +86,7 @@ export declare function isSharpWeaponType(weaponType: WeaponType): boolean;
 export declare function isBluntWeaponType(weaponType: WeaponType): boolean;
 export declare const specEPTransforms: Record<Spec, (epWeights: Stats) => Stats>;
 export declare function getMetaGemEffectEP(spec: Spec, gem: Gem, playerStats: Stats): number;
-export declare function canEquipItem(item: Item, spec: Spec): boolean;
+export declare function canEquipItem(item: Item, spec: Spec, slot: ItemSlot | undefined): boolean;
 export declare function getEligibleItemSlots(item: Item): Array<ItemSlot>;
 export declare function validWeaponCombo(mainHand: Item | null | undefined, offHand: Item | null | undefined): boolean;
 export declare function getEligibleEnchantSlots(enchant: Enchant): Array<ItemSlot>;

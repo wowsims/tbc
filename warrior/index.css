@@ -2838,7 +2838,7 @@ input, select {
 }
 
 .warrior-sim-ui .buffs-section {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
 }
 
 .warrior-sim-ui .debuffs-section {
