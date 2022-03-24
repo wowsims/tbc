@@ -218,8 +218,11 @@ message ComputeStatsRequest {
     Raid raid = 1;
 }
 message PlayerStats {
-    repeated double gear_only = 1;
+		// Stats
+    repeated double base_stats = 6;
+    repeated double gear_stats = 1;
     repeated double final_stats = 2;
+
     repeated string sets = 3;
 		IndividualBuffs buffs = 4;
 		repeated ActionID cooldowns = 5;
