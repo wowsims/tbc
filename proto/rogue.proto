@@ -86,7 +86,6 @@ message Rogue {
     RogueTalents talents = 2;
     
     message Options {
-			bool ar_resets_ticks = 1;
     }
     Options options = 3;
 }
