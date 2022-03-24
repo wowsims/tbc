@@ -135,6 +135,14 @@ func newLightningSpeedAuraFactory(character *core.Character, auraID core.AuraID,
 	aura := core.Aura{
 		ID:       auraID,
 		ActionID: actionID,
+		Duration: time.Second * 15,
+		OnGain: func(sim *core.Simulation) {
+			character.AddStatsDynamic(sim, buffs)
+			character.MultiplyMeleeSpeed(sim, 1.02)
+			if sim.Log != nil {
+				character.Log(sim, "Gained %s from %s", buffs.FlatString(), actionID)
+			}
+		},
 		OnExpire: func(sim *core.Simulation) {
 			character.AddStatsDynamic(sim, unbuffs)
 			character.MultiplyMeleeSpeed(sim, 1/1.02)
@@ -145,14 +153,6 @@ func newLightningSpeedAuraFactory(character *core.Character, auraID core.AuraID,
 	}
 
 	return func(sim *core.Simulation) core.Aura {
-		if !character.HasAura(auraID) {
-			character.AddStatsDynamic(sim, buffs)
-			character.MultiplyMeleeSpeed(sim, 1.02)
-			if sim.Log != nil {
-				character.Log(sim, "Gained %s from %s", buffs.FlatString(), actionID)
-			}
-		}
-		aura.Expires = sim.CurrentTime + 15*time.Second
 		return aura
 	}
 }

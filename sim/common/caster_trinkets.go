@@ -300,6 +300,27 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 		meleeStacks := 0
 		spellStacks := 0
 
+		apAura := core.Aura{
+			ID:       AuraOfTheCrusadeMeleeAuraID,
+			ActionID: core.ActionID{ItemID: 31856, Tag: 1},
+			Duration: time.Second * 10,
+			OnExpire: func(sim *core.Simulation) {
+				character.AddStat(stats.AttackPower, -meleeBonus*float64(meleeStacks))
+				character.AddStat(stats.RangedAttackPower, -meleeBonus*float64(meleeStacks))
+				meleeStacks = 0
+			},
+		}
+
+		spAura := core.Aura{
+			ID:       AuraOfTheCrusadeSpellAuraID,
+			ActionID: core.ActionID{ItemID: 31856, Tag: 2},
+			Duration: time.Second * 10,
+			OnExpire: func(sim *core.Simulation) {
+				character.AddStat(stats.SpellPower, -spellBonus*float64(spellStacks))
+				spellStacks = 0
+			},
+		}
+
 		return core.Aura{
 			ID: DarkmoonCardCrusadeAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -316,16 +337,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 
 					// Removal aura will refresh with new total spellpower based on stacks.
 					//  This will remove the old stack removal buff.
-					character.ReplaceAura(sim, core.Aura{
-						ID:       AuraOfTheCrusadeMeleeAuraID,
-						ActionID: core.ActionID{ItemID: 31856, Tag: 1},
-						Expires:  sim.CurrentTime + time.Second*10,
-						OnExpire: func(sim *core.Simulation) {
-							character.AddStat(stats.AttackPower, -meleeBonus*float64(meleeStacks))
-							character.AddStat(stats.RangedAttackPower, -meleeBonus*float64(meleeStacks))
-							meleeStacks = 0
-						},
-					})
+					character.ReplaceAura(sim, apAura)
 				} else {
 					if !spellEffect.Landed() {
 						return
@@ -337,15 +349,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 
 					// Removal aura will refresh with new total spellpower based on stacks.
 					//  This will remove the old stack removal buff.
-					character.ReplaceAura(sim, core.Aura{
-						ID:       AuraOfTheCrusadeSpellAuraID,
-						ActionID: core.ActionID{ItemID: 31856, Tag: 2},
-						Expires:  sim.CurrentTime + time.Second*10,
-						OnExpire: func(sim *core.Simulation) {
-							character.AddStat(stats.SpellPower, -spellBonus*float64(spellStacks))
-							spellStacks = 0
-						},
-					})
+					character.ReplaceAura(sim, spAura)
 				}
 			},
 		}

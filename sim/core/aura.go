@@ -55,13 +55,15 @@ type OnGain func(sim *Simulation)
 type OnExpire func(sim *Simulation)
 
 type Aura struct {
-	ID          AuraID
-	ActionID    ActionID      // If set, metrics will be tracked for this aura using this ID.
-	Expires     time.Duration // Time at which aura will be removed.
-	activeIndex int32         // Position of this aura's index in the sim.activeAuraIDs array.
+	ID       AuraID
+	ActionID ActionID // If set, metrics will be tracked for this aura using this ID.
+
+	Duration time.Duration // Duration of aura, upon being applied.
+	expires  time.Duration // Time at which aura will be removed.
 
 	startTime time.Duration // Time at which the aura was applied.
 
+	activeIndex                 int32 // Position of this aura's index in the sim.activeAuraIDs array.
 	onCastIndex                 int32 // Position of this aura's index in the sim.onCastIDs array.
 	onCastCompleteIndex         int32 // Position of this aura's index in the sim.onCastCompleteIDs array.
 	onBeforeSpellHitIndex       int32 // Position of this aura's index in the sim.onBeforeSpellHitIDs array.
@@ -97,6 +99,14 @@ type Aura struct {
 	OnPeriodicDamage OnPeriodicDamage
 }
 
+func (aura *Aura) Refresh(sim *Simulation) {
+	if aura.Duration == NeverExpires {
+		aura.expires = NeverExpires
+	} else {
+		aura.expires = sim.CurrentTime + aura.Duration
+	}
+}
+
 type AuraFactory func(*Simulation) Aura
 
 // Wraps aura creation and calls it on every sim reset.
@@ -107,7 +117,7 @@ type PermanentAura struct {
 	// This option disables that behavior, creating an aura which is applies at the
 	// beginning of every iteration but expires after a period of time. This is
 	// used for some snapshotting effects like Warrior battle shout.
-	RespectExpiration bool
+	RespectDuration bool
 
 	// Multiplies uptime for the aura metrics of this aura. This is for buffs coded
 	// as permanent but which are actually averaged versions of the real buff.
@@ -226,8 +236,8 @@ func (at *auraTracker) reset(sim *Simulation) {
 
 	for _, permAura := range at.permanentAuras {
 		aura := permAura.AuraFactory(sim)
-		if !permAura.RespectExpiration {
-			aura.Expires = NeverExpires
+		if !permAura.RespectDuration {
+			aura.Duration = NeverExpires
 		}
 		at.ReplaceAura(sim, aura)
 		if permAura.UptimeMultiplier != 0 && !aura.ActionID.IsEmptyAction() {
@@ -261,7 +271,7 @@ func (at *auraTracker) advance(sim *Simulation) {
 	}
 
 	for _, id := range at.activeAuraIDs {
-		if aura := &at.auras[id]; aura.Expires != 0 && aura.Expires <= sim.CurrentTime {
+		if aura := &at.auras[id]; aura.expires != 0 && aura.expires <= sim.CurrentTime {
 			at.RemoveAura(sim, id)
 		}
 	}
@@ -300,6 +310,7 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 	newAura.onBeforePeriodicDamageIndex = old.onBeforePeriodicDamageIndex
 	newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
 	newAura.startTime = old.startTime
+	newAura.Refresh(sim)
 
 	at.auras[newAura.ID] = newAura
 
@@ -317,11 +328,12 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 
 	if aura := at.auras[newAura.ID]; aura.ID != 0 {
 		// Getting lots of bug reports, do a grep and catch all cases for this before uncommenting.
-		//panic(fmt.Sprintf("AddAura(%v) at %s - previous has %s left, use ReplaceAura() instead", newAura.ActionID, sim.CurrentTime, aura.Expires-sim.CurrentTime))
+		//panic(fmt.Sprintf("AddAura(%v) at %s - previous has %s left, use ReplaceAura() instead", newAura.ActionID, sim.CurrentTime, aura.expires-sim.CurrentTime))
 		at.RemoveAura(sim, newAura.ID)
 	}
 
 	newAura.startTime = sim.CurrentTime
+	newAura.Refresh(sim)
 
 	at.auras[newAura.ID] = newAura
 	at.auras[newAura.ID].activeIndex = int32(len(at.activeAuraIDs))
@@ -373,8 +385,8 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 	}
 
 	if aura := at.auras[id]; !aura.ActionID.IsEmptyAction() {
-		if sim.CurrentTime > aura.Expires {
-			at.AddAuraUptime(id, aura.ActionID, aura.Expires-aura.startTime)
+		if sim.CurrentTime > aura.expires {
+			at.AddAuraUptime(id, aura.ActionID, aura.expires-aura.startTime)
 		} else {
 			at.AddAuraUptime(id, aura.ActionID, sim.CurrentTime-aura.startTime)
 		}
@@ -474,15 +486,21 @@ func (at *auraTracker) NumStacks(id AuraID) int32 {
 	}
 }
 
+func (at *auraTracker) RefreshAura(sim *Simulation, id AuraID) {
+	if aura := &at.auras[id]; aura.ID != 0 {
+		aura.Refresh(sim)
+	}
+}
+
 func (at *auraTracker) UpdateExpires(id AuraID, newExpires time.Duration) {
 	if aura := &at.auras[id]; aura.ID != 0 {
-		aura.Expires = newExpires
+		aura.expires = newExpires
 	}
 }
 
 func (at *auraTracker) RemainingAuraDuration(sim *Simulation, id AuraID) time.Duration {
 	if at.HasAura(id) {
-		expires := at.auras[id].Expires
+		expires := at.auras[id].expires
 		if expires == NeverExpires {
 			return NeverExpires
 		} else {
@@ -495,7 +513,7 @@ func (at *auraTracker) RemainingAuraDuration(sim *Simulation, id AuraID) time.Du
 
 func (at *auraTracker) AuraExpiresAt(id AuraID) time.Duration {
 	if at.HasAura(id) {
-		return at.auras[id].Expires
+		return at.auras[id].expires
 	} else {
 		return 0
 	}
@@ -617,6 +635,13 @@ func (character *Character) NewTemporaryStatsAuraFactory(auraID AuraID, actionID
 	aura := Aura{
 		ID:       auraID,
 		ActionID: actionID,
+		Duration: duration,
+		OnGain: func(sim *Simulation) {
+			character.AddStatsDynamic(sim, buffs)
+			if sim.Log != nil {
+				character.Log(sim, "Gained %s from %s.", buffs.FlatString(), actionID)
+			}
+		},
 		OnExpire: func(sim *Simulation) {
 			if sim.Log != nil {
 				character.Log(sim, "Lost %s from fading %s.", buffs.FlatString(), actionID)
@@ -626,13 +651,6 @@ func (character *Character) NewTemporaryStatsAuraFactory(auraID AuraID, actionID
 	}
 
 	return func(sim *Simulation) Aura {
-		if !character.HasAura(auraID) {
-			character.AddStatsDynamic(sim, buffs)
-			if sim.Log != nil {
-				character.Log(sim, "Gained %s from %s.", buffs.FlatString(), actionID)
-			}
-		}
-		aura.Expires = sim.CurrentTime + duration
 		return aura
 	}
 }

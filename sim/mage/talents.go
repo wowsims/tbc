@@ -74,7 +74,7 @@ func (mage *Mage) applyArcaneConcentration() {
 		ccAura := core.Aura{
 			ID:       ClearcastingAuraID,
 			ActionID: core.ActionID{SpellID: 12536},
-			Expires:  core.NeverExpires, // actually 15s, but that's hardly ever relevant
+			Duration: core.NeverExpires, // actually 15s, but that's hardly ever relevant
 			OnCast: func(sim *core.Simulation, cast *core.Cast) {
 				if !cast.SpellExtras.Matches(SpellFlagMage) {
 					return
@@ -231,7 +231,7 @@ func (mage *Mage) registerArcanePowerCD() {
 				character.AddAura(sim, core.Aura{
 					ID:       ArcanePowerAuraID,
 					ActionID: actionID,
-					Expires:  sim.CurrentTime + time.Second*15,
+					Duration: time.Second * 15,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						if cast.SpellSchool.Matches(core.SpellSchoolMagic) {
 							cast.Cost.Value *= 1.3
@@ -312,7 +312,7 @@ func (mage *Mage) registerCombustionCD() {
 				character.AddAura(sim, core.Aura{
 					ID:       CombustionAuraID,
 					ActionID: actionID,
-					Expires:  core.NeverExpires,
+					Duration: core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						cast.BonusCritRating += float64(numHits) * 10 * core.SpellCritRatingPerCritChance
 					},
@@ -376,19 +376,20 @@ func (mage *Mage) registerIcyVeinsCD() {
 			manaCost = mage.BaseMana() * 0.03
 
 			return func(sim *core.Simulation, character *core.Character) {
-				character.PseudoStats.CastSpeedMultiplier *= bonus
-
 				character.AddAura(sim, core.Aura{
 					ID:       IcyVeinsAuraID,
 					ActionID: actionID,
-					Expires:  sim.CurrentTime + time.Second*20,
+					Duration: sim.CurrentTime + time.Second*20,
+					OnGain: func(sim *core.Simulation) {
+						character.PseudoStats.CastSpeedMultiplier *= bonus
+						character.SpendMana(sim, manaCost, actionID)
+						character.Metrics.AddInstantCast(actionID)
+						character.SetCD(IcyVeinsCooldownID, sim.CurrentTime+time.Minute*3)
+					},
 					OnExpire: func(sim *core.Simulation) {
 						character.PseudoStats.CastSpeedMultiplier *= inverseBonus
 					},
 				})
-				character.SpendMana(sim, manaCost, actionID)
-				character.Metrics.AddInstantCast(actionID)
-				character.SetCD(IcyVeinsCooldownID, sim.CurrentTime+time.Minute*3)
 			}
 		},
 	})

@@ -75,19 +75,19 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		})
 	} else if debuffs.SunderArmor {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return SunderArmorAura(0, target, 5)
+			return SunderArmorAura(target, 5)
 		})
 	}
 
 	if debuffs.FaerieFire != proto.TristateEffect_TristateEffectMissing {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return FaerieFireAura(0, target, debuffs.FaerieFire == proto.TristateEffect_TristateEffectImproved)
+			return FaerieFireAura(target, debuffs.FaerieFire == proto.TristateEffect_TristateEffectImproved)
 		})
 	}
 
 	if debuffs.CurseOfRecklessness {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return CurseOfRecklessnessAura(0, target)
+			return CurseOfRecklessnessAura(target)
 		})
 	}
 
@@ -95,7 +95,7 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		multiplier := MinFloat(1.0, debuffs.ExposeWeaknessUptime)
 		target.AddPermanentAuraWithOptions(PermanentAura{
 			AuraFactory: func(sim *Simulation) Aura {
-				return ExposeWeaknessAura(0, debuffs.ExposeWeaknessHunterAgility, multiplier)
+				return ExposeWeaknessAura(debuffs.ExposeWeaknessHunterAgility, multiplier)
 			},
 			UptimeMultiplier: multiplier,
 		})
@@ -122,7 +122,7 @@ func MiseryAura(sim *Simulation, numPoints int32) Aura {
 	return Aura{
 		ID:       MiseryDebuffID,
 		ActionID: ActionID{SpellID: 33195},
-		Expires:  sim.CurrentTime + time.Second*24,
+		Duration: time.Second * 24,
 		Stacks:   numPoints,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellCast.SpellSchool.Matches(SpellSchoolMagic) {
@@ -145,7 +145,7 @@ func ShadowWeavingAura(sim *Simulation, numStacks int32) Aura {
 	return Aura{
 		ID:       ShadowWeavingDebuffID,
 		ActionID: ActionID{SpellID: 15334},
-		Expires:  sim.CurrentTime + time.Second*15,
+		Duration: time.Second * 15,
 		Stacks:   numStacks,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellCast.SpellSchool.Matches(SpellSchoolShadow) {
@@ -169,7 +169,7 @@ func JudgementOfWisdomAura(sim *Simulation) Aura {
 	aura = Aura{
 		ID:       JudgementOfWisdomDebuffID,
 		ActionID: actionID,
-		Expires:  sim.CurrentTime + time.Second*20,
+		Duration: time.Second * 20,
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			// TODO: This check is purely to maintain behavior during refactoring. Should be removed when possible.
 			if !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) && !spellEffect.Landed() {
@@ -185,8 +185,7 @@ func JudgementOfWisdomAura(sim *Simulation) Aura {
 			}
 
 			if spellCast.ActionID.SpellID == 35395 {
-				aura.Expires = sim.CurrentTime + time.Second*20
-				spellEffect.Target.ReplaceAura(sim, aura)
+				spellEffect.Target.RefreshAura(sim, JudgementOfWisdomDebuffID)
 			}
 		},
 	}
@@ -202,7 +201,7 @@ func JudgementOfTheCrusaderAura(sim *Simulation, level float64) Aura {
 	aura = Aura{
 		ID:       ImprovedSealOfTheCrusaderDebuffID,
 		ActionID: ActionID{SpellID: 27159},
-		Expires:  sim.CurrentTime + time.Second*20,
+		Duration: time.Second * 20,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
 				spellEffect.BonusSpellPower += 219
@@ -211,8 +210,7 @@ func JudgementOfTheCrusaderAura(sim *Simulation, level float64) Aura {
 			spellEffect.BonusCritRating += bonusMCrit
 
 			if spellCast.ActionID.SpellID == 35395 {
-				aura.Expires = sim.CurrentTime + time.Second*20
-				spellEffect.Target.ReplaceAura(sim, aura)
+				spellEffect.Target.RefreshAura(sim, ImprovedSealOfTheCrusaderDebuffID)
 			}
 		},
 	}
@@ -312,7 +310,7 @@ func ImprovedScorchAura(sim *Simulation, numStacks int32) Aura {
 	return Aura{
 		ID:       ImprovedScorchDebuffID,
 		ActionID: ActionID{SpellID: 12873},
-		Expires:  sim.CurrentTime + time.Second*30,
+		Duration: time.Second * 30,
 		Stacks:   numStacks,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellCast.SpellSchool.Matches(SpellSchoolFire) {
@@ -335,7 +333,7 @@ func WintersChillAura(sim *Simulation, numStacks int32) Aura {
 	return Aura{
 		ID:       WintersChillDebuffID,
 		ActionID: ActionID{SpellID: 28595},
-		Expires:  sim.CurrentTime + time.Second*15,
+		Duration: time.Second * 15,
 		Stacks:   numStacks,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
@@ -347,13 +345,13 @@ func WintersChillAura(sim *Simulation, numStacks int32) Aura {
 
 var FaerieFireDebuffID = NewDebuffID()
 
-func FaerieFireAura(currentTime time.Duration, target *Target, improved bool) Aura {
+func FaerieFireAura(target *Target, improved bool) Aura {
 	const hitBonus = 3 * MeleeHitRatingPerHitChance
 	target.AddArmor(-610)
 	aura := Aura{
 		ID:       FaerieFireDebuffID,
 		ActionID: ActionID{SpellID: 26993},
-		Expires:  currentTime + time.Second*40,
+		Duration: time.Second * 40,
 		OnExpire: func(sim *Simulation) {
 			target.AddArmor(610)
 		},
@@ -369,14 +367,14 @@ func FaerieFireAura(currentTime time.Duration, target *Target, improved bool) Au
 
 var SunderArmorDebuffID = NewDebuffID()
 
-func SunderArmorAura(currentTime time.Duration, target *Target, stacks int) Aura {
+func SunderArmorAura(target *Target, stacks int) Aura {
 	armorReduction := 520.0 * float64(stacks)
 	target.AddArmor(-armorReduction)
 
 	aura := Aura{
 		ID:       SunderArmorDebuffID,
 		ActionID: ActionID{SpellID: 25225},
-		Expires:  currentTime + time.Second*30,
+		Duration: time.Second * 30,
 		OnExpire: func(sim *Simulation) {
 			target.AddArmor(armorReduction)
 		},
@@ -401,7 +399,7 @@ func ExposeArmorAura(sim *Simulation, target *Target, talentPoints int32) Aura {
 	return Aura{
 		ID:       ExposeArmorDebuffID,
 		ActionID: ActionID{SpellID: 26866},
-		Expires:  sim.CurrentTime + time.Second*30,
+		Duration: time.Second * 30,
 		OnExpire: func(sim *Simulation) {
 			target.AddArmor(armorReduction)
 		},
@@ -410,14 +408,14 @@ func ExposeArmorAura(sim *Simulation, target *Target, talentPoints int32) Aura {
 
 var CurseOfRecklessnessDebuffID = NewDebuffID()
 
-func CurseOfRecklessnessAura(currentTime time.Duration, target *Target) Aura {
+func CurseOfRecklessnessAura(target *Target) Aura {
 	armorReduction := 800.0
 	target.AddArmor(-armorReduction)
 
 	aura := Aura{
 		ID:       CurseOfRecklessnessDebuffID,
 		ActionID: ActionID{SpellID: 27226},
-		Expires:  currentTime + time.Minute*2,
+		Duration: time.Minute * 2,
 		OnExpire: func(sim *Simulation) {
 			target.AddArmor(armorReduction)
 		},
@@ -429,13 +427,13 @@ func CurseOfRecklessnessAura(currentTime time.Duration, target *Target) Aura {
 var ExposeWeaknessDebuffID = NewDebuffID()
 
 // Multiplier is for accomodating uptime %. For a real hunter, always pass 1.0
-func ExposeWeaknessAura(currentTime time.Duration, hunterAgility float64, multiplier float64) Aura {
+func ExposeWeaknessAura(hunterAgility float64, multiplier float64) Aura {
 	apBonus := hunterAgility * 0.25 * multiplier
 
 	return Aura{
 		ID:       ExposeWeaknessDebuffID,
 		ActionID: ActionID{SpellID: 34503},
-		Expires:  currentTime + time.Second*7,
+		Duration: time.Second * 7,
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			spellEffect.BonusAttackPowerOnTarget += apBonus
 		},

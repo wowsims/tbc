@@ -166,19 +166,20 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				character.SetCD(NaturalAlignmentCrystalCooldownID, sim.CurrentTime+cd)
-				character.AddStat(stats.SpellPower, sp)
-				character.Metrics.AddInstantCast(actionID)
-
 				character.AddAura(sim, core.Aura{
 					ID:       NaturalAlignmentCrystalAuraID,
 					ActionID: actionID,
-					Expires:  sim.CurrentTime + dur,
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.Cost.Value += cast.BaseCost.Value * 0.2
+					Duration: dur,
+					OnGain: func(sim *core.Simulation) {
+						character.AddStat(stats.SpellPower, sp)
+						character.SetCD(NaturalAlignmentCrystalCooldownID, sim.CurrentTime+cd)
+						character.Metrics.AddInstantCast(actionID)
 					},
 					OnExpire: func(sim *core.Simulation) {
 						character.AddStat(stats.SpellPower, -sp)
+					},
+					OnCast: func(sim *core.Simulation, cast *core.Cast) {
+						cast.Cost.Value += cast.BaseCost.Value * 0.2
 					},
 				})
 			}
@@ -252,8 +253,8 @@ func ApplySkycallTotem(agent core.Agent) {
 		applyStatAura := character.NewTemporaryStatsAuraApplier(EnergizedAuraID, core.ActionID{ItemID: 33506}, stats.Stats{stats.SpellHaste: hasteBonus}, dur)
 
 		return core.Aura{
-			ID:      SkycallTotemAuraID,
-			Expires: core.NeverExpires,
+			ID:       SkycallTotemAuraID,
+			Duration: core.NeverExpires,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if cast.ActionID.SpellID != SpellIDLB12 || sim.RandomFloat("Skycall Totem") > 0.15 {
 					return
@@ -279,8 +280,8 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 		const icdDur = time.Second * 10
 
 		return core.Aura{
-			ID:      StonebreakersTotemAuraID,
-			Expires: core.NeverExpires,
+			ID:       StonebreakersTotemAuraID,
+			Duration: core.NeverExpires,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return

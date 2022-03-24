@@ -12,10 +12,10 @@ var HemorrhageDebuffID = core.NewDebuffID()
 var HemorrhageEnergyCost = 35.0
 
 func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
-	hemoDuration := time.Second * 15
 	hemoAura := core.Aura{
 		ID:       HemorrhageDebuffID,
 		ActionID: HemorrhageActionID,
+		Duration: time.Second * 15,
 	}
 	hemoAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 		if spellCast.SpellSchool != core.SpellSchoolPhysical {
@@ -36,7 +36,6 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 			spellEffect.Target.RemoveAura(sim, HemorrhageDebuffID)
 		} else {
 			hemoAura.Stacks = stacks
-			hemoAura.Expires = sim.CurrentTime + hemoDuration
 			spellEffect.Target.ReplaceAura(sim, hemoAura)
 		}
 	}
@@ -49,7 +48,6 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 			rogue.AddComboPoints(sim, 1, HemorrhageActionID)
 
 			hemoAura.Stacks = 10
-			hemoAura.Expires = sim.CurrentTime + hemoDuration
 			spellEffect.Target.ReplaceAura(sim, hemoAura)
 		} else {
 			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})

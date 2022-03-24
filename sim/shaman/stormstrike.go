@@ -17,6 +17,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 	ssDebuffAura := core.Aura{
 		ID:       StormstrikeDebuffID,
 		ActionID: StormstrikeActionID,
+		Duration: time.Second * 12,
 		Stacks:   2,
 	}
 	ssDebuffAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
@@ -76,7 +77,6 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 						}
 
 						ssDebuffAura.Stacks = 2
-						ssDebuffAura.Expires = sim.CurrentTime + 12*time.Second
 						spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
 						if hasSkyshatter4p {
 							skyshatterAuraApplier(sim)

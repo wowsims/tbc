@@ -138,7 +138,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 				character.AddAura(sim, core.Aura{
 					ID:       ElementalMasteryAuraID,
 					ActionID: actionID,
-					Expires:  core.NeverExpires,
+					Duration: core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						if !cast.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
 							return
@@ -191,7 +191,7 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 				character.AddAura(sim, core.Aura{
 					ID:       NaturesSwiftnessAuraID,
 					ActionID: actionID,
-					Expires:  core.NeverExpires,
+					Duration: core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						if cast.ActionID.SpellID != SpellIDLB12 {
 							return
@@ -251,7 +251,6 @@ func (shaman *Shaman) applyUnleashedRage() {
 	level := shaman.Talents.UnleashedRage
 
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const dur = time.Second * 10
 		bonusCoeff := 0.02 * float64(level)
 
 		currentAPBonuses := make([]float64, len(shaman.Party.PlayersAndPets))
@@ -273,11 +272,13 @@ func (shaman *Shaman) applyUnleashedRage() {
 						buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: newBonus})
 						unbuffs := buffs.Multiply(-1)
 
-						char.AddStats(buffs)
 						currentAuras[i] = core.Aura{
 							ID:       UnleashedRageProcAuraID,
 							ActionID: core.ActionID{SpellID: 30811},
-							Expires:  sim.CurrentTime + dur,
+							Duration: time.Second * 10,
+							OnGain: func(sim *core.Simulation) {
+								char.AddStats(buffs)
+							},
 							OnExpire: func(sim *core.Simulation) {
 								char.AddStats(unbuffs)
 							},
@@ -289,7 +290,6 @@ func (shaman *Shaman) applyUnleashedRage() {
 						char.AddAura(sim, currentAuras[i])
 					} else if newBonus != 0 {
 						// If the bonus is the same, we can just update.
-						currentAuras[i].Expires = sim.CurrentTime + dur
 						char.ReplaceAura(sim, currentAuras[i])
 					}
 				}
@@ -309,7 +309,7 @@ func (shaman *Shaman) applyShamanisticFocus() {
 	focusedAura := core.Aura{
 		ID:       ShamanisticFocusAuraID,
 		ActionID: core.ActionID{SpellID: 43338},
-		Expires:  core.NeverExpires,
+		Duration: core.NeverExpires,
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
 			// Shaman use spell extras agent reserved for shamanistic rage checking.
 			if !cast.SpellExtras.Matches(SpellFlagShock) {
@@ -369,11 +369,13 @@ func (shaman *Shaman) applyFlurry() {
 
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					if flurryStacks == 0 {
-						shaman.MultiplyMeleeSpeed(sim, bonus)
 						shaman.AddAura(sim, core.Aura{
 							ID:       FlurryProcAuraID,
 							ActionID: core.ActionID{SpellID: 16280},
-							Expires:  core.NeverExpires,
+							Duration: core.NeverExpires,
+							OnGain: func(sim *core.Simulation) {
+								shaman.MultiplyMeleeSpeed(sim, bonus)
+							},
 							OnExpire: func(sim *core.Simulation) {
 								shaman.MultiplyMeleeSpeed(sim, inverseBonus)
 							},

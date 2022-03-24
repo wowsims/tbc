@@ -266,13 +266,14 @@ func applyRaceEffects(agent Agent) {
 						Cost:      cost,
 						Cooldown:  cd,
 						OnCastComplete: func(sim *Simulation, cast *Cast) {
-							// Increase cast speed multiplier
-							character.PseudoStats.CastSpeedMultiplier *= hasteBonus
-							character.MultiplyAttackSpeed(sim, hasteBonus)
 							character.AddAura(sim, Aura{
 								ID:       TrollBerserkingAuraID,
 								ActionID: actionID,
-								Expires:  sim.CurrentTime + dur,
+								Duration: dur,
+								OnGain: func(sim *Simulation) {
+									character.PseudoStats.CastSpeedMultiplier *= hasteBonus
+									character.MultiplyAttackSpeed(sim, hasteBonus)
+								},
 								OnExpire: func(sim *Simulation) {
 									character.PseudoStats.CastSpeedMultiplier /= hasteBonus
 									character.MultiplyAttackSpeed(sim, inverseBonus)

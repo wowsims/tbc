@@ -35,6 +35,9 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 	sliceAndDiceAura := core.Aura{
 		ID:       SliceAndDiceAuraID,
 		ActionID: SliceAndDiceActionID,
+		OnGain: func(sim *core.Simulation) {
+			rogue.MultiplyMeleeSpeed(sim, hasteBonus)
+		},
 		OnExpire: func(sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
 		},
@@ -54,17 +57,12 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				numPoints := rogue.ComboPoints()
 				aura := sliceAndDiceAura
-				aura.Expires = sim.CurrentTime + rogue.sliceAndDiceDurations[numPoints]
-				if rogue.HasAura(SliceAndDiceAuraID) {
-					rogue.ReplaceAura(sim, aura)
-				} else {
-					rogue.MultiplyMeleeSpeed(sim, hasteBonus)
-					rogue.AddAura(sim, aura)
-				}
+				aura.Duration = rogue.sliceAndDiceDurations[numPoints]
+				rogue.ReplaceAura(sim, aura)
 
 				rogue.ApplyFinisher(sim, cast.ActionID)
 
-				if aura.Expires >= sim.Duration {
+				if aura.Duration >= sim.GetRemainingDuration() {
 					rogue.doneSND = true
 				}
 			},

@@ -272,14 +272,13 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
 				const arPenBonus = 200.0
-				const dur = time.Second * 30
 				ppmm := character.AutoAttacks.NewPPMManager(10.0)
 				stacks := 0
 
 				character.AddAura(sim, core.Aura{
 					ID:       BadgeOfTheSwarmguardProcAuraID,
 					ActionID: BadgeOfTheSwarmguardActionID,
-					Expires:  sim.CurrentTime + dur,
+					Duration: time.Second * 30,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
@@ -573,13 +572,12 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 
 				const apBonus = 44.0
-				const dur = time.Second * 20
 				stacks := 0
 
 				character.AddAura(sim, core.Aura{
 					ID:       BlackenedNaaruSliverProcAuraID,
 					ActionID: core.ActionID{ItemID: 34427},
-					Expires:  sim.CurrentTime + dur,
+					Duration: time.Second * 20,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
 							return

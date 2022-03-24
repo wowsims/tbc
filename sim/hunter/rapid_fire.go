@@ -14,6 +14,18 @@ func (hunter *Hunter) registerRapidFireCD() {
 	cooldown := time.Minute * 5
 	actionID := core.ActionID{SpellID: 3045, CooldownID: RapidFireCooldownID}
 
+	rfAura := core.Aura{
+		ID:       RapidFireAuraID,
+		ActionID: actionID,
+		Duration: time.Second * 15,
+		OnGain: func(sim *core.Simulation) {
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.4
+		},
+		OnExpire: func(sim *core.Simulation) {
+			hunter.PseudoStats.RangedSpeedMultiplier /= 1.4
+		},
+	}
+
 	template := core.SimpleCast{
 		Cast: core.Cast{
 			ActionID:  actionID,
@@ -28,15 +40,7 @@ func (hunter *Hunter) registerRapidFireCD() {
 				Value: 100,
 			},
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				hunter.PseudoStats.RangedSpeedMultiplier *= 1.4
-				hunter.AddAura(sim, core.Aura{
-					ID:       RapidFireAuraID,
-					ActionID: actionID,
-					Expires:  sim.CurrentTime + time.Second*15,
-					OnExpire: func(sim *core.Simulation) {
-						hunter.PseudoStats.RangedSpeedMultiplier /= 1.4
-					},
-				})
+				hunter.AddAura(sim, rfAura)
 			},
 		},
 	}
