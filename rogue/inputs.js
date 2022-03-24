@@ -3,24 +3,6 @@ import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Rogue_Rotation_Builder as Builder, } from '/tbc/core/proto/rogue.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
-export const ARResetsTicks = {
-    type: 'boolean',
-    getModObject: (simUI) => simUI.player,
-    config: {
-        extraCssClasses: [
-            'experimental',
-            'ar-resets-ticks-picker',
-        ],
-        label: 'AR Resets Ticks',
-        changedEvent: (player) => player.specOptionsChangeEmitter,
-        getValue: (player) => player.getSpecOptions().arResetsTicks,
-        setValue: (eventID, player, newValue) => {
-            const newOptions = player.getSpecOptions();
-            newOptions.arResetsTicks = newValue;
-            player.setSpecOptions(eventID, newOptions);
-        },
-    },
-};
 export const RogueRotationConfig = {
     inputs: [
         {

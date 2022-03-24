@@ -284,10 +284,6 @@ export declare enum Rogue_Rotation_Builder {
  * @generated from protobuf message proto.Rogue.Options
  */
 export interface Rogue_Options {
-    /**
-     * @generated from protobuf field: bool ar_resets_ticks = 1;
-     */
-    arResetsTicks: boolean;
 }
 declare class RogueTalents$Type extends MessageType<RogueTalents> {
     constructor();

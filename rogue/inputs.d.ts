@@ -3,17 +3,6 @@ import { Player } from '/tbc/core/player.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { Rogue_Rotation_Builder as Builder } from '/tbc/core/proto/rogue.js';
-export declare const ARResetsTicks: {
-    type: "boolean";
-    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
-    config: {
-        extraCssClasses: string[];
-        label: string;
-        changedEvent: (player: Player<Spec.SpecRogue>) => TypedEvent<void>;
-        getValue: (player: Player<Spec.SpecRogue>) => boolean;
-        setValue: (eventID: EventID, player: Player<Spec.SpecRogue>, newValue: boolean) => void;
-    };
-};
 export declare const RogueRotationConfig: {
     inputs: ({
         type: "enum";

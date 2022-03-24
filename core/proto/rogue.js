@@ -541,40 +541,19 @@ export const Rogue_Rotation = new Rogue_Rotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Rogue_Options$Type extends MessageType {
     constructor() {
-        super("proto.Rogue.Options", [
-            { no: 1, name: "ar_resets_ticks", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
-        ]);
+        super("proto.Rogue.Options", []);
     }
     create(value) {
-        const message = { arResetsTicks: false };
+        const message = {};
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* bool ar_resets_ticks */ 1:
-                    message.arResetsTicks = reader.bool();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
+        return target ?? this.create();
     }
     internalBinaryWrite(message, writer, options) {
-        /* bool ar_resets_ticks = 1; */
-        if (message.arResetsTicks !== false)
-            writer.tag(1, WireType.Varint).bool(message.arResetsTicks);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
