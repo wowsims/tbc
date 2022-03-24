@@ -379,7 +379,7 @@ func (mage *Mage) registerIcyVeinsCD() {
 				character.AddAura(sim, core.Aura{
 					ID:       IcyVeinsAuraID,
 					ActionID: actionID,
-					Duration: sim.CurrentTime + time.Second*20,
+					Duration: time.Second * 20,
 					OnGain: func(sim *core.Simulation) {
 						character.PseudoStats.CastSpeedMultiplier *= bonus
 						character.SpendMana(sim, manaCost, actionID)
