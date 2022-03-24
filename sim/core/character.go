@@ -567,13 +567,14 @@ func (character *Character) doneIteration(simDuration time.Duration) {
 func (character *Character) GetStatsProto() *proto.PlayerStats {
 	gearStats := character.Equip.Stats()
 	finalStats := character.GetStats()
-	setBonusNames := character.GetActiveSetBonusNames()
 
 	return &proto.PlayerStats{
-		GearOnly:   gearStats[:],
+		BaseStats:  character.baseStats[:],
+		GearStats:  gearStats[:],
 		FinalStats: finalStats[:],
-		Sets:       setBonusNames,
-		Cooldowns:  character.GetMajorCooldownIDs(),
+
+		Sets:      character.GetActiveSetBonusNames(),
+		Cooldowns: character.GetMajorCooldownIDs(),
 	}
 }
 
