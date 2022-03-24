@@ -46,6 +46,12 @@ const (
 	Rage
 	Armor
 	RangedAttackPower
+	Defense
+	Block
+	BlockValue
+	Dodge
+	Parry
+	Resilience
 
 	Len
 )
@@ -118,6 +124,18 @@ func (s Stat) StatName() string {
 		return "Armor"
 	case RangedAttackPower:
 		return "RangedAttackPower"
+	case Defense:
+		return "Defense"
+	case Block:
+		return "Block"
+	case BlockValue:
+		return "BlockValue"
+	case Dodge:
+		return "Dodge"
+	case Parry:
+		return "Parry"
+	case Resilience:
+		return "Resilience"
 	}
 
 	return "none"

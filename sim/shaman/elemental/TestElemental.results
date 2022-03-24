@@ -30,6 +30,12 @@ character_stats_results: {
   final_stats: 0
   final_stats: 9369.98
   final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
  }
 }
 stat_weights_results: {
@@ -51,6 +57,12 @@ stat_weights_results: {
   weights: 0
   weights: 1.5521285960051727
   weights: 0.568961833403464
+  weights: 0
+  weights: 0
+  weights: 0
+  weights: 0
+  weights: 0
+  weights: 0
   weights: 0
   weights: 0
   weights: 0
