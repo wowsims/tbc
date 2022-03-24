@@ -525,9 +525,15 @@ export interface ComputeStatsRequest {
  */
 export interface PlayerStats {
     /**
-     * @generated from protobuf field: repeated double gear_only = 1;
+     * Stats
+     *
+     * @generated from protobuf field: repeated double base_stats = 6;
      */
-    gearOnly: number[];
+    baseStats: number[];
+    /**
+     * @generated from protobuf field: repeated double gear_stats = 1;
+     */
+    gearStats: number[];
     /**
      * @generated from protobuf field: repeated double final_stats = 2;
      */

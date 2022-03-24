@@ -1378,7 +1378,8 @@ export const ComputeStatsRequest = new ComputeStatsRequest$Type();
 class PlayerStats$Type extends MessageType {
     constructor() {
         super("proto.PlayerStats", [
-            { no: 1, name: "gear_only", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 6, name: "base_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 1, name: "gear_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 2, name: "final_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "sets", kind: "scalar", repeat: 2 /*RepeatType.UNPACKED*/, T: 9 /*ScalarType.STRING*/ },
             { no: 4, name: "buffs", kind: "message", T: () => IndividualBuffs },
@@ -1386,7 +1387,7 @@ class PlayerStats$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { gearOnly: [], finalStats: [], sets: [], cooldowns: [] };
+        const message = { baseStats: [], gearStats: [], finalStats: [], sets: [], cooldowns: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1397,12 +1398,19 @@ class PlayerStats$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated double gear_only */ 1:
+                case /* repeated double base_stats */ 6:
                     if (wireType === WireType.LengthDelimited)
                         for (let e = reader.int32() + reader.pos; reader.pos < e;)
-                            message.gearOnly.push(reader.double());
+                            message.baseStats.push(reader.double());
                     else
-                        message.gearOnly.push(reader.double());
+                        message.baseStats.push(reader.double());
+                    break;
+                case /* repeated double gear_stats */ 1:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.gearStats.push(reader.double());
+                    else
+                        message.gearStats.push(reader.double());
                     break;
                 case /* repeated double final_stats */ 2:
                     if (wireType === WireType.LengthDelimited)
@@ -1432,11 +1440,18 @@ class PlayerStats$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated double gear_only = 1; */
-        if (message.gearOnly.length) {
+        /* repeated double base_stats = 6; */
+        if (message.baseStats.length) {
+            writer.tag(6, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.baseStats.length; i++)
+                writer.double(message.baseStats[i]);
+            writer.join();
+        }
+        /* repeated double gear_stats = 1; */
+        if (message.gearStats.length) {
             writer.tag(1, WireType.LengthDelimited).fork();
-            for (let i = 0; i < message.gearOnly.length; i++)
-                writer.double(message.gearOnly[i]);
+            for (let i = 0; i < message.gearStats.length; i++)
+                writer.double(message.gearStats[i]);
             writer.join();
         }
         /* repeated double final_stats = 2; */
