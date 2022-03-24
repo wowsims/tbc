@@ -334,13 +334,9 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		at.RemoveAura(sim, newAura.ID)
 	}
 
-	if newAura.Duration == NeverExpires {
-		newAura.expires = NeverExpires
-		newAura.startTime = sim.CurrentTime
+	newAura.startTime = sim.CurrentTime
 
-		// permanent auras can be ignored for advance()
-	} else {
-		newAura.startTime = sim.CurrentTime
+	if newAura.Duration != NeverExpires {
 		newAura.expires = sim.CurrentTime + newAura.Duration
 
 		newAura.activeIndex = int32(len(at.activeAuraIDs))
