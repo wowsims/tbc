@@ -9,6 +9,7 @@ import (
 
 const JudgementManaCost = 147.0
 const JudgementCDTime = time.Second * 10
+const JudgementDuration = time.Second * 20
 
 var JudgementCD = core.NewCooldownID()
 var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: JudgementCD}
@@ -37,7 +38,8 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
 					paladin.RemoveAura(sim, SealOfBloodAuraID)
-					paladin.currentSeal = core.Aura{}
+					paladin.currentSealID = 0
+					paladin.currentSealExpires = 0
 				},
 			},
 			DirectInput: core.DirectDamageInput{
@@ -64,12 +66,12 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 
 func (paladin *Paladin) NewJudgementOfBlood(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// No seal has even been active, so we can't cast judgement
-	if paladin.currentSeal.ID != SealOfBloodAuraID {
+	if paladin.currentSealID != SealOfBloodAuraID {
 		return nil
 	}
 
 	// Most recent seal has expired so we can't cast judgement
-	if paladin.currentSeal.Expires <= sim.CurrentTime {
+	if paladin.currentSealExpires <= sim.CurrentTime {
 		return nil
 	}
 
@@ -103,7 +105,8 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.Cost.Value)
 					paladin.RemoveAura(sim, SealOfTheCrusaderAuraID)
-					paladin.currentSeal = core.Aura{}
+					paladin.currentSealID = 0
+					paladin.currentSealExpires = 0
 				},
 			},
 		},
@@ -115,7 +118,8 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 					}
 					aura := core.JudgementOfTheCrusaderAura(sim, float64(paladin.Talents.ImprovedSealOfTheCrusader))
 					spellEffect.Target.AddAura(sim, aura)
-					paladin.currentJudgement = aura
+					paladin.currentJudgementID = aura.ID
+					paladin.currentJudgementExpires = sim.CurrentTime + JudgementDuration
 				},
 			},
 		},
@@ -132,12 +136,12 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 
 func (paladin *Paladin) NewJudgementOfTheCrusader(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// No seal has even been active, so we can't cast judgement
-	if paladin.currentSeal.ID != SealOfTheCrusaderAuraID {
+	if paladin.currentSealID != SealOfTheCrusaderAuraID {
 		return nil
 	}
 
 	// Most recent seal has expired so we can't cast judgement
-	if paladin.currentSeal.Expires <= sim.CurrentTime {
+	if paladin.currentSealExpires <= sim.CurrentTime {
 		return nil
 	}
 
@@ -173,7 +177,8 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfWisdom.Cost.Value)
 					paladin.RemoveAura(sim, SealOfWisdomAuraID)
-					paladin.currentSeal = core.Aura{}
+					paladin.currentSealID = 0
+					paladin.currentSealExpires = 0
 				},
 			},
 		},
@@ -185,7 +190,8 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 					}
 					aura := core.JudgementOfWisdomAura(sim)
 					spellEffect.Target.AddAura(sim, aura)
-					paladin.currentJudgement = aura
+					paladin.currentJudgementID = aura.ID
+					paladin.currentJudgementExpires = sim.CurrentTime + JudgementDuration
 				},
 			},
 		},
@@ -202,12 +208,12 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 
 func (paladin *Paladin) NewJudgementOfWisdom(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 	// No seal has even been active, so we can't cast judgement
-	if paladin.currentSeal.ID != SealOfWisdomAuraID {
+	if paladin.currentSealID != SealOfWisdomAuraID {
 		return nil
 	}
 
 	// Most recent seal has expired so we can't cast judgement
-	if paladin.currentSeal.Expires <= sim.CurrentTime {
+	if paladin.currentSealExpires <= sim.CurrentTime {
 		return nil
 	}
 

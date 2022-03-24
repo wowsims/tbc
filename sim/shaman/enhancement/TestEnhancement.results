@@ -143,7 +143,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-CloakofDarkness-33122"
  value: {
-  dps: 1902.1727555083569
+  dps: 1902.1727555083576
  }
 }
 dps_results: {
@@ -161,7 +161,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-CycloneHarness"
  value: {
-  dps: 1587.44868094404
+  dps: 1588.2521302418263
  }
 }
 dps_results: {
@@ -203,7 +203,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Devastation-30316"
  value: {
-  dps: 1762.7706330076528
+  dps: 1763.6008311725388
  }
 }
 dps_results: {
@@ -473,7 +473,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-SingingCrystalAxe-31318"
  value: {
-  dps: 1376.0450680993276
+  dps: 1376.83973200501
  }
 }
 dps_results: {
@@ -575,7 +575,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TheFistsofFury"
  value: {
-  dps: 1603.156280572847
+  dps: 1603.1562805728468
  }
 }
 dps_results: {
@@ -665,13 +665,13 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Average-Default"
  value: {
-  dps: 1958.5581405397522
+  dps: 1958.6813996715691
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2102.3635649869293
+  dps: 2103.1962328213285
  }
 }
 dps_results: {
@@ -683,7 +683,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1310.8844272342774
+  dps: 1311.6650880872833
  }
 }
 dps_results: {
@@ -695,19 +695,19 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1000.8904261718038
+  dps: 1002.2368020504226
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 916.2151961729058
+  dps: 916.8826606577816
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 641.626727436137
+  dps: 641.6267274361369
  }
 }
 dps_results: {
@@ -749,7 +749,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 895.2263939251243
+  dps: 896.5696726775185
  }
 }
 dps_results: {

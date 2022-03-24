@@ -37,7 +37,7 @@ func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.SimpleS
 					spellEffect.Target.AddAura(sim, core.Aura{
 						ID:       ScorpidStingDebuffID,
 						ActionID: actionID,
-						Expires:  sim.CurrentTime + time.Second*20,
+						Duration: time.Second * 20,
 					})
 				},
 			},

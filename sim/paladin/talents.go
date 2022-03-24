@@ -108,6 +108,7 @@ func (paladin *Paladin) applyVengeance() {
 	vng := core.Aura{
 		ID:       VengeanceAuraID,
 		ActionID: VengeanceActionID,
+		Duration: VengeanceDuration,
 		Stacks:   0,
 	}
 
@@ -128,7 +129,6 @@ func (paladin *Paladin) applyVengeance() {
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					vng.Stacks = core.MinInt32(3, paladin.NumStacks(VengeanceAuraID)+1)
-					vng.Expires = sim.CurrentTime + VengeanceDuration
 					paladin.ReplaceAura(sim, vng)
 				}
 			},

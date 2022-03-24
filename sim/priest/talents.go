@@ -148,7 +148,7 @@ func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
 	priest.Character.AddAura(sim, core.Aura{
 		ID:       InnerFocusAuraID,
 		ActionID: actionID,
-		Expires:  core.NeverExpires,
+		Duration: core.NeverExpires,
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
 			cast.Cost.Value = 0
 		},

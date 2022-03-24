@@ -17,7 +17,6 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 		return
 	}
 
-	const dur = time.Second * 15
 	const cd = time.Minute * 2
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
@@ -42,7 +41,7 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 				character.AddAura(sim, core.Aura{
 					ID:       ShamanisticRageAuraID,
 					ActionID: ShamanisticRageActionID,
-					Expires:  sim.CurrentTime + dur,
+					Duration: time.Second * 15,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						// proc mask: 20
 						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {

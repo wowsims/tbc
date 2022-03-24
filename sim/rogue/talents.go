@@ -80,6 +80,7 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim 
 	findWeaknessAura := core.Aura{
 		ID:       FindWeaknessAuraID,
 		ActionID: core.ActionID{SpellID: 31242},
+		Duration: time.Second * 10,
 		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 			// TODO: This should be rogue abilities only, not all specials.
 			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
@@ -103,9 +104,7 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim 
 			}
 		}
 		if findWeaknessMultiplier != 1 {
-			aura := findWeaknessAura
-			aura.Expires = sim.CurrentTime + time.Second*10
-			rogue.ReplaceAura(sim, aura)
+			rogue.ReplaceAura(sim, findWeaknessAura)
 		}
 	}
 }
@@ -151,7 +150,7 @@ func (rogue *Rogue) registerColdBloodCD() {
 	coldBloodAura := core.Aura{
 		ID:       ColdBloodAuraID,
 		ActionID: actionID,
-		Expires:  core.NeverExpires,
+		Duration: core.NeverExpires,
 		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 			// TODO: This should be rogue abilities only, not all specials.
 			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
@@ -353,21 +352,25 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 	const inverseHasteBonus = 1 / 1.2
 	const energyCost = 25.0
 
+	dur := time.Second * 15
+	cooldown := time.Minute * 2
+
 	bladeFlurryAura := core.Aura{
 		ID:       BladeFlurryAuraID,
 		ActionID: actionID,
+		Duration: dur,
+		OnGain: func(sim *core.Simulation) {
+			rogue.MultiplyMeleeSpeed(sim, hasteBonus)
+		},
+		OnExpire: func(sim *core.Simulation) {
+			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
+		},
 		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 			if sim.GetNumTargets() > 1 {
 				spellEffect.DamageMultiplier *= 2
 			}
 		},
-		OnExpire: func(sim *core.Simulation) {
-			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
-		},
 	}
-
-	cooldown := time.Minute * 2
-	dur := time.Second * 15
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
@@ -381,10 +384,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 				Value: energyCost,
 			},
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				rogue.MultiplyMeleeSpeed(sim, hasteBonus)
-				aura := bladeFlurryAura
-				aura.Expires = sim.CurrentTime + dur
-				rogue.AddAura(sim, aura)
+				rogue.AddAura(sim, bladeFlurryAura)
 			},
 		},
 	}
@@ -441,6 +441,7 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 	adrenalineRushAura := core.Aura{
 		ID:       AdrenalineRushAuraID,
 		ActionID: actionID,
+		Duration: time.Second * 15,
 		OnGain: func(sim *core.Simulation) {
 			rogue.ResetEnergyTick(sim)
 			rogue.EnergyTickMultiplier = 2
@@ -461,9 +462,7 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 			GCD:         time.Second,
 			IgnoreHaste: true,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				aura := adrenalineRushAura
-				aura.Expires = sim.CurrentTime + time.Second*15
-				rogue.AddAura(sim, aura)
+				rogue.AddAura(sim, adrenalineRushAura)
 			},
 		},
 	}
