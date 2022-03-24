@@ -116,6 +116,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfMight: TristateEffect.TristateEffectImproved,
+					blessingOfSalvation: true,
 					unleashedRage: true,
 				}),
 				debuffs: Debuffs.create({
@@ -160,6 +161,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
 				IconInputs.BlessingOfMight,
+				IconInputs.BlessingOfSalvation,
 				IconInputs.UnleashedRage,
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
