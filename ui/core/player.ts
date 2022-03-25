@@ -46,6 +46,7 @@ import {
 	SpecTalents,
 	SpecTypeFunctions,
 	SpecOptions,
+	canEquipEnchant,
 	canEquipItem,
 	classColors,
 	getEligibleEnchantSlots,
@@ -210,7 +211,7 @@ export class Player<SpecType extends Spec> {
 
 	// Returns all enchants that this player can wear in the given slot.
 	getEnchants(slot: ItemSlot | undefined): Array<Enchant> {
-		return this.sim.getEnchants(slot);
+		return this.sim.getEnchants(slot).filter(enchant => canEquipEnchant(enchant, this.spec));
 	}
 
 	// Returns all gems that this player can wear of the given color.
