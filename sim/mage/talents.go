@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (mage *Mage) applyTalents() {
+func (mage *Mage) ApplyTalents() {
 	mage.applyArcaneConcentration()
 	mage.applyIgnite()
 	mage.applyMasterOfElements()

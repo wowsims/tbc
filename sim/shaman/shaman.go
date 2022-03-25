@@ -81,7 +81,6 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, totems pro
 	}
 
 	shaman.registerBloodlustCD()
-	shaman.applyTalents()
 
 	return shaman
 }

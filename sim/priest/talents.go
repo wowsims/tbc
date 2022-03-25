@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (priest *Priest) applyTalents() {
+func (priest *Priest) ApplyTalents() {
 	if priest.Talents.Meditation > 0 {
 		priest.PseudoStats.SpiritRegenRateCasting = float64(priest.Talents.Meditation) * 0.1
 	}

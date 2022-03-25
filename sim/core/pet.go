@@ -169,3 +169,4 @@ func (pet *Pet) GetCharacter() *Character {
 }
 func (pet *Pet) AddRaidBuffs(raidBuffs *proto.RaidBuffs)    {}
 func (pet *Pet) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {}
+func (pet *Pet) ApplyTalents()                              {}

@@ -331,7 +331,6 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		},
 	})
 
-	rogue.applyTalents()
 	rogue.registerThistleTeaCD()
 
 	return rogue

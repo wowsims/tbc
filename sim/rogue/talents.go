@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (rogue *Rogue) applyTalents() {
+func (rogue *Rogue) ApplyTalents() {
 	// TODO: Puncturing Wounds, IEA, poisons, mutilate, blade flurry, adrenaline rush
 	// Everything in the sub tree
 

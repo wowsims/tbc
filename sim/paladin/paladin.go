@@ -127,8 +127,6 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 	paladin.setupSealOfTheCrusader()
 	paladin.setupSealOfWisdom()
 
-	paladin.applyTalents()
-
 	paladin.registerAvengingWrathCD()
 
 	return paladin

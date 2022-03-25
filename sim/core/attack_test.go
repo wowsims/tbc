@@ -116,6 +116,10 @@ func (fa *FakeAgent) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	panic("not implemented") // TODO: Implement
 }
 
+func (fa *FakeAgent) ApplyTalents() {
+	panic("not implemented") // TODO: Implement
+}
+
 // Called once before the first iteration, after all Agents and Targets are finalized.
 // Use this to do any precomputations that require access to Sim or Target fields.
 func (fa *FakeAgent) Init(sim *Simulation) {

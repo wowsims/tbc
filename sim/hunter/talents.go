@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (hunter *Hunter) applyTalents() {
+func (hunter *Hunter) ApplyTalents() {
 	if hunter.pet != nil {
 		hunter.applyFocusedFire()
 		hunter.applyFrenzy()
@@ -100,6 +100,10 @@ func (hunter *Hunter) applyTalents() {
 			},
 		})
 	}
+
+	hunter.applyInitialAspect()
+	hunter.applyKillCommand()
+	hunter.registerRapidFireCD()
 }
 
 func (hunter *Hunter) critMultiplier(isRanged bool, target *core.Target) float64 {
