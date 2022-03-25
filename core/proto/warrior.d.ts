@@ -383,6 +383,45 @@ export interface Warrior_Options {
      */
     recklessness: boolean;
 }
+/**
+ * @generated from protobuf message proto.ProtectionWarrior
+ */
+export interface ProtectionWarrior {
+    /**
+     * @generated from protobuf field: proto.ProtectionWarrior.Rotation rotation = 1;
+     */
+    rotation?: ProtectionWarrior_Rotation;
+    /**
+     * @generated from protobuf field: proto.WarriorTalents talents = 2;
+     */
+    talents?: WarriorTalents;
+    /**
+     * @generated from protobuf field: proto.ProtectionWarrior.Options options = 3;
+     */
+    options?: ProtectionWarrior_Options;
+}
+/**
+ * @generated from protobuf message proto.ProtectionWarrior.Rotation
+ */
+export interface ProtectionWarrior_Rotation {
+}
+/**
+ * @generated from protobuf message proto.ProtectionWarrior.Options
+ */
+export interface ProtectionWarrior_Options {
+    /**
+     * @generated from protobuf field: double starting_rage = 1;
+     */
+    startingRage: number;
+    /**
+     * @generated from protobuf field: bool precast_t2 = 2;
+     */
+    precastT2: boolean;
+    /**
+     * @generated from protobuf field: bool precast_sapphire = 3;
+     */
+    precastSapphire: boolean;
+}
 declare class WarriorTalents$Type extends MessageType<WarriorTalents> {
     constructor();
     create(value?: PartialMessage<WarriorTalents>): WarriorTalents;
@@ -453,4 +492,34 @@ declare class Warrior_Options$Type extends MessageType<Warrior_Options> {
  * @generated MessageType for protobuf message proto.Warrior.Options
  */
 export declare const Warrior_Options: Warrior_Options$Type;
+declare class ProtectionWarrior$Type extends MessageType<ProtectionWarrior> {
+    constructor();
+    create(value?: PartialMessage<ProtectionWarrior>): ProtectionWarrior;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ProtectionWarrior): ProtectionWarrior;
+    internalBinaryWrite(message: ProtectionWarrior, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.ProtectionWarrior
+ */
+export declare const ProtectionWarrior: ProtectionWarrior$Type;
+declare class ProtectionWarrior_Rotation$Type extends MessageType<ProtectionWarrior_Rotation> {
+    constructor();
+    create(value?: PartialMessage<ProtectionWarrior_Rotation>): ProtectionWarrior_Rotation;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ProtectionWarrior_Rotation): ProtectionWarrior_Rotation;
+    internalBinaryWrite(message: ProtectionWarrior_Rotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.ProtectionWarrior.Rotation
+ */
+export declare const ProtectionWarrior_Rotation: ProtectionWarrior_Rotation$Type;
+declare class ProtectionWarrior_Options$Type extends MessageType<ProtectionWarrior_Options> {
+    constructor();
+    create(value?: PartialMessage<ProtectionWarrior_Options>): ProtectionWarrior_Options;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ProtectionWarrior_Options): ProtectionWarrior_Options;
+    internalBinaryWrite(message: ProtectionWarrior_Options, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.ProtectionWarrior.Options
+ */
+export declare const ProtectionWarrior_Options: ProtectionWarrior_Options$Type;
 export {};

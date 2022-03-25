@@ -13,12 +13,13 @@ import { ActionID } from "./common";
 import { RaidBuffs } from "./common";
 import { PartyBuffs } from "./common";
 import { Cooldowns } from "./common";
-import { SmitePriest } from "./priest";
+import { ProtectionWarrior } from "./warrior";
 import { Warrior } from "./warrior";
 import { Warlock } from "./warlock";
 import { EnhancementShaman } from "./shaman";
 import { ElementalShaman } from "./shaman";
 import { Rogue } from "./rogue";
+import { SmitePriest } from "./priest";
 import { ShadowPriest } from "./priest";
 import { RetributionPaladin } from "./paladin";
 import { Mage } from "./mage";
@@ -97,6 +98,12 @@ export interface Player {
          */
         shadowPriest: ShadowPriest;
     } | {
+        oneofKind: "smitePriest";
+        /**
+         * @generated from protobuf field: proto.SmitePriest smite_priest = 20;
+         */
+        smitePriest: SmitePriest;
+    } | {
         oneofKind: "rogue";
         /**
          * @generated from protobuf field: proto.Rogue rogue = 11;
@@ -127,11 +134,11 @@ export interface Player {
          */
         warrior: Warrior;
     } | {
-        oneofKind: "smitePriest";
+        oneofKind: "protectionWarrior";
         /**
-         * @generated from protobuf field: proto.SmitePriest smite_priest = 20;
+         * @generated from protobuf field: proto.ProtectionWarrior protection_warrior = 21;
          */
-        smitePriest: SmitePriest;
+        protectionWarrior: ProtectionWarrior;
     } | {
         oneofKind: undefined;
     };

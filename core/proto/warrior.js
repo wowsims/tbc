@@ -854,3 +854,151 @@ class Warrior_Options$Type extends MessageType {
  * @generated MessageType for protobuf message proto.Warrior.Options
  */
 export const Warrior_Options = new Warrior_Options$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ProtectionWarrior$Type extends MessageType {
+    constructor() {
+        super("proto.ProtectionWarrior", [
+            { no: 1, name: "rotation", kind: "message", T: () => ProtectionWarrior_Rotation },
+            { no: 2, name: "talents", kind: "message", T: () => WarriorTalents },
+            { no: 3, name: "options", kind: "message", T: () => ProtectionWarrior_Options }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.ProtectionWarrior.Rotation rotation */ 1:
+                    message.rotation = ProtectionWarrior_Rotation.internalBinaryRead(reader, reader.uint32(), options, message.rotation);
+                    break;
+                case /* proto.WarriorTalents talents */ 2:
+                    message.talents = WarriorTalents.internalBinaryRead(reader, reader.uint32(), options, message.talents);
+                    break;
+                case /* proto.ProtectionWarrior.Options options */ 3:
+                    message.options = ProtectionWarrior_Options.internalBinaryRead(reader, reader.uint32(), options, message.options);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.ProtectionWarrior.Rotation rotation = 1; */
+        if (message.rotation)
+            ProtectionWarrior_Rotation.internalBinaryWrite(message.rotation, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.WarriorTalents talents = 2; */
+        if (message.talents)
+            WarriorTalents.internalBinaryWrite(message.talents, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.ProtectionWarrior.Options options = 3; */
+        if (message.options)
+            ProtectionWarrior_Options.internalBinaryWrite(message.options, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.ProtectionWarrior
+ */
+export const ProtectionWarrior = new ProtectionWarrior$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ProtectionWarrior_Rotation$Type extends MessageType {
+    constructor() {
+        super("proto.ProtectionWarrior.Rotation", []);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        return target ?? this.create();
+    }
+    internalBinaryWrite(message, writer, options) {
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.ProtectionWarrior.Rotation
+ */
+export const ProtectionWarrior_Rotation = new ProtectionWarrior_Rotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ProtectionWarrior_Options$Type extends MessageType {
+    constructor() {
+        super("proto.ProtectionWarrior.Options", [
+            { no: 1, name: "starting_rage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 2, name: "precast_t2", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "precast_sapphire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { startingRage: 0, precastT2: false, precastSapphire: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* double starting_rage */ 1:
+                    message.startingRage = reader.double();
+                    break;
+                case /* bool precast_t2 */ 2:
+                    message.precastT2 = reader.bool();
+                    break;
+                case /* bool precast_sapphire */ 3:
+                    message.precastSapphire = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* double starting_rage = 1; */
+        if (message.startingRage !== 0)
+            writer.tag(1, WireType.Bit64).double(message.startingRage);
+        /* bool precast_t2 = 2; */
+        if (message.precastT2 !== false)
+            writer.tag(2, WireType.Varint).bool(message.precastT2);
+        /* bool precast_sapphire = 3; */
+        if (message.precastSapphire !== false)
+            writer.tag(3, WireType.Varint).bool(message.precastSapphire);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.ProtectionWarrior.Options
+ */
+export const ProtectionWarrior_Options = new ProtectionWarrior_Options$Type();

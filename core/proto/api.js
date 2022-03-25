@@ -12,12 +12,13 @@ import { ActionID } from './common.js';
 import { RaidBuffs } from './common.js';
 import { PartyBuffs } from './common.js';
 import { Cooldowns } from './common.js';
-import { SmitePriest } from './priest.js';
+import { ProtectionWarrior } from './warrior.js';
 import { Warrior } from './warrior.js';
 import { Warlock } from './warlock.js';
 import { EnhancementShaman } from './shaman.js';
 import { ElementalShaman } from './shaman.js';
 import { Rogue } from './rogue.js';
+import { SmitePriest } from './priest.js';
 import { ShadowPriest } from './priest.js';
 import { RetributionPaladin } from './paladin.js';
 import { Mage } from './mage.js';
@@ -74,12 +75,13 @@ class Player$Type extends MessageType {
             { no: 8, name: "mage", kind: "message", oneof: "spec", T: () => Mage },
             { no: 9, name: "retribution_paladin", kind: "message", oneof: "spec", T: () => RetributionPaladin },
             { no: 10, name: "shadow_priest", kind: "message", oneof: "spec", T: () => ShadowPriest },
+            { no: 20, name: "smite_priest", kind: "message", oneof: "spec", T: () => SmitePriest },
             { no: 11, name: "rogue", kind: "message", oneof: "spec", T: () => Rogue },
             { no: 12, name: "elemental_shaman", kind: "message", oneof: "spec", T: () => ElementalShaman },
             { no: 18, name: "enhancement_shaman", kind: "message", oneof: "spec", T: () => EnhancementShaman },
             { no: 13, name: "warlock", kind: "message", oneof: "spec", T: () => Warlock },
             { no: 14, name: "warrior", kind: "message", oneof: "spec", T: () => Warrior },
-            { no: 20, name: "smite_priest", kind: "message", oneof: "spec", T: () => SmitePriest },
+            { no: 21, name: "protection_warrior", kind: "message", oneof: "spec", T: () => ProtectionWarrior },
             { no: 17, name: "talentsString", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 19, name: "cooldowns", kind: "message", T: () => Cooldowns }
         ]);
@@ -151,6 +153,12 @@ class Player$Type extends MessageType {
                         shadowPriest: ShadowPriest.internalBinaryRead(reader, reader.uint32(), options, message.spec.shadowPriest)
                     };
                     break;
+                case /* proto.SmitePriest smite_priest */ 20:
+                    message.spec = {
+                        oneofKind: "smitePriest",
+                        smitePriest: SmitePriest.internalBinaryRead(reader, reader.uint32(), options, message.spec.smitePriest)
+                    };
+                    break;
                 case /* proto.Rogue rogue */ 11:
                     message.spec = {
                         oneofKind: "rogue",
@@ -181,10 +189,10 @@ class Player$Type extends MessageType {
                         warrior: Warrior.internalBinaryRead(reader, reader.uint32(), options, message.spec.warrior)
                     };
                     break;
-                case /* proto.SmitePriest smite_priest */ 20:
+                case /* proto.ProtectionWarrior protection_warrior */ 21:
                     message.spec = {
-                        oneofKind: "smitePriest",
-                        smitePriest: SmitePriest.internalBinaryRead(reader, reader.uint32(), options, message.spec.smitePriest)
+                        oneofKind: "protectionWarrior",
+                        protectionWarrior: ProtectionWarrior.internalBinaryRead(reader, reader.uint32(), options, message.spec.protectionWarrior)
                     };
                     break;
                 case /* string talentsString */ 17:
@@ -245,6 +253,9 @@ class Player$Type extends MessageType {
         /* proto.ShadowPriest shadow_priest = 10; */
         if (message.spec.oneofKind === "shadowPriest")
             ShadowPriest.internalBinaryWrite(message.spec.shadowPriest, writer.tag(10, WireType.LengthDelimited).fork(), options).join();
+        /* proto.SmitePriest smite_priest = 20; */
+        if (message.spec.oneofKind === "smitePriest")
+            SmitePriest.internalBinaryWrite(message.spec.smitePriest, writer.tag(20, WireType.LengthDelimited).fork(), options).join();
         /* proto.Rogue rogue = 11; */
         if (message.spec.oneofKind === "rogue")
             Rogue.internalBinaryWrite(message.spec.rogue, writer.tag(11, WireType.LengthDelimited).fork(), options).join();
@@ -260,9 +271,9 @@ class Player$Type extends MessageType {
         /* proto.Warrior warrior = 14; */
         if (message.spec.oneofKind === "warrior")
             Warrior.internalBinaryWrite(message.spec.warrior, writer.tag(14, WireType.LengthDelimited).fork(), options).join();
-        /* proto.SmitePriest smite_priest = 20; */
-        if (message.spec.oneofKind === "smitePriest")
-            SmitePriest.internalBinaryWrite(message.spec.smitePriest, writer.tag(20, WireType.LengthDelimited).fork(), options).join();
+        /* proto.ProtectionWarrior protection_warrior = 21; */
+        if (message.spec.oneofKind === "protectionWarrior")
+            ProtectionWarrior.internalBinaryWrite(message.spec.protectionWarrior, writer.tag(21, WireType.LengthDelimited).fork(), options).join();
         /* string talentsString = 17; */
         if (message.talentsString !== "")
             writer.tag(17, WireType.LengthDelimited).string(message.talentsString);
