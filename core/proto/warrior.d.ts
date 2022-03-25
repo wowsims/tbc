@@ -15,6 +15,10 @@ export interface WarriorTalents {
      */
     improvedHeroicStrike: number;
     /**
+     * @generated from protobuf field: int32 deflection = 45;
+     */
+    deflection: number;
+    /**
      * @generated from protobuf field: int32 improved_rend = 2;
      */
     improvedRend: number;
@@ -93,6 +97,10 @@ export interface WarriorTalents {
      */
     cruelty: number;
     /**
+     * @generated from protobuf field: int32 improved_demoralizing_shout = 46;
+     */
+    improvedDemoralizingShout: number;
+    /**
      * @generated from protobuf field: int32 unbridled_wrath = 21;
      */
     unbridledWrath: number;
@@ -163,6 +171,22 @@ export interface WarriorTalents {
      */
     tacticalMastery: number;
     /**
+     * @generated from protobuf field: int32 anticipation = 47;
+     */
+    anticipation: number;
+    /**
+     * @generated from protobuf field: int32 shield_specialization = 48;
+     */
+    shieldSpecialization: number;
+    /**
+     * @generated from protobuf field: int32 toughness = 49;
+     */
+    toughness: number;
+    /**
+     * @generated from protobuf field: int32 improved_shield_block = 50;
+     */
+    improvedShieldBlock: number;
+    /**
      * @generated from protobuf field: int32 defiance = 38;
      */
     defiance: number;
@@ -171,9 +195,17 @@ export interface WarriorTalents {
      */
     improvedSunderArmor: number;
     /**
+     * @generated from protobuf field: int32 shield_mastery = 51;
+     */
+    shieldMastery: number;
+    /**
      * @generated from protobuf field: int32 one_handed_weapon_specialization = 40;
      */
     oneHandedWeaponSpecialization: number;
+    /**
+     * @generated from protobuf field: int32 improved_defensive_stance = 52;
+     */
+    improvedDefensiveStance: number;
     /**
      * @generated from protobuf field: bool shield_slam = 41;
      */

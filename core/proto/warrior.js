@@ -40,6 +40,7 @@ class WarriorTalents$Type extends MessageType {
     constructor() {
         super("proto.WarriorTalents", [
             { no: 1, name: "improved_heroic_strike", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 45, name: "deflection", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "improved_rend", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "improved_charge", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 4, name: "improved_thunder_clap", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -59,6 +60,7 @@ class WarriorTalents$Type extends MessageType {
             { no: 18, name: "endless_rage", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 19, name: "booming_voice", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 20, name: "cruelty", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 46, name: "improved_demoralizing_shout", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 21, name: "unbridled_wrath", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 22, name: "improved_cleave", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 23, name: "commanding_presence", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -76,9 +78,15 @@ class WarriorTalents$Type extends MessageType {
             { no: 35, name: "rampage", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 36, name: "improved_bloodrage", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 37, name: "tactical_mastery", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 47, name: "anticipation", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 48, name: "shield_specialization", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 49, name: "toughness", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 50, name: "improved_shield_block", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 38, name: "defiance", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 39, name: "improved_sunder_armor", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 51, name: "shield_mastery", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 40, name: "one_handed_weapon_specialization", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 52, name: "improved_defensive_stance", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 41, name: "shield_slam", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 42, name: "focused_rage", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 43, name: "vitality", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -86,7 +94,7 @@ class WarriorTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { improvedHeroicStrike: 0, improvedRend: 0, improvedCharge: 0, improvedThunderClap: 0, improvedOverpower: 0, angerManagement: false, deepWounds: 0, twoHandedWeaponSpecialization: 0, impale: 0, poleaxeSpecialization: 0, deathWish: false, maceSpecialization: 0, swordSpecialization: 0, improvedDisciplines: 0, bloodFrenzy: 0, mortalStrike: false, improvedMortalStrike: 0, endlessRage: false, boomingVoice: 0, cruelty: 0, unbridledWrath: 0, improvedCleave: 0, commandingPresence: 0, dualWieldSpecialization: 0, improvedExecute: 0, improvedSlam: 0, sweepingStrikes: false, weaponMastery: 0, improvedBerserkerRage: 0, flurry: 0, precision: 0, bloodthirst: false, improvedWhirlwind: 0, improvedBerserkerStance: 0, rampage: false, improvedBloodrage: 0, tacticalMastery: 0, defiance: 0, improvedSunderArmor: 0, oneHandedWeaponSpecialization: 0, shieldSlam: false, focusedRage: 0, vitality: 0, devastate: false };
+        const message = { improvedHeroicStrike: 0, deflection: 0, improvedRend: 0, improvedCharge: 0, improvedThunderClap: 0, improvedOverpower: 0, angerManagement: false, deepWounds: 0, twoHandedWeaponSpecialization: 0, impale: 0, poleaxeSpecialization: 0, deathWish: false, maceSpecialization: 0, swordSpecialization: 0, improvedDisciplines: 0, bloodFrenzy: 0, mortalStrike: false, improvedMortalStrike: 0, endlessRage: false, boomingVoice: 0, cruelty: 0, improvedDemoralizingShout: 0, unbridledWrath: 0, improvedCleave: 0, commandingPresence: 0, dualWieldSpecialization: 0, improvedExecute: 0, improvedSlam: 0, sweepingStrikes: false, weaponMastery: 0, improvedBerserkerRage: 0, flurry: 0, precision: 0, bloodthirst: false, improvedWhirlwind: 0, improvedBerserkerStance: 0, rampage: false, improvedBloodrage: 0, tacticalMastery: 0, anticipation: 0, shieldSpecialization: 0, toughness: 0, improvedShieldBlock: 0, defiance: 0, improvedSunderArmor: 0, shieldMastery: 0, oneHandedWeaponSpecialization: 0, improvedDefensiveStance: 0, shieldSlam: false, focusedRage: 0, vitality: 0, devastate: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -99,6 +107,9 @@ class WarriorTalents$Type extends MessageType {
             switch (fieldNo) {
                 case /* int32 improved_heroic_strike */ 1:
                     message.improvedHeroicStrike = reader.int32();
+                    break;
+                case /* int32 deflection */ 45:
+                    message.deflection = reader.int32();
                     break;
                 case /* int32 improved_rend */ 2:
                     message.improvedRend = reader.int32();
@@ -157,6 +168,9 @@ class WarriorTalents$Type extends MessageType {
                 case /* int32 cruelty */ 20:
                     message.cruelty = reader.int32();
                     break;
+                case /* int32 improved_demoralizing_shout */ 46:
+                    message.improvedDemoralizingShout = reader.int32();
+                    break;
                 case /* int32 unbridled_wrath */ 21:
                     message.unbridledWrath = reader.int32();
                     break;
@@ -208,14 +222,32 @@ class WarriorTalents$Type extends MessageType {
                 case /* int32 tactical_mastery */ 37:
                     message.tacticalMastery = reader.int32();
                     break;
+                case /* int32 anticipation */ 47:
+                    message.anticipation = reader.int32();
+                    break;
+                case /* int32 shield_specialization */ 48:
+                    message.shieldSpecialization = reader.int32();
+                    break;
+                case /* int32 toughness */ 49:
+                    message.toughness = reader.int32();
+                    break;
+                case /* int32 improved_shield_block */ 50:
+                    message.improvedShieldBlock = reader.int32();
+                    break;
                 case /* int32 defiance */ 38:
                     message.defiance = reader.int32();
                     break;
                 case /* int32 improved_sunder_armor */ 39:
                     message.improvedSunderArmor = reader.int32();
                     break;
+                case /* int32 shield_mastery */ 51:
+                    message.shieldMastery = reader.int32();
+                    break;
                 case /* int32 one_handed_weapon_specialization */ 40:
                     message.oneHandedWeaponSpecialization = reader.int32();
+                    break;
+                case /* int32 improved_defensive_stance */ 52:
+                    message.improvedDefensiveStance = reader.int32();
                     break;
                 case /* bool shield_slam */ 41:
                     message.shieldSlam = reader.bool();
@@ -244,6 +276,9 @@ class WarriorTalents$Type extends MessageType {
         /* int32 improved_heroic_strike = 1; */
         if (message.improvedHeroicStrike !== 0)
             writer.tag(1, WireType.Varint).int32(message.improvedHeroicStrike);
+        /* int32 deflection = 45; */
+        if (message.deflection !== 0)
+            writer.tag(45, WireType.Varint).int32(message.deflection);
         /* int32 improved_rend = 2; */
         if (message.improvedRend !== 0)
             writer.tag(2, WireType.Varint).int32(message.improvedRend);
@@ -301,6 +336,9 @@ class WarriorTalents$Type extends MessageType {
         /* int32 cruelty = 20; */
         if (message.cruelty !== 0)
             writer.tag(20, WireType.Varint).int32(message.cruelty);
+        /* int32 improved_demoralizing_shout = 46; */
+        if (message.improvedDemoralizingShout !== 0)
+            writer.tag(46, WireType.Varint).int32(message.improvedDemoralizingShout);
         /* int32 unbridled_wrath = 21; */
         if (message.unbridledWrath !== 0)
             writer.tag(21, WireType.Varint).int32(message.unbridledWrath);
@@ -352,15 +390,33 @@ class WarriorTalents$Type extends MessageType {
         /* int32 tactical_mastery = 37; */
         if (message.tacticalMastery !== 0)
             writer.tag(37, WireType.Varint).int32(message.tacticalMastery);
+        /* int32 anticipation = 47; */
+        if (message.anticipation !== 0)
+            writer.tag(47, WireType.Varint).int32(message.anticipation);
+        /* int32 shield_specialization = 48; */
+        if (message.shieldSpecialization !== 0)
+            writer.tag(48, WireType.Varint).int32(message.shieldSpecialization);
+        /* int32 toughness = 49; */
+        if (message.toughness !== 0)
+            writer.tag(49, WireType.Varint).int32(message.toughness);
+        /* int32 improved_shield_block = 50; */
+        if (message.improvedShieldBlock !== 0)
+            writer.tag(50, WireType.Varint).int32(message.improvedShieldBlock);
         /* int32 defiance = 38; */
         if (message.defiance !== 0)
             writer.tag(38, WireType.Varint).int32(message.defiance);
         /* int32 improved_sunder_armor = 39; */
         if (message.improvedSunderArmor !== 0)
             writer.tag(39, WireType.Varint).int32(message.improvedSunderArmor);
+        /* int32 shield_mastery = 51; */
+        if (message.shieldMastery !== 0)
+            writer.tag(51, WireType.Varint).int32(message.shieldMastery);
         /* int32 one_handed_weapon_specialization = 40; */
         if (message.oneHandedWeaponSpecialization !== 0)
             writer.tag(40, WireType.Varint).int32(message.oneHandedWeaponSpecialization);
+        /* int32 improved_defensive_stance = 52; */
+        if (message.improvedDefensiveStance !== 0)
+            writer.tag(52, WireType.Varint).int32(message.improvedDefensiveStance);
         /* bool shield_slam = 41; */
         if (message.shieldSlam !== false)
             writer.tag(41, WireType.Varint).bool(message.shieldSlam);
