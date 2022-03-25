@@ -2357,11 +2357,12 @@ class Enchant$Type extends MessageType {
             { no: 9, name: "enchant_type", kind: "enum", T: () => ["proto.EnchantType", EnchantType] },
             { no: 7, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 8, name: "quality", kind: "enum", T: () => ["proto.ItemQuality", ItemQuality] },
-            { no: 11, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+            { no: 11, name: "phase", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 12, name: "class_allowlist", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.Class", Class] }
         ]);
     }
     create(value) {
-        const message = { id: 0, effectId: 0, name: "", isSpellId: false, type: 0, enchantType: 0, stats: [], quality: 0, phase: 0 };
+        const message = { id: 0, effectId: 0, name: "", isSpellId: false, type: 0, enchantType: 0, stats: [], quality: 0, phase: 0, classAllowlist: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -2402,6 +2403,13 @@ class Enchant$Type extends MessageType {
                     break;
                 case /* int32 phase */ 11:
                     message.phase = reader.int32();
+                    break;
+                case /* repeated proto.Class class_allowlist */ 12:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.classAllowlist.push(reader.int32());
+                    else
+                        message.classAllowlist.push(reader.int32());
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -2446,6 +2454,13 @@ class Enchant$Type extends MessageType {
         /* int32 phase = 11; */
         if (message.phase !== 0)
             writer.tag(11, WireType.Varint).int32(message.phase);
+        /* repeated proto.Class class_allowlist = 12; */
+        if (message.classAllowlist.length) {
+            writer.tag(12, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.classAllowlist.length; i++)
+                writer.int32(message.classAllowlist[i]);
+            writer.join();
+        }
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

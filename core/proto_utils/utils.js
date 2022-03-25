@@ -1081,6 +1081,13 @@ export function enchantAppliesToItem(enchant, item) {
     return true;
 }
 ;
+export function canEquipEnchant(enchant, spec) {
+    const playerClass = specToClass[spec];
+    if (enchant.classAllowlist.length > 0 && !enchant.classAllowlist.includes(playerClass)) {
+        return false;
+    }
+    return true;
+}
 export const NO_TARGET = -1;
 export function newRaidTarget(raidIndex) {
     return RaidTarget.create({

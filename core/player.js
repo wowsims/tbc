@@ -14,7 +14,7 @@ import { getWeaponDPS } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { gemMatchesSocket, } from '/tbc/core/proto_utils/gems.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { canEquipItem, classColors, getEligibleItemSlots, getTalentTree, getTalentTreeIcon, getMetaGemEffectEP, raceToFaction, specEPTransforms, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
+import { canEquipEnchant, canEquipItem, classColors, getEligibleItemSlots, getTalentTree, getTalentTreeIcon, getMetaGemEffectEP, raceToFaction, specEPTransforms, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
 import { TypedEvent } from './typed_event.js';
 import { MAX_PARTY_SIZE } from './party.js';
 import { sum } from './utils.js';
@@ -124,7 +124,7 @@ export class Player {
     }
     // Returns all enchants that this player can wear in the given slot.
     getEnchants(slot) {
-        return this.sim.getEnchants(slot);
+        return this.sim.getEnchants(slot).filter(enchant => canEquipEnchant(enchant, this.spec));
     }
     // Returns all gems that this player can wear of the given color.
     getGems(socketColor) {

@@ -573,6 +573,12 @@ export interface Enchant {
      * @generated from protobuf field: int32 phase = 11;
      */
     phase: number;
+    /**
+     * Classes that are allowed to use the enchant. Empty indicates no special class restrictions.
+     *
+     * @generated from protobuf field: repeated proto.Class class_allowlist = 12;
+     */
+    classAllowlist: Class[];
 }
 /**
  * @generated from protobuf message proto.Gem

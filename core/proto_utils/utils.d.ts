@@ -92,6 +92,7 @@ export declare function getEligibleItemSlots(item: Item): Array<ItemSlot>;
 export declare function validWeaponCombo(mainHand: Item | null | undefined, offHand: Item | null | undefined): boolean;
 export declare function getEligibleEnchantSlots(enchant: Enchant): Array<ItemSlot>;
 export declare function enchantAppliesToItem(enchant: Enchant, item: Item): boolean;
+export declare function canEquipEnchant(enchant: Enchant, spec: Spec): boolean;
 export declare const NO_TARGET = -1;
 export declare function newRaidTarget(raidIndex: number): RaidTarget;
 export declare function emptyRaidTarget(): RaidTarget;
