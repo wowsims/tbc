@@ -85,7 +85,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 
 			defaults: {
 				// Default equipped gear.
-				gear: EquipmentSpec.create(),
+				gear: Presets.P1_BALANCED_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
 					[Stat.StatStrength]: 2.5,
@@ -236,6 +236,8 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
+					Presets.P1_BALANCED_PRESET,
+					Presets.P4_BALANCED_PRESET,
 				],
 			},
 		});
