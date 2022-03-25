@@ -141,19 +141,23 @@ type Enchant struct {
 	ItemType    proto.ItemType    // Which slot the enchant goes on.
 	EnchantType proto.EnchantType // Additional category when ItemType isn't enough.
 	Phase       int32
+
+	// Used by the UI to filter which enchants are shown.
+	ClassAllowlist []proto.Class
 }
 
 func (enchant Enchant) ToProto() *proto.Enchant {
 	return &proto.Enchant{
-		Id:          enchant.ID,
-		EffectId:    enchant.EffectID,
-		Name:        enchant.Name,
-		IsSpellId:   enchant.IsSpellID,
-		Type:        enchant.ItemType,
-		EnchantType: enchant.EnchantType,
-		Stats:       enchant.Bonus[:],
-		Quality:     enchant.Quality,
-		Phase:       enchant.Phase,
+		Id:             enchant.ID,
+		EffectId:       enchant.EffectID,
+		Name:           enchant.Name,
+		IsSpellId:      enchant.IsSpellID,
+		Type:           enchant.ItemType,
+		EnchantType:    enchant.EnchantType,
+		Stats:          enchant.Bonus[:],
+		Quality:        enchant.Quality,
+		Phase:          enchant.Phase,
+		ClassAllowlist: enchant.ClassAllowlist[:],
 	}
 }
 
