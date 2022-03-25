@@ -96,4 +96,6 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	{ID: 32421, Filter: true},
 	{ID: 32422, Filter: true},
 	{ID: 33482, Filter: true},
+	{ID: 35321, Phase: 4}, // Cloak of arcane Alacrity
+	{ID: 33304, Phase: 4}, // Cloak of Subjugated Power
 }
