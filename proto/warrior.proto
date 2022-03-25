@@ -51,7 +51,7 @@ message WarriorTalents {
 	int32 anticipation = 47;
 	int32 shield_specialization = 48;
 	int32 toughness = 49;
-	int32 improved_shield_block = 50;
+	bool improved_shield_block = 50;
 	int32 defiance = 38;
 	int32 improved_sunder_armor = 39;
 	int32 shield_mastery = 51;
