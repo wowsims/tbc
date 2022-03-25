@@ -381,13 +381,13 @@ func (shaman *Shaman) applyFlurry() {
 							},
 						})
 					}
-					icd = 0
+					icd = 0 // the "charge protection" ICD isn't up yet
 					flurryStacks = 3
 					return
 				}
 
 				// Remove a stack.
-				if flurryStacks > 0 && !spellCast.SameAction(StormstrikeActionID) && !icd.IsOnCD(sim) {
+				if flurryStacks > 0 && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) && !icd.IsOnCD(sim) {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 					flurryStacks--
 					if flurryStacks == 0 {
