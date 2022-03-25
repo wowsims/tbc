@@ -183,9 +183,9 @@ export interface WarriorTalents {
      */
     toughness: number;
     /**
-     * @generated from protobuf field: int32 improved_shield_block = 50;
+     * @generated from protobuf field: bool improved_shield_block = 50;
      */
-    improvedShieldBlock: number;
+    improvedShieldBlock: boolean;
     /**
      * @generated from protobuf field: int32 defiance = 38;
      */
