@@ -12,9 +12,10 @@ enum Spec {
     SpecRetributionPaladin = 3;
     SpecRogue = 7;
     SpecShadowPriest = 4;
+    SpecSmitePriest = 10;
     SpecWarlock = 5;
     SpecWarrior = 6;
-    SpecSmitePriest = 10;
+    SpecProtectionWarrior = 11;
 }
 
 enum Race {
@@ -520,6 +521,9 @@ message Enchant {
 
     ItemQuality quality = 8;
 		int32 phase = 11;
+
+		// Classes that are allowed to use the enchant. Empty indicates no special class restrictions.
+		repeated Class class_allowlist = 12;
 }
 
 message Gem {
