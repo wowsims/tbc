@@ -6,6 +6,7 @@ option go_package = "./proto";
 message WarriorTalents {
 	// Arms
 	int32 improved_heroic_strike = 1;
+	int32 deflection = 45;
 	int32 improved_rend = 2;
 	int32 improved_charge = 3;
 	int32 improved_thunder_clap = 4;
@@ -27,6 +28,7 @@ message WarriorTalents {
 	// Fury
 	int32 booming_voice = 19;
 	int32 cruelty = 20;
+	int32 improved_demoralizing_shout = 46;
 	int32 unbridled_wrath = 21;
 	int32 improved_cleave = 22;
 	int32 commanding_presence = 23;
@@ -46,9 +48,15 @@ message WarriorTalents {
 	// Protection
 	int32 improved_bloodrage = 36;
 	int32 tactical_mastery = 37;
+	int32 anticipation = 47;
+	int32 shield_specialization = 48;
+	int32 toughness = 49;
+	int32 improved_shield_block = 50;
 	int32 defiance = 38;
 	int32 improved_sunder_armor = 39;
+	int32 shield_mastery = 51;
 	int32 one_handed_weapon_specialization = 40;
+	int32 improved_defensive_stance = 52;
 	bool shield_slam = 41;
 	int32 focused_rage = 42;
 	int32 vitality = 43;
