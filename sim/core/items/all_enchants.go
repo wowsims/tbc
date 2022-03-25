@@ -88,6 +88,7 @@ var Enchants = []Enchant{
 
 	// Shield
 	{ID: 22539, EffectID: 2654, Name: "Shield - Intellect", Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Intellect: 12}, ItemType: proto.ItemType_ItemTypeWeapon, EnchantType: proto.EnchantType_EnchantTypeShield},
+	{ID: 28282, EffectID: 1071, Name: "Shield - Major Stamina", Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Stamina: 18}, ItemType: proto.ItemType_ItemTypeWeapon, EnchantType: proto.EnchantType_EnchantTypeShield},
 
 	// Ring
 	{ID: 22535, EffectID: 2929, Name: "Ring - Striking", Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{}, ItemType: proto.ItemType_ItemTypeFinger},
