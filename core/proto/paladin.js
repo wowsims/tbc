@@ -56,22 +56,38 @@ class PaladinTalents$Type extends MessageType {
             { no: 6, name: "purifying_power", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 7, name: "holy_power", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 8, name: "holy_shock", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 51, name: "blessed_life", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 9, name: "holy_guidance", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 10, name: "divine_illumination", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 35, name: "improved_devotion_aura", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 36, name: "redoubt", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 11, name: "precision", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 37, name: "toughness", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 12, name: "blessing_of_kings", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 38, name: "improved_righteous_fury", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 39, name: "shield_specialization", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 40, name: "anticipation", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 41, name: "spell_warding", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 42, name: "blessing_of_sanctuary", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 13, name: "reckoning", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 14, name: "sacred_duty", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 15, name: "one_handed_weapon_specialization", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 43, name: "improved_holy_shield", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 44, name: "holy_shield", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 45, name: "ardent_defender", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 16, name: "combat_expertise", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 17, name: "avengers_shield", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 18, name: "improved_blessing_of_might", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 19, name: "benediction", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 20, name: "improved_judgement", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 21, name: "improved_seal_of_the_crusader", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 46, name: "deflection", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 22, name: "vindication", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 23, name: "conviction", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 24, name: "seal_of_command", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 47, name: "pursuit_of_justice", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 48, name: "eye_for_an_eye", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 49, name: "improved_retribution_aura", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 25, name: "crusade", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 26, name: "two_handed_weapon_specialization", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 27, name: "sanctity_aura", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -79,12 +95,13 @@ class PaladinTalents$Type extends MessageType {
             { no: 29, name: "vengeance", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 30, name: "sanctified_judgement", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 31, name: "sanctified_seals", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 50, name: "divine_purpose", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 32, name: "fanaticism", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 33, name: "crusader_strike", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { divineStrength: 0, divineIntellect: 0, improvedSealOfRighteousness: 0, illumination: 0, improvedBlessingOfWisdom: 0, divineFavor: false, purifyingPower: 0, holyPower: 0, holyShock: false, holyGuidance: 0, divineIllumination: false, precision: 0, blessingOfKings: false, reckoning: 0, sacredDuty: 0, oneHandedWeaponSpecialization: 0, combatExpertise: 0, avengersShield: false, improvedBlessingOfMight: 0, benediction: 0, improvedJudgement: 0, improvedSealOfTheCrusader: 0, vindication: 0, conviction: 0, sealOfCommand: false, crusade: 0, twoHandedWeaponSpecialization: 0, sanctityAura: false, improvedSanctityAura: 0, vengeance: 0, sanctifiedJudgement: 0, sanctifiedSeals: 0, fanaticism: 0, crusaderStrike: false };
+        const message = { divineStrength: 0, divineIntellect: 0, improvedSealOfRighteousness: 0, illumination: 0, improvedBlessingOfWisdom: 0, divineFavor: false, purifyingPower: 0, holyPower: 0, holyShock: false, blessedLife: 0, holyGuidance: 0, divineIllumination: false, improvedDevotionAura: 0, redoubt: 0, precision: 0, toughness: 0, blessingOfKings: false, improvedRighteousFury: 0, shieldSpecialization: 0, anticipation: 0, spellWarding: 0, blessingOfSanctuary: false, reckoning: 0, sacredDuty: 0, oneHandedWeaponSpecialization: 0, improvedHolyShield: 0, holyShield: false, ardentDefender: 0, combatExpertise: 0, avengersShield: false, improvedBlessingOfMight: 0, benediction: 0, improvedJudgement: 0, improvedSealOfTheCrusader: 0, deflection: 0, vindication: 0, conviction: 0, sealOfCommand: false, pursuitOfJustice: 0, eyeForAnEye: 0, improvedRetributionAura: 0, crusade: 0, twoHandedWeaponSpecialization: 0, sanctityAura: false, improvedSanctityAura: 0, vengeance: 0, sanctifiedJudgement: 0, sanctifiedSeals: 0, divinePurpose: 0, fanaticism: 0, crusaderStrike: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -122,17 +139,44 @@ class PaladinTalents$Type extends MessageType {
                 case /* bool holy_shock */ 8:
                     message.holyShock = reader.bool();
                     break;
+                case /* int32 blessed_life */ 51:
+                    message.blessedLife = reader.int32();
+                    break;
                 case /* int32 holy_guidance */ 9:
                     message.holyGuidance = reader.int32();
                     break;
                 case /* bool divine_illumination */ 10:
                     message.divineIllumination = reader.bool();
                     break;
+                case /* int32 improved_devotion_aura */ 35:
+                    message.improvedDevotionAura = reader.int32();
+                    break;
+                case /* int32 redoubt */ 36:
+                    message.redoubt = reader.int32();
+                    break;
                 case /* int32 precision */ 11:
                     message.precision = reader.int32();
                     break;
+                case /* int32 toughness */ 37:
+                    message.toughness = reader.int32();
+                    break;
                 case /* bool blessing_of_kings */ 12:
                     message.blessingOfKings = reader.bool();
+                    break;
+                case /* int32 improved_righteous_fury */ 38:
+                    message.improvedRighteousFury = reader.int32();
+                    break;
+                case /* int32 shield_specialization */ 39:
+                    message.shieldSpecialization = reader.int32();
+                    break;
+                case /* int32 anticipation */ 40:
+                    message.anticipation = reader.int32();
+                    break;
+                case /* int32 spell_warding */ 41:
+                    message.spellWarding = reader.int32();
+                    break;
+                case /* bool blessing_of_sanctuary */ 42:
+                    message.blessingOfSanctuary = reader.bool();
                     break;
                 case /* int32 reckoning */ 13:
                     message.reckoning = reader.int32();
@@ -142,6 +186,15 @@ class PaladinTalents$Type extends MessageType {
                     break;
                 case /* int32 one_handed_weapon_specialization */ 15:
                     message.oneHandedWeaponSpecialization = reader.int32();
+                    break;
+                case /* int32 improved_holy_shield */ 43:
+                    message.improvedHolyShield = reader.int32();
+                    break;
+                case /* bool holy_shield */ 44:
+                    message.holyShield = reader.bool();
+                    break;
+                case /* int32 ardent_defender */ 45:
+                    message.ardentDefender = reader.int32();
                     break;
                 case /* int32 combat_expertise */ 16:
                     message.combatExpertise = reader.int32();
@@ -161,6 +214,9 @@ class PaladinTalents$Type extends MessageType {
                 case /* int32 improved_seal_of_the_crusader */ 21:
                     message.improvedSealOfTheCrusader = reader.int32();
                     break;
+                case /* int32 deflection */ 46:
+                    message.deflection = reader.int32();
+                    break;
                 case /* int32 vindication */ 22:
                     message.vindication = reader.int32();
                     break;
@@ -169,6 +225,15 @@ class PaladinTalents$Type extends MessageType {
                     break;
                 case /* bool seal_of_command */ 24:
                     message.sealOfCommand = reader.bool();
+                    break;
+                case /* int32 pursuit_of_justice */ 47:
+                    message.pursuitOfJustice = reader.int32();
+                    break;
+                case /* int32 eye_for_an_eye */ 48:
+                    message.eyeForAnEye = reader.int32();
+                    break;
+                case /* int32 improved_retribution_aura */ 49:
+                    message.improvedRetributionAura = reader.int32();
                     break;
                 case /* int32 crusade */ 25:
                     message.crusade = reader.int32();
@@ -190,6 +255,9 @@ class PaladinTalents$Type extends MessageType {
                     break;
                 case /* int32 sanctified_seals */ 31:
                     message.sanctifiedSeals = reader.int32();
+                    break;
+                case /* int32 divine_purpose */ 50:
+                    message.divinePurpose = reader.int32();
                     break;
                 case /* int32 fanaticism */ 32:
                     message.fanaticism = reader.int32();
@@ -236,18 +304,45 @@ class PaladinTalents$Type extends MessageType {
         /* bool holy_shock = 8; */
         if (message.holyShock !== false)
             writer.tag(8, WireType.Varint).bool(message.holyShock);
+        /* int32 blessed_life = 51; */
+        if (message.blessedLife !== 0)
+            writer.tag(51, WireType.Varint).int32(message.blessedLife);
         /* int32 holy_guidance = 9; */
         if (message.holyGuidance !== 0)
             writer.tag(9, WireType.Varint).int32(message.holyGuidance);
         /* bool divine_illumination = 10; */
         if (message.divineIllumination !== false)
             writer.tag(10, WireType.Varint).bool(message.divineIllumination);
+        /* int32 improved_devotion_aura = 35; */
+        if (message.improvedDevotionAura !== 0)
+            writer.tag(35, WireType.Varint).int32(message.improvedDevotionAura);
+        /* int32 redoubt = 36; */
+        if (message.redoubt !== 0)
+            writer.tag(36, WireType.Varint).int32(message.redoubt);
         /* int32 precision = 11; */
         if (message.precision !== 0)
             writer.tag(11, WireType.Varint).int32(message.precision);
+        /* int32 toughness = 37; */
+        if (message.toughness !== 0)
+            writer.tag(37, WireType.Varint).int32(message.toughness);
         /* bool blessing_of_kings = 12; */
         if (message.blessingOfKings !== false)
             writer.tag(12, WireType.Varint).bool(message.blessingOfKings);
+        /* int32 improved_righteous_fury = 38; */
+        if (message.improvedRighteousFury !== 0)
+            writer.tag(38, WireType.Varint).int32(message.improvedRighteousFury);
+        /* int32 shield_specialization = 39; */
+        if (message.shieldSpecialization !== 0)
+            writer.tag(39, WireType.Varint).int32(message.shieldSpecialization);
+        /* int32 anticipation = 40; */
+        if (message.anticipation !== 0)
+            writer.tag(40, WireType.Varint).int32(message.anticipation);
+        /* int32 spell_warding = 41; */
+        if (message.spellWarding !== 0)
+            writer.tag(41, WireType.Varint).int32(message.spellWarding);
+        /* bool blessing_of_sanctuary = 42; */
+        if (message.blessingOfSanctuary !== false)
+            writer.tag(42, WireType.Varint).bool(message.blessingOfSanctuary);
         /* int32 reckoning = 13; */
         if (message.reckoning !== 0)
             writer.tag(13, WireType.Varint).int32(message.reckoning);
@@ -257,6 +352,15 @@ class PaladinTalents$Type extends MessageType {
         /* int32 one_handed_weapon_specialization = 15; */
         if (message.oneHandedWeaponSpecialization !== 0)
             writer.tag(15, WireType.Varint).int32(message.oneHandedWeaponSpecialization);
+        /* int32 improved_holy_shield = 43; */
+        if (message.improvedHolyShield !== 0)
+            writer.tag(43, WireType.Varint).int32(message.improvedHolyShield);
+        /* bool holy_shield = 44; */
+        if (message.holyShield !== false)
+            writer.tag(44, WireType.Varint).bool(message.holyShield);
+        /* int32 ardent_defender = 45; */
+        if (message.ardentDefender !== 0)
+            writer.tag(45, WireType.Varint).int32(message.ardentDefender);
         /* int32 combat_expertise = 16; */
         if (message.combatExpertise !== 0)
             writer.tag(16, WireType.Varint).int32(message.combatExpertise);
@@ -275,6 +379,9 @@ class PaladinTalents$Type extends MessageType {
         /* int32 improved_seal_of_the_crusader = 21; */
         if (message.improvedSealOfTheCrusader !== 0)
             writer.tag(21, WireType.Varint).int32(message.improvedSealOfTheCrusader);
+        /* int32 deflection = 46; */
+        if (message.deflection !== 0)
+            writer.tag(46, WireType.Varint).int32(message.deflection);
         /* int32 vindication = 22; */
         if (message.vindication !== 0)
             writer.tag(22, WireType.Varint).int32(message.vindication);
@@ -284,6 +391,15 @@ class PaladinTalents$Type extends MessageType {
         /* bool seal_of_command = 24; */
         if (message.sealOfCommand !== false)
             writer.tag(24, WireType.Varint).bool(message.sealOfCommand);
+        /* int32 pursuit_of_justice = 47; */
+        if (message.pursuitOfJustice !== 0)
+            writer.tag(47, WireType.Varint).int32(message.pursuitOfJustice);
+        /* int32 eye_for_an_eye = 48; */
+        if (message.eyeForAnEye !== 0)
+            writer.tag(48, WireType.Varint).int32(message.eyeForAnEye);
+        /* int32 improved_retribution_aura = 49; */
+        if (message.improvedRetributionAura !== 0)
+            writer.tag(49, WireType.Varint).int32(message.improvedRetributionAura);
         /* int32 crusade = 25; */
         if (message.crusade !== 0)
             writer.tag(25, WireType.Varint).int32(message.crusade);
@@ -305,6 +421,9 @@ class PaladinTalents$Type extends MessageType {
         /* int32 sanctified_seals = 31; */
         if (message.sanctifiedSeals !== 0)
             writer.tag(31, WireType.Varint).int32(message.sanctifiedSeals);
+        /* int32 divine_purpose = 50; */
+        if (message.divinePurpose !== 0)
+            writer.tag(50, WireType.Varint).int32(message.divinePurpose);
         /* int32 fanaticism = 32; */
         if (message.fanaticism !== 0)
             writer.tag(32, WireType.Varint).int32(message.fanaticism);

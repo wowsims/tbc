@@ -47,6 +47,10 @@ export interface PaladinTalents {
      */
     holyShock: boolean;
     /**
+     * @generated from protobuf field: int32 blessed_life = 51;
+     */
+    blessedLife: number;
+    /**
      * @generated from protobuf field: int32 holy_guidance = 9;
      */
     holyGuidance: number;
@@ -57,13 +61,45 @@ export interface PaladinTalents {
     /**
      * Protection
      *
+     * @generated from protobuf field: int32 improved_devotion_aura = 35;
+     */
+    improvedDevotionAura: number;
+    /**
+     * @generated from protobuf field: int32 redoubt = 36;
+     */
+    redoubt: number;
+    /**
      * @generated from protobuf field: int32 precision = 11;
      */
     precision: number;
     /**
+     * @generated from protobuf field: int32 toughness = 37;
+     */
+    toughness: number;
+    /**
      * @generated from protobuf field: bool blessing_of_kings = 12;
      */
     blessingOfKings: boolean;
+    /**
+     * @generated from protobuf field: int32 improved_righteous_fury = 38;
+     */
+    improvedRighteousFury: number;
+    /**
+     * @generated from protobuf field: int32 shield_specialization = 39;
+     */
+    shieldSpecialization: number;
+    /**
+     * @generated from protobuf field: int32 anticipation = 40;
+     */
+    anticipation: number;
+    /**
+     * @generated from protobuf field: int32 spell_warding = 41;
+     */
+    spellWarding: number;
+    /**
+     * @generated from protobuf field: bool blessing_of_sanctuary = 42;
+     */
+    blessingOfSanctuary: boolean;
     /**
      * @generated from protobuf field: int32 reckoning = 13;
      */
@@ -76,6 +112,18 @@ export interface PaladinTalents {
      * @generated from protobuf field: int32 one_handed_weapon_specialization = 15;
      */
     oneHandedWeaponSpecialization: number;
+    /**
+     * @generated from protobuf field: int32 improved_holy_shield = 43;
+     */
+    improvedHolyShield: number;
+    /**
+     * @generated from protobuf field: bool holy_shield = 44;
+     */
+    holyShield: boolean;
+    /**
+     * @generated from protobuf field: int32 ardent_defender = 45;
+     */
+    ardentDefender: number;
     /**
      * @generated from protobuf field: int32 combat_expertise = 16;
      */
@@ -103,6 +151,10 @@ export interface PaladinTalents {
      */
     improvedSealOfTheCrusader: number;
     /**
+     * @generated from protobuf field: int32 deflection = 46;
+     */
+    deflection: number;
+    /**
      * @generated from protobuf field: int32 vindication = 22;
      */
     vindication: number;
@@ -114,6 +166,18 @@ export interface PaladinTalents {
      * @generated from protobuf field: bool seal_of_command = 24;
      */
     sealOfCommand: boolean;
+    /**
+     * @generated from protobuf field: int32 pursuit_of_justice = 47;
+     */
+    pursuitOfJustice: number;
+    /**
+     * @generated from protobuf field: int32 eye_for_an_eye = 48;
+     */
+    eyeForAnEye: number;
+    /**
+     * @generated from protobuf field: int32 improved_retribution_aura = 49;
+     */
+    improvedRetributionAura: number;
     /**
      * @generated from protobuf field: int32 crusade = 25;
      */
@@ -142,6 +206,10 @@ export interface PaladinTalents {
      * @generated from protobuf field: int32 sanctified_seals = 31;
      */
     sanctifiedSeals: number;
+    /**
+     * @generated from protobuf field: int32 divine_purpose = 50;
+     */
+    divinePurpose: number;
     /**
      * @generated from protobuf field: int32 fanaticism = 32;
      */

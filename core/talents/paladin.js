@@ -172,7 +172,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 1,
             },
             {
-                //fieldName: 'blessedLife',
+                fieldName: 'blessedLife',
                 location: {
                     rowIdx: 6,
                     colIdx: 2,
@@ -205,7 +205,7 @@ export const paladinTalentsConfig = [
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/classic/383.jpg',
         talents: [
             {
-                //fieldName: 'improvedDevotionAura',
+                fieldName: 'improvedDevotionAura',
                 location: {
                     rowIdx: 0,
                     colIdx: 1,
@@ -214,7 +214,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 5,
             },
             {
-                //fieldName: 'redoubt',
+                fieldName: 'redoubt',
                 location: {
                     rowIdx: 0,
                     colIdx: 2,
@@ -241,7 +241,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 2,
             },
             {
-                //fieldName: 'toughness',
+                fieldName: 'toughness',
                 location: {
                     rowIdx: 1,
                     colIdx: 3,
@@ -259,7 +259,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 1,
             },
             {
-                //fieldName: 'improvedRighteousFury',
+                fieldName: 'improvedRighteousFury',
                 location: {
                     rowIdx: 2,
                     colIdx: 1,
@@ -268,7 +268,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 3,
             },
             {
-                //fieldName: 'shieldSpecialization',
+                fieldName: 'shieldSpecialization',
                 location: {
                     rowIdx: 2,
                     colIdx: 2,
@@ -281,7 +281,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 3,
             },
             {
-                //fieldName: 'anticipation',
+                fieldName: 'anticipation',
                 location: {
                     rowIdx: 2,
                     colIdx: 3,
@@ -317,7 +317,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 3,
             },
             {
-                //fieldName: 'spellWarding',
+                fieldName: 'spellWarding',
                 location: {
                     rowIdx: 4,
                     colIdx: 0,
@@ -326,7 +326,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 2,
             },
             {
-                //fieldName: 'blessingOfSanctuary',
+                fieldName: 'blessingOfSanctuary',
                 location: {
                     rowIdx: 4,
                     colIdx: 1,
@@ -362,7 +362,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 5,
             },
             {
-                //fieldName: 'improvedHolyShield',
+                fieldName: 'improvedHolyShield',
                 location: {
                     rowIdx: 6,
                     colIdx: 0,
@@ -375,7 +375,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 2,
             },
             {
-                //fieldName: 'holyShield',
+                fieldName: 'holyShield',
                 location: {
                     rowIdx: 6,
                     colIdx: 1,
@@ -388,7 +388,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 1,
             },
             {
-                //fieldName: 'ardentDefender',
+                fieldName: 'ardentDefender',
                 location: {
                     rowIdx: 6,
                     colIdx: 2,
@@ -461,7 +461,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 3,
             },
             {
-                //fieldName: 'deflection',
+                fieldName: 'deflection',
                 location: {
                     rowIdx: 1,
                     colIdx: 2,
@@ -497,7 +497,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 1,
             },
             {
-                //fieldName: 'pursuitOfJustice',
+                fieldName: 'pursuitOfJustice',
                 location: {
                     rowIdx: 2,
                     colIdx: 3,
@@ -506,7 +506,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 3,
             },
             {
-                //fieldName: 'eyeForAnEye',
+                fieldName: 'eyeForAnEye',
                 location: {
                     rowIdx: 3,
                     colIdx: 0,
@@ -515,7 +515,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 2,
             },
             {
-                //fieldName: 'improvedRetributionAura',
+                fieldName: 'improvedRetributionAura',
                 location: {
                     rowIdx: 3,
                     colIdx: 2,
@@ -600,7 +600,7 @@ export const paladinTalentsConfig = [
                 maxPoints: 1,
             },
             {
-                //fieldName: 'divinePurpose',
+                fieldName: 'divinePurpose',
                 location: {
                     rowIdx: 6,
                     colIdx: 2,
