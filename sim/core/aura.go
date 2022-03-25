@@ -100,7 +100,9 @@ type Aura struct {
 }
 
 func (aura *Aura) refresh(sim *Simulation) {
-	if aura.Duration != NeverExpires {
+	if aura.Duration == NeverExpires {
+		aura.expires = NeverExpires
+	} else {
 		aura.expires = sim.CurrentTime + aura.Duration
 	}
 }
@@ -334,12 +336,10 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		at.RemoveAura(sim, newAura.ID)
 	}
 
-	if newAura.Duration == NeverExpires {
-		newAura.startTime = sim.CurrentTime
-		newAura.expires = NeverExpires
+	newAura.startTime = sim.CurrentTime
+	newAura.refresh(sim)
 
-		// permanent auras can be ignored in advance()
-	} else {
+	if newAura.Duration != NeverExpires {
 		newAura.startTime = sim.CurrentTime
 		newAura.expires = sim.CurrentTime + newAura.Duration
 
