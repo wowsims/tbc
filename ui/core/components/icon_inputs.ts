@@ -66,8 +66,9 @@ export const DrumsOfRestorationBuff = makeEnumValuePartyBuffInput(ActionId.fromS
 
 // Individual Buffs
 export const BlessingOfKings = makeBooleanIndividualBuffInput(ActionId.fromSpellId(25898), 'blessingOfKings');
-export const BlessingOfWisdom = makeTristateIndividualBuffInput(ActionId.fromSpellId(27143), ActionId.fromSpellId(20245), 'blessingOfWisdom');
 export const BlessingOfMight = makeTristateIndividualBuffInput(ActionId.fromSpellId(27140), ActionId.fromSpellId(20048), 'blessingOfMight');
+export const BlessingOfSalvation = makeBooleanIndividualBuffInput(ActionId.fromSpellId(25895), 'blessingOfSalvation');
+export const BlessingOfWisdom = makeTristateIndividualBuffInput(ActionId.fromSpellId(27143), ActionId.fromSpellId(20245), 'blessingOfWisdom');
 export const Innervate = makeMultistateIndividualBuffInput(ActionId.fromSpellId(29166), 11, 'innervates');
 export const PowerInfusion = makeMultistateIndividualBuffInput(ActionId.fromSpellId(10060), 11, 'powerInfusions');
 export const UnleashedRage = makeBooleanIndividualBuffInput(ActionId.fromSpellId(30811), 'unleashedRage');
@@ -194,6 +195,7 @@ function makeBooleanIndividualBuffInput(id: ActionId, buffsFieldName: keyof Indi
 	return {
 		id: id,
 		states: 2,
+		extraCssClasses: buffsFieldName == 'blessingOfSalvation' ? [ 'threat-metrics' ] : [],
 		exclusivityTags: exclusivityTags,
 		changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
 		getValue: (player: Player<any>) => player.getBuffs()[buffsFieldName] as boolean,

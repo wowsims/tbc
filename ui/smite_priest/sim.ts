@@ -116,6 +116,7 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfWisdom: 2,
+					blessingOfSalvation: true,
 				}),
 				debuffs: Debuffs.create({
 					judgementOfWisdom: true,
@@ -156,6 +157,7 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
+				IconInputs.BlessingOfSalvation,
 				IconInputs.Innervate,
 				IconInputs.PowerInfusion,
 			],

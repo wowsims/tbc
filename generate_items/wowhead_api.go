@@ -15,7 +15,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-type Stats [29]float64
+type Stats [35]float64
 
 type WowheadItemResponse struct {
 	Name    string `json:"name"`
@@ -97,6 +97,16 @@ var armorPenetrationRegex = regexp.MustCompile("Your attacks ignore ([0-9]+) of 
 var expertiseRegex = regexp.MustCompile("Increases your expertise rating by <!--rtg37-->([0-9]+)\\.")
 var weaponDamageRegex = regexp.MustCompile("<!--dmg-->([0-9]+) - ([0-9]+)")
 var weaponSpeedRegex = regexp.MustCompile("<!--spd-->(([0-9]+).([0-9]+))")
+var defenseRegex = regexp.MustCompile("Increases defense rating by <!--rtg12-->([0-9]+)\\.")
+var defenseRegex2 = regexp.MustCompile("Increases defense rating by ([0-9]+)\\.")
+var blockRegex = regexp.MustCompile("Increases your shield block rating by <!--rtg15-->([0-9]+)\\.")
+var blockRegex2 = regexp.MustCompile("Increases your shield block rating by ([0-9]+)\\.")
+var blockValueRegex = regexp.MustCompile("Increases the block value of your shield by ([0-9]+)\\.")
+var dodgeRegex = regexp.MustCompile("Increases your dodge rating by <!--rtg13-->([0-9]+)\\.")
+var dodgeRegex2 = regexp.MustCompile("Increases your dodge rating by ([0-9]+)\\.")
+var parryRegex = regexp.MustCompile("Increases your parry rating by <!--rtg14-->([0-9]+)\\.")
+var parryRegex2 = regexp.MustCompile("Increases your parry rating by ([0-9]+)\\.")
+var resilienceRegex = regexp.MustCompile("Improved your resilience rating by <!--rtg35-->([0-9]+)\\.")
 
 func (item WowheadItemResponse) GetStats() Stats {
 	spellPower := item.GetIntValue(spellPowerRegex)
@@ -134,6 +144,12 @@ func (item WowheadItemResponse) GetStats() Stats {
 		proto.Stat_StatMeleeHaste:        float64(item.GetIntValue(meleeHasteRegex)),
 		proto.Stat_StatArmorPenetration:  float64(item.GetIntValue(armorPenetrationRegex)),
 		proto.Stat_StatExpertise:         float64(item.GetIntValue(expertiseRegex)),
+		proto.Stat_StatDefense:           float64(item.GetIntValue(defenseRegex) + item.GetIntValue(defenseRegex2)),
+		proto.Stat_StatBlock:             float64(item.GetIntValue(blockRegex) + item.GetIntValue(blockRegex2)),
+		proto.Stat_StatBlockValue:        float64(item.GetIntValue(blockValueRegex)),
+		proto.Stat_StatDodge:             float64(item.GetIntValue(dodgeRegex) + item.GetIntValue(dodgeRegex2)),
+		proto.Stat_StatParry:             float64(item.GetIntValue(parryRegex) + item.GetIntValue(parryRegex2)),
+		proto.Stat_StatResilience:        float64(item.GetIntValue(resilienceRegex)),
 	}
 }
 
@@ -405,6 +421,11 @@ var mp5SocketBonusRegexes = []*regexp.Regexp{
 var attackPowerSocketBonusRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Attack Power")}
 var meleeHitSocketBonusRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Hit Rating")}
 var meleeCritSocketBonusRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Critical Strike Rating")}
+var defenseSocketBonusRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Defense Rating")}
+var blockSocketBonusRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Block Rating")}
+var dodgeSocketBonusRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Dodge Rating")}
+var parrySocketBonusRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Parry Rating")}
+var resilienceSocketBonusRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Resilience Rating")}
 
 func (item WowheadItemResponse) GetSocketBonus() Stats {
 	match := socketBonusRegex.FindStringSubmatch(item.Tooltip)
@@ -428,6 +449,11 @@ func (item WowheadItemResponse) GetSocketBonus() Stats {
 		proto.Stat_StatRangedAttackPower: float64(GetBestRegexIntValue(bonusStr, attackPowerSocketBonusRegexes, 1)),
 		proto.Stat_StatMeleeHit:          float64(GetBestRegexIntValue(bonusStr, meleeHitSocketBonusRegexes, 1)),
 		proto.Stat_StatMeleeCrit:         float64(GetBestRegexIntValue(bonusStr, meleeCritSocketBonusRegexes, 1)),
+		proto.Stat_StatDefense:           float64(GetBestRegexIntValue(bonusStr, defenseSocketBonusRegexes, 1)),
+		proto.Stat_StatBlock:             float64(GetBestRegexIntValue(bonusStr, blockSocketBonusRegexes, 1)),
+		proto.Stat_StatDodge:             float64(GetBestRegexIntValue(bonusStr, dodgeSocketBonusRegexes, 1)),
+		proto.Stat_StatParry:             float64(GetBestRegexIntValue(bonusStr, parrySocketBonusRegexes, 1)),
+		proto.Stat_StatResilience:        float64(GetBestRegexIntValue(bonusStr, resilienceSocketBonusRegexes, 1)),
 	}
 
 	spellPower := GetBestRegexIntValue(bonusStr, spellPowerSocketBonusRegexes, 1)
@@ -494,6 +520,10 @@ var meleeCritGemStatRegexes = []*regexp.Regexp{
 	regexp.MustCompile("\\+([0-9]+) Critical Rating"),
 	regexp.MustCompile("\\+([0-9]+) Critical Strike Rating"),
 }
+var defenseGemStatRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Defense Rating")}
+var dodgeGemStatRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Dodge Rating")}
+var parryGemStatRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Parry Rating")}
+var resilienceGemStatRegexes = []*regexp.Regexp{regexp.MustCompile("\\+([0-9]+) Resilience Rating")}
 
 func (item WowheadItemResponse) GetGemStats() Stats {
 	stats := Stats{
@@ -510,6 +540,10 @@ func (item WowheadItemResponse) GetGemStats() Stats {
 		proto.Stat_StatRangedAttackPower: float64(GetBestRegexIntValue(item.Tooltip, attackPowerGemStatRegexes, 1)),
 		proto.Stat_StatMeleeHit:          float64(GetBestRegexIntValue(item.Tooltip, meleeHitGemStatRegexes, 1)),
 		proto.Stat_StatMeleeCrit:         float64(GetBestRegexIntValue(item.Tooltip, meleeCritGemStatRegexes, 1)),
+		proto.Stat_StatDefense:           float64(GetBestRegexIntValue(item.Tooltip, defenseGemStatRegexes, 1)),
+		proto.Stat_StatDodge:             float64(GetBestRegexIntValue(item.Tooltip, dodgeGemStatRegexes, 1)),
+		proto.Stat_StatParry:             float64(GetBestRegexIntValue(item.Tooltip, parryGemStatRegexes, 1)),
+		proto.Stat_StatResilience:        float64(GetBestRegexIntValue(item.Tooltip, resilienceGemStatRegexes, 1)),
 	}
 
 	spellPower := GetBestRegexIntValue(item.Tooltip, spellPowerGemStatRegexes, 1)

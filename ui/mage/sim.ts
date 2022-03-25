@@ -112,6 +112,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfWisdom: TristateEffect.TristateEffectImproved,
+					blessingOfSalvation: true,
 					innervates: 1,
 				}),
 				debuffs: Debuffs.create({
@@ -150,6 +151,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
+				IconInputs.BlessingOfSalvation,
 				IconInputs.Innervate,
 				IconInputs.PowerInfusion,
 			],

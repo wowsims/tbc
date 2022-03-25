@@ -1129,7 +1129,7 @@ export function getMetaGemEffectEP(spec: Spec, gem: Gem, playerStats: Stats) {
 }
 
 // Returns true if this item may be equipped in at least 1 slot for the given Spec.
-export function canEquipItem(item: Item, spec: Spec): boolean {
+export function canEquipItem(item: Item, spec: Spec, slot: ItemSlot | undefined): boolean {
 	const playerClass = specToClass[spec];
 	if (item.classAllowlist.length > 0 && !item.classAllowlist.includes(playerClass)) {
 		return false;
@@ -1145,7 +1145,7 @@ export function canEquipItem(item: Item, spec: Spec): boolean {
 			return false;
 		}
 
-		if (item.handType == HandType.HandTypeOffHand
+		if ((item.handType == HandType.HandTypeOffHand || (item.handType == HandType.HandTypeOneHand && slot == ItemSlot.ItemSlotOffHand))
 			&& ![WeaponType.WeaponTypeShield, WeaponType.WeaponTypeOffHand].includes(item.weaponType)
 			&& !dualWieldSpecs.includes(spec)) {
 			return false;
