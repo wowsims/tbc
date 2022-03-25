@@ -123,3 +123,18 @@ message Warrior {
     }
     Options options = 3;
 }
+
+message ProtectionWarrior {
+    message Rotation {
+		}
+    Rotation rotation = 1;
+
+    WarriorTalents talents = 2;
+    
+    message Options {
+			double starting_rage = 1;
+			bool precast_t2 = 2;
+			bool precast_sapphire = 3; // Disabled if sapphire is equipped
+    }
+    Options options = 3;
+}
