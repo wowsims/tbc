@@ -59,17 +59,17 @@ type Aura struct {
 	ActionID ActionID // If set, metrics will be tracked for this aura using this ID.
 
 	Duration time.Duration // Duration of aura, upon being applied.
-	expires  time.Duration // Time at which aura will be removed.
 
 	startTime time.Duration // Time at which the aura was applied.
+	expires   time.Duration // Time at which aura will be removed.
 
-	activeIndex                 int32 // Position of this aura's index in the sim.activeAuraIDs array.
-	onCastIndex                 int32 // Position of this aura's index in the sim.onCastIDs array.
-	onCastCompleteIndex         int32 // Position of this aura's index in the sim.onCastCompleteIDs array.
-	onBeforeSpellHitIndex       int32 // Position of this aura's index in the sim.onBeforeSpellHitIDs array.
-	onSpellHitIndex             int32 // Position of this aura's index in the sim.onSpellHitIDs array.
-	onBeforePeriodicDamageIndex int32 // Position of this aura's index in the sim.onBeforePeriodicDamageIDs array.
-	onPeriodicDamageIndex       int32 // Position of this aura's index in the sim.onPeriodicDamageIDs array.
+	activeIndex                 int32 // Position of this aura's index in the activeAuraIDs array.
+	onCastIndex                 int32 // Position of this aura's index in the onCastIDs array.
+	onCastCompleteIndex         int32 // Position of this aura's index in the onCastCompleteIDs array.
+	onBeforeSpellHitIndex       int32 // Position of this aura's index in the onBeforeSpellHitIDs array.
+	onSpellHitIndex             int32 // Position of this aura's index in the onSpellHitIDs array.
+	onBeforePeriodicDamageIndex int32 // Position of this aura's index in the onBeforePeriodicDamageIDs array.
+	onPeriodicDamageIndex       int32 // Position of this aura's index in the onPeriodicDamageIDs array.
 
 	// The number of stacks, or charges, of this aura. If this aura doesn't care
 	// about charges, is just 0.
@@ -99,14 +99,9 @@ type Aura struct {
 	OnPeriodicDamage OnPeriodicDamage
 }
 
-func (aura *Aura) Refresh(sim *Simulation) {
-	if aura.Duration == NeverExpires {
-		aura.expires = NeverExpires
-	} else {
+func (aura *Aura) refresh(sim *Simulation) {
+	if aura.Duration != NeverExpires {
 		aura.expires = sim.CurrentTime + aura.Duration
-	}
-	if aura.expires == 0 {
-		panic("Aura with 0 duration!")
 	}
 }
 
@@ -313,7 +308,7 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 	newAura.onBeforePeriodicDamageIndex = old.onBeforePeriodicDamageIndex
 	newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
 	newAura.startTime = old.startTime
-	newAura.Refresh(sim)
+	newAura.refresh(sim)
 
 	at.auras[newAura.ID] = newAura
 
@@ -329,46 +324,52 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		panic("Empty aura ID")
 	}
 
-	if aura := at.auras[newAura.ID]; aura.ID != 0 {
+	if newAura.Duration == 0 {
+		panic("Aura with 0 duration")
+	}
+
+	if aura := &at.auras[newAura.ID]; aura.ID != 0 {
 		// Getting lots of bug reports, do a grep and catch all cases for this before uncommenting.
 		//panic(fmt.Sprintf("AddAura(%v) at %s - previous has %s left, use ReplaceAura() instead", newAura.ActionID, sim.CurrentTime, aura.expires-sim.CurrentTime))
 		at.RemoveAura(sim, newAura.ID)
 	}
 
 	newAura.startTime = sim.CurrentTime
-	newAura.Refresh(sim)
 
-	at.auras[newAura.ID] = newAura
-	at.auras[newAura.ID].activeIndex = int32(len(at.activeAuraIDs))
-	at.activeAuraIDs = append(at.activeAuraIDs, newAura.ID)
+	if newAura.Duration != NeverExpires {
+		newAura.expires = sim.CurrentTime + newAura.Duration
+
+		newAura.activeIndex = int32(len(at.activeAuraIDs))
+		at.activeAuraIDs = append(at.activeAuraIDs, newAura.ID)
+	}
 
 	if newAura.OnCast != nil {
-		at.auras[newAura.ID].onCastIndex = int32(len(at.onCastIDs))
+		newAura.onCastIndex = int32(len(at.onCastIDs))
 		at.onCastIDs = append(at.onCastIDs, newAura.ID)
 	}
 
 	if newAura.OnCastComplete != nil {
-		at.auras[newAura.ID].onCastCompleteIndex = int32(len(at.onCastCompleteIDs))
+		newAura.onCastCompleteIndex = int32(len(at.onCastCompleteIDs))
 		at.onCastCompleteIDs = append(at.onCastCompleteIDs, newAura.ID)
 	}
 
 	if newAura.OnBeforeSpellHit != nil {
-		at.auras[newAura.ID].onBeforeSpellHitIndex = int32(len(at.onBeforeSpellHitIDs))
+		newAura.onBeforeSpellHitIndex = int32(len(at.onBeforeSpellHitIDs))
 		at.onBeforeSpellHitIDs = append(at.onBeforeSpellHitIDs, newAura.ID)
 	}
 
 	if newAura.OnSpellHit != nil {
-		at.auras[newAura.ID].onSpellHitIndex = int32(len(at.onSpellHitIDs))
+		newAura.onSpellHitIndex = int32(len(at.onSpellHitIDs))
 		at.onSpellHitIDs = append(at.onSpellHitIDs, newAura.ID)
 	}
 
 	if newAura.OnBeforePeriodicDamage != nil {
-		at.auras[newAura.ID].onBeforePeriodicDamageIndex = int32(len(at.onBeforePeriodicDamageIDs))
+		newAura.onBeforePeriodicDamageIndex = int32(len(at.onBeforePeriodicDamageIDs))
 		at.onBeforePeriodicDamageIDs = append(at.onBeforePeriodicDamageIDs, newAura.ID)
 	}
 
 	if newAura.OnPeriodicDamage != nil {
-		at.auras[newAura.ID].onPeriodicDamageIndex = int32(len(at.onPeriodicDamageIDs))
+		newAura.onPeriodicDamageIndex = int32(len(at.onPeriodicDamageIDs))
 		at.onPeriodicDamageIDs = append(at.onPeriodicDamageIDs, newAura.ID)
 	}
 
@@ -376,18 +377,22 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		at.logFn("Aura gained: %s", newAura.ActionID)
 	}
 
-	if at.auras[newAura.ID].OnGain != nil {
-		at.auras[newAura.ID].OnGain(sim)
+	at.auras[newAura.ID] = newAura
+
+	if newAura.OnGain != nil {
+		newAura.OnGain(sim)
 	}
 }
 
 // Remove an aura by its ID
 func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
-	if at.auras[id].OnExpire != nil {
-		at.auras[id].OnExpire(sim)
+	aura := &at.auras[id]
+
+	if aura.OnExpire != nil {
+		aura.OnExpire(sim)
 	}
 
-	if aura := at.auras[id]; !aura.ActionID.IsEmptyAction() {
+	if !aura.ActionID.IsEmptyAction() {
 		if sim.CurrentTime > aura.expires {
 			at.AddAuraUptime(id, aura.ActionID, aura.expires-aura.startTime)
 		} else {
@@ -395,58 +400,60 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 		}
 	}
 
-	if sim.Log != nil && !at.auras[id].ActionID.IsEmptyAction() {
-		at.logFn("Aura faded: %s", at.auras[id].ActionID)
+	if sim.Log != nil && !aura.ActionID.IsEmptyAction() {
+		at.logFn("Aura faded: %s", aura.ActionID)
 	}
 
-	removeActiveIndex := at.auras[id].activeIndex
-	at.activeAuraIDs = removeBySwappingToBack(at.activeAuraIDs, removeActiveIndex)
-	if removeActiveIndex < int32(len(at.activeAuraIDs)) {
-		at.auras[at.activeAuraIDs[removeActiveIndex]].activeIndex = removeActiveIndex
+	if aura.Duration != NeverExpires {
+		removeActiveIndex := aura.activeIndex
+		at.activeAuraIDs = removeBySwappingToBack(at.activeAuraIDs, removeActiveIndex)
+		if removeActiveIndex < int32(len(at.activeAuraIDs)) {
+			at.auras[at.activeAuraIDs[removeActiveIndex]].activeIndex = removeActiveIndex
+		}
 	}
 
-	if at.auras[id].OnCast != nil {
-		removeOnCastIndex := at.auras[id].onCastIndex
+	if aura.OnCast != nil {
+		removeOnCastIndex := aura.onCastIndex
 		at.onCastIDs = removeBySwappingToBack(at.onCastIDs, removeOnCastIndex)
 		if removeOnCastIndex < int32(len(at.onCastIDs)) {
 			at.auras[at.onCastIDs[removeOnCastIndex]].onCastIndex = removeOnCastIndex
 		}
 	}
 
-	if at.auras[id].OnCastComplete != nil {
-		removeOnCastCompleteIndex := at.auras[id].onCastCompleteIndex
+	if aura.OnCastComplete != nil {
+		removeOnCastCompleteIndex := aura.onCastCompleteIndex
 		at.onCastCompleteIDs = removeBySwappingToBack(at.onCastCompleteIDs, removeOnCastCompleteIndex)
 		if removeOnCastCompleteIndex < int32(len(at.onCastCompleteIDs)) {
 			at.auras[at.onCastCompleteIDs[removeOnCastCompleteIndex]].onCastCompleteIndex = removeOnCastCompleteIndex
 		}
 	}
 
-	if at.auras[id].OnBeforeSpellHit != nil {
-		removeOnBeforeSpellHitIndex := at.auras[id].onBeforeSpellHitIndex
+	if aura.OnBeforeSpellHit != nil {
+		removeOnBeforeSpellHitIndex := aura.onBeforeSpellHitIndex
 		at.onBeforeSpellHitIDs = removeBySwappingToBack(at.onBeforeSpellHitIDs, removeOnBeforeSpellHitIndex)
 		if removeOnBeforeSpellHitIndex < int32(len(at.onBeforeSpellHitIDs)) {
 			at.auras[at.onBeforeSpellHitIDs[removeOnBeforeSpellHitIndex]].onBeforeSpellHitIndex = removeOnBeforeSpellHitIndex
 		}
 	}
 
-	if at.auras[id].OnSpellHit != nil {
-		removeOnSpellHitIndex := at.auras[id].onSpellHitIndex
+	if aura.OnSpellHit != nil {
+		removeOnSpellHitIndex := aura.onSpellHitIndex
 		at.onSpellHitIDs = removeBySwappingToBack(at.onSpellHitIDs, removeOnSpellHitIndex)
 		if removeOnSpellHitIndex < int32(len(at.onSpellHitIDs)) {
 			at.auras[at.onSpellHitIDs[removeOnSpellHitIndex]].onSpellHitIndex = removeOnSpellHitIndex
 		}
 	}
 
-	if at.auras[id].OnBeforePeriodicDamage != nil {
-		removeOnBeforePeriodicDamage := at.auras[id].onBeforePeriodicDamageIndex
+	if aura.OnBeforePeriodicDamage != nil {
+		removeOnBeforePeriodicDamage := aura.onBeforePeriodicDamageIndex
 		at.onBeforePeriodicDamageIDs = removeBySwappingToBack(at.onBeforePeriodicDamageIDs, removeOnBeforePeriodicDamage)
 		if removeOnBeforePeriodicDamage < int32(len(at.onBeforePeriodicDamageIDs)) {
 			at.auras[at.onBeforePeriodicDamageIDs[removeOnBeforePeriodicDamage]].onBeforePeriodicDamageIndex = removeOnBeforePeriodicDamage
 		}
 	}
 
-	if at.auras[id].OnPeriodicDamage != nil {
-		removeOnPeriodicDamage := at.auras[id].onPeriodicDamageIndex
+	if aura.OnPeriodicDamage != nil {
+		removeOnPeriodicDamage := aura.onPeriodicDamageIndex
 		at.onPeriodicDamageIDs = removeBySwappingToBack(at.onPeriodicDamageIDs, removeOnPeriodicDamage)
 		if removeOnPeriodicDamage < int32(len(at.onPeriodicDamageIDs)) {
 			at.auras[at.onPeriodicDamageIDs[removeOnPeriodicDamage]].onPeriodicDamageIndex = removeOnPeriodicDamage
@@ -491,7 +498,7 @@ func (at *auraTracker) NumStacks(id AuraID) int32 {
 
 func (at *auraTracker) RefreshAura(sim *Simulation, id AuraID) {
 	if aura := &at.auras[id]; aura.ID != 0 {
-		aura.Refresh(sim)
+		aura.refresh(sim)
 	}
 }
 

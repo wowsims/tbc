@@ -92,12 +92,12 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	}
 
 	if debuffs.ExposeWeaknessUptime > 0 && debuffs.ExposeWeaknessHunterAgility > 0 {
-		multiplier := MinFloat(1.0, debuffs.ExposeWeaknessUptime)
+		uptime := MinFloat(1.0, debuffs.ExposeWeaknessUptime)
 		target.AddPermanentAuraWithOptions(PermanentAura{
 			AuraFactory: func(sim *Simulation) Aura {
-				return ExposeWeaknessAura(debuffs.ExposeWeaknessHunterAgility, multiplier)
+				return ExposeWeaknessAura(debuffs.ExposeWeaknessHunterAgility, uptime)
 			},
-			UptimeMultiplier: multiplier,
+			UptimeMultiplier: uptime,
 		})
 	}
 
