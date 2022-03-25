@@ -115,7 +115,6 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) *
 	})
 
 	druid.registerInnervateCD()
-	druid.applyTalents()
 
 	return druid
 }

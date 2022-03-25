@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (paladin *Paladin) applyTalents() {
+func (paladin *Paladin) ApplyTalents() {
 	paladin.applyConviction()
 	paladin.applyCrusade()
 	paladin.applyTwoHandedWeaponSpecialization()

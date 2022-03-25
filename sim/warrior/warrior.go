@@ -74,8 +74,6 @@ func NewWarrior(character core.Character, talents proto.WarriorTalents) *Warrior
 		},
 	})
 
-	//warrior.applyTalents()
-
 	return warrior
 }
 

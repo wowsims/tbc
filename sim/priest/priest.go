@@ -111,8 +111,6 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) 
 
 	priest.registerPowerInfusionCD()
 
-	priest.applyTalents()
-
 	return priest
 }
 

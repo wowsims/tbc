@@ -199,7 +199,6 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 
 	mage.registerEvocationCD()
 	mage.registerManaGemsCD()
-	mage.applyTalents()
 
 	mage.hasTristfal = ItemSetTirisfalRegalia.CharacterHasSetBonus(&mage.Character, 2)
 	return mage

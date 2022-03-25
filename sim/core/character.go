@@ -140,15 +140,14 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 	}
 
 	character.baseStats = BaseStats[BaseStatsKey{Race: character.Race, Class: character.Class}]
-	character.AddStats(character.baseStats)
-	character.AddStats(character.Equip.Stats())
 
+	bonusStats := stats.Stats{}
 	if player.BonusStats != nil {
-		bonusStats := stats.Stats{}
 		copy(bonusStats[:], player.BonusStats[:])
-		character.AddStats(bonusStats)
 	}
 
+	character.AddStats(character.baseStats)
+	character.AddStats(bonusStats)
 	character.addUniversalStatDependencies()
 
 	return character
@@ -168,10 +167,20 @@ func (character *Character) Log(sim *Simulation, message string, vals ...interfa
 	sim.Log("[%s] "+message, append([]interface{}{character.Label}, vals...)...)
 }
 
-func (character *Character) applyAllEffects(agent Agent) {
+func (character *Character) applyAllEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) {
+	agent.ApplyTalents()
 	applyRaceEffects(agent)
+
+	character.AddStats(character.Equip.Stats())
 	character.applyItemEffects(agent)
 	character.applyItemSetBonusEffects(agent)
+
+	applyBuffEffects(agent, raidBuffs, partyBuffs, individualBuffs)
+	applyConsumeEffects(agent, raidBuffs, partyBuffs)
+
+	for _, petAgent := range character.Pets {
+		applyPetBuffEffects(petAgent, raidBuffs, partyBuffs, individualBuffs)
+	}
 }
 
 // Apply effects from all equipped items.
