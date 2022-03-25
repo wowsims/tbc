@@ -31,8 +31,8 @@ export class BlessingsPicker extends Component {
 
 	private assignments: BlessingsAssignments;
 
-  constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI) {
-    super(parentElem, 'blessings-picker-root');
+	constructor(parentElem: HTMLElement, raidSimUI: RaidSimUI) {
+		super(parentElem, 'blessings-picker-root');
 		this.raidSimUI = raidSimUI;
 		this.assignments = BlessingsAssignments.clone(makeDefaultBlessings(4));
 

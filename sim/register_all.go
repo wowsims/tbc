@@ -2,7 +2,6 @@ package sim
 
 import (
 	_ "github.com/wowsims/tbc/sim/common"
-	"github.com/wowsims/tbc/sim/core/warrior"
 	"github.com/wowsims/tbc/sim/druid/balance"
 	"github.com/wowsims/tbc/sim/hunter"
 	"github.com/wowsims/tbc/sim/mage"
@@ -12,6 +11,7 @@ import (
 	"github.com/wowsims/tbc/sim/rogue"
 	"github.com/wowsims/tbc/sim/shaman/elemental"
 	"github.com/wowsims/tbc/sim/shaman/enhancement"
+	dpsWarrior "github.com/wowsims/tbc/sim/warrior/dps"
 )
 
 var registered = false
@@ -29,7 +29,7 @@ func RegisterAll() {
 	mage.RegisterMage()
 	shadow.RegisterShadowPriest()
 	rogue.RegisterRogue()
-	warrior.RegisterWarrior()
+	dpsWarrior.RegisterDpsWarrior()
 	retribution.RegisterRetributionPaladin()
 	smite.RegisterSmitePriest()
 }

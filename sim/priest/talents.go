@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (priest *Priest) applyTalents() {
+func (priest *Priest) ApplyTalents() {
 	if priest.Talents.Meditation > 0 {
 		priest.PseudoStats.SpiritRegenRateCasting = float64(priest.Talents.Meditation) * 0.1
 	}
@@ -44,7 +44,7 @@ func (priest *Priest) applyTalents() {
 			},
 		})
 	}
-	
+
 	if priest.Talents.Enlightenment > 0 {
 		coeff := 0.01 * float64(priest.Talents.Enlightenment)
 		priest.AddStatDependency(stats.StatDependency{
@@ -54,7 +54,7 @@ func (priest *Priest) applyTalents() {
 				return intellect + intellect*coeff
 			},
 		})
-		
+
 		priest.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Stamina,
 			ModifiedStat: stats.Stamina,
@@ -62,7 +62,7 @@ func (priest *Priest) applyTalents() {
 				return stamina + stamina*coeff
 			},
 		})
-		
+
 		priest.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Spirit,
 			ModifiedStat: stats.Spirit,
@@ -71,7 +71,7 @@ func (priest *Priest) applyTalents() {
 			},
 		})
 	}
-	
+
 	if priest.Talents.SpiritOfRedemption {
 		priest.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Spirit,
@@ -148,7 +148,7 @@ func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
 	priest.Character.AddAura(sim, core.Aura{
 		ID:       InnerFocusAuraID,
 		ActionID: actionID,
-		Expires:  core.NeverExpires,
+		Duration: core.NeverExpires,
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
 			cast.Cost.Value = 0
 		},

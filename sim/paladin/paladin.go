@@ -13,8 +13,10 @@ type Paladin struct {
 
 	Talents proto.PaladinTalents
 
-	currentSeal      core.Aura
-	currentJudgement core.Aura
+	currentSealID           core.AuraID
+	currentSealExpires      time.Duration
+	currentJudgementID      core.AuraID
+	currentJudgementExpires time.Duration
 
 	sealOfBlood       core.SimpleCast
 	sealOfCommand     core.SimpleCast
@@ -72,15 +74,18 @@ func (paladin *Paladin) Init(sim *core.Simulation) {
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {
-	paladin.currentSeal.Expires = sim.CurrentTime
+	paladin.currentSealID = 0
+	paladin.currentSealExpires = 0
+	paladin.currentJudgementID = 0
+	paladin.currentJudgementExpires = 0
 }
 
 func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, ability *core.SimpleSpell) {
-	if paladin.currentJudgement.ID == 0 || paladin.currentJudgement.Expires >= sim.CurrentTime {
+	if paladin.currentJudgementID == 0 || paladin.currentJudgementExpires >= sim.CurrentTime {
 		return
 	}
-	paladin.currentJudgement.Expires = sim.CurrentTime + time.Second*20
-	ability.Effect.Target.ReplaceAura(sim, paladin.currentJudgement)
+	paladin.currentJudgementExpires = sim.CurrentTime + JudgementDuration
+	ability.Effect.Target.RefreshAura(sim, paladin.currentJudgementID)
 }
 
 // maybe need to add stat dependencies
@@ -120,8 +125,6 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 	paladin.SetupSealOfBlood()
 	paladin.SetupSealOfTheCrusader()
 	paladin.SetupSealOfWisdom()
-
-	paladin.applyTalents()
 
 	paladin.registerAvengingWrathCD()
 

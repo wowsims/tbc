@@ -23,12 +23,6 @@ func NewAuraID() AuraID {
 	return newAuraID
 }
 
-// Offsensive trinkets put each other on CD, so they can all share 1 aura ID
-var OffensiveTrinketActiveAuraID = NewAuraID()
-
-// Defensive trinkets put each other on CD, so they can all share 1 aura ID
-var DefensiveTrinketActiveAuraID = NewAuraID()
-
 // Reserve the default value so no aura uses it.
 const UnknownDebuffID = AuraID(0)
 
@@ -54,28 +48,28 @@ func NewCooldownID() CooldownID {
 }
 
 var GCDCooldownID = NewCooldownID()
-var MainHandSwingCooldownID = NewCooldownID()
-var OffHandSwingCooldownID = NewCooldownID()
-var RangedSwingCooldownID = NewCooldownID()
 var OffensiveTrinketSharedCooldownID = NewCooldownID()
 var DefensiveTrinketSharedCooldownID = NewCooldownID()
 
+type OnGain func(sim *Simulation)
 type OnExpire func(sim *Simulation)
 
 type Aura struct {
-	ID          AuraID
-	ActionID    ActionID      // If set, metrics will be tracked for this aura using this ID.
-	Expires     time.Duration // Time at which aura will be removed.
-	activeIndex int32         // Position of this aura's index in the sim.activeAuraIDs array.
+	ID       AuraID
+	ActionID ActionID // If set, metrics will be tracked for this aura using this ID.
+
+	Duration time.Duration // Duration of aura, upon being applied.
 
 	startTime time.Duration // Time at which the aura was applied.
+	expires   time.Duration // Time at which aura will be removed.
 
-	onCastIndex                 int32 // Position of this aura's index in the sim.onCastIDs array.
-	onCastCompleteIndex         int32 // Position of this aura's index in the sim.onCastCompleteIDs array.
-	onBeforeSpellHitIndex       int32 // Position of this aura's index in the sim.onBeforeSpellHitIDs array.
-	onSpellHitIndex             int32 // Position of this aura's index in the sim.onSpellHitIDs array.
-	onBeforePeriodicDamageIndex int32 // Position of this aura's index in the sim.onBeforePeriodicDamageIDs array.
-	onPeriodicDamageIndex       int32 // Position of this aura's index in the sim.onPeriodicDamageIDs array.
+	activeIndex                 int32 // Position of this aura's index in the activeAuraIDs array.
+	onCastIndex                 int32 // Position of this aura's index in the onCastIDs array.
+	onCastCompleteIndex         int32 // Position of this aura's index in the onCastCompleteIDs array.
+	onBeforeSpellHitIndex       int32 // Position of this aura's index in the onBeforeSpellHitIDs array.
+	onSpellHitIndex             int32 // Position of this aura's index in the onSpellHitIDs array.
+	onBeforePeriodicDamageIndex int32 // Position of this aura's index in the onBeforePeriodicDamageIDs array.
+	onPeriodicDamageIndex       int32 // Position of this aura's index in the onPeriodicDamageIDs array.
 
 	// The number of stacks, or charges, of this aura. If this aura doesn't care
 	// about charges, is just 0.
@@ -94,7 +88,8 @@ type Aura struct {
 	// properties of result.
 	OnSpellHit OnSpellHit
 
-	// Invoked when this Aura expires.
+	// Invoked when this Aura is added/remvoed. Neither is invoked on refresh.
+	OnGain   OnGain
 	OnExpire OnExpire
 
 	// Invoked when a dot tick occurs, before damage is calculated.
@@ -102,6 +97,12 @@ type Aura struct {
 
 	// Invoked when a dot tick occurs, after damage is calculated.
 	OnPeriodicDamage OnPeriodicDamage
+}
+
+func (aura *Aura) refresh(sim *Simulation) {
+	if aura.Duration != NeverExpires {
+		aura.expires = sim.CurrentTime + aura.Duration
+	}
 }
 
 type AuraFactory func(*Simulation) Aura
@@ -114,7 +115,7 @@ type PermanentAura struct {
 	// This option disables that behavior, creating an aura which is applies at the
 	// beginning of every iteration but expires after a period of time. This is
 	// used for some snapshotting effects like Warrior battle shout.
-	RespectExpiration bool
+	RespectDuration bool
 
 	// Multiplies uptime for the aura metrics of this aura. This is for buffs coded
 	// as permanent but which are actually averaged versions of the real buff.
@@ -163,7 +164,7 @@ type auraTracker struct {
 }
 
 func newAuraTracker(useDebuffIDs bool) auraTracker {
-	numAura := numAuraIDs
+	numAura := numAuraIDs + 1 // TODO: this +1 shouldn't be needed, probably an aura ID created strangely somewhere.
 	if useDebuffIDs {
 		numAura = numDebuffIDs
 	}
@@ -233,12 +234,13 @@ func (at *auraTracker) reset(sim *Simulation) {
 
 	for _, permAura := range at.permanentAuras {
 		aura := permAura.AuraFactory(sim)
-		if !permAura.RespectExpiration {
-			aura.Expires = NeverExpires
+		if !permAura.RespectDuration {
+			aura.Duration = NeverExpires
 		}
-		at.AddAura(sim, aura)
+		at.ReplaceAura(sim, aura)
 		if permAura.UptimeMultiplier != 0 && !aura.ActionID.IsEmptyAction() {
-			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(-1*float64(sim.Duration)*(1.0-permAura.UptimeMultiplier)))
+			// We're going to add 100% uptime at the end, so subtract 1 now.
+			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(float64(sim.Duration)*(permAura.UptimeMultiplier-1)))
 		}
 	}
 }
@@ -267,7 +269,7 @@ func (at *auraTracker) advance(sim *Simulation) {
 	}
 
 	for _, id := range at.activeAuraIDs {
-		if at.auras[id].Expires != 0 && at.auras[id].Expires <= sim.CurrentTime {
+		if aura := &at.auras[id]; aura.expires <= sim.CurrentTime {
 			at.RemoveAura(sim, id)
 		}
 	}
@@ -306,6 +308,7 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 	newAura.onBeforePeriodicDamageIndex = old.onBeforePeriodicDamageIndex
 	newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
 	newAura.startTime = old.startTime
+	newAura.refresh(sim)
 
 	at.auras[newAura.ID] = newAura
 
@@ -321,113 +324,136 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		panic("Empty aura ID")
 	}
 
-	if at.HasAura(newAura.ID) {
+	if newAura.Duration == 0 {
+		panic("Aura with 0 duration")
+	}
+
+	if aura := &at.auras[newAura.ID]; aura.ID != 0 {
+		// Getting lots of bug reports, do a grep and catch all cases for this before uncommenting.
+		//panic(fmt.Sprintf("AddAura(%v) at %s - previous has %s left, use ReplaceAura() instead", newAura.ActionID, sim.CurrentTime, aura.expires-sim.CurrentTime))
 		at.RemoveAura(sim, newAura.ID)
 	}
 
 	newAura.startTime = sim.CurrentTime
 
-	at.auras[newAura.ID] = newAura
-	at.auras[newAura.ID].activeIndex = int32(len(at.activeAuraIDs))
-	at.activeAuraIDs = append(at.activeAuraIDs, newAura.ID)
+	if newAura.Duration != NeverExpires {
+		newAura.expires = sim.CurrentTime + newAura.Duration
+
+		newAura.activeIndex = int32(len(at.activeAuraIDs))
+		at.activeAuraIDs = append(at.activeAuraIDs, newAura.ID)
+	}
 
 	if newAura.OnCast != nil {
-		at.auras[newAura.ID].onCastIndex = int32(len(at.onCastIDs))
+		newAura.onCastIndex = int32(len(at.onCastIDs))
 		at.onCastIDs = append(at.onCastIDs, newAura.ID)
 	}
 
 	if newAura.OnCastComplete != nil {
-		at.auras[newAura.ID].onCastCompleteIndex = int32(len(at.onCastCompleteIDs))
+		newAura.onCastCompleteIndex = int32(len(at.onCastCompleteIDs))
 		at.onCastCompleteIDs = append(at.onCastCompleteIDs, newAura.ID)
 	}
 
 	if newAura.OnBeforeSpellHit != nil {
-		at.auras[newAura.ID].onBeforeSpellHitIndex = int32(len(at.onBeforeSpellHitIDs))
+		newAura.onBeforeSpellHitIndex = int32(len(at.onBeforeSpellHitIDs))
 		at.onBeforeSpellHitIDs = append(at.onBeforeSpellHitIDs, newAura.ID)
 	}
 
 	if newAura.OnSpellHit != nil {
-		at.auras[newAura.ID].onSpellHitIndex = int32(len(at.onSpellHitIDs))
+		newAura.onSpellHitIndex = int32(len(at.onSpellHitIDs))
 		at.onSpellHitIDs = append(at.onSpellHitIDs, newAura.ID)
 	}
 
 	if newAura.OnBeforePeriodicDamage != nil {
-		at.auras[newAura.ID].onBeforePeriodicDamageIndex = int32(len(at.onBeforePeriodicDamageIDs))
+		newAura.onBeforePeriodicDamageIndex = int32(len(at.onBeforePeriodicDamageIDs))
 		at.onBeforePeriodicDamageIDs = append(at.onBeforePeriodicDamageIDs, newAura.ID)
 	}
 
 	if newAura.OnPeriodicDamage != nil {
-		at.auras[newAura.ID].onPeriodicDamageIndex = int32(len(at.onPeriodicDamageIDs))
+		newAura.onPeriodicDamageIndex = int32(len(at.onPeriodicDamageIDs))
 		at.onPeriodicDamageIDs = append(at.onPeriodicDamageIDs, newAura.ID)
 	}
 
 	if sim.Log != nil && !newAura.ActionID.IsEmptyAction() {
 		at.logFn("Aura gained: %s", newAura.ActionID)
 	}
+
+	at.auras[newAura.ID] = newAura
+
+	if newAura.OnGain != nil {
+		newAura.OnGain(sim)
+	}
 }
 
 // Remove an aura by its ID
 func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
-	if at.auras[id].OnExpire != nil {
-		at.auras[id].OnExpire(sim)
+	aura := &at.auras[id]
+
+	if aura.OnExpire != nil {
+		aura.OnExpire(sim)
 	}
 
-	if !at.auras[id].ActionID.IsEmptyAction() {
-		at.AddAuraUptime(id, at.auras[id].ActionID, sim.CurrentTime-at.auras[id].startTime)
+	if !aura.ActionID.IsEmptyAction() {
+		if sim.CurrentTime > aura.expires {
+			at.AddAuraUptime(id, aura.ActionID, aura.expires-aura.startTime)
+		} else {
+			at.AddAuraUptime(id, aura.ActionID, sim.CurrentTime-aura.startTime)
+		}
 	}
 
-	if sim.Log != nil && !at.auras[id].ActionID.IsEmptyAction() {
-		at.logFn("Aura faded: %s", at.auras[id].ActionID)
+	if sim.Log != nil && !aura.ActionID.IsEmptyAction() {
+		at.logFn("Aura faded: %s", aura.ActionID)
 	}
 
-	removeActiveIndex := at.auras[id].activeIndex
-	at.activeAuraIDs = removeBySwappingToBack(at.activeAuraIDs, removeActiveIndex)
-	if removeActiveIndex < int32(len(at.activeAuraIDs)) {
-		at.auras[at.activeAuraIDs[removeActiveIndex]].activeIndex = removeActiveIndex
+	if aura.Duration != NeverExpires {
+		removeActiveIndex := aura.activeIndex
+		at.activeAuraIDs = removeBySwappingToBack(at.activeAuraIDs, removeActiveIndex)
+		if removeActiveIndex < int32(len(at.activeAuraIDs)) {
+			at.auras[at.activeAuraIDs[removeActiveIndex]].activeIndex = removeActiveIndex
+		}
 	}
 
-	if at.auras[id].OnCast != nil {
-		removeOnCastIndex := at.auras[id].onCastIndex
+	if aura.OnCast != nil {
+		removeOnCastIndex := aura.onCastIndex
 		at.onCastIDs = removeBySwappingToBack(at.onCastIDs, removeOnCastIndex)
 		if removeOnCastIndex < int32(len(at.onCastIDs)) {
 			at.auras[at.onCastIDs[removeOnCastIndex]].onCastIndex = removeOnCastIndex
 		}
 	}
 
-	if at.auras[id].OnCastComplete != nil {
-		removeOnCastCompleteIndex := at.auras[id].onCastCompleteIndex
+	if aura.OnCastComplete != nil {
+		removeOnCastCompleteIndex := aura.onCastCompleteIndex
 		at.onCastCompleteIDs = removeBySwappingToBack(at.onCastCompleteIDs, removeOnCastCompleteIndex)
 		if removeOnCastCompleteIndex < int32(len(at.onCastCompleteIDs)) {
 			at.auras[at.onCastCompleteIDs[removeOnCastCompleteIndex]].onCastCompleteIndex = removeOnCastCompleteIndex
 		}
 	}
 
-	if at.auras[id].OnBeforeSpellHit != nil {
-		removeOnBeforeSpellHitIndex := at.auras[id].onBeforeSpellHitIndex
+	if aura.OnBeforeSpellHit != nil {
+		removeOnBeforeSpellHitIndex := aura.onBeforeSpellHitIndex
 		at.onBeforeSpellHitIDs = removeBySwappingToBack(at.onBeforeSpellHitIDs, removeOnBeforeSpellHitIndex)
 		if removeOnBeforeSpellHitIndex < int32(len(at.onBeforeSpellHitIDs)) {
 			at.auras[at.onBeforeSpellHitIDs[removeOnBeforeSpellHitIndex]].onBeforeSpellHitIndex = removeOnBeforeSpellHitIndex
 		}
 	}
 
-	if at.auras[id].OnSpellHit != nil {
-		removeOnSpellHitIndex := at.auras[id].onSpellHitIndex
+	if aura.OnSpellHit != nil {
+		removeOnSpellHitIndex := aura.onSpellHitIndex
 		at.onSpellHitIDs = removeBySwappingToBack(at.onSpellHitIDs, removeOnSpellHitIndex)
 		if removeOnSpellHitIndex < int32(len(at.onSpellHitIDs)) {
 			at.auras[at.onSpellHitIDs[removeOnSpellHitIndex]].onSpellHitIndex = removeOnSpellHitIndex
 		}
 	}
 
-	if at.auras[id].OnBeforePeriodicDamage != nil {
-		removeOnBeforePeriodicDamage := at.auras[id].onBeforePeriodicDamageIndex
+	if aura.OnBeforePeriodicDamage != nil {
+		removeOnBeforePeriodicDamage := aura.onBeforePeriodicDamageIndex
 		at.onBeforePeriodicDamageIDs = removeBySwappingToBack(at.onBeforePeriodicDamageIDs, removeOnBeforePeriodicDamage)
 		if removeOnBeforePeriodicDamage < int32(len(at.onBeforePeriodicDamageIDs)) {
 			at.auras[at.onBeforePeriodicDamageIDs[removeOnBeforePeriodicDamage]].onBeforePeriodicDamageIndex = removeOnBeforePeriodicDamage
 		}
 	}
 
-	if at.auras[id].OnPeriodicDamage != nil {
-		removeOnPeriodicDamage := at.auras[id].onPeriodicDamageIndex
+	if aura.OnPeriodicDamage != nil {
+		removeOnPeriodicDamage := aura.onPeriodicDamageIndex
 		at.onPeriodicDamageIDs = removeBySwappingToBack(at.onPeriodicDamageIDs, removeOnPeriodicDamage)
 		if removeOnPeriodicDamage < int32(len(at.onPeriodicDamageIDs)) {
 			at.auras[at.onPeriodicDamageIDs[removeOnPeriodicDamage]].onPeriodicDamageIndex = removeOnPeriodicDamage
@@ -470,9 +496,21 @@ func (at *auraTracker) NumStacks(id AuraID) int32 {
 	}
 }
 
+func (at *auraTracker) RefreshAura(sim *Simulation, id AuraID) {
+	if aura := &at.auras[id]; aura.ID != 0 {
+		aura.refresh(sim)
+	}
+}
+
+func (at *auraTracker) UpdateExpires(id AuraID, newExpires time.Duration) {
+	if aura := &at.auras[id]; aura.ID != 0 {
+		aura.expires = newExpires
+	}
+}
+
 func (at *auraTracker) RemainingAuraDuration(sim *Simulation, id AuraID) time.Duration {
 	if at.HasAura(id) {
-		expires := at.auras[id].Expires
+		expires := at.auras[id].expires
 		if expires == NeverExpires {
 			return NeverExpires
 		} else {
@@ -485,7 +523,7 @@ func (at *auraTracker) RemainingAuraDuration(sim *Simulation, id AuraID) time.Du
 
 func (at *auraTracker) AuraExpiresAt(id AuraID) time.Duration {
 	if at.HasAura(id) {
-		return at.auras[id].Expires
+		return at.auras[id].expires
 	} else {
 		return 0
 	}
@@ -607,6 +645,13 @@ func (character *Character) NewTemporaryStatsAuraFactory(auraID AuraID, actionID
 	aura := Aura{
 		ID:       auraID,
 		ActionID: actionID,
+		Duration: duration,
+		OnGain: func(sim *Simulation) {
+			character.AddStatsDynamic(sim, buffs)
+			if sim.Log != nil {
+				character.Log(sim, "Gained %s from %s.", buffs.FlatString(), actionID)
+			}
+		},
 		OnExpire: func(sim *Simulation) {
 			if sim.Log != nil {
 				character.Log(sim, "Lost %s from fading %s.", buffs.FlatString(), actionID)
@@ -616,13 +661,6 @@ func (character *Character) NewTemporaryStatsAuraFactory(auraID AuraID, actionID
 	}
 
 	return func(sim *Simulation) Aura {
-		if !character.HasAura(auraID) {
-			character.AddStatsDynamic(sim, buffs)
-			if sim.Log != nil {
-				character.Log(sim, "Gained %s from %s.", buffs.FlatString(), actionID)
-			}
-		}
-		aura.Expires = sim.CurrentTime + duration
 		return aura
 	}
 }

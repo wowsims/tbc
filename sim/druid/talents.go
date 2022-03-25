@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (druid *Druid) applyTalents() {
+func (druid *Druid) ApplyTalents() {
 	druid.registerNaturesSwiftnessCD()
 
 	druid.AddStat(stats.SpellHit, float64(druid.Talents.BalanceOfPower)*2*core.SpellHitRatingPerHitChance)
@@ -150,7 +150,7 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 				character.AddAura(sim, core.Aura{
 					ID:       NaturesSwiftnessAuraID,
 					ActionID: actionID,
-					Expires:  core.NeverExpires,
+					Duration: core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						if cast.ActionID.SpellID != SpellIDWrath && cast.ActionID.SpellID != SpellIDSF8 && cast.ActionID.SpellID != SpellIDSF6 {
 							return

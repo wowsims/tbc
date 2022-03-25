@@ -6,8 +6,8 @@ import { Player } from '/tbc/core/player.js';
 import { TalentsConfig, TalentsPicker } from './talents_picker.js';
 
 export class WarriorTalentsPicker extends TalentsPicker<Spec.SpecWarrior> {
-  constructor(parent: HTMLElement, player: Player<Spec.SpecWarrior>) {
-    super(parent, player, warriorTalentsConfig);
+	constructor(parent: HTMLElement, player: Player<Spec.SpecWarrior>) {
+		super(parent, player, warriorTalentsConfig);
 	}
 }
 
@@ -26,7 +26,7 @@ export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = [
 				maxPoints: 3,
 			},
 			{
-				//fieldName: 'deflection',
+				fieldName: 'deflection',
 				location: {
 					rowIdx: 0,
 					colIdx: 1,
@@ -260,7 +260,7 @@ export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = [
 				maxPoints: 5,
 			},
 			{
-				//fieldName: 'improvedDemoralizingShout',
+				fieldName: 'improvedDemoralizingShout',
 				location: {
 					rowIdx: 1,
 					colIdx: 1,
@@ -467,7 +467,7 @@ export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = [
 				maxPoints: 3,
 			},
 			{
-				//fieldName: 'anticipation',
+				fieldName: 'anticipation',
 				location: {
 					rowIdx: 0,
 					colIdx: 2,
@@ -476,7 +476,7 @@ export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = [
 				maxPoints: 5,
 			},
 			{
-				//fieldName: 'shieldSpecialization',
+				fieldName: 'shieldSpecialization',
 				location: {
 					rowIdx: 1,
 					colIdx: 1,
@@ -485,7 +485,7 @@ export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = [
 				maxPoints: 5,
 			},
 			{
-				//fieldName: 'toughness',
+				fieldName: 'toughness',
 				location: {
 					rowIdx: 1,
 					colIdx: 2,
@@ -503,7 +503,7 @@ export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = [
 				maxPoints: 1,
 			},
 			{
-				//fieldName: 'improvedShieldBlock',
+				fieldName: 'improvedShieldBlock',
 				location: {
 					rowIdx: 2,
 					colIdx: 1,
@@ -588,7 +588,7 @@ export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = [
 				maxPoints: 2,
 			},
 			{
-				//fieldName: 'shieldMastery',
+				fieldName: 'shieldMastery',
 				location: {
 					rowIdx: 5,
 					colIdx: 0,
@@ -606,7 +606,7 @@ export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = [
 				maxPoints: 5,
 			},
 			{
-				//fieldName: 'improvedDefensiveStance',
+				fieldName: 'improvedDefensiveStance',
 				location: {
 					rowIdx: 6,
 					colIdx: 0,

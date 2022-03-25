@@ -167,23 +167,23 @@ export const NumStartingConjured = {
 };
 
 export const ShadowPriestDPS = {
-  type: 'number' as const,
-  cssClass: 'shadow-priest-dps-picker',
+	type: 'number' as const,
+	cssClass: 'shadow-priest-dps-picker',
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-  config: {
+	config: {
 		extraCssClasses: [
 			'shadow-priest-dps-picker',
 			'within-raid-sim-hide',
 		],
-    label: 'Shadow Priest DPS',
-    changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
-    getValue: (player: Player<any>) => player.getBuffs().shadowPriestDps,
-    setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
-      const buffs = player.getBuffs();
-      buffs.shadowPriestDps = newValue;
-      player.setBuffs(eventID, buffs);
-    },
-  },
+		label: 'Shadow Priest DPS',
+		changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
+		getValue: (player: Player<any>) => player.getBuffs().shadowPriestDps,
+		setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
+			const buffs = player.getBuffs();
+			buffs.shadowPriestDps = newValue;
+			player.setBuffs(eventID, buffs);
+		},
+	},
 };
 
 export const ISBUptime = {
@@ -195,12 +195,12 @@ export const ISBUptime = {
 			'within-raid-sim-hide',
 		],
 		label: 'Improved Shadowbolt Uptime %',
-		labelTooltip: "Uptime for the Improved Shadowbolt debuff, applied by 1 or more warlocks in your raid.",	
+		labelTooltip: "Uptime for the Improved Shadowbolt debuff, applied by 1 or more warlocks in your raid.",
 		changedEvent: (target: Target) => target.debuffsChangeEmitter,
-		getValue: (target: Target) => Math.round(target.getDebuffs().isbUptime*100),
+		getValue: (target: Target) => Math.round(target.getDebuffs().isbUptime * 100),
 		setValue: (eventID: EventID, target: Target, newValue: number) => {
 			const newDebuffs = target.getDebuffs();
-			newDebuffs.isbUptime = newValue/100;
+			newDebuffs.isbUptime = newValue / 100;
 			target.setDebuffs(eventID, newDebuffs);
 		},
 	},
@@ -217,10 +217,10 @@ export const ExposeWeaknessUptime = {
 		label: 'Expose Weakness Uptime %',
 		labelTooltip: 'Uptime for the Expose Weakness debuff, applied by 1 or more Survival hunters in your raid.',
 		changedEvent: (target: Target) => target.debuffsChangeEmitter,
-		getValue: (target: Target) => Math.round(target.getDebuffs().exposeWeaknessUptime*100),
+		getValue: (target: Target) => Math.round(target.getDebuffs().exposeWeaknessUptime * 100),
 		setValue: (eventID: EventID, target: Target, newValue: number) => {
 			const newDebuffs = target.getDebuffs();
-			newDebuffs.exposeWeaknessUptime = newValue/100;
+			newDebuffs.exposeWeaknessUptime = newValue / 100;
 			target.setDebuffs(eventID, newDebuffs);
 		},
 	},

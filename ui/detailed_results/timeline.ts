@@ -12,6 +12,7 @@ import {
 	ResourceChangedLogGroup,
 	DpsLog,
 	SimLog,
+	ThreatLogGroup,
 } from '/tbc/core/proto_utils/logs_parser.js';
 
 import { actionColors } from './color_settings.js';
@@ -21,8 +22,11 @@ declare var $: any;
 declare var tippy: any;
 declare var ApexCharts: any;
 
+type TooltipHandler = (dataPointIndex: number) => string;
+
 const dpsColor = '#ed5653';
 const manaColor = '#2E93fA';
+const threatColor = '#b56d07';
 
 export class Timeline extends ResultComponent {
 	private readonly dpsResourcesPlotElem: HTMLElement;
@@ -32,16 +36,17 @@ export class Timeline extends ResultComponent {
 	private readonly rotationLabels: HTMLElement;
 	private readonly rotationTimeline: HTMLElement;
 	private readonly rotationHiddenIdsContainer: HTMLElement;
+	private readonly chartPicker: HTMLSelectElement;
 
 	private resultData: SimResultData | null;
 	private rendered: boolean;
 
 	private hiddenIds: Array<ActionId>;
-  private hiddenIdsChangeEmitter;
+	private hiddenIdsChangeEmitter;
 
-  constructor(config: ResultComponentConfig) {
+	constructor(config: ResultComponentConfig) {
 		config.rootCssClass = 'timeline-root';
-    super(config);
+		super(config);
 		this.resultData = null;
 		this.rendered = false;
 		this.hiddenIds = [];
@@ -53,8 +58,9 @@ export class Timeline extends ResultComponent {
 			<span class="timeline-warning-description">Timeline data visualizes only 1 sim iteration.</span>
 			<div class="timeline-run-again-button sim-button">SIM 1 ITERATION</div>
 			<select class="timeline-chart-picker">
-				<option value="rotation">Rotation</option>
-				<option value="dps">DPS</option>
+				<option class="rotation-option" value="rotation">Rotation</option>
+				<option class="dps-option" value="dps">DPS</option>
+				<option class="threat-option" value="threat">Threat</option>
 			</select>
 		</div>
 		<div class="timeline-plots-container">
@@ -77,15 +83,16 @@ export class Timeline extends ResultComponent {
 			(window.opener || window.parent)!.postMessage('runOnce', '*');
 		});
 
-		const chartPicker = this.rootElem.getElementsByClassName('timeline-chart-picker')[0] as HTMLSelectElement;
-		chartPicker.addEventListener('change', event => {
-			if (chartPicker.value == 'rotation') {
+		this.chartPicker = this.rootElem.getElementsByClassName('timeline-chart-picker')[0] as HTMLSelectElement;
+		this.chartPicker.addEventListener('change', event => {
+			if (this.chartPicker.value == 'rotation') {
 				this.dpsResourcesPlotElem.classList.add('hide');
 				this.rotationPlotElem.classList.remove('hide');
 			} else {
 				this.dpsResourcesPlotElem.classList.remove('hide');
 				this.rotationPlotElem.classList.add('hide');
 			}
+			this.updatePlot();
 		});
 
 		this.dpsResourcesPlotElem = this.rootElem.getElementsByClassName('dps-resources-plot')[0] as HTMLElement;
@@ -99,18 +106,12 @@ export class Timeline extends ResultComponent {
 				},
 				height: '100%',
 			},
-			colors: [
-				dpsColor,
-				manaColor,
-			],
 			series: [], // Set dynamically
 			xaxis: {
 				title: {
 					text: 'Time (s)',
 				},
 				type: 'datetime',
-			},
-			yaxis: {
 			},
 			noData: {
 				text: 'Waiting for data...',
@@ -136,50 +137,14 @@ export class Timeline extends ResultComponent {
 	}
 
 	private updatePlot() {
-		const players = this.resultData!.result.getPlayers(this.resultData!.filter);
-		if (players.length != 1) {
+		if (this.resultData == null) {
 			return;
 		}
-		const player = players[0];
 
 		const duration = this.resultData!.result.result.firstIterationDuration || 1;
-		this.updateRotationChart(player, duration);
-
-		let manaLogs = player.groupedResourceLogs[ResourceType.ResourceTypeMana];
-		let dpsLogs = player.dpsLogs;
-		let mcdLogs = player.majorCooldownLogs;
-		let mcdAuraLogs = player.majorCooldownAuraUptimeLogs;
-		if (dpsLogs.length == 0) {
-			return;
-		}
-
-		const maxDps = dpsLogs[maxIndex(dpsLogs.map(l => l.dps))!].dps;
-		const dpsAxisMax = (Math.floor(maxDps / 100) + 1) * 100;
-
-		// Figure out how much to vertically offset cooldown icons, for cooldowns
-		// used very close to each other. This is so the icons don't overlap.
-		const MAX_ALLOWED_DIST = 10;
-		const cooldownIconOffsets = mcdLogs.map((mcdLog, mcdIdx) => mcdLogs.filter((cdLog, cdIdx) => (cdIdx < mcdIdx) && (cdLog.timestamp > mcdLog.timestamp - MAX_ALLOWED_DIST)).length);
-
-		const distinctMcdAuras = distinct(mcdAuraLogs, (a, b) => a.aura.equalsIgnoringTag(b.aura));
-		// Sort by name so auras keep their same colors even if timings change.
-		distinctMcdAuras.sort((a, b) => stringComparator(a.aura.name, b.aura.name));
-		const mcdAuraColors = mcdAuraLogs.map(mcdAuraLog => actionColors[distinctMcdAuras.findIndex(dAura => dAura.aura.equalsIgnoringTag(mcdAuraLog.aura))]);
-
-		const showMana = manaLogs.length > 0;
-		const maxMana = showMana ? manaLogs[0].valueBefore : 0;
-
-		let options = {
-			series: [{
-				name: 'DPS',
-				type: 'line',
-				data: dpsLogs.map(log => {
-					return {
-						x: this.toDatetime(log.timestamp),
-						y: log.dps,
-					};
-				}),
-			}],
+		let options: any = {
+			series: [],
+			colors: [],
 			xaxis: {
 				min: this.toDatetime(0).getTime(),
 				max: this.toDatetime(duration).getTime(),
@@ -189,121 +154,14 @@ export class Timeline extends ResultComponent {
 				labels: {
 					show: true,
 					formatter: (defaultValue: string, timestamp: number) => {
-						return (timestamp/1000).toFixed(1);
+						return (timestamp / 1000).toFixed(1);
 					},
 				},
 				title: {
 					text: 'Time (s)',
 				},
 			},
-			yaxis: [
-				{
-					color: dpsColor,
-					seriesName: 'DPS',
-					min: 0,
-					max: dpsAxisMax,
-					tickAmount: 10,
-					decimalsInFloat: 0,
-					title: {
-						text: 'DPS',
-						style: {
-							color: dpsColor,
-						},
-					},
-					axisBorder: {
-						show: true,
-						color: dpsColor,
-					},
-					axisTicks: {
-						color: dpsColor,
-					},
-					labels: {
-						minWidth: 30,
-						style: {
-							colors: [dpsColor],
-						},
-					},
-				},
-			],
-			annotations: {
-				position: 'back',
-				xaxis: mcdAuraLogs.map((log, i) => {
-					return {
-						x: this.toDatetime(log.gainedAt).getTime(),
-						x2: this.toDatetime(log.fadedAt).getTime(),
-						fillColor: mcdAuraColors[i],
-					};
-				}),
-				points: mcdLogs.map((log, i) => {
-					return {
-						x: this.toDatetime(log.timestamp).getTime(),
-						y: 0,
-						image: {
-							path: log.cooldownId.iconUrl,
-							width: 20,
-							height: 20,
-							offsetY: cooldownIconOffsets[i] * -25,
-						},
-					};
-				}),
-			},
-			tooltip: {
-				enabled: true,
-				custom: (data: {series: any, seriesIndex: number, dataPointIndex: number, w: any}) => {
-					if (data.seriesIndex == 0) {
-						// DPS
-						const log = dpsLogs[data.dataPointIndex];
-						return `<div class="timeline-tooltip dps">
-							<div class="timeline-tooltip-header">
-								<span class="bold">${log.timestamp.toFixed(2)}s</span>
-							</div>
-							<div class="timeline-tooltip-body">
-								<ul class="timeline-dps-events">
-									${log.damageLogs.map(damageLog => {
-										let iconElem = '';
-										if (damageLog.cause.iconUrl) {
-											iconElem = `<img class="timeline-tooltip-icon" src="${damageLog.cause.iconUrl}">`;
-										}
-										return `
-										<li>
-											${iconElem}
-											<span>${damageLog.cause.name}:</span>
-											<span class="series-color">${damageLog.resultString()}</span>
-										</li>`;
-									}).join('')}
-								</ul>
-								<div class="timeline-tooltip-body-row">
-									<span class="series-color">DPS: ${log.dps.toFixed(2)}</span>
-								</div>
-							</div>
-							${log.activeAuras.length == 0 ? '' : `
-								<div class="timeline-tooltip-auras">
-									<div class="timeline-tooltip-body-row">
-										<span class="bold">Active Auras</span>
-									</div>
-									<ul class="timeline-active-auras">
-										${log.activeAuras.map(auraLog => {
-											let iconElem = '';
-											if (auraLog.aura.iconUrl) {
-												iconElem = `<img class="timeline-tooltip-icon" src="${auraLog.aura.iconUrl}">`;
-											}
-											return `
-											<li>
-												${iconElem}
-												<span>${auraLog.aura.name}</span>
-											</li>`;
-										}).join('')}
-									</ul>
-								</div>`
-							}
-						</div>`;
-					} else if (data.seriesIndex == 1) {
-						// Mana
-						const log = manaLogs[data.dataPointIndex];
-						return this.resourceTooltip(log, maxMana, true);
-					}
-				}
-			},
+			yaxis: [],
 			chart: {
 				events: {
 					beforeResetZoom: () => {
@@ -318,59 +176,272 @@ export class Timeline extends ResultComponent {
 			},
 		};
 
-		if (showMana) {
-			options.series.push({
-				name: 'Mana',
-				type: 'line',
-				data: manaLogs.map(log => {
-					return {
-						x: this.toDatetime(log.timestamp),
-						y: log.valueAfter,
-					};
-				}),
-			});
-			options.yaxis.push({
-				seriesName: 'Mana',
-				opposite: true, // Appear on right side
-				min: 0,
-				max: maxMana,
-				tickAmount: 10,
-				title: {
-					text: 'Mana',
-					style: {
-						color: manaColor,
-					},
-				},
-				axisBorder: {
-					show: true,
-					color: manaColor,
-				},
-				axisTicks: {
-					color: manaColor,
-				},
-				labels: {
-					minWidth: 30,
-					style: {
-						colors: [manaColor],
-					},
-					formatter: (val: string) => {
-						const v = parseFloat(val);
-						return `${v.toFixed(0)} (${(v/maxMana*100).toFixed(0)}%)`;
-					},
-				},
-			} as any);
+		let tooltipHandlers: Array<TooltipHandler | null> = [];
+		options.tooltip = {
+			enabled: true,
+			custom: (data: { series: any, seriesIndex: number, dataPointIndex: number, w: any }) => {
+				if (tooltipHandlers[data.seriesIndex]) {
+					return tooltipHandlers[data.seriesIndex]!(data.dataPointIndex);
+				} else {
+					throw new Error('No tooltip handler for series ' + data.seriesIndex);
+				}
+			},
+		};
+
+		const players = this.resultData!.result.getPlayers(this.resultData!.filter);
+		if (players.length == 1) {
+			const player = players[0];
+
+			const rotationOption = this.rootElem.getElementsByClassName('rotation-option')[0] as HTMLElement;
+			rotationOption.classList.remove('hide');
+			const threatOption = this.rootElem.getElementsByClassName('threat-option')[0] as HTMLElement;
+			threatOption.classList.add('hide');
+
+			this.updateRotationChart(player, duration);
+
+			const dpsData = this.addDpsSeries(player, options, '');
+			this.addDpsYAxis(dpsData.maxDps, options);
+			tooltipHandlers.push(dpsData.tooltipHandler);
+			tooltipHandlers.push(this.addManaSeries(player, options));
+			tooltipHandlers.push(this.addThreatSeries(player, options, ''));
+			tooltipHandlers = tooltipHandlers.filter(handler => handler != null);
+
+			this.addMajorCooldownAnnotations(player, options);
+		} else {
+			if (this.chartPicker.value == 'rotation') {
+				this.chartPicker.value = 'dps';
+				return;
+			}
+			const rotationOption = this.rootElem.getElementsByClassName('rotation-option')[0] as HTMLElement;
+			rotationOption.classList.add('hide');
+			const threatOption = this.rootElem.getElementsByClassName('threat-option')[0] as HTMLElement;
+			threatOption.classList.remove('hide');
+
+			this.clearRotationChart();
+
+			if (this.chartPicker.value == 'dps') {
+				let maxDps = 0;
+				players.forEach(player => {
+					const dpsData = this.addDpsSeries(player, options, player.classColor);
+					maxDps = Math.max(maxDps, dpsData.maxDps);
+					tooltipHandlers.push(dpsData.tooltipHandler);
+				});
+				this.addDpsYAxis(maxDps, options);
+			} else { // threat
+				let maxThreat = 0;
+				players.forEach(player => {
+					tooltipHandlers.push(this.addThreatSeries(player, options, player.classColor));
+					maxThreat = Math.max(maxThreat, player.maxThreat);
+				});
+				this.addThreatYAxis(maxThreat, options);
+			}
 		}
 
 		this.dpsResourcesPlot.updateOptions(options);
 	}
 
-	private updateRotationChart(player: PlayerMetrics, duration: number) {
-		const targets = this.resultData!.result.getTargets(this.resultData!.filter);
-		if (targets.length == 0) {
-			return;
-		}
-		const target = targets[0];
+	private addDpsYAxis(maxDps: number, options: any) {
+		const dpsAxisMax = Math.ceil(maxDps / 100) * 100;
+		options.yaxis.push({
+			color: dpsColor,
+			seriesName: 'DPS',
+			min: 0,
+			max: dpsAxisMax,
+			tickAmount: 10,
+			decimalsInFloat: 0,
+			title: {
+				text: 'DPS',
+				style: {
+					color: dpsColor,
+				},
+			},
+			axisBorder: {
+				show: true,
+				color: dpsColor,
+			},
+			axisTicks: {
+				color: dpsColor,
+			},
+			labels: {
+				minWidth: 30,
+				style: {
+					colors: [dpsColor],
+				},
+			},
+		});
+	}
 
+	private addThreatYAxis(maxThreat: number, options: any) {
+		const axisMax = Math.ceil(maxThreat / 10000) * 10000;
+		options.yaxis.push({
+			color: threatColor,
+			seriesName: 'Threat',
+			min: 0,
+			max: axisMax,
+			tickAmount: 10,
+			decimalsInFloat: 0,
+			title: {
+				text: 'Threat',
+				style: {
+					color: threatColor,
+				},
+			},
+			axisBorder: {
+				show: true,
+				color: threatColor,
+			},
+			axisTicks: {
+				color: threatColor,
+			},
+			labels: {
+				minWidth: 30,
+				style: {
+					colors: [threatColor],
+				},
+			},
+		});
+	}
+
+	// Returns a function for drawing the tooltip, or null if no series was added.
+	private addDpsSeries(player: PlayerMetrics, options: any, colorOverride: string): { maxDps: number, tooltipHandler: TooltipHandler } {
+		const dpsLogs = player.dpsLogs;
+
+		options.colors.push(colorOverride || dpsColor);
+		options.series.push({
+			name: 'DPS',
+			type: 'line',
+			data: dpsLogs.map(log => {
+				return {
+					x: this.toDatetime(log.timestamp),
+					y: log.dps,
+				};
+			}),
+		});
+
+		return {
+			maxDps: dpsLogs[maxIndex(dpsLogs.map(l => l.dps))!].dps,
+			tooltipHandler: (dataPointIndex: number) => {
+				const log = dpsLogs[dataPointIndex];
+				return this.dpsTooltip(log, true, player, colorOverride);
+			},
+		};
+	}
+
+	// Returns a function for drawing the tooltip, or null if no series was added.
+	private addManaSeries(player: PlayerMetrics, options: any): TooltipHandler | null {
+		const manaLogs = player.groupedResourceLogs[ResourceType.ResourceTypeMana];
+		if (manaLogs.length == 0) {
+			return null;
+		}
+		const maxMana = manaLogs[0].valueBefore;
+
+		options.colors.push(manaColor);
+		options.series.push({
+			name: 'Mana',
+			type: 'line',
+			data: manaLogs.map(log => {
+				return {
+					x: this.toDatetime(log.timestamp),
+					y: log.valueAfter,
+				};
+			}),
+		});
+		options.yaxis.push({
+			seriesName: 'Mana',
+			opposite: true, // Appear on right side
+			min: 0,
+			max: maxMana,
+			tickAmount: 10,
+			title: {
+				text: 'Mana',
+				style: {
+					color: manaColor,
+				},
+			},
+			axisBorder: {
+				show: true,
+				color: manaColor,
+			},
+			axisTicks: {
+				color: manaColor,
+			},
+			labels: {
+				minWidth: 30,
+				style: {
+					colors: [manaColor],
+				},
+				formatter: (val: string) => {
+					const v = parseFloat(val);
+					return `${v.toFixed(0)} (${(v / maxMana * 100).toFixed(0)}%)`;
+				},
+			},
+		} as any);
+
+		return (dataPointIndex: number) => {
+			const log = manaLogs[dataPointIndex];
+			return this.resourceTooltip(log, maxMana, true);
+		};
+	}
+
+	// Returns a function for drawing the tooltip, or null if no series was added.
+	private addThreatSeries(player: PlayerMetrics, options: any, colorOverride: string): TooltipHandler | null {
+		options.colors.push(colorOverride || threatColor);
+		options.series.push({
+			name: 'Threat',
+			type: 'line',
+			data: player.threatLogs.map(log => {
+				return {
+					x: this.toDatetime(log.timestamp),
+					y: log.threatAfter,
+				};
+			}),
+		});
+
+		return (dataPointIndex: number) => {
+			const log = player.threatLogs[dataPointIndex];
+			return this.threatTooltip(log, true, player, colorOverride);
+		};
+	}
+
+	private addMajorCooldownAnnotations(player: PlayerMetrics, options: any) {
+		const mcdLogs = player.majorCooldownLogs;
+		const mcdAuraLogs = player.majorCooldownAuraUptimeLogs;
+
+		// Figure out how much to vertically offset cooldown icons, for cooldowns
+		// used very close to each other. This is so the icons don't overlap.
+		const MAX_ALLOWED_DIST = 10;
+		const cooldownIconOffsets = mcdLogs.map((mcdLog, mcdIdx) => mcdLogs.filter((cdLog, cdIdx) => (cdIdx < mcdIdx) && (cdLog.timestamp > mcdLog.timestamp - MAX_ALLOWED_DIST)).length);
+
+		const distinctMcdAuras = distinct(mcdAuraLogs, (a, b) => a.actionId!.equalsIgnoringTag(b.actionId!));
+		// Sort by name so auras keep their same colors even if timings change.
+		distinctMcdAuras.sort((a, b) => stringComparator(a.actionId!.name, b.actionId!.name));
+		const mcdAuraColors = mcdAuraLogs.map(mcdAuraLog => actionColors[distinctMcdAuras.findIndex(dAura => dAura.actionId!.equalsIgnoringTag(mcdAuraLog.actionId!))]);
+
+		options.annotations = {
+			position: 'back',
+			xaxis: mcdAuraLogs.map((log, i) => {
+				return {
+					x: this.toDatetime(log.gainedAt).getTime(),
+					x2: this.toDatetime(log.fadedAt).getTime(),
+					fillColor: mcdAuraColors[i],
+				};
+			}),
+			points: mcdLogs.map((log, i) => {
+				return {
+					x: this.toDatetime(log.timestamp).getTime(),
+					y: 0,
+					image: {
+						path: log.actionId!.iconUrl,
+						width: 20,
+						height: 20,
+						offsetY: cooldownIconOffsets[i] * -25,
+					},
+				};
+			}),
+		};
+	}
+
+	private clearRotationChart() {
 		this.rotationLabels.innerHTML = `
 			<div class="rotation-label-header"></div>
 		`;
@@ -381,7 +452,16 @@ export class Timeline extends ResultComponent {
 		`;
 		this.rotationHiddenIdsContainer.innerHTML = '';
 		this.hiddenIdsChangeEmitter = new TypedEvent<void>();
+	}
 
+	private updateRotationChart(player: PlayerMetrics, duration: number) {
+		const targets = this.resultData!.result.getTargets(this.resultData!.filter);
+		if (targets.length == 0) {
+			return;
+		}
+		const target = targets[0];
+
+		this.clearRotationChart();
 		this.drawRotationTimeRuler(this.rotationTimeline.getElementsByClassName('rotation-timeline-canvas')[0] as HTMLCanvasElement, duration);
 
 		const meleeActionIds = player.getMeleeActions().map(action => action.actionId);
@@ -400,21 +480,21 @@ export class Timeline extends ResultComponent {
 		};
 
 		const castsByAbility = Object.values(bucket(player.castLogs, log => {
-			if (idsToGroupForRotation.includes(log.castId.spellId)) {
-				return log.castId.toStringIgnoringTag();
+			if (idsToGroupForRotation.includes(log.actionId!.spellId)) {
+				return log.actionId!.toStringIgnoringTag();
 			} else {
-				return log.castId.toString();
+				return log.actionId!.toString();
 			}
 		}));
 		castsByAbility.sort((a, b) => {
-			const categoryA = getActionCategory(a[0].castId);
-			const categoryB = getActionCategory(b[0].castId);
+			const categoryA = getActionCategory(a[0].actionId!);
+			const categoryB = getActionCategory(b[0].actionId!);
 			if (categoryA != categoryB) {
 				return categoryA - categoryB;
-			} else if (a[0].castId.anyId() == b[0].castId.anyId()) {
-				return a[0].castId.tag - b[0].castId.tag;
+			} else if (a[0].actionId!.anyId() == b[0].actionId!.anyId()) {
+				return a[0].actionId!.tag - b[0].actionId!.tag;
 			} else {
-				return stringComparator(a[0].castId.name, b[0].castId.name);
+				return stringComparator(a[0].actionId!.name, b[0].actionId!.name);
 			}
 		});
 
@@ -501,11 +581,11 @@ export class Timeline extends ResultComponent {
 				const resourceElem = document.createElement('div');
 				resourceElem.classList.add('rotation-timeline-resource', 'series-color', resourceNames[resourceType].toLowerCase().replaceAll(' ', '-'));
 				resourceElem.style.left = this.timeToPx(resourceLogGroup.timestamp);
-				resourceElem.style.width = this.timeToPx((resourceLogs[i+1]?.timestamp || duration) - resourceLogGroup.timestamp);
+				resourceElem.style.width = this.timeToPx((resourceLogs[i + 1]?.timestamp || duration) - resourceLogGroup.timestamp);
 				if (resourceType == ResourceType.ResourceTypeMana) {
 					resourceElem.textContent = (resourceLogGroup.valueAfter / startValue * 100).toFixed(0) + '%';
 				} else {
-					resourceElem.textContent = resourceLogGroup.valueAfter.toFixed(0);
+					resourceElem.textContent = Math.floor(resourceLogGroup.valueAfter).toFixed(0);
 				}
 				rowElem.appendChild(resourceElem);
 
@@ -519,7 +599,7 @@ export class Timeline extends ResultComponent {
 		});
 
 		const castRowElems = castsByAbility.map(abilityCasts => {
-			const actionId = abilityCasts[0].castId;
+			const actionId = abilityCasts[0].actionId!;
 
 			this.rotationLabels.appendChild(makeLabelElem(actionId, false));
 			this.rotationHiddenIdsContainer.appendChild(makeLabelElem(actionId, true));
@@ -551,9 +631,9 @@ export class Timeline extends ResultComponent {
 				castElem.appendChild(iconElem);
 				tippy(castElem, {
 					content: `
-						<span>${castLog.castId.name}: ${castLog.castTime.toFixed(2)}s (${castLog.timestamp.toFixed(2)}s - ${(castLog.timestamp + castLog.castTime).toFixed(2)}s)</span>
+						<span>${castLog.actionId!.name}: ${castLog.castTime.toFixed(2)}s (${castLog.timestamp.toFixed(2)}s - ${(castLog.timestamp + castLog.castTime).toFixed(2)}s)</span>
 						<ul class="rotation-timeline-cast-damage-list">
-							${castLog.damageDealtLogs.map(ddl => `<li>${ddl.timestamp.toFixed(2)}s - ${ddl.resultString()}</li>`).join('')}
+							${castLog.damageDealtLogs.map(ddl => `<li><span>${ddl.timestamp.toFixed(2)}s - ${ddl.resultString()}</span><span class="threat-metrics"> (${ddl.threat.toFixed(1)} Threat)</span></li>`).join('')}
 						</ul>
 					`,
 					allowHTML: true,
@@ -568,7 +648,8 @@ export class Timeline extends ResultComponent {
 
 					tippy(tickElem, {
 						content: `
-							<span>${ddl.timestamp.toFixed(2)}s - ${ddl.cause.name} ${ddl.resultString()}</span>
+							<span>${ddl.timestamp.toFixed(2)}s - ${ddl.actionId!.name} ${ddl.resultString()}</span>
+							<span class="threat-metrics"> (${ddl.threat.toFixed(1)} Threat)</span>
 						`,
 						allowHTML: true,
 						placement: 'bottom',
@@ -579,20 +660,20 @@ export class Timeline extends ResultComponent {
 			return rowElem;
 		});
 
-		const buffsById = Object.values(bucket(player.auraUptimeLogs, log => log.aura.toString()));
-		buffsById.sort((a, b) => stringComparator(a[0].aura.name, b[0].aura.name));
+		const buffsById = Object.values(bucket(player.auraUptimeLogs, log => log.actionId!.toString()));
+		buffsById.sort((a, b) => stringComparator(a[0].actionId!.name, b[0].actionId!.name));
 
-		const debuffsById = Object.values(bucket(target.auraUptimeLogs, log => log.aura.toString()));
-		debuffsById.sort((a, b) => stringComparator(a[0].aura.name, b[0].aura.name));
+		const debuffsById = Object.values(bucket(target.auraUptimeLogs, log => log.actionId!.toString()));
+		debuffsById.sort((a, b) => stringComparator(a[0].actionId!.name, b[0].actionId!.name));
 
 		const addAurasSection = (aurasById: Array<Array<AuraUptimeLog>>) => {
 			let addedRow = false;
 			aurasById.forEach(auraUptimeLogs => {
-				const actionId = auraUptimeLogs[0].aura;
+				const actionId = auraUptimeLogs[0].actionId!;
 
 				// If there is already a corresponding row from the casts, use that one. Otherwise make a new one.
 				let rowElem = makeRowElem(actionId, duration);
-				const castRowIndex = castsByAbility.findIndex(casts => casts[0].castId.equalsIgnoringTag(actionId));
+				const castRowIndex = castsByAbility.findIndex(casts => casts[0].actionId!.equalsIgnoringTag(actionId));
 				if (castRowIndex != -1) {
 					rowElem = castRowElems[castRowIndex];
 				} else {
@@ -620,7 +701,7 @@ export class Timeline extends ResultComponent {
 
 					tippy(auraElem, {
 						content: `
-							<span>${aul.aura.name}: ${aul.gainedAt.toFixed(2)}s - ${(aul.fadedAt || duration).toFixed(2)}s</span>
+							<span>${aul.actionId!.name}: ${aul.gainedAt.toFixed(2)}s - ${(aul.fadedAt || duration).toFixed(2)}s</span>
 						`,
 						allowHTML: true,
 					});
@@ -686,11 +767,58 @@ export class Timeline extends ResultComponent {
 		ctx.stroke();
 	}
 
+	private dpsTooltip(log: DpsLog, includeAuras: boolean, player: PlayerMetrics, colorOverride: string): string {
+		const showPlayerLabel = colorOverride != '';
+		return `<div class="timeline-tooltip dps">
+			<div class="timeline-tooltip-header">
+				${showPlayerLabel ? `
+				<img class="timeline-tooltip-icon" src="${player.iconUrl}">
+				<span class="" style="color: ${colorOverride}">${player.label}</span></span> - </span>
+				` : ''}
+				<span class="bold">${log.timestamp.toFixed(2)}s</span>
+			</div>
+			<div class="timeline-tooltip-body">
+				<ul class="timeline-dps-events">
+					${log.damageLogs.map(damageLog => this.tooltipLogItem(damageLog, damageLog.resultString())).join('')}
+				</ul>
+				<div class="timeline-tooltip-body-row">
+					<span class="series-color">DPS: ${log.dps.toFixed(2)}</span>
+				</div>
+			</div>
+			${this.tooltipAurasSection(log)}
+		</div>`;
+	}
+
+	private threatTooltip(log: ThreatLogGroup, includeAuras: boolean, player: PlayerMetrics, colorOverride: string): string {
+		const showPlayerLabel = colorOverride != '';
+		return `<div class="timeline-tooltip threat">
+			<div class="timeline-tooltip-header">
+				${showPlayerLabel ? `
+				<img class="timeline-tooltip-icon" src="${player.iconUrl}">
+				<span class="" style="color: ${colorOverride}">${player.label}</span></span> - </span>
+				` : ''}
+				<span class="bold">${log.timestamp.toFixed(2)}s</span>
+			</div>
+			<div class="timeline-tooltip-body">
+				<div class="timeline-tooltip-body-row">
+					<span class="series-color">Before: ${log.threatBefore.toFixed(1)}</span>
+				</div>
+				<ul class="timeline-threat-events">
+					${log.logs.map(log => this.tooltipLogItem(log, `${log.threat.toFixed(1)} Threat`)).join('')}
+				</ul>
+				<div class="timeline-tooltip-body-row">
+					<span class="series-color">After: ${log.threatAfter.toFixed(1)}</span>
+				</div>
+			</div>
+			${includeAuras ? this.tooltipAurasSection(log) : ''}
+		</div>`;
+	}
+
 	private resourceTooltip(log: ResourceChangedLogGroup, maxValue: number, includeAuras: boolean): string {
 		const valToDisplayString = log.resourceType == ResourceType.ResourceTypeMana
-				? (val: number) => `${val.toFixed(1)} (${(val/maxValue*100).toFixed(0)}%)`
-				: (val: number) => `${val.toFixed(1)}`;
-			
+			? (val: number) => `${val.toFixed(1)} (${(val / maxValue * 100).toFixed(0)}%)`
+			: (val: number) => `${val.toFixed(1)}`;
+
 		return `<div class="timeline-tooltip ${resourceNames[log.resourceType].toLowerCase().replaceAll(' ', '-')}">
 			<div class="timeline-tooltip-header">
 				<span class="bold">${log.timestamp.toFixed(2)}s</span>
@@ -700,53 +828,68 @@ export class Timeline extends ResultComponent {
 					<span class="series-color">Before: ${valToDisplayString(log.valueBefore)}</span>
 				</div>
 				<ul class="timeline-mana-events">
-					${log.logs.map(manaChangedLog => {
-						let iconElem = '';
-						if (manaChangedLog.cause.iconUrl) {
-							iconElem = `<img class="timeline-tooltip-icon" src="${manaChangedLog.cause.iconUrl}">`;
-						}
-						return `
-						<li>
-							${iconElem}
-							<span>${manaChangedLog.cause.name}:</span>
-							<span class="series-color">${manaChangedLog.resultString()}</span>
-						</li>`;
-					}).join('')}
+					${log.logs.map(manaChangedLog => this.tooltipLogItem(manaChangedLog, manaChangedLog.resultString())).join('')}
 				</ul>
 				<div class="timeline-tooltip-body-row">
 					<span class="series-color">After: ${valToDisplayString(log.valueAfter)}</span>
 				</div>
 			</div>
-			${!includeAuras || log.activeAuras.length == 0 ? '' : `
-				<div class="timeline-tooltip-auras">
-					<div class="timeline-tooltip-body-row">
-						<span class="bold">Active Auras</span>
-					</div>
-					<ul class="timeline-active-auras">
-						${log.activeAuras.map(auraLog => {
-							let iconElem = '';
-							if (auraLog.aura.iconUrl) {
-								iconElem = `<img class="timeline-tooltip-icon" src="${auraLog.aura.iconUrl}">`;
-							}
-							return `
-							<li>
-								${iconElem}
-								<span>${auraLog.aura.name}</span>
-							</li>`;
-						}).join('')}
-					</ul>
-				</div>`
-			}
+			${includeAuras ? this.tooltipAurasSection(log) : ''}
 		</div>`;
+	}
+
+	private tooltipLogItem(log: SimLog, value: string): string {
+		const valueElem = `<span class="series-color">${value}</span>`;
+		let actionElem = '';
+		if (log.actionId) {
+			let iconElem = '';
+			if (log.actionId.iconUrl) {
+				iconElem = `<img class="timeline-tooltip-icon" src="${log.actionId.iconUrl}">`;
+			}
+			actionElem = `
+			${iconElem}
+			<span>${log.actionId.name}:</span>
+			`;
+		}
+		return `
+		<li>
+			${actionElem}
+			${valueElem}
+		</li>`;
+	}
+
+	private tooltipAurasSection(log: SimLog): string {
+		if (log.activeAuras.length == 0) {
+			return '';
+		}
+
+		return `
+		<div class="timeline-tooltip-auras">
+			<div class="timeline-tooltip-body-row">
+				<span class="bold">Active Auras</span>
+			</div>
+			<ul class="timeline-active-auras">
+				${log.activeAuras.map(auraLog => {
+			let iconElem = '';
+			if (auraLog.actionId!.iconUrl) {
+				iconElem = `<img class="timeline-tooltip-icon" src="${auraLog.actionId!.iconUrl}">`;
+			}
+			return `
+					<li>
+						${iconElem}
+						<span>${auraLog.actionId!.name}</span>
+					</li>`;
+		}).join('')}
+			</ul>
+		</div>
+		`;
 	}
 
 	render() {
 		setTimeout(() => {
 			this.dpsResourcesPlot.render();
 			this.rendered = true;
-			if (this.resultData != null) {
-				this.updatePlot();
-			}
+			this.updatePlot();
 		}, 300);
 	}
 
@@ -762,13 +905,13 @@ const DEFAULT_ACTION_CATEGORY = 3;
 // Hard-coded spell categories for controlling rotation ordering.
 const idToCategoryMap: Record<number, number> = {
 	[OtherAction.OtherActionAttack]: 0,
-	[OtherAction.OtherActionShoot]:  0.5,
+	[OtherAction.OtherActionShoot]: 0.5,
 
 	// Hunter
 	[27014]: 0.1, // Raptor Strike
 
 	// Rogue
-	[6774]:  MELEE_ACTION_CATEGORY + 0.1, // Slice and Dice
+	[6774]: MELEE_ACTION_CATEGORY + 0.1, // Slice and Dice
 	[26866]: MELEE_ACTION_CATEGORY + 0.2, // Expose Armor
 	[26865]: MELEE_ACTION_CATEGORY + 0.3, // Eviscerate
 	[26867]: MELEE_ACTION_CATEGORY + 0.3, // Rupture
@@ -782,12 +925,12 @@ const idToCategoryMap: Record<number, number> = {
 	[25552]: SPELL_ACTION_CATEGORY + 0.2, // Magma Totem
 	[25537]: SPELL_ACTION_CATEGORY + 0.2, // Fire Nova Totem
 	[25359]: SPELL_ACTION_CATEGORY + 0.3, // Grace of Air Totem
-	[8512]:  SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r1
+	[8512]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r1
 	[10613]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r2
 	[10614]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r3
 	[25585]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r4
 	[25587]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r5
-	[2825]:  DEFAULT_ACTION_CATEGORY + 0.1, // Bloodlust
+	[2825]: DEFAULT_ACTION_CATEGORY + 0.1, // Bloodlust
 };
 
 const idsToGroupForRotation: Array<number> = [

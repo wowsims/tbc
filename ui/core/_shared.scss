@@ -193,6 +193,16 @@ $sim-transitions: .2s ease-in;
 	color: red !important;
 }
 
+.safe {
+	color: lawngreen;
+}
+.warning {
+	color: yellow;
+}
+.danger {
+	color: red;
+}
+
 .bold {
 	font-weight: bold;
 }

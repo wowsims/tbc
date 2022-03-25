@@ -7,6 +7,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+const (
+	SpellFlagMage = core.SpellExtrasAgentReserved1
+)
+
 func RegisterMage() {
 	core.RegisterAgentFactory(
 		proto.Player_Mage{},
@@ -195,7 +199,6 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 
 	mage.registerEvocationCD()
 	mage.registerManaGemsCD()
-	mage.applyTalents()
 
 	mage.hasTristfal = ItemSetTirisfalRegalia.CharacterHasSetBonus(&mage.Character, 2)
 	return mage

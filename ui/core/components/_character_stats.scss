@@ -21,3 +21,10 @@
   text-align: right;
   padding: 8px 10px 1px 10px;
 }
+
+.character-stats-tooltip-row {
+  width: 100%;
+	display: flex;
+	justify-content: space-between;
+	margin: 5px;
+}

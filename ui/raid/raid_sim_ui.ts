@@ -22,6 +22,7 @@ import { EncounterPicker, EncounterPickerConfig } from '/tbc/core/components/enc
 import { LogRunner } from '/tbc/core/components/log_runner.js';
 import { SavedDataConfig } from '/tbc/core/components/saved_data_manager.js';
 import { SavedDataManager } from '/tbc/core/components/saved_data_manager.js';
+import { SettingsMenu } from '/tbc/core/components/settings_menu.js';
 import { addRaidSimAction, RaidSimResultsManager, ReferenceData } from '/tbc/core/components/raid_sim_action.js';
 import { downloadJson } from '/tbc/core/utils.js';
 
@@ -30,6 +31,7 @@ import { BlessingsPicker } from './blessings_picker.js';
 import { BuffBot } from './buff_bot.js';
 import { RaidPicker } from './raid_picker.js';
 import { implementedSpecs } from './presets.js';
+import { newRaidExporters, newRaidImporters } from './import_export.js';
 
 declare var tippy: any;
 
@@ -42,25 +44,25 @@ const extraKnownIssues = [
 ];
 
 export class RaidSimUI extends SimUI {
-  private readonly config: RaidSimConfig;
+	private readonly config: RaidSimConfig;
 	private raidSimResultsManager: RaidSimResultsManager | null = null;
 	private raidPicker: RaidPicker | null = null;
 	private blessingsPicker: BlessingsPicker | null = null;
 
 	// Emits when the raid comp changes. Includes changes to buff bots.
-  readonly compChangeEmitter = new TypedEvent<void>();
-  readonly changeEmitter = new TypedEvent<void>();
+	readonly compChangeEmitter = new TypedEvent<void>();
+	readonly changeEmitter = new TypedEvent<void>();
 
-  readonly referenceChangeEmitter = new TypedEvent<void>();
+	readonly referenceChangeEmitter = new TypedEvent<void>();
 
-  constructor(parentElem: HTMLElement, config: RaidSimConfig) {
+	constructor(parentElem: HTMLElement, config: RaidSimConfig) {
 		super(parentElem, new Sim(), {
 			spec: null,
 			knownIssues: (config.knownIssues || []).concat(extraKnownIssues),
 		});
 		this.rootElem.classList.add('raid-sim-ui');
 
-    this.config = config;
+		this.config = config;
 
 		this.sim.raid.compChangeEmitter.on(eventID => this.compChangeEmitter.emit(eventID));
 		this.sim.setModifyRaidProto(raidProto => this.modifyRaidProto(raidProto));
@@ -79,7 +81,7 @@ export class RaidSimUI extends SimUI {
 		this.addSettingsTab();
 		this.addDetailedResultsTab();
 		this.addLogTab();
-  }
+	}
 
 	private loadSettings() {
 		const initEventID = TypedEvent.nextEventID();
@@ -98,7 +100,7 @@ export class RaidSimUI extends SimUI {
 			}
 
 			if (!loadedSettings) {
-				// Apply any defaults here.
+				this.applyDefaults(initEventID);
 			}
 
 			// This needs to go last so it doesn't re-store things as they are initialized.
@@ -115,50 +117,19 @@ export class RaidSimUI extends SimUI {
 	}
 
 	private addTopbarComponents() {
-		const downloadSettings = document.createElement('span');
-		downloadSettings.classList.add('download-settings', 'fa', 'fa-download');
-		tippy(downloadSettings, {
-			'content': 'Download',
+		this.addToolbarItem(newRaidImporters(this));
+		this.addToolbarItem(newRaidExporters(this));
+
+		const settingsMenu = document.createElement('span');
+		settingsMenu.classList.add('fas', 'fa-cog');
+		tippy(settingsMenu, {
+			'content': 'Settings',
 			'allowHTML': true,
 		});
-		downloadSettings.addEventListener('click', event => {
-			const json = RaidSimSettings.toJson(this.toProto());
-			downloadJson(json, 'tbc_raid_sim.json');
+		settingsMenu.addEventListener('click', event => {
+			new SettingsMenu(this.rootElem, this);
 		});
-		this.addToolbarItem(downloadSettings);
-
-		const uploadContainer = document.createElement('div');
-		uploadContainer.classList.add('upload-container');
-		uploadContainer.innerHTML = `
-			<span class="upload-settings fa fa-upload"></span>
-			<input class="upload-input" type="file" accept="application/json" style="display:none">
-		`;
-
-		const uploadInput = uploadContainer.getElementsByClassName('upload-input')[0] as HTMLInputElement;
-		uploadInput.addEventListener('change', event => {
-			const file = (uploadInput.files && uploadInput.files[0]) || null;
-			if (!file) {
-				return;
-			}
-
-			const reader = new FileReader();
-			reader.onload = (event) => {
-				const text = event.target!.result as string;
-				const settings = RaidSimSettings.fromJsonString(text);
-				this.fromProto(TypedEvent.nextEventID(), settings);
-			};
-			reader.readAsText(file, 'UTF-8');
-		});
-
-		const uploadSettings = uploadContainer.getElementsByClassName('upload-settings')[0] as HTMLSpanElement;
-		tippy(uploadSettings, {
-			'content': 'Upload',
-			'allowHTML': true,
-		});
-		uploadSettings.addEventListener('click', event => {
-			uploadInput.click();
-		});
-		this.addToolbarItem(uploadSettings);
+		this.addToolbarItem(settingsMenu);
 	}
 
 	private addRaidTab() {
@@ -173,28 +144,28 @@ export class RaidSimUI extends SimUI {
 
 		this.raidPicker = new RaidPicker(this.rootElem.getElementsByClassName('raid-picker')[0] as HTMLElement, this);
 
-    const savedRaidManager = new SavedDataManager<RaidSimUI, SavedRaid>(this.rootElem.getElementsByClassName('saved-raids-manager')[0] as HTMLElement, this, {
-      label: 'Raid',
+		const savedRaidManager = new SavedDataManager<RaidSimUI, SavedRaid>(this.rootElem.getElementsByClassName('saved-raids-manager')[0] as HTMLElement, this, {
+			label: 'Raid',
 			storageKey: this.getSavedRaidStorageKey(),
-      getData: (raidSimUI: RaidSimUI) => SavedRaid.create({
+			getData: (raidSimUI: RaidSimUI) => SavedRaid.create({
 				raid: this.sim.raid.toProto(),
 				buffBots: this.getBuffBots().map(b => b.toProto()),
 				blessings: this.blessingsPicker!.getAssignments(),
 			}),
-      setData: (eventID: EventID, raidSimUI: RaidSimUI, newRaid: SavedRaid) => {
+			setData: (eventID: EventID, raidSimUI: RaidSimUI, newRaid: SavedRaid) => {
 				TypedEvent.freezeAllAndDo(() => {
 					this.sim.raid.fromProto(eventID, newRaid.raid || RaidProto.create());
 					this.raidPicker!.setBuffBots(eventID, newRaid.buffBots);
 					this.blessingsPicker!.setAssignments(eventID, newRaid.blessings || BlessingsAssignments.create());
 				});
 			},
-      changeEmitters: [this.sim.changeEmitter],
-      equals: (a: SavedRaid, b: SavedRaid) => {
+			changeEmitters: [this.changeEmitter],
+			equals: (a: SavedRaid, b: SavedRaid) => {
 				return SavedRaid.equals(a, b);
 			},
-      toJson: (a: SavedRaid) => SavedRaid.toJson(a),
-      fromJson: (obj: any) => SavedRaid.fromJson(obj),
-    });
+			toJson: (a: SavedRaid) => SavedRaid.toJson(a),
+			fromJson: (obj: any) => SavedRaid.fromJson(obj),
+		});
 		this.sim.waitForInit().then(() => {
 			savedRaidManager.loadUserData();
 		});
@@ -227,39 +198,40 @@ export class RaidSimUI extends SimUI {
 			</div>
 		`);
 
-    const encounterSectionElem = this.rootElem.getElementsByClassName('raid-encounter-section')[0] as HTMLElement;
+		const encounterSectionElem = this.rootElem.getElementsByClassName('raid-encounter-section')[0] as HTMLElement;
 		new EncounterPicker(encounterSectionElem, this.sim.encounter, {
 			showTargetArmor: true,
 			showExecuteProportion: true,
 			showNumTargets: true,
 		});
-    const savedEncounterManager = new SavedDataManager<Encounter, SavedEncounter>(this.rootElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim.encounter, {
-      label: 'Encounter',
+		const savedEncounterManager = new SavedDataManager<Encounter, SavedEncounter>(this.rootElem.getElementsByClassName('saved-encounter-manager')[0] as HTMLElement, this.sim.encounter, {
+			label: 'Encounter',
 			storageKey: this.getSavedEncounterStorageKey(),
-      getData: (encounter: Encounter) => SavedEncounter.create({ encounter: encounter.toProto() }),
-      setData: (eventID: EventID, encounter: Encounter, newEncounter: SavedEncounter) => encounter.fromProto(eventID, newEncounter.encounter!),
-      changeEmitters: [this.sim.encounter.changeEmitter],
-      equals: (a: SavedEncounter, b: SavedEncounter) => SavedEncounter.equals(a, b),
-      toJson: (a: SavedEncounter) => SavedEncounter.toJson(a),
-      fromJson: (obj: any) => SavedEncounter.fromJson(obj),
-    });
+			getData: (encounter: Encounter) => SavedEncounter.create({ encounter: encounter.toProto() }),
+			setData: (eventID: EventID, encounter: Encounter, newEncounter: SavedEncounter) => encounter.fromProto(eventID, newEncounter.encounter!),
+			changeEmitters: [this.sim.encounter.changeEmitter],
+			equals: (a: SavedEncounter, b: SavedEncounter) => SavedEncounter.equals(a, b),
+			toJson: (a: SavedEncounter) => SavedEncounter.toJson(a),
+			fromJson: (obj: any) => SavedEncounter.fromJson(obj),
+		});
 		this.sim.waitForInit().then(() => {
 			savedEncounterManager.loadUserData();
 		});
 
 		this.blessingsPicker = new BlessingsPicker(this.rootElem.getElementsByClassName('blessings-section')[0] as HTMLElement, this);
+		this.blessingsPicker.changeEmitter.on(eventID => this.changeEmitter.emit(eventID));
 		const assignmentsPicker = new AssignmentsPicker(this.rootElem.getElementsByClassName('assignments-section-container')[0] as HTMLElement, this);
 
-    const otherOptionsSectionElem = this.rootElem.getElementsByClassName('other-options-section')[0] as HTMLElement;
-    new BooleanPicker(otherOptionsSectionElem, this.sim.raid, {
-      label: 'Stagger Stormstrikes',
+		const otherOptionsSectionElem = this.rootElem.getElementsByClassName('other-options-section')[0] as HTMLElement;
+		new BooleanPicker(otherOptionsSectionElem, this.sim.raid, {
+			label: 'Stagger Stormstrikes',
 			labelTooltip: 'When there are multiple Enhancement Shaman in the raid, causes them to coordinate their Stormstrike casts for optimal SS charge usage.',
-      changedEvent: (raid: Raid) => raid.staggerStormstrikesChangeEmitter,
-      getValue: (raid: Raid) => raid.getStaggerStormstrikes(),
-      setValue: (eventID: EventID, raid: Raid, newValue: boolean) => {
+			changedEvent: (raid: Raid) => raid.staggerStormstrikesChangeEmitter,
+			getValue: (raid: Raid) => raid.getStaggerStormstrikes(),
+			setValue: (eventID: EventID, raid: Raid, newValue: boolean) => {
 				raid.setStaggerStormstrikes(eventID, newValue);
-      },
-    });
+			},
+		});
 	}
 
 	private addDetailedResultsTab() {
@@ -268,7 +240,7 @@ export class RaidSimUI extends SimUI {
 			</div>
 		`);
 
-    const detailedResults = new DetailedResults(this.rootElem.getElementsByClassName('detailed-results')[0] as HTMLElement, this, this.raidSimResultsManager!);
+		const detailedResults = new DetailedResults(this.rootElem.getElementsByClassName('detailed-results')[0] as HTMLElement, this, this.raidSimResultsManager!);
 	}
 
 	private addLogTab() {
@@ -277,7 +249,7 @@ export class RaidSimUI extends SimUI {
 			</div>
 		`);
 
-    const logRunner = new LogRunner(this.rootElem.getElementsByClassName('log-runner')[0] as HTMLElement, this);
+		const logRunner = new LogRunner(this.rootElem.getElementsByClassName('log-runner')[0] as HTMLElement, this);
 	}
 
 	private modifyRaidProto(raidProto: RaidProto) {
@@ -295,8 +267,8 @@ export class RaidSimUI extends SimUI {
 		const blessingsAssignments = this.blessingsPicker!.getAssignments();
 		implementedSpecs.forEach(spec => {
 			const playerProtos = raidProto.parties
-					.map(party => party.players.filter(player => player.class != Class.ClassUnknown && playerToSpec(player) == spec))
-					.flat();
+				.map(party => party.players.filter(player => player.class != Class.ClassUnknown && playerToSpec(player) == spec))
+				.flat();
 
 			blessingsAssignments.paladins.forEach((paladin, i) => {
 				if (i >= numPaladins) {
@@ -339,8 +311,8 @@ export class RaidSimUI extends SimUI {
 
 	getClassCount(playerClass: Class): number {
 		return this.sim.raid.getClassCount(playerClass)
-				+ this.getBuffBots()
-						.filter(buffBot => buffBot.getClass() == playerClass).length;
+			+ this.getBuffBots()
+				.filter(buffBot => buffBot.getClass() == playerClass).length;
 	}
 
 	getBuffBots(): Array<BuffBot> {
@@ -357,6 +329,14 @@ export class RaidSimUI extends SimUI {
 		});
 
 		return playersAndBuffBots;
+	}
+
+	applyDefaults(eventID: EventID) {
+		TypedEvent.freezeAllAndDo(() => {
+			this.sim.raid.fromProto(eventID, RaidProto.create());
+			this.sim.encounter.applyDefaults(eventID);
+			this.sim.applyDefaults(eventID);
+		});
 	}
 
 	toProto(): RaidSimSettings {

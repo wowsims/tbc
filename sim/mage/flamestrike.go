@@ -22,6 +22,7 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
+				SpellExtras:         SpellFlagMage,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 1175,
@@ -86,7 +87,7 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         core.SpellExtrasAlwaysHits,
+				SpellExtras:         SpellFlagMage | core.SpellExtrasAlwaysHits,
 			},
 		},
 	}

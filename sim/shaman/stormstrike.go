@@ -14,10 +14,10 @@ var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeC
 var SkyshatterAPBonusAuraID = core.NewAuraID()
 
 func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-
 	ssDebuffAura := core.Aura{
 		ID:       StormstrikeDebuffID,
 		ActionID: StormstrikeActionID,
+		Duration: time.Second * 12,
 		Stacks:   2,
 	}
 	ssDebuffAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
@@ -110,6 +110,11 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {
 		ss.Effects[0].WeaponInput.FlatDamageBonus += 30
 		ss.Effects[1].WeaponInput.FlatDamageBonus += 30
+	}
+
+	if shaman.Talents.SpiritWeapons {
+		ss.Effects[0].ThreatMultiplier *= 0.7
+		ss.Effects[1].ThreatMultiplier *= 0.7
 	}
 
 	return core.NewSimpleSpellTemplate(ss)

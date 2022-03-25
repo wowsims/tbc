@@ -23,9 +23,10 @@ func init() {
 	core.AddItemEffect(34472, ApplyShardOfContempt)
 
 	// Activatable effects. Keep these in order by item ID.
+	var KissOfTheSpiderAuraID = core.NewAuraID()
 	var KissOfTheSpiderCooldownID = core.NewCooldownID()
 	core.AddItemEffect(22954, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		KissOfTheSpiderAuraID,
 		stats.Stats{stats.MeleeHaste: 200},
 		time.Second*15,
 		core.MajorCooldown{
@@ -36,9 +37,10 @@ func init() {
 		},
 	))
 
+	var SlayersCrestAuraID = core.NewAuraID()
 	var SlayersCrestCooldownID = core.NewCooldownID()
 	core.AddItemEffect(23041, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		SlayersCrestAuraID,
 		stats.Stats{stats.AttackPower: 260, stats.RangedAttackPower: 260},
 		time.Second*20,
 		core.MajorCooldown{
@@ -49,9 +51,10 @@ func init() {
 		},
 	))
 
+	var FigurineNightseyePantherAuraID = core.NewAuraID()
 	var FigurineNightseyePantherCooldownID = core.NewCooldownID()
 	core.AddItemEffect(24128, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		FigurineNightseyePantherAuraID,
 		stats.Stats{stats.AttackPower: 320, stats.RangedAttackPower: 320},
 		time.Second*12,
 		core.MajorCooldown{
@@ -62,9 +65,10 @@ func init() {
 		},
 	))
 
+	var BladefistsBreadthAuraID = core.NewAuraID()
 	var BladefistsBreadthCooldownID = core.NewCooldownID()
 	core.AddItemEffect(28041, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		BladefistsBreadthAuraID,
 		stats.Stats{stats.AttackPower: 200, stats.RangedAttackPower: 200},
 		time.Second*15,
 		core.MajorCooldown{
@@ -75,9 +79,10 @@ func init() {
 		},
 	))
 
+	var IconOfUnyieldingCourageAuraID = core.NewAuraID()
 	var IconOfUnyieldingCourageCooldownID = core.NewCooldownID()
 	core.AddItemEffect(28121, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		IconOfUnyieldingCourageAuraID,
 		stats.Stats{stats.ArmorPenetration: 600},
 		time.Second*20,
 		core.MajorCooldown{
@@ -88,9 +93,10 @@ func init() {
 		},
 	))
 
+	var AbacusViolentOddsAuraID = core.NewAuraID()
 	var AbacusViolentOddsCooldownID = core.NewCooldownID()
 	core.AddItemEffect(28288, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		AbacusViolentOddsAuraID,
 		stats.Stats{stats.MeleeHaste: 260},
 		time.Second*10,
 		core.MajorCooldown{
@@ -101,9 +107,10 @@ func init() {
 		},
 	))
 
+	var BloodlustBroochAuraID = core.NewAuraID()
 	var BloodlustBroochCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29383, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		BloodlustBroochAuraID,
 		stats.Stats{stats.AttackPower: 278, stats.RangedAttackPower: 278},
 		time.Second*20,
 		core.MajorCooldown{
@@ -114,9 +121,10 @@ func init() {
 		},
 	))
 
+	var CoreOfArkelosAuraID = core.NewAuraID()
 	var CoreOfArkelosCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29776, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		CoreOfArkelosAuraID,
 		stats.Stats{stats.AttackPower: 200, stats.RangedAttackPower: 200},
 		time.Second*20,
 		core.MajorCooldown{
@@ -129,9 +137,10 @@ func init() {
 
 	core.AddItemEffect(32654, ApplyCrystalforgedTrinket)
 
+	var BadgeOfTenacityAuraID = core.NewAuraID()
 	var BadgeOfTenacityCooldownID = core.NewCooldownID()
 	core.AddItemEffect(32658, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		BadgeOfTenacityAuraID,
 		stats.Stats{stats.Agility: 150},
 		time.Second*20,
 		core.MajorCooldown{
@@ -142,9 +151,10 @@ func init() {
 		},
 	))
 
+	var BerserkersCallAuraID = core.NewAuraID()
 	var BerserkersCallCooldownID = core.NewCooldownID()
 	core.AddItemEffect(33831, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		BerserkersCallAuraID,
 		stats.Stats{stats.AttackPower: 360, stats.RangedAttackPower: 360},
 		time.Second*20,
 		core.MajorCooldown{
@@ -155,9 +165,10 @@ func init() {
 		},
 	))
 
+	var FigurineShadowsongPantherAuraID = core.NewAuraID()
 	var FigurineShadowsongPantherCooldownID = core.NewCooldownID()
 	core.AddItemEffect(35702, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		FigurineShadowsongPantherAuraID,
 		stats.Stats{stats.AttackPower: 320, stats.RangedAttackPower: 320},
 		time.Second*15,
 		core.MajorCooldown{
@@ -168,9 +179,10 @@ func init() {
 		},
 	))
 
+	var EmptyDirebrewMugAuraID = core.NewAuraID()
 	var EmptyDirebrewMugCooldownID = core.NewCooldownID()
 	core.AddItemEffect(38287, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.OffensiveTrinketActiveAuraID,
+		EmptyDirebrewMugAuraID,
 		stats.Stats{stats.AttackPower: 278, stats.RangedAttackPower: 278},
 		time.Second*20,
 		core.MajorCooldown{
@@ -223,11 +235,10 @@ func ApplyHandOfJustice(agent core.Agent) {
 var CrystalforgedTrinketCooldownID = core.NewCooldownID()
 
 func ApplyCrystalforgedTrinket(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 7
-	agent.GetCharacter().PseudoStats.BonusRangedDamage += 7
+	agent.GetCharacter().PseudoStats.BonusDamage += 7
 	core.RegisterTemporaryStatsOnUseCD(
 		agent,
-		core.OffensiveTrinketActiveAuraID,
+		core.NewAuraID(),
 		stats.Stats{stats.AttackPower: 216, stats.RangedAttackPower: 216},
 		time.Second*10,
 		core.MajorCooldown{
@@ -261,14 +272,13 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
 				const arPenBonus = 200.0
-				const dur = time.Second * 30
 				ppmm := character.AutoAttacks.NewPPMManager(10.0)
 				stacks := 0
 
 				character.AddAura(sim, core.Aura{
 					ID:       BadgeOfTheSwarmguardProcAuraID,
 					ActionID: BadgeOfTheSwarmguardActionID,
-					Expires:  sim.CurrentTime + dur,
+					Duration: time.Second * 30,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
@@ -562,13 +572,12 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 
 				const apBonus = 44.0
-				const dur = time.Second * 20
 				stacks := 0
 
 				character.AddAura(sim, core.Aura{
 					ID:       BlackenedNaaruSliverProcAuraID,
 					ActionID: core.ActionID{ItemID: 34427},
-					Expires:  sim.CurrentTime + dur,
+					Duration: time.Second * 20,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
 							return

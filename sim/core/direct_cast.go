@@ -51,9 +51,10 @@ type DotDamageInput struct {
 
 	// Internal fields
 	startTime     time.Duration
-	finalTickTime time.Duration
+	endTime       time.Duration
 	damagePerTick float64
 	tickIndex     int
+	nextTickTime  time.Duration
 }
 
 func (ddi *DotDamageInput) init(spellCast *SpellCast) {
@@ -72,7 +73,7 @@ func (ddi DotDamageInput) FullDuration() time.Duration {
 }
 
 func (ddi DotDamageInput) TimeRemaining(sim *Simulation) time.Duration {
-	return MaxDuration(0, ddi.finalTickTime-sim.CurrentTime)
+	return MaxDuration(0, ddi.endTime-sim.CurrentTime)
 }
 
 // Returns the remaining number of times this dot is expected to tick, assuming
@@ -92,7 +93,7 @@ func (ddi DotDamageInput) IsTicking(sim *Simulation) bool {
 	//  In this case the dot "time remaining" will be 0 but there will be ticks left.
 	//  If a DOT misses then it will have NumberOfTicks set but never have been started.
 	//  So the case of 'has a final tick time but its now, but it has ticks remaining' looks like this.
-	return (ddi.finalTickTime != 0 && ddi.tickIndex < ddi.NumberOfTicks)
+	return (ddi.endTime != 0 && ddi.tickIndex < ddi.NumberOfTicks)
 }
 
 func (ddi *DotDamageInput) SetTickDamage(newDamage float64) {
@@ -100,10 +101,9 @@ func (ddi *DotDamageInput) SetTickDamage(newDamage float64) {
 }
 
 // Restarts the dot with the same number of ticks / duration as it started with.
-// TODO: This should allow the dot 'debuff' to continue for the partial tick time
-// after the last tick, based on refresh time. This matters for stack refreshers.
-func (ddi *DotDamageInput) RefreshDot() {
-	ddi.finalTickTime += time.Duration(ddi.tickIndex) * ddi.TickLength
+// Note that this does NOT change nextTickTime.
+func (ddi *DotDamageInput) RefreshDot(sim *Simulation) {
+	ddi.endTime = sim.CurrentTime + time.Duration(ddi.NumberOfTicks)*ddi.TickLength
 	ddi.tickIndex = 0
 }
 
@@ -261,22 +261,26 @@ func (spell *SimpleSpell) ApplyDot(sim *Simulation) {
 		referenceHit := &spell.Effect
 		if multiDot {
 			referenceHit = &spell.Effects[0]
-			for i := range spell.Effects {
-				spell.Effects[i].calculateDotDamage(sim, &spell.SpellCast)
-			}
-			spell.applyAOECap()
-			for i := range spell.Effects {
-				spell.Effects[i].afterDotTick(sim, spell)
+			if sim.CurrentTime == referenceHit.DotInput.nextTickTime {
+				for i := range spell.Effects {
+					spell.Effects[i].calculateDotDamage(sim, &spell.SpellCast)
+				}
+				spell.applyAOECap()
+				for i := range spell.Effects {
+					spell.Effects[i].afterDotTick(sim, spell)
+				}
 			}
 		} else {
-			referenceHit.calculateDotDamage(sim, &spell.SpellCast)
-			referenceHit.afterDotTick(sim, spell)
+			if sim.CurrentTime == referenceHit.DotInput.nextTickTime {
+				referenceHit.calculateDotDamage(sim, &spell.SpellCast)
+				referenceHit.afterDotTick(sim, spell)
+			}
 		}
 
 		// This assumes that all the dots have the same # of ticks and tick length.
-		if referenceHit.DotInput.tickIndex < referenceHit.DotInput.NumberOfTicks {
+		if referenceHit.DotInput.endTime > sim.CurrentTime {
 			// Refresh action.
-			pa.NextActionAt = sim.CurrentTime + referenceHit.DotInput.TickLength
+			pa.NextActionAt = MinDuration(referenceHit.DotInput.endTime, referenceHit.DotInput.nextTickTime)
 			sim.AddPendingAction(pa)
 		} else {
 			pa.CleanUp(sim)

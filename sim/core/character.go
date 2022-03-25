@@ -140,15 +140,14 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 	}
 
 	character.baseStats = BaseStats[BaseStatsKey{Race: character.Race, Class: character.Class}]
-	character.AddStats(character.baseStats)
-	character.AddStats(character.Equip.Stats())
 
+	bonusStats := stats.Stats{}
 	if player.BonusStats != nil {
-		bonusStats := stats.Stats{}
 		copy(bonusStats[:], player.BonusStats[:])
-		character.AddStats(bonusStats)
 	}
 
+	character.AddStats(character.baseStats)
+	character.AddStats(bonusStats)
 	character.addUniversalStatDependencies()
 
 	return character
@@ -168,15 +167,25 @@ func (character *Character) Log(sim *Simulation, message string, vals ...interfa
 	sim.Log("[%s] "+message, append([]interface{}{character.Label}, vals...)...)
 }
 
-func (character *Character) applyAllEffects(agent Agent) {
+func (character *Character) applyAllEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) {
+	agent.ApplyTalents()
 	applyRaceEffects(agent)
+
+	character.AddStats(character.Equip.Stats())
 	character.applyItemEffects(agent)
 	character.applyItemSetBonusEffects(agent)
+
+	applyBuffEffects(agent, raidBuffs, partyBuffs, individualBuffs)
+	applyConsumeEffects(agent, raidBuffs, partyBuffs)
+
+	for _, petAgent := range character.Pets {
+		applyPetBuffEffects(petAgent, raidBuffs, partyBuffs, individualBuffs)
+	}
 }
 
 // Apply effects from all equipped items.
 func (character *Character) applyItemEffects(agent Agent) {
-	for _, eq := range character.Equip {
+	for slot, eq := range character.Equip {
 		if applyItemEffect, ok := itemEffects[eq.ID]; ok {
 			applyItemEffect(agent)
 		}
@@ -190,6 +199,10 @@ func (character *Character) applyItemEffects(agent Agent) {
 		// TODO: should we use eq.Enchant.EffectID because some enchants use a spellID instead of itemID?
 		if applyEnchantEffect, ok := itemEffects[eq.Enchant.ID]; ok {
 			applyEnchantEffect(agent)
+		}
+
+		if applyWeaponEffect, ok := weaponEffects[eq.Enchant.ID]; ok {
+			applyWeaponEffect(agent, proto.ItemSlot(slot))
 		}
 	}
 }
@@ -563,13 +576,14 @@ func (character *Character) doneIteration(simDuration time.Duration) {
 func (character *Character) GetStatsProto() *proto.PlayerStats {
 	gearStats := character.Equip.Stats()
 	finalStats := character.GetStats()
-	setBonusNames := character.GetActiveSetBonusNames()
 
 	return &proto.PlayerStats{
-		GearOnly:   gearStats[:],
+		BaseStats:  character.baseStats[:],
+		GearStats:  gearStats[:],
 		FinalStats: finalStats[:],
-		Sets:       setBonusNames,
-		Cooldowns:  character.GetMajorCooldownIDs(),
+
+		Sets:      character.GetActiveSetBonusNames(),
+		Cooldowns: character.GetMajorCooldownIDs(),
 	}
 }
 

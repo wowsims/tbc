@@ -21,10 +21,10 @@ export class BuffBot {
 	private innervateAssignment: RaidTarget = emptyRaidTarget();
 	private powerInfusionAssignment: RaidTarget = emptyRaidTarget();
 
-  readonly raidIndexChangeEmitter = new TypedEvent<void>();
-  readonly innervateAssignmentChangeEmitter = new TypedEvent<void>();
-  readonly powerInfusionAssignmentChangeEmitter = new TypedEvent<void>();
-  readonly changeEmitter = new TypedEvent<void>();
+	readonly raidIndexChangeEmitter = new TypedEvent<void>();
+	readonly innervateAssignmentChangeEmitter = new TypedEvent<void>();
+	readonly powerInfusionAssignmentChangeEmitter = new TypedEvent<void>();
+	readonly changeEmitter = new TypedEvent<void>();
 
 	private readonly sim: Sim;
 
@@ -39,10 +39,10 @@ export class BuffBot {
 		this.updateSettings();
 
 		[
-      this.raidIndexChangeEmitter,
-      this.innervateAssignmentChangeEmitter,
-      this.powerInfusionAssignmentChangeEmitter,
-    ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+			this.raidIndexChangeEmitter,
+			this.innervateAssignmentChangeEmitter,
+			this.powerInfusionAssignmentChangeEmitter,
+		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
 
 		this.changeEmitter.on(eventID => sim.raid.getParty(this.getPartyIndex()).changeEmitter.emit(eventID));
 	}

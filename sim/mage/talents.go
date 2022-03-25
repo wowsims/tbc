@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (mage *Mage) applyTalents() {
+func (mage *Mage) ApplyTalents() {
 	mage.applyArcaneConcentration()
 	mage.applyIgnite()
 	mage.applyMasterOfElements()
@@ -74,11 +74,18 @@ func (mage *Mage) applyArcaneConcentration() {
 		ccAura := core.Aura{
 			ID:       ClearcastingAuraID,
 			ActionID: core.ActionID{SpellID: 12536},
+			Duration: core.NeverExpires, // actually 15s, but that's hardly ever relevant
 			OnCast: func(sim *core.Simulation, cast *core.Cast) {
+				if !cast.SpellExtras.Matches(SpellFlagMage) {
+					return
+				}
 				cast.Cost.Value = 0
 				cast.BonusCritRating += bonusCrit
 			},
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				if !cast.SpellExtras.Matches(SpellFlagMage) {
+					return
+				}
 				mage.RemoveAura(sim, ClearcastingAuraID)
 			},
 		}
@@ -88,7 +95,7 @@ func (mage *Mage) applyArcaneConcentration() {
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				curCastIdx++
 
-				// Arcane missle initial hit can proc clearcasting.
+				// Arcane missile initial hit can proc clearcasting.
 				if !cast.IsSpellAction(SpellIDArcaneMissiles) {
 					return
 				}
@@ -97,9 +104,11 @@ func (mage *Mage) applyArcaneConcentration() {
 					return
 				}
 
-				mage.AddAura(sim, ccAura)
-				// Also has special interaction with AM, gets the benefit of CC crit bonus on its own cast.
-				cast.BonusCritRating += bonusCrit
+				if !mage.HasAura(ClearcastingAuraID) {
+					// Also has special interaction with AM, gets the benefit of CC crit bonus on its own cast.
+					cast.BonusCritRating += bonusCrit
+				}
+				mage.ReplaceAura(sim, ccAura)
 			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
@@ -109,7 +118,7 @@ func (mage *Mage) applyArcaneConcentration() {
 					return
 				}
 				if spellCast.IsSpellAction(SpellIDArcaneMissiles) {
-					// Arcane missle bolts shouldn't proc clearcasting.
+					// Arcane missile bolts shouldn't proc clearcasting.
 					return
 				}
 
@@ -222,7 +231,7 @@ func (mage *Mage) registerArcanePowerCD() {
 				character.AddAura(sim, core.Aura{
 					ID:       ArcanePowerAuraID,
 					ActionID: actionID,
-					Expires:  sim.CurrentTime + time.Second*15,
+					Duration: time.Second * 15,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						if cast.SpellSchool.Matches(core.SpellSchoolMagic) {
 							cast.Cost.Value *= 1.3
@@ -303,7 +312,7 @@ func (mage *Mage) registerCombustionCD() {
 				character.AddAura(sim, core.Aura{
 					ID:       CombustionAuraID,
 					ActionID: actionID,
-					Expires:  core.NeverExpires,
+					Duration: core.NeverExpires,
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						cast.BonusCritRating += float64(numHits) * 10 * core.SpellCritRatingPerCritChance
 					},
@@ -367,19 +376,20 @@ func (mage *Mage) registerIcyVeinsCD() {
 			manaCost = mage.BaseMana() * 0.03
 
 			return func(sim *core.Simulation, character *core.Character) {
-				character.PseudoStats.CastSpeedMultiplier *= bonus
-
 				character.AddAura(sim, core.Aura{
 					ID:       IcyVeinsAuraID,
 					ActionID: actionID,
-					Expires:  sim.CurrentTime + time.Second*20,
+					Duration: time.Second * 20,
+					OnGain: func(sim *core.Simulation) {
+						character.PseudoStats.CastSpeedMultiplier *= bonus
+						character.SpendMana(sim, manaCost, actionID)
+						character.Metrics.AddInstantCast(actionID)
+						character.SetCD(IcyVeinsCooldownID, sim.CurrentTime+time.Minute*3)
+					},
 					OnExpire: func(sim *core.Simulation) {
 						character.PseudoStats.CastSpeedMultiplier *= inverseBonus
 					},
 				})
-				character.SpendMana(sim, manaCost, actionID)
-				character.Metrics.AddInstantCast(actionID)
-				character.SetCD(IcyVeinsCooldownID, sim.CurrentTime+time.Minute*3)
 			}
 		},
 	})

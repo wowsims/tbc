@@ -3,6 +3,7 @@ import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { IconEnumPicker, IconEnumPickerConfig } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPickerConfig } from '/tbc/core/components/icon_picker.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
@@ -77,6 +78,22 @@ export const RogueRotationConfig = {
 			},
 		},
 		{
+			type: 'boolean' as const, cssClass: 'use-shiv-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Use Shiv',
+				labelTooltip: 'Uses Shiv in place of the selected builder if Deadly Poison is about to expire. Requires Deadly Poison in the off-hand.',
+				changedEvent: (player: Player<Spec.SpecRogue>) => TypedEvent.onAny([player.rotationChangeEmitter, player.consumesChangeEmitter]),
+				getValue: (player: Player<Spec.SpecRogue>) => player.getRotation().useShiv,
+				setValue: (eventID: EventID, player: Player<Spec.SpecRogue>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.useShiv = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+				enableWhen: (player: Player<Spec.SpecRogue>) => player.getConsumes().offHandImbue == WeaponImbue.WeaponImbueRogueDeadlyPoison,
+			},
+		},
+		{
 			type: 'number' as const, cssClass: 'min-combo-points-for-dps-finisher-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
@@ -96,8 +113,8 @@ export const RogueRotationConfig = {
 
 function makeBooleanRogueBuffInput(id: ActionId, optionsFieldName: keyof RogueOptions): IconPickerConfig<Player<any>, boolean> {
 	return {
-	  id: id,
-	  states: 2,
+		id: id,
+		states: 2,
 		changedEvent: (player: Player<Spec.SpecRogue>) => player.specOptionsChangeEmitter,
 		getValue: (player: Player<Spec.SpecRogue>) => player.getSpecOptions()[optionsFieldName] as boolean,
 		setValue: (eventID: EventID, player: Player<Spec.SpecRogue>, newValue: boolean) => {

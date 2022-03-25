@@ -30,6 +30,12 @@ character_stats_results: {
   final_stats: 0
   final_stats: 1640.78
   final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
  }
 }
 dps_results: {
@@ -179,19 +185,13 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-Dragonmaw-28438"
  value: {
-  dps: 1111.5631813066163
+  dps: 1302.1935453964481
  }
 }
 dps_results: {
  key: "TestBalance-AllItems-DragonspineTrophy-28830"
  value: {
   dps: 1257.609108853167
- }
-}
-dps_results: {
- key: "TestBalance-AllItems-Dragonstrike(StackingAuras)--23"
- value: {
-  dps: 1302.1935453964481
  }
 }
 dps_results: {
@@ -203,7 +203,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 1111.5631813066163
+  dps: 1302.1935453964481
  }
 }
 dps_results: {
@@ -581,7 +581,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-SelfDrums-DPS"
  value: {
-  dps: 1266.6642674779105
+  dps: 1267.4734604779107
  }
 }
 dps_results: {

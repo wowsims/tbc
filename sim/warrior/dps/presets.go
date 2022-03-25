@@ -1,4 +1,4 @@
-package warrior
+package dps
 
 import (
 	"github.com/wowsims/tbc/sim/core/items"
@@ -82,7 +82,7 @@ var FullDebuffs = &proto.Debuffs{
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: FullDebuffs,
-	Armor:   7700,
+	Armor:   7684,
 }
 
 var FuryP1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{

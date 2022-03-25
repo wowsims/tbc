@@ -25,11 +25,11 @@ export class Title extends Component {
 	private readonly buttonElem: HTMLElement;
 	private readonly dropdownElem: HTMLElement;
 
-  constructor(parent: HTMLElement, currentSpec: Spec | null) {
-    super(parent, 'sim-title-root');
+	constructor(parent: HTMLElement, currentSpec: Spec | null) {
+		super(parent, 'sim-title-root');
 		this.rootElem.classList.add('dropdown-root');
 
-    this.rootElem.innerHTML = `
+		this.rootElem.innerHTML = `
 			<div class="dropdown-button sim-title-button"></div>
 			<div class="dropdown-panel sim-title-dropdown within-raid-sim-hide"></div>
     `;
@@ -49,9 +49,9 @@ export class Title extends Component {
 		} else {
 			currentOption = this.makeOptionData(currentSpec, true);
 			otherOptions = launchedSpecs
-					.filter(spec => spec != currentSpec)
-					.map(spec => this.makeOptionData(spec, false))
-					.concat([ this.makeOptionData(null, false) ]);
+				.filter(spec => spec != currentSpec)
+				.map(spec => this.makeOptionData(spec, false))
+				.concat([this.makeOptionData(null, false)]);
 		}
 
 		this.buttonElem.appendChild(Title.makeOptionElem(currentOption));
@@ -60,7 +60,7 @@ export class Title extends Component {
 		if (!isWithinRaidSim) {
 			otherOptions.forEach(option => this.dropdownElem.appendChild(this.makeOption(option)));
 		}
-  }
+	}
 
 	private makeOptionData(spec: Spec | null, isButton: boolean) {
 		if (spec == null) {

@@ -2,19 +2,19 @@ import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
 
 const socketToMatchingColors = new Map<GemColor, Array<GemColor>>();
-socketToMatchingColors.set(GemColor.GemColorMeta,   [GemColor.GemColorMeta]);
-socketToMatchingColors.set(GemColor.GemColorBlue,   [GemColor.GemColorBlue, GemColor.GemColorPurple, GemColor.GemColorGreen, GemColor.GemColorPrismatic]);
-socketToMatchingColors.set(GemColor.GemColorRed,    [GemColor.GemColorRed, GemColor.GemColorPurple, GemColor.GemColorOrange, GemColor.GemColorPrismatic]);
+socketToMatchingColors.set(GemColor.GemColorMeta, [GemColor.GemColorMeta]);
+socketToMatchingColors.set(GemColor.GemColorBlue, [GemColor.GemColorBlue, GemColor.GemColorPurple, GemColor.GemColorGreen, GemColor.GemColorPrismatic]);
+socketToMatchingColors.set(GemColor.GemColorRed, [GemColor.GemColorRed, GemColor.GemColorPurple, GemColor.GemColorOrange, GemColor.GemColorPrismatic]);
 socketToMatchingColors.set(GemColor.GemColorYellow, [GemColor.GemColorYellow, GemColor.GemColorOrange, GemColor.GemColorGreen, GemColor.GemColorPrismatic]);
 
 // Whether the gem matches the given socket color, for the purposes of gaining the socket bonuses.
 export function gemMatchesSocket(gem: Gem, socketColor: GemColor) {
-  return socketToMatchingColors.has(socketColor) && socketToMatchingColors.get(socketColor)!.includes(gem.color);
+	return socketToMatchingColors.has(socketColor) && socketToMatchingColors.get(socketColor)!.includes(gem.color);
 }
 
 // Whether the gem is capable of slotting into a socket of the given color.
 export function gemEligibleForSocket(gem: Gem, socketColor: GemColor) {
-  return (gem.color == GemColor.GemColorMeta) == (socketColor == GemColor.GemColorMeta);
+	return (gem.color == GemColor.GemColorMeta) == (socketColor == GemColor.GemColorMeta);
 }
 
 
@@ -132,31 +132,31 @@ export const JAGGED_SEASPRAY_EMERALD = 32226;
 export const JAGGED_TALASITE = 24067;
 
 const gemSocketCssClasses: Partial<Record<GemColor, string>> = {
-  [GemColor.GemColorBlue]: 'socket-color-blue',
-  [GemColor.GemColorMeta]: 'socket-color-meta',
-  [GemColor.GemColorRed]: 'socket-color-red',
-  [GemColor.GemColorYellow]: 'socket-color-yellow',
+	[GemColor.GemColorBlue]: 'socket-color-blue',
+	[GemColor.GemColorMeta]: 'socket-color-meta',
+	[GemColor.GemColorRed]: 'socket-color-red',
+	[GemColor.GemColorYellow]: 'socket-color-yellow',
 };
 export function setGemSocketCssClass(elem: HTMLElement, color: GemColor) {
-  Object.values(gemSocketCssClasses).forEach(cssClass => elem.classList.remove(cssClass));
+	Object.values(gemSocketCssClasses).forEach(cssClass => elem.classList.remove(cssClass));
 
-  if (gemSocketCssClasses[color]) {
-    elem.classList.add(gemSocketCssClasses[color] as string);
-    return;
-  }
+	if (gemSocketCssClasses[color]) {
+		elem.classList.add(gemSocketCssClasses[color] as string);
+		return;
+	}
 
-  throw new Error('No css class for gem socket color: ' + color);
+	throw new Error('No css class for gem socket color: ' + color);
 }
 
 const emptyGemSocketIcons: Partial<Record<GemColor, string>> = {
-  [GemColor.GemColorBlue]: 'https://wow.zamimg.com/images/icons/socket-blue.gif',
-  [GemColor.GemColorMeta]: 'https://wow.zamimg.com/images/icons/socket-meta.gif',
-  [GemColor.GemColorRed]: 'https://wow.zamimg.com/images/icons/socket-red.gif',
-  [GemColor.GemColorYellow]: 'https://wow.zamimg.com/images/icons/socket-yellow.gif',
+	[GemColor.GemColorBlue]: 'https://wow.zamimg.com/images/icons/socket-blue.gif',
+	[GemColor.GemColorMeta]: 'https://wow.zamimg.com/images/icons/socket-meta.gif',
+	[GemColor.GemColorRed]: 'https://wow.zamimg.com/images/icons/socket-red.gif',
+	[GemColor.GemColorYellow]: 'https://wow.zamimg.com/images/icons/socket-yellow.gif',
 };
 export function getEmptyGemSocketIconUrl(color: GemColor): string {
-  if (emptyGemSocketIcons[color])
-    return emptyGemSocketIcons[color] as string;
+	if (emptyGemSocketIcons[color])
+		return emptyGemSocketIcons[color] as string;
 
-  throw new Error('No empty socket url for gem socket color: ' + color);
+	throw new Error('No empty socket url for gem socket color: ' + color);
 }

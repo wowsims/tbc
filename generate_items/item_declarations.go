@@ -76,6 +76,15 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	// Badge Vendor is probably phase 4
 	{ /** Nyn'jah's Tabi Boots */ ID: 33222, Phase: 4},
 
+	{ID: 28431, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28432, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28433, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28437, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28438, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28439, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28657, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28767, HandType: proto.HandType_HandTypeOneHand},
+
 	{ID: 17782, Filter: true}, // talisman of the binding shard
 	{ID: 17783, Filter: true}, // talisman of the binding fragment
 	{ID: 18582, Filter: true},
@@ -83,7 +92,6 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	{ID: 18584, Filter: true},
 	{ID: 24265, Filter: true},
 	{ID: 24525, Filter: true},
-	{ID: 28439, HandType: proto.HandType_HandTypeOneHand},
 	{ID: 32384, Filter: true},
 	{ID: 32421, Filter: true},
 	{ID: 32422, Filter: true},

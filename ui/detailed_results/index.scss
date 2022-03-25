@@ -1,19 +1,18 @@
 @import "../core/shared";
 @import "../core/sim_ui";
-@import "cast_metrics";
-@import "aura_metrics";
 @import "dps_histogram";
-@import "dps_result";
-@import "percent_oom";
 @import "player_damage";
 @import "resource_metrics";
 @import "results_filter";
 @import "source_chart";
 @import "timeline";
+@import "topline_results";
 
 body {
 	background-color: transparent;
 	overflow: auto;
+	max-height: 100vh;
+	color: var(--main-text-color);
 }
 body.new-tab {
 	background-image:
@@ -86,8 +85,6 @@ body.new-tab {
 }
 
 .topline-results {
-	display: flex;
-	justify-content: space-around;
 }
 
 .metrics-table {

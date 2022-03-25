@@ -208,14 +208,14 @@ func (rogue *Rogue) doPlanFillBeforeEA(sim *core.Simulation) {
 				rogue.plan = PlanExposeArmor
 				return
 			}
-			if rogue.tryUseDamageFinisher(sim, energy) {
+			if rogue.tryUseDamageFinisher(sim, energy, comboPoints) {
 				rogue.plan = PlanExposeArmor
 				return
 			}
 		}
 	} else {
 		if comboPoints == 5 {
-			rogue.tryUseDamageFinisher(sim, energy)
+			rogue.tryUseDamageFinisher(sim, energy, comboPoints)
 		} else if energy >= rogue.builderEnergyCost {
 			rogue.newBuilder(sim, target).Cast(sim)
 		}
@@ -240,14 +240,14 @@ func (rogue *Rogue) doPlanFillBeforeSND(sim *core.Simulation) {
 				rogue.plan = PlanMaximalSlice
 				return
 			}
-			if rogue.tryUseDamageFinisher(sim, energy) {
+			if rogue.tryUseDamageFinisher(sim, energy, comboPoints) {
 				rogue.plan = PlanMaximalSlice
 				return
 			}
 		}
 	} else {
 		if comboPoints == 5 || (comboPoints > 0 && sim.GetRemainingDuration() < time.Second*2) {
-			rogue.tryUseDamageFinisher(sim, energy)
+			rogue.tryUseDamageFinisher(sim, energy, comboPoints)
 		} else if energy >= rogue.builderEnergyCost {
 			rogue.newBuilder(sim, target).Cast(sim)
 		}
@@ -289,7 +289,7 @@ func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 	energyForEANext := rogue.builderEnergyCost*float64(5-comboPoints) + ExposeArmorEnergyCost
 	eaNextBuildTime := core.MaxDuration(0, time.Duration(((energyForEANext-energy)/rogue.energyPerSecondAvg)*float64(time.Second)))
 	spareTime := core.MaxDuration(0, eaTimeRemaining-eaNextBuildTime)
-	if spareTime < buildTimeBuffer {
+	if spareTime <= buildTimeBuffer {
 		rogue.plan = PlanExposeArmor
 		rogue.doPlanExposeArmor(sim)
 		return
@@ -321,10 +321,10 @@ func (rogue *Rogue) canPoolEnergy(sim *core.Simulation, energy float64) bool {
 	return sim.GetRemainingDuration() >= time.Second*6 && energy <= 50 && (!rogue.HasAura(AdrenalineRushAuraID) || energy <= 30)
 }
 
-func (rogue *Rogue) tryUseDamageFinisher(sim *core.Simulation, energy float64) bool {
+func (rogue *Rogue) tryUseDamageFinisher(sim *core.Simulation, energy float64, comboPoints int32) bool {
 	if rogue.Rotation.UseRupture &&
 		!rogue.rupture.IsInUse() &&
-		sim.GetRemainingDuration() >= time.Second*16 &&
+		sim.GetRemainingDuration() >= rogue.RuptureDuration(comboPoints) &&
 		(sim.GetNumTargets() == 1 || !rogue.HasAura(BladeFlurryAuraID)) {
 		if energy >= RuptureEnergyCost || rogue.deathmantle4pcProc {
 			rogue.NewRupture(sim, sim.GetPrimaryTarget()).Cast(sim)

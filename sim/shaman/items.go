@@ -73,7 +73,8 @@ var ItemSetCycloneRegalia = core.ItemSet{
 							return // if not a crit or didn't proc, don't activate
 						}
 						character.AddAura(sim, core.Aura{
-							ID: Cyclone4PcManaRegainAuraID,
+							ID:       Cyclone4PcManaRegainAuraID,
+							Duration: time.Second * 15,
 							OnCast: func(sim *core.Simulation, cast *core.Cast) {
 								// TODO: how to make sure this goes in before clearcasting?
 								cast.Cost.Value -= 270
@@ -143,6 +144,7 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 	},
 }
 
+var NaturalAlignmentCrystalAuraID = core.NewAuraID()
 var NaturalAlignmentCrystalCooldownID = core.NewCooldownID()
 
 func ApplyNaturalAlignmentCrystal(agent core.Agent) {
@@ -165,19 +167,20 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				character.SetCD(NaturalAlignmentCrystalCooldownID, sim.CurrentTime+cd)
-				character.AddStat(stats.SpellPower, sp)
-				character.Metrics.AddInstantCast(actionID)
-
 				character.AddAura(sim, core.Aura{
-					ID:       core.OffensiveTrinketActiveAuraID,
+					ID:       NaturalAlignmentCrystalAuraID,
 					ActionID: actionID,
-					Expires:  sim.CurrentTime + dur,
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.Cost.Value += cast.BaseCost.Value * 0.2
+					Duration: dur,
+					OnGain: func(sim *core.Simulation) {
+						character.AddStat(stats.SpellPower, sp)
+						character.SetCD(NaturalAlignmentCrystalCooldownID, sim.CurrentTime+cd)
+						character.Metrics.AddInstantCast(actionID)
 					},
 					OnExpire: func(sim *core.Simulation) {
 						character.AddStat(stats.SpellPower, -sp)
+					},
+					OnCast: func(sim *core.Simulation, cast *core.Cast) {
+						cast.Cost.Value += cast.BaseCost.Value * 0.2
 					},
 				})
 			}
@@ -251,8 +254,8 @@ func ApplySkycallTotem(agent core.Agent) {
 		applyStatAura := character.NewTemporaryStatsAuraApplier(EnergizedAuraID, core.ActionID{ItemID: 33506}, stats.Stats{stats.SpellHaste: hasteBonus}, dur)
 
 		return core.Aura{
-			ID:      SkycallTotemAuraID,
-			Expires: core.NeverExpires,
+			ID:       SkycallTotemAuraID,
+			Duration: core.NeverExpires,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				if cast.ActionID.SpellID != SpellIDLB12 || sim.RandomFloat("Skycall Totem") > 0.15 {
 					return
@@ -274,11 +277,22 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 		const procChance = 0.5
 		applyStatAura := character.NewTemporaryStatsAuraApplier(ElementalStrengthAuraID, core.ActionID{ItemID: 33507}, stats.Stats{stats.AttackPower: apBonus}, dur)
 
+		icd := core.NewICD()
+		const icdDur = time.Second * 10
+
 		return core.Aura{
-			ID:      StonebreakersTotemAuraID,
-			Expires: core.NeverExpires,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if !cast.IsSpellAction(SpellIDEarthShock) && !cast.IsSpellAction(SpellIDFlameShock) && !cast.IsSpellAction(SpellIDFrostShock) {
+			ID:       StonebreakersTotemAuraID,
+			Duration: core.NeverExpires,
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+
+				if !spellCast.SpellExtras.Matches(SpellFlagShock) {
+					return
+				}
+
+				if icd.IsOnCD(sim) {
 					return
 				}
 
@@ -286,6 +300,7 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 					return
 				}
 
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				applyStatAura(sim)
 			},
 		}

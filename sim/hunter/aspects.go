@@ -17,11 +17,22 @@ var AspectOfTheViperAuraID = core.NewAuraID()
 func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
 	const improvedHawkProcChance = 0.1
 	improvedHawkBonus := 1 + 0.03*float64(hunter.Talents.ImprovedAspectOfTheHawk)
+	impHawkAura := core.Aura{
+		ID:       ImprovedAspectOfTheHawkAuraID,
+		ActionID: core.ActionID{SpellID: 19556},
+		Duration: time.Second * 12,
+		OnGain: func(sim *core.Simulation) {
+			hunter.PseudoStats.RangedSpeedMultiplier *= improvedHawkBonus
+		},
+		OnExpire: func(sim *core.Simulation) {
+			hunter.PseudoStats.RangedSpeedMultiplier /= improvedHawkBonus
+		},
+	}
 
 	aura := core.Aura{
 		ID:       AspectOfTheHawkAuraID,
 		ActionID: AspectOfTheHawkActionID,
-		Expires:  core.NeverExpires,
+		Duration: core.NeverExpires,
 		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 			spellEffect.BonusAttackPower += 155
 		},
@@ -31,15 +42,7 @@ func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
 			}
 
 			if improvedHawkBonus > 1 && sim.RandomFloat("Imp Aspect of the Hawk") < improvedHawkProcChance {
-				hunter.PseudoStats.RangedSpeedMultiplier *= improvedHawkBonus
-				hunter.AddAura(sim, core.Aura{
-					ID:       ImprovedAspectOfTheHawkAuraID,
-					ActionID: core.ActionID{SpellID: 19556},
-					Expires:  sim.CurrentTime + time.Second*12,
-					OnExpire: func(sim *core.Simulation) {
-						hunter.PseudoStats.RangedSpeedMultiplier /= improvedHawkBonus
-					},
-				})
+				hunter.ReplaceAura(sim, impHawkAura)
 			}
 		},
 	}
@@ -84,7 +87,7 @@ func (hunter *Hunter) aspectOfTheViperAura() core.Aura {
 	aura := core.Aura{
 		ID:       AspectOfTheViperAuraID,
 		ActionID: AspectOfTheViperActionID,
-		Expires:  core.NeverExpires,
+		Duration: core.NeverExpires,
 		// Mana gain from viper is handled in rotation.go
 	}
 	return aura

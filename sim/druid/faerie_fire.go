@@ -35,7 +35,7 @@ func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpell
 					}
 					// core.FaerieFireAura applies the -armor buff and removes it on expire.
 					//  Don't use ReplaceAura or the armor won't be removed.
-					spellEffect.Target.AddAura(sim, core.FaerieFireAura(sim.CurrentTime, spellEffect.Target, druid.Talents.ImprovedFaerieFire == 3))
+					spellEffect.Target.AddAura(sim, core.FaerieFireAura(spellEffect.Target, druid.Talents.ImprovedFaerieFire == 3))
 				},
 			},
 		},

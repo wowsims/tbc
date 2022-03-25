@@ -19,6 +19,10 @@ type Agent interface {
 	// Updates the input Buffs to include party-wide buffs provided by this Agent.
 	AddPartyBuffs(partyBuffs *proto.PartyBuffs)
 
+	// All talent stats / auras should be added within this callback. This makes sure
+	// talents are applied at the right time so we can calculate groups of stats.
+	ApplyTalents()
+
 	// Called once before Character.Finalize(), but after all effects / auras / cooldowns
 	// have been registered for the whole raid.
 	// Use this for any initialization steps that require other raid members or auras.

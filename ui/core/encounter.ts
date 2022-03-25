@@ -1,4 +1,6 @@
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
+import { MobType } from '/tbc/core/proto/common.js';
+import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { Target } from '/tbc/core/target.js';
 
 import { Sim } from './sim.js';
@@ -8,74 +10,74 @@ import { EventID, TypedEvent } from './typed_event.js';
 export class Encounter {
 	private readonly sim: Sim;
 
-  private duration: number = 180;
-  private durationVariation: number = 5;
-  private numTargets: number = 1;
-  private executeProportion: number = 0.2;
+	private duration: number = 180;
+	private durationVariation: number = 5;
+	private numTargets: number = 1;
+	private executeProportion: number = 0.2;
 	readonly primaryTarget: Target;
 
-  readonly durationChangeEmitter = new TypedEvent<void>();
-  readonly numTargetsChangeEmitter = new TypedEvent<void>();
-  readonly executeProportionChangeEmitter = new TypedEvent<void>();
+	readonly durationChangeEmitter = new TypedEvent<void>();
+	readonly numTargetsChangeEmitter = new TypedEvent<void>();
+	readonly executeProportionChangeEmitter = new TypedEvent<void>();
 
-  // Emits when any of the above emitters emit.
-  readonly changeEmitter = new TypedEvent<void>();
+	// Emits when any of the above emitters emit.
+	readonly changeEmitter = new TypedEvent<void>();
 
-  constructor(sim: Sim) {
+	constructor(sim: Sim) {
 		this.sim = sim;
 		this.primaryTarget = new Target(sim);
 
-    [
-      this.durationChangeEmitter,
-      this.numTargetsChangeEmitter,
-      this.executeProportionChangeEmitter,
-      this.primaryTarget.changeEmitter,
-    ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
-  }
+		[
+			this.durationChangeEmitter,
+			this.numTargetsChangeEmitter,
+			this.executeProportionChangeEmitter,
+			this.primaryTarget.changeEmitter,
+		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+	}
 
-  getDurationVariation(): number {
-	  return this.durationVariation;
-  }
-  setDurationVariation(eventID: EventID, newDuration: number) {
-    if (newDuration == this.durationVariation)
+	getDurationVariation(): number {
+		return this.durationVariation;
+	}
+	setDurationVariation(eventID: EventID, newDuration: number) {
+		if (newDuration == this.durationVariation)
 			return;
 
-	this.durationVariation = newDuration;
-	this.durationChangeEmitter.emit(eventID);
-  }
-  
-  getDuration(): number {
-    return this.duration;
-  }
-  setDuration(eventID: EventID, newDuration: number) {
-    if (newDuration == this.duration)
+		this.durationVariation = newDuration;
+		this.durationChangeEmitter.emit(eventID);
+	}
+
+	getDuration(): number {
+		return this.duration;
+	}
+	setDuration(eventID: EventID, newDuration: number) {
+		if (newDuration == this.duration)
 			return;
 
 		this.duration = newDuration;
 		this.durationChangeEmitter.emit(eventID);
-  }
-  
-  getExecuteProportion(): number {
-    return this.executeProportion;
-  }
-  setExecuteProportion(eventID: EventID, newExecuteProportion: number) {
-    if (newExecuteProportion == this.executeProportion)
+	}
+
+	getExecuteProportion(): number {
+		return this.executeProportion;
+	}
+	setExecuteProportion(eventID: EventID, newExecuteProportion: number) {
+		if (newExecuteProportion == this.executeProportion)
 			return;
 
 		this.executeProportion = newExecuteProportion;
 		this.executeProportionChangeEmitter.emit(eventID);
-  }
-  
-  getNumTargets(): number {
-    return this.numTargets;
-  }
-  setNumTargets(eventID: EventID, newNumTargets: number) {
-    if (newNumTargets == this.numTargets)
+	}
+
+	getNumTargets(): number {
+		return this.numTargets;
+	}
+	setNumTargets(eventID: EventID, newNumTargets: number) {
+		if (newNumTargets == this.numTargets)
 			return;
 
 		this.numTargets = newNumTargets;
 		this.numTargetsChangeEmitter.emit(eventID);
-  }
+	}
 
 	toProto(): EncounterProto {
 		const numTargets = Math.max(1, this.numTargets);
@@ -103,5 +105,18 @@ export class Encounter {
 				this.primaryTarget.fromProto(eventID, proto.targets[0]);
 			}
 		});
+	}
+
+	applyDefaults(eventID: EventID) {
+		this.fromProto(eventID, EncounterProto.create({
+			duration: 180,
+			durationVariation: 5,
+			executeProportion: 0.2,
+			targets: [TargetProto.create({
+				level: 73,
+				armor: 7684,
+				mobType: MobType.MobTypeDemon,
+			})],
+		}));
 	}
 }

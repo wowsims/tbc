@@ -30,6 +30,12 @@ character_stats_results: {
   final_stats: 0
   final_stats: 1328.98
   final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
  }
 }
 dps_results: {
@@ -323,7 +329,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Mana-EtchedRegalia"
  value: {
-  dps: 1448.8659940124035
+  dps: 1451.2251458624035
  }
 }
 dps_results: {
@@ -347,7 +353,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 1621.6502398795806
+  dps: 1621.6000959399541
  }
 }
 dps_results: {
@@ -437,7 +443,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 1524.7776547103667
+  dps: 1524.5699426303668
  }
 }
 dps_results: {
@@ -473,7 +479,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-TheLightningCapacitor-28785"
  value: {
-  dps: 1597.8023783958977
+  dps: 1578.7515092973476
  }
 }
 dps_results: {
@@ -539,13 +545,13 @@ dps_results: {
 dps_results: {
  key: "TestFrost-Average-Default"
  value: {
-  dps: 1621.0866990599723
+  dps: 1621.1839636545021
  }
 }
 dps_results: {
  key: "TestFrost-SelfDrums-DPS"
  value: {
-  dps: 1623.6405135012305
+  dps: 1648.4714366469964
  }
 }
 dps_results: {
@@ -575,19 +581,19 @@ dps_results: {
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1047.7206379454337
+  dps: 1045.4901291890576
  }
 }
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1047.7206379454337
+  dps: 1045.4901291890576
  }
 }
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 705.3905207291506
+  dps: 710.9522360208014
  }
 }
 dps_results: {

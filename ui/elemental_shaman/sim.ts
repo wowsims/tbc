@@ -17,7 +17,7 @@ import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { TotemsSection } from '/tbc/core/components/totem_inputs.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -39,7 +39,7 @@ import * as ShamanInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalShaman> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecElementalShaman>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecElementalShaman>) {
 		super(parentElem, player, {
 			cssClass: 'elemental-shaman-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
@@ -86,13 +86,13 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 			],
 			modifyDisplayStats: (player: Player<Spec.SpecElementalShaman>, stats: Stats) => {
 				stats = stats.withStat(Stat.StatSpellHit,
-						stats.getStat(Stat.StatSpellHit)
-						+ player.getTalents().elementalPrecision * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+					stats.getStat(Stat.StatSpellHit)
+					+ player.getTalents().elementalPrecision * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
 
 				stats = stats.withStat(Stat.StatSpellCrit,
-						stats.getStat(Stat.StatSpellCrit)
-						+ player.getTalents().lightningMastery * 1 * Mechanics.SPELL_CRIT_RATING_PER_CRIT_CHANCE
-						+ player.getTalents().tidalMastery * 1 * Mechanics.SPELL_CRIT_RATING_PER_CRIT_CHANCE);
+					stats.getStat(Stat.StatSpellCrit)
+					+ player.getTalents().lightningMastery * 1 * Mechanics.SPELL_CRIT_RATING_PER_CRIT_CHANCE
+					+ player.getTalents().tidalMastery * 1 * Mechanics.SPELL_CRIT_RATING_PER_CRIT_CHANCE);
 
 				return stats;
 			},
@@ -128,6 +128,7 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfWisdom: 2,
+					blessingOfSalvation: true,
 				}),
 				debuffs: Debuffs.create({
 					judgementOfWisdom: true,
@@ -164,6 +165,7 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
+				IconInputs.BlessingOfSalvation,
 				IconInputs.Innervate,
 				IconInputs.PowerInfusion,
 			],
@@ -245,6 +247,8 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 					Presets.P1_PRESET,
 					Presets.P2_PRESET,
 					Presets.P3_PRESET,
+					Presets.P4_PRESET,
+					Presets.P5_PRESET,
 				],
 			},
 		});

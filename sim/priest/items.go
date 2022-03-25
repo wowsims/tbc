@@ -68,10 +68,10 @@ var ItemSetAvatar = core.ItemSet{
 							return
 						}
 
-						character.AddAura(sim, core.Aura{
+						character.ReplaceAura(sim, core.Aura{
 							ID:       SadistAuraID,
 							ActionID: core.ActionID{SpellID: 37604},
-							Expires:  sim.CurrentTime + time.Second*15,
+							Duration: time.Second * 15,
 							OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 								spellEffect.BonusSpellPower += 100
 								character.RemoveAura(sim, SadistAuraID)

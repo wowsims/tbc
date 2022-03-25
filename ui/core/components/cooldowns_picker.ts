@@ -20,8 +20,8 @@ export class CooldownsPicker extends Component {
 
 	private cooldownPickers: Array<HTMLElement>;
 
-  constructor(parentElem: HTMLElement, player: Player<any>) {
-    super(parentElem, 'cooldowns-picker-root');
+	constructor(parentElem: HTMLElement, player: Player<any>) {
+		super(parentElem, 'cooldowns-picker-root');
 		this.player = player;
 		this.cooldownPickers = [];
 

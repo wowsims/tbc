@@ -87,7 +87,7 @@ var FullDebuffs = &proto.Debuffs{
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: FullDebuffs,
-	Armor:   7700,
+	Armor:   7684,
 }
 
 var Phase2Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{

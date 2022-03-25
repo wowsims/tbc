@@ -17,7 +17,7 @@ import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -38,7 +38,7 @@ import * as HunterInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecHunter>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecHunter>) {
 		super(parentElem, player, {
 			cssClass: 'hunter-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
@@ -113,6 +113,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 					blessingOfKings: true,
 					blessingOfWisdom: 2,
 					blessingOfMight: 2,
+					blessingOfSalvation: true,
 				}),
 				debuffs: Debuffs.create({
 					sunderArmor: true,
@@ -154,6 +155,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
 				IconInputs.BlessingOfMight,
+				IconInputs.BlessingOfSalvation,
 				IconInputs.UnleashedRage,
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
@@ -257,9 +259,11 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 					Presets.P1_BM_PRESET,
 					Presets.P2_BM_PRESET,
 					Presets.P3_BM_PRESET,
+					Presets.P4_BM_PRESET,
 					Presets.P1_SV_PRESET,
 					Presets.P2_SV_PRESET,
 					Presets.P3_SV_PRESET,
+					Presets.P4_SV_PRESET,
 				],
 			},
 		});

@@ -1,114 +1,120 @@
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { ActionMetrics, PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
-import { sum } from '/tbc/core/utils.js';
 
-import { AbilityMetrics } from './ability_metrics.js';
+import { ColumnSortType, MetricsTable } from './metrics_table.js';
 import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
 
 declare var $: any;
 declare var tippy: any;
 
-export class MeleeMetrics extends AbilityMetrics {
-  constructor(config: ResultComponentConfig) {
-		config.rootCssClass = 'cast-metrics-root';
-    super(config);
-
-		this.rootElem.innerHTML = `
-		<table class="metrics-table tablesorter">
-			<thead class="metrics-table-header">
-				<tr class="metrics-table-header-row">
-					<th class="metrics-table-header-cell"><span>Name</span></th>
-					<th class="metrics-table-header-cell"><span>DPS</span></th>
-					<th class="metrics-table-header-cell"><span>Casts</span></th>
-					<th class="metrics-table-header-cell"><span>Avg Cast</span></th>
-					<th class="metrics-table-header-cell"><span>Hits</span></th>
-					<th class="metrics-table-header-cell"><span>Avg Hit</span></th>
-					<th class="metrics-table-header-cell"><span>Crit %</span></th>
-					<th class="metrics-table-header-cell"><span>Miss %</span></th>
-					<th class="metrics-table-header-cell"><span>Dodge %</span></th>
-					<th class="metrics-table-header-cell"><span>Glance %</span></th>
-				</tr>
-			</thead>
-			<tbody class="metrics-table-body">
-			</tbody>
-		</table>
-		`;
-
-		const tableElem = this.rootElem.getElementsByClassName('metrics-table')[0] as HTMLTableSectionElement;
-		const headerElems = Array.from(tableElem.querySelectorAll('th'));
-
-		// DPS
-		tippy(headerElems[1], {
-			'content': 'Damage / Encounter Duration',
-			'allowHTML': true,
-		});
-
-		// Casts
-		tippy(headerElems[2], {
-			'content': 'Casts',
-			'allowHTML': true,
-		});
-
-		// Avg Cast
-		tippy(headerElems[3], {
-			'content': 'Damage / Casts',
-			'allowHTML': true,
-		});
-
-		// Hits
-		tippy(headerElems[4], {
-			'content': 'Hits + Crits + Glances + Blocks',
-			'allowHTML': true,
-		});
-
-		// Avg Hit
-		tippy(headerElems[5], {
-			'content': 'Damage / (Hits + Crits + Glances + Blocks)',
-			'allowHTML': true,
-		});
-
-		// Crit %
-		tippy(headerElems[6], {
-			'content': 'Crits / Swings',
-			'allowHTML': true,
-		});
-
-		// Miss %
-		tippy(headerElems[7], {
-			'content': 'Misses / Swings',
-			'allowHTML': true,
-		});
-
-		// Dodge %
-		tippy(headerElems[8], {
-			'content': 'Dodges / Swings',
-			'allowHTML': true,
-		});
-
-		// Glance %
-		tippy(headerElems[9], {
-			'content': 'Glances / Swings',
-			'allowHTML': true,
-		});
-
-		$(tableElem).tablesorter({
-			sortList: [[1, 1]],
-			cssChildRow: 'child-metric',
-		});
+export class MeleeMetricsTable extends MetricsTable<ActionMetrics> {
+	constructor(config: ResultComponentConfig) {
+		config.rootCssClass = 'melee-metrics-root';
+		super(config, [
+			MetricsTable.nameCellConfig((metric: ActionMetrics) => {
+				return {
+					name: metric.name,
+					actionId: metric.actionId,
+				};
+			}),
+			{
+				name: 'DPS',
+				tooltip: 'Damage / Encounter Duration',
+				sort: ColumnSortType.Descending,
+				getValue: (metric: ActionMetrics) => metric.dps,
+				getDisplayString: (metric: ActionMetrics) => metric.dps.toFixed(1),
+			},
+			{
+				name: 'Avg Cast',
+				tooltip: 'Damage / Casts',
+				getValue: (metric: ActionMetrics) => metric.avgCast,
+				getDisplayString: (metric: ActionMetrics) => metric.avgCast.toFixed(1),
+			},
+			{
+				name: 'Avg Hit',
+				tooltip: 'Damage / (Hits + Crits + Glances + Blocks)',
+				getValue: (metric: ActionMetrics) => metric.avgHit,
+				getDisplayString: (metric: ActionMetrics) => metric.avgHit.toFixed(1),
+			},
+			{
+				name: 'TPS',
+				tooltip: 'Threat / Encounter Duration',
+				columnClass: 'threat-metrics',
+				getValue: (metric: ActionMetrics) => metric.tps,
+				getDisplayString: (metric: ActionMetrics) => metric.tps.toFixed(1),
+			},
+			{
+				name: 'Avg Cast',
+				tooltip: 'Threat / Casts',
+				columnClass: 'threat-metrics',
+				getValue: (metric: ActionMetrics) => metric.avgCastThreat,
+				getDisplayString: (metric: ActionMetrics) => metric.avgCastThreat.toFixed(1),
+			},
+			{
+				name: 'Avg Hit',
+				tooltip: 'Threat / (Hits + Crits + Glances + Blocks)',
+				columnClass: 'threat-metrics',
+				getValue: (metric: ActionMetrics) => metric.avgHitThreat,
+				getDisplayString: (metric: ActionMetrics) => metric.avgHitThreat.toFixed(1),
+			},
+			{
+				name: 'Casts',
+				tooltip: 'Casts',
+				getValue: (metric: ActionMetrics) => metric.casts,
+				getDisplayString: (metric: ActionMetrics) => metric.casts.toFixed(1),
+			},
+			{
+				name: 'Hits',
+				tooltip: 'Hits + Crits + Glances + Blocks',
+				getValue: (metric: ActionMetrics) => metric.hits,
+				getDisplayString: (metric: ActionMetrics) => metric.hits.toFixed(1),
+			},
+			{
+				name: 'Crit %',
+				tooltip: 'Crits / Swings',
+				getValue: (metric: ActionMetrics) => metric.critPercent,
+				getDisplayString: (metric: ActionMetrics) => metric.critPercent.toFixed(2) + '%',
+			},
+			{
+				name: 'Miss %',
+				tooltip: 'Misses / Swings',
+				getValue: (metric: ActionMetrics) => metric.missPercent,
+				getDisplayString: (metric: ActionMetrics) => metric.missPercent.toFixed(2) + '%',
+			},
+			{
+				name: 'Dodge %',
+				tooltip: 'Dodges / Swings',
+				getValue: (metric: ActionMetrics) => metric.dodgePercent,
+				getDisplayString: (metric: ActionMetrics) => metric.dodgePercent.toFixed(2) + '%',
+			},
+			{
+				name: 'Glance %',
+				tooltip: 'Glances / Swings',
+				getValue: (metric: ActionMetrics) => metric.glancePercent,
+				getDisplayString: (metric: ActionMetrics) => metric.glancePercent.toFixed(2) + '%',
+			},
+		]);
 	}
 
-	getPlayerActions(player: PlayerMetrics): Array<ActionMetrics> {
-		return player.getMeleeActions();
+	getGroupedMetrics(resultData: SimResultData): Array<Array<ActionMetrics>> {
+		const players = resultData.result.getPlayers(resultData.filter);
+		if (players.length != 1) {
+			return [];
+		}
+		const player = players[0];
+
+		const actions = player.getMeleeActions();
+		const actionGroups = ActionMetrics.groupById(actions);
+		const petGroups = player.pets.map(pet => pet.getMeleeActions());
+
+		return actionGroups.concat(petGroups);
 	}
 
-	addRowCells(action: ActionMetrics, addCell: (value: string | number) => HTMLElement): void {
-		addCell(action.dps.toFixed(1)); // DPS
-		addCell(action.casts.toFixed(1)); // Casts
-		addCell(action.avgCast.toFixed(1)); // Avg Cast
-		addCell(action.landedHits.toFixed(1)); // Hits
-		addCell(action.avgHit.toFixed(1)); // Avg Hit
-		addCell(action.critPercent.toFixed(2) + ' %'); // Crit %
-		addCell(action.missPercent.toFixed(2) + ' %'); // Miss %
-		addCell(action.dodgePercent.toFixed(2) + ' %'); // Dodge %
-		addCell(action.glancePercent.toFixed(2) + ' %'); // Glance %
+	mergeMetrics(metrics: Array<ActionMetrics>): ActionMetrics {
+		return ActionMetrics.merge(metrics, true, metrics[0].player?.petActionId || undefined);
+	}
+
+	shouldCollapse(metric: ActionMetrics): boolean {
+		return !metric.player?.isPet;
 	}
 }

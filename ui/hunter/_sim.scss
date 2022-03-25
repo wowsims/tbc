@@ -14,9 +14,6 @@
 .hunter-sim-ui .self-buffs-section {
   grid-template-columns: repeat(2, 1fr);
 }
-.hunter-sim-ui .consumes-section {
-  grid-template-columns: repeat(6, 1fr);
-}
 .hunter-sim-ui .buffs-section {
   grid-template-columns: repeat(7, 1fr);
 }
@@ -27,7 +24,7 @@
   grid-template-columns: repeat(3, 1fr);
 }
 
-// Enhancement has a lot of EP stats, so make the text smaller so it fits vertically.
+// Hunter has a lot of EP stats, so make the text smaller so it fits vertically.
 .hunter-sim-ui .character-stats-table-row {
   font-size: 11px;
 }

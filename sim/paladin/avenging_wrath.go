@@ -12,7 +12,6 @@ var AvengingWrathActionID = core.ActionID{SpellID: 31884}
 
 func (paladin *Paladin) registerAvengingWrathCD() {
 	cd := time.Minute * 3
-	dur := time.Second * 20
 	var manaCost float64 = 236
 
 	paladin.AddMajorCooldown(core.MajorCooldown{
@@ -32,7 +31,7 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 				character.AddAura(sim, core.Aura{
 					ID:       AvengingWrathAuraID,
 					ActionID: AvengingWrathActionID,
-					Expires:  sim.CurrentTime + dur,
+					Duration: time.Second * 20,
 					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 						spellEffect.DamageMultiplier *= 1.3
 					},
@@ -42,6 +41,7 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 				})
 				character.Metrics.AddInstantCast(AvengingWrathActionID)
 				character.SetCD(AvengingWrathCD, sim.CurrentTime+cd)
+				// TODO: Apply mana cost
 			}
 		},
 	})

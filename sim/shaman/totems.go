@@ -78,7 +78,7 @@ func (shaman *Shaman) NewTranquilAirTotem(sim *core.Simulation) *core.SimpleCast
 	return &shaman.totemSpell
 }
 
-var windfuryBaseManaCosts = []float64{
+var windfuryTotemBaseManaCosts = []float64{
 	95,
 	140,
 	200,
@@ -93,8 +93,8 @@ func (shaman *Shaman) newWindfuryTotemTemplate(sim *core.Simulation, rank int32)
 		rank = 1
 	}
 
-	baseManaCost := windfuryBaseManaCosts[rank-1]
-	spellID := core.WindfurySpellRanks[rank-1]
+	baseManaCost := windfuryTotemBaseManaCosts[rank-1]
+	spellID := core.WindfuryTotemSpellRanks[rank-1]
 	cast := shaman.newTotemCastTemplate(sim, baseManaCost, spellID)
 	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
 		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120

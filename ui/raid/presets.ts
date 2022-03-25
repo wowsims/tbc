@@ -25,14 +25,18 @@ import * as ElementalShamanPresets from '/tbc/elemental_shaman/presets.js';
 import * as EnhancementShamanPresets from '/tbc/enhancement_shaman/presets.js';
 import * as HunterPresets from '/tbc/hunter/presets.js';
 import * as MagePresets from '/tbc/mage/presets.js';
+import * as RoguePresets from '/tbc/rogue/presets.js';
 import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
+import * as SmitePriestPresets from '/tbc/smite_priest/presets.js';
 
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
 import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
 import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
 import { HunterSimUI } from '/tbc/hunter/sim.js';
 import { MageSimUI } from '/tbc/mage/sim.js';
+import { RogueSimUI } from '/tbc/rogue/sim.js';
 import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
+import { SmitePriestSimUI } from '/tbc/smite_priest/sim.js';
 
 export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, player: Player<any>) => IndividualSimUI<any>>> = {
 	[Spec.SpecBalanceDruid]: (parentElem: HTMLElement, player: Player<any>) => new BalanceDruidSimUI(parentElem, player),
@@ -40,7 +44,9 @@ export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, pl
 	[Spec.SpecEnhancementShaman]: (parentElem: HTMLElement, player: Player<any>) => new EnhancementShamanSimUI(parentElem, player),
 	[Spec.SpecHunter]: (parentElem: HTMLElement, player: Player<any>) => new HunterSimUI(parentElem, player),
 	[Spec.SpecMage]: (parentElem: HTMLElement, player: Player<any>) => new MageSimUI(parentElem, player),
+	[Spec.SpecRogue]: (parentElem: HTMLElement, player: Player<any>) => new RogueSimUI(parentElem, player),
 	[Spec.SpecShadowPriest]: (parentElem: HTMLElement, player: Player<any>) => new ShadowPriestSimUI(parentElem, player),
+	[Spec.SpecSmitePriest]: (parentElem: HTMLElement, player: Player<any>) => new SmitePriestSimUI(parentElem, player),
 };
 
 // Configuration necessary for creating new players.
@@ -98,11 +104,13 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 				1: BalanceDruidPresets.P1_ALLIANCE_PRESET.gear,
 				2: BalanceDruidPresets.P2_ALLIANCE_PRESET.gear,
 				3: BalanceDruidPresets.P3_PRESET.gear,
+				4: BalanceDruidPresets.P4_PRESET.gear,
 			},
 			[Faction.Horde]: {
 				1: BalanceDruidPresets.P1_HORDE_PRESET.gear,
 				2: BalanceDruidPresets.P2_HORDE_PRESET.gear,
 				3: BalanceDruidPresets.P3_PRESET.gear,
+				4: BalanceDruidPresets.P4_PRESET.gear,
 			},
 		},
 		tooltip: specNames[Spec.SpecBalanceDruid],
@@ -126,11 +134,13 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 				1: HunterPresets.P1_BM_PRESET.gear,
 				2: HunterPresets.P2_BM_PRESET.gear,
 				3: HunterPresets.P3_BM_PRESET.gear,
+				4: HunterPresets.P4_BM_PRESET.gear,
 			},
 			[Faction.Horde]: {
 				1: HunterPresets.P1_BM_PRESET.gear,
 				2: HunterPresets.P2_BM_PRESET.gear,
 				3: HunterPresets.P3_BM_PRESET.gear,
+				4: HunterPresets.P4_BM_PRESET.gear,
 			},
 		},
 		tooltip: 'BM Hunter',
@@ -154,11 +164,13 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 				1: HunterPresets.P1_SV_PRESET.gear,
 				2: HunterPresets.P2_SV_PRESET.gear,
 				3: HunterPresets.P3_SV_PRESET.gear,
+				4: HunterPresets.P4_SV_PRESET.gear,
 			},
 			[Faction.Horde]: {
 				1: HunterPresets.P1_SV_PRESET.gear,
 				2: HunterPresets.P2_SV_PRESET.gear,
 				3: HunterPresets.P3_SV_PRESET.gear,
+				4: HunterPresets.P4_SV_PRESET.gear,
 			},
 		},
 		tooltip: 'SV Hunter',
@@ -182,11 +194,13 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 				1: MagePresets.P1_ARCANE_PRESET.gear,
 				2: MagePresets.P2_ARCANE_PRESET.gear,
 				3: MagePresets.P3_ARCANE_PRESET.gear,
+				4: MagePresets.P4_ARCANE_PRESET.gear,
 			},
 			[Faction.Horde]: {
 				1: MagePresets.P1_ARCANE_PRESET.gear,
 				2: MagePresets.P2_ARCANE_PRESET.gear,
 				3: MagePresets.P3_ARCANE_PRESET.gear,
+				4: MagePresets.P4_ARCANE_PRESET.gear,
 			},
 		},
 		tooltip: 'Arcane Mage',
@@ -210,11 +224,13 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 				1: MagePresets.P1_FIRE_PRESET.gear,
 				2: MagePresets.P2_FIRE_PRESET.gear,
 				3: MagePresets.P3_FIRE_PRESET.gear,
+				4: MagePresets.P4_FIRE_PRESET.gear,
 			},
 			[Faction.Horde]: {
 				1: MagePresets.P1_FIRE_PRESET.gear,
 				2: MagePresets.P2_FIRE_PRESET.gear,
 				3: MagePresets.P3_FIRE_PRESET.gear,
+				4: MagePresets.P4_FIRE_PRESET.gear,
 			},
 		},
 		tooltip: 'Fire Mage',
@@ -238,15 +254,77 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 				1: MagePresets.P1_FROST_PRESET.gear,
 				2: MagePresets.P2_FROST_PRESET.gear,
 				3: MagePresets.P3_FROST_PRESET.gear,
+				4: MagePresets.P4_FROST_PRESET.gear,
 			},
 			[Faction.Horde]: {
 				1: MagePresets.P1_FROST_PRESET.gear,
 				2: MagePresets.P2_FROST_PRESET.gear,
 				3: MagePresets.P3_FROST_PRESET.gear,
+				4: MagePresets.P4_FROST_PRESET.gear,
 			},
 		},
 		tooltip: 'Frost Mage',
 		iconUrl: talentTreeIcons[Class.ClassMage][2],
+	},
+	{
+		spec: Spec.SpecRogue,
+		rotation: RoguePresets.DefaultRotation,
+		talents: RoguePresets.CombatTalents.data,
+		specOptions: RoguePresets.DefaultOptions,
+		consumes: RoguePresets.DefaultConsumes,
+		defaultName: 'Combat Rogue',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceHuman,
+			[Faction.Horde]: Race.RaceOrc,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: RoguePresets.P1_PRESET.gear,
+				2: RoguePresets.P2_PRESET.gear,
+				3: RoguePresets.P3_PRESET.gear,
+				4: RoguePresets.P4_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: RoguePresets.P1_PRESET.gear,
+				2: RoguePresets.P2_PRESET.gear,
+				3: RoguePresets.P3_PRESET.gear,
+				4: RoguePresets.P4_PRESET.gear,
+			},
+		},
+		tooltip: 'Combat Rogue',
+		iconUrl: specIconsLarge[Spec.SpecRogue],
+	},
+	{
+		spec: Spec.SpecRogue,
+		rotation: RoguePresets.DefaultRotation,
+		talents: RoguePresets.HemoTalents.data,
+		specOptions: RoguePresets.DefaultOptions,
+		consumes: RoguePresets.DefaultConsumes,
+		defaultName: 'Hemo Rogue',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceHuman,
+			[Faction.Horde]: Race.RaceOrc,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: RoguePresets.P1_PRESET.gear,
+				2: RoguePresets.P2_PRESET.gear,
+				3: RoguePresets.P3_PRESET.gear,
+				4: RoguePresets.P4_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: RoguePresets.P1_PRESET.gear,
+				2: RoguePresets.P2_PRESET.gear,
+				3: RoguePresets.P3_PRESET.gear,
+				4: RoguePresets.P4_PRESET.gear,
+			},
+		},
+		tooltip: 'Hemo Rogue',
+		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_lifedrain.jpg',
 	},
 	{
 		spec: Spec.SpecElementalShaman,
@@ -266,11 +344,15 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 				1: ElementalShamanPresets.P1_PRESET.gear,
 				2: ElementalShamanPresets.P2_PRESET.gear,
 				3: ElementalShamanPresets.P3_PRESET.gear,
+				4: ElementalShamanPresets.P4_PRESET.gear,
+				5: ElementalShamanPresets.P5_PRESET.gear,
 			},
 			[Faction.Horde]: {
 				1: ElementalShamanPresets.P1_PRESET.gear,
 				2: ElementalShamanPresets.P2_PRESET.gear,
 				3: ElementalShamanPresets.P3_PRESET.gear,
+				4: ElementalShamanPresets.P4_PRESET.gear,
+				5: ElementalShamanPresets.P5_PRESET.gear,
 			},
 		},
 		tooltip: specNames[Spec.SpecElementalShaman],
@@ -294,11 +376,15 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 				1: EnhancementShamanPresets.P1_PRESET.gear,
 				2: EnhancementShamanPresets.P2_PRESET.gear,
 				3: EnhancementShamanPresets.P3_PRESET.gear,
+				4: EnhancementShamanPresets.P4_PRESET.gear,
+				5: EnhancementShamanPresets.P5_PRESET.gear,
 			},
 			[Faction.Horde]: {
 				1: EnhancementShamanPresets.P1_PRESET.gear,
 				2: EnhancementShamanPresets.P2_PRESET.gear,
 				3: EnhancementShamanPresets.P3_PRESET.gear,
+				4: EnhancementShamanPresets.P4_PRESET.gear,
+				5: EnhancementShamanPresets.P5_PRESET.gear,
 			},
 		},
 		tooltip: specNames[Spec.SpecEnhancementShaman],
@@ -322,15 +408,51 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 				1: ShadowPriestPresets.P1_PRESET.gear,
 				2: ShadowPriestPresets.P2_PRESET.gear,
 				3: ShadowPriestPresets.P3_PRESET.gear,
+				4: ShadowPriestPresets.P4_PRESET.gear,
+				5: ShadowPriestPresets.P5_PRESET.gear,
 			},
 			[Faction.Horde]: {
 				1: ShadowPriestPresets.P1_PRESET.gear,
 				2: ShadowPriestPresets.P2_PRESET.gear,
 				3: ShadowPriestPresets.P3_PRESET.gear,
+				4: ShadowPriestPresets.P4_PRESET.gear,
+				5: ShadowPriestPresets.P5_PRESET.gear,
 			},
 		},
 		tooltip: specNames[Spec.SpecShadowPriest],
 		iconUrl: specIconsLarge[Spec.SpecShadowPriest],
+	},
+	{
+		spec: Spec.SpecSmitePriest,
+		rotation: SmitePriestPresets.DefaultRotation,
+		talents: SmitePriestPresets.StandardTalents.data,
+		specOptions: SmitePriestPresets.DefaultOptions,
+		consumes: SmitePriestPresets.DefaultConsumes,
+		defaultName: 'Smite Priest',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceDwarf,
+			[Faction.Horde]: Race.RaceUndead,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: SmitePriestPresets.P1_PRESET.gear,
+				2: SmitePriestPresets.P2_PRESET.gear,
+				3: SmitePriestPresets.P3_PRESET.gear,
+				4: SmitePriestPresets.P4_PRESET.gear,
+				5: SmitePriestPresets.P5_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: SmitePriestPresets.P1_PRESET.gear,
+				2: SmitePriestPresets.P2_PRESET.gear,
+				3: SmitePriestPresets.P3_PRESET.gear,
+				4: SmitePriestPresets.P4_PRESET.gear,
+				5: SmitePriestPresets.P5_PRESET.gear,
+			},
+		},
+		tooltip: specNames[Spec.SpecSmitePriest],
+		iconUrl: specIconsLarge[Spec.SpecSmitePriest],
 	},
 ];
 

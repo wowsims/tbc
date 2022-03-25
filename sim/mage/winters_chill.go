@@ -16,6 +16,7 @@ func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpell
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFrost,
+				SpellExtras:         SpellFlagMage,
 			},
 		},
 		Effect: core.SpellHitEffect{

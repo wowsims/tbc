@@ -221,8 +221,16 @@ func applyRaceEffects(agent Agent) {
 		inverseBonus := 1 / hasteBonus
 		const dur = time.Second * 10
 		const cd = time.Minute * 3
-		manaCost := 0.0
-		actionID := ActionID{SpellID: 20554}
+
+		var cost ResourceCost
+		var actionID ActionID
+		if character.Class == proto.Class_ClassRogue {
+			actionID = ActionID{SpellID: 26297, CooldownID: TrollBerserkingCooldownID}
+		} else if character.Class == proto.Class_ClassWarrior {
+			actionID = ActionID{SpellID: 26296, CooldownID: TrollBerserkingCooldownID}
+		} else {
+			actionID = ActionID{SpellID: 20554, CooldownID: TrollBerserkingCooldownID}
+		}
 
 		character.AddMajorCooldown(MajorCooldown{
 			ActionID:   actionID,
@@ -230,32 +238,55 @@ func applyRaceEffects(agent Agent) {
 			Cooldown:   cd,
 			Type:       CooldownTypeDPS,
 			CanActivate: func(sim *Simulation, character *Character) bool {
-				if character.CurrentMana() < manaCost {
-					return false
+				if character.Class == proto.Class_ClassRogue {
+					return character.CurrentEnergy() >= cost.Value
+				} else if character.Class == proto.Class_ClassWarrior {
+					return character.CurrentRage() >= cost.Value
+				} else {
+					return character.CurrentMana() >= cost.Value
 				}
-				return true
 			},
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
 				return true
 			},
 			ActivationFactory: func(sim *Simulation) CooldownActivation {
-				manaCost = character.BaseMana() * 0.06
-				return func(sim *Simulation, character *Character) {
-					// Increase cast speed multiplier
-					character.PseudoStats.CastSpeedMultiplier *= hasteBonus
-					character.MultiplyAttackSpeed(sim, hasteBonus)
-					character.AddAura(sim, Aura{
-						ID:       TrollBerserkingAuraID,
-						ActionID: actionID,
-						Expires:  sim.CurrentTime + dur,
-						OnExpire: func(sim *Simulation) {
-							character.PseudoStats.CastSpeedMultiplier /= hasteBonus
-							character.MultiplyAttackSpeed(sim, inverseBonus)
+				if character.Class == proto.Class_ClassRogue {
+					cost = ResourceCost{Type: stats.Energy, Value: 10}
+				} else if character.Class == proto.Class_ClassWarrior {
+					cost = ResourceCost{Type: stats.Rage, Value: 5}
+				} else {
+					cost = ResourceCost{Type: stats.Mana, Value: character.BaseMana() * 0.06}
+				}
+
+				castTemplate := SimpleCast{
+					Cast: Cast{
+						ActionID:  actionID,
+						Character: character,
+						BaseCost:  cost,
+						Cost:      cost,
+						Cooldown:  cd,
+						OnCastComplete: func(sim *Simulation, cast *Cast) {
+							character.AddAura(sim, Aura{
+								ID:       TrollBerserkingAuraID,
+								ActionID: actionID,
+								Duration: dur,
+								OnGain: func(sim *Simulation) {
+									character.PseudoStats.CastSpeedMultiplier *= hasteBonus
+									character.MultiplyAttackSpeed(sim, hasteBonus)
+								},
+								OnExpire: func(sim *Simulation) {
+									character.PseudoStats.CastSpeedMultiplier /= hasteBonus
+									character.MultiplyAttackSpeed(sim, inverseBonus)
+								},
+							})
 						},
-					})
-					character.SpendMana(sim, manaCost, actionID)
-					character.SetCD(TrollBerserkingCooldownID, sim.CurrentTime+cd)
-					character.Metrics.AddInstantCast(actionID)
+					},
+				}
+
+				return func(sim *Simulation, character *Character) {
+					cast := castTemplate
+					cast.Init(sim)
+					cast.StartCast(sim)
 				}
 			},
 		})

@@ -98,7 +98,7 @@ export const WarriorRotationConfig = {
 					'rotation-type-enum-picker',
 				],
 				label: 'Primary Instant',
-				labelTooltip:'Main instant ability that will be prioritized above everything else while it is off CD.',
+				labelTooltip: 'Main instant ability that will be prioritized above everything else while it is off CD.',
 				values: [
 					{
 						name: 'Bloodthirst', value: PrimaryInstant.Bloodthirst,
@@ -140,7 +140,7 @@ export const WarriorRotationConfig = {
 				showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().type == RotationType.Fury,
 			},
 		},
-		
+
 		{
 			type: 'number' as const,
 			cssClass: 'rampage-duration-threshold',
@@ -254,119 +254,119 @@ export const WarriorRotationConfig = {
 		// ********************************************************
 		//                      GENERAL INPUTS
 		// ********************************************************
-	{
-		type: 'boolean' as const,
-		cssClass: 'ww-exec-picker',
-		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-		config: {
-			label: 'WW during Execute Phase',
-			labelTooltip: 'Use Whirlwind during Execute Phase.',
-			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useWwDuringExecute,
-			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
-				const newRotation = player.getRotation();
-				newRotation.useWwDuringExecute = newValue;
-				player.setRotation(eventID, newRotation);
+		{
+			type: 'boolean' as const,
+			cssClass: 'ww-exec-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'WW during Execute Phase',
+				labelTooltip: 'Use Whirlwind during Execute Phase.',
+				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useWwDuringExecute,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.useWwDuringExecute = newValue;
+					player.setRotation(eventID, newRotation);
+				},
 			},
 		},
-	},
-	{
-		type: 'boolean' as const,
-		cssClass: 'hs-exec-picker',
-		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-		config: {
-			label: 'HS during Execute Phase',
-			labelTooltip: 'Use Heroic Strike during Execute Phase.',
-			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHsDuringExecute,
-			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
-				const newRotation = player.getRotation();
-				newRotation.useHsDuringExecute = newValue;
-				player.setRotation(eventID, newRotation);
+		{
+			type: 'boolean' as const,
+			cssClass: 'hs-exec-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'HS during Execute Phase',
+				labelTooltip: 'Use Heroic Strike during Execute Phase.',
+				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHsDuringExecute,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.useHsDuringExecute = newValue;
+					player.setRotation(eventID, newRotation);
+				},
 			},
 		},
-	},
-	{
-		type: 'number' as const,
-		cssClass: 'hs-rage-threshold',
-		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-		config: {
-			label: 'HS rage threshold',
-			labelTooltip: 'Queue HS when rage is above:',
-			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().hsRageThreshold,
-			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
-				const newRotation = player.getRotation();
-				newRotation.hsRageThreshold = newValue;
-				player.setRotation(eventID, newRotation);
+		{
+			type: 'number' as const,
+			cssClass: 'hs-rage-threshold',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'HS rage threshold',
+				labelTooltip: 'Queue HS when rage is above:',
+				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().hsRageThreshold,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.hsRageThreshold = newValue;
+					player.setRotation(eventID, newRotation);
+				},
 			},
 		},
-	},
-	{
-		type: 'boolean' as const,
-		cssClass: 'overpower-picker',
-		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-		config: {
-			label: 'Use Overpower',
-			labelTooltip: 'Use Overpower when it is possible.',
-			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useOverpower,
-			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
-				const newRotation = player.getRotation();
-				newRotation.useOverpower = newValue;
-				player.setRotation(eventID, newRotation);
+		{
+			type: 'boolean' as const,
+			cssClass: 'overpower-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Use Overpower',
+				labelTooltip: 'Use Overpower when it is possible.',
+				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useOverpower,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.useOverpower = newValue;
+					player.setRotation(eventID, newRotation);
+				},
 			},
 		},
-	},
-	{
-		type: 'number' as const,
-		cssClass: 'overpower-rage-threshold',
-		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-		config: {
-			label: 'Overpower rage threshold',
-			labelTooltip: 'Use Overpower when rage is below a point.',
-			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().overpowerRageThreshold,
-			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
-				const newRotation = player.getRotation();
-				newRotation.overpowerRageThreshold = newValue;
-				player.setRotation(eventID, newRotation);
-			},
-			showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useOverpower,
-		},
-	},
-	{
-		type: 'boolean' as const,
-		cssClass: 'hamstring-picker',
-		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-		config: {
-			label: 'Use Hamstring',
-			labelTooltip: 'Use Hamstring on free global.',
-			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHamstring,
-			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
-				const newRotation = player.getRotation();
-				newRotation.useHamstring = newValue;
-				player.setRotation(eventID, newRotation);
+		{
+			type: 'number' as const,
+			cssClass: 'overpower-rage-threshold',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Overpower rage threshold',
+				labelTooltip: 'Use Overpower when rage is below a point.',
+				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().overpowerRageThreshold,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.overpowerRageThreshold = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useOverpower,
 			},
 		},
-	},
-	{
-		type: 'number' as const,
-		cssClass: 'hamstring-rage-threshold',
-		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-		config: {
-			label: 'Hamstring rage threshold',
-			labelTooltip: 'Use Hamstring when rage is above a ',
-			changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-			getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().hamstringRageThreshold,
-			setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
-				const newRotation = player.getRotation();
-				newRotation.hamstringRageThreshold = newValue;
-				player.setRotation(eventID, newRotation);
+		{
+			type: 'boolean' as const,
+			cssClass: 'hamstring-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Use Hamstring',
+				labelTooltip: 'Use Hamstring on free global.',
+				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHamstring,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.useHamstring = newValue;
+					player.setRotation(eventID, newRotation);
+				},
 			},
-			showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHamstring,
 		},
-	},
+		{
+			type: 'number' as const,
+			cssClass: 'hamstring-rage-threshold',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Hamstring rage threshold',
+				labelTooltip: 'Use Hamstring when rage is above a ',
+				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().hamstringRageThreshold,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.hamstringRageThreshold = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useHamstring,
+			},
+		},
 	],
 };

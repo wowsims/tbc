@@ -15,6 +15,7 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 	abAura := core.Aura{
 		ID:       ArcaneBlastAuraID,
 		ActionID: core.ActionID{SpellID: 36032},
+		Duration: time.Second * 8,
 		Stacks:   0,
 		OnExpire: func(sim *core.Simulation) {
 			// Reset the mana cost on expiration.
@@ -24,7 +25,6 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 			}
 		},
 	}
-	const abAuraDuration = time.Second * 8
 
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -34,6 +34,7 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolArcane,
+				SpellExtras:         SpellFlagMage,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: ArcaneBlastBaseManaCost,
@@ -47,7 +48,6 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					abAura.Stacks = core.MinInt32(3, mage.NumStacks(ArcaneBlastAuraID)+1)
-					abAura.Expires = sim.CurrentTime + abAuraDuration
 					cast.Character.ReplaceAura(sim, abAura)
 				},
 			},

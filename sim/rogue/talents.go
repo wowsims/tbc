@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (rogue *Rogue) applyTalents() {
+func (rogue *Rogue) ApplyTalents() {
 	// TODO: Puncturing Wounds, IEA, poisons, mutilate, blade flurry, adrenaline rush
 	// Everything in the sub tree
 
@@ -80,6 +80,7 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim 
 	findWeaknessAura := core.Aura{
 		ID:       FindWeaknessAuraID,
 		ActionID: core.ActionID{SpellID: 31242},
+		Duration: time.Second * 10,
 		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 			// TODO: This should be rogue abilities only, not all specials.
 			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
@@ -103,9 +104,7 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim 
 			}
 		}
 		if findWeaknessMultiplier != 1 {
-			aura := findWeaknessAura
-			aura.Expires = sim.CurrentTime + time.Second*10
-			rogue.AddAura(sim, aura)
+			rogue.ReplaceAura(sim, findWeaknessAura)
 		}
 	}
 }
@@ -123,12 +122,14 @@ func (rogue *Rogue) applyMurder() {
 		return core.Aura{
 			ID: MurderAuraID,
 			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if spellEffect.Target.MobType == proto.MobType_MobTypeHumanoid || spellEffect.Target.MobType == proto.MobType_MobTypeBeast || spellEffect.Target.MobType == proto.MobType_MobTypeGiant || spellEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
+				switch spellEffect.Target.MobType {
+				case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
 					spellEffect.DamageMultiplier *= damageMultiplier
 				}
 			},
 			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				if spellEffect.Target.MobType == proto.MobType_MobTypeHumanoid || spellEffect.Target.MobType == proto.MobType_MobTypeBeast || spellEffect.Target.MobType == proto.MobType_MobTypeGiant || spellEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
+				switch spellEffect.Target.MobType {
+				case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
 					*tickDamage *= damageMultiplier
 				}
 			},
@@ -149,7 +150,7 @@ func (rogue *Rogue) registerColdBloodCD() {
 	coldBloodAura := core.Aura{
 		ID:       ColdBloodAuraID,
 		ActionID: actionID,
-		Expires:  core.NeverExpires,
+		Duration: core.NeverExpires,
 		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 			// TODO: This should be rogue abilities only, not all specials.
 			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
@@ -351,15 +352,25 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 	const inverseHasteBonus = 1 / 1.2
 	const energyCost = 25.0
 
+	dur := time.Second * 15
+	cooldown := time.Minute * 2
+
 	bladeFlurryAura := core.Aura{
 		ID:       BladeFlurryAuraID,
 		ActionID: actionID,
+		Duration: dur,
+		OnGain: func(sim *core.Simulation) {
+			rogue.MultiplyMeleeSpeed(sim, hasteBonus)
+		},
 		OnExpire: func(sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
 		},
+		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
+			if sim.GetNumTargets() > 1 {
+				spellEffect.DamageMultiplier *= 2
+			}
+		},
 	}
-
-	cooldown := time.Minute * 2
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
@@ -373,10 +384,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 				Value: energyCost,
 			},
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				rogue.MultiplyMeleeSpeed(sim, hasteBonus)
-				aura := bladeFlurryAura
-				aura.Expires = sim.CurrentTime + time.Second*15
-				rogue.AddAura(sim, aura)
+				rogue.AddAura(sim, bladeFlurryAura)
 			},
 		},
 	}
@@ -395,7 +403,20 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 			return true
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
+			if sim.GetRemainingDuration() > cooldown+dur {
+				// We'll have enough time to cast another BF, so use it immediately to make sure we get the 2nd one.
+				return true
+			}
+
+			// Since this is our last BF, wait until we have SND / procs up.
+			sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
+			if sndTimeRemaining >= time.Second {
+				return true
+			}
+
+			// TODO: Wait for dst/mongoose procs
+
+			return false
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
@@ -420,7 +441,13 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 	adrenalineRushAura := core.Aura{
 		ID:       AdrenalineRushAuraID,
 		ActionID: actionID,
+		Duration: time.Second * 15,
+		OnGain: func(sim *core.Simulation) {
+			rogue.ResetEnergyTick(sim)
+			rogue.EnergyTickMultiplier = 2
+		},
 		OnExpire: func(sim *core.Simulation) {
+			rogue.ResetEnergyTick(sim)
 			rogue.EnergyTickMultiplier = 1
 		},
 	}
@@ -435,19 +462,7 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 			GCD:         time.Second,
 			IgnoreHaste: true,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				rogue.EnergyTickMultiplier = 2
-				const halfTick = core.EnergyPerTick / 2
-				if rogue.NextEnergyTickAt() < sim.CurrentTime+time.Second*1 {
-					// There will be 8 ticks during the 15s duration, so we need to subtract half a tick.
-					rogue.NextEnergyTickAdjustment = -halfTick
-				} else {
-					// There will be 7 ticks during the 15s duration, so we need to add half a tick.
-					rogue.AddEnergy(sim, halfTick, core.ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
-				}
-
-				aura := adrenalineRushAura
-				aura.Expires = sim.CurrentTime + time.Second*15
-				rogue.AddAura(sim, aura)
+				rogue.AddAura(sim, adrenalineRushAura)
 			},
 		},
 	}
@@ -464,7 +479,11 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Make sure we have plenty of room so the big ticks dont get wasted.
-			if rogue.CurrentEnergy() > 60 {
+			thresh := 85.0
+			if rogue.NextEnergyTickAt() < sim.CurrentTime+time.Second*1 {
+				thresh = 60.0
+			}
+			if rogue.CurrentEnergy() > thresh {
 				return false
 			}
 			return true

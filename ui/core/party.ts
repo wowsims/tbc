@@ -18,22 +18,22 @@ export class Party {
 	readonly sim: Sim;
 	readonly raid: Raid;
 
-  private buffs: PartyBuffs = PartyBuffs.create();
+	private buffs: PartyBuffs = PartyBuffs.create();
 
 	// Emits when a party member is added/removed/moved.
-  readonly compChangeEmitter = new TypedEvent<void>();
+	readonly compChangeEmitter = new TypedEvent<void>();
 
-  readonly buffsChangeEmitter = new TypedEvent<void>();
+	readonly buffsChangeEmitter = new TypedEvent<void>();
 
-  // Emits when anything in the party changes.
-  readonly changeEmitter: TypedEvent<void>;
+	// Emits when anything in the party changes.
+	readonly changeEmitter: TypedEvent<void>;
 
 	// Should always hold exactly MAX_PARTY_SIZE elements.
 	private players: Array<Player<any> | null>;
 
 	private readonly playerChangeListener: (eventID: EventID) => void;
 
-  constructor(raid: Raid, sim: Sim) {
+	constructor(raid: Raid, sim: Sim) {
 		this.sim = sim;
 		this.raid = raid;
 		this.players = [...Array(MAX_PARTY_SIZE).keys()].map(i => null);
@@ -43,7 +43,7 @@ export class Party {
 			this.compChangeEmitter,
 			this.buffsChangeEmitter,
 		], 'PartyChange');
-  }
+	}
 
 	size(): number {
 		return this.players.filter(player => player != null).length;
@@ -104,19 +104,19 @@ export class Party {
 		});
 	}
 
-  getBuffs(): PartyBuffs {
-    // Make a defensive copy
-    return PartyBuffs.clone(this.buffs);
-  }
+	getBuffs(): PartyBuffs {
+		// Make a defensive copy
+		return PartyBuffs.clone(this.buffs);
+	}
 
-  setBuffs(eventID: EventID, newBuffs: PartyBuffs) {
-    if (PartyBuffs.equals(this.buffs, newBuffs))
-      return;
+	setBuffs(eventID: EventID, newBuffs: PartyBuffs) {
+		if (PartyBuffs.equals(this.buffs, newBuffs))
+			return;
 
-    // Make a defensive copy
-    this.buffs = PartyBuffs.clone(newBuffs);
-    this.buffsChangeEmitter.emit(eventID);
-  }
+		// Make a defensive copy
+		this.buffs = PartyBuffs.clone(newBuffs);
+		this.buffsChangeEmitter.emit(eventID);
+	}
 
 	toProto(): PartyProto {
 		return PartyProto.create({

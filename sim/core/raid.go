@@ -220,13 +220,7 @@ func (raid *Raid) finalize(raidConfig proto.Raid) {
 				individualBuffs = *playerConfig.Buffs
 			}
 
-			player.GetCharacter().applyAllEffects(player)
-			applyBuffEffects(player, raidBuffs, partyBuffs, individualBuffs)
-			applyConsumeEffects(player, raidBuffs, partyBuffs)
-
-			for _, petAgent := range player.GetCharacter().Pets {
-				applyPetBuffEffects(petAgent, raidBuffs, partyBuffs, individualBuffs)
-			}
+			player.GetCharacter().applyAllEffects(player, raidBuffs, partyBuffs, individualBuffs)
 		}
 	}
 

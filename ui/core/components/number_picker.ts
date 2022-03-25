@@ -14,21 +14,21 @@ export class NumberPicker<ModObject> extends Input<ModObject, number> {
 	private readonly inputElem: HTMLInputElement;
 	private float: boolean;
 
-  constructor(parent: HTMLElement, modObject: ModObject, config: NumberPickerConfig<ModObject>) {
-    super(parent, 'number-picker-root', modObject, config);
+	constructor(parent: HTMLElement, modObject: ModObject, config: NumberPickerConfig<ModObject>) {
+		super(parent, 'number-picker-root', modObject, config);
 		this.float = config.float || false;
 
-    this.inputElem = document.createElement('input');
-    this.inputElem.type = 'number';
-    this.inputElem.classList.add('number-picker-input');
-    this.rootElem.appendChild(this.inputElem);
+		this.inputElem = document.createElement('input');
+		this.inputElem.type = 'number';
+		this.inputElem.classList.add('number-picker-input');
+		this.rootElem.appendChild(this.inputElem);
 
 		this.init();
 
-    this.inputElem.addEventListener('change', event => {
+		this.inputElem.addEventListener('change', event => {
 			this.inputChanged(TypedEvent.nextEventID());
-    });
-  }
+		});
+	}
 
 	getInputElem(): HTMLElement {
 		return this.inputElem;

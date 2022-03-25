@@ -49,7 +49,7 @@ type Priest struct {
 
 type SelfBuffs struct {
 	UseShadowfiend bool
-	
+
 	PowerInfusionTarget proto.RaidTarget
 }
 
@@ -108,10 +108,8 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) 
 	})
 
 	priest.registerShadowfiendCD()
-	
+
 	priest.registerPowerInfusionCD()
-	
-	priest.applyTalents()
 
 	return priest
 }

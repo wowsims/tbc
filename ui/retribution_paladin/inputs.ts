@@ -3,7 +3,7 @@ import { Player } from '/tbc/core/player.js';
 import { EventID } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank,  RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
+import { RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank, RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.

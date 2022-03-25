@@ -9,7 +9,7 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -27,7 +27,7 @@ import * as RetributionPaladinInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributionPaladin> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecRetributionPaladin>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecRetributionPaladin>) {
 		super(parentElem, player, {
 			cssClass: 'retribution-paladin-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
@@ -116,6 +116,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfMight: TristateEffect.TristateEffectImproved,
+					blessingOfSalvation: true,
 					unleashedRage: true,
 				}),
 				debuffs: Debuffs.create({
@@ -160,6 +161,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
 				IconInputs.BlessingOfMight,
+				IconInputs.BlessingOfSalvation,
 				IconInputs.UnleashedRage,
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
@@ -253,7 +255,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
-					Presets.PRE_RAID_PRESET, 
+					Presets.PRE_RAID_PRESET,
 					Presets.P1_PRESET,
 					Presets.P2_PRESET,
 					Presets.P3_PRESET,

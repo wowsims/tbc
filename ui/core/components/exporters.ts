@@ -33,29 +33,30 @@ export function newIndividualExporters<SpecType extends Spec>(simUI: IndividualS
 	});
 
 	const menuElem = exportSettings.getElementsByClassName('dropdown-menu')[0] as HTMLElement;
-	const addMenuItem = (label: string, onClick: () => void) => {
+	const addMenuItem = (label: string, onClick: () => void, showInRaidSim: boolean) => {
 		const itemElem = document.createElement('span');
 		itemElem.classList.add('dropdown-item');
+		if (!showInRaidSim) {
+			itemElem.classList.add('within-raid-sim-hide');
+		}
 		itemElem.textContent = label;
 		itemElem.addEventListener('click', onClick);
 		menuElem.appendChild(itemElem);
 	};
 
-	addMenuItem('Link', () => new IndividualLinkExporter(menuElem, simUI));
-	addMenuItem('Json', () => new IndividualJsonExporter(menuElem, simUI));
-	addMenuItem('70U EP', () => new Individual70UEPExporter(menuElem, simUI));
-	if (simUI.debug) {
-		addMenuItem('Pawn EP', () => new IndividualPawnEPExporter(menuElem, simUI));
-	}
+	addMenuItem('Link', () => new IndividualLinkExporter(menuElem, simUI), false);
+	addMenuItem('Json', () => new IndividualJsonExporter(menuElem, simUI), true);
+	addMenuItem('70U EP', () => new Individual70UEPExporter(menuElem, simUI), false);
+	addMenuItem('Pawn EP', () => new IndividualPawnEPExporter(menuElem, simUI), false);
 
 	return exportSettings;
 }
 
-abstract class Exporter extends Popup {
-  private readonly textElem: HTMLElement;
+export abstract class Exporter extends Popup {
+	private readonly textElem: HTMLElement;
 
-  constructor(parent: HTMLElement, title: string, allowDownload: boolean) {
-    super(parent);
+	constructor(parent: HTMLElement, title: string, allowDownload: boolean) {
+		super(parent);
 
 		this.rootElem.classList.add('exporter');
 		this.rootElem.innerHTML = `
@@ -71,9 +72,9 @@ abstract class Exporter extends Popup {
 
 		this.addCloseButton();
 
-    this.textElem = this.rootElem.getElementsByClassName('exporter-textarea')[0] as HTMLElement;
+		this.textElem = this.rootElem.getElementsByClassName('exporter-textarea')[0] as HTMLElement;
 
-    const clipboardButton = this.rootElem.getElementsByClassName('clipboard-button')[0] as HTMLElement;
+		const clipboardButton = this.rootElem.getElementsByClassName('clipboard-button')[0] as HTMLElement;
 		clipboardButton.addEventListener('click', event => {
 			const data = this.textElem.textContent!;
 			if (navigator.clipboard == undefined) {
@@ -83,7 +84,7 @@ abstract class Exporter extends Popup {
 			}
 		});
 
-    const downloadButton = this.rootElem.getElementsByClassName('download-button')[0] as HTMLElement;
+		const downloadButton = this.rootElem.getElementsByClassName('download-button')[0] as HTMLElement;
 		if (allowDownload) {
 			downloadButton.addEventListener('click', event => {
 				const data = this.textElem.textContent!;
@@ -104,8 +105,8 @@ abstract class Exporter extends Popup {
 class IndividualLinkExporter<SpecType extends Spec> extends Exporter {
 	private readonly simUI: IndividualSimUI<SpecType>;
 
-  constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-    super(parent, 'Sharable Link', false);
+	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
+		super(parent, 'Sharable Link', false);
 		this.simUI = simUI;
 		this.init();
 	}
@@ -129,8 +130,8 @@ class IndividualLinkExporter<SpecType extends Spec> extends Exporter {
 class IndividualJsonExporter<SpecType extends Spec> extends Exporter {
 	private readonly simUI: IndividualSimUI<SpecType>;
 
-  constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-    super(parent, 'JSON Export', true);
+	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
+		super(parent, 'JSON Export', true);
 		this.simUI = simUI;
 		this.init();
 	}
@@ -143,8 +144,8 @@ class IndividualJsonExporter<SpecType extends Spec> extends Exporter {
 class Individual70UEPExporter<SpecType extends Spec> extends Exporter {
 	private readonly simUI: IndividualSimUI<SpecType>;
 
-  constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-    super(parent, '70Upgrades EP Export', true);
+	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
+		super(parent, '70Upgrades EP Export', true);
 		this.simUI = simUI;
 		this.init();
 	}
@@ -153,9 +154,9 @@ class Individual70UEPExporter<SpecType extends Spec> extends Exporter {
 		const epValues = this.simUI.player.getEpWeights();
 		const allStats = (getEnumValues(Stat) as Array<Stat>).filter(stat => ![Stat.StatEnergy, Stat.StatRage].includes(stat));
 		return `https://seventyupgrades.com/ep/import?name=${encodeURIComponent('WoWSims Weights')}` +
-				allStats
-						.filter(stat => epValues.getStat(stat) != 0)
-						.map(stat => `&${Individual70UEPExporter.linkNames[stat]}=${epValues.getStat(stat).toFixed(3)}`).join('');
+			allStats
+				.filter(stat => epValues.getStat(stat) != 0)
+				.map(stat => `&${Individual70UEPExporter.linkNames[stat]}=${epValues.getStat(stat).toFixed(3)}`).join('');
 	}
 
 	static linkNames: Record<Stat, string> = {
@@ -188,14 +189,20 @@ class Individual70UEPExporter<SpecType extends Spec> extends Exporter {
 		[Stat.StatRage]: 'rage',
 		[Stat.StatArmor]: 'armor',
 		[Stat.StatRangedAttackPower]: 'rangedAttackPower',
+		[Stat.StatDefense]: 'defenseRating',
+		[Stat.StatBlock]: 'blockRating',
+		[Stat.StatBlockValue]: 'blockValue',
+		[Stat.StatDodge]: 'dodgeRating',
+		[Stat.StatParry]: 'parryRating',
+		[Stat.StatResilience]: 'resilienceRating',
 	}
 }
 
 class IndividualPawnEPExporter<SpecType extends Spec> extends Exporter {
 	private readonly simUI: IndividualSimUI<SpecType>;
 
-  constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-    super(parent, 'Pawn EP Export', true);
+	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
+		super(parent, 'Pawn EP Export', true);
 		this.simUI = simUI;
 		this.init();
 	}
@@ -204,10 +211,10 @@ class IndividualPawnEPExporter<SpecType extends Spec> extends Exporter {
 		const epValues = this.simUI.player.getEpWeights();
 		const allStats = (getEnumValues(Stat) as Array<Stat>).filter(stat => ![Stat.StatEnergy, Stat.StatRage].includes(stat));
 		return `( Pawn: v1: "WoWSims Weights": Class=${classNames[this.simUI.player.getClass()]},` +
-				allStats
-						.filter(stat => epValues.getStat(stat) != 0)
-						.map(stat => `${IndividualPawnEPExporter.statNames[stat]}=${epValues.getStat(stat).toFixed(3)}`).join(',') +
-				' )';
+			allStats
+				.filter(stat => epValues.getStat(stat) != 0)
+				.map(stat => `${IndividualPawnEPExporter.statNames[stat]}=${epValues.getStat(stat).toFixed(3)}`).join(',') +
+			' )';
 	}
 
 	static statNames: Record<Stat, string> = {
@@ -240,5 +247,11 @@ class IndividualPawnEPExporter<SpecType extends Spec> extends Exporter {
 		[Stat.StatRage]: 'Rage',
 		[Stat.StatArmor]: 'Armor',
 		[Stat.StatRangedAttackPower]: 'Rap',
+		[Stat.StatDefense]: 'DefenseRating',
+		[Stat.StatBlock]: 'BlockRating',
+		[Stat.StatBlockValue]: 'BlockValue',
+		[Stat.StatDodge]: 'DodgeRating',
+		[Stat.StatParry]: 'ParryRating',
+		[Stat.StatResilience]: 'ResilienceRating',
 	}
 }

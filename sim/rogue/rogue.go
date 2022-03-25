@@ -230,6 +230,9 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		Rotation:  *rogueOptions.Rotation,
 	}
 
+	// Passive rogue threat reduction: https://tbc.wowhead.com/spell=21184/rogue-passive-dnd
+	rogue.PseudoStats.ThreatMultiplier *= 0.71
+
 	daggerMH := rogue.Equip[proto.ItemSlot_ItemSlotMainHand].WeaponType == proto.WeaponType_WeaponTypeDagger
 	if rogue.Rotation.Builder == proto.Rogue_Rotation_Unknown {
 		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
@@ -277,7 +280,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		}
 	}
 
-	if rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueDeadlyPoison {
+	if rogue.Rotation.UseShiv && rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueDeadlyPoison {
 		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
 			if rogue.deadlyPoison.Effect.DotInput.IsTicking(sim) && rogue.deadlyPoison.Effect.DotInput.TimeRemaining(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.shivEnergyCost {
 				return rogue.NewShiv(sim, target)
@@ -328,7 +331,6 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		},
 	})
 
-	rogue.applyTalents()
 	rogue.registerThistleTeaCD()
 
 	return rogue

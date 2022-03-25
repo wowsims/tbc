@@ -185,12 +185,10 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 	}
 
 	if imbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
-		character.PseudoStats.BonusMeleeDamage += 12
-		character.PseudoStats.BonusRangedDamage += 12
+		character.PseudoStats.BonusDamage += 12
 		// Melee crit component handled separately because its melee-only.
 	} else if imbue == proto.WeaponImbue_WeaponImbueAdamantiteWeightstone {
-		character.PseudoStats.BonusMeleeDamage += 12
-		character.PseudoStats.BonusRangedDamage += 12
+		character.PseudoStats.BonusDamage += 12
 		character.AddStats(stats.Stats{
 			stats.MeleeCrit: 14,
 		})
@@ -336,7 +334,6 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 				Cast: Cast{
 					ActionID:  actionID,
 					Character: character,
-					CastTime:  time.Second * 1,
 					GCD:       GCDDefault,
 					OnCastComplete: func(sim *Simulation, cast *Cast) {
 						// When a real player is using drums, their cast applies to the whole party.

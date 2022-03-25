@@ -30,27 +30,30 @@ export function newIndividualImporters<SpecType extends Spec>(simUI: IndividualS
 	});
 
 	const menuElem = importSettings.getElementsByClassName('dropdown-menu')[0] as HTMLElement;
-	const addMenuItem = (label: string, onClick: () => void) => {
+	const addMenuItem = (label: string, onClick: () => void, showInRaidSim: boolean) => {
 		const itemElem = document.createElement('span');
 		itemElem.classList.add('dropdown-item');
+		if (!showInRaidSim) {
+			itemElem.classList.add('within-raid-sim-hide');
+		}
 		itemElem.textContent = label;
 		itemElem.addEventListener('click', onClick);
 		menuElem.appendChild(itemElem);
 	};
 
-	addMenuItem('Json', () => new IndividualJsonImporter(menuElem, simUI));
-	addMenuItem('70U', () => new Individual70UImporter(menuElem, simUI));
-	addMenuItem('Addon', () => new IndividualAddonImporter(menuElem, simUI));
+	addMenuItem('Json', () => new IndividualJsonImporter(menuElem, simUI), true);
+	addMenuItem('70U', () => new Individual70UImporter(menuElem, simUI), true);
+	addMenuItem('Addon', () => new IndividualAddonImporter(menuElem, simUI), true);
 
 	return importSettings;
 }
 
-abstract class Importer extends Popup {
-  private readonly textElem: HTMLElement;
-  protected readonly descriptionElem: HTMLElement;
+export abstract class Importer extends Popup {
+	private readonly textElem: HTMLTextAreaElement;
+	protected readonly descriptionElem: HTMLElement;
 
-  constructor(parent: HTMLElement, title: string) {
-    super(parent);
+	constructor(parent: HTMLElement, title: string) {
+		super(parent);
 
 		const uploadInputId = 'upload-input-' + title.toLowerCase().replaceAll(' ', '-');
 
@@ -71,19 +74,19 @@ abstract class Importer extends Popup {
 
 		this.addCloseButton();
 
-    this.textElem = this.rootElem.getElementsByClassName('importer-textarea')[0] as HTMLElement;
-    this.descriptionElem = this.rootElem.getElementsByClassName('import-description')[0] as HTMLElement;
+		this.textElem = this.rootElem.getElementsByClassName('importer-textarea')[0] as HTMLTextAreaElement;
+		this.descriptionElem = this.rootElem.getElementsByClassName('import-description')[0] as HTMLElement;
 
-    const uploadInput = this.rootElem.getElementsByClassName('importer-upload-input')[0] as HTMLElement;
+		const uploadInput = this.rootElem.getElementsByClassName('importer-upload-input')[0] as HTMLElement;
 		uploadInput.addEventListener('change', async event => {
 			const data: string = await (event as any).target.files[0].text();
 			this.textElem.textContent = data;
 		});
 
-    const importButton = this.rootElem.getElementsByClassName('import-button')[0] as HTMLElement;
+		const importButton = this.rootElem.getElementsByClassName('import-button')[0] as HTMLElement;
 		importButton.addEventListener('click', event => {
 			try {
-				this.onImport(this.textElem.textContent || '');
+				this.onImport(this.textElem.value || '');
 			} catch (error) {
 				alert('Import error: ' + error);
 			}
@@ -134,22 +137,22 @@ abstract class Importer extends Popup {
 		if (missingItems.length == 0 && missingEnchants.length == 0) {
 			alert('Import successful!');
 		} else {
-			alert('Import successful, but the following IDs were not found in the sim database:' + 
-					(missingItems.length == 0 ? '' : '\n\nItems: ' + missingItems.join(', ')) +
-					(missingEnchants.length == 0 ? '' : '\n\nEnchants: ' + missingEnchants.join(', ')));
+			alert('Import successful, but the following IDs were not found in the sim database:' +
+				(missingItems.length == 0 ? '' : '\n\nItems: ' + missingItems.join(', ')) +
+				(missingEnchants.length == 0 ? '' : '\n\nEnchants: ' + missingEnchants.join(', ')));
 		}
 	}
 }
 
 class IndividualJsonImporter<SpecType extends Spec> extends Importer {
 	private readonly simUI: IndividualSimUI<SpecType>;
-  constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-    super(parent, 'JSON Import');
+	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
+		super(parent, 'JSON Import');
 		this.simUI = simUI;
 
 		this.descriptionElem.innerHTML = `
 			<p>
-				Import settings from a JSON text file, which can be created using the JSON Export feature of this site.</a>.
+				Import settings from a JSON text file, which can be created using the JSON Export feature of this site.
 			</p>
 			<p>
 				To import, paste the JSON text below and click, 'Import'.
@@ -159,15 +162,21 @@ class IndividualJsonImporter<SpecType extends Spec> extends Importer {
 
 	onImport(data: string) {
 		const proto = IndividualSimSettings.fromJsonString(data);
-		this.simUI.fromProto(TypedEvent.nextEventID(), proto);
+		if (this.simUI.isWithinRaidSim) {
+			if (proto.player) {
+				this.simUI.player.fromProto(TypedEvent.nextEventID(), proto.player);
+			}
+		} else {
+			this.simUI.fromProto(TypedEvent.nextEventID(), proto);
+		}
 		this.close();
 	}
 }
 
 class Individual70UImporter<SpecType extends Spec> extends Importer {
 	private readonly simUI: IndividualSimUI<SpecType>;
-  constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-    super(parent, '70 Upgrades Import');
+	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
+		super(parent, '70 Upgrades Import');
 		this.simUI = simUI;
 
 		this.descriptionElem.innerHTML = `
@@ -198,7 +207,7 @@ class Individual70UImporter<SpecType extends Spec> extends Importer {
 		}
 
 		let talentsStr = '';
-		if (importJson?.talents.length > 0) {
+		if (importJson?.talents?.length > 0) {
 			const talentIds = (importJson.talents as Array<any>).map(talentJson => talentJson.spellId);
 			talentsStr = talentSpellIdsToTalentString(charClass, talentIds);
 		}
@@ -224,13 +233,13 @@ class Individual70UImporter<SpecType extends Spec> extends Importer {
 
 class IndividualAddonImporter<SpecType extends Spec> extends Importer {
 	private readonly simUI: IndividualSimUI<SpecType>;
-  constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
-    super(parent, 'Addon Import');
+	constructor(parent: HTMLElement, simUI: IndividualSimUI<SpecType>) {
+		super(parent, 'Addon Import');
 		this.simUI = simUI;
 
 		this.descriptionElem.innerHTML = `
 			<p>
-				Import settings from the <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank">WoWSims Importer In-Game Addon</a>.
+				Import settings from the <a href="https://www.curseforge.com/wow/addons/wowsimsexporter" target="_blank">WoWSims Importer In-Game Addon</a>.
 			</p>
 			<p>
 				This feature imports gear, race, and talents. It does NOT import buffs, debuffs, consumes, rotation, or custom stats.
@@ -256,7 +265,10 @@ class IndividualAddonImporter<SpecType extends Spec> extends Importer {
 		}
 
 		const talentsStr = (importJson['talents'] as string) || '';
-		const equipmentSpec = EquipmentSpec.fromJson(importJson['gear']);
+
+		const gearJson = importJson['gear'];
+		gearJson.items = (gearJson.items as Array<any>).filter(item => item != null);
+		const equipmentSpec = EquipmentSpec.fromJson(gearJson);
 
 		this.finishIndividualImport(this.simUI, charClass, race, equipmentSpec, talentsStr);
 	}

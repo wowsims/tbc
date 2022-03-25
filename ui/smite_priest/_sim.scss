@@ -12,11 +12,8 @@
 .smite-priest-sim-ui .self-buffs-section {
   grid-template-columns: repeat(3, 1fr);
 }
-.smite-priest-sim-ui .consumes-section {
-  grid-template-columns: repeat(5, 1fr);
-}
 .smite-priest-sim-ui .buffs-section {
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(6, 1fr);
 }
 .smite-priest-sim-ui .debuffs-section {
   grid-template-columns: repeat(3, 1fr);

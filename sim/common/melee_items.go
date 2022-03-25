@@ -21,7 +21,6 @@ func init() {
 	core.AddItemEffect(28437, ApplyDrakefistHammer)
 	core.AddItemEffect(28438, ApplyDragonmaw)
 	core.AddItemEffect(28439, ApplyDragonstrike)
-	core.AddItemEffect(-23, ApplyDragonstrikeStacking)
 	core.AddItemEffect(28573, ApplyDespair)
 	core.AddItemEffect(28767, ApplyTheDecapitator)
 	core.AddItemEffect(28774, ApplyGlaiveOfThePit)
@@ -198,8 +197,7 @@ func ApplyKhoriumChampion(agent core.Agent) {
 }
 
 func ApplyBraidedEterniumChain(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 5
-	agent.GetCharacter().PseudoStats.BonusRangedDamage += 5
+	agent.GetCharacter().PseudoStats.BonusDamage += 5
 }
 
 var BlackoutTruncheonAuraID = core.NewAuraID()
@@ -347,8 +345,7 @@ func ApplyDragonmaw(agent core.Agent) {
 }
 
 var DragonstrikeAuraID = core.NewAuraID()
-var DragonstrikeProcMHAuraID = core.NewAuraID()
-var DragonstrikeProcOHAuraID = core.NewAuraID()
+var DragonstrikeProcAuraID = core.NewAuraID()
 
 func ApplyDragonstrike(agent core.Agent) {
 	character := agent.GetCharacter()
@@ -358,7 +355,7 @@ func ApplyDragonstrike(agent core.Agent) {
 		const hasteBonus = 212.0
 		const dur = time.Second * 10
 		const procChance = 2.7 / 60.0
-		applyStatAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcMHAuraID, core.ActionID{ItemID: 28439}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
+		applyStatAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcAuraID, core.ActionID{ItemID: 28439}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
 
 		return core.Aura{
 			ID: DragonstrikeAuraID,
@@ -371,37 +368,6 @@ func ApplyDragonstrike(agent core.Agent) {
 				}
 
 				applyStatAura(sim)
-			},
-		}
-	})
-}
-
-func ApplyDragonstrikeStacking(agent core.Agent) {
-	character := agent.GetCharacter()
-	mh, oh := character.GetWeaponHands(-23)
-	procMask := core.GetMeleeProcMaskForHands(mh, oh)
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const hasteBonus = 212.0
-		const dur = time.Second * 10
-		const procChance = 2.7 / 60.0
-		applyStatMHAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcMHAuraID, core.ActionID{ItemID: 28439, Tag: 1}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
-		applyStatOHAura := character.NewTemporaryStatsAuraApplier(DragonstrikeProcOHAuraID, core.ActionID{ItemID: 28439, Tag: 2}, stats.Stats{stats.MeleeHaste: hasteBonus}, dur)
-
-		return core.Aura{
-			ID: DragonstrikeAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) {
-					return
-				}
-				if sim.RandomFloat("Dragonstrike") > procChance {
-					return
-				}
-
-				if spellEffect.IsMH() {
-					applyStatMHAura(sim)
-				} else {
-					applyStatOHAura(sim)
-				}
 			},
 		}
 	})
@@ -751,12 +717,24 @@ func ApplyWarpSlicer(agent core.Agent) {
 	character := agent.GetCharacter()
 	mh, oh := character.GetWeaponHands(30311)
 	procMask := core.GetMeleeProcMaskForHands(mh, oh)
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const bonus = 1.2
-		const inverseBonus = 1 / 1.2
-		const dur = time.Second * 30
-		const procChance = 0.5
 
+	const bonus = 1.2
+	const inverseBonus = 1 / 1.2
+	const procChance = 0.5
+
+	procAura := core.Aura{
+		ID:       WarpSlicerProcAuraID,
+		ActionID: core.ActionID{ItemID: 30311},
+		Duration: time.Second * 30,
+		OnGain: func(sim *core.Simulation) {
+			character.MultiplyMeleeSpeed(sim, bonus)
+		},
+		OnExpire: func(sim *core.Simulation) {
+			character.MultiplyMeleeSpeed(sim, inverseBonus)
+		},
+	}
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: WarpSlicerAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -767,15 +745,7 @@ func ApplyWarpSlicer(agent core.Agent) {
 					return
 				}
 
-				character.MultiplyMeleeSpeed(sim, bonus)
-				character.AddAura(sim, core.Aura{
-					ID:       WarpSlicerProcAuraID,
-					ActionID: core.ActionID{ItemID: 30311},
-					Expires:  sim.CurrentTime + dur,
-					OnExpire: func(sim *core.Simulation) {
-						character.MultiplyMeleeSpeed(sim, inverseBonus)
-					},
-				})
+				character.ReplaceAura(sim, procAura)
 			},
 		}
 	})
@@ -786,12 +756,24 @@ var DevastationProcAuraID = core.NewAuraID()
 
 func ApplyDevastation(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const bonus = 1.2
-		const inverseBonus = 1 / 1.2
-		const dur = time.Second * 30
-		const procChance = 0.5
 
+	const bonus = 1.2
+	const inverseBonus = 1 / 1.2
+	const procChance = 0.5
+
+	procAura := core.Aura{
+		ID:       DevastationProcAuraID,
+		ActionID: core.ActionID{ItemID: 30316},
+		Duration: time.Second * 30,
+		OnGain: func(sim *core.Simulation) {
+			character.MultiplyMeleeSpeed(sim, bonus)
+		},
+		OnExpire: func(sim *core.Simulation) {
+			character.MultiplyMeleeSpeed(sim, inverseBonus)
+		},
+	}
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: DevastationAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -802,15 +784,7 @@ func ApplyDevastation(agent core.Agent) {
 					return
 				}
 
-				character.MultiplyMeleeSpeed(sim, bonus)
-				character.AddAura(sim, core.Aura{
-					ID:       DevastationProcAuraID,
-					ActionID: core.ActionID{ItemID: 30316},
-					Expires:  sim.CurrentTime + dur,
-					OnExpire: func(sim *core.Simulation) {
-						character.MultiplyMeleeSpeed(sim, inverseBonus)
-					},
-				})
+				character.ReplaceAura(sim, procAura)
 			},
 		}
 	})
@@ -956,7 +930,6 @@ func ApplyTheNightBlade(agent core.Agent) {
 	procMask := core.GetMeleeProcMaskForHands(mh, oh)
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const arPenBonus = 435.0
-		const dur = time.Second * 10
 		const procChance = 2 * 1.8 / 60.0
 
 		return core.Aura{
@@ -971,10 +944,10 @@ func ApplyTheNightBlade(agent core.Agent) {
 
 				stacks := character.NumStacks(TheNightBladeProcAuraID) + 1
 				newBonus := arPenBonus * float64(stacks)
-				character.AddAura(sim, core.Aura{
+				character.ReplaceAura(sim, core.Aura{
 					ID:       TheNightBladeProcAuraID,
 					ActionID: core.ActionID{ItemID: 31331},
-					Expires:  sim.CurrentTime + dur,
+					Duration: time.Second * 10,
 					Stacks:   stacks,
 					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 						spellEffect.BonusArmorPenetration += newBonus
@@ -1030,6 +1003,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		procAura := core.Aura{
 			ID:       SiphonEssenceAuraID,
 			ActionID: core.ActionID{SpellID: 40291},
+			Duration: time.Second * 6,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
 					return
@@ -1051,9 +1025,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 				}
 
 				if ppmm.Proc(sim, spellEffect.IsMH(), false, "Syphon Of The Nathrezim") {
-					aura := procAura
-					aura.Expires = sim.CurrentTime + time.Second*6
-					character.AddAura(sim, aura)
+					character.ReplaceAura(sim, procAura)
 				}
 			},
 		}

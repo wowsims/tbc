@@ -318,6 +318,10 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 // Decides whether to use an instant-cast GCD spell.
 // Returns true if any of these spells was selected.
 func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
+	if hunter.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		return true
+	}
+
 	// First prio is swapping aspect if necessary.
 	currentMana := hunter.CurrentManaPercent()
 	if hunter.aspectOfTheViper && hunter.Rotation.ViperStartManaPercent < 1 {

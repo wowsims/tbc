@@ -79,6 +79,8 @@ func ApplyTalonOfAlar(agent core.Agent) {
 		procAura := core.Aura{
 			ID:       TalonOfAlarProcAuraID,
 			ActionID: core.ActionID{ItemID: 30448},
+			// Add 1 in case we use arcane shot exactly off CD.
+			Duration: time.Second*6 + 1,
 			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 				if !spellCast.SameAction(SteadyShotActionID) &&
 					!spellCast.SameAction(MultiShotActionID) &&
@@ -97,11 +99,7 @@ func ApplyTalonOfAlar(agent core.Agent) {
 					return
 				}
 
-				aura := procAura
-				// Add 1 in case we use arcane shot exactly off CD.
-				aura.Expires = sim.CurrentTime + time.Second*6 + 1
-
-				character.AddAura(sim, aura)
+				character.AddAura(sim, procAura)
 			},
 		}
 	})

@@ -2,9 +2,6 @@ package core
 
 import (
 	"fmt"
-	"strings"
-	"time"
-
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -63,6 +60,8 @@ type SpellEffect struct {
 	BonusArmorPenetration float64
 	BonusWeaponDamage     float64
 
+	BonusAttackPowerOnTarget float64
+
 	// Additional multiplier that is always applied.
 	DamageMultiplier float64
 
@@ -90,6 +89,7 @@ type SpellEffect struct {
 	// Results
 	Outcome HitOutcome
 	Damage  float64 // Damage done by this cast.
+	Threat  float64
 
 	// Certain damage multiplier, such as target debuffs and crit multipliers, do
 	// not count towards the AOE cap. Store them here to they can be subtracted
@@ -103,6 +103,14 @@ func (spellEffect *SpellEffect) Landed() bool {
 
 func (spellEffect *SpellEffect) TotalThreatMultiplier(spellCast *SpellCast) float64 {
 	return spellEffect.ThreatMultiplier * spellCast.Character.PseudoStats.ThreatMultiplier
+}
+
+func (spellEffect *SpellEffect) calcThreat(spellCast *SpellCast) float64 {
+	if spellEffect.Landed() {
+		return (spellEffect.Damage + spellEffect.FlatThreatBonus) * spellEffect.TotalThreatMultiplier(spellCast)
+	} else {
+		return 0
+	}
 }
 
 func (she *SpellHitEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell) {
@@ -144,10 +152,7 @@ func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spell *Simple
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *SimpleSpell) {
 	if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasAlwaysHits) {
-		spell.Character.Log(sim, "%s %s.", spell.ActionID, spellEffect)
-	}
-	if spellEffect.Landed() && spellEffect.FlatThreatBonus > 0 {
-		spell.TotalThreat += spellEffect.FlatThreatBonus * spellEffect.TotalThreatMultiplier(&spell.SpellCast)
+		spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(&spell.SpellCast))
 	}
 
 	spellEffect.triggerSpellProcs(sim, spell)
@@ -176,7 +181,6 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast)
 }
 
 func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
-
 	if spellEffect.Outcome.Matches(OutcomeHit) {
 		spellCast.Hits++
 	}
@@ -209,7 +213,7 @@ func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
 	}
 
 	spellCast.TotalDamage += spellEffect.Damage
-	spellCast.TotalThreat += spellEffect.Damage * spellEffect.TotalThreatMultiplier(spellCast)
+	spellCast.TotalThreat += spellEffect.calcThreat(spellCast)
 }
 
 // Only applies the results from the ticks, not the initial dot application.
@@ -281,9 +285,10 @@ func (hitEffect *SpellHitEffect) takeDotSnapshot(sim *Simulation, spellCast *Spe
 	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool.Stat()) + hitEffect.BonusSpellPower
 
 	// snapshot total damage per tick, including any static damage multipliers
-	hitEffect.DotInput.startTime = sim.CurrentTime
-	hitEffect.DotInput.finalTickTime = sim.CurrentTime + time.Duration(hitEffect.DotInput.NumberOfTicks)*hitEffect.DotInput.TickLength
 	hitEffect.DotInput.damagePerTick = (hitEffect.DotInput.TickBaseDamage + totalSpellPower*hitEffect.DotInput.TickSpellCoefficient) * hitEffect.StaticDamageMultiplier
+	hitEffect.DotInput.startTime = sim.CurrentTime
+	hitEffect.DotInput.RefreshDot(sim)
+	hitEffect.DotInput.nextTickTime = sim.CurrentTime + hitEffect.DotInput.TickLength
 	hitEffect.SpellEffect.BeyondAOECapMultiplier = 1
 }
 
@@ -331,7 +336,7 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 // This should be called on each dot tick.
 func (hitEffect *SpellHitEffect) afterDotTick(sim *Simulation, spell *SimpleSpell) {
 	if sim.Log != nil {
-		spell.Character.Log(sim, "%s %s.", spell.ActionID, hitEffect.SpellEffect.DotResultString())
+		spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, hitEffect.SpellEffect.DotResultString(), hitEffect.SpellEffect.calcThreat(&spell.SpellCast))
 	}
 
 	hitEffect.applyDotTickResultsToCast(&spell.SpellCast)
@@ -347,12 +352,13 @@ func (hitEffect *SpellHitEffect) afterDotTick(sim *Simulation, spell *SimpleSpel
 	}
 
 	hitEffect.DotInput.tickIndex++
+	hitEffect.DotInput.nextTickTime = sim.CurrentTime + hitEffect.DotInput.TickLength
 }
 
 // This should be called after the final tick of the dot, or when the dot is cancelled.
 func (hitEffect *SpellHitEffect) onDotComplete(sim *Simulation, spellCast *SpellCast) {
 	// Clean up the dot object.
-	hitEffect.DotInput.finalTickTime = 0
+	hitEffect.DotInput.endTime = 0
 
 	if hitEffect.DotInput.DebuffID != 0 {
 		hitEffect.Target.AddAuraUptime(hitEffect.DotInput.DebuffID, spellCast.ActionID, sim.CurrentTime-hitEffect.DotInput.startTime)
@@ -364,10 +370,7 @@ func (spellEffect *SpellEffect) String() string {
 	if !spellEffect.Landed() {
 		return outcomeStr
 	}
-
-	var sb strings.Builder
-	fmt.Fprintf(&sb, "%s for %0.3f damage", outcomeStr, spellEffect.Damage)
-	return sb.String()
+	return fmt.Sprintf("%s for %0.3f damage", outcomeStr, spellEffect.Damage)
 }
 
 func (spellEffect *SpellEffect) DotResultString() string {

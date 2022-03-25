@@ -16,7 +16,7 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -38,7 +38,7 @@ import * as SmitePriestInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecSmitePriest>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecSmitePriest>) {
 		super(parentElem, player, {
 			cssClass: 'smite-priest-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
@@ -72,9 +72,9 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 			],
 			modifyDisplayStats: (player: Player<Spec.SpecSmitePriest>, stats: Stats) => {
 				return stats.withStat(Stat.StatSpellHit,
-						stats.getStat(Stat.StatSpellHit)
-						+ player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE
-						+ player.getTalents().focusedPower * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
+					stats.getStat(Stat.StatSpellHit)
+					+ player.getTalents().shadowFocus * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE
+					+ player.getTalents().focusedPower * 2 * Mechanics.SPELL_HIT_RATING_PER_HIT_CHANCE);
 			},
 
 			defaults: {
@@ -116,6 +116,7 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfWisdom: 2,
+					blessingOfSalvation: true,
 				}),
 				debuffs: Debuffs.create({
 					judgementOfWisdom: true,
@@ -136,7 +137,7 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
-				
+
 				IconInputs.MoonkinAura,
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.DrumsOfRestorationBuff,
@@ -156,6 +157,7 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
+				IconInputs.BlessingOfSalvation,
 				IconInputs.Innervate,
 				IconInputs.PowerInfusion,
 			],
@@ -206,6 +208,7 @@ export class SmitePriestSimUI extends IndividualSimUI<Spec.SpecSmitePriest> {
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					OtherInputs.ISBUptime,
 					OtherInputs.ShadowPriestDPS,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,

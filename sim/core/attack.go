@@ -202,11 +202,12 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	var attackPower float64
 	var bonusWeaponDamage float64
 	if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-		attackPower = character.stats[stats.RangedAttackPower] + ahe.BonusAttackPower
-		bonusWeaponDamage = character.PseudoStats.BonusRangedDamage + ahe.BonusWeaponDamage
+		// all ranged attacks honor BonusAttackPowerOnTarget...
+		attackPower = character.stats[stats.RangedAttackPower] + ahe.BonusAttackPower + ahe.BonusAttackPowerOnTarget
+		bonusWeaponDamage = character.PseudoStats.BonusDamage + ahe.BonusWeaponDamage
 	} else {
 		attackPower = character.stats[stats.AttackPower] + ahe.BonusAttackPower
-		bonusWeaponDamage = character.PseudoStats.BonusMeleeDamage + ahe.BonusWeaponDamage
+		bonusWeaponDamage = character.PseudoStats.BonusDamage + ahe.BonusWeaponDamage
 	}
 
 	dmg := 0.0
@@ -215,21 +216,22 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	} else if ahe.WeaponInput.DamageMultiplier != 0 {
 		// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
 		// TODO not all weapon damage based attacks "scale" with +bonusWeaponDamage (e.g. Devastate, Shiv, Mutilate don't)
+		// ... but for other's, BonusAttackPowerOnTarget only applies to weapon damage based attacks
 		if ahe.WeaponInput.Normalized {
 			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 				dmg += character.AutoAttacks.Ranged.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
 			} else if !ahe.WeaponInput.Offhand {
-				dmg += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
+				dmg += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower+ahe.BonusAttackPowerOnTarget) + bonusWeaponDamage
 			} else {
-				dmg += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower)*0.5 + bonusWeaponDamage
+				dmg += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower+2*ahe.BonusAttackPowerOnTarget)*0.5 + bonusWeaponDamage
 			}
 		} else {
 			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 				dmg += character.AutoAttacks.Ranged.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
 			} else if !ahe.WeaponInput.Offhand {
-				dmg += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
+				dmg += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower+ahe.BonusAttackPowerOnTarget) + bonusWeaponDamage
 			} else {
-				dmg += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower)*0.5 + bonusWeaponDamage
+				dmg += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower+2*ahe.BonusAttackPowerOnTarget)*0.5 + bonusWeaponDamage
 			}
 		}
 		dmg += ahe.WeaponInput.FlatDamageBonus
@@ -239,7 +241,9 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	if ahe.DirectInput.SpellCoefficient > 0 {
 		bonus := (character.GetStat(stats.SpellPower) + character.GetStat(ability.SpellSchool.Stat())) * ahe.DirectInput.SpellCoefficient * ahe.WeaponInput.DamageMultiplier
 		bonus += ahe.SpellEffect.BonusSpellPower * ahe.DirectInput.SpellCoefficient // does not get changed by weapon input multiplier
+		dmg += bonus
 	}
+	dmg += ahe.DirectInput.FlatDamageBonus
 
 	//if sim.Log != nil {
 	//	character.Log(sim, "Melee dmg calcs: AP=%0.1f, bonusWepDmg:%0.1f, dmgMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weaponDmgCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, ahe.DamageMultiplier, ahe.StaticDamageMultiplier, ahe.HitType, dmg, ability.CritMultiplier, ahe.Target.currentArmor)

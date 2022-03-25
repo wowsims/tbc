@@ -6,8 +6,8 @@ import { Player } from '/tbc/core/player.js';
 import { TalentsConfig, TalentsPicker } from './talents_picker.js';
 
 export class MageTalentsPicker extends TalentsPicker<Spec.SpecMage> {
-  constructor(parent: HTMLElement, player: Player<Spec.SpecMage>) {
-    super(parent, player, mageTalentsConfig);
+	constructor(parent: HTMLElement, player: Player<Spec.SpecMage>) {
+		super(parent, player, mageTalentsConfig);
 	}
 }
 

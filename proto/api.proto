@@ -21,7 +21,7 @@ message Player {
     Race race = 1;
     Class class = 2;
 
-  EquipmentSpec equipment = 3;
+    EquipmentSpec equipment = 3;
     Consumes consumes = 4;
     repeated double bonus_stats = 5;
 
@@ -104,12 +104,8 @@ message ActionMetrics {
 		// Total damage done to all targets by this action.
     double damage = 6;
 
-    // # of times spells were partially resisted
-    int32 resists25 = 12;
-
-    int32 resists50 = 13;
-
-    int32 resists75 = 14;
+		// Total threat done to all targets by this action.
+    double threat = 12;
 }
 
 message AuraMetrics {
@@ -222,8 +218,11 @@ message ComputeStatsRequest {
     Raid raid = 1;
 }
 message PlayerStats {
-    repeated double gear_only = 1;
+		// Stats
+    repeated double base_stats = 6;
+    repeated double gear_stats = 1;
     repeated double final_stats = 2;
+
     repeated string sets = 3;
 		IndividualBuffs buffs = 4;
 		repeated ActionID cooldowns = 5;

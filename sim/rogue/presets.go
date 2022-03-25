@@ -50,6 +50,23 @@ var MutilateTalents = &proto.RogueTalents{
 	DualWieldSpecialization: 5,
 }
 
+var HemoTalents = &proto.RogueTalents{
+	ImprovedSinisterStrike:  2,
+	ImprovedSliceAndDice:    3,
+	Precision:               5,
+	DualWieldSpecialization: 5,
+	BladeFlurry:             true,
+	SwordSpecialization:     5,
+	WeaponExpertise:         2,
+	Aggression:              3,
+	Vitality:                2,
+	AdrenalineRush:          true,
+	CombatPotency:           5,
+
+	SerratedBlades: 3,
+	Hemorrhage:     true,
+}
+
 var PlayerOptionsBasic = &proto.Player_Rogue{
 	Rogue: &proto.Rogue{
 		Talents:  CombatTalents,
@@ -66,10 +83,19 @@ var PlayerOptionsMutilate = &proto.Player_Rogue{
 	},
 }
 
+var PlayerOptionsHemo = &proto.Player_Rogue{
+	Rogue: &proto.Rogue{
+		Talents:  HemoTalents,
+		Options:  basicOptions,
+		Rotation: basicRotation,
+	},
+}
+
 var basicRotation = &proto.Rogue_Rotation{
 	Builder:             proto.Rogue_Rotation_Auto,
 	MaintainExposeArmor: true,
 	UseRupture:          true,
+	UseShiv:             true,
 
 	MinComboPointsForDamageFinisher: 3,
 }
@@ -114,7 +140,7 @@ var FullDebuffs = &proto.Debuffs{
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: FullDebuffs,
-	Armor:   7700,
+	Armor:   7684,
 }
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{

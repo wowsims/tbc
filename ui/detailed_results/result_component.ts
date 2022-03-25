@@ -21,16 +21,28 @@ export interface ResultComponentConfig {
 export abstract class ResultComponent extends Component {
 	private readonly colorSettings: ColorSettings;
 
-  constructor(config: ResultComponentConfig) {
-    super(config.parent, config.rootCssClass || '');
+	private lastSimResult: SimResultData | null;
+
+	constructor(config: ResultComponentConfig) {
+		super(config.parent, config.rootCssClass || '');
 		this.colorSettings = config.colorSettings;
+		this.lastSimResult = null;
 
 		config.resultsEmitter.on((eventID, resultData) => {
 			if (!resultData)
 				return;
 
+			this.lastSimResult = resultData;
 			this.onSimResult(resultData);
 		});
+	}
+
+	getLastSimResult(): SimResultData {
+		if (this.lastSimResult) {
+			return this.lastSimResult;
+		} else {
+			throw new Error('No last sim result!');
+		}
 	}
 
 	abstract onSimResult(resultData: SimResultData): void;

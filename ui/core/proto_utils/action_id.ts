@@ -81,9 +81,9 @@ export class ActionId {
 
 	equalsIgnoringTag(other: ActionId): boolean {
 		return (
-				this.itemId == other.itemId
-				&& this.spellId == other.spellId
-				&& this.otherId == other.otherId);
+			this.itemId == other.itemId
+			&& this.spellId == other.spellId
+			&& this.otherId == other.otherId);
 	}
 
 	setBackground(elem: HTMLElement) {
@@ -176,7 +176,7 @@ export class ActionId {
 					if (this.tag === playerIndex) {
 						name += ` (self)`;
 					} else {
-						name += ` (from #${this.tag+1})`;
+						name += ` (from #${this.tag + 1})`;
 					}
 				}
 				break;
@@ -285,7 +285,7 @@ export class ActionId {
 	}
 
 	static fromPetName(petName: string): ActionId {
-		return new ActionId(0, 0, OtherAction.OtherActionPet, 0, petName, petName, petNameToIcon[petName] || '');
+		return petNameToActionId[petName] || new ActionId(0, 0, OtherAction.OtherActionPet, 0, petName, petName, petNameToIcon[petName] || '');
 	}
 
 	static fromItem(item: Item): ActionId {
@@ -310,11 +310,11 @@ export class ActionId {
 			const idType = match[1];
 			const id = parseInt(match[5]);
 			return new ActionId(
-					idType == 'ItemID' ? id : 0,
-					idType == 'SpellID' ? id : 0,
-					idType == 'OtherID' ? id : 0,
-					match[7] ? parseInt(match[7]) : 0,
-					'', '', '');
+				idType == 'ItemID' ? id : 0,
+				idType == 'SpellID' ? id : 0,
+				idType == 'OtherID' ? id : 0,
+				match[7] ? parseInt(match[7]) : 0,
+				'', '', '');
 		} else {
 			console.warn('Failed to parse action id from log: ' + str);
 			return ActionId.fromEmpty();
@@ -324,7 +324,7 @@ export class ActionId {
 	private static async getTooltipDataHelper(id: number, tooltipPostfix: string, cache: Map<number, Promise<any>>): Promise<any> {
 		if (!cache.has(id)) {
 			cache.set(id,
-					fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
+				fetch(`https://tbc.wowhead.com/tooltip/${tooltipPostfix}/${id}`)
 					.then(response => response.json()));
 		}
 
@@ -350,6 +350,11 @@ idOverrides[ActionId.fromSpellId(37223).toProtoString()] = ActionId.fromItemId(2
 idOverrides[ActionId.fromSpellId(37447).toProtoString()] = ActionId.fromItemId(30720); // Serpent-Coil Braid
 idOverrides[ActionId.fromSpellId(37443).toProtoString()] = ActionId.fromItemId(30196); // Robes of Tirisfal (4pc bonus)
 
+const petNameToActionId: Record<string, ActionId> = {
+	'Gnomish Flame Turret': ActionId.fromItemId(23841),
+	'Water Elemental': ActionId.fromSpellId(31687),
+};
+
 // https://tbc.wowhead.com/hunter-pets
 const petNameToIcon: Record<string, string> = {
 	'Bat': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_bat.jpg',
@@ -372,17 +377,16 @@ const petNameToIcon: Record<string, string> = {
 	'Sporebat': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_sporebat.jpg',
 	'Tallstrider': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_tallstrider.jpg',
 	'Turtle': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_turtle.jpg',
-	'Water Elemental': 'https://wow.zamimg.com/images/wow/icons/medium/spell_frost_summonwaterelemental_2.jpg',
 	'Warp Stalker': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_warpstalker.jpg',
 	'Wind Serpent': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_windserpent.jpg',
 	'Wolf': 'https://wow.zamimg.com/images/wow/icons/medium/ability_hunter_pet_wolf.jpg',
 };
 
 export const resourceTypeToIcon: Record<ResourceType, string> = {
-  [ResourceType.ResourceTypeNone]: '',
-  [ResourceType.ResourceTypeMana]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
-  [ResourceType.ResourceTypeEnergy]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
-  [ResourceType.ResourceTypeRage]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
-  [ResourceType.ResourceTypeComboPoints]: 'https://wow.zamimg.com/images/wow/icons/large/inv_mace_2h_pvp410_c_01.jpg',
-  [ResourceType.ResourceTypeFocus]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
+	[ResourceType.ResourceTypeNone]: '',
+	[ResourceType.ResourceTypeMana]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
+	[ResourceType.ResourceTypeEnergy]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
+	[ResourceType.ResourceTypeRage]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
+	[ResourceType.ResourceTypeComboPoints]: 'https://wow.zamimg.com/images/wow/icons/large/inv_mace_2h_pvp410_c_01.jpg',
+	[ResourceType.ResourceTypeFocus]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_wispsplode.jpg',
 };
