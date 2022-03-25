@@ -4,7 +4,6 @@ import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
-import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
@@ -63,7 +62,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
             ],
             defaults: {
                 // Default equipped gear.
-                gear: EquipmentSpec.create(),
+                gear: Presets.P1_BALANCED_PRESET.gear,
                 // Default EP weights for sorting gear in the gear picker.
                 epWeights: Stats.fromMap({
                     [Stat.StatStrength]: 2.5,
@@ -207,7 +206,10 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                     Presets.ImpaleProtTalents,
                 ],
                 // Preset gear configurations that the user can quickly select.
-                gear: [],
+                gear: [
+                    Presets.P1_BALANCED_PRESET,
+                    Presets.P4_BALANCED_PRESET,
+                ],
             },
         });
     }
