@@ -115,6 +115,7 @@ class MageTalents$Type extends MessageType {
             { no: 1, name: "arcane_subtlety", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "arcane_focus", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "wand_specialization", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 48, name: "magic_absorption", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 4, name: "arcane_concentration", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 5, name: "arcane_impact", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 6, name: "arcane_meditation", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -162,7 +163,7 @@ class MageTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { arcaneSubtlety: 0, arcaneFocus: 0, wandSpecialization: 0, arcaneConcentration: 0, arcaneImpact: 0, arcaneMeditation: 0, presenceOfMind: false, arcaneMind: 0, arcaneInstability: 0, arcanePotency: 0, empoweredArcaneMissiles: 0, arcanePower: false, spellPower: 0, mindMastery: 0, improvedFireball: 0, ignite: 0, improvedFireBlast: 0, incineration: 0, improvedFlamestrike: 0, pyroblast: false, burningSoul: 0, improvedScorch: 0, masterOfElements: 0, playingWithFire: 0, criticalMass: 0, blastWave: false, firePower: 0, pyromaniac: 0, combustion: false, moltenFury: 0, empoweredFireball: 0, dragonsBreath: false, improvedFrostbolt: 0, elementalPrecision: 0, iceShards: 0, improvedFrostNova: 0, piercingIce: 0, icyVeins: false, frostChanneling: 0, shatter: 0, coldSnap: false, improvedConeOfCold: 0, iceFloes: 0, wintersChill: 0, arcticWinds: 0, empoweredFrostbolt: 0, summonWaterElemental: false };
+        const message = { arcaneSubtlety: 0, arcaneFocus: 0, wandSpecialization: 0, magicAbsorption: 0, arcaneConcentration: 0, arcaneImpact: 0, arcaneMeditation: 0, presenceOfMind: false, arcaneMind: 0, arcaneInstability: 0, arcanePotency: 0, empoweredArcaneMissiles: 0, arcanePower: false, spellPower: 0, mindMastery: 0, improvedFireball: 0, ignite: 0, improvedFireBlast: 0, incineration: 0, improvedFlamestrike: 0, pyroblast: false, burningSoul: 0, improvedScorch: 0, masterOfElements: 0, playingWithFire: 0, criticalMass: 0, blastWave: false, firePower: 0, pyromaniac: 0, combustion: false, moltenFury: 0, empoweredFireball: 0, dragonsBreath: false, improvedFrostbolt: 0, elementalPrecision: 0, iceShards: 0, improvedFrostNova: 0, piercingIce: 0, icyVeins: false, frostChanneling: 0, shatter: 0, coldSnap: false, improvedConeOfCold: 0, iceFloes: 0, wintersChill: 0, arcticWinds: 0, empoweredFrostbolt: 0, summonWaterElemental: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -181,6 +182,9 @@ class MageTalents$Type extends MessageType {
                     break;
                 case /* int32 wand_specialization */ 3:
                     message.wandSpecialization = reader.int32();
+                    break;
+                case /* int32 magic_absorption */ 48:
+                    message.magicAbsorption = reader.int32();
                     break;
                 case /* int32 arcane_concentration */ 4:
                     message.arcaneConcentration = reader.int32();
@@ -335,6 +339,9 @@ class MageTalents$Type extends MessageType {
         /* int32 wand_specialization = 3; */
         if (message.wandSpecialization !== 0)
             writer.tag(3, WireType.Varint).int32(message.wandSpecialization);
+        /* int32 magic_absorption = 48; */
+        if (message.magicAbsorption !== 0)
+            writer.tag(48, WireType.Varint).int32(message.magicAbsorption);
         /* int32 arcane_concentration = 4; */
         if (message.arcaneConcentration !== 0)
             writer.tag(4, WireType.Varint).int32(message.arcaneConcentration);

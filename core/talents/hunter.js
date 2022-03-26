@@ -460,7 +460,7 @@ export const hunterTalentsConfig = [
                 maxPoints: 3,
             },
             {
-                //fieldName: 'deflection',
+                fieldName: 'deflection',
                 location: {
                     rowIdx: 1,
                     colIdx: 1,

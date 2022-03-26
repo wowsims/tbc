@@ -985,7 +985,31 @@ export declare enum Stat {
     /**
      * @generated from protobuf enum value: StatResilience = 34;
      */
-    StatResilience = 34
+    StatResilience = 34,
+    /**
+     * @generated from protobuf enum value: StatHealth = 35;
+     */
+    StatHealth = 35,
+    /**
+     * @generated from protobuf enum value: StatArcaneResistance = 36;
+     */
+    StatArcaneResistance = 36,
+    /**
+     * @generated from protobuf enum value: StatFireResistance = 37;
+     */
+    StatFireResistance = 37,
+    /**
+     * @generated from protobuf enum value: StatFrostResistance = 38;
+     */
+    StatFrostResistance = 38,
+    /**
+     * @generated from protobuf enum value: StatNatureResistance = 39;
+     */
+    StatNatureResistance = 39,
+    /**
+     * @generated from protobuf enum value: StatShadowResistance = 40;
+     */
+    StatShadowResistance = 40
 }
 /**
  * @generated from protobuf enum proto.ItemType

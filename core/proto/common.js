@@ -302,6 +302,30 @@ export var Stat;
      * @generated from protobuf enum value: StatResilience = 34;
      */
     Stat[Stat["StatResilience"] = 34] = "StatResilience";
+    /**
+     * @generated from protobuf enum value: StatHealth = 35;
+     */
+    Stat[Stat["StatHealth"] = 35] = "StatHealth";
+    /**
+     * @generated from protobuf enum value: StatArcaneResistance = 36;
+     */
+    Stat[Stat["StatArcaneResistance"] = 36] = "StatArcaneResistance";
+    /**
+     * @generated from protobuf enum value: StatFireResistance = 37;
+     */
+    Stat[Stat["StatFireResistance"] = 37] = "StatFireResistance";
+    /**
+     * @generated from protobuf enum value: StatFrostResistance = 38;
+     */
+    Stat[Stat["StatFrostResistance"] = 38] = "StatFrostResistance";
+    /**
+     * @generated from protobuf enum value: StatNatureResistance = 39;
+     */
+    Stat[Stat["StatNatureResistance"] = 39] = "StatNatureResistance";
+    /**
+     * @generated from protobuf enum value: StatShadowResistance = 40;
+     */
+    Stat[Stat["StatShadowResistance"] = 40] = "StatShadowResistance";
 })(Stat || (Stat = {}));
 /**
  * @generated from protobuf enum proto.ItemType

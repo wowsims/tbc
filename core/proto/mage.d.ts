@@ -23,6 +23,10 @@ export interface MageTalents {
      */
     wandSpecialization: number;
     /**
+     * @generated from protobuf field: int32 magic_absorption = 48;
+     */
+    magicAbsorption: number;
+    /**
      * @generated from protobuf field: int32 arcane_concentration = 4;
      */
     arcaneConcentration: number;

@@ -218,7 +218,7 @@ export const shamanTalentsConfig = [
                 maxPoints: 5,
             },
             {
-                //fieldName: 'shieldSpecialization',
+                fieldName: 'shieldSpecialization',
                 location: {
                     rowIdx: 0,
                     colIdx: 2,
@@ -281,7 +281,7 @@ export const shamanTalentsConfig = [
                 maxPoints: 1,
             },
             {
-                //fieldName: 'anticipation',
+                fieldName: 'anticipation',
                 location: {
                     rowIdx: 2,
                     colIdx: 3,
@@ -303,7 +303,7 @@ export const shamanTalentsConfig = [
                 maxPoints: 5,
             },
             {
-                //fieldName: 'toughness',
+                fieldName: 'toughness',
                 location: {
                     rowIdx: 3,
                     colIdx: 2,

@@ -85,9 +85,17 @@ export interface RogueTalents {
      */
     improvedSinisterStrike: number;
     /**
+     * @generated from protobuf field: int32 lightning_reflexes = 48;
+     */
+    lightningReflexes: number;
+    /**
      * @generated from protobuf field: int32 improved_slice_and_dice = 19;
      */
     improvedSliceAndDice: number;
+    /**
+     * @generated from protobuf field: int32 deflection = 49;
+     */
+    deflection: number;
     /**
      * @generated from protobuf field: int32 precision = 20;
      */

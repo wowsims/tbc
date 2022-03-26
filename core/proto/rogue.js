@@ -55,7 +55,9 @@ class RogueTalents$Type extends MessageType {
             { no: 16, name: "find_weakness", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 17, name: "mutilate", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 18, name: "improved_sinister_strike", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 48, name: "lightning_reflexes", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 19, name: "improved_slice_and_dice", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 49, name: "deflection", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 20, name: "precision", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 21, name: "dagger_specialization", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 22, name: "dual_wield_specialization", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -87,7 +89,7 @@ class RogueTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { improvedEviscerate: 0, malice: 0, ruthlessness: 0, murder: 0, puncturingWounds: 0, relentlessStrikes: false, improvedExposeArmor: 0, lethality: 0, vilePoisons: 0, improvedPoisons: 0, coldBlood: false, quickRecovery: 0, sealFate: 0, masterPoisoner: 0, vigor: false, findWeakness: 0, mutilate: false, improvedSinisterStrike: 0, improvedSliceAndDice: 0, precision: 0, daggerSpecialization: 0, dualWieldSpecialization: 0, maceSpecialization: 0, bladeFlurry: false, swordSpecialization: 0, fistWeaponSpecialization: 0, weaponExpertise: 0, aggression: 0, vitality: 0, adrenalineRush: false, combatPotency: 0, surpriseAttacks: false, opportunity: 0, sleightOfHand: 0, initiative: 0, ghostlyStrike: false, improvedAmbush: 0, elusiveness: 0, serratedBlades: 0, preparation: false, dirtyDeeds: 0, hemorrhage: false, masterOfSubtlety: 0, deadliness: 0, premeditation: false, sinisterCalling: 0, shadowstep: false };
+        const message = { improvedEviscerate: 0, malice: 0, ruthlessness: 0, murder: 0, puncturingWounds: 0, relentlessStrikes: false, improvedExposeArmor: 0, lethality: 0, vilePoisons: 0, improvedPoisons: 0, coldBlood: false, quickRecovery: 0, sealFate: 0, masterPoisoner: 0, vigor: false, findWeakness: 0, mutilate: false, improvedSinisterStrike: 0, lightningReflexes: 0, improvedSliceAndDice: 0, deflection: 0, precision: 0, daggerSpecialization: 0, dualWieldSpecialization: 0, maceSpecialization: 0, bladeFlurry: false, swordSpecialization: 0, fistWeaponSpecialization: 0, weaponExpertise: 0, aggression: 0, vitality: 0, adrenalineRush: false, combatPotency: 0, surpriseAttacks: false, opportunity: 0, sleightOfHand: 0, initiative: 0, ghostlyStrike: false, improvedAmbush: 0, elusiveness: 0, serratedBlades: 0, preparation: false, dirtyDeeds: 0, hemorrhage: false, masterOfSubtlety: 0, deadliness: 0, premeditation: false, sinisterCalling: 0, shadowstep: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -152,8 +154,14 @@ class RogueTalents$Type extends MessageType {
                 case /* int32 improved_sinister_strike */ 18:
                     message.improvedSinisterStrike = reader.int32();
                     break;
+                case /* int32 lightning_reflexes */ 48:
+                    message.lightningReflexes = reader.int32();
+                    break;
                 case /* int32 improved_slice_and_dice */ 19:
                     message.improvedSliceAndDice = reader.int32();
+                    break;
+                case /* int32 deflection */ 49:
+                    message.deflection = reader.int32();
                     break;
                 case /* int32 precision */ 20:
                     message.precision = reader.int32();
@@ -305,9 +313,15 @@ class RogueTalents$Type extends MessageType {
         /* int32 improved_sinister_strike = 18; */
         if (message.improvedSinisterStrike !== 0)
             writer.tag(18, WireType.Varint).int32(message.improvedSinisterStrike);
+        /* int32 lightning_reflexes = 48; */
+        if (message.lightningReflexes !== 0)
+            writer.tag(48, WireType.Varint).int32(message.lightningReflexes);
         /* int32 improved_slice_and_dice = 19; */
         if (message.improvedSliceAndDice !== 0)
             writer.tag(19, WireType.Varint).int32(message.improvedSliceAndDice);
+        /* int32 deflection = 49; */
+        if (message.deflection !== 0)
+            writer.tag(49, WireType.Varint).int32(message.deflection);
         /* int32 precision = 20; */
         if (message.precision !== 0)
             writer.tag(20, WireType.Varint).int32(message.precision);

@@ -235,7 +235,7 @@ export const rogueTalentsConfig = [
                 maxPoints: 2,
             },
             {
-                //fieldName: 'lightningReflexees',
+                fieldName: 'lightningReflexes',
                 location: {
                     rowIdx: 0,
                     colIdx: 2,
@@ -253,7 +253,7 @@ export const rogueTalentsConfig = [
                 maxPoints: 3,
             },
             {
-                //fieldName: 'deflection',
+                fieldName: 'deflection',
                 location: {
                     rowIdx: 1,
                     colIdx: 1,

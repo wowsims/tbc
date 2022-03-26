@@ -77,6 +77,10 @@ export interface ShamanTalents {
      */
     ancestralKnowledge: number;
     /**
+     * @generated from protobuf field: int32 shield_specialization = 37;
+     */
+    shieldSpecialization: number;
+    /**
      * @generated from protobuf field: int32 thundering_strikes = 16;
      */
     thunderingStrikes: number;
@@ -89,9 +93,17 @@ export interface ShamanTalents {
      */
     shamanisticFocus: boolean;
     /**
+     * @generated from protobuf field: int32 anticipation = 38;
+     */
+    anticipation: number;
+    /**
      * @generated from protobuf field: int32 flurry = 19;
      */
     flurry: number;
+    /**
+     * @generated from protobuf field: int32 toughness = 39;
+     */
+    toughness: number;
     /**
      * @generated from protobuf field: int32 improved_weapon_totems = 20;
      */

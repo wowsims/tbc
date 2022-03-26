@@ -147,6 +147,10 @@ export interface HunterTalents {
      */
     savageStrikes: number;
     /**
+     * @generated from protobuf field: int32 deflection = 46;
+     */
+    deflection: number;
+    /**
      * @generated from protobuf field: int32 clever_traps = 33;
      */
     cleverTraps: number;
