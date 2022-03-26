@@ -52,6 +52,12 @@ const (
 	Dodge
 	Parry
 	Resilience
+	Health
+	ArcaneResistance
+	FireResistance
+	FrostResistance
+	NatureResistance
+	ShadowResistance
 
 	Len
 )
@@ -136,6 +142,18 @@ func (s Stat) StatName() string {
 		return "Parry"
 	case Resilience:
 		return "Resilience"
+	case Health:
+		return "Health"
+	case FireResistance:
+		return "FireResistance"
+	case NatureResistance:
+		return "NatureResistance"
+	case FrostResistance:
+		return "FrostResistance"
+	case ShadowResistance:
+		return "ShadowResistance"
+	case ArcaneResistance:
+		return "ArcaneResistance"
 	}
 
 	return "none"

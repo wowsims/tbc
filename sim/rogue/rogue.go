@@ -338,6 +338,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  92,
 		stats.Agility:   160,
 		stats.Stamina:   88,
@@ -348,6 +349,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  97,
 		stats.Agility:   154,
 		stats.Stamina:   92,
@@ -358,6 +360,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceGnome, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  90,
 		stats.Agility:   161,
 		stats.Stamina:   88,
@@ -368,6 +371,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  95,
 		stats.Agility:   158,
 		stats.Stamina:   89,
@@ -378,6 +382,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  92,
 		stats.Agility:   163,
 		stats.Stamina:   88,
@@ -388,6 +393,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  98,
 		stats.Agility:   155,
 		stats.Stamina:   91,
@@ -398,6 +404,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	trollStats := stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  96,
 		stats.Agility:   160,
 		stats.Stamina:   90,
@@ -410,6 +417,7 @@ func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassRogue}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassRogue}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceUndead, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  94,
 		stats.Agility:   156,
 		stats.Stamina:   90,

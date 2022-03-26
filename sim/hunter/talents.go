@@ -34,6 +34,18 @@ func (hunter *Hunter) ApplyTalents() {
 	hunter.PseudoStats.RangedSpeedMultiplier *= 1 + 0.04*float64(hunter.Talents.SerpentsSwiftness)
 	hunter.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*1*float64(hunter.Talents.Surefooted))
 	hunter.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(hunter.Talents.KillerInstinct))
+	hunter.AddStat(stats.Parry, core.ParryRatingPerParryChance*1*float64(hunter.Talents.Deflection))
+
+	if hunter.Talents.Survivalist > 0 {
+		healthBonus := 1 + 0.02*float64(hunter.Talents.Survivalist)
+		hunter.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Health,
+			ModifiedStat: stats.Health,
+			Modifier: func(health float64, _ float64) float64 {
+				return health * healthBonus
+			},
+		})
+	}
 
 	if hunter.Talents.CombatExperience > 0 {
 		agiBonus := 1 + 0.01*float64(hunter.Talents.CombatExperience)

@@ -134,6 +134,7 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassPaladin}] = stats.Stats{
+		stats.Health:      3197,
 		stats.Stamina:     118,
 		stats.Intellect:   87,
 		stats.Mana:        2953,
@@ -145,6 +146,7 @@ func init() {
 		stats.SpellCrit:   73.69,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassPaladin}] = stats.Stats{
+		stats.Health:      3197,
 		stats.Stamina:     119,
 		stats.Intellect:   84,
 		stats.Mana:        2953,
@@ -156,6 +158,7 @@ func init() {
 		stats.SpellCrit:   73.69,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassPaladin}] = stats.Stats{
+		stats.Health:      3197,
 		stats.Stamina:     120,
 		stats.Intellect:   83,
 		stats.Mana:        2953,
@@ -167,6 +170,7 @@ func init() {
 		stats.SpellCrit:   73.69,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassPaladin}] = stats.Stats{
+		stats.Health:      3197,
 		stats.Stamina:     123,
 		stats.Intellect:   82,
 		stats.Mana:        2953,

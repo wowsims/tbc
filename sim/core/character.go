@@ -155,6 +155,13 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 
 func (character *Character) addUniversalStatDependencies() {
 	character.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Stamina,
+		ModifiedStat: stats.Health,
+		Modifier: func(stamina float64, health float64) float64 {
+			return health + stamina*10
+		},
+	})
+	character.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.Armor,
 		Modifier: func(agility float64, armor float64) float64 {

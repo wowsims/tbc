@@ -8,6 +8,7 @@ message MageTalents {
 	int32 arcane_subtlety = 1;
 	int32 arcane_focus = 2;
 	int32 wand_specialization = 3;
+	int32 magic_absorption = 48;
 	int32 arcane_concentration = 4;
 	int32 arcane_impact = 5;
 	int32 arcane_meditation = 6;

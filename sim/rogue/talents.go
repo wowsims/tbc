@@ -17,6 +17,8 @@ func (rogue *Rogue) ApplyTalents() {
 	rogue.applyWeaponSpecializations()
 	rogue.applyCombatPotency()
 
+	rogue.AddStat(stats.Dodge, core.DodgeRatingPerDodgeChance*1*float64(rogue.Talents.LightningReflexes))
+	rogue.AddStat(stats.Parry, core.ParryRatingPerParryChance*1*float64(rogue.Talents.Deflection))
 	rogue.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(rogue.Talents.Malice))
 	rogue.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*1*float64(rogue.Talents.Precision))
 	rogue.AddStat(stats.Expertise, core.ExpertisePerQuarterPercentReduction*5*float64(rogue.Talents.WeaponExpertise))

@@ -310,6 +310,7 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassShaman}] = stats.Stats{
+		stats.Health:      2979,
 		stats.Strength:    103,
 		stats.Agility:     61,
 		stats.Stamina:     113,
@@ -321,6 +322,7 @@ func init() {
 		stats.MeleeCrit:   37.07,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassShaman}] = stats.Stats{
+		stats.Health:      2979,
 		stats.Strength:    105,
 		stats.Agility:     61,
 		stats.Stamina:     116,
@@ -332,6 +334,7 @@ func init() {
 		stats.MeleeCrit:   37.07,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassShaman}] = stats.Stats{
+		stats.Health:      2979,
 		stats.Strength:    107,
 		stats.Agility:     59,
 		stats.Stamina:     116,
@@ -344,6 +347,7 @@ func init() {
 	}
 
 	trollStats := stats.Stats{
+		stats.Health:      2979,
 		stats.Strength:    103,
 		stats.Agility:     66,
 		stats.Stamina:     115,

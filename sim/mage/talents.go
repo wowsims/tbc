@@ -53,6 +53,9 @@ func (mage *Mage) ApplyTalents() {
 	if mage.Talents.PlayingWithFire > 0 {
 		mage.spellDamageMultiplier += float64(mage.Talents.PlayingWithFire) * 0.01
 	}
+
+	magicAbsorptionBonus := 2 * float64(mage.Talents.MagicAbsorption)
+	mage.AddStat(stats.ArcaneResistance, magicAbsorptionBonus)
 }
 
 var ArcaneConcentrationAuraID = core.NewAuraID()

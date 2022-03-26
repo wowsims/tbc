@@ -17,6 +17,21 @@ func (shaman *Shaman) ApplyTalents() {
 		shaman.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(shaman.Talents.ThunderingStrikes))
 	}
 
+	shaman.AddStat(stats.Dodge, core.DodgeRatingPerDodgeChance*1*float64(shaman.Talents.Anticipation))
+	shaman.AddStat(stats.Block, core.BlockRatingPerBlockChance*1*float64(shaman.Talents.ShieldSpecialization))
+	shaman.AddStat(stats.Armor, shaman.Equip.Stats()[stats.Armor]*0.02*float64(shaman.Talents.Toughness))
+
+	if shaman.Talents.ShieldSpecialization > 0 {
+		bonus := 1 + 0.05*float64(shaman.Talents.ShieldSpecialization)
+		shaman.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.BlockValue,
+			ModifiedStat: stats.BlockValue,
+			Modifier: func(bv float64, _ float64) float64 {
+				return bv * bonus
+			},
+		})
+	}
+
 	if shaman.Talents.DualWieldSpecialization > 0 && shaman.HasOHWeapon() {
 		shaman.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*2*float64(shaman.Talents.DualWieldSpecialization))
 	}
