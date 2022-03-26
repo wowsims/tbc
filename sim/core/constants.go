@@ -21,6 +21,14 @@ const ArmorPenPerPercentArmor = 5.92
 const SpellCritRatingPerCritChance = 22.08
 const SpellHitRatingPerHitChance = 12.62
 
+const DefenseRatingPerDefense = 2.3654
+const MissDodgeParryBlockCritChancePerDefense = 0.04
+const BlockRatingPerBlockChance = 7.8846
+const DodgeRatingPerDodgeChance = 18.9231
+const ParryRatingPerParryChance = 23.6538
+const ResilienceRatingPerCritReductionChance = 39.4231
+const ResilienceRatingPerCritDamageReductionPercent = 39.4231 / 2
+
 // IDs for items used in core
 const (
 	ItemIDAtieshMage            = 22589
