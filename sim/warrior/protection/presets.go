@@ -38,7 +38,8 @@ var PlayerOptionsBasic = &proto.Player_ProtectionWarrior{
 }
 
 var warriorRotation = &proto.ProtectionWarrior_Rotation{
-	DemoShout: proto.ProtectionWarrior_Rotation_DemoShoutMaintain,
+	DemoShout:   proto.ProtectionWarrior_Rotation_DemoShoutMaintain,
+	ThunderClap: proto.ProtectionWarrior_Rotation_ThunderClapMaintain,
 }
 
 var warriorOptions = &proto.ProtectionWarrior_Options{

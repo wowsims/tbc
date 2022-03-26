@@ -14,6 +14,7 @@ import {
 	ProtectionWarrior,
 	ProtectionWarrior_Rotation as ProtectionWarriorRotation,
 	ProtectionWarrior_Rotation_DemoShout as DemoShout,
+	ProtectionWarrior_Rotation_ThunderClap as ThunderClap,
 	ProtectionWarrior_Options as ProtectionWarriorOptions
 } from '/tbc/core/proto/warrior.js';
 
@@ -34,6 +35,7 @@ export const ImpaleProtTalents = {
 
 export const DefaultRotation = ProtectionWarriorRotation.create({
 	demoShout: DemoShout.DemoShoutMaintain,
+	thunderClap: ThunderClap.ThunderClapMaintain,
 });
 
 export const DefaultOptions = ProtectionWarriorOptions.create({
