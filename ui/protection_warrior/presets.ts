@@ -10,6 +10,7 @@ import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
 import {
+	WarriorShout,
 	WarriorTalents as WarriorTalents,
 	ProtectionWarrior,
 	ProtectionWarrior_Rotation as ProtectionWarriorRotation,
@@ -39,9 +40,12 @@ export const DefaultRotation = ProtectionWarriorRotation.create({
 });
 
 export const DefaultOptions = ProtectionWarriorOptions.create({
+	shout: WarriorShout.WarriorShoutCommanding,
+	precastShout: true,
+	precastShoutSapphire: false,
+	precastShoutT2: false,
+
 	startingRage: 0,
-	precastSapphire: false,
-	precastT2: false,
 });
 
 export const DefaultConsumes = Consumes.create({

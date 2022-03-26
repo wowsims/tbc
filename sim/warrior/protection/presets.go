@@ -43,9 +43,12 @@ var warriorRotation = &proto.ProtectionWarrior_Rotation{
 }
 
 var warriorOptions = &proto.ProtectionWarrior_Options{
-	StartingRage:    0,
-	PrecastT2:       false,
-	PrecastSapphire: false,
+	Shout:                proto.WarriorShout_WarriorShoutCommanding,
+	PrecastShout:         false,
+	PrecastShoutT2:       false,
+	PrecastShoutSapphire: false,
+
+	StartingRage: 0,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{

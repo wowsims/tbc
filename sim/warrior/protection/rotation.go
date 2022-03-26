@@ -19,6 +19,8 @@ func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 			war.NewShieldSlam(sim, target).Cast(sim)
 		} else if war.CanRevenge(sim) {
 			war.NewRevenge(sim, target).Cast(sim)
+		} else if war.ShouldShout(sim) {
+			war.CastShout(sim)
 		} else if (war.Rotation.ThunderClap == proto.ProtectionWarrior_Rotation_ThunderClapOnCD || (war.Rotation.ThunderClap == proto.ProtectionWarrior_Rotation_ThunderClapMaintain && target.RemainingAuraDuration(sim, core.ThunderClapDebuffID) < time.Second*2)) && war.CanThunderClap(sim) {
 			war.NewThunderClap(sim).Cast(sim)
 		} else if (war.Rotation.DemoShout == proto.ProtectionWarrior_Rotation_DemoShoutFiller || (war.Rotation.DemoShout == proto.ProtectionWarrior_Rotation_DemoShoutMaintain && target.RemainingAuraDuration(sim, core.DemoralizingShoutDebuffID) < time.Second*2)) && war.CanDemoralizingShout(sim) {

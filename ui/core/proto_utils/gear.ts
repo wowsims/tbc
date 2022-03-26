@@ -93,6 +93,10 @@ export class Gear {
 		];
 	}
 
+	hasTrinket(itemId: number): boolean {
+		return this.getTrinkets().map(t => t?.item.id).includes(itemId);
+	}
+
 	asArray(): Array<EquippedItem | null> {
 		return Object.values(this.gear);
 	}

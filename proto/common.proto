@@ -342,6 +342,9 @@ message PartyBuffs {
 		bool bs_solarian_sapphire = 28;
 		bool snapshot_bs_solarian_sapphire = 29;
 		bool snapshot_bs_t2 = 30;
+
+		// Mitigation buffs
+    TristateEffect commanding_shout = 32;
 }
 
 enum StrengthOfEarthType {
