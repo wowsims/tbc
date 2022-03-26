@@ -95,7 +95,7 @@ func (s Stat) StatName() string {
 	case MP5:
 		return "MP5"
 	case SpellPenetration:
-		return "StatSpellPenetration"
+		return "SpellPenetration"
 	case FireSpellPower:
 		return "FireSpellPower"
 	case NatureSpellPower:
