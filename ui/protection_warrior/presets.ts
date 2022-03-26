@@ -9,7 +9,13 @@ import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
-import { ProtectionWarrior, ProtectionWarrior_Rotation as ProtectionWarriorRotation, WarriorTalents as WarriorTalents, ProtectionWarrior_Options as ProtectionWarriorOptions } from '/tbc/core/proto/warrior.js';
+import {
+	WarriorTalents as WarriorTalents,
+	ProtectionWarrior,
+	ProtectionWarrior_Rotation as ProtectionWarriorRotation,
+	ProtectionWarrior_Rotation_DemoShout as DemoShout,
+	ProtectionWarrior_Options as ProtectionWarriorOptions
+} from '/tbc/core/proto/warrior.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
@@ -27,6 +33,7 @@ export const ImpaleProtTalents = {
 };
 
 export const DefaultRotation = ProtectionWarriorRotation.create({
+	demoShout: DemoShout.DemoShoutMaintain,
 });
 
 export const DefaultOptions = ProtectionWarriorOptions.create({

@@ -27,7 +27,9 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 	warOptions := options.GetProtectionWarrior()
 
 	war := &ProtectionWarrior{
-		Warrior: warrior.NewWarrior(character, *warOptions.Talents),
+		Warrior:  warrior.NewWarrior(character, *warOptions.Talents),
+		Rotation: *warOptions.Rotation,
+		Options:  *warOptions.Options,
 	}
 
 	war.EnableRageBar(warOptions.Options.StartingRage, func(sim *core.Simulation) {
@@ -50,7 +52,8 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 type ProtectionWarrior struct {
 	*warrior.Warrior
 
-	Options proto.Warrior_Options
+	Rotation proto.ProtectionWarrior_Rotation
+	Options  proto.ProtectionWarrior_Options
 }
 
 func (war *ProtectionWarrior) GetWarrior() *warrior.Warrior {

@@ -29,6 +29,9 @@ type Warrior struct {
 	bloodthirstTemplate core.SimpleSpellTemplate
 	bloodthirst         core.SimpleSpell
 
+	demoralizingShoutTemplate core.SimpleSpellTemplate
+	demoralizingShout         core.SimpleSpell
+
 	devastateTemplate core.SimpleSpellTemplate
 	devastate         core.SimpleSpell
 
@@ -57,6 +60,7 @@ func (warrior *Warrior) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.bloodthirstTemplate = warrior.newBloodthirstTemplate(sim)
+	warrior.demoralizingShoutTemplate = warrior.newDemoralizingShoutTemplate(sim)
 	warrior.devastateTemplate = warrior.newDevastateTemplate(sim)
 	warrior.heroicStrikeTemplate = warrior.newHeroicStrikeTemplate(sim)
 	warrior.revengeTemplate = warrior.newRevengeTemplate(sim)
