@@ -408,6 +408,10 @@ export interface ProtectionWarrior_Rotation {
      * @generated from protobuf field: proto.ProtectionWarrior.Rotation.DemoShout demo_shout = 1;
      */
     demoShout: ProtectionWarrior_Rotation_DemoShout;
+    /**
+     * @generated from protobuf field: proto.ProtectionWarrior.Rotation.ThunderClap thunder_clap = 2;
+     */
+    thunderClap: ProtectionWarrior_Rotation_ThunderClap;
 }
 /**
  * @generated from protobuf enum proto.ProtectionWarrior.Rotation.DemoShout
@@ -425,6 +429,23 @@ export declare enum ProtectionWarrior_Rotation_DemoShout {
      * @generated from protobuf enum value: DemoShoutFiller = 2;
      */
     DemoShoutFiller = 2
+}
+/**
+ * @generated from protobuf enum proto.ProtectionWarrior.Rotation.ThunderClap
+ */
+export declare enum ProtectionWarrior_Rotation_ThunderClap {
+    /**
+     * @generated from protobuf enum value: ThunderClapNone = 0;
+     */
+    ThunderClapNone = 0,
+    /**
+     * @generated from protobuf enum value: ThunderClapMaintain = 1;
+     */
+    ThunderClapMaintain = 1,
+    /**
+     * @generated from protobuf enum value: ThunderClapOnCD = 2;
+     */
+    ThunderClapOnCD = 2
 }
 /**
  * @generated from protobuf message proto.ProtectionWarrior.Options

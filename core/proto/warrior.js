@@ -53,6 +53,24 @@ export var ProtectionWarrior_Rotation_DemoShout;
      */
     ProtectionWarrior_Rotation_DemoShout[ProtectionWarrior_Rotation_DemoShout["DemoShoutFiller"] = 2] = "DemoShoutFiller";
 })(ProtectionWarrior_Rotation_DemoShout || (ProtectionWarrior_Rotation_DemoShout = {}));
+/**
+ * @generated from protobuf enum proto.ProtectionWarrior.Rotation.ThunderClap
+ */
+export var ProtectionWarrior_Rotation_ThunderClap;
+(function (ProtectionWarrior_Rotation_ThunderClap) {
+    /**
+     * @generated from protobuf enum value: ThunderClapNone = 0;
+     */
+    ProtectionWarrior_Rotation_ThunderClap[ProtectionWarrior_Rotation_ThunderClap["ThunderClapNone"] = 0] = "ThunderClapNone";
+    /**
+     * @generated from protobuf enum value: ThunderClapMaintain = 1;
+     */
+    ProtectionWarrior_Rotation_ThunderClap[ProtectionWarrior_Rotation_ThunderClap["ThunderClapMaintain"] = 1] = "ThunderClapMaintain";
+    /**
+     * @generated from protobuf enum value: ThunderClapOnCD = 2;
+     */
+    ProtectionWarrior_Rotation_ThunderClap[ProtectionWarrior_Rotation_ThunderClap["ThunderClapOnCD"] = 2] = "ThunderClapOnCD";
+})(ProtectionWarrior_Rotation_ThunderClap || (ProtectionWarrior_Rotation_ThunderClap = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class WarriorTalents$Type extends MessageType {
     constructor() {
@@ -937,11 +955,12 @@ export const ProtectionWarrior = new ProtectionWarrior$Type();
 class ProtectionWarrior_Rotation$Type extends MessageType {
     constructor() {
         super("proto.ProtectionWarrior.Rotation", [
-            { no: 1, name: "demo_shout", kind: "enum", T: () => ["proto.ProtectionWarrior.Rotation.DemoShout", ProtectionWarrior_Rotation_DemoShout] }
+            { no: 1, name: "demo_shout", kind: "enum", T: () => ["proto.ProtectionWarrior.Rotation.DemoShout", ProtectionWarrior_Rotation_DemoShout] },
+            { no: 2, name: "thunder_clap", kind: "enum", T: () => ["proto.ProtectionWarrior.Rotation.ThunderClap", ProtectionWarrior_Rotation_ThunderClap] }
         ]);
     }
     create(value) {
-        const message = { demoShout: 0 };
+        const message = { demoShout: 0, thunderClap: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -954,6 +973,9 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
             switch (fieldNo) {
                 case /* proto.ProtectionWarrior.Rotation.DemoShout demo_shout */ 1:
                     message.demoShout = reader.int32();
+                    break;
+                case /* proto.ProtectionWarrior.Rotation.ThunderClap thunder_clap */ 2:
+                    message.thunderClap = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -970,6 +992,9 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
         /* proto.ProtectionWarrior.Rotation.DemoShout demo_shout = 1; */
         if (message.demoShout !== 0)
             writer.tag(1, WireType.Varint).int32(message.demoShout);
+        /* proto.ProtectionWarrior.Rotation.ThunderClap thunder_clap = 2; */
+        if (message.thunderClap !== 0)
+            writer.tag(2, WireType.Varint).int32(message.thunderClap);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

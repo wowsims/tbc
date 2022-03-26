@@ -3,7 +3,7 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
-import { ProtectionWarrior_Rotation as ProtectionWarriorRotation, ProtectionWarrior_Rotation_DemoShout as DemoShout, ProtectionWarrior_Options as ProtectionWarriorOptions } from '/tbc/core/proto/warrior.js';
+import { ProtectionWarrior_Rotation as ProtectionWarriorRotation, ProtectionWarrior_Rotation_DemoShout as DemoShout, ProtectionWarrior_Rotation_ThunderClap as ThunderClap, ProtectionWarrior_Options as ProtectionWarriorOptions } from '/tbc/core/proto/warrior.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // Preset options for this spec.
 // Eventually we will import these values for the raid sim too, so its good to
@@ -16,6 +16,7 @@ export const ImpaleProtTalents = {
 };
 export const DefaultRotation = ProtectionWarriorRotation.create({
     demoShout: DemoShout.DemoShoutMaintain,
+    thunderClap: ThunderClap.ThunderClapMaintain,
 });
 export const DefaultOptions = ProtectionWarriorOptions.create({
     startingRage: 0,
