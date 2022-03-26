@@ -166,6 +166,14 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	sobActive := ret.RemainingAuraDuration(sim, paladin.SealOfBloodAuraID) > 0
 	socActive := ret.RemainingAuraDuration(sim, paladin.SealOfCommandAuraID) > 0
 
+	// Use Judgement if we will twist
+	if judgmentCD == 0 && willTwist && sobActive {
+		judgement := ret.NewJudgementOfBlood(sim, target)
+		if judgement != nil {
+			judgement.Cast(sim)
+		}
+	}
+
 	if !gcdActive {
 		if socActive && inTwistWindow {
 			// If Seal of Command is Active, complete the twist
