@@ -496,3 +496,17 @@ func DemoralizingShoutAura(target *Target, boomingVoicePts int32, impDemoShoutPt
 		},
 	}
 }
+
+var ThunderClapDebuffID = NewDebuffID()
+
+func ThunderClapAura(target *Target, impThunderClapPts int32) Aura {
+	return Aura{
+		ID:       ThunderClapDebuffID,
+		ActionID: ActionID{SpellID: 25264},
+		Duration: time.Second * 30,
+		OnGain: func(sim *Simulation) {
+		},
+		OnExpire: func(sim *Simulation) {
+		},
+	}
+}

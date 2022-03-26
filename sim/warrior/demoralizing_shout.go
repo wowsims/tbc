@@ -29,12 +29,6 @@ func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.
 				},
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ThreatMultiplier: 1,
-				FlatThreatBonus:  56,
-			},
-		},
 	}
 
 	baseEffect := core.SpellHitEffect{

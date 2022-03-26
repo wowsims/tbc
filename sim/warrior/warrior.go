@@ -47,6 +47,9 @@ type Warrior struct {
 	sunderArmorTemplate core.SimpleSpellTemplate
 	sunderArmor         core.SimpleSpell
 
+	thunderClapTemplate core.SimpleSpellTemplate
+	thunderClap         core.SimpleSpell
+
 	whirlwindTemplate core.SimpleSpellTemplate
 	whirlwind         core.SimpleSpell
 }
@@ -66,6 +69,7 @@ func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.revengeTemplate = warrior.newRevengeTemplate(sim)
 	warrior.shieldSlamTemplate = warrior.newShieldSlamTemplate(sim)
 	warrior.sunderArmorTemplate = warrior.newSunderArmorTemplate(sim)
+	warrior.thunderClapTemplate = warrior.newThunderClapTemplate(sim)
 	warrior.whirlwindTemplate = warrior.newWhirlwindTemplate(sim)
 }
 
@@ -113,15 +117,18 @@ func NewWarrior(character core.Character, talents proto.WarriorTalents) *Warrior
 	return warrior
 }
 
-func (warrior *Warrior) critMultiplier(applyImpale bool) float64 {
-	primaryModifier := 1.0
+func (warrior *Warrior) secondaryCritModifier(applyImpale bool) float64 {
 	secondaryModifier := 0.0
-
 	if applyImpale {
 		secondaryModifier += 0.1 * float64(warrior.Talents.Impale)
 	}
-
-	return warrior.MeleeCritMultiplier(primaryModifier, secondaryModifier)
+	return secondaryModifier
+}
+func (warrior *Warrior) critMultiplier(applyImpale bool) float64 {
+	return warrior.MeleeCritMultiplier(1.0, warrior.secondaryCritModifier(applyImpale))
+}
+func (warrior *Warrior) spellCritMultiplier(applyImpale bool) float64 {
+	return warrior.SpellCritMultiplier(1.0, warrior.secondaryCritModifier(applyImpale))
 }
 
 func init() {

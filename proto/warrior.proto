@@ -132,6 +132,13 @@ message ProtectionWarrior {
 				DemoShoutFiller = 2;
 			}
 			DemoShout demo_shout = 1;
+
+			enum ThunderClap {
+				ThunderClapNone = 0;
+				ThunderClapMaintain = 1;
+				ThunderClapOnCD = 2;
+			}
+			ThunderClap thunder_clap = 2;
 		}
     Rotation rotation = 1;
 

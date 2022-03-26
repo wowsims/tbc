@@ -14,6 +14,7 @@ import {
 	ProtectionWarrior,
 	ProtectionWarrior_Rotation as ProtectionWarriorRotation,
 	ProtectionWarrior_Rotation_DemoShout as DemoShout,
+	ProtectionWarrior_Rotation_ThunderClap as ThunderClap,
 	ProtectionWarrior_Options as ProtectionWarriorOptions
 } from '/tbc/core/proto/warrior.js';
 
@@ -40,6 +41,25 @@ export const ProtectionWarriorRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
 					const newRotation = player.getRotation();
 					newRotation.demoShout = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'enum' as const, cssClass: 'thunder-clap-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Thunder Clap',
+				values: [
+					{ name: 'None', value: ThunderClap.ThunderClapNone },
+					{ name: 'Maintain Debuff', value: ThunderClap.ThunderClapMaintain },
+					{ name: 'On CD', value: ThunderClap.ThunderClapOnCD },
+				],
+				changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getRotation().thunderClap,
+				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.thunderClap = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},
