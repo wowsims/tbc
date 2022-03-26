@@ -257,6 +257,7 @@ export class RogueSimUI extends IndividualSimUI {
                     Presets.P2_PRESET,
                     Presets.P3_PRESET,
                     Presets.P4_PRESET,
+                    Presets.P5_PRESET,
                 ],
             },
         });
