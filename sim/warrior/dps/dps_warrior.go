@@ -27,7 +27,7 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 	warOptions := options.GetWarrior()
 
 	war := &DpsWarrior{
-		Warrior:      warrior.NewWarrior(character, *warOptions.Talents),
+		Warrior:      warrior.NewWarrior(character, *warOptions.Talents, warrior.WarriorInputs{}),
 		RotationType: warOptions.Rotation.Type,
 	}
 

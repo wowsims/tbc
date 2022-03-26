@@ -63,6 +63,12 @@ message WarriorTalents {
 	bool devastate = 44;
 }
 
+enum WarriorShout {
+	WarriorShoutNone = 0;
+	WarriorShoutBattle = 1;
+	WarriorShoutCommanding = 2;
+}
+
 message Warrior {
     message Rotation {
 		enum Type {
@@ -145,9 +151,12 @@ message ProtectionWarrior {
     WarriorTalents talents = 2;
     
     message Options {
+			WarriorShout shout = 4;
+			bool precast_shout = 5;
+			bool precast_shout_t2 = 2;
+			bool precast_shout_sapphire = 3; // Disabled if sapphire is equipped
+
 			double starting_rage = 1;
-			bool precast_t2 = 2;
-			bool precast_sapphire = 3; // Disabled if sapphire is equipped
     }
     Options options = 3;
 }

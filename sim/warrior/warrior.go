@@ -1,28 +1,42 @@
 package warrior
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
+
+type WarriorInputs struct {
+	Shout                proto.WarriorShout
+	PrecastShout         bool
+	PrecastShoutSapphire bool
+	PrecastShoutT2       bool
+}
 
 type Warrior struct {
 	core.Character
 
 	Talents proto.WarriorTalents
 
+	WarriorInputs
+
 	// Current state
 	Stance             Stance
 	heroicStrikeQueued bool
 	revengeTriggered   bool
+	shoutExpiresAt     time.Duration
 
 	// Cached values
+	shoutDuration    time.Duration
 	heroicStrikeCost float64
 	canShieldSlam    bool
 
-	castBattleStance    func(*core.Simulation)
-	castDefensiveStance func(*core.Simulation)
-	castBerserkerStance func(*core.Simulation)
+	CastShout           func(*core.Simulation)
+	CastBattleStance    func(*core.Simulation)
+	CastDefensiveStance func(*core.Simulation)
+	CastBerserkerStance func(*core.Simulation)
 
 	bloodthirstTemplate core.SimpleSpellTemplate
 	bloodthirst         core.SimpleSpell
@@ -57,12 +71,36 @@ func (warrior *Warrior) GetCharacter() *core.Character {
 }
 
 func (warrior *Warrior) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
+	if warrior.Shout == proto.WarriorShout_WarriorShoutBattle {
+		partyBuffs.BattleShout = core.MaxTristate(partyBuffs.BattleShout, proto.TristateEffect_TristateEffectRegular)
+		if warrior.Talents.CommandingPresence == 5 {
+			partyBuffs.BattleShout = proto.TristateEffect_TristateEffectImproved
+		}
+		if warrior.HasTrinketEquipped(30446) { // Solarian's Sapphire
+			partyBuffs.BsSolarianSapphire = true
+			partyBuffs.SnapshotBsSolarianSapphire = false
+		}
+		if warrior.PrecastShout {
+			if warrior.PrecastShoutSapphire {
+				partyBuffs.SnapshotBsSolarianSapphire = true
+			}
+			if warrior.PrecastShoutT2 {
+				partyBuffs.SnapshotBsT2 = true
+			}
+		}
+	} else if warrior.Shout == proto.WarriorShout_WarriorShoutCommanding {
+		partyBuffs.CommandingShout = core.MaxTristate(partyBuffs.CommandingShout, proto.TristateEffect_TristateEffectRegular)
+		if warrior.Talents.CommandingPresence == 5 {
+			partyBuffs.CommandingShout = proto.TristateEffect_TristateEffectImproved
+		}
+	}
 }
 
 func (warrior *Warrior) Init(sim *core.Simulation) {
-	warrior.castBattleStance = warrior.makeCastStance(sim, BattleStance, warrior.BattleStanceAura())
-	warrior.castDefensiveStance = warrior.makeCastStance(sim, DefensiveStance, warrior.DefensiveStanceAura())
-	warrior.castBerserkerStance = warrior.makeCastStance(sim, BerserkerStance, warrior.BerserkerStanceAura())
+	warrior.CastShout = warrior.makeCastShout()
+	warrior.CastBattleStance = warrior.makeCastStance(sim, BattleStance, warrior.BattleStanceAura())
+	warrior.CastDefensiveStance = warrior.makeCastStance(sim, DefensiveStance, warrior.DefensiveStanceAura())
+	warrior.CastBerserkerStance = warrior.makeCastStance(sim, BerserkerStance, warrior.BerserkerStanceAura())
 
 	warrior.bloodthirstTemplate = warrior.newBloodthirstTemplate(sim)
 	warrior.demoralizingShoutTemplate = warrior.newDemoralizingShoutTemplate(sim)
@@ -73,17 +111,27 @@ func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.sunderArmorTemplate = warrior.newSunderArmorTemplate(sim)
 	warrior.thunderClapTemplate = warrior.newThunderClapTemplate(sim)
 	warrior.whirlwindTemplate = warrior.newWhirlwindTemplate(sim)
+
+	warrior.shoutDuration = time.Duration(float64(time.Minute*2) * (1 + 0.1*float64(warrior.Talents.BoomingVoice)))
 }
 
 func (warrior *Warrior) Reset(sim *core.Simulation) {
 	warrior.heroicStrikeQueued = false
 	warrior.revengeTriggered = false
+
+	warrior.shoutExpiresAt = 0
+	if warrior.Shout != proto.WarriorShout_WarriorShoutNone {
+		if warrior.PrecastShout {
+			warrior.shoutExpiresAt = warrior.shoutDuration - time.Second*10
+		}
+	}
 }
 
-func NewWarrior(character core.Character, talents proto.WarriorTalents) *Warrior {
+func NewWarrior(character core.Character, talents proto.WarriorTalents, inputs WarriorInputs) *Warrior {
 	warrior := &Warrior{
-		Character: character,
-		Talents:   talents,
+		Character:     character,
+		Talents:       talents,
+		WarriorInputs: inputs,
 	}
 
 	warrior.Character.AddStatDependency(stats.StatDependency{
