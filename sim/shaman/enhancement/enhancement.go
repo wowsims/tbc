@@ -101,23 +101,25 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 
 	var curTime time.Duration
 
-	ssAction := common.ScheduledAbility{
-		Duration: core.GCDDefault,
-		TryCast: func(sim *core.Simulation) bool {
-			ss := enh.NewStormstrike(sim, sim.GetPrimaryTarget())
-			success := ss.Cast(sim)
-			if !success {
-				enh.WaitForMana(sim, ss.Cost.Value)
-			}
-			return success
-		},
-	}
-	curTime = core.DurationFromSeconds(enh.Rotation.FirstStormstrikeDelay)
-	for curTime <= maxDuration {
-		ability := ssAction
-		ability.DesiredCastAt = curTime
-		castAt := enh.scheduler.Schedule(ability)
-		curTime = castAt + time.Second*10
+	if enh.Talents.Stormstrike {
+		ssAction := common.ScheduledAbility{
+			Duration: core.GCDDefault,
+			TryCast: func(sim *core.Simulation) bool {
+				ss := enh.NewStormstrike(sim, sim.GetPrimaryTarget())
+				success := ss.Cast(sim)
+				if !success {
+					enh.WaitForMana(sim, ss.Cost.Value)
+				}
+				return success
+			},
+		}
+		curTime = core.DurationFromSeconds(enh.Rotation.FirstStormstrikeDelay)
+		for curTime <= maxDuration {
+			ability := ssAction
+			ability.DesiredCastAt = curTime
+			castAt := enh.scheduler.Schedule(ability)
+			curTime = castAt + time.Second*10
+		}
 	}
 
 	shockCD := enh.ShockCD()
