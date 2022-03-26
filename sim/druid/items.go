@@ -12,16 +12,15 @@ func init() {
 	core.AddItemEffect(33510, ApplyIdoloftheUnseenMoon)
 	core.AddItemEffect(32486, ApplyAshtongueTalisman)
 
-	core.AddItemSet(ItemSetMalorne)
-	core.AddItemSet(ItemSetNordrassil)
-	core.AddItemSet(ItemSetThunderheart)
+	core.AddItemSet(&ItemSetMalorne)
+	core.AddItemSet(&ItemSetNordrassil)
+	core.AddItemSet(&ItemSetThunderheart)
 }
 
 var Malorne2PcAuraID = core.NewAuraID()
 
 var ItemSetMalorne = core.ItemSet{
-	Name:  "Malorne Rainment",
-	Items: map[int32]struct{}{29093: {}, 29094: {}, 29091: {}, 29092: {}, 29095: {}},
+	Name: "Malorne Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
@@ -52,8 +51,7 @@ var ItemSetMalorne = core.ItemSet{
 var Nordrassil4pAuraID = core.NewAuraID()
 
 var ItemSetNordrassil = core.ItemSet{
-	Name:  "Nordrassil Regalia",
-	Items: map[int32]struct{}{30231: {}, 30232: {}, 30233: {}, 30234: {}, 30235: {}},
+	Name: "Nordrassil Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
@@ -82,8 +80,7 @@ var ItemSetNordrassil = core.ItemSet{
 }
 
 var ItemSetThunderheart = core.ItemSet{
-	Name:  "Thunderheart Regalia",
-	Items: map[int32]struct{}{31043: {}, 31035: {}, 31040: {}, 31046: {}, 31049: {}, 34572: {}, 34446: {}, 34555: {}},
+	Name: "Thunderheart Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// handled in moonfire.go in template construction

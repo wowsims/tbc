@@ -10,14 +10,13 @@ import (
 func init() {
 	core.AddItemEffect(32490, ApplyAshtongueTalismanOfAcumen)
 
-	core.AddItemSet(ItemSetIncarnate)
-	core.AddItemSet(ItemSetAvatar)
-	core.AddItemSet(ItemSetAbsolution)
+	core.AddItemSet(&ItemSetIncarnate)
+	core.AddItemSet(&ItemSetAvatar)
+	core.AddItemSet(&ItemSetAbsolution)
 }
 
 var ItemSetIncarnate = core.ItemSet{
-	Name:  "Incarnate Raiment",
-	Items: map[int32]struct{}{29056: {}, 29057: {}, 29058: {}, 29059: {}, 29060: {}},
+	Name: "Incarnate Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Your shadowfiend now has 75 more stamina and lasts 3 sec. longer.
@@ -35,8 +34,7 @@ var Avatar4PcAuraID = core.NewAuraID()
 var SadistAuraID = core.NewAuraID()
 
 var ItemSetAvatar = core.ItemSet{
-	Name:  "Avatar Regalia",
-	Items: map[int32]struct{}{30160: {}, 30161: {}, 30162: {}, 30159: {}, 30163: {}},
+	Name: "Avatar Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
@@ -85,8 +83,7 @@ var ItemSetAvatar = core.ItemSet{
 }
 
 var ItemSetAbsolution = core.ItemSet{
-	Name:  "Absolution Regalia",
-	Items: map[int32]struct{}{31061: {}, 31064: {}, 31067: {}, 31070: {}, 31065: {}, 34434: {}, 34528: {}, 34563: {}},
+	Name: "Absolution Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// this is implemented in swp.go

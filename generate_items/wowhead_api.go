@@ -24,13 +24,18 @@ type WowheadItemResponse struct {
 	Tooltip string `json:"tooltip"`
 }
 
-func GetRegexIntValue(srcStr string, pattern *regexp.Regexp, matchIdx int) int {
+func GetRegexStringValue(srcStr string, pattern *regexp.Regexp, matchIdx int) string {
 	match := pattern.FindStringSubmatch(srcStr)
 	if match == nil {
-		return 0
+		return ""
+	} else {
+		return match[matchIdx]
 	}
+}
+func GetRegexIntValue(srcStr string, pattern *regexp.Regexp, matchIdx int) int {
+	matchStr := GetRegexStringValue(srcStr, pattern, matchIdx)
 
-	val, err := strconv.Atoi(match[matchIdx])
+	val, err := strconv.Atoi(matchStr)
 	if err != nil {
 		return 0
 	}
@@ -48,7 +53,7 @@ func GetBestRegexIntValue(srcStr string, patterns []*regexp.Regexp, matchIdx int
 	return best
 }
 
-func (item WowheadItemResponse) TooltipWithoutSet() string {
+func (item WowheadItemResponse) TooltipWithoutSetBonus() string {
 	setIdx := strings.Index(item.Tooltip, "Set : ")
 	if setIdx == -1 {
 		return item.Tooltip
@@ -57,8 +62,12 @@ func (item WowheadItemResponse) TooltipWithoutSet() string {
 	}
 }
 
+func (item WowheadItemResponse) GetTooltipRegexString(pattern *regexp.Regexp, matchIdx int) string {
+	return GetRegexStringValue(item.TooltipWithoutSetBonus(), pattern, matchIdx)
+}
+
 func (item WowheadItemResponse) GetTooltipRegexValue(pattern *regexp.Regexp, matchIdx int) int {
-	return GetRegexIntValue(item.TooltipWithoutSet(), pattern, matchIdx)
+	return GetRegexIntValue(item.TooltipWithoutSetBonus(), pattern, matchIdx)
 }
 
 func (item WowheadItemResponse) GetIntValue(pattern *regexp.Regexp) int {
@@ -554,6 +563,12 @@ func (item WowheadItemResponse) GetGemStats() Stats {
 	stats[proto.Stat_StatHealingPower] = math.Max(float64(spellPower), float64(healingPower))
 
 	return stats
+}
+
+var itemSetNameRegex = regexp.MustCompile("<a href=\\\"\\/item-set=([0-9]+)\\\" class=\\\"q\\\">([^<]+)<")
+
+func (item WowheadItemResponse) GetItemSetName() string {
+	return item.GetTooltipRegexString(itemSetNameRegex, 2)
 }
 
 func getWowheadItemResponse(itemID int, tooltipsDB map[int]string) WowheadItemResponse {

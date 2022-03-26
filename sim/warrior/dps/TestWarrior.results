@@ -207,12 +207,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestWarrior-AllItems-EbonNetherscale"
- value: {
-  dps: 465.65608977606314
- }
-}
-dps_results: {
  key: "TestWarrior-AllItems-EmberSkyfireDiamond"
  value: {
   dps: 500.0545548018357
@@ -255,7 +249,7 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestWarrior-AllItems-Felstalker"
+ key: "TestWarrior-AllItems-FelstalkerArmor"
  value: {
   dps: 469.84747819031395
  }
@@ -381,6 +375,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestWarrior-AllItems-NetherscaleArmor"
+ value: {
+  dps: 465.65608977606314
+ }
+}
+dps_results: {
  key: "TestWarrior-AllItems-NetherstrikeArmor"
  value: {
   dps: 426.59620656152316
@@ -399,7 +399,7 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestWarrior-AllItems-Primalstrike"
+ key: "TestWarrior-AllItems-PrimalIntent"
  value: {
   dps: 519.6880301730015
  }
@@ -480,12 +480,6 @@ dps_results: {
  key: "TestWarrior-AllItems-Sorcerer'sAlchemistStone-35749"
  value: {
   dps: 504.3308114711293
- }
-}
-dps_results: {
- key: "TestWarrior-AllItems-SpellfireSet"
- value: {
-  dps: 441.16512121556843
  }
 }
 dps_results: {
@@ -624,6 +618,12 @@ dps_results: {
  key: "TestWarrior-AllItems-WorldBreaker-30090"
  value: {
   dps: 442.05375328802074
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-WrathofSpellfire"
+ value: {
+  dps: 441.16512121556843
  }
 }
 dps_results: {

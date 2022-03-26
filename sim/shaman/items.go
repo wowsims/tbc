@@ -16,14 +16,14 @@ func init() {
 	core.AddItemEffect(33506, ApplySkycallTotem)
 	core.AddItemEffect(33507, ApplyStonebreakersTotem)
 
-	core.AddItemSet(ItemSetTidefury)
-	core.AddItemSet(ItemSetCycloneRegalia)
-	core.AddItemSet(ItemSetCataclysmRegalia)
-	core.AddItemSet(ItemSetSkyshatterRegalia)
+	core.AddItemSet(&ItemSetTidefury)
+	core.AddItemSet(&ItemSetCycloneRegalia)
+	core.AddItemSet(&ItemSetCataclysmRegalia)
+	core.AddItemSet(&ItemSetSkyshatterRegalia)
 
-	core.AddItemSet(ItemSetCycloneHarness)
-	core.AddItemSet(ItemSetCataclysmHarness)
-	core.AddItemSet(ItemSetSkyshatterHarness)
+	core.AddItemSet(&ItemSetCycloneHarness)
+	core.AddItemSet(&ItemSetCataclysmHarness)
+	core.AddItemSet(&ItemSetSkyshatterHarness)
 
 	// Even though these item effects are handled elsewhere, add them so they are
 	// detected for automatic testing.
@@ -31,8 +31,7 @@ func init() {
 }
 
 var ItemSetTidefury = core.ItemSet{
-	Name:  "Tidefury Raiment",
-	Items: map[int32]struct{}{28231: {}, 27510: {}, 28349: {}, 27909: {}, 27802: {}},
+	Name: "Tidefury Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Handled in chain_lightning.go
@@ -54,8 +53,7 @@ var ItemSetTidefury = core.ItemSet{
 var Cyclone4PcAuraID = core.NewAuraID()
 var Cyclone4PcManaRegainAuraID = core.NewAuraID()
 var ItemSetCycloneRegalia = core.ItemSet{
-	Name:  "Cyclone Regalia",
-	Items: map[int32]struct{}{29033: {}, 29035: {}, 29034: {}, 29036: {}, 29037: {}},
+	Name: "Cyclone Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Handled in shaman.go
@@ -92,8 +90,7 @@ var ItemSetCycloneRegalia = core.ItemSet{
 
 var Cataclysm4PcAuraID = core.NewAuraID()
 var ItemSetCataclysmRegalia = core.ItemSet{
-	Name:  "Cataclysm Regalia",
-	Items: map[int32]struct{}{30169: {}, 30170: {}, 30171: {}, 30172: {}, 30173: {}},
+	Name: "Cataclysm Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
@@ -116,8 +113,7 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 }
 
 var ItemSetSkyshatterRegalia = core.ItemSet{
-	Name:  "Skyshatter Regalia",
-	Items: map[int32]struct{}{34437: {}, 31017: {}, 34542: {}, 31008: {}, 31014: {}, 31020: {}, 31023: {}, 34566: {}},
+	Name: "Skyshatter Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			shamanAgent, ok := agent.(ShamanAgent)
@@ -312,8 +308,7 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 // (4) Set : Your Stormstrike ability does an additional 30 damage per weapon.
 
 var ItemSetCycloneHarness = core.ItemSet{
-	Name:  "Cyclone Harness",
-	Items: map[int32]struct{}{29038: {}, 29039: {}, 29040: {}, 29043: {}, 29042: {}},
+	Name: "Cyclone Harness",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// shaman.go
@@ -329,8 +324,7 @@ var ItemSetCycloneHarness = core.ItemSet{
 // (4) Set : You gain 5% additional haste from your Flurry ability.
 
 var ItemSetCataclysmHarness = core.ItemSet{
-	Name:  "Cataclysm Harness",
-	Items: map[int32]struct{}{30185: {}, 30189: {}, 30190: {}, 30192: {}, 30194: {}},
+	Name: "Cataclysm Harness",
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
 			// shaman.go
@@ -343,8 +337,7 @@ var ItemSetCataclysmHarness = core.ItemSet{
 // 4 pieces: Whenever you use Stormstrike, you gain 70 attack power for 12 sec.
 
 var ItemSetSkyshatterHarness = core.ItemSet{
-	Name:  "Skyshatter Harness",
-	Items: map[int32]struct{}{31018: {}, 31011: {}, 31015: {}, 31021: {}, 31024: {}, 34567: {}, 34439: {}, 34545: {}},
+	Name: "Skyshatter Harness",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// implemented in shocks.go

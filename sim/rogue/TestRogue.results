@@ -411,7 +411,7 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestRogue-AllItems-Primalstrike"
+ key: "TestRogue-AllItems-PrimalIntent"
  value: {
   dps: 1426.188210998029
  }
@@ -498,12 +498,6 @@ dps_results: {
  key: "TestRogue-AllItems-Sorcerer'sAlchemistStone-35749"
  value: {
   dps: 1411.6739605874695
- }
-}
-dps_results: {
- key: "TestRogue-AllItems-SpellfireSet"
- value: {
-  dps: 1222.3172769472237
  }
 }
 dps_results: {
@@ -642,6 +636,12 @@ dps_results: {
  key: "TestRogue-AllItems-WorldBreaker-30090"
  value: {
   dps: 1002.9596606764353
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-WrathofSpellfire"
+ value: {
+  dps: 1222.3172769472237
  }
 }
 dps_results: {
