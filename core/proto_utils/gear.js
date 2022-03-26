@@ -75,6 +75,9 @@ export class Gear {
             this.getEquippedItem(ItemSlot.ItemSlotTrinket2),
         ];
     }
+    hasTrinket(itemId) {
+        return this.getTrinkets().map(t => t?.item.id).includes(itemId);
+    }
     asArray() {
         return Object.values(this.gear);
     }

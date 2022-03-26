@@ -3,7 +3,7 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
-import { ProtectionWarrior_Rotation as ProtectionWarriorRotation, ProtectionWarrior_Rotation_DemoShout as DemoShout, ProtectionWarrior_Rotation_ThunderClap as ThunderClap, ProtectionWarrior_Options as ProtectionWarriorOptions } from '/tbc/core/proto/warrior.js';
+import { WarriorShout, ProtectionWarrior_Rotation as ProtectionWarriorRotation, ProtectionWarrior_Rotation_DemoShout as DemoShout, ProtectionWarrior_Rotation_ThunderClap as ThunderClap, ProtectionWarrior_Options as ProtectionWarriorOptions } from '/tbc/core/proto/warrior.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // Preset options for this spec.
 // Eventually we will import these values for the raid sim too, so its good to
@@ -19,9 +19,11 @@ export const DefaultRotation = ProtectionWarriorRotation.create({
     thunderClap: ThunderClap.ThunderClapMaintain,
 });
 export const DefaultOptions = ProtectionWarriorOptions.create({
+    shout: WarriorShout.WarriorShoutCommanding,
+    precastShout: true,
+    precastShoutSapphire: false,
+    precastShoutT2: false,
     startingRage: 0,
-    precastSapphire: false,
-    precastT2: false,
 });
 export const DefaultConsumes = Consumes.create({
     flask: Flask.FlaskOfRelentlessAssault,

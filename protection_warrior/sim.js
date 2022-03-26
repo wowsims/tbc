@@ -186,6 +186,10 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
             // Inputs to include in the 'Other' section on the settings tab.
             otherInputs: {
                 inputs: [
+                    ProtectionWarriorInputs.ShoutPicker,
+                    ProtectionWarriorInputs.PrecastShout,
+                    ProtectionWarriorInputs.PrecastShoutWithSapphire,
+                    ProtectionWarriorInputs.PrecastShoutWithT2,
                     OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
                 ],
             },

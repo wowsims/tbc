@@ -71,6 +71,24 @@ export var ProtectionWarrior_Rotation_ThunderClap;
      */
     ProtectionWarrior_Rotation_ThunderClap[ProtectionWarrior_Rotation_ThunderClap["ThunderClapOnCD"] = 2] = "ThunderClapOnCD";
 })(ProtectionWarrior_Rotation_ThunderClap || (ProtectionWarrior_Rotation_ThunderClap = {}));
+/**
+ * @generated from protobuf enum proto.WarriorShout
+ */
+export var WarriorShout;
+(function (WarriorShout) {
+    /**
+     * @generated from protobuf enum value: WarriorShoutNone = 0;
+     */
+    WarriorShout[WarriorShout["WarriorShoutNone"] = 0] = "WarriorShoutNone";
+    /**
+     * @generated from protobuf enum value: WarriorShoutBattle = 1;
+     */
+    WarriorShout[WarriorShout["WarriorShoutBattle"] = 1] = "WarriorShoutBattle";
+    /**
+     * @generated from protobuf enum value: WarriorShoutCommanding = 2;
+     */
+    WarriorShout[WarriorShout["WarriorShoutCommanding"] = 2] = "WarriorShoutCommanding";
+})(WarriorShout || (WarriorShout = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class WarriorTalents$Type extends MessageType {
     constructor() {
@@ -1009,13 +1027,15 @@ export const ProtectionWarrior_Rotation = new ProtectionWarrior_Rotation$Type();
 class ProtectionWarrior_Options$Type extends MessageType {
     constructor() {
         super("proto.ProtectionWarrior.Options", [
-            { no: 1, name: "starting_rage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 2, name: "precast_t2", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "precast_sapphire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 4, name: "shout", kind: "enum", T: () => ["proto.WarriorShout", WarriorShout] },
+            { no: 5, name: "precast_shout", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "precast_shout_t2", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "precast_shout_sapphire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 1, name: "starting_rage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { startingRage: 0, precastT2: false, precastSapphire: false };
+        const message = { shout: 0, precastShout: false, precastShoutT2: false, precastShoutSapphire: false, startingRage: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1026,14 +1046,20 @@ class ProtectionWarrior_Options$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
+                case /* proto.WarriorShout shout */ 4:
+                    message.shout = reader.int32();
+                    break;
+                case /* bool precast_shout */ 5:
+                    message.precastShout = reader.bool();
+                    break;
+                case /* bool precast_shout_t2 */ 2:
+                    message.precastShoutT2 = reader.bool();
+                    break;
+                case /* bool precast_shout_sapphire */ 3:
+                    message.precastShoutSapphire = reader.bool();
+                    break;
                 case /* double starting_rage */ 1:
                     message.startingRage = reader.double();
-                    break;
-                case /* bool precast_t2 */ 2:
-                    message.precastT2 = reader.bool();
-                    break;
-                case /* bool precast_sapphire */ 3:
-                    message.precastSapphire = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1047,15 +1073,21 @@ class ProtectionWarrior_Options$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* proto.WarriorShout shout = 4; */
+        if (message.shout !== 0)
+            writer.tag(4, WireType.Varint).int32(message.shout);
+        /* bool precast_shout = 5; */
+        if (message.precastShout !== false)
+            writer.tag(5, WireType.Varint).bool(message.precastShout);
+        /* bool precast_shout_t2 = 2; */
+        if (message.precastShoutT2 !== false)
+            writer.tag(2, WireType.Varint).bool(message.precastShoutT2);
+        /* bool precast_shout_sapphire = 3; */
+        if (message.precastShoutSapphire !== false)
+            writer.tag(3, WireType.Varint).bool(message.precastShoutSapphire);
         /* double starting_rage = 1; */
         if (message.startingRage !== 0)
             writer.tag(1, WireType.Bit64).double(message.startingRage);
-        /* bool precast_t2 = 2; */
-        if (message.precastT2 !== false)
-            writer.tag(2, WireType.Varint).bool(message.precastT2);
-        /* bool precast_sapphire = 3; */
-        if (message.precastSapphire !== false)
-            writer.tag(3, WireType.Varint).bool(message.precastSapphire);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

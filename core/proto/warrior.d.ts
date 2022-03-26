@@ -452,17 +452,42 @@ export declare enum ProtectionWarrior_Rotation_ThunderClap {
  */
 export interface ProtectionWarrior_Options {
     /**
+     * @generated from protobuf field: proto.WarriorShout shout = 4;
+     */
+    shout: WarriorShout;
+    /**
+     * @generated from protobuf field: bool precast_shout = 5;
+     */
+    precastShout: boolean;
+    /**
+     * @generated from protobuf field: bool precast_shout_t2 = 2;
+     */
+    precastShoutT2: boolean;
+    /**
+     * @generated from protobuf field: bool precast_shout_sapphire = 3;
+     */
+    precastShoutSapphire: boolean;
+    /**
      * @generated from protobuf field: double starting_rage = 1;
      */
     startingRage: number;
+}
+/**
+ * @generated from protobuf enum proto.WarriorShout
+ */
+export declare enum WarriorShout {
     /**
-     * @generated from protobuf field: bool precast_t2 = 2;
+     * @generated from protobuf enum value: WarriorShoutNone = 0;
      */
-    precastT2: boolean;
+    WarriorShoutNone = 0,
     /**
-     * @generated from protobuf field: bool precast_sapphire = 3;
+     * @generated from protobuf enum value: WarriorShoutBattle = 1;
      */
-    precastSapphire: boolean;
+    WarriorShoutBattle = 1,
+    /**
+     * @generated from protobuf enum value: WarriorShoutCommanding = 2;
+     */
+    WarriorShoutCommanding = 2
 }
 declare class WarriorTalents$Type extends MessageType<WarriorTalents> {
     constructor();

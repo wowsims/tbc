@@ -155,6 +155,12 @@ export interface PartyBuffs {
      * @generated from protobuf field: bool snapshot_bs_t2 = 30;
      */
     snapshotBsT2: boolean;
+    /**
+     * Mitigation buffs
+     *
+     * @generated from protobuf field: proto.TristateEffect commanding_shout = 32;
+     */
+    commandingShout: TristateEffect;
 }
 /**
  * Buffs are only used by individual sims, never the raid sim.
