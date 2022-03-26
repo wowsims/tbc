@@ -1,6 +1,7 @@
 package retribution
 
 import (
+	"sort"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -8,6 +9,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/paladin"
 )
+
+const twistWindow = 399 * time.Millisecond
 
 func RegisterRetributionPaladin() {
 	core.RegisterAgentFactory(
@@ -99,7 +102,7 @@ func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 		ret.openingRotation(sim)
 		return
 	}
-	ret.ActRotation(sim)
+	ret.ActRotation2(sim)
 }
 
 func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
@@ -142,7 +145,75 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	}
 }
 
-// TO-DO maybe add low mana logic
+func (ret *RetributionPaladin) ActRotation2(sim *core.Simulation) {
+	// Setup
+	target := sim.GetPrimaryTarget()
+
+	gcdActive := ret.NextGCDAt() > sim.CurrentTime
+	crusaderStrikeCD := ret.GetRemainingCD(paladin.CrusaderStrikeCD, sim.CurrentTime)
+	judgmentCD := ret.GetRemainingCD(paladin.JudgementCD, sim.CurrentTime)
+	// consecrateCD := ret.GetRemainingCD(paladin.ConsecrateCD, sim.CurrentTime)
+	// exorcismCD := ret.GetRemainingCD(paladin.ExorcismCD, sim.CurrentTime)
+
+	nextSwing := ret.AutoAttacks.NextAttackAt() - sim.CurrentTime
+	// effWeaponSpeed := ret.AutoAttacks.MainhandSwingSpeed()
+	spellGCD := ret.SpellGCD()
+
+	possibleTwist := nextSwing-ret.hasteLeeway > spellGCD
+	willTwist := possibleTwist && nextSwing+spellGCD <= crusaderStrikeCD+ret.csDelay
+	inTwistWindow := sim.CurrentTime >= ret.AutoAttacks.NextAttackAt()-twistWindow && sim.CurrentTime < ret.AutoAttacks.NextAttackAt()
+
+	sobActive := ret.RemainingAuraDuration(sim, paladin.SealOfBloodAuraID) > 0
+	socActive := ret.RemainingAuraDuration(sim, paladin.SealOfCommandAuraID) > 0
+
+	if !gcdActive {
+		if socActive && inTwistWindow {
+			// If Seal of Command is Active, complete the twist
+			ret.NewSealOfBlood(sim).StartCast(sim)
+		} else if crusaderStrikeCD == 0 &&
+			(sobActive || spellGCD < nextSwing-ret.hasteLeeway) {
+			// Cast Crusader Strike if its up and we won't swing naked
+			ret.NewCrusaderStrike(sim, target).Cast(sim)
+			// } else if crusaderStrikeCD > spellGCD && !willTwist || (willTwist && nextSwing-ret.hasteLeeway > spellGCD*2) {
+			// 	// Use fillers if it won't clip Crusader Strike or a Twist
+			// 	ret.useFillers(sim)
+		} else if willTwist && !socActive {
+			// Prep seal of command
+			ret.NewSealOfCommand(sim).StartCast(sim)
+		} else if !sobActive && !socActive {
+			// If no seal is active, cast Seal of Blood
+			ret.NewSealOfBlood(sim).StartCast(sim)
+		}
+	}
+
+	// Determine when next action is available
+	// Throw everything into an array then filter and sort compared to do individual comparisons
+	var events [5]time.Duration
+	events[0] = ret.AutoAttacks.NextAttackAt()               // next swing
+	events[1] = ret.AutoAttacks.NextAttackAt() - twistWindow // next twist window
+	events[2] = ret.NextGCDAt()                              // next GCD
+	events[3] = sim.CurrentTime + judgmentCD                 // next Judgement CD
+	events[4] = sim.CurrentTime + crusaderStrikeCD           // next Crusader Strike CD
+	// events[5] = sim.CurrentTime + consecrateCD               // next Consecrate CD
+	// events[6] = sim.CurrentTime + exorcismCD                 // next Exorcism CD
+
+	// Time has to move forward... so exclude any events that are at current time
+	n := 0
+	for _, elem := range events {
+		if elem > sim.CurrentTime {
+			events[n] = elem
+			n++
+		}
+	}
+
+	var filteredEvents []time.Duration = events[:n]
+
+	// Sort it
+	sort.Slice(filteredEvents, func(i, j int) bool { return events[i] < events[j] })
+	ret.WaitUntil(sim, filteredEvents[0])
+}
+
+// I tried to clone the flow chart Pride shared but this turned into a total disaster
 func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
@@ -157,7 +228,7 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	effWeaponSpeed := ret.AutoAttacks.MainhandSwingSpeed()
 	spellGCD := ret.SpellGCD()
 
-	twistWindow := ret.AutoAttacks.NextAttackAt() - 400*time.Millisecond
+	twistWindow := 400 * time.Millisecond
 	canTwist := sim.CurrentTime >= twistWindow && sim.CurrentTime <= ret.AutoAttacks.NextAttackAt()
 
 	// Check if we are on GCD
@@ -244,7 +315,79 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 					}
 				}
 			} else {
-
+				// Check if Crusader Strike will be ready this swing
+				if crusaderStrikeCD < nextSwing-ret.hasteLeeway {
+					// Check if we should wait for CS
+					if nextSwing-twistWindow+spellGCD-ret.hasteLeeway > crusaderStrikeCD+ret.csDelay {
+						// Check if we should use fillers
+						if effWeaponSpeed > spellGCD*2 &&
+							spellGCD < crusaderStrikeCD {
+							ret.useFillers(sim)
+						} else {
+							// Do nothing
+							return
+						}
+					}
+				} else {
+					// Check if there is time for 2 seals
+					if spellGCD < nextSwing {
+						// Check if seal of blood is up
+						if sobActive {
+							// See if we can judge before casting Seal of Command
+							if judgmentCD == 0 {
+								// Cast judgement of Blood
+								judge := ret.NewJudgementOfBlood(sim, target)
+								if judge != nil {
+									if success := judge.Cast(sim); !success {
+										ret.WaitForMana(sim, judge.Cost.Value)
+									}
+								}
+							} else {
+								// Check if Judgement will become ready in time
+								if judgmentCD+spellGCD < nextSwing {
+									// Do nothing
+									return
+								}
+							}
+						}
+						// If not ready, cast Seal of Command
+						soc := ret.NewSealOfCommand(sim)
+						if success := soc.StartCast(sim); !success {
+							ret.WaitForMana(sim, soc.GetManaCost())
+						}
+						return
+					} else {
+						// Check if Seal of Blood is Active
+						if sobActive {
+							// Check if Judgement is ready
+							if judgmentCD == 0 {
+								// Check if we will have time to reseal
+								if sim.CurrentTime < sim.CurrentTime+nextSwing {
+									// Cast Judgement
+									judge := ret.NewJudgementOfBlood(sim, target)
+									if judge != nil {
+										if success := judge.Cast(sim); !success {
+											ret.WaitForMana(sim, judge.Cost.Value)
+										}
+									}
+								} else {
+									// check if we can use fillers
+									if effWeaponSpeed > spellGCD*2 &&
+										spellGCD < crusaderStrikeCD {
+										ret.useFillers(sim)
+									}
+								}
+							}
+						} else {
+							// Cast seal of blood
+							sob := ret.NewSealOfBlood(sim)
+							if success := sob.StartCast(sim); !success {
+								ret.WaitForMana(sim, sob.GetManaCost())
+							}
+							return
+						}
+					}
+				}
 			}
 		}
 	}
