@@ -20,15 +20,29 @@ type Warrior struct {
 	// Current state
 	stance             int
 	heroicStrikeQueued bool
+	revengeTriggered   bool
 
 	// Cached values
 	heroicStrikeCost float64
+	canShieldSlam    bool
 
 	bloodthirstTemplate core.SimpleSpellTemplate
 	bloodthirst         core.SimpleSpell
 
+	devastateTemplate core.SimpleSpellTemplate
+	devastate         core.SimpleSpell
+
 	heroicStrikeTemplate core.SimpleSpellTemplate
 	heroicStrike         core.SimpleSpell
+
+	revengeTemplate core.SimpleSpellTemplate
+	revenge         core.SimpleSpell
+
+	shieldSlamTemplate core.SimpleSpellTemplate
+	shieldSlam         core.SimpleSpell
+
+	sunderArmorTemplate core.SimpleSpellTemplate
+	sunderArmor         core.SimpleSpell
 
 	whirlwindTemplate core.SimpleSpellTemplate
 	whirlwind         core.SimpleSpell
@@ -43,13 +57,18 @@ func (warrior *Warrior) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.bloodthirstTemplate = warrior.newBloodthirstTemplate(sim)
+	warrior.devastateTemplate = warrior.newDevastateTemplate(sim)
 	warrior.heroicStrikeTemplate = warrior.newHeroicStrikeTemplate(sim)
+	warrior.revengeTemplate = warrior.newRevengeTemplate(sim)
+	warrior.shieldSlamTemplate = warrior.newShieldSlamTemplate(sim)
+	warrior.sunderArmorTemplate = warrior.newSunderArmorTemplate(sim)
 	warrior.whirlwindTemplate = warrior.newWhirlwindTemplate(sim)
 }
 
 func (warrior *Warrior) Reset(newsim *core.Simulation) {
 	warrior.stance = BerserkerStance
 	warrior.heroicStrikeQueued = false
+	warrior.revengeTriggered = false
 }
 
 func NewWarrior(character core.Character, talents proto.WarriorTalents) *Warrior {

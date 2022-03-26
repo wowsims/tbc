@@ -26,6 +26,17 @@ func (warrior *Warrior) ApplyTalents() {
 		})
 	}
 
+	if warrior.Talents.ShieldMastery > 0 {
+		bonus := 1 + 0.1*float64(warrior.Talents.ShieldMastery)
+		warrior.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.BlockValue,
+			ModifiedStat: stats.BlockValue,
+			Modifier: func(bv float64, _ float64) float64 {
+				return bv * bonus
+			},
+		})
+	}
+
 	if warrior.Talents.Vitality > 0 {
 		stamBonus := 1 + 0.01*float64(warrior.Talents.Vitality)
 		warrior.AddStatDependency(stats.StatDependency{
