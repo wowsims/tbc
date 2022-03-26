@@ -37,7 +37,9 @@ var PlayerOptionsBasic = &proto.Player_ProtectionWarrior{
 	},
 }
 
-var warriorRotation = &proto.ProtectionWarrior_Rotation{}
+var warriorRotation = &proto.ProtectionWarrior_Rotation{
+	DemoShout: proto.ProtectionWarrior_Rotation_DemoShoutMaintain,
+}
 
 var warriorOptions = &proto.ProtectionWarrior_Options{
 	StartingRage:    0,

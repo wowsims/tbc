@@ -9,7 +9,13 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { Target } from '/tbc/core/target.js';
 
-import { ProtectionWarrior, ProtectionWarrior_Rotation as ProtectionWarriorRotation, WarriorTalents as WarriorTalents, ProtectionWarrior_Options as ProtectionWarriorOptions } from '/tbc/core/proto/warrior.js';
+import {
+	WarriorTalents as WarriorTalents,
+	ProtectionWarrior,
+	ProtectionWarrior_Rotation as ProtectionWarriorRotation,
+	ProtectionWarrior_Rotation_DemoShout as DemoShout,
+	ProtectionWarrior_Options as ProtectionWarriorOptions
+} from '/tbc/core/proto/warrior.js';
 
 import * as Presets from './presets.js';
 import { SimUI } from '../core/sim_ui.js';
@@ -19,5 +25,24 @@ import { SimUI } from '../core/sim_ui.js';
 
 export const ProtectionWarriorRotationConfig = {
 	inputs: [
+		{
+			type: 'enum' as const, cssClass: 'demo-shout-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Demo Shout',
+				values: [
+					{ name: 'None', value: DemoShout.DemoShoutNone },
+					{ name: 'Maintain Debuff', value: DemoShout.DemoShoutMaintain },
+					{ name: 'Filler', value: DemoShout.DemoShoutFiller },
+				],
+				changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getRotation().demoShout,
+				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.demoShout = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
 	],
 };

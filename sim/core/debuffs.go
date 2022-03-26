@@ -481,3 +481,18 @@ func HuntersMarkAura(points int32, fullyStacked bool) Aura {
 		},
 	}
 }
+
+var DemoralizingShoutDebuffID = NewDebuffID()
+
+func DemoralizingShoutAura(target *Target, boomingVoicePts int32, impDemoShoutPts int32) Aura {
+	duration := time.Duration(float64(time.Second*30) * (1 + 0.1*float64(boomingVoicePts)))
+	return Aura{
+		ID:       DemoralizingShoutDebuffID,
+		ActionID: ActionID{SpellID: 25203},
+		Duration: duration,
+		OnGain: func(sim *Simulation) {
+		},
+		OnExpire: func(sim *Simulation) {
+		},
+	}
+}

@@ -126,6 +126,12 @@ message Warrior {
 
 message ProtectionWarrior {
     message Rotation {
+			enum DemoShout {
+				DemoShoutNone = 0;
+				DemoShoutMaintain = 1;
+				DemoShoutFiller = 2;
+			}
+			DemoShout demo_shout = 1;
 		}
     Rotation rotation = 1;
 
