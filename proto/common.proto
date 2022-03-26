@@ -82,6 +82,12 @@ enum Stat {
 		StatDodge = 32;
 		StatParry = 33;
 		StatResilience = 34;
+		StatHealth = 35;
+    StatArcaneResistance = 36;
+    StatFireResistance = 37;
+    StatFrostResistance = 38;
+    StatNatureResistance = 39;
+    StatShadowResistance = 40;
 }
 
 enum ItemType {

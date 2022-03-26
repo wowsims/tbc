@@ -25,7 +25,9 @@ message RogueTalents {
 
 	// Combat
 	int32 improved_sinister_strike = 18;
+	int32 lightning_reflexes = 48;
 	int32 improved_slice_and_dice = 19;
+	int32 deflection = 49;
 	int32 precision = 20;
 	int32 dagger_specialization = 21;
 	int32 dual_wield_specialization = 22;

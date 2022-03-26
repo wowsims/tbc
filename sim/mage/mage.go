@@ -206,6 +206,7 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassMage}] = stats.Stats{
+		stats.Health:    3213,
 		stats.Strength:  30,
 		stats.Agility:   41,
 		stats.Stamina:   50,
@@ -215,6 +216,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 0.926,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassMage}] = stats.Stats{
+		stats.Health:    3213,
 		stats.Strength:  34,
 		stats.Agility:   36,
 		stats.Stamina:   50,
@@ -224,15 +226,17 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 0.933,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceGnome, Class: proto.Class_ClassMage}] = stats.Stats{
+		stats.Health:    3213,
 		stats.Strength:  28,
 		stats.Agility:   42,
 		stats.Stamina:   50,
 		stats.Intellect: 154.3, // Gnomes start with 162 int, we assume this include racial so / 1.05
 		stats.Spirit:    145,
 		stats.Mana:      2241,
-		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.029,
+		stats.SpellCrit: core.SpellCritRatingPerCritChance * 0.93,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassMage}] = stats.Stats{
+		stats.Health:    3213,
 		stats.Strength:  33,
 		stats.Agility:   39,
 		stats.Stamina:   51,
@@ -242,6 +246,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 0.926,
 	}
 	trollStats := stats.Stats{
+		stats.Health:    3213,
 		stats.Strength:  34,
 		stats.Agility:   41,
 		stats.Stamina:   52,
@@ -253,6 +258,7 @@ func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassMage}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassMage}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceUndead, Class: proto.Class_ClassMage}] = stats.Stats{
+		stats.Health:    3213,
 		stats.Strength:  32,
 		stats.Agility:   37,
 		stats.Stamina:   52,

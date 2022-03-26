@@ -195,6 +195,12 @@ class Individual70UEPExporter<SpecType extends Spec> extends Exporter {
 		[Stat.StatDodge]: 'dodgeRating',
 		[Stat.StatParry]: 'parryRating',
 		[Stat.StatResilience]: 'resilienceRating',
+		[Stat.StatHealth]: 'health',
+		[Stat.StatArcaneResistance]: 'arcaneResistance',
+		[Stat.StatFireResistance]: 'fireResistance',
+		[Stat.StatFrostResistance]: 'frostResistance',
+		[Stat.StatNatureResistance]: 'natureResistance',
+		[Stat.StatShadowResistance]: 'shadowResistance',
 	}
 }
 
@@ -253,5 +259,11 @@ class IndividualPawnEPExporter<SpecType extends Spec> extends Exporter {
 		[Stat.StatDodge]: 'DodgeRating',
 		[Stat.StatParry]: 'ParryRating',
 		[Stat.StatResilience]: 'ResilienceRating',
+		[Stat.StatHealth]: 'Health',
+		[Stat.StatArcaneResistance]: 'ArcaneResistance',
+		[Stat.StatFireResistance]: 'FireResistance',
+		[Stat.StatFrostResistance]: 'FrostResistance',
+		[Stat.StatNatureResistance]: 'NatureResistance',
+		[Stat.StatShadowResistance]: 'ShadowResistance',
 	}
 }

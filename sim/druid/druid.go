@@ -121,6 +121,7 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) *
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassDruid}] = stats.Stats{
+		stats.Health:    3434,
 		stats.Strength:  81,
 		stats.Agility:   65,
 		stats.Stamina:   85,
@@ -131,6 +132,7 @@ func init() {
 		// 4498 health shown on naked character (would include tauren bonus)
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassDruid}] = stats.Stats{
+		stats.Health:    3434,
 		stats.Strength:  73,
 		stats.Agility:   75,
 		stats.Stamina:   82,
