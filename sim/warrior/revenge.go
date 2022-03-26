@@ -72,5 +72,5 @@ func (warrior *Warrior) NewRevenge(_ *core.Simulation, target *core.Target) *cor
 }
 
 func (warrior *Warrior) CanRevenge(sim *core.Simulation) bool {
-	return warrior.revengeTriggered && warrior.CurrentRage() >= RevengeCost && !warrior.IsOnCD(RevengeCooldownID, sim.CurrentTime)
+	return warrior.StanceMatches(DefensiveStance) && warrior.revengeTriggered && warrior.CurrentRage() >= RevengeCost && !warrior.IsOnCD(RevengeCooldownID, sim.CurrentTime)
 }

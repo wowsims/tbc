@@ -76,5 +76,5 @@ func (warrior *Warrior) NewThunderClap(_ *core.Simulation) *core.SimpleSpell {
 }
 
 func (warrior *Warrior) CanThunderClap(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= ThunderClapCost && !warrior.IsOnCD(ThunderClapCooldownID, sim.CurrentTime)
+	return warrior.StanceMatches(BattleStance|DefensiveStance) && warrior.CurrentRage() >= ThunderClapCost && !warrior.IsOnCD(ThunderClapCooldownID, sim.CurrentTime)
 }

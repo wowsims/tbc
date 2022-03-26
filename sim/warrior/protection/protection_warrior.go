@@ -59,3 +59,8 @@ type ProtectionWarrior struct {
 func (war *ProtectionWarrior) GetWarrior() *warrior.Warrior {
 	return war.Warrior
 }
+
+func (war *ProtectionWarrior) Reset(sim *core.Simulation) {
+	war.Warrior.Reset(sim)
+	war.AddAura(sim, war.DefensiveStanceAura())
+}
