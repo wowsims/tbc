@@ -404,6 +404,27 @@ export interface ProtectionWarrior {
  * @generated from protobuf message proto.ProtectionWarrior.Rotation
  */
 export interface ProtectionWarrior_Rotation {
+    /**
+     * @generated from protobuf field: proto.ProtectionWarrior.Rotation.DemoShout demo_shout = 1;
+     */
+    demoShout: ProtectionWarrior_Rotation_DemoShout;
+}
+/**
+ * @generated from protobuf enum proto.ProtectionWarrior.Rotation.DemoShout
+ */
+export declare enum ProtectionWarrior_Rotation_DemoShout {
+    /**
+     * @generated from protobuf enum value: DemoShoutNone = 0;
+     */
+    DemoShoutNone = 0,
+    /**
+     * @generated from protobuf enum value: DemoShoutMaintain = 1;
+     */
+    DemoShoutMaintain = 1,
+    /**
+     * @generated from protobuf enum value: DemoShoutFiller = 2;
+     */
+    DemoShoutFiller = 2
 }
 /**
  * @generated from protobuf message proto.ProtectionWarrior.Options

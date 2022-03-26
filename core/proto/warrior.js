@@ -35,6 +35,24 @@ export var Warrior_Rotation_Type;
      */
     Warrior_Rotation_Type[Warrior_Rotation_Type["Fury"] = 2] = "Fury";
 })(Warrior_Rotation_Type || (Warrior_Rotation_Type = {}));
+/**
+ * @generated from protobuf enum proto.ProtectionWarrior.Rotation.DemoShout
+ */
+export var ProtectionWarrior_Rotation_DemoShout;
+(function (ProtectionWarrior_Rotation_DemoShout) {
+    /**
+     * @generated from protobuf enum value: DemoShoutNone = 0;
+     */
+    ProtectionWarrior_Rotation_DemoShout[ProtectionWarrior_Rotation_DemoShout["DemoShoutNone"] = 0] = "DemoShoutNone";
+    /**
+     * @generated from protobuf enum value: DemoShoutMaintain = 1;
+     */
+    ProtectionWarrior_Rotation_DemoShout[ProtectionWarrior_Rotation_DemoShout["DemoShoutMaintain"] = 1] = "DemoShoutMaintain";
+    /**
+     * @generated from protobuf enum value: DemoShoutFiller = 2;
+     */
+    ProtectionWarrior_Rotation_DemoShout[ProtectionWarrior_Rotation_DemoShout["DemoShoutFiller"] = 2] = "DemoShoutFiller";
+})(ProtectionWarrior_Rotation_DemoShout || (ProtectionWarrior_Rotation_DemoShout = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class WarriorTalents$Type extends MessageType {
     constructor() {
@@ -918,19 +936,40 @@ export const ProtectionWarrior = new ProtectionWarrior$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class ProtectionWarrior_Rotation$Type extends MessageType {
     constructor() {
-        super("proto.ProtectionWarrior.Rotation", []);
+        super("proto.ProtectionWarrior.Rotation", [
+            { no: 1, name: "demo_shout", kind: "enum", T: () => ["proto.ProtectionWarrior.Rotation.DemoShout", ProtectionWarrior_Rotation_DemoShout] }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { demoShout: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.ProtectionWarrior.Rotation.DemoShout demo_shout */ 1:
+                    message.demoShout = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* proto.ProtectionWarrior.Rotation.DemoShout demo_shout = 1; */
+        if (message.demoShout !== 0)
+            writer.tag(1, WireType.Varint).int32(message.demoShout);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
