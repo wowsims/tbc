@@ -6,25 +6,23 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const (
-	BattleStance = iota
-	DefensiveStance
-	BerserkerStance
-)
-
 type Warrior struct {
 	core.Character
 
 	Talents proto.WarriorTalents
 
 	// Current state
-	stance             int
+	Stance             Stance
 	heroicStrikeQueued bool
 	revengeTriggered   bool
 
 	// Cached values
 	heroicStrikeCost float64
 	canShieldSlam    bool
+
+	castBattleStance    func(*core.Simulation)
+	castDefensiveStance func(*core.Simulation)
+	castBerserkerStance func(*core.Simulation)
 
 	bloodthirstTemplate core.SimpleSpellTemplate
 	bloodthirst         core.SimpleSpell
@@ -62,6 +60,10 @@ func (warrior *Warrior) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (warrior *Warrior) Init(sim *core.Simulation) {
+	warrior.castBattleStance = warrior.makeCastStance(sim, BattleStance, warrior.BattleStanceAura())
+	warrior.castDefensiveStance = warrior.makeCastStance(sim, DefensiveStance, warrior.DefensiveStanceAura())
+	warrior.castBerserkerStance = warrior.makeCastStance(sim, BerserkerStance, warrior.BerserkerStanceAura())
+
 	warrior.bloodthirstTemplate = warrior.newBloodthirstTemplate(sim)
 	warrior.demoralizingShoutTemplate = warrior.newDemoralizingShoutTemplate(sim)
 	warrior.devastateTemplate = warrior.newDevastateTemplate(sim)
@@ -73,8 +75,7 @@ func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.whirlwindTemplate = warrior.newWhirlwindTemplate(sim)
 }
 
-func (warrior *Warrior) Reset(newsim *core.Simulation) {
-	warrior.stance = BerserkerStance
+func (warrior *Warrior) Reset(sim *core.Simulation) {
 	warrior.heroicStrikeQueued = false
 	warrior.revengeTriggered = false
 }

@@ -36,6 +36,7 @@ func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleS
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
+				FlatThreatBonus:        194,
 			},
 			WeaponInput: core.WeaponDamageInput{
 				DamageMultiplier: 1,
