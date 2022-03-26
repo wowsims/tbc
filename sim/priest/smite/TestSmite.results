@@ -317,7 +317,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-IncarnateRaiment"
  value: {
-  dps: 837.6710218489775
+  dps: 707.2169771556121
  }
 }
 dps_results: {
@@ -447,12 +447,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestSmite-AllItems-SpellfireSet"
- value: {
-  dps: 908.9565815825405
- }
-}
-dps_results: {
  key: "TestSmite-AllItems-SpellstrikeInfusion"
  value: {
   dps: 945.8631514951711
@@ -534,6 +528,12 @@ dps_results: {
  key: "TestSmite-AllItems-WorldBreaker-30090"
  value: {
   dps: 891.0811555327313
+ }
+}
+dps_results: {
+ key: "TestSmite-AllItems-WrathofSpellfire"
+ value: {
+  dps: 908.9565815825405
  }
 }
 dps_results: {

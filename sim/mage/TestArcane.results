@@ -435,12 +435,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestArcane-AllItems-SpellfireSet"
- value: {
-  dps: 1315.9206931761541
- }
-}
-dps_results: {
  key: "TestArcane-AllItems-SpellstrikeInfusion"
  value: {
   dps: 1268.9725223895614
@@ -534,6 +528,12 @@ dps_results: {
  key: "TestArcane-AllItems-WarpSlicer-30311"
  value: {
   dps: 1369.2890588298783
+ }
+}
+dps_results: {
+ key: "TestArcane-AllItems-WrathofSpellfire"
+ value: {
+  dps: 1315.9206931761541
  }
 }
 dps_results: {

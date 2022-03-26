@@ -236,6 +236,11 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 
 	itemStr += fmt.Sprintf("SocketBonus: %s", statsToGoString(itemResponse.GetSocketBonus(), Stats{}))
 
+	setName := itemResponse.GetItemSetName()
+	if setName != "" {
+		itemStr += fmt.Sprintf(", SetName: \"%s\"", setName)
+	}
+
 	itemStr += "}"
 	return itemStr
 }
