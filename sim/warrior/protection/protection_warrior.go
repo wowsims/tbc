@@ -3,7 +3,6 @@ package protection
 import (
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/warrior"
 )
 
@@ -42,21 +41,6 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 		AutoSwingMelee: true,
 		ReplaceMHSwing: func(sim *core.Simulation) *core.SimpleSpell {
 			return war.TryHeroicStrike(sim)
-		},
-	})
-
-	war.Character.AddStatDependency(stats.StatDependency{
-		SourceStat:   stats.Strength,
-		ModifiedStat: stats.BlockValue,
-		Modifier: func(strength float64, blockValue float64) float64 {
-			return blockValue + strength/20
-		},
-	})
-	war.Character.AddStatDependency(stats.StatDependency{
-		SourceStat:   stats.Agility,
-		ModifiedStat: stats.Dodge,
-		Modifier: func(agility float64, dodge float64) float64 {
-			return dodge + (agility/30)*core.DodgeRatingPerDodgeChance
 		},
 	})
 

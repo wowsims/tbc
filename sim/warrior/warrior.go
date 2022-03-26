@@ -65,12 +65,25 @@ func NewWarrior(character core.Character, talents proto.WarriorTalents) *Warrior
 			return meleecrit + (agility/33)*core.MeleeCritRatingPerCritChance
 		},
 	})
-
+	warrior.Character.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Agility,
+		ModifiedStat: stats.Dodge,
+		Modifier: func(agility float64, dodge float64) float64 {
+			return dodge + (agility/30)*core.DodgeRatingPerDodgeChance
+		},
+	})
 	warrior.Character.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Strength,
 		ModifiedStat: stats.AttackPower,
 		Modifier: func(strength float64, attackPower float64) float64 {
 			return attackPower + strength*2
+		},
+	})
+	warrior.Character.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Strength,
+		ModifiedStat: stats.BlockValue,
+		Modifier: func(strength float64, blockValue float64) float64 {
+			return blockValue + strength/20
 		},
 	})
 
