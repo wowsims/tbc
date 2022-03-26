@@ -92,7 +92,7 @@ var ItemSetDeathmantle = core.ItemSet{
 
 var ItemSetSlayers = core.ItemSet{
 	Name:  "Slayer's Armor",
-	Items: map[int32]struct{}{31026: {}, 31037: {}, 31028: {}, 31029: {}, 31030: {}, 34558: {}, 34575: {}, 34448: {}},
+	Items: map[int32]struct{}{31026: {}, 31027: {}, 31028: {}, 31029: {}, 31030: {}, 34558: {}, 34575: {}, 34448: {}},
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Increases the haste from your Slice and Dice ability by 5%.
