@@ -144,6 +144,7 @@ export const ProtectionWarriorRotationConfig = {
 					player.setRotation(eventID, newRotation);
 				},
 			},
+		},
 		{
 			type: 'number' as const, cssClass: 'heroic-strike-threshold-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
@@ -158,7 +159,6 @@ export const ProtectionWarriorRotationConfig = {
 					player.setRotation(eventID, newRotation);
 				},
 			},
-		},
 		},
 	],
 };
