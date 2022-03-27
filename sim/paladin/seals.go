@@ -111,6 +111,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
+				ProcMask:               core.ProcMaskMeleeMHSpecial,
 			},
 			WeaponInput: core.WeaponDamageInput{
 				DamageMultiplier: 0.70, // should deal 70% weapon deamage

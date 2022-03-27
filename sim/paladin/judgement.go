@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -14,9 +15,20 @@ const JudgementDuration = time.Second * 20
 var JudgementCD = core.NewCooldownID()
 var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: JudgementCD}
 
+var LibramOfAvengementAuraID = core.NewAuraID()
+var LibramOfAvengementActionID = core.ActionID{SpellID: 34260}
+
 // refactored Judgement of Blood as an ActiveMeleeAbility which is most similar to actual behavior with a typical ret build
 // but still has a few differences (differences are: does not scale off spell power, cannot be partially resisted, can be missed or dodged)
 func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	loaIsEquipped := paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27484
+	loaAura := paladin.NewTemporaryStatsAuraApplier(
+		LibramOfAvengementAuraID,
+		LibramOfAvengementActionID,
+		stats.Stats{stats.MeleeCrit: 53},
+		time.Second*5,
+	)
+
 	job := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -40,6 +52,9 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 					paladin.RemoveAura(sim, SealOfBloodAuraID)
 					paladin.currentSealID = 0
 					paladin.currentSealExpires = 0
+					if loaIsEquipped {
+						loaAura(sim)
+					}
 				},
 			},
 			DirectInput: core.DirectDamageInput{

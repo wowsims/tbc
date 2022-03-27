@@ -37,8 +37,8 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 	ret := &RetributionPaladin{
 		Paladin:     paladin.NewPaladin(character, *retOptions.Talents),
 		Rotation:    *retOptions.Rotation,
-		csDelay:     time.Duration(retOptions.Options.CrusaderStrikeDelayMs),
-		hasteLeeway: time.Duration(retOptions.Options.HasteLeewayMs),
+		csDelay:     time.Duration(retOptions.Options.CrusaderStrikeDelayMs) * time.Millisecond,
+		hasteLeeway: time.Duration(retOptions.Options.HasteLeewayMs) * time.Millisecond,
 		judgement:   retOptions.Options.Judgement,
 	}
 
@@ -85,6 +85,7 @@ func (ret *RetributionPaladin) Reset(sim *core.Simulation) {
 		ret.UpdateSeal(sim, ret.SealOfCommandAura)
 	}
 
+	ret.SetupSealOfCommand() // Reset this to reset the internal CD back to time 0
 	ret.AutoAttacks.CancelAutoSwing(sim)
 	ret.openerCompleted = false
 }
@@ -151,19 +152,19 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	// Setup
 	target := sim.GetPrimaryTarget()
 
-	gcdActive := ret.NextGCDAt() > sim.CurrentTime
-	crusaderStrikeCD := ret.GetRemainingCD(paladin.CrusaderStrikeCD, sim.CurrentTime)
+	gcdActive := ret.IsOnCD(core.GCDCooldownID, sim.CurrentTime)                      // false
+	crusaderStrikeCD := ret.GetRemainingCD(paladin.CrusaderStrikeCD, sim.CurrentTime) // 4.35
 	judgmentCD := ret.GetRemainingCD(paladin.JudgementCD, sim.CurrentTime)
 	// consecrateCD := ret.GetRemainingCD(paladin.ConsecrateCD, sim.CurrentTime)
 	// exorcismCD := ret.GetRemainingCD(paladin.ExorcismCD, sim.CurrentTime)
 
-	nextSwing := ret.AutoAttacks.NextAttackAt() - sim.CurrentTime
+	nextSwing := ret.AutoAttacks.NextAttackAt() - sim.CurrentTime // 3.48
 	// effWeaponSpeed := ret.AutoAttacks.MainhandSwingSpeed()
-	spellGCD := ret.SpellGCD()
+	spellGCD := ret.SpellGCD() // 1.5 seconds
 
-	possibleTwist := nextSwing-ret.hasteLeeway > spellGCD
-	willTwist := possibleTwist && nextSwing+spellGCD <= crusaderStrikeCD+ret.csDelay
-	inTwistWindow := sim.CurrentTime >= ret.AutoAttacks.NextAttackAt()-twistWindow && sim.CurrentTime < ret.AutoAttacks.NextAttackAt()
+	possibleTwist := nextSwing-ret.hasteLeeway > spellGCD                                                                              // true
+	willTwist := possibleTwist && (nextSwing+spellGCD <= crusaderStrikeCD+ret.csDelay)                                                 // 3.48 + 1.5 <= 4.35 + 3
+	inTwistWindow := sim.CurrentTime >= ret.AutoAttacks.NextAttackAt()-twistWindow && sim.CurrentTime < ret.AutoAttacks.NextAttackAt() // false
 
 	sobActive := ret.RemainingAuraDuration(sim, paladin.SealOfBloodAuraID) > 0
 	socActive := ret.RemainingAuraDuration(sim, paladin.SealOfCommandAuraID) > 0
@@ -199,11 +200,11 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	// Determine when next action is available
 	// Throw everything into an array then filter and sort compared to doing individual comparisons
 	var events [5]time.Duration
-	events[0] = ret.AutoAttacks.NextAttackAt()               // next swing
-	events[1] = ret.AutoAttacks.NextAttackAt() - twistWindow // next twist window
-	events[2] = ret.NextGCDAt()                              // next GCD
-	events[3] = sim.CurrentTime + judgmentCD                 // next Judgement CD
-	events[4] = sim.CurrentTime + crusaderStrikeCD           // next Crusader Strike CD
+	events[0] = ret.AutoAttacks.NextAttackAt()                          // next swing
+	events[1] = ret.AutoAttacks.NextAttackAt() - twistWindow            // next twist window
+	events[2] = ret.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime) // next GCD
+	events[3] = sim.CurrentTime + judgmentCD                            // next Judgement CD
+	events[4] = sim.CurrentTime + crusaderStrikeCD                      // next Crusader Strike CD
 	// events[5] = sim.CurrentTime + consecrateCD               // next Consecrate CD
 	// events[6] = sim.CurrentTime + exorcismCD                 // next Exorcism CD
 
