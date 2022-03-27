@@ -144,6 +144,21 @@ export const ProtectionWarriorRotationConfig = {
 					player.setRotation(eventID, newRotation);
 				},
 			},
+		{
+			type: 'number' as const, cssClass: 'heroic-strike-threshold-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'HS Threshold',
+				labelTooltip: 'Minimum Rage requires to queue Heroic Strike or Cleave.',
+				changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getRotation().heroicStrikeThreshold,
+				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.heroicStrikeThreshold = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
 		},
 	],
 };

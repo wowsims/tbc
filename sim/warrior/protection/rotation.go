@@ -32,7 +32,7 @@ func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 		}
 	}
 
-	if war.CanHeroicStrike(sim) {
+	if war.CurrentRage() >= float64(war.Rotation.HeroicStrikeThreshold) && war.CanHeroicStrike(sim) {
 		war.QueueHeroicStrike(sim)
 	}
 }

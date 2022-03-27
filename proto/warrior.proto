@@ -145,6 +145,9 @@ message ProtectionWarrior {
 				ThunderClapOnCD = 2;
 			}
 			ThunderClap thunder_clap = 2;
+
+			// Minimum rage to queue HS or Cleave.
+			int32 heroic_strike_threshold = 3;
 		}
     Rotation rotation = 1;
 
