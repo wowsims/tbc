@@ -147,6 +147,9 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 			})
 		}
 	}
+	character.AddStats(stats.Stats{
+		stats.Health: GetTristateValueFloat(partyBuffs.CommandingShout, 1080, 1080*1.25),
+	})
 
 	if partyBuffs.TotemOfWrath > 0 {
 		character.AddStats(stats.Stats{

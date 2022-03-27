@@ -290,6 +290,7 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 					Presets.P2_PRESET,
 					Presets.P3_PRESET,
 					Presets.P4_PRESET,
+					Presets.P5_PRESET,
 				],
 			},
 		});

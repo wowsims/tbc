@@ -216,31 +216,6 @@ func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
 	spellCast.TotalThreat += spellEffect.calcThreat(spellCast)
 }
 
-// Only applies the results from the ticks, not the initial dot application.
-func (hitEffect *SpellHitEffect) applyDotTickResultsToCast(spellCast *SpellCast) {
-	if hitEffect.DotInput.TicksCanMissAndCrit {
-		if hitEffect.Landed() {
-			spellCast.Hits++
-			if hitEffect.Outcome.Matches(OutcomeCrit) {
-				spellCast.Crits++
-			}
-
-			if hitEffect.Outcome.Matches(OutcomePartial1_4) {
-				spellCast.PartialResists_1_4++
-			} else if hitEffect.Outcome.Matches(OutcomePartial2_4) {
-				spellCast.PartialResists_2_4++
-			} else if hitEffect.Outcome.Matches(OutcomePartial3_4) {
-				spellCast.PartialResists_3_4++
-			}
-		} else {
-			spellCast.Misses++
-		}
-	}
-
-	spellCast.TotalDamage += hitEffect.Damage
-	spellCast.TotalThreat += hitEffect.Damage * hitEffect.TotalThreatMultiplier(spellCast)
-}
-
 func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCast *SpellCast) {
 	character := spellCast.Character
 
@@ -262,14 +237,7 @@ func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCas
 	damage := baseDamage + (schoolBonus * hitEffect.DirectInput.SpellCoefficient) + hitEffect.DirectInput.FlatDamageBonus
 	damage *= hitEffect.SpellEffect.DamageMultiplier * hitEffect.SpellEffect.StaticDamageMultiplier
 
-	// Use spell school to determine damage reduction type.
-	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
-		if !spellCast.SpellExtras.Matches(SpellExtrasIgnoreResists) {
-			damage *= 1 - hitEffect.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+hitEffect.BonusArmorPenetration)
-		}
-	} else if !spellCast.SpellExtras.Matches(SpellExtrasBinary | SpellExtrasIgnoreResists) {
-		damage = calculateResists(sim, damage, &hitEffect.SpellEffect)
-	}
+	hitEffect.applyResistances(sim, spellCast, &damage)
 
 	if hitEffect.SpellEffect.critCheck(sim, spellCast) {
 		hitEffect.Outcome |= OutcomeCrit
@@ -280,91 +248,6 @@ func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCas
 	hitEffect.SpellEffect.Damage = damage
 }
 
-// Snapshots a few values at the start of a dot.
-func (hitEffect *SpellHitEffect) takeDotSnapshot(sim *Simulation, spellCast *SpellCast) {
-	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool.Stat()) + hitEffect.BonusSpellPower
-
-	// snapshot total damage per tick, including any static damage multipliers
-	hitEffect.DotInput.damagePerTick = (hitEffect.DotInput.TickBaseDamage + totalSpellPower*hitEffect.DotInput.TickSpellCoefficient) * hitEffect.StaticDamageMultiplier
-	hitEffect.DotInput.startTime = sim.CurrentTime
-	hitEffect.DotInput.RefreshDot(sim)
-	hitEffect.DotInput.nextTickTime = sim.CurrentTime + hitEffect.DotInput.TickLength
-	hitEffect.SpellEffect.BeyondAOECapMultiplier = 1
-}
-
-func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *SpellCast) {
-	// fmt.Printf("DOT (%s) Ticking, Time Remaining: %0.2f\n", spellCast.Name, hitEffect.DotInput.TimeRemaining(sim).Seconds())
-	damage := hitEffect.DotInput.damagePerTick
-
-	spellCast.Character.OnBeforePeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, &damage)
-
-	damageBeforeTargetEffects := damage
-	hitEffect.Target.OnBeforePeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, &damage)
-	hitEffect.SpellEffect.BeyondAOECapMultiplier *= damage / damageBeforeTargetEffects
-
-	if hitEffect.DotInput.OnBeforePeriodicDamage != nil {
-		hitEffect.DotInput.OnBeforePeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, &damage)
-	}
-	if hitEffect.DotInput.IgnoreDamageModifiers {
-		damage = hitEffect.DotInput.damagePerTick
-	}
-
-	hitEffect.Outcome = OutcomeEmpty
-	if !hitEffect.DotInput.TicksCanMissAndCrit || hitEffect.hitCheck(sim, spellCast) {
-		hitEffect.Outcome = OutcomeHit
-	} else {
-		hitEffect.Outcome = OutcomeMiss
-	}
-
-	if hitEffect.Outcome == OutcomeHit {
-		if !spellCast.SpellExtras.Matches(SpellExtrasBinary | SpellExtrasIgnoreResists) {
-			damage = calculateResists(sim, damage, &hitEffect.SpellEffect)
-		}
-
-		if hitEffect.DotInput.TicksCanMissAndCrit && hitEffect.critCheck(sim, spellCast) {
-			hitEffect.Outcome |= OutcomeCrit
-			damage *= spellCast.CritMultiplier
-			hitEffect.SpellEffect.BeyondAOECapMultiplier *= spellCast.CritMultiplier
-		}
-	} else {
-		damage = 0
-	}
-
-	hitEffect.SpellEffect.Damage = damage
-}
-
-// This should be called on each dot tick.
-func (hitEffect *SpellHitEffect) afterDotTick(sim *Simulation, spell *SimpleSpell) {
-	if sim.Log != nil {
-		spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, hitEffect.SpellEffect.DotResultString(), hitEffect.SpellEffect.calcThreat(&spell.SpellCast))
-	}
-
-	hitEffect.applyDotTickResultsToCast(&spell.SpellCast)
-
-	if hitEffect.DotInput.TicksProcSpellHitEffects {
-		hitEffect.SpellEffect.triggerSpellProcs(sim, spell)
-	}
-
-	spell.Character.OnPeriodicDamage(sim, &spell.SpellCast, &hitEffect.SpellEffect, hitEffect.Damage)
-	hitEffect.Target.OnPeriodicDamage(sim, &spell.SpellCast, &hitEffect.SpellEffect, hitEffect.Damage)
-	if hitEffect.DotInput.OnPeriodicDamage != nil {
-		hitEffect.DotInput.OnPeriodicDamage(sim, &spell.SpellCast, &hitEffect.SpellEffect, hitEffect.Damage)
-	}
-
-	hitEffect.DotInput.tickIndex++
-	hitEffect.DotInput.nextTickTime = sim.CurrentTime + hitEffect.DotInput.TickLength
-}
-
-// This should be called after the final tick of the dot, or when the dot is cancelled.
-func (hitEffect *SpellHitEffect) onDotComplete(sim *Simulation, spellCast *SpellCast) {
-	// Clean up the dot object.
-	hitEffect.DotInput.endTime = 0
-
-	if hitEffect.DotInput.DebuffID != 0 {
-		hitEffect.Target.AddAuraUptime(hitEffect.DotInput.DebuffID, spellCast.ActionID, sim.CurrentTime-hitEffect.DotInput.startTime)
-	}
-}
-
 func (spellEffect *SpellEffect) String() string {
 	outcomeStr := spellEffect.Outcome.String()
 	if !spellEffect.Landed() {
@@ -373,34 +256,31 @@ func (spellEffect *SpellEffect) String() string {
 	return fmt.Sprintf("%s for %0.3f damage", outcomeStr, spellEffect.Damage)
 }
 
-func (spellEffect *SpellEffect) DotResultString() string {
-	return "tick " + spellEffect.String()
-}
-
-// Return value is (newDamage, resistMultiplier)
-func calculateResists(sim *Simulation, damage float64, spellEffect *SpellEffect) float64 {
-	// Average Resistance (AR) = (Target's Resistance / (Caster's Level * 5)) * 0.75
-	// P(x) = 50% - 250%*|x - AR| <- where X is %resisted
-	// Using these stats:
-	//    13.6% chance of
-	//  FUTURE: handle boss resists for fights/classes that are actually impacted by that.
-	resVal := sim.RandomFloat("DirectSpell Resist")
-	if resVal > 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
-		// No partial resist.
-		return damage
+// Modifies damage based on Armor or Magic resistances, depending on the damage type.
+func (hitEffect *SpellHitEffect) applyResistances(sim *Simulation, spellCast *SpellCast, damage *float64) {
+	if spellCast.SpellExtras.Matches(SpellExtrasIgnoreResists) {
+		return
 	}
 
-	var multiplier float64
-	if resVal < 0.01 {
-		spellEffect.Outcome |= OutcomePartial3_4
-		multiplier = 0.25
-	} else if resVal < 0.05 {
-		spellEffect.Outcome |= OutcomePartial2_4
-		multiplier = 0.5
-	} else {
-		spellEffect.Outcome |= OutcomePartial1_4
-		multiplier = 0.75
-	}
+	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
+		// Physical resistance (armor).
+		*damage *= 1 - hitEffect.Target.ArmorDamageReduction(spellCast.Character.stats[stats.ArmorPenetration]+hitEffect.BonusArmorPenetration)
+	} else if !spellCast.SpellExtras.Matches(SpellExtrasBinary) {
+		// Magical resistance.
+		// https://royalgiraffe.github.io/resist-guide
 
-	return damage * multiplier
+		resistanceRoll := sim.RandomFloat("DirectSpell Resist")
+		if resistanceRoll > 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
+			// No partial resist.
+		} else if resistanceRoll > 0.05 {
+			hitEffect.SpellEffect.Outcome |= OutcomePartial1_4
+			*damage *= 0.75
+		} else if resistanceRoll > 0.01 {
+			hitEffect.SpellEffect.Outcome |= OutcomePartial2_4
+			*damage *= 0.5
+		} else {
+			hitEffect.SpellEffect.Outcome |= OutcomePartial3_4
+			*damage *= 0.25
+		}
+	}
 }

@@ -68,6 +68,7 @@ import { newIndividualExporters } from '/tbc/core/components/exporters.js';
 import { newIndividualImporters } from '/tbc/core/components/importers.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
+import { isTankSpec } from '/tbc/core/proto_utils/utils.js';
 import { specNames } from '/tbc/core/proto_utils/utils.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
@@ -877,7 +878,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 			this.sim.encounter.applyDefaults(eventID);
 			this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
-			this.sim.applyDefaults(eventID);
+			this.sim.applyDefaults(eventID, isTankSpec(this.player.spec));
 		});
 	}
 

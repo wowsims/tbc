@@ -9,7 +9,7 @@ import (
 var HeroicStrikeActionID = core.ActionID{SpellID: 29707}
 
 func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
-	warrior.heroicStrikeCost = 15.0
+	warrior.heroicStrikeCost = 15.0 - float64(warrior.Talents.ImprovedHeroicStrike) - float64(warrior.Talents.FocusedRage)
 
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -36,6 +36,7 @@ func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleS
 				DamageMultiplier:       1,
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
+				FlatThreatBonus:        194,
 			},
 			WeaponInput: core.WeaponDamageInput{
 				DamageMultiplier: 1,

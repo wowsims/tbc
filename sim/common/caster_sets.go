@@ -9,19 +9,18 @@ import (
 
 // Keep these (and their functions) in alphabetical order.
 func init() {
-	core.AddItemSet(ItemSetManaEtched)
-	core.AddItemSet(ItemSetNetherstrike)
-	core.AddItemSet(ItemSetSpellstrike)
-	core.AddItemSet(ItemSetTheTwinStars)
-	core.AddItemSet(ItemSetWindhawk)
-	core.AddItemSet(ItemSetSpellfire)
+	core.AddItemSet(&ItemSetManaEtched)
+	core.AddItemSet(&ItemSetNetherstrike)
+	core.AddItemSet(&ItemSetSpellstrike)
+	core.AddItemSet(&ItemSetTheTwinStars)
+	core.AddItemSet(&ItemSetWindhawk)
+	core.AddItemSet(&ItemSetSpellfire)
 }
 
 var ManaEtchedAuraID = core.NewAuraID()
 var ManaEtchedInsightAuraID = core.NewAuraID()
 var ItemSetManaEtched = core.ItemSet{
-	Name:  "Mana-Etched Regalia",
-	Items: map[int32]struct{}{28193: {}, 27465: {}, 27907: {}, 27796: {}, 28191: {}},
+	Name: "Mana-Etched Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.SpellHit, 35)
@@ -47,8 +46,7 @@ var ItemSetManaEtched = core.ItemSet{
 }
 
 var ItemSetNetherstrike = core.ItemSet{
-	Name:  "Netherstrike Armor",
-	Items: map[int32]struct{}{29519: {}, 29521: {}, 29520: {}},
+	Name: "Netherstrike Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.SpellPower, 23)
@@ -59,8 +57,7 @@ var ItemSetNetherstrike = core.ItemSet{
 var SpellstrikeAuraID = core.NewAuraID()
 var SpellstrikeInfusionAuraID = core.NewAuraID()
 var ItemSetSpellstrike = core.ItemSet{
-	Name:  "Spellstrike Infusion",
-	Items: map[int32]struct{}{24266: {}, 24262: {}},
+	Name: "Spellstrike Infusion",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
@@ -84,8 +81,7 @@ var ItemSetSpellstrike = core.ItemSet{
 }
 
 var ItemSetTheTwinStars = core.ItemSet{
-	Name:  "The Twin Stars",
-	Items: map[int32]struct{}{31338: {}, 31339: {}},
+	Name: "The Twin Stars",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.SpellPower, 15)
@@ -94,8 +90,7 @@ var ItemSetTheTwinStars = core.ItemSet{
 }
 
 var ItemSetWindhawk = core.ItemSet{
-	Name:  "Windhawk Armor",
-	Items: map[int32]struct{}{29524: {}, 29523: {}, 29522: {}},
+	Name: "Windhawk Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.MP5, 8)
@@ -104,8 +99,7 @@ var ItemSetWindhawk = core.ItemSet{
 }
 
 var ItemSetSpellfire = core.ItemSet{
-	Name:  "Spellfire Set",
-	Items: map[int32]struct{}{21848: {}, 21847: {}, 21846: {}},
+	Name: "Wrath of Spellfire",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			character := agent.GetCharacter()

@@ -116,6 +116,7 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) 
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassPriest}] = stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  39,
 		stats.Agility:   45,
 		stats.Stamina:   58,
@@ -125,6 +126,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassPriest}] = stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  41,
 		stats.Agility:   41,
 		stats.Stamina:   61,
@@ -134,6 +136,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassPriest}] = stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  36,
 		stats.Agility:   50,
 		stats.Stamina:   57,
@@ -143,6 +146,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassPriest}] = stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  40,
 		stats.Agility:   42,
 		stats.Stamina:   57,
@@ -152,6 +156,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceUndead, Class: proto.Class_ClassPriest}] = stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  38,
 		stats.Agility:   43,
 		stats.Stamina:   59,
@@ -161,6 +166,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	trollStats := stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  40,
 		stats.Agility:   47,
 		stats.Stamina:   59,
@@ -172,6 +178,7 @@ func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassPriest}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassPriest}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassPriest}] = stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  36,
 		stats.Agility:   47,
 		stats.Stamina:   57,

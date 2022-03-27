@@ -12,15 +12,14 @@ func init() {
 	core.AddItemEffect(30450, ApplyWarpSpringCoil)
 	core.AddItemEffect(32492, ApplyAshtongueTalismanOfLethality)
 
-	core.AddItemSet(ItemSetAssassination)
-	core.AddItemSet(ItemSetNetherblade)
-	core.AddItemSet(ItemSetDeathmantle)
-	core.AddItemSet(ItemSetSlayers)
+	core.AddItemSet(&ItemSetAssassination)
+	core.AddItemSet(&ItemSetNetherblade)
+	core.AddItemSet(&ItemSetDeathmantle)
+	core.AddItemSet(&ItemSetSlayers)
 }
 
 var ItemSetAssassination = core.ItemSet{
-	Name:  "Assassination Armor",
-	Items: map[int32]struct{}{28414: {}, 27776: {}, 28204: {}, 27908: {}, 27509: {}},
+	Name: "Assassination Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 		},
@@ -32,8 +31,7 @@ var ItemSetAssassination = core.ItemSet{
 }
 
 var ItemSetNetherblade = core.ItemSet{
-	Name:  "Netherblade",
-	Items: map[int32]struct{}{29044: {}, 29045: {}, 29046: {}, 29047: {}, 29048: {}},
+	Name: "Netherblade",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Increases the duration of your Slice and Dice ability by 3 sec.
@@ -48,8 +46,7 @@ var ItemSetNetherblade = core.ItemSet{
 
 var Deathmantle4PcAuraID = core.NewAuraID()
 var ItemSetDeathmantle = core.ItemSet{
-	Name:  "Deathmantle",
-	Items: map[int32]struct{}{30144: {}, 30145: {}, 30146: {}, 30148: {}, 30149: {}},
+	Name: "Deathmantle",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Your Eviscerate and Envenom abilities cause 40 extra damage per combo point.
@@ -91,8 +88,7 @@ var ItemSetDeathmantle = core.ItemSet{
 }
 
 var ItemSetSlayers = core.ItemSet{
-	Name:  "Slayer's Armor",
-	Items: map[int32]struct{}{31026: {}, 31037: {}, 31028: {}, 31029: {}, 31030: {}, 34558: {}, 34575: {}, 34448: {}},
+	Name: "Slayer's Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Increases the haste from your Slice and Dice ability by 5%.

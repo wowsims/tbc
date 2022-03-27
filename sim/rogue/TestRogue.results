@@ -36,12 +36,30 @@ character_stats_results: {
   final_stats: 3
   final_stats: 0
   final_stats: 0
+  final_stats: 8750.936000000002
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-AbacusofViolentOdds-28288"
  value: {
   dps: 1440.4085729457022
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-AdamantineFigurine-27891"
+ value: {
+  dps: 1411.6739605874695
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-AncientAqirArtifact-33830"
+ value: {
+  dps: 1411.6739605874695
  }
 }
 dps_results: {
@@ -78,6 +96,36 @@ dps_results: {
  key: "TestRogue-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1428.63668715403
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-Battlemaster'sAudacity-34049"
+ value: {
+  dps: 1411.6739605874695
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-Battlemaster'sCruelty-34163"
+ value: {
+  dps: 1428.6410971808623
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-Battlemaster'sDepravity-34162"
+ value: {
+  dps: 1411.6739605874695
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-Battlemaster'sDetermination-33832"
+ value: {
+  dps: 1436.8909675777718
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-Battlemaster'sPerseverance-34050"
+ value: {
+  dps: 1411.6739605874695
  }
 }
 dps_results: {
@@ -135,6 +183,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-BroochoftheImmortalKing-32534"
+ value: {
+  dps: 1411.6739605874695
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-BrutalEarthstormDiamond"
  value: {
   dps: 1436.9135234319767
@@ -153,6 +207,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-Coren'sLuckyCoin-38289"
+ value: {
+  dps: 1411.6739605874695
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-CoreofAr'kelos-29776"
  value: {
   dps: 1445.3409881719842
@@ -162,6 +222,12 @@ dps_results: {
  key: "TestRogue-AllItems-CrystalforgedTrinket-32654"
  value: {
   dps: 1446.174423799463
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-Dabiri'sEnigma-30300"
+ value: {
+  dps: 1411.6739605874695
  }
 }
 dps_results: {
@@ -291,6 +357,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-GnomereganAuto-Blocker600-29387"
+ value: {
+  dps: 1411.6739605874695
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-HandofJustice-11815"
  value: {
   dps: 1420.8036668999875
@@ -387,6 +459,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-Moroes'LuckyPocketWatch-28528"
+ value: {
+  dps: 1411.6739605874695
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-MysticalSkyfireDiamond"
  value: {
   dps: 1428.2782451208193
@@ -411,7 +489,7 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestRogue-AllItems-Primalstrike"
+ key: "TestRogue-AllItems-PrimalIntent"
  value: {
   dps: 1426.188210998029
  }
@@ -447,6 +525,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-ScarabofDisplacement-30629"
+ value: {
+  dps: 1396.728237424999
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-Scryer'sBloodgem-29132"
  value: {
   dps: 1413.1917519514934
@@ -454,6 +538,12 @@ dps_results: {
 }
 dps_results: {
  key: "TestRogue-AllItems-SextantofUnstableCurrents-30626"
+ value: {
+  dps: 1411.6739605874695
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-ShadowmoonInsignia-32501"
  value: {
   dps: 1411.6739605874695
  }
@@ -485,7 +575,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Slayer'sArmor"
  value: {
-  dps: 1473.1144425151865
+  dps: 1565.7795744017626
  }
 }
 dps_results: {
@@ -501,15 +591,15 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestRogue-AllItems-SpellfireSet"
- value: {
-  dps: 1222.3172769472237
- }
-}
-dps_results: {
  key: "TestRogue-AllItems-SpellstrikeInfusion"
  value: {
   dps: 1236.852510865191
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-StrengthoftheClefthoof"
+ value: {
+  dps: 1196.5899327515485
  }
 }
 dps_results: {
@@ -645,6 +735,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-WrathofSpellfire"
+ value: {
+  dps: 1222.3172769472237
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-Xi'ri'sGift-29179"
  value: {
   dps: 1411.6739605874695
@@ -653,7 +749,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Average-Default"
  value: {
-  dps: 1409.732060085843
+  dps: 1409.7195529302564
  }
 }
 dps_results: {

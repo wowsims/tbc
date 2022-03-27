@@ -26,9 +26,17 @@ func applyRaceEffects(agent Agent) {
 
 	switch character.Race {
 	case proto.Race_RaceBloodElf:
+		character.AddStat(stats.ArcaneResistance, 5)
+		character.AddStat(stats.FireResistance, 5)
+		character.AddStat(stats.FrostResistance, 5)
+		character.AddStat(stats.NatureResistance, 5)
+		character.AddStat(stats.ShadowResistance, 5)
 		// TODO: Add major cooldown: arcane torrent
 	case proto.Race_RaceDraenei:
+		character.AddStat(stats.ShadowResistance, 10)
 	case proto.Race_RaceDwarf:
+		character.AddStat(stats.FrostResistance, 10)
+
 		// Gun specialization (+1% ranged crit when using a gun).
 		matches := false
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotRanged]; weapon.ID != 0 {
@@ -50,6 +58,8 @@ func applyRaceEffects(agent Agent) {
 			})
 		}
 	case proto.Race_RaceGnome:
+		character.AddStat(stats.ArcaneResistance, 10)
+
 		character.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Intellect,
 			ModifiedStat: stats.Intellect,
@@ -95,6 +105,8 @@ func applyRaceEffects(agent Agent) {
 			})
 		}
 	case proto.Race_RaceNightElf:
+		character.AddStat(stats.NatureResistance, 10)
+		character.AddStat(stats.Dodge, DodgeRatingPerDodgeChance*1)
 	case proto.Race_RaceOrc:
 		// Command (Pet damage +5%)
 		if len(character.Pets) > 0 {
@@ -173,7 +185,14 @@ func applyRaceEffects(agent Agent) {
 			})
 		}
 	case proto.Race_RaceTauren:
-		// TODO: Health +5%
+		character.AddStat(stats.NatureResistance, 10)
+		character.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Health,
+			ModifiedStat: stats.Health,
+			Modifier: func(health float64, _ float64) float64 {
+				return health * 1.05
+			},
+		})
 	case proto.Race_RaceTroll10, proto.Race_RaceTroll30:
 		// Bow specialization (+1% ranged crit when using a bow).
 		matches := false
@@ -291,5 +310,6 @@ func applyRaceEffects(agent Agent) {
 			},
 		})
 	case proto.Race_RaceUndead:
+		character.AddStat(stats.ShadowResistance, 10)
 	}
 }

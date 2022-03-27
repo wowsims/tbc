@@ -347,15 +347,20 @@ var FaerieFireDebuffID = NewDebuffID()
 
 func FaerieFireAura(target *Target, improved bool) Aura {
 	const hitBonus = 3 * MeleeHitRatingPerHitChance
-	target.AddArmor(-610)
+	const armorReduction = 610
+
 	aura := Aura{
 		ID:       FaerieFireDebuffID,
 		ActionID: ActionID{SpellID: 26993},
 		Duration: time.Second * 40,
+		OnGain: func(sim *Simulation) {
+			target.AddArmor(-armorReduction)
+		},
 		OnExpire: func(sim *Simulation) {
-			target.AddArmor(610)
+			target.AddArmor(armorReduction)
 		},
 	}
+
 	if improved {
 		aura.OnBeforeSpellHit = func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			spellEffect.BonusHitRating += hitBonus
@@ -367,20 +372,20 @@ func FaerieFireAura(target *Target, improved bool) Aura {
 
 var SunderArmorDebuffID = NewDebuffID()
 
-func SunderArmorAura(target *Target, stacks int) Aura {
+func SunderArmorAura(target *Target, stacks int32) Aura {
 	armorReduction := 520.0 * float64(stacks)
-	target.AddArmor(-armorReduction)
 
-	aura := Aura{
+	return Aura{
 		ID:       SunderArmorDebuffID,
 		ActionID: ActionID{SpellID: 25225},
 		Duration: time.Second * 30,
+		OnGain: func(sim *Simulation) {
+			target.AddArmor(-armorReduction)
+		},
 		OnExpire: func(sim *Simulation) {
 			target.AddArmor(armorReduction)
 		},
 	}
-
-	return aura
 }
 
 var ExposeArmorDebuffID = NewDebuffID()
@@ -388,18 +393,16 @@ var ExposeArmorDebuffID = NewDebuffID()
 func ExposeArmorAura(sim *Simulation, target *Target, talentPoints int32) Aura {
 	armorReduction := 2050.0 * (1.0 + 0.25*float64(talentPoints))
 
-	if !target.HasAura(ExposeArmorDebuffID) {
-		target.AddArmor(-armorReduction)
-
-		if target.HasAura(SunderArmorDebuffID) {
-			target.RemoveAura(sim, SunderArmorDebuffID)
-		}
-	}
-
 	return Aura{
 		ID:       ExposeArmorDebuffID,
 		ActionID: ActionID{SpellID: 26866},
 		Duration: time.Second * 30,
+		OnGain: func(sim *Simulation) {
+			if target.HasAura(SunderArmorDebuffID) {
+				target.RemoveAura(sim, SunderArmorDebuffID)
+			}
+			target.AddArmor(-armorReduction)
+		},
 		OnExpire: func(sim *Simulation) {
 			target.AddArmor(armorReduction)
 		},
@@ -410,18 +413,18 @@ var CurseOfRecklessnessDebuffID = NewDebuffID()
 
 func CurseOfRecklessnessAura(target *Target) Aura {
 	armorReduction := 800.0
-	target.AddArmor(-armorReduction)
 
-	aura := Aura{
+	return Aura{
 		ID:       CurseOfRecklessnessDebuffID,
 		ActionID: ActionID{SpellID: 27226},
 		Duration: time.Minute * 2,
+		OnGain: func(sim *Simulation) {
+			target.AddArmor(-armorReduction)
+		},
 		OnExpire: func(sim *Simulation) {
 			target.AddArmor(armorReduction)
 		},
 	}
-
-	return aura
 }
 
 var ExposeWeaknessDebuffID = NewDebuffID()
@@ -475,6 +478,35 @@ func HuntersMarkAura(points int32, fullyStacked bool) Aura {
 				stacks++
 				rangedBonus = baseRangedBonus + bonusPerStack*float64(stacks)
 			}
+		},
+	}
+}
+
+var DemoralizingShoutDebuffID = NewDebuffID()
+
+func DemoralizingShoutAura(target *Target, boomingVoicePts int32, impDemoShoutPts int32) Aura {
+	duration := time.Duration(float64(time.Second*30) * (1 + 0.1*float64(boomingVoicePts)))
+	return Aura{
+		ID:       DemoralizingShoutDebuffID,
+		ActionID: ActionID{SpellID: 25203},
+		Duration: duration,
+		OnGain: func(sim *Simulation) {
+		},
+		OnExpire: func(sim *Simulation) {
+		},
+	}
+}
+
+var ThunderClapDebuffID = NewDebuffID()
+
+func ThunderClapAura(target *Target, impThunderClapPts int32) Aura {
+	return Aura{
+		ID:       ThunderClapDebuffID,
+		ActionID: ActionID{SpellID: 25264},
+		Duration: time.Second * 30,
+		OnGain: func(sim *Simulation) {
+		},
+		OnExpire: func(sim *Simulation) {
 		},
 	}
 }

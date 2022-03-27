@@ -27,9 +27,9 @@ func init() {
 
 	core.AddItemEffect(32488, ApplyAshtongueTalismanOfInsight)
 
-	core.AddItemSet(ItemSetAldorRegalia)
-	core.AddItemSet(ItemSetTirisfalRegalia)
-	core.AddItemSet(ItemSetTempestRegalia)
+	core.AddItemSet(&ItemSetAldorRegalia)
+	core.AddItemSet(&ItemSetTirisfalRegalia)
+	core.AddItemSet(&ItemSetTempestRegalia)
 
 	// Even though these item effects are handled elsewhere, add them so they are
 	// detected for automatic testing.
@@ -37,8 +37,7 @@ func init() {
 }
 
 var ItemSetAldorRegalia = core.ItemSet{
-	Name:  "Aldor Regalia",
-	Items: map[int32]struct{}{29076: {}, 29077: {}, 29078: {}, 29079: {}, 29080: {}},
+	Name: "Aldor Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Interruption avoidance.
@@ -53,8 +52,7 @@ var Tirisfal4PcAuraID = core.NewAuraID()
 var Tirisfal4PcProcAuraID = core.NewAuraID()
 
 var ItemSetTirisfalRegalia = core.ItemSet{
-	Name:  "Tirisfal Regalia",
-	Items: map[int32]struct{}{30196: {}, 30205: {}, 30206: {}, 30207: {}, 30210: {}},
+	Name: "Tirisfal Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Increases the damage and mana cost of Arcane Blast by 20%.
@@ -82,8 +80,7 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 }
 
 var ItemSetTempestRegalia = core.ItemSet{
-	Name:  "Tempest Regalia",
-	Items: map[int32]struct{}{31055: {}, 31056: {}, 31057: {}, 31058: {}, 31059: {}, 34447: {}, 34557: {}, 34574: {}},
+	Name: "Tempest Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Increases the duratoin of your Evocation ability by 2 sec.

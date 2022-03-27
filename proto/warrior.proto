@@ -51,7 +51,7 @@ message WarriorTalents {
 	int32 anticipation = 47;
 	int32 shield_specialization = 48;
 	int32 toughness = 49;
-	int32 improved_shield_block = 50;
+	bool improved_shield_block = 50;
 	int32 defiance = 38;
 	int32 improved_sunder_armor = 39;
 	int32 shield_mastery = 51;
@@ -61,6 +61,12 @@ message WarriorTalents {
 	int32 focused_rage = 42;
 	int32 vitality = 43;
 	bool devastate = 44;
+}
+
+enum WarriorShout {
+	WarriorShoutNone = 0;
+	WarriorShoutBattle = 1;
+	WarriorShoutCommanding = 2;
 }
 
 message Warrior {
@@ -120,6 +126,40 @@ message Warrior {
 		bool precast_t2 = 2;
 		bool precast_sapphire = 3; // Disabled if sapphire is equipped
 		bool recklessness = 4;
+    }
+    Options options = 3;
+}
+
+message ProtectionWarrior {
+    message Rotation {
+			enum DemoShout {
+				DemoShoutNone = 0;
+				DemoShoutMaintain = 1;
+				DemoShoutFiller = 2;
+			}
+			DemoShout demo_shout = 1;
+
+			enum ThunderClap {
+				ThunderClapNone = 0;
+				ThunderClapMaintain = 1;
+				ThunderClapOnCD = 2;
+			}
+			ThunderClap thunder_clap = 2;
+
+			// Minimum rage to queue HS or Cleave.
+			int32 heroic_strike_threshold = 3;
+		}
+    Rotation rotation = 1;
+
+    WarriorTalents talents = 2;
+    
+    message Options {
+			WarriorShout shout = 4;
+			bool precast_shout = 5;
+			bool precast_shout_t2 = 2;
+			bool precast_shout_sapphire = 3; // Disabled if sapphire is equipped
+
+			double starting_rage = 1;
     }
     Options options = 3;
 }

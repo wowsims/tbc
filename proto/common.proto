@@ -12,9 +12,10 @@ enum Spec {
     SpecRetributionPaladin = 3;
     SpecRogue = 7;
     SpecShadowPriest = 4;
+    SpecSmitePriest = 10;
     SpecWarlock = 5;
     SpecWarrior = 6;
-    SpecSmitePriest = 10;
+    SpecProtectionWarrior = 11;
 }
 
 enum Race {
@@ -81,6 +82,12 @@ enum Stat {
 		StatDodge = 32;
 		StatParry = 33;
 		StatResilience = 34;
+		StatHealth = 35;
+    StatArcaneResistance = 36;
+    StatFireResistance = 37;
+    StatFrostResistance = 38;
+    StatNatureResistance = 39;
+    StatShadowResistance = 40;
 }
 
 enum ItemType {
@@ -335,6 +342,9 @@ message PartyBuffs {
 		bool bs_solarian_sapphire = 28;
 		bool snapshot_bs_solarian_sapphire = 29;
 		bool snapshot_bs_t2 = 30;
+
+		// Mitigation buffs
+    TristateEffect commanding_shout = 32;
 }
 
 enum StrengthOfEarthType {
@@ -520,6 +530,9 @@ message Enchant {
 
     ItemQuality quality = 8;
 		int32 phase = 11;
+
+		// Classes that are allowed to use the enchant. Empty indicates no special class restrictions.
+		repeated Class class_allowlist = 12;
 }
 
 message Gem {

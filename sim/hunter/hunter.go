@@ -293,6 +293,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassHunter}] = stats.Stats{
+		stats.Health:    3388,
 		stats.Strength:  61,
 		stats.Agility:   153,
 		stats.Stamina:   106,
@@ -305,6 +306,7 @@ func init() {
 		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassHunter}] = stats.Stats{
+		stats.Health:    3388,
 		stats.Strength:  65,
 		stats.Agility:   148,
 		stats.Stamina:   107,
@@ -317,6 +319,7 @@ func init() {
 		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassHunter}] = stats.Stats{
+		stats.Health:    3388,
 		stats.Strength:  66,
 		stats.Agility:   147,
 		stats.Stamina:   111,
@@ -329,6 +332,7 @@ func init() {
 		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassHunter}] = stats.Stats{
+		stats.Health:    3388,
 		stats.Strength:  61,
 		stats.Agility:   156,
 		stats.Stamina:   107,
@@ -341,6 +345,7 @@ func init() {
 		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassHunter}] = stats.Stats{
+		stats.Health:    3388,
 		stats.Strength:  67,
 		stats.Agility:   148,
 		stats.Stamina:   110,
@@ -353,6 +358,7 @@ func init() {
 		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassHunter}] = stats.Stats{
+		stats.Health:    3388,
 		stats.Strength:  69,
 		stats.Agility:   146,
 		stats.Stamina:   110,
@@ -365,6 +371,7 @@ func init() {
 		stats.MeleeCrit:         -1.53 * core.MeleeCritRatingPerCritChance,
 	}
 	trollStats := stats.Stats{
+		stats.Health:    3388,
 		stats.Strength:  65,
 		stats.Agility:   153,
 		stats.Stamina:   109,

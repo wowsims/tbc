@@ -467,7 +467,7 @@ export const hunterTalentsConfig: TalentsConfig<Spec.SpecHunter> = [
 				maxPoints: 3,
 			},
 			{
-				//fieldName: 'deflection',
+				fieldName: 'deflection',
 				location: {
 					rowIdx: 1,
 					colIdx: 1,

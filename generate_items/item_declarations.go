@@ -96,4 +96,11 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	{ID: 32421, Filter: true},
 	{ID: 32422, Filter: true},
 	{ID: 33482, Filter: true},
+	{ID: 35321, Phase: 4},     // Cloak of arcane Alacrity
+	{ID: 33304, Phase: 4},     // Cloak of Subjugated Power
+	{ID: 34576, Filter: true}, // Battlemaster's Cruelty
+	{ID: 34577, Filter: true}, // Battlemaster's Depreavity
+	{ID: 34578, Filter: true}, // Battlemaster's Determination
+	{ID: 34579, Filter: true}, // Battlemaster's Audacity
+	{ID: 34580, Filter: true}, // Battlemaster's Perseverence
 }
