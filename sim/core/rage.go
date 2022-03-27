@@ -31,6 +31,11 @@ func (character *Character) EnableRageBar(startingRage float64, onRageGain OnRag
 					return
 				}
 
+				// Need separate check to exclude auto replacers (e.g. Heroic Strike and Cleave).
+				if spellEffect.ProcMask.Matches(ProcMaskMeleeMHSpecial) {
+					return
+				}
+
 				var HitFactor float64
 				var BaseSwingSpeed float64
 

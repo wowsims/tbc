@@ -21,11 +21,11 @@ func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpel
 				IgnoreHaste:         true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: SunderArmorCost,
+					Value: warrior.sunderArmorCost,
 				},
 				Cost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: SunderArmorCost,
+					Value: warrior.sunderArmorCost,
 				},
 				CritMultiplier: warrior.critMultiplier(true),
 			},
@@ -45,7 +45,7 @@ func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpel
 		},
 	}
 
-	refundAmount := SunderArmorCost * 0.8
+	refundAmount := warrior.sunderArmorCost * 0.8
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			target := spellEffect.Target
@@ -55,6 +55,8 @@ func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpel
 
 				sa.Effect.Target = target
 				sa.SpellExtras |= core.SpellExtrasAlwaysHits
+				sa.Cost.Value = 0
+				sa.BaseCost.Value = 0
 				if target.NumStacks(core.SunderArmorDebuffID) == 5 {
 					sa.Effect.SpellEffect.ThreatMultiplier = 0
 				}
@@ -86,5 +88,5 @@ func (warrior *Warrior) NewDevastate(_ *core.Simulation, target *core.Target) *c
 }
 
 func (warrior *Warrior) CanDevastate(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= SunderArmorCost
+	return warrior.CurrentRage() >= warrior.sunderArmorCost
 }

@@ -10,9 +10,9 @@ import (
 var WhirlwindCooldownID = core.NewCooldownID()
 var WhirlwindActionID = core.ActionID{SpellID: 1680, CooldownID: WhirlwindCooldownID}
 
-const WhirlwindCost = 25.0
-
 func (warrior *Warrior) newWhirlwindTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	warrior.whirlwindCost = 25.0 - float64(warrior.Talents.FocusedRage)
+
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -22,15 +22,15 @@ func (warrior *Warrior) newWhirlwindTemplate(sim *core.Simulation) core.SimpleSp
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				SpellSchool:         core.SpellSchoolPhysical,
 				GCD:                 core.GCDDefault,
-				Cooldown:            time.Second * 10,
+				Cooldown:            time.Second*10 - time.Second*time.Duration(warrior.Talents.ImprovedWhirlwind),
 				IgnoreHaste:         true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: WhirlwindCost,
+					Value: warrior.whirlwindCost,
 				},
 				Cost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: WhirlwindCost,
+					Value: warrior.whirlwindCost,
 				},
 				CritMultiplier: warrior.critMultiplier(true),
 			},
@@ -72,5 +72,5 @@ func (warrior *Warrior) NewWhirlwind(_ *core.Simulation, target *core.Target) *c
 }
 
 func (warrior *Warrior) CanWhirlwind(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= WhirlwindCost && !warrior.IsOnCD(WhirlwindCooldownID, sim.CurrentTime)
+	return warrior.CurrentRage() >= warrior.whirlwindCost && !warrior.IsOnCD(WhirlwindCooldownID, sim.CurrentTime)
 }

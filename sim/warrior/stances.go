@@ -27,6 +27,8 @@ var DefensiveStanceAuraID = core.NewAuraID()
 var BerserkerStanceAuraID = core.NewAuraID()
 
 func (warrior *Warrior) makeCastStance(_ *core.Simulation, stance Stance, aura core.Aura) func(sim *core.Simulation) {
+	maxRetainedRage := 10.0 + 5*float64(warrior.Talents.TacticalMastery)
+
 	return func(sim *core.Simulation) {
 		if warrior.Stance == stance {
 			panic("Already in stance " + string(stance))
@@ -37,6 +39,9 @@ func (warrior *Warrior) makeCastStance(_ *core.Simulation, stance Stance, aura c
 
 		warrior.SetCD(StanceCooldownID, sim.CurrentTime+StanceCooldown)
 		warrior.Metrics.AddInstantCast(aura.ActionID)
+		if warrior.CurrentRage() > maxRetainedRage {
+			warrior.SpendRage(sim, warrior.CurrentRage()-maxRetainedRage, aura.ActionID)
+		}
 
 		// Remove old stance aura.
 		if warrior.Stance == BattleStance {
