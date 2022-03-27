@@ -9,8 +9,6 @@ import (
 var SunderArmorActionID = core.ActionID{SpellID: 25225}
 
 func (warrior *Warrior) newSunderArmorTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
-	warrior.sunderArmorCost = 15.0 - float64(warrior.Talents.ImprovedSunderArmor) - float64(warrior.Talents.FocusedRage)
-
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{

@@ -32,6 +32,7 @@ type Warrior struct {
 	shoutDuration    time.Duration
 	bloodthirstCost  float64
 	shoutCost        float64
+	demoShoutCost    float64
 	heroicStrikeCost float64
 	revengeCost      float64
 	shieldSlamCost   float64

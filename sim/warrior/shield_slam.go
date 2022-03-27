@@ -11,9 +11,9 @@ import (
 var ShieldSlamCooldownID = core.NewCooldownID()
 var ShieldSlamActionID = core.ActionID{SpellID: 30356, CooldownID: ShieldSlamCooldownID}
 
-const ShieldSlamCost = 20.0
-
 func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+	warrior.shieldSlamCost = 20.0 - float64(warrior.Talents.FocusedRage)
+
 	warrior.canShieldSlam = warrior.Talents.ShieldSlam && warrior.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType == proto.WeaponType_WeaponTypeShield
 
 	ability := core.SimpleSpell{
@@ -29,11 +29,11 @@ func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpe
 				IgnoreHaste:         true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: ShieldSlamCost,
+					Value: warrior.shieldSlamCost,
 				},
 				Cost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: ShieldSlamCost,
+					Value: warrior.shieldSlamCost,
 				},
 				CritMultiplier: warrior.critMultiplier(true),
 			},
@@ -57,7 +57,7 @@ func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpe
 		ability.Effect.SpellEffect.StaticDamageMultiplier *= 1.1
 	}
 
-	refundAmount := ShieldSlamCost * 0.8
+	refundAmount := warrior.shieldSlamCost * 0.8
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if !spellEffect.Landed() {
 			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
@@ -79,5 +79,5 @@ func (warrior *Warrior) NewShieldSlam(_ *core.Simulation, target *core.Target) *
 }
 
 func (warrior *Warrior) CanShieldSlam(sim *core.Simulation) bool {
-	return warrior.canShieldSlam && warrior.CurrentRage() >= ShieldSlamCost && !warrior.IsOnCD(ShieldSlamCooldownID, sim.CurrentTime)
+	return warrior.canShieldSlam && warrior.CurrentRage() >= warrior.shieldSlamCost && !warrior.IsOnCD(ShieldSlamCooldownID, sim.CurrentTime)
 }

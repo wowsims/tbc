@@ -13,6 +13,8 @@ func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.
 		warrior.shoutCost -= 2
 	}
 
+	warrior.demoShoutCost = warrior.shoutCost - float64(warrior.Talents.FocusedRage)
+
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -24,11 +26,11 @@ func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.
 				IgnoreHaste:         true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: warrior.shoutCost,
+					Value: warrior.demoShoutCost,
 				},
 				Cost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: warrior.shoutCost,
+					Value: warrior.demoShoutCost,
 				},
 			},
 		},
@@ -68,5 +70,5 @@ func (warrior *Warrior) NewDemoralizingShout(_ *core.Simulation) *core.SimpleSpe
 }
 
 func (warrior *Warrior) CanDemoralizingShout(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= warrior.shoutCost
+	return warrior.CurrentRage() >= warrior.demoShoutCost
 }
