@@ -7,9 +7,12 @@ import (
 
 var DemoralizingShoutActionID = core.ActionID{SpellID: 25203}
 
-const DemoralizingShoutCost = 10.0
-
 func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	warrior.shoutCost = 10.0
+	if ItemSetBoldArmor.CharacterHasSetBonus(&warrior.Character, 2) {
+		warrior.shoutCost -= 2
+	}
+
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -21,11 +24,11 @@ func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.
 				IgnoreHaste:         true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: DemoralizingShoutCost,
+					Value: warrior.shoutCost,
 				},
 				Cost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: DemoralizingShoutCost,
+					Value: warrior.shoutCost,
 				},
 			},
 		},
@@ -65,5 +68,5 @@ func (warrior *Warrior) NewDemoralizingShout(_ *core.Simulation) *core.SimpleSpe
 }
 
 func (warrior *Warrior) CanDemoralizingShout(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= DemoralizingShoutCost
+	return warrior.CurrentRage() >= warrior.shoutCost
 }

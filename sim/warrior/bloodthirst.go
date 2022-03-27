@@ -11,9 +11,12 @@ import (
 var BloodthirstCooldownID = core.NewCooldownID()
 var BloodthirstActionID = core.ActionID{SpellID: 30335, CooldownID: BloodthirstCooldownID}
 
-const BloodthirstCost = 30.0
-
 func (warrior *Warrior) newBloodthirstTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+	warrior.bloodthirstCost = 30
+	if ItemSetDestroyerBattlegear.CharacterHasSetBonus(&warrior.Character, 4) {
+		warrior.bloodthirstCost -= 5
+	}
+
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -27,11 +30,11 @@ func (warrior *Warrior) newBloodthirstTemplate(_ *core.Simulation) core.SimpleSp
 				IgnoreHaste:         true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: BloodthirstCost,
+					Value: warrior.bloodthirstCost,
 				},
 				Cost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: BloodthirstCost,
+					Value: warrior.bloodthirstCost,
 				},
 				CritMultiplier: warrior.critMultiplier(true),
 			},
@@ -51,7 +54,11 @@ func (warrior *Warrior) newBloodthirstTemplate(_ *core.Simulation) core.SimpleSp
 		},
 	}
 
-	refundAmount := BloodthirstCost * 0.8
+	if ItemSetOnslaughtBattlegear.CharacterHasSetBonus(&warrior.Character, 4) {
+		ability.Effect.SpellEffect.StaticDamageMultiplier *= 1.05
+	}
+
+	refundAmount := warrior.bloodthirstCost * 0.8
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if !spellEffect.Landed() {
 			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
@@ -75,5 +82,5 @@ func (warrior *Warrior) NewBloodthirst(_ *core.Simulation, target *core.Target) 
 }
 
 func (warrior *Warrior) CanBloodthirst(sim *core.Simulation) bool {
-	return warrior.Talents.Bloodthirst && warrior.CurrentRage() >= BloodthirstCost && !warrior.IsOnCD(BloodthirstCooldownID, sim.CurrentTime)
+	return warrior.Talents.Bloodthirst && warrior.CurrentRage() >= warrior.bloodthirstCost && !warrior.IsOnCD(BloodthirstCooldownID, sim.CurrentTime)
 }

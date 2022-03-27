@@ -53,6 +53,10 @@ func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpe
 		},
 	}
 
+	if ItemSetOnslaughtArmor.CharacterHasSetBonus(&warrior.Character, 4) {
+		ability.Effect.SpellEffect.StaticDamageMultiplier *= 1.1
+	}
+
 	refundAmount := ShieldSlamCost * 0.8
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if !spellEffect.Landed() {

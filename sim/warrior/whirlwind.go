@@ -12,6 +12,9 @@ var WhirlwindActionID = core.ActionID{SpellID: 1680, CooldownID: WhirlwindCooldo
 
 func (warrior *Warrior) newWhirlwindTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	warrior.whirlwindCost = 25.0 - float64(warrior.Talents.FocusedRage)
+	if ItemSetWarbringerBattlegear.CharacterHasSetBonus(&warrior.Character, 2) {
+		warrior.whirlwindCost -= 5
+	}
 
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{

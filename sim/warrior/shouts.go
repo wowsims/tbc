@@ -7,20 +7,18 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var ShoutCost = 10.0
-
 func (warrior *Warrior) makeCastShoutHelper(actionID core.ActionID) func(sim *core.Simulation) {
 	return func(sim *core.Simulation) {
 		if warrior.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
 			panic("Shout requires GCD")
 		}
-		if warrior.CurrentRage() < ShoutCost {
+		if warrior.CurrentRage() < warrior.shoutCost {
 			panic("Shout requires rage")
 		}
 
 		// Actual shout effects are handled in core/buffs.go
 		warrior.SetCD(core.GCDCooldownID, sim.CurrentTime+core.GCDDefault)
-		warrior.SpendRage(sim, ShoutCost, actionID)
+		warrior.SpendRage(sim, warrior.shoutCost, actionID)
 		warrior.Metrics.AddInstantCast(actionID)
 		warrior.shoutExpiresAt = sim.CurrentTime + warrior.shoutDuration
 	}
@@ -37,5 +35,5 @@ func (warrior *Warrior) makeCastShout() func(sim *core.Simulation) {
 }
 
 func (warrior *Warrior) ShouldShout(sim *core.Simulation) bool {
-	return warrior.Shout != proto.WarriorShout_WarriorShoutNone && warrior.CurrentRage() >= ShoutCost && sim.CurrentTime+time.Second*3 > warrior.shoutExpiresAt
+	return warrior.Shout != proto.WarriorShout_WarriorShoutNone && warrior.CurrentRage() >= warrior.shoutCost && sim.CurrentTime+time.Second*3 > warrior.shoutExpiresAt
 }
