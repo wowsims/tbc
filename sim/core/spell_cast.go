@@ -140,6 +140,12 @@ func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *Simpl
 	} else if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
 		spellEffect.Outcome = spellEffect.WhiteHitTableResult(sim, spell)
 	}
+
+	if spellEffect.Landed() {
+		if spellEffect.critCheck(sim, &spell.SpellCast) {
+			spellEffect.Outcome = OutcomeCrit
+		}
+	}
 }
 
 func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spell *SimpleSpell) {
@@ -239,8 +245,12 @@ func (hitEffect *SpellHitEffect) calculateDirectDamage(sim *Simulation, spellCas
 
 	hitEffect.applyResistances(sim, spellCast, &damage)
 
-	if hitEffect.SpellEffect.critCheck(sim, spellCast) {
-		hitEffect.Outcome |= OutcomeCrit
+	//if hitEffect.SpellEffect.critCheck(sim, spellCast) {
+	//	hitEffect.Outcome |= OutcomeCrit
+	//	damage *= spellCast.CritMultiplier
+	//	hitEffect.SpellEffect.BeyondAOECapMultiplier *= spellCast.CritMultiplier
+	//}
+	if hitEffect.Outcome.Matches(OutcomeCrit) {
 		damage *= spellCast.CritMultiplier
 		hitEffect.SpellEffect.BeyondAOECapMultiplier *= spellCast.CritMultiplier
 	}

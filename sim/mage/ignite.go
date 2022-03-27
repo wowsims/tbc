@@ -18,7 +18,7 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 					SpellID: SpellIDIgnite,
 				},
 				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
+				CritRollCategory:    core.CritRollCategoryNone,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
 				SpellExtras:         SpellFlagMage | core.SpellExtrasBinary | core.SpellExtrasAlwaysHits,

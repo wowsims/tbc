@@ -249,12 +249,12 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	//	character.Log(sim, "Melee dmg calcs: AP=%0.1f, bonusWepDmg:%0.1f, dmgMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weaponDmgCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, ahe.DamageMultiplier, ahe.StaticDamageMultiplier, ahe.HitType, dmg, ability.CritMultiplier, ahe.Target.currentArmor)
 	//}
 
-	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
-	if ahe.critCheck(sim, &ability.SpellCast) {
-		ahe.Outcome = OutcomeCrit
-	}
+	//// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
+	//if ahe.critCheck(sim, &ability.SpellCast) {
+	//	ahe.Outcome = OutcomeCrit
+	//}
 
-	if ahe.Outcome == OutcomeCrit {
+	if ahe.Outcome.Matches(OutcomeCrit) {
 		dmg *= ability.CritMultiplier
 	} else if ahe.Outcome == OutcomeGlance {
 		// TODO glancing blow damage reduction is actually a range ([65%, 85%] vs. 73)
