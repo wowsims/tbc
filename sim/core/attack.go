@@ -262,13 +262,7 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	}
 
 	// Apply damage reduction.
-	if ability.SpellSchool.Matches(SpellSchoolPhysical) {
-		if !ability.SpellExtras.Matches(SpellExtrasIgnoreResists) {
-			dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
-		}
-	} else if !ability.SpellExtras.Matches(SpellExtrasBinary | SpellExtrasIgnoreResists) {
-		dmg = calculateResists(sim, dmg, &ahe.SpellEffect)
-	}
+	ahe.applyResistances(sim, &ability.SpellCast, &dmg)
 
 	// Apply all other effect multipliers.
 	dmg *= ahe.DamageMultiplier * ahe.StaticDamageMultiplier
