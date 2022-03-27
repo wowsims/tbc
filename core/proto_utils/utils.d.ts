@@ -80,6 +80,7 @@ export declare const raceToFaction: Record<Race, Faction>;
 export declare const specToClass: Record<Spec, Class>;
 export declare const specToEligibleRaces: Record<Spec, Array<Race>>;
 export declare function isDualWieldSpec(spec: Spec): boolean;
+export declare function isTankSpec(spec: Spec): boolean;
 export declare const specToLocalStorageKey: Record<Spec, string>;
 export declare function withSpecProto<SpecType extends Spec>(spec: Spec, player: Player, rotation: SpecRotation<SpecType>, talents: SpecTalents<SpecType>, specOptions: SpecOptions<SpecType>): Player;
 export declare function playerToSpec(player: Player): Spec;

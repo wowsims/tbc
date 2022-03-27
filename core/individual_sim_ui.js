@@ -36,6 +36,7 @@ import { newIndividualExporters } from '/tbc/core/components/exporters.js';
 import { newIndividualImporters } from '/tbc/core/components/importers.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
+import { isTankSpec } from '/tbc/core/proto_utils/utils.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
@@ -636,7 +637,7 @@ export class IndividualSimUI extends SimUI {
             this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
             this.sim.encounter.applyDefaults(eventID);
             this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
-            this.sim.applyDefaults(eventID);
+            this.sim.applyDefaults(eventID, isTankSpec(this.player.spec));
         });
     }
     registerExclusiveEffect(effect) {

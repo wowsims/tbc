@@ -974,11 +974,12 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
     constructor() {
         super("proto.ProtectionWarrior.Rotation", [
             { no: 1, name: "demo_shout", kind: "enum", T: () => ["proto.ProtectionWarrior.Rotation.DemoShout", ProtectionWarrior_Rotation_DemoShout] },
-            { no: 2, name: "thunder_clap", kind: "enum", T: () => ["proto.ProtectionWarrior.Rotation.ThunderClap", ProtectionWarrior_Rotation_ThunderClap] }
+            { no: 2, name: "thunder_clap", kind: "enum", T: () => ["proto.ProtectionWarrior.Rotation.ThunderClap", ProtectionWarrior_Rotation_ThunderClap] },
+            { no: 3, name: "heroic_strike_threshold", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { demoShout: 0, thunderClap: 0 };
+        const message = { demoShout: 0, thunderClap: 0, heroicStrikeThreshold: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -994,6 +995,9 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
                     break;
                 case /* proto.ProtectionWarrior.Rotation.ThunderClap thunder_clap */ 2:
                     message.thunderClap = reader.int32();
+                    break;
+                case /* int32 heroic_strike_threshold */ 3:
+                    message.heroicStrikeThreshold = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1013,6 +1017,9 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
         /* proto.ProtectionWarrior.Rotation.ThunderClap thunder_clap = 2; */
         if (message.thunderClap !== 0)
             writer.tag(2, WireType.Varint).int32(message.thunderClap);
+        /* int32 heroic_strike_threshold = 3; */
+        if (message.heroicStrikeThreshold !== 0)
+            writer.tag(3, WireType.Varint).int32(message.heroicStrikeThreshold);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

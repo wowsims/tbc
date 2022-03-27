@@ -361,11 +361,11 @@ export class Sim {
             this.setShowExperimental(eventID, proto.showExperimental);
         });
     }
-    applyDefaults(eventID) {
+    applyDefaults(eventID, isTankSim) {
         this.fromProto(eventID, SimSettingsProto.create({
             iterations: 3000,
             phase: OtherConstants.CURRENT_PHASE,
-            showThreatMetrics: false, // TODO: true if tank sim
+            showThreatMetrics: isTankSim,
         }));
     }
 }

@@ -71,6 +71,7 @@ export declare const ProtectionWarriorRotationConfig: {
             changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => TypedEvent<void>;
             getValue: (player: Player<Spec.SpecProtectionWarrior>) => DemoShout;
             setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => void;
+            labelTooltip?: undefined;
         };
     } | {
         type: "enum";
@@ -85,6 +86,19 @@ export declare const ProtectionWarriorRotationConfig: {
             changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => TypedEvent<void>;
             getValue: (player: Player<Spec.SpecProtectionWarrior>) => ThunderClap;
             setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => void;
+            labelTooltip?: undefined;
+        };
+    } | {
+        type: "number";
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+        config: {
+            label: string;
+            labelTooltip: string;
+            changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecProtectionWarrior>) => number;
+            setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => void;
+            values?: undefined;
         };
     })[];
 };

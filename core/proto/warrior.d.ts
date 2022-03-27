@@ -412,6 +412,12 @@ export interface ProtectionWarrior_Rotation {
      * @generated from protobuf field: proto.ProtectionWarrior.Rotation.ThunderClap thunder_clap = 2;
      */
     thunderClap: ProtectionWarrior_Rotation_ThunderClap;
+    /**
+     * Minimum rage to queue HS or Cleave.
+     *
+     * @generated from protobuf field: int32 heroic_strike_threshold = 3;
+     */
+    heroicStrikeThreshold: number;
 }
 /**
  * @generated from protobuf enum proto.ProtectionWarrior.Rotation.DemoShout
