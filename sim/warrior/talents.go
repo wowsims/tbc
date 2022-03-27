@@ -1,6 +1,8 @@
 package warrior
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -60,6 +62,20 @@ func (warrior *Warrior) ApplyTalents() {
 	}
 
 	warrior.applyOneHandedWeaponSpecialization()
+}
+
+// Unlike most other applyXXX() talent appliers, this is meant to be called from Reset().
+func (warrior *Warrior) applyAngerManagement(sim *core.Simulation) {
+	if !warrior.Talents.AngerManagement {
+		return
+	}
+
+	core.StartPeriodicAction(sim, core.PeriodicActionOptions{
+		Period: time.Second * 3,
+		OnAction: func(sim *core.Simulation) {
+			warrior.AddRage(sim, 1, core.ActionID{SpellID: 12296})
+		},
+	})
 }
 
 var OneHandedWeaponSpecializationAuraID = core.NewAuraID()
