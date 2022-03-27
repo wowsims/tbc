@@ -97,15 +97,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			hitEffect.beforeCalculations(sim, spell)
 
 			if hitEffect.Landed() {
-				// Weapon Damage Effects
-				if hitEffect.WeaponInput.HasWeaponDamage() {
-					hitEffect.calculateWeaponDamage(sim, spell)
-				}
-
-				// Direct Damage Effects
-				if hitEffect.DirectInput.MaxBaseDamage != 0 {
-					hitEffect.calculateDirectDamage(sim, &spell.SpellCast)
-				}
+				hitEffect.directCalculations(sim, spell)
 
 				// Dot Damage Effects
 				if hitEffect.DotInput.NumberOfTicks != 0 {
@@ -127,14 +119,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			for effectIdx := range spell.Effects {
 				hitEffect := &spell.Effects[effectIdx]
 				if hitEffect.Landed() {
-					// Weapon Damage Effects
-					if hitEffect.WeaponInput.HasWeaponDamage() {
-						hitEffect.calculateWeaponDamage(sim, spell)
-					}
-					// Direct Damage Effects
-					if hitEffect.DirectInput.MaxBaseDamage != 0 {
-						hitEffect.calculateDirectDamage(sim, &spell.SpellCast)
-					}
+					hitEffect.directCalculations(sim, spell)
 					if hitEffect.DotInput.NumberOfTicks != 0 {
 						hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
 					}

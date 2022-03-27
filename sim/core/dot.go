@@ -197,16 +197,8 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 		hitEffect.Outcome = OutcomeHit
 	}
 
-	if hitEffect.Landed() {
-		hitEffect.applyResistances(sim, spellCast, &damage)
-
-		if hitEffect.Outcome.Matches(OutcomeCrit) {
-			damage *= spellCast.CritMultiplier
-			hitEffect.SpellEffect.BeyondAOECapMultiplier *= spellCast.CritMultiplier
-		}
-	} else {
-		damage = 0
-	}
+	hitEffect.applyResistances(sim, spellCast, &damage)
+	hitEffect.applyOutcome(sim, spellCast, &damage)
 
 	hitEffect.SpellEffect.Damage = damage
 }

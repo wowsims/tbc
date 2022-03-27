@@ -2,12 +2,10 @@ package core
 
 import (
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // ReplaceMHSwing is called right before an auto attack fires
@@ -87,7 +85,7 @@ func (character *Character) WeaponFromRanged(critMultiplier float64) Weapon {
 }
 
 func (weapon Weapon) BaseDamage(sim *Simulation) float64 {
-	return weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("melee")
+	return weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("Weapon Base Damage")
 }
 
 func (weapon Weapon) calculateWeaponDamage(sim *Simulation, attackPower float64) float64 {
@@ -113,161 +111,6 @@ type WeaponDamageInput struct {
 
 func (wdi WeaponDamageInput) HasWeaponDamage() bool {
 	return wdi.DamageMultiplier != 0 || wdi.CalculateDamage != nil
-}
-
-// Computes an attack result using the white-hit table formula (single roll).
-func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpell) HitOutcome {
-	// 1. Single roll -> Miss				Dodge	Parry	Glance	Block	Crit / Hit
-	// 3 				8.0%(9.0% hit cap)	6.5%	14.0%	24% 	5%		-4.8%
-
-	// TODO: many calculations in here can be cached. For now its just written out fully.
-	//  Once everything is working we can start caching values.
-	character := ability.Character
-
-	roll := sim.RandomFloat("auto attack")
-
-	// Miss
-	missChance := ahe.Target.MissChance
-	if character.AutoAttacks.IsDualWielding && ability.OutcomeRollCategory == OutcomeRollCategoryWhite {
-		missChance += 0.19
-	}
-	hitBonus := ((character.stats[stats.MeleeHit] + ahe.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - ahe.Target.HitSuppression
-	if hitBonus > 0 {
-		missChance = MaxFloat(0, missChance-hitBonus)
-	}
-
-	chance := missChance
-	if roll < chance {
-		return OutcomeMiss
-	}
-
-	if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
-		// Dodge
-		if !ability.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
-			dodge := ahe.Target.Dodge
-			expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
-			chance += dodge - expertisePercentage
-			if roll < chance {
-				return OutcomeDodge
-			}
-		}
-
-		// Parry (if in front)
-		// If the target is a mob and defense minus weapon skill is 11 or more:
-		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.6%
-
-		// If the target is a mob and defense minus weapon skill is 10 or less:
-		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.1%
-
-		// Block (if in front)
-		// If the target is a mob:
-		// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
-		// If we actually implement blocks, ranged hits can be blocked.
-
-		// No need to crit/glance roll if we are not a white hit
-		if ability.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial | OutcomeRollCategoryRanged) {
-			return OutcomeHit
-		}
-
-		// Glance
-		chance += ahe.Target.Glance
-		if roll < chance {
-			return OutcomeGlance
-		}
-
-		// Crit
-		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
-		chance += critChance
-		if roll < chance {
-			return OutcomeCrit
-		}
-	}
-
-	return OutcomeHit
-}
-
-func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *SimpleSpell) {
-	if ahe.StaticDamageMultiplier == 0 {
-		ahe.Damage = 0
-		return
-	}
-
-	if !ahe.Landed() {
-		ahe.Damage = 0
-		return
-	}
-
-	character := ability.Character
-
-	var attackPower float64
-	var bonusWeaponDamage float64
-	if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-		// all ranged attacks honor BonusAttackPowerOnTarget...
-		attackPower = character.stats[stats.RangedAttackPower] + ahe.BonusAttackPower + ahe.BonusAttackPowerOnTarget
-		bonusWeaponDamage = character.PseudoStats.BonusDamage + ahe.BonusWeaponDamage
-	} else {
-		attackPower = character.stats[stats.AttackPower] + ahe.BonusAttackPower
-		bonusWeaponDamage = character.PseudoStats.BonusDamage + ahe.BonusWeaponDamage
-	}
-
-	dmg := 0.0
-	if ahe.WeaponInput.CalculateDamage != nil {
-		dmg += ahe.WeaponInput.CalculateDamage(attackPower, bonusWeaponDamage)
-	} else if ahe.WeaponInput.DamageMultiplier != 0 {
-		// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
-		// TODO not all weapon damage based attacks "scale" with +bonusWeaponDamage (e.g. Devastate, Shiv, Mutilate don't)
-		// ... but for other's, BonusAttackPowerOnTarget only applies to weapon damage based attacks
-		if ahe.WeaponInput.Normalized {
-			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-				dmg += character.AutoAttacks.Ranged.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
-			} else if !ahe.WeaponInput.Offhand {
-				dmg += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower+ahe.BonusAttackPowerOnTarget) + bonusWeaponDamage
-			} else {
-				dmg += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower+2*ahe.BonusAttackPowerOnTarget)*0.5 + bonusWeaponDamage
-			}
-		} else {
-			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-				dmg += character.AutoAttacks.Ranged.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
-			} else if !ahe.WeaponInput.Offhand {
-				dmg += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower+ahe.BonusAttackPowerOnTarget) + bonusWeaponDamage
-			} else {
-				dmg += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower+2*ahe.BonusAttackPowerOnTarget)*0.5 + bonusWeaponDamage
-			}
-		}
-		dmg += ahe.WeaponInput.FlatDamageBonus
-		dmg *= ahe.WeaponInput.DamageMultiplier
-	}
-
-	if ahe.DirectInput.SpellCoefficient > 0 {
-		bonus := (character.GetStat(stats.SpellPower) + character.GetStat(ability.SpellSchool.Stat())) * ahe.DirectInput.SpellCoefficient * ahe.WeaponInput.DamageMultiplier
-		bonus += ahe.SpellEffect.BonusSpellPower * ahe.DirectInput.SpellCoefficient // does not get changed by weapon input multiplier
-		dmg += bonus
-	}
-	dmg += ahe.DirectInput.FlatDamageBonus
-
-	//if sim.Log != nil {
-	//	character.Log(sim, "Melee dmg calcs: AP=%0.1f, bonusWepDmg:%0.1f, dmgMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weaponDmgCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, ahe.DamageMultiplier, ahe.StaticDamageMultiplier, ahe.HitType, dmg, ability.CritMultiplier, ahe.Target.currentArmor)
-	//}
-
-	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
-	if ahe.critCheck(sim, &ability.SpellCast) {
-		ahe.Outcome = OutcomeCrit
-	}
-
-	if ahe.Outcome == OutcomeCrit {
-		dmg *= ability.CritMultiplier
-	} else if ahe.Outcome == OutcomeGlance {
-		// TODO glancing blow damage reduction is actually a range ([65%, 85%] vs. 73)
-		dmg *= 0.75
-	}
-
-	// Apply damage reduction.
-	ahe.applyResistances(sim, &ability.SpellCast, &dmg)
-
-	// Apply all other effect multipliers.
-	dmg *= ahe.DamageMultiplier * ahe.StaticDamageMultiplier
-
-	ahe.Damage += dmg
 }
 
 // Returns whether this hit effect is associated with the main-hand weapon.
