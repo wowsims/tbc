@@ -14,7 +14,7 @@ var RuptureEnergyCost = 25.0
 func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
-	ability := rogue.newAbility(RuptureActionID, RuptureEnergyCost, SpellFlagFinisher|core.SpellExtrasBinary, core.ProcMaskMeleeMHSpecial)
+	ability := rogue.newAbility(RuptureActionID, RuptureEnergyCost, SpellFlagFinisher|core.SpellExtrasIgnoreResists, core.ProcMaskMeleeMHSpecial)
 	ability.SpellCast.Cast.CritRollCategory = core.CritRollCategoryNone
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
