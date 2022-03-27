@@ -132,6 +132,8 @@ func (warrior *Warrior) Reset(sim *core.Simulation) {
 			warrior.shoutExpiresAt = warrior.shoutDuration - time.Second*10
 		}
 	}
+
+	warrior.applyAngerManagement(sim)
 }
 
 func NewWarrior(character core.Character, talents proto.WarriorTalents, inputs WarriorInputs) *Warrior {
