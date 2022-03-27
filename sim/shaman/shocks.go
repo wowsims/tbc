@@ -33,7 +33,7 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         spellSchool,
-				SpellExtras:         core.SpellExtrasBinary | SpellFlagShock,
+				SpellExtras:         SpellFlagShock,
 				BaseCost:            cost,
 				Cost:                cost,
 				GCD:                 core.GCDDefault,
@@ -98,6 +98,7 @@ func (shaman *Shaman) applyShockInitModifiers(spellCast *core.SpellCast) {
 
 func (shaman *Shaman) newEarthShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	spell := shaman.newShockTemplateSpell(sim, SpellIDEarthShock, core.SpellSchoolNature, 535.0)
+	spell.SpellExtras |= core.SpellExtrasBinary
 
 	spell.Effect.DirectInput = core.DirectDamageInput{
 		MinBaseDamage:    661,
@@ -156,6 +157,7 @@ func (shaman *Shaman) NewFlameShock(sim *core.Simulation, target *core.Target) *
 
 func (shaman *Shaman) newFrostShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	spell := shaman.newShockTemplateSpell(sim, SpellIDFrostShock, core.SpellSchoolFrost, 525.0)
+	spell.SpellExtras |= core.SpellExtrasBinary
 
 	spell.Effect.DirectInput = core.DirectDamageInput{
 		MinBaseDamage:    647,
