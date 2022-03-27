@@ -199,7 +199,7 @@ func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast 
 
 	// Direct Damage Effects
 	if hitEffect.DirectInput.MaxBaseDamage != 0 {
-		baseDamage := hitEffect.DirectInput.MinBaseDamage + sim.RandomFloat("DirectSpell Base Damage")*(hitEffect.DirectInput.MaxBaseDamage-hitEffect.DirectInput.MinBaseDamage)
+		baseDamage := hitEffect.DirectInput.MinBaseDamage + sim.RandomFloat("Base Damage Direct")*(hitEffect.DirectInput.MaxBaseDamage-hitEffect.DirectInput.MinBaseDamage)
 
 		schoolBonus := 0.0
 		// Use outcome roll to decide if it should use AP or spell school for bonus damage.
@@ -250,7 +250,7 @@ func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spell *SimpleS
 func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpell) HitOutcome {
 	character := ability.Character
 
-	roll := sim.RandomFloat("auto attack")
+	roll := sim.RandomFloat("White Hit Table")
 
 	// Miss
 	missChance := ahe.Target.MissChance
@@ -317,7 +317,7 @@ func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spellCast *SpellCast) 
 	hit := 0.83 + (spellCast.Character.GetStat(stats.SpellHit)+spellEffect.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
-	return sim.RandomFloat("SpellCast Hit") < hit
+	return sim.RandomFloat("Magical Hit Roll") < hit
 }
 
 // Calculates a crit check using the stats from this spell.
@@ -325,10 +325,10 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast)
 	switch spellCast.CritRollCategory {
 	case CritRollCategoryMagical:
 		critChance := (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
-		return sim.RandomFloat("DirectSpell Crit") < critChance
+		return sim.RandomFloat("Magical Crit Roll") < critChance
 	case CritRollCategoryPhysical:
 		critChance := (spellCast.Character.GetStat(stats.MeleeCrit)+spellCast.BonusCritRating+spellEffect.BonusCritRating)/(MeleeCritRatingPerCritChance*100) - spellEffect.Target.CritSuppression
-		return sim.RandomFloat("weapon swing") < critChance
+		return sim.RandomFloat("Physical Crit Roll") < critChance
 	default:
 		return false
 	}
@@ -407,7 +407,7 @@ func (hitEffect *SpellHitEffect) applyResistances(sim *Simulation, spellCast *Sp
 		// Magical resistance.
 		// https://royalgiraffe.github.io/resist-guide
 
-		resistanceRoll := sim.RandomFloat("DirectSpell Resist")
+		resistanceRoll := sim.RandomFloat("Partial Resist")
 		if resistanceRoll > 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
 			// No partial resist.
 		} else if resistanceRoll > 0.05 {

@@ -40,8 +40,8 @@ func TestAutoSwing(t *testing.T) {
 		key   ActionKey
 		value float64
 	}{
-		{key: NewActionKey(ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1}), value: 290.042434315968},
-		{key: NewActionKey(ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2}), value: 111.03181478285845},
+		{key: NewActionKey(ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1}), value: 323.355012},
+		{key: NewActionKey(ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2}), value: 126.601614},
 	}
 	tolerance := 0.0001
 	for _, mt := range metricTests {
@@ -89,8 +89,8 @@ func TestRangedAutoSwing(t *testing.T) {
 		key   ActionKey
 		value float64
 	}{
-		{name: "main hand attack", key: NewActionKey(ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1}), value: 448.937683},
-		{name: "ranged attack", key: NewActionKey(ActionID{OtherID: proto.OtherAction_OtherActionShoot}), value: 191.362286},
+		{name: "main hand attack", key: NewActionKey(ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1}), value: 483.630072},
+		{name: "ranged attack", key: NewActionKey(ActionID{OtherID: proto.OtherAction_OtherActionShoot}), value: 218.079693},
 	}
 	tolerance := 0.0001
 
