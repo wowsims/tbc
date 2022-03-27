@@ -815,6 +815,13 @@ export function isDualWieldSpec(spec: Spec): boolean {
 	return dualWieldSpecs.includes(spec);
 }
 
+const tankSpecs: Array<Spec> = [
+	Spec.SpecProtectionWarrior,
+];
+export function isTankSpec(spec: Spec): boolean {
+	return tankSpecs.includes(spec);
+}
+
 // Prefixes used for storing browser data for each site. Even if a Spec is
 // renamed, DO NOT change these values or people will lose their saved data.
 export const specToLocalStorageKey: Record<Spec, string> = {
