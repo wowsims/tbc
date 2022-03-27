@@ -234,6 +234,8 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 	rogue.PseudoStats.ThreatMultiplier *= 0.71
 
 	daggerMH := rogue.Equip[proto.ItemSlot_ItemSlotMainHand].WeaponType == proto.WeaponType_WeaponTypeDagger
+	daggerOH := rogue.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType == proto.WeaponType_WeaponTypeDagger
+	dualDagger := daggerMH && daggerOH
 	if rogue.Rotation.Builder == proto.Rogue_Rotation_Unknown {
 		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
 	}
@@ -243,9 +245,11 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
 	} else if rogue.Rotation.Builder == proto.Rogue_Rotation_Mutilate && !rogue.Talents.Mutilate {
 		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
+	} else if rogue.Rotation.Builder == proto.Rogue_Rotation_Mutilate && !dualDagger {
+		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
 	}
 	if rogue.Rotation.Builder == proto.Rogue_Rotation_Auto {
-		if rogue.Talents.Mutilate {
+		if rogue.Talents.Mutilate && dualDagger{
 			rogue.Rotation.Builder = proto.Rogue_Rotation_Mutilate
 		} else if rogue.Talents.Hemorrhage {
 			rogue.Rotation.Builder = proto.Rogue_Rotation_Hemorrhage
