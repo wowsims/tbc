@@ -10,6 +10,8 @@ import (
 	"github.com/wowsims/tbc/sim/paladin"
 )
 
+// Do 1 less millisecond to solve for sim order of operation problems
+// Buffs are removed before melee swing is processed
 const twistWindow = 399 * time.Millisecond
 
 func RegisterRetributionPaladin() {
@@ -195,7 +197,7 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	}
 
 	// Determine when next action is available
-	// Throw everything into an array then filter and sort compared to do individual comparisons
+	// Throw everything into an array then filter and sort compared to doing individual comparisons
 	var events [5]time.Duration
 	events[0] = ret.AutoAttacks.NextAttackAt()               // next swing
 	events[1] = ret.AutoAttacks.NextAttackAt() - twistWindow // next twist window
@@ -216,7 +218,7 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 
 	var filteredEvents []time.Duration = events[:n]
 
-	// Sort it
+	// Sort it to get minimum element
 	sort.Slice(filteredEvents, func(i, j int) bool { return events[i] < events[j] })
 	ret.WaitUntil(sim, filteredEvents[0])
 }
