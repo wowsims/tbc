@@ -11,9 +11,9 @@ import (
 var RevengeCooldownID = core.NewCooldownID()
 var RevengeActionID = core.ActionID{SpellID: 30357, CooldownID: RevengeCooldownID}
 
-const RevengeCost = 5.0
-
 func (warrior *Warrior) newRevengeTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+	warrior.revengeCost = 5.0 - float64(warrior.Talents.FocusedRage)
+
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -27,11 +27,11 @@ func (warrior *Warrior) newRevengeTemplate(_ *core.Simulation) core.SimpleSpellT
 				IgnoreHaste:         true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: RevengeCost,
+					Value: warrior.revengeCost,
 				},
 				Cost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: RevengeCost,
+					Value: warrior.revengeCost,
 				},
 				CritMultiplier: warrior.critMultiplier(true),
 			},
@@ -51,7 +51,7 @@ func (warrior *Warrior) newRevengeTemplate(_ *core.Simulation) core.SimpleSpellT
 		},
 	}
 
-	refundAmount := RevengeCost * 0.8
+	refundAmount := warrior.revengeCost * 0.8
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if !spellEffect.Landed() {
 			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
@@ -72,5 +72,5 @@ func (warrior *Warrior) NewRevenge(_ *core.Simulation, target *core.Target) *cor
 }
 
 func (warrior *Warrior) CanRevenge(sim *core.Simulation) bool {
-	return warrior.StanceMatches(DefensiveStance) && warrior.revengeTriggered && warrior.CurrentRage() >= RevengeCost && !warrior.IsOnCD(RevengeCooldownID, sim.CurrentTime)
+	return warrior.StanceMatches(DefensiveStance) && warrior.revengeTriggered && warrior.CurrentRage() >= warrior.revengeCost && !warrior.IsOnCD(RevengeCooldownID, sim.CurrentTime)
 }

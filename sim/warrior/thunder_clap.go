@@ -10,9 +10,20 @@ import (
 var ThunderClapCooldownID = core.NewCooldownID()
 var ThunderClapActionID = core.ActionID{SpellID: 25264, CooldownID: ThunderClapCooldownID}
 
-const ThunderClapCost = 20.0
-
 func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	warrior.thunderClapCost = 20.0 - float64(warrior.Talents.FocusedRage)
+	impTCDamageMult := 1.0
+	if warrior.Talents.ImprovedThunderClap == 1 {
+		warrior.thunderClapCost -= 1
+		impTCDamageMult = 1.4
+	} else if warrior.Talents.ImprovedThunderClap == 2 {
+		warrior.thunderClapCost -= 2
+		impTCDamageMult = 1.7
+	} else if warrior.Talents.ImprovedThunderClap == 3 {
+		warrior.thunderClapCost -= 4
+		impTCDamageMult = 2
+	}
+
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -27,11 +38,11 @@ func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.Simple
 				IgnoreHaste:         true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: ThunderClapCost,
+					Value: warrior.thunderClapCost,
 				},
 				Cost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: ThunderClapCost,
+					Value: warrior.thunderClapCost,
 				},
 				CritMultiplier: warrior.spellCritMultiplier(true),
 			},
@@ -41,7 +52,7 @@ func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.Simple
 	baseEffect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
 			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
+			StaticDamageMultiplier: impTCDamageMult,
 			ThreatMultiplier:       1.75,
 		},
 		DirectInput: core.DirectDamageInput{
@@ -76,5 +87,5 @@ func (warrior *Warrior) NewThunderClap(_ *core.Simulation) *core.SimpleSpell {
 }
 
 func (warrior *Warrior) CanThunderClap(sim *core.Simulation) bool {
-	return warrior.StanceMatches(BattleStance|DefensiveStance) && warrior.CurrentRage() >= ThunderClapCost && !warrior.IsOnCD(ThunderClapCooldownID, sim.CurrentTime)
+	return warrior.StanceMatches(BattleStance|DefensiveStance) && warrior.CurrentRage() >= warrior.thunderClapCost && !warrior.IsOnCD(ThunderClapCooldownID, sim.CurrentTime)
 }

@@ -2,10 +2,13 @@ package warrior
 
 import (
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func (warrior *Warrior) ApplyTalents() {
+	warrior.registerBloodrageCD()
+
 	warrior.AddStat(stats.Parry, core.ParryRatingPerParryChance*1*float64(warrior.Talents.Deflection))
 	warrior.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(warrior.Talents.Cruelty))
 	// TODO WeaponMastery (reduces dodge only)
@@ -55,4 +58,35 @@ func (warrior *Warrior) ApplyTalents() {
 			},
 		})
 	}
+
+	warrior.applyOneHandedWeaponSpecialization()
+}
+
+var OneHandedWeaponSpecializationAuraID = core.NewAuraID()
+
+func (warrior *Warrior) applyOneHandedWeaponSpecialization() {
+	if warrior.Talents.OneHandedWeaponSpecialization == 0 {
+		return
+	}
+	if warrior.Equip[proto.ItemSlot_ItemSlotMainHand].HandType == proto.HandType_HandTypeTwoHand {
+		return
+	}
+
+	multiplier := 1 + 0.02*float64(warrior.Talents.OneHandedWeaponSpecialization)
+
+	warrior.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		return core.Aura{
+			ID: OneHandedWeaponSpecializationAuraID,
+			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
+				if spellCast.SpellSchool.Matches(core.SpellSchoolPhysical) {
+					spellEffect.DamageMultiplier *= multiplier
+				}
+			},
+			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
+				if spellCast.SpellSchool.Matches(core.SpellSchoolPhysical) {
+					*tickDamage *= multiplier
+				}
+			},
+		}
+	})
 }

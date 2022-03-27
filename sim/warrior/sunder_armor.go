@@ -8,9 +8,9 @@ import (
 
 var SunderArmorActionID = core.ActionID{SpellID: 25225}
 
-const SunderArmorCost = 15.0
-
 func (warrior *Warrior) newSunderArmorTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+	warrior.sunderArmorCost = 15.0 - float64(warrior.Talents.ImprovedSunderArmor) - float64(warrior.Talents.FocusedRage)
+
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -22,11 +22,11 @@ func (warrior *Warrior) newSunderArmorTemplate(_ *core.Simulation) core.SimpleSp
 				IgnoreHaste:         true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: SunderArmorCost,
+					Value: warrior.sunderArmorCost,
 				},
 				Cost: core.ResourceCost{
 					Type:  stats.Rage,
-					Value: SunderArmorCost,
+					Value: warrior.sunderArmorCost,
 				},
 			},
 		},
@@ -39,7 +39,7 @@ func (warrior *Warrior) newSunderArmorTemplate(_ *core.Simulation) core.SimpleSp
 		},
 	}
 
-	refundAmount := SunderArmorCost * 0.8
+	refundAmount := warrior.sunderArmorCost * 0.8
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			target := spellEffect.Target
@@ -68,5 +68,5 @@ func (warrior *Warrior) NewSunderArmor(_ *core.Simulation, target *core.Target) 
 }
 
 func (warrior *Warrior) CanSunderArmor(sim *core.Simulation, target *core.Target) bool {
-	return warrior.CurrentRage() >= SunderArmorCost && !target.HasAura(core.ExposeArmorDebuffID)
+	return warrior.CurrentRage() >= warrior.sunderArmorCost && !target.HasAura(core.ExposeArmorDebuffID)
 }

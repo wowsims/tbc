@@ -67,6 +67,9 @@ func (warrior *Warrior) NewBloodthirst(_ *core.Simulation, target *core.Target) 
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	bt.Effect.Target = target
+	if warrior.StanceMatches(DefensiveStance) {
+		bt.Effect.SpellEffect.ThreatMultiplier *= 1 + 0.21*float64(warrior.Talents.TacticalMastery)
+	}
 
 	return bt
 }
