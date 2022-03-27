@@ -51,6 +51,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestHunter-AllItems-AdamantineFigurine-27891"
+ value: {
+  dps: 1616.5985119106997
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-AncientAqirArtifact-33830"
+ value: {
+  dps: 1616.5985119106997
+ }
+}
+dps_results: {
  key: "TestHunter-AllItems-AshtongueTalismanofSwiftness-32487"
  value: {
   dps: 1656.1756371260633
@@ -78,6 +90,36 @@ dps_results: {
  key: "TestHunter-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1629.63119787072
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-Battlemaster'sAudacity-34049"
+ value: {
+  dps: 1616.5985119106997
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-Battlemaster'sCruelty-34163"
+ value: {
+  dps: 1633.1129743573508
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-Battlemaster'sDepravity-34162"
+ value: {
+  dps: 1616.5985119106997
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-Battlemaster'sDetermination-33832"
+ value: {
+  dps: 1639.1887445191744
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-Battlemaster'sPerseverance-34050"
+ value: {
+  dps: 1616.5985119106997
  }
 }
 dps_results: {
@@ -153,6 +195,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestHunter-AllItems-BroochoftheImmortalKing-32534"
+ value: {
+  dps: 1616.5985119106997
+ }
+}
+dps_results: {
  key: "TestHunter-AllItems-BrutalEarthstormDiamond"
  value: {
   dps: 1629.784635417713
@@ -171,6 +219,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestHunter-AllItems-Coren'sLuckyCoin-38289"
+ value: {
+  dps: 1616.5985119106997
+ }
+}
+dps_results: {
  key: "TestHunter-AllItems-CoreofAr'kelos-29776"
  value: {
   dps: 1646.99987555349
@@ -180,6 +234,12 @@ dps_results: {
  key: "TestHunter-AllItems-CrystalforgedTrinket-32654"
  value: {
   dps: 1634.3223011708735
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-Dabiri'sEnigma-30300"
+ value: {
+  dps: 1616.5985119106997
  }
 }
 dps_results: {
@@ -321,6 +381,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestHunter-AllItems-GnomereganAuto-Blocker600-29387"
+ value: {
+  dps: 1616.5985119106997
+ }
+}
+dps_results: {
  key: "TestHunter-AllItems-Gronnstalker'sArmor"
  value: {
   dps: 1691.0876287874075
@@ -423,6 +489,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestHunter-AllItems-Moroes'LuckyPocketWatch-28528"
+ value: {
+  dps: 1616.5985119106997
+ }
+}
+dps_results: {
  key: "TestHunter-AllItems-MysticalSkyfireDiamond"
  value: {
   dps: 1627.8499163495324
@@ -495,6 +567,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestHunter-AllItems-ScarabofDisplacement-30629"
+ value: {
+  dps: 1603.0085702694844
+ }
+}
+dps_results: {
  key: "TestHunter-AllItems-Scryer'sBloodgem-29132"
  value: {
   dps: 1616.5985119106997
@@ -502,6 +580,12 @@ dps_results: {
 }
 dps_results: {
  key: "TestHunter-AllItems-SextantofUnstableCurrents-30626"
+ value: {
+  dps: 1616.5985119106997
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-ShadowmoonInsignia-32501"
  value: {
   dps: 1616.5985119106997
  }
@@ -552,6 +636,12 @@ dps_results: {
  key: "TestHunter-AllItems-StormGauntlets-12632"
  value: {
   dps: 1542.6588102634123
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-StrengthoftheClefthoof"
+ value: {
+  dps: 1417.0065265972155
  }
 }
 dps_results: {

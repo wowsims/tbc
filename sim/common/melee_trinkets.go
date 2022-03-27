@@ -65,6 +65,19 @@ func init() {
 		},
 	))
 
+	// Adamantine Figurine
+	core.AddItemEffect(27891, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.NewAuraID(),
+		stats.Stats{stats.Armor: 1280},
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 27891},
+			CooldownID:       core.NewCooldownID(),
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
+		},
+	))
+
 	var BladefistsBreadthAuraID = core.NewAuraID()
 	var BladefistsBreadthCooldownID = core.NewCooldownID()
 	core.AddItemEffect(28041, core.MakeTemporaryStatsOnUseCDRegistration(
@@ -107,6 +120,19 @@ func init() {
 		},
 	))
 
+	// Moroes Lucky Pocket Watch
+	core.AddItemEffect(28528, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.NewAuraID(),
+		stats.Stats{stats.Dodge: 300},
+		time.Second*10,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 28528},
+			CooldownID:       core.NewCooldownID(),
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
+		},
+	))
+
 	var BloodlustBroochAuraID = core.NewAuraID()
 	var BloodlustBroochCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29383, core.MakeTemporaryStatsOnUseCDRegistration(
@@ -121,6 +147,19 @@ func init() {
 		},
 	))
 
+	// Gnomeregan Auto-Blocker 600
+	core.AddItemEffect(29387, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.NewAuraID(),
+		stats.Stats{stats.BlockValue: 200},
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 29387},
+			CooldownID:       core.NewCooldownID(),
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
+		},
+	))
+
 	var CoreOfArkelosAuraID = core.NewAuraID()
 	var CoreOfArkelosCooldownID = core.NewCooldownID()
 	core.AddItemEffect(29776, core.MakeTemporaryStatsOnUseCDRegistration(
@@ -132,6 +171,58 @@ func init() {
 			CooldownID:       CoreOfArkelosCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	// Dabiris Enigma
+	core.AddItemEffect(30300, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.NewAuraID(),
+		stats.Stats{stats.Block: 125},
+		time.Second*15,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 30300},
+			CooldownID:       core.NewCooldownID(),
+			Cooldown:         time.Second * 90,
+			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
+		},
+	))
+
+	// Scarab of Displacement
+	core.AddItemEffect(30629, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.NewAuraID(),
+		stats.Stats{stats.Defense: 165, stats.AttackPower: -330, stats.RangedAttackPower: -330},
+		time.Second*15,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 30629},
+			CooldownID:       core.NewCooldownID(),
+			Cooldown:         time.Minute * 3,
+			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
+		},
+	))
+
+	// Shadowmoon Insignia
+	core.AddItemEffect(32501, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.NewAuraID(),
+		stats.Stats{stats.Health: 1750},
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 32501},
+			CooldownID:       core.NewCooldownID(),
+			Cooldown:         time.Minute * 3,
+			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
+		},
+	))
+
+	// Brooch of the Immortal King
+	core.AddItemEffect(32534, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.NewAuraID(),
+		stats.Stats{stats.Health: 1250},
+		time.Second*15,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 32534},
+			CooldownID:       core.NewCooldownID(),
+			Cooldown:         time.Minute * 5,
+			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
 		},
 	))
 
@@ -151,6 +242,19 @@ func init() {
 		},
 	))
 
+	// Ancient Aqir Artifact
+	core.AddItemEffect(33830, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.NewAuraID(),
+		stats.Stats{stats.Armor: 2500},
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 33830},
+			CooldownID:       core.NewCooldownID(),
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
+		},
+	))
+
 	var BerserkersCallAuraID = core.NewAuraID()
 	var BerserkersCallCooldownID = core.NewCooldownID()
 	core.AddItemEffect(33831, core.MakeTemporaryStatsOnUseCDRegistration(
@@ -164,6 +268,27 @@ func init() {
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
 		},
 	))
+
+	// Battlemasters trinkets
+	sharedBattlemasterCooldownID := core.NewCooldownID()
+	addBattlemasterEffect := func(itemID int32) {
+		core.AddItemEffect(itemID, core.MakeTemporaryStatsOnUseCDRegistration(
+			core.NewAuraID(),
+			stats.Stats{stats.Health: 1750},
+			time.Second*15,
+			core.MajorCooldown{
+				ActionID:         core.ActionID{ItemID: itemID},
+				CooldownID:       sharedBattlemasterCooldownID,
+				Cooldown:         time.Minute * 3,
+				SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
+			},
+		))
+	}
+	addBattlemasterEffect(33832)
+	addBattlemasterEffect(34049)
+	addBattlemasterEffect(34050)
+	addBattlemasterEffect(34162)
+	addBattlemasterEffect(34163)
 
 	var FigurineShadowsongPantherAuraID = core.NewAuraID()
 	var FigurineShadowsongPantherCooldownID = core.NewCooldownID()
@@ -190,6 +315,19 @@ func init() {
 			CooldownID:       EmptyDirebrewMugCooldownID,
 			Cooldown:         time.Minute * 2,
 			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+		},
+	))
+
+	// Coren's Lucky Coin
+	core.AddItemEffect(38289, core.MakeTemporaryStatsOnUseCDRegistration(
+		core.NewAuraID(),
+		stats.Stats{stats.BlockValue: 200},
+		time.Second*20,
+		core.MajorCooldown{
+			ActionID:         core.ActionID{ItemID: 38289},
+			CooldownID:       core.NewCooldownID(),
+			Cooldown:         time.Minute * 2,
+			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
 		},
 	))
 }
