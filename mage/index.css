@@ -2829,7 +2829,7 @@ input, select {
   --theme-color-background: #101a20;
   --theme-color-background-raw: 16, 26, 32;
   --theme-background-image: url("/tbc/assets/mage_background.jpg");
-  --theme-background-opacity: 0.9;
+  --theme-background-opacity: 0.95;
   --main-text-color: White;
 }
 

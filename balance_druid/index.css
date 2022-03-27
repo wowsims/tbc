@@ -2829,7 +2829,7 @@ input, select {
   --theme-color-background: #1d1510;
   --theme-color-background-raw: 29, 21, 16;
   --theme-background-image: url("/tbc/assets/balance_druid_background.jpg");
-  --theme-background-opacity: 0.9;
+  --theme-background-opacity: 0.95;
   --main-text-color: White;
 }
 

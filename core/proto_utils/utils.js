@@ -149,7 +149,7 @@ export const titleIcons = {
     [Spec.SpecShadowPriest]: '/tbc/assets/shadow_priest_icon.png',
     [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
     [Spec.SpecWarrior]: '/tbc/assets/warrior_icon.png',
-    [Spec.SpecProtectionWarrior]: 'https://wow.zamimg.com/images/wow/icons/large/ability_warrior_defensivestance.jpg',
+    [Spec.SpecProtectionWarrior]: '/tbc/assets/protection_warrior_icon.png',
     [Spec.SpecSmitePriest]: '/tbc/assets/smite_priest_icon.png',
 };
 export const raidSimIcon = '/tbc/assets/raid_icon.png';

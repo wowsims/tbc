@@ -2829,7 +2829,7 @@ input, select {
   --theme-color-background: rgb(20, 13, 18);
   --theme-color-background-raw: 20, 13, 18;
   --theme-background-image: url("/tbc/assets/retribution_paladin.jpg");
-  --theme-background-opacity: 0.9;
+  --theme-background-opacity: 0.95;
   --main-text-color: White;
 }
 
