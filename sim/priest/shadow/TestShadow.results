@@ -57,6 +57,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestShadow-AllItems-AdamantineFigurine-27891"
+ value: {
+  dps: 1446.8793857509806
+ }
+}
+dps_results: {
+ key: "TestShadow-AllItems-AncientAqirArtifact-33830"
+ value: {
+  dps: 1446.8793857509806
+ }
+}
+dps_results: {
  key: "TestShadow-AllItems-AshtongueTalismanofAcumen-32490"
  value: {
   dps: 1471.9255436708404
@@ -90,6 +102,36 @@ dps_results: {
  key: "TestShadow-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1448.9117305801053
+ }
+}
+dps_results: {
+ key: "TestShadow-AllItems-Battlemaster'sAudacity-34049"
+ value: {
+  dps: 1473.0082081177343
+ }
+}
+dps_results: {
+ key: "TestShadow-AllItems-Battlemaster'sCruelty-34163"
+ value: {
+  dps: 1446.8793857509806
+ }
+}
+dps_results: {
+ key: "TestShadow-AllItems-Battlemaster'sDepravity-34162"
+ value: {
+  dps: 1446.8793857509806
+ }
+}
+dps_results: {
+ key: "TestShadow-AllItems-Battlemaster'sDetermination-33832"
+ value: {
+  dps: 1446.8793857509806
+ }
+}
+dps_results: {
+ key: "TestShadow-AllItems-Battlemaster'sPerseverance-34050"
+ value: {
+  dps: 1463.5573574744426
  }
 }
 dps_results: {
@@ -147,6 +189,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestShadow-AllItems-BroochoftheImmortalKing-32534"
+ value: {
+  dps: 1446.8793857509806
+ }
+}
+dps_results: {
  key: "TestShadow-AllItems-BrutalEarthstormDiamond"
  value: {
   dps: 1474.7840783412385
@@ -165,6 +213,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestShadow-AllItems-Coren'sLuckyCoin-38289"
+ value: {
+  dps: 1446.8793857509806
+ }
+}
+dps_results: {
  key: "TestShadow-AllItems-CoreofAr'kelos-29776"
  value: {
   dps: 1446.8793857509806
@@ -172,6 +226,12 @@ dps_results: {
 }
 dps_results: {
  key: "TestShadow-AllItems-CrystalforgedTrinket-32654"
+ value: {
+  dps: 1446.8793857509806
+ }
+}
+dps_results: {
+ key: "TestShadow-AllItems-Dabiri'sEnigma-30300"
  value: {
   dps: 1446.8793857509806
  }
@@ -285,6 +345,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestShadow-AllItems-GnomereganAuto-Blocker600-29387"
+ value: {
+  dps: 1446.8793857509806
+ }
+}
+dps_results: {
  key: "TestShadow-AllItems-HandofJustice-11815"
  value: {
   dps: 1446.8793857509806
@@ -363,6 +429,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestShadow-AllItems-Moroes'LuckyPocketWatch-28528"
+ value: {
+  dps: 1446.8793857509806
+ }
+}
+dps_results: {
  key: "TestShadow-AllItems-MysticalSkyfireDiamond"
  value: {
   dps: 1503.281126093247
@@ -411,6 +483,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestShadow-AllItems-ScarabofDisplacement-30629"
+ value: {
+  dps: 1446.8793857509806
+ }
+}
+dps_results: {
  key: "TestShadow-AllItems-Scryer'sBloodgem-29132"
  value: {
   dps: 1466.854015405596
@@ -420,6 +498,12 @@ dps_results: {
  key: "TestShadow-AllItems-SextantofUnstableCurrents-30626"
  value: {
   dps: 1457.0222504038147
+ }
+}
+dps_results: {
+ key: "TestShadow-AllItems-ShadowmoonInsignia-32501"
+ value: {
+  dps: 1446.8793857509806
  }
 }
 dps_results: {

@@ -10,13 +10,27 @@ import (
 
 // Keep these (and their functions) in alphabetical order.
 func init() {
+	core.AddItemSet(&ItemSetBurningRage)
 	core.AddItemSet(&ItemSetDesolationBattlegear)
+	core.AddItemSet(&ItemSetDoomplateBattlegear)
 	core.AddItemSet(&ItemSetEbonNetherscale)
+	core.AddItemSet(&ItemSetFaithInFelsteel)
 	core.AddItemSet(&ItemSetFelstalker)
 	core.AddItemSet(&ItemSetFistsOfFury)
+	core.AddItemSet(&ItemSetFlameGuard)
 	core.AddItemSet(&ItemSetPrimalstrike)
+	core.AddItemSet(&ItemSetStrengthOfTheClefthoof)
 	core.AddItemSet(&ItemSetTwinBladesOfAzzinoth)
 	core.AddItemSet(&ItemSetWastewalkerArmor)
+}
+
+var ItemSetBurningRage = core.ItemSet{
+	Name: "Burning Rage",
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			agent.GetCharacter().AddStat(stats.MeleeHit, 20)
+		},
+	},
 }
 
 var DesolationBattlegearAuraID = core.NewAuraID()
@@ -62,11 +76,56 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 	},
 }
 
+var DoomplateBattlegearAuraID = core.NewAuraID()
+var DoomplateBattlegearProcAuraID = core.NewAuraID()
+var ItemSetDoomplateBattlegear = core.ItemSet{
+	Name: "Doomplate Battlegear",
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			agent.GetCharacter().AddStat(stats.MeleeHit, 35)
+		},
+		4: func(agent core.Agent) {
+			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+				const apBonus = 160.0
+				const duration = time.Second * 15
+				const procChance = 0.02
+				applyStatAura := character.NewTemporaryStatsAuraApplier(DoomplateBattlegearProcAuraID, core.ActionID{SpellID: 37611}, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus}, duration)
+
+				return core.Aura{
+					ID: DoomplateBattlegearAuraID,
+					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if !spellEffect.Landed() {
+							return
+						}
+						if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+							return
+						}
+						if sim.RandomFloat("Doomplate Battlegear") > procChance {
+							return
+						}
+						applyStatAura(sim)
+					},
+				}
+			})
+		},
+	},
+}
+
 var ItemSetEbonNetherscale = core.ItemSet{
 	Name: "Netherscale Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.MeleeHit, 20)
+		},
+	},
+}
+
+var ItemSetFaithInFelsteel = core.ItemSet{
+	Name: "Faith in Felsteel",
+	Bonuses: map[int32]core.ApplyEffect{
+		3: func(agent core.Agent) {
+			agent.GetCharacter().AddStat(stats.Strength, 25)
 		},
 	},
 }
@@ -138,12 +197,30 @@ var ItemSetFistsOfFury = core.ItemSet{
 	},
 }
 
+var ItemSetFlameGuard = core.ItemSet{
+	Name: "Flame Guard",
+	Bonuses: map[int32]core.ApplyEffect{
+		3: func(agent core.Agent) {
+			agent.GetCharacter().AddStat(stats.Parry, 20)
+		},
+	},
+}
+
 var ItemSetPrimalstrike = core.ItemSet{
 	Name: "Primal Intent",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.AttackPower, 40)
 			agent.GetCharacter().AddStat(stats.RangedAttackPower, 40)
+		},
+	},
+}
+
+var ItemSetStrengthOfTheClefthoof = core.ItemSet{
+	Name: "Strength of the Clefthoof",
+	Bonuses: map[int32]core.ApplyEffect{
+		3: func(agent core.Agent) {
+			agent.GetCharacter().AddStat(stats.Strength, 20)
 		},
 	},
 }

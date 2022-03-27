@@ -51,6 +51,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestWarrior-AllItems-AdamantineFigurine-27891"
+ value: {
+  dps: 443.1994178428883
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-AncientAqirArtifact-33830"
+ value: {
+  dps: 443.1994178428883
+ }
+}
+dps_results: {
  key: "TestWarrior-AllItems-BadgeofTenacity-32658"
  value: {
   dps: 466.8092238754398
@@ -72,6 +84,36 @@ dps_results: {
  key: "TestWarrior-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 446.444275192072
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-Battlemaster'sAudacity-34049"
+ value: {
+  dps: 443.1994178428883
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-Battlemaster'sCruelty-34163"
+ value: {
+  dps: 451.20851946561464
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-Battlemaster'sDepravity-34162"
+ value: {
+  dps: 443.1994178428883
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-Battlemaster'sDetermination-33832"
+ value: {
+  dps: 445.0592633925538
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-Battlemaster'sPerseverance-34050"
+ value: {
+  dps: 443.1994178428883
  }
 }
 dps_results: {
@@ -129,9 +171,21 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestWarrior-AllItems-BroochoftheImmortalKing-32534"
+ value: {
+  dps: 443.1994178428883
+ }
+}
+dps_results: {
  key: "TestWarrior-AllItems-BrutalEarthstormDiamond"
  value: {
   dps: 463.159765373733
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-BurningRage"
+ value: {
+  dps: 402.76736939555457
  }
 }
 dps_results: {
@@ -147,6 +201,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestWarrior-AllItems-Coren'sLuckyCoin-38289"
+ value: {
+  dps: 443.1994178428883
+ }
+}
+dps_results: {
  key: "TestWarrior-AllItems-CoreofAr'kelos-29776"
  value: {
   dps: 468.70524052519926
@@ -156,6 +216,12 @@ dps_results: {
  key: "TestWarrior-AllItems-CrystalforgedTrinket-32654"
  value: {
   dps: 458.75848670367316
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-Dabiri'sEnigma-30300"
+ value: {
+  dps: 443.1994178428883
  }
 }
 dps_results: {
@@ -198,6 +264,12 @@ dps_results: {
  key: "TestWarrior-AllItems-Devastation-30316"
  value: {
   dps: 538.4572801196352
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-DoomplateBattlegear"
+ value: {
+  dps: 390.45508385634764
  }
 }
 dps_results: {
@@ -255,6 +327,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestWarrior-AllItems-FaithinFelsteel"
+ value: {
+  dps: 369.0963791638624
+ }
+}
+dps_results: {
  key: "TestWarrior-AllItems-FelstalkerArmor"
  value: {
   dps: 437.3214809366915
@@ -276,6 +354,18 @@ dps_results: {
  key: "TestWarrior-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
   dps: 461.7878478677549
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-FlameGuard"
+ value: {
+  dps: 352.23846093874727
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-GnomereganAuto-Blocker600-29387"
+ value: {
+  dps: 443.1994178428883
  }
 }
 dps_results: {
@@ -375,6 +465,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestWarrior-AllItems-Moroes'LuckyPocketWatch-28528"
+ value: {
+  dps: 443.1994178428883
+ }
+}
+dps_results: {
  key: "TestWarrior-AllItems-MysticalSkyfireDiamond"
  value: {
   dps: 453.77955418435073
@@ -441,6 +537,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestWarrior-AllItems-ScarabofDisplacement-30629"
+ value: {
+  dps: 436.3020609176151
+ }
+}
+dps_results: {
  key: "TestWarrior-AllItems-Scryer'sBloodgem-29132"
  value: {
   dps: 443.1994178428883
@@ -448,6 +550,12 @@ dps_results: {
 }
 dps_results: {
  key: "TestWarrior-AllItems-SextantofUnstableCurrents-30626"
+ value: {
+  dps: 443.1994178428883
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-ShadowmoonInsignia-32501"
  value: {
   dps: 443.1994178428883
  }
@@ -498,6 +606,12 @@ dps_results: {
  key: "TestWarrior-AllItems-StormGauntlets-12632"
  value: {
   dps: 444.0868267765776
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-StrengthoftheClefthoof"
+ value: {
+  dps: 398.4752313220457
  }
 }
 dps_results: {
