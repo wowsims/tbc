@@ -63,6 +63,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestProtectionWarrior-AllItems-AshtongueTalismanofValor-32485"
+ value: {
+  dps: 394.3539697409615
+ }
+}
+dps_results: {
  key: "TestProtectionWarrior-AllItems-BadgeofTenacity-32658"
  value: {
   dps: 407.3504706067964
@@ -165,6 +171,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestProtectionWarrior-AllItems-BoldArmor"
+ value: {
+  dps: 393.1070001389136
+ }
+}
+dps_results: {
  key: "TestProtectionWarrior-AllItems-BracingEarthstormDiamond"
  value: {
   dps: 400.7021702709204
@@ -258,6 +270,18 @@ dps_results: {
  key: "TestProtectionWarrior-AllItems-Despair-28573"
  value: {
   dps: 465.03616457218936
+ }
+}
+dps_results: {
+ key: "TestProtectionWarrior-AllItems-DestroyerArmor"
+ value: {
+  dps: 407.0815355107813
+ }
+}
+dps_results: {
+ key: "TestProtectionWarrior-AllItems-DestroyerBattlegear"
+ value: {
+  dps: 443.9896317154021
  }
 }
 dps_results: {
@@ -495,6 +519,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestProtectionWarrior-AllItems-OnslaughtArmor"
+ value: {
+  dps: 368.8883213327551
+ }
+}
+dps_results: {
+ key: "TestProtectionWarrior-AllItems-OnslaughtBattlegear"
+ value: {
+  dps: 527.4505429084215
+ }
+}
+dps_results: {
  key: "TestProtectionWarrior-AllItems-PotentUnstableDiamond"
  value: {
   dps: 396.828750738185
@@ -720,6 +756,18 @@ dps_results: {
  key: "TestProtectionWarrior-AllItems-TsunamiTalisman-30627"
  value: {
   dps: 421.6844474455238
+ }
+}
+dps_results: {
+ key: "TestProtectionWarrior-AllItems-WarbringerArmor"
+ value: {
+  dps: 381.6296645632443
+ }
+}
+dps_results: {
+ key: "TestProtectionWarrior-AllItems-WarbringerBattlegear"
+ value: {
+  dps: 439.56599373399735
  }
 }
 dps_results: {
