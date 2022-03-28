@@ -14,7 +14,7 @@ var ImprovedAspectOfTheHawkAuraID = core.NewAuraID()
 var AspectOfTheViperActionID = core.ActionID{SpellID: 34074}
 var AspectOfTheViperAuraID = core.NewAuraID()
 
-func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
+func (hunter *Hunter) aspectOfTheHawkAura(sim *core.Simulation) core.Aura {
 	const improvedHawkProcChance = 0.1
 	improvedHawkBonus := 1 + 0.03*float64(hunter.Talents.ImprovedAspectOfTheHawk)
 	impHawkAura := core.Aura{
@@ -29,28 +29,22 @@ func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
 		},
 	}
 
-	aura := core.Aura{
-		ID:       AspectOfTheHawkAuraID,
-		ActionID: AspectOfTheHawkActionID,
-		Duration: core.NeverExpires,
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			spellEffect.BonusAttackPower += 155
-		},
-		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-			if !spellEffect.ProcMask.Matches(core.ProcMaskRangedAuto) {
-				return
-			}
+	factory := hunter.NewTemporaryStatsAuraFactory(AspectOfTheHawkAuraID, AspectOfTheHawkActionID, stats.Stats{stats.RangedAttackPower: 155}, core.NeverExpires)
+	aura := factory(sim)
+	aura.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		if !spellEffect.ProcMask.Matches(core.ProcMaskRangedAuto) {
+			return
+		}
 
-			if improvedHawkBonus > 1 && sim.RandomFloat("Imp Aspect of the Hawk") < improvedHawkProcChance {
-				hunter.ReplaceAura(sim, impHawkAura)
-			}
-		},
+		if improvedHawkBonus > 1 && sim.RandomFloat("Imp Aspect of the Hawk") < improvedHawkProcChance {
+			hunter.ReplaceAura(sim, impHawkAura)
+		}
 	}
 	return aura
 }
 
 func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.SimpleCast {
-	aura := hunter.aspectOfTheHawkAura()
+	aura := hunter.aspectOfTheHawkAura(sim)
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
@@ -128,12 +122,11 @@ func (hunter *Hunter) NewAspectOfTheViper(sim *core.Simulation) core.SimpleCast 
 }
 
 func (hunter *Hunter) applyInitialAspect() {
-	aura := hunter.aspectOfTheHawkAura()
-	if hunter.Rotation.ViperStartManaPercent >= 1 {
-		aura = hunter.aspectOfTheViperAura()
-	}
-
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return aura
+		if hunter.Rotation.ViperStartManaPercent >= 1 {
+			return hunter.aspectOfTheViperAura()
+		} else {
+			return hunter.aspectOfTheHawkAura(sim)
+		}
 	})
 }

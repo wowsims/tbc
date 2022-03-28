@@ -39,8 +39,6 @@ func (paladin *Paladin) applyCrusade() {
 	})
 }
 
-var TwoHandedWeaponSpecializationAuraID = core.NewAuraID()
-
 // Affects all physical damage or spells that can be rolled as physical
 // It affects white, Windfury, Crusader Strike, Seals, and Judgement of Command / Blood
 func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
@@ -49,16 +47,8 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
 	}
 
 	if paladin.GetMHWeapon().HandType == proto.HandType_HandTypeTwoHand {
-		paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-			return core.Aura{
-				ID: TwoHandedWeaponSpecializationAuraID,
-				OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-					if spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryPhysical) {
-						spellEffect.StaticDamageMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization)) // assume multiplicative scaling
-					}
-				},
-			}
-		})
+		paladin.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization)) // assume multiplicative scaling
+		// TODO: Might need to additionally apply this to non-physical spells directly.
 	}
 }
 

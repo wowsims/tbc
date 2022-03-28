@@ -45,12 +45,16 @@ var ItemSetWarbringerArmor = core.ItemSet{
 			// Your Revenge ability causes your next damaging ability to do 10% more damage.
 			character := agent.GetCharacter()
 
+			// TODO: This needs to apply only to specific abilities, not any source of damage.
 			procAura := core.Aura{
 				ID:       WarbringerArmor4PcProcAuraID,
 				ActionID: core.ActionID{SpellID: 37516},
 				Duration: core.NeverExpires,
-				OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-					spellEffect.DamageMultiplier *= 1.1
+				OnGain: func(sim *core.Simulation) {
+					character.PseudoStats.DamageDealtMultiplier *= 1.1
+				},
+				OnExpire: func(sim *core.Simulation) {
+					character.PseudoStats.DamageDealtMultiplier /= 1.1
 				},
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					if spellEffect.Damage > 0 {

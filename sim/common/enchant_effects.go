@@ -91,24 +91,9 @@ func ApplyCrusader(agent core.Agent) {
 	})
 }
 
-var BiznicksScopeAuraID = core.NewAuraID()
-
 func ApplyBiznicksScope(agent core.Agent) {
 	character := agent.GetCharacter()
-	if character.Class != proto.Class_ClassHunter {
-		return
-	}
-
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: BiznicksScopeAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
-					spellEffect.BonusHitRating += 30
-				}
-			},
-		}
-	})
+	character.PseudoStats.BonusRangedHitRating += 30
 }
 
 func ApplyRingStriking(agent core.Agent) {
@@ -205,24 +190,9 @@ func ApplyKhoriumScope(agent core.Agent, _ proto.ItemSlot) {
 	w.BaseDamageMax += 12
 }
 
-var StabilizedEterniumScopeAuraID = core.NewAuraID()
-
 func ApplyStabilizedEterniumScope(agent core.Agent) {
 	character := agent.GetCharacter()
-	if character.Class != proto.Class_ClassHunter {
-		return
-	}
-
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: StabilizedEterniumScopeAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
-					spellEffect.BonusCritRating += 28
-				}
-			},
-		}
-	})
+	character.PseudoStats.BonusRangedCritRating += 28
 }
 
 func ApplyBackSubtlety(agent core.Agent) {

@@ -58,8 +58,6 @@ type SpellEffect struct {
 	BonusArmorPenetration float64
 	BonusWeaponDamage     float64
 
-	BonusAttackPowerOnTarget float64
-
 	// Additional multiplier that is always applied.
 	DamageMultiplier float64
 
@@ -111,6 +109,36 @@ func (spellEffect *SpellEffect) calcThreat(spellCast *SpellCast) float64 {
 	}
 }
 
+func (spellEffect *SpellEffect) physicalHitChance(character *Character, spellCast *SpellCast) float64 {
+	hitRating := character.stats[stats.MeleeHit] + spellEffect.BonusHitRating + spellEffect.Target.PseudoStats.BonusMeleeHitRating
+
+	if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+		hitRating += character.PseudoStats.BonusRangedHitRating
+	}
+
+	return (hitRating / (MeleeHitRatingPerHitChance * 100)) - spellEffect.Target.HitSuppression
+}
+
+func (spellEffect *SpellEffect) physicalCritChance(character *Character, spellCast *SpellCast) float64 {
+	critRating := character.stats[stats.MeleeCrit] + spellEffect.BonusCritRating + spellCast.BonusCritRating + spellEffect.Target.PseudoStats.BonusCritRating
+
+	if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+		critRating += character.PseudoStats.BonusRangedCritRating
+	} else {
+		critRating += character.PseudoStats.BonusMeleeCritRating
+	}
+
+	return (critRating / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
+}
+
+func (spellEffect *SpellEffect) spellPower(character *Character, spellCast *SpellCast) float64 {
+	return character.GetStat(stats.SpellPower) + character.GetStat(spellCast.SpellSchool.Stat()) + character.PseudoStats.MobTypeSpellPower + spellEffect.BonusSpellPower
+}
+
+func (spellEffect *SpellEffect) spellCritChance(character *Character, spellCast *SpellCast) float64 {
+	return (character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating + spellEffect.Target.PseudoStats.BonusCritRating) / (SpellCritRatingPerCritChance * 100)
+}
+
 func (she *SpellHitEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell) {
 	se := &she.SpellEffect
 	se.beforeCalculations(sim, spell, she)
@@ -147,15 +175,19 @@ func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast 
 	// Weapon Damage Effects
 	if hitEffect.WeaponInput.HasWeaponDamage() {
 		var attackPower float64
+		var attackPowerOnTarget float64
 		var bonusWeaponDamage float64
 		if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+			attackPowerOnTarget = hitEffect.Target.PseudoStats.BonusRangedAttackPower
 			// all ranged attacks honor BonusAttackPowerOnTarget...
-			attackPower = character.stats[stats.RangedAttackPower] + hitEffect.BonusAttackPower + hitEffect.BonusAttackPowerOnTarget
+			attackPower = character.stats[stats.RangedAttackPower] + attackPowerOnTarget
 			bonusWeaponDamage = character.PseudoStats.BonusDamage + hitEffect.BonusWeaponDamage
 		} else {
-			attackPower = character.stats[stats.AttackPower] + hitEffect.BonusAttackPower
+			attackPowerOnTarget = hitEffect.Target.PseudoStats.BonusMeleeAttackPower
+			attackPower = character.stats[stats.AttackPower]
 			bonusWeaponDamage = character.PseudoStats.BonusDamage + hitEffect.BonusWeaponDamage
 		}
+		attackPower += character.PseudoStats.MobTypeAttackPower + hitEffect.BonusAttackPower
 
 		if hitEffect.WeaponInput.CalculateDamage != nil {
 			damage += hitEffect.WeaponInput.CalculateDamage(attackPower, bonusWeaponDamage)
@@ -167,23 +199,22 @@ func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast 
 				if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 					damage += character.AutoAttacks.Ranged.calculateNormalizedWeaponDamage(sim, attackPower)
 				} else if !hitEffect.WeaponInput.Offhand {
-					damage += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower+hitEffect.BonusAttackPowerOnTarget)
+					damage += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower+attackPowerOnTarget)
 				} else {
-					damage += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower+2*hitEffect.BonusAttackPowerOnTarget)*0.5
+					damage += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower+2*attackPowerOnTarget) * 0.5
 				}
 			} else {
 				if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 					damage += character.AutoAttacks.Ranged.calculateWeaponDamage(sim, attackPower)
 				} else if !hitEffect.WeaponInput.Offhand {
-					damage += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower+hitEffect.BonusAttackPowerOnTarget)
+					damage += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower+attackPowerOnTarget)
 				} else {
-					damage += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower+2*hitEffect.BonusAttackPowerOnTarget)*0.5
+					damage += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower+2*attackPowerOnTarget) * 0.5
 				}
 			}
 			damage += hitEffect.WeaponInput.FlatDamageBonus
 			damage *= hitEffect.WeaponInput.DamageMultiplier
 		}
-
 
 		//if sim.Log != nil {
 		//	character.Log(sim, "Melee damage calcs: AP=%0.1f, bonusWepdamage:%0.1f, damageMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weapondamageCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, hitEffect.DamageMultiplier, hitEffect.StaticDamageMultiplier, hitEffect.HitType, damage, spellCast.CritMultiplier, hitEffect.Target.currentArmor)
@@ -200,9 +231,9 @@ func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast 
 		// Use outcome roll to decide if it should use AP or spell school for bonus damage.
 		isPhysical := spellCast.SpellSchool.Matches(SpellSchoolPhysical)
 		if isPhysical {
-			schoolBonus = (character.PseudoStats.BonusDamage + hitEffect.BonusWeaponDamage)  * hitEffect.WeaponInput.DamageMultiplier  //DamageMultiplier may be removed later
+			schoolBonus = (character.PseudoStats.BonusDamage + hitEffect.BonusWeaponDamage) * hitEffect.WeaponInput.DamageMultiplier //DamageMultiplier may be removed later
 		} else {
-			schoolBonus = character.GetStat(stats.SpellPower) + character.GetStat(spellCast.SpellSchool.Stat()) + hitEffect.SpellEffect.BonusSpellPower
+			schoolBonus = hitEffect.spellPower(character, spellCast)
 		}
 		damage += schoolBonus * hitEffect.DirectInput.SpellCoefficient
 	}
@@ -243,14 +274,11 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 	roll := sim.RandomFloat("White Hit Table")
 
 	// Miss
-	missChance := ahe.Target.MissChance
+	missChance := ahe.Target.MissChance - ahe.physicalHitChance(character, &ability.SpellCast)
 	if character.AutoAttacks.IsDualWielding && ability.OutcomeRollCategory == OutcomeRollCategoryWhite {
 		missChance += 0.19
 	}
-	hitBonus := ((character.stats[stats.MeleeHit] + ahe.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - ahe.Target.HitSuppression
-	if hitBonus > 0 {
-		missChance = MaxFloat(0, missChance-hitBonus)
-	}
+	missChance = MaxFloat(0, missChance)
 
 	chance := missChance
 	if roll < chance {
@@ -292,8 +320,7 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 		}
 
 		// Crit
-		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
-		chance += critChance
+		chance += ahe.physicalCritChance(character, &ability.SpellCast)
 		if roll < chance {
 			return OutcomeCrit
 		}
@@ -314,11 +341,10 @@ func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spellCast *SpellCast) 
 func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast) bool {
 	switch spellCast.CritRollCategory {
 	case CritRollCategoryMagical:
-		critChance := (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
+		critChance := spellEffect.spellCritChance(spellCast.Character, spellCast)
 		return sim.RandomFloat("Magical Crit Roll") < critChance
 	case CritRollCategoryPhysical:
-		critChance := (spellCast.Character.GetStat(stats.MeleeCrit)+spellCast.BonusCritRating+spellEffect.BonusCritRating)/(MeleeCritRatingPerCritChance*100) - spellEffect.Target.CritSuppression
-		return sim.RandomFloat("Physical Crit Roll") < critChance
+		return sim.RandomFloat("Physical Crit Roll") < spellEffect.physicalCritChance(spellCast.Character, spellCast)
 	default:
 		return false
 	}
@@ -386,6 +412,10 @@ func (spellEffect *SpellEffect) String() string {
 
 func (hitEffect *SpellHitEffect) applyAttackerMultipliers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, damage *float64) {
 	attacker := spellCast.Character
+
+	if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+		*damage *= attacker.PseudoStats.RangedDamageDealtMultiplier
+	}
 
 	*damage *= attacker.PseudoStats.DamageDealtMultiplier
 	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {

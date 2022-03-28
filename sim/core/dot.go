@@ -1,7 +1,6 @@
 package core
 
 import (
-	"github.com/wowsims/tbc/sim/core/stats"
 	"time"
 )
 
@@ -154,7 +153,7 @@ func (spell *SimpleSpell) ApplyDot(sim *Simulation) {
 
 // Snapshots a few values at the start of a dot.
 func (hitEffect *SpellHitEffect) takeDotSnapshot(sim *Simulation, spellCast *SpellCast) {
-	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool.Stat()) + hitEffect.BonusSpellPower
+	totalSpellPower := hitEffect.spellPower(spellCast.Character, spellCast)
 
 	// snapshot total damage per tick, including any static damage multipliers
 	hitEffect.DotInput.damagePerTick = (hitEffect.DotInput.TickBaseDamage + totalSpellPower*hitEffect.DotInput.TickSpellCoefficient) * hitEffect.StaticDamageMultiplier

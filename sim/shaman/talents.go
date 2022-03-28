@@ -20,6 +20,7 @@ func (shaman *Shaman) ApplyTalents() {
 	shaman.AddStat(stats.Dodge, core.DodgeRatingPerDodgeChance*1*float64(shaman.Talents.Anticipation))
 	shaman.AddStat(stats.Block, core.BlockRatingPerBlockChance*1*float64(shaman.Talents.ShieldSpecialization))
 	shaman.AddStat(stats.Armor, shaman.Equip.Stats()[stats.Armor]*0.02*float64(shaman.Talents.Toughness))
+	shaman.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
 
 	if shaman.Talents.ShieldSpecialization > 0 {
 		bonus := 1 + 0.05*float64(shaman.Talents.ShieldSpecialization)
@@ -88,7 +89,6 @@ func (shaman *Shaman) ApplyTalents() {
 	shaman.applyElementalDevastation()
 	shaman.applyFlurry()
 	shaman.applyShamanisticFocus()
-	shaman.applyWeaponMastery()
 	shaman.applyUnleashedRage()
 	shaman.registerElementalMasteryCD()
 	shaman.registerNaturesSwiftnessCD()
@@ -228,31 +228,6 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 				})
 			}
 		},
-	})
-}
-
-var WeaponMasteryAuraID = core.NewAuraID()
-
-func (shaman *Shaman) applyWeaponMastery() {
-	if shaman.Talents.WeaponMastery == 0 {
-		return
-	}
-
-	multiplier := 1 + 0.02*float64(shaman.Talents.WeaponMastery)
-
-	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: WeaponMasteryAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryPhysical) {
-					return
-				}
-				if spellEffect.WeaponInput.DamageMultiplier == 0 {
-					return
-				}
-				spellEffect.DamageMultiplier *= multiplier
-			},
-		}
 	})
 }
 

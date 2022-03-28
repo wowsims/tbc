@@ -49,8 +49,10 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 				stats.HealingPower: 24,
 			})
 		case proto.BattleElixir_ElixirOfDemonslaying:
-			character.AddPermanentAura(func(sim *Simulation) Aura {
-				return ElixirOfDemonslayingAura()
+			character.RegisterResetEffect(func(sim *Simulation) {
+				if sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon {
+					character.PseudoStats.MobTypeAttackPower += 265
+				}
 			})
 		case proto.BattleElixir_ElixirOfMajorAgility:
 			character.AddStats(stats.Stats{
@@ -210,8 +212,6 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 	}
 }
 
-var AdamantiteSharpeningStoneMeleeCritAuraID = NewAuraID()
-
 func applyAdamantiteSharpeningStoneAura(character *Character, consumes proto.Consumes, allowMHImbue bool) {
 	critBonus := 0.0
 	if consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone && allowMHImbue {
@@ -227,35 +227,12 @@ func applyAdamantiteSharpeningStoneAura(character *Character, consumes proto.Con
 
 	// Crit rating for sharpening stone applies to melee only.
 	if character.Class != proto.Class_ClassHunter {
+		// For non-hunters just give direct crit so it shows on the stats panel.
 		character.AddStats(stats.Stats{
 			stats.MeleeCrit: critBonus,
 		})
-		return
-	}
-
-	character.AddPermanentAura(func(sim *Simulation) Aura {
-		return Aura{
-			ID: AdamantiteSharpeningStoneMeleeCritAuraID,
-			OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-				if !spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-					spellEffect.BonusCritRating += critBonus
-				}
-			},
-		}
-	})
-}
-
-var ElixirOfDemonslayingAuraID = NewAuraID()
-
-func ElixirOfDemonslayingAura() Aura {
-	return Aura{
-		ID:       ElixirOfDemonslayingAuraID,
-		ActionID: ActionID{ItemID: 9224},
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-			if spellEffect.Target.MobType == proto.MobType_MobTypeDemon {
-				spellEffect.BonusAttackPower += 265
-			}
-		},
+	} else {
+		character.PseudoStats.BonusMeleeCritRating += critBonus
 	}
 }
 
