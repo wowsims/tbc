@@ -444,9 +444,13 @@ func NewPseudoStats() PseudoStats {
 type TargetPseudoStats struct {
 	BonusMeleeAttackPower  float64
 	BonusRangedAttackPower float64
-	BonusCritRating        float64 // Bonus crit for all types of hits.
+
+	BonusCritRating float64 // Bonus crit for all types of hits.
 
 	BonusMeleeHitRating float64 // Imp FF
+
+	BonusPhysicalDamageTaken float64 // Gift of Arthas, Hemorrhage
+	BonusHolyDamageTaken     float64 // Judgement of the Crusader
 
 	DamageTakenMultiplier float64 // All damage
 

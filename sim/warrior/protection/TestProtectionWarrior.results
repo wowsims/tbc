@@ -527,7 +527,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-OnslaughtBattlegear"
  value: {
-  dps: 600.2048583894692
+  dps: 600.2048583894691
  }
 }
 dps_results: {

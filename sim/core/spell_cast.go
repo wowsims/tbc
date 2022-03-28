@@ -83,14 +83,10 @@ type SpellEffect struct {
 	OnSpellHit OnSpellHit
 
 	// Results
-	Outcome HitOutcome
-	Damage  float64 // Damage done by this cast.
-	Threat  float64
-
-	// Certain damage multiplier, such as target debuffs and crit multipliers, do
-	// not count towards the AOE cap. Store them here to they can be subtracted
-	// later when calculating AOE cap.
-	BeyondAOECapMultiplier float64
+	Outcome   HitOutcome
+	RawDamage float64 // Damage done by this cast before damage taken and crit multipliers
+	Damage    float64 // Damage done by this cast.
+	Threat    float64
 }
 
 func (spellEffect *SpellEffect) Landed() bool {
@@ -145,14 +141,8 @@ func (she *SpellHitEffect) beforeCalculations(sim *Simulation, spell *SimpleSpel
 }
 
 func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell, she *SpellHitEffect) {
-	spellEffect.BeyondAOECapMultiplier = 1
-	multiplierBeforeTargetEffects := spellEffect.DamageMultiplier
-
 	spell.Character.OnBeforeSpellHit(sim, &spell.SpellCast, she)
 	spellEffect.Target.OnBeforeSpellHit(sim, &spell.SpellCast, she)
-
-	spellEffect.BeyondAOECapMultiplier *= spellEffect.DamageMultiplier / multiplierBeforeTargetEffects
-
 	spellEffect.determineOutcome(sim, spell, she)
 }
 
@@ -161,6 +151,9 @@ func (hitEffect *SpellHitEffect) directCalculations(sim *Simulation, spell *Simp
 
 	damage *= hitEffect.DamageMultiplier * hitEffect.StaticDamageMultiplier
 	hitEffect.applyAttackerMultipliers(sim, &spell.SpellCast, false, &damage)
+
+	hitEffect.RawDamage = damage
+
 	hitEffect.applyTargetMultipliers(sim, &spell.SpellCast, false, &damage)
 	hitEffect.applyResistances(sim, &spell.SpellCast, &damage)
 	hitEffect.applyOutcome(sim, &spell.SpellCast, &damage)
@@ -193,7 +186,6 @@ func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast 
 			damage += hitEffect.WeaponInput.CalculateDamage(attackPower, bonusWeaponDamage)
 		} else if hitEffect.WeaponInput.DamageMultiplier != 0 {
 			// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
-			// TODO not all weapon damage based attacks "scale" with +bonusWeaponDamage (e.g. Devastate, Shiv, Mutilate don't)
 			// ... but for other's, BonusAttackPowerOnTarget only applies to weapon damage based attacks
 			if hitEffect.WeaponInput.Normalized {
 				if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
@@ -212,6 +204,9 @@ func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast 
 					damage += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower+2*attackPowerOnTarget) * 0.5
 				}
 			}
+
+			damage += character.PseudoStats.BonusDamage + hitEffect.BonusWeaponDamage
+
 			damage += hitEffect.WeaponInput.FlatDamageBonus
 			damage *= hitEffect.WeaponInput.DamageMultiplier
 		}
@@ -222,23 +217,27 @@ func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast 
 	}
 
 	// Direct Damage Effects
-	if hitEffect.DirectInput.MaxBaseDamage != 0 {
-		damage += hitEffect.DirectInput.MinBaseDamage + sim.RandomFloat("Base Damage Direct")*(hitEffect.DirectInput.MaxBaseDamage-hitEffect.DirectInput.MinBaseDamage)
-	}
-
-	if hitEffect.DirectInput.SpellCoefficient > 0 {
-		schoolBonus := 0.0
-		// Use outcome roll to decide if it should use AP or spell school for bonus damage.
-		isPhysical := spellCast.SpellSchool.Matches(SpellSchoolPhysical)
-		if isPhysical {
-			schoolBonus = (character.PseudoStats.BonusDamage + hitEffect.BonusWeaponDamage) * hitEffect.WeaponInput.DamageMultiplier //DamageMultiplier may be removed later
-		} else {
-			schoolBonus = hitEffect.spellPower(character, spellCast)
+	if hitEffect.DirectInput.MaxBaseDamage != 0 || hitEffect.DirectInput.FlatDamageBonus != 0 {
+		damage = hitEffect.DirectInput.MinBaseDamage
+		if hitEffect.DirectInput.MaxBaseDamage > 0 {
+			damage += sim.RandomFloat("Base Damage Direct") * (hitEffect.DirectInput.MaxBaseDamage - hitEffect.DirectInput.MinBaseDamage)
 		}
-		damage += schoolBonus * hitEffect.DirectInput.SpellCoefficient
+
+		if hitEffect.DirectInput.SpellCoefficient > 0 {
+			schoolBonus := 0.0
+			// Use outcome roll to decide if it should use AP or spell school for bonus damage.
+			isPhysical := spellCast.SpellSchool.Matches(SpellSchoolPhysical)
+			if isPhysical {
+				schoolBonus = character.PseudoStats.BonusDamage + hitEffect.BonusWeaponDamage
+			} else {
+				schoolBonus = hitEffect.spellPower(character, spellCast)
+			}
+			damage += schoolBonus * hitEffect.DirectInput.SpellCoefficient
+		}
+
+		damage += hitEffect.DirectInput.FlatDamageBonus
 	}
 
-	damage += hitEffect.DirectInput.FlatDamageBonus
 	return damage
 }
 
@@ -296,17 +295,9 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 			}
 		}
 
-		// Parry (if in front)
-		// If the target is a mob and defense minus weapon skill is 11 or more:
-		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.6%
+		// Parry (5%, 5.5%, 6%, 14% for 70-73 mobs)
 
-		// If the target is a mob and defense minus weapon skill is 10 or less:
-		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.1%
-
-		// Block (if in front)
-		// If the target is a mob:
-		// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
-		// If we actually implement blocks, ranged hits can be blocked.
+		// Block (5% for 70-73 mobs)
 
 		// No need to crit/glance roll if we are not a white hit
 		if ability.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial | OutcomeRollCategoryRanged) {
@@ -438,8 +429,12 @@ func (hitEffect *SpellHitEffect) applyAttackerMultipliers(sim *Simulation, spell
 func (hitEffect *SpellHitEffect) applyTargetMultipliers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, damage *float64) {
 	target := hitEffect.Target
 
-	*damage *= target.PseudoStats.DamageTakenMultiplier
 	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
+		if target.PseudoStats.BonusPhysicalDamageTaken > 0 {
+			if hitEffect.WeaponInput.HasWeaponDamage() || hitEffect.DirectInput.SpellCoefficient > 0 {
+				*damage += target.PseudoStats.BonusPhysicalDamageTaken
+			}
+		}
 		*damage *= target.PseudoStats.PhysicalDamageTakenMultiplier
 		if isPeriodic {
 			*damage *= target.PseudoStats.PeriodicPhysicalDamageTakenMultiplier
@@ -451,12 +446,19 @@ func (hitEffect *SpellHitEffect) applyTargetMultipliers(sim *Simulation, spellCa
 	} else if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
 		*damage *= target.PseudoStats.FrostDamageTakenMultiplier
 	} else if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
+		if target.PseudoStats.BonusHolyDamageTaken > 0 {
+			if hitEffect.DirectInput.SpellCoefficient > 0 {
+				*damage += target.PseudoStats.BonusHolyDamageTaken * hitEffect.DirectInput.SpellCoefficient
+			}
+		}
 		*damage *= target.PseudoStats.HolyDamageTakenMultiplier
 	} else if spellCast.SpellSchool.Matches(SpellSchoolNature) {
 		*damage *= target.PseudoStats.NatureDamageTakenMultiplier
 	} else if spellCast.SpellSchool.Matches(SpellSchoolShadow) {
 		*damage *= target.PseudoStats.ShadowDamageTakenMultiplier
 	}
+
+	*damage *= target.PseudoStats.DamageTakenMultiplier
 }
 
 // Modifies damage based on Armor or Magic resistances, depending on the damage type.
@@ -467,18 +469,18 @@ func (hitEffect *SpellHitEffect) applyResistances(sim *Simulation, spellCast *Sp
 
 	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
 		// Physical resistance (armor).
-		*damage *= 1 - hitEffect.Target.ArmorDamageReduction(spellCast.Character.stats[stats.ArmorPenetration]+hitEffect.BonusArmorPenetration)
+		*damage *= hitEffect.Target.ArmorDamageMultiplier(spellCast.Character.stats[stats.ArmorPenetration] + hitEffect.BonusArmorPenetration)
 	} else if !spellCast.SpellExtras.Matches(SpellExtrasBinary) {
 		// Magical resistance.
 		// https://royalgiraffe.github.io/resist-guide
 
 		resistanceRoll := sim.RandomFloat("Partial Resist")
-		if resistanceRoll > 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
+		if resistanceRoll >= 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
 			// No partial resist.
-		} else if resistanceRoll > 0.05 {
+		} else if resistanceRoll >= 0.05 {
 			hitEffect.SpellEffect.Outcome |= OutcomePartial1_4
 			*damage *= 0.75
-		} else if resistanceRoll > 0.01 {
+		} else if resistanceRoll >= 0.01 {
 			hitEffect.SpellEffect.Outcome |= OutcomePartial2_4
 			*damage *= 0.5
 		} else {

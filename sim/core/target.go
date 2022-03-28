@@ -179,9 +179,8 @@ func (target *Target) AddArmor(value float64) {
 	target.calculateReduction()
 }
 
-// ArmorDamageReduction currently assumes a level 70 attacker
-func (target *Target) ArmorDamageReduction(armorPen float64) float64 {
-	// TODO: Cache this somehow so we dont have to recalculate every time.
+// ArmorDamageMultiplier currently assumes a level 70 attacker
+func (target *Target) ArmorDamageMultiplier(armorPen float64) float64 {
 	effectiveArmor := MaxFloat(0, target.currentArmor-armorPen)
-	return effectiveArmor / (effectiveArmor + 10557.5)
+	return 10557.5 / (effectiveArmor + 10557.5)
 }

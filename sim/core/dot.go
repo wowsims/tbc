@@ -73,7 +73,7 @@ func (ddi DotDamageInput) IsTicking(sim *Simulation) bool {
 	//  In this case the dot "time remaining" will be 0 but there will be ticks left.
 	//  If a DOT misses then it will have NumberOfTicks set but never have been started.
 	//  So the case of 'has a final tick time but its now, but it has ticks remaining' looks like this.
-	return (ddi.endTime != 0 && ddi.tickIndex < ddi.NumberOfTicks)
+	return ddi.endTime != 0 && ddi.tickIndex < ddi.NumberOfTicks
 }
 
 func (ddi *DotDamageInput) SetTickDamage(newDamage float64) {
@@ -160,7 +160,6 @@ func (hitEffect *SpellHitEffect) takeDotSnapshot(sim *Simulation, spellCast *Spe
 	hitEffect.DotInput.startTime = sim.CurrentTime
 	hitEffect.DotInput.RefreshDot(sim)
 	hitEffect.DotInput.nextTickTime = sim.CurrentTime + hitEffect.DotInput.TickLength
-	hitEffect.SpellEffect.BeyondAOECapMultiplier = 1
 }
 
 func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *SpellCast) {

@@ -119,7 +119,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Battlemaster'sDetermination-33832"
  value: {
-  dps: 1416.2388688354952
+  dps: 1416.2388688354956
  }
 }
 dps_results: {
@@ -137,7 +137,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-BlackenedNaaruSliver-34427"
  value: {
-  dps: 1485.50402612147
+  dps: 1485.5040261214701
  }
 }
 dps_results: {
@@ -179,7 +179,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-BraidedEterniumChain-24114"
  value: {
-  dps: 1430.691668672615
+  dps: 1430.6916686726152
  }
 }
 dps_results: {
@@ -779,7 +779,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1674.3637367233357
+  dps: 1674.363736723336
  }
 }
 dps_results: {
@@ -809,49 +809,49 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1782.0339624456712
+  dps: 1762.5929840951126
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1470.1016383936833
+  dps: 1469.5559967727904
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1120.9908933633633
+  dps: 1121.046163843913
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1799.261677498566
+  dps: 1798.2177804248795
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-NoBuffs-LongMultiTarget"
  value: {
-  dps: 976.5303919321993
+  dps: 964.1323982692987
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 839.8238550823238
+  dps: 839.0328776877752
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 600.3363597757378
+  dps: 599.7906325191797
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 906.3213108345304
+  dps: 905.8740788588508
  }
 }
 dps_results: {
@@ -875,7 +875,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1707.256964461252
+  dps: 1707.2569644612522
  }
 }
 dps_results: {
@@ -905,48 +905,48 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1792.1237775899108
+  dps: 1773.8434819890397
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1491.7712785818262
+  dps: 1490.5359779220553
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1169.1384615348986
+  dps: 1168.7801509688786
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1794.5920822070575
+  dps: 1794.0120927781013
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-NoBuffs-LongMultiTarget"
  value: {
-  dps: 974.2666886263293
+  dps: 961.0870190785346
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 840.0676126711827
+  dps: 838.9187211825999
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 618.3209996798184
+  dps: 618.081209181602
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 922.7859981244068
+  dps: 921.7440127580473
  }
 }
