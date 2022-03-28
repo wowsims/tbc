@@ -54,7 +54,10 @@ var ItemSetAvatar = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
+
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+				procFactory := character.NewTemporaryStatsAuraFactory(SadistAuraID, core.ActionID{SpellID: 37604}, stats.Stats{stats.SpellPower: 100}, time.Second*15)
+
 				return core.Aura{
 					ID: Avatar4PcAuraID,
 					OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
@@ -66,15 +69,11 @@ var ItemSetAvatar = core.ItemSet{
 							return
 						}
 
-						character.ReplaceAura(sim, core.Aura{
-							ID:       SadistAuraID,
-							ActionID: core.ActionID{SpellID: 37604},
-							Duration: time.Second * 15,
-							OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-								spellEffect.BonusSpellPower += 100
-								character.RemoveAura(sim, SadistAuraID)
-							},
-						})
+						procAura := procFactory(sim)
+						procAura.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+							character.RemoveAura(sim, SadistAuraID)
+						}
+						character.ReplaceAura(sim, procAura)
 					},
 				}
 			})

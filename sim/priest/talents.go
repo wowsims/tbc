@@ -142,7 +142,7 @@ func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.Sp
 var InnerFocusAuraID = core.NewAuraID()
 var InnerFocusCooldownID = core.NewCooldownID()
 
-func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
+func (priest *Priest) ApplyInnerFocus(sim *core.Simulation) {
 	actionID := core.ActionID{SpellID: 14751}
 	priest.Metrics.AddInstantCast(actionID)
 	priest.Character.AddAura(sim, core.Aura{
@@ -161,5 +161,4 @@ func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
 			priest.RemoveAura(sim, InnerFocusAuraID)
 		},
 	})
-	return true
 }

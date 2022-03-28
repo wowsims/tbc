@@ -23,7 +23,6 @@ func (hunter *Hunter) ApplyTalents() {
 		hunter.pet.PseudoStats.MeleeSpeedMultiplier *= 1 + 0.04*float64(hunter.Talents.SerpentsSwiftness)
 	}
 
-	hunter.applyRangedEffects()
 	hunter.applyGoForTheThroat()
 	hunter.applySlaying()
 	hunter.applyThrillOfTheHunt()
@@ -31,10 +30,12 @@ func (hunter *Hunter) ApplyTalents() {
 	hunter.applyMasterTactician()
 	hunter.registerReadinessCD()
 
-	hunter.PseudoStats.RangedSpeedMultiplier *= 1 + 0.04*float64(hunter.Talents.SerpentsSwiftness)
 	hunter.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*1*float64(hunter.Talents.Surefooted))
 	hunter.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(hunter.Talents.KillerInstinct))
 	hunter.AddStat(stats.Parry, core.ParryRatingPerParryChance*1*float64(hunter.Talents.Deflection))
+	hunter.PseudoStats.RangedSpeedMultiplier *= 1 + 0.04*float64(hunter.Talents.SerpentsSwiftness)
+	hunter.PseudoStats.RangedDamageDealtMultiplier *= 1 + 0.01*float64(hunter.Talents.RangedWeaponSpecialization)
+	hunter.PseudoStats.BonusRangedCritRating += 1 * float64(hunter.Talents.LethalShots) * core.MeleeCritRatingPerCritChance
 
 	if hunter.Talents.Survivalist > 0 {
 		healthBonus := 1 + 0.02*float64(hunter.Talents.Survivalist)
@@ -324,25 +325,6 @@ func (hunter *Hunter) registerBestialWrathCD() {
 	})
 }
 
-var RangedEffectsAuraID = core.NewAuraID()
-
-func (hunter *Hunter) applyRangedEffects() {
-	critBonus := 1 * float64(hunter.Talents.LethalShots) * core.MeleeCritRatingPerCritChance
-	damageBonus := 1 + 0.01*float64(hunter.Talents.RangedWeaponSpecialization)
-
-	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: RangedEffectsAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
-					spellEffect.BonusCritRating += critBonus
-					spellEffect.DamageMultiplier *= damageBonus
-				}
-			},
-		}
-	})
-}
-
 var GoForTheThroatAuraID = core.NewAuraID()
 
 func (hunter *Hunter) applyGoForTheThroat() {
@@ -447,7 +429,7 @@ func (hunter *Hunter) applyExposeWeakness() {
 				}
 
 				if procChance == 1 || sim.RandomFloat("ExposeWeakness") < procChance {
-					spellEffect.Target.ReplaceAura(sim, core.ExposeWeaknessAura(hunter.GetStat(stats.Agility), 1.0))
+					spellEffect.Target.ReplaceAura(sim, core.ExposeWeaknessAura(spellEffect.Target, hunter.GetStat(stats.Agility), 1.0))
 				}
 			},
 		}
@@ -465,16 +447,9 @@ func (hunter *Hunter) applyMasterTactician() {
 	procChance := 0.06
 	critBonus := 2 * core.MeleeCritRatingPerCritChance * float64(hunter.Talents.MasterTactician)
 
-	procAura := core.Aura{
-		ID:       MasterTacticianProcAuraID,
-		ActionID: core.ActionID{SpellID: 34839},
-		Duration: time.Second * 8,
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			spellEffect.BonusCritRating += critBonus
-		},
-	}
-
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		procApplier := hunter.NewTemporaryStatsAuraApplier(MasterTacticianProcAuraID, core.ActionID{SpellID: 34839}, stats.Stats{stats.MeleeCrit: critBonus}, time.Second*8)
+
 		return core.Aura{
 			ID: MasterTacticianAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -486,7 +461,7 @@ func (hunter *Hunter) applyMasterTactician() {
 					return
 				}
 
-				hunter.ReplaceAura(sim, procAura)
+				procApplier(sim)
 			},
 		}
 	})

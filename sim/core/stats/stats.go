@@ -408,7 +408,9 @@ type PseudoStats struct {
 
 	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
 
-	DamageDealtMultiplier         float64 // All damage
+	DamageDealtMultiplier       float64 // All damage
+	RangedDamageDealtMultiplier float64
+
 	PhysicalDamageDealtMultiplier float64
 	ArcaneDamageDealtMultiplier   float64
 	FireDamageDealtMultiplier     float64
@@ -426,7 +428,9 @@ func NewPseudoStats() PseudoStats {
 		SpiritRegenMultiplier: 1,
 		ThreatMultiplier:      1,
 
-		DamageDealtMultiplier:         1,
+		DamageDealtMultiplier:       1,
+		RangedDamageDealtMultiplier: 1,
+
 		PhysicalDamageDealtMultiplier: 1,
 		ArcaneDamageDealtMultiplier:   1,
 		FireDamageDealtMultiplier:     1,
@@ -438,6 +442,12 @@ func NewPseudoStats() PseudoStats {
 }
 
 type TargetPseudoStats struct {
+	BonusMeleeAttackPower  float64
+	BonusRangedAttackPower float64
+	BonusCritRating        float64 // Bonus crit for all types of hits.
+
+	BonusMeleeHitRating float64 // Imp FF
+
 	DamageTakenMultiplier float64 // All damage
 
 	PhysicalDamageTakenMultiplier float64

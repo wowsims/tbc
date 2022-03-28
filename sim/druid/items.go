@@ -54,16 +54,16 @@ var ItemSetNordrassil = core.ItemSet{
 	Name: "Nordrassil Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
-			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+			druidAgent, ok := agent.(Agent)
+			if !ok {
+				panic("why is a non-druid using nordassil regalia")
+			}
+			druid := druidAgent.GetDruid()
+
+			druid.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: Nordrassil4pAuraID,
 					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-						agent, ok := agent.(Agent)
-						if !ok {
-							panic("why is a non-druid using nordassil regalia")
-						}
-						druid := agent.GetDruid()
 						if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
 							// Check if moonfire/insectswarm is ticking on the target.
 							// TODO: in a raid simulator we need to be able to see which dots are ticking from other druids.

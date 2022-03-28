@@ -21,7 +21,7 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 
 	if debuffs.ImprovedSealOfTheCrusader {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return JudgementOfTheCrusaderAura(3)
+			return JudgementOfTheCrusaderAura(target, 3)
 		})
 	}
 
@@ -95,7 +95,7 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		uptime := MinFloat(1.0, debuffs.ExposeWeaknessUptime)
 		target.AddPermanentAuraWithOptions(PermanentAura{
 			AuraFactory: func(sim *Simulation) Aura {
-				return ExposeWeaknessAura(debuffs.ExposeWeaknessHunterAgility, uptime)
+				return ExposeWeaknessAura(target, debuffs.ExposeWeaknessHunterAgility, uptime)
 			},
 			UptimeMultiplier: uptime,
 		})
@@ -104,11 +104,11 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	if debuffs.HuntersMark != proto.TristateEffect_TristateEffectMissing {
 		if debuffs.HuntersMark == proto.TristateEffect_TristateEffectImproved {
 			target.AddPermanentAura(func(sim *Simulation) Aura {
-				return HuntersMarkAura(5, true)
+				return HuntersMarkAura(target, 5, true)
 			})
 		} else {
 			target.AddPermanentAura(func(sim *Simulation) Aura {
-				return HuntersMarkAura(0, true)
+				return HuntersMarkAura(target, 0, true)
 			})
 		}
 	}
@@ -195,21 +195,25 @@ func JudgementOfWisdomAura() Aura {
 
 var ImprovedSealOfTheCrusaderDebuffID = NewDebuffID()
 
-func JudgementOfTheCrusaderAura(level float64) Aura {
-	bonusSPCrit := level * SpellCritRatingPerCritChance
-	bonusMCrit := level * MeleeCritRatingPerCritChance
+func JudgementOfTheCrusaderAura(target *Target, level float64) Aura {
+	bonusCrit := level * SpellCritRatingPerCritChance
 
 	return Aura{
 		ID:       ImprovedSealOfTheCrusaderDebuffID,
 		ActionID: ActionID{SpellID: 27159},
 		Duration: time.Second * 20,
+		OnGain: func(sim *Simulation) {
+			target.PseudoStats.BonusCritRating += bonusCrit
+		},
+		OnExpire: func(sim *Simulation) {
+			target.PseudoStats.BonusCritRating -= bonusCrit
+		},
 		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
 			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
 				spellEffect.BonusSpellPower += 219
 			}
-			spellEffect.BonusSpellCritRating += bonusSPCrit
-			spellEffect.BonusCritRating += bonusMCrit
-
+		},
+		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.ActionID.SpellID == 35395 {
 				spellEffect.Target.RefreshAura(sim, ImprovedSealOfTheCrusaderDebuffID)
 			}
@@ -336,25 +340,23 @@ func FaerieFireAura(target *Target, improved bool) Aura {
 	const hitBonus = 3 * MeleeHitRatingPerHitChance
 	const armorReduction = 610
 
-	aura := Aura{
+	return Aura{
 		ID:       FaerieFireDebuffID,
 		ActionID: ActionID{SpellID: 26993},
 		Duration: time.Second * 40,
 		OnGain: func(sim *Simulation) {
 			target.AddArmor(-armorReduction)
+			if improved {
+				target.PseudoStats.BonusMeleeHitRating += hitBonus
+			}
 		},
 		OnExpire: func(sim *Simulation) {
 			target.AddArmor(armorReduction)
+			if improved {
+				target.PseudoStats.BonusMeleeHitRating -= hitBonus
+			}
 		},
 	}
-
-	if improved {
-		aura.OnBeforeSpellHit = func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-			spellEffect.BonusHitRating += hitBonus
-		}
-	}
-
-	return aura
 }
 
 var SunderArmorDebuffID = NewDebuffID()
@@ -417,22 +419,27 @@ func CurseOfRecklessnessAura(target *Target) Aura {
 var ExposeWeaknessDebuffID = NewDebuffID()
 
 // Multiplier is for accomodating uptime %. For a real hunter, always pass 1.0
-func ExposeWeaknessAura(hunterAgility float64, multiplier float64) Aura {
+func ExposeWeaknessAura(target *Target, hunterAgility float64, multiplier float64) Aura {
 	apBonus := hunterAgility * 0.25 * multiplier
 
 	return Aura{
 		ID:       ExposeWeaknessDebuffID,
 		ActionID: ActionID{SpellID: 34503},
 		Duration: time.Second * 7,
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-			spellEffect.BonusAttackPowerOnTarget += apBonus
+		OnGain: func(sim *Simulation) {
+			target.PseudoStats.BonusMeleeAttackPower += apBonus
+			target.PseudoStats.BonusRangedAttackPower += apBonus
+		},
+		OnExpire: func(sim *Simulation) {
+			target.PseudoStats.BonusMeleeAttackPower -= apBonus
+			target.PseudoStats.BonusRangedAttackPower -= apBonus
 		},
 	}
 }
 
 var HuntersMarkDebuffID = NewDebuffID()
 
-func HuntersMarkAura(points int32, fullyStacked bool) Aura {
+func HuntersMarkAura(target *Target, points int32, fullyStacked bool) Aura {
 	const baseRangedBonus = 110.0
 	const bonusPerStack = 11.0
 	const maxStacks = 30
@@ -450,12 +457,13 @@ func HuntersMarkAura(points int32, fullyStacked bool) Aura {
 		ActionID: ActionID{SpellID: 14325},
 		Stacks:   points, // Use this to check whether to override in hunter/hunter.go
 		Duration: NeverExpires,
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-			if spellEffect.ProcMask.Matches(ProcMaskMelee) {
-				spellEffect.BonusAttackPowerOnTarget += meleeBonus
-			} else {
-				spellEffect.BonusAttackPowerOnTarget += rangedBonus
-			}
+		OnGain: func(sim *Simulation) {
+			target.PseudoStats.BonusMeleeAttackPower += meleeBonus
+			target.PseudoStats.BonusRangedAttackPower += rangedBonus
+		},
+		OnExpire: func(sim *Simulation) {
+			target.PseudoStats.BonusMeleeAttackPower -= meleeBonus
+			target.PseudoStats.BonusRangedAttackPower -= rangedBonus
 		},
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if !spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || !spellEffect.Landed() {
@@ -463,7 +471,8 @@ func HuntersMarkAura(points int32, fullyStacked bool) Aura {
 			}
 			if stacks < maxStacks {
 				stacks++
-				rangedBonus = baseRangedBonus + bonusPerStack*float64(stacks)
+				target.PseudoStats.BonusRangedAttackPower += bonusPerStack
+				rangedBonus += bonusPerStack
 			}
 		},
 	}
