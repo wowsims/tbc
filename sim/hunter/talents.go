@@ -15,11 +15,11 @@ func (hunter *Hunter) ApplyTalents() {
 		hunter.applyFerociousInspiration()
 		hunter.registerBestialWrathCD()
 
-		hunter.pet.damageMultiplier *= 1 + 0.04*float64(hunter.Talents.UnleashedFury)
 		hunter.pet.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*2*float64(hunter.Talents.Ferocity))
 		hunter.pet.AddStat(stats.SpellCrit, core.SpellCritRatingPerCritChance*2*float64(hunter.Talents.Ferocity))
 		hunter.pet.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*2*float64(hunter.Talents.AnimalHandler))
 		hunter.pet.AddStat(stats.SpellHit, core.SpellHitRatingPerHitChance*2*float64(hunter.Talents.AnimalHandler))
+		hunter.pet.PseudoStats.DamageDealtMultiplier *= 1 + 0.04*float64(hunter.Talents.UnleashedFury)
 		hunter.pet.PseudoStats.MeleeSpeedMultiplier *= 1 + 0.04*float64(hunter.Talents.SerpentsSwiftness)
 	}
 
@@ -137,26 +137,12 @@ func (hunter *Hunter) critMultiplier(isRanged bool, target *core.Target) float64
 	return hunter.MeleeCritMultiplier(primaryModifier, secondaryModifier)
 }
 
-var FocusedFireAuraID = core.NewAuraID()
-
 func (hunter *Hunter) applyFocusedFire() {
 	if hunter.Talents.FocusedFire == 0 || hunter.pet == nil {
 		return
 	}
 
-	multiplier := 1.0 + 0.01*float64(hunter.Talents.FocusedFire)
-
-	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: FocusedFireAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				spellEffect.DamageMultiplier *= multiplier
-			},
-			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				*tickDamage *= multiplier
-			},
-		}
-	})
+	hunter.PseudoStats.DamageDealtMultiplier *= 1.0 + 0.01*float64(hunter.Talents.FocusedFire)
 }
 
 var FrenzyAuraID = core.NewAuraID()
@@ -214,19 +200,26 @@ func (hunter *Hunter) applyFerociousInspiration() {
 
 	multiplier := 1.0 + 0.01*float64(hunter.Talents.FerociousInspiration)
 
-	procAura := core.Aura{
-		ID:       FerociousInspirationAuraIDs[hunter.PartyIndex],
-		ActionID: core.ActionID{SpellID: 34460, Tag: int32(hunter.RaidIndex)},
-		Duration: time.Second * 10,
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			spellEffect.DamageMultiplier *= multiplier
-		},
-		OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-			*tickDamage *= multiplier
-		},
+	makeProcAura := func(character *core.Character) core.Aura {
+		return core.Aura{
+			ID:       FerociousInspirationAuraIDs[hunter.PartyIndex],
+			ActionID: core.ActionID{SpellID: 34460, Tag: int32(hunter.RaidIndex)},
+			Duration: time.Second * 10,
+			OnGain: func(sim *core.Simulation) {
+				character.PseudoStats.DamageDealtMultiplier *= multiplier
+			},
+			OnExpire: func(sim *core.Simulation) {
+				character.PseudoStats.DamageDealtMultiplier /= multiplier
+			},
+		}
 	}
 
 	hunter.pet.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		procAuras := make([]core.Aura, len(hunter.Party.PlayersAndPets))
+		for i, playerOrPet := range hunter.Party.PlayersAndPets {
+			procAuras[i] = makeProcAura(playerOrPet.GetCharacter())
+		}
+
 		return core.Aura{
 			ID: FerociousInspirationAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -234,9 +227,9 @@ func (hunter *Hunter) applyFerociousInspiration() {
 					return
 				}
 
-				for _, playerOrPet := range hunter.Party.PlayersAndPets {
+				for i, playerOrPet := range hunter.Party.PlayersAndPets {
 					char := playerOrPet.GetCharacter()
-					char.ReplaceAura(sim, procAura)
+					char.ReplaceAura(sim, procAuras[i])
 				}
 			},
 		}
@@ -258,11 +251,11 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		ID:       BestialWrathPetAuraID,
 		ActionID: actionID,
 		Duration: time.Second * 18,
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			spellEffect.DamageMultiplier *= 1.5
+		OnGain: func(sim *core.Simulation) {
+			hunter.pet.PseudoStats.DamageDealtMultiplier *= 1.5
 		},
-		OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-			*tickDamage *= 1.5
+		OnExpire: func(sim *core.Simulation) {
+			hunter.pet.PseudoStats.DamageDealtMultiplier /= 1.5
 		},
 	}
 
@@ -270,14 +263,14 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		ID:       BestialWrathAuraID,
 		ActionID: actionID,
 		Duration: time.Second * 18,
+		OnGain: func(sim *core.Simulation) {
+			hunter.PseudoStats.DamageDealtMultiplier *= 1.1
+		},
+		OnExpire: func(sim *core.Simulation) {
+			hunter.PseudoStats.DamageDealtMultiplier /= 1.1
+		},
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
 			cast.Cost.Value -= cast.BaseCost.Value * 0.2
-		},
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			spellEffect.DamageMultiplier *= 1.1
-		},
-		OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-			*tickDamage *= 1.1
 		},
 	}
 
@@ -378,8 +371,6 @@ func (hunter *Hunter) applyGoForTheThroat() {
 	})
 }
 
-var SlayingAuraID = core.NewAuraID()
-
 func (hunter *Hunter) applySlaying() {
 	if hunter.Talents.MonsterSlaying == 0 && hunter.Talents.HumanoidSlaying == 0 {
 		return
@@ -388,23 +379,12 @@ func (hunter *Hunter) applySlaying() {
 	monsterMultiplier := 1.0 + 0.01*float64(hunter.Talents.MonsterSlaying)
 	humanoidMultiplier := 1.0 + 0.01*float64(hunter.Talents.HumanoidSlaying)
 
-	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: SlayingAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if spellEffect.Target.MobType == proto.MobType_MobTypeBeast || spellEffect.Target.MobType == proto.MobType_MobTypeGiant || spellEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
-					spellEffect.DamageMultiplier *= monsterMultiplier
-				} else if spellEffect.Target.MobType == proto.MobType_MobTypeHumanoid {
-					spellEffect.DamageMultiplier *= humanoidMultiplier
-				}
-			},
-			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				if spellEffect.Target.MobType == proto.MobType_MobTypeBeast || spellEffect.Target.MobType == proto.MobType_MobTypeGiant || spellEffect.Target.MobType == proto.MobType_MobTypeDragonkin {
-					*tickDamage *= monsterMultiplier
-				} else if spellEffect.Target.MobType == proto.MobType_MobTypeHumanoid {
-					*tickDamage *= humanoidMultiplier
-				}
-			},
+	hunter.RegisterResetEffect(func(sim *core.Simulation) {
+		switch sim.GetPrimaryTarget().MobType {
+		case proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
+			hunter.PseudoStats.DamageDealtMultiplier *= monsterMultiplier
+		case proto.MobType_MobTypeHumanoid:
+			hunter.PseudoStats.DamageDealtMultiplier *= humanoidMultiplier
 		}
 	})
 }

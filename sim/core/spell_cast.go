@@ -15,10 +15,6 @@ type OnBeforeSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *S
 // or anything that comes from the final result of the spell.
 type OnSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect)
 
-// OnBeforePeriodicDamage is called when dots tick, before damage is calculated.
-// Use it to modify the spell damage or results.
-type OnBeforePeriodicDamage func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64)
-
 // OnPeriodicDamage is called when dots tick, after damage is calculated. Use it for proc effects
 // or anything that comes from the final result of a tick.
 type OnPeriodicDamage func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage float64)
@@ -136,6 +132,8 @@ func (hitEffect *SpellHitEffect) directCalculations(sim *Simulation, spell *Simp
 	damage := hitEffect.calculateBaseDamage(sim, &spell.SpellCast)
 
 	damage *= hitEffect.DamageMultiplier * hitEffect.StaticDamageMultiplier
+	hitEffect.applyAttackerMultipliers(sim, &spell.SpellCast, false, &damage)
+	hitEffect.applyTargetMultipliers(sim, &spell.SpellCast, false, &damage)
 	hitEffect.applyResistances(sim, &spell.SpellCast, &damage)
 	hitEffect.applyOutcome(sim, &spell.SpellCast, &damage)
 
@@ -392,6 +390,51 @@ func (spellEffect *SpellEffect) String() string {
 		return outcomeStr
 	}
 	return fmt.Sprintf("%s for %0.3f damage", outcomeStr, spellEffect.Damage)
+}
+
+func (hitEffect *SpellHitEffect) applyAttackerMultipliers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, damage *float64) {
+	attacker := spellCast.Character
+
+	*damage *= attacker.PseudoStats.DamageDealtMultiplier
+	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
+		*damage *= attacker.PseudoStats.PhysicalDamageDealtMultiplier
+	} else if spellCast.SpellSchool.Matches(SpellSchoolArcane) {
+		*damage *= attacker.PseudoStats.ArcaneDamageDealtMultiplier
+	} else if spellCast.SpellSchool.Matches(SpellSchoolFire) {
+		*damage *= attacker.PseudoStats.FireDamageDealtMultiplier
+	} else if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
+		*damage *= attacker.PseudoStats.FrostDamageDealtMultiplier
+	} else if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
+		*damage *= attacker.PseudoStats.HolyDamageDealtMultiplier
+	} else if spellCast.SpellSchool.Matches(SpellSchoolNature) {
+		*damage *= attacker.PseudoStats.NatureDamageDealtMultiplier
+	} else if spellCast.SpellSchool.Matches(SpellSchoolShadow) {
+		*damage *= attacker.PseudoStats.ShadowDamageDealtMultiplier
+	}
+}
+
+func (hitEffect *SpellHitEffect) applyTargetMultipliers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, damage *float64) {
+	target := hitEffect.Target
+
+	*damage *= target.PseudoStats.DamageTakenMultiplier
+	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
+		*damage *= target.PseudoStats.PhysicalDamageTakenMultiplier
+		if isPeriodic {
+			*damage *= target.PseudoStats.PeriodicPhysicalDamageTakenMultiplier
+		}
+	} else if spellCast.SpellSchool.Matches(SpellSchoolArcane) {
+		*damage *= target.PseudoStats.ArcaneDamageTakenMultiplier
+	} else if spellCast.SpellSchool.Matches(SpellSchoolFire) {
+		*damage *= target.PseudoStats.FireDamageTakenMultiplier
+	} else if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
+		*damage *= target.PseudoStats.FrostDamageTakenMultiplier
+	} else if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
+		*damage *= target.PseudoStats.HolyDamageTakenMultiplier
+	} else if spellCast.SpellSchool.Matches(SpellSchoolNature) {
+		*damage *= target.PseudoStats.NatureDamageTakenMultiplier
+	} else if spellCast.SpellSchool.Matches(SpellSchoolShadow) {
+		*damage *= target.PseudoStats.ShadowDamageTakenMultiplier
+	}
 }
 
 // Modifies damage based on Armor or Magic resistances, depending on the damage type.

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 type Encounter struct {
@@ -71,6 +72,9 @@ type Target struct {
 	currentArmor         float64 // current armor, can be mutated by spells
 	armorDamageReduction float64 // cached armor damage reduction
 
+	initialPseudoStats stats.TargetPseudoStats
+	PseudoStats        stats.TargetPseudoStats
+
 	MissChance      float64
 	HitSuppression  float64
 	CritSuppression float64
@@ -100,6 +104,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		Index:        targetIndex,
 		currentArmor: float64(options.Armor),
 		MobType:      options.MobType,
+		PseudoStats:  stats.NewTargetPseudoStats(),
 		auraTracker:  newAuraTracker(true),
 		Name:         "Target " + strconv.Itoa(int(targetIndex)+1),
 		Level:        options.Level,
@@ -139,11 +144,13 @@ func (target *Target) finalize() {
 	target.finalized = true
 
 	target.initialArmor = target.currentArmor
+	target.initialPseudoStats = target.PseudoStats
 	target.auraTracker.finalize()
 }
 
 func (target *Target) Reset(sim *Simulation) {
 	target.currentArmor = target.initialArmor
+	target.PseudoStats = target.initialPseudoStats
 	target.auraTracker.reset(sim)
 	// Reset after removing any auras above
 	target.calculateReduction()

@@ -111,8 +111,6 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim 
 	}
 }
 
-var MurderAuraID = core.NewAuraID()
-
 func (rogue *Rogue) applyMurder() {
 	if rogue.Talents.Murder == 0 {
 		return
@@ -120,21 +118,10 @@ func (rogue *Rogue) applyMurder() {
 
 	damageMultiplier := 1.0 + 0.01*float64(rogue.Talents.Murder)
 
-	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: MurderAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				switch spellEffect.Target.MobType {
-				case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
-					spellEffect.DamageMultiplier *= damageMultiplier
-				}
-			},
-			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				switch spellEffect.Target.MobType {
-				case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
-					*tickDamage *= damageMultiplier
-				}
-			},
+	rogue.RegisterResetEffect(func(sim *core.Simulation) {
+		switch sim.GetPrimaryTarget().MobType {
+		case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
+			rogue.PseudoStats.DamageDealtMultiplier *= damageMultiplier
 		}
 	})
 }

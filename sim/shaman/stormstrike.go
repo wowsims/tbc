@@ -13,18 +13,18 @@ var StormstrikeDebuffID = core.NewDebuffID()
 var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeCD}
 var SkyshatterAPBonusAuraID = core.NewAuraID()
 
-func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) core.Aura {
 	ssDebuffAura := core.Aura{
 		ID:       StormstrikeDebuffID,
 		ActionID: StormstrikeActionID,
 		Duration: time.Second * 12,
 		Stacks:   2,
-	}
-	ssDebuffAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-		if spellCast.SpellSchool != core.SpellSchoolNature {
-			return
-		}
-		spellEffect.DamageMultiplier *= 1.2
+		OnGain: func(sim *core.Simulation) {
+			target.PseudoStats.NatureDamageTakenMultiplier *= 1.2
+		},
+		OnExpire: func(sim *core.Simulation) {
+			target.PseudoStats.NatureDamageTakenMultiplier /= 1.2
+		},
 	}
 	ssDebuffAura.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if spellCast.SpellSchool != core.SpellSchoolNature {
@@ -42,6 +42,11 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 			spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
 		}
 	}
+	return ssDebuffAura
+}
+
+func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+	ssDebuffAura := shaman.stormstrikeDebuffAura(sim.GetPrimaryTarget())
 
 	hasSkyshatter4p := ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4)
 	skyshatterAuraApplier := shaman.NewTemporaryStatsAuraApplier(SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.Stats{stats.AttackPower: 70}, time.Second*12)

@@ -108,7 +108,7 @@ func ApplyBeasttamersShoulders(agent core.Agent) {
 	}
 	hunter := hunterAgent.GetHunter()
 
-	hunter.pet.damageMultiplier *= 1.03
+	hunter.pet.PseudoStats.DamageDealtMultiplier *= 1.03
 	hunter.pet.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*2)
 }
 

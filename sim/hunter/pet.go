@@ -16,9 +16,6 @@ type HunterPet struct {
 
 	hunterOwner *Hunter
 
-	// Combines a few static effects.
-	damageMultiplier float64
-
 	// Time when pet should die, as per petUptime.
 	deathTime time.Duration
 
@@ -46,13 +43,12 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 			hunterPetStatInheritance,
 			true,
 		),
-		config:           petConfig,
-		hunterOwner:      hunter,
-		damageMultiplier: 1.0,
+		config:      petConfig,
+		hunterOwner: hunter,
 	}
 
 	// Happiness
-	hp.damageMultiplier *= 1.25
+	hp.PseudoStats.DamageDealtMultiplier *= 1.25
 
 	hp.EnableFocusBar(1.0+0.5*float64(hunter.Talents.BestialDiscipline), func(sim *core.Simulation) {
 		if !hp.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
@@ -92,7 +88,6 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 	})
 
 	core.ApplyPetConsumeEffects(&hp.Character, hunter.Consumes)
-	hp.applyPetEffects()
 
 	hunter.AddPet(hp)
 
@@ -171,22 +166,6 @@ var hunterPetStatInheritance = func(ownerStats stats.Stats) stats.Stats {
 		stats.AttackPower: ownerStats[stats.RangedAttackPower] * 0.22,
 		stats.SpellPower:  ownerStats[stats.RangedAttackPower] * 0.128,
 	}
-}
-
-var PetEffectsAuraID = core.NewAuraID()
-
-func (hp *HunterPet) applyPetEffects() {
-	hp.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: PetEffectsAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				spellEffect.DamageMultiplier *= hp.damageMultiplier
-			},
-			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				*tickDamage *= hp.damageMultiplier
-			},
-		}
-	})
 }
 
 type PetConfig struct {

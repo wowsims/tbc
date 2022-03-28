@@ -185,7 +185,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-ChaoticSkyfireDiamond"
  value: {
-  dps: 1220.6017326617025
+  dps: 1220.6017326617027
  }
 }
 dps_results: {
@@ -209,7 +209,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 1223.5157674757252
+  dps: 1223.5157674757254
  }
 }
 dps_results: {
@@ -647,7 +647,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1087.8550663210997
+  dps: 1087.8550663210995
  }
 }
 dps_results: {

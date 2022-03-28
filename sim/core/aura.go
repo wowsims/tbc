@@ -92,9 +92,6 @@ type Aura struct {
 	OnGain   OnGain
 	OnExpire OnExpire
 
-	// Invoked when a dot tick occurs, before damage is calculated.
-	OnBeforePeriodicDamage OnBeforePeriodicDamage
-
 	// Invoked when a dot tick occurs, after damage is calculated.
 	OnPeriodicDamage OnPeriodicDamage
 }
@@ -108,6 +105,9 @@ func (aura *Aura) refresh(sim *Simulation) {
 }
 
 type AuraFactory func(*Simulation) Aura
+
+// Callback for doing something on reset.
+type ResetEffect func(*Simulation)
 
 // Wraps aura creation and calls it on every sim reset.
 type PermanentAura struct {
@@ -127,6 +127,9 @@ type PermanentAura struct {
 // auraTracker is a centralized implementation of CD and Aura tracking.
 //  This is currently used by Player and Raid (for global debuffs)
 type auraTracker struct {
+	// Effects to invoke on every sim reset.
+	resetEffects []ResetEffect
+
 	// Auras that never expire and should always be active.
 	// These are automatically applied on each Sim reset.
 	permanentAuras []PermanentAura
@@ -171,6 +174,7 @@ func newAuraTracker(useDebuffIDs bool) auraTracker {
 		numAura = numDebuffIDs
 	}
 	return auraTracker{
+		resetEffects:              []ResetEffect{},
 		permanentAuras:            []PermanentAura{},
 		activeAuraIDs:             make([]AuraID, 0, 16),
 		onCastIDs:                 make([]AuraID, 0, 16),
@@ -185,6 +189,16 @@ func newAuraTracker(useDebuffIDs bool) auraTracker {
 		useDebuffIDs:              useDebuffIDs,
 		metrics:                   make([]AuraMetrics, numAura),
 	}
+}
+
+// Registers a callback to this Character which will be invoked on
+// every Sim reset.
+func (at *auraTracker) RegisterResetEffect(resetEffect ResetEffect) {
+	if at.finalized {
+		panic("Reset effects may not be added once finalized!")
+	}
+
+	at.resetEffects = append(at.resetEffects, resetEffect)
 }
 
 // Registers a permanent aura to this Character which will be re-applied on
@@ -232,6 +246,10 @@ func (at *auraTracker) reset(sim *Simulation) {
 	for i, _ := range at.metrics {
 		auraMetric := &at.metrics[i]
 		auraMetric.reset()
+	}
+
+	for _, resetEffect := range at.resetEffects {
+		resetEffect(sim)
 	}
 
 	for _, permAura := range at.permanentAuras {
@@ -367,11 +385,6 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		at.onSpellHitIDs = append(at.onSpellHitIDs, newAura.ID)
 	}
 
-	if newAura.OnBeforePeriodicDamage != nil {
-		newAura.onBeforePeriodicDamageIndex = int32(len(at.onBeforePeriodicDamageIDs))
-		at.onBeforePeriodicDamageIDs = append(at.onBeforePeriodicDamageIDs, newAura.ID)
-	}
-
 	if newAura.OnPeriodicDamage != nil {
 		newAura.onPeriodicDamageIndex = int32(len(at.onPeriodicDamageIDs))
 		at.onPeriodicDamageIDs = append(at.onPeriodicDamageIDs, newAura.ID)
@@ -450,14 +463,6 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 		at.onSpellHitIDs = removeBySwappingToBack(at.onSpellHitIDs, removeOnSpellHitIndex)
 		if removeOnSpellHitIndex < int32(len(at.onSpellHitIDs)) {
 			at.auras[at.onSpellHitIDs[removeOnSpellHitIndex]].onSpellHitIndex = removeOnSpellHitIndex
-		}
-	}
-
-	if aura.OnBeforePeriodicDamage != nil {
-		removeOnBeforePeriodicDamage := aura.onBeforePeriodicDamageIndex
-		at.onBeforePeriodicDamageIDs = removeBySwappingToBack(at.onBeforePeriodicDamageIDs, removeOnBeforePeriodicDamage)
-		if removeOnBeforePeriodicDamage < int32(len(at.onBeforePeriodicDamageIDs)) {
-			at.auras[at.onBeforePeriodicDamageIDs[removeOnBeforePeriodicDamage]].onBeforePeriodicDamageIndex = removeOnBeforePeriodicDamage
 		}
 	}
 
@@ -582,15 +587,6 @@ func (at *auraTracker) OnBeforeSpellHit(sim *Simulation, spellCast *SpellCast, s
 func (at *auraTracker) OnSpellHit(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 	for _, id := range at.onSpellHitIDs {
 		at.auras[id].OnSpellHit(sim, spellCast, spellEffect)
-	}
-}
-
-// Invokes the OnBeforePeriodicDamage
-//   As a debuff when target is being hit by dot.
-//   As a buff when caster's dots are ticking.
-func (at *auraTracker) OnBeforePeriodicDamage(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-	for _, id := range at.onBeforePeriodicDamageIDs {
-		at.auras[id].OnBeforePeriodicDamage(sim, spellCast, spellEffect, tickDamage)
 	}
 }
 
