@@ -42,6 +42,9 @@ func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleS
 				DamageMultiplier: 1,
 				FlatDamageBonus:  176,
 			},
+			DirectInput: core.DirectDamageInput{
+				SpellCoefficient: 1,
+			},
 		},
 	}
 

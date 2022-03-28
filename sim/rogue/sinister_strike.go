@@ -27,6 +27,9 @@ func (rogue *Rogue) newSinisterStrikeTemplate(_ *core.Simulation) core.SimpleSpe
 		FlatDamageBonus:  98,
 		DamageMultiplier: 1,
 	}
+	ability.Effect.DirectInput = core.DirectDamageInput{
+		SpellCoefficient: 1,
+	}
 
 	// cp. backstab
 	ability.Effect.StaticDamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
