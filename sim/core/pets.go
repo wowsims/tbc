@@ -97,10 +97,7 @@ func (gft *GnomishFlameTurret) newFlameCannonTemplate(sim *Simulation) SimpleSpe
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: DirectDamageInput{
-				MinBaseDamage: 31,
-				MaxBaseDamage: 36,
-			},
+			BaseDamage: BaseDamageFuncRoll(31, 36),
 		},
 	}
 

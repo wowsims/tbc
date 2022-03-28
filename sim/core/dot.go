@@ -153,7 +153,7 @@ func (spell *SimpleSpell) ApplyDot(sim *Simulation) {
 
 // Snapshots a few values at the start of a dot.
 func (hitEffect *SpellHitEffect) takeDotSnapshot(sim *Simulation, spellCast *SpellCast) {
-	totalSpellPower := hitEffect.spellPower(spellCast.Character, spellCast)
+	totalSpellPower := hitEffect.SpellPower(spellCast.Character, spellCast)
 
 	// snapshot total damage per tick, including any static damage multipliers
 	hitEffect.DotInput.damagePerTick = (hitEffect.DotInput.TickBaseDamage + totalSpellPower*hitEffect.DotInput.TickSpellCoefficient) * hitEffect.StaticDamageMultiplier

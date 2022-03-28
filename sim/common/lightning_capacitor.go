@@ -76,10 +76,7 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 694,
-				MaxBaseDamage: 807,
-			},
+			BaseDamage: core.BaseDamageFuncRoll(694, 807),
 		},
 	})
 }

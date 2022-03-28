@@ -100,10 +100,7 @@ func ApplyTimbals(agent core.Agent) {
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 285,
-				MaxBaseDamage: 475,
-			},
+			BaseDamage: core.BaseDamageFuncRoll(285, 475),
 		},
 	})
 	character := agent.GetCharacter()

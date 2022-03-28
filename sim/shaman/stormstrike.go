@@ -91,9 +91,6 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 				WeaponInput: core.WeaponDamageInput{
 					DamageMultiplier: 1,
 				},
-				DirectInput: core.DirectDamageInput{
-					SpellCoefficient: 1,
-				},
 			},
 			{
 				SpellEffect: core.SpellEffect{
@@ -106,9 +103,6 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 				WeaponInput: core.WeaponDamageInput{
 					Offhand:          true,
 					DamageMultiplier: 1,
-				},
-				DirectInput: core.DirectDamageInput{
-					SpellCoefficient: 1,
 				},
 			},
 		},

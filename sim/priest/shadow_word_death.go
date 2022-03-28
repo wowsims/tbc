@@ -41,11 +41,7 @@ func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.Simp
 			StaticDamageMultiplier: 1,
 			ThreatMultiplier:       1,
 		},
-		DirectInput: core.DirectDamageInput{
-			MinBaseDamage:    572,
-			MaxBaseDamage:    664,
-			SpellCoefficient: 0.429,
-		},
+		BaseDamage: core.BaseDamageFuncMagic(572, 664, 0.429),
 	}
 
 	priest.applyTalentsToShadowSpell(&baseCast, &effect)

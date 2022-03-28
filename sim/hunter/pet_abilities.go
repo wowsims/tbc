@@ -99,10 +99,7 @@ func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 108,
-				MaxBaseDamage: 132,
-			},
+			BaseDamage: core.BaseDamageFuncRoll(108, 132),
 		},
 	}
 
@@ -156,10 +153,7 @@ func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 54,
-				MaxBaseDamage: 76,
-			},
+			BaseDamage: core.BaseDamageFuncRoll(54, 76),
 		},
 	}
 
@@ -204,10 +198,7 @@ func (hp *HunterPet) newGore(sim *core.Simulation, isPrimary bool) PetAbility {
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 37,
-				MaxBaseDamage: 61,
-			},
+			BaseDamage: core.BaseDamageFuncRoll(37, 61),
 		},
 	}
 
@@ -253,11 +244,7 @@ func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) Pe
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    80,
-				MaxBaseDamage:    93,
-				SpellCoefficient: 0.05,
-			},
+			BaseDamage: core.BaseDamageFuncMagic(80, 93, 0.05),
 		},
 	}
 
@@ -302,10 +289,7 @@ func (hp *HunterPet) newScreech(sim *core.Simulation, isPrimary bool) PetAbility
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 33,
-				MaxBaseDamage: 61,
-			},
+			BaseDamage: core.BaseDamageFuncRoll(33, 61),
 		},
 	}
 

@@ -100,11 +100,7 @@ func (shaman *Shaman) newEarthShockTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := shaman.newShockTemplateSpell(sim, SpellIDEarthShock, core.SpellSchoolNature, 535.0)
 	spell.SpellExtras |= core.SpellExtrasBinary
 
-	spell.Effect.DirectInput = core.DirectDamageInput{
-		MinBaseDamage:    661,
-		MaxBaseDamage:    696,
-		SpellCoefficient: 0.386,
-	}
+	spell.Effect.BaseDamage = core.BaseDamageFuncMagic(661, 696, 0.386)
 
 	return core.NewSimpleSpellTemplate(spell)
 }
@@ -123,11 +119,7 @@ func (shaman *Shaman) NewEarthShock(sim *core.Simulation, target *core.Target) *
 func (shaman *Shaman) newFlameShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	spell := shaman.newShockTemplateSpell(sim, SpellIDFlameShock, core.SpellSchoolFire, 500.0)
 
-	spell.Effect.DirectInput = core.DirectDamageInput{
-		MinBaseDamage:    377,
-		MaxBaseDamage:    377,
-		SpellCoefficient: 0.214,
-	}
+	spell.Effect.BaseDamage = core.BaseDamageFuncMagic(377, 377, 0.214)
 	spell.Effect.DotInput = core.DotDamageInput{
 		NumberOfTicks:        4,
 		TickLength:           time.Second * 3,
@@ -159,11 +151,7 @@ func (shaman *Shaman) newFrostShockTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := shaman.newShockTemplateSpell(sim, SpellIDFrostShock, core.SpellSchoolFrost, 525.0)
 	spell.SpellExtras |= core.SpellExtrasBinary
 
-	spell.Effect.DirectInput = core.DirectDamageInput{
-		MinBaseDamage:    647,
-		MaxBaseDamage:    683,
-		SpellCoefficient: 0.386,
-	}
+	spell.Effect.BaseDamage = core.BaseDamageFuncMagic(647, 683, 0.386)
 	spell.Effect.ThreatMultiplier *= 2
 
 	return core.NewSimpleSpellTemplate(spell)

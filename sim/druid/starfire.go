@@ -35,28 +35,33 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
-		DirectInput: core.DirectDamageInput{
-			MinBaseDamage:    550,
-			MaxBaseDamage:    647,
-			SpellCoefficient: 1.0,
-		},
-	}
-
+	minBaseDamage := 550.0
+	maxBaseDamage := 647.0
+	spellCoefficient := 1.0
 	if rank == 6 {
 		baseCast.BaseCost.Value = 315
 		baseCast.Cost.Value = 315
 		baseCast.ActionID = core.ActionID{
 			SpellID: SpellIDSF6,
 		}
-		effect.DirectInput.MinBaseDamage = 463
-		effect.DirectInput.MaxBaseDamage = 543
-		effect.DirectInput.SpellCoefficient = 0.99
+		minBaseDamage = 463
+		maxBaseDamage = 543
+		spellCoefficient = 0.99
+	}
+	bonusFlatDamage := 0.0
+	if druid.Equip[items.ItemSlotRanged].ID == IvoryMoongoddess {
+		// This seems to be unaffected by wrath of cenarius so it needs to come first.
+		bonusFlatDamage += 55 * spellCoefficient
+	}
+	spellCoefficient += 0.04 * float64(druid.Talents.WrathOfCenarius)
+
+	effect := core.SpellHitEffect{
+		SpellEffect: core.SpellEffect{
+			DamageMultiplier:       1,
+			StaticDamageMultiplier: 1,
+			ThreatMultiplier:       1,
+		},
+		BaseDamage: core.BaseDamageFuncMagic(minBaseDamage+bonusFlatDamage, maxBaseDamage+bonusFlatDamage, spellCoefficient),
 	}
 
 	baseCast.Cost.Value -= baseCast.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
@@ -64,12 +69,7 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 
 	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
 	effect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
-	effect.DirectInput.SpellCoefficient += 0.04 * float64(druid.Talents.WrathOfCenarius)
 
-	if druid.Equip[items.ItemSlotRanged].ID == IvoryMoongoddess {
-		// This seems to be unaffected by wrath of cenarius so it needs to come first.
-		effect.DirectInput.FlatDamageBonus += 55 * effect.DirectInput.SpellCoefficient
-	}
 	if ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 4) { // Thunderheart 4p adds 5% crit to starfire
 		effect.BonusSpellCritRating += 5 * core.SpellCritRatingPerCritChance
 	}

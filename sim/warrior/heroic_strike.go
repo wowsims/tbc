@@ -38,13 +38,7 @@ func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleS
 				ThreatMultiplier:       1,
 				FlatThreatBonus:        194,
 			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 1,
-				FlatDamageBonus:  176,
-			},
-			DirectInput: core.DirectDamageInput{
-				SpellCoefficient: 1,
-			},
+			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 176, 1, true),
 		},
 	}
 

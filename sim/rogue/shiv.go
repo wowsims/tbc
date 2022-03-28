@@ -31,9 +31,6 @@ func (rogue *Rogue) newShivTemplate(_ *core.Simulation) core.SimpleSpellTemplate
 		Offhand:          true,
 		DamageMultiplier: 1 + 0.1*float64(rogue.Talents.DualWieldSpecialization),
 	}
-	ability.Effect.DirectInput = core.DirectDamageInput{
-		SpellCoefficient: 1,
-	}
 
 	if rogue.Talents.SurpriseAttacks {
 		ability.Effect.StaticDamageMultiplier += 0.1

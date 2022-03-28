@@ -41,11 +41,7 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 			StaticDamageMultiplier: 1,
 			ThreatMultiplier:       1,
 		},
-		DirectInput: core.DirectDamageInput{
-			MinBaseDamage:    711,
-			MaxBaseDamage:    752,
-			SpellCoefficient: 0.429,
-		},
+		BaseDamage: core.BaseDamageFuncMagic(711, 752, 0.429),
 	}
 
 	priest.applyTalentsToShadowSpell(&baseCast, &effect)

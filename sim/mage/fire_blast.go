@@ -43,11 +43,7 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
 				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    664,
-				MaxBaseDamage:    786,
-				SpellCoefficient: 1.5 / 3.5,
-			},
+			BaseDamage: core.BaseDamageFuncMagic(664, 786, 1.5/3.5),
 		},
 	}
 

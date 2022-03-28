@@ -225,9 +225,9 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				WeaponInput: WeaponDamageInput{
 					DamageMultiplier: 1,
 				},
-				DirectInput: DirectDamageInput{
-					SpellCoefficient: 1,
-				},
+				//DirectInput: DirectDamageInput{
+				//	SpellCoefficient: 1,
+				//},
 			},
 		},
 		OHAuto: SimpleSpell{

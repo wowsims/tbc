@@ -168,10 +168,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 							StaticDamageMultiplier: 1,
 							ThreatMultiplier:       1,
 						},
-						DirectInput: core.DirectDamageInput{
-							MinBaseDamage: 100,
-							MaxBaseDamage: 150,
-						},
+						BaseDamage: core.BaseDamageFuncRoll(100, 150),
 					},
 				})
 

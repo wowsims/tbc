@@ -41,11 +41,7 @@ func (priest *Priest) newSmiteTemplate(sim *core.Simulation) core.SimpleSpellTem
 			StaticDamageMultiplier: 1,
 			ThreatMultiplier:       1,
 		},
-		DirectInput: core.DirectDamageInput{
-			MinBaseDamage:    549,
-			MaxBaseDamage:    616,
-			SpellCoefficient: 0.7143,
-		},
+		BaseDamage: core.BaseDamageFuncMagic(549, 616, 0.7143),
 	}
 
 	priest.applyTalentsToHolySpell(&baseCast, &effect)

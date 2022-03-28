@@ -38,13 +38,7 @@ func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpel
 				ThreatMultiplier:       1,
 				FlatThreatBonus:        100,
 			},
-			WeaponInput: core.WeaponDamageInput{
-				Normalized:       true,
-				DamageMultiplier: 0.5,
-			},
-			DirectInput: core.DirectDamageInput{
-				SpellCoefficient: 1,
-			},
+			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 0.5, true),
 		},
 	}
 

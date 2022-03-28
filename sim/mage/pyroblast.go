@@ -49,11 +49,7 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 					pyroblastDot.Cast(sim)
 				},
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    939,
-				MaxBaseDamage:    1191,
-				SpellCoefficient: 1.15,
-			},
+			BaseDamage: core.BaseDamageFuncMagic(939, 1191, 1.15),
 		},
 	}
 

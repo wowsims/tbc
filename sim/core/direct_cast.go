@@ -5,6 +5,118 @@ import (
 	"time"
 )
 
+// Function for calculating the base damage of a spell.
+type BaseDamageCalculator func(*Simulation, *SpellHitEffect, *SpellCast) float64
+
+// Creates a BaseDamageCalculator function which returns a flat value.
+func BaseDamageFuncFlat(damage float64) BaseDamageCalculator {
+	return func(_ *Simulation, _ *SpellHitEffect, _ *SpellCast) float64 {
+		return damage
+	}
+}
+
+// Creates a BaseDamageCalculator function with a single damage roll.
+func BaseDamageFuncRoll(minFlatDamage float64, maxFlatDamage float64) BaseDamageCalculator {
+	if minFlatDamage == maxFlatDamage {
+		return BaseDamageFuncFlat(minFlatDamage)
+	} else {
+		deltaDamage := maxFlatDamage - minFlatDamage
+		return func(sim *Simulation, _ *SpellHitEffect, _ *SpellCast) float64 {
+			return damageRoll(sim, minFlatDamage, deltaDamage)
+		}
+	}
+}
+
+func BaseDamageFuncMagic(minFlatDamage float64, maxFlatDamage float64, spellCoefficient float64) BaseDamageCalculator {
+	if spellCoefficient == 0 {
+		return BaseDamageFuncRoll(minFlatDamage, maxFlatDamage)
+	}
+
+	// TODO: Add case for min == max which skips the roll and just adds damage. Will change RNG
+	if minFlatDamage == 0 && maxFlatDamage == 0 {
+		return func(_ *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+			return hitEffect.SpellPower(spellCast.Character, spellCast) * spellCoefficient
+		}
+	} else {
+		deltaDamage := maxFlatDamage - minFlatDamage
+		return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+			damage := hitEffect.SpellPower(spellCast.Character, spellCast) * spellCoefficient
+			damage += damageRoll(sim, minFlatDamage, deltaDamage)
+			return damage
+		}
+	}
+}
+
+type Hand bool
+
+const MainHand Hand = true
+const OffHand Hand = false
+
+func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, weaponMultiplier float64, includeBonusWeaponDamage bool) BaseDamageCalculator {
+	// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
+	// TODO not all weapon damage based attacks "scale" with +bonusWeaponDamage (e.g. Devastate, Shiv, Mutilate don't)
+	// ... but for other's, BonusAttackPowerOnTarget only applies to weapon damage based attacks
+	if normalized {
+		if hand == MainHand {
+			return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+				damage := spellCast.Character.AutoAttacks.MH.calculateNormalizedWeaponDamage(
+					sim, hitEffect.MeleeAttackPower(spellCast)+hitEffect.MeleeAttackPowerOnTarget())
+				damage += flatBonus
+				if includeBonusWeaponDamage {
+					damage += hitEffect.PlusWeaponDamage(spellCast)
+				}
+				return damage * weaponMultiplier
+			}
+		} else {
+			return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+				damage := spellCast.Character.AutoAttacks.OH.calculateNormalizedWeaponDamage(
+					sim, hitEffect.MeleeAttackPower(spellCast)+2*hitEffect.MeleeAttackPowerOnTarget())
+				damage = damage*0.5 + flatBonus
+				if includeBonusWeaponDamage {
+					damage += hitEffect.PlusWeaponDamage(spellCast)
+				}
+				return damage * weaponMultiplier
+			}
+		}
+	} else {
+		if hand == MainHand {
+			return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+				damage := spellCast.Character.AutoAttacks.MH.calculateWeaponDamage(
+					sim, hitEffect.MeleeAttackPower(spellCast)+hitEffect.MeleeAttackPowerOnTarget())
+				damage += flatBonus
+				if includeBonusWeaponDamage {
+					damage += hitEffect.PlusWeaponDamage(spellCast)
+				}
+				return damage * weaponMultiplier
+			}
+		} else {
+			return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+				damage := spellCast.Character.AutoAttacks.OH.calculateWeaponDamage(
+					sim, hitEffect.MeleeAttackPower(spellCast)+2*hitEffect.MeleeAttackPowerOnTarget())
+				damage = damage*0.5 + flatBonus
+				if includeBonusWeaponDamage {
+					damage += hitEffect.PlusWeaponDamage(spellCast)
+				}
+				return damage * weaponMultiplier
+			}
+		}
+	}
+}
+
+// Performs an actual damage roll. Keep this internal because the 2nd parameter
+// is the delta rather than maxDamage, which is error-prone.
+func damageRoll(sim *Simulation, minDamage float64, deltaDamage float64) float64 {
+	// TODO: Rename RNG label
+	return minDamage + deltaDamage*sim.RandomFloat("Base Damage Direct")
+}
+
+func DamageRollFunc(minDamage float64, maxDamage float64) func(*Simulation) float64 {
+	deltaDamage := maxDamage - minDamage
+	return func(sim *Simulation) float64 {
+		return damageRoll(sim, minDamage, deltaDamage)
+	}
+}
+
 // A direct spell is one that does a single instance of damage once casting is
 // complete, i.e. shadowbolt or fire blast.
 // Note that some spell casts can have more than 1 DirectSpellEffect, e.g.
@@ -25,9 +137,12 @@ type DirectDamageInput struct {
 
 type SpellHitEffect struct {
 	SpellEffect
-	DotInput    DotDamageInput
+
+	BaseDamage  BaseDamageCalculator
 	DirectInput DirectDamageInput
 	WeaponInput WeaponDamageInput
+
+	DotInput DotDamageInput
 }
 
 // SimpleSpell has a single cast and could have a dot or direct effect (or no effect)

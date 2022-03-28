@@ -38,9 +38,6 @@ func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemp
 				FlatDamageBonus:  101,
 				DamageMultiplier: 1,
 			},
-			DirectInput: core.DirectDamageInput{
-				SpellCoefficient: 1,
-			},
 		},
 	}
 
