@@ -165,30 +165,25 @@ func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast 
 			// ... but for other's, BonusAttackPowerOnTarget only applies to weapon damage based attacks
 			if hitEffect.WeaponInput.Normalized {
 				if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-					damage += character.AutoAttacks.Ranged.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
+					damage += character.AutoAttacks.Ranged.calculateNormalizedWeaponDamage(sim, attackPower)
 				} else if !hitEffect.WeaponInput.Offhand {
-					damage += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower+hitEffect.BonusAttackPowerOnTarget) + bonusWeaponDamage
+					damage += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower+hitEffect.BonusAttackPowerOnTarget)
 				} else {
-					damage += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower+2*hitEffect.BonusAttackPowerOnTarget)*0.5 + bonusWeaponDamage
+					damage += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower+2*hitEffect.BonusAttackPowerOnTarget)*0.5
 				}
 			} else {
 				if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-					damage += character.AutoAttacks.Ranged.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
+					damage += character.AutoAttacks.Ranged.calculateWeaponDamage(sim, attackPower)
 				} else if !hitEffect.WeaponInput.Offhand {
-					damage += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower+hitEffect.BonusAttackPowerOnTarget) + bonusWeaponDamage
+					damage += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower+hitEffect.BonusAttackPowerOnTarget)
 				} else {
-					damage += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower+2*hitEffect.BonusAttackPowerOnTarget)*0.5 + bonusWeaponDamage
+					damage += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower+2*hitEffect.BonusAttackPowerOnTarget)*0.5
 				}
 			}
 			damage += hitEffect.WeaponInput.FlatDamageBonus
 			damage *= hitEffect.WeaponInput.DamageMultiplier
 		}
 
-		if hitEffect.DirectInput.SpellCoefficient > 0 {
-			bonus := (character.GetStat(stats.SpellPower) + character.GetStat(spellCast.SpellSchool.Stat())) * hitEffect.DirectInput.SpellCoefficient * hitEffect.WeaponInput.DamageMultiplier
-			bonus += hitEffect.SpellEffect.BonusSpellPower * hitEffect.DirectInput.SpellCoefficient // does not get changed by weapon input multiplier
-			damage += bonus
-		}
 
 		//if sim.Log != nil {
 		//	character.Log(sim, "Melee damage calcs: AP=%0.1f, bonusWepdamage:%0.1f, damageMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weapondamageCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, hitEffect.DamageMultiplier, hitEffect.StaticDamageMultiplier, hitEffect.HitType, damage, spellCast.CritMultiplier, hitEffect.Target.currentArmor)
@@ -197,22 +192,19 @@ func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast 
 
 	// Direct Damage Effects
 	if hitEffect.DirectInput.MaxBaseDamage != 0 {
-		baseDamage := hitEffect.DirectInput.MinBaseDamage + sim.RandomFloat("Base Damage Direct")*(hitEffect.DirectInput.MaxBaseDamage-hitEffect.DirectInput.MinBaseDamage)
+		damage += hitEffect.DirectInput.MinBaseDamage + sim.RandomFloat("Base Damage Direct")*(hitEffect.DirectInput.MaxBaseDamage-hitEffect.DirectInput.MinBaseDamage)
+	}
 
+	if hitEffect.DirectInput.SpellCoefficient > 0 {
 		schoolBonus := 0.0
 		// Use outcome roll to decide if it should use AP or spell school for bonus damage.
-		isPhysical := spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical)
+		isPhysical := spellCast.SpellSchool.Matches(SpellSchoolPhysical)
 		if isPhysical {
-			if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-				schoolBonus = character.stats[stats.RangedAttackPower]
-			} else if spellCast.SpellSchool == SpellSchoolPhysical {
-				schoolBonus = character.stats[stats.AttackPower]
-			}
-			schoolBonus += hitEffect.BonusAttackPower
+			schoolBonus = (character.PseudoStats.BonusDamage + hitEffect.BonusWeaponDamage)  * hitEffect.WeaponInput.DamageMultiplier  //DamageMultiplier may be removed later
 		} else {
 			schoolBonus = character.GetStat(stats.SpellPower) + character.GetStat(spellCast.SpellSchool.Stat()) + hitEffect.SpellEffect.BonusSpellPower
 		}
-		damage += baseDamage + (schoolBonus * hitEffect.DirectInput.SpellCoefficient)
+		damage += schoolBonus * hitEffect.DirectInput.SpellCoefficient
 	}
 
 	damage += hitEffect.DirectInput.FlatDamageBonus

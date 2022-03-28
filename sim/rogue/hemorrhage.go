@@ -57,6 +57,9 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 		Normalized:       true,
 		DamageMultiplier: 1.1,
 	}
+	ability.Effect.DirectInput = core.DirectDamageInput{
+		SpellCoefficient: 1,
+	}
 
 	// cp. backstab
 	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {

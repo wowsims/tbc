@@ -51,6 +51,9 @@ func (warrior *Warrior) newWhirlwindTemplate(sim *core.Simulation) core.SimpleSp
 			Normalized:       true,
 			DamageMultiplier: 1,
 		},
+		DirectInput: core.DirectDamageInput{
+			SpellCoefficient: 1,
+		},
 	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())

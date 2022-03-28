@@ -225,6 +225,9 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				WeaponInput: WeaponDamageInput{
 					DamageMultiplier: 1,
 				},
+				DirectInput: DirectDamageInput{
+					SpellCoefficient: 1,
+				},
 			},
 		},
 		OHAuto: SimpleSpell{
@@ -248,6 +251,9 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					Offhand:          true,
 					DamageMultiplier: 1,
 				},
+				DirectInput: DirectDamageInput{
+					SpellCoefficient: 1,
+				},
 			},
 		},
 		RangedAuto: SimpleSpell{
@@ -270,6 +276,9 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				},
 				WeaponInput: WeaponDamageInput{
 					DamageMultiplier: 1,
+				},
+				DirectInput: DirectDamageInput{
+					SpellCoefficient: 1,
 				},
 			},
 		},

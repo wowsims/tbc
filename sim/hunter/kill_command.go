@@ -89,6 +89,9 @@ func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.SimpleSpe
 				DamageMultiplier: 1,
 				FlatDamageBonus:  127,
 			},
+			DirectInput: core.DirectDamageInput{
+				SpellCoefficient: 1,
+			},
 		},
 	}
 
