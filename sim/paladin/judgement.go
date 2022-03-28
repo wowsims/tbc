@@ -116,7 +116,7 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 					if !spellEffect.Landed() {
 						return
 					}
-					aura := core.JudgementOfTheCrusaderAura(sim, float64(paladin.Talents.ImprovedSealOfTheCrusader))
+					aura := core.JudgementOfTheCrusaderAura(float64(paladin.Talents.ImprovedSealOfTheCrusader))
 					spellEffect.Target.AddAura(sim, aura)
 					paladin.currentJudgementID = aura.ID
 					paladin.currentJudgementExpires = sim.CurrentTime + JudgementDuration
@@ -188,7 +188,7 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 					if !spellEffect.Landed() {
 						return
 					}
-					aura := core.JudgementOfWisdomAura(sim)
+					aura := core.JudgementOfWisdomAura()
 					spellEffect.Target.AddAura(sim, aura)
 					paladin.currentJudgementID = aura.ID
 					paladin.currentJudgementExpires = sim.CurrentTime + JudgementDuration

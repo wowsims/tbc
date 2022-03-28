@@ -71,7 +71,7 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 			}
 
 			newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.ImprovedScorchDebuffID)+1)
-			spellEffect.Target.ReplaceAura(sim, core.ImprovedScorchAura(sim, newNumStacks))
+			spellEffect.Target.AddAura(sim, core.ImprovedScorchAura(spellEffect.Target, newNumStacks))
 		}
 	}
 

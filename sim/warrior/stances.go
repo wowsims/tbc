@@ -85,15 +85,11 @@ func (warrior *Warrior) DefensiveStanceAura() core.Aura {
 		Duration: core.NeverExpires,
 		OnGain: func(sim *core.Simulation) {
 			warrior.PseudoStats.ThreatMultiplier *= threatMult
+			warrior.PseudoStats.DamageDealtMultiplier *= 0.9
 		},
 		OnExpire: func(sim *core.Simulation) {
 			warrior.PseudoStats.ThreatMultiplier /= threatMult
-		},
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			spellEffect.DamageMultiplier *= 0.9
-		},
-		OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-			*tickDamage *= 0.9
+			warrior.PseudoStats.DamageDealtMultiplier /= 0.9
 		},
 	}
 }

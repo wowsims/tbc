@@ -78,8 +78,6 @@ func (warrior *Warrior) applyAngerManagement(sim *core.Simulation) {
 	})
 }
 
-var OneHandedWeaponSpecializationAuraID = core.NewAuraID()
-
 func (warrior *Warrior) applyOneHandedWeaponSpecialization() {
 	if warrior.Talents.OneHandedWeaponSpecialization == 0 {
 		return
@@ -88,21 +86,5 @@ func (warrior *Warrior) applyOneHandedWeaponSpecialization() {
 		return
 	}
 
-	multiplier := 1 + 0.02*float64(warrior.Talents.OneHandedWeaponSpecialization)
-
-	warrior.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: OneHandedWeaponSpecializationAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if spellCast.SpellSchool.Matches(core.SpellSchoolPhysical) {
-					spellEffect.DamageMultiplier *= multiplier
-				}
-			},
-			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				if spellCast.SpellSchool.Matches(core.SpellSchoolPhysical) {
-					*tickDamage *= multiplier
-				}
-			},
-		}
-	})
+	warrior.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + 0.02*float64(warrior.Talents.OneHandedWeaponSpecialization)
 }

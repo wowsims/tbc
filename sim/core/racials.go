@@ -12,11 +12,9 @@ var HumanWeaponSpecializationAuraID = NewAuraID()
 
 var OrcBloodFuryAuraID = NewAuraID()
 var OrcBloodFuryCooldownID = NewCooldownID()
-var OrcCommandAuraID = NewAuraID()
 var OrcWeaponSpecializationAuraID = NewAuraID()
 
 var TrollBowSpecializationAuraID = NewAuraID()
-var TrollBeastSlayingAuraID = NewAuraID()
 
 var TrollBerserkingAuraID = NewAuraID()
 var TrollBerserkingCooldownID = NewCooldownID()
@@ -110,20 +108,9 @@ func applyRaceEffects(agent Agent) {
 	case proto.Race_RaceOrc:
 		// Command (Pet damage +5%)
 		if len(character.Pets) > 0 {
-			const multiplier = 1.05
 			for _, petAgent := range character.Pets {
 				pet := petAgent.GetPet()
-				pet.AddPermanentAura(func(sim *Simulation) Aura {
-					return Aura{
-						ID: OrcCommandAuraID,
-						OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-							spellEffect.DamageMultiplier *= multiplier
-						},
-						OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-							*tickDamage *= multiplier
-						},
-					}
-				})
+				pet.PseudoStats.DamageDealtMultiplier *= 1.05
 			}
 		}
 
@@ -216,19 +203,9 @@ func applyRaceEffects(agent Agent) {
 		}
 
 		// Beast Slaying (+5% damage to beasts)
-		character.AddPermanentAura(func(sim *Simulation) Aura {
-			return Aura{
-				ID: TrollBeastSlayingAuraID,
-				OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-					if spellEffect.Target.MobType == proto.MobType_MobTypeBeast {
-						spellEffect.DamageMultiplier *= 1.05
-					}
-				},
-				OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-					if spellEffect.Target.MobType == proto.MobType_MobTypeBeast {
-						*tickDamage *= 1.05
-					}
-				},
+		character.RegisterResetEffect(func(sim *Simulation) {
+			if sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeBeast {
+				character.PseudoStats.DamageDealtMultiplier *= 1.05
 			}
 		})
 

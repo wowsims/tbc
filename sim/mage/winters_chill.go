@@ -37,7 +37,7 @@ func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpell
 		}
 
 		newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.WintersChillDebuffID)+1)
-		spellEffect.Target.ReplaceAura(sim, core.WintersChillAura(sim, newNumStacks))
+		spellEffect.Target.AddAura(sim, core.WintersChillAura(sim, newNumStacks))
 	}
 
 	return core.NewSimpleSpellTemplate(spell)

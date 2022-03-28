@@ -37,6 +37,9 @@ type Simulation struct {
 	logs []string
 
 	emptyAuras []Aura
+
+	executePhase          bool
+	executePhaseCallbacks []func(*Simulation)
 }
 
 func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) *proto.RaidSimResult {
@@ -123,6 +126,9 @@ func (sim *Simulation) reset() {
 	sim.CurrentTime = 0.0
 
 	sim.pendingActions = make([]*PendingAction, 0, 64)
+
+	sim.executePhase = false
+	sim.executePhaseCallbacks = []func(*Simulation){}
 
 	// Targets need to be reset before the raid, so that players can check for
 	// the presence of permanent target auras in their Reset handlers.
@@ -277,6 +283,13 @@ func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 func (sim *Simulation) advance(elapsedTime time.Duration) {
 	sim.CurrentTime += elapsedTime
 
+	if !sim.executePhase && sim.CurrentTime >= sim.encounter.executePhaseBegins {
+		sim.executePhase = true
+		for _, callback := range sim.executePhaseCallbacks {
+			callback(sim)
+		}
+	}
+
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
 			agent.GetCharacter().advance(sim, elapsedTime)
@@ -288,8 +301,11 @@ func (sim *Simulation) advance(elapsedTime time.Duration) {
 	}
 }
 
+func (sim *Simulation) RegisterExecutePhaseCallback(callback func(*Simulation)) {
+	sim.executePhaseCallbacks = append(sim.executePhaseCallbacks, callback)
+}
 func (sim *Simulation) IsExecutePhase() bool {
-	return sim.CurrentTime > sim.encounter.executePhaseBegins
+	return sim.executePhase
 }
 
 func (sim *Simulation) GetRemainingDuration() time.Duration {

@@ -59,7 +59,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-AldorRegalia"
  value: {
-  dps: 1432.1511759556502
+  dps: 1432.15117595565
  }
 }
 dps_results: {
@@ -95,7 +95,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-BandoftheEternalSage-29305"
  value: {
-  dps: 1633.9033308161975
+  dps: 1633.9033308161968
  }
 }
 dps_results: {
@@ -305,7 +305,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Figurine-LivingRubySerpent-24126"
  value: {
-  dps: 1540.7608979062031
+  dps: 1540.760897906203
  }
 }
 dps_results: {
@@ -341,7 +341,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-HexShrunkenHead-33829"
  value: {
-  dps: 1617.5979279458945
+  dps: 1617.5979279458943
  }
 }
 dps_results: {
@@ -431,7 +431,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 1559.8764526315433
+  dps: 1559.876452631543
  }
 }
 dps_results: {
@@ -455,7 +455,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-RobeoftheElderScribes-28602"
  value: {
-  dps: 1605.9543272866092
+  dps: 1605.954327286609
  }
 }
 dps_results: {
@@ -521,7 +521,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Sorcerer'sAlchemistStone-35749"
  value: {
-  dps: 1579.8359141429937
+  dps: 1579.8359141429935
  }
 }
 dps_results: {
@@ -671,13 +671,13 @@ dps_results: {
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-NoBuffs-LongMultiTarget"
  value: {
-  dps: 934.0151739139434
+  dps: 934.0151739139432
  }
 }
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 934.0151739139434
+  dps: 934.0151739139432
  }
 }
 dps_results: {

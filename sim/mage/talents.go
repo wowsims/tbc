@@ -239,19 +239,15 @@ func (mage *Mage) registerArcanePowerCD() {
 					ID:       ArcanePowerAuraID,
 					ActionID: actionID,
 					Duration: time.Second * 15,
+					OnGain: func(sim *core.Simulation) {
+						mage.PseudoStats.DamageDealtMultiplier *= 1.3
+					},
+					OnExpire: func(sim *core.Simulation) {
+						mage.PseudoStats.DamageDealtMultiplier /= 1.3
+					},
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						if cast.SpellSchool.Matches(core.SpellSchoolMagic) {
 							cast.Cost.Value *= 1.3
-						}
-					},
-					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-						if spellCast.SpellSchool.Matches(core.SpellSchoolMagic) {
-							spellEffect.DamageMultiplier *= 1.3
-						}
-					},
-					OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-						if spellCast.SpellSchool.Matches(core.SpellSchoolMagic) {
-							*tickDamage *= 1.3
 						}
 					},
 				})
@@ -447,8 +443,6 @@ func (mage *Mage) registerColdSnapCD() {
 	})
 }
 
-var MoltenFuryAuraID = core.NewAuraID()
-
 func (mage *Mage) applyMoltenFury() {
 	if mage.Talents.MoltenFury == 0 {
 		return
@@ -456,19 +450,9 @@ func (mage *Mage) applyMoltenFury() {
 
 	multiplier := 1.0 + 0.1*float64(mage.Talents.MoltenFury)
 
-	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: MoltenFuryAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if sim.IsExecutePhase() && spellCast.SpellSchool.Matches(core.SpellSchoolMagic) {
-					spellEffect.DamageMultiplier *= multiplier
-				}
-			},
-			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				if sim.IsExecutePhase() && spellCast.SpellSchool.Matches(core.SpellSchoolMagic) {
-					*tickDamage *= multiplier
-				}
-			},
-		}
+	mage.RegisterResetEffect(func(sim *core.Simulation) {
+		sim.RegisterExecutePhaseCallback(func(sim *core.Simulation) {
+			mage.PseudoStats.DamageDealtMultiplier *= multiplier
+		})
 	})
 }

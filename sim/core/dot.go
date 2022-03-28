@@ -25,8 +25,7 @@ type DotDamageInput struct {
 	// Whether ticks can proc spell hit effects such as Judgement of Wisdom.
 	TicksProcSpellHitEffects bool
 
-	OnBeforePeriodicDamage OnBeforePeriodicDamage // Before-calculation logic for this dot.
-	OnPeriodicDamage       OnPeriodicDamage       // After-calculation logic for this dot.
+	OnPeriodicDamage OnPeriodicDamage // After-calculation logic for this dot.
 
 	// If both of these are set, will display uptime metrics for this dot.
 	DebuffID AuraID
@@ -166,21 +165,7 @@ func (hitEffect *SpellHitEffect) takeDotSnapshot(sim *Simulation, spellCast *Spe
 }
 
 func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *SpellCast) {
-	// fmt.Printf("DOT (%s) Ticking, Time Remaining: %0.2f\n", spellCast.Name, hitEffect.DotInput.TimeRemaining(sim).Seconds())
 	damage := hitEffect.DotInput.damagePerTick
-
-	spellCast.Character.OnBeforePeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, &damage)
-
-	damageBeforeTargetEffects := damage
-	hitEffect.Target.OnBeforePeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, &damage)
-	hitEffect.SpellEffect.BeyondAOECapMultiplier *= damage / damageBeforeTargetEffects
-
-	if hitEffect.DotInput.OnBeforePeriodicDamage != nil {
-		hitEffect.DotInput.OnBeforePeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, &damage)
-	}
-	if hitEffect.DotInput.IgnoreDamageModifiers {
-		damage = hitEffect.DotInput.damagePerTick
-	}
 
 	hitEffect.Outcome = OutcomeEmpty
 	if hitEffect.DotInput.TicksCanMissAndCrit {
@@ -197,6 +182,10 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 		hitEffect.Outcome = OutcomeHit
 	}
 
+	if !hitEffect.DotInput.IgnoreDamageModifiers {
+		hitEffect.applyAttackerMultipliers(sim, spellCast, !hitEffect.DotInput.TicksCanMissAndCrit, &damage)
+		hitEffect.applyTargetMultipliers(sim, spellCast, !hitEffect.DotInput.TicksCanMissAndCrit, &damage)
+	}
 	hitEffect.applyResistances(sim, spellCast, &damage)
 	hitEffect.applyOutcome(sim, spellCast, &damage)
 
