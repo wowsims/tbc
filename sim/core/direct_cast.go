@@ -22,7 +22,7 @@ func BaseDamageFuncRoll(minFlatDamage float64, maxFlatDamage float64) BaseDamage
 	} else {
 		deltaDamage := maxFlatDamage - minFlatDamage
 		return func(sim *Simulation, _ *SpellHitEffect, _ *SpellCast) float64 {
-			return damageRoll(sim, minFlatDamage, deltaDamage)
+			return damageRollOptimized(sim, minFlatDamage, deltaDamage)
 		}
 	}
 }
@@ -41,7 +41,7 @@ func BaseDamageFuncMagic(minFlatDamage float64, maxFlatDamage float64, spellCoef
 		deltaDamage := maxFlatDamage - minFlatDamage
 		return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
 			damage := hitEffect.SpellPower(spellCast.Character, spellCast) * spellCoefficient
-			damage += damageRoll(sim, minFlatDamage, deltaDamage)
+			damage += damageRollOptimized(sim, minFlatDamage, deltaDamage)
 			return damage
 		}
 	}
@@ -103,44 +103,37 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 	}
 }
 
+func BaseDamageFuncRangedWeapon(flatBonus float64) BaseDamageCalculator {
+	return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+		return spellCast.Character.AutoAttacks.Ranged.calculateWeaponDamage(sim, hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget()) +
+			flatBonus +
+			hitEffect.PlusWeaponDamage(spellCast)
+	}
+}
+
 // Performs an actual damage roll. Keep this internal because the 2nd parameter
 // is the delta rather than maxDamage, which is error-prone.
-func damageRoll(sim *Simulation, minDamage float64, deltaDamage float64) float64 {
+func damageRollOptimized(sim *Simulation, minDamage float64, deltaDamage float64) float64 {
 	// TODO: Rename RNG label
 	return minDamage + deltaDamage*sim.RandomFloat("Base Damage Direct")
+}
+
+// For convenience, but try to use damageRollOptimized in most cases.
+func DamageRoll(sim *Simulation, minDamage float64, maxDamage float64) float64 {
+	return damageRollOptimized(sim, minDamage, maxDamage-minDamage)
 }
 
 func DamageRollFunc(minDamage float64, maxDamage float64) func(*Simulation) float64 {
 	deltaDamage := maxDamage - minDamage
 	return func(sim *Simulation) float64 {
-		return damageRoll(sim, minDamage, deltaDamage)
+		return damageRollOptimized(sim, minDamage, deltaDamage)
 	}
-}
-
-// A direct spell is one that does a single instance of damage once casting is
-// complete, i.e. shadowbolt or fire blast.
-// Note that some spell casts can have more than 1 DirectSpellEffect, e.g.
-// Chain Lightning.
-//
-// This struct holds additional inputs beyond what a SpellEffect already contains,
-// which are necessary for a direct spell damage calculation.
-type DirectDamageInput struct {
-	MinBaseDamage float64
-	MaxBaseDamage float64
-
-	// Increase in damage per point of spell power (or weapon damage, if a physical school).
-	SpellCoefficient float64
-
-	// Adds a fixed amount of damage to the spell, before multipliers.
-	FlatDamageBonus float64
 }
 
 type SpellHitEffect struct {
 	SpellEffect
 
-	BaseDamage  BaseDamageCalculator
-	DirectInput DirectDamageInput
-	WeaponInput WeaponDamageInput
+	BaseDamage BaseDamageCalculator
 
 	DotInput DotDamageInput
 }

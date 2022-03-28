@@ -445,8 +445,8 @@ type TargetPseudoStats struct {
 	BonusMeleeAttackPower  float64
 	BonusRangedAttackPower float64
 	BonusCritRating        float64 // Bonus crit for all types of hits.
-
-	BonusMeleeHitRating float64 // Imp FF
+	BonusMeleeHitRating    float64 // Imp FF
+	BonusWeaponDamage      float64 // Hemo, Gift of Arthas, etc
 
 	DamageTakenMultiplier float64 // All damage
 

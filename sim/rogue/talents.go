@@ -22,7 +22,6 @@ func (rogue *Rogue) ApplyTalents() {
 	rogue.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(rogue.Talents.Malice))
 	rogue.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*1*float64(rogue.Talents.Precision))
 	rogue.AddStat(stats.Expertise, core.ExpertisePerQuarterPercentReduction*5*float64(rogue.Talents.WeaponExpertise))
-	rogue.AutoAttacks.OHAuto.Effect.WeaponInput.DamageMultiplier *= 1.0 + 0.1*float64(rogue.Talents.DualWieldSpecialization)
 	rogue.AddStat(stats.ArmorPenetration, 186*float64(rogue.Talents.SerratedBlades))
 
 	if rogue.Talents.Vitality > 0 {

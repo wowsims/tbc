@@ -249,7 +249,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
 	}
 	if rogue.Rotation.Builder == proto.Rogue_Rotation_Auto {
-		if rogue.Talents.Mutilate && dualDagger{
+		if rogue.Talents.Mutilate && dualDagger {
 			rogue.Rotation.Builder = proto.Rogue_Rotation_Mutilate
 		} else if rogue.Talents.Hemorrhage {
 			rogue.Rotation.Builder = proto.Rogue_Rotation_Hemorrhage
@@ -305,9 +305,14 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 			rogue.doRotation(sim)
 		}
 	})
+
+	ohWeapon := rogue.WeaponFromOffHand(rogue.critMultiplier(false, false))
+	if rogue.Talents.DualWieldSpecialization > 0 {
+		ohWeapon.BaseDamageOverride = core.BaseDamageFuncMeleeWeapon(core.OffHand, false, 0, 1+0.1*float64(rogue.Talents.DualWieldSpecialization), true)
+	}
 	rogue.EnableAutoAttacks(rogue, core.AutoAttackOptions{
 		MainHand:       rogue.WeaponFromMainHand(rogue.critMultiplier(true, false)),
-		OffHand:        rogue.WeaponFromOffHand(rogue.critMultiplier(false, false)),
+		OffHand:        ohWeapon,
 		AutoSwingMelee: true,
 	})
 

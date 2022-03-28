@@ -54,15 +54,13 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpel
 				hunter.rotation(sim, false)
 			},
 		},
-		WeaponInput: core.WeaponDamageInput{
-			CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
-				return attackPower*0.2 +
-					hunter.AmmoDamageBonus +
-					hunter.AutoAttacks.Ranged.BaseDamage(sim) +
-					bonusWeaponDamage +
-					205
-			},
-		},
+		BaseDamage: hunter.talonOfAlarDamageMod(func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+			return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
+				hunter.AutoAttacks.Ranged.BaseDamage(sim) +
+				hunter.AmmoDamageBonus +
+				hitEffect.PlusWeaponDamage(spellCast) +
+				205
+		}),
 	}
 
 	baseEffect.DamageMultiplier *= 1 + 0.04*float64(hunter.Talents.Barrage)

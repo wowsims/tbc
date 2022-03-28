@@ -23,6 +23,8 @@ type Weapon struct {
 	NormalizedSwingSpeed float64
 	SwingDuration        time.Duration // Duration between 2 swings.
 	CritMultiplier       float64
+
+	BaseDamageOverride BaseDamageCalculator
 }
 
 func newWeaponFromUnarmed(critMultiplier float64) Weapon {
@@ -97,21 +99,6 @@ func (weapon Weapon) calculateNormalizedWeaponDamage(sim *Simulation, attackPowe
 }
 
 type MeleeDamageCalculator func(attackPower float64, bonusWeaponDamage float64) float64
-
-// If MainHand or Offhand is non-zero the associated ability will create a weapon swing.
-type WeaponDamageInput struct {
-	Normalized       bool    // If set, uses normalized damage
-	Offhand          bool    // If set, uses offhand weapon instead of main hand for damage.
-	DamageMultiplier float64 // Damage multiplier on weapon damage.
-	FlatDamageBonus  float64 // Flat bonus added to swing.
-
-	// If set, skips the normal calc for weapon damage and uses this function instead.
-	CalculateDamage MeleeDamageCalculator
-}
-
-func (wdi WeaponDamageInput) HasWeaponDamage() bool {
-	return wdi.DamageMultiplier != 0 || wdi.CalculateDamage != nil
-}
 
 // Returns whether this hit effect is associated with the main-hand weapon.
 func (ahe *SpellEffect) IsMH() bool {
@@ -222,12 +209,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
 				},
-				WeaponInput: WeaponDamageInput{
-					DamageMultiplier: 1,
-				},
-				//DirectInput: DirectDamageInput{
-				//	SpellCoefficient: 1,
-				//},
+				BaseDamage: BaseDamageFuncMeleeWeapon(MainHand, false, 0, 1, true),
 			},
 		},
 		OHAuto: SimpleSpell{
@@ -247,13 +229,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
 				},
-				WeaponInput: WeaponDamageInput{
-					Offhand:          true,
-					DamageMultiplier: 1,
-				},
-				DirectInput: DirectDamageInput{
-					SpellCoefficient: 1,
-				},
+				BaseDamage: BaseDamageFuncMeleeWeapon(OffHand, false, 0, 1, true),
 			},
 		},
 		RangedAuto: SimpleSpell{
@@ -274,14 +250,19 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
 				},
-				WeaponInput: WeaponDamageInput{
-					DamageMultiplier: 1,
-				},
-				DirectInput: DirectDamageInput{
-					SpellCoefficient: 1,
-				},
+				BaseDamage: BaseDamageFuncRangedWeapon(0),
 			},
 		},
+	}
+
+	if options.MainHand.BaseDamageOverride != nil {
+		aa.MHAuto.Effect.BaseDamage = options.MainHand.BaseDamageOverride
+	}
+	if options.OffHand.BaseDamageOverride != nil {
+		aa.OHAuto.Effect.BaseDamage = options.OffHand.BaseDamageOverride
+	}
+	if options.Ranged.BaseDamageOverride != nil {
+		aa.RangedAuto.Effect.BaseDamage = options.Ranged.BaseDamageOverride
 	}
 
 	aa.IsDualWielding = aa.MH.SwingSpeed != 0 && aa.OH.SwingSpeed != 0

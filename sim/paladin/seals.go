@@ -35,9 +35,8 @@ func (paladin *Paladin) setupSealOfBlood() {
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 0.35, // should deal 35% weapon deamage
-			},
+			// should deal 35% weapon deamage
+			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 0.35, false),
 		},
 	}
 
@@ -112,14 +111,12 @@ func (paladin *Paladin) setupSealOfCommand() {
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 0.70, // should deal 70% weapon deamage
-			},
-			// By having no base damage, this will be added to weapon input
-			DirectInput: core.DirectDamageInput{
-				SpellCoefficient: 0.29,
-			},
 		},
+	}
+
+	weaponBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 0.7, false)
+	socProc.Effect.BaseDamage = func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+		return weaponBaseDamage(sim, hitEffect, spellCast) + 0.29*hitEffect.SpellPower(spellCast.Character, spellCast)
 	}
 
 	socTemplate := core.NewSimpleSpellTemplate(socProc)

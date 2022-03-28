@@ -155,7 +155,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 490.052467635559
+  dps: 490.10664017833255
  }
 }
 dps_results: {
@@ -647,7 +647,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-StormGauntlets-12632"
  value: {
-  dps: 473.6901014988071
+  dps: 473.61797711655294
  }
 }
 dps_results: {
