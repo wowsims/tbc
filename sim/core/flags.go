@@ -219,7 +219,7 @@ func (ss SpellSchool) Stat() stats.Stat {
 	case SpellSchoolShadow:
 		return stats.ShadowSpellPower
 	case SpellSchoolPhysical:
-		return stats.AttackPower
+		return 0 // should be weapon damage (mod_damage_done (physical))
 	}
 
 	return 0

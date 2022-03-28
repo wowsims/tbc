@@ -24,6 +24,9 @@ func (rogue *Rogue) newBackstabTemplate(_ *core.Simulation) core.SimpleSpellTemp
 		FlatDamageBonus:  170,
 		DamageMultiplier: 1.5,
 	}
+	ability.Effect.DirectInput = core.DirectDamageInput{
+		SpellCoefficient: 1,
+	}
 
 	// all these use "Apply Aura: Modifies Damage/Healing Done", and stack additively (up to 142%)
 	ability.Effect.StaticDamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)

@@ -38,6 +38,9 @@ func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.SimpleS
 				DamageMultiplier: 1,
 				FlatDamageBonus:  170,
 			},
+			DirectInput: core.DirectDamageInput{
+				SpellCoefficient: 1,
+			},
 		},
 	}
 
