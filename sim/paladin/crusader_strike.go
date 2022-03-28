@@ -43,12 +43,8 @@ func (paladin *Paladin) newCrusaderStrikeTemplate(sim *core.Simulation) core.Sim
 					}
 				},
 			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 1.1, // maybe this isn't the one that should be set to 1.1
-			},
-			DirectInput: core.DirectDamageInput{
-				SpellCoefficient: 1,
-			},
+			// maybe this isn't the one that should be set to 1.1
+			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 1.1, true),
 		},
 	}
 

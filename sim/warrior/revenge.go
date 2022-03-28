@@ -44,10 +44,7 @@ func (warrior *Warrior) newRevengeTemplate(_ *core.Simulation) core.SimpleSpellT
 				ThreatMultiplier:       1,
 				FlatThreatBonus:        200,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 414,
-				MaxBaseDamage: 506,
-			},
+			BaseDamage: core.BaseDamageFuncRoll(414, 506),
 		},
 	}
 

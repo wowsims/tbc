@@ -48,15 +48,6 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 			ThreatMultiplier:       1.0,
 			BonusAttackPower:       apBonus,
 		},
-		WeaponInput: core.WeaponDamageInput{
-			DamageMultiplier: 1.0,
-		},
-		DirectInput: core.DirectDamageInput{
-			SpellCoefficient: 1,
-		},
-	}
-	if shaman.Talents.ElementalWeapons > 0 {
-		baseEffect.WeaponInput.DamageMultiplier *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
 	}
 	if shaman.Talents.SpiritWeapons {
 		baseEffect.ThreatMultiplier *= 0.7
@@ -66,6 +57,10 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		baseEffect,
 		baseEffect,
 	}
+
+	weaponDamageMultiplier := 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
+	mhBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, weaponDamageMultiplier, true)
+	ohBaseDamage := core.BaseDamageFuncMeleeWeapon(core.OffHand, false, 0, weaponDamageMultiplier, true)
 
 	wfTemplate := core.NewSimpleSpellTemplate(wftempl)
 
@@ -106,11 +101,13 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 				for i := 0; i < 2; i++ {
 					wfAtk.Effects[i].Target = spellEffect.Target
 					wfAtk.Effects[i].ProcMask = attackProc
-					wfAtk.Effects[i].WeaponInput.Offhand = !isMHHit
-					if !isMHHit {
+					if isMHHit {
+						wfAtk.Effects[i].BaseDamage = mhBaseDamage
+					} else {
 						// For whatever reason, OH penalty does not apply to the bonus AP from WF OH
 						// hits. Implement this by doubling the AP bonus we provide.
 						wfAtk.Effects[i].BonusAttackPower += apBonus
+						wfAtk.Effects[i].BaseDamage = ohBaseDamage
 					}
 				}
 				wfAtk.Cast(sim)
@@ -144,9 +141,6 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				SpellCoefficient: 0.1,
-			},
 		},
 	}
 	ftTmpl.Effect.StaticDamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
@@ -156,13 +150,11 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 
 	if weapon := shaman.GetMHWeapon(); weapon != nil {
 		baseDamage := weapon.SwingSpeed * 35.0
-		mhTmpl.Effect.DirectInput.MinBaseDamage = baseDamage
-		mhTmpl.Effect.DirectInput.MaxBaseDamage = baseDamage
+		mhTmpl.Effect.BaseDamage = core.BaseDamageFuncMagic(baseDamage, baseDamage, 0.1)
 	}
 	if weapon := shaman.GetOHWeapon(); weapon != nil {
 		baseDamage := weapon.SwingSpeed * 35.0
-		ohTmpl.Effect.DirectInput.MinBaseDamage = baseDamage
-		ohTmpl.Effect.DirectInput.MaxBaseDamage = baseDamage
+		ohTmpl.Effect.BaseDamage = core.BaseDamageFuncMagic(baseDamage, baseDamage, 0.1)
 	}
 
 	mhTemplate := core.NewSimpleSpellTemplate(mhTmpl)
@@ -220,11 +212,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    246,
-				MaxBaseDamage:    246,
-				SpellCoefficient: 0.1,
-			},
+			BaseDamage: core.BaseDamageFuncMagic(246, 246, 0.1),
 		},
 	}
 	fbTmpl.Effect.StaticDamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)

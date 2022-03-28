@@ -46,10 +46,8 @@ func (warrior *Warrior) newBloodthirstTemplate(_ *core.Simulation) core.SimpleSp
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			WeaponInput: core.WeaponDamageInput{
-				CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
-					return attackPower * 0.45
-				},
+			BaseDamage: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+				return hitEffect.MeleeAttackPower(spellCast) * 0.45
 			},
 		},
 	}

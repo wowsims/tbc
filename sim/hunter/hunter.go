@@ -187,6 +187,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 
 		hasGronnstalker2Pc: ItemSetGronnstalker.CharacterHasSetBonus(&character, 2),
 	}
+	hunter.EnableManaBar()
 
 	if hunter.Rotation.PercentWeaved <= 0 {
 		hunter.Rotation.Weave = proto.Hunter_Rotation_WeaveNone
@@ -197,14 +198,50 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		hunter.HasMHWeaponImbue = true
 	}
 
+	rangedWeapon := hunter.WeaponFromRanged(0)
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
-	hunter.EnableManaBar()
+	if hunter.HasRangedWeapon() && hunter.GetRangedWeapon().ID == ThoridalTheStarsFuryItemID {
+		hunter.PseudoStats.RangedSpeedMultiplier *= 1.15
+	} else {
+		switch hunter.Options.Ammo {
+		case proto.Hunter_Options_TimelessArrow:
+			hunter.AmmoDPS = 53
+		case proto.Hunter_Options_MysteriousArrow:
+			hunter.AmmoDPS = 46.5
+		case proto.Hunter_Options_AdamantiteStinger:
+			hunter.AmmoDPS = 43
+		case proto.Hunter_Options_WardensArrow:
+			hunter.AmmoDPS = 37
+		case proto.Hunter_Options_HalaaniRazorshaft:
+			hunter.AmmoDPS = 34
+		case proto.Hunter_Options_BlackflightArrow:
+			hunter.AmmoDPS = 32
+		}
+		hunter.AmmoDamageBonus = hunter.AmmoDPS * rangedWeapon.SwingSpeed
+
+		switch hunter.Options.QuiverBonus {
+		case proto.Hunter_Options_Speed10:
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.1
+		case proto.Hunter_Options_Speed11:
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.11
+		case proto.Hunter_Options_Speed12:
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.12
+		case proto.Hunter_Options_Speed13:
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.13
+		case proto.Hunter_Options_Speed14:
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.14
+		case proto.Hunter_Options_Speed15:
+			hunter.PseudoStats.RangedSpeedMultiplier *= 1.15
+		}
+	}
+
+	rangedWeapon.BaseDamageOverride = core.BaseDamageFuncRangedWeapon(hunter.AmmoDamageBonus)
 	hunter.EnableAutoAttacks(hunter, core.AutoAttackOptions{
 		// We don't know crit multiplier until later when we see the target so just
 		// use 0 for now.
 		MainHand: hunter.WeaponFromMainHand(0),
 		OffHand:  hunter.WeaponFromOffHand(0),
-		Ranged:   hunter.WeaponFromRanged(0),
+		Ranged:   rangedWeapon,
 		ReplaceMHSwing: func(sim *core.Simulation) *core.SimpleSpell {
 			return hunter.TryRaptorStrike(sim)
 		},
@@ -251,42 +288,6 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 			return meleeCrit + (agility/40)*core.MeleeCritRatingPerCritChance
 		},
 	})
-
-	if hunter.HasRangedWeapon() && hunter.GetRangedWeapon().ID == ThoridalTheStarsFuryItemID {
-		hunter.PseudoStats.RangedSpeedMultiplier *= 1.15
-	} else {
-		switch hunter.Options.Ammo {
-		case proto.Hunter_Options_TimelessArrow:
-			hunter.AmmoDPS = 53
-		case proto.Hunter_Options_MysteriousArrow:
-			hunter.AmmoDPS = 46.5
-		case proto.Hunter_Options_AdamantiteStinger:
-			hunter.AmmoDPS = 43
-		case proto.Hunter_Options_WardensArrow:
-			hunter.AmmoDPS = 37
-		case proto.Hunter_Options_HalaaniRazorshaft:
-			hunter.AmmoDPS = 34
-		case proto.Hunter_Options_BlackflightArrow:
-			hunter.AmmoDPS = 32
-		}
-		hunter.AmmoDamageBonus = hunter.AmmoDPS * hunter.AutoAttacks.Ranged.SwingSpeed
-		hunter.AutoAttacks.RangedAuto.Effect.WeaponInput.FlatDamageBonus += hunter.AmmoDamageBonus
-
-		switch hunter.Options.QuiverBonus {
-		case proto.Hunter_Options_Speed10:
-			hunter.PseudoStats.RangedSpeedMultiplier *= 1.1
-		case proto.Hunter_Options_Speed11:
-			hunter.PseudoStats.RangedSpeedMultiplier *= 1.11
-		case proto.Hunter_Options_Speed12:
-			hunter.PseudoStats.RangedSpeedMultiplier *= 1.12
-		case proto.Hunter_Options_Speed13:
-			hunter.PseudoStats.RangedSpeedMultiplier *= 1.13
-		case proto.Hunter_Options_Speed14:
-			hunter.PseudoStats.RangedSpeedMultiplier *= 1.14
-		case proto.Hunter_Options_Speed15:
-			hunter.PseudoStats.RangedSpeedMultiplier *= 1.15
-		}
-	}
 
 	return hunter
 }

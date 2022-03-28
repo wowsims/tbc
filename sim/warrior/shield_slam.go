@@ -46,11 +46,12 @@ func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpe
 				ThreatMultiplier:       1,
 				FlatThreatBonus:        305,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 420,
-				MaxBaseDamage: 440,
-			},
 		},
+	}
+
+	damageRollFunc := core.DamageRollFunc(420, 440)
+	ability.Effect.BaseDamage = func(sim *core.Simulation, _ *core.SpellHitEffect, _ *core.SpellCast) float64 {
+		return damageRollFunc(sim) + warrior.GetStat(stats.BlockValue)
 	}
 
 	if ItemSetOnslaughtArmor.CharacterHasSetBonus(&warrior.Character, 4) {
@@ -73,7 +74,6 @@ func (warrior *Warrior) NewShieldSlam(_ *core.Simulation, target *core.Target) *
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	ss.Effect.Target = target
-	ss.Effect.DirectInput.FlatDamageBonus = warrior.GetStat(stats.BlockValue)
 
 	return ss
 }

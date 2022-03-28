@@ -34,13 +34,7 @@ func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.SimpleS
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 1,
-				FlatDamageBonus:  170,
-			},
-			DirectInput: core.DirectDamageInput{
-				SpellCoefficient: 1,
-			},
+			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 170, 1, true),
 		},
 	}
 

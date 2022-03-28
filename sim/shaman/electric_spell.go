@@ -86,11 +86,7 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 			StaticDamageMultiplier: 1,
 			ThreatMultiplier:       1,
 		},
-		DirectInput: core.DirectDamageInput{
-			MinBaseDamage:    minBaseDamage,
-			MaxBaseDamage:    maxBaseDamage,
-			SpellCoefficient: spellCoefficient,
-		},
+		BaseDamage: core.BaseDamageFuncMagic(minBaseDamage, maxBaseDamage, spellCoefficient),
 	}
 
 	effect.SpellEffect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)

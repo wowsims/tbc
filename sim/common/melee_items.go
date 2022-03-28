@@ -64,10 +64,7 @@ func ApplyStormGauntlets(agent core.Agent) {
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
 				},
-				DirectInput: core.DirectDamageInput{
-					MinBaseDamage: 3,
-					MaxBaseDamage: 3,
-				},
+				BaseDamage: core.BaseDamageFuncFlat(3),
 			},
 		})
 
@@ -114,10 +111,7 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
 				},
-				DirectInput: core.DirectDamageInput{
-					MinBaseDamage: 2,
-					MaxBaseDamage: 2,
-				},
+				BaseDamage: core.BaseDamageFuncFlat(2),
 			},
 		})
 
@@ -401,9 +395,7 @@ func ApplyDespair(agent core.Agent) {
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				FlatDamageBonus: 600,
-			},
+			BaseDamage: core.BaseDamageFuncFlat(600),
 		},
 	}
 
@@ -458,10 +450,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 513,
-				MaxBaseDamage: 567,
-			},
+			BaseDamage: core.BaseDamageFuncRoll(513, 567),
 		},
 	}
 
@@ -523,10 +512,7 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
 				},
-				DirectInput: core.DirectDamageInput{
-					MinBaseDamage: 285,
-					MaxBaseDamage: 315,
-				},
+				BaseDamage: core.BaseDamageFuncRoll(285, 315),
 			},
 		})
 
@@ -818,11 +804,7 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
 				},
-				DirectInput: core.DirectDamageInput{
-					MinBaseDamage:    48,
-					MaxBaseDamage:    54,
-					SpellCoefficient: 1,
-				},
+				BaseDamage: core.BaseDamageFuncMagic(48, 54, 1),
 			},
 		})
 		spellObj := core.SimpleSpell{}
@@ -998,10 +980,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 					StaticDamageMultiplier: 1,
 					ThreatMultiplier:       1,
 				},
-				DirectInput: core.DirectDamageInput{
-					MinBaseDamage: 20,
-					MaxBaseDamage: 20,
-				},
+				BaseDamage: core.BaseDamageFuncFlat(20),
 			},
 		})
 		spellObj := core.SimpleSpell{}

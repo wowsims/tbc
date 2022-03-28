@@ -35,11 +35,9 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpe
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			WeaponInput: core.WeaponDamageInput{
-				CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
-					return attackPower*0.15 + 273
-				},
-			},
+			BaseDamage: hunter.talonOfAlarDamageMod(func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+				return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.15 + 273
+			}),
 		},
 	}
 

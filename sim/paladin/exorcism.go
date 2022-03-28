@@ -38,11 +38,7 @@ func (paladin *Paladin) newExorcismTemplate(sim *core.Simulation) core.SimpleSpe
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    521,
-				MaxBaseDamage:    579,
-				SpellCoefficient: 1,
-			},
+			BaseDamage: core.BaseDamageFuncMagic(521, 579, 1),
 		},
 	}
 

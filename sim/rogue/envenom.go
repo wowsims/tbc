@@ -13,7 +13,6 @@ func (rogue *Rogue) newEnvenomTemplate(_ *core.Simulation) core.SimpleSpellTempl
 	}
 
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
-	hasDeathmantle2pc := ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2)
 
 	ability := rogue.newAbility(EnvenomActionID, rogue.envenomEnergyCost, SpellFlagFinisher|core.SpellExtrasIgnoreResists, core.ProcMaskMeleeMHSpecial)
 	ability.SpellCast.SpellSchool = core.SpellSchoolNature
@@ -26,14 +25,15 @@ func (rogue *Rogue) newEnvenomTemplate(_ *core.Simulation) core.SimpleSpellTempl
 			}
 		}
 	}
-	// Envenom doesn't have partial resists
-	ability.Effect.WeaponInput.CalculateDamage = func(attackPower float64, bonusWeaponDamage float64) float64 {
+
+	basePerComboPoint := 180.0
+	if ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2) {
+		basePerComboPoint += 40
+	}
+	ability.Effect.BaseDamage = func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
 		comboPoints := rogue.ComboPoints()
-		base := 180 * float64(comboPoints)
-		if hasDeathmantle2pc {
-			base += 40 * float64(comboPoints)
-		}
-		return base + (attackPower*0.03)*float64(comboPoints)
+		base := basePerComboPoint * float64(comboPoints)
+		return base + (hitEffect.MeleeAttackPower(spellCast)*0.03)*float64(comboPoints)
 	}
 
 	// cp. backstab

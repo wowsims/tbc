@@ -38,11 +38,7 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
 				ThreatMultiplier:       1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    600,
-				MaxBaseDamage:    647,
-				SpellCoefficient: (3.0 / 3.5) * 0.95,
-			},
+			BaseDamage: core.BaseDamageFuncMagic(600, 647, (3.0/3.5)*0.95+0.02*float64(mage.Talents.EmpoweredFrostbolt)),
 		},
 	}
 
@@ -53,7 +49,6 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.EmpoweredFrostbolt) * 1 * core.SpellCritRatingPerCritChance
 	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.PiercingIce)
 	spell.Effect.StaticDamageMultiplier *= 1 + 0.01*float64(mage.Talents.ArcticWinds)
-	spell.Effect.DirectInput.SpellCoefficient += 0.02 * float64(mage.Talents.EmpoweredFrostbolt)
 
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
 		spell.Effect.StaticDamageMultiplier *= 1.05

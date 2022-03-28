@@ -51,6 +51,11 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 	hasSkyshatter4p := ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4)
 	skyshatterAuraApplier := shaman.NewTemporaryStatsAuraApplier(SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.Stats{stats.AttackPower: 70}, time.Second*12)
 
+	flatDamageBonus := 0.0
+	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {
+		flatDamageBonus += 30
+	}
+
 	ss := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -88,12 +93,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 						}
 					},
 				},
-				WeaponInput: core.WeaponDamageInput{
-					DamageMultiplier: 1,
-				},
-				DirectInput: core.DirectDamageInput{
-					SpellCoefficient: 1,
-				},
+				BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, flatDamageBonus, 1, true),
 			},
 			{
 				SpellEffect: core.SpellEffect{
@@ -103,24 +103,13 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 					ThreatMultiplier:       1,
 					ReuseMainHitRoll:       true,
 				},
-				WeaponInput: core.WeaponDamageInput{
-					Offhand:          true,
-					DamageMultiplier: 1,
-				},
-				DirectInput: core.DirectDamageInput{
-					SpellCoefficient: 1,
-				},
+				BaseDamage: core.BaseDamageFuncMeleeWeapon(core.OffHand, false, flatDamageBonus, 1, true),
 			},
 		},
 	}
 
 	if shaman.Equip[items.ItemSlotRanged].ID == StormfuryTotem {
 		ss.Cost.Value -= 22
-	}
-
-	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {
-		ss.Effects[0].WeaponInput.FlatDamageBonus += 30
-		ss.Effects[1].WeaponInput.FlatDamageBonus += 30
 	}
 
 	if shaman.Talents.SpiritWeapons {

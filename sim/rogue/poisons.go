@@ -147,10 +147,7 @@ func (rogue *Rogue) newInstantPoisonTemplate(_ *core.Simulation) core.SimpleSpel
 				ThreatMultiplier:       1,
 				BonusSpellHitRating:    5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 146,
-				MaxBaseDamage: 194,
-			},
+			BaseDamage: core.BaseDamageFuncRoll(146, 194),
 		},
 	}
 	return core.NewSimpleSpellTemplate(cast)

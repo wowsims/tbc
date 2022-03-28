@@ -16,12 +16,12 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 		ID:       HemorrhageDebuffID,
 		ActionID: HemorrhageActionID,
 		Duration: time.Second * 15,
-	}
-	hemoAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-		if spellCast.SpellSchool != core.SpellSchoolPhysical {
-			return
-		}
-		spellEffect.DirectInput.FlatDamageBonus += 42
+		OnGain: func(sim *core.Simulation) {
+			sim.GetPrimaryTarget().PseudoStats.BonusWeaponDamage += 42
+		},
+		OnExpire: func(sim *core.Simulation) {
+			sim.GetPrimaryTarget().PseudoStats.BonusWeaponDamage -= 42
+		},
 	}
 	hemoAura.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if spellCast.SpellSchool != core.SpellSchoolPhysical {
@@ -53,20 +53,12 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}
 	}
-	ability.Effect.WeaponInput = core.WeaponDamageInput{
-		Normalized:       true,
-		DamageMultiplier: 1.1,
-	}
-	ability.Effect.DirectInput = core.DirectDamageInput{
-		SpellCoefficient: 1,
-	}
+	ability.Effect.BaseDamage = core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 1.1+0.01*float64(rogue.Talents.SinisterCalling), true)
 
 	// cp. backstab
 	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
 		ability.Effect.StaticDamageMultiplier += 0.06
 	}
-
-	ability.Effect.WeaponInput.DamageMultiplier += 0.01 * float64(rogue.Talents.SinisterCalling)
 
 	return core.NewSimpleSpellTemplate(ability)
 }

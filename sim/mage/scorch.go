@@ -38,11 +38,7 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
 				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    305,
-				MaxBaseDamage:    361,
-				SpellCoefficient: 1.5 / 3.5,
-			},
+			BaseDamage: core.BaseDamageFuncMagic(305, 361, 1.5/3.5),
 		},
 	}
 

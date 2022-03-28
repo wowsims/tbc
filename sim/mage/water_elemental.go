@@ -191,11 +191,7 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 				StaticDamageMultiplier: 1,
 				ThreatMultiplier:       1,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    256,
-				MaxBaseDamage:    328,
-				SpellCoefficient: 3.0 / 3.5,
-			},
+			BaseDamage: core.BaseDamageFuncMagic(256, 328, 3.0/3.5),
 		},
 	}
 

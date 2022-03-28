@@ -85,13 +85,7 @@ func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.SimpleSpe
 					}
 				},
 			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 1,
-				FlatDamageBonus:  127,
-			},
-			DirectInput: core.DirectDamageInput{
-				SpellCoefficient: 1,
-			},
+			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 127, 1, true),
 		},
 	}
 

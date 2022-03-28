@@ -49,11 +49,7 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 					fireballDot.Cast(sim)
 				},
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    649,
-				MaxBaseDamage:    821,
-				SpellCoefficient: 1.0,
-			},
+			BaseDamage: core.BaseDamageFuncMagic(649, 821, 1.0+0.03*float64(mage.Talents.EmpoweredFireball)),
 		},
 	}
 
@@ -64,7 +60,6 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
 	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
-	spell.Effect.DirectInput.SpellCoefficient += 0.03 * float64(mage.Talents.EmpoweredFireball)
 
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
 		spell.Effect.StaticDamageMultiplier *= 1.05

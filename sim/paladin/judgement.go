@@ -42,11 +42,7 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 					paladin.currentSealExpires = 0
 				},
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    295,
-				MaxBaseDamage:    325,
-				SpellCoefficient: 0.429,
-			},
+			BaseDamage: core.BaseDamageFuncMagic(295, 325, 0.429),
 		},
 	}
 	// Reduce mana cost if we have Benediction Talent

@@ -19,14 +19,7 @@ func (rogue *Rogue) newBackstabTemplate(_ *core.Simulation) core.SimpleSpellTemp
 			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}
 	}
-	ability.Effect.WeaponInput = core.WeaponDamageInput{
-		Normalized:       true,
-		FlatDamageBonus:  170,
-		DamageMultiplier: 1.5,
-	}
-	ability.Effect.DirectInput = core.DirectDamageInput{
-		SpellCoefficient: 1,
-	}
+	ability.Effect.BaseDamage = core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 170, 1.5+0.01*float64(rogue.Talents.SinisterCalling), true)
 
 	// all these use "Apply Aura: Modifies Damage/Healing Done", and stack additively (up to 142%)
 	ability.Effect.StaticDamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
@@ -41,9 +34,6 @@ func (rogue *Rogue) newBackstabTemplate(_ *core.Simulation) core.SimpleSpellTemp
 	}
 
 	ability.Effect.BonusCritRating += 10 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.PuncturingWounds)
-
-	// SinisterCalling uses "Apply Aura: Modifies Effect Value", adding to the DamageMultiplier (up to 155%)
-	ability.Effect.WeaponInput.DamageMultiplier += 0.01 * float64(rogue.Talents.SinisterCalling)
 
 	return core.NewSimpleSpellTemplate(ability)
 }
