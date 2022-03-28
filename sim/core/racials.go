@@ -7,14 +7,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var DwarfGunSpecializationAuraID = NewAuraID()
 var HumanWeaponSpecializationAuraID = NewAuraID()
 
 var OrcBloodFuryAuraID = NewAuraID()
 var OrcBloodFuryCooldownID = NewCooldownID()
 var OrcWeaponSpecializationAuraID = NewAuraID()
-
-var TrollBowSpecializationAuraID = NewAuraID()
 
 var TrollBerserkingAuraID = NewAuraID()
 var TrollBerserkingCooldownID = NewCooldownID()
@@ -36,24 +33,10 @@ func applyRaceEffects(agent Agent) {
 		character.AddStat(stats.FrostResistance, 10)
 
 		// Gun specialization (+1% ranged crit when using a gun).
-		matches := false
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotRanged]; weapon.ID != 0 {
 			if weapon.RangedWeaponType == proto.RangedWeaponType_RangedWeaponTypeGun {
-				matches = true
+				character.PseudoStats.BonusRangedCritRating += 1 * MeleeCritRatingPerCritChance
 			}
-		}
-
-		if matches && character.Class == proto.Class_ClassHunter {
-			character.AddPermanentAura(func(sim *Simulation) Aura {
-				return Aura{
-					ID: DwarfGunSpecializationAuraID,
-					OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-						if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-							spellEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
-						}
-					},
-				}
-			})
 		}
 	case proto.Race_RaceGnome:
 		character.AddStat(stats.ArcaneResistance, 10)
@@ -182,24 +165,10 @@ func applyRaceEffects(agent Agent) {
 		})
 	case proto.Race_RaceTroll10, proto.Race_RaceTroll30:
 		// Bow specialization (+1% ranged crit when using a bow).
-		matches := false
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotRanged]; weapon.ID != 0 {
 			if weapon.RangedWeaponType == proto.RangedWeaponType_RangedWeaponTypeBow {
-				matches = true
+				character.PseudoStats.BonusRangedCritRating += 1 * MeleeCritRatingPerCritChance
 			}
-		}
-
-		if matches && character.Class == proto.Class_ClassHunter {
-			character.AddPermanentAura(func(sim *Simulation) Aura {
-				return Aura{
-					ID: TrollBowSpecializationAuraID,
-					OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-						if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-							spellEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
-						}
-					},
-				}
-			})
 		}
 
 		// Beast Slaying (+5% damage to beasts)

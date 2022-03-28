@@ -932,6 +932,21 @@ func ApplyTheNightBlade(agent core.Agent) {
 		const arPenBonus = 435.0
 		const procChance = 2 * 1.8 / 60.0
 
+		makeProcAura := func(numStacks int32) core.Aura {
+			bonus := arPenBonus * float64(numStacks)
+			return core.Aura{
+				ID:       TheNightBladeProcAuraID,
+				ActionID: core.ActionID{ItemID: 31331},
+				Duration: time.Second * 10,
+				OnGain: func(sim *core.Simulation) {
+					character.AddStat(stats.ArmorPenetration, bonus)
+				},
+				OnExpire: func(sim *core.Simulation) {
+					character.AddStat(stats.ArmorPenetration, -bonus)
+				},
+			}
+		}
+
 		return core.Aura{
 			ID: TheNightBladeAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -942,17 +957,8 @@ func ApplyTheNightBlade(agent core.Agent) {
 					return
 				}
 
-				stacks := character.NumStacks(TheNightBladeProcAuraID) + 1
-				newBonus := arPenBonus * float64(stacks)
-				character.ReplaceAura(sim, core.Aura{
-					ID:       TheNightBladeProcAuraID,
-					ActionID: core.ActionID{ItemID: 31331},
-					Duration: time.Second * 10,
-					Stacks:   stacks,
-					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-						spellEffect.BonusArmorPenetration += newBonus
-					},
-				})
+				stacks := core.MinInt32(3, character.NumStacks(TheNightBladeProcAuraID)+1)
+				character.AddAura(sim, makeProcAura(stacks))
 			},
 		}
 	})
@@ -1032,26 +1038,15 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 	})
 }
 
-var CloakOfDarknessAuraID = core.NewAuraID()
-
 func ApplyCloakOfDarkness(agent core.Agent) {
 	character := agent.GetCharacter()
 
-	// The melee distinction only matters for hunters, so for others we can skip
-	// having a separate aura.
 	if character.Class != proto.Class_ClassHunter {
-		character.AddStat(stats.MeleeCrit, 24)
-		return
+		// For non-hunters just give direct crit so it shows on the stats panel.
+		character.AddStats(stats.Stats{
+			stats.MeleeCrit: 24,
+		})
+	} else {
+		character.PseudoStats.BonusMeleeCritRating += 24
 	}
-
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: CloakOfDarknessAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
-					spellEffect.BonusCritRating += 24
-				}
-			},
-		}
-	})
 }

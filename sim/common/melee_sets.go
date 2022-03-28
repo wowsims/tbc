@@ -232,6 +232,13 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
+
+			character.RegisterResetEffect(func(sim *core.Simulation) {
+				if sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon {
+					character.PseudoStats.MobTypeAttackPower += 200
+				}
+			})
+
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				const hasteBonus = 450.0
 				const duration = time.Second * 10
@@ -243,11 +250,6 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 
 				return core.Aura{
 					ID: TwinBladesOfAzzinothAuraID,
-					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-						if spellEffect.Target.MobType == proto.MobType_MobTypeDemon {
-							spellEffect.BonusAttackPower += 200
-						}
-					},
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return

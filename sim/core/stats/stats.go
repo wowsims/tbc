@@ -400,6 +400,12 @@ type PseudoStats struct {
 	//  This includes almost all "(Normalized) Weapon Damage", but also some "School Damage (Physical)" abilities.
 	BonusDamage float64 // Comes from '+X Weapon Damage' effects
 
+	BonusRangedHitRating  float64 // Hit rating for ranged only.
+	BonusMeleeCritRating  float64 // Crit rating for melee only (not ranged).
+	BonusRangedCritRating float64 // Crit rating for ranged only.
+	MobTypeAttackPower    float64 // Bonus AP against mobs of the current type.
+	MobTypeSpellPower     float64 // Bonus SP against mobs of the current type.
+
 	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
 
 	DamageDealtMultiplier         float64 // All damage
