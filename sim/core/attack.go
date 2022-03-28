@@ -219,19 +219,19 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 		// ... but for other's, BonusAttackPowerOnTarget only applies to weapon damage based attacks
 		if ahe.WeaponInput.Normalized {
 			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-				dmg += character.AutoAttacks.Ranged.calculateNormalizedWeaponDamage(sim, attackPower) + bonusWeaponDamage
+				dmg += character.AutoAttacks.Ranged.calculateNormalizedWeaponDamage(sim, attackPower)
 			} else if !ahe.WeaponInput.Offhand {
-				dmg += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower+ahe.BonusAttackPowerOnTarget) + bonusWeaponDamage
+				dmg += character.AutoAttacks.MH.calculateNormalizedWeaponDamage(sim, attackPower+ahe.BonusAttackPowerOnTarget)
 			} else {
-				dmg += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower+2*ahe.BonusAttackPowerOnTarget)*0.5 + bonusWeaponDamage
+				dmg += character.AutoAttacks.OH.calculateNormalizedWeaponDamage(sim, attackPower+2*ahe.BonusAttackPowerOnTarget)*0.5
 			}
 		} else {
 			if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-				dmg += character.AutoAttacks.Ranged.calculateWeaponDamage(sim, attackPower) + bonusWeaponDamage
+				dmg += character.AutoAttacks.Ranged.calculateWeaponDamage(sim, attackPower)
 			} else if !ahe.WeaponInput.Offhand {
-				dmg += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower+ahe.BonusAttackPowerOnTarget) + bonusWeaponDamage
+				dmg += character.AutoAttacks.MH.calculateWeaponDamage(sim, attackPower+ahe.BonusAttackPowerOnTarget)
 			} else {
-				dmg += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower+2*ahe.BonusAttackPowerOnTarget)*0.5 + bonusWeaponDamage
+				dmg += character.AutoAttacks.OH.calculateWeaponDamage(sim, attackPower+2*ahe.BonusAttackPowerOnTarget)*0.5
 			}
 		}
 		dmg += ahe.WeaponInput.FlatDamageBonus
@@ -239,9 +239,13 @@ func (ahe *SpellHitEffect) calculateWeaponDamage(sim *Simulation, ability *Simpl
 	}
 
 	if ahe.DirectInput.SpellCoefficient > 0 {
-		bonus := (character.GetStat(stats.SpellPower) + character.GetStat(ability.SpellSchool.Stat())) * ahe.DirectInput.SpellCoefficient * ahe.WeaponInput.DamageMultiplier
-		bonus += ahe.SpellEffect.BonusSpellPower * ahe.DirectInput.SpellCoefficient // does not get changed by weapon input multiplier
-		dmg += bonus
+		if ability.SpellSchool.Matches(SpellSchoolMagic) {
+			bonus := (character.GetStat(stats.SpellPower) + character.GetStat(ability.SpellSchool.Stat())) * ahe.DirectInput.SpellCoefficient * ahe.WeaponInput.DamageMultiplier
+			bonus += ahe.SpellEffect.BonusSpellPower * ahe.DirectInput.SpellCoefficient // does not get changed by weapon input multiplier
+			dmg += bonus
+		} else {
+			dmg += bonusWeaponDamage * ahe.DirectInput.SpellCoefficient * ahe.WeaponInput.DamageMultiplier
+		}
 	}
 	dmg += ahe.DirectInput.FlatDamageBonus
 
@@ -382,6 +386,9 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				WeaponInput: WeaponDamageInput{
 					DamageMultiplier: 1,
 				},
+				DirectInput: DirectDamageInput{
+					SpellCoefficient: 1,
+				},
 			},
 		},
 		OHAuto: SimpleSpell{
@@ -405,6 +412,9 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					Offhand:          true,
 					DamageMultiplier: 1,
 				},
+				DirectInput: DirectDamageInput{
+					SpellCoefficient: 1,
+				},
 			},
 		},
 		RangedAuto: SimpleSpell{
@@ -427,6 +437,9 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				},
 				WeaponInput: WeaponDamageInput{
 					DamageMultiplier: 1,
+				},
+				DirectInput: DirectDamageInput{
+					SpellCoefficient: 1,
 				},
 			},
 		},

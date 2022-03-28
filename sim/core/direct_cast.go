@@ -16,7 +16,7 @@ type DirectDamageInput struct {
 	MinBaseDamage float64
 	MaxBaseDamage float64
 
-	// Increase in damage per point of spell power (or attack power, if a physical spell).
+	// Increase in damage per point of spell power (or weapon damage, if a physical spell).
 	SpellCoefficient float64
 
 	// Adds a fixed amount of damage to the spell, before multipliers.

@@ -51,6 +51,9 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		WeaponInput: core.WeaponDamageInput{
 			DamageMultiplier: 1.0,
 		},
+		DirectInput: core.DirectDamageInput{
+			SpellCoefficient: 1,
+		},
 	}
 	if shaman.Talents.ElementalWeapons > 0 {
 		baseEffect.WeaponInput.DamageMultiplier *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100

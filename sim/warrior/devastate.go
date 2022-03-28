@@ -44,6 +44,9 @@ func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpel
 				Normalized:       true,
 				DamageMultiplier: 0.5,
 			},
+			DirectInput: core.DirectDamageInput{
+				SpellCoefficient: 1,
+			},
 		},
 	}
 
