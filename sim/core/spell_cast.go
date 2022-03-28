@@ -300,14 +300,17 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 		}
 
 		// Crit
-		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
-		chance += critChance
+		chance += ahe.physicalCritChance(character, &ability.SpellCast)
 		if roll < chance {
 			return OutcomeCrit
 		}
 	}
 
 	return OutcomeHit
+}
+
+func (spellEffect *SpellEffect) physicalCritChance(character *Character, spellCast *SpellCast) float64 {
+	return ((character.stats[stats.MeleeCrit] + spellEffect.BonusCritRating + spellCast.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
 }
 
 // Calculates a hit check using the stats from this spell.
@@ -325,8 +328,7 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast)
 		critChance := (spellCast.Character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating) / (SpellCritRatingPerCritChance * 100)
 		return sim.RandomFloat("Magical Crit Roll") < critChance
 	case CritRollCategoryPhysical:
-		critChance := (spellCast.Character.GetStat(stats.MeleeCrit)+spellCast.BonusCritRating+spellEffect.BonusCritRating)/(MeleeCritRatingPerCritChance*100) - spellEffect.Target.CritSuppression
-		return sim.RandomFloat("Physical Crit Roll") < critChance
+		return sim.RandomFloat("Physical Crit Roll") < spellEffect.physicalCritChance(spellCast.Character, spellCast)
 	default:
 		return false
 	}
