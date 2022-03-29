@@ -26,8 +26,9 @@ func RegisterRogue() {
 }
 
 const (
-	SpellFlagBuilder  = core.SpellExtrasAgentReserved1
-	SpellFlagFinisher = core.SpellExtrasAgentReserved2
+	SpellFlagRogueAbility = core.SpellExtrasAgentReserved1
+	SpellFlagBuilder      = core.SpellExtrasAgentReserved1 | core.SpellExtrasAgentReserved2
+	SpellFlagFinisher     = core.SpellExtrasAgentReserved1 | core.SpellExtrasAgentReserved3
 )
 
 type Rogue struct {
@@ -138,13 +139,10 @@ func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras
 				SpellExtras:    spellExtras,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               procMask,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
+		Effect: core.SpellEffect{
+			ProcMask:         procMask,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 	}
 }
@@ -234,6 +232,8 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 	rogue.PseudoStats.ThreatMultiplier *= 0.71
 
 	daggerMH := rogue.Equip[proto.ItemSlot_ItemSlotMainHand].WeaponType == proto.WeaponType_WeaponTypeDagger
+	daggerOH := rogue.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType == proto.WeaponType_WeaponTypeDagger
+	dualDagger := daggerMH && daggerOH
 	if rogue.Rotation.Builder == proto.Rogue_Rotation_Unknown {
 		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
 	}
@@ -243,9 +243,11 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
 	} else if rogue.Rotation.Builder == proto.Rogue_Rotation_Mutilate && !rogue.Talents.Mutilate {
 		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
+	} else if rogue.Rotation.Builder == proto.Rogue_Rotation_Mutilate && !dualDagger {
+		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
 	}
 	if rogue.Rotation.Builder == proto.Rogue_Rotation_Auto {
-		if rogue.Talents.Mutilate {
+		if rogue.Talents.Mutilate && dualDagger {
 			rogue.Rotation.Builder = proto.Rogue_Rotation_Mutilate
 		} else if rogue.Talents.Hemorrhage {
 			rogue.Rotation.Builder = proto.Rogue_Rotation_Hemorrhage
@@ -301,9 +303,14 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 			rogue.doRotation(sim)
 		}
 	})
+
+	ohWeapon := rogue.WeaponFromOffHand(rogue.critMultiplier(false, false))
+	if rogue.Talents.DualWieldSpecialization > 0 {
+		ohWeapon.BaseDamageOverride = core.BaseDamageFuncMeleeWeapon(core.OffHand, false, 0, 1+0.1*float64(rogue.Talents.DualWieldSpecialization), true)
+	}
 	rogue.EnableAutoAttacks(rogue, core.AutoAttackOptions{
 		MainHand:       rogue.WeaponFromMainHand(rogue.critMultiplier(true, false)),
-		OffHand:        rogue.WeaponFromOffHand(rogue.critMultiplier(false, false)),
+		OffHand:        ohWeapon,
 		AutoSwingMelee: true,
 	})
 

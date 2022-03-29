@@ -35,25 +35,21 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 		GCD:      core.GCDDefault,
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        3,
-			TickLength:           time.Second,
-			TickBaseDamage:       528 / 3,
-			TickSpellCoefficient: 0.19,
-			AffectedByCastSpeed:  true,
+			NumberOfTicks:       3,
+			TickLength:          time.Second,
+			TickBaseDamage:      core.DotSnapshotFuncMagic(528/3, 0.19),
+			AffectedByCastSpeed: true,
 		},
 	}
 
 	priest.applyTalentsToShadowSpell(&baseCast, &effect)
 
 	if ItemSetIncarnate.CharacterHasSetBonus(&priest.Character, 4) {
-		effect.StaticDamageMultiplier *= 1.05
+		effect.DamageMultiplier *= 1.05
 	}
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{

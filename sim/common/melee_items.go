@@ -58,16 +58,10 @@ func ApplyStormGauntlets(agent core.Agent) {
 					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
-			Effect: core.SpellHitEffect{
-				SpellEffect: core.SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-				},
-				DirectInput: core.DirectDamageInput{
-					MinBaseDamage: 3,
-					MaxBaseDamage: 3,
-				},
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigFlat(3),
 			},
 		})
 
@@ -108,16 +102,10 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
-			Effect: core.SpellHitEffect{
-				SpellEffect: core.SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-				},
-				DirectInput: core.DirectDamageInput{
-					MinBaseDamage: 2,
-					MaxBaseDamage: 2,
-				},
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigFlat(2),
 			},
 		})
 
@@ -392,18 +380,13 @@ func ApplyDespair(agent core.Agent) {
 				IsPhantom:           true,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				// TODO: This should be removed once we have an attack mask.
-				//  This is only set here to correctly calculate damage.
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				FlatDamageBonus: 600,
-			},
+		Effect: core.SpellEffect{
+			// TODO: This should be removed once we have an attack mask.
+			//  This is only set here to correctly calculate damage.
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigFlat(600),
 		},
 	}
 
@@ -451,17 +434,11 @@ func ApplyTheDecapitator(agent core.Agent) {
 				IsPhantom:           true,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 513,
-				MaxBaseDamage: 567,
-			},
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigRoll(513, 567),
 		},
 	}
 
@@ -517,16 +494,10 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
-			Effect: core.SpellHitEffect{
-				SpellEffect: core.SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-				},
-				DirectInput: core.DirectDamageInput{
-					MinBaseDamage: 285,
-					MaxBaseDamage: 315,
-				},
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigRoll(285, 315),
 			},
 		})
 
@@ -812,17 +783,10 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
-			Effect: core.SpellHitEffect{
-				SpellEffect: core.SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-				},
-				DirectInput: core.DirectDamageInput{
-					MinBaseDamage:    48,
-					MaxBaseDamage:    54,
-					SpellCoefficient: 1,
-				},
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigMagic(48, 54, 1),
 			},
 		})
 		spellObj := core.SimpleSpell{}
@@ -932,6 +896,21 @@ func ApplyTheNightBlade(agent core.Agent) {
 		const arPenBonus = 435.0
 		const procChance = 2 * 1.8 / 60.0
 
+		makeProcAura := func(numStacks int32) core.Aura {
+			bonus := arPenBonus * float64(numStacks)
+			return core.Aura{
+				ID:       TheNightBladeProcAuraID,
+				ActionID: core.ActionID{ItemID: 31331},
+				Duration: time.Second * 10,
+				OnGain: func(sim *core.Simulation) {
+					character.AddStat(stats.ArmorPenetration, bonus)
+				},
+				OnExpire: func(sim *core.Simulation) {
+					character.AddStat(stats.ArmorPenetration, -bonus)
+				},
+			}
+		}
+
 		return core.Aura{
 			ID: TheNightBladeAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -942,17 +921,8 @@ func ApplyTheNightBlade(agent core.Agent) {
 					return
 				}
 
-				stacks := character.NumStacks(TheNightBladeProcAuraID) + 1
-				newBonus := arPenBonus * float64(stacks)
-				character.ReplaceAura(sim, core.Aura{
-					ID:       TheNightBladeProcAuraID,
-					ActionID: core.ActionID{ItemID: 31331},
-					Duration: time.Second * 10,
-					Stacks:   stacks,
-					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-						spellEffect.BonusArmorPenetration += newBonus
-					},
-				})
+				stacks := core.MinInt32(3, character.NumStacks(TheNightBladeProcAuraID)+1)
+				character.AddAura(sim, makeProcAura(stacks))
 			},
 		}
 	})
@@ -986,16 +956,10 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
-			Effect: core.SpellHitEffect{
-				SpellEffect: core.SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-				},
-				DirectInput: core.DirectDamageInput{
-					MinBaseDamage: 20,
-					MaxBaseDamage: 20,
-				},
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigFlat(20),
 			},
 		})
 		spellObj := core.SimpleSpell{}
@@ -1032,26 +996,15 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 	})
 }
 
-var CloakOfDarknessAuraID = core.NewAuraID()
-
 func ApplyCloakOfDarkness(agent core.Agent) {
 	character := agent.GetCharacter()
 
-	// The melee distinction only matters for hunters, so for others we can skip
-	// having a separate aura.
 	if character.Class != proto.Class_ClassHunter {
-		character.AddStat(stats.MeleeCrit, 24)
-		return
+		// For non-hunters just give direct crit so it shows on the stats panel.
+		character.AddStats(stats.Stats{
+			stats.MeleeCrit: 24,
+		})
+	} else {
+		character.PseudoStats.BonusMeleeCritRating += 24
 	}
-
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: CloakOfDarknessAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
-					spellEffect.BonusCritRating += 24
-				}
-			},
-		}
-	})
 }

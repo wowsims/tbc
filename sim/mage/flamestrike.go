@@ -43,17 +43,10 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 		AOECap: 7830,
 	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
-		},
-		DirectInput: core.DirectDamageInput{
-			MinBaseDamage:    480,
-			MaxBaseDamage:    585,
-			SpellCoefficient: 0.236,
-		},
+	baseEffect := core.SpellEffect{
+		DamageMultiplier: mage.spellDamageMultiplier,
+		ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+		BaseDamage:       core.BaseDamageConfigMagic(480, 585, 0.236),
 	}
 
 	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
@@ -62,10 +55,10 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 	baseEffect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
 	baseEffect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
 	baseEffect.BonusSpellCritRating += float64(mage.Talents.ImprovedFlamestrike) * 5 * core.SpellCritRatingPerCritChance
-	baseEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+	baseEffect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
 	numHits := sim.GetNumTargets()
-	effects := make([]core.SpellHitEffect, 0, numHits)
+	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)
@@ -92,24 +85,21 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 		},
 	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: mage.spellDamageMultiplier,
-		},
+	baseEffect := core.SpellEffect{
+		DamageMultiplier: mage.spellDamageMultiplier,
+		ThreatMultiplier: 1,
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        4,
-			TickLength:           time.Second * 2,
-			TickBaseDamage:       106,
-			TickSpellCoefficient: 0.03,
+			NumberOfTicks:  4,
+			TickLength:     time.Second * 2,
+			TickBaseDamage: core.DotSnapshotFuncMagic(106, 0.03),
 		},
 	}
 
 	baseEffect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-	baseEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+	baseEffect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
 	numHits := sim.GetNumTargets()
-	effects := make([]core.SpellHitEffect, 0, numHits)
+	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)

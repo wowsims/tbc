@@ -36,18 +36,12 @@ func (warrior *Warrior) newRevengeTemplate(_ *core.Simulation) core.SimpleSpellT
 				CritMultiplier: warrior.critMultiplier(true),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				FlatThreatBonus:        200,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 414,
-				MaxBaseDamage: 506,
-			},
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			FlatThreatBonus:  200,
+			BaseDamage:       core.BaseDamageConfigRoll(414, 506),
 		},
 	}
 

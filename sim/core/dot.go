@@ -1,19 +1,35 @@
 package core
 
 import (
-	"github.com/wowsims/tbc/sim/core/stats"
 	"time"
 )
+
+func DotSnapshotFuncMagic(baseDamage float64, spellCoefficient float64) BaseDamageCalculator {
+	if spellCoefficient == 0 {
+		return BaseDamageFuncFlat(baseDamage)
+	}
+
+	if baseDamage == 0 {
+		return func(_ *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
+			totalSpellPower := hitEffect.SpellPower(spellCast.Character, spellCast)
+			return totalSpellPower * spellCoefficient
+		}
+	} else {
+		return func(_ *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
+			totalSpellPower := hitEffect.SpellPower(spellCast.Character, spellCast)
+			return baseDamage + totalSpellPower*spellCoefficient
+		}
+	}
+}
 
 // DotDamageInput is the data needed to kick of the dot ticking in pendingActions.
 //  For now the only way for a caster to track their dot is to keep a reference to the cast object
 //  that started this and check the DotDamageInput.IsTicking()
 type DotDamageInput struct {
-	NumberOfTicks        int           // number of ticks over the whole duration
-	TickLength           time.Duration // time between each tick
-	TickBaseDamage       float64
-	TickSpellCoefficient float64
-	TicksCanMissAndCrit  bool // Allows individual ticks to hit/miss, and also crit.
+	NumberOfTicks       int           // number of ticks over the whole duration
+	TickLength          time.Duration // time between each tick
+	TicksCanMissAndCrit bool          // Allows individual ticks to hit/miss, and also crit.
+	TickBaseDamage      BaseDamageCalculator
 
 	// If true, tick length will be shortened based on casting speed.
 	AffectedByCastSpeed bool
@@ -23,10 +39,9 @@ type DotDamageInput struct {
 	IgnoreDamageModifiers bool
 
 	// Whether ticks can proc spell hit effects such as Judgement of Wisdom.
-	TicksProcSpellHitEffects bool
+	TicksProcSpellEffects bool
 
-	OnBeforePeriodicDamage OnBeforePeriodicDamage // Before-calculation logic for this dot.
-	OnPeriodicDamage       OnPeriodicDamage       // After-calculation logic for this dot.
+	OnPeriodicDamage OnPeriodicDamage // After-calculation logic for this dot.
 
 	// If both of these are set, will display uptime metrics for this dot.
 	DebuffID AuraID
@@ -154,41 +169,25 @@ func (spell *SimpleSpell) ApplyDot(sim *Simulation) {
 }
 
 // Snapshots a few values at the start of a dot.
-func (hitEffect *SpellHitEffect) takeDotSnapshot(sim *Simulation, spellCast *SpellCast) {
-	totalSpellPower := spellCast.Character.GetStat(stats.SpellPower) + spellCast.Character.GetStat(spellCast.SpellSchool.Stat()) + hitEffect.BonusSpellPower
-
+func (hitEffect *SpellEffect) takeDotSnapshot(sim *Simulation, spellCast *SpellCast) {
 	// snapshot total damage per tick, including any static damage multipliers
-	hitEffect.DotInput.damagePerTick = (hitEffect.DotInput.TickBaseDamage + totalSpellPower*hitEffect.DotInput.TickSpellCoefficient) * hitEffect.StaticDamageMultiplier
+	hitEffect.DotInput.damagePerTick = hitEffect.DotInput.TickBaseDamage(sim, hitEffect, spellCast) * hitEffect.DamageMultiplier
+
 	hitEffect.DotInput.startTime = sim.CurrentTime
 	hitEffect.DotInput.RefreshDot(sim)
 	hitEffect.DotInput.nextTickTime = sim.CurrentTime + hitEffect.DotInput.TickLength
-	hitEffect.SpellEffect.BeyondAOECapMultiplier = 1
+	hitEffect.BeyondAOECapMultiplier = 1
 }
 
-func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *SpellCast) {
-	// fmt.Printf("DOT (%s) Ticking, Time Remaining: %0.2f\n", spellCast.Name, hitEffect.DotInput.TimeRemaining(sim).Seconds())
+func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spellCast *SpellCast) {
 	damage := hitEffect.DotInput.damagePerTick
-
-	spellCast.Character.OnBeforePeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, &damage)
-
-	damageBeforeTargetEffects := damage
-	hitEffect.Target.OnBeforePeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, &damage)
-	hitEffect.SpellEffect.BeyondAOECapMultiplier *= damage / damageBeforeTargetEffects
-
-	if hitEffect.DotInput.OnBeforePeriodicDamage != nil {
-		hitEffect.DotInput.OnBeforePeriodicDamage(sim, spellCast, &hitEffect.SpellEffect, &damage)
-	}
-	if hitEffect.DotInput.IgnoreDamageModifiers {
-		damage = hitEffect.DotInput.damagePerTick
-	}
 
 	hitEffect.Outcome = OutcomeEmpty
 	if hitEffect.DotInput.TicksCanMissAndCrit {
 		if hitEffect.hitCheck(sim, spellCast) {
 			hitEffect.Outcome = OutcomeHit
 			if hitEffect.critCheck(sim, spellCast) {
-				// TODO: Remove |=
-				hitEffect.Outcome |= OutcomeCrit
+				hitEffect.Outcome = OutcomeCrit
 			}
 		} else {
 			hitEffect.Outcome = OutcomeMiss
@@ -197,36 +196,32 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 		hitEffect.Outcome = OutcomeHit
 	}
 
-	if hitEffect.Landed() {
-		hitEffect.applyResistances(sim, spellCast, &damage)
-
-		if hitEffect.Outcome.Matches(OutcomeCrit) {
-			damage *= spellCast.CritMultiplier
-			hitEffect.SpellEffect.BeyondAOECapMultiplier *= spellCast.CritMultiplier
-		}
-	} else {
-		damage = 0
+	if !hitEffect.DotInput.IgnoreDamageModifiers {
+		hitEffect.applyAttackerMultipliers(sim, spellCast, !hitEffect.DotInput.TicksCanMissAndCrit, &damage)
+		hitEffect.applyTargetMultipliers(sim, spellCast, !hitEffect.DotInput.TicksCanMissAndCrit, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	}
+	hitEffect.applyResistances(sim, spellCast, &damage)
+	hitEffect.applyOutcome(sim, spellCast, &damage)
 
-	hitEffect.SpellEffect.Damage = damage
+	hitEffect.Damage = damage
 }
 
 // This should be called on each dot tick.
-func (hitEffect *SpellHitEffect) afterDotTick(sim *Simulation, spell *SimpleSpell) {
+func (hitEffect *SpellEffect) afterDotTick(sim *Simulation, spell *SimpleSpell) {
 	if sim.Log != nil {
-		spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, hitEffect.SpellEffect.DotResultString(), hitEffect.SpellEffect.calcThreat(&spell.SpellCast))
+		spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, hitEffect.DotResultString(), hitEffect.calcThreat(&spell.SpellCast))
 	}
 
 	hitEffect.applyDotTickResultsToCast(&spell.SpellCast)
 
-	if hitEffect.DotInput.TicksProcSpellHitEffects {
-		hitEffect.SpellEffect.triggerSpellProcs(sim, spell)
+	if hitEffect.DotInput.TicksProcSpellEffects {
+		hitEffect.triggerSpellProcs(sim, spell)
 	}
 
-	spell.Character.OnPeriodicDamage(sim, &spell.SpellCast, &hitEffect.SpellEffect, hitEffect.Damage)
-	hitEffect.Target.OnPeriodicDamage(sim, &spell.SpellCast, &hitEffect.SpellEffect, hitEffect.Damage)
+	spell.Character.OnPeriodicDamage(sim, &spell.SpellCast, hitEffect, hitEffect.Damage)
+	hitEffect.Target.OnPeriodicDamage(sim, &spell.SpellCast, hitEffect, hitEffect.Damage)
 	if hitEffect.DotInput.OnPeriodicDamage != nil {
-		hitEffect.DotInput.OnPeriodicDamage(sim, &spell.SpellCast, &hitEffect.SpellEffect, hitEffect.Damage)
+		hitEffect.DotInput.OnPeriodicDamage(sim, &spell.SpellCast, hitEffect, hitEffect.Damage)
 	}
 
 	hitEffect.DotInput.tickIndex++
@@ -234,7 +229,7 @@ func (hitEffect *SpellHitEffect) afterDotTick(sim *Simulation, spell *SimpleSpel
 }
 
 // This should be called after the final tick of the dot, or when the dot is cancelled.
-func (hitEffect *SpellHitEffect) onDotComplete(sim *Simulation, spellCast *SpellCast) {
+func (hitEffect *SpellEffect) onDotComplete(sim *Simulation, spellCast *SpellCast) {
 	// Clean up the dot object.
 	hitEffect.DotInput.endTime = 0
 
@@ -248,7 +243,7 @@ func (spellEffect *SpellEffect) DotResultString() string {
 }
 
 // Only applies the results from the ticks, not the initial dot application.
-func (hitEffect *SpellHitEffect) applyDotTickResultsToCast(spellCast *SpellCast) {
+func (hitEffect *SpellEffect) applyDotTickResultsToCast(spellCast *SpellCast) {
 	if hitEffect.DotInput.TicksCanMissAndCrit {
 		if hitEffect.Landed() {
 			spellCast.Hits++

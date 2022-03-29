@@ -7,16 +7,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var DwarfGunSpecializationAuraID = NewAuraID()
-var HumanWeaponSpecializationAuraID = NewAuraID()
-
 var OrcBloodFuryAuraID = NewAuraID()
 var OrcBloodFuryCooldownID = NewCooldownID()
-var OrcCommandAuraID = NewAuraID()
-var OrcWeaponSpecializationAuraID = NewAuraID()
-
-var TrollBowSpecializationAuraID = NewAuraID()
-var TrollBeastSlayingAuraID = NewAuraID()
 
 var TrollBerserkingAuraID = NewAuraID()
 var TrollBerserkingCooldownID = NewCooldownID()
@@ -38,24 +30,10 @@ func applyRaceEffects(agent Agent) {
 		character.AddStat(stats.FrostResistance, 10)
 
 		// Gun specialization (+1% ranged crit when using a gun).
-		matches := false
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotRanged]; weapon.ID != 0 {
 			if weapon.RangedWeaponType == proto.RangedWeaponType_RangedWeaponTypeGun {
-				matches = true
+				character.PseudoStats.BonusRangedCritRating += 1 * MeleeCritRatingPerCritChance
 			}
-		}
-
-		if matches && character.Class == proto.Class_ClassHunter {
-			character.AddPermanentAura(func(sim *Simulation) Aura {
-				return Aura{
-					ID: DwarfGunSpecializationAuraID,
-					OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-						if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-							spellEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
-						}
-					},
-				}
-			})
 		}
 	case proto.Race_RaceGnome:
 		character.AddStat(stats.ArcaneResistance, 10)
@@ -77,32 +55,15 @@ func applyRaceEffects(agent Agent) {
 		})
 
 		const expertiseBonus = 5 * ExpertisePerQuarterPercentReduction
-		mhMatches := false
-		ohMatches := false
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
 			if weapon.WeaponType == proto.WeaponType_WeaponTypeSword || weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
-				mhMatches = true
+				character.PseudoStats.BonusMHExpertiseRating += expertiseBonus
 			}
 		}
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
 			if weapon.WeaponType == proto.WeaponType_WeaponTypeSword || weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
-				ohMatches = true
+				character.PseudoStats.BonusOHExpertiseRating += expertiseBonus
 			}
-		}
-		procMask := GetMeleeProcMaskForHands(mhMatches, ohMatches)
-
-		if procMask != ProcMaskEmpty {
-			character.AddPermanentAura(func(sim *Simulation) Aura {
-				return Aura{
-					ID: HumanWeaponSpecializationAuraID,
-					OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-						if !spellEffect.ProcMask.Matches(procMask) {
-							return
-						}
-						spellEffect.BonusExpertiseRating += expertiseBonus
-					},
-				}
-			})
 		}
 	case proto.Race_RaceNightElf:
 		character.AddStat(stats.NatureResistance, 10)
@@ -110,20 +71,9 @@ func applyRaceEffects(agent Agent) {
 	case proto.Race_RaceOrc:
 		// Command (Pet damage +5%)
 		if len(character.Pets) > 0 {
-			const multiplier = 1.05
 			for _, petAgent := range character.Pets {
 				pet := petAgent.GetPet()
-				pet.AddPermanentAura(func(sim *Simulation) Aura {
-					return Aura{
-						ID: OrcCommandAuraID,
-						OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-							spellEffect.DamageMultiplier *= multiplier
-						},
-						OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-							*tickDamage *= multiplier
-						},
-					}
-				})
+				pet.PseudoStats.DamageDealtMultiplier *= 1.05
 			}
 		}
 
@@ -157,32 +107,15 @@ func applyRaceEffects(agent Agent) {
 
 		// Axe specialization
 		const expertiseBonus = 5 * ExpertisePerQuarterPercentReduction
-		mhMatches := false
-		ohMatches := false
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
 			if weapon.WeaponType == proto.WeaponType_WeaponTypeAxe {
-				mhMatches = true
+				character.PseudoStats.BonusMHExpertiseRating += expertiseBonus
 			}
 		}
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
 			if weapon.WeaponType == proto.WeaponType_WeaponTypeAxe {
-				ohMatches = true
+				character.PseudoStats.BonusMHExpertiseRating += expertiseBonus
 			}
-		}
-		procMask := GetMeleeProcMaskForHands(mhMatches, ohMatches)
-
-		if procMask != ProcMaskEmpty {
-			character.AddPermanentAura(func(sim *Simulation) Aura {
-				return Aura{
-					ID: OrcWeaponSpecializationAuraID,
-					OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-						if !spellEffect.ProcMask.Matches(procMask) {
-							return
-						}
-						spellEffect.BonusExpertiseRating += expertiseBonus
-					},
-				}
-			})
 		}
 	case proto.Race_RaceTauren:
 		character.AddStat(stats.NatureResistance, 10)
@@ -195,40 +128,16 @@ func applyRaceEffects(agent Agent) {
 		})
 	case proto.Race_RaceTroll10, proto.Race_RaceTroll30:
 		// Bow specialization (+1% ranged crit when using a bow).
-		matches := false
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotRanged]; weapon.ID != 0 {
 			if weapon.RangedWeaponType == proto.RangedWeaponType_RangedWeaponTypeBow {
-				matches = true
+				character.PseudoStats.BonusRangedCritRating += 1 * MeleeCritRatingPerCritChance
 			}
 		}
 
-		if matches && character.Class == proto.Class_ClassHunter {
-			character.AddPermanentAura(func(sim *Simulation) Aura {
-				return Aura{
-					ID: TrollBowSpecializationAuraID,
-					OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-						if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-							spellEffect.BonusCritRating += 1 * MeleeCritRatingPerCritChance
-						}
-					},
-				}
-			})
-		}
-
 		// Beast Slaying (+5% damage to beasts)
-		character.AddPermanentAura(func(sim *Simulation) Aura {
-			return Aura{
-				ID: TrollBeastSlayingAuraID,
-				OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-					if spellEffect.Target.MobType == proto.MobType_MobTypeBeast {
-						spellEffect.DamageMultiplier *= 1.05
-					}
-				},
-				OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-					if spellEffect.Target.MobType == proto.MobType_MobTypeBeast {
-						*tickDamage *= 1.05
-					}
-				},
+		character.RegisterResetEffect(func(sim *Simulation) {
+			if sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeBeast {
+				character.PseudoStats.DamageDealtMultiplier *= 1.05
 			}
 		})
 

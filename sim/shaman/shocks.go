@@ -33,7 +33,7 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         spellSchool,
-				SpellExtras:         core.SpellExtrasBinary | SpellFlagShock,
+				SpellExtras:         SpellFlagShock,
 				BaseCost:            cost,
 				Cost:                cost,
 				GCD:                 core.GCDDefault,
@@ -41,12 +41,9 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 	}
 
@@ -59,7 +56,7 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 	spell.Effect.ThreatMultiplier *= 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision)
 	spell.Effect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
 	spell.Effect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
-	spell.Effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
+	spell.Effect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 
 	// TODO: confirm this is how it reduces mana cost.
 	if ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 2) {
@@ -98,12 +95,9 @@ func (shaman *Shaman) applyShockInitModifiers(spellCast *core.SpellCast) {
 
 func (shaman *Shaman) newEarthShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	spell := shaman.newShockTemplateSpell(sim, SpellIDEarthShock, core.SpellSchoolNature, 535.0)
+	spell.SpellExtras |= core.SpellExtrasBinary
 
-	spell.Effect.DirectInput = core.DirectDamageInput{
-		MinBaseDamage:    661,
-		MaxBaseDamage:    696,
-		SpellCoefficient: 0.386,
-	}
+	spell.Effect.BaseDamage = core.BaseDamageConfigMagic(661, 696, 0.386)
 
 	return core.NewSimpleSpellTemplate(spell)
 }
@@ -122,17 +116,12 @@ func (shaman *Shaman) NewEarthShock(sim *core.Simulation, target *core.Target) *
 func (shaman *Shaman) newFlameShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	spell := shaman.newShockTemplateSpell(sim, SpellIDFlameShock, core.SpellSchoolFire, 500.0)
 
-	spell.Effect.DirectInput = core.DirectDamageInput{
-		MinBaseDamage:    377,
-		MaxBaseDamage:    377,
-		SpellCoefficient: 0.214,
-	}
+	spell.Effect.BaseDamage = core.BaseDamageConfigMagic(377, 377, 0.214)
 	spell.Effect.DotInput = core.DotDamageInput{
-		NumberOfTicks:        4,
-		TickLength:           time.Second * 3,
-		TickBaseDamage:       420 / 4,
-		TickSpellCoefficient: 0.1,
-		DebuffID:             FlameShockDebuffID,
+		NumberOfTicks:  4,
+		TickLength:     time.Second * 3,
+		TickBaseDamage: core.DotSnapshotFuncMagic(420/4, 0.1),
+		DebuffID:       FlameShockDebuffID,
 	}
 
 	return core.NewSimpleSpellTemplate(spell)
@@ -156,12 +145,9 @@ func (shaman *Shaman) NewFlameShock(sim *core.Simulation, target *core.Target) *
 
 func (shaman *Shaman) newFrostShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	spell := shaman.newShockTemplateSpell(sim, SpellIDFrostShock, core.SpellSchoolFrost, 525.0)
+	spell.SpellExtras |= core.SpellExtrasBinary
 
-	spell.Effect.DirectInput = core.DirectDamageInput{
-		MinBaseDamage:    647,
-		MaxBaseDamage:    683,
-		SpellCoefficient: 0.386,
-	}
+	spell.Effect.BaseDamage = core.BaseDamageConfigMagic(647, 683, 0.386)
 	spell.Effect.ThreatMultiplier *= 2
 
 	return core.NewSimpleSpellTemplate(spell)

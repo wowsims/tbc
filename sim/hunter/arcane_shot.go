@@ -28,18 +28,16 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpe
 				CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskRangedSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			WeaponInput: core.WeaponDamageInput{
-				CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
-					return attackPower*0.15 + 273
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskRangedSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+					return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.15 + 273
 				},
-			},
+				TargetSpellCoefficient: 1,
+			}),
 		},
 	}
 

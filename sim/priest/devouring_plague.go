@@ -29,17 +29,13 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 		Cooldown:            time.Minute * 3,
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        8,
-			TickLength:           time.Second * 3,
-			TickBaseDamage:       1216 / 8,
-			TickSpellCoefficient: 0.1,
+			NumberOfTicks:  8,
+			TickLength:     time.Second * 3,
+			TickBaseDamage: core.DotSnapshotFuncMagic(1216/8, 0.1),
 		},
 	}
 

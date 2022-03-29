@@ -70,16 +70,10 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 				CritMultiplier:      character.DefaultSpellCritMultiplier(),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 694,
-				MaxBaseDamage: 807,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigRoll(694, 807),
 		},
 	})
 }

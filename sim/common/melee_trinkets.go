@@ -445,17 +445,11 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 	})
 }
 
-var MarkOfTheChampionMeleeAuraID = core.NewAuraID()
-
 func ApplyMarkOfTheChampionMelee(agent core.Agent) {
-	agent.GetCharacter().AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: MarkOfTheChampionMeleeAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if spellEffect.Target.MobType == proto.MobType_MobTypeDemon || spellEffect.Target.MobType == proto.MobType_MobTypeUndead {
-					spellEffect.BonusAttackPower += 150
-				}
-			},
+	character := agent.GetCharacter()
+	character.RegisterResetEffect(func(sim *core.Simulation) {
+		if sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon || sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeUndead {
+			character.PseudoStats.MobTypeAttackPower += 150
 		}
 	})
 }
@@ -518,16 +512,10 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
-			Effect: core.SpellHitEffect{
-				SpellEffect: core.SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-				},
-				DirectInput: core.DirectDamageInput{
-					MinBaseDamage: 222,
-					MaxBaseDamage: 332,
-				},
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigRoll(222, 332),
 			},
 		})
 

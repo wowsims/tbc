@@ -26,18 +26,14 @@ func (priest *Priest) newShadowWordPainTemplate(sim *core.Simulation) core.Simpl
 		GCD:                 core.GCDDefault,
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        6,
-			TickLength:           time.Second * 3,
-			TickBaseDamage:       1236 / 6,
-			TickSpellCoefficient: 0.183,
-			DebuffID:             ShadowWordPainDebuffID,
+			NumberOfTicks:  6,
+			TickLength:     time.Second * 3,
+			TickBaseDamage: core.DotSnapshotFuncMagic(1236/6, 0.183),
+			DebuffID:       ShadowWordPainDebuffID,
 		},
 	}
 

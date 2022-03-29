@@ -26,24 +26,24 @@ func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleS
 				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskRangedSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskRangedSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 			DotInput: core.DotDamageInput{
-				NumberOfTicks:  5,
-				TickLength:     time.Second * 3,
-				TickBaseDamage: 0, // Calculated on application
-				DebuffID:       SerpentStingDebuffID,
+				NumberOfTicks: 5,
+				TickLength:    time.Second * 3,
+				TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+					attackPower := hitEffect.RangedAttackPower(spellCast) + hitEffect.RangedAttackPowerOnTarget()
+					return 132 + attackPower*0.02
+				},
+				DebuffID: SerpentStingDebuffID,
 			},
 		},
 	}
 
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
-	ama.Effect.StaticDamageMultiplier *= 1 + 0.06*float64(hunter.Talents.ImprovedStings)
+	ama.Effect.DamageMultiplier *= 1 + 0.06*float64(hunter.Talents.ImprovedStings)
 
 	return core.NewSimpleSpellTemplate(ama)
 }
@@ -54,8 +54,6 @@ func (hunter *Hunter) NewSerpentSting(sim *core.Simulation, target *core.Target)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	ss.Effect.Target = target
-	// TODO: This should probably include AP from mark of the champion / elixir of demonslaying / target debuffs
-	ss.Effect.DotInput.TickBaseDamage = 132 + hunter.GetStat(stats.RangedAttackPower)*0.02
 
 	ss.Init(sim)
 	return ss

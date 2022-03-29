@@ -6,7 +6,7 @@ import (
 
 func (priest *Priest) ApplyMisery(sim *core.Simulation, target *core.Target) {
 	if priest.Talents.Misery >= target.NumStacks(core.MiseryDebuffID) {
-		target.ReplaceAura(sim, core.MiseryAura(sim, priest.Talents.Misery))
+		target.AddAura(sim, core.MiseryAura(target, priest.Talents.Misery))
 	}
 }
 
@@ -26,7 +26,7 @@ func (priest *Priest) ApplyShadowWeaving(sim *core.Simulation, target *core.Targ
 		priest.Log(sim, "Applied Shadow Weaving stack, %d --> %d", curStacks, newStacks)
 	}
 
-	target.ReplaceAura(sim, core.ShadowWeavingAura(sim, newStacks))
+	target.AddAura(sim, core.ShadowWeavingAura(target, newStacks))
 }
 
 var ShadowWeaverAuraID = core.NewAuraID()

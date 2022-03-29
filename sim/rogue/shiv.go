@@ -26,14 +26,10 @@ func (rogue *Rogue) newShivTemplate(_ *core.Simulation) core.SimpleSpellTemplate
 			}
 		}
 	}
-	ability.Effect.WeaponInput = core.WeaponDamageInput{
-		Normalized:       true,
-		Offhand:          true,
-		DamageMultiplier: 1 + 0.1*float64(rogue.Talents.DualWieldSpecialization),
-	}
+	ability.Effect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.OffHand, true, 0, 1+0.1*float64(rogue.Talents.DualWieldSpecialization), true)
 
 	if rogue.Talents.SurpriseAttacks {
-		ability.Effect.StaticDamageMultiplier += 0.1
+		ability.Effect.DamageMultiplier += 0.1
 	}
 
 	return core.NewSimpleSpellTemplate(ability)

@@ -32,17 +32,10 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    305,
-				MaxBaseDamage:    361,
-				SpellCoefficient: 1.5 / 3.5,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+			BaseDamage:       core.BaseDamageConfigMagic(305, 361, 1.5/3.5),
 		},
 	}
 
@@ -52,7 +45,7 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Incineration) * 2 * core.SpellCritRatingPerCritChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
-	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+	spell.Effect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
 	if mage.Talents.ImprovedScorch > 0 {
 		procChance := float64(mage.Talents.ImprovedScorch) / 3.0
@@ -71,7 +64,7 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 			}
 
 			newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.ImprovedScorchDebuffID)+1)
-			spellEffect.Target.ReplaceAura(sim, core.ImprovedScorchAura(sim, newNumStacks))
+			spellEffect.Target.AddAura(sim, core.ImprovedScorchAura(spellEffect.Target, newNumStacks))
 		}
 	}
 

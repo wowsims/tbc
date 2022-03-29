@@ -1,7 +1,6 @@
 package rogue
 
 import (
-	"github.com/wowsims/tbc/sim/core/stats"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -26,13 +25,18 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 		}
 	}
 	ability.Effect.DotInput = core.DotDamageInput{
-		NumberOfTicks:  0, // Set dynamically.
-		TickLength:     time.Second * 2,
-		TickBaseDamage: 0, // Set dynamically.
-		DebuffID:       RuptureDebuffID,
+		NumberOfTicks: 0, // Set dynamically.
+		TickLength:    time.Second * 2,
+		TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+			comboPoints := rogue.ComboPoints()
+			attackPower := hitEffect.MeleeAttackPower(spellCast) + hitEffect.MeleeAttackPowerOnTarget()
+
+			return 70 + float64(comboPoints)*11 + attackPower*[]float64{0.01, 0.02, 0.03, 0.03, 0.03}[comboPoints-1]
+		},
+		DebuffID: RuptureDebuffID,
 	}
 
-	ability.Effect.StaticDamageMultiplier += 0.1 * float64(rogue.Talents.SerratedBlades)
+	ability.Effect.DamageMultiplier += 0.1 * float64(rogue.Talents.SerratedBlades)
 	if rogue.Talents.SurpriseAttacks {
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}
@@ -53,8 +57,6 @@ func (rogue *Rogue) NewRupture(sim *core.Simulation, target *core.Target) *core.
 	rp.ActionID.Tag = comboPoints
 	rp.Effect.Target = target
 	rp.Effect.DotInput.NumberOfTicks = int(comboPoints) + 3
-	// TODO: this is missing BonusAttackPower for snapshotting
-	rp.Effect.DotInput.TickBaseDamage = 70 + float64(comboPoints)*11 + rogue.GetStat(stats.AttackPower)*[]float64{0.01, 0.02, 0.03, 0.03, 0.03}[comboPoints-1]
 
 	if rogue.deathmantle4pcProc {
 		rp.Cost.Value = 0

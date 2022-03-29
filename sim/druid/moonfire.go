@@ -31,30 +31,22 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
-		DirectInput: core.DirectDamageInput{
-			MinBaseDamage:    305,
-			MaxBaseDamage:    357,
-			SpellCoefficient: 0.15,
-		},
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+		BaseDamage:       core.BaseDamageConfigMagic(305, 357, 0.15),
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        4,
-			TickLength:           time.Second * 3,
-			TickBaseDamage:       600 / 4,
-			TickSpellCoefficient: 0.13,
-			DebuffID:             MoonfireDebuffID,
+			NumberOfTicks:  4,
+			TickLength:     time.Second * 3,
+			TickBaseDamage: core.DotSnapshotFuncMagic(600/4, 0.13),
+			DebuffID:       MoonfireDebuffID,
 		},
 	}
 
 	baseCast.Cost.Value -= baseCast.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
 
-	effect.StaticDamageMultiplier *= 1 + 0.05*float64(druid.Talents.ImprovedMoonfire)
-	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
+	effect.DamageMultiplier *= 1 + 0.05*float64(druid.Talents.ImprovedMoonfire)
+	effect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
 	effect.BonusSpellCritRating += float64(druid.Talents.ImprovedMoonfire) * 5 * core.SpellCritRatingPerCritChance
 	if ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 2) { // Thunderheart 2p adds 1 extra tick to moonfire
 		effect.DotInput.NumberOfTicks += 1

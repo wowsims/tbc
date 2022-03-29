@@ -24,38 +24,20 @@ func (paladin *Paladin) applyConviction() {
 	paladin.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*float64(paladin.Talents.Conviction))
 }
 
-var CrusadeAuraID = core.NewAuraID()
-
-// Maybe don't make this an aura but we'll do it for now
 func (paladin *Paladin) applyCrusade() {
 	if paladin.Talents.Crusade == 0 {
 		return
 	}
 
-	paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: CrusadeAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				target := spellEffect.Target
+	damageMultiplier := 1 + (0.01 * float64(paladin.Talents.Crusade)) // assume multiplicative scaling
 
-				if target.MobType == proto.MobType_MobTypeDemon || target.MobType == proto.MobType_MobTypeHumanoid ||
-					target.MobType == proto.MobType_MobTypeUndead || target.MobType == proto.MobType_MobTypeElemental {
-					spellEffect.DamageMultiplier *= 1 + (0.01 * float64(paladin.Talents.Crusade)) // assume multiplicative scaling
-				}
-			},
-			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				target := spellEffect.Target
-
-				if target.MobType == proto.MobType_MobTypeDemon || target.MobType == proto.MobType_MobTypeHumanoid ||
-					target.MobType == proto.MobType_MobTypeUndead || target.MobType == proto.MobType_MobTypeElemental {
-					*tickDamage *= 1 + (0.01 * float64(paladin.Talents.Crusade))
-				}
-			},
+	paladin.RegisterResetEffect(func(sim *core.Simulation) {
+		switch sim.GetPrimaryTarget().MobType {
+		case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeDemon, proto.MobType_MobTypeUndead, proto.MobType_MobTypeElemental:
+			paladin.PseudoStats.DamageDealtMultiplier *= damageMultiplier
 		}
 	})
 }
-
-var TwoHandedWeaponSpecializationAuraID = core.NewAuraID()
 
 // Affects all physical damage or spells that can be rolled as physical
 // It affects white, Windfury, Crusader Strike, Seals, and Judgement of Command / Blood
@@ -65,16 +47,8 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
 	}
 
 	if paladin.GetMHWeapon().HandType == proto.HandType_HandTypeTwoHand {
-		paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-			return core.Aura{
-				ID: TwoHandedWeaponSpecializationAuraID,
-				OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-					if spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryPhysical) {
-						spellEffect.StaticDamageMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization)) // assume multiplicative scaling
-					}
-				},
-			}
-		})
+		paladin.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization)) // assume multiplicative scaling
+		// TODO: Might need to additionally apply this to non-physical spells directly.
 	}
 }
 
@@ -86,17 +60,16 @@ func (paladin *Paladin) applySanctityAura() {
 	}
 
 	paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.ImprovedSanctityAura(sim, float64(paladin.Talents.ImprovedSanctityAura))
+		return core.ImprovedSanctityAura(&paladin.Character, float64(paladin.Talents.ImprovedSanctityAura))
 	})
 
 }
 
 var VengeanceAuraID = core.NewAuraID()
+var VengeanceProcAuraID = core.NewAuraID()
 var VengeanceActionID = core.ActionID{SpellID: 20059}
 
 const VengeanceDuration = time.Second * 30
-
-var VengeancePermAuraID = core.NewAuraID()
 
 // I don't know if the new stack of vengeance applies to the crit that triggered it or not
 // Need to check this
@@ -105,31 +78,31 @@ func (paladin *Paladin) applyVengeance() {
 		return
 	}
 
-	vng := core.Aura{
-		ID:       VengeanceAuraID,
-		ActionID: VengeanceActionID,
-		Duration: VengeanceDuration,
-		Stacks:   0,
+	multiplierPerStack := 1 + (0.01 * float64(paladin.Talents.Vengeance))
+
+	makeProcAura := func(numStacks int32) core.Aura {
+		multiplier := multiplierPerStack * float64(numStacks)
+		return core.Aura{
+			ID:       VengeanceProcAuraID,
+			ActionID: VengeanceActionID,
+			Duration: VengeanceDuration,
+			Stacks:   numStacks,
+			OnGain: func(sim *core.Simulation) {
+				paladin.PseudoStats.DamageDealtMultiplier *= multiplier
+			},
+			OnExpire: func(sim *core.Simulation) {
+				paladin.PseudoStats.DamageDealtMultiplier /= multiplier
+			},
+		}
 	}
 
-	// Maybe a better way to do this than a perm aura that applies the buff and then increases damage based on it?
 	paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
-			ID: VengeancePermAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if spellCast.SpellSchool.Matches(core.SpellSchoolHoly | core.SpellSchoolPhysical) {
-					spellEffect.DamageMultiplier *= 1 + (0.01*float64(paladin.Talents.Vengeance))*float64(paladin.NumStacks(VengeanceAuraID))
-				}
-			},
-			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				if spellCast.SpellSchool.Matches(core.SpellSchoolHoly | core.SpellSchoolPhysical) {
-					*tickDamage *= 1 + (0.01*float64(paladin.Talents.Vengeance))*float64(paladin.NumStacks(VengeanceAuraID))
-				}
-			},
+			ID: VengeanceAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					vng.Stacks = core.MinInt32(3, paladin.NumStacks(VengeanceAuraID)+1)
-					paladin.ReplaceAura(sim, vng)
+					newStacks := core.MinInt32(3, paladin.NumStacks(VengeanceAuraID)+1)
+					paladin.AddAura(sim, makeProcAura(newStacks))
 				}
 			},
 		}

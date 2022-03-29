@@ -39,23 +39,21 @@ func (warrior *Warrior) newBloodthirstTemplate(_ *core.Simulation) core.SimpleSp
 				CritMultiplier: warrior.critMultiplier(true),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			WeaponInput: core.WeaponDamageInput{
-				CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
-					return attackPower * 0.45
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage: core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+					return hitEffect.MeleeAttackPower(spellCast) * 0.45
 				},
+				TargetSpellCoefficient: 0, // Doesn't scale with +damage on target?
 			},
 		},
 	}
 
 	if ItemSetOnslaughtBattlegear.CharacterHasSetBonus(&warrior.Character, 4) {
-		ability.Effect.SpellEffect.StaticDamageMultiplier *= 1.05
+		ability.Effect.DamageMultiplier *= 1.05
 	}
 
 	refundAmount := warrior.bloodthirstCost * 0.8
@@ -75,7 +73,7 @@ func (warrior *Warrior) NewBloodthirst(_ *core.Simulation, target *core.Target) 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	bt.Effect.Target = target
 	if warrior.StanceMatches(DefensiveStance) {
-		bt.Effect.SpellEffect.ThreatMultiplier *= 1 + 0.21*float64(warrior.Talents.TacticalMastery)
+		bt.Effect.ThreatMultiplier *= 1 + 0.21*float64(warrior.Talents.TacticalMastery)
 	}
 
 	return bt

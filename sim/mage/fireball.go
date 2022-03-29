@@ -36,24 +36,17 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						return
-					}
-					fireballDot := mage.newFireballDot(sim, spellEffect.Target)
-					fireballDot.Cast(sim)
-				},
+		Effect: core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+				fireballDot := mage.newFireballDot(sim, spellEffect.Target)
+				fireballDot.Cast(sim)
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    649,
-				MaxBaseDamage:    821,
-				SpellCoefficient: 1.0,
-			},
+			BaseDamage: core.BaseDamageConfigMagic(649, 821, 1.0+0.03*float64(mage.Talents.EmpoweredFireball)),
 		},
 	}
 
@@ -63,11 +56,10 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
-	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
-	spell.Effect.DirectInput.SpellCoefficient += 0.03 * float64(mage.Talents.EmpoweredFireball)
+	spell.Effect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
-		spell.Effect.StaticDamageMultiplier *= 1.05
+		spell.Effect.DamageMultiplier *= 1.05
 	}
 
 	return core.NewSimpleSpellTemplate(spell)
@@ -89,25 +81,21 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 				SpellExtras:      SpellFlagMage,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: mage.spellDamageMultiplier,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier,
 			DotInput: core.DotDamageInput{
-				NumberOfTicks:        4,
-				TickLength:           time.Second * 2,
-				TickBaseDamage:       84 / 4,
-				TickSpellCoefficient: 0,
-				DebuffID:             FireballDotDebuffID,
+				NumberOfTicks:  4,
+				TickLength:     time.Second * 2,
+				TickBaseDamage: core.DotSnapshotFuncMagic(84/4, 0),
+				DebuffID:       FireballDotDebuffID,
 			},
 		},
 	}
 
-	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+	spell.Effect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
-		spell.Effect.StaticDamageMultiplier *= 1.05
+		spell.Effect.DamageMultiplier *= 1.05
 	}
 
 	return core.NewSimpleSpellTemplate(spell)

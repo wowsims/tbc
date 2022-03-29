@@ -44,24 +44,22 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpel
 		ama.Cost.Value -= 275.0 * 0.1
 	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			ProcMask:               core.ProcMaskRangedSpecial,
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				hunter.rotation(sim, false)
-			},
-		},
-		WeaponInput: core.WeaponDamageInput{
-			CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
-				return attackPower*0.2 +
-					hunter.AmmoDamageBonus +
+	baseEffect := core.SpellEffect{
+		ProcMask:         core.ProcMaskRangedSpecial,
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+		BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
+			Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+				return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
 					hunter.AutoAttacks.Ranged.BaseDamage(sim) +
-					bonusWeaponDamage +
+					hunter.AmmoDamageBonus +
+					hitEffect.BonusWeaponDamage(spellCast) +
 					205
 			},
+			TargetSpellCoefficient: 1,
+		}),
+		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			hunter.rotation(sim, false)
 		},
 	}
 
@@ -69,7 +67,7 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpel
 	baseEffect.BonusCritRating += float64(hunter.Talents.ImprovedBarrage) * 4 * core.MeleeCritRatingPerCritChance
 
 	numHits := core.MinInt32(3, sim.GetNumTargets())
-	effects := make([]core.SpellHitEffect, 0, numHits)
+	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)

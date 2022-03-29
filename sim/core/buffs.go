@@ -42,9 +42,8 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 
 	if partyBuffs.FerociousInspiration > 0 {
-		character.AddPermanentAura(func(sim *Simulation) Aura {
-			return FerociousInspirationAura(partyBuffs.FerociousInspiration)
-		})
+		multiplier := math.Pow(1.03, float64(partyBuffs.FerociousInspiration))
+		character.PseudoStats.DamageDealtMultiplier *= multiplier
 	}
 
 	if partyBuffs.DraeneiRacialMelee {
@@ -112,11 +111,11 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 
 	if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectImproved {
 		character.AddPermanentAura(func(sim *Simulation) Aura {
-			return ImprovedSanctityAura(sim, 2)
+			return ImprovedSanctityAura(character, 2)
 		})
 	} else if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectRegular {
 		character.AddPermanentAura(func(sim *Simulation) Aura {
-			return ImprovedSanctityAura(sim, 0)
+			return ImprovedSanctityAura(character, 0)
 		})
 	}
 
@@ -283,42 +282,19 @@ func SnapshotBattleShoutAura(character *Character, snapshotAp float64) AuraFacto
 	}
 }
 
-var FerociousInspirationAuraID = NewAuraID()
-
-func FerociousInspirationAura(numBMHunters int32) Aura {
-	multiplier := math.Pow(1.03, float64(numBMHunters))
-	return Aura{
-		ID:       FerociousInspirationAuraID,
-		ActionID: ActionID{SpellID: 34460, Tag: -1},
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-			spellEffect.DamageMultiplier *= multiplier
-		},
-		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			*tickDamage *= multiplier
-		},
-	}
-}
-
 var ImprovedSanctityAuraID = NewAuraID()
 
-func ImprovedSanctityAura(sim *Simulation, level float64) Aura {
+func ImprovedSanctityAura(character *Character, level float64) Aura {
 	return Aura{
 		ID:       ImprovedSanctityAuraID,
 		ActionID: ActionID{SpellID: 31870},
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-			// unsure if this scaling should be additive or multiplicative
-			// scale 10% for holy damange
-			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
-				spellEffect.DamageMultiplier *= 1.1
-			}
-			// scale additional 2% for all damage
-			spellEffect.DamageMultiplier *= 1 + 0.01*level
+		OnGain: func(sim *Simulation) {
+			character.PseudoStats.HolyDamageDealtMultiplier *= 1.1
+			character.PseudoStats.DamageDealtMultiplier *= 1 + 0.01*level
 		},
-		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
-				*tickDamage *= 1.1
-			}
-			*tickDamage *= 1 + 0.01*level
+		OnExpire: func(sim *Simulation) {
+			character.PseudoStats.HolyDamageDealtMultiplier /= 1.1
+			character.PseudoStats.DamageDealtMultiplier /= 1 + 0.01*level
 		},
 	}
 }

@@ -41,28 +41,23 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		},
 	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1.0,
-			StaticDamageMultiplier: 1.0,
-			ThreatMultiplier:       1.0,
-			BonusAttackPower:       apBonus,
-		},
-		WeaponInput: core.WeaponDamageInput{
-			DamageMultiplier: 1.0,
-		},
-	}
-	if shaman.Talents.ElementalWeapons > 0 {
-		baseEffect.WeaponInput.DamageMultiplier *= 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
+	baseEffect := core.SpellEffect{
+		DamageMultiplier: 1.0,
+		ThreatMultiplier: 1.0,
+		BonusAttackPower: apBonus,
 	}
 	if shaman.Talents.SpiritWeapons {
 		baseEffect.ThreatMultiplier *= 0.7
 	}
 
-	wftempl.Effects = []core.SpellHitEffect{
+	wftempl.Effects = []core.SpellEffect{
 		baseEffect,
 		baseEffect,
 	}
+
+	weaponDamageMultiplier := 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
+	mhBaseDamage := core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, weaponDamageMultiplier, true)
+	ohBaseDamage := core.BaseDamageConfigMeleeWeapon(core.OffHand, false, 0, weaponDamageMultiplier, true)
 
 	wfTemplate := core.NewSimpleSpellTemplate(wftempl)
 
@@ -104,12 +99,12 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 					wfAtk.Effects[i].Target = spellEffect.Target
 					wfAtk.Effects[i].ProcMask = attackProc
 					if isMHHit {
-						wfAtk.Effects[i].WeaponInput.Offhand = false
+						wfAtk.Effects[i].BaseDamage = mhBaseDamage
 					} else {
-						wfAtk.Effects[i].WeaponInput.Offhand = true
 						// For whatever reason, OH penalty does not apply to the bonus AP from WF OH
 						// hits. Implement this by doubling the AP bonus we provide.
 						wfAtk.Effects[i].BonusAttackPower += apBonus
+						wfAtk.Effects[i].BaseDamage = ohBaseDamage
 					}
 				}
 				wfAtk.Cast(sim)
@@ -137,31 +132,23 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				SpellCoefficient: 0.1,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 	}
-	ftTmpl.Effect.StaticDamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
+	ftTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
 
 	mhTmpl := ftTmpl
 	ohTmpl := ftTmpl
 
 	if weapon := shaman.GetMHWeapon(); weapon != nil {
 		baseDamage := weapon.SwingSpeed * 35.0
-		mhTmpl.Effect.DirectInput.MinBaseDamage = baseDamage
-		mhTmpl.Effect.DirectInput.MaxBaseDamage = baseDamage
+		mhTmpl.Effect.BaseDamage = core.BaseDamageConfigMagic(baseDamage, baseDamage, 0.1)
 	}
 	if weapon := shaman.GetOHWeapon(); weapon != nil {
 		baseDamage := weapon.SwingSpeed * 35.0
-		ohTmpl.Effect.DirectInput.MinBaseDamage = baseDamage
-		ohTmpl.Effect.DirectInput.MaxBaseDamage = baseDamage
+		ohTmpl.Effect.BaseDamage = core.BaseDamageConfigMagic(baseDamage, baseDamage, 0.1)
 	}
 
 	mhTemplate := core.NewSimpleSpellTemplate(mhTmpl)
@@ -213,20 +200,13 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    246,
-				MaxBaseDamage:    246,
-				SpellCoefficient: 0.1,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagic(246, 246, 0.1),
 		},
 	}
-	fbTmpl.Effect.StaticDamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
+	fbTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
 
 	fbTemplate := core.NewSimpleSpellTemplate(fbTmpl)
 	fbSpell := core.SimpleSpell{}

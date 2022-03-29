@@ -25,38 +25,27 @@ func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemp
 				SpellExtras:         core.SpellExtrasAlwaysHits,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				BonusCritRating:        bonusCritRating,
-			},
-			WeaponInput: core.WeaponDamageInput{
-				Normalized:       true,
-				FlatDamageBonus:  101,
-				DamageMultiplier: 1,
-			},
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BonusCritRating:  bonusCritRating,
+			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 101, 1, true),
 		},
 	}
 
 	// cp. backstab
-	mhDamageAbility.Effect.StaticDamageMultiplier += 0.04 * float64(rogue.Talents.Opportunity)
+	mhDamageAbility.Effect.DamageMultiplier += 0.04 * float64(rogue.Talents.Opportunity)
 
 	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
-		mhDamageAbility.Effect.StaticDamageMultiplier += 0.06
+		mhDamageAbility.Effect.DamageMultiplier += 0.06
 	}
 
 	ohDamageAbility := mhDamageAbility
 	ohDamageAbility.SpellCast.Cast.ActionID = MutilateOHActionID
 	ohDamageAbility.SpellCast.Cast.CritMultiplier = rogue.critMultiplier(false, true)
-	ohDamageAbility.Effect.SpellEffect.ProcMask = core.ProcMaskMeleeOHSpecial
-	ohDamageAbility.Effect.WeaponInput.Offhand = true
-
-	if rogue.Talents.DualWieldSpecialization > 0 {
-		ohDamageAbility.Effect.WeaponInput.DamageMultiplier *= 1 + 0.1*float64(rogue.Talents.DualWieldSpecialization)
-	}
+	ohDamageAbility.Effect.ProcMask = core.ProcMaskMeleeOHSpecial
+	ohDamageAbility.Effect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.OffHand, true, 101, 1+0.1*float64(rogue.Talents.DualWieldSpecialization), true)
 
 	mhTemplate := core.NewSimpleSpellTemplate(mhDamageAbility)
 	ohTemplate := core.NewSimpleSpellTemplate(ohDamageAbility)
@@ -92,7 +81,7 @@ func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemp
 		ohAtk.Cast(sim)
 
 		// applyResultsToCast() has already been done here, so we have to update the spell statistics, too
-		if mhAtk.Effect.Outcome == core.OutcomeCrit || ohAtk.Effect.Outcome == core.OutcomeCrit {
+		if mhAtk.Effect.Outcome.Matches(core.OutcomeCrit) || ohAtk.Effect.Outcome.Matches(core.OutcomeCrit) {
 			spellEffect.Outcome = core.OutcomeCrit
 			spellCast.Hits--
 			spellCast.Crits++

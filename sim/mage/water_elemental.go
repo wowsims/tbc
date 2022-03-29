@@ -185,17 +185,10 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 				CritMultiplier: we.DefaultSpellCritMultiplier(),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    256,
-				MaxBaseDamage:    328,
-				SpellCoefficient: 3.0 / 3.5,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagic(256, 328, 3.0/3.5),
 		},
 	}
 

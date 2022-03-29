@@ -41,26 +41,19 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeOrRangedSpecial,
-				DamageMultiplier:       1, // Need to review to make sure I set these properly
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
-					paladin.RemoveAura(sim, SealOfBloodAuraID)
-					paladin.currentSealID = 0
-					paladin.currentSealExpires = 0
-					if loaIsEquipped {
-						loaAura(sim)
-					}
-				},
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    295,
-				MaxBaseDamage:    325,
-				SpellCoefficient: 0.429,
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeOrRangedSpecial,
+			DamageMultiplier: 1, // Need to review to make sure I set these properly
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagic(295, 325, 0.429),
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
+				paladin.RemoveAura(sim, SealOfBloodAuraID)
+				paladin.currentSealID = 0
+				paladin.currentSealExpires = 0
+				if loaIsEquipped {
+					loaAura(sim)
+				}
 			},
 		},
 	}
@@ -125,17 +118,15 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 				},
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						return
-					}
-					aura := core.JudgementOfTheCrusaderAura(sim, float64(paladin.Talents.ImprovedSealOfTheCrusader))
-					spellEffect.Target.AddAura(sim, aura)
-					paladin.currentJudgementID = aura.ID
-					paladin.currentJudgementExpires = sim.CurrentTime + JudgementDuration
-				},
+		Effect: core.SpellEffect{
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+				aura := core.JudgementOfTheCrusaderAura(spellEffect.Target, float64(paladin.Talents.ImprovedSealOfTheCrusader))
+				spellEffect.Target.AddAura(sim, aura)
+				paladin.currentJudgementID = aura.ID
+				paladin.currentJudgementExpires = sim.CurrentTime + JudgementDuration
 			},
 		},
 	}
@@ -197,17 +188,15 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 				},
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						return
-					}
-					aura := core.JudgementOfWisdomAura(sim)
-					spellEffect.Target.AddAura(sim, aura)
-					paladin.currentJudgementID = aura.ID
-					paladin.currentJudgementExpires = sim.CurrentTime + JudgementDuration
-				},
+		Effect: core.SpellEffect{
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+				aura := core.JudgementOfWisdomAura()
+				spellEffect.Target.AddAura(sim, aura)
+				paladin.currentJudgementID = aura.ID
+				paladin.currentJudgementExpires = sim.CurrentTime + JudgementDuration
 			},
 		},
 	}

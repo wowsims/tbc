@@ -103,7 +103,7 @@ func (priest *Priest) applySurgeOfLight(spellCast *core.SpellCast) {
 	}
 }
 
-func (priest *Priest) applyTalentsToHolySpell(cast *core.Cast, effect *core.SpellHitEffect) {
+func (priest *Priest) applyTalentsToHolySpell(cast *core.Cast, effect *core.SpellEffect) {
 	effect.ThreatMultiplier *= 1 - 0.04*float64(priest.Talents.SilentResolve)
 	if cast.ActionID.SpellID == SpellIDSmite || cast.ActionID.SpellID == SpellIDHolyFire {
 		effect.BonusSpellCritRating += float64(priest.Talents.HolySpecialization) * 1 * core.SpellCritRatingPerCritChance
@@ -112,7 +112,7 @@ func (priest *Priest) applyTalentsToHolySpell(cast *core.Cast, effect *core.Spel
 	effect.BonusSpellCritRating += float64(priest.Talents.ForceOfWill) * 1 * core.SpellCritRatingPerCritChance
 }
 
-func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellHitEffect) {
+func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellEffect) {
 	effect.ThreatMultiplier *= 1 - 0.08*float64(priest.Talents.ShadowAffinity)
 	if cast.ActionID.SpellID == SpellIDShadowWordDeath || cast.ActionID.SpellID == SpellIDMindBlast {
 		effect.BonusSpellCritRating += float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance
@@ -121,10 +121,10 @@ func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.Sp
 		cast.Cost.Value -= cast.BaseCost.Value * float64(priest.Talents.FocusedMind) * 0.05
 	}
 	if cast.SpellSchool == core.SpellSchoolShadow {
-		effect.StaticDamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
+		effect.DamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
 
 		if priest.Talents.Shadowform {
-			effect.StaticDamageMultiplier *= 1.15
+			effect.DamageMultiplier *= 1.15
 		}
 
 		// shadow focus gives 2% hit per level
@@ -142,24 +142,26 @@ func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.Sp
 var InnerFocusAuraID = core.NewAuraID()
 var InnerFocusCooldownID = core.NewCooldownID()
 
-func ApplyInnerFocus(sim *core.Simulation, priest *Priest) bool {
+func (priest *Priest) ApplyInnerFocus(sim *core.Simulation) {
 	actionID := core.ActionID{SpellID: 14751}
 	priest.Metrics.AddInstantCast(actionID)
 	priest.Character.AddAura(sim, core.Aura{
 		ID:       InnerFocusAuraID,
 		ActionID: actionID,
 		Duration: core.NeverExpires,
+		OnGain: func(sim *core.Simulation) {
+			priest.AddStat(stats.SpellCrit, 25*core.SpellCritRatingPerCritChance)
+		},
+		OnExpire: func(sim *core.Simulation) {
+			priest.AddStat(stats.SpellCrit, -25*core.SpellCritRatingPerCritChance)
+		},
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
 			cast.Cost.Value = 0
 		},
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			spellEffect.BonusSpellCritRating += 25 * core.SpellCritRatingPerCritChance
-		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 			// Remove the buff and put skill on CD
 			priest.SetCD(InnerFocusCooldownID, sim.CurrentTime+time.Minute*3)
 			priest.RemoveAura(sim, InnerFocusAuraID)
 		},
 	})
-	return true
 }

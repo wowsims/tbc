@@ -37,17 +37,10 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    664,
-				MaxBaseDamage:    786,
-				SpellCoefficient: 1.5 / 3.5,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+			BaseDamage:       core.BaseDamageConfigMagic(664, 786, 1.5/3.5),
 		},
 	}
 
@@ -57,7 +50,7 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
-	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+	spell.Effect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
 	return core.NewSimpleSpellTemplate(spell)
 }

@@ -35,26 +35,19 @@ func (priest *Priest) newSmiteTemplate(sim *core.Simulation) core.SimpleSpellTem
 		CritMultiplier: priest.DefaultSpellCritMultiplier(),
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
-		DirectInput: core.DirectDamageInput{
-			MinBaseDamage:    549,
-			MaxBaseDamage:    616,
-			SpellCoefficient: 0.7143,
-		},
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+		BaseDamage:       core.BaseDamageConfigMagic(549, 616, 0.7143),
 	}
 
 	priest.applyTalentsToHolySpell(&baseCast, &effect)
 
 	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(priest.Talents.DivineFury)
 
-	effect.StaticDamageMultiplier *= (1 + (0.05 * float64(priest.Talents.SearingLight)))
+	effect.DamageMultiplier *= (1 + (0.05 * float64(priest.Talents.SearingLight)))
 
-	effect.BonusHitRating += float64(priest.Talents.FocusedPower) * 2 * core.SpellHitRatingPerHitChance // 2% crit per point
+	effect.BonusSpellHitRating += float64(priest.Talents.FocusedPower) * 2 * core.SpellHitRatingPerHitChance // 2% crit per point
 
 	effect.OnSpellHit = priest.applyOnHitTalents
 

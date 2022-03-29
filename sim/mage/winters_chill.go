@@ -19,9 +19,7 @@ func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpell
 				SpellExtras:         SpellFlagMage,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{},
-		},
+		Effect: core.SpellEffect{},
 	}
 
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
@@ -37,7 +35,7 @@ func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpell
 		}
 
 		newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.WintersChillDebuffID)+1)
-		spellEffect.Target.ReplaceAura(sim, core.WintersChillAura(sim, newNumStacks))
+		spellEffect.Target.AddAura(sim, core.WintersChillAura(spellEffect.Target, newNumStacks))
 	}
 
 	return core.NewSimpleSpellTemplate(spell)

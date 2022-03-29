@@ -30,18 +30,14 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpel
 		GCD: core.GCDDefault,
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        6,
-			TickLength:           time.Second * 2,
-			TickBaseDamage:       792 / 6,
-			TickSpellCoefficient: 0.127,
-			DebuffID:             InsectSwarmDebuffID,
+			NumberOfTicks:  6,
+			TickLength:     time.Second * 2,
+			TickBaseDamage: core.DotSnapshotFuncMagic(792/6, 0.127),
+			DebuffID:       InsectSwarmDebuffID,
 		},
 	}
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{

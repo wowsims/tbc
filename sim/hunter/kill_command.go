@@ -48,10 +48,8 @@ func (hunter *Hunter) newKillCommandTemplate(sim *core.Simulation) core.SimpleSp
 				Cooldown: time.Second * 5,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ThreatMultiplier: 1,
-			},
+		Effect: core.SpellEffect{
+			ThreatMultiplier: 1,
 		},
 	}
 
@@ -73,21 +71,15 @@ func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.SimpleSpe
 				CritMultiplier:      2,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if hasBeastLord4Pc {
-						beastLordStatApplier(sim)
-					}
-				},
-			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 1,
-				FlatDamageBonus:  127,
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 127, 1, true),
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if hasBeastLord4Pc {
+					beastLordStatApplier(sim)
+				}
 			},
 		},
 	}

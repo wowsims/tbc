@@ -35,29 +35,25 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 		AOECap: 3620,
 	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier:       1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
-		},
+	baseEffect := core.SpellEffect{
+		DamageMultiplier: mage.spellDamageMultiplier,
+		ThreatMultiplier: 1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        8,
-			TickLength:           time.Second * 1,
-			TickBaseDamage:       184,
-			TickSpellCoefficient: 0.119,
-			AffectedByCastSpeed:  true,
+			NumberOfTicks:       8,
+			TickLength:          time.Second * 1,
+			TickBaseDamage:      core.DotSnapshotFuncMagic(184, 0.119),
+			AffectedByCastSpeed: true,
 		},
 	}
 
 	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.FrostChanneling) * 0.05
 	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
 	baseEffect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-	baseEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.PiercingIce)
-	baseEffect.StaticDamageMultiplier *= 1 + 0.01*float64(mage.Talents.ArcticWinds)
+	baseEffect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.PiercingIce)
+	baseEffect.DamageMultiplier *= 1 + 0.01*float64(mage.Talents.ArcticWinds)
 
 	numHits := sim.GetNumTargets()
-	effects := make([]core.SpellHitEffect, 0, numHits)
+	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)

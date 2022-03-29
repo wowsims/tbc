@@ -22,7 +22,6 @@ func (rogue *Rogue) ApplyTalents() {
 	rogue.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(rogue.Talents.Malice))
 	rogue.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*1*float64(rogue.Talents.Precision))
 	rogue.AddStat(stats.Expertise, core.ExpertisePerQuarterPercentReduction*5*float64(rogue.Talents.WeaponExpertise))
-	rogue.AutoAttacks.OHAuto.Effect.WeaponInput.DamageMultiplier *= 1.0 + 0.1*float64(rogue.Talents.DualWieldSpecialization)
 	rogue.AddStat(stats.ArmorPenetration, 186*float64(rogue.Talents.SerratedBlades))
 
 	if rogue.Talents.Vitality > 0 {
@@ -83,11 +82,11 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim 
 		ID:       FindWeaknessAuraID,
 		ActionID: core.ActionID{SpellID: 31242},
 		Duration: time.Second * 10,
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			// TODO: This should be rogue abilities only, not all specials.
-			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
-				spellEffect.DamageMultiplier *= findWeaknessMultiplier
-			}
+		OnGain: func(sim *core.Simulation) {
+			rogue.PseudoStats.AgentReserved1DamageDealtMultiplier *= findWeaknessMultiplier
+		},
+		OnExpire: func(sim *core.Simulation) {
+			rogue.PseudoStats.AgentReserved1DamageDealtMultiplier /= findWeaknessMultiplier
 		},
 	}
 
@@ -111,8 +110,6 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim 
 	}
 }
 
-var MurderAuraID = core.NewAuraID()
-
 func (rogue *Rogue) applyMurder() {
 	if rogue.Talents.Murder == 0 {
 		return
@@ -120,21 +117,10 @@ func (rogue *Rogue) applyMurder() {
 
 	damageMultiplier := 1.0 + 0.01*float64(rogue.Talents.Murder)
 
-	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: MurderAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				switch spellEffect.Target.MobType {
-				case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
-					spellEffect.DamageMultiplier *= damageMultiplier
-				}
-			},
-			OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-				switch spellEffect.Target.MobType {
-				case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
-					*tickDamage *= damageMultiplier
-				}
-			},
+	rogue.RegisterResetEffect(func(sim *core.Simulation) {
+		switch sim.GetPrimaryTarget().MobType {
+		case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
+			rogue.PseudoStats.DamageDealtMultiplier *= damageMultiplier
 		}
 	})
 }
@@ -153,12 +139,14 @@ func (rogue *Rogue) registerColdBloodCD() {
 		ID:       ColdBloodAuraID,
 		ActionID: actionID,
 		Duration: core.NeverExpires,
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			// TODO: This should be rogue abilities only, not all specials.
-			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
-				spellEffect.BonusCritRating += 100 * core.MeleeCritRatingPerCritChance
-				rogue.RemoveAura(sim, ColdBloodAuraID)
-			}
+		OnGain: func(sim *core.Simulation) {
+			rogue.PseudoStats.BonusCritRatingAgentReserved1 += 100 * core.MeleeCritRatingPerCritChance
+		},
+		OnExpire: func(sim *core.Simulation) {
+			rogue.PseudoStats.BonusCritRatingAgentReserved1 -= 100 * core.MeleeCritRatingPerCritChance
+		},
+		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			rogue.RemoveAuraOnNextAdvance(sim, ColdBloodAuraID)
 		},
 	}
 
@@ -225,39 +213,21 @@ func (rogue *Rogue) applySealFate() {
 	})
 }
 
-var DaggerAndFistSpecializationsAuraID = core.NewAuraID()
 var SwordSpecializationAuraID = core.NewAuraID()
 
 func (rogue *Rogue) applyWeaponSpecializations() {
-	mhCritBonus := 0.0
-	ohCritBonus := 0.0
 	if weapon := rogue.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
 		if weapon.WeaponType == proto.WeaponType_WeaponTypeFist {
-			mhCritBonus = 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.FistWeaponSpecialization)
+			rogue.PseudoStats.BonusMHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.FistWeaponSpecialization)
 		} else if weapon.WeaponType == proto.WeaponType_WeaponTypeDagger {
-			mhCritBonus = 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.DaggerSpecialization)
+			rogue.PseudoStats.BonusMHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.DaggerSpecialization)
 		}
 	} else if weapon := rogue.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
 		if weapon.WeaponType == proto.WeaponType_WeaponTypeFist {
-			ohCritBonus = 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.FistWeaponSpecialization)
+			rogue.PseudoStats.BonusOHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.FistWeaponSpecialization)
 		} else if weapon.WeaponType == proto.WeaponType_WeaponTypeDagger {
-			ohCritBonus = 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.DaggerSpecialization)
+			rogue.PseudoStats.BonusOHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.DaggerSpecialization)
 		}
-	}
-
-	if mhCritBonus > 0 || ohCritBonus > 0 {
-		rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-			return core.Aura{
-				ID: DaggerAndFistSpecializationsAuraID,
-				OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-					if spellEffect.ProcMask.Matches(core.ProcMaskMeleeMH) {
-						spellEffect.BonusCritRating += mhCritBonus
-					} else if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOH) {
-						spellEffect.BonusCritRating += ohCritBonus
-					}
-				},
-			}
-		})
 	}
 
 	// https://tbc.wowhead.com/spell=13964/sword-specialization, proc mask = 20.
@@ -363,13 +333,14 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 		Duration: dur,
 		OnGain: func(sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, hasteBonus)
+			if sim.GetNumTargets() > 1 {
+				rogue.PseudoStats.DamageDealtMultiplier *= 2
+			}
 		},
 		OnExpire: func(sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
-		},
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 			if sim.GetNumTargets() > 1 {
-				spellEffect.DamageMultiplier *= 2
+				rogue.PseudoStats.DamageDealtMultiplier /= 2
 			}
 		},
 	}

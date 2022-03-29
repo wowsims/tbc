@@ -18,23 +18,18 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 					SpellID: SpellIDIgnite,
 				},
 				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
+				CritRollCategory:    core.CritRollCategoryNone,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				SpellSchool:         core.SpellSchoolFire,
 				SpellExtras:         SpellFlagMage | core.SpellExtrasBinary | core.SpellExtrasAlwaysHits,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:         2,
 				TickLength:            time.Second * 2,
-				TickBaseDamage:        0, // This is set dynamically
-				TickSpellCoefficient:  0,
 				IgnoreDamageModifiers: true,
 				DebuffID:              IgniteDebuffID,
 			},
@@ -59,7 +54,7 @@ func (mage *Mage) procIgnite(sim *core.Simulation, target *core.Target, damageFr
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	ignite.Effect.Target = target
-	ignite.Effect.DotInput.TickBaseDamage = newIgniteDamage / 2
+	ignite.Effect.DotInput.TickBaseDamage = core.DotSnapshotFuncMagic(newIgniteDamage/2, 0)
 	ignite.Init(sim)
 	ignite.Cast(sim)
 }

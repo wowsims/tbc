@@ -25,18 +25,14 @@ func (priest *Priest) newVampiricTouchTemplate(sim *core.Simulation) core.Simple
 		GCD:                 core.GCDDefault,
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        5,
-			TickLength:           time.Second * 3,
-			TickBaseDamage:       650 / 5,
-			TickSpellCoefficient: 0.2,
-			DebuffID:             VampiricTouchDebuffID,
+			NumberOfTicks:  5,
+			TickLength:     time.Second * 3,
+			TickBaseDamage: core.DotSnapshotFuncMagic(650/5, 0.2),
+			DebuffID:       VampiricTouchDebuffID,
 		},
 	}
 

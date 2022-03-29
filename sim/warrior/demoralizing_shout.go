@@ -34,15 +34,13 @@ func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.
 		},
 	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			ThreatMultiplier: 1,
-			FlatThreatBonus:  56,
-		},
+	baseEffect := core.SpellEffect{
+		ThreatMultiplier: 1,
+		FlatThreatBonus:  56,
 	}
 
 	numHits := sim.GetNumTargets()
-	effects := make([]core.SpellHitEffect, 0, numHits)
+	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)

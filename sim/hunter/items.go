@@ -77,15 +77,6 @@ func ApplyTalonOfAlar(agent core.Agent) {
 			ActionID: core.ActionID{ItemID: 30448},
 			// Add 1 in case we use arcane shot exactly off CD.
 			Duration: time.Second*6 + 1,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if !spellCast.SameAction(SteadyShotActionID) &&
-					!spellCast.SameAction(MultiShotActionID) &&
-					!spellCast.SameAction(ArcaneShotActionID) &&
-					!spellCast.SameAction(AimedShotActionID) {
-					return
-				}
-				spellEffect.DirectInput.FlatDamageBonus += 40
-			},
 		}
 
 		return core.Aura{
@@ -101,6 +92,23 @@ func ApplyTalonOfAlar(agent core.Agent) {
 	})
 }
 
+func (hunter *Hunter) talonOfAlarDamageMod(baseDamageConfig core.BaseDamageConfig) core.BaseDamageConfig {
+	if hunter.HasTrinketEquipped(30448) {
+		return core.WrapBaseDamageConfig(baseDamageConfig, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
+			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+				normalDamage := oldCalculator(sim, hitEffect, spellCast)
+				if hunter.HasAura(TalonOfAlarProcAuraID) {
+					return normalDamage + 40
+				} else {
+					return normalDamage
+				}
+			}
+		})
+	} else {
+		return baseDamageConfig
+	}
+}
+
 func ApplyBeasttamersShoulders(agent core.Agent) {
 	hunterAgent, ok := agent.(Agent)
 	if !ok {
@@ -108,7 +116,7 @@ func ApplyBeasttamersShoulders(agent core.Agent) {
 	}
 	hunter := hunterAgent.GetHunter()
 
-	hunter.pet.damageMultiplier *= 1.03
+	hunter.pet.PseudoStats.DamageDealtMultiplier *= 1.03
 	hunter.pet.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*2)
 }
 

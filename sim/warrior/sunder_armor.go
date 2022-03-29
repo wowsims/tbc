@@ -30,12 +30,10 @@ func (warrior *Warrior) newSunderArmorTemplate(_ *core.Simulation) core.SimpleSp
 				},
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:         core.ProcMaskMeleeMHSpecial,
-				ThreatMultiplier: 1,
-				FlatThreatBonus:  301.5,
-			},
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			ThreatMultiplier: 1,
+			FlatThreatBonus:  301.5,
 		},
 	}
 

@@ -400,7 +400,35 @@ type PseudoStats struct {
 	//  This includes almost all "(Normalized) Weapon Damage", but also some "School Damage (Physical)" abilities.
 	BonusDamage float64 // Comes from '+X Weapon Damage' effects
 
+	BonusRangedHitRating  float64 // Hit rating for ranged only.
+	BonusMeleeCritRating  float64 // Crit rating for melee only (not ranged).
+	BonusRangedCritRating float64 // Crit rating for ranged only.
+	BonusMHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
+	BonusOHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
+
+	MobTypeAttackPower float64 // Bonus AP against mobs of the current type.
+	MobTypeSpellPower  float64 // Bonus SP against mobs of the current type.
+
+	// For Human and Orc weapon racials
+	BonusMHExpertiseRating float64
+	BonusOHExpertiseRating float64
+
 	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
+
+	DamageDealtMultiplier       float64 // All damage
+	RangedDamageDealtMultiplier float64
+
+	PhysicalDamageDealtMultiplier float64
+	ArcaneDamageDealtMultiplier   float64
+	FireDamageDealtMultiplier     float64
+	FrostDamageDealtMultiplier    float64
+	HolyDamageDealtMultiplier     float64
+	NatureDamageDealtMultiplier   float64
+	ShadowDamageDealtMultiplier   float64
+
+	// Modifiers for spells with the SpellExtrasAgentReserved1 flag set.
+	BonusCritRatingAgentReserved1       float64
+	AgentReserved1DamageDealtMultiplier float64
 }
 
 func NewPseudoStats() PseudoStats {
@@ -410,5 +438,57 @@ func NewPseudoStats() PseudoStats {
 		//RangedSpeedMultiplier: 1, // Leave at 0 so we can use this to ignore ranged stuff for non-hunters.
 		SpiritRegenMultiplier: 1,
 		ThreatMultiplier:      1,
+
+		DamageDealtMultiplier:       1,
+		RangedDamageDealtMultiplier: 1,
+
+		PhysicalDamageDealtMultiplier: 1,
+		ArcaneDamageDealtMultiplier:   1,
+		FireDamageDealtMultiplier:     1,
+		FrostDamageDealtMultiplier:    1,
+		HolyDamageDealtMultiplier:     1,
+		NatureDamageDealtMultiplier:   1,
+		ShadowDamageDealtMultiplier:   1,
+
+		AgentReserved1DamageDealtMultiplier: 1,
+	}
+}
+
+type TargetPseudoStats struct {
+	BonusMeleeAttackPower  float64 // Imp Hunters mark, EW
+	BonusRangedAttackPower float64 // Hunters mark, EW
+	BonusCritRating        float64 // Imp Judgement of the Crusader
+	BonusFrostCritRating   float64 // Winter's Chill
+	BonusMeleeHitRating    float64 // Imp FF
+
+	BonusPhysicalDamageTaken float64 // Hemo, Gift of Arthas, etc
+	BonusHolyDamageTaken     float64 // Judgement of the Crusader
+
+	DamageTakenMultiplier float64 // All damage
+
+	PhysicalDamageTakenMultiplier float64
+	ArcaneDamageTakenMultiplier   float64
+	FireDamageTakenMultiplier     float64
+	FrostDamageTakenMultiplier    float64
+	HolyDamageTakenMultiplier     float64
+	NatureDamageTakenMultiplier   float64
+	ShadowDamageTakenMultiplier   float64
+
+	PeriodicPhysicalDamageTakenMultiplier float64
+}
+
+func NewTargetPseudoStats() TargetPseudoStats {
+	return TargetPseudoStats{
+		DamageTakenMultiplier: 1,
+
+		PhysicalDamageTakenMultiplier: 1,
+		ArcaneDamageTakenMultiplier:   1,
+		FireDamageTakenMultiplier:     1,
+		FrostDamageTakenMultiplier:    1,
+		HolyDamageTakenMultiplier:     1,
+		NatureDamageTakenMultiplier:   1,
+		ShadowDamageTakenMultiplier:   1,
+
+		PeriodicPhysicalDamageTakenMultiplier: 1,
 	}
 }

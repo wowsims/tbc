@@ -13,7 +13,6 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 	}
 
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
-	hasDeathmantle2pc := ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2)
 
 	ability := rogue.newAbility(EviscerateActionID, rogue.eviscerateEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -25,19 +24,24 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 			}
 		}
 	}
-	ability.Effect.WeaponInput.CalculateDamage = func(attackPower float64, bonusWeaponDamage float64) float64 {
-		comboPoints := rogue.ComboPoints()
-		base := 60.0 + 185.0*float64(comboPoints)
-		if hasDeathmantle2pc {
-			base += 40.0 * float64(comboPoints)
-		}
-		roll := sim.RandomFloat("Eviscerate") * 120.0
-		return base + roll + (attackPower*0.03)*float64(comboPoints) + bonusWeaponDamage
+
+	basePerComboPoint := 185.0
+	if ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2) {
+		basePerComboPoint += 40
+	}
+	ability.Effect.BaseDamage = core.BaseDamageConfig{
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+			comboPoints := rogue.ComboPoints()
+			base := 60.0 + basePerComboPoint*float64(comboPoints)
+			roll := sim.RandomFloat("Eviscerate") * 120.0
+			return base + roll + (hitEffect.MeleeAttackPower(spellCast)*0.03)*float64(comboPoints) + hitEffect.BonusWeaponDamage(spellCast)
+		},
+		TargetSpellCoefficient: 1,
 	}
 
 	// cp. backstab
-	ability.Effect.StaticDamageMultiplier += 0.05 * float64(rogue.Talents.ImprovedEviscerate)
-	ability.Effect.StaticDamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
+	ability.Effect.DamageMultiplier += 0.05 * float64(rogue.Talents.ImprovedEviscerate)
+	ability.Effect.DamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
 	if rogue.Talents.SurpriseAttacks {
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}

@@ -38,23 +38,24 @@ func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpe
 				CritMultiplier: warrior.critMultiplier(true),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial, // TODO: Is this right?
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				FlatThreatBonus:        305,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 420,
-				MaxBaseDamage: 440,
-			},
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial, // TODO: Is this right?
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			FlatThreatBonus:  305,
 		},
 	}
 
+	damageRollFunc := core.DamageRollFunc(420, 440)
+	ability.Effect.BaseDamage = core.BaseDamageConfig{
+		Calculator: func(sim *core.Simulation, _ *core.SpellEffect, _ *core.SpellCast) float64 {
+			return damageRollFunc(sim) + warrior.GetStat(stats.BlockValue)
+		},
+		TargetSpellCoefficient: 1,
+	}
+
 	if ItemSetOnslaughtArmor.CharacterHasSetBonus(&warrior.Character, 4) {
-		ability.Effect.SpellEffect.StaticDamageMultiplier *= 1.1
+		ability.Effect.DamageMultiplier *= 1.1
 	}
 
 	refundAmount := ShieldSlamCost * 0.8
@@ -73,7 +74,6 @@ func (warrior *Warrior) NewShieldSlam(_ *core.Simulation, target *core.Target) *
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	ss.Effect.Target = target
-	ss.Effect.DirectInput.FlatDamageBonus = warrior.GetStat(stats.BlockValue)
 
 	return ss
 }

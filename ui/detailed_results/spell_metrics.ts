@@ -66,8 +66,8 @@ export class SpellMetricsTable extends MetricsTable<ActionMetrics> {
 			{
 				name: 'Hits',
 				tooltip: 'Hits',
-				getValue: (metric: ActionMetrics) => metric.hits,
-				getDisplayString: (metric: ActionMetrics) => metric.hits.toFixed(1),
+				getValue: (metric: ActionMetrics) => metric.landedHits,
+				getDisplayString: (metric: ActionMetrics) => metric.landedHits.toFixed(1),
 			},
 			{
 				name: 'Crit %',

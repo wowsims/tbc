@@ -32,11 +32,11 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 					ID:       AvengingWrathAuraID,
 					ActionID: AvengingWrathActionID,
 					Duration: time.Second * 20,
-					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-						spellEffect.DamageMultiplier *= 1.3
+					OnGain: func(sim *core.Simulation) {
+						paladin.PseudoStats.DamageDealtMultiplier *= 1.3
 					},
-					OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-						*tickDamage *= 1.3
+					OnExpire: func(sim *core.Simulation) {
+						paladin.PseudoStats.DamageDealtMultiplier /= 1.3
 					},
 				})
 				character.Metrics.AddInstantCast(AvengingWrathActionID)
