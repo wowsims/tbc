@@ -37,7 +37,7 @@ func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleS
 				ThreatMultiplier: 1,
 				FlatThreatBonus:  194,
 			},
-			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 176, 1, true),
+			BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 176, 1, true),
 		},
 	}
 

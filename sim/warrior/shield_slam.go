@@ -49,8 +49,11 @@ func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpe
 	}
 
 	damageRollFunc := core.DamageRollFunc(420, 440)
-	ability.Effect.BaseDamage = func(sim *core.Simulation, _ *core.SpellHitEffect, _ *core.SpellCast) float64 {
-		return damageRollFunc(sim) + warrior.GetStat(stats.BlockValue)
+	ability.Effect.BaseDamage = core.BaseDamageConfig{
+		Calculator: func(sim *core.Simulation, _ *core.SpellHitEffect, _ *core.SpellCast) float64 {
+			return damageRollFunc(sim) + warrior.GetStat(stats.BlockValue)
+		},
+		TargetSpellCoefficient: 1,
 	}
 
 	if ItemSetOnslaughtArmor.CharacterHasSetBonus(&warrior.Character, 4) {

@@ -48,7 +48,7 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 					fireballDot.Cast(sim)
 				},
 			},
-			BaseDamage: core.BaseDamageFuncMagic(649, 821, 1.0+0.03*float64(mage.Talents.EmpoweredFireball)),
+			BaseDamage: core.BaseDamageConfigMagic(649, 821, 1.0+0.03*float64(mage.Talents.EmpoweredFireball)),
 		},
 	}
 

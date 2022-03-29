@@ -96,7 +96,7 @@ func (gft *GnomishFlameTurret) newFlameCannonTemplate(sim *Simulation) SimpleSpe
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 			},
-			BaseDamage: BaseDamageFuncRoll(31, 36),
+			BaseDamage: BaseDamageConfigRoll(31, 36),
 		},
 	}
 

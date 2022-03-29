@@ -42,7 +42,7 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 				DamageMultiplier: mage.spellDamageMultiplier,
 				ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 			},
-			BaseDamage: core.BaseDamageFuncMagic(664, 786, 1.5/3.5),
+			BaseDamage: core.BaseDamageConfigMagic(664, 786, 1.5/3.5),
 		},
 	}
 

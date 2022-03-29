@@ -63,7 +63,7 @@ func ApplyStormGauntlets(agent core.Agent) {
 					DamageMultiplier: 1,
 					ThreatMultiplier: 1,
 				},
-				BaseDamage: core.BaseDamageFuncFlat(3),
+				BaseDamage: core.BaseDamageConfigFlat(3),
 			},
 		})
 
@@ -109,7 +109,7 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 					DamageMultiplier: 1,
 					ThreatMultiplier: 1,
 				},
-				BaseDamage: core.BaseDamageFuncFlat(2),
+				BaseDamage: core.BaseDamageConfigFlat(2),
 			},
 		})
 
@@ -392,7 +392,7 @@ func ApplyDespair(agent core.Agent) {
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 			},
-			BaseDamage: core.BaseDamageFuncFlat(600),
+			BaseDamage: core.BaseDamageConfigFlat(600),
 		},
 	}
 
@@ -446,7 +446,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 			},
-			BaseDamage: core.BaseDamageFuncRoll(513, 567),
+			BaseDamage: core.BaseDamageConfigRoll(513, 567),
 		},
 	}
 
@@ -507,7 +507,7 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 					DamageMultiplier: 1,
 					ThreatMultiplier: 1,
 				},
-				BaseDamage: core.BaseDamageFuncRoll(285, 315),
+				BaseDamage: core.BaseDamageConfigRoll(285, 315),
 			},
 		})
 
@@ -798,7 +798,7 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 					DamageMultiplier: 1,
 					ThreatMultiplier: 1,
 				},
-				BaseDamage: core.BaseDamageFuncMagic(48, 54, 1),
+				BaseDamage: core.BaseDamageConfigMagic(48, 54, 1),
 			},
 		})
 		spellObj := core.SimpleSpell{}
@@ -973,7 +973,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 					DamageMultiplier: 1,
 					ThreatMultiplier: 1,
 				},
-				BaseDamage: core.BaseDamageFuncFlat(20),
+				BaseDamage: core.BaseDamageConfigFlat(20),
 			},
 		})
 		spellObj := core.SimpleSpell{}

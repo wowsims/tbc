@@ -84,7 +84,7 @@ func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.SimpleSpe
 					}
 				},
 			},
-			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 127, 1, true),
+			BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 127, 1, true),
 		},
 	}
 

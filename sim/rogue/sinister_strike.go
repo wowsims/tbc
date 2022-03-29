@@ -22,7 +22,7 @@ func (rogue *Rogue) newSinisterStrikeTemplate(_ *core.Simulation) core.SimpleSpe
 			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}
 	}
-	ability.Effect.BaseDamage = core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 98, 1, true)
+	ability.Effect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 98, 1, true)
 
 	// cp. backstab
 	ability.Effect.DamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)

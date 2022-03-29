@@ -40,7 +40,7 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 		},
-		BaseDamage: core.BaseDamageFuncMagic(711, 752, 0.429),
+		BaseDamage: core.BaseDamageConfigMagic(711, 752, 0.429),
 	}
 
 	priest.applyTalentsToShadowSpell(&baseCast, &effect)

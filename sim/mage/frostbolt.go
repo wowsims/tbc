@@ -37,7 +37,7 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 				DamageMultiplier: mage.spellDamageMultiplier,
 				ThreatMultiplier: 1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
 			},
-			BaseDamage: core.BaseDamageFuncMagic(600, 647, (3.0/3.5)*0.95+0.02*float64(mage.Talents.EmpoweredFrostbolt)),
+			BaseDamage: core.BaseDamageConfigMagic(600, 647, (3.0/3.5)*0.95+0.02*float64(mage.Talents.EmpoweredFrostbolt)),
 		},
 	}
 

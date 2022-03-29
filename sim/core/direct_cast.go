@@ -8,11 +8,36 @@ import (
 // Function for calculating the base damage of a spell.
 type BaseDamageCalculator func(*Simulation, *SpellHitEffect, *SpellCast) float64
 
+type BaseDamageConfig struct {
+	// Lambda for calculating the base damage.
+	Calculator BaseDamageCalculator
+
+	// Spell coefficient for +damage effects on the target.
+	TargetSpellCoefficient float64
+}
+
+func BuildBaseDamageConfig(calculator BaseDamageCalculator, coeff float64) BaseDamageConfig {
+	return BaseDamageConfig{
+		Calculator:             calculator,
+		TargetSpellCoefficient: coeff,
+	}
+}
+
+func WrapBaseDamageConfig(config BaseDamageConfig, wrapper func(oldCalculator BaseDamageCalculator) BaseDamageCalculator) BaseDamageConfig {
+	return BaseDamageConfig{
+		Calculator:             wrapper(config.Calculator),
+		TargetSpellCoefficient: config.TargetSpellCoefficient,
+	}
+}
+
 // Creates a BaseDamageCalculator function which returns a flat value.
 func BaseDamageFuncFlat(damage float64) BaseDamageCalculator {
 	return func(_ *Simulation, _ *SpellHitEffect, _ *SpellCast) float64 {
 		return damage
 	}
+}
+func BaseDamageConfigFlat(damage float64) BaseDamageConfig {
+	return BuildBaseDamageConfig(BaseDamageFuncFlat(damage), 0)
 }
 
 // Creates a BaseDamageCalculator function with a single damage roll.
@@ -25,6 +50,9 @@ func BaseDamageFuncRoll(minFlatDamage float64, maxFlatDamage float64) BaseDamage
 			return damageRollOptimized(sim, minFlatDamage, deltaDamage)
 		}
 	}
+}
+func BaseDamageConfigRoll(minFlatDamage float64, maxFlatDamage float64) BaseDamageConfig {
+	return BuildBaseDamageConfig(BaseDamageFuncRoll(minFlatDamage, maxFlatDamage), 0)
 }
 
 func BaseDamageFuncMagic(minFlatDamage float64, maxFlatDamage float64, spellCoefficient float64) BaseDamageCalculator {
@@ -49,6 +77,9 @@ func BaseDamageFuncMagic(minFlatDamage float64, maxFlatDamage float64, spellCoef
 			return damage
 		}
 	}
+}
+func BaseDamageConfigMagic(minFlatDamage float64, maxFlatDamage float64, spellCoefficient float64) BaseDamageConfig {
+	return BuildBaseDamageConfig(BaseDamageFuncMagic(minFlatDamage, maxFlatDamage, spellCoefficient), spellCoefficient)
 }
 
 type Hand bool
@@ -106,6 +137,14 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 		}
 	}
 }
+func BaseDamageConfigMeleeWeapon(hand Hand, normalized bool, flatBonus float64, weaponMultiplier float64, includeBonusWeaponDamage bool) BaseDamageConfig {
+	calculator := BaseDamageFuncMeleeWeapon(hand, normalized, flatBonus, weaponMultiplier, includeBonusWeaponDamage)
+	if includeBonusWeaponDamage {
+		return BuildBaseDamageConfig(calculator, 1)
+	} else {
+		return BuildBaseDamageConfig(calculator, 0)
+	}
+}
 
 func BaseDamageFuncRangedWeapon(flatBonus float64) BaseDamageCalculator {
 	return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
@@ -113,6 +152,9 @@ func BaseDamageFuncRangedWeapon(flatBonus float64) BaseDamageCalculator {
 			flatBonus +
 			hitEffect.BonusWeaponDamage(spellCast)
 	}
+}
+func BaseDamageConfigRangedWeapon(flatBonus float64) BaseDamageConfig {
+	return BuildBaseDamageConfig(BaseDamageFuncRangedWeapon(flatBonus), 1)
 }
 
 // Performs an actual damage roll. Keep this internal because the 2nd parameter
@@ -136,7 +178,7 @@ func DamageRollFunc(minDamage float64, maxDamage float64) func(*Simulation) floa
 type SpellHitEffect struct {
 	SpellEffect
 
-	BaseDamage BaseDamageCalculator
+	BaseDamage BaseDamageConfig
 
 	DotInput DotDamageInput
 }

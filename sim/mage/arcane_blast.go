@@ -57,7 +57,7 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 				DamageMultiplier: mage.spellDamageMultiplier,
 				ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 			},
-			BaseDamage: core.BaseDamageFuncMagic(668, 772, 2.5/3.5),
+			BaseDamage: core.BaseDamageConfigMagic(668, 772, 2.5/3.5),
 		},
 	}
 

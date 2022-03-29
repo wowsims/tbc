@@ -45,8 +45,11 @@ func (warrior *Warrior) newBloodthirstTemplate(_ *core.Simulation) core.SimpleSp
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 			},
-			BaseDamage: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
-				return hitEffect.MeleeAttackPower(spellCast) * 0.45
+			BaseDamage: core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+					return hitEffect.MeleeAttackPower(spellCast) * 0.45
+				},
+				TargetSpellCoefficient: 0, // Doesn't scale with +damage on target?
 			},
 		},
 	}

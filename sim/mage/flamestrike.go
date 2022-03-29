@@ -48,7 +48,7 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 			DamageMultiplier: mage.spellDamageMultiplier,
 			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 		},
-		BaseDamage: core.BaseDamageFuncMagic(480, 585, 0.236),
+		BaseDamage: core.BaseDamageConfigMagic(480, 585, 0.236),
 	}
 
 	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01

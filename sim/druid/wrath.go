@@ -46,7 +46,7 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 		},
-		BaseDamage: core.BaseDamageFuncMagic(383+bonusFlatDamage, 432+bonusFlatDamage, spellCoefficient),
+		BaseDamage: core.BaseDamageConfigMagic(383+bonusFlatDamage, 432+bonusFlatDamage, spellCoefficient),
 	}
 
 	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)

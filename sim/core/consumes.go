@@ -802,7 +802,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 					DamageMultiplier: 1,
 					ThreatMultiplier: 1,
 				},
-				BaseDamage: BaseDamageFuncFlat(40),
+				BaseDamage: BaseDamageConfigFlat(40),
 			},
 		})
 		spellObj := SimpleSpell{}
@@ -963,7 +963,7 @@ func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID Act
 			// Explosives always have 1% resist chance, so just give them hit cap.
 			BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,
 		},
-		BaseDamage: BaseDamageFuncRoll(minDamage, maxDamage),
+		BaseDamage: BaseDamageConfigRoll(minDamage, maxDamage),
 	}
 
 	numHits := sim.GetNumTargets()

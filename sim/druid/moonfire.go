@@ -36,7 +36,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 		},
-		BaseDamage: core.BaseDamageFuncMagic(305, 357, 0.15),
+		BaseDamage: core.BaseDamageConfigMagic(305, 357, 0.15),
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:  4,
 			TickLength:     time.Second * 3,

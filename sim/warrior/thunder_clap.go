@@ -54,7 +54,7 @@ func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.Simple
 			DamageMultiplier: impTCDamageMult,
 			ThreatMultiplier: 1.75,
 		},
-		BaseDamage: core.BaseDamageFuncFlat(123),
+		BaseDamage: core.BaseDamageConfigFlat(123),
 	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())
