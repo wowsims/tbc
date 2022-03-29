@@ -211,39 +211,21 @@ func (rogue *Rogue) applySealFate() {
 	})
 }
 
-var DaggerAndFistSpecializationsAuraID = core.NewAuraID()
 var SwordSpecializationAuraID = core.NewAuraID()
 
 func (rogue *Rogue) applyWeaponSpecializations() {
-	mhCritBonus := 0.0
-	ohCritBonus := 0.0
 	if weapon := rogue.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
 		if weapon.WeaponType == proto.WeaponType_WeaponTypeFist {
-			mhCritBonus = 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.FistWeaponSpecialization)
+			rogue.PseudoStats.BonusMHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.FistWeaponSpecialization)
 		} else if weapon.WeaponType == proto.WeaponType_WeaponTypeDagger {
-			mhCritBonus = 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.DaggerSpecialization)
+			rogue.PseudoStats.BonusMHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.DaggerSpecialization)
 		}
 	} else if weapon := rogue.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
 		if weapon.WeaponType == proto.WeaponType_WeaponTypeFist {
-			ohCritBonus = 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.FistWeaponSpecialization)
+			rogue.PseudoStats.BonusOHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.FistWeaponSpecialization)
 		} else if weapon.WeaponType == proto.WeaponType_WeaponTypeDagger {
-			ohCritBonus = 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.DaggerSpecialization)
+			rogue.PseudoStats.BonusOHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.DaggerSpecialization)
 		}
-	}
-
-	if mhCritBonus > 0 || ohCritBonus > 0 {
-		rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-			return core.Aura{
-				ID: DaggerAndFistSpecializationsAuraID,
-				OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-					if spellEffect.ProcMask.Matches(core.ProcMaskMeleeMH) {
-						spellEffect.BonusCritRating += mhCritBonus
-					} else if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOH) {
-						spellEffect.BonusCritRating += ohCritBonus
-					}
-				},
-			}
-		})
 	}
 
 	// https://tbc.wowhead.com/spell=13964/sword-specialization, proc mask = 20.

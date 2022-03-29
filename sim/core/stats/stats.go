@@ -403,8 +403,15 @@ type PseudoStats struct {
 	BonusRangedHitRating  float64 // Hit rating for ranged only.
 	BonusMeleeCritRating  float64 // Crit rating for melee only (not ranged).
 	BonusRangedCritRating float64 // Crit rating for ranged only.
-	MobTypeAttackPower    float64 // Bonus AP against mobs of the current type.
-	MobTypeSpellPower     float64 // Bonus SP against mobs of the current type.
+	BonusMHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
+	BonusOHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
+
+	MobTypeAttackPower float64 // Bonus AP against mobs of the current type.
+	MobTypeSpellPower  float64 // Bonus SP against mobs of the current type.
+
+	// For Human and Orc weapon racials
+	BonusMHExpertiseRating float64
+	BonusOHExpertiseRating float64
 
 	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
 
@@ -445,6 +452,7 @@ type TargetPseudoStats struct {
 	BonusMeleeAttackPower  float64 // Imp Hunters mark, EW
 	BonusRangedAttackPower float64 // Hunters mark, EW
 	BonusCritRating        float64 // Imp Judgement of the Crusader
+	BonusFrostCritRating   float64 // Winter's Chill
 	BonusMeleeHitRating    float64 // Imp FF
 
 	BonusPhysicalDamageTaken float64 // Hemo, Gift of Arthas, etc

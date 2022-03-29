@@ -51,9 +51,8 @@ type SpellEffect struct {
 	BonusSpellPower      float64
 	BonusSpellCritRating float64
 
-	BonusAttackPower     float64
-	BonusCritRating      float64
-	BonusExpertiseRating float64
+	BonusAttackPower float64
+	BonusCritRating  float64
 
 	// Additional multiplier that is always applied.
 	DamageMultiplier float64
@@ -139,6 +138,11 @@ func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spellCa
 	} else {
 		critRating += character.PseudoStats.BonusMeleeCritRating
 	}
+	if spellEffect.ProcMask.Matches(ProcMaskMeleeMH) {
+		spellEffect.BonusCritRating += character.PseudoStats.BonusMHCritRating
+	} else if spellEffect.ProcMask.Matches(ProcMaskMeleeOH) {
+		spellEffect.BonusCritRating += character.PseudoStats.BonusOHCritRating
+	}
 
 	return (critRating / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
 }
@@ -148,7 +152,11 @@ func (spellEffect *SpellEffect) SpellPower(character *Character, spellCast *Spel
 }
 
 func (spellEffect *SpellEffect) SpellCritChance(character *Character, spellCast *SpellCast) float64 {
-	return (character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating + spellEffect.Target.PseudoStats.BonusCritRating) / (SpellCritRatingPerCritChance * 100)
+	critRating := (character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating + spellEffect.Target.PseudoStats.BonusCritRating)
+	if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
+		critRating += spellEffect.Target.PseudoStats.BonusFrostCritRating
+	}
+	return critRating / (SpellCritRatingPerCritChance * 100)
 }
 
 func (she *SpellHitEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell) {
@@ -235,7 +243,15 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 		// Dodge
 		if !ability.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
 			dodge := ahe.Target.Dodge
-			expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
+
+			expertiseRating := character.stats[stats.Expertise]
+			if ahe.ProcMask.Matches(ProcMaskMeleeMH) {
+				expertiseRating += character.PseudoStats.BonusMHExpertiseRating
+			} else if ahe.ProcMask.Matches(ProcMaskMeleeOH) {
+				expertiseRating += character.PseudoStats.BonusOHExpertiseRating
+			}
+			expertisePercentage := MinFloat(math.Floor(expertiseRating/ExpertisePerQuarterPercentReduction)/400, dodge)
+
 			chance += dodge - expertisePercentage
 			if roll < chance {
 				return OutcomeDodge
