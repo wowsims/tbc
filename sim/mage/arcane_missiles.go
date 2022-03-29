@@ -41,12 +41,11 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 				ThreatMultiplier:       1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 			},
 			DotInput: core.DotDamageInput{
-				NumberOfTicks:        5,
-				TickLength:           time.Second,
-				TickBaseDamage:       265,
-				TickSpellCoefficient: 1 / 3.5,
-				TicksCanMissAndCrit:  true,
-				AffectedByCastSpeed:  true,
+				NumberOfTicks:       5,
+				TickLength:          time.Second,
+				TickBaseDamage:      core.DotSnapshotFuncMagic(265, 1/3.5+0.15*float64(mage.Talents.EmpoweredArcaneMissiles)),
+				TicksCanMissAndCrit: true,
+				AffectedByCastSpeed: true,
 
 				TicksProcSpellHitEffects: true,
 			},
@@ -55,7 +54,6 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance
 	spell.Cost.Value += spell.BaseCost.Value * float64(mage.Talents.EmpoweredArcaneMissiles) * 0.02
-	spell.Effect.DotInput.TickSpellCoefficient += 0.15 * float64(mage.Talents.EmpoweredArcaneMissiles)
 
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
 		spell.Effect.StaticDamageMultiplier *= 1.05

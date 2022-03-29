@@ -41,10 +41,9 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 			StaticDamageMultiplier: 1,
 		},
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        8,
-			TickLength:           time.Second,
-			TickBaseDamage:       64,
-			TickSpellCoefficient: 0.119,
+			NumberOfTicks:  8,
+			TickLength:     time.Second,
+			TickBaseDamage: core.DotSnapshotFuncMagic(64, 0.119),
 		},
 	}
 

@@ -90,11 +90,10 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
 			},
 			DotInput: core.DotDamageInput{
-				NumberOfTicks:        4,
-				TickLength:           time.Second * 2,
-				TickBaseDamage:       84 / 4,
-				TickSpellCoefficient: 0,
-				DebuffID:             FireballDotDebuffID,
+				NumberOfTicks:  4,
+				TickLength:     time.Second * 2,
+				TickBaseDamage: core.DotSnapshotFuncMagic(84/4, 0),
+				DebuffID:       FireballDotDebuffID,
 			},
 		},
 	}

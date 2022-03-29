@@ -4,15 +4,32 @@ import (
 	"time"
 )
 
+func DotSnapshotFuncMagic(baseDamage float64, spellCoefficient float64) BaseDamageCalculator {
+	if spellCoefficient == 0 {
+		return BaseDamageFuncFlat(baseDamage)
+	}
+
+	if baseDamage == 0 {
+		return func(_ *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+			totalSpellPower := hitEffect.SpellPower(spellCast.Character, spellCast)
+			return totalSpellPower * spellCoefficient
+		}
+	} else {
+		return func(_ *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+			totalSpellPower := hitEffect.SpellPower(spellCast.Character, spellCast)
+			return baseDamage + totalSpellPower*spellCoefficient
+		}
+	}
+}
+
 // DotDamageInput is the data needed to kick of the dot ticking in pendingActions.
 //  For now the only way for a caster to track their dot is to keep a reference to the cast object
 //  that started this and check the DotDamageInput.IsTicking()
 type DotDamageInput struct {
-	NumberOfTicks        int           // number of ticks over the whole duration
-	TickLength           time.Duration // time between each tick
-	TickBaseDamage       float64
-	TickSpellCoefficient float64
-	TicksCanMissAndCrit  bool // Allows individual ticks to hit/miss, and also crit.
+	NumberOfTicks       int           // number of ticks over the whole duration
+	TickLength          time.Duration // time between each tick
+	TicksCanMissAndCrit bool          // Allows individual ticks to hit/miss, and also crit.
+	TickBaseDamage      BaseDamageCalculator
 
 	// If true, tick length will be shortened based on casting speed.
 	AffectedByCastSpeed bool
@@ -153,10 +170,9 @@ func (spell *SimpleSpell) ApplyDot(sim *Simulation) {
 
 // Snapshots a few values at the start of a dot.
 func (hitEffect *SpellHitEffect) takeDotSnapshot(sim *Simulation, spellCast *SpellCast) {
-	totalSpellPower := hitEffect.SpellPower(spellCast.Character, spellCast)
-
 	// snapshot total damage per tick, including any static damage multipliers
-	hitEffect.DotInput.damagePerTick = (hitEffect.DotInput.TickBaseDamage + totalSpellPower*hitEffect.DotInput.TickSpellCoefficient) * hitEffect.StaticDamageMultiplier
+	hitEffect.DotInput.damagePerTick = hitEffect.DotInput.TickBaseDamage(sim, hitEffect, spellCast) * hitEffect.StaticDamageMultiplier
+
 	hitEffect.DotInput.startTime = sim.CurrentTime
 	hitEffect.DotInput.RefreshDot(sim)
 	hitEffect.DotInput.nextTickTime = sim.CurrentTime + hitEffect.DotInput.TickLength

@@ -41,9 +41,8 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 				NumberOfTicks: 24,
 				TickLength:    time.Second * 60 / 24,
 
-				TickBaseDamage:       58,
-				TickSpellCoefficient: 0.167,
-				TicksCanMissAndCrit:  true,
+				TickBaseDamage:      core.DotSnapshotFuncMagic(58, 0.167),
+				TicksCanMissAndCrit: true,
 			},
 		},
 	}
@@ -111,11 +110,10 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 			StaticDamageMultiplier: 1,
 		},
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        10,
-			TickLength:           time.Second * 2,
-			TickBaseDamage:       97,
-			TickSpellCoefficient: 0.067,
-			TicksCanMissAndCrit:  true,
+			NumberOfTicks:       10,
+			TickLength:          time.Second * 2,
+			TickBaseDamage:      core.DotSnapshotFuncMagic(97, 0.067),
+			TicksCanMissAndCrit: true,
 		},
 	}
 	baseEffect.StaticDamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
@@ -194,11 +192,10 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 			StaticDamageMultiplier: 1,
 		},
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        1,
-			TickLength:           shaman.FireNovaTickLength(),
-			TickBaseDamage:       692,
-			TickSpellCoefficient: 0.214,
-			TicksCanMissAndCrit:  true,
+			NumberOfTicks:       1,
+			TickLength:          shaman.FireNovaTickLength(),
+			TickBaseDamage:      core.DotSnapshotFuncMagic(692, 0.214),
+			TicksCanMissAndCrit: true,
 		},
 	}
 	baseEffect.StaticDamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05

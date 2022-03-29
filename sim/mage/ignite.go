@@ -33,8 +33,6 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:         2,
 				TickLength:            time.Second * 2,
-				TickBaseDamage:        0, // This is set dynamically
-				TickSpellCoefficient:  0,
 				IgnoreDamageModifiers: true,
 				DebuffID:              IgniteDebuffID,
 			},
@@ -59,7 +57,7 @@ func (mage *Mage) procIgnite(sim *core.Simulation, target *core.Target, damageFr
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	ignite.Effect.Target = target
-	ignite.Effect.DotInput.TickBaseDamage = newIgniteDamage / 2
+	ignite.Effect.DotInput.TickBaseDamage = core.DotSnapshotFuncMagic(newIgniteDamage/2, 0)
 	ignite.Init(sim)
 	ignite.Cast(sim)
 }

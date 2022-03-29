@@ -42,11 +42,10 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 			ThreatMultiplier:       1,
 		},
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        3,
-			TickLength:           time.Second,
-			TickBaseDamage:       528 / 3,
-			TickSpellCoefficient: 0.19,
-			AffectedByCastSpeed:  true,
+			NumberOfTicks:       3,
+			TickLength:          time.Second,
+			TickBaseDamage:      core.DotSnapshotFuncMagic(528/3, 0.19),
+			AffectedByCastSpeed: true,
 		},
 	}
 

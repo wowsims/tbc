@@ -85,11 +85,10 @@ func (mage *Mage) newPyroblastDotTemplate(sim *core.Simulation) core.SimpleSpell
 				StaticDamageMultiplier: mage.spellDamageMultiplier,
 			},
 			DotInput: core.DotDamageInput{
-				NumberOfTicks:        4,
-				TickLength:           time.Second * 3,
-				TickBaseDamage:       356 / 4,
-				TickSpellCoefficient: 0,
-				DebuffID:             PyroblastDotDebuffID,
+				NumberOfTicks:  4,
+				TickLength:     time.Second * 3,
+				TickBaseDamage: core.DotSnapshotFuncMagic(356/4, 0),
+				DebuffID:       PyroblastDotDebuffID,
 			},
 		},
 	}

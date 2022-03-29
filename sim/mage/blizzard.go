@@ -42,11 +42,10 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 			ThreatMultiplier:       1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
 		},
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        8,
-			TickLength:           time.Second * 1,
-			TickBaseDamage:       184,
-			TickSpellCoefficient: 0.119,
-			AffectedByCastSpeed:  true,
+			NumberOfTicks:       8,
+			TickLength:          time.Second * 1,
+			TickBaseDamage:      core.DotSnapshotFuncMagic(184, 0.119),
+			AffectedByCastSpeed: true,
 		},
 	}
 

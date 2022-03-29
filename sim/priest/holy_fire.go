@@ -39,11 +39,10 @@ func (priest *Priest) newHolyFireTemplate(sim *core.Simulation) core.SimpleSpell
 		},
 		BaseDamage: core.BaseDamageFuncMagic(426, 537, 0.8571),
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        5,
-			TickLength:           time.Second * 2,
-			TickBaseDamage:       33,
-			TickSpellCoefficient: 0.17,
-			DebuffID:             HolyFireDebuffID,
+			NumberOfTicks:  5,
+			TickLength:     time.Second * 2,
+			TickBaseDamage: core.DotSnapshotFuncMagic(33, 0.17),
+			DebuffID:       HolyFireDebuffID,
 		},
 	}
 
