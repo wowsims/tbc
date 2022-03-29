@@ -51,12 +51,9 @@ type SpellEffect struct {
 	BonusSpellPower      float64
 	BonusSpellCritRating float64
 
-	BonusHitRating        float64
-	BonusAttackPower      float64
-	BonusCritRating       float64
-	BonusExpertiseRating  float64
-	BonusArmorPenetration float64
-	BonusWeaponDamage     float64
+	BonusAttackPower     float64
+	BonusCritRating      float64
+	BonusExpertiseRating float64
 
 	// Additional multiplier that is always applied.
 	DamageMultiplier float64
@@ -120,13 +117,12 @@ func (spellEffect *SpellEffect) RangedAttackPowerOnTarget() float64 {
 	return spellEffect.Target.PseudoStats.BonusRangedAttackPower
 }
 
-// TODO: Rename this after possibly removing spellEffect.BonusWeaponDamage
-func (spellEffect *SpellEffect) PlusWeaponDamage(spellCast *SpellCast) float64 {
-	return spellCast.Character.PseudoStats.BonusDamage + spellEffect.BonusWeaponDamage + spellEffect.Target.PseudoStats.BonusWeaponDamage
+func (spellEffect *SpellEffect) BonusWeaponDamage(spellCast *SpellCast) float64 {
+	return spellCast.Character.PseudoStats.BonusDamage + spellEffect.Target.PseudoStats.BonusWeaponDamage
 }
 
 func (spellEffect *SpellEffect) PhysicalHitChance(character *Character, spellCast *SpellCast) float64 {
-	hitRating := character.stats[stats.MeleeHit] + spellEffect.BonusHitRating + spellEffect.Target.PseudoStats.BonusMeleeHitRating
+	hitRating := character.stats[stats.MeleeHit] + spellEffect.Target.PseudoStats.BonusMeleeHitRating
 
 	if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 		hitRating += character.PseudoStats.BonusRangedHitRating
@@ -417,7 +413,7 @@ func (hitEffect *SpellHitEffect) applyResistances(sim *Simulation, spellCast *Sp
 
 	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
 		// Physical resistance (armor).
-		*damage *= 1 - hitEffect.Target.ArmorDamageReduction(spellCast.Character.stats[stats.ArmorPenetration]+hitEffect.BonusArmorPenetration)
+		*damage *= 1 - hitEffect.Target.ArmorDamageReduction(spellCast.Character.stats[stats.ArmorPenetration])
 	} else if !spellCast.SpellExtras.Matches(SpellExtrasBinary) {
 		// Magical resistance.
 		// https://royalgiraffe.github.io/resist-guide
