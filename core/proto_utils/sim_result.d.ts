@@ -180,7 +180,6 @@ export declare class ActionMetrics {
     get castsPerMinute(): number;
     get avgCast(): number;
     get avgCastThreat(): number;
-    get hits(): number;
     private get landedHitsRaw();
     get landedHits(): number;
     get hitAttempts(): number;

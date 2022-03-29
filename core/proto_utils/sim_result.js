@@ -392,33 +392,20 @@ export class ActionMetrics {
     get avgCastThreat() {
         return this.data.threat / this.data.casts;
     }
-    get hits() {
-        return this.data.hits / this.iterations;
-    }
     get landedHitsRaw() {
-        if (this.data.isMelee) {
-            return this.data.hits + this.data.crits + this.data.blocks + this.data.glances;
-        }
-        else {
-            return this.data.hits;
-        }
+        return this.data.hits + this.data.crits + this.data.blocks + this.data.glances;
     }
     get landedHits() {
         return this.landedHitsRaw / this.iterations;
     }
     get hitAttempts() {
-        if (this.data.isMelee) {
-            return this.data.misses
-                + this.data.dodges
-                + this.data.parries
-                + this.data.blocks
-                + this.data.glances
-                + this.data.crits
-                + this.data.hits;
-        }
-        else {
-            return this.data.hits + this.data.misses;
-        }
+        return this.data.misses
+            + this.data.dodges
+            + this.data.parries
+            + this.data.blocks
+            + this.data.glances
+            + this.data.crits
+            + this.data.hits;
     }
     get avgHit() {
         return this.data.damage / this.landedHitsRaw;
