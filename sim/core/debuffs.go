@@ -49,7 +49,7 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 
 	if debuffs.WintersChill {
 		target.AddPermanentAura(func(sim *Simulation) Aura {
-			return WintersChillAura(sim, 5)
+			return WintersChillAura(target, 5)
 		})
 	}
 
@@ -315,7 +315,7 @@ func ImprovedScorchAura(target *Target, numStacks int32) Aura {
 
 var WintersChillDebuffID = NewDebuffID()
 
-func WintersChillAura(sim *Simulation, numStacks int32) Aura {
+func WintersChillAura(target *Target, numStacks int32) Aura {
 	bonusCrit := 2 * float64(numStacks) * SpellCritRatingPerCritChance
 
 	return Aura{
@@ -323,10 +323,11 @@ func WintersChillAura(sim *Simulation, numStacks int32) Aura {
 		ActionID: ActionID{SpellID: 28595},
 		Duration: time.Second * 15,
 		Stacks:   numStacks,
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-			if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
-				spellEffect.BonusSpellCritRating += bonusCrit
-			}
+		OnGain: func(sim *Simulation) {
+			target.PseudoStats.BonusFrostCritRating += bonusCrit
+		},
+		OnExpire: func(sim *Simulation) {
+			target.PseudoStats.BonusFrostCritRating -= bonusCrit
 		},
 	}
 }

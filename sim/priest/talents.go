@@ -149,13 +149,16 @@ func (priest *Priest) ApplyInnerFocus(sim *core.Simulation) {
 		ID:       InnerFocusAuraID,
 		ActionID: actionID,
 		Duration: core.NeverExpires,
+		OnGain: func(sim *core.Simulation) {
+			priest.AddStat(stats.SpellCrit, 25*core.SpellCritRatingPerCritChance)
+		},
+		OnExpire: func(sim *core.Simulation) {
+			priest.AddStat(stats.SpellCrit, -25*core.SpellCritRatingPerCritChance)
+		},
 		OnCast: func(sim *core.Simulation, cast *core.Cast) {
 			cast.Cost.Value = 0
 		},
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			spellEffect.BonusSpellCritRating += 25 * core.SpellCritRatingPerCritChance
-		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 			// Remove the buff and put skill on CD
 			priest.SetCD(InnerFocusCooldownID, sim.CurrentTime+time.Minute*3)
 			priest.RemoveAura(sim, InnerFocusAuraID)

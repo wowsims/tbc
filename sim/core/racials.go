@@ -7,11 +7,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var HumanWeaponSpecializationAuraID = NewAuraID()
-
 var OrcBloodFuryAuraID = NewAuraID()
 var OrcBloodFuryCooldownID = NewCooldownID()
-var OrcWeaponSpecializationAuraID = NewAuraID()
 
 var TrollBerserkingAuraID = NewAuraID()
 var TrollBerserkingCooldownID = NewCooldownID()
@@ -58,32 +55,15 @@ func applyRaceEffects(agent Agent) {
 		})
 
 		const expertiseBonus = 5 * ExpertisePerQuarterPercentReduction
-		mhMatches := false
-		ohMatches := false
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
 			if weapon.WeaponType == proto.WeaponType_WeaponTypeSword || weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
-				mhMatches = true
+				character.PseudoStats.BonusMHExpertiseRating += expertiseBonus
 			}
 		}
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
 			if weapon.WeaponType == proto.WeaponType_WeaponTypeSword || weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
-				ohMatches = true
+				character.PseudoStats.BonusOHExpertiseRating += expertiseBonus
 			}
-		}
-		procMask := GetMeleeProcMaskForHands(mhMatches, ohMatches)
-
-		if procMask != ProcMaskEmpty {
-			character.AddPermanentAura(func(sim *Simulation) Aura {
-				return Aura{
-					ID: HumanWeaponSpecializationAuraID,
-					OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-						if !spellEffect.ProcMask.Matches(procMask) {
-							return
-						}
-						spellEffect.BonusExpertiseRating += expertiseBonus
-					},
-				}
-			})
 		}
 	case proto.Race_RaceNightElf:
 		character.AddStat(stats.NatureResistance, 10)
@@ -127,32 +107,15 @@ func applyRaceEffects(agent Agent) {
 
 		// Axe specialization
 		const expertiseBonus = 5 * ExpertisePerQuarterPercentReduction
-		mhMatches := false
-		ohMatches := false
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
 			if weapon.WeaponType == proto.WeaponType_WeaponTypeAxe {
-				mhMatches = true
+				character.PseudoStats.BonusMHExpertiseRating += expertiseBonus
 			}
 		}
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
 			if weapon.WeaponType == proto.WeaponType_WeaponTypeAxe {
-				ohMatches = true
+				character.PseudoStats.BonusMHExpertiseRating += expertiseBonus
 			}
-		}
-		procMask := GetMeleeProcMaskForHands(mhMatches, ohMatches)
-
-		if procMask != ProcMaskEmpty {
-			character.AddPermanentAura(func(sim *Simulation) Aura {
-				return Aura{
-					ID: OrcWeaponSpecializationAuraID,
-					OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-						if !spellEffect.ProcMask.Matches(procMask) {
-							return
-						}
-						spellEffect.BonusExpertiseRating += expertiseBonus
-					},
-				}
-			})
 		}
 	case proto.Race_RaceTauren:
 		character.AddStat(stats.NatureResistance, 10)
