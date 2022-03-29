@@ -171,8 +171,7 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 		if hitEffect.hitCheck(sim, spellCast) {
 			hitEffect.Outcome = OutcomeHit
 			if hitEffect.critCheck(sim, spellCast) {
-				// TODO: Remove |=
-				hitEffect.Outcome |= OutcomeCrit
+				hitEffect.Outcome = OutcomeCrit
 			}
 		} else {
 			hitEffect.Outcome = OutcomeMiss

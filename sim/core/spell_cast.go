@@ -201,7 +201,7 @@ func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spell *SimpleS
 	if spell.OutcomeRollCategory == OutcomeRollCategoryNone || spell.SpellExtras.Matches(SpellExtrasAlwaysHits) {
 		spellEffect.Outcome = OutcomeHit
 		if spellEffect.critCheck(sim, &spell.SpellCast) {
-			spellEffect.Outcome |= OutcomeCrit
+			spellEffect.Outcome = OutcomeCrit
 		}
 	} else if spellEffect.ReuseMainHitRoll { // TODO: can we remove this.
 		spellEffect.Outcome = spell.Effects[0].Outcome
@@ -209,7 +209,7 @@ func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spell *SimpleS
 		if spellEffect.hitCheck(sim, &spell.SpellCast) {
 			spellEffect.Outcome = OutcomeHit
 			if spellEffect.critCheck(sim, &spell.SpellCast) {
-				spellEffect.Outcome |= OutcomeCrit
+				spellEffect.Outcome = OutcomeCrit
 			}
 		} else {
 			spellEffect.Outcome = OutcomeMiss
