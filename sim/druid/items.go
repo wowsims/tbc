@@ -54,27 +54,7 @@ var ItemSetNordrassil = core.ItemSet{
 	Name: "Nordrassil Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
-			druidAgent, ok := agent.(Agent)
-			if !ok {
-				panic("why is a non-druid using nordassil regalia")
-			}
-			druid := druidAgent.GetDruid()
-
-			druid.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				return core.Aura{
-					ID: Nordrassil4pAuraID,
-					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-						if spellCast.ActionID.SpellID == SpellIDSF8 || spellCast.ActionID.SpellID == SpellIDSF6 {
-							// Check if moonfire/insectswarm is ticking on the target.
-							// TODO: in a raid simulator we need to be able to see which dots are ticking from other druids.
-							if (druid.MoonfireSpell.Effect.DotInput.IsTicking(sim) && druid.MoonfireSpell.Effect.Target == spellEffect.Target) ||
-								(druid.InsectSwarmSpell.Effect.DotInput.IsTicking(sim) && druid.InsectSwarmSpell.Effect.Target == spellEffect.Target) {
-								spellEffect.DamageMultiplier *= 1.1
-							}
-						}
-					},
-				}
-			})
+			// Implemented in starfire.go.
 		},
 	},
 }

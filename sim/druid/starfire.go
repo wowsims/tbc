@@ -64,6 +64,22 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 		BaseDamage: core.BaseDamageFuncMagic(minBaseDamage+bonusFlatDamage, maxBaseDamage+bonusFlatDamage, spellCoefficient),
 	}
 
+	if ItemSetNordrassil.CharacterHasSetBonus(&druid.Character, 4) {
+		normalDamageCalculator := effect.BaseDamage
+		effect.BaseDamage = func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+			normalDamage := normalDamageCalculator(sim, hitEffect, spellCast)
+
+			// Check if moonfire/insectswarm is ticking on the target.
+			// TODO: in a raid simulator we need to be able to see which dots are ticking from other druids.
+			if (druid.MoonfireSpell.Effect.DotInput.IsTicking(sim) && druid.MoonfireSpell.Effect.Target == hitEffect.Target) ||
+				(druid.InsectSwarmSpell.Effect.DotInput.IsTicking(sim) && druid.InsectSwarmSpell.Effect.Target == hitEffect.Target) {
+				return normalDamage * 1.1
+			} else {
+				return normalDamage
+			}
+		}
+	}
+
 	baseCast.Cost.Value -= baseCast.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
 	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
 
