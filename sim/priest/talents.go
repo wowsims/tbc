@@ -103,7 +103,7 @@ func (priest *Priest) applySurgeOfLight(spellCast *core.SpellCast) {
 	}
 }
 
-func (priest *Priest) applyTalentsToHolySpell(cast *core.Cast, effect *core.SpellHitEffect) {
+func (priest *Priest) applyTalentsToHolySpell(cast *core.Cast, effect *core.SpellEffect) {
 	effect.ThreatMultiplier *= 1 - 0.04*float64(priest.Talents.SilentResolve)
 	if cast.ActionID.SpellID == SpellIDSmite || cast.ActionID.SpellID == SpellIDHolyFire {
 		effect.BonusSpellCritRating += float64(priest.Talents.HolySpecialization) * 1 * core.SpellCritRatingPerCritChance
@@ -112,7 +112,7 @@ func (priest *Priest) applyTalentsToHolySpell(cast *core.Cast, effect *core.Spel
 	effect.BonusSpellCritRating += float64(priest.Talents.ForceOfWill) * 1 * core.SpellCritRatingPerCritChance
 }
 
-func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellHitEffect) {
+func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellEffect) {
 	effect.ThreatMultiplier *= 1 - 0.08*float64(priest.Talents.ShadowAffinity)
 	if cast.ActionID.SpellID == SpellIDShadowWordDeath || cast.ActionID.SpellID == SpellIDMindBlast {
 		effect.BonusSpellCritRating += float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance

@@ -26,20 +26,18 @@ func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.SimpleS
 				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask: core.ProcMaskRangedSpecial,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						return
-					}
+		Effect: core.SpellEffect{
+			ProcMask: core.ProcMaskRangedSpecial,
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
 
-					spellEffect.Target.AddAura(sim, core.Aura{
-						ID:       ScorpidStingDebuffID,
-						ActionID: actionID,
-						Duration: time.Second * 20,
-					})
-				},
+				spellEffect.Target.AddAura(sim, core.Aura{
+					ID:       ScorpidStingDebuffID,
+					ActionID: actionID,
+					Duration: time.Second * 20,
+				})
 			},
 		},
 	}

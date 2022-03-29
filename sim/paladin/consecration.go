@@ -35,10 +35,9 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 		},
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
-		},
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:  8,
 			TickLength:     time.Second,
@@ -49,7 +48,7 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 	// TODO: consecration talents here
 
 	numHits := sim.GetNumTargets()
-	effects := make([]core.SpellHitEffect, 0, numHits)
+	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, effect)
 		effects[i].Target = sim.GetTarget(i)

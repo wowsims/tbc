@@ -36,17 +36,15 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						return
-					}
-					fireballDot := mage.newFireballDot(sim, spellEffect.Target)
-					fireballDot.Cast(sim)
-				},
+		Effect: core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+				fireballDot := mage.newFireballDot(sim, spellEffect.Target)
+				fireballDot.Cast(sim)
 			},
 			BaseDamage: core.BaseDamageConfigMagic(649, 821, 1.0+0.03*float64(mage.Talents.EmpoweredFireball)),
 		},
@@ -83,10 +81,8 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 				SpellExtras:      SpellFlagMage,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: mage.spellDamageMultiplier,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier,
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 2,

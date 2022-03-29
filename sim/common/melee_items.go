@@ -58,12 +58,10 @@ func ApplyStormGauntlets(agent core.Agent) {
 					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
-			Effect: core.SpellHitEffect{
-				SpellEffect: core.SpellEffect{
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-				},
-				BaseDamage: core.BaseDamageConfigFlat(3),
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigFlat(3),
 			},
 		})
 
@@ -104,12 +102,10 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
-			Effect: core.SpellHitEffect{
-				SpellEffect: core.SpellEffect{
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-				},
-				BaseDamage: core.BaseDamageConfigFlat(2),
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigFlat(2),
 			},
 		})
 
@@ -384,15 +380,13 @@ func ApplyDespair(agent core.Agent) {
 				IsPhantom:           true,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				// TODO: This should be removed once we have an attack mask.
-				//  This is only set here to correctly calculate damage.
-				ProcMask:         core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-			},
-			BaseDamage: core.BaseDamageConfigFlat(600),
+		Effect: core.SpellEffect{
+			// TODO: This should be removed once we have an attack mask.
+			//  This is only set here to correctly calculate damage.
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigFlat(600),
 		},
 	}
 
@@ -440,13 +434,11 @@ func ApplyTheDecapitator(agent core.Agent) {
 				IsPhantom:           true,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:         core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-			},
-			BaseDamage: core.BaseDamageConfigRoll(513, 567),
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigRoll(513, 567),
 		},
 	}
 
@@ -502,12 +494,10 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
-			Effect: core.SpellHitEffect{
-				SpellEffect: core.SpellEffect{
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-				},
-				BaseDamage: core.BaseDamageConfigRoll(285, 315),
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigRoll(285, 315),
 			},
 		})
 
@@ -793,12 +783,10 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
-			Effect: core.SpellHitEffect{
-				SpellEffect: core.SpellEffect{
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-				},
-				BaseDamage: core.BaseDamageConfigMagic(48, 54, 1),
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigMagic(48, 54, 1),
 			},
 		})
 		spellObj := core.SimpleSpell{}
@@ -968,12 +956,10 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
-			Effect: core.SpellHitEffect{
-				SpellEffect: core.SpellEffect{
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-				},
-				BaseDamage: core.BaseDamageConfigFlat(20),
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigFlat(20),
 			},
 		})
 		spellObj := core.SimpleSpell{}

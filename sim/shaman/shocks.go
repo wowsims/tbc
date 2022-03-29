@@ -41,11 +41,9 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 	}
 
@@ -58,7 +56,7 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 	spell.Effect.ThreatMultiplier *= 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision)
 	spell.Effect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
 	spell.Effect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
-	spell.Effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
+	spell.Effect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 
 	// TODO: confirm this is how it reduces mana cost.
 	if ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 2) {

@@ -68,10 +68,8 @@ func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSp
 
 	// Dmg over 15 sec = shadow_dmg*.6 + 1191
 	// just simulate 10 1.5s long ticks
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
-		},
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:  10,
 			TickLength:     time.Millisecond * 1500,

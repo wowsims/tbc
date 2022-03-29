@@ -35,12 +35,10 @@ func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.Simp
 		CritMultiplier: priest.DefaultSpellCritMultiplier(),
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-		},
-		BaseDamage: core.BaseDamageConfigMagic(572, 664, 0.429),
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+		BaseDamage:       core.BaseDamageConfigMagic(572, 664, 0.429),
 	}
 
 	priest.applyTalentsToShadowSpell(&baseCast, &effect)

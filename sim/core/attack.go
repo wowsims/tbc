@@ -202,13 +202,11 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					CritMultiplier:      options.MainHand.CritMultiplier,
 				},
 			},
-			Effect: SpellHitEffect{
-				SpellEffect: SpellEffect{
-					ProcMask:         ProcMaskMeleeMHAuto,
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-				},
-				BaseDamage: BaseDamageConfigMeleeWeapon(MainHand, false, 0, 1, true),
+			Effect: SpellEffect{
+				ProcMask:         ProcMaskMeleeMHAuto,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       BaseDamageConfigMeleeWeapon(MainHand, false, 0, 1, true),
 			},
 		},
 		OHAuto: SimpleSpell{
@@ -221,13 +219,11 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					CritMultiplier:      options.OffHand.CritMultiplier,
 				},
 			},
-			Effect: SpellHitEffect{
-				SpellEffect: SpellEffect{
-					ProcMask:         ProcMaskMeleeOHAuto,
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-				},
-				BaseDamage: BaseDamageConfigMeleeWeapon(OffHand, false, 0, 1, true),
+			Effect: SpellEffect{
+				ProcMask:         ProcMaskMeleeOHAuto,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       BaseDamageConfigMeleeWeapon(OffHand, false, 0, 1, true),
 			},
 		},
 		RangedAuto: SimpleSpell{
@@ -241,13 +237,11 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					IgnoreHaste:         true, // Affected by ranged haste, not spell haste.
 				},
 			},
-			Effect: SpellHitEffect{
-				SpellEffect: SpellEffect{
-					ProcMask:         ProcMaskRangedAuto,
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-				},
-				BaseDamage: BaseDamageConfigRangedWeapon(0),
+			Effect: SpellEffect{
+				ProcMask:         ProcMaskRangedAuto,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       BaseDamageConfigRangedWeapon(0),
 			},
 		},
 	}

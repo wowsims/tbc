@@ -41,18 +41,16 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		},
 	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1.0,
-			ThreatMultiplier: 1.0,
-			BonusAttackPower: apBonus,
-		},
+	baseEffect := core.SpellEffect{
+		DamageMultiplier: 1.0,
+		ThreatMultiplier: 1.0,
+		BonusAttackPower: apBonus,
 	}
 	if shaman.Talents.SpiritWeapons {
 		baseEffect.ThreatMultiplier *= 0.7
 	}
 
-	wftempl.Effects = []core.SpellHitEffect{
+	wftempl.Effects = []core.SpellEffect{
 		baseEffect,
 		baseEffect,
 	}
@@ -134,11 +132,9 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 	}
 	ftTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
@@ -204,12 +200,10 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-			},
-			BaseDamage: core.BaseDamageConfigMagic(246, 246, 0.1),
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagic(246, 246, 0.1),
 		},
 	}
 	fbTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)

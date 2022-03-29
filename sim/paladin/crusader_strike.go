@@ -31,16 +31,14 @@ func (paladin *Paladin) newCrusaderStrikeTemplate(sim *core.Simulation) core.Sim
 				},
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:         core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier: 1, // Need to review to make sure I set these properly
-				ThreatMultiplier: 1,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						return
-					}
-				},
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1, // Need to review to make sure I set these properly
+			ThreatMultiplier: 1,
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
 			},
 			// maybe this isn't the one that should be set to 1.1
 			BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 1.1, true),

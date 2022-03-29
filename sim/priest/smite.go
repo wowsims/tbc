@@ -35,12 +35,10 @@ func (priest *Priest) newSmiteTemplate(sim *core.Simulation) core.SimpleSpellTem
 		CritMultiplier: priest.DefaultSpellCritMultiplier(),
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-		},
-		BaseDamage: core.BaseDamageConfigMagic(549, 616, 0.7143),
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+		BaseDamage:       core.BaseDamageConfigMagic(549, 616, 0.7143),
 	}
 
 	priest.applyTalentsToHolySpell(&baseCast, &effect)

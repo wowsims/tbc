@@ -49,16 +49,14 @@ func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.Simple
 		},
 	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: impTCDamageMult,
-			ThreatMultiplier: 1.75,
-		},
-		BaseDamage: core.BaseDamageConfigFlat(123),
+	baseEffect := core.SpellEffect{
+		DamageMultiplier: impTCDamageMult,
+		ThreatMultiplier: 1.75,
+		BaseDamage:       core.BaseDamageConfigFlat(123),
 	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())
-	effects := make([]core.SpellHitEffect, 0, numHits)
+	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)

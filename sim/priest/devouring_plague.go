@@ -29,11 +29,9 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 		Cooldown:            time.Minute * 3,
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-		},
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:  8,
 			TickLength:     time.Second * 3,

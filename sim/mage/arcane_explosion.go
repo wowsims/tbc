@@ -31,18 +31,16 @@ func (mage *Mage) newArcaneExplosionTemplate(sim *core.Simulation) core.SimpleSp
 		AOECap: 10180,
 	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
-		},
-		BaseDamage: core.BaseDamageConfigMagic(249, 270, 0.214),
+	baseEffect := core.SpellEffect{
+		DamageMultiplier: mage.spellDamageMultiplier,
+		ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
+		BaseDamage:       core.BaseDamageConfigMagic(249, 270, 0.214),
 	}
 	baseEffect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance
 	baseEffect.BonusSpellCritRating += float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance
 
 	numHits := sim.GetNumTargets()
-	effects := make([]core.SpellHitEffect, 0, numHits)
+	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)

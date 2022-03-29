@@ -33,25 +33,23 @@ func (hunter *Hunter) newSteadyShotTemplate(sim *core.Simulation) core.SimpleSpe
 				CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:         core.ProcMaskRangedSpecial,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					hunter.killCommandBlocked = false
-					hunter.TryKillCommand(sim, spellEffect.Target)
-					hunter.rotation(sim, false)
-				},
-			},
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskRangedSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 			BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
-				Calculator: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
 					return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
 						hunter.AutoAttacks.Ranged.BaseDamage(sim)*2.8/hunter.AutoAttacks.Ranged.SwingSpeed +
 						150
 				},
 				TargetSpellCoefficient: 1,
 			}),
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				hunter.killCommandBlocked = false
+				hunter.TryKillCommand(sim, spellEffect.Target)
+				hunter.rotation(sim, false)
+			},
 		},
 	}
 

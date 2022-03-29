@@ -32,12 +32,10 @@ func (paladin *Paladin) newExorcismTemplate(sim *core.Simulation) core.SimpleSpe
 				CritMultiplier: paladin.SpellCritMultiplier(1, 0.25), // look up crit multiplier in the future
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-			},
-			BaseDamage: core.BaseDamageConfigMagic(521, 579, 1),
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagic(521, 579, 1),
 		},
 	}
 

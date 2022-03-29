@@ -42,6 +42,9 @@ type SpellEffect struct {
 	// Target of the spell.
 	Target *Target
 
+	BaseDamage BaseDamageConfig
+	DotInput   DotDamageInput
+
 	// Bonus stats to be added to the spell.
 	BonusSpellHitRating  float64
 	BonusSpellPower      float64
@@ -158,7 +161,7 @@ func (spellEffect *SpellEffect) SpellCritChance(character *Character, spellCast 
 	return critRating / (SpellCritRatingPerCritChance * 100)
 }
 
-func (hitEffect *SpellHitEffect) directCalculations(sim *Simulation, spell *SimpleSpell) {
+func (hitEffect *SpellEffect) directCalculations(sim *Simulation, spell *SimpleSpell) {
 	damage := hitEffect.calculateBaseDamage(sim, &spell.SpellCast)
 
 	damage *= hitEffect.DamageMultiplier
@@ -170,7 +173,7 @@ func (hitEffect *SpellHitEffect) directCalculations(sim *Simulation, spell *Simp
 	hitEffect.Damage = damage
 }
 
-func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast *SpellCast) float64 {
+func (hitEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spellCast *SpellCast) float64 {
 	if hitEffect.BaseDamage.Calculator == nil {
 		return 0
 	} else {
@@ -178,7 +181,7 @@ func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast 
 	}
 }
 
-func (spellEffect *SpellHitEffect) determineOutcome(sim *Simulation, spell *SimpleSpell) {
+func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spell *SimpleSpell) {
 	if spell.OutcomeRollCategory == OutcomeRollCategoryNone || spell.SpellExtras.Matches(SpellExtrasAlwaysHits) {
 		spellEffect.Outcome = OutcomeHit
 		if spellEffect.critCheck(sim, &spell.SpellCast) {
@@ -354,7 +357,7 @@ func (spellEffect *SpellEffect) String() string {
 	return fmt.Sprintf("%s for %0.3f damage", outcomeStr, spellEffect.Damage)
 }
 
-func (hitEffect *SpellHitEffect) applyAttackerMultipliers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, damage *float64) {
+func (hitEffect *SpellEffect) applyAttackerMultipliers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, damage *float64) {
 	attacker := spellCast.Character
 
 	if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
@@ -382,7 +385,7 @@ func (hitEffect *SpellHitEffect) applyAttackerMultipliers(sim *Simulation, spell
 	}
 }
 
-func (hitEffect *SpellHitEffect) applyTargetMultipliers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, targetCoeff float64, damage *float64) {
+func (hitEffect *SpellEffect) applyTargetMultipliers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, targetCoeff float64, damage *float64) {
 	target := hitEffect.Target
 
 	*damage *= target.PseudoStats.DamageTakenMultiplier
@@ -411,7 +414,7 @@ func (hitEffect *SpellHitEffect) applyTargetMultipliers(sim *Simulation, spellCa
 }
 
 // Modifies damage based on Armor or Magic resistances, depending on the damage type.
-func (hitEffect *SpellHitEffect) applyResistances(sim *Simulation, spellCast *SpellCast, damage *float64) {
+func (hitEffect *SpellEffect) applyResistances(sim *Simulation, spellCast *SpellCast, damage *float64) {
 	if spellCast.SpellExtras.Matches(SpellExtrasIgnoreResists) {
 		return
 	}
@@ -427,19 +430,19 @@ func (hitEffect *SpellHitEffect) applyResistances(sim *Simulation, spellCast *Sp
 		if resistanceRoll > 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
 			// No partial resist.
 		} else if resistanceRoll > 0.05 {
-			hitEffect.SpellEffect.Outcome |= OutcomePartial1_4
+			hitEffect.Outcome |= OutcomePartial1_4
 			*damage *= 0.75
 		} else if resistanceRoll > 0.01 {
-			hitEffect.SpellEffect.Outcome |= OutcomePartial2_4
+			hitEffect.Outcome |= OutcomePartial2_4
 			*damage *= 0.5
 		} else {
-			hitEffect.SpellEffect.Outcome |= OutcomePartial3_4
+			hitEffect.Outcome |= OutcomePartial3_4
 			*damage *= 0.25
 		}
 	}
 }
 
-func (hitEffect *SpellHitEffect) applyOutcome(sim *Simulation, spellCast *SpellCast, damage *float64) {
+func (hitEffect *SpellEffect) applyOutcome(sim *Simulation, spellCast *SpellCast, damage *float64) {
 	if !hitEffect.Landed() {
 		*damage = 0
 	} else if hitEffect.Outcome.Matches(OutcomeCrit) {

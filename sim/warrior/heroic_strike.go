@@ -30,14 +30,12 @@ func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleS
 				CritMultiplier: warrior.critMultiplier(true),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				FlatThreatBonus:  194,
-			},
-			BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 176, 1, true),
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			FlatThreatBonus:  194,
+			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 176, 1, true),
 		},
 	}
 

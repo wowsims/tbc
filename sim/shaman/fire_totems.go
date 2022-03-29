@@ -27,10 +27,8 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 				IsPhantom:           true,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: 1,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
 			DotInput: core.DotDamageInput{
 				// These are the real tick values, but searing totem doesn't start its next
 				// cast until the previous missile hits the target. We don't have an option
@@ -51,7 +49,7 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 	if shaman.Talents.ElementalFury {
 		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
-	spell.Effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
+	spell.Effect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 
 	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
 		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*60
@@ -103,10 +101,8 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
-		},
+	baseEffect := core.SpellEffect{
+		DamageMultiplier: 1,
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:       10,
 			TickLength:          time.Second * 2,
@@ -115,7 +111,7 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 		},
 	}
 	baseEffect.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
-	baseEffect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
+	baseEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 
 	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
 		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*20
@@ -123,7 +119,7 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 	}
 
 	numHits := sim.GetNumTargets()
-	effects := make([]core.SpellHitEffect, 0, numHits)
+	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)
@@ -184,10 +180,8 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
-		},
+	baseEffect := core.SpellEffect{
+		DamageMultiplier: 1,
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:       1,
 			TickLength:          shaman.FireNovaTickLength(),
@@ -196,7 +190,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 		},
 	}
 	baseEffect.DamageMultiplier *= 1 + float64(shaman.Talents.CallOfFlame)*0.05
-	baseEffect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
+	baseEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
 
 	tickLength := baseEffect.DotInput.TickLength
 	spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
@@ -205,7 +199,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 	}
 
 	numHits := sim.GetNumTargets()
-	effects := make([]core.SpellHitEffect, 0, numHits)
+	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)

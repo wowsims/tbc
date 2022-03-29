@@ -74,34 +74,30 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 				CritMultiplier: shaman.DefaultMeleeCritMultiplier(),
 			},
 		},
-		Effects: []core.SpellHitEffect{
+		Effects: []core.SpellEffect{
 			{
-				SpellEffect: core.SpellEffect{
-					ProcMask:         core.ProcMaskMeleeMHSpecial,
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if !spellEffect.Landed() {
-							return
-						}
+				ProcMask:         core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, false, flatDamageBonus, 1, true),
+				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					if !spellEffect.Landed() {
+						return
+					}
 
-						ssDebuffAura.Stacks = 2
-						spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
-						if hasSkyshatter4p {
-							skyshatterAuraApplier(sim)
-						}
-					},
+					ssDebuffAura.Stacks = 2
+					spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
+					if hasSkyshatter4p {
+						skyshatterAuraApplier(sim)
+					}
 				},
-				BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, false, flatDamageBonus, 1, true),
 			},
 			{
-				SpellEffect: core.SpellEffect{
-					ProcMask:         core.ProcMaskMeleeOHSpecial,
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-					ReuseMainHitRoll: true,
-				},
-				BaseDamage: core.BaseDamageConfigMeleeWeapon(core.OffHand, false, flatDamageBonus, 1, true),
+				ProcMask:         core.ProcMaskMeleeOHSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				ReuseMainHitRoll: true,
+				BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.OffHand, false, flatDamageBonus, 1, true),
 			},
 		},
 	}

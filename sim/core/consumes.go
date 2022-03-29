@@ -797,12 +797,10 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 					CritMultiplier:      1.5,
 				},
 			},
-			Effect: SpellHitEffect{
-				SpellEffect: SpellEffect{
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-				},
-				BaseDamage: BaseDamageConfigFlat(40),
+			Effect: SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       BaseDamageConfigFlat(40),
 			},
 		})
 		spellObj := SimpleSpell{}
@@ -955,19 +953,18 @@ func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID Act
 		},
 	}
 
-	baseEffect := SpellHitEffect{
-		SpellEffect: SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+	baseEffect := SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
 
-			// Explosives always have 1% resist chance, so just give them hit cap.
-			BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,
-		},
+		// Explosives always have 1% resist chance, so just give them hit cap.
+		BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,
+
 		BaseDamage: BaseDamageConfigRoll(minDamage, maxDamage),
 	}
 
 	numHits := sim.GetNumTargets()
-	effects := make([]SpellHitEffect, 0, numHits)
+	effects := make([]SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)

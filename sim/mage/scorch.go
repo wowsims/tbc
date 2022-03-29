@@ -32,12 +32,10 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
-			},
-			BaseDamage: core.BaseDamageConfigMagic(305, 361, 1.5/3.5),
+		Effect: core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+			BaseDamage:       core.BaseDamageConfigMagic(305, 361, 1.5/3.5),
 		},
 	}
 

@@ -27,14 +27,12 @@ func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.SimpleSpel
 				CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:         core.ProcMaskRangedSpecial,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-			},
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskRangedSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 			BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
-				Calculator: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
 					return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
 						hunter.AutoAttacks.Ranged.BaseDamage(sim) +
 						hunter.AmmoDamageBonus +

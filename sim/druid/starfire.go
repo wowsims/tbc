@@ -55,17 +55,15 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 	}
 	spellCoefficient += 0.04 * float64(druid.Talents.WrathOfCenarius)
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-		},
-		BaseDamage: core.BaseDamageConfigMagic(minBaseDamage+bonusFlatDamage, maxBaseDamage+bonusFlatDamage, spellCoefficient),
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+		BaseDamage:       core.BaseDamageConfigMagic(minBaseDamage+bonusFlatDamage, maxBaseDamage+bonusFlatDamage, spellCoefficient),
 	}
 
 	if ItemSetNordrassil.CharacterHasSetBonus(&druid.Character, 4) {
 		effect.BaseDamage = core.WrapBaseDamageConfig(effect.BaseDamage, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
-			return func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
 				normalDamage := oldCalculator(sim, hitEffect, spellCast)
 
 				// Check if moonfire/insectswarm is ticking on the target.
