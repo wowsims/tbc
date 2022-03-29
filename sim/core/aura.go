@@ -383,6 +383,44 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 	}
 }
 
+// Like AddAura but ensures that callbacks for this Aura will be invoked first.
+func (at *auraTracker) AddPriorityAura(sim *Simulation, auraToAdd Aura) {
+	at.AddAura(sim, auraToAdd)
+	newAura := &at.auras[auraToAdd.ID]
+
+	if newAura.OnCast != nil {
+		otherAuraID := at.onCastIDs[0]
+		at.onCastIDs[0] = newAura.ID
+		at.onCastIDs[len(at.onCastIDs)-1] = otherAuraID
+		at.auras[otherAuraID].onCastIndex = newAura.onCastIndex
+		newAura.onCastIndex = 0
+	}
+
+	if newAura.OnCastComplete != nil {
+		otherAuraID := at.onCastCompleteIDs[0]
+		at.onCastCompleteIDs[0] = newAura.ID
+		at.onCastCompleteIDs[len(at.onCastCompleteIDs)-1] = otherAuraID
+		at.auras[otherAuraID].onCastCompleteIndex = newAura.onCastCompleteIndex
+		newAura.onCastCompleteIndex = 0
+	}
+
+	if newAura.OnSpellHit != nil {
+		otherAuraID := at.onSpellHitIDs[0]
+		at.onSpellHitIDs[0] = newAura.ID
+		at.onSpellHitIDs[len(at.onSpellHitIDs)-1] = otherAuraID
+		at.auras[otherAuraID].onSpellHitIndex = newAura.onSpellHitIndex
+		newAura.onSpellHitIndex = 0
+	}
+
+	if newAura.OnPeriodicDamage != nil {
+		otherAuraID := at.onPeriodicDamageIDs[0]
+		at.onPeriodicDamageIDs[0] = newAura.ID
+		at.onPeriodicDamageIDs[len(at.onPeriodicDamageIDs)-1] = otherAuraID
+		at.auras[otherAuraID].onPeriodicDamageIndex = newAura.onPeriodicDamageIndex
+		newAura.onPeriodicDamageIndex = 0
+	}
+}
+
 // Remove an aura by its ID
 func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 	aura := &at.auras[id]

@@ -155,7 +155,9 @@ func (spellEffect *SpellEffect) SpellPower(character *Character, spellCast *Spel
 
 func (spellEffect *SpellEffect) SpellCritChance(character *Character, spellCast *SpellCast) float64 {
 	critRating := (character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating + spellEffect.Target.PseudoStats.BonusCritRating)
-	if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
+	if spellCast.SpellSchool.Matches(SpellSchoolFire) {
+		critRating += character.PseudoStats.BonusFireCritRating
+	} else if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
 		critRating += spellEffect.Target.PseudoStats.BonusFrostCritRating
 	}
 	return critRating / (SpellCritRatingPerCritChance * 100)
@@ -165,8 +167,8 @@ func (hitEffect *SpellEffect) directCalculations(sim *Simulation, spell *SimpleS
 	damage := hitEffect.calculateBaseDamage(sim, &spell.SpellCast)
 
 	damage *= hitEffect.DamageMultiplier
-	hitEffect.applyAttackerMultipliers(sim, &spell.SpellCast, false, &damage)
-	hitEffect.applyTargetMultipliers(sim, &spell.SpellCast, false, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
+	hitEffect.applyAttackerModifiers(sim, &spell.SpellCast, false, &damage)
+	hitEffect.applyTargetModifiers(sim, &spell.SpellCast, false, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	hitEffect.applyResistances(sim, &spell.SpellCast, &damage)
 	hitEffect.applyOutcome(sim, &spell.SpellCast, &damage)
 
@@ -357,7 +359,7 @@ func (spellEffect *SpellEffect) String() string {
 	return fmt.Sprintf("%s for %0.3f damage", outcomeStr, spellEffect.Damage)
 }
 
-func (hitEffect *SpellEffect) applyAttackerMultipliers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, damage *float64) {
+func (hitEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, damage *float64) {
 	attacker := spellCast.Character
 
 	if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
@@ -385,7 +387,7 @@ func (hitEffect *SpellEffect) applyAttackerMultipliers(sim *Simulation, spellCas
 	}
 }
 
-func (hitEffect *SpellEffect) applyTargetMultipliers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, targetCoeff float64, damage *float64) {
+func (hitEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, targetCoeff float64, damage *float64) {
 	target := hitEffect.Target
 
 	*damage *= target.PseudoStats.DamageTakenMultiplier

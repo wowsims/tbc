@@ -150,19 +150,24 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 			return func(sim *core.Simulation, character *core.Character) {
 				character.Metrics.AddInstantCast(actionID)
 
-				character.AddAura(sim, core.Aura{
+				character.AddPriorityAura(sim, core.Aura{
 					ID:       ElementalMasteryAuraID,
 					ActionID: actionID,
 					Duration: core.NeverExpires,
+					OnGain: func(sim *core.Simulation) {
+						shaman.AddStat(stats.SpellCrit, 100*core.SpellCritRatingPerCritChance)
+					},
+					OnExpire: func(sim *core.Simulation) {
+						shaman.AddStat(stats.SpellCrit, -100*core.SpellCritRatingPerCritChance)
+					},
 					OnCast: func(sim *core.Simulation, cast *core.Cast) {
 						if !cast.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
 							return
 						}
 						cast.Cost.Value = 0
-						cast.BonusCritRating = 100.0 * core.SpellCritRatingPerCritChance
 					},
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						if !cast.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
+					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+						if !spellCast.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
 							return
 						}
 						// Remove the buff and put skill on CD
