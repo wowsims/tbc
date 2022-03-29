@@ -7,10 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Callback for after a spell hits the target, before damage has been calculated.
-// Use it to modify the spell damage or results.
-type OnBeforeSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect)
-
 // Callback for after a spell hits the target and after damage is calculated. Use it for proc effects
 // or anything that comes from the final result of the spell.
 type OnSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect)
@@ -138,6 +134,9 @@ func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spellCa
 	} else {
 		critRating += character.PseudoStats.BonusMeleeCritRating
 	}
+	if spellCast.SpellExtras.Matches(SpellExtrasAgentReserved1) {
+		critRating += character.PseudoStats.BonusCritRatingAgentReserved1
+	}
 	if spellEffect.ProcMask.Matches(ProcMaskMeleeMH) {
 		spellEffect.BonusCritRating += character.PseudoStats.BonusMHCritRating
 	} else if spellEffect.ProcMask.Matches(ProcMaskMeleeOH) {
@@ -157,23 +156,6 @@ func (spellEffect *SpellEffect) SpellCritChance(character *Character, spellCast 
 		critRating += spellEffect.Target.PseudoStats.BonusFrostCritRating
 	}
 	return critRating / (SpellCritRatingPerCritChance * 100)
-}
-
-func (she *SpellHitEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell) {
-	se := &she.SpellEffect
-	se.beforeCalculations(sim, spell, she)
-}
-
-func (spellEffect *SpellEffect) beforeCalculations(sim *Simulation, spell *SimpleSpell, she *SpellHitEffect) {
-	spellEffect.BeyondAOECapMultiplier = 1
-	multiplierBeforeTargetEffects := spellEffect.DamageMultiplier
-
-	spell.Character.OnBeforeSpellHit(sim, &spell.SpellCast, she)
-	spellEffect.Target.OnBeforeSpellHit(sim, &spell.SpellCast, she)
-
-	spellEffect.BeyondAOECapMultiplier *= spellEffect.DamageMultiplier / multiplierBeforeTargetEffects
-
-	spellEffect.determineOutcome(sim, spell, she)
 }
 
 func (hitEffect *SpellHitEffect) directCalculations(sim *Simulation, spell *SimpleSpell) {
@@ -196,7 +178,7 @@ func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast 
 	}
 }
 
-func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spell *SimpleSpell, she *SpellHitEffect) {
+func (spellEffect *SpellHitEffect) determineOutcome(sim *Simulation, spell *SimpleSpell) {
 	if spell.OutcomeRollCategory == OutcomeRollCategoryNone || spell.SpellExtras.Matches(SpellExtrasAlwaysHits) {
 		spellEffect.Outcome = OutcomeHit
 		if spellEffect.critCheck(sim, &spell.SpellCast) {
@@ -377,6 +359,9 @@ func (hitEffect *SpellHitEffect) applyAttackerMultipliers(sim *Simulation, spell
 
 	if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 		*damage *= attacker.PseudoStats.RangedDamageDealtMultiplier
+	}
+	if spellCast.SpellExtras.Matches(SpellExtrasAgentReserved1) {
+		*damage *= attacker.PseudoStats.AgentReserved1DamageDealtMultiplier
 	}
 
 	*damage *= attacker.PseudoStats.DamageDealtMultiplier

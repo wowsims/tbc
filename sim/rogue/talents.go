@@ -82,11 +82,11 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim 
 		ID:       FindWeaknessAuraID,
 		ActionID: core.ActionID{SpellID: 31242},
 		Duration: time.Second * 10,
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			// TODO: This should be rogue abilities only, not all specials.
-			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
-				spellEffect.DamageMultiplier *= findWeaknessMultiplier
-			}
+		OnGain: func(sim *core.Simulation) {
+			rogue.PseudoStats.AgentReserved1DamageDealtMultiplier *= findWeaknessMultiplier
+		},
+		OnExpire: func(sim *core.Simulation) {
+			rogue.PseudoStats.AgentReserved1DamageDealtMultiplier /= findWeaknessMultiplier
 		},
 	}
 
@@ -139,12 +139,14 @@ func (rogue *Rogue) registerColdBloodCD() {
 		ID:       ColdBloodAuraID,
 		ActionID: actionID,
 		Duration: core.NeverExpires,
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			// TODO: This should be rogue abilities only, not all specials.
-			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeSpecial) {
-				spellEffect.BonusCritRating += 100 * core.MeleeCritRatingPerCritChance
-				rogue.RemoveAura(sim, ColdBloodAuraID)
-			}
+		OnGain: func(sim *core.Simulation) {
+			rogue.PseudoStats.BonusCritRatingAgentReserved1 += 100 * core.MeleeCritRatingPerCritChance
+		},
+		OnExpire: func(sim *core.Simulation) {
+			rogue.PseudoStats.BonusCritRatingAgentReserved1 -= 100 * core.MeleeCritRatingPerCritChance
+		},
+		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			rogue.RemoveAuraOnNextAdvance(sim, ColdBloodAuraID)
 		},
 	}
 
@@ -331,13 +333,14 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 		Duration: dur,
 		OnGain: func(sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, hasteBonus)
+			if sim.GetNumTargets() > 1 {
+				rogue.PseudoStats.DamageDealtMultiplier *= 2
+			}
 		},
 		OnExpire: func(sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
-		},
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
 			if sim.GetNumTargets() > 1 {
-				spellEffect.DamageMultiplier *= 2
+				rogue.PseudoStats.DamageDealtMultiplier /= 2
 			}
 		},
 	}

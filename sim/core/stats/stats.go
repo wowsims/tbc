@@ -425,6 +425,10 @@ type PseudoStats struct {
 	HolyDamageDealtMultiplier     float64
 	NatureDamageDealtMultiplier   float64
 	ShadowDamageDealtMultiplier   float64
+
+	// Modifiers for spells with the SpellExtrasAgentReserved1 flag set.
+	BonusCritRatingAgentReserved1       float64
+	AgentReserved1DamageDealtMultiplier float64
 }
 
 func NewPseudoStats() PseudoStats {
@@ -445,6 +449,8 @@ func NewPseudoStats() PseudoStats {
 		HolyDamageDealtMultiplier:     1,
 		NatureDamageDealtMultiplier:   1,
 		ShadowDamageDealtMultiplier:   1,
+
+		AgentReserved1DamageDealtMultiplier: 1,
 	}
 }
 
