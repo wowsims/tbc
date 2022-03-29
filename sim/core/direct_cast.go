@@ -32,10 +32,14 @@ func BaseDamageFuncMagic(minFlatDamage float64, maxFlatDamage float64, spellCoef
 		return BaseDamageFuncRoll(minFlatDamage, maxFlatDamage)
 	}
 
-	// TODO: Add case for min == max which skips the roll and just adds damage. Will change RNG
 	if minFlatDamage == 0 && maxFlatDamage == 0 {
 		return func(_ *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
 			return hitEffect.SpellPower(spellCast.Character, spellCast) * spellCoefficient
+		}
+	} else if minFlatDamage == maxFlatDamage {
+		return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+			damage := hitEffect.SpellPower(spellCast.Character, spellCast) * spellCoefficient
+			return damage + minFlatDamage
 		}
 	} else {
 		deltaDamage := maxFlatDamage - minFlatDamage
@@ -114,8 +118,7 @@ func BaseDamageFuncRangedWeapon(flatBonus float64) BaseDamageCalculator {
 // Performs an actual damage roll. Keep this internal because the 2nd parameter
 // is the delta rather than maxDamage, which is error-prone.
 func damageRollOptimized(sim *Simulation, minDamage float64, deltaDamage float64) float64 {
-	// TODO: Rename RNG label
-	return minDamage + deltaDamage*sim.RandomFloat("Base Damage Direct")
+	return minDamage + deltaDamage*sim.RandomFloat("Damage Roll")
 }
 
 // For convenience, but try to use damageRollOptimized in most cases.
