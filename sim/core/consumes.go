@@ -800,6 +800,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 			Effect: SpellHitEffect{
 				SpellEffect: SpellEffect{
 					DamageMultiplier: 1,
+					ThreatMultiplier: 1,
 				},
 				BaseDamage: BaseDamageFuncFlat(40),
 			},
