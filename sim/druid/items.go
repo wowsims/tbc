@@ -48,8 +48,6 @@ var ItemSetMalorne = core.ItemSet{
 	},
 }
 
-var Nordrassil4pAuraID = core.NewAuraID()
-
 var ItemSetNordrassil = core.ItemSet{
 	Name: "Nordrassil Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
