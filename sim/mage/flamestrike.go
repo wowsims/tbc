@@ -94,10 +94,9 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 			StaticDamageMultiplier: mage.spellDamageMultiplier,
 		},
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        4,
-			TickLength:           time.Second * 2,
-			TickBaseDamage:       106,
-			TickSpellCoefficient: 0.03,
+			NumberOfTicks:  4,
+			TickLength:     time.Second * 2,
+			TickBaseDamage: core.DotSnapshotFuncMagic(106, 0.03),
 		},
 	}
 

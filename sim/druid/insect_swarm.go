@@ -37,11 +37,10 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpel
 			ThreatMultiplier:       1,
 		},
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        6,
-			TickLength:           time.Second * 2,
-			TickBaseDamage:       792 / 6,
-			TickSpellCoefficient: 0.127,
-			DebuffID:             InsectSwarmDebuffID,
+			NumberOfTicks:  6,
+			TickLength:     time.Second * 2,
+			TickBaseDamage: core.DotSnapshotFuncMagic(792/6, 0.127),
+			DebuffID:       InsectSwarmDebuffID,
 		},
 	}
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{

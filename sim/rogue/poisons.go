@@ -38,7 +38,7 @@ func (rogue *Rogue) newDeadlyPoisonTemplate(_ *core.Simulation) core.SimpleSpell
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 3,
-				TickBaseDamage: 180 / 4,
+				TickBaseDamage: core.DotSnapshotFuncMagic(180/4, 0),
 				DebuffID:       DeadlyPoisonDebuffID,
 			},
 		},

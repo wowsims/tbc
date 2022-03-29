@@ -39,11 +39,10 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 		},
 		BaseDamage: core.BaseDamageFuncMagic(305, 357, 0.15),
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        4,
-			TickLength:           time.Second * 3,
-			TickBaseDamage:       600 / 4,
-			TickSpellCoefficient: 0.13,
-			DebuffID:             MoonfireDebuffID,
+			NumberOfTicks:  4,
+			TickLength:     time.Second * 3,
+			TickBaseDamage: core.DotSnapshotFuncMagic(600/4, 0.13),
+			DebuffID:       MoonfireDebuffID,
 		},
 	}
 

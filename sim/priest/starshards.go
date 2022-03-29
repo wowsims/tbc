@@ -32,10 +32,9 @@ func (priest *Priest) newStarshardsTemplate(sim *core.Simulation) core.SimpleSpe
 			ThreatMultiplier:       1,
 		},
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        5,
-			TickLength:           time.Second * 3,
-			TickBaseDamage:       785 / 5,
-			TickSpellCoefficient: 0.167,
+			NumberOfTicks:  5,
+			TickLength:     time.Second * 3,
+			TickBaseDamage: core.DotSnapshotFuncMagic(785/5, 0.167),
 		},
 	}
 

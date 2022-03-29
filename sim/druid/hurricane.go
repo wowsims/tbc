@@ -47,12 +47,11 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 			ThreatMultiplier:       1,
 		},
 		DotInput: core.DotDamageInput{
-			NumberOfTicks:        10,
-			TickLength:           time.Second * 1,
-			TickBaseDamage:       206,
-			TickSpellCoefficient: 0.107,
-			DebuffID:             HurricaneDebuffID,
-			AffectedByCastSpeed:  true,
+			NumberOfTicks:       10,
+			TickLength:          time.Second * 1,
+			TickBaseDamage:      core.DotSnapshotFuncMagic(206, 0.107),
+			DebuffID:            HurricaneDebuffID,
+			AffectedByCastSpeed: true,
 		},
 	}
 

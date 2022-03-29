@@ -121,11 +121,10 @@ func (shaman *Shaman) newFlameShockTemplate(sim *core.Simulation) core.SimpleSpe
 
 	spell.Effect.BaseDamage = core.BaseDamageFuncMagic(377, 377, 0.214)
 	spell.Effect.DotInput = core.DotDamageInput{
-		NumberOfTicks:        4,
-		TickLength:           time.Second * 3,
-		TickBaseDamage:       420 / 4,
-		TickSpellCoefficient: 0.1,
-		DebuffID:             FlameShockDebuffID,
+		NumberOfTicks:  4,
+		TickLength:     time.Second * 3,
+		TickBaseDamage: core.DotSnapshotFuncMagic(420/4, 0.1),
+		DebuffID:       FlameShockDebuffID,
 	}
 
 	return core.NewSimpleSpellTemplate(spell)
