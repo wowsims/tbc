@@ -57,7 +57,7 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpel
 			return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
 				hunter.AutoAttacks.Ranged.BaseDamage(sim) +
 				hunter.AmmoDamageBonus +
-				hitEffect.PlusWeaponDamage(spellCast) +
+				hitEffect.BonusWeaponDamage(spellCast) +
 				205
 		}),
 	}

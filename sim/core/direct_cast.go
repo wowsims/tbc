@@ -67,7 +67,7 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 					sim, hitEffect.MeleeAttackPower(spellCast)+hitEffect.MeleeAttackPowerOnTarget())
 				damage += flatBonus
 				if includeBonusWeaponDamage {
-					damage += hitEffect.PlusWeaponDamage(spellCast)
+					damage += hitEffect.BonusWeaponDamage(spellCast)
 				}
 				return damage * weaponMultiplier
 			}
@@ -77,7 +77,7 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 					sim, hitEffect.MeleeAttackPower(spellCast)+2*hitEffect.MeleeAttackPowerOnTarget())
 				damage = damage*0.5 + flatBonus
 				if includeBonusWeaponDamage {
-					damage += hitEffect.PlusWeaponDamage(spellCast)
+					damage += hitEffect.BonusWeaponDamage(spellCast)
 				}
 				return damage * weaponMultiplier
 			}
@@ -89,7 +89,7 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 					sim, hitEffect.MeleeAttackPower(spellCast)+hitEffect.MeleeAttackPowerOnTarget())
 				damage += flatBonus
 				if includeBonusWeaponDamage {
-					damage += hitEffect.PlusWeaponDamage(spellCast)
+					damage += hitEffect.BonusWeaponDamage(spellCast)
 				}
 				return damage * weaponMultiplier
 			}
@@ -99,7 +99,7 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 					sim, hitEffect.MeleeAttackPower(spellCast)+2*hitEffect.MeleeAttackPowerOnTarget())
 				damage = damage*0.5 + flatBonus
 				if includeBonusWeaponDamage {
-					damage += hitEffect.PlusWeaponDamage(spellCast)
+					damage += hitEffect.BonusWeaponDamage(spellCast)
 				}
 				return damage * weaponMultiplier
 			}
@@ -111,7 +111,7 @@ func BaseDamageFuncRangedWeapon(flatBonus float64) BaseDamageCalculator {
 	return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
 		return spellCast.Character.AutoAttacks.Ranged.calculateWeaponDamage(sim, hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget()) +
 			flatBonus +
-			hitEffect.PlusWeaponDamage(spellCast)
+			hitEffect.BonusWeaponDamage(spellCast)
 	}
 }
 

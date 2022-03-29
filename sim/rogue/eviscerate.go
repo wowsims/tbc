@@ -33,7 +33,7 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 		comboPoints := rogue.ComboPoints()
 		base := 60.0 + basePerComboPoint*float64(comboPoints)
 		roll := sim.RandomFloat("Eviscerate") * 120.0
-		return base + roll + (hitEffect.MeleeAttackPower(spellCast)*0.03)*float64(comboPoints) + hitEffect.PlusWeaponDamage(spellCast)
+		return base + roll + (hitEffect.MeleeAttackPower(spellCast)*0.03)*float64(comboPoints) + hitEffect.BonusWeaponDamage(spellCast)
 	}
 
 	// cp. backstab
