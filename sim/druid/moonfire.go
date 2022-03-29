@@ -31,12 +31,10 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-		},
-		BaseDamage: core.BaseDamageConfigMagic(305, 357, 0.15),
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+		BaseDamage:       core.BaseDamageConfigMagic(305, 357, 0.15),
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:  4,
 			TickLength:     time.Second * 3,

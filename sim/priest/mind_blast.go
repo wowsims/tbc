@@ -35,12 +35,10 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 		CritMultiplier: priest.DefaultSpellCritMultiplier(),
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-		},
-		BaseDamage: core.BaseDamageConfigMagic(711, 752, 0.429),
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+		BaseDamage:       core.BaseDamageConfigMagic(711, 752, 0.429),
 	}
 
 	priest.applyTalentsToShadowSpell(&baseCast, &effect)

@@ -162,12 +162,10 @@ var ItemSetFistsOfFury = core.ItemSet{
 							CritMultiplier:      character.DefaultSpellCritMultiplier(),
 						},
 					},
-					Effect: core.SpellHitEffect{
-						SpellEffect: core.SpellEffect{
-							DamageMultiplier: 1,
-							ThreatMultiplier: 1,
-						},
-						BaseDamage: core.BaseDamageConfigRoll(100, 150),
+					Effect: core.SpellEffect{
+						DamageMultiplier: 1,
+						ThreatMultiplier: 1,
+						BaseDamage:       core.BaseDamageConfigRoll(100, 150),
 					},
 				})
 

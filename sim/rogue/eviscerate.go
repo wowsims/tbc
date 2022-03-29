@@ -30,7 +30,7 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 		basePerComboPoint += 40
 	}
 	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
 			comboPoints := rogue.ComboPoints()
 			base := 60.0 + basePerComboPoint*float64(comboPoints)
 			roll := sim.RandomFloat("Eviscerate") * 120.0

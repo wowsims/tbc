@@ -31,12 +31,10 @@ func (priest *Priest) newHolyFireTemplate(sim *core.Simulation) core.SimpleSpell
 		CritMultiplier: priest.DefaultSpellCritMultiplier(),
 	}
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-		},
-		BaseDamage: core.BaseDamageConfigMagic(426, 537, 0.8571),
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+		BaseDamage:       core.BaseDamageConfigMagic(426, 537, 0.8571),
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:  5,
 			TickLength:     time.Second * 2,

@@ -52,12 +52,10 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 				},
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
-			},
-			BaseDamage: core.BaseDamageConfigMagic(668, 772, 2.5/3.5),
+		Effect: core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
+			BaseDamage:       core.BaseDamageConfigMagic(668, 772, 2.5/3.5),
 		},
 	}
 

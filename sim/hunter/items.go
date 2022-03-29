@@ -95,7 +95,7 @@ func ApplyTalonOfAlar(agent core.Agent) {
 func (hunter *Hunter) talonOfAlarDamageMod(baseDamageConfig core.BaseDamageConfig) core.BaseDamageConfig {
 	if hunter.HasTrinketEquipped(30448) {
 		return core.WrapBaseDamageConfig(baseDamageConfig, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
-			return func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
 				normalDamage := oldCalculator(sim, hitEffect, spellCast)
 				if hunter.HasAura(TalonOfAlarProcAuraID) {
 					return normalDamage + 40

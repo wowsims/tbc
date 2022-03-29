@@ -34,11 +34,9 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:       5,
 				TickLength:          time.Second,
@@ -46,7 +44,7 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 				TicksCanMissAndCrit: true,
 				AffectedByCastSpeed: true,
 
-				TicksProcSpellHitEffects: true,
+				TicksProcSpellEffects: true,
 			},
 		},
 	}

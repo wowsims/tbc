@@ -27,7 +27,7 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 	ability.Effect.DotInput = core.DotDamageInput{
 		NumberOfTicks: 0, // Set dynamically.
 		TickLength:    time.Second * 2,
-		TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+		TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
 			comboPoints := rogue.ComboPoints()
 			attackPower := hitEffect.MeleeAttackPower(spellCast) + hitEffect.MeleeAttackPowerOnTarget()
 

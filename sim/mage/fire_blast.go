@@ -37,12 +37,10 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
-			},
-			BaseDamage: core.BaseDamageConfigMagic(664, 786, 1.5/3.5),
+		Effect: core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+			BaseDamage:       core.BaseDamageConfigMagic(664, 786, 1.5/3.5),
 		},
 	}
 

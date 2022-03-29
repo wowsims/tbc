@@ -26,16 +26,14 @@ func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleS
 				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:         core.ProcMaskRangedSpecial,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-			},
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskRangedSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 			DotInput: core.DotDamageInput{
 				NumberOfTicks: 5,
 				TickLength:    time.Second * 3,
-				TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+				TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
 					attackPower := hitEffect.RangedAttackPower(spellCast) + hitEffect.RangedAttackPowerOnTarget()
 					return 132 + attackPower*0.02
 				},

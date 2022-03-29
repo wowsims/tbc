@@ -29,11 +29,9 @@ func (paladin *Paladin) setupSealOfBlood() {
 				IsPhantom:           true,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 			// should deal 35% weapon deamage
 			BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
 		},
@@ -104,17 +102,15 @@ func (paladin *Paladin) setupSealOfCommand() {
 				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 	}
 
 	weaponBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 0.7, false)
 	socProc.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
 			return weaponBaseDamage(sim, hitEffect, spellCast) + 0.29*hitEffect.SpellPower(spellCast.Character, spellCast)
 		},
 		TargetSpellCoefficient: 0.29,

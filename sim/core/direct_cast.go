@@ -6,7 +6,7 @@ import (
 )
 
 // Function for calculating the base damage of a spell.
-type BaseDamageCalculator func(*Simulation, *SpellHitEffect, *SpellCast) float64
+type BaseDamageCalculator func(*Simulation, *SpellEffect, *SpellCast) float64
 
 type BaseDamageConfig struct {
 	// Lambda for calculating the base damage.
@@ -32,7 +32,7 @@ func WrapBaseDamageConfig(config BaseDamageConfig, wrapper func(oldCalculator Ba
 
 // Creates a BaseDamageCalculator function which returns a flat value.
 func BaseDamageFuncFlat(damage float64) BaseDamageCalculator {
-	return func(_ *Simulation, _ *SpellHitEffect, _ *SpellCast) float64 {
+	return func(_ *Simulation, _ *SpellEffect, _ *SpellCast) float64 {
 		return damage
 	}
 }
@@ -46,7 +46,7 @@ func BaseDamageFuncRoll(minFlatDamage float64, maxFlatDamage float64) BaseDamage
 		return BaseDamageFuncFlat(minFlatDamage)
 	} else {
 		deltaDamage := maxFlatDamage - minFlatDamage
-		return func(sim *Simulation, _ *SpellHitEffect, _ *SpellCast) float64 {
+		return func(sim *Simulation, _ *SpellEffect, _ *SpellCast) float64 {
 			return damageRollOptimized(sim, minFlatDamage, deltaDamage)
 		}
 	}
@@ -61,17 +61,17 @@ func BaseDamageFuncMagic(minFlatDamage float64, maxFlatDamage float64, spellCoef
 	}
 
 	if minFlatDamage == 0 && maxFlatDamage == 0 {
-		return func(_ *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+		return func(_ *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
 			return hitEffect.SpellPower(spellCast.Character, spellCast) * spellCoefficient
 		}
 	} else if minFlatDamage == maxFlatDamage {
-		return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+		return func(sim *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
 			damage := hitEffect.SpellPower(spellCast.Character, spellCast) * spellCoefficient
 			return damage + minFlatDamage
 		}
 	} else {
 		deltaDamage := maxFlatDamage - minFlatDamage
-		return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+		return func(sim *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
 			damage := hitEffect.SpellPower(spellCast.Character, spellCast) * spellCoefficient
 			damage += damageRollOptimized(sim, minFlatDamage, deltaDamage)
 			return damage
@@ -93,7 +93,7 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 	// ... but for other's, BonusAttackPowerOnTarget only applies to weapon damage based attacks
 	if normalized {
 		if hand == MainHand {
-			return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+			return func(sim *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
 				damage := spellCast.Character.AutoAttacks.MH.calculateNormalizedWeaponDamage(
 					sim, hitEffect.MeleeAttackPower(spellCast)+hitEffect.MeleeAttackPowerOnTarget())
 				damage += flatBonus
@@ -103,7 +103,7 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 				return damage * weaponMultiplier
 			}
 		} else {
-			return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+			return func(sim *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
 				damage := spellCast.Character.AutoAttacks.OH.calculateNormalizedWeaponDamage(
 					sim, hitEffect.MeleeAttackPower(spellCast)+2*hitEffect.MeleeAttackPowerOnTarget())
 				damage = damage*0.5 + flatBonus
@@ -115,7 +115,7 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 		}
 	} else {
 		if hand == MainHand {
-			return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+			return func(sim *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
 				damage := spellCast.Character.AutoAttacks.MH.calculateWeaponDamage(
 					sim, hitEffect.MeleeAttackPower(spellCast)+hitEffect.MeleeAttackPowerOnTarget())
 				damage += flatBonus
@@ -125,7 +125,7 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 				return damage * weaponMultiplier
 			}
 		} else {
-			return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+			return func(sim *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
 				damage := spellCast.Character.AutoAttacks.OH.calculateWeaponDamage(
 					sim, hitEffect.MeleeAttackPower(spellCast)+2*hitEffect.MeleeAttackPowerOnTarget())
 				damage = damage*0.5 + flatBonus
@@ -147,7 +147,7 @@ func BaseDamageConfigMeleeWeapon(hand Hand, normalized bool, flatBonus float64, 
 }
 
 func BaseDamageFuncRangedWeapon(flatBonus float64) BaseDamageCalculator {
-	return func(sim *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+	return func(sim *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
 		return spellCast.Character.AutoAttacks.Ranged.calculateWeaponDamage(sim, hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget()) +
 			flatBonus +
 			hitEffect.BonusWeaponDamage(spellCast)
@@ -175,14 +175,6 @@ func DamageRollFunc(minDamage float64, maxDamage float64) func(*Simulation) floa
 	}
 }
 
-type SpellHitEffect struct {
-	SpellEffect
-
-	BaseDamage BaseDamageConfig
-
-	DotInput DotDamageInput
-}
-
 // SimpleSpell has a single cast and could have a dot or direct effect (or no effect)
 //  A SimpleSpell without a target or effect will simply be cast and nothing else happens.
 type SimpleSpell struct {
@@ -192,11 +184,11 @@ type SimpleSpell struct {
 	// Individual direct damage effect of this spell. Use this when there is only 1
 	// effect for the spell.
 	// Only one of this or Effects should be filled, not both.
-	Effect SpellHitEffect
+	Effect SpellEffect
 
 	// Individual direct damage effects of this spell. Use this for spells with
 	// multiple effects, like Arcane Explosion, Chain Lightning, or Consecrate.
-	Effects []SpellHitEffect
+	Effects []SpellEffect
 
 	// Maximum amount of pre-crit damage this spell is allowed to do.
 	AOECap float64
@@ -340,7 +332,7 @@ func (spell *SimpleSpell) Cancel(sim *Simulation) {
 
 type SimpleSpellTemplate struct {
 	template SimpleSpell
-	effects  []SpellHitEffect
+	effects  []SpellEffect
 }
 
 func (template *SimpleSpellTemplate) Apply(newAction *SimpleSpell) {
@@ -360,6 +352,6 @@ func NewSimpleSpellTemplate(spellTemplate SimpleSpell) SimpleSpellTemplate {
 
 	return SimpleSpellTemplate{
 		template: spellTemplate,
-		effects:  make([]SpellHitEffect, len(spellTemplate.Effects)),
+		effects:  make([]SpellEffect, len(spellTemplate.Effects)),
 	}
 }

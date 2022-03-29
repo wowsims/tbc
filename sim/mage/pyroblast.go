@@ -36,19 +36,17 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						return
-					}
-					pyroblastDot := mage.newPyroblastDot(sim, spellEffect.Target)
-					pyroblastDot.Cast(sim)
-				},
+		Effect: core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+			BaseDamage:       core.BaseDamageConfigMagic(939, 1191, 1.15),
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+				pyroblastDot := mage.newPyroblastDot(sim, spellEffect.Target)
+				pyroblastDot.Cast(sim)
 			},
-			BaseDamage: core.BaseDamageConfigMagic(939, 1191, 1.15),
 		},
 	}
 
@@ -78,10 +76,9 @@ func (mage *Mage) newPyroblastDotTemplate(sim *core.Simulation) core.SimpleSpell
 				SpellExtras:      SpellFlagMage,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: mage.spellDamageMultiplier,
-			},
+		Effect: core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1,
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 3,

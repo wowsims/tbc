@@ -10,12 +10,12 @@ func DotSnapshotFuncMagic(baseDamage float64, spellCoefficient float64) BaseDama
 	}
 
 	if baseDamage == 0 {
-		return func(_ *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+		return func(_ *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
 			totalSpellPower := hitEffect.SpellPower(spellCast.Character, spellCast)
 			return totalSpellPower * spellCoefficient
 		}
 	} else {
-		return func(_ *Simulation, hitEffect *SpellHitEffect, spellCast *SpellCast) float64 {
+		return func(_ *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
 			totalSpellPower := hitEffect.SpellPower(spellCast.Character, spellCast)
 			return baseDamage + totalSpellPower*spellCoefficient
 		}
@@ -39,7 +39,7 @@ type DotDamageInput struct {
 	IgnoreDamageModifiers bool
 
 	// Whether ticks can proc spell hit effects such as Judgement of Wisdom.
-	TicksProcSpellHitEffects bool
+	TicksProcSpellEffects bool
 
 	OnPeriodicDamage OnPeriodicDamage // After-calculation logic for this dot.
 
@@ -169,17 +169,17 @@ func (spell *SimpleSpell) ApplyDot(sim *Simulation) {
 }
 
 // Snapshots a few values at the start of a dot.
-func (hitEffect *SpellHitEffect) takeDotSnapshot(sim *Simulation, spellCast *SpellCast) {
+func (hitEffect *SpellEffect) takeDotSnapshot(sim *Simulation, spellCast *SpellCast) {
 	// snapshot total damage per tick, including any static damage multipliers
 	hitEffect.DotInput.damagePerTick = hitEffect.DotInput.TickBaseDamage(sim, hitEffect, spellCast) * hitEffect.DamageMultiplier
 
 	hitEffect.DotInput.startTime = sim.CurrentTime
 	hitEffect.DotInput.RefreshDot(sim)
 	hitEffect.DotInput.nextTickTime = sim.CurrentTime + hitEffect.DotInput.TickLength
-	hitEffect.SpellEffect.BeyondAOECapMultiplier = 1
+	hitEffect.BeyondAOECapMultiplier = 1
 }
 
-func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *SpellCast) {
+func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spellCast *SpellCast) {
 	damage := hitEffect.DotInput.damagePerTick
 
 	hitEffect.Outcome = OutcomeEmpty
@@ -203,25 +203,25 @@ func (hitEffect *SpellHitEffect) calculateDotDamage(sim *Simulation, spellCast *
 	hitEffect.applyResistances(sim, spellCast, &damage)
 	hitEffect.applyOutcome(sim, spellCast, &damage)
 
-	hitEffect.SpellEffect.Damage = damage
+	hitEffect.Damage = damage
 }
 
 // This should be called on each dot tick.
-func (hitEffect *SpellHitEffect) afterDotTick(sim *Simulation, spell *SimpleSpell) {
+func (hitEffect *SpellEffect) afterDotTick(sim *Simulation, spell *SimpleSpell) {
 	if sim.Log != nil {
-		spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, hitEffect.SpellEffect.DotResultString(), hitEffect.SpellEffect.calcThreat(&spell.SpellCast))
+		spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, hitEffect.DotResultString(), hitEffect.calcThreat(&spell.SpellCast))
 	}
 
 	hitEffect.applyDotTickResultsToCast(&spell.SpellCast)
 
-	if hitEffect.DotInput.TicksProcSpellHitEffects {
-		hitEffect.SpellEffect.triggerSpellProcs(sim, spell)
+	if hitEffect.DotInput.TicksProcSpellEffects {
+		hitEffect.triggerSpellProcs(sim, spell)
 	}
 
-	spell.Character.OnPeriodicDamage(sim, &spell.SpellCast, &hitEffect.SpellEffect, hitEffect.Damage)
-	hitEffect.Target.OnPeriodicDamage(sim, &spell.SpellCast, &hitEffect.SpellEffect, hitEffect.Damage)
+	spell.Character.OnPeriodicDamage(sim, &spell.SpellCast, hitEffect, hitEffect.Damage)
+	hitEffect.Target.OnPeriodicDamage(sim, &spell.SpellCast, hitEffect, hitEffect.Damage)
 	if hitEffect.DotInput.OnPeriodicDamage != nil {
-		hitEffect.DotInput.OnPeriodicDamage(sim, &spell.SpellCast, &hitEffect.SpellEffect, hitEffect.Damage)
+		hitEffect.DotInput.OnPeriodicDamage(sim, &spell.SpellCast, hitEffect, hitEffect.Damage)
 	}
 
 	hitEffect.DotInput.tickIndex++
@@ -229,7 +229,7 @@ func (hitEffect *SpellHitEffect) afterDotTick(sim *Simulation, spell *SimpleSpel
 }
 
 // This should be called after the final tick of the dot, or when the dot is cancelled.
-func (hitEffect *SpellHitEffect) onDotComplete(sim *Simulation, spellCast *SpellCast) {
+func (hitEffect *SpellEffect) onDotComplete(sim *Simulation, spellCast *SpellCast) {
 	// Clean up the dot object.
 	hitEffect.DotInput.endTime = 0
 
@@ -243,7 +243,7 @@ func (spellEffect *SpellEffect) DotResultString() string {
 }
 
 // Only applies the results from the ticks, not the initial dot application.
-func (hitEffect *SpellHitEffect) applyDotTickResultsToCast(spellCast *SpellCast) {
+func (hitEffect *SpellEffect) applyDotTickResultsToCast(spellCast *SpellCast) {
 	if hitEffect.DotInput.TicksCanMissAndCrit {
 		if hitEffect.Landed() {
 			spellCast.Hits++

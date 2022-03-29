@@ -139,12 +139,10 @@ func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras
 				SpellExtras:    spellExtras,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:         procMask,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-			},
+		Effect: core.SpellEffect{
+			ProcMask:         procMask,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 	}
 }

@@ -30,19 +30,17 @@ func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpel
 				CritMultiplier: warrior.critMultiplier(true),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:         core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				FlatThreatBonus:  100,
-			},
+		Effect: core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			FlatThreatBonus:  100,
 		},
 	}
 
 	normalBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 0.5, true)
 	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
 			// Bonus 35 damage / stack of sunder. Counts stacks AFTER cast but only if stacks > 0.
 			sunderBonus := 0.0
 			saStacks := hitEffect.Target.NumStacks(core.SunderArmorDebuffID)
@@ -68,7 +66,7 @@ func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpel
 				sa.Cost.Value = 0
 				sa.BaseCost.Value = 0
 				if target.NumStacks(core.SunderArmorDebuffID) == 5 {
-					sa.Effect.SpellEffect.ThreatMultiplier = 0
+					sa.Effect.ThreatMultiplier = 0
 				}
 
 				sa.Cast(sim)

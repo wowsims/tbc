@@ -94,12 +94,10 @@ func ApplyTimbals(agent core.Agent) {
 				CritMultiplier:      agent.GetCharacter().DefaultSpellCritMultiplier(),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-			},
-			BaseDamage: core.BaseDamageConfigRoll(285, 475),
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigRoll(285, 475),
 		},
 	})
 	character := agent.GetCharacter()

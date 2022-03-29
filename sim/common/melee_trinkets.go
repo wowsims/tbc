@@ -512,12 +512,10 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 					CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				},
 			},
-			Effect: core.SpellHitEffect{
-				SpellEffect: core.SpellEffect{
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-				},
-				BaseDamage: core.BaseDamageConfigRoll(222, 332),
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigRoll(222, 332),
 			},
 		})
 
