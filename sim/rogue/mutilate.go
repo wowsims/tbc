@@ -84,7 +84,7 @@ func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemp
 		ohAtk.Cast(sim)
 
 		// applyResultsToCast() has already been done here, so we have to update the spell statistics, too
-		if mhAtk.Effect.Outcome == core.OutcomeCrit || ohAtk.Effect.Outcome == core.OutcomeCrit {
+		if mhAtk.Effect.Outcome.Matches(core.OutcomeCrit) || ohAtk.Effect.Outcome.Matches(core.OutcomeCrit) {
 			spellEffect.Outcome = core.OutcomeCrit
 			spellCast.Hits--
 			spellCast.Crits++
