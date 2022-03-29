@@ -81,7 +81,7 @@ func (mage *Mage) applyArcaneConcentration() {
 		ccAura := core.Aura{
 			ID:       ClearcastingAuraID,
 			ActionID: core.ActionID{SpellID: 12536},
-			Duration: core.NeverExpires, // actually 15s, but that's hardly ever relevant
+			Duration: time.Second * 15,
 			OnCast: func(sim *core.Simulation, cast *core.Cast) {
 				if !cast.SpellExtras.Matches(SpellFlagMage) {
 					return
@@ -311,25 +311,34 @@ func (mage *Mage) registerCombustionCD() {
 
 				numHits := 0
 				numCrits := 0
+				const critPerStack = 10 * core.SpellCritRatingPerCritChance
 
-				character.AddAura(sim, core.Aura{
+				character.AddPriorityAura(sim, core.Aura{
 					ID:       CombustionAuraID,
 					ActionID: actionID,
 					Duration: core.NeverExpires,
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.BonusCritRating += float64(numHits) * 10 * core.SpellCritRatingPerCritChance
-					},
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+						if spellCast.SpellSchool != core.SpellSchoolFire {
+							return
+						}
+						if spellCast.SameAction(IgniteActionID) {
 							return
 						}
 						if !spellEffect.Landed() {
 							return
 						}
+						if numCrits >= 3 {
+							return
+						}
+
+						// TODO: This wont work properly with flamestrike
 						numHits++
+						character.PseudoStats.BonusFireCritRating += critPerStack
+
 						if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 							numCrits++
 							if numCrits == 3 {
+								character.PseudoStats.BonusFireCritRating -= critPerStack * float64(numHits)
 								character.RemoveAuraOnNextAdvance(sim, CombustionAuraID)
 								character.SetCD(CombustionCooldownID, sim.CurrentTime+time.Minute*3)
 								character.UpdateMajorCooldowns()

@@ -197,8 +197,8 @@ func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spellCast *Spe
 	}
 
 	if !hitEffect.DotInput.IgnoreDamageModifiers {
-		hitEffect.applyAttackerMultipliers(sim, spellCast, !hitEffect.DotInput.TicksCanMissAndCrit, &damage)
-		hitEffect.applyTargetMultipliers(sim, spellCast, !hitEffect.DotInput.TicksCanMissAndCrit, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
+		hitEffect.applyAttackerModifiers(sim, spellCast, !hitEffect.DotInput.TicksCanMissAndCrit, &damage)
+		hitEffect.applyTargetModifiers(sim, spellCast, !hitEffect.DotInput.TicksCanMissAndCrit, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	}
 	hitEffect.applyResistances(sim, spellCast, &damage)
 	hitEffect.applyOutcome(sim, spellCast, &damage)

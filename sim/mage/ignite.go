@@ -6,17 +6,14 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-const SpellIDIgnite int32 = 12848
-
+var IgniteActionID = core.ActionID{SpellID: 12848}
 var IgniteDebuffID = core.NewDebuffID()
 
 func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID: SpellIDIgnite,
-				},
+				ActionID:            IgniteActionID,
 				Character:           &mage.Character,
 				CritRollCategory:    core.CritRollCategoryNone,
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
