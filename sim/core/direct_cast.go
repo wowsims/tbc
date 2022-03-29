@@ -118,7 +118,6 @@ func BaseDamageFuncRangedWeapon(flatBonus float64) BaseDamageCalculator {
 // Performs an actual damage roll. Keep this internal because the 2nd parameter
 // is the delta rather than maxDamage, which is error-prone.
 func damageRollOptimized(sim *Simulation, minDamage float64, deltaDamage float64) float64 {
-	// TODO: Rename RNG label
 	return minDamage + deltaDamage*sim.RandomFloat("Damage Roll")
 }
 
