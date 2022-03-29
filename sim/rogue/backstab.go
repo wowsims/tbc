@@ -19,7 +19,7 @@ func (rogue *Rogue) newBackstabTemplate(_ *core.Simulation) core.SimpleSpellTemp
 			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}
 	}
-	ability.Effect.BaseDamage = core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 170, 1.5+0.01*float64(rogue.Talents.SinisterCalling), true)
+	ability.Effect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 170, 1.5+0.01*float64(rogue.Talents.SinisterCalling), true)
 
 	// all these use "Apply Aura: Modifies Damage/Healing Done", and stack additively (up to 142%)
 	ability.Effect.DamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)

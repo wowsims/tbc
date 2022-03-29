@@ -75,7 +75,7 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 			},
-			BaseDamage: core.BaseDamageFuncRoll(694, 807),
+			BaseDamage: core.BaseDamageConfigRoll(694, 807),
 		},
 	})
 }

@@ -29,11 +29,14 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 	if ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2) {
 		basePerComboPoint += 40
 	}
-	ability.Effect.BaseDamage = func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
-		comboPoints := rogue.ComboPoints()
-		base := 60.0 + basePerComboPoint*float64(comboPoints)
-		roll := sim.RandomFloat("Eviscerate") * 120.0
-		return base + roll + (hitEffect.MeleeAttackPower(spellCast)*0.03)*float64(comboPoints) + hitEffect.BonusWeaponDamage(spellCast)
+	ability.Effect.BaseDamage = core.BaseDamageConfig{
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+			comboPoints := rogue.ComboPoints()
+			base := 60.0 + basePerComboPoint*float64(comboPoints)
+			roll := sim.RandomFloat("Eviscerate") * 120.0
+			return base + roll + (hitEffect.MeleeAttackPower(spellCast)*0.03)*float64(comboPoints) + hitEffect.BonusWeaponDamage(spellCast)
+		},
+		TargetSpellCoefficient: 1,
 	}
 
 	// cp. backstab

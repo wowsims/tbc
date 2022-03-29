@@ -181,10 +181,10 @@ func (hitEffect *SpellHitEffect) directCalculations(sim *Simulation, spell *Simp
 }
 
 func (hitEffect *SpellHitEffect) calculateBaseDamage(sim *Simulation, spellCast *SpellCast) float64 {
-	if hitEffect.BaseDamage == nil {
+	if hitEffect.BaseDamage.Calculator == nil {
 		return 0
 	} else {
-		return hitEffect.BaseDamage(sim, hitEffect, spellCast)
+		return hitEffect.BaseDamage.Calculator(sim, hitEffect, spellCast)
 	}
 }
 

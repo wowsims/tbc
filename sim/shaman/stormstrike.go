@@ -92,7 +92,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 						}
 					},
 				},
-				BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, flatDamageBonus, 1, true),
+				BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, false, flatDamageBonus, 1, true),
 			},
 			{
 				SpellEffect: core.SpellEffect{
@@ -101,7 +101,7 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 					ThreatMultiplier: 1,
 					ReuseMainHitRoll: true,
 				},
-				BaseDamage: core.BaseDamageFuncMeleeWeapon(core.OffHand, false, flatDamageBonus, 1, true),
+				BaseDamage: core.BaseDamageConfigMeleeWeapon(core.OffHand, false, flatDamageBonus, 1, true),
 			},
 		},
 	}

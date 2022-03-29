@@ -44,10 +44,13 @@ func (hunter *Hunter) newSteadyShotTemplate(sim *core.Simulation) core.SimpleSpe
 					hunter.rotation(sim, false)
 				},
 			},
-			BaseDamage: hunter.talonOfAlarDamageMod(func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
-				return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
-					hunter.AutoAttacks.Ranged.BaseDamage(sim)*2.8/hunter.AutoAttacks.Ranged.SwingSpeed +
-					150
+			BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+					return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
+						hunter.AutoAttacks.Ranged.BaseDamage(sim)*2.8/hunter.AutoAttacks.Ranged.SwingSpeed +
+						150
+				},
+				TargetSpellCoefficient: 1,
 			}),
 		},
 	}

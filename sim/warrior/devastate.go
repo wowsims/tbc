@@ -41,15 +41,18 @@ func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpel
 	}
 
 	normalBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 0.5, true)
-	ability.Effect.BaseDamage = func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
-		// Bonus 35 damage / stack of sunder. Counts stacks AFTER cast but only if stacks > 0.
-		sunderBonus := 0.0
-		saStacks := hitEffect.Target.NumStacks(core.SunderArmorDebuffID)
-		if saStacks != 0 {
-			sunderBonus = 35 * float64(core.MinInt32(saStacks+1, 5))
-		}
+	ability.Effect.BaseDamage = core.BaseDamageConfig{
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+			// Bonus 35 damage / stack of sunder. Counts stacks AFTER cast but only if stacks > 0.
+			sunderBonus := 0.0
+			saStacks := hitEffect.Target.NumStacks(core.SunderArmorDebuffID)
+			if saStacks != 0 {
+				sunderBonus = 35 * float64(core.MinInt32(saStacks+1, 5))
+			}
 
-		return normalBaseDamage(sim, hitEffect, spellCast) + sunderBonus
+			return normalBaseDamage(sim, hitEffect, spellCast) + sunderBonus
+		},
+		TargetSpellCoefficient: 1,
 	}
 
 	refundAmount := warrior.sunderArmorCost * 0.8

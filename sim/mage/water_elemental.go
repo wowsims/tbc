@@ -190,7 +190,7 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 			},
-			BaseDamage: core.BaseDamageFuncMagic(256, 328, 3.0/3.5),
+			BaseDamage: core.BaseDamageConfigMagic(256, 328, 3.0/3.5),
 		},
 	}
 

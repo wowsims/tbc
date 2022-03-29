@@ -30,10 +30,13 @@ func (rogue *Rogue) newEnvenomTemplate(_ *core.Simulation) core.SimpleSpellTempl
 	if ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2) {
 		basePerComboPoint += 40
 	}
-	ability.Effect.BaseDamage = func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
-		comboPoints := rogue.ComboPoints()
-		base := basePerComboPoint * float64(comboPoints)
-		return base + (hitEffect.MeleeAttackPower(spellCast)*0.03)*float64(comboPoints)
+	ability.Effect.BaseDamage = core.BaseDamageConfig{
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
+			comboPoints := rogue.ComboPoints()
+			base := basePerComboPoint * float64(comboPoints)
+			return base + (hitEffect.MeleeAttackPower(spellCast)*0.03)*float64(comboPoints)
+		},
+		TargetSpellCoefficient: 0,
 	}
 
 	// cp. backstab

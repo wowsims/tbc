@@ -33,7 +33,7 @@ func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.SimpleS
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 			},
-			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 170, 1, true),
+			BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 170, 1, true),
 		},
 	}
 

@@ -37,7 +37,7 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				DamageMultiplier: mage.spellDamageMultiplier,
 				ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 			},
-			BaseDamage: core.BaseDamageFuncMagic(305, 361, 1.5/3.5),
+			BaseDamage: core.BaseDamageConfigMagic(305, 361, 1.5/3.5),
 		},
 	}
 

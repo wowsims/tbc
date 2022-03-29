@@ -167,7 +167,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 							DamageMultiplier: 1,
 							ThreatMultiplier: 1,
 						},
-						BaseDamage: core.BaseDamageFuncRoll(100, 150),
+						BaseDamage: core.BaseDamageConfigRoll(100, 150),
 					},
 				})
 

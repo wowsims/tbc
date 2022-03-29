@@ -41,7 +41,7 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 					paladin.currentSealExpires = 0
 				},
 			},
-			BaseDamage: core.BaseDamageFuncMagic(295, 325, 0.429),
+			BaseDamage: core.BaseDamageConfigMagic(295, 325, 0.429),
 		},
 	}
 	// Reduce mana cost if we have Benediction Talent

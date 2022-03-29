@@ -58,8 +58,8 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 	}
 
 	weaponDamageMultiplier := 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
-	mhBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, weaponDamageMultiplier, true)
-	ohBaseDamage := core.BaseDamageFuncMeleeWeapon(core.OffHand, false, 0, weaponDamageMultiplier, true)
+	mhBaseDamage := core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, weaponDamageMultiplier, true)
+	ohBaseDamage := core.BaseDamageConfigMeleeWeapon(core.OffHand, false, 0, weaponDamageMultiplier, true)
 
 	wfTemplate := core.NewSimpleSpellTemplate(wftempl)
 
@@ -148,11 +148,11 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 
 	if weapon := shaman.GetMHWeapon(); weapon != nil {
 		baseDamage := weapon.SwingSpeed * 35.0
-		mhTmpl.Effect.BaseDamage = core.BaseDamageFuncMagic(baseDamage, baseDamage, 0.1)
+		mhTmpl.Effect.BaseDamage = core.BaseDamageConfigMagic(baseDamage, baseDamage, 0.1)
 	}
 	if weapon := shaman.GetOHWeapon(); weapon != nil {
 		baseDamage := weapon.SwingSpeed * 35.0
-		ohTmpl.Effect.BaseDamage = core.BaseDamageFuncMagic(baseDamage, baseDamage, 0.1)
+		ohTmpl.Effect.BaseDamage = core.BaseDamageConfigMagic(baseDamage, baseDamage, 0.1)
 	}
 
 	mhTemplate := core.NewSimpleSpellTemplate(mhTmpl)
@@ -209,7 +209,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 			},
-			BaseDamage: core.BaseDamageFuncMagic(246, 246, 0.1),
+			BaseDamage: core.BaseDamageConfigMagic(246, 246, 0.1),
 		},
 	}
 	fbTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)

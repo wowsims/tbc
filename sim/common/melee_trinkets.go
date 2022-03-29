@@ -517,7 +517,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 					DamageMultiplier: 1,
 					ThreatMultiplier: 1,
 				},
-				BaseDamage: core.BaseDamageFuncRoll(222, 332),
+				BaseDamage: core.BaseDamageConfigRoll(222, 332),
 			},
 		})
 

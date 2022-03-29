@@ -99,7 +99,7 @@ func ApplyTimbals(agent core.Agent) {
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 			},
-			BaseDamage: core.BaseDamageFuncRoll(285, 475),
+			BaseDamage: core.BaseDamageConfigRoll(285, 475),
 		},
 	})
 	character := agent.GetCharacter()

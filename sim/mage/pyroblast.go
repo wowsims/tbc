@@ -48,7 +48,7 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 					pyroblastDot.Cast(sim)
 				},
 			},
-			BaseDamage: core.BaseDamageFuncMagic(939, 1191, 1.15),
+			BaseDamage: core.BaseDamageConfigMagic(939, 1191, 1.15),
 		},
 	}
 

@@ -37,7 +37,7 @@ func (paladin *Paladin) newExorcismTemplate(sim *core.Simulation) core.SimpleSpe
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 			},
-			BaseDamage: core.BaseDamageFuncMagic(521, 579, 1),
+			BaseDamage: core.BaseDamageConfigMagic(521, 579, 1),
 		},
 	}
 

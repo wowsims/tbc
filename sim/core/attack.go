@@ -208,7 +208,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					DamageMultiplier: 1,
 					ThreatMultiplier: 1,
 				},
-				BaseDamage: BaseDamageFuncMeleeWeapon(MainHand, false, 0, 1, true),
+				BaseDamage: BaseDamageConfigMeleeWeapon(MainHand, false, 0, 1, true),
 			},
 		},
 		OHAuto: SimpleSpell{
@@ -227,7 +227,7 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					DamageMultiplier: 1,
 					ThreatMultiplier: 1,
 				},
-				BaseDamage: BaseDamageFuncMeleeWeapon(OffHand, false, 0, 1, true),
+				BaseDamage: BaseDamageConfigMeleeWeapon(OffHand, false, 0, 1, true),
 			},
 		},
 		RangedAuto: SimpleSpell{
@@ -247,19 +247,19 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 					DamageMultiplier: 1,
 					ThreatMultiplier: 1,
 				},
-				BaseDamage: BaseDamageFuncRangedWeapon(0),
+				BaseDamage: BaseDamageConfigRangedWeapon(0),
 			},
 		},
 	}
 
 	if options.MainHand.BaseDamageOverride != nil {
-		aa.MHAuto.Effect.BaseDamage = options.MainHand.BaseDamageOverride
+		aa.MHAuto.Effect.BaseDamage.Calculator = options.MainHand.BaseDamageOverride
 	}
 	if options.OffHand.BaseDamageOverride != nil {
-		aa.OHAuto.Effect.BaseDamage = options.OffHand.BaseDamageOverride
+		aa.OHAuto.Effect.BaseDamage.Calculator = options.OffHand.BaseDamageOverride
 	}
 	if options.Ranged.BaseDamageOverride != nil {
-		aa.RangedAuto.Effect.BaseDamage = options.Ranged.BaseDamageOverride
+		aa.RangedAuto.Effect.BaseDamage.Calculator = options.Ranged.BaseDamageOverride
 	}
 
 	aa.IsDualWielding = aa.MH.SwingSpeed != 0 && aa.OH.SwingSpeed != 0

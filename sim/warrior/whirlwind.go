@@ -46,7 +46,7 @@ func (warrior *Warrior) newWhirlwindTemplate(sim *core.Simulation) core.SimpleSp
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 		},
-		BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 1, true),
+		BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 0, 1, true),
 	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())
