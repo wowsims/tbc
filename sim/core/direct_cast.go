@@ -247,7 +247,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		if len(spell.Effects) == 0 {
 			hitEffect := &spell.Effect
-			hitEffect.beforeCalculations(sim, spell)
+			hitEffect.determineOutcome(sim, spell)
 
 			if hitEffect.Landed() {
 				hitEffect.directCalculations(sim, spell)
@@ -267,7 +267,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			// on the first hit from benefitting other hits of the same spell.
 			for effectIdx := range spell.Effects {
 				hitEffect := &spell.Effects[effectIdx]
-				hitEffect.beforeCalculations(sim, spell)
+				hitEffect.determineOutcome(sim, spell)
 			}
 			for effectIdx := range spell.Effects {
 				hitEffect := &spell.Effects[effectIdx]
@@ -278,7 +278,10 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 					}
 				}
 			}
-			spell.applyAOECap()
+
+			// TODO: Reenable this when spell code is cleaned up.
+			//spell.applyAOECap()
+
 			// Use a separate loop for the afterCalculations() calls so all effect damage
 			// is fully calculated before invoking proc callbacks.
 			for effectIdx := range spell.Effects {
