@@ -203,15 +203,12 @@ func JudgementOfTheCrusaderAura(target *Target, level float64) Aura {
 		ActionID: ActionID{SpellID: 27159},
 		Duration: time.Second * 20,
 		OnGain: func(sim *Simulation) {
+			target.PseudoStats.BonusHolyDamageTaken += 219
 			target.PseudoStats.BonusCritRating += bonusCrit
 		},
 		OnExpire: func(sim *Simulation) {
+			target.PseudoStats.BonusHolyDamageTaken -= 219
 			target.PseudoStats.BonusCritRating -= bonusCrit
-		},
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellHitEffect) {
-			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
-				spellEffect.BonusSpellPower += 219
-			}
 		},
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
 			if spellCast.ActionID.SpellID == 35395 {

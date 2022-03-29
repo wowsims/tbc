@@ -17,10 +17,10 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 		ActionID: HemorrhageActionID,
 		Duration: time.Second * 15,
 		OnGain: func(sim *core.Simulation) {
-			sim.GetPrimaryTarget().PseudoStats.BonusWeaponDamage += 42
+			sim.GetPrimaryTarget().PseudoStats.BonusPhysicalDamageTaken += 42
 		},
 		OnExpire: func(sim *core.Simulation) {
-			sim.GetPrimaryTarget().PseudoStats.BonusWeaponDamage -= 42
+			sim.GetPrimaryTarget().PseudoStats.BonusPhysicalDamageTaken -= 42
 		},
 	}
 	hemoAura.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {

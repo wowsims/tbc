@@ -118,7 +118,7 @@ func (spellEffect *SpellEffect) RangedAttackPowerOnTarget() float64 {
 }
 
 func (spellEffect *SpellEffect) BonusWeaponDamage(spellCast *SpellCast) float64 {
-	return spellCast.Character.PseudoStats.BonusDamage + spellEffect.Target.PseudoStats.BonusWeaponDamage
+	return spellCast.Character.PseudoStats.BonusDamage
 }
 
 func (spellEffect *SpellEffect) PhysicalHitChance(character *Character, spellCast *SpellCast) float64 {
@@ -173,7 +173,7 @@ func (hitEffect *SpellHitEffect) directCalculations(sim *Simulation, spell *Simp
 
 	damage *= hitEffect.DamageMultiplier
 	hitEffect.applyAttackerMultipliers(sim, &spell.SpellCast, false, &damage)
-	hitEffect.applyTargetMultipliers(sim, &spell.SpellCast, false, &damage)
+	hitEffect.applyTargetMultipliers(sim, &spell.SpellCast, false, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	hitEffect.applyResistances(sim, &spell.SpellCast, &damage)
 	hitEffect.applyOutcome(sim, &spell.SpellCast, &damage)
 
@@ -381,11 +381,14 @@ func (hitEffect *SpellHitEffect) applyAttackerMultipliers(sim *Simulation, spell
 	}
 }
 
-func (hitEffect *SpellHitEffect) applyTargetMultipliers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, damage *float64) {
+func (hitEffect *SpellHitEffect) applyTargetMultipliers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, targetCoeff float64, damage *float64) {
 	target := hitEffect.Target
 
 	*damage *= target.PseudoStats.DamageTakenMultiplier
 	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
+		if targetCoeff > 0 {
+			*damage += target.PseudoStats.BonusPhysicalDamageTaken
+		}
 		*damage *= target.PseudoStats.PhysicalDamageTakenMultiplier
 		if isPeriodic {
 			*damage *= target.PseudoStats.PeriodicPhysicalDamageTakenMultiplier
@@ -397,6 +400,7 @@ func (hitEffect *SpellHitEffect) applyTargetMultipliers(sim *Simulation, spellCa
 	} else if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
 		*damage *= target.PseudoStats.FrostDamageTakenMultiplier
 	} else if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
+		*damage += target.PseudoStats.BonusHolyDamageTaken * targetCoeff
 		*damage *= target.PseudoStats.HolyDamageTakenMultiplier
 	} else if spellCast.SpellSchool.Matches(SpellSchoolNature) {
 		*damage *= target.PseudoStats.NatureDamageTakenMultiplier
