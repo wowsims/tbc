@@ -42,9 +42,8 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 
 	baseEffect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:       10,

@@ -47,7 +47,7 @@ character_stats_results: {
 dps_results: {
  key: "TestMutilate-AllItems-AbacusofViolentOdds-28288"
  value: {
-  dps: 1261.3721601586021
+  dps: 1261.880540280202
  }
 }
 dps_results: {
@@ -65,7 +65,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-AshtongueTalismanofLethality-32492"
  value: {
-  dps: 1268.41729601908
+  dps: 1268.9097766206798
  }
 }
 dps_results: {
@@ -311,7 +311,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-HandofJustice-11815"
  value: {
-  dps: 1223.6548331709655
+  dps: 1224.1596440125654
  }
 }
 dps_results: {
@@ -623,7 +623,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Average-Default"
  value: {
-  dps: 1248.4217813484431
+  dps: 1248.703719998365
  }
 }
 dps_results: {
@@ -635,7 +635,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1253.247533984434
+  dps: 1253.7790251940341
  }
 }
 dps_results: {
@@ -647,7 +647,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1118.22138319914
+  dps: 1118.5972682951399
  }
 }
 dps_results: {
@@ -683,7 +683,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1253.5287843471708
+  dps: 1254.0603647887708
  }
 }
 dps_results: {
@@ -695,7 +695,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1118.4711722607424
+  dps: 1118.8471246767424
  }
 }
 dps_results: {

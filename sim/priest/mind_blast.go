@@ -37,9 +37,8 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 		BaseDamage: core.BaseDamageFuncMagic(711, 752, 0.429),
 	}
@@ -51,7 +50,7 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 	effect.BonusHitRating += float64(priest.Talents.FocusedPower) * 2 * core.SpellHitRatingPerHitChance // 2% crit per point
 
 	if ItemSetAbsolution.CharacterHasSetBonus(&priest.Character, 4) { // Absolution 4p adds 10% damage
-		effect.StaticDamageMultiplier *= 1.1
+		effect.DamageMultiplier *= 1.1
 	}
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{

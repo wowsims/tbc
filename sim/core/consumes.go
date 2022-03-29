@@ -799,8 +799,8 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 			},
 			Effect: SpellHitEffect{
 				SpellEffect: SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
+					DamageMultiplier: 1,
+					ThreatMultiplier: 1,
 				},
 				BaseDamage: BaseDamageFuncFlat(40),
 			},
@@ -957,9 +957,8 @@ func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID Act
 
 	baseEffect := SpellHitEffect{
 		SpellEffect: SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 
 			// Explosives always have 1% resist chance, so just give them hit cap.
 			BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,
@@ -1019,7 +1018,7 @@ func (character *Character) newHolyWaterCaster(sim *Simulation) func(sim *Simula
 	for i, _ := range es.Effects {
 		effect := &es.Effects[i]
 		if effect.Target.MobType != proto.MobType_MobTypeUndead {
-			effect.StaticDamageMultiplier = 0
+			effect.DamageMultiplier = 0
 		}
 	}
 	template := NewSimpleSpellTemplate(es)

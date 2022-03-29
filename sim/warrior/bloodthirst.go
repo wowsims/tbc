@@ -41,10 +41,9 @@ func (warrior *Warrior) newBloodthirstTemplate(_ *core.Simulation) core.SimpleSp
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				ProcMask:         core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
 			},
 			BaseDamage: func(sim *core.Simulation, hitEffect *core.SpellHitEffect, spellCast *core.SpellCast) float64 {
 				return hitEffect.MeleeAttackPower(spellCast) * 0.45
@@ -53,7 +52,7 @@ func (warrior *Warrior) newBloodthirstTemplate(_ *core.Simulation) core.SimpleSp
 	}
 
 	if ItemSetOnslaughtBattlegear.CharacterHasSetBonus(&warrior.Character, 4) {
-		ability.Effect.SpellEffect.StaticDamageMultiplier *= 1.05
+		ability.Effect.SpellEffect.DamageMultiplier *= 1.05
 	}
 
 	refundAmount := warrior.bloodthirstCost * 0.8

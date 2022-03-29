@@ -36,9 +36,8 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier:       1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
+				DamageMultiplier: mage.spellDamageMultiplier,
+				ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 			},
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:       5,
@@ -56,7 +55,7 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 	spell.Cost.Value += spell.BaseCost.Value * float64(mage.Talents.EmpoweredArcaneMissiles) * 0.02
 
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
-		spell.Effect.StaticDamageMultiplier *= 1.05
+		spell.Effect.DamageMultiplier *= 1.05
 	}
 
 	return core.NewSimpleSpellTemplate(spell)

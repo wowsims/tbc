@@ -37,8 +37,8 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 	}
 
 	// cp. backstab
-	ability.Effect.StaticDamageMultiplier += 0.05 * float64(rogue.Talents.ImprovedEviscerate)
-	ability.Effect.StaticDamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
+	ability.Effect.DamageMultiplier += 0.05 * float64(rogue.Talents.ImprovedEviscerate)
+	ability.Effect.DamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
 	if rogue.Talents.SurpriseAttacks {
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}

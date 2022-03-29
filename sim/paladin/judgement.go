@@ -31,10 +31,9 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeOrRangedSpecial,
-				DamageMultiplier:       1, // Need to review to make sure I set these properly
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				ProcMask:         core.ProcMaskMeleeOrRangedSpecial,
+				DamageMultiplier: 1, // Need to review to make sure I set these properly
+				ThreatMultiplier: 1,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
 					paladin.RemoveAura(sim, SealOfBloodAuraID)

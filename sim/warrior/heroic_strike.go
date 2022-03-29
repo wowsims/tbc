@@ -32,11 +32,10 @@ func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleS
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				FlatThreatBonus:        194,
+				ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				FlatThreatBonus:  194,
 			},
 			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 176, 1, true),
 		},

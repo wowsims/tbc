@@ -25,12 +25,12 @@ func (rogue *Rogue) newSinisterStrikeTemplate(_ *core.Simulation) core.SimpleSpe
 	ability.Effect.BaseDamage = core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 98, 1, true)
 
 	// cp. backstab
-	ability.Effect.StaticDamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
+	ability.Effect.DamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
 	if rogue.Talents.SurpriseAttacks {
-		ability.Effect.StaticDamageMultiplier += 0.1
+		ability.Effect.DamageMultiplier += 0.1
 	}
 	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
-		ability.Effect.StaticDamageMultiplier += 0.06
+		ability.Effect.DamageMultiplier += 0.06
 	}
 
 	return core.NewSimpleSpellTemplate(ability)

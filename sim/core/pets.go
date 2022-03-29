@@ -93,9 +93,8 @@ func (gft *GnomishFlameTurret) newFlameCannonTemplate(sim *Simulation) SimpleSpe
 		},
 		Effect: SpellHitEffect{
 			SpellEffect: SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
 			},
 			BaseDamage: BaseDamageFuncRoll(31, 36),
 		},

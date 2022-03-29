@@ -57,9 +57,8 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 		BaseDamage: core.BaseDamageFuncMagic(minBaseDamage+bonusFlatDamage, maxBaseDamage+bonusFlatDamage, spellCoefficient),
 	}
@@ -83,7 +82,7 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 	baseCast.Cost.Value -= baseCast.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
 	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
 
-	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
+	effect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
 	effect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
 
 	if ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 4) { // Thunderheart 4p adds 5% crit to starfire

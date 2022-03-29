@@ -204,10 +204,9 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 			},
 			Effect: SpellHitEffect{
 				SpellEffect: SpellEffect{
-					ProcMask:               ProcMaskMeleeMHAuto,
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
+					ProcMask:         ProcMaskMeleeMHAuto,
+					DamageMultiplier: 1,
+					ThreatMultiplier: 1,
 				},
 				BaseDamage: BaseDamageFuncMeleeWeapon(MainHand, false, 0, 1, true),
 			},
@@ -224,10 +223,9 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 			},
 			Effect: SpellHitEffect{
 				SpellEffect: SpellEffect{
-					ProcMask:               ProcMaskMeleeOHAuto,
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
+					ProcMask:         ProcMaskMeleeOHAuto,
+					DamageMultiplier: 1,
+					ThreatMultiplier: 1,
 				},
 				BaseDamage: BaseDamageFuncMeleeWeapon(OffHand, false, 0, 1, true),
 			},
@@ -245,10 +243,9 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 			},
 			Effect: SpellHitEffect{
 				SpellEffect: SpellEffect{
-					ProcMask:               ProcMaskRangedAuto,
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
+					ProcMask:         ProcMaskRangedAuto,
+					DamageMultiplier: 1,
+					ThreatMultiplier: 1,
 				},
 				BaseDamage: BaseDamageFuncRangedWeapon(0),
 			},

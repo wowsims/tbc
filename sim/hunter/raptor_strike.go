@@ -29,10 +29,9 @@ func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.SimpleS
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
 			},
 			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 170, 1, true),
 		},

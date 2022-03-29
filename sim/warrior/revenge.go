@@ -38,11 +38,10 @@ func (warrior *Warrior) newRevengeTemplate(_ *core.Simulation) core.SimpleSpellT
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				FlatThreatBonus:        200,
+				ProcMask:         core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				FlatThreatBonus:  200,
 			},
 			BaseDamage: core.BaseDamageFuncRoll(414, 506),
 		},

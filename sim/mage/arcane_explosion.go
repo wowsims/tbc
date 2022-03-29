@@ -33,9 +33,8 @@ func (mage *Mage) newArcaneExplosionTemplate(sim *core.Simulation) core.SimpleSp
 
 	baseEffect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier:       1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 		},
 		BaseDamage: core.BaseDamageFuncMagic(249, 270, 0.214),
 	}

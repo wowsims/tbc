@@ -36,7 +36,7 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 		DebuffID: RuptureDebuffID,
 	}
 
-	ability.Effect.StaticDamageMultiplier += 0.1 * float64(rogue.Talents.SerratedBlades)
+	ability.Effect.DamageMultiplier += 0.1 * float64(rogue.Talents.SerratedBlades)
 	if rogue.Talents.SurpriseAttacks {
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}

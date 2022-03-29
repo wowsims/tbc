@@ -33,9 +33,8 @@ func (priest *Priest) newHolyFireTemplate(sim *core.Simulation) core.SimpleSpell
 
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 		BaseDamage: core.BaseDamageFuncMagic(426, 537, 0.8571),
 		DotInput: core.DotDamageInput{

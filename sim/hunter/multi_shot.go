@@ -46,10 +46,9 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpel
 
 	baseEffect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			ProcMask:               core.ProcMaskRangedSpecial,
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
+			ProcMask:         core.ProcMaskRangedSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				hunter.rotation(sim, false)
 			},

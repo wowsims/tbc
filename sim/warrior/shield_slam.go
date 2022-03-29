@@ -40,11 +40,10 @@ func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpe
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial, // TODO: Is this right?
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				FlatThreatBonus:        305,
+				ProcMask:         core.ProcMaskMeleeMHSpecial, // TODO: Is this right?
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				FlatThreatBonus:  305,
 			},
 		},
 	}
@@ -55,7 +54,7 @@ func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpe
 	}
 
 	if ItemSetOnslaughtArmor.CharacterHasSetBonus(&warrior.Character, 4) {
-		ability.Effect.SpellEffect.StaticDamageMultiplier *= 1.1
+		ability.Effect.SpellEffect.DamageMultiplier *= 1.1
 	}
 
 	refundAmount := ShieldSlamCost * 0.8

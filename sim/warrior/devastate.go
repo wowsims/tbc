@@ -32,11 +32,10 @@ func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpel
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				FlatThreatBonus:        100,
+				ProcMask:         core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				FlatThreatBonus:  100,
 			},
 		},
 	}

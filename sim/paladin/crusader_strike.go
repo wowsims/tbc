@@ -33,10 +33,9 @@ func (paladin *Paladin) newCrusaderStrikeTemplate(sim *core.Simulation) core.Sim
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1, // Need to review to make sure I set these properly
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				ProcMask:         core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier: 1, // Need to review to make sure I set these properly
+				ThreatMultiplier: 1,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					if !spellEffect.Landed() {
 						return

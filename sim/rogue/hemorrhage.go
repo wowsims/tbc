@@ -57,7 +57,7 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 
 	// cp. backstab
 	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
-		ability.Effect.StaticDamageMultiplier += 0.06
+		ability.Effect.DamageMultiplier += 0.06
 	}
 
 	return core.NewSimpleSpellTemplate(ability)

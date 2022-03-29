@@ -30,10 +30,9 @@ func (rogue *Rogue) newDeadlyPoisonTemplate(_ *core.Simulation) core.SimpleSpell
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1 + 0.04*float64(rogue.Talents.VilePoisons),
-				ThreatMultiplier:       1,
-				BonusSpellHitRating:    5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
+				DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
+				ThreatMultiplier:    1,
+				BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
 			},
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:  4,
@@ -60,10 +59,9 @@ func (rogue *Rogue) newDeadlyPoisonRefreshTemplate(_ *core.Simulation) core.Simp
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1 + 0.04*float64(rogue.Talents.VilePoisons),
-				ThreatMultiplier:       1,
-				BonusSpellHitRating:    5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
+				DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
+				ThreatMultiplier:    1,
+				BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					if !spellEffect.Landed() {
 						return
@@ -142,10 +140,9 @@ func (rogue *Rogue) newInstantPoisonTemplate(_ *core.Simulation) core.SimpleSpel
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1 + 0.04*float64(rogue.Talents.VilePoisons),
-				ThreatMultiplier:       1,
-				BonusSpellHitRating:    5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
+				DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
+				ThreatMultiplier:    1,
+				BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
 			},
 			BaseDamage: core.BaseDamageFuncRoll(146, 194),
 		},

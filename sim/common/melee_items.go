@@ -60,9 +60,8 @@ func ApplyStormGauntlets(agent core.Agent) {
 			},
 			Effect: core.SpellHitEffect{
 				SpellEffect: core.SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
+					DamageMultiplier: 1,
+					ThreatMultiplier: 1,
 				},
 				BaseDamage: core.BaseDamageFuncFlat(3),
 			},
@@ -107,9 +106,8 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 			},
 			Effect: core.SpellHitEffect{
 				SpellEffect: core.SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
+					DamageMultiplier: 1,
+					ThreatMultiplier: 1,
 				},
 				BaseDamage: core.BaseDamageFuncFlat(2),
 			},
@@ -390,10 +388,9 @@ func ApplyDespair(agent core.Agent) {
 			SpellEffect: core.SpellEffect{
 				// TODO: This should be removed once we have an attack mask.
 				//  This is only set here to correctly calculate damage.
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				ProcMask:         core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
 			},
 			BaseDamage: core.BaseDamageFuncFlat(600),
 		},
@@ -445,10 +442,9 @@ func ApplyTheDecapitator(agent core.Agent) {
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				ProcMask:         core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
 			},
 			BaseDamage: core.BaseDamageFuncRoll(513, 567),
 		},
@@ -508,9 +504,8 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 			},
 			Effect: core.SpellHitEffect{
 				SpellEffect: core.SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
+					DamageMultiplier: 1,
+					ThreatMultiplier: 1,
 				},
 				BaseDamage: core.BaseDamageFuncRoll(285, 315),
 			},
@@ -800,9 +795,8 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 			},
 			Effect: core.SpellHitEffect{
 				SpellEffect: core.SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
+					DamageMultiplier: 1,
+					ThreatMultiplier: 1,
 				},
 				BaseDamage: core.BaseDamageFuncMagic(48, 54, 1),
 			},
@@ -976,9 +970,8 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 			},
 			Effect: core.SpellHitEffect{
 				SpellEffect: core.SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
+					DamageMultiplier: 1,
+					ThreatMultiplier: 1,
 				},
 				BaseDamage: core.BaseDamageFuncFlat(20),
 			},
