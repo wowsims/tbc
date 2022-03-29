@@ -43,9 +43,8 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
 			},
 		},
 	}

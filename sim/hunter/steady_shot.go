@@ -35,10 +35,9 @@ func (hunter *Hunter) newSteadyShotTemplate(sim *core.Simulation) core.SimpleSpe
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskRangedSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				ProcMask:         core.ProcMaskRangedSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
 				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 					hunter.killCommandBlocked = false
 					hunter.TryKillCommand(sim, spellEffect.Target)

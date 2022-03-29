@@ -37,7 +37,7 @@ func (rogue *Rogue) newEnvenomTemplate(_ *core.Simulation) core.SimpleSpellTempl
 	}
 
 	// cp. backstab
-	ability.Effect.StaticDamageMultiplier += 0.04 * float64(rogue.Talents.VilePoisons)
+	ability.Effect.DamageMultiplier += 0.04 * float64(rogue.Talents.VilePoisons)
 	if rogue.Talents.SurpriseAttacks {
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}

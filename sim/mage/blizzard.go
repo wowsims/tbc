@@ -37,9 +37,8 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 
 	baseEffect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier:       1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:       8,
@@ -52,8 +51,8 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.FrostChanneling) * 0.05
 	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
 	baseEffect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-	baseEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.PiercingIce)
-	baseEffect.StaticDamageMultiplier *= 1 + 0.01*float64(mage.Talents.ArcticWinds)
+	baseEffect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.PiercingIce)
+	baseEffect.DamageMultiplier *= 1 + 0.01*float64(mage.Talents.ArcticWinds)
 
 	numHits := sim.GetNumTargets()
 	effects := make([]core.SpellHitEffect, 0, numHits)

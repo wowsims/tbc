@@ -42,10 +42,9 @@ func (warrior *Warrior) newWhirlwindTemplate(sim *core.Simulation) core.SimpleSp
 
 	baseEffect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			ProcMask:               core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 		BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 1, true),
 	}

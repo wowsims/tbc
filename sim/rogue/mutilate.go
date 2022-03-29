@@ -27,21 +27,20 @@ func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemp
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				BonusCritRating:        bonusCritRating,
+				ProcMask:         core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BonusCritRating:  bonusCritRating,
 			},
 			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 101, 1, true),
 		},
 	}
 
 	// cp. backstab
-	mhDamageAbility.Effect.StaticDamageMultiplier += 0.04 * float64(rogue.Talents.Opportunity)
+	mhDamageAbility.Effect.DamageMultiplier += 0.04 * float64(rogue.Talents.Opportunity)
 
 	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
-		mhDamageAbility.Effect.StaticDamageMultiplier += 0.06
+		mhDamageAbility.Effect.DamageMultiplier += 0.06
 	}
 
 	ohDamageAbility := mhDamageAbility

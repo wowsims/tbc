@@ -27,9 +27,8 @@ func (priest *Priest) newVampiricTouchTemplate(sim *core.Simulation) core.Simple
 
 	effect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:  5,

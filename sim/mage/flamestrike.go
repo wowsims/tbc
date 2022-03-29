@@ -45,9 +45,8 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 
 	baseEffect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
+			DamageMultiplier: mage.spellDamageMultiplier,
+			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 		},
 		BaseDamage: core.BaseDamageFuncMagic(480, 585, 0.236),
 	}
@@ -58,7 +57,7 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 	baseEffect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
 	baseEffect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
 	baseEffect.BonusSpellCritRating += float64(mage.Talents.ImprovedFlamestrike) * 5 * core.SpellCritRatingPerCritChance
-	baseEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+	baseEffect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
 	numHits := sim.GetNumTargets()
 	effects := make([]core.SpellHitEffect, 0, numHits)
@@ -90,8 +89,7 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 
 	baseEffect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: mage.spellDamageMultiplier,
+			DamageMultiplier: mage.spellDamageMultiplier,
 		},
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:  4,
@@ -101,7 +99,7 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 	}
 
 	baseEffect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-	baseEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+	baseEffect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
 	numHits := sim.GetNumTargets()
 	effects := make([]core.SpellHitEffect, 0, numHits)

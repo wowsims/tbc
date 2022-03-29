@@ -187,9 +187,8 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
 			},
 			BaseDamage: core.BaseDamageFuncMagic(256, 328, 3.0/3.5),
 		},

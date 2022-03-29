@@ -28,10 +28,9 @@ func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleS
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskRangedSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				ProcMask:         core.ProcMaskRangedSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
 			},
 			DotInput: core.DotDamageInput{
 				NumberOfTicks: 5,
@@ -46,7 +45,7 @@ func (hunter *Hunter) newSerpentStingTemplate(sim *core.Simulation) core.SimpleS
 	}
 
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
-	ama.Effect.StaticDamageMultiplier *= 1 + 0.06*float64(hunter.Talents.ImprovedStings)
+	ama.Effect.DamageMultiplier *= 1 + 0.06*float64(hunter.Talents.ImprovedStings)
 
 	return core.NewSimpleSpellTemplate(ama)
 }

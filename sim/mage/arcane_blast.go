@@ -54,9 +54,8 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier:       1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
+				DamageMultiplier: mage.spellDamageMultiplier,
+				ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 			},
 			BaseDamage: core.BaseDamageFuncMagic(668, 772, 2.5/3.5),
 		},
@@ -66,7 +65,7 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance
 
 	if mage.hasTristfal {
-		spell.Effect.StaticDamageMultiplier *= 1.2
+		spell.Effect.DamageMultiplier *= 1.2
 		spell.Cost.Value += 0.2 * ArcaneBlastBaseManaCost
 	}
 

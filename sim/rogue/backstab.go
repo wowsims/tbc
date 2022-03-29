@@ -22,15 +22,15 @@ func (rogue *Rogue) newBackstabTemplate(_ *core.Simulation) core.SimpleSpellTemp
 	ability.Effect.BaseDamage = core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 170, 1.5+0.01*float64(rogue.Talents.SinisterCalling), true)
 
 	// all these use "Apply Aura: Modifies Damage/Healing Done", and stack additively (up to 142%)
-	ability.Effect.StaticDamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
+	ability.Effect.DamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
 	if rogue.Talents.SurpriseAttacks {
-		ability.Effect.StaticDamageMultiplier += 0.1
+		ability.Effect.DamageMultiplier += 0.1
 	}
 
-	ability.Effect.StaticDamageMultiplier += 0.04 * float64(rogue.Talents.Opportunity)
+	ability.Effect.DamageMultiplier += 0.04 * float64(rogue.Talents.Opportunity)
 
 	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
-		ability.Effect.StaticDamageMultiplier += 0.06
+		ability.Effect.DamageMultiplier += 0.06
 	}
 
 	ability.Effect.BonusCritRating += 10 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.PuncturingWounds)

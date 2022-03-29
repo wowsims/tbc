@@ -51,9 +51,8 @@ func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.Simple
 
 	baseEffect := core.SpellHitEffect{
 		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: impTCDamageMult,
-			ThreatMultiplier:       1.75,
+			DamageMultiplier: impTCDamageMult,
+			ThreatMultiplier: 1.75,
 		},
 		BaseDamage: core.BaseDamageFuncFlat(123),
 	}

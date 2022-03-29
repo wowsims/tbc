@@ -31,9 +31,8 @@ func (paladin *Paladin) setupSealOfBlood() {
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
 			},
 			// should deal 35% weapon deamage
 			BaseDamage: core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 0.35, false),
@@ -107,9 +106,8 @@ func (paladin *Paladin) setupSealOfCommand() {
 		},
 		Effect: core.SpellHitEffect{
 			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
 			},
 		},
 	}

@@ -77,10 +77,9 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 		Effects: []core.SpellHitEffect{
 			{
 				SpellEffect: core.SpellEffect{
-					ProcMask:               core.ProcMaskMeleeMHSpecial,
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
+					ProcMask:         core.ProcMaskMeleeMHSpecial,
+					DamageMultiplier: 1,
+					ThreatMultiplier: 1,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
@@ -97,11 +96,10 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 			},
 			{
 				SpellEffect: core.SpellEffect{
-					ProcMask:               core.ProcMaskMeleeOHSpecial,
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-					ReuseMainHitRoll:       true,
+					ProcMask:         core.ProcMaskMeleeOHSpecial,
+					DamageMultiplier: 1,
+					ThreatMultiplier: 1,
+					ReuseMainHitRoll: true,
 				},
 				BaseDamage: core.BaseDamageFuncMeleeWeapon(core.OffHand, false, flatDamageBonus, 1, true),
 			},
