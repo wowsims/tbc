@@ -116,6 +116,13 @@ func (cast *Cast) init(sim *Simulation) {
 
 	// Apply on-cast effects.
 	cast.Character.OnCast(sim, cast)
+	if cast.Character.PseudoStats.NoCost {
+		cast.Cost.Value = 0
+	} else {
+		cast.Cost.Value -= cast.BaseCost.Value * (1 - cast.Character.PseudoStats.CostMultiplier)
+		cast.Cost.Value -= cast.Character.PseudoStats.CostReduction
+		cast.Cost.Value = MaxFloat(0, cast.Cost.Value)
+	}
 
 	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
 	if cast.GCD != 0 && cast.Character.IsOnCD(GCDCooldownID, sim.CurrentTime) {

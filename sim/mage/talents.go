@@ -84,15 +84,11 @@ func (mage *Mage) applyArcaneConcentration() {
 			Duration: time.Second * 15,
 			OnGain: func(sim *core.Simulation) {
 				mage.AddStat(stats.SpellCrit, bonusCrit)
+				mage.PseudoStats.NoCost = true
 			},
 			OnExpire: func(sim *core.Simulation) {
 				mage.AddStat(stats.SpellCrit, -bonusCrit)
-			},
-			OnCast: func(sim *core.Simulation, cast *core.Cast) {
-				if !cast.SpellExtras.Matches(SpellFlagMage) {
-					return
-				}
-				cast.Cost.Value = 0
+				mage.PseudoStats.NoCost = false
 			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if !spellCast.SpellExtras.Matches(SpellFlagMage) {
@@ -235,14 +231,11 @@ func (mage *Mage) registerArcanePowerCD() {
 					Duration: time.Second * 15,
 					OnGain: func(sim *core.Simulation) {
 						mage.PseudoStats.DamageDealtMultiplier *= 1.3
+						mage.PseudoStats.CostMultiplier *= 1.3
 					},
 					OnExpire: func(sim *core.Simulation) {
 						mage.PseudoStats.DamageDealtMultiplier /= 1.3
-					},
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						if cast.SpellSchool.Matches(core.SpellSchoolMagic) {
-							cast.Cost.Value *= 1.3
-						}
+						mage.PseudoStats.CostMultiplier /= 1.3
 					},
 				})
 				character.Metrics.AddInstantCast(actionID)

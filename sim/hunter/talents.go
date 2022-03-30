@@ -266,12 +266,11 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		Duration: time.Second * 18,
 		OnGain: func(sim *core.Simulation) {
 			hunter.PseudoStats.DamageDealtMultiplier *= 1.1
+			hunter.PseudoStats.CostMultiplier *= 0.8
 		},
 		OnExpire: func(sim *core.Simulation) {
 			hunter.PseudoStats.DamageDealtMultiplier /= 1.1
-		},
-		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			cast.Cost.Value -= cast.BaseCost.Value * 0.2
+			hunter.PseudoStats.CostMultiplier /= 0.8
 		},
 	}
 

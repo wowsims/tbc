@@ -695,7 +695,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-Settings-Tauren-P1-Adaptive-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1008.0530864603041
+  dps: 1008.4408015183594
  }
 }
 dps_results: {

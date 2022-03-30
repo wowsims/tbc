@@ -151,12 +151,11 @@ func (priest *Priest) ApplyInnerFocus(sim *core.Simulation) {
 		Duration: core.NeverExpires,
 		OnGain: func(sim *core.Simulation) {
 			priest.AddStat(stats.SpellCrit, 25*core.SpellCritRatingPerCritChance)
+			priest.PseudoStats.NoCost = true
 		},
 		OnExpire: func(sim *core.Simulation) {
 			priest.AddStat(stats.SpellCrit, -25*core.SpellCritRatingPerCritChance)
-		},
-		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			cast.Cost.Value = 0
+			priest.PseudoStats.NoCost = false
 		},
 		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 			// Remove the buff and put skill on CD

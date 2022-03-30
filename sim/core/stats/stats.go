@@ -385,6 +385,10 @@ func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
 }
 
 type PseudoStats struct {
+	NoCost         bool    // If set, spells cost no mana/energy/rage.
+	CostMultiplier float64 // Multiplies spell cost.
+	CostReduction  float64 // Reduces spell cost.
+
 	CastSpeedMultiplier   float64
 	MeleeSpeedMultiplier  float64
 	RangedSpeedMultiplier float64
@@ -434,6 +438,8 @@ type PseudoStats struct {
 
 func NewPseudoStats() PseudoStats {
 	return PseudoStats{
+		CostMultiplier: 1,
+
 		CastSpeedMultiplier:  1,
 		MeleeSpeedMultiplier: 1,
 		//RangedSpeedMultiplier: 1, // Leave at 0 so we can use this to ignore ranged stuff for non-hunters.
