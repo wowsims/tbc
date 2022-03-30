@@ -174,14 +174,14 @@ func (spellEffect *SpellEffect) SpellCritChance(character *Character, spellCast 
 	return critRating / (SpellCritRatingPerCritChance * 100)
 }
 
-func (hitEffect *SpellEffect) directCalculations(sim *Simulation, spell *SimpleSpell) {
-	damage := hitEffect.calculateBaseDamage(sim, &spell.SpellCast)
+func (hitEffect *SpellEffect) directCalculations(sim *Simulation, spellCast *SpellCast) {
+	damage := hitEffect.calculateBaseDamage(sim, spellCast)
 
 	damage *= hitEffect.DamageMultiplier
-	hitEffect.applyAttackerModifiers(sim, &spell.SpellCast, false, &damage)
-	hitEffect.applyTargetModifiers(sim, &spell.SpellCast, false, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
-	hitEffect.applyResistances(sim, &spell.SpellCast, &damage)
-	hitEffect.applyOutcome(sim, &spell.SpellCast, &damage)
+	hitEffect.applyAttackerModifiers(sim, spellCast, false, &damage)
+	hitEffect.applyTargetModifiers(sim, spellCast, false, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
+	hitEffect.applyResistances(sim, spellCast, &damage)
+	hitEffect.applyOutcome(sim, spellCast, &damage)
 
 	hitEffect.Damage = damage
 }
@@ -194,40 +194,40 @@ func (hitEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spellCast *Sp
 	}
 }
 
-func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spell *SimpleSpell) {
-	if spell.OutcomeRollCategory == OutcomeRollCategoryNone || spell.SpellExtras.Matches(SpellExtrasAlwaysHits) {
+func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spellCast *SpellCast, spell *SimpleSpell) {
+	if spellCast.OutcomeRollCategory == OutcomeRollCategoryNone || spellCast.SpellExtras.Matches(SpellExtrasAlwaysHits) {
 		spellEffect.Outcome = OutcomeHit
-		if spellEffect.critCheck(sim, &spell.SpellCast) {
+		if spellEffect.critCheck(sim, spellCast) {
 			spellEffect.Outcome = OutcomeCrit
 		}
 	} else if spellEffect.ReuseMainHitRoll { // TODO: can we remove this.
 		spellEffect.Outcome = spell.Effects[0].Outcome
-	} else if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryMagic) {
-		if spellEffect.hitCheck(sim, &spell.SpellCast) {
+	} else if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryMagic) {
+		if spellEffect.hitCheck(sim, spellCast) {
 			spellEffect.Outcome = OutcomeHit
-			if spellEffect.critCheck(sim, &spell.SpellCast) {
+			if spellEffect.critCheck(sim, spellCast) {
 				spellEffect.Outcome = OutcomeCrit
 			}
 		} else {
 			spellEffect.Outcome = OutcomeMiss
 		}
-	} else if spell.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
-		spellEffect.Outcome = spellEffect.WhiteHitTableResult(sim, spell)
-		if spellEffect.Landed() && spellEffect.critCheck(sim, &spell.SpellCast) {
+	} else if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
+		spellEffect.Outcome = spellEffect.WhiteHitTableResult(sim, spellCast)
+		if spellEffect.Landed() && spellEffect.critCheck(sim, spellCast) {
 			spellEffect.Outcome = OutcomeCrit
 		}
 	}
 }
 
 // Computes an attack result using the white-hit table formula (single roll).
-func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpell) HitOutcome {
-	character := ability.Character
+func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, spellCast *SpellCast) HitOutcome {
+	character := spellCast.Character
 
 	roll := sim.RandomFloat("White Hit Table")
 
 	// Miss
-	missChance := ahe.Target.MissChance - ahe.PhysicalHitChance(character, &ability.SpellCast)
-	if character.AutoAttacks.IsDualWielding && ability.OutcomeRollCategory == OutcomeRollCategoryWhite {
+	missChance := ahe.Target.MissChance - ahe.PhysicalHitChance(character, spellCast)
+	if character.AutoAttacks.IsDualWielding && spellCast.OutcomeRollCategory == OutcomeRollCategoryWhite {
 		missChance += 0.19
 	}
 	missChance = MaxFloat(0, missChance)
@@ -237,9 +237,9 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 		return OutcomeMiss
 	}
 
-	if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
+	if !spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
 		// Dodge
-		if !ability.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
+		if !spellCast.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
 			dodge := ahe.Target.Dodge
 
 			expertiseRating := character.stats[stats.Expertise]
@@ -269,7 +269,7 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 		// If we actually implement blocks, ranged hits can be blocked.
 
 		// No need to crit/glance roll if we are not a white hit
-		if ability.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial | OutcomeRollCategoryRanged) {
+		if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial | OutcomeRollCategoryRanged) {
 			return OutcomeHit
 		}
 
@@ -280,7 +280,7 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, ability *SimpleSpel
 		}
 
 		// Crit
-		chance += ahe.PhysicalCritChance(character, &ability.SpellCast)
+		chance += ahe.PhysicalCritChance(character, spellCast)
 		if roll < chance {
 			return OutcomeCrit
 		}
@@ -310,20 +310,20 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast)
 	}
 }
 
-func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spell *SimpleSpell) {
+func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spellCast *SpellCast) {
 	if spellEffect.OnSpellHit != nil {
-		spellEffect.OnSpellHit(sim, &spell.SpellCast, spellEffect)
+		spellEffect.OnSpellHit(sim, spellCast, spellEffect)
 	}
-	spell.Character.OnSpellHit(sim, &spell.SpellCast, spellEffect)
-	spellEffect.Target.OnSpellHit(sim, &spell.SpellCast, spellEffect)
+	spellCast.Character.OnSpellHit(sim, spellCast, spellEffect)
+	spellEffect.Target.OnSpellHit(sim, spellCast, spellEffect)
 }
 
-func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *SimpleSpell) {
-	if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasAlwaysHits) {
-		spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(&spell.SpellCast))
+func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
+	if sim.Log != nil && !spellCast.SpellExtras.Matches(SpellExtrasAlwaysHits) {
+		spellCast.Character.Log(sim, "%s %s. (Threat: %0.3f)", spellCast.ActionID, spellEffect, spellEffect.calcThreat(spellCast))
 	}
 
-	spellEffect.triggerSpellProcs(sim, spell)
+	spellEffect.triggerSpellProcs(sim, spellCast)
 }
 
 func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {

@@ -237,36 +237,37 @@ func (spell *SimpleSpell) GetDuration() time.Duration {
 
 func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
+		spellCast := &spell.SpellCast
 		if len(spell.Effects) == 0 {
 			hitEffect := &spell.Effect
-			hitEffect.determineOutcome(sim, spell)
+			hitEffect.determineOutcome(sim, spellCast, spell)
 
 			if hitEffect.Landed() {
-				hitEffect.directCalculations(sim, spell)
+				hitEffect.directCalculations(sim, spellCast)
 
 				// Dot Damage Effects
 				if hitEffect.DotInput.NumberOfTicks != 0 {
-					hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
+					hitEffect.takeDotSnapshot(sim, spellCast)
 					spell.ApplyDot(sim)
 				}
 			}
 
-			hitEffect.applyResultsToCast(&spell.SpellCast)
-			hitEffect.afterCalculations(sim, spell)
+			hitEffect.applyResultsToCast(spellCast)
+			hitEffect.afterCalculations(sim, spellCast)
 		} else {
 			// Use a separate loop for the beforeCalculations() calls so that they all
 			// come before the first afterCalculations() call. This prevents proc effects
 			// on the first hit from benefitting other hits of the same spell.
 			for effectIdx := range spell.Effects {
 				hitEffect := &spell.Effects[effectIdx]
-				hitEffect.determineOutcome(sim, spell)
+				hitEffect.determineOutcome(sim, spellCast, spell)
 			}
 			for effectIdx := range spell.Effects {
 				hitEffect := &spell.Effects[effectIdx]
 				if hitEffect.Landed() {
-					hitEffect.directCalculations(sim, spell)
+					hitEffect.directCalculations(sim, spellCast)
 					if hitEffect.DotInput.NumberOfTicks != 0 {
-						hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
+						hitEffect.takeDotSnapshot(sim, spellCast)
 					}
 				}
 			}
@@ -278,8 +279,8 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			// is fully calculated before invoking proc callbacks.
 			for effectIdx := range spell.Effects {
 				hitEffect := &spell.Effects[effectIdx]
-				hitEffect.applyResultsToCast(&spell.SpellCast)
-				hitEffect.afterCalculations(sim, spell)
+				hitEffect.applyResultsToCast(spellCast)
+				hitEffect.afterCalculations(sim, spellCast)
 			}
 
 			// This assumes that the effects either all have dots, or none of them do.
@@ -289,7 +290,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 		}
 
 		if spell.currentDotAction == nil {
-			spell.Character.Metrics.AddSpellCast(&spell.SpellCast)
+			spell.Character.Metrics.AddSpellCast(spellCast)
 			spell.objectInUse = false
 		}
 	})
