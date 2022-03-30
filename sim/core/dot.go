@@ -108,6 +108,7 @@ func (spell *SimpleSpell) ApplyDot(sim *Simulation) {
 	pa := sim.pendingActionPool.Get()
 	pa.Priority = ActionPriorityDOT
 	multiDot := len(spell.Effects) > 0
+	spellCast := &spell.SpellCast
 
 	if multiDot {
 		pa.NextActionAt = sim.CurrentTime + spell.Effects[0].DotInput.TickLength
@@ -121,17 +122,17 @@ func (spell *SimpleSpell) ApplyDot(sim *Simulation) {
 			referenceHit = &spell.Effects[0]
 			if sim.CurrentTime == referenceHit.DotInput.nextTickTime {
 				for i := range spell.Effects {
-					spell.Effects[i].calculateDotDamage(sim, &spell.SpellCast)
+					spell.Effects[i].calculateDotDamage(sim, spellCast)
 				}
 				spell.applyAOECap()
 				for i := range spell.Effects {
-					spell.Effects[i].afterDotTick(sim, spell)
+					spell.Effects[i].afterDotTick(sim, spellCast)
 				}
 			}
 		} else {
 			if sim.CurrentTime == referenceHit.DotInput.nextTickTime {
-				referenceHit.calculateDotDamage(sim, &spell.SpellCast)
-				referenceHit.afterDotTick(sim, spell)
+				referenceHit.calculateDotDamage(sim, spellCast)
+				referenceHit.afterDotTick(sim, spellCast)
 			}
 		}
 
@@ -155,12 +156,12 @@ func (spell *SimpleSpell) ApplyDot(sim *Simulation) {
 		}
 		if multiDot {
 			for i := range spell.Effects {
-				spell.Effects[i].onDotComplete(sim, &spell.SpellCast)
+				spell.Effects[i].onDotComplete(sim, spellCast)
 			}
 		} else {
-			spell.Effect.onDotComplete(sim, &spell.SpellCast)
+			spell.Effect.onDotComplete(sim, spellCast)
 		}
-		spell.Character.Metrics.AddSpellCast(&spell.SpellCast)
+		spell.Character.Metrics.AddSpellCast(spellCast)
 		spell.objectInUse = false
 	}
 
@@ -207,21 +208,21 @@ func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spellCast *Spe
 }
 
 // This should be called on each dot tick.
-func (hitEffect *SpellEffect) afterDotTick(sim *Simulation, spell *SimpleSpell) {
+func (hitEffect *SpellEffect) afterDotTick(sim *Simulation, spellCast *SpellCast) {
 	if sim.Log != nil {
-		spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, hitEffect.DotResultString(), hitEffect.calcThreat(&spell.SpellCast))
+		spellCast.Character.Log(sim, "%s %s. (Threat: %0.3f)", spellCast.ActionID, hitEffect.DotResultString(), hitEffect.calcThreat(spellCast))
 	}
 
-	hitEffect.applyDotTickResultsToCast(&spell.SpellCast)
+	hitEffect.applyDotTickResultsToCast(spellCast)
 
 	if hitEffect.DotInput.TicksProcSpellEffects {
-		hitEffect.triggerSpellProcs(sim, spell)
+		hitEffect.triggerSpellProcs(sim, spellCast)
 	}
 
-	spell.Character.OnPeriodicDamage(sim, &spell.SpellCast, hitEffect, hitEffect.Damage)
-	hitEffect.Target.OnPeriodicDamage(sim, &spell.SpellCast, hitEffect, hitEffect.Damage)
+	spellCast.Character.OnPeriodicDamage(sim, spellCast, hitEffect, hitEffect.Damage)
+	hitEffect.Target.OnPeriodicDamage(sim, spellCast, hitEffect, hitEffect.Damage)
 	if hitEffect.DotInput.OnPeriodicDamage != nil {
-		hitEffect.DotInput.OnPeriodicDamage(sim, &spell.SpellCast, hitEffect, hitEffect.Damage)
+		hitEffect.DotInput.OnPeriodicDamage(sim, spellCast, hitEffect, hitEffect.Damage)
 	}
 
 	hitEffect.DotInput.tickIndex++
