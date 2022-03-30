@@ -71,7 +71,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-AshtongueTalismanofInsight-32488"
  value: {
-  dps: 1370.0201587505862
+  dps: 1357.241303492055
  }
 }
 dps_results: {
@@ -563,7 +563,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-TheLightningCapacitor-28785"
  value: {
-  dps: 1302.8235691978978
+  dps: 1351.684165414845
  }
 }
 dps_results: {
@@ -599,7 +599,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 1288.609015768153
+  dps: 1309.1502614627711
  }
 }
 dps_results: {
@@ -635,7 +635,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-Average-Default"
  value: {
-  dps: 1342.1395015598462
+  dps: 1344.5278007321385
  }
 }
 dps_results: {

@@ -59,9 +59,6 @@ type Cast struct {
 	// used for adding latency following the cast.
 	AfterCastDelay time.Duration
 
-	// Bonus crit to be applied to all effects resulting from this cast.
-	BonusCritRating float64 // TODO: move this off cast and move to SpellEffect or something.
-
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete OnCastComplete
 

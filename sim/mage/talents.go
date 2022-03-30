@@ -82,15 +82,24 @@ func (mage *Mage) applyArcaneConcentration() {
 			ID:       ClearcastingAuraID,
 			ActionID: core.ActionID{SpellID: 12536},
 			Duration: time.Second * 15,
+			OnGain: func(sim *core.Simulation) {
+				mage.AddStat(stats.SpellCrit, bonusCrit)
+			},
+			OnExpire: func(sim *core.Simulation) {
+				mage.AddStat(stats.SpellCrit, -bonusCrit)
+			},
 			OnCast: func(sim *core.Simulation, cast *core.Cast) {
 				if !cast.SpellExtras.Matches(SpellFlagMage) {
 					return
 				}
 				cast.Cost.Value = 0
-				cast.BonusCritRating += bonusCrit
 			},
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if !cast.SpellExtras.Matches(SpellFlagMage) {
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellCast.SpellExtras.Matches(SpellFlagMage) {
+					return
+				}
+				if curCastIdx == lastCheckedCastIdx {
+					// Means this is another hit from the same cast that procced CC.
 					return
 				}
 				mage.RemoveAura(sim, ClearcastingAuraID)
@@ -100,32 +109,13 @@ func (mage *Mage) applyArcaneConcentration() {
 		return core.Aura{
 			ID: ArcaneConcentrationAuraID,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				if !cast.SpellExtras.Matches(SpellFlagMage) {
+					return
+				}
 				curCastIdx++
-
-				// Arcane missile initial hit can proc clearcasting.
-				if !cast.IsSpellAction(SpellIDArcaneMissiles) {
-					return
-				}
-
-				if sim.RandomFloat("Arcane Concentration") > procChance {
-					return
-				}
-
-				if !mage.HasAura(ClearcastingAuraID) {
-					// Also has special interaction with AM, gets the benefit of CC crit bonus on its own cast.
-					cast.BonusCritRating += bonusCrit
-				}
-				mage.ReplaceAura(sim, ccAura)
 			},
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
-				if !spellEffect.Landed() {
-					return
-				}
-				if spellCast.IsSpellAction(SpellIDArcaneMissiles) {
-					// Arcane missile bolts shouldn't proc clearcasting.
+				if !spellCast.SpellExtras.Matches(SpellFlagMage) {
 					return
 				}
 
@@ -135,11 +125,15 @@ func (mage *Mage) applyArcaneConcentration() {
 				}
 				lastCheckedCastIdx = curCastIdx
 
+				if !spellEffect.Landed() {
+					return
+				}
+
 				if sim.RandomFloat("Arcane Concentration") > procChance {
 					return
 				}
 
-				mage.AddAura(sim, ccAura)
+				mage.AddPriorityAura(sim, ccAura)
 			},
 		}
 	})
