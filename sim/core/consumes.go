@@ -788,14 +788,14 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 		castTemplate := NewSimpleSpellTemplate(SimpleSpell{
 			SpellCast: SpellCast{
 				Cast: Cast{
-					ActionID:            actionID,
-					Character:           character,
-					IsPhantom:           true,
-					OutcomeRollCategory: OutcomeRollCategoryMagic,
-					CritRollCategory:    CritRollCategoryMagical,
-					SpellSchool:         SpellSchoolFire,
-					CritMultiplier:      1.5,
+					ActionID:    actionID,
+					Character:   character,
+					SpellSchool: SpellSchoolFire,
 				},
+				IsPhantom:           true,
+				OutcomeRollCategory: OutcomeRollCategoryMagic,
+				CritRollCategory:    CritRollCategoryMagical,
+				CritMultiplier:      1.5,
 			},
 			Effect: SpellEffect{
 				DamageMultiplier: 1,
@@ -942,14 +942,14 @@ func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID Act
 	spell := SimpleSpell{
 		SpellCast: SpellCast{
 			Cast: Cast{
-				ActionID:            actionID,
-				Character:           character,
-				CritRollCategory:    CritRollCategoryMagical,
-				OutcomeRollCategory: OutcomeRollCategoryMagic,
-				SpellSchool:         SpellSchoolFire,
-				CritMultiplier:      2,
-				Cooldown:            cooldown,
+				ActionID:    actionID,
+				Character:   character,
+				SpellSchool: SpellSchoolFire,
+				Cooldown:    cooldown,
 			},
+			OutcomeRollCategory: OutcomeRollCategoryMagic,
+			CritRollCategory:    CritRollCategoryMagical,
+			CritMultiplier:      2,
 		},
 	}
 

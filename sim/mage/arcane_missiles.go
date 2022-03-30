@@ -16,12 +16,10 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDArcaneMissiles},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolArcane,
-				SpellExtras:         SpellFlagMage | core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
+				ActionID:    core.ActionID{SpellID: SpellIDArcaneMissiles},
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolArcane,
+				SpellExtras: SpellFlagMage | core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 740,
@@ -30,9 +28,11 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 					Type:  stats.Mana,
 					Value: 740,
 				},
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				GCD: core.GCDDefault,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier: mage.spellDamageMultiplier,

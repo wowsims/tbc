@@ -17,10 +17,8 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 			SpellID:    SpellIDMindBlast,
 			CooldownID: MBCooldownID,
 		},
-		Character:           &priest.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolShadow,
+		Character:   &priest.Character,
+		SpellSchool: core.SpellSchoolShadow,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 450,
@@ -29,10 +27,9 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 			Type:  stats.Mana,
 			Value: 450,
 		},
-		CastTime:       time.Millisecond * 1500,
-		GCD:            core.GCDDefault,
-		Cooldown:       time.Second * 8,
-		CritMultiplier: priest.DefaultSpellCritMultiplier(),
+		CastTime: time.Millisecond * 1500,
+		GCD:      core.GCDDefault,
+		Cooldown: time.Second * 8,
 	}
 
 	effect := core.SpellEffect{
@@ -53,7 +50,10 @@ func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpel
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast: baseCast,
+			Cast:                baseCast,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
 		},
 		Effect: effect,
 	})

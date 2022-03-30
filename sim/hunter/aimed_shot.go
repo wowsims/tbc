@@ -13,19 +13,19 @@ func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.SimpleSpel
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            AimedShotActionID,
-				Character:           &hunter.Character,
-				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
+				ActionID:    AimedShotActionID,
+				Character:   &hunter.Character,
+				SpellSchool: core.SpellSchoolPhysical,
 				// Actual aimed shot has a 2.5s cast time, but we only use it as an instant precast.
 				//CastTime:       time.Millisecond * 2500,
 				//Cooldown:       time.Second * 6,
 				//GCD:            core.GCDDefault,
-				Cost:           cost,
-				BaseCost:       cost,
-				CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+				Cost:     cost,
+				BaseCost: cost,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 		Effect: core.SpellEffect{
 			ProcMask:         core.ProcMaskRangedSpecial,

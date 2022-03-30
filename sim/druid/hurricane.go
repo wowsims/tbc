@@ -21,11 +21,9 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 					SpellID:    SpellIDHurricane,
 					CooldownID: HurricaneCooldownID,
 				},
-				Character:           &druid.Character,
-				SpellSchool:         core.SpellSchoolNature,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellExtras:         core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
+				Character:   &druid.Character,
+				SpellSchool: core.SpellSchoolNature,
+				SpellExtras: core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 1905,
@@ -37,6 +35,8 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 				GCD:      core.GCDDefault,
 				Cooldown: time.Second * 60,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
 		},
 	}
 

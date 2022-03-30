@@ -195,12 +195,12 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		MHAuto: SimpleSpell{
 			SpellCast: SpellCast{
 				Cast: Cast{
-					ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
-					Character:           character,
-					OutcomeRollCategory: OutcomeRollCategoryWhite,
-					SpellSchool:         SpellSchoolPhysical,
-					CritMultiplier:      options.MainHand.CritMultiplier,
+					ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
+					Character:   character,
+					SpellSchool: SpellSchoolPhysical,
 				},
+				OutcomeRollCategory: OutcomeRollCategoryWhite,
+				CritMultiplier:      options.MainHand.CritMultiplier,
 			},
 			Effect: SpellEffect{
 				ProcMask:         ProcMaskMeleeMHAuto,
@@ -212,12 +212,12 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		OHAuto: SimpleSpell{
 			SpellCast: SpellCast{
 				Cast: Cast{
-					ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
-					Character:           character,
-					OutcomeRollCategory: OutcomeRollCategoryWhite,
-					SpellSchool:         SpellSchoolPhysical,
-					CritMultiplier:      options.OffHand.CritMultiplier,
+					ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
+					Character:   character,
+					SpellSchool: SpellSchoolPhysical,
 				},
+				OutcomeRollCategory: OutcomeRollCategoryWhite,
+				CritMultiplier:      options.OffHand.CritMultiplier,
 			},
 			Effect: SpellEffect{
 				ProcMask:         ProcMaskMeleeOHAuto,
@@ -229,13 +229,13 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		RangedAuto: SimpleSpell{
 			SpellCast: SpellCast{
 				Cast: Cast{
-					ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionShoot},
-					Character:           character,
-					SpellSchool:         SpellSchoolPhysical,
-					OutcomeRollCategory: OutcomeRollCategoryRanged,
-					CritRollCategory:    CritRollCategoryPhysical,
-					IgnoreHaste:         true, // Affected by ranged haste, not spell haste.
+					ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
+					Character:   character,
+					SpellSchool: SpellSchoolPhysical,
+					IgnoreHaste: true, // Affected by ranged haste, not spell haste.
 				},
+				OutcomeRollCategory: OutcomeRollCategoryRanged,
+				CritRollCategory:    CritRollCategoryPhysical,
 			},
 			Effect: SpellEffect{
 				ProcMask:         ProcMaskRangedAuto,

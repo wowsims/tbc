@@ -78,18 +78,18 @@ func (gft *GnomishFlameTurret) newFlameCannonTemplate(sim *Simulation) SimpleSpe
 	spell := SimpleSpell{
 		SpellCast: SpellCast{
 			Cast: Cast{
-				ActionID:            ActionID{SpellID: SpellIDFlameCannon},
-				Character:           &gft.Character,
-				CritRollCategory:    CritRollCategoryMagical,
-				OutcomeRollCategory: OutcomeRollCategoryMagic,
-				SpellSchool:         SpellSchoolFire,
+				ActionID:    ActionID{SpellID: SpellIDFlameCannon},
+				Character:   &gft.Character,
+				SpellSchool: SpellSchoolFire,
 				// Pretty sure this works the same way as Searing Totem, where the next shot
 				// fires once the previous missile has hit the target. Just give some static
 				// value for now.
-				GCD:            time.Millisecond * 800,
-				CritMultiplier: gft.DefaultSpellCritMultiplier(),
-				IgnoreHaste:    true,
+				GCD:         time.Millisecond * 800,
+				IgnoreHaste: true,
 			},
+			OutcomeRollCategory: OutcomeRollCategoryMagic,
+			CritRollCategory:    CritRollCategoryMagical,
+			CritMultiplier:      gft.DefaultSpellCritMultiplier(),
 		},
 		Effect: SpellEffect{
 			DamageMultiplier: 1,

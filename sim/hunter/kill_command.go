@@ -63,13 +63,13 @@ func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.SimpleSpe
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 34027},
-				Character:           &hp.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				CritMultiplier:      2,
+				ActionID:    core.ActionID{SpellID: 34027},
+				Character:   &hp.Character,
+				SpellSchool: core.SpellSchoolPhysical,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      2,
 		},
 		Effect: core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,

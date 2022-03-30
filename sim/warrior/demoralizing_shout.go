@@ -16,12 +16,11 @@ func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            DemoralizingShoutActionID,
-				Character:           &warrior.Character,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				IgnoreHaste:         true,
+				ActionID:    DemoralizingShoutActionID,
+				Character:   &warrior.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         core.GCDDefault,
+				IgnoreHaste: true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
 					Value: warrior.shoutCost,
@@ -31,6 +30,7 @@ func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.
 					Value: warrior.shoutCost,
 				},
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 	}
 

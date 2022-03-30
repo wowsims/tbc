@@ -14,11 +14,9 @@ var InsectSwarmDebuffID = core.NewDebuffID()
 
 func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		ActionID:            core.ActionID{SpellID: SpellIDInsectSwarm},
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolNature,
-		Character:           &druid.Character,
+		ActionID:    core.ActionID{SpellID: SpellIDInsectSwarm},
+		SpellSchool: core.SpellSchoolNature,
+		Character:   &druid.Character,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 175,
@@ -42,7 +40,9 @@ func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpel
 	}
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast: baseCast,
+			Cast:                baseCast,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
 		},
 		Effect: effect,
 	})

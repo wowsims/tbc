@@ -30,14 +30,14 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 	wftempl := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 25505},
-				Character:           &shaman.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
-				IsPhantom:           true,
+				ActionID:    core.ActionID{SpellID: 25505},
+				Character:   &shaman.Character,
+				SpellSchool: core.SpellSchoolPhysical,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
 		},
 	}
 
@@ -123,14 +123,14 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	ftTmpl := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 25489},
-				Character:           &shaman.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				IsPhantom:           true,
-				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+				ActionID:    core.ActionID{SpellID: 25489},
+				Character:   &shaman.Character,
+				SpellSchool: core.SpellSchoolFire,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+			IsPhantom:           true,
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier: 1,
@@ -191,14 +191,14 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 	fbTmpl := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 25500},
-				Character:           &shaman.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFrost,
-				IsPhantom:           true,
-				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+				ActionID:    core.ActionID{SpellID: 25500},
+				Character:   &shaman.Character,
+				SpellSchool: core.SpellSchoolFrost,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+			IsPhantom:           true,
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier: 1,

@@ -13,12 +13,10 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDScorch},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         SpellFlagMage,
+				ActionID:    core.ActionID{SpellID: SpellIDScorch},
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolFire,
+				SpellExtras: SpellFlagMage,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 180,
@@ -27,10 +25,12 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 					Type:  stats.Mana,
 					Value: 180,
 				},
-				CastTime:       time.Millisecond * 1500,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				CastTime: time.Millisecond * 1500,
+				GCD:      core.GCDDefault,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier: mage.spellDamageMultiplier,

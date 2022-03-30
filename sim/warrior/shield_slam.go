@@ -19,14 +19,12 @@ func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpe
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            ShieldSlamActionID,
-				Character:           &warrior.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				Cooldown:            time.Second * 6,
-				IgnoreHaste:         true,
+				ActionID:    ShieldSlamActionID,
+				Character:   &warrior.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         core.GCDDefault,
+				Cooldown:    time.Second * 6,
+				IgnoreHaste: true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
 					Value: ShieldSlamCost,
@@ -35,8 +33,10 @@ func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpe
 					Type:  stats.Rage,
 					Value: ShieldSlamCost,
 				},
-				CritMultiplier: warrior.critMultiplier(true),
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      warrior.critMultiplier(true),
 		},
 		Effect: core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial, // TODO: Is this right?

@@ -13,13 +13,13 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            IgniteActionID,
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryNone,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         SpellFlagMage | core.SpellExtrasBinary | core.SpellExtrasAlwaysHits,
+				ActionID:    IgniteActionID,
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolFire,
+				SpellExtras: SpellFlagMage | core.SpellExtrasBinary | core.SpellExtrasAlwaysHits,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryNone,
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier: 1,

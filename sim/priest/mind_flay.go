@@ -18,11 +18,9 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 			SpellID: SpellIDMindFlay,
 			Tag:     3, // default to 3 tick mf
 		},
-		Character:           &priest.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolShadow,
-		SpellExtras:         core.SpellExtrasBinary | core.SpellExtrasChanneled,
+		Character:   &priest.Character,
+		SpellSchool: core.SpellSchoolShadow,
+		SpellExtras: core.SpellExtrasBinary | core.SpellExtrasChanneled,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 230,
@@ -54,7 +52,9 @@ func (priest *Priest) newMindflayTemplate(sim *core.Simulation) core.SimpleSpell
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast: baseCast,
+			Cast:                baseCast,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
 		},
 		Effect: effect,
 	})

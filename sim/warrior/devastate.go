@@ -12,13 +12,11 @@ func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpel
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            DevastateActionID,
-				Character:           &warrior.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				IgnoreHaste:         true,
+				ActionID:    DevastateActionID,
+				Character:   &warrior.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         core.GCDDefault,
+				IgnoreHaste: true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
 					Value: warrior.sunderArmorCost,
@@ -27,8 +25,10 @@ func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpel
 					Type:  stats.Rage,
 					Value: warrior.sunderArmorCost,
 				},
-				CritMultiplier: warrior.critMultiplier(true),
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      warrior.critMultiplier(true),
 		},
 		Effect: core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,

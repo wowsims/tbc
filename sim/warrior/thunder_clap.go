@@ -27,15 +27,12 @@ func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.Simple
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            ThunderClapActionID,
-				Character:           &warrior.Character,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				SpellExtras:         core.SpellExtrasBinary,
-				GCD:                 core.GCDDefault,
-				Cooldown:            time.Second * 4,
-				IgnoreHaste:         true,
+				ActionID:    ThunderClapActionID,
+				Character:   &warrior.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         core.GCDDefault,
+				Cooldown:    time.Second * 4,
+				IgnoreHaste: true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
 					Value: warrior.thunderClapCost,
@@ -44,8 +41,11 @@ func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.Simple
 					Type:  stats.Rage,
 					Value: warrior.thunderClapCost,
 				},
-				CritMultiplier: warrior.spellCritMultiplier(true),
+				SpellExtras: core.SpellExtrasBinary,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      warrior.spellCritMultiplier(true),
 		},
 	}
 

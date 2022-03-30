@@ -20,14 +20,14 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 	job := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            JudgementOfBloodActionID,
-				Character:           &paladin.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolHoly,
-				SpellExtras:         core.SpellExtrasAlwaysHits,
-				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+				ActionID:    JudgementOfBloodActionID,
+				Character:   &paladin.Character,
+				SpellSchool: core.SpellSchoolHoly,
+				SpellExtras: core.SpellExtrasAlwaysHits,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+			CritRollCategory:    core.CritRollCategoryPhysical,
 		},
 		Effect: core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeOrRangedSpecial,
@@ -82,11 +82,10 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 	jotc := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            JudgementOfTheCrusaderActionID,
-				Character:           &paladin.Character,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolHoly,
-				SpellExtras:         core.SpellExtrasAlwaysHits,
+				ActionID:    JudgementOfTheCrusaderActionID,
+				Character:   &paladin.Character,
+				SpellSchool: core.SpellSchoolHoly,
+				SpellExtras: core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: JudgementManaCost,
@@ -102,6 +101,7 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 					paladin.currentSealExpires = 0
 				},
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 		Effect: core.SpellEffect{
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -151,12 +151,10 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 	jow := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            JudgementOfWisdomActionID,
-				Character:           &paladin.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolHoly,
-				SpellExtras:         core.SpellExtrasAlwaysHits,
+				ActionID:    JudgementOfWisdomActionID,
+				Character:   &paladin.Character,
+				SpellSchool: core.SpellSchoolHoly,
+				SpellExtras: core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: JudgementManaCost,
@@ -172,6 +170,8 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 					paladin.currentSealExpires = 0
 				},
 			},
+			CritRollCategory:    core.CritRollCategoryMagical,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 		Effect: core.SpellEffect{
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {

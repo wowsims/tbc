@@ -59,20 +59,20 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 	ss := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            StormstrikeActionID,
-				Character:           &shaman.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				IgnoreHaste:         true,
-				Cooldown:            time.Second * 10,
+				ActionID:    StormstrikeActionID,
+				Character:   &shaman.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         core.GCDDefault,
+				IgnoreHaste: true,
+				Cooldown:    time.Second * 10,
 				Cost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 237,
 				},
-				CritMultiplier: shaman.DefaultMeleeCritMultiplier(),
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
 		},
 		Effects: []core.SpellEffect{
 			{

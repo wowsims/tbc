@@ -120,13 +120,11 @@ func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras
 	return core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            actionID,
-				Character:           &rogue.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second,
-				IgnoreHaste:         true,
+				ActionID:    actionID,
+				Character:   &rogue.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         time.Second,
+				IgnoreHaste: true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Energy,
 					Value: cost,
@@ -135,9 +133,11 @@ func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras
 					Type:  stats.Energy,
 					Value: cost,
 				},
-				CritMultiplier: rogue.critMultiplier(procMask.Matches(core.ProcMaskMeleeMH), spellExtras.Matches(SpellFlagBuilder)),
-				SpellExtras:    spellExtras,
+				SpellExtras: spellExtras,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      rogue.critMultiplier(procMask.Matches(core.ProcMaskMeleeMH), spellExtras.Matches(SpellFlagBuilder)),
 		},
 		Effect: core.SpellEffect{
 			ProcMask:         procMask,

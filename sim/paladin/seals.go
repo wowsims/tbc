@@ -20,14 +20,14 @@ func (paladin *Paladin) setupSealOfBlood() {
 	sobProc := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            SealOfBloodProcActionID,
-				Character:           &paladin.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolHoly,
-				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
-				IsPhantom:           true,
+				ActionID:    SealOfBloodProcActionID,
+				Character:   &paladin.Character,
+				SpellSchool: core.SpellSchoolHoly,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier: 1,
@@ -94,13 +94,13 @@ func (paladin *Paladin) setupSealOfCommand() {
 	socProc := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            SealOfCommandProcActionID,
-				Character:           &paladin.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolHoly,
-				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+				ActionID:    SealOfCommandProcActionID,
+				Character:   &paladin.Character,
+				SpellSchool: core.SpellSchoolHoly,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier: 1,

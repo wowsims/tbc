@@ -17,12 +17,10 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDFlamestrike},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         SpellFlagMage,
+				ActionID:    core.ActionID{SpellID: SpellIDFlamestrike},
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolFire,
+				SpellExtras: SpellFlagMage,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 1175,
@@ -31,14 +29,16 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 					Type:  stats.Mana,
 					Value: 1175,
 				},
-				CastTime:       time.Second * 3,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				CastTime: time.Second * 3,
+				GCD:      core.GCDDefault,
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					flamestrikeDot := mage.newFlamestrikeDot(sim)
 					flamestrikeDot.Cast(sim)
 				},
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 		},
 		AOECap: 7830,
 	}
@@ -76,12 +76,11 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 					SpellID: SpellIDFlamestrike,
 					Tag:     CastTagFlamestrikeDot,
 				},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         SpellFlagMage | core.SpellExtrasAlwaysHits,
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolFire,
+				SpellExtras: SpellFlagMage | core.SpellExtrasAlwaysHits,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 	}
 

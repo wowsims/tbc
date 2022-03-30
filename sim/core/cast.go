@@ -41,15 +41,8 @@ type Cast struct {
 	// The amount of GCD time incurred by this cast. This is almost always 0, 1s, or 1.5s.
 	GCD time.Duration
 
-	// Whether this is a phantom cast. Phantom casts are usually casts triggered by some effect,
-	// like The Lightning Capacitor or Shaman Flametongue Weapon. Many on-hit effects do not
-	// proc from phantom casts, only regular casts.
-	IsPhantom bool
-
-	OutcomeRollCategory OutcomeRollCategory
-	CritRollCategory    CritRollCategory
-	SpellSchool         SpellSchool
-	SpellExtras         SpellExtras
+	SpellSchool SpellSchool
+	SpellExtras SpellExtras
 
 	// Base cost. Many effects in the game which 'reduce mana cost by X%'
 	// are calculated using the base mana cost. Any effects which reduce the base
@@ -65,9 +58,6 @@ type Cast struct {
 	// Adds additional delay to the GCD after the cast is completed. This is usually
 	// used for adding latency following the cast.
 	AfterCastDelay time.Duration
-
-	// How much to multiply damage by, if this cast crits.
-	CritMultiplier float64
 
 	// Bonus crit to be applied to all effects resulting from this cast.
 	BonusCritRating float64 // TODO: move this off cast and move to SpellEffect or something.

@@ -16,14 +16,14 @@ func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemp
 	mhDamageAbility := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            MutilateMHActionID,
-				Character:           &rogue.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				CritMultiplier:      rogue.critMultiplier(true, true),
-				SpellExtras:         core.SpellExtrasAlwaysHits,
+				ActionID:    MutilateMHActionID,
+				Character:   &rogue.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				SpellExtras: core.SpellExtrasAlwaysHits,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      rogue.critMultiplier(true, true),
 		},
 		Effect: core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
@@ -43,7 +43,7 @@ func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemp
 
 	ohDamageAbility := mhDamageAbility
 	ohDamageAbility.SpellCast.Cast.ActionID = MutilateOHActionID
-	ohDamageAbility.SpellCast.Cast.CritMultiplier = rogue.critMultiplier(false, true)
+	ohDamageAbility.SpellCast.CritMultiplier = rogue.critMultiplier(false, true)
 	ohDamageAbility.Effect.ProcMask = core.ProcMaskMeleeOHSpecial
 	ohDamageAbility.Effect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.OffHand, true, 101, 1+0.1*float64(rogue.Talents.DualWieldSpecialization), true)
 
