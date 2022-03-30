@@ -592,19 +592,20 @@ func AddPowerInfusionAura(sim *Simulation, character *Character, actionTag int32
 		ActionID: ActionID{SpellID: 10060, Tag: actionTag},
 		Duration: PowerInfusionDuration,
 		OnGain: func(sim *Simulation) {
+			if character.HasManaBar() {
+				// TODO: Double-check this is how the calculation works.
+				character.PseudoStats.CostMultiplier *= 0.8
+			}
 			if !character.HasAura(BloodlustAuraID) {
 				character.PseudoStats.CastSpeedMultiplier *= bonus
 			}
 		},
 		OnExpire: func(sim *Simulation) {
+			if character.HasManaBar() {
+				character.PseudoStats.CostMultiplier /= 0.8
+			}
 			if !character.HasAura(BloodlustAuraID) {
 				character.PseudoStats.CastSpeedMultiplier *= inverseBonus
-			}
-		},
-		OnCast: func(sim *Simulation, cast *Cast) {
-			if cast.Cost.Type == stats.Mana {
-				// TODO: Double-check this is how the calculation works.
-				cast.Cost.Value = MaxFloat(0, cast.Cost.Value-cast.BaseCost.Value*0.2)
 			}
 		},
 	})
@@ -666,9 +667,6 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 }
 
 func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaReduction float64, actionTag int32) {
-	lastUpdateTime := sim.CurrentTime
-	bonusManaSubtracted := 0.0
-
 	character.AddAura(sim, Aura{
 		ID:       InnervateAuraID,
 		ActionID: ActionID{SpellID: 29166, Tag: actionTag},
@@ -682,20 +680,16 @@ func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaRe
 			character.PseudoStats.ForceFullSpiritRegen = false
 			character.PseudoStats.SpiritRegenMultiplier /= 5.0
 			character.UpdateManaRegenRates()
-
-			remainder := expectedBonusManaReduction - bonusManaSubtracted
-			character.ExpectedBonusMana -= remainder
-			character.Metrics.BonusManaGained += remainder
 		},
-		OnCast: func(sim *Simulation, cast *Cast) {
-			timeDelta := sim.CurrentTime - lastUpdateTime
-			lastUpdateTime = sim.CurrentTime
-			progressRatio := float64(timeDelta) / float64(InnervateDuration)
-			amount := expectedBonusManaReduction * progressRatio
+	})
 
-			character.ExpectedBonusMana -= amount
-			character.Metrics.BonusManaGained += amount
-			bonusManaSubtracted += amount
+	expectedBonusManaPerTick := expectedBonusManaReduction / 10
+	StartPeriodicAction(sim, PeriodicActionOptions{
+		Period:   InnervateDuration / 10,
+		NumTicks: 10,
+		OnAction: func(sim *Simulation) {
+			character.ExpectedBonusMana -= expectedBonusManaPerTick
+			character.Metrics.BonusManaGained += expectedBonusManaPerTick
 		},
 	})
 }
@@ -755,38 +749,19 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 }
 
 func AddManaTideTotemAura(sim *Simulation, character *Character, actionTag int32) {
-	lastUpdateTime := sim.CurrentTime
-	totalBonusMana := ManaTideTotemAmount(character)
-	bonusManaSubtracted := 0.0
 	actionID := ActionID{SpellID: 16190, Tag: actionTag}
 
-	character.AddAura(sim, Aura{
-		ID:       ManaTideTotemAuraID,
-		ActionID: actionID,
-		Duration: ManaTideTotemDuration,
-		OnExpire: func(sim *Simulation) {
-			if !character.HasManaBar() {
-				return
-			}
+	character.AddAuraUptime(ManaTideTotemAuraID, actionID, MinDuration(ManaTideTotemDuration, sim.GetRemainingDuration()))
 
-			remainder := totalBonusMana - bonusManaSubtracted
-			character.AddMana(sim, remainder, actionID, true)
-			character.ExpectedBonusMana -= remainder
-		},
-		OnCast: func(sim *Simulation, cast *Cast) {
-			if !character.HasManaBar() {
-				return
-			}
-
-			timeDelta := sim.CurrentTime - lastUpdateTime
-			lastUpdateTime = sim.CurrentTime
-			progressRatio := float64(timeDelta) / float64(ManaTideTotemDuration)
-			remainder := totalBonusMana - bonusManaSubtracted
-			amount := MinFloat(remainder, totalBonusMana*progressRatio)
-
-			character.AddMana(sim, amount, actionID, true)
-			character.ExpectedBonusMana -= amount
-			bonusManaSubtracted += amount
-		},
-	})
+	if character.HasManaBar() {
+		manaPerTick := ManaTideTotemAmount(character) / 4
+		StartPeriodicAction(sim, PeriodicActionOptions{
+			Period:   ManaTideTotemDuration / 4,
+			NumTicks: 4,
+			OnAction: func(sim *Simulation) {
+				character.AddMana(sim, manaPerTick, actionID, true)
+				character.ExpectedBonusMana -= manaPerTick
+			},
+		})
+	}
 }
