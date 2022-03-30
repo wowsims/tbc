@@ -17,10 +17,8 @@ func (priest *Priest) newSmiteTemplate(sim *core.Simulation) core.SimpleSpellTem
 			SpellID:    SpellIDSmite,
 			CooldownID: SmiteCooldownID,
 		},
-		Character:           &priest.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolHoly,
+		Character:   &priest.Character,
+		SpellSchool: core.SpellSchoolHoly,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 385,
@@ -29,10 +27,9 @@ func (priest *Priest) newSmiteTemplate(sim *core.Simulation) core.SimpleSpellTem
 			Type:  stats.Mana,
 			Value: 385,
 		},
-		CastTime:       time.Millisecond * 2500,
-		GCD:            core.GCDDefault,
-		Cooldown:       time.Second * 0,
-		CritMultiplier: priest.DefaultSpellCritMultiplier(),
+		CastTime: time.Millisecond * 2500,
+		GCD:      core.GCDDefault,
+		Cooldown: time.Second * 0,
 	}
 
 	effect := core.SpellEffect{
@@ -53,7 +50,10 @@ func (priest *Priest) newSmiteTemplate(sim *core.Simulation) core.SimpleSpellTem
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast: baseCast,
+			Cast:                baseCast,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
 		},
 		Effect: effect,
 	})

@@ -49,14 +49,14 @@ func ApplyStormGauntlets(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:            core.ActionID{ItemID: 12632},
-					Character:           character,
-					IsPhantom:           true,
-					CritRollCategory:    core.CritRollCategoryMagical,
-					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-					SpellSchool:         core.SpellSchoolNature,
-					CritMultiplier:      character.DefaultSpellCritMultiplier(),
+					ActionID:    core.ActionID{ItemID: 12632},
+					Character:   character,
+					SpellSchool: core.SpellSchoolNature,
 				},
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				CritMultiplier:      character.DefaultSpellCritMultiplier(),
+				IsPhantom:           true,
 			},
 			Effect: core.SpellEffect{
 				DamageMultiplier: 1,
@@ -93,14 +93,14 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:            core.ActionID{ItemID: 17111},
-					Character:           character,
-					IsPhantom:           true,
-					CritRollCategory:    core.CritRollCategoryMagical,
-					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-					SpellSchool:         core.SpellSchoolFire,
-					CritMultiplier:      character.DefaultSpellCritMultiplier(),
+					ActionID:    core.ActionID{ItemID: 17111},
+					Character:   character,
+					SpellSchool: core.SpellSchoolFire,
 				},
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				CritMultiplier:      character.DefaultSpellCritMultiplier(),
+				IsPhantom:           true,
 			},
 			Effect: core.SpellEffect{
 				DamageMultiplier: 1,
@@ -370,15 +370,15 @@ func ApplyDespair(agent core.Agent) {
 	templ := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            actionID,
-				Character:           character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				SpellExtras:         core.SpellExtrasIgnoreResists,
-				CritMultiplier:      character.DefaultMeleeCritMultiplier(),
-				IsPhantom:           true,
+				ActionID:    actionID,
+				Character:   character,
+				SpellSchool: core.SpellSchoolPhysical,
+				SpellExtras: core.SpellExtrasIgnoreResists,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      character.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
 		},
 		Effect: core.SpellEffect{
 			// TODO: This should be removed once we have an attack mask.
@@ -424,15 +424,15 @@ func ApplyTheDecapitator(agent core.Agent) {
 	templ := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            actionID,
-				Character:           character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				SpellExtras:         core.SpellExtrasIgnoreResists,
-				CritMultiplier:      character.DefaultMeleeCritMultiplier(),
-				IsPhantom:           true,
+				ActionID:    actionID,
+				Character:   character,
+				SpellSchool: core.SpellSchoolPhysical,
+				SpellExtras: core.SpellExtrasIgnoreResists,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      character.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
 		},
 		Effect: core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
@@ -485,14 +485,14 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:            core.ActionID{SpellID: 34696},
-					Character:           character,
-					IsPhantom:           true,
-					CritRollCategory:    core.CritRollCategoryMagical,
-					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-					SpellSchool:         core.SpellSchoolShadow,
-					CritMultiplier:      character.DefaultSpellCritMultiplier(),
+					ActionID:    core.ActionID{SpellID: 34696},
+					Character:   character,
+					SpellSchool: core.SpellSchoolShadow,
 				},
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				CritMultiplier:      character.DefaultSpellCritMultiplier(),
+				IsPhantom:           true,
 			},
 			Effect: core.SpellEffect{
 				DamageMultiplier: 1,
@@ -774,14 +774,14 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:            core.ActionID{ItemID: 31193},
-					Character:           character,
-					IsPhantom:           true,
-					CritRollCategory:    core.CritRollCategoryMagical,
-					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-					SpellSchool:         core.SpellSchoolShadow,
-					CritMultiplier:      character.DefaultSpellCritMultiplier(),
+					ActionID:    core.ActionID{ItemID: 31193},
+					Character:   character,
+					SpellSchool: core.SpellSchoolShadow,
 				},
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				CritMultiplier:      character.DefaultSpellCritMultiplier(),
+				IsPhantom:           true,
 			},
 			Effect: core.SpellEffect{
 				DamageMultiplier: 1,
@@ -947,14 +947,14 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:            core.ActionID{SpellID: 40291},
-					Character:           character,
-					IsPhantom:           true,
-					CritRollCategory:    core.CritRollCategoryMagical,
-					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-					SpellSchool:         core.SpellSchoolShadow,
-					CritMultiplier:      character.DefaultSpellCritMultiplier(),
+					ActionID:    core.ActionID{SpellID: 40291},
+					Character:   character,
+					SpellSchool: core.SpellSchoolShadow,
 				},
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				CritMultiplier:      character.DefaultSpellCritMultiplier(),
+				IsPhantom:           true,
 			},
 			Effect: core.SpellEffect{
 				DamageMultiplier: 1,

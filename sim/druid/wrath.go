@@ -15,11 +15,9 @@ const IdolAvenger int32 = 31025
 
 func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		ActionID:            core.ActionID{SpellID: SpellIDWrath},
-		Character:           &druid.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolNature,
+		ActionID:    core.ActionID{SpellID: SpellIDWrath},
+		Character:   &druid.Character,
+		SpellSchool: core.SpellSchoolNature,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 255,
@@ -28,9 +26,8 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 			Type:  stats.Mana,
 			Value: 255,
 		},
-		CastTime:       time.Millisecond * 2000,
-		GCD:            core.GCDDefault,
-		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
+		CastTime: time.Millisecond * 2000,
+		GCD:      core.GCDDefault,
 	}
 
 	spellCoefficient := 0.571
@@ -55,7 +52,10 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 
 	effect.OnSpellHit = druid.applyOnHitTalents
 	spCast := &core.SpellCast{
-		Cast: baseCast,
+		Cast:                baseCast,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{

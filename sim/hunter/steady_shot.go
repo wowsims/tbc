@@ -25,13 +25,13 @@ func (hunter *Hunter) newSteadyShotTemplate(sim *core.Simulation) core.SimpleSpe
 				},
 				// Cast time is affected by ranged attack speed so set it later.
 				//CastTime:     time.Millisecond * 1500,
-				GCD:                 core.GCDDefault + hunter.latency,
-				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
-				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+				GCD:         core.GCDDefault + hunter.latency,
+				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+				SpellSchool: core.SpellSchoolPhysical,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 		Effect: core.SpellEffect{
 			ProcMask:         core.ProcMaskRangedSpecial,

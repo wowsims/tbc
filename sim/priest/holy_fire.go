@@ -13,11 +13,9 @@ var HolyFireDebuffID = core.NewDebuffID()
 
 func (priest *Priest) newHolyFireTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		ActionID:            core.ActionID{SpellID: SpellIDHolyFire},
-		Character:           &priest.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolHoly,
+		ActionID:    core.ActionID{SpellID: SpellIDHolyFire},
+		Character:   &priest.Character,
+		SpellSchool: core.SpellSchoolHoly,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 290,
@@ -26,9 +24,8 @@ func (priest *Priest) newHolyFireTemplate(sim *core.Simulation) core.SimpleSpell
 			Type:  stats.Mana,
 			Value: 290,
 		},
-		CastTime:       time.Millisecond * 3500,
-		GCD:            core.GCDDefault,
-		CritMultiplier: priest.DefaultSpellCritMultiplier(),
+		CastTime: time.Millisecond * 3500,
+		GCD:      core.GCDDefault,
 	}
 
 	effect := core.SpellEffect{
@@ -51,7 +48,10 @@ func (priest *Priest) newHolyFireTemplate(sim *core.Simulation) core.SimpleSpell
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast: baseCast,
+			Cast:                baseCast,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
 		},
 		Effect: effect,
 	})

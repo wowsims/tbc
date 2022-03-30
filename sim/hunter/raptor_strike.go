@@ -16,16 +16,16 @@ func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.SimpleS
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            RaptorStrikeActionID,
-				Character:           &hunter.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				Cost:                cost,
-				BaseCost:            cost,
-				Cooldown:            time.Second * 6,
-				CritMultiplier:      hunter.critMultiplier(false, sim.GetPrimaryTarget()),
+				ActionID:    RaptorStrikeActionID,
+				Character:   &hunter.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				Cost:        cost,
+				BaseCost:    cost,
+				Cooldown:    time.Second * 6,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      hunter.critMultiplier(false, sim.GetPrimaryTarget()),
 		},
 		Effect: core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,

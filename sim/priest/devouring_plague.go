@@ -18,15 +18,13 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 			SpellID:    SpellIDDevouringPlague,
 			CooldownID: DevouringPlagueCooldownID,
 		},
-		Character:           &priest.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolShadow,
-		BaseCost:            cost,
-		Cost:                cost,
-		CastTime:            0,
-		GCD:                 core.GCDDefault,
-		Cooldown:            time.Minute * 3,
+		Character:   &priest.Character,
+		SpellSchool: core.SpellSchoolShadow,
+		BaseCost:    cost,
+		Cost:        cost,
+		CastTime:    0,
+		GCD:         core.GCDDefault,
+		Cooldown:    time.Minute * 3,
 	}
 
 	effect := core.SpellEffect{
@@ -43,7 +41,9 @@ func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.Simp
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast: baseCast,
+			Cast:                baseCast,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 		Effect: effect,
 	})

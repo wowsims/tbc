@@ -21,12 +21,12 @@ func (rogue *Rogue) newDeadlyPoisonTemplate(_ *core.Simulation) core.SimpleSpell
 	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 27186},
-				Character:           rogue.GetCharacter(),
-				IsPhantom:           true,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolNature,
+				ActionID:    core.ActionID{SpellID: 27186},
+				Character:   rogue.GetCharacter(),
+				SpellSchool: core.SpellSchoolNature,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			IsPhantom:           true,
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
@@ -47,13 +47,13 @@ func (rogue *Rogue) newDeadlyPoisonRefreshTemplate(_ *core.Simulation) core.Simp
 	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 27186},
-				Character:           rogue.GetCharacter(),
-				IsPhantom:           true,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				CritRollCategory:    core.CritRollCategoryNone,
-				SpellSchool:         core.SpellSchoolNature,
+				ActionID:    core.ActionID{SpellID: 27186},
+				Character:   rogue.GetCharacter(),
+				SpellSchool: core.SpellSchoolNature,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryNone,
+			IsPhantom:           true,
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
@@ -125,14 +125,14 @@ func (rogue *Rogue) newInstantPoisonTemplate(_ *core.Simulation) core.SimpleSpel
 	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 26891},
-				Character:           rogue.GetCharacter(),
-				IsPhantom:           true,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolNature,
-				CritMultiplier:      rogue.DefaultSpellCritMultiplier(),
+				ActionID:    core.ActionID{SpellID: 26891},
+				Character:   rogue.GetCharacter(),
+				SpellSchool: core.SpellSchoolNature,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      rogue.DefaultSpellCritMultiplier(),
+			IsPhantom:           true,
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),

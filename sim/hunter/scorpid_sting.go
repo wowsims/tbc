@@ -15,16 +15,16 @@ func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.SimpleS
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            actionID,
-				Character:           &hunter.Character,
-				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolNature,
-				GCD:                 core.GCDDefault,
-				Cost:                cost,
-				BaseCost:            cost,
-				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
+				ActionID:    actionID,
+				Character:   &hunter.Character,
+				SpellSchool: core.SpellSchoolNature,
+				GCD:         core.GCDDefault,
+				Cost:        cost,
+				BaseCost:    cost,
+				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
 		},
 		Effect: core.SpellEffect{
 			ProcMask: core.ProcMaskRangedSpecial,

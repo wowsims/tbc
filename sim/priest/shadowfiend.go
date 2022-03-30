@@ -53,17 +53,14 @@ func (priest *Priest) registerShadowfiendCD() {
 func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	cost := core.ResourceCost{Type: stats.Mana, Value: priest.BaseMana() * 0.06}
 	baseCast := core.Cast{
-		ActionID:            ShadowfiendActionID,
-		Character:           &priest.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolShadow,
-		BaseCost:            cost,
-		Cost:                cost,
-		CastTime:            0,
-		GCD:                 core.GCDDefault,
-		Cooldown:            time.Minute * 5,
-		CritMultiplier:      priest.DefaultSpellCritMultiplier(),
+		ActionID:    ShadowfiendActionID,
+		Character:   &priest.Character,
+		SpellSchool: core.SpellSchoolShadow,
+		BaseCost:    cost,
+		Cost:        cost,
+		CastTime:    0,
+		GCD:         core.GCDDefault,
+		Cooldown:    time.Minute * 5,
 	}
 
 	// Dmg over 15 sec = shadow_dmg*.6 + 1191
@@ -89,7 +86,10 @@ func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSp
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast: baseCast,
+			Cast:                baseCast,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
 		},
 		Effect: effect,
 	})

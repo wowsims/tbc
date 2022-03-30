@@ -16,20 +16,20 @@ func (paladin *Paladin) newCrusaderStrikeTemplate(sim *core.Simulation) core.Sim
 	cs := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            CrusaderStrikeActionID,
-				Character:           &paladin.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				Cooldown:            time.Second * 6,
-				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
-				IsPhantom:           true,
+				ActionID:    CrusaderStrikeActionID,
+				Character:   &paladin.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         core.GCDDefault,
+				Cooldown:    time.Second * 6,
 				Cost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 236,
 				},
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
 		},
 		Effect: core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,

@@ -14,11 +14,9 @@ var MoonfireDebuffID = core.NewDebuffID()
 
 func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		ActionID:            core.ActionID{SpellID: SpellIDMoonfire},
-		Character:           &druid.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolArcane,
+		ActionID:    core.ActionID{SpellID: SpellIDMoonfire},
+		Character:   &druid.Character,
+		SpellSchool: core.SpellSchoolArcane,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 495,
@@ -27,8 +25,7 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 			Type:  stats.Mana,
 			Value: 495,
 		},
-		GCD:            core.GCDDefault,
-		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
+		GCD: core.GCDDefault,
 	}
 
 	effect := core.SpellEffect{
@@ -57,7 +54,10 @@ func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTe
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast: baseCast,
+			Cast:                baseCast,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 		},
 		Effect: effect,
 	})

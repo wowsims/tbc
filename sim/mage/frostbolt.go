@@ -13,12 +13,10 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDFrostbolt},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFrost,
-				SpellExtras:         SpellFlagMage | core.SpellExtrasBinary,
+				ActionID:    core.ActionID{SpellID: SpellIDFrostbolt},
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolFrost,
+				SpellExtras: SpellFlagMage | core.SpellExtrasBinary,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 330,
@@ -27,10 +25,12 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 					Type:  stats.Mana,
 					Value: 330,
 				},
-				CastTime:       time.Millisecond * 3000,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)+0.2*float64(mage.Talents.IceShards)),
+				CastTime: time.Millisecond * 3000,
+				GCD:      core.GCDDefault,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)+0.2*float64(mage.Talents.IceShards)),
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier: mage.spellDamageMultiplier,

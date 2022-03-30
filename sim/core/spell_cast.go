@@ -20,6 +20,17 @@ type SpellCast struct {
 	// Embedded Cast
 	Cast
 
+	// Whether this is a phantom cast. Phantom casts are usually casts triggered by some effect,
+	// like The Lightning Capacitor or Shaman Flametongue Weapon. Many on-hit effects do not
+	// proc from phantom casts, only regular casts.
+	IsPhantom bool
+
+	OutcomeRollCategory OutcomeRollCategory
+	CritRollCategory    CritRollCategory
+
+	// How much to multiply damage by, if this cast crits.
+	CritMultiplier float64
+
 	// Results from the spell cast. Spell casts can have multiple effects (e.g.
 	// Chain Lightning, Moonfire) so these are totals from all the effects.
 	Hits               int32

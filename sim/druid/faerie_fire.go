@@ -10,10 +10,9 @@ func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpell
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 26993},
-				SpellSchool:         core.SpellSchoolNature,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				Character:           druid.GetCharacter(),
+				ActionID:    core.ActionID{SpellID: 26993},
+				SpellSchool: core.SpellSchoolNature,
+				Character:   druid.GetCharacter(),
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 145,
@@ -24,6 +23,7 @@ func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpell
 				},
 				GCD: core.GCDDefault,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 		Effect: core.SpellEffect{
 			ThreatMultiplier: 1,

@@ -17,11 +17,9 @@ const IvoryMoongoddess int32 = 27518
 
 func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.SimpleSpellTemplate {
 	baseCast := core.Cast{
-		ActionID:            core.ActionID{SpellID: SpellIDSF8},
-		Character:           &druid.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolArcane,
+		ActionID:    core.ActionID{SpellID: SpellIDSF8},
+		Character:   &druid.Character,
+		SpellSchool: core.SpellSchoolArcane,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 370,
@@ -30,9 +28,8 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 			Type:  stats.Mana,
 			Value: 370,
 		},
-		CastTime:       time.Millisecond * 3500,
-		GCD:            core.GCDDefault,
-		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
+		CastTime: time.Millisecond * 3500,
+		GCD:      core.GCDDefault,
 	}
 
 	minBaseDamage := 550.0
@@ -90,7 +87,10 @@ func (druid *Druid) newStarfireTemplate(sim *core.Simulation, rank int) core.Sim
 
 	effect.OnSpellHit = druid.applyOnHitTalents
 	spCast := &core.SpellCast{
-		Cast: baseCast,
+		Cast:                baseCast,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 	}
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{

@@ -503,14 +503,14 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
-					ActionID:            core.ActionID{ItemID: 28579},
-					Character:           character,
-					IsPhantom:           true,
-					CritRollCategory:    core.CritRollCategoryMagical,
-					OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-					SpellSchool:         core.SpellSchoolNature,
-					CritMultiplier:      character.DefaultSpellCritMultiplier(),
+					ActionID:    core.ActionID{ItemID: 28579},
+					Character:   character,
+					SpellSchool: core.SpellSchoolNature,
 				},
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				CritMultiplier:      character.DefaultSpellCritMultiplier(),
+				IsPhantom:           true,
 			},
 			Effect: core.SpellEffect{
 				DamageMultiplier: 1,

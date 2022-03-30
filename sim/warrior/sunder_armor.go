@@ -14,12 +14,11 @@ func (warrior *Warrior) newSunderArmorTemplate(_ *core.Simulation) core.SimpleSp
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            SunderArmorActionID,
-				Character:           &warrior.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				IgnoreHaste:         true,
+				ActionID:    SunderArmorActionID,
+				Character:   &warrior.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         core.GCDDefault,
+				IgnoreHaste: true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
 					Value: warrior.sunderArmorCost,
@@ -29,6 +28,7 @@ func (warrior *Warrior) newSunderArmorTemplate(_ *core.Simulation) core.SimpleSp
 					Value: warrior.sunderArmorCost,
 				},
 			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 		},
 		Effect: core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,

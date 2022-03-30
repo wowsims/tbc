@@ -26,16 +26,16 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpel
 				},
 				// Cast time is affected by ranged attack speed so set it later.
 				//CastTime:     time.Millisecond * 500,
-				GCD:                 core.GCDDefault + hunter.latency,
-				Cooldown:            time.Second * 10,
-				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
-				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				// TODO: If we ever allow multiple targets to have their own type, need to
-				// update this.
-				CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+				GCD:         core.GCDDefault + hunter.latency,
+				Cooldown:    time.Second * 10,
+				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+				SpellSchool: core.SpellSchoolPhysical,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			// TODO: If we ever allow multiple targets to have their own type, need to
+			// update this.
+			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 	}
 

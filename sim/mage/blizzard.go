@@ -16,11 +16,9 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				ActionID: core.ActionID{
 					SpellID: SpellIDBlizzard,
 				},
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFrost,
-				SpellExtras:         SpellFlagMage | core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
-				Character:           &mage.Character,
+				SpellSchool: core.SpellSchoolFrost,
+				SpellExtras: SpellFlagMage | core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
+				Character:   &mage.Character,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 1645,
@@ -31,6 +29,8 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 				},
 				GCD: core.GCDDefault,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
 		},
 		AOECap: 3620,
 	}

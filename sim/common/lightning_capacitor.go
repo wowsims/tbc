@@ -62,13 +62,13 @@ func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Cha
 				ActionID: core.ActionID{
 					ItemID: core.ItemIDTheLightningCapacitor,
 				},
-				Character:           character,
-				IsPhantom:           true, // TODO: replace with ProcMask
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolNature,
-				CritMultiplier:      character.DefaultSpellCritMultiplier(),
+				Character:   character,
+				SpellSchool: core.SpellSchoolNature,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      character.DefaultSpellCritMultiplier(),
+			IsPhantom:           true, // TODO: replace with ProcMask
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier: 1,

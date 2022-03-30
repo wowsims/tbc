@@ -16,13 +16,11 @@ func (priest *Priest) newStarshardsTemplate(sim *core.Simulation) core.SimpleSpe
 			SpellID:    SpellIDStarshards,
 			CooldownID: SSCooldownID,
 		},
-		Character:           &priest.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolArcane,
-		CastTime:            0,
-		GCD:                 core.GCDDefault,
-		Cooldown:            time.Second * 30,
+		Character:   &priest.Character,
+		SpellSchool: core.SpellSchoolArcane,
+		CastTime:    0,
+		GCD:         core.GCDDefault,
+		Cooldown:    time.Second * 30,
 	}
 
 	effect := core.SpellEffect{
@@ -37,7 +35,9 @@ func (priest *Priest) newStarshardsTemplate(sim *core.Simulation) core.SimpleSpe
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast: baseCast,
+			Cast:                baseCast,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
 		},
 		Effect: effect,
 	})

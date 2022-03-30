@@ -36,18 +36,18 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 	cost := core.ResourceCost{Type: stats.Mana, Value: baseManaCost}
 	spellCast := core.SpellCast{
 		Cast: core.Cast{
-			ActionID:            actionID,
-			Character:           shaman.GetCharacter(),
-			CritRollCategory:    core.CritRollCategoryMagical,
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			SpellSchool:         core.SpellSchoolNature,
-			BaseCost:            cost,
-			Cost:                cost,
-			CastTime:            baseCastTime,
-			GCD:                 core.GCDDefault,
-			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
-			SpellExtras:         SpellFlagElectric,
+			ActionID:    actionID,
+			Character:   shaman.GetCharacter(),
+			SpellSchool: core.SpellSchoolNature,
+			BaseCost:    cost,
+			Cost:        cost,
+			CastTime:    baseCastTime,
+			GCD:         core.GCDDefault,
+			SpellExtras: SpellFlagElectric,
 		},
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 	}
 
 	if shaman.Talents.ElementalFury {

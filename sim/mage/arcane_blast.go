@@ -29,12 +29,10 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDArcaneBlast},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolArcane,
-				SpellExtras:         SpellFlagMage,
+				ActionID:    core.ActionID{SpellID: SpellIDArcaneBlast},
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolArcane,
+				SpellExtras: SpellFlagMage,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: ArcaneBlastBaseManaCost,
@@ -43,14 +41,16 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 					Type:  stats.Mana,
 					Value: ArcaneBlastBaseManaCost,
 				},
-				CastTime:       ArcaneBlastBaseCastTime,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				CastTime: ArcaneBlastBaseCastTime,
+				GCD:      core.GCDDefault,
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					abAura.Stacks = core.MinInt32(3, mage.NumStacks(ArcaneBlastAuraID)+1)
 					cast.Character.ReplaceAura(sim, abAura)
 				},
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier: mage.spellDamageMultiplier,

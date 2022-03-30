@@ -167,11 +167,9 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDWaterbolt},
-				Character:           &we.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFrost,
+				ActionID:    core.ActionID{SpellID: SpellIDWaterbolt},
+				Character:   &we.Character,
+				SpellSchool: core.SpellSchoolFrost,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: baseManaCost,
@@ -180,10 +178,12 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 					Type:  stats.Mana,
 					Value: baseManaCost,
 				},
-				CastTime:       time.Millisecond * 3000,
-				GCD:            core.GCDDefault,
-				CritMultiplier: we.DefaultSpellCritMultiplier(),
+				CastTime: time.Millisecond * 3000,
+				GCD:      core.GCDDefault,
 			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      we.DefaultSpellCritMultiplier(),
 		},
 		Effect: core.SpellEffect{
 			DamageMultiplier: 1,

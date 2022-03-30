@@ -17,10 +17,8 @@ func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.Simp
 			SpellID:    SpellIDShadowWordDeath,
 			CooldownID: SWDCooldownID,
 		},
-		Character:           &priest.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolShadow,
+		Character:   &priest.Character,
+		SpellSchool: core.SpellSchoolShadow,
 		BaseCost: core.ResourceCost{
 			Type:  stats.Mana,
 			Value: 309,
@@ -29,10 +27,9 @@ func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.Simp
 			Type:  stats.Mana,
 			Value: 309,
 		},
-		CastTime:       0,
-		GCD:            core.GCDDefault,
-		Cooldown:       time.Second * 12,
-		CritMultiplier: priest.DefaultSpellCritMultiplier(),
+		CastTime: 0,
+		GCD:      core.GCDDefault,
+		Cooldown: time.Second * 12,
 	}
 
 	effect := core.SpellEffect{
@@ -45,7 +42,10 @@ func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.Simp
 
 	return core.NewSimpleSpellTemplate(core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast: baseCast,
+			Cast:                baseCast,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
 		},
 		Effect: effect,
 	})
