@@ -86,17 +86,6 @@ func (druid *Druid) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // does nothing
 }
 
-func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
-	if druid.NaturesGrace {
-		spellCast.CastTime -= time.Millisecond * 500
-		// This applies on cast complete, removing the effect.
-		//  if it crits, during 'onspellhit' then it will be reapplied (see func above)
-		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-			druid.NaturesGrace = false
-		}
-	}
-}
-
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) *Druid {
 	druid := &Druid{
 		Character:   char,
