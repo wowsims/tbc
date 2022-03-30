@@ -141,7 +141,7 @@ func (spellEffect *SpellEffect) PhysicalHitChance(character *Character, spellCas
 }
 
 func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spellCast *SpellCast) float64 {
-	critRating := character.stats[stats.MeleeCrit] + spellEffect.BonusCritRating + spellCast.BonusCritRating + spellEffect.Target.PseudoStats.BonusCritRating
+	critRating := character.stats[stats.MeleeCrit] + spellEffect.BonusCritRating + spellEffect.Target.PseudoStats.BonusCritRating
 
 	if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 		critRating += character.PseudoStats.BonusRangedCritRating
@@ -165,7 +165,7 @@ func (spellEffect *SpellEffect) SpellPower(character *Character, spellCast *Spel
 }
 
 func (spellEffect *SpellEffect) SpellCritChance(character *Character, spellCast *SpellCast) float64 {
-	critRating := (character.GetStat(stats.SpellCrit) + spellCast.BonusCritRating + spellEffect.BonusSpellCritRating + spellEffect.Target.PseudoStats.BonusCritRating)
+	critRating := (character.GetStat(stats.SpellCrit) + spellEffect.BonusSpellCritRating + spellEffect.Target.PseudoStats.BonusCritRating)
 	if spellCast.SpellSchool.Matches(SpellSchoolFire) {
 		critRating += character.PseudoStats.BonusFireCritRating
 	} else if spellCast.SpellSchool.Matches(SpellSchoolFrost) {

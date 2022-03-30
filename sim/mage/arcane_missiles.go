@@ -66,6 +66,14 @@ func (mage *Mage) NewArcaneMissiles(sim *core.Simulation, target *core.Target) *
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	arcaneMissiles.Effect.Target = target
+
+	// CC has a special interaction with AM, gets the benefit of CC crit bonus from
+	// the previous cast along with its own.
+	if mage.HasAura(ClearcastingAuraID) {
+		bonusCrit := float64(mage.Talents.ArcanePotency) * 10 * core.SpellCritRatingPerCritChance
+		arcaneMissiles.Effect.BonusSpellCritRating += bonusCrit
+	}
+
 	arcaneMissiles.Init(sim)
 
 	return arcaneMissiles
