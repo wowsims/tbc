@@ -16,9 +16,6 @@ type ResourceCost struct {
 // shown, and activates the GCD. Note that a cast can also be instant, i.e.
 // the effects are applied immediately even though the GCD is still activated.
 
-// Callback for when a cast begins, i.e. when the in-game castbar starts filling up.
-type OnCast func(sim *Simulation, cast *Cast)
-
 // Callback for when a cast is finished, i.e. when the in-game castbar reaches full.
 type OnCastComplete func(sim *Simulation, cast *Cast)
 
@@ -114,8 +111,6 @@ func (cast *Cast) init(sim *Simulation) {
 		cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())
 	}
 
-	// Apply on-cast effects.
-	cast.Character.OnCast(sim, cast)
 	if cast.Character.PseudoStats.NoCost {
 		cast.Cost.Value = 0
 	} else {

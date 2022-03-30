@@ -111,6 +111,7 @@ func (druid *Druid) NewStarfire(sim *core.Simulation, target *core.Target, rank 
 
 	// Applies nature's grace cast time reduction if available.
 	druid.applyNaturesGrace(&sf.SpellCast)
+	druid.applyNaturesSwiftness(&sf.SpellCast)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	sf.Effect.Target = target

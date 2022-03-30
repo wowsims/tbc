@@ -160,12 +160,6 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 					OnExpire: func(sim *core.Simulation) {
 						shaman.AddStat(stats.SpellCrit, -100*core.SpellCritRatingPerCritChance)
 					},
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						if !cast.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
-							return
-						}
-						cast.Cost.Value = 0
-					},
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 						if !spellCast.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
 							return
@@ -212,13 +206,6 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 					ID:       NaturesSwiftnessAuraID,
 					ActionID: actionID,
 					Duration: core.NeverExpires,
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						if cast.ActionID.SpellID != SpellIDLB12 {
-							return
-						}
-
-						cast.CastTime = 0
-					},
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						if cast.ActionID.SpellID != SpellIDLB12 {
 							return
@@ -305,16 +292,8 @@ func (shaman *Shaman) applyShamanisticFocus() {
 		ID:       ShamanisticFocusAuraID,
 		ActionID: core.ActionID{SpellID: 43338},
 		Duration: core.NeverExpires,
-		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			// Shaman use spell extras agent reserved for shamanistic rage checking.
-			if !cast.SpellExtras.Matches(SpellFlagShock) {
-				return
-			}
-
-			cast.Cost.Value -= cast.BaseCost.Value * 0.6
-		},
 		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			if cast.IsSpellAction(SpellIDEarthShock) || cast.IsSpellAction(SpellIDFlameShock) || cast.IsSpellAction(SpellIDFrostShock) {
+			if cast.SpellExtras.Matches(SpellFlagShock) {
 				cast.Character.RemoveAura(sim, ShamanisticFocusAuraID)
 			}
 		},

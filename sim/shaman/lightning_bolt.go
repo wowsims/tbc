@@ -73,6 +73,9 @@ func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	lb.Effect.Target = target
 	shaman.applyElectricSpellCastInitModifiers(&lb.SpellCast)
+	if shaman.HasAura(NaturesSwiftnessAuraID) {
+		lb.CastTime = 0
+	}
 
 	lb.Init(sim)
 

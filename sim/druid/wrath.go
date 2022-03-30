@@ -72,6 +72,7 @@ func (druid *Druid) NewWrath(sim *core.Simulation, target *core.Target) *core.Si
 
 	// Modifies the cast time.
 	druid.applyNaturesGrace(&sf.SpellCast)
+	druid.applyNaturesSwiftness(&sf.SpellCast)
 
 	// Set dynamic fields, i.e. the stuff we couldn't precompute.
 	sf.Effect.Target = target

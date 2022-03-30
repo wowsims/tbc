@@ -64,7 +64,6 @@ type Aura struct {
 	expires   time.Duration // Time at which aura will be removed.
 
 	activeIndex           int32 // Position of this aura's index in the activeAuraIDs array.
-	onCastIndex           int32 // Position of this aura's index in the onCastIDs array.
 	onCastCompleteIndex   int32 // Position of this aura's index in the onCastCompleteIDs array.
 	onSpellHitIndex       int32 // Position of this aura's index in the onSpellHitIDs array.
 	onPeriodicDamageIndex int32 // Position of this aura's index in the onPeriodicDamageIDs array.
@@ -72,9 +71,6 @@ type Aura struct {
 	// The number of stacks, or charges, of this aura. If this aura doesn't care
 	// about charges, is just 0.
 	Stacks int32
-
-	// Invoked at creation time for a spell cast.
-	OnCast OnCast
 
 	// Invoked when a spell cast completes casting, before results are calculated.
 	OnCastComplete OnCastComplete
@@ -148,7 +144,6 @@ type auraTracker struct {
 	activeAuraIDs []AuraID
 
 	// IDs of Auras that have a non-nil XXX function set.
-	onCastIDs           []AuraID
 	onCastCompleteIDs   []AuraID
 	onSpellHitIDs       []AuraID
 	onPeriodicDamageIDs []AuraID
@@ -170,7 +165,6 @@ func newAuraTracker(useDebuffIDs bool) auraTracker {
 		resetEffects:        []ResetEffect{},
 		permanentAuras:      []PermanentAura{},
 		activeAuraIDs:       make([]AuraID, 0, 16),
-		onCastIDs:           make([]AuraID, 0, 16),
 		onCastCompleteIDs:   make([]AuraID, 0, 16),
 		onSpellHitIDs:       make([]AuraID, 0, 16),
 		onPeriodicDamageIDs: make([]AuraID, 0, 16),
@@ -223,7 +217,6 @@ func (at *auraTracker) reset(sim *Simulation) {
 
 	at.cooldowns = make([]time.Duration, numCooldownIDs)
 	at.activeAuraIDs = at.activeAuraIDs[:0]
-	at.onCastIDs = at.onCastIDs[:0]
 	at.onCastCompleteIDs = at.onCastCompleteIDs[:0]
 	at.onSpellHitIDs = at.onSpellHitIDs[:0]
 	at.onPeriodicDamageIDs = at.onPeriodicDamageIDs[:0]
@@ -310,7 +303,6 @@ func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
 
 	// private cached state has to be copied over
 	newAura.activeIndex = old.activeIndex
-	newAura.onCastIndex = old.onCastIndex
 	newAura.onCastCompleteIndex = old.onCastCompleteIndex
 	newAura.onSpellHitIndex = old.onSpellHitIndex
 	newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
@@ -352,11 +344,6 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 		at.activeAuraIDs = append(at.activeAuraIDs, newAura.ID)
 	}
 
-	if newAura.OnCast != nil {
-		newAura.onCastIndex = int32(len(at.onCastIDs))
-		at.onCastIDs = append(at.onCastIDs, newAura.ID)
-	}
-
 	if newAura.OnCastComplete != nil {
 		newAura.onCastCompleteIndex = int32(len(at.onCastCompleteIDs))
 		at.onCastCompleteIDs = append(at.onCastCompleteIDs, newAura.ID)
@@ -387,14 +374,6 @@ func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
 func (at *auraTracker) AddPriorityAura(sim *Simulation, auraToAdd Aura) {
 	at.AddAura(sim, auraToAdd)
 	newAura := &at.auras[auraToAdd.ID]
-
-	if newAura.OnCast != nil {
-		otherAuraID := at.onCastIDs[0]
-		at.onCastIDs[0] = newAura.ID
-		at.onCastIDs[len(at.onCastIDs)-1] = otherAuraID
-		at.auras[otherAuraID].onCastIndex = newAura.onCastIndex
-		newAura.onCastIndex = 0
-	}
 
 	if newAura.OnCastComplete != nil {
 		otherAuraID := at.onCastCompleteIDs[0]
@@ -451,14 +430,6 @@ func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
 		at.activeAuraIDs = removeBySwappingToBack(at.activeAuraIDs, removeActiveIndex)
 		if removeActiveIndex < int32(len(at.activeAuraIDs)) {
 			at.auras[at.activeAuraIDs[removeActiveIndex]].activeIndex = removeActiveIndex
-		}
-	}
-
-	if aura.OnCast != nil {
-		removeOnCastIndex := aura.onCastIndex
-		at.onCastIDs = removeBySwappingToBack(at.onCastIDs, removeOnCastIndex)
-		if removeOnCastIndex < int32(len(at.onCastIDs)) {
-			at.auras[at.onCastIDs[removeOnCastIndex]].onCastIndex = removeOnCastIndex
 		}
 	}
 
@@ -572,13 +543,6 @@ func (at *auraTracker) SetCD(id CooldownID, newCD time.Duration) {
 		panic("Trying to set CD with ID 0!")
 	}
 	at.cooldowns[id] = newCD
-}
-
-// Invokes the OnCast event for all tracked Auras.
-func (at *auraTracker) OnCast(sim *Simulation, cast *Cast) {
-	for _, id := range at.onCastIDs {
-		at.auras[id].OnCast(sim, cast)
-	}
 }
 
 // Invokes the OnCastComplete event for all tracked Auras.
