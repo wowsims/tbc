@@ -82,8 +82,8 @@ func (shaman *Shaman) ApplyTalents() {
 	}
 
 	if shaman.Talents.SpiritWeapons {
-		shaman.AutoAttacks.MHAuto.Effect.ThreatMultiplier *= 0.7
-		shaman.AutoAttacks.OHAuto.Effect.ThreatMultiplier *= 0.7
+		shaman.AutoAttacks.MHAuto.Template.Effect.ThreatMultiplier *= 0.7
+		shaman.AutoAttacks.OHAuto.Template.Effect.ThreatMultiplier *= 0.7
 	}
 
 	shaman.applyElementalDevastation()

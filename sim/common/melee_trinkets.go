@@ -336,14 +336,21 @@ var HandOfJusticeAuraID = core.NewAuraID()
 
 func ApplyHandOfJustice(agent core.Agent) {
 	character := agent.GetCharacter()
+	if !character.AutoAttacks.IsEnabled() {
+		return
+	}
+
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		procChance := 0.013333
 		var icd core.InternalCD
 		icdDur := time.Second * 2
 
-		mhAttack := character.AutoAttacks.MHAuto
-		mhAttack.ActionID = core.ActionID{ItemID: 11815}
-		cachedAttack := core.SimpleSpell{}
+		template := character.AutoAttacks.MHAuto.Template
+		template.ActionID = core.ActionID{ItemID: 11815}
+		handOfJusticeSpell := character.GetOrRegisterSpell(core.SpellConfig{
+			Template:   template,
+			ModifyCast: core.ModifyCastAssignTarget,
+		})
 
 		return core.Aura{
 			ID: HandOfJusticeAuraID,
@@ -362,9 +369,7 @@ func ApplyHandOfJustice(agent core.Agent) {
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 
-				cachedAttack = mhAttack
-				cachedAttack.Effect.Target = spellEffect.Target
-				cachedAttack.Cast(sim)
+				handOfJusticeSpell.Cast(sim, spellEffect.Target)
 			},
 		}
 	})

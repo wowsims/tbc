@@ -65,12 +65,12 @@ func (spell *SimpleSpell) GetDuration() time.Duration {
 	}
 }
 
-func (spell *SimpleSpell) Cast(sim *Simulation) bool {
-	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		spellCast := &spell.SpellCast
-		if len(spell.Effects) == 0 {
-			hitEffect := &spell.Effect
-			hitEffect.determineOutcome(sim, spellCast, spell)
+func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) bool {
+	return instance.startCasting(sim, func(sim *Simulation, cast *Cast) {
+		spellCast := &instance.SpellCast
+		if len(instance.Effects) == 0 {
+			hitEffect := &instance.Effect
+			hitEffect.determineOutcome(sim, spellCast, instance)
 
 			if hitEffect.Landed() {
 				hitEffect.directCalculations(sim, spellCast)
@@ -78,7 +78,7 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 				// Dot Damage Effects
 				if hitEffect.DotInput.NumberOfTicks != 0 {
 					hitEffect.takeDotSnapshot(sim, spellCast)
-					spell.ApplyDot(sim)
+					instance.ApplyDot(sim)
 				}
 			}
 
@@ -88,12 +88,12 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 			// Use a separate loop for the beforeCalculations() calls so that they all
 			// come before the first afterCalculations() call. This prevents proc effects
 			// on the first hit from benefitting other hits of the same spell.
-			for effectIdx := range spell.Effects {
-				hitEffect := &spell.Effects[effectIdx]
-				hitEffect.determineOutcome(sim, spellCast, spell)
+			for effectIdx := range instance.Effects {
+				hitEffect := &instance.Effects[effectIdx]
+				hitEffect.determineOutcome(sim, spellCast, instance)
 			}
-			for effectIdx := range spell.Effects {
-				hitEffect := &spell.Effects[effectIdx]
+			for effectIdx := range instance.Effects {
+				hitEffect := &instance.Effects[effectIdx]
 				if hitEffect.Landed() {
 					hitEffect.directCalculations(sim, spellCast)
 					if hitEffect.DotInput.NumberOfTicks != 0 {
@@ -107,45 +107,45 @@ func (spell *SimpleSpell) Cast(sim *Simulation) bool {
 
 			// Use a separate loop for the afterCalculations() calls so all effect damage
 			// is fully calculated before invoking proc callbacks.
-			for effectIdx := range spell.Effects {
-				hitEffect := &spell.Effects[effectIdx]
+			for effectIdx := range instance.Effects {
+				hitEffect := &instance.Effects[effectIdx]
 				hitEffect.applyResultsToCast(spellCast)
 				hitEffect.afterCalculations(sim, spellCast)
 			}
 
 			// This assumes that the effects either all have dots, or none of them do.
-			if spell.Effects[0].DotInput.NumberOfTicks != 0 {
-				spell.ApplyDot(sim)
+			if instance.Effects[0].DotInput.NumberOfTicks != 0 {
+				instance.ApplyDot(sim)
 			}
 		}
 
-		if spell.currentDotAction == nil {
-			spell.Character.Metrics.AddSpellCast(spellCast)
-			spell.objectInUse = false
+		if instance.currentDotAction == nil {
+			instance.Character.Metrics.AddSpellCast(spellCast)
+			instance.objectInUse = false
 		}
 	})
 }
 
-func (spell *SimpleSpell) applyAOECap() {
-	if spell.AOECap == 0 {
+func (instance *SimpleSpell) applyAOECap() {
+	if instance.AOECap == 0 {
 		return
 	}
 
 	// Increased damage from crits doesn't count towards the cap, so need to
 	// tally pre-crit damage.
 	totalTowardsCap := 0.0
-	for i, _ := range spell.Effects {
-		effect := &spell.Effects[i]
+	for i, _ := range instance.Effects {
+		effect := &instance.Effects[i]
 		totalTowardsCap += effect.Damage / effect.BeyondAOECapMultiplier
 	}
 
-	if totalTowardsCap <= spell.AOECap {
+	if totalTowardsCap <= instance.AOECap {
 		return
 	}
 
-	maxDamagePerHit := spell.AOECap / float64(len(spell.Effects))
-	for i, _ := range spell.Effects {
-		effect := &spell.Effects[i]
+	maxDamagePerHit := instance.AOECap / float64(len(instance.Effects))
+	for i, _ := range instance.Effects {
+		effect := &instance.Effects[i]
 		damageTowardsCap := effect.Damage / effect.BeyondAOECapMultiplier
 		if damageTowardsCap > maxDamagePerHit {
 			effect.Damage -= damageTowardsCap - maxDamagePerHit
@@ -153,11 +153,11 @@ func (spell *SimpleSpell) applyAOECap() {
 	}
 }
 
-func (spell *SimpleSpell) Cancel(sim *Simulation) {
-	spell.SpellCast.Cancel()
-	if spell.currentDotAction != nil {
-		spell.currentDotAction.Cancel(sim)
-		spell.currentDotAction = nil
+func (instance *SimpleSpell) Cancel(sim *Simulation) {
+	instance.SpellCast.Cancel()
+	if instance.currentDotAction != nil {
+		instance.currentDotAction.Cancel(sim)
+		instance.currentDotAction = nil
 	}
 }
 
@@ -201,15 +201,6 @@ type SimpleSpellTemplate struct {
 	Instance SimpleSpell
 }
 
-func (template *SimpleSpellTemplate) Apply(newAction *SimpleSpell) {
-	if newAction.objectInUse {
-		panic(fmt.Sprintf("Spell (%s) already in use", newAction.ActionID))
-	}
-	*newAction = template.Template
-	newAction.Effects = template.effects
-	copy(newAction.Effects, template.Template.Effects)
-}
-
 func (spell *SimpleSpellTemplate) reset(_ *Simulation) {
 	spell.SpellMetrics = SpellMetrics{}
 }
@@ -221,14 +212,19 @@ func (spell *SimpleSpellTemplate) doneIteration() {
 func (spell *SimpleSpellTemplate) Cast(sim *Simulation, target *Target) bool {
 	// Initialize cast from precomputed template.
 	instance := &spell.Instance
-	spell.Apply(instance)
+	if instance.objectInUse {
+		panic(fmt.Sprintf("Spell (%s) already in use", instance.ActionID))
+	}
+	*instance = spell.Template
+	instance.Effects = spell.effects
+	copy(instance.Effects, spell.Template.Effects)
 
 	if spell.ModifyCast != nil {
 		spell.ModifyCast(sim, target, instance)
 	}
 
 	instance.Init(sim)
-	return instance.Cast(sim)
+	return instance.Cast(sim, spell)
 }
 
 type ModifySpellCast func(*Simulation, *Target, *SimpleSpell)
@@ -245,6 +241,9 @@ type SpellConfig struct {
 
 // Registers a new spell to the character. Returns the newly created spell.
 func (character *Character) RegisterSpell(config SpellConfig) *SimpleSpellTemplate {
+	if len(character.Spellbook) > 100 {
+		panic(fmt.Sprintf("Over 100 registered spells when registering %s! There is probably a spell being registered every iteration.", config.Template.ActionID))
+	}
 	if len(config.Template.Effects) > 0 && config.Template.Effect.DamageMultiplier != 0 {
 		panic("Cannot use both Effect and Effects, pick one!")
 	}
@@ -265,4 +264,24 @@ func (character *Character) RegisterSpell(config SpellConfig) *SimpleSpellTempla
 	character.Spellbook = append(character.Spellbook, spell)
 
 	return spell
+}
+
+// Returns the first registered spell with the given ID, or nil if there are none.
+func (character *Character) GetSpell(actionID ActionID) *SimpleSpellTemplate {
+	for _, spell := range character.Spellbook {
+		if spell.ActionID.SameAction(actionID) {
+			return spell
+		}
+	}
+	return nil
+}
+
+// Retrieves an existing spell with the same ID as the config uses, or registers it if there is none.
+func (character *Character) GetOrRegisterSpell(config SpellConfig) *SimpleSpellTemplate {
+	registered := character.GetSpell(config.Template.ActionID)
+	if registered == nil {
+		return character.RegisterSpell(config)
+	} else {
+		return registered
+	}
 }
