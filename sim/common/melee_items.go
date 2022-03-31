@@ -846,9 +846,12 @@ func ApplyBlinkstrike(agent core.Agent) {
 		var icd core.InternalCD
 		icdDur := time.Millisecond * 1
 
-		mhAttack := character.AutoAttacks.MHAuto
-		mhAttack.ActionID = core.ActionID{ItemID: 31332}
-		cachedAttack := core.SimpleSpell{}
+		template := character.AutoAttacks.MHAuto.Template
+		template.ActionID = core.ActionID{ItemID: 31332}
+		blinkstrikeSpell := character.GetOrRegisterSpell(core.SpellConfig{
+			Template:   template,
+			ModifyCast: core.ModifyCastAssignTarget,
+		})
 
 		return core.Aura{
 			ID: BlinkstrikeAuraID,
@@ -866,9 +869,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 
-				cachedAttack = mhAttack
-				cachedAttack.Effect.Target = spellEffect.Target
-				cachedAttack.Cast(sim)
+				blinkstrikeSpell.Cast(sim, spellEffect.Target)
 			},
 		}
 	})

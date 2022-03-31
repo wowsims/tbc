@@ -244,9 +244,12 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 			var icd core.InternalCD
 			icdDur := time.Millisecond * 500
 
-			mhAttack := rogue.AutoAttacks.MHAuto
-			mhAttack.ActionID = core.ActionID{SpellID: 13964}
-			cachedAttack := core.SimpleSpell{}
+			template := rogue.AutoAttacks.MHAuto.Template
+			template.ActionID = core.ActionID{SpellID: 13964}
+			swordSpecializationSpell := rogue.GetOrRegisterSpell(core.SpellConfig{
+				Template:   template,
+				ModifyCast: core.ModifyCastAssignTarget,
+			})
 
 			return core.Aura{
 				ID: SwordSpecializationAuraID,
@@ -268,10 +271,7 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 					}
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 
-					// Got a proc
-					cachedAttack = mhAttack
-					cachedAttack.Effect.Target = spellEffect.Target
-					cachedAttack.Cast(sim)
+					swordSpecializationSpell.Cast(sim, spellEffect.Target)
 				},
 			}
 		})

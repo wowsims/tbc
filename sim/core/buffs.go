@@ -382,9 +382,13 @@ func newWindfuryBuffAuraFactory(character *Character, rank int32, iwtTalentPoint
 func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) Aura {
 	factory := newWindfuryBuffAuraFactory(character, rank, iwtTalentPoints)
 
-	mhAttack := character.AutoAttacks.MHAuto
-	mhAttack.ActionID = ActionID{SpellID: windfuryBuffSpellRanks[rank-1]} // temporary buff ("Windfury Attack") spell id
-	cachedAttack := SimpleSpell{}
+	wfTemplate := character.AutoAttacks.MHAuto.Template
+	wfTemplate.ActionID = ActionID{SpellID: windfuryBuffSpellRanks[rank-1]} // temporary buff ("Windfury Attack") spell id
+
+	wfSpell := character.GetOrRegisterSpell(SpellConfig{
+		Template:   wfTemplate,
+		ModifyCast: ModifyCastAssignTarget,
+	})
 
 	const procChance = 0.2
 
@@ -412,9 +416,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 
 			character.AddAura(sim, factory(sim, startCharges))
 
-			cachedAttack = mhAttack
-			cachedAttack.Effect.Target = spellEffect.Target
-			cachedAttack.Cast(sim)
+			wfSpell.Cast(sim, spellEffect.Target)
 		},
 	}
 }

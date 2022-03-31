@@ -785,7 +785,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 	} else if conjuredType == proto.Conjured_ConjuredFlameCap {
 		actionID := ActionID{ItemID: 22788}
 
-		castTemplate := character.RegisterSpell(SpellConfig{
+		flameCapProc := character.RegisterSpell(SpellConfig{
 			Template: SimpleSpell{
 				SpellCast: SpellCast{
 					Cast: Cast{
@@ -804,8 +804,8 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 					BaseDamage:       BaseDamageConfigFlat(40),
 				},
 			},
+			ModifyCast: ModifyCastAssignTarget,
 		})
-		spellObj := SimpleSpell{}
 
 		return MajorCooldown{
 				ActionID: actionID,
@@ -833,11 +833,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 						return
 					}
 
-					castAction := &spellObj
-					castTemplate.Apply(castAction)
-					castAction.Effect.Target = spellEffect.Target
-					castAction.Init(sim)
-					castAction.Cast(sim)
+					flameCapProc.Cast(sim, spellEffect.Target)
 				}
 				character.AddAura(sim, aura)
 
@@ -978,25 +974,25 @@ func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID Act
 	}
 }
 func (character *Character) newSuperSapperCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.RegisterSpell(character.newBasicExplosiveSpell(sim, SuperSapperActionID, 900, 1500, time.Minute*5))
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, SuperSapperActionID, 900, 1500, time.Minute*5))
 	return func(sim *Simulation) {
 		spell.Cast(sim, nil)
 	}
 }
 func (character *Character) newGoblinSapperCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.RegisterSpell(character.newBasicExplosiveSpell(sim, GoblinSapperActionID, 450, 750, time.Minute*5))
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, GoblinSapperActionID, 450, 750, time.Minute*5))
 	return func(sim *Simulation) {
 		spell.Cast(sim, nil)
 	}
 }
 func (character *Character) newFelIronBombCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.RegisterSpell(character.newBasicExplosiveSpell(sim, FelIronBombActionID, 330, 770, 0))
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, FelIronBombActionID, 330, 770, 0))
 	return func(sim *Simulation) {
 		spell.Cast(sim, nil)
 	}
 }
 func (character *Character) newAdamantiteGrenadeCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.RegisterSpell(character.newBasicExplosiveSpell(sim, AdamantiteGrenadeActionID, 450, 750, 0))
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, AdamantiteGrenadeActionID, 450, 750, 0))
 	return func(sim *Simulation) {
 		spell.Cast(sim, nil)
 	}
@@ -1010,7 +1006,7 @@ func (character *Character) newHolyWaterCaster(sim *Simulation) func(sim *Simula
 			effect.DamageMultiplier = 0
 		}
 	}
-	spell := character.RegisterSpell(config)
+	spell := character.GetOrRegisterSpell(config)
 
 	return func(sim *Simulation) {
 		spell.Cast(sim, nil)
