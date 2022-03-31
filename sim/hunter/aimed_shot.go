@@ -8,7 +8,7 @@ import (
 var AimedShotCooldownID = core.NewCooldownID()
 var AimedShotActionID = core.ActionID{SpellID: 27065, CooldownID: AimedShotCooldownID}
 
-func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (hunter *Hunter) registerAimedShotSpell(sim *core.Simulation) {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 370}
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -46,15 +46,8 @@ func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.SimpleSpel
 
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 
-	return core.NewSimpleSpellTemplate(ama)
-}
-
-func (hunter *Hunter) NewAimedShot(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	as := &hunter.aimedShot
-	hunter.aimedShotTemplate.Apply(as)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	as.Effect.Target = target
-	as.Init(sim)
-	return as
+	hunter.AimedShot = hunter.RegisterSpell(core.SpellConfig{
+		Template:   ama,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

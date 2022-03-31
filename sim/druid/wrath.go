@@ -13,21 +13,28 @@ const SpellIDWrath int32 = 26985
 
 const IdolAvenger int32 = 31025
 
-func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	baseCast := core.Cast{
-		ActionID:    core.ActionID{SpellID: SpellIDWrath},
-		Character:   &druid.Character,
-		SpellSchool: core.SpellSchoolNature,
-		BaseCost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 255,
+func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
+	template := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:    core.ActionID{SpellID: SpellIDWrath},
+				Character:   &druid.Character,
+				SpellSchool: core.SpellSchoolNature,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 255,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 255,
+				},
+				CastTime: time.Millisecond * 2000,
+				GCD:      core.GCDDefault,
+			},
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 		},
-		Cost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 255,
-		},
-		CastTime: time.Millisecond * 2000,
-		GCD:      core.GCDDefault,
 	}
 
 	spellCoefficient := 0.571
@@ -38,45 +45,25 @@ func (druid *Druid) newWrathTemplate(sim *core.Simulation) core.SimpleSpellTempl
 	}
 	spellCoefficient += 0.02 * float64(druid.Talents.WrathOfCenarius)
 
-	effect := core.SpellEffect{
+	template.Effect = core.SpellEffect{
 		DamageMultiplier: 1,
 		ThreatMultiplier: 1,
 		BaseDamage:       core.BaseDamageConfigMagic(383+bonusFlatDamage, 432+bonusFlatDamage, spellCoefficient),
 	}
 
-	baseCast.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
-	baseCast.Cost.Value -= baseCast.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
+	template.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
+	template.Cost.Value -= template.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
 
-	effect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
-	effect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
+	template.Effect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
+	template.Effect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
+	template.Effect.OnSpellHit = druid.applyOnHitTalents
 
-	effect.OnSpellHit = druid.applyOnHitTalents
-	spCast := &core.SpellCast{
-		Cast:                baseCast,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
-	}
-
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: *spCast,
-		Effect:    effect,
+	druid.Wrath = druid.RegisterSpell(core.SpellConfig{
+		Template: template,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effect.Target = target
+			druid.applyNaturesGrace(&instance.SpellCast)
+			druid.applyNaturesSwiftness(&instance.SpellCast)
+		},
 	})
-}
-
-func (druid *Druid) NewWrath(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	sf := &druid.wrathSpell
-
-	druid.wrathCastTemplate.Apply(sf)
-
-	// Modifies the cast time.
-	druid.applyNaturesGrace(&sf.SpellCast)
-	druid.applyNaturesSwiftness(&sf.SpellCast)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sf.Effect.Target = target
-	sf.Init(sim)
-
-	return sf
 }

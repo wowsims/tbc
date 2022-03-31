@@ -9,7 +9,7 @@ import (
 
 var ScorpidStingDebuffID = core.NewDebuffID()
 
-func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (hunter *Hunter) registerScorpidStingSpell(sim *core.Simulation) {
 	actionID := core.ActionID{SpellID: 3043}
 	cost := core.ResourceCost{Type: stats.Mana, Value: hunter.BaseMana() * 0.09}
 	ama := core.SimpleSpell{
@@ -44,17 +44,8 @@ func (hunter *Hunter) newScorpidStingTemplate(sim *core.Simulation) core.SimpleS
 
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 
-	return core.NewSimpleSpellTemplate(ama)
-}
-
-func (hunter *Hunter) NewScorpidSting(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	as := &hunter.scorpidSting
-	hunter.scorpidStingTemplate.Apply(as)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	as.Effect.Target = target
-
-	as.Init(sim)
-
-	return as
+	hunter.ScorpidSting = hunter.RegisterSpell(core.SpellConfig{
+		Template:   ama,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

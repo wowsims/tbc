@@ -13,8 +13,8 @@ const SpellIDHurricane int32 = 27012
 var HurricaneCooldownID = core.NewCooldownID()
 var HurricaneDebuffID = core.NewDebuffID()
 
-func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := core.SimpleSpell{
+func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
+	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				ActionID: core.ActionID{
@@ -58,20 +58,11 @@ func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellT
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)
 	}
-	spell.Effects = effects
+	template.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (druid *Druid) NewHurricane(sim *core.Simulation) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	hurricane := &druid.HurricaneSpell
-	druid.hurricaneCastTemplate.Apply(hurricane)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hurricane.Init(sim)
-
-	return hurricane
+	druid.Hurricane = druid.RegisterSpell(core.SpellConfig{
+		Template: template,
+	})
 }
 
 func (druid *Druid) ShouldCastHurricane(sim *core.Simulation, rotation proto.BalanceDruid_Rotation) bool {

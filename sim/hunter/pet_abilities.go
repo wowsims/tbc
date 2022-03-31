@@ -115,16 +115,13 @@ func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 	}
 	pa.ActionID = ama.ActionID
 
-	template := core.NewSimpleSpellTemplate(ama)
-	cast := core.SimpleSpell{}
+	spell := hp.RegisterSpell(core.SpellConfig{
+		Template:   ama,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
 	pa.Cast = func(target *core.Target) {
-		template.Apply(&cast)
-
-		// Set dynamic fields, i.e. the stuff we couldn't precompute.
-		cast.Effect.Target = target
-
-		cast.Cast(sim)
+		spell.Cast(sim, target)
 	}
 	return pa
 }
@@ -157,16 +154,13 @@ func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
 	}
 	pa.ActionID = ama.ActionID
 
-	template := core.NewSimpleSpellTemplate(ama)
-	cast := core.SimpleSpell{}
+	spell := hp.RegisterSpell(core.SpellConfig{
+		Template:   ama,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
 	pa.Cast = func(target *core.Target) {
-		template.Apply(&cast)
-
-		// Set dynamic fields, i.e. the stuff we couldn't precompute.
-		cast.Effect.Target = target
-
-		cast.Cast(sim)
+		spell.Cast(sim, target)
 	}
 	return pa
 }
@@ -199,25 +193,25 @@ func (hp *HunterPet) newGore(sim *core.Simulation, isPrimary bool) PetAbility {
 	}
 	pa.ActionID = ama.ActionID
 
-	template := core.NewSimpleSpellTemplate(ama)
-	cast := core.SimpleSpell{}
+	spell := hp.RegisterSpell(core.SpellConfig{
+		Template: ama,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effect.Target = target
+
+			if sim.RandomFloat("Gore") < 0.5 {
+				instance.Effect.DamageMultiplier *= 2
+			}
+		},
+	})
 
 	pa.Cast = func(target *core.Target) {
-		template.Apply(&cast)
-
-		// Set dynamic fields, i.e. the stuff we couldn't precompute.
-		cast.Effect.Target = target
-		if sim.RandomFloat("Gore") < 0.5 {
-			cast.Effect.DamageMultiplier *= 2
-		}
-
-		cast.Cast(sim)
+		spell.Cast(sim, target)
 	}
 	return pa
 }
 
 func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) PetAbility {
-	spell := core.SimpleSpell{
+	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				ActionID:    core.ActionID{SpellID: 25011},
@@ -240,19 +234,15 @@ func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) Pe
 		Type: LightningBreath,
 		Cost: 50,
 	}
-	pa.ActionID = spell.ActionID
+	pa.ActionID = ama.ActionID
 
-	template := core.NewSimpleSpellTemplate(spell)
-	cast := core.SimpleSpell{}
+	spell := hp.RegisterSpell(core.SpellConfig{
+		Template:   ama,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
 	pa.Cast = func(target *core.Target) {
-		template.Apply(&cast)
-
-		// Set dynamic fields, i.e. the stuff we couldn't precompute.
-		cast.Effect.Target = target
-
-		cast.Init(sim)
-		cast.Cast(sim)
+		spell.Cast(sim, target)
 	}
 	return pa
 }
@@ -284,16 +274,13 @@ func (hp *HunterPet) newScreech(sim *core.Simulation, isPrimary bool) PetAbility
 	}
 	pa.ActionID = ama.ActionID
 
-	template := core.NewSimpleSpellTemplate(ama)
-	cast := core.SimpleSpell{}
+	spell := hp.RegisterSpell(core.SpellConfig{
+		Template:   ama,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
 	pa.Cast = func(target *core.Target) {
-		template.Apply(&cast)
-
-		// Set dynamic fields, i.e. the stuff we couldn't precompute.
-		cast.Effect.Target = target
-
-		cast.Cast(sim)
+		spell.Cast(sim, target)
 	}
 	return pa
 }

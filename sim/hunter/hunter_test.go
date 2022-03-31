@@ -34,9 +34,9 @@ func TestBestialWrath(t *testing.T) {
 
 	sim.Reset()
 	h.TryUseCooldowns(sim)
-	as := h.NewAimedShot(sim, sim.GetPrimaryTarget())
-	if as.Cost.Value != 259 {
-		t.Logf("cost is wrong, expected: %0.1f, actual: %0.1f", 259.0, as.Cost.Value)
+	h.AimedShot.Cast(sim, sim.GetPrimaryTarget())
+	if h.AimedShot.Instance.Cost.Value != 259 {
+		t.Logf("cost is wrong, expected: %0.1f, actual: %0.1f", 259.0, h.AimedShot.Instance.Cost.Value)
 	}
 }
 

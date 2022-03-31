@@ -12,54 +12,44 @@ const SpellIDInsectSwarm int32 = 27013
 
 var InsectSwarmDebuffID = core.NewDebuffID()
 
-func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	baseCast := core.Cast{
-		ActionID:    core.ActionID{SpellID: SpellIDInsectSwarm},
-		SpellSchool: core.SpellSchoolNature,
-		Character:   &druid.Character,
-		BaseCost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 175,
-		},
-		Cost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 175,
-		},
-		GCD: core.GCDDefault,
-	}
-
-	effect := core.SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:  6,
-			TickLength:     time.Second * 2,
-			TickBaseDamage: core.DotSnapshotFuncMagic(792/6, 0.127),
-			DebuffID:       InsectSwarmDebuffID,
-		},
-	}
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
+func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
+	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast:                baseCast,
+			Cast: core.Cast{
+				ActionID:    core.ActionID{SpellID: SpellIDInsectSwarm},
+				SpellSchool: core.SpellSchoolNature,
+				Character:   &druid.Character,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 175,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 175,
+				},
+				GCD: core.GCDDefault,
+			},
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 		},
-		Effect: effect,
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			DotInput: core.DotDamageInput{
+				NumberOfTicks:  6,
+				TickLength:     time.Second * 2,
+				TickBaseDamage: core.DotSnapshotFuncMagic(792/6, 0.127),
+				DebuffID:       InsectSwarmDebuffID,
+			},
+		},
+	}
+
+	druid.InsectSwarm = druid.RegisterSpell(core.SpellConfig{
+		Template:   template,
+		ModifyCast: core.ModifyCastAssignTarget,
 	})
 }
 
-func (druid *Druid) NewInsectSwarm(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	sf := &druid.InsectSwarmSpell
-	druid.insectSwarmCastTemplate.Apply(sf)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sf.Effect.Target = target
-	sf.Init(sim)
-
-	return sf
-}
-
 func (druid *Druid) ShouldCastInsectSwarm(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.InsectSwarm && !druid.InsectSwarmSpell.Effect.DotInput.IsTicking(sim)
+	return rotation.InsectSwarm && !druid.InsectSwarm.Instance.Effect.DotInput.IsTicking(sim)
 }
