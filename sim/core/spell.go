@@ -78,11 +78,11 @@ func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) b
 				// Dot Damage Effects
 				if hitEffect.DotInput.NumberOfTicks != 0 {
 					hitEffect.takeDotSnapshot(sim, spellCast)
-					instance.ApplyDot(sim)
+					instance.ApplyDot(sim, spell)
 				}
 			}
 
-			hitEffect.applyResultsToCast(spellCast)
+			hitEffect.applyResultsToSpell(spell)
 			hitEffect.afterCalculations(sim, spellCast)
 		} else {
 			// Use a separate loop for the beforeCalculations() calls so that they all
@@ -109,13 +109,13 @@ func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) b
 			// is fully calculated before invoking proc callbacks.
 			for effectIdx := range instance.Effects {
 				hitEffect := &instance.Effects[effectIdx]
-				hitEffect.applyResultsToCast(spellCast)
+				hitEffect.applyResultsToSpell(spell)
 				hitEffect.afterCalculations(sim, spellCast)
 			}
 
 			// This assumes that the effects either all have dots, or none of them do.
 			if instance.Effects[0].DotInput.NumberOfTicks != 0 {
-				instance.ApplyDot(sim)
+				instance.ApplyDot(sim, spell)
 			}
 		}
 
