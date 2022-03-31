@@ -10,7 +10,7 @@ var MutilateMHActionID = core.ActionID{SpellID: 34419}
 var MutilateOHActionID = core.ActionID{SpellID: 34418}
 var MutilateEnergyCost = 60.0
 
-func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
 	bonusCritRating := 5 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.PuncturingWounds)
 
 	mhDamageAbility := core.SimpleSpell{
@@ -47,11 +47,20 @@ func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemp
 	ohDamageAbility.Effect.ProcMask = core.ProcMaskMeleeOHSpecial
 	ohDamageAbility.Effect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.OffHand, true, 101, 1+0.1*float64(rogue.Talents.DualWieldSpecialization), true)
 
-	mhTemplate := core.NewSimpleSpellTemplate(mhDamageAbility)
-	ohTemplate := core.NewSimpleSpellTemplate(ohDamageAbility)
-
-	mhAtk := core.SimpleSpell{}
-	ohAtk := core.SimpleSpell{}
+	modifyCast := func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+		instance.Effect.Target = target
+		if rogue.deadlyPoisonStacks > 0 {
+			instance.Effect.DamageMultiplier *= 1.5
+		}
+	}
+	mhHitSpell := rogue.RegisterSpell(core.SpellConfig{
+		Template:   mhDamageAbility,
+		ModifyCast: modifyCast,
+	})
+	ohHitSpell := rogue.RegisterSpell(core.SpellConfig{
+		Template:   ohDamageAbility,
+		ModifyCast: modifyCast,
+	})
 
 	refundAmount := MutilateEnergyCost * 0.8
 	ability := rogue.newAbility(MutilateActionID, MutilateEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
@@ -64,39 +73,21 @@ func (rogue *Rogue) newMutilateTemplate(_ *core.Simulation) core.SimpleSpellTemp
 
 		rogue.AddComboPoints(sim, 2, MutilateActionID)
 
-		mhTemplate.Apply(&mhAtk)
-		mhAtk.Effect.Target = spellEffect.Target
-
-		ohTemplate.Apply(&ohAtk)
-		ohAtk.Effect.Target = spellEffect.Target
-
-		if rogue.deadlyPoisonStacks > 0 {
-			mhAtk.Effect.DamageMultiplier *= 1.5
-			ohAtk.Effect.DamageMultiplier *= 1.5
-		}
-
 		// TODO: while this is the most natural handling, the oh attack might have effects
 		//  from the mh attack applied
-		mhAtk.Cast(sim)
-		ohAtk.Cast(sim)
+		mhHitSpell.Cast(sim, spellEffect.Target)
+		ohHitSpell.Cast(sim, spellEffect.Target)
 
 		// applyResultsToCast() has already been done here, so we have to update the spell statistics, too
-		if mhAtk.Effect.Outcome.Matches(core.OutcomeCrit) || ohAtk.Effect.Outcome.Matches(core.OutcomeCrit) {
+		if mhHitSpell.Instance.Effect.Outcome.Matches(core.OutcomeCrit) || ohHitSpell.Instance.Effect.Outcome.Matches(core.OutcomeCrit) {
 			spellEffect.Outcome = core.OutcomeCrit
 			spellCast.Hits--
 			spellCast.Crits++
 		}
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (rogue *Rogue) NewMutilate(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	mt := &rogue.mutilate
-	rogue.mutilateTemplate.Apply(mt)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mt.Effect.Target = target
-
-	return mt
+	rogue.Mutilate = rogue.RegisterSpell(core.SpellConfig{
+		Template:   ability,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

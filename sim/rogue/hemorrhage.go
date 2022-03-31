@@ -11,7 +11,7 @@ var HemorrhageActionID = core.ActionID{SpellID: 26864}
 var HemorrhageDebuffID = core.NewDebuffID()
 var HemorrhageEnergyCost = 35.0
 
-func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerHemorrhageSpell(_ *core.Simulation) {
 	hemoAura := core.Aura{
 		ID:       HemorrhageDebuffID,
 		ActionID: HemorrhageActionID,
@@ -60,15 +60,8 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 		ability.Effect.DamageMultiplier += 0.06
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (rogue *Rogue) NewHemorrhage(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	hm := &rogue.hemorrhage
-	rogue.hemorrhageTemplate.Apply(hm)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hm.Effect.Target = target
-
-	return hm
+	rogue.Hemorrhage = rogue.RegisterSpell(core.SpellConfig{
+		Template:   ability,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

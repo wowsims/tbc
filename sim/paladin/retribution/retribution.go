@@ -104,12 +104,10 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
 	// judge blood whenever we can
-	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) {
-		judge := ret.NewJudgementOfBlood(sim, target)
-		if judge != nil {
-			if success := judge.Cast(sim); !success {
-				ret.WaitForMana(sim, judge.Cost.Value)
-			}
+	if ret.CanJudgementOfBlood(sim) {
+		success := ret.JudgementOfBlood.Cast(sim, target)
+		if !success {
+			ret.WaitForMana(sim, ret.JudgementOfBlood.Instance.Cost.Value)
 		}
 	}
 
@@ -124,9 +122,9 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 
 	// Crusader strike if we can
 	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
-		cs := ret.NewCrusaderStrike(sim, target)
-		if success := cs.Cast(sim); !success {
-			ret.WaitForMana(sim, cs.Cost.Value)
+		success := ret.CrusaderStrike.Cast(sim, target)
+		if !success {
+			ret.WaitForMana(sim, ret.CrusaderStrike.Instance.Cost.Value)
 		}
 		return
 	}
@@ -146,16 +144,16 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	// Cast selected judgement to keep on the boss
 	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) &&
 		ret.judgement != proto.RetributionPaladin_Options_None {
-		var judge *core.SimpleSpell
+		var judge *core.SimpleSpellTemplate
 		switch ret.judgement {
 		case proto.RetributionPaladin_Options_Wisdom:
-			judge = ret.NewJudgementOfWisdom(sim, target)
+			judge = ret.JudgementOfWisdom
 		case proto.RetributionPaladin_Options_Crusader:
-			judge = ret.NewJudgementOfTheCrusader(sim, target)
+			judge = ret.JudgementOfTheCrusader
 		}
 		if judge != nil {
-			if success := judge.Cast(sim); !success {
-				ret.WaitForMana(sim, judge.GetManaCost())
+			if success := judge.Cast(sim, target); !success {
+				ret.WaitForMana(sim, judge.Instance.GetManaCost())
 			}
 		}
 	}

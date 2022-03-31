@@ -191,7 +191,7 @@ type SimpleSpellTemplate struct {
 
 	SpellMetrics
 
-	modifyCast ModifySpellCast
+	ModifyCast ModifySpellCast
 
 	// Templates for creating new casts of this spell.
 	Template SimpleSpell
@@ -223,8 +223,8 @@ func (spell *SimpleSpellTemplate) Cast(sim *Simulation, target *Target) bool {
 	instance := &spell.Instance
 	spell.Apply(instance)
 
-	if spell.modifyCast != nil {
-		spell.modifyCast(sim, target, instance)
+	if spell.ModifyCast != nil {
+		spell.ModifyCast(sim, target, instance)
 	}
 
 	instance.Init(sim)
@@ -256,7 +256,7 @@ func (character *Character) RegisterSpell(config SpellConfig) *SimpleSpellTempla
 		SpellSchool: config.Template.SpellSchool,
 		SpellExtras: config.Template.SpellExtras,
 
-		modifyCast: config.ModifyCast,
+		ModifyCast: config.ModifyCast,
 
 		Template: config.Template,
 		effects:  make([]SpellEffect, len(config.Template.Effects)),

@@ -66,7 +66,8 @@ func (priest *Priest) Init(sim *core.Simulation) {
 	priest.registerShadowfiendSpell(sim)
 	priest.registerSmiteSpell(sim)
 	priest.registerStarshardsSpell(sim)
-	priest.registerVampiricTouchSpell(sim)
+	priest.VampiricTouch = priest.newVampiricTouchSpell(sim, false)
+	priest.VampiricTouch2 = priest.newVampiricTouchSpell(sim, true)
 
 	priest.MindFlay = []*core.SimpleSpellTemplate{
 		nil, // So we can use # of ticks as the index

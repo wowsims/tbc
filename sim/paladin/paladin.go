@@ -27,23 +27,12 @@ type Paladin struct {
 	SealOfWisdomAura      core.Aura
 	SealOfCommandAura     core.Aura
 
-	consecrationTemplate core.SimpleSpellTemplate
-	ConsecrationSpell    core.SimpleSpell
-
-	exorcismTemplate core.SimpleSpellTemplate
-	exorcismSpell    core.SimpleSpell
-
-	crusaderStrikeTemplate core.SimpleSpellTemplate
-	crusaderStrikeSpell    core.SimpleSpell
-
-	judgementOfBloodTemplate core.SimpleSpellTemplate
-	judgementOfBloodSpell    core.SimpleSpell
-
-	judgementOfTheCrusaderTemplate core.SimpleSpellTemplate
-	judgementOfTheCrusaderSpell    core.SimpleSpell
-
-	judgementOfWisdomTemplate core.SimpleSpellTemplate
-	judgementOfWisdomSpell    core.SimpleSpell
+	Consecration           *core.SimpleSpellTemplate
+	CrusaderStrike         *core.SimpleSpellTemplate
+	Exorcism               *core.SimpleSpellTemplate
+	JudgementOfBlood       *core.SimpleSpellTemplate
+	JudgementOfTheCrusader *core.SimpleSpellTemplate
+	JudgementOfWisdom      *core.SimpleSpellTemplate
 }
 
 // Implemented by each Paladin spec.
@@ -65,12 +54,12 @@ func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (paladin *Paladin) Init(sim *core.Simulation) {
-	paladin.crusaderStrikeTemplate = paladin.newCrusaderStrikeTemplate(sim)
-	paladin.judgementOfBloodTemplate = paladin.newJudgementOfBloodTemplate(sim)
-	paladin.judgementOfTheCrusaderTemplate = paladin.newJudgementOfTheCrusaderTemplate(sim)
-	paladin.judgementOfWisdomTemplate = paladin.newJudgementOfWisdomTemplate(sim)
-	paladin.consecrationTemplate = paladin.newConsecrationTemplate(sim)
-	paladin.exorcismTemplate = paladin.newExorcismTemplate(sim)
+	paladin.registerConsecrationSpell(sim)
+	paladin.registerCrusaderStrikeSpell(sim)
+	paladin.registerExorcismSpell(sim)
+	paladin.registerJudgementOfBloodSpell(sim)
+	paladin.registerJudgementOfTheCrusaderSpell(sim)
+	paladin.registerJudgementOfWisdomSpell(sim)
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {

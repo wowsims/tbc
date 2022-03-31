@@ -11,7 +11,7 @@ import (
 var RevengeCooldownID = core.NewCooldownID()
 var RevengeActionID = core.ActionID{SpellID: 30357, CooldownID: RevengeCooldownID}
 
-func (warrior *Warrior) newRevengeTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerRevengeSpell(_ *core.Simulation) {
 	warrior.revengeCost = 5.0 - float64(warrior.Talents.FocusedRage)
 
 	ability := core.SimpleSpell{
@@ -52,17 +52,10 @@ func (warrior *Warrior) newRevengeTemplate(_ *core.Simulation) core.SimpleSpellT
 		}
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (warrior *Warrior) NewRevenge(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	rv := &warrior.revenge
-	warrior.revengeTemplate.Apply(rv)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	rv.Effect.Target = target
-
-	return rv
+	warrior.Revenge = warrior.RegisterSpell(core.SpellConfig{
+		Template:   ability,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 func (warrior *Warrior) CanRevenge(sim *core.Simulation) bool {

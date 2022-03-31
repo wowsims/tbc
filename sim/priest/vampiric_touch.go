@@ -11,7 +11,7 @@ var VampiricTouchActionID = core.ActionID{SpellID: 34917}
 
 var VampiricTouchDebuffID = core.NewDebuffID()
 
-func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
+func (priest *Priest) newVampiricTouchSpell(sim *core.Simulation, isAltCast bool) *core.SimpleSpellTemplate {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 425}
 	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -36,25 +36,22 @@ func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
 				TickBaseDamage: core.DotSnapshotFuncMagic(650/5, 0.2),
 				DebuffID:       VampiricTouchDebuffID,
 			},
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if isAltCast {
+					priest.CurVTSpell = priest.VampiricTouch2
+					priest.NextVTSpell = priest.VampiricTouch
+				} else {
+					priest.CurVTSpell = priest.VampiricTouch
+					priest.NextVTSpell = priest.VampiricTouch2
+				}
+			},
 		},
 	}
 
 	priest.applyTalentsToShadowSpell(&template.SpellCast.Cast, &template.Effect)
 
-	priest.VampiricTouch = priest.RegisterSpell(core.SpellConfig{
-		Template: template,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.Effect.Target = target
-			priest.CurVTSpell = priest.VampiricTouch
-			priest.NextVTSpell = priest.VampiricTouch2
-		},
-	})
-	priest.VampiricTouch2 = priest.RegisterSpell(core.SpellConfig{
-		Template: template,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.Effect.Target = target
-			priest.CurVTSpell = priest.VampiricTouch2
-			priest.NextVTSpell = priest.VampiricTouch
-		},
+	return priest.RegisterSpell(core.SpellConfig{
+		Template:   template,
+		ModifyCast: core.ModifyCastAssignTarget,
 	})
 }

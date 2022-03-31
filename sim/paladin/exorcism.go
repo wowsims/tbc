@@ -11,7 +11,7 @@ import (
 var ExorcismCD = core.NewCooldownID()
 var ExorcismActionID = core.ActionID{SpellID: 10314, CooldownID: ExorcismCD}
 
-func (paladin *Paladin) newExorcismTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (paladin *Paladin) registerExorcismSpell(sim *core.Simulation) {
 	exo := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -39,20 +39,12 @@ func (paladin *Paladin) newExorcismTemplate(sim *core.Simulation) core.SimpleSpe
 		},
 	}
 
-	return core.NewSimpleSpellTemplate(exo)
+	paladin.Exorcism = paladin.RegisterSpell(core.SpellConfig{
+		Template:   exo,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
-func (paladin *Paladin) NewExorcism(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	if target.MobType != proto.MobType_MobTypeUndead && target.MobType != proto.MobType_MobTypeDemon {
-		return nil
-	}
-
-	exo := &paladin.exorcismSpell
-	paladin.exorcismTemplate.Apply(exo)
-
-	exo.Effect.Target = target
-
-	exo.Init(sim)
-
-	return exo
+func (paladin *Paladin) CanExorcism(target *core.Target) bool {
+	return target.MobType == proto.MobType_MobTypeUndead || target.MobType == proto.MobType_MobTypeDemon
 }

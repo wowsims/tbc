@@ -6,7 +6,7 @@ import (
 
 var EnvenomActionID = core.ActionID{SpellID: 32684}
 
-func (rogue *Rogue) newEnvenomTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 	rogue.envenomEnergyCost = 35
 	if ItemSetAssassination.CharacterHasSetBonus(&rogue.Character, 4) {
 		rogue.envenomEnergyCost -= 10
@@ -45,25 +45,15 @@ func (rogue *Rogue) newEnvenomTemplate(_ *core.Simulation) core.SimpleSpellTempl
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (rogue *Rogue) NewEnvenom(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	comboPoints := rogue.ComboPoints()
-	if comboPoints == 0 {
-		panic("Envenom requires combo points!")
-	}
-
-	ev := &rogue.envenom
-	rogue.envenomTemplate.Apply(ev)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ev.ActionID.Tag = comboPoints
-	ev.Effect.Target = target
-	if rogue.deathmantle4pcProc {
-		ev.Cost.Value = 0
-		rogue.deathmantle4pcProc = false
-	}
-
-	return ev
+	rogue.Envenom = rogue.RegisterSpell(core.SpellConfig{
+		Template: ability,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effect.Target = target
+			instance.ActionID.Tag = rogue.ComboPoints()
+			if rogue.deathmantle4pcProc {
+				instance.Cost.Value = 0
+				rogue.deathmantle4pcProc = false
+			}
+		},
+	})
 }

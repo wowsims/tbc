@@ -9,7 +9,7 @@ import (
 var ExposeArmorActionID = core.ActionID{SpellID: 26866, Tag: 5}
 var ExposeArmorEnergyCost = 25.0
 
-func (rogue *Rogue) newExposeArmorTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerExposeArmorSpell(_ *core.Simulation) {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	ability := rogue.newAbility(ExposeArmorActionID, ExposeArmorEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
@@ -32,26 +32,20 @@ func (rogue *Rogue) newExposeArmorTemplate(_ *core.Simulation) core.SimpleSpellT
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (rogue *Rogue) NewExposeArmor(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	if rogue.ComboPoints() != 5 {
-		panic("Expose Armor requires 5 combo points!")
-	}
-
-	ea := &rogue.exposeArmor
-	rogue.exposeArmorTemplate.Apply(ea)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ea.Effect.Target = target
-
-	if rogue.deathmantle4pcProc {
-		ea.Cost.Value = 0
-		rogue.deathmantle4pcProc = false
-	}
-
-	return ea
+	rogue.ExposeArmor = rogue.RegisterSpell(core.SpellConfig{
+		Template: ability,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			if rogue.ComboPoints() != 5 {
+				panic("Expose Armor requires 5 combo points!")
+			}
+			instance.Effect.Target = target
+			instance.ActionID.Tag = rogue.ComboPoints()
+			if rogue.deathmantle4pcProc {
+				instance.Cost.Value = 0
+				rogue.deathmantle4pcProc = false
+			}
+		},
+	})
 }
 
 func (rogue *Rogue) MaintainingExpose(target *core.Target) bool {

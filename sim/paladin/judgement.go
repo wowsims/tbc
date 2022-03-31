@@ -11,12 +11,17 @@ const JudgementManaCost = 147.0
 const JudgementCDTime = time.Second * 10
 const JudgementDuration = time.Second * 20
 
+// Shared conditions required to be able to cast any Judgement.
+func (paladin *Paladin) canJudgement(sim *core.Simulation) bool {
+	return paladin.currentSealExpires > sim.CurrentTime && !paladin.IsOnCD(JudgementCD, sim.CurrentTime)
+}
+
 var JudgementCD = core.NewCooldownID()
 var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: JudgementCD}
 
 // refactored Judgement of Blood as an ActiveMeleeAbility which is most similar to actual behavior with a typical ret build
 // but still has a few differences (differences are: does not scale off spell power, cannot be partially resisted, can be missed or dodged)
-func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 	job := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -54,31 +59,19 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.S
 	// Increase Judgement Crit Chance if we have Fanaticism talent
 	job.Effect.BonusCritRating = 3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism)
 
-	return core.NewSimpleSpellTemplate(job)
+	paladin.JudgementOfBlood = paladin.RegisterSpell(core.SpellConfig{
+		Template:   job,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
-func (paladin *Paladin) NewJudgementOfBlood(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// No seal has even been active, so we can't cast judgement
-	if paladin.currentSealID != SealOfBloodAuraID {
-		return nil
-	}
-
-	// Most recent seal has expired so we can't cast judgement
-	if paladin.currentSealExpires <= sim.CurrentTime {
-		return nil
-	}
-
-	job := &paladin.judgementOfBloodSpell
-	paladin.judgementOfBloodTemplate.Apply(job)
-
-	job.Effect.Target = target
-
-	return job
+func (paladin *Paladin) CanJudgementOfBlood(sim *core.Simulation) bool {
+	return paladin.canJudgement(sim) && paladin.currentSealID == SealOfBloodAuraID
 }
 
 var JudgementOfTheCrusaderActionID = core.ActionID{SpellID: 27159, CooldownID: JudgementCD}
 
-func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation) {
 	jotc := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -122,32 +115,19 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 	// Reduce CD if we have Improved Judgement Talent
 	jotc.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
-	return core.NewSimpleSpellTemplate(jotc)
+	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
+		Template:   jotc,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
-func (paladin *Paladin) NewJudgementOfTheCrusader(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// No seal has even been active, so we can't cast judgement
-	if paladin.currentSealID != SealOfTheCrusaderAuraID {
-		return nil
-	}
-
-	// Most recent seal has expired so we can't cast judgement
-	if paladin.currentSealExpires <= sim.CurrentTime {
-		return nil
-	}
-
-	jotc := &paladin.judgementOfTheCrusaderSpell
-	paladin.judgementOfTheCrusaderTemplate.Apply(jotc)
-
-	jotc.Effect.Target = target
-	jotc.Init(sim)
-
-	return jotc
+func (paladin *Paladin) CanJudgementOfTheCrusader(sim *core.Simulation) bool {
+	return paladin.canJudgement(sim) && paladin.currentSealID == SealOfTheCrusaderAuraID
 }
 
 var JudgementOfWisdomActionID = core.ActionID{SpellID: 27164, CooldownID: JudgementCD}
 
-func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 	jow := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -192,27 +172,14 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 	// Reduce CD if we have Improved Judgement Talent
 	jow.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
-	return core.NewSimpleSpellTemplate(jow)
+	paladin.JudgementOfWisdom = paladin.RegisterSpell(core.SpellConfig{
+		Template:   jow,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
-func (paladin *Paladin) NewJudgementOfWisdom(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// No seal has even been active, so we can't cast judgement
-	if paladin.currentSealID != SealOfWisdomAuraID {
-		return nil
-	}
-
-	// Most recent seal has expired so we can't cast judgement
-	if paladin.currentSealExpires <= sim.CurrentTime {
-		return nil
-	}
-
-	jow := &paladin.judgementOfWisdomSpell
-	paladin.judgementOfWisdomTemplate.Apply(jow)
-
-	jow.Effect.Target = target
-	jow.Init(sim)
-
-	return jow
+func (paladin *Paladin) CanJudgementOfWisdom(sim *core.Simulation) bool {
+	return paladin.canJudgement(sim) && paladin.currentSealID == SealOfWisdomAuraID
 }
 
 var SanctifiedJudgementActionID = core.ActionID{SpellID: 31930}
