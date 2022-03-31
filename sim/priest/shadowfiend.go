@@ -41,7 +41,7 @@ func (priest *Priest) registerShadowfiendCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				priest.NewShadowfiend(sim, sim.GetPrimaryTarget()).Cast(sim)
+				priest.Shadowfiend.Cast(sim, sim.GetPrimaryTarget())
 
 				// All MCDs that use the GCD and have a non-zero cast time must call this.
 				priest.UpdateMajorCooldowns()
@@ -50,60 +50,48 @@ func (priest *Priest) registerShadowfiendCD() {
 	})
 }
 
-func (priest *Priest) newShadowfiendTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 	cost := core.ResourceCost{Type: stats.Mana, Value: priest.BaseMana() * 0.06}
-	baseCast := core.Cast{
-		ActionID:    ShadowfiendActionID,
-		Character:   &priest.Character,
-		SpellSchool: core.SpellSchoolShadow,
-		BaseCost:    cost,
-		Cost:        cost,
-		CastTime:    0,
-		GCD:         core.GCDDefault,
-		Cooldown:    time.Minute * 5,
-	}
-
-	// Dmg over 15 sec = shadow_dmg*.6 + 1191
-	// just simulate 10 1.5s long ticks
-	effect := core.SpellEffect{
-		DamageMultiplier: 1,
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:  10,
-			TickLength:     time.Millisecond * 1500,
-			TickBaseDamage: core.DotSnapshotFuncMagic(1191/10, 0.06),
-			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
-				// TODO: This should also do something with ExpectedBonusMana
-				priest.AddMana(sim, tickDamage*2.5, ShadowfiendActionID, false)
-			},
-		},
-	}
-
-	priest.applyTalentsToShadowSpell(&baseCast, &effect)
-
-	if ItemSetIncarnate.CharacterHasSetBonus(&priest.Character, 2) { // Increases duration by 3s
-		effect.DotInput.NumberOfTicks += 2
-	}
-
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
+	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast:                baseCast,
+			Cast: core.Cast{
+				ActionID:    ShadowfiendActionID,
+				Character:   &priest.Character,
+				SpellSchool: core.SpellSchoolShadow,
+				BaseCost:    cost,
+				Cost:        cost,
+				CastTime:    0,
+				GCD:         core.GCDDefault,
+				Cooldown:    time.Minute * 5,
+			},
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
 		},
-		Effect: effect,
+		Effect: core.SpellEffect{
+			// Dmg over 15 sec = shadow_dmg*.6 + 1191
+			// just simulate 10 1.5s long ticks
+			DamageMultiplier: 1,
+			DotInput: core.DotDamageInput{
+				NumberOfTicks:  10,
+				TickLength:     time.Millisecond * 1500,
+				TickBaseDamage: core.DotSnapshotFuncMagic(1191/10, 0.06),
+				OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
+					// TODO: This should also do something with ExpectedBonusMana
+					priest.AddMana(sim, tickDamage*2.5, ShadowfiendActionID, false)
+				},
+			},
+		},
+	}
+
+	priest.applyTalentsToShadowSpell(&template.SpellCast.Cast, &template.Effect)
+
+	if ItemSetIncarnate.CharacterHasSetBonus(&priest.Character, 2) { // Increases duration by 3s
+		template.Effect.DotInput.NumberOfTicks += 2
+	}
+
+	priest.Shadowfiend = priest.RegisterSpell(core.SpellConfig{
+		Template:   template,
+		ModifyCast: core.ModifyCastAssignTarget,
 	})
-}
-
-func (priest *Priest) NewShadowfiend(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	mf := &priest.ShadowfiendSpell
-
-	priest.shadowfiendTemplate.Apply(mf)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Effect.Target = target
-	mf.Init(sim)
-
-	return mf
 }

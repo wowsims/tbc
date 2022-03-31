@@ -17,7 +17,7 @@ var SealOfBloodProcActionID = core.ActionID{SpellID: 31893}
 // Handles the cast, gcd, deducts the mana cost
 func (paladin *Paladin) setupSealOfBlood() {
 	// The proc behaviour
-	sobProc := core.SimpleSpell{
+	sobProcTemplate := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				ActionID:    SealOfBloodProcActionID,
@@ -37,8 +37,10 @@ func (paladin *Paladin) setupSealOfBlood() {
 		},
 	}
 
-	sobTemplate := core.NewSimpleSpellTemplate(sobProc)
-	sobAtk := core.SimpleSpell{}
+	sobProc := paladin.RegisterSpell(core.SpellConfig{
+		Template:   sobProcTemplate,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
 	// Define the aura
 	sobAura := core.Aura{
@@ -51,9 +53,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 				return
 			}
 
-			sobTemplate.Apply(&sobAtk)
-			sobAtk.Effect.Target = spellEffect.Target
-			sobAtk.Cast(sim)
+			sobProc.Cast(sim, spellEffect.Target)
 		},
 	}
 
@@ -91,7 +91,7 @@ var SealOfCommandCastActionID = core.ActionID{SpellID: 20375}
 var SealOfCommandProcActionID = core.ActionID{SpellID: 20424}
 
 func (paladin *Paladin) setupSealOfCommand() {
-	socProc := core.SimpleSpell{
+	socProcTemplate := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				ActionID:    SealOfCommandProcActionID,
@@ -109,15 +109,17 @@ func (paladin *Paladin) setupSealOfCommand() {
 	}
 
 	weaponBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 0.7, false)
-	socProc.Effect.BaseDamage = core.BaseDamageConfig{
+	socProcTemplate.Effect.BaseDamage = core.BaseDamageConfig{
 		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
 			return weaponBaseDamage(sim, hitEffect, spellCast) + 0.29*hitEffect.SpellPower(spellCast.Character, spellCast)
 		},
 		TargetSpellCoefficient: 0.29,
 	}
 
-	socTemplate := core.NewSimpleSpellTemplate(socProc)
-	socAtk := core.SimpleSpell{}
+	socProc := paladin.RegisterSpell(core.SpellConfig{
+		Template:   socProcTemplate,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
 	ppmm := paladin.AutoAttacks.NewPPMManager(7.0)
 
@@ -145,9 +147,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 
 			icd = core.InternalCD(sim.CurrentTime + icdDur)
 
-			socTemplate.Apply(&socAtk)
-			socAtk.Effect.Target = spellEffect.Target
-			socAtk.Cast(sim)
+			socProc.Cast(sim, spellEffect.Target)
 		},
 	}
 

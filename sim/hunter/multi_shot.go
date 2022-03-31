@@ -10,7 +10,7 @@ import (
 var MultiShotCooldownID = core.NewCooldownID()
 var MultiShotActionID = core.ActionID{SpellID: 27021, CooldownID: MultiShotCooldownID}
 
-func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -74,18 +74,12 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpel
 	}
 	ama.Effects = effects
 
-	return core.NewSimpleSpellTemplate(ama)
-}
-
-func (hunter *Hunter) NewMultiShot(sim *core.Simulation) *core.SimpleSpell {
-	ms := &hunter.multiShot
-	hunter.multiShotTemplate.Apply(ms)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ms.CastTime = hunter.MultiShotCastTime()
-
-	ms.Init(sim)
-	return ms
+	hunter.MultiShot = hunter.RegisterSpell(core.SpellConfig{
+		Template: ama,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.CastTime = hunter.MultiShotCastTime()
+		},
+	})
 }
 
 func (hunter *Hunter) MultiShotCastTime() time.Duration {

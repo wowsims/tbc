@@ -19,8 +19,7 @@ type HunterPet struct {
 	// Time when pet should die, as per petUptime.
 	deathTime time.Duration
 
-	killCommandTemplate core.SimpleSpellTemplate
-	killCommand         core.SimpleSpell
+	KillCommand *core.SimpleSpellTemplate
 
 	primaryAbility   PetAbility
 	secondaryAbility PetAbility
@@ -99,7 +98,7 @@ func (hp *HunterPet) GetPet() *core.Pet {
 }
 
 func (hp *HunterPet) Init(sim *core.Simulation) {
-	hp.killCommandTemplate = hp.newKillCommandTemplate(sim)
+	hp.registerKillCommandSpell(sim)
 
 	if hp.hunterOwner.Options.PetSingleAbility {
 		hp.primaryAbility = hp.NewPetAbility(sim, hp.config.SecondaryAbility, true)

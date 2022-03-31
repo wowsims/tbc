@@ -9,7 +9,7 @@ import (
 
 const SpellIDFrostbolt int32 = 27072
 
-func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerFrostboltSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -51,17 +51,8 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 		spell.Effect.DamageMultiplier *= 1.05
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) NewFrostbolt(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	frostbolt := &mage.frostboltSpell
-	mage.frostboltCastTemplate.Apply(frostbolt)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	frostbolt.Effect.Target = target
-	frostbolt.Init(sim)
-
-	return frostbolt
+	mage.Frostbolt = mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

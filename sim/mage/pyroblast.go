@@ -13,7 +13,7 @@ const (
 
 const SpellIDPyroblast int32 = 33938
 
-func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -41,11 +41,10 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 			BaseDamage:       core.BaseDamageConfigMagic(939, 1191, 1.15),
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
-					return
+				if spellEffect.Landed() {
+					mage.PyroblastDot.Instance.Cancel(sim)
+					mage.PyroblastDot.Cast(sim, spellEffect.Target)
 				}
-				pyroblastDot := mage.newPyroblastDot(sim, spellEffect.Target)
-				pyroblastDot.Cast(sim)
 			},
 		},
 	}
@@ -57,12 +56,15 @@ func (mage *Mage) newPyroblastTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
 	spell.Effect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
-	return core.NewSimpleSpellTemplate(spell)
+	mage.Pyroblast = mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 var PyroblastDotDebuffID = core.NewDebuffID()
 
-func (mage *Mage) newPyroblastDotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerPyroblastDotSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -89,31 +91,8 @@ func (mage *Mage) newPyroblastDotTemplate(sim *core.Simulation) core.SimpleSpell
 
 	spell.Effect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) newPyroblastDot(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Cancel the current pyroblast dot.
-	mage.pyroblastDotSpell.Cancel(sim)
-
-	pyroblastDot := &mage.pyroblastDotSpell
-	mage.pyroblastDotCastTemplate.Apply(pyroblastDot)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	pyroblastDot.Effect.Target = target
-	pyroblastDot.Init(sim)
-
-	return pyroblastDot
-}
-
-func (mage *Mage) NewPyroblast(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	pyroblast := &mage.pyroblastSpell
-	mage.pyroblastCastTemplate.Apply(pyroblast)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	pyroblast.Effect.Target = target
-	pyroblast.Init(sim)
-
-	return pyroblast
+	mage.PyroblastDot = mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

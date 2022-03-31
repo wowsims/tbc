@@ -145,12 +145,9 @@ var ItemSetFistsOfFury = core.ItemSet{
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			spellObj := core.SimpleSpell{}
 
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				ppmm := character.AutoAttacks.NewPPMManager(2)
-
-				castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+			spell := character.RegisterSpell(core.SpellConfig{
+				Template: core.SimpleSpell{
 					SpellCast: core.SpellCast{
 						Cast: core.Cast{
 							ActionID:    core.ActionID{SpellID: 41989},
@@ -167,7 +164,12 @@ var ItemSetFistsOfFury = core.ItemSet{
 						ThreatMultiplier: 1,
 						BaseDamage:       core.BaseDamageConfigRoll(100, 150),
 					},
-				})
+				},
+				ModifyCast: core.ModifyCastAssignTarget,
+			})
+
+			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+				ppmm := character.AutoAttacks.NewPPMManager(2)
 
 				return core.Aura{
 					ID: FistsOfFuryAuraID,
@@ -179,11 +181,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 							return
 						}
 
-						castAction := &spellObj
-						castTemplate.Apply(castAction)
-						castAction.Effect.Target = spellEffect.Target
-						castAction.Init(sim)
-						castAction.Cast(sim)
+						spell.Cast(sim, spellEffect.Target)
 					},
 				}
 			})

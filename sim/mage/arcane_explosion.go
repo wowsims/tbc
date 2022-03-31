@@ -7,7 +7,7 @@ import (
 
 const SpellIDArcaneExplosion int32 = 10202
 
-func (mage *Mage) newArcaneExplosionTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerArcaneExplosionSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -47,16 +47,7 @@ func (mage *Mage) newArcaneExplosionTemplate(sim *core.Simulation) core.SimpleSp
 	}
 	spell.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) NewArcaneExplosion(sim *core.Simulation) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	arcaneExplosion := &mage.arcaneExplosionSpell
-	mage.arcaneExplosionCastTemplate.Apply(arcaneExplosion)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	arcaneExplosion.Init(sim)
-
-	return arcaneExplosion
+	mage.ArcaneExplosion = mage.RegisterSpell(core.SpellConfig{
+		Template: spell,
+	})
 }

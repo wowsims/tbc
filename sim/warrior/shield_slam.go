@@ -13,7 +13,7 @@ var ShieldSlamActionID = core.ActionID{SpellID: 30356, CooldownID: ShieldSlamCoo
 
 const ShieldSlamCost = 20.0
 
-func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
 	warrior.canShieldSlam = warrior.Talents.ShieldSlam && warrior.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType == proto.WeaponType_WeaponTypeShield
 
 	ability := core.SimpleSpell{
@@ -65,17 +65,10 @@ func (warrior *Warrior) newShieldSlamTemplate(_ *core.Simulation) core.SimpleSpe
 		}
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (warrior *Warrior) NewShieldSlam(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	ss := &warrior.shieldSlam
-	warrior.shieldSlamTemplate.Apply(ss)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ss.Effect.Target = target
-
-	return ss
+	warrior.ShieldSlam = warrior.RegisterSpell(core.SpellConfig{
+		Template:   ability,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 func (warrior *Warrior) CanShieldSlam(sim *core.Simulation) bool {

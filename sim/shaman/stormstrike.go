@@ -45,7 +45,7 @@ func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) core.Aura {
 	return ssDebuffAura
 }
 
-func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 	ssDebuffAura := shaman.stormstrikeDebuffAura(sim.GetPrimaryTarget())
 
 	hasSkyshatter4p := ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4)
@@ -111,14 +111,11 @@ func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSp
 		ss.Effects[1].ThreatMultiplier *= 0.7
 	}
 
-	return core.NewSimpleSpellTemplate(ss)
-}
-
-func (shaman *Shaman) NewStormstrike(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	ss := &shaman.stormstrikeSpell
-	shaman.stormstrikeTemplate.Apply(ss)
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ss.Effects[0].Target = target
-	ss.Effects[1].Target = target
-	return ss
+	shaman.Stormstrike = shaman.RegisterSpell(core.SpellConfig{
+		Template: ss,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effects[0].Target = target
+			instance.Effects[1].Target = target
+		},
+	})
 }

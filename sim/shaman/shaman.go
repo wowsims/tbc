@@ -117,31 +117,19 @@ type Shaman struct {
 
 	ElementalFocusStacks byte
 
-	// "object pool" for shaman spells that are currently being cast.
-	lightningBoltSpell   core.SimpleSpell
-	lightningBoltSpellLO core.SimpleSpell
-
-	chainLightningSpell    core.SimpleSpell
-	chainLightningSpellLOs []core.SimpleSpell
-
 	// Precomputed templated cast generator for quickly resetting cast fields.
-	lightningBoltCastTemplate   core.SimpleSpellTemplate
-	lightningBoltLOCastTemplate core.SimpleSpellTemplate
+	LightningBolt   *core.SimpleSpellTemplate
+	LightningBoltLO *core.SimpleSpellTemplate
 
-	chainLightningCastTemplate    core.SimpleSpellTemplate
-	chainLightningLOCastTemplates []core.SimpleSpellTemplate
+	ChainLightning    *core.SimpleSpellTemplate
+	ChainLightningLOs []*core.SimpleSpellTemplate
 
-	stormstrikeTemplate core.SimpleSpellTemplate
-	stormstrikeSpell    core.SimpleSpell
+	Stormstrike *core.SimpleSpellTemplate
 
 	// Shocks
-	shockSpell         core.SimpleSpell
-	earthShockTemplate core.SimpleSpellTemplate
-	frostShockTemplate core.SimpleSpellTemplate
-
-	// Flame shock needs a separate spell object because of the dot.
-	FlameShockSpell    core.SimpleSpell
-	flameShockTemplate core.SimpleSpellTemplate
+	EarthShock *core.SimpleSpellTemplate
+	FrostShock *core.SimpleSpellTemplate
+	FlameShock *core.SimpleSpellTemplate
 
 	strengthOfEarthTotemTemplate core.SimpleCast
 	tremorTotemTemplate          core.SimpleCast
@@ -153,10 +141,9 @@ type Shaman struct {
 	manaSpringTotemTemplate      core.SimpleCast
 	totemSpell                   core.SimpleCast
 
-	searingTotemTemplate core.SimpleSpellTemplate
-	magmaTotemTemplate   core.SimpleSpellTemplate
-	novaTotemTemplate    core.SimpleSpellTemplate
-	FireTotemSpell       core.SimpleSpell
+	SearingTotem  *core.SimpleSpellTemplate
+	MagmaTotem    *core.SimpleSpellTemplate
+	FireNovaTotem *core.SimpleSpellTemplate
 }
 
 // Implemented by each Shaman spec.
@@ -238,21 +225,20 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (shaman *Shaman) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
-	shaman.stormstrikeTemplate = shaman.newStormstrikeTemplate(sim)
-	shaman.lightningBoltCastTemplate = shaman.newLightningBoltTemplate(sim, false)
-	shaman.lightningBoltLOCastTemplate = shaman.newLightningBoltTemplate(sim, true)
+	shaman.registerStormstrikeSpell(sim)
+	shaman.LightningBolt = shaman.newLightningBoltSpell(sim, false)
+	shaman.LightningBoltLO = shaman.newLightningBoltSpell(sim, true)
 
-	shaman.chainLightningCastTemplate = shaman.newChainLightningTemplate(sim, false)
-
+	shaman.ChainLightning = shaman.newChainLightningSpell(sim, false)
 	numHits := core.MinInt32(3, sim.GetNumTargets())
-	shaman.chainLightningSpellLOs = make([]core.SimpleSpell, numHits)
-	shaman.chainLightningLOCastTemplates = []core.SimpleSpellTemplate{}
+	shaman.ChainLightningLOs = []*core.SimpleSpellTemplate{}
 	for i := int32(0); i < numHits; i++ {
-		shaman.chainLightningLOCastTemplates = append(shaman.chainLightningLOCastTemplates, shaman.newChainLightningTemplate(sim, true))
+		shaman.ChainLightningLOs = append(shaman.ChainLightningLOs, shaman.newChainLightningSpell(sim, true))
 	}
-	shaman.earthShockTemplate = shaman.newEarthShockTemplate(sim)
-	shaman.flameShockTemplate = shaman.newFlameShockTemplate(sim)
-	shaman.frostShockTemplate = shaman.newFrostShockTemplate(sim)
+
+	shaman.registerEarthShockSpell(sim)
+	shaman.registerFlameShockSpell(sim)
+	shaman.registerFrostShockSpell(sim)
 
 	shaman.strengthOfEarthTotemTemplate = shaman.newStrengthOfEarthTotemTemplate(sim)
 	shaman.tremorTotemTemplate = shaman.newTremorTotemTemplate(sim)
@@ -263,9 +249,9 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 	shaman.manaSpringTotemTemplate = shaman.newManaSpringTotemTemplate(sim)
 	shaman.totemOfWrathTemplate = shaman.newTotemOfWrathTemplate(sim)
 
-	shaman.searingTotemTemplate = shaman.newSearingTotemTemplate(sim)
-	shaman.magmaTotemTemplate = shaman.newMagmaTotemTemplate(sim)
-	shaman.novaTotemTemplate = shaman.newNovaTotemTemplate(sim)
+	shaman.registerSearingTotemSpell(sim)
+	shaman.registerMagmaTotemSpell(sim)
+	shaman.registerNovaTotemSpell(sim)
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {

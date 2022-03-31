@@ -7,7 +7,7 @@ import (
 
 var DemoralizingShoutActionID = core.ActionID{SpellID: 25203}
 
-func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
 	warrior.shoutCost = 10.0
 	if ItemSetBoldArmor.CharacterHasSetBonus(&warrior.Character, 2) {
 		warrior.shoutCost -= 2
@@ -55,14 +55,9 @@ func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.
 	}
 	ability.Effects = effects
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (warrior *Warrior) NewDemoralizingShout(_ *core.Simulation) *core.SimpleSpell {
-	ds := &warrior.demoralizingShout
-	warrior.demoralizingShoutTemplate.Apply(ds)
-
-	return ds
+	warrior.DemoralizingShout = warrior.RegisterSpell(core.SpellConfig{
+		Template: ability,
+	})
 }
 
 func (warrior *Warrior) CanDemoralizingShout(sim *core.Simulation) bool {

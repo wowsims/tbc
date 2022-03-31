@@ -78,6 +78,9 @@ type Character struct {
 	initialPseudoStats stats.PseudoStats
 	PseudoStats        stats.PseudoStats
 
+	// All spells that can be cast by this character.
+	Spellbook []*SimpleSpellTemplate
+
 	// Used for applying the effects of hardcast / channeled spells at a later time.
 	// By definition there can be only 1 hardcast spell being cast at any moment.
 	Hardcast Hardcast
@@ -460,6 +463,9 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 	character.majorCooldownManager.reset(sim)
 	character.AutoAttacks.reset(sim)
 	character.Metrics.reset()
+	for _, spell := range character.Spellbook {
+		spell.reset(sim)
+	}
 
 	for _, petAgent := range character.Pets {
 		petAgent.GetPet().reset(sim, petAgent)
@@ -576,8 +582,11 @@ func (character *Character) doneIteration(simDuration time.Duration) {
 		character.Hardcast = Hardcast{}
 	}
 	character.doneIterationGCD(simDuration)
-	character.Metrics.doneIteration(simDuration.Seconds())
 	character.auraTracker.doneIteration(simDuration)
+	for _, spell := range character.Spellbook {
+		spell.doneIteration()
+	}
+	character.Metrics.doneIteration(simDuration.Seconds())
 }
 
 func (character *Character) GetStatsProto() *proto.PlayerStats {

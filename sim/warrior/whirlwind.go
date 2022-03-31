@@ -10,7 +10,7 @@ import (
 var WhirlwindCooldownID = core.NewCooldownID()
 var WhirlwindActionID = core.ActionID{SpellID: 1680, CooldownID: WhirlwindCooldownID}
 
-func (warrior *Warrior) newWhirlwindTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 	warrior.whirlwindCost = 25.0 - float64(warrior.Talents.FocusedRage)
 	if ItemSetWarbringerBattlegear.CharacterHasSetBonus(&warrior.Character, 2) {
 		warrior.whirlwindCost -= 5
@@ -55,17 +55,9 @@ func (warrior *Warrior) newWhirlwindTemplate(sim *core.Simulation) core.SimpleSp
 	}
 	ability.Effects = effects
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (warrior *Warrior) NewWhirlwind(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	ww := &warrior.whirlwind
-	warrior.whirlwindTemplate.Apply(ww)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ww.Effect.Target = target
-
-	return ww
+	warrior.Whirlwind = warrior.RegisterSpell(core.SpellConfig{
+		Template: ability,
+	})
 }
 
 func (warrior *Warrior) CanWhirlwind(sim *core.Simulation) bool {

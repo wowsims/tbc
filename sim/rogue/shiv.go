@@ -7,7 +7,7 @@ import (
 
 var ShivActionID = core.ActionID{SpellID: 5938}
 
-func (rogue *Rogue) newShivTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerShivSpell(_ *core.Simulation) {
 	rogue.shivEnergyCost = 20
 	if rogue.GetOHWeapon() != nil {
 		rogue.shivEnergyCost = 20 + 10*rogue.GetOHWeapon().SwingSpeed
@@ -32,16 +32,8 @@ func (rogue *Rogue) newShivTemplate(_ *core.Simulation) core.SimpleSpellTemplate
 		ability.Effect.DamageMultiplier += 0.1
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (rogue *Rogue) NewShiv(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	sh := &rogue.shiv
-	rogue.shivTemplate.Apply(sh)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sh.Effect.Target = target
-	sh.Init(sim)
-
-	return sh
+	rogue.Shiv = rogue.RegisterSpell(core.SpellConfig{
+		Template:   ability,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

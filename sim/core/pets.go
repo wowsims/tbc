@@ -33,8 +33,7 @@ func (character *Character) newGnomishFlameTurretCaster() func(sim *Simulation) 
 type GnomishFlameTurret struct {
 	Pet
 
-	flameCannon         SimpleSpell
-	flameCannonTemplate SimpleSpellTemplate
+	FlameCannon *SimpleSpellTemplate
 }
 
 func (character *Character) NewGnomishFlameTurret() *GnomishFlameTurret {
@@ -62,19 +61,19 @@ func (gft *GnomishFlameTurret) GetPet() *Pet {
 }
 
 func (gft *GnomishFlameTurret) Init(sim *Simulation) {
-	gft.flameCannonTemplate = gft.newFlameCannonTemplate(sim)
+	gft.registerFlameCannonSpell(sim)
 }
 
 func (gft *GnomishFlameTurret) Reset(sim *Simulation) {
 }
 
 func (gft *GnomishFlameTurret) OnGCDReady(sim *Simulation) {
-	gft.NewFlameCannon(sim, sim.GetPrimaryTarget()).Cast(sim)
+	gft.FlameCannon.Cast(sim, sim.GetPrimaryTarget())
 }
 
 const SpellIDFlameCannon int32 = 30527
 
-func (gft *GnomishFlameTurret) newFlameCannonTemplate(sim *Simulation) SimpleSpellTemplate {
+func (gft *GnomishFlameTurret) registerFlameCannonSpell(sim *Simulation) {
 	spell := SimpleSpell{
 		SpellCast: SpellCast{
 			Cast: Cast{
@@ -98,17 +97,8 @@ func (gft *GnomishFlameTurret) newFlameCannonTemplate(sim *Simulation) SimpleSpe
 		},
 	}
 
-	return NewSimpleSpellTemplate(spell)
-}
-
-func (gft *GnomishFlameTurret) NewFlameCannon(sim *Simulation, target *Target) *SimpleSpell {
-	// Initialize cast from precomputed template.
-	fc := &gft.flameCannon
-	gft.flameCannonTemplate.Apply(fc)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	fc.Effect.Target = target
-	fc.Init(sim)
-
-	return fc
+	gft.FlameCannon = gft.RegisterSpell(SpellConfig{
+		Template:   spell,
+		ModifyCast: ModifyCastAssignTarget,
+	})
 }

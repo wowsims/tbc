@@ -20,7 +20,7 @@ func (shaman *Shaman) ShockCD() time.Duration {
 }
 
 // Shared logic for all shocks.
-func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32, spellSchool core.SpellSchool, baseManaCost float64) core.SimpleSpell {
+func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, spellSchool core.SpellSchool, baseManaCost float64) core.SpellConfig {
 	cost := core.ResourceCost{Type: stats.Mana, Value: baseManaCost}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -82,90 +82,54 @@ func (shaman *Shaman) newShockTemplateSpell(sim *core.Simulation, spellID int32,
 		}
 	}
 
-	return spell
-}
+	return core.SpellConfig{
+		Template: spell,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effect.Target = target
 
-// Shared shock logic that is dynamic, i.e. can't be precomputed.
-func (shaman *Shaman) applyShockInitModifiers(spellCast *core.SpellCast) {
-	if shaman.ElementalFocusStacks > 0 {
-		// Reduces mana cost by 40%
-		spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.4
+			spellCast := &instance.SpellCast
+			if shaman.ElementalFocusStacks > 0 {
+				// Reduces mana cost by 40%
+				spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.4
+			}
+			if shaman.HasAura(ShamanisticFocusAuraID) {
+				spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.6
+			}
+			if shaman.HasAura(ElementalMasteryAuraID) {
+				spellCast.Cost.Value = 0
+			}
+		},
 	}
-	if shaman.HasAura(ShamanisticFocusAuraID) {
-		spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.6
-	}
-	if shaman.HasAura(ElementalMasteryAuraID) {
-		spellCast.Cost.Value = 0
-	}
 }
 
-func (shaman *Shaman) newEarthShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := shaman.newShockTemplateSpell(sim, SpellIDEarthShock, core.SpellSchoolNature, 535.0)
-	spell.SpellExtras |= core.SpellExtrasBinary
+func (shaman *Shaman) registerEarthShockSpell(sim *core.Simulation) {
+	config := shaman.newShockSpellConfig(sim, SpellIDEarthShock, core.SpellSchoolNature, 535.0)
+	config.Template.SpellExtras |= core.SpellExtrasBinary
+	config.Template.Effect.BaseDamage = core.BaseDamageConfigMagic(661, 696, 0.386)
 
-	spell.Effect.BaseDamage = core.BaseDamageConfigMagic(661, 696, 0.386)
-
-	return core.NewSimpleSpellTemplate(spell)
+	shaman.EarthShock = shaman.RegisterSpell(config)
 }
 
-func (shaman *Shaman) NewEarthShock(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	shock := &shaman.shockSpell
-	shaman.earthShockTemplate.Apply(shock)
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	shock.Effect.Target = target
-	shaman.applyShockInitModifiers(&shock.SpellCast)
-	shock.Init(sim)
+func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation) {
+	config := shaman.newShockSpellConfig(sim, SpellIDFlameShock, core.SpellSchoolFire, 500.0)
 
-	return shock
-}
-
-func (shaman *Shaman) newFlameShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := shaman.newShockTemplateSpell(sim, SpellIDFlameShock, core.SpellSchoolFire, 500.0)
-
-	spell.Effect.BaseDamage = core.BaseDamageConfigMagic(377, 377, 0.214)
-	spell.Effect.DotInput = core.DotDamageInput{
+	config.Template.Effect.BaseDamage = core.BaseDamageConfigMagic(377, 377, 0.214)
+	config.Template.Effect.DotInput = core.DotDamageInput{
 		NumberOfTicks:  4,
 		TickLength:     time.Second * 3,
 		TickBaseDamage: core.DotSnapshotFuncMagic(420/4, 0.1),
 		DebuffID:       FlameShockDebuffID,
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
+	shaman.FlameShock = shaman.RegisterSpell(config)
 }
 
-func (shaman *Shaman) NewFlameShock(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	if shaman.FlameShockSpell.IsInUse() {
-		// Cancel old cast, i.e. overwrite the dot.
-		shaman.FlameShockSpell.Cancel(sim)
-	}
+func (shaman *Shaman) registerFrostShockSpell(sim *core.Simulation) {
+	config := shaman.newShockSpellConfig(sim, SpellIDFrostShock, core.SpellSchoolFrost, 525.0)
+	config.Template.SpellExtras |= core.SpellExtrasBinary
 
-	shock := &shaman.FlameShockSpell
-	shaman.flameShockTemplate.Apply(shock)
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	shock.Effect.Target = target
-	shaman.applyShockInitModifiers(&shock.SpellCast)
-	shock.Init(sim)
+	config.Template.Effect.BaseDamage = core.BaseDamageConfigMagic(647, 683, 0.386)
+	config.Template.Effect.ThreatMultiplier *= 2
 
-	return shock
-}
-
-func (shaman *Shaman) newFrostShockTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := shaman.newShockTemplateSpell(sim, SpellIDFrostShock, core.SpellSchoolFrost, 525.0)
-	spell.SpellExtras |= core.SpellExtrasBinary
-
-	spell.Effect.BaseDamage = core.BaseDamageConfigMagic(647, 683, 0.386)
-	spell.Effect.ThreatMultiplier *= 2
-
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (shaman *Shaman) NewFrostShock(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	shock := &shaman.shockSpell
-	shaman.frostShockTemplate.Apply(shock)
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	shock.Effect.Target = target
-	shaman.applyShockInitModifiers(&shock.SpellCast)
-	shock.Init(sim)
-
-	return shock
+	shaman.FrostShock = shaman.RegisterSpell(config)
 }

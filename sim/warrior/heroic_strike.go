@@ -8,7 +8,7 @@ import (
 
 var HeroicStrikeActionID = core.ActionID{SpellID: 29707}
 
-func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerHeroicStrikeSpell(_ *core.Simulation) {
 	warrior.heroicStrikeCost = 15.0 - float64(warrior.Talents.ImprovedHeroicStrike) - float64(warrior.Talents.FocusedRage)
 
 	ability := core.SimpleSpell{
@@ -46,7 +46,10 @@ func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleS
 		}
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
+	warrior.HeroicStrike = warrior.RegisterSpell(core.SpellConfig{
+		Template:   ability,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 func (warrior *Warrior) QueueHeroicStrike(_ *core.Simulation) {
@@ -57,7 +60,7 @@ func (warrior *Warrior) QueueHeroicStrike(_ *core.Simulation) {
 }
 
 // Returns true if the regular melee swing should be used, false otherwise.
-func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.SimpleSpell {
+func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.SimpleSpellTemplate {
 	if !warrior.heroicStrikeQueued {
 		return nil
 	}
@@ -67,14 +70,7 @@ func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.SimpleSpell 
 		return nil
 	}
 
-	target := sim.GetPrimaryTarget()
-	hs := &warrior.heroicStrike
-	warrior.heroicStrikeTemplate.Apply(hs)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hs.Effect.Target = target
-
-	return hs
+	return warrior.HeroicStrike
 }
 
 func (warrior *Warrior) CanHeroicStrike(sim *core.Simulation) bool {

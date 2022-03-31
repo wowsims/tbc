@@ -45,32 +45,15 @@ type Warrior struct {
 	CastDefensiveStance func(*core.Simulation)
 	CastBerserkerStance func(*core.Simulation)
 
-	bloodthirstTemplate core.SimpleSpellTemplate
-	bloodthirst         core.SimpleSpell
-
-	demoralizingShoutTemplate core.SimpleSpellTemplate
-	demoralizingShout         core.SimpleSpell
-
-	devastateTemplate core.SimpleSpellTemplate
-	devastate         core.SimpleSpell
-
-	heroicStrikeTemplate core.SimpleSpellTemplate
-	heroicStrike         core.SimpleSpell
-
-	revengeTemplate core.SimpleSpellTemplate
-	revenge         core.SimpleSpell
-
-	shieldSlamTemplate core.SimpleSpellTemplate
-	shieldSlam         core.SimpleSpell
-
-	sunderArmorTemplate core.SimpleSpellTemplate
-	sunderArmor         core.SimpleSpell
-
-	thunderClapTemplate core.SimpleSpellTemplate
-	thunderClap         core.SimpleSpell
-
-	whirlwindTemplate core.SimpleSpellTemplate
-	whirlwind         core.SimpleSpell
+	Bloodthirst       *core.SimpleSpellTemplate
+	DemoralizingShout *core.SimpleSpellTemplate
+	Devastate         *core.SimpleSpellTemplate
+	HeroicStrike      *core.SimpleSpellTemplate
+	Revenge           *core.SimpleSpellTemplate
+	ShieldSlam        *core.SimpleSpellTemplate
+	SunderArmor       *core.SimpleSpellTemplate
+	ThunderClap       *core.SimpleSpellTemplate
+	Whirlwind         *core.SimpleSpellTemplate
 }
 
 func (warrior *Warrior) GetCharacter() *core.Character {
@@ -109,15 +92,15 @@ func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.CastDefensiveStance = warrior.makeCastStance(sim, DefensiveStance, warrior.DefensiveStanceAura())
 	warrior.CastBerserkerStance = warrior.makeCastStance(sim, BerserkerStance, warrior.BerserkerStanceAura())
 
-	warrior.bloodthirstTemplate = warrior.newBloodthirstTemplate(sim)
-	warrior.demoralizingShoutTemplate = warrior.newDemoralizingShoutTemplate(sim)
-	warrior.devastateTemplate = warrior.newDevastateTemplate(sim)
-	warrior.heroicStrikeTemplate = warrior.newHeroicStrikeTemplate(sim)
-	warrior.revengeTemplate = warrior.newRevengeTemplate(sim)
-	warrior.shieldSlamTemplate = warrior.newShieldSlamTemplate(sim)
-	warrior.sunderArmorTemplate = warrior.newSunderArmorTemplate(sim)
-	warrior.thunderClapTemplate = warrior.newThunderClapTemplate(sim)
-	warrior.whirlwindTemplate = warrior.newWhirlwindTemplate(sim)
+	warrior.registerBloodthirstSpell(sim)
+	warrior.registerDemoralizingShoutSpell(sim)
+	warrior.registerDevastateSpell(sim)
+	warrior.registerHeroicStrikeSpell(sim)
+	warrior.registerRevengeSpell(sim)
+	warrior.registerShieldSlamSpell(sim)
+	warrior.registerSunderArmorSpell(sim)
+	warrior.registerThunderClapSpell(sim)
+	warrior.registerWhirlwindSpell(sim)
 
 	warrior.shoutDuration = time.Duration(float64(time.Minute*2) * (1 + 0.1*float64(warrior.Talents.BoomingVoice)))
 }

@@ -9,7 +9,7 @@ import (
 
 var SteadyShotActionID = core.ActionID{SpellID: 34120}
 
-func (hunter *Hunter) newSteadyShotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (hunter *Hunter) registerSteadyShotSpell(sim *core.Simulation) {
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -62,19 +62,13 @@ func (hunter *Hunter) newSteadyShotTemplate(sim *core.Simulation) core.SimpleSpe
 		ama.Effect.DamageMultiplier *= 1.1
 	}
 
-	return core.NewSimpleSpellTemplate(ama)
-}
-
-func (hunter *Hunter) NewSteadyShot(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	ss := &hunter.steadyShot
-	hunter.steadyShotTemplate.Apply(ss)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ss.CastTime = hunter.SteadyShotCastTime()
-	ss.Effect.Target = target
-
-	ss.Init(sim)
-	return ss
+	hunter.SteadyShot = hunter.RegisterSpell(core.SpellConfig{
+		Template: ama,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effect.Target = target
+			instance.CastTime = hunter.SteadyShotCastTime()
+		},
+	})
 }
 
 func (hunter *Hunter) SteadyShotCastTime() time.Duration {

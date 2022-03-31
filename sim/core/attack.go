@@ -12,7 +12,7 @@ import (
 //  If it returns nil, the attack takes place as normal. If it returns an ability,
 //  that ability is used in place of the attack.
 //  This allows for abilities that convert a white attack into yellow attack.
-type ReplaceMHSwing func(sim *Simulation) *SimpleSpell
+type ReplaceMHSwing func(sim *Simulation) *SimpleSpellTemplate
 
 // Represents a generic weapon. Pets / unarmed / various other cases dont use
 // actual weapon items so this is an abstraction of a Weapon.
@@ -417,24 +417,26 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		return
 	}
 
-	// Allow MH swing to be overridden for abilities like Heroic Strike.
-	var replaceAMA *SimpleSpell
+	var replaceAMA *SimpleSpellTemplate
 	if aa.ReplaceMHSwing != nil {
 		replaceAMA = aa.ReplaceMHSwing(sim)
 	}
 
-	ptr := &aa.cachedMelee
+	// Allow MH swing to be overridden for abilities like Heroic Strike.
 	if replaceAMA == nil {
+		ptr := &aa.cachedMelee
 		aa.cachedMelee = aa.MHAuto
 		aa.cachedMelee.Effect.Target = target
+		ptr.Cast(sim)
+		aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
+		aa.previousMHSwingAt = sim.CurrentTime
+		aa.agent.OnAutoAttack(sim, ptr)
 	} else {
-		ptr = replaceAMA
+		replaceAMA.Cast(sim, sim.GetPrimaryTarget())
+		aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
+		aa.previousMHSwingAt = sim.CurrentTime
+		aa.agent.OnAutoAttack(sim, &replaceAMA.Instance)
 	}
-
-	ptr.Cast(sim)
-	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
-	aa.previousMHSwingAt = sim.CurrentTime
-	aa.agent.OnAutoAttack(sim, ptr)
 }
 
 // Performs an autoattack using the main hand weapon, if the OH CD is ready.

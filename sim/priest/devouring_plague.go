@@ -11,53 +11,42 @@ const SpellIDDevouringPlague int32 = 25467
 
 var DevouringPlagueCooldownID = core.NewCooldownID()
 
-func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 1145}
-	baseCast := core.Cast{
-		ActionID: core.ActionID{
-			SpellID:    SpellIDDevouringPlague,
-			CooldownID: DevouringPlagueCooldownID,
-		},
-		Character:   &priest.Character,
-		SpellSchool: core.SpellSchoolShadow,
-		BaseCost:    cost,
-		Cost:        cost,
-		CastTime:    0,
-		GCD:         core.GCDDefault,
-		Cooldown:    time.Minute * 3,
-	}
 
-	effect := core.SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:  8,
-			TickLength:     time.Second * 3,
-			TickBaseDamage: core.DotSnapshotFuncMagic(1216/8, 0.1),
-		},
-	}
-
-	priest.applyTalentsToShadowSpell(&baseCast, &effect)
-
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
+	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
-			Cast:                baseCast,
+			Cast: core.Cast{
+				ActionID: core.ActionID{
+					SpellID:    SpellIDDevouringPlague,
+					CooldownID: DevouringPlagueCooldownID,
+				},
+				Character:   &priest.Character,
+				SpellSchool: core.SpellSchoolShadow,
+				BaseCost:    cost,
+				Cost:        cost,
+				CastTime:    0,
+				GCD:         core.GCDDefault,
+				Cooldown:    time.Minute * 3,
+			},
 			CritRollCategory:    core.CritRollCategoryMagical,
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
-		Effect: effect,
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			DotInput: core.DotDamageInput{
+				NumberOfTicks:  8,
+				TickLength:     time.Second * 3,
+				TickBaseDamage: core.DotSnapshotFuncMagic(1216/8, 0.1),
+			},
+		},
+	}
+
+	priest.applyTalentsToShadowSpell(&template.SpellCast.Cast, &template.Effect)
+
+	priest.DevouringPlague = priest.RegisterSpell(core.SpellConfig{
+		Template:   template,
+		ModifyCast: core.ModifyCastAssignTarget,
 	})
-}
-
-func (priest *Priest) NewDevouringPlague(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	mf := &priest.DevouringPlagueSpell
-
-	priest.devouringPlagueTemplate.Apply(mf)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Effect.Target = target
-	mf.Init(sim)
-
-	return mf
 }

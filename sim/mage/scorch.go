@@ -9,7 +9,7 @@ import (
 
 const SpellIDScorch int32 = 27074
 
-func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -68,17 +68,8 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 		}
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) NewScorch(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	scorch := &mage.scorchSpell
-	mage.scorchCastTemplate.Apply(scorch)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	scorch.Effect.Target = target
-	scorch.Init(sim)
-
-	return scorch
+	mage.Scorch = mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

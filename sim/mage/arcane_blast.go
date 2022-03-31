@@ -11,7 +11,7 @@ const SpellIDArcaneBlast int32 = 30451
 const ArcaneBlastBaseManaCost = 195.0
 const ArcaneBlastBaseCastTime = time.Millisecond * 2500
 
-func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerArcaneBlastSpell(sim *core.Simulation) {
 	abAura := core.Aura{
 		ID:       ArcaneBlastAuraID,
 		ActionID: core.ActionID{SpellID: 36032},
@@ -19,9 +19,9 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 		Stacks:   0,
 		OnExpire: func(sim *core.Simulation) {
 			// Reset the mana cost on expiration.
-			if mage.arcaneBlastSpell.IsInUse() {
-				mage.arcaneBlastSpell.Cost.Value = core.MaxFloat(0, mage.arcaneBlastSpell.Cost.Value-3.0*ArcaneBlastBaseManaCost*0.75)
-				mage.arcaneBlastSpell.ActionID.Tag = 1
+			if mage.ArcaneBlast.Instance.IsInUse() {
+				mage.ArcaneBlast.Instance.Cost.Value = core.MaxFloat(0, mage.ArcaneBlast.Instance.Cost.Value-3.0*ArcaneBlastBaseManaCost*0.75)
+				mage.ArcaneBlast.Instance.ActionID.Tag = 1
 			}
 		},
 	}
@@ -67,37 +67,45 @@ func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellT
 		spell.Cost.Value += 0.2 * ArcaneBlastBaseManaCost
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
+	mage.ArcaneBlast = mage.RegisterSpell(core.SpellConfig{
+		Template: spell,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			numStacks := mage.NumStacks(ArcaneBlastAuraID)
+			instance.CastTime -= time.Duration(numStacks) * time.Second / 3
+			instance.Cost.Value += float64(numStacks) * ArcaneBlastBaseManaCost * 0.75
+			instance.ActionID.Tag = numStacks + 1
+
+			// Set dynamic fields, i.e. the stuff we couldn't precompute.
+			instance.Effect.Target = target
+		},
+	})
 }
 
-func (mage *Mage) NewArcaneBlast(sim *core.Simulation, target *core.Target) (*core.SimpleSpell, int32) {
-	// Initialize cast from precomputed template.
-	arcaneBlast := &mage.arcaneBlastSpell
-	mage.arcaneBlastCastTemplate.Apply(arcaneBlast)
+func (mage *Mage) ArcaneBlastCastTime(numStacks int32) time.Duration {
+	castTime := mage.ArcaneBlast.Template.CastTime
+	castTime -= time.Duration(numStacks) * time.Second / 3
+	castTime = time.Duration(float64(castTime) / mage.CastSpeed())
+	return castTime
+}
 
-	numStacks := mage.NumStacks(ArcaneBlastAuraID)
-	arcaneBlast.CastTime -= time.Duration(numStacks) * time.Second / 3
-	arcaneBlast.Cost.Value += float64(numStacks) * ArcaneBlastBaseManaCost * 0.75
-	arcaneBlast.ActionID.Tag = numStacks + 1
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	arcaneBlast.Effect.Target = target
-	arcaneBlast.Init(sim)
-
-	return arcaneBlast, numStacks
+func (mage *Mage) ArcaneBlastManaCost(numStacks int32) float64 {
+	cost := mage.ArcaneBlast.Template.Cost.Value
+	cost += float64(numStacks) * ArcaneBlastBaseManaCost * 0.75
+	mage.ArcaneBlast.Template.ApplyCostModifiers(&cost)
+	return cost
 }
 
 var ArcaneBlastAuraID = core.NewAuraID()
 
 // Whether Arcane Blast stacks will fall off before a new blast could finish casting.
-func (mage *Mage) willDropArcaneBlastStacks(sim *core.Simulation, curArcaneBlast *core.SimpleSpell, numStacks int32) bool {
+func (mage *Mage) willDropArcaneBlastStacks(sim *core.Simulation, castTime time.Duration, numStacks int32) bool {
 	remainingBuffTime := mage.RemainingAuraDuration(sim, ArcaneBlastAuraID)
 
-	return numStacks == 0 || remainingBuffTime < curArcaneBlast.CastTime
+	return numStacks == 0 || remainingBuffTime < castTime
 }
 
 // Determines whether we can spam arcane blast for the remainder of the encounter.
-func (mage *Mage) canBlast(sim *core.Simulation, curArcaneBlast *core.SimpleSpell, numStacks int32, willDropStacks bool) bool {
+func (mage *Mage) canBlast(sim *core.Simulation, curManaCost float64, curCastTime time.Duration, numStacks int32, willDropStacks bool) bool {
 	numStacksAfterFirstCast := numStacks + 1
 	if willDropStacks {
 		numStacksAfterFirstCast = 1
@@ -113,8 +121,8 @@ func (mage *Mage) canBlast(sim *core.Simulation, curArcaneBlast *core.SimpleSpel
 	}
 
 	// First cast, which is curArcaneBlast
-	projectedRemainingMana -= curArcaneBlast.Cost.Value
-	remainingDuration -= curArcaneBlast.CastTime
+	projectedRemainingMana -= curManaCost
+	remainingDuration -= curCastTime
 	if projectedRemainingMana < 0 {
 		return false
 	} else if remainingDuration < 0 {

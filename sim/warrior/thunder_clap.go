@@ -10,7 +10,7 @@ import (
 var ThunderClapCooldownID = core.NewCooldownID()
 var ThunderClapActionID = core.ActionID{SpellID: 25264, CooldownID: ThunderClapCooldownID}
 
-func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 	warrior.thunderClapCost = 20.0 - float64(warrior.Talents.FocusedRage)
 	impTCDamageMult := 1.0
 	if warrior.Talents.ImprovedThunderClap == 1 {
@@ -71,13 +71,9 @@ func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.Simple
 	}
 	ability.Effects = effects
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (warrior *Warrior) NewThunderClap(_ *core.Simulation) *core.SimpleSpell {
-	tc := &warrior.thunderClap
-	warrior.thunderClapTemplate.Apply(tc)
-	return tc
+	warrior.ThunderClap = warrior.RegisterSpell(core.SpellConfig{
+		Template: ability,
+	})
 }
 
 func (warrior *Warrior) CanThunderClap(sim *core.Simulation) bool {

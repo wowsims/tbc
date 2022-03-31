@@ -9,7 +9,7 @@ import (
 
 const SpellIDSearingTotem int32 = 25533
 
-func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (shaman *Shaman) registerSearingTotemSpell(sim *core.Simulation) {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 205}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -56,26 +56,15 @@ func (shaman *Shaman) newSearingTotemTemplate(sim *core.Simulation) core.SimpleS
 		shaman.tryTwistFireNova(sim)
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (shaman *Shaman) NewSearingTotem(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	searingTotem := &shaman.FireTotemSpell
-	shaman.searingTotemTemplate.Apply(searingTotem)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	searingTotem.Effect.Target = target
-	searingTotem.Init(sim)
-
-	return searingTotem
+	shaman.SearingTotem = shaman.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 const SpellIDMagmaTotem int32 = 25552
 
-// This is probably not worth simming since no other spell in the game does this and AM isn't
-// even a popular choice for arcane mages.
-func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (shaman *Shaman) registerMagmaTotemSpell(sim *core.Simulation) {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 800}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -126,18 +115,9 @@ func (shaman *Shaman) newMagmaTotemTemplate(sim *core.Simulation) core.SimpleSpe
 	}
 	spell.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (shaman *Shaman) NewMagmaTotem(sim *core.Simulation) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	magmaTotem := &shaman.FireTotemSpell
-	shaman.magmaTotemTemplate.Apply(magmaTotem)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	magmaTotem.Init(sim)
-
-	return magmaTotem
+	shaman.MagmaTotem = shaman.RegisterSpell(core.SpellConfig{
+		Template: spell,
+	})
 }
 
 const SpellIDNovaTotem int32 = 25537
@@ -150,7 +130,7 @@ func (shaman *Shaman) FireNovaTickLength() time.Duration {
 
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
-func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (shaman *Shaman) registerNovaTotemSpell(sim *core.Simulation) {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 765}
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -206,21 +186,7 @@ func (shaman *Shaman) newNovaTotemTemplate(sim *core.Simulation) core.SimpleSpel
 	}
 	spell.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (shaman *Shaman) NewNovaTotem(sim *core.Simulation) *core.SimpleSpell {
-	// If we drop nova while another totem is running, cancel it.
-	if shaman.FireTotemSpell.IsInUse() {
-		shaman.FireTotemSpell.Cancel(sim)
-	}
-
-	// Initialize cast from precomputed template.
-	novaTotem := &shaman.FireTotemSpell
-	shaman.novaTotemTemplate.Apply(novaTotem)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	novaTotem.Init(sim)
-
-	return novaTotem
+	shaman.FireNovaTotem = shaman.RegisterSpell(core.SpellConfig{
+		Template: spell,
+	})
 }

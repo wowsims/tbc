@@ -11,7 +11,7 @@ const SpellIDFireBlast int32 = 27079
 
 var FireBlastCooldownID = core.NewCooldownID()
 
-func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerFireBlastSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -52,17 +52,8 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
 	spell.Effect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) NewFireBlast(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	fireBlast := &mage.fireBlastSpell
-	mage.fireBlastCastTemplate.Apply(fireBlast)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	fireBlast.Effect.Target = target
-	fireBlast.Init(sim)
-
-	return fireBlast
+	mage.FireBlast = mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

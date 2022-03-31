@@ -225,6 +225,33 @@ func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
 	characterMetrics.actions[actionKey] = actionMetrics
 }
 
+// Adds the results of a spell to the character metrics.
+func (characterMetrics *CharacterMetrics) addSpell(spell *SimpleSpellTemplate) {
+	actionID := spell.ActionID
+	actionKey := NewActionKey(actionID)
+	actionMetrics, ok := characterMetrics.actions[actionKey]
+
+	if !ok {
+		actionMetrics.ActionID = actionID
+		actionMetrics.IsMelee = spell.Template.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical)
+	}
+
+	actionMetrics.Casts += spell.Casts
+	actionMetrics.Misses += spell.Misses
+	actionMetrics.Hits += spell.Hits
+	actionMetrics.Crits += spell.Crits
+	actionMetrics.Dodges += spell.Dodges
+	actionMetrics.Parries += spell.Parries
+	actionMetrics.Blocks += spell.Blocks
+	actionMetrics.Glances += spell.Glances
+	actionMetrics.Damage += spell.TotalDamage
+	actionMetrics.Threat += spell.TotalThreat
+	characterMetrics.dps.Total += spell.TotalDamage
+	characterMetrics.threat.Total += spell.TotalThreat
+
+	characterMetrics.actions[actionKey] = actionMetrics
+}
+
 // This should be called at the end of each iteration, to include metrics from Pets in
 // those of their owner.
 // Assumes that doneIteration() has already been called on the pet metrics.

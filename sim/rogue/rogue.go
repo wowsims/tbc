@@ -54,50 +54,28 @@ type Rogue struct {
 
 	shivEnergyCost    float64
 	builderEnergyCost float64
-	newBuilder        func(sim *core.Simulation, target *core.Target) *core.SimpleSpell
+	CastBuilder       func(sim *core.Simulation, target *core.Target)
 
-	sinisterStrikeTemplate core.SimpleSpellTemplate
-	sinisterStrike         core.SimpleSpell
+	eviscerateEnergyCost float64
+	envenomEnergyCost    float64
+	deadlyPoisonStacks   int
 
-	backstabTemplate core.SimpleSpellTemplate
-	backstab         core.SimpleSpell
-
-	hemorrhageTemplate core.SimpleSpellTemplate
-	hemorrhage         core.SimpleSpell
-
-	mutilateTemplate core.SimpleSpellTemplate
-	mutilate         core.SimpleSpell
-
-	shivTemplate core.SimpleSpellTemplate
-	shiv         core.SimpleSpell
+	Backstab            *core.SimpleSpellTemplate
+	DeadlyPoisonRefresh *core.SimpleSpellTemplate
+	DeadlyPoison        *core.SimpleSpellTemplate
+	Envenom             *core.SimpleSpellTemplate
+	Eviscerate          *core.SimpleSpellTemplate
+	ExposeArmor         *core.SimpleSpellTemplate
+	Hemorrhage          *core.SimpleSpellTemplate
+	InstantPoison       *core.SimpleSpellTemplate
+	Mutilate            *core.SimpleSpellTemplate
+	Rupture             *core.SimpleSpellTemplate
+	Shiv                *core.SimpleSpellTemplate
+	SinisterStrike      *core.SimpleSpellTemplate
 
 	finishingMoveEffectApplier func(sim *core.Simulation, numPoints int32)
 
 	castSliceAndDice func()
-
-	eviscerateEnergyCost float64
-	eviscerateTemplate   core.SimpleSpellTemplate
-	eviscerate           core.SimpleSpell
-
-	envenomEnergyCost float64
-	envenomTemplate   core.SimpleSpellTemplate
-	envenom           core.SimpleSpell
-
-	exposeArmorTemplate core.SimpleSpellTemplate
-	exposeArmor         core.SimpleSpell
-
-	ruptureTemplate core.SimpleSpellTemplate
-	rupture         core.SimpleSpell
-
-	deadlyPoisonStacks   int
-	deadlyPoisonTemplate core.SimpleSpellTemplate
-	deadlyPoison         core.SimpleSpell
-
-	deadlyPoisonRefreshTemplate core.SimpleSpellTemplate
-	deadlyPoisonRefresh         core.SimpleSpell
-
-	instantPoisonTemplate core.SimpleSpellTemplate
-	instantPoison         core.SimpleSpell
 }
 
 func (rogue *Rogue) GetCharacter() *core.Character {
@@ -154,22 +132,21 @@ func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) 
 }
 
 func (rogue *Rogue) Init(sim *core.Simulation) {
-	// Precompute all the spell templates.
-	rogue.sinisterStrikeTemplate = rogue.newSinisterStrikeTemplate(sim)
-	rogue.backstabTemplate = rogue.newBackstabTemplate(sim)
-	rogue.hemorrhageTemplate = rogue.newHemorrhageTemplate(sim)
-	rogue.mutilateTemplate = rogue.newMutilateTemplate(sim)
-	rogue.shivTemplate = rogue.newShivTemplate(sim)
+	rogue.registerBackstabSpell(sim)
+	rogue.registerDeadlyPoisonSpell(sim)
+	rogue.registerDeadlyPoisonRefreshSpell(sim)
+	rogue.registerEviscerateSpell(sim)
+	rogue.registerExposeArmorSpell(sim)
+	rogue.registerHemorrhageSpell(sim)
+	rogue.registerInstantPoisonSpell(sim)
+	rogue.registerMutilateSpell(sim)
+	rogue.registerRuptureSpell(sim)
+	rogue.registerShivSpell(sim)
+	rogue.registerSinisterStrikeSpell(sim)
 
 	rogue.finishingMoveEffectApplier = rogue.makeFinishingMoveEffectApplier(sim)
 
 	rogue.initSliceAndDice(sim)
-	rogue.eviscerateTemplate = rogue.newEviscerateTemplate(sim)
-	rogue.exposeArmorTemplate = rogue.newExposeArmorTemplate(sim)
-	rogue.ruptureTemplate = rogue.newRuptureTemplate(sim)
-	rogue.deadlyPoisonTemplate = rogue.newDeadlyPoisonTemplate(sim)
-	rogue.deadlyPoisonRefreshTemplate = rogue.newDeadlyPoisonRefreshTemplate(sim)
-	rogue.instantPoisonTemplate = rogue.newInstantPoisonTemplate(sim)
 
 	rogue.energyPerSecondAvg = core.EnergyPerTick / core.EnergyTickDuration.Seconds()
 
@@ -258,40 +235,40 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		}
 	}
 
-	var newBuilder func(sim *core.Simulation, target *core.Target) *core.SimpleSpell
+	var CastBuilder func(sim *core.Simulation, target *core.Target)
 	switch rogue.Rotation.Builder {
 	case proto.Rogue_Rotation_SinisterStrike:
 		rogue.builderEnergyCost = rogue.SinisterStrikeEnergyCost()
-		newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-			return rogue.NewSinisterStrike(sim, target)
+		CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			rogue.SinisterStrike.Cast(sim, target)
 		}
 	case proto.Rogue_Rotation_Backstab:
 		rogue.builderEnergyCost = BackstabEnergyCost
-		newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-			return rogue.NewBackstab(sim, target)
+		CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			rogue.Backstab.Cast(sim, target)
 		}
 	case proto.Rogue_Rotation_Hemorrhage:
 		rogue.builderEnergyCost = HemorrhageEnergyCost
-		newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-			return rogue.NewHemorrhage(sim, target)
+		CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			rogue.Hemorrhage.Cast(sim, target)
 		}
 	case proto.Rogue_Rotation_Mutilate:
 		rogue.builderEnergyCost = MutilateEnergyCost
-		newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-			return rogue.NewMutilate(sim, target)
+		CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			rogue.Mutilate.Cast(sim, target)
 		}
 	}
 
 	if rogue.Rotation.UseShiv && rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueDeadlyPoison {
-		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-			if rogue.deadlyPoison.Effect.DotInput.IsTicking(sim) && rogue.deadlyPoison.Effect.DotInput.TimeRemaining(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.shivEnergyCost {
-				return rogue.NewShiv(sim, target)
+		rogue.CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			if rogue.DeadlyPoison.Instance.Effect.DotInput.IsTicking(sim) && rogue.DeadlyPoison.Instance.Effect.DotInput.TimeRemaining(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.shivEnergyCost {
+				rogue.Shiv.Cast(sim, target)
 			} else {
-				return newBuilder(sim, target)
+				CastBuilder(sim, target)
 			}
 		}
 	} else {
-		rogue.newBuilder = newBuilder
+		rogue.CastBuilder = CastBuilder
 	}
 
 	maxEnergy := 100.0

@@ -9,7 +9,7 @@ import (
 
 const SpellIDConsecration int32 = 27173
 
-func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (paladin *Paladin) registerConsecrationSpell(sim *core.Simulation) {
 
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -55,17 +55,7 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 	}
 	spell.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (paladin *Paladin) NewConsecration(sim *core.Simulation) *core.SimpleSpell {
-	paladin.ConsecrationSpell.Cancel(sim)
-
-	consecration := &paladin.ConsecrationSpell
-	paladin.consecrationTemplate.Apply(consecration)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	consecration.Init(sim)
-
-	return consecration
+	paladin.Consecration = paladin.RegisterSpell(core.SpellConfig{
+		Template: spell,
+	})
 }

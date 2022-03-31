@@ -8,7 +8,7 @@ import (
 
 var SunderArmorActionID = core.ActionID{SpellID: 25225}
 
-func (warrior *Warrior) newSunderArmorTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerSunderArmorSpell(_ *core.Simulation) {
 	warrior.sunderArmorCost = 15.0 - float64(warrior.Talents.ImprovedSunderArmor) - float64(warrior.Talents.FocusedRage)
 
 	ability := core.SimpleSpell{
@@ -52,17 +52,10 @@ func (warrior *Warrior) newSunderArmorTemplate(_ *core.Simulation) core.SimpleSp
 		}
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (warrior *Warrior) NewSunderArmor(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	sa := &warrior.sunderArmor
-	warrior.sunderArmorTemplate.Apply(sa)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sa.Effect.Target = target
-
-	return sa
+	warrior.SunderArmor = warrior.RegisterSpell(core.SpellConfig{
+		Template:   ability,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 func (warrior *Warrior) CanSunderArmor(sim *core.Simulation, target *core.Target) bool {

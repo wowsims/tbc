@@ -10,7 +10,7 @@ var RuptureActionID = core.ActionID{SpellID: 26867}
 var RuptureDebuffID = core.NewDebuffID()
 var RuptureEnergyCost = 25.0
 
-func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	ability := rogue.newAbility(RuptureActionID, RuptureEnergyCost, SpellFlagFinisher|core.SpellExtrasIgnoreResists, core.ProcMaskMeleeMHSpecial)
@@ -41,30 +41,18 @@ func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTem
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (rogue *Rogue) NewRupture(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	comboPoints := rogue.ComboPoints()
-	if comboPoints == 0 {
-		panic("Rupture requires combo points!")
-	}
-
-	rp := &rogue.rupture
-	rogue.ruptureTemplate.Apply(rp)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	rp.ActionID.Tag = comboPoints
-	rp.Effect.Target = target
-	rp.Effect.DotInput.NumberOfTicks = int(comboPoints) + 3
-
-	if rogue.deathmantle4pcProc {
-		rp.Cost.Value = 0
-		rogue.deathmantle4pcProc = false
-	}
-
-	rp.Init(sim)
-	return rp
+	rogue.Rupture = rogue.RegisterSpell(core.SpellConfig{
+		Template: ability,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.ActionID.Tag = rogue.ComboPoints()
+			instance.Effect.Target = target
+			instance.Effect.DotInput.NumberOfTicks = int(rogue.ComboPoints()) + 3
+			if rogue.deathmantle4pcProc {
+				instance.Cost.Value = 0
+				rogue.deathmantle4pcProc = false
+			}
+		},
+	})
 }
 
 func (rogue *Rogue) RuptureDuration(comboPoints int32) time.Duration {

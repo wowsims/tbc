@@ -17,7 +17,7 @@ func (rogue *Rogue) applyPoisons() {
 var DeadlyPoisonAuraID = core.NewAuraID()
 var DeadlyPoisonDebuffID = core.NewDebuffID()
 
-func (rogue *Rogue) newDeadlyPoisonTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerDeadlyPoisonSpell(_ *core.Simulation) {
 	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -40,10 +40,13 @@ func (rogue *Rogue) newDeadlyPoisonTemplate(_ *core.Simulation) core.SimpleSpell
 			},
 		},
 	}
-	return core.NewSimpleSpellTemplate(cast)
+	rogue.DeadlyPoison = rogue.RegisterSpell(core.SpellConfig{
+		Template:   cast,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
-func (rogue *Rogue) newDeadlyPoisonRefreshTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerDeadlyPoisonRefreshSpell(_ *core.Simulation) {
 	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -66,12 +69,15 @@ func (rogue *Rogue) newDeadlyPoisonRefreshTemplate(_ *core.Simulation) core.Simp
 
 				const tickDamagePerStack = 180.0 / 4.0
 				rogue.deadlyPoisonStacks = core.MinInt(rogue.deadlyPoisonStacks+1, 5)
-				rogue.deadlyPoison.Effect.DotInput.SetTickDamage(tickDamagePerStack * float64(rogue.deadlyPoisonStacks))
-				rogue.deadlyPoison.Effect.DotInput.RefreshDot(sim)
+				rogue.DeadlyPoison.Instance.Effect.DotInput.SetTickDamage(tickDamagePerStack * float64(rogue.deadlyPoisonStacks))
+				rogue.DeadlyPoison.Instance.Effect.DotInput.RefreshDot(sim)
 			},
 		},
 	}
-	return core.NewSimpleSpellTemplate(cast)
+	rogue.DeadlyPoisonRefresh = rogue.RegisterSpell(core.SpellConfig{
+		Template:   cast,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
@@ -103,25 +109,17 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 }
 
 func (rogue *Rogue) procDeadlyPoison(sim *core.Simulation, spellEffect *core.SpellEffect) {
-	if rogue.deadlyPoison.IsInUse() {
-		dp := &rogue.deadlyPoisonRefresh
-		rogue.deadlyPoisonRefreshTemplate.Apply(dp)
-		dp.Effect.Target = spellEffect.Target
-		dp.Init(sim)
-		dp.Cast(sim)
+	if rogue.DeadlyPoison.Instance.IsInUse() {
+		rogue.DeadlyPoisonRefresh.Cast(sim, spellEffect.Target)
 	} else {
-		dp := &rogue.deadlyPoison
-		rogue.deadlyPoisonTemplate.Apply(dp)
-		dp.Effect.Target = spellEffect.Target
-		dp.Init(sim)
-		dp.Cast(sim)
+		rogue.DeadlyPoison.Cast(sim, spellEffect.Target)
 		rogue.deadlyPoisonStacks = 1
 	}
 }
 
 var InstantPoisonAuraID = core.NewAuraID()
 
-func (rogue *Rogue) newInstantPoisonTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerInstantPoisonSpell(_ *core.Simulation) {
 	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -141,7 +139,11 @@ func (rogue *Rogue) newInstantPoisonTemplate(_ *core.Simulation) core.SimpleSpel
 			BaseDamage:          core.BaseDamageConfigRoll(146, 194),
 		},
 	}
-	return core.NewSimpleSpellTemplate(cast)
+
+	rogue.InstantPoison = rogue.RegisterSpell(core.SpellConfig{
+		Template:   cast,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
@@ -173,8 +175,5 @@ func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
 }
 
 func (rogue *Rogue) procInstantPoison(sim *core.Simulation, spellEffect *core.SpellEffect) {
-	rogue.instantPoisonTemplate.Apply(&rogue.instantPoison)
-	rogue.instantPoison.Effect.Target = spellEffect.Target
-	rogue.instantPoison.Init(sim)
-	rogue.instantPoison.Cast(sim)
+	rogue.InstantPoison.Cast(sim, spellEffect.Target)
 }

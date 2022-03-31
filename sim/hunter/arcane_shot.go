@@ -10,7 +10,7 @@ import (
 var ArcaneShotCooldownID = core.NewCooldownID()
 var ArcaneShotActionID = core.ActionID{SpellID: 27019, CooldownID: ArcaneShotCooldownID}
 
-func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (hunter *Hunter) registerArcaneShotSpell(sim *core.Simulation) {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 230}
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -44,17 +44,8 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpe
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 	ama.Cooldown -= time.Millisecond * 200 * time.Duration(hunter.Talents.ImprovedArcaneShot)
 
-	return core.NewSimpleSpellTemplate(ama)
-}
-
-func (hunter *Hunter) NewArcaneShot(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	as := &hunter.arcaneShot
-	hunter.arcaneShotTemplate.Apply(as)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	as.Effect.Target = target
-
-	as.Init(sim)
-
-	return as
+	hunter.ArcaneShot = hunter.RegisterSpell(core.SpellConfig{
+		Template:   ama,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

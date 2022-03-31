@@ -11,7 +11,7 @@ import (
 var BloodthirstCooldownID = core.NewCooldownID()
 var BloodthirstActionID = core.ActionID{SpellID: 30335, CooldownID: BloodthirstCooldownID}
 
-func (warrior *Warrior) newBloodthirstTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerBloodthirstSpell(_ *core.Simulation) {
 	warrior.bloodthirstCost = 30
 	if ItemSetDestroyerBattlegear.CharacterHasSetBonus(&warrior.Character, 4) {
 		warrior.bloodthirstCost -= 5
@@ -63,20 +63,15 @@ func (warrior *Warrior) newBloodthirstTemplate(_ *core.Simulation) core.SimpleSp
 		}
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (warrior *Warrior) NewBloodthirst(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	bt := &warrior.bloodthirst
-	warrior.bloodthirstTemplate.Apply(bt)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	bt.Effect.Target = target
-	if warrior.StanceMatches(DefensiveStance) {
-		bt.Effect.ThreatMultiplier *= 1 + 0.21*float64(warrior.Talents.TacticalMastery)
-	}
-
-	return bt
+	warrior.Bloodthirst = warrior.RegisterSpell(core.SpellConfig{
+		Template: ability,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effect.Target = target
+			if warrior.StanceMatches(DefensiveStance) {
+				instance.Effect.ThreatMultiplier *= 1 + 0.21*float64(warrior.Talents.TacticalMastery)
+			}
+		},
+	})
 }
 
 func (warrior *Warrior) CanBloodthirst(sim *core.Simulation) bool {

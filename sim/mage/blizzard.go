@@ -9,7 +9,7 @@ import (
 
 const SpellIDBlizzard int32 = 27085
 
-func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -60,16 +60,7 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	}
 	spell.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) NewBlizzard(sim *core.Simulation) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	blizzard := &mage.blizzardSpell
-	mage.blizzardCastTemplate.Apply(blizzard)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	blizzard.Init(sim)
-
-	return blizzard
+	mage.Blizzard = mage.RegisterSpell(core.SpellConfig{
+		Template: spell,
+	})
 }

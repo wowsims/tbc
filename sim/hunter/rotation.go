@@ -50,7 +50,7 @@ func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.SimpleSpe
 func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 	if sim.CurrentTime == 0 {
 		if hunter.Rotation.PrecastAimedShot && hunter.Talents.AimedShot {
-			hunter.NewAimedShot(sim, sim.GetPrimaryTarget()).Cast(sim)
+			hunter.AimedShot.Cast(sim, sim.GetPrimaryTarget())
 		}
 		hunter.AutoAttacks.SwingRanged(sim, sim.GetPrimaryTarget())
 		return
@@ -286,30 +286,30 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 		hunter.doMeleeWeave(sim)
 	case OptionSteady:
 		if !hunter.tryUsePrioGCD(sim) {
-			ss := hunter.NewSteadyShot(sim, target)
-			if success := ss.Cast(sim); success {
+			success := hunter.SteadyShot.Cast(sim, target)
+			if success {
 				// Can't use kill command while casting steady shot.
 				hunter.killCommandBlocked = true
 			} else {
-				hunter.WaitForMana(sim, ss.GetManaCost())
+				hunter.WaitForMana(sim, hunter.SteadyShot.Instance.GetManaCost())
 			}
 		}
 	case OptionMulti:
 		if !hunter.tryUsePrioGCD(sim) {
-			ms := hunter.NewMultiShot(sim)
-			if success := ms.Cast(sim); success {
+			success := hunter.MultiShot.Cast(sim, target)
+			if success {
 			} else {
-				hunter.WaitForMana(sim, ms.GetManaCost())
+				hunter.WaitForMana(sim, hunter.MultiShot.Instance.GetManaCost())
 			}
 		}
 	case OptionArcane:
 		if !hunter.tryUsePrioGCD(sim) {
-			as := hunter.NewArcaneShot(sim, target)
-			if success := as.Cast(sim); success {
+			success := hunter.ArcaneShot.Cast(sim, target)
+			if success {
 				// Arcane is instant, so we can try another action immediately.
 				hunter.rotation(sim, false)
 			} else {
-				hunter.WaitForMana(sim, as.Cost.Value)
+				hunter.WaitForMana(sim, hunter.ArcaneShot.Instance.Cost.Value)
 			}
 		}
 	}
@@ -351,15 +351,15 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 	target := sim.GetPrimaryTarget()
 
 	if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !target.HasAura(ScorpidStingDebuffID) {
-		ss := hunter.NewScorpidSting(sim, target)
-		if success := ss.Cast(sim); !success {
-			hunter.WaitForMana(sim, ss.Cost.Value)
+		success := hunter.ScorpidSting.Cast(sim, target)
+		if !success {
+			hunter.WaitForMana(sim, hunter.ScorpidSting.Instance.Cost.Value)
 		}
 		return true
-	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_SerpentSting && !hunter.serpentSting.IsInUse() {
-		ss := hunter.NewSerpentSting(sim, target)
-		if success := ss.Cast(sim); !success {
-			hunter.WaitForMana(sim, ss.Cost.Value)
+	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_SerpentSting && !hunter.SerpentSting.Instance.IsInUse() {
+		success := hunter.SerpentSting.Cast(sim, target)
+		if !success {
+			hunter.WaitForMana(sim, hunter.SerpentSting.Instance.Cost.Value)
 		}
 		return true
 	}
