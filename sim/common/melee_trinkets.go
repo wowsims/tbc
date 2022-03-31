@@ -495,12 +495,9 @@ var RomulosPoisonVialAuraID = core.NewAuraID()
 
 func ApplyRomulosPoisonVial(agent core.Agent) {
 	character := agent.GetCharacter()
-	spellObj := core.SimpleSpell{}
 
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		ppmm := character.AutoAttacks.NewPPMManager(1.0)
-
-		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+	spell := character.RegisterSpell(core.SpellConfig{
+		Template: core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
 					ActionID:    core.ActionID{ItemID: 28579},
@@ -517,7 +514,12 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 				ThreatMultiplier: 1,
 				BaseDamage:       core.BaseDamageConfigRoll(222, 332),
 			},
-		})
+		},
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
 		return core.Aura{
 			ID: RomulosPoisonVialAuraID,
@@ -530,11 +532,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 					return
 				}
 
-				castAction := &spellObj
-				castTemplate.Apply(castAction)
-				castAction.Effect.Target = spellEffect.Target
-				castAction.Init(sim)
-				castAction.Cast(sim)
+				spell.Cast(sim, spellEffect.Target)
 			},
 		}
 	})

@@ -95,7 +95,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-BandoftheEternalSage-29305"
  value: {
-  dps: 1306.4688054723367
+  dps: 1362.7727155205218
  }
 }
 dps_results: {
@@ -401,7 +401,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Mana-EtchedRegalia"
  value: {
-  dps: 1127.0832654674239
+  dps: 1152.4780430603694
  }
 }
 dps_results: {
@@ -431,7 +431,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 1319.9018111469716
+  dps: 1353.344651293781
  }
 }
 dps_results: {
@@ -455,7 +455,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-RobeoftheElderScribes-28602"
  value: {
-  dps: 1325.1488702054403
+  dps: 1320.756163489594
  }
 }
 dps_results: {
@@ -479,7 +479,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Serpent-CoilBraid-30720"
  value: {
-  dps: 1322.301212660297
+  dps: 1321.4940644724988
  }
 }
 dps_results: {
@@ -551,7 +551,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-TempestRegalia"
  value: {
-  dps: 1438.1750377113224
+  dps: 1440.9218098455215
  }
 }
 dps_results: {
@@ -563,7 +563,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-TheLightningCapacitor-28785"
  value: {
-  dps: 1328.0125963974606
+  dps: 1360.80308092935
  }
 }
 dps_results: {
@@ -587,7 +587,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-TheTwinStars"
  value: {
-  dps: 1406.2631069053293
+  dps: 1416.9505275993242
  }
 }
 dps_results: {
@@ -599,13 +599,13 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 1360.332825192046
+  dps: 1420.594959616221
  }
 }
 dps_results: {
  key: "TestArcane-AllItems-TirisfalRegalia"
  value: {
-  dps: 1409.3445907549524
+  dps: 1486.2339150182754
  }
 }
 dps_results: {
@@ -623,7 +623,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-WrathofSpellfire"
  value: {
-  dps: 1312.672477804819
+  dps: 1314.7260600935235
  }
 }
 dps_results: {
@@ -635,7 +635,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-Average-Default"
  value: {
-  dps: 1354.6588042683652
+  dps: 1357.1920145346785
  }
 }
 dps_results: {
@@ -659,7 +659,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-Settings-Troll10-P1Arcane-ArcaneRotation-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1039.367768035132
+  dps: 1034.2686312663168
  }
 }
 dps_results: {

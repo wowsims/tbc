@@ -7,7 +7,7 @@ import (
 const SpellIDWintersChill int32 = 28595
 
 // Winters Chill has a separate hit check from frostbolt, so it needs its own spell.
-func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -37,18 +37,10 @@ func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpell
 		spellEffect.Target.AddAura(sim, core.WintersChillAura(spellEffect.Target, newNumStacks))
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) procWintersChill(sim *core.Simulation, target *core.Target) {
-	// Initialize cast from precomputed template.
-	wintersChill := &mage.wintersChillSpell
-	mage.wintersChillCastTemplate.Apply(wintersChill)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	wintersChill.Effect.Target = target
-	wintersChill.Init(sim)
-	wintersChill.Cast(sim)
+	mage.WintersChill = mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 var WintersChillAuraID = core.NewAuraID()
@@ -73,7 +65,7 @@ func (mage *Mage) applyWintersChill() {
 						return
 					}
 
-					mage.procWintersChill(sim, spellEffect.Target)
+					mage.WintersChill.Cast(sim, spellEffect.Target)
 				}
 			},
 		}

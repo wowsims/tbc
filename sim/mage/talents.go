@@ -181,20 +181,20 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				target := sim.GetPrimaryTarget()
-				var spell *core.SimpleSpell
+				var spell *core.SimpleSpellTemplate
 				if mage.Talents.Pyroblast {
-					spell = mage.NewPyroblast(sim, target)
+					spell = mage.Pyroblast
 				} else if mage.RotationType == proto.Mage_Rotation_Fire {
-					spell = mage.NewFireball(sim, target)
+					spell = mage.Fireball
 				} else if mage.RotationType == proto.Mage_Rotation_Frost {
-					spell = mage.NewFrostbolt(sim, target)
+					spell = mage.Frostbolt
 				} else {
-					spell, _ = mage.NewArcaneBlast(sim, target)
+					spell = mage.ArcaneBlast
 				}
-				spell.CastTime = 0
-
-				spell.Cast(sim)
+				normalCastTime := spell.Template.CastTime
+				spell.Template.CastTime = 0
+				spell.Cast(sim, sim.GetPrimaryTarget())
+				spell.Template.CastTime = normalCastTime
 
 				character.Metrics.AddInstantCast(actionID)
 				character.SetCD(PresenceOfMindCooldownID, sim.CurrentTime+cooldown)

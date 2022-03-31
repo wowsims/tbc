@@ -10,7 +10,7 @@ import (
 const SpellIDLB12 int32 = 25449
 
 // newLightningBoltTemplate returns a cast generator for Lightning Bolt with as many fields precomputed as possible.
-func (shaman *Shaman) newLightningBoltTemplate(sim *core.Simulation, isLightningOverload bool) core.SimpleSpellTemplate {
+func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOverload bool) *core.SimpleSpellTemplate {
 	baseManaCost := 300.0
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfThePulsingEarth {
 		baseManaCost -= 27.0
@@ -40,8 +40,7 @@ func (shaman *Shaman) newLightningBoltTemplate(sim *core.Simulation, isLightning
 			if sim.RandomFloat("LB Lightning Overload") > lightningOverloadChance {
 				return
 			}
-			overloadAction := shaman.NewLightningBolt(sim, spellEffect.Target, true)
-			overloadAction.Cast(sim)
+			shaman.LightningBoltLO.Cast(sim, spellEffect.Target)
 		}
 	} else {
 		spellTemplate.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -55,29 +54,14 @@ func (shaman *Shaman) newLightningBoltTemplate(sim *core.Simulation, isLightning
 		spellTemplate.Effect.DamageMultiplier *= 1.05
 	}
 
-	return core.NewSimpleSpellTemplate(spellTemplate)
-}
-
-func (shaman *Shaman) NewLightningBolt(sim *core.Simulation, target *core.Target, isLightningOverload bool) *core.SimpleSpell {
-	var lb *core.SimpleSpell
-
-	// Initialize cast from precomputed template.
-	if isLightningOverload {
-		lb = &shaman.lightningBoltSpellLO
-		shaman.lightningBoltLOCastTemplate.Apply(lb)
-	} else {
-		lb = &shaman.lightningBoltSpell
-		shaman.lightningBoltCastTemplate.Apply(lb)
-	}
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	lb.Effect.Target = target
-	shaman.applyElectricSpellCastInitModifiers(&lb.SpellCast)
-	if shaman.HasAura(NaturesSwiftnessAuraID) {
-		lb.CastTime = 0
-	}
-
-	lb.Init(sim)
-
-	return lb
+	return shaman.RegisterSpell(core.SpellConfig{
+		Template: spellTemplate,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effect.Target = target
+			shaman.applyElectricSpellCastInitModifiers(&instance.SpellCast)
+			if shaman.HasAura(NaturesSwiftnessAuraID) {
+				instance.CastTime = 0
+			}
+		},
+	})
 }

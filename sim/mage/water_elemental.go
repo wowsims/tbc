@@ -82,8 +82,7 @@ type WaterElemental struct {
 	// does its own thing. This controls how much it does that.
 	disobeyChance float64
 
-	waterboltSpell        core.SimpleSpell
-	waterboltCastTemplate core.SimpleSpellTemplate
+	Waterbolt *core.SimpleSpellTemplate
 }
 
 func (mage *Mage) NewWaterElemental(disobeyChance float64) *WaterElemental {
@@ -109,7 +108,7 @@ func (we *WaterElemental) GetPet() *core.Pet {
 }
 
 func (we *WaterElemental) Init(sim *core.Simulation) {
-	we.waterboltCastTemplate = we.newWaterboltTemplate(sim)
+	we.registerWaterboltSpell(sim)
 }
 
 func (we *WaterElemental) Reset(sim *core.Simulation) {
@@ -117,20 +116,20 @@ func (we *WaterElemental) Reset(sim *core.Simulation) {
 
 func (we *WaterElemental) OnGCDReady(sim *core.Simulation) {
 	// There's some edge case where this causes a panic, haven't figured it out yet.
-	if we.waterboltSpell.IsInUse() {
-		we.waterboltSpell.Cancel(sim)
+	if we.Waterbolt.Instance.IsInUse() {
+		we.Waterbolt.Instance.Cancel(sim)
 	}
 
-	spell := we.NewWaterbolt(sim, sim.GetPrimaryTarget())
+	spell := we.Waterbolt
 
 	if sim.RandomFloat("Water Elemental Disobey") < we.disobeyChance {
 		// Water ele has decided not to cooperate, so just wait for the cast time
 		// instead of casting.
-		we.WaitUntil(sim, sim.CurrentTime+spell.GetDuration())
+		we.WaitUntil(sim, sim.CurrentTime+spell.Template.CastTime)
 		return
 	}
 
-	if success := spell.Cast(sim); !success {
+	if success := spell.Cast(sim, sim.GetPrimaryTarget()); !success {
 		// If water ele has gone OOM then there won't be enough time left for meaningful
 		// regen to occur before the ele expires. So just murder itself.
 		we.Disable(sim)
@@ -162,7 +161,7 @@ var waterElementalStatInheritance = func(ownerStats stats.Stats) stats.Stats {
 
 const SpellIDWaterbolt int32 = 31707
 
-func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (we *WaterElemental) registerWaterboltSpell(sim *core.Simulation) {
 	baseManaCost := we.BaseMana() * 0.1
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -178,7 +177,7 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 					Type:  stats.Mana,
 					Value: baseManaCost,
 				},
-				CastTime: time.Millisecond * 3000,
+				CastTime: time.Second * 3,
 				GCD:      core.GCDDefault,
 			},
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
@@ -192,17 +191,8 @@ func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.Simple
 		},
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (we *WaterElemental) NewWaterbolt(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	waterbolt := &we.waterboltSpell
-	we.waterboltCastTemplate.Apply(waterbolt)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	waterbolt.Effect.Target = target
-	waterbolt.Init(sim)
-
-	return waterbolt
+	we.Waterbolt = we.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

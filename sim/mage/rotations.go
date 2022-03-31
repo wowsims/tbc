@@ -18,7 +18,7 @@ func (mage *Mage) OnManaTick(sim *core.Simulation) {
 }
 
 func (mage *Mage) tryUseGCD(sim *core.Simulation) {
-	var spell *core.SimpleSpell
+	var spell *core.SimpleSpellTemplate
 	if mage.RotationType == proto.Mage_Rotation_Arcane {
 		spell = mage.doArcaneRotation(sim)
 	} else if mage.RotationType == proto.Mage_Rotation_Fire {
@@ -27,7 +27,7 @@ func (mage *Mage) tryUseGCD(sim *core.Simulation) {
 		spell = mage.doFrostRotation(sim)
 	}
 
-	if success := spell.Cast(sim); success {
+	if success := spell.Cast(sim, sim.GetPrimaryTarget()); success {
 		return
 	}
 
@@ -45,11 +45,11 @@ func (mage *Mage) tryUseGCD(sim *core.Simulation) {
 		mage.Metrics.MarkOOM(&mage.Character, waitTime)
 		mage.WaitUntil(sim, sim.CurrentTime+waitTime)
 	} else {
-		mage.WaitForMana(sim, spell.GetManaCost())
+		mage.WaitForMana(sim, spell.Instance.GetManaCost())
 	}
 }
 
-func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
+func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpellTemplate {
 	if mage.UseAoeRotation {
 		return mage.doAoeRotation(sim)
 	}
@@ -58,15 +58,15 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
 	// Don't need to update tracker because we only use certain functions.
 	//mage.manaTracker.Update(sim, mage.GetCharacter())
 
-	target := sim.GetPrimaryTarget()
-
 	// Create an AB object because we use its mana cost / cast time in many of our calculations.
-	arcaneBlast, numStacks := mage.NewArcaneBlast(sim, target)
-	willDropStacks := mage.willDropArcaneBlastStacks(sim, arcaneBlast, numStacks)
+	numStacks := mage.NumStacks(ArcaneBlastAuraID)
+	abCastTime := mage.ArcaneBlastCastTime(numStacks)
+	abManaCost := mage.ArcaneBlastManaCost(numStacks)
+	willDropStacks := mage.willDropArcaneBlastStacks(sim, abCastTime, numStacks)
 
-	mage.isBlastSpamming = mage.canBlast(sim, arcaneBlast, numStacks, willDropStacks)
+	mage.isBlastSpamming = mage.canBlast(sim, abManaCost, abCastTime, numStacks, willDropStacks)
 	if mage.isBlastSpamming {
-		return arcaneBlast
+		return mage.ArcaneBlast
 	}
 
 	currentManaPercent := mage.CurrentManaPercent()
@@ -99,47 +99,46 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
 	}
 
 	if !mage.isDoingRegenRotation {
-		return arcaneBlast
+		return mage.ArcaneBlast
 	}
 
 	if mage.tryingToDropStacks {
 		if willDropStacks {
 			mage.tryingToDropStacks = false
 			mage.numCastsDone = 1 // 1 to count the blast we're about to return
-			return arcaneBlast
+			return mage.ArcaneBlast
 		} else {
 			// Do a filler spell while waiting for stacks to drop.
-			arcaneBlast.Cancel(sim)
 			mage.numCastsDone++
 			switch mage.ArcaneRotation.Filler {
 			case proto.Mage_Rotation_ArcaneRotation_Frostbolt:
-				return mage.NewFrostbolt(sim, target)
+				return mage.Frostbolt
 			case proto.Mage_Rotation_ArcaneRotation_ArcaneMissiles:
-				return mage.NewArcaneMissiles(sim, target)
+				return mage.ArcaneMissiles
 			case proto.Mage_Rotation_ArcaneRotation_Scorch:
-				return mage.NewScorch(sim, target)
+				return mage.Scorch
 			case proto.Mage_Rotation_ArcaneRotation_Fireball:
-				return mage.NewFireball(sim, target)
+				return mage.Fireball
 			case proto.Mage_Rotation_ArcaneRotation_ArcaneMissilesFrostbolt:
 				if mage.numCastsDone%2 == 1 {
-					return mage.NewArcaneMissiles(sim, target)
+					return mage.ArcaneMissiles
 				} else {
-					return mage.NewFrostbolt(sim, target)
+					return mage.Frostbolt
 				}
 			case proto.Mage_Rotation_ArcaneRotation_ArcaneMissilesScorch:
 				if mage.numCastsDone%2 == 1 {
-					return mage.NewArcaneMissiles(sim, target)
+					return mage.ArcaneMissiles
 				} else {
-					return mage.NewScorch(sim, target)
+					return mage.Scorch
 				}
 			case proto.Mage_Rotation_ArcaneRotation_ScorchTwoFireball:
 				if mage.numCastsDone%3 == 1 {
-					return mage.NewScorch(sim, target)
+					return mage.Scorch
 				} else {
-					return mage.NewFireball(sim, target)
+					return mage.Fireball
 				}
 			default:
-				return mage.NewFrostbolt(sim, target)
+				return mage.Frostbolt
 			}
 		}
 	} else {
@@ -148,15 +147,15 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpell {
 			mage.tryingToDropStacks = true
 			mage.numCastsDone = 0
 		}
-		return arcaneBlast
+		return mage.ArcaneBlast
 	}
 }
 
-func (mage *Mage) doFireRotation(sim *core.Simulation) *core.SimpleSpell {
+func (mage *Mage) doFireRotation(sim *core.Simulation) *core.SimpleSpellTemplate {
 	target := sim.GetPrimaryTarget()
 
 	if mage.FireRotation.MaintainImprovedScorch && (target.NumStacks(core.ImprovedScorchDebuffID) < 5 || target.RemainingAuraDuration(sim, core.ImprovedScorchDebuffID) < time.Millisecond*5500) {
-		return mage.NewScorch(sim, target)
+		return mage.Scorch
 	}
 
 	if mage.UseAoeRotation {
@@ -164,32 +163,30 @@ func (mage *Mage) doFireRotation(sim *core.Simulation) *core.SimpleSpell {
 	}
 
 	if mage.FireRotation.WeaveFireBlast && !mage.IsOnCD(FireBlastCooldownID, sim.CurrentTime) {
-		return mage.NewFireBlast(sim, target)
+		return mage.FireBlast
 	}
 
 	if mage.FireRotation.PrimarySpell == proto.Mage_Rotation_FireRotation_Fireball {
-		return mage.NewFireball(sim, target)
+		return mage.Fireball
 	} else {
-		return mage.NewScorch(sim, target)
+		return mage.Scorch
 	}
 }
 
-func (mage *Mage) doFrostRotation(sim *core.Simulation) *core.SimpleSpell {
+func (mage *Mage) doFrostRotation(sim *core.Simulation) *core.SimpleSpellTemplate {
 	if mage.UseAoeRotation {
 		return mage.doAoeRotation(sim)
 	}
 
-	target := sim.GetPrimaryTarget()
-	spell := mage.NewFrostbolt(sim, target)
-	return spell
+	return mage.Frostbolt
 }
 
-func (mage *Mage) doAoeRotation(sim *core.Simulation) *core.SimpleSpell {
+func (mage *Mage) doAoeRotation(sim *core.Simulation) *core.SimpleSpellTemplate {
 	if mage.AoeRotation.Rotation == proto.Mage_Rotation_AoeRotation_ArcaneExplosion {
-		return mage.NewArcaneExplosion(sim)
+		return mage.ArcaneExplosion
 	} else if mage.AoeRotation.Rotation == proto.Mage_Rotation_AoeRotation_Flamestrike {
-		return mage.NewFlamestrike(sim)
+		return mage.Flamestrike
 	} else {
-		return mage.NewBlizzard(sim)
+		return mage.Blizzard
 	}
 }

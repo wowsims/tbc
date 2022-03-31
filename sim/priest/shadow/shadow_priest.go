@@ -1,7 +1,6 @@
 package shadow
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -44,6 +43,7 @@ func NewShadowPriest(character core.Character, options proto.Player) *ShadowPrie
 	}
 
 	basePriest := priest.New(character, selfBuffs, *shadowOptions.Talents)
+	basePriest.Latency = shadowOptions.Rotation.Latency
 	spriest := &ShadowPriest{
 		Priest:   basePriest,
 		rotation: *shadowOptions.Rotation,
@@ -88,31 +88,17 @@ func (spriest *ShadowPriest) OnManaTick(sim *core.Simulation) {
 
 func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	if spriest.rotation.PrecastVt && sim.CurrentTime == 0 {
-		spell := spriest.NewVampiricTouch(sim, sim.GetPrimaryTarget())
-		spell.CastTime = 0
-		spell.GCD = 0
-		spell.Cast(sim)
-	}
-
-	// This if block is to handle being able to cast a VT while having another one ticking.
-	//  This will swap the casting spell if it is ticking, so the newly cast spell is now the ticking spell.
-	//  spriest.NewVampiricTouch() will always use the priest.VTSpellCasting as the target.
-	if spriest.VTSpellCasting.Effect.DotInput.IsTicking(sim) {
-		if spriest.VTSpell.Effect.DotInput.TimeRemaining(sim) > 0 {
-			// If we still have VT ticking that isn't allowed... crash immediately so we can fix the logic.
-			panic(fmt.Sprintf("Two VT copies ticking at: %s, time remaining: %s, %s",
-				sim.CurrentTime,
-				spriest.VTSpellCasting.Effect.DotInput.TimeRemaining(sim),
-				spriest.VTSpell.Effect.DotInput.TimeRemaining(sim)))
-		}
-		oldVT := spriest.VTSpell
-		spriest.VTSpell = spriest.VTSpellCasting
-		spriest.VTSpellCasting = oldVT // will probably have one more tick
+		castTime := spriest.VampiricTouch.Template.CastTime
+		gcd := spriest.VampiricTouch.Template.GCD
+		spriest.VampiricTouch.Template.CastTime = 0
+		spriest.VampiricTouch.Template.GCD = 0
+		spriest.VampiricTouch.Cast(sim, sim.GetPrimaryTarget())
+		spriest.VampiricTouch.Template.CastTime = castTime
+		spriest.VampiricTouch.Template.GCD = gcd
 	}
 
 	// Activate shared behaviors
-	target := sim.GetPrimaryTarget()
-	var spell *core.SimpleSpell
+	var spell *core.SimpleSpellTemplate
 	var wait1 time.Duration
 	var wait2 time.Duration
 	var wait time.Duration
@@ -124,30 +110,30 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	// timeForDots := sim.Duration-sim.CurrentTime > time.Second*12
 	// TODO: stop casting dots near the end?
 
-	if spriest.Talents.VampiricTouch && spriest.VTSpell.Effect.DotInput.TimeRemaining(sim) <= vtCastTime {
-		spell = spriest.NewVampiricTouch(sim, target)
-	} else if !spriest.SWPSpell.Effect.DotInput.IsTicking(sim) {
-		spell = spriest.NewShadowWordPain(sim, target)
+	if spriest.Talents.VampiricTouch && spriest.CurVTSpell.Instance.Effect.DotInput.TimeRemaining(sim) <= vtCastTime {
+		spell = spriest.NextVTSpell
+	} else if !spriest.ShadowWordPain.Instance.Effect.DotInput.IsTicking(sim) {
+		spell = spriest.ShadowWordPain
 	} else if spriest.rotation.UseStarshards && spriest.GetRemainingCD(priest.SSCooldownID, sim.CurrentTime) == 0 {
-		spell = spriest.NewStarshards(sim, target)
+		spell = spriest.Starshards
 	} else if spriest.rotation.UseDevPlague && spriest.GetRemainingCD(priest.DevouringPlagueCooldownID, sim.CurrentTime) == 0 {
-		spell = spriest.NewDevouringPlague(sim, target)
+		spell = spriest.DevouringPlague
 	} else if spriest.Talents.MindFlay {
 
 		allCDs := []time.Duration{
 			mbidx:  spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime),
 			swdidx: spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime),
-			vtidx:  spriest.VTSpell.Effect.DotInput.TimeRemaining(sim) - vtCastTime,
-			swpidx: spriest.SWPSpell.Effect.DotInput.TimeRemaining(sim),
+			vtidx:  spriest.CurVTSpell.Instance.Effect.DotInput.TimeRemaining(sim) - vtCastTime,
+			swpidx: spriest.ShadowWordPain.Instance.Effect.DotInput.TimeRemaining(sim),
 		}
 
 		if allCDs[mbidx] == 0 {
 			if spriest.Talents.InnerFocus && spriest.GetRemainingCD(priest.InnerFocusCooldownID, sim.CurrentTime) == 0 {
 				spriest.ApplyInnerFocus(sim)
 			}
-			spell = spriest.NewMindBlast(sim, target)
+			spell = spriest.MindBlast
 		} else if allCDs[swdidx] == 0 {
-			spell = spriest.NewShadowWordDeath(sim, target)
+			spell = spriest.ShadowWordDeath
 		} else {
 			gcd := core.MinDuration(core.GCDMin, time.Duration(float64(core.GCDDefault)/castSpeed))
 			tickLength := time.Duration(float64(time.Second) / castSpeed)
@@ -174,22 +160,14 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 				return
 			}
 
-			spell = spriest.NewMindFlay(sim, target, numTicks)
-
-			// if our channel is longer than GCD it will have human latency to end it beause you can't queue the next spell.
-			if wait > gcd && spriest.rotation.Latency > 0 {
-				base := spriest.rotation.Latency * 0.66
-				variation := base + sim.RandomFloat("spriest latency")*base // should vary from 0.66 - 1.33 of given latency
-				variation = core.MaxFloat(variation, 10)                    // no player can go under XXXms response time
-				spell.AfterCastDelay += time.Duration(variation) * time.Millisecond
-			}
+			spell = spriest.MindFlay[numTicks]
 		}
 	} else {
 		// what do you even do... i guess just sit around
 		mbcd := spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime)
 		swdcd := spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime)
-		vtidx := spriest.VTSpell.Effect.DotInput.TimeRemaining(sim) - vtCastTime
-		swpidx := spriest.SWPSpell.Effect.DotInput.TimeRemaining(sim)
+		vtidx := spriest.CurVTSpell.Instance.Effect.DotInput.TimeRemaining(sim) - vtCastTime
+		swpidx := spriest.ShadowWordPain.Instance.Effect.DotInput.TimeRemaining(sim)
 		wait1 = core.MinDuration(mbcd, swdcd)
 		wait2 = core.MinDuration(vtidx, swpidx)
 		wait = core.MinDuration(wait1, wait2)
@@ -197,8 +175,8 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 		return
 	}
 
-	if success := spell.Cast(sim); !success {
-		spriest.WaitForMana(sim, spell.GetManaCost())
+	if success := spell.Cast(sim, sim.GetPrimaryTarget()); !success {
+		spriest.WaitForMana(sim, spell.Instance.GetManaCost())
 	}
 }
 
@@ -249,9 +227,9 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, allCDs 
 		} else if nextIdx == 1 {
 			Major_dmg = (618 + spriest.GetStat(stats.SpellPower)*0.429) / (gcd + nextCD).Seconds() * averageCritMultiplier
 		} else if nextIdx == 2 {
-			Major_dmg = (spriest.VTSpell.Effect.DotInput.DamagePerTick() * float64(spriest.VTSpell.Effect.DotInput.NumberOfTicks)) / (gcd + nextCD).Seconds()
+			Major_dmg = (spriest.CurVTSpell.Instance.Effect.DotInput.DamagePerTick() * float64(spriest.CurVTSpell.Instance.Effect.DotInput.NumberOfTicks)) / (gcd + nextCD).Seconds()
 		} else if nextIdx == 3 {
-			Major_dmg = (spriest.SWPSpell.Effect.DotInput.DamagePerTick() * float64(spriest.SWPSpell.Effect.DotInput.NumberOfTicks)) / (gcd + nextCD).Seconds()
+			Major_dmg = (spriest.ShadowWordPain.Instance.Effect.DotInput.DamagePerTick() * float64(spriest.ShadowWordPain.Instance.Effect.DotInput.NumberOfTicks)) / (gcd + nextCD).Seconds()
 		}
 
 		dpsPossibleshort := []float64{
@@ -302,8 +280,8 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, allCDs 
 	spellDamages := []float64{
 		mbidx:  (731.5 + spriest.GetStat(stats.SpellPower)*0.429) / (gcd + cdDiffs[mbidx]).Seconds() * averageCritMultiplier,
 		swdidx: (618 + spriest.GetStat(stats.SpellPower)*0.429) / (gcd + cdDiffs[swdidx]).Seconds() * averageCritMultiplier,
-		vtidx:  (spriest.VTSpell.Effect.DotInput.DamagePerTick() * float64(spriest.VTSpell.Effect.DotInput.NumberOfTicks)) / (gcd + cdDiffs[vtidx]).Seconds(),
-		swpidx: (spriest.SWPSpell.Effect.DotInput.DamagePerTick() * float64(spriest.SWPSpell.Effect.DotInput.NumberOfTicks)) / (gcd + cdDiffs[swpidx]).Seconds(),
+		vtidx:  (spriest.CurVTSpell.Instance.Effect.DotInput.DamagePerTick() * float64(spriest.CurVTSpell.Instance.Effect.DotInput.NumberOfTicks)) / (gcd + cdDiffs[vtidx]).Seconds(),
+		swpidx: (spriest.ShadowWordPain.Instance.Effect.DotInput.DamagePerTick() * float64(spriest.ShadowWordPain.Instance.Effect.DotInput.NumberOfTicks)) / (gcd + cdDiffs[swpidx]).Seconds(),
 	}
 
 	bestIdx := 0

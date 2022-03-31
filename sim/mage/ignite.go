@@ -9,7 +9,7 @@ import (
 var IgniteActionID = core.ActionID{SpellID: 12848}
 var IgniteDebuffID = core.NewDebuffID()
 
-func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) newIgniteSpell(sim *core.Simulation) *core.SimpleSpellTemplate {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -33,27 +33,24 @@ func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTempla
 		},
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
+	return mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 func (mage *Mage) procIgnite(sim *core.Simulation, target *core.Target, damageFromProccingSpell float64) {
 	newIgniteDamage := damageFromProccingSpell * float64(mage.Talents.Ignite) * 0.08
-	ignite := &mage.igniteSpells[target.Index]
+	ignite := mage.Ignites[target.Index]
 
-	if ignite.Effect.DotInput.IsTicking(sim) {
-		newIgniteDamage += ignite.Effect.DotInput.RemainingDamage()
+	if ignite.Instance.Effect.DotInput.IsTicking(sim) {
+		newIgniteDamage += ignite.Instance.Effect.DotInput.RemainingDamage()
 	}
 
 	// Cancel the current ignite dot.
-	ignite.Cancel(sim)
-
-	mage.igniteCastTemplate.Apply(ignite)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ignite.Effect.Target = target
-	ignite.Effect.DotInput.TickBaseDamage = core.DotSnapshotFuncMagic(newIgniteDamage/2, 0)
-	ignite.Init(sim)
-	ignite.Cast(sim)
+	ignite.Instance.Cancel(sim)
+	ignite.Template.Effect.DotInput.TickBaseDamage = core.DotSnapshotFuncMagic(newIgniteDamage/2, 0)
+	ignite.Cast(sim, target)
 }
 
 var IgniteAuraID = core.NewAuraID()

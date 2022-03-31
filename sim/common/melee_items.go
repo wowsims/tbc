@@ -43,10 +43,9 @@ var StormGauntletsAuraID = core.NewAuraID()
 
 func ApplyStormGauntlets(agent core.Agent) {
 	character := agent.GetCharacter()
-	spellObj := core.SimpleSpell{}
 
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+	spell := character.RegisterSpell(core.SpellConfig{
+		Template: core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
 					ActionID:    core.ActionID{ItemID: 12632},
@@ -63,8 +62,11 @@ func ApplyStormGauntlets(agent core.Agent) {
 				ThreatMultiplier: 1,
 				BaseDamage:       core.BaseDamageConfigFlat(3),
 			},
-		})
+		},
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: StormGauntletsAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -73,11 +75,7 @@ func ApplyStormGauntlets(agent core.Agent) {
 					return
 				}
 
-				castAction := &spellObj
-				castTemplate.Apply(castAction)
-				castAction.Effect.Target = spellEffect.Target
-				castAction.Init(sim)
-				castAction.Cast(sim)
+				spell.Cast(sim, spellEffect.Target)
 			},
 		}
 	})
@@ -87,10 +85,9 @@ var BlazefuryMedallionAuraID = core.NewAuraID()
 
 func ApplyBlazefuryMedallion(agent core.Agent) {
 	character := agent.GetCharacter()
-	spellObj := core.SimpleSpell{}
 
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+	spell := character.RegisterSpell(core.SpellConfig{
+		Template: core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
 					ActionID:    core.ActionID{ItemID: 17111},
@@ -107,8 +104,11 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 				ThreatMultiplier: 1,
 				BaseDamage:       core.BaseDamageConfigFlat(2),
 			},
-		})
+		},
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: BlazefuryMedallionAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
@@ -117,11 +117,7 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 					return
 				}
 
-				castAction := &spellObj
-				castTemplate.Apply(castAction)
-				castAction.Effect.Target = spellEffect.Target
-				castAction.Init(sim)
-				castAction.Cast(sim)
+				spell.Cast(sim, spellEffect.Target)
 			},
 		}
 	})
@@ -367,31 +363,31 @@ func ApplyDespair(agent core.Agent) {
 	character := agent.GetCharacter()
 	actionID := core.ActionID{SpellID: 34580}
 
-	templ := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    actionID,
-				Character:   character,
-				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasIgnoreResists,
+	spell := character.RegisterSpell(core.SpellConfig{
+		Template: core.SimpleSpell{
+			SpellCast: core.SpellCast{
+				Cast: core.Cast{
+					ActionID:    actionID,
+					Character:   character,
+					SpellSchool: core.SpellSchoolPhysical,
+					SpellExtras: core.SpellExtrasIgnoreResists,
+				},
+				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				CritMultiplier:      character.DefaultMeleeCritMultiplier(),
+				IsPhantom:           true,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      character.DefaultMeleeCritMultiplier(),
-			IsPhantom:           true,
+			Effect: core.SpellEffect{
+				// TODO: This should be removed once we have an attack mask.
+				//  This is only set here to correctly calculate damage.
+				ProcMask:         core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigFlat(600),
+			},
 		},
-		Effect: core.SpellEffect{
-			// TODO: This should be removed once we have an attack mask.
-			//  This is only set here to correctly calculate damage.
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigFlat(600),
-		},
-	}
-
-	spellCastTemplate := core.NewSimpleSpellTemplate(templ)
-	cast := core.SimpleSpell{}
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		const procChance = 0.5 * 3.5 / 60.0
@@ -407,9 +403,7 @@ func ApplyDespair(agent core.Agent) {
 					return
 				}
 
-				spellCastTemplate.Apply(&cast)
-				cast.Effect.Target = sim.GetPrimaryTarget()
-				cast.Cast(sim)
+				spell.Cast(sim, spellEffect.Target)
 			},
 		}
 	})
@@ -421,29 +415,29 @@ func ApplyTheDecapitator(agent core.Agent) {
 	character := agent.GetCharacter()
 	actionID := core.ActionID{ItemID: 28767}
 
-	templ := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    actionID,
-				Character:   character,
-				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasIgnoreResists,
+	spell := character.RegisterSpell(core.SpellConfig{
+		Template: core.SimpleSpell{
+			SpellCast: core.SpellCast{
+				Cast: core.Cast{
+					ActionID:    actionID,
+					Character:   character,
+					SpellSchool: core.SpellSchoolPhysical,
+					SpellExtras: core.SpellExtrasIgnoreResists,
+				},
+				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+				CritRollCategory:    core.CritRollCategoryPhysical,
+				CritMultiplier:      character.DefaultMeleeCritMultiplier(),
+				IsPhantom:           true,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      character.DefaultMeleeCritMultiplier(),
-			IsPhantom:           true,
+			Effect: core.SpellEffect{
+				ProcMask:         core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigRoll(513, 567),
+			},
 		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigRoll(513, 567),
-		},
-	}
-
-	spellCastTemplate := core.NewSimpleSpellTemplate(templ)
-	spellCast := core.SimpleSpell{}
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
 	character.AddMajorCooldown(core.MajorCooldown{
 		ActionID:         actionID,
@@ -461,9 +455,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				spellCastTemplate.Apply(&spellCast)
-				spellCast.Effect.Target = sim.GetPrimaryTarget()
-				spellCast.Cast(sim)
+				spell.Cast(sim, sim.GetPrimaryTarget())
 
 				character.SetCD(TheDecapitatorCooldownID, sim.CurrentTime+time.Minute*3)
 				character.SetCD(core.OffensiveTrinketSharedCooldownID, sim.CurrentTime+time.Second*10)
@@ -477,12 +469,9 @@ var GlaiveOfThePitProcAuraID = core.NewAuraID()
 
 func ApplyGlaiveOfThePit(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const hasteBonus = 212.0
-		const procChance = 3.7 / 60.0
 
-		spellObj := core.SimpleSpell{}
-		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+	spell := character.RegisterSpell(core.SpellConfig{
+		Template: core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
 					ActionID:    core.ActionID{SpellID: 34696},
@@ -499,7 +488,13 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 				ThreatMultiplier: 1,
 				BaseDamage:       core.BaseDamageConfigRoll(285, 315),
 			},
-		})
+		},
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const hasteBonus = 212.0
+		const procChance = 3.7 / 60.0
 
 		return core.Aura{
 			ID: GlaiveOfThePitAuraID,
@@ -511,11 +506,7 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 					return
 				}
 
-				castAction := &spellObj
-				castTemplate.Apply(castAction)
-				castAction.Effect.Target = spellEffect.Target
-				castAction.Init(sim)
-				castAction.Cast(sim)
+				spell.Cast(sim, spellEffect.Target)
 			},
 		}
 	})
@@ -768,10 +759,8 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 	mh, oh := character.GetWeaponHands(31193)
 	procMask := core.GetMeleeProcMaskForHands(mh, oh)
 
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const procChance = 0.02
-
-		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+	spell := character.RegisterSpell(core.SpellConfig{
+		Template: core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
 					ActionID:    core.ActionID{ItemID: 31193},
@@ -788,8 +777,12 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 				ThreatMultiplier: 1,
 				BaseDamage:       core.BaseDamageConfigMagic(48, 54, 1),
 			},
-		})
-		spellObj := core.SimpleSpell{}
+		},
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+		const procChance = 0.02
 
 		return core.Aura{
 			ID: BladeOfUnquenchedThirstAuraID,
@@ -801,11 +794,7 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 					return
 				}
 
-				castAction := &spellObj
-				castTemplate.Apply(castAction)
-				castAction.Effect.Target = spellEffect.Target
-				castAction.Init(sim)
-				castAction.Cast(sim)
+				spell.Cast(sim, spellEffect.Target)
 			},
 		}
 	})
@@ -943,8 +932,8 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		ppmm.SetProcChance(false, 0)
 	}
 
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
+	spell := character.RegisterSpell(core.SpellConfig{
+		Template: core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
 					ActionID:    core.ActionID{SpellID: 40291},
@@ -961,9 +950,11 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 				ThreatMultiplier: 1,
 				BaseDamage:       core.BaseDamageConfigFlat(20),
 			},
-		})
-		spellObj := core.SimpleSpell{}
+		},
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		procAura := core.Aura{
 			ID:       SiphonEssenceAuraID,
 			ActionID: core.ActionID{SpellID: 40291},
@@ -973,11 +964,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 					return
 				}
 
-				castAction := &spellObj
-				castTemplate.Apply(castAction)
-				castAction.Effect.Target = spellEffect.Target
-				castAction.Init(sim)
-				castAction.Cast(sim)
+				spell.Cast(sim, spellEffect.Target)
 			},
 		}
 

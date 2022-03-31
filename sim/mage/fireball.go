@@ -13,7 +13,7 @@ const (
 
 const SpellIDFireball int32 = 27070
 
-func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -40,11 +40,10 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 			DamageMultiplier: mage.spellDamageMultiplier,
 			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
-					return
+				if spellEffect.Landed() {
+					mage.FireballDot.Instance.Cancel(sim)
+					mage.FireballDot.Cast(sim, spellEffect.Target)
 				}
-				fireballDot := mage.newFireballDot(sim, spellEffect.Target)
-				fireballDot.Cast(sim)
 			},
 			BaseDamage: core.BaseDamageConfigMagic(649, 821, 1.0+0.03*float64(mage.Talents.EmpoweredFireball)),
 		},
@@ -62,12 +61,15 @@ func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemp
 		spell.Effect.DamageMultiplier *= 1.05
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
+	mage.Fireball = mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 var FireballDotDebuffID = core.NewDebuffID()
 
-func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerFireballDotSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -97,31 +99,8 @@ func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellT
 		spell.Effect.DamageMultiplier *= 1.05
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) newFireballDot(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Cancel the current fireball dot.
-	mage.fireballDotSpell.Cancel(sim)
-
-	fireballDot := &mage.fireballDotSpell
-	mage.fireballDotCastTemplate.Apply(fireballDot)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	fireballDot.Effect.Target = target
-	fireballDot.Init(sim)
-
-	return fireballDot
-}
-
-func (mage *Mage) NewFireball(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	fireball := &mage.fireballSpell
-	mage.fireballCastTemplate.Apply(fireball)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	fireball.Effect.Target = target
-	fireball.Init(sim)
-
-	return fireball
+	mage.FireballDot = mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

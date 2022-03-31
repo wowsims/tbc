@@ -84,26 +84,30 @@ func ApplyEternalSage(agent core.Agent) {
 var AugmentPainAuraID = core.NewAuraID()
 
 func ApplyTimbals(agent core.Agent) {
-	timbalsTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: 45055},
-				SpellSchool: core.SpellSchoolShadow,
-			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      agent.GetCharacter().DefaultSpellCritMultiplier(),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigRoll(285, 475),
-		},
-	})
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		var shadowBolt = &core.SimpleSpell{}
 
+	timbalsSpell := character.RegisterSpell(core.SpellConfig{
+		Template: core.SimpleSpell{
+			SpellCast: core.SpellCast{
+				Cast: core.Cast{
+					Character:   character,
+					ActionID:    core.ActionID{SpellID: 45055},
+					SpellSchool: core.SpellSchoolShadow,
+				},
+				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+				CritRollCategory:    core.CritRollCategoryMagical,
+				CritMultiplier:      agent.GetCharacter().DefaultSpellCritMultiplier(),
+			},
+			Effect: core.SpellEffect{
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigRoll(285, 475),
+			},
+		},
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
+
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		// Each time one of your spells deals periodic damage,
 		// there is a chance 285 to 475 additional damage will be dealt. (Proc chance: 10%, 15s cooldown)
 		icd := core.NewICD()
@@ -117,11 +121,8 @@ func ApplyTimbals(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				timbalsTemplate.Apply(shadowBolt)
-				// Apply the caster/target from the cast that procd this.
-				shadowBolt.Character = spellCast.Character
-				shadowBolt.Effect.Target = spellEffect.Target
-				shadowBolt.Cast(sim)
+
+				timbalsSpell.Cast(sim, spellEffect.Target)
 			},
 		}
 	})

@@ -97,6 +97,21 @@ func (cast *Cast) Cancel() {
 	cast.objectInUse = false
 }
 
+func (cast *Cast) ApplyCostModifiers(curCost *float64) {
+	if cast.Character.PseudoStats.NoCost {
+		*curCost = 0
+	} else {
+		*curCost -= cast.BaseCost.Value * (1 - cast.Character.PseudoStats.CostMultiplier)
+		*curCost -= cast.Character.PseudoStats.CostReduction
+		*curCost = MaxFloat(0, *curCost)
+	}
+}
+func (cast *Cast) ApplyCastTimeModifiers(dur *time.Duration) {
+	if !cast.IgnoreHaste {
+		*dur = time.Duration(float64(*dur) / cast.Character.CastSpeed())
+	}
+}
+
 // Should be called exactly once after creation.
 func (cast *Cast) init(sim *Simulation) {
 	if cast.Character == nil {
@@ -107,17 +122,8 @@ func (cast *Cast) init(sim *Simulation) {
 	}
 	cast.objectInUse = true
 
-	if !cast.IgnoreHaste {
-		cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())
-	}
-
-	if cast.Character.PseudoStats.NoCost {
-		cast.Cost.Value = 0
-	} else {
-		cast.Cost.Value -= cast.BaseCost.Value * (1 - cast.Character.PseudoStats.CostMultiplier)
-		cast.Cost.Value -= cast.Character.PseudoStats.CostReduction
-		cast.Cost.Value = MaxFloat(0, cast.Cost.Value)
-	}
+	cast.ApplyCastTimeModifiers(&cast.CastTime)
+	cast.ApplyCostModifiers(&cast.Cost.Value)
 
 	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
 	if cast.GCD != 0 && cast.Character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
