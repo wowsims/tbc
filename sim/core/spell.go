@@ -72,7 +72,7 @@ func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) b
 		spellCast := &instance.SpellCast
 		if len(instance.Effects) == 0 {
 			hitEffect := &instance.Effect
-			hitEffect.determineOutcome(sim, spellCast, instance)
+			hitEffect.determineOutcome(sim, spellCast, spell, false)
 
 			if hitEffect.Landed() {
 				hitEffect.directCalculations(sim, spellCast)
@@ -84,18 +84,14 @@ func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) b
 				}
 			}
 
-			hitEffect.applyResultsToSpell(spell, false)
-			hitEffect.afterCalculations(sim, spellCast)
+			hitEffect.afterCalculations(sim, spellCast, spell, false)
 		} else {
 			// Use a separate loop for the beforeCalculations() calls so that they all
 			// come before the first afterCalculations() call. This prevents proc effects
 			// on the first hit from benefitting other hits of the same spell.
 			for effectIdx := range instance.Effects {
 				hitEffect := &instance.Effects[effectIdx]
-				hitEffect.determineOutcome(sim, spellCast, instance)
-			}
-			for effectIdx := range instance.Effects {
-				hitEffect := &instance.Effects[effectIdx]
+				hitEffect.determineOutcome(sim, spellCast, spell, false)
 				if hitEffect.Landed() {
 					hitEffect.directCalculations(sim, spellCast)
 					if hitEffect.DotInput.NumberOfTicks != 0 {
@@ -110,9 +106,7 @@ func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) b
 			// Use a separate loop for the afterCalculations() calls so all effect damage
 			// is fully calculated before invoking proc callbacks.
 			for effectIdx := range instance.Effects {
-				hitEffect := &instance.Effects[effectIdx]
-				hitEffect.applyResultsToSpell(spell, false)
-				hitEffect.afterCalculations(sim, spellCast)
+				instance.Effects[effectIdx].afterCalculations(sim, spellCast, spell, false)
 			}
 
 			// This assumes that the effects either all have dots, or none of them do.
