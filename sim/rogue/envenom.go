@@ -16,7 +16,7 @@ func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 
 	ability := rogue.newAbility(EnvenomActionID, rogue.envenomEnergyCost, SpellFlagFinisher|core.SpellExtrasIgnoreResists, core.ProcMaskMeleeMHSpecial)
 	ability.SpellCast.SpellSchool = core.SpellSchoolNature
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			rogue.ApplyFinisher(sim, spell.ActionID)
 		} else {
@@ -31,7 +31,7 @@ func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 		basePerComboPoint += 40
 	}
 	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 			comboPoints := rogue.ComboPoints()
 			base := basePerComboPoint * float64(comboPoints)
 			return base + (hitEffect.MeleeAttackPower(spell.Character)*0.03)*float64(comboPoints)

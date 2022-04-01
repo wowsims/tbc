@@ -14,7 +14,7 @@ func (rogue *Rogue) registerShivSpell(_ *core.Simulation) {
 	}
 
 	ability := rogue.newAbility(ShivActionID, rogue.shivEnergyCost, SpellFlagBuilder|core.SpellExtrasCannotBeDodged, core.ProcMaskMeleeOHSpecial)
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			rogue.AddComboPoints(sim, 1, ShivActionID)
 

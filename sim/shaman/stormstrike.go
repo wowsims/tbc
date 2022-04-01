@@ -26,7 +26,7 @@ func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) core.Aura {
 			target.PseudoStats.NatureDamageTakenMultiplier /= 1.2
 		},
 	}
-	ssDebuffAura.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+	ssDebuffAura.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spell.SpellSchool != core.SpellSchoolNature {
 			return
 		}
@@ -45,7 +45,7 @@ func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) core.Aura {
 	return ssDebuffAura
 }
 
-func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.SimpleSpellTemplate {
+func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
 	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -115,7 +115,7 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryNone,
 			ThreatMultiplier:    1,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}

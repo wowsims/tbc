@@ -98,7 +98,7 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	}
 
 	// Activate shared behaviors
-	var spell *core.SimpleSpellTemplate
+	var spell *core.Spell
 	var wait1 time.Duration
 	var wait2 time.Duration
 	var wait time.Duration

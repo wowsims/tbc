@@ -56,7 +56,7 @@ var ItemSetWarbringerArmor = core.ItemSet{
 				OnExpire: func(sim *core.Simulation) {
 					character.PseudoStats.DamageDealtMultiplier /= 1.1
 				},
-				OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+				OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if spellEffect.Damage > 0 {
 						character.RemoveAura(sim, WarbringerArmor4PcProcAuraID)
 					}
@@ -66,7 +66,7 @@ var ItemSetWarbringerArmor = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: WarbringerArmor4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spell.SameAction(RevengeActionID) {
 							return
 						}
@@ -152,7 +152,7 @@ func ApplyAshtongueTalismanOfValor(agent core.Agent) {
 
 		return core.Aura{
 			ID: AshtongueTalismanOfValorAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SameAction(ShieldSlamActionID) && !spell.SameAction(BloodthirstActionID) {
 					return
 				}

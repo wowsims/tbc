@@ -55,21 +55,21 @@ type Mage struct {
 	// Cached values for a few mechanics.
 	spellDamageMultiplier float64
 
-	ArcaneBlast     *core.SimpleSpellTemplate
-	ArcaneExplosion *core.SimpleSpellTemplate
-	ArcaneMissiles  *core.SimpleSpellTemplate
-	Blizzard        *core.SimpleSpellTemplate
-	Ignites         []*core.SimpleSpellTemplate
-	Fireball        *core.SimpleSpellTemplate
-	FireballDot     *core.SimpleSpellTemplate
-	FireBlast       *core.SimpleSpellTemplate
-	Flamestrike     *core.SimpleSpellTemplate
-	FlamestrikeDot  *core.SimpleSpellTemplate
-	Frostbolt       *core.SimpleSpellTemplate
-	Pyroblast       *core.SimpleSpellTemplate
-	PyroblastDot    *core.SimpleSpellTemplate
-	Scorch          *core.SimpleSpellTemplate
-	WintersChill    *core.SimpleSpellTemplate
+	ArcaneBlast     *core.Spell
+	ArcaneExplosion *core.Spell
+	ArcaneMissiles  *core.Spell
+	Blizzard        *core.Spell
+	Ignites         []*core.Spell
+	Fireball        *core.Spell
+	FireballDot     *core.Spell
+	FireBlast       *core.Spell
+	Flamestrike     *core.Spell
+	FlamestrikeDot  *core.Spell
+	Frostbolt       *core.Spell
+	Pyroblast       *core.Spell
+	PyroblastDot    *core.Spell
+	Scorch          *core.Spell
+	WintersChill    *core.Spell
 
 	manaTracker common.ManaSpendingRateTracker
 }
@@ -100,7 +100,7 @@ func (mage *Mage) Init(sim *core.Simulation) {
 	mage.registerScorchSpell(sim)
 	mage.registerWintersChillSpell(sim)
 
-	mage.Ignites = []*core.SimpleSpellTemplate{}
+	mage.Ignites = []*core.Spell{}
 	for i := int32(0); i < sim.GetNumTargets(); i++ {
 		mage.Ignites = append(mage.Ignites, mage.newIgniteSpell(sim))
 	}

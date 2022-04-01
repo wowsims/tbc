@@ -75,7 +75,7 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 				shaman.ElementalFocusStacks--
 			}
 		}
-		spell.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+		spell.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				shaman.ElementalFocusStacks = 2
 			}

@@ -44,7 +44,7 @@ func (warrior *Warrior) registerBloodthirstSpell(_ *core.Simulation) {
 			DamageMultiplier:    1,
 			ThreatMultiplier:    1,
 			BaseDamage: core.BaseDamageConfig{
-				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 					return hitEffect.MeleeAttackPower(spell.Character) * 0.45
 				},
 				TargetSpellCoefficient: 0, // Doesn't scale with +damage on target?
@@ -57,7 +57,7 @@ func (warrior *Warrior) registerBloodthirstSpell(_ *core.Simulation) {
 	}
 
 	refundAmount := warrior.bloodthirstCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if !spellEffect.Landed() {
 			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}

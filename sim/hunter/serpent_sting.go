@@ -33,7 +33,7 @@ func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
 			DotInput: core.DotDamageInput{
 				NumberOfTicks: 5,
 				TickLength:    time.Second * 3,
-				TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+				TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 					attackPower := hitEffect.RangedAttackPower(spell.Character) + hitEffect.RangedAttackPowerOnTarget()
 					return 132 + attackPower*0.02
 				},

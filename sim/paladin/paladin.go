@@ -27,12 +27,12 @@ type Paladin struct {
 	SealOfWisdomAura      core.Aura
 	SealOfCommandAura     core.Aura
 
-	Consecration           *core.SimpleSpellTemplate
-	CrusaderStrike         *core.SimpleSpellTemplate
-	Exorcism               *core.SimpleSpellTemplate
-	JudgementOfBlood       *core.SimpleSpellTemplate
-	JudgementOfTheCrusader *core.SimpleSpellTemplate
-	JudgementOfWisdom      *core.SimpleSpellTemplate
+	Consecration           *core.Spell
+	CrusaderStrike         *core.Spell
+	Exorcism               *core.Spell
+	JudgementOfBlood       *core.Spell
+	JudgementOfTheCrusader *core.Spell
+	JudgementOfWisdom      *core.Spell
 }
 
 // Implemented by each Paladin spec.

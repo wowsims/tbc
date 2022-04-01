@@ -80,14 +80,14 @@ type Hunter struct {
 	aspectOfTheHawkTemplate  core.SimpleCast
 	aspectOfTheViperTemplate core.SimpleCast
 
-	AimedShot    *core.SimpleSpellTemplate
-	ArcaneShot   *core.SimpleSpellTemplate
-	KillCommand  *core.SimpleSpellTemplate
-	MultiShot    *core.SimpleSpellTemplate
-	RaptorStrike *core.SimpleSpellTemplate
-	ScorpidSting *core.SimpleSpellTemplate
-	SerpentSting *core.SimpleSpellTemplate
-	SteadyShot   *core.SimpleSpellTemplate
+	AimedShot    *core.Spell
+	ArcaneShot   *core.Spell
+	KillCommand  *core.Spell
+	MultiShot    *core.Spell
+	RaptorStrike *core.Spell
+	ScorpidSting *core.Spell
+	SerpentSting *core.Spell
+	SteadyShot   *core.Spell
 
 	fakeHardcast core.Cast
 }
@@ -229,7 +229,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		MainHand: hunter.WeaponFromMainHand(0),
 		OffHand:  hunter.WeaponFromOffHand(0),
 		Ranged:   rangedWeapon,
-		ReplaceMHSwing: func(sim *core.Simulation) *core.SimpleSpellTemplate {
+		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
 			return hunter.TryRaptorStrike(sim)
 		},
 	})

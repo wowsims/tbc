@@ -37,7 +37,7 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 	priest.Character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ShadowWeaverAuraID,
-			OnPeriodicDamage: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect, tickDamage float64) {
+			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
 				if tickDamage > 0 && priest.CurVTSpell.Instance.Effect.DotInput.IsTicking(sim) {
 					amount := tickDamage * 0.05
 					for _, partyMember := range priest.Party.Players {
@@ -51,7 +51,7 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 					}
 				}
 			},
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}

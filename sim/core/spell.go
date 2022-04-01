@@ -65,7 +65,7 @@ func (spell *SimpleSpell) GetDuration() time.Duration {
 	}
 }
 
-func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) bool {
+func (instance *SimpleSpell) Cast(sim *Simulation, spell *Spell) bool {
 	return instance.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		spell.Casts++
 		spell.MostRecentCost = cast.Cost.Value
@@ -175,7 +175,7 @@ type SpellMetrics struct {
 }
 
 // TODO: Rename to 'Spell' when we're done with the refactoring.
-type SimpleSpellTemplate struct {
+type Spell struct {
 	// ID for the action.
 	ActionID
 
@@ -202,15 +202,15 @@ type SimpleSpellTemplate struct {
 	Instance SimpleSpell
 }
 
-func (spell *SimpleSpellTemplate) reset(_ *Simulation) {
+func (spell *Spell) reset(_ *Simulation) {
 	spell.SpellMetrics = SpellMetrics{}
 }
 
-func (spell *SimpleSpellTemplate) doneIteration() {
+func (spell *Spell) doneIteration() {
 	spell.Character.Metrics.addSpell(spell)
 }
 
-func (spell *SimpleSpellTemplate) Cast(sim *Simulation, target *Target) bool {
+func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
 	// Initialize cast from precomputed template.
 	instance := &spell.Instance
 	if instance.objectInUse {
@@ -241,7 +241,7 @@ type SpellConfig struct {
 }
 
 // Registers a new spell to the character. Returns the newly created spell.
-func (character *Character) RegisterSpell(config SpellConfig) *SimpleSpellTemplate {
+func (character *Character) RegisterSpell(config SpellConfig) *Spell {
 	if len(character.Spellbook) > 100 {
 		panic(fmt.Sprintf("Over 100 registered spells when registering %s! There is probably a spell being registered every iteration.", config.Template.ActionID))
 	}
@@ -250,7 +250,7 @@ func (character *Character) RegisterSpell(config SpellConfig) *SimpleSpellTempla
 	}
 	config.Template.Character = character
 
-	spell := &SimpleSpellTemplate{
+	spell := &Spell{
 		ActionID:    config.Template.ActionID,
 		Character:   character,
 		SpellSchool: config.Template.SpellSchool,
@@ -268,7 +268,7 @@ func (character *Character) RegisterSpell(config SpellConfig) *SimpleSpellTempla
 }
 
 // Returns the first registered spell with the given ID, or nil if there are none.
-func (character *Character) GetSpell(actionID ActionID) *SimpleSpellTemplate {
+func (character *Character) GetSpell(actionID ActionID) *Spell {
 	for _, spell := range character.Spellbook {
 		if spell.ActionID.SameAction(actionID) {
 			return spell
@@ -278,7 +278,7 @@ func (character *Character) GetSpell(actionID ActionID) *SimpleSpellTemplate {
 }
 
 // Retrieves an existing spell with the same ID as the config uses, or registers it if there is none.
-func (character *Character) GetOrRegisterSpell(config SpellConfig) *SimpleSpellTemplate {
+func (character *Character) GetOrRegisterSpell(config SpellConfig) *Spell {
 	registered := character.GetSpell(config.Template.ActionID)
 	if registered == nil {
 		return character.RegisterSpell(config)

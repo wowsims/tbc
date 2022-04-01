@@ -39,7 +39,7 @@ func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
 			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			DamageMultiplier:    mage.spellDamageMultiplier,
 			ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					mage.FireballDot.Instance.Cancel(sim)
 					mage.FireballDot.Cast(sim, spellEffect.Target)

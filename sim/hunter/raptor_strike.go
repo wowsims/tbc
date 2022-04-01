@@ -47,7 +47,7 @@ func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
 }
 
 // Returns true if the regular melee swing should be used, false otherwise.
-func (hunter *Hunter) TryRaptorStrike(sim *core.Simulation) *core.SimpleSpellTemplate {
+func (hunter *Hunter) TryRaptorStrike(sim *core.Simulation) *core.Spell {
 	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveAutosOnly || hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime) || hunter.CurrentMana() < hunter.raptorStrikeCost {
 		return nil
 	}

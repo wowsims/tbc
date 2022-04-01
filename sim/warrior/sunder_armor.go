@@ -38,7 +38,7 @@ func (warrior *Warrior) registerSunderArmorSpell(_ *core.Simulation) {
 	}
 
 	refundAmount := warrior.sunderArmorCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			target := spellEffect.Target
 			// Don't overwrite permanent version of SA

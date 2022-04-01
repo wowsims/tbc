@@ -48,7 +48,7 @@ func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
 
 	damageRollFunc := core.DamageRollFunc(420, 440)
 	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, _ *core.SpellEffect, _ *core.SimpleSpellTemplate) float64 {
+		Calculator: func(sim *core.Simulation, _ *core.SpellEffect, _ *core.Spell) float64 {
 			return damageRollFunc(sim) + warrior.GetStat(stats.BlockValue)
 		},
 		TargetSpellCoefficient: 1,
@@ -59,7 +59,7 @@ func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
 	}
 
 	refundAmount := ShieldSlamCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if !spellEffect.Landed() {
 			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}

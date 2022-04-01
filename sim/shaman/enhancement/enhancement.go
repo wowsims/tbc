@@ -126,7 +126,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 	shockAction := common.ScheduledAbility{
 		Duration: core.GCDDefault,
 		TryCast: func(sim *core.Simulation) bool {
-			var shock *core.SimpleSpellTemplate
+			var shock *core.Spell
 			if enh.Rotation.WeaveFlameShock && !enh.FlameShock.Instance.IsInUse() {
 				shock = enh.FlameShock
 			} else if enh.Rotation.PrimaryShock == proto.EnhancementShaman_Rotation_Earth {
@@ -207,7 +207,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 			curTime = castAt + duration
 		}
 	}
-	scheduleSpellTotem := func(duration time.Duration, spell *core.SimpleSpellTemplate) {
+	scheduleSpellTotem := func(duration time.Duration, spell *core.Spell) {
 		scheduleTotem(duration, false, false, func(sim *core.Simulation) (bool, float64) {
 			success := spell.Cast(sim, sim.GetPrimaryTarget())
 			return success, spell.Instance.Cost.Value

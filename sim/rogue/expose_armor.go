@@ -14,7 +14,7 @@ func (rogue *Rogue) registerExposeArmorSpell(_ *core.Simulation) {
 
 	ability := rogue.newAbility(ExposeArmorActionID, ExposeArmorEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
 	ability.Effect.CritRollCategory = core.CritRollCategoryNone
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			spellEffect.Target.ReplaceAura(sim, core.ExposeArmorAura(sim, spellEffect.Target, rogue.Talents.ImprovedExposeArmor))
 			rogue.ApplyFinisher(sim, spell.ActionID)

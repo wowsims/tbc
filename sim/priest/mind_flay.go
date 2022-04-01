@@ -12,7 +12,7 @@ const SpellIDMindFlay int32 = 25387
 const TagMF2 = 2
 const TagMF3 = 3
 
-func (priest *Priest) newMindFlaySpell(sim *core.Simulation, numTicks int) *core.SimpleSpellTemplate {
+func (priest *Priest) newMindFlaySpell(sim *core.Simulation, numTicks int) *core.Spell {
 	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{

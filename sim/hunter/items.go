@@ -81,7 +81,7 @@ func ApplyTalonOfAlar(agent core.Agent) {
 
 		return core.Aura{
 			ID: TalonOfAlarAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SameAction(ArcaneShotActionID) {
 					return
 				}
@@ -95,7 +95,7 @@ func ApplyTalonOfAlar(agent core.Agent) {
 func (hunter *Hunter) talonOfAlarDamageMod(baseDamageConfig core.BaseDamageConfig) core.BaseDamageConfig {
 	if hunter.HasTrinketEquipped(30448) {
 		return core.WrapBaseDamageConfig(baseDamageConfig, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
-			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 				normalDamage := oldCalculator(sim, hitEffect, spell)
 				if hunter.HasAura(TalonOfAlarProcAuraID) {
 					return normalDamage + 40
@@ -128,7 +128,7 @@ func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: BlackBowOfTheBetrayerAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
@@ -149,7 +149,7 @@ func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
 
 		return core.Aura{
 			ID: AshtongueTalismanOfSwiftnessAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SameAction(SteadyShotActionID) {
 					return
 				}

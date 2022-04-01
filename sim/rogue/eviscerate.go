@@ -15,7 +15,7 @@ func (rogue *Rogue) registerEviscerateSpell(sim *core.Simulation) {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	ability := rogue.newAbility(EviscerateActionID, rogue.eviscerateEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			rogue.ApplyFinisher(sim, spell.ActionID)
 		} else {
@@ -30,7 +30,7 @@ func (rogue *Rogue) registerEviscerateSpell(sim *core.Simulation) {
 		basePerComboPoint += 40
 	}
 	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 			comboPoints := rogue.ComboPoints()
 			base := 60.0 + basePerComboPoint*float64(comboPoints)
 			roll := sim.RandomFloat("Eviscerate") * 120.0

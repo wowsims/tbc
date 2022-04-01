@@ -150,7 +150,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 
 	target := sim.GetPrimaryTarget()
 
-	var spell *core.SimpleSpellTemplate
+	var spell *core.Spell
 
 	if moonkin.ShouldCastFaerieFire(sim, target, rotation) {
 		spell = moonkin.FaerieFire

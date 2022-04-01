@@ -222,7 +222,7 @@ func (shaman *Shaman) NextTotemAt(sim *core.Simulation) time.Duration {
 //  Returns whether we tried to cast a totem, regardless of whether it succeeded.
 func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 	var cast *core.SimpleCast
-	var attackCast *core.SimpleSpellTemplate // if using fire totems this will be an attack cast.
+	var attackCast *core.Spell // if using fire totems this will be an attack cast.
 
 	for totemTypeIdx, totemExpiration := range shaman.NextTotemDrops {
 		if cast != nil || attackCast != nil {

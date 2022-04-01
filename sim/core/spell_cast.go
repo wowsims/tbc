@@ -9,11 +9,11 @@ import (
 
 // Callback for after a spell hits the target and after damage is calculated. Use it for proc effects
 // or anything that comes from the final result of the spell.
-type OnSpellHit func(sim *Simulation, spell *SimpleSpellTemplate, spellEffect *SpellEffect)
+type OnSpellHit func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
 
 // OnPeriodicDamage is called when dots tick, after damage is calculated. Use it for proc effects
 // or anything that comes from the final result of a tick.
-type OnPeriodicDamage func(sim *Simulation, spell *SimpleSpellTemplate, spellEffect *SpellEffect, tickDamage float64)
+type OnPeriodicDamage func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, tickDamage float64)
 
 // A Spell is a type of cast that can hit/miss using spell stats, and has a spell school.
 type SpellCast struct {
@@ -119,7 +119,7 @@ func (spellEffect *SpellEffect) PhysicalHitChance(character *Character) float64 
 	return (hitRating / (MeleeHitRatingPerHitChance * 100)) - spellEffect.Target.HitSuppression
 }
 
-func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spell *SimpleSpellTemplate) float64 {
+func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spell *Spell) float64 {
 	critRating := character.stats[stats.MeleeCrit] + spellEffect.BonusCritRating + spellEffect.Target.PseudoStats.BonusCritRating
 
 	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
@@ -139,11 +139,11 @@ func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spell *
 	return (critRating / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
 }
 
-func (spellEffect *SpellEffect) SpellPower(character *Character, spell *SimpleSpellTemplate) float64 {
+func (spellEffect *SpellEffect) SpellPower(character *Character, spell *Spell) float64 {
 	return character.GetStat(stats.SpellPower) + character.GetStat(spell.SpellSchool.Stat()) + character.PseudoStats.MobTypeSpellPower + spellEffect.BonusSpellPower
 }
 
-func (spellEffect *SpellEffect) SpellCritChance(character *Character, spell *SimpleSpellTemplate) float64 {
+func (spellEffect *SpellEffect) SpellCritChance(character *Character, spell *Spell) float64 {
 	critRating := (character.GetStat(stats.SpellCrit) + spellEffect.BonusSpellCritRating + spellEffect.Target.PseudoStats.BonusCritRating)
 	if spell.SpellSchool.Matches(SpellSchoolFire) {
 		critRating += character.PseudoStats.BonusFireCritRating
@@ -153,7 +153,7 @@ func (spellEffect *SpellEffect) SpellCritChance(character *Character, spell *Sim
 	return critRating / (SpellCritRatingPerCritChance * 100)
 }
 
-func (spellEffect *SpellEffect) directCalculations(sim *Simulation, spell *SimpleSpellTemplate) {
+func (spellEffect *SpellEffect) directCalculations(sim *Simulation, spell *Spell) {
 	damage := spellEffect.calculateBaseDamage(sim, spell)
 
 	damage *= spellEffect.DamageMultiplier
@@ -165,7 +165,7 @@ func (spellEffect *SpellEffect) directCalculations(sim *Simulation, spell *Simpl
 	spellEffect.Damage = damage
 }
 
-func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *SimpleSpellTemplate) float64 {
+func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spell) float64 {
 	if spellEffect.BaseDamage.Calculator == nil {
 		return 0
 	} else {
@@ -173,7 +173,7 @@ func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Simp
 	}
 }
 
-func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spell *SimpleSpellTemplate, isPeriodic bool) {
+func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spell *Spell, isPeriodic bool) {
 	if isPeriodic {
 		if spellEffect.DotInput.TicksCanMissAndCrit {
 			if spellEffect.hitCheck(sim, spell) {
@@ -213,7 +213,7 @@ func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spell *SimpleS
 }
 
 // Computes an attack result using the white-hit table formula (single roll).
-func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, spell *SimpleSpellTemplate) HitOutcome {
+func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, spell *Spell) HitOutcome {
 	character := spell.Character
 
 	roll := sim.RandomFloat("White Hit Table")
@@ -283,7 +283,7 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, spell *SimpleSpellT
 }
 
 // Calculates a hit check using the stats from this spell.
-func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spell *SimpleSpellTemplate) bool {
+func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spell *Spell) bool {
 	hit := 0.83 + (spell.Character.GetStat(stats.SpellHit)+spellEffect.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
@@ -291,7 +291,7 @@ func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spell *SimpleSpellTemp
 }
 
 // Calculates a crit check using the stats from this spell.
-func (spellEffect *SpellEffect) critCheck(sim *Simulation, spell *SimpleSpellTemplate) bool {
+func (spellEffect *SpellEffect) critCheck(sim *Simulation, spell *Spell) bool {
 	switch spellEffect.CritRollCategory {
 	case CritRollCategoryMagical:
 		critChance := spellEffect.SpellCritChance(spell.Character, spell)
@@ -303,7 +303,7 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spell *SimpleSpellTem
 	}
 }
 
-func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *SimpleSpellTemplate, isPeriodic bool) {
+func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *Spell, isPeriodic bool) {
 	spellEffect.applyResultsToSpell(spell, isPeriodic && !spellEffect.DotInput.TicksCanMissAndCrit)
 
 	if sim.Log != nil && !(spell.SpellExtras.Matches(SpellExtrasAlwaysHits) && spellEffect.Damage == 0) {
@@ -331,7 +331,7 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *Simple
 	}
 }
 
-func (spellEffect *SpellEffect) applyResultsToSpell(spell *SimpleSpellTemplate, isPeriodic bool) {
+func (spellEffect *SpellEffect) applyResultsToSpell(spell *Spell, isPeriodic bool) {
 	if !isPeriodic {
 		if spellEffect.Outcome.Matches(OutcomeHit) {
 			spell.Hits++
@@ -381,7 +381,7 @@ func (spellEffect *SpellEffect) DotResultString() string {
 	return "tick " + spellEffect.String()
 }
 
-func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *SimpleSpellTemplate, isPeriodic bool, damage *float64) {
+func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *Spell, isPeriodic bool, damage *float64) {
 	attacker := spell.Character
 
 	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
@@ -409,7 +409,7 @@ func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *S
 	}
 }
 
-func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *SimpleSpellTemplate, isPeriodic bool, targetCoeff float64, damage *float64) {
+func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Spell, isPeriodic bool, targetCoeff float64, damage *float64) {
 	target := spellEffect.Target
 
 	*damage *= target.PseudoStats.DamageTakenMultiplier
@@ -438,7 +438,7 @@ func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Sim
 }
 
 // Modifies damage based on Armor or Magic resistances, depending on the damage type.
-func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *SimpleSpellTemplate, damage *float64) {
+func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, damage *float64) {
 	if spell.SpellExtras.Matches(SpellExtrasIgnoreResists) {
 		return
 	}
@@ -466,7 +466,7 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *SimpleS
 	}
 }
 
-func (spellEffect *SpellEffect) applyOutcome(sim *Simulation, spell *SimpleSpellTemplate, damage *float64) {
+func (spellEffect *SpellEffect) applyOutcome(sim *Simulation, spell *Spell, damage *float64) {
 	if !spellEffect.Landed() {
 		*damage = 0
 	} else if spellEffect.Outcome.Matches(OutcomeCrit) {

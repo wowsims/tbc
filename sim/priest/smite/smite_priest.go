@@ -101,7 +101,7 @@ func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 	// holy fire cast time
 	hfCastTime := time.Duration(float64(time.Millisecond*3000) / castSpeed)
 
-	var spell *core.SimpleSpellTemplate
+	var spell *core.Spell
 	// Always attempt to keep SW:P up if its down
 	if !spriest.ShadowWordPain.Instance.Effect.DotInput.IsTicking(sim) {
 		spell = spriest.ShadowWordPain

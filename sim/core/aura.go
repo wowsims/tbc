@@ -553,7 +553,7 @@ func (at *auraTracker) OnCastComplete(sim *Simulation, cast *Cast) {
 }
 
 // Invokes the OnSpellHit event for all tracked Auras.
-func (at *auraTracker) OnSpellHit(sim *Simulation, spell *SimpleSpellTemplate, spellEffect *SpellEffect) {
+func (at *auraTracker) OnSpellHit(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 	for _, id := range at.onSpellHitIDs {
 		at.auras[id].OnSpellHit(sim, spell, spellEffect)
 	}
@@ -562,7 +562,7 @@ func (at *auraTracker) OnSpellHit(sim *Simulation, spell *SimpleSpellTemplate, s
 // Invokes the OnPeriodicDamage
 //   As a debuff when target is being hit by dot.
 //   As a buff when caster's dots are ticking.
-func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spell *SimpleSpellTemplate, spellEffect *SpellEffect, tickDamage float64) {
+func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spell *Spell, spellEffect *SpellEffect, tickDamage float64) {
 	for _, id := range at.onPeriodicDamageIDs {
 		at.auras[id].OnPeriodicDamage(sim, spell, spellEffect, tickDamage)
 	}
