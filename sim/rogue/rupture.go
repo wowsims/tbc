@@ -15,12 +15,12 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 
 	ability := rogue.newAbility(RuptureActionID, RuptureEnergyCost, SpellFlagFinisher|core.SpellExtrasIgnoreResists, core.ProcMaskMeleeMHSpecial)
 	ability.Effect.CritRollCategory = core.CritRollCategoryNone
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
-			rogue.ApplyFinisher(sim, spellCast.ActionID)
+			rogue.ApplyFinisher(sim, spell.ActionID)
 		} else {
 			if refundAmount > 0 {
-				rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
+				rogue.AddEnergy(sim, spell.MostRecentCost*refundAmount, core.ActionID{SpellID: 31245})
 			}
 		}
 	}

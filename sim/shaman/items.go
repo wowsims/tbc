@@ -63,7 +63,7 @@ var ItemSetCycloneRegalia = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: Cyclone4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 							return
 						}
@@ -99,7 +99,7 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: Cataclysm4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 							return
 						}
@@ -280,12 +280,12 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 		return core.Aura{
 			ID:       StonebreakersTotemAuraID,
 			Duration: core.NeverExpires,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
 
-				if !spellCast.SpellExtras.Matches(SpellFlagShock) {
+				if !spell.SpellExtras.Matches(SpellFlagShock) {
 					return
 				}
 

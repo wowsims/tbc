@@ -30,7 +30,7 @@ func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOv
 	makeOnSpellHit := func(hitIndex int32) core.OnSpellHit {
 		if !isLightningOverload && shaman.Talents.LightningOverload > 0 {
 			lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04 / 3
-			return func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			return func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
@@ -47,7 +47,7 @@ func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOv
 				shaman.ChainLightningLOs[hitIndex].Cast(sim, spellEffect.Target)
 			}
 		} else {
-			return func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			return func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if shaman.Talents.ElementalFocus && spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					shaman.ElementalFocusStacks = 2
 				}

@@ -75,7 +75,7 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 				shaman.ElementalFocusStacks--
 			}
 		}
-		spell.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		spell.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				shaman.ElementalFocusStacks = 2
 			}
@@ -87,16 +87,16 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
 			instance.Effect.Target = target
 
-			spellCast := &instance.SpellCast
+			spell := &instance.SpellCast
 			if shaman.ElementalFocusStacks > 0 {
 				// Reduces mana cost by 40%
-				spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.4
+				spell.Cost.Value -= spell.BaseCost.Value * 0.4
 			}
 			if shaman.HasAura(ShamanisticFocusAuraID) {
-				spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.6
+				spell.Cost.Value -= spell.BaseCost.Value * 0.6
 			}
 			if shaman.HasAura(ElementalMasteryAuraID) {
-				spellCast.Cost.Value = 0
+				spell.Cost.Value = 0
 			}
 		},
 	}

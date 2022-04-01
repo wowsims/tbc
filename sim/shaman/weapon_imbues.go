@@ -89,7 +89,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 		return core.Aura{
 			ID: WFImbueAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				// ProcMask: 20
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
@@ -168,7 +168,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: FTImbueAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
 				}
@@ -229,7 +229,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 		ppmm := shaman.AutoAttacks.NewPPMManager(9.0)
 		return core.Aura{
 			ID: FBImbueAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
 				}

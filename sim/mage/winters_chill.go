@@ -24,7 +24,7 @@ func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 
-	spell.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	spell.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 		if !spellEffect.Landed() {
 			return
 		}
@@ -56,12 +56,12 @@ func (mage *Mage) applyWintersChill() {
 	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: WintersChillAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
 
-				if spellCast.SpellSchool == core.SpellSchoolFrost && spellCast.ActionID.SpellID != SpellIDWintersChill {
+				if spell.SpellSchool == core.SpellSchoolFrost && spell.ActionID.SpellID != SpellIDWintersChill {
 					if procChance != 1.0 && sim.RandomFloat("Winters Chill") > procChance {
 						return
 					}

@@ -31,7 +31,7 @@ func (hunter *Hunter) aspectOfTheHawkAura(sim *core.Simulation) core.Aura {
 
 	factory := hunter.NewTemporaryStatsAuraFactory(AspectOfTheHawkAuraID, AspectOfTheHawkActionID, stats.Stats{stats.RangedAttackPower: 155}, core.NeverExpires)
 	aura := factory(sim)
-	aura.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	aura.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 		if !spellEffect.ProcMask.Matches(core.ProcMaskRangedAuto) {
 			return
 		}

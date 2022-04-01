@@ -62,7 +62,7 @@ func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 		effects[i].Target = sim.GetTarget(i)
 
 		tcAura := core.ThunderClapAura(effects[i].Target, warrior.Talents.ImprovedThunderClap)
-		effects[i].OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		effects[i].OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				// This needs to be AddAura instead of ReplaceAura, in case a lower rank of Thunder Clap was applied by another warrior.
 				spellEffect.Target.AddAura(sim, tcAura)

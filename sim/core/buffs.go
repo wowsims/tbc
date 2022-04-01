@@ -361,7 +361,7 @@ func newWindfuryBuffAuraFactory(character *Character, rank int32, iwtTalentPoint
 				character.Log(sim, "Lost %s from fading %s", buffs.FlatString(), buffActionID)
 			}
 		},
-		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+		OnSpellHit: func(sim *Simulation, spell *SimpleSpellTemplate, spellEffect *SpellEffect) {
 			if !spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryWhite) {
 				return
 			}
@@ -395,7 +395,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	return Aura{
 		ID:       windfuryTotemAuraID,
 		ActionID: ActionID{SpellID: WindfuryTotemSpellRanks[rank-1]}, // totem spell id ("Windfury Totem")
-		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+		OnSpellHit: func(sim *Simulation, spell *SimpleSpellTemplate, spellEffect *SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeMHAuto) {
 				return
 			}

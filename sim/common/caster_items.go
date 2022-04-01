@@ -31,7 +31,7 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 		applyStatAura := character.NewTemporaryStatsAuraApplier(PowerOfArcanagosAuraID, core.ActionID{ItemID: 28602}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 		return core.Aura{
 			ID: RobeOfTheElderScribeAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -64,7 +64,7 @@ func ApplyEternalSage(agent core.Agent) {
 
 		return core.Aura{
 			ID: EternalSageItemAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -116,7 +116,7 @@ func ApplyTimbals(agent core.Agent) {
 
 		return core.Aura{
 			ID: AugmentPainAuraID,
-			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
+			OnPeriodicDamage: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect, tickDamage float64) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("timbals") > proc { // can't activate if on CD or didn't proc
 					return
 				}

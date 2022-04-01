@@ -59,7 +59,7 @@ func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
 	}
 
 	refundAmount := ShieldSlamCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 		if !spellEffect.Landed() {
 			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}

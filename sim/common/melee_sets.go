@@ -54,7 +54,7 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 
 				return core.Aura{
 					ID: DesolationBattlegearAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}
@@ -94,7 +94,7 @@ var ItemSetDoomplateBattlegear = core.ItemSet{
 
 				return core.Aura{
 					ID: DoomplateBattlegearAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}
@@ -146,7 +146,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
 
-			spell := character.RegisterSpell(core.SpellConfig{
+			procSpell := character.RegisterSpell(core.SpellConfig{
 				Template: core.SimpleSpell{
 					SpellCast: core.SpellCast{
 						Cast: core.Cast{
@@ -173,7 +173,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 
 				return core.Aura{
 					ID: FistsOfFuryAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 							return
 						}
@@ -181,7 +181,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 							return
 						}
 
-						spell.Cast(sim, spellEffect.Target)
+						procSpell.Cast(sim, spellEffect.Target)
 					},
 				}
 			})
@@ -242,7 +242,7 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 
 				return core.Aura{
 					ID: TwinBladesOfAzzinothAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}
@@ -289,7 +289,7 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 
 				return core.Aura{
 					ID: WastewalkerArmorAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}

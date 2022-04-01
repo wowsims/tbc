@@ -54,9 +54,9 @@ type DotDamageInput struct {
 	nextTickTime  time.Duration
 }
 
-func (ddi *DotDamageInput) init(spellCast *SpellCast) {
+func (ddi *DotDamageInput) init(spell *SpellCast) {
 	if ddi.AffectedByCastSpeed {
-		ddi.TickLength = time.Duration(float64(ddi.TickLength) / spellCast.Character.CastSpeed())
+		ddi.TickLength = time.Duration(float64(ddi.TickLength) / spell.Character.CastSpeed())
 	}
 }
 
@@ -108,7 +108,6 @@ func (instance *SimpleSpell) ApplyDot(sim *Simulation, spell *SimpleSpellTemplat
 	pa := sim.pendingActionPool.Get()
 	pa.Priority = ActionPriorityDOT
 	multiDot := len(instance.Effects) > 0
-	spellCast := &instance.SpellCast
 
 	if multiDot {
 		pa.NextActionAt = sim.CurrentTime + instance.Effects[0].DotInput.TickLength
@@ -122,17 +121,17 @@ func (instance *SimpleSpell) ApplyDot(sim *Simulation, spell *SimpleSpellTemplat
 			referenceHit = &instance.Effects[0]
 			if sim.CurrentTime == referenceHit.DotInput.nextTickTime {
 				for i := range instance.Effects {
-					instance.Effects[i].calculateDotDamage(sim, spellCast, spell)
+					instance.Effects[i].calculateDotDamage(sim, spell)
 				}
 				instance.applyAOECap()
 				for i := range instance.Effects {
-					instance.Effects[i].afterDotTick(sim, spell, spellCast)
+					instance.Effects[i].afterDotTick(sim, spell)
 				}
 			}
 		} else {
 			if sim.CurrentTime == referenceHit.DotInput.nextTickTime {
-				referenceHit.calculateDotDamage(sim, spellCast, spell)
-				referenceHit.afterDotTick(sim, spell, spellCast)
+				referenceHit.calculateDotDamage(sim, spell)
+				referenceHit.afterDotTick(sim, spell)
 			}
 		}
 
@@ -175,7 +174,7 @@ func (hitEffect *SpellEffect) takeDotSnapshot(sim *Simulation, spell *SimpleSpel
 	hitEffect.BeyondAOECapMultiplier = 1
 }
 
-func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spellCast *SpellCast, spell *SimpleSpellTemplate) {
+func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spell *SimpleSpellTemplate) {
 	damage := hitEffect.DotInput.damagePerTick
 
 	hitEffect.determineOutcome(sim, spell, true)
@@ -191,8 +190,8 @@ func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spellCast *Spe
 }
 
 // This should be called on each dot tick.
-func (hitEffect *SpellEffect) afterDotTick(sim *Simulation, spell *SimpleSpellTemplate, spellCast *SpellCast) {
-	hitEffect.afterCalculations(sim, spellCast, spell, true)
+func (hitEffect *SpellEffect) afterDotTick(sim *Simulation, spell *SimpleSpellTemplate) {
+	hitEffect.afterCalculations(sim, spell, true)
 	hitEffect.DotInput.tickIndex++
 	hitEffect.DotInput.nextTickTime = sim.CurrentTime + hitEffect.DotInput.TickLength
 }

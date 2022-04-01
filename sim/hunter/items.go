@@ -81,8 +81,8 @@ func ApplyTalonOfAlar(agent core.Agent) {
 
 		return core.Aura{
 			ID: TalonOfAlarAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.SameAction(ArcaneShotActionID) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+				if !spell.SameAction(ArcaneShotActionID) {
 					return
 				}
 
@@ -128,7 +128,7 @@ func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: BlackBowOfTheBetrayerAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
@@ -149,8 +149,8 @@ func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
 
 		return core.Aura{
 			ID: AshtongueTalismanOfSwiftnessAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.SameAction(SteadyShotActionID) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+				if !spell.SameAction(SteadyShotActionID) {
 					return
 				}
 				if sim.RandomFloat("Ashtongue Talisman of Swiftness") > procChance {

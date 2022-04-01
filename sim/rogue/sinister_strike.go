@@ -15,7 +15,7 @@ func (rogue *Rogue) registerSinisterStrikeSpell(_ *core.Simulation) {
 	energyCost := rogue.SinisterStrikeEnergyCost()
 	refundAmount := energyCost * 0.8
 	ability := rogue.newAbility(SinisterStrikeActionID, energyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			rogue.AddComboPoints(sim, 1, SinisterStrikeActionID)
 		} else {
