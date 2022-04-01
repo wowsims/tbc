@@ -36,7 +36,7 @@ func (priest *Priest) newVampiricTouchSpell(sim *core.Simulation, isAltCast bool
 				TickBaseDamage: core.DotSnapshotFuncMagic(650/5, 0.2),
 				DebuffID:       VampiricTouchDebuffID,
 			},
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if isAltCast {
 					priest.CurVTSpell = priest.VampiricTouch2
 					priest.NextVTSpell = priest.VampiricTouch

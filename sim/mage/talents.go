@@ -90,8 +90,8 @@ func (mage *Mage) applyArcaneConcentration() {
 				mage.AddStat(stats.SpellCrit, -bonusCrit)
 				mage.PseudoStats.NoCost = false
 			},
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.SpellExtras.Matches(SpellFlagMage) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+				if !spell.SpellExtras.Matches(SpellFlagMage) {
 					return
 				}
 				if curCastIdx == lastCheckedCastIdx {
@@ -110,8 +110,8 @@ func (mage *Mage) applyArcaneConcentration() {
 				}
 				curCastIdx++
 			},
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.SpellExtras.Matches(SpellFlagMage) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+				if !spell.SpellExtras.Matches(SpellFlagMage) {
 					return
 				}
 
@@ -257,12 +257,12 @@ func (mage *Mage) applyMasterOfElements() {
 	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: MasterOfElementsAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					mage.AddMana(sim, spellCast.BaseCost.Value*refundCoeff, core.ActionID{SpellID: 29076}, false)
+					mage.AddMana(sim, spell.MostRecentBaseCost*refundCoeff, core.ActionID{SpellID: 29076}, false)
 				}
 			},
 		}
@@ -304,11 +304,11 @@ func (mage *Mage) registerCombustionCD() {
 					ID:       CombustionAuraID,
 					ActionID: actionID,
 					Duration: core.NeverExpires,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if spellCast.SpellSchool != core.SpellSchoolFire {
+					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+						if spell.SpellSchool != core.SpellSchoolFire {
 							return
 						}
-						if spellCast.SameAction(IgniteActionID) {
+						if spell.SameAction(IgniteActionID) {
 							return
 						}
 						if !spellEffect.Landed() {

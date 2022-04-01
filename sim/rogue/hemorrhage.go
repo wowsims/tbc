@@ -23,8 +23,8 @@ func (rogue *Rogue) registerHemorrhageSpell(_ *core.Simulation) {
 			sim.GetPrimaryTarget().PseudoStats.BonusPhysicalDamageTaken -= 42
 		},
 	}
-	hemoAura.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-		if spellCast.SpellSchool != core.SpellSchoolPhysical {
+	hemoAura.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+		if spell.SpellSchool != core.SpellSchoolPhysical {
 			return
 		}
 		if !spellEffect.Landed() || spellEffect.Damage == 0 {
@@ -43,7 +43,7 @@ func (rogue *Rogue) registerHemorrhageSpell(_ *core.Simulation) {
 	refundAmount := HemorrhageEnergyCost * 0.8
 
 	ability := rogue.newAbility(HemorrhageActionID, HemorrhageEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			rogue.AddComboPoints(sim, 1, HemorrhageActionID)
 

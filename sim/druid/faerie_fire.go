@@ -28,7 +28,7 @@ func (druid *Druid) registerFaerieFireSpell(sim *core.Simulation) {
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			ThreatMultiplier:    1,
 			FlatThreatBonus:     0, // TODO
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}

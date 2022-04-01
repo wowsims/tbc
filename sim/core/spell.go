@@ -68,8 +68,9 @@ func (spell *SimpleSpell) GetDuration() time.Duration {
 func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) bool {
 	return instance.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		spell.Casts++
+		spell.MostRecentCost = cast.Cost.Value
+		spell.MostRecentBaseCost = cast.BaseCost.Value
 
-		spellCast := &instance.SpellCast
 		if len(instance.Effects) == 0 {
 			hitEffect := &instance.Effect
 			hitEffect.determineOutcome(sim, spell, false)
@@ -84,7 +85,7 @@ func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) b
 				}
 			}
 
-			hitEffect.afterCalculations(sim, spellCast, spell, false)
+			hitEffect.afterCalculations(sim, spell, false)
 		} else {
 			// Use a separate loop for the beforeCalculations() calls so that they all
 			// come before the first afterCalculations() call. This prevents proc effects
@@ -106,7 +107,7 @@ func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) b
 			// Use a separate loop for the afterCalculations() calls so all effect damage
 			// is fully calculated before invoking proc callbacks.
 			for effectIdx := range instance.Effects {
-				instance.Effects[effectIdx].afterCalculations(sim, spellCast, spell, false)
+				instance.Effects[effectIdx].afterCalculations(sim, spell, false)
 			}
 
 			// This assumes that the effects either all have dots, or none of them do.
@@ -187,6 +188,11 @@ type SimpleSpellTemplate struct {
 	SpellMetrics
 
 	ModifyCast ModifySpellCast
+
+	// The amount of resource spent by the most recent cast of this spell.
+	// TODO: Find a way to remove this later, as its a bit hacky.
+	MostRecentBaseCost float64
+	MostRecentCost     float64
 
 	// Templates for creating new casts of this spell.
 	Template SimpleSpell

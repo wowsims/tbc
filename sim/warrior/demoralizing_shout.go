@@ -46,7 +46,7 @@ func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
 		effects[i].Target = sim.GetTarget(i)
 
 		demoShoutAura := core.DemoralizingShoutAura(effects[i].Target, warrior.Talents.BoomingVoice, warrior.Talents.ImprovedDemoralizingShout)
-		effects[i].OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		effects[i].OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				// This needs to be AddAura instead of ReplaceAura, in case a lower rank of demo shout was applied by another warrior.
 				spellEffect.Target.AddAura(sim, demoShoutAura)

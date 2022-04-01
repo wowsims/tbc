@@ -76,7 +76,7 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 				NumberOfTicks:  10,
 				TickLength:     time.Millisecond * 1500,
 				TickBaseDamage: core.DotSnapshotFuncMagic(1191/10, 0.06),
-				OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
+				OnPeriodicDamage: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect, tickDamage float64) {
 					// TODO: This should also do something with ExpectedBonusMana
 					priest.AddMana(sim, tickDamage*2.5, ShadowfiendActionID, false)
 				},

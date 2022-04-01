@@ -354,7 +354,7 @@ func ApplyHandOfJustice(agent core.Agent) {
 
 		return core.Aura{
 			ID: HandOfJusticeAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				// https://tbc.wowhead.com/spell=15600/hand-of-justice, proc mask = 20.
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
@@ -422,7 +422,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 					ID:       BadgeOfTheSwarmguardProcAuraID,
 					ActionID: BadgeOfTheSwarmguardActionID,
 					Duration: time.Second * 30,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}
@@ -475,7 +475,7 @@ func ApplyHourglassUnraveller(agent core.Agent) {
 
 		return core.Aura{
 			ID: HourglassUnravellerAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellEffect.IsPhantom {
 					return
 				}
@@ -501,7 +501,7 @@ var RomulosPoisonVialAuraID = core.NewAuraID()
 func ApplyRomulosPoisonVial(agent core.Agent) {
 	character := agent.GetCharacter()
 
-	spell := character.RegisterSpell(core.SpellConfig{
+	procSpell := character.RegisterSpell(core.SpellConfig{
 		Template: core.SimpleSpell{
 			SpellCast: core.SpellCast{
 				Cast: core.Cast{
@@ -528,7 +528,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 
 		return core.Aura{
 			ID: RomulosPoisonVialAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				// mask 340
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
@@ -537,7 +537,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 					return
 				}
 
-				spell.Cast(sim, spellEffect.Target)
+				procSpell.Cast(sim, spellEffect.Target)
 			},
 		}
 	})
@@ -558,7 +558,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 		ppmm := character.AutoAttacks.NewPPMManager(1.0)
 		return core.Aura{
 			ID: DragonspineTrophyAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				// mask: 340
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
@@ -593,7 +593,7 @@ func ApplyTsunamiTalisman(agent core.Agent) {
 
 		return core.Aura{
 			ID: TsunamiTalismanAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellEffect.IsPhantom {
 					return
 				}
@@ -624,7 +624,7 @@ func ApplyDarkmoonCardWrath(agent core.Agent) {
 
 		return core.Aura{
 			ID: DarkmoonCardWrathAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				// mask 340
 				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
@@ -658,7 +658,7 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 
 		return core.Aura{
 			ID: MadnessOfTheBetrayerAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				// mask 340
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
@@ -686,7 +686,7 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 
 		return core.Aura{
 			ID: BlackenedNaaruSliverAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				// mask 340
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
@@ -707,7 +707,7 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 					ID:       BlackenedNaaruSliverProcAuraID,
 					ActionID: core.ActionID{ItemID: 34427},
 					Duration: time.Second * 20,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 							return
 						}
@@ -745,7 +745,7 @@ func ApplyShardOfContempt(agent core.Agent) {
 
 		return core.Aura{
 			ID: ShardOfContemptAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
 				}

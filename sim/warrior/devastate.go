@@ -66,7 +66,7 @@ func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 	}
 
 	refundAmount := warrior.sunderArmorCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			target := spellEffect.Target
 			if !target.HasAura(core.ExposeArmorDebuffID) {

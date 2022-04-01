@@ -172,7 +172,7 @@ func JudgementOfWisdomAura() Aura {
 		ID:       JudgementOfWisdomDebuffID,
 		ActionID: actionID,
 		Duration: time.Second * 20,
-		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+		OnSpellHit: func(sim *Simulation, spell *SimpleSpellTemplate, spellEffect *SpellEffect) {
 			// TODO: This check is purely to maintain behavior during refactoring. Should be removed when possible.
 			if !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) && !spellEffect.Landed() {
 				return
@@ -181,12 +181,12 @@ func JudgementOfWisdomAura() Aura {
 				return // Phantom spells (Romulo's, Lightning Capacitor, etc) don't proc JoW.
 			}
 
-			character := spellCast.Character
+			character := spell.Character
 			if character.HasManaBar() {
 				character.AddMana(sim, mana, actionID, false)
 			}
 
-			if spellCast.ActionID.SpellID == 35395 {
+			if spell.ActionID.SpellID == 35395 {
 				spellEffect.Target.RefreshAura(sim, JudgementOfWisdomDebuffID)
 			}
 		},
@@ -210,8 +210,8 @@ func JudgementOfTheCrusaderAura(target *Target, level float64) Aura {
 			target.PseudoStats.BonusHolyDamageTaken -= 219
 			target.PseudoStats.BonusCritRating -= bonusCrit
 		},
-		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if spellCast.ActionID.SpellID == 35395 {
+		OnSpellHit: func(sim *Simulation, spell *SimpleSpellTemplate, spellEffect *SpellEffect) {
+			if spell.ActionID.SpellID == 35395 {
 				spellEffect.Target.RefreshAura(sim, ImprovedSealOfTheCrusaderDebuffID)
 			}
 		},
@@ -463,7 +463,7 @@ func HuntersMarkAura(target *Target, points int32, fullyStacked bool) Aura {
 			target.PseudoStats.BonusMeleeAttackPower -= meleeBonus
 			target.PseudoStats.BonusRangedAttackPower -= rangedBonus
 		},
-		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+		OnSpellHit: func(sim *Simulation, spell *SimpleSpellTemplate, spellEffect *SpellEffect) {
 			if !spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || !spellEffect.Landed() {
 				return
 			}

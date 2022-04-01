@@ -9,11 +9,11 @@ import (
 
 // Callback for after a spell hits the target and after damage is calculated. Use it for proc effects
 // or anything that comes from the final result of the spell.
-type OnSpellHit func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect)
+type OnSpellHit func(sim *Simulation, spell *SimpleSpellTemplate, spellEffect *SpellEffect)
 
 // OnPeriodicDamage is called when dots tick, after damage is calculated. Use it for proc effects
 // or anything that comes from the final result of a tick.
-type OnPeriodicDamage func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage float64)
+type OnPeriodicDamage func(sim *Simulation, spell *SimpleSpellTemplate, spellEffect *SpellEffect, tickDamage float64)
 
 // A Spell is a type of cast that can hit/miss using spell stats, and has a spell school.
 type SpellCast struct {
@@ -303,7 +303,7 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spell *SimpleSpellTem
 	}
 }
 
-func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast, spell *SimpleSpellTemplate, isPeriodic bool) {
+func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *SimpleSpellTemplate, isPeriodic bool) {
 	spellEffect.applyResultsToSpell(spell, isPeriodic && !spellEffect.DotInput.TicksCanMissAndCrit)
 
 	if sim.Log != nil && !(spell.SpellExtras.Matches(SpellExtrasAlwaysHits) && spellEffect.Damage == 0) {
@@ -316,17 +316,17 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *Sp
 
 	if !isPeriodic || spellEffect.DotInput.TicksProcSpellEffects {
 		if spellEffect.OnSpellHit != nil {
-			spellEffect.OnSpellHit(sim, spellCast, spellEffect)
+			spellEffect.OnSpellHit(sim, spell, spellEffect)
 		}
-		spellCast.Character.OnSpellHit(sim, spellCast, spellEffect)
-		spellEffect.Target.OnSpellHit(sim, spellCast, spellEffect)
+		spell.Character.OnSpellHit(sim, spell, spellEffect)
+		spellEffect.Target.OnSpellHit(sim, spell, spellEffect)
 	}
 
 	if isPeriodic {
-		spellCast.Character.OnPeriodicDamage(sim, spellCast, spellEffect, spellEffect.Damage)
-		spellEffect.Target.OnPeriodicDamage(sim, spellCast, spellEffect, spellEffect.Damage)
+		spell.Character.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
+		spellEffect.Target.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 		if spellEffect.DotInput.OnPeriodicDamage != nil {
-			spellEffect.DotInput.OnPeriodicDamage(sim, spellCast, spellEffect, spellEffect.Damage)
+			spellEffect.DotInput.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 		}
 	}
 }

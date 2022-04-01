@@ -34,7 +34,7 @@ const (
 // Shared precomputation logic for LB and CL.
 func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellCast {
 	cost := core.ResourceCost{Type: stats.Mana, Value: baseManaCost}
-	spellCast := core.SpellCast{
+	spell := core.SpellCast{
 		Cast: core.Cast{
 			ActionID:    actionID,
 			Character:   shaman.GetCharacter(),
@@ -48,27 +48,27 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 	}
 
 	if isLightningOverload {
-		spellCast.ActionID.Tag = CastTagLightningOverload
-		spellCast.CastTime = 0
-		spellCast.GCD = 0
-		spellCast.Cost.Value = 0
+		spell.ActionID.Tag = CastTagLightningOverload
+		spell.CastTime = 0
+		spell.GCD = 0
+		spell.Cost.Value = 0
 	} else if shaman.Talents.LightningMastery > 0 {
 		// Convection applies against the base cost of the spell.
-		spellCast.Cost.Value -= spellCast.BaseCost.Value * float64(shaman.Talents.Convection) * 0.02
-		spellCast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
+		spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.Convection) * 0.02
+		spell.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
 	}
 
 	if !isLightningOverload && shaman.Talents.ElementalFocus {
-		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
 			if shaman.ElementalFocusStacks > 0 {
 				shaman.ElementalFocusStacks--
 			}
 		}
 	} else {
-		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {}
+		spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {}
 	}
 
-	return spellCast
+	return spell
 }
 
 // Helper for precomputing spell effects.

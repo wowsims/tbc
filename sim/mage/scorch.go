@@ -49,7 +49,7 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 
 	if mage.Talents.ImprovedScorch > 0 {
 		procChance := float64(mage.Talents.ImprovedScorch) / 3.0
-		spell.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		spell.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() {
 				return
 			}

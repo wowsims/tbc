@@ -825,7 +825,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 
 				statsAuraFactory := character.NewTemporaryStatsAuraFactory(ConjuredAuraID, actionID, stats.Stats{stats.FireSpellPower: fireBonus}, dur)
 				aura := statsAuraFactory(sim)
-				aura.OnSpellHit = func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+				aura.OnSpellHit = func(sim *Simulation, spell *SimpleSpellTemplate, spellEffect *SpellEffect) {
 					if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 						return
 					}
