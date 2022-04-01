@@ -104,35 +104,35 @@ func (ddi *DotDamageInput) RefreshDot(sim *Simulation) {
 	ddi.tickIndex = 0
 }
 
-func (spell *SimpleSpell) ApplyDot(sim *Simulation) {
+func (instance *SimpleSpell) ApplyDot(sim *Simulation, spell *SimpleSpellTemplate) {
 	pa := sim.pendingActionPool.Get()
 	pa.Priority = ActionPriorityDOT
-	multiDot := len(spell.Effects) > 0
-	spellCast := &spell.SpellCast
+	multiDot := len(instance.Effects) > 0
+	spellCast := &instance.SpellCast
 
 	if multiDot {
-		pa.NextActionAt = sim.CurrentTime + spell.Effects[0].DotInput.TickLength
+		pa.NextActionAt = sim.CurrentTime + instance.Effects[0].DotInput.TickLength
 	} else {
-		pa.NextActionAt = sim.CurrentTime + spell.Effect.DotInput.TickLength
+		pa.NextActionAt = sim.CurrentTime + instance.Effect.DotInput.TickLength
 	}
 
 	pa.OnAction = func(sim *Simulation) {
-		referenceHit := &spell.Effect
+		referenceHit := &instance.Effect
 		if multiDot {
-			referenceHit = &spell.Effects[0]
+			referenceHit = &instance.Effects[0]
 			if sim.CurrentTime == referenceHit.DotInput.nextTickTime {
-				for i := range spell.Effects {
-					spell.Effects[i].calculateDotDamage(sim, spellCast)
+				for i := range instance.Effects {
+					instance.Effects[i].calculateDotDamage(sim, spellCast)
 				}
-				spell.applyAOECap()
-				for i := range spell.Effects {
-					spell.Effects[i].afterDotTick(sim, spellCast)
+				instance.applyAOECap()
+				for i := range instance.Effects {
+					instance.Effects[i].afterDotTick(sim, spell, spellCast)
 				}
 			}
 		} else {
 			if sim.CurrentTime == referenceHit.DotInput.nextTickTime {
 				referenceHit.calculateDotDamage(sim, spellCast)
-				referenceHit.afterDotTick(sim, spellCast)
+				referenceHit.afterDotTick(sim, spell, spellCast)
 			}
 		}
 
@@ -150,22 +150,21 @@ func (spell *SimpleSpell) ApplyDot(sim *Simulation) {
 			return
 		}
 		pa.cancelled = true
-		if spell.currentDotAction != nil {
-			spell.currentDotAction.cancelled = true
-			spell.currentDotAction = nil
+		if instance.currentDotAction != nil {
+			instance.currentDotAction.cancelled = true
+			instance.currentDotAction = nil
 		}
 		if multiDot {
-			for i := range spell.Effects {
-				spell.Effects[i].onDotComplete(sim, spellCast)
+			for i := range instance.Effects {
+				instance.Effects[i].onDotComplete(sim, spell)
 			}
 		} else {
-			spell.Effect.onDotComplete(sim, spellCast)
+			instance.Effect.onDotComplete(sim, spell)
 		}
-		spell.Character.Metrics.AddSpellCast(spellCast)
-		spell.objectInUse = false
+		instance.objectInUse = false
 	}
 
-	spell.currentDotAction = pa
+	instance.currentDotAction = pa
 	sim.AddPendingAction(pa)
 }
 
@@ -208,12 +207,12 @@ func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spellCast *Spe
 }
 
 // This should be called on each dot tick.
-func (hitEffect *SpellEffect) afterDotTick(sim *Simulation, spellCast *SpellCast) {
+func (hitEffect *SpellEffect) afterDotTick(sim *Simulation, spell *SimpleSpellTemplate, spellCast *SpellCast) {
 	if sim.Log != nil {
-		spellCast.Character.Log(sim, "%s %s. (Threat: %0.3f)", spellCast.ActionID, hitEffect.DotResultString(), hitEffect.calcThreat(spellCast))
+		spellCast.Character.Log(sim, "%s %s. (Threat: %0.3f)", spellCast.ActionID, hitEffect.DotResultString(), hitEffect.calcThreat(spell.Character))
 	}
 
-	hitEffect.applyDotTickResultsToCast(spellCast)
+	hitEffect.applyResultsToSpell(spell, !hitEffect.DotInput.TicksCanMissAndCrit)
 
 	if hitEffect.DotInput.TicksProcSpellEffects {
 		hitEffect.triggerSpellProcs(sim, spellCast)
@@ -230,40 +229,15 @@ func (hitEffect *SpellEffect) afterDotTick(sim *Simulation, spellCast *SpellCast
 }
 
 // This should be called after the final tick of the dot, or when the dot is cancelled.
-func (hitEffect *SpellEffect) onDotComplete(sim *Simulation, spellCast *SpellCast) {
+func (hitEffect *SpellEffect) onDotComplete(sim *Simulation, spell *SimpleSpellTemplate) {
 	// Clean up the dot object.
 	hitEffect.DotInput.endTime = 0
 
 	if hitEffect.DotInput.DebuffID != 0 {
-		hitEffect.Target.AddAuraUptime(hitEffect.DotInput.DebuffID, spellCast.ActionID, sim.CurrentTime-hitEffect.DotInput.startTime)
+		hitEffect.Target.AddAuraUptime(hitEffect.DotInput.DebuffID, spell.ActionID, sim.CurrentTime-hitEffect.DotInput.startTime)
 	}
 }
 
 func (spellEffect *SpellEffect) DotResultString() string {
 	return "tick " + spellEffect.String()
-}
-
-// Only applies the results from the ticks, not the initial dot application.
-func (hitEffect *SpellEffect) applyDotTickResultsToCast(spellCast *SpellCast) {
-	if hitEffect.DotInput.TicksCanMissAndCrit {
-		if hitEffect.Landed() {
-			spellCast.Hits++
-			if hitEffect.Outcome.Matches(OutcomeCrit) {
-				spellCast.Crits++
-			}
-
-			if hitEffect.Outcome.Matches(OutcomePartial1_4) {
-				spellCast.PartialResists_1_4++
-			} else if hitEffect.Outcome.Matches(OutcomePartial2_4) {
-				spellCast.PartialResists_2_4++
-			} else if hitEffect.Outcome.Matches(OutcomePartial3_4) {
-				spellCast.PartialResists_3_4++
-			}
-		} else {
-			spellCast.Misses++
-		}
-	}
-
-	spellCast.TotalDamage += hitEffect.Damage
-	spellCast.TotalThreat += hitEffect.Damage * hitEffect.TotalThreatMultiplier(spellCast)
 }

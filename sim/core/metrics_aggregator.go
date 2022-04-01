@@ -198,33 +198,6 @@ func (characterMetrics *CharacterMetrics) AddCast(cast *Cast) {
 	characterMetrics.addCastInternal(cast.ActionID)
 }
 
-// Adds the results of an action to the aggregated metrics.
-func (characterMetrics *CharacterMetrics) AddSpellCast(spellCast *SpellCast) {
-	actionID := spellCast.ActionID
-	actionKey := NewActionKey(actionID)
-	actionMetrics, ok := characterMetrics.actions[actionKey]
-
-	if !ok {
-		actionMetrics.ActionID = actionID
-		actionMetrics.IsMelee = spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical)
-	}
-
-	actionMetrics.Casts++
-	actionMetrics.Hits += spellCast.Hits
-	actionMetrics.Misses += spellCast.Misses
-	actionMetrics.Crits += spellCast.Crits
-	actionMetrics.Dodges += spellCast.Dodges
-	actionMetrics.Parries += spellCast.Parries
-	actionMetrics.Blocks += spellCast.Blocks
-	actionMetrics.Glances += spellCast.Glances
-	actionMetrics.Damage += spellCast.TotalDamage
-	actionMetrics.Threat += spellCast.TotalThreat
-	characterMetrics.dps.Total += spellCast.TotalDamage
-	characterMetrics.threat.Total += spellCast.TotalThreat
-
-	characterMetrics.actions[actionKey] = actionMetrics
-}
-
 // Adds the results of a spell to the character metrics.
 func (characterMetrics *CharacterMetrics) addSpell(spell *SimpleSpellTemplate) {
 	actionID := spell.ActionID

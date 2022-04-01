@@ -98,13 +98,13 @@ func (spellEffect *SpellEffect) Landed() bool {
 	return spellEffect.Outcome.Matches(OutcomeLanded)
 }
 
-func (spellEffect *SpellEffect) TotalThreatMultiplier(spellCast *SpellCast) float64 {
-	return spellEffect.ThreatMultiplier * spellCast.Character.PseudoStats.ThreatMultiplier
+func (spellEffect *SpellEffect) TotalThreatMultiplier(character *Character) float64 {
+	return spellEffect.ThreatMultiplier * character.PseudoStats.ThreatMultiplier
 }
 
-func (spellEffect *SpellEffect) calcThreat(spellCast *SpellCast) float64 {
+func (spellEffect *SpellEffect) calcThreat(character *Character) float64 {
 	if spellEffect.Landed() {
-		return (spellEffect.Damage + spellEffect.FlatThreatBonus) * spellEffect.TotalThreatMultiplier(spellCast)
+		return (spellEffect.Damage + spellEffect.FlatThreatBonus) * spellEffect.TotalThreatMultiplier(character)
 	} else {
 		return 0
 	}
@@ -320,46 +320,48 @@ func (spellEffect *SpellEffect) triggerSpellProcs(sim *Simulation, spellCast *Sp
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast) {
 	if sim.Log != nil && !spellCast.SpellExtras.Matches(SpellExtrasAlwaysHits) {
-		spellCast.Character.Log(sim, "%s %s. (Threat: %0.3f)", spellCast.ActionID, spellEffect, spellEffect.calcThreat(spellCast))
+		spellCast.Character.Log(sim, "%s %s. (Threat: %0.3f)", spellCast.ActionID, spellEffect, spellEffect.calcThreat(spellCast.Character))
 	}
 
 	spellEffect.triggerSpellProcs(sim, spellCast)
 }
 
-func (spellEffect *SpellEffect) applyResultsToCast(spellCast *SpellCast) {
-	if spellEffect.Outcome.Matches(OutcomeHit) {
-		spellCast.Hits++
-	}
-	if spellEffect.Outcome.Matches(OutcomeGlance) {
-		spellCast.Glances++
-	}
-	if spellEffect.Outcome.Matches(OutcomeCrit) {
-		spellCast.Crits++
-	}
-	if spellEffect.Outcome.Matches(OutcomeBlock) {
-		spellCast.Blocks++
+func (spellEffect *SpellEffect) applyResultsToSpell(spell *SimpleSpellTemplate, isPeriodic bool) {
+	if !isPeriodic {
+		if spellEffect.Outcome.Matches(OutcomeHit) {
+			spell.Hits++
+		}
+		if spellEffect.Outcome.Matches(OutcomeGlance) {
+			spell.Glances++
+		}
+		if spellEffect.Outcome.Matches(OutcomeCrit) {
+			spell.Crits++
+		}
+		if spellEffect.Outcome.Matches(OutcomeBlock) {
+			spell.Blocks++
+		}
+
+		if spellEffect.Landed() {
+			if spellEffect.Outcome.Matches(OutcomePartial1_4) {
+				spell.PartialResists_1_4++
+			} else if spellEffect.Outcome.Matches(OutcomePartial2_4) {
+				spell.PartialResists_2_4++
+			} else if spellEffect.Outcome.Matches(OutcomePartial3_4) {
+				spell.PartialResists_3_4++
+			}
+		} else {
+			if spellEffect.Outcome == OutcomeMiss {
+				spell.Misses++
+			} else if spellEffect.Outcome == OutcomeDodge {
+				spell.Dodges++
+			} else if spellEffect.Outcome == OutcomeParry {
+				spell.Parries++
+			}
+		}
 	}
 
-	if spellEffect.Landed() {
-		if spellEffect.Outcome.Matches(OutcomePartial1_4) {
-			spellCast.PartialResists_1_4++
-		} else if spellEffect.Outcome.Matches(OutcomePartial2_4) {
-			spellCast.PartialResists_2_4++
-		} else if spellEffect.Outcome.Matches(OutcomePartial3_4) {
-			spellCast.PartialResists_3_4++
-		}
-	} else {
-		if spellEffect.Outcome == OutcomeMiss {
-			spellCast.Misses++
-		} else if spellEffect.Outcome == OutcomeDodge {
-			spellCast.Dodges++
-		} else if spellEffect.Outcome == OutcomeParry {
-			spellCast.Parries++
-		}
-	}
-
-	spellCast.TotalDamage += spellEffect.Damage
-	spellCast.TotalThreat += spellEffect.calcThreat(spellCast)
+	spell.TotalDamage += spellEffect.Damage
+	spell.TotalThreat += spellEffect.calcThreat(spell.Character)
 }
 
 func (spellEffect *SpellEffect) String() string {
