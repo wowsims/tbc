@@ -326,35 +326,37 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *Sp
 	spellEffect.triggerSpellProcs(sim, spellCast)
 }
 
-func (spellEffect *SpellEffect) applyResultsToSpell(spell *SimpleSpellTemplate) {
-	if spellEffect.Outcome.Matches(OutcomeHit) {
-		spell.Hits++
-	}
-	if spellEffect.Outcome.Matches(OutcomeGlance) {
-		spell.Glances++
-	}
-	if spellEffect.Outcome.Matches(OutcomeCrit) {
-		spell.Crits++
-	}
-	if spellEffect.Outcome.Matches(OutcomeBlock) {
-		spell.Blocks++
-	}
-
-	if spellEffect.Landed() {
-		if spellEffect.Outcome.Matches(OutcomePartial1_4) {
-			spell.PartialResists_1_4++
-		} else if spellEffect.Outcome.Matches(OutcomePartial2_4) {
-			spell.PartialResists_2_4++
-		} else if spellEffect.Outcome.Matches(OutcomePartial3_4) {
-			spell.PartialResists_3_4++
+func (spellEffect *SpellEffect) applyResultsToSpell(spell *SimpleSpellTemplate, isPeriodic bool) {
+	if !isPeriodic {
+		if spellEffect.Outcome.Matches(OutcomeHit) {
+			spell.Hits++
 		}
-	} else {
-		if spellEffect.Outcome == OutcomeMiss {
-			spell.Misses++
-		} else if spellEffect.Outcome == OutcomeDodge {
-			spell.Dodges++
-		} else if spellEffect.Outcome == OutcomeParry {
-			spell.Parries++
+		if spellEffect.Outcome.Matches(OutcomeGlance) {
+			spell.Glances++
+		}
+		if spellEffect.Outcome.Matches(OutcomeCrit) {
+			spell.Crits++
+		}
+		if spellEffect.Outcome.Matches(OutcomeBlock) {
+			spell.Blocks++
+		}
+
+		if spellEffect.Landed() {
+			if spellEffect.Outcome.Matches(OutcomePartial1_4) {
+				spell.PartialResists_1_4++
+			} else if spellEffect.Outcome.Matches(OutcomePartial2_4) {
+				spell.PartialResists_2_4++
+			} else if spellEffect.Outcome.Matches(OutcomePartial3_4) {
+				spell.PartialResists_3_4++
+			}
+		} else {
+			if spellEffect.Outcome == OutcomeMiss {
+				spell.Misses++
+			} else if spellEffect.Outcome == OutcomeDodge {
+				spell.Dodges++
+			} else if spellEffect.Outcome == OutcomeParry {
+				spell.Parries++
+			}
 		}
 	}
 

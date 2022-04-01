@@ -67,6 +67,8 @@ func (spell *SimpleSpell) GetDuration() time.Duration {
 
 func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) bool {
 	return instance.startCasting(sim, func(sim *Simulation, cast *Cast) {
+		spell.Casts++
+
 		spellCast := &instance.SpellCast
 		if len(instance.Effects) == 0 {
 			hitEffect := &instance.Effect
@@ -82,7 +84,7 @@ func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) b
 				}
 			}
 
-			hitEffect.applyResultsToSpell(spell)
+			hitEffect.applyResultsToSpell(spell, false)
 			hitEffect.afterCalculations(sim, spellCast)
 		} else {
 			// Use a separate loop for the beforeCalculations() calls so that they all
@@ -109,7 +111,7 @@ func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) b
 			// is fully calculated before invoking proc callbacks.
 			for effectIdx := range instance.Effects {
 				hitEffect := &instance.Effects[effectIdx]
-				hitEffect.applyResultsToSpell(spell)
+				hitEffect.applyResultsToSpell(spell, false)
 				hitEffect.afterCalculations(sim, spellCast)
 			}
 
@@ -120,7 +122,6 @@ func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) b
 		}
 
 		if instance.currentDotAction == nil {
-			instance.Character.Metrics.AddSpellCast(spellCast)
 			instance.objectInUse = false
 		}
 	})

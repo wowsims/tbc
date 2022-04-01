@@ -212,7 +212,7 @@ func (hitEffect *SpellEffect) afterDotTick(sim *Simulation, spell *SimpleSpellTe
 		spellCast.Character.Log(sim, "%s %s. (Threat: %0.3f)", spellCast.ActionID, hitEffect.DotResultString(), hitEffect.calcThreat(spell.Character))
 	}
 
-	hitEffect.applyDotTickResultsToSpell(spell)
+	hitEffect.applyResultsToSpell(spell, !hitEffect.DotInput.TicksCanMissAndCrit)
 
 	if hitEffect.DotInput.TicksProcSpellEffects {
 		hitEffect.triggerSpellProcs(sim, spellCast)
@@ -240,29 +240,4 @@ func (hitEffect *SpellEffect) onDotComplete(sim *Simulation, spell *SimpleSpellT
 
 func (spellEffect *SpellEffect) DotResultString() string {
 	return "tick " + spellEffect.String()
-}
-
-// Only applies the results from the ticks, not the initial dot application.
-func (hitEffect *SpellEffect) applyDotTickResultsToSpell(spell *SimpleSpellTemplate) {
-	if hitEffect.DotInput.TicksCanMissAndCrit {
-		if hitEffect.Landed() {
-			spell.Hits++
-			if hitEffect.Outcome.Matches(OutcomeCrit) {
-				spell.Crits++
-			}
-
-			if hitEffect.Outcome.Matches(OutcomePartial1_4) {
-				spell.PartialResists_1_4++
-			} else if hitEffect.Outcome.Matches(OutcomePartial2_4) {
-				spell.PartialResists_2_4++
-			} else if hitEffect.Outcome.Matches(OutcomePartial3_4) {
-				spell.PartialResists_3_4++
-			}
-		} else {
-			spell.Misses++
-		}
-	}
-
-	spell.TotalDamage += hitEffect.Damage
-	spell.TotalThreat += hitEffect.Damage * hitEffect.TotalThreatMultiplier(spell.Character)
 }
