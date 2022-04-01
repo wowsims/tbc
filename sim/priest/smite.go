@@ -33,14 +33,14 @@ func (priest *Priest) registerSmiteSpell(sim *core.Simulation) {
 				GCD:      core.GCDDefault,
 				Cooldown: time.Second * 0,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMagic(549, 616, 0.7143),
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMagic(549, 616, 0.7143),
 		},
 	}
 

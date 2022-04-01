@@ -18,12 +18,12 @@ func (mage *Mage) newIgniteSpell(sim *core.Simulation) *core.SimpleSpellTemplate
 				SpellSchool: core.SpellSchoolFire,
 				SpellExtras: SpellFlagMage | core.SpellExtrasBinary | core.SpellExtrasAlwaysHits,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryNone,
 		},
 		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryNone,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:         2,
 				TickLength:            time.Second * 2,

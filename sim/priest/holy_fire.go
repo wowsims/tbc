@@ -29,14 +29,14 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 				CastTime: time.Millisecond * 3500,
 				GCD:      core.GCDDefault,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMagic(426, 537, 0.8571),
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMagic(426, 537, 0.8571),
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:  5,
 				TickLength:     time.Second * 2,

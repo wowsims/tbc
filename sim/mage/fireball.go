@@ -32,13 +32,13 @@ func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
 				CastTime: time.Millisecond * 3500,
 				GCD:      core.GCDDefault,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+			DamageMultiplier:    mage.spellDamageMultiplier,
+			ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					mage.FireballDot.Instance.Cancel(sim)

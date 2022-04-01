@@ -23,11 +23,11 @@ func (hunter *Hunter) registerScorpidStingSpell(sim *core.Simulation) {
 				BaseCost:    cost,
 				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-			CritRollCategory:    core.CritRollCategoryPhysical,
 		},
 		Effect: core.SpellEffect{
-			ProcMask: core.ProcMaskRangedSpecial,
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			ProcMask:            core.ProcMaskRangedSpecial,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return

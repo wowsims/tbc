@@ -64,11 +64,11 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 				GCD:         core.GCDDefault,
 				Cooldown:    time.Minute * 5,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
-		},
-		Effect: core.SpellEffect{
 			// Dmg over 15 sec = shadow_dmg*.6 + 1191
 			// just simulate 10 1.5s long ticks
 			DamageMultiplier: 1,

@@ -28,12 +28,12 @@ func (warrior *Warrior) registerSunderArmorSpell(_ *core.Simulation) {
 					Value: warrior.sunderArmorCost,
 				},
 			},
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 		},
 		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			ThreatMultiplier: 1,
-			FlatThreatBonus:  301.5,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			ProcMask:            core.ProcMaskMeleeMHSpecial,
+			ThreatMultiplier:    1,
+			FlatThreatBonus:     301.5,
 		},
 	}
 

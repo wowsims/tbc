@@ -23,15 +23,15 @@ func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
 				BaseCost:    cost,
 				Cooldown:    time.Second * 6,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      hunter.critMultiplier(false, sim.GetPrimaryTarget()),
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 170, 1, true),
+			ProcMask:            core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 170, 1, true),
 		},
 	}
 

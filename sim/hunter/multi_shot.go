@@ -31,11 +31,6 @@ func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
 				SpellSchool: core.SpellSchoolPhysical,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			// TODO: If we ever allow multiple targets to have their own type, need to
-			// update this.
-			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		},
 	}
 
@@ -45,15 +40,20 @@ func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 	}
 
 	baseEffect := core.SpellEffect{
+		OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+		CritRollCategory:    core.CritRollCategoryPhysical,
+		// TODO: If we ever allow multiple targets to have their own type, need to
+		// update this.
+		CritMultiplier:   hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		ProcMask:         core.ProcMaskRangedSpecial,
 		DamageMultiplier: 1,
 		ThreatMultiplier: 1,
 		BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
-			Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
-				return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
+			Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+				return (hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
 					hunter.AutoAttacks.Ranged.BaseDamage(sim) +
 					hunter.AmmoDamageBonus +
-					hitEffect.BonusWeaponDamage(spellCast) +
+					hitEffect.BonusWeaponDamage(spell.Character) +
 					205
 			},
 			TargetSpellCoefficient: 1,

@@ -24,17 +24,17 @@ func (mage *Mage) registerArcaneExplosionSpell(sim *core.Simulation) {
 				},
 				GCD: core.GCDDefault,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 		},
 		AOECap: 10180,
 	}
 
 	baseEffect := core.SpellEffect{
-		DamageMultiplier: mage.spellDamageMultiplier,
-		ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
-		BaseDamage:       core.BaseDamageConfigMagic(249, 270, 0.214),
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+		DamageMultiplier:    mage.spellDamageMultiplier,
+		ThreatMultiplier:    1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
+		BaseDamage:          core.BaseDamageConfigMagic(249, 270, 0.214),
 	}
 	baseEffect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance
 	baseEffect.BonusSpellCritRating += float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance

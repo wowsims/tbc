@@ -23,11 +23,11 @@ func (druid *Druid) registerFaerieFireSpell(sim *core.Simulation) {
 				},
 				GCD: core.GCDDefault,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 		Effect: core.SpellEffect{
-			ThreatMultiplier: 1,
-			FlatThreatBonus:  0, // TODO
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			ThreatMultiplier:    1,
+			FlatThreatBonus:     0, // TODO
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return

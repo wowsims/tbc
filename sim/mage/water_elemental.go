@@ -180,14 +180,14 @@ func (we *WaterElemental) registerWaterboltSpell(sim *core.Simulation) {
 				CastTime: time.Second * 3,
 				GCD:      core.GCDDefault,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      we.DefaultSpellCritMultiplier(),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMagic(256, 328, 3.0/3.5),
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMagic(256, 328, 3.0/3.5),
 		},
 	}
 

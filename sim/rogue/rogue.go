@@ -113,14 +113,14 @@ func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras
 				},
 				SpellExtras: spellExtras,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      rogue.critMultiplier(procMask.Matches(core.ProcMaskMeleeMH), spellExtras.Matches(SpellFlagBuilder)),
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         procMask,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			ProcMask:            procMask,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 		},
 	}
 }

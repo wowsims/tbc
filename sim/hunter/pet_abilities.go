@@ -88,15 +88,15 @@ func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 				GCD:         core.GCDDefault,
 				IgnoreHaste: true,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      2,
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigRoll(108, 132),
+			ProcMask:            core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigRoll(108, 132),
 		},
 	}
 
@@ -136,15 +136,15 @@ func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
 				GCD:         core.GCDDefault,
 				IgnoreHaste: true,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      2,
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigRoll(54, 76),
+			ProcMask:            core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigRoll(54, 76),
 		},
 	}
 
@@ -175,15 +175,15 @@ func (hp *HunterPet) newGore(sim *core.Simulation, isPrimary bool) PetAbility {
 				GCD:         core.GCDDefault,
 				IgnoreHaste: true,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      2,
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigRoll(37, 61),
+			ProcMask:            core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigRoll(37, 61),
 		},
 	}
 
@@ -219,14 +219,14 @@ func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) Pe
 				SpellSchool: core.SpellSchoolNature,
 				GCD:         core.GCDDefault,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      1.5,
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMagic(80, 93, 0.05),
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMagic(80, 93, 0.05),
 		},
 	}
 
@@ -256,15 +256,15 @@ func (hp *HunterPet) newScreech(sim *core.Simulation, isPrimary bool) PetAbility
 				SpellSchool: core.SpellSchoolPhysical,
 				GCD:         core.GCDDefault,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      2,
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigRoll(33, 61),
+			ProcMask:            core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigRoll(33, 61),
 		},
 	}
 

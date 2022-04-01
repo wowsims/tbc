@@ -37,22 +37,22 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 				Cooldown:    shaman.ShockCD(),
 				SpellExtras: SpellFlagShock,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 		},
 	}
 
 	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.Convection) * 0.02
 	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
-	if shaman.Talents.ElementalFury {
-		spell.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
-	}
 
+	if shaman.Talents.ElementalFury {
+		spell.Effect.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
+	}
 	spell.Effect.ThreatMultiplier *= 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision)
 	spell.Effect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
 	spell.Effect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance

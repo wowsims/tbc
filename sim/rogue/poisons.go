@@ -25,10 +25,10 @@ func (rogue *Rogue) registerDeadlyPoisonSpell(_ *core.Simulation) {
 				Character:   rogue.GetCharacter(),
 				SpellSchool: core.SpellSchoolNature,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			IsPhantom:           true,
 		},
 		Effect: core.SpellEffect{
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			IsPhantom:           true,
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
 			ThreatMultiplier:    1,
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
@@ -54,11 +54,11 @@ func (rogue *Rogue) registerDeadlyPoisonRefreshSpell(_ *core.Simulation) {
 				Character:   rogue.GetCharacter(),
 				SpellSchool: core.SpellSchoolNature,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryNone,
 			IsPhantom:           true,
-		},
-		Effect: core.SpellEffect{
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
 			ThreatMultiplier:    1,
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
@@ -95,7 +95,7 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 		return core.Aura{
 			ID: DeadlyPoisonAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("Deadly Poison") > procChance {
@@ -127,12 +127,12 @@ func (rogue *Rogue) registerInstantPoisonSpell(_ *core.Simulation) {
 				Character:   rogue.GetCharacter(),
 				SpellSchool: core.SpellSchoolNature,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      rogue.DefaultSpellCritMultiplier(),
 			IsPhantom:           true,
-		},
-		Effect: core.SpellEffect{
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
 			ThreatMultiplier:    1,
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
@@ -161,7 +161,7 @@ func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
 		return core.Aura{
 			ID: InstantPoisonAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("Instant Poison") > procChance {

@@ -32,14 +32,14 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 				CastTime: time.Millisecond * 6000,
 				GCD:      core.GCDDefault,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
-			BaseDamage:       core.BaseDamageConfigMagic(939, 1191, 1.15),
+			DamageMultiplier:    mage.spellDamageMultiplier,
+			ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
+			BaseDamage:          core.BaseDamageConfigMagic(939, 1191, 1.15),
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					mage.PyroblastDot.Instance.Cancel(sim)

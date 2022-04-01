@@ -21,16 +21,16 @@ func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
 				SpellSchool: core.SpellSchoolPhysical,
 				SpellExtras: core.SpellExtrasAlwaysHits,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      rogue.critMultiplier(true, true),
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BonusCritRating:  bonusCritRating,
-			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 101, 1, true),
+			ProcMask:            core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BonusCritRating:     bonusCritRating,
+			BaseDamage:          core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 101, 1, true),
 		},
 	}
 
@@ -43,7 +43,7 @@ func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
 
 	ohDamageAbility := mhDamageAbility
 	ohDamageAbility.SpellCast.Cast.ActionID = MutilateOHActionID
-	ohDamageAbility.SpellCast.CritMultiplier = rogue.critMultiplier(false, true)
+	ohDamageAbility.Effect.CritMultiplier = rogue.critMultiplier(false, true)
 	ohDamageAbility.Effect.ProcMask = core.ProcMaskMeleeOHSpecial
 	ohDamageAbility.Effect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.OffHand, true, 101, 1+0.1*float64(rogue.Talents.DualWieldSpecialization), true)
 
@@ -64,7 +64,7 @@ func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
 
 	refundAmount := MutilateEnergyCost * 0.8
 	ability := rogue.newAbility(MutilateActionID, MutilateEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
-	ability.SpellCast.CritRollCategory = core.CritRollCategoryNone
+	ability.Effect.CritRollCategory = core.CritRollCategoryNone
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if !spellEffect.Landed() {
 			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})

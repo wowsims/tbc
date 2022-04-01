@@ -29,15 +29,15 @@ func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
 				},
 				GCD: core.GCDDefault,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
 		},
 		AOECap: 3620,
 	}
 
 	baseEffect := core.SpellEffect{
-		DamageMultiplier: mage.spellDamageMultiplier,
-		ThreatMultiplier: 1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		DamageMultiplier:    mage.spellDamageMultiplier,
+		ThreatMultiplier:    1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:       8,
 			TickLength:          time.Second * 1,

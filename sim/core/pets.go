@@ -86,14 +86,14 @@ func (gft *GnomishFlameTurret) registerFlameCannonSpell(sim *Simulation) {
 				GCD:         time.Millisecond * 800,
 				IgnoreHaste: true,
 			},
+		},
+		Effect: SpellEffect{
 			OutcomeRollCategory: OutcomeRollCategoryMagic,
 			CritRollCategory:    CritRollCategoryMagical,
 			CritMultiplier:      gft.DefaultSpellCritMultiplier(),
-		},
-		Effect: SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       BaseDamageConfigRoll(31, 36),
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          BaseDamageConfigRoll(31, 36),
 		},
 	}
 

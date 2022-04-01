@@ -36,17 +36,17 @@ func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
 					mage.FlamestrikeDot.Cast(sim, nil)
 				},
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 		},
 		AOECap: 7830,
 	}
 
 	baseEffect := core.SpellEffect{
-		DamageMultiplier: mage.spellDamageMultiplier,
-		ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
-		BaseDamage:       core.BaseDamageConfigMagic(480, 585, 0.236),
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+		DamageMultiplier:    mage.spellDamageMultiplier,
+		ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
+		BaseDamage:          core.BaseDamageConfigMagic(480, 585, 0.236),
 	}
 
 	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
@@ -82,13 +82,13 @@ func (mage *Mage) registerFlamestrikeDotSpell(sim *core.Simulation) {
 				SpellSchool: core.SpellSchoolFire,
 				SpellExtras: SpellFlagMage | core.SpellExtrasAlwaysHits,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 	}
 
 	baseEffect := core.SpellEffect{
-		DamageMultiplier: mage.spellDamageMultiplier,
-		ThreatMultiplier: 1,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		DamageMultiplier:    mage.spellDamageMultiplier,
+		ThreatMultiplier:    1,
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:  4,
 			TickLength:     time.Second * 2,

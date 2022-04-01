@@ -30,14 +30,14 @@ func (paladin *Paladin) registerConsecrationSpell(sim *core.Simulation) {
 				},
 				GCD: core.GCDDefault,
 			},
-			CritRollCategory:    core.CritRollCategoryMagical,
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 	}
 
 	effect := core.SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		DamageMultiplier:    1,
+		ThreatMultiplier:    1,
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:  8,
 			TickLength:     time.Second,

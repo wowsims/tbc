@@ -33,14 +33,14 @@ func (mage *Mage) registerFireBlastSpell(sim *core.Simulation) {
 				GCD:      core.GCDDefault,
 				Cooldown: time.Second * 8,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
-			BaseDamage:       core.BaseDamageConfigMagic(664, 786, 1.5/3.5),
+			DamageMultiplier:    mage.spellDamageMultiplier,
+			ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
+			BaseDamage:          core.BaseDamageConfigMagic(664, 786, 1.5/3.5),
 		},
 	}
 

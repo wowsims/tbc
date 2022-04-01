@@ -41,7 +41,7 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 
 func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.SimpleSpell) {
 	hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
-	if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
+	if !ability.Effect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 		return
 	}
 	hunter.rotation(sim, true)

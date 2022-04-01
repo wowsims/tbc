@@ -114,7 +114,7 @@ func (shaman *Shaman) applyElementalDevastation() {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
-				if spellCast.IsPhantom {
+				if spellEffect.IsPhantom {
 					return
 				}
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {

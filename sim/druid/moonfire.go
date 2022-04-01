@@ -29,14 +29,14 @@ func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
 				},
 				GCD: core.GCDDefault,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMagic(305, 357, 0.15),
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMagic(305, 357, 0.15),
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 3,

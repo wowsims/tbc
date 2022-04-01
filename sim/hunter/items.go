@@ -95,8 +95,8 @@ func ApplyTalonOfAlar(agent core.Agent) {
 func (hunter *Hunter) talonOfAlarDamageMod(baseDamageConfig core.BaseDamageConfig) core.BaseDamageConfig {
 	if hunter.HasTrinketEquipped(30448) {
 		return core.WrapBaseDamageConfig(baseDamageConfig, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
-			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
-				normalDamage := oldCalculator(sim, hitEffect, spellCast)
+			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+				normalDamage := oldCalculator(sim, hitEffect, spell)
 				if hunter.HasAura(TalonOfAlarProcAuraID) {
 					return normalDamage + 40
 				} else {
@@ -129,7 +129,7 @@ func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 		return core.Aura{
 			ID: BlackBowOfTheBetrayerAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
+				if !spellEffect.Landed() || !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
 				character.AddMana(sim, manaGain, core.ActionID{SpellID: 46939}, false)

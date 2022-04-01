@@ -356,7 +356,7 @@ func ApplyHandOfJustice(agent core.Agent) {
 			ID: HandOfJusticeAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// https://tbc.wowhead.com/spell=15600/hand-of-justice, proc mask = 20.
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
 				}
 
@@ -430,7 +430,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 							return
 						}
 
-						if !ppmm.Proc(sim, spellEffect.IsMH(), spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Badge of the Swarmguard") {
+						if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Badge of the Swarmguard") {
 							return
 						}
 
@@ -476,7 +476,7 @@ func ApplyHourglassUnraveller(agent core.Agent) {
 		return core.Aura{
 			ID: HourglassUnravellerAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellCast.IsPhantom {
+				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellEffect.IsPhantom {
 					return
 				}
 				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
@@ -509,15 +509,15 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 					Character:   character,
 					SpellSchool: core.SpellSchoolNature,
 				},
+			},
+			Effect: core.SpellEffect{
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				IsPhantom:           true,
-			},
-			Effect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       core.BaseDamageConfigRoll(222, 332),
+				DamageMultiplier:    1,
+				ThreatMultiplier:    1,
+				BaseDamage:          core.BaseDamageConfigRoll(222, 332),
 			},
 		},
 		ModifyCast: core.ModifyCastAssignTarget,
@@ -530,10 +530,10 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 			ID: RomulosPoisonVialAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// mask 340
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
 				}
-				if !ppmm.Proc(sim, spellEffect.IsMH(), spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "RomulosPoisonVial") {
+				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "RomulosPoisonVial") {
 					return
 				}
 
@@ -560,13 +560,13 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 			ID: DragonspineTrophyAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// mask: 340
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, spellEffect.IsMH(), spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "dragonspine") {
+				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "dragonspine") {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
@@ -594,7 +594,7 @@ func ApplyTsunamiTalisman(agent core.Agent) {
 		return core.Aura{
 			ID: TsunamiTalismanAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellCast.IsPhantom {
+				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellEffect.IsPhantom {
 					return
 				}
 				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
@@ -626,7 +626,7 @@ func ApplyDarkmoonCardWrath(agent core.Agent) {
 			ID: DarkmoonCardWrathAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// mask 340
-				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
+				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
 				}
 
@@ -660,10 +660,10 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 			ID: MadnessOfTheBetrayerAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// mask 340
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
 				}
-				if !ppmm.Proc(sim, spellEffect.IsMH(), spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Madness of the Betrayer") {
+				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Madness of the Betrayer") {
 					return
 				}
 
@@ -688,7 +688,7 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 			ID: BlackenedNaaruSliverAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// mask 340
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
@@ -708,7 +708,7 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 					ActionID: core.ActionID{ItemID: 34427},
 					Duration: time.Second * 20,
 					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
+						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 							return
 						}
 
@@ -746,7 +746,7 @@ func ApplyShardOfContempt(agent core.Agent) {
 		return core.Aura{
 			ID: ShardOfContemptAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {

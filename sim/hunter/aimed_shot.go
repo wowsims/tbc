@@ -23,20 +23,20 @@ func (hunter *Hunter) registerAimedShotSpell(sim *core.Simulation) {
 				Cost:     cost,
 				BaseCost: cost,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskRangedSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			ProcMask:            core.ProcMaskRangedSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 			BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
-				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
-					return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+					return (hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
 						hunter.AutoAttacks.Ranged.BaseDamage(sim) +
 						hunter.AmmoDamageBonus +
-						hitEffect.BonusWeaponDamage(spellCast) +
+						hitEffect.BonusWeaponDamage(spell.Character) +
 						870
 				},
 				TargetSpellCoefficient: 1,
