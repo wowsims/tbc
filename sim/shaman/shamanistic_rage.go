@@ -42,7 +42,7 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 					ID:       ShamanisticRageAuraID,
 					ActionID: ShamanisticRageActionID,
 					Duration: time.Second * 15,
-					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						// proc mask: 20
 						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 							return

@@ -17,20 +17,20 @@ type Priest struct {
 
 	// cached cast stuff
 	// TODO: aoe multi-target situations will need multiple spells ticking for each target.
-	DevouringPlague *core.SimpleSpellTemplate
-	HolyFire        *core.SimpleSpellTemplate
-	MindBlast       *core.SimpleSpellTemplate
-	MindFlay        []*core.SimpleSpellTemplate
-	ShadowWordDeath *core.SimpleSpellTemplate
-	ShadowWordPain  *core.SimpleSpellTemplate
-	Shadowfiend     *core.SimpleSpellTemplate
-	Smite           *core.SimpleSpellTemplate
-	Starshards      *core.SimpleSpellTemplate
-	VampiricTouch   *core.SimpleSpellTemplate
-	VampiricTouch2  *core.SimpleSpellTemplate
+	DevouringPlague *core.Spell
+	HolyFire        *core.Spell
+	MindBlast       *core.Spell
+	MindFlay        []*core.Spell
+	ShadowWordDeath *core.Spell
+	ShadowWordPain  *core.Spell
+	Shadowfiend     *core.Spell
+	Smite           *core.Spell
+	Starshards      *core.Spell
+	VampiricTouch   *core.Spell
+	VampiricTouch2  *core.Spell
 
-	CurVTSpell  *core.SimpleSpellTemplate
-	NextVTSpell *core.SimpleSpellTemplate
+	CurVTSpell  *core.Spell
+	NextVTSpell *core.Spell
 }
 
 type SelfBuffs struct {
@@ -69,7 +69,7 @@ func (priest *Priest) Init(sim *core.Simulation) {
 	priest.VampiricTouch = priest.newVampiricTouchSpell(sim, false)
 	priest.VampiricTouch2 = priest.newVampiricTouchSpell(sim, true)
 
-	priest.MindFlay = []*core.SimpleSpellTemplate{
+	priest.MindFlay = []*core.Spell{
 		nil, // So we can use # of ticks as the index
 		priest.newMindFlaySpell(sim, 1),
 		priest.newMindFlaySpell(sim, 2),

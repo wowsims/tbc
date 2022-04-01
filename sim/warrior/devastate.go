@@ -40,7 +40,7 @@ func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 
 	normalBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 0.5, true)
 	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 			// Bonus 35 damage / stack of sunder. Counts stacks AFTER cast but only if stacks > 0.
 			sunderBonus := 0.0
 			saStacks := hitEffect.Target.NumStacks(core.SunderArmorDebuffID)
@@ -66,7 +66,7 @@ func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 	}
 
 	refundAmount := warrior.sunderArmorCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			target := spellEffect.Target
 			if !target.HasAura(core.ExposeArmorDebuffID) {

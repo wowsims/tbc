@@ -211,7 +211,7 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 
 		return core.Aura{
 			ID: ShiffarsNexusHornAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -240,7 +240,7 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 
 		return core.Aura{
 			ID: EyeOfMagtheridonAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -267,7 +267,7 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 
 		return core.Aura{
 			ID: SextantOfUnstableCurrentsAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -319,7 +319,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 
 		return core.Aura{
 			ID: DarkmoonCardCrusadeAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					if spellEffect.IsPhantom {
 						return

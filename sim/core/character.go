@@ -79,7 +79,7 @@ type Character struct {
 	PseudoStats        stats.PseudoStats
 
 	// All spells that can be cast by this character.
-	Spellbook []*SimpleSpellTemplate
+	Spellbook []*Spell
 
 	// Used for applying the effects of hardcast / channeled spells at a later time.
 	// By definition there can be only 1 hardcast spell being cast at any moment.

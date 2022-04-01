@@ -171,7 +171,7 @@ func (hunter *Hunter) applyFrenzy() {
 	hunter.pet.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: FrenzyAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
@@ -223,7 +223,7 @@ func (hunter *Hunter) applyFerociousInspiration() {
 
 		return core.Aura{
 			ID: FerociousInspirationAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
@@ -339,7 +339,7 @@ func (hunter *Hunter) applyGoForTheThroat() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: GoForTheThroatAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
@@ -383,7 +383,7 @@ func (hunter *Hunter) applyThrillOfTheHunt() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ThrillOfTheHuntAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				// mask 256
 				if !spellEffect.ProcMask.Matches(core.ProcMaskRangedSpecial) {
 					return
@@ -413,7 +413,7 @@ func (hunter *Hunter) applyExposeWeakness() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ExposeWeaknessAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
@@ -451,7 +451,7 @@ func (hunter *Hunter) applyMasterTactician() {
 
 		return core.Aura{
 			ID: MasterTacticianAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !spellEffect.Landed() {
 					return
 				}

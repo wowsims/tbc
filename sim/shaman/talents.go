@@ -110,7 +110,7 @@ func (shaman *Shaman) applyElementalDevastation() {
 		applyStatAura := shaman.NewTemporaryStatsAuraApplier(ElementalDevastationAuraID, core.ActionID{SpellID: 30160}, stats.Stats{stats.MeleeCrit: critBonus}, dur)
 		return core.Aura{
 			ID: ElementalDevastationTalentAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -160,7 +160,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 					OnExpire: func(sim *core.Simulation) {
 						shaman.AddStat(stats.SpellCrit, -100*core.SpellCritRatingPerCritChance)
 					},
-					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spell.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
 							return
 						}
@@ -239,7 +239,7 @@ func (shaman *Shaman) applyUnleashedRage() {
 		currentAuras := make([]core.Aura, len(shaman.Party.PlayersAndPets))
 		return core.Aura{
 			ID: UnleashedRageTalentAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				// proc mask = 20 (melee auto & special)
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
@@ -302,7 +302,7 @@ func (shaman *Shaman) applyShamanisticFocus() {
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ShamanisticFocusTalentAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
@@ -336,7 +336,7 @@ func (shaman *Shaman) applyFlurry() {
 
 		return core.Aura{
 			ID: FlurryTalentAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}

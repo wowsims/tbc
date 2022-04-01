@@ -49,7 +49,7 @@ func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 		DamageMultiplier: 1,
 		ThreatMultiplier: 1,
 		BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
-			Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+			Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 				return (hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
 					hunter.AutoAttacks.Ranged.BaseDamage(sim) +
 					hunter.AmmoDamageBonus +
@@ -58,7 +58,7 @@ func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 			},
 			TargetSpellCoefficient: 1,
 		}),
-		OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			hunter.rotation(sim, false)
 		},
 	}

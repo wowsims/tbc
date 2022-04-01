@@ -45,15 +45,15 @@ type Warrior struct {
 	CastDefensiveStance func(*core.Simulation)
 	CastBerserkerStance func(*core.Simulation)
 
-	Bloodthirst       *core.SimpleSpellTemplate
-	DemoralizingShout *core.SimpleSpellTemplate
-	Devastate         *core.SimpleSpellTemplate
-	HeroicStrike      *core.SimpleSpellTemplate
-	Revenge           *core.SimpleSpellTemplate
-	ShieldSlam        *core.SimpleSpellTemplate
-	SunderArmor       *core.SimpleSpellTemplate
-	ThunderClap       *core.SimpleSpellTemplate
-	Whirlwind         *core.SimpleSpellTemplate
+	Bloodthirst       *core.Spell
+	DemoralizingShout *core.Spell
+	Devastate         *core.Spell
+	HeroicStrike      *core.Spell
+	Revenge           *core.Spell
+	ShieldSlam        *core.Spell
+	SunderArmor       *core.Spell
+	ThunderClap       *core.Spell
+	Whirlwind         *core.Spell
 }
 
 func (warrior *Warrior) GetCharacter() *core.Character {

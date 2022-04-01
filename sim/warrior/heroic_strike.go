@@ -40,7 +40,7 @@ func (warrior *Warrior) registerHeroicStrikeSpell(_ *core.Simulation) {
 	}
 
 	refundAmount := warrior.heroicStrikeCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if !spellEffect.Landed() {
 			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}
@@ -60,7 +60,7 @@ func (warrior *Warrior) QueueHeroicStrike(_ *core.Simulation) {
 }
 
 // Returns true if the regular melee swing should be used, false otherwise.
-func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.SimpleSpellTemplate {
+func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.Spell {
 	if !warrior.heroicStrikeQueued {
 		return nil
 	}

@@ -60,18 +60,18 @@ type Rogue struct {
 	envenomEnergyCost    float64
 	deadlyPoisonStacks   int
 
-	Backstab            *core.SimpleSpellTemplate
-	DeadlyPoisonRefresh *core.SimpleSpellTemplate
-	DeadlyPoison        *core.SimpleSpellTemplate
-	Envenom             *core.SimpleSpellTemplate
-	Eviscerate          *core.SimpleSpellTemplate
-	ExposeArmor         *core.SimpleSpellTemplate
-	Hemorrhage          *core.SimpleSpellTemplate
-	InstantPoison       *core.SimpleSpellTemplate
-	Mutilate            *core.SimpleSpellTemplate
-	Rupture             *core.SimpleSpellTemplate
-	Shiv                *core.SimpleSpellTemplate
-	SinisterStrike      *core.SimpleSpellTemplate
+	Backstab            *core.Spell
+	DeadlyPoisonRefresh *core.Spell
+	DeadlyPoison        *core.Spell
+	Envenom             *core.Spell
+	Eviscerate          *core.Spell
+	ExposeArmor         *core.Spell
+	Hemorrhage          *core.Spell
+	InstantPoison       *core.Spell
+	Mutilate            *core.Spell
+	Rupture             *core.Spell
+	Shiv                *core.Spell
+	SinisterStrike      *core.Spell
 
 	finishingMoveEffectApplier func(sim *core.Simulation, numPoints int32)
 

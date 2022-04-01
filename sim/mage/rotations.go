@@ -18,7 +18,7 @@ func (mage *Mage) OnManaTick(sim *core.Simulation) {
 }
 
 func (mage *Mage) tryUseGCD(sim *core.Simulation) {
-	var spell *core.SimpleSpellTemplate
+	var spell *core.Spell
 	if mage.RotationType == proto.Mage_Rotation_Arcane {
 		spell = mage.doArcaneRotation(sim)
 	} else if mage.RotationType == proto.Mage_Rotation_Fire {
@@ -49,7 +49,7 @@ func (mage *Mage) tryUseGCD(sim *core.Simulation) {
 	}
 }
 
-func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpellTemplate {
+func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.Spell {
 	if mage.UseAoeRotation {
 		return mage.doAoeRotation(sim)
 	}
@@ -151,7 +151,7 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.SimpleSpellTempla
 	}
 }
 
-func (mage *Mage) doFireRotation(sim *core.Simulation) *core.SimpleSpellTemplate {
+func (mage *Mage) doFireRotation(sim *core.Simulation) *core.Spell {
 	target := sim.GetPrimaryTarget()
 
 	if mage.FireRotation.MaintainImprovedScorch && (target.NumStacks(core.ImprovedScorchDebuffID) < 5 || target.RemainingAuraDuration(sim, core.ImprovedScorchDebuffID) < time.Millisecond*5500) {
@@ -173,7 +173,7 @@ func (mage *Mage) doFireRotation(sim *core.Simulation) *core.SimpleSpellTemplate
 	}
 }
 
-func (mage *Mage) doFrostRotation(sim *core.Simulation) *core.SimpleSpellTemplate {
+func (mage *Mage) doFrostRotation(sim *core.Simulation) *core.Spell {
 	if mage.UseAoeRotation {
 		return mage.doAoeRotation(sim)
 	}
@@ -181,7 +181,7 @@ func (mage *Mage) doFrostRotation(sim *core.Simulation) *core.SimpleSpellTemplat
 	return mage.Frostbolt
 }
 
-func (mage *Mage) doAoeRotation(sim *core.Simulation) *core.SimpleSpellTemplate {
+func (mage *Mage) doAoeRotation(sim *core.Simulation) *core.Spell {
 	if mage.AoeRotation.Rotation == proto.Mage_Rotation_AoeRotation_ArcaneExplosion {
 		return mage.ArcaneExplosion
 	} else if mage.AoeRotation.Rotation == proto.Mage_Rotation_AoeRotation_Flamestrike {

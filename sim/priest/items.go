@@ -60,7 +60,7 @@ var ItemSetAvatar = core.ItemSet{
 
 				return core.Aura{
 					ID: Avatar4PcAuraID,
-					OnPeriodicDamage: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect, tickDamage float64) {
+					OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
 						if spell.ActionID.SpellID != SpellIDShadowWordPain {
 							return
 						}
@@ -70,7 +70,7 @@ var ItemSetAvatar = core.ItemSet{
 						}
 
 						procAura := procFactory(sim)
-						procAura.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+						procAura.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 							character.RemoveAura(sim, SadistAuraID)
 						}
 						character.ReplaceAura(sim, procAura)
@@ -109,7 +109,7 @@ func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
 		applyStatAura := char.NewTemporaryStatsAuraApplier(AshtongueTalismanOfAcumenAuraID, core.ActionID{ItemID: 32490}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 		return core.Aura{
 			ID: AshtongueTalismanOfAcumenItemAuraID,
-			OnPeriodicDamage: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect, tickDamage float64) {
+			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
 				if spell.ActionID.SpellID != SpellIDShadowWordPain {
 					return
 				}

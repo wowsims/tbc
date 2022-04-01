@@ -199,7 +199,7 @@ func (characterMetrics *CharacterMetrics) AddCast(cast *Cast) {
 }
 
 // Adds the results of a spell to the character metrics.
-func (characterMetrics *CharacterMetrics) addSpell(spell *SimpleSpellTemplate) {
+func (characterMetrics *CharacterMetrics) addSpell(spell *Spell) {
 	actionID := spell.ActionID
 	actionKey := NewActionKey(actionID)
 	actionMetrics, ok := characterMetrics.actions[actionKey]

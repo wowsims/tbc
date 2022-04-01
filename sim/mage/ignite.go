@@ -9,7 +9,7 @@ import (
 var IgniteActionID = core.ActionID{SpellID: 12848}
 var IgniteDebuffID = core.NewDebuffID()
 
-func (mage *Mage) newIgniteSpell(sim *core.Simulation) *core.SimpleSpellTemplate {
+func (mage *Mage) newIgniteSpell(sim *core.Simulation) *core.Spell {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -63,7 +63,7 @@ func (mage *Mage) applyIgnite() {
 	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: IgniteAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}

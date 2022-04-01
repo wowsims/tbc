@@ -10,12 +10,12 @@ func DotSnapshotFuncMagic(baseDamage float64, spellCoefficient float64) BaseDama
 	}
 
 	if baseDamage == 0 {
-		return func(_ *Simulation, hitEffect *SpellEffect, spell *SimpleSpellTemplate) float64 {
+		return func(_ *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
 			totalSpellPower := hitEffect.SpellPower(spell.Character, spell)
 			return totalSpellPower * spellCoefficient
 		}
 	} else {
-		return func(_ *Simulation, hitEffect *SpellEffect, spell *SimpleSpellTemplate) float64 {
+		return func(_ *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
 			totalSpellPower := hitEffect.SpellPower(spell.Character, spell)
 			return baseDamage + totalSpellPower*spellCoefficient
 		}
@@ -104,7 +104,7 @@ func (ddi *DotDamageInput) RefreshDot(sim *Simulation) {
 	ddi.tickIndex = 0
 }
 
-func (instance *SimpleSpell) ApplyDot(sim *Simulation, spell *SimpleSpellTemplate) {
+func (instance *SimpleSpell) ApplyDot(sim *Simulation, spell *Spell) {
 	pa := sim.pendingActionPool.Get()
 	pa.Priority = ActionPriorityDOT
 	multiDot := len(instance.Effects) > 0
@@ -164,7 +164,7 @@ func (instance *SimpleSpell) ApplyDot(sim *Simulation, spell *SimpleSpellTemplat
 }
 
 // Snapshots a few values at the start of a dot.
-func (hitEffect *SpellEffect) takeDotSnapshot(sim *Simulation, spell *SimpleSpellTemplate) {
+func (hitEffect *SpellEffect) takeDotSnapshot(sim *Simulation, spell *Spell) {
 	// snapshot total damage per tick, including any static damage multipliers
 	hitEffect.DotInput.damagePerTick = hitEffect.DotInput.TickBaseDamage(sim, hitEffect, spell) * hitEffect.DamageMultiplier
 
@@ -174,7 +174,7 @@ func (hitEffect *SpellEffect) takeDotSnapshot(sim *Simulation, spell *SimpleSpel
 	hitEffect.BeyondAOECapMultiplier = 1
 }
 
-func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spell *SimpleSpellTemplate) {
+func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spell *Spell) {
 	damage := hitEffect.DotInput.damagePerTick
 
 	hitEffect.determineOutcome(sim, spell, true)
@@ -190,14 +190,14 @@ func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spell *SimpleS
 }
 
 // This should be called on each dot tick.
-func (hitEffect *SpellEffect) afterDotTick(sim *Simulation, spell *SimpleSpellTemplate) {
+func (hitEffect *SpellEffect) afterDotTick(sim *Simulation, spell *Spell) {
 	hitEffect.afterCalculations(sim, spell, true)
 	hitEffect.DotInput.tickIndex++
 	hitEffect.DotInput.nextTickTime = sim.CurrentTime + hitEffect.DotInput.TickLength
 }
 
 // This should be called after the final tick of the dot, or when the dot is cancelled.
-func (hitEffect *SpellEffect) onDotComplete(sim *Simulation, spell *SimpleSpellTemplate) {
+func (hitEffect *SpellEffect) onDotComplete(sim *Simulation, spell *Spell) {
 	// Clean up the dot object.
 	hitEffect.DotInput.endTime = 0
 

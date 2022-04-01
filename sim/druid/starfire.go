@@ -15,7 +15,7 @@ const SpellIDSF6 int32 = 9876
 // Idol IDs
 const IvoryMoongoddess int32 = 27518
 
-func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.SimpleSpellTemplate {
+func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Spell {
 	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -67,7 +67,7 @@ func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Simpl
 
 	if ItemSetNordrassil.CharacterHasSetBonus(&druid.Character, 4) {
 		template.Effect.BaseDamage = core.WrapBaseDamageConfig(template.Effect.BaseDamage, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
-			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 				normalDamage := oldCalculator(sim, hitEffect, spell)
 
 				// Check if moonfire/insectswarm is ticking on the target.

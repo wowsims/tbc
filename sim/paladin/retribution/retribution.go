@@ -144,7 +144,7 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	// Cast selected judgement to keep on the boss
 	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) &&
 		ret.judgement != proto.RetributionPaladin_Options_None {
-		var judge *core.SimpleSpellTemplate
+		var judge *core.Spell
 		switch ret.judgement {
 		case proto.RetributionPaladin_Options_Wisdom:
 			judge = ret.JudgementOfWisdom

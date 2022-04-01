@@ -90,7 +90,7 @@ func (mage *Mage) applyArcaneConcentration() {
 				mage.AddStat(stats.SpellCrit, -bonusCrit)
 				mage.PseudoStats.NoCost = false
 			},
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SpellExtras.Matches(SpellFlagMage) {
 					return
 				}
@@ -110,7 +110,7 @@ func (mage *Mage) applyArcaneConcentration() {
 				}
 				curCastIdx++
 			},
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SpellExtras.Matches(SpellFlagMage) {
 					return
 				}
@@ -181,7 +181,7 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				var spell *core.SimpleSpellTemplate
+				var spell *core.Spell
 				if mage.Talents.Pyroblast {
 					spell = mage.Pyroblast
 				} else if mage.RotationType == proto.Mage_Rotation_Fire {
@@ -257,7 +257,7 @@ func (mage *Mage) applyMasterOfElements() {
 	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: MasterOfElementsAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -304,7 +304,7 @@ func (mage *Mage) registerCombustionCD() {
 					ID:       CombustionAuraID,
 					ActionID: actionID,
 					Duration: core.NeverExpires,
-					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spell.SpellSchool != core.SpellSchoolFire {
 							return
 						}

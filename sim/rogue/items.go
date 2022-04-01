@@ -65,7 +65,7 @@ var ItemSetDeathmantle = core.ItemSet{
 			rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: Deathmantle4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}
@@ -115,7 +115,7 @@ func ApplyWarpSpringCoil(agent core.Agent) {
 
 		return core.Aura{
 			ID: WarpSpringCoilAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
@@ -171,7 +171,7 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 					}
 				}
 			},
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SpellExtras.Matches(SpellFlagFinisher) {
 					return
 				}

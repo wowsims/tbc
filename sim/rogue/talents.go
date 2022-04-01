@@ -145,7 +145,7 @@ func (rogue *Rogue) registerColdBloodCD() {
 		OnExpire: func(sim *core.Simulation) {
 			rogue.PseudoStats.BonusCritRatingAgentReserved1 -= 100 * core.MeleeCritRatingPerCritChance
 		},
-		OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			rogue.RemoveAuraOnNextAdvance(sim, ColdBloodAuraID)
 		},
 	}
@@ -196,7 +196,7 @@ func (rogue *Rogue) applySealFate() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: SealFateAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SpellExtras.Matches(SpellFlagBuilder) {
 					return
 				}
@@ -253,7 +253,7 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 
 			return core.Aura{
 				ID: SwordSpecializationAuraID,
-				OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+				OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if !spellEffect.Landed() {
 						return
 					}
@@ -291,7 +291,7 @@ func (rogue *Rogue) applyCombatPotency() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: CombatPotencyAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}

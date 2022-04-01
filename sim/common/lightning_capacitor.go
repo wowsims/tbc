@@ -47,7 +47,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 
 		return core.Aura{
 			ID: TheLightningCapacitorAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if icd.IsOnCD(sim) {
 					return
 				}

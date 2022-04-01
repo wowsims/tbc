@@ -16,13 +16,13 @@ type Druid struct {
 	NaturesGrace bool // when true next spellcast is 0.5s faster
 	RebirthUsed  bool
 
-	FaerieFire  *core.SimpleSpellTemplate
-	Hurricane   *core.SimpleSpellTemplate
-	InsectSwarm *core.SimpleSpellTemplate
-	Moonfire    *core.SimpleSpellTemplate
-	Starfire6   *core.SimpleSpellTemplate
-	Starfire8   *core.SimpleSpellTemplate
-	Wrath       *core.SimpleSpellTemplate
+	FaerieFire  *core.Spell
+	Hurricane   *core.Spell
+	InsectSwarm *core.Spell
+	Moonfire    *core.Spell
+	Starfire6   *core.Spell
+	Starfire8   *core.Spell
+	Wrath       *core.Spell
 }
 
 type SelfBuffs struct {

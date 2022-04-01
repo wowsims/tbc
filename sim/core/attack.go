@@ -12,7 +12,7 @@ import (
 //  If it returns nil, the attack takes place as normal. If it returns an ability,
 //  that ability is used in place of the attack.
 //  This allows for abilities that convert a white attack into yellow attack.
-type ReplaceMHSwing func(sim *Simulation) *SimpleSpellTemplate
+type ReplaceMHSwing func(sim *Simulation) *Spell
 
 // Represents a generic weapon. Pets / unarmed / various other cases dont use
 // actual weapon items so this is an abstraction of a Weapon.
@@ -154,9 +154,9 @@ type AutoAttacks struct {
 	OffhandSwingAt  time.Duration
 	RangedSwingAt   time.Duration
 
-	MHAuto     *SimpleSpellTemplate
-	OHAuto     *SimpleSpellTemplate
-	RangedAuto *SimpleSpellTemplate
+	MHAuto     *Spell
+	OHAuto     *Spell
+	RangedAuto *Spell
 
 	RangedSwingInProgress bool
 

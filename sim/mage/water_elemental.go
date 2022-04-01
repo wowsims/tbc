@@ -82,7 +82,7 @@ type WaterElemental struct {
 	// does its own thing. This controls how much it does that.
 	disobeyChance float64
 
-	Waterbolt *core.SimpleSpellTemplate
+	Waterbolt *core.Spell
 }
 
 func (mage *Mage) NewWaterElemental(disobeyChance float64) *WaterElemental {

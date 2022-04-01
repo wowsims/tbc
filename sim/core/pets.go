@@ -33,7 +33,7 @@ func (character *Character) newGnomishFlameTurretCaster() func(sim *Simulation) 
 type GnomishFlameTurret struct {
 	Pet
 
-	FlameCannon *SimpleSpellTemplate
+	FlameCannon *Spell
 }
 
 func (character *Character) NewGnomishFlameTurret() *GnomishFlameTurret {

@@ -118,18 +118,18 @@ type Shaman struct {
 	ElementalFocusStacks byte
 
 	// Precomputed templated cast generator for quickly resetting cast fields.
-	LightningBolt   *core.SimpleSpellTemplate
-	LightningBoltLO *core.SimpleSpellTemplate
+	LightningBolt   *core.Spell
+	LightningBoltLO *core.Spell
 
-	ChainLightning    *core.SimpleSpellTemplate
-	ChainLightningLOs []*core.SimpleSpellTemplate
+	ChainLightning    *core.Spell
+	ChainLightningLOs []*core.Spell
 
-	Stormstrike *core.SimpleSpellTemplate
+	Stormstrike *core.Spell
 
 	// Shocks
-	EarthShock *core.SimpleSpellTemplate
-	FrostShock *core.SimpleSpellTemplate
-	FlameShock *core.SimpleSpellTemplate
+	EarthShock *core.Spell
+	FrostShock *core.Spell
+	FlameShock *core.Spell
 
 	strengthOfEarthTotemTemplate core.SimpleCast
 	tremorTotemTemplate          core.SimpleCast
@@ -141,9 +141,9 @@ type Shaman struct {
 	manaSpringTotemTemplate      core.SimpleCast
 	totemSpell                   core.SimpleCast
 
-	SearingTotem  *core.SimpleSpellTemplate
-	MagmaTotem    *core.SimpleSpellTemplate
-	FireNovaTotem *core.SimpleSpellTemplate
+	SearingTotem  *core.Spell
+	MagmaTotem    *core.Spell
+	FireNovaTotem *core.Spell
 }
 
 // Implemented by each Shaman spec.
@@ -231,7 +231,7 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 
 	shaman.ChainLightning = shaman.newChainLightningSpell(sim, false)
 	numHits := core.MinInt32(3, sim.GetNumTargets())
-	shaman.ChainLightningLOs = []*core.SimpleSpellTemplate{}
+	shaman.ChainLightningLOs = []*core.Spell{}
 	for i := int32(0); i < numHits; i++ {
 		shaman.ChainLightningLOs = append(shaman.ChainLightningLOs, shaman.newChainLightningSpell(sim, true))
 	}

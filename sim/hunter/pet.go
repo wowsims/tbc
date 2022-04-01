@@ -19,7 +19,7 @@ type HunterPet struct {
 	// Time when pet should die, as per petUptime.
 	deathTime time.Duration
 
-	KillCommand *core.SimpleSpellTemplate
+	KillCommand *core.Spell
 
 	primaryAbility   PetAbility
 	secondaryAbility PetAbility

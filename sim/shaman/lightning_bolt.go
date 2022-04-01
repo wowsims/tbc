@@ -10,7 +10,7 @@ import (
 const SpellIDLB12 int32 = 25449
 
 // newLightningBoltTemplate returns a cast generator for Lightning Bolt with as many fields precomputed as possible.
-func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOverload bool) *core.SimpleSpellTemplate {
+func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOverload bool) *core.Spell {
 	baseManaCost := 300.0
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfThePulsingEarth {
 		baseManaCost -= 27.0
@@ -29,7 +29,7 @@ func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOve
 
 	if !isLightningOverload && shaman.Talents.LightningOverload > 0 {
 		lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04
-		spellTemplate.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+		spellTemplate.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() {
 				return
 			}
@@ -43,7 +43,7 @@ func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOve
 			shaman.LightningBoltLO.Cast(sim, spellEffect.Target)
 		}
 	} else {
-		spellTemplate.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.SimpleSpellTemplate, spellEffect *core.SpellEffect) {
+		spellTemplate.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if shaman.Talents.ElementalFocus && spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				shaman.ElementalFocusStacks = 2
 			}

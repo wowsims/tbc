@@ -147,7 +147,7 @@ type CLOnCDRotation struct {
 }
 
 func (rotation *CLOnCDRotation) DoAction(eleShaman *ElementalShaman, sim *core.Simulation) {
-	var spell *core.SimpleSpellTemplate
+	var spell *core.Spell
 	if eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) {
 		spell = eleShaman.LightningBolt
 	} else {
@@ -175,7 +175,7 @@ type FixedRotation struct {
 }
 
 func (rotation *FixedRotation) DoAction(eleShaman *ElementalShaman, sim *core.Simulation) {
-	var spell *core.SimpleSpellTemplate
+	var spell *core.Spell
 	if rotation.numLBsSinceLastCL < rotation.numLBsPerCL {
 		spell = eleShaman.LightningBolt
 		rotation.numLBsSinceLastCL++
@@ -219,7 +219,7 @@ type CLOnClearcastRotation struct {
 }
 
 func (rotation *CLOnClearcastRotation) DoAction(eleShaman *ElementalShaman, sim *core.Simulation) {
-	var spell *core.SimpleSpellTemplate
+	var spell *core.Spell
 	if eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) || !rotation.prevPrevCastProccedCC {
 		spell = eleShaman.LightningBolt
 	} else {
