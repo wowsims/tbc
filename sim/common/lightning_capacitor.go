@@ -25,15 +25,15 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 					Character:   character,
 					SpellSchool: core.SpellSchoolNature,
 				},
+			},
+			Effect: core.SpellEffect{
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				IsPhantom:           true, // TODO: replace with ProcMask
-			},
-			Effect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       core.BaseDamageConfigRoll(694, 807),
+				DamageMultiplier:    1,
+				ThreatMultiplier:    1,
+				BaseDamage:          core.BaseDamageConfigRoll(694, 807),
 			},
 		},
 		ModifyCast: core.ModifyCastAssignTarget,

@@ -31,10 +31,10 @@ func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 		basePerComboPoint += 40
 	}
 	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
 			comboPoints := rogue.ComboPoints()
 			base := basePerComboPoint * float64(comboPoints)
-			return base + (hitEffect.MeleeAttackPower(spellCast)*0.03)*float64(comboPoints)
+			return base + (hitEffect.MeleeAttackPower(spell.Character)*0.03)*float64(comboPoints)
 		},
 		TargetSpellCoefficient: 0,
 	}

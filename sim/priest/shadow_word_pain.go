@@ -26,11 +26,11 @@ func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
 				CastTime:    0,
 				GCD:         core.GCDDefault,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:  6,
 				TickLength:     time.Second * 3,

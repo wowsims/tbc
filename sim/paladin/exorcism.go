@@ -28,14 +28,14 @@ func (paladin *Paladin) registerExorcismSpell(sim *core.Simulation) {
 				},
 				Cooldown: time.Second * 15,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      paladin.SpellCritMultiplier(1, 0.25), // look up crit multiplier in the future
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMagic(521, 579, 1),
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMagic(521, 579, 1),
 		},
 	}
 

@@ -29,12 +29,12 @@ func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
 				GCD:         core.GCDDefault,
 				Cooldown:    time.Minute * 3,
 			},
-			CritRollCategory:    core.CritRollCategoryMagical,
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:  8,
 				TickLength:     time.Second * 3,

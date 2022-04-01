@@ -33,14 +33,14 @@ func (priest *Priest) registerShadowWordDeathSpell(sim *core.Simulation) {
 				GCD:      core.GCDDefault,
 				Cooldown: time.Second * 12,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMagic(572, 664, 0.429),
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMagic(572, 664, 0.429),
 		},
 	}
 

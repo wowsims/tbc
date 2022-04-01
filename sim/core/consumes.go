@@ -793,15 +793,15 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 						Character:   character,
 						SpellSchool: SpellSchoolFire,
 					},
+				},
+				Effect: SpellEffect{
 					IsPhantom:           true,
 					OutcomeRollCategory: OutcomeRollCategoryMagic,
 					CritRollCategory:    CritRollCategoryMagical,
 					CritMultiplier:      1.5,
-				},
-				Effect: SpellEffect{
-					DamageMultiplier: 1,
-					ThreatMultiplier: 1,
-					BaseDamage:       BaseDamageConfigFlat(40),
+					DamageMultiplier:    1,
+					ThreatMultiplier:    1,
+					BaseDamage:          BaseDamageConfigFlat(40),
 				},
 			},
 			ModifyCast: ModifyCastAssignTarget,
@@ -826,7 +826,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				statsAuraFactory := character.NewTemporaryStatsAuraFactory(ConjuredAuraID, actionID, stats.Stats{stats.FireSpellPower: fireBonus}, dur)
 				aura := statsAuraFactory(sim)
 				aura.OnSpellHit = func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-					if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
+					if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 						return
 					}
 					if sim.RandomFloat("Flame Cap Melee") > procChance {
@@ -945,15 +945,15 @@ func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID Act
 				SpellSchool: SpellSchoolFire,
 				Cooldown:    cooldown,
 			},
-			OutcomeRollCategory: OutcomeRollCategoryMagic,
-			CritRollCategory:    CritRollCategoryMagical,
-			CritMultiplier:      2,
 		},
 	}
 
 	baseEffect := SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
+		DamageMultiplier:    1,
+		ThreatMultiplier:    1,
+		OutcomeRollCategory: OutcomeRollCategoryMagic,
+		CritRollCategory:    CritRollCategoryMagical,
+		CritMultiplier:      2,
 
 		// Explosives always have 1% resist chance, so just give them hit cap.
 		BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,

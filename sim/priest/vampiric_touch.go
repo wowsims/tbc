@@ -24,12 +24,12 @@ func (priest *Priest) newVampiricTouchSpell(sim *core.Simulation, isAltCast bool
 				CastTime:    time.Millisecond * 1500,
 				GCD:         core.GCDDefault,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
 		},
 		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:  5,
 				TickLength:     time.Second * 3,

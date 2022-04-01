@@ -13,7 +13,7 @@ func (rogue *Rogue) registerExposeArmorSpell(_ *core.Simulation) {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	ability := rogue.newAbility(ExposeArmorActionID, ExposeArmorEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
-	ability.SpellCast.CritRollCategory = core.CritRollCategoryNone
+	ability.Effect.CritRollCategory = core.CritRollCategoryNone
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			spellEffect.Target.ReplaceAura(sim, core.ExposeArmorAura(sim, spellEffect.Target, rogue.Talents.ImprovedExposeArmor))

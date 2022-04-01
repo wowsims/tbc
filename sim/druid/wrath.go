@@ -31,9 +31,6 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 				CastTime: time.Millisecond * 2000,
 				GCD:      core.GCDDefault,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 		},
 	}
 
@@ -46,9 +43,12 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 	spellCoefficient += 0.02 * float64(druid.Talents.WrathOfCenarius)
 
 	template.Effect = core.SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
-		BaseDamage:       core.BaseDamageConfigMagic(383+bonusFlatDamage, 432+bonusFlatDamage, spellCoefficient),
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
+		DamageMultiplier:    1,
+		ThreatMultiplier:    1,
+		BaseDamage:          core.BaseDamageConfigMagic(383+bonusFlatDamage, 432+bonusFlatDamage, spellCoefficient),
 	}
 
 	template.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)

@@ -33,9 +33,6 @@ func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Simpl
 				CastTime: time.Millisecond * 3500,
 				GCD:      core.GCDDefault,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 		},
 	}
 
@@ -60,15 +57,18 @@ func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Simpl
 	spellCoefficient += 0.04 * float64(druid.Talents.WrathOfCenarius)
 
 	template.Effect = core.SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
-		BaseDamage:       core.BaseDamageConfigMagic(minBaseDamage+bonusFlatDamage, maxBaseDamage+bonusFlatDamage, spellCoefficient),
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
+		DamageMultiplier:    1,
+		ThreatMultiplier:    1,
+		BaseDamage:          core.BaseDamageConfigMagic(minBaseDamage+bonusFlatDamage, maxBaseDamage+bonusFlatDamage, spellCoefficient),
 	}
 
 	if ItemSetNordrassil.CharacterHasSetBonus(&druid.Character, 4) {
 		template.Effect.BaseDamage = core.WrapBaseDamageConfig(template.Effect.BaseDamage, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
-			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
-				normalDamage := oldCalculator(sim, hitEffect, spellCast)
+			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+				normalDamage := oldCalculator(sim, hitEffect, spell)
 
 				// Check if moonfire/insectswarm is ticking on the target.
 				// TODO: in a raid simulator we need to be able to see which dots are ticking from other druids.

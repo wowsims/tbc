@@ -24,12 +24,12 @@ func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
 				GCD:         core.GCDDefault,
 				Cooldown:    time.Second * 30,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
 		},
 		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:  5,
 				TickLength:     time.Second * 3,

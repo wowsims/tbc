@@ -43,16 +43,16 @@ func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 				},
 				SpellExtras: core.SpellExtrasBinary,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      warrior.spellCritMultiplier(true),
 		},
 	}
 
 	baseEffect := core.SpellEffect{
-		DamageMultiplier: impTCDamageMult,
-		ThreatMultiplier: 1.75,
-		BaseDamage:       core.BaseDamageConfigFlat(123),
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      warrior.spellCritMultiplier(true),
+		DamageMultiplier:    impTCDamageMult,
+		ThreatMultiplier:    1.75,
+		BaseDamage:          core.BaseDamageConfigFlat(123),
 	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())

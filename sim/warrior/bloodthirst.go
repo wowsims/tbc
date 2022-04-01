@@ -35,17 +35,17 @@ func (warrior *Warrior) registerBloodthirstSpell(_ *core.Simulation) {
 					Value: warrior.bloodthirstCost,
 				},
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      warrior.critMultiplier(true),
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			ProcMask:            core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 			BaseDamage: core.BaseDamageConfig{
-				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
-					return hitEffect.MeleeAttackPower(spellCast) * 0.45
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+					return hitEffect.MeleeAttackPower(spell.Character) * 0.45
 				},
 				TargetSpellCoefficient: 0, // Doesn't scale with +damage on target?
 			},

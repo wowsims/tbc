@@ -72,14 +72,14 @@ func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) b
 		spellCast := &instance.SpellCast
 		if len(instance.Effects) == 0 {
 			hitEffect := &instance.Effect
-			hitEffect.determineOutcome(sim, spellCast, spell, false)
+			hitEffect.determineOutcome(sim, spell, false)
 
 			if hitEffect.Landed() {
-				hitEffect.directCalculations(sim, spellCast)
+				hitEffect.directCalculations(sim, spell)
 
 				// Dot Damage Effects
 				if hitEffect.DotInput.NumberOfTicks != 0 {
-					hitEffect.takeDotSnapshot(sim, spellCast)
+					hitEffect.takeDotSnapshot(sim, spell)
 					instance.ApplyDot(sim, spell)
 				}
 			}
@@ -91,11 +91,11 @@ func (instance *SimpleSpell) Cast(sim *Simulation, spell *SimpleSpellTemplate) b
 			// on the first hit from benefitting other hits of the same spell.
 			for effectIdx := range instance.Effects {
 				hitEffect := &instance.Effects[effectIdx]
-				hitEffect.determineOutcome(sim, spellCast, spell, false)
+				hitEffect.determineOutcome(sim, spell, false)
 				if hitEffect.Landed() {
-					hitEffect.directCalculations(sim, spellCast)
+					hitEffect.directCalculations(sim, spell)
 					if hitEffect.DotInput.NumberOfTicks != 0 {
-						hitEffect.takeDotSnapshot(sim, spellCast)
+						hitEffect.takeDotSnapshot(sim, spell)
 					}
 				}
 			}

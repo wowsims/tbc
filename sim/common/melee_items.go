@@ -52,15 +52,15 @@ func ApplyStormGauntlets(agent core.Agent) {
 					Character:   character,
 					SpellSchool: core.SpellSchoolNature,
 				},
+			},
+			Effect: core.SpellEffect{
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				IsPhantom:           true,
-			},
-			Effect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       core.BaseDamageConfigFlat(3),
+				DamageMultiplier:    1,
+				ThreatMultiplier:    1,
+				BaseDamage:          core.BaseDamageConfigFlat(3),
 			},
 		},
 		ModifyCast: core.ModifyCastAssignTarget,
@@ -71,7 +71,7 @@ func ApplyStormGauntlets(agent core.Agent) {
 			ID: StormGauntletsAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// https://tbc.wowhead.com/spell=16615/add-lightning-dam-weap-03, proc mask = 20.
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
 				}
 
@@ -94,15 +94,15 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 					Character:   character,
 					SpellSchool: core.SpellSchoolFire,
 				},
+			},
+			Effect: core.SpellEffect{
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				IsPhantom:           true,
-			},
-			Effect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       core.BaseDamageConfigFlat(2),
+				DamageMultiplier:    1,
+				ThreatMultiplier:    1,
+				BaseDamage:          core.BaseDamageConfigFlat(2),
 			},
 		},
 		ModifyCast: core.ModifyCastAssignTarget,
@@ -113,7 +113,7 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 			ID: BlazefuryMedallionAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// https://tbc.wowhead.com/spell=7711/add-fire-dam-weap-02, proc mask = 20.
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
 				}
 
@@ -372,12 +372,12 @@ func ApplyDespair(agent core.Agent) {
 					SpellSchool: core.SpellSchoolPhysical,
 					SpellExtras: core.SpellExtrasIgnoreResists,
 				},
+			},
+			Effect: core.SpellEffect{
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				CritMultiplier:      character.DefaultMeleeCritMultiplier(),
 				IsPhantom:           true,
-			},
-			Effect: core.SpellEffect{
 				// TODO: This should be removed once we have an attack mask.
 				//  This is only set here to correctly calculate damage.
 				ProcMask:         core.ProcMaskMeleeMHSpecial,
@@ -424,16 +424,16 @@ func ApplyTheDecapitator(agent core.Agent) {
 					SpellSchool: core.SpellSchoolPhysical,
 					SpellExtras: core.SpellExtrasIgnoreResists,
 				},
+			},
+			Effect: core.SpellEffect{
 				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 				CritRollCategory:    core.CritRollCategoryPhysical,
 				CritMultiplier:      character.DefaultMeleeCritMultiplier(),
 				IsPhantom:           true,
-			},
-			Effect: core.SpellEffect{
-				ProcMask:         core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       core.BaseDamageConfigRoll(513, 567),
+				ProcMask:            core.ProcMaskMeleeMHSpecial,
+				DamageMultiplier:    1,
+				ThreatMultiplier:    1,
+				BaseDamage:          core.BaseDamageConfigRoll(513, 567),
 			},
 		},
 		ModifyCast: core.ModifyCastAssignTarget,
@@ -478,15 +478,15 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 					Character:   character,
 					SpellSchool: core.SpellSchoolShadow,
 				},
+			},
+			Effect: core.SpellEffect{
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				IsPhantom:           true,
-			},
-			Effect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       core.BaseDamageConfigRoll(285, 315),
+				DamageMultiplier:    1,
+				ThreatMultiplier:    1,
+				BaseDamage:          core.BaseDamageConfigRoll(285, 315),
 			},
 		},
 		ModifyCast: core.ModifyCastAssignTarget,
@@ -530,13 +530,13 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 			ID: BandOfTheEternalChampionAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// mask 340
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, spellEffect.IsMH(), spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Band of the Eternal Champion") {
+				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Band of the Eternal Champion") {
 					return
 				}
 
@@ -592,7 +592,7 @@ func ApplyHeartrazor(agent core.Agent) {
 		return core.Aura{
 			ID: HeartrazorAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
 					return
 				}
 
@@ -767,15 +767,15 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 					Character:   character,
 					SpellSchool: core.SpellSchoolShadow,
 				},
+			},
+			Effect: core.SpellEffect{
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				IsPhantom:           true,
-			},
-			Effect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       core.BaseDamageConfigMagic(48, 54, 1),
+				DamageMultiplier:    1,
+				ThreatMultiplier:    1,
+				BaseDamage:          core.BaseDamageConfigMagic(48, 54, 1),
 			},
 		},
 		ModifyCast: core.ModifyCastAssignTarget,
@@ -856,7 +856,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 		return core.Aura{
 			ID: BlinkstrikeAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
 					return
 				}
 
@@ -941,15 +941,15 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 					Character:   character,
 					SpellSchool: core.SpellSchoolShadow,
 				},
+			},
+			Effect: core.SpellEffect{
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				CritRollCategory:    core.CritRollCategoryMagical,
 				CritMultiplier:      character.DefaultSpellCritMultiplier(),
 				IsPhantom:           true,
-			},
-			Effect: core.SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       core.BaseDamageConfigFlat(20),
+				DamageMultiplier:    1,
+				ThreatMultiplier:    1,
+				BaseDamage:          core.BaseDamageConfigFlat(20),
 			},
 		},
 		ModifyCast: core.ModifyCastAssignTarget,
@@ -961,7 +961,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 			ActionID: core.ActionID{SpellID: 40291},
 			Duration: time.Second * 6,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
 				}
 

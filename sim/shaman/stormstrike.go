@@ -54,13 +54,13 @@ func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.SimpleSpellTemplat
 				SpellSchool: core.SpellSchoolPhysical,
 				SpellExtras: core.SpellExtrasAlwaysHits,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 		},
 	}
 
@@ -110,11 +110,11 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 					Value: 237,
 				},
 			},
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryNone,
 		},
 		Effect: core.SpellEffect{
-			ThreatMultiplier: 1,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryNone,
+			ThreatMultiplier:    1,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return

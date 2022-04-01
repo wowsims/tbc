@@ -10,13 +10,13 @@ func DotSnapshotFuncMagic(baseDamage float64, spellCoefficient float64) BaseDama
 	}
 
 	if baseDamage == 0 {
-		return func(_ *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
-			totalSpellPower := hitEffect.SpellPower(spellCast.Character, spellCast)
+		return func(_ *Simulation, hitEffect *SpellEffect, spell *SimpleSpellTemplate) float64 {
+			totalSpellPower := hitEffect.SpellPower(spell.Character, spell)
 			return totalSpellPower * spellCoefficient
 		}
 	} else {
-		return func(_ *Simulation, hitEffect *SpellEffect, spellCast *SpellCast) float64 {
-			totalSpellPower := hitEffect.SpellPower(spellCast.Character, spellCast)
+		return func(_ *Simulation, hitEffect *SpellEffect, spell *SimpleSpellTemplate) float64 {
+			totalSpellPower := hitEffect.SpellPower(spell.Character, spell)
 			return baseDamage + totalSpellPower*spellCoefficient
 		}
 	}
@@ -165,9 +165,9 @@ func (instance *SimpleSpell) ApplyDot(sim *Simulation, spell *SimpleSpellTemplat
 }
 
 // Snapshots a few values at the start of a dot.
-func (hitEffect *SpellEffect) takeDotSnapshot(sim *Simulation, spellCast *SpellCast) {
+func (hitEffect *SpellEffect) takeDotSnapshot(sim *Simulation, spell *SimpleSpellTemplate) {
 	// snapshot total damage per tick, including any static damage multipliers
-	hitEffect.DotInput.damagePerTick = hitEffect.DotInput.TickBaseDamage(sim, hitEffect, spellCast) * hitEffect.DamageMultiplier
+	hitEffect.DotInput.damagePerTick = hitEffect.DotInput.TickBaseDamage(sim, hitEffect, spell) * hitEffect.DamageMultiplier
 
 	hitEffect.DotInput.startTime = sim.CurrentTime
 	hitEffect.DotInput.RefreshDot(sim)
@@ -178,14 +178,14 @@ func (hitEffect *SpellEffect) takeDotSnapshot(sim *Simulation, spellCast *SpellC
 func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spellCast *SpellCast, spell *SimpleSpellTemplate) {
 	damage := hitEffect.DotInput.damagePerTick
 
-	hitEffect.determineOutcome(sim, spellCast, spell, true)
+	hitEffect.determineOutcome(sim, spell, true)
 
 	if !hitEffect.DotInput.IgnoreDamageModifiers {
-		hitEffect.applyAttackerModifiers(sim, spellCast, !hitEffect.DotInput.TicksCanMissAndCrit, &damage)
-		hitEffect.applyTargetModifiers(sim, spellCast, !hitEffect.DotInput.TicksCanMissAndCrit, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
+		hitEffect.applyAttackerModifiers(sim, spell, !hitEffect.DotInput.TicksCanMissAndCrit, &damage)
+		hitEffect.applyTargetModifiers(sim, spell, !hitEffect.DotInput.TicksCanMissAndCrit, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	}
-	hitEffect.applyResistances(sim, spellCast, &damage)
-	hitEffect.applyOutcome(sim, spellCast, &damage)
+	hitEffect.applyResistances(sim, spell, &damage)
+	hitEffect.applyOutcome(sim, spell, &damage)
 
 	hitEffect.Damage = damage
 }

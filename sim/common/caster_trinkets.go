@@ -215,7 +215,7 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
-				if icd.IsOnCD(sim) || !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellCast.IsPhantom {
+				if icd.IsOnCD(sim) || !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellEffect.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("Shiffar's Nexus-Horn") > 0.2 {
@@ -271,7 +271,7 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || icd.IsOnCD(sim) || spellCast.IsPhantom {
+				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || icd.IsOnCD(sim) || spellEffect.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("Sextant of Unstable Currents") > 0.2 {
@@ -321,7 +321,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 			ID: DarkmoonCardCrusadeAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					if spellCast.IsPhantom {
+					if spellEffect.IsPhantom {
 						return
 					}
 

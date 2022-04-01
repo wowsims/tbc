@@ -154,15 +154,15 @@ var ItemSetFistsOfFury = core.ItemSet{
 							Character:   character,
 							SpellSchool: core.SpellSchoolFire,
 						},
+					},
+					Effect: core.SpellEffect{
 						OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 						CritRollCategory:    core.CritRollCategoryMagical,
 						CritMultiplier:      character.DefaultSpellCritMultiplier(),
 						IsPhantom:           true,
-					},
-					Effect: core.SpellEffect{
-						DamageMultiplier: 1,
-						ThreatMultiplier: 1,
-						BaseDamage:       core.BaseDamageConfigRoll(100, 150),
+						DamageMultiplier:    1,
+						ThreatMultiplier:    1,
+						BaseDamage:          core.BaseDamageConfigRoll(100, 150),
 					},
 				},
 				ModifyCast: core.ModifyCastAssignTarget,
@@ -248,7 +248,7 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 						}
 
 						// https://tbc.wowhead.com/spell=41434/the-twin-blades-of-azzinoth, proc mask = 20.
-						if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+						if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 							return
 						}
 

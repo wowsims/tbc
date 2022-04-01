@@ -177,7 +177,7 @@ func JudgementOfWisdomAura() Aura {
 			if !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) && !spellEffect.Landed() {
 				return
 			}
-			if spellCast.IsPhantom {
+			if spellEffect.IsPhantom {
 				return // Phantom spells (Romulo's, Lightning Capacitor, etc) don't proc JoW.
 			}
 
@@ -464,7 +464,7 @@ func HuntersMarkAura(target *Target, points int32, fullyStacked bool) Aura {
 			target.PseudoStats.BonusRangedAttackPower -= rangedBonus
 		},
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if !spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || !spellEffect.Landed() {
+			if !spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || !spellEffect.Landed() {
 				return
 			}
 			if stacks < maxStacks {

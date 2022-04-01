@@ -16,9 +16,10 @@ func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 				SpellSchool: core.SpellSchoolFrost,
 				SpellExtras: SpellFlagMage,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
-		Effect: core.SpellEffect{},
 	}
 
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance

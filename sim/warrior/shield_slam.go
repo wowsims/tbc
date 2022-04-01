@@ -34,21 +34,21 @@ func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
 					Value: ShieldSlamCost,
 				},
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      warrior.critMultiplier(true),
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial, // TODO: Is this right?
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			FlatThreatBonus:  305,
+			ProcMask:            core.ProcMaskMeleeMHSpecial, // TODO: Is this right?
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			FlatThreatBonus:     305,
 		},
 	}
 
 	damageRollFunc := core.DamageRollFunc(420, 440)
 	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, _ *core.SpellEffect, _ *core.SpellCast) float64 {
+		Calculator: func(sim *core.Simulation, _ *core.SpellEffect, _ *core.SimpleSpellTemplate) float64 {
 			return damageRollFunc(sim) + warrior.GetStat(stats.BlockValue)
 		},
 		TargetSpellCoefficient: 1,

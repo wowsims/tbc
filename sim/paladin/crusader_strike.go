@@ -26,15 +26,15 @@ func (paladin *Paladin) registerCrusaderStrikeSpell(sim *core.Simulation) {
 					Value: 236,
 				},
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 			IsPhantom:           true,
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1, // Need to review to make sure I set these properly
-			ThreatMultiplier: 1,
+			ProcMask:            core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1, // Need to review to make sure I set these properly
+			ThreatMultiplier:    1,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return

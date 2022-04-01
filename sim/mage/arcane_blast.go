@@ -48,14 +48,14 @@ func (mage *Mage) registerArcaneBlastSpell(sim *core.Simulation) {
 					cast.Character.ReplaceAura(sim, abAura)
 				},
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
-			BaseDamage:       core.BaseDamageConfigMagic(668, 772, 2.5/3.5),
+			DamageMultiplier:    mage.spellDamageMultiplier,
+			ThreatMultiplier:    1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
+			BaseDamage:          core.BaseDamageConfigMagic(668, 772, 2.5/3.5),
 		},
 	}
 

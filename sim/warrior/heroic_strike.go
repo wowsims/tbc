@@ -26,16 +26,16 @@ func (warrior *Warrior) registerHeroicStrikeSpell(_ *core.Simulation) {
 					Value: warrior.heroicStrikeCost,
 				},
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      warrior.critMultiplier(true),
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			FlatThreatBonus:  194,
-			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 176, 1, true),
+			ProcMask:            core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			FlatThreatBonus:     194,
+			BaseDamage:          core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 176, 1, true),
 		},
 	}
 

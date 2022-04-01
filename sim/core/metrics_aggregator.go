@@ -206,7 +206,8 @@ func (characterMetrics *CharacterMetrics) addSpell(spell *SimpleSpellTemplate) {
 
 	if !ok {
 		actionMetrics.ActionID = actionID
-		actionMetrics.IsMelee = spell.Template.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical)
+		actionMetrics.IsMelee = spell.Template.Effect.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) ||
+			(len(spell.Template.Effects) > 0 && spell.Template.Effects[0].OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical))
 	}
 
 	actionMetrics.Casts += spell.Casts

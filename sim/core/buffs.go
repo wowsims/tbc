@@ -362,7 +362,7 @@ func newWindfuryBuffAuraFactory(character *Character, rank int32, iwtTalentPoint
 			}
 		},
 		OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if !spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryWhite) {
+			if !spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryWhite) {
 				return
 			}
 			charges--

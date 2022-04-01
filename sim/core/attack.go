@@ -200,14 +200,14 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				SpellSchool: SpellSchoolPhysical,
 				IgnoreHaste: true,
 			},
-			OutcomeRollCategory: OutcomeRollCategoryWhite,
-			CritMultiplier:      options.MainHand.CritMultiplier,
 		},
 		Effect: SpellEffect{
-			ProcMask:         ProcMaskMeleeMHAuto,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       BaseDamageConfigMeleeWeapon(MainHand, false, 0, 1, true),
+			OutcomeRollCategory: OutcomeRollCategoryWhite,
+			CritMultiplier:      options.MainHand.CritMultiplier,
+			ProcMask:            ProcMaskMeleeMHAuto,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          BaseDamageConfigMeleeWeapon(MainHand, false, 0, 1, true),
 		},
 	}
 	if options.MainHand.BaseDamageOverride != nil {
@@ -226,14 +226,14 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				SpellSchool: SpellSchoolPhysical,
 				IgnoreHaste: true,
 			},
-			OutcomeRollCategory: OutcomeRollCategoryWhite,
-			CritMultiplier:      options.OffHand.CritMultiplier,
 		},
 		Effect: SpellEffect{
-			ProcMask:         ProcMaskMeleeOHAuto,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       BaseDamageConfigMeleeWeapon(OffHand, false, 0, 1, true),
+			OutcomeRollCategory: OutcomeRollCategoryWhite,
+			CritMultiplier:      options.OffHand.CritMultiplier,
+			ProcMask:            ProcMaskMeleeOHAuto,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          BaseDamageConfigMeleeWeapon(OffHand, false, 0, 1, true),
 		},
 	}
 	if options.OffHand.BaseDamageOverride != nil {
@@ -252,14 +252,14 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 				SpellSchool: SpellSchoolPhysical,
 				IgnoreHaste: true, // Affected by ranged haste, not spell haste.
 			},
-			OutcomeRollCategory: OutcomeRollCategoryRanged,
-			CritRollCategory:    CritRollCategoryPhysical,
 		},
 		Effect: SpellEffect{
-			ProcMask:         ProcMaskRangedAuto,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       BaseDamageConfigRangedWeapon(0),
+			OutcomeRollCategory: OutcomeRollCategoryRanged,
+			CritRollCategory:    CritRollCategoryPhysical,
+			ProcMask:            ProcMaskRangedAuto,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          BaseDamageConfigRangedWeapon(0),
 		},
 	}
 	if options.Ranged.BaseDamageOverride != nil {
@@ -311,7 +311,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 	aa.resetAutoSwing(sim)
 
 	// Can precompute this.
-	aa.RangedAuto.Template.CritMultiplier = aa.Ranged.CritMultiplier
+	aa.RangedAuto.Template.Effect.CritMultiplier = aa.Ranged.CritMultiplier
 
 	aa.RangedSwingAt = 0
 	aa.RangedSwingInProgress = false

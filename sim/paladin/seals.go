@@ -24,14 +24,14 @@ func (paladin *Paladin) setupSealOfBlood() {
 				Character:   &paladin.Character,
 				SpellSchool: core.SpellSchoolHoly,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 			IsPhantom:           true,
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 			// should deal 35% weapon deamage
 			BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
 		},
@@ -49,7 +49,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 		Duration: SealDuration,
 
 		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 				return
 			}
 
@@ -98,20 +98,20 @@ func (paladin *Paladin) setupSealOfCommand() {
 				Character:   &paladin.Character,
 				SpellSchool: core.SpellSchoolHoly,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 		},
 	}
 
 	weaponBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 0.7, false)
 	socProcTemplate.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
-			return weaponBaseDamage(sim, hitEffect, spellCast) + 0.29*hitEffect.SpellPower(spellCast.Character, spellCast)
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
+			return weaponBaseDamage(sim, hitEffect, spell) + 0.29*hitEffect.SpellPower(spell.Character, spell)
 		},
 		TargetSpellCoefficient: 0.29,
 	}
@@ -133,7 +133,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 		Duration: SealDuration,
 
 		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 				return
 			}
 

@@ -33,14 +33,14 @@ func (priest *Priest) registerMindBlastSpell(sim *core.Simulation) {
 				GCD:      core.GCDDefault,
 				Cooldown: time.Second * 8,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMagic(711, 752, 0.429),
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMagic(711, 752, 0.429),
 		},
 	}
 

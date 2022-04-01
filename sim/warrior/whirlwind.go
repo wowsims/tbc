@@ -34,17 +34,17 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 					Value: warrior.whirlwindCost,
 				},
 			},
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      warrior.critMultiplier(true),
 		},
 	}
 
 	baseEffect := core.SpellEffect{
-		ProcMask:         core.ProcMaskMeleeMHSpecial,
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
-		BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 0, 1, true),
+		OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+		CritRollCategory:    core.CritRollCategoryPhysical,
+		CritMultiplier:      warrior.critMultiplier(true),
+		ProcMask:            core.ProcMaskMeleeMHSpecial,
+		DamageMultiplier:    1,
+		ThreatMultiplier:    1,
+		BaseDamage:          core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 0, 1, true),
 	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())

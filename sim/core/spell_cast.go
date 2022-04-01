@@ -19,17 +19,6 @@ type OnPeriodicDamage func(sim *Simulation, spellCast *SpellCast, spellEffect *S
 type SpellCast struct {
 	// Embedded Cast
 	Cast
-
-	// Whether this is a phantom cast. Phantom casts are usually casts triggered by some effect,
-	// like The Lightning Capacitor or Shaman Flametongue Weapon. Many on-hit effects do not
-	// proc from phantom casts, only regular casts.
-	IsPhantom bool
-
-	OutcomeRollCategory OutcomeRollCategory
-	CritRollCategory    CritRollCategory
-
-	// How much to multiply damage by, if this cast crits.
-	CritMultiplier float64
 }
 
 type SpellEffect struct {
@@ -55,6 +44,17 @@ type SpellEffect struct {
 
 	// Adds a fixed amount of threat to this spell, before multipliers.
 	FlatThreatBonus float64
+
+	// Whether this is a phantom cast. Phantom casts are usually casts triggered by some effect,
+	// like The Lightning Capacitor or Shaman Flametongue Weapon. Many on-hit effects do not
+	// proc from phantom casts, only regular casts.
+	IsPhantom bool
+
+	OutcomeRollCategory OutcomeRollCategory
+	CritRollCategory    CritRollCategory
+
+	// How much to multiply damage by, if this cast crits.
+	CritMultiplier float64
 
 	// Controls which effects can proc from this effect.
 	ProcMask ProcMask
@@ -89,45 +89,45 @@ func (spellEffect *SpellEffect) calcThreat(character *Character) float64 {
 	}
 }
 
-func (spellEffect *SpellEffect) MeleeAttackPower(spellCast *SpellCast) float64 {
-	return spellCast.Character.stats[stats.AttackPower] + spellCast.Character.PseudoStats.MobTypeAttackPower + spellEffect.BonusAttackPower
+func (spellEffect *SpellEffect) MeleeAttackPower(character *Character) float64 {
+	return character.stats[stats.AttackPower] + character.PseudoStats.MobTypeAttackPower + spellEffect.BonusAttackPower
 }
 
 func (spellEffect *SpellEffect) MeleeAttackPowerOnTarget() float64 {
 	return spellEffect.Target.PseudoStats.BonusMeleeAttackPower
 }
 
-func (spellEffect *SpellEffect) RangedAttackPower(spellCast *SpellCast) float64 {
-	return spellCast.Character.stats[stats.RangedAttackPower] + spellCast.Character.PseudoStats.MobTypeAttackPower + spellEffect.BonusAttackPower
+func (spellEffect *SpellEffect) RangedAttackPower(character *Character) float64 {
+	return character.stats[stats.RangedAttackPower] + character.PseudoStats.MobTypeAttackPower + spellEffect.BonusAttackPower
 }
 
 func (spellEffect *SpellEffect) RangedAttackPowerOnTarget() float64 {
 	return spellEffect.Target.PseudoStats.BonusRangedAttackPower
 }
 
-func (spellEffect *SpellEffect) BonusWeaponDamage(spellCast *SpellCast) float64 {
-	return spellCast.Character.PseudoStats.BonusDamage
+func (spellEffect *SpellEffect) BonusWeaponDamage(character *Character) float64 {
+	return character.PseudoStats.BonusDamage
 }
 
-func (spellEffect *SpellEffect) PhysicalHitChance(character *Character, spellCast *SpellCast) float64 {
+func (spellEffect *SpellEffect) PhysicalHitChance(character *Character) float64 {
 	hitRating := character.stats[stats.MeleeHit] + spellEffect.Target.PseudoStats.BonusMeleeHitRating
 
-	if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 		hitRating += character.PseudoStats.BonusRangedHitRating
 	}
 
 	return (hitRating / (MeleeHitRatingPerHitChance * 100)) - spellEffect.Target.HitSuppression
 }
 
-func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spellCast *SpellCast) float64 {
+func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spell *SimpleSpellTemplate) float64 {
 	critRating := character.stats[stats.MeleeCrit] + spellEffect.BonusCritRating + spellEffect.Target.PseudoStats.BonusCritRating
 
-	if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 		critRating += character.PseudoStats.BonusRangedCritRating
 	} else {
 		critRating += character.PseudoStats.BonusMeleeCritRating
 	}
-	if spellCast.SpellExtras.Matches(SpellExtrasAgentReserved1) {
+	if spell.SpellExtras.Matches(SpellExtrasAgentReserved1) {
 		critRating += character.PseudoStats.BonusCritRatingAgentReserved1
 	}
 	if spellEffect.ProcMask.Matches(ProcMaskMeleeMH) {
@@ -139,46 +139,46 @@ func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spellCa
 	return (critRating / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
 }
 
-func (spellEffect *SpellEffect) SpellPower(character *Character, spellCast *SpellCast) float64 {
-	return character.GetStat(stats.SpellPower) + character.GetStat(spellCast.SpellSchool.Stat()) + character.PseudoStats.MobTypeSpellPower + spellEffect.BonusSpellPower
+func (spellEffect *SpellEffect) SpellPower(character *Character, spell *SimpleSpellTemplate) float64 {
+	return character.GetStat(stats.SpellPower) + character.GetStat(spell.SpellSchool.Stat()) + character.PseudoStats.MobTypeSpellPower + spellEffect.BonusSpellPower
 }
 
-func (spellEffect *SpellEffect) SpellCritChance(character *Character, spellCast *SpellCast) float64 {
+func (spellEffect *SpellEffect) SpellCritChance(character *Character, spell *SimpleSpellTemplate) float64 {
 	critRating := (character.GetStat(stats.SpellCrit) + spellEffect.BonusSpellCritRating + spellEffect.Target.PseudoStats.BonusCritRating)
-	if spellCast.SpellSchool.Matches(SpellSchoolFire) {
+	if spell.SpellSchool.Matches(SpellSchoolFire) {
 		critRating += character.PseudoStats.BonusFireCritRating
-	} else if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
+	} else if spell.SpellSchool.Matches(SpellSchoolFrost) {
 		critRating += spellEffect.Target.PseudoStats.BonusFrostCritRating
 	}
 	return critRating / (SpellCritRatingPerCritChance * 100)
 }
 
-func (hitEffect *SpellEffect) directCalculations(sim *Simulation, spellCast *SpellCast) {
-	damage := hitEffect.calculateBaseDamage(sim, spellCast)
+func (spellEffect *SpellEffect) directCalculations(sim *Simulation, spell *SimpleSpellTemplate) {
+	damage := spellEffect.calculateBaseDamage(sim, spell)
 
-	damage *= hitEffect.DamageMultiplier
-	hitEffect.applyAttackerModifiers(sim, spellCast, false, &damage)
-	hitEffect.applyTargetModifiers(sim, spellCast, false, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
-	hitEffect.applyResistances(sim, spellCast, &damage)
-	hitEffect.applyOutcome(sim, spellCast, &damage)
+	damage *= spellEffect.DamageMultiplier
+	spellEffect.applyAttackerModifiers(sim, spell, false, &damage)
+	spellEffect.applyTargetModifiers(sim, spell, false, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
+	spellEffect.applyResistances(sim, spell, &damage)
+	spellEffect.applyOutcome(sim, spell, &damage)
 
-	hitEffect.Damage = damage
+	spellEffect.Damage = damage
 }
 
-func (hitEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spellCast *SpellCast) float64 {
-	if hitEffect.BaseDamage.Calculator == nil {
+func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *SimpleSpellTemplate) float64 {
+	if spellEffect.BaseDamage.Calculator == nil {
 		return 0
 	} else {
-		return hitEffect.BaseDamage.Calculator(sim, hitEffect, spellCast)
+		return spellEffect.BaseDamage.Calculator(sim, spellEffect, spell)
 	}
 }
 
-func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spellCast *SpellCast, spell *SimpleSpellTemplate, isPeriodic bool) {
+func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spell *SimpleSpellTemplate, isPeriodic bool) {
 	if isPeriodic {
 		if spellEffect.DotInput.TicksCanMissAndCrit {
-			if spellEffect.hitCheck(sim, spellCast) {
+			if spellEffect.hitCheck(sim, spell) {
 				spellEffect.Outcome = OutcomeHit
-				if spellEffect.critCheck(sim, spellCast) {
+				if spellEffect.critCheck(sim, spell) {
 					spellEffect.Outcome = OutcomeCrit
 				}
 			} else {
@@ -190,37 +190,37 @@ func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spellCast *Spe
 		return
 	}
 
-	if spellCast.OutcomeRollCategory == OutcomeRollCategoryNone || spellCast.SpellExtras.Matches(SpellExtrasAlwaysHits) {
+	if spellEffect.OutcomeRollCategory == OutcomeRollCategoryNone || spell.SpellExtras.Matches(SpellExtrasAlwaysHits) {
 		spellEffect.Outcome = OutcomeHit
-		if spellEffect.critCheck(sim, spellCast) {
+		if spellEffect.critCheck(sim, spell) {
 			spellEffect.Outcome = OutcomeCrit
 		}
-	} else if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryMagic) {
-		if spellEffect.hitCheck(sim, spellCast) {
+	} else if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryMagic) {
+		if spellEffect.hitCheck(sim, spell) {
 			spellEffect.Outcome = OutcomeHit
-			if spellEffect.critCheck(sim, spellCast) {
+			if spellEffect.critCheck(sim, spell) {
 				spellEffect.Outcome = OutcomeCrit
 			}
 		} else {
 			spellEffect.Outcome = OutcomeMiss
 		}
-	} else if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
-		spellEffect.Outcome = spellEffect.WhiteHitTableResult(sim, spellCast)
-		if spellEffect.Landed() && spellEffect.critCheck(sim, spellCast) {
+	} else if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
+		spellEffect.Outcome = spellEffect.WhiteHitTableResult(sim, spell)
+		if spellEffect.Landed() && spellEffect.critCheck(sim, spell) {
 			spellEffect.Outcome = OutcomeCrit
 		}
 	}
 }
 
 // Computes an attack result using the white-hit table formula (single roll).
-func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, spellCast *SpellCast) HitOutcome {
-	character := spellCast.Character
+func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, spell *SimpleSpellTemplate) HitOutcome {
+	character := spell.Character
 
 	roll := sim.RandomFloat("White Hit Table")
 
 	// Miss
-	missChance := ahe.Target.MissChance - ahe.PhysicalHitChance(character, spellCast)
-	if character.AutoAttacks.IsDualWielding && spellCast.OutcomeRollCategory == OutcomeRollCategoryWhite {
+	missChance := ahe.Target.MissChance - ahe.PhysicalHitChance(character)
+	if character.AutoAttacks.IsDualWielding && ahe.OutcomeRollCategory == OutcomeRollCategoryWhite {
 		missChance += 0.19
 	}
 	missChance = MaxFloat(0, missChance)
@@ -230,9 +230,9 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, spellCast *SpellCas
 		return OutcomeMiss
 	}
 
-	if !spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
+	if !ahe.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
 		// Dodge
-		if !spellCast.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
+		if !spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
 			dodge := ahe.Target.Dodge
 
 			expertiseRating := character.stats[stats.Expertise]
@@ -262,7 +262,7 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, spellCast *SpellCas
 		// If we actually implement blocks, ranged hits can be blocked.
 
 		// No need to crit/glance roll if we are not a white hit
-		if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial | OutcomeRollCategoryRanged) {
+		if ahe.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial | OutcomeRollCategoryRanged) {
 			return OutcomeHit
 		}
 
@@ -273,7 +273,7 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, spellCast *SpellCas
 		}
 
 		// Crit
-		chance += ahe.PhysicalCritChance(character, spellCast)
+		chance += ahe.PhysicalCritChance(character, spell)
 		if roll < chance {
 			return OutcomeCrit
 		}
@@ -283,21 +283,21 @@ func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, spellCast *SpellCas
 }
 
 // Calculates a hit check using the stats from this spell.
-func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spellCast *SpellCast) bool {
-	hit := 0.83 + (spellCast.Character.GetStat(stats.SpellHit)+spellEffect.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
+func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spell *SimpleSpellTemplate) bool {
+	hit := 0.83 + (spell.Character.GetStat(stats.SpellHit)+spellEffect.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
 	return sim.RandomFloat("Magical Hit Roll") < hit
 }
 
 // Calculates a crit check using the stats from this spell.
-func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast) bool {
-	switch spellCast.CritRollCategory {
+func (spellEffect *SpellEffect) critCheck(sim *Simulation, spell *SimpleSpellTemplate) bool {
+	switch spellEffect.CritRollCategory {
 	case CritRollCategoryMagical:
-		critChance := spellEffect.SpellCritChance(spellCast.Character, spellCast)
+		critChance := spellEffect.SpellCritChance(spell.Character, spell)
 		return sim.RandomFloat("Magical Crit Roll") < critChance
 	case CritRollCategoryPhysical:
-		return sim.RandomFloat("Physical Crit Roll") < spellEffect.PhysicalCritChance(spellCast.Character, spellCast)
+		return sim.RandomFloat("Physical Crit Roll") < spellEffect.PhysicalCritChance(spell.Character, spell)
 	default:
 		return false
 	}
@@ -306,11 +306,11 @@ func (spellEffect *SpellEffect) critCheck(sim *Simulation, spellCast *SpellCast)
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spellCast *SpellCast, spell *SimpleSpellTemplate, isPeriodic bool) {
 	spellEffect.applyResultsToSpell(spell, isPeriodic && !spellEffect.DotInput.TicksCanMissAndCrit)
 
-	if sim.Log != nil && !(spellCast.SpellExtras.Matches(SpellExtrasAlwaysHits) && spellEffect.Damage == 0) {
+	if sim.Log != nil && !(spell.SpellExtras.Matches(SpellExtrasAlwaysHits) && spellEffect.Damage == 0) {
 		if isPeriodic {
 			spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect.DotResultString(), spellEffect.calcThreat(spell.Character))
 		} else {
-			spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spellCast.Character))
+			spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Character))
 		}
 	}
 
@@ -381,39 +381,39 @@ func (spellEffect *SpellEffect) DotResultString() string {
 	return "tick " + spellEffect.String()
 }
 
-func (hitEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, damage *float64) {
-	attacker := spellCast.Character
+func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *SimpleSpellTemplate, isPeriodic bool, damage *float64) {
+	attacker := spell.Character
 
-	if spellCast.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
 		*damage *= attacker.PseudoStats.RangedDamageDealtMultiplier
 	}
-	if spellCast.SpellExtras.Matches(SpellExtrasAgentReserved1) {
+	if spell.SpellExtras.Matches(SpellExtrasAgentReserved1) {
 		*damage *= attacker.PseudoStats.AgentReserved1DamageDealtMultiplier
 	}
 
 	*damage *= attacker.PseudoStats.DamageDealtMultiplier
-	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
+	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
 		*damage *= attacker.PseudoStats.PhysicalDamageDealtMultiplier
-	} else if spellCast.SpellSchool.Matches(SpellSchoolArcane) {
+	} else if spell.SpellSchool.Matches(SpellSchoolArcane) {
 		*damage *= attacker.PseudoStats.ArcaneDamageDealtMultiplier
-	} else if spellCast.SpellSchool.Matches(SpellSchoolFire) {
+	} else if spell.SpellSchool.Matches(SpellSchoolFire) {
 		*damage *= attacker.PseudoStats.FireDamageDealtMultiplier
-	} else if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
+	} else if spell.SpellSchool.Matches(SpellSchoolFrost) {
 		*damage *= attacker.PseudoStats.FrostDamageDealtMultiplier
-	} else if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
+	} else if spell.SpellSchool.Matches(SpellSchoolHoly) {
 		*damage *= attacker.PseudoStats.HolyDamageDealtMultiplier
-	} else if spellCast.SpellSchool.Matches(SpellSchoolNature) {
+	} else if spell.SpellSchool.Matches(SpellSchoolNature) {
 		*damage *= attacker.PseudoStats.NatureDamageDealtMultiplier
-	} else if spellCast.SpellSchool.Matches(SpellSchoolShadow) {
+	} else if spell.SpellSchool.Matches(SpellSchoolShadow) {
 		*damage *= attacker.PseudoStats.ShadowDamageDealtMultiplier
 	}
 }
 
-func (hitEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spellCast *SpellCast, isPeriodic bool, targetCoeff float64, damage *float64) {
-	target := hitEffect.Target
+func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *SimpleSpellTemplate, isPeriodic bool, targetCoeff float64, damage *float64) {
+	target := spellEffect.Target
 
 	*damage *= target.PseudoStats.DamageTakenMultiplier
-	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
+	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
 		if targetCoeff > 0 {
 			*damage += target.PseudoStats.BonusPhysicalDamageTaken
 		}
@@ -421,32 +421,32 @@ func (hitEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spellCast *S
 		if isPeriodic {
 			*damage *= target.PseudoStats.PeriodicPhysicalDamageTakenMultiplier
 		}
-	} else if spellCast.SpellSchool.Matches(SpellSchoolArcane) {
+	} else if spell.SpellSchool.Matches(SpellSchoolArcane) {
 		*damage *= target.PseudoStats.ArcaneDamageTakenMultiplier
-	} else if spellCast.SpellSchool.Matches(SpellSchoolFire) {
+	} else if spell.SpellSchool.Matches(SpellSchoolFire) {
 		*damage *= target.PseudoStats.FireDamageTakenMultiplier
-	} else if spellCast.SpellSchool.Matches(SpellSchoolFrost) {
+	} else if spell.SpellSchool.Matches(SpellSchoolFrost) {
 		*damage *= target.PseudoStats.FrostDamageTakenMultiplier
-	} else if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
+	} else if spell.SpellSchool.Matches(SpellSchoolHoly) {
 		*damage += target.PseudoStats.BonusHolyDamageTaken * targetCoeff
 		*damage *= target.PseudoStats.HolyDamageTakenMultiplier
-	} else if spellCast.SpellSchool.Matches(SpellSchoolNature) {
+	} else if spell.SpellSchool.Matches(SpellSchoolNature) {
 		*damage *= target.PseudoStats.NatureDamageTakenMultiplier
-	} else if spellCast.SpellSchool.Matches(SpellSchoolShadow) {
+	} else if spell.SpellSchool.Matches(SpellSchoolShadow) {
 		*damage *= target.PseudoStats.ShadowDamageTakenMultiplier
 	}
 }
 
 // Modifies damage based on Armor or Magic resistances, depending on the damage type.
-func (hitEffect *SpellEffect) applyResistances(sim *Simulation, spellCast *SpellCast, damage *float64) {
-	if spellCast.SpellExtras.Matches(SpellExtrasIgnoreResists) {
+func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *SimpleSpellTemplate, damage *float64) {
+	if spell.SpellExtras.Matches(SpellExtrasIgnoreResists) {
 		return
 	}
 
-	if spellCast.SpellSchool.Matches(SpellSchoolPhysical) {
+	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
 		// Physical resistance (armor).
-		*damage *= 1 - hitEffect.Target.ArmorDamageReduction(spellCast.Character.stats[stats.ArmorPenetration])
-	} else if !spellCast.SpellExtras.Matches(SpellExtrasBinary) {
+		*damage *= 1 - spellEffect.Target.ArmorDamageReduction(spell.Character.stats[stats.ArmorPenetration])
+	} else if !spell.SpellExtras.Matches(SpellExtrasBinary) {
 		// Magical resistance.
 		// https://royalgiraffe.github.io/resist-guide
 
@@ -454,24 +454,24 @@ func (hitEffect *SpellEffect) applyResistances(sim *Simulation, spellCast *Spell
 		if resistanceRoll > 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
 			// No partial resist.
 		} else if resistanceRoll > 0.05 {
-			hitEffect.Outcome |= OutcomePartial1_4
+			spellEffect.Outcome |= OutcomePartial1_4
 			*damage *= 0.75
 		} else if resistanceRoll > 0.01 {
-			hitEffect.Outcome |= OutcomePartial2_4
+			spellEffect.Outcome |= OutcomePartial2_4
 			*damage *= 0.5
 		} else {
-			hitEffect.Outcome |= OutcomePartial3_4
+			spellEffect.Outcome |= OutcomePartial3_4
 			*damage *= 0.25
 		}
 	}
 }
 
-func (hitEffect *SpellEffect) applyOutcome(sim *Simulation, spellCast *SpellCast, damage *float64) {
-	if !hitEffect.Landed() {
+func (spellEffect *SpellEffect) applyOutcome(sim *Simulation, spell *SimpleSpellTemplate, damage *float64) {
+	if !spellEffect.Landed() {
 		*damage = 0
-	} else if hitEffect.Outcome.Matches(OutcomeCrit) {
-		*damage *= spellCast.CritMultiplier
-	} else if hitEffect.Outcome == OutcomeGlance {
+	} else if spellEffect.Outcome.Matches(OutcomeCrit) {
+		*damage *= spellEffect.CritMultiplier
+	} else if spellEffect.Outcome == OutcomeGlance {
 		// TODO glancing blow damage reduction is actually a range ([65%, 85%] vs. 73)
 		*damage *= 0.75
 	}

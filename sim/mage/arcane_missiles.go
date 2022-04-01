@@ -30,13 +30,13 @@ func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
 				},
 				GCD: core.GCDDefault,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
+			DamageMultiplier:    mage.spellDamageMultiplier,
+			ThreatMultiplier:    1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:       5,
 				TickLength:          time.Second,

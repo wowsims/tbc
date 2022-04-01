@@ -30,15 +30,15 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 				SpellSchool: core.SpellSchoolHoly,
 				SpellExtras: core.SpellExtrasAlwaysHits,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 			CritRollCategory:    core.CritRollCategoryPhysical,
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeOrRangedSpecial,
-			DamageMultiplier: 1, // Need to review to make sure I set these properly
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMagic(295, 325, 0.429),
+			ProcMask:            core.ProcMaskMeleeOrRangedSpecial,
+			DamageMultiplier:    1, // Need to review to make sure I set these properly
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMagic(295, 325, 0.429),
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
 				paladin.RemoveAura(sim, SealOfBloodAuraID)
@@ -94,9 +94,9 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 					paladin.currentSealExpires = 0
 				},
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 		Effect: core.SpellEffect{
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
@@ -150,10 +150,10 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 					paladin.currentSealExpires = 0
 				},
 			},
-			CritRollCategory:    core.CritRollCategoryMagical,
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		},
 		Effect: core.SpellEffect{
+			CritRollCategory:    core.CritRollCategoryMagical,
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return

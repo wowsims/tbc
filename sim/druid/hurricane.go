@@ -35,14 +35,14 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 				GCD:      core.GCDDefault,
 				Cooldown: time.Second * 60,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
 		},
 	}
 
 	baseEffect := core.SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		DamageMultiplier:    1,
+		ThreatMultiplier:    1,
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:       10,
 			TickLength:          time.Second * 1,

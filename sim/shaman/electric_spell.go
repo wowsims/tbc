@@ -45,13 +45,6 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 			GCD:         core.GCDDefault,
 			SpellExtras: SpellFlagElectric,
 		},
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
-	}
-
-	if shaman.Talents.ElementalFury {
-		spellCast.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
 
 	if isLightningOverload {
@@ -81,9 +74,16 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 // Helper for precomputing spell effects.
 func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamage float64, spellCoefficient float64, isLightningOverload bool) core.SpellEffect {
 	effect := core.SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
-		BaseDamage:       core.BaseDamageConfigMagic(minBaseDamage, maxBaseDamage, spellCoefficient),
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+		DamageMultiplier:    1,
+		ThreatMultiplier:    1,
+		BaseDamage:          core.BaseDamageConfigMagic(minBaseDamage, maxBaseDamage, spellCoefficient),
+	}
+
+	if shaman.Talents.ElementalFury {
+		effect.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
 
 	effect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)

@@ -14,7 +14,7 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	ability := rogue.newAbility(RuptureActionID, RuptureEnergyCost, SpellFlagFinisher|core.SpellExtrasIgnoreResists, core.ProcMaskMeleeMHSpecial)
-	ability.SpellCast.CritRollCategory = core.CritRollCategoryNone
+	ability.Effect.CritRollCategory = core.CritRollCategoryNone
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			rogue.ApplyFinisher(sim, spellCast.ActionID)
@@ -27,9 +27,9 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 	ability.Effect.DotInput = core.DotDamageInput{
 		NumberOfTicks: 0, // Set dynamically.
 		TickLength:    time.Second * 2,
-		TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+		TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
 			comboPoints := rogue.ComboPoints()
-			attackPower := hitEffect.MeleeAttackPower(spellCast) + hitEffect.MeleeAttackPowerOnTarget()
+			attackPower := hitEffect.MeleeAttackPower(spell.Character) + hitEffect.MeleeAttackPowerOnTarget()
 
 			return 70 + float64(comboPoints)*11 + attackPower*[]float64{0.01, 0.02, 0.03, 0.03, 0.03}[comboPoints-1]
 		},

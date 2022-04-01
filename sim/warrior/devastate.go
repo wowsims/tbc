@@ -26,21 +26,21 @@ func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 					Value: warrior.sunderArmorCost,
 				},
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      warrior.critMultiplier(true),
-		},
-		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			FlatThreatBonus:  100,
+			ProcMask:            core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			FlatThreatBonus:     100,
 		},
 	}
 
 	normalBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 0.5, true)
 	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.SimpleSpellTemplate) float64 {
 			// Bonus 35 damage / stack of sunder. Counts stacks AFTER cast but only if stacks > 0.
 			sunderBonus := 0.0
 			saStacks := hitEffect.Target.NumStacks(core.SunderArmorDebuffID)
@@ -48,7 +48,7 @@ func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 				sunderBonus = 35 * float64(core.MinInt32(saStacks+1, 5))
 			}
 
-			return normalBaseDamage(sim, hitEffect, spellCast) + sunderBonus
+			return normalBaseDamage(sim, hitEffect, spell) + sunderBonus
 		},
 		TargetSpellCoefficient: 1,
 	}

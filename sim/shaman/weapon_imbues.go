@@ -25,17 +25,17 @@ func (shaman *Shaman) newWindfuryImbueSpell(isMH bool) *core.SimpleSpellTemplate
 				Character:   &shaman.Character,
 				SpellSchool: core.SpellSchoolPhysical,
 			},
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
-			IsPhantom:           true,
 		},
 	}
 
 	baseEffect := core.SpellEffect{
-		DamageMultiplier: 1.0,
-		ThreatMultiplier: 1.0,
-		BonusAttackPower: apBonus,
+		OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+		CritRollCategory:    core.CritRollCategoryPhysical,
+		CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
+		IsPhantom:           true,
+		DamageMultiplier:    1.0,
+		ThreatMultiplier:    1.0,
+		BonusAttackPower:    apBonus,
 	}
 	if shaman.Talents.SpiritWeapons {
 		baseEffect.ThreatMultiplier *= 0.7
@@ -91,7 +91,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 			ID: WFImbueAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
 				// ProcMask: 20
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
 				}
 
@@ -127,14 +127,14 @@ func (shaman *Shaman) newFlametongueImbueSpell(isMH bool) *core.SimpleSpellTempl
 				Character:   &shaman.Character,
 				SpellSchool: core.SpellSchoolFire,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 			IsPhantom:           true,
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 		},
 	}
 	ftTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
@@ -169,7 +169,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: FTImbueAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
 				}
 
@@ -198,15 +198,15 @@ func (shaman *Shaman) newFrostbrandImbueSpell(isMH bool) *core.SimpleSpellTempla
 				Character:   &shaman.Character,
 				SpellSchool: core.SpellSchoolFrost,
 			},
+		},
+		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 			CritRollCategory:    core.CritRollCategoryMagical,
 			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
 			IsPhantom:           true,
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMagic(246, 246, 0.1),
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMagic(246, 246, 0.1),
 		},
 	}
 	fbTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
@@ -230,7 +230,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 		return core.Aura{
 			ID: FBImbueAuraID,
 			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
 				}
 
