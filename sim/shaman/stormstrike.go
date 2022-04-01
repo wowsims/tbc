@@ -45,16 +45,56 @@ func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) core.Aura {
 	return ssDebuffAura
 }
 
+func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.SimpleSpellTemplate {
+	template := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:    StormstrikeActionID,
+				Character:   &shaman.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				SpellExtras: core.SpellExtrasAlwaysHits,
+			},
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
+		},
+		Effect: core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+		},
+	}
+
+	if shaman.Talents.SpiritWeapons {
+		template.Effect.ThreatMultiplier *= 0.7
+	}
+
+	flatDamageBonus := 0.0
+	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {
+		flatDamageBonus += 30
+	}
+
+	if isMH {
+		template.Effect.ProcMask = core.ProcMaskMeleeMHSpecial
+		template.Effect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.MainHand, false, flatDamageBonus, 1, true)
+	} else {
+		template.Effect.ProcMask = core.ProcMaskMeleeOHSpecial
+		template.Effect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.OffHand, false, flatDamageBonus, 1, true)
+	}
+
+	return shaman.RegisterSpell(core.SpellConfig{
+		Template:   template,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
+}
+
 func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 	ssDebuffAura := shaman.stormstrikeDebuffAura(sim.GetPrimaryTarget())
 
 	hasSkyshatter4p := ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4)
 	skyshatterAuraApplier := shaman.NewTemporaryStatsAuraApplier(SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.Stats{stats.AttackPower: 70}, time.Second*12)
 
-	flatDamageBonus := 0.0
-	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {
-		flatDamageBonus += 30
-	}
+	mhHit := shaman.newStormstrikeHitSpell(true)
+	ohHit := shaman.newStormstrikeHitSpell(false)
 
 	ss := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -71,33 +111,25 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 				},
 			},
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
+			CritRollCategory:    core.CritRollCategoryNone,
 		},
-		Effects: []core.SpellEffect{
-			{
-				ProcMask:         core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, false, flatDamageBonus, 1, true),
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						return
-					}
+		Effect: core.SpellEffect{
+			ThreatMultiplier: 1,
+			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
 
-					ssDebuffAura.Stacks = 2
-					spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
-					if hasSkyshatter4p {
-						skyshatterAuraApplier(sim)
-					}
-				},
-			},
-			{
-				ProcMask:         core.ProcMaskMeleeOHSpecial,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				ReuseMainHitRoll: true,
-				BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.OffHand, false, flatDamageBonus, 1, true),
+				ssDebuffAura.Stacks = 2
+				spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
+				if hasSkyshatter4p {
+					skyshatterAuraApplier(sim)
+				}
+
+				mhHit.Cast(sim, spellEffect.Target)
+				ohHit.Cast(sim, spellEffect.Target)
+				shaman.Stormstrike.Casts -= 2
+				shaman.Stormstrike.Hits--
 			},
 		},
 	}
@@ -106,16 +138,8 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 		ss.Cost.Value -= 22
 	}
 
-	if shaman.Talents.SpiritWeapons {
-		ss.Effects[0].ThreatMultiplier *= 0.7
-		ss.Effects[1].ThreatMultiplier *= 0.7
-	}
-
 	shaman.Stormstrike = shaman.RegisterSpell(core.SpellConfig{
-		Template: ss,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.Effects[0].Target = target
-			instance.Effects[1].Target = target
-		},
+		Template:   ss,
+		ModifyCast: core.ModifyCastAssignTarget,
 	})
 }

@@ -78,11 +78,10 @@ func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
 		mhHitSpell.Cast(sim, spellEffect.Target)
 		ohHitSpell.Cast(sim, spellEffect.Target)
 
-		// applyResultsToCast() has already been done here, so we have to update the spell statistics, too
 		if mhHitSpell.Instance.Effect.Outcome.Matches(core.OutcomeCrit) || ohHitSpell.Instance.Effect.Outcome.Matches(core.OutcomeCrit) {
 			spellEffect.Outcome = core.OutcomeCrit
-			spellCast.Hits--
-			spellCast.Crits++
+			rogue.Mutilate.Hits--
+			rogue.Mutilate.Crits++
 		}
 	}
 
