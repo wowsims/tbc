@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
@@ -343,13 +344,13 @@ func FaerieFireAura(target *Target, improved bool) Aura {
 		ActionID: ActionID{SpellID: 26993},
 		Duration: time.Second * 40,
 		OnGain: func(sim *Simulation) {
-			target.AddArmor(-armorReduction)
+			target.AddStat(stats.Armor, -armorReduction)
 			if improved {
 				target.PseudoStats.BonusMeleeHitRating += hitBonus
 			}
 		},
 		OnExpire: func(sim *Simulation) {
-			target.AddArmor(armorReduction)
+			target.AddStat(stats.Armor, armorReduction)
 			if improved {
 				target.PseudoStats.BonusMeleeHitRating -= hitBonus
 			}
@@ -367,10 +368,10 @@ func SunderArmorAura(target *Target, stacks int32) Aura {
 		ActionID: ActionID{SpellID: 25225},
 		Duration: time.Second * 30,
 		OnGain: func(sim *Simulation) {
-			target.AddArmor(-armorReduction)
+			target.AddStat(stats.Armor, -armorReduction)
 		},
 		OnExpire: func(sim *Simulation) {
-			target.AddArmor(armorReduction)
+			target.AddStat(stats.Armor, armorReduction)
 		},
 	}
 }
@@ -388,10 +389,10 @@ func ExposeArmorAura(sim *Simulation, target *Target, talentPoints int32) Aura {
 			if target.HasAura(SunderArmorAuraID) {
 				target.RemoveAura(sim, SunderArmorAuraID)
 			}
-			target.AddArmor(-armorReduction)
+			target.AddStat(stats.Armor, -armorReduction)
 		},
 		OnExpire: func(sim *Simulation) {
-			target.AddArmor(armorReduction)
+			target.AddStat(stats.Armor, armorReduction)
 		},
 	}
 }
@@ -406,10 +407,10 @@ func CurseOfRecklessnessAura(target *Target) Aura {
 		ActionID: ActionID{SpellID: 27226},
 		Duration: time.Minute * 2,
 		OnGain: func(sim *Simulation) {
-			target.AddArmor(-armorReduction)
+			target.AddStat(stats.Armor, -armorReduction)
 		},
 		OnExpire: func(sim *Simulation) {
-			target.AddArmor(armorReduction)
+			target.AddStat(stats.Armor, armorReduction)
 		},
 	}
 }

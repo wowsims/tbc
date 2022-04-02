@@ -385,6 +385,10 @@ func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
 }
 
 type PseudoStats struct {
+	///////////////////////////////////////////////////
+	// Effects that apply when this unit is the attacker.
+	///////////////////////////////////////////////////
+
 	NoCost         bool    // If set, spells cost no mana/energy/rage.
 	CostMultiplier float64 // Multiplies spell cost.
 	CostReduction  float64 // Reduces spell cost.
@@ -434,6 +438,31 @@ type PseudoStats struct {
 	// Modifiers for spells with the SpellExtrasAgentReserved1 flag set.
 	BonusCritRatingAgentReserved1       float64
 	AgentReserved1DamageDealtMultiplier float64
+
+	///////////////////////////////////////////////////
+	// Effects that apply when this unit is the target.
+	///////////////////////////////////////////////////
+
+	BonusMeleeAttackPower  float64 // Imp Hunters mark, EW
+	BonusRangedAttackPower float64 // Hunters mark, EW
+	BonusCritRating        float64 // Imp Judgement of the Crusader
+	BonusFrostCritRating   float64 // Winter's Chill
+	BonusMeleeHitRating    float64 // Imp FF
+
+	BonusPhysicalDamageTaken float64 // Hemo, Gift of Arthas, etc
+	BonusHolyDamageTaken     float64 // Judgement of the Crusader
+
+	DamageTakenMultiplier float64 // All damage
+
+	PhysicalDamageTakenMultiplier float64
+	ArcaneDamageTakenMultiplier   float64
+	FireDamageTakenMultiplier     float64
+	FrostDamageTakenMultiplier    float64
+	HolyDamageTakenMultiplier     float64
+	NatureDamageTakenMultiplier   float64
+	ShadowDamageTakenMultiplier   float64
+
+	PeriodicPhysicalDamageTakenMultiplier float64
 }
 
 func NewPseudoStats() PseudoStats {
@@ -458,34 +487,8 @@ func NewPseudoStats() PseudoStats {
 		ShadowDamageDealtMultiplier:   1,
 
 		AgentReserved1DamageDealtMultiplier: 1,
-	}
-}
 
-type TargetPseudoStats struct {
-	BonusMeleeAttackPower  float64 // Imp Hunters mark, EW
-	BonusRangedAttackPower float64 // Hunters mark, EW
-	BonusCritRating        float64 // Imp Judgement of the Crusader
-	BonusFrostCritRating   float64 // Winter's Chill
-	BonusMeleeHitRating    float64 // Imp FF
-
-	BonusPhysicalDamageTaken float64 // Hemo, Gift of Arthas, etc
-	BonusHolyDamageTaken     float64 // Judgement of the Crusader
-
-	DamageTakenMultiplier float64 // All damage
-
-	PhysicalDamageTakenMultiplier float64
-	ArcaneDamageTakenMultiplier   float64
-	FireDamageTakenMultiplier     float64
-	FrostDamageTakenMultiplier    float64
-	HolyDamageTakenMultiplier     float64
-	NatureDamageTakenMultiplier   float64
-	ShadowDamageTakenMultiplier   float64
-
-	PeriodicPhysicalDamageTakenMultiplier float64
-}
-
-func NewTargetPseudoStats() TargetPseudoStats {
-	return TargetPseudoStats{
+		// Target effects.
 		DamageTakenMultiplier: 1,
 
 		PhysicalDamageTakenMultiplier: 1,
