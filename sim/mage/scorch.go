@@ -55,7 +55,7 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 			}
 
 			// Don't overwrite the permanent version.
-			if spellEffect.Target.RemainingAuraDuration(sim, core.ImprovedScorchDebuffID) == core.NeverExpires {
+			if spellEffect.Target.RemainingAuraDuration(sim, core.ImprovedScorchAuraID) == core.NeverExpires {
 				return
 			}
 
@@ -63,7 +63,7 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 				return
 			}
 
-			newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.ImprovedScorchDebuffID)+1)
+			newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.ImprovedScorchAuraID)+1)
 			spellEffect.Target.AddAura(sim, core.ImprovedScorchAura(spellEffect.Target, newNumStacks))
 		}
 	}

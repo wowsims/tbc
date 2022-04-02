@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ScorpidStingDebuffID = core.NewDebuffID()
+var ScorpidStingAuraID = core.NewAuraID()
 
 func (hunter *Hunter) registerScorpidStingSpell(sim *core.Simulation) {
 	actionID := core.ActionID{SpellID: 3043}
@@ -34,7 +34,7 @@ func (hunter *Hunter) registerScorpidStingSpell(sim *core.Simulation) {
 				}
 
 				spellEffect.Target.AddAura(sim, core.Aura{
-					ID:       ScorpidStingDebuffID,
+					ID:       ScorpidStingAuraID,
 					ActionID: actionID,
 					Duration: time.Second * 20,
 				})

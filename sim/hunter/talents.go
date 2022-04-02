@@ -422,7 +422,7 @@ func (hunter *Hunter) applyExposeWeakness() {
 					return
 				}
 
-				if spellEffect.Target.RemainingAuraDuration(sim, core.ExposeWeaknessDebuffID) == core.NeverExpires {
+				if spellEffect.Target.RemainingAuraDuration(sim, core.ExposeWeaknessAuraID) == core.NeverExpires {
 					// Don't overwrite permanent version
 					return
 				}

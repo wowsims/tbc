@@ -7,7 +7,7 @@ import (
 )
 
 var RuptureActionID = core.ActionID{SpellID: 26867}
-var RuptureDebuffID = core.NewDebuffID()
+var RuptureAuraID = core.NewAuraID()
 var RuptureEnergyCost = 25.0
 
 func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
@@ -33,7 +33,7 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 
 			return 70 + float64(comboPoints)*11 + attackPower*[]float64{0.01, 0.02, 0.03, 0.03, 0.03}[comboPoints-1]
 		},
-		DebuffID: RuptureDebuffID,
+		AuraID: RuptureAuraID,
 	}
 
 	ability.Effect.DamageMultiplier += 0.1 * float64(rogue.Talents.SerratedBlades)

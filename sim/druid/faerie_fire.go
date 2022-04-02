@@ -46,5 +46,5 @@ func (druid *Druid) registerFaerieFireSpell(sim *core.Simulation) {
 }
 
 func (druid *Druid) ShouldCastFaerieFire(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.FaerieFire && !target.HasAura(core.FaerieFireDebuffID)
+	return rotation.FaerieFire && !target.HasAura(core.FaerieFireAuraID)
 }

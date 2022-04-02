@@ -130,7 +130,7 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 		PartyIndex: partyIndex,
 		RaidIndex:  party.Index*5 + partyIndex,
 
-		auraTracker:          newAuraTracker(false),
+		auraTracker:          newAuraTracker(),
 		majorCooldownManager: newMajorCooldownManager(player.Cooldowns),
 
 		Metrics: NewCharacterMetrics(),

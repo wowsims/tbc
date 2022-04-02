@@ -105,7 +105,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		currentArmor: float64(options.Armor),
 		MobType:      options.MobType,
 		PseudoStats:  stats.NewTargetPseudoStats(),
-		auraTracker:  newAuraTracker(true),
+		auraTracker:  newAuraTracker(),
 		Name:         "Target " + strconv.Itoa(int(targetIndex)+1),
 		Level:        options.Level,
 	}

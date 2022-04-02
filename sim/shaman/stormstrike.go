@@ -9,13 +9,13 @@ import (
 )
 
 var StormstrikeCD = core.NewCooldownID()
-var StormstrikeDebuffID = core.NewDebuffID()
+var StormstrikeAuraID = core.NewAuraID()
 var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeCD}
 var SkyshatterAPBonusAuraID = core.NewAuraID()
 
 func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) core.Aura {
 	ssDebuffAura := core.Aura{
-		ID:       StormstrikeDebuffID,
+		ID:       StormstrikeAuraID,
 		ActionID: StormstrikeActionID,
 		Duration: time.Second * 12,
 		Stacks:   2,
@@ -34,9 +34,9 @@ func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) core.Aura {
 			return
 		}
 
-		stacks := spellEffect.Target.NumStacks(StormstrikeDebuffID) - 1
+		stacks := spellEffect.Target.NumStacks(StormstrikeAuraID) - 1
 		if stacks == 0 {
-			spellEffect.Target.RemoveAura(sim, StormstrikeDebuffID)
+			spellEffect.Target.RemoveAura(sim, StormstrikeAuraID)
 		} else {
 			ssDebuffAura.Stacks = stacks
 			spellEffect.Target.ReplaceAura(sim, ssDebuffAura)

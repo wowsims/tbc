@@ -7,7 +7,8 @@ import (
 )
 
 var IgniteActionID = core.ActionID{SpellID: 12848}
-var IgniteDebuffID = core.NewDebuffID()
+var IgniteAuraID = core.NewAuraID()
+var IgniteDotAuraID = core.NewAuraID()
 
 func (mage *Mage) newIgniteSpell(sim *core.Simulation) *core.Spell {
 	spell := core.SimpleSpell{
@@ -28,7 +29,7 @@ func (mage *Mage) newIgniteSpell(sim *core.Simulation) *core.Spell {
 				NumberOfTicks:         2,
 				TickLength:            time.Second * 2,
 				IgnoreDamageModifiers: true,
-				DebuffID:              IgniteDebuffID,
+				AuraID:                IgniteDotAuraID,
 			},
 		},
 	}
@@ -52,8 +53,6 @@ func (mage *Mage) procIgnite(sim *core.Simulation, target *core.Target, damageFr
 	ignite.Template.Effect.DotInput.TickBaseDamage = core.DotSnapshotFuncMagic(newIgniteDamage/2, 0)
 	ignite.Cast(sim, target)
 }
-
-var IgniteAuraID = core.NewAuraID()
 
 func (mage *Mage) applyIgnite() {
 	if mage.Talents.Ignite == 0 {

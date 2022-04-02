@@ -10,7 +10,7 @@ import (
 
 const SpellIDInsectSwarm int32 = 27013
 
-var InsectSwarmDebuffID = core.NewDebuffID()
+var InsectSwarmAuraID = core.NewAuraID()
 
 func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
 	template := core.SimpleSpell{
@@ -39,7 +39,7 @@ func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
 				NumberOfTicks:  6,
 				TickLength:     time.Second * 2,
 				TickBaseDamage: core.DotSnapshotFuncMagic(792/6, 0.127),
-				DebuffID:       InsectSwarmDebuffID,
+				AuraID:         InsectSwarmAuraID,
 			},
 		},
 	}

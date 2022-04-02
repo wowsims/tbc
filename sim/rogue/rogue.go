@@ -164,7 +164,7 @@ func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.deadlyPoisonStacks = 0
 	rogue.doneSND = false
 
-	permaEA := sim.GetPrimaryTarget().AuraExpiresAt(core.ExposeArmorDebuffID) == core.NeverExpires
+	permaEA := sim.GetPrimaryTarget().AuraExpiresAt(core.ExposeArmorAuraID) == core.NeverExpires
 	rogue.doneEA = !rogue.Rotation.MaintainExposeArmor || permaEA
 
 	rogue.disabledMCDs = rogue.DisableAllEnabledCooldowns(core.CooldownTypeUnknown)

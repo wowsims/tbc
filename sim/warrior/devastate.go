@@ -43,7 +43,7 @@ func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 			// Bonus 35 damage / stack of sunder. Counts stacks AFTER cast but only if stacks > 0.
 			sunderBonus := 0.0
-			saStacks := hitEffect.Target.NumStacks(core.SunderArmorDebuffID)
+			saStacks := hitEffect.Target.NumStacks(core.SunderArmorAuraID)
 			if saStacks != 0 {
 				sunderBonus = 35 * float64(core.MinInt32(saStacks+1, 5))
 			}
@@ -60,7 +60,7 @@ func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 		instance.Cost.Value = 0
 		instance.BaseCost.Value = 0
 		instance.GCD = 0
-		if target.NumStacks(core.SunderArmorDebuffID) == 5 {
+		if target.NumStacks(core.SunderArmorAuraID) == 5 {
 			instance.Effect.ThreatMultiplier = 0
 		}
 	}
@@ -69,7 +69,7 @@ func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			target := spellEffect.Target
-			if !target.HasAura(core.ExposeArmorDebuffID) {
+			if !target.HasAura(core.ExposeArmorAuraID) {
 				warrior.SunderArmor.ModifyCast = devastateSunderModifier
 				warrior.SunderArmor.Cast(sim, spellEffect.Target)
 				warrior.SunderArmor.ModifyCast = normalSunderModifier

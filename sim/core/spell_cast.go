@@ -308,7 +308,7 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *Spell,
 
 	if sim.Log != nil && !(spell.SpellExtras.Matches(SpellExtrasAlwaysHits) && spellEffect.Damage == 0) {
 		if isPeriodic {
-			spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect.DotResultString(), spellEffect.calcThreat(spell.Character))
+			spell.Character.Log(sim, "%s tick %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Character))
 		} else {
 			spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Character))
 		}
@@ -375,10 +375,6 @@ func (spellEffect *SpellEffect) String() string {
 		return outcomeStr
 	}
 	return fmt.Sprintf("%s for %0.3f damage", outcomeStr, spellEffect.Damage)
-}
-
-func (spellEffect *SpellEffect) DotResultString() string {
-	return "tick " + spellEffect.String()
 }
 
 func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *Spell, isPeriodic bool, damage *float64) {

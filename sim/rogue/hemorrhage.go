@@ -8,12 +8,12 @@ import (
 )
 
 var HemorrhageActionID = core.ActionID{SpellID: 26864}
-var HemorrhageDebuffID = core.NewDebuffID()
+var HemorrhageAuraID = core.NewAuraID()
 var HemorrhageEnergyCost = 35.0
 
 func (rogue *Rogue) registerHemorrhageSpell(_ *core.Simulation) {
 	hemoAura := core.Aura{
-		ID:       HemorrhageDebuffID,
+		ID:       HemorrhageAuraID,
 		ActionID: HemorrhageActionID,
 		Duration: time.Second * 15,
 		OnGain: func(sim *core.Simulation) {
@@ -31,9 +31,9 @@ func (rogue *Rogue) registerHemorrhageSpell(_ *core.Simulation) {
 			return
 		}
 
-		stacks := spellEffect.Target.NumStacks(HemorrhageDebuffID) - 1
+		stacks := spellEffect.Target.NumStacks(HemorrhageAuraID) - 1
 		if stacks == 0 {
-			spellEffect.Target.RemoveAura(sim, HemorrhageDebuffID)
+			spellEffect.Target.RemoveAura(sim, HemorrhageAuraID)
 		} else {
 			hemoAura.Stacks = stacks
 			spellEffect.Target.ReplaceAura(sim, hemoAura)

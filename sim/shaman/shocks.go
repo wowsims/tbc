@@ -13,7 +13,7 @@ const SpellIDFlameShock int32 = 25457
 const SpellIDFrostShock int32 = 25464
 
 var ShockCooldownID = core.NewCooldownID() // shared CD for all shocks
-var FlameShockDebuffID = core.NewDebuffID()
+var FlameShockAuraID = core.NewAuraID()
 
 func (shaman *Shaman) ShockCD() time.Duration {
 	return time.Second*6 - time.Millisecond*200*time.Duration(shaman.Talents.Reverberation)
@@ -118,7 +118,7 @@ func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation) {
 		NumberOfTicks:  4,
 		TickLength:     time.Second * 3,
 		TickBaseDamage: core.DotSnapshotFuncMagic(420/4, 0.1),
-		DebuffID:       FlameShockDebuffID,
+		AuraID:         FlameShockAuraID,
 	}
 
 	shaman.FlameShock = shaman.RegisterSpell(config)
