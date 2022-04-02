@@ -204,7 +204,7 @@ func (hunter *Hunter) applyFerociousInspiration() {
 	makeProcAura := func(character *core.Character) core.Aura {
 		return core.Aura{
 			ID:       FerociousInspirationAuraIDs[hunter.PartyIndex],
-			ActionID: core.ActionID{SpellID: 34460, Tag: int32(hunter.RaidIndex)},
+			ActionID: core.ActionID{SpellID: 34460, Tag: int32(hunter.Index)},
 			Duration: time.Second * 10,
 			OnGain: func(sim *core.Simulation) {
 				character.PseudoStats.DamageDealtMultiplier *= multiplier

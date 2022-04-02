@@ -22,7 +22,7 @@ type Unit struct {
 	// Index of this unit with its group.
 	//  For Players, this is the 0-indexed raid index (0-24).
 	//  For Enemies, this is its enemy index.
-	//  For Pets, this is the pet index among the owner's pets.
+	//  For Pets, this is the same as the owner's index.
 	Index int32
 
 	// Unique label for logging.
@@ -77,7 +77,7 @@ func (unit *Unit) AddStat(stat stats.Stat, amount float64) {
 	unit.stats[stat] += amount
 }
 
-func (unit *Unit) Finalize(raid *Raid) {
+func (unit *Unit) finalize() {
 	if unit.finalized {
 		return
 	}

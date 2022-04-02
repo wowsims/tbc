@@ -77,6 +77,7 @@ type Target struct {
 func NewTarget(options proto.Target, targetIndex int32) *Target {
 	target := &Target{
 		Unit: Unit{
+			Type:        EnemyUnit,
 			Index:       targetIndex,
 			Label:       "Target " + strconv.Itoa(int(targetIndex)+1),
 			Level:       options.Level,

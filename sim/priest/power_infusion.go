@@ -13,7 +13,7 @@ func (priest *Priest) registerPowerInfusionCD() {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 10060, CooldownID: PowerInfusionCooldownID, Tag: int32(priest.RaidIndex)}
+	actionID := core.ActionID{SpellID: 10060, CooldownID: PowerInfusionCooldownID, Tag: int32(priest.Index)}
 
 	baseManaCost := priest.BaseMana() * 0.16
 

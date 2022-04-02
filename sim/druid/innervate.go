@@ -12,7 +12,7 @@ var InnervateCooldownID = core.NewCooldownID()
 // Returns the time to wait before the next action, or 0 if innervate is on CD
 // or disabled.
 func (druid *Druid) registerInnervateCD() {
-	actionID := core.ActionID{SpellID: 29166, CooldownID: InnervateCooldownID, Tag: int32(druid.RaidIndex)}
+	actionID := core.ActionID{SpellID: 29166, CooldownID: InnervateCooldownID, Tag: int32(druid.Index)}
 
 	baseManaCost := druid.BaseMana() * 0.04
 	innervateCD := core.InnervateCD
