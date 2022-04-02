@@ -415,6 +415,8 @@ func (character *Character) Finalize(raid *Raid) {
 }
 
 func (character *Character) reset(sim *Simulation, agent Agent) {
+	character.Unit.reset(sim)
+
 	character.ExpectedBonusMana = 0
 	character.UpdateManaRegenRates()
 
@@ -428,8 +430,6 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 		petAgent.GetPet().reset(sim, petAgent)
 		petAgent.Reset(sim)
 	}
-
-	character.Unit.reset(sim)
 
 	if character.gcdAction != nil {
 		sim.pendingActionPool.Put(character.gcdAction)
