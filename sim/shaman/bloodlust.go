@@ -11,7 +11,7 @@ func (shaman *Shaman) BloodlustActionID() core.ActionID {
 	return core.ActionID{
 		SpellID:    2825,
 		CooldownID: BloodlustCooldownID,
-		Tag:        int32(shaman.RaidIndex),
+		Tag:        int32(shaman.Index),
 	}
 }
 
