@@ -160,10 +160,10 @@ func (hunter *Hunter) applyFrenzy() {
 		ID:       FrenzyProcAuraID,
 		ActionID: core.ActionID{SpellID: 19625},
 		Duration: time.Second * 8,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			hunter.pet.PseudoStats.MeleeSpeedMultiplier *= 1.3
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			hunter.pet.PseudoStats.MeleeSpeedMultiplier /= 1.3
 		},
 	}
@@ -206,10 +206,10 @@ func (hunter *Hunter) applyFerociousInspiration() {
 			ID:       FerociousInspirationAuraIDs[hunter.PartyIndex],
 			ActionID: core.ActionID{SpellID: 34460, Tag: int32(hunter.Index)},
 			Duration: time.Second * 10,
-			OnGain: func(sim *core.Simulation) {
+			OnGain: func(aura *core.Aura, sim *core.Simulation) {
 				character.PseudoStats.DamageDealtMultiplier *= multiplier
 			},
-			OnExpire: func(sim *core.Simulation) {
+			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 				character.PseudoStats.DamageDealtMultiplier /= multiplier
 			},
 		}
@@ -252,10 +252,10 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		ID:       BestialWrathPetAuraID,
 		ActionID: actionID,
 		Duration: time.Second * 18,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			hunter.pet.PseudoStats.DamageDealtMultiplier *= 1.5
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			hunter.pet.PseudoStats.DamageDealtMultiplier /= 1.5
 		},
 	}
@@ -264,11 +264,11 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		ID:       BestialWrathAuraID,
 		ActionID: actionID,
 		Duration: time.Second * 18,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			hunter.PseudoStats.DamageDealtMultiplier *= 1.1
 			hunter.PseudoStats.CostMultiplier *= 0.8
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			hunter.PseudoStats.DamageDealtMultiplier /= 1.1
 			hunter.PseudoStats.CostMultiplier /= 0.8
 		},

@@ -16,10 +16,10 @@ func (rogue *Rogue) registerHemorrhageSpell(_ *core.Simulation) {
 		ID:       HemorrhageAuraID,
 		ActionID: HemorrhageActionID,
 		Duration: time.Second * 15,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			sim.GetPrimaryTarget().PseudoStats.BonusPhysicalDamageTaken += 42
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			sim.GetPrimaryTarget().PseudoStats.BonusPhysicalDamageTaken -= 42
 		},
 	}

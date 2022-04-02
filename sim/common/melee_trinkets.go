@@ -175,7 +175,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 							stacks++
 						}
 					},
-					OnExpire: func(sim *core.Simulation) {
+					OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 						character.AddStat(stats.ArmorPenetration, -arPenBonus*float64(stacks))
 						stacks = 0
 					},
@@ -454,7 +454,7 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 							stacks++
 						}
 					},
-					OnExpire: func(sim *core.Simulation) {
+					OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 						character.AddStat(stats.AttackPower, -apBonus*float64(stacks))
 						character.AddStat(stats.RangedAttackPower, -apBonus*float64(stacks))
 						stacks = 0

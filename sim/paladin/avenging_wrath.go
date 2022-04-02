@@ -32,10 +32,10 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 					ID:       AvengingWrathAuraID,
 					ActionID: AvengingWrathActionID,
 					Duration: time.Second * 20,
-					OnGain: func(sim *core.Simulation) {
+					OnGain: func(aura *core.Aura, sim *core.Simulation) {
 						paladin.PseudoStats.DamageDealtMultiplier *= 1.3
 					},
-					OnExpire: func(sim *core.Simulation) {
+					OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 						paladin.PseudoStats.DamageDealtMultiplier /= 1.3
 					},
 				})

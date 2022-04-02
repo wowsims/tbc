@@ -82,10 +82,10 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim 
 		ID:       FindWeaknessAuraID,
 		ActionID: core.ActionID{SpellID: 31242},
 		Duration: time.Second * 10,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.PseudoStats.AgentReserved1DamageDealtMultiplier *= findWeaknessMultiplier
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.PseudoStats.AgentReserved1DamageDealtMultiplier /= findWeaknessMultiplier
 		},
 	}
@@ -139,10 +139,10 @@ func (rogue *Rogue) registerColdBloodCD() {
 		ID:       ColdBloodAuraID,
 		ActionID: actionID,
 		Duration: core.NeverExpires,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.PseudoStats.BonusCritRatingAgentReserved1 += 100 * core.MeleeCritRatingPerCritChance
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.PseudoStats.BonusCritRatingAgentReserved1 -= 100 * core.MeleeCritRatingPerCritChance
 		},
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -331,13 +331,13 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 		ID:       BladeFlurryAuraID,
 		ActionID: actionID,
 		Duration: dur,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, hasteBonus)
 			if sim.GetNumTargets() > 1 {
 				rogue.PseudoStats.DamageDealtMultiplier *= 2
 			}
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
 			if sim.GetNumTargets() > 1 {
 				rogue.PseudoStats.DamageDealtMultiplier /= 2
@@ -415,11 +415,11 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 		ID:       AdrenalineRushAuraID,
 		ActionID: actionID,
 		Duration: time.Second * 15,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.ResetEnergyTick(sim)
 			rogue.EnergyTickMultiplier = 2
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.ResetEnergyTick(sim)
 			rogue.EnergyTickMultiplier = 1
 		},

@@ -10,23 +10,10 @@ import (
 
 const NeverExpires = time.Duration(math.MaxInt64)
 
-type AuraID int32
-
-// Reserve the default value so no aura uses it.
-const UnknownAuraID = AuraID(0)
-
-var numAuraIDs = 1
-
-func NewAuraID() AuraID {
-	newAuraID := AuraID(numAuraIDs)
-	numAuraIDs++
-	return newAuraID
-}
-
 type CooldownID int32
 
 // Reserve the default value so no cooldown uses it.
-const UnknownCooldownID = AuraID(0)
+const UnknownCooldownID = CooldownID(0)
 
 var numCooldownIDs = 1
 
@@ -44,6 +31,8 @@ type OnGain func(aura *Aura, sim *Simulation)
 type OnExpire func(aura *Aura, sim *Simulation)
 type OnStacksChange func(aura *Aura, sim *Simulation, oldStacks int32, newStacks int32)
 
+const Inactive = -1
+
 // Aura lifecycle:
 //
 // myAura = &Aura{ ... }
@@ -53,23 +42,36 @@ type OnStacksChange func(aura *Aura, sim *Simulation, oldStacks int32, newStacks
 // myAura.Deactivate(sim)
 
 type Aura struct {
-	ID       AuraID
-	ActionID ActionID // If set, metrics will be tracked for this aura using this ID.
+	// String label for this Aura. Gauranteed to be unique among the Auras for a single Unit.
+	Label string
+
+	// For easily grouping auras.
+	Tag string
+
+	ActionID ActionID // If set, metrics will be tracked for this aura.
 
 	Duration time.Duration // Duration of aura, upon being applied.
 
 	startTime time.Duration // Time at which the aura was applied.
 	expires   time.Duration // Time at which aura will be removed.
 
-	activeIndex           int32 // Position of this aura's index in the activeAuraIDs array.
-	onCastCompleteIndex   int32 // Position of this aura's index in the onCastCompleteIDs array.
-	onSpellHitIndex       int32 // Position of this aura's index in the onSpellHitIDs array.
-	onPeriodicDamageIndex int32 // Position of this aura's index in the onPeriodicDamageIDs array.
+	// The unit this aura is attached to.
+	Unit *Unit
+
+	active                bool
+	activeIndex           int32 // Position of this aura's index in the activeAuras array.
+	onCastCompleteIndex   int32 // Position of this aura's index in the onCastCompleteAuras array.
+	onSpellHitIndex       int32 // Position of this aura's index in the onSpellHitAuras array.
+	onPeriodicDamageIndex int32 // Position of this aura's index in the onPeriodicDamageAuras array.
 
 	// The number of stacks, or charges, of this aura. If this aura doesn't care
 	// about charges, is just 0.
-	Stacks    int32
+	stacks    int32
 	MaxStacks int32
+
+	// If nonzero, activation of this aura will deactivate other auras with the
+	// same Tag and equal or lower Priority.
+	Priority int32
 
 	// Invoked when a spell cast completes casting, before results are calculated.
 	OnCastComplete OnCastComplete
@@ -87,9 +89,16 @@ type Aura struct {
 
 	// Invoked when a dot tick occurs, after damage is calculated.
 	OnPeriodicDamage OnPeriodicDamage
+
+	// Metrics for this aura.
+	metrics AuraMetrics
 }
 
-func (aura *Aura) refresh(sim *Simulation) {
+func (aura *Aura) IsActive() bool {
+	return aura.active
+}
+
+func (aura *Aura) Refresh(sim *Simulation) {
 	if aura.Duration == NeverExpires {
 		aura.expires = NeverExpires
 	} else {
@@ -97,17 +106,46 @@ func (aura *Aura) refresh(sim *Simulation) {
 	}
 }
 
+func (aura *Aura) SetStacks(sim *Simulation, newStacks int32) {
+	if !aura.IsActive() {
+		panic("Aura must be active before stacks can be modified!")
+	}
+
+	oldStacks := aura.stacks
+	aura.stacks = MinInt32(newStacks, aura.MaxStacks)
+	if aura.OnStacksChange != nil {
+		aura.OnStacksChange(aura, sim, oldStacks, newStacks)
+	}
+}
+
+func (aura *Aura) UpdateExpires(newExpires time.Duration) {
+	aura.expires = newExpires
+}
+
+func (aura *Aura) RemainingDuration(sim *Simulation) time.Duration {
+	expires := at.auras[id].expires
+	if expires == NeverExpires {
+		return NeverExpires
+	} else {
+		return expires - sim.CurrentTime
+	}
+}
+
+func (aura *Aura) ExpiresAt() time.Duration {
+	return at.auras[id].expires
+}
+
 type AuraFactory func(*Simulation) Aura
 
 // Callback for doing something on reset.
 type ResetEffect func(*Simulation)
 
-// Wraps aura creation and calls it on every sim reset.
+// Convenience for some common Aura behavior.
 type PermanentAura struct {
-	AuraFactory AuraFactory
+	Aura *Aura
 
 	// By default, permanent auras have their expiration overwritten to never expire.
-	// This option disables that behavior, creating an aura which is applies at the
+	// This option disables that behavior, creating an aura which is applied at the
 	// beginning of every iteration but expires after a period of time. This is
 	// used for some snapshotting effects like Warrior battle shout.
 	RespectDuration bool
@@ -127,48 +165,99 @@ type auraTracker struct {
 	// These are automatically applied on each Sim reset.
 	permanentAuras []PermanentAura
 
-	// Callback to format aura-related logs.
-	logFn func(string, ...interface{})
-
 	// Whether finalize() has been called for this object.
 	finalized bool
 
 	// Maps MagicIDs to sim duration at which CD is done. Using array for perf.
 	cooldowns []time.Duration
 
-	// Maps MagicIDs to aura for that ID. Using array for perf.
-	auras []Aura
+	// Maps Aura labels to the corresponding Aura.
+	auras map[string]*Aura
+
+	aurasByTag map[string][]*Aura
 
 	// IDs of Auras that are active, in no particular order.
-	activeAuraIDs []AuraID
+	activeAuras []*Aura
 
-	// IDs of Auras that have a non-nil XXX function set.
-	onCastCompleteIDs   []AuraID
-	onSpellHitIDs       []AuraID
-	onPeriodicDamageIDs []AuraID
-	onMeleeAttackIDs    []AuraID
-
-	aurasToAdd      []Aura
-	auraIDsToRemove []AuraID
-
-	// Metrics for each aura.
-	metrics []AuraMetrics
+	// Auras that have a non-nil XXX function set and are currently active.
+	onCastCompleteAuras   []*Aura
+	onSpellHitAuras       []*Aura
+	onPeriodicDamageAuras []*Aura
+	onMeleeAttackAuras    []*Aura
 }
 
 func newAuraTracker() auraTracker {
-	numAura := numAuraIDs + 1 // TODO: this +1 shouldn't be needed, probably an aura ID created strangely somewhere.
 	return auraTracker{
-		resetEffects:        []ResetEffect{},
-		permanentAuras:      []PermanentAura{},
-		activeAuraIDs:       make([]AuraID, 0, 16),
-		onCastCompleteIDs:   make([]AuraID, 0, 16),
-		onSpellHitIDs:       make([]AuraID, 0, 16),
-		onPeriodicDamageIDs: make([]AuraID, 0, 16),
-		onMeleeAttackIDs:    make([]AuraID, 0, 16),
-		auras:               make([]Aura, numAura),
-		cooldowns:           make([]time.Duration, numCooldownIDs),
-		metrics:             make([]AuraMetrics, numAura),
+		resetEffects:          []ResetEffect{},
+		permanentAuras:        []PermanentAura{},
+		activeAuras:           make([]*Aura, 0, 16),
+		onCastCompleteAuras:   make([]*Aura, 0, 16),
+		onSpellHitAuras:       make([]*Aura, 0, 16),
+		onPeriodicDamageAuras: make([]*Aura, 0, 16),
+		onMeleeAttackAuras:    make([]*Aura, 0, 16),
+		auras:                 make(map[string]*Aura),
+		aurasByTag:            make(map[string][]*Aura),
+		cooldowns:             make([]time.Duration, numCooldownIDs),
 	}
+}
+
+func (at *auraTracker) registerAura(unit *Unit, aura *Aura) *Aura {
+	if unit == nil {
+		panic("Aura unit is required!")
+	}
+	if aura.Label == "" {
+		panic("Aura label is required!")
+	}
+	if aura.Priority != 0 && aura.Tag == "" {
+		panic("Aura.Priority requires Aura.Tag also be set")
+	}
+	if at.GetAura(aura.Label) != nil {
+		panic(fmt.Sprintf("Aura %s already registered!", aura.Label))
+	}
+
+	aura.Unit = unit
+	aura.metrics.ID = aura.ActionID
+
+	at.auras[aura.Label] = aura
+	if aura.Tag != "" {
+		at.aurasByTag[aura.Tag] = append(at.aurasByTag[aura.Tag], aura)
+	}
+
+	return aura
+}
+func (unit *Unit) RegisterAura(aura *Aura) *Aura {
+	return unit.auraTracker.registerAura(unit, aura)
+}
+
+func (at *auraTracker) GetAura(label string) *Aura {
+	return at.auras[label]
+}
+
+func (unit *Unit) GetOrRegisterAura(label string, aura *Aura) *Aura {
+	curAura := unit.GetAura(label)
+	if curAura == nil {
+		return unit.RegisterAura(label, aura)
+	} else {
+		return curAura
+	}
+}
+
+func (at *auraTracker) GetAurasWithTag(tag string) []*Aura {
+	if auras, ok := at.aurasByTag[tag]; ok {
+		return auras[:] // Defensive copy
+	} else {
+		return []*Aura{}
+	}
+}
+
+func (at *auraTracker) GetActiveAurasWithTag(tag string) []*Aura {
+	active = []*Aura{}
+	for aura := range at.GetAurasWithTag(tag) {
+		if aura.IsActive() {
+			active = append(active, aura)
+		}
+	}
+	return active
 }
 
 // Registers a callback to this Character which will be invoked on
@@ -207,14 +296,11 @@ func (at *auraTracker) reset(sim *Simulation) {
 	copy(at.auras, sim.emptyAuras)
 
 	at.cooldowns = make([]time.Duration, numCooldownIDs)
-	at.activeAuraIDs = at.activeAuraIDs[:0]
-	at.onCastCompleteIDs = at.onCastCompleteIDs[:0]
-	at.onSpellHitIDs = at.onSpellHitIDs[:0]
-	at.onPeriodicDamageIDs = at.onPeriodicDamageIDs[:0]
-	at.onMeleeAttackIDs = at.onMeleeAttackIDs[:0]
-
-	at.aurasToAdd = []Aura{}
-	at.auraIDsToRemove = []AuraID{}
+	at.activeAuraAuras = at.activeAuraAuras[:0]
+	at.onCastCompleteAuras = at.onCastCompleteAuras[:0]
+	at.onSpellHitAuras = at.onSpellHitAuras[:0]
+	at.onPeriodicDamageAuras = at.onPeriodicDamageAuras[:0]
+	at.onMeleeAttackAuras = at.onMeleeAttackAuras[:0]
 
 	for i, _ := range at.metrics {
 		auraMetric := &at.metrics[i]
@@ -226,308 +312,188 @@ func (at *auraTracker) reset(sim *Simulation) {
 	}
 
 	for _, permAura := range at.permanentAuras {
-		aura := permAura.AuraFactory(sim)
+		aura := permAura.Aura
 		if !permAura.RespectDuration {
 			aura.Duration = NeverExpires
 		}
-		at.ReplaceAura(sim, aura)
-		if permAura.UptimeMultiplier != 0 && !aura.ActionID.IsEmptyAction() {
-			// We're going to add 100% uptime at the end, so subtract 1 now.
-			at.AddAuraUptime(aura.ID, aura.ActionID, time.Duration(float64(sim.Duration)*(permAura.UptimeMultiplier-1)))
-		}
+		aura.Activate(sim)
 	}
 }
 
 func (at *auraTracker) advance(sim *Simulation) {
-	if len(at.auraIDsToRemove) > 0 {
-		// Copy to temp array so there are no issues if RemoveAuraOnNextAdvance()
-		// is called within the loop.
-		toRemove := at.auraIDsToRemove
-		at.auraIDsToRemove = []AuraID{}
-
-		for _, id := range toRemove {
-			at.RemoveAura(sim, id)
-		}
-	}
-
-	if len(at.aurasToAdd) > 0 {
-		// Copy to temp array so there are no issues if AddAuraOnNextAdvance()
-		// is called within the loop.
-		toAdd := at.aurasToAdd
-		at.aurasToAdd = []Aura{}
-
-		for _, aura := range toAdd {
-			at.AddAura(sim, aura)
-		}
-	}
-
-	for _, id := range at.activeAuraIDs {
-		if aura := &at.auras[id]; aura.expires <= sim.CurrentTime {
-			at.RemoveAura(sim, id)
+	// Loop in reverse order so that aura removal is safe.
+	for i := len(at.activeAuras) - 1; i >= 0; i-- {
+		aura := at.activeAuras[i]
+		if aura.expires <= sim.CurrentTime {
+			aura.Deactivate(sim)
 		}
 	}
 }
 
 func (at *auraTracker) doneIteration(simDuration time.Duration) {
-	// Add metrics for any auras that are still active.
-	for _, aura := range at.auras {
-		if !aura.ActionID.IsEmptyAction() {
-			at.AddAuraUptime(aura.ID, aura.ActionID, simDuration-aura.startTime)
+	// Expire all the remaining auras.
+	for i := len(at.activeAuras) - 1; i >= 0; i-- {
+		aura := at.activeAuras[i]
+		aura.Deactivate(sim)
+	}
+
+	for _, permAura := range at.permanentAuras {
+		if permAura.UptimeMultiplier != 0 {
+			permAura.Aura.Uptime = time.Duration(float64(permAura.Aura.Uptime) * permAura.UptimeMultiplier)
 		}
 	}
 
-	for i, _ := range at.metrics {
-		auraMetric := &at.metrics[i]
-		auraMetric.doneIteration()
-	}
-}
-
-// ReplaceAura is like AddAura but an existing aura will not be removed/readded.
-// This means that 'OnExpire' will not fire off on the old aura.
-func (at *auraTracker) ReplaceAura(sim *Simulation, newAura Aura) {
-	if !at.HasAura(newAura.ID) {
-		at.AddAura(sim, newAura)
-		return
-	}
-
-	old := at.auras[newAura.ID]
-
-	// private cached state has to be copied over
-	newAura.activeIndex = old.activeIndex
-	newAura.onCastCompleteIndex = old.onCastCompleteIndex
-	newAura.onSpellHitIndex = old.onSpellHitIndex
-	newAura.onPeriodicDamageIndex = old.onPeriodicDamageIndex
-	newAura.startTime = old.startTime
-	newAura.refresh(sim)
-
-	at.auras[newAura.ID] = newAura
-
-	if sim.Log != nil && !at.auras[newAura.ID].ActionID.IsEmptyAction() {
-		at.logFn("Aura refreshed: %s", at.auras[newAura.ID].ActionID)
+	// Add metrics for any auras that are still active.
+	for _, aura := range at.auras {
+		aura.metrics.doneIteration()
 	}
 }
 
 // Adds a new aura to the simulation. If an aura with the same ID already
 // exists it will be replaced with the new one.
-func (at *auraTracker) AddAura(sim *Simulation, newAura Aura) {
-	if newAura.ID == 0 {
-		panic("Empty aura ID")
+func (aura *Aura) Activate(sim *Simulation) {
+	if aura.IsActive() {
+		return
 	}
-
-	if newAura.Duration == 0 {
+	if aura.Duration == 0 {
 		panic("Aura with 0 duration")
 	}
 
-	if aura := &at.auras[newAura.ID]; aura.ID != 0 {
-		// Getting lots of bug reports, do a grep and catch all cases for this before uncommenting.
-		//panic(fmt.Sprintf("AddAura(%v) at %s - previous has %s left, use ReplaceAura() instead", newAura.ActionID, sim.CurrentTime, aura.expires-sim.CurrentTime))
-		at.RemoveAura(sim, newAura.ID)
+	if aura.Priority != 0 {
+		for _, otherAura := range aura.Unit.GetAurasWithTag(aura.Tag) {
+			if otherAura.Priority <= aura.Priority {
+				otherAura.Deactivate(sim)
+			}
+		}
 	}
 
-	newAura.startTime = sim.CurrentTime
-	newAura.refresh(sim)
+	aura.startTime = sim.CurrentTime
+	aura.Refresh(sim)
 
-	if newAura.Duration != NeverExpires {
-		newAura.startTime = sim.CurrentTime
-		newAura.expires = sim.CurrentTime + newAura.Duration
+	if aura.Duration != NeverExpires {
+		aura.startTime = sim.CurrentTime
+		aura.expires = sim.CurrentTime + aura.Duration
 
-		newAura.activeIndex = int32(len(at.activeAuraIDs))
-		at.activeAuraIDs = append(at.activeAuraIDs, newAura.ID)
+		aura.activeIndex = int32(len(aura.tracker.activeAuras))
+		aura.tracker.activeAuras = append(aura.tracker.activeAuras, aura)
 	}
 
-	if newAura.OnCastComplete != nil {
-		newAura.onCastCompleteIndex = int32(len(at.onCastCompleteIDs))
-		at.onCastCompleteIDs = append(at.onCastCompleteIDs, newAura.ID)
+	if aura.OnCastComplete != nil {
+		aura.onCastCompleteIndex = int32(len(aura.tracker.onCastCompleteAuras))
+		aura.tracker.onCastCompleteAuras = append(aura.tracker.onCastCompleteAuras, aura)
 	}
 
-	if newAura.OnSpellHit != nil {
-		newAura.onSpellHitIndex = int32(len(at.onSpellHitIDs))
-		at.onSpellHitIDs = append(at.onSpellHitIDs, newAura.ID)
+	if aura.OnSpellHit != nil {
+		aura.onSpellHitIndex = int32(len(aura.tracker.onSpellHitAuras))
+		aura.tracker.onSpellHitAuras = append(aura.tracker.onSpellHitAuras, aura)
 	}
 
-	if newAura.OnPeriodicDamage != nil {
-		newAura.onPeriodicDamageIndex = int32(len(at.onPeriodicDamageIDs))
-		at.onPeriodicDamageIDs = append(at.onPeriodicDamageIDs, newAura.ID)
+	if aura.OnPeriodicDamage != nil {
+		aura.onPeriodicDamageIndex = int32(len(aura.tracker.onPeriodicDamageAuras))
+		aura.tracker.onPeriodicDamageAuras = append(aura.tracker.onPeriodicDamageAuras, aura)
 	}
 
-	if sim.Log != nil && !newAura.ActionID.IsEmptyAction() {
-		at.logFn("Aura gained: %s", newAura.ActionID)
+	if sim.Log != nil && !aura.ActionID.IsEmptyAction() {
+		aura.Unit.Log(sim, "Aura gained: %s", aura.ActionID)
 	}
 
-	at.auras[newAura.ID] = newAura
-
-	if newAura.OnGain != nil {
-		newAura.OnGain(sim)
+	if aura.OnGain != nil {
+		aura.OnGain(aura, sim)
 	}
+	aura.active = true
 }
 
-// Like AddAura but ensures that callbacks for this Aura will be invoked first.
-func (at *auraTracker) AddPriorityAura(sim *Simulation, auraToAdd Aura) {
-	at.AddAura(sim, auraToAdd)
-	newAura := &at.auras[auraToAdd.ID]
-
-	if newAura.OnCastComplete != nil {
-		otherAuraID := at.onCastCompleteIDs[0]
-		at.onCastCompleteIDs[0] = newAura.ID
-		at.onCastCompleteIDs[len(at.onCastCompleteIDs)-1] = otherAuraID
-		at.auras[otherAuraID].onCastCompleteIndex = newAura.onCastCompleteIndex
-		newAura.onCastCompleteIndex = 0
+// Moves an Aura to the front of the list of active Auras, so its callbacks are invoked first.
+func (aura *Aura) Prioritize() {
+	if aura.OnCastComplete != nil {
+		otherAura := aura.tracker.onCastCompleteAuras[0]
+		aura.tracker.onCastCompleteAuras[0] = aura
+		aura.tracker.onCastCompleteAuras[len(aura.tracker.onCastCompleteAuras)-1] = otherAura
+		otherAura.onCastCompleteIndex = aura.onCastCompleteIndex
+		aura.onCastCompleteIndex = Inactive
 	}
 
-	if newAura.OnSpellHit != nil {
-		otherAuraID := at.onSpellHitIDs[0]
-		at.onSpellHitIDs[0] = newAura.ID
-		at.onSpellHitIDs[len(at.onSpellHitIDs)-1] = otherAuraID
-		at.auras[otherAuraID].onSpellHitIndex = newAura.onSpellHitIndex
-		newAura.onSpellHitIndex = 0
+	if aura.OnSpellHit != nil {
+		otherAura := aura.tracker.onSpellHitAuras[0]
+		aura.tracker.onSpellHitAuras[0] = aura
+		aura.tracker.onSpellHitAuras[len(aura.tracker.onSpellHitAuras)-1] = otherAura
+		otherAura.onSpellHitIndex = aura.onSpellHitIndex
+		aura.onSpellHitIndex = Inactive
 	}
 
-	if newAura.OnPeriodicDamage != nil {
-		otherAuraID := at.onPeriodicDamageIDs[0]
-		at.onPeriodicDamageIDs[0] = newAura.ID
-		at.onPeriodicDamageIDs[len(at.onPeriodicDamageIDs)-1] = otherAuraID
-		at.auras[otherAuraID].onPeriodicDamageIndex = newAura.onPeriodicDamageIndex
-		newAura.onPeriodicDamageIndex = 0
+	if aura.OnPeriodicDamage != nil {
+		otherAura := aura.tracker.onPeriodicDamageAuras[0]
+		aura.tracker.onPeriodicDamageAuras[0] = aura
+		aura.tracker.onPeriodicDamageAuras[len(aura.tracker.onPeriodicDamageAuras)-1] = otherAura
+		otherAura.onPeriodicDamageIndex = aura.onPeriodicDamageIndex
+		aura.onPeriodicDamageIndex = Inactive
 	}
 }
 
 // Remove an aura by its ID
-func (at *auraTracker) RemoveAura(sim *Simulation, id AuraID) {
-	aura := &at.auras[id]
-
-	if aura.ID == 0 {
-		// rarely happens if advance() triggers actions that result in RemoveAura() calls
+func (aura *Aura) Deactivate(sim *Simulation) {
+	if !aura.active {
 		return
 	}
 
+	if aura.Stacks != 0 {
+		aura.SetStacks(sim, 0)
+	}
 	if aura.OnExpire != nil {
-		aura.OnExpire(sim)
+		aura.OnExpire(aura, sim)
 	}
 
 	if !aura.ActionID.IsEmptyAction() {
 		if sim.CurrentTime > aura.expires {
-			at.AddAuraUptime(id, aura.ActionID, aura.expires-aura.startTime)
+			aura.tracker.AddAuraUptime(id, aura.ActionID, aura.expires-aura.startTime)
 		} else {
-			at.AddAuraUptime(id, aura.ActionID, sim.CurrentTime-aura.startTime)
+			aura.tracker.AddAuraUptime(id, aura.ActionID, sim.CurrentTime-aura.startTime)
 		}
 	}
 
 	if sim.Log != nil && !aura.ActionID.IsEmptyAction() {
-		at.logFn("Aura faded: %s", aura.ActionID)
+		aura.Unit.Log(sim, "Aura faded: %s", aura.ActionID)
 	}
 
 	if aura.Duration != NeverExpires {
 		removeActiveIndex := aura.activeIndex
-		at.activeAuraIDs = removeBySwappingToBack(at.activeAuraIDs, removeActiveIndex)
-		if removeActiveIndex < int32(len(at.activeAuraIDs)) {
-			at.auras[at.activeAuraIDs[removeActiveIndex]].activeIndex = removeActiveIndex
+		aura.tracker.activeAuras = removeBySwappingToBack(aura.tracker.activeAuras, removeActiveIndex)
+		if removeActiveIndex < int32(len(aura.tracker.activeAuras)) {
+			aura.tracker.activeAuras[removeActiveIndex].activeIndex = removeActiveIndex
 		}
 	}
 
 	if aura.OnCastComplete != nil {
 		removeOnCastCompleteIndex := aura.onCastCompleteIndex
-		at.onCastCompleteIDs = removeBySwappingToBack(at.onCastCompleteIDs, removeOnCastCompleteIndex)
-		if removeOnCastCompleteIndex < int32(len(at.onCastCompleteIDs)) {
-			at.auras[at.onCastCompleteIDs[removeOnCastCompleteIndex]].onCastCompleteIndex = removeOnCastCompleteIndex
+		aura.tracker.onCastCompleteAuras = removeBySwappingToBack(aura.tracker.onCastCompleteAuras, removeOnCastCompleteIndex)
+		if removeOnCastCompleteIndex < int32(len(aura.tracker.onCastCompleteAuras)) {
+			aura.tracker.onCastCompleteAuras[removeOnCastCompleteIndex].onCastCompleteIndex = removeOnCastCompleteIndex
 		}
 	}
 
 	if aura.OnSpellHit != nil {
 		removeOnSpellHitIndex := aura.onSpellHitIndex
-		at.onSpellHitIDs = removeBySwappingToBack(at.onSpellHitIDs, removeOnSpellHitIndex)
-		if removeOnSpellHitIndex < int32(len(at.onSpellHitIDs)) {
-			at.auras[at.onSpellHitIDs[removeOnSpellHitIndex]].onSpellHitIndex = removeOnSpellHitIndex
+		aura.tracker.onSpellHitAuras = removeBySwappingToBack(aura.tracker.onSpellHitAuras, removeOnSpellHitIndex)
+		if removeOnSpellHitIndex < int32(len(aura.tracker.onSpellHitAuras)) {
+			aura.tracker.onSpellHitAuras[removeOnSpellHitIndex].onSpellHitIndex = removeOnSpellHitIndex
 		}
 	}
 
 	if aura.OnPeriodicDamage != nil {
 		removeOnPeriodicDamage := aura.onPeriodicDamageIndex
-		at.onPeriodicDamageIDs = removeBySwappingToBack(at.onPeriodicDamageIDs, removeOnPeriodicDamage)
-		if removeOnPeriodicDamage < int32(len(at.onPeriodicDamageIDs)) {
-			at.auras[at.onPeriodicDamageIDs[removeOnPeriodicDamage]].onPeriodicDamageIndex = removeOnPeriodicDamage
+		aura.tracker.onPeriodicDamageAuras = removeBySwappingToBack(aura.tracker.onPeriodicDamageAuras, removeOnPeriodicDamage)
+		if removeOnPeriodicDamage < int32(len(aura.tracker.onPeriodicDamageAuras)) {
+			aura.tracker.onPeriodicDamageAuras[removeOnPeriodicDamage].onPeriodicDamageIndex = removeOnPeriodicDamage
 		}
 	}
 
-	at.auras[id] = Aura{}
-}
-
-// Registers an ID to be added on the next advance() call. This is used instead
-// of AddAura() when calling from inside a callback like OnSpellHit() to avoid
-// modifying auraTracker arrays while they are being looped over.
-func (at *auraTracker) AddAuraOnNextAdvance(sim *Simulation, aura Aura) {
-	at.aurasToAdd = append(at.aurasToAdd, aura)
-}
-
-// Registers an ID to be removed on the next advance() call. This is used instead
-// of RemoveAura() when calling from inside a callback like OnSpellHit() to avoid
-// modifying auraTracker arrays while they are being looped over.
-func (at *auraTracker) RemoveAuraOnNextAdvance(sim *Simulation, id AuraID) {
-	at.auraIDsToRemove = append(at.auraIDsToRemove, id)
+	aura.active = false
 }
 
 // Constant-time removal from slice by swapping with the last element before removing.
-func removeBySwappingToBack(arr []AuraID, removeIdx int32) []AuraID {
+func removeBySwappingToBack(arr []*Aura, removeIdx int32) []*Aura {
 	arr[removeIdx] = arr[len(arr)-1]
 	return arr[:len(arr)-1]
-}
-
-// Returns whether an aura with the given ID is currently active.
-func (at *auraTracker) HasAura(id AuraID) bool {
-	return at.auras[id].ID != 0
-}
-
-func (at *auraTracker) NumStacks(id AuraID) int32 {
-	if at.HasAura(id) {
-		return at.auras[id].Stacks
-	} else {
-		return 0
-	}
-}
-
-func (at *auraTracker) SetStacks(sim *Simulation, id AuraID, newStacks int32) {
-	if at.HasAura(id) {
-		aura := &at.auras[id]
-		oldStacks := aura.Stacks
-		aura.Stacks = MinInt32(newStacks, aura.MaxStacks)
-		if aura.OnStacksChange != nil {
-			aura.OnStacksChange(sim, oldStacks, newStacks)
-		}
-	} else {
-		panic("No aura found to set stacks")
-	}
-}
-
-func (at *auraTracker) RefreshAura(sim *Simulation, id AuraID) {
-	if aura := &at.auras[id]; aura.ID != 0 {
-		aura.refresh(sim)
-	}
-}
-
-func (at *auraTracker) UpdateExpires(id AuraID, newExpires time.Duration) {
-	if aura := &at.auras[id]; aura.ID != 0 {
-		aura.expires = newExpires
-	}
-}
-
-func (at *auraTracker) RemainingAuraDuration(sim *Simulation, id AuraID) time.Duration {
-	if at.HasAura(id) {
-		expires := at.auras[id].expires
-		if expires == NeverExpires {
-			return NeverExpires
-		} else {
-			return expires - sim.CurrentTime
-		}
-	} else {
-		return 0
-	}
-}
-
-func (at *auraTracker) AuraExpiresAt(id AuraID) time.Duration {
-	if at.HasAura(id) {
-		return at.auras[id].expires
-	} else {
-		return 0
-	}
 }
 
 func (at *auraTracker) IsOnCD(id CooldownID, currentTime time.Duration) bool {
@@ -551,15 +517,15 @@ func (at *auraTracker) SetCD(id CooldownID, newCD time.Duration) {
 
 // Invokes the OnCastComplete event for all tracked Auras.
 func (at *auraTracker) OnCastComplete(sim *Simulation, cast *Cast) {
-	for _, id := range at.onCastCompleteIDs {
-		at.auras[id].OnCastComplete(sim, cast)
+	for _, aura := range at.onCastCompleteAuras {
+		aura.OnCastComplete(sim, cast)
 	}
 }
 
 // Invokes the OnSpellHit event for all tracked Auras.
 func (at *auraTracker) OnSpellHit(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
-	for _, id := range at.onSpellHitIDs {
-		at.auras[id].OnSpellHit(sim, spell, spellEffect)
+	for _, aura := range at.onSpellHitAuras {
+		aura.OnSpellHit(sim, spell, spellEffect)
 	}
 }
 
@@ -567,12 +533,12 @@ func (at *auraTracker) OnSpellHit(sim *Simulation, spell *Spell, spellEffect *Sp
 //   As a debuff when target is being hit by dot.
 //   As a buff when caster's dots are ticking.
 func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spell *Spell, spellEffect *SpellEffect, tickDamage float64) {
-	for _, id := range at.onPeriodicDamageIDs {
-		at.auras[id].OnPeriodicDamage(sim, spell, spellEffect, tickDamage)
+	for _, aura := range at.onPeriodicDamageAuras {
+		aura.OnPeriodicDamage(sim, spell, spellEffect, tickDamage)
 	}
 }
 
-func (at *auraTracker) AddAuraUptime(auraID AuraID, actionID ActionID, uptime time.Duration) {
+func (at *auraTracker) AddAuraUptime(aura *Aura, actionID ActionID, uptime time.Duration) {
 	metrics := &at.metrics[auraID]
 
 	metrics.ID = actionID
@@ -580,11 +546,11 @@ func (at *auraTracker) AddAuraUptime(auraID AuraID, actionID ActionID, uptime ti
 }
 
 func (at *auraTracker) GetMetricsProto(numIterations int32) []*proto.AuraMetrics {
-	metrics := make([]*proto.AuraMetrics, 0, len(at.metrics))
+	metrics := make([]*proto.AuraMetrics, 0, len(at.auras))
 
-	for _, auraMetric := range at.metrics {
-		if !auraMetric.ID.IsEmptyAction() {
-			metrics = append(metrics, auraMetric.ToProto(numIterations))
+	for _, aura := range at.auras {
+		if !aura.metrics.ID.IsEmptyAction() {
+			metrics = append(metrics, aura.metrics.ToProto(numIterations))
 		}
 	}
 
@@ -606,39 +572,26 @@ func NewICD() InternalCD {
 	return InternalCD(0)
 }
 
-// NewTemporaryStatsAuraApplier creates an application function for applying temp stats.
-//  This is higher performance because it creates a cached Aura object in its closure.
-func (character *Character) NewTemporaryStatsAuraApplier(auraID AuraID, actionID ActionID, tempStats stats.Stats, duration time.Duration) func(sim *Simulation) {
-	factory := character.NewTemporaryStatsAuraFactory(auraID, actionID, tempStats, duration)
-
-	return func(sim *Simulation) {
-		character.ReplaceAura(sim, factory(sim))
-	}
-}
-
-func (character *Character) NewTemporaryStatsAuraFactory(auraID AuraID, actionID ActionID, tempStats stats.Stats, duration time.Duration) func(sim *Simulation) Aura {
+// Helper for the common case of making an aura that adds stats.
+func (character *Character) NewTemporaryStatsAura(auraLabel string, actionID ActionID, tempStats stats.Stats, duration time.Duration) *Aura {
 	buffs := character.ApplyStatDependencies(tempStats)
 	unbuffs := buffs.Multiply(-1)
 
-	aura := Aura{
-		ID:       auraID,
+	return character.RegisterAura(&Aura{
+		Label:    auraLabel,
 		ActionID: actionID,
 		Duration: duration,
-		OnGain: func(sim *Simulation) {
+		OnGain: func(aura *Aura, sim *Simulation) {
 			character.AddStatsDynamic(sim, buffs)
 			if sim.Log != nil {
 				character.Log(sim, "Gained %s from %s.", buffs.FlatString(), actionID)
 			}
 		},
-		OnExpire: func(sim *Simulation) {
+		OnExpire: func(aura *Aura, sim *Simulation) {
 			if sim.Log != nil {
 				character.Log(sim, "Lost %s from fading %s.", buffs.FlatString(), actionID)
 			}
 			character.AddStatsDynamic(sim, unbuffs)
 		},
-	}
-
-	return func(sim *Simulation) Aura {
-		return aura
-	}
+	})
 }

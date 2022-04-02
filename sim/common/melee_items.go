@@ -688,10 +688,10 @@ func ApplyWarpSlicer(agent core.Agent) {
 		ID:       WarpSlicerProcAuraID,
 		ActionID: core.ActionID{ItemID: 30311},
 		Duration: time.Second * 30,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			character.MultiplyMeleeSpeed(sim, bonus)
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			character.MultiplyMeleeSpeed(sim, inverseBonus)
 		},
 	}
@@ -727,10 +727,10 @@ func ApplyDevastation(agent core.Agent) {
 		ID:       DevastationProcAuraID,
 		ActionID: core.ActionID{ItemID: 30316},
 		Duration: time.Second * 30,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			character.MultiplyMeleeSpeed(sim, bonus)
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			character.MultiplyMeleeSpeed(sim, inverseBonus)
 		},
 	}
@@ -892,10 +892,10 @@ func ApplyTheNightBlade(agent core.Agent) {
 				ID:       TheNightBladeProcAuraID,
 				ActionID: core.ActionID{ItemID: 31331},
 				Duration: time.Second * 10,
-				OnGain: func(sim *core.Simulation) {
+				OnGain: func(aura *core.Aura, sim *core.Simulation) {
 					character.AddStat(stats.ArmorPenetration, bonus)
 				},
-				OnExpire: func(sim *core.Simulation) {
+				OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 					character.AddStat(stats.ArmorPenetration, -bonus)
 				},
 			}

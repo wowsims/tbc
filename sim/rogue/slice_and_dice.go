@@ -35,10 +35,10 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 	sliceAndDiceAura := core.Aura{
 		ID:       SliceAndDiceAuraID,
 		ActionID: SliceAndDiceActionID,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, hasteBonus)
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
 		},
 	}

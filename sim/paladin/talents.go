@@ -87,10 +87,10 @@ func (paladin *Paladin) applyVengeance() {
 			ActionID: VengeanceActionID,
 			Duration: VengeanceDuration,
 			Stacks:   numStacks,
-			OnGain: func(sim *core.Simulation) {
+			OnGain: func(aura *core.Aura, sim *core.Simulation) {
 				paladin.PseudoStats.DamageDealtMultiplier *= multiplier
 			},
-			OnExpire: func(sim *core.Simulation) {
+			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 				paladin.PseudoStats.DamageDealtMultiplier /= multiplier
 			},
 		}

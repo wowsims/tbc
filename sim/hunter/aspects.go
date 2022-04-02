@@ -21,10 +21,10 @@ func (hunter *Hunter) aspectOfTheHawkAura(sim *core.Simulation) core.Aura {
 		ID:       ImprovedAspectOfTheHawkAuraID,
 		ActionID: core.ActionID{SpellID: 19556},
 		Duration: time.Second * 12,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			hunter.PseudoStats.RangedSpeedMultiplier *= improvedHawkBonus
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			hunter.PseudoStats.RangedSpeedMultiplier /= improvedHawkBonus
 		},
 	}

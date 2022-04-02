@@ -171,7 +171,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 			ID:       AuraOfTheCrusadeMeleeAuraID,
 			ActionID: core.ActionID{ItemID: 31856, Tag: 1},
 			Duration: time.Second * 10,
-			OnExpire: func(sim *core.Simulation) {
+			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 				character.AddStat(stats.AttackPower, -meleeBonus*float64(meleeStacks))
 				character.AddStat(stats.RangedAttackPower, -meleeBonus*float64(meleeStacks))
 				meleeStacks = 0
@@ -182,7 +182,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 			ID:       AuraOfTheCrusadeSpellAuraID,
 			ActionID: core.ActionID{ItemID: 31856, Tag: 2},
 			Duration: time.Second * 10,
-			OnExpire: func(sim *core.Simulation) {
+			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 				character.AddStat(stats.SpellPower, -spellBonus*float64(spellStacks))
 				spellStacks = 0
 			},

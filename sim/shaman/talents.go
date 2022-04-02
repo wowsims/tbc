@@ -154,10 +154,10 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 					ID:       ElementalMasteryAuraID,
 					ActionID: actionID,
 					Duration: core.NeverExpires,
-					OnGain: func(sim *core.Simulation) {
+					OnGain: func(aura *core.Aura, sim *core.Simulation) {
 						shaman.AddStat(stats.SpellCrit, 100*core.SpellCritRatingPerCritChance)
 					},
-					OnExpire: func(sim *core.Simulation) {
+					OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 						shaman.AddStat(stats.SpellCrit, -100*core.SpellCritRatingPerCritChance)
 					},
 					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -258,10 +258,10 @@ func (shaman *Shaman) applyUnleashedRage() {
 							ID:       UnleashedRageProcAuraID,
 							ActionID: core.ActionID{SpellID: 30811},
 							Duration: time.Second * 10,
-							OnGain: func(sim *core.Simulation) {
+							OnGain: func(aura *core.Aura, sim *core.Simulation) {
 								char.AddStats(buffs)
 							},
-							OnExpire: func(sim *core.Simulation) {
+							OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 								char.AddStats(unbuffs)
 							},
 						}
@@ -347,10 +347,10 @@ func (shaman *Shaman) applyFlurry() {
 							ID:       FlurryProcAuraID,
 							ActionID: core.ActionID{SpellID: 16280},
 							Duration: core.NeverExpires,
-							OnGain: func(sim *core.Simulation) {
+							OnGain: func(aura *core.Aura, sim *core.Simulation) {
 								shaman.MultiplyMeleeSpeed(sim, bonus)
 							},
-							OnExpire: func(sim *core.Simulation) {
+							OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 								shaman.MultiplyMeleeSpeed(sim, inverseBonus)
 							},
 						})

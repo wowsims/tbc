@@ -149,11 +149,11 @@ func (priest *Priest) ApplyInnerFocus(sim *core.Simulation) {
 		ID:       InnerFocusAuraID,
 		ActionID: actionID,
 		Duration: core.NeverExpires,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			priest.AddStat(stats.SpellCrit, 25*core.SpellCritRatingPerCritChance)
 			priest.PseudoStats.NoCost = true
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			priest.AddStat(stats.SpellCrit, -25*core.SpellCritRatingPerCritChance)
 			priest.PseudoStats.NoCost = false
 		},

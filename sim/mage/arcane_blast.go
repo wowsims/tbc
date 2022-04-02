@@ -17,7 +17,7 @@ func (mage *Mage) registerArcaneBlastSpell(sim *core.Simulation) {
 		ActionID: core.ActionID{SpellID: 36032},
 		Duration: time.Second * 8,
 		Stacks:   0,
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			// Reset the mana cost on expiration.
 			if mage.ArcaneBlast.Instance.IsInUse() {
 				mage.ArcaneBlast.Instance.Cost.Value = core.MaxFloat(0, mage.ArcaneBlast.Instance.Cost.Value-3.0*ArcaneBlastBaseManaCost*0.75)

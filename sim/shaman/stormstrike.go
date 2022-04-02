@@ -19,10 +19,10 @@ func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) core.Aura {
 		ActionID: StormstrikeActionID,
 		Duration: time.Second * 12,
 		Stacks:   2,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			target.PseudoStats.NatureDamageTakenMultiplier *= 1.2
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			target.PseudoStats.NatureDamageTakenMultiplier /= 1.2
 		},
 	}

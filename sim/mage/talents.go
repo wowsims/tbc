@@ -82,11 +82,11 @@ func (mage *Mage) applyArcaneConcentration() {
 			ID:       ClearcastingAuraID,
 			ActionID: core.ActionID{SpellID: 12536},
 			Duration: time.Second * 15,
-			OnGain: func(sim *core.Simulation) {
+			OnGain: func(aura *core.Aura, sim *core.Simulation) {
 				mage.AddStat(stats.SpellCrit, bonusCrit)
 				mage.PseudoStats.NoCost = true
 			},
-			OnExpire: func(sim *core.Simulation) {
+			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 				mage.AddStat(stats.SpellCrit, -bonusCrit)
 				mage.PseudoStats.NoCost = false
 			},
@@ -229,11 +229,11 @@ func (mage *Mage) registerArcanePowerCD() {
 					ID:       ArcanePowerAuraID,
 					ActionID: actionID,
 					Duration: time.Second * 15,
-					OnGain: func(sim *core.Simulation) {
+					OnGain: func(aura *core.Aura, sim *core.Simulation) {
 						mage.PseudoStats.DamageDealtMultiplier *= 1.3
 						mage.PseudoStats.CostMultiplier *= 1.3
 					},
-					OnExpire: func(sim *core.Simulation) {
+					OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 						mage.PseudoStats.DamageDealtMultiplier /= 1.3
 						mage.PseudoStats.CostMultiplier /= 1.3
 					},
@@ -379,13 +379,13 @@ func (mage *Mage) registerIcyVeinsCD() {
 					ID:       IcyVeinsAuraID,
 					ActionID: actionID,
 					Duration: time.Second * 20,
-					OnGain: func(sim *core.Simulation) {
+					OnGain: func(aura *core.Aura, sim *core.Simulation) {
 						character.PseudoStats.CastSpeedMultiplier *= bonus
 						character.SpendMana(sim, manaCost, actionID)
 						character.Metrics.AddInstantCast(actionID)
 						character.SetCD(IcyVeinsCooldownID, sim.CurrentTime+time.Minute*3)
 					},
-					OnExpire: func(sim *core.Simulation) {
+					OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 						character.PseudoStats.CastSpeedMultiplier *= inverseBonus
 					},
 				})

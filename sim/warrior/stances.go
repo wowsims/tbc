@@ -66,10 +66,10 @@ func (warrior *Warrior) BattleStanceAura() core.Aura {
 		ID:       BattleStanceAuraID,
 		ActionID: actionID,
 		Duration: core.NeverExpires,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			warrior.PseudoStats.ThreatMultiplier *= threatMult
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			warrior.PseudoStats.ThreatMultiplier /= threatMult
 		},
 	}
@@ -83,11 +83,11 @@ func (warrior *Warrior) DefensiveStanceAura() core.Aura {
 		ID:       DefensiveStanceAuraID,
 		ActionID: actionID,
 		Duration: core.NeverExpires,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			warrior.PseudoStats.ThreatMultiplier *= threatMult
 			warrior.PseudoStats.DamageDealtMultiplier *= 0.9
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			warrior.PseudoStats.ThreatMultiplier /= threatMult
 			warrior.PseudoStats.DamageDealtMultiplier /= 0.9
 		},
@@ -102,11 +102,11 @@ func (warrior *Warrior) BerserkerStanceAura() core.Aura {
 		ID:       BerserkerStanceAuraID,
 		ActionID: core.ActionID{SpellID: 2458},
 		Duration: core.NeverExpires,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			warrior.PseudoStats.ThreatMultiplier *= threatMult
 			warrior.AddStat(stats.MeleeCrit, critBonus)
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			warrior.PseudoStats.ThreatMultiplier /= threatMult
 			warrior.AddStat(stats.MeleeCrit, -critBonus)
 		},

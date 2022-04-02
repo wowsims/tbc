@@ -73,10 +73,10 @@ var ItemSetCycloneRegalia = core.ItemSet{
 						character.AddAura(sim, core.Aura{
 							ID:       Cyclone4PcManaRegainAuraID,
 							Duration: time.Second * 15,
-							OnGain: func(sim *core.Simulation) {
+							OnGain: func(aura *core.Aura, sim *core.Simulation) {
 								character.PseudoStats.CostReduction += 270
 							},
-							OnExpire: func(sim *core.Simulation) {
+							OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 								character.PseudoStats.CostReduction -= 270
 							},
 							OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
@@ -169,11 +169,11 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 					ID:       NaturalAlignmentCrystalAuraID,
 					ActionID: actionID,
 					Duration: dur,
-					OnGain: func(sim *core.Simulation) {
+					OnGain: func(aura *core.Aura, sim *core.Simulation) {
 						character.AddStat(stats.SpellPower, sp)
 						character.PseudoStats.CostMultiplier *= 1.2
 					},
-					OnExpire: func(sim *core.Simulation) {
+					OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 						character.AddStat(stats.SpellPower, -sp)
 						character.PseudoStats.CostMultiplier /= 1.2
 					},

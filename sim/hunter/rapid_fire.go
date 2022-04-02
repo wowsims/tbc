@@ -18,10 +18,10 @@ func (hunter *Hunter) registerRapidFireCD() {
 		ID:       RapidFireAuraID,
 		ActionID: actionID,
 		Duration: time.Second * 15,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			hunter.PseudoStats.RangedSpeedMultiplier *= 1.4
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			hunter.PseudoStats.RangedSpeedMultiplier /= 1.4
 		},
 	}

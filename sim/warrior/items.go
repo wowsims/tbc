@@ -50,10 +50,10 @@ var ItemSetWarbringerArmor = core.ItemSet{
 				ID:       WarbringerArmor4PcProcAuraID,
 				ActionID: core.ActionID{SpellID: 37516},
 				Duration: core.NeverExpires,
-				OnGain: func(sim *core.Simulation) {
+				OnGain: func(aura *core.Aura, sim *core.Simulation) {
 					character.PseudoStats.DamageDealtMultiplier *= 1.1
 				},
-				OnExpire: func(sim *core.Simulation) {
+				OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 					character.PseudoStats.DamageDealtMultiplier /= 1.1
 				},
 				OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
