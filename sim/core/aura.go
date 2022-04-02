@@ -40,8 +40,17 @@ var GCDCooldownID = NewCooldownID()
 var OffensiveTrinketSharedCooldownID = NewCooldownID()
 var DefensiveTrinketSharedCooldownID = NewCooldownID()
 
-type OnGain func(sim *Simulation)
-type OnExpire func(sim *Simulation)
+type OnGain func(aura *Aura, sim *Simulation)
+type OnExpire func(aura *Aura, sim *Simulation)
+type OnStacksChange func(aura *Aura, sim *Simulation, oldStacks int32, newStacks int32)
+
+// Aura lifecycle:
+//
+// myAura = &Aura{ ... }
+// character.RegisterAura(myAura)
+// myAura.SetStacks(sim, 3)
+// myAura.Refresh(sim)
+// myAura.Deactivate(sim)
 
 type Aura struct {
 	ID       AuraID
@@ -59,7 +68,8 @@ type Aura struct {
 
 	// The number of stacks, or charges, of this aura. If this aura doesn't care
 	// about charges, is just 0.
-	Stacks int32
+	Stacks    int32
+	MaxStacks int32
 
 	// Invoked when a spell cast completes casting, before results are calculated.
 	OnCastComplete OnCastComplete
@@ -71,6 +81,9 @@ type Aura struct {
 	// Invoked when this Aura is added/remvoed. Neither is invoked on refresh.
 	OnGain   OnGain
 	OnExpire OnExpire
+
+	// Invoked when the number of stacks of this aura changes.
+	OnStacksChange OnStacksChange
 
 	// Invoked when a dot tick occurs, after damage is calculated.
 	OnPeriodicDamage OnPeriodicDamage
@@ -468,6 +481,19 @@ func (at *auraTracker) NumStacks(id AuraID) int32 {
 		return at.auras[id].Stacks
 	} else {
 		return 0
+	}
+}
+
+func (at *auraTracker) SetStacks(sim *Simulation, id AuraID, newStacks int32) {
+	if at.HasAura(id) {
+		aura := &at.auras[id]
+		oldStacks := aura.Stacks
+		aura.Stacks = MinInt32(newStacks, aura.MaxStacks)
+		if aura.OnStacksChange != nil {
+			aura.OnStacksChange(sim, oldStacks, newStacks)
+		}
+	} else {
+		panic("No aura found to set stacks")
 	}
 }
 

@@ -150,10 +150,11 @@ func ShadowWeavingAura(target *Target, numStacks int32) Aura {
 	multiplier := 1.0 + 0.02*float64(numStacks)
 
 	return Aura{
-		ID:       ShadowWeavingAuraID,
-		ActionID: ActionID{SpellID: 15334},
-		Duration: time.Second * 15,
-		Stacks:   numStacks,
+		ID:        ShadowWeavingAuraID,
+		ActionID:  ActionID{SpellID: 15334},
+		Duration:  time.Second * 15,
+		Stacks:    numStacks,
+		MaxStacks: 5,
 		OnGain: func(sim *Simulation) {
 			target.PseudoStats.ShadowDamageTakenMultiplier *= multiplier
 		},
@@ -254,8 +255,9 @@ func ImprovedShadowBoltAura(target *Target, uptime float64) Aura {
 	multiplier := (1 + uptime*0.2)
 
 	return Aura{
-		ID:       ImprovedShadowBoltID,
-		ActionID: ActionID{SpellID: 17803},
+		ID:        ImprovedShadowBoltID,
+		ActionID:  ActionID{SpellID: 17803},
+		MaxStacks: 4,
 		OnGain: func(sim *Simulation) {
 			target.PseudoStats.ShadowDamageTakenMultiplier *= multiplier
 		},
@@ -301,10 +303,11 @@ func ImprovedScorchAura(target *Target, numStacks int32) Aura {
 	multiplier := 1.0 + 0.03*float64(numStacks)
 
 	return Aura{
-		ID:       ImprovedScorchAuraID,
-		ActionID: ActionID{SpellID: 12873},
-		Duration: time.Second * 30,
-		Stacks:   numStacks,
+		ID:        ImprovedScorchAuraID,
+		ActionID:  ActionID{SpellID: 12873},
+		Duration:  time.Second * 30,
+		Stacks:    numStacks,
+		MaxStacks: 5,
 		OnGain: func(sim *Simulation) {
 			target.PseudoStats.FireDamageTakenMultiplier *= multiplier
 		},
@@ -320,10 +323,11 @@ func WintersChillAura(target *Target, numStacks int32) Aura {
 	bonusCrit := 2 * float64(numStacks) * SpellCritRatingPerCritChance
 
 	return Aura{
-		ID:       WintersChillAuraID,
-		ActionID: ActionID{SpellID: 28595},
-		Duration: time.Second * 15,
-		Stacks:   numStacks,
+		ID:        WintersChillAuraID,
+		ActionID:  ActionID{SpellID: 28595},
+		Duration:  time.Second * 15,
+		Stacks:    numStacks,
+		MaxStacks: 5,
 		OnGain: func(sim *Simulation) {
 			target.PseudoStats.BonusFrostCritRating += bonusCrit
 		},
@@ -364,9 +368,11 @@ func SunderArmorAura(target *Target, stacks int32) Aura {
 	armorReduction := 520.0 * float64(stacks)
 
 	return Aura{
-		ID:       SunderArmorAuraID,
-		ActionID: ActionID{SpellID: 25225},
-		Duration: time.Second * 30,
+		ID:        SunderArmorAuraID,
+		ActionID:  ActionID{SpellID: 25225},
+		Duration:  time.Second * 30,
+		Stacks:    stacks,
+		MaxStacks: 5,
 		OnGain: func(sim *Simulation) {
 			target.AddStat(stats.Armor, -armorReduction)
 		},
