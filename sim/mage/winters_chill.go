@@ -30,11 +30,11 @@ func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 		}
 
 		// Don't overwrite the permanent version.
-		if spellEffect.Target.RemainingAuraDuration(sim, core.WintersChillDebuffID) == core.NeverExpires {
+		if spellEffect.Target.RemainingAuraDuration(sim, core.WintersChillAuraID) == core.NeverExpires {
 			return
 		}
 
-		newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.WintersChillDebuffID)+1)
+		newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.WintersChillAuraID)+1)
 		spellEffect.Target.AddAura(sim, core.WintersChillAura(spellEffect.Target, newNumStacks))
 	}
 

@@ -11,7 +11,7 @@ import (
 const SpellIDHurricane int32 = 27012
 
 var HurricaneCooldownID = core.NewCooldownID()
-var HurricaneDebuffID = core.NewDebuffID()
+var HurricaneAuraID = core.NewAuraID()
 
 func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 	template := core.SimpleSpell{
@@ -47,7 +47,7 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 			NumberOfTicks:       10,
 			TickLength:          time.Second * 1,
 			TickBaseDamage:      core.DotSnapshotFuncMagic(206, 0.107),
-			DebuffID:            HurricaneDebuffID,
+			AuraID:              HurricaneAuraID,
 			AffectedByCastSpeed: true,
 		},
 	}

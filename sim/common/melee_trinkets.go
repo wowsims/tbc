@@ -19,255 +19,9 @@ func init() {
 	core.AddItemEffect(30627, ApplyTsunamiTalisman)
 	core.AddItemEffect(31857, ApplyDarkmoonCardWrath)
 	core.AddItemEffect(32505, ApplyMadnessOfTheBetrayer)
+	core.AddItemEffect(32654, ApplyCrystalforgedTrinket)
 	core.AddItemEffect(34427, ApplyBlackenedNaaruSliver)
 	core.AddItemEffect(34472, ApplyShardOfContempt)
-
-	// Activatable effects. Keep these in order by item ID.
-	var KissOfTheSpiderAuraID = core.NewAuraID()
-	var KissOfTheSpiderCooldownID = core.NewCooldownID()
-	core.AddItemEffect(22954, core.MakeTemporaryStatsOnUseCDRegistration(
-		KissOfTheSpiderAuraID,
-		stats.Stats{stats.MeleeHaste: 200},
-		time.Second*15,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 22954},
-			CooldownID:       KissOfTheSpiderCooldownID,
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
-
-	var SlayersCrestAuraID = core.NewAuraID()
-	var SlayersCrestCooldownID = core.NewCooldownID()
-	core.AddItemEffect(23041, core.MakeTemporaryStatsOnUseCDRegistration(
-		SlayersCrestAuraID,
-		stats.Stats{stats.AttackPower: 260, stats.RangedAttackPower: 260},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 23041},
-			CooldownID:       SlayersCrestCooldownID,
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
-
-	var FigurineNightseyePantherAuraID = core.NewAuraID()
-	var FigurineNightseyePantherCooldownID = core.NewCooldownID()
-	core.AddItemEffect(24128, core.MakeTemporaryStatsOnUseCDRegistration(
-		FigurineNightseyePantherAuraID,
-		stats.Stats{stats.AttackPower: 320, stats.RangedAttackPower: 320},
-		time.Second*12,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 24128},
-			CooldownID:       FigurineNightseyePantherCooldownID,
-			Cooldown:         time.Minute * 3,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
-
-	// Adamantine Figurine
-	core.AddItemEffect(27891, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.NewAuraID(),
-		stats.Stats{stats.Armor: 1280},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 27891},
-			CooldownID:       core.NewCooldownID(),
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
-		},
-	))
-
-	var BladefistsBreadthAuraID = core.NewAuraID()
-	var BladefistsBreadthCooldownID = core.NewCooldownID()
-	core.AddItemEffect(28041, core.MakeTemporaryStatsOnUseCDRegistration(
-		BladefistsBreadthAuraID,
-		stats.Stats{stats.AttackPower: 200, stats.RangedAttackPower: 200},
-		time.Second*15,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 28041},
-			CooldownID:       BladefistsBreadthCooldownID,
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
-
-	var IconOfUnyieldingCourageAuraID = core.NewAuraID()
-	var IconOfUnyieldingCourageCooldownID = core.NewCooldownID()
-	core.AddItemEffect(28121, core.MakeTemporaryStatsOnUseCDRegistration(
-		IconOfUnyieldingCourageAuraID,
-		stats.Stats{stats.ArmorPenetration: 600},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 28121},
-			CooldownID:       IconOfUnyieldingCourageCooldownID,
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
-
-	var AbacusViolentOddsAuraID = core.NewAuraID()
-	var AbacusViolentOddsCooldownID = core.NewCooldownID()
-	core.AddItemEffect(28288, core.MakeTemporaryStatsOnUseCDRegistration(
-		AbacusViolentOddsAuraID,
-		stats.Stats{stats.MeleeHaste: 260},
-		time.Second*10,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 28288},
-			CooldownID:       AbacusViolentOddsCooldownID,
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
-
-	// Moroes Lucky Pocket Watch
-	core.AddItemEffect(28528, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.NewAuraID(),
-		stats.Stats{stats.Dodge: 300},
-		time.Second*10,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 28528},
-			CooldownID:       core.NewCooldownID(),
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
-		},
-	))
-
-	var BloodlustBroochAuraID = core.NewAuraID()
-	var BloodlustBroochCooldownID = core.NewCooldownID()
-	core.AddItemEffect(29383, core.MakeTemporaryStatsOnUseCDRegistration(
-		BloodlustBroochAuraID,
-		stats.Stats{stats.AttackPower: 278, stats.RangedAttackPower: 278},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 29383},
-			CooldownID:       BloodlustBroochCooldownID,
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
-
-	// Gnomeregan Auto-Blocker 600
-	core.AddItemEffect(29387, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.NewAuraID(),
-		stats.Stats{stats.BlockValue: 200},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 29387},
-			CooldownID:       core.NewCooldownID(),
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
-		},
-	))
-
-	var CoreOfArkelosAuraID = core.NewAuraID()
-	var CoreOfArkelosCooldownID = core.NewCooldownID()
-	core.AddItemEffect(29776, core.MakeTemporaryStatsOnUseCDRegistration(
-		CoreOfArkelosAuraID,
-		stats.Stats{stats.AttackPower: 200, stats.RangedAttackPower: 200},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 29776},
-			CooldownID:       CoreOfArkelosCooldownID,
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
-
-	// Dabiris Enigma
-	core.AddItemEffect(30300, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.NewAuraID(),
-		stats.Stats{stats.Block: 125},
-		time.Second*15,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 30300},
-			CooldownID:       core.NewCooldownID(),
-			Cooldown:         time.Second * 90,
-			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
-		},
-	))
-
-	// Scarab of Displacement
-	core.AddItemEffect(30629, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.NewAuraID(),
-		stats.Stats{stats.Defense: 165, stats.AttackPower: -330, stats.RangedAttackPower: -330},
-		time.Second*15,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 30629},
-			CooldownID:       core.NewCooldownID(),
-			Cooldown:         time.Minute * 3,
-			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
-		},
-	))
-
-	// Shadowmoon Insignia
-	core.AddItemEffect(32501, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.NewAuraID(),
-		stats.Stats{stats.Health: 1750},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 32501},
-			CooldownID:       core.NewCooldownID(),
-			Cooldown:         time.Minute * 3,
-			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
-		},
-	))
-
-	// Brooch of the Immortal King
-	core.AddItemEffect(32534, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.NewAuraID(),
-		stats.Stats{stats.Health: 1250},
-		time.Second*15,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 32534},
-			CooldownID:       core.NewCooldownID(),
-			Cooldown:         time.Minute * 5,
-			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
-		},
-	))
-
-	core.AddItemEffect(32654, ApplyCrystalforgedTrinket)
-
-	var BadgeOfTenacityAuraID = core.NewAuraID()
-	var BadgeOfTenacityCooldownID = core.NewCooldownID()
-	core.AddItemEffect(32658, core.MakeTemporaryStatsOnUseCDRegistration(
-		BadgeOfTenacityAuraID,
-		stats.Stats{stats.Agility: 150},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 32658},
-			CooldownID:       BadgeOfTenacityCooldownID,
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
-
-	// Ancient Aqir Artifact
-	core.AddItemEffect(33830, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.NewAuraID(),
-		stats.Stats{stats.Armor: 2500},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 33830},
-			CooldownID:       core.NewCooldownID(),
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
-		},
-	))
-
-	var BerserkersCallAuraID = core.NewAuraID()
-	var BerserkersCallCooldownID = core.NewCooldownID()
-	core.AddItemEffect(33831, core.MakeTemporaryStatsOnUseCDRegistration(
-		BerserkersCallAuraID,
-		stats.Stats{stats.AttackPower: 360, stats.RangedAttackPower: 360},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 33831},
-			CooldownID:       BerserkersCallCooldownID,
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
 
 	// Battlemasters trinkets
 	sharedBattlemasterCooldownID := core.NewCooldownID()
@@ -290,46 +44,28 @@ func init() {
 	addBattlemasterEffect(34162)
 	addBattlemasterEffect(34163)
 
-	var FigurineShadowsongPantherAuraID = core.NewAuraID()
-	var FigurineShadowsongPantherCooldownID = core.NewCooldownID()
-	core.AddItemEffect(35702, core.MakeTemporaryStatsOnUseCDRegistration(
-		FigurineShadowsongPantherAuraID,
-		stats.Stats{stats.AttackPower: 320, stats.RangedAttackPower: 320},
-		time.Second*15,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 35702},
-			CooldownID:       FigurineShadowsongPantherCooldownID,
-			Cooldown:         time.Second * 90,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
-
-	var EmptyDirebrewMugAuraID = core.NewAuraID()
-	var EmptyDirebrewMugCooldownID = core.NewCooldownID()
-	core.AddItemEffect(38287, core.MakeTemporaryStatsOnUseCDRegistration(
-		EmptyDirebrewMugAuraID,
-		stats.Stats{stats.AttackPower: 278, stats.RangedAttackPower: 278},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 38287},
-			CooldownID:       EmptyDirebrewMugCooldownID,
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
-
-	// Coren's Lucky Coin
-	core.AddItemEffect(38289, core.MakeTemporaryStatsOnUseCDRegistration(
-		core.NewAuraID(),
-		stats.Stats{stats.BlockValue: 200},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 38289},
-			CooldownID:       core.NewCooldownID(),
-			Cooldown:         time.Minute * 2,
-			SharedCooldownID: core.DefensiveTrinketSharedCooldownID,
-		},
-	))
+	// Activatable effects. Keep these in order by item ID.
+	AddSimpleStatItemActiveEffect(22954, stats.Stats{stats.MeleeHaste: 200}, time.Second*15, time.Minute*2, core.OffensiveTrinketSharedCooldownID)                                                      // Kiss of the Spider
+	AddSimpleStatItemActiveEffect(23041, stats.Stats{stats.AttackPower: 260, stats.RangedAttackPower: 260}, time.Second*20, time.Minute*2, core.OffensiveTrinketSharedCooldownID)                       // Slayer's Crest
+	AddSimpleStatItemActiveEffect(24128, stats.Stats{stats.AttackPower: 320, stats.RangedAttackPower: 320}, time.Second*12, time.Minute*3, core.OffensiveTrinketSharedCooldownID)                       // Figurine Nightseye Panther
+	AddSimpleStatItemActiveEffect(27891, stats.Stats{stats.Armor: 1280}, time.Second*20, time.Minute*2, core.DefensiveTrinketSharedCooldownID)                                                          // Adamantine Figurine
+	AddSimpleStatItemActiveEffect(28041, stats.Stats{stats.AttackPower: 200, stats.RangedAttackPower: 200}, time.Second*15, time.Minute*2, core.OffensiveTrinketSharedCooldownID)                       // Bladefists Breadth
+	AddSimpleStatItemActiveEffect(28121, stats.Stats{stats.ArmorPenetration: 600}, time.Second*20, time.Minute*2, core.OffensiveTrinketSharedCooldownID)                                                // Icon of Unyielding Courage
+	AddSimpleStatItemActiveEffect(28288, stats.Stats{stats.MeleeHaste: 260}, time.Second*10, time.Minute*2, core.OffensiveTrinketSharedCooldownID)                                                      // Abacus of Violent Odds
+	AddSimpleStatItemActiveEffect(28528, stats.Stats{stats.Dodge: 300}, time.Second*10, time.Minute*2, core.DefensiveTrinketSharedCooldownID)                                                           // Moroes Lucky Pocket Watch
+	AddSimpleStatItemActiveEffect(29383, stats.Stats{stats.AttackPower: 278, stats.RangedAttackPower: 278}, time.Second*20, time.Minute*2, core.OffensiveTrinketSharedCooldownID)                       // Bloodlust Brooch
+	AddSimpleStatItemActiveEffect(29387, stats.Stats{stats.BlockValue: 200}, time.Second*20, time.Minute*2, core.DefensiveTrinketSharedCooldownID)                                                      // Gnomeregan Auto-Blocker 600
+	AddSimpleStatItemActiveEffect(29776, stats.Stats{stats.AttackPower: 200, stats.RangedAttackPower: 200}, time.Second*20, time.Minute*2, core.OffensiveTrinketSharedCooldownID)                       // Core of Arkelos
+	AddSimpleStatItemActiveEffect(30300, stats.Stats{stats.Block: 125}, time.Second*15, time.Second*90, core.DefensiveTrinketSharedCooldownID)                                                          // Dabiris Enigma
+	AddSimpleStatItemActiveEffect(30629, stats.Stats{stats.Defense: 165, stats.AttackPower: -330, stats.RangedAttackPower: -330}, time.Second*15, time.Minute*3, core.DefensiveTrinketSharedCooldownID) // Scarab of Displacement
+	AddSimpleStatItemActiveEffect(32501, stats.Stats{stats.Health: 1750}, time.Second*20, time.Minute*3, core.DefensiveTrinketSharedCooldownID)                                                         // Shadowmoon Insignia
+	AddSimpleStatItemActiveEffect(32534, stats.Stats{stats.Health: 1250}, time.Second*15, time.Minute*5, core.DefensiveTrinketSharedCooldownID)                                                         // Brooch of the Immortal King
+	AddSimpleStatItemActiveEffect(32658, stats.Stats{stats.Agility: 150}, time.Second*20, time.Minute*2, core.OffensiveTrinketSharedCooldownID)                                                         // Badge of Tenacity
+	AddSimpleStatItemActiveEffect(33830, stats.Stats{stats.Armor: 2500}, time.Second*20, time.Minute*2, core.DefensiveTrinketSharedCooldownID)                                                          // Ancient Aqir Artifact
+	AddSimpleStatItemActiveEffect(33831, stats.Stats{stats.AttackPower: 360, stats.RangedAttackPower: 360}, time.Second*20, time.Minute*2, core.OffensiveTrinketSharedCooldownID)                       // Berserkers Call
+	AddSimpleStatItemActiveEffect(35702, stats.Stats{stats.AttackPower: 320, stats.RangedAttackPower: 320}, time.Second*15, time.Second*90, core.OffensiveTrinketSharedCooldownID)                      // Figurine Shadowsong Panther
+	AddSimpleStatItemActiveEffect(38287, stats.Stats{stats.AttackPower: 278, stats.RangedAttackPower: 278}, time.Second*20, time.Minute*2, core.OffensiveTrinketSharedCooldownID)                       // Empty Direbrew Mug
+	AddSimpleStatItemActiveEffect(38289, stats.Stats{stats.BlockValue: 200}, time.Second*20, time.Minute*2, core.DefensiveTrinketSharedCooldownID)                                                      // Coren's Lucky Coin
 }
 
 var HandOfJusticeAuraID = core.NewAuraID()

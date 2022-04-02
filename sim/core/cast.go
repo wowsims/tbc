@@ -243,9 +243,6 @@ type SimpleCast struct {
 	Cast
 
 	OnCastComplete OnCastComplete
-
-	// Turns off metrics recording for this cast.
-	DisableMetrics bool
 }
 
 func (simpleCast *SimpleCast) Init(sim *Simulation) {
@@ -255,9 +252,7 @@ func (simpleCast *SimpleCast) Init(sim *Simulation) {
 // TODO: Need to rename this. Cant call it Cast() because of conflict with field of the same name.
 func (simpleCast *SimpleCast) StartCast(sim *Simulation) bool {
 	return simpleCast.Cast.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		if !simpleCast.DisableMetrics {
-			cast.Character.Metrics.AddCast(cast)
-		}
+		cast.Character.Metrics.AddCast(cast)
 		if simpleCast.OnCastComplete != nil {
 			simpleCast.OnCastComplete(sim, cast)
 		}

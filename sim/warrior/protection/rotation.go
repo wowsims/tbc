@@ -21,9 +21,9 @@ func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 			war.Revenge.Cast(sim, target)
 		} else if war.ShouldShout(sim) {
 			war.CastShout(sim)
-		} else if (war.Rotation.ThunderClap == proto.ProtectionWarrior_Rotation_ThunderClapOnCD || (war.Rotation.ThunderClap == proto.ProtectionWarrior_Rotation_ThunderClapMaintain && target.RemainingAuraDuration(sim, core.ThunderClapDebuffID) < time.Second*2)) && war.CanThunderClap(sim) {
+		} else if (war.Rotation.ThunderClap == proto.ProtectionWarrior_Rotation_ThunderClapOnCD || (war.Rotation.ThunderClap == proto.ProtectionWarrior_Rotation_ThunderClapMaintain && target.RemainingAuraDuration(sim, core.ThunderClapAuraID) < time.Second*2)) && war.CanThunderClap(sim) {
 			war.ThunderClap.Cast(sim, target)
-		} else if (war.Rotation.DemoShout == proto.ProtectionWarrior_Rotation_DemoShoutFiller || (war.Rotation.DemoShout == proto.ProtectionWarrior_Rotation_DemoShoutMaintain && target.RemainingAuraDuration(sim, core.DemoralizingShoutDebuffID) < time.Second*2)) && war.CanDemoralizingShout(sim) {
+		} else if (war.Rotation.DemoShout == proto.ProtectionWarrior_Rotation_DemoShoutFiller || (war.Rotation.DemoShout == proto.ProtectionWarrior_Rotation_DemoShoutMaintain && target.RemainingAuraDuration(sim, core.DemoralizingShoutAuraID) < time.Second*2)) && war.CanDemoralizingShout(sim) {
 			war.DemoralizingShout.Cast(sim, target)
 		} else if war.CanDevastate(sim) {
 			war.Devastate.Cast(sim, target)

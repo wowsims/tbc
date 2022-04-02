@@ -42,8 +42,8 @@ func (warrior *Warrior) registerSunderArmorSpell(_ *core.Simulation) {
 		if spellEffect.Landed() {
 			target := spellEffect.Target
 			// Don't overwrite permanent version of SA
-			if target.AuraExpiresAt(core.SunderArmorDebuffID) != core.NeverExpires {
-				curStacks := target.NumStacks(core.SunderArmorDebuffID)
+			if target.AuraExpiresAt(core.SunderArmorAuraID) != core.NeverExpires {
+				curStacks := target.NumStacks(core.SunderArmorAuraID)
 				newStacks := core.MinInt32(curStacks+1, 5)
 				target.ReplaceAura(sim, core.SunderArmorAura(target, newStacks))
 			}
@@ -59,5 +59,5 @@ func (warrior *Warrior) registerSunderArmorSpell(_ *core.Simulation) {
 }
 
 func (warrior *Warrior) CanSunderArmor(sim *core.Simulation, target *core.Target) bool {
-	return warrior.CurrentRage() >= warrior.sunderArmorCost && !target.HasAura(core.ExposeArmorDebuffID)
+	return warrior.CurrentRage() >= warrior.sunderArmorCost && !target.HasAura(core.ExposeArmorAuraID)
 }

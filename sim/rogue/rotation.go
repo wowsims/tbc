@@ -115,7 +115,7 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 	}
 
 	if rogue.MaintainingExpose(target) {
-		eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
+		eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorAuraID)
 		if rogue.eaBuildTime+buildTimeBuffer > eaTimeRemaining {
 			// Cast our slice and start prepping for EA.
 			if comboPoints == 0 {
@@ -175,7 +175,7 @@ func (rogue *Rogue) doPlanExposeArmor(sim *core.Simulation) {
 
 	if comboPoints == 5 {
 		if energy >= ExposeArmorEnergyCost || rogue.deathmantle4pcProc {
-			eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
+			eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorAuraID)
 			if rogue.canPoolEnergy(sim, energy) && eaTimeRemaining > time.Second*2 {
 				return
 			}
@@ -195,7 +195,7 @@ func (rogue *Rogue) doPlanFillBeforeEA(sim *core.Simulation) {
 	energy := rogue.CurrentEnergy()
 	comboPoints := rogue.ComboPoints()
 	target := sim.GetPrimaryTarget()
-	eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
+	eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorAuraID)
 
 	if rogue.eaBuildTime+buildTimeBuffer > eaTimeRemaining {
 		// Cast our finisher and start prepping for EA.
@@ -285,7 +285,7 @@ func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 		return
 	}
 
-	eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
+	eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorAuraID)
 	energyForEANext := rogue.builderEnergyCost*float64(5-comboPoints) + ExposeArmorEnergyCost
 	eaNextBuildTime := core.MaxDuration(0, time.Duration(((energyForEANext-energy)/rogue.energyPerSecondAvg)*float64(time.Second)))
 	spareTime := core.MaxDuration(0, eaTimeRemaining-eaNextBuildTime)

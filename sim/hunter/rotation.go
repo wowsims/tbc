@@ -350,7 +350,7 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 
 	target := sim.GetPrimaryTarget()
 
-	if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !target.HasAura(ScorpidStingDebuffID) {
+	if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !target.HasAura(ScorpidStingAuraID) {
 		success := hunter.ScorpidSting.Cast(sim, target)
 		if !success {
 			hunter.WaitForMana(sim, hunter.ScorpidSting.Instance.Cost.Value)

@@ -62,7 +62,7 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 	})
 }
 
-var PyroblastDotDebuffID = core.NewDebuffID()
+var PyroblastDotAuraID = core.NewAuraID()
 
 func (mage *Mage) registerPyroblastDotSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
@@ -84,7 +84,7 @@ func (mage *Mage) registerPyroblastDotSpell(sim *core.Simulation) {
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 3,
 				TickBaseDamage: core.DotSnapshotFuncMagic(356/4, 0),
-				DebuffID:       PyroblastDotDebuffID,
+				AuraID:         PyroblastDotAuraID,
 			},
 		},
 	}

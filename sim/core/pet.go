@@ -52,7 +52,7 @@ func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanc
 			Party:       owner.Party,
 			PartyIndex:  owner.PartyIndex,
 			RaidIndex:   owner.RaidIndex,
-			auraTracker: newAuraTracker(false),
+			auraTracker: newAuraTracker(),
 			baseStats:   baseStats,
 			Metrics:     NewCharacterMetrics(),
 		},

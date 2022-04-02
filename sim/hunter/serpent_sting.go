@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var SerpentStingDebuffID = core.NewDebuffID()
+var SerpentStingAuraID = core.NewAuraID()
 var SerpentStingActionID = core.ActionID{SpellID: 27016}
 
 func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
@@ -37,7 +37,7 @@ func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
 					attackPower := hitEffect.RangedAttackPower(spell.Character) + hitEffect.RangedAttackPowerOnTarget()
 					return 132 + attackPower*0.02
 				},
-				DebuffID: SerpentStingDebuffID,
+				AuraID: SerpentStingAuraID,
 			},
 		},
 	}

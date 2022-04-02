@@ -15,7 +15,7 @@ func (rogue *Rogue) applyPoisons() {
 }
 
 var DeadlyPoisonAuraID = core.NewAuraID()
-var DeadlyPoisonDebuffID = core.NewDebuffID()
+var DeadlyPoisonDotAuraID = core.NewAuraID()
 
 func (rogue *Rogue) registerDeadlyPoisonSpell(_ *core.Simulation) {
 	cast := core.SimpleSpell{
@@ -36,7 +36,7 @@ func (rogue *Rogue) registerDeadlyPoisonSpell(_ *core.Simulation) {
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 3,
 				TickBaseDamage: core.DotSnapshotFuncMagic(180/4, 0),
-				DebuffID:       DeadlyPoisonDebuffID,
+				AuraID:         DeadlyPoisonDotAuraID,
 			},
 		},
 	}

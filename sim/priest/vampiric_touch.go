@@ -9,7 +9,7 @@ import (
 
 var VampiricTouchActionID = core.ActionID{SpellID: 34917}
 
-var VampiricTouchDebuffID = core.NewDebuffID()
+var VampiricTouchAuraID = core.NewAuraID()
 
 func (priest *Priest) newVampiricTouchSpell(sim *core.Simulation, isAltCast bool) *core.Spell {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 425}
@@ -34,7 +34,7 @@ func (priest *Priest) newVampiricTouchSpell(sim *core.Simulation, isAltCast bool
 				NumberOfTicks:  5,
 				TickLength:     time.Second * 3,
 				TickBaseDamage: core.DotSnapshotFuncMagic(650/5, 0.2),
-				DebuffID:       VampiricTouchDebuffID,
+				AuraID:         VampiricTouchAuraID,
 			},
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if isAltCast {

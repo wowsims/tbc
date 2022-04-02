@@ -23,17 +23,6 @@ func NewAuraID() AuraID {
 	return newAuraID
 }
 
-// Reserve the default value so no aura uses it.
-const UnknownDebuffID = AuraID(0)
-
-var numDebuffIDs = 1
-
-func NewDebuffID() AuraID {
-	newDebuffID := AuraID(numDebuffIDs)
-	numDebuffIDs++
-	return newDebuffID
-}
-
 type CooldownID int32
 
 // Reserve the default value so no cooldown uses it.
@@ -128,9 +117,6 @@ type auraTracker struct {
 	// Callback to format aura-related logs.
 	logFn func(string, ...interface{})
 
-	// Set to true if this aura tracker is tracking target debuffs, instead of player buffs.
-	useDebuffIDs bool
-
 	// Whether finalize() has been called for this object.
 	finalized bool
 
@@ -156,11 +142,8 @@ type auraTracker struct {
 	metrics []AuraMetrics
 }
 
-func newAuraTracker(useDebuffIDs bool) auraTracker {
+func newAuraTracker() auraTracker {
 	numAura := numAuraIDs + 1 // TODO: this +1 shouldn't be needed, probably an aura ID created strangely somewhere.
-	if useDebuffIDs {
-		numAura = numDebuffIDs
-	}
 	return auraTracker{
 		resetEffects:        []ResetEffect{},
 		permanentAuras:      []PermanentAura{},
@@ -171,7 +154,6 @@ func newAuraTracker(useDebuffIDs bool) auraTracker {
 		onMeleeAttackIDs:    make([]AuraID, 0, 16),
 		auras:               make([]Aura, numAura),
 		cooldowns:           make([]time.Duration, numCooldownIDs),
-		useDebuffIDs:        useDebuffIDs,
 		metrics:             make([]AuraMetrics, numAura),
 	}
 }
@@ -209,11 +191,7 @@ func (at *auraTracker) finalize() {
 }
 
 func (at *auraTracker) reset(sim *Simulation) {
-	if at.useDebuffIDs {
-		at.auras = make([]Aura, numDebuffIDs)
-	} else {
-		copy(at.auras, sim.emptyAuras)
-	}
+	copy(at.auras, sim.emptyAuras)
 
 	at.cooldowns = make([]time.Duration, numCooldownIDs)
 	at.activeAuraIDs = at.activeAuraIDs[:0]

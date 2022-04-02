@@ -154,7 +154,7 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.Spell {
 func (mage *Mage) doFireRotation(sim *core.Simulation) *core.Spell {
 	target := sim.GetPrimaryTarget()
 
-	if mage.FireRotation.MaintainImprovedScorch && (target.NumStacks(core.ImprovedScorchDebuffID) < 5 || target.RemainingAuraDuration(sim, core.ImprovedScorchDebuffID) < time.Millisecond*5500) {
+	if mage.FireRotation.MaintainImprovedScorch && (target.NumStacks(core.ImprovedScorchAuraID) < 5 || target.RemainingAuraDuration(sim, core.ImprovedScorchAuraID) < time.Millisecond*5500) {
 		return mage.Scorch
 	}
 

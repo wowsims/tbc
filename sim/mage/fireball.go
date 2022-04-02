@@ -67,7 +67,7 @@ func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
 	})
 }
 
-var FireballDotDebuffID = core.NewDebuffID()
+var FireballDotAuraID = core.NewAuraID()
 
 func (mage *Mage) registerFireballDotSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
@@ -88,7 +88,7 @@ func (mage *Mage) registerFireballDotSpell(sim *core.Simulation) {
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 2,
 				TickBaseDamage: core.DotSnapshotFuncMagic(84/4, 0),
-				DebuffID:       FireballDotDebuffID,
+				AuraID:         FireballDotAuraID,
 			},
 		},
 	}
