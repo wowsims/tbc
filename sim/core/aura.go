@@ -381,9 +381,26 @@ func (at *auraTracker) advance(sim *Simulation) {
 }
 
 func (at *auraTracker) doneIteration(sim *Simulation) {
-	// Expire all the remaining auras.
+	// Expire all the remaining auras. Need to keep looping because sometimes
+	// expiring auras can trigger other auras.
+	foundUnexpired := true
+	for foundUnexpired {
+		foundUnexpired = false
+		for _, aura := range at.auras {
+			if aura.IsActive() {
+				foundUnexpired = true
+				aura.Deactivate(sim)
+			}
+		}
+	}
+
 	for _, aura := range at.auras {
-		aura.Deactivate(sim)
+		if aura.IsActive() {
+			panic("Active aura during doneIter: " + aura.Label)
+		}
+		if aura.stacks != 0 {
+			panic("Aura nonzero stacks during doneIter: " + aura.Label)
+		}
 	}
 
 	for _, permAura := range at.permanentAuras {
@@ -627,10 +644,15 @@ func NewICD() InternalCD {
 
 // Helper for the common case of making an aura that adds stats.
 func (character *Character) NewTemporaryStatsAura(auraLabel string, actionID ActionID, tempStats stats.Stats, duration time.Duration) *Aura {
+	return character.NewTemporaryStatsAuraWrapped(auraLabel, actionID, tempStats, duration, nil)
+}
+
+// Alternative that allows modifying the Aura config.
+func (character *Character) NewTemporaryStatsAuraWrapped(auraLabel string, actionID ActionID, tempStats stats.Stats, duration time.Duration, modConfig func(*Aura)) *Aura {
 	buffs := character.ApplyStatDependencies(tempStats)
 	unbuffs := buffs.Multiply(-1)
 
-	return character.GetOrRegisterAura(&Aura{
+	config := &Aura{
 		Label:    auraLabel,
 		ActionID: actionID,
 		Duration: duration,
@@ -646,5 +668,11 @@ func (character *Character) NewTemporaryStatsAura(auraLabel string, actionID Act
 			}
 			character.AddStatsDynamic(sim, unbuffs)
 		},
-	})
+	}
+
+	if modConfig != nil {
+		modConfig(config)
+	}
+
+	return character.GetOrRegisterAura(config)
 }

@@ -73,6 +73,12 @@ type Rogue struct {
 	Shiv                *core.Spell
 	SinisterStrike      *core.Spell
 
+	AdrenalineRushAura *core.Aura
+	BladeFlurryAura    *core.Aura
+	ExposeArmorAura    *core.Aura
+	SliceAndDiceAura   *core.Aura
+	SunderArmorAura    *core.Aura // Rogues don't apply this but need to check it.
+
 	finishingMoveEffectApplier func(sim *core.Simulation, numPoints int32)
 
 	castSliceAndDice func()
@@ -164,7 +170,7 @@ func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.deadlyPoisonStacks = 0
 	rogue.doneSND = false
 
-	permaEA := sim.GetPrimaryTarget().AuraExpiresAt(core.ExposeArmorAuraID) == core.NeverExpires
+	permaEA := rogue.ExposeArmorAura.ExpiresAt() == core.NeverExpires
 	rogue.doneEA = !rogue.Rotation.MaintainExposeArmor || permaEA
 
 	rogue.disabledMCDs = rogue.DisableAllEnabledCooldowns(core.CooldownTypeUnknown)
@@ -316,6 +322,11 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 	})
 
 	rogue.registerThistleTeaCD()
+
+	rogue.RegisterResetEffect(func(sim *core.Simulation) {
+		// Do this in reset so other Warriors will have added theirs if available.
+		rogue.SunderArmorAura = sim.GetPrimaryTarget().GetAura(core.SunderArmorAuraLabel)
+	})
 
 	return rogue
 }

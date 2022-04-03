@@ -166,8 +166,8 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 		registerDrumsCD(agent, partyBuffs, consumes)
 		registerPotionCD(agent, consumes)
 		registerConjuredCD(agent, consumes)
-		registerExplosivesCD(agent, consumes)
 	})
+	registerExplosivesCD(agent, consumes)
 }
 
 func ApplyPetConsumeEffects(pet *Character, ownerConsumes proto.Consumes) {
@@ -349,20 +349,17 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 func makeDrumsAura(character *Character, drumsType proto.Drums) *Aura {
 	if drumsType == proto.Drums_DrumsOfBattle {
 		const hasteBonus = 80
-		aura := character.NewTemporaryStatsAura("Drums of Battle", DrumsOfBattleActionID, stats.Stats{stats.MeleeHaste: hasteBonus, stats.SpellHaste: hasteBonus}, time.Second*30)
-		oldOnGain := aura.OnGain
-
-		aura.OnGain = func(aura *Aura, sim *Simulation) {
-			oldOnGain(aura, sim)
-			character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
-			// Drums of battle doesn't affect pets, ask Blizzard.
-		}
-
-		return aura
+		return character.NewTemporaryStatsAuraWrapped("Drums of Battle", DrumsOfBattleActionID, stats.Stats{stats.MeleeHaste: hasteBonus, stats.SpellHaste: hasteBonus}, time.Second*30, func(aura *Aura) {
+			oldOnGain := aura.OnGain
+			aura.OnGain = func(aura *Aura, sim *Simulation) {
+				oldOnGain(aura, sim)
+				character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
+				// Drums of battle doesn't affect pets, ask Blizzard.
+			}
+		})
 	} else if drumsType == proto.Drums_DrumsOfRestoration {
 		// 600 mana over 15 seconds == 200 mp5
 		const mp5Bonus = 200
-		aura := character.NewTemporaryStatsAura("Drums of Restoration", DrumsOfRestorationActionID, stats.Stats{stats.MP5: mp5Bonus}, time.Second*15)
 
 		petAuras := []*Aura{}
 		for _, petAgent := range character.Party.Pets {
@@ -370,20 +367,20 @@ func makeDrumsAura(character *Character, drumsType proto.Drums) *Aura {
 			petAuras = append(petAuras, pet.NewTemporaryStatsAura("Drums of Restoration", DrumsOfRestorationActionID, stats.Stats{stats.MP5: mp5Bonus}, time.Second*15))
 		}
 
-		oldOnGain := aura.OnGain
-		aura.OnGain = func(aura *Aura, sim *Simulation) {
-			oldOnGain(aura, sim)
-			character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
+		return character.NewTemporaryStatsAuraWrapped("Drums of Restoration", DrumsOfRestorationActionID, stats.Stats{stats.MP5: mp5Bonus}, time.Second*15, func(aura *Aura) {
+			oldOnGain := aura.OnGain
+			aura.OnGain = func(aura *Aura, sim *Simulation) {
+				oldOnGain(aura, sim)
+				character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
 
-			for i, petAgent := range character.Party.Pets {
-				pet := petAgent.GetPet()
-				if pet.IsEnabled() {
-					petAuras[i].Activate(sim)
+				for i, petAgent := range character.Party.Pets {
+					pet := petAgent.GetPet()
+					if pet.IsEnabled() {
+						petAuras[i].Activate(sim)
+					}
 				}
 			}
-		}
-
-		return aura
+		})
 	} else {
 		return nil
 	}

@@ -8,37 +8,30 @@ import (
 )
 
 var HemorrhageActionID = core.ActionID{SpellID: 26864}
-var HemorrhageAuraID = core.NewAuraID()
 var HemorrhageEnergyCost = 35.0
 
-func (rogue *Rogue) registerHemorrhageSpell(_ *core.Simulation) {
-	hemoAura := core.Aura{
-		ID:       HemorrhageAuraID,
+func (rogue *Rogue) registerHemorrhageSpell(sim *core.Simulation) {
+	hemoAura := sim.GetPrimaryTarget().GetOrRegisterAura(&core.Aura{
+		Label:    "Hemorrhage",
 		ActionID: HemorrhageActionID,
 		Duration: time.Second * 15,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			sim.GetPrimaryTarget().PseudoStats.BonusPhysicalDamageTaken += 42
+			aura.Unit.PseudoStats.BonusPhysicalDamageTaken += 42
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			sim.GetPrimaryTarget().PseudoStats.BonusPhysicalDamageTaken -= 42
+			aura.Unit.PseudoStats.BonusPhysicalDamageTaken -= 42
 		},
-	}
-	hemoAura.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-		if spell.SpellSchool != core.SpellSchoolPhysical {
-			return
-		}
-		if !spellEffect.Landed() || spellEffect.Damage == 0 {
-			return
-		}
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell.SpellSchool != core.SpellSchoolPhysical {
+				return
+			}
+			if !spellEffect.Landed() || spellEffect.Damage == 0 {
+				return
+			}
 
-		stacks := spellEffect.Target.NumStacks(HemorrhageAuraID) - 1
-		if stacks == 0 {
-			spellEffect.Target.RemoveAura(sim, HemorrhageAuraID)
-		} else {
-			hemoAura.Stacks = stacks
-			spellEffect.Target.ReplaceAura(sim, hemoAura)
-		}
-	}
+			aura.RemoveStack(sim)
+		},
+	})
 
 	refundAmount := HemorrhageEnergyCost * 0.8
 
@@ -47,8 +40,8 @@ func (rogue *Rogue) registerHemorrhageSpell(_ *core.Simulation) {
 		if spellEffect.Landed() {
 			rogue.AddComboPoints(sim, 1, HemorrhageActionID)
 
-			hemoAura.Stacks = 10
-			spellEffect.Target.ReplaceAura(sim, hemoAura)
+			hemoAura.Activate(sim)
+			hemoAura.SetStacks(sim, 10)
 		} else {
 			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}

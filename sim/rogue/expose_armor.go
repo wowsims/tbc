@@ -9,14 +9,16 @@ import (
 var ExposeArmorActionID = core.ActionID{SpellID: 26866, Tag: 5}
 var ExposeArmorEnergyCost = 25.0
 
-func (rogue *Rogue) registerExposeArmorSpell(_ *core.Simulation) {
+func (rogue *Rogue) registerExposeArmorSpell(sim *core.Simulation) {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
+
+	rogue.ExposeArmorAura = core.ExposeArmorAura(sim.GetPrimaryTarget(), rogue.Talents.ImprovedExposeArmor)
 
 	ability := rogue.newAbility(ExposeArmorActionID, ExposeArmorEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
 	ability.Effect.CritRollCategory = core.CritRollCategoryNone
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
-			spellEffect.Target.ReplaceAura(sim, core.ExposeArmorAura(sim, spellEffect.Target, rogue.Talents.ImprovedExposeArmor))
+			rogue.ExposeArmorAura.Activate(sim)
 			rogue.ApplyFinisher(sim, spell.ActionID)
 			if sim.GetRemainingDuration() <= time.Second*30 {
 				rogue.doneEA = true
@@ -49,5 +51,5 @@ func (rogue *Rogue) registerExposeArmorSpell(_ *core.Simulation) {
 }
 
 func (rogue *Rogue) MaintainingExpose(target *core.Target) bool {
-	return !rogue.doneEA && (rogue.Talents.ImprovedExposeArmor == 2 || !target.HasAura(core.SunderArmorAuraID))
+	return !rogue.doneEA && (rogue.Talents.ImprovedExposeArmor == 2 || rogue.SunderArmorAura != nil)
 }

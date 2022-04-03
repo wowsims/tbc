@@ -22,7 +22,7 @@ func (rogue *Rogue) registerThistleTeaCD() {
 			ActionID:  actionID,
 			Character: rogue.GetCharacter(),
 			Cooldown:  cooldown,
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				rogue.AddEnergy(sim, energyRegen, actionID)
 			},
 		},

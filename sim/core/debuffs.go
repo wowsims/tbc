@@ -308,13 +308,14 @@ func FaerieFireAura(target *Target, level int32) *Aura {
 	})
 }
 
+var SunderArmorAuraLabel = "Sunder Armor"
 var SunderExposeAuraTag = "SunderExpose"
 
 func SunderArmorAura(target *Target, startingStacks int32) *Aura {
 	armorReductionPerStack := 520.0
 
 	return target.GetOrRegisterAura(&Aura{
-		Label:     "Sunder Armor",
+		Label:     SunderArmorAuraLabel,
 		Tag:       SunderExposeAuraTag,
 		ActionID:  ActionID{SpellID: 25225},
 		Duration:  time.Second * 30,
@@ -368,8 +369,6 @@ func ExposeWeaknessAura(target *Target, hunterAgility float64, multiplier float6
 	apBonus := hunterAgility * 0.25 * multiplier
 
 	return target.GetOrRegisterAura(&Aura{
-		// TODO overwrite behavior?
-		// Also isnt this missing mongoose?
 		Label:    "ExposeWeakness-" + strconv.Itoa(int(hunterAgility)),
 		Tag:      "ExposeWeakness",
 		ActionID: ActionID{SpellID: 34503},

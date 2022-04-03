@@ -96,20 +96,18 @@ func ApplyRingStriking(agent core.Agent) {
 }
 
 func newLightningSpeedAura(character *core.Character, auraLabel string, actionID core.ActionID) *core.Aura {
-	aura := character.NewTemporaryStatsAura(auraLabel, actionID, stats.Stats{stats.Agility: 120}, time.Second*15)
-
-	oldOnGain := aura.OnGain
-	oldOnExpire := aura.OnExpire
-	aura.OnGain = func(aura *core.Aura, sim *core.Simulation) {
-		oldOnGain(aura, sim)
-		character.MultiplyMeleeSpeed(sim, 1.02)
-	}
-	aura.OnExpire = func(aura *core.Aura, sim *core.Simulation) {
-		oldOnExpire(aura, sim)
-		character.MultiplyMeleeSpeed(sim, 1/1.02)
-	}
-
-	return aura
+	return character.NewTemporaryStatsAuraWrapped(auraLabel, actionID, stats.Stats{stats.Agility: 120}, time.Second*15, func(aura *core.Aura) {
+		oldOnGain := aura.OnGain
+		oldOnExpire := aura.OnExpire
+		aura.OnGain = func(aura *core.Aura, sim *core.Simulation) {
+			oldOnGain(aura, sim)
+			character.MultiplyMeleeSpeed(sim, 1.02)
+		}
+		aura.OnExpire = func(aura *core.Aura, sim *core.Simulation) {
+			oldOnExpire(aura, sim)
+			character.MultiplyMeleeSpeed(sim, 1/1.02)
+		}
+	})
 }
 
 // ApplyMongooseEffect will be applied twice if there is two weapons with this enchant.

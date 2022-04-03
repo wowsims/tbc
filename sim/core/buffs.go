@@ -317,16 +317,17 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 
 	var charges int32
 
-	wfBuffAura := character.NewTemporaryStatsAura("Windfury Buff", buffActionID, stats.Stats{stats.AttackPower: apBonus}, time.Millisecond*1500)
-	wfBuffAura.OnSpellHit = func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
-		if !spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryWhite) {
-			return
+	wfBuffAura := character.NewTemporaryStatsAuraWrapped("Windfury Buff", buffActionID, stats.Stats{stats.AttackPower: apBonus}, time.Millisecond*1500, func(config *Aura) {
+		config.OnSpellHit = func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if !spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryWhite) {
+				return
+			}
+			charges--
+			if charges == 0 {
+				aura.Deactivate(sim)
+			}
 		}
-		charges--
-		if charges == 0 {
-			aura.Deactivate(sim)
-		}
-	}
+	})
 
 	wfTemplate := character.AutoAttacks.MHAuto.Template
 	wfTemplate.ActionID = ActionID{SpellID: windfuryBuffSpellRanks[rank-1]} // temporary buff ("Windfury Attack") spell id
@@ -338,6 +339,9 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 
 	const procChance = 0.2
 
+	icd := NewICD()
+	const icdDur = time.Duration(1)
+
 	return character.GetOrRegisterAura(&Aura{
 		Label:    "Windfury Totem",
 		ActionID: ActionID{SpellID: WindfuryTotemSpellRanks[rank-1]}, // totem spell id ("Windfury Totem")
@@ -347,6 +351,11 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			}
 
 			if wfBuffAura.IsActive() {
+				return
+			}
+			if icd.IsOnCD(sim) {
+				// Checking for WF buff aura isn't quite enough now that we refactored auras.
+				// TODO: Clean this up to remove the need for an instant ICD.
 				return
 			}
 
@@ -361,6 +370,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			}
 			charges = startCharges
 			wfBuffAura.Activate(sim)
+			icd = InternalCD(sim.CurrentTime + icdDur)
 
 			wfSpell.Cast(sim, spellEffect.Target)
 		},
