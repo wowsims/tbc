@@ -39,9 +39,8 @@ type Hunter struct {
 	AmmoDPS         float64
 	AmmoDamageBonus float64
 
-	aspectOfTheViper bool // False indicates aspect of the hawk.
-
 	hasGronnstalker2Pc bool
+	currentAspect      *core.Aura
 
 	killCommandEnabledUntil time.Duration // Time that KC enablement expires.
 	killCommandBlocked      bool          // True while Steady Shot is casting, to prevent KC.
@@ -89,6 +88,11 @@ type Hunter struct {
 	SerpentSting *core.Spell
 	SteadyShot   *core.Spell
 
+	AspectOfTheHawkAura  *core.Aura
+	AspectOfTheViperAura *core.Aura
+	ScorpidStingAura     *core.Aura
+	TalonOfAlarAura      *core.Aura
+
 	fakeHardcast core.Cast
 }
 
@@ -132,14 +136,13 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 		Character:   &hunter.Character,
 		IgnoreHaste: true,
 		CastTime:    hunter.timeToWeave,
-		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 			hunter.rotation(sim, false)
 		},
 	}
 }
 
 func (hunter *Hunter) Reset(sim *core.Simulation) {
-	hunter.aspectOfTheViper = false
 	hunter.killCommandEnabledUntil = 0
 	hunter.killCommandBlocked = false
 	hunter.nextAction = OptionNone
@@ -149,11 +152,8 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.permaHawk = false
 	hunter.weaveStartTime = time.Duration(float64(sim.Duration) * (1 - hunter.Rotation.PercentWeaved))
 
-	target := sim.GetPrimaryTarget()
-	impHuntersMark := hunter.Talents.ImprovedHuntersMark
-	if !target.HasAura(core.HuntersMarkAuraID) || target.NumStacks(core.HuntersMarkAuraID) < impHuntersMark {
-		target.AddAura(sim, core.HuntersMarkAura(target, impHuntersMark, false))
-	}
+	huntersMarkAura := core.HuntersMarkAura(sim.GetPrimaryTarget(), hunter.Talents.ImprovedHuntersMark, false)
+	huntersMarkAura.Activate(sim)
 
 	if sim.Log != nil && !hunter.Rotation.LazyRotation {
 		hunter.Log(sim, "Average damage values for adaptive rotation: shoot=%0.02f, weave=%0.02f, steady=%0.02f, multi=%0.02f, arcane=%0.02f", hunter.avgShootDmg, hunter.avgWeaveDmg, hunter.avgSteadyDmg, hunter.avgMultiDmg, hunter.avgArcaneDmg)

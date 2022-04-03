@@ -8,23 +8,22 @@ import (
 )
 
 var RapidFireCooldownID = core.NewCooldownID()
-var RapidFireAuraID = core.NewAuraID()
 
 func (hunter *Hunter) registerRapidFireCD() {
 	cooldown := time.Minute * 5
 	actionID := core.ActionID{SpellID: 3045, CooldownID: RapidFireCooldownID}
 
-	rfAura := core.Aura{
-		ID:       RapidFireAuraID,
+	rfAura := hunter.RegisterAura(&core.Aura{
+		Label:    "Rapid Fire",
 		ActionID: actionID,
 		Duration: time.Second * 15,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			hunter.PseudoStats.RangedSpeedMultiplier *= 1.4
+			aura.Unit.PseudoStats.RangedSpeedMultiplier *= 1.4
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			hunter.PseudoStats.RangedSpeedMultiplier /= 1.4
+			aura.Unit.PseudoStats.RangedSpeedMultiplier /= 1.4
 		},
-	}
+	})
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
@@ -39,8 +38,8 @@ func (hunter *Hunter) registerRapidFireCD() {
 				Type:  stats.Mana,
 				Value: 100,
 			},
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-				hunter.AddAura(sim, rfAura)
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				rfAura.Activate(sim)
 			},
 		},
 	}
@@ -54,10 +53,7 @@ func (hunter *Hunter) registerRapidFireCD() {
 		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Make sure we don't reuse after a Readiness cast.
-			if character.HasAura(RapidFireAuraID) {
-				return false
-			}
-			return true
+			return !rfAura.IsActive()
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return true

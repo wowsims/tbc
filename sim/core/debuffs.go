@@ -98,7 +98,7 @@ func MiseryAura(target *Target, numPoints int32) *Aura {
 		Tag:      "Misery",
 		ActionID: ActionID{SpellID: 33195},
 		Duration: time.Second * 24,
-		Priority: numPoints,
+		Priority: float64(numPoints),
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.ArcaneDamageTakenMultiplier *= multiplier
 			aura.Unit.PseudoStats.FireDamageTakenMultiplier *= multiplier
@@ -171,7 +171,7 @@ func JudgementOfTheCrusaderAura(target *Target, level int32) *Aura {
 		Tag:      "Judgement of the Crusader",
 		ActionID: ActionID{SpellID: 27159},
 		Duration: time.Second * 20,
-		Priority: level,
+		Priority: float64(level),
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.BonusHolyDamageTaken += 219
 			aura.Unit.PseudoStats.BonusCritRating += bonusCrit
@@ -195,7 +195,7 @@ func CurseOfElementsAura(target *Target, points int32) *Aura {
 		Label:    "Curse of Elements-" + strconv.Itoa(int(points)),
 		Tag:      "Curse of Elements",
 		ActionID: ActionID{SpellID: 27228},
-		Priority: points,
+		Priority: float64(points),
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.ArcaneDamageTakenMultiplier *= multiplier
 			aura.Unit.PseudoStats.FireDamageTakenMultiplier *= multiplier
@@ -296,7 +296,7 @@ func FaerieFireAura(target *Target, level int32) *Aura {
 		Tag:      "Faerie Fire",
 		ActionID: ActionID{SpellID: 26993},
 		Duration: time.Second * 40,
-		Priority: level,
+		Priority: float64(level),
 		OnGain: func(aura *Aura, sim *Simulation) {
 			target.AddStat(stats.Armor, -armorReduction)
 			target.PseudoStats.BonusMeleeHitRating += float64(level) * MeleeHitRatingPerHitChance
@@ -320,7 +320,7 @@ func SunderArmorAura(target *Target, startingStacks int32) *Aura {
 		ActionID:  ActionID{SpellID: 25225},
 		Duration:  time.Second * 30,
 		MaxStacks: 5,
-		Priority:  int32(armorReductionPerStack * 5),
+		Priority:  armorReductionPerStack * 5,
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.SetStacks(sim, startingStacks)
 		},
@@ -338,7 +338,7 @@ func ExposeArmorAura(target *Target, talentPoints int32) *Aura {
 		Tag:      SunderExposeAuraTag,
 		ActionID: ActionID{SpellID: 26866},
 		Duration: time.Second * 30,
-		Priority: int32(armorReduction),
+		Priority: armorReduction,
 		OnGain: func(aura *Aura, sim *Simulation) {
 			target.AddStat(stats.Armor, -armorReduction)
 		},
@@ -373,14 +373,14 @@ func ExposeWeaknessAura(target *Target, hunterAgility float64, multiplier float6
 		Tag:      "ExposeWeakness",
 		ActionID: ActionID{SpellID: 34503},
 		Duration: time.Second * 7,
-		Priority: int32(hunterAgility),
+		Priority: apBonus,
 		OnGain: func(aura *Aura, sim *Simulation) {
-			target.PseudoStats.BonusMeleeAttackPower += apBonus
-			target.PseudoStats.BonusRangedAttackPower += apBonus
+			aura.Unit.PseudoStats.BonusMeleeAttackPower += aura.Priority
+			aura.Unit.PseudoStats.BonusRangedAttackPower += aura.Priority
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			target.PseudoStats.BonusMeleeAttackPower -= apBonus
-			target.PseudoStats.BonusRangedAttackPower -= apBonus
+			aura.Unit.PseudoStats.BonusMeleeAttackPower -= aura.Priority
+			aura.Unit.PseudoStats.BonusRangedAttackPower -= aura.Priority
 		},
 	})
 }
@@ -396,13 +396,19 @@ func HuntersMarkAura(target *Target, points int32, fullyStacked bool) *Aura {
 		startingStacks = maxStacks
 	}
 
+	priority := float64(points)
+	if fullyStacked {
+		// Add a half point so that permanent versions always win.
+		priority += 0.5
+	}
+
 	return target.GetOrRegisterAura(&Aura{
 		Label:     "HuntersMark-" + strconv.Itoa(int(points)),
 		Tag:       "HuntersMark",
 		ActionID:  ActionID{SpellID: 14325},
 		Duration:  NeverExpires,
 		MaxStacks: 30,
-		Priority:  points,
+		Priority:  priority,
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.BonusMeleeAttackPower += meleeBonus
 			aura.Unit.PseudoStats.BonusRangedAttackPower += baseRangedBonus
@@ -431,7 +437,7 @@ func DemoralizingShoutAura(target *Target, boomingVoicePts int32, impDemoShoutPt
 		Tag:      "DemoralizingShout",
 		ActionID: ActionID{SpellID: 25203},
 		Duration: duration,
-		Priority: impDemoShoutPts,
+		Priority: float64(impDemoShoutPts),
 		OnGain: func(aura *Aura, sim *Simulation) {
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
@@ -445,7 +451,19 @@ func ThunderClapAura(target *Target, impThunderClapPts int32) *Aura {
 		Tag:      "ThunderClap",
 		ActionID: ActionID{SpellID: 25264},
 		Duration: time.Second * 30,
-		Priority: impThunderClapPts,
+		Priority: float64(impThunderClapPts),
+		OnGain: func(aura *Aura, sim *Simulation) {
+		},
+		OnExpire: func(aura *Aura, sim *Simulation) {
+		},
+	})
+}
+
+func ScorpidStingAura(target *Target) *Aura {
+	return target.GetOrRegisterAura(&Aura{
+		Label:    "Scorpid Sting",
+		ActionID: ActionID{SpellID: 3043},
+		Duration: time.Second * 20,
 		OnGain: func(aura *Aura, sim *Simulation) {
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {

@@ -71,7 +71,7 @@ type Aura struct {
 
 	// If nonzero, activation of this aura will deactivate other auras with the
 	// same Tag and equal or lower Priority.
-	Priority int32
+	Priority float64
 
 	// Invoked when a spell cast completes casting, before results are calculated.
 	OnCastComplete OnCastComplete

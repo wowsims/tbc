@@ -58,7 +58,7 @@ func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 			},
 			TargetSpellCoefficient: 1,
 		}),
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			hunter.rotation(sim, false)
 		},
 	}
