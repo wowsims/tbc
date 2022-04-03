@@ -78,10 +78,10 @@ func (paladin *Paladin) applyVengeance() {
 		return
 	}
 
-	multiplierPerStack := 1 + (0.01 * float64(paladin.Talents.Vengeance))
+	multiplierPerStack := 0.01 * float64(paladin.Talents.Vengeance)
 
 	makeProcAura := func(numStacks int32) core.Aura {
-		multiplier := multiplierPerStack * float64(numStacks)
+		multiplier := 1 + (multiplierPerStack * float64(numStacks))
 		return core.Aura{
 			ID:       VengeanceProcAuraID,
 			ActionID: VengeanceActionID,
@@ -101,7 +101,7 @@ func (paladin *Paladin) applyVengeance() {
 			ID: VengeanceAuraID,
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					newStacks := core.MinInt32(3, paladin.NumStacks(VengeanceAuraID)+1)
+					newStacks := core.MinInt32(3, paladin.NumStacks(VengeanceProcAuraID)+1)
 					paladin.AddAura(sim, makeProcAura(newStacks))
 				}
 			},
