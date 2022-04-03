@@ -8,17 +8,15 @@ import (
 
 var HeroicStrikeActionID = core.ActionID{SpellID: 29707}
 
-func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerHeroicStrikeSpell(_ *core.Simulation) {
 	warrior.heroicStrikeCost = 15.0 - float64(warrior.Talents.ImprovedHeroicStrike) - float64(warrior.Talents.FocusedRage)
 
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            HeroicStrikeActionID,
-				Character:           &warrior.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
+				ActionID:    HeroicStrikeActionID,
+				Character:   &warrior.Character,
+				SpellSchool: core.SpellSchoolPhysical,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
 					Value: warrior.heroicStrikeCost,
@@ -27,26 +25,31 @@ func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleS
 					Type:  stats.Rage,
 					Value: warrior.heroicStrikeCost,
 				},
-				CritMultiplier: warrior.critMultiplier(true),
 			},
 		},
 		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			FlatThreatBonus:  194,
-			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 176, 1, true),
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      warrior.critMultiplier(true),
+			ProcMask:            core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			FlatThreatBonus:     194,
+			BaseDamage:          core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 176, 1, true),
 		},
 	}
 
 	refundAmount := warrior.heroicStrikeCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if !spellEffect.Landed() {
 			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
+	warrior.HeroicStrike = warrior.RegisterSpell(core.SpellConfig{
+		Template:   ability,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 func (warrior *Warrior) QueueHeroicStrike(_ *core.Simulation) {
@@ -57,7 +60,7 @@ func (warrior *Warrior) QueueHeroicStrike(_ *core.Simulation) {
 }
 
 // Returns true if the regular melee swing should be used, false otherwise.
-func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.SimpleSpell {
+func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.Spell {
 	if !warrior.heroicStrikeQueued {
 		return nil
 	}
@@ -67,14 +70,7 @@ func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.SimpleSpell 
 		return nil
 	}
 
-	target := sim.GetPrimaryTarget()
-	hs := &warrior.heroicStrike
-	warrior.heroicStrikeTemplate.Apply(hs)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hs.Effect.Target = target
-
-	return hs
+	return warrior.HeroicStrike
 }
 
 func (warrior *Warrior) CanHeroicStrike(sim *core.Simulation) bool {

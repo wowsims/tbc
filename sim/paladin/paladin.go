@@ -17,6 +17,7 @@ type Paladin struct {
 	currentSealExpires      time.Duration
 	currentJudgementID      core.AuraID
 	currentJudgementExpires time.Duration
+	sealOfCommandICD        core.InternalCD
 
 	sealOfBlood       core.SimpleCast
 	sealOfCommand     core.SimpleCast
@@ -27,23 +28,12 @@ type Paladin struct {
 	SealOfWisdomAura      core.Aura
 	SealOfCommandAura     core.Aura
 
-	consecrationTemplate core.SimpleSpellTemplate
-	ConsecrationSpell    core.SimpleSpell
-
-	exorcismTemplate core.SimpleSpellTemplate
-	exorcismSpell    core.SimpleSpell
-
-	crusaderStrikeTemplate core.SimpleSpellTemplate
-	crusaderStrikeSpell    core.SimpleSpell
-
-	judgementOfBloodTemplate core.SimpleSpellTemplate
-	judgementOfBloodSpell    core.SimpleSpell
-
-	judgementOfTheCrusaderTemplate core.SimpleSpellTemplate
-	judgementOfTheCrusaderSpell    core.SimpleSpell
-
-	judgementOfWisdomTemplate core.SimpleSpellTemplate
-	judgementOfWisdomSpell    core.SimpleSpell
+	Consecration           *core.Spell
+	CrusaderStrike         *core.Spell
+	Exorcism               *core.Spell
+	JudgementOfBlood       *core.Spell
+	JudgementOfTheCrusader *core.Spell
+	JudgementOfWisdom      *core.Spell
 }
 
 // Implemented by each Paladin spec.
@@ -65,15 +55,16 @@ func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (paladin *Paladin) Init(sim *core.Simulation) {
-	paladin.crusaderStrikeTemplate = paladin.newCrusaderStrikeTemplate(sim)
-	paladin.judgementOfBloodTemplate = paladin.newJudgementOfBloodTemplate(sim)
-	paladin.judgementOfTheCrusaderTemplate = paladin.newJudgementOfTheCrusaderTemplate(sim)
-	paladin.judgementOfWisdomTemplate = paladin.newJudgementOfWisdomTemplate(sim)
-	paladin.consecrationTemplate = paladin.newConsecrationTemplate(sim)
-	paladin.exorcismTemplate = paladin.newExorcismTemplate(sim)
+	paladin.registerConsecrationSpell(sim)
+	paladin.registerCrusaderStrikeSpell(sim)
+	paladin.registerExorcismSpell(sim)
+	paladin.registerJudgementOfBloodSpell(sim)
+	paladin.registerJudgementOfTheCrusaderSpell(sim)
+	paladin.registerJudgementOfWisdomSpell(sim)
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {
+	paladin.sealOfCommandICD = 0
 	paladin.currentSealID = 0
 	paladin.currentSealExpires = 0
 	paladin.currentJudgementID = 0
@@ -125,6 +116,7 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 	paladin.SetupSealOfBlood()
 	paladin.SetupSealOfTheCrusader()
 	paladin.SetupSealOfWisdom()
+	paladin.SetupSealOfCommand()
 
 	paladin.registerAvengingWrathCD()
 

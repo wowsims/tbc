@@ -10,7 +10,7 @@ import (
 var WhirlwindCooldownID = core.NewCooldownID()
 var WhirlwindActionID = core.ActionID{SpellID: 1680, CooldownID: WhirlwindCooldownID}
 
-func (warrior *Warrior) newWhirlwindTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 	warrior.whirlwindCost = 25.0 - float64(warrior.Talents.FocusedRage)
 	if ItemSetWarbringerBattlegear.CharacterHasSetBonus(&warrior.Character, 2) {
 		warrior.whirlwindCost -= 5
@@ -19,14 +19,12 @@ func (warrior *Warrior) newWhirlwindTemplate(sim *core.Simulation) core.SimpleSp
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            WhirlwindActionID,
-				Character:           &warrior.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				Cooldown:            time.Second*10 - time.Second*time.Duration(warrior.Talents.ImprovedWhirlwind),
-				IgnoreHaste:         true,
+				ActionID:    WhirlwindActionID,
+				Character:   &warrior.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         core.GCDDefault,
+				Cooldown:    time.Second*10 - time.Second*time.Duration(warrior.Talents.ImprovedWhirlwind),
+				IgnoreHaste: true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
 					Value: warrior.whirlwindCost,
@@ -35,16 +33,18 @@ func (warrior *Warrior) newWhirlwindTemplate(sim *core.Simulation) core.SimpleSp
 					Type:  stats.Rage,
 					Value: warrior.whirlwindCost,
 				},
-				CritMultiplier: warrior.critMultiplier(true),
 			},
 		},
 	}
 
 	baseEffect := core.SpellEffect{
-		ProcMask:         core.ProcMaskMeleeMHSpecial,
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
-		BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 0, 1, true),
+		OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+		CritRollCategory:    core.CritRollCategoryPhysical,
+		CritMultiplier:      warrior.critMultiplier(true),
+		ProcMask:            core.ProcMaskMeleeMHSpecial,
+		DamageMultiplier:    1,
+		ThreatMultiplier:    1,
+		BaseDamage:          core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 0, 1, true),
 	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())
@@ -55,17 +55,9 @@ func (warrior *Warrior) newWhirlwindTemplate(sim *core.Simulation) core.SimpleSp
 	}
 	ability.Effects = effects
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (warrior *Warrior) NewWhirlwind(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	ww := &warrior.whirlwind
-	warrior.whirlwindTemplate.Apply(ww)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ww.Effect.Target = target
-
-	return ww
+	warrior.Whirlwind = warrior.RegisterSpell(core.SpellConfig{
+		Template: ability,
+	})
 }
 
 func (warrior *Warrior) CanWhirlwind(sim *core.Simulation) bool {

@@ -17,9 +17,9 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 	}
 
 	if war.CanBloodthirst(sim) {
-		war.NewBloodthirst(sim, sim.GetPrimaryTarget()).Cast(sim)
+		war.Bloodthirst.Cast(sim, sim.GetPrimaryTarget())
 	} else if war.CanWhirlwind(sim) {
-		war.NewWhirlwind(sim, sim.GetPrimaryTarget()).Cast(sim)
+		war.Whirlwind.Cast(sim, sim.GetPrimaryTarget())
 	} else if war.CanHeroicStrike(sim) {
 		war.QueueHeroicStrike(sim)
 	}

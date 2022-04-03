@@ -34,56 +34,56 @@ const (
 // Shared precomputation logic for LB and CL.
 func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellCast {
 	cost := core.ResourceCost{Type: stats.Mana, Value: baseManaCost}
-	spellCast := core.SpellCast{
+	spell := core.SpellCast{
 		Cast: core.Cast{
-			ActionID:            actionID,
-			Character:           shaman.GetCharacter(),
-			CritRollCategory:    core.CritRollCategoryMagical,
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			SpellSchool:         core.SpellSchoolNature,
-			BaseCost:            cost,
-			Cost:                cost,
-			CastTime:            baseCastTime,
-			GCD:                 core.GCDDefault,
-			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
-			SpellExtras:         SpellFlagElectric,
+			ActionID:    actionID,
+			Character:   shaman.GetCharacter(),
+			SpellSchool: core.SpellSchoolNature,
+			BaseCost:    cost,
+			Cost:        cost,
+			CastTime:    baseCastTime,
+			GCD:         core.GCDDefault,
+			SpellExtras: SpellFlagElectric,
 		},
 	}
 
-	if shaman.Talents.ElementalFury {
-		spellCast.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
-	}
-
 	if isLightningOverload {
-		spellCast.ActionID.Tag = CastTagLightningOverload
-		spellCast.CastTime = 0
-		spellCast.GCD = 0
-		spellCast.Cost.Value = 0
+		spell.ActionID.Tag = CastTagLightningOverload
+		spell.CastTime = 0
+		spell.GCD = 0
+		spell.Cost.Value = 0
 	} else if shaman.Talents.LightningMastery > 0 {
 		// Convection applies against the base cost of the spell.
-		spellCast.Cost.Value -= spellCast.BaseCost.Value * float64(shaman.Talents.Convection) * 0.02
-		spellCast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
+		spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.Convection) * 0.02
+		spell.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
 	}
 
 	if !isLightningOverload && shaman.Talents.ElementalFocus {
-		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
 			if shaman.ElementalFocusStacks > 0 {
 				shaman.ElementalFocusStacks--
 			}
 		}
 	} else {
-		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {}
+		spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {}
 	}
 
-	return spellCast
+	return spell
 }
 
 // Helper for precomputing spell effects.
 func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamage float64, spellCoefficient float64, isLightningOverload bool) core.SpellEffect {
 	effect := core.SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
-		BaseDamage:       core.BaseDamageConfigMagic(minBaseDamage, maxBaseDamage, spellCoefficient),
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+		DamageMultiplier:    1,
+		ThreatMultiplier:    1,
+		BaseDamage:          core.BaseDamageConfigMagic(minBaseDamage, maxBaseDamage, spellCoefficient),
+	}
+
+	if shaman.Talents.ElementalFury {
+		effect.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
 	}
 
 	effect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
@@ -113,5 +113,8 @@ func (shaman *Shaman) applyElectricSpellCastInitModifiers(spellCast *core.SpellC
 	if shaman.ElementalFocusStacks > 0 {
 		// Reduces mana cost by 40%
 		spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.4
+	}
+	if shaman.HasAura(ElementalMasteryAuraID) {
+		spellCast.Cost.Value = 0
 	}
 }

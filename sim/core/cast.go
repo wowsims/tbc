@@ -16,9 +16,6 @@ type ResourceCost struct {
 // shown, and activates the GCD. Note that a cast can also be instant, i.e.
 // the effects are applied immediately even though the GCD is still activated.
 
-// Callback for when a cast begins, i.e. when the in-game castbar starts filling up.
-type OnCast func(sim *Simulation, cast *Cast)
-
 // Callback for when a cast is finished, i.e. when the in-game castbar reaches full.
 type OnCastComplete func(sim *Simulation, cast *Cast)
 
@@ -41,15 +38,8 @@ type Cast struct {
 	// The amount of GCD time incurred by this cast. This is almost always 0, 1s, or 1.5s.
 	GCD time.Duration
 
-	// Whether this is a phantom cast. Phantom casts are usually casts triggered by some effect,
-	// like The Lightning Capacitor or Shaman Flametongue Weapon. Many on-hit effects do not
-	// proc from phantom casts, only regular casts.
-	IsPhantom bool
-
-	OutcomeRollCategory OutcomeRollCategory
-	CritRollCategory    CritRollCategory
-	SpellSchool         SpellSchool
-	SpellExtras         SpellExtras
+	SpellSchool SpellSchool
+	SpellExtras SpellExtras
 
 	// Base cost. Many effects in the game which 'reduce mana cost by X%'
 	// are calculated using the base mana cost. Any effects which reduce the base
@@ -65,12 +55,6 @@ type Cast struct {
 	// Adds additional delay to the GCD after the cast is completed. This is usually
 	// used for adding latency following the cast.
 	AfterCastDelay time.Duration
-
-	// How much to multiply damage by, if this cast crits.
-	CritMultiplier float64
-
-	// Bonus crit to be applied to all effects resulting from this cast.
-	BonusCritRating float64 // TODO: move this off cast and move to SpellEffect or something.
 
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete OnCastComplete
@@ -113,6 +97,21 @@ func (cast *Cast) Cancel() {
 	cast.objectInUse = false
 }
 
+func (cast *Cast) ApplyCostModifiers(curCost *float64) {
+	if cast.Character.PseudoStats.NoCost {
+		*curCost = 0
+	} else {
+		*curCost -= cast.BaseCost.Value * (1 - cast.Character.PseudoStats.CostMultiplier)
+		*curCost -= cast.Character.PseudoStats.CostReduction
+		*curCost = MaxFloat(0, *curCost)
+	}
+}
+func (cast *Cast) ApplyCastTimeModifiers(dur *time.Duration) {
+	if !cast.IgnoreHaste {
+		*dur = time.Duration(float64(*dur) / cast.Character.CastSpeed())
+	}
+}
+
 // Should be called exactly once after creation.
 func (cast *Cast) init(sim *Simulation) {
 	if cast.Character == nil {
@@ -123,12 +122,8 @@ func (cast *Cast) init(sim *Simulation) {
 	}
 	cast.objectInUse = true
 
-	if !cast.IgnoreHaste {
-		cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())
-	}
-
-	// Apply on-cast effects.
-	cast.Character.OnCast(sim, cast)
+	cast.ApplyCastTimeModifiers(&cast.CastTime)
+	cast.ApplyCostModifiers(&cast.Cost.Value)
 
 	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
 	if cast.GCD != 0 && cast.Character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
@@ -248,9 +243,6 @@ type SimpleCast struct {
 	Cast
 
 	OnCastComplete OnCastComplete
-
-	// Turns off metrics recording for this cast.
-	DisableMetrics bool
 }
 
 func (simpleCast *SimpleCast) Init(sim *Simulation) {
@@ -260,9 +252,7 @@ func (simpleCast *SimpleCast) Init(sim *Simulation) {
 // TODO: Need to rename this. Cant call it Cast() because of conflict with field of the same name.
 func (simpleCast *SimpleCast) StartCast(sim *Simulation) bool {
 	return simpleCast.Cast.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		if !simpleCast.DisableMetrics {
-			cast.Character.Metrics.AddCast(cast)
-		}
+		cast.Character.Metrics.AddCast(cast)
 		if simpleCast.OnCastComplete != nil {
 			simpleCast.OnCastComplete(sim, cast)
 		}

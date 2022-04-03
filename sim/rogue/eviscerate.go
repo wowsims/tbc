@@ -6,7 +6,7 @@ import (
 
 var EviscerateActionID = core.ActionID{SpellID: 26865}
 
-func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerEviscerateSpell(sim *core.Simulation) {
 	rogue.eviscerateEnergyCost = 35
 	if ItemSetAssassination.CharacterHasSetBonus(&rogue.Character, 4) {
 		rogue.eviscerateEnergyCost -= 10
@@ -15,12 +15,12 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	ability := rogue.newAbility(EviscerateActionID, rogue.eviscerateEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
-			rogue.ApplyFinisher(sim, spellCast.ActionID)
+			rogue.ApplyFinisher(sim, spell.ActionID)
 		} else {
 			if refundAmount > 0 {
-				rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
+				rogue.AddEnergy(sim, spell.MostRecentCost*refundAmount, core.ActionID{SpellID: 31245})
 			}
 		}
 	}
@@ -30,11 +30,11 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 		basePerComboPoint += 40
 	}
 	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 			comboPoints := rogue.ComboPoints()
 			base := 60.0 + basePerComboPoint*float64(comboPoints)
 			roll := sim.RandomFloat("Eviscerate") * 120.0
-			return base + roll + (hitEffect.MeleeAttackPower(spellCast)*0.03)*float64(comboPoints) + hitEffect.BonusWeaponDamage(spellCast)
+			return base + roll + (hitEffect.MeleeAttackPower(spell.Character)*0.03)*float64(comboPoints) + hitEffect.BonusWeaponDamage(spell.Character)
 		},
 		TargetSpellCoefficient: 1,
 	}
@@ -46,25 +46,15 @@ func (rogue *Rogue) newEviscerateTemplate(sim *core.Simulation) core.SimpleSpell
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (rogue *Rogue) NewEviscerate(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	comboPoints := rogue.ComboPoints()
-	if comboPoints == 0 {
-		panic("Eviscerate requires combo points!")
-	}
-
-	ev := &rogue.eviscerate
-	rogue.eviscerateTemplate.Apply(ev)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ev.ActionID.Tag = comboPoints
-	ev.Effect.Target = target
-	if rogue.deathmantle4pcProc {
-		ev.Cost.Value = 0
-		rogue.deathmantle4pcProc = false
-	}
-
-	return ev
+	rogue.Eviscerate = rogue.RegisterSpell(core.SpellConfig{
+		Template: ability,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effect.Target = target
+			instance.ActionID.Tag = rogue.ComboPoints()
+			if rogue.deathmantle4pcProc {
+				instance.Cost.Value = 0
+				rogue.deathmantle4pcProc = false
+			}
+		},
+	})
 }

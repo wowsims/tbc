@@ -11,11 +11,11 @@ func (rogue *Rogue) SinisterStrikeEnergyCost() float64 {
 	return []float64{45, 42, 40}[rogue.Talents.ImprovedSinisterStrike]
 }
 
-func (rogue *Rogue) newSinisterStrikeTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerSinisterStrikeSpell(_ *core.Simulation) {
 	energyCost := rogue.SinisterStrikeEnergyCost()
 	refundAmount := energyCost * 0.8
 	ability := rogue.newAbility(SinisterStrikeActionID, energyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			rogue.AddComboPoints(sim, 1, SinisterStrikeActionID)
 		} else {
@@ -33,15 +33,8 @@ func (rogue *Rogue) newSinisterStrikeTemplate(_ *core.Simulation) core.SimpleSpe
 		ability.Effect.DamageMultiplier += 0.06
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (rogue *Rogue) NewSinisterStrike(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	ss := &rogue.sinisterStrike
-	rogue.sinisterStrikeTemplate.Apply(ss)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ss.Effect.Target = target
-
-	return ss
+	rogue.SinisterStrike = rogue.RegisterSpell(core.SpellConfig{
+		Template:   ability,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

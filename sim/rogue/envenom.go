@@ -6,7 +6,7 @@ import (
 
 var EnvenomActionID = core.ActionID{SpellID: 32684}
 
-func (rogue *Rogue) newEnvenomTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 	rogue.envenomEnergyCost = 35
 	if ItemSetAssassination.CharacterHasSetBonus(&rogue.Character, 4) {
 		rogue.envenomEnergyCost -= 10
@@ -16,12 +16,12 @@ func (rogue *Rogue) newEnvenomTemplate(_ *core.Simulation) core.SimpleSpellTempl
 
 	ability := rogue.newAbility(EnvenomActionID, rogue.envenomEnergyCost, SpellFlagFinisher|core.SpellExtrasIgnoreResists, core.ProcMaskMeleeMHSpecial)
 	ability.SpellCast.SpellSchool = core.SpellSchoolNature
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
-			rogue.ApplyFinisher(sim, spellCast.ActionID)
+			rogue.ApplyFinisher(sim, spell.ActionID)
 		} else {
 			if refundAmount > 0 {
-				rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
+				rogue.AddEnergy(sim, spell.MostRecentCost*refundAmount, core.ActionID{SpellID: 31245})
 			}
 		}
 	}
@@ -31,10 +31,10 @@ func (rogue *Rogue) newEnvenomTemplate(_ *core.Simulation) core.SimpleSpellTempl
 		basePerComboPoint += 40
 	}
 	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 			comboPoints := rogue.ComboPoints()
 			base := basePerComboPoint * float64(comboPoints)
-			return base + (hitEffect.MeleeAttackPower(spellCast)*0.03)*float64(comboPoints)
+			return base + (hitEffect.MeleeAttackPower(spell.Character)*0.03)*float64(comboPoints)
 		},
 		TargetSpellCoefficient: 0,
 	}
@@ -45,25 +45,15 @@ func (rogue *Rogue) newEnvenomTemplate(_ *core.Simulation) core.SimpleSpellTempl
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (rogue *Rogue) NewEnvenom(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	comboPoints := rogue.ComboPoints()
-	if comboPoints == 0 {
-		panic("Envenom requires combo points!")
-	}
-
-	ev := &rogue.envenom
-	rogue.envenomTemplate.Apply(ev)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ev.ActionID.Tag = comboPoints
-	ev.Effect.Target = target
-	if rogue.deathmantle4pcProc {
-		ev.Cost.Value = 0
-		rogue.deathmantle4pcProc = false
-	}
-
-	return ev
+	rogue.Envenom = rogue.RegisterSpell(core.SpellConfig{
+		Template: ability,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effect.Target = target
+			instance.ActionID.Tag = rogue.ComboPoints()
+			if rogue.deathmantle4pcProc {
+				instance.Cost.Value = 0
+				rogue.deathmantle4pcProc = false
+			}
+		},
+	})
 }

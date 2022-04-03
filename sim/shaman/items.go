@@ -63,7 +63,7 @@ var ItemSetCycloneRegalia = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: Cyclone4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 							return
 						}
@@ -73,9 +73,11 @@ var ItemSetCycloneRegalia = core.ItemSet{
 						character.AddAura(sim, core.Aura{
 							ID:       Cyclone4PcManaRegainAuraID,
 							Duration: time.Second * 15,
-							OnCast: func(sim *core.Simulation, cast *core.Cast) {
-								// TODO: how to make sure this goes in before clearcasting?
-								cast.Cost.Value -= 270
+							OnGain: func(sim *core.Simulation) {
+								character.PseudoStats.CostReduction += 270
+							},
+							OnExpire: func(sim *core.Simulation) {
+								character.PseudoStats.CostReduction -= 270
 							},
 							OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 								character.RemoveAura(sim, Cyclone4PcManaRegainAuraID)
@@ -97,7 +99,7 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: Cataclysm4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 							return
 						}
@@ -169,16 +171,15 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 					Duration: dur,
 					OnGain: func(sim *core.Simulation) {
 						character.AddStat(stats.SpellPower, sp)
-						character.SetCD(NaturalAlignmentCrystalCooldownID, sim.CurrentTime+cd)
-						character.Metrics.AddInstantCast(actionID)
+						character.PseudoStats.CostMultiplier *= 1.2
 					},
 					OnExpire: func(sim *core.Simulation) {
 						character.AddStat(stats.SpellPower, -sp)
-					},
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.Cost.Value += cast.BaseCost.Value * 0.2
+						character.PseudoStats.CostMultiplier /= 1.2
 					},
 				})
+				character.SetCD(NaturalAlignmentCrystalCooldownID, sim.CurrentTime+cd)
+				character.Metrics.AddInstantCast(actionID)
 			}
 		},
 	})
@@ -279,12 +280,12 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 		return core.Aura{
 			ID:       StonebreakersTotemAuraID,
 			Duration: core.NeverExpires,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
 
-				if !spellCast.SpellExtras.Matches(SpellFlagShock) {
+				if !spell.SpellExtras.Matches(SpellFlagShock) {
 					return
 				}
 

@@ -9,7 +9,7 @@ import (
 
 const SpellIDConsecration int32 = 27173
 
-func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (paladin *Paladin) registerConsecrationSpell(sim *core.Simulation) {
 
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -17,11 +17,9 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 				ActionID: core.ActionID{
 					SpellID: SpellIDConsecration,
 				},
-				Character:           &paladin.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolHoly,
-				SpellExtras:         core.SpellExtrasAlwaysHits,
+				Character:   &paladin.Character,
+				SpellSchool: core.SpellSchoolHoly,
+				SpellExtras: core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 660,
@@ -36,8 +34,10 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 	}
 
 	effect := core.SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		DamageMultiplier:    1,
+		ThreatMultiplier:    1,
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:  8,
 			TickLength:     time.Second,
@@ -55,17 +55,7 @@ func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.Simpl
 	}
 	spell.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (paladin *Paladin) NewConsecration(sim *core.Simulation) *core.SimpleSpell {
-	paladin.ConsecrationSpell.Cancel(sim)
-
-	consecration := &paladin.ConsecrationSpell
-	paladin.consecrationTemplate.Apply(consecration)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	consecration.Init(sim)
-
-	return consecration
+	paladin.Consecration = paladin.RegisterSpell(core.SpellConfig{
+		Template: spell,
+	})
 }

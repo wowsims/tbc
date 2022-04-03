@@ -81,8 +81,8 @@ func ApplyTalonOfAlar(agent core.Agent) {
 
 		return core.Aura{
 			ID: TalonOfAlarAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.SameAction(ArcaneShotActionID) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spell.SameAction(ArcaneShotActionID) {
 					return
 				}
 
@@ -95,8 +95,8 @@ func ApplyTalonOfAlar(agent core.Agent) {
 func (hunter *Hunter) talonOfAlarDamageMod(baseDamageConfig core.BaseDamageConfig) core.BaseDamageConfig {
 	if hunter.HasTrinketEquipped(30448) {
 		return core.WrapBaseDamageConfig(baseDamageConfig, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
-			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
-				normalDamage := oldCalculator(sim, hitEffect, spellCast)
+			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+				normalDamage := oldCalculator(sim, hitEffect, spell)
 				if hunter.HasAura(TalonOfAlarProcAuraID) {
 					return normalDamage + 40
 				} else {
@@ -128,8 +128,8 @@ func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: BlackBowOfTheBetrayerAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
 				character.AddMana(sim, manaGain, core.ActionID{SpellID: 46939}, false)
@@ -149,8 +149,8 @@ func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
 
 		return core.Aura{
 			ID: AshtongueTalismanOfSwiftnessAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.SameAction(SteadyShotActionID) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spell.SameAction(SteadyShotActionID) {
 					return
 				}
 				if sim.RandomFloat("Ashtongue Talisman of Swiftness") > procChance {

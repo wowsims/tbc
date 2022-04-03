@@ -54,7 +54,7 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 
 				return core.Aura{
 					ID: DesolationBattlegearAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}
@@ -94,7 +94,7 @@ var ItemSetDoomplateBattlegear = core.ItemSet{
 
 				return core.Aura{
 					ID: DoomplateBattlegearAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}
@@ -145,33 +145,35 @@ var ItemSetFistsOfFury = core.ItemSet{
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			spellObj := core.SimpleSpell{}
+
+			procSpell := character.RegisterSpell(core.SpellConfig{
+				Template: core.SimpleSpell{
+					SpellCast: core.SpellCast{
+						Cast: core.Cast{
+							ActionID:    core.ActionID{SpellID: 41989},
+							Character:   character,
+							SpellSchool: core.SpellSchoolFire,
+						},
+					},
+					Effect: core.SpellEffect{
+						OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+						CritRollCategory:    core.CritRollCategoryMagical,
+						CritMultiplier:      character.DefaultSpellCritMultiplier(),
+						IsPhantom:           true,
+						DamageMultiplier:    1,
+						ThreatMultiplier:    1,
+						BaseDamage:          core.BaseDamageConfigRoll(100, 150),
+					},
+				},
+				ModifyCast: core.ModifyCastAssignTarget,
+			})
 
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				ppmm := character.AutoAttacks.NewPPMManager(2)
 
-				castTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
-					SpellCast: core.SpellCast{
-						Cast: core.Cast{
-							ActionID:            core.ActionID{SpellID: 41989},
-							Character:           character,
-							IsPhantom:           true,
-							CritRollCategory:    core.CritRollCategoryMagical,
-							OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-							SpellSchool:         core.SpellSchoolFire,
-							CritMultiplier:      character.DefaultSpellCritMultiplier(),
-						},
-					},
-					Effect: core.SpellEffect{
-						DamageMultiplier: 1,
-						ThreatMultiplier: 1,
-						BaseDamage:       core.BaseDamageConfigRoll(100, 150),
-					},
-				})
-
 				return core.Aura{
 					ID: FistsOfFuryAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 							return
 						}
@@ -179,11 +181,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 							return
 						}
 
-						castAction := &spellObj
-						castTemplate.Apply(castAction)
-						castAction.Effect.Target = spellEffect.Target
-						castAction.Init(sim)
-						castAction.Cast(sim)
+						procSpell.Cast(sim, spellEffect.Target)
 					},
 				}
 			})
@@ -244,13 +242,13 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 
 				return core.Aura{
 					ID: TwinBladesOfAzzinothAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}
 
 						// https://tbc.wowhead.com/spell=41434/the-twin-blades-of-azzinoth, proc mask = 20.
-						if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+						if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 							return
 						}
 
@@ -291,7 +289,7 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 
 				return core.Aura{
 					ID: WastewalkerArmorAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}

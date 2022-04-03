@@ -11,7 +11,7 @@ const SpellIDFireBlast int32 = 27079
 
 var FireBlastCooldownID = core.NewCooldownID()
 
-func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerFireBlastSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -19,11 +19,9 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 					SpellID:    SpellIDFireBlast,
 					CooldownID: FireBlastCooldownID,
 				},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         SpellFlagMage,
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolFire,
+				SpellExtras: SpellFlagMage,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 465,
@@ -32,15 +30,17 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 					Type:  stats.Mana,
 					Value: 465,
 				},
-				GCD:            core.GCDDefault,
-				Cooldown:       time.Second * 8,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				GCD:      core.GCDDefault,
+				Cooldown: time.Second * 8,
 			},
 		},
 		Effect: core.SpellEffect{
-			DamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
-			BaseDamage:       core.BaseDamageConfigMagic(664, 786, 1.5/3.5),
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+			DamageMultiplier:    mage.spellDamageMultiplier,
+			ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
+			BaseDamage:          core.BaseDamageConfigMagic(664, 786, 1.5/3.5),
 		},
 	}
 
@@ -52,17 +52,8 @@ func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTem
 	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
 	spell.Effect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) NewFireBlast(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	fireBlast := &mage.fireBlastSpell
-	mage.fireBlastCastTemplate.Apply(fireBlast)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	fireBlast.Effect.Target = target
-	fireBlast.Init(sim)
-
-	return fireBlast
+	mage.FireBlast = mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

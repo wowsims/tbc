@@ -73,7 +73,7 @@ func ApplyCrusader(agent core.Agent) {
 
 		return core.Aura{
 			ID: CrusaderAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
@@ -166,7 +166,7 @@ func ApplyMongoose(agent core.Agent) {
 
 		return core.Aura{
 			ID: MongooseAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
@@ -229,7 +229,7 @@ func ApplyExecutioner(agent core.Agent) {
 
 		return core.Aura{
 			ID: ExecutionerAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}

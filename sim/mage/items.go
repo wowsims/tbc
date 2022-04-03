@@ -65,7 +65,7 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 				applyStatAura := character.NewTemporaryStatsAuraApplier(Tirisfal4PcProcAuraID, core.ActionID{SpellID: 37443}, stats.Stats{stats.SpellPower: 70}, time.Second*6)
 				return core.Aura{
 					ID: Tirisfal4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 							return
 						}
@@ -109,7 +109,7 @@ func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
 
 		return core.Aura{
 			ID: AshtongueTalismanOfInsightAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}

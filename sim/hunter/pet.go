@@ -19,8 +19,7 @@ type HunterPet struct {
 	// Time when pet should die, as per petUptime.
 	deathTime time.Duration
 
-	killCommandTemplate core.SimpleSpellTemplate
-	killCommand         core.SimpleSpell
+	KillCommand *core.Spell
 
 	primaryAbility   PetAbility
 	secondaryAbility PetAbility
@@ -69,8 +68,8 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 
 	// Cobra reflexes
 	hp.PseudoStats.MeleeSpeedMultiplier *= 1.3
-	hp.AutoAttacks.MHAuto.Effect.DamageMultiplier *= petConfig.DamageMultiplier
-	hp.AutoAttacks.MHAuto.Effect.DamageMultiplier *= 0.85
+	hp.AutoAttacks.MHAuto.Template.Effect.DamageMultiplier *= petConfig.DamageMultiplier
+	hp.AutoAttacks.MHAuto.Template.Effect.DamageMultiplier *= 0.85
 
 	hp.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Strength,
@@ -99,7 +98,7 @@ func (hp *HunterPet) GetPet() *core.Pet {
 }
 
 func (hp *HunterPet) Init(sim *core.Simulation) {
-	hp.killCommandTemplate = hp.newKillCommandTemplate(sim)
+	hp.registerKillCommandSpell(sim)
 
 	if hp.hunterOwner.Options.PetSingleAbility {
 		hp.primaryAbility = hp.NewPetAbility(sim, hp.config.SecondaryAbility, true)

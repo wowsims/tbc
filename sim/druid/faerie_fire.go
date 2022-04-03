@@ -6,14 +6,13 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
+func (druid *Druid) registerFaerieFireSpell(sim *core.Simulation) {
+	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 26993},
-				SpellSchool:         core.SpellSchoolNature,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				Character:           druid.GetCharacter(),
+				ActionID:    core.ActionID{SpellID: 26993},
+				SpellSchool: core.SpellSchoolNature,
+				Character:   druid.GetCharacter(),
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 145,
@@ -26,9 +25,10 @@ func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpell
 			},
 		},
 		Effect: core.SpellEffect{
-			ThreatMultiplier: 1,
-			FlatThreatBonus:  0, // TODO
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			ThreatMultiplier:    1,
+			FlatThreatBonus:     0, // TODO
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
@@ -37,21 +37,14 @@ func (druid *Druid) newFaerieFireTemplate(sim *core.Simulation) core.SimpleSpell
 				spellEffect.Target.AddAura(sim, core.FaerieFireAura(spellEffect.Target, druid.Talents.ImprovedFaerieFire == 3))
 			},
 		},
+	}
+
+	druid.FaerieFire = druid.RegisterSpell(core.SpellConfig{
+		Template:   template,
+		ModifyCast: core.ModifyCastAssignTarget,
 	})
 }
 
-func (druid *Druid) NewFaerieFire(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	ff := &druid.FaerieFireSpell
-	druid.faerieFireCastTemplate.Apply(ff)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ff.Effect.Target = target
-	ff.Init(sim)
-
-	return ff
-}
-
 func (druid *Druid) ShouldCastFaerieFire(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.FaerieFire && !target.HasAura(core.FaerieFireDebuffID)
+	return rotation.FaerieFire && !target.HasAura(core.FaerieFireAuraID)
 }

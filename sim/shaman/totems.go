@@ -222,7 +222,7 @@ func (shaman *Shaman) NextTotemAt(sim *core.Simulation) time.Duration {
 //  Returns whether we tried to cast a totem, regardless of whether it succeeded.
 func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 	var cast *core.SimpleCast
-	var attackCast *core.SimpleSpell // if using fire totems this will be an attack cast.
+	var attackCast *core.Spell // if using fire totems this will be an attack cast.
 
 	for totemTypeIdx, totemExpiration := range shaman.NextTotemDrops {
 		if cast != nil || attackCast != nil {
@@ -256,11 +256,11 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 				case proto.FireTotem_TotemOfWrath:
 					cast = shaman.NewTotemOfWrath(sim)
 				case proto.FireTotem_SearingTotem:
-					attackCast = shaman.NewSearingTotem(sim, sim.GetPrimaryTarget())
+					attackCast = shaman.SearingTotem
 				case proto.FireTotem_MagmaTotem:
-					attackCast = shaman.NewMagmaTotem(sim)
+					attackCast = shaman.MagmaTotem
 				case proto.FireTotem_FireNovaTotem:
-					attackCast = shaman.NewNovaTotem(sim)
+					attackCast = shaman.FireNovaTotem
 				}
 
 			case WaterTotem:
@@ -275,8 +275,8 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 		}
 		return true
 	} else if attackCast != nil {
-		if success := attackCast.Cast(sim); !success {
-			shaman.WaitForMana(sim, attackCast.Cost.Value)
+		if success := attackCast.Cast(sim, sim.GetPrimaryTarget()); !success {
+			shaman.WaitForMana(sim, attackCast.Instance.Cost.Value)
 		}
 		return true
 	}

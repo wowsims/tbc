@@ -55,51 +55,21 @@ type Mage struct {
 	// Cached values for a few mechanics.
 	spellDamageMultiplier float64
 
-	// cached cast stuff
-	arcaneBlastSpell        core.SimpleSpell
-	arcaneBlastCastTemplate core.SimpleSpellTemplate
-
-	arcaneExplosionSpell        core.SimpleSpell
-	arcaneExplosionCastTemplate core.SimpleSpellTemplate
-
-	arcaneMissilesSpell        core.SimpleSpell
-	arcaneMissilesCastTemplate core.SimpleSpellTemplate
-
-	blizzardSpell        core.SimpleSpell
-	blizzardCastTemplate core.SimpleSpellTemplate
-
-	igniteSpells       []core.SimpleSpell
-	igniteCastTemplate core.SimpleSpellTemplate
-
-	fireballSpell        core.SimpleSpell
-	fireballCastTemplate core.SimpleSpellTemplate
-
-	fireballDotSpell        core.SimpleSpell
-	fireballDotCastTemplate core.SimpleSpellTemplate
-
-	fireBlastSpell        core.SimpleSpell
-	fireBlastCastTemplate core.SimpleSpellTemplate
-
-	flamestrikeSpell        core.SimpleSpell
-	flamestrikeCastTemplate core.SimpleSpellTemplate
-
-	flamestrikeDotSpell        core.SimpleSpell
-	flamestrikeDotCastTemplate core.SimpleSpellTemplate
-
-	frostboltSpell        core.SimpleSpell
-	frostboltCastTemplate core.SimpleSpellTemplate
-
-	pyroblastSpell        core.SimpleSpell
-	pyroblastCastTemplate core.SimpleSpellTemplate
-
-	pyroblastDotSpell        core.SimpleSpell
-	pyroblastDotCastTemplate core.SimpleSpellTemplate
-
-	scorchSpell        core.SimpleSpell
-	scorchCastTemplate core.SimpleSpellTemplate
-
-	wintersChillSpell        core.SimpleSpell
-	wintersChillCastTemplate core.SimpleSpellTemplate
+	ArcaneBlast     *core.Spell
+	ArcaneExplosion *core.Spell
+	ArcaneMissiles  *core.Spell
+	Blizzard        *core.Spell
+	Ignites         []*core.Spell
+	Fireball        *core.Spell
+	FireballDot     *core.Spell
+	FireBlast       *core.Spell
+	Flamestrike     *core.Spell
+	FlamestrikeDot  *core.Spell
+	Frostbolt       *core.Spell
+	Pyroblast       *core.Spell
+	PyroblastDot    *core.Spell
+	Scorch          *core.Spell
+	WintersChill    *core.Spell
 
 	manaTracker common.ManaSpendingRateTracker
 }
@@ -115,23 +85,25 @@ func (mage *Mage) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (mage *Mage) Init(sim *core.Simulation) {
-	mage.arcaneBlastCastTemplate = mage.newArcaneBlastTemplate(sim)
-	mage.arcaneExplosionCastTemplate = mage.newArcaneExplosionTemplate(sim)
-	mage.arcaneMissilesCastTemplate = mage.newArcaneMissilesTemplate(sim)
-	mage.blizzardCastTemplate = mage.newBlizzardTemplate(sim)
-	mage.igniteCastTemplate = mage.newIgniteTemplate(sim)
-	mage.fireballCastTemplate = mage.newFireballTemplate(sim)
-	mage.fireballDotCastTemplate = mage.newFireballDotTemplate(sim)
-	mage.fireBlastCastTemplate = mage.newFireBlastTemplate(sim)
-	mage.flamestrikeCastTemplate = mage.newFlamestrikeTemplate(sim)
-	mage.flamestrikeDotCastTemplate = mage.newFlamestrikeDotTemplate(sim)
-	mage.frostboltCastTemplate = mage.newFrostboltTemplate(sim)
-	mage.pyroblastCastTemplate = mage.newPyroblastTemplate(sim)
-	mage.pyroblastDotCastTemplate = mage.newPyroblastDotTemplate(sim)
-	mage.scorchCastTemplate = mage.newScorchTemplate(sim)
-	mage.wintersChillCastTemplate = mage.newWintersChillTemplate(sim)
+	mage.registerArcaneBlastSpell(sim)
+	mage.registerArcaneExplosionSpell(sim)
+	mage.registerArcaneMissilesSpell(sim)
+	mage.registerBlizzardSpell(sim)
+	mage.registerFireballSpell(sim)
+	mage.registerFireballDotSpell(sim)
+	mage.registerFireBlastSpell(sim)
+	mage.registerFlamestrikeSpell(sim)
+	mage.registerFlamestrikeDotSpell(sim)
+	mage.registerFrostboltSpell(sim)
+	mage.registerPyroblastSpell(sim)
+	mage.registerPyroblastDotSpell(sim)
+	mage.registerScorchSpell(sim)
+	mage.registerWintersChillSpell(sim)
 
-	mage.igniteSpells = make([]core.SimpleSpell, sim.GetNumTargets())
+	mage.Ignites = []*core.Spell{}
+	for i := int32(0); i < sim.GetNumTargets(); i++ {
+		mage.Ignites = append(mage.Ignites, mage.newIgniteSpell(sim))
+	}
 }
 
 func (mage *Mage) Reset(newsim *core.Simulation) {

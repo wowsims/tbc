@@ -10,7 +10,7 @@ import (
 var ThunderClapCooldownID = core.NewCooldownID()
 var ThunderClapActionID = core.ActionID{SpellID: 25264, CooldownID: ThunderClapCooldownID}
 
-func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 	warrior.thunderClapCost = 20.0 - float64(warrior.Talents.FocusedRage)
 	impTCDamageMult := 1.0
 	if warrior.Talents.ImprovedThunderClap == 1 {
@@ -27,15 +27,12 @@ func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.Simple
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            ThunderClapActionID,
-				Character:           &warrior.Character,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				SpellExtras:         core.SpellExtrasBinary,
-				GCD:                 core.GCDDefault,
-				Cooldown:            time.Second * 4,
-				IgnoreHaste:         true,
+				ActionID:    ThunderClapActionID,
+				Character:   &warrior.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         core.GCDDefault,
+				Cooldown:    time.Second * 4,
+				IgnoreHaste: true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
 					Value: warrior.thunderClapCost,
@@ -44,15 +41,18 @@ func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.Simple
 					Type:  stats.Rage,
 					Value: warrior.thunderClapCost,
 				},
-				CritMultiplier: warrior.spellCritMultiplier(true),
+				SpellExtras: core.SpellExtrasBinary,
 			},
 		},
 	}
 
 	baseEffect := core.SpellEffect{
-		DamageMultiplier: impTCDamageMult,
-		ThreatMultiplier: 1.75,
-		BaseDamage:       core.BaseDamageConfigFlat(123),
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      warrior.spellCritMultiplier(true),
+		DamageMultiplier:    impTCDamageMult,
+		ThreatMultiplier:    1.75,
+		BaseDamage:          core.BaseDamageConfigFlat(123),
 	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())
@@ -62,7 +62,7 @@ func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.Simple
 		effects[i].Target = sim.GetTarget(i)
 
 		tcAura := core.ThunderClapAura(effects[i].Target, warrior.Talents.ImprovedThunderClap)
-		effects[i].OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		effects[i].OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				// This needs to be AddAura instead of ReplaceAura, in case a lower rank of Thunder Clap was applied by another warrior.
 				spellEffect.Target.AddAura(sim, tcAura)
@@ -71,13 +71,9 @@ func (warrior *Warrior) newThunderClapTemplate(sim *core.Simulation) core.Simple
 	}
 	ability.Effects = effects
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (warrior *Warrior) NewThunderClap(_ *core.Simulation) *core.SimpleSpell {
-	tc := &warrior.thunderClap
-	warrior.thunderClapTemplate.Apply(tc)
-	return tc
+	warrior.ThunderClap = warrior.RegisterSpell(core.SpellConfig{
+		Template: ability,
+	})
 }
 
 func (warrior *Warrior) CanThunderClap(sim *core.Simulation) bool {

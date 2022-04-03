@@ -12,16 +12,14 @@ const SpellIDArcaneMissiles int32 = 38699
 // Note: AM doesn't charge its mana up-front, instead it charges 1/5 of the mana on each tick.
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
-func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDArcaneMissiles},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolArcane,
-				SpellExtras:         SpellFlagMage | core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
+				ActionID:    core.ActionID{SpellID: SpellIDArcaneMissiles},
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolArcane,
+				SpellExtras: SpellFlagMage | core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 740,
@@ -30,13 +28,15 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 					Type:  stats.Mana,
 					Value: 740,
 				},
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				GCD: core.GCDDefault,
 			},
 		},
 		Effect: core.SpellEffect{
-			DamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+			DamageMultiplier:    mage.spellDamageMultiplier,
+			ThreatMultiplier:    1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 			DotInput: core.DotDamageInput{
 				NumberOfTicks:       5,
 				TickLength:          time.Second,
@@ -56,17 +56,17 @@ func (mage *Mage) newArcaneMissilesTemplate(sim *core.Simulation) core.SimpleSpe
 		spell.Effect.DamageMultiplier *= 1.05
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
-}
+	mage.ArcaneMissiles = mage.RegisterSpell(core.SpellConfig{
+		Template: spell,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effect.Target = target
 
-func (mage *Mage) NewArcaneMissiles(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	arcaneMissiles := &mage.arcaneMissilesSpell
-	mage.arcaneMissilesCastTemplate.Apply(arcaneMissiles)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	arcaneMissiles.Effect.Target = target
-	arcaneMissiles.Init(sim)
-
-	return arcaneMissiles
+			// CC has a special interaction with AM, gets the benefit of CC crit bonus from
+			// the previous cast along with its own.
+			if mage.HasAura(ClearcastingAuraID) {
+				bonusCrit := float64(mage.Talents.ArcanePotency) * 10 * core.SpellCritRatingPerCritChance
+				instance.Effect.BonusSpellCritRating += bonusCrit
+			}
+		},
+	})
 }

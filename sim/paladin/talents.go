@@ -31,6 +31,7 @@ func (paladin *Paladin) applyCrusade() {
 
 	damageMultiplier := 1 + (0.01 * float64(paladin.Talents.Crusade)) // assume multiplicative scaling
 
+	// TO-DO: This doesn't account for multiple targets
 	paladin.RegisterResetEffect(func(sim *core.Simulation) {
 		switch sim.GetPrimaryTarget().MobType {
 		case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeDemon, proto.MobType_MobTypeUndead, proto.MobType_MobTypeElemental:
@@ -48,12 +49,11 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
 
 	if paladin.GetMHWeapon().HandType == proto.HandType_HandTypeTwoHand {
 		paladin.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization)) // assume multiplicative scaling
-		// TODO: Might need to additionally apply this to non-physical spells directly.
 	}
 }
 
 // Apply as permanent aura only to self for now
-// Maybe should put this in the partybuff section instead at some point
+// TO-DO: Maybe should put this in the partybuff section instead at some point
 func (paladin *Paladin) applySanctityAura() {
 	if !paladin.Talents.SanctityAura {
 		return
@@ -99,7 +99,7 @@ func (paladin *Paladin) applyVengeance() {
 	paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: VengeanceAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					newStacks := core.MinInt32(3, paladin.NumStacks(VengeanceAuraID)+1)
 					paladin.AddAura(sim, makeProcAura(newStacks))

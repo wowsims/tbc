@@ -11,57 +11,45 @@ const SpellIDShadowWordPain int32 = 25368
 
 var ShadowWordPainActionID = core.ActionID{SpellID: SpellIDShadowWordPain}
 
-var ShadowWordPainDebuffID = core.NewDebuffID()
+var ShadowWordPainAuraID = core.NewAuraID()
 
-func (priest *Priest) newShadowWordPainTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 575}
-	baseCast := core.Cast{
-		ActionID:            ShadowWordPainActionID,
-		Character:           &priest.Character,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolShadow,
-		BaseCost:            cost,
-		Cost:                cost,
-		CastTime:            0,
-		GCD:                 core.GCDDefault,
-	}
-
-	effect := core.SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:  6,
-			TickLength:     time.Second * 3,
-			TickBaseDamage: core.DotSnapshotFuncMagic(1236/6, 0.183),
-			DebuffID:       ShadowWordPainDebuffID,
+	template := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:    ShadowWordPainActionID,
+				Character:   &priest.Character,
+				SpellSchool: core.SpellSchoolShadow,
+				BaseCost:    cost,
+				Cost:        cost,
+				CastTime:    0,
+				GCD:         core.GCDDefault,
+			},
+		},
+		Effect: core.SpellEffect{
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			DotInput: core.DotDamageInput{
+				NumberOfTicks:  6,
+				TickLength:     time.Second * 3,
+				TickBaseDamage: core.DotSnapshotFuncMagic(1236/6, 0.183),
+				AuraID:         ShadowWordPainAuraID,
+			},
 		},
 	}
 
-	effect.DotInput.NumberOfTicks += int(priest.Talents.ImprovedShadowWordPain) // extra tick per point
+	template.Effect.DotInput.NumberOfTicks += int(priest.Talents.ImprovedShadowWordPain) // extra tick per point
 
 	if ItemSetAbsolution.CharacterHasSetBonus(&priest.Character, 2) { // Absolution 2p adds 1 extra tick to swp
-		effect.DotInput.NumberOfTicks += 1
+		template.Effect.DotInput.NumberOfTicks += 1
 	}
 
-	priest.applyTalentsToShadowSpell(&baseCast, &effect)
+	priest.applyTalentsToShadowSpell(&template.SpellCast.Cast, &template.Effect)
 
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: baseCast,
-		},
-		Effect: effect,
+	priest.ShadowWordPain = priest.RegisterSpell(core.SpellConfig{
+		Template:   template,
+		ModifyCast: core.ModifyCastAssignTarget,
 	})
-}
-
-func (priest *Priest) NewShadowWordPain(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	mf := &priest.SWPSpell
-
-	priest.swpCastTemplate.Apply(mf)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Effect.Target = target
-	mf.Init(sim)
-
-	return mf
 }

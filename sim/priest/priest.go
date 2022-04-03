@@ -13,38 +13,24 @@ type Priest struct {
 
 	SurgeOfLight bool
 
+	Latency float64
+
 	// cached cast stuff
 	// TODO: aoe multi-target situations will need multiple spells ticking for each target.
-	MindFlaySpell        core.SimpleSpell
-	mindflayCastTemplate core.SimpleSpellTemplate
+	DevouringPlague *core.Spell
+	HolyFire        *core.Spell
+	MindBlast       *core.Spell
+	MindFlay        []*core.Spell
+	ShadowWordDeath *core.Spell
+	ShadowWordPain  *core.Spell
+	Shadowfiend     *core.Spell
+	Smite           *core.Spell
+	Starshards      *core.Spell
+	VampiricTouch   *core.Spell
+	VampiricTouch2  *core.Spell
 
-	mindblastSpell        core.SimpleSpell
-	mindblastCastTemplate core.SimpleSpellTemplate
-
-	swdSpell        core.SimpleSpell
-	swdCastTemplate core.SimpleSpellTemplate
-
-	SWPSpell        core.SimpleSpell
-	swpCastTemplate core.SimpleSpellTemplate
-
-	VTSpell        *core.SimpleSpell
-	VTSpellCasting *core.SimpleSpell
-	vtCastTemplate core.SimpleSpellTemplate
-
-	ShadowfiendSpell    core.SimpleSpell
-	shadowfiendTemplate core.SimpleSpellTemplate
-
-	DevouringPlagueSpell    core.SimpleSpell
-	devouringPlagueTemplate core.SimpleSpellTemplate
-
-	StarshardsSpell    core.SimpleSpell
-	starshardsTemplate core.SimpleSpellTemplate
-
-	smiteSpell        core.SimpleSpell
-	smiteCastTemplate core.SimpleSpellTemplate
-
-	holyFireSpell        core.SimpleSpell
-	holyFireCastTemplate core.SimpleSpellTemplate
+	CurVTSpell  *core.Spell
+	NextVTSpell *core.Spell
 }
 
 type SelfBuffs struct {
@@ -72,23 +58,28 @@ func (priest *Priest) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (priest *Priest) Init(sim *core.Simulation) {
-	priest.mindflayCastTemplate = priest.newMindflayTemplate(sim)
-	priest.mindblastCastTemplate = priest.newMindBlastTemplate(sim)
-	priest.swpCastTemplate = priest.newShadowWordPainTemplate(sim)
-	priest.vtCastTemplate = priest.newVampiricTouchTemplate(sim)
-	priest.swdCastTemplate = priest.newShadowWordDeathTemplate(sim)
-	priest.shadowfiendTemplate = priest.newShadowfiendTemplate(sim)
-	priest.devouringPlagueTemplate = priest.newDevouringPlagueTemplate(sim)
-	priest.starshardsTemplate = priest.newStarshardsTemplate(sim)
-	priest.smiteCastTemplate = priest.newSmiteTemplate(sim)
-	priest.holyFireCastTemplate = priest.newHolyFireTemplate(sim)
+	priest.registerDevouringPlagueSpell(sim)
+	priest.registerHolyFireSpell(sim)
+	priest.registerMindBlastSpell(sim)
+	priest.registerShadowWordDeathSpell(sim)
+	priest.registerShadowWordPainSpell(sim)
+	priest.registerShadowfiendSpell(sim)
+	priest.registerSmiteSpell(sim)
+	priest.registerStarshardsSpell(sim)
+	priest.VampiricTouch = priest.newVampiricTouchSpell(sim, false)
+	priest.VampiricTouch2 = priest.newVampiricTouchSpell(sim, true)
+
+	priest.MindFlay = []*core.Spell{
+		nil, // So we can use # of ticks as the index
+		priest.newMindFlaySpell(sim, 1),
+		priest.newMindFlaySpell(sim, 2),
+		priest.newMindFlaySpell(sim, 3),
+	}
 }
 
 func (priest *Priest) Reset(newsim *core.Simulation) {
-	// These spells still need special cleanup because they're wierd.
-	priest.VTSpell = &core.SimpleSpell{}
-	priest.VTSpellCasting = &core.SimpleSpell{}
-
+	priest.CurVTSpell = priest.VampiricTouch
+	priest.NextVTSpell = priest.VampiricTouch
 }
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) *Priest {

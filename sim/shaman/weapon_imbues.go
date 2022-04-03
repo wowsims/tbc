@@ -12,6 +12,64 @@ var TotemOfTheAstralWinds int32 = 27815
 
 var WFImbueAuraID = core.NewAuraID()
 
+func (shaman *Shaman) newWindfuryImbueSpell(isMH bool) *core.Spell {
+	apBonus := 475.0
+	if shaman.Equip[proto.ItemSlot_ItemSlotRanged].ID == TotemOfTheAstralWinds {
+		apBonus += 80
+	}
+
+	wftempl := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:    core.ActionID{SpellID: 25505},
+				Character:   &shaman.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+			},
+		},
+	}
+
+	baseEffect := core.SpellEffect{
+		OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+		CritRollCategory:    core.CritRollCategoryPhysical,
+		CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
+		IsPhantom:           true,
+		DamageMultiplier:    1.0,
+		ThreatMultiplier:    1.0,
+		BonusAttackPower:    apBonus,
+	}
+	if shaman.Talents.SpiritWeapons {
+		baseEffect.ThreatMultiplier *= 0.7
+	}
+
+	weaponDamageMultiplier := 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
+	if isMH {
+		wftempl.ActionID.Tag = 1
+		baseEffect.ProcMask = core.ProcMaskMeleeMHSpecial
+		baseEffect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, weaponDamageMultiplier, true)
+	} else {
+		wftempl.ActionID.Tag = 2
+		baseEffect.ProcMask = core.ProcMaskMeleeOHSpecial
+		baseEffect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.OffHand, false, 0, weaponDamageMultiplier, true)
+
+		// For whatever reason, OH penalty does not apply to the bonus AP from WF OH
+		// hits. Implement this by doubling the AP bonus we provide.
+		baseEffect.BonusAttackPower += apBonus
+	}
+
+	wftempl.Effects = []core.SpellEffect{
+		baseEffect,
+		baseEffect,
+	}
+
+	return shaman.RegisterSpell(core.SpellConfig{
+		Template: wftempl,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effects[0].Target = target
+			instance.Effects[1].Target = target
+		},
+	})
+}
+
 func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 	if !mh && !oh {
 		return
@@ -21,56 +79,19 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 	if mh && oh {
 		proc = 0.36
 	}
-	apBonus := 475.0
 
-	if shaman.Equip[proto.ItemSlot_ItemSlotRanged].ID == TotemOfTheAstralWinds {
-		apBonus += 80
-	}
+	mhSpell := shaman.newWindfuryImbueSpell(true)
+	ohSpell := shaman.newWindfuryImbueSpell(false)
 
-	wftempl := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 25505},
-				Character:           &shaman.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
-				IsPhantom:           true,
-			},
-		},
-	}
-
-	baseEffect := core.SpellEffect{
-		DamageMultiplier: 1.0,
-		ThreatMultiplier: 1.0,
-		BonusAttackPower: apBonus,
-	}
-	if shaman.Talents.SpiritWeapons {
-		baseEffect.ThreatMultiplier *= 0.7
-	}
-
-	wftempl.Effects = []core.SpellEffect{
-		baseEffect,
-		baseEffect,
-	}
-
-	weaponDamageMultiplier := 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
-	mhBaseDamage := core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, weaponDamageMultiplier, true)
-	ohBaseDamage := core.BaseDamageConfigMeleeWeapon(core.OffHand, false, 0, weaponDamageMultiplier, true)
-
-	wfTemplate := core.NewSimpleSpellTemplate(wftempl)
-
-	wfAtk := core.SimpleSpell{}
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		var icd core.InternalCD
 		const icdDur = time.Second * 3
 
 		return core.Aura{
 			ID: WFImbueAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				// ProcMask: 20
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
 				}
 
@@ -86,28 +107,11 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 
-				wfTemplate.Apply(&wfAtk)
-				// Set so only the proc'd hand attacks
-				attackProc := core.ProcMaskMeleeMHSpecial
 				if isMHHit {
-					wfAtk.ActionID.Tag = 1
+					mhSpell.Cast(sim, spellEffect.Target)
 				} else {
-					wfAtk.ActionID.Tag = 2
-					attackProc = core.ProcMaskMeleeOHSpecial
+					ohSpell.Cast(sim, spellEffect.Target)
 				}
-				for i := 0; i < 2; i++ {
-					wfAtk.Effects[i].Target = spellEffect.Target
-					wfAtk.Effects[i].ProcMask = attackProc
-					if isMHHit {
-						wfAtk.Effects[i].BaseDamage = mhBaseDamage
-					} else {
-						// For whatever reason, OH penalty does not apply to the bonus AP from WF OH
-						// hits. Implement this by doubling the AP bonus we provide.
-						wfAtk.Effects[i].BonusAttackPower += apBonus
-						wfAtk.Effects[i].BaseDamage = ohBaseDamage
-					}
-				}
-				wfAtk.Cast(sim)
 			},
 		}
 	})
@@ -115,51 +119,57 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 var FTImbueAuraID = core.NewAuraID()
 
+func (shaman *Shaman) newFlametongueImbueSpell(isMH bool) *core.Spell {
+	ftTmpl := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:    core.ActionID{SpellID: 25489},
+				Character:   &shaman.Character,
+				SpellSchool: core.SpellSchoolFire,
+			},
+		},
+		Effect: core.SpellEffect{
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+			IsPhantom:           true,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+		},
+	}
+	ftTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
+
+	if isMH {
+		if weapon := shaman.GetMHWeapon(); weapon != nil {
+			baseDamage := weapon.SwingSpeed * 35.0
+			ftTmpl.Effect.BaseDamage = core.BaseDamageConfigMagic(baseDamage, baseDamage, 0.1)
+		}
+	} else {
+		if weapon := shaman.GetOHWeapon(); weapon != nil {
+			baseDamage := weapon.SwingSpeed * 35.0
+			ftTmpl.Effect.BaseDamage = core.BaseDamageConfigMagic(baseDamage, baseDamage, 0.1)
+		}
+	}
+
+	return shaman.RegisterSpell(core.SpellConfig{
+		Template:   ftTmpl,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
+}
+
 func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	if !mh && !oh {
 		return
 	}
 
-	ftTmpl := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 25489},
-				Character:           &shaman.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				IsPhantom:           true,
-				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
-			},
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-		},
-	}
-	ftTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
-
-	mhTmpl := ftTmpl
-	ohTmpl := ftTmpl
-
-	if weapon := shaman.GetMHWeapon(); weapon != nil {
-		baseDamage := weapon.SwingSpeed * 35.0
-		mhTmpl.Effect.BaseDamage = core.BaseDamageConfigMagic(baseDamage, baseDamage, 0.1)
-	}
-	if weapon := shaman.GetOHWeapon(); weapon != nil {
-		baseDamage := weapon.SwingSpeed * 35.0
-		ohTmpl.Effect.BaseDamage = core.BaseDamageConfigMagic(baseDamage, baseDamage, 0.1)
-	}
-
-	mhTemplate := core.NewSimpleSpellTemplate(mhTmpl)
-	ohTemplate := core.NewSimpleSpellTemplate(ohTmpl)
-	ftSpell := core.SimpleSpell{}
+	mhSpell := shaman.newFlametongueImbueSpell(true)
+	ohSpell := shaman.newFlametongueImbueSpell(false)
 
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: FTImbueAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
 				}
 
@@ -169,13 +179,10 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 				}
 
 				if isMHHit {
-					mhTemplate.Apply(&ftSpell)
+					mhSpell.Cast(sim, spellEffect.Target)
 				} else {
-					ohTemplate.Apply(&ftSpell)
+					ohSpell.Cast(sim, spellEffect.Target)
 				}
-				ftSpell.Effect.Target = spellEffect.Target
-				ftSpell.Init(sim)
-				ftSpell.Cast(sim)
 			},
 		}
 	})
@@ -183,40 +190,47 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 
 var FBImbueAuraID = core.NewAuraID()
 
+func (shaman *Shaman) newFrostbrandImbueSpell(isMH bool) *core.Spell {
+	fbTmpl := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:    core.ActionID{SpellID: 25500},
+				Character:   &shaman.Character,
+				SpellSchool: core.SpellSchoolFrost,
+			},
+		},
+		Effect: core.SpellEffect{
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+			IsPhantom:           true,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMagic(246, 246, 0.1),
+		},
+	}
+	fbTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
+
+	return shaman.RegisterSpell(core.SpellConfig{
+		Template:   fbTmpl,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
+}
+
 func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 	if !mh && !oh {
 		return
 	}
 
-	fbTmpl := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 25500},
-				Character:           &shaman.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFrost,
-				IsPhantom:           true,
-				CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
-			},
-		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMagic(246, 246, 0.1),
-		},
-	}
-	fbTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
-
-	fbTemplate := core.NewSimpleSpellTemplate(fbTmpl)
-	fbSpell := core.SimpleSpell{}
+	mhSpell := shaman.newFrostbrandImbueSpell(true)
+	ohSpell := shaman.newFrostbrandImbueSpell(false)
 
 	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		ppmm := shaman.AutoAttacks.NewPPMManager(9.0)
 		return core.Aura{
 			ID: FBImbueAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 					return
 				}
 
@@ -229,10 +243,11 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 					return
 				}
 
-				fbTemplate.Apply(&fbSpell)
-				fbSpell.Effect.Target = spellEffect.Target
-				fbSpell.Init(sim)
-				fbSpell.Cast(sim)
+				if isMHHit {
+					mhSpell.Cast(sim, spellEffect.Target)
+				} else {
+					ohSpell.Cast(sim, spellEffect.Target)
+				}
 			},
 		}
 	})

@@ -49,7 +49,7 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 				continue
 			}
 
-			raidPresimOptions[player.GetCharacter().RaidIndex] = presimOptions
+			raidPresimOptions[player.GetCharacter().Index] = presimOptions
 			remainingAgents++
 		}
 	}
@@ -74,7 +74,7 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 			for _, player := range party.Players {
 				playerConfig := partyConfig.Players[player.GetCharacter().PartyIndex]
 
-				presimOptions := raidPresimOptions[player.GetCharacter().RaidIndex]
+				presimOptions := raidPresimOptions[player.GetCharacter().Index]
 				if presimOptions == nil {
 					continue
 				}
@@ -91,11 +91,11 @@ func (sim *Simulation) runPresims(request proto.RaidSimRequest) {
 			partyMetrics := presimResult.RaidMetrics.Parties[partyIdx]
 			for _, player := range party.Players {
 				playerMetrics := partyMetrics.Players[player.GetCharacter().PartyIndex]
-				presimOptions := raidPresimOptions[player.GetCharacter().RaidIndex]
+				presimOptions := raidPresimOptions[player.GetCharacter().Index]
 				if presimOptions != nil {
 					done := presimOptions.OnPresimResult(*playerMetrics, numPresimIterations, duration)
 					if done {
-						raidPresimOptions[player.GetCharacter().RaidIndex] = nil
+						raidPresimOptions[player.GetCharacter().Index] = nil
 						remainingAgents--
 					}
 				}

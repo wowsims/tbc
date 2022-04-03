@@ -46,15 +46,19 @@ type Pet struct {
 func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritance PetStatInheritance, enabledOnStart bool) Pet {
 	pet := Pet{
 		Character: Character{
-			Name:        name,
-			Label:       fmt.Sprintf("%s - %s", owner.Label, name),
-			PseudoStats: stats.NewPseudoStats(),
-			Party:       owner.Party,
-			PartyIndex:  owner.PartyIndex,
-			RaidIndex:   owner.RaidIndex,
-			auraTracker: newAuraTracker(false),
-			baseStats:   baseStats,
-			Metrics:     NewCharacterMetrics(),
+			Unit: Unit{
+				Type:        PetUnit,
+				Index:       owner.Index,
+				Label:       fmt.Sprintf("%s - %s", owner.Label, name),
+				Level:       CharacterLevel,
+				PseudoStats: stats.NewPseudoStats(),
+				auraTracker: newAuraTracker(),
+				Metrics:     NewCharacterMetrics(),
+			},
+			Name:       name,
+			Party:      owner.Party,
+			PartyIndex: owner.PartyIndex,
+			baseStats:  baseStats,
 		},
 		Owner:           owner,
 		statInheritance: statInheritance,

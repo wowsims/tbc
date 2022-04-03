@@ -11,27 +11,27 @@ import (
 var RaptorStrikeCooldownID = core.NewCooldownID()
 var RaptorStrikeActionID = core.ActionID{SpellID: 27014, CooldownID: RaptorStrikeCooldownID}
 
-func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 120}
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            RaptorStrikeActionID,
-				Character:           &hunter.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				Cost:                cost,
-				BaseCost:            cost,
-				Cooldown:            time.Second * 6,
-				CritMultiplier:      hunter.critMultiplier(false, sim.GetPrimaryTarget()),
+				ActionID:    RaptorStrikeActionID,
+				Character:   &hunter.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				Cost:        cost,
+				BaseCost:    cost,
+				Cooldown:    time.Second * 6,
 			},
 		},
 		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 170, 1, true),
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      hunter.critMultiplier(false, sim.GetPrimaryTarget()),
+			ProcMask:            core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 170, 1, true),
 		},
 	}
 
@@ -40,25 +40,17 @@ func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.SimpleS
 
 	hunter.raptorStrikeCost = ama.Cost.Value
 
-	return core.NewSimpleSpellTemplate(ama)
-}
-
-func (hunter *Hunter) NewRaptorStrike(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	rs := &hunter.raptorStrike
-	hunter.raptorStrikeTemplate.Apply(rs)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	rs.Effect.Target = target
-
-	rs.Init(sim)
-	return rs
+	hunter.RaptorStrike = hunter.RegisterSpell(core.SpellConfig{
+		Template:   ama,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 // Returns true if the regular melee swing should be used, false otherwise.
-func (hunter *Hunter) TryRaptorStrike(sim *core.Simulation) *core.SimpleSpell {
+func (hunter *Hunter) TryRaptorStrike(sim *core.Simulation) *core.Spell {
 	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveAutosOnly || hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime) || hunter.CurrentMana() < hunter.raptorStrikeCost {
 		return nil
 	}
 
-	return hunter.NewRaptorStrike(sim, sim.GetPrimaryTarget())
+	return hunter.RaptorStrike
 }

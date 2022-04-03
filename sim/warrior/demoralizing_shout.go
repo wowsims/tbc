@@ -7,7 +7,7 @@ import (
 
 var DemoralizingShoutActionID = core.ActionID{SpellID: 25203}
 
-func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
 	warrior.shoutCost = 10.0
 	if ItemSetBoldArmor.CharacterHasSetBonus(&warrior.Character, 2) {
 		warrior.shoutCost -= 2
@@ -16,12 +16,11 @@ func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            DemoralizingShoutActionID,
-				Character:           &warrior.Character,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				IgnoreHaste:         true,
+				ActionID:    DemoralizingShoutActionID,
+				Character:   &warrior.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         core.GCDDefault,
+				IgnoreHaste: true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
 					Value: warrior.shoutCost,
@@ -35,8 +34,9 @@ func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.
 	}
 
 	baseEffect := core.SpellEffect{
-		ThreatMultiplier: 1,
-		FlatThreatBonus:  56,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		ThreatMultiplier:    1,
+		FlatThreatBonus:     56,
 	}
 
 	numHits := sim.GetNumTargets()
@@ -46,7 +46,7 @@ func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.
 		effects[i].Target = sim.GetTarget(i)
 
 		demoShoutAura := core.DemoralizingShoutAura(effects[i].Target, warrior.Talents.BoomingVoice, warrior.Talents.ImprovedDemoralizingShout)
-		effects[i].OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		effects[i].OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				// This needs to be AddAura instead of ReplaceAura, in case a lower rank of demo shout was applied by another warrior.
 				spellEffect.Target.AddAura(sim, demoShoutAura)
@@ -55,14 +55,9 @@ func (warrior *Warrior) newDemoralizingShoutTemplate(sim *core.Simulation) core.
 	}
 	ability.Effects = effects
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (warrior *Warrior) NewDemoralizingShout(_ *core.Simulation) *core.SimpleSpell {
-	ds := &warrior.demoralizingShout
-	warrior.demoralizingShoutTemplate.Apply(ds)
-
-	return ds
+	warrior.DemoralizingShout = warrior.RegisterSpell(core.SpellConfig{
+		Template: ability,
+	})
 }
 
 func (warrior *Warrior) CanDemoralizingShout(sim *core.Simulation) bool {

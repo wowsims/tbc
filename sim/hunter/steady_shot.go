@@ -9,7 +9,7 @@ import (
 
 var SteadyShotActionID = core.ActionID{SpellID: 34120}
 
-func (hunter *Hunter) newSteadyShotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (hunter *Hunter) registerSteadyShotSpell(sim *core.Simulation) {
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -25,27 +25,27 @@ func (hunter *Hunter) newSteadyShotTemplate(sim *core.Simulation) core.SimpleSpe
 				},
 				// Cast time is affected by ranged attack speed so set it later.
 				//CastTime:     time.Millisecond * 1500,
-				GCD:                 core.GCDDefault + hunter.latency,
-				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
-				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+				GCD:         core.GCDDefault + hunter.latency,
+				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+				SpellSchool: core.SpellSchoolPhysical,
 			},
 		},
 		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskRangedSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+			ProcMask:            core.ProcMaskRangedSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 			BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
-				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
-					return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					return (hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
 						hunter.AutoAttacks.Ranged.BaseDamage(sim)*2.8/hunter.AutoAttacks.Ranged.SwingSpeed +
 						150
 				},
 				TargetSpellCoefficient: 1,
 			}),
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				hunter.killCommandBlocked = false
 				hunter.TryKillCommand(sim, spellEffect.Target)
 				hunter.rotation(sim, false)
@@ -62,19 +62,13 @@ func (hunter *Hunter) newSteadyShotTemplate(sim *core.Simulation) core.SimpleSpe
 		ama.Effect.DamageMultiplier *= 1.1
 	}
 
-	return core.NewSimpleSpellTemplate(ama)
-}
-
-func (hunter *Hunter) NewSteadyShot(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	ss := &hunter.steadyShot
-	hunter.steadyShotTemplate.Apply(ss)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ss.CastTime = hunter.SteadyShotCastTime()
-	ss.Effect.Target = target
-
-	ss.Init(sim)
-	return ss
+	hunter.SteadyShot = hunter.RegisterSpell(core.SpellConfig{
+		Template: ama,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.Effect.Target = target
+			instance.CastTime = hunter.SteadyShotCastTime()
+		},
+	})
 }
 
 func (hunter *Hunter) SteadyShotCastTime() time.Duration {

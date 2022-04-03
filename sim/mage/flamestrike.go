@@ -13,16 +13,14 @@ const (
 
 const SpellIDFlamestrike int32 = 27086
 
-func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDFlamestrike},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         SpellFlagMage,
+				ActionID:    core.ActionID{SpellID: SpellIDFlamestrike},
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolFire,
+				SpellExtras: SpellFlagMage,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 1175,
@@ -31,12 +29,11 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 					Type:  stats.Mana,
 					Value: 1175,
 				},
-				CastTime:       time.Second * 3,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				CastTime: time.Second * 3,
+				GCD:      core.GCDDefault,
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					flamestrikeDot := mage.newFlamestrikeDot(sim)
-					flamestrikeDot.Cast(sim)
+					mage.FlamestrikeDot.Instance.Cancel(sim)
+					mage.FlamestrikeDot.Cast(sim, nil)
 				},
 			},
 		},
@@ -44,9 +41,12 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 	}
 
 	baseEffect := core.SpellEffect{
-		DamageMultiplier: mage.spellDamageMultiplier,
-		ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
-		BaseDamage:       core.BaseDamageConfigMagic(480, 585, 0.236),
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+		DamageMultiplier:    mage.spellDamageMultiplier,
+		ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
+		BaseDamage:          core.BaseDamageConfigMagic(480, 585, 0.236),
 	}
 
 	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
@@ -65,10 +65,12 @@ func (mage *Mage) newFlamestrikeTemplate(sim *core.Simulation) core.SimpleSpellT
 	}
 	spell.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
+	mage.Flamestrike = mage.RegisterSpell(core.SpellConfig{
+		Template: spell,
+	})
 }
 
-func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerFlamestrikeDotSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -76,18 +78,17 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 					SpellID: SpellIDFlamestrike,
 					Tag:     CastTagFlamestrikeDot,
 				},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         SpellFlagMage | core.SpellExtrasAlwaysHits,
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolFire,
+				SpellExtras: SpellFlagMage | core.SpellExtrasAlwaysHits,
 			},
 		},
 	}
 
 	baseEffect := core.SpellEffect{
-		DamageMultiplier: mage.spellDamageMultiplier,
-		ThreatMultiplier: 1,
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		DamageMultiplier:    mage.spellDamageMultiplier,
+		ThreatMultiplier:    1,
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:  4,
 			TickLength:     time.Second * 2,
@@ -106,29 +107,8 @@ func (mage *Mage) newFlamestrikeDotTemplate(sim *core.Simulation) core.SimpleSpe
 	}
 	spell.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) newFlamestrikeDot(sim *core.Simulation) *core.SimpleSpell {
-	// Cancel the current flamestrike dot.
-	mage.flamestrikeDotSpell.Cancel(sim)
-
-	flamestrikeDot := &mage.flamestrikeDotSpell
-	mage.flamestrikeDotCastTemplate.Apply(flamestrikeDot)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	flamestrikeDot.Init(sim)
-
-	return flamestrikeDot
-}
-
-func (mage *Mage) NewFlamestrike(sim *core.Simulation) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	flamestrike := &mage.flamestrikeSpell
-	mage.flamestrikeCastTemplate.Apply(flamestrike)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	flamestrike.Init(sim)
-
-	return flamestrike
+	mage.FlamestrikeDot = mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

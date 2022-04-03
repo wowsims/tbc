@@ -145,7 +145,7 @@ func (rogue *Rogue) registerColdBloodCD() {
 		OnExpire: func(sim *core.Simulation) {
 			rogue.PseudoStats.BonusCritRatingAgentReserved1 -= 100 * core.MeleeCritRatingPerCritChance
 		},
-		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			rogue.RemoveAuraOnNextAdvance(sim, ColdBloodAuraID)
 		},
 	}
@@ -196,8 +196,8 @@ func (rogue *Rogue) applySealFate() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: SealFateAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.SpellExtras.Matches(SpellFlagBuilder) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spell.SpellExtras.Matches(SpellFlagBuilder) {
 					return
 				}
 
@@ -244,13 +244,16 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 			var icd core.InternalCD
 			icdDur := time.Millisecond * 500
 
-			mhAttack := rogue.AutoAttacks.MHAuto
-			mhAttack.ActionID = core.ActionID{SpellID: 13964}
-			cachedAttack := core.SimpleSpell{}
+			template := rogue.AutoAttacks.MHAuto.Template
+			template.ActionID = core.ActionID{SpellID: 13964}
+			swordSpecializationSpell := rogue.GetOrRegisterSpell(core.SpellConfig{
+				Template:   template,
+				ModifyCast: core.ModifyCastAssignTarget,
+			})
 
 			return core.Aura{
 				ID: SwordSpecializationAuraID,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+				OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if !spellEffect.Landed() {
 						return
 					}
@@ -268,10 +271,7 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 					}
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
 
-					// Got a proc
-					cachedAttack = mhAttack
-					cachedAttack.Effect.Target = spellEffect.Target
-					cachedAttack.Cast(sim)
+					swordSpecializationSpell.Cast(sim, spellEffect.Target)
 				},
 			}
 		})
@@ -291,7 +291,7 @@ func (rogue *Rogue) applyCombatPotency() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: CombatPotencyAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}

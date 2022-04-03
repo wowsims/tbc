@@ -90,11 +90,8 @@ func (spriest *SmitePriest) OnManaTick(sim *core.Simulation) {
 
 func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 
-	target := sim.GetPrimaryTarget()
-	var spell *core.SimpleSpell
-
 	// Calculate higher SW:P uptime if using HF
-	swpRemaining := spriest.SWPSpell.Effect.DotInput.TimeRemaining(sim)
+	swpRemaining := spriest.ShadowWordPain.Instance.Effect.DotInput.TimeRemaining(sim)
 
 	castSpeed := spriest.CastSpeed()
 
@@ -104,31 +101,32 @@ func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 	// holy fire cast time
 	hfCastTime := time.Duration(float64(time.Millisecond*3000) / castSpeed)
 
+	var spell *core.Spell
 	// Always attempt to keep SW:P up if its down
-	if !spriest.SWPSpell.Effect.DotInput.IsTicking(sim) {
-		spell = spriest.NewShadowWordPain(sim, target)
+	if !spriest.ShadowWordPain.Instance.Effect.DotInput.IsTicking(sim) {
+		spell = spriest.ShadowWordPain
 		// Favor star shards for NE if off cooldown first
 	} else if spriest.rotation.UseStarshards && spriest.GetRemainingCD(priest.SSCooldownID, sim.CurrentTime) == 0 {
-		spell = spriest.NewStarshards(sim, target)
+		spell = spriest.Starshards
 		// Allow for undead to use devouring plague off CD
 	} else if spriest.rotation.UseDevPlague && spriest.GetRemainingCD(priest.DevouringPlagueCooldownID, sim.CurrentTime) == 0 {
-		spell = spriest.NewDevouringPlague(sim, target)
+		spell = spriest.DevouringPlague
 		// If setting enabled, throw mind blast into our rotation off CD
 	} else if spriest.rotation.UseMindBlast && spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime) == 0 {
-		spell = spriest.NewMindBlast(sim, target)
+		spell = spriest.MindBlast
 		// If setting enabled, cast Shadow Word: Death on cooldown
 	} else if spriest.rotation.UseShadowWordDeath && spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime) == 0 {
-		spell = spriest.NewShadowWordDeath(sim, target)
+		spell = spriest.ShadowWordDeath
 		// Consider HF if SWP will fall off after 1 smite but before 2 smites from now finishes
 		//	and swp falls off after hf finishes (assumption never worth clipping)
 	} else if spriest.rotation.RotationType == proto.SmitePriest_Rotation_HolyFireWeave && swpRemaining > smiteCastTime && swpRemaining < hfCastTime {
-		spell = spriest.NewHolyFire(sim, target)
+		spell = spriest.HolyFire
 		// Base filler spell is smite
 	} else {
-		spell = spriest.NewSmite(sim, target)
+		spell = spriest.Smite
 	}
 
-	if success := spell.Cast(sim); !success {
-		spriest.WaitForMana(sim, spell.GetManaCost())
+	if success := spell.Cast(sim, sim.GetPrimaryTarget()); !success {
+		spriest.WaitForMana(sim, spell.Instance.GetManaCost())
 	}
 }

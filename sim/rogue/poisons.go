@@ -15,20 +15,20 @@ func (rogue *Rogue) applyPoisons() {
 }
 
 var DeadlyPoisonAuraID = core.NewAuraID()
-var DeadlyPoisonDebuffID = core.NewDebuffID()
+var DeadlyPoisonDotAuraID = core.NewAuraID()
 
-func (rogue *Rogue) newDeadlyPoisonTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerDeadlyPoisonSpell(_ *core.Simulation) {
 	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 27186},
-				Character:           rogue.GetCharacter(),
-				IsPhantom:           true,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolNature,
+				ActionID:    core.ActionID{SpellID: 27186},
+				Character:   rogue.GetCharacter(),
+				SpellSchool: core.SpellSchoolNature,
 			},
 		},
 		Effect: core.SpellEffect{
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			IsPhantom:           true,
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
 			ThreatMultiplier:    1,
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
@@ -36,42 +36,48 @@ func (rogue *Rogue) newDeadlyPoisonTemplate(_ *core.Simulation) core.SimpleSpell
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 3,
 				TickBaseDamage: core.DotSnapshotFuncMagic(180/4, 0),
-				DebuffID:       DeadlyPoisonDebuffID,
+				AuraID:         DeadlyPoisonDotAuraID,
 			},
 		},
 	}
-	return core.NewSimpleSpellTemplate(cast)
+	rogue.DeadlyPoison = rogue.RegisterSpell(core.SpellConfig{
+		Template:   cast,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
-func (rogue *Rogue) newDeadlyPoisonRefreshTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerDeadlyPoisonRefreshSpell(_ *core.Simulation) {
 	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 27186},
-				Character:           rogue.GetCharacter(),
-				IsPhantom:           true,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				CritRollCategory:    core.CritRollCategoryNone,
-				SpellSchool:         core.SpellSchoolNature,
+				ActionID:    core.ActionID{SpellID: 27186},
+				Character:   rogue.GetCharacter(),
+				SpellSchool: core.SpellSchoolNature,
 			},
 		},
 		Effect: core.SpellEffect{
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryNone,
+			IsPhantom:           true,
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
 			ThreatMultiplier:    1,
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
 
 				const tickDamagePerStack = 180.0 / 4.0
 				rogue.deadlyPoisonStacks = core.MinInt(rogue.deadlyPoisonStacks+1, 5)
-				rogue.deadlyPoison.Effect.DotInput.SetTickDamage(tickDamagePerStack * float64(rogue.deadlyPoisonStacks))
-				rogue.deadlyPoison.Effect.DotInput.RefreshDot(sim)
+				rogue.DeadlyPoison.Instance.Effect.DotInput.SetTickDamage(tickDamagePerStack * float64(rogue.deadlyPoisonStacks))
+				rogue.DeadlyPoison.Instance.Effect.DotInput.RefreshDot(sim)
 			},
 		},
 	}
-	return core.NewSimpleSpellTemplate(cast)
+	rogue.DeadlyPoisonRefresh = rogue.RegisterSpell(core.SpellConfig{
+		Template:   cast,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
@@ -88,8 +94,8 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: DeadlyPoisonAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellCast.IsPhantom {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("Deadly Poison") > procChance {
@@ -103,45 +109,41 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 }
 
 func (rogue *Rogue) procDeadlyPoison(sim *core.Simulation, spellEffect *core.SpellEffect) {
-	if rogue.deadlyPoison.IsInUse() {
-		dp := &rogue.deadlyPoisonRefresh
-		rogue.deadlyPoisonRefreshTemplate.Apply(dp)
-		dp.Effect.Target = spellEffect.Target
-		dp.Init(sim)
-		dp.Cast(sim)
+	if rogue.DeadlyPoison.Instance.IsInUse() {
+		rogue.DeadlyPoisonRefresh.Cast(sim, spellEffect.Target)
 	} else {
-		dp := &rogue.deadlyPoison
-		rogue.deadlyPoisonTemplate.Apply(dp)
-		dp.Effect.Target = spellEffect.Target
-		dp.Init(sim)
-		dp.Cast(sim)
+		rogue.DeadlyPoison.Cast(sim, spellEffect.Target)
 		rogue.deadlyPoisonStacks = 1
 	}
 }
 
 var InstantPoisonAuraID = core.NewAuraID()
 
-func (rogue *Rogue) newInstantPoisonTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerInstantPoisonSpell(_ *core.Simulation) {
 	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 26891},
-				Character:           rogue.GetCharacter(),
-				IsPhantom:           true,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolNature,
-				CritMultiplier:      rogue.DefaultSpellCritMultiplier(),
+				ActionID:    core.ActionID{SpellID: 26891},
+				Character:   rogue.GetCharacter(),
+				SpellSchool: core.SpellSchoolNature,
 			},
 		},
 		Effect: core.SpellEffect{
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      rogue.DefaultSpellCritMultiplier(),
+			IsPhantom:           true,
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
 			ThreatMultiplier:    1,
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
 			BaseDamage:          core.BaseDamageConfigRoll(146, 194),
 		},
 	}
-	return core.NewSimpleSpellTemplate(cast)
+
+	rogue.InstantPoison = rogue.RegisterSpell(core.SpellConfig{
+		Template:   cast,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
@@ -158,8 +160,8 @@ func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: InstantPoisonAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellCast.IsPhantom {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
 					return
 				}
 				if sim.RandomFloat("Instant Poison") > procChance {
@@ -173,8 +175,5 @@ func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
 }
 
 func (rogue *Rogue) procInstantPoison(sim *core.Simulation, spellEffect *core.SpellEffect) {
-	rogue.instantPoisonTemplate.Apply(&rogue.instantPoison)
-	rogue.instantPoison.Effect.Target = spellEffect.Target
-	rogue.instantPoison.Init(sim)
-	rogue.instantPoison.Cast(sim)
+	rogue.InstantPoison.Cast(sim, spellEffect.Target)
 }

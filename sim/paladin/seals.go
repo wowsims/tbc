@@ -17,28 +17,30 @@ var SealOfBloodProcActionID = core.ActionID{SpellID: 31893}
 // Handles the cast, gcd, deducts the mana cost
 func (paladin *Paladin) SetupSealOfBlood() {
 	// The proc behaviour
-	sobProc := core.SimpleSpell{
+	sobProcTemplate := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            SealOfBloodProcActionID,
-				Character:           &paladin.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolHoly,
-				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
-				IsPhantom:           true,
+				ActionID:    SealOfBloodProcActionID,
+				Character:   &paladin.Character,
+				SpellSchool: core.SpellSchoolHoly,
 			},
 		},
 		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+			IsPhantom:           true,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 			// should deal 35% weapon deamage
 			BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
 		},
 	}
 
-	sobTemplate := core.NewSimpleSpellTemplate(sobProc)
-	sobAtk := core.SimpleSpell{}
+	sobProc := paladin.RegisterSpell(core.SpellConfig{
+		Template:   sobProcTemplate,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
 	// Define the aura
 	sobAura := core.Aura{
@@ -46,18 +48,16 @@ func (paladin *Paladin) SetupSealOfBlood() {
 		ActionID: SealOfBloodProcActionID,
 		Duration: SealDuration,
 
-		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 				return
 			}
-
-			sobTemplate.Apply(&sobAtk)
-			sobAtk.Effect.Target = spellEffect.Target
-			sobAtk.Cast(sim)
+			sobProc.Cast(sim, spellEffect.Target)
 		},
 	}
 
 	manaCost := 210 * (1 - 0.03*float64(paladin.Talents.Benediction))
+
 	sob := core.SimpleCast{
 		Cast: core.Cast{
 			ActionID:  SealOfBloodCastActionID,
@@ -91,39 +91,38 @@ var SealOfCommandCastActionID = core.ActionID{SpellID: 20375}
 var SealOfCommandProcActionID = core.ActionID{SpellID: 20424}
 
 func (paladin *Paladin) SetupSealOfCommand() {
-	socProc := core.SimpleSpell{
+	socProcTemplate := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            SealOfCommandProcActionID,
-				Character:           &paladin.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolHoly,
-				CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+				ActionID:    SealOfCommandProcActionID,
+				Character:   &paladin.Character,
+				SpellSchool: core.SpellSchoolHoly,
 			},
 		},
 		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			ProcMask:            core.ProcMaskMeleeMHSpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 		},
 	}
 
 	weaponBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 0.7, false)
-	socProc.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
-			return weaponBaseDamage(sim, hitEffect, spellCast) + 0.29*hitEffect.SpellPower(spellCast.Character, spellCast)
+	socProcTemplate.Effect.BaseDamage = core.BaseDamageConfig{
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+			return weaponBaseDamage(sim, hitEffect, spell) + 0.29*hitEffect.SpellPower(spell.Character, spell)
 		},
 		TargetSpellCoefficient: 0.29,
 	}
 
-	socTemplate := core.NewSimpleSpellTemplate(socProc)
-	socAtk := core.SimpleSpell{}
+	socProc := paladin.RegisterSpell(core.SpellConfig{
+		Template:   socProcTemplate,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 
 	ppmm := paladin.AutoAttacks.NewPPMManager(7.0)
-
-	// I might not be implementing the ICD correctly here, should debug later
-	var icd core.InternalCD
 	const icdDur = time.Second * 1
 
 	socAura := core.Aura{
@@ -131,12 +130,12 @@ func (paladin *Paladin) SetupSealOfCommand() {
 		ActionID: SealOfCommandProcActionID,
 		Duration: SealDuration,
 
-		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellCast.IsPhantom {
+		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 				return
 			}
 
-			if icd.IsOnCD(sim) {
+			if paladin.sealOfCommandICD.IsOnCD(sim) {
 				return
 			}
 
@@ -144,11 +143,9 @@ func (paladin *Paladin) SetupSealOfCommand() {
 				return
 			}
 
-			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			paladin.sealOfCommandICD = core.InternalCD(sim.CurrentTime + icdDur)
 
-			socTemplate.Apply(&socAtk)
-			socAtk.Effect.Target = spellEffect.Target
-			socAtk.Cast(sim)
+			socProc.Cast(sim, spellEffect.Target)
 		},
 	}
 
@@ -279,6 +276,7 @@ func (paladin *Paladin) UpdateSeal(sim *core.Simulation, newSeal core.Aura) {
 			paladin.UpdateExpires(SealOfCommandAuraID, expiresAt)
 
 			// This is a hack to get the sim to process and log the SoC aura expiring at the right time
+			// Applies to single sim iterations only
 			if sim.Options.Iterations == 1 {
 				sim.AddPendingAction(&core.PendingAction{
 					NextActionAt: expiresAt,

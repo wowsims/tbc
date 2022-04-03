@@ -48,7 +48,7 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 		MainHand:       war.WeaponFromMainHand(war.DefaultMeleeCritMultiplier()),
 		OffHand:        war.WeaponFromOffHand(war.DefaultMeleeCritMultiplier()),
 		AutoSwingMelee: true,
-		ReplaceMHSwing: func(sim *core.Simulation) *core.SimpleSpell {
+		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
 			return war.TryHeroicStrike(sim)
 		},
 	})

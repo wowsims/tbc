@@ -10,31 +10,31 @@ import (
 var ArcaneShotCooldownID = core.NewCooldownID()
 var ArcaneShotActionID = core.ActionID{SpellID: 27019, CooldownID: ArcaneShotCooldownID}
 
-func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (hunter *Hunter) registerArcaneShotSpell(sim *core.Simulation) {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 230}
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            ArcaneShotActionID,
-				Character:           &hunter.Character,
-				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolArcane,
-				GCD:                 core.GCDDefault + hunter.latency,
-				IgnoreHaste:         true,
-				Cooldown:            time.Second * 6,
-				Cost:                cost,
-				BaseCost:            cost,
-				CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+				ActionID:    ArcaneShotActionID,
+				Character:   &hunter.Character,
+				SpellSchool: core.SpellSchoolArcane,
+				GCD:         core.GCDDefault + hunter.latency,
+				IgnoreHaste: true,
+				Cooldown:    time.Second * 6,
+				Cost:        cost,
+				BaseCost:    cost,
 			},
 		},
 		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskRangedSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+			ProcMask:            core.ProcMaskRangedSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
 			BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
-				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
-					return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.15 + 273
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					return (hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget())*0.15 + 273
 				},
 				TargetSpellCoefficient: 1,
 			}),
@@ -44,17 +44,8 @@ func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.SimpleSpe
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 	ama.Cooldown -= time.Millisecond * 200 * time.Duration(hunter.Talents.ImprovedArcaneShot)
 
-	return core.NewSimpleSpellTemplate(ama)
-}
-
-func (hunter *Hunter) NewArcaneShot(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	as := &hunter.arcaneShot
-	hunter.arcaneShotTemplate.Apply(as)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	as.Effect.Target = target
-
-	as.Init(sim)
-
-	return as
+	hunter.ArcaneShot = hunter.RegisterSpell(core.SpellConfig{
+		Template:   ama,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

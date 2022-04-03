@@ -10,7 +10,7 @@ import (
 var MultiShotCooldownID = core.NewCooldownID()
 var MultiShotActionID = core.ActionID{SpellID: 27021, CooldownID: MultiShotCooldownID}
 
-func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -26,15 +26,10 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpel
 				},
 				// Cast time is affected by ranged attack speed so set it later.
 				//CastTime:     time.Millisecond * 500,
-				GCD:                 core.GCDDefault + hunter.latency,
-				Cooldown:            time.Second * 10,
-				IgnoreHaste:         true, // Hunter GCD is locked at 1.5s
-				OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				// TODO: If we ever allow multiple targets to have their own type, need to
-				// update this.
-				CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+				GCD:         core.GCDDefault + hunter.latency,
+				Cooldown:    time.Second * 10,
+				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+				SpellSchool: core.SpellSchoolPhysical,
 			},
 		},
 	}
@@ -45,20 +40,25 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpel
 	}
 
 	baseEffect := core.SpellEffect{
+		OutcomeRollCategory: core.OutcomeRollCategoryRanged,
+		CritRollCategory:    core.CritRollCategoryPhysical,
+		// TODO: If we ever allow multiple targets to have their own type, need to
+		// update this.
+		CritMultiplier:   hunter.critMultiplier(true, sim.GetPrimaryTarget()),
 		ProcMask:         core.ProcMaskRangedSpecial,
 		DamageMultiplier: 1,
 		ThreatMultiplier: 1,
 		BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
-			Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
-				return (hitEffect.RangedAttackPower(spellCast)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
+			Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+				return (hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
 					hunter.AutoAttacks.Ranged.BaseDamage(sim) +
 					hunter.AmmoDamageBonus +
-					hitEffect.BonusWeaponDamage(spellCast) +
+					hitEffect.BonusWeaponDamage(spell.Character) +
 					205
 			},
 			TargetSpellCoefficient: 1,
 		}),
-		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			hunter.rotation(sim, false)
 		},
 	}
@@ -74,18 +74,12 @@ func (hunter *Hunter) newMultiShotTemplate(sim *core.Simulation) core.SimpleSpel
 	}
 	ama.Effects = effects
 
-	return core.NewSimpleSpellTemplate(ama)
-}
-
-func (hunter *Hunter) NewMultiShot(sim *core.Simulation) *core.SimpleSpell {
-	ms := &hunter.multiShot
-	hunter.multiShotTemplate.Apply(ms)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ms.CastTime = hunter.MultiShotCastTime()
-
-	ms.Init(sim)
-	return ms
+	hunter.MultiShot = hunter.RegisterSpell(core.SpellConfig{
+		Template: ama,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.CastTime = hunter.MultiShotCastTime()
+		},
+	})
 }
 
 func (hunter *Hunter) MultiShotCastTime() time.Duration {

@@ -171,7 +171,7 @@ func (hunter *Hunter) applyFrenzy() {
 	hunter.pet.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: FrenzyAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
@@ -204,7 +204,7 @@ func (hunter *Hunter) applyFerociousInspiration() {
 	makeProcAura := func(character *core.Character) core.Aura {
 		return core.Aura{
 			ID:       FerociousInspirationAuraIDs[hunter.PartyIndex],
-			ActionID: core.ActionID{SpellID: 34460, Tag: int32(hunter.RaidIndex)},
+			ActionID: core.ActionID{SpellID: 34460, Tag: int32(hunter.Index)},
 			Duration: time.Second * 10,
 			OnGain: func(sim *core.Simulation) {
 				character.PseudoStats.DamageDealtMultiplier *= multiplier
@@ -223,7 +223,7 @@ func (hunter *Hunter) applyFerociousInspiration() {
 
 		return core.Aura{
 			ID: FerociousInspirationAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
@@ -266,12 +266,11 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		Duration: time.Second * 18,
 		OnGain: func(sim *core.Simulation) {
 			hunter.PseudoStats.DamageDealtMultiplier *= 1.1
+			hunter.PseudoStats.CostMultiplier *= 0.8
 		},
 		OnExpire: func(sim *core.Simulation) {
 			hunter.PseudoStats.DamageDealtMultiplier /= 1.1
-		},
-		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			cast.Cost.Value -= cast.BaseCost.Value * 0.2
+			hunter.PseudoStats.CostMultiplier /= 0.8
 		},
 	}
 
@@ -340,8 +339,8 @@ func (hunter *Hunter) applyGoForTheThroat() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: GoForTheThroatAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					return
 				}
 				if !hunter.pet.IsEnabled() {
@@ -384,7 +383,7 @@ func (hunter *Hunter) applyThrillOfTheHunt() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ThrillOfTheHuntAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				// mask 256
 				if !spellEffect.ProcMask.Matches(core.ProcMaskRangedSpecial) {
 					return
@@ -395,7 +394,7 @@ func (hunter *Hunter) applyThrillOfTheHunt() {
 				}
 
 				if procChance == 1 || sim.RandomFloat("ThrillOfTheHunt") < procChance {
-					hunter.AddMana(sim, spellCast.Cost.Value*0.4, actionID, false)
+					hunter.AddMana(sim, spell.MostRecentCost*0.4, actionID, false)
 				}
 			},
 		}
@@ -414,8 +413,8 @@ func (hunter *Hunter) applyExposeWeakness() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: ExposeWeaknessAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
 					return
 				}
 
@@ -423,7 +422,7 @@ func (hunter *Hunter) applyExposeWeakness() {
 					return
 				}
 
-				if spellEffect.Target.RemainingAuraDuration(sim, core.ExposeWeaknessDebuffID) == core.NeverExpires {
+				if spellEffect.Target.RemainingAuraDuration(sim, core.ExposeWeaknessAuraID) == core.NeverExpires {
 					// Don't overwrite permanent version
 					return
 				}
@@ -452,8 +451,8 @@ func (hunter *Hunter) applyMasterTactician() {
 
 		return core.Aura{
 			ID: MasterTacticianAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !spellEffect.Landed() {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !spellEffect.Landed() {
 					return
 				}
 

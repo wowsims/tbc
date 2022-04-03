@@ -81,16 +81,21 @@ func (mage *Mage) applyArcaneConcentration() {
 		ccAura := core.Aura{
 			ID:       ClearcastingAuraID,
 			ActionID: core.ActionID{SpellID: 12536},
-			Duration: core.NeverExpires, // actually 15s, but that's hardly ever relevant
-			OnCast: func(sim *core.Simulation, cast *core.Cast) {
-				if !cast.SpellExtras.Matches(SpellFlagMage) {
+			Duration: time.Second * 15,
+			OnGain: func(sim *core.Simulation) {
+				mage.AddStat(stats.SpellCrit, bonusCrit)
+				mage.PseudoStats.NoCost = true
+			},
+			OnExpire: func(sim *core.Simulation) {
+				mage.AddStat(stats.SpellCrit, -bonusCrit)
+				mage.PseudoStats.NoCost = false
+			},
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spell.SpellExtras.Matches(SpellFlagMage) {
 					return
 				}
-				cast.Cost.Value = 0
-				cast.BonusCritRating += bonusCrit
-			},
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if !cast.SpellExtras.Matches(SpellFlagMage) {
+				if curCastIdx == lastCheckedCastIdx {
+					// Means this is another hit from the same cast that procced CC.
 					return
 				}
 				mage.RemoveAura(sim, ClearcastingAuraID)
@@ -100,32 +105,13 @@ func (mage *Mage) applyArcaneConcentration() {
 		return core.Aura{
 			ID: ArcaneConcentrationAuraID,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				if !cast.SpellExtras.Matches(SpellFlagMage) {
+					return
+				}
 				curCastIdx++
-
-				// Arcane missile initial hit can proc clearcasting.
-				if !cast.IsSpellAction(SpellIDArcaneMissiles) {
-					return
-				}
-
-				if sim.RandomFloat("Arcane Concentration") > procChance {
-					return
-				}
-
-				if !mage.HasAura(ClearcastingAuraID) {
-					// Also has special interaction with AM, gets the benefit of CC crit bonus on its own cast.
-					cast.BonusCritRating += bonusCrit
-				}
-				mage.ReplaceAura(sim, ccAura)
 			},
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
-				if !spellEffect.Landed() {
-					return
-				}
-				if spellCast.IsSpellAction(SpellIDArcaneMissiles) {
-					// Arcane missile bolts shouldn't proc clearcasting.
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spell.SpellExtras.Matches(SpellFlagMage) {
 					return
 				}
 
@@ -135,11 +121,15 @@ func (mage *Mage) applyArcaneConcentration() {
 				}
 				lastCheckedCastIdx = curCastIdx
 
+				if !spellEffect.Landed() {
+					return
+				}
+
 				if sim.RandomFloat("Arcane Concentration") > procChance {
 					return
 				}
 
-				mage.AddAura(sim, ccAura)
+				mage.AddPriorityAura(sim, ccAura)
 			},
 		}
 	})
@@ -191,20 +181,20 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				target := sim.GetPrimaryTarget()
-				var spell *core.SimpleSpell
+				var spell *core.Spell
 				if mage.Talents.Pyroblast {
-					spell = mage.NewPyroblast(sim, target)
+					spell = mage.Pyroblast
 				} else if mage.RotationType == proto.Mage_Rotation_Fire {
-					spell = mage.NewFireball(sim, target)
+					spell = mage.Fireball
 				} else if mage.RotationType == proto.Mage_Rotation_Frost {
-					spell = mage.NewFrostbolt(sim, target)
+					spell = mage.Frostbolt
 				} else {
-					spell, _ = mage.NewArcaneBlast(sim, target)
+					spell = mage.ArcaneBlast
 				}
-				spell.CastTime = 0
-
-				spell.Cast(sim)
+				normalCastTime := spell.Template.CastTime
+				spell.Template.CastTime = 0
+				spell.Cast(sim, sim.GetPrimaryTarget())
+				spell.Template.CastTime = normalCastTime
 
 				character.Metrics.AddInstantCast(actionID)
 				character.SetCD(PresenceOfMindCooldownID, sim.CurrentTime+cooldown)
@@ -241,14 +231,11 @@ func (mage *Mage) registerArcanePowerCD() {
 					Duration: time.Second * 15,
 					OnGain: func(sim *core.Simulation) {
 						mage.PseudoStats.DamageDealtMultiplier *= 1.3
+						mage.PseudoStats.CostMultiplier *= 1.3
 					},
 					OnExpire: func(sim *core.Simulation) {
 						mage.PseudoStats.DamageDealtMultiplier /= 1.3
-					},
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						if cast.SpellSchool.Matches(core.SpellSchoolMagic) {
-							cast.Cost.Value *= 1.3
-						}
+						mage.PseudoStats.CostMultiplier /= 1.3
 					},
 				})
 				character.Metrics.AddInstantCast(actionID)
@@ -270,12 +257,12 @@ func (mage *Mage) applyMasterOfElements() {
 	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: MasterOfElementsAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					mage.AddMana(sim, spellCast.BaseCost.Value*refundCoeff, core.ActionID{SpellID: 29076}, false)
+					mage.AddMana(sim, spell.MostRecentBaseCost*refundCoeff, core.ActionID{SpellID: 29076}, false)
 				}
 			},
 		}
@@ -311,25 +298,34 @@ func (mage *Mage) registerCombustionCD() {
 
 				numHits := 0
 				numCrits := 0
+				const critPerStack = 10 * core.SpellCritRatingPerCritChance
 
-				character.AddAura(sim, core.Aura{
+				character.AddPriorityAura(sim, core.Aura{
 					ID:       CombustionAuraID,
 					ActionID: actionID,
 					Duration: core.NeverExpires,
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.BonusCritRating += float64(numHits) * 10 * core.SpellCritRatingPerCritChance
-					},
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+						if spell.SpellSchool != core.SpellSchoolFire {
+							return
+						}
+						if spell.SameAction(IgniteActionID) {
 							return
 						}
 						if !spellEffect.Landed() {
 							return
 						}
+						if numCrits >= 3 {
+							return
+						}
+
+						// TODO: This wont work properly with flamestrike
 						numHits++
+						character.PseudoStats.BonusFireCritRating += critPerStack
+
 						if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 							numCrits++
 							if numCrits == 3 {
+								character.PseudoStats.BonusFireCritRating -= critPerStack * float64(numHits)
 								character.RemoveAuraOnNextAdvance(sim, CombustionAuraID)
 								character.SetCD(CombustionCooldownID, sim.CurrentTime+time.Minute*3)
 								character.UpdateMajorCooldowns()

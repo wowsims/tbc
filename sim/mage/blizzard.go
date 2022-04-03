@@ -9,18 +9,16 @@ import (
 
 const SpellIDBlizzard int32 = 27085
 
-func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				ActionID: core.ActionID{
 					SpellID: SpellIDBlizzard,
 				},
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFrost,
-				SpellExtras:         SpellFlagMage | core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
-				Character:           &mage.Character,
+				SpellSchool: core.SpellSchoolFrost,
+				SpellExtras: SpellFlagMage | core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
+				Character:   &mage.Character,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 1645,
@@ -36,8 +34,10 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	}
 
 	baseEffect := core.SpellEffect{
-		DamageMultiplier: mage.spellDamageMultiplier,
-		ThreatMultiplier: 1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		DamageMultiplier:    mage.spellDamageMultiplier,
+		ThreatMultiplier:    1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
 		DotInput: core.DotDamageInput{
 			NumberOfTicks:       8,
 			TickLength:          time.Second * 1,
@@ -60,16 +60,7 @@ func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemp
 	}
 	spell.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) NewBlizzard(sim *core.Simulation) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	blizzard := &mage.blizzardSpell
-	mage.blizzardCastTemplate.Apply(blizzard)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	blizzard.Init(sim)
-
-	return blizzard
+	mage.Blizzard = mage.RegisterSpell(core.SpellConfig{
+		Template: spell,
+	})
 }

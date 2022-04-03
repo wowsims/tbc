@@ -16,25 +16,13 @@ type Druid struct {
 	NaturesGrace bool // when true next spellcast is 0.5s faster
 	RebirthUsed  bool
 
-	// cached cast stuff
-	starfireSpell         core.SimpleSpell
-	starfire8CastTemplate core.SimpleSpellTemplate
-	starfire6CastTemplate core.SimpleSpellTemplate
-
-	MoonfireSpell        core.SimpleSpell
-	moonfireCastTemplate core.SimpleSpellTemplate
-
-	wrathSpell        core.SimpleSpell
-	wrathCastTemplate core.SimpleSpellTemplate
-
-	InsectSwarmSpell        core.SimpleSpell
-	insectSwarmCastTemplate core.SimpleSpellTemplate
-
-	FaerieFireSpell        core.SimpleSpell
-	faerieFireCastTemplate core.SimpleSpellTemplate
-
-	HurricaneSpell        core.SimpleSpell
-	hurricaneCastTemplate core.SimpleSpellTemplate
+	FaerieFire  *core.Spell
+	Hurricane   *core.Spell
+	InsectSwarm *core.Spell
+	Moonfire    *core.Spell
+	Starfire6   *core.Spell
+	Starfire8   *core.Spell
+	Wrath       *core.Spell
 }
 
 type SelfBuffs struct {
@@ -69,13 +57,13 @@ func (druid *Druid) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (druid *Druid) Init(sim *core.Simulation) {
-	druid.starfire8CastTemplate = druid.newStarfireTemplate(sim, 8)
-	druid.starfire6CastTemplate = druid.newStarfireTemplate(sim, 6)
-	druid.moonfireCastTemplate = druid.newMoonfireTemplate(sim)
-	druid.wrathCastTemplate = druid.newWrathTemplate(sim)
-	druid.insectSwarmCastTemplate = druid.newInsectSwarmTemplate(sim)
-	druid.faerieFireCastTemplate = druid.newFaerieFireTemplate(sim)
-	druid.hurricaneCastTemplate = druid.newHurricaneTemplate(sim)
+	druid.registerFaerieFireSpell(sim)
+	druid.registerHurricaneSpell(sim)
+	druid.registerInsectSwarmSpell(sim)
+	druid.registerMoonfireSpell(sim)
+	druid.Starfire8 = druid.newStarfireSpell(sim, 8)
+	druid.Starfire6 = druid.newStarfireSpell(sim, 6)
+	druid.registerWrathSpell(sim)
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {
@@ -84,17 +72,6 @@ func (druid *Druid) Reset(sim *core.Simulation) {
 
 func (druid *Druid) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // does nothing
-}
-
-func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
-	if druid.NaturesGrace {
-		spellCast.CastTime -= time.Millisecond * 500
-		// This applies on cast complete, removing the effect.
-		//  if it crits, during 'onspellhit' then it will be reapplied (see func above)
-		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-			druid.NaturesGrace = false
-		}
-	}
 }
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) *Druid {

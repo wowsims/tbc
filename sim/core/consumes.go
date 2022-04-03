@@ -785,25 +785,27 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 	} else if conjuredType == proto.Conjured_ConjuredFlameCap {
 		actionID := ActionID{ItemID: 22788}
 
-		castTemplate := NewSimpleSpellTemplate(SimpleSpell{
-			SpellCast: SpellCast{
-				Cast: Cast{
-					ActionID:            actionID,
-					Character:           character,
+		flameCapProc := character.RegisterSpell(SpellConfig{
+			Template: SimpleSpell{
+				SpellCast: SpellCast{
+					Cast: Cast{
+						ActionID:    actionID,
+						Character:   character,
+						SpellSchool: SpellSchoolFire,
+					},
+				},
+				Effect: SpellEffect{
 					IsPhantom:           true,
 					OutcomeRollCategory: OutcomeRollCategoryMagic,
 					CritRollCategory:    CritRollCategoryMagical,
-					SpellSchool:         SpellSchoolFire,
 					CritMultiplier:      1.5,
+					DamageMultiplier:    1,
+					ThreatMultiplier:    1,
+					BaseDamage:          BaseDamageConfigFlat(40),
 				},
 			},
-			Effect: SpellEffect{
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       BaseDamageConfigFlat(40),
-			},
+			ModifyCast: ModifyCastAssignTarget,
 		})
-		spellObj := SimpleSpell{}
 
 		return MajorCooldown{
 				ActionID: actionID,
@@ -823,19 +825,15 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 
 				statsAuraFactory := character.NewTemporaryStatsAuraFactory(ConjuredAuraID, actionID, stats.Stats{stats.FireSpellPower: fireBonus}, dur)
 				aura := statsAuraFactory(sim)
-				aura.OnSpellHit = func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-					if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || spellCast.IsPhantom {
+				aura.OnSpellHit = func(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+					if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 						return
 					}
 					if sim.RandomFloat("Flame Cap Melee") > procChance {
 						return
 					}
 
-					castAction := &spellObj
-					castTemplate.Apply(castAction)
-					castAction.Effect.Target = spellEffect.Target
-					castAction.Init(sim)
-					castAction.Cast(sim)
+					flameCapProc.Cast(sim, spellEffect.Target)
 				}
 				character.AddAura(sim, aura)
 
@@ -938,24 +936,24 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 }
 
 // Creates a spell object for the common explosive case.
-func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID ActionID, minDamage float64, maxDamage float64, cooldown time.Duration) SimpleSpell {
+func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID ActionID, minDamage float64, maxDamage float64, cooldown time.Duration) SpellConfig {
 	spell := SimpleSpell{
 		SpellCast: SpellCast{
 			Cast: Cast{
-				ActionID:            actionID,
-				Character:           character,
-				CritRollCategory:    CritRollCategoryMagical,
-				OutcomeRollCategory: OutcomeRollCategoryMagic,
-				SpellSchool:         SpellSchoolFire,
-				CritMultiplier:      2,
-				Cooldown:            cooldown,
+				ActionID:    actionID,
+				Character:   character,
+				SpellSchool: SpellSchoolFire,
+				Cooldown:    cooldown,
 			},
 		},
 	}
 
 	baseEffect := SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
+		DamageMultiplier:    1,
+		ThreatMultiplier:    1,
+		OutcomeRollCategory: OutcomeRollCategoryMagic,
+		CritRollCategory:    CritRollCategoryMagical,
+		CritMultiplier:      2,
 
 		// Explosives always have 1% resist chance, so just give them hit cap.
 		BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,
@@ -971,59 +969,46 @@ func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID Act
 	}
 	spell.Effects = effects
 
-	return spell
+	return SpellConfig{
+		Template: spell,
+	}
 }
 func (character *Character) newSuperSapperCaster(sim *Simulation) func(sim *Simulation) {
-	template := NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, SuperSapperActionID, 900, 1500, time.Minute*5))
-	var spell SimpleSpell
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, SuperSapperActionID, 900, 1500, time.Minute*5))
 	return func(sim *Simulation) {
-		template.Apply(&spell)
-		spell.Init(sim)
-		spell.Cast(sim)
+		spell.Cast(sim, nil)
 	}
 }
 func (character *Character) newGoblinSapperCaster(sim *Simulation) func(sim *Simulation) {
-	template := NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, GoblinSapperActionID, 450, 750, time.Minute*5))
-	var spell SimpleSpell
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, GoblinSapperActionID, 450, 750, time.Minute*5))
 	return func(sim *Simulation) {
-		template.Apply(&spell)
-		spell.Init(sim)
-		spell.Cast(sim)
+		spell.Cast(sim, nil)
 	}
 }
 func (character *Character) newFelIronBombCaster(sim *Simulation) func(sim *Simulation) {
-	template := NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, FelIronBombActionID, 330, 770, 0))
-	var spell SimpleSpell
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, FelIronBombActionID, 330, 770, 0))
 	return func(sim *Simulation) {
-		template.Apply(&spell)
-		spell.Init(sim)
-		spell.Cast(sim)
+		spell.Cast(sim, nil)
 	}
 }
 func (character *Character) newAdamantiteGrenadeCaster(sim *Simulation) func(sim *Simulation) {
-	template := NewSimpleSpellTemplate(character.newBasicExplosiveSpell(sim, AdamantiteGrenadeActionID, 450, 750, 0))
-	var spell SimpleSpell
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, AdamantiteGrenadeActionID, 450, 750, 0))
 	return func(sim *Simulation) {
-		template.Apply(&spell)
-		spell.Init(sim)
-		spell.Cast(sim)
+		spell.Cast(sim, nil)
 	}
 }
 func (character *Character) newHolyWaterCaster(sim *Simulation) func(sim *Simulation) {
-	es := character.newBasicExplosiveSpell(sim, HolyWaterActionID, 438, 562, 0)
-	es.SpellSchool = SpellSchoolHoly
-	for i, _ := range es.Effects {
-		effect := &es.Effects[i]
+	config := character.newBasicExplosiveSpell(sim, HolyWaterActionID, 438, 562, 0)
+	config.Template.SpellSchool = SpellSchoolHoly
+	for i, _ := range config.Template.Effects {
+		effect := &config.Template.Effects[i]
 		if effect.Target.MobType != proto.MobType_MobTypeUndead {
 			effect.DamageMultiplier = 0
 		}
 	}
-	template := NewSimpleSpellTemplate(es)
+	spell := character.GetOrRegisterSpell(config)
 
-	var spell SimpleSpell
 	return func(sim *Simulation) {
-		template.Apply(&spell)
-		spell.Init(sim)
-		spell.Cast(sim)
+		spell.Cast(sim, nil)
 	}
 }

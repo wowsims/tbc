@@ -9,16 +9,14 @@ import (
 
 const SpellIDScorch int32 = 27074
 
-func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDScorch},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         SpellFlagMage,
+				ActionID:    core.ActionID{SpellID: SpellIDScorch},
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolFire,
+				SpellExtras: SpellFlagMage,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 180,
@@ -27,15 +25,17 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 					Type:  stats.Mana,
 					Value: 180,
 				},
-				CastTime:       time.Millisecond * 1500,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				CastTime: time.Millisecond * 1500,
+				GCD:      core.GCDDefault,
 			},
 		},
 		Effect: core.SpellEffect{
-			DamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
-			BaseDamage:       core.BaseDamageConfigMagic(305, 361, 1.5/3.5),
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+			DamageMultiplier:    mage.spellDamageMultiplier,
+			ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
+			BaseDamage:          core.BaseDamageConfigMagic(305, 361, 1.5/3.5),
 		},
 	}
 
@@ -49,13 +49,13 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 
 	if mage.Talents.ImprovedScorch > 0 {
 		procChance := float64(mage.Talents.ImprovedScorch) / 3.0
-		spell.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		spell.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() {
 				return
 			}
 
 			// Don't overwrite the permanent version.
-			if spellEffect.Target.RemainingAuraDuration(sim, core.ImprovedScorchDebuffID) == core.NeverExpires {
+			if spellEffect.Target.RemainingAuraDuration(sim, core.ImprovedScorchAuraID) == core.NeverExpires {
 				return
 			}
 
@@ -63,22 +63,13 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				return
 			}
 
-			newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.ImprovedScorchDebuffID)+1)
+			newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.ImprovedScorchAuraID)+1)
 			spellEffect.Target.AddAura(sim, core.ImprovedScorchAura(spellEffect.Target, newNumStacks))
 		}
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) NewScorch(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	scorch := &mage.scorchSpell
-	mage.scorchCastTemplate.Apply(scorch)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	scorch.Effect.Target = target
-	scorch.Init(sim)
-
-	return scorch
+	mage.Scorch = mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

@@ -26,7 +26,7 @@ func (character *Character) EnableRageBar(startingRage float64, onRageGain OnRag
 	character.AddPermanentAura(func(sim *Simulation) Aura {
 		return Aura{
 			ID: RageBarAuraID,
-			OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
+			OnSpellHit: func(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 				if !spellEffect.ProcMask.Matches(ProcMaskWhiteHit) {
 					return
 				}
@@ -53,7 +53,7 @@ func (character *Character) EnableRageBar(startingRage float64, onRageGain OnRag
 
 				generatedRage := spellEffect.Damage*RageFactor + HitFactor*BaseSwingSpeed
 
-				character.AddRage(sim, generatedRage, spellCast.ActionID)
+				character.AddRage(sim, generatedRage, spell.ActionID)
 			},
 		}
 	})

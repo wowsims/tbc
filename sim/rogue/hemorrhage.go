@@ -8,12 +8,12 @@ import (
 )
 
 var HemorrhageActionID = core.ActionID{SpellID: 26864}
-var HemorrhageDebuffID = core.NewDebuffID()
+var HemorrhageAuraID = core.NewAuraID()
 var HemorrhageEnergyCost = 35.0
 
-func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerHemorrhageSpell(_ *core.Simulation) {
 	hemoAura := core.Aura{
-		ID:       HemorrhageDebuffID,
+		ID:       HemorrhageAuraID,
 		ActionID: HemorrhageActionID,
 		Duration: time.Second * 15,
 		OnGain: func(sim *core.Simulation) {
@@ -23,17 +23,17 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 			sim.GetPrimaryTarget().PseudoStats.BonusPhysicalDamageTaken -= 42
 		},
 	}
-	hemoAura.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-		if spellCast.SpellSchool != core.SpellSchoolPhysical {
+	hemoAura.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		if spell.SpellSchool != core.SpellSchoolPhysical {
 			return
 		}
 		if !spellEffect.Landed() || spellEffect.Damage == 0 {
 			return
 		}
 
-		stacks := spellEffect.Target.NumStacks(HemorrhageDebuffID) - 1
+		stacks := spellEffect.Target.NumStacks(HemorrhageAuraID) - 1
 		if stacks == 0 {
-			spellEffect.Target.RemoveAura(sim, HemorrhageDebuffID)
+			spellEffect.Target.RemoveAura(sim, HemorrhageAuraID)
 		} else {
 			hemoAura.Stacks = stacks
 			spellEffect.Target.ReplaceAura(sim, hemoAura)
@@ -43,7 +43,7 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 	refundAmount := HemorrhageEnergyCost * 0.8
 
 	ability := rogue.newAbility(HemorrhageActionID, HemorrhageEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			rogue.AddComboPoints(sim, 1, HemorrhageActionID)
 
@@ -60,15 +60,8 @@ func (rogue *Rogue) newHemorrhageTemplate(_ *core.Simulation) core.SimpleSpellTe
 		ability.Effect.DamageMultiplier += 0.06
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (rogue *Rogue) NewHemorrhage(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	hm := &rogue.hemorrhage
-	rogue.hemorrhageTemplate.Apply(hm)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hm.Effect.Target = target
-
-	return hm
+	rogue.Hemorrhage = rogue.RegisterSpell(core.SpellConfig{
+		Template:   ability,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

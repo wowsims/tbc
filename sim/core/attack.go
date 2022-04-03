@@ -12,7 +12,7 @@ import (
 //  If it returns nil, the attack takes place as normal. If it returns an ability,
 //  that ability is used in place of the attack.
 //  This allows for abilities that convert a white attack into yellow attack.
-type ReplaceMHSwing func(sim *Simulation) *SimpleSpell
+type ReplaceMHSwing func(sim *Simulation) *Spell
 
 // Represents a generic weapon. Pets / unarmed / various other cases dont use
 // actual weapon items so this is an abstraction of a Weapon.
@@ -154,12 +154,10 @@ type AutoAttacks struct {
 	OffhandSwingAt  time.Duration
 	RangedSwingAt   time.Duration
 
-	MHAuto      SimpleSpell // Parameters for MH auto attacks.
-	OHAuto      SimpleSpell // Parameters for OH auto attacks.
-	cachedMelee SimpleSpell // Reuse to save memory allocations.
+	MHAuto     *Spell
+	OHAuto     *Spell
+	RangedAuto *Spell
 
-	RangedAuto            SimpleSpell // Parameters for ranged auto attacks.
-	cachedRanged          SimpleSpell // Reuse to save memory allocations.
 	RangedSwingInProgress bool
 
 	ReplaceMHSwing ReplaceMHSwing
@@ -192,69 +190,85 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		AutoSwingMelee: options.AutoSwingMelee,
 		DelayOHSwings:  options.DelayOHSwings,
 		ReplaceMHSwing: options.ReplaceMHSwing,
-		MHAuto: SimpleSpell{
-			SpellCast: SpellCast{
-				Cast: Cast{
-					ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
-					Character:           character,
-					OutcomeRollCategory: OutcomeRollCategoryWhite,
-					SpellSchool:         SpellSchoolPhysical,
-					CritMultiplier:      options.MainHand.CritMultiplier,
-				},
-			},
-			Effect: SpellEffect{
-				ProcMask:         ProcMaskMeleeMHAuto,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       BaseDamageConfigMeleeWeapon(MainHand, false, 0, 1, true),
-			},
-		},
-		OHAuto: SimpleSpell{
-			SpellCast: SpellCast{
-				Cast: Cast{
-					ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
-					Character:           character,
-					OutcomeRollCategory: OutcomeRollCategoryWhite,
-					SpellSchool:         SpellSchoolPhysical,
-					CritMultiplier:      options.OffHand.CritMultiplier,
-				},
-			},
-			Effect: SpellEffect{
-				ProcMask:         ProcMaskMeleeOHAuto,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       BaseDamageConfigMeleeWeapon(OffHand, false, 0, 1, true),
-			},
-		},
-		RangedAuto: SimpleSpell{
-			SpellCast: SpellCast{
-				Cast: Cast{
-					ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionShoot},
-					Character:           character,
-					SpellSchool:         SpellSchoolPhysical,
-					OutcomeRollCategory: OutcomeRollCategoryRanged,
-					CritRollCategory:    CritRollCategoryPhysical,
-					IgnoreHaste:         true, // Affected by ranged haste, not spell haste.
-				},
-			},
-			Effect: SpellEffect{
-				ProcMask:         ProcMaskRangedAuto,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       BaseDamageConfigRangedWeapon(0),
-			},
-		},
 	}
 
+	mhTemplate := SimpleSpell{
+		SpellCast: SpellCast{
+			Cast: Cast{
+				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
+				Character:   character,
+				SpellSchool: SpellSchoolPhysical,
+				IgnoreHaste: true,
+			},
+		},
+		Effect: SpellEffect{
+			OutcomeRollCategory: OutcomeRollCategoryWhite,
+			CritMultiplier:      options.MainHand.CritMultiplier,
+			ProcMask:            ProcMaskMeleeMHAuto,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          BaseDamageConfigMeleeWeapon(MainHand, false, 0, 1, true),
+		},
+	}
 	if options.MainHand.BaseDamageOverride != nil {
-		aa.MHAuto.Effect.BaseDamage.Calculator = options.MainHand.BaseDamageOverride
+		mhTemplate.Effect.BaseDamage.Calculator = options.MainHand.BaseDamageOverride
+	}
+	aa.MHAuto = character.RegisterSpell(SpellConfig{
+		Template:   mhTemplate,
+		ModifyCast: ModifyCastAssignTarget,
+	})
+
+	ohTemplate := SimpleSpell{
+		SpellCast: SpellCast{
+			Cast: Cast{
+				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
+				Character:   character,
+				SpellSchool: SpellSchoolPhysical,
+				IgnoreHaste: true,
+			},
+		},
+		Effect: SpellEffect{
+			OutcomeRollCategory: OutcomeRollCategoryWhite,
+			CritMultiplier:      options.OffHand.CritMultiplier,
+			ProcMask:            ProcMaskMeleeOHAuto,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          BaseDamageConfigMeleeWeapon(OffHand, false, 0, 1, true),
+		},
 	}
 	if options.OffHand.BaseDamageOverride != nil {
-		aa.OHAuto.Effect.BaseDamage.Calculator = options.OffHand.BaseDamageOverride
+		ohTemplate.Effect.BaseDamage.Calculator = options.OffHand.BaseDamageOverride
+	}
+	aa.OHAuto = character.RegisterSpell(SpellConfig{
+		Template:   ohTemplate,
+		ModifyCast: ModifyCastAssignTarget,
+	})
+
+	rangedTemplate := SimpleSpell{
+		SpellCast: SpellCast{
+			Cast: Cast{
+				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
+				Character:   character,
+				SpellSchool: SpellSchoolPhysical,
+				IgnoreHaste: true, // Affected by ranged haste, not spell haste.
+			},
+		},
+		Effect: SpellEffect{
+			OutcomeRollCategory: OutcomeRollCategoryRanged,
+			CritRollCategory:    CritRollCategoryPhysical,
+			ProcMask:            ProcMaskRangedAuto,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			BaseDamage:          BaseDamageConfigRangedWeapon(0),
+		},
 	}
 	if options.Ranged.BaseDamageOverride != nil {
-		aa.RangedAuto.Effect.BaseDamage.Calculator = options.Ranged.BaseDamageOverride
+		rangedTemplate.Effect.BaseDamage.Calculator = options.Ranged.BaseDamageOverride
 	}
+	aa.RangedAuto = character.RegisterSpell(SpellConfig{
+		Template:   rangedTemplate,
+		ModifyCast: ModifyCastAssignTarget,
+	})
 
 	aa.IsDualWielding = aa.MH.SwingSpeed != 0 && aa.OH.SwingSpeed != 0
 
@@ -297,13 +311,17 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 	aa.resetAutoSwing(sim)
 
 	// Can precompute this.
-	aa.RangedAuto.CritMultiplier = aa.Ranged.CritMultiplier
+	aa.RangedAuto.Template.Effect.CritMultiplier = aa.Ranged.CritMultiplier
 
 	aa.RangedSwingAt = 0
 	aa.RangedSwingInProgress = false
-	aa.RangedAuto.AfterCast = func(sim *Simulation, cast *Cast) {
+	aa.RangedAuto.ModifyCast = func(_ *Simulation, target *Target, instance *SimpleSpell) {
+		instance.CastTime = aa.RangedSwingWindup()
+		instance.Effect.Target = target
+	}
+	aa.RangedAuto.Template.AfterCast = func(sim *Simulation, cast *Cast) {
 		aa.RangedSwingInProgress = false
-		aa.agent.OnAutoAttack(sim, &aa.cachedRanged)
+		aa.agent.OnAutoAttack(sim, &aa.RangedAuto.Instance)
 	}
 }
 
@@ -417,24 +435,19 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		return
 	}
 
-	// Allow MH swing to be overridden for abilities like Heroic Strike.
-	var replaceAMA *SimpleSpell
+	attackSpell := aa.MHAuto
 	if aa.ReplaceMHSwing != nil {
-		replaceAMA = aa.ReplaceMHSwing(sim)
+		// Allow MH swing to be overridden for abilities like Heroic Strike.
+		replacementSpell := aa.ReplaceMHSwing(sim)
+		if replacementSpell != nil {
+			attackSpell = replacementSpell
+		}
 	}
 
-	ptr := &aa.cachedMelee
-	if replaceAMA == nil {
-		aa.cachedMelee = aa.MHAuto
-		aa.cachedMelee.Effect.Target = target
-	} else {
-		ptr = replaceAMA
-	}
-
-	ptr.Cast(sim)
+	attackSpell.Cast(sim, target)
 	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	aa.previousMHSwingAt = sim.CurrentTime
-	aa.agent.OnAutoAttack(sim, ptr)
+	aa.agent.OnAutoAttack(sim, &attackSpell.Instance)
 }
 
 // Performs an autoattack using the main hand weapon, if the OH CD is ready.
@@ -452,11 +465,9 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 		return
 	}
 
-	aa.cachedMelee = aa.OHAuto
-	aa.cachedMelee.Effect.Target = target
-	aa.cachedMelee.Cast(sim)
+	aa.OHAuto.Cast(sim, target)
 	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
-	aa.agent.OnAutoAttack(sim, &aa.cachedMelee)
+	aa.agent.OnAutoAttack(sim, &aa.OHAuto.Instance)
 }
 
 // Performs an autoattack using the ranged weapon, if the ranged CD is ready.
@@ -465,16 +476,13 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 		return
 	}
 
-	aa.cachedRanged = aa.RangedAuto
-	aa.cachedRanged.Effect.Target = target
-	aa.cachedRanged.CastTime = aa.RangedSwingWindup()
-	aa.cachedRanged.Cast(sim)
+	aa.RangedAuto.Cast(sim, target)
 	aa.RangedSwingAt = sim.CurrentTime + aa.RangedSwingSpeed()
 	aa.RangedSwingInProgress = true
 
 	// It's important that we update the GCD timer AFTER starting the ranged auto.
 	// Otherwise the hardcast action won't be created separately.
-	nextGCD := sim.CurrentTime + aa.cachedRanged.CastTime
+	nextGCD := sim.CurrentTime + aa.RangedAuto.Instance.CastTime
 	if nextGCD > aa.character.NextGCDAt() {
 		aa.character.SetGCDTimer(sim, nextGCD)
 	}

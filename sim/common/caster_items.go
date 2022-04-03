@@ -31,7 +31,7 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 		applyStatAura := character.NewTemporaryStatsAuraApplier(PowerOfArcanagosAuraID, core.ActionID{ItemID: 28602}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 		return core.Aura{
 			ID: RobeOfTheElderScribeAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -64,7 +64,7 @@ func ApplyEternalSage(agent core.Agent) {
 
 		return core.Aura{
 			ID: EternalSageItemAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -84,26 +84,30 @@ func ApplyEternalSage(agent core.Agent) {
 var AugmentPainAuraID = core.NewAuraID()
 
 func ApplyTimbals(agent core.Agent) {
-	timbalsTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 45055},
+	character := agent.GetCharacter()
+
+	timbalsSpell := character.RegisterSpell(core.SpellConfig{
+		Template: core.SimpleSpell{
+			SpellCast: core.SpellCast{
+				Cast: core.Cast{
+					Character:   character,
+					ActionID:    core.ActionID{SpellID: 45055},
+					SpellSchool: core.SpellSchoolShadow,
+				},
+			},
+			Effect: core.SpellEffect{
 				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 				CritRollCategory:    core.CritRollCategoryMagical,
-				SpellSchool:         core.SpellSchoolShadow,
 				CritMultiplier:      agent.GetCharacter().DefaultSpellCritMultiplier(),
+				DamageMultiplier:    1,
+				ThreatMultiplier:    1,
+				BaseDamage:          core.BaseDamageConfigRoll(285, 475),
 			},
 		},
-		Effect: core.SpellEffect{
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			BaseDamage:       core.BaseDamageConfigRoll(285, 475),
-		},
+		ModifyCast: core.ModifyCastAssignTarget,
 	})
-	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		var shadowBolt = &core.SimpleSpell{}
 
+	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		// Each time one of your spells deals periodic damage,
 		// there is a chance 285 to 475 additional damage will be dealt. (Proc chance: 10%, 15s cooldown)
 		icd := core.NewICD()
@@ -112,16 +116,13 @@ func ApplyTimbals(agent core.Agent) {
 
 		return core.Aura{
 			ID: AugmentPainAuraID,
-			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
+			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("timbals") > proc { // can't activate if on CD or didn't proc
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				timbalsTemplate.Apply(shadowBolt)
-				// Apply the caster/target from the cast that procd this.
-				shadowBolt.Character = spellCast.Character
-				shadowBolt.Effect.Target = spellEffect.Target
-				shadowBolt.Cast(sim)
+
+				timbalsSpell.Cast(sim, spellEffect.Target)
 			},
 		}
 	})

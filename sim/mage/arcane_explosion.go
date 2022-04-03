@@ -7,15 +7,13 @@ import (
 
 const SpellIDArcaneExplosion int32 = 10202
 
-func (mage *Mage) newArcaneExplosionTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerArcaneExplosionSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDArcaneExplosion},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolArcane,
+				ActionID:    core.ActionID{SpellID: SpellIDArcaneExplosion},
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolArcane,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 390,
@@ -24,17 +22,19 @@ func (mage *Mage) newArcaneExplosionTemplate(sim *core.Simulation) core.SimpleSp
 					Type:  stats.Mana,
 					Value: 390,
 				},
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+				GCD: core.GCDDefault,
 			},
 		},
 		AOECap: 10180,
 	}
 
 	baseEffect := core.SpellEffect{
-		DamageMultiplier: mage.spellDamageMultiplier,
-		ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
-		BaseDamage:       core.BaseDamageConfigMagic(249, 270, 0.214),
+		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+		CritRollCategory:    core.CritRollCategoryMagical,
+		CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+		DamageMultiplier:    mage.spellDamageMultiplier,
+		ThreatMultiplier:    1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
+		BaseDamage:          core.BaseDamageConfigMagic(249, 270, 0.214),
 	}
 	baseEffect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance
 	baseEffect.BonusSpellCritRating += float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance
@@ -47,16 +47,7 @@ func (mage *Mage) newArcaneExplosionTemplate(sim *core.Simulation) core.SimpleSp
 	}
 	spell.Effects = effects
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) NewArcaneExplosion(sim *core.Simulation) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	arcaneExplosion := &mage.arcaneExplosionSpell
-	mage.arcaneExplosionCastTemplate.Apply(arcaneExplosion)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	arcaneExplosion.Init(sim)
-
-	return arcaneExplosion
+	mage.ArcaneExplosion = mage.RegisterSpell(core.SpellConfig{
+		Template: spell,
+	})
 }

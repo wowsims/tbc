@@ -77,32 +77,17 @@ type Hunter struct {
 	arcaneShotCastTime float64
 	useMultiForCatchup bool
 
-	aimedShotTemplate core.SimpleSpellTemplate
-	aimedShot         core.SimpleSpell
-
-	arcaneShotTemplate core.SimpleSpellTemplate
-	arcaneShot         core.SimpleSpell
-
 	aspectOfTheHawkTemplate  core.SimpleCast
 	aspectOfTheViperTemplate core.SimpleCast
 
-	killCommandTemplate core.SimpleSpellTemplate
-	killCommand         core.SimpleSpell
-
-	multiShotTemplate core.SimpleSpellTemplate
-	multiShot         core.SimpleSpell
-
-	raptorStrikeTemplate core.SimpleSpellTemplate
-	raptorStrike         core.SimpleSpell
-
-	scorpidStingTemplate core.SimpleSpellTemplate
-	scorpidSting         core.SimpleSpell
-
-	serpentStingTemplate core.SimpleSpellTemplate
-	serpentSting         core.SimpleSpell
-
-	steadyShotTemplate core.SimpleSpellTemplate
-	steadyShot         core.SimpleSpell
+	AimedShot    *core.Spell
+	ArcaneShot   *core.Spell
+	KillCommand  *core.Spell
+	MultiShot    *core.Spell
+	RaptorStrike *core.Spell
+	ScorpidSting *core.Spell
+	SerpentSting *core.Spell
+	SteadyShot   *core.Spell
 
 	fakeHardcast core.Cast
 }
@@ -125,21 +110,23 @@ func (hunter *Hunter) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (hunter *Hunter) Init(sim *core.Simulation) {
 	// Update auto crit multipliers now that we have the targets.
-	hunter.AutoAttacks.MHAuto.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
-	hunter.AutoAttacks.OHAuto.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.MH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.OH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.MHAuto.Template.Effect.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.OHAuto.Template.Effect.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
 	hunter.AutoAttacks.Ranged.CritMultiplier = hunter.critMultiplier(true, sim.GetPrimaryTarget())
 
-	// Precompute all the spell templates.
-	hunter.aimedShotTemplate = hunter.newAimedShotTemplate(sim)
-	hunter.arcaneShotTemplate = hunter.newArcaneShotTemplate(sim)
 	hunter.aspectOfTheHawkTemplate = hunter.newAspectOfTheHawkTemplate(sim)
 	hunter.aspectOfTheViperTemplate = hunter.newAspectOfTheViperTemplate(sim)
-	hunter.killCommandTemplate = hunter.newKillCommandTemplate(sim)
-	hunter.multiShotTemplate = hunter.newMultiShotTemplate(sim)
-	hunter.raptorStrikeTemplate = hunter.newRaptorStrikeTemplate(sim)
-	hunter.scorpidStingTemplate = hunter.newScorpidStingTemplate(sim)
-	hunter.serpentStingTemplate = hunter.newSerpentStingTemplate(sim)
-	hunter.steadyShotTemplate = hunter.newSteadyShotTemplate(sim)
+
+	hunter.registerAimedShotSpell(sim)
+	hunter.registerArcaneShotSpell(sim)
+	hunter.registerKillCommandSpell(sim)
+	hunter.registerMultiShotSpell(sim)
+	hunter.registerRaptorStrikeSpell(sim)
+	hunter.registerScorpidStingSpell(sim)
+	hunter.registerSerpentStingSpell(sim)
+	hunter.registerSteadyShotSpell(sim)
 
 	hunter.fakeHardcast = core.Cast{
 		Character:   &hunter.Character,
@@ -164,7 +151,7 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 
 	target := sim.GetPrimaryTarget()
 	impHuntersMark := hunter.Talents.ImprovedHuntersMark
-	if !target.HasAura(core.HuntersMarkDebuffID) || target.NumStacks(core.HuntersMarkDebuffID) < impHuntersMark {
+	if !target.HasAura(core.HuntersMarkAuraID) || target.NumStacks(core.HuntersMarkAuraID) < impHuntersMark {
 		target.AddAura(sim, core.HuntersMarkAura(target, impHuntersMark, false))
 	}
 
@@ -242,7 +229,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		MainHand: hunter.WeaponFromMainHand(0),
 		OffHand:  hunter.WeaponFromOffHand(0),
 		Ranged:   rangedWeapon,
-		ReplaceMHSwing: func(sim *core.Simulation) *core.SimpleSpell {
+		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
 			return hunter.TryRaptorStrike(sim)
 		},
 	})

@@ -385,6 +385,14 @@ func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
 }
 
 type PseudoStats struct {
+	///////////////////////////////////////////////////
+	// Effects that apply when this unit is the attacker.
+	///////////////////////////////////////////////////
+
+	NoCost         bool    // If set, spells cost no mana/energy/rage.
+	CostMultiplier float64 // Multiplies spell cost.
+	CostReduction  float64 // Reduces spell cost.
+
 	CastSpeedMultiplier   float64
 	MeleeSpeedMultiplier  float64
 	RangedSpeedMultiplier float64
@@ -403,6 +411,7 @@ type PseudoStats struct {
 	BonusRangedHitRating  float64 // Hit rating for ranged only.
 	BonusMeleeCritRating  float64 // Crit rating for melee only (not ranged).
 	BonusRangedCritRating float64 // Crit rating for ranged only.
+	BonusFireCritRating   float64 // Crit rating for fire spells only (Combustion).
 	BonusMHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
 	BonusOHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
 
@@ -429,32 +438,11 @@ type PseudoStats struct {
 	// Modifiers for spells with the SpellExtrasAgentReserved1 flag set.
 	BonusCritRatingAgentReserved1       float64
 	AgentReserved1DamageDealtMultiplier float64
-}
 
-func NewPseudoStats() PseudoStats {
-	return PseudoStats{
-		CastSpeedMultiplier:  1,
-		MeleeSpeedMultiplier: 1,
-		//RangedSpeedMultiplier: 1, // Leave at 0 so we can use this to ignore ranged stuff for non-hunters.
-		SpiritRegenMultiplier: 1,
-		ThreatMultiplier:      1,
+	///////////////////////////////////////////////////
+	// Effects that apply when this unit is the target.
+	///////////////////////////////////////////////////
 
-		DamageDealtMultiplier:       1,
-		RangedDamageDealtMultiplier: 1,
-
-		PhysicalDamageDealtMultiplier: 1,
-		ArcaneDamageDealtMultiplier:   1,
-		FireDamageDealtMultiplier:     1,
-		FrostDamageDealtMultiplier:    1,
-		HolyDamageDealtMultiplier:     1,
-		NatureDamageDealtMultiplier:   1,
-		ShadowDamageDealtMultiplier:   1,
-
-		AgentReserved1DamageDealtMultiplier: 1,
-	}
-}
-
-type TargetPseudoStats struct {
 	BonusMeleeAttackPower  float64 // Imp Hunters mark, EW
 	BonusRangedAttackPower float64 // Hunters mark, EW
 	BonusCritRating        float64 // Imp Judgement of the Crusader
@@ -477,8 +465,30 @@ type TargetPseudoStats struct {
 	PeriodicPhysicalDamageTakenMultiplier float64
 }
 
-func NewTargetPseudoStats() TargetPseudoStats {
-	return TargetPseudoStats{
+func NewPseudoStats() PseudoStats {
+	return PseudoStats{
+		CostMultiplier: 1,
+
+		CastSpeedMultiplier:  1,
+		MeleeSpeedMultiplier: 1,
+		//RangedSpeedMultiplier: 1, // Leave at 0 so we can use this to ignore ranged stuff for non-hunters.
+		SpiritRegenMultiplier: 1,
+		ThreatMultiplier:      1,
+
+		DamageDealtMultiplier:       1,
+		RangedDamageDealtMultiplier: 1,
+
+		PhysicalDamageDealtMultiplier: 1,
+		ArcaneDamageDealtMultiplier:   1,
+		FireDamageDealtMultiplier:     1,
+		FrostDamageDealtMultiplier:    1,
+		HolyDamageDealtMultiplier:     1,
+		NatureDamageDealtMultiplier:   1,
+		ShadowDamageDealtMultiplier:   1,
+
+		AgentReserved1DamageDealtMultiplier: 1,
+
+		// Target effects.
 		DamageTakenMultiplier: 1,
 
 		PhysicalDamageTakenMultiplier: 1,

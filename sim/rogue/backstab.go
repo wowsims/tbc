@@ -8,11 +8,11 @@ import (
 var BackstabActionID = core.ActionID{SpellID: 26863}
 var BackstabEnergyCost = 60.0
 
-func (rogue *Rogue) newBackstabTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerBackstabSpell(_ *core.Simulation) {
 	refundAmount := BackstabEnergyCost * 0.8
 
 	ability := rogue.newAbility(BackstabActionID, BackstabEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			rogue.AddComboPoints(sim, 1, BackstabActionID)
 		} else {
@@ -35,15 +35,8 @@ func (rogue *Rogue) newBackstabTemplate(_ *core.Simulation) core.SimpleSpellTemp
 
 	ability.Effect.BonusCritRating += 10 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.PuncturingWounds)
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (rogue *Rogue) NewBackstab(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	bs := &rogue.backstab
-	rogue.backstabTemplate.Apply(bs)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	bs.Effect.Target = target
-
-	return bs
+	rogue.Backstab = rogue.RegisterSpell(core.SpellConfig{
+		Template:   ability,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }

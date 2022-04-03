@@ -99,15 +99,15 @@ func (eleShaman *ElementalShaman) tryUseGCD(sim *core.Simulation) {
 		return
 	}
 
-	newAction := eleShaman.rotation.ChooseAction(eleShaman, sim)
-	actionSuccessful := newAction.Cast(sim)
-	if actionSuccessful {
-		eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
-	} else {
-		// Only way for a shaman spell to fail is due to mana cost.
-		// Wait until we have enough mana to cast.
-		eleShaman.WaitForMana(sim, newAction.GetManaCost())
-	}
+	eleShaman.rotation.DoAction(eleShaman, sim)
+	//actionSuccessful := newAction.Cast(sim)
+	//if actionSuccessful {
+	//	eleShaman.rotation.OnActionAccepted(eleShaman, sim, newAction)
+	//} else {
+	//	// Only way for a shaman spell to fail is due to mana cost.
+	//	// Wait until we have enough mana to cast.
+	//	eleShaman.WaitForMana(sim, newAction.GetManaCost())
+	//}
 }
 
 // Picks which attacks / abilities the Shaman does.
@@ -115,11 +115,7 @@ type Rotation interface {
 	GetPresimOptions() *core.PresimOptions
 
 	// Returns the action this rotation would like to take next.
-	ChooseAction(*ElementalShaman, *core.Simulation) AgentAction
-
-	// This will be invoked right before the chosen action is actually executed, so the rotation can update its state.
-	// Note that the action may be different from the action chosen by this rotation.
-	OnActionAccepted(*ElementalShaman, *core.Simulation, AgentAction)
+	DoAction(*ElementalShaman, *core.Simulation)
 
 	// Returns this rotation to its initial state. Called before each Sim iteration.
 	Reset(*ElementalShaman, *core.Simulation)
@@ -131,12 +127,12 @@ type Rotation interface {
 type LBOnlyRotation struct {
 }
 
-func (rotation *LBOnlyRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
-	return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
+func (rotation *LBOnlyRotation) DoAction(eleShaman *ElementalShaman, sim *core.Simulation) {
+	if !eleShaman.LightningBolt.Cast(sim, sim.GetPrimaryTarget()) {
+		eleShaman.WaitForMana(sim, eleShaman.LightningBolt.Instance.GetManaCost())
+	}
 }
 
-func (rotation *LBOnlyRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
-}
 func (rotation *LBOnlyRotation) Reset(eleShaman *ElementalShaman, sim *core.Simulation) {}
 func (rotation *LBOnlyRotation) GetPresimOptions() *core.PresimOptions                  { return nil }
 
@@ -150,16 +146,19 @@ func NewLBOnlyRotation() *LBOnlyRotation {
 type CLOnCDRotation struct {
 }
 
-func (rotation *CLOnCDRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
+func (rotation *CLOnCDRotation) DoAction(eleShaman *ElementalShaman, sim *core.Simulation) {
+	var spell *core.Spell
 	if eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) {
-		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
+		spell = eleShaman.LightningBolt
 	} else {
-		return eleShaman.NewChainLightning(sim, sim.GetPrimaryTarget(), false)
+		spell = eleShaman.ChainLightning
+	}
+
+	if !spell.Cast(sim, sim.GetPrimaryTarget()) {
+		eleShaman.WaitForMana(sim, spell.Instance.GetManaCost())
 	}
 }
 
-func (rotation *CLOnCDRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
-}
 func (rotation *CLOnCDRotation) Reset(eleShaman *ElementalShaman, sim *core.Simulation) {}
 func (rotation *CLOnCDRotation) GetPresimOptions() *core.PresimOptions                  { return nil }
 
@@ -175,29 +174,27 @@ type FixedRotation struct {
 	numLBsSinceLastCL int32
 }
 
-func (rotation *FixedRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
+func (rotation *FixedRotation) DoAction(eleShaman *ElementalShaman, sim *core.Simulation) {
+	var spell *core.Spell
 	if rotation.numLBsSinceLastCL < rotation.numLBsPerCL {
-		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
-	}
-
-	if !eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) {
-		return eleShaman.NewChainLightning(sim, sim.GetPrimaryTarget(), false)
-	}
-
-	// If we have a temporary haste effect (like bloodlust or quags eye) then
-	// we should add LB casts instead of waiting
-	if eleShaman.HasTemporarySpellCastSpeedIncrease() {
-		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
-	}
-
-	return common.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(shaman.ChainLightningCooldownID, sim.CurrentTime), common.WaitReasonRotation)
-}
-
-func (rotation *FixedRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
-	if action.GetActionID().SpellID == shaman.SpellIDLB12 {
+		spell = eleShaman.LightningBolt
 		rotation.numLBsSinceLastCL++
-	} else if action.GetActionID().SpellID == shaman.SpellIDCL6 {
+	} else if !eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) {
+		spell = eleShaman.ChainLightning
 		rotation.numLBsSinceLastCL = 0
+	} else if eleShaman.HasTemporarySpellCastSpeedIncrease() {
+		// If we have a temporary haste effect (like bloodlust or quags eye) then
+		// we should add LB casts instead of waiting
+		spell = eleShaman.LightningBolt
+		rotation.numLBsSinceLastCL++
+	}
+
+	if spell == nil {
+		common.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(shaman.ChainLightningCooldownID, sim.CurrentTime), common.WaitReasonRotation).Cast(sim)
+	} else {
+		if !spell.Cast(sim, sim.GetPrimaryTarget()) {
+			eleShaman.WaitForMana(sim, spell.Instance.GetManaCost())
+		}
 	}
 }
 
@@ -221,16 +218,19 @@ type CLOnClearcastRotation struct {
 	prevPrevCastProccedCC bool
 }
 
-func (rotation *CLOnClearcastRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
+func (rotation *CLOnClearcastRotation) DoAction(eleShaman *ElementalShaman, sim *core.Simulation) {
+	var spell *core.Spell
 	if eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) || !rotation.prevPrevCastProccedCC {
-		return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
+		spell = eleShaman.LightningBolt
+	} else {
+		spell = eleShaman.ChainLightning
 	}
 
-	return eleShaman.NewChainLightning(sim, sim.GetPrimaryTarget(), false)
-}
-
-func (rotation *CLOnClearcastRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
-	rotation.prevPrevCastProccedCC = eleShaman.ElementalFocusStacks == 2
+	if !spell.Cast(sim, sim.GetPrimaryTarget()) {
+		eleShaman.WaitForMana(sim, spell.Instance.GetManaCost())
+	} else {
+		rotation.prevPrevCastProccedCC = eleShaman.ElementalFocusStacks == 2
+	}
 }
 
 func (rotation *CLOnClearcastRotation) Reset(eleShaman *ElementalShaman, sim *core.Simulation) {
@@ -253,7 +253,8 @@ type AdaptiveRotation struct {
 	surplusRotation Rotation // The rotation used when we have extra mana
 }
 
-func (rotation *AdaptiveRotation) ChooseAction(eleShaman *ElementalShaman, sim *core.Simulation) AgentAction {
+func (rotation *AdaptiveRotation) DoAction(eleShaman *ElementalShaman, sim *core.Simulation) {
+	didLB := false
 	if sim.GetNumTargets() == 1 {
 		sp := eleShaman.GetStat(stats.NatureSpellPower) + eleShaman.GetStat(stats.SpellPower)
 		castSpeed := eleShaman.CastSpeed()
@@ -263,21 +264,21 @@ func (rotation *AdaptiveRotation) ChooseAction(eleShaman *ElementalShaman, sim *
 			lb *= 1.05
 		}
 		if lb+10 >= cl {
-			return eleShaman.NewLightningBolt(sim, sim.GetPrimaryTarget(), false)
+			eleShaman.LightningBolt.Cast(sim, sim.GetPrimaryTarget())
+			didLB = true
 		}
 	}
 
-	// If we have enough mana to burn, use the surplus rotation.
-	if rotation.manaTracker.ProjectedManaSurplus(sim, eleShaman.GetCharacter()) {
-		return rotation.surplusRotation.ChooseAction(eleShaman, sim)
-	} else {
-		return rotation.baseRotation.ChooseAction(eleShaman, sim)
+	if !didLB {
+		// If we have enough mana to burn, use the surplus rotation.
+		if rotation.manaTracker.ProjectedManaSurplus(sim, eleShaman.GetCharacter()) {
+			rotation.surplusRotation.DoAction(eleShaman, sim)
+		} else {
+			rotation.baseRotation.DoAction(eleShaman, sim)
+		}
 	}
-}
-func (rotation *AdaptiveRotation) OnActionAccepted(eleShaman *ElementalShaman, sim *core.Simulation, action AgentAction) {
+
 	rotation.manaTracker.Update(sim, eleShaman.GetCharacter())
-	rotation.baseRotation.OnActionAccepted(eleShaman, sim, action)
-	rotation.surplusRotation.OnActionAccepted(eleShaman, sim, action)
 }
 
 func (rotation *AdaptiveRotation) Reset(eleShaman *ElementalShaman, sim *core.Simulation) {
@@ -314,13 +315,6 @@ func NewAdaptiveRotation() *AdaptiveRotation {
 // A single action that an Agent can take.
 type AgentAction interface {
 	GetActionID() core.ActionID
-
-	// The Character performing this action.
-	GetCharacter() *core.Character
-
-	// How long this action takes to cast/channel/etc.
-	// In other words, how long until another action should be chosen.
-	GetDuration() time.Duration
 
 	// TODO: Maybe change this to 'ResourceCost'
 	// Amount of mana required to perform the action.

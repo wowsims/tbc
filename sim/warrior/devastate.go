@@ -8,17 +8,15 @@ import (
 
 var DevastateActionID = core.ActionID{SpellID: 30022}
 
-func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            DevastateActionID,
-				Character:           &warrior.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				IgnoreHaste:         true,
+				ActionID:    DevastateActionID,
+				Character:   &warrior.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         core.GCDDefault,
+				IgnoreHaste: true,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Rage,
 					Value: warrior.sunderArmorCost,
@@ -27,66 +25,64 @@ func (warrior *Warrior) newDevastateTemplate(_ *core.Simulation) core.SimpleSpel
 					Type:  stats.Rage,
 					Value: warrior.sunderArmorCost,
 				},
-				CritMultiplier: warrior.critMultiplier(true),
 			},
 		},
 		Effect: core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			FlatThreatBonus:  100,
+			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			CritRollCategory:    core.CritRollCategoryPhysical,
+			CritMultiplier:      warrior.critMultiplier(true),
+			ProcMask:            core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier:    1,
+			ThreatMultiplier:    1,
+			FlatThreatBonus:     100,
 		},
 	}
 
 	normalBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 0.5, true)
 	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spellCast *core.SpellCast) float64 {
+		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 			// Bonus 35 damage / stack of sunder. Counts stacks AFTER cast but only if stacks > 0.
 			sunderBonus := 0.0
-			saStacks := hitEffect.Target.NumStacks(core.SunderArmorDebuffID)
+			saStacks := hitEffect.Target.NumStacks(core.SunderArmorAuraID)
 			if saStacks != 0 {
 				sunderBonus = 35 * float64(core.MinInt32(saStacks+1, 5))
 			}
 
-			return normalBaseDamage(sim, hitEffect, spellCast) + sunderBonus
+			return normalBaseDamage(sim, hitEffect, spell) + sunderBonus
 		},
 		TargetSpellCoefficient: 1,
 	}
 
+	normalSunderModifier := core.ModifyCastAssignTarget
+	devastateSunderModifier := func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+		instance.Effect.Target = target
+		instance.SpellExtras |= core.SpellExtrasAlwaysHits
+		instance.Cost.Value = 0
+		instance.BaseCost.Value = 0
+		instance.GCD = 0
+		if target.NumStacks(core.SunderArmorAuraID) == 5 {
+			instance.Effect.ThreatMultiplier = 0
+		}
+	}
+
 	refundAmount := warrior.sunderArmorCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
 			target := spellEffect.Target
-			if !target.HasAura(core.ExposeArmorDebuffID) {
-				sa := &warrior.sunderArmor
-				warrior.sunderArmorTemplate.Apply(sa)
-
-				sa.Effect.Target = target
-				sa.SpellExtras |= core.SpellExtrasAlwaysHits
-				sa.Cost.Value = 0
-				sa.BaseCost.Value = 0
-				if target.NumStacks(core.SunderArmorDebuffID) == 5 {
-					sa.Effect.ThreatMultiplier = 0
-				}
-
-				sa.Cast(sim)
+			if !target.HasAura(core.ExposeArmorAuraID) {
+				warrior.SunderArmor.ModifyCast = devastateSunderModifier
+				warrior.SunderArmor.Cast(sim, spellEffect.Target)
+				warrior.SunderArmor.ModifyCast = normalSunderModifier
 			}
 		} else {
 			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}
 	}
 
-	return core.NewSimpleSpellTemplate(ability)
-}
-
-func (warrior *Warrior) NewDevastate(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	dv := &warrior.devastate
-	warrior.devastateTemplate.Apply(dv)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	dv.Effect.Target = target
-
-	return dv
+	warrior.Devastate = warrior.RegisterSpell(core.SpellConfig{
+		Template:   ability,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
 
 func (warrior *Warrior) CanDevastate(sim *core.Simulation) bool {

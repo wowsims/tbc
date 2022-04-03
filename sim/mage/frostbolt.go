@@ -9,16 +9,14 @@ import (
 
 const SpellIDFrostbolt int32 = 27072
 
-func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (mage *Mage) registerFrostboltSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDFrostbolt},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFrost,
-				SpellExtras:         SpellFlagMage | core.SpellExtrasBinary,
+				ActionID:    core.ActionID{SpellID: SpellIDFrostbolt},
+				Character:   &mage.Character,
+				SpellSchool: core.SpellSchoolFrost,
+				SpellExtras: SpellFlagMage | core.SpellExtrasBinary,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 330,
@@ -27,15 +25,17 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 					Type:  stats.Mana,
 					Value: 330,
 				},
-				CastTime:       time.Millisecond * 3000,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)+0.2*float64(mage.Talents.IceShards)),
+				CastTime: time.Millisecond * 3000,
+				GCD:      core.GCDDefault,
 			},
 		},
 		Effect: core.SpellEffect{
-			DamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier: 1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
-			BaseDamage:       core.BaseDamageConfigMagic(600, 647, (3.0/3.5)*0.95+0.02*float64(mage.Talents.EmpoweredFrostbolt)),
+			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
+			CritRollCategory:    core.CritRollCategoryMagical,
+			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)+0.2*float64(mage.Talents.IceShards)),
+			DamageMultiplier:    mage.spellDamageMultiplier,
+			ThreatMultiplier:    1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
+			BaseDamage:          core.BaseDamageConfigMagic(600, 647, (3.0/3.5)*0.95+0.02*float64(mage.Talents.EmpoweredFrostbolt)),
 		},
 	}
 
@@ -51,17 +51,8 @@ func (mage *Mage) newFrostboltTemplate(sim *core.Simulation) core.SimpleSpellTem
 		spell.Effect.DamageMultiplier *= 1.05
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) NewFrostbolt(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	frostbolt := &mage.frostboltSpell
-	mage.frostboltCastTemplate.Apply(frostbolt)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	frostbolt.Effect.Target = target
-	frostbolt.Init(sim)
-
-	return frostbolt
+	mage.Frostbolt = mage.RegisterSpell(core.SpellConfig{
+		Template:   spell,
+		ModifyCast: core.ModifyCastAssignTarget,
+	})
 }
