@@ -9,7 +9,7 @@ import (
 
 // Callback for after a spell hits the target and after damage is calculated. Use it for proc effects
 // or anything that comes from the final result of the spell.
-type OnSpellHit func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
+type OnSpellHit func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect)
 
 // OnPeriodicDamage is called when dots tick, after damage is calculated. Use it for proc effects
 // or anything that comes from the final result of a tick.
@@ -60,7 +60,7 @@ type SpellEffect struct {
 	ProcMask ProcMask
 
 	// Callbacks for providing additional custom behavior.
-	OnSpellHit OnSpellHit
+	OnSpellHit func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
 
 	// Results
 	Outcome HitOutcome

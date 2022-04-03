@@ -20,7 +20,7 @@ func (hunter *Hunter) applyKillCommand() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: KillCommandAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					hunter.killCommandEnabledUntil = sim.CurrentTime + time.Second*5
 					hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
@@ -45,7 +45,7 @@ func (hunter *Hunter) registerKillCommandSpell(sim *core.Simulation) {
 					Value: 75,
 				},
 				Cooldown: time.Second * 5,
-				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 					hunter.killCommandEnabledUntil = 0
 					hunter.pet.KillCommand.Cast(sim, sim.GetPrimaryTarget())
 				},
@@ -82,7 +82,7 @@ func (hp *HunterPet) registerKillCommandSpell(sim *core.Simulation) {
 			DamageMultiplier:    1,
 			ThreatMultiplier:    1,
 			BaseDamage:          core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 127, 1, true),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if hasBeastLord4Pc {
 					beastLordStatApplier(sim)
 				}

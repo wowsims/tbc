@@ -41,7 +41,7 @@ var ItemSetAvatar = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: Avatar2PcAuraID,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 						if sim.RandomFloat("avatar 2p") > 0.06 {
 							return
 						}

@@ -31,7 +31,7 @@ func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
 				},
 				CastTime: time.Second * 3,
 				GCD:      core.GCDDefault,
-				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 					mage.FlamestrikeDot.Instance.Cancel(sim)
 					mage.FlamestrikeDot.Cast(sim, nil)
 				},

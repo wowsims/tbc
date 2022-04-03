@@ -48,7 +48,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 		ActionID: SealOfBloodProcActionID,
 		Duration: SealDuration,
 
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 				return
 			}
@@ -72,7 +72,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 			},
 			GCD: core.GCDDefault,
 		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 			paladin.UpdateSeal(sim, sobAura)
 		},
 	}
@@ -132,7 +132,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 		ActionID: SealOfCommandProcActionID,
 		Duration: SealDuration,
 
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 				return
 			}
@@ -166,7 +166,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 			},
 			GCD: core.GCDDefault,
 		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 			paladin.UpdateSeal(sim, socAura)
 		},
 	}
@@ -208,7 +208,7 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 			},
 			GCD: core.GCDDefault,
 		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 			paladin.UpdateSeal(sim, sotcAura)
 		},
 	}
@@ -250,7 +250,7 @@ func (paladin *Paladin) setupSealOfWisdom() {
 			},
 			GCD: core.GCDDefault,
 		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 			paladin.UpdateSeal(sim, sowAura)
 		},
 	}

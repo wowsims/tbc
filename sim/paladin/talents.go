@@ -99,7 +99,7 @@ func (paladin *Paladin) applyVengeance() {
 	paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: VengeanceAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					newStacks := core.MinInt32(3, paladin.NumStacks(VengeanceAuraID)+1)
 					paladin.AddAura(sim, makeProcAura(newStacks))

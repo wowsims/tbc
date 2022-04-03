@@ -162,10 +162,12 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	}
 	applyAdamantiteSharpeningStoneAura(character, consumes, allowMHImbue)
 
-	registerDrumsCD(agent, partyBuffs, consumes)
-	registerPotionCD(agent, consumes)
-	registerConjuredCD(agent, consumes)
-	registerExplosivesCD(agent, consumes)
+	character.RegisterFinalizeEffect(func() {
+		registerDrumsCD(agent, partyBuffs, consumes)
+		registerPotionCD(agent, consumes)
+		registerConjuredCD(agent, consumes)
+		registerExplosivesCD(agent, consumes)
+	})
 }
 
 func ApplyPetConsumeEffects(pet *Character, ownerConsumes proto.Consumes) {
@@ -658,10 +660,8 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 			},
 			func(sim *Simulation, character *Character) {
 				buffAura.Activate(sim)
-
-				if !character.HasAura(FelManaPotionDebuffAuraID) {
-					debuffAura.Activate(sim)
-				}
+				debuffAura.Activate(sim)
+				debuffAura.Refresh(sim)
 
 				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
 				character.Metrics.AddInstantCast(actionID)
@@ -813,7 +813,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 
 		const procChance = 0.185
 		flameCapAura := character.NewTemporaryStatsAura("Flame Cap", actionID, stats.Stats{stats.FireSpellPower: 80}, time.Minute)
-		flameCapAura.OnSpellHit = func(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+		flameCapAura.OnSpellHit = func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 				return
 			}

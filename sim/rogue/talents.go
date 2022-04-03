@@ -145,7 +145,7 @@ func (rogue *Rogue) registerColdBloodCD() {
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.PseudoStats.BonusCritRatingAgentReserved1 -= 100 * core.MeleeCritRatingPerCritChance
 		},
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			rogue.RemoveAuraOnNextAdvance(sim, ColdBloodAuraID)
 		},
 	}
@@ -157,7 +157,7 @@ func (rogue *Rogue) registerColdBloodCD() {
 			ActionID:  actionID,
 			Character: rogue.GetCharacter(),
 			Cooldown:  cooldown,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				rogue.AddAura(sim, coldBloodAura)
 			},
 		},
@@ -196,7 +196,7 @@ func (rogue *Rogue) applySealFate() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: SealFateAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SpellExtras.Matches(SpellFlagBuilder) {
 					return
 				}
@@ -253,7 +253,7 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 
 			return core.Aura{
 				ID: SwordSpecializationAuraID,
-				OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if !spellEffect.Landed() {
 						return
 					}
@@ -291,7 +291,7 @@ func (rogue *Rogue) applyCombatPotency() {
 	rogue.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: CombatPotencyAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
@@ -356,7 +356,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 				Type:  stats.Energy,
 				Value: energyCost,
 			},
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				rogue.AddAura(sim, bladeFlurryAura)
 			},
 		},
@@ -434,7 +434,7 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 			Cooldown:    cooldown,
 			GCD:         time.Second,
 			IgnoreHaste: true,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				rogue.AddAura(sim, adrenalineRushAura)
 			},
 		},

@@ -88,7 +88,7 @@ func (druid *Druid) registerInnervateCD() {
 					},
 					GCD:      core.GCDDefault,
 					Cooldown: innervateCD,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 						// Update expected bonus mana
 						newRemainingUsages := int(sim.GetRemainingDuration() / innervateCD)
 						expectedBonusManaReduction := expectedManaPerInnervate * float64(remainingInnervateUsages-newRemainingUsages)

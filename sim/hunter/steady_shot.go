@@ -45,7 +45,7 @@ func (hunter *Hunter) registerSteadyShotSpell(sim *core.Simulation) {
 				},
 				TargetSpellCoefficient: 1,
 			}),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				hunter.killCommandBlocked = false
 				hunter.TryKillCommand(sim, spellEffect.Target)
 				hunter.rotation(sim, false)

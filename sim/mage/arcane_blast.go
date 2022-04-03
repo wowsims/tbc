@@ -43,7 +43,7 @@ func (mage *Mage) registerArcaneBlastSpell(sim *core.Simulation) {
 				},
 				CastTime: ArcaneBlastBaseCastTime,
 				GCD:      core.GCDDefault,
-				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 					abAura.Stacks = core.MinInt32(3, mage.NumStacks(ArcaneBlastAuraID)+1)
 					cast.Character.ReplaceAura(sim, abAura)
 				},

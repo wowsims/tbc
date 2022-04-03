@@ -51,7 +51,7 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 					}
 				}
 			},
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}

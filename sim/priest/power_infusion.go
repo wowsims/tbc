@@ -68,7 +68,7 @@ func (priest *Priest) registerPowerInfusionCD() {
 						Value: baseManaCost,
 					},
 					Cooldown: powerInfusionCD,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 						core.AddPowerInfusionAura(sim, powerInfusionTarget, actionID.Tag)
 					},
 				},

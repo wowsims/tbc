@@ -42,11 +42,6 @@ func ApplyWeaponMajorStriking(agent core.Agent, slot proto.ItemSlot) {
 	w.BaseDamageMax += 7
 }
 
-var CrusaderAuraID = core.NewAuraID()
-
-var CrusaderStrengthMHAuraID = core.NewAuraID()
-var CrusaderStrengthOHAuraID = core.NewAuraID()
-
 // ApplyCrusaderEffect will be applied twice if there is two weapons with this enchant.
 //   However it will automatically overwrite one of them so it should be ok.
 //   A single application of the aura will handle both mh and oh procs.
@@ -65,15 +60,15 @@ func ApplyCrusader(agent core.Agent) {
 		ppmm.SetProcChance(false, 0)
 	}
 
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		// -4 str per level over 60
 		const strBonus = 100.0 - 4.0*float64(core.CharacterLevel-60)
-		applyStatAuraMH := character.NewTemporaryStatsAuraApplier(CrusaderStrengthMHAuraID, core.ActionID{SpellID: 20007, Tag: 1}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
-		applyStatAuraOH := character.NewTemporaryStatsAuraApplier(CrusaderStrengthOHAuraID, core.ActionID{SpellID: 20007, Tag: 2}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
+		mhAura := character.NewTemporaryStatsAura("Crusader Enchant MH", core.ActionID{SpellID: 20007, Tag: 1}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
+		ohAura := character.NewTemporaryStatsAura("Crusader Enchant OH", core.ActionID{SpellID: 20007, Tag: 2}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
 
-		return core.Aura{
-			ID: CrusaderAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Crusader Enchant",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
@@ -81,13 +76,13 @@ func ApplyCrusader(agent core.Agent) {
 				isMH := spellEffect.IsMH()
 				if ppmm.Proc(sim, isMH, false, "Crusader") {
 					if isMH {
-						applyStatAuraMH(sim)
+						mhAura.Activate(sim)
 					} else {
-						applyStatAuraOH(sim)
+						ohAura.Activate(sim)
 					}
 				}
 			},
-		}
+		})
 	})
 }
 
@@ -100,46 +95,21 @@ func ApplyRingStriking(agent core.Agent) {
 	agent.GetCharacter().PseudoStats.BonusDamage += 2
 }
 
-var MongooseAuraID = core.NewAuraID()
+func newLightningSpeedAura(character *core.Character, auraLabel string, actionID core.ActionID) *core.Aura {
+	aura := character.NewTemporaryStatsAura(auraLabel, actionID, stats.Stats{stats.Agility: 120}, time.Second*15)
 
-var LightningSpeedMHAuraID = core.NewAuraID()
-var LightningSpeedOHAuraID = core.NewAuraID()
-
-func newLightningSpeedApplier(character *core.Character, auraID core.AuraID, actionID core.ActionID) func(sim *core.Simulation) {
-	factory := newLightningSpeedAuraFactory(character, auraID, actionID)
-
-	return func(sim *core.Simulation) {
-		character.ReplaceAura(sim, factory(sim))
+	oldOnGain := aura.OnGain
+	oldOnExpire := aura.OnExpire
+	aura.OnGain = func(aura *core.Aura, sim *core.Simulation) {
+		oldOnGain(aura, sim)
+		character.MultiplyMeleeSpeed(sim, 1.02)
 	}
-}
-
-func newLightningSpeedAuraFactory(character *core.Character, auraID core.AuraID, actionID core.ActionID) func(sim *core.Simulation) core.Aura {
-	buffs := character.ApplyStatDependencies(stats.Stats{stats.Agility: 120})
-	unbuffs := buffs.Multiply(-1)
-
-	aura := core.Aura{
-		ID:       auraID,
-		ActionID: actionID,
-		Duration: time.Second * 15,
-		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			character.AddStatsDynamic(sim, buffs)
-			character.MultiplyMeleeSpeed(sim, 1.02)
-			if sim.Log != nil {
-				character.Log(sim, "Gained %s from %s", buffs.FlatString(), actionID)
-			}
-		},
-		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			character.AddStatsDynamic(sim, unbuffs)
-			character.MultiplyMeleeSpeed(sim, 1/1.02)
-			if sim.Log != nil {
-				character.Log(sim, "Lost %s from fading %s", buffs.FlatString(), actionID)
-			}
-		},
+	aura.OnExpire = func(aura *core.Aura, sim *core.Simulation) {
+		oldOnExpire(aura, sim)
+		character.MultiplyMeleeSpeed(sim, 1/1.02)
 	}
 
-	return func(sim *core.Simulation) core.Aura {
-		return aura
-	}
+	return aura
 }
 
 // ApplyMongooseEffect will be applied twice if there is two weapons with this enchant.
@@ -160,13 +130,13 @@ func ApplyMongoose(agent core.Agent) {
 		ppmm.SetProcChance(false, 0)
 	}
 
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		applyStatAuraMH := newLightningSpeedApplier(character, LightningSpeedMHAuraID, core.ActionID{SpellID: 28093, Tag: 1})
-		applyStatAuraOH := newLightningSpeedApplier(character, LightningSpeedOHAuraID, core.ActionID{SpellID: 28093, Tag: 2})
+	mhAura := newLightningSpeedAura(character, "Lightning Speed MH", core.ActionID{SpellID: 28093, Tag: 1})
+	ohAura := newLightningSpeedAura(character, "Lightning Speed OH", core.ActionID{SpellID: 28093, Tag: 2})
 
-		return core.Aura{
-			ID: MongooseAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Mongoose Enchant",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
@@ -174,13 +144,13 @@ func ApplyMongoose(agent core.Agent) {
 				isMH := spellEffect.IsMH()
 				if ppmm.Proc(sim, isMH, false, "mongoose") {
 					if isMH {
-						applyStatAuraMH(sim)
+						mhAura.Activate(sim)
 					} else {
-						applyStatAuraOH(sim)
+						ohAura.Activate(sim)
 					}
 				}
 			},
-		}
+		})
 	})
 }
 
@@ -204,9 +174,6 @@ func ApplyGlovesThreat(agent core.Agent) {
 	character.PseudoStats.ThreatMultiplier *= 1.02
 }
 
-var ExecutionerAuraID = core.NewAuraID()
-var ExecutionerProcAuraID = core.NewAuraID()
-
 func ApplyExecutioner(agent core.Agent) {
 	character := agent.GetCharacter()
 	ppmm := character.AutoAttacks.NewPPMManager(1.0)
@@ -222,22 +189,20 @@ func ApplyExecutioner(agent core.Agent) {
 		ppmm.SetProcChance(false, 0)
 	}
 
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const arPenBonus = 840.0
-		const dur = time.Second * 15
-		applyStatAura := character.NewTemporaryStatsAuraApplier(ExecutionerProcAuraID, core.ActionID{SpellID: 42976}, stats.Stats{stats.ArmorPenetration: arPenBonus}, dur)
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Executioner Proc", core.ActionID{SpellID: 42976}, stats.Stats{stats.ArmorPenetration: 840}, time.Second*15)
 
-		return core.Aura{
-			ID: ExecutionerAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Executioner",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 					return
 				}
 
 				if ppmm.Proc(sim, spellEffect.IsMH(), false, "Executioner") {
-					applyStatAura(sim)
+					procAura.Activate(sim)
 				}
 			},
-		}
+		})
 	})
 }

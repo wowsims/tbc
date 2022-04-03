@@ -59,7 +59,7 @@ func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOve
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
 			instance.Effect.Target = target
 			shaman.applyElectricSpellCastInitModifiers(&instance.SpellCast)
-			if shaman.HasAura(NaturesSwiftnessAuraID) {
+			if shaman.NaturesSwiftnessAura != nil && shaman.NaturesSwiftnessAura.IsActive() {
 				instance.CastTime = 0
 			}
 		},

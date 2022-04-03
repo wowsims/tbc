@@ -10,8 +10,6 @@ func init() {
 	core.AddItemEffect(core.ItemIDTheLightningCapacitor, ApplyTheLightningCapacitor)
 }
 
-var TheLightningCapacitorAuraID = core.NewAuraID()
-
 func ApplyTheLightningCapacitor(agent core.Agent) {
 	character := agent.GetCharacter()
 
@@ -39,15 +37,15 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 		ModifyCast: core.ModifyCastAssignTarget,
 	})
 
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		charges := 0
 
 		const icdDur = time.Millisecond * 2500
 		icd := core.NewICD()
 
-		return core.Aura{
-			ID: TheLightningCapacitorAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Lightning Capacitor",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if icd.IsOnCD(sim) {
 					return
 				}
@@ -67,6 +65,6 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 					charges = 0
 				}
 			},
-		}
+		})
 	})
 }

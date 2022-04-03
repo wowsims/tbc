@@ -60,7 +60,7 @@ func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.Simp
 			},
 			GCD:         core.GCDDefault,
 			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				hunter.aspectOfTheViper = false
 				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheViperAuraID)
 				hunter.AddAuraOnNextAdvance(sim, aura)
@@ -104,7 +104,7 @@ func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.Sim
 			},
 			GCD:         core.GCDDefault,
 			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				hunter.aspectOfTheViper = true
 				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheHawkAuraID)
 				hunter.AddAuraOnNextAdvance(sim, aura)

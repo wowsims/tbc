@@ -33,7 +33,7 @@ func (mage *Mage) registerEvocationCD() {
 			Cooldown:  time.Minute * 8,
 			CastTime:  castTime,
 			GCD:       core.GCDDefault,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				mage.AddMana(sim, manaGain, actionID, true)
 
 				// All MCDs that use the GCD and have a non-zero cast time must call this.

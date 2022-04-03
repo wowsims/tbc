@@ -157,7 +157,7 @@ func (priest *Priest) ApplyInnerFocus(sim *core.Simulation) {
 			priest.AddStat(stats.SpellCrit, -25*core.SpellCritRatingPerCritChance)
 			priest.PseudoStats.NoCost = false
 		},
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// Remove the buff and put skill on CD
 			priest.SetCD(InnerFocusCooldownID, sim.CurrentTime+time.Minute*3)
 			priest.RemoveAura(sim, InnerFocusAuraID)

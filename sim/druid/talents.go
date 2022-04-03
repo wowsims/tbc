@@ -162,7 +162,7 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 					ID:       NaturesSwiftnessAuraID,
 					ActionID: actionID,
 					Duration: core.NeverExpires,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 						if cast.ActionID.SpellID != SpellIDWrath && cast.ActionID.SpellID != SpellIDSF8 && cast.ActionID.SpellID != SpellIDSF6 {
 							return
 						}

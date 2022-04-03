@@ -54,7 +54,7 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 			GCD:         time.Second,
 			IgnoreHaste: true,
 			SpellExtras: SpellFlagFinisher,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				numPoints := rogue.ComboPoints()
 				aura := sliceAndDiceAura
 				aura.Duration = rogue.sliceAndDiceDurations[numPoints]

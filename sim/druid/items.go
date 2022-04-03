@@ -27,7 +27,7 @@ var ItemSetMalorne = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 				return core.Aura{
 					ID: Malorne2PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 							return
 						}
@@ -82,7 +82,7 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 		applyStatAura := agent.GetCharacter().NewTemporaryStatsAuraApplier(LunarBlessingAuraID, core.ActionID{ItemID: 30664}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 		return core.Aura{
 			ID: LivingRootoftheWildheartAuraID,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				// technically only works while in moonkin form... but i think we can assume thats always true.
 				if druid.Talents.MoonkinForm {
 					if sim.RandomFloat("Living Root of the Wildheart") > 0.03 {
@@ -109,7 +109,7 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 		applyStatAura := agent.GetCharacter().NewTemporaryStatsAuraApplier(LunarGraceAuraID, actionID, stats.Stats{stats.SpellPower: spellBonus}, dur)
 		return core.Aura{
 			ID: IdoloftheUnseenMoonAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spell.ActionID.SpellID == SpellIDMoonfire {
 					if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
 						return
@@ -137,7 +137,7 @@ func ApplyAshtongueTalisman(agent core.Agent) {
 		applyStatAura := agent.GetCharacter().NewTemporaryStatsAuraApplier(AshtongueTalismanAuraID, actionID, stats.Stats{stats.SpellPower: spellBonus}, dur)
 		return core.Aura{
 			ID: AshtongueTalismanItemAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spell.ActionID.SpellID == SpellIDSF8 || spell.ActionID.SpellID == SpellIDSF6 {
 					if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
 						return

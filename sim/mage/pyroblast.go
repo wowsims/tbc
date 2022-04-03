@@ -40,7 +40,7 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 			DamageMultiplier:    mage.spellDamageMultiplier,
 			ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
 			BaseDamage:          core.BaseDamageConfigMagic(939, 1191, 1.15),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					mage.PyroblastDot.Instance.Cancel(sim)
 					mage.PyroblastDot.Cast(sim, spellEffect.Target)

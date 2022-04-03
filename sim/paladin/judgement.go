@@ -39,7 +39,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 			DamageMultiplier:    1, // Need to review to make sure I set these properly
 			ThreatMultiplier:    1,
 			BaseDamage:          core.BaseDamageConfigMagic(295, 325, 0.429),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
 				paladin.RemoveAura(sim, SealOfBloodAuraID)
 				paladin.currentSealID = 0
@@ -87,7 +87,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 					Type:  stats.Mana,
 					Value: JudgementManaCost,
 				},
-				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.Cost.Value)
 					paladin.RemoveAura(sim, SealOfTheCrusaderAuraID)
 					paladin.currentSealID = 0
@@ -97,7 +97,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 		},
 		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
@@ -143,7 +143,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 					Type:  stats.Mana,
 					Value: JudgementManaCost,
 				},
-				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfWisdom.Cost.Value)
 					paladin.RemoveAura(sim, SealOfWisdomAuraID)
 					paladin.currentSealID = 0
@@ -154,7 +154,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 		Effect: core.SpellEffect{
 			CritRollCategory:    core.CritRollCategoryMagical,
 			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}

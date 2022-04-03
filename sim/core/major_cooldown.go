@@ -368,7 +368,7 @@ func (mcdm *majorCooldownManager) UpdateMajorCooldowns() {
 
 // Add a major cooldown to the given agent, which provides a temporary boost to a single stat.
 // This is use for effects like Icon of the Silver Crescent and Bloodlust Brooch.
-func RegisterTemporaryStatsOnUseCD(agent Agent, auraID AuraID, tempStats stats.Stats, duration time.Duration, mcd MajorCooldown) {
+func RegisterTemporaryStatsOnUseCD(agent Agent, auraLabel string, tempStats stats.Stats, duration time.Duration, mcd MajorCooldown) {
 	// If shared cooldown ID is set but shared cooldown isn't, default to duration.
 	// Most items on a shared cooldown put each other on that cooldown for the
 	// duration of their active effect.
@@ -381,9 +381,9 @@ func RegisterTemporaryStatsOnUseCD(agent Agent, auraID AuraID, tempStats stats.S
 	mcd.Type = CooldownTypeDPS
 
 	mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
-		applier := agent.GetCharacter().NewTemporaryStatsAuraApplier(auraID, mcd.ActionID, tempStats, duration)
+		aura := agent.GetCharacter().NewTemporaryStatsAura(auraLabel, mcd.ActionID, tempStats, duration)
 		return func(sim *Simulation, character *Character) {
-			applier(sim)
+			aura.Activate(sim)
 			character.SetCD(mcd.CooldownID, sim.CurrentTime+mcd.Cooldown)
 			if mcd.SharedCooldownID != 0 {
 				character.SetCD(mcd.SharedCooldownID, sim.CurrentTime+mcd.SharedCooldown)
@@ -395,8 +395,8 @@ func RegisterTemporaryStatsOnUseCD(agent Agent, auraID AuraID, tempStats stats.S
 }
 
 // Helper function to make an ApplyEffect for a temporary stats on-use cooldown.
-func MakeTemporaryStatsOnUseCDRegistration(auraID AuraID, tempStats stats.Stats, duration time.Duration, mcd MajorCooldown) ApplyEffect {
+func MakeTemporaryStatsOnUseCDRegistration(auraLabel string, tempStats stats.Stats, duration time.Duration, mcd MajorCooldown) ApplyEffect {
 	return func(agent Agent) {
-		RegisterTemporaryStatsOnUseCD(agent, auraID, tempStats, duration, mcd)
+		RegisterTemporaryStatsOnUseCD(agent, auraLabel, tempStats, duration, mcd)
 	}
 }

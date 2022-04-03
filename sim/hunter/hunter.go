@@ -132,7 +132,7 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 		Character:   &hunter.Character,
 		IgnoreHaste: true,
 		CastTime:    hunter.timeToWeave,
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 			hunter.rotation(sim, false)
 		},
 	}

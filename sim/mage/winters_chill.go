@@ -56,7 +56,7 @@ func (mage *Mage) applyWintersChill() {
 	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: WintersChillAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}

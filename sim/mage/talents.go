@@ -90,7 +90,7 @@ func (mage *Mage) applyArcaneConcentration() {
 				mage.AddStat(stats.SpellCrit, -bonusCrit)
 				mage.PseudoStats.NoCost = false
 			},
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SpellExtras.Matches(SpellFlagMage) {
 					return
 				}
@@ -104,13 +104,13 @@ func (mage *Mage) applyArcaneConcentration() {
 
 		return core.Aura{
 			ID: ArcaneConcentrationAuraID,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				if !cast.SpellExtras.Matches(SpellFlagMage) {
 					return
 				}
 				curCastIdx++
 			},
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SpellExtras.Matches(SpellFlagMage) {
 					return
 				}
@@ -257,7 +257,7 @@ func (mage *Mage) applyMasterOfElements() {
 	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: MasterOfElementsAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -304,7 +304,7 @@ func (mage *Mage) registerCombustionCD() {
 					ID:       CombustionAuraID,
 					ActionID: actionID,
 					Duration: core.NeverExpires,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spell.SpellSchool != core.SpellSchoolFire {
 							return
 						}

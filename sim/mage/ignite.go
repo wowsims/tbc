@@ -62,7 +62,7 @@ func (mage *Mage) applyIgnite() {
 	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
 		return core.Aura{
 			ID: IgniteAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}

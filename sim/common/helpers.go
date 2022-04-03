@@ -1,6 +1,7 @@
 package common
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -8,11 +9,10 @@ import (
 )
 
 func AddSimpleStatItemActiveEffect(itemID int32, bonus stats.Stats, duration time.Duration, cooldown time.Duration, sharedCooldownID core.CooldownID) {
-	auraID := core.NewAuraID()
 	cooldownID := core.NewCooldownID()
 
 	core.AddItemEffect(itemID, core.MakeTemporaryStatsOnUseCDRegistration(
-		auraID,
+		"ItemActive-"+strconv.Itoa(int(itemID)),
 		bonus,
 		duration,
 		core.MajorCooldown{

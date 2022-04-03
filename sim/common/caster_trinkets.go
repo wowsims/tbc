@@ -34,8 +34,6 @@ func init() {
 	core.AddItemEffect(core.AlchStoneItemID, func(core.Agent) {})
 }
 
-var MarkOfTheChampionCasterAuraID = core.NewAuraID()
-
 func ApplyMarkOfTheChampionCaster(agent core.Agent) {
 	character := agent.GetCharacter()
 	character.RegisterResetEffect(func(sim *core.Simulation) {
@@ -45,44 +43,38 @@ func ApplyMarkOfTheChampionCaster(agent core.Agent) {
 	})
 }
 
-var QuagmirransEyeAuraID = core.NewAuraID()
-var FungalFrenzyAuraID = core.NewAuraID()
-
 func ApplyQuagmirransEye(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const hasteBonus = 320.0
-		const dur = time.Second * 45
-		icd := core.NewICD()
 
-		applyStatAura := character.NewTemporaryStatsAuraApplier(FungalFrenzyAuraID, core.ActionID{ItemID: 27683}, stats.Stats{stats.SpellHaste: hasteBonus}, time.Second*6)
-		return core.Aura{
-			ID: QuagmirransEyeAuraID,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Fungal Frenzy", core.ActionID{ItemID: 27683}, stats.Stats{stats.SpellHaste: 320}, time.Second*6)
+		icd := core.NewICD()
+		const icdDur = time.Second * 45
+
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Quagmirran's Eye",
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("Quagmirran's Eye") > 0.1 {
 					return
 				}
-				icd = core.InternalCD(sim.CurrentTime + dur)
-				applyStatAura(sim)
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				procAura.Activate(sim)
 			},
-		}
+		})
 	})
 }
 
-var ShiffarsNexusHornAuraID = core.NewAuraID()
-var CallOfTheNexusAuraID = core.NewAuraID()
-
 func ApplyShiffarsNexusHorn(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		icd := core.NewICD()
-		const spellBonus = 225.0
-		const dur = time.Second * 45
-		applyStatAura := character.NewTemporaryStatsAuraApplier(CallOfTheNexusAuraID, core.ActionID{ItemID: 28418}, stats.Stats{stats.SpellPower: spellBonus}, time.Second*10)
 
-		return core.Aura{
-			ID: ShiffarsNexusHornAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Call of the Nexus", core.ActionID{ItemID: 28418}, stats.Stats{stats.SpellPower: 225}, time.Second*10)
+		icd := core.NewICD()
+		const dur = time.Second * 45
+
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Shiffar's Nexus Horn",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -93,52 +85,43 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + dur)
-				applyStatAura(sim)
+				procAura.Activate(sim)
 			},
-		}
+		})
 	})
 }
 
-var EyeOfMagtheridonAuraID = core.NewAuraID()
-var RecurringPowerAuraID = core.NewAuraID()
-
 func ApplyEyeOfMagtheridon(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const spellBonus = 170.0
-		const dur = time.Second * 10
-		applyStatAura := character.NewTemporaryStatsAuraApplier(RecurringPowerAuraID, core.ActionID{ItemID: 28789}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 
-		return core.Aura{
-			ID: EyeOfMagtheridonAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Recurring Power", core.ActionID{ItemID: 28789}, stats.Stats{stats.SpellPower: 170}, time.Second*10)
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Eye of Magtheridon",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
 				if !spellEffect.Outcome.Matches(core.OutcomeMiss) {
 					return
 				}
-				applyStatAura(sim)
+				procAura.Activate(sim)
 			},
-		}
+		})
 	})
 }
 
-var SextantOfUnstableCurrentsAuraID = core.NewAuraID()
-var UnstableCurrentsAuraID = core.NewAuraID()
-
 func ApplySextantOfUnstableCurrents(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		icd := core.NewICD()
-		const spellBonus = 190.0
-		const dur = time.Second * 15
-		const icdDur = time.Second * 45
-		applyStatAura := character.NewTemporaryStatsAuraApplier(UnstableCurrentsAuraID, core.ActionID{ItemID: 30626}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 
-		return core.Aura{
-			ID: SextantOfUnstableCurrentsAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Unstable Currents", core.ActionID{ItemID: 30626}, stats.Stats{stats.SpellPower: 190}, time.Second*15)
+		icd := core.NewICD()
+		const icdDur = time.Second * 45
+
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Sextant of Unstable Currents",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -149,76 +132,55 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				applyStatAura(sim)
+				procAura.Activate(sim)
 			},
-		}
+		})
 	})
 }
 
-var DarkmoonCardCrusadeAuraID = core.NewAuraID()
-var AuraOfTheCrusadeMeleeAuraID = core.NewAuraID()
-var AuraOfTheCrusadeSpellAuraID = core.NewAuraID()
-
 func ApplyDarkmoonCardCrusade(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const meleeBonus = 6.0
-		const spellBonus = 8.0
-		meleeStacks := 0
-		spellStacks := 0
 
-		apAura := core.Aura{
-			ID:       AuraOfTheCrusadeMeleeAuraID,
-			ActionID: core.ActionID{ItemID: 31856, Tag: 1},
-			Duration: time.Second * 10,
-			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-				character.AddStat(stats.AttackPower, -meleeBonus*float64(meleeStacks))
-				character.AddStat(stats.RangedAttackPower, -meleeBonus*float64(meleeStacks))
-				meleeStacks = 0
-			},
-		}
+	apAura := character.RegisterAura(&core.Aura{
+		Label:     "DMC Crusade AP",
+		ActionID:  core.ActionID{ItemID: 31856, Tag: 1},
+		Duration:  time.Second * 10,
+		MaxStacks: 20,
+		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
+			character.AddStat(stats.AttackPower, 6*float64(newStacks-oldStacks))
+			character.AddStat(stats.RangedAttackPower, 6*float64(newStacks-oldStacks))
+		},
+	})
+	spAura := character.RegisterAura(&core.Aura{
+		Label:     "DMC Crusade SP",
+		ActionID:  core.ActionID{ItemID: 31856, Tag: 2},
+		Duration:  time.Second * 10,
+		MaxStacks: 10,
+		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
+			character.AddStat(stats.SpellPower, 8*float64(newStacks-oldStacks))
+		},
+	})
 
-		spAura := core.Aura{
-			ID:       AuraOfTheCrusadeSpellAuraID,
-			ActionID: core.ActionID{ItemID: 31856, Tag: 2},
-			Duration: time.Second * 10,
-			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-				character.AddStat(stats.SpellPower, -spellBonus*float64(spellStacks))
-				spellStacks = 0
-			},
-		}
-
-		return core.Aura{
-			ID: DarkmoonCardCrusadeAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "DMC Crusade",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					if spellEffect.IsPhantom {
 						return
 					}
-
-					if meleeStacks < 20 {
-						meleeStacks++
-						character.AddStat(stats.AttackPower, meleeBonus)
-						character.AddStat(stats.RangedAttackPower, meleeBonus)
-					}
-
-					// Removal aura will refresh with new total spellpower based on stacks.
-					//  This will remove the old stack removal buff.
-					character.ReplaceAura(sim, apAura)
+					apAura.Activate(sim)
+					apAura.AddStack(sim)
+					apAura.Refresh(sim)
 				} else {
 					if !spellEffect.Landed() {
 						return
 					}
-					if spellStacks < 10 {
-						spellStacks++
-						character.AddStat(stats.SpellPower, spellBonus)
-					}
-
-					// Removal aura will refresh with new total spellpower based on stacks.
-					//  This will remove the old stack removal buff.
-					character.ReplaceAura(sim, spAura)
+					spAura.Activate(sim)
+					spAura.AddStack(sim)
+					spAura.Refresh(sim)
 				}
 			},
-		}
+		})
 	})
 }

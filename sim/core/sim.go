@@ -36,8 +36,6 @@ type Simulation struct {
 	Log  func(string, ...interface{})
 	logs []string
 
-	emptyAuras []Aura
-
 	executePhase          bool
 	executePhaseCallbacks []func(*Simulation)
 }
@@ -79,8 +77,6 @@ func NewSim(rsr proto.RaidSimRequest) *Simulation {
 
 		isTest:    simOptions.IsTest,
 		testRands: make(map[string]*rand.Rand),
-
-		emptyAuras: make([]Aura, numAuraIDs),
 
 		pendingActionPool: newPAPool(),
 	}
@@ -159,24 +155,11 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	for _, party := range sim.Raid.Parties {
 		for _, player := range party.Players {
 			character := player.GetCharacter()
-			character.auraTracker.logFn = func(message string, vals ...interface{}) {
-				character.Log(sim, message, vals...)
-			}
 			player.Init(sim)
 
 			for _, petAgent := range character.Pets {
-				petCharacter := petAgent.GetCharacter()
-				petCharacter.auraTracker.logFn = func(message string, vals ...interface{}) {
-					petCharacter.Log(sim, message, vals...)
-				}
 				petAgent.Init(sim)
 			}
-		}
-	}
-
-	for _, target := range sim.encounter.Targets {
-		target.auraTracker.logFn = func(message string, vals ...interface{}) {
-			target.Log(sim, message, vals...)
 		}
 	}
 
@@ -250,8 +233,8 @@ func (sim *Simulation) runOnce() {
 		}
 	}
 
-	sim.Raid.doneIteration(sim.Duration)
-	sim.encounter.doneIteration(sim.Duration)
+	sim.Raid.doneIteration(sim)
+	sim.encounter.doneIteration(sim)
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {

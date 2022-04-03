@@ -39,7 +39,7 @@ func (hunter *Hunter) registerRapidFireCD() {
 				Type:  stats.Mana,
 				Value: 100,
 			},
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				hunter.AddAura(sim, rfAura)
 			},
 		},

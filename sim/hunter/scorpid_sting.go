@@ -28,7 +28,7 @@ func (hunter *Hunter) registerScorpidStingSpell(sim *core.Simulation) {
 			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			ProcMask:            core.ProcMaskRangedSpecial,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}

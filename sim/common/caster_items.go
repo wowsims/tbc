@@ -15,23 +15,19 @@ func init() {
 	core.AddItemEffect(34470, ApplyTimbals)
 }
 
-var RobeOfTheElderScribeAuraID = core.NewAuraID()
-var PowerOfArcanagosAuraID = core.NewAuraID()
-
 func ApplyRobeOfTheElderScribes(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Power of Arcanagos", core.ActionID{ItemID: 28602}, stats.Stats{stats.SpellPower: 130}, time.Second*10)
 		// Gives a chance when your harmful spells land to increase the damage of your spells and effects by up to 130 for 10 sec. (Proc chance: 20%, 50s cooldown)
 		icd := core.NewICD()
-		const spellBonus = 130.0
-		const dur = time.Second * 10
 		const icdDur = time.Second * 50
 		const proc = 0.2
 
-		applyStatAura := character.NewTemporaryStatsAuraApplier(PowerOfArcanagosAuraID, core.ActionID{ItemID: 28602}, stats.Stats{stats.SpellPower: spellBonus}, dur)
-		return core.Aura{
-			ID: RobeOfTheElderScribeAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Robe of the Elder Scribes",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -42,29 +38,25 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				applyStatAura(sim)
+				procAura.Activate(sim)
 			},
-		}
+		})
 	})
 }
 
-var EternalSageItemAuraID = core.NewAuraID()
-var BandOfTheEternalSageAuraID = core.NewAuraID()
-
 func ApplyEternalSage(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Band of the Eternal Sage Proc", core.ActionID{ItemID: 29305}, stats.Stats{stats.SpellPower: 95}, time.Second*10)
 		// Your offensive spells have a chance on hit to increase your spell damage by 95 for 10 secs.
 		icd := core.NewICD()
-		const spellBonus = 95.0
-		const dur = time.Second * 10
 		const icdDur = time.Second * 60
 		const proc = 0.1
-		applyStatAura := character.NewTemporaryStatsAuraApplier(BandOfTheEternalSageAuraID, core.ActionID{ItemID: 29305}, stats.Stats{stats.SpellPower: spellBonus}, dur)
 
-		return core.Aura{
-			ID: EternalSageItemAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Band of the Eternal Sage",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -75,13 +67,11 @@ func ApplyEternalSage(agent core.Agent) {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				applyStatAura(sim)
+				procAura.Activate(sim)
 			},
-		}
+		})
 	})
 }
-
-var AugmentPainAuraID = core.NewAuraID()
 
 func ApplyTimbals(agent core.Agent) {
 	character := agent.GetCharacter()
@@ -107,15 +97,15 @@ func ApplyTimbals(agent core.Agent) {
 		ModifyCast: core.ModifyCastAssignTarget,
 	})
 
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		// Each time one of your spells deals periodic damage,
 		// there is a chance 285 to 475 additional damage will be dealt. (Proc chance: 10%, 15s cooldown)
 		icd := core.NewICD()
 		const icdDur = time.Second * 15
 		const proc = 0.1
 
-		return core.Aura{
-			ID: AugmentPainAuraID,
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Timbals",
 			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("timbals") > proc { // can't activate if on CD or didn't proc
 					return
@@ -124,6 +114,6 @@ func ApplyTimbals(agent core.Agent) {
 
 				timbalsSpell.Cast(sim, spellEffect.Target)
 			},
-		}
+		})
 	})
 }
