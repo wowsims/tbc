@@ -39,6 +39,7 @@ func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
 				NumberOfTicks:  8,
 				TickLength:     time.Second * 3,
 				TickBaseDamage: core.DotSnapshotFuncMagic(1216/8, 0.1),
+				Aura:           priest.NewDotAura("Devouring Plague", core.ActionID{SpellID: SpellIDDevouringPlague}),
 			},
 		},
 	}

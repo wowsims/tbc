@@ -5,13 +5,13 @@ import (
 )
 
 func (priest *Priest) ApplyMisery(sim *core.Simulation, target *core.Target) {
-	if priest.Talents.Misery >= target.NumStacks(core.MiseryAuraID) {
-		target.AddAura(sim, core.MiseryAura(target, priest.Talents.Misery))
+	if priest.MiseryAura != nil {
+		priest.MiseryAura.Activate(sim)
 	}
 }
 
 func (priest *Priest) ApplyShadowWeaving(sim *core.Simulation, target *core.Target) {
-	if priest.Talents.ShadowWeaving == 0 {
+	if priest.ShadowWeavingAura == nil {
 		return
 	}
 
@@ -19,24 +19,18 @@ func (priest *Priest) ApplyShadowWeaving(sim *core.Simulation, target *core.Targ
 		return
 	}
 
-	curStacks := target.NumStacks(core.ShadowWeavingAuraID)
-	newStacks := core.MinInt32(curStacks+1, 5)
-
-	if sim.Log != nil && curStacks != newStacks {
-		priest.Log(sim, "Applied Shadow Weaving stack, %d --> %d", curStacks, newStacks)
+	priest.ShadowWeavingAura.Activate(sim)
+	if priest.ShadowWeavingAura.IsActive() {
+		priest.ShadowWeavingAura.AddStack(sim)
 	}
-
-	target.AddAura(sim, core.ShadowWeavingAura(target, newStacks))
 }
-
-var ShadowWeaverAuraID = core.NewAuraID()
 
 func (priest *Priest) ApplyShadowOnHitEffects() {
 	// This is a combined aura for all priest major on hit effects.
 	//  Shadow Weaving, Vampiric Touch, and Misery
-	priest.Character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: ShadowWeaverAuraID,
+	priest.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		return priest.GetOrRegisterAura(&core.Aura{
+			Label: "Priest Shadow Effects",
 			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
 				if tickDamage > 0 && priest.CurVTSpell.Instance.Effect.DotInput.IsTicking(sim) {
 					amount := tickDamage * 0.05
@@ -73,6 +67,6 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 					priest.ApplyMisery(sim, spellEffect.Target)
 				}
 			},
-		}
+		})
 	})
 }

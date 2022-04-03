@@ -9,8 +9,6 @@ import (
 
 const SpellIDHolyFire int32 = 25384
 
-var HolyFireAuraID = core.NewAuraID()
-
 func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -41,7 +39,7 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 				NumberOfTicks:  5,
 				TickLength:     time.Second * 2,
 				TickBaseDamage: core.DotSnapshotFuncMagic(33, 0.17),
-				AuraID:         HolyFireAuraID,
+				Aura:           priest.NewDotAura("Holy Fire", core.ActionID{SpellID: SpellIDHolyFire}),
 			},
 		},
 	}

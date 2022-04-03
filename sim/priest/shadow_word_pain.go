@@ -11,8 +11,6 @@ const SpellIDShadowWordPain int32 = 25368
 
 var ShadowWordPainActionID = core.ActionID{SpellID: SpellIDShadowWordPain}
 
-var ShadowWordPainAuraID = core.NewAuraID()
-
 func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 575}
 	template := core.SimpleSpell{
@@ -35,7 +33,7 @@ func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
 				NumberOfTicks:  6,
 				TickLength:     time.Second * 3,
 				TickBaseDamage: core.DotSnapshotFuncMagic(1236/6, 0.183),
-				AuraID:         ShadowWordPainAuraID,
+				Aura:           priest.NewDotAura("Shadow Word Pain", core.ActionID{SpellID: SpellIDShadowWordPain}),
 			},
 		},
 	}
