@@ -28,7 +28,7 @@ func (druid *Druid) NewRebirth(sim *core.Simulation) *core.SimpleCast {
 			CastTime: time.Second*3 + time.Millisecond*500,
 			GCD:      core.GCDDefault,
 		},
-		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) { druid.RebirthUsed = true },
+		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) { druid.RebirthUsed = true },
 	}
 
 	rb.Init(sim)

@@ -23,6 +23,9 @@ type Druid struct {
 	Starfire6   *core.Spell
 	Starfire8   *core.Spell
 	Wrath       *core.Spell
+
+	FaerieFireAura       *core.Aura
+	NaturesSwiftnessAura *core.Aura
 }
 
 type SelfBuffs struct {

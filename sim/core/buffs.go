@@ -633,7 +633,7 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 
 func InnervateAura(character *Character, expectedBonusManaReduction float64, actionTag int32) *Aura {
 	actionID := ActionID{SpellID: 29166, Tag: actionTag}
-	return character.RegisterAura(&Aura{
+	return character.GetOrRegisterAura(&Aura{
 		Label:    "Innervate-" + actionID.String(),
 		Tag:      InnervateAuraTag,
 		ActionID: actionID,

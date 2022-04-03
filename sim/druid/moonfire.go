@@ -10,8 +10,6 @@ import (
 
 const SpellIDMoonfire int32 = 26988
 
-var MoonfireAuraID = core.NewAuraID()
-
 func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
 	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -41,7 +39,7 @@ func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 3,
 				TickBaseDamage: core.DotSnapshotFuncMagic(600/4, 0.13),
-				AuraID:         MoonfireAuraID,
+				Aura:           druid.NewDotAura("Moonfire", core.ActionID{SpellID: SpellIDMoonfire}),
 			},
 		},
 	}
