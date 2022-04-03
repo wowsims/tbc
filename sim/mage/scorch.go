@@ -48,14 +48,14 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 	spell.Effect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
 
 	if mage.Talents.ImprovedScorch > 0 {
+		mage.ScorchAura = sim.GetPrimaryTarget().GetAura(core.ImprovedScorchAuraLabel)
+		if mage.ScorchAura == nil {
+			mage.ScorchAura = core.ImprovedScorchAura(sim.GetPrimaryTarget(), 0)
+		}
+
 		procChance := float64(mage.Talents.ImprovedScorch) / 3.0
 		spell.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() {
-				return
-			}
-
-			// Don't overwrite the permanent version.
-			if spellEffect.Target.RemainingAuraDuration(sim, core.ImprovedScorchAuraID) == core.NeverExpires {
 				return
 			}
 
@@ -63,8 +63,8 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 				return
 			}
 
-			newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.ImprovedScorchAuraID)+1)
-			spellEffect.Target.AddAura(sim, core.ImprovedScorchAura(spellEffect.Target, newNumStacks))
+			mage.ScorchAura.Activate(sim)
+			mage.ScorchAura.AddStack(sim)
 		}
 	}
 

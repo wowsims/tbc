@@ -263,6 +263,9 @@ func (unit *Unit) GetOrRegisterAura(aura *Aura) *Aura {
 	if curAura == nil {
 		return unit.RegisterAura(aura)
 	} else {
+		curAura.OnCastComplete = aura.OnCastComplete
+		curAura.OnSpellHit = aura.OnSpellHit
+		curAura.OnPeriodicDamage = aura.OnPeriodicDamage
 		return curAura
 	}
 }
@@ -356,7 +359,8 @@ func (at *auraTracker) reset(sim *Simulation) {
 		resetEffect(sim)
 	}
 
-	for _, permAura := range at.permanentAuras {
+	for i, _ := range at.permanentAuras {
+		permAura := &at.permanentAuras[i]
 		permAura.aura = permAura.AuraFactory(sim)
 		aura := permAura.aura
 		if !permAura.RespectDuration {

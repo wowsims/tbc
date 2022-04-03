@@ -40,7 +40,7 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 			DamageMultiplier:    mage.spellDamageMultiplier,
 			ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
 			BaseDamage:          core.BaseDamageConfigMagic(939, 1191, 1.15),
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					mage.PyroblastDot.Instance.Cancel(sim)
 					mage.PyroblastDot.Cast(sim, spellEffect.Target)
@@ -62,16 +62,13 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 	})
 }
 
-var PyroblastDotAuraID = core.NewAuraID()
+var PyroblastDotActionID = core.ActionID{SpellID: SpellIDPyroblast, Tag: CastTagPyroblastDot}
 
 func (mage *Mage) registerPyroblastDotSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID: SpellIDPyroblast,
-					Tag:     CastTagPyroblastDot,
-				},
+				ActionID:    PyroblastDotActionID,
 				Character:   &mage.Character,
 				SpellSchool: core.SpellSchoolFire,
 				SpellExtras: SpellFlagMage,
@@ -84,7 +81,7 @@ func (mage *Mage) registerPyroblastDotSpell(sim *core.Simulation) {
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 3,
 				TickBaseDamage: core.DotSnapshotFuncMagic(356/4, 0),
-				AuraID:         PyroblastDotAuraID,
+				Aura:           mage.NewDotAura("Pyroblast", PyroblastDotActionID),
 			},
 		},
 	}

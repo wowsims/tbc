@@ -253,9 +253,11 @@ func MangleAura(target *Target) *Aura {
 	})
 }
 
+var ImprovedScorchAuraLabel = "Improved Scorch"
+
 func ImprovedScorchAura(target *Target, startingStacks int32) *Aura {
 	return target.GetOrRegisterAura(&Aura{
-		Label:     "Improved Scorch",
+		Label:     ImprovedScorchAuraLabel,
 		ActionID:  ActionID{SpellID: 12873},
 		Duration:  time.Second * 30,
 		MaxStacks: 5,
@@ -269,9 +271,11 @@ func ImprovedScorchAura(target *Target, startingStacks int32) *Aura {
 	})
 }
 
+var WintersChillAuraLabel = "Winter's Chill"
+
 func WintersChillAura(target *Target, startingStacks int32) *Aura {
 	return target.GetOrRegisterAura(&Aura{
-		Label:     "Winter's Chill",
+		Label:     WintersChillAuraLabel,
 		ActionID:  ActionID{SpellID: 28595},
 		Duration:  time.Second * 15,
 		MaxStacks: 5,

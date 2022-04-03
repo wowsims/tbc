@@ -7,8 +7,6 @@ import (
 )
 
 var IgniteActionID = core.ActionID{SpellID: 12848}
-var IgniteAuraID = core.NewAuraID()
-var IgniteDotAuraID = core.NewAuraID()
 
 func (mage *Mage) newIgniteSpell(sim *core.Simulation) *core.Spell {
 	spell := core.SimpleSpell{
@@ -29,7 +27,7 @@ func (mage *Mage) newIgniteSpell(sim *core.Simulation) *core.Spell {
 				NumberOfTicks:         2,
 				TickLength:            time.Second * 2,
 				IgnoreDamageModifiers: true,
-				AuraID:                IgniteDotAuraID,
+				Aura:                  mage.NewDotAura("Ignite", IgniteActionID),
 			},
 		},
 	}
@@ -59,9 +57,9 @@ func (mage *Mage) applyIgnite() {
 		return
 	}
 
-	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: IgniteAuraID,
+	mage.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		return mage.GetOrRegisterAura(&core.Aura{
+			Label: "Ignite Talent",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
@@ -70,6 +68,6 @@ func (mage *Mage) applyIgnite() {
 					mage.procIgnite(sim, spellEffect.Target, spellEffect.Damage)
 				}
 			},
-		}
+		})
 	})
 }

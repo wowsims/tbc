@@ -130,10 +130,10 @@ func ApplyMongoose(agent core.Agent) {
 		ppmm.SetProcChance(false, 0)
 	}
 
-	mhAura := newLightningSpeedAura(character, "Lightning Speed MH", core.ActionID{SpellID: 28093, Tag: 1})
-	ohAura := newLightningSpeedAura(character, "Lightning Speed OH", core.ActionID{SpellID: 28093, Tag: 2})
-
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		mhAura := newLightningSpeedAura(character, "Lightning Speed MH", core.ActionID{SpellID: 28093, Tag: 1})
+		ohAura := newLightningSpeedAura(character, "Lightning Speed OH", core.ActionID{SpellID: 28093, Tag: 2})
+
 		return character.GetOrRegisterAura(&core.Aura{
 			Label: "Mongoose Enchant",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {

@@ -264,7 +264,7 @@ func SnapshotBattleShoutAura(character *Character, snapshotAp float64) *Aura {
 }
 
 func SanctityAura(character *Character, level float64) *Aura {
-	return character.RegisterAura(&Aura{
+	return character.GetOrRegisterAura(&Aura{
 		Label:    "Sanctity Aura",
 		ActionID: ActionID{SpellID: 31870},
 		OnGain: func(aura *Aura, sim *Simulation) {
@@ -338,7 +338,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 
 	const procChance = 0.2
 
-	return character.RegisterAura(&Aura{
+	return character.GetOrRegisterAura(&Aura{
 		Label:    "Windfury Totem",
 		ActionID: ActionID{SpellID: WindfuryTotemSpellRanks[rank-1]}, // totem spell id ("Windfury Totem")
 		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
@@ -720,7 +720,7 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 func ManaTideTotemAura(character *Character, actionTag int32) *Aura {
 	actionID := ActionID{SpellID: 16190, Tag: actionTag}
 
-	return character.RegisterAura(&Aura{
+	return character.GetOrRegisterAura(&Aura{
 		Label:    "ManaTideTotem-" + actionID.String(),
 		Tag:      ManaTideTotemAuraTag,
 		ActionID: actionID,

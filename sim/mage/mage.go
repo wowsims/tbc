@@ -71,6 +71,10 @@ type Mage struct {
 	Scorch          *core.Spell
 	WintersChill    *core.Spell
 
+	ArcaneBlastAura  *core.Aura
+	ClearcastingAura *core.Aura
+	ScorchAura       *core.Aura
+
 	manaTracker common.ManaSpendingRateTracker
 }
 

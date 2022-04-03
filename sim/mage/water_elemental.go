@@ -54,7 +54,7 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 					},
 					GCD:      core.GCDDefault,
 					Cooldown: time.Minute * 3,
-					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
 
 						// All MCDs that use the GCD and have a non-zero cast time must call this.

@@ -39,7 +39,7 @@ func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
 			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
 			DamageMultiplier:    mage.spellDamageMultiplier,
 			ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					mage.FireballDot.Instance.Cancel(sim)
 					mage.FireballDot.Cast(sim, spellEffect.Target)
@@ -67,16 +67,13 @@ func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
 	})
 }
 
-var FireballDotAuraID = core.NewAuraID()
+var FireballDotActionID = core.ActionID{SpellID: SpellIDFireball, Tag: CastTagFireballDot}
 
 func (mage *Mage) registerFireballDotSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID: SpellIDFireball,
-					Tag:     CastTagFireballDot,
-				},
+				ActionID:    FireballDotActionID,
 				Character:   &mage.Character,
 				SpellSchool: core.SpellSchoolFire,
 				SpellExtras: SpellFlagMage,
@@ -88,7 +85,7 @@ func (mage *Mage) registerFireballDotSpell(sim *core.Simulation) {
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 2,
 				TickBaseDamage: core.DotSnapshotFuncMagic(84/4, 0),
-				AuraID:         FireballDotAuraID,
+				Aura:           mage.NewDotAura("Fireball", FireballDotActionID),
 			},
 		},
 	}
