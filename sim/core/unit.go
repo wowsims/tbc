@@ -96,10 +96,10 @@ func (unit *Unit) finalize() {
 }
 
 func (unit *Unit) reset(sim *Simulation) {
+	unit.Metrics.reset()
 	unit.stats = unit.initialStats
 	unit.PseudoStats = unit.initialPseudoStats
 	unit.auraTracker.reset(sim)
-	unit.Metrics.reset()
 	for _, spell := range unit.Spellbook {
 		spell.reset(sim)
 	}

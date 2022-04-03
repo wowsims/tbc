@@ -36,12 +36,11 @@ const Inactive = -1
 
 // Aura lifecycle:
 //
-// myAura = &Aura{ ... }
-// character.RegisterAura(myAura)
+// myAura := unit.RegisterAura(myAuraConfig)
+// myAura.Activate(sim)
 // myAura.SetStacks(sim, 3)
 // myAura.Refresh(sim)
 // myAura.Deactivate(sim)
-
 type Aura struct {
 	// String label for this Aura. Gauranteed to be unique among the Auras for a single Unit.
 	Label string
@@ -344,6 +343,12 @@ func (at *auraTracker) reset(sim *Simulation) {
 	at.onMeleeAttackAuras = at.onMeleeAttackAuras[:0]
 
 	for _, aura := range at.auras {
+		if aura.IsActive() {
+			panic("Active aura during reset: " + aura.Label)
+		}
+		if aura.stacks != 0 {
+			panic("Aura nonzero stacks during reset: " + aura.Label)
+		}
 		aura.metrics.reset()
 	}
 
@@ -373,8 +378,7 @@ func (at *auraTracker) advance(sim *Simulation) {
 
 func (at *auraTracker) doneIteration(sim *Simulation) {
 	// Expire all the remaining auras.
-	for i := len(at.activeAuras) - 1; i >= 0; i-- {
-		aura := at.activeAuras[i]
+	for _, aura := range at.auras {
 		aura.Deactivate(sim)
 	}
 
@@ -425,13 +429,8 @@ func (aura *Aura) Activate(sim *Simulation) {
 	aura.startTime = sim.CurrentTime
 	aura.Refresh(sim)
 
-	if aura.Duration != NeverExpires {
-		aura.startTime = sim.CurrentTime
-		aura.expires = sim.CurrentTime + aura.Duration
-
-		aura.activeIndex = int32(len(aura.Unit.activeAuras))
-		aura.Unit.activeAuras = append(aura.Unit.activeAuras, aura)
-	}
+	aura.activeIndex = int32(len(aura.Unit.activeAuras))
+	aura.Unit.activeAuras = append(aura.Unit.activeAuras, aura)
 
 	if aura.OnCastComplete != nil {
 		aura.onCastCompleteIndex = int32(len(aura.Unit.onCastCompleteAuras))
