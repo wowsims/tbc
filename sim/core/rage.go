@@ -22,7 +22,7 @@ type rageBar struct {
 
 func (character *Character) EnableRageBar(startingRage float64, onRageGain OnRageGain) {
 	character.AddPermanentAura(func(*Simulation) *Aura {
-		return character.RegisterAura(&Aura{
+		return character.GetOrRegisterAura(&Aura{
 			Label: "RageBar",
 			OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 				if !spellEffect.ProcMask.Matches(ProcMaskWhiteHit) {

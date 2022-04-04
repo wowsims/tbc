@@ -7,12 +7,23 @@ import (
 )
 
 var AvengingWrathCD = core.NewCooldownID()
-var AvengingWrathAuraID = core.NewAuraID()
 var AvengingWrathActionID = core.ActionID{SpellID: 31884}
 
 func (paladin *Paladin) registerAvengingWrathCD() {
 	cd := time.Minute * 3
 	var manaCost float64 = 236
+
+	aura := paladin.RegisterAura(&core.Aura{
+		Label:    "Avenging Wrath",
+		ActionID: AvengingWrathActionID,
+		Duration: time.Second * 20,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.DamageDealtMultiplier *= 1.3
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.DamageDealtMultiplier /= 1.3
+		},
+	})
 
 	paladin.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   AvengingWrathActionID,
@@ -28,17 +39,7 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				character.AddAura(sim, core.Aura{
-					ID:       AvengingWrathAuraID,
-					ActionID: AvengingWrathActionID,
-					Duration: time.Second * 20,
-					OnGain: func(aura *core.Aura, sim *core.Simulation) {
-						paladin.PseudoStats.DamageDealtMultiplier *= 1.3
-					},
-					OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-						paladin.PseudoStats.DamageDealtMultiplier /= 1.3
-					},
-				})
+				aura.Activate(sim)
 				character.Metrics.AddInstantCast(AvengingWrathActionID)
 				character.SetCD(AvengingWrathCD, sim.CurrentTime+cd)
 				// TODO: Apply mana cost

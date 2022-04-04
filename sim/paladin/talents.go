@@ -55,18 +55,13 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
 // Apply as permanent aura only to self for now
 // Maybe should put this in the partybuff section instead at some point
 func (paladin *Paladin) applySanctityAura() {
-	if !paladin.Talents.SanctityAura {
-		return
+	if paladin.Talents.SanctityAura {
+		paladin.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+			return core.SanctityAura(&paladin.Character, float64(paladin.Talents.ImprovedSanctityAura))
+		})
 	}
-
-	paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.ImprovedSanctityAura(&paladin.Character, float64(paladin.Talents.ImprovedSanctityAura))
-	})
-
 }
 
-var VengeanceAuraID = core.NewAuraID()
-var VengeanceProcAuraID = core.NewAuraID()
 var VengeanceActionID = core.ActionID{SpellID: 20059}
 
 const VengeanceDuration = time.Second * 30
@@ -78,34 +73,30 @@ func (paladin *Paladin) applyVengeance() {
 		return
 	}
 
-	multiplierPerStack := 1 + (0.01 * float64(paladin.Talents.Vengeance))
+	bonusPerStack := 0.01 * float64(paladin.Talents.Vengeance)
+	procAura := paladin.RegisterAura(&core.Aura{
+		Label:     "Vengeance Proc",
+		ActionID:  VengeanceActionID,
+		Duration:  VengeanceDuration,
+		MaxStacks: 3,
+		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
+			aura.Unit.PseudoStats.DamageDealtMultiplier /= 1 + (bonusPerStack * float64(oldStacks))
+			aura.Unit.PseudoStats.DamageDealtMultiplier *= 1 + (bonusPerStack * float64(newStacks))
+		},
+	})
 
-	makeProcAura := func(numStacks int32) core.Aura {
-		multiplier := multiplierPerStack * float64(numStacks)
-		return core.Aura{
-			ID:       VengeanceProcAuraID,
-			ActionID: VengeanceActionID,
-			Duration: VengeanceDuration,
-			Stacks:   numStacks,
-			OnGain: func(aura *core.Aura, sim *core.Simulation) {
-				paladin.PseudoStats.DamageDealtMultiplier *= multiplier
-			},
-			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-				paladin.PseudoStats.DamageDealtMultiplier /= multiplier
-			},
-		}
-	}
+	passiveAura := paladin.RegisterAura(&core.Aura{
+		Label: "Vengeance",
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				procAura.Activate(sim)
+				procAura.AddStack(sim)
+			}
+		},
+	})
 
-	paladin.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: VengeanceAuraID,
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					newStacks := core.MinInt32(3, paladin.NumStacks(VengeanceAuraID)+1)
-					paladin.AddAura(sim, makeProcAura(newStacks))
-				}
-			},
-		}
+	paladin.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		return passiveAura
 	})
 }
 

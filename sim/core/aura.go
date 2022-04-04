@@ -118,6 +118,9 @@ func (aura *Aura) SetStacks(sim *Simulation, newStacks int32) {
 		return
 	}
 
+	if sim.Log != nil {
+		aura.Unit.Log(sim, "Aura %s stacks changed: %d --> %d", aura.ActionID, oldStacks, newStacks)
+	}
 	aura.stacks = newStacks
 	if aura.OnStacksChange != nil {
 		aura.OnStacksChange(aura, sim, oldStacks, newStacks)

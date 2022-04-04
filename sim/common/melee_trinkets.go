@@ -409,6 +409,12 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 			character.AddStat(stats.AttackPower, 44*float64(newStacks-oldStacks))
 			character.AddStat(stats.RangedAttackPower, 44*float64(newStacks-oldStacks))
 		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+				return
+			}
+			aura.AddStack(sim)
+		},
 	})
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
@@ -432,11 +438,7 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 				}
 
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-
-				if !procAura.IsActive() {
-					procAura.Activate(sim)
-				}
-				procAura.AddStack(sim)
+				procAura.Activate(sim)
 			},
 		})
 	})

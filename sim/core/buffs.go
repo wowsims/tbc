@@ -268,12 +268,12 @@ func SanctityAura(character *Character, level float64) *Aura {
 		Label:    "Sanctity Aura",
 		ActionID: ActionID{SpellID: 31870},
 		OnGain: func(aura *Aura, sim *Simulation) {
-			character.PseudoStats.HolyDamageDealtMultiplier *= 1.1
-			character.PseudoStats.DamageDealtMultiplier *= 1 + 0.01*level
+			aura.Unit.PseudoStats.HolyDamageDealtMultiplier *= 1.1
+			aura.Unit.PseudoStats.DamageDealtMultiplier *= 1 + 0.01*level
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			character.PseudoStats.HolyDamageDealtMultiplier /= 1.1
-			character.PseudoStats.DamageDealtMultiplier /= 1 + 0.01*level
+			aura.Unit.PseudoStats.HolyDamageDealtMultiplier /= 1.1
+			aura.Unit.PseudoStats.DamageDealtMultiplier /= 1 + 0.01*level
 		},
 	})
 }

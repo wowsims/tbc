@@ -1,8 +1,6 @@
 package paladin
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -13,19 +11,13 @@ type Paladin struct {
 
 	Talents proto.PaladinTalents
 
-	currentSealID           core.AuraID
-	currentSealExpires      time.Duration
-	currentJudgementID      core.AuraID
-	currentJudgementExpires time.Duration
+	CurrentSeal      *core.Aura
+	CurrentJudgement *core.Aura
 
 	sealOfBlood       core.SimpleCast
 	sealOfCommand     core.SimpleCast
 	sealOfTheCrusader core.SimpleCast
 	sealOfWisdom      core.SimpleCast
-
-	SealOfTheCrusaderAura core.Aura
-	SealOfWisdomAura      core.Aura
-	SealOfCommandAura     core.Aura
 
 	Consecration           *core.Spell
 	CrusaderStrike         *core.Spell
@@ -33,6 +25,13 @@ type Paladin struct {
 	JudgementOfBlood       *core.Spell
 	JudgementOfTheCrusader *core.Spell
 	JudgementOfWisdom      *core.Spell
+
+	JudgementOfTheCrusaderAura *core.Aura
+	JudgementOfWisdomAura      *core.Aura
+	SealOfBloodAura            *core.Aura
+	SealOfCommandAura          *core.Aura
+	SealOfTheCrusaderAura      *core.Aura
+	SealOfWisdomAura           *core.Aura
 }
 
 // Implemented by each Paladin spec.
@@ -63,18 +62,14 @@ func (paladin *Paladin) Init(sim *core.Simulation) {
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {
-	paladin.currentSealID = 0
-	paladin.currentSealExpires = 0
-	paladin.currentJudgementID = 0
-	paladin.currentJudgementExpires = 0
+	paladin.CurrentSeal = nil
+	paladin.CurrentJudgement = nil
 }
 
 func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, ability *core.SimpleSpell) {
-	if paladin.currentJudgementID == 0 || paladin.currentJudgementExpires >= sim.CurrentTime {
-		return
+	if paladin.CurrentJudgement != nil && paladin.CurrentJudgement.IsActive() {
+		paladin.CurrentJudgement.UpdateExpires(sim.CurrentTime + JudgementDuration)
 	}
-	paladin.currentJudgementExpires = sim.CurrentTime + JudgementDuration
-	ability.Effect.Target.RefreshAura(sim, paladin.currentJudgementID)
 }
 
 // maybe need to add stat dependencies

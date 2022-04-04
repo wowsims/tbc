@@ -35,7 +35,7 @@ func (paladin *Paladin) registerCrusaderStrikeSpell(sim *core.Simulation) {
 			ProcMask:            core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier:    1, // Need to review to make sure I set these properly
 			ThreatMultiplier:    1,
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}

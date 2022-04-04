@@ -20,7 +20,7 @@ func (warrior *Warrior) registerBloodrageCD() {
 			ActionID:  actionID,
 			Character: warrior.GetCharacter(),
 			Cooldown:  BloodrageCooldown,
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 				// TODO: Rage over time should be done over time, not immediately.
 				warrior.AddRage(sim, instantRage+rageOverTime, actionID)
 			},
