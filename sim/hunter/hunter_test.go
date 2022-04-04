@@ -31,6 +31,9 @@ func TestBestialWrath(t *testing.T) {
 	})
 	h := sim.Raid.Parties[0].Players[0].(*Hunter)
 	h.Init(sim)
+	for _, pa := range h.Pets {
+		pa.Init(sim)
+	}
 
 	sim.Reset()
 	h.TryUseCooldowns(sim)
