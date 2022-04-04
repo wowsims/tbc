@@ -77,7 +77,6 @@ type Rogue struct {
 	BladeFlurryAura    *core.Aura
 	ExposeArmorAura    *core.Aura
 	SliceAndDiceAura   *core.Aura
-	SunderArmorAura    *core.Aura // Rogues don't apply this but need to check it.
 
 	finishingMoveEffectApplier func(sim *core.Simulation, numPoints int32)
 
@@ -322,11 +321,6 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 	})
 
 	rogue.registerThistleTeaCD()
-
-	rogue.RegisterResetEffect(func(sim *core.Simulation) {
-		// Do this in reset so other Warriors will have added theirs if available.
-		rogue.SunderArmorAura = sim.GetPrimaryTarget().GetAura(core.SunderArmorAuraLabel)
-	})
 
 	return rogue
 }

@@ -119,7 +119,7 @@ func (aura *Aura) SetStacks(sim *Simulation, newStacks int32) {
 	}
 
 	if sim.Log != nil {
-		aura.Unit.Log(sim, "Aura %s stacks changed: %d --> %d", aura.ActionID, oldStacks, newStacks)
+		aura.Unit.Log(sim, "Aura %s stacks: %d --> %d", aura.ActionID, oldStacks, newStacks)
 	}
 	aura.stacks = newStacks
 	if aura.OnStacksChange != nil {
@@ -259,6 +259,10 @@ func (unit *Unit) RegisterAura(aura *Aura) *Aura {
 
 func (at *auraTracker) GetAura(label string) *Aura {
 	return at.auras[label]
+}
+func (at *auraTracker) HasActiveAura(label string) bool {
+	aura := at.GetAura(label)
+	return aura != nil && aura.IsActive()
 }
 
 func (unit *Unit) GetOrRegisterAura(aura *Aura) *Aura {
@@ -422,6 +426,9 @@ func (at *auraTracker) doneIteration(sim *Simulation) {
 // exists it will be replaced with the new one.
 func (aura *Aura) Activate(sim *Simulation) {
 	if aura.IsActive() {
+		if sim.Log != nil && !aura.ActionID.IsEmptyAction() {
+			aura.Unit.Log(sim, "Aura refreshed: %s", aura.ActionID)
+		}
 		aura.Refresh(sim)
 		return
 	}
@@ -434,7 +441,7 @@ func (aura *Aura) Activate(sim *Simulation) {
 	// is blocked.
 	if aura.Tag != "" {
 		for _, otherAura := range aura.Unit.GetAurasWithTag(aura.Tag) {
-			if otherAura.Priority > aura.Priority {
+			if otherAura.Priority > aura.Priority && otherAura.active {
 				return
 			}
 		}
@@ -533,14 +540,12 @@ func (aura *Aura) Deactivate(sim *Simulation) {
 		aura.Unit.Log(sim, "Aura faded: %s", aura.ActionID)
 	}
 
-	if aura.Duration != NeverExpires {
-		removeActiveIndex := aura.activeIndex
-		aura.Unit.activeAuras = removeBySwappingToBack(aura.Unit.activeAuras, removeActiveIndex)
-		if removeActiveIndex < int32(len(aura.Unit.activeAuras)) {
-			aura.Unit.activeAuras[removeActiveIndex].activeIndex = removeActiveIndex
-		}
-		aura.activeIndex = Inactive
+	removeActiveIndex := aura.activeIndex
+	aura.Unit.activeAuras = removeBySwappingToBack(aura.Unit.activeAuras, removeActiveIndex)
+	if removeActiveIndex < int32(len(aura.Unit.activeAuras)) {
+		aura.Unit.activeAuras[removeActiveIndex].activeIndex = removeActiveIndex
 	}
+	aura.activeIndex = Inactive
 
 	if aura.OnCastComplete != nil {
 		removeOnCastCompleteIndex := aura.onCastCompleteIndex

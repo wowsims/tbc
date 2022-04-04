@@ -325,7 +325,7 @@ func SunderArmorAura(target *Target, startingStacks int32) *Aura {
 			aura.SetStacks(sim, startingStacks)
 		},
 		OnStacksChange: func(aura *Aura, sim *Simulation, oldStacks int32, newStacks int32) {
-			target.AddStat(stats.Armor, float64(newStacks-oldStacks)*armorReductionPerStack)
+			target.AddStat(stats.Armor, float64(oldStacks-newStacks)*armorReductionPerStack)
 		},
 	})
 }
