@@ -191,6 +191,8 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                     ProtectionWarriorInputs.PrecastShout,
                     ProtectionWarriorInputs.PrecastShoutWithSapphire,
                     ProtectionWarriorInputs.PrecastShoutWithT2,
+                    OtherInputs.ExposeWeaknessUptime,
+                    OtherInputs.ExposeWeaknessHunterAgility,
                     OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
                 ],
             },

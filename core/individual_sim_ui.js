@@ -625,6 +625,7 @@ export class IndividualSimUI extends SimUI {
     }
     applyDefaults(eventID) {
         TypedEvent.freezeAllAndDo(() => {
+            this.player.setRace(eventID, specToEligibleRaces[this.player.spec][0]);
             this.player.setGear(eventID, this.sim.lookupEquipmentSpec(this.individualConfig.defaults.gear));
             this.player.setConsumes(eventID, this.individualConfig.defaults.consumes);
             this.player.setRotation(eventID, this.individualConfig.defaults.rotation);
