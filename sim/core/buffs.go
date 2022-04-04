@@ -18,7 +18,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		})
 	}
 
-	gotwAmount := GetTristateValueFloat(raidBuffs.GiftOfTheWild, 14.0, 14.0*1.35)
+	gotwAmount := GetTristateValueFloat(raidBuffs.GiftOfTheWild, 14.0, 18.0)
 	character.AddStats(stats.Stats{
 		stats.Stamina:   gotwAmount,
 		stats.Agility:   gotwAmount,
@@ -118,26 +118,26 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	if partyBuffs.BattleShout != proto.TristateEffect_TristateEffectMissing {
 		talentMultiplier := GetTristateValueFloat(partyBuffs.BattleShout, 1, 1.25)
 
-		character.AddStats(stats.Stats{
-			stats.AttackPower: 306 * talentMultiplier,
-		})
+		battleShoutAP := 306 * talentMultiplier
 		if partyBuffs.BsSolarianSapphire {
 			partyBuffs.SnapshotBsSolarianSapphire = false
-			character.AddStats(stats.Stats{
-				stats.AttackPower: 70 * talentMultiplier,
-			})
+			battleShoutAP += 70 * talentMultiplier
 		}
+		character.AddStats(stats.Stats{
+			stats.AttackPower: math.Floor(battleShoutAP),
+		})
 
-		snapshotAp := 0.0
+		snapshotAP := 0.0
 		if partyBuffs.SnapshotBsSolarianSapphire {
-			snapshotAp += 70 * talentMultiplier
+			snapshotAP += 70 * talentMultiplier
 		}
 		if partyBuffs.SnapshotBsT2 {
-			snapshotAp += 30 * talentMultiplier
+			snapshotAP += 30 * talentMultiplier
 		}
-		if snapshotAp > 0 {
+		if snapshotAP > 0 {
+			snapshotAP = math.Floor(snapshotAP)
 			character.AddPermanentAuraWithOptions(PermanentAura{
-				AuraFactory:     func(*Simulation) *Aura { return SnapshotBattleShoutAura(character, snapshotAp) },
+				AuraFactory:     func(*Simulation) *Aura { return SnapshotBattleShoutAura(character, snapshotAP) },
 				RespectDuration: true,
 			})
 		}
@@ -153,7 +153,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		})
 	}
 	character.AddStats(stats.Stats{
-		stats.SpellPower: GetTristateValueFloat(partyBuffs.WrathOfAirTotem, 101.0, 121.0),
+		stats.SpellPower: GetTristateValueFloat(partyBuffs.WrathOfAirTotem, 101, 121),
 	})
 	if partyBuffs.WrathOfAirTotem == proto.TristateEffect_TristateEffectRegular && partyBuffs.SnapshotImprovedWrathOfAirTotem {
 		character.AddPermanentAuraWithOptions(PermanentAura{
@@ -162,7 +162,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		})
 	}
 	character.AddStats(stats.Stats{
-		stats.Agility: GetTristateValueFloat(partyBuffs.GraceOfAirTotem, 77.0, 88.55),
+		stats.Agility: GetTristateValueFloat(partyBuffs.GraceOfAirTotem, 77, 88),
 	})
 	switch partyBuffs.StrengthOfEarthTotem {
 	case proto.StrengthOfEarthType_Basic:
@@ -170,9 +170,9 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	case proto.StrengthOfEarthType_CycloneBonus:
 		character.AddStat(stats.Strength, 98)
 	case proto.StrengthOfEarthType_EnhancingTotems:
-		character.AddStat(stats.Strength, 98.9)
+		character.AddStat(stats.Strength, 98)
 	case proto.StrengthOfEarthType_EnhancingAndCyclone:
-		character.AddStat(stats.Strength, 110.9)
+		character.AddStat(stats.Strength, 112)
 	}
 	if (partyBuffs.StrengthOfEarthTotem == proto.StrengthOfEarthType_Basic || partyBuffs.StrengthOfEarthTotem == proto.StrengthOfEarthType_EnhancingTotems) && partyBuffs.SnapshotImprovedStrengthOfEarthTotem {
 		character.AddPermanentAuraWithOptions(PermanentAura{

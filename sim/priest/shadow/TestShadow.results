@@ -1,11 +1,11 @@
 character_stats_results: {
  key: "TestShadow-CharacterStats-Default"
  value: {
-  final_stats: 69.19
-  final_stats: 74.69000000000001
-  final_stats: 559.79
-  final_stats: 561.99
-  final_stats: 301.29
+  final_stats: 68.2
+  final_stats: 73.7
+  final_stats: 558.8000000000001
+  final_stats: 561
+  final_stats: 300.3
   final_stats: 1282
   final_stats: 1011
   final_stats: 0
@@ -16,7 +16,7 @@ character_stats_results: {
   final_stats: 235
   final_stats: 142
   final_stats: 174.86
-  final_stats: 537.12844
+  final_stats: 536.8552
   final_stats: 122
   final_stats: 0
   final_stats: 0
@@ -25,18 +25,18 @@ character_stats_results: {
   final_stats: 0
   final_stats: 0
   final_stats: 0
-  final_stats: 10769.85
+  final_stats: 10755
   final_stats: 0
   final_stats: 0
-  final_stats: 1651.38
-  final_stats: 0
-  final_stats: 0
-  final_stats: 0
+  final_stats: 1649.4
   final_stats: 0
   final_stats: 0
   final_stats: 0
   final_stats: 0
-  final_stats: 8808.9
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 8799
   final_stats: 0
   final_stats: 0
   final_stats: 0
@@ -623,7 +623,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-AllItems-WrathofSpellfire"
  value: {
-  dps: 1286.9739988465888
+  dps: 1286.9377886334194
  }
 }
 dps_results: {
@@ -635,7 +635,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-Average-Default"
  value: {
-  dps: 1489.6070505094897
+  dps: 1489.576162327594
  }
 }
 dps_results: {
@@ -803,7 +803,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-Settings-Draenei-P3-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1277.7312802182125
+  dps: 1273.453497580087
  }
 }
 dps_results: {
@@ -1031,13 +1031,13 @@ dps_results: {
 dps_results: {
  key: "TestShadow-Settings-NightElf-P1-Ideal-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1333.401229102054
+  dps: 1325.8656828772835
  }
 }
 dps_results: {
  key: "TestShadow-Settings-NightElf-P1-Ideal-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1333.401229102054
+  dps: 1325.8656828772835
  }
 }
 dps_results: {
@@ -1187,7 +1187,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-Settings-NightElf-P3-Ideal-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1271.2735543469046
+  dps: 1265.9801340786566
  }
 }
 dps_results: {
@@ -1235,7 +1235,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-Settings-Undead-P1-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1145.004034376509
+  dps: 1142.47507077899
  }
 }
 dps_results: {
@@ -1475,7 +1475,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-Settings-Undead-P3-Ideal-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1286.494518735967
+  dps: 1271.2735543469046
  }
 }
 dps_results: {

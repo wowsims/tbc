@@ -1,11 +1,11 @@
 character_stats_results: {
  key: "TestElemental-CharacterStats-Default"
  value: {
-  final_stats: 140.69000000000003
-  final_stats: 99.99000000000001
-  final_stats: 522.39
-  final_stats: 531.19
-  final_stats: 182.49
+  final_stats: 139.70000000000002
+  final_stats: 99.00000000000001
+  final_stats: 521.4000000000001
+  final_stats: 530.2
+  final_stats: 181.50000000000003
   final_stats: 1109
   final_stats: 791
   final_stats: 80
@@ -14,21 +14,21 @@ character_stats_results: {
   final_stats: 80
   final_stats: 123
   final_stats: 0
-  final_stats: 337.8714
+  final_stats: 337.812
   final_stats: 125.72
-  final_stats: 695.7050985915492
+  final_stats: 695.4252112676056
   final_stats: 0
   final_stats: 0
-  final_stats: 401.38000000000005
+  final_stats: 399.40000000000003
   final_stats: 47.31
-  final_stats: 125.381168
+  final_stats: 124.5068
   final_stats: 0
   final_stats: 0
   final_stats: 0
-  final_stats: 10645.85
+  final_stats: 10631
   final_stats: 0
   final_stats: 0
-  final_stats: 9369.98
+  final_stats: 9368
   final_stats: 0
   final_stats: 0
   final_stats: 0
@@ -36,7 +36,7 @@ character_stats_results: {
   final_stats: 0
   final_stats: 0
   final_stats: 0
-  final_stats: 8202.9
+  final_stats: 8193
   final_stats: 0
   final_stats: 0
   final_stats: 0
@@ -50,19 +50,19 @@ stat_weights_results: {
   weights: 0
   weights: 0
   weights: 0
-  weights: 0.17392985144825618
+  weights: 0.17451021034899214
   weights: 0
-  weights: 0.6825182813360628
-  weights: 0
-  weights: 0
+  weights: 0.6828135263985065
   weights: 0
   weights: 0
   weights: 0
   weights: 0
   weights: 0
   weights: 0
-  weights: 1.3594775614901664
-  weights: 0.5470599114611718
+  weights: 0
+  weights: 0
+  weights: 1.2956672426581917
+  weights: 0.5742733373830652
   weights: 0
   weights: 0
   weights: 0
@@ -807,7 +807,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-WrathofSpellfire"
  value: {
-  dps: 1365.370230793848
+  dps: 1365.3251456460532
  }
 }
 dps_results: {
@@ -819,7 +819,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Average-Default"
  value: {
-  dps: 1539.065683711784
+  dps: 1539.2049590968377
  }
 }
 dps_results: {
@@ -837,7 +837,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-Adaptive-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1382.4254079174896
+  dps: 1375.8299611221078
  }
 }
 dps_results: {
@@ -885,7 +885,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-CLOnClearcast-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1392.176209358623
+  dps: 1385.976061081563
  }
 }
 dps_results: {
@@ -921,13 +921,13 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-CLOnClearcastNoBuffs-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1610.5383510171735
+  dps: 1592.805785491382
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-CLOnClearcastNoBuffs-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1336.5674055454779
+  dps: 1330.9702585954792
  }
 }
 dps_results: {
@@ -981,7 +981,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-Fixed3LBCL-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1382.875969859824
+  dps: 1373.9359885763677
  }
 }
 dps_results: {
@@ -1029,7 +1029,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-LBOnly-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1358.4854244834191
+  dps: 1351.420799495795
  }
 }
 dps_results: {
