@@ -287,7 +287,7 @@ func (unit *Unit) GetOrRegisterAura(aura *Aura) *Aura {
 
 func (at *auraTracker) GetAurasWithTag(tag string) []*Aura {
 	if auras, ok := at.aurasByTag[tag]; ok {
-		return auras[:] // Defensive copy
+		return auras
 	} else {
 		return []*Aura{}
 	}

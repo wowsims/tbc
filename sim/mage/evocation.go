@@ -34,17 +34,6 @@ func (mage *Mage) registerEvocationCD() {
 			CastTime:  castTime,
 			GCD:       core.GCDDefault,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				period := time.Second * 2
-				cast.ApplyCastTimeModifiers(&period)
-
-				core.StartPeriodicAction(sim, core.PeriodicActionOptions{
-					Period:   period,
-					NumTicks: int(numTicks),
-					OnAction: func(sim *core.Simulation) {
-						mage.AddMana(sim, manaPerTick, actionID, true)
-					},
-				})
-
 				// All MCDs that use the GCD and have a non-zero cast time must call this.
 				mage.UpdateMajorCooldowns()
 			},
@@ -88,6 +77,15 @@ func (mage *Mage) registerEvocationCD() {
 				cast := template
 				cast.Init(sim)
 				cast.StartCast(sim)
+
+				period := cast.CastTime / time.Duration(numTicks)
+				core.StartPeriodicAction(sim, core.PeriodicActionOptions{
+					Period:   period,
+					NumTicks: int(numTicks),
+					OnAction: func(sim *core.Simulation) {
+						mage.AddMana(sim, manaPerTick, actionID, true)
+					},
+				})
 			}
 		},
 	})
