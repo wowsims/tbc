@@ -17,7 +17,7 @@ type ResourceCost struct {
 // the effects are applied immediately even though the GCD is still activated.
 
 // Callback for when a cast is finished, i.e. when the in-game castbar reaches full.
-type OnCastComplete func(sim *Simulation, cast *Cast)
+type OnCastComplete func(aura *Aura, sim *Simulation, cast *Cast)
 
 // Callback for when a cast is finished and all its immediate effects have taken effect.
 type AfterCast func(sim *Simulation, cast *Cast)
@@ -57,7 +57,7 @@ type Cast struct {
 	AfterCastDelay time.Duration
 
 	// Callbacks for providing additional custom behavior.
-	OnCastComplete OnCastComplete
+	OnCastComplete func(sim *Simulation, cast *Cast)
 
 	// Callbacks for providing additional custom behavior.
 	AfterCast AfterCast
@@ -140,7 +140,7 @@ func (cast *Cast) init(sim *Simulation) {
 
 // Start casting the spell. Return value indicates whether the spell successfully
 // started casting.
-func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) bool {
+func (cast *Cast) startCasting(sim *Simulation, onCastComplete func(*Simulation, *Cast)) bool {
 	switch cast.Cost.Type {
 	case stats.Mana:
 		if cast.Character.CurrentMana() < cast.Cost.Value {
@@ -214,7 +214,7 @@ func (cast *Cast) CalculatedGCD(char *Character) time.Duration {
 }
 
 // Cast has finished, activate the effects of the cast.
-func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastComplete) {
+func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete func(sim *Simulation, cast *Cast)) {
 	if sim.Log != nil {
 		// Hunter fake cast has no ID.
 		if !cast.ActionID.SameAction(ActionID{}) {
@@ -242,7 +242,7 @@ type SimpleCast struct {
 	// Embedded Cast
 	Cast
 
-	OnCastComplete OnCastComplete
+	OnCastComplete func(*Simulation, *Cast)
 }
 
 func (simpleCast *SimpleCast) Init(sim *Simulation) {
@@ -263,7 +263,7 @@ func (simpleCast *SimpleCast) StartCast(sim *Simulation) bool {
 type Hardcast struct {
 	Cast       *Cast
 	Expires    time.Duration
-	OnComplete OnCastComplete
+	OnComplete func(*Simulation, *Cast)
 }
 
 func (hc Hardcast) OnExpire(sim *Simulation) {

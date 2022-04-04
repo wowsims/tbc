@@ -1,17 +1,15 @@
 package hunter
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ScorpidStingAuraID = core.NewAuraID()
-
 func (hunter *Hunter) registerScorpidStingSpell(sim *core.Simulation) {
 	actionID := core.ActionID{SpellID: 3043}
 	cost := core.ResourceCost{Type: stats.Mana, Value: hunter.BaseMana() * 0.09}
+	hunter.ScorpidStingAura = core.ScorpidStingAura(sim.GetPrimaryTarget())
+
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -29,15 +27,9 @@ func (hunter *Hunter) registerScorpidStingSpell(sim *core.Simulation) {
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			ProcMask:            core.ProcMaskRangedSpecial,
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
-					return
+				if spellEffect.Landed() {
+					hunter.ScorpidStingAura.Activate(sim)
 				}
-
-				spellEffect.Target.AddAura(sim, core.Aura{
-					ID:       ScorpidStingAuraID,
-					ActionID: actionID,
-					Duration: time.Second * 20,
-				})
 			},
 		},
 	}

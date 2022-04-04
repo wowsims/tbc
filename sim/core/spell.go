@@ -65,11 +65,16 @@ func (spell *SimpleSpell) GetDuration() time.Duration {
 	}
 }
 
-func (instance *SimpleSpell) Cast(sim *Simulation, spell *Spell) bool {
+func (instance *SimpleSpell) Cast(sim *Simulation, target *Target, spell *Spell) bool {
 	return instance.startCasting(sim, func(sim *Simulation, cast *Cast) {
 		spell.Casts++
 		spell.MostRecentCost = cast.Cost.Value
 		spell.MostRecentBaseCost = cast.BaseCost.Value
+
+		if spell.ApplyEffects != nil {
+			spell.ApplyEffects(sim, target, spell)
+			return
+		}
 
 		if len(instance.Effects) == 0 {
 			hitEffect := &instance.Effect
@@ -157,12 +162,16 @@ func (instance *SimpleSpell) Cancel(sim *Simulation) {
 	}
 }
 
+type ModifySpellCast func(*Simulation, *Target, *SimpleSpell)
+type ApplySpellEffects func(*Simulation, *Target, *Spell)
+
 type SpellConfig struct {
 	Template SimpleSpell
 
 	ModifyCast ModifySpellCast
 
 	//CastFn SpellCast
+	ApplyEffects ApplySpellEffects
 }
 
 type SpellMetrics struct {
@@ -194,7 +203,8 @@ type Spell struct {
 
 	SpellMetrics
 
-	ModifyCast ModifySpellCast
+	ModifyCast   ModifySpellCast
+	ApplyEffects ApplySpellEffects
 
 	//castFn SpellCast
 
@@ -234,10 +244,8 @@ func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
 	}
 
 	instance.Init(sim)
-	return instance.Cast(sim, spell)
+	return instance.Cast(sim, target, spell)
 }
-
-type ModifySpellCast func(*Simulation, *Target, *SimpleSpell)
 
 func ModifyCastAssignTarget(_ *Simulation, target *Target, instance *SimpleSpell) {
 	instance.Effect.Target = target

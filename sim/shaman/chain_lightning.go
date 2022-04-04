@@ -27,7 +27,7 @@ func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOv
 
 	effect := shaman.newElectricSpellEffect(734, 838, 0.651, isLightningOverload)
 
-	makeOnSpellHit := func(hitIndex int32) core.OnSpellHit {
+	makeOnSpellHit := func(hitIndex int32) func(*core.Simulation, *core.Spell, *core.SpellEffect) {
 		if !isLightningOverload && shaman.Talents.LightningOverload > 0 {
 			lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04 / 3
 			return func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {

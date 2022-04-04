@@ -128,7 +128,7 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	}
 
 	// Cast Seal of Command
-	if !ret.HasAura(paladin.SealOfCommandAuraID) {
+	if !ret.SealOfCommandAura.IsActive() {
 		soc := ret.NewSealOfCommand(sim)
 		if success := soc.StartCast(sim); !success {
 			ret.WaitForMana(sim, soc.GetManaCost())
@@ -137,7 +137,7 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	}
 
 	// Cast Seal of Blood and enable attacks to twist
-	if !ret.HasAura(paladin.SealOfBloodAuraID) {
+	if !ret.SealOfBloodAura.IsActive() {
 		sob := ret.NewSealOfBlood(sim)
 		if success := sob.StartCast(sim); !success {
 			ret.WaitForMana(sim, sob.GetManaCost())
@@ -166,8 +166,8 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	inTwistWindow := (sim.CurrentTime >= nextSwingAt-twistWindow) && (sim.CurrentTime < ret.AutoAttacks.NextAttackAt())
 	latestTwistStart := nextSwingAt - spellGCD
 
-	sobActive := ret.RemainingAuraDuration(sim, paladin.SealOfBloodAuraID) > 0
-	socActive := ret.RemainingAuraDuration(sim, paladin.SealOfCommandAuraID) > 0
+	sobActive := ret.SealOfBloodAura.RemainingDuration(sim) > 0
+	socActive := ret.SealOfCommandAura.RemainingDuration(sim) > 0
 
 	// Use Judgement if we will twist
 	if judgementCD == 0 && willTwist && sobActive {
@@ -251,7 +251,7 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	}
 
 	// roll seal of blood
-	if !ret.HasAura(paladin.SealOfBloodAuraID) {
+	if !ret.SealOfBloodAura.IsActive() {
 		sob := ret.NewSealOfBlood(sim)
 		if success := sob.StartCast(sim); !success {
 			ret.WaitForMana(sim, sob.GetManaCost())
@@ -270,7 +270,7 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 
 	// Proceed until SoB expires, CrusaderStrike comes off GCD, or Judgement comes off GCD
 	nextEventAt := ret.CDReadyAt(paladin.CrusaderStrikeCD)
-	sobExpiration := sim.CurrentTime + ret.RemainingAuraDuration(sim, paladin.SealOfBloodAuraID)
+	sobExpiration := sim.CurrentTime + ret.SealOfBloodAura.RemainingDuration(sim)
 	nextEventAt = core.MinDuration(nextEventAt, sobExpiration)
 	// Waiting for judgement CD causes a bug that infinite loops for some reason
 	// nextEventAt = core.MinDuration(nextEventAt, ret.CDReadyAt(paladin.JudgementCD))

@@ -7,10 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var OrcBloodFuryAuraID = NewAuraID()
 var OrcBloodFuryCooldownID = NewCooldownID()
-
-var TrollBerserkingAuraID = NewAuraID()
 var TrollBerserkingCooldownID = NewCooldownID()
 
 func applyRaceEffects(agent Agent) {
@@ -77,32 +74,34 @@ func applyRaceEffects(agent Agent) {
 			}
 		}
 
-		// Blood Fury
-		const cd = time.Minute * 2
-		const dur = time.Second * 15
-		const apBonus = float64(CharacterLevel)*4 + 2
-		const spBonus = float64(CharacterLevel)*2 + 3
-		actionID := ActionID{SpellID: 33697}
+		character.RegisterFinalizeEffect(func() {
+			// Blood Fury
+			const cd = time.Minute * 2
+			const dur = time.Second * 15
+			const apBonus = float64(CharacterLevel)*4 + 2
+			const spBonus = float64(CharacterLevel)*2 + 3
+			actionID := ActionID{SpellID: 33697}
+			bloodFuryAura := character.NewTemporaryStatsAura("Blood Fury", actionID, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus, stats.SpellPower: spBonus}, dur)
 
-		character.AddMajorCooldown(MajorCooldown{
-			ActionID:   actionID,
-			CooldownID: OrcBloodFuryCooldownID,
-			Cooldown:   cd,
-			Type:       CooldownTypeDPS,
-			CanActivate: func(sim *Simulation, character *Character) bool {
-				return true
-			},
-			ShouldActivate: func(sim *Simulation, character *Character) bool {
-				return true
-			},
-			ActivationFactory: func(sim *Simulation) CooldownActivation {
-				applyStatAura := character.NewTemporaryStatsAuraApplier(OrcBloodFuryAuraID, actionID, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus, stats.SpellPower: spBonus}, dur)
-				return func(sim *Simulation, character *Character) {
-					applyStatAura(sim)
-					character.SetCD(OrcBloodFuryCooldownID, sim.CurrentTime+cd)
-					character.Metrics.AddInstantCast(actionID)
-				}
-			},
+			character.AddMajorCooldown(MajorCooldown{
+				ActionID:   actionID,
+				CooldownID: OrcBloodFuryCooldownID,
+				Cooldown:   cd,
+				Type:       CooldownTypeDPS,
+				CanActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+				ShouldActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+				ActivationFactory: func(sim *Simulation) CooldownActivation {
+					return func(sim *Simulation, character *Character) {
+						bloodFuryAura.Activate(sim)
+						character.SetCD(OrcBloodFuryCooldownID, sim.CurrentTime+cd)
+						character.Metrics.AddInstantCast(actionID)
+					}
+				},
+			})
 		})
 
 		// Axe specialization
@@ -186,6 +185,20 @@ func applyRaceEffects(agent Agent) {
 					cost = ResourceCost{Type: stats.Mana, Value: character.BaseMana() * 0.06}
 				}
 
+				berserkingAura := character.GetOrRegisterAura(&Aura{
+					Label:    "Berserking",
+					ActionID: actionID,
+					Duration: dur,
+					OnGain: func(aura *Aura, sim *Simulation) {
+						character.PseudoStats.CastSpeedMultiplier *= hasteBonus
+						character.MultiplyAttackSpeed(sim, hasteBonus)
+					},
+					OnExpire: func(aura *Aura, sim *Simulation) {
+						character.PseudoStats.CastSpeedMultiplier /= hasteBonus
+						character.MultiplyAttackSpeed(sim, inverseBonus)
+					},
+				})
+
 				castTemplate := SimpleCast{
 					Cast: Cast{
 						ActionID:  actionID,
@@ -194,19 +207,7 @@ func applyRaceEffects(agent Agent) {
 						Cost:      cost,
 						Cooldown:  cd,
 						OnCastComplete: func(sim *Simulation, cast *Cast) {
-							character.AddAura(sim, Aura{
-								ID:       TrollBerserkingAuraID,
-								ActionID: actionID,
-								Duration: dur,
-								OnGain: func(sim *Simulation) {
-									character.PseudoStats.CastSpeedMultiplier *= hasteBonus
-									character.MultiplyAttackSpeed(sim, hasteBonus)
-								},
-								OnExpire: func(sim *Simulation) {
-									character.PseudoStats.CastSpeedMultiplier /= hasteBonus
-									character.MultiplyAttackSpeed(sim, inverseBonus)
-								},
-							})
+							berserkingAura.Activate(sim)
 						},
 					},
 				}

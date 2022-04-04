@@ -114,7 +114,7 @@ func (shaman *Shaman) applyElectricSpellCastInitModifiers(spellCast *core.SpellC
 		// Reduces mana cost by 40%
 		spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.4
 	}
-	if shaman.HasAura(ElementalMasteryAuraID) {
+	if shaman.ElementalMasteryAura != nil && shaman.ElementalMasteryAura.IsActive() {
 		spellCast.Cost.Value = 0
 	}
 }

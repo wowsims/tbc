@@ -132,7 +132,6 @@ func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
 	}
 }
 
-var NaturesSwiftnessAuraID = core.NewAuraID()
 var NaturesSwiftnessCooldownID = core.NewCooldownID()
 
 func (druid *Druid) registerNaturesSwiftnessCD() {
@@ -140,6 +139,22 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 		return
 	}
 	actionID := core.ActionID{SpellID: 17116}
+
+	druid.NaturesSwiftnessAura = druid.GetOrRegisterAura(&core.Aura{
+		Label:    "Natures Swiftness",
+		ActionID: actionID,
+		Duration: core.NeverExpires,
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+			if cast.ActionID.SpellID != SpellIDWrath && cast.ActionID.SpellID != SpellIDSF8 && cast.ActionID.SpellID != SpellIDSF6 {
+				return
+			}
+
+			// Remove the buff and put skill on CD
+			aura.Deactivate(sim)
+			druid.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
+			druid.UpdateMajorCooldowns()
+		},
+	})
 
 	druid.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -158,29 +173,15 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				character.AddAura(sim, core.Aura{
-					ID:       NaturesSwiftnessAuraID,
-					ActionID: actionID,
-					Duration: core.NeverExpires,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						if cast.ActionID.SpellID != SpellIDWrath && cast.ActionID.SpellID != SpellIDSF8 && cast.ActionID.SpellID != SpellIDSF6 {
-							return
-						}
-
-						// Remove the buff and put skill on CD
-						character.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
-						character.RemoveAura(sim, NaturesSwiftnessAuraID)
-						character.UpdateMajorCooldowns()
-						character.Metrics.AddInstantCast(actionID)
-					},
-				})
+				druid.NaturesSwiftnessAura.Activate(sim)
+				druid.Metrics.AddInstantCast(actionID)
 			}
 		},
 	})
 }
 
 func (druid *Druid) applyNaturesSwiftness(spellCast *core.SpellCast) {
-	if druid.HasAura(NaturesSwiftnessAuraID) {
+	if druid.NaturesSwiftnessAura != nil && druid.NaturesSwiftnessAura.IsActive() {
 		spellCast.CastTime = 0
 	}
 }

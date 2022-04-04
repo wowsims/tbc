@@ -14,23 +14,29 @@ const JudgementDuration = time.Second * 20
 
 // Shared conditions required to be able to cast any Judgement.
 func (paladin *Paladin) canJudgement(sim *core.Simulation) bool {
-	return paladin.currentSealExpires > sim.CurrentTime && !paladin.IsOnCD(JudgementCD, sim.CurrentTime)
+	return paladin.CurrentSeal != nil && paladin.CurrentSeal.IsActive() && !paladin.IsOnCD(JudgementCD, sim.CurrentTime)
 }
 
 var JudgementCD = core.NewCooldownID()
 var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: JudgementCD}
 
-var LibramOfAvengementAuraID = core.NewAuraID()
 var LibramOfAvengementActionID = core.ActionID{SpellID: 34260}
 
 func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 	loaIsEquipped := paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27484
-	loaAura := paladin.NewTemporaryStatsAuraApplier(
-		LibramOfAvengementAuraID,
-		LibramOfAvengementActionID,
-		stats.Stats{stats.MeleeCrit: 53},
-		time.Second*5,
-	)
+
+	loaAura := paladin.RegisterAura(&core.Aura{
+		Label:    "Libram of Avengement",
+		ActionID: LibramOfAvengementActionID,
+		Duration: time.Second * 5,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.BonusMeleeCritRating += 53
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.BonusMeleeCritRating -= 53
+		},
+	})
+
 	job := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -50,11 +56,9 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 			BaseDamage:          core.BaseDamageConfigMagic(295, 325, 0.429),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
-				paladin.RemoveAura(sim, SealOfBloodAuraID)
-				paladin.currentSealID = 0
-				paladin.currentSealExpires = 0
+				paladin.SealOfBloodAura.Deactivate(sim)
 				if loaIsEquipped {
-					loaAura(sim)
+					loaAura.Activate(sim)
 				}
 			},
 		},
@@ -78,12 +82,14 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 }
 
 func (paladin *Paladin) CanJudgementOfBlood(sim *core.Simulation) bool {
-	return paladin.canJudgement(sim) && paladin.currentSealID == SealOfBloodAuraID
+	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfBloodAura
 }
 
 var JudgementOfTheCrusaderActionID = core.ActionID{SpellID: 27159, CooldownID: JudgementCD}
 
 func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation) {
+	paladin.JudgementOfTheCrusaderAura = core.JudgementOfTheCrusaderAura(sim.GetPrimaryTarget(), paladin.Talents.ImprovedSealOfTheCrusader)
+
 	jotc := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -101,9 +107,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 				},
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.Cost.Value)
-					paladin.RemoveAura(sim, SealOfTheCrusaderAuraID)
-					paladin.currentSealID = 0
-					paladin.currentSealExpires = 0
+					paladin.SealOfTheCrusaderAura.Deactivate(sim)
 				},
 			},
 		},
@@ -113,10 +117,8 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 				if !spellEffect.Landed() {
 					return
 				}
-				aura := core.JudgementOfTheCrusaderAura(spellEffect.Target, float64(paladin.Talents.ImprovedSealOfTheCrusader))
-				spellEffect.Target.AddAura(sim, aura)
-				paladin.currentJudgementID = aura.ID
-				paladin.currentJudgementExpires = sim.CurrentTime + JudgementDuration
+				paladin.JudgementOfTheCrusaderAura.Activate(sim)
+				paladin.CurrentJudgement = paladin.JudgementOfTheCrusaderAura
 			},
 		},
 	}
@@ -134,12 +136,14 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 }
 
 func (paladin *Paladin) CanJudgementOfTheCrusader(sim *core.Simulation) bool {
-	return paladin.canJudgement(sim) && paladin.currentSealID == SealOfTheCrusaderAuraID
+	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfTheCrusaderAura
 }
 
 var JudgementOfWisdomActionID = core.ActionID{SpellID: 27164, CooldownID: JudgementCD}
 
 func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
+	paladin.JudgementOfWisdomAura = core.JudgementOfWisdomAura(sim.GetPrimaryTarget())
+
 	jow := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -157,9 +161,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 				},
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfWisdom.Cost.Value)
-					paladin.RemoveAura(sim, SealOfWisdomAuraID)
-					paladin.currentSealID = 0
-					paladin.currentSealExpires = 0
+					paladin.SealOfWisdomAura.Deactivate(sim)
 				},
 			},
 		},
@@ -170,10 +172,8 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 				if !spellEffect.Landed() {
 					return
 				}
-				aura := core.JudgementOfWisdomAura()
-				spellEffect.Target.AddAura(sim, aura)
-				paladin.currentJudgementID = aura.ID
-				paladin.currentJudgementExpires = sim.CurrentTime + JudgementDuration
+				paladin.JudgementOfWisdomAura.Activate(sim)
+				paladin.CurrentJudgement = paladin.JudgementOfWisdomAura
 			},
 		},
 	}
@@ -191,7 +191,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 }
 
 func (paladin *Paladin) CanJudgementOfWisdom(sim *core.Simulation) bool {
-	return paladin.canJudgement(sim) && paladin.currentSealID == SealOfWisdomAuraID
+	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfWisdomAura
 }
 
 var SanctifiedJudgementActionID = core.ActionID{SpellID: 31930}

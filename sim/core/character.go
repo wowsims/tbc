@@ -525,12 +525,12 @@ func (character *Character) GetWeaponHands(itemID int32) (bool, bool) {
 	return mh, oh
 }
 
-func (character *Character) doneIteration(simDuration time.Duration) {
+func (character *Character) doneIteration(sim *Simulation) {
 	// Need to do pets first so we can add their results to the owners.
 	if len(character.Pets) > 0 {
 		for _, petAgent := range character.Pets {
 			pet := petAgent.GetPet()
-			pet.doneIteration(simDuration)
+			pet.doneIteration(sim)
 			character.Metrics.AddFinalPetMetrics(&pet.Metrics)
 		}
 	}
@@ -539,9 +539,9 @@ func (character *Character) doneIteration(simDuration time.Duration) {
 		character.Hardcast.Cast.Cancel()
 		character.Hardcast = Hardcast{}
 	}
-	character.doneIterationGCD(simDuration)
+	character.doneIterationGCD(sim.Duration)
 
-	character.Unit.doneIteration(simDuration)
+	character.Unit.doneIteration(sim)
 }
 
 func (character *Character) GetStatsProto() *proto.PlayerStats {

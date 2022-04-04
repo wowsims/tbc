@@ -73,6 +73,11 @@ type Rogue struct {
 	Shiv                *core.Spell
 	SinisterStrike      *core.Spell
 
+	AdrenalineRushAura *core.Aura
+	BladeFlurryAura    *core.Aura
+	ExposeArmorAura    *core.Aura
+	SliceAndDiceAura   *core.Aura
+
 	finishingMoveEffectApplier func(sim *core.Simulation, numPoints int32)
 
 	castSliceAndDice func()
@@ -164,7 +169,7 @@ func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.deadlyPoisonStacks = 0
 	rogue.doneSND = false
 
-	permaEA := sim.GetPrimaryTarget().AuraExpiresAt(core.ExposeArmorAuraID) == core.NeverExpires
+	permaEA := rogue.ExposeArmorAura.ExpiresAt() == core.NeverExpires
 	rogue.doneEA = !rogue.Rotation.MaintainExposeArmor || permaEA
 
 	rogue.disabledMCDs = rogue.DisableAllEnabledCooldowns(core.CooldownTypeUnknown)

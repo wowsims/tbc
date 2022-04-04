@@ -50,8 +50,6 @@ var ItemSetTidefury = core.ItemSet{
 	},
 }
 
-var Cyclone4PcAuraID = core.NewAuraID()
-var Cyclone4PcManaRegainAuraID = core.NewAuraID()
 var ItemSetCycloneRegalia = core.ItemSet{
 	Name: "Cyclone Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -60,46 +58,48 @@ var ItemSetCycloneRegalia = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				return core.Aura{
-					ID: Cyclone4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+
+			procAura := character.GetOrRegisterAura(&core.Aura{
+				Label:    "Cyclone Regalia 4pc Proc",
+				Duration: time.Second * 15,
+				OnGain: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Unit.PseudoStats.CostReduction += 270
+				},
+				OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Unit.PseudoStats.CostReduction -= 270
+				},
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+					aura.Deactivate(sim)
+				},
+			})
+
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Cyclone Regalia 4pc",
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 							return
 						}
 						if !spellEffect.Outcome.Matches(core.OutcomeCrit) || sim.RandomFloat("cycl4p") > 0.11 {
 							return // if not a crit or didn't proc, don't activate
 						}
-						character.AddAura(sim, core.Aura{
-							ID:       Cyclone4PcManaRegainAuraID,
-							Duration: time.Second * 15,
-							OnGain: func(sim *core.Simulation) {
-								character.PseudoStats.CostReduction += 270
-							},
-							OnExpire: func(sim *core.Simulation) {
-								character.PseudoStats.CostReduction -= 270
-							},
-							OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-								character.RemoveAura(sim, Cyclone4PcManaRegainAuraID)
-							},
-						})
+						procAura.Activate(sim)
 					},
-				}
+				})
 			})
 		},
 	},
 }
 
-var Cataclysm4PcAuraID = core.NewAuraID()
 var ItemSetCataclysmRegalia = core.ItemSet{
 	Name: "Cataclysm Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				return core.Aura{
-					ID: Cataclysm4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Cataclysm Regalia 4pc",
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 							return
 						}
@@ -108,7 +108,7 @@ var ItemSetCataclysmRegalia = core.ItemSet{
 						}
 						character.AddMana(sim, 120, core.ActionID{SpellID: 37237}, false)
 					},
-				}
+				})
 			})
 		},
 	},
@@ -142,7 +142,6 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 	},
 }
 
-var NaturalAlignmentCrystalAuraID = core.NewAuraID()
 var NaturalAlignmentCrystalCooldownID = core.NewCooldownID()
 
 func ApplyNaturalAlignmentCrystal(agent core.Agent) {
@@ -151,7 +150,22 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 	const cd = time.Minute * 5
 	actionID := core.ActionID{ItemID: 19344}
 
-	agent.GetCharacter().AddMajorCooldown(core.MajorCooldown{
+	character := agent.GetCharacter()
+	activeAura := character.GetOrRegisterAura(&core.Aura{
+		Label:    "Natural Alignment Crystal",
+		ActionID: actionID,
+		Duration: dur,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			character.AddStat(stats.SpellPower, sp)
+			character.PseudoStats.CostMultiplier *= 1.2
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			character.AddStat(stats.SpellPower, -sp)
+			character.PseudoStats.CostMultiplier /= 1.2
+		},
+	})
+
+	character.AddMajorCooldown(core.MajorCooldown{
 		ActionID:         actionID,
 		CooldownID:       NaturalAlignmentCrystalCooldownID,
 		Cooldown:         cd,
@@ -165,19 +179,7 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				character.AddAura(sim, core.Aura{
-					ID:       NaturalAlignmentCrystalAuraID,
-					ActionID: actionID,
-					Duration: dur,
-					OnGain: func(sim *core.Simulation) {
-						character.AddStat(stats.SpellPower, sp)
-						character.PseudoStats.CostMultiplier *= 1.2
-					},
-					OnExpire: func(sim *core.Simulation) {
-						character.AddStat(stats.SpellPower, -sp)
-						character.PseudoStats.CostMultiplier /= 1.2
-					},
-				})
+				activeAura.Activate(sim)
 				character.SetCD(NaturalAlignmentCrystalCooldownID, sim.CurrentTime+cd)
 				character.Metrics.AddInstantCast(actionID)
 			}
@@ -187,17 +189,15 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 
 // ActivateFathomBrooch adds an aura that has a chance on cast of nature spell
 //  to restore 335 mana. 40s ICD
-var FathomBroochOfTheTidewalkerAuraID = core.NewAuraID()
-
 func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		icd := core.NewICD()
 		const icdDur = time.Second * 40
 
-		return core.Aura{
-			ID: FathomBroochOfTheTidewalkerAuraID,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Fathom Brooch of the Tidewalker",
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				if icd.IsOnCD(sim) {
 					return
 				}
@@ -210,77 +210,58 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				character.AddMana(sim, 335, core.ActionID{ItemID: 30663}, false)
 			},
-		}
+		})
 	})
 }
-
-var AshtongueTalismanOfVisionAuraID = core.NewAuraID()
-var AshtongueTalismanOfVisionProcAuraID = core.NewAuraID()
 
 func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const apBonus = 275
-		const dur = time.Second * 10
-		const procChance = 0.5
-		applyStatAura := character.NewTemporaryStatsAuraApplier(AshtongueTalismanOfVisionProcAuraID, core.ActionID{ItemID: 32491}, stats.Stats{stats.AttackPower: apBonus}, dur)
 
-		return core.Aura{
-			ID: AshtongueTalismanOfVisionAuraID,
-			OnCastComplete: func(sim *core.Simulation, ability *core.Cast) {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Ashtongue Talisman of Vision Proc", core.ActionID{ItemID: 32491}, stats.Stats{stats.AttackPower: 275}, time.Second*10)
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Ashtongue Talisman of Vision",
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, ability *core.Cast) {
 				if !ability.SameAction(StormstrikeActionID) {
 					return
 				}
-				if sim.RandomFloat("Ashtongue Talisman of Vision") > procChance {
+				if sim.RandomFloat("Ashtongue Talisman of Vision") > 0.5 {
 					return
 				}
-				applyStatAura(sim)
+				procAura.Activate(sim)
 			},
-		}
+		})
 	})
 }
-
-var SkycallTotemAuraID = core.NewAuraID()
-var EnergizedAuraID = core.NewAuraID()
 
 func ApplySkycallTotem(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const hasteBonus = 101
-		const dur = time.Second * 10
-		applyStatAura := character.NewTemporaryStatsAuraApplier(EnergizedAuraID, core.ActionID{ItemID: 33506}, stats.Stats{stats.SpellHaste: hasteBonus}, dur)
 
-		return core.Aura{
-			ID:       SkycallTotemAuraID,
-			Duration: core.NeverExpires,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if cast.ActionID.SpellID != SpellIDLB12 || sim.RandomFloat("Skycall Totem") > 0.15 {
-					return
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Skycall Totem Proc", core.ActionID{ItemID: 33506}, stats.Stats{stats.SpellHaste: 101}, time.Second*10)
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Skycall Totem",
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+				if cast.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("Skycall Totem") < 0.15 {
+					procAura.Activate(sim)
 				}
-				applyStatAura(sim)
 			},
-		}
+		})
 	})
 }
 
-var StonebreakersTotemAuraID = core.NewAuraID()
-var ElementalStrengthAuraID = core.NewAuraID()
-
 func ApplyStonebreakersTotem(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const apBonus = 110
-		const dur = time.Second * 10
-		const procChance = 0.5
-		applyStatAura := character.NewTemporaryStatsAuraApplier(ElementalStrengthAuraID, core.ActionID{ItemID: 33507}, stats.Stats{stats.AttackPower: apBonus}, dur)
-
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Stonebreakers Totem Proc", core.ActionID{ItemID: 33507}, stats.Stats{stats.AttackPower: 110}, time.Second*10)
 		icd := core.NewICD()
 		const icdDur = time.Second * 10
+		const procChance = 0.5
 
-		return core.Aura{
-			ID:       StonebreakersTotemAuraID,
+		return character.GetOrRegisterAura(&core.Aura{
+			Label:    "Stonebreakers Totem",
 			Duration: core.NeverExpires,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
@@ -298,9 +279,9 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 				}
 
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				applyStatAura(sim)
+				procAura.Activate(sim)
 			},
-		}
+		})
 	})
 }
 

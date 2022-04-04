@@ -72,5 +72,5 @@ func (war *DpsWarrior) GetWarrior() *warrior.Warrior {
 
 func (war *DpsWarrior) Reset(sim *core.Simulation) {
 	war.Warrior.Reset(sim)
-	war.AddAura(sim, war.BerserkerStanceAura())
+	war.BerserkerStanceAura.Activate(sim)
 }

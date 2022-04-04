@@ -12,19 +12,19 @@ const ArcaneBlastBaseManaCost = 195.0
 const ArcaneBlastBaseCastTime = time.Millisecond * 2500
 
 func (mage *Mage) registerArcaneBlastSpell(sim *core.Simulation) {
-	abAura := core.Aura{
-		ID:       ArcaneBlastAuraID,
-		ActionID: core.ActionID{SpellID: 36032},
-		Duration: time.Second * 8,
-		Stacks:   0,
-		OnExpire: func(sim *core.Simulation) {
+	mage.ArcaneBlastAura = mage.RegisterAura(&core.Aura{
+		Label:     "Arcane Blast",
+		ActionID:  core.ActionID{SpellID: 36032},
+		Duration:  time.Second * 8,
+		MaxStacks: 3,
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			// Reset the mana cost on expiration.
 			if mage.ArcaneBlast.Instance.IsInUse() {
 				mage.ArcaneBlast.Instance.Cost.Value = core.MaxFloat(0, mage.ArcaneBlast.Instance.Cost.Value-3.0*ArcaneBlastBaseManaCost*0.75)
 				mage.ArcaneBlast.Instance.ActionID.Tag = 1
 			}
 		},
-	}
+	})
 
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -44,8 +44,8 @@ func (mage *Mage) registerArcaneBlastSpell(sim *core.Simulation) {
 				CastTime: ArcaneBlastBaseCastTime,
 				GCD:      core.GCDDefault,
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					abAura.Stacks = core.MinInt32(3, mage.NumStacks(ArcaneBlastAuraID)+1)
-					cast.Character.ReplaceAura(sim, abAura)
+					mage.ArcaneBlastAura.Activate(sim)
+					mage.ArcaneBlastAura.AddStack(sim)
 				},
 			},
 		},
@@ -70,7 +70,7 @@ func (mage *Mage) registerArcaneBlastSpell(sim *core.Simulation) {
 	mage.ArcaneBlast = mage.RegisterSpell(core.SpellConfig{
 		Template: spell,
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			numStacks := mage.NumStacks(ArcaneBlastAuraID)
+			numStacks := mage.ArcaneBlastAura.GetStacks()
 			instance.CastTime -= time.Duration(numStacks) * time.Second / 3
 			instance.Cost.Value += float64(numStacks) * ArcaneBlastBaseManaCost * 0.75
 			instance.ActionID.Tag = numStacks + 1
@@ -95,12 +95,9 @@ func (mage *Mage) ArcaneBlastManaCost(numStacks int32) float64 {
 	return cost
 }
 
-var ArcaneBlastAuraID = core.NewAuraID()
-
 // Whether Arcane Blast stacks will fall off before a new blast could finish casting.
 func (mage *Mage) willDropArcaneBlastStacks(sim *core.Simulation, castTime time.Duration, numStacks int32) bool {
-	remainingBuffTime := mage.RemainingAuraDuration(sim, ArcaneBlastAuraID)
-
+	remainingBuffTime := mage.ArcaneBlastAura.RemainingDuration(sim)
 	return numStacks == 0 || remainingBuffTime < castTime
 }
 

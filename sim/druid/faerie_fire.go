@@ -7,6 +7,8 @@ import (
 )
 
 func (druid *Druid) registerFaerieFireSpell(sim *core.Simulation) {
+	druid.FaerieFireAura = core.FaerieFireAura(sim.GetPrimaryTarget(), druid.Talents.ImprovedFaerieFire)
+
 	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -32,9 +34,7 @@ func (druid *Druid) registerFaerieFireSpell(sim *core.Simulation) {
 				if !spellEffect.Landed() {
 					return
 				}
-				// core.FaerieFireAura applies the -armor buff and removes it on expire.
-				//  Don't use ReplaceAura or the armor won't be removed.
-				spellEffect.Target.AddAura(sim, core.FaerieFireAura(spellEffect.Target, druid.Talents.ImprovedFaerieFire == 3))
+				druid.FaerieFireAura.Activate(sim)
 			},
 		},
 	}
@@ -46,5 +46,5 @@ func (druid *Druid) registerFaerieFireSpell(sim *core.Simulation) {
 }
 
 func (druid *Druid) ShouldCastFaerieFire(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.FaerieFire && !target.HasAura(core.FaerieFireAuraID)
+	return rotation.FaerieFire && !druid.FaerieFireAura.IsActive()
 }

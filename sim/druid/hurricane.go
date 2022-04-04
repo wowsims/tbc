@@ -11,7 +11,6 @@ import (
 const SpellIDHurricane int32 = 27012
 
 var HurricaneCooldownID = core.NewCooldownID()
-var HurricaneAuraID = core.NewAuraID()
 
 func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 	template := core.SimpleSpell{
@@ -47,7 +46,7 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 			NumberOfTicks:       10,
 			TickLength:          time.Second * 1,
 			TickBaseDamage:      core.DotSnapshotFuncMagic(206, 0.107),
-			AuraID:              HurricaneAuraID,
+			Aura:                druid.NewDotAura("Hurricane", core.ActionID{SpellID: SpellIDHurricane}),
 			AffectedByCastSpeed: true,
 		},
 	}

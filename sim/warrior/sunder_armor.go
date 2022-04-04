@@ -8,8 +8,9 @@ import (
 
 var SunderArmorActionID = core.ActionID{SpellID: 25225}
 
-func (warrior *Warrior) registerSunderArmorSpell(_ *core.Simulation) {
-	warrior.sunderArmorCost = 15.0 - float64(warrior.Talents.ImprovedSunderArmor) - float64(warrior.Talents.FocusedRage)
+func (warrior *Warrior) registerSunderArmorSpell(sim *core.Simulation) {
+	warrior.SunderArmorAura = core.SunderArmorAura(sim.GetPrimaryTarget(), 0)
+	warrior.ExposeArmorAura = core.ExposeArmorAura(sim.GetPrimaryTarget(), 2)
 
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -40,13 +41,8 @@ func (warrior *Warrior) registerSunderArmorSpell(_ *core.Simulation) {
 	refundAmount := warrior.sunderArmorCost * 0.8
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
-			target := spellEffect.Target
-			// Don't overwrite permanent version of SA
-			if target.AuraExpiresAt(core.SunderArmorAuraID) != core.NeverExpires {
-				curStacks := target.NumStacks(core.SunderArmorAuraID)
-				newStacks := core.MinInt32(curStacks+1, 5)
-				target.ReplaceAura(sim, core.SunderArmorAura(target, newStacks))
-			}
+			warrior.SunderArmorAura.Activate(sim)
+			warrior.SunderArmorAura.AddStack(sim)
 		} else {
 			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 		}
@@ -59,5 +55,5 @@ func (warrior *Warrior) registerSunderArmorSpell(_ *core.Simulation) {
 }
 
 func (warrior *Warrior) CanSunderArmor(sim *core.Simulation, target *core.Target) bool {
-	return warrior.CurrentRage() >= warrior.sunderArmorCost && !target.HasAura(core.ExposeArmorAuraID)
+	return warrior.CurrentRage() >= warrior.sunderArmorCost && !warrior.ExposeArmorAura.IsActive()
 }

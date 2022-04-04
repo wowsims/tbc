@@ -32,9 +32,6 @@ var ItemSetBoldArmor = core.ItemSet{
 	},
 }
 
-var WarbringerArmor4PcAuraID = core.NewAuraID()
-var WarbringerArmor4PcProcAuraID = core.NewAuraID()
-
 var ItemSetWarbringerArmor = core.ItemSet{
 	Name: "Warbringer Armor",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -46,34 +43,34 @@ var ItemSetWarbringerArmor = core.ItemSet{
 			character := agent.GetCharacter()
 
 			// TODO: This needs to apply only to specific abilities, not any source of damage.
-			procAura := core.Aura{
-				ID:       WarbringerArmor4PcProcAuraID,
+			procAura := character.GetOrRegisterAura(&core.Aura{
+				Label:    "Warbringer 4pc Proc",
 				ActionID: core.ActionID{SpellID: 37516},
 				Duration: core.NeverExpires,
-				OnGain: func(sim *core.Simulation) {
-					character.PseudoStats.DamageDealtMultiplier *= 1.1
+				OnGain: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Unit.PseudoStats.DamageDealtMultiplier *= 1.1
 				},
-				OnExpire: func(sim *core.Simulation) {
-					character.PseudoStats.DamageDealtMultiplier /= 1.1
+				OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Unit.PseudoStats.DamageDealtMultiplier /= 1.1
 				},
-				OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if spellEffect.Damage > 0 {
-						character.RemoveAura(sim, WarbringerArmor4PcProcAuraID)
+						aura.Deactivate(sim)
 					}
 				},
-			}
+			})
 
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				return core.Aura{
-					ID: WarbringerArmor4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-						if !spell.SameAction(RevengeActionID) {
-							return
-						}
+			passiveAura := character.GetOrRegisterAura(&core.Aura{
+				Label: "Warbringer 4pc",
+				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+					if spell.SameAction(RevengeActionID) {
+						procAura.Activate(sim)
+					}
+				},
+			})
 
-						character.AddAura(sim, procAura)
-					},
-				}
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				return passiveAura
 			})
 		},
 	},
@@ -142,25 +139,22 @@ var ItemSetOnslaughtBattlegear = core.ItemSet{
 	},
 }
 
-var AshtongueTalismanOfValorAuraID = core.NewAuraID()
-var AshtongueTalismanOfValorProcAuraID = core.NewAuraID()
-
 func ApplyAshtongueTalismanOfValor(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		applyStatAura := character.NewTemporaryStatsAuraApplier(AshtongueTalismanOfValorProcAuraID, core.ActionID{ItemID: 32485}, stats.Stats{stats.Strength: 55}, time.Second*12)
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32485}, stats.Stats{stats.Strength: 55}, time.Second*12)
 
-		return core.Aura{
-			ID: AshtongueTalismanOfValorAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Ashtongue Talisman",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SameAction(ShieldSlamActionID) && !spell.SameAction(BloodthirstActionID) {
 					return
 				}
 
 				if sim.RandomFloat("AshtongueTalismanOfValor") < 0.25 {
-					applyStatAura(sim)
+					procAura.Activate(sim)
 				}
 			},
-		}
+		})
 	})
 }

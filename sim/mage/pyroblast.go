@@ -62,16 +62,13 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 	})
 }
 
-var PyroblastDotAuraID = core.NewAuraID()
+var PyroblastDotActionID = core.ActionID{SpellID: SpellIDPyroblast, Tag: CastTagPyroblastDot}
 
 func (mage *Mage) registerPyroblastDotSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID: SpellIDPyroblast,
-					Tag:     CastTagPyroblastDot,
-				},
+				ActionID:    PyroblastDotActionID,
 				Character:   &mage.Character,
 				SpellSchool: core.SpellSchoolFire,
 				SpellExtras: SpellFlagMage,
@@ -84,7 +81,7 @@ func (mage *Mage) registerPyroblastDotSpell(sim *core.Simulation) {
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 3,
 				TickBaseDamage: core.DotSnapshotFuncMagic(356/4, 0),
-				AuraID:         PyroblastDotAuraID,
+				Aura:           mage.NewDotAura("Pyroblast", PyroblastDotActionID),
 			},
 		},
 	}

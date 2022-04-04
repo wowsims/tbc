@@ -67,5 +67,5 @@ func (war *ProtectionWarrior) GetWarrior() *warrior.Warrior {
 
 func (war *ProtectionWarrior) Reset(sim *core.Simulation) {
 	war.Warrior.Reset(sim)
-	war.AddAura(sim, war.DefensiveStanceAura())
+	war.DefensiveStanceAura.Activate(sim)
 }

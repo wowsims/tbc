@@ -32,6 +32,7 @@ type Warrior struct {
 	shoutDuration    time.Duration
 	bloodthirstCost  float64
 	shoutCost        float64
+	demoShoutCost    float64
 	heroicStrikeCost float64
 	revengeCost      float64
 	shieldSlamCost   float64
@@ -54,6 +55,15 @@ type Warrior struct {
 	SunderArmor       *core.Spell
 	ThunderClap       *core.Spell
 	Whirlwind         *core.Spell
+
+	BattleStanceAura    *core.Aura
+	DefensiveStanceAura *core.Aura
+	BerserkerStanceAura *core.Aura
+
+	DemoralizingShoutAura *core.Aura
+	SunderArmorAura       *core.Aura
+	ThunderClapAura       *core.Aura
+	ExposeArmorAura       *core.Aura // Warriors don't cast this but they need to check it.
 }
 
 func (warrior *Warrior) GetCharacter() *core.Character {
@@ -88,9 +98,13 @@ func (warrior *Warrior) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.CastShout = warrior.makeCastShout()
-	warrior.CastBattleStance = warrior.makeCastStance(sim, BattleStance, warrior.BattleStanceAura())
-	warrior.CastDefensiveStance = warrior.makeCastStance(sim, DefensiveStance, warrior.DefensiveStanceAura())
-	warrior.CastBerserkerStance = warrior.makeCastStance(sim, BerserkerStance, warrior.BerserkerStanceAura())
+
+	warrior.registerBattleStanceAura()
+	warrior.registerDefensiveStanceAura()
+	warrior.registerBerserkerStanceAura()
+	warrior.CastBattleStance = warrior.makeCastStance(sim, BattleStance, warrior.BattleStanceAura)
+	warrior.CastDefensiveStance = warrior.makeCastStance(sim, DefensiveStance, warrior.DefensiveStanceAura)
+	warrior.CastBerserkerStance = warrior.makeCastStance(sim, BerserkerStance, warrior.BerserkerStanceAura)
 
 	warrior.registerBloodthirstSpell(sim)
 	warrior.registerDemoralizingShoutSpell(sim)

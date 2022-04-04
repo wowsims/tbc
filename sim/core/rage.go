@@ -8,8 +8,6 @@ const MaxRage = 100.0
 
 const RageFactor = 3.75 / 274.7
 
-var RageBarAuraID = NewAuraID()
-
 // OnRageGain is called any time rage is increased.
 type OnRageGain func(sim *Simulation)
 
@@ -23,10 +21,10 @@ type rageBar struct {
 }
 
 func (character *Character) EnableRageBar(startingRage float64, onRageGain OnRageGain) {
-	character.AddPermanentAura(func(sim *Simulation) Aura {
-		return Aura{
-			ID: RageBarAuraID,
-			OnSpellHit: func(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+	character.AddPermanentAura(func(*Simulation) *Aura {
+		return character.GetOrRegisterAura(&Aura{
+			Label: "RageBar",
+			OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 				if !spellEffect.ProcMask.Matches(ProcMaskWhiteHit) {
 					return
 				}
@@ -55,8 +53,9 @@ func (character *Character) EnableRageBar(startingRage float64, onRageGain OnRag
 
 				character.AddRage(sim, generatedRage, spell.ActionID)
 			},
-		}
+		})
 	})
+
 	character.rageBar = rageBar{
 		character:    character,
 		startingRage: MaxFloat(0, MinFloat(startingRage, MaxRage)),

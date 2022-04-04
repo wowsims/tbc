@@ -53,7 +53,7 @@ func (mage *Mage) registerManaGemsCD() {
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			serpentCoilAuraApplier := mage.NewTemporaryStatsAuraApplier(SerpentCoilBraidAuraID, core.ActionID{ItemID: SerpentCoilBraidID}, stats.Stats{stats.SpellPower: 225}, time.Second*15)
+			serpentCoilAura := mage.NewTemporaryStatsAura("Serpent Coil Braid", core.ActionID{ItemID: SerpentCoilBraidID}, stats.Stats{stats.SpellPower: 225}, time.Second*15)
 
 			return func(sim *core.Simulation, character *core.Character) {
 				if mage.remainingManaGems == 1 {
@@ -71,7 +71,7 @@ func (mage *Mage) registerManaGemsCD() {
 				}
 
 				if serpentCoilBraid {
-					serpentCoilAuraApplier(sim)
+					serpentCoilAura.Activate(sim)
 				}
 
 				mage.remainingManaGems--
@@ -83,5 +83,3 @@ func (mage *Mage) registerManaGemsCD() {
 		},
 	})
 }
-
-var SerpentCoilBraidAuraID = core.NewAuraID()
