@@ -198,8 +198,8 @@ type auraTracker struct {
 	// Maps MagicIDs to sim duration at which CD is done. Using array for perf.
 	cooldowns []time.Duration
 
-	// Maps Aura labels to the corresponding Aura.
-	auras map[string]*Aura
+	// All registered auras, both active and inactive.
+	auras []*Aura
 
 	aurasByTag map[string][]*Aura
 
@@ -223,10 +223,23 @@ func newAuraTracker() auraTracker {
 		onSpellHitAuras:       make([]*Aura, 0, 16),
 		onPeriodicDamageAuras: make([]*Aura, 0, 16),
 		onMeleeAttackAuras:    make([]*Aura, 0, 16),
-		auras:                 make(map[string]*Aura),
+		auras:                 make([]*Aura, 0, 16),
 		aurasByTag:            make(map[string][]*Aura),
 		cooldowns:             make([]time.Duration, numCooldownIDs),
 	}
+}
+
+func (at *auraTracker) GetAura(label string) *Aura {
+	for _, aura := range at.auras {
+		if aura.Label == label {
+			return aura
+		}
+	}
+	return nil
+}
+func (at *auraTracker) HasActiveAura(label string) bool {
+	aura := at.GetAura(label)
+	return aura != nil && aura.IsActive()
 }
 
 func (at *auraTracker) registerAura(unit *Unit, aura *Aura) *Aura {
@@ -249,7 +262,7 @@ func (at *auraTracker) registerAura(unit *Unit, aura *Aura) *Aura {
 	aura.Unit = unit
 	aura.metrics.ID = aura.ActionID
 
-	at.auras[aura.Label] = aura
+	at.auras = append(at.auras, aura)
 	if aura.Tag != "" {
 		at.aurasByTag[aura.Tag] = append(at.aurasByTag[aura.Tag], aura)
 	}
@@ -258,14 +271,6 @@ func (at *auraTracker) registerAura(unit *Unit, aura *Aura) *Aura {
 }
 func (unit *Unit) RegisterAura(aura *Aura) *Aura {
 	return unit.auraTracker.registerAura(unit, aura)
-}
-
-func (at *auraTracker) GetAura(label string) *Aura {
-	return at.auras[label]
-}
-func (at *auraTracker) HasActiveAura(label string) bool {
-	aura := at.GetAura(label)
-	return aura != nil && aura.IsActive()
 }
 
 func (unit *Unit) GetOrRegisterAura(aura *Aura) *Aura {
