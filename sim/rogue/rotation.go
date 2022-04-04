@@ -318,14 +318,14 @@ func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 }
 
 func (rogue *Rogue) canPoolEnergy(sim *core.Simulation, energy float64) bool {
-	return sim.GetRemainingDuration() >= time.Second*6 && energy <= 50 && ((rogue.AdrenalineRushAura != nil && rogue.AdrenalineRushAura.IsActive()) || energy <= 30)
+	return sim.GetRemainingDuration() >= time.Second*6 && energy <= 50 && ((rogue.AdrenalineRushAura == nil || !rogue.AdrenalineRushAura.IsActive()) || energy <= 30)
 }
 
 func (rogue *Rogue) tryUseDamageFinisher(sim *core.Simulation, energy float64, comboPoints int32) bool {
 	if rogue.Rotation.UseRupture &&
 		!rogue.Rupture.Instance.IsInUse() &&
 		sim.GetRemainingDuration() >= rogue.RuptureDuration(comboPoints) &&
-		(sim.GetNumTargets() == 1 || (rogue.BladeFlurryAura != nil && rogue.BladeFlurryAura.IsActive())) {
+		(sim.GetNumTargets() == 1 || (rogue.BladeFlurryAura == nil || !rogue.BladeFlurryAura.IsActive())) {
 		if energy >= RuptureEnergyCost || rogue.deathmantle4pcProc {
 			rogue.Rupture.Cast(sim, sim.GetPrimaryTarget())
 		}

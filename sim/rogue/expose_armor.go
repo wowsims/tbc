@@ -51,5 +51,5 @@ func (rogue *Rogue) registerExposeArmorSpell(sim *core.Simulation) {
 }
 
 func (rogue *Rogue) MaintainingExpose(target *core.Target) bool {
-	return !rogue.doneEA && (rogue.Talents.ImprovedExposeArmor == 2 || target.HasActiveAura(core.SunderArmorAuraLabel))
+	return !rogue.doneEA && (rogue.Talents.ImprovedExposeArmor == 2 || !target.HasActiveAura(core.SunderArmorAuraLabel))
 }

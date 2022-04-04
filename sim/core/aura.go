@@ -111,6 +111,9 @@ func (aura *Aura) GetStacks() int32 {
 }
 
 func (aura *Aura) SetStacks(sim *Simulation, newStacks int32) {
+	if aura.MaxStacks == 0 {
+		panic("MaxStacks required to set Aura stacks: " + aura.Label)
+	}
 	oldStacks := aura.stacks
 	newStacks = MinInt32(newStacks, aura.MaxStacks)
 
@@ -119,7 +122,7 @@ func (aura *Aura) SetStacks(sim *Simulation, newStacks int32) {
 	}
 
 	if sim.Log != nil {
-		aura.Unit.Log(sim, "Aura %s stacks: %d --> %d", aura.ActionID, oldStacks, newStacks)
+		aura.Unit.Log(sim, "%s stacks: %d --> %d", aura.ActionID, oldStacks, newStacks)
 	}
 	aura.stacks = newStacks
 	if aura.OnStacksChange != nil {
@@ -378,11 +381,14 @@ func (at *auraTracker) reset(sim *Simulation) {
 }
 
 func (at *auraTracker) advance(sim *Simulation) {
-	// Loop in reverse order so that aura removal is safe.
+	// Loop in reverse order so that aura removal is (mostly) safe.
 	for i := len(at.activeAuras) - 1; i >= 0; i-- {
-		aura := at.activeAuras[i]
-		if aura.expires <= sim.CurrentTime {
-			aura.Deactivate(sim)
+		// Need to check again because some effects can expire 2 auras at once.
+		if i < len(at.activeAuras) {
+			aura := at.activeAuras[i]
+			if aura.expires <= sim.CurrentTime {
+				aura.Deactivate(sim)
+			}
 		}
 	}
 }
@@ -408,6 +414,8 @@ func (at *auraTracker) doneIteration(sim *Simulation) {
 		if aura.stacks != 0 {
 			panic("Aura nonzero stacks during doneIter: " + aura.Label)
 		}
+		aura.startTime = 0
+		aura.expires = 0
 	}
 
 	for _, permAura := range at.permanentAuras {

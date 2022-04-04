@@ -635,7 +635,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-TheBladefist-29348"
  value: {
-  dps: 1300.467594885478
+  dps: 1300.2451013402283
  }
 }
 dps_results: {
@@ -749,13 +749,13 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Average-Default"
  value: {
-  dps: 1409.961227239657
+  dps: 1410.0558298992373
  }
 }
 dps_results: {
  key: "TestRogue-SelfDrums-DPS"
  value: {
-  dps: 1449.280844625322
+  dps: 1449.0583510800723
  }
 }
 dps_results: {
@@ -809,7 +809,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1775.3485989316646
+  dps: 1775.1364037532844
  }
 }
 dps_results: {

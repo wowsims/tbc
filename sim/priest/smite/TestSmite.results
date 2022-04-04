@@ -167,7 +167,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 1040.1303061191836
+  dps: 1040.1303061191838
  }
 }
 dps_results: {
@@ -185,7 +185,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-BraidedEterniumChain-24114"
  value: {
-  dps: 1040.1303061191836
+  dps: 1040.1303061191838
  }
 }
 dps_results: {
@@ -323,7 +323,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-EyeofMagtheridon-28789"
  value: {
-  dps: 1041.6459481098195
+  dps: 1041.64594810982
  }
 }
 dps_results: {
@@ -515,7 +515,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
-  dps: 1045.1801848585758
+  dps: 1045.180184858576
  }
 }
 dps_results: {
@@ -551,7 +551,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-SwiftStarfireDiamond"
  value: {
-  dps: 1045.4721386324657
+  dps: 1045.4721386324659
  }
 }
 dps_results: {
@@ -575,7 +575,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-TheLightningCapacitor-28785"
  value: {
-  dps: 1030.9390258845476
+  dps: 1030.9390258845478
  }
 }
 dps_results: {
@@ -629,7 +629,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-Xi'ri'sGift-29179"
  value: {
-  dps: 1045.2751081398258
+  dps: 1045.275108139826
  }
 }
 dps_results: {
@@ -641,7 +641,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-SelfDrums-DPS"
  value: {
-  dps: 1046.3361379828
+  dps: 1046.3361379828002
  }
 }
 dps_results: {

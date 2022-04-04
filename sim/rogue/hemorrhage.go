@@ -11,15 +11,17 @@ var HemorrhageActionID = core.ActionID{SpellID: 26864}
 var HemorrhageEnergyCost = 35.0
 
 func (rogue *Rogue) registerHemorrhageSpell(sim *core.Simulation) {
-	hemoAura := sim.GetPrimaryTarget().GetOrRegisterAura(&core.Aura{
-		Label:    "Hemorrhage",
-		ActionID: HemorrhageActionID,
-		Duration: time.Second * 15,
+	target := sim.GetPrimaryTarget()
+	hemoAura := target.GetOrRegisterAura(&core.Aura{
+		Label:     "Hemorrhage",
+		ActionID:  HemorrhageActionID,
+		Duration:  time.Second * 15,
+		MaxStacks: 10,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Unit.PseudoStats.BonusPhysicalDamageTaken += 42
+			target.PseudoStats.BonusPhysicalDamageTaken += 42
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Unit.PseudoStats.BonusPhysicalDamageTaken -= 42
+			target.PseudoStats.BonusPhysicalDamageTaken -= 42
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell.SpellSchool != core.SpellSchoolPhysical {
