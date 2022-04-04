@@ -173,7 +173,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 						return
 					}
 
-					if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Badge of the Swarmguard") {
+					if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Badge of the Swarmguard") {
 						return
 					}
 
@@ -266,7 +266,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
 				}
-				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "RomulosPoisonVial") {
+				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "RomulosPoisonVial") {
 					return
 				}
 
@@ -295,7 +295,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "dragonspine") {
+				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "dragonspine") {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
@@ -387,7 +387,7 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 					return
 				}
-				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Madness of the Betrayer") {
+				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Madness of the Betrayer") {
 					return
 				}
 

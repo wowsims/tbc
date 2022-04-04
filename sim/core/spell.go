@@ -271,7 +271,8 @@ func (character *Character) RegisterSpell(config SpellConfig) *Spell {
 		SpellSchool: config.Template.SpellSchool,
 		SpellExtras: config.Template.SpellExtras,
 
-		ModifyCast: config.ModifyCast,
+		ModifyCast:   config.ModifyCast,
+		ApplyEffects: config.ApplyEffects,
 
 		Template: config.Template,
 		effects:  make([]SpellEffect, len(config.Template.Effects)),
@@ -299,5 +300,34 @@ func (character *Character) GetOrRegisterSpell(config SpellConfig) *Spell {
 		return character.RegisterSpell(config)
 	} else {
 		return registered
+	}
+}
+
+func ApplyEffectFuncAll(effectFuncs []ApplySpellEffects) ApplySpellEffects {
+	if len(effectFuncs) == 0 {
+		return nil
+	} else if len(effectFuncs) == 1 {
+		return effectFuncs[0]
+	} else {
+		return func(sim *Simulation, target *Target, spell *Spell) {
+			for _, effectFunc := range effectFuncs {
+				effectFunc(sim, target, spell)
+			}
+		}
+	}
+}
+
+func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
+	return func(sim *Simulation, target *Target, spell *Spell) {
+		effect := baseEffect
+		effect.Target = target
+		effect.determineOutcome(sim, spell, false)
+
+		if effect.Landed() {
+			effect.directCalculations(sim, spell)
+		}
+
+		effect.afterCalculations(sim, spell, false)
+		spell.Instance.objectInUse = false
 	}
 }
