@@ -9,7 +9,6 @@ import (
 var SunderArmorActionID = core.ActionID{SpellID: 25225}
 
 func (warrior *Warrior) registerSunderArmorSpell(sim *core.Simulation) {
-	warrior.sunderArmorCost = 15.0 - float64(warrior.Talents.ImprovedSunderArmor) - float64(warrior.Talents.FocusedRage)
 	warrior.SunderArmorAura = core.SunderArmorAura(sim.GetPrimaryTarget(), 0)
 	warrior.ExposeArmorAura = core.ExposeArmorAura(sim.GetPrimaryTarget(), 2)
 
