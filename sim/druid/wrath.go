@@ -34,6 +34,9 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 		},
 	}
 
+	template.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
+	template.Cost.Value -= template.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
+
 	spellCoefficient := 0.571
 	bonusFlatDamage := 0.0
 	if druid.Equip[items.ItemSlotRanged].ID == IdolAvenger {
@@ -42,21 +45,18 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 	}
 	spellCoefficient += 0.02 * float64(druid.Talents.WrathOfCenarius)
 
-	template.Effect = core.SpellEffect{
+	effect := core.SpellEffect{
 		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
 		CritRollCategory:    core.CritRollCategoryMagical,
 		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
-		DamageMultiplier:    1,
-		ThreatMultiplier:    1,
-		BaseDamage:          core.BaseDamageConfigMagic(383+bonusFlatDamage, 432+bonusFlatDamage, spellCoefficient),
+
+		BonusSpellCritRating: float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance, // 2% crit per point
+		DamageMultiplier:     1 + 0.02*float64(druid.Talents.Moonfury),
+		ThreatMultiplier:     1,
+
+		BaseDamage: core.BaseDamageConfigMagic(383+bonusFlatDamage, 432+bonusFlatDamage, spellCoefficient),
+		OnSpellHit: druid.applyOnHitTalents,
 	}
-
-	template.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
-	template.Cost.Value -= template.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
-
-	template.Effect.BonusSpellCritRating += float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance // 2% crit per point
-	template.Effect.DamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
-	template.Effect.OnSpellHit = druid.applyOnHitTalents
 
 	druid.Wrath = druid.RegisterSpell(core.SpellConfig{
 		Template: template,
@@ -65,5 +65,6 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 			druid.applyNaturesGrace(&instance.SpellCast)
 			druid.applyNaturesSwiftness(&instance.SpellCast)
 		},
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }

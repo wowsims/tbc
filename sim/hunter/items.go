@@ -129,7 +129,7 @@ func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 		return character.GetOrRegisterAura(&core.Aura{
 			Label: "Black Bow of the Betrayer",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskRanged) {
 					return
 				}
 				character.AddMana(sim, manaGain, core.ActionID{SpellID: 46939}, false)

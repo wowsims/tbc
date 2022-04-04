@@ -155,8 +155,8 @@ func (spellEffect *SpellEffect) SpellCritChance(character *Character, spell *Spe
 
 func (spellEffect *SpellEffect) directCalculations(sim *Simulation, spell *Spell) {
 	damage := spellEffect.calculateBaseDamage(sim, spell)
-
 	damage *= spellEffect.DamageMultiplier
+
 	spellEffect.applyAttackerModifiers(sim, spell, false, &damage)
 	spellEffect.applyTargetModifiers(sim, spell, false, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	spellEffect.applyResistances(sim, spell, &damage)
@@ -320,9 +320,7 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *Spell,
 		}
 		spell.Character.OnSpellHit(sim, spell, spellEffect)
 		spellEffect.Target.OnSpellHit(sim, spell, spellEffect)
-	}
-
-	if isPeriodic {
+	} else {
 		spell.Character.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 		spellEffect.Target.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 		if spellEffect.DotInput.OnPeriodicDamage != nil {

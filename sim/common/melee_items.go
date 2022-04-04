@@ -489,7 +489,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Band of the Eternal Champion") {
+				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Band of the Eternal Champion") {
 					return
 				}
 
