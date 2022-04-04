@@ -3,27 +3,15 @@ package mage
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const SerpentCoilBraidID = 30720
 
-var MindQuickeningGemAuraID = core.NewAuraID()
-var MindQuickeningGemCooldownID = core.NewCooldownID()
-
 func init() {
-	core.AddItemEffect(19339, core.MakeTemporaryStatsOnUseCDRegistration(
-		MindQuickeningGemAuraID,
-		stats.Stats{stats.SpellHaste: 330},
-		time.Second*20,
-		core.MajorCooldown{
-			ActionID:         core.ActionID{ItemID: 19339},
-			CooldownID:       MindQuickeningGemCooldownID,
-			Cooldown:         time.Minute * 5,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		},
-	))
+	common.AddSimpleStatItemActiveEffect(19339, stats.Stats{stats.SpellHaste: 330}, time.Second*20, time.Minute*5, core.OffensiveTrinketSharedCooldownID) // MQG
 
 	core.AddItemEffect(32488, ApplyAshtongueTalismanOfInsight)
 
@@ -48,9 +36,6 @@ var ItemSetAldorRegalia = core.ItemSet{
 	},
 }
 
-var Tirisfal4PcAuraID = core.NewAuraID()
-var Tirisfal4PcProcAuraID = core.NewAuraID()
-
 var ItemSetTirisfalRegalia = core.ItemSet{
 	Name: "Tirisfal Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -61,19 +46,19 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 		4: func(agent core.Agent) {
 			// Your spell critical strikes grant you up to 70 spell damage for 6 sec.
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				applyStatAura := character.NewTemporaryStatsAuraApplier(Tirisfal4PcProcAuraID, core.ActionID{SpellID: 37443}, stats.Stats{stats.SpellPower: 70}, time.Second*6)
-				return core.Aura{
-					ID: Tirisfal4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				procAura := character.NewTemporaryStatsAura("Tirisfal 4pc Proc", core.ActionID{SpellID: 37443}, stats.Stats{stats.SpellPower: 70}, time.Second*6)
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Tirisfal 4pc",
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 							return
 						}
 						if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-							applyStatAura(sim)
+							procAura.Activate(sim)
 						}
 					},
-				}
+				})
 			})
 		},
 	},
@@ -93,23 +78,17 @@ var ItemSetTempestRegalia = core.ItemSet{
 	},
 }
 
-var AshtongueTalismanOfInsightAuraID = core.NewAuraID()
-var AshtongueTalismanOfInsightProcAuraID = core.NewAuraID()
-
 func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
 	// Not in the game yet so cant test; this logic assumes that:
 	// - No ICD.
 	// - 50% proc rate.
-	const hasteBonus = 150
-	const dur = time.Second * 5
-
 	char := agent.GetCharacter()
-	char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		applyStatAura := char.NewTemporaryStatsAuraApplier(AshtongueTalismanOfInsightProcAuraID, core.ActionID{SpellID: 32488}, stats.Stats{stats.SpellHaste: hasteBonus}, dur)
+	char.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := char.NewTemporaryStatsAura("Asghtongue Talisman Proc", core.ActionID{SpellID: 32488}, stats.Stats{stats.SpellHaste: 150}, time.Second*5)
 
-		return core.Aura{
-			ID: AshtongueTalismanOfInsightAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		return char.GetOrRegisterAura(&core.Aura{
+			Label: "Ashtongue Talisman",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
@@ -121,8 +100,8 @@ func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
 					return
 				}
 
-				applyStatAura(sim)
+				procAura.Activate(sim)
 			},
-		}
+		})
 	})
 }

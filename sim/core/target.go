@@ -40,10 +40,10 @@ func (encounter *Encounter) finalize() {
 	}
 }
 
-func (encounter *Encounter) doneIteration(simDuration time.Duration) {
+func (encounter *Encounter) doneIteration(sim *Simulation) {
 	for i, _ := range encounter.Targets {
 		target := encounter.Targets[i]
-		target.doneIteration(simDuration)
+		target.doneIteration(sim)
 	}
 }
 
@@ -125,8 +125,8 @@ func (target *Target) Advance(sim *Simulation, elapsedTime time.Duration) {
 	target.Unit.advance(sim, elapsedTime)
 }
 
-func (target *Target) doneIteration(simDuration time.Duration) {
-	target.Unit.doneIteration(simDuration)
+func (target *Target) doneIteration(sim *Simulation) {
+	target.Unit.doneIteration(sim)
 }
 
 func (target *Target) GetMetricsProto(numIterations int32) *proto.TargetMetrics {

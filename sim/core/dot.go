@@ -43,8 +43,8 @@ type DotDamageInput struct {
 
 	OnPeriodicDamage OnPeriodicDamage // After-calculation logic for this dot.
 
-	// If both of these are set, will display uptime metrics for this dot.
-	AuraID AuraID
+	// If this is set, will display uptime metrics for this dot.
+	Aura *Aura
 
 	// Internal fields
 	startTime     time.Duration
@@ -201,7 +201,15 @@ func (hitEffect *SpellEffect) onDotComplete(sim *Simulation, spell *Spell) {
 	// Clean up the dot object.
 	hitEffect.DotInput.endTime = 0
 
-	if hitEffect.DotInput.AuraID != 0 {
-		hitEffect.Target.AddAuraUptime(hitEffect.DotInput.AuraID, spell.ActionID, sim.CurrentTime-hitEffect.DotInput.startTime)
+	if hitEffect.DotInput.Aura != nil {
+		hitEffect.DotInput.Aura.metrics.Uptime += sim.CurrentTime - hitEffect.DotInput.startTime
 	}
+}
+
+func (unit *Unit) NewDotAura(auraLabel string, actionID ActionID) *Aura {
+	return unit.GetOrRegisterAura(&Aura{
+		Label:    auraLabel,
+		ActionID: actionID,
+		Duration: NeverExpires,
+	})
 }

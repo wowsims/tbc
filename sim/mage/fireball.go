@@ -67,16 +67,13 @@ func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
 	})
 }
 
-var FireballDotAuraID = core.NewAuraID()
+var FireballDotActionID = core.ActionID{SpellID: SpellIDFireball, Tag: CastTagFireballDot}
 
 func (mage *Mage) registerFireballDotSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID: SpellIDFireball,
-					Tag:     CastTagFireballDot,
-				},
+				ActionID:    FireballDotActionID,
 				Character:   &mage.Character,
 				SpellSchool: core.SpellSchoolFire,
 				SpellExtras: SpellFlagMage,
@@ -88,7 +85,7 @@ func (mage *Mage) registerFireballDotSpell(sim *core.Simulation) {
 				NumberOfTicks:  4,
 				TickLength:     time.Second * 2,
 				TickBaseDamage: core.DotSnapshotFuncMagic(84/4, 0),
-				AuraID:         FireballDotAuraID,
+				Aura:           mage.NewDotAura("Fireball", FireballDotActionID),
 			},
 		},
 	}

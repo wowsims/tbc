@@ -8,8 +8,6 @@ import (
 )
 
 var ShamanisticRageCD = core.NewCooldownID()
-var ShamanisticRageAuraID = core.NewAuraID()
-
 var ShamanisticRageActionID = core.ActionID{SpellID: 30823}
 
 func (shaman *Shaman) registerShamanisticRageCD() {
@@ -37,23 +35,25 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			ppmm := shaman.AutoAttacks.NewPPMManager(15)
+			srAura := shaman.GetOrRegisterAura(&core.Aura{
+				Label:    "Shamanistic Rage",
+				ActionID: ShamanisticRageActionID,
+				Duration: time.Second * 15,
+				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+					// proc mask: 20
+					if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+						return
+					}
+					if !ppmm.Proc(sim, spellEffect.IsMH(), false, "shamanistic rage") {
+						return
+					}
+					mana := shaman.GetStat(stats.AttackPower) * 0.3
+					shaman.AddMana(sim, mana, ShamanisticRageActionID, true)
+				},
+			})
+
 			return func(sim *core.Simulation, character *core.Character) {
-				character.AddAura(sim, core.Aura{
-					ID:       ShamanisticRageAuraID,
-					ActionID: ShamanisticRageActionID,
-					Duration: time.Second * 15,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-						// proc mask: 20
-						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
-							return
-						}
-						if !ppmm.Proc(sim, spellEffect.IsMH(), false, "shamanistic rage") {
-							return
-						}
-						mana := character.GetStat(stats.AttackPower) * 0.3
-						character.AddMana(sim, mana, ShamanisticRageActionID, true)
-					},
-				})
+				srAura.Activate(sim)
 				character.Metrics.AddInstantCast(ShamanisticRageActionID)
 				character.SetCD(ShamanisticRageCD, sim.CurrentTime+cd)
 			}

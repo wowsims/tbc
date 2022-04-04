@@ -8,6 +8,8 @@ import (
 )
 
 func (priest *Priest) ApplyTalents() {
+	priest.registerInnerFocusAura()
+
 	if priest.Talents.Meditation > 0 {
 		priest.PseudoStats.SpiritRegenRateCasting = float64(priest.Talents.Meditation) * 0.1
 	}
@@ -139,28 +141,37 @@ func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.Sp
 	}
 }
 
-var InnerFocusAuraID = core.NewAuraID()
 var InnerFocusCooldownID = core.NewCooldownID()
+var InnerFocusActionID = core.ActionID{SpellID: 14751}
 
-func (priest *Priest) ApplyInnerFocus(sim *core.Simulation) {
-	actionID := core.ActionID{SpellID: 14751}
-	priest.Metrics.AddInstantCast(actionID)
-	priest.Character.AddAura(sim, core.Aura{
-		ID:       InnerFocusAuraID,
-		ActionID: actionID,
+func (priest *Priest) registerInnerFocusAura() {
+	if !priest.Talents.InnerFocus {
+		return
+	}
+
+	priest.InnerFocusAura = priest.GetOrRegisterAura(&core.Aura{
+		Label:    "Inner Focus",
+		ActionID: InnerFocusActionID,
 		Duration: core.NeverExpires,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			priest.AddStat(stats.SpellCrit, 25*core.SpellCritRatingPerCritChance)
 			priest.PseudoStats.NoCost = true
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			priest.AddStat(stats.SpellCrit, -25*core.SpellCritRatingPerCritChance)
 			priest.PseudoStats.NoCost = false
 		},
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// Remove the buff and put skill on CD
+			aura.Deactivate(sim)
 			priest.SetCD(InnerFocusCooldownID, sim.CurrentTime+time.Minute*3)
-			priest.RemoveAura(sim, InnerFocusAuraID)
 		},
 	})
+}
+
+func (priest *Priest) ApplyInnerFocus(sim *core.Simulation) {
+	if priest.InnerFocusAura != nil {
+		priest.InnerFocusAura.Activate(sim)
+		priest.Metrics.AddInstantCast(InnerFocusActionID)
+	}
 }

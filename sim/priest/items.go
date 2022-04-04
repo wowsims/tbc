@@ -29,19 +29,15 @@ var ItemSetIncarnate = core.ItemSet{
 	},
 }
 
-var Avatar2PcAuraID = core.NewAuraID()
-var Avatar4PcAuraID = core.NewAuraID()
-var SadistAuraID = core.NewAuraID()
-
 var ItemSetAvatar = core.ItemSet{
 	Name: "Avatar Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				return core.Aura{
-					ID: Avatar2PcAuraID,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Avatar Regalia 2pc",
+					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 						if sim.RandomFloat("avatar 2p") > 0.06 {
 							return
 						}
@@ -49,17 +45,19 @@ var ItemSetAvatar = core.ItemSet{
 						// easier than adding another aura the subtracts 150 mana from next cast.
 						character.AddMana(sim, 150, core.ActionID{SpellID: 37600}, false)
 					},
-				}
+				})
 			})
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				procAura := character.NewTemporaryStatsAura("Avatar Regalia 4pc Proc", core.ActionID{SpellID: 37604}, stats.Stats{stats.SpellPower: 100}, time.Second*15)
+				procAura.OnSpellHit = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+					aura.Deactivate(sim)
+				}
 
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				procFactory := character.NewTemporaryStatsAuraFactory(SadistAuraID, core.ActionID{SpellID: 37604}, stats.Stats{stats.SpellPower: 100}, time.Second*15)
-
-				return core.Aura{
-					ID: Avatar4PcAuraID,
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Avatar Regalia 4pc",
 					OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
 						if spell.ActionID.SpellID != SpellIDShadowWordPain {
 							return
@@ -69,13 +67,9 @@ var ItemSetAvatar = core.ItemSet{
 							return
 						}
 
-						procAura := procFactory(sim)
-						procAura.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-							character.RemoveAura(sim, SadistAuraID)
-						}
-						character.ReplaceAura(sim, procAura)
+						procAura.Activate(sim)
 					},
-				}
+				})
 			})
 		},
 	},
@@ -93,22 +87,17 @@ var ItemSetAbsolution = core.ItemSet{
 	},
 }
 
-var AshtongueTalismanOfAcumenItemAuraID = core.NewAuraID()
-var AshtongueTalismanOfAcumenAuraID = core.NewAuraID()
-
 func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
 	// Not in the game yet so cant test; this logic assumes that:
 	// - procrate is 10%
 	// - no ICD on proc
-	const spellBonus = 220
-	const dur = time.Second * 10
 	const procrate = 0.1
 
 	char := agent.GetCharacter()
-	char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		applyStatAura := char.NewTemporaryStatsAuraApplier(AshtongueTalismanOfAcumenAuraID, core.ActionID{ItemID: 32490}, stats.Stats{stats.SpellPower: spellBonus}, dur)
-		return core.Aura{
-			ID: AshtongueTalismanOfAcumenItemAuraID,
+	char.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := char.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32490}, stats.Stats{stats.SpellPower: 220}, time.Second*10)
+		return char.GetOrRegisterAura(&core.Aura{
+			Label: "Ashtongue Talisman",
 			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
 				if spell.ActionID.SpellID != SpellIDShadowWordPain {
 					return
@@ -118,8 +107,8 @@ func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
 					return
 				}
 
-				applyStatAura(sim)
+				procAura.Activate(sim)
 			},
-		}
+		})
 	})
 }

@@ -24,18 +24,20 @@ func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 
 	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
 
-	spell.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-		if !spellEffect.Landed() {
-			return
+	if mage.Talents.WintersChill > 0 {
+		wcAura := sim.GetPrimaryTarget().GetAura(core.WintersChillAuraLabel)
+		if wcAura == nil {
+			wcAura = core.WintersChillAura(sim.GetPrimaryTarget(), 0)
 		}
 
-		// Don't overwrite the permanent version.
-		if spellEffect.Target.RemainingAuraDuration(sim, core.WintersChillAuraID) == core.NeverExpires {
-			return
-		}
+		spell.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() {
+				return
+			}
 
-		newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.WintersChillAuraID)+1)
-		spellEffect.Target.AddAura(sim, core.WintersChillAura(spellEffect.Target, newNumStacks))
+			wcAura.Activate(sim)
+			wcAura.AddStack(sim)
+		}
 	}
 
 	mage.WintersChill = mage.RegisterSpell(core.SpellConfig{
@@ -44,8 +46,6 @@ func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 	})
 }
 
-var WintersChillAuraID = core.NewAuraID()
-
 func (mage *Mage) applyWintersChill() {
 	if mage.Talents.WintersChill == 0 {
 		return
@@ -53,10 +53,10 @@ func (mage *Mage) applyWintersChill() {
 
 	procChance := float64(mage.Talents.WintersChill) / 5.0
 
-	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: WintersChillAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+	mage.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		return mage.GetOrRegisterAura(&core.Aura{
+			Label: "Winters Chill Talent",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
@@ -69,6 +69,6 @@ func (mage *Mage) applyWintersChill() {
 					mage.WintersChill.Cast(sim, spellEffect.Target)
 				}
 			},
-		}
+		})
 	})
 }

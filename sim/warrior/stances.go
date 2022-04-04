@@ -22,11 +22,7 @@ func (warrior *Warrior) StanceMatches(other Stance) bool {
 var StanceCooldownID = core.NewCooldownID()
 var StanceCooldown = time.Second * 1
 
-var BattleStanceAuraID = core.NewAuraID()
-var DefensiveStanceAuraID = core.NewAuraID()
-var BerserkerStanceAuraID = core.NewAuraID()
-
-func (warrior *Warrior) makeCastStance(_ *core.Simulation, stance Stance, aura core.Aura) func(sim *core.Simulation) {
+func (warrior *Warrior) makeCastStance(sim *core.Simulation, stance Stance, aura *core.Aura) func(sim *core.Simulation) {
 	maxRetainedRage := 10.0 + 5*float64(warrior.Talents.TacticalMastery)
 
 	return func(sim *core.Simulation) {
@@ -43,72 +39,69 @@ func (warrior *Warrior) makeCastStance(_ *core.Simulation, stance Stance, aura c
 			warrior.SpendRage(sim, warrior.CurrentRage()-maxRetainedRage, aura.ActionID)
 		}
 
-		// Remove old stance aura.
-		if warrior.Stance == BattleStance {
-			warrior.RemoveAura(sim, BattleStanceAuraID)
-		} else if warrior.Stance == DefensiveStance {
-			warrior.RemoveAura(sim, DefensiveStanceAuraID)
-		} else {
-			warrior.RemoveAura(sim, BerserkerStanceAuraID)
-		}
-
 		// Add new stance aura.
-		warrior.AddAura(sim, aura)
+		aura.Activate(sim)
 		warrior.Stance = stance
 	}
 }
 
-func (warrior *Warrior) BattleStanceAura() core.Aura {
+func (warrior *Warrior) registerBattleStanceAura() {
 	actionID := core.ActionID{SpellID: 2457}
 	threatMult := 0.8
 
-	return core.Aura{
-		ID:       BattleStanceAuraID,
+	warrior.BattleStanceAura = warrior.GetOrRegisterAura(&core.Aura{
+		Label:    "Battle Stance",
+		Tag:      "Stance",
+		Priority: 1,
 		ActionID: actionID,
 		Duration: core.NeverExpires,
-		OnGain: func(sim *core.Simulation) {
-			warrior.PseudoStats.ThreatMultiplier *= threatMult
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.ThreatMultiplier *= threatMult
 		},
-		OnExpire: func(sim *core.Simulation) {
-			warrior.PseudoStats.ThreatMultiplier /= threatMult
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.ThreatMultiplier /= threatMult
 		},
-	}
+	})
 }
 
-func (warrior *Warrior) DefensiveStanceAura() core.Aura {
+func (warrior *Warrior) registerDefensiveStanceAura() {
 	actionID := core.ActionID{SpellID: 71}
 	threatMult := 1.3 * (1 + 0.05*float64(warrior.Talents.Defiance))
 
-	return core.Aura{
-		ID:       DefensiveStanceAuraID,
+	warrior.DefensiveStanceAura = warrior.GetOrRegisterAura(&core.Aura{
+		Label:    "Defensive Stance",
+		Tag:      "Stance",
+		Priority: 1,
 		ActionID: actionID,
 		Duration: core.NeverExpires,
-		OnGain: func(sim *core.Simulation) {
-			warrior.PseudoStats.ThreatMultiplier *= threatMult
-			warrior.PseudoStats.DamageDealtMultiplier *= 0.9
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.ThreatMultiplier *= threatMult
+			aura.Unit.PseudoStats.DamageDealtMultiplier *= 0.9
 		},
-		OnExpire: func(sim *core.Simulation) {
-			warrior.PseudoStats.ThreatMultiplier /= threatMult
-			warrior.PseudoStats.DamageDealtMultiplier /= 0.9
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.ThreatMultiplier /= threatMult
+			aura.Unit.PseudoStats.DamageDealtMultiplier /= 0.9
 		},
-	}
+	})
 }
 
-func (warrior *Warrior) BerserkerStanceAura() core.Aura {
+func (warrior *Warrior) registerBerserkerStanceAura() {
 	threatMult := 0.8 - 0.02*float64(warrior.Talents.ImprovedBerserkerStance)
 	critBonus := core.MeleeCritRatingPerCritChance * 3
 
-	return core.Aura{
-		ID:       BerserkerStanceAuraID,
+	warrior.BerserkerStanceAura = warrior.GetOrRegisterAura(&core.Aura{
+		Label:    "Berserker Stance",
+		Tag:      "Stance",
+		Priority: 1,
 		ActionID: core.ActionID{SpellID: 2458},
 		Duration: core.NeverExpires,
-		OnGain: func(sim *core.Simulation) {
-			warrior.PseudoStats.ThreatMultiplier *= threatMult
-			warrior.AddStat(stats.MeleeCrit, critBonus)
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.ThreatMultiplier *= threatMult
+			aura.Unit.AddStat(stats.MeleeCrit, critBonus)
 		},
-		OnExpire: func(sim *core.Simulation) {
-			warrior.PseudoStats.ThreatMultiplier /= threatMult
-			warrior.AddStat(stats.MeleeCrit, -critBonus)
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.ThreatMultiplier /= threatMult
+			aura.Unit.AddStat(stats.MeleeCrit, -critBonus)
 		},
-	}
+	})
 }

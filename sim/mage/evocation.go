@@ -24,7 +24,7 @@ func (mage *Mage) registerEvocationCD() {
 	}
 
 	castTime := time.Duration(numTicks) * time.Second * 2
-	manaGain := 0.0
+	manaPerTick := 0.0
 
 	template := core.SimpleCast{
 		Cast: core.Cast{
@@ -34,7 +34,16 @@ func (mage *Mage) registerEvocationCD() {
 			CastTime:  castTime,
 			GCD:       core.GCDDefault,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				mage.AddMana(sim, manaGain, actionID, true)
+				period := time.Second * 2
+				cast.ApplyCastTimeModifiers(&period)
+
+				core.StartPeriodicAction(sim, core.PeriodicActionOptions{
+					Period:   period,
+					NumTicks: int(numTicks),
+					OnAction: func(sim *core.Simulation) {
+						mage.AddMana(sim, manaPerTick, actionID, true)
+					},
+				})
 
 				// All MCDs that use the GCD and have a non-zero cast time must call this.
 				mage.UpdateMajorCooldowns()
@@ -52,7 +61,7 @@ func (mage *Mage) registerEvocationCD() {
 			return true
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if character.HasAura(core.InnervateAuraID) || character.HasAura(core.ManaTideTotemAuraID) {
+			if character.HasActiveAuraWithTag(core.InnervateAuraTag) || character.HasActiveAuraWithTag(core.ManaTideTotemAuraTag) {
 				return false
 			}
 
@@ -61,7 +70,7 @@ func (mage *Mage) registerEvocationCD() {
 				return false
 			}
 
-			if character.HasAura(core.BloodlustAuraID) && curMana > manaThreshold/2 {
+			if character.HasActiveAuraWithTag(core.BloodlustAuraTag) && curMana > manaThreshold/2 {
 				return false
 			}
 
@@ -72,7 +81,7 @@ func (mage *Mage) registerEvocationCD() {
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			manaGain = float64(numTicks) * mage.MaxMana() * 0.15
+			manaPerTick = mage.MaxMana() * 0.15
 			manaThreshold = mage.MaxMana() * 0.2
 
 			return func(sim *core.Simulation, character *core.Character) {

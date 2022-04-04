@@ -17,8 +17,6 @@ func init() {
 	core.AddItemSet(&ItemSetSpellfire)
 }
 
-var ManaEtchedAuraID = core.NewAuraID()
-var ManaEtchedInsightAuraID = core.NewAuraID()
 var ItemSetManaEtched = core.ItemSet{
 	Name: "Mana-Etched Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -27,19 +25,18 @@ var ItemSetManaEtched = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				const spellBonus = 110.0
-				const duration = time.Second * 15
-				applyStatAura := character.NewTemporaryStatsAuraApplier(ManaEtchedInsightAuraID, core.ActionID{SpellID: 37619}, stats.Stats{stats.SpellPower: spellBonus}, duration)
-				return core.Aura{
-					ID: ManaEtchedAuraID,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				procAura := character.NewTemporaryStatsAura("Mana-Etched Insight Proc", core.ActionID{SpellID: 37619}, stats.Stats{stats.SpellPower: 110}, time.Second*15)
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Mana-Etched Insight",
+					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 						if sim.RandomFloat("Mana-Etched Insight") > 0.02 {
 							return
 						}
-						applyStatAura(sim)
+						procAura.Activate(sim)
 					},
-				}
+				})
 			})
 		},
 	},
@@ -54,27 +51,23 @@ var ItemSetNetherstrike = core.ItemSet{
 	},
 }
 
-var SpellstrikeAuraID = core.NewAuraID()
-var SpellstrikeInfusionAuraID = core.NewAuraID()
 var ItemSetSpellstrike = core.ItemSet{
 	Name: "Spellstrike Infusion",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				const spellBonus = 92.0
-				const duration = time.Second * 10
-				applyStatAura := character.NewTemporaryStatsAuraApplier(SpellstrikeInfusionAuraID, core.ActionID{SpellID: 32106}, stats.Stats{stats.SpellPower: spellBonus}, duration)
 
-				return core.Aura{
-					ID: SpellstrikeAuraID,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				procAura := character.NewTemporaryStatsAura("Spellstrike Proc", core.ActionID{SpellID: 32106}, stats.Stats{stats.SpellPower: 92}, time.Second*10)
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Spellstrike",
+					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 						if sim.RandomFloat("spellstrike") > 0.05 {
 							return
 						}
-						applyStatAura(sim)
+						procAura.Activate(sim)
 					},
-				}
+				})
 			})
 		},
 	},

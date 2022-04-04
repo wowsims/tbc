@@ -10,23 +10,21 @@ import (
 var KillCommandCooldownID = core.NewCooldownID()
 var KillCommandActionID = core.ActionID{SpellID: 34026, CooldownID: KillCommandCooldownID}
 
-var KillCommandAuraID = core.NewAuraID()
-
 func (hunter *Hunter) applyKillCommand() {
 	if hunter.pet == nil {
 		return
 	}
 
-	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: KillCommandAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+	hunter.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		return hunter.GetOrRegisterAura(&core.Aura{
+			Label: "Kill Command Trigger",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					hunter.killCommandEnabledUntil = sim.CurrentTime + time.Second*5
 					hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
 				}
 			},
-		}
+		})
 	})
 }
 
@@ -63,8 +61,10 @@ func (hunter *Hunter) registerKillCommandSpell(sim *core.Simulation) {
 }
 
 func (hp *HunterPet) registerKillCommandSpell(sim *core.Simulation) {
-	hasBeastLord4Pc := ItemSetBeastLord.CharacterHasSetBonus(&hp.hunterOwner.Character, 4)
-	beastLordStatApplier := hp.hunterOwner.NewTemporaryStatsAuraApplier(BeastLord4PcAuraID, core.ActionID{SpellID: 37483}, stats.Stats{stats.ArmorPenetration: 600}, time.Second*15)
+	var beastLordProcAura *core.Aura
+	if ItemSetBeastLord.CharacterHasSetBonus(&hp.hunterOwner.Character, 4) {
+		beastLordProcAura = hp.hunterOwner.NewTemporaryStatsAura("Beast Lord Proc", core.ActionID{SpellID: 37483}, stats.Stats{stats.ArmorPenetration: 600}, time.Second*15)
+	}
 
 	ama := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -83,8 +83,8 @@ func (hp *HunterPet) registerKillCommandSpell(sim *core.Simulation) {
 			ThreatMultiplier:    1,
 			BaseDamage:          core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 127, 1, true),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if hasBeastLord4Pc {
-					beastLordStatApplier(sim)
+				if beastLordProcAura != nil {
+					beastLordProcAura.Activate(sim)
 				}
 			},
 		},

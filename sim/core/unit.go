@@ -96,10 +96,10 @@ func (unit *Unit) finalize() {
 }
 
 func (unit *Unit) reset(sim *Simulation) {
+	unit.Metrics.reset()
 	unit.stats = unit.initialStats
 	unit.PseudoStats = unit.initialPseudoStats
 	unit.auraTracker.reset(sim)
-	unit.Metrics.reset()
 	for _, spell := range unit.Spellbook {
 		spell.reset(sim)
 	}
@@ -110,12 +110,12 @@ func (unit *Unit) advance(sim *Simulation, elapsedTime time.Duration) {
 	unit.auraTracker.advance(sim)
 }
 
-func (unit *Unit) doneIteration(simDuration time.Duration) {
-	unit.auraTracker.doneIteration(simDuration)
+func (unit *Unit) doneIteration(sim *Simulation) {
+	unit.auraTracker.doneIteration(sim)
 	for _, spell := range unit.Spellbook {
 		spell.doneIteration()
 	}
-	unit.Metrics.doneIteration(simDuration.Seconds())
+	unit.Metrics.doneIteration(sim.Duration.Seconds())
 }
 
 // ArmorDamageReduction currently assumes a level 70 attacker

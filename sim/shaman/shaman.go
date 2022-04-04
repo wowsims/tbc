@@ -144,6 +144,10 @@ type Shaman struct {
 	SearingTotem  *core.Spell
 	MagmaTotem    *core.Spell
 	FireNovaTotem *core.Spell
+
+	ElementalMasteryAura *core.Aura
+	NaturesSwiftnessAura *core.Aura
+	ShamanisticFocusAura *core.Aura
 }
 
 // Implemented by each Shaman spec.

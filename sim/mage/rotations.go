@@ -35,10 +35,10 @@ func (mage *Mage) tryUseGCD(sim *core.Simulation) {
 		mage.tryingToDropStacks = false
 	}
 
-	numStacks := mage.NumStacks(ArcaneBlastAuraID)
+	numStacks := mage.ArcaneBlastAura.GetStacks()
 	if numStacks > 0 && sim.GetRemainingDuration() > time.Second*5 {
 		// Wait for AB stacks to drop.
-		waitTime := mage.RemainingAuraDuration(sim, ArcaneBlastAuraID) + time.Millisecond*100
+		waitTime := mage.ArcaneBlastAura.RemainingDuration(sim) + time.Millisecond*100
 		if sim.Log != nil {
 			mage.Log(sim, "Waiting for AB stacks to drop: %0.02f", waitTime.Seconds())
 		}
@@ -59,7 +59,7 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.Spell {
 	//mage.manaTracker.Update(sim, mage.GetCharacter())
 
 	// Create an AB object because we use its mana cost / cast time in many of our calculations.
-	numStacks := mage.NumStacks(ArcaneBlastAuraID)
+	numStacks := mage.ArcaneBlastAura.GetStacks()
 	abCastTime := mage.ArcaneBlastCastTime(numStacks)
 	abManaCost := mage.ArcaneBlastManaCost(numStacks)
 	willDropStacks := mage.willDropArcaneBlastStacks(sim, abCastTime, numStacks)
@@ -83,7 +83,7 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.Spell {
 	} else {
 		// Check if we should start regen rotation.
 		startThreshold := mage.ArcaneRotation.StartRegenRotationPercent
-		if mage.HasAura(core.BloodlustAuraID) {
+		if mage.HasActiveAuraWithTag(core.BloodlustAuraTag) {
 			startThreshold = core.MinFloat(0.1, startThreshold)
 		}
 
@@ -152,9 +152,7 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.Spell {
 }
 
 func (mage *Mage) doFireRotation(sim *core.Simulation) *core.Spell {
-	target := sim.GetPrimaryTarget()
-
-	if mage.FireRotation.MaintainImprovedScorch && (target.NumStacks(core.ImprovedScorchAuraID) < 5 || target.RemainingAuraDuration(sim, core.ImprovedScorchAuraID) < time.Millisecond*5500) {
+	if mage.FireRotation.MaintainImprovedScorch && mage.ScorchAura != nil && (mage.ScorchAura.GetStacks() < 5 || mage.ScorchAura.RemainingDuration(sim) < time.Millisecond*5500) {
 		return mage.Scorch
 	}
 

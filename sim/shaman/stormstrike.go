@@ -9,40 +9,32 @@ import (
 )
 
 var StormstrikeCD = core.NewCooldownID()
-var StormstrikeAuraID = core.NewAuraID()
 var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeCD}
-var SkyshatterAPBonusAuraID = core.NewAuraID()
 
-func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) core.Aura {
-	ssDebuffAura := core.Aura{
-		ID:       StormstrikeAuraID,
-		ActionID: StormstrikeActionID,
-		Duration: time.Second * 12,
-		Stacks:   2,
-		OnGain: func(sim *core.Simulation) {
+func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) *core.Aura {
+	return target.GetOrRegisterAura(&core.Aura{
+		Label:     "Stormstrike",
+		ActionID:  StormstrikeActionID,
+		Duration:  time.Second * 12,
+		MaxStacks: 2,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			target.PseudoStats.NatureDamageTakenMultiplier *= 1.2
+			aura.SetStacks(sim, 2)
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			target.PseudoStats.NatureDamageTakenMultiplier /= 1.2
 		},
-	}
-	ssDebuffAura.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-		if spell.SpellSchool != core.SpellSchoolNature {
-			return
-		}
-		if !spellEffect.Landed() || spellEffect.Damage == 0 {
-			return
-		}
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell.SpellSchool != core.SpellSchoolNature {
+				return
+			}
+			if !spellEffect.Landed() || spellEffect.Damage == 0 {
+				return
+			}
 
-		stacks := spellEffect.Target.NumStacks(StormstrikeAuraID) - 1
-		if stacks == 0 {
-			spellEffect.Target.RemoveAura(sim, StormstrikeAuraID)
-		} else {
-			ssDebuffAura.Stacks = stacks
-			spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
-		}
-	}
-	return ssDebuffAura
+			aura.RemoveStack(sim)
+		},
+	})
 }
 
 func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
@@ -90,8 +82,11 @@ func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
 func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 	ssDebuffAura := shaman.stormstrikeDebuffAura(sim.GetPrimaryTarget())
 
+	var skyshatterAura *core.Aura
 	hasSkyshatter4p := ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4)
-	skyshatterAuraApplier := shaman.NewTemporaryStatsAuraApplier(SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.Stats{stats.AttackPower: 70}, time.Second*12)
+	if hasSkyshatter4p {
+		skyshatterAura = shaman.NewTemporaryStatsAura("Skyshatter 4pc AP Bonus", core.ActionID{SpellID: 38432}, stats.Stats{stats.AttackPower: 70}, time.Second*12)
+	}
 
 	mhHit := shaman.newStormstrikeHitSpell(true)
 	ohHit := shaman.newStormstrikeHitSpell(false)
@@ -120,10 +115,11 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 					return
 				}
 
-				ssDebuffAura.Stacks = 2
-				spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
+				ssDebuffAura.Activate(sim)
+				ssDebuffAura.SetStacks(sim, 2)
+
 				if hasSkyshatter4p {
-					skyshatterAuraApplier(sim)
+					skyshatterAura.Activate(sim)
 				}
 
 				mhHit.Cast(sim, spellEffect.Target)

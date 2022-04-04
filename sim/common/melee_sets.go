@@ -33,8 +33,6 @@ var ItemSetBurningRage = core.ItemSet{
 	},
 }
 
-var DesolationBattlegearAuraID = core.NewAuraID()
-var DesolationBattlegearProcAuraID = core.NewAuraID()
 var ItemSetDesolationBattlegear = core.ItemSet{
 	Name: "Desolation Battlegear",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -43,18 +41,16 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				const apBonus = 160.0
-				const duration = time.Second * 15
-				const procChance = 0.01
-				applyStatAura := character.NewTemporaryStatsAuraApplier(DesolationBattlegearProcAuraID, core.ActionID{SpellID: 37617}, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus}, duration)
 
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				procAura := character.NewTemporaryStatsAura("Desolation Battlegear Proc", core.ActionID{SpellID: 37617}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*15)
 				icd := core.NewICD()
 				const icdDur = time.Second * 20
+				const procChance = 0.01
 
-				return core.Aura{
-					ID: DesolationBattlegearAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Desolation Battlegear",
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}
@@ -68,16 +64,14 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 							return
 						}
 						icd = core.InternalCD(sim.CurrentTime + icdDur)
-						applyStatAura(sim)
+						procAura.Activate(sim)
 					},
-				}
+				})
 			})
 		},
 	},
 }
 
-var DoomplateBattlegearAuraID = core.NewAuraID()
-var DoomplateBattlegearProcAuraID = core.NewAuraID()
 var ItemSetDoomplateBattlegear = core.ItemSet{
 	Name: "Doomplate Battlegear",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -86,15 +80,13 @@ var ItemSetDoomplateBattlegear = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				const apBonus = 160.0
-				const duration = time.Second * 15
-				const procChance = 0.02
-				applyStatAura := character.NewTemporaryStatsAuraApplier(DoomplateBattlegearProcAuraID, core.ActionID{SpellID: 37611}, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus}, duration)
 
-				return core.Aura{
-					ID: DoomplateBattlegearAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				procAura := character.NewTemporaryStatsAura("Doomplate Battlegear Proc", core.ActionID{SpellID: 37611}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*15)
+				const procChance = 0.02
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Doomplate Battlegear",
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}
@@ -104,9 +96,9 @@ var ItemSetDoomplateBattlegear = core.ItemSet{
 						if sim.RandomFloat("Doomplate Battlegear") > procChance {
 							return
 						}
-						applyStatAura(sim)
+						procAura.Activate(sim)
 					},
-				}
+				})
 			})
 		},
 	},
@@ -139,7 +131,6 @@ var ItemSetFelstalker = core.ItemSet{
 	},
 }
 
-var FistsOfFuryAuraID = core.NewAuraID()
 var ItemSetFistsOfFury = core.ItemSet{
 	Name: "The Fists of Fury",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -168,12 +159,12 @@ var ItemSetFistsOfFury = core.ItemSet{
 				ModifyCast: core.ModifyCastAssignTarget,
 			})
 
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 				ppmm := character.AutoAttacks.NewPPMManager(2)
 
-				return core.Aura{
-					ID: FistsOfFuryAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Fists of Fury",
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 							return
 						}
@@ -183,7 +174,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 
 						procSpell.Cast(sim, spellEffect.Target)
 					},
-				}
+				})
 			})
 		},
 	},
@@ -217,8 +208,6 @@ var ItemSetStrengthOfTheClefthoof = core.ItemSet{
 	},
 }
 
-var TwinBladesOfAzzinothAuraID = core.NewAuraID()
-var TwinBladesOfAzzinothProcAuraID = core.NewAuraID()
 var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 	Name: "The Twin Blades of Azzinoth",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -231,18 +220,16 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 				}
 			})
 
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				const hasteBonus = 450.0
-				const duration = time.Second * 10
-				applyStatAura := character.NewTemporaryStatsAuraApplier(TwinBladesOfAzzinothProcAuraID, core.ActionID{SpellID: 41435}, stats.Stats{stats.MeleeHaste: hasteBonus}, duration)
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				procAura := character.NewTemporaryStatsAura("Twin Blade of Azzinoth Proc", core.ActionID{SpellID: 41435}, stats.Stats{stats.MeleeHaste: 450}, time.Second*10)
 				ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
 				icd := core.NewICD()
 				const icdDur = time.Second * 45
 
-				return core.Aura{
-					ID: TwinBladesOfAzzinothAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Twin Blades of Azzinoth",
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}
@@ -260,16 +247,14 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 							return
 						}
 						icd = core.InternalCD(sim.CurrentTime + icdDur)
-						applyStatAura(sim)
+						procAura.Activate(sim)
 					},
-				}
+				})
 			})
 		},
 	},
 }
 
-var WastewalkerArmorAuraID = core.NewAuraID()
-var WastewalkerArmorProcAuraID = core.NewAuraID()
 var ItemSetWastewalkerArmor = core.ItemSet{
 	Name: "Wastewalker Armor",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -278,18 +263,16 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				const apBonus = 160.0
-				const duration = time.Second * 15
-				const procChance = 0.02
-				applyStatAura := character.NewTemporaryStatsAuraApplier(WastewalkerArmorProcAuraID, core.ActionID{SpellID: 37618}, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus}, duration)
 
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				procAura := character.NewTemporaryStatsAura("Wastewalker Armor Proc", core.ActionID{SpellID: 37618}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*15)
 				icd := core.NewICD()
 				const icdDur = time.Second * 20
+				const procChance = 0.02
 
-				return core.Aura{
-					ID: WastewalkerArmorAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Wastewalker Armor",
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
 							return
 						}
@@ -303,9 +286,9 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 							return
 						}
 						icd = core.InternalCD(sim.CurrentTime + icdDur)
-						applyStatAura(sim)
+						procAura.Activate(sim)
 					},
-				}
+				})
 			})
 		},
 	},

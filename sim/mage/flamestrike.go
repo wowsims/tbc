@@ -70,14 +70,13 @@ func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
 	})
 }
 
+var FlamestrikeDotActionID = core.ActionID{SpellID: SpellIDFlamestrike, Tag: CastTagFlamestrikeDot}
+
 func (mage *Mage) registerFlamestrikeDotSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID: SpellIDFlamestrike,
-					Tag:     CastTagFlamestrikeDot,
-				},
+				ActionID:    FlamestrikeDotActionID,
 				Character:   &mage.Character,
 				SpellSchool: core.SpellSchoolFire,
 				SpellExtras: SpellFlagMage | core.SpellExtrasAlwaysHits,

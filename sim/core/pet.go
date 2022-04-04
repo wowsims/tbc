@@ -103,8 +103,8 @@ func (pet *Pet) reset(sim *Simulation, agent Agent) {
 func (pet *Pet) advance(sim *Simulation, elapsedTime time.Duration) {
 	pet.Character.advance(sim, elapsedTime)
 }
-func (pet *Pet) doneIteration(simDuration time.Duration) {
-	pet.Character.doneIteration(simDuration)
+func (pet *Pet) doneIteration(sim *Simulation) {
+	pet.Character.doneIteration(sim)
 }
 
 func (pet *Pet) IsEnabled() bool {

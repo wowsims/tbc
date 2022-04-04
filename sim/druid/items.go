@@ -17,17 +17,15 @@ func init() {
 	core.AddItemSet(&ItemSetThunderheart)
 }
 
-var Malorne2PcAuraID = core.NewAuraID()
-
 var ItemSetMalorne = core.ItemSet{
 	Name: "Malorne Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				return core.Aura{
-					ID: Malorne2PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Malorne Raiment 2pc",
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 							return
 						}
@@ -39,7 +37,7 @@ var ItemSetMalorne = core.ItemSet{
 						}
 						spell.Character.AddMana(sim, 120, core.ActionID{SpellID: 37295}, false)
 					},
-				}
+				})
 			})
 		},
 		4: func(agent core.Agent) {
@@ -69,82 +67,67 @@ var ItemSetThunderheart = core.ItemSet{
 	},
 }
 
-var LivingRootoftheWildheartAuraID = core.NewAuraID()
-var LunarBlessingAuraID = core.NewAuraID()
-
 func ApplyLivingRootoftheWildheart(agent core.Agent) {
-	const spellBonus = 209
-	const dur = time.Second * 15
-
 	druidAgent := agent.(Agent)
 	druid := druidAgent.GetDruid()
-	druid.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		applyStatAura := agent.GetCharacter().NewTemporaryStatsAuraApplier(LunarBlessingAuraID, core.ActionID{ItemID: 30664}, stats.Stats{stats.SpellPower: spellBonus}, dur)
-		return core.Aura{
-			ID: LivingRootoftheWildheartAuraID,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+
+	druid.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := druid.NewTemporaryStatsAura("Living Root Proc", core.ActionID{ItemID: 30664}, stats.Stats{stats.SpellPower: 209}, time.Second*15)
+		return druid.GetOrRegisterAura(&core.Aura{
+			Label: "Living Root of the Wildheart",
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				// technically only works while in moonkin form... but i think we can assume thats always true.
 				if druid.Talents.MoonkinForm {
 					if sim.RandomFloat("Living Root of the Wildheart") > 0.03 {
 						return
 					}
-					applyStatAura(sim)
+					procAura.Activate(sim)
 				}
 			},
-		}
+		})
 	})
 }
 
-var IdoloftheUnseenMoonAuraID = core.NewAuraID()
-var LunarGraceAuraID = core.NewAuraID()
-
 func ApplyIdoloftheUnseenMoon(agent core.Agent) {
-	const spellBonus = 140
-	const dur = time.Second * 10
 	actionID := core.ActionID{ItemID: 33510}
 
 	druidAgent := agent.(Agent)
 	druid := druidAgent.GetDruid()
-	druid.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		applyStatAura := agent.GetCharacter().NewTemporaryStatsAuraApplier(LunarGraceAuraID, actionID, stats.Stats{stats.SpellPower: spellBonus}, dur)
-		return core.Aura{
-			ID: IdoloftheUnseenMoonAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+	druid.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := druid.NewTemporaryStatsAura("Idol of the Unseen Moon Proc", actionID, stats.Stats{stats.SpellPower: 140}, time.Second*10)
+		return druid.GetOrRegisterAura(&core.Aura{
+			Label: "Idol of the Unseen Moon",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spell.ActionID.SpellID == SpellIDMoonfire {
 					if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
 						return
 					}
-					applyStatAura(sim)
+					procAura.Activate(sim)
 				}
 			},
-		}
+		})
 	})
 }
-
-var AshtongueTalismanItemAuraID = core.NewAuraID()
-var AshtongueTalismanAuraID = core.NewAuraID()
 
 func ApplyAshtongueTalisman(agent core.Agent) {
 	// Not in the game yet so cant test; this logic assumes that:
 	// - does not affect the starfire which procs it
 	// - can proc off of any completed cast, not just hits
-	const spellBonus = 150
-	const dur = time.Second * 8
 	actionID := core.ActionID{ItemID: 32486}
 
 	char := agent.GetCharacter()
-	char.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		applyStatAura := agent.GetCharacter().NewTemporaryStatsAuraApplier(AshtongueTalismanAuraID, actionID, stats.Stats{stats.SpellPower: spellBonus}, dur)
-		return core.Aura{
-			ID: AshtongueTalismanItemAuraID,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+	char.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := char.NewTemporaryStatsAura("Ashtongue Talisman Proc", actionID, stats.Stats{stats.SpellPower: 150}, time.Second*8)
+		return char.GetOrRegisterAura(&core.Aura{
+			Label: "Ashtongue Talisman",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spell.ActionID.SpellID == SpellIDSF8 || spell.ActionID.SpellID == SpellIDSF6 {
 					if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
 						return
 					}
-					applyStatAura(sim)
+					procAura.Activate(sim)
 				}
 			},
-		}
+		})
 	})
 }

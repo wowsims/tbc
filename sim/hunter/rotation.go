@@ -18,7 +18,7 @@ const (
 )
 
 func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
-	if hunter.aspectOfTheViper {
+	if hunter.currentAspect == hunter.AspectOfTheViperAura {
 		// https://wowpedia.fandom.com/wiki/Aspect_of_the_Viper?oldid=1458832
 		percentMana := core.MaxFloat(0.2, core.MinFloat(0.9, hunter.CurrentManaPercent()))
 		scaling := 22.0/35.0*(0.9-percentMana) + 0.11
@@ -324,7 +324,7 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 
 	// First prio is swapping aspect if necessary.
 	currentMana := hunter.CurrentManaPercent()
-	if hunter.aspectOfTheViper && hunter.Rotation.ViperStartManaPercent < 1 {
+	if hunter.currentAspect == hunter.AspectOfTheViperAura && hunter.Rotation.ViperStartManaPercent < 1 {
 		if !hunter.permaHawk &&
 			hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
 			hunter.permaHawk = true
@@ -334,7 +334,7 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 			aspect.StartCast(sim)
 			return true
 		}
-	} else if !hunter.aspectOfTheViper && !hunter.permaHawk && currentMana < hunter.Rotation.ViperStartManaPercent {
+	} else if hunter.currentAspect != hunter.AspectOfTheViperAura && !hunter.permaHawk && currentMana < hunter.Rotation.ViperStartManaPercent {
 		if hunter.manaSpentPerSecondAtFirstAspectSwap == 0 {
 			hunter.manaSpentPerSecondAtFirstAspectSwap = (hunter.Metrics.ManaSpent - hunter.Metrics.ManaGained) / sim.CurrentTime.Seconds()
 		}
@@ -350,7 +350,7 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 
 	target := sim.GetPrimaryTarget()
 
-	if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !target.HasAura(ScorpidStingAuraID) {
+	if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !hunter.ScorpidStingAura.IsActive() {
 		success := hunter.ScorpidSting.Cast(sim, target)
 		if !success {
 			hunter.WaitForMana(sim, hunter.ScorpidSting.Instance.Cost.Value)

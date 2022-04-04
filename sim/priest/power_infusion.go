@@ -8,23 +8,19 @@ import (
 var PowerInfusionCooldownID = core.NewCooldownID()
 
 func (priest *Priest) registerPowerInfusionCD() {
-
 	if !priest.Talents.PowerInfusion {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 10060, CooldownID: PowerInfusionCooldownID, Tag: int32(priest.Index)}
-
-	baseManaCost := priest.BaseMana() * 0.16
-
-	powerInfusionCD := core.PowerInfusionCD
-
 	var powerInfusionTarget *core.Character
+	var powerInfusionAura *core.Aura
+	actionID := core.ActionID{SpellID: 10060, CooldownID: PowerInfusionCooldownID, Tag: int32(priest.Index)}
+	baseManaCost := priest.BaseMana() * 0.16
 
 	priest.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
 		CooldownID: PowerInfusionCooldownID,
-		Cooldown:   powerInfusionCD,
+		Cooldown:   core.PowerInfusionCD,
 		Priority:   core.CooldownPriorityBloodlust,
 		Type:       core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
@@ -37,13 +33,12 @@ func (priest *Priest) registerPowerInfusionCD() {
 			return true
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-
 			// How can we determine the target will be able to continue casting
 			// 	for the next 15s at 20% reduced mana cost? Arbitrary value until then.
 			//if powerInfusionTarget.CurrentMana() < 3000 {
 			//	return false
 			//}
-			if character.HasAura(core.BloodlustAuraID) {
+			if powerInfusionTarget.HasActiveAuraWithTag(core.BloodlustAuraTag) {
 				return false
 			}
 			return true
@@ -53,6 +48,7 @@ func (priest *Priest) registerPowerInfusionCD() {
 
 			if powerInfusionTargetAgent != nil {
 				powerInfusionTarget = powerInfusionTargetAgent.GetCharacter()
+				powerInfusionAura = core.PowerInfusionAura(powerInfusionTarget, actionID.Tag)
 			}
 
 			castTemplate := core.SimpleCast{
@@ -67,9 +63,9 @@ func (priest *Priest) registerPowerInfusionCD() {
 						Type:  stats.Mana,
 						Value: baseManaCost,
 					},
-					Cooldown: powerInfusionCD,
+					Cooldown: core.PowerInfusionCD,
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						core.AddPowerInfusionAura(sim, powerInfusionTarget, actionID.Tag)
+						powerInfusionAura.Activate(sim)
 					},
 				},
 			}

@@ -31,6 +31,10 @@ type Priest struct {
 
 	CurVTSpell  *core.Spell
 	NextVTSpell *core.Spell
+
+	InnerFocusAura    *core.Aura
+	MiseryAura        *core.Aura
+	ShadowWeavingAura *core.Aura
 }
 
 type SelfBuffs struct {
@@ -74,6 +78,13 @@ func (priest *Priest) Init(sim *core.Simulation) {
 		priest.newMindFlaySpell(sim, 1),
 		priest.newMindFlaySpell(sim, 2),
 		priest.newMindFlaySpell(sim, 3),
+	}
+
+	if priest.Talents.Misery > 0 {
+		priest.MiseryAura = core.MiseryAura(sim.GetPrimaryTarget(), priest.Talents.Misery)
+	}
+	if priest.Talents.ShadowWeaving > 0 {
+		priest.ShadowWeavingAura = core.ShadowWeavingAura(sim.GetPrimaryTarget(), 0)
 	}
 }
 
