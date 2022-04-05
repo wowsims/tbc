@@ -36,6 +36,9 @@ func (paladin *Paladin) setupSealOfBlood() {
 		},
 	}
 
+	// Apply 2 Handed Weapon Specialization talent
+	paladin.applyTwoHandedWeaponSpecializationToSpell(&sobProcTemplate.Effect)
+
 	sobProc := paladin.RegisterSpell(core.SpellConfig{
 		Template:   sobProcTemplate,
 		ModifyCast: core.ModifyCastAssignTarget,
@@ -52,12 +55,12 @@ func (paladin *Paladin) setupSealOfBlood() {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
 				return
 			}
-
 			sobProc.Cast(sim, spellEffect.Target)
 		},
 	})
 
 	manaCost := 210 * (1 - 0.03*float64(paladin.Talents.Benediction))
+
 	sob := core.SimpleCast{
 		Cast: core.Cast{
 			ActionID:  SealOfBloodCastActionID,
@@ -89,7 +92,7 @@ func (paladin *Paladin) NewSealOfBlood(sim *core.Simulation) *core.SimpleCast {
 var SealOfCommandCastActionID = core.ActionID{SpellID: 20375}
 var SealOfCommandProcActionID = core.ActionID{SpellID: 20424}
 
-func (paladin *Paladin) setupSealOfCommand() {
+func (paladin *Paladin) SetupSealOfCommand() {
 	socProcTemplate := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -100,12 +103,16 @@ func (paladin *Paladin) setupSealOfCommand() {
 		},
 		Effect: core.SpellEffect{
 			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
+			ProcMask:            core.ProcMaskMeleeMHSpecial,
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 			DamageMultiplier:    1,
 			ThreatMultiplier:    1,
 		},
 	}
+
+	// Apply 2 Handed Weapon Specialization talent
+	paladin.applyTwoHandedWeaponSpecializationToSpell(&socProcTemplate.Effect)
 
 	weaponBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 0.7, false)
 	socProcTemplate.Effect.BaseDamage = core.BaseDamageConfig{
@@ -121,9 +128,6 @@ func (paladin *Paladin) setupSealOfCommand() {
 	})
 
 	ppmm := paladin.AutoAttacks.NewPPMManager(7.0)
-
-	// I might not be implementing the ICD correctly here, should debug later
-	var icd core.InternalCD
 	const icdDur = time.Second * 1
 
 	paladin.SealOfCommandAura = paladin.RegisterAura(&core.Aura{
@@ -132,11 +136,11 @@ func (paladin *Paladin) setupSealOfCommand() {
 		ActionID: SealOfCommandProcActionID,
 		Duration: SealDuration,
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) || spellEffect.IsPhantom {
 				return
 			}
 
-			if icd.IsOnCD(sim) {
+			if paladin.sealOfCommandICD.IsOnCD(sim) {
 				return
 			}
 
@@ -144,7 +148,7 @@ func (paladin *Paladin) setupSealOfCommand() {
 				return
 			}
 
-			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			paladin.sealOfCommandICD = core.InternalCD(sim.CurrentTime + icdDur)
 
 			socProc.Cast(sim, spellEffect.Target)
 		},
@@ -180,6 +184,8 @@ func (paladin *Paladin) NewSealOfCommand(sim *core.Simulation) *core.SimpleCast 
 }
 
 var SealOfTheCrusaderActionID = core.ActionID{SpellID: 27158}
+
+// TODO: Make a universal setup seals function
 
 // Seal of the crusader has a bunch of effects that we realistically don't care about (bonus AP, faster swing speed)
 // For now, we'll just use it as a setup to casting Judgement of the Crusader

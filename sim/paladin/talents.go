@@ -31,6 +31,7 @@ func (paladin *Paladin) applyCrusade() {
 
 	damageMultiplier := 1 + (0.01 * float64(paladin.Talents.Crusade)) // assume multiplicative scaling
 
+	// TO-DO: This doesn't account for multiple targets
 	paladin.RegisterResetEffect(func(sim *core.Simulation) {
 		switch sim.GetPrimaryTarget().MobType {
 		case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeDemon, proto.MobType_MobTypeUndead, proto.MobType_MobTypeElemental:
@@ -46,14 +47,21 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
 		return
 	}
 
+	// This impacts Crusader Strike, Melee Attacks, WF attacks
+	// Seals + Judgements need to be implemented separately
 	if paladin.GetMHWeapon().HandType == proto.HandType_HandTypeTwoHand {
 		paladin.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization)) // assume multiplicative scaling
-		// TODO: Might need to additionally apply this to non-physical spells directly.
+	}
+}
+
+func (paladin *Paladin) applyTwoHandedWeaponSpecializationToSpell(spellEffect *core.SpellEffect) {
+	if paladin.GetMHWeapon().HandType == proto.HandType_HandTypeTwoHand {
+		spellEffect.DamageMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization))
 	}
 }
 
 // Apply as permanent aura only to self for now
-// Maybe should put this in the partybuff section instead at some point
+// TO-DO: Maybe should put this in the partybuff section instead at some point
 func (paladin *Paladin) applySanctityAura() {
 	if paladin.Talents.SanctityAura {
 		paladin.AddPermanentAura(func(sim *core.Simulation) *core.Aura {

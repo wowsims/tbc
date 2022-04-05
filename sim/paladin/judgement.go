@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -19,9 +20,20 @@ func (paladin *Paladin) canJudgement(sim *core.Simulation) bool {
 var JudgementCD = core.NewCooldownID()
 var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: JudgementCD}
 
-// refactored Judgement of Blood as an ActiveMeleeAbility which is most similar to actual behavior with a typical ret build
-// but still has a few differences (differences are: does not scale off spell power, cannot be partially resisted, can be missed or dodged)
+var LibramOfAvengementActionID = core.ActionID{SpellID: 34260}
+
 func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
+	loaIsEquipped := paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27484
+
+	var loaAura *core.Aura
+	if loaIsEquipped {
+		loaAura = paladin.NewTemporaryStatsAura(
+			"Libram of Avengement",
+			LibramOfAvengementActionID,
+			stats.Stats{stats.MeleeCrit: 53},
+			time.Second*5)
+	}
+
 	job := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
@@ -36,15 +48,22 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
 			CritRollCategory:    core.CritRollCategoryPhysical,
 			ProcMask:            core.ProcMaskMeleeOrRangedSpecial,
-			DamageMultiplier:    1, // Need to review to make sure I set these properly
+			DamageMultiplier:    1,
 			ThreatMultiplier:    1,
 			BaseDamage:          core.BaseDamageConfigMagic(295, 325, 0.429),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
 				paladin.SealOfBloodAura.Deactivate(sim)
+				if loaAura != nil {
+					loaAura.Activate(sim)
+				}
 			},
 		},
 	}
+
+	// Apply 2 Handed Weapon Specialization talent
+	paladin.applyTwoHandedWeaponSpecializationToSpell(&job.Effect)
+
 	// Reduce mana cost if we have Benediction Talent
 	job.Cost = core.ResourceCost{
 		Type:  stats.Mana,
