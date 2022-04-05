@@ -323,7 +323,7 @@ func (hunter *Hunter) applyGoForTheThroat() {
 	aura := hunter.RegisterAura(&core.Aura{
 		Label: "Go for the Throat",
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskRanged) || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				return
 			}
 			if !hunter.pet.IsEnabled() {
@@ -400,7 +400,7 @@ func (hunter *Hunter) applyExposeWeakness() {
 		return hunter.GetOrRegisterAura(&core.Aura{
 			Label: "Expose Weakness Talent",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
+				if !spellEffect.ProcMask.Matches(core.ProcMaskRanged) {
 					return
 				}
 
@@ -441,7 +441,7 @@ func (hunter *Hunter) applyMasterTactician() {
 		return hunter.GetOrRegisterAura(&core.Aura{
 			Label: "Master Tactician",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) || !spellEffect.Landed() {
+				if !spellEffect.ProcMask.Matches(core.ProcMaskRanged) || !spellEffect.Landed() {
 					return
 				}
 

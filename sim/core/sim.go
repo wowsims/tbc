@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"math/rand"
 	"runtime"
 	"strings"
 	"time"
@@ -20,11 +19,11 @@ type Simulation struct {
 	DurationVariation time.Duration // variation per duration
 	Duration          time.Duration // Duration of current iteration
 
-	rand *rand.Rand
+	rand Rand
 
 	// Used for testing only, see RandomFloat().
 	isTest    bool
-	testRands map[string]*rand.Rand
+	testRands map[string]Rand
 
 	// Current Simulation State
 	pendingActions    []*PendingAction
@@ -73,10 +72,10 @@ func NewSim(rsr proto.RaidSimRequest) *Simulation {
 		DurationVariation: encounter.DurationVariation,
 		Log:               nil,
 
-		rand: rand.New(rand.NewSource(rseed)),
+		rand: NewSplitMix(uint64(rseed)),
 
 		isTest:    simOptions.IsTest,
-		testRands: make(map[string]*rand.Rand),
+		testRands: make(map[string]Rand),
 
 		pendingActionPool: newPAPool(),
 	}
@@ -90,15 +89,15 @@ func NewSim(rsr proto.RaidSimRequest) *Simulation {
 // distinguished by the label string.
 func (sim *Simulation) RandomFloat(label string) float64 {
 	if !sim.isTest {
-		return sim.rand.Float64()
+		return sim.rand.NextFloat64()
 	}
 
 	labelRand, isPresent := sim.testRands[label]
 	if !isPresent {
-		labelRand = rand.New(rand.NewSource(int64(hash(label))))
+		labelRand = NewSplitMix(uint64(hash(label)))
 		sim.testRands[label] = labelRand
 	}
-	v := labelRand.Float64()
+	v := labelRand.NextFloat64()
 	// if sim.Log != nil {
 	// 	sim.Log("FLOAT64 '%s': %0.5f", label, v)
 	// }

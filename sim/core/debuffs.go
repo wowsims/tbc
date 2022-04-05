@@ -422,7 +422,7 @@ func HuntersMarkAura(target *Target, points int32, fullyStacked bool) *Aura {
 			aura.Unit.PseudoStats.BonusRangedAttackPower += bonusPerStack * float64(newStacks-oldStacks)
 		},
 		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
-			if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) && spellEffect.Landed() {
+			if spellEffect.ProcMask.Matches(ProcMaskRanged) && spellEffect.Landed() {
 				aura.AddStack(sim)
 			}
 		},
