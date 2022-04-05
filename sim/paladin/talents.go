@@ -47,8 +47,16 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
 		return
 	}
 
+	// This impacts Crusader Strike, Melee Attacks, WF attacks
+	// Seals + Judgements need to be implemented separately
 	if paladin.GetMHWeapon().HandType == proto.HandType_HandTypeTwoHand {
 		paladin.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization)) // assume multiplicative scaling
+	}
+}
+
+func (paladin *Paladin) applyTwoHandedWeaponSpecializationToSpell(spellEffect *core.SpellEffect) {
+	if paladin.GetMHWeapon().HandType == proto.HandType_HandTypeTwoHand {
+		spellEffect.DamageMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization))
 	}
 }
 

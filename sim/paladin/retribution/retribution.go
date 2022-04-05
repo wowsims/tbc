@@ -156,22 +156,25 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	nextCrusaderStrikeCD := ret.CDReadyAt(paladin.CrusaderStrikeCD)
 	judgementCD := ret.GetRemainingCD(paladin.JudgementCD, sim.CurrentTime)
 
+	sobActive := ret.HasActiveAura(ret.SealOfBloodAura.Label)
+	socActive := ret.HasActiveAura(ret.SealOfCommandAura.Label)
+
 	nextSwingAt := ret.AutoAttacks.NextAttackAt()
 	timeTilNextSwing := nextSwingAt - sim.CurrentTime
+	//weaponSpeed := ret.AutoAttacks.MainhandSwingSpeed()
 
 	spellGCD := ret.SpellGCD()
 
-	possibleTwist := timeTilNextSwing > spellGCD+gcdCD
-	willTwist := possibleTwist && (nextSwingAt+spellGCD <= nextCrusaderStrikeCD+ret.crusaderStrikeDelay)
 	inTwistWindow := (sim.CurrentTime >= nextSwingAt-twistWindow) && (sim.CurrentTime < ret.AutoAttacks.NextAttackAt())
 	latestTwistStart := nextSwingAt - spellGCD
+	possibleTwist := timeTilNextSwing > spellGCD+gcdCD
+	willTwist := possibleTwist && (nextSwingAt+spellGCD <= nextCrusaderStrikeCD+ret.crusaderStrikeDelay)
 
-	sobActive := ret.SealOfBloodAura.RemainingDuration(sim) > 0
-	socActive := ret.SealOfCommandAura.RemainingDuration(sim) > 0
-
-	// Use Judgement if we will twist
-	if judgementCD == 0 && willTwist && sobActive {
+	// Use Judgement if we will prep Seal of Command
+	// Or if we can squeeze it in on a Crusader Strike Swing
+	if judgementCD == 0 && sobActive && willTwist {
 		ret.JudgementOfBlood.Cast(sim, target)
+		sobActive = false
 	}
 
 	// Judgement can affect active seals and CDs
@@ -233,8 +236,8 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	sim.AddPendingAction(pa)
 }
 
-func (ret *RetributionPaladin) useFillers(sim *core.Simulation) {
-	return
+func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Target, sobActive bool) {
+
 }
 
 // Once filler moves are implemented, experiment with various mana settings

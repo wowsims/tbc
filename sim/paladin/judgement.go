@@ -63,6 +63,10 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 			},
 		},
 	}
+
+	// Apply 2 Handed Weapon Specialization talent
+	paladin.applyTwoHandedWeaponSpecializationToSpell(&job.Effect)
+
 	// Reduce mana cost if we have Benediction Talent
 	job.Cost = core.ResourceCost{
 		Type:  stats.Mana,

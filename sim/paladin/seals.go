@@ -36,6 +36,9 @@ func (paladin *Paladin) setupSealOfBlood() {
 		},
 	}
 
+	// Apply 2 Handed Weapon Specialization talent
+	paladin.applyTwoHandedWeaponSpecializationToSpell(&sobProcTemplate.Effect)
+
 	sobProc := paladin.RegisterSpell(core.SpellConfig{
 		Template:   sobProcTemplate,
 		ModifyCast: core.ModifyCastAssignTarget,
@@ -108,6 +111,9 @@ func (paladin *Paladin) SetupSealOfCommand() {
 		},
 	}
 
+	// Apply 2 Handed Weapon Specialization talent
+	paladin.applyTwoHandedWeaponSpecializationToSpell(&socProcTemplate.Effect)
+
 	weaponBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 0.7, false)
 	socProcTemplate.Effect.BaseDamage = core.BaseDamageConfig{
 		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
@@ -130,7 +136,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 		ActionID: SealOfCommandProcActionID,
 		Duration: SealDuration,
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) || spellEffect.IsPhantom {
 				return
 			}
 
