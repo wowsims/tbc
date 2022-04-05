@@ -46,13 +46,10 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 	spellCoefficient += 0.02 * float64(druid.Talents.WrathOfCenarius)
 
 	effect := core.SpellEffect{
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
-
 		BonusSpellCritRating: float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance, // 2% crit per point
 		DamageMultiplier:     1 + 0.02*float64(druid.Talents.Moonfury),
 		ThreatMultiplier:     1,
+		CritMultiplier:       druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
 
 		BaseDamage: core.BaseDamageConfigMagic(383+bonusFlatDamage, 432+bonusFlatDamage, spellCoefficient),
 		OnSpellHit: druid.applyOnHitTalents,
@@ -65,6 +62,6 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 			druid.applyNaturesGrace(&instance.SpellCast)
 			druid.applyNaturesSwiftness(&instance.SpellCast)
 		},
-		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect, core.OutcomeFuncMagic()),
 	})
 }

@@ -317,11 +317,11 @@ func ApplyEffectFuncAll(effectFuncs []ApplySpellEffects) ApplySpellEffects {
 	}
 }
 
-func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
+func ApplyEffectFuncDirectDamage(baseEffect SpellEffect, outcomeDeterminer OutcomeDeterminer) ApplySpellEffects {
 	return func(sim *Simulation, target *Target, spell *Spell) {
 		effect := baseEffect
 		effect.Target = target
-		effect.determineOutcome(sim, spell, false)
+		effect.Outcome = outcomeDeterminer(sim, spell, &effect)
 
 		if effect.Landed() {
 			effect.directCalculations(sim, spell)

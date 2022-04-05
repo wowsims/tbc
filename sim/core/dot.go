@@ -213,3 +213,37 @@ func (unit *Unit) NewDotAura(auraLabel string, actionID ActionID) *Aura {
 		Duration: NeverExpires,
 	})
 }
+
+type DotConfig struct {
+	Spell *Spell
+	Label string // Label for the aura.
+
+	TickOutcome    OutcomeDeterminer
+	TickBaseDamage BaseDamageCalculator
+	NumberOfTicks  int           // number of ticks over the whole duration
+	TickLength     time.Duration // time between each tick
+
+	// If true, tick length will be shortened based on casting speed.
+	AffectedByCastSpeed bool
+}
+
+type Dot struct {
+	Spell *Spell
+	Aura *Aura
+
+	tickAction *PendingAction
+}
+
+func NewDot(config DotConfig) *Dot {
+	aura :=
+	return target.GetOrRegisterAura(&Aura{
+		Label:     "HuntersMark-" + strconv.Itoa(int(points)),
+		Tag:       "HuntersMark",
+		ActionID:  ActionID{SpellID: 14325},
+		Duration:  NeverExpires,
+		OnGain: func(aura *Aura, sim *Simulation) {
+		},
+		OnExpire: func(aura *Aura, sim *Simulation) {
+		},
+	})
+}
