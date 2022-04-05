@@ -221,8 +221,9 @@ func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 		procAura := character.NewTemporaryStatsAura("Ashtongue Talisman of Vision Proc", core.ActionID{ItemID: 32491}, stats.Stats{stats.AttackPower: 275}, time.Second*10)
 		return character.GetOrRegisterAura(&core.Aura{
 			Label: "Ashtongue Talisman of Vision",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, ability *core.Cast) {
-				if !ability.SameAction(StormstrikeActionID) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+				// Cooldown != 0 makes sure this is the first 'fake' hit of SS.
+				if !cast.SameAction(StormstrikeActionID) || cast.Cooldown == 0 {
 					return
 				}
 				if sim.RandomFloat("Ashtongue Talisman of Vision") > 0.5 {
