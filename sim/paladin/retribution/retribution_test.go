@@ -17,11 +17,11 @@ func TestRetribution(t *testing.T) {
 		Class: proto.Class_ClassPaladin,
 
 		Race:       proto.Race_RaceBloodElf,
-		OtherRaces: []proto.Race{proto.Race_RaceHuman, proto.Race_RaceDraenei, proto.Race_RaceDwarf}, // To-do deal with tests for other races
+		OtherRaces: []proto.Race{proto.Race_RaceHuman, proto.Race_RaceDraenei, proto.Race_RaceDwarf},
 
-		GearSet: core.GearSetCombo{Label: "P2", GearSet: Phase2Gear},
+		GearSet: core.GearSetCombo{Label: "P4", GearSet: Phase4Gear},
 
-		SpecOptions: core.SpecOptionsCombo{Label: "Retribution Paladin", SpecOptions: PlayerOptionsBasic},
+		SpecOptions: core.SpecOptionsCombo{Label: "Retribution Paladin", SpecOptions: DefaultOptions},
 
 		RaidBuffs:   FullRaidBuffs,
 		PartyBuffs:  FullPartyBuffs,
@@ -45,26 +45,26 @@ func TestRetribution(t *testing.T) {
 }
 
 func BenchmarkSimulate(b *testing.B) {
-	// rsr := &proto.RaidSimRequest{
-	// 	Raid: core.SinglePlayerRaidProto(
-	// 		&proto.Player{
-	// 			Race:      proto.Race_RaceOrc,
-	// 			Class:     proto.Class_ClassShaman,
-	// 			Equipment: Phase2Gear,
-	// 			Consumes:  FullConsumes,
-	// 			Spec:      PlayerOptionsBasic,
-	// 			Buffs:     FullIndividualBuffs,
-	// 		},
-	// 		FullPartyBuffs,
-	// 		FullRaidBuffs),
-	// 	Encounter: &proto.Encounter{
-	// 		Duration: 300,
-	// 		Targets: []*proto.Target{
-	// 			FullDebuffTarget,
-	// 		},
-	// 	},
-	// 	SimOptions: core.AverageDefaultSimTestOptions,
-	// }
+	rsr := &proto.RaidSimRequest{
+		Raid: core.SinglePlayerRaidProto(
+			&proto.Player{
+				Race:      proto.Race_RaceBloodElf,
+				Class:     proto.Class_ClassPaladin,
+				Equipment: Phase4Gear,
+				Consumes:  FullConsumes,
+				Spec:      DefaultOptions,
+				Buffs:     FullIndividualBuffs,
+			},
+			FullPartyBuffs,
+			FullRaidBuffs),
+		Encounter: &proto.Encounter{
+			Duration: 300,
+			Targets: []*proto.Target{
+				FullDebuffTarget,
+			},
+		},
+		SimOptions: core.AverageDefaultSimTestOptions,
+	}
 
-	// core.RaidBenchmark(b, rsr)
+	core.RaidBenchmark(b, rsr)
 }

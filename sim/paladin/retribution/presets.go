@@ -5,165 +5,178 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var BasicRaidBuffs = &proto.RaidBuffs{}
-var BasicPartyBuffs = &proto.PartyBuffs{}
-var BasicIndividualBuffs = &proto.IndividualBuffs{
-	BlessingOfKings: true,
+var defaultRetTalents = &proto.PaladinTalents{
+	Benediction:                   5,
+	ImprovedSealOfTheCrusader:     3,
+	ImprovedJudgement:             2,
+	Conviction:                    5,
+	SealOfCommand:                 true,
+	Crusade:                       3,
+	SanctityAura:                  true,
+	TwoHandedWeaponSpecialization: 3,
+	ImprovedSanctityAura:          2,
+	Vengeance:                     5,
+	SanctifiedJudgement:           2,
+	SanctifiedSeals:               3,
+	Fanaticism:                    5,
+	CrusaderStrike:                true,
+	Precision:                     3,
+	DivineStrength:                5,
 }
 
-// Need to create a standard Retribution talents
-var StandardTalents = &proto.PaladinTalents{
-	Benediction:               5,
-	ImprovedSealOfTheCrusader: 3,
-	ImprovedJudgement:         2,
-	Conviction:                5,
-	SealOfCommand:             true,
-	Crusade:                   3,
-	SanctityAura:              true,
-	ImprovedSanctityAura:      2,
-	Vengeance:                 5,
-	SanctifiedJudgement:       2,
-	SanctifiedSeals:           0,
-	Fanaticism:                5,
-	CrusaderStrike:            true,
-	Precision:                 3,
-	DivineStrength:            5,
+var defaultRetRotation = &proto.RetributionPaladin_Rotation{
+	ConsecrationRank: proto.RetributionPaladin_Rotation_None,
+	UseExorcism:      false,
 }
 
-var PlayerOptionsBasic = &proto.Player_RetributionPaladin{
+var defaultRetOptions = &proto.RetributionPaladin_Options{
+	Judgement:             proto.RetributionPaladin_Options_Crusader,
+	CrusaderStrikeDelayMs: 1700,
+	HasteLeewayMs:         100,
+	DamageTakenPerSecond:  0,
+}
+
+var DefaultOptions = &proto.Player_RetributionPaladin{
 	RetributionPaladin: &proto.RetributionPaladin{
-		Talents:  StandardTalents,
-		Options:  retPalOptions,
-		Rotation: retPalRotation,
+		Talents:  defaultRetTalents,
+		Options:  defaultRetOptions,
+		Rotation: defaultRetRotation,
 	},
 }
-
-var retPalRotation = &proto.RetributionPaladin_Rotation{}
-
-var retPalOptions = &proto.RetributionPaladin_Options{}
 
 var FullRaidBuffs = &proto.RaidBuffs{
 	ArcaneBrilliance: true,
 	GiftOfTheWild:    proto.TristateEffect_TristateEffectImproved,
+	DivineSpirit:     proto.TristateEffect_TristateEffectImproved,
 }
 
 var FullPartyBuffs = &proto.PartyBuffs{
-	FerociousInspiration: 2,
+	Bloodlust:            1,
+	Drums:                proto.Drums_DrumsOfBattle,
+	BraidedEterniumChain: true,
+	ManaSpringTotem:      proto.TristateEffect_TristateEffectRegular,
+	StrengthOfEarthTotem: proto.StrengthOfEarthType_EnhancingTotems,
+	WindfuryTotemRank:    5,
 	BattleShout:          proto.TristateEffect_TristateEffectImproved,
-	LeaderOfThePack:      proto.TristateEffect_TristateEffectImproved,
-	SanctityAura:         proto.TristateEffect_TristateEffectImproved,
-	TrueshotAura:         true,
+	WindfuryTotemIwt:     2,
 }
 
 var FullIndividualBuffs = &proto.IndividualBuffs{
-	BlessingOfKings:  true,
-	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
-	BlessingOfMight:  proto.TristateEffect_TristateEffectImproved,
+	BlessingOfKings:     true,
+	BlessingOfMight:     proto.TristateEffect_TristateEffectImproved,
+	BlessingOfSalvation: true,
+	UnleashedRage:       true,
 }
 
 var FullConsumes = &proto.Consumes{
 	Flask:           proto.Flask_FlaskOfRelentlessAssault,
 	DefaultPotion:   proto.Potions_HastePotion,
-	SuperSapper:     true,
-	GoblinSapper:    true,
-	FillerExplosive: proto.Explosive_ExplosiveFelIronBomb,
+	DefaultConjured: proto.Conjured_ConjuredDarkRune,
+	Food:            proto.Food_FoodRoastedClefthoof,
 }
 
 var NoDebuffTarget = &proto.Target{
 	Debuffs: &proto.Debuffs{},
-	Armor:   6700,
+	Armor:   7700,
 }
 
 var FullDebuffs = &proto.Debuffs{
+	JudgementOfWisdom:           true,
+	Misery:                      true,
+	CurseOfElements:             proto.TristateEffect_TristateEffectImproved,
+	IsbUptime:                   1,
 	BloodFrenzy:                 true,
 	ExposeArmor:                 proto.TristateEffect_TristateEffectImproved,
 	FaerieFire:                  proto.TristateEffect_TristateEffectImproved,
-	ImprovedSealOfTheCrusader:   true,
-	JudgementOfWisdom:           true,
-	Misery:                      true,
-	ExposeWeaknessUptime:        0.8,
+	CurseOfRecklessness:         true,
+	HuntersMark:                 proto.TristateEffect_TristateEffectImproved,
+	ExposeWeaknessUptime:        1,
 	ExposeWeaknessHunterAgility: 800,
 }
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: FullDebuffs,
-	Armor:   7684,
+	Armor:   7700,
 }
 
-var Phase2Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+var Phase4Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{
-		Name:    "Cataclysm Helm",
+		Name:    "Cursed Vision of Sargeras",
 		Enchant: "Glyph of Ferocity",
 		Gems: []string{
 			"Relentless Earthstorm Diamond",
-			"Bold Living Ruby",
+			"Bold Crimson Spinel",
 		},
 	},
 	{
-		Name: "Telonicus's Pendant of Mayhem",
+		Name: "Pendant of the Perilous",
 	},
 	{
 		Name:    "Shoulderpads of the Stranger",
 		Enchant: "Greater Inscription of Vengeance",
 		Gems: []string{
-			"Bold Living Ruby",
+			"Bold Crimson Spinel",
 		},
 	},
 	{
-		Name: "Thalassian Wildercloak",
+		Name:    "Cloak of Fiends",
+		Enchant: "Enchant Cloak - Greater Agility",
 	},
 	{
-		Name:    "Cataclysm Chestplate",
+		Name:    "Midnight Chestguard",
 		Enchant: "Chest - Exceptional Stats",
 		Gems: []string{
-			"Bold Living Ruby",
-			"Sovereign Nightseye",
-			"Inscribed Noble Topaz",
+			"Bold Crimson Spinel",
+			"Sovereign Shadowsong Amethyst",
+			"Inscribed Pyrestone",
 		},
 	},
 	{
-		Name:    "True-Aim Stalker Bands",
+		Name:    "Bindings of Lightning Reflexes",
 		Enchant: "Bracer - Brawn",
-		Gems: []string{
-			"Bold Living Ruby",
-		},
 	},
 	{
-		Name:    "Cataclysm Gauntlets",
+		Name:    "Gloves of the Searing Grip",
 		Enchant: "Gloves - Major Strength",
 	},
 	{
 		Name: "Belt of One-Hundred Deaths",
 		Gems: []string{
-			"Bold Living Ruby",
-			"Sovereign Nightseye",
+			"Bold Crimson Spinel",
+			"Sovereign Shadowsong Amethyst",
 		},
 	},
 	{
-		Name:    "Cataclysm Legplates",
+		Name:    "Bow-stitched Leggings",
 		Enchant: "Nethercobra Leg Armor",
 		Gems: []string{
-			"Bold Living Ruby",
+			"Bold Crimson Spinel",
+			"Bold Crimson Spinel",
+			"Bold Crimson Spinel",
 		},
 	},
 	{
-		Name:    "Boots of Utter Darkness",
-		Enchant: "Enchant Boots - Cat's Swiftness",
+		Name:    "Shadowmaster's Boots",
+		Enchant: "Enchant Boots - Dexterity",
+		Gems: []string{
+			"Bold Crimson Spinel",
+			"Inscribed Pyrestone",
+		},
 	},
 	{
-		Name: "Ring of Lethality",
+		Name: "Shapeshifter's Signet",
 	},
 	{
-		Name: "Band of the Ranger-General",
+		Name: "Band of Devastation",
 	},
 	{
 		Name: "Dragonspine Trophy",
 	},
 	{
-		Name: "Bloodlust Brooch",
+		Name: "Berserker's Call",
 	},
 	{
-		Name:    "Cataclysm's Edge",
+		Name:    "Torch of the Damned",
 		Enchant: "Weapon - Mongoose",
 	},
 	{
