@@ -156,8 +156,8 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	nextCrusaderStrikeCD := ret.CDReadyAt(paladin.CrusaderStrikeCD)
 	judgementCD := ret.GetRemainingCD(paladin.JudgementCD, sim.CurrentTime)
 
-	sobActive := ret.HasActiveAura(ret.SealOfBloodAura.Label)
-	socActive := ret.HasActiveAura(ret.SealOfCommandAura.Label)
+	sobActive := ret.SealOfBloodAura.IsActive()
+	socActive := ret.SealOfCommandAura.IsActive()
 
 	nextSwingAt := ret.AutoAttacks.NextAttackAt()
 	timeTilNextSwing := nextSwingAt - sim.CurrentTime

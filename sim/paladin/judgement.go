@@ -25,17 +25,14 @@ var LibramOfAvengementActionID = core.ActionID{SpellID: 34260}
 func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 	loaIsEquipped := paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27484
 
-	loaAura := paladin.RegisterAura(&core.Aura{
-		Label:    "Libram of Avengement",
-		ActionID: LibramOfAvengementActionID,
-		Duration: time.Second * 5,
-		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Unit.PseudoStats.BonusMeleeCritRating += 53
-		},
-		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Unit.PseudoStats.BonusMeleeCritRating -= 53
-		},
-	})
+	var loaAura *core.Aura
+	if loaIsEquipped {
+		loaAura = paladin.NewTemporaryStatsAura(
+			"Libram of Avengement",
+			LibramOfAvengementActionID,
+			stats.Stats{stats.MeleeCrit: 53},
+			time.Second*5)
+	}
 
 	job := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -57,7 +54,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
 				paladin.SealOfBloodAura.Deactivate(sim)
-				if loaIsEquipped {
+				if loaAura != nil {
 					loaAura.Activate(sim)
 				}
 			},
