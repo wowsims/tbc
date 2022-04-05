@@ -103,6 +103,7 @@ func (aura *Aura) Refresh(sim *Simulation) {
 		aura.expires = NeverExpires
 	} else {
 		aura.expires = sim.CurrentTime + aura.Duration
+		aura.Unit.minExpires = 0
 	}
 }
 
@@ -203,14 +204,16 @@ type auraTracker struct {
 
 	aurasByTag map[string][]*Aura
 
-	// IDs of Auras that are active, in no particular order.
+	// IDs of Auras that may expire and are currently active, in no particular order.
 	activeAuras []*Aura
+
+	// caches the minimum expires time of all active auras; reset to 0 on Activate(), Deactivate(), and Refresh()
+	minExpires time.Duration
 
 	// Auras that have a non-nil XXX function set and are currently active.
 	onCastCompleteAuras   []*Aura
 	onSpellHitAuras       []*Aura
 	onPeriodicDamageAuras []*Aura
-	onMeleeAttackAuras    []*Aura
 }
 
 func newAuraTracker() auraTracker {
@@ -222,7 +225,6 @@ func newAuraTracker() auraTracker {
 		onCastCompleteAuras:   make([]*Aura, 0, 16),
 		onSpellHitAuras:       make([]*Aura, 0, 16),
 		onPeriodicDamageAuras: make([]*Aura, 0, 16),
-		onMeleeAttackAuras:    make([]*Aura, 0, 16),
 		auras:                 make([]*Aura, 0, 16),
 		aurasByTag:            make(map[string][]*Aura),
 		cooldowns:             make([]time.Duration, numCooldownIDs),
@@ -286,24 +288,16 @@ func (unit *Unit) GetOrRegisterAura(aura *Aura) *Aura {
 }
 
 func (at *auraTracker) GetAurasWithTag(tag string) []*Aura {
-	if auras, ok := at.aurasByTag[tag]; ok {
-		return auras
-	} else {
-		return []*Aura{}
-	}
+	return at.aurasByTag[tag]
 }
 
-func (at *auraTracker) GetActiveAurasWithTag(tag string) []*Aura {
-	active := []*Aura{}
-	for _, aura := range at.GetAurasWithTag(tag) {
-		if aura.IsActive() {
-			active = append(active, aura)
+func (at *auraTracker) HasActiveAuraWithTag(tag string) bool {
+	for _, aura := range at.aurasByTag[tag] {
+		if aura.active {
+			return true
 		}
 	}
-	return active
-}
-func (at *auraTracker) HasActiveAuraWithTag(tag string) bool {
-	return len(at.GetActiveAurasWithTag(tag)) > 0
+	return false
 }
 
 // Registers a callback to this Character which will be invoked on
@@ -358,7 +352,6 @@ func (at *auraTracker) reset(sim *Simulation) {
 	at.onCastCompleteAuras = at.onCastCompleteAuras[:0]
 	at.onSpellHitAuras = at.onSpellHitAuras[:0]
 	at.onPeriodicDamageAuras = at.onPeriodicDamageAuras[:0]
-	at.onMeleeAttackAuras = at.onMeleeAttackAuras[:0]
 
 	for _, aura := range at.auras {
 		if aura.IsActive() {
@@ -374,7 +367,7 @@ func (at *auraTracker) reset(sim *Simulation) {
 		resetEffect(sim)
 	}
 
-	for i, _ := range at.permanentAuras {
+	for i := range at.permanentAuras {
 		permAura := &at.permanentAuras[i]
 		permAura.aura = permAura.AuraFactory(sim)
 		aura := permAura.aura
@@ -386,16 +379,22 @@ func (at *auraTracker) reset(sim *Simulation) {
 }
 
 func (at *auraTracker) advance(sim *Simulation) {
-	// Loop in reverse order so that aura removal is (mostly) safe.
-	for i := len(at.activeAuras) - 1; i >= 0; i-- {
-		// Need to check again because some effects can expire 2 auras at once.
-		if i < len(at.activeAuras) {
-			aura := at.activeAuras[i]
-			if aura.expires <= sim.CurrentTime {
-				aura.Deactivate(sim)
-			}
+	if at.minExpires > sim.CurrentTime {
+		return
+	}
+
+restart:
+	minExpires := NeverExpires
+	for _, aura := range at.activeAuras {
+		if aura.expires <= sim.CurrentTime {
+			aura.Deactivate(sim)
+			goto restart // activeAuras have changed
+		}
+		if aura.expires < minExpires {
+			minExpires = aura.expires
 		}
 	}
+	at.minExpires = minExpires
 }
 
 func (at *auraTracker) doneIteration(sim *Simulation) {
@@ -473,8 +472,10 @@ func (aura *Aura) Activate(sim *Simulation) {
 	aura.startTime = sim.CurrentTime
 	aura.Refresh(sim)
 
-	aura.activeIndex = int32(len(aura.Unit.activeAuras))
-	aura.Unit.activeAuras = append(aura.Unit.activeAuras, aura)
+	if aura.Duration != NeverExpires {
+		aura.activeIndex = int32(len(aura.Unit.activeAuras))
+		aura.Unit.activeAuras = append(aura.Unit.activeAuras, aura)
+	}
 
 	if aura.OnCastComplete != nil {
 		aura.onCastCompleteIndex = int32(len(aura.Unit.onCastCompleteAuras))
@@ -553,12 +554,16 @@ func (aura *Aura) Deactivate(sim *Simulation) {
 		aura.Unit.Log(sim, "Aura faded: %s", aura.ActionID)
 	}
 
-	removeActiveIndex := aura.activeIndex
-	aura.Unit.activeAuras = removeBySwappingToBack(aura.Unit.activeAuras, removeActiveIndex)
-	if removeActiveIndex < int32(len(aura.Unit.activeAuras)) {
-		aura.Unit.activeAuras[removeActiveIndex].activeIndex = removeActiveIndex
+	if aura.Duration != NeverExpires {
+		removeActiveIndex := aura.activeIndex
+		aura.Unit.activeAuras = removeBySwappingToBack(aura.Unit.activeAuras, removeActiveIndex)
+		if removeActiveIndex < int32(len(aura.Unit.activeAuras)) {
+			aura.Unit.activeAuras[removeActiveIndex].activeIndex = removeActiveIndex
+		}
+		aura.activeIndex = Inactive
+
+		aura.Unit.minExpires = 0
 	}
-	aura.activeIndex = Inactive
 
 	if aura.OnCastComplete != nil {
 		removeOnCastCompleteIndex := aura.onCastCompleteIndex
