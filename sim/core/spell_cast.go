@@ -159,9 +159,16 @@ func (spellEffect *SpellEffect) directCalculations(sim *Simulation, spell *Spell
 	spellEffect.applyAttackerModifiers(sim, spell, false, &damage)
 	spellEffect.applyTargetModifiers(sim, spell, false, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	spellEffect.applyResistances(sim, spell, &damage)
+	spellEffect.determineOutcome(sim, spell, false)
 	spellEffect.applyOutcome(sim, spell, &damage)
 
 	spellEffect.Damage = damage
+}
+func (spellEffect *SpellEffect) applyModifiers(sim *Simulation, spell *Spell, isPeriodic bool, damage *float64) {
+	spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, damage)
+	spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, damage)
+	spellEffect.applyResistances(sim, spell, damage)
+	spellEffect.applyOutcome(sim, spell, damage)
 }
 
 func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spell) float64 {
@@ -222,7 +229,7 @@ func (spellEffect *SpellEffect) applyResultsToSpell(spell *Spell, isPeriodic boo
 				spell.PartialResists_3_4++
 			}
 		} else {
-			if spellEffect.Outcome == OutcomeMiss {
+			if spellEffect.Outcome.Matches(OutcomeMiss) {
 				spell.Misses++
 			} else if spellEffect.Outcome == OutcomeDodge {
 				spell.Dodges++

@@ -6,11 +6,22 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-type OutcomeDeterminer func(*Simulation, *Spell, *SpellEffect) HitOutcome
+// This function should do 3 things:
+//  1. Set the Outcome of the hit effect.
+//  2. Update spell outcome metrics.
+//  3. Modify the damage if necessary.
+type OutcomeApplier func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64)
 
 func OutcomeFuncHit() OutcomeDeterminer {
-	return func(*Simulation, *Spell, *SpellEffect) HitOutcome {
-		return OutcomeHit
+	return func(_ *Simulation, spell *Spell, spellEffect *SpellEffect, _ *float64) HitOutcome {
+		spellEffect.Outcome = OutcomeHit
+		spell.Hits++
+	}
+}
+
+func OutcomeFuncTick() OutcomeDeterminer {
+	return func(_ *Simulation, _ *Spell, spellEffect *SpellEffect, _ *float64) {
+		spellEffect.Outcome = OutcomeHit
 	}
 }
 

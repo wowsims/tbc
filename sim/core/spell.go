@@ -78,11 +78,10 @@ func (instance *SimpleSpell) Cast(sim *Simulation, target *Target, spell *Spell)
 
 		if len(instance.Effects) == 0 {
 			hitEffect := &instance.Effect
-			hitEffect.determineOutcome(sim, spell, false)
+
+			hitEffect.directCalculations(sim, spell)
 
 			if hitEffect.Landed() {
-				hitEffect.directCalculations(sim, spell)
-
 				// Dot Damage Effects
 				if hitEffect.DotInput.NumberOfTicks != 0 {
 					hitEffect.takeDotSnapshot(sim, spell)
@@ -97,9 +96,8 @@ func (instance *SimpleSpell) Cast(sim *Simulation, target *Target, spell *Spell)
 			// on the first hit from benefitting other hits of the same spell.
 			for effectIdx := range instance.Effects {
 				hitEffect := &instance.Effects[effectIdx]
-				hitEffect.determineOutcome(sim, spell, false)
+				hitEffect.directCalculations(sim, spell)
 				if hitEffect.Landed() {
-					hitEffect.directCalculations(sim, spell)
 					if hitEffect.DotInput.NumberOfTicks != 0 {
 						hitEffect.takeDotSnapshot(sim, spell)
 					}
@@ -323,9 +321,10 @@ func ApplyEffectFuncDirectDamage(baseEffect SpellEffect, outcomeDeterminer Outco
 		effect.Target = target
 		effect.Outcome = outcomeDeterminer(sim, spell, &effect)
 
-		if effect.Landed() {
-			effect.directCalculations(sim, spell)
-		}
+		damage := effect.calculateBaseDamage(sim, spell)
+		damage *= effect.DamageMultiplier
+		effect.applyModifiers(sim, spell, false, &damage)
+		effect.Damage = damage
 
 		effect.afterCalculations(sim, spell, false)
 		spell.Instance.objectInUse = false

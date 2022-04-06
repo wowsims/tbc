@@ -177,13 +177,12 @@ func (hitEffect *SpellEffect) takeDotSnapshot(sim *Simulation, spell *Spell) {
 func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spell *Spell) {
 	damage := hitEffect.DotInput.damagePerTick
 
-	hitEffect.determineOutcome(sim, spell, true)
-
 	if !hitEffect.DotInput.IgnoreDamageModifiers {
 		hitEffect.applyAttackerModifiers(sim, spell, !hitEffect.DotInput.TicksCanMissAndCrit, &damage)
 		hitEffect.applyTargetModifiers(sim, spell, !hitEffect.DotInput.TicksCanMissAndCrit, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	}
 	hitEffect.applyResistances(sim, spell, &damage)
+	hitEffect.determineOutcome(sim, spell, true)
 	hitEffect.applyOutcome(sim, spell, &damage)
 
 	hitEffect.Damage = damage
@@ -215,23 +214,22 @@ func (unit *Unit) NewDotAura(auraLabel string, actionID ActionID) *Aura {
 }
 
 type DotConfig struct {
-	Spell *Spell
-	Aura Aura
+	Spell        *Spell
+	AuraLabel    string
+	AuraActionID ActionID
 
-	TickOutcome    OutcomeDeterminer
-	TickBaseDamage BaseDamageCalculator
-	NumberOfTicks  int           // number of ticks over the whole duration
-	TickLength     time.Duration // time between each tick
+	NumberOfTicks int           // number of ticks over the whole duration
+	TickLength    time.Duration // time between each tick
 
 	// If true, tick length will be shortened based on casting speed.
 	AffectedByCastSpeed bool
 
-	MakeEffect func(*Simulation) SpellEffect
+	//MakeApplyEffects func (....) ApplySpellEffects
 }
 
 type Dot struct {
 	Spell *Spell
-	Aura *Aura
+	Aura  *Aura
 
 	TickOutcome    OutcomeDeterminer
 	TickBaseDamage BaseDamageCalculator
@@ -244,7 +242,9 @@ type Dot struct {
 	MakeEffect func(*Simulation) SpellEffect
 
 	tickAction *PendingAction
-	effect SpellEffect
+	effect     SpellEffect
+
+	tickDamageSnapshot float64
 }
 
 func (dot *Dot) Apply(sim *Simulation, spellEffect SpellEffect) {
@@ -257,6 +257,20 @@ func (dot *Dot) Apply(sim *Simulation, spellEffect SpellEffect) {
 }
 
 func (dot *Dot) tick(sim *Simulation) {
+	damage := dot.tickDamageSnapshot
+
+	dot.effect.determineOutcome(sim, dot.Spell, true)
+
+	//if !dot.effect.DotInput.IgnoreDamageModifiers {
+	dot.effect.applyAttackerModifiers(sim, dot.Spell, true, &damage)
+	dot.effect.applyTargetModifiers(sim, dot.Spell, true, dot.effect.BaseDamage.TargetSpellCoefficient, &damage)
+	//}
+	dot.effect.applyResistances(sim, dot.Spell, &damage)
+	dot.effect.applyOutcome(sim, dot.Spell, &damage)
+
+	dot.effect.Damage = damage
+
+	dot.effect.afterCalculations(sim, dot.Spell, true)
 }
 
 // Note that unit should be the unit this dot will be attached to. For regular dots
@@ -267,10 +281,10 @@ func (unit *Unit) NewDot(config Dot, auraConfig Aura) *Dot {
 	*dot = config
 
 	basePeriodicOptions := PeriodicActionOptions{
-		OnAction: func(sim *core.Simulation) {
+		OnAction: func(sim *Simulation) {
 			dot.tick(sim)
 		},
-		CleanUp: func(sim *core.Simulation) {
+		CleanUp: func(sim *Simulation) {
 			if sim.CurrentTime == dot.tickAction.NextActionAt {
 				dot.tick(sim)
 			}
@@ -290,6 +304,6 @@ func (unit *Unit) NewDot(config Dot, auraConfig Aura) *Dot {
 		dot.tickAction = nil
 	}
 
-	dot.Aura := unit.RegisterAura(&auraConfig)
+	dot.Aura = unit.RegisterAura(&auraConfig)
 	return dot
 }
