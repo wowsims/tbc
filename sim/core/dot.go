@@ -216,7 +216,7 @@ func (unit *Unit) NewDotAura(auraLabel string, actionID ActionID) *Aura {
 
 type DotConfig struct {
 	Spell *Spell
-	Label string // Label for the aura.
+	Aura Aura
 
 	TickOutcome    OutcomeDeterminer
 	TickBaseDamage BaseDamageCalculator
@@ -225,25 +225,71 @@ type DotConfig struct {
 
 	// If true, tick length will be shortened based on casting speed.
 	AffectedByCastSpeed bool
+
+	MakeEffect func(*Simulation) SpellEffect
 }
 
 type Dot struct {
 	Spell *Spell
 	Aura *Aura
 
+	TickOutcome    OutcomeDeterminer
+	TickBaseDamage BaseDamageCalculator
+	NumberOfTicks  int           // number of ticks over the whole duration
+	TickLength     time.Duration // time between each tick
+
+	// If true, tick length will be shortened based on casting speed.
+	AffectedByCastSpeed bool
+
+	MakeEffect func(*Simulation) SpellEffect
+
 	tickAction *PendingAction
+	effect SpellEffect
 }
 
-func NewDot(config DotConfig) *Dot {
-	aura :=
-	return target.GetOrRegisterAura(&Aura{
-		Label:     "HuntersMark-" + strconv.Itoa(int(points)),
-		Tag:       "HuntersMark",
-		ActionID:  ActionID{SpellID: 14325},
-		Duration:  NeverExpires,
-		OnGain: func(aura *Aura, sim *Simulation) {
+func (dot *Dot) Apply(sim *Simulation, spellEffect SpellEffect) {
+	if dot.Aura.IsActive() {
+		dot.Aura.Deactivate(sim)
+	}
+
+	dot.Aura.Duration = dot.TickLength * time.Duration(dot.NumberOfTicks)
+	dot.Aura.Activate(sim)
+}
+
+func (dot *Dot) tick(sim *Simulation) {
+}
+
+// Note that unit should be the unit this dot will be attached to. For regular dots
+// this is usually the target, and for aoe spells (like Blizzard) this might be
+// the caster.
+func (unit *Unit) NewDot(config Dot, auraConfig Aura) *Dot {
+	dot := &Dot{}
+	*dot = config
+
+	basePeriodicOptions := PeriodicActionOptions{
+		OnAction: func(sim *core.Simulation) {
+			dot.tick(sim)
 		},
-		OnExpire: func(aura *Aura, sim *Simulation) {
+		CleanUp: func(sim *core.Simulation) {
+			if sim.CurrentTime == dot.tickAction.NextActionAt {
+				dot.tick(sim)
+			}
 		},
-	})
+	}
+
+	auraConfig.OnGain = func(aura *Aura, sim *Simulation) {
+		dot.effect = dot.MakeEffect(sim)
+
+		periodicOptions := basePeriodicOptions
+		periodicOptions.Period = dot.TickLength
+		dot.tickAction = NewPeriodicAction(sim, periodicOptions)
+		sim.AddPendingAction(dot.tickAction)
+	}
+	auraConfig.OnExpire = func(aura *Aura, sim *Simulation) {
+		dot.tickAction.Cancel(sim)
+		dot.tickAction = nil
+	}
+
+	dot.Aura := unit.RegisterAura(&auraConfig)
+	return dot
 }
