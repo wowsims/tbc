@@ -314,7 +314,7 @@ func (character *Character) InitialCastSpeed() float64 {
 }
 
 func (character *Character) SpellGCD() time.Duration {
-	return MinDuration(GCDMin, time.Duration(float64(GCDDefault)/character.CastSpeed()))
+	return MaxDuration(GCDMin, time.Duration(float64(GCDDefault)/character.CastSpeed()))
 }
 
 func (character *Character) CastSpeed() float64 {

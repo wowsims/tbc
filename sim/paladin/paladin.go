@@ -13,6 +13,7 @@ type Paladin struct {
 
 	CurrentSeal      *core.Aura
 	CurrentJudgement *core.Aura
+	sealOfCommandICD core.InternalCD
 
 	sealOfBlood       core.SimpleCast
 	sealOfCommand     core.SimpleCast
@@ -62,6 +63,7 @@ func (paladin *Paladin) Init(sim *core.Simulation) {
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {
+	paladin.sealOfCommandICD = 0
 	paladin.CurrentSeal = nil
 	paladin.CurrentJudgement = nil
 }
@@ -107,7 +109,6 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 	})
 
 	paladin.setupSealOfBlood()
-	paladin.setupSealOfCommand()
 	paladin.setupSealOfTheCrusader()
 	paladin.setupSealOfWisdom()
 

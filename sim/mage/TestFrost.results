@@ -455,7 +455,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-RobeoftheElderScribes-28602"
  value: {
-  dps: 1656.125661967007
+  dps: 1653.905027551007
  }
 }
 dps_results: {
@@ -473,19 +473,19 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 1601.3545121752693
+  dps: 1600.7280401752696
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-Serpent-CoilBraid-30720"
  value: {
-  dps: 1617.7589044117094
+  dps: 1615.7949146917097
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-SextantofUnstableCurrents-30626"
  value: {
-  dps: 1638.3444050307257
+  dps: 1635.8923936227259
  }
 }
 dps_results: {
@@ -527,7 +527,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 1551.4339891347265
+  dps: 1549.8970444947265
  }
 }
 dps_results: {
@@ -563,7 +563,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-TheLightningCapacitor-28785"
  value: {
-  dps: 1600.8609028559802
+  dps: 1645.1161727646013
  }
 }
 dps_results: {
@@ -629,7 +629,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Xi'ri'sGift-29179"
  value: {
-  dps: 1633.4157901223925
+  dps: 1632.7893181223926
  }
 }
 dps_results: {
