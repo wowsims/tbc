@@ -177,13 +177,12 @@ func (hitEffect *SpellEffect) takeDotSnapshot(sim *Simulation, spell *Spell) {
 func (hitEffect *SpellEffect) calculateDotDamage(sim *Simulation, spell *Spell) {
 	damage := hitEffect.DotInput.damagePerTick
 
-	hitEffect.determineOutcome(sim, spell, true)
-
 	if !hitEffect.DotInput.IgnoreDamageModifiers {
 		hitEffect.applyAttackerModifiers(sim, spell, !hitEffect.DotInput.TicksCanMissAndCrit, &damage)
 		hitEffect.applyTargetModifiers(sim, spell, !hitEffect.DotInput.TicksCanMissAndCrit, hitEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	}
 	hitEffect.applyResistances(sim, spell, &damage)
+	hitEffect.determineOutcome(sim, spell, true)
 	hitEffect.applyOutcome(sim, spell, &damage)
 
 	hitEffect.Damage = damage
@@ -212,4 +211,105 @@ func (unit *Unit) NewDotAura(auraLabel string, actionID ActionID) *Aura {
 		ActionID: actionID,
 		Duration: NeverExpires,
 	})
+}
+
+type TickEffects func(*Simulation, *Spell) func()
+
+type Dot struct {
+	Spell *Spell
+
+	// Embed Aura so we can use IsActive/Refresh/etc directly.
+	*Aura
+
+	NumberOfTicks int           // number of ticks over the whole duration
+	TickLength    time.Duration // time between each tick
+
+	// If true, tick length will be shortened based on casting speed.
+	AffectedByCastSpeed bool
+
+	TickEffects TickEffects
+
+	tickFn     func()
+	tickAction *PendingAction
+	tickPeriod time.Duration
+}
+
+func (dot *Dot) Apply(sim *Simulation) {
+	if dot.Aura.IsActive() {
+		dot.Aura.Deactivate(sim)
+	}
+
+	if dot.AffectedByCastSpeed {
+		baseDuration := dot.TickLength * time.Duration(dot.NumberOfTicks)
+		castSpeed := dot.Spell.Character.CastSpeed()
+		dot.Aura.Duration = time.Duration(float64(baseDuration) / castSpeed)
+		dot.tickPeriod = time.Duration(float64(dot.TickLength) / castSpeed)
+	}
+	dot.Aura.Activate(sim)
+}
+
+func NewDot(config Dot) *Dot {
+	dot := &Dot{}
+	*dot = config
+
+	basePeriodicOptions := PeriodicActionOptions{
+		OnAction: func(sim *Simulation) {
+			dot.tickFn()
+		},
+	}
+
+	dot.tickPeriod = dot.TickLength
+	dot.Aura.Duration = dot.TickLength * time.Duration(dot.NumberOfTicks)
+
+	dot.Aura.OnGain = func(aura *Aura, sim *Simulation) {
+		dot.tickFn = dot.TickEffects(sim, dot.Spell)
+
+		periodicOptions := basePeriodicOptions
+		periodicOptions.Period = dot.tickPeriod
+		dot.tickAction = NewPeriodicAction(sim, periodicOptions)
+		sim.AddPendingAction(dot.tickAction)
+	}
+	dot.Aura.OnExpire = func(aura *Aura, sim *Simulation) {
+		dot.tickAction.Cancel(sim)
+		dot.tickAction = nil
+	}
+
+	return dot
+}
+
+func TickFuncSnapshot(target *Target, baseEffect SpellEffect) TickEffects {
+	return func(sim *Simulation, spell *Spell) func() {
+		snapshotEffect := baseEffect
+		snapshotEffect.Target = target
+		baseDamage := snapshotEffect.calculateBaseDamage(sim, spell) * snapshotEffect.DamageMultiplier
+		snapshotEffect.DamageMultiplier = 1
+		snapshotEffect.BaseDamage = BaseDamageConfigFlat(baseDamage)
+
+		effectsFunc := ApplyEffectFuncDirectDamage(snapshotEffect)
+		return func() {
+			effectsFunc(sim, target, spell)
+		}
+	}
+}
+func TickFuncAOESnapshot(sim *Simulation, baseEffect SpellEffect) TickEffects {
+	return func(sim *Simulation, spell *Spell) func() {
+		target := sim.GetPrimaryTarget()
+		snapshotEffect := baseEffect
+		snapshotEffect.Target = target
+		baseDamage := snapshotEffect.calculateBaseDamage(sim, spell) * snapshotEffect.DamageMultiplier
+		snapshotEffect.DamageMultiplier = 1
+		snapshotEffect.BaseDamage = BaseDamageConfigFlat(baseDamage)
+
+		effectsFunc := ApplyEffectFuncAOEDamage(sim, snapshotEffect)
+		return func() {
+			effectsFunc(sim, target, spell)
+		}
+	}
+}
+func TickFuncApplyEffects(effectsFunc ApplySpellEffects) TickEffects {
+	return func(sim *Simulation, spell *Spell) func() {
+		return func() {
+			effectsFunc(sim, sim.GetPrimaryTarget(), spell)
+		}
+	}
 }

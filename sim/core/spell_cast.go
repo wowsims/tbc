@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"math"
 
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -25,8 +24,9 @@ type SpellEffect struct {
 	// Target of the spell.
 	Target *Target
 
-	BaseDamage BaseDamageConfig
-	DotInput   DotDamageInput
+	BaseDamage     BaseDamageConfig
+	OutcomeApplier OutcomeApplier
+	DotInput       DotDamageInput
 
 	// Bonus stats to be added to the spell.
 	BonusSpellHitRating  float64
@@ -44,6 +44,9 @@ type SpellEffect struct {
 
 	// Adds a fixed amount of threat to this spell, before multipliers.
 	FlatThreatBonus float64
+
+	// TODO: Should be able to remove this after refactoring is done.
+	IsPeriodic bool
 
 	// Whether this is a phantom cast. Phantom casts are usually casts triggered by some effect,
 	// like The Lightning Capacitor or Shaman Flametongue Weapon. Many on-hit effects do not
@@ -160,9 +163,15 @@ func (spellEffect *SpellEffect) directCalculations(sim *Simulation, spell *Spell
 	spellEffect.applyAttackerModifiers(sim, spell, false, &damage)
 	spellEffect.applyTargetModifiers(sim, spell, false, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	spellEffect.applyResistances(sim, spell, &damage)
+	spellEffect.determineOutcome(sim, spell, false)
 	spellEffect.applyOutcome(sim, spell, &damage)
 
 	spellEffect.Damage = damage
+}
+func (spellEffect *SpellEffect) applyModifiers(sim *Simulation, spell *Spell, isPeriodic bool, damage *float64) {
+	spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, damage)
+	spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, damage)
+	spellEffect.applyResistances(sim, spell, damage)
 }
 
 func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spell) float64 {
@@ -173,139 +182,28 @@ func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spel
 	}
 }
 
-func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spell *Spell, isPeriodic bool) {
-	if isPeriodic {
-		if spellEffect.DotInput.TicksCanMissAndCrit {
-			if spellEffect.hitCheck(sim, spell) {
-				spellEffect.Outcome = OutcomeHit
-				if spellEffect.critCheck(sim, spell) {
-					spellEffect.Outcome = OutcomeCrit
-				}
-			} else {
-				spellEffect.Outcome = OutcomeMiss
-			}
-		} else {
-			spellEffect.Outcome = OutcomeHit
-		}
-		return
-	}
-
-	if spellEffect.OutcomeRollCategory == OutcomeRollCategoryNone || spell.SpellExtras.Matches(SpellExtrasAlwaysHits) {
-		spellEffect.Outcome = OutcomeHit
-		if spellEffect.critCheck(sim, spell) {
-			spellEffect.Outcome = OutcomeCrit
-		}
-	} else if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryMagic) {
-		if spellEffect.hitCheck(sim, spell) {
-			spellEffect.Outcome = OutcomeHit
-			if spellEffect.critCheck(sim, spell) {
-				spellEffect.Outcome = OutcomeCrit
-			}
-		} else {
-			spellEffect.Outcome = OutcomeMiss
-		}
-	} else if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryPhysical) {
-		spellEffect.Outcome = spellEffect.WhiteHitTableResult(sim, spell)
-		if spellEffect.Landed() && spellEffect.critCheck(sim, spell) {
-			spellEffect.Outcome = OutcomeCrit
-		}
-	}
-}
-
-// Computes an attack result using the white-hit table formula (single roll).
-func (ahe *SpellEffect) WhiteHitTableResult(sim *Simulation, spell *Spell) HitOutcome {
-	character := spell.Character
-
-	roll := sim.RandomFloat("White Hit Table")
-
-	// Miss
-	missChance := ahe.Target.MissChance - ahe.PhysicalHitChance(character)
-	if character.AutoAttacks.IsDualWielding && ahe.OutcomeRollCategory == OutcomeRollCategoryWhite {
-		missChance += 0.19
-	}
-	missChance = MaxFloat(0, missChance)
-
-	chance := missChance
-	if roll < chance {
-		return OutcomeMiss
-	}
-
-	if !ahe.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
-		// Dodge
-		if !spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
-			dodge := ahe.Target.Dodge
-
-			expertiseRating := character.stats[stats.Expertise]
-			if ahe.ProcMask.Matches(ProcMaskMeleeMH) {
-				expertiseRating += character.PseudoStats.BonusMHExpertiseRating
-			} else if ahe.ProcMask.Matches(ProcMaskMeleeOH) {
-				expertiseRating += character.PseudoStats.BonusOHExpertiseRating
-			}
-			expertisePercentage := MinFloat(math.Floor(expertiseRating/ExpertisePerQuarterPercentReduction)/400, dodge)
-
-			chance += dodge - expertisePercentage
-			if roll < chance {
-				return OutcomeDodge
-			}
-		}
-
-		// Parry (if in front)
-		// If the target is a mob and defense minus weapon skill is 11 or more:
-		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.6%
-
-		// If the target is a mob and defense minus weapon skill is 10 or less:
-		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.1%
-
-		// Block (if in front)
-		// If the target is a mob:
-		// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
-		// If we actually implement blocks, ranged hits can be blocked.
-
-		// No need to crit/glance roll if we are not a white hit
-		if ahe.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial | OutcomeRollCategoryRanged) {
-			return OutcomeHit
-		}
-
-		// Glance
-		chance += ahe.Target.Glance
-		if roll < chance {
-			return OutcomeGlance
-		}
-
-		// Crit
-		chance += ahe.PhysicalCritChance(character, spell)
-		if roll < chance {
-			return OutcomeCrit
-		}
-	}
-
-	return OutcomeHit
-}
-
-// Calculates a hit check using the stats from this spell.
-func (spellEffect *SpellEffect) hitCheck(sim *Simulation, spell *Spell) bool {
-	hit := 0.83 + (spell.Character.GetStat(stats.SpellHit)+spellEffect.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
-	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
-
-	return sim.RandomFloat("Magical Hit Roll") < hit
-}
-
-// Calculates a crit check using the stats from this spell.
-func (spellEffect *SpellEffect) critCheck(sim *Simulation, spell *Spell) bool {
-	switch spellEffect.CritRollCategory {
-	case CritRollCategoryMagical:
-		critChance := spellEffect.SpellCritChance(spell.Character, spell)
-		return sim.RandomFloat("Magical Crit Roll") < critChance
-	case CritRollCategoryPhysical:
-		return sim.RandomFloat("Physical Crit Roll") < spellEffect.PhysicalCritChance(spell.Character, spell)
-	default:
-		return false
-	}
-}
-
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *Spell, isPeriodic bool) {
 	spellEffect.applyResultsToSpell(spell, isPeriodic && !spellEffect.DotInput.TicksCanMissAndCrit)
+	spellEffect.triggerProcs(sim, spell, isPeriodic)
+}
 
+func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, isPeriodic bool, damage float64) {
+	spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, &damage)
+	spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
+	spellEffect.applyResistances(sim, spell, &damage)
+	spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
+	spellEffect.Damage = damage
+}
+
+func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell, isPeriodic bool) {
+	spell.TotalDamage += spellEffect.Damage
+	if spellEffect.Landed() {
+		spell.TotalThreat += spellEffect.calcThreat(spell.Character)
+	}
+	spellEffect.triggerProcs(sim, spell, isPeriodic)
+}
+
+func (spellEffect *SpellEffect) triggerProcs(sim *Simulation, spell *Spell, isPeriodic bool) {
 	if sim.Log != nil && !(spell.SpellExtras.Matches(SpellExtrasAlwaysHits) && spellEffect.Damage == 0) {
 		if isPeriodic {
 			spell.Character.Log(sim, "%s tick %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Character))
@@ -321,11 +219,11 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *Spell,
 		spell.Character.OnSpellHit(sim, spell, spellEffect)
 		spellEffect.Target.OnSpellHit(sim, spell, spellEffect)
 	} else {
-		spell.Character.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
-		spellEffect.Target.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 		if spellEffect.DotInput.OnPeriodicDamage != nil {
 			spellEffect.DotInput.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 		}
+		spell.Character.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
+		spellEffect.Target.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 	}
 }
 
@@ -353,7 +251,7 @@ func (spellEffect *SpellEffect) applyResultsToSpell(spell *Spell, isPeriodic boo
 				spell.PartialResists_3_4++
 			}
 		} else {
-			if spellEffect.Outcome == OutcomeMiss {
+			if spellEffect.Outcome.Matches(OutcomeMiss) {
 				spell.Misses++
 			} else if spellEffect.Outcome == OutcomeDodge {
 				spell.Dodges++

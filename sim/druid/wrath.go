@@ -37,25 +37,17 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 	template.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
 	template.Cost.Value -= template.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
 
-	spellCoefficient := 0.571
-	bonusFlatDamage := 0.0
-	if druid.Equip[items.ItemSlotRanged].ID == IdolAvenger {
-		// This seems to be unaffected by wrath of cenarius so it needs to come first.
-		bonusFlatDamage += 25 * spellCoefficient
-	}
-	spellCoefficient += 0.02 * float64(druid.Talents.WrathOfCenarius)
+	// This seems to be unaffected by wrath of cenarius.
+	bonusFlatDamage := core.TernaryFloat64(druid.Equip[items.ItemSlotRanged].ID == IdolAvenger, 25*0.571, 0)
 
 	effect := core.SpellEffect{
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		CritMultiplier:      druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
-
 		BonusSpellCritRating: float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance, // 2% crit per point
 		DamageMultiplier:     1 + 0.02*float64(druid.Talents.Moonfury),
 		ThreatMultiplier:     1,
 
-		BaseDamage: core.BaseDamageConfigMagic(383+bonusFlatDamage, 432+bonusFlatDamage, spellCoefficient),
-		OnSpellHit: druid.applyOnHitTalents,
+		BaseDamage:     core.BaseDamageConfigMagic(383+bonusFlatDamage, 432+bonusFlatDamage, 0.571+0.02*float64(druid.Talents.WrathOfCenarius)),
+		OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance))),
+		OnSpellHit:     druid.applyOnHitTalents,
 	}
 
 	druid.Wrath = druid.RegisterSpell(core.SpellConfig{

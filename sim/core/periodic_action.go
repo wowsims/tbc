@@ -18,7 +18,7 @@ type PeriodicActionOptions struct {
 
 func NewPeriodicAction(sim *Simulation, options PeriodicActionOptions) *PendingAction {
 	pa := sim.pendingActionPool.Get()
-	pa.NextActionAt = options.Period
+	pa.NextActionAt = sim.CurrentTime + options.Period
 
 	tickIndex := 0
 
@@ -38,7 +38,6 @@ func NewPeriodicAction(sim *Simulation, options PeriodicActionOptions) *PendingA
 		if options.CleanUp != nil {
 			options.CleanUp(sim)
 		}
-		sim.pendingActionPool.Put(pa)
 	}
 
 	return pa

@@ -116,3 +116,27 @@ func hash(s string) uint32 {
 	h.Write([]byte(s))
 	return h.Sum32()
 }
+
+func TernaryInt(condition bool, val1 int, val2 int) int {
+	if condition {
+		return val1
+	} else {
+		return val2
+	}
+}
+
+func TernaryInt32(condition bool, val1 int32, val2 int32) int32 {
+	if condition {
+		return val1
+	} else {
+		return val2
+	}
+}
+
+func TernaryFloat64(condition bool, val1 float64, val2 float64) float64 {
+	if condition {
+		return val1
+	} else {
+		return val2
+	}
+}

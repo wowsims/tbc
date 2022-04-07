@@ -24,6 +24,9 @@ type Druid struct {
 	Starfire8   *core.Spell
 	Wrath       *core.Spell
 
+	InsectSwarmDot *core.Dot
+	MoonfireDot    *core.Dot
+
 	FaerieFireAura       *core.Aura
 	NaturesSwiftnessAura *core.Aura
 }
