@@ -60,18 +60,20 @@ type Rogue struct {
 	envenomEnergyCost    float64
 	deadlyPoisonStacks   int
 
-	Backstab            *core.Spell
-	DeadlyPoisonRefresh *core.Spell
-	DeadlyPoison        *core.Spell
-	Envenom             *core.Spell
-	Eviscerate          *core.Spell
-	ExposeArmor         *core.Spell
-	Hemorrhage          *core.Spell
-	InstantPoison       *core.Spell
-	Mutilate            *core.Spell
-	Rupture             *core.Spell
-	Shiv                *core.Spell
-	SinisterStrike      *core.Spell
+	Backstab       *core.Spell
+	DeadlyPoison   *core.Spell
+	Envenom        *core.Spell
+	Eviscerate     *core.Spell
+	ExposeArmor    *core.Spell
+	Hemorrhage     *core.Spell
+	InstantPoison  *core.Spell
+	Mutilate       *core.Spell
+	Rupture        *core.Spell
+	Shiv           *core.Spell
+	SinisterStrike *core.Spell
+
+	DeadlyPoisonDot *core.Dot
+	RuptureDot      *core.Dot
 
 	AdrenalineRushAura *core.Aura
 	BladeFlurryAura    *core.Aura
@@ -139,7 +141,6 @@ func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) 
 func (rogue *Rogue) Init(sim *core.Simulation) {
 	rogue.registerBackstabSpell(sim)
 	rogue.registerDeadlyPoisonSpell(sim)
-	rogue.registerDeadlyPoisonRefreshSpell(sim)
 	rogue.registerEviscerateSpell(sim)
 	rogue.registerExposeArmorSpell(sim)
 	rogue.registerHemorrhageSpell(sim)
@@ -266,7 +267,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 
 	if rogue.Rotation.UseShiv && rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueDeadlyPoison {
 		rogue.CastBuilder = func(sim *core.Simulation, target *core.Target) {
-			if rogue.DeadlyPoison.Instance.Effect.DotInput.IsTicking(sim) && rogue.DeadlyPoison.Instance.Effect.DotInput.TimeRemaining(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.shivEnergyCost {
+			if rogue.DeadlyPoisonDot.IsActive() && rogue.DeadlyPoisonDot.RemainingDuration(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.shivEnergyCost {
 				rogue.Shiv.Cast(sim, target)
 			} else {
 				CastBuilder(sim, target)

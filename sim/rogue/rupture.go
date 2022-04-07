@@ -1,6 +1,7 @@
 package rogue
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -16,6 +17,8 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 	ability.Effect.CritRollCategory = core.CritRollCategoryNone
 	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 		if spellEffect.Landed() {
+			rogue.RuptureDot.NumberOfTicks = int(rogue.ComboPoints()) + 3
+			rogue.RuptureDot.Apply(sim)
 			rogue.ApplyFinisher(sim, spell.ActionID)
 		} else {
 			if refundAmount > 0 {
@@ -23,19 +26,7 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 			}
 		}
 	}
-	ability.Effect.DotInput = core.DotDamageInput{
-		NumberOfTicks: 0, // Set dynamically.
-		TickLength:    time.Second * 2,
-		TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
-			comboPoints := rogue.ComboPoints()
-			attackPower := hitEffect.MeleeAttackPower(spell.Character) + hitEffect.MeleeAttackPowerOnTarget()
 
-			return 70 + float64(comboPoints)*11 + attackPower*[]float64{0.01, 0.02, 0.03, 0.03, 0.03}[comboPoints-1]
-		},
-		Aura: rogue.NewDotAura("Rupture", RuptureActionID),
-	}
-
-	ability.Effect.DamageMultiplier += 0.1 * float64(rogue.Talents.SerratedBlades)
 	if rogue.Talents.SurpriseAttacks {
 		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
 	}
@@ -45,12 +36,34 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
 			instance.ActionID.Tag = rogue.ComboPoints()
 			instance.Effect.Target = target
-			instance.Effect.DotInput.NumberOfTicks = int(rogue.ComboPoints()) + 3
 			if rogue.deathmantle4pcProc {
 				instance.Cost.Value = 0
 				rogue.deathmantle4pcProc = false
 			}
 		},
+	})
+
+	target := sim.GetPrimaryTarget()
+	rogue.RuptureDot = core.NewDot(core.Dot{
+		Spell: rogue.Rupture,
+		Aura: target.RegisterAura(&core.Aura{
+			Label:    "Rupture-" + strconv.Itoa(int(rogue.Index)),
+			ActionID: RuptureActionID,
+		}),
+		NumberOfTicks: 0, // Set dynamically
+		TickLength:    time.Second * 2,
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1 + 0.1*float64(rogue.Talents.SerratedBlades),
+			ThreatMultiplier: 1,
+			IsPeriodic:       true,
+			BaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+				comboPoints := rogue.ComboPoints()
+				attackPower := hitEffect.MeleeAttackPower(spell.Character) + hitEffect.MeleeAttackPowerOnTarget()
+
+				return 70 + float64(comboPoints)*11 + attackPower*[]float64{0.01, 0.02, 0.03, 0.03, 0.03}[comboPoints-1]
+			},
+			OutcomeApplier: core.OutcomeFuncTick(),
+		}),
 	})
 }
 

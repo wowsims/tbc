@@ -58,6 +58,71 @@ func OutcomeFuncMagicHit() OutcomeApplier {
 	}
 }
 
+func OutcomeFuncMeleeWhiteHit() OutcomeApplier {
+	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+		character := spell.Character
+		roll := sim.RandomFloat("White Hit Table")
+
+		// Miss
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
+		if character.AutoAttacks.IsDualWielding {
+			missChance += 0.19
+		}
+
+		chance := MaxFloat(0, missChance)
+		if roll < chance {
+			spellEffect.Outcome = OutcomeMiss
+			spell.Misses++
+			*damage = 0
+			return
+		}
+
+		// Dodge
+		chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character))
+		if roll < chance {
+			spellEffect.Outcome = OutcomeDodge
+			spell.Dodges++
+			*damage = 0
+			return
+		}
+
+		// Parry (if in front)
+		// If the target is a mob and defense minus weapon skill is 11 or more:
+		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.6%
+
+		// If the target is a mob and defense minus weapon skill is 10 or less:
+		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.1%
+
+		// Block (if in front)
+		// If the target is a mob:
+		// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
+		// If we actually implement blocks, ranged hits can be blocked.
+
+		// Glance
+		chance += spellEffect.Target.Glance
+		if roll < chance {
+			spellEffect.Outcome = OutcomeGlance
+			spell.Glances++
+			// TODO glancing blow damage reduction is actually a range ([65%, 85%] vs. 73)
+			*damage *= 0.75
+			return OutcomeGlance
+		}
+
+		// Crit
+		chance += spellEffect.PhysicalCritChance(character, spell)
+		if roll < chance {
+			spellEffect.Outcome = OutcomeCrit
+			spell.Crits++
+			*damage *= critMultiplier
+			return
+		}
+
+		// Hit
+		spellEffect.Outcome = OutcomeHit
+		spell.Hits++
+	}
+}
+
 func (spellEffect *SpellEffect) determineOutcome(sim *Simulation, spell *Spell, isPeriodic bool) {
 	if isPeriodic {
 		if spellEffect.DotInput.TicksCanMissAndCrit {

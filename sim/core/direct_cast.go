@@ -80,6 +80,14 @@ func BaseDamageConfigMagicNoRoll(flatDamage float64, spellCoefficient float64) B
 	return BaseDamageConfigMagic(flatDamage, flatDamage, spellCoefficient)
 }
 
+func MultiplyByStacks(config BaseDamageConfig, aura *Aura) BaseDamageConfig {
+	return WrapBaseDamageConfig(config, func(oldCalculator BaseDamageCalculator) BaseDamageCalculator {
+		return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
+			return oldCalculator(sim, hitEffect, spell) * float64(aura.GetStacks())
+		}
+	})
+}
+
 type Hand bool
 
 const MainHand Hand = true

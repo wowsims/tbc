@@ -20,7 +20,7 @@ func (rogue *Rogue) registerShivSpell(_ *core.Simulation) {
 
 			switch rogue.Consumes.OffHandImbue {
 			case proto.WeaponImbue_WeaponImbueRogueDeadlyPoison:
-				rogue.procDeadlyPoison(sim, spellEffect)
+				rogue.DeadlyPoison.Cast(sim, spellEffect.Target)
 			case proto.WeaponImbue_WeaponImbueRogueInstantPoison:
 				rogue.procInstantPoison(sim, spellEffect)
 			}
