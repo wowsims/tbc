@@ -12,29 +12,34 @@ import (
 //  3. Modify the damage if necessary.
 type OutcomeApplier func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64)
 
-func OutcomeFuncHit() OutcomeDeterminer {
-	return func(_ *Simulation, spell *Spell, spellEffect *SpellEffect, _ *float64) HitOutcome {
+func OutcomeFuncHit() OutcomeApplier {
+	return func(_ *Simulation, spell *Spell, spellEffect *SpellEffect, _ *float64) {
 		spellEffect.Outcome = OutcomeHit
 		spell.Hits++
 	}
 }
 
-func OutcomeFuncTick() OutcomeDeterminer {
+// A tick always hits, but we don't count them as hits in the metrics.
+func OutcomeFuncTick() OutcomeApplier {
 	return func(_ *Simulation, _ *Spell, spellEffect *SpellEffect, _ *float64) {
 		spellEffect.Outcome = OutcomeHit
 	}
 }
 
-func OutcomeFuncMagic() OutcomeDeterminer {
-	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect) HitOutcome {
+func OutcomeFuncMagic(critMultiplier float64) OutcomeApplier {
+	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		if spellEffect.magicHitCheck(sim, spell) {
 			if spellEffect.magicCritCheck(sim, spell) {
-				return OutcomeCrit
+				spellEffect.Outcome = OutcomeCrit
+				spell.Crits++
+				*damage *= critMultiplier
 			} else {
-				return OutcomeHit
+				spellEffect.Outcome = OutcomeHit
+				spell.Hits++
 			}
 		} else {
-			return OutcomeMiss
+			spellEffect.Outcome = OutcomeMiss
+			spell.Misses++
 		}
 	}
 }

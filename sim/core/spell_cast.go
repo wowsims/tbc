@@ -168,7 +168,6 @@ func (spellEffect *SpellEffect) applyModifiers(sim *Simulation, spell *Spell, is
 	spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, damage)
 	spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, damage)
 	spellEffect.applyResistances(sim, spell, damage)
-	spellEffect.applyOutcome(sim, spell, damage)
 }
 
 func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spell) float64 {
@@ -181,7 +180,26 @@ func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spel
 
 func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *Spell, isPeriodic bool) {
 	spellEffect.applyResultsToSpell(spell, isPeriodic && !spellEffect.DotInput.TicksCanMissAndCrit)
+	spellEffect.triggerProcs(sim, spell, isPeriodic)
+}
 
+func (spellEffect *SpellEffect) doDamageSingle(sim *Simulation, spell *Spell, isPeriodic bool, damage float64, outcomeApplier OutcomeApplier) {
+	spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, &damage)
+	spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
+	spellEffect.applyResistances(sim, spell, &damage)
+	outcomeApplier(sim, spell, spellEffect, &damage)
+	spellEffect.Damage = damage
+
+	spellEffect.finalize(sim, spell, false)
+}
+
+func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell, isPeriodic bool) {
+	spell.TotalDamage += spellEffect.Damage
+	spell.TotalThreat += spellEffect.calcThreat(spell.Character)
+	spellEffect.triggerProcs(sim, spell, isPeriodic)
+}
+
+func (spellEffect *SpellEffect) triggerProcs(sim *Simulation, spell *Spell, isPeriodic bool) {
 	if sim.Log != nil && !(spell.SpellExtras.Matches(SpellExtrasAlwaysHits) && spellEffect.Damage == 0) {
 		if isPeriodic {
 			spell.Character.Log(sim, "%s tick %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Character))

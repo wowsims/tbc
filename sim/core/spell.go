@@ -315,18 +315,13 @@ func ApplyEffectFuncAll(effectFuncs []ApplySpellEffects) ApplySpellEffects {
 	}
 }
 
-func ApplyEffectFuncDirectDamage(baseEffect SpellEffect, outcomeDeterminer OutcomeDeterminer) ApplySpellEffects {
+func ApplyEffectFuncDirectDamage(baseEffect SpellEffect, outcomeApplier OutcomeApplier) ApplySpellEffects {
 	return func(sim *Simulation, target *Target, spell *Spell) {
 		effect := baseEffect
 		effect.Target = target
-		effect.Outcome = outcomeDeterminer(sim, spell, &effect)
 
-		damage := effect.calculateBaseDamage(sim, spell)
-		damage *= effect.DamageMultiplier
-		effect.applyModifiers(sim, spell, false, &damage)
-		effect.Damage = damage
-
-		effect.afterCalculations(sim, spell, false)
+		damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
+		effect.doDamageSingle(sim, spell, false, damage, outcomeApplier)
 		spell.Instance.objectInUse = false
 	}
 }

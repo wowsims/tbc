@@ -62,6 +62,6 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 			druid.applyNaturesGrace(&instance.SpellCast)
 			druid.applyNaturesSwiftness(&instance.SpellCast)
 		},
-		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect, core.OutcomeFuncMagic()),
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect, core.OutcomeFuncMagic(druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)))),
 	})
 }

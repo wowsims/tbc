@@ -231,8 +231,8 @@ type Dot struct {
 	Spell *Spell
 	Aura  *Aura
 
-	TickOutcome    OutcomeDeterminer
 	TickBaseDamage BaseDamageCalculator
+	TickOutcome    OutcomeApplier
 	NumberOfTicks  int           // number of ticks over the whole duration
 	TickLength     time.Duration // time between each tick
 
@@ -293,6 +293,7 @@ func (unit *Unit) NewDot(config Dot, auraConfig Aura) *Dot {
 
 	auraConfig.OnGain = func(aura *Aura, sim *Simulation) {
 		dot.effect = dot.MakeEffect(sim)
+		dot.tickDamageSnapshot = 
 
 		periodicOptions := basePeriodicOptions
 		periodicOptions.Period = dot.TickLength
