@@ -33,36 +33,38 @@ func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
 		},
 	}
 
-	baseEffect := core.SpellEffect{
-		DamageMultiplier: 1,
-		ThreatMultiplier: 1,
-		OutcomeApplier:   core.OutcomeFuncMagicHit(),
-	}
+	druid.InsectSwarm = druid.RegisterSpell(core.SpellConfig{
+		Template:   template,
+		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			OutcomeApplier:   core.OutcomeFuncMagicHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					druid.InsectSwarmDot.Apply(sim)
+				}
+			},
+		}),
+	})
 
 	target := sim.GetPrimaryTarget()
-	debuffAura := target.RegisterAura(&core.Aura{
-		Label:    "InsectSwarm-" + strconv.Itoa(int(druid.Index)),
-		ActionID: InsectSwarmActionID,
-	})
-
-	dotEffect := baseEffect
-	dotEffect.IsPeriodic = true
-	dotEffect.BaseDamage = core.BaseDamageConfigMagicNoRoll(792/6, 0.127)
-	dotEffect.OutcomeApplier = core.OutcomeFuncTick()
-
 	druid.InsectSwarmDot = core.NewDot(core.Dot{
-		Aura:          debuffAura,
+		Spell: druid.InsectSwarm,
+		Aura: target.RegisterAura(&core.Aura{
+			Label:    "InsectSwarm-" + strconv.Itoa(int(druid.Index)),
+			ActionID: InsectSwarmActionID,
+		}),
 		NumberOfTicks: 6,
 		TickLength:    time.Second * 2,
-		TickEffects:   core.TickFuncSnapshot(dotEffect, target),
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			IsPeriodic:       true,
+			BaseDamage:       core.BaseDamageConfigMagicNoRoll(792/6, 0.127),
+			OutcomeApplier:   core.OutcomeFuncTick(),
+		}),
 	})
-
-	druid.InsectSwarm = druid.RegisterSpell(core.SpellConfig{
-		Template:     template,
-		ModifyCast:   core.ModifyCastAssignTarget,
-		ApplyEffects: core.ApplyEffectFuncDot(baseEffect, druid.InsectSwarmDot),
-	})
-	druid.InsectSwarmDot.Spell = druid.InsectSwarm
 }
 
 func (druid *Druid) ShouldCastInsectSwarm(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {

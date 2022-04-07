@@ -37,31 +37,27 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 		},
 	}
 
-	baseEffect := core.SpellEffect{
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		DamageMultiplier:    1,
-		ThreatMultiplier:    1,
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:       10,
-			TickLength:          time.Second * 1,
-			TickBaseDamage:      core.DotSnapshotFuncMagic(206, 0.107),
-			Aura:                druid.NewDotAura("Hurricane", core.ActionID{SpellID: SpellIDHurricane}),
-			AffectedByCastSpeed: true,
-		},
-	}
-
-	numHits := sim.GetNumTargets()
-	effects := make([]core.SpellEffect, 0, numHits)
-	for i := int32(0); i < numHits; i++ {
-		effects = append(effects, baseEffect)
-		effects[i].Target = sim.GetTarget(i)
-	}
-	template.Effects = effects
+	hurricaneDot := core.NewDot(core.Dot{
+		Aura: druid.RegisterAura(&core.Aura{
+			Label: "Hurricane",
+		}),
+		NumberOfTicks:       10,
+		TickLength:          time.Second * 1,
+		AffectedByCastSpeed: true,
+		TickEffects: core.TickFuncAOESnapshot(sim, core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagicNoRoll(206, 0.107),
+			OutcomeApplier:   core.OutcomeFuncTick(),
+			IsPeriodic:       true,
+		}),
+	})
 
 	druid.Hurricane = druid.RegisterSpell(core.SpellConfig{
-		Template: template,
+		Template:     template,
+		ApplyEffects: core.ApplyEffectFuncDot(hurricaneDot),
 	})
+	hurricaneDot.Spell = druid.Hurricane
 }
 
 func (druid *Druid) ShouldCastHurricane(sim *core.Simulation, rotation proto.BalanceDruid_Rotation) bool {

@@ -231,6 +231,7 @@ type Dot struct {
 
 	tickFn     func()
 	tickAction *PendingAction
+	tickPeriod time.Duration
 }
 
 func (dot *Dot) Apply(sim *Simulation) {
@@ -238,7 +239,12 @@ func (dot *Dot) Apply(sim *Simulation) {
 		dot.Aura.Deactivate(sim)
 	}
 
-	dot.Aura.Duration = dot.TickLength * time.Duration(dot.NumberOfTicks)
+	if dot.AffectedByCastSpeed {
+		baseDuration := dot.TickLength * time.Duration(dot.NumberOfTicks)
+		castSpeed := dot.Spell.Character.CastSpeed()
+		dot.Aura.Duration = time.Duration(float64(baseDuration) / castSpeed)
+		dot.tickPeriod = time.Duration(float64(dot.TickLength) / castSpeed)
+	}
 	dot.Aura.Activate(sim)
 }
 
@@ -247,18 +253,19 @@ func NewDot(config Dot) *Dot {
 	*dot = config
 
 	basePeriodicOptions := PeriodicActionOptions{
-		Period: dot.TickLength,
 		OnAction: func(sim *Simulation) {
 			dot.tickFn()
 		},
 	}
 
+	dot.tickPeriod = dot.TickLength
+	dot.Aura.Duration = dot.TickLength * time.Duration(dot.NumberOfTicks)
+
 	dot.Aura.OnGain = func(aura *Aura, sim *Simulation) {
 		dot.tickFn = dot.TickEffects(sim, dot.Spell)
 
 		periodicOptions := basePeriodicOptions
-		// TODO: Change tick length if necessary
-		//periodicOptions.Period = dot.TickLength
+		periodicOptions.Period = dot.tickPeriod
 		dot.tickAction = NewPeriodicAction(sim, periodicOptions)
 		sim.AddPendingAction(dot.tickAction)
 	}
@@ -270,7 +277,7 @@ func NewDot(config Dot) *Dot {
 	return dot
 }
 
-func TickFuncSnapshot(baseEffect SpellEffect, target *Target) TickEffects {
+func TickFuncSnapshot(target *Target, baseEffect SpellEffect) TickEffects {
 	return func(sim *Simulation, spell *Spell) func() {
 		snapshotEffect := baseEffect
 		snapshotEffect.Target = target
@@ -281,6 +288,28 @@ func TickFuncSnapshot(baseEffect SpellEffect, target *Target) TickEffects {
 		effectsFunc := ApplyEffectFuncDirectDamage(snapshotEffect)
 		return func() {
 			effectsFunc(sim, target, spell)
+		}
+	}
+}
+func TickFuncAOESnapshot(sim *Simulation, baseEffect SpellEffect) TickEffects {
+	return func(sim *Simulation, spell *Spell) func() {
+		target := sim.GetPrimaryTarget()
+		snapshotEffect := baseEffect
+		snapshotEffect.Target = target
+		baseDamage := snapshotEffect.calculateBaseDamage(sim, spell) * snapshotEffect.DamageMultiplier
+		snapshotEffect.DamageMultiplier = 1
+		snapshotEffect.BaseDamage = BaseDamageConfigFlat(baseDamage)
+
+		effectsFunc := ApplyEffectFuncAOEDamage(sim, snapshotEffect)
+		return func() {
+			effectsFunc(sim, target, spell)
+		}
+	}
+}
+func TickFuncApplyEffects(effectsFunc ApplySpellEffects) TickEffects {
+	return func(sim *Simulation, spell *Spell) func() {
+		return func() {
+			effectsFunc(sim, sim.GetPrimaryTarget(), spell)
 		}
 	}
 }

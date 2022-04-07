@@ -187,10 +187,6 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *Spell,
 	spellEffect.triggerProcs(sim, spell, isPeriodic)
 }
 
-func (spellEffect *SpellEffect) doDamageSingle(sim *Simulation, spell *Spell, isPeriodic bool, damage float64) {
-	spellEffect.calcDamageSingle(sim, spell, isPeriodic, damage)
-	spellEffect.finalize(sim, spell, isPeriodic)
-}
 func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, isPeriodic bool, damage float64) {
 	spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, &damage)
 	spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
@@ -223,11 +219,11 @@ func (spellEffect *SpellEffect) triggerProcs(sim *Simulation, spell *Spell, isPe
 		spell.Character.OnSpellHit(sim, spell, spellEffect)
 		spellEffect.Target.OnSpellHit(sim, spell, spellEffect)
 	} else {
-		spell.Character.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
-		spellEffect.Target.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 		if spellEffect.DotInput.OnPeriodicDamage != nil {
 			spellEffect.DotInput.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 		}
+		spell.Character.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
+		spellEffect.Target.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 	}
 }
 

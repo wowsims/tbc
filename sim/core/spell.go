@@ -73,6 +73,7 @@ func (instance *SimpleSpell) Cast(sim *Simulation, target *Target, spell *Spell)
 
 		if spell.ApplyEffects != nil {
 			spell.ApplyEffects(sim, target, spell)
+			spell.Instance.objectInUse = false
 			return
 		}
 
@@ -316,46 +317,59 @@ func ApplyEffectFuncAll(effectFuncs []ApplySpellEffects) ApplySpellEffects {
 }
 
 func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
-	return func(sim *Simulation, target *Target, spell *Spell) {
-		effect := baseEffect
-		effect.Target = target
-
-		damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
-		effect.doDamageSingle(sim, spell, effect.IsPeriodic, damage)
-		spell.Instance.objectInUse = false
-	}
-}
-
-func ApplyEffectFuncDot(baseEffect SpellEffect, dot *Dot) ApplySpellEffects {
 	if baseEffect.BaseDamage.Calculator == nil {
-		// Applying the dot is the only effect.
+		// Just a hit check.
 		return func(sim *Simulation, target *Target, spell *Spell) {
 			effect := baseEffect
 			effect.Target = target
 
 			damage := 0.0
 			effect.OutcomeApplier(sim, spell, &effect, &damage)
-			if effect.Landed() {
-				dot.Apply(sim)
-			}
 			effect.triggerProcs(sim, spell, effect.IsPeriodic)
-
-			spell.Instance.objectInUse = false
 		}
 	} else {
-		// Direct damage + apply dot spell, e.g. Moonfire or Immolate.
 		return func(sim *Simulation, target *Target, spell *Spell) {
 			effect := baseEffect
 			effect.Target = target
 
 			damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
 			effect.calcDamageSingle(sim, spell, effect.IsPeriodic, damage)
-			if effect.Landed() {
-				dot.Apply(sim)
-			}
 			effect.finalize(sim, spell, effect.IsPeriodic)
-
-			spell.Instance.objectInUse = false
 		}
+	}
+}
+
+func ApplyEffectFuncDamageMultiple(baseEffects []SpellEffect) ApplySpellEffects {
+	if len(baseEffects) == 0 {
+		panic("Multiple damage requires hits")
+	} else if len(baseEffects) == 1 {
+		return ApplyEffectFuncDirectDamage(baseEffects[0])
+	}
+
+	return func(sim *Simulation, _ *Target, spell *Spell) {
+		for i, _ := range baseEffects {
+			effect := &baseEffects[i]
+			damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
+			effect.calcDamageSingle(sim, spell, effect.IsPeriodic, damage)
+		}
+		for i, _ := range baseEffects {
+			effect := &baseEffects[i]
+			effect.finalize(sim, spell, effect.IsPeriodic)
+		}
+	}
+}
+func ApplyEffectFuncAOEDamage(sim *Simulation, baseEffect SpellEffect) ApplySpellEffects {
+	numHits := sim.GetNumTargets()
+	effects := make([]SpellEffect, 0, numHits)
+	for i := int32(0); i < numHits; i++ {
+		effects = append(effects, baseEffect)
+		effects[i].Target = sim.GetTarget(i)
+	}
+	return ApplyEffectFuncDamageMultiple(effects)
+}
+
+func ApplyEffectFuncDot(dot *Dot) ApplySpellEffects {
+	return func(sim *Simulation, _ *Target, _ *Spell) {
+		dot.Apply(sim)
 	}
 }

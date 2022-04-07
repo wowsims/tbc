@@ -26,22 +26,21 @@ func (druid *Druid) registerFaerieFireSpell(sim *core.Simulation) {
 				GCD: core.GCDDefault,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			ThreatMultiplier:    1,
-			FlatThreatBonus:     0, // TODO
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
-					return
-				}
-				druid.FaerieFireAura.Activate(sim)
-			},
-		},
 	}
 
 	druid.FaerieFire = druid.RegisterSpell(core.SpellConfig{
 		Template:   template,
 		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ThreatMultiplier: 1,
+			FlatThreatBonus:  0, // TODO
+			OutcomeApplier:   core.OutcomeFuncMagicHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					druid.FaerieFireAura.Activate(sim)
+				}
+			},
+		}),
 	})
 }
 
