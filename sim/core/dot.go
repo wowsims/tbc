@@ -213,10 +213,13 @@ func (unit *Unit) NewDotAura(auraLabel string, actionID ActionID) *Aura {
 	})
 }
 
-type DotConfig struct {
-	Spell        *Spell
-	AuraLabel    string
-	AuraActionID ActionID
+type TickEffects func(*Simulation, *Spell) func()
+
+type Dot struct {
+	Spell *Spell
+
+	// Embed Aura so we can use IsActive/Refresh/etc directly.
+	*Aura
 
 	NumberOfTicks int           // number of ticks over the whole duration
 	TickLength    time.Duration // time between each tick
@@ -224,30 +227,13 @@ type DotConfig struct {
 	// If true, tick length will be shortened based on casting speed.
 	AffectedByCastSpeed bool
 
-	//MakeApplyEffects func (....) ApplySpellEffects
-}
+	TickEffects TickEffects
 
-type Dot struct {
-	Spell *Spell
-	Aura  *Aura
-
-	TickBaseDamage BaseDamageCalculator
-	TickOutcome    OutcomeApplier
-	NumberOfTicks  int           // number of ticks over the whole duration
-	TickLength     time.Duration // time between each tick
-
-	// If true, tick length will be shortened based on casting speed.
-	AffectedByCastSpeed bool
-
-	MakeEffect func(*Simulation) SpellEffect
-
+	tickFn     func()
 	tickAction *PendingAction
-	effect     SpellEffect
-
-	tickDamageSnapshot float64
 }
 
-func (dot *Dot) Apply(sim *Simulation, spellEffect SpellEffect) {
+func (dot *Dot) Apply(sim *Simulation) {
 	if dot.Aura.IsActive() {
 		dot.Aura.Deactivate(sim)
 	}
@@ -256,55 +242,45 @@ func (dot *Dot) Apply(sim *Simulation, spellEffect SpellEffect) {
 	dot.Aura.Activate(sim)
 }
 
-func (dot *Dot) tick(sim *Simulation) {
-	damage := dot.tickDamageSnapshot
-
-	dot.effect.determineOutcome(sim, dot.Spell, true)
-
-	//if !dot.effect.DotInput.IgnoreDamageModifiers {
-	dot.effect.applyAttackerModifiers(sim, dot.Spell, true, &damage)
-	dot.effect.applyTargetModifiers(sim, dot.Spell, true, dot.effect.BaseDamage.TargetSpellCoefficient, &damage)
-	//}
-	dot.effect.applyResistances(sim, dot.Spell, &damage)
-	dot.effect.applyOutcome(sim, dot.Spell, &damage)
-
-	dot.effect.Damage = damage
-
-	dot.effect.afterCalculations(sim, dot.Spell, true)
-}
-
-// Note that unit should be the unit this dot will be attached to. For regular dots
-// this is usually the target, and for aoe spells (like Blizzard) this might be
-// the caster.
-func (unit *Unit) NewDot(config Dot, auraConfig Aura) *Dot {
+func NewDot(config Dot) *Dot {
 	dot := &Dot{}
 	*dot = config
 
 	basePeriodicOptions := PeriodicActionOptions{
+		Period: dot.TickLength,
 		OnAction: func(sim *Simulation) {
-			dot.tick(sim)
-		},
-		CleanUp: func(sim *Simulation) {
-			if sim.CurrentTime == dot.tickAction.NextActionAt {
-				dot.tick(sim)
-			}
+			dot.tickFn()
 		},
 	}
 
-	auraConfig.OnGain = func(aura *Aura, sim *Simulation) {
-		dot.effect = dot.MakeEffect(sim)
-		dot.tickDamageSnapshot = 
+	dot.Aura.OnGain = func(aura *Aura, sim *Simulation) {
+		dot.tickFn = dot.TickEffects(sim, dot.Spell)
 
 		periodicOptions := basePeriodicOptions
-		periodicOptions.Period = dot.TickLength
+		// TODO: Change tick length if necessary
+		//periodicOptions.Period = dot.TickLength
 		dot.tickAction = NewPeriodicAction(sim, periodicOptions)
 		sim.AddPendingAction(dot.tickAction)
 	}
-	auraConfig.OnExpire = func(aura *Aura, sim *Simulation) {
+	dot.Aura.OnExpire = func(aura *Aura, sim *Simulation) {
 		dot.tickAction.Cancel(sim)
 		dot.tickAction = nil
 	}
 
-	dot.Aura = unit.RegisterAura(&auraConfig)
 	return dot
+}
+
+func TickFuncSnapshot(baseEffect SpellEffect, target *Target) TickEffects {
+	return func(sim *Simulation, spell *Spell) func() {
+		snapshotEffect := baseEffect
+		snapshotEffect.Target = target
+		baseDamage := snapshotEffect.calculateBaseDamage(sim, spell) * snapshotEffect.DamageMultiplier
+		snapshotEffect.DamageMultiplier = 1
+		snapshotEffect.BaseDamage = BaseDamageConfigFlat(baseDamage)
+
+		effectsFunc := ApplyEffectFuncDirectDamage(snapshotEffect)
+		return func() {
+			effectsFunc(sim, target, spell)
+		}
+	}
 }

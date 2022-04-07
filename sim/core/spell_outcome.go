@@ -12,7 +12,7 @@ import (
 //  3. Modify the damage if necessary.
 type OutcomeApplier func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64)
 
-func OutcomeFuncHit() OutcomeApplier {
+func OutcomeFuncAlwaysHit() OutcomeApplier {
 	return func(_ *Simulation, spell *Spell, spellEffect *SpellEffect, _ *float64) {
 		spellEffect.Outcome = OutcomeHit
 		spell.Hits++
@@ -26,7 +26,7 @@ func OutcomeFuncTick() OutcomeApplier {
 	}
 }
 
-func OutcomeFuncMagic(critMultiplier float64) OutcomeApplier {
+func OutcomeFuncMagicHitAndCrit(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		if spellEffect.magicHitCheck(sim, spell) {
 			if spellEffect.magicCritCheck(sim, spell) {
@@ -40,6 +40,20 @@ func OutcomeFuncMagic(critMultiplier float64) OutcomeApplier {
 		} else {
 			spellEffect.Outcome = OutcomeMiss
 			spell.Misses++
+			*damage = 0
+		}
+	}
+}
+
+func OutcomeFuncMagicHit() OutcomeApplier {
+	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+		if spellEffect.magicHitCheck(sim, spell) {
+			spellEffect.Outcome = OutcomeHit
+			spell.Hits++
+		} else {
+			spellEffect.Outcome = OutcomeMiss
+			spell.Misses++
+			*damage = 0
 		}
 	}
 }

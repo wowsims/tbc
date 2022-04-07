@@ -24,8 +24,9 @@ type SpellEffect struct {
 	// Target of the spell.
 	Target *Target
 
-	BaseDamage BaseDamageConfig
-	DotInput   DotDamageInput
+	BaseDamage     BaseDamageConfig
+	OutcomeApplier OutcomeApplier
+	DotInput       DotDamageInput
 
 	// Bonus stats to be added to the spell.
 	BonusSpellHitRating  float64
@@ -43,6 +44,9 @@ type SpellEffect struct {
 
 	// Adds a fixed amount of threat to this spell, before multipliers.
 	FlatThreatBonus float64
+
+	// TODO: Should be able to remove this after refactoring is done.
+	IsPeriodic bool
 
 	// Whether this is a phantom cast. Phantom casts are usually casts triggered by some effect,
 	// like The Lightning Capacitor or Shaman Flametongue Weapon. Many on-hit effects do not
@@ -183,19 +187,23 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *Spell,
 	spellEffect.triggerProcs(sim, spell, isPeriodic)
 }
 
-func (spellEffect *SpellEffect) doDamageSingle(sim *Simulation, spell *Spell, isPeriodic bool, damage float64, outcomeApplier OutcomeApplier) {
+func (spellEffect *SpellEffect) doDamageSingle(sim *Simulation, spell *Spell, isPeriodic bool, damage float64) {
+	spellEffect.calcDamageSingle(sim, spell, isPeriodic, damage)
+	spellEffect.finalize(sim, spell, isPeriodic)
+}
+func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, isPeriodic bool, damage float64) {
 	spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, &damage)
 	spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	spellEffect.applyResistances(sim, spell, &damage)
-	outcomeApplier(sim, spell, spellEffect, &damage)
+	spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
 	spellEffect.Damage = damage
-
-	spellEffect.finalize(sim, spell, false)
 }
 
 func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell, isPeriodic bool) {
 	spell.TotalDamage += spellEffect.Damage
-	spell.TotalThreat += spellEffect.calcThreat(spell.Character)
+	if spellEffect.Landed() {
+		spell.TotalThreat += spellEffect.calcThreat(spell.Character)
+	}
 	spellEffect.triggerProcs(sim, spell, isPeriodic)
 }
 
