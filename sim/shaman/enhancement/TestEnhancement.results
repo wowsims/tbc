@@ -191,7 +191,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-CataclysmRegalia"
  value: {
-  dps: 1558.374953730326
+  dps: 1562.053495639929
  }
 }
 dps_results: {
@@ -263,7 +263,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-DesolationBattlegear"
  value: {
-  dps: 1646.0189716243558
+  dps: 1666.1747574209207
  }
 }
 dps_results: {
@@ -275,7 +275,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Devastation-30316"
  value: {
-  dps: 1596.658695782933
+  dps: 1600.6633175760737
  }
 }
 dps_results: {
@@ -419,7 +419,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 2010.8579333695218
+  dps: 2005.980590677767
  }
 }
 dps_results: {
@@ -437,7 +437,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Mana-EtchedRegalia"
  value: {
-  dps: 1568.101512116819
+  dps: 1557.825711230113
  }
 }
 dps_results: {
@@ -467,7 +467,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-NaturalAlignmentCrystal-19344"
  value: {
-  dps: 1963.5642879588968
+  dps: 1966.4455158021797
  }
 }
 dps_results: {
@@ -515,7 +515,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-RobeoftheElderScribes-28602"
  value: {
-  dps: 1875.7910581436772
+  dps: 1856.4864562905743
  }
 }
 dps_results: {
@@ -569,7 +569,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-SingingCrystalAxe-31318"
  value: {
-  dps: 1265.9961581540329
+  dps: 1242.9136375802009
  }
 }
 dps_results: {
@@ -605,7 +605,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 1813.7177420937626
+  dps: 1828.2016558862742
  }
 }
 dps_results: {
@@ -617,13 +617,13 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-StormGauntlets-12632"
  value: {
-  dps: 1865.759119201971
+  dps: 1868.6544454537375
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-StrengthoftheClefthoof"
  value: {
-  dps: 1739.7407018234192
+  dps: 1754.084604501798
  }
 }
 dps_results: {
@@ -713,7 +713,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TidefuryRaiment"
  value: {
-  dps: 1551.5724624086217
+  dps: 1545.5523368857819
  }
 }
 dps_results: {
@@ -737,19 +737,19 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-WastewalkerArmor"
  value: {
-  dps: 1696.6033355947488
+  dps: 1707.5435183540158
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-WindhawkArmor"
  value: {
-  dps: 1745.3928742682763
+  dps: 1741.3384476772676
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-WorldBreaker-30090"
  value: {
-  dps: 1407.7358991310562
+  dps: 1411.3907421073002
  }
 }
 dps_results: {
@@ -767,19 +767,19 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Average-Default"
  value: {
-  dps: 1959.2336415558566
+  dps: 1959.7817616554685
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2233.3279625725704
+  dps: 2246.564440693792
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 2050.856110308428
+  dps: 2066.6294221740714
  }
 }
 dps_results: {
@@ -797,25 +797,25 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1040.4387297028074
+  dps: 1097.3041504808807
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 965.1668623911315
+  dps: 985.1488436159751
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 659.3503084877705
+  dps: 685.1823960899601
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1189.1929696785478
+  dps: 1212.5343236484898
  }
 }
 dps_results: {
@@ -845,24 +845,24 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1050.53894193653
+  dps: 1084.1248201965482
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 958.0119940695064
+  dps: 971.8274825579675
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 678.8361399011736
+  dps: 713.2117319002464
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1188.5861391205954
+  dps: 1212.1992793942206
  }
 }

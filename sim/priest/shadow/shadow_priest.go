@@ -110,9 +110,9 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	// timeForDots := sim.Duration-sim.CurrentTime > time.Second*12
 	// TODO: stop casting dots near the end?
 
-	if spriest.Talents.VampiricTouch && spriest.CurVTSpell.Instance.Effect.DotInput.TimeRemaining(sim) <= vtCastTime {
-		spell = spriest.NextVTSpell
-	} else if !spriest.ShadowWordPain.Instance.Effect.DotInput.IsTicking(sim) {
+	if spriest.Talents.VampiricTouch && spriest.VampiricTouchDot.RemainingDuration(sim) <= vtCastTime {
+		spell = spriest.VampiricTouch
+	} else if !spriest.ShadowWordPainDot.IsActive() {
 		spell = spriest.ShadowWordPain
 	} else if spriest.rotation.UseStarshards && spriest.GetRemainingCD(priest.SSCooldownID, sim.CurrentTime) == 0 {
 		spell = spriest.Starshards
@@ -123,8 +123,8 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 		allCDs := []time.Duration{
 			mbidx:  spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime),
 			swdidx: spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime),
-			vtidx:  spriest.CurVTSpell.Instance.Effect.DotInput.TimeRemaining(sim) - vtCastTime,
-			swpidx: spriest.ShadowWordPain.Instance.Effect.DotInput.TimeRemaining(sim),
+			vtidx:  spriest.VampiricTouchDot.RemainingDuration(sim) - vtCastTime,
+			swpidx: spriest.ShadowWordPainDot.RemainingDuration(sim),
 		}
 
 		if allCDs[mbidx] == 0 {
@@ -166,8 +166,8 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 		// what do you even do... i guess just sit around
 		mbcd := spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime)
 		swdcd := spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime)
-		vtidx := spriest.CurVTSpell.Instance.Effect.DotInput.TimeRemaining(sim) - vtCastTime
-		swpidx := spriest.ShadowWordPain.Instance.Effect.DotInput.TimeRemaining(sim)
+		vtidx := spriest.VampiricTouchDot.RemainingDuration(sim) - vtCastTime
+		swpidx := spriest.ShadowWordPainDot.RemainingDuration(sim)
 		wait1 = core.MinDuration(mbcd, swdcd)
 		wait2 = core.MinDuration(vtidx, swpidx)
 		wait = core.MinDuration(wait1, wait2)
@@ -227,9 +227,9 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, allCDs 
 		} else if nextIdx == 1 {
 			Major_dmg = (618 + spriest.GetStat(stats.SpellPower)*0.429) / (gcd + nextCD).Seconds() * averageCritMultiplier
 		} else if nextIdx == 2 {
-			Major_dmg = (spriest.CurVTSpell.Instance.Effect.DotInput.DamagePerTick() * float64(spriest.CurVTSpell.Instance.Effect.DotInput.NumberOfTicks)) / (gcd + nextCD).Seconds()
+			Major_dmg = spriest.VampiricTouch.CurDamagePerCast() / (gcd + nextCD).Seconds()
 		} else if nextIdx == 3 {
-			Major_dmg = (spriest.ShadowWordPain.Instance.Effect.DotInput.DamagePerTick() * float64(spriest.ShadowWordPain.Instance.Effect.DotInput.NumberOfTicks)) / (gcd + nextCD).Seconds()
+			Major_dmg = spriest.ShadowWordPain.CurDamagePerCast() / (gcd + nextCD).Seconds()
 		}
 
 		dpsPossibleshort := []float64{
@@ -280,8 +280,8 @@ func (spriest *ShadowPriest) IdealMindflayRotation(sim *core.Simulation, allCDs 
 	spellDamages := []float64{
 		mbidx:  (731.5 + spriest.GetStat(stats.SpellPower)*0.429) / (gcd + cdDiffs[mbidx]).Seconds() * averageCritMultiplier,
 		swdidx: (618 + spriest.GetStat(stats.SpellPower)*0.429) / (gcd + cdDiffs[swdidx]).Seconds() * averageCritMultiplier,
-		vtidx:  (spriest.CurVTSpell.Instance.Effect.DotInput.DamagePerTick() * float64(spriest.CurVTSpell.Instance.Effect.DotInput.NumberOfTicks)) / (gcd + cdDiffs[vtidx]).Seconds(),
-		swpidx: (spriest.ShadowWordPain.Instance.Effect.DotInput.DamagePerTick() * float64(spriest.ShadowWordPain.Instance.Effect.DotInput.NumberOfTicks)) / (gcd + cdDiffs[swpidx]).Seconds(),
+		vtidx:  spriest.VampiricTouch.CurDamagePerCast() / (gcd + cdDiffs[vtidx]).Seconds(),
+		swpidx: spriest.ShadowWordPain.CurDamagePerCast() / (gcd + cdDiffs[swpidx]).Seconds(),
 	}
 
 	bestIdx := 0

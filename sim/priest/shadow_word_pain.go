@@ -1,6 +1,7 @@
 package priest
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -25,29 +26,44 @@ func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
 				GCD:         core.GCDDefault,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:  6,
-				TickLength:     time.Second * 3,
-				TickBaseDamage: core.DotSnapshotFuncMagic(1236/6, 0.183),
-				Aura:           priest.NewDotAura("Shadow Word Pain", core.ActionID{SpellID: SpellIDShadowWordPain}),
-			},
-		},
 	}
-
-	template.Effect.DotInput.NumberOfTicks += int(priest.Talents.ImprovedShadowWordPain) // extra tick per point
-
-	if ItemSetAbsolution.CharacterHasSetBonus(&priest.Character, 2) { // Absolution 2p adds 1 extra tick to swp
-		template.Effect.DotInput.NumberOfTicks += 1
-	}
-
-	priest.applyTalentsToShadowSpell(&template.SpellCast.Cast, &template.Effect)
+	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
 
 	priest.ShadowWordPain = priest.RegisterSpell(core.SpellConfig{
-		Template:   template,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: template,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
+			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
+			OutcomeApplier:      core.OutcomeFuncMagicHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					priest.ShadowWordPainDot.Apply(sim)
+				}
+			},
+		}),
+	})
+
+	target := sim.GetPrimaryTarget()
+	priest.ShadowWordPainDot = core.NewDot(core.Dot{
+		Spell: priest.ShadowWordPain,
+		Aura: target.RegisterAura(&core.Aura{
+			Label:    "ShadowWordPain-" + strconv.Itoa(int(priest.Index)),
+			ActionID: ShadowWordPainActionID,
+		}),
+
+		NumberOfTicks: 6 +
+			int(priest.Talents.ImprovedShadowWordPain) +
+			core.TernaryInt(ItemSetAbsolution.CharacterHasSetBonus(&priest.Character, 2), 1, 0),
+		TickLength: time.Second * 3,
+
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1 *
+				(1 + float64(priest.Talents.Darkness)*0.02) *
+				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1),
+			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
+			IsPeriodic:       true,
+			BaseDamage:       core.BaseDamageConfigMagicNoRoll(1236/6, 0.183),
+			OutcomeApplier:   core.OutcomeFuncTick(),
+		}),
 	})
 }

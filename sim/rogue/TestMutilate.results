@@ -623,7 +623,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Average-Default"
  value: {
-  dps: 1229.156917277762
+  dps: 1229.1516974523254
  }
 }
 dps_results: {

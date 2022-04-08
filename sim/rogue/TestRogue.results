@@ -749,7 +749,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Average-Default"
  value: {
-  dps: 1417.5013617628028
+  dps: 1417.5038923218751
  }
 }
 dps_results: {

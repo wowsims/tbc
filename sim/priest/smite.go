@@ -10,6 +10,7 @@ import (
 const SpellIDSmite int32 = 25364
 
 var SmiteCooldownID = core.NewCooldownID()
+var SmiteActionID = core.ActionID{SpellID: SpellIDSmite}
 
 func (priest *Priest) registerSmiteSpell(sim *core.Simulation) {
 	template := core.SimpleSpell{
@@ -34,28 +35,28 @@ func (priest *Priest) registerSmiteSpell(sim *core.Simulation) {
 				Cooldown: time.Second * 0,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			BaseDamage:          core.BaseDamageConfigMagic(549, 616, 0.7143),
-		},
 	}
-
-	priest.applyTalentsToHolySpell(&template.SpellCast.Cast, &template.Effect)
-
 	template.CastTime -= time.Millisecond * 100 * time.Duration(priest.Talents.DivineFury)
-	template.Effect.DamageMultiplier *= (1 + (0.05 * float64(priest.Talents.SearingLight)))
-	template.Effect.BonusSpellHitRating += float64(priest.Talents.FocusedPower) * 2 * core.SpellHitRatingPerHitChance // 2% crit per point
-	template.Effect.OnSpellHit = priest.applyOnHitTalents
 
 	priest.Smite = priest.RegisterSpell(core.SpellConfig{
 		Template: template,
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.Effect.Target = target
 			priest.applySurgeOfLight(&instance.SpellCast)
 		},
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+
+			BonusSpellHitRating: float64(priest.Talents.FocusedPower) * 2 * core.SpellHitRatingPerHitChance,
+
+			BonusSpellCritRating: float64(priest.Talents.HolySpecialization) * 1 * core.SpellCritRatingPerCritChance,
+
+			DamageMultiplier: 1 + 0.05*float64(priest.Talents.SearingLight),
+
+			ThreatMultiplier: 1 - 0.04*float64(priest.Talents.SilentResolve),
+
+			BaseDamage:     core.BaseDamageConfigMagic(549, 616, 0.7143),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
+
+			OnSpellHit: priest.applyOnHitTalents,
+		}),
 	})
 }

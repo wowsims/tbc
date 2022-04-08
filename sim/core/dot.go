@@ -232,6 +232,8 @@ type Dot struct {
 	tickFn     func()
 	tickAction *PendingAction
 	tickPeriod time.Duration
+
+	lastTickTime time.Duration
 }
 
 func (dot *Dot) Apply(sim *Simulation) {
@@ -247,6 +249,7 @@ func (dot *Dot) Apply(sim *Simulation) {
 	dot.Aura.Activate(sim)
 }
 
+// Call this after manually changing NumberOfTicks or TickLength.
 func (dot *Dot) RecomputeAuraDuration() {
 	if dot.AffectedByCastSpeed {
 		castSpeed := dot.Spell.Character.CastSpeed()
@@ -264,7 +267,20 @@ func NewDot(config Dot) *Dot {
 
 	basePeriodicOptions := PeriodicActionOptions{
 		OnAction: func(sim *Simulation) {
-			dot.tickFn()
+			if dot.lastTickTime != sim.CurrentTime {
+				dot.lastTickTime = sim.CurrentTime
+				dot.tickFn()
+			}
+		},
+		CleanUp: func(sim *Simulation) {
+			// In certain cases, the last tick and the dot aura expiration can happen in
+			// different orders, so we might need to apply the last tick.
+			if dot.tickAction.NextActionAt == sim.CurrentTime {
+				if dot.lastTickTime != sim.CurrentTime {
+					dot.lastTickTime = sim.CurrentTime
+					dot.tickFn()
+				}
+			}
 		},
 	}
 

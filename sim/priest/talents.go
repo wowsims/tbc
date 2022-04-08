@@ -45,6 +45,7 @@ func (priest *Priest) ApplyTalents() {
 				return spellPower + spellPower*coeff
 			},
 		})
+		priest.AddStat(stats.SpellCrit, float64(priest.Talents.ForceOfWill)*1*core.SpellCritRatingPerCritChance)
 	}
 
 	if priest.Talents.Enlightenment > 0 {
@@ -86,7 +87,6 @@ func (priest *Priest) ApplyTalents() {
 }
 
 func (priest *Priest) applyOnHitTalents(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-
 	roll := sim.RandomFloat("SurgeOfLight")
 	if priest.Talents.SurgeOfLight == 2 && spellEffect.Outcome.Matches(core.OutcomeCrit) && roll > 0.5 {
 		priest.SurgeOfLight = true
@@ -109,35 +109,6 @@ func (priest *Priest) applyTalentsToHolySpell(cast *core.Cast, effect *core.Spel
 	effect.ThreatMultiplier *= 1 - 0.04*float64(priest.Talents.SilentResolve)
 	if cast.ActionID.SpellID == SpellIDSmite || cast.ActionID.SpellID == SpellIDHolyFire {
 		effect.BonusSpellCritRating += float64(priest.Talents.HolySpecialization) * 1 * core.SpellCritRatingPerCritChance
-	}
-
-	effect.BonusSpellCritRating += float64(priest.Talents.ForceOfWill) * 1 * core.SpellCritRatingPerCritChance
-}
-
-func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellEffect) {
-	effect.ThreatMultiplier *= 1 - 0.08*float64(priest.Talents.ShadowAffinity)
-	if cast.ActionID.SpellID == SpellIDShadowWordDeath || cast.ActionID.SpellID == SpellIDMindBlast {
-		effect.BonusSpellCritRating += float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance
-	}
-	if cast.ActionID.SpellID == SpellIDMindFlay || cast.ActionID.SpellID == SpellIDMindBlast {
-		cast.Cost.Value -= cast.BaseCost.Value * float64(priest.Talents.FocusedMind) * 0.05
-	}
-	if cast.SpellSchool == core.SpellSchoolShadow {
-		effect.DamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
-
-		if priest.Talents.Shadowform {
-			effect.DamageMultiplier *= 1.15
-		}
-
-		// shadow focus gives 2% hit per level
-		effect.BonusSpellHitRating += float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance
-
-		// TODO should add more instant cast spells here
-		if cast.ActionID.SpellID == SpellIDShadowWordPain {
-			cast.Cost.Value -= cast.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
-		}
-
-		effect.BonusSpellCritRating += float64(priest.Talents.ForceOfWill) * 1 * core.SpellCritRatingPerCritChance
 	}
 }
 

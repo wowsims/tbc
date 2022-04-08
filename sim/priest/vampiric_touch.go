@@ -1,6 +1,7 @@
 package priest
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -9,7 +10,7 @@ import (
 
 var VampiricTouchActionID = core.ActionID{SpellID: 34917}
 
-func (priest *Priest) newVampiricTouchSpell(sim *core.Simulation, isAltCast bool) *core.Spell {
+func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
 	cost := core.ResourceCost{Type: stats.Mana, Value: 425}
 	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -23,33 +24,41 @@ func (priest *Priest) newVampiricTouchSpell(sim *core.Simulation, isAltCast bool
 				GCD:         core.GCDDefault,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:  5,
-				TickLength:     time.Second * 3,
-				TickBaseDamage: core.DotSnapshotFuncMagic(650/5, 0.2),
-				Aura:           priest.NewDotAura("Vampiric Touch", VampiricTouchActionID),
-			},
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if isAltCast {
-					priest.CurVTSpell = priest.VampiricTouch2
-					priest.NextVTSpell = priest.VampiricTouch
-				} else {
-					priest.CurVTSpell = priest.VampiricTouch
-					priest.NextVTSpell = priest.VampiricTouch2
-				}
-			},
-		},
 	}
 
-	priest.applyTalentsToShadowSpell(&template.SpellCast.Cast, &template.Effect)
+	priest.VampiricTouch = priest.RegisterSpell(core.SpellConfig{
+		Template: template,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
+			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
+			OutcomeApplier:      core.OutcomeFuncMagicHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					priest.VampiricTouchDot.Apply(sim)
+				}
+			},
+		}),
+	})
 
-	return priest.RegisterSpell(core.SpellConfig{
-		Template:   template,
-		ModifyCast: core.ModifyCastAssignTarget,
+	target := sim.GetPrimaryTarget()
+	priest.VampiricTouchDot = core.NewDot(core.Dot{
+		Spell: priest.VampiricTouch,
+		Aura: target.RegisterAura(&core.Aura{
+			Label:    "VampiricTouch-" + strconv.Itoa(int(priest.Index)),
+			ActionID: VampiricTouchActionID,
+		}),
+
+		NumberOfTicks: 5,
+		TickLength:    time.Second * 3,
+
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1 *
+				(1 + float64(priest.Talents.Darkness)*0.02) *
+				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1),
+			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
+			IsPeriodic:       true,
+			BaseDamage:       core.BaseDamageConfigMagicNoRoll(650/5, 0.2),
+			OutcomeApplier:   core.OutcomeFuncTick(),
+		}),
 	})
 }
