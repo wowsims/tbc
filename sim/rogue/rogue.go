@@ -58,20 +58,21 @@ type Rogue struct {
 
 	eviscerateEnergyCost float64
 	envenomEnergyCost    float64
-	deadlyPoisonStacks   int
 
-	Backstab            *core.Spell
-	DeadlyPoisonRefresh *core.Spell
-	DeadlyPoison        *core.Spell
-	Envenom             *core.Spell
-	Eviscerate          *core.Spell
-	ExposeArmor         *core.Spell
-	Hemorrhage          *core.Spell
-	InstantPoison       *core.Spell
-	Mutilate            *core.Spell
-	Rupture             *core.Spell
-	Shiv                *core.Spell
-	SinisterStrike      *core.Spell
+	Backstab       *core.Spell
+	DeadlyPoison   *core.Spell
+	Envenom        *core.Spell
+	Eviscerate     *core.Spell
+	ExposeArmor    *core.Spell
+	Hemorrhage     *core.Spell
+	InstantPoison  *core.Spell
+	Mutilate       *core.Spell
+	Rupture        *core.Spell
+	Shiv           *core.Spell
+	SinisterStrike *core.Spell
+
+	DeadlyPoisonDot *core.Dot
+	RuptureDot      *core.Dot
 
 	AdrenalineRushAura *core.Aura
 	BladeFlurryAura    *core.Aura
@@ -100,7 +101,7 @@ func (rogue *Rogue) Finalize(raid *core.Raid) {
 }
 
 func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras core.SpellExtras, procMask core.ProcMask) core.SimpleSpell {
-	return core.SimpleSpell{
+	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				ActionID:    actionID,
@@ -119,15 +120,11 @@ func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras
 				SpellExtras: spellExtras,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      rogue.critMultiplier(procMask.Matches(core.ProcMaskMeleeMH), spellExtras.Matches(SpellFlagBuilder)),
-			ProcMask:            procMask,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-		},
 	}
+	if rogue.Talents.SurpriseAttacks && spellExtras.Matches(SpellFlagFinisher) {
+		spell.SpellExtras |= core.SpellExtrasCannotBeDodged
+	}
+	return spell
 }
 
 func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) {
@@ -139,7 +136,6 @@ func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) 
 func (rogue *Rogue) Init(sim *core.Simulation) {
 	rogue.registerBackstabSpell(sim)
 	rogue.registerDeadlyPoisonSpell(sim)
-	rogue.registerDeadlyPoisonRefreshSpell(sim)
 	rogue.registerEviscerateSpell(sim)
 	rogue.registerExposeArmorSpell(sim)
 	rogue.registerHemorrhageSpell(sim)
@@ -166,7 +162,6 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.plan = PlanOpener
 	rogue.deathmantle4pcProc = false
-	rogue.deadlyPoisonStacks = 0
 	rogue.doneSND = false
 
 	permaEA := rogue.ExposeArmorAura.ExpiresAt() == core.NeverExpires
@@ -266,7 +261,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 
 	if rogue.Rotation.UseShiv && rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueDeadlyPoison {
 		rogue.CastBuilder = func(sim *core.Simulation, target *core.Target) {
-			if rogue.DeadlyPoison.Instance.Effect.DotInput.IsTicking(sim) && rogue.DeadlyPoison.Instance.Effect.DotInput.TimeRemaining(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.shivEnergyCost {
+			if rogue.DeadlyPoisonDot.IsActive() && rogue.DeadlyPoisonDot.RemainingDuration(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.shivEnergyCost {
 				rogue.Shiv.Cast(sim, target)
 			} else {
 				CastBuilder(sim, target)

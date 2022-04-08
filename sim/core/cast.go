@@ -52,6 +52,9 @@ type Cast struct {
 
 	CastTime time.Duration
 
+	// TODO: Figure out how to compute this automatically based on channel settings.
+	ChannelTime time.Duration
+
 	// Adds additional delay to the GCD after the cast is completed. This is usually
 	// used for adding latency following the cast.
 	AfterCastDelay time.Duration
@@ -123,6 +126,7 @@ func (cast *Cast) init(sim *Simulation) {
 	cast.objectInUse = true
 
 	cast.ApplyCastTimeModifiers(&cast.CastTime)
+	cast.ApplyCastTimeModifiers(&cast.ChannelTime)
 	cast.ApplyCostModifiers(&cast.Cost.Value)
 
 	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
@@ -172,7 +176,7 @@ func (cast *Cast) startCasting(sim *Simulation, onCastComplete func(*Simulation,
 	// casting speed caused by the cast don't affect the GCD CD.
 	if cast.GCD != 0 {
 		// Prevent any actions on the GCD until the cast AND the GCD are done.
-		gcdCD := MaxDuration(cast.CalculatedGCD(cast.Character), cast.CastTime+cast.AfterCastDelay)
+		gcdCD := MaxDuration(cast.CalculatedGCD(cast.Character), cast.CastTime+cast.ChannelTime+cast.AfterCastDelay)
 		cast.Character.SetGCDTimer(sim, sim.CurrentTime+gcdCD)
 	}
 

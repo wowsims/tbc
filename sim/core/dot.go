@@ -240,12 +240,22 @@ func (dot *Dot) Apply(sim *Simulation) {
 	}
 
 	if dot.AffectedByCastSpeed {
-		baseDuration := dot.TickLength * time.Duration(dot.NumberOfTicks)
 		castSpeed := dot.Spell.Character.CastSpeed()
-		dot.Aura.Duration = time.Duration(float64(baseDuration) / castSpeed)
 		dot.tickPeriod = time.Duration(float64(dot.TickLength) / castSpeed)
+		dot.Aura.Duration = dot.tickPeriod * time.Duration(dot.NumberOfTicks)
 	}
 	dot.Aura.Activate(sim)
+}
+
+func (dot *Dot) RecomputeAuraDuration() {
+	if dot.AffectedByCastSpeed {
+		castSpeed := dot.Spell.Character.CastSpeed()
+		dot.tickPeriod = time.Duration(float64(dot.TickLength) / castSpeed)
+		dot.Aura.Duration = dot.tickPeriod * time.Duration(dot.NumberOfTicks)
+	} else {
+		dot.tickPeriod = dot.TickLength
+		dot.Aura.Duration = dot.tickPeriod * time.Duration(dot.NumberOfTicks)
+	}
 }
 
 func NewDot(config Dot) *Dot {
@@ -306,6 +316,7 @@ func TickFuncAOESnapshot(sim *Simulation, baseEffect SpellEffect) TickEffects {
 		}
 	}
 }
+
 func TickFuncApplyEffects(effectsFunc ApplySpellEffects) TickEffects {
 	return func(sim *Simulation, spell *Spell) func() {
 		return func() {

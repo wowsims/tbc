@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -110,6 +111,16 @@ func (spellEffect *SpellEffect) RangedAttackPowerOnTarget() float64 {
 
 func (spellEffect *SpellEffect) BonusWeaponDamage(character *Character) float64 {
 	return character.PseudoStats.BonusDamage
+}
+
+func (spellEffect *SpellEffect) ExpertisePercentage(character *Character) float64 {
+	expertiseRating := character.stats[stats.Expertise]
+	if spellEffect.ProcMask.Matches(ProcMaskMeleeMH) {
+		expertiseRating += character.PseudoStats.BonusMHExpertiseRating
+	} else if spellEffect.ProcMask.Matches(ProcMaskMeleeOH) {
+		expertiseRating += character.PseudoStats.BonusOHExpertiseRating
+	}
+	return math.Floor(expertiseRating/ExpertisePerQuarterPercentReduction) / 400
 }
 
 func (spellEffect *SpellEffect) PhysicalHitChance(character *Character) float64 {

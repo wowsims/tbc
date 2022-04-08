@@ -13,26 +13,7 @@ func (rogue *Rogue) registerExposeArmorSpell(sim *core.Simulation) {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	rogue.ExposeArmorAura = core.ExposeArmorAura(sim.GetPrimaryTarget(), rogue.Talents.ImprovedExposeArmor)
-
 	ability := rogue.newAbility(ExposeArmorActionID, ExposeArmorEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
-	ability.Effect.CritRollCategory = core.CritRollCategoryNone
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-		if spellEffect.Landed() {
-			rogue.ExposeArmorAura.Activate(sim)
-			rogue.ApplyFinisher(sim, spell.ActionID)
-			if sim.GetRemainingDuration() <= time.Second*30 {
-				rogue.doneEA = true
-			}
-		} else {
-			if refundAmount > 0 {
-				rogue.AddEnergy(sim, spell.MostRecentCost*refundAmount, core.ActionID{SpellID: 31245})
-			}
-		}
-	}
-
-	if rogue.Talents.SurpriseAttacks {
-		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
-	}
 
 	rogue.ExposeArmor = rogue.RegisterSpell(core.SpellConfig{
 		Template: ability,
@@ -47,6 +28,24 @@ func (rogue *Rogue) registerExposeArmorSpell(sim *core.Simulation) {
 				rogue.deathmantle4pcProc = false
 			}
 		},
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			ThreatMultiplier: 1,
+			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					rogue.ExposeArmorAura.Activate(sim)
+					rogue.ApplyFinisher(sim, spell.ActionID)
+					if sim.GetRemainingDuration() <= time.Second*30 {
+						rogue.doneEA = true
+					}
+				} else {
+					if refundAmount > 0 {
+						rogue.AddEnergy(sim, spell.MostRecentCost*refundAmount, core.ActionID{SpellID: 31245})
+					}
+				}
+			},
+		}),
 	})
 }
 
