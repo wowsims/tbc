@@ -127,7 +127,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 		Duration: core.GCDDefault,
 		TryCast: func(sim *core.Simulation) bool {
 			var shock *core.Spell
-			if enh.Rotation.WeaveFlameShock && !enh.FlameShock.Instance.IsInUse() {
+			if enh.Rotation.WeaveFlameShock && !enh.FlameShockDot.IsActive() {
 				shock = enh.FlameShock
 			} else if enh.Rotation.PrimaryShock == proto.EnhancementShaman_Rotation_Earth {
 				shock = enh.EarthShock
@@ -225,7 +225,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 		switch enh.Totems.Fire {
 		case proto.FireTotem_MagmaTotem:
 			defaultCastFactory = func(sim *core.Simulation) {
-				if enh.SearingTotem.Instance.IsInUse() || enh.MagmaTotem.Instance.IsInUse() || enh.FireNovaTotem.Instance.IsInUse() {
+				if enh.SearingTotemDot.IsActive() || enh.MagmaTotemDot.IsActive() || enh.FireNovaTotemDot.IsActive() {
 					return
 				}
 
@@ -237,7 +237,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 			}
 		case proto.FireTotem_SearingTotem:
 			defaultCastFactory = func(sim *core.Simulation) {
-				if enh.SearingTotem.Instance.IsInUse() || enh.MagmaTotem.Instance.IsInUse() || enh.FireNovaTotem.Instance.IsInUse() {
+				if enh.SearingTotemDot.IsActive() || enh.MagmaTotemDot.IsActive() || enh.FireNovaTotemDot.IsActive() {
 					return
 				}
 
@@ -303,11 +303,11 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				curTime = nextNovaCD
 				defaultNext = false
 			} else {
-				nextNovaCD = castAt + time.Second*15
+				nextNovaCD = castAt + time.Second*15 + 1
 				if defaultCastFactory == nil {
 					curTime = nextNovaCD
 				} else {
-					curTime = castAt + enh.FireNovaTickLength()
+					curTime = castAt + enh.FireNovaTickLength() + 1
 					defaultNext = true
 				}
 			}
@@ -315,9 +315,9 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 	} else {
 		switch enh.Totems.Fire {
 		case proto.FireTotem_MagmaTotem:
-			scheduleSpellTotem(time.Second*20, enh.MagmaTotem)
+			scheduleSpellTotem(time.Second*20+1, enh.MagmaTotem)
 		case proto.FireTotem_SearingTotem:
-			scheduleSpellTotem(time.Minute*1, enh.SearingTotem)
+			scheduleSpellTotem(time.Minute*1+1, enh.SearingTotem)
 		case proto.FireTotem_TotemOfWrath:
 			schedule2MTotem(func(sim *core.Simulation) *core.SimpleCast { return enh.NewTotemOfWrath(sim) })
 		}

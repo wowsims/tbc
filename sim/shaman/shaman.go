@@ -145,6 +145,11 @@ type Shaman struct {
 	MagmaTotem    *core.Spell
 	FireNovaTotem *core.Spell
 
+	FlameShockDot    *core.Dot
+	SearingTotemDot  *core.Dot
+	MagmaTotemDot    *core.Dot
+	FireNovaTotemDot *core.Dot
+
 	ElementalMasteryAura *core.Aura
 	NaturesSwiftnessAura *core.Aura
 	ShamanisticFocusAura *core.Aura
@@ -296,6 +301,14 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 	}
 
 	shaman.ElementalFocusStacks = 0
+}
+
+func (shaman *Shaman) ElementalCritMultiplier() float64 {
+	critMultiplier := shaman.DefaultSpellCritMultiplier()
+	if shaman.Talents.ElementalFury {
+		critMultiplier = shaman.SpellCritMultiplier(1, 1)
+	}
+	return critMultiplier
 }
 
 func init() {

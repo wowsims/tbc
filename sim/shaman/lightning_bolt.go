@@ -24,12 +24,17 @@ func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOve
 			baseManaCost,
 			time.Millisecond*2500,
 			isLightningOverload),
-		Effect: shaman.newElectricSpellEffect(571, 652, 0.794, isLightningOverload),
+	}
+
+	effect := shaman.newElectricSpellEffect(571, 652, 0.794, isLightningOverload)
+
+	if ItemSetSkyshatterRegalia.CharacterHasSetBonus(&shaman.Character, 4) {
+		effect.DamageMultiplier *= 1.05
 	}
 
 	if !isLightningOverload && shaman.Talents.LightningOverload > 0 {
 		lightningOverloadChance := float64(shaman.Talents.LightningOverload) * 0.04
-		spellTemplate.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() {
 				return
 			}
@@ -43,15 +48,11 @@ func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOve
 			shaman.LightningBoltLO.Cast(sim, spellEffect.Target)
 		}
 	} else {
-		spellTemplate.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if shaman.Talents.ElementalFocus && spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				shaman.ElementalFocusStacks = 2
 			}
 		}
-	}
-
-	if ItemSetSkyshatterRegalia.CharacterHasSetBonus(&shaman.Character, 4) {
-		spellTemplate.Effect.DamageMultiplier *= 1.05
 	}
 
 	return shaman.RegisterSpell(core.SpellConfig{
@@ -63,5 +64,6 @@ func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOve
 				instance.CastTime = 0
 			}
 		},
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
