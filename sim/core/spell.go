@@ -220,6 +220,15 @@ type Spell struct {
 	Instance SimpleSpell
 }
 
+// Metrics for the current iteration
+func (spell *Spell) CurDamagePerCast() float64 {
+	if spell.Casts == 0 {
+		return 0
+	} else {
+		return spell.TotalDamage / float64(spell.Casts)
+	}
+}
+
 func (spell *Spell) reset(_ *Simulation) {
 	spell.SpellMetrics = SpellMetrics{}
 }

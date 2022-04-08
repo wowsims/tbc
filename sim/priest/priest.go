@@ -27,10 +27,14 @@ type Priest struct {
 	Smite           *core.Spell
 	Starshards      *core.Spell
 	VampiricTouch   *core.Spell
-	VampiricTouch2  *core.Spell
 
-	CurVTSpell  *core.Spell
-	NextVTSpell *core.Spell
+	DevouringPlagueDot *core.Dot
+	HolyFireDot        *core.Dot
+	MindFlayDot        []*core.Dot
+	ShadowWordPainDot  *core.Dot
+	ShadowfiendDot     *core.Dot
+	StarshardsDot      *core.Dot
+	VampiricTouchDot   *core.Dot
 
 	InnerFocusAura    *core.Aura
 	MiseryAura        *core.Aura
@@ -70,14 +74,19 @@ func (priest *Priest) Init(sim *core.Simulation) {
 	priest.registerShadowfiendSpell(sim)
 	priest.registerSmiteSpell(sim)
 	priest.registerStarshardsSpell(sim)
-	priest.VampiricTouch = priest.newVampiricTouchSpell(sim, false)
-	priest.VampiricTouch2 = priest.newVampiricTouchSpell(sim, true)
+	priest.registerVampiricTouchSpell(sim)
 
 	priest.MindFlay = []*core.Spell{
 		nil, // So we can use # of ticks as the index
 		priest.newMindFlaySpell(sim, 1),
 		priest.newMindFlaySpell(sim, 2),
 		priest.newMindFlaySpell(sim, 3),
+	}
+	priest.MindFlayDot = []*core.Dot{
+		nil, // So we can use # of ticks as the index
+		priest.newMindFlayDot(sim, 1),
+		priest.newMindFlayDot(sim, 2),
+		priest.newMindFlayDot(sim, 3),
 	}
 
 	if priest.Talents.Misery > 0 {
@@ -89,8 +98,6 @@ func (priest *Priest) Init(sim *core.Simulation) {
 }
 
 func (priest *Priest) Reset(newsim *core.Simulation) {
-	priest.CurVTSpell = priest.VampiricTouch
-	priest.NextVTSpell = priest.VampiricTouch
 }
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) *Priest {

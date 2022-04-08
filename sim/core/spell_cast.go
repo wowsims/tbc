@@ -64,7 +64,8 @@ type SpellEffect struct {
 	ProcMask ProcMask
 
 	// Callbacks for providing additional custom behavior.
-	OnSpellHit func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
+	OnSpellHit       func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
+	OnPeriodicDamage func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage float64)
 
 	// Results
 	Outcome HitOutcome
@@ -230,6 +231,9 @@ func (spellEffect *SpellEffect) triggerProcs(sim *Simulation, spell *Spell, isPe
 		spell.Character.OnSpellHit(sim, spell, spellEffect)
 		spellEffect.Target.OnSpellHit(sim, spell, spellEffect)
 	} else {
+		if spellEffect.OnPeriodicDamage != nil {
+			spellEffect.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
+		}
 		if spellEffect.DotInput.OnPeriodicDamage != nil {
 			spellEffect.DotInput.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 		}

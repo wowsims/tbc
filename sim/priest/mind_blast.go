@@ -10,15 +10,13 @@ import (
 const SpellIDMindBlast int32 = 25375
 
 var MBCooldownID = core.NewCooldownID()
+var MindBlastActionID = core.ActionID{SpellID: SpellIDMindBlast, CooldownID: MBCooldownID}
 
 func (priest *Priest) registerMindBlastSpell(sim *core.Simulation) {
 	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID:    SpellIDMindBlast,
-					CooldownID: MBCooldownID,
-				},
+				ActionID:    MindBlastActionID,
 				Character:   &priest.Character,
 				SpellSchool: core.SpellSchoolShadow,
 				BaseCost: core.ResourceCost{
@@ -34,26 +32,29 @@ func (priest *Priest) registerMindBlastSpell(sim *core.Simulation) {
 				Cooldown: time.Second * 8,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			BaseDamage:          core.BaseDamageConfigMagic(711, 752, 0.429),
-		},
 	}
-
-	priest.applyTalentsToShadowSpell(&template.SpellCast.Cast, &template.Effect)
 	template.Cooldown -= time.Millisecond * 500 * time.Duration(priest.Talents.ImprovedMindBlast)
-	template.Effect.BonusSpellHitRating += float64(priest.Talents.FocusedPower) * 2 * core.SpellHitRatingPerHitChance // 2% crit per point
-
-	if ItemSetAbsolution.CharacterHasSetBonus(&priest.Character, 4) { // Absolution 4p adds 10% damage
-		template.Effect.DamageMultiplier *= 1.1
-	}
+	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.FocusedMind) * 0.05
 
 	priest.MindBlast = priest.RegisterSpell(core.SpellConfig{
-		Template:   template,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: template,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+
+			BonusSpellHitRating: 0 +
+				float64(priest.Talents.ShadowFocus)*2*core.SpellHitRatingPerHitChance +
+				float64(priest.Talents.FocusedPower)*2*core.SpellHitRatingPerHitChance,
+
+			BonusSpellCritRating: float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance,
+
+			DamageMultiplier: 1 *
+				(1 + float64(priest.Talents.Darkness)*0.02) *
+				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1) *
+				core.TernaryFloat64(ItemSetAbsolution.CharacterHasSetBonus(&priest.Character, 4), 1.1, 1),
+
+			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
+
+			BaseDamage:     core.BaseDamageConfigMagic(711, 752, 0.429),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
+		}),
 	})
 }

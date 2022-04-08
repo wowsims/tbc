@@ -91,7 +91,7 @@ func (spriest *SmitePriest) OnManaTick(sim *core.Simulation) {
 func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 
 	// Calculate higher SW:P uptime if using HF
-	swpRemaining := spriest.ShadowWordPain.Instance.Effect.DotInput.TimeRemaining(sim)
+	swpRemaining := spriest.ShadowWordPainDot.RemainingDuration(sim)
 
 	castSpeed := spriest.CastSpeed()
 
@@ -103,7 +103,7 @@ func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 
 	var spell *core.Spell
 	// Always attempt to keep SW:P up if its down
-	if !spriest.ShadowWordPain.Instance.Effect.DotInput.IsTicking(sim) {
+	if !spriest.ShadowWordPainDot.IsActive() {
 		spell = spriest.ShadowWordPain
 		// Favor star shards for NE if off cooldown first
 	} else if spriest.rotation.UseStarshards && spriest.GetRemainingCD(priest.SSCooldownID, sim.CurrentTime) == 0 {

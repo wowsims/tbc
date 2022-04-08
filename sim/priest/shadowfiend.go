@@ -1,6 +1,7 @@
 package priest
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -65,33 +66,45 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 				Cooldown:    time.Minute * 5,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
-			// Dmg over 15 sec = shadow_dmg*.6 + 1191
-			// just simulate 10 1.5s long ticks
-			DamageMultiplier: 1,
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:  10,
-				TickLength:     time.Millisecond * 1500,
-				TickBaseDamage: core.DotSnapshotFuncMagic(1191/10, 0.06),
-				OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
-					// TODO: This should also do something with ExpectedBonusMana
-					priest.AddMana(sim, tickDamage*2.5, ShadowfiendActionID, false)
-				},
-			},
-		},
 	}
-
-	priest.applyTalentsToShadowSpell(&template.SpellCast.Cast, &template.Effect)
-
-	if ItemSetIncarnate.CharacterHasSetBonus(&priest.Character, 2) { // Increases duration by 3s
-		template.Effect.DotInput.NumberOfTicks += 2
-	}
+	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
 
 	priest.Shadowfiend = priest.RegisterSpell(core.SpellConfig{
-		Template:   template,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: template,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
+			OutcomeApplier:      core.OutcomeFuncMagicHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					priest.ShadowfiendDot.Apply(sim)
+				}
+			},
+		}),
+	})
+
+	target := sim.GetPrimaryTarget()
+	priest.ShadowfiendDot = core.NewDot(core.Dot{
+		Spell: priest.Shadowfiend,
+		Aura: target.RegisterAura(&core.Aura{
+			Label:    "Shadowfiend-" + strconv.Itoa(int(priest.Index)),
+			ActionID: ShadowfiendActionID,
+		}),
+
+		// Dmg over 15 sec = shadow_dmg*.6 + 1191
+		// just simulate 10 1.5s long ticks
+		NumberOfTicks: 10 + core.TernaryInt(ItemSetIncarnate.CharacterHasSetBonus(&priest.Character, 2), 2, 0),
+		TickLength:    time.Millisecond * 1500,
+
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1 *
+				(1 + float64(priest.Talents.Darkness)*0.02) *
+				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1),
+			IsPeriodic:     true,
+			BaseDamage:     core.BaseDamageConfigMagicNoRoll(1191/10, 0.06),
+			OutcomeApplier: core.OutcomeFuncTick(),
+			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
+				priest.AddMana(sim, tickDamage*2.5, ShadowfiendActionID, false)
+			},
+		}),
 	})
 }

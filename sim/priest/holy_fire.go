@@ -1,6 +1,7 @@
 package priest
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -9,11 +10,13 @@ import (
 
 const SpellIDHolyFire int32 = 25384
 
+var HolyFireActionID = core.ActionID{SpellID: SpellIDHolyFire}
+
 func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 	template := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDHolyFire},
+				ActionID:    HolyFireActionID,
 				Character:   &priest.Character,
 				SpellSchool: core.SpellSchoolHoly,
 				BaseCost: core.ResourceCost{
@@ -28,28 +31,45 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 				GCD:      core.GCDDefault,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      priest.DefaultSpellCritMultiplier(),
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			BaseDamage:          core.BaseDamageConfigMagic(426, 537, 0.8571),
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:  5,
-				TickLength:     time.Second * 2,
-				TickBaseDamage: core.DotSnapshotFuncMagic(33, 0.17),
-				Aura:           priest.NewDotAura("Holy Fire", core.ActionID{SpellID: SpellIDHolyFire}),
-			},
-		},
 	}
-
-	priest.applyTalentsToHolySpell(&template.SpellCast.Cast, &template.Effect)
 	template.CastTime -= time.Millisecond * 100 * time.Duration(priest.Talents.DivineFury)
-	template.Effect.DamageMultiplier *= (1 + (0.05 * float64(priest.Talents.SearingLight)))
 
 	priest.HolyFire = priest.RegisterSpell(core.SpellConfig{
-		Template:   template,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: template,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			priest.applySurgeOfLight(&instance.SpellCast)
+		},
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			BonusSpellCritRating: float64(priest.Talents.HolySpecialization) * 1 * core.SpellCritRatingPerCritChance,
+			DamageMultiplier:     1 + 0.05*float64(priest.Talents.SearingLight),
+			ThreatMultiplier:     1 - 0.04*float64(priest.Talents.SilentResolve),
+			BaseDamage:           core.BaseDamageConfigMagic(426, 537, 0.8571),
+			OutcomeApplier:       core.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					priest.HolyFireDot.Apply(sim)
+				}
+				priest.applyOnHitTalents(sim, spell, spellEffect)
+			},
+		}),
+	})
+
+	target := sim.GetPrimaryTarget()
+	priest.HolyFireDot = core.NewDot(core.Dot{
+		Spell: priest.HolyFire,
+		Aura: target.RegisterAura(&core.Aura{
+			Label:    "HolyFire-" + strconv.Itoa(int(priest.Index)),
+			ActionID: HolyFireActionID,
+		}),
+		NumberOfTicks: 5,
+		TickLength:    time.Second * 2,
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1 + 0.05*float64(priest.Talents.SearingLight),
+			ThreatMultiplier: 1 - 0.04*float64(priest.Talents.SilentResolve),
+
+			BaseDamage:     core.BaseDamageConfigMagicNoRoll(33, 0.17),
+			OutcomeApplier: core.OutcomeFuncTick(),
+			IsPeriodic:     true,
+		}),
 	})
 }

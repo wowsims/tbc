@@ -32,7 +32,7 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 		return priest.GetOrRegisterAura(&core.Aura{
 			Label: "Priest Shadow Effects",
 			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
-				if tickDamage > 0 && priest.CurVTSpell.Instance.Effect.DotInput.IsTicking(sim) {
+				if tickDamage > 0 && priest.VampiricTouchDot.IsActive() {
 					amount := tickDamage * 0.05
 					for _, partyMember := range priest.Party.Players {
 						partyMember.GetCharacter().AddMana(sim, amount, VampiricTouchActionID, false)
@@ -50,7 +50,7 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 					return
 				}
 				priest.ApplyShadowWeaving(sim, spellEffect.Target)
-				if spellEffect.Damage > 0 && priest.CurVTSpell.Instance.Effect.DotInput.IsTicking(sim) {
+				if spellEffect.Damage > 0 && priest.VampiricTouchDot.IsActive() {
 					amount := spellEffect.Damage * 0.05
 					for _, partyMember := range priest.Party.Players {
 						partyMember.GetCharacter().AddMana(sim, amount, VampiricTouchActionID, false)
