@@ -1,6 +1,7 @@
 package rogue
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -16,66 +17,59 @@ func (rogue *Rogue) applyPoisons() {
 
 var DeadlyPoisonActionID = core.ActionID{SpellID: 27186}
 
-func (rogue *Rogue) registerDeadlyPoisonSpell(_ *core.Simulation) {
+func (rogue *Rogue) registerDeadlyPoisonSpell(sim *core.Simulation) {
 	cast := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				ActionID:    DeadlyPoisonActionID,
 				Character:   rogue.GetCharacter(),
 				SpellSchool: core.SpellSchoolNature,
-			},
-		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			IsPhantom:           true,
-			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
-			ThreatMultiplier:    1,
-			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:  4,
-				TickLength:     time.Second * 3,
-				TickBaseDamage: core.DotSnapshotFuncMagic(180/4, 0),
-				Aura:           rogue.NewDotAura("Deadly Poison Dot", DeadlyPoisonActionID),
 			},
 		},
 	}
 	rogue.DeadlyPoison = rogue.RegisterSpell(core.SpellConfig{
 		Template:   cast,
 		ModifyCast: core.ModifyCastAssignTarget,
-	})
-}
-
-func (rogue *Rogue) registerDeadlyPoisonRefreshSpell(_ *core.Simulation) {
-	cast := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    DeadlyPoisonActionID,
-				Character:   rogue.GetCharacter(),
-				SpellSchool: core.SpellSchoolNature,
-			},
-		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryNone,
-			IsPhantom:           true,
-			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
-			ThreatMultiplier:    1,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
+			ThreatMultiplier:    1,
+			IsPhantom:           true,
+			OutcomeApplier:      core.OutcomeFuncMagicHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
-					return
+				if spellEffect.Landed() {
+					if rogue.DeadlyPoisonDot.IsActive() {
+						rogue.DeadlyPoisonDot.Refresh(sim)
+						rogue.DeadlyPoisonDot.AddStack(sim)
+					} else {
+						rogue.DeadlyPoisonDot.Apply(sim)
+						rogue.DeadlyPoisonDot.SetStacks(sim, 1)
+					}
 				}
-
-				const tickDamagePerStack = 180.0 / 4.0
-				rogue.deadlyPoisonStacks = core.MinInt(rogue.deadlyPoisonStacks+1, 5)
-				rogue.DeadlyPoison.Instance.Effect.DotInput.SetTickDamage(tickDamagePerStack * float64(rogue.deadlyPoisonStacks))
-				rogue.DeadlyPoison.Instance.Effect.DotInput.RefreshDot(sim)
 			},
-		},
-	}
-	rogue.DeadlyPoisonRefresh = rogue.RegisterSpell(core.SpellConfig{
-		Template:   cast,
-		ModifyCast: core.ModifyCastAssignTarget,
+		}),
+	})
+
+	target := sim.GetPrimaryTarget()
+	dotAura := target.RegisterAura(&core.Aura{
+		Label:     "DeadlyPoison-" + strconv.Itoa(int(rogue.Index)),
+		ActionID:  DeadlyPoisonActionID,
+		MaxStacks: 5,
+		Duration:  time.Second * 12,
+	})
+	rogue.DeadlyPoisonDot = core.NewDot(core.Dot{
+		Spell:         rogue.DeadlyPoison,
+		Aura:          dotAura,
+		NumberOfTicks: 4,
+		TickLength:    time.Second * 3,
+		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			DamageMultiplier: 1 + 0.04*float64(rogue.Talents.VilePoisons),
+			ThreatMultiplier: 1,
+			IsPeriodic:       true,
+			IsPhantom:        true,
+			//BaseDamage:       core.BaseDamageConfigFlat(180/4),
+			BaseDamage:     core.MultiplyByStacks(core.BaseDamageConfigFlat(180/4), dotAura),
+			OutcomeApplier: core.OutcomeFuncTick(),
+		})),
 	})
 }
 
@@ -101,19 +95,10 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 					return
 				}
 
-				rogue.procDeadlyPoison(sim, spellEffect)
+				rogue.DeadlyPoison.Cast(sim, spellEffect.Target)
 			},
 		})
 	})
-}
-
-func (rogue *Rogue) procDeadlyPoison(sim *core.Simulation, spellEffect *core.SpellEffect) {
-	if rogue.DeadlyPoison.Instance.IsInUse() {
-		rogue.DeadlyPoisonRefresh.Cast(sim, spellEffect.Target)
-	} else {
-		rogue.DeadlyPoison.Cast(sim, spellEffect.Target)
-		rogue.deadlyPoisonStacks = 1
-	}
 }
 
 func (rogue *Rogue) registerInstantPoisonSpell(_ *core.Simulation) {

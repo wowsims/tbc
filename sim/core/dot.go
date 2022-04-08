@@ -306,6 +306,7 @@ func TickFuncAOESnapshot(sim *Simulation, baseEffect SpellEffect) TickEffects {
 		}
 	}
 }
+
 func TickFuncApplyEffects(effectsFunc ApplySpellEffects) TickEffects {
 	return func(sim *Simulation, spell *Spell) func() {
 		return func() {
