@@ -194,11 +194,11 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 			ability := totemAction
 			ability.DesiredCastAt = curTime
 			if prioritizeEarlier {
-				ability.MinCastAt = curTime - time.Second*20
-				ability.MaxCastAt = curTime + time.Second*10
+				ability.MinCastAt = curTime - time.Second*30
+				ability.MaxCastAt = curTime + time.Second*15
 			} else {
-				ability.MinCastAt = curTime
-				ability.MaxCastAt = curTime + time.Second*10
+				ability.MinCastAt = curTime - time.Second*5
+				ability.MaxCastAt = curTime + time.Second*30
 			}
 			castAt := enh.scheduler.Schedule(ability)
 			if castAt == common.Unresolved {
