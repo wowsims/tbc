@@ -358,6 +358,26 @@ func ApplyEffectFuncDamageMultiple(baseEffects []SpellEffect) ApplySpellEffects 
 		}
 	}
 }
+func ApplyEffectFuncDamageMultipleTargeted(baseEffects []SpellEffect) ApplySpellEffects {
+	if len(baseEffects) == 0 {
+		panic("Multiple damage requires hits")
+	} else if len(baseEffects) == 1 {
+		return ApplyEffectFuncDirectDamage(baseEffects[0])
+	}
+
+	return func(sim *Simulation, target *Target, spell *Spell) {
+		for i, _ := range baseEffects {
+			effect := &baseEffects[i]
+			effect.Target = target
+			damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
+			effect.calcDamageSingle(sim, spell, effect.IsPeriodic, damage)
+		}
+		for i, _ := range baseEffects {
+			effect := &baseEffects[i]
+			effect.finalize(sim, spell, effect.IsPeriodic)
+		}
+	}
+}
 func ApplyEffectFuncAOEDamage(sim *Simulation, baseEffect SpellEffect) ApplySpellEffects {
 	numHits := sim.GetNumTargets()
 	effects := make([]SpellEffect, 0, numHits)

@@ -74,35 +74,23 @@ func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost 
 // Helper for precomputing spell effects.
 func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamage float64, spellCoefficient float64, isLightningOverload bool) core.SpellEffect {
 	effect := core.SpellEffect{
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
-		DamageMultiplier:    1,
-		ThreatMultiplier:    1,
-		BaseDamage:          core.BaseDamageConfigMagic(minBaseDamage, maxBaseDamage, spellCoefficient),
+		BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
+		BonusSpellCritRating: 0 +
+			(float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance) +
+			(float64(shaman.Talents.CallOfThunder) * 1 * core.SpellCritRatingPerCritChance),
+		BonusSpellPower: 0 +
+			core.TernaryFloat64(shaman.Equip[items.ItemSlotRanged].ID == TotemOfStorms, 33, 0) +
+			core.TernaryFloat64(shaman.Equip[items.ItemSlotRanged].ID == TotemOfTheVoid, 55, 0) +
+			core.TernaryFloat64(shaman.Equip[items.ItemSlotRanged].ID == TotemOfAncestralGuidance, 85, 0),
+		DamageMultiplier: 1 * (1 + 0.01*float64(shaman.Talents.Concussion)),
+		ThreatMultiplier: 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision),
+		BaseDamage:       core.BaseDamageConfigMagic(minBaseDamage, maxBaseDamage, spellCoefficient),
+		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier()),
 	}
 
-	if shaman.Talents.ElementalFury {
-		effect.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
-	}
-
-	effect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
 	if isLightningOverload {
 		effect.DamageMultiplier *= 0.5
 		effect.ThreatMultiplier = 0
-	}
-
-	effect.ThreatMultiplier *= 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision)
-	effect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
-	effect.BonusSpellCritRating += float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance
-	effect.BonusSpellCritRating += float64(shaman.Talents.CallOfThunder) * 1 * core.SpellCritRatingPerCritChance
-
-	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfStorms {
-		effect.BonusSpellPower += 33
-	} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfTheVoid {
-		effect.BonusSpellPower += 55
-	} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfAncestralGuidance {
-		effect.BonusSpellPower += 85
 	}
 
 	return effect

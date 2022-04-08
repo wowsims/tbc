@@ -27,16 +27,11 @@ func (shaman *Shaman) newWindfuryImbueSpell(isMH bool) *core.Spell {
 	}
 
 	baseEffect := core.SpellEffect{
-		OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-		CritRollCategory:    core.CritRollCategoryPhysical,
-		CritMultiplier:      shaman.DefaultMeleeCritMultiplier(),
-		IsPhantom:           true,
-		DamageMultiplier:    1.0,
-		ThreatMultiplier:    1.0,
-		BonusAttackPower:    apBonus,
-	}
-	if shaman.Talents.SpiritWeapons {
-		baseEffect.ThreatMultiplier *= 0.7
+		BonusAttackPower: apBonus,
+		IsPhantom:        true,
+		DamageMultiplier: 1.0,
+		ThreatMultiplier: core.TernaryFloat64(shaman.Talents.SpiritWeapons, 0.7, 1),
+		OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(shaman.DefaultMeleeCritMultiplier()),
 	}
 
 	weaponDamageMultiplier := 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
@@ -54,17 +49,14 @@ func (shaman *Shaman) newWindfuryImbueSpell(isMH bool) *core.Spell {
 		baseEffect.BonusAttackPower += apBonus
 	}
 
-	wftempl.Effects = []core.SpellEffect{
+	effects := []core.SpellEffect{
 		baseEffect,
 		baseEffect,
 	}
 
 	return shaman.RegisterSpell(core.SpellConfig{
-		Template: wftempl,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.Effects[0].Target = target
-			instance.Effects[1].Target = target
-		},
+		Template:     wftempl,
+		ApplyEffects: core.ApplyEffectFuncDamageMultipleTargeted(effects),
 	})
 }
 
@@ -124,32 +116,31 @@ func (shaman *Shaman) newFlametongueImbueSpell(isMH bool) *core.Spell {
 				SpellSchool: core.SpellSchoolFire,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
-			IsPhantom:           true,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-		},
 	}
-	ftTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
+
+	effect := core.SpellEffect{
+		IsPhantom:        true,
+		DamageMultiplier: 1 + 0.05*float64(shaman.Talents.ElementalWeapons),
+		ThreatMultiplier: 1,
+		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(shaman.DefaultSpellCritMultiplier()),
+	}
 
 	if isMH {
 		if weapon := shaman.GetMHWeapon(); weapon != nil {
 			baseDamage := weapon.SwingSpeed * 35.0
-			ftTmpl.Effect.BaseDamage = core.BaseDamageConfigMagic(baseDamage, baseDamage, 0.1)
+			effect.BaseDamage = core.BaseDamageConfigMagic(baseDamage, baseDamage, 0.1)
 		}
 	} else {
 		if weapon := shaman.GetOHWeapon(); weapon != nil {
 			baseDamage := weapon.SwingSpeed * 35.0
-			ftTmpl.Effect.BaseDamage = core.BaseDamageConfigMagic(baseDamage, baseDamage, 0.1)
+			effect.BaseDamage = core.BaseDamageConfigMagic(baseDamage, baseDamage, 0.1)
 		}
 	}
 
 	return shaman.RegisterSpell(core.SpellConfig{
-		Template:   ftTmpl,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template:     ftTmpl,
+		ModifyCast:   core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
 
@@ -193,21 +184,19 @@ func (shaman *Shaman) newFrostbrandImbueSpell(isMH bool) *core.Spell {
 				SpellSchool: core.SpellSchoolFrost,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
-			IsPhantom:           true,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			BaseDamage:          core.BaseDamageConfigMagic(246, 246, 0.1),
-		},
 	}
-	fbTmpl.Effect.DamageMultiplier *= 1 + 0.05*float64(shaman.Talents.ElementalWeapons)
+
+	effect := core.SpellEffect{
+		IsPhantom:        true,
+		DamageMultiplier: 1 + 0.05*float64(shaman.Talents.ElementalWeapons),
+		ThreatMultiplier: 1,
+		BaseDamage:       core.BaseDamageConfigMagic(246, 246, 0.1),
+		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(shaman.DefaultSpellCritMultiplier()),
+	}
 
 	return shaman.RegisterSpell(core.SpellConfig{
-		Template:   fbTmpl,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template:     fbTmpl,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
 

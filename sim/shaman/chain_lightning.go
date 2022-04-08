@@ -59,11 +59,13 @@ func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOv
 	numHits := core.MinInt32(3, sim.GetNumTargets())
 	effects := make([]core.SpellEffect, 0, numHits)
 
+	effect.Target = sim.GetTarget(0)
 	effect.OnSpellHit = makeOnSpellHit(0)
 	effects = append(effects, effect)
 
 	for i := int32(1); i < numHits; i++ {
 		bounceEffect := effects[i-1] // Makes a copy of the previous bounce
+		bounceEffect.Target = sim.GetTarget(i)
 		if hasTidefury {
 			bounceEffect.DamageMultiplier *= 0.83
 		} else {
@@ -73,23 +75,12 @@ func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOv
 
 		effects = append(effects, bounceEffect)
 	}
-	spellTemplate.Effects = effects
 
 	return shaman.RegisterSpell(core.SpellConfig{
 		Template: spellTemplate,
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			// Set the targets.
-			instance.Effects[0].Target = target
-			curTargetIndex := target.Index
-			numHits := core.MinInt32(3, sim.GetNumTargets())
-			for i := int32(1); i < numHits; i++ {
-				// Pick targets by index, incrementally.
-				newTargetIndex := (curTargetIndex + 1) % sim.GetNumTargets()
-				instance.Effects[i].Target = sim.GetTarget(newTargetIndex)
-				curTargetIndex = newTargetIndex
-			}
-
 			shaman.applyElectricSpellCastInitModifiers(&instance.SpellCast)
 		},
+		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
 	})
 }
