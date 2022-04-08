@@ -66,9 +66,8 @@ func (rogue *Rogue) registerDeadlyPoisonSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1,
 			IsPeriodic:       true,
 			IsPhantom:        true,
-			//BaseDamage:       core.BaseDamageConfigFlat(180/4),
-			BaseDamage:     core.MultiplyByStacks(core.BaseDamageConfigFlat(180/4), dotAura),
-			OutcomeApplier: core.OutcomeFuncTick(),
+			BaseDamage:       core.MultiplyByStacks(core.BaseDamageConfigFlat(180/4), dotAura),
+			OutcomeApplier:   core.OutcomeFuncTick(),
 		})),
 	})
 }
@@ -110,21 +109,19 @@ func (rogue *Rogue) registerInstantPoisonSpell(_ *core.Simulation) {
 				SpellSchool: core.SpellSchoolNature,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      rogue.DefaultSpellCritMultiplier(),
-			IsPhantom:           true,
-			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
-			ThreatMultiplier:    1,
-			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
-			BaseDamage:          core.BaseDamageConfigRoll(146, 194),
-		},
 	}
 
 	rogue.InstantPoison = rogue.RegisterSpell(core.SpellConfig{
 		Template:   cast,
 		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			IsPhantom:           true,
+			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
+			ThreatMultiplier:    1,
+			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
+			BaseDamage:          core.BaseDamageConfigRoll(146, 194),
+			OutcomeApplier:      core.OutcomeFuncMagicHitAndCrit(rogue.DefaultSpellCritMultiplier()),
+		}),
 	})
 }
 

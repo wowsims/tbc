@@ -323,7 +323,7 @@ func (rogue *Rogue) canPoolEnergy(sim *core.Simulation, energy float64) bool {
 
 func (rogue *Rogue) tryUseDamageFinisher(sim *core.Simulation, energy float64, comboPoints int32) bool {
 	if rogue.Rotation.UseRupture &&
-		!rogue.Rupture.Instance.IsInUse() &&
+		!rogue.RuptureDot.IsActive() &&
 		sim.GetRemainingDuration() >= rogue.RuptureDuration(comboPoints) &&
 		(sim.GetNumTargets() == 1 || (rogue.BladeFlurryAura == nil || !rogue.BladeFlurryAura.IsActive())) {
 		if energy >= RuptureEnergyCost || rogue.deathmantle4pcProc {

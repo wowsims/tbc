@@ -12,24 +12,7 @@ var RuptureEnergyCost = 25.0
 
 func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
-
 	ability := rogue.newAbility(RuptureActionID, RuptureEnergyCost, SpellFlagFinisher|core.SpellExtrasIgnoreResists, core.ProcMaskMeleeMHSpecial)
-	ability.Effect.CritRollCategory = core.CritRollCategoryNone
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-		if spellEffect.Landed() {
-			rogue.RuptureDot.NumberOfTicks = int(rogue.ComboPoints()) + 3
-			rogue.RuptureDot.Apply(sim)
-			rogue.ApplyFinisher(sim, spell.ActionID)
-		} else {
-			if refundAmount > 0 {
-				rogue.AddEnergy(sim, spell.MostRecentCost*refundAmount, core.ActionID{SpellID: 31245})
-			}
-		}
-	}
-
-	if rogue.Talents.SurpriseAttacks {
-		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
-	}
 
 	rogue.Rupture = rogue.RegisterSpell(core.SpellConfig{
 		Template: ability,
@@ -41,6 +24,24 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 				rogue.deathmantle4pcProc = false
 			}
 		},
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					rogue.RuptureDot.NumberOfTicks = int(rogue.ComboPoints()) + 3
+					rogue.RuptureDot.RecomputeAuraDuration()
+					rogue.RuptureDot.Apply(sim)
+					rogue.ApplyFinisher(sim, spell.ActionID)
+				} else {
+					if refundAmount > 0 {
+						rogue.AddEnergy(sim, spell.MostRecentCost*refundAmount, core.ActionID{SpellID: 31245})
+					}
+				}
+			},
+		}),
 	})
 
 	target := sim.GetPrimaryTarget()
@@ -56,12 +57,12 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 			DamageMultiplier: 1 + 0.1*float64(rogue.Talents.SerratedBlades),
 			ThreatMultiplier: 1,
 			IsPeriodic:       true,
-			BaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+			BaseDamage: core.BuildBaseDamageConfig(func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 				comboPoints := rogue.ComboPoints()
 				attackPower := hitEffect.MeleeAttackPower(spell.Character) + hitEffect.MeleeAttackPowerOnTarget()
 
 				return 70 + float64(comboPoints)*11 + attackPower*[]float64{0.01, 0.02, 0.03, 0.03, 0.03}[comboPoints-1]
-			},
+			}, 0),
 			OutcomeApplier: core.OutcomeFuncTick(),
 		}),
 	})

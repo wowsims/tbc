@@ -40,16 +40,6 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 	// This seems to be unaffected by wrath of cenarius.
 	bonusFlatDamage := core.TernaryFloat64(druid.Equip[items.ItemSlotRanged].ID == IdolAvenger, 25*0.571, 0)
 
-	effect := core.SpellEffect{
-		BonusSpellCritRating: float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance, // 2% crit per point
-		DamageMultiplier:     1 + 0.02*float64(druid.Talents.Moonfury),
-		ThreatMultiplier:     1,
-
-		BaseDamage:     core.BaseDamageConfigMagic(383+bonusFlatDamage, 432+bonusFlatDamage, 0.571+0.02*float64(druid.Talents.WrathOfCenarius)),
-		OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance))),
-		OnSpellHit:     druid.applyOnHitTalents,
-	}
-
 	druid.Wrath = druid.RegisterSpell(core.SpellConfig{
 		Template: template,
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
@@ -57,6 +47,14 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 			druid.applyNaturesGrace(&instance.SpellCast)
 			druid.applyNaturesSwiftness(&instance.SpellCast)
 		},
-		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			BonusSpellCritRating: float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance, // 2% crit per point
+			DamageMultiplier:     1 + 0.02*float64(druid.Talents.Moonfury),
+			ThreatMultiplier:     1,
+
+			BaseDamage:     core.BaseDamageConfigMagic(383+bonusFlatDamage, 432+bonusFlatDamage, 0.571+0.02*float64(druid.Talents.WrathOfCenarius)),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance))),
+			OnSpellHit:     druid.applyOnHitTalents,
+		}),
 	})
 }

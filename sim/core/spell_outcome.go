@@ -58,7 +58,7 @@ func OutcomeFuncMagicHit() OutcomeApplier {
 	}
 }
 
-func OutcomeFuncMeleeWhiteHit() OutcomeApplier {
+func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		character := spell.Character
 		roll := sim.RandomFloat("White Hit Table")
@@ -89,7 +89,6 @@ func OutcomeFuncMeleeWhiteHit() OutcomeApplier {
 		// Parry (if in front)
 		// If the target is a mob and defense minus weapon skill is 11 or more:
 		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.6%
-
 		// If the target is a mob and defense minus weapon skill is 10 or less:
 		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.1%
 
@@ -105,12 +104,150 @@ func OutcomeFuncMeleeWhiteHit() OutcomeApplier {
 			spell.Glances++
 			// TODO glancing blow damage reduction is actually a range ([65%, 85%] vs. 73)
 			*damage *= 0.75
-			return OutcomeGlance
+			return
 		}
 
 		// Crit
 		chance += spellEffect.PhysicalCritChance(character, spell)
 		if roll < chance {
+			spellEffect.Outcome = OutcomeCrit
+			spell.Crits++
+			*damage *= critMultiplier
+			return
+		}
+
+		// Hit
+		spellEffect.Outcome = OutcomeHit
+		spell.Hits++
+	}
+}
+
+func OutcomeFuncMeleeSpecialHit() OutcomeApplier {
+	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+		character := spell.Character
+		roll := sim.RandomFloat("White Hit Table")
+
+		// Miss
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
+		chance := MaxFloat(0, missChance)
+		if roll < chance {
+			spellEffect.Outcome = OutcomeMiss
+			spell.Misses++
+			*damage = 0
+			return
+		}
+
+		// Dodge
+		if !spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
+			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character))
+			if roll < chance {
+				spellEffect.Outcome = OutcomeDodge
+				spell.Dodges++
+				*damage = 0
+				return
+			}
+		}
+
+		// Parry (if in front)
+		// If the target is a mob and defense minus weapon skill is 11 or more:
+		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.6%
+		// If the target is a mob and defense minus weapon skill is 10 or less:
+		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.1%
+
+		// Hit
+		spellEffect.Outcome = OutcomeHit
+		spell.Hits++
+	}
+}
+
+func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
+	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+		character := spell.Character
+		roll := sim.RandomFloat("White Hit Table")
+
+		// Miss
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
+		chance := MaxFloat(0, missChance)
+		if roll < chance {
+			spellEffect.Outcome = OutcomeMiss
+			spell.Misses++
+			*damage = 0
+			return
+		}
+
+		// Dodge
+		if !spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
+			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character))
+			if roll < chance {
+				spellEffect.Outcome = OutcomeDodge
+				spell.Dodges++
+				*damage = 0
+				return
+			}
+		}
+
+		// Parry (if in front)
+		// If the target is a mob and defense minus weapon skill is 11 or more:
+		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.6%
+		// If the target is a mob and defense minus weapon skill is 10 or less:
+		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.1%
+
+		// Block (if in front). Note that critical blocks are allowed for 2-roll hits.
+		// If the target is a mob:
+		// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
+		// If we actually implement blocks, ranged hits can be blocked.
+
+		// Crit (separate roll)
+		if spellEffect.physicalCritRoll(sim, spell) {
+			spellEffect.Outcome = OutcomeCrit
+			spell.Crits++
+			*damage *= critMultiplier
+			return
+		}
+
+		// Hit
+		spellEffect.Outcome = OutcomeHit
+		spell.Hits++
+	}
+}
+
+func OutcomeFuncMeleeSpecialCritOnly(critMultiplier float64) OutcomeApplier {
+	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+		if spellEffect.physicalCritRoll(sim, spell) {
+			spellEffect.Outcome = OutcomeCrit
+			spell.Crits++
+			*damage *= critMultiplier
+			return
+		}
+
+		// Hit
+		spellEffect.Outcome = OutcomeHit
+		spell.Hits++
+	}
+}
+
+func OutcomeFuncRanged(critMultiplier float64) OutcomeApplier {
+	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+		character := spell.Character
+		roll := sim.RandomFloat("White Hit Table")
+
+		// Miss
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
+		chance := MaxFloat(0, missChance)
+		if roll < chance {
+			spellEffect.Outcome = OutcomeMiss
+			spell.Misses++
+			*damage = 0
+			return
+		}
+
+		// Block (if in front). Note that critical blocks are allowed for 2-roll hits.
+		// If the target is a mob:
+		// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
+		// If we actually implement blocks, ranged hits can be blocked.
+
+		// Crit (separate roll)
+		if spellEffect.physicalCritRoll(sim, spell) {
 			spellEffect.Outcome = OutcomeCrit
 			spell.Crits++
 			*damage *= critMultiplier

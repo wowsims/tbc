@@ -58,7 +58,6 @@ type Rogue struct {
 
 	eviscerateEnergyCost float64
 	envenomEnergyCost    float64
-	deadlyPoisonStacks   int
 
 	Backstab       *core.Spell
 	DeadlyPoison   *core.Spell
@@ -102,7 +101,7 @@ func (rogue *Rogue) Finalize(raid *core.Raid) {
 }
 
 func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras core.SpellExtras, procMask core.ProcMask) core.SimpleSpell {
-	return core.SimpleSpell{
+	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				ActionID:    actionID,
@@ -121,15 +120,11 @@ func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras
 				SpellExtras: spellExtras,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      rogue.critMultiplier(procMask.Matches(core.ProcMaskMeleeMH), spellExtras.Matches(SpellFlagBuilder)),
-			ProcMask:            procMask,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-		},
 	}
+	if rogue.Talents.SurpriseAttacks && spellExtras.Matches(SpellFlagFinisher) {
+		spell.SpellExtras |= core.SpellExtrasCannotBeDodged
+	}
+	return spell
 }
 
 func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) {
@@ -167,7 +162,6 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.plan = PlanOpener
 	rogue.deathmantle4pcProc = false
-	rogue.deadlyPoisonStacks = 0
 	rogue.doneSND = false
 
 	permaEA := rogue.ExposeArmorAura.ExpiresAt() == core.NeverExpires

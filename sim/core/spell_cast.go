@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/wowsims/tbc/sim/core/stats"
 )
