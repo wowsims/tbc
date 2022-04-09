@@ -30,24 +30,22 @@ func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 				Cooldown:    time.Second * 10,
 				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
 				SpellSchool: core.SpellSchoolPhysical,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}
-
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 	if ItemSetDemonStalker.CharacterHasSetBonus(&hunter.Character, 4) {
 		ama.Cost.Value -= 275.0 * 0.1
 	}
 
 	baseEffect := core.SpellEffect{
-		OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-		CritRollCategory:    core.CritRollCategoryPhysical,
-		// TODO: If we ever allow multiple targets to have their own type, need to
-		// update this.
-		CritMultiplier:   hunter.critMultiplier(true, sim.GetPrimaryTarget()),
-		ProcMask:         core.ProcMaskRangedSpecial,
-		DamageMultiplier: 1,
+		ProcMask: core.ProcMaskRangedSpecial,
+
+		BonusCritRating:  float64(hunter.Talents.ImprovedBarrage) * 4 * core.MeleeCritRatingPerCritChance,
+		DamageMultiplier: 1 + 0.04*float64(hunter.Talents.Barrage),
 		ThreatMultiplier: 1,
+
 		BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
 			Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 				return (hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
@@ -58,13 +56,12 @@ func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 			},
 			TargetSpellCoefficient: 1,
 		}),
+		OutcomeApplier: core.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
+
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			hunter.rotation(sim, false)
 		},
 	}
-
-	baseEffect.DamageMultiplier *= 1 + 0.04*float64(hunter.Talents.Barrage)
-	baseEffect.BonusCritRating += float64(hunter.Talents.ImprovedBarrage) * 4 * core.MeleeCritRatingPerCritChance
 
 	numHits := core.MinInt32(3, sim.GetNumTargets())
 	effects := make([]core.SpellEffect, 0, numHits)
@@ -72,13 +69,13 @@ func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 		effects = append(effects, baseEffect)
 		effects[i].Target = sim.GetTarget(i)
 	}
-	ama.Effects = effects
 
 	hunter.MultiShot = hunter.RegisterSpell(core.SpellConfig{
 		Template: ama,
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
 			instance.CastTime = hunter.MultiShotCastTime()
 		},
+		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
 	})
 }
 

@@ -226,7 +226,28 @@ func OutcomeFuncMeleeSpecialCritOnly(critMultiplier float64) OutcomeApplier {
 	}
 }
 
-func OutcomeFuncRanged(critMultiplier float64) OutcomeApplier {
+func OutcomeFuncRangedHit() OutcomeApplier {
+	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+		character := spell.Character
+		roll := sim.RandomFloat("White Hit Table")
+
+		// Miss
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
+		chance := MaxFloat(0, missChance)
+		if roll < chance {
+			spellEffect.Outcome = OutcomeMiss
+			spell.Misses++
+			*damage = 0
+			return
+		}
+
+		// Hit
+		spellEffect.Outcome = OutcomeHit
+		spell.Hits++
+	}
+}
+
+func OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		character := spell.Character
 		roll := sim.RandomFloat("White Hit Table")

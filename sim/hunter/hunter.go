@@ -88,6 +88,8 @@ type Hunter struct {
 	SerpentSting *core.Spell
 	SteadyShot   *core.Spell
 
+	SerpentStingDot *core.Dot
+
 	AspectOfTheHawkAura  *core.Aura
 	AspectOfTheViperAura *core.Aura
 	ScorpidStingAura     *core.Aura

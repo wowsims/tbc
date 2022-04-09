@@ -23,29 +23,27 @@ func (hunter *Hunter) registerArcaneShotSpell(sim *core.Simulation) {
 				Cooldown:    time.Second * 6,
 				Cost:        cost,
 				BaseCost:    cost,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
-			ProcMask:            core.ProcMaskRangedSpecial,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
+	}
+	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+	ama.Cooldown -= time.Millisecond * 200 * time.Duration(hunter.Talents.ImprovedArcaneShot)
+
+	hunter.ArcaneShot = hunter.RegisterSpell(core.SpellConfig{
+		Template: ama,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskRangedSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
 			BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 					return (hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget())*0.15 + 273
 				},
 				TargetSpellCoefficient: 1,
 			}),
-		},
-	}
-
-	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
-	ama.Cooldown -= time.Millisecond * 200 * time.Duration(hunter.Talents.ImprovedArcaneShot)
-
-	hunter.ArcaneShot = hunter.RegisterSpell(core.SpellConfig{
-		Template:   ama,
-		ModifyCast: core.ModifyCastAssignTarget,
+			OutcomeApplier: core.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
+		}),
 	})
 }

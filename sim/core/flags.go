@@ -164,6 +164,7 @@ const (
 	SpellExtrasBinary                                  // Does not do partial resists and could need a different hit roll.
 	SpellExtrasChanneled                               // Spell is channeled
 	SpellExtrasIgnoreModifiers                         // Only used by Ignite
+	SpellExtrasMeleeMetrics                            // Marks a spell as a melee ability for metrics.
 
 	// Used to let agents categorize their spells.
 	SpellExtrasAgentReserved1

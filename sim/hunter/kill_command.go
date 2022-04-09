@@ -74,28 +74,25 @@ func (hp *HunterPet) registerKillCommandSpell(sim *core.Simulation) {
 				SpellSchool: core.SpellSchoolPhysical,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      2,
-			ProcMask:            core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			BaseDamage:          core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 127, 1, true),
+	}
+
+	hp.KillCommand = hp.RegisterSpell(core.SpellConfig{
+		Template: ama,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			BonusCritRating:  float64(hp.hunterOwner.Talents.FocusedFire) * 10 * core.MeleeCritRatingPerCritChance,
+			DamageMultiplier: hp.config.DamageMultiplier,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 127, 1, true),
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(2),
+
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if beastLordProcAura != nil {
 					beastLordProcAura.Activate(sim)
 				}
 			},
-		},
-	}
-
-	ama.Effect.DamageMultiplier *= hp.config.DamageMultiplier
-	ama.Effect.BonusCritRating += float64(hp.hunterOwner.Talents.FocusedFire) * 10 * core.MeleeCritRatingPerCritChance
-
-	hp.KillCommand = hp.RegisterSpell(core.SpellConfig{
-		Template:   ama,
-		ModifyCast: core.ModifyCastAssignTarget,
+		}),
 	})
 }
 

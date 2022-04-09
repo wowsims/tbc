@@ -17,7 +17,7 @@ func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
 				ActionID:    MutilateMHActionID,
 				Character:   &rogue.Character,
 				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasAlwaysHits,
+				SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasAlwaysHits,
 			},
 		},
 	}

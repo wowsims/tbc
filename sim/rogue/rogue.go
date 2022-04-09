@@ -117,7 +117,7 @@ func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras
 					Type:  stats.Energy,
 					Value: cost,
 				},
-				SpellExtras: spellExtras,
+				SpellExtras: core.SpellExtrasMeleeMetrics | spellExtras,
 			},
 		},
 	}

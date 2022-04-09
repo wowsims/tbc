@@ -22,27 +22,27 @@ func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
 				Cost:        cost,
 				BaseCost:    cost,
 				Cooldown:    time.Second * 6,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      hunter.critMultiplier(false, sim.GetPrimaryTarget()),
-			ProcMask:            core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			BaseDamage:          core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 170, 1, true),
-		},
 	}
-
 	ama.Cost.Value -= 120 * 0.2 * float64(hunter.Talents.Resourcefulness)
-	ama.Effect.BonusCritRating += float64(hunter.Talents.SavageStrikes) * 10 * core.MeleeCritRatingPerCritChance
 
 	hunter.raptorStrikeCost = ama.Cost.Value
 
 	hunter.RaptorStrike = hunter.RegisterSpell(core.SpellConfig{
 		Template:   ama,
 		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask: core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
+
+			BonusCritRating:  float64(hunter.Talents.SavageStrikes) * 10 * core.MeleeCritRatingPerCritChance,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 170, 1, true),
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(hunter.critMultiplier(false, sim.GetPrimaryTarget())),
+		}),
 	})
 }
 

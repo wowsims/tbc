@@ -867,6 +867,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		TypedEvent.freezeAllAndDo(() => {
 			this.player.setRace(eventID, specToEligibleRaces[this.player.spec][0]);
 			this.player.setGear(eventID, this.sim.lookupEquipmentSpec(this.individualConfig.defaults.gear));
+			this.player.setBonusStats(eventID, new Stats());
 			this.player.setConsumes(eventID, this.individualConfig.defaults.consumes);
 			this.player.setRotation(eventID, this.individualConfig.defaults.rotation);
 			this.player.setTalentsString(eventID, this.individualConfig.defaults.talents);
