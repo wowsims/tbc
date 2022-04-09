@@ -129,7 +129,7 @@ type LBOnlyRotation struct {
 
 func (rotation *LBOnlyRotation) DoAction(eleShaman *ElementalShaman, sim *core.Simulation) {
 	if !eleShaman.LightningBolt.Cast(sim, sim.GetPrimaryTarget()) {
-		eleShaman.WaitForMana(sim, eleShaman.LightningBolt.Instance.GetManaCost())
+		eleShaman.WaitForMana(sim, eleShaman.LightningBolt.MostRecentCost)
 	}
 }
 
@@ -155,7 +155,7 @@ func (rotation *CLOnCDRotation) DoAction(eleShaman *ElementalShaman, sim *core.S
 	}
 
 	if !spell.Cast(sim, sim.GetPrimaryTarget()) {
-		eleShaman.WaitForMana(sim, spell.Instance.GetManaCost())
+		eleShaman.WaitForMana(sim, spell.MostRecentCost)
 	}
 }
 
@@ -193,7 +193,7 @@ func (rotation *FixedRotation) DoAction(eleShaman *ElementalShaman, sim *core.Si
 		common.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(shaman.ChainLightningCooldownID, sim.CurrentTime), common.WaitReasonRotation).Cast(sim)
 	} else {
 		if !spell.Cast(sim, sim.GetPrimaryTarget()) {
-			eleShaman.WaitForMana(sim, spell.Instance.GetManaCost())
+			eleShaman.WaitForMana(sim, spell.MostRecentCost)
 		}
 	}
 }
@@ -227,7 +227,7 @@ func (rotation *CLOnClearcastRotation) DoAction(eleShaman *ElementalShaman, sim 
 	}
 
 	if !spell.Cast(sim, sim.GetPrimaryTarget()) {
-		eleShaman.WaitForMana(sim, spell.Instance.GetManaCost())
+		eleShaman.WaitForMana(sim, spell.MostRecentCost)
 	} else {
 		rotation.prevPrevCastProccedCC = eleShaman.ElementalFocusStacks == 2
 	}

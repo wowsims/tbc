@@ -122,7 +122,7 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 		}
 		if judge != nil {
 			if success := judge.Cast(sim, target); !success {
-				ret.WaitForMana(sim, judge.Instance.GetManaCost())
+				ret.WaitForMana(sim, judge.MostRecentCost)
 			}
 		}
 	}
@@ -249,7 +249,7 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	if ret.CanJudgementOfBlood(sim) {
 		success := ret.JudgementOfBlood.Cast(sim, target)
 		if !success {
-			ret.WaitForMana(sim, ret.JudgementOfBlood.Instance.Cost.Value)
+			ret.WaitForMana(sim, ret.JudgementOfBlood.MostRecentCost)
 		}
 	}
 
@@ -266,7 +266,7 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
 		success := ret.CrusaderStrike.Cast(sim, target)
 		if !success {
-			ret.WaitForMana(sim, ret.CrusaderStrike.Instance.Cost.Value)
+			ret.WaitForMana(sim, ret.CrusaderStrike.MostRecentCost)
 		}
 		return
 	}

@@ -4,14 +4,6 @@ import (
 	"time"
 )
 
-func (unit *Unit) NewDotAura(auraLabel string, actionID ActionID) *Aura {
-	return unit.GetOrRegisterAura(&Aura{
-		Label:    auraLabel,
-		ActionID: actionID,
-		Duration: NeverExpires,
-	})
-}
-
 type TickEffects func(*Simulation, *Spell) func()
 
 type Dot struct {

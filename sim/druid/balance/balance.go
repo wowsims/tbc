@@ -172,7 +172,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 	}
 
 	if success := spell.Cast(sim, target); !success {
-		moonkin.WaitForMana(sim, spell.Instance.GetManaCost())
+		moonkin.WaitForMana(sim, spell.MostRecentCost)
 	}
 }
 
