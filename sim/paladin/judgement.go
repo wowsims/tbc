@@ -43,26 +43,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 				SpellExtras: core.SpellExtrasAlwaysHits,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			ProcMask:            core.ProcMaskMeleeOrRangedSpecial,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			BaseDamage:          core.BaseDamageConfigMagic(295, 325, 0.429),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
-				paladin.SealOfBloodAura.Deactivate(sim)
-				if loaAura != nil {
-					loaAura.Activate(sim)
-				}
-			},
-		},
 	}
-
-	// Apply 2 Handed Weapon Specialization talent
-	paladin.applyTwoHandedWeaponSpecializationToSpell(&job.Effect)
 
 	// Reduce mana cost if we have Benediction Talent
 	job.Cost = core.ResourceCost{
@@ -73,12 +54,29 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 	// Reduce CD if we have Improved Judgement Talent
 	job.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
-	// Increase Judgement Crit Chance if we have Fanaticism talent
-	job.Effect.BonusCritRating = 3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism)
+	effect := core.SpellEffect{
+		ProcMask: core.ProcMaskMeleeOrRangedSpecial,
+
+		BonusCritRating:  3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism),
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+
+		BaseDamage:     core.BaseDamageConfigMagic(295, 325, 0.429),
+		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+
+		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
+			paladin.SealOfBloodAura.Deactivate(sim)
+			if loaAura != nil {
+				loaAura.Activate(sim)
+			}
+		},
+	}
+	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
 
 	paladin.JudgementOfBlood = paladin.RegisterSpell(core.SpellConfig{
-		Template:   job,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template:     job,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
 
@@ -112,16 +110,6 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 				},
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
-					return
-				}
-				paladin.JudgementOfTheCrusaderAura.Activate(sim)
-				paladin.CurrentJudgement = paladin.JudgementOfTheCrusaderAura
-			},
-		},
 	}
 
 	// Reduce mana cost if we have Benediction Talent
@@ -133,6 +121,17 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
 		Template:   jotc,
 		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			OutcomeApplier: core.OutcomeFuncAlwaysHit(),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+				paladin.JudgementOfTheCrusaderAura.Activate(sim)
+				paladin.CurrentJudgement = paladin.JudgementOfTheCrusaderAura
+			},
+		}),
 	})
 }
 
@@ -166,17 +165,6 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 				},
 			},
 		},
-		Effect: core.SpellEffect{
-			CritRollCategory:    core.CritRollCategoryMagical,
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
-					return
-				}
-				paladin.JudgementOfWisdomAura.Activate(sim)
-				paladin.CurrentJudgement = paladin.JudgementOfWisdomAura
-			},
-		},
 	}
 
 	// Reduce mana cost if we have Benediction Talent
@@ -186,8 +174,18 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 	jow.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
 	paladin.JudgementOfWisdom = paladin.RegisterSpell(core.SpellConfig{
-		Template:   jow,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: jow,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			OutcomeApplier: core.OutcomeFuncMagicHit(),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+				paladin.JudgementOfWisdomAura.Activate(sim)
+				paladin.CurrentJudgement = paladin.JudgementOfWisdomAura
+			},
+		}),
 	})
 }
 
