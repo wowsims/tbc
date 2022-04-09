@@ -276,7 +276,7 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 		return true
 	} else if attackCast != nil {
 		if success := attackCast.Cast(sim, sim.GetPrimaryTarget()); !success {
-			shaman.WaitForMana(sim, attackCast.Instance.Cost.Value)
+			shaman.WaitForMana(sim, attackCast.MostRecentCost)
 		}
 		return true
 	}

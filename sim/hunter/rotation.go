@@ -290,7 +290,7 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 				// Can't use kill command while casting steady shot.
 				hunter.killCommandBlocked = true
 			} else {
-				hunter.WaitForMana(sim, hunter.SteadyShot.Instance.GetManaCost())
+				hunter.WaitForMana(sim, hunter.SteadyShot.MostRecentCost)
 			}
 		}
 	case OptionMulti:
@@ -298,7 +298,7 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 			success := hunter.MultiShot.Cast(sim, target)
 			if success {
 			} else {
-				hunter.WaitForMana(sim, hunter.MultiShot.Instance.GetManaCost())
+				hunter.WaitForMana(sim, hunter.MultiShot.MostRecentCost)
 			}
 		}
 	case OptionArcane:
@@ -308,7 +308,7 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 				// Arcane is instant, so we can try another action immediately.
 				hunter.rotation(sim, false)
 			} else {
-				hunter.WaitForMana(sim, hunter.ArcaneShot.Instance.Cost.Value)
+				hunter.WaitForMana(sim, hunter.ArcaneShot.MostRecentCost)
 			}
 		}
 	}
@@ -352,13 +352,13 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 	if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !hunter.ScorpidStingAura.IsActive() {
 		success := hunter.ScorpidSting.Cast(sim, target)
 		if !success {
-			hunter.WaitForMana(sim, hunter.ScorpidSting.Instance.Cost.Value)
+			hunter.WaitForMana(sim, hunter.ScorpidSting.MostRecentCost)
 		}
 		return true
 	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_SerpentSting && !hunter.SerpentStingDot.IsActive() {
 		success := hunter.SerpentSting.Cast(sim, target)
 		if !success {
-			hunter.WaitForMana(sim, hunter.SerpentSting.Instance.Cost.Value)
+			hunter.WaitForMana(sim, hunter.SerpentSting.MostRecentCost)
 		}
 		return true
 	}
