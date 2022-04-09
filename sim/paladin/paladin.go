@@ -113,7 +113,7 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 
 	paladin.registerAvengingWrathCD()
 
-	// paladin.setupJudgementRefresh()
+	paladin.setupJudgementRefresh()
 
 	return paladin
 }

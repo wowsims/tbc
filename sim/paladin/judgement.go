@@ -196,20 +196,20 @@ func (paladin *Paladin) CanJudgementOfWisdom(sim *core.Simulation) bool {
 // Defines judgement refresh behavior from attacks
 // Returns extra mana if a different pally applied Judgement of Wisdom
 func (paladin *Paladin) setupJudgementRefresh() {
+	const mana = 74 / 2
 	refreshAura := paladin.RegisterAura(&core.Aura{
 		Label: "Refresh Judgement",
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.Outcome.Matches(core.OutcomeLanded) &&
-				spellEffect.ProcMask.Matches(core.ProcMaskMeleeMHAuto) {
-				if paladin.CurrentJudgement.IsActive() {
+			if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) {
+				if paladin.CurrentJudgement != nil && paladin.CurrentJudgement.IsActive() {
 					// Refresh the judgement
 					paladin.CurrentJudgement.Refresh(sim)
 
 					// Check if current judgement is not JoW and also that JoW is on the target
-					if paladin.CurrentJudgement.ActionID != JudgementOfWisdomActionID &&
+					if paladin.CurrentJudgement.ActionID.SpellID != 27164 &&
 						spellEffect.Target.HasActiveAura(paladin.JudgementOfWisdomAura.Label) {
 						// Just trigger a second JoW
-						paladin.JudgementOfWisdomAura.OnSpellHit(paladin.JudgementOfWisdomAura, sim, spell, spellEffect)
+						paladin.AddMana(sim, mana, core.ActionID{SpellID: 27164}, false)
 					}
 				}
 			}
