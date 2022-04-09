@@ -27,6 +27,8 @@ type Paladin struct {
 	JudgementOfTheCrusader *core.Spell
 	JudgementOfWisdom      *core.Spell
 
+	ConsecrationDot *core.Dot
+
 	JudgementOfTheCrusaderAura *core.Aura
 	JudgementOfWisdomAura      *core.Aura
 	SealOfBloodAura            *core.Aura

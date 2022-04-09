@@ -29,19 +29,19 @@ func (paladin *Paladin) registerExorcismSpell(sim *core.Simulation) {
 				Cooldown: time.Second * 15,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      paladin.SpellCritMultiplier(1, 0.25), // look up crit multiplier in the future
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			BaseDamage:          core.BaseDamageConfigMagic(521, 579, 1),
-		},
 	}
 
 	paladin.Exorcism = paladin.RegisterSpell(core.SpellConfig{
-		Template:   exo,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: exo,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage: core.BaseDamageConfigMagic(521, 579, 1),
+			// look up crit multiplier in the future
+			// TODO: What is this 0.25?
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(paladin.SpellCritMultiplier(1, 0.25)),
+		}),
 	})
 }
 

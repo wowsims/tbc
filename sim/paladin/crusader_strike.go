@@ -25,28 +25,29 @@ func (paladin *Paladin) registerCrusaderStrikeSpell(sim *core.Simulation) {
 					Type:  stats.Mana,
 					Value: 236,
 				},
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
-			IsPhantom:           true,
-			ProcMask:            core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier:    1, // Need to review to make sure I set these properly
-			ThreatMultiplier:    1,
+	}
+
+	paladin.CrusaderStrike = paladin.RegisterSpell(core.SpellConfig{
+		Template: cs,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:  core.ProcMaskMeleeMHSpecial,
+			IsPhantom: true,
+
+			DamageMultiplier: 1, // Need to review to make sure I set these properly
+			ThreatMultiplier: 1,
+
+			// maybe this isn't the one that should be set to 1.1
+			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 1.1, true),
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
 			},
-			// maybe this isn't the one that should be set to 1.1
-			BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 1.1, true),
-		},
-	}
-
-	paladin.CrusaderStrike = paladin.RegisterSpell(core.SpellConfig{
-		Template:   cs,
-		ModifyCast: core.ModifyCastAssignTarget,
+		}),
 	})
 }

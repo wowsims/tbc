@@ -24,24 +24,24 @@ func (paladin *Paladin) setupSealOfBlood() {
 				SpellSchool: core.SpellSchoolHoly,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
-			IsPhantom:           true,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			// should deal 35% weapon deamage
-			BaseDamage: core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
-		},
+	}
+
+	effect := core.SpellEffect{
+		IsPhantom:        true,
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+
+		// should deal 35% weapon deamage
+		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
+		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
 	}
 
 	// Apply 2 Handed Weapon Specialization talent
-	paladin.applyTwoHandedWeaponSpecializationToSpell(&sobProcTemplate.Effect)
+	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
 
 	sobProc := paladin.RegisterSpell(core.SpellConfig{
-		Template:   sobProcTemplate,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template:     sobProcTemplate,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 
 	// Define the aura
@@ -101,21 +101,18 @@ func (paladin *Paladin) SetupSealOfCommand() {
 				SpellSchool: core.SpellSchoolHoly,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			ProcMask:            core.ProcMaskMeleeMHSpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-		},
 	}
 
-	// Apply 2 Handed Weapon Specialization talent
-	paladin.applyTwoHandedWeaponSpecializationToSpell(&socProcTemplate.Effect)
+	effect := core.SpellEffect{
+		ProcMask:         core.ProcMaskMeleeMHSpecial,
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+		OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+	}
+	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
 
 	weaponBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, false, 0, 0.7, false)
-	socProcTemplate.Effect.BaseDamage = core.BaseDamageConfig{
+	effect.BaseDamage = core.BaseDamageConfig{
 		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 			return weaponBaseDamage(sim, hitEffect, spell) + 0.29*hitEffect.SpellPower(spell.Character, spell)
 		},
@@ -123,8 +120,8 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	}
 
 	socProc := paladin.RegisterSpell(core.SpellConfig{
-		Template:   socProcTemplate,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template:     socProcTemplate,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 
 	ppmm := paladin.AutoAttacks.NewPPMManager(7.0)
