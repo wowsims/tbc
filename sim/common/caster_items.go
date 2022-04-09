@@ -85,16 +85,14 @@ func ApplyTimbals(agent core.Agent) {
 					SpellSchool: core.SpellSchoolShadow,
 				},
 			},
-			Effect: core.SpellEffect{
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				CritMultiplier:      agent.GetCharacter().DefaultSpellCritMultiplier(),
-				DamageMultiplier:    1,
-				ThreatMultiplier:    1,
-				BaseDamage:          core.BaseDamageConfigRoll(285, 475),
-			},
 		},
-		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigRoll(285, 475),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+		}),
 	})
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
