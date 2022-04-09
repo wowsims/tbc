@@ -11,17 +11,19 @@ const SpellIDArcaneBlast int32 = 30451
 const ArcaneBlastBaseManaCost = 195.0
 const ArcaneBlastBaseCastTime = time.Millisecond * 2500
 
-func (mage *Mage) registerArcaneBlastSpell(sim *core.Simulation) {
-	mage.ArcaneBlastAura = mage.RegisterAura(&core.Aura{
+func (mage *Mage) newArcaneBlastSpell(sim *core.Simulation, numStacks int32) *core.Spell {
+	mage.ArcaneBlastAura = mage.GetOrRegisterAura(&core.Aura{
 		Label:     "Arcane Blast",
 		ActionID:  core.ActionID{SpellID: 36032},
 		Duration:  time.Second * 8,
 		MaxStacks: 3,
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			// Reset the mana cost on expiration.
-			if mage.ArcaneBlast.Instance.IsInUse() {
-				mage.ArcaneBlast.Instance.Cost.Value = core.MaxFloat(0, mage.ArcaneBlast.Instance.Cost.Value-3.0*ArcaneBlastBaseManaCost*0.75)
-				mage.ArcaneBlast.Instance.ActionID.Tag = 1
+			for i := int32(0); i < 4; i++ {
+				if mage.ArcaneBlast[i].Instance.IsInUse() {
+					mage.ArcaneBlast[i].Instance.Cost.Value = core.MaxFloat(0, mage.ArcaneBlast[i].Instance.Cost.Value-3.0*ArcaneBlastBaseManaCost*0.75)
+					mage.ArcaneBlast[i].Instance.ActionID.Tag = 1
+				}
 			}
 		},
 	})
@@ -49,49 +51,39 @@ func (mage *Mage) registerArcaneBlastSpell(sim *core.Simulation) {
 				},
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
-			DamageMultiplier:    mage.spellDamageMultiplier,
-			ThreatMultiplier:    1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
-			BaseDamage:          core.BaseDamageConfigMagic(668, 772, 2.5/3.5),
-		},
 	}
-
-	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance
-	spell.Effect.BonusSpellCritRating += float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance
+	spell.CastTime -= time.Duration(numStacks) * time.Second / 3
+	spell.Cost.Value += float64(numStacks) * ArcaneBlastBaseManaCost * 0.75
+	spell.ActionID.Tag = numStacks + 1
 
 	if mage.hasTristfal {
-		spell.Effect.DamageMultiplier *= 1.2
 		spell.Cost.Value += 0.2 * ArcaneBlastBaseManaCost
 	}
 
-	mage.ArcaneBlast = mage.RegisterSpell(core.SpellConfig{
+	return mage.RegisterSpell(core.SpellConfig{
 		Template: spell,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			numStacks := mage.ArcaneBlastAura.GetStacks()
-			instance.CastTime -= time.Duration(numStacks) * time.Second / 3
-			instance.Cost.Value += float64(numStacks) * ArcaneBlastBaseManaCost * 0.75
-			instance.ActionID.Tag = numStacks + 1
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			BonusSpellHitRating:  float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance,
+			BonusSpellCritRating: float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance,
 
-			// Set dynamic fields, i.e. the stuff we couldn't precompute.
-			instance.Effect.Target = target
-		},
+			DamageMultiplier: mage.spellDamageMultiplier * core.TernaryFloat64(mage.hasTristfal, 1.2, 1),
+			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
+
+			BaseDamage:     core.BaseDamageConfigMagic(668, 772, 2.5/3.5),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
+		}),
 	})
 }
 
 func (mage *Mage) ArcaneBlastCastTime(numStacks int32) time.Duration {
-	castTime := mage.ArcaneBlast.Template.CastTime
-	castTime -= time.Duration(numStacks) * time.Second / 3
+	castTime := mage.ArcaneBlast[numStacks].Template.CastTime
 	castTime = time.Duration(float64(castTime) / mage.CastSpeed())
 	return castTime
 }
 
 func (mage *Mage) ArcaneBlastManaCost(numStacks int32) float64 {
-	cost := mage.ArcaneBlast.Template.Cost.Value
-	cost += float64(numStacks) * ArcaneBlastBaseManaCost * 0.75
-	mage.ArcaneBlast.Template.ApplyCostModifiers(&cost)
+	cost := mage.ArcaneBlast[numStacks].Template.Cost.Value
+	mage.ArcaneBlast[numStacks].Template.ApplyCostModifiers(&cost)
 	return cost
 }
 

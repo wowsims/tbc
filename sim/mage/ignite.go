@@ -1,6 +1,7 @@
 package mage
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -8,48 +9,62 @@ import (
 
 var IgniteActionID = core.ActionID{SpellID: 12848}
 
-func (mage *Mage) newIgniteSpell(sim *core.Simulation) *core.Spell {
+func (mage *Mage) registerIgniteSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
 				ActionID:    IgniteActionID,
 				Character:   &mage.Character,
 				SpellSchool: core.SpellSchoolFire,
-				SpellExtras: SpellFlagMage | core.SpellExtrasBinary | core.SpellExtrasAlwaysHits,
-			},
-		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryNone,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:         2,
-				TickLength:            time.Second * 2,
-				IgnoreDamageModifiers: true,
-				Aura:                  mage.NewDotAura("Ignite", IgniteActionID),
+				SpellExtras: SpellFlagMage | core.SpellExtrasIgnoreModifiers,
 			},
 		},
 	}
 
-	return mage.RegisterSpell(core.SpellConfig{
-		Template:   spell,
-		ModifyCast: core.ModifyCastAssignTarget,
+	mage.Ignite = mage.RegisterSpell(core.SpellConfig{
+		Template: spell,
+	})
+}
+
+func (mage *Mage) newIgniteDot(sim *core.Simulation, target *core.Target) *core.Dot {
+	return core.NewDot(core.Dot{
+		Spell: mage.Ignite,
+		Aura: target.RegisterAura(&core.Aura{
+			Label:    "Ignite-" + strconv.Itoa(int(mage.Index)),
+			ActionID: IgniteActionID,
+		}),
+		NumberOfTicks: 2,
+		TickLength:    time.Second * 2,
 	})
 }
 
 func (mage *Mage) procIgnite(sim *core.Simulation, target *core.Target, damageFromProccingSpell float64) {
-	newIgniteDamage := damageFromProccingSpell * float64(mage.Talents.Ignite) * 0.08
-	ignite := mage.Ignites[target.Index]
+	igniteDot := mage.IgniteDots[target.Index]
 
-	if ignite.Instance.Effect.DotInput.IsTicking(sim) {
-		newIgniteDamage += ignite.Instance.Effect.DotInput.RemainingDamage()
+	newIgniteDamage := damageFromProccingSpell * float64(mage.Talents.Ignite) * 0.08
+	if igniteDot.IsActive() {
+		newIgniteDamage += mage.IgniteTickDamage[target.Index] * float64(2-igniteDot.TickCount)
 	}
 
-	// Cancel the current ignite dot.
-	ignite.Instance.Cancel(sim)
-	ignite.Template.Effect.DotInput.TickBaseDamage = core.DotSnapshotFuncMagic(newIgniteDamage/2, 0)
-	ignite.Cast(sim, target)
+	newTickDamage := newIgniteDamage / 2
+	mage.IgniteTickDamage[target.Index] = newTickDamage
+
+	if sim.Log != nil {
+		mage.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)", IgniteActionID, 0.0, time.Duration(0))
+		mage.Log(sim, "Completed cast %s", IgniteActionID)
+	}
+	mage.Ignite.Casts++
+	mage.Ignite.Hits++
+
+	// Reassign the effect to apply the new damage value.
+	igniteDot.TickEffects = core.TickFuncSnapshot(target, core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+		IsPeriodic:       true,
+		BaseDamage:       core.BaseDamageConfigFlat(newTickDamage),
+		OutcomeApplier:   core.OutcomeFuncTick(),
+	})
+	igniteDot.Apply(sim)
 }
 
 func (mage *Mage) applyIgnite() {

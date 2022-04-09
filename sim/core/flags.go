@@ -157,12 +157,13 @@ func (se SpellExtras) Matches(other SpellExtras) bool {
 }
 
 const (
-	SpellExtrasNone           SpellExtras = 0
-	SpellExtrasIgnoreResists  SpellExtras = 1 << iota // skip spell resist/armor
-	SpellExtrasCannotBeDodged                         // Ignores dodge in physical hit rolls
-	SpellExtrasAlwaysHits                             // Can't miss the hit roll
-	SpellExtrasBinary                                 // Does not do partial resists and could need a different hit roll.
-	SpellExtrasChanneled                              // Spell is channeled
+	SpellExtrasNone            SpellExtras = 0
+	SpellExtrasIgnoreResists   SpellExtras = 1 << iota // skip spell resist/armor
+	SpellExtrasCannotBeDodged                          // Ignores dodge in physical hit rolls
+	SpellExtrasAlwaysHits                              // Can't miss the hit roll
+	SpellExtrasBinary                                  // Does not do partial resists and could need a different hit roll.
+	SpellExtrasChanneled                               // Spell is channeled
+	SpellExtrasIgnoreModifiers                         // Only used by Ignite
 
 	// Used to let agents categorize their spells.
 	SpellExtrasAgentReserved1

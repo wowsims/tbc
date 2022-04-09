@@ -66,7 +66,7 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.Spell {
 
 	mage.isBlastSpamming = mage.canBlast(sim, abManaCost, abCastTime, numStacks, willDropStacks)
 	if mage.isBlastSpamming {
-		return mage.ArcaneBlast
+		return mage.ArcaneBlast[numStacks]
 	}
 
 	currentManaPercent := mage.CurrentManaPercent()
@@ -99,14 +99,14 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.Spell {
 	}
 
 	if !mage.isDoingRegenRotation {
-		return mage.ArcaneBlast
+		return mage.ArcaneBlast[numStacks]
 	}
 
 	if mage.tryingToDropStacks {
 		if willDropStacks {
 			mage.tryingToDropStacks = false
 			mage.numCastsDone = 1 // 1 to count the blast we're about to return
-			return mage.ArcaneBlast
+			return mage.ArcaneBlast[numStacks]
 		} else {
 			// Do a filler spell while waiting for stacks to drop.
 			mage.numCastsDone++
@@ -147,7 +147,7 @@ func (mage *Mage) doArcaneRotation(sim *core.Simulation) *core.Spell {
 			mage.tryingToDropStacks = true
 			mage.numCastsDone = 0
 		}
-		return mage.ArcaneBlast
+		return mage.ArcaneBlast[numStacks]
 	}
 }
 

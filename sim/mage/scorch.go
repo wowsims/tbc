@@ -9,11 +9,13 @@ import (
 
 const SpellIDScorch int32 = 27074
 
+var ScorchActionID = core.ActionID{SpellID: SpellIDScorch}
+
 func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDScorch},
+				ActionID:    ScorchActionID,
 				Character:   &mage.Character,
 				SpellSchool: core.SpellSchoolFire,
 				SpellExtras: SpellFlagMage,
@@ -29,23 +31,24 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 				GCD:      core.GCDDefault,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
-			DamageMultiplier:    mage.spellDamageMultiplier,
-			ThreatMultiplier:    1 - 0.05*float64(mage.Talents.BurningSoul),
-			BaseDamage:          core.BaseDamageConfigMagic(305, 361, 1.5/3.5),
-		},
 	}
-
 	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
 	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
-	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Incineration) * 2 * core.SpellCritRatingPerCritChance
-	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
-	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
-	spell.Effect.DamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+
+	effect := core.SpellEffect{
+		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
+
+		BonusSpellCritRating: 0 +
+			float64(mage.Talents.Incineration)*2*core.SpellCritRatingPerCritChance +
+			float64(mage.Talents.CriticalMass)*2*core.SpellCritRatingPerCritChance +
+			float64(mage.Talents.Pyromaniac)*1*core.SpellCritRatingPerCritChance,
+
+		DamageMultiplier: mage.spellDamageMultiplier * (1 + 0.02*float64(mage.Talents.FirePower)),
+		ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+
+		BaseDamage:     core.BaseDamageConfigMagic(305, 361, 1.5/3.5),
+		OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
+	}
 
 	if mage.Talents.ImprovedScorch > 0 {
 		mage.ScorchAura = sim.GetPrimaryTarget().GetAura(core.ImprovedScorchAuraLabel)
@@ -54,7 +57,7 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 		}
 
 		procChance := float64(mage.Talents.ImprovedScorch) / 3.0
-		spell.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() {
 				return
 			}
@@ -69,7 +72,7 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 	}
 
 	mage.Scorch = mage.RegisterSpell(core.SpellConfig{
-		Template:   spell,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template:     spell,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }

@@ -55,25 +55,33 @@ type Mage struct {
 	// Cached values for a few mechanics.
 	spellDamageMultiplier float64
 
-	ArcaneBlast     *core.Spell
+	// Current bonus crit from AM+CC interaction.
+	bonusAMCCCrit float64
+
+	ArcaneBlast     []*core.Spell
 	ArcaneExplosion *core.Spell
 	ArcaneMissiles  *core.Spell
 	Blizzard        *core.Spell
-	Ignites         []*core.Spell
+	Ignite          *core.Spell
 	Fireball        *core.Spell
-	FireballDot     *core.Spell
 	FireBlast       *core.Spell
 	Flamestrike     *core.Spell
-	FlamestrikeDot  *core.Spell
 	Frostbolt       *core.Spell
 	Pyroblast       *core.Spell
-	PyroblastDot    *core.Spell
 	Scorch          *core.Spell
 	WintersChill    *core.Spell
+
+	ArcaneMissilesDot *core.Dot
+	IgniteDots        []*core.Dot
+	FireballDot       *core.Dot
+	FlamestrikeDot    *core.Dot
+	PyroblastDot      *core.Dot
 
 	ArcaneBlastAura  *core.Aura
 	ClearcastingAura *core.Aura
 	ScorchAura       *core.Aura
+
+	IgniteTickDamage []float64
 
 	manaTracker common.ManaSpendingRateTracker
 }
@@ -89,24 +97,31 @@ func (mage *Mage) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (mage *Mage) Init(sim *core.Simulation) {
-	mage.registerArcaneBlastSpell(sim)
+	mage.ArcaneBlast = []*core.Spell{
+		mage.newArcaneBlastSpell(sim, 0),
+		mage.newArcaneBlastSpell(sim, 1),
+		mage.newArcaneBlastSpell(sim, 2),
+		mage.newArcaneBlastSpell(sim, 3),
+	}
 	mage.registerArcaneExplosionSpell(sim)
 	mage.registerArcaneMissilesSpell(sim)
 	mage.registerBlizzardSpell(sim)
 	mage.registerFireballSpell(sim)
-	mage.registerFireballDotSpell(sim)
 	mage.registerFireBlastSpell(sim)
 	mage.registerFlamestrikeSpell(sim)
-	mage.registerFlamestrikeDotSpell(sim)
 	mage.registerFrostboltSpell(sim)
+	mage.registerIgniteSpell(sim)
 	mage.registerPyroblastSpell(sim)
-	mage.registerPyroblastDotSpell(sim)
 	mage.registerScorchSpell(sim)
 	mage.registerWintersChillSpell(sim)
 
-	mage.Ignites = []*core.Spell{}
+	mage.IgniteDots = []*core.Dot{}
+	mage.IgniteTickDamage = []float64{}
 	for i := int32(0); i < sim.GetNumTargets(); i++ {
-		mage.Ignites = append(mage.Ignites, mage.newIgniteSpell(sim))
+		mage.IgniteTickDamage = append(mage.IgniteTickDamage, 0)
+	}
+	for i := int32(0); i < sim.GetNumTargets(); i++ {
+		mage.IgniteDots = append(mage.IgniteDots, mage.newIgniteDot(sim, sim.GetTarget(i)))
 	}
 }
 
@@ -118,6 +133,7 @@ func (mage *Mage) Reset(newsim *core.Simulation) {
 	mage.isBlastSpamming = false
 	mage.manaTracker.Reset()
 	mage.disabledMCDs = nil
+	mage.bonusAMCCCrit = 0
 }
 
 func NewMage(character core.Character, options proto.Player) *Mage {
