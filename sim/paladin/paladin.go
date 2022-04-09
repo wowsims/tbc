@@ -70,7 +70,7 @@ func (paladin *Paladin) Reset(sim *core.Simulation) {
 	paladin.CurrentJudgement = nil
 }
 
-func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, ability *core.SimpleSpell) {
+func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
 	if paladin.CurrentJudgement != nil && paladin.CurrentJudgement.IsActive() {
 		paladin.CurrentJudgement.UpdateExpires(sim.CurrentTime + JudgementDuration)
 	}

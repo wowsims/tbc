@@ -281,13 +281,9 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		}
 	})
 
-	ohWeapon := rogue.WeaponFromOffHand(rogue.critMultiplier(false, false))
-	if rogue.Talents.DualWieldSpecialization > 0 {
-		ohWeapon.BaseDamageOverride = core.BaseDamageFuncMeleeWeapon(core.OffHand, false, 0, 1+0.1*float64(rogue.Talents.DualWieldSpecialization), true)
-	}
 	rogue.EnableAutoAttacks(rogue, core.AutoAttackOptions{
 		MainHand:       rogue.WeaponFromMainHand(rogue.critMultiplier(true, false)),
-		OffHand:        ohWeapon,
+		OffHand:        rogue.WeaponFromOffHand(rogue.critMultiplier(false, false)),
 		AutoSwingMelee: true,
 	})
 

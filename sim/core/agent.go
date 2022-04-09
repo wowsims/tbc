@@ -46,7 +46,7 @@ type Agent interface {
 	// This is different from Aura.OnSpellHit in that it is invoked fully after
 	// everything related to the attack is complete, and it is only invoked for
 	// auto attacks (white hits or white-hit-replacers).
-	OnAutoAttack(sim *Simulation, spell *SimpleSpell)
+	OnAutoAttack(sim *Simulation, spell *Spell)
 }
 
 type ActionID struct {

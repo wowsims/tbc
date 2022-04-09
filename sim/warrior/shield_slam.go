@@ -33,6 +33,7 @@ func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
 					Type:  stats.Rage,
 					Value: warrior.shieldSlamCost,
 				},
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}

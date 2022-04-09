@@ -72,6 +72,7 @@ func (hp *HunterPet) registerKillCommandSpell(sim *core.Simulation) {
 				ActionID:    core.ActionID{SpellID: 34027},
 				Character:   &hp.Character,
 				SpellSchool: core.SpellSchoolPhysical,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}

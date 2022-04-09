@@ -80,11 +80,19 @@ func ApplyHandOfJustice(agent core.Agent) {
 		var icd core.InternalCD
 		icdDur := time.Second * 2
 
-		template := character.AutoAttacks.MHAuto.Template
-		template.ActionID = core.ActionID{ItemID: 11815}
 		handOfJusticeSpell := character.GetOrRegisterSpell(core.SpellConfig{
-			Template:   template,
-			ModifyCast: core.ModifyCastAssignTarget,
+			Template: core.SimpleSpell{
+				SpellCast: core.SpellCast{
+					Cast: core.Cast{
+						ActionID:    core.ActionID{ItemID: 11815},
+						Character:   character,
+						SpellSchool: core.SpellSchoolPhysical,
+						IgnoreHaste: true,
+						SpellExtras: core.SpellExtrasMeleeMetrics,
+					},
+				},
+			},
+			ApplyEffects: core.ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
 		})
 
 		return character.GetOrRegisterAura(&core.Aura{

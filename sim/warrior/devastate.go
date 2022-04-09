@@ -28,6 +28,7 @@ func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 					Type:  stats.Rage,
 					Value: warrior.sunderArmorCost,
 				},
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}

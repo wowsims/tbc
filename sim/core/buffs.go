@@ -329,12 +329,19 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 		}
 	})
 
-	wfTemplate := character.AutoAttacks.MHAuto.Template
-	wfTemplate.ActionID = ActionID{SpellID: windfuryBuffSpellRanks[rank-1]} // temporary buff ("Windfury Attack") spell id
-
 	wfSpell := character.GetOrRegisterSpell(SpellConfig{
-		Template:   wfTemplate,
-		ModifyCast: ModifyCastAssignTarget,
+		Template: SimpleSpell{
+			SpellCast: SpellCast{
+				Cast: Cast{
+					ActionID:    ActionID{SpellID: windfuryBuffSpellRanks[rank-1]}, // temporary buff ("Windfury Attack") spell id
+					Character:   character,
+					SpellSchool: SpellSchoolPhysical,
+					IgnoreHaste: true,
+					SpellExtras: SpellExtrasMeleeMetrics,
+				},
+			},
+		},
+		ApplyEffects: ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
 	})
 
 	const procChance = 0.2

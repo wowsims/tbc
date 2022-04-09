@@ -26,6 +26,7 @@ func (warrior *Warrior) registerHeroicStrikeSpell(_ *core.Simulation) {
 					Type:  stats.Rage,
 					Value: warrior.heroicStrikeCost,
 				},
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}

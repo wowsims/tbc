@@ -24,6 +24,10 @@ func (rogue *Rogue) ApplyTalents() {
 	rogue.AddStat(stats.Expertise, core.ExpertisePerQuarterPercentReduction*5*float64(rogue.Talents.WeaponExpertise))
 	rogue.AddStat(stats.ArmorPenetration, 186*float64(rogue.Talents.SerratedBlades))
 
+	if rogue.Talents.DualWieldSpecialization > 0 {
+		rogue.AutoAttacks.OHEffect.BaseDamage.Calculator = core.BaseDamageFuncMeleeWeapon(core.OffHand, false, 0, 1+0.1*float64(rogue.Talents.DualWieldSpecialization), true)
+	}
+
 	if rogue.Talents.Vitality > 0 {
 		agiBonus := 1 + 0.01*float64(rogue.Talents.Vitality)
 		rogue.AddStatDependency(stats.StatDependency{
@@ -239,11 +243,19 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 			var icd core.InternalCD
 			icdDur := time.Millisecond * 500
 
-			template := rogue.AutoAttacks.MHAuto.Template
-			template.ActionID = core.ActionID{SpellID: 13964}
 			swordSpecializationSpell := rogue.GetOrRegisterSpell(core.SpellConfig{
-				Template:   template,
-				ModifyCast: core.ModifyCastAssignTarget,
+				Template: core.SimpleSpell{
+					SpellCast: core.SpellCast{
+						Cast: core.Cast{
+							ActionID:    core.ActionID{SpellID: 13964},
+							Character:   &rogue.Character,
+							SpellSchool: core.SpellSchoolPhysical,
+							IgnoreHaste: true,
+							SpellExtras: core.SpellExtrasMeleeMetrics,
+						},
+					},
+				},
+				ApplyEffects: core.ApplyEffectFuncDirectDamage(rogue.AutoAttacks.MHEffect),
 			})
 
 			return rogue.GetOrRegisterAura(&core.Aura{

@@ -35,6 +35,7 @@ func (warrior *Warrior) registerBloodthirstSpell(_ *core.Simulation) {
 					Type:  stats.Rage,
 					Value: warrior.bloodthirstCost,
 				},
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}

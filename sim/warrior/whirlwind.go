@@ -33,6 +33,7 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 					Type:  stats.Rage,
 					Value: warrior.whirlwindCost,
 				},
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}
