@@ -13,6 +13,7 @@ var RevengeActionID = core.ActionID{SpellID: 30357, CooldownID: RevengeCooldownI
 
 func (warrior *Warrior) registerRevengeSpell(_ *core.Simulation) {
 	warrior.revengeCost = 5.0 - float64(warrior.Talents.FocusedRage)
+	refundAmount := warrior.revengeCost * 0.8
 
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -33,28 +34,26 @@ func (warrior *Warrior) registerRevengeSpell(_ *core.Simulation) {
 				},
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      warrior.critMultiplier(true),
-			ProcMask:            core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			FlatThreatBonus:     200,
-			BaseDamage:          core.BaseDamageConfigRoll(414, 506),
-		},
-	}
-
-	refundAmount := warrior.revengeCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-		if !spellEffect.Landed() {
-			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
-		}
 	}
 
 	warrior.Revenge = warrior.RegisterSpell(core.SpellConfig{
-		Template:   ability,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: ability,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask: core.ProcMaskMeleeMHSpecial,
+
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			FlatThreatBonus:  200,
+
+			BaseDamage:     core.BaseDamageConfigRoll(414, 506),
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+				}
+			},
+		}),
 	})
 }
 
