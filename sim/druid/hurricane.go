@@ -20,7 +20,7 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 				ActionID:    HurricaneActionID,
 				Character:   &druid.Character,
 				SpellSchool: core.SpellSchoolNature,
-				SpellExtras: core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
+				SpellExtras: core.SpellExtrasChanneled,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 1905,

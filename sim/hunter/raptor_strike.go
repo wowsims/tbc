@@ -31,8 +31,7 @@ func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
 	hunter.raptorStrikeCost = ama.Cost.Value
 
 	hunter.RaptorStrike = hunter.RegisterSpell(core.SpellConfig{
-		Template:   ama,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: ama,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
 

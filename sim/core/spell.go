@@ -11,58 +11,18 @@ type SimpleSpell struct {
 	// Embedded spell cast.
 	SpellCast
 
-	// Individual direct damage effect of this spell. Use this when there is only 1
-	// effect for the spell.
-	// Only one of this or Effects should be filled, not both.
-	Effect SpellEffect
-
-	// Individual direct damage effects of this spell. Use this for spells with
-	// multiple effects, like Arcane Explosion, Chain Lightning, or Consecrate.
-	Effects []SpellEffect
-
 	// Maximum amount of pre-crit damage this spell is allowed to do.
 	AOECap float64
-
-	// The action currently used for the dot effects of this spell, or nil if not ticking.
-	currentDotAction *PendingAction
 }
 
 // Init will call any 'OnCast' effects associated with the caster and then apply spell haste to the cast.
 //  Init will panic if the spell or the GCD is still on CD.
 func (spell *SimpleSpell) Init(sim *Simulation) {
 	spell.SpellCast.init(sim)
-
-	if len(spell.Effects) == 0 {
-		if spell.Effect.DotInput.NumberOfTicks > 0 {
-			spell.Effect.DotInput.init(&spell.SpellCast)
-		}
-	} else {
-		for i, _ := range spell.Effects {
-			if spell.Effects[i].DotInput.NumberOfTicks > 0 {
-				spell.Effects[i].DotInput.init(&spell.SpellCast)
-			}
-		}
-	}
-
-	if spell.SpellExtras.Matches(SpellExtrasChanneled) {
-		spell.AfterCastDelay += spell.GetChannelDuration()
-	}
-}
-
-func (spell *SimpleSpell) GetChannelDuration() time.Duration {
-	if len(spell.Effects) == 0 {
-		return spell.Effect.DotInput.FullDuration()
-	} else {
-		return spell.Effects[0].DotInput.FullDuration()
-	}
 }
 
 func (spell *SimpleSpell) GetDuration() time.Duration {
-	if spell.SpellExtras.Matches(SpellExtrasChanneled) {
-		return spell.CastTime + spell.GetChannelDuration()
-	} else {
-		return spell.CastTime
-	}
+	return spell.CastTime + spell.ChannelTime
 }
 
 func (instance *SimpleSpell) Cast(sim *Simulation, target *Target, spell *Spell) bool {
@@ -71,82 +31,28 @@ func (instance *SimpleSpell) Cast(sim *Simulation, target *Target, spell *Spell)
 		spell.MostRecentCost = cast.Cost.Value
 		spell.MostRecentBaseCost = cast.BaseCost.Value
 
-		if spell.ApplyEffects != nil {
-			spell.ApplyEffects(sim, target, spell)
-			spell.Instance.objectInUse = false
-			return
-		}
-
-		if len(instance.Effects) == 0 {
-			hitEffect := &instance.Effect
-
-			hitEffect.directCalculations(sim, spell)
-
-			if hitEffect.Landed() {
-				// Dot Damage Effects
-				if hitEffect.DotInput.NumberOfTicks != 0 {
-					hitEffect.takeDotSnapshot(sim, spell)
-					instance.ApplyDot(sim, spell)
-				}
-			}
-
-			hitEffect.afterCalculations(sim, spell, false)
-		} else {
-			// Use a separate loop for the beforeCalculations() calls so that they all
-			// come before the first afterCalculations() call. This prevents proc effects
-			// on the first hit from benefitting other hits of the same spell.
-			for effectIdx := range instance.Effects {
-				hitEffect := &instance.Effects[effectIdx]
-				hitEffect.directCalculations(sim, spell)
-				if hitEffect.Landed() {
-					if hitEffect.DotInput.NumberOfTicks != 0 {
-						hitEffect.takeDotSnapshot(sim, spell)
-					}
-				}
-			}
-
-			// TODO: Reenable this when spell code is cleaned up.
-			//spell.applyAOECap()
-
-			// Use a separate loop for the afterCalculations() calls so all effect damage
-			// is fully calculated before invoking proc callbacks.
-			for effectIdx := range instance.Effects {
-				instance.Effects[effectIdx].afterCalculations(sim, spell, false)
-			}
-
-			// This assumes that the effects either all have dots, or none of them do.
-			if instance.Effects[0].DotInput.NumberOfTicks != 0 {
-				instance.ApplyDot(sim, spell)
-			}
-		}
-
-		if instance.currentDotAction == nil {
-			instance.objectInUse = false
-		}
+		spell.ApplyEffects(sim, target, spell)
+		spell.Instance.objectInUse = false
 	})
 }
 
-func (instance *SimpleSpell) applyAOECap() {
-	if instance.AOECap == 0 {
-		return
-	}
-
+func applyAOECap(effects []SpellEffect, aoeCap float64) {
 	// Increased damage from crits doesn't count towards the cap, so need to
 	// tally pre-crit damage.
 	totalTowardsCap := 0.0
-	for i, _ := range instance.Effects {
-		effect := &instance.Effects[i]
-		totalTowardsCap += effect.Damage / effect.BeyondAOECapMultiplier
+	for i, _ := range effects {
+		effect := &effects[i]
+		totalTowardsCap += effect.Damage
 	}
 
-	if totalTowardsCap <= instance.AOECap {
+	if totalTowardsCap <= aoeCap {
 		return
 	}
 
-	maxDamagePerHit := instance.AOECap / float64(len(instance.Effects))
-	for i, _ := range instance.Effects {
-		effect := &instance.Effects[i]
-		damageTowardsCap := effect.Damage / effect.BeyondAOECapMultiplier
+	maxDamagePerHit := aoeCap / float64(len(effects))
+	for i, _ := range effects {
+		effect := &effects[i]
+		damageTowardsCap := effect.Damage
 		if damageTowardsCap > maxDamagePerHit {
 			effect.Damage -= damageTowardsCap - maxDamagePerHit
 		}
@@ -155,10 +61,6 @@ func (instance *SimpleSpell) applyAOECap() {
 
 func (instance *SimpleSpell) Cancel(sim *Simulation) {
 	instance.SpellCast.Cancel()
-	if instance.currentDotAction != nil {
-		instance.currentDotAction.Cancel(sim)
-		instance.currentDotAction = nil
-	}
 }
 
 type ModifySpellCast func(*Simulation, *Target, *SimpleSpell)
@@ -214,7 +116,6 @@ type Spell struct {
 
 	// Templates for creating new casts of this spell.
 	Template SimpleSpell
-	effects  []SpellEffect
 
 	// Current instantiation of this spell. Can only be casting 1 instance of this spell at a time.
 	Instance SimpleSpell
@@ -244,8 +145,6 @@ func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
 		panic(fmt.Sprintf("Spell (%s) already in use", instance.ActionID))
 	}
 	*instance = spell.Template
-	instance.Effects = spell.effects
-	copy(instance.Effects, spell.Template.Effects)
 
 	if spell.ModifyCast != nil {
 		spell.ModifyCast(sim, target, instance)
@@ -253,10 +152,6 @@ func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
 
 	instance.Init(sim)
 	return instance.Cast(sim, target, spell)
-}
-
-func ModifyCastAssignTarget(_ *Simulation, target *Target, instance *SimpleSpell) {
-	instance.Effect.Target = target
 }
 
 // User-provided function for performing a cast of a spell. Should return whether
@@ -267,9 +162,6 @@ func ModifyCastAssignTarget(_ *Simulation, target *Target, instance *SimpleSpell
 func (character *Character) RegisterSpell(config SpellConfig) *Spell {
 	if len(character.Spellbook) > 100 {
 		panic(fmt.Sprintf("Over 100 registered spells when registering %s! There is probably a spell being registered every iteration.", config.Template.ActionID))
-	}
-	if len(config.Template.Effects) > 0 && config.Template.Effect.DamageMultiplier != 0 {
-		panic("Cannot use both Effect and Effects, pick one!")
 	}
 	config.Template.Character = character
 
@@ -283,7 +175,6 @@ func (character *Character) RegisterSpell(config SpellConfig) *Spell {
 		ApplyEffects: config.ApplyEffects,
 
 		Template: config.Template,
-		effects:  make([]SpellEffect, len(config.Template.Effects)),
 	}
 
 	character.Spellbook = append(character.Spellbook, spell)
@@ -335,7 +226,7 @@ func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
 
 			damage := 0.0
 			effect.OutcomeApplier(sim, spell, &effect, &damage)
-			effect.triggerProcs(sim, spell, effect.IsPeriodic)
+			effect.triggerProcs(sim, spell)
 		}
 	} else {
 		return func(sim *Simulation, target *Target, spell *Spell) {
@@ -344,8 +235,8 @@ func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
 			effect.init(sim, spell)
 
 			damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
-			effect.calcDamageSingle(sim, spell, effect.IsPeriodic, damage)
-			effect.finalize(sim, spell, effect.IsPeriodic)
+			effect.calcDamageSingle(sim, spell, damage)
+			effect.finalize(sim, spell)
 		}
 	}
 }
@@ -362,11 +253,11 @@ func ApplyEffectFuncDamageMultiple(baseEffects []SpellEffect) ApplySpellEffects 
 			effect := &baseEffects[i]
 			effect.init(sim, spell)
 			damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
-			effect.calcDamageSingle(sim, spell, effect.IsPeriodic, damage)
+			effect.calcDamageSingle(sim, spell, damage)
 		}
 		for i, _ := range baseEffects {
 			effect := &baseEffects[i]
-			effect.finalize(sim, spell, effect.IsPeriodic)
+			effect.finalize(sim, spell)
 		}
 	}
 }
@@ -383,11 +274,11 @@ func ApplyEffectFuncDamageMultipleTargeted(baseEffects []SpellEffect) ApplySpell
 			effect.Target = target
 			effect.init(sim, spell)
 			damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
-			effect.calcDamageSingle(sim, spell, effect.IsPeriodic, damage)
+			effect.calcDamageSingle(sim, spell, damage)
 		}
 		for i, _ := range baseEffects {
 			effect := &baseEffects[i]
-			effect.finalize(sim, spell, effect.IsPeriodic)
+			effect.finalize(sim, spell)
 		}
 	}
 }

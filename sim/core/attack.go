@@ -281,7 +281,6 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 		Template: rangedTemplate,
 		ModifyCast: func(_ *Simulation, target *Target, instance *SimpleSpell) {
 			instance.CastTime = aa.RangedSwingWindup()
-			instance.Effect.Target = target
 		},
 		ApplyEffects: ApplyEffectFuncDirectDamage(aa.RangedEffect),
 	})

@@ -34,8 +34,7 @@ func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
 	}
 
 	druid.InsectSwarm = druid.RegisterSpell(core.SpellConfig{
-		Template:   template,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: template,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,

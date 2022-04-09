@@ -17,7 +17,7 @@ func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
 				ActionID:    MutilateMHActionID,
 				Character:   &rogue.Character,
 				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasAlwaysHits,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}
@@ -59,7 +59,6 @@ func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
 
 	return rogue.RegisterSpell(core.SpellConfig{
 		Template:     ability,
-		ModifyCast:   core.ModifyCastAssignTarget,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
@@ -72,8 +71,7 @@ func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
 	ability := rogue.newAbility(MutilateActionID, MutilateEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
 
 	rogue.Mutilate = rogue.RegisterSpell(core.SpellConfig{
-		Template:   ability,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: ability,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			ThreatMultiplier: 1,
@@ -90,12 +88,8 @@ func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
 				//  from the mh attack applied
 				mhHitSpell.Cast(sim, spellEffect.Target)
 				ohHitSpell.Cast(sim, spellEffect.Target)
-
-				if mhHitSpell.Instance.Effect.Outcome.Matches(core.OutcomeCrit) || ohHitSpell.Instance.Effect.Outcome.Matches(core.OutcomeCrit) {
-					spellEffect.Outcome = core.OutcomeCrit
-					rogue.Mutilate.Hits--
-					rogue.Mutilate.Crits++
-				}
+				rogue.Mutilate.Casts -= 2
+				rogue.Mutilate.Hits--
 			},
 		}),
 	})

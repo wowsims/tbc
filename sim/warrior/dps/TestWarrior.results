@@ -89,7 +89,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-BandoftheEternalSage-29305"
  value: {
-  dps: 493.459860258749
+  dps: 493.45986025874913
  }
 }
 dps_results: {
@@ -101,7 +101,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-Battlemaster'sCruelty-34163"
  value: {
-  dps: 515.6259397106195
+  dps: 515.6259397106194
  }
 }
 dps_results: {
@@ -191,13 +191,13 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-BrutalEarthstormDiamond"
  value: {
-  dps: 507.49010762158093
+  dps: 507.4901076215808
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-BurningRage"
  value: {
-  dps: 460.39196497017787
+  dps: 460.3919649701778
  }
 }
 dps_results: {
@@ -209,7 +209,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-CloakofDarkness-33122"
  value: {
-  dps: 505.96437789475266
+  dps: 505.9643778947527
  }
 }
 dps_results: {
@@ -257,7 +257,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-DesolationBattlegear"
  value: {
-  dps: 410.80543815120194
+  dps: 410.805438151202
  }
 }
 dps_results: {
@@ -293,7 +293,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-DoomplateBattlegear"
  value: {
-  dps: 419.94816173179805
+  dps: 419.9481617317981
  }
 }
 dps_results: {
@@ -353,13 +353,13 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-FaithinFelsteel"
  value: {
-  dps: 395.5320207181688
+  dps: 395.53202071816884
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-FelstalkerArmor"
  value: {
-  dps: 485.7903357782537
+  dps: 485.7903357782538
  }
 }
 dps_results: {
@@ -377,13 +377,13 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
-  dps: 522.4110471320683
+  dps: 522.4110471320682
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-FlameGuard"
  value: {
-  dps: 382.5490505631801
+  dps: 382.5490505631802
  }
 }
 dps_results: {
@@ -395,7 +395,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-HandofJustice-11815"
  value: {
-  dps: 509.90253480829927
+  dps: 509.9025348082992
  }
 }
 dps_results: {
@@ -413,13 +413,13 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-HourglassoftheUnraveller-28034"
  value: {
-  dps: 511.42446435240765
+  dps: 511.42446435240777
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-IconofUnyieldingCourage-28121"
  value: {
-  dps: 522.1942602213607
+  dps: 522.1942602213608
  }
 }
 dps_results: {
@@ -473,7 +473,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-Mana-EtchedRegalia"
  value: {
-  dps: 376.8919542337585
+  dps: 376.89195423375855
  }
 }
 dps_results: {
@@ -497,13 +497,13 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 495.0757373215072
+  dps: 495.07573732150706
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-NetherscaleArmor"
  value: {
-  dps: 505.28060736944656
+  dps: 505.28060736944644
  }
 }
 dps_results: {
@@ -515,19 +515,19 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-OnslaughtArmor"
  value: {
-  dps: 339.25757415893077
+  dps: 339.2575741589307
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-OnslaughtBattlegear"
  value: {
-  dps: 529.3983162877824
+  dps: 529.3983162877826
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-PotentUnstableDiamond"
  value: {
-  dps: 514.1393864799406
+  dps: 514.1393864799408
  }
 }
 dps_results: {
@@ -539,7 +539,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-PrimalIntent"
  value: {
-  dps: 487.5555484735792
+  dps: 487.5555484735791
  }
 }
 dps_results: {
@@ -569,7 +569,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 527.9603793324576
+  dps: 527.9603793324575
  }
 }
 dps_results: {
@@ -599,7 +599,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-ShardofContempt-34472"
  value: {
-  dps: 546.6259957194586
+  dps: 546.6259957194587
  }
 }
 dps_results: {
@@ -641,19 +641,19 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-StormGauntlets-12632"
  value: {
-  dps: 488.6065376464102
+  dps: 488.6065376464101
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-StrengthoftheClefthoof"
  value: {
-  dps: 436.3643017956611
+  dps: 436.36430179566116
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-SwiftSkyfireDiamond"
  value: {
-  dps: 514.1393864799406
+  dps: 514.1393864799408
  }
 }
 dps_results: {
@@ -665,7 +665,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-SwiftWindfireDiamond"
  value: {
-  dps: 495.9607607366064
+  dps: 495.9607607366065
  }
 }
 dps_results: {
@@ -695,7 +695,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-TheFistsofFury"
  value: {
-  dps: 517.1550461736759
+  dps: 517.1550461736758
  }
 }
 dps_results: {
@@ -725,7 +725,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-TheTwinBladesofAzzinoth"
  value: {
-  dps: 626.7914949111608
+  dps: 626.791494911161
  }
 }
 dps_results: {
@@ -761,7 +761,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-WarbringerBattlegear"
  value: {
-  dps: 436.13762589949306
+  dps: 436.1376258994931
  }
 }
 dps_results: {
@@ -773,7 +773,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-WastewalkerArmor"
  value: {
-  dps: 411.5515717166439
+  dps: 411.5515717166438
  }
 }
 dps_results: {
@@ -785,7 +785,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-AllItems-WorldBreaker-30090"
  value: {
-  dps: 405.5132970492489
+  dps: 405.5132970492488
  }
 }
 dps_results: {
@@ -827,7 +827,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-Settings-Human-Fury P1-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 488.9284115672883
+  dps: 488.92841156728826
  }
 }
 dps_results: {
@@ -839,13 +839,13 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-Settings-Human-Fury P1-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 361.66426670136684
+  dps: 361.6642667013668
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Human-Fury P1-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 308.90560666459504
+  dps: 308.905606664595
  }
 }
 dps_results: {
@@ -857,7 +857,7 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-Settings-Orc-Fury P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 629.4038842626427
+  dps: 629.4038842626428
  }
 }
 dps_results: {
@@ -869,13 +869,13 @@ dps_results: {
 dps_results: {
  key: "TestWarrior-Settings-Orc-Fury P1-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 429.6119525952771
+  dps: 429.61195259527705
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Orc-Fury P1-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 493.1069418413016
+  dps: 493.10694184130153
  }
 }
 dps_results: {

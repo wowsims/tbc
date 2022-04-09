@@ -72,8 +72,6 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 	return core.SpellConfig{
 		Template: spell,
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.Effect.Target = target
-
 			spell := &instance.SpellCast
 			if shaman.ElementalFocusStacks > 0 {
 				// Reduces mana cost by 40%

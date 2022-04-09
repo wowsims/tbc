@@ -40,7 +40,6 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 				ActionID:    JudgementOfBloodActionID,
 				Character:   &paladin.Character,
 				SpellSchool: core.SpellSchoolHoly,
-				SpellExtras: core.SpellExtrasAlwaysHits,
 			},
 		},
 	}
@@ -95,7 +94,6 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 				ActionID:    JudgementOfTheCrusaderActionID,
 				Character:   &paladin.Character,
 				SpellSchool: core.SpellSchoolHoly,
-				SpellExtras: core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: JudgementManaCost,
@@ -119,8 +117,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 	jotc.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
 	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
-		Template:   jotc,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: jotc,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			OutcomeApplier: core.OutcomeFuncAlwaysHit(),
 
@@ -150,7 +147,6 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 				ActionID:    JudgementOfWisdomActionID,
 				Character:   &paladin.Character,
 				SpellSchool: core.SpellSchoolHoly,
-				SpellExtras: core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: JudgementManaCost,

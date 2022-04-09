@@ -43,20 +43,21 @@ func (hunter *Hunter) registerKillCommandSpell(sim *core.Simulation) {
 					Value: 75,
 				},
 				Cooldown: time.Second * 5,
-				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					hunter.killCommandEnabledUntil = 0
-					hunter.pet.KillCommand.Cast(sim, sim.GetPrimaryTarget())
-				},
 			},
-		},
-		Effect: core.SpellEffect{
-			ThreatMultiplier: 1,
 		},
 	}
 
 	hunter.KillCommand = hunter.RegisterSpell(core.SpellConfig{
-		Template:   spell,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: spell,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ThreatMultiplier: 1,
+			OutcomeApplier:   core.OutcomeFuncAlwaysHit(),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				hunter.killCommandEnabledUntil = 0
+				hunter.pet.KillCommand.Cast(sim, sim.GetPrimaryTarget())
+			},
+		}),
 	})
 }
 

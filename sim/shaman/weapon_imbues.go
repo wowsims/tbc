@@ -140,7 +140,6 @@ func (shaman *Shaman) newFlametongueImbueSpell(isMH bool) *core.Spell {
 
 	return shaman.RegisterSpell(core.SpellConfig{
 		Template:     ftTmpl,
-		ModifyCast:   core.ModifyCastAssignTarget,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
