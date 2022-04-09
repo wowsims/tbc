@@ -51,17 +51,15 @@ func ApplyStormGauntlets(agent core.Agent) {
 					SpellSchool: core.SpellSchoolNature,
 				},
 			},
-			Effect: core.SpellEffect{
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				CritMultiplier:      character.DefaultSpellCritMultiplier(),
-				IsPhantom:           true,
-				DamageMultiplier:    1,
-				ThreatMultiplier:    1,
-				BaseDamage:          core.BaseDamageConfigFlat(3),
-			},
 		},
-		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			IsPhantom:        true,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigFlat(3),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+		}),
 	})
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
@@ -91,17 +89,15 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 					SpellSchool: core.SpellSchoolFire,
 				},
 			},
-			Effect: core.SpellEffect{
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				CritMultiplier:      character.DefaultSpellCritMultiplier(),
-				IsPhantom:           true,
-				DamageMultiplier:    1,
-				ThreatMultiplier:    1,
-				BaseDamage:          core.BaseDamageConfigFlat(2),
-			},
 		},
-		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			IsPhantom:        true,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigFlat(2),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+		}),
 	})
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
@@ -334,20 +330,18 @@ func ApplyDespair(agent core.Agent) {
 					SpellExtras: core.SpellExtrasIgnoreResists,
 				},
 			},
-			Effect: core.SpellEffect{
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				CritMultiplier:      character.DefaultMeleeCritMultiplier(),
-				IsPhantom:           true,
-				// TODO: This should be removed once we have an attack mask.
-				//  This is only set here to correctly calculate damage.
-				ProcMask:         core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier: 1,
-				ThreatMultiplier: 1,
-				BaseDamage:       core.BaseDamageConfigFlat(600),
-			},
 		},
-		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			// TODO: This should be removed once we have an attack mask.
+			//  This is only set here to correctly calculate damage.
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			IsPhantom:        true,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigFlat(600),
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(character.DefaultMeleeCritMultiplier()),
+		}),
 	})
 
 	const procChance = 0.5 * 3.5 / 60.0
@@ -385,18 +379,16 @@ func ApplyTheDecapitator(agent core.Agent) {
 					SpellExtras: core.SpellExtrasIgnoreResists,
 				},
 			},
-			Effect: core.SpellEffect{
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				CritMultiplier:      character.DefaultMeleeCritMultiplier(),
-				IsPhantom:           true,
-				ProcMask:            core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:    1,
-				ThreatMultiplier:    1,
-				BaseDamage:          core.BaseDamageConfigRoll(513, 567),
-			},
 		},
-		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			IsPhantom:        true,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigRoll(513, 567),
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(character.DefaultMeleeCritMultiplier()),
+		}),
 	})
 
 	character.AddMajorCooldown(core.MajorCooldown{
@@ -436,17 +428,15 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 					SpellSchool: core.SpellSchoolShadow,
 				},
 			},
-			Effect: core.SpellEffect{
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				CritMultiplier:      character.DefaultSpellCritMultiplier(),
-				IsPhantom:           true,
-				DamageMultiplier:    1,
-				ThreatMultiplier:    1,
-				BaseDamage:          core.BaseDamageConfigRoll(285, 315),
-			},
 		},
-		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			IsPhantom:        true,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigRoll(285, 315),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+		}),
 	})
 
 	const hasteBonus = 212.0
@@ -695,17 +685,15 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 					SpellSchool: core.SpellSchoolShadow,
 				},
 			},
-			Effect: core.SpellEffect{
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				CritMultiplier:      character.DefaultSpellCritMultiplier(),
-				IsPhantom:           true,
-				DamageMultiplier:    1,
-				ThreatMultiplier:    1,
-				BaseDamage:          core.BaseDamageConfigMagic(48, 54, 1),
-			},
 		},
-		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			IsPhantom:        true,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigMagic(48, 54, 1),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+		}),
 	})
 
 	const procChance = 0.02
@@ -849,17 +837,15 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 					SpellSchool: core.SpellSchoolShadow,
 				},
 			},
-			Effect: core.SpellEffect{
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				CritMultiplier:      character.DefaultSpellCritMultiplier(),
-				IsPhantom:           true,
-				DamageMultiplier:    1,
-				ThreatMultiplier:    1,
-				BaseDamage:          core.BaseDamageConfigFlat(20),
-			},
 		},
-		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			IsPhantom:        true,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigFlat(20),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+		}),
 	})
 
 	procAura := character.GetOrRegisterAura(&core.Aura{

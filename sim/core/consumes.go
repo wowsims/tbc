@@ -795,17 +795,15 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 						SpellSchool: SpellSchoolFire,
 					},
 				},
-				Effect: SpellEffect{
-					IsPhantom:           true,
-					OutcomeRollCategory: OutcomeRollCategoryMagic,
-					CritRollCategory:    CritRollCategoryMagical,
-					CritMultiplier:      1.5,
-					DamageMultiplier:    1,
-					ThreatMultiplier:    1,
-					BaseDamage:          BaseDamageConfigFlat(40),
-				},
 			},
-			ModifyCast: ModifyCastAssignTarget,
+			ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
+				IsPhantom:        true,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+
+				BaseDamage:     BaseDamageConfigFlat(40),
+				OutcomeApplier: OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			}),
 		})
 
 		const procChance = 0.185
@@ -933,7 +931,7 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 }
 
 // Creates a spell object for the common explosive case.
-func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID ActionID, minDamage float64, maxDamage float64, cooldown time.Duration) SpellConfig {
+func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID ActionID, minDamage float64, maxDamage float64, cooldown time.Duration, isHolyWater bool) SpellConfig {
 	spell := SimpleSpell{
 		SpellCast: SpellCast{
 			Cast: Cast{
@@ -945,67 +943,55 @@ func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID Act
 		},
 	}
 
-	baseEffect := SpellEffect{
-		DamageMultiplier:    1,
-		ThreatMultiplier:    1,
-		OutcomeRollCategory: OutcomeRollCategoryMagic,
-		CritRollCategory:    CritRollCategoryMagical,
-		CritMultiplier:      2,
-
-		// Explosives always have 1% resist chance, so just give them hit cap.
-		BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,
-
-		BaseDamage: BaseDamageConfigRoll(minDamage, maxDamage),
+	damageMultiplier := 1.0
+	if isHolyWater {
+		spell.SpellSchool = SpellSchoolHoly
+		if sim.GetPrimaryTarget().MobType != proto.MobType_MobTypeUndead {
+			damageMultiplier = 0
+		}
 	}
-
-	numHits := sim.GetNumTargets()
-	effects := make([]SpellEffect, 0, numHits)
-	for i := int32(0); i < numHits; i++ {
-		effects = append(effects, baseEffect)
-		effects[i].Target = sim.GetTarget(i)
-	}
-	spell.Effects = effects
 
 	return SpellConfig{
 		Template: spell,
+		ApplyEffects: ApplyEffectFuncAOEDamage(sim, SpellEffect{
+			// Explosives always have 1% resist chance, so just give them hit cap.
+			BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,
+
+			DamageMultiplier: damageMultiplier,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     BaseDamageConfigRoll(minDamage, maxDamage),
+			OutcomeApplier: OutcomeFuncMagicHitAndCrit(2),
+		}),
 	}
 }
 func (character *Character) newSuperSapperCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, SuperSapperActionID, 900, 1500, time.Minute*5))
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, SuperSapperActionID, 900, 1500, time.Minute*5, false))
 	return func(sim *Simulation) {
-		spell.Cast(sim, nil)
+		spell.Cast(sim, sim.GetPrimaryTarget())
 	}
 }
 func (character *Character) newGoblinSapperCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, GoblinSapperActionID, 450, 750, time.Minute*5))
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, GoblinSapperActionID, 450, 750, time.Minute*5, false))
 	return func(sim *Simulation) {
-		spell.Cast(sim, nil)
+		spell.Cast(sim, sim.GetPrimaryTarget())
 	}
 }
 func (character *Character) newFelIronBombCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, FelIronBombActionID, 330, 770, 0))
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, FelIronBombActionID, 330, 770, 0, false))
 	return func(sim *Simulation) {
-		spell.Cast(sim, nil)
+		spell.Cast(sim, sim.GetPrimaryTarget())
 	}
 }
 func (character *Character) newAdamantiteGrenadeCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, AdamantiteGrenadeActionID, 450, 750, 0))
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, AdamantiteGrenadeActionID, 450, 750, 0, false))
 	return func(sim *Simulation) {
-		spell.Cast(sim, nil)
+		spell.Cast(sim, sim.GetPrimaryTarget())
 	}
 }
 func (character *Character) newHolyWaterCaster(sim *Simulation) func(sim *Simulation) {
-	config := character.newBasicExplosiveSpell(sim, HolyWaterActionID, 438, 562, 0)
-	config.Template.SpellSchool = SpellSchoolHoly
-	for i, _ := range config.Template.Effects {
-		effect := &config.Template.Effects[i]
-		if effect.Target.MobType != proto.MobType_MobTypeUndead {
-			effect.DamageMultiplier = 0
-		}
-	}
-	spell := character.GetOrRegisterSpell(config)
-
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, HolyWaterActionID, 438, 562, 0, true))
 	return func(sim *Simulation) {
-		spell.Cast(sim, nil)
+		spell.Cast(sim, sim.GetPrimaryTarget())
 	}
 }

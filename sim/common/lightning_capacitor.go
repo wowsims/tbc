@@ -24,17 +24,15 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 					SpellSchool: core.SpellSchoolNature,
 				},
 			},
-			Effect: core.SpellEffect{
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				CritMultiplier:      character.DefaultSpellCritMultiplier(),
-				IsPhantom:           true, // TODO: replace with ProcMask
-				DamageMultiplier:    1,
-				ThreatMultiplier:    1,
-				BaseDamage:          core.BaseDamageConfigRoll(694, 807),
-			},
 		},
-		ModifyCast: core.ModifyCastAssignTarget,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			IsPhantom:        true, // TODO: replace with ProcMask
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigRoll(694, 807),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+		}),
 	})
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
