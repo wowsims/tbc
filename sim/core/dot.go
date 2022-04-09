@@ -233,6 +233,9 @@ type Dot struct {
 	tickAction *PendingAction
 	tickPeriod time.Duration
 
+	// Number of ticks since last call to Apply().
+	TickCount int
+
 	lastTickTime time.Duration
 }
 
@@ -241,6 +244,7 @@ func (dot *Dot) Apply(sim *Simulation) {
 		dot.Aura.Deactivate(sim)
 	}
 
+	dot.TickCount = 0
 	if dot.AffectedByCastSpeed {
 		castSpeed := dot.Spell.Character.CastSpeed()
 		dot.tickPeriod = time.Duration(float64(dot.TickLength) / castSpeed)
@@ -269,6 +273,7 @@ func NewDot(config Dot) *Dot {
 		OnAction: func(sim *Simulation) {
 			if dot.lastTickTime != sim.CurrentTime {
 				dot.lastTickTime = sim.CurrentTime
+				dot.TickCount++
 				dot.tickFn()
 			}
 		},
@@ -278,6 +283,7 @@ func NewDot(config Dot) *Dot {
 			if dot.tickAction.NextActionAt == sim.CurrentTime {
 				if dot.lastTickTime != sim.CurrentTime {
 					dot.lastTickTime = sim.CurrentTime
+					dot.TickCount++
 					dot.tickFn()
 				}
 			}

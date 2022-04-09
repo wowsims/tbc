@@ -59,25 +59,25 @@ type Mage struct {
 	ArcaneExplosion *core.Spell
 	ArcaneMissiles  *core.Spell
 	Blizzard        *core.Spell
-	Ignites         []*core.Spell
+	Ignite          *core.Spell
 	Fireball        *core.Spell
 	FireBlast       *core.Spell
 	Flamestrike     *core.Spell
-	FlamestrikeDot  *core.Spell
 	Frostbolt       *core.Spell
 	Pyroblast       *core.Spell
-	PyroblastDot    *core.Spell
 	Scorch          *core.Spell
 	WintersChill    *core.Spell
 
-	IgniteDots  []*core.Dot
-	FireballDot *core.Dot
-	//FlamestrikeDot *core.Dot
-	//PyroblastDot *core.Dot
+	IgniteDots     []*core.Dot
+	FireballDot    *core.Dot
+	FlamestrikeDot *core.Dot
+	PyroblastDot   *core.Dot
 
 	ArcaneBlastAura  *core.Aura
 	ClearcastingAura *core.Aura
 	ScorchAura       *core.Aura
+
+	IgniteTickDamage []float64
 
 	manaTracker common.ManaSpendingRateTracker
 }
@@ -100,16 +100,19 @@ func (mage *Mage) Init(sim *core.Simulation) {
 	mage.registerFireballSpell(sim)
 	mage.registerFireBlastSpell(sim)
 	mage.registerFlamestrikeSpell(sim)
-	mage.registerFlamestrikeDotSpell(sim)
 	mage.registerFrostboltSpell(sim)
+	mage.registerIgniteSpell(sim)
 	mage.registerPyroblastSpell(sim)
-	mage.registerPyroblastDotSpell(sim)
 	mage.registerScorchSpell(sim)
 	mage.registerWintersChillSpell(sim)
 
-	mage.Ignites = []*core.Spell{}
+	mage.IgniteDots = []*core.Dot{}
+	mage.IgniteTickDamage = []float64{}
 	for i := int32(0); i < sim.GetNumTargets(); i++ {
-		mage.Ignites = append(mage.Ignites, mage.newIgniteSpell(sim))
+		mage.IgniteTickDamage = append(mage.IgniteTickDamage, 0)
+	}
+	for i := int32(0); i < sim.GetNumTargets(); i++ {
+		mage.IgniteDots = append(mage.IgniteDots, mage.newIgniteDot(sim, sim.GetTarget(i)))
 	}
 }
 

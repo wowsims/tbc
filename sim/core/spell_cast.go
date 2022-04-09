@@ -181,9 +181,11 @@ func (spellEffect *SpellEffect) directCalculations(sim *Simulation, spell *Spell
 	spellEffect.Damage = damage
 }
 func (spellEffect *SpellEffect) applyModifiers(sim *Simulation, spell *Spell, isPeriodic bool, damage *float64) {
-	spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, damage)
-	spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, damage)
-	spellEffect.applyResistances(sim, spell, damage)
+	if !spell.SpellExtras.Matches(SpellExtrasIgnoreModifiers) {
+		spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, damage)
+		spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, damage)
+		spellEffect.applyResistances(sim, spell, damage)
+	}
 }
 
 func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spell) float64 {
@@ -200,10 +202,12 @@ func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *Spell,
 }
 
 func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, isPeriodic bool, damage float64) {
-	spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, &damage)
-	spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
-	spellEffect.applyResistances(sim, spell, &damage)
-	spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
+	if !spell.SpellExtras.Matches(SpellExtrasIgnoreModifiers) {
+		spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, &damage)
+		spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
+		spellEffect.applyResistances(sim, spell, &damage)
+		spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
+	}
 	spellEffect.Damage = damage
 }
 
