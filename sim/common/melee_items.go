@@ -754,11 +754,19 @@ func ApplyBlinkstrike(agent core.Agent) {
 		var icd core.InternalCD
 		icdDur := time.Millisecond * 1
 
-		template := character.AutoAttacks.MHAuto.Template
-		template.ActionID = core.ActionID{ItemID: 31332}
 		blinkstrikeSpell := character.GetOrRegisterSpell(core.SpellConfig{
-			Template:   template,
-			ModifyCast: core.ModifyCastAssignTarget,
+			Template: core.SimpleSpell{
+				SpellCast: core.SpellCast{
+					Cast: core.Cast{
+						ActionID:    core.ActionID{ItemID: 31332},
+						Character:   character,
+						SpellSchool: core.SpellSchoolPhysical,
+						IgnoreHaste: true,
+						SpellExtras: core.SpellExtrasMeleeMetrics,
+					},
+				},
+			},
+			ApplyEffects: core.ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
 		})
 
 		return character.GetOrRegisterAura(&core.Aura{

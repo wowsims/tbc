@@ -116,11 +116,9 @@ func (hunter *Hunter) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (hunter *Hunter) Init(sim *core.Simulation) {
 	// Update auto crit multipliers now that we have the targets.
-	hunter.AutoAttacks.MH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
-	hunter.AutoAttacks.OH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
-	hunter.AutoAttacks.MHAuto.Template.Effect.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
-	hunter.AutoAttacks.OHAuto.Template.Effect.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
-	hunter.AutoAttacks.Ranged.CritMultiplier = hunter.critMultiplier(true, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.MHEffect.OutcomeApplier = core.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, sim.GetPrimaryTarget()))
+	hunter.AutoAttacks.OHEffect.OutcomeApplier = core.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, sim.GetPrimaryTarget()))
+	hunter.AutoAttacks.RangedEffect.OutcomeApplier = core.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget()))
 
 	hunter.aspectOfTheHawkTemplate = hunter.newAspectOfTheHawkTemplate(sim)
 	hunter.aspectOfTheViperTemplate = hunter.newAspectOfTheViperTemplate(sim)
@@ -224,7 +222,6 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		}
 	}
 
-	rangedWeapon.BaseDamageOverride = core.BaseDamageFuncRangedWeapon(hunter.AmmoDamageBonus)
 	hunter.EnableAutoAttacks(hunter, core.AutoAttackOptions{
 		// We don't know crit multiplier until later when we see the target so just
 		// use 0 for now.
@@ -235,6 +232,8 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 			return hunter.TryRaptorStrike(sim)
 		},
 	})
+	hunter.AutoAttacks.RangedEffect.BaseDamage.Calculator = core.BaseDamageFuncRangedWeapon(hunter.AmmoDamageBonus)
+
 	if hunter.Options.RemoveRandomness {
 		weaponAvg := (hunter.AutoAttacks.Ranged.BaseDamageMin + hunter.AutoAttacks.Ranged.BaseDamageMax) / 2
 		hunter.AutoAttacks.Ranged.BaseDamageMin = weaponAvg

@@ -29,6 +29,7 @@ func (warrior *Warrior) newSunderArmorSpell(sim *core.Simulation, isDevastateEff
 					Type:  stats.Rage,
 					Value: warrior.sunderArmorCost,
 				},
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}

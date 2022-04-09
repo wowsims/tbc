@@ -39,12 +39,11 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 	}
 }
 
-func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.SimpleSpell) {
+func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
 	hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
-	if !ability.Effect.ProcMask.Matches(core.ProcMaskRanged) {
-		return
+	if spell == hunter.AutoAttacks.RangedAuto {
+		hunter.rotation(sim, true)
 	}
-	hunter.rotation(sim, true)
 }
 
 func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {

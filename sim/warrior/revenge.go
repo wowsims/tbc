@@ -32,6 +32,7 @@ func (warrior *Warrior) registerRevengeSpell(_ *core.Simulation) {
 					Type:  stats.Rage,
 					Value: warrior.revengeCost,
 				},
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}
