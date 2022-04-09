@@ -181,18 +181,15 @@ func (we *WaterElemental) registerWaterboltSpell(sim *core.Simulation) {
 				GCD:      core.GCDDefault,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			CritMultiplier:      we.DefaultSpellCritMultiplier(),
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			BaseDamage:          core.BaseDamageConfigMagic(256, 328, 3.0/3.5),
-		},
 	}
 
 	we.Waterbolt = we.RegisterSpell(core.SpellConfig{
-		Template:   spell,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: spell,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagic(256, 328, 3.0/3.5),
+			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(we.DefaultSpellCritMultiplier()),
+		}),
 	})
 }

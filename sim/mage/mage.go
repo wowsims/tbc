@@ -61,7 +61,6 @@ type Mage struct {
 	Blizzard        *core.Spell
 	Ignites         []*core.Spell
 	Fireball        *core.Spell
-	FireballDot     *core.Spell
 	FireBlast       *core.Spell
 	Flamestrike     *core.Spell
 	FlamestrikeDot  *core.Spell
@@ -70,6 +69,11 @@ type Mage struct {
 	PyroblastDot    *core.Spell
 	Scorch          *core.Spell
 	WintersChill    *core.Spell
+
+	IgniteDots  []*core.Dot
+	FireballDot *core.Dot
+	//FlamestrikeDot *core.Dot
+	//PyroblastDot *core.Dot
 
 	ArcaneBlastAura  *core.Aura
 	ClearcastingAura *core.Aura
@@ -94,7 +98,6 @@ func (mage *Mage) Init(sim *core.Simulation) {
 	mage.registerArcaneMissilesSpell(sim)
 	mage.registerBlizzardSpell(sim)
 	mage.registerFireballSpell(sim)
-	mage.registerFireballDotSpell(sim)
 	mage.registerFireBlastSpell(sim)
 	mage.registerFlamestrikeSpell(sim)
 	mage.registerFlamestrikeDotSpell(sim)

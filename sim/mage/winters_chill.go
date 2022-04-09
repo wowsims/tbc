@@ -6,23 +6,26 @@ import (
 
 const SpellIDWintersChill int32 = 28595
 
+var WintersChillActionID = core.ActionID{SpellID: SpellIDWintersChill}
+
 // Winters Chill has a separate hit check from frostbolt, so it needs its own spell.
 func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 	spell := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDWintersChill},
+				ActionID:    WintersChillActionID,
 				Character:   &mage.Character,
 				SpellSchool: core.SpellSchoolFrost,
 				SpellExtras: SpellFlagMage,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		},
 	}
 
-	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
+	effect := core.SpellEffect{
+		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
+		ThreatMultiplier:    1,
+		OutcomeApplier:      core.OutcomeFuncMagicHit(),
+	}
 
 	if mage.Talents.WintersChill > 0 {
 		wcAura := sim.GetPrimaryTarget().GetAura(core.WintersChillAuraLabel)
@@ -30,19 +33,17 @@ func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 			wcAura = core.WintersChillAura(sim.GetPrimaryTarget(), 0)
 		}
 
-		spell.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() {
-				return
+		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Landed() {
+				wcAura.Activate(sim)
+				wcAura.AddStack(sim)
 			}
-
-			wcAura.Activate(sim)
-			wcAura.AddStack(sim)
 		}
 	}
 
 	mage.WintersChill = mage.RegisterSpell(core.SpellConfig{
-		Template:   spell,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template:     spell,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
 
@@ -61,7 +62,7 @@ func (mage *Mage) applyWintersChill() {
 					return
 				}
 
-				if spell.SpellSchool == core.SpellSchoolFrost && spell.ActionID.SpellID != SpellIDWintersChill {
+				if spell.SpellSchool == core.SpellSchoolFrost && !spell.SameAction(WintersChillActionID) {
 					if procChance != 1.0 && sim.RandomFloat("Winters Chill") > procChance {
 						return
 					}
