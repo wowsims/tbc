@@ -151,7 +151,12 @@ func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
 	}
 
 	instance.Init(sim)
-	return instance.Cast(sim, target, spell)
+	success := instance.Cast(sim, target, spell)
+
+	spell.MostRecentCost = instance.Cost.Value
+	spell.MostRecentBaseCost = instance.BaseCost.Value
+
+	return success
 }
 
 // User-provided function for performing a cast of a spell. Should return whether
