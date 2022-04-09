@@ -43,6 +43,7 @@ func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
 				ActionID:    StormstrikeActionID,
 				Character:   &shaman.Character,
 				SpellSchool: core.SpellSchoolPhysical,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}
@@ -86,6 +87,7 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 					Type:  stats.Mana,
 					Value: 237,
 				},
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}

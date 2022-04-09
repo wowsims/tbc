@@ -127,7 +127,7 @@ func (spellEffect *SpellEffect) ExpertisePercentage(character *Character) float6
 func (spellEffect *SpellEffect) PhysicalHitChance(character *Character) float64 {
 	hitRating := character.stats[stats.MeleeHit] + spellEffect.Target.PseudoStats.BonusMeleeHitRating
 
-	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || spellEffect.ProcMask.Matches(ProcMaskRanged) {
 		hitRating += character.PseudoStats.BonusRangedHitRating
 	}
 
@@ -137,7 +137,7 @@ func (spellEffect *SpellEffect) PhysicalHitChance(character *Character) float64 
 func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spell *Spell) float64 {
 	critRating := character.stats[stats.MeleeCrit] + spellEffect.BonusCritRating + spellEffect.Target.PseudoStats.BonusCritRating
 
-	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || spellEffect.ProcMask.Matches(ProcMaskRanged) {
 		critRating += character.PseudoStats.BonusRangedCritRating
 	} else {
 		critRating += character.PseudoStats.BonusMeleeCritRating
@@ -295,7 +295,7 @@ func (spellEffect *SpellEffect) String() string {
 func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *Spell, isPeriodic bool, damage *float64) {
 	attacker := spell.Character
 
-	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
+	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || spellEffect.ProcMask.Matches(ProcMaskRanged) {
 		*damage *= attacker.PseudoStats.RangedDamageDealtMultiplier
 	}
 	if spell.SpellExtras.Matches(SpellExtrasAgentReserved1) {

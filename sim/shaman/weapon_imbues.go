@@ -22,6 +22,7 @@ func (shaman *Shaman) newWindfuryImbueSpell(isMH bool) *core.Spell {
 				ActionID:    core.ActionID{SpellID: 25505},
 				Character:   &shaman.Character,
 				SpellSchool: core.SpellSchoolPhysical,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}
