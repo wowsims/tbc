@@ -47,12 +47,10 @@ func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 	}
 
 	baseEffect := core.SpellEffect{
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		CritMultiplier:      warrior.spellCritMultiplier(true),
-		DamageMultiplier:    impTCDamageMult,
-		ThreatMultiplier:    1.75,
-		BaseDamage:          core.BaseDamageConfigFlat(123),
+		DamageMultiplier: impTCDamageMult,
+		ThreatMultiplier: 1.75,
+		BaseDamage:       core.BaseDamageConfigFlat(123),
+		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(warrior.spellCritMultiplier(true)),
 	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())
@@ -72,10 +70,10 @@ func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 			}
 		}
 	}
-	ability.Effects = effects
 
 	warrior.ThunderClap = warrior.RegisterSpell(core.SpellConfig{
-		Template: ability,
+		Template:     ability,
+		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
 	})
 }
 

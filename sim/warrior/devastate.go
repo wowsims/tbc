@@ -10,6 +10,7 @@ var DevastateActionID = core.ActionID{SpellID: 30022}
 
 func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 	warrior.sunderArmorCost = 15.0 - float64(warrior.Talents.ImprovedSunderArmor) - float64(warrior.Talents.FocusedRage)
+	refundAmount := warrior.sunderArmorCost * 0.8
 
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -29,60 +30,44 @@ func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 				},
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			CritMultiplier:      warrior.critMultiplier(true),
-			ProcMask:            core.ProcMaskMeleeMHSpecial,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			FlatThreatBonus:     100,
-		},
 	}
 
 	normalBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 0.5, true)
-	ability.Effect.BaseDamage = core.BaseDamageConfig{
-		Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
-			// Bonus 35 damage / stack of sunder. Counts stacks AFTER cast but only if stacks > 0.
-			sunderBonus := 0.0
-			saStacks := warrior.SunderArmorAura.GetStacks()
-			if saStacks != 0 {
-				sunderBonus = 35 * float64(core.MinInt32(saStacks+1, 5))
-			}
-
-			return normalBaseDamage(sim, hitEffect, spell) + sunderBonus
-		},
-		TargetSpellCoefficient: 1,
-	}
-
-	normalSunderModifier := core.ModifyCastAssignTarget
-	devastateSunderModifier := func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-		instance.Effect.Target = target
-		instance.SpellExtras |= core.SpellExtrasAlwaysHits
-		instance.Cost.Value = 0
-		instance.BaseCost.Value = 0
-		instance.GCD = 0
-		if warrior.SunderArmorAura.GetStacks() == 5 {
-			instance.Effect.ThreatMultiplier = 0
-		}
-	}
-
-	refundAmount := warrior.sunderArmorCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-		if spellEffect.Landed() {
-			if !warrior.ExposeArmorAura.IsActive() {
-				warrior.SunderArmor.ModifyCast = devastateSunderModifier
-				warrior.SunderArmor.Cast(sim, spellEffect.Target)
-				warrior.SunderArmor.ModifyCast = normalSunderModifier
-			}
-		} else {
-			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
-		}
-	}
 
 	warrior.Devastate = warrior.RegisterSpell(core.SpellConfig{
-		Template:   ability,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: ability,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask: core.ProcMaskMeleeMHSpecial,
+
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			FlatThreatBonus:  100,
+
+			BaseDamage: core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					// Bonus 35 damage / stack of sunder. Counts stacks AFTER cast but only if stacks > 0.
+					sunderBonus := 0.0
+					saStacks := warrior.SunderArmorAura.GetStacks()
+					if saStacks != 0 {
+						sunderBonus = 35 * float64(core.MinInt32(saStacks+1, 5))
+					}
+
+					return normalBaseDamage(sim, hitEffect, spell) + sunderBonus
+				},
+				TargetSpellCoefficient: 1,
+			},
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					if !warrior.ExposeArmorAura.IsActive() {
+						warrior.SunderArmorDevastate.Cast(sim, spellEffect.Target)
+					}
+				} else {
+					warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+				}
+			},
+		}),
 	})
 }
 

@@ -35,9 +35,9 @@ func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
 	}
 
 	baseEffect := core.SpellEffect{
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		ThreatMultiplier:    1,
-		FlatThreatBonus:     56,
+		ThreatMultiplier: 1,
+		FlatThreatBonus:  56,
+		OutcomeApplier:   core.OutcomeFuncMagicHit(),
 	}
 
 	numHits := sim.GetNumTargets()
@@ -57,10 +57,10 @@ func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
 			}
 		}
 	}
-	ability.Effects = effects
 
 	warrior.DemoralizingShout = warrior.RegisterSpell(core.SpellConfig{
-		Template: ability,
+		Template:     ability,
+		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
 	})
 }
 

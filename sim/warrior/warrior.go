@@ -46,15 +46,16 @@ type Warrior struct {
 	CastDefensiveStance func(*core.Simulation)
 	CastBerserkerStance func(*core.Simulation)
 
-	Bloodthirst       *core.Spell
-	DemoralizingShout *core.Spell
-	Devastate         *core.Spell
-	HeroicStrike      *core.Spell
-	Revenge           *core.Spell
-	ShieldSlam        *core.Spell
-	SunderArmor       *core.Spell
-	ThunderClap       *core.Spell
-	Whirlwind         *core.Spell
+	Bloodthirst          *core.Spell
+	DemoralizingShout    *core.Spell
+	Devastate            *core.Spell
+	HeroicStrike         *core.Spell
+	Revenge              *core.Spell
+	ShieldSlam           *core.Spell
+	SunderArmor          *core.Spell
+	SunderArmorDevastate *core.Spell
+	ThunderClap          *core.Spell
+	Whirlwind            *core.Spell
 
 	BattleStanceAura    *core.Aura
 	DefensiveStanceAura *core.Aura
@@ -112,9 +113,11 @@ func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.registerHeroicStrikeSpell(sim)
 	warrior.registerRevengeSpell(sim)
 	warrior.registerShieldSlamSpell(sim)
-	warrior.registerSunderArmorSpell(sim)
 	warrior.registerThunderClapSpell(sim)
 	warrior.registerWhirlwindSpell(sim)
+
+	warrior.SunderArmor = warrior.newSunderArmorSpell(sim, false)
+	warrior.SunderArmorDevastate = warrior.newSunderArmorSpell(sim, true)
 
 	warrior.shoutDuration = time.Duration(float64(time.Minute*2) * (1 + 0.1*float64(warrior.Talents.BoomingVoice)))
 }

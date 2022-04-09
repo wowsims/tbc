@@ -8,9 +8,10 @@ import (
 
 var SunderArmorActionID = core.ActionID{SpellID: 25225}
 
-func (warrior *Warrior) registerSunderArmorSpell(sim *core.Simulation) {
+func (warrior *Warrior) newSunderArmorSpell(sim *core.Simulation, isDevastateEffect bool) *core.Spell {
 	warrior.SunderArmorAura = core.SunderArmorAura(sim.GetPrimaryTarget(), 0)
 	warrior.ExposeArmorAura = core.ExposeArmorAura(sim.GetPrimaryTarget(), 2)
+	refundAmount := warrior.sunderArmorCost * 0.8
 
 	ability := core.SimpleSpell{
 		SpellCast: core.SpellCast{
@@ -30,27 +31,42 @@ func (warrior *Warrior) registerSunderArmorSpell(sim *core.Simulation) {
 				},
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			ProcMask:            core.ProcMaskMeleeMHSpecial,
-			ThreatMultiplier:    1,
-			FlatThreatBonus:     301.5,
-		},
+	}
+	if isDevastateEffect {
+		ability.Cost.Value = 0
+		ability.BaseCost.Value = 0
+		ability.GCD = 0
 	}
 
-	refundAmount := warrior.sunderArmorCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-		if spellEffect.Landed() {
-			warrior.SunderArmorAura.Activate(sim)
-			warrior.SunderArmorAura.AddStack(sim)
-		} else {
-			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+	effect := core.SpellEffect{
+		ProcMask: core.ProcMaskMeleeMHSpecial,
+
+		ThreatMultiplier: 1,
+		FlatThreatBonus:  301.5,
+
+		OutcomeApplier: core.OutcomeFuncMeleeSpecialHit(),
+
+		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Landed() {
+				warrior.SunderArmorAura.Activate(sim)
+				warrior.SunderArmorAura.AddStack(sim)
+			} else {
+				warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+			}
+		},
+	}
+	if isDevastateEffect {
+		effect.OutcomeApplier = core.OutcomeFuncAlwaysHit()
+		effect.OnInit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if warrior.SunderArmorAura.GetStacks() == 5 {
+				spellEffect.ThreatMultiplier = 0
+			}
 		}
 	}
 
-	warrior.SunderArmor = warrior.RegisterSpell(core.SpellConfig{
-		Template:   ability,
-		ModifyCast: core.ModifyCastAssignTarget,
+	return warrior.RegisterSpell(core.SpellConfig{
+		Template:     ability,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
 

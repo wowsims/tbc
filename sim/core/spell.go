@@ -331,6 +331,7 @@ func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
 		return func(sim *Simulation, target *Target, spell *Spell) {
 			effect := baseEffect
 			effect.Target = target
+			effect.init(sim, spell)
 
 			damage := 0.0
 			effect.OutcomeApplier(sim, spell, &effect, &damage)
@@ -340,6 +341,7 @@ func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
 		return func(sim *Simulation, target *Target, spell *Spell) {
 			effect := baseEffect
 			effect.Target = target
+			effect.init(sim, spell)
 
 			damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
 			effect.calcDamageSingle(sim, spell, effect.IsPeriodic, damage)
@@ -358,6 +360,7 @@ func ApplyEffectFuncDamageMultiple(baseEffects []SpellEffect) ApplySpellEffects 
 	return func(sim *Simulation, _ *Target, spell *Spell) {
 		for i, _ := range baseEffects {
 			effect := &baseEffects[i]
+			effect.init(sim, spell)
 			damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
 			effect.calcDamageSingle(sim, spell, effect.IsPeriodic, damage)
 		}
@@ -378,6 +381,7 @@ func ApplyEffectFuncDamageMultipleTargeted(baseEffects []SpellEffect) ApplySpell
 		for i, _ := range baseEffects {
 			effect := &baseEffects[i]
 			effect.Target = target
+			effect.init(sim, spell)
 			damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
 			effect.calcDamageSingle(sim, spell, effect.IsPeriodic, damage)
 		}
