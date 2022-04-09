@@ -206,9 +206,7 @@ func (characterMetrics *CharacterMetrics) addSpell(spell *Spell) {
 
 	if !ok {
 		actionMetrics.ActionID = actionID
-		actionMetrics.IsMelee = spell.SpellExtras.Matches(SpellExtrasMeleeMetrics) ||
-			spell.Template.Effect.ProcMask.Matches(ProcMaskMeleeOrRanged) ||
-			(len(spell.Template.Effects) > 0 && spell.Template.Effects[0].ProcMask.Matches(ProcMaskMeleeOrRanged))
+		actionMetrics.IsMelee = spell.SpellExtras.Matches(SpellExtrasMeleeMetrics)
 	}
 
 	actionMetrics.Casts += spell.Casts

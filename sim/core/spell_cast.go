@@ -27,7 +27,6 @@ type SpellEffect struct {
 
 	BaseDamage     BaseDamageConfig
 	OutcomeApplier OutcomeApplier
-	DotInput       DotDamageInput
 
 	// Bonus stats to be added to the spell.
 	BonusSpellHitRating  float64
@@ -54,12 +53,6 @@ type SpellEffect struct {
 	// proc from phantom casts, only regular casts.
 	IsPhantom bool
 
-	OutcomeRollCategory OutcomeRollCategory
-	CritRollCategory    CritRollCategory
-
-	// How much to multiply damage by, if this cast crits.
-	CritMultiplier float64
-
 	// Controls which effects can proc from this effect.
 	ProcMask ProcMask
 
@@ -72,11 +65,6 @@ type SpellEffect struct {
 	Outcome HitOutcome
 	Damage  float64 // Damage done by this cast.
 	Threat  float64
-
-	// Certain damage multiplier, such as target debuffs and crit multipliers, do
-	// not count towards the AOE cap. Store them here to they can be subtracted
-	// later when calculating AOE cap.
-	BeyondAOECapMultiplier float64
 }
 
 func (spellEffect *SpellEffect) Landed() bool {
@@ -85,14 +73,6 @@ func (spellEffect *SpellEffect) Landed() bool {
 
 func (spellEffect *SpellEffect) TotalThreatMultiplier(character *Character) float64 {
 	return spellEffect.ThreatMultiplier * character.PseudoStats.ThreatMultiplier
-}
-
-func (spellEffect *SpellEffect) calcThreat(character *Character) float64 {
-	if spellEffect.Landed() {
-		return (spellEffect.Damage + spellEffect.FlatThreatBonus) * spellEffect.TotalThreatMultiplier(character)
-	} else {
-		return 0
-	}
 }
 
 func (spellEffect *SpellEffect) MeleeAttackPower(character *Character) float64 {
@@ -128,7 +108,7 @@ func (spellEffect *SpellEffect) ExpertisePercentage(character *Character) float6
 func (spellEffect *SpellEffect) PhysicalHitChance(character *Character) float64 {
 	hitRating := character.stats[stats.MeleeHit] + spellEffect.Target.PseudoStats.BonusMeleeHitRating
 
-	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || spellEffect.ProcMask.Matches(ProcMaskRanged) {
+	if spellEffect.ProcMask.Matches(ProcMaskRanged) {
 		hitRating += character.PseudoStats.BonusRangedHitRating
 	}
 
@@ -138,7 +118,7 @@ func (spellEffect *SpellEffect) PhysicalHitChance(character *Character) float64 
 func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spell *Spell) float64 {
 	critRating := character.stats[stats.MeleeCrit] + spellEffect.BonusCritRating + spellEffect.Target.PseudoStats.BonusCritRating
 
-	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || spellEffect.ProcMask.Matches(ProcMaskRanged) {
+	if spellEffect.ProcMask.Matches(ProcMaskRanged) {
 		critRating += character.PseudoStats.BonusRangedCritRating
 	} else {
 		critRating += character.PseudoStats.BonusMeleeCritRating
@@ -175,26 +155,6 @@ func (spellEffect *SpellEffect) init(sim *Simulation, spell *Spell) {
 	}
 }
 
-func (spellEffect *SpellEffect) directCalculations(sim *Simulation, spell *Spell) {
-	damage := spellEffect.calculateBaseDamage(sim, spell)
-	damage *= spellEffect.DamageMultiplier
-
-	spellEffect.applyAttackerModifiers(sim, spell, false, &damage)
-	spellEffect.applyTargetModifiers(sim, spell, false, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
-	spellEffect.applyResistances(sim, spell, &damage)
-	spellEffect.determineOutcome(sim, spell, false)
-	spellEffect.applyOutcome(sim, spell, &damage)
-
-	spellEffect.Damage = damage
-}
-func (spellEffect *SpellEffect) applyModifiers(sim *Simulation, spell *Spell, isPeriodic bool, damage *float64) {
-	if !spell.SpellExtras.Matches(SpellExtrasIgnoreModifiers) {
-		spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, damage)
-		spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, damage)
-		spellEffect.applyResistances(sim, spell, damage)
-	}
-}
-
 func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spell) float64 {
 	if spellEffect.BaseDamage.Calculator == nil {
 		return 0
@@ -203,39 +163,40 @@ func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spel
 	}
 }
 
-func (spellEffect *SpellEffect) afterCalculations(sim *Simulation, spell *Spell, isPeriodic bool) {
-	spellEffect.applyResultsToSpell(spell, isPeriodic && !spellEffect.DotInput.TicksCanMissAndCrit)
-	spellEffect.triggerProcs(sim, spell, isPeriodic)
-}
-
-func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, isPeriodic bool, damage float64) {
+func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, damage float64) {
 	if !spell.SpellExtras.Matches(SpellExtrasIgnoreModifiers) {
-		spellEffect.applyAttackerModifiers(sim, spell, isPeriodic, &damage)
-		spellEffect.applyTargetModifiers(sim, spell, isPeriodic, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
+		spellEffect.applyAttackerModifiers(sim, spell, &damage)
+		spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
 		spellEffect.applyResistances(sim, spell, &damage)
 		spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
 	}
 	spellEffect.Damage = damage
 }
 
-func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell, isPeriodic bool) {
-	spell.TotalDamage += spellEffect.Damage
+func (spellEffect *SpellEffect) calcThreat(character *Character) float64 {
 	if spellEffect.Landed() {
-		spell.TotalThreat += spellEffect.calcThreat(spell.Character)
+		return (spellEffect.Damage + spellEffect.FlatThreatBonus) * spellEffect.TotalThreatMultiplier(character)
+	} else {
+		return 0
 	}
-	spellEffect.triggerProcs(sim, spell, isPeriodic)
 }
 
-func (spellEffect *SpellEffect) triggerProcs(sim *Simulation, spell *Spell, isPeriodic bool) {
-	if sim.Log != nil && !(spell.SpellExtras.Matches(SpellExtrasAlwaysHits) && spellEffect.Damage == 0) {
-		if isPeriodic {
+func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell) {
+	spell.TotalDamage += spellEffect.Damage
+	spell.TotalThreat += spellEffect.calcThreat(spell.Character)
+	spellEffect.triggerProcs(sim, spell)
+}
+
+func (spellEffect *SpellEffect) triggerProcs(sim *Simulation, spell *Spell) {
+	if sim.Log != nil {
+		if spellEffect.IsPeriodic {
 			spell.Character.Log(sim, "%s tick %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Character))
 		} else {
 			spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Character))
 		}
 	}
 
-	if !isPeriodic || spellEffect.DotInput.TicksProcSpellEffects {
+	if !spellEffect.IsPeriodic {
 		if spellEffect.OnSpellHit != nil {
 			spellEffect.OnSpellHit(sim, spell, spellEffect)
 		}
@@ -245,50 +206,9 @@ func (spellEffect *SpellEffect) triggerProcs(sim *Simulation, spell *Spell, isPe
 		if spellEffect.OnPeriodicDamage != nil {
 			spellEffect.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 		}
-		if spellEffect.DotInput.OnPeriodicDamage != nil {
-			spellEffect.DotInput.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
-		}
 		spell.Character.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 		spellEffect.Target.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
 	}
-}
-
-func (spellEffect *SpellEffect) applyResultsToSpell(spell *Spell, isPeriodic bool) {
-	if !isPeriodic {
-		if spellEffect.Outcome.Matches(OutcomeHit) {
-			spell.Hits++
-		}
-		if spellEffect.Outcome.Matches(OutcomeGlance) {
-			spell.Glances++
-		}
-		if spellEffect.Outcome.Matches(OutcomeCrit) {
-			spell.Crits++
-		}
-		if spellEffect.Outcome.Matches(OutcomeBlock) {
-			spell.Blocks++
-		}
-
-		if spellEffect.Landed() {
-			if spellEffect.Outcome.Matches(OutcomePartial1_4) {
-				spell.PartialResists_1_4++
-			} else if spellEffect.Outcome.Matches(OutcomePartial2_4) {
-				spell.PartialResists_2_4++
-			} else if spellEffect.Outcome.Matches(OutcomePartial3_4) {
-				spell.PartialResists_3_4++
-			}
-		} else {
-			if spellEffect.Outcome.Matches(OutcomeMiss) {
-				spell.Misses++
-			} else if spellEffect.Outcome == OutcomeDodge {
-				spell.Dodges++
-			} else if spellEffect.Outcome == OutcomeParry {
-				spell.Parries++
-			}
-		}
-	}
-
-	spell.TotalDamage += spellEffect.Damage
-	spell.TotalThreat += spellEffect.calcThreat(spell.Character)
 }
 
 func (spellEffect *SpellEffect) String() string {
@@ -299,10 +219,10 @@ func (spellEffect *SpellEffect) String() string {
 	return fmt.Sprintf("%s for %0.3f damage", outcomeStr, spellEffect.Damage)
 }
 
-func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *Spell, isPeriodic bool, damage *float64) {
+func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *Spell, damage *float64) {
 	attacker := spell.Character
 
-	if spellEffect.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) || spellEffect.ProcMask.Matches(ProcMaskRanged) {
+	if spellEffect.ProcMask.Matches(ProcMaskRanged) {
 		*damage *= attacker.PseudoStats.RangedDamageDealtMultiplier
 	}
 	if spell.SpellExtras.Matches(SpellExtrasAgentReserved1) {
@@ -327,7 +247,7 @@ func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *S
 	}
 }
 
-func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Spell, isPeriodic bool, targetCoeff float64, damage *float64) {
+func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Spell, targetCoeff float64, damage *float64) {
 	target := spellEffect.Target
 
 	*damage *= target.PseudoStats.DamageTakenMultiplier
@@ -336,7 +256,7 @@ func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Spe
 			*damage += target.PseudoStats.BonusPhysicalDamageTaken
 		}
 		*damage *= target.PseudoStats.PhysicalDamageTakenMultiplier
-		if isPeriodic {
+		if spellEffect.IsPeriodic {
 			*damage *= target.PseudoStats.PeriodicPhysicalDamageTakenMultiplier
 		}
 	} else if spell.SpellSchool.Matches(SpellSchoolArcane) {
@@ -381,16 +301,5 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, 
 			spellEffect.Outcome |= OutcomePartial3_4
 			*damage *= 0.25
 		}
-	}
-}
-
-func (spellEffect *SpellEffect) applyOutcome(sim *Simulation, spell *Spell, damage *float64) {
-	if !spellEffect.Landed() {
-		*damage = 0
-	} else if spellEffect.Outcome.Matches(OutcomeCrit) {
-		*damage *= spellEffect.CritMultiplier
-	} else if spellEffect.Outcome == OutcomeGlance {
-		// TODO glancing blow damage reduction is actually a range ([65%, 85%] vs. 73)
-		*damage *= 0.75
 	}
 }

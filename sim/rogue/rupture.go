@@ -18,7 +18,6 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 		Template: ability,
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
 			instance.ActionID.Tag = rogue.ComboPoints()
-			instance.Effect.Target = target
 			if rogue.deathmantle4pcProc {
 				instance.Cost.Value = 0
 				rogue.deathmantle4pcProc = false

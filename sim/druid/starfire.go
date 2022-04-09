@@ -84,7 +84,6 @@ func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Spell
 	return druid.RegisterSpell(core.SpellConfig{
 		Template: template,
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.Effect.Target = target
 			druid.applyNaturesGrace(&instance.SpellCast)
 			druid.applyNaturesSwiftness(&instance.SpellCast)
 		},

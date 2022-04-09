@@ -31,8 +31,7 @@ func (shaman *Shaman) registerSearingTotemSpell(sim *core.Simulation) {
 	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
 
 	shaman.SearingTotem = shaman.RegisterSpell(core.SpellConfig{
-		Template:   spell,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: spell,
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			shaman.SearingTotemDot.Apply(sim)
 			// +1 needed because of rounding issues with Searing totem tick time.

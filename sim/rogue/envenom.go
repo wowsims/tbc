@@ -24,7 +24,6 @@ func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 	rogue.Envenom = rogue.RegisterSpell(core.SpellConfig{
 		Template: ability,
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.Effect.Target = target
 			instance.ActionID.Tag = rogue.ComboPoints()
 			if rogue.deathmantle4pcProc {
 				instance.Cost.Value = 0

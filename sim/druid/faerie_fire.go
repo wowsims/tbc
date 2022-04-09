@@ -29,8 +29,7 @@ func (druid *Druid) registerFaerieFireSpell(sim *core.Simulation) {
 	}
 
 	druid.FaerieFire = druid.RegisterSpell(core.SpellConfig{
-		Template:   template,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: template,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO

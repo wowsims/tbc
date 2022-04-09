@@ -146,9 +146,6 @@ func (ho HitOutcome) PartialResistString() string {
 }
 
 // Other flags
-// Ignore Resistance (armor or magical, use school)
-// Always Hits
-
 type SpellExtras uint16
 
 // Returns whether there is any overlap between the given masks.
@@ -160,7 +157,6 @@ const (
 	SpellExtrasNone            SpellExtras = 0
 	SpellExtrasIgnoreResists   SpellExtras = 1 << iota // skip spell resist/armor
 	SpellExtrasCannotBeDodged                          // Ignores dodge in physical hit rolls
-	SpellExtrasAlwaysHits                              // Can't miss the hit roll
 	SpellExtrasBinary                                  // Does not do partial resists and could need a different hit roll.
 	SpellExtrasChanneled                               // Spell is channeled
 	SpellExtrasIgnoreModifiers                         // Only used by Ignite
@@ -171,37 +167,6 @@ const (
 	SpellExtrasAgentReserved2
 	SpellExtrasAgentReserved3
 	SpellExtrasAgentReserved4
-)
-
-// OutcomeRollCategory is the mask for what kind of hit roll to perform
-type OutcomeRollCategory byte
-
-// Returns whether there is any overlap between the given masks.
-func (at OutcomeRollCategory) Matches(other OutcomeRollCategory) bool {
-	return (at & other) != 0
-}
-
-const (
-	OutcomeRollCategoryNone    OutcomeRollCategory = 0         // No outcome roll needed
-	OutcomeRollCategoryWhite   OutcomeRollCategory = 1 << iota // White hit roll rules
-	OutcomeRollCategorySpecial                                 // Melee special attack
-	OutcomeRollCategoryRanged                                  // Ranged attack roll
-	OutcomeRollCategoryMagic                                   // Spell Hit roll
-
-	OutcomeRollCategoryPhysical = OutcomeRollCategoryWhite | OutcomeRollCategorySpecial | OutcomeRollCategoryRanged
-)
-
-type CritRollCategory byte
-
-// Returns whether there is any overlap between the given masks.
-func (at CritRollCategory) Matches(other CritRollCategory) bool {
-	return (at & other) != 0
-}
-
-const (
-	CritRollCategoryNone     CritRollCategory = 0         // cannot crit
-	CritRollCategoryPhysical CritRollCategory = 1 << iota // uses MeleeCrit for roll
-	CritRollCategoryMagical                               // Uses SpellCrit for crit roll
 )
 
 type SpellSchool byte

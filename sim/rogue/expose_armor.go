@@ -21,7 +21,6 @@ func (rogue *Rogue) registerExposeArmorSpell(sim *core.Simulation) {
 			if rogue.ComboPoints() != 5 {
 				panic("Expose Armor requires 5 combo points!")
 			}
-			instance.Effect.Target = target
 			instance.ActionID.Tag = rogue.ComboPoints()
 			if rogue.deathmantle4pcProc {
 				instance.Cost.Value = 0

@@ -14,8 +14,7 @@ func (rogue *Rogue) registerBackstabSpell(_ *core.Simulation) {
 	ability := rogue.newAbility(BackstabActionID, BackstabEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
 
 	rogue.Backstab = rogue.RegisterSpell(core.SpellConfig{
-		Template:   ability,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: ability,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:        core.ProcMaskMeleeMHSpecial,
 			BonusCritRating: 10 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.PuncturingWounds),

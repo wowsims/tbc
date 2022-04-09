@@ -18,7 +18,6 @@ func (paladin *Paladin) registerConsecrationSpell(sim *core.Simulation) {
 				ActionID:    ConsecrationActionID,
 				Character:   &paladin.Character,
 				SpellSchool: core.SpellSchoolHoly,
-				SpellExtras: core.SpellExtrasAlwaysHits,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: 660,

@@ -24,17 +24,6 @@ func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
 				Cooldown:    time.Second * 30,
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			CritRollCategory:    core.CritRollCategoryMagical,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:  5,
-				TickLength:     time.Second * 3,
-				TickBaseDamage: core.DotSnapshotFuncMagic(785/5, 0.167),
-			},
-		},
 	}
 	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
 

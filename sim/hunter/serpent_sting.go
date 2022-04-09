@@ -24,28 +24,11 @@ func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
 				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
 			},
 		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-			CritRollCategory:    core.CritRollCategoryNone,
-			ProcMask:            core.ProcMaskRangedSpecial,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			DotInput: core.DotDamageInput{
-				NumberOfTicks: 5,
-				TickLength:    time.Second * 3,
-				TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
-					attackPower := hitEffect.RangedAttackPower(spell.Character) + hitEffect.RangedAttackPowerOnTarget()
-					return 132 + attackPower*0.02
-				},
-				Aura: hunter.NewDotAura("Serpent String", SerpentStingActionID),
-			},
-		},
 	}
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 
 	hunter.SerpentSting = hunter.RegisterSpell(core.SpellConfig{
-		Template:   ama,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: ama,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			OutcomeApplier:   core.OutcomeFuncRangedHit(),

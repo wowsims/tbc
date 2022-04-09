@@ -65,7 +65,6 @@ func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
 
 	return shaman.RegisterSpell(core.SpellConfig{
 		Template:     template,
-		ModifyCast:   core.ModifyCastAssignTarget,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
@@ -103,8 +102,7 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 	}
 
 	shaman.Stormstrike = shaman.RegisterSpell(core.SpellConfig{
-		Template:   ss,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: ss,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),

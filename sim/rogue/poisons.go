@@ -28,8 +28,7 @@ func (rogue *Rogue) registerDeadlyPoisonSpell(sim *core.Simulation) {
 		},
 	}
 	rogue.DeadlyPoison = rogue.RegisterSpell(core.SpellConfig{
-		Template:   cast,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: cast,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
 			ThreatMultiplier:    1,
@@ -112,8 +111,7 @@ func (rogue *Rogue) registerInstantPoisonSpell(_ *core.Simulation) {
 	}
 
 	rogue.InstantPoison = rogue.RegisterSpell(core.SpellConfig{
-		Template:   cast,
-		ModifyCast: core.ModifyCastAssignTarget,
+		Template: cast,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			IsPhantom:           true,
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
