@@ -55,7 +55,10 @@ type Mage struct {
 	// Cached values for a few mechanics.
 	spellDamageMultiplier float64
 
-	ArcaneBlast     *core.Spell
+	// Current bonus crit from AM+CC interaction.
+	bonusAMCCCrit float64
+
+	ArcaneBlast     []*core.Spell
 	ArcaneExplosion *core.Spell
 	ArcaneMissiles  *core.Spell
 	Blizzard        *core.Spell
@@ -68,10 +71,11 @@ type Mage struct {
 	Scorch          *core.Spell
 	WintersChill    *core.Spell
 
-	IgniteDots     []*core.Dot
-	FireballDot    *core.Dot
-	FlamestrikeDot *core.Dot
-	PyroblastDot   *core.Dot
+	ArcaneMissilesDot *core.Dot
+	IgniteDots        []*core.Dot
+	FireballDot       *core.Dot
+	FlamestrikeDot    *core.Dot
+	PyroblastDot      *core.Dot
 
 	ArcaneBlastAura  *core.Aura
 	ClearcastingAura *core.Aura
@@ -93,7 +97,12 @@ func (mage *Mage) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (mage *Mage) Init(sim *core.Simulation) {
-	mage.registerArcaneBlastSpell(sim)
+	mage.ArcaneBlast = []*core.Spell{
+		mage.newArcaneBlastSpell(sim, 0),
+		mage.newArcaneBlastSpell(sim, 1),
+		mage.newArcaneBlastSpell(sim, 2),
+		mage.newArcaneBlastSpell(sim, 3),
+	}
 	mage.registerArcaneExplosionSpell(sim)
 	mage.registerArcaneMissilesSpell(sim)
 	mage.registerBlizzardSpell(sim)
@@ -124,6 +133,7 @@ func (mage *Mage) Reset(newsim *core.Simulation) {
 	mage.isBlastSpamming = false
 	mage.manaTracker.Reset()
 	mage.disabledMCDs = nil
+	mage.bonusAMCCCrit = 0
 }
 
 func NewMage(character core.Character, options proto.Player) *Mage {

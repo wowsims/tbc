@@ -102,6 +102,10 @@ func (mage *Mage) applyArcaneConcentration() {
 		return mage.GetOrRegisterAura(&core.Aura{
 			Label: "Arcane Concentration",
 			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+				if mage.bonusAMCCCrit != 0 {
+					mage.AddStat(stats.SpellCrit, -mage.bonusAMCCCrit)
+					mage.bonusAMCCCrit = 0
+				}
 				if !cast.SpellExtras.Matches(SpellFlagMage) {
 					return
 				}
@@ -183,7 +187,8 @@ func (mage *Mage) registerPresenceOfMindCD() {
 				} else if mage.RotationType == proto.Mage_Rotation_Frost {
 					spell = mage.Frostbolt
 				} else {
-					spell = mage.ArcaneBlast
+					numStacks := mage.ArcaneBlastAura.GetStacks()
+					spell = mage.ArcaneBlast[numStacks]
 				}
 				normalCastTime := spell.Template.CastTime
 				spell.Template.CastTime = 0
