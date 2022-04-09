@@ -193,6 +193,34 @@ func (paladin *Paladin) CanJudgementOfWisdom(sim *core.Simulation) bool {
 	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfWisdomAura
 }
 
+// Defines judgement refresh behavior from attacks
+// Returns extra mana if a different pally applied Judgement of Wisdom
+func (paladin *Paladin) setupJudgementRefresh() {
+	refreshAura := paladin.RegisterAura(&core.Aura{
+		Label: "Refresh Judgement",
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Outcome.Matches(core.OutcomeLanded) &&
+				spellEffect.ProcMask.Matches(core.ProcMaskMeleeMHAuto) {
+				if paladin.CurrentJudgement.IsActive() {
+					// Refresh the judgement
+					paladin.CurrentJudgement.Refresh(sim)
+
+					// Check if current judgement is not JoW and also that JoW is on the target
+					if paladin.CurrentJudgement.ActionID != JudgementOfWisdomActionID &&
+						spellEffect.Target.HasActiveAura(paladin.JudgementOfWisdomAura.Label) {
+						// Just trigger a second JoW
+						paladin.JudgementOfWisdomAura.OnSpellHit(paladin.JudgementOfWisdomAura, sim, spell, spellEffect)
+					}
+				}
+			}
+		},
+	})
+
+	paladin.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		return refreshAura
+	})
+}
+
 var SanctifiedJudgementActionID = core.ActionID{SpellID: 31930}
 
 // Helper function to implement Sanctified Seals talent

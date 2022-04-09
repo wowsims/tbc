@@ -52,7 +52,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 		Duration: SealDuration,
 
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeMH) || spellEffect.IsPhantom {
 				return
 			}
 			sobProc.Cast(sim, spellEffect.Target)

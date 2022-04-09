@@ -71,9 +71,6 @@ func (paladin *Paladin) Reset(sim *core.Simulation) {
 }
 
 func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, ability *core.SimpleSpell) {
-	if paladin.CurrentJudgement != nil && paladin.CurrentJudgement.IsActive() {
-		paladin.CurrentJudgement.UpdateExpires(sim.CurrentTime + JudgementDuration)
-	}
 }
 
 // maybe need to add stat dependencies
@@ -115,6 +112,8 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 	paladin.setupSealOfWisdom()
 
 	paladin.registerAvengingWrathCD()
+
+	// paladin.setupJudgementRefresh()
 
 	return paladin
 }
