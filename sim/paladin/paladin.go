@@ -15,10 +15,11 @@ type Paladin struct {
 	CurrentJudgement *core.Aura
 	sealOfCommandICD core.InternalCD
 
-	sealOfBlood       core.SimpleCast
-	sealOfCommand     core.SimpleCast
-	sealOfTheCrusader core.SimpleCast
-	sealOfWisdom      core.SimpleCast
+	// I should probably make these *core.Spell
+	SealOfBlood       core.SimpleCast
+	SealOfCommand     core.SimpleCast
+	SealOfTheCrusader core.SimpleCast
+	SealOfWisdom      core.SimpleCast
 
 	Consecration           *core.Spell
 	CrusaderStrike         *core.Spell

@@ -1,7 +1,6 @@
 package retribution
 
 import (
-	"sort"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -105,7 +104,7 @@ func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 		ret.openingRotation(sim)
 		return
 	}
-	ret.ActRotation(sim)
+	ret.rotation(sim)
 }
 
 func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
@@ -148,7 +147,16 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	}
 }
 
-func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
+func (ret *RetributionPaladin) rotation(sim *core.Simulation) {
+	// Need to check for SoC early
+	socActive := ret.SealOfCommandAura.IsActive()
+
+	// If mana is low, do the low mana rotation instead
+	// Don't do the low mana rotation in the middle of a twist
+	if ret.CurrentMana() <= 1000 && !socActive {
+		ret.lowManaRotation(sim)
+	}
+
 	// Setup
 	target := sim.GetPrimaryTarget()
 
@@ -158,7 +166,6 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	judgementCD := ret.GetRemainingCD(paladin.JudgementCD, sim.CurrentTime)
 
 	sobActive := ret.SealOfBloodAura.IsActive()
-	socActive := ret.SealOfCommandAura.IsActive()
 
 	nextSwingAt := ret.AutoAttacks.NextAttackAt()
 	timeTilNextSwing := nextSwingAt - sim.CurrentTime
@@ -198,8 +205,7 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 		}
 	}
 
-	// Determine when next action is available
-	// Throw everything into an array then filter and sort compared to doing individual comparisons
+	// All possible next events
 	events := []time.Duration{
 		nextSwingAt,
 		nextSwingAt - twistWindow,
@@ -208,75 +214,77 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 		ret.CDReadyAt(paladin.CrusaderStrikeCD),
 	}
 
-	// Time has to move forward... so exclude any events that are at current time
-	n := 0
-	for _, elem := range events {
-		if elem > sim.CurrentTime {
-			events[n] = elem
-			n++
-		}
-	}
-
-	filteredEvents := events[:n]
-
-	// Sort it to get minimum element
-	sort.Slice(filteredEvents, func(i, j int) bool { return events[i] < events[j] })
-
-	// If the next action is  the GCD, just return
-	if filteredEvents[0] == ret.CDReadyAt(core.GCDCooldownID) {
-		return
-	}
-
-	// Otherwise add a pending action for the next time
-	pa := &core.PendingAction{
-		Priority:     core.ActionPriorityLow,
-		OnAction:     ret.ActRotation,
-		NextActionAt: filteredEvents[0],
-	}
-
-	sim.AddPendingAction(pa)
+	ret.waitUntilNextEvent(sim, events)
 }
 
 func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Target, sobActive bool) {
 
 }
 
-// Once filler moves are implemented, experiment with various mana settings
-// See if its needed to use 2007 rotation or a variation at low mana
-func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
+// Just roll seal of blood and cast crusader strike on CD to conserve mana
+func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
-	// judge blood whenever we can
-	if ret.CanJudgementOfBlood(sim) {
-		success := ret.JudgementOfBlood.Cast(sim, target)
-		if !success {
-			ret.WaitForMana(sim, ret.JudgementOfBlood.Instance.Cost.Value)
+	nextSwingAt := ret.AutoAttacks.NextAttackAt()
+	sobExpiration := ret.SealOfBloodAura.ExpiresAt()
+
+	spellGCD := ret.SpellGCD()
+
+	sobAndCSCost := ret.CrusaderStrike.Template.GetManaCost() + ret.SealOfBlood.Cost.Value
+	sobAndJudgementCost := ret.JudgementOfBlood.Template.GetManaCost() + ret.SealOfBlood.Cost.Value
+
+	if !ret.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		// Roll seal of blood
+		if sim.CurrentTime+time.Second >= sobExpiration {
+			if ret.CanJudgementOfBlood(sim) && ret.CurrentMana() >= sobAndJudgementCost {
+				ret.JudgementOfBlood.Cast(sim, target)
+			}
+			sob := ret.NewSealOfBlood(sim)
+			if success := sob.StartCast(sim); !success {
+				ret.WaitForMana(sim, sob.GetManaCost())
+			}
+		}
+
+		// Crusader strike unless it will cause seal of blood to drop
+		// Or we won't have enough mana to reseal
+		if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) &&
+			!(spellGCD+sim.CurrentTime > nextSwingAt && sobExpiration < nextSwingAt) &&
+			(ret.CurrentMana() >= sobAndCSCost) {
+			ret.CrusaderStrike.Cast(sim, target)
 		}
 	}
 
-	// roll seal of blood
-	if !ret.SealOfBloodAura.IsActive() {
-		sob := ret.NewSealOfBlood(sim)
-		if success := sob.StartCast(sim); !success {
-			ret.WaitForMana(sim, sob.GetManaCost())
+	events := []time.Duration{
+		ret.CDReadyAt(core.GCDCooldownID),
+		ret.CDReadyAt(paladin.CrusaderStrikeCD),
+		// ret.TimeUntilManaRegen(sobAndCSCost),
+		sobExpiration - time.Second,
+	}
+
+	ret.waitUntilNextEvent(sim, events)
+}
+
+// Helper function for finding the next event
+func (ret *RetributionPaladin) waitUntilNextEvent(sim *core.Simulation, events []time.Duration) {
+	// Find the minimum possible next event that is greater than the current time
+	nextEventAt := events[0]
+	for _, elem := range events {
+		if elem > sim.CurrentTime && elem < nextEventAt {
+			nextEventAt = elem
 		}
+	}
+	// If the next action is  the GCD, just return
+	if nextEventAt == ret.CDReadyAt(core.GCDCooldownID) {
 		return
 	}
 
-	// Crusader strike if we can
-	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
-		success := ret.CrusaderStrike.Cast(sim, target)
-		if !success {
-			ret.WaitForMana(sim, ret.CrusaderStrike.Instance.Cost.Value)
-		}
-		return
+	// Otherwise add a pending action for the next time
+	pa := &core.PendingAction{
+		Name:         "Next Ret Rotation Event",
+		Priority:     core.ActionPriorityLow,
+		OnAction:     ret.rotation,
+		NextActionAt: nextEventAt,
 	}
 
-	// Proceed until SoB expires, CrusaderStrike comes off GCD, or Judgement comes off GCD
-	nextEventAt := ret.CDReadyAt(paladin.CrusaderStrikeCD)
-	sobExpiration := sim.CurrentTime + ret.SealOfBloodAura.RemainingDuration(sim)
-	nextEventAt = core.MinDuration(nextEventAt, sobExpiration)
-	// Waiting for judgement CD causes a bug that infinite loops for some reason
-	// nextEventAt = core.MinDuration(nextEventAt, ret.CDReadyAt(paladin.JudgementCD))
-	ret.WaitUntil(sim, nextEventAt)
+	sim.AddPendingAction(pa)
 }

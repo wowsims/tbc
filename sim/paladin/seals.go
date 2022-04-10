@@ -80,11 +80,11 @@ func (paladin *Paladin) setupSealOfBlood() {
 		},
 	}
 
-	paladin.sealOfBlood = sob
+	paladin.SealOfBlood = sob
 }
 
 func (paladin *Paladin) NewSealOfBlood(sim *core.Simulation) *core.SimpleCast {
-	sob := &paladin.sealOfBlood
+	sob := &paladin.SealOfBlood
 	sob.Init(sim)
 	return sob
 }
@@ -171,11 +171,11 @@ func (paladin *Paladin) SetupSealOfCommand() {
 		},
 	}
 
-	paladin.sealOfCommand = soc
+	paladin.SealOfCommand = soc
 }
 
 func (paladin *Paladin) NewSealOfCommand(sim *core.Simulation) *core.SimpleCast {
-	soc := &paladin.sealOfCommand
+	soc := &paladin.SealOfCommand
 	soc.Init(sim)
 	return soc
 }
@@ -214,11 +214,11 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 		},
 	}
 
-	paladin.sealOfTheCrusader = sotc
+	paladin.SealOfTheCrusader = sotc
 }
 
 func (paladin *Paladin) NewSealOfTheCrusader(sim *core.Simulation) *core.SimpleCast {
-	sotc := &paladin.sealOfTheCrusader
+	sotc := &paladin.SealOfTheCrusader
 	sotc.Init(sim)
 	return sotc
 }
@@ -255,11 +255,11 @@ func (paladin *Paladin) setupSealOfWisdom() {
 		},
 	}
 
-	paladin.sealOfWisdom = sow
+	paladin.SealOfWisdom = sow
 }
 
 func (paladin *Paladin) NewSealOfWisdom(sim *core.Simulation) *core.SimpleCast {
-	sow := &paladin.sealOfWisdom
+	sow := &paladin.SealOfWisdom
 	sow.Init(sim)
 	return sow
 }

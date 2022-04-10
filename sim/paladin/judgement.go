@@ -65,7 +65,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
 
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
+			paladin.sanctifiedJudgement(sim, paladin.SealOfBlood.Cost.Value)
 			paladin.SealOfBloodAura.Deactivate(sim)
 			if loaAura != nil {
 				loaAura.Activate(sim)
@@ -105,7 +105,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 					Value: JudgementManaCost,
 				},
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.Cost.Value)
+					paladin.sanctifiedJudgement(sim, paladin.SealOfTheCrusader.Cost.Value)
 					paladin.SealOfTheCrusaderAura.Deactivate(sim)
 				},
 			},
@@ -160,7 +160,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 					Value: JudgementManaCost,
 				},
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					paladin.sanctifiedJudgement(sim, paladin.sealOfWisdom.Cost.Value)
+					paladin.sanctifiedJudgement(sim, paladin.SealOfWisdom.Cost.Value)
 					paladin.SealOfWisdomAura.Deactivate(sim)
 				},
 			},
