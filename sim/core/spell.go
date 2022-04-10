@@ -3,6 +3,8 @@ package core
 import (
 	"fmt"
 	"time"
+
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // SimpleSpell has a single cast and could have a dot or direct effect (or no effect)
@@ -67,11 +69,19 @@ type ModifySpellCast func(*Simulation, *Target, *SimpleSpell)
 type ApplySpellEffects func(*Simulation, *Target, *Spell)
 
 type SpellConfig struct {
+	// See definition of Spell (below) for comments on these.
+	ActionID
+	Character    *Character
+	SpellSchool  SpellSchool
+	SpellExtras  SpellExtras
+	ResourceType stats.Stat
+	BaseCost     float64
+
 	Template SimpleSpell
 
+	Cast       CastConfig
 	ModifyCast ModifySpellCast
 
-	//CastFn SpellCast
 	ApplyEffects ApplySpellEffects
 }
 
@@ -93,14 +103,31 @@ type SpellMetrics struct {
 }
 
 type Spell struct {
-	// ID for the action.
+	// ID for this spell.
 	ActionID
 
-	// The character performing this action.
+	// The character who will perform this spell.
 	Character *Character
 
+	// Fire, Frost, Shadow, etc.
 	SpellSchool SpellSchool
+
+	// Flags
 	SpellExtras SpellExtras
+
+	// The type of resource used by this spell.
+	// Should be stats.Mana, stats.Energy, stats.Rage, or unset.
+	ResourceType stats.Stat
+
+	// Base cost. Many effects in the game which 'reduce mana cost by X%'
+	// are calculated using the base cost.
+	BaseCost float64
+
+	// Default cast parameters for this spell with all static effects applied.
+	DefaultCast NewCast
+
+	// Performs a cast of this spell.
+	castFn CastSuccessFunc
 
 	SpellMetrics
 
@@ -109,10 +136,14 @@ type Spell struct {
 
 	//castFn SpellCast
 
+	// These fields are manipulated when this spell is cast.
 	// The amount of resource spent by the most recent cast of this spell.
 	// TODO: Find a way to remove this later, as its a bit hacky.
 	MostRecentBaseCost float64
 	MostRecentCost     float64
+
+	// The current or most recent cast data for this spell.
+	CurCast NewCast
 
 	// Templates for creating new casts of this spell.
 	Template SimpleSpell
@@ -171,15 +202,32 @@ func (character *Character) RegisterSpell(config SpellConfig) *Spell {
 	config.Template.Character = character
 
 	spell := &Spell{
-		ActionID:    config.Template.ActionID,
-		Character:   character,
-		SpellSchool: config.Template.SpellSchool,
-		SpellExtras: config.Template.SpellExtras,
+		ActionID:     config.ActionID,
+		Character:    character,
+		SpellSchool:  config.SpellSchool,
+		SpellExtras:  config.SpellExtras,
+		ResourceType: config.ResourceType,
+		BaseCost:     config.BaseCost,
+
+		DefaultCast: config.Cast.DefaultCast,
 
 		ModifyCast:   config.ModifyCast,
 		ApplyEffects: config.ApplyEffects,
+	}
 
-		Template: config.Template,
+	if !config.Template.ActionID.IsEmptyAction() {
+		spell.ActionID = config.Template.ActionID
+		spell.SpellSchool = config.Template.SpellSchool
+		spell.SpellExtras = config.Template.SpellExtras
+		spell.Template = config.Template
+	} else {
+		spell.castFn = spell.makeCastFunc(config.Cast, func(sim *Simulation, target *Target) {
+			spell.Casts++
+			spell.MostRecentCost = spell.CurCast.Cost
+			spell.MostRecentBaseCost = spell.BaseCost
+
+			spell.ApplyEffects(sim, target, spell)
+		})
 	}
 
 	character.Spellbook = append(character.Spellbook, spell)
