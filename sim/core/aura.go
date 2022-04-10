@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"time"
 
@@ -265,11 +264,6 @@ func (at *auraTracker) registerAura(unit *Unit, aura *Aura) *Aura {
 	aura.Unit = unit
 	aura.metrics.ID = aura.ActionID
 
-	aura.activeIndex = Inactive
-	aura.onSpellHitIndex = Inactive
-	aura.onPeriodicDamageIndex = Inactive
-	aura.onCastCompleteIndex = Inactive
-
 	at.auras = append(at.auras, aura)
 	if aura.Tag != "" {
 		at.aurasByTag[aura.Tag] = append(at.aurasByTag[aura.Tag], aura)
@@ -382,8 +376,6 @@ func (at *auraTracker) reset(sim *Simulation) {
 		}
 		aura.Activate(sim)
 	}
-
-	at.validateAuras()
 }
 
 func (at *auraTracker) advance(sim *Simulation) {
@@ -403,57 +395,6 @@ restart:
 		}
 	}
 	at.minExpires = minExpires
-}
-
-func (at *auraTracker) validateAuras() {
-	for _, aura := range at.auras {
-		if aura.active {
-			if aura.Duration != NeverExpires && aura.activeIndex == Inactive {
-				log.Panicf("active aura %v has no active index", aura.ActionID)
-			}
-			if aura.OnSpellHit != nil && aura.onSpellHitIndex == Inactive {
-				log.Panicf("spell hit aura %v has not spell hit index", aura.ActionID)
-			}
-		} else {
-			if aura.activeIndex != Inactive {
-				log.Panicf("inactive aura %v has an active index", aura.ActionID)
-			}
-			for _, a := range at.activeAuras {
-				if a == aura {
-					log.Panicf("inactive aura %v is on the active list", aura.ActionID)
-				}
-			}
-			if aura.onSpellHitIndex != Inactive {
-				log.Panicf("inactive aura %v has a spell hit index", aura.ActionID)
-			}
-			for _, a := range at.onSpellHitAuras {
-				if a == aura {
-					log.Panicf("inactive aura %v is on the spell hit list", aura.ActionID)
-				}
-			}
-		}
-	}
-
-	for i, aura := range at.activeAuras {
-		if !aura.active {
-			log.Panicf("active aura %v is not active", aura.ActionID)
-		}
-		if aura.activeIndex != int32(i) {
-			log.Panicf("active aura %v has wrong active index (%d instead of %d)", aura.ActionID, aura.activeIndex, i)
-		}
-	}
-
-	for i, aura := range at.onSpellHitAuras {
-		if !aura.active {
-			log.Panicf("spell hit aura %v is not active", aura.ActionID)
-		}
-		if aura.onSpellHitIndex != int32(i) {
-			log.Panicf("spell hit aura %v has wrong spell hit index (%d instead of %d)", aura.ActionID, aura.onSpellHitIndex, i)
-		}
-		if aura.OnSpellHit == nil {
-			log.Panicf("spell hit aura %v has non OnSpellHit", aura.ActionID)
-		}
-	}
 }
 
 func (at *auraTracker) doneIteration(sim *Simulation) {
