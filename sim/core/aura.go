@@ -514,7 +514,7 @@ func (aura *Aura) Activate(sim *Simulation) {
 
 // Moves an Aura to the front of the list of active Auras, so its callbacks are invoked first.
 func (aura *Aura) Prioritize() {
-	if aura.OnCastComplete != nil {
+	if aura.onCastCompleteIndex > 0 {
 		otherAura := aura.Unit.onCastCompleteAuras[0]
 		aura.Unit.onCastCompleteAuras[0] = aura
 		aura.Unit.onCastCompleteAuras[len(aura.Unit.onCastCompleteAuras)-1] = otherAura
@@ -522,7 +522,7 @@ func (aura *Aura) Prioritize() {
 		aura.onCastCompleteIndex = 0
 	}
 
-	if aura.OnSpellCastComplete != nil {
+	if aura.onSpellCastCompleteIndex > 0 {
 		otherAura := aura.Unit.onSpellCastCompleteAuras[0]
 		aura.Unit.onSpellCastCompleteAuras[0] = aura
 		aura.Unit.onSpellCastCompleteAuras[len(aura.Unit.onSpellCastCompleteAuras)-1] = otherAura
@@ -530,7 +530,7 @@ func (aura *Aura) Prioritize() {
 		aura.onSpellCastCompleteIndex = 0
 	}
 
-	if aura.OnSpellHit != nil {
+	if aura.onSpellHitIndex > 0 {
 		otherAura := aura.Unit.onSpellHitAuras[0]
 		aura.Unit.onSpellHitAuras[0] = aura
 		aura.Unit.onSpellHitAuras[len(aura.Unit.onSpellHitAuras)-1] = otherAura
@@ -538,7 +538,7 @@ func (aura *Aura) Prioritize() {
 		aura.onSpellHitIndex = 0
 	}
 
-	if aura.OnPeriodicDamage != nil {
+	if aura.onPeriodicDamageIndex > 0 {
 		otherAura := aura.Unit.onPeriodicDamageAuras[0]
 		aura.Unit.onPeriodicDamageAuras[0] = aura
 		aura.Unit.onPeriodicDamageAuras[len(aura.Unit.onPeriodicDamageAuras)-1] = otherAura
