@@ -31,8 +31,8 @@ func (instance *SimpleSpell) Cast(sim *Simulation, target *Target, spell *Spell)
 		spell.MostRecentCost = cast.Cost.Value
 		spell.MostRecentBaseCost = cast.BaseCost.Value
 
-		spell.ApplyEffects(sim, target, spell)
 		spell.Instance.objectInUse = false
+		spell.ApplyEffects(sim, target, spell)
 	})
 }
 
