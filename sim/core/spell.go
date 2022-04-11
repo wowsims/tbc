@@ -262,6 +262,10 @@ func (character *Character) GetSpell(actionID ActionID) *Spell {
 func (character *Character) GetOrRegisterSpell(config SpellConfig) *Spell {
 	registered := character.GetSpell(config.Template.ActionID)
 	if registered == nil {
+		registered = character.GetSpell(config.ActionID)
+	}
+
+	if registered == nil {
 		return character.RegisterSpell(config)
 	} else {
 		return registered

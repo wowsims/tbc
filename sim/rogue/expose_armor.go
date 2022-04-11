@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var ExposeArmorActionID = core.ActionID{SpellID: 26866, Tag: 5}
@@ -13,20 +14,24 @@ func (rogue *Rogue) registerExposeArmorSpell(sim *core.Simulation) {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	rogue.ExposeArmorAura = core.ExposeArmorAura(sim.GetPrimaryTarget(), rogue.Talents.ImprovedExposeArmor)
-	ability := rogue.newAbility(ExposeArmorActionID, ExposeArmorEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
 
 	rogue.ExposeArmor = rogue.RegisterSpell(core.SpellConfig{
-		Template: ability,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			if rogue.ComboPoints() != 5 {
-				panic("Expose Armor requires 5 combo points!")
-			}
-			instance.ActionID.Tag = rogue.ComboPoints()
-			if rogue.deathmantle4pcProc {
-				instance.Cost.Value = 0
-				rogue.deathmantle4pcProc = false
-			}
+		ActionID:    ExposeArmorActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | rogue.finisherFlags(),
+
+		ResourceType: stats.Energy,
+		BaseCost:     ExposeArmorEnergyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: ExposeArmorEnergyCost,
+				GCD:  time.Second,
+			},
+			ModifyCast:  rogue.applyDeathmantle,
+			IgnoreHaste: true,
 		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			ThreatMultiplier: 1,
@@ -40,7 +45,7 @@ func (rogue *Rogue) registerExposeArmorSpell(sim *core.Simulation) {
 					}
 				} else {
 					if refundAmount > 0 {
-						rogue.AddEnergy(sim, spell.MostRecentCost*refundAmount, core.ActionID{SpellID: 31245})
+						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, core.ActionID{SpellID: 31245})
 					}
 				}
 			},

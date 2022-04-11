@@ -1,8 +1,11 @@
 package rogue
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var BackstabActionID = core.ActionID{SpellID: 26863}
@@ -11,10 +14,22 @@ var BackstabEnergyCost = 60.0
 func (rogue *Rogue) registerBackstabSpell(_ *core.Simulation) {
 	refundAmount := BackstabEnergyCost * 0.8
 
-	ability := rogue.newAbility(BackstabActionID, BackstabEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
-
 	rogue.Backstab = rogue.RegisterSpell(core.SpellConfig{
-		Template: ability,
+		ActionID:    BackstabActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder,
+
+		ResourceType: stats.Energy,
+		BaseCost:     BackstabEnergyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: BackstabEnergyCost,
+				GCD:  time.Second,
+			},
+			IgnoreHaste: true,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:        core.ProcMaskMeleeMHSpecial,
 			BonusCritRating: 10 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.PuncturingWounds),

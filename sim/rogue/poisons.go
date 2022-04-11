@@ -18,17 +18,10 @@ func (rogue *Rogue) applyPoisons() {
 var DeadlyPoisonActionID = core.ActionID{SpellID: 27186}
 
 func (rogue *Rogue) registerDeadlyPoisonSpell(sim *core.Simulation) {
-	cast := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    DeadlyPoisonActionID,
-				Character:   rogue.GetCharacter(),
-				SpellSchool: core.SpellSchoolNature,
-			},
-		},
-	}
 	rogue.DeadlyPoison = rogue.RegisterSpell(core.SpellConfig{
-		Template: cast,
+		ActionID:    DeadlyPoisonActionID,
+		SpellSchool: core.SpellSchoolNature,
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
 			ThreatMultiplier:    1,
@@ -100,18 +93,10 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 }
 
 func (rogue *Rogue) registerInstantPoisonSpell(_ *core.Simulation) {
-	cast := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: 26891},
-				Character:   rogue.GetCharacter(),
-				SpellSchool: core.SpellSchoolNature,
-			},
-		},
-	}
-
 	rogue.InstantPoison = rogue.RegisterSpell(core.SpellConfig{
-		Template: cast,
+		ActionID:    core.ActionID{SpellID: 26891},
+		SpellSchool: core.SpellSchoolNature,
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			IsPhantom:           true,
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),

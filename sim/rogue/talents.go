@@ -244,17 +244,10 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 			icdDur := time.Millisecond * 500
 
 			swordSpecializationSpell := rogue.GetOrRegisterSpell(core.SpellConfig{
-				Template: core.SimpleSpell{
-					SpellCast: core.SpellCast{
-						Cast: core.Cast{
-							ActionID:    core.ActionID{SpellID: 13964},
-							Character:   &rogue.Character,
-							SpellSchool: core.SpellSchoolPhysical,
-							IgnoreHaste: true,
-							SpellExtras: core.SpellExtrasMeleeMetrics,
-						},
-					},
-				},
+				ActionID:    core.ActionID{SpellID: 13964},
+				SpellSchool: core.SpellSchoolPhysical,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
+
 				ApplyEffects: core.ApplyEffectFuncDirectDamage(rogue.AutoAttacks.MHEffect),
 			})
 

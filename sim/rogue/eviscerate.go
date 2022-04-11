@@ -1,7 +1,10 @@
 package rogue
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var EviscerateActionID = core.ActionID{SpellID: 26865}
@@ -11,9 +14,7 @@ func (rogue *Rogue) registerEviscerateSpell(sim *core.Simulation) {
 	if ItemSetAssassination.CharacterHasSetBonus(&rogue.Character, 4) {
 		rogue.eviscerateEnergyCost -= 10
 	}
-
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
-	ability := rogue.newAbility(EviscerateActionID, rogue.eviscerateEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
 
 	basePerComboPoint := 185.0
 	if ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2) {
@@ -21,14 +22,22 @@ func (rogue *Rogue) registerEviscerateSpell(sim *core.Simulation) {
 	}
 
 	rogue.Eviscerate = rogue.RegisterSpell(core.SpellConfig{
-		Template: ability,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.ActionID.Tag = rogue.ComboPoints()
-			if rogue.deathmantle4pcProc {
-				instance.Cost.Value = 0
-				rogue.deathmantle4pcProc = false
-			}
+		ActionID:    EviscerateActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | rogue.finisherFlags(),
+
+		ResourceType: stats.Energy,
+		BaseCost:     rogue.eviscerateEnergyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: rogue.eviscerateEnergyCost,
+				GCD:  time.Second,
+			},
+			ModifyCast:  rogue.applyDeathmantle,
+			IgnoreHaste: true,
 		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier: 1 + 0.05*float64(rogue.Talents.ImprovedEviscerate) + 0.02*float64(rogue.Talents.Aggression),
@@ -48,7 +57,7 @@ func (rogue *Rogue) registerEviscerateSpell(sim *core.Simulation) {
 					rogue.ApplyFinisher(sim, spell.ActionID)
 				} else {
 					if refundAmount > 0 {
-						rogue.AddEnergy(sim, spell.MostRecentCost*refundAmount, core.ActionID{SpellID: 31245})
+						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, core.ActionID{SpellID: 31245})
 					}
 				}
 			},
