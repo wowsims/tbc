@@ -60,6 +60,13 @@ func ApplyQuagmirransEye(agent core.Agent) {
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				procAura.Activate(sim)
 			},
+			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				if icd.IsOnCD(sim) || sim.RandomFloat("Quagmirran's Eye") > 0.1 {
+					return
+				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				procAura.Activate(sim)
+			},
 		})
 	})
 }
