@@ -440,9 +440,10 @@ export const P4_PRESET = {
 	]}`),
 };
 
-export const P5_PRESET = {
+export const P5_ALLIANCE_PRESET = {
 	name: 'P5 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<any>) => player.getFaction() == Faction.Alliance,
 	gear: EquipmentSpec.fromJsonString(`{"items": [
 		{
 			"id": 34332,
@@ -529,6 +530,110 @@ export const P5_PRESET = {
 		},
 		{
 			"id": 33829
+		},
+		{
+			"id": 34336,
+			"enchant": 22555
+		},
+		{
+			"id": 34179
+		},
+		{
+			"id": 32330
+		}
+	]}`),
+};
+
+export const P5_HORDE_PRESET = {
+	name: 'P5 Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<any>) => player.getFaction() == Faction.Horde,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 34332,
+			"enchant": 29191,
+			"gems": [
+				35761,
+				34220
+			]
+		},
+		{
+			"id": 34204
+		},
+		{
+			"id": 31023,
+			"enchant": 23545,
+			"gems": [
+				32215,
+				35761
+			]
+		},
+		{
+			"id": 34242,
+			"enchant": 33150,
+			"gems": [
+				35760
+			]
+		},
+		{
+			"id": 34396,
+			"enchant": 24003,
+			"gems": [
+				35760,
+				35761,
+				35761
+			]
+		},
+		{
+			"id": 34437,
+			"enchant": 22534,
+			"gems": [
+				35761
+			]
+		},
+		{
+			"id": 34350,
+			"enchant": 28272,
+			"gems": [
+				35760,
+				32215
+			]
+		},
+		{
+			"id": 34542,
+			"gems": [
+				35761
+			]
+		},
+		{
+			"id": 34186,
+			"enchant": 24274,
+			"gems": [
+				35761,
+				35760,
+				35760
+			]
+		},
+		{
+			"id": 34566,
+			"enchant": 35297,
+			"gems": [
+				35760
+			]
+		},
+		{
+			"id": 34230,
+			"enchant": 22536
+		},
+		{
+			"id": 32527,
+			"enchant": 22536
+		},
+		{
+			"id": 34429
+		},
+		{
+			"id": 32483
 		},
 		{
 			"id": 34336,
