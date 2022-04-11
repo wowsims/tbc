@@ -14,26 +14,23 @@ var DevouringPlagueCooldownID = core.NewCooldownID()
 var DevouringPlagueActionID = core.ActionID{SpellID: SpellIDDevouringPlague, CooldownID: DevouringPlagueCooldownID}
 
 func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 1145}
-
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    DevouringPlagueActionID,
-				Character:   &priest.Character,
-				SpellSchool: core.SpellSchoolShadow,
-				BaseCost:    cost,
-				Cost:        cost,
-				CastTime:    0,
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Minute * 3,
-			},
-		},
-	}
-	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
+	baseCost := 1145.0
 
 	priest.DevouringPlague = priest.RegisterSpell(core.SpellConfig{
-		Template: template,
+		ActionID:    DevouringPlagueActionID,
+		SpellSchool: core.SpellSchoolShadow,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
+				GCD:  core.GCDDefault,
+			},
+			Cooldown: time.Minute * 3,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),

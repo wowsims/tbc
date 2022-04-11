@@ -116,17 +116,6 @@ func (druid *Druid) ApplyTalents() {
 	}
 }
 
-func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
-	if druid.NaturesGraceProcAura != nil && druid.NaturesGraceProcAura.IsActive() {
-		spellCast.CastTime -= time.Millisecond * 500
-	}
-}
-func (druid *Druid) applyNewNaturesGrace(cast *core.NewCast) {
-	if druid.NaturesGraceProcAura != nil && druid.NaturesGraceProcAura.IsActive() {
-		cast.CastTime -= time.Millisecond * 500
-	}
-}
-
 func (druid *Druid) setupNaturesGrace() {
 	if !druid.Talents.NaturesGrace {
 		return
@@ -164,6 +153,12 @@ func (druid *Druid) setupNaturesGrace() {
 			},
 		})
 	})
+}
+
+func (druid *Druid) applyNaturesGrace(cast *core.NewCast) {
+	if druid.NaturesGraceProcAura != nil && druid.NaturesGraceProcAura.IsActive() {
+		cast.CastTime -= time.Millisecond * 500
+	}
 }
 
 var NaturesSwiftnessCooldownID = core.NewCooldownID()
@@ -224,12 +219,7 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 	})
 }
 
-func (druid *Druid) applyNaturesSwiftness(spellCast *core.SpellCast) {
-	if druid.NaturesSwiftnessAura != nil && druid.NaturesSwiftnessAura.IsActive() {
-		spellCast.CastTime = 0
-	}
-}
-func (druid *Druid) applyNewNaturesSwiftness(cast *core.NewCast) {
+func (druid *Druid) applyNaturesSwiftness(cast *core.NewCast) {
 	if druid.NaturesSwiftnessAura != nil && druid.NaturesSwiftnessAura.IsActive() {
 		cast.CastTime = 0
 	}

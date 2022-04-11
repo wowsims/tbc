@@ -88,13 +88,8 @@ func (spriest *ShadowPriest) OnManaTick(sim *core.Simulation) {
 
 func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	if spriest.rotation.PrecastVt && sim.CurrentTime == 0 {
-		castTime := spriest.VampiricTouch.Template.CastTime
-		gcd := spriest.VampiricTouch.Template.GCD
-		spriest.VampiricTouch.Template.CastTime = 0
-		spriest.VampiricTouch.Template.GCD = 0
-		spriest.VampiricTouch.Cast(sim, sim.GetPrimaryTarget())
-		spriest.VampiricTouch.Template.CastTime = castTime
-		spriest.VampiricTouch.Template.GCD = gcd
+		spriest.SpendMana(sim, priest.VampiricTouchBaseCost, priest.VampiricTouchActionID)
+		spriest.VampiricTouch.SkipCastAndApplyEffects(sim, sim.GetPrimaryTarget())
 	}
 
 	// Activate shared behaviors
@@ -176,7 +171,7 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	}
 
 	if success := spell.Cast(sim, sim.GetPrimaryTarget()); !success {
-		spriest.WaitForMana(sim, spell.MostRecentCost)
+		spriest.WaitForMana(sim, spell.CurCast.Cost)
 	}
 }
 
