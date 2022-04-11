@@ -37,17 +37,6 @@ func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) *core.Aura {
 }
 
 func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    StormstrikeActionID,
-				Character:   &shaman.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
-
 	effect := core.SpellEffect{
 		DamageMultiplier: 1,
 		ThreatMultiplier: core.TernaryFloat64(shaman.Talents.SpiritWeapons, 0.7, 1),
@@ -64,7 +53,10 @@ func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
 	}
 
 	return shaman.RegisterSpell(core.SpellConfig{
-		Template:     template,
+		ActionID:    StormstrikeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
@@ -73,25 +65,9 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 	mhHit := shaman.newStormstrikeHitSpell(true)
 	ohHit := shaman.newStormstrikeHitSpell(false)
 
-	ss := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    StormstrikeActionID,
-				Character:   &shaman.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				IgnoreHaste: true,
-				Cooldown:    time.Second * 10,
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 237,
-				},
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
+	baseCost := 237.0
 	if shaman.Equip[items.ItemSlotRanged].ID == StormfuryTotem {
-		ss.Cost.Value -= 22
+		baseCost -= 22
 	}
 
 	ssDebuffAura := shaman.stormstrikeDebuffAura(sim.GetPrimaryTarget())
@@ -102,7 +78,22 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 	}
 
 	shaman.Stormstrike = shaman.RegisterSpell(core.SpellConfig{
-		Template: ss,
+		ActionID:    StormstrikeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true,
+			Cooldown:    time.Second * 10,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),

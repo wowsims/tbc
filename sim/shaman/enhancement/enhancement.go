@@ -108,7 +108,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				ss := enh.Stormstrike
 				success := ss.Cast(sim, sim.GetPrimaryTarget())
 				if !success {
-					enh.WaitForMana(sim, ss.MostRecentCost)
+					enh.WaitForMana(sim, ss.CurCast.Cost)
 				}
 				return success
 			},
@@ -137,7 +137,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 
 			success := shock.Cast(sim, sim.GetPrimaryTarget())
 			if !success {
-				enh.WaitForMana(sim, shock.MostRecentCost)
+				enh.WaitForMana(sim, shock.CurCast.Cost)
 			}
 			return success
 		},
@@ -210,7 +210,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 	scheduleSpellTotem := func(duration time.Duration, spell *core.Spell) {
 		scheduleTotem(duration, false, false, func(sim *core.Simulation) (bool, float64) {
 			success := spell.Cast(sim, sim.GetPrimaryTarget())
-			return success, spell.MostRecentCost
+			return success, spell.CurCast.Cost
 		})
 	}
 	schedule2MTotem := func(castFactory func(sim *core.Simulation) *core.SimpleCast) {
@@ -232,7 +232,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.MagmaTotem
 				success := cast.Cast(sim, nil)
 				if !success {
-					enh.WaitForMana(sim, cast.MostRecentCost)
+					enh.WaitForMana(sim, cast.CurCast.Cost)
 				}
 			}
 		case proto.FireTotem_SearingTotem:
@@ -244,7 +244,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.SearingTotem
 				success := cast.Cast(sim, sim.GetPrimaryTarget())
 				if !success {
-					enh.WaitForMana(sim, cast.MostRecentCost)
+					enh.WaitForMana(sim, cast.CurCast.Cost)
 				}
 			}
 		case proto.FireTotem_TotemOfWrath:
@@ -272,7 +272,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.FireNovaTotem
 				success := cast.Cast(sim, nil)
 				if !success {
-					enh.WaitForMana(sim, cast.MostRecentCost)
+					enh.WaitForMana(sim, cast.CurCast.Cost)
 				}
 				return success
 			},

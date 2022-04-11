@@ -16,16 +16,7 @@ func (shaman *Shaman) newWindfuryImbueSpell(isMH bool) *core.Spell {
 		apBonus += 80
 	}
 
-	wftempl := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: 25505},
-				Character:   &shaman.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
+	actionID := core.ActionID{SpellID: 25505}
 
 	baseEffect := core.SpellEffect{
 		BonusAttackPower: apBonus,
@@ -37,11 +28,11 @@ func (shaman *Shaman) newWindfuryImbueSpell(isMH bool) *core.Spell {
 
 	weaponDamageMultiplier := 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
 	if isMH {
-		wftempl.ActionID.Tag = 1
+		actionID.Tag = 1
 		baseEffect.ProcMask = core.ProcMaskMeleeMHSpecial
 		baseEffect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, weaponDamageMultiplier, true)
 	} else {
-		wftempl.ActionID.Tag = 2
+		actionID.Tag = 2
 		baseEffect.ProcMask = core.ProcMaskMeleeOHSpecial
 		baseEffect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.OffHand, false, 0, weaponDamageMultiplier, true)
 
@@ -56,7 +47,10 @@ func (shaman *Shaman) newWindfuryImbueSpell(isMH bool) *core.Spell {
 	}
 
 	return shaman.RegisterSpell(core.SpellConfig{
-		Template:     wftempl,
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
 		ApplyEffects: core.ApplyEffectFuncDamageMultipleTargeted(effects),
 	})
 }
@@ -109,16 +103,6 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 }
 
 func (shaman *Shaman) newFlametongueImbueSpell(isMH bool) *core.Spell {
-	ftTmpl := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: 25489},
-				Character:   &shaman.Character,
-				SpellSchool: core.SpellSchoolFire,
-			},
-		},
-	}
-
 	effect := core.SpellEffect{
 		IsPhantom:        true,
 		DamageMultiplier: 1 + 0.05*float64(shaman.Talents.ElementalWeapons),
@@ -139,7 +123,8 @@ func (shaman *Shaman) newFlametongueImbueSpell(isMH bool) *core.Spell {
 	}
 
 	return shaman.RegisterSpell(core.SpellConfig{
-		Template:     ftTmpl,
+		ActionID:     core.ActionID{SpellID: 25489},
+		SpellSchool:  core.SpellSchoolFire,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
@@ -176,27 +161,18 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 }
 
 func (shaman *Shaman) newFrostbrandImbueSpell(isMH bool) *core.Spell {
-	fbTmpl := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: 25500},
-				Character:   &shaman.Character,
-				SpellSchool: core.SpellSchoolFrost,
-			},
-		},
-	}
-
-	effect := core.SpellEffect{
-		IsPhantom:        true,
-		DamageMultiplier: 1 + 0.05*float64(shaman.Talents.ElementalWeapons),
-		ThreatMultiplier: 1,
-		BaseDamage:       core.BaseDamageConfigMagic(246, 246, 0.1),
-		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(shaman.DefaultSpellCritMultiplier()),
-	}
-
 	return shaman.RegisterSpell(core.SpellConfig{
-		Template:     fbTmpl,
-		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+		ActionID:    core.ActionID{SpellID: 25500},
+		SpellSchool: core.SpellSchoolFrost,
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			IsPhantom:        true,
+			DamageMultiplier: 1 + 0.05*float64(shaman.Talents.ElementalWeapons),
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigMagic(246, 246, 0.1),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(shaman.DefaultSpellCritMultiplier()),
+		}),
 	})
 }
 
