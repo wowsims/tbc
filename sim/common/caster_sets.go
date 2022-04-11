@@ -36,6 +36,12 @@ var ItemSetManaEtched = core.ItemSet{
 						}
 						procAura.Activate(sim)
 					},
+					OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+						if sim.RandomFloat("Mana-Etched Insight") > 0.02 {
+							return
+						}
+						procAura.Activate(sim)
+					},
 				})
 			})
 		},
@@ -62,6 +68,12 @@ var ItemSetSpellstrike = core.ItemSet{
 				return character.GetOrRegisterAura(&core.Aura{
 					Label: "Spellstrike",
 					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+						if sim.RandomFloat("spellstrike") > 0.05 {
+							return
+						}
+						procAura.Activate(sim)
+					},
+					OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 						if sim.RandomFloat("spellstrike") > 0.05 {
 							return
 						}
