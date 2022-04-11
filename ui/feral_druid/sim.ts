@@ -78,7 +78,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 
 			defaults: {
 				// Default equipped gear.
-				gear: Presets.P3_PRESET.gear,
+				gear: Presets.P4_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
 					[Stat.StatStrength]: 2.266,
@@ -100,7 +100,8 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 				specOptions: FeralDruidOptions.create({
 					innervateTarget: RaidTarget.create({
 						targetIndex: NO_TARGET, // In an individual sim the 0-indexed player is ourself.
-					}),
+	  				}),
+					latencyMs: 100,
 				}),
 				// Default raid/party buffs settings.
 				raidBuffs: RaidBuffs.create({
@@ -116,6 +117,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 	  				strengthOfEarthTotem: StrengthOfEarthType.EnhancingTotems,
 					battleShout: TristateEffect.TristateEffectImproved,
 	  				snapshotBsSolarianSapphire: true,
+					sanctityAura: TristateEffect.TristateEffectImproved,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
@@ -148,8 +150,11 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 			],
 			partyBuffInputs: [
 				IconInputs.DrumsOfBattleBuff,
-				IconInputs.Bloodlust,
+	  			IconInputs.Bloodlust,
+				IconInputs.StrengthOfEarthTotem,
+	  			IconInputs.GraceOfAirTotem,
 	  			IconInputs.ManaSpringTotem,
+				IconInputs.BattleShout,
 				IconInputs.BraidedEterniumChain,
 	  			IconInputs.DraeneiRacialMelee,
 	  			IconInputs.FerociousInspiration,
@@ -214,8 +219,12 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
-					OtherInputs.StartingPotion,
+	  				DruidInputs.LatencyMs,
+	  				OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
+					OtherInputs.ExposeWeaknessUptime,
+					OtherInputs.ExposeWeaknessHunterAgility,
+					OtherInputs.SnapshotBsSolarianSapphire,
 				],
 			},
 			encounterPicker: {
@@ -238,7 +247,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
-					Presets.P3_PRESET,
+					Presets.P4_PRESET,
 				],
 			},
 		});

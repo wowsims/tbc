@@ -4,6 +4,7 @@ import { Food } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
+import { Conjured } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
@@ -31,10 +32,10 @@ export const DefaultRotation = FeralDruidRotation.create({
 	mangleTrick: true,
 	biteweave: true,
 	mangleBot: false,
-	ripCp: 4,
-	biteCp: 4,
+	ripCp: 5,
+	biteCp: 5,
 	rakeTrick: false,
-	biteTrick: false,
+	ripweave: false,
 });
 
 export const DefaultOptions = FeralDruidOptions.create({
@@ -44,11 +45,14 @@ export const DefaultConsumes = Consumes.create({
 	battleElixir: BattleElixir.ElixirOfMajorAgility,
 	food: Food.FoodGrilledMudfish,
 	mainHandImbue: WeaponImbue.WeaponImbueAdamantiteWeightstone,
-	defaultPotion: Potions.SuperManaPotion,
+	defaultPotion: Potions.HastePotion,
+	defaultConjured: Conjured.ConjuredDarkRune,
+	scrollOfAgility: 5,
+	scrollOfStrength: 5,
 });
 
-export const P3_PRESET = {
-	name: 'P3 Preset',
+export const P4_PRESET = {
+	name: 'P4 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	gear: EquipmentSpec.create({
 		items: [
@@ -121,14 +125,14 @@ export const P3_PRESET = {
 				enchant: Enchants.RING_STATS,
 			}),
 			ItemSpec.create({
-				id: 32335, // Unstoppable Aggressor's Ring
+				id: 33496, // Signet of Primal Wrath
 				enchant: Enchants.RING_STATS,
 			}),
 			ItemSpec.create({
 				id: 30627, // Tsunami Talisman
 			}),
 			ItemSpec.create({
-				id: 29383, // Bloodlust Brooch
+				id: 33831, // Berserker's Call
 			}),
 			ItemSpec.create({
 				id: 33716, // Vengeful Gladiator's Staff

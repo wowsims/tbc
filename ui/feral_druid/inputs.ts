@@ -49,6 +49,25 @@ export const SelfInnervate = {
 		player.setSpecOptions(eventID, newOptions);
 	},
 };
+		
+export const LatencyMs = {
+	type: 'number' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'latency-ms-picker',
+		],
+		label: 'Latency',
+		labelTooltip: 'Player latency, in milliseconds. Adds a delay to actions that cannot be spell queued.',
+		changedEvent: (player: Player<Spec.SpecFeralDruid>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecFeralDruid>) => player.getSpecOptions().latencyMs,
+		setValue: (eventID: EventID, player: Player<Spec.SpecFeralDruid>, newValue: number) => {
+			const newOptions = player.getSpecOptions();
+			newOptions.latencyMs = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+	},
+};
 
 export const FeralDruidRotationConfig = {
 	inputs: [
@@ -101,6 +120,25 @@ export const FeralDruidRotationConfig = {
 			},
 		},
 		{
+			type: 'boolean' as const,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				extraCssClasses: [
+					'ripweave-picker',
+				],
+				label: 'Enable Rip-weaving',
+				labelTooltip: 'Spend Combo Points on Rip when at 52 Energy or above.',
+				changedEvent: (player: Player<Spec.SpecFeralDruid>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecFeralDruid>) => player.getRotation().ripweave,
+				setValue: (eventID: EventID, player: Player<Spec.SpecFeralDruid>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.ripweave = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+				enableWhen: (player: Player<Spec.SpecFeralDruid>) => player.getRotation().finishingMove == FinishingMove.Bite,
+			},
+		},
+		{
 			type: 'enum' as const,
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
@@ -124,7 +162,7 @@ export const FeralDruidRotationConfig = {
 					newRotation.ripCp = newValue;
 					player.setRotation(eventID, newRotation);
 				},
-				enableWhen: (player: Player<Spec.SpecFeralDruid>) => player.getRotation().finishingMove == FinishingMove.Rip,
+				enableWhen: (player: Player<Spec.SpecFeralDruid>) => (player.getRotation().finishingMove == FinishingMove.Rip) || (player.getRotation().ripweave && (player.getRotation().finishingMove != FinishingMove.None)),
 			},
 		},
 		{
@@ -151,7 +189,7 @@ export const FeralDruidRotationConfig = {
 					newRotation.biteCp = newValue;
 					player.setRotation(eventID, newRotation);
 				},
-				enableWhen: (player: Player<Spec.SpecFeralDruid>) => (player.getRotation().finishingMove == FinishingMove.Bite) || player.getRotation().biteweave,
+				enableWhen: (player: Player<Spec.SpecFeralDruid>) => (player.getRotation().finishingMove == FinishingMove.Bite) || (player.getRotation().biteweave && (player.getRotation().finishingMove != FinishingMove.None)),
 			},
 		},
 		{
@@ -162,7 +200,7 @@ export const FeralDruidRotationConfig = {
 					'mangle-trick-picker',
 				],
 				label: 'Use Mangle trick',
-				labelTooltip: 'Cast Mangle rather than Shred when between 50-56 Energy with 2pT6, or 60-61 Energy without 2pT6, with less than 1 second remaining until the next Energy tick.',
+				labelTooltip: 'Cast Mangle rather than Shred when between 50-56 Energy with 2pT6, or 60-61 Energy without 2pT6, and with less than 1 second remaining until the next Energy tick.',
 				changedEvent: (player: Player<Spec.SpecFeralDruid>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecFeralDruid>) => player.getRotation().mangleTrick,
 				setValue: (eventID: EventID, player: Player<Spec.SpecFeralDruid>, newValue: boolean) => {
@@ -179,9 +217,9 @@ export const FeralDruidRotationConfig = {
 				extraCssClasses: [
 					'rake-trick-picker',
 				],
-				label: 'Use Rake trick',
-				labelTooltip: 'Cast Rake rather than powershifting when between 35-39 Energy without 2pT6, and with more than 1 second remaining until the next Energy tick.',
-				changedEvent: (player: Player<Spec.SpecFeralDruid>) => player.rotationChangeEmitter,
+				label: 'Use Rake/Bite tricks',
+				labelTooltip: 'Cast Rake or Ferocious Bite rather than powershifting when between 35-39 Energy without 2pT6, and with more than 1 second remaining until the next Energy tick.',
+				changedEvent: (player: Player<Spec.SpecFeralDruid>) => player.changeEmitter,
 				getValue: (player: Player<Spec.SpecFeralDruid>) => player.getRotation().rakeTrick,
 				setValue: (eventID: EventID, player: Player<Spec.SpecFeralDruid>, newValue: boolean) => {
 					const newRotation = player.getRotation();

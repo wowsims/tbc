@@ -94,13 +94,14 @@ message FeralDruid {
     int32 rip_cp = 5;
     int32 bite_cp = 6;
     bool rake_trick = 7;
-    bool bite_trick = 8;
+    bool ripweave = 8;
   }
   Rotation rotation = 1;
   DruidTalents talents = 2;
 
   message Options {
     RaidTarget innervate_target = 1;
+    int32 latency_ms = 2;
   }
   Options options = 3;
 }
