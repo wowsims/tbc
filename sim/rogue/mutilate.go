@@ -1,8 +1,11 @@
 package rogue
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var MutilateActionID = core.ActionID{SpellID: 34413}
@@ -11,18 +14,9 @@ var MutilateOHActionID = core.ActionID{SpellID: 34418}
 var MutilateEnergyCost = 60.0
 
 func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    MutilateMHActionID,
-				Character:   &rogue.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
+	actionID := MutilateMHActionID
 	if !isMH {
-		ability.ActionID = MutilateOHActionID
+		actionID = MutilateOHActionID
 	}
 
 	effect := core.SpellEffect{
@@ -38,7 +32,7 @@ func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
 		OutcomeApplier: core.OutcomeFuncMeleeSpecialCritOnly(rogue.critMultiplier(isMH, true)),
 
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			rogue.AddComboPoints(sim, 1, ability.ActionID)
+			rogue.AddComboPoints(sim, 1, actionID)
 		},
 	}
 	if !isMH {
@@ -58,7 +52,10 @@ func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
 	})
 
 	return rogue.RegisterSpell(core.SpellConfig{
-		Template:     ability,
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
@@ -68,10 +65,23 @@ func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
 	ohHitSpell := rogue.newMutilateHitSpell(false)
 
 	refundAmount := MutilateEnergyCost * 0.8
-	ability := rogue.newAbility(MutilateActionID, MutilateEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
 
 	rogue.Mutilate = rogue.RegisterSpell(core.SpellConfig{
-		Template: ability,
+		ActionID:    MutilateActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder,
+
+		ResourceType: stats.Energy,
+		BaseCost:     MutilateEnergyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: MutilateEnergyCost,
+				GCD:  time.Second,
+			},
+			IgnoreHaste: true,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			ThreatMultiplier: 1,

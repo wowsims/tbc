@@ -1,8 +1,11 @@
 package rogue
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var ShivActionID = core.ActionID{SpellID: 5938}
@@ -13,10 +16,22 @@ func (rogue *Rogue) registerShivSpell(_ *core.Simulation) {
 		rogue.shivEnergyCost = 20 + 10*rogue.GetOHWeapon().SwingSpeed
 	}
 
-	ability := rogue.newAbility(ShivActionID, rogue.shivEnergyCost, SpellFlagBuilder|core.SpellExtrasCannotBeDodged, core.ProcMaskMeleeOHSpecial)
-
 	rogue.Shiv = rogue.RegisterSpell(core.SpellConfig{
-		Template: ability,
+		ActionID:    ShivActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder | core.SpellExtrasCannotBeDodged,
+
+		ResourceType: stats.Energy,
+		BaseCost:     rogue.shivEnergyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: rogue.shivEnergyCost,
+				GCD:  time.Second,
+			},
+			IgnoreHaste: true,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeOHSpecial,
 			DamageMultiplier: 1 + core.TernaryFloat64(rogue.Talents.SurpriseAttacks, 0.1, 0),

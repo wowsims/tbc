@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var RuptureActionID = core.ActionID{SpellID: 26867}
@@ -12,17 +13,24 @@ var RuptureEnergyCost = 25.0
 
 func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
-	ability := rogue.newAbility(RuptureActionID, RuptureEnergyCost, SpellFlagFinisher|core.SpellExtrasIgnoreResists, core.ProcMaskMeleeMHSpecial)
 
 	rogue.Rupture = rogue.RegisterSpell(core.SpellConfig{
-		Template: ability,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.ActionID.Tag = rogue.ComboPoints()
-			if rogue.deathmantle4pcProc {
-				instance.Cost.Value = 0
-				rogue.deathmantle4pcProc = false
-			}
+		ActionID:    RuptureActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasIgnoreResists | rogue.finisherFlags(),
+
+		ResourceType: stats.Energy,
+		BaseCost:     RuptureEnergyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: RuptureEnergyCost,
+				GCD:  time.Second,
+			},
+			ModifyCast:  rogue.applyDeathmantle,
+			IgnoreHaste: true,
 		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier: 1,
@@ -36,7 +44,7 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 					rogue.ApplyFinisher(sim, spell.ActionID)
 				} else {
 					if refundAmount > 0 {
-						rogue.AddEnergy(sim, spell.MostRecentCost*refundAmount, core.ActionID{SpellID: 31245})
+						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, core.ActionID{SpellID: 31245})
 					}
 				}
 			},

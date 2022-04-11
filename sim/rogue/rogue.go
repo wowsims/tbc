@@ -100,31 +100,12 @@ func (rogue *Rogue) Finalize(raid *core.Raid) {
 	rogue.applyPoisons()
 }
 
-func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras core.SpellExtras, procMask core.ProcMask) core.SimpleSpell {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    actionID,
-				Character:   &rogue.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         time.Second,
-				IgnoreHaste: true,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: cost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: cost,
-				},
-				SpellExtras: core.SpellExtrasMeleeMetrics | spellExtras,
-			},
-		},
+func (rogue *Rogue) finisherFlags() core.SpellExtras {
+	flags := SpellFlagFinisher
+	if rogue.Talents.SurpriseAttacks {
+		flags |= core.SpellExtrasCannotBeDodged
 	}
-	if rogue.Talents.SurpriseAttacks && spellExtras.Matches(SpellFlagFinisher) {
-		spell.SpellExtras |= core.SpellExtrasCannotBeDodged
-	}
-	return spell
+	return flags
 }
 
 func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) {

@@ -1,7 +1,10 @@
 package rogue
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var EnvenomActionID = core.ActionID{SpellID: 32684}
@@ -11,10 +14,7 @@ func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 	if ItemSetAssassination.CharacterHasSetBonus(&rogue.Character, 4) {
 		rogue.envenomEnergyCost -= 10
 	}
-
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
-	ability := rogue.newAbility(EnvenomActionID, rogue.envenomEnergyCost, SpellFlagFinisher|core.SpellExtrasIgnoreResists, core.ProcMaskMeleeMHSpecial)
-	ability.SpellCast.SpellSchool = core.SpellSchoolNature
 
 	basePerComboPoint := 180.0
 	if ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2) {
@@ -22,14 +22,22 @@ func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 	}
 
 	rogue.Envenom = rogue.RegisterSpell(core.SpellConfig{
-		Template: ability,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.ActionID.Tag = rogue.ComboPoints()
-			if rogue.deathmantle4pcProc {
-				instance.Cost.Value = 0
-				rogue.deathmantle4pcProc = false
-			}
+		ActionID:    EnvenomActionID,
+		SpellSchool: core.SpellSchoolNature,
+		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasIgnoreResists | rogue.finisherFlags(),
+
+		ResourceType: stats.Energy,
+		BaseCost:     rogue.envenomEnergyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: rogue.envenomEnergyCost,
+				GCD:  time.Second,
+			},
+			ModifyCast:  rogue.applyDeathmantle,
+			IgnoreHaste: true,
 		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier: 1 + 0.04*float64(rogue.Talents.VilePoisons),
@@ -48,7 +56,7 @@ func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 					rogue.ApplyFinisher(sim, spell.ActionID)
 				} else {
 					if refundAmount > 0 {
-						rogue.AddEnergy(sim, spell.MostRecentCost*refundAmount, core.ActionID{SpellID: 31245})
+						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, core.ActionID{SpellID: 31245})
 					}
 				}
 			},

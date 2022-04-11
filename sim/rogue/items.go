@@ -86,6 +86,14 @@ var ItemSetDeathmantle = core.ItemSet{
 	},
 }
 
+func (rogue *Rogue) applyDeathmantle(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+	//instance.ActionID.Tag = rogue.ComboPoints()
+	if rogue.deathmantle4pcProc {
+		cast.Cost = 0
+		rogue.deathmantle4pcProc = false
+	}
+}
+
 var ItemSetSlayers = core.ItemSet{
 	Name: "Slayer's Armor",
 	Bonuses: map[int32]core.ApplyEffect{
@@ -157,6 +165,21 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 				numPoints = rogue.ComboPoints()
 
 				if cast.SameActionIgnoreTag(SliceAndDiceActionID) {
+					// SND won't call OnSpellHit so we have to add the effect now.
+					if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
+						procAura.Activate(sim)
+					}
+				}
+			},
+			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				if !spell.SpellExtras.Matches(SpellFlagFinisher) {
+					return
+				}
+
+				// Need to store the points because they get spent before OnSpellHit is called.
+				numPoints = rogue.ComboPoints()
+
+				if spell.SameActionIgnoreTag(SliceAndDiceActionID) {
 					// SND won't call OnSpellHit so we have to add the effect now.
 					if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
 						procAura.Activate(sim)
