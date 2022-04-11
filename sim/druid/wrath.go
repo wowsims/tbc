@@ -35,7 +35,7 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 				CastTime: time.Second*2 - (time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)),
 			},
 
-			ModifyCast: func(sim *core.Simulation, cast *core.NewCast) {
+			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
 				druid.applyNaturesGrace(cast)
 				druid.applyNaturesSwiftness(cast)
 			},

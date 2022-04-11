@@ -291,7 +291,7 @@ type CastConfig struct {
 	DefaultCast NewCast
 
 	// Dynamic modifications for each cast.
-	ModifyCast func(*Simulation, *NewCast)
+	ModifyCast func(*Simulation, *Spell, *NewCast)
 
 	// Ignores haste when calculating the GCD and cast time for this cast.
 	IgnoreHaste bool
@@ -360,7 +360,7 @@ func (spell *Spell) wrapCastFuncInit(config CastConfig, onCastComplete CastSucce
 		modifyCast := config.ModifyCast
 		return func(sim *Simulation, target *Target) bool {
 			spell.CurCast = spell.DefaultCast
-			modifyCast(sim, &spell.CurCast)
+			modifyCast(sim, spell, &spell.CurCast)
 			return onCastComplete(sim, target)
 		}
 	}

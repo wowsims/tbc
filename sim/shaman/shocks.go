@@ -20,49 +20,18 @@ func (shaman *Shaman) ShockCD() time.Duration {
 }
 
 // Shared logic for all shocks.
-func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, spellSchool core.SpellSchool, baseManaCost float64) (core.SpellConfig, core.SpellEffect) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: baseManaCost}
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID:    spellID,
-					CooldownID: ShockCooldownID,
-				},
-				Character:   &shaman.Character,
-				SpellSchool: spellSchool,
-				BaseCost:    cost,
-				Cost:        cost,
-				GCD:         core.GCDDefault,
-				Cooldown:    shaman.ShockCD(),
-				SpellExtras: SpellFlagShock,
-			},
-		},
-	}
+func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, spellSchool core.SpellSchool, baseCost float64) (core.SpellConfig, core.SpellEffect) {
+	actionID := core.ActionID{SpellID: spellID, CooldownID: ShockCooldownID}
 
-	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.Convection) * 0.02
-	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
-	// TODO: confirm this is how it reduces mana cost.
-	if ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 2) {
-		spell.Cost.Value -= spell.BaseCost.Value * 0.1
-	}
-
-	effect := core.SpellEffect{
-		BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
-		BonusSpellPower: 0 +
-			core.TernaryFloat64(shaman.Equip[items.ItemSlotRanged].ID == TotemOfRage, 30, 0) +
-			core.TernaryFloat64(shaman.Equip[items.ItemSlotRanged].ID == TotemOfImpact, 46, 0),
-		DamageMultiplier: 1 * (1 + 0.01*float64(shaman.Talents.Concussion)),
-		ThreatMultiplier: 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision),
-	}
-
+	var onCastComplete func(*core.Simulation, *core.Spell)
+	var onSpellHit func(*core.Simulation, *core.Spell, *core.SpellEffect)
 	if shaman.Talents.ElementalFocus {
-		spell.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		onCastComplete = func(*core.Simulation, *core.Spell) {
 			if shaman.ElementalFocusStacks > 0 {
 				shaman.ElementalFocusStacks--
 			}
 		}
-		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		onSpellHit = func(_ *core.Simulation, _ *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				shaman.ElementalFocusStacks = 2
 			}
@@ -70,26 +39,50 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 	}
 
 	return core.SpellConfig{
-		Template: spell,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			spell := &instance.SpellCast
-			if shaman.ElementalFocusStacks > 0 {
-				// Reduces mana cost by 40%
-				spell.Cost.Value -= spell.BaseCost.Value * 0.4
-			}
-			if shaman.ShamanisticFocusAura != nil && shaman.ShamanisticFocusAura.IsActive() {
-				spell.Cost.Value -= spell.BaseCost.Value * 0.6
-			}
-			if shaman.ElementalMasteryAura != nil && shaman.ElementalMasteryAura.IsActive() {
-				spell.Cost.Value = 0
-			}
-		},
-	}, effect
+			ActionID:    actionID,
+			SpellSchool: spellSchool,
+			SpellExtras: SpellFlagShock,
+
+			ResourceType: stats.Mana,
+			BaseCost:     baseCost,
+
+			Cast: core.CastConfig{
+				DefaultCast: core.NewCast{
+					Cost: baseCost -
+						baseCost*float64(shaman.Talents.Convection)*0.02 -
+						baseCost*float64(shaman.Talents.MentalQuickness)*0.02 -
+						core.TernaryFloat64(ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 2), baseCost*0.1, 0),
+					GCD: core.GCDDefault,
+				},
+				ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+					if shaman.ElementalFocusStacks > 0 {
+						// Reduces mana cost by 40%
+						cast.Cost -= baseCost * 0.4
+					}
+					if shaman.ShamanisticFocusAura != nil && shaman.ShamanisticFocusAura.IsActive() {
+						cast.Cost -= baseCost * 0.6
+					}
+					if shaman.ElementalMasteryAura != nil && shaman.ElementalMasteryAura.IsActive() {
+						cast.Cost = 0
+					}
+				},
+				Cooldown:       shaman.ShockCD(),
+				OnCastComplete: onCastComplete,
+			},
+		}, core.SpellEffect{
+			BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
+			BonusSpellPower: 0 +
+				core.TernaryFloat64(shaman.Equip[items.ItemSlotRanged].ID == TotemOfRage, 30, 0) +
+				core.TernaryFloat64(shaman.Equip[items.ItemSlotRanged].ID == TotemOfImpact, 46, 0),
+			DamageMultiplier: 1 * (1 + 0.01*float64(shaman.Talents.Concussion)),
+			ThreatMultiplier: 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision),
+			OnSpellHit:       onSpellHit,
+		}
 }
 
 func (shaman *Shaman) registerEarthShockSpell(sim *core.Simulation) {
 	config, effect := shaman.newShockSpellConfig(sim, SpellIDEarthShock, core.SpellSchoolNature, 535.0)
-	config.Template.SpellExtras |= core.SpellExtrasBinary
+	config.SpellExtras |= core.SpellExtrasBinary
 
 	effect.BaseDamage = core.BaseDamageConfigMagic(661, 696, 0.386)
 	effect.OutcomeApplier = core.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
@@ -143,7 +136,7 @@ func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation) {
 
 func (shaman *Shaman) registerFrostShockSpell(sim *core.Simulation) {
 	config, effect := shaman.newShockSpellConfig(sim, SpellIDFrostShock, core.SpellSchoolFrost, 525.0)
-	config.Template.SpellExtras |= core.SpellExtrasBinary
+	config.SpellExtras |= core.SpellExtrasBinary
 
 	effect.ThreatMultiplier *= 2
 	effect.BaseDamage = core.BaseDamageConfigMagic(647, 683, 0.386)

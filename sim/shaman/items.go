@@ -71,6 +71,9 @@ var ItemSetCycloneRegalia = core.ItemSet{
 				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 					aura.Deactivate(sim)
 				},
+				OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+					aura.Deactivate(sim)
+				},
 			})
 
 			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
@@ -210,20 +213,47 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				character.AddMana(sim, 335, core.ActionID{ItemID: 30663}, false)
 			},
+			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				if icd.IsOnCD(sim) {
+					return
+				}
+				if spell.SpellSchool != core.SpellSchoolNature {
+					return
+				}
+				if sim.RandomFloat("Fathom-Brooch of the Tidewalker") > 0.15 {
+					return
+				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				character.AddMana(sim, 335, core.ActionID{ItemID: 30663}, false)
+			},
 		})
 	})
 }
 
 func ApplyAshtongueTalismanOfVision(agent core.Agent) {
-	character := agent.GetCharacter()
+	shamanAgent, ok := agent.(ShamanAgent)
+	if !ok {
+		log.Fatalf("Non-shaman attempted to activate Ashtongue Talisman of Vision.")
+	}
+	shaman := shamanAgent.GetShaman()
 
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Ashtongue Talisman of Vision Proc", core.ActionID{ItemID: 32491}, stats.Stats{stats.AttackPower: 275}, time.Second*10)
-		return character.GetOrRegisterAura(&core.Aura{
+	shaman.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := shaman.NewTemporaryStatsAura("Ashtongue Talisman of Vision Proc", core.ActionID{ItemID: 32491}, stats.Stats{stats.AttackPower: 275}, time.Second*10)
+		return shaman.GetOrRegisterAura(&core.Aura{
 			Label: "Ashtongue Talisman of Vision",
 			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				// Cooldown != 0 makes sure this is the first 'fake' hit of SS.
 				if !cast.SameAction(StormstrikeActionID) || cast.Cooldown == 0 {
+					return
+				}
+				if sim.RandomFloat("Ashtongue Talisman of Vision") > 0.5 {
+					return
+				}
+				procAura.Activate(sim)
+			},
+			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				// Note that shaman.Stormstrike is the first 'fake' SS hit.
+				if spell != shaman.Stormstrike {
 					return
 				}
 				if sim.RandomFloat("Ashtongue Talisman of Vision") > 0.5 {
@@ -244,6 +274,11 @@ func ApplySkycallTotem(agent core.Agent) {
 			Label: "Skycall Totem",
 			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				if cast.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("Skycall Totem") < 0.15 {
+					procAura.Activate(sim)
+				}
+			},
+			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				if spell.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("Skycall Totem") < 0.15 {
 					procAura.Activate(sim)
 				}
 			},

@@ -193,6 +193,16 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 			shaman.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
 			shaman.UpdateMajorCooldowns()
 		},
+		OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			if spell != shaman.LightningBolt {
+				return
+			}
+
+			// Remove the buff and put skill on CD
+			aura.Deactivate(sim)
+			shaman.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
+			shaman.UpdateMajorCooldowns()
+		},
 	})
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
@@ -288,6 +298,11 @@ func (shaman *Shaman) applyShamanisticFocus() {
 		Duration: core.NeverExpires,
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 			if cast.SpellExtras.Matches(SpellFlagShock) {
+				aura.Deactivate(sim)
+			}
+		},
+		OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			if spell.SpellExtras.Matches(SpellFlagShock) {
 				aura.Deactivate(sim)
 			}
 		},

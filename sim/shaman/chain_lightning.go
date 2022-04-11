@@ -11,18 +11,18 @@ const SpellIDCL6 int32 = 25442
 var ChainLightningCooldownID = core.NewCooldownID()
 
 func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOverload bool) *core.Spell {
-	spellTemplate := core.SimpleSpell{
-		SpellCast: shaman.newElectricSpellCast(
-			core.ActionID{
-				SpellID:    SpellIDCL6,
-				CooldownID: ChainLightningCooldownID,
-			},
-			760.0,
-			time.Millisecond*2000,
-			isLightningOverload),
-	}
+	spellConfig := shaman.newElectricSpellConfig(
+		core.ActionID{SpellID: SpellIDCL6, CooldownID: ChainLightningCooldownID},
+		760.0,
+		time.Millisecond*2000,
+		isLightningOverload)
+
 	if !isLightningOverload {
-		spellTemplate.Cooldown = time.Second * 6
+		spellConfig.Cast.Cooldown = time.Second * 6
+	}
+
+	spellConfig.Cast.ModifyCast = func(_ *core.Simulation, spell *core.Spell, cast *core.NewCast) {
+		shaman.applyElectricSpellCastInitModifiers(spell, cast)
 	}
 
 	effect := shaman.newElectricSpellEffect(734, 838, 0.651, isLightningOverload)
@@ -76,11 +76,6 @@ func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOv
 		effects = append(effects, bounceEffect)
 	}
 
-	return shaman.RegisterSpell(core.SpellConfig{
-		Template: spellTemplate,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			shaman.applyElectricSpellCastInitModifiers(&instance.SpellCast)
-		},
-		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
-	})
+	spellConfig.ApplyEffects = core.ApplyEffectFuncDamageMultiple(effects)
+	return shaman.RegisterSpell(spellConfig)
 }

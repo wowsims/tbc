@@ -13,25 +13,25 @@ const SpellIDSearingTotem int32 = 25533
 var SearingTotemActionID = core.ActionID{SpellID: SpellIDSearingTotem}
 
 func (shaman *Shaman) registerSearingTotemSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 205}
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    SearingTotemActionID,
-				Character:   &shaman.Character,
-				SpellSchool: core.SpellSchoolFire,
-				BaseCost:    cost,
-				Cost:        cost,
-				GCD:         time.Second,
-				SpellExtras: SpellFlagTotem,
-			},
-		},
-	}
-	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.TotemicFocus) * 0.05
-	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
+	baseCost := 205.0
 
 	shaman.SearingTotem = shaman.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    SearingTotemActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagTotem,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost -
+					baseCost*float64(shaman.Talents.TotemicFocus)*0.05 -
+					baseCost*float64(shaman.Talents.MentalQuickness)*0.02,
+				GCD: time.Second,
+			},
+		},
+
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			shaman.SearingTotemDot.Apply(sim)
 			// +1 needed because of rounding issues with Searing totem tick time.
@@ -69,26 +69,26 @@ const SpellIDMagmaTotem int32 = 25552
 var MagmaTotemActionID = core.ActionID{SpellID: SpellIDMagmaTotem}
 
 func (shaman *Shaman) registerMagmaTotemSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 800}
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    MagmaTotemActionID,
-				Character:   &shaman.Character,
-				SpellSchool: core.SpellSchoolFire,
-				BaseCost:    cost,
-				Cost:        cost,
-				GCD:         time.Second,
-				SpellExtras: SpellFlagTotem,
-			},
-		},
-		AOECap: 1600,
-	}
-	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.TotemicFocus) * 0.05
-	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
+	//AOECap: 1600,
+	baseCost := 800.0
 
 	shaman.MagmaTotem = shaman.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    MagmaTotemActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagTotem,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost -
+					baseCost*float64(shaman.Talents.TotemicFocus)*0.05 -
+					baseCost*float64(shaman.Talents.MentalQuickness)*0.02,
+				GCD: time.Second,
+			},
+		},
+
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			shaman.MagmaTotemDot.Apply(sim)
 			shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*20 + 1
@@ -127,28 +127,28 @@ func (shaman *Shaman) FireNovaTickLength() time.Duration {
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
 func (shaman *Shaman) registerNovaTotemSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 765}
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    FireNovaTotemActionID,
-				Character:   &shaman.Character,
-				SpellSchool: core.SpellSchoolFire,
-				BaseCost:    cost,
-				Cost:        cost,
-				GCD:         time.Second,
-				Cooldown:    time.Second * 15,
-				SpellExtras: SpellFlagTotem,
-			},
-		},
-		AOECap: 9975,
-	}
-	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.TotemicFocus) * 0.05
-	spell.Cost.Value -= spell.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
+	//AOECap: 9975,
+	baseCost := 765.0
 
 	tickLength := shaman.FireNovaTickLength()
 	shaman.FireNovaTotem = shaman.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    FireNovaTotemActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagTotem,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost -
+					baseCost*float64(shaman.Talents.TotemicFocus)*0.05 -
+					baseCost*float64(shaman.Talents.MentalQuickness)*0.02,
+				GCD: time.Second,
+			},
+			Cooldown: time.Second * 15,
+		},
+
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			shaman.FireNovaTotemDot.Apply(sim)
 			shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + tickLength + 1
