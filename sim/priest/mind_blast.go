@@ -13,31 +13,24 @@ var MBCooldownID = core.NewCooldownID()
 var MindBlastActionID = core.ActionID{SpellID: SpellIDMindBlast, CooldownID: MBCooldownID}
 
 func (priest *Priest) registerMindBlastSpell(sim *core.Simulation) {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    MindBlastActionID,
-				Character:   &priest.Character,
-				SpellSchool: core.SpellSchoolShadow,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 450,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 450,
-				},
-				CastTime: time.Millisecond * 1500,
-				GCD:      core.GCDDefault,
-				Cooldown: time.Second * 8,
-			},
-		},
-	}
-	template.Cooldown -= time.Millisecond * 500 * time.Duration(priest.Talents.ImprovedMindBlast)
-	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.FocusedMind) * 0.05
+	baseCost := 450.0
 
 	priest.MindBlast = priest.RegisterSpell(core.SpellConfig{
-		Template: template,
+		ActionID:    MindBlastActionID,
+		SpellSchool: core.SpellSchoolShadow,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost:     baseCost * (1 - 0.05*float64(priest.Talents.FocusedMind)),
+				GCD:      core.GCDDefault,
+				CastTime: time.Millisecond * 1500,
+			},
+			Cooldown: time.Second*8 - time.Millisecond*500*time.Duration(priest.Talents.ImprovedMindBlast),
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 
 			BonusSpellHitRating: 0 +

@@ -18,31 +18,24 @@ func (priest *Priest) MindFlayActionID(numTicks int) core.ActionID {
 }
 
 func (priest *Priest) newMindFlaySpell(sim *core.Simulation, numTicks int) *core.Spell {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    priest.MindFlayActionID(numTicks),
-				Character:   &priest.Character,
-				SpellSchool: core.SpellSchoolShadow,
-				SpellExtras: core.SpellExtrasBinary | core.SpellExtrasChanneled,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 230,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 230,
-				},
-				CastTime:    0,
-				ChannelTime: time.Second * time.Duration(numTicks),
-				GCD:         core.GCDDefault,
-			},
-		},
-	}
-	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.FocusedMind) * 0.05
+	baseCost := 230.0
 
 	return priest.RegisterSpell(core.SpellConfig{
-		Template: template,
+		ActionID:    priest.MindFlayActionID(numTicks),
+		SpellSchool: core.SpellSchoolShadow,
+		SpellExtras: core.SpellExtrasBinary | core.SpellExtrasChanneled,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost:        baseCost * (1 - 0.05*float64(priest.Talents.FocusedMind)),
+				GCD:         core.GCDDefault,
+				ChannelTime: time.Second * time.Duration(numTicks),
+			},
+		},
+
 		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
 			// if our channel is longer than GCD it will have human latency to end it beause you can't queue the next spell.
 			var wait time.Duration // TODO: I think this got deleted at some point

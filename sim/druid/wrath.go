@@ -36,8 +36,8 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 			},
 
 			ModifyCast: func(sim *core.Simulation, cast *core.NewCast) {
-				druid.applyNewNaturesGrace(cast)
-				druid.applyNewNaturesSwiftness(cast)
+				druid.applyNaturesGrace(cast)
+				druid.applyNaturesSwiftness(cast)
 			},
 		},
 

@@ -45,6 +45,14 @@ var ItemSetAvatar = core.ItemSet{
 						// easier than adding another aura the subtracts 150 mana from next cast.
 						character.AddMana(sim, 150, core.ActionID{SpellID: 37600}, false)
 					},
+					OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+						if sim.RandomFloat("avatar 2p") > 0.06 {
+							return
+						}
+						// This is a cheat...
+						// easier than adding another aura the subtracts 150 mana from next cast.
+						character.AddMana(sim, 150, core.ActionID{SpellID: 37600}, false)
+					},
 				})
 			})
 		},

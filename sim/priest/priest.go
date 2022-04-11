@@ -36,9 +36,10 @@ type Priest struct {
 	StarshardsDot      *core.Dot
 	VampiricTouchDot   *core.Dot
 
-	InnerFocusAura    *core.Aura
-	MiseryAura        *core.Aura
-	ShadowWeavingAura *core.Aura
+	InnerFocusAura       *core.Aura
+	MiseryAura           *core.Aura
+	ShadowWeavingAura    *core.Aura
+	SurgeOfLightProcAura *core.Aura
 }
 
 type SelfBuffs struct {

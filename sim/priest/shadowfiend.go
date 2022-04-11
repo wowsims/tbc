@@ -52,25 +52,23 @@ func (priest *Priest) registerShadowfiendCD() {
 }
 
 func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: priest.BaseMana() * 0.06}
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    ShadowfiendActionID,
-				Character:   &priest.Character,
-				SpellSchool: core.SpellSchoolShadow,
-				BaseCost:    cost,
-				Cost:        cost,
-				CastTime:    0,
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Minute * 5,
-			},
-		},
-	}
-	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
+	baseCost := priest.BaseMana() * 0.06
 
 	priest.Shadowfiend = priest.RegisterSpell(core.SpellConfig{
-		Template: template,
+		ActionID:    ShadowfiendActionID,
+		SpellSchool: core.SpellSchoolShadow,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
+				GCD:  core.GCDDefault,
+			},
+			Cooldown: time.Minute * 5,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			OutcomeApplier:      core.OutcomeFuncMagicHit(),

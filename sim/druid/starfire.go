@@ -75,8 +75,8 @@ func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Spell
 			},
 
 			ModifyCast: func(sim *core.Simulation, cast *core.NewCast) {
-				druid.applyNewNaturesGrace(cast)
-				druid.applyNewNaturesSwiftness(cast)
+				druid.applyNaturesGrace(cast)
+				druid.applyNaturesSwiftness(cast)
 			},
 		},
 

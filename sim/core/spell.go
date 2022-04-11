@@ -191,6 +191,24 @@ func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
 	}
 }
 
+// Skips the actual cast and applies spell effects immediately.
+func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Target) {
+	if sim.Log != nil {
+		spell.Character.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
+			spell.ActionID, spell.DefaultCast.Cost, 0)
+		spell.Character.Log(sim, "Completed cast %s", spell.ActionID)
+	}
+	spell.applyEffects(sim, target)
+}
+
+func (spell *Spell) applyEffects(sim *Simulation, target *Target) {
+	spell.Casts++
+	spell.MostRecentCost = spell.CurCast.Cost
+	spell.MostRecentBaseCost = spell.BaseCost
+
+	spell.ApplyEffects(sim, target, spell)
+}
+
 // User-provided function for performing a cast of a spell. Should return whether
 // the spell was cast (e.g. not blocked by CDs or resources).
 //type SpellCast func(*Simulation, *Spell, *Target) bool
@@ -222,13 +240,7 @@ func (character *Character) RegisterSpell(config SpellConfig) *Spell {
 		spell.SpellExtras = config.Template.SpellExtras
 		spell.Template = config.Template
 	} else {
-		spell.castFn = spell.makeCastFunc(config.Cast, func(sim *Simulation, target *Target) {
-			spell.Casts++
-			spell.MostRecentCost = spell.CurCast.Cost
-			spell.MostRecentBaseCost = spell.BaseCost
-
-			spell.ApplyEffects(sim, target, spell)
-		})
+		spell.castFn = spell.makeCastFunc(config.Cast, spell.applyEffects)
 	}
 
 	character.Spellbook = append(character.Spellbook, spell)

@@ -8,6 +8,7 @@ import (
 )
 
 func (priest *Priest) ApplyTalents() {
+	priest.setupSurgeOfLight()
 	priest.registerInnerFocusAura()
 
 	if priest.Talents.Meditation > 0 {
@@ -86,29 +87,44 @@ func (priest *Priest) ApplyTalents() {
 	}
 }
 
-func (priest *Priest) applyOnHitTalents(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-	roll := sim.RandomFloat("SurgeOfLight")
-	if priest.Talents.SurgeOfLight == 2 && spellEffect.Outcome.Matches(core.OutcomeCrit) && roll > 0.5 {
-		priest.SurgeOfLight = true
+func (priest *Priest) setupSurgeOfLight() {
+	if priest.Talents.SurgeOfLight == 0 {
+		return
 	}
+
+	priest.SurgeOfLightProcAura = priest.RegisterAura(&core.Aura{
+		Label:    "Surge of Light Proc",
+		ActionID: core.ActionID{SpellID: 33151},
+		Duration: core.NeverExpires,
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell == priest.Smite {
+				aura.Deactivate(sim)
+			}
+		},
+	})
+
+	procChance := 0.25 * float64(priest.Talents.SurgeOfLight)
+
+	priest.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		return priest.GetOrRegisterAura(&core.Aura{
+			Label:    "Surge of Light",
+			Duration: core.NeverExpires,
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+					if procChance < sim.RandomFloat("SurgeOfLight") {
+						priest.SurgeOfLightProcAura.Activate(sim)
+						priest.SurgeOfLightProcAura.Prioritize()
+					}
+				}
+			},
+		})
+	})
 }
 
-func (priest *Priest) applySurgeOfLight(spellCast *core.SpellCast) {
-	if priest.SurgeOfLight {
-		spellCast.CastTime = 0
-		spellCast.Cost.Value = 0
-		// This applies on cast complete, removing the effect.
-		//  if it crits, during 'onspellhit' then it will be reapplied (see func above)
-		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-			priest.SurgeOfLight = false
-		}
-	}
-}
-
-func (priest *Priest) applyTalentsToHolySpell(cast *core.Cast, effect *core.SpellEffect) {
-	effect.ThreatMultiplier *= 1 - 0.04*float64(priest.Talents.SilentResolve)
-	if cast.ActionID.SpellID == SpellIDSmite || cast.ActionID.SpellID == SpellIDHolyFire {
-		effect.BonusSpellCritRating += float64(priest.Talents.HolySpecialization) * 1 * core.SpellCritRatingPerCritChance
+func (priest *Priest) applySurgeOfLight(_ *core.Simulation, cast *core.NewCast) {
+	if priest.SurgeOfLightProcAura != nil && priest.SurgeOfLightProcAura.IsActive() {
+		cast.CastTime = 0
+		cast.Cost = 0
 	}
 }
 

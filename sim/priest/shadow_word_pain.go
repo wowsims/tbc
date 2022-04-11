@@ -13,24 +13,22 @@ const SpellIDShadowWordPain int32 = 25368
 var ShadowWordPainActionID = core.ActionID{SpellID: SpellIDShadowWordPain}
 
 func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 575}
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    ShadowWordPainActionID,
-				Character:   &priest.Character,
-				SpellSchool: core.SpellSchoolShadow,
-				BaseCost:    cost,
-				Cost:        cost,
-				CastTime:    0,
-				GCD:         core.GCDDefault,
-			},
-		},
-	}
-	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
+	baseCost := 575.0
 
 	priest.ShadowWordPain = priest.RegisterSpell(core.SpellConfig{
-		Template: template,
+		ActionID:    ShadowWordPainActionID,
+		SpellSchool: core.SpellSchoolShadow,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
+				GCD:  core.GCDDefault,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),

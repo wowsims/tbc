@@ -13,30 +13,23 @@ var SWDCooldownID = core.NewCooldownID()
 var ShadowWordDeathActionID = core.ActionID{SpellID: SpellIDShadowWordDeath, CooldownID: SWDCooldownID}
 
 func (priest *Priest) registerShadowWordDeathSpell(sim *core.Simulation) {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    ShadowWordDeathActionID,
-				Character:   &priest.Character,
-				SpellSchool: core.SpellSchoolShadow,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 309,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 309,
-				},
-				CastTime: 0,
-				GCD:      core.GCDDefault,
-				Cooldown: time.Second * 12,
-			},
-		},
-	}
-	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
+	baseCost := 309.0
 
 	priest.ShadowWordDeath = priest.RegisterSpell(core.SpellConfig{
-		Template: template,
+		ActionID:    ShadowWordDeathActionID,
+		SpellSchool: core.SpellSchoolShadow,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
+				GCD:  core.GCDDefault,
+			},
+			Cooldown: time.Second * 12,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,

@@ -13,22 +13,17 @@ var SSCooldownID = core.NewCooldownID()
 var StarshardsActionID = core.ActionID{SpellID: SpellIDStarshards, CooldownID: SSCooldownID}
 
 func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    StarshardsActionID,
-				Character:   &priest.Character,
-				SpellSchool: core.SpellSchoolArcane,
-				CastTime:    0,
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Second * 30,
-			},
-		},
-	}
-	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
-
 	priest.Starshards = priest.RegisterSpell(core.SpellConfig{
-		Template: template,
+		ActionID:    StarshardsActionID,
+		SpellSchool: core.SpellSchoolArcane,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				GCD: core.GCDDefault,
+			},
+			Cooldown: time.Second * 30,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			OutcomeApplier:   core.OutcomeFuncMagicHit(),
