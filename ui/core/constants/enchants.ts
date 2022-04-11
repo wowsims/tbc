@@ -17,6 +17,8 @@ export const POWER_OF_THE_SCOURGE = 23545;
 enchantDescriptions.set(POWER_OF_THE_SCOURGE, '+15 Spell Damage and +14 Spell Crit Rating');
 export const GREATER_INSCRIPTION_OF_VENGEANCE = 28888;
 enchantDescriptions.set(GREATER_INSCRIPTION_OF_VENGEANCE, '+30 Attack Power and +10 Crit Rating');
+export const MIGHT_OF_THE_SCOURGE = 23548;
+enchantDescriptions.set(MIGHT_OF_THE_SCOURGE, '+26 Attack Power and +14 Crit Rating');
 
 // Back
 export const SUBTLETY = 33150;
@@ -100,6 +102,8 @@ enchantDescriptions.set(SHIELD_INTELLECT, '+12 Intellect');
 // Ring
 export const RING_SPELLPOWER = 22536;
 enchantDescriptions.set(RING_SPELLPOWER, '+12 Spell Damage');
+export const RING_STATS = 22538;
+enchantDescriptions.set(RING_STATS, '+4 All Stats');
 
 // Ranged
 export const STABILIZED_ETERNIUM_SCOPE = 23766;
