@@ -7,8 +7,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 
 	balanceDruid "github.com/wowsims/tbc/sim/druid/balance"
+	hunter "github.com/wowsims/tbc/sim/hunter"
 	shadowPriest "github.com/wowsims/tbc/sim/priest/shadow"
 	elementalShaman "github.com/wowsims/tbc/sim/shaman/elemental"
+	enhancementShaman "github.com/wowsims/tbc/sim/shaman/enhancement"
 )
 
 func init() {
@@ -21,7 +23,7 @@ var SimOptions = &proto.SimOptions{
 }
 
 var StandardTarget = &proto.Target{
-	Armor:   7700,
+	Armor:   7684,
 	MobType: proto.MobType_MobTypeDemon,
 }
 
@@ -62,13 +64,39 @@ var P1ShadowPriest = &proto.Player{
 	Buffs:     shadowPriest.FullIndividualBuffs,
 }
 
+var P1EnhancementShaman = &proto.Player{
+	Name:      "P1 Enh Shaman",
+	Race:      proto.Race_RaceOrc,
+	Class:     proto.Class_ClassShaman,
+	Equipment: enhancementShaman.Phase2Gear,
+	Consumes:  enhancementShaman.FullConsumes,
+	Spec:      enhancementShaman.PlayerOptionsBasic,
+	Buffs:     enhancementShaman.FullIndividualBuffs,
+}
+
+var P1BMHunter = &proto.Player{
+	Name:      "P1 BM Hunter",
+	Race:      proto.Race_RaceOrc,
+	Class:     proto.Class_ClassHunter,
+	Equipment: hunter.P1Gear,
+	Consumes:  hunter.FullConsumes,
+	Spec:      hunter.PlayerOptionsBasic,
+	Buffs:     hunter.FullIndividualBuffs,
+}
+
 var BasicRaid = &proto.Raid{
 	Parties: []*proto.Party{
 		&proto.Party{
 			Players: []*proto.Player{
 				P1BalanceDruid,
 				P1ElementalShaman,
+				P1EnhancementShaman,
 				P1ShadowPriest,
+			},
+		},
+		&proto.Party{
+			Players: []*proto.Player{
+				P1BMHunter,
 			},
 		},
 	},
@@ -114,5 +142,5 @@ func TestBasicRaid(t *testing.T) {
 		SimOptions: SimOptions,
 	}
 
-	core.RaidSimTest("P1 ST", t, rsr, 4096.15)
+	core.RaidSimTest("P1 ST", t, rsr, 6168.06)
 }

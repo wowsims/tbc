@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/wowsims/tbc/sim/core/proto"
 	"log"
 )
 
@@ -10,10 +11,19 @@ import (
 // but there are occasionally class-specific item effects.
 type ApplyEffect func(Agent)
 
+// Function for applying permenent effects to an agent's weapon
+type ApplyWeaponEffect func(Agent, proto.ItemSlot)
+
 var itemEffects = map[int32]ApplyEffect{}
+var weaponEffects = map[int32]ApplyWeaponEffect{}
 
 func HasItemEffect(id int32) bool {
 	_, ok := itemEffects[id]
+	return ok
+}
+
+func HasWeaponEffect(id int32) bool {
+	_, ok := weaponEffects[id]
 	return ok
 }
 
@@ -24,4 +34,11 @@ func AddItemEffect(id int32, itemEffect ApplyEffect) {
 		log.Fatalf("Cannot add multiple effects for one item: %d, %#v", id, itemEffect)
 	}
 	itemEffects[id] = itemEffect
+}
+
+func AddWeaponEffect(id int32, weaponEffect ApplyWeaponEffect) {
+	if HasWeaponEffect(id) {
+		log.Fatalf("Cannot add multiple effects for one item: %d, %#v", id, weaponEffect)
+	}
+	weaponEffects[id] = weaponEffect
 }

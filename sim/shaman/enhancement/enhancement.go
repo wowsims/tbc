@@ -101,42 +101,43 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 
 	var curTime time.Duration
 
-	ssAction := common.ScheduledAbility{
-		Duration: core.GCDDefault,
-		TryCast: func(sim *core.Simulation) bool {
-			ss := enh.NewStormstrike(sim, sim.GetPrimaryTarget())
-			success := ss.Attack(sim)
-			if !success {
-				enh.WaitForMana(sim, ss.Cost.Value)
-			}
-			return success
-		},
-	}
-	curTime = core.DurationFromSeconds(enh.Rotation.FirstStormstrikeDelay)
-	for curTime <= maxDuration {
-		ability := ssAction
-		ability.DesiredCastAt = curTime
-		castAt := enh.scheduler.Schedule(ability)
-		curTime = castAt + time.Second*10
+	if enh.Talents.Stormstrike {
+		ssAction := common.ScheduledAbility{
+			Duration: core.GCDDefault,
+			TryCast: func(sim *core.Simulation) bool {
+				ss := enh.Stormstrike
+				success := ss.Cast(sim, sim.GetPrimaryTarget())
+				if !success {
+					enh.WaitForMana(sim, ss.CurCast.Cost)
+				}
+				return success
+			},
+		}
+		curTime = core.DurationFromSeconds(enh.Rotation.FirstStormstrikeDelay)
+		for curTime <= maxDuration {
+			ability := ssAction
+			ability.DesiredCastAt = curTime
+			castAt := enh.scheduler.Schedule(ability)
+			curTime = castAt + time.Second*10
+		}
 	}
 
 	shockCD := enh.ShockCD()
 	shockAction := common.ScheduledAbility{
 		Duration: core.GCDDefault,
 		TryCast: func(sim *core.Simulation) bool {
-			var shock *core.SimpleSpell
-			target := sim.GetPrimaryTarget()
-			if enh.Rotation.WeaveFlameShock && !enh.FlameShockSpell.IsInUse() {
-				shock = enh.NewFlameShock(sim, target)
+			var shock *core.Spell
+			if enh.Rotation.WeaveFlameShock && !enh.FlameShockDot.IsActive() {
+				shock = enh.FlameShock
 			} else if enh.Rotation.PrimaryShock == proto.EnhancementShaman_Rotation_Earth {
-				shock = enh.NewEarthShock(sim, target)
+				shock = enh.EarthShock
 			} else if enh.Rotation.PrimaryShock == proto.EnhancementShaman_Rotation_Frost {
-				shock = enh.NewFrostShock(sim, target)
+				shock = enh.FrostShock
 			}
 
-			success := shock.Cast(sim)
+			success := shock.Cast(sim, sim.GetPrimaryTarget())
 			if !success {
-				enh.WaitForMana(sim, shock.Cost.Value)
+				enh.WaitForMana(sim, shock.CurCast.Cost)
 			}
 			return success
 		},
@@ -193,11 +194,11 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 			ability := totemAction
 			ability.DesiredCastAt = curTime
 			if prioritizeEarlier {
-				ability.MinCastAt = curTime - time.Second*20
-				ability.MaxCastAt = curTime + time.Second*10
+				ability.MinCastAt = curTime - time.Second*30
+				ability.MaxCastAt = curTime + time.Second*15
 			} else {
-				ability.MinCastAt = curTime
-				ability.MaxCastAt = curTime + time.Second*10
+				ability.MinCastAt = curTime - time.Second*5
+				ability.MaxCastAt = curTime + time.Second*30
 			}
 			castAt := enh.scheduler.Schedule(ability)
 			if castAt == common.Unresolved {
@@ -206,10 +207,10 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 			curTime = castAt + duration
 		}
 	}
-	scheduleSpellTotem := func(duration time.Duration, castFactory func(sim *core.Simulation) *core.SimpleSpell) {
+	scheduleSpellTotem := func(duration time.Duration, spell *core.Spell) {
 		scheduleTotem(duration, false, false, func(sim *core.Simulation) (bool, float64) {
-			cast := castFactory(sim)
-			return cast.Cast(sim), cast.Cost.Value
+			success := spell.Cast(sim, sim.GetPrimaryTarget())
+			return success, spell.CurCast.Cost
 		})
 	}
 	schedule2MTotem := func(castFactory func(sim *core.Simulation) *core.SimpleCast) {
@@ -224,26 +225,26 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 		switch enh.Totems.Fire {
 		case proto.FireTotem_MagmaTotem:
 			defaultCastFactory = func(sim *core.Simulation) {
-				if enh.FireTotemSpell.IsInUse() {
+				if enh.SearingTotemDot.IsActive() || enh.MagmaTotemDot.IsActive() || enh.FireNovaTotemDot.IsActive() {
 					return
 				}
 
-				cast := enh.NewMagmaTotem(sim)
-				success := cast.Cast(sim)
+				cast := enh.MagmaTotem
+				success := cast.Cast(sim, nil)
 				if !success {
-					enh.WaitForMana(sim, cast.Cost.Value)
+					enh.WaitForMana(sim, cast.CurCast.Cost)
 				}
 			}
 		case proto.FireTotem_SearingTotem:
 			defaultCastFactory = func(sim *core.Simulation) {
-				if enh.FireTotemSpell.IsInUse() {
+				if enh.SearingTotemDot.IsActive() || enh.MagmaTotemDot.IsActive() || enh.FireNovaTotemDot.IsActive() {
 					return
 				}
 
-				cast := enh.NewSearingTotem(sim, sim.GetPrimaryTarget())
-				success := cast.Cast(sim)
+				cast := enh.SearingTotem
+				success := cast.Cast(sim, sim.GetPrimaryTarget())
 				if !success {
-					enh.WaitForMana(sim, cast.Cost.Value)
+					enh.WaitForMana(sim, cast.CurCast.Cost)
 				}
 			}
 		case proto.FireTotem_TotemOfWrath:
@@ -268,10 +269,10 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 					return false
 				}
 
-				cast := enh.NewNovaTotem(sim)
-				success := cast.Cast(sim)
+				cast := enh.FireNovaTotem
+				success := cast.Cast(sim, nil)
 				if !success {
-					enh.WaitForMana(sim, cast.Cost.Value)
+					enh.WaitForMana(sim, cast.CurCast.Cost)
 				}
 				return success
 			},
@@ -302,11 +303,11 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				curTime = nextNovaCD
 				defaultNext = false
 			} else {
-				nextNovaCD = castAt + time.Second*15
+				nextNovaCD = castAt + time.Second*15 + 1
 				if defaultCastFactory == nil {
 					curTime = nextNovaCD
 				} else {
-					curTime = castAt + enh.FireNovaTickLength()
+					curTime = castAt + enh.FireNovaTickLength() + 1
 					defaultNext = true
 				}
 			}
@@ -314,9 +315,9 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 	} else {
 		switch enh.Totems.Fire {
 		case proto.FireTotem_MagmaTotem:
-			scheduleSpellTotem(time.Second*20, func(sim *core.Simulation) *core.SimpleSpell { return enh.NewMagmaTotem(sim) })
+			scheduleSpellTotem(time.Second*20+1, enh.MagmaTotem)
 		case proto.FireTotem_SearingTotem:
-			scheduleSpellTotem(time.Minute*1, func(sim *core.Simulation) *core.SimpleSpell { return enh.NewSearingTotem(sim, sim.GetPrimaryTarget()) })
+			scheduleSpellTotem(time.Minute*1+1, enh.SearingTotem)
 		case proto.FireTotem_TotemOfWrath:
 			schedule2MTotem(func(sim *core.Simulation) *core.SimpleCast { return enh.NewTotemOfWrath(sim) })
 		}
@@ -374,7 +375,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				ability := wfAction
 				ability.DesiredCastAt = curTime
 				ability.MinCastAt = curTime - time.Second*8
-				ability.MaxCastAt = curTime + time.Second*8
+				ability.MaxCastAt = curTime + time.Second*20
 				defaultAbility := defaultAction
 				castAt := enh.scheduler.ScheduleGroup(sim, []common.ScheduledAbility{ability, defaultAbility})
 				if castAt == common.Unresolved {

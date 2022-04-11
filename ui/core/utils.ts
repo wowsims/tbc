@@ -1,12 +1,12 @@
 // Returns if the two items are equal, or if both are null / undefined.
 export function equalsOrBothNull<T>(a: T, b: T, comparator?: (_a: NonNullable<T>, _b: NonNullable<T>) => boolean): boolean {
-  if (a == null && b == null)
-    return true;
+	if (a == null && b == null)
+		return true;
 
-  if (a == null || b == null)
-    return false;
+	if (a == null || b == null)
+		return false;
 
-  return (comparator || ((_a: NonNullable<T>, _b: NonNullable<T>) => a == b))(a!, b!);
+	return (comparator || ((_a: NonNullable<T>, _b: NonNullable<T>) => a == b))(a!, b!);
 }
 
 // Default comparator function for strings. Used with functions like Array.sort().
@@ -21,7 +21,7 @@ export function stringComparator(a: string, b: string): number {
 }
 
 export function sum(arr: Array<number>): number {
-  return arr.reduce((total, cur) => total + cur, 0);
+	return arr.reduce((total, cur) => total + cur, 0);
 }
 
 // Returns the index of maximum value, or null if empty.
@@ -37,7 +37,7 @@ export function arrayEquals<T>(a: Array<T>, b: Array<T>, comparator?: (a: T, b: 
 
 // Returns a new array containing only elements present in both a and b.
 export function intersection<T>(a: Array<T>, b: Array<T>): Array<T> {
-  return a.filter(value => b.includes(value));
+	return a.filter(value => b.includes(value));
 }
 
 // Returns a new array containing only distinct elements of arr.
@@ -68,23 +68,23 @@ export function bucket<T>(arr: Array<T>, toString: (val: T) => string): Record<s
 }
 
 export function stDevToConf90(stDev: number, N: number) {
-  return 1.645 * stDev / Math.sqrt(N);
+	return 1.645 * stDev / Math.sqrt(N);
 }
 
 export async function wait(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 // Only works for numeric enums
 export function getEnumValues<E>(enumType: any): Array<E> {
-  return Object.keys(enumType)
-      .filter(key => !isNaN(Number(enumType[key])))
-      .map(key => parseInt(enumType[key]) as unknown as E);
+	return Object.keys(enumType)
+		.filter(key => !isNaN(Number(enumType[key])))
+		.map(key => parseInt(enumType[key]) as unknown as E);
 }
 
 // Whether a click event was a right click.
 export function isRightClick(event: MouseEvent): boolean {
-  return event.button == 2;
+	return event.button == 2;
 }
 
 // Converts from '#ffffff' --> 'rgba(255, 255, 255, alpha)'
@@ -95,7 +95,7 @@ export function hexToRgba(hex: string, alpha: number): string {
 			parts = [parts[0], parts[0], parts[1], parts[1], parts[2], parts[2]];
 		}
 		const c: any = '0x' + parts.join('');
-		return 'rgba(' + [(c>>16)&255, (c>>8)&255, c&255].join(',') + ',' + alpha + ')';
+		return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',' + alpha + ')';
 	}
 	throw new Error('Invalid hex color: ' + hex);
 }
@@ -109,7 +109,10 @@ export function camelToSnakeCase(str: string): string {
 }
 
 export function downloadJson(json: any, fileName: string) {
-	const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json, null, 2));
+	downloadString(JSON.stringify(json, null, 2), fileName);
+}
+export function downloadString(data: string, fileName: string) {
+	const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(data);
 	const downloadAnchorNode = document.createElement('a');
 	downloadAnchorNode.setAttribute("href", dataStr);
 	downloadAnchorNode.setAttribute("download", fileName);

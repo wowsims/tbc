@@ -46,15 +46,19 @@ type Pet struct {
 func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritance PetStatInheritance, enabledOnStart bool) Pet {
 	pet := Pet{
 		Character: Character{
-			Name:        name,
-			Label:       fmt.Sprintf("%s - %s", owner.Label, name),
-			PseudoStats: stats.NewPseudoStats(),
-			Party:       owner.Party,
-			PartyIndex:  owner.PartyIndex,
-			RaidIndex:   owner.RaidIndex,
-			auraTracker: newAuraTracker(false),
-			baseStats:   baseStats,
-			Metrics:     NewCharacterMetrics(),
+			Unit: Unit{
+				Type:        PetUnit,
+				Index:       owner.Index,
+				Label:       fmt.Sprintf("%s - %s", owner.Label, name),
+				Level:       CharacterLevel,
+				PseudoStats: stats.NewPseudoStats(),
+				auraTracker: newAuraTracker(),
+				Metrics:     NewCharacterMetrics(),
+			},
+			Name:       name,
+			Party:      owner.Party,
+			PartyIndex: owner.PartyIndex,
+			baseStats:  baseStats,
 		},
 		Owner:           owner,
 		statInheritance: statInheritance,
@@ -85,11 +89,11 @@ func (pet *Pet) addOwnerStat(stat stats.Stat, addedAmount float64) {
 
 // This needs to be called after owner stats are finalized so we can inherit the
 // final values.
-func (pet *Pet) Finalize() {
+func (pet *Pet) Finalize(raid *Raid) {
 	inheritedStats := pet.statInheritance(pet.Owner.GetStats())
 	pet.AddStats(inheritedStats)
 	pet.currentStatInheritance = pet.statInheritance
-	pet.Character.Finalize()
+	pet.Character.Finalize(raid)
 }
 
 func (pet *Pet) reset(sim *Simulation, agent Agent) {
@@ -99,8 +103,8 @@ func (pet *Pet) reset(sim *Simulation, agent Agent) {
 func (pet *Pet) advance(sim *Simulation, elapsedTime time.Duration) {
 	pet.Character.advance(sim, elapsedTime)
 }
-func (pet *Pet) doneIteration(simDuration time.Duration) {
-	pet.Character.doneIteration(simDuration)
+func (pet *Pet) doneIteration(sim *Simulation) {
+	pet.Character.doneIteration(sim)
 }
 
 func (pet *Pet) IsEnabled() bool {
@@ -169,3 +173,4 @@ func (pet *Pet) GetCharacter() *Character {
 }
 func (pet *Pet) AddRaidBuffs(raidBuffs *proto.RaidBuffs)    {}
 func (pet *Pet) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {}
+func (pet *Pet) ApplyTalents()                              {}

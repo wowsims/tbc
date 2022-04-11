@@ -8,54 +8,44 @@ import (
 var AimedShotCooldownID = core.NewCooldownID()
 var AimedShotActionID = core.ActionID{SpellID: 27065, CooldownID: AimedShotCooldownID}
 
-func (hunter *Hunter) newAimedShotTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
-	ama := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            AimedShotActionID,
-			Character:           &hunter.Character,
-			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolPhysical,
-			// Actual aimed shot has a 2.5s cast time, but we only use it as an instant precast.
-			//CastTime:       time.Millisecond * 2500,
-			//Cooldown:       time.Second * 6,
-			//GCD:            core.GCDDefault,
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 370,
-			},
-			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskRangedSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			WeaponInput: core.WeaponDamageInput{
-				CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
-					return attackPower*0.2 +
-						hunter.AmmoDamageBonus +
-						hunter.AutoAttacks.Ranged.BaseDamage(sim) +
-						bonusWeaponDamage +
-						870
-				},
+func (hunter *Hunter) registerAimedShotSpell(sim *core.Simulation) {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 370}
+	ama := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:    AimedShotActionID,
+				Character:   &hunter.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				// Actual aimed shot has a 2.5s cast time, but we only use it as an instant precast.
+				//CastTime:       time.Millisecond * 2500,
+				//Cooldown:       time.Second * 6,
+				//GCD:            core.GCDDefault,
+				Cost:        cost,
+				BaseCost:    cost,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}
-
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 
-	return core.NewMeleeAbilityTemplate(ama)
-}
+	hunter.AimedShot = hunter.RegisterSpell(core.SpellConfig{
+		Template: ama,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskRangedSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 
-func (hunter *Hunter) NewAimedShot(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
-	as := &hunter.aimedShot
-	hunter.aimedShotTemplate.Apply(as)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	as.Effect.Target = target
-
-	return as
+			BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					return (hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
+						hunter.AutoAttacks.Ranged.BaseDamage(sim) +
+						hunter.AmmoDamageBonus +
+						hitEffect.BonusWeaponDamage(spell.Character) +
+						870
+				},
+				TargetSpellCoefficient: 1,
+			}),
+			OutcomeApplier: core.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
+		}),
+	})
 }

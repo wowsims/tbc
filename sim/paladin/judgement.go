@@ -4,46 +4,46 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 const JudgementManaCost = 147.0
 const JudgementCDTime = time.Second * 10
+const JudgementDuration = time.Second * 20
+
+// Shared conditions required to be able to cast any Judgement.
+func (paladin *Paladin) canJudgement(sim *core.Simulation) bool {
+	return paladin.CurrentSeal != nil && paladin.CurrentSeal.IsActive() && !paladin.IsOnCD(JudgementCD, sim.CurrentTime)
+}
 
 var JudgementCD = core.NewCooldownID()
 var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: JudgementCD}
 
-// refactored Judgement of Blood as an ActiveMeleeAbility which is most similar to actual behavior with a typical ret build
-// but still has a few differences (differences are: does not scale off spell power, cannot be partially resisted, can be missed or dodged)
-func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
-	job := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            JudgementOfBloodActionID,
-			Character:           &paladin.Character,
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolHoly,
-			CritMultiplier:      paladin.DefaultMeleeCritMultiplier(),
-			IsPhantom:           true,
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1, // Need to review to make sure I set these properly
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				IgnoreArmor:            true,
+var LibramOfAvengementActionID = core.ActionID{SpellID: 34260}
+
+func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
+	loaIsEquipped := paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27484
+
+	var loaAura *core.Aura
+	if loaIsEquipped {
+		loaAura = paladin.NewTemporaryStatsAura(
+			"Libram of Avengement",
+			LibramOfAvengementActionID,
+			stats.Stats{stats.MeleeCrit: 53},
+			time.Second*5)
+	}
+
+	job := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:    JudgementOfBloodActionID,
+				Character:   &paladin.Character,
+				SpellSchool: core.SpellSchoolHoly,
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 295,
-				MaxBaseDamage: 325,
-			},
-		},
-		OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
-			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
-			paladin.RemoveAura(sim, SealOfBloodAuraID)
-			paladin.currentSeal = core.Aura{}
 		},
 	}
+
 	// Reduce mana cost if we have Benediction Talent
 	job.Cost = core.ResourceCost{
 		Type:  stats.Mana,
@@ -53,43 +53,47 @@ func (paladin *Paladin) newJudgementOfBloodTemplate(sim *core.Simulation) core.M
 	// Reduce CD if we have Improved Judgement Talent
 	job.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
-	// Increase Judgement Crit Chance if we have Fanaticism talent
-	job.Effect.BonusCritRating = 3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism)
+	effect := core.SpellEffect{
+		ProcMask: core.ProcMaskMeleeOrRangedSpecial,
 
-	return core.NewMeleeAbilityTemplate(job)
+		BonusCritRating:  3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism),
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+
+		BaseDamage:     core.BaseDamageConfigMagic(295, 325, 0.429),
+		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+
+		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
+			paladin.SealOfBloodAura.Deactivate(sim)
+			if loaAura != nil {
+				loaAura.Activate(sim)
+			}
+		},
+	}
+	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
+
+	paladin.JudgementOfBlood = paladin.RegisterSpell(core.SpellConfig{
+		Template:     job,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+	})
 }
 
-func (paladin *Paladin) NewJudgementOfBlood(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
-	// No seal has even been active, so we can't cast judgement
-	if paladin.currentSeal.ID != SealOfBloodAuraID {
-		return nil
-	}
-
-	// Most recent seal has expired so we can't cast judgement
-	if paladin.currentSeal.Expires <= sim.CurrentTime {
-		return nil
-	}
-
-	job := &paladin.judgementOfBloodSpell
-	paladin.judgementOfBloodTemplate.Apply(job)
-
-	job.Effect.Target = target
-
-	return job
+func (paladin *Paladin) CanJudgementOfBlood(sim *core.Simulation) bool {
+	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfBloodAura
 }
 
 var JudgementOfTheCrusaderActionID = core.ActionID{SpellID: 27159, CooldownID: JudgementCD}
 
-func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation) {
+	paladin.JudgementOfTheCrusaderAura = core.JudgementOfTheCrusaderAura(sim.GetPrimaryTarget(), paladin.Talents.ImprovedSealOfTheCrusader)
+
 	jotc := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            JudgementOfTheCrusaderActionID,
-				Character:           &paladin.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolHoly,
-				SpellExtras:         core.SpellExtrasAlwaysHits,
+				ActionID:    JudgementOfTheCrusaderActionID,
+				Character:   &paladin.Character,
+				SpellSchool: core.SpellSchoolHoly,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: JudgementManaCost,
@@ -100,18 +104,7 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 				},
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.Cost.Value)
-					paladin.RemoveAura(sim, SealOfTheCrusaderAuraID)
-					paladin.currentSeal = core.Aura{}
-				},
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				IgnoreHitCheck: true,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					aura := core.JudgementOfTheCrusaderAura(sim, float64(paladin.Talents.ImprovedSealOfTheCrusader))
-					spellEffect.Target.AddAura(sim, aura)
-					paladin.currentJudgement = aura
+					paladin.SealOfTheCrusaderAura.Deactivate(sim)
 				},
 			},
 		},
@@ -123,40 +116,37 @@ func (paladin *Paladin) newJudgementOfTheCrusaderTemplate(sim *core.Simulation) 
 	// Reduce CD if we have Improved Judgement Talent
 	jotc.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
-	return core.NewSimpleSpellTemplate(jotc)
+	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
+		Template: jotc,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			OutcomeApplier: core.OutcomeFuncAlwaysHit(),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+				paladin.JudgementOfTheCrusaderAura.Activate(sim)
+				paladin.CurrentJudgement = paladin.JudgementOfTheCrusaderAura
+			},
+		}),
+	})
 }
 
-func (paladin *Paladin) NewJudgementOfTheCrusader(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// No seal has even been active, so we can't cast judgement
-	if paladin.currentSeal.ID != SealOfTheCrusaderAuraID {
-		return nil
-	}
-
-	// Most recent seal has expired so we can't cast judgement
-	if paladin.currentSeal.Expires <= sim.CurrentTime {
-		return nil
-	}
-
-	jotc := &paladin.judgementOfTheCrusaderSpell
-	paladin.judgementOfTheCrusaderTemplate.Apply(jotc)
-
-	jotc.Effect.Target = target
-	jotc.Init(sim)
-
-	return jotc
+func (paladin *Paladin) CanJudgementOfTheCrusader(sim *core.Simulation) bool {
+	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfTheCrusaderAura
 }
 
 var JudgementOfWisdomActionID = core.ActionID{SpellID: 27164, CooldownID: JudgementCD}
 
-func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
+	paladin.JudgementOfWisdomAura = core.JudgementOfWisdomAura(sim.GetPrimaryTarget())
+
 	jow := core.SimpleSpell{
 		SpellCast: core.SpellCast{
 			Cast: core.Cast{
-				ActionID:            JudgementOfWisdomActionID,
-				Character:           &paladin.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolHoly,
+				ActionID:    JudgementOfWisdomActionID,
+				Character:   &paladin.Character,
+				SpellSchool: core.SpellSchoolHoly,
 				BaseCost: core.ResourceCost{
 					Type:  stats.Mana,
 					Value: JudgementManaCost,
@@ -167,18 +157,7 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 				},
 				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 					paladin.sanctifiedJudgement(sim, paladin.sealOfWisdom.Cost.Value)
-					paladin.RemoveAura(sim, SealOfWisdomAuraID)
-					paladin.currentSeal = core.Aura{}
-				},
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				IgnoreHitCheck: true,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					aura := core.JudgementOfWisdomAura(sim)
-					spellEffect.Target.AddAura(sim, aura)
-					paladin.currentJudgement = aura
+					paladin.SealOfWisdomAura.Deactivate(sim)
 				},
 			},
 		},
@@ -190,27 +169,24 @@ func (paladin *Paladin) newJudgementOfWisdomTemplate(sim *core.Simulation) core.
 	// Reduce CD if we have Improved Judgement Talent
 	jow.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
-	return core.NewSimpleSpellTemplate(jow)
+	paladin.JudgementOfWisdom = paladin.RegisterSpell(core.SpellConfig{
+		Template: jow,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			OutcomeApplier: core.OutcomeFuncMagicHit(),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+				paladin.JudgementOfWisdomAura.Activate(sim)
+				paladin.CurrentJudgement = paladin.JudgementOfWisdomAura
+			},
+		}),
+	})
 }
 
-func (paladin *Paladin) NewJudgementOfWisdom(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// No seal has even been active, so we can't cast judgement
-	if paladin.currentSeal.ID != SealOfWisdomAuraID {
-		return nil
-	}
-
-	// Most recent seal has expired so we can't cast judgement
-	if paladin.currentSeal.Expires <= sim.CurrentTime {
-		return nil
-	}
-
-	jow := &paladin.judgementOfWisdomSpell
-	paladin.judgementOfWisdomTemplate.Apply(jow)
-
-	jow.Effect.Target = target
-	jow.Init(sim)
-
-	return jow
+func (paladin *Paladin) CanJudgementOfWisdom(sim *core.Simulation) bool {
+	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfWisdomAura
 }
 
 var SanctifiedJudgementActionID = core.ActionID{SpellID: 31930}

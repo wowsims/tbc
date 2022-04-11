@@ -1,18 +1,19 @@
+import { DetailedResultsUpdate, SimRun, SimRunData } from '/tbc/core/proto/ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 
 import { SimResultData } from './result_component.js';
 import { ResultsFilter } from './results_filter.js';
-import { CastMetrics } from './cast_metrics.js';
-import { MeleeMetrics } from './melee_metrics.js';
-import { SpellMetrics } from './spell_metrics.js';
-import { PlayerDamageMetrics } from './player_damage.js';
-import { AuraMetrics } from './aura_metrics.js'
+import { CastMetricsTable } from './cast_metrics.js';
+import { MeleeMetricsTable } from './melee_metrics.js';
+import { SpellMetricsTable } from './spell_metrics.js';
+import { ResourceMetricsTable } from './resource_metrics.js';
+import { PlayerDamageMetricsTable } from './player_damage.js';
+import { AuraMetricsTable } from './aura_metrics.js'
 import { DpsHistogram } from './dps_histogram.js';
-import { DpsResult } from './dps_result.js';
-import { PercentOom } from './percent_oom.js';
 import { SourceChart } from './source_chart.js';
 import { Timeline } from './timeline.js';
+import { ToplineResults } from './topline_results.js';
 
 declare var Chart: any;
 
@@ -31,6 +32,9 @@ if (urlParams.has('themeColorBackgroundRaw')) {
 }
 if (urlParams.has('themeBackgroundImage')) {
 	document.body.style.setProperty('--theme-background-image', urlParams.get('themeBackgroundImage')!);
+}
+if (urlParams.has('themeBackgroundOpacity')) {
+	document.body.style.setProperty('--theme-background-opacity', urlParams.get('themeBackgroundOpacity')!);
 }
 
 const isIndividualSim = urlParams.has('isIndividualSim');
@@ -60,6 +64,7 @@ const layoutHTML = `
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#buffsTab">BUFFS</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#debuffsTab">DEBUFFS</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#castsTab">CASTS</a></li>
+		<li class="dr-tab-tab"><a data-toggle="tab" href="#resourcesTab">RESOURCES</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#timelineTab" id="timelineTabTab">TIMELINE</a></li>
 	</ul>
 	<div class="tab-content">
@@ -99,6 +104,12 @@ const layoutHTML = `
 				</div>
 			</div>
 		</div>
+		<div id="resourcesTab" class="tab-pane dr-tab-content resources-content fade">
+			<div class="dr-row">
+				<div class="resource-metrics">
+				</div>
+			</div>
+		</div>
 		<div id="timelineTab" class="tab-pane dr-tab-content timeline-content fade">
 			<div class="dr-row">
 				<div class="timeline">
@@ -119,19 +130,19 @@ const resultsFilter = new ResultsFilter({
 });
 
 const toplineResultsDiv = document.body.getElementsByClassName('topline-results')[0] as HTMLElement;
-const dpsResult = new DpsResult({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-const percentOom = new PercentOom({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const toplineResults = new ToplineResults({ parent: toplineResultsDiv, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 
-const castMetrics = new CastMetrics({ parent: document.body.getElementsByClassName('cast-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-const meleeMetrics = new MeleeMetrics({ parent: document.body.getElementsByClassName('melee-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-const spellMetrics = new SpellMetrics({ parent: document.body.getElementsByClassName('spell-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
-const playerDamageMetrics = new PlayerDamageMetrics({ parent: document.body.getElementsByClassName('player-damage-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings }, resultsFilter);
-const buffAuraMetrics = new AuraMetrics({
+const castMetrics = new CastMetricsTable({ parent: document.body.getElementsByClassName('cast-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const meleeMetrics = new MeleeMetricsTable({ parent: document.body.getElementsByClassName('melee-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const spellMetrics = new SpellMetricsTable({ parent: document.body.getElementsByClassName('spell-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const resourceMetrics = new ResourceMetricsTable({ parent: document.body.getElementsByClassName('resource-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+const playerDamageMetrics = new PlayerDamageMetricsTable({ parent: document.body.getElementsByClassName('player-damage-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings }, resultsFilter);
+const buffAuraMetrics = new AuraMetricsTable({
 	parent: document.body.getElementsByClassName('buff-aura-metrics')[0] as HTMLElement,
 	resultsEmitter: resultsEmitter,
 	colorSettings: colorSettings,
 }, false);
-const debuffAuraMetrics = new AuraMetrics({
+const debuffAuraMetrics = new AuraMetricsTable({
 	parent: document.body.getElementsByClassName('debuff-aura-metrics')[0] as HTMLElement,
 	resultsEmitter: resultsEmitter,
 	colorSettings: colorSettings,
@@ -159,16 +170,29 @@ function updateResults() {
 	}
 }
 
+document.body.classList.add('hide-threat-metrics');
 window.addEventListener('message', async event => {
-	// Null indicates pending results
-	const data: Object | null = event.data;
-
-	if (data) {
-		currentSimResult = await SimResult.fromJson(data);
-	} else {
-		currentSimResult = null;
+	const data = DetailedResultsUpdate.fromJson(event.data);
+	switch (data.data.oneofKind) {
+		case 'runData':
+			const runData = data.data.runData;
+			currentSimResult = await SimResult.fromProto(runData.run || SimRun.create());
+			updateResults();
+			break;
+		case 'settings':
+			const settings = data.data.settings;
+			if (settings.showThreatMetrics) {
+				document.body.classList.remove('hide-threat-metrics');
+			} else {
+				document.body.classList.add('hide-threat-metrics');
+			}
+			if (settings.showExperimental) {
+				document.body.classList.remove('hide-experimental');
+			} else {
+				document.body.classList.add('hide-experimental');
+			}
+			break;
 	}
-	updateResults();
 });
 
 resultsFilter.changeEmitter.on(() => updateResults());

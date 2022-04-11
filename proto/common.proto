@@ -13,8 +13,10 @@ enum Spec {
     SpecRetributionPaladin = 3;
     SpecRogue = 7;
     SpecShadowPriest = 4;
+    SpecSmitePriest = 10;
     SpecWarlock = 5;
     SpecWarrior = 6;
+    SpecProtectionWarrior = 11;
 }
 
 enum Race {
@@ -75,6 +77,18 @@ enum Stat {
     StatRage = 26;
     StatArmor = 27;
     StatRangedAttackPower = 28;
+		StatDefense = 29;
+		StatBlock = 30;
+		StatBlockValue = 31;
+		StatDodge = 32;
+		StatParry = 33;
+		StatResilience = 34;
+		StatHealth = 35;
+    StatArcaneResistance = 36;
+    StatFireResistance = 37;
+    StatFrostResistance = 38;
+    StatNatureResistance = 39;
+    StatShadowResistance = 40;
 }
 
 enum ItemType {
@@ -190,6 +204,14 @@ enum Drums {
 	DrumsOfRestoration = 2;
 }
 
+enum Explosive {
+	ExplosiveUnknown = 0;
+	ExplosiveFelIronBomb = 1;
+	ExplosiveAdamantiteGrenade = 2;
+	ExplosiveGnomishFlameTurret = 3;
+	ExplosiveHolyWater = 4;
+}
+
 enum Potions {
 	UnknownPotion = 0;
 	DestructionPotion = 1;
@@ -205,6 +227,7 @@ enum Conjured {
 	ConjuredFlameCap = 2;
 
 	ConjuredMageManaEmerald = 3;
+	ConjuredRogueThistleTea = 4;
 }
 
 enum WeaponImbue {
@@ -214,6 +237,9 @@ enum WeaponImbue {
 	WeaponImbueElementalSharpeningStone = 2;
 	WeaponImbueBrilliantWizardOil = 3;
 	WeaponImbueSuperiorWizardOil = 4;
+
+	WeaponImbueRogueDeadlyPoison = 10;
+	WeaponImbueRogueInstantPoison = 11;
 
 	WeaponImbueShamanFlametongue = 6;
 	WeaponImbueShamanFrostbrand = 7;
@@ -280,7 +306,6 @@ message RaidBuffs {
 message PartyBuffs {
     int32 bloodlust = 1;
 		int32 ferocious_inspiration = 22; // Number of BM hunters in party.
-    int32 battle_chickens = 27;
 
     TristateEffect moonkin_aura = 2;
     TristateEffect leader_of_the_pack = 19;
@@ -318,6 +343,9 @@ message PartyBuffs {
 		bool bs_solarian_sapphire = 28;
 		bool snapshot_bs_solarian_sapphire = 29;
 		bool snapshot_bs_t2 = 30;
+
+		// Mitigation buffs
+    TristateEffect commanding_shout = 32;
 }
 
 enum StrengthOfEarthType {
@@ -346,58 +374,16 @@ message IndividualBuffs {
 }
 
 message Consumes {
-		// Deprecated in favor of flask.
-		// Remove on 3/4/2022 (1 month).
-    bool flask_of_blinding_light = 1;
-    bool flask_of_mighty_restoration = 2;
-    bool flask_of_pure_death = 3;
-    bool flask_of_supreme_power = 4;
-    bool flask_of_relentless_assault = 21;
 		Flask flask = 38;
-
-		// Deprecated in favor of battle_elixir.
-		// Remove on 3/4/2022 (1 month).
-    bool adepts_elixir = 5;
-    bool elixir_of_major_fire_power = 6;
-    bool elixir_of_major_frost_power = 7;
-    bool elixir_of_major_shadow_power = 8;
-    bool elixir_of_major_agility = 22;
-    bool elixir_of_major_strength = 31;
-    bool elixir_of_demonslaying = 23;
-    bool elixir_of_the_mongoose = 30;
 		BattleElixir battle_elixir = 39;
-
-		// Deprecated in favor of guardian_elixir.
-		// Remove on 3/4/2022 (1 month).
-    bool elixir_of_draenic_wisdom = 9;
-    bool elixir_of_major_mageblood = 10;
 		GuardianElixir guardian_elixir = 40;
 
 		WeaponImbue main_hand_imbue = 32;
 		WeaponImbue off_hand_imbue = 33;
 
-		// Deprecated in favor of food.
-		// Remove on 3/4/2022 (1 month).
-    bool blackened_basilisk = 13;
-    bool skullfish_soup = 14;
-    bool roasted_clefthoof = 24;
-    bool spicy_hot_talbuk = 29;
-    bool grilled_mudfish = 35;
-		bool ravager_dog = 36;
 		Food food = 41;
-
 		PetFood pet_food = 37;
-
-		// Deprecated in favor of alchohol.
-		// Remove on 3/4/2022 (1 month).
-    bool kreegsStoutBeatdown = 20;
 		Alchohol alchohol = 42;
-
-		// Deprecated in favor of int32 versions below.
-		// Remove on 3/4/2022 (1 month).
-    bool scroll_of_strength_v = 25; // 20 str
-    bool scroll_of_agility_v = 26; // 20 agi
-    bool scroll_of_spirit_v = 28; // 30 spirit
 
 		// 0 means no scroll, otherwise value is the scroll level.
 		// E.g. 5 indicates Scroll of Agility V.
@@ -413,9 +399,14 @@ message Consumes {
     int32 num_starting_potions = 17;
 
     Conjured default_conjured = 27;
+    Conjured starting_conjured = 48;
+    int32 num_starting_conjured = 49;
 
 		Drums drums = 19;
-		bool battle_chicken = 34;
+
+		bool super_sapper = 50;
+		bool goblin_sapper = 51;
+		Explosive filler_explosive = 52;
 }
 
 message Debuffs {
@@ -429,6 +420,7 @@ message Debuffs {
     bool winters_chill = 7;
 
     bool blood_frenzy = 8; // Blood Frenzy: +4% phy dmg
+    bool mangle = 16;
     TristateEffect expose_armor = 9; // Expose Armor (If you have a rogue):    5 points: 2050 armor / imp 5 points: 3075 armor
     TristateEffect faerie_fire = 10; // Faerie Fire: -610 armor / imp 3% hit
     bool sunder_armor = 11; // Number of stacks of sunder armor: -520 armor per stack, 5 max
@@ -539,6 +531,9 @@ message Enchant {
 
     ItemQuality quality = 8;
 		int32 phase = 11;
+
+		// Classes that are allowed to use the enchant. Empty indicates no special class restrictions.
+		repeated Class class_allowlist = 12;
 }
 
 message Gem {

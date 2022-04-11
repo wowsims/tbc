@@ -6,11 +6,11 @@
 export type EventID = number;
 
 export interface Disposable {
-  dispose(): void;
+	dispose(): void;
 }
 
 export interface Listener<T> {
-  (eventID: EventID, event: T): any;
+	(eventID: EventID, event: T): any;
 }
 
 interface FiredEventData {
@@ -32,7 +32,7 @@ export class TypedEvent<T> {
 		this.label = label || '';
 	}
 
-  private listeners: Array<Listener<T>> = [];
+	private listeners: Array<Listener<T>> = [];
 
 	// The events which have already been fired from this TypedEvent.
 	private firedEvents: Array<FiredEventData> = [];
@@ -42,32 +42,32 @@ export class TypedEvent<T> {
 	private frozenEvents: Array<FrozenEventData<T>> = [];
 
 	// Registers a new listener to this event.
-  on(listener: Listener<T>): Disposable {
-    this.listeners.push(listener);
-    return {
-      dispose: () => this.off(listener),
-    };
-  }
+	on(listener: Listener<T>): Disposable {
+		this.listeners.push(listener);
+		return {
+			dispose: () => this.off(listener),
+		};
+	}
 
 	// Removes a listener from this event.
-  off(listener: Listener<T>) {
-    const idx = this.listeners.indexOf(listener);
-    if (idx != -1) {
-      this.listeners.splice(idx, 1);
-    }
-  }
+	off(listener: Listener<T>) {
+		const idx = this.listeners.indexOf(listener);
+		if (idx != -1) {
+			this.listeners.splice(idx, 1);
+		}
+	}
 
 	// Convenience for on() which calls off() autmatically after firing once.
-  once(listener: Listener<T>): Disposable {
-    const onceListener = (eventID: EventID, event: T) => {
-      this.off(onceListener);
-      listener(eventID, event);
-    };
+	once(listener: Listener<T>): Disposable {
+		const onceListener = (eventID: EventID, event: T) => {
+			this.off(onceListener);
+			listener(eventID, event);
+		};
 
-    return this.on(onceListener);
-  }
+		return this.on(onceListener);
+	}
 
-  emit(eventID: EventID, event: T) {
+	emit(eventID: EventID, event: T) {
 		const originalEvent = this.firedEvents.find(fe => fe.eventID == eventID);
 		if (originalEvent) {
 			if (!thawing) {
@@ -93,7 +93,7 @@ export class TypedEvent<T> {
 		} else {
 			this.fireEventInternal(eventID, event);
 		}
-  }
+	}
 
 	private fireEventInternal(eventID: EventID, event: T) {
 		this.listeners.forEach(listener => listener(eventID, event));
@@ -142,7 +142,7 @@ export class TypedEvent<T> {
 
 	static onAny(events: Array<TypedEvent<any>>, label?: string): TypedEvent<void> {
 		const newEvent = new TypedEvent<void>(label);
-    events.forEach(emitter => emitter.on(eventID => newEvent.emit(eventID)));
+		events.forEach(emitter => emitter.on(eventID => newEvent.emit(eventID)));
 		return newEvent;
 	}
 }

@@ -88,8 +88,8 @@ export const DefaultArmsSlamOptions = WarriorOptions.create({
 
 export const DefaultArmsSlamConsumes = Consumes.create({
 	defaultPotion: Potions.HastePotion,
-	flaskOfRelentlessAssault: true,
-	roastedClefthoof: true,
+	flask: Flask.FlaskOfRelentlessAssault,
+	food: Food.FoodRoastedClefthoof,
 });
 
 export const DefaultArmsDWRotation = WarriorRotation.create({
@@ -114,8 +114,8 @@ export const DefaultArmsDWOptions = WarriorOptions.create({
 
 export const DefaultArmsDWConsumes = Consumes.create({
 	defaultPotion: Potions.HastePotion,
-	flaskOfRelentlessAssault: true,
-	roastedClefthoof: true,
+	flask: Flask.FlaskOfRelentlessAssault,
+	food: Food.FoodRoastedClefthoof,
 });
 
 export const P1_FURY_PRESET = {

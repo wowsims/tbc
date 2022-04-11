@@ -11,7 +11,8 @@ type ItemDeclaration struct {
 	Stats          Stats // Only non-zero values will override
 	ClassAllowlist []proto.Class
 	Phase          int
-	Filter         bool // If true, this item will be omitted from the sim.
+	HandType       proto.HandType // Overrides hand type.
+	Filter         bool           // If true, this item will be omitted from the sim.
 }
 type ItemData struct {
 	Declaration ItemDeclaration
@@ -75,6 +76,15 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	// Badge Vendor is probably phase 4
 	{ /** Nyn'jah's Tabi Boots */ ID: 33222, Phase: 4},
 
+	{ID: 28431, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28432, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28433, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28437, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28438, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28439, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28657, HandType: proto.HandType_HandTypeOneHand},
+	{ID: 28767, HandType: proto.HandType_HandTypeOneHand},
+
 	{ID: 17782, Filter: true}, // talisman of the binding shard
 	{ID: 17783, Filter: true}, // talisman of the binding fragment
 	{ID: 18582, Filter: true},
@@ -86,4 +96,11 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	{ID: 32421, Filter: true},
 	{ID: 32422, Filter: true},
 	{ID: 33482, Filter: true},
+	{ID: 35321, Phase: 4},     // Cloak of arcane Alacrity
+	{ID: 33304, Phase: 4},     // Cloak of Subjugated Power
+	{ID: 34576, Filter: true}, // Battlemaster's Cruelty
+	{ID: 34577, Filter: true}, // Battlemaster's Depreavity
+	{ID: 34578, Filter: true}, // Battlemaster's Determination
+	{ID: 34579, Filter: true}, // Battlemaster's Audacity
+	{ID: 34580, Filter: true}, // Battlemaster's Perseverence
 }

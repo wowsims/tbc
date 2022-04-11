@@ -16,24 +16,24 @@ export const MAX_NUM_PARTIES = 5;
 
 // Manages all the settings for a single Raid.
 export class Raid {
-  private buffs: RaidBuffs = RaidBuffs.create();
+	private buffs: RaidBuffs = RaidBuffs.create();
 	private staggerStormstrikes: boolean = false;
 
 	// Emits when a raid member is added/removed/moved.
-  readonly compChangeEmitter = new TypedEvent<void>();
+	readonly compChangeEmitter = new TypedEvent<void>();
 
-  readonly buffsChangeEmitter = new TypedEvent<void>();
-  readonly staggerStormstrikesChangeEmitter = new TypedEvent<void>();
+	readonly buffsChangeEmitter = new TypedEvent<void>();
+	readonly staggerStormstrikesChangeEmitter = new TypedEvent<void>();
 
-  // Emits when anything in the raid changes.
-  readonly changeEmitter: TypedEvent<void>;
+	// Emits when anything in the raid changes.
+	readonly changeEmitter: TypedEvent<void>;
 
 	// Should always hold exactly MAX_NUM_PARTIES elements.
 	private parties: Array<Party>;
 
 	readonly sim: Sim;
 
-  constructor(sim: Sim) {
+	constructor(sim: Sim) {
 		this.sim = sim;
 
 		this.parties = [...Array(MAX_NUM_PARTIES).keys()].map(i => {
@@ -44,10 +44,10 @@ export class Raid {
 		});
 
 		this.changeEmitter = TypedEvent.onAny([
-      this.compChangeEmitter,
-      this.buffsChangeEmitter,
+			this.compChangeEmitter,
+			this.buffsChangeEmitter,
 		], 'RaidChange');
-  }
+	}
 
 	size(): number {
 		return sum(this.parties.map(party => party.size()));
@@ -92,19 +92,19 @@ export class Raid {
 		return this.getPlayers().filter(player => player != null && player.getClass() == playerClass).length;
 	}
 
-  getBuffs(): RaidBuffs {
-    // Make a defensive copy
-    return RaidBuffs.clone(this.buffs);
-  }
+	getBuffs(): RaidBuffs {
+		// Make a defensive copy
+		return RaidBuffs.clone(this.buffs);
+	}
 
-  setBuffs(eventID: EventID, newBuffs: RaidBuffs) {
-    if (RaidBuffs.equals(this.buffs, newBuffs))
-      return;
+	setBuffs(eventID: EventID, newBuffs: RaidBuffs) {
+		if (RaidBuffs.equals(this.buffs, newBuffs))
+			return;
 
-    // Make a defensive copy
-    this.buffs = RaidBuffs.clone(newBuffs);
-    this.buffsChangeEmitter.emit(eventID);
-  }
+		// Make a defensive copy
+		this.buffs = RaidBuffs.clone(newBuffs);
+		this.buffsChangeEmitter.emit(eventID);
+	}
 
 	getStaggerStormstrikes(): boolean {
 		return this.staggerStormstrikes;

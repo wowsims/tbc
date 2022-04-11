@@ -9,18 +9,18 @@ declare var tippy: any;
  * Data for creating a new input UI element.
  */
 export interface InputConfig<ModObject, T> {
-  label?: string,
+	label?: string,
 	labelTooltip?: string,
 	extraCssClasses?: Array<string>,
 
-  defaultValue?: T,
+	defaultValue?: T,
 
 	// Returns the event indicating the mapped value has changed.
-  changedEvent: (obj: ModObject) => TypedEvent<any>,
+	changedEvent: (obj: ModObject) => TypedEvent<any>,
 
 	// Get and set the mapped value.
-  getValue: (obj: ModObject) => T,
-  setValue: (eventID: EventID, obj: ModObject, newValue: T) => void,
+	getValue: (obj: ModObject) => T,
+	setValue: (eventID: EventID, obj: ModObject, newValue: T) => void,
 
 	// If set, will automatically disable the input when this evaluates to false.
 	enableWhen?: (obj: ModObject) => boolean,
@@ -37,10 +37,10 @@ export abstract class Input<ModObject, T> extends Component {
 	private readonly inputConfig: InputConfig<ModObject, T>;
 	readonly modObject: ModObject;
 
-  readonly changeEmitter = new TypedEvent<void>();
+	readonly changeEmitter = new TypedEvent<void>();
 
-  constructor(parent: HTMLElement, cssClass: string, modObject: ModObject, config: InputConfig<ModObject, T>) {
-    super(parent, 'input-root', config.rootElem);
+	constructor(parent: HTMLElement, cssClass: string, modObject: ModObject, config: InputConfig<ModObject, T>) {
+		super(parent, 'input-root', config.rootElem);
 		this.inputConfig = config;
 		this.modObject = modObject;
 		this.rootElem.classList.add(cssClass);
@@ -48,15 +48,15 @@ export abstract class Input<ModObject, T> extends Component {
 			this.rootElem.classList.add(...config.extraCssClasses);
 		}
 
-    if (config.label) {
-      const labelDiv = document.createElement('div');
-      labelDiv.classList.add('input-label-div');
-      this.rootElem.appendChild(labelDiv);
+		if (config.label) {
+			const labelDiv = document.createElement('div');
+			labelDiv.classList.add('input-label-div');
+			this.rootElem.appendChild(labelDiv);
 
-      const label = document.createElement('span');
-      label.classList.add('input-label');
-      label.textContent = config.label;
-      labelDiv.appendChild(label);
+			const label = document.createElement('span');
+			label.classList.add('input-label');
+			label.textContent = config.label;
+			labelDiv.appendChild(label);
 
 			if (config.labelTooltip) {
 				const tooltip = document.createElement('span');
@@ -67,12 +67,12 @@ export abstract class Input<ModObject, T> extends Component {
 				});
 				labelDiv.appendChild(tooltip);
 			}
-    }
+		}
 
-    config.changedEvent(this.modObject).on(eventID => {
+		config.changedEvent(this.modObject).on(eventID => {
 			this.setInputValue(config.getValue(this.modObject));
 			this.update();
-    });
+		});
 	}
 
 	private update() {

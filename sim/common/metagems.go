@@ -20,53 +20,61 @@ func init() {
 	core.AddItemEffect(32409, func(_ core.Agent) {}) // Relentless Earthstorm Diamond
 }
 
-var MysticalSkyfireDiamondAuraID = core.NewAuraID()
-var MysticFocusAuraID = core.NewAuraID()
-
 func ApplyBrutalEarthstormDiamond(agent core.Agent) {
-	agent.GetCharacter().PseudoStats.BonusMeleeDamage += 3
-	agent.GetCharacter().PseudoStats.BonusRangedDamage += 3
+	agent.GetCharacter().PseudoStats.BonusDamage += 3
 }
 
 func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const hasteBonus = 320.0
-		const dur = time.Second * 4
+
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Mystic Focus Proc", core.ActionID{ItemID: 25893}, stats.Stats{stats.SpellHaste: 320}, time.Second*4)
 		const icdDur = time.Second * 35
 		icd := core.NewICD()
 
-		return core.Aura{
-			ID: MysticalSkyfireDiamondAuraID,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Mystical Skyfire Diamond",
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("Mystical Skyfire Diamond") > 0.15 {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, MysticFocusAuraID, core.ActionID{ItemID: 25893}, stats.SpellHaste, hasteBonus, dur)
+				procAura.Activate(sim)
 			},
-		}
+			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				if icd.IsOnCD(sim) || sim.RandomFloat("Mystical Skyfire Diamond") > 0.15 {
+					return
+				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				procAura.Activate(sim)
+			},
+		})
 	})
 }
 
-var InsightfulEarthstormDiamondAuraID = core.NewAuraID()
-
 func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		icd := core.NewICD()
 		const dur = time.Second * 15
 
-		return core.Aura{
-			ID: InsightfulEarthstormDiamondAuraID,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Insightful Earthstorm Diamond",
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("Insightful Earthstorm Diamond") > 0.04 {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + dur)
 				character.AddMana(sim, 300, core.ActionID{ItemID: 25901}, false)
 			},
-		}
+			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				if icd.IsOnCD(sim) || sim.RandomFloat("Insightful Earthstorm Diamond") > 0.04 {
+					return
+				}
+				icd = core.InternalCD(sim.CurrentTime + dur)
+				character.AddMana(sim, 300, core.ActionID{ItemID: 25901}, false)
+			},
+		})
 	})
 }
 
@@ -80,35 +88,31 @@ func ApplyEmberSkyfireDiamond(agent core.Agent) {
 	})
 }
 
-var ThunderingSkyfireDiamondAuraID = core.NewAuraID()
-var SkyfireSwiftnessAuraID = core.NewAuraID()
-
 func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const hasteBonus = 240.0
-		const dur = time.Second * 6
-		const icdDur = time.Second * 40
-		icd := core.NewICD()
 
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Thundering Skyfire Diamond Proc", core.ActionID{ItemID: 32410}, stats.Stats{stats.MeleeHaste: 240}, time.Second*6)
+		icd := core.NewICD()
+		const icdDur = time.Second * 40
 		ppmm := character.AutoAttacks.NewPPMManager(1.5)
 
-		return core.Aura{
-			ID: ThunderingSkyfireDiamondAuraID,
-			OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Thundering Skyfire Diamond",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				// Mask 68, melee or ranged auto attacks.
-				if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(core.ProcMaskWhiteHit) || ability.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskWhiteHit) || spellEffect.IsPhantom {
 					return
 				}
 				if icd.IsOnCD(sim) {
 					return
 				}
-				if !ppmm.Proc(sim, hitEffect.IsMH(), ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged), "Thundering Skyfire Diamond") {
+				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Thundering Skyfire Diamond") {
 					return
 				}
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddAuraWithTemporaryStats(sim, SkyfireSwiftnessAuraID, core.ActionID{ItemID: 32410}, stats.MeleeHaste, hasteBonus, dur)
+				procAura.Activate(sim)
 			},
-		}
+		})
 	})
 }

@@ -4,6 +4,7 @@
 	--theme-color-background: #1e0f0c;
 	--theme-color-background-raw: 29, 21, 16;
 	--theme-background-image: url('/tbc/assets/warrior_background.jpg');
+	--theme-background-opacity: 0.95;
 	--main-text-color: White;
 }
 
@@ -11,11 +12,8 @@
 .warrior-sim-ui .self-buffs-section {
   grid-template-columns: repeat(4, 1fr);
 }
-.warrior-sim-ui .consumes-section {
-  grid-template-columns: repeat(4, 1fr);
-}
 .warrior-sim-ui .buffs-section {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
 }
 .warrior-sim-ui .debuffs-section {
   grid-template-columns: repeat(3, 1fr);

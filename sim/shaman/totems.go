@@ -24,7 +24,8 @@ func (shaman *Shaman) newTotemCastTemplate(sim *core.Simulation, baseManaCost fl
 				Type:  stats.Mana,
 				Value: manaCost,
 			},
-			GCD: time.Second,
+			GCD:         time.Second,
+			SpellExtras: SpellFlagTotem,
 		},
 	}
 
@@ -77,7 +78,7 @@ func (shaman *Shaman) NewTranquilAirTotem(sim *core.Simulation) *core.SimpleCast
 	return &shaman.totemSpell
 }
 
-var windfuryBaseManaCosts = []float64{
+var windfuryTotemBaseManaCosts = []float64{
 	95,
 	140,
 	200,
@@ -92,8 +93,8 @@ func (shaman *Shaman) newWindfuryTotemTemplate(sim *core.Simulation, rank int32)
 		rank = 1
 	}
 
-	baseManaCost := windfuryBaseManaCosts[rank-1]
-	spellID := core.WindfurySpellRanks[rank-1]
+	baseManaCost := windfuryTotemBaseManaCosts[rank-1]
+	spellID := core.WindfuryTotemSpellRanks[rank-1]
 	cast := shaman.newTotemCastTemplate(sim, baseManaCost, spellID)
 	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
 		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
@@ -221,7 +222,7 @@ func (shaman *Shaman) NextTotemAt(sim *core.Simulation) time.Duration {
 //  Returns whether we tried to cast a totem, regardless of whether it succeeded.
 func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 	var cast *core.SimpleCast
-	var attackCast *core.SimpleSpell // if using fire totems this will be an attack cast.
+	var attackCast *core.Spell // if using fire totems this will be an attack cast.
 
 	for totemTypeIdx, totemExpiration := range shaman.NextTotemDrops {
 		if cast != nil || attackCast != nil {
@@ -255,11 +256,11 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 				case proto.FireTotem_TotemOfWrath:
 					cast = shaman.NewTotemOfWrath(sim)
 				case proto.FireTotem_SearingTotem:
-					attackCast = shaman.NewSearingTotem(sim, sim.GetPrimaryTarget())
+					attackCast = shaman.SearingTotem
 				case proto.FireTotem_MagmaTotem:
-					attackCast = shaman.NewMagmaTotem(sim)
+					attackCast = shaman.MagmaTotem
 				case proto.FireTotem_FireNovaTotem:
-					attackCast = shaman.NewNovaTotem(sim)
+					attackCast = shaman.FireNovaTotem
 				}
 
 			case WaterTotem:
@@ -274,8 +275,8 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 		}
 		return true
 	} else if attackCast != nil {
-		if success := attackCast.Cast(sim); !success {
-			shaman.WaitForMana(sim, attackCast.Cost.Value)
+		if success := attackCast.Cast(sim, sim.GetPrimaryTarget()); !success {
+			shaman.WaitForMana(sim, attackCast.MostRecentCost)
 		}
 		return true
 	}

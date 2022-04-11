@@ -10,61 +10,40 @@ import (
 var ArcaneShotCooldownID = core.NewCooldownID()
 var ArcaneShotActionID = core.ActionID{SpellID: 27019, CooldownID: ArcaneShotCooldownID}
 
-func (hunter *Hunter) newArcaneShotTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
-	ama := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            ArcaneShotActionID,
-			Character:           &hunter.Character,
-			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolArcane,
-			GCD:                 core.GCDDefault,
-			Cooldown:            time.Second * 6,
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 230,
-			},
-			CritMultiplier: hunter.critMultiplier(true, sim.GetPrimaryTarget()),
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskRangedSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				IgnoreArmor:            true,
-			},
-			WeaponInput: core.WeaponDamageInput{
-				CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
-					return attackPower*0.15 + 273
-				},
+func (hunter *Hunter) registerArcaneShotSpell(sim *core.Simulation) {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 230}
+	ama := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:    ArcaneShotActionID,
+				Character:   &hunter.Character,
+				SpellSchool: core.SpellSchoolArcane,
+				GCD:         core.GCDDefault + hunter.latency,
+				IgnoreHaste: true,
+				Cooldown:    time.Second * 6,
+				Cost:        cost,
+				BaseCost:    cost,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}
-
 	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 	ama.Cooldown -= time.Millisecond * 200 * time.Duration(hunter.Talents.ImprovedArcaneShot)
 
-	return core.NewMeleeAbilityTemplate(ama)
-}
+	hunter.ArcaneShot = hunter.RegisterSpell(core.SpellConfig{
+		Template: ama,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskRangedSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 
-func (hunter *Hunter) NewArcaneShot(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
-	as := &hunter.arcaneShot
-	hunter.arcaneShotTemplate.Apply(as)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	as.Effect.Target = target
-
-	// Arcane shot is super weird, because its a melee ability but it uses arcane
-	// modifiers instead of physical. Luckily, CoE and Misery are the only modifiers
-	// for arcane in the game so we can hardcode them here.
-	if target.HasAura(core.MiseryDebuffID) {
-		as.Effect.DamageMultiplier *= 1.05
-	}
-	if target.HasAura(core.CurseOfElementsDebuffID) {
-		level := target.NumStacks(core.CurseOfElementsDebuffID)
-		as.Effect.DamageMultiplier *= 1.1 + 0.01*float64(level)
-	}
-
-	return as
+			BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					return (hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget())*0.15 + 273
+				},
+				TargetSpellCoefficient: 1,
+			}),
+			OutcomeApplier: core.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
+		}),
+	})
 }

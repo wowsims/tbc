@@ -5,7 +5,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // Totem Item IDs
@@ -32,92 +31,78 @@ const (
 // Normal: 246, w/ EF: 136
 
 // Shared precomputation logic for LB and CL.
-func (shaman *Shaman) newElectricSpellCast(actionID core.ActionID, baseManaCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellCast {
-	cost := core.ResourceCost{Type: stats.Mana, Value: baseManaCost}
-	spellCast := core.SpellCast{
-		Cast: core.Cast{
-			ActionID:            actionID,
-			Character:           shaman.GetCharacter(),
-			CritRollCategory:    core.CritRollCategoryMagical,
-			OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-			SpellSchool:         core.SpellSchoolNature,
-			BaseCost:            cost,
-			Cost:                cost,
-			CastTime:            baseCastTime,
-			GCD:                 core.GCDDefault,
-			CritMultiplier:      shaman.DefaultSpellCritMultiplier(),
+func (shaman *Shaman) newElectricSpellConfig(actionID core.ActionID, baseCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellConfig {
+	spell := core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolNature,
+		SpellExtras: SpellFlagElectric,
+		BaseCost:    baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost:     baseCost,
+				CastTime: baseCastTime,
+				GCD:      core.GCDDefault,
+			},
 		},
 	}
 
-	if shaman.Talents.ElementalFury {
-		spellCast.CritMultiplier = shaman.SpellCritMultiplier(1, 1)
-	}
-
 	if isLightningOverload {
-		spellCast.ActionID.Tag = CastTagLightningOverload
-		spellCast.CastTime = 0
-		spellCast.GCD = 0
-		spellCast.Cost.Value = 0
+		spell.ActionID.Tag = CastTagLightningOverload
+		spell.Cast.DefaultCast.CastTime = 0
+		spell.Cast.DefaultCast.GCD = 0
+		spell.Cast.DefaultCast.Cost = 0
 	} else if shaman.Talents.LightningMastery > 0 {
 		// Convection applies against the base cost of the spell.
-		spellCast.Cost.Value -= spellCast.BaseCost.Value * float64(shaman.Talents.Convection) * 0.02
-		spellCast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
+		spell.Cast.DefaultCast.Cost -= baseCost * float64(shaman.Talents.Convection) * 0.02
+		spell.Cast.DefaultCast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
 	}
 
 	if !isLightningOverload && shaman.Talents.ElementalFocus {
-		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+		spell.Cast.OnCastComplete = func(sim *core.Simulation, spell *core.Spell) {
 			if shaman.ElementalFocusStacks > 0 {
 				shaman.ElementalFocusStacks--
 			}
 		}
 	} else {
-		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {}
+		spell.Cast.OnCastComplete = func(sim *core.Simulation, spell *core.Spell) {}
 	}
 
-	return spellCast
+	return spell
 }
 
 // Helper for precomputing spell effects.
-func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamage float64, spellCoefficient float64, isLightningOverload bool) core.SpellHitEffect {
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
-		DirectInput: core.DirectDamageInput{
-			MinBaseDamage:    minBaseDamage,
-			MaxBaseDamage:    maxBaseDamage,
-			SpellCoefficient: spellCoefficient,
-		},
+func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamage float64, spellCoefficient float64, isLightningOverload bool) core.SpellEffect {
+	effect := core.SpellEffect{
+		BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
+		BonusSpellCritRating: 0 +
+			(float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance) +
+			(float64(shaman.Talents.CallOfThunder) * 1 * core.SpellCritRatingPerCritChance),
+		BonusSpellPower: 0 +
+			core.TernaryFloat64(shaman.Equip[items.ItemSlotRanged].ID == TotemOfStorms, 33, 0) +
+			core.TernaryFloat64(shaman.Equip[items.ItemSlotRanged].ID == TotemOfTheVoid, 55, 0) +
+			core.TernaryFloat64(shaman.Equip[items.ItemSlotRanged].ID == TotemOfAncestralGuidance, 85, 0),
+		DamageMultiplier: 1 * (1 + 0.01*float64(shaman.Talents.Concussion)),
+		ThreatMultiplier: 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision),
+		BaseDamage:       core.BaseDamageConfigMagic(minBaseDamage, maxBaseDamage, spellCoefficient),
+		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier()),
 	}
 
-	effect.SpellEffect.DamageMultiplier *= 1 + 0.01*float64(shaman.Talents.Concussion)
 	if isLightningOverload {
-		effect.SpellEffect.DamageMultiplier *= 0.5
-		effect.SpellEffect.ThreatMultiplier = 0
-	}
-
-	effect.ThreatMultiplier *= 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision)
-	effect.SpellEffect.BonusSpellHitRating += float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance
-	effect.SpellEffect.BonusSpellCritRating += float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance
-	effect.SpellEffect.BonusSpellCritRating += float64(shaman.Talents.CallOfThunder) * 1 * core.SpellCritRatingPerCritChance
-
-	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfStorms {
-		effect.SpellEffect.BonusSpellPower += 33
-	} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfTheVoid {
-		effect.SpellEffect.BonusSpellPower += 55
-	} else if shaman.Equip[items.ItemSlotRanged].ID == TotemOfAncestralGuidance {
-		effect.SpellEffect.BonusSpellPower += 85
+		effect.DamageMultiplier *= 0.5
+		effect.ThreatMultiplier = 0
 	}
 
 	return effect
 }
 
 // Shared LB/CL logic that is dynamic, i.e. can't be precomputed.
-func (shaman *Shaman) applyElectricSpellCastInitModifiers(spellCast *core.SpellCast) {
+func (shaman *Shaman) applyElectricSpellCastInitModifiers(spell *core.Spell, cast *core.NewCast) {
 	if shaman.ElementalFocusStacks > 0 {
 		// Reduces mana cost by 40%
-		spellCast.Cost.Value -= spellCast.BaseCost.Value * 0.4
+		cast.Cost -= spell.BaseCost * 0.4
+	}
+	if shaman.ElementalMasteryAura != nil && shaman.ElementalMasteryAura.IsActive() {
+		cast.Cost = 0
 	}
 }

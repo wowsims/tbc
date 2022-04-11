@@ -82,8 +82,7 @@ type WaterElemental struct {
 	// does its own thing. This controls how much it does that.
 	disobeyChance float64
 
-	waterboltSpell        core.SimpleSpell
-	waterboltCastTemplate core.SimpleSpellTemplate
+	Waterbolt *core.Spell
 }
 
 func (mage *Mage) NewWaterElemental(disobeyChance float64) *WaterElemental {
@@ -109,28 +108,23 @@ func (we *WaterElemental) GetPet() *core.Pet {
 }
 
 func (we *WaterElemental) Init(sim *core.Simulation) {
-	we.waterboltCastTemplate = we.newWaterboltTemplate(sim)
+	we.registerWaterboltSpell(sim)
 }
 
-func (we *WaterElemental) Reset(newsim *core.Simulation) {
+func (we *WaterElemental) Reset(sim *core.Simulation) {
 }
 
 func (we *WaterElemental) OnGCDReady(sim *core.Simulation) {
-	// There's some edge case where this causes a panic, haven't figured it out yet.
-	if we.waterboltSpell.IsInUse() {
-		we.waterboltSpell.Cancel(sim)
-	}
-
-	spell := we.NewWaterbolt(sim, sim.GetPrimaryTarget())
+	spell := we.Waterbolt
 
 	if sim.RandomFloat("Water Elemental Disobey") < we.disobeyChance {
 		// Water ele has decided not to cooperate, so just wait for the cast time
 		// instead of casting.
-		we.WaitUntil(sim, sim.CurrentTime+spell.GetDuration())
+		we.WaitUntil(sim, sim.CurrentTime+spell.Template.CastTime)
 		return
 	}
 
-	if success := spell.Cast(sim); !success {
+	if success := spell.Cast(sim, sim.GetPrimaryTarget()); !success {
 		// If water ele has gone OOM then there won't be enough time left for meaningful
 		// regen to occur before the ele expires. So just murder itself.
 		we.Disable(sim)
@@ -162,53 +156,31 @@ var waterElementalStatInheritance = func(ownerStats stats.Stats) stats.Stats {
 
 const SpellIDWaterbolt int32 = 31707
 
-func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	baseManaCost := we.BaseMana() * 0.1
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDWaterbolt},
-				Character:           &we.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFrost,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: baseManaCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: baseManaCost,
-				},
-				CastTime:       time.Millisecond * 3000,
-				GCD:            core.GCDDefault,
-				CritMultiplier: we.DefaultSpellCritMultiplier(),
+var WaterboltActionID = core.ActionID{SpellID: SpellIDWaterbolt}
+
+func (we *WaterElemental) registerWaterboltSpell(sim *core.Simulation) {
+	baseCost := we.BaseMana() * 0.1
+
+	we.Waterbolt = we.RegisterSpell(core.SpellConfig{
+		ActionID:    WaterboltActionID,
+		SpellSchool: core.SpellSchoolFrost,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost:     baseCost,
+				GCD:      core.GCDDefault,
+				CastTime: time.Second * 3,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    256,
-				MaxBaseDamage:    328,
-				SpellCoefficient: 3.0 / 3.5,
-			},
-		},
-	}
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (we *WaterElemental) NewWaterbolt(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	waterbolt := &we.waterboltSpell
-	we.waterboltCastTemplate.Apply(waterbolt)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	waterbolt.Effect.Target = target
-	waterbolt.Init(sim)
-
-	return waterbolt
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagic(256, 328, 3.0/3.5),
+			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(we.DefaultSpellCritMultiplier()),
+		}),
+	})
 }

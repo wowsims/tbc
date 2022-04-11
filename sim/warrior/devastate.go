@@ -1,0 +1,77 @@
+package warrior
+
+import (
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
+)
+
+var DevastateActionID = core.ActionID{SpellID: 30022}
+
+func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
+	warrior.sunderArmorCost = 15.0 - float64(warrior.Talents.ImprovedSunderArmor) - float64(warrior.Talents.FocusedRage)
+	refundAmount := warrior.sunderArmorCost * 0.8
+
+	ability := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:    DevastateActionID,
+				Character:   &warrior.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				GCD:         core.GCDDefault,
+				IgnoreHaste: true,
+				BaseCost: core.ResourceCost{
+					Type:  stats.Rage,
+					Value: warrior.sunderArmorCost,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Rage,
+					Value: warrior.sunderArmorCost,
+				},
+				SpellExtras: core.SpellExtrasMeleeMetrics,
+			},
+		},
+	}
+
+	normalBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 0.5, true)
+
+	warrior.Devastate = warrior.RegisterSpell(core.SpellConfig{
+		Template: ability,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask: core.ProcMaskMeleeMHSpecial,
+
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			FlatThreatBonus:  100,
+
+			BaseDamage: core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					// Bonus 35 damage / stack of sunder. Counts stacks AFTER cast but only if stacks > 0.
+					sunderBonus := 0.0
+					saStacks := warrior.SunderArmorAura.GetStacks()
+					if saStacks != 0 {
+						sunderBonus = 35 * float64(core.MinInt32(saStacks+1, 5))
+					}
+
+					return normalBaseDamage(sim, hitEffect, spell) + sunderBonus
+				},
+				TargetSpellCoefficient: 1,
+			},
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					if !warrior.ExposeArmorAura.IsActive() {
+						warrior.SunderArmorDevastate.Cast(sim, spellEffect.Target)
+					}
+				} else {
+					warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+				}
+			},
+		}),
+	})
+}
+
+func (warrior *Warrior) CanDevastate(sim *core.Simulation) bool {
+	return warrior.CurrentRage() >= warrior.sunderArmorCost
+}

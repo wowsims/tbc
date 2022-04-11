@@ -42,6 +42,7 @@ message HunterTalents {
 	int32 monster_slaying = 30;
 	int32 humanoid_slaying = 31;
 	int32 savage_strikes = 32;
+	int32 deflection = 46;
 	int32 clever_traps = 33;
 	int32 survivalist = 34;
 	int32 trap_mastery = 35;

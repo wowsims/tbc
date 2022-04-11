@@ -7,13 +7,23 @@ import (
 )
 
 var AvengingWrathCD = core.NewCooldownID()
-var AvengingWrathAuraID = core.NewAuraID()
 var AvengingWrathActionID = core.ActionID{SpellID: 31884}
 
 func (paladin *Paladin) registerAvengingWrathCD() {
 	cd := time.Minute * 3
-	dur := time.Second * 20
 	var manaCost float64 = 236
+
+	aura := paladin.RegisterAura(&core.Aura{
+		Label:    "Avenging Wrath",
+		ActionID: AvengingWrathActionID,
+		Duration: time.Second * 20,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.DamageDealtMultiplier *= 1.3
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Unit.PseudoStats.DamageDealtMultiplier /= 1.3
+		},
+	})
 
 	paladin.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   AvengingWrathActionID,
@@ -29,22 +39,10 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				character.AddAura(sim, core.Aura{
-					ID:       AvengingWrathAuraID,
-					ActionID: AvengingWrathActionID,
-					Expires:  sim.CurrentTime + dur,
-					OnBeforeMeleeHit: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
-						hitEffect.DamageMultiplier *= 1.3
-					},
-					OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						spellEffect.DamageMultiplier *= 1.3
-					},
-					OnBeforePeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage *float64) {
-						*tickDamage *= 1.3
-					},
-				})
+				aura.Activate(sim)
 				character.Metrics.AddInstantCast(AvengingWrathActionID)
 				character.SetCD(AvengingWrathCD, sim.CurrentTime+cd)
+				// TODO: Apply mana cost
 			}
 		},
 	})

@@ -18,7 +18,7 @@ const (
 )
 
 func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
-	if hunter.aspectOfTheViper {
+	if hunter.currentAspect == hunter.AspectOfTheViperAura {
 		// https://wowpedia.fandom.com/wiki/Aspect_of_the_Viper?oldid=1458832
 		percentMana := core.MaxFloat(0.2, core.MinFloat(0.9, hunter.CurrentManaPercent()))
 		scaling := 22.0/35.0*(0.9-percentMana) + 0.11
@@ -39,18 +39,17 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 	}
 }
 
-func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
+func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
 	hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
-	if !ability.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
-		return
+	if spell == hunter.AutoAttacks.RangedAuto {
+		hunter.rotation(sim, true)
 	}
-	hunter.rotation(sim, true)
 }
 
 func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 	if sim.CurrentTime == 0 {
 		if hunter.Rotation.PrecastAimedShot && hunter.Talents.AimedShot {
-			hunter.NewAimedShot(sim, sim.GetPrimaryTarget()).Attack(sim)
+			hunter.AimedShot.Cast(sim, sim.GetPrimaryTarget())
 		}
 		hunter.AutoAttacks.SwingRanged(sim, sim.GetPrimaryTarget())
 		return
@@ -154,7 +153,7 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 		hunter.rangedWindup = rangedWindupDuration.Seconds()
 
 		// Use the inverse (1 / x) because multiplication is faster than division.
-		gcdRate := 1.0 / 1.5
+		gcdRate := 1.0 / (1.5 + hunter.latency.Seconds())
 		weaveRate := 1.0 / hunter.AutoAttacks.MainhandSwingSpeed().Seconds()
 		shootRate := 1.0 / hunter.AutoAttacks.RangedSwingSpeed().Seconds()
 
@@ -286,30 +285,30 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 		hunter.doMeleeWeave(sim)
 	case OptionSteady:
 		if !hunter.tryUsePrioGCD(sim) {
-			ss := hunter.NewSteadyShot(sim, target)
-			if success := ss.StartCast(sim); success {
+			success := hunter.SteadyShot.Cast(sim, target)
+			if success {
 				// Can't use kill command while casting steady shot.
 				hunter.killCommandBlocked = true
 			} else {
-				hunter.WaitForMana(sim, ss.GetManaCost())
+				hunter.WaitForMana(sim, hunter.SteadyShot.MostRecentCost)
 			}
 		}
 	case OptionMulti:
 		if !hunter.tryUsePrioGCD(sim) {
-			ms := hunter.NewMultiShot(sim)
-			if success := ms.StartCast(sim); success {
+			success := hunter.MultiShot.Cast(sim, target)
+			if success {
 			} else {
-				hunter.WaitForMana(sim, ms.GetManaCost())
+				hunter.WaitForMana(sim, hunter.MultiShot.MostRecentCost)
 			}
 		}
 	case OptionArcane:
 		if !hunter.tryUsePrioGCD(sim) {
-			as := hunter.NewArcaneShot(sim, target)
-			if success := as.Attack(sim); success {
+			success := hunter.ArcaneShot.Cast(sim, target)
+			if success {
 				// Arcane is instant, so we can try another action immediately.
 				hunter.rotation(sim, false)
 			} else {
-				hunter.WaitForMana(sim, as.Cost.Value)
+				hunter.WaitForMana(sim, hunter.ArcaneShot.MostRecentCost)
 			}
 		}
 	}
@@ -318,9 +317,13 @@ func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 // Decides whether to use an instant-cast GCD spell.
 // Returns true if any of these spells was selected.
 func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
+	if hunter.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		return true
+	}
+
 	// First prio is swapping aspect if necessary.
 	currentMana := hunter.CurrentManaPercent()
-	if hunter.aspectOfTheViper {
+	if hunter.currentAspect == hunter.AspectOfTheViperAura && hunter.Rotation.ViperStartManaPercent < 1 {
 		if !hunter.permaHawk &&
 			hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
 			hunter.permaHawk = true
@@ -330,7 +333,7 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 			aspect.StartCast(sim)
 			return true
 		}
-	} else if !hunter.aspectOfTheViper && !hunter.permaHawk && currentMana < hunter.Rotation.ViperStartManaPercent {
+	} else if hunter.currentAspect != hunter.AspectOfTheViperAura && !hunter.permaHawk && currentMana < hunter.Rotation.ViperStartManaPercent {
 		if hunter.manaSpentPerSecondAtFirstAspectSwap == 0 {
 			hunter.manaSpentPerSecondAtFirstAspectSwap = (hunter.Metrics.ManaSpent - hunter.Metrics.ManaGained) / sim.CurrentTime.Seconds()
 		}
@@ -346,16 +349,16 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 
 	target := sim.GetPrimaryTarget()
 
-	if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !target.HasAura(ScorpidStingDebuffID) {
-		ss := hunter.NewScorpidSting(sim, target)
-		if success := ss.Attack(sim); !success {
-			hunter.WaitForMana(sim, ss.Cost.Value)
+	if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !hunter.ScorpidStingAura.IsActive() {
+		success := hunter.ScorpidSting.Cast(sim, target)
+		if !success {
+			hunter.WaitForMana(sim, hunter.ScorpidSting.MostRecentCost)
 		}
 		return true
-	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_SerpentSting && !hunter.serpentStingDot.IsInUse() {
-		ss := hunter.NewSerpentSting(sim, target)
-		if success := ss.Attack(sim); !success {
-			hunter.WaitForMana(sim, ss.Cost.Value)
+	} else if hunter.Rotation.Sting == proto.Hunter_Rotation_SerpentSting && !hunter.SerpentStingDot.IsActive() {
+		success := hunter.SerpentSting.Cast(sim, target)
+		if !success {
+			hunter.WaitForMana(sim, hunter.SerpentSting.MostRecentCost)
 		}
 		return true
 	}

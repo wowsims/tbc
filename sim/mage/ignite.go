@@ -1,85 +1,79 @@
 package mage
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
 )
 
-const SpellIDIgnite int32 = 12848
+var IgniteActionID = core.ActionID{SpellID: 12848}
 
-var IgniteDebuffID = core.NewDebuffID()
+func (mage *Mage) registerIgniteSpell(sim *core.Simulation) {
+	mage.Ignite = mage.RegisterSpell(core.SpellConfig{
+		ActionID:    IgniteActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagMage | core.SpellExtrasIgnoreModifiers,
+	})
+}
 
-func (mage *Mage) newIgniteTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID: SpellIDIgnite,
-				},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         core.SpellExtrasBinary,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
-				IgnoreHitCheck:         true,
-			},
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:         2,
-				TickLength:            time.Second * 2,
-				TickBaseDamage:        0, // This is set dynamically
-				TickSpellCoefficient:  0,
-				IgnoreDamageModifiers: true,
-				DebuffID:              IgniteDebuffID,
-			},
-		},
-	}
-
-	return core.NewSimpleSpellTemplate(spell)
+func (mage *Mage) newIgniteDot(sim *core.Simulation, target *core.Target) *core.Dot {
+	return core.NewDot(core.Dot{
+		Spell: mage.Ignite,
+		Aura: target.RegisterAura(&core.Aura{
+			Label:    "Ignite-" + strconv.Itoa(int(mage.Index)),
+			ActionID: IgniteActionID,
+		}),
+		NumberOfTicks: 2,
+		TickLength:    time.Second * 2,
+	})
 }
 
 func (mage *Mage) procIgnite(sim *core.Simulation, target *core.Target, damageFromProccingSpell float64) {
-	newIgniteDamage := damageFromProccingSpell * float64(mage.Talents.Ignite) * 0.08
-	ignite := &mage.igniteSpells[target.Index]
+	igniteDot := mage.IgniteDots[target.Index]
 
-	if ignite.Effect.DotInput.IsTicking(sim) {
-		newIgniteDamage += ignite.Effect.DotInput.RemainingDamage()
+	newIgniteDamage := damageFromProccingSpell * float64(mage.Talents.Ignite) * 0.08
+	if igniteDot.IsActive() {
+		newIgniteDamage += mage.IgniteTickDamage[target.Index] * float64(2-igniteDot.TickCount)
 	}
 
-	// Cancel the current ignite dot.
-	ignite.Cancel(sim)
+	newTickDamage := newIgniteDamage / 2
+	mage.IgniteTickDamage[target.Index] = newTickDamage
 
-	mage.igniteCastTemplate.Apply(ignite)
+	if sim.Log != nil {
+		mage.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)", IgniteActionID, 0.0, time.Duration(0))
+		mage.Log(sim, "Completed cast %s", IgniteActionID)
+	}
+	mage.Ignite.Casts++
+	mage.Ignite.Hits++
 
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ignite.Effect.Target = target
-	ignite.Effect.DotInput.TickBaseDamage = newIgniteDamage / 2
-	ignite.Init(sim)
-	ignite.Cast(sim)
+	// Reassign the effect to apply the new damage value.
+	igniteDot.TickEffects = core.TickFuncSnapshot(target, core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+		IsPeriodic:       true,
+		BaseDamage:       core.BaseDamageConfigFlat(newTickDamage),
+		OutcomeApplier:   core.OutcomeFuncTick(),
+	})
+	igniteDot.Apply(sim)
 }
-
-var IgniteAuraID = core.NewAuraID()
 
 func (mage *Mage) applyIgnite() {
 	if mage.Talents.Ignite == 0 {
 		return
 	}
 
-	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: IgniteAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellCast.SpellSchool == core.SpellSchoolFire && spellEffect.Outcome.Matches(core.OutcomeCrit) {
+	mage.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		return mage.GetOrRegisterAura(&core.Aura{
+			Label: "Ignite Talent",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
+				}
+				if spell.SpellSchool == core.SpellSchoolFire && spellEffect.Outcome.Matches(core.OutcomeCrit) {
 					mage.procIgnite(sim, spellEffect.Target, spellEffect.Damage)
 				}
 			},
-		}
+		})
 	})
 }

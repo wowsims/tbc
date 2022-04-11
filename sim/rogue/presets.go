@@ -28,6 +28,45 @@ var CombatTalents = &proto.RogueTalents{
 	SurpriseAttacks:         true,
 }
 
+var MutilateTalents = &proto.RogueTalents{
+	Malice:              5,
+	Ruthlessness:        3,
+	Murder:              2,
+	PuncturingWounds:    3,
+	RelentlessStrikes:   true,
+	ImprovedExposeArmor: 2,
+	Lethality:           5,
+	ImprovedPoisons:     5,
+	ColdBlood:           true,
+	QuickRecovery:       2,
+	SealFate:            5,
+	Vigor:               true,
+	FindWeakness:        5,
+	Mutilate:            true,
+
+	ImprovedSinisterStrike:  2,
+	ImprovedSliceAndDice:    3,
+	Precision:               5,
+	DualWieldSpecialization: 5,
+}
+
+var HemoTalents = &proto.RogueTalents{
+	ImprovedSinisterStrike:  2,
+	ImprovedSliceAndDice:    3,
+	Precision:               5,
+	DualWieldSpecialization: 5,
+	BladeFlurry:             true,
+	SwordSpecialization:     5,
+	WeaponExpertise:         2,
+	Aggression:              3,
+	Vitality:                2,
+	AdrenalineRush:          true,
+	CombatPotency:           5,
+
+	SerratedBlades: 3,
+	Hemorrhage:     true,
+}
+
 var PlayerOptionsBasic = &proto.Player_Rogue{
 	Rogue: &proto.Rogue{
 		Talents:  CombatTalents,
@@ -36,8 +75,29 @@ var PlayerOptionsBasic = &proto.Player_Rogue{
 	},
 }
 
+var PlayerOptionsMutilate = &proto.Player_Rogue{
+	Rogue: &proto.Rogue{
+		Talents:  MutilateTalents,
+		Options:  basicOptions,
+		Rotation: basicRotation,
+	},
+}
+
+var PlayerOptionsHemo = &proto.Player_Rogue{
+	Rogue: &proto.Rogue{
+		Talents:  HemoTalents,
+		Options:  basicOptions,
+		Rotation: basicRotation,
+	},
+}
+
 var basicRotation = &proto.Rogue_Rotation{
+	Builder:             proto.Rogue_Rotation_Auto,
 	MaintainExposeArmor: true,
+	UseRupture:          true,
+	UseShiv:             true,
+
+	MinComboPointsForDamageFinisher: 3,
 }
 
 var basicOptions = &proto.Rogue_Options{}
@@ -60,12 +120,18 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var FullConsumes = &proto.Consumes{
-	Flask:         proto.Flask_FlaskOfRelentlessAssault,
-	DefaultPotion: proto.Potions_HastePotion,
+	MainHandImbue:   proto.WeaponImbue_WeaponImbueRogueInstantPoison,
+	OffHandImbue:    proto.WeaponImbue_WeaponImbueRogueDeadlyPoison,
+	Flask:           proto.Flask_FlaskOfRelentlessAssault,
+	DefaultPotion:   proto.Potions_HastePotion,
+	DefaultConjured: proto.Conjured_ConjuredRogueThistleTea,
+	SuperSapper:     true,
+	FillerExplosive: proto.Explosive_ExplosiveGnomishFlameTurret,
 }
 
 var FullDebuffs = &proto.Debuffs{
 	BloodFrenzy:               true,
+	Mangle:                    true,
 	SunderArmor:               true,
 	FaerieFire:                proto.TristateEffect_TristateEffectImproved,
 	ImprovedSealOfTheCrusader: true,
@@ -74,7 +140,7 @@ var FullDebuffs = &proto.Debuffs{
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: FullDebuffs,
-	Armor:   7700,
+	Armor:   7684,
 }
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
@@ -166,4 +232,95 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		Name:    "Sunfury Bow of the Phoenix",
 		Enchant: "Stabilized Eternium Scope",
 	},
+})
+
+var MutilateP1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+        {
+                Name:    "Netherblade Facemask",
+                Enchant: "Glyph of Ferocity",
+                Gems: []string{
+                        "Relentless Earthstorm Diamond",
+                        "Glinting Noble Topaz",
+                },
+        },
+        {
+                Name: "Choker of Vile Intent",
+        },
+        {
+                Name:    "Wastewalker Shoulderpads",
+                Enchant: "Greater Inscription of Vengeance",
+                Gems: []string{
+                        "Glinting Noble Topaz",
+                        "Shifting Nightseye",
+                },
+        },
+        {
+                Name: "Drape of the Dark Reavers",
+        },
+        {
+                Name:    "Netherblade Chestpiece",
+                Enchant: "Chest - Exceptional Stats",
+                Gems: []string{
+                        "Glinting Noble Topaz",
+                        "Glinting Noble Topaz",
+                        "Shifting Nightseye",
+                },
+        },
+        {
+                Name:    "Nightfall Wristguards",
+                Enchant: "Bracer - Assault",
+        },
+        {
+                Name:    "Wastewalker Gloves",
+                Enchant: "Gloves - Major Agility",
+                Gems: []string{
+                        "Glinting Noble Topaz",
+                        "Glinting Noble Topaz",
+                },
+        },
+        {
+                Name: "Girdle of the Deathdealer",
+                Gems: []string{},
+        },
+        {
+                Name:    "Skulker's Greaves",
+                Enchant: "Nethercobra Leg Armor",
+                Gems: []string{
+                        "Delicate Living Ruby",
+                        "Glinting Noble Topaz",
+                        "Glinting Noble Topaz",
+                },
+        },
+        {
+                Name:    "Edgewalker Longboots",
+                Enchant: "Enchant Boots - Cat's Swiftness",
+                Gems: []string{
+                        "Glinting Noble Topaz",
+                        "Glinting Noble Topaz",
+                },
+        },
+        {
+                Name: "Ring of a Thousand Marks",
+        },
+        {
+                Name: "Garona's Signet Ring",
+        },
+        {
+                Name: "Dragonspine Trophy",
+        },
+        {
+                Name: "Bloodlust Brooch",
+        },
+        {
+                Name:    "Malchazeen",
+                Enchant: "Weapon - Mongoose",
+        },
+        {
+                Name:    "Riftmaker",
+                Enchant: "Weapon - Mongoose",
+        },
+        {
+                Name:    "Sunfury Bow of the Phoenix",
+                Enchant: "Stabilized Eternium Scope",
+        },
 })

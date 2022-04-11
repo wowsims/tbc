@@ -2,6 +2,8 @@ package core
 
 import (
 	"fmt"
+
+	"github.com/wowsims/tbc/sim/core/items"
 )
 
 type ItemSet struct {
@@ -57,11 +59,25 @@ func GetAllItemSets() []ItemSet {
 // cache for mapping item to set for fast resetting of sim.
 var itemSetLookup = map[int32]*ItemSet{}
 
-func AddItemSet(set ItemSet) {
-	// TODO: validate the set doesnt exist already?
+// Modifies ItemSet with item IDs populated.
+func AddItemSet(set *ItemSet) {
+	if len(set.Items) > 0 {
+		panic(set.Name + " supplied item IDs, set items are detected automatically!")
+	}
+
+	set.Items = make(map[int32]struct{})
+	for _, item := range items.Items {
+		if item.SetName == set.Name {
+			//fmt.Printf("Adding item %s-%d to set %s\n", item.Name, item.ID, item.SetName)
+			set.Items[item.ID] = struct{}{}
+		}
+	}
+	if len(set.Items) == 0 {
+		panic("No items found for set " + set.Name)
+	}
 
 	setIdx := len(sets)
-	sets = append(sets, set)
+	sets = append(sets, *set)
 	for itemID := range set.Items {
 		itemSetLookup[itemID] = &sets[setIdx]
 	}

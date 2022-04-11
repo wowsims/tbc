@@ -49,8 +49,10 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 				stats.HealingPower: 24,
 			})
 		case proto.BattleElixir_ElixirOfDemonslaying:
-			character.AddPermanentAura(func(sim *Simulation) Aura {
-				return ElixirOfDemonslayingAura()
+			character.RegisterResetEffect(func(sim *Simulation) {
+				if sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon {
+					character.PseudoStats.MobTypeAttackPower += 265
+				}
 			})
 		case proto.BattleElixir_ElixirOfMajorAgility:
 			character.AddStats(stats.Stats{
@@ -151,17 +153,21 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	}
 
 	// Weapon Imbues
-	if character.HasMHWeapon() && (character.HasMHWeaponImbue || partyBuffs.WindfuryTotemRank == 0) {
+	allowMHImbue := character.HasMHWeapon() && (character.HasMHWeaponImbue || partyBuffs.WindfuryTotemRank == 0)
+	if allowMHImbue {
 		addImbueStats(character, consumes.MainHandImbue)
 	}
 	if character.HasOHWeapon() {
 		addImbueStats(character, consumes.OffHandImbue)
 	}
-	applyAdamantiteSharpeningStoneAura(character, consumes)
+	applyAdamantiteSharpeningStoneAura(character, consumes, allowMHImbue)
 
+	character.RegisterFinalizeEffect(func() {
+		registerPotionCD(agent, consumes)
+		registerConjuredCD(agent, consumes)
+	})
 	registerDrumsCD(agent, partyBuffs, consumes)
-	registerPotionCD(agent, consumes)
-	registerConjuredCD(agent, consumes)
+	registerExplosivesCD(agent, consumes)
 }
 
 func ApplyPetConsumeEffects(pet *Character, ownerConsumes proto.Consumes) {
@@ -183,12 +189,10 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 	}
 
 	if imbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
-		character.PseudoStats.BonusMeleeDamage += 12
-		character.PseudoStats.BonusRangedDamage += 12
+		character.PseudoStats.BonusDamage += 12
 		// Melee crit component handled separately because its melee-only.
 	} else if imbue == proto.WeaponImbue_WeaponImbueAdamantiteWeightstone {
-		character.PseudoStats.BonusMeleeDamage += 12
-		character.PseudoStats.BonusRangedDamage += 12
+		character.PseudoStats.BonusDamage += 12
 		character.AddStats(stats.Stats{
 			stats.MeleeCrit: 14,
 		})
@@ -210,52 +214,31 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 	}
 }
 
-var AdamantiteSharpeningStoneMeleeCritAuraID = NewAuraID()
-
-func applyAdamantiteSharpeningStoneAura(character *Character, consumes proto.Consumes) {
+func applyAdamantiteSharpeningStoneAura(character *Character, consumes proto.Consumes, allowMHImbue bool) {
 	critBonus := 0.0
-	if consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
+	if consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone && allowMHImbue {
 		critBonus += 14
 	}
 	if consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
 		critBonus += 14
 	}
 
-	// Crit rating for sharpening stone applies to melee only.
-	if character.Class != proto.Class_ClassHunter {
-		character.AddStats(stats.Stats{
-			stats.MeleeCrit: critBonus,
-		})
+	if critBonus == 0 {
 		return
 	}
 
-	character.AddPermanentAura(func(sim *Simulation) Aura {
-		return Aura{
-			ID: AdamantiteSharpeningStoneMeleeCritAuraID,
-			OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
-				if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-					hitEffect.BonusCritRating += critBonus
-				}
-			},
-		}
-	})
-}
-
-var ElixirOfDemonslayingAuraID = NewAuraID()
-
-func ElixirOfDemonslayingAura() Aura {
-	return Aura{
-		ID:       ElixirOfDemonslayingAuraID,
-		ActionID: ActionID{ItemID: 9224},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
-			if hitEffect.Target.MobType == proto.MobType_MobTypeDemon {
-				hitEffect.BonusAttackPower += 265
-			}
-		},
+	// Crit rating for sharpening stone applies to melee only.
+	if character.Class != proto.Class_ClassHunter {
+		// For non-hunters just give direct crit so it shows on the stats panel.
+		character.AddStats(stats.Stats{
+			stats.MeleeCrit: critBonus,
+		})
+	} else {
+		character.PseudoStats.BonusMeleeCritRating += critBonus
 	}
 }
 
-var DrumsAuraID = NewAuraID()
+var DrumsAuraTag = "Drums"
 var DrumsCooldownID = NewCooldownID()
 
 const DrumsCD = time.Minute * 2 // Tinnitus
@@ -293,20 +276,15 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 		}
 	}
 
-	var applyDrums func(sim *Simulation, character *Character)
 	var actionID ActionID
 	var cooldownType int32
 	if drumsType == proto.Drums_DrumsOfBattle {
-		applyDrums = applyDrumsOfBattle
 		actionID = DrumsOfBattleActionID
 		cooldownType = CooldownTypeDPS
 	} else if drumsType == proto.Drums_DrumsOfRestoration {
-		applyDrums = applyDrumsOfRestoration
 		actionID = DrumsOfRestorationActionID
 		cooldownType = CooldownTypeMana
-	}
-
-	if applyDrums == nil {
+	} else {
 		return
 	}
 
@@ -325,26 +303,21 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 		mcd.UsesGCD = true
 		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
 			character := agent.GetCharacter()
+
+			auras := []*Aura{}
+			for _, agent := range character.Party.Players {
+				auras = append(auras, makeDrumsAura(agent.GetCharacter(), drumsType))
+			}
+
 			drumsTemplate := SimpleCast{
 				Cast: Cast{
 					ActionID:  actionID,
 					Character: character,
-					CastTime:  time.Second * 1,
 					GCD:       GCDDefault,
 					OnCastComplete: func(sim *Simulation, cast *Cast) {
 						// When a real player is using drums, their cast applies to the whole party.
-						for _, agent := range character.Party.Players {
-							applyDrums(sim, agent.GetCharacter())
-						}
-
-						// Drums of battle doesn't affect pets, ask Blizzard
-						if drumsType != proto.Drums_DrumsOfBattle {
-							for _, petAgent := range character.Party.Pets {
-								pet := petAgent.GetPet()
-								if pet.IsEnabled() {
-									applyDrums(sim, &pet.Character)
-								}
-							}
+						for _, aura := range auras {
+							aura.Activate(sim)
 						}
 
 						// All MCDs that use the GCD and have a non-zero cast time must call this.
@@ -363,19 +336,9 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 		// When there is no real player using drums, each player gets a fake CD that
 		// gives just themself the buff, with no cast time.
 		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
-			return applyDrums
+			drumsAura := makeDrumsAura(agent.GetCharacter(), drumsType)
 			return func(sim *Simulation, character *Character) {
-				applyDrums(sim, character)
-
-				// Drums of battle doesn't affect pets, ask Blizzard
-				if drumsType != proto.Drums_DrumsOfBattle {
-					for _, petAgent := range character.Pets {
-						pet := petAgent.GetPet()
-						if pet.IsEnabled() {
-							applyDrums(sim, &pet.Character)
-						}
-					}
-				}
+				drumsAura.Activate(sim)
 			}
 		}
 	}
@@ -383,32 +346,47 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 	agent.GetCharacter().AddMajorCooldown(mcd)
 }
 
-func applyDrumsOfBattle(sim *Simulation, character *Character) {
-	const hasteBonus = 80
+func makeDrumsAura(character *Character, drumsType proto.Drums) *Aura {
+	if drumsType == proto.Drums_DrumsOfBattle {
+		const hasteBonus = 80
+		return character.NewTemporaryStatsAuraWrapped("Drums of Battle", DrumsOfBattleActionID, stats.Stats{stats.MeleeHaste: hasteBonus, stats.SpellHaste: hasteBonus}, time.Second*30, func(aura *Aura) {
+			oldOnGain := aura.OnGain
+			aura.OnGain = func(aura *Aura, sim *Simulation) {
+				oldOnGain(aura, sim)
+				character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
+				// Drums of battle doesn't affect pets, ask Blizzard.
+			}
+		})
+	} else if drumsType == proto.Drums_DrumsOfRestoration {
+		// 600 mana over 15 seconds == 200 mp5
+		const mp5Bonus = 200
 
-	character.AddMeleeHaste(sim, hasteBonus)
-	character.AddStat(stats.SpellHaste, hasteBonus)
-	character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
+		petAuras := []*Aura{}
+		for _, petAgent := range character.Party.Pets {
+			pet := petAgent.GetPet()
+			petAuras = append(petAuras, pet.NewTemporaryStatsAura("Drums of Restoration", DrumsOfRestorationActionID, stats.Stats{stats.MP5: mp5Bonus}, time.Second*15))
+		}
 
-	character.AddAura(sim, Aura{
-		ID:       DrumsAuraID,
-		ActionID: DrumsOfBattleActionID,
-		Expires:  sim.CurrentTime + time.Second*30,
-		OnExpire: func(sim *Simulation) {
-			character.AddMeleeHaste(sim, -hasteBonus)
-			character.AddStat(stats.SpellHaste, -hasteBonus)
-		},
-	})
+		return character.NewTemporaryStatsAuraWrapped("Drums of Restoration", DrumsOfRestorationActionID, stats.Stats{stats.MP5: mp5Bonus}, time.Second*15, func(aura *Aura) {
+			oldOnGain := aura.OnGain
+			aura.OnGain = func(aura *Aura, sim *Simulation) {
+				oldOnGain(aura, sim)
+				character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
+
+				for i, petAgent := range character.Party.Pets {
+					pet := petAgent.GetPet()
+					if pet.IsEnabled() {
+						petAuras[i].Activate(sim)
+					}
+				}
+			}
+		})
+	} else {
+		return nil
+	}
 }
 
-func applyDrumsOfRestoration(sim *Simulation, character *Character) {
-	// 600 mana over 15 seconds == 200 mp5
-	const mp5Bonus = 200
-	character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
-	character.AddAuraWithTemporaryStats(sim, DrumsAuraID, DrumsOfRestorationActionID, stats.MP5, mp5Bonus, time.Second*15)
-}
-
-var PotionAuraID = NewAuraID()
+var PotionAuraTag = "Potion"
 var PotionCooldownID = NewCooldownID()
 
 func registerPotionCD(agent Agent, consumes proto.Consumes) {
@@ -418,6 +396,9 @@ func registerPotionCD(agent Agent, consumes proto.Consumes) {
 	}
 	if consumes.StartingPotion == proto.Potions_UnknownPotion {
 		consumes.NumStartingPotions = 0
+	}
+	if consumes.NumStartingPotions == 0 {
+		consumes.StartingPotion = proto.Potions_UnknownPotion
 	}
 
 	character := agent.GetCharacter()
@@ -553,6 +534,7 @@ const AlchStoneItemID = 35749
 func makePotionActivation(potionType proto.Potions, character *Character) (MajorCooldown, CooldownActivation) {
 	if potionType == proto.Potions_DestructionPotion {
 		actionID := ActionID{ItemID: 22839}
+		aura := character.NewTemporaryStatsAura("Destruction Potion", actionID, stats.Stats{stats.SpellPower: 120, stats.SpellCrit: 2 * SpellCritRatingPerCritChance}, time.Second*15)
 		return MajorCooldown{
 				ActionID: actionID,
 				Type:     CooldownTypeDPS,
@@ -564,23 +546,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 				},
 			},
 			func(sim *Simulation, character *Character) {
-				const spBonus = 120
-				const critBonus = 2 * SpellCritRatingPerCritChance
-				const dur = time.Second * 15
-
-				character.AddStat(stats.SpellPower, spBonus)
-				character.AddStat(stats.SpellCrit, critBonus)
-
-				character.AddAura(sim, Aura{
-					ID:       PotionAuraID,
-					ActionID: actionID,
-					Expires:  sim.CurrentTime + dur,
-					OnExpire: func(sim *Simulation) {
-						character.AddStat(stats.SpellPower, -spBonus)
-						character.AddStat(stats.SpellCrit, -critBonus)
-					},
-				})
-
+				aura.Activate(sim)
 				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
 				character.Metrics.AddInstantCast(actionID)
 			}
@@ -617,6 +583,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 			}
 	} else if potionType == proto.Potions_HastePotion {
 		actionID := ActionID{ItemID: 22838}
+		aura := character.NewTemporaryStatsAura("Haste Potion", actionID, stats.Stats{stats.MeleeHaste: 400}, time.Second*15)
 		return MajorCooldown{
 				ActionID: actionID,
 				Type:     CooldownTypeDPS,
@@ -628,25 +595,13 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 				},
 			},
 			func(sim *Simulation, character *Character) {
-				const hasteBonus = 400
-				const dur = time.Second * 15
-
-				character.AddMeleeHaste(sim, hasteBonus)
-
-				character.AddAura(sim, Aura{
-					ID:       PotionAuraID,
-					ActionID: actionID,
-					Expires:  sim.CurrentTime + dur,
-					OnExpire: func(sim *Simulation) {
-						character.AddMeleeHaste(sim, -hasteBonus)
-					},
-				})
-
+				aura.Activate(sim)
 				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
 				character.Metrics.AddInstantCast(actionID)
 			}
 	} else if potionType == proto.Potions_MightyRagePotion {
 		actionID := ActionID{ItemID: 13442}
+		aura := character.NewTemporaryStatsAura("Mighty Rage Potion", actionID, stats.Stats{stats.Strength: 20}, time.Second*15)
 		return MajorCooldown{
 				ActionID: actionID,
 				Type:     CooldownTypeDPS,
@@ -661,10 +616,7 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 				},
 			},
 			func(sim *Simulation, character *Character) {
-				const strBonus = 20.0
-				const dur = time.Second * 15
-
-				character.AddAuraWithTemporaryStats(sim, PotionAuraID, actionID, stats.Strength, strBonus, dur)
+				aura.Activate(sim)
 				if character.Class == proto.Class_ClassWarrior {
 					bonusRage := 45.0 + (75.0-45.0)*sim.RandomFloat("Mighty Rage Potion")
 					character.AddRage(sim, bonusRage, actionID)
@@ -674,8 +626,19 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 				character.Metrics.AddInstantCast(actionID)
 			}
 	} else if potionType == proto.Potions_FelManaPotion {
-		alchStoneEquipped := character.HasTrinketEquipped(AlchStoneItemID)
 		actionID := ActionID{ItemID: 31677}
+
+		// Restores 3200 mana over 24 seconds.
+		manaGain := 3200.0
+		alchStoneEquipped := character.HasTrinketEquipped(AlchStoneItemID)
+		if alchStoneEquipped {
+			manaGain *= 1.4
+		}
+		mp5 := manaGain / 24 * 5
+
+		buffAura := character.NewTemporaryStatsAura("Fel Mana Potion", actionID, stats.Stats{stats.MP5: mp5}, time.Second*24)
+		debuffAura := character.NewTemporaryStatsAura("Fel Mana Potion Debuff", ActionID{SpellID: 38927}, stats.Stats{stats.SpellPower: -25}, time.Minute*15)
+
 		return MajorCooldown{
 				ActionID: actionID,
 				Type:     CooldownTypeMana,
@@ -693,22 +656,9 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 				},
 			},
 			func(sim *Simulation, character *Character) {
-				// Restores 3200 mana over 24 seconds.
-				manaGain := 3200.0
-				if alchStoneEquipped {
-					manaGain *= 1.4
-				}
-				mp5 := manaGain / 24 * 5
-				character.AddAuraWithTemporaryStats(sim, FelManaPotionAuraID, actionID, stats.MP5, mp5, time.Second*24)
-
-				if !character.HasAura(FelManaPotionDebuffAuraID) {
-					character.AddStat(stats.SpellPower, -25)
-					character.AddAura(sim, Aura{
-						ID:       FelManaPotionDebuffAuraID,
-						ActionID: ActionID{SpellID: 38927},
-						Expires:  NeverExpires,
-					})
-				}
+				buffAura.Activate(sim)
+				debuffAura.Activate(sim)
+				debuffAura.Refresh(sim)
 
 				character.SetCD(PotionCooldownID, time.Minute*2+sim.CurrentTime)
 				character.Metrics.AddInstantCast(actionID)
@@ -718,50 +668,93 @@ func makePotionActivation(potionType proto.Potions, character *Character) (Major
 	}
 }
 
-var FelManaPotionAuraID = NewAuraID()
-var FelManaPotionDebuffAuraID = NewAuraID()
-
-var ConjuredAuraID = NewAuraID()
+var ConjuredAuraTag = "Conjured"
 var ConjuredCooldownID = NewCooldownID()
 
 func registerConjuredCD(agent Agent, consumes proto.Consumes) {
+	if consumes.DefaultConjured == consumes.StartingConjured {
+		// Starting conjured is redundant in this case.
+		consumes.StartingConjured = proto.Conjured_ConjuredUnknown
+	}
+	if consumes.StartingConjured == proto.Conjured_ConjuredUnknown {
+		consumes.NumStartingConjured = 0
+	}
+	if consumes.NumStartingConjured == 0 {
+		consumes.StartingConjured = proto.Conjured_ConjuredUnknown
+	}
 	character := agent.GetCharacter()
 
-	mcd, activationFn := makeConjuredActivation(consumes.DefaultConjured, character)
-	if activationFn == nil {
+	defaultMCD, defaultActivationFn := makeConjuredActivation(consumes.DefaultConjured, character)
+	startingMCD, startingActivationFn := makeConjuredActivation(consumes.StartingConjured, character)
+	numStartingConjured := int(consumes.NumStartingConjured)
+	if defaultActivationFn == nil && startingActivationFn == nil {
 		return
 	}
 
-	character.AddMajorCooldown(MajorCooldown{
-		ActionID:    mcd.ActionID,
-		CooldownID:  ConjuredCooldownID,
-		Cooldown:    mcd.Cooldown,
-		CanActivate: mcd.CanActivate,
-		Type:        mcd.Type,
-		ShouldActivate: func(sim *Simulation, character *Character) bool {
-			return mcd.ShouldActivate(sim, character)
-		},
-		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			expectedManaPerUsage := float64((900 + 600) / 2)
+	numStartingConjuredUsed := 0
 
-			remainingUsages := int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
+	if startingActivationFn != nil {
+		character.AddMajorCooldown(MajorCooldown{
+			ActionID:   startingMCD.ActionID,
+			CooldownID: ConjuredCooldownID,
+			Cooldown:   startingMCD.Cooldown,
+			Type:       startingMCD.Type,
+			CanActivate: func(sim *Simulation, character *Character) bool {
+				if numStartingConjuredUsed >= numStartingConjured {
+					return false
+				}
+				return startingMCD.CanActivate(sim, character)
+			},
+			ShouldActivate: func(sim *Simulation, character *Character) bool {
+				return startingMCD.ShouldActivate(sim, character)
+			},
+			ActivationFactory: func(sim *Simulation) CooldownActivation {
+				numStartingConjuredUsed = 0
+				return func(sim *Simulation, character *Character) {
+					startingActivationFn(sim, character)
+					numStartingConjuredUsed++
+				}
+			},
+		})
+	}
 
-			if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune {
-				character.ExpectedBonusMana += expectedManaPerUsage * float64(remainingUsages)
-			}
+	if defaultActivationFn != nil {
+		character.AddMajorCooldown(MajorCooldown{
+			ActionID:   defaultMCD.ActionID,
+			CooldownID: ConjuredCooldownID,
+			Cooldown:   defaultMCD.Cooldown,
+			Type:       defaultMCD.Type,
+			CanActivate: func(sim *Simulation, character *Character) bool {
+				if numStartingConjuredUsed < numStartingConjured {
+					return false
+				}
+				return defaultMCD.CanActivate(sim, character)
+			},
+			ShouldActivate: func(sim *Simulation, character *Character) bool {
+				return defaultMCD.ShouldActivate(sim, character)
+			},
+			ActivationFactory: func(sim *Simulation) CooldownActivation {
+				expectedManaPerUsage := float64((900 + 600) / 2)
 
-			return func(sim *Simulation, character *Character) {
-				activationFn(sim, character)
+				remainingUsages := int(1 + (MaxDuration(0, sim.Duration))/(time.Minute*2))
 
 				if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune {
-					// Update expected bonus mana
-					newRemainingUsages := int(sim.GetRemainingDuration() / (time.Minute * 2))
-					character.ExpectedBonusMana -= expectedManaPerUsage * float64(remainingUsages-newRemainingUsages)
-					remainingUsages = newRemainingUsages
+					character.ExpectedBonusMana += expectedManaPerUsage * float64(remainingUsages)
 				}
-			}
-		},
-	})
+
+				return func(sim *Simulation, character *Character) {
+					defaultActivationFn(sim, character)
+
+					if consumes.DefaultConjured == proto.Conjured_ConjuredDarkRune {
+						// Update expected bonus mana
+						newRemainingUsages := int(sim.GetRemainingDuration() / (time.Minute * 2))
+						character.ExpectedBonusMana -= expectedManaPerUsage * float64(remainingUsages-newRemainingUsages)
+						remainingUsages = newRemainingUsages
+					}
+				}
+			},
+		})
+	}
 }
 
 func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (MajorCooldown, CooldownActivation) {
@@ -793,28 +786,38 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 	} else if conjuredType == proto.Conjured_ConjuredFlameCap {
 		actionID := ActionID{ItemID: 22788}
 
-		castTemplate := NewSimpleSpellTemplate(SimpleSpell{
-			SpellCast: SpellCast{
-				Cast: Cast{
-					ActionID:       actionID,
-					Character:      character,
-					IsPhantom:      true,
-					SpellSchool:    SpellSchoolFire,
-					CritMultiplier: 1.5,
+		flameCapProc := character.RegisterSpell(SpellConfig{
+			Template: SimpleSpell{
+				SpellCast: SpellCast{
+					Cast: Cast{
+						ActionID:    actionID,
+						Character:   character,
+						SpellSchool: SpellSchoolFire,
+					},
 				},
 			},
-			Effect: SpellHitEffect{
-				SpellEffect: SpellEffect{
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-				},
-				DirectInput: DirectDamageInput{
-					MinBaseDamage: 40,
-					MaxBaseDamage: 40,
-				},
-			},
+			ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
+				IsPhantom:        true,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+
+				BaseDamage:     BaseDamageConfigFlat(40),
+				OutcomeApplier: OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			}),
 		})
-		spellObj := SimpleSpell{}
+
+		const procChance = 0.185
+		flameCapAura := character.NewTemporaryStatsAura("Flame Cap", actionID, stats.Stats{stats.FireSpellPower: 80}, time.Minute)
+		flameCapAura.OnSpellHit = func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+				return
+			}
+			if sim.RandomFloat("Flame Cap Melee") > procChance {
+				return
+			}
+
+			flameCapProc.Cast(sim, spellEffect.Target)
+		}
 
 		return MajorCooldown{
 				ActionID: actionID,
@@ -828,27 +831,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				},
 			},
 			func(sim *Simulation, character *Character) {
-				const fireBonus = 80
-				const dur = time.Minute * 1
-				const procChance = 0.185
-
-				aura := character.NewAuraWithTemporaryStats(sim, ConjuredAuraID, actionID, stats.FireSpellPower, fireBonus, dur)
-				aura.OnMeleeAttack = func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
-					if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || ability.IsPhantom {
-						return
-					}
-					if sim.RandomFloat("Flame Cap Melee") > procChance {
-						return
-					}
-
-					castAction := &spellObj
-					castTemplate.Apply(castAction)
-					castAction.Effect.Target = hitEffect.Target
-					castAction.Init(sim)
-					castAction.Cast(sim)
-				}
-				character.AddAura(sim, aura)
-
+				flameCapAura.Activate(sim)
 				character.SetCD(ConjuredCooldownID, time.Minute*3+sim.CurrentTime)
 				character.Metrics.AddInstantCast(actionID)
 			}
@@ -860,3 +843,155 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 // Mana-related consumes need to know this so they can wait for the Mage to use
 // gems first.
 var MageManaGemMCDActionID = ActionID{ItemID: 22044}
+
+var ExplosivesCooldownID = NewCooldownID()
+var SuperSapperCooldownID = NewCooldownID()
+var GoblinSapperCooldownID = NewCooldownID()
+var SuperSapperActionID = ActionID{ItemID: 23827, CooldownID: SuperSapperCooldownID}
+var GoblinSapperActionID = ActionID{ItemID: 10646, CooldownID: GoblinSapperCooldownID}
+var FelIronBombActionID = ActionID{ItemID: 23736}
+var AdamantiteGrenadeActionID = ActionID{ItemID: 23737}
+var HolyWaterActionID = ActionID{ItemID: 13180}
+
+func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
+	if !consumes.SuperSapper && !consumes.GoblinSapper && consumes.FillerExplosive == proto.Explosive_ExplosiveUnknown {
+		return
+	}
+	character := agent.GetCharacter()
+
+	var gnomishFlameTurretCaster func(sim *Simulation)
+	if consumes.FillerExplosive == proto.Explosive_ExplosiveGnomishFlameTurret {
+		gnomishFlameTurretCaster = character.newGnomishFlameTurretCaster()
+	}
+
+	character.AddMajorCooldown(MajorCooldown{
+		ActionID:   SuperSapperActionID,
+		CooldownID: ExplosivesCooldownID,
+		Cooldown:   time.Minute,
+		Type:       CooldownTypeDPS,
+		CanActivate: func(sim *Simulation, character *Character) bool {
+			return true
+		},
+		ShouldActivate: func(sim *Simulation, character *Character) bool {
+			return true
+		},
+		ActivationFactory: func(sim *Simulation) CooldownActivation {
+			superSapperCaster := character.newSuperSapperCaster(sim)
+			goblinSapperCaster := character.newGoblinSapperCaster(sim)
+
+			var castFiller func(sim *Simulation)
+			hasFiller := false
+			switch consumes.FillerExplosive {
+			case proto.Explosive_ExplosiveFelIronBomb:
+				hasFiller = true
+				castFiller = character.newFelIronBombCaster(sim)
+			case proto.Explosive_ExplosiveAdamantiteGrenade:
+				hasFiller = true
+				castFiller = character.newAdamantiteGrenadeCaster(sim)
+			case proto.Explosive_ExplosiveGnomishFlameTurret:
+				hasFiller = true
+				castFiller = gnomishFlameTurretCaster
+			case proto.Explosive_ExplosiveHolyWater:
+				hasFiller = true
+				castFiller = character.newHolyWaterCaster(sim)
+			}
+
+			cdAfterGoblinSapper := time.Minute
+			if !hasFiller {
+				if consumes.SuperSapper {
+					cdAfterGoblinSapper = time.Minute * 4
+				} else {
+					cdAfterGoblinSapper = time.Minute * 5
+				}
+			}
+
+			cdAfterSuperSapper := time.Minute
+			if !hasFiller && !consumes.GoblinSapper {
+				cdAfterSuperSapper = time.Minute * 5
+			}
+
+			return func(sim *Simulation, character *Character) {
+				var castExplosive func(sim *Simulation)
+				var cd time.Duration
+				if consumes.SuperSapper && !character.IsOnCD(SuperSapperCooldownID, sim.CurrentTime) {
+					castExplosive = superSapperCaster
+					cd = cdAfterSuperSapper
+				} else if consumes.GoblinSapper && !character.IsOnCD(GoblinSapperCooldownID, sim.CurrentTime) {
+					castExplosive = goblinSapperCaster
+					cd = cdAfterGoblinSapper
+				} else {
+					castExplosive = castFiller
+					cd = time.Minute
+				}
+				castExplosive(sim)
+				character.SetCD(ExplosivesCooldownID, sim.CurrentTime+cd)
+			}
+		},
+	})
+}
+
+// Creates a spell object for the common explosive case.
+func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID ActionID, minDamage float64, maxDamage float64, cooldown time.Duration, isHolyWater bool) SpellConfig {
+	spell := SimpleSpell{
+		SpellCast: SpellCast{
+			Cast: Cast{
+				ActionID:    actionID,
+				Character:   character,
+				SpellSchool: SpellSchoolFire,
+				Cooldown:    cooldown,
+			},
+		},
+	}
+
+	damageMultiplier := 1.0
+	if isHolyWater {
+		spell.SpellSchool = SpellSchoolHoly
+		if sim.GetPrimaryTarget().MobType != proto.MobType_MobTypeUndead {
+			damageMultiplier = 0
+		}
+	}
+
+	return SpellConfig{
+		Template: spell,
+		ApplyEffects: ApplyEffectFuncAOEDamage(sim, SpellEffect{
+			// Explosives always have 1% resist chance, so just give them hit cap.
+			BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,
+
+			DamageMultiplier: damageMultiplier,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     BaseDamageConfigRoll(minDamage, maxDamage),
+			OutcomeApplier: OutcomeFuncMagicHitAndCrit(2),
+		}),
+	}
+}
+func (character *Character) newSuperSapperCaster(sim *Simulation) func(sim *Simulation) {
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, SuperSapperActionID, 900, 1500, time.Minute*5, false))
+	return func(sim *Simulation) {
+		spell.Cast(sim, sim.GetPrimaryTarget())
+	}
+}
+func (character *Character) newGoblinSapperCaster(sim *Simulation) func(sim *Simulation) {
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, GoblinSapperActionID, 450, 750, time.Minute*5, false))
+	return func(sim *Simulation) {
+		spell.Cast(sim, sim.GetPrimaryTarget())
+	}
+}
+func (character *Character) newFelIronBombCaster(sim *Simulation) func(sim *Simulation) {
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, FelIronBombActionID, 330, 770, 0, false))
+	return func(sim *Simulation) {
+		spell.Cast(sim, sim.GetPrimaryTarget())
+	}
+}
+func (character *Character) newAdamantiteGrenadeCaster(sim *Simulation) func(sim *Simulation) {
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, AdamantiteGrenadeActionID, 450, 750, 0, false))
+	return func(sim *Simulation) {
+		spell.Cast(sim, sim.GetPrimaryTarget())
+	}
+}
+func (character *Character) newHolyWaterCaster(sim *Simulation) func(sim *Simulation) {
+	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, HolyWaterActionID, 438, 562, 0, true))
+	return func(sim *Simulation) {
+		spell.Cast(sim, sim.GetPrimaryTarget())
+	}
+}

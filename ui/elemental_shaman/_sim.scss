@@ -6,6 +6,7 @@
 	--theme-color-background: #181d2d;
 	--theme-color-background-raw: 24, 29, 45;
 	--theme-background-image: url('/tbc/assets/elemental_shaman_background.jpg');
+	--theme-background-opacity: 0.95;
 	--main-text-color: White;
 }
 
@@ -13,11 +14,8 @@
 .elemental-shaman-sim-ui .self-buffs-section {
   grid-template-columns: repeat(2, 1fr);
 }
-.elemental-shaman-sim-ui .consumes-section {
-  grid-template-columns: repeat(4, 1fr);
-}
 .elemental-shaman-sim-ui .buffs-section {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(6, 1fr);
 }
 .elemental-shaman-sim-ui .debuffs-section {
   grid-template-columns: repeat(3, 1fr);

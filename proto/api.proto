@@ -34,11 +34,13 @@ message Player {
         Mage mage = 8;
         RetributionPaladin retribution_paladin = 9;
         ShadowPriest shadow_priest = 10;
+        SmitePriest smite_priest = 20;
         Rogue rogue = 11;
         ElementalShaman elemental_shaman = 12;
         EnhancementShaman enhancement_shaman = 18;
         Warlock warlock = 13;
         Warrior warrior = 14;
+        ProtectionWarrior protection_warrior = 21;
     }
 
 		// Only used by the UI. Sim uses talents within the spec protos.
@@ -103,6 +105,9 @@ message ActionMetrics {
 
 		// Total damage done to all targets by this action.
     double damage = 6;
+
+		// Total threat done to all targets by this action.
+    double threat = 12;
 }
 
 message AuraMetrics {
@@ -110,6 +115,30 @@ message AuraMetrics {
 
 		double uptime_seconds_avg = 2;
 		double uptime_seconds_stdev = 3;
+}
+
+enum ResourceType {
+	ResourceTypeNone = 0;
+	ResourceTypeMana = 1;
+	ResourceTypeEnergy = 2;
+	ResourceTypeRage = 3;
+	ResourceTypeComboPoints = 4;
+	ResourceTypeFocus = 5;
+}
+
+message ResourceMetrics {
+		ActionID id = 1;
+
+		ResourceType type = 2;
+
+		// # of times this action was used by the agent.
+		int32 events = 3;
+
+		// Total resource gain from this action. Will be negative for spend actions.
+		double gain = 4;
+
+		// Like gain, but doesn't include gains over resource cap.
+		double actual_gain = 5;
 }
 
 message DistributionMetrics {
@@ -131,6 +160,7 @@ message PlayerMetrics {
 
     repeated ActionMetrics actions = 5;
 		repeated AuraMetrics auras = 6;
+		repeated ResourceMetrics resources = 10;
 
 		repeated PlayerMetrics pets = 7;
 }
@@ -190,8 +220,11 @@ message ComputeStatsRequest {
     Raid raid = 1;
 }
 message PlayerStats {
-    repeated double gear_only = 1;
+		// Stats
+    repeated double base_stats = 6;
+    repeated double gear_stats = 1;
     repeated double final_stats = 2;
+
     repeated string sets = 3;
 		IndividualBuffs buffs = 4;
 		repeated ActionID cooldowns = 5;

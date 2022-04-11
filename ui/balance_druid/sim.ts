@@ -16,7 +16,7 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -38,7 +38,7 @@ import * as DruidInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecBalanceDruid>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecBalanceDruid>) {
 		super(parentElem, player, {
 			cssClass: 'balance-druid-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
@@ -114,6 +114,7 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfWisdom: TristateEffect.TristateEffectImproved,
+					blessingOfSalvation: true,
 				}),
 				debuffs: Debuffs.create({
 					judgementOfWisdom: true,
@@ -149,6 +150,7 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
+				IconInputs.BlessingOfSalvation,
 				IconInputs.Innervate,
 				IconInputs.PowerInfusion,
 			],
@@ -192,8 +194,6 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 					WeaponImbue.WeaponImbueSuperiorWizardOil,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.DrumsOfRestorationConsume,
 					IconInputs.ScrollOfSpiritV,
 				],
 			},
@@ -233,6 +233,7 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 					Presets.P1_HORDE_PRESET,
 					Presets.P2_HORDE_PRESET,
 					Presets.P3_PRESET,
+					Presets.P4_PRESET,
 				],
 			},
 		});

@@ -9,72 +9,53 @@ import (
 
 const SpellIDBlizzard int32 = 27085
 
-func (mage *Mage) newBlizzardTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID: SpellIDBlizzard,
-				},
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFrost,
-				SpellExtras:         core.SpellExtrasChanneled,
-				Character:           &mage.Character,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 1645,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 1645,
-				},
-				GCD: core.GCDDefault,
+var BlizzardActionID = core.ActionID{SpellID: SpellIDBlizzard}
+
+func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
+	//AOECap: 3620,
+	baseCost := 1645.0
+
+	blizzardDot := core.NewDot(core.Dot{
+		Aura: mage.RegisterAura(&core.Aura{
+			Label:    "Blizzard",
+			ActionID: BlizzardActionID,
+		}),
+		NumberOfTicks:       8,
+		TickLength:          time.Second * 1,
+		AffectedByCastSpeed: true,
+		TickEffects: core.TickFuncAOESnapshot(sim, core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier *
+				(1 + 0.02*float64(mage.Talents.PiercingIce)) *
+				(1 + 0.01*float64(mage.Talents.ArcticWinds)),
+
+			ThreatMultiplier: 1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
+
+			BaseDamage:     core.BaseDamageConfigMagicNoRoll(184, 0.119),
+			OutcomeApplier: core.OutcomeFuncTick(),
+			IsPeriodic:     true,
+		}),
+	})
+
+	mage.Blizzard = mage.RegisterSpell(core.SpellConfig{
+		ActionID:    BlizzardActionID,
+		SpellSchool: core.SpellSchoolFrost,
+		SpellExtras: SpellFlagMage | core.SpellExtrasChanneled,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost *
+					(1 - 0.05*float64(mage.Talents.FrostChanneling)) *
+					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
+
+				GCD:         core.GCDDefault,
+				ChannelTime: time.Second * 8,
 			},
 		},
-		AOECap: 3620,
-	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: mage.spellDamageMultiplier,
-			ThreatMultiplier:       1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
-			IgnoreHitCheck:         true,
-		},
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:        8,
-			TickLength:           time.Second * 1,
-			TickBaseDamage:       184,
-			TickSpellCoefficient: 0.119,
-			AffectedByCastSpeed:  true,
-		},
-	}
-
-	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.FrostChanneling) * 0.05
-	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
-	baseEffect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-	baseEffect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.PiercingIce)
-	baseEffect.StaticDamageMultiplier *= 1 + 0.01*float64(mage.Talents.ArcticWinds)
-
-	numHits := sim.GetNumTargets()
-	effects := make([]core.SpellHitEffect, 0, numHits)
-	for i := int32(0); i < numHits; i++ {
-		effects = append(effects, baseEffect)
-		effects[i].Target = sim.GetTarget(i)
-	}
-	spell.Effects = effects
-
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) NewBlizzard(sim *core.Simulation) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	blizzard := &mage.blizzardSpell
-	mage.blizzardCastTemplate.Apply(blizzard)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	blizzard.Init(sim)
-
-	return blizzard
+		ApplyEffects: core.ApplyEffectFuncDot(blizzardDot),
+	})
+	blizzardDot.Spell = mage.Blizzard
 }

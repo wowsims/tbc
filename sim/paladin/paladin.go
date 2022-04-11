@@ -1,8 +1,6 @@
 package paladin
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -13,35 +11,30 @@ type Paladin struct {
 
 	Talents proto.PaladinTalents
 
-	currentSeal      core.Aura
-	currentJudgement core.Aura
+	CurrentSeal      *core.Aura
+	CurrentJudgement *core.Aura
+	sealOfCommandICD core.InternalCD
 
 	sealOfBlood       core.SimpleCast
 	sealOfCommand     core.SimpleCast
 	sealOfTheCrusader core.SimpleCast
 	sealOfWisdom      core.SimpleCast
 
-	SealOfTheCrusaderAura core.Aura
-	SealOfWisdomAura      core.Aura
-	SealOfCommandAura     core.Aura
+	Consecration           *core.Spell
+	CrusaderStrike         *core.Spell
+	Exorcism               *core.Spell
+	JudgementOfBlood       *core.Spell
+	JudgementOfTheCrusader *core.Spell
+	JudgementOfWisdom      *core.Spell
 
-	consecrationTemplate core.SimpleSpellTemplate
-	ConsecrationSpell    core.SimpleSpell
+	ConsecrationDot *core.Dot
 
-	exorcismTemplate core.SimpleSpellTemplate
-	exorcismSpell    core.SimpleSpell
-
-	crusaderStrikeTemplate core.MeleeAbilityTemplate
-	crusaderStrikeSpell    core.ActiveMeleeAbility
-
-	judgementOfBloodTemplate core.MeleeAbilityTemplate
-	judgementOfBloodSpell    core.ActiveMeleeAbility
-
-	judgementOfTheCrusaderTemplate core.SimpleSpellTemplate
-	judgementOfTheCrusaderSpell    core.SimpleSpell
-
-	judgementOfWisdomTemplate core.SimpleSpellTemplate
-	judgementOfWisdomSpell    core.SimpleSpell
+	JudgementOfTheCrusaderAura *core.Aura
+	JudgementOfWisdomAura      *core.Aura
+	SealOfBloodAura            *core.Aura
+	SealOfCommandAura          *core.Aura
+	SealOfTheCrusaderAura      *core.Aura
+	SealOfWisdomAura           *core.Aura
 }
 
 // Implemented by each Paladin spec.
@@ -63,24 +56,24 @@ func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (paladin *Paladin) Init(sim *core.Simulation) {
-	paladin.crusaderStrikeTemplate = paladin.newCrusaderStrikeTemplate(sim)
-	paladin.judgementOfBloodTemplate = paladin.newJudgementOfBloodTemplate(sim)
-	paladin.judgementOfTheCrusaderTemplate = paladin.newJudgementOfTheCrusaderTemplate(sim)
-	paladin.judgementOfWisdomTemplate = paladin.newJudgementOfWisdomTemplate(sim)
-	paladin.consecrationTemplate = paladin.newConsecrationTemplate(sim)
-	paladin.exorcismTemplate = paladin.newExorcismTemplate(sim)
+	paladin.registerConsecrationSpell(sim)
+	paladin.registerCrusaderStrikeSpell(sim)
+	paladin.registerExorcismSpell(sim)
+	paladin.registerJudgementOfBloodSpell(sim)
+	paladin.registerJudgementOfTheCrusaderSpell(sim)
+	paladin.registerJudgementOfWisdomSpell(sim)
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {
-	paladin.currentSeal.Expires = sim.CurrentTime
+	paladin.sealOfCommandICD = 0
+	paladin.CurrentSeal = nil
+	paladin.CurrentJudgement = nil
 }
 
-func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
-	if paladin.currentJudgement.ID == 0 || paladin.currentJudgement.Expires >= sim.CurrentTime {
-		return
+func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
+	if paladin.CurrentJudgement != nil && paladin.CurrentJudgement.IsActive() {
+		paladin.CurrentJudgement.UpdateExpires(sim.CurrentTime + JudgementDuration)
 	}
-	paladin.currentJudgement.Expires = sim.CurrentTime + time.Second*20
-	ability.Effect.Target.ReplaceAura(sim, paladin.currentJudgement)
 }
 
 // maybe need to add stat dependencies
@@ -118,11 +111,8 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 	})
 
 	paladin.setupSealOfBlood()
-	paladin.setupSealOfCommand()
 	paladin.setupSealOfTheCrusader()
 	paladin.setupSealOfWisdom()
-
-	paladin.applyTalents()
 
 	paladin.registerAvengingWrathCD()
 
@@ -131,6 +121,7 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassPaladin}] = stats.Stats{
+		stats.Health:      3197,
 		stats.Stamina:     118,
 		stats.Intellect:   87,
 		stats.Mana:        2953,
@@ -142,6 +133,7 @@ func init() {
 		stats.SpellCrit:   73.69,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassPaladin}] = stats.Stats{
+		stats.Health:      3197,
 		stats.Stamina:     119,
 		stats.Intellect:   84,
 		stats.Mana:        2953,
@@ -153,6 +145,7 @@ func init() {
 		stats.SpellCrit:   73.69,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassPaladin}] = stats.Stats{
+		stats.Health:      3197,
 		stats.Stamina:     120,
 		stats.Intellect:   83,
 		stats.Mana:        2953,
@@ -164,6 +157,7 @@ func init() {
 		stats.SpellCrit:   73.69,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassPaladin}] = stats.Stats{
+		stats.Health:      3197,
 		stats.Stamina:     123,
 		stats.Intellect:   82,
 		stats.Mana:        2953,

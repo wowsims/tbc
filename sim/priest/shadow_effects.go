@@ -4,34 +4,14 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-func (priest *Priest) applyTalentsToShadowSpell(cast *core.Cast, effect *core.SpellHitEffect) {
-	effect.ThreatMultiplier *= 1 - 0.08*float64(priest.Talents.ShadowAffinity)
-	if cast.ActionID.SpellID == SpellIDShadowWordDeath || cast.ActionID.SpellID == SpellIDMindBlast {
-		effect.BonusSpellCritRating += float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance
-	}
-	if cast.ActionID.SpellID == SpellIDMindFlay || cast.ActionID.SpellID == SpellIDMindBlast {
-		cast.Cost.Value -= cast.BaseCost.Value * float64(priest.Talents.FocusedMind) * 0.05
-	}
-	if cast.SpellSchool == core.SpellSchoolShadow {
-		effect.StaticDamageMultiplier *= 1 + float64(priest.Talents.Darkness)*0.02
-
-		if priest.Talents.Shadowform {
-			effect.StaticDamageMultiplier *= 1.15
-		}
-
-		// shadow focus gives 2% hit per level
-		effect.BonusSpellHitRating += float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance
-	}
-}
-
 func (priest *Priest) ApplyMisery(sim *core.Simulation, target *core.Target) {
-	if priest.Talents.Misery >= target.NumStacks(core.MiseryDebuffID) {
-		target.ReplaceAura(sim, core.MiseryAura(sim, priest.Talents.Misery))
+	if priest.MiseryAura != nil {
+		priest.MiseryAura.Activate(sim)
 	}
 }
 
 func (priest *Priest) ApplyShadowWeaving(sim *core.Simulation, target *core.Target) {
-	if priest.Talents.ShadowWeaving == 0 {
+	if priest.ShadowWeavingAura == nil {
 		return
 	}
 
@@ -39,26 +19,20 @@ func (priest *Priest) ApplyShadowWeaving(sim *core.Simulation, target *core.Targ
 		return
 	}
 
-	curStacks := target.NumStacks(core.ShadowWeavingDebuffID)
-	newStacks := core.MinInt32(curStacks+1, 5)
-
-	if sim.Log != nil && curStacks != newStacks {
-		priest.Log(sim, "Applied Shadow Weaving stack, %d --> %d", curStacks, newStacks)
+	priest.ShadowWeavingAura.Activate(sim)
+	if priest.ShadowWeavingAura.IsActive() {
+		priest.ShadowWeavingAura.AddStack(sim)
 	}
-
-	target.ReplaceAura(sim, core.ShadowWeavingAura(sim, newStacks))
 }
-
-var ShadowWeaverAuraID = core.NewAuraID()
 
 func (priest *Priest) ApplyShadowOnHitEffects() {
 	// This is a combined aura for all priest major on hit effects.
 	//  Shadow Weaving, Vampiric Touch, and Misery
-	priest.Character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: ShadowWeaverAuraID,
-			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
-				if tickDamage > 0 && priest.VTSpell.Effect.DotInput.IsTicking(sim) {
+	priest.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		return priest.GetOrRegisterAura(&core.Aura{
+			Label: "Priest Shadow Effects",
+			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
+				if tickDamage > 0 && priest.VampiricTouchDot.IsActive() {
 					amount := tickDamage * 0.05
 					for _, partyMember := range priest.Party.Players {
 						partyMember.GetCharacter().AddMana(sim, amount, VampiricTouchActionID, false)
@@ -71,9 +45,12 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 					}
 				}
 			},
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
 				priest.ApplyShadowWeaving(sim, spellEffect.Target)
-				if spellEffect.Damage > 0 && priest.VTSpell.Effect.DotInput.IsTicking(sim) {
+				if spellEffect.Damage > 0 && priest.VampiricTouchDot.IsActive() {
 					amount := spellEffect.Damage * 0.05
 					for _, partyMember := range priest.Party.Players {
 						partyMember.GetCharacter().AddMana(sim, amount, VampiricTouchActionID, false)
@@ -86,10 +63,10 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 					}
 				}
 
-				if spellCast.ActionID.SpellID == SpellIDShadowWordPain || spellCast.ActionID.SpellID == VampiricTouchActionID.SpellID || spellCast.ActionID.SpellID == SpellIDMindFlay {
+				if spell.ActionID.SpellID == SpellIDShadowWordPain || spell.ActionID.SpellID == VampiricTouchActionID.SpellID || spell.ActionID.SpellID == SpellIDMindFlay {
 					priest.ApplyMisery(sim, spellEffect.Target)
 				}
 			},
-		}
+		})
 	})
 }

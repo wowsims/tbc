@@ -2,6 +2,7 @@ import { StatWeightsRequest, StatWeightsResult, ProgressMetrics } from '/tbc/cor
 import { Stat } from '/tbc/core/proto/common.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { stDevToConf90 } from '/tbc/core/utils.js';
 
 import { Component } from './component.js';
@@ -13,7 +14,7 @@ export function addStatWeightsAction(simUI: IndividualSimUI<any>, epStats: Array
 	simUI.addAction('EP WEIGHTS', 'ep-weights-action', async () => {
 		simUI.setResultsPending();
 		const iterations = simUI.sim.getIterations();
-		const result = await simUI.player.computeStatWeights(epStats, epReferenceStat, (progress: ProgressMetrics) =>{
+		const result = await simUI.player.computeStatWeights(TypedEvent.nextEventID(), epStats, epReferenceStat, (progress: ProgressMetrics) => {
 			resultsManager.setSimProgress(progress);
 		});
 		resultsManager.setSimResult(iterations, epStats, epReferenceStat, result);
@@ -24,13 +25,13 @@ class StatWeightsResultsManager {
 	private readonly simUI: IndividualSimUI<any>;
 	private statsType: string;
 
-  constructor(simUI: IndividualSimUI<any>) {
+	constructor(simUI: IndividualSimUI<any>) {
 		this.simUI = simUI;
 		this.statsType = 'ep';
-  }
+	}
 
-  setSimProgress(progress: ProgressMetrics) {
-	this.simUI.setResultsContent(`
+	setSimProgress(progress: ProgressMetrics) {
+		this.simUI.setResultsContent(`
   <div class="results-sim">
   			<div class=""> ${progress.completedSims} / ${progress.totalSims}<br>simulations complete</div>
   			<div class="">
@@ -38,17 +39,17 @@ class StatWeightsResultsManager {
 			</div>
   </div>
 `);
-  }
+	}
 
-  setSimResult(iterations: number, epStats: Array<Stat>, epReferenceStat: Stat, result: StatWeightsResult) {
+	setSimResult(iterations: number, epStats: Array<Stat>, epReferenceStat: Stat, result: StatWeightsResult) {
 		if (epReferenceStat == Stat.StatSpellPower) {
-			result.epValues.forEach( (value, index) => {
+			result.epValues.forEach((value, index) => {
 				if (index == Stat.StatArcaneSpellPower ||
-						index == Stat.StatFireSpellPower ||
-						index == Stat.StatFrostSpellPower ||
-						index == Stat.StatHolySpellPower ||
-						index == Stat.StatNatureSpellPower ||
-						index == Stat.StatShadowSpellPower) {
+					index == Stat.StatFireSpellPower ||
+					index == Stat.StatFrostSpellPower ||
+					index == Stat.StatHolySpellPower ||
+					index == Stat.StatNatureSpellPower ||
+					index == Stat.StatShadowSpellPower) {
 					if (value > result.epValues[epReferenceStat]) {
 						const diff = value - result.epValues[epReferenceStat];
 						result.epValues[index] = result.epValues[epReferenceStat];
@@ -58,7 +59,7 @@ class StatWeightsResultsManager {
 						result.weightsStdev[index] -= wdiff;
 					}
 				}
-			});		
+			});
 		}
 
 		this.simUI.setResultsContent(`
@@ -75,10 +76,10 @@ class StatWeightsResultsManager {
 							<td>${result.epValues[stat].toFixed(2)}</td>
 							<td>${stDevToConf90(result.epValuesStdev[stat], iterations).toFixed(2)}</td>
 							</tr>`)
-					.join('')
-					+ '</table></div>');
+				.join('')
+			+ '</table></div>');
 
-    const epElem = this.simUI.resultsContentElem.getElementsByClassName('results-ep')[0] as HTMLDivElement;
+		const epElem = this.simUI.resultsContentElem.getElementsByClassName('results-ep')[0] as HTMLDivElement;
 
 		const setType = (type: string) => {
 			if (type == 'ep') {
@@ -98,5 +99,5 @@ class StatWeightsResultsManager {
 		});
 		selectElem.value = this.statsType;
 		setType(this.statsType);
-  }
+	}
 }

@@ -12,20 +12,20 @@ export interface StringPickerConfig<ModObject> extends InputConfig<ModObject, st
 export class StringPicker<ModObject> extends Input<ModObject, string> {
 	private readonly inputElem: HTMLSpanElement;
 
-  constructor(parent: HTMLElement, modObject: ModObject, config: StringPickerConfig<ModObject>) {
-    super(parent, 'string-picker-root', modObject, config);
+	constructor(parent: HTMLElement, modObject: ModObject, config: StringPickerConfig<ModObject>) {
+		super(parent, 'string-picker-root', modObject, config);
 
-    this.inputElem = document.createElement('span');
+		this.inputElem = document.createElement('span');
 		this.inputElem.setAttribute('contenteditable', '');
-    this.inputElem.classList.add('string-picker-input');
-    this.rootElem.appendChild(this.inputElem);
+		this.inputElem.classList.add('string-picker-input');
+		this.rootElem.appendChild(this.inputElem);
 
 		this.init();
 
-    this.inputElem.addEventListener('input', event => {
+		this.inputElem.addEventListener('change', event => {
 			this.inputChanged(TypedEvent.nextEventID());
-    });
-  }
+		});
+	}
 
 	getInputElem(): HTMLElement {
 		return this.inputElem;

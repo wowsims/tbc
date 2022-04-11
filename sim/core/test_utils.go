@@ -10,7 +10,7 @@ import (
 )
 
 var DefaultSimTestOptions = &proto.SimOptions{
-	Iterations: 1,
+	Iterations: 50,
 	IsTest:     true,
 	Debug:      false,
 	RandomSeed: 101,
@@ -22,7 +22,7 @@ var StatWeightsDefaultSimTestOptions = &proto.SimOptions{
 	RandomSeed: 101,
 }
 var AverageDefaultSimTestOptions = &proto.SimOptions{
-	Iterations: 10000,
+	Iterations: 5000,
 	IsTest:     true,
 	Debug:      false,
 	RandomSeed: 101,
@@ -34,14 +34,14 @@ const LongDuration = 300
 func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
 	var NoDebuffTarget = &proto.Target{
 		Level:   73,
-		Armor:   7700,
+		Armor:   7684,
 		MobType: proto.MobType_MobTypeBeast,
 		Debuffs: &proto.Debuffs{},
 	}
 
 	var FullDebuffTarget = &proto.Target{
 		Level:   73,
-		Armor:   7700,
+		Armor:   7684,
 		MobType: proto.MobType_MobTypeDemon,
 		Debuffs: debuffs,
 	}
@@ -100,7 +100,7 @@ func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs, variation float
 		Targets: []*proto.Target{
 			&proto.Target{
 				Level:   73,
-				Armor:   7700,
+				Armor:   7684,
 				MobType: proto.MobType_MobTypeDemon,
 				Debuffs: debuffs,
 			},

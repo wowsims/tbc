@@ -10,23 +10,45 @@ func init() {
 	core.AddItemEffect(core.ItemIDTheLightningCapacitor, ApplyTheLightningCapacitor)
 }
 
-var TheLightningCapacitorAuraID = core.NewAuraID()
-
 func ApplyTheLightningCapacitor(agent core.Agent) {
-	spellObj := core.SimpleSpell{}
-
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		castTemplate := newLightningCapacitorCastTemplate(sim, character)
+
+	tlcSpell := character.RegisterSpell(core.SpellConfig{
+		Template: core.SimpleSpell{
+			SpellCast: core.SpellCast{
+				Cast: core.Cast{
+					ActionID: core.ActionID{
+						ItemID: core.ItemIDTheLightningCapacitor,
+					},
+					Character:   character,
+					SpellSchool: core.SpellSchoolNature,
+				},
+			},
+		},
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			IsPhantom:        true, // TODO: replace with ProcMask
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigRoll(694, 807),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+		}),
+	})
+
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		charges := 0
 
 		const icdDur = time.Millisecond * 2500
 		icd := core.NewICD()
 
-		return core.Aura{
-			ID: TheLightningCapacitorAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Lightning Capacitor",
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if icd.IsOnCD(sim) {
+					return
+				}
+
+				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 					return
 				}
 
@@ -37,45 +59,10 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 				charges++
 				if charges >= 3 {
 					icd = core.InternalCD(sim.CurrentTime + icdDur)
+					tlcSpell.Cast(sim, spellEffect.Target)
 					charges = 0
-
-					castAction := &spellObj
-					castTemplate.Apply(castAction)
-					castAction.Effect.Target = spellEffect.Target
-					castAction.Init(sim)
-					castAction.Cast(sim)
 				}
 			},
-		}
-	})
-}
-
-// Returns a cast object for a Lightning Capacitor cast with as many fields precomputed as possible.
-func newLightningCapacitorCastTemplate(sim *core.Simulation, character *core.Character) core.SimpleSpellTemplate {
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID: core.ActionID{
-					ItemID: core.ItemIDTheLightningCapacitor,
-				},
-				Character:           character,
-				IsPhantom:           true, // TODO: replace with ProcMask
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolNature,
-				CritMultiplier:      character.DefaultSpellCritMultiplier(),
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 694,
-				MaxBaseDamage: 807,
-			},
-		},
+		})
 	})
 }

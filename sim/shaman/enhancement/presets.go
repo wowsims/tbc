@@ -25,6 +25,7 @@ var StandardTalents = &proto.ShamanTalents{
 	ShamanisticFocus:        true,
 	Flurry:                  5,
 	ImprovedWeaponTotems:    1,
+	SpiritWeapons:           true,
 	ElementalWeapons:        3,
 	MentalQuickness:         3,
 	WeaponMastery:           5,
@@ -81,10 +82,10 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 }
 
 var FullConsumes = &proto.Consumes{
-	Drums:         proto.Drums_DrumsOfBattle,
-	BattleChicken: true,
-	MainHandImbue: proto.WeaponImbue_WeaponImbueShamanWindfury,
-	OffHandImbue:  proto.WeaponImbue_WeaponImbueShamanWindfury,
+	Drums:           proto.Drums_DrumsOfBattle,
+	MainHandImbue:   proto.WeaponImbue_WeaponImbueShamanWindfury,
+	OffHandImbue:    proto.WeaponImbue_WeaponImbueShamanWindfury,
+	DefaultConjured: proto.Conjured_ConjuredFlameCap,
 }
 
 var NoDebuffTarget = &proto.Target{
@@ -105,7 +106,7 @@ var FullDebuffs = &proto.Debuffs{
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: FullDebuffs,
-	Armor:   7700,
+	Armor:   7684,
 }
 
 var Phase2Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{

@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"math/rand"
 	"runtime"
 	"strings"
 	"time"
@@ -20,11 +19,11 @@ type Simulation struct {
 	DurationVariation time.Duration // variation per duration
 	Duration          time.Duration // Duration of current iteration
 
-	rand *rand.Rand
+	rand Rand
 
 	// Used for testing only, see RandomFloat().
 	isTest    bool
-	testRands map[uint32]*rand.Rand
+	testRands map[string]Rand
 
 	// Current Simulation State
 	pendingActions    []*PendingAction
@@ -36,11 +35,12 @@ type Simulation struct {
 	Log  func(string, ...interface{})
 	logs []string
 
-	emptyAuras []Aura
+	executePhase          bool
+	executePhaseCallbacks []func(*Simulation)
 }
 
 func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) *proto.RaidSimResult {
-	sim := newSim(rsr)
+	sim := NewSim(rsr)
 	sim.runPresims(rsr)
 	if progress != nil {
 		sim.ProgressReport = func(progMetric *proto.ProgressMetrics) {
@@ -50,7 +50,7 @@ func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) *pro
 	return sim.run()
 }
 
-func newSim(rsr proto.RaidSimRequest) *Simulation {
+func NewSim(rsr proto.RaidSimRequest) *Simulation {
 	raid := NewRaid(*rsr.Raid)
 	encounter := NewEncounter(*rsr.Encounter)
 	simOptions := *rsr.SimOptions
@@ -72,12 +72,10 @@ func newSim(rsr proto.RaidSimRequest) *Simulation {
 		DurationVariation: encounter.DurationVariation,
 		Log:               nil,
 
-		rand: rand.New(rand.NewSource(rseed)),
+		rand: NewSplitMix(uint64(rseed)),
 
 		isTest:    simOptions.IsTest,
-		testRands: make(map[uint32]*rand.Rand),
-
-		emptyAuras: make([]Aura, numAuraIDs),
+		testRands: make(map[string]Rand),
 
 		pendingActionPool: newPAPool(),
 	}
@@ -91,20 +89,23 @@ func newSim(rsr proto.RaidSimRequest) *Simulation {
 // distinguished by the label string.
 func (sim *Simulation) RandomFloat(label string) float64 {
 	if !sim.isTest {
-		return sim.rand.Float64()
+		return sim.rand.NextFloat64()
 	}
 
-	// if sim.Log != nil {
-	// 	sim.Log("FLOAT64 FROM: %s", label)
-	// }
-
-	labelHash := hash(label)
-	labelRand, isPresent := sim.testRands[labelHash]
+	labelRand, isPresent := sim.testRands[label]
 	if !isPresent {
-		labelRand = rand.New(rand.NewSource(int64(labelHash)))
-		sim.testRands[labelHash] = labelRand
+		labelRand = NewSplitMix(uint64(hash(label)))
+		sim.testRands[label] = labelRand
 	}
-	return labelRand.Float64()
+	v := labelRand.NextFloat64()
+	// if sim.Log != nil {
+	// 	sim.Log("FLOAT64 '%s': %0.5f", label, v)
+	// }
+	return v
+}
+
+func (sim *Simulation) Reset() {
+	sim.reset()
 }
 
 // Reset will set sim back and erase all current state.
@@ -120,6 +121,9 @@ func (sim *Simulation) reset() {
 	sim.CurrentTime = 0.0
 
 	sim.pendingActions = make([]*PendingAction, 0, 64)
+
+	sim.executePhase = false
+	sim.executePhaseCallbacks = []func(*Simulation){}
 
 	// Targets need to be reset before the raid, so that players can check for
 	// the presence of permanent target auras in their Reset handlers.
@@ -143,31 +147,18 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	}
 
 	// Uncomment this to print logs directly to console.
-	//sim.Log = func(message string, vals ...interface{}) {
-	//	fmt.Printf(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
-	//}
+	// sim.Log = func(message string, vals ...interface{}) {
+	// 	fmt.Printf(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
+	// }
 
 	for _, party := range sim.Raid.Parties {
 		for _, player := range party.Players {
 			character := player.GetCharacter()
-			character.auraTracker.logFn = func(message string, vals ...interface{}) {
-				character.Log(sim, message, vals...)
-			}
 			player.Init(sim)
 
 			for _, petAgent := range character.Pets {
-				petCharacter := petAgent.GetCharacter()
-				petCharacter.auraTracker.logFn = func(message string, vals ...interface{}) {
-					petCharacter.Log(sim, message, vals...)
-				}
 				petAgent.Init(sim)
 			}
-		}
-	}
-
-	for _, target := range sim.encounter.Targets {
-		target.auraTracker.logFn = func(message string, vals ...interface{}) {
-			target.Log(sim, message, vals...)
 		}
 	}
 
@@ -241,8 +232,8 @@ func (sim *Simulation) runOnce() {
 		}
 	}
 
-	sim.Raid.doneIteration(sim.Duration)
-	sim.encounter.doneIteration(sim.Duration)
+	sim.Raid.doneIteration(sim)
+	sim.encounter.doneIteration(sim)
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
@@ -274,6 +265,13 @@ func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 func (sim *Simulation) advance(elapsedTime time.Duration) {
 	sim.CurrentTime += elapsedTime
 
+	if !sim.executePhase && sim.CurrentTime >= sim.encounter.executePhaseBegins {
+		sim.executePhase = true
+		for _, callback := range sim.executePhaseCallbacks {
+			callback(sim)
+		}
+	}
+
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
 			agent.GetCharacter().advance(sim, elapsedTime)
@@ -285,8 +283,11 @@ func (sim *Simulation) advance(elapsedTime time.Duration) {
 	}
 }
 
+func (sim *Simulation) RegisterExecutePhaseCallback(callback func(*Simulation)) {
+	sim.executePhaseCallbacks = append(sim.executePhaseCallbacks, callback)
+}
 func (sim *Simulation) IsExecutePhase() bool {
-	return sim.CurrentTime > sim.encounter.executePhaseBegins
+	return sim.executePhase
 }
 
 func (sim *Simulation) GetRemainingDuration() time.Duration {

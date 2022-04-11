@@ -17,7 +17,7 @@ import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -31,6 +31,7 @@ import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Rogue, Rogue_Rotation as RogueRotation, Rogue_Options as RogueOptions } from '/tbc/core/proto/rogue.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
+import * as Mechanics from '/tbc/core/constants/mechanics.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
@@ -38,11 +39,21 @@ import * as RogueInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecRogue>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecRogue>) {
 		super(parentElem, player, {
 			cssClass: 'rogue-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
+				'Rotations are not fully optimized, especially for non-standard setups.',
+			],
+			warnings: [
+				(simUI: IndividualSimUI<Spec.SpecRogue>) => {
+					return {
+						updateOn: simUI.player.changeEmitter,
+						shouldDisplay: () => simUI.player.getRotation().maintainExposeArmor && simUI.player.getTalents().improvedExposeArmor < 2,
+						getContent: () => '\'Maintain Expose Armor\' selected, but missing points in Improved Expose Armor!',
+					};
+				},
 			],
 
 			// All stats for which EP should be calculated.
@@ -70,20 +81,52 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 				Stat.StatArmorPenetration,
 				Stat.StatExpertise,
 			],
+			modifyDisplayStats: (player: Player<Spec.SpecRogue>, stats: Stats) => {
+				const hasImpFF = player.sim.encounter.primaryTarget.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
+				if (hasImpFF) {
+					stats = stats.withStat(Stat.StatMeleeHit,
+						stats.getStat(Stat.StatMeleeHit)
+						+ 3 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE);
+				}
+				return stats;
+			},
+			statBreakdowns: (player: Player<Spec.SpecRogue>, stats: Stats) => {
+				const totalHit = stats.getStat(Stat.StatMeleeHit);
+
+				const hasImpFF = player.sim.encounter.primaryTarget.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
+				const debuffsHit = hasImpFF ? 3 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE : 0;
+
+				const talentsHit = player.getTalents().precision * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE;
+				const consumesHit = player.getConsumes().food == Food.FoodSpicyHotTalbuk ? 20 : 0;
+				const buffsHit = player.getParty()?.getBuffs().draeneiRacialMelee ? 1 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE : 0;
+
+				const gearHit = totalHit - debuffsHit - buffsHit - consumesHit - talentsHit;
+
+				return {
+					[Stat.StatMeleeHit]: [
+						{ label: 'Gear', value: gearHit },
+						{ label: 'Talents', value: talentsHit },
+						{ label: 'Consumes', value: consumesHit },
+						{ label: 'Buffs', value: buffsHit },
+						{ label: 'Debuffs', value: debuffsHit },
+						{ label: 'Total', value: totalHit },
+					].filter(b => b.value != 0),
+				};
+			},
 
 			defaults: {
 				// Default equipped gear.
 				gear: Presets.P1_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
-					[Stat.StatAgility]: 2.5,
-					[Stat.StatStrength]: 1,
+					[Stat.StatAgility]: 2.214,
+					[Stat.StatStrength]: 1.1,
 					[Stat.StatAttackPower]: 1,
-					[Stat.StatMeleeHit]: 1,
-					[Stat.StatMeleeCrit]: 1,
-					[Stat.StatMeleeHaste]: 1.4,
-					[Stat.StatArmorPenetration]: 0.4,
-					[Stat.StatExpertise]: 3,
+					[Stat.StatMeleeHit]: 2.852,
+					[Stat.StatMeleeCrit]: 1.763,
+					[Stat.StatMeleeHaste]: 2.311,
+					[Stat.StatArmorPenetration]: 0.44,
+					[Stat.StatExpertise]: 3.107,
 				}),
 				// Default consumes settings.
 				consumes: Presets.DefaultConsumes,
@@ -99,21 +142,31 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 				}),
 				partyBuffs: PartyBuffs.create({
 					bloodlust: 1,
+					drums: Drums.DrumsOfBattle,
 					graceOfAirTotem: TristateEffect.TristateEffectImproved,
 					strengthOfEarthTotem: StrengthOfEarthType.EnhancingTotems,
 					windfuryTotemRank: 5,
+					windfuryTotemIwt: 2,
 					battleShout: TristateEffect.TristateEffectImproved,
 					leaderOfThePack: TristateEffect.TristateEffectImproved,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfMight: TristateEffect.TristateEffectImproved,
+					blessingOfSalvation: true,
+					unleashedRage: true,
 				}),
 				debuffs: Debuffs.create({
+					bloodFrenzy: true,
+					mangle: true,
 					sunderArmor: true,
 					curseOfRecklessness: true,
 					faerieFire: TristateEffect.TristateEffectImproved,
 					improvedSealOfTheCrusader: true,
+					misery: true,
+					huntersMark: TristateEffect.TristateEffectImproved,
+					exposeWeaknessUptime: 0.95,
+					exposeWeaknessHunterAgility: 1200,
 				}),
 			},
 
@@ -127,26 +180,27 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 			partyBuffInputs: [
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.Bloodlust,
+				IconInputs.StrengthOfEarthTotem,
 				IconInputs.GraceOfAirTotem,
 				IconInputs.WindfuryTotem,
-				IconInputs.StrengthOfEarthTotem,
 				IconInputs.BattleShout,
-				IconInputs.DraeneiRacialMelee,
 				IconInputs.LeaderOfThePack,
 				IconInputs.FerociousInspiration,
 				IconInputs.TrueshotAura,
 				IconInputs.SanctityAura,
+				IconInputs.DraeneiRacialMelee,
 				IconInputs.BraidedEterniumChain,
-				IconInputs.BattleChickens,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfMight,
+				IconInputs.BlessingOfSalvation,
 				IconInputs.UnleashedRage,
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
 				IconInputs.BloodFrenzy,
+				IconInputs.Mangle,
 				IconInputs.ImprovedSealOfTheCrusader,
 				IconInputs.HuntersMark,
 				IconInputs.FaerieFire,
@@ -161,6 +215,7 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 					Potions.HastePotion,
 				],
 				conjured: [
+					Conjured.ConjuredRogueThistleTea,
 					Conjured.ConjuredFlameCap,
 				],
 				flasks: [
@@ -182,12 +237,12 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 				alcohol: [
 				],
 				weaponImbues: [
+					WeaponImbue.WeaponImbueRogueDeadlyPoison,
+					WeaponImbue.WeaponImbueRogueInstantPoison,
 					WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.BattleChicken,
 					IconInputs.ScrollOfAgilityV,
 					IconInputs.ScrollOfStrengthV,
 				],
@@ -197,8 +252,8 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
-					OtherInputs.StartingPotion,
-					OtherInputs.NumStartingPotions,
+					OtherInputs.StartingConjured,
+					OtherInputs.NumStartingConjured,
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
@@ -226,12 +281,16 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 				talents: [
 					Presets.CombatTalents,
 					Presets.CombatMaceTalents,
+					Presets.MutilateTalents,
+					Presets.HemoTalents,
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
 					Presets.P1_PRESET,
 					Presets.P2_PRESET,
 					Presets.P3_PRESET,
+					Presets.P4_PRESET,
+					Presets.P5_PRESET,
 				],
 			},
 		});

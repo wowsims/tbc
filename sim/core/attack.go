@@ -2,61 +2,58 @@ package core
 
 import (
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // ReplaceMHSwing is called right before an auto attack fires
 //  If it returns nil, the attack takes place as normal. If it returns an ability,
 //  that ability is used in place of the attack.
 //  This allows for abilities that convert a white attack into yellow attack.
-type ReplaceMHSwing func(sim *Simulation) *ActiveMeleeAbility
-
-// OnBeforeMelee is invoked once for each ability, even if there are multiple hits.
-//  This should be used for any effects that adjust the cost / stats / multipliers of the attack.
-type OnBeforeMelee func(sim *Simulation, ability *ActiveMeleeAbility)
-
-// OnBeforeMelee is invoked before the hit/dmg rolls are made.
-//  This is invoked on both auto attacks and melee abilities.
-//  This should be used for any effects that adjust the stats / multipliers of the attack.
-type OnBeforeMeleeHit func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect)
-
-// OnMeleeAttack is invoked on auto attacks and abilities.
-//  This should be used for any on-hit procs.
-type OnMeleeAttack func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect)
+type ReplaceMHSwing func(sim *Simulation) *Spell
 
 // Represents a generic weapon. Pets / unarmed / various other cases dont use
 // actual weapon items so this is an abstraction of a Weapon.
 type Weapon struct {
-	BaseDamageMin  float64
-	BaseDamageMax  float64
-	SwingSpeed     float64
-	SwingDuration  time.Duration // Duration between 2 swings.
-	CritMultiplier float64
+	BaseDamageMin        float64
+	BaseDamageMax        float64
+	SwingSpeed           float64
+	NormalizedSwingSpeed float64
+	SwingDuration        time.Duration // Duration between 2 swings.
+	CritMultiplier       float64
 }
 
 func newWeaponFromUnarmed(critMultiplier float64) Weapon {
 	// These numbers are probably wrong but nobody cares.
 	return Weapon{
-		BaseDamageMin:  0,
-		BaseDamageMax:  0,
-		SwingSpeed:     1,
-		SwingDuration:  time.Second,
-		CritMultiplier: critMultiplier,
+		BaseDamageMin:        0,
+		BaseDamageMax:        0,
+		SwingSpeed:           1,
+		NormalizedSwingSpeed: 1,
+		SwingDuration:        time.Second,
+		CritMultiplier:       critMultiplier,
 	}
 }
 
 func newWeaponFromItem(item items.Item, critMultiplier float64) Weapon {
+	normalizedWeaponSpeed := 2.4
+	if item.WeaponType == proto.WeaponType_WeaponTypeDagger {
+		normalizedWeaponSpeed = 1.7
+	} else if item.HandType == proto.HandType_HandTypeTwoHand {
+		normalizedWeaponSpeed = 3.3
+	} else if item.RangedWeaponType != proto.RangedWeaponType_RangedWeaponTypeUnknown {
+		normalizedWeaponSpeed = 2.8
+	}
+
 	return Weapon{
-		BaseDamageMin:  item.WeaponDamageMin,
-		BaseDamageMax:  item.WeaponDamageMax,
-		SwingSpeed:     item.SwingSpeed,
-		SwingDuration:  time.Duration(item.SwingSpeed * float64(time.Second)),
-		CritMultiplier: critMultiplier,
+		BaseDamageMin:        item.WeaponDamageMin,
+		BaseDamageMax:        item.WeaponDamageMax,
+		SwingSpeed:           item.SwingSpeed,
+		NormalizedSwingSpeed: normalizedWeaponSpeed,
+		SwingDuration:        time.Duration(item.SwingSpeed * float64(time.Second)),
+		CritMultiplier:       critMultiplier,
 	}
 }
 
@@ -88,311 +85,44 @@ func (character *Character) WeaponFromRanged(critMultiplier float64) Weapon {
 }
 
 func (weapon Weapon) BaseDamage(sim *Simulation) float64 {
-	return weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("melee")
+	return weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("Weapon Base Damage")
 }
 
-func (weapon Weapon) calculateSwingDamage(sim *Simulation, attackPower float64) float64 {
+func (weapon Weapon) calculateWeaponDamage(sim *Simulation, attackPower float64) float64 {
 	return weapon.BaseDamage(sim) + (weapon.SwingSpeed*attackPower)/MeleeAttackRatingPerDamage
+}
+
+func (weapon Weapon) calculateNormalizedWeaponDamage(sim *Simulation, attackPower float64) float64 {
+	return weapon.BaseDamage(sim) + (weapon.NormalizedSwingSpeed*attackPower)/MeleeAttackRatingPerDamage
 }
 
 type MeleeDamageCalculator func(attackPower float64, bonusWeaponDamage float64) float64
 
-// If MainHand or Offhand is non-zero the associated ability will create a weapon swing.
-type WeaponDamageInput struct {
-	DamageMultiplier float64 // Damage multiplier on weapon damage.
-	FlatDamageBonus  float64 // Flat bonus added to swing.
-
-	// If set, skips the normal calc for weapon damage and uses this function instead.
-	CalculateDamage MeleeDamageCalculator
-}
-
-type ActiveMeleeAbility struct {
-	Cast
-
-	OnMeleeAttack OnMeleeAttack
-
-	Outcome     HitOutcome // Hit roll result
-	Hits        int32
-	Misses      int32
-	Crits       int32
-	Dodges      int32
-	Glances     int32
-	Parries     int32
-	Blocks      int32
-	TotalDamage float64 // Damage done by this cast.
-	TotalThreat float64 // Threat generated by this cast.
-
-	// For abilities that only have 1 hit. Either this or Effects should be filled, not both.
-	Effect SpellHitEffect
-
-	// For abilities that have more than 1 hit. Either this of Effect should be filled, not both.
-	Effects []SpellHitEffect
-}
-
-// Computes an attack result using the white-hit table formula (single roll).
-func (ahe *SpellHitEffect) WhiteHitTableResult(sim *Simulation, ability *ActiveMeleeAbility) HitOutcome {
-	// 1. Single roll -> Miss				Dodge	Parry	Glance	Block	Crit / Hit
-	// 3 				8.0%(9.0% hit cap)	6.5%	14.0%	24% 	5%		-4.8%
-
-	// TODO: many calculations in here can be cached. For now its just written out fully.
-	//  Once everything is working we can start caching values.
-	character := ability.Character
-
-	roll := sim.RandomFloat("auto attack")
-
-	// Miss
-	missChance := ahe.Target.MissChance
-	if character.AutoAttacks.IsDualWielding && ability.OutcomeRollCategory == OutcomeRollCategoryWhite {
-		missChance += 0.19
-	}
-	hitBonus := ((character.stats[stats.MeleeHit] + ahe.BonusHitRating) / (MeleeHitRatingPerHitChance * 100)) - ahe.Target.HitSuppression
-	if hitBonus > 0 {
-		missChance = MaxFloat(0, missChance-hitBonus)
-	}
-
-	chance := missChance
-	if roll < chance {
-		return OutcomeMiss
-	}
-
-	if !ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) { // Ranged hits can't be dodged/glance, and are always 2-roll
-		// Dodge
-		if !ahe.CannotBeDodged {
-			dodge := ahe.Target.Dodge
-			expertisePercentage := MinFloat(math.Floor((character.stats[stats.Expertise]+ahe.BonusExpertiseRating)/(ExpertisePerQuarterPercentReduction))/400, dodge)
-			chance += dodge - expertisePercentage
-			if roll < chance {
-				return OutcomeDodge
-			}
-		}
-
-		// Parry (if in front)
-		// If the target is a mob and defense minus weapon skill is 11 or more:
-		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.6%
-
-		// If the target is a mob and defense minus weapon skill is 10 or less:
-		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.1%
-
-		// Block (if in front)
-		// If the target is a mob:
-		// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
-		// If we actually implement blocks, ranged hits can be blocked.
-
-		// Glance
-		chance += ahe.Target.Glance
-		if roll < chance {
-			return OutcomeGlance
-		}
-
-		// No need to crit roll if we are a special attack.
-		if ability.OutcomeRollCategory.Matches(OutcomeRollCategorySpecial) {
-			return OutcomeHit
-		}
-
-		// Crit
-		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
-		chance += critChance
-		if roll < chance {
-			return OutcomeCrit
-		}
-	}
-
-	return OutcomeHit
-}
-
-func (ahe *SpellHitEffect) calculateDamage(sim *Simulation, ability *ActiveMeleeAbility) {
-	character := ability.Character
-
-	if ahe.ReuseMainHitRoll {
-		ahe.Outcome = ability.Effects[0].Outcome
-	} else {
-		ahe.Outcome = ahe.WhiteHitTableResult(sim, ability)
-	}
-
-	if !ahe.Landed() {
-		ahe.Damage = 0
-		return
-	}
-
-	var attackPower float64
-	var bonusWeaponDamage float64
-	if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-		attackPower = character.stats[stats.RangedAttackPower] + ahe.BonusAttackPower
-		bonusWeaponDamage = character.PseudoStats.BonusRangedDamage + ahe.BonusWeaponDamage
-	} else if ability.SpellSchool == SpellSchoolPhysical { // any physical attack gains from AP
-		attackPower = character.stats[stats.AttackPower] + ahe.BonusAttackPower
-		bonusWeaponDamage = character.PseudoStats.BonusMeleeDamage + ahe.BonusWeaponDamage
-	}
-
-	dmg := 0.0
-	if ahe.WeaponInput.CalculateDamage != nil {
-		dmg += ahe.WeaponInput.CalculateDamage(attackPower, bonusWeaponDamage)
-	} else if ahe.WeaponInput.DamageMultiplier != 0 {
-		// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
-		if ability.OutcomeRollCategory.Matches(OutcomeRollCategoryRanged) {
-			dmg += character.AutoAttacks.Ranged.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
-		} else if ahe.IsMH() {
-			dmg += character.AutoAttacks.MH.calculateSwingDamage(sim, attackPower) + bonusWeaponDamage
-		} else {
-			dmg += character.AutoAttacks.OH.calculateSwingDamage(sim, attackPower)*0.5 + bonusWeaponDamage
-		}
-		dmg *= ahe.WeaponInput.DamageMultiplier
-		dmg += ahe.WeaponInput.FlatDamageBonus
-	}
-
-	//if sim.Log != nil {
-	//	character.Log(sim, "Melee dmg calcs: AP=%0.1f, bonusWepDmg:%0.1f, dmgMultiplier:%0.2f, staticMultiplier:%0.2f, result:%d, weaponDmgCalc: %0.1f, critMultiplier: %0.3f, Target armor: %0.1f\n", attackPower, bonusWeaponDamage, ahe.DamageMultiplier, ahe.StaticDamageMultiplier, ahe.HitType, dmg, ability.CritMultiplier, ahe.Target.currentArmor)
-	//}
-
-	// Add damage from DirectInput
-	if ahe.DirectInput.MinBaseDamage != 0 {
-		dmg += ahe.DirectInput.MinBaseDamage + (ahe.DirectInput.MaxBaseDamage-ahe.DirectInput.MinBaseDamage)*sim.RandomFloat("Melee Direct Input")
-	}
-	dmg += attackPower * ahe.DirectInput.SpellCoefficient
-	dmg += ahe.DirectInput.FlatDamageBonus
-
-	// If this is a yellow attack, need a 2nd roll to decide crit. Otherwise just use existing hit result.
-	if ability.OutcomeRollCategory != OutcomeRollCategoryWhite {
-		critChance := ((character.stats[stats.MeleeCrit] + ahe.BonusCritRating) / (MeleeCritRatingPerCritChance * 100)) - ahe.Target.CritSuppression
-
-		roll := sim.RandomFloat("weapon swing")
-		if roll < critChance {
-			ahe.Outcome = OutcomeCrit
-		} else {
-			ahe.Outcome = OutcomeHit
-		}
-	}
-
-	if ahe.Outcome == OutcomeCrit {
-		dmg *= ability.CritMultiplier
-	} else if ahe.Outcome == OutcomeGlance {
-		dmg *= 0.75
-	}
-
-	// Apply armor reduction.
-	if !ahe.IgnoreArmor { // TODO: replace with SpellExtras
-		dmg *= 1 - ahe.Target.ArmorDamageReduction(character.stats[stats.ArmorPenetration]+ahe.BonusArmorPenetration)
-	}
-
-	// Apply all other effect multipliers.
-	dmg *= ahe.DamageMultiplier * ahe.StaticDamageMultiplier
-
-	ahe.Damage = dmg
-}
-
 // Returns whether this hit effect is associated with the main-hand weapon.
-func (ahe *SpellHitEffect) IsMH() bool {
+func (ahe *SpellEffect) IsMH() bool {
 	const mhmask = ProcMaskMeleeMH
 	return ahe.ProcMask.Matches(mhmask)
 }
 
 // Returns whether this hit effect is associated with the off-hand weapon.
-func (ahe *SpellHitEffect) IsOH() bool {
+func (ahe *SpellEffect) IsOH() bool {
 	return ahe.ProcMask.Matches(ProcMaskMeleeOH)
 }
 
 // Returns whether this hit effect is associated with either melee weapon.
-func (ahe *SpellHitEffect) IsMelee() bool {
+func (ahe *SpellEffect) IsMelee() bool {
 	return ahe.ProcMask.Matches(ProcMaskMelee)
-}
-
-// Returns whether this hit effect matches the hand in which a weapon is equipped.
-func (ahe *SpellHitEffect) IsEquippedHand(mh bool, oh bool) bool {
-	return (mh && ahe.IsMH()) || (oh && ahe.IsOH())
 }
 
 // It appears that TBC does not do hasted GCD for abilities.
 //  Leaving this option here in case we want it in the future.
 const EnableAbilityHaste = false
 
-func (ability *ActiveMeleeAbility) CalculatedGCD(char *Character) time.Duration {
+func (ability *SimpleSpell) CalculatedGCD(char *Character) time.Duration {
 	if !EnableAbilityHaste {
 		return ability.GCD
 	}
 	return MaxDuration(GCDMin, time.Duration(float64(ability.GCD)/char.SwingSpeed()))
-}
-
-// Attack will perform the attack
-//  Returns false if unable to attack (due to resource lacking)
-func (ability *ActiveMeleeAbility) Attack(sim *Simulation) bool {
-	if ability.GCD != 0 && ability.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime) > 0 {
-		panic(fmt.Sprintf("Ability used while on GCD\n-------\nAbility %s: %#v\n", ability.ActionID, ability))
-	}
-
-	ability.Character.OnBeforeMelee(sim, ability)
-
-	switch ability.Cast.Cost.Type {
-	case stats.Mana:
-		if ability.Character.CurrentMana() < ability.Cast.Cost.Value {
-			return false
-		}
-		ability.Character.SpendMana(sim, ability.Cast.Cost.Value, ability.Cast.ActionID)
-	case stats.Rage:
-		if ability.Character.CurrentRage() < ability.Cast.Cost.Value {
-			return false
-		}
-		ability.Character.SpendRage(sim, ability.Cast.Cost.Value, ability.Cast.ActionID)
-	case stats.Energy:
-		if ability.Character.CurrentEnergy() < ability.Cast.Cost.Value {
-			return false
-		}
-		ability.Character.SpendEnergy(sim, ability.Cast.Cost.Value, ability.Cast.ActionID)
-	}
-
-	if len(ability.Effects) == 0 {
-		ability.Effect.performAttack(sim, ability)
-	} else {
-		for i, _ := range ability.Effects {
-			ahe := &ability.Effects[i]
-			ahe.performAttack(sim, ability)
-		}
-	}
-
-	if ability.GCD != 0 {
-		gcdCD := MaxDuration(ability.CalculatedGCD(ability.Character), ability.CastTime)
-		ability.Character.SetGCDTimer(sim, sim.CurrentTime+gcdCD)
-	}
-
-	if ability.Cooldown != 0 {
-		ability.Character.SetCD(ability.ActionID.CooldownID, sim.CurrentTime+ability.Cooldown)
-	}
-	ability.Character.Metrics.AddMeleeAbility(ability)
-	return true
-}
-
-func (ahe *SpellHitEffect) performAttack(sim *Simulation, ability *ActiveMeleeAbility) {
-	ability.Character.OnBeforeMeleeHit(sim, ability, ahe)
-	ahe.Target.OnBeforeMeleeHit(sim, ability, ahe)
-
-	ahe.calculateDamage(sim, ability)
-
-	if ahe.Outcome == OutcomeMiss {
-		ability.Misses++
-	} else if ahe.Outcome == OutcomeDodge {
-		ability.Dodges++
-	} else if ahe.Outcome == OutcomeGlance {
-		ability.Glances++
-	} else if ahe.Outcome == OutcomeCrit {
-		ability.Crits++
-	} else if ahe.Outcome == OutcomeHit {
-		ability.Hits++
-	} else if ahe.Outcome == OutcomeParry {
-		ability.Parries++
-	} else if ahe.Outcome.Matches(OutcomeBlock) {
-		ability.Blocks++
-	}
-	ability.TotalDamage += ahe.Damage
-	ability.TotalThreat += (ahe.Damage + ahe.FlatThreatBonus) * ahe.ThreatMultiplier * ability.Character.PseudoStats.ThreatMultiplier
-
-	if sim.Log != nil {
-		ability.Character.Log(sim, "%s %s", ability.ActionID, ahe)
-	}
-
-	ability.Character.OnMeleeAttack(sim, ability, ahe)
-	ahe.Target.OnMeleeAttack(sim, ability, ahe)
-	if ability.OnMeleeAttack != nil {
-		ability.OnMeleeAttack(sim, ability, ahe)
-	}
 }
 
 type AutoAttacks struct {
@@ -422,12 +152,14 @@ type AutoAttacks struct {
 	OffhandSwingAt  time.Duration
 	RangedSwingAt   time.Duration
 
-	MHAuto      ActiveMeleeAbility // Parameters for MH auto attacks.
-	OHAuto      ActiveMeleeAbility // Parameters for OH auto attacks.
-	cachedMelee ActiveMeleeAbility // reuse to save memory allocations
+	MHEffect     SpellEffect
+	OHEffect     SpellEffect
+	RangedEffect SpellEffect
 
-	RangedAuto            ActiveMeleeAbility // Parameters for ranged auto attacks.
-	RangedCast            SimpleCast         // Used for the 0.5s cast time on ranged autos.
+	MHAuto     *Spell
+	OHAuto     *Spell
+	RangedAuto *Spell
+
 	RangedSwingInProgress bool
 
 	ReplaceMHSwing ReplaceMHSwing
@@ -451,7 +183,7 @@ type AutoAttackOptions struct {
 }
 
 func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOptions) {
-	aa := AutoAttacks{
+	character.AutoAttacks = AutoAttacks{
 		agent:          agent,
 		character:      character,
 		MH:             options.MainHand,
@@ -460,81 +192,29 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		AutoSwingMelee: options.AutoSwingMelee,
 		DelayOHSwings:  options.DelayOHSwings,
 		ReplaceMHSwing: options.ReplaceMHSwing,
-		MHAuto: ActiveMeleeAbility{
-			Cast: Cast{
-				ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
-				Character:           character,
-				OutcomeRollCategory: OutcomeRollCategoryWhite,
-				CritRollCategory:    CritRollCategoryPhysical,
-				SpellSchool:         SpellSchoolPhysical,
-				CritMultiplier:      options.MainHand.CritMultiplier,
-			},
-			Effect: SpellHitEffect{
-				SpellEffect: SpellEffect{
-					ProcMask:               ProcMaskMeleeMHAuto,
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-				},
-				WeaponInput: WeaponDamageInput{
-					DamageMultiplier: 1,
-				},
-			},
+		IsDualWielding: options.MainHand.SwingSpeed != 0 && options.OffHand.SwingSpeed != 0,
+		MHEffect: SpellEffect{
+			ProcMask:         ProcMaskMeleeMHAuto,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       BaseDamageConfigMeleeWeapon(MainHand, false, 0, 1, true),
+			OutcomeApplier:   OutcomeFuncMeleeWhite(options.MainHand.CritMultiplier),
 		},
-		OHAuto: ActiveMeleeAbility{
-			Cast: Cast{
-				ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
-				Character:           character,
-				OutcomeRollCategory: OutcomeRollCategoryWhite,
-				CritRollCategory:    CritRollCategoryPhysical,
-				SpellSchool:         SpellSchoolPhysical,
-				CritMultiplier:      options.OffHand.CritMultiplier,
-			},
-			Effect: SpellHitEffect{
-				SpellEffect: SpellEffect{
-					ProcMask:               ProcMaskMeleeOHAuto,
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-				},
-				WeaponInput: WeaponDamageInput{
-					DamageMultiplier: 1,
-				},
-			},
+		OHEffect: SpellEffect{
+			ProcMask:         ProcMaskMeleeOHAuto,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       BaseDamageConfigMeleeWeapon(OffHand, false, 0, 1, true),
+			OutcomeApplier:   OutcomeFuncMeleeWhite(options.OffHand.CritMultiplier),
 		},
-		RangedAuto: ActiveMeleeAbility{
-			Cast: Cast{
-				ActionID:            ActionID{OtherID: proto.OtherAction_OtherActionShoot},
-				Character:           character,
-				SpellSchool:         SpellSchoolPhysical,
-				OutcomeRollCategory: OutcomeRollCategoryRanged | OutcomeRollCategoryWhite,
-				CritRollCategory:    CritRollCategoryPhysical,
-			},
-			Effect: SpellHitEffect{
-				SpellEffect: SpellEffect{
-					ProcMask:               ProcMaskRangedAuto,
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-				},
-				WeaponInput: WeaponDamageInput{
-					DamageMultiplier: 1,
-				},
-			},
-		},
-		RangedCast: SimpleCast{
-			Cast: Cast{
-				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
-				Character:   character,
-				IgnoreHaste: true, // Affected by ranged haste, not spell haste.
-			},
-			DisableMetrics: true,
+		RangedEffect: SpellEffect{
+			ProcMask:         ProcMaskRangedAuto,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       BaseDamageConfigRangedWeapon(0),
+			OutcomeApplier:   OutcomeFuncRangedHitAndCrit(options.Ranged.CritMultiplier),
 		},
 	}
-
-	aa.IsDualWielding = aa.MH.SwingSpeed != 0 && aa.OH.SwingSpeed != 0
-
-	character.AutoAttacks = aa
 }
 
 func (aa *AutoAttacks) IsEnabled() bool {
@@ -542,12 +222,68 @@ func (aa *AutoAttacks) IsEnabled() bool {
 }
 
 // Empty handler so Agents don't have to provide one if they have no logic to add.
-func (character *Character) OnAutoAttack(sim *Simulation, ability *ActiveMeleeAbility) {}
+func (character *Character) OnAutoAttack(sim *Simulation, spell *Spell) {}
 
 func (aa *AutoAttacks) reset(sim *Simulation) {
 	if !aa.IsEnabled() {
 		return
 	}
+
+	mhTemplate := SimpleSpell{
+		SpellCast: SpellCast{
+			Cast: Cast{
+				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
+				Character:   aa.character,
+				SpellSchool: SpellSchoolPhysical,
+				IgnoreHaste: true,
+				SpellExtras: SpellExtrasMeleeMetrics,
+			},
+		},
+	}
+	aa.MHAuto = aa.character.GetOrRegisterSpell(SpellConfig{
+		Template:     mhTemplate,
+		ApplyEffects: ApplyEffectFuncDirectDamage(aa.MHEffect),
+	})
+
+	ohTemplate := SimpleSpell{
+		SpellCast: SpellCast{
+			Cast: Cast{
+				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
+				Character:   aa.character,
+				SpellSchool: SpellSchoolPhysical,
+				IgnoreHaste: true,
+				SpellExtras: SpellExtrasMeleeMetrics,
+			},
+		},
+	}
+	aa.OHAuto = aa.character.GetOrRegisterSpell(SpellConfig{
+		Template:     ohTemplate,
+		ApplyEffects: ApplyEffectFuncDirectDamage(aa.OHEffect),
+	})
+
+	rangedTemplate := SimpleSpell{
+		SpellCast: SpellCast{
+			Cast: Cast{
+				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
+				Character:   aa.character,
+				SpellSchool: SpellSchoolPhysical,
+				IgnoreHaste: true, // Affected by ranged haste, not spell haste.
+				SpellExtras: SpellExtrasMeleeMetrics,
+
+				AfterCast: func(sim *Simulation, cast *Cast) {
+					aa.RangedSwingInProgress = false
+					aa.agent.OnAutoAttack(sim, aa.RangedAuto)
+				},
+			},
+		},
+	}
+	aa.RangedAuto = aa.character.GetOrRegisterSpell(SpellConfig{
+		Template: rangedTemplate,
+		ModifyCast: func(_ *Simulation, target *Target, instance *SimpleSpell) {
+			instance.CastTime = aa.RangedSwingWindup()
+		},
+		ApplyEffects: ApplyEffectFuncDirectDamage(aa.RangedEffect),
+	})
 
 	aa.MainhandSwingAt = 0
 	aa.OffhandSwingAt = 0
@@ -572,18 +308,8 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 	aa.autoSwingCancelled = false
 	aa.resetAutoSwing(sim)
 
-	// Can precompute this.
-	aa.RangedAuto.CritMultiplier = aa.Ranged.CritMultiplier
-
 	aa.RangedSwingAt = 0
 	aa.RangedSwingInProgress = false
-	aa.RangedCast.OnCastComplete = func(sim *Simulation, cast *Cast) {
-		ama := aa.RangedAuto
-		ama.Effect.Target = sim.GetPrimaryTarget()
-		ama.Attack(sim)
-		aa.RangedSwingInProgress = false
-		aa.agent.OnAutoAttack(sim, &ama)
-	}
 }
 
 func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
@@ -696,23 +422,19 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		return
 	}
 
-	// Allow MH swing to be overridden for abilities like Heroic Strike.
-	var replaceAMA *ActiveMeleeAbility
+	attackSpell := aa.MHAuto
 	if aa.ReplaceMHSwing != nil {
-		replaceAMA = aa.ReplaceMHSwing(sim)
+		// Allow MH swing to be overridden for abilities like Heroic Strike.
+		replacementSpell := aa.ReplaceMHSwing(sim)
+		if replacementSpell != nil {
+			attackSpell = replacementSpell
+		}
 	}
 
-	if replaceAMA == nil {
-		aa.cachedMelee = aa.MHAuto
-		aa.cachedMelee.Effect.Target = target
-	} else {
-		aa.cachedMelee = *replaceAMA
-	}
-
-	aa.cachedMelee.Attack(sim)
+	attackSpell.Cast(sim, target)
 	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	aa.previousMHSwingAt = sim.CurrentTime
-	aa.agent.OnAutoAttack(sim, &aa.cachedMelee)
+	aa.agent.OnAutoAttack(sim, attackSpell)
 }
 
 // Performs an autoattack using the main hand weapon, if the OH CD is ready.
@@ -730,11 +452,9 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 		return
 	}
 
-	aa.cachedMelee = aa.OHAuto
-	aa.cachedMelee.Effect.Target = target
-	aa.cachedMelee.Attack(sim)
+	aa.OHAuto.Cast(sim, target)
 	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
-	aa.agent.OnAutoAttack(sim, &aa.cachedMelee)
+	aa.agent.OnAutoAttack(sim, aa.OHAuto)
 }
 
 // Performs an autoattack using the ranged weapon, if the ranged CD is ready.
@@ -743,14 +463,13 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 		return
 	}
 
-	aa.RangedCast.CastTime = aa.RangedSwingWindup()
-	aa.RangedCast.StartCast(sim)
+	aa.RangedAuto.Cast(sim, target)
 	aa.RangedSwingAt = sim.CurrentTime + aa.RangedSwingSpeed()
 	aa.RangedSwingInProgress = true
 
 	// It's important that we update the GCD timer AFTER starting the ranged auto.
 	// Otherwise the hardcast action won't be created separately.
-	nextGCD := sim.CurrentTime + aa.RangedCast.CastTime
+	nextGCD := sim.CurrentTime + aa.RangedAuto.Instance.CastTime
 	if nextGCD > aa.character.NextGCDAt() {
 		aa.character.SetGCDTimer(sim, nextGCD)
 	}
@@ -905,31 +624,5 @@ func (aa *AutoAttacks) NewPPMManager(ppm float64) PPMManager {
 		mhProcChance:     (aa.MH.SwingSpeed * ppm) / 60.0,
 		ohProcChance:     (aa.OH.SwingSpeed * ppm) / 60.0,
 		rangedProcChance: (aa.Ranged.SwingSpeed * ppm) / 60.0,
-	}
-}
-
-type MeleeAbilityTemplate struct {
-	template ActiveMeleeAbility
-	effects  []SpellHitEffect
-}
-
-func (template *MeleeAbilityTemplate) Apply(newAction *ActiveMeleeAbility) {
-	if newAction.objectInUse {
-		panic(fmt.Sprintf("Melee ability (%s) already in use", newAction.ActionID))
-	}
-	*newAction = template.template
-	newAction.Effects = template.effects
-	copy(newAction.Effects, template.template.Effects)
-}
-
-// Takes in a cast template and returns a template, so you don't need to keep track of which things to allocate yourself.
-func NewMeleeAbilityTemplate(abilityTemplate ActiveMeleeAbility) MeleeAbilityTemplate {
-	if len(abilityTemplate.Effects) > 0 && abilityTemplate.Effect.StaticDamageMultiplier != 0 {
-		panic("Cannot use both Effect and Effects, pick one!")
-	}
-
-	return MeleeAbilityTemplate{
-		template: abilityTemplate,
-		effects:  make([]SpellHitEffect, len(abilityTemplate.Effects)),
 	}
 }

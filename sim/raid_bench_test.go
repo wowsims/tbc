@@ -35,10 +35,8 @@ var castersWithElemental = &proto.Party{
 				},
 			},
 			Consumes: &proto.Consumes{
-				FlaskOfBlindingLight: true,
-				MainHandImbue:        proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
-				BlackenedBasilisk:    true,
-				DefaultPotion:        proto.Potions_SuperManaPotion,
+				MainHandImbue: proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
+				DefaultPotion: proto.Potions_SuperManaPotion,
 			},
 			Buffs: &proto.IndividualBuffs{
 				BlessingOfKings:  true,
@@ -63,10 +61,8 @@ var castersWithElemental = &proto.Party{
 				},
 			},
 			Consumes: &proto.Consumes{
-				FlaskOfPureDeath:  true,
-				MainHandImbue:     proto.WeaponImbue_WeaponImbueSuperiorWizardOil,
-				BlackenedBasilisk: true,
-				DefaultPotion:     proto.Potions_SuperManaPotion,
+				MainHandImbue: proto.WeaponImbue_WeaponImbueSuperiorWizardOil,
+				DefaultPotion: proto.Potions_SuperManaPotion,
 			},
 			Buffs: &proto.IndividualBuffs{
 				BlessingOfKings:  true,
@@ -97,11 +93,9 @@ var castersWithElemental = &proto.Party{
 				},
 			},
 			Consumes: &proto.Consumes{
-				FlaskOfBlindingLight: true,
-				MainHandImbue:        proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
-				BlackenedBasilisk:    true,
-				DefaultPotion:        proto.Potions_SuperManaPotion,
-				Drums:                proto.Drums_DrumsOfBattle,
+				MainHandImbue: proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
+				DefaultPotion: proto.Potions_SuperManaPotion,
+				Drums:         proto.Drums_DrumsOfBattle,
 			},
 			Buffs: &proto.IndividualBuffs{
 				BlessingOfKings:  true,
@@ -130,10 +124,8 @@ var castersWithElemental = &proto.Party{
 				},
 			},
 			Consumes: &proto.Consumes{
-				FlaskOfBlindingLight: true,
-				MainHandImbue:        proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
-				BlackenedBasilisk:    true,
-				DefaultPotion:        proto.Potions_SuperManaPotion,
+				MainHandImbue: proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
+				DefaultPotion: proto.Potions_SuperManaPotion,
 			},
 			Buffs: &proto.IndividualBuffs{
 				BlessingOfKings:  true,
@@ -167,10 +159,8 @@ var castersWithResto = &proto.Party{
 				},
 			},
 			Consumes: &proto.Consumes{
-				FlaskOfBlindingLight: true,
-				MainHandImbue:        proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
-				BlackenedBasilisk:    true,
-				DefaultPotion:        proto.Potions_SuperManaPotion,
+				MainHandImbue: proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
+				DefaultPotion: proto.Potions_SuperManaPotion,
 			},
 			Buffs: &proto.IndividualBuffs{
 				BlessingOfKings:  true,
@@ -195,10 +185,8 @@ var castersWithResto = &proto.Party{
 				},
 			},
 			Consumes: &proto.Consumes{
-				FlaskOfPureDeath:  true,
-				MainHandImbue:     proto.WeaponImbue_WeaponImbueSuperiorWizardOil,
-				BlackenedBasilisk: true,
-				DefaultPotion:     proto.Potions_SuperManaPotion,
+				MainHandImbue: proto.WeaponImbue_WeaponImbueSuperiorWizardOil,
+				DefaultPotion: proto.Potions_SuperManaPotion,
 			},
 			Buffs: &proto.IndividualBuffs{
 				BlessingOfKings:  true,
@@ -214,8 +202,7 @@ var castersWithResto = &proto.Party{
 				Mage: &proto.Mage{
 					Talents: mage.ArcaneTalents,
 					Options: &proto.Mage_Options{
-						Armor:           proto.Mage_Options_MageArmor,
-						UseManaEmeralds: true,
+						Armor: proto.Mage_Options_MageArmor,
 					},
 					Rotation: &proto.Mage_Rotation{
 						Arcane: &proto.Mage_Rotation_ArcaneRotation{
@@ -227,10 +214,8 @@ var castersWithResto = &proto.Party{
 				},
 			},
 			Consumes: &proto.Consumes{
-				FlaskOfBlindingLight: true,
-				MainHandImbue:        proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
-				BlackenedBasilisk:    true,
-				DefaultPotion:        proto.Potions_SuperManaPotion,
+				MainHandImbue: proto.WeaponImbue_WeaponImbueBrilliantWizardOil,
+				DefaultPotion: proto.Potions_SuperManaPotion,
 			},
 			Buffs: &proto.IndividualBuffs{
 				BlessingOfKings:  true,
@@ -299,7 +284,7 @@ func BenchmarkSimulate(b *testing.B) {
 			ExecuteProportion: 0.1,
 			Targets: []*proto.Target{
 				{
-					Armor:   7700,
+					Armor:   7684,
 					MobType: proto.MobType_MobTypeDemon,
 					Debuffs: &proto.Debuffs{
 						JudgementOfWisdom:         true,

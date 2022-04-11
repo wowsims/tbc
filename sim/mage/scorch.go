@@ -9,55 +9,35 @@ import (
 
 const SpellIDScorch int32 = 27074
 
-func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDScorch},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 180,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 180,
-				},
-				CastTime:       time.Millisecond * 1500,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    305,
-				MaxBaseDamage:    361,
-				SpellCoefficient: 1.5 / 3.5,
-			},
-		},
+var ScorchActionID = core.ActionID{SpellID: SpellIDScorch}
+
+func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
+	baseCost := 180.0
+
+	effect := core.SpellEffect{
+		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
+
+		BonusSpellCritRating: 0 +
+			float64(mage.Talents.Incineration)*2*core.SpellCritRatingPerCritChance +
+			float64(mage.Talents.CriticalMass)*2*core.SpellCritRatingPerCritChance +
+			float64(mage.Talents.Pyromaniac)*1*core.SpellCritRatingPerCritChance,
+
+		DamageMultiplier: mage.spellDamageMultiplier * (1 + 0.02*float64(mage.Talents.FirePower)),
+		ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+
+		BaseDamage:     core.BaseDamageConfigMagic(305, 361, 1.5/3.5),
+		OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
 	}
 
-	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
-	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
-	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Incineration) * 2 * core.SpellCritRatingPerCritChance
-	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
-	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
-	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
-
 	if mage.Talents.ImprovedScorch > 0 {
+		mage.ScorchAura = sim.GetPrimaryTarget().GetAura(core.ImprovedScorchAuraLabel)
+		if mage.ScorchAura == nil {
+			mage.ScorchAura = core.ImprovedScorchAura(sim.GetPrimaryTarget(), 0)
+		}
+
 		procChance := float64(mage.Talents.ImprovedScorch) / 3.0
-		spell.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-			// Don't overwrite the permanent version.
-			if spellEffect.Target.RemainingAuraDuration(sim, core.ImprovedScorchDebuffID) == core.NeverExpires {
+		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() {
 				return
 			}
 
@@ -65,22 +45,30 @@ func (mage *Mage) newScorchTemplate(sim *core.Simulation) core.SimpleSpellTempla
 				return
 			}
 
-			newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.ImprovedScorchDebuffID)+1)
-			spellEffect.Target.ReplaceAura(sim, core.ImprovedScorchAura(sim, newNumStacks))
+			mage.ScorchAura.Activate(sim)
+			mage.ScorchAura.AddStack(sim)
 		}
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
-}
+	mage.Scorch = mage.RegisterSpell(core.SpellConfig{
+		ActionID:    ScorchActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagMage,
 
-func (mage *Mage) NewScorch(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	scorch := &mage.scorchSpell
-	mage.scorchCastTemplate.Apply(scorch)
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
 
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	scorch.Effect.Target = target
-	scorch.Init(sim)
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost *
+					(1 - 0.01*float64(mage.Talents.Pyromaniac)) *
+					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
 
-	return scorch
+				GCD:      core.GCDDefault,
+				CastTime: time.Millisecond * 1500,
+			},
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+	})
 }

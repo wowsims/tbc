@@ -16,7 +16,7 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -37,7 +37,7 @@ import * as MageInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecMage>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecMage>) {
 		super(parentElem, player, {
 			cssClass: 'mage-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
@@ -112,6 +112,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfWisdom: TristateEffect.TristateEffectImproved,
+					blessingOfSalvation: true,
 					innervates: 1,
 				}),
 				debuffs: Debuffs.create({
@@ -150,6 +151,7 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
+				IconInputs.BlessingOfSalvation,
 				IconInputs.Innervate,
 				IconInputs.PowerInfusion,
 			],
@@ -199,8 +201,6 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 					WeaponImbue.WeaponImbueSuperiorWizardOil,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.DrumsOfRestorationConsume,
 					IconInputs.ScrollOfSpiritV,
 				],
 			},
@@ -242,12 +242,15 @@ export class MageSimUI extends IndividualSimUI<Spec.SpecMage> {
 					Presets.P1_ARCANE_PRESET,
 					Presets.P2_ARCANE_PRESET,
 					Presets.P3_ARCANE_PRESET,
+					Presets.P4_ARCANE_PRESET,
 					Presets.P1_FIRE_PRESET,
 					Presets.P2_FIRE_PRESET,
 					Presets.P3_FIRE_PRESET,
+					Presets.P4_FIRE_PRESET,
 					Presets.P1_FROST_PRESET,
 					Presets.P2_FROST_PRESET,
 					Presets.P3_FROST_PRESET,
+					Presets.P4_FROST_PRESET,
 				],
 			},
 		});

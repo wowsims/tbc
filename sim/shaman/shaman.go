@@ -11,6 +11,12 @@ import (
 // Start looking to refresh 2 minute totems at 1:55.
 const TotemRefreshTime2M = time.Second * 115
 
+const (
+	SpellFlagShock    = core.SpellExtrasAgentReserved1
+	SpellFlagElectric = core.SpellExtrasAgentReserved2
+	SpellFlagTotem    = core.SpellExtrasAgentReserved3
+)
+
 func NewShaman(character core.Character, talents proto.ShamanTalents, totems proto.ShamanTotems, selfBuffs SelfBuffs) *Shaman {
 	if totems.WindfuryTotemRank == 0 {
 		// If rank is 0, disable windfury options.
@@ -75,7 +81,6 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, totems pro
 	}
 
 	shaman.registerBloodlustCD()
-	shaman.applyTalents()
 
 	return shaman
 }
@@ -112,31 +117,19 @@ type Shaman struct {
 
 	ElementalFocusStacks byte
 
-	// "object pool" for shaman spells that are currently being cast.
-	lightningBoltSpell   core.SimpleSpell
-	lightningBoltSpellLO core.SimpleSpell
-
-	chainLightningSpell    core.SimpleSpell
-	chainLightningSpellLOs []core.SimpleSpell
-
 	// Precomputed templated cast generator for quickly resetting cast fields.
-	lightningBoltCastTemplate   core.SimpleSpellTemplate
-	lightningBoltLOCastTemplate core.SimpleSpellTemplate
+	LightningBolt   *core.Spell
+	LightningBoltLO *core.Spell
 
-	chainLightningCastTemplate    core.SimpleSpellTemplate
-	chainLightningLOCastTemplates []core.SimpleSpellTemplate
+	ChainLightning    *core.Spell
+	ChainLightningLOs []*core.Spell
 
-	stormstrikeTemplate core.MeleeAbilityTemplate
-	stormstrikeSpell    core.ActiveMeleeAbility
+	Stormstrike *core.Spell
 
 	// Shocks
-	shockSpell         core.SimpleSpell
-	earthShockTemplate core.SimpleSpellTemplate
-	frostShockTemplate core.SimpleSpellTemplate
-
-	// Flame shock needs a separate spell object because of the dot.
-	FlameShockSpell    core.SimpleSpell
-	flameShockTemplate core.SimpleSpellTemplate
+	EarthShock *core.Spell
+	FrostShock *core.Spell
+	FlameShock *core.Spell
 
 	strengthOfEarthTotemTemplate core.SimpleCast
 	tremorTotemTemplate          core.SimpleCast
@@ -148,10 +141,18 @@ type Shaman struct {
 	manaSpringTotemTemplate      core.SimpleCast
 	totemSpell                   core.SimpleCast
 
-	searingTotemTemplate core.SimpleSpellTemplate
-	magmaTotemTemplate   core.SimpleSpellTemplate
-	novaTotemTemplate    core.SimpleSpellTemplate
-	FireTotemSpell       core.SimpleSpell
+	SearingTotem  *core.Spell
+	MagmaTotem    *core.Spell
+	FireNovaTotem *core.Spell
+
+	FlameShockDot    *core.Dot
+	SearingTotemDot  *core.Dot
+	MagmaTotemDot    *core.Dot
+	FireNovaTotemDot *core.Dot
+
+	ElementalMasteryAura *core.Aura
+	NaturesSwiftnessAura *core.Aura
+	ShamanisticFocusAura *core.Aura
 }
 
 // Implemented by each Shaman spec.
@@ -233,21 +234,20 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (shaman *Shaman) Init(sim *core.Simulation) {
 	// Precompute all the spell templates.
-	shaman.stormstrikeTemplate = shaman.newStormstrikeTemplate(sim)
-	shaman.lightningBoltCastTemplate = shaman.newLightningBoltTemplate(sim, false)
-	shaman.lightningBoltLOCastTemplate = shaman.newLightningBoltTemplate(sim, true)
+	shaman.registerStormstrikeSpell(sim)
+	shaman.LightningBolt = shaman.newLightningBoltSpell(sim, false)
+	shaman.LightningBoltLO = shaman.newLightningBoltSpell(sim, true)
 
-	shaman.chainLightningCastTemplate = shaman.newChainLightningTemplate(sim, false)
-
+	shaman.ChainLightning = shaman.newChainLightningSpell(sim, false)
 	numHits := core.MinInt32(3, sim.GetNumTargets())
-	shaman.chainLightningSpellLOs = make([]core.SimpleSpell, numHits)
-	shaman.chainLightningLOCastTemplates = []core.SimpleSpellTemplate{}
+	shaman.ChainLightningLOs = []*core.Spell{}
 	for i := int32(0); i < numHits; i++ {
-		shaman.chainLightningLOCastTemplates = append(shaman.chainLightningLOCastTemplates, shaman.newChainLightningTemplate(sim, true))
+		shaman.ChainLightningLOs = append(shaman.ChainLightningLOs, shaman.newChainLightningSpell(sim, true))
 	}
-	shaman.earthShockTemplate = shaman.newEarthShockTemplate(sim)
-	shaman.flameShockTemplate = shaman.newFlameShockTemplate(sim)
-	shaman.frostShockTemplate = shaman.newFrostShockTemplate(sim)
+
+	shaman.registerEarthShockSpell(sim)
+	shaman.registerFlameShockSpell(sim)
+	shaman.registerFrostShockSpell(sim)
 
 	shaman.strengthOfEarthTotemTemplate = shaman.newStrengthOfEarthTotemTemplate(sim)
 	shaman.tremorTotemTemplate = shaman.newTremorTotemTemplate(sim)
@@ -258,9 +258,9 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 	shaman.manaSpringTotemTemplate = shaman.newManaSpringTotemTemplate(sim)
 	shaman.totemOfWrathTemplate = shaman.newTotemOfWrathTemplate(sim)
 
-	shaman.searingTotemTemplate = shaman.newSearingTotemTemplate(sim)
-	shaman.magmaTotemTemplate = shaman.newMagmaTotemTemplate(sim)
-	shaman.novaTotemTemplate = shaman.newNovaTotemTemplate(sim)
+	shaman.registerSearingTotemSpell(sim)
+	shaman.registerMagmaTotemSpell(sim)
+	shaman.registerNovaTotemSpell(sim)
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {
@@ -289,7 +289,7 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 			}
 			if shaman.NextTotemDropType[i] != int32(proto.FireTotem_NoFireTotem) {
 				shaman.NextTotemDrops[i] = TotemRefreshTime2M
-				if shaman.Totems.Fire != proto.FireTotem_TotemOfWrath {
+				if shaman.NextTotemDropType[i] != int32(proto.FireTotem_TotemOfWrath) {
 					shaman.NextTotemDrops[i] = 0 // attack totems we drop immediately
 				}
 			}
@@ -303,8 +303,17 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 	shaman.ElementalFocusStacks = 0
 }
 
+func (shaman *Shaman) ElementalCritMultiplier() float64 {
+	critMultiplier := shaman.DefaultSpellCritMultiplier()
+	if shaman.Talents.ElementalFury {
+		critMultiplier = shaman.SpellCritMultiplier(1, 1)
+	}
+	return critMultiplier
+}
+
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassShaman}] = stats.Stats{
+		stats.Health:      2979,
 		stats.Strength:    103,
 		stats.Agility:     61,
 		stats.Stamina:     113,
@@ -316,6 +325,7 @@ func init() {
 		stats.MeleeCrit:   37.07,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassShaman}] = stats.Stats{
+		stats.Health:      2979,
 		stats.Strength:    105,
 		stats.Agility:     61,
 		stats.Stamina:     116,
@@ -327,6 +337,7 @@ func init() {
 		stats.MeleeCrit:   37.07,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassShaman}] = stats.Stats{
+		stats.Health:      2979,
 		stats.Strength:    107,
 		stats.Agility:     59,
 		stats.Stamina:     116,
@@ -339,6 +350,7 @@ func init() {
 	}
 
 	trollStats := stats.Stats{
+		stats.Health:      2979,
 		stats.Strength:    103,
 		stats.Agility:     66,
 		stats.Stamina:     115,

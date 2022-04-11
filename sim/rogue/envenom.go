@@ -1,0 +1,65 @@
+package rogue
+
+import (
+	"time"
+
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
+)
+
+var EnvenomActionID = core.ActionID{SpellID: 32684}
+
+func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
+	rogue.envenomEnergyCost = 35
+	if ItemSetAssassination.CharacterHasSetBonus(&rogue.Character, 4) {
+		rogue.envenomEnergyCost -= 10
+	}
+	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
+
+	basePerComboPoint := 180.0
+	if ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2) {
+		basePerComboPoint += 40
+	}
+
+	rogue.Envenom = rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    EnvenomActionID,
+		SpellSchool: core.SpellSchoolNature,
+		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasIgnoreResists | rogue.finisherFlags(),
+
+		ResourceType: stats.Energy,
+		BaseCost:     rogue.envenomEnergyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: rogue.envenomEnergyCost,
+				GCD:  time.Second,
+			},
+			ModifyCast:  rogue.applyDeathmantle,
+			IgnoreHaste: true,
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1 + 0.04*float64(rogue.Talents.VilePoisons),
+			ThreatMultiplier: 1,
+			BaseDamage: core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					comboPoints := rogue.ComboPoints()
+					base := basePerComboPoint * float64(comboPoints)
+					return base + (hitEffect.MeleeAttackPower(spell.Character)*0.03)*float64(comboPoints)
+				},
+				TargetSpellCoefficient: 0,
+			},
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, false)),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					rogue.ApplyFinisher(sim, spell.ActionID)
+				} else {
+					if refundAmount > 0 {
+						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, core.ActionID{SpellID: 31245})
+					}
+				}
+			},
+		}),
+	})
+}

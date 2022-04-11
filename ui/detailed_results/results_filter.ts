@@ -20,9 +20,9 @@ export class ResultsFilter extends ResultComponent {
 
 	private readonly playerFilter: PlayerFilter;
 
-  constructor(config: ResultComponentConfig) {
+	constructor(config: ResultComponentConfig) {
 		config.rootCssClass = 'results-filter-root';
-    super(config);
+		super(config);
 		this.currentFilter = {
 			player: ALL_PLAYERS,
 			target: ALL_TARGETS,
@@ -31,7 +31,7 @@ export class ResultsFilter extends ResultComponent {
 
 		this.playerFilter = new PlayerFilter(this.rootElem, this.currentFilter);
 		this.playerFilter.changeEmitter.on(eventID => this.changeEmitter.emit(eventID));
-  }
+	}
 
 	getFilter(): SimResultFilter {
 		return {
@@ -74,9 +74,9 @@ class PlayerFilter extends Input<FilterData, number> {
 	private readonly buttonElem: HTMLElement;
 	private readonly dropdownElem: HTMLElement;
 
-  constructor(parent: HTMLElement, filterData: FilterData) {
+	constructor(parent: HTMLElement, filterData: FilterData) {
 		const changeEmitter = new TypedEvent<void>();
-    super(parent, 'player-filter-root', filterData, {
+		super(parent, 'player-filter-root', filterData, {
 			extraCssClasses: [
 				'dropdown-root',
 			],
@@ -88,7 +88,7 @@ class PlayerFilter extends Input<FilterData, number> {
 		this.currentOptions = [allPlayersOption];
 		this.changeEmitter = changeEmitter;
 
-    this.rootElem.innerHTML = `
+		this.rootElem.innerHTML = `
 			<div class="dropdown-button player-filter-button"></div>
 			<div class="dropdown-panel player-filter-dropdown"></div>
     `;
@@ -101,7 +101,7 @@ class PlayerFilter extends Input<FilterData, number> {
 		});
 
 		this.init();
-  }
+	}
 
 	setOptions(eventID: EventID, simResult: SimResult) {
 		this.currentOptions = [allPlayersOption].concat(simResult.getPlayers().map(player => {
@@ -172,8 +172,8 @@ class PlayerFilter extends Input<FilterData, number> {
 		return this.filterData.player;
 	}
 
-  setInputValue(newValue: number) {
-    this.filterData.player = newValue;
+	setInputValue(newValue: number) {
+		this.filterData.player = newValue;
 
 		const optionData = this.currentOptions.find(optionData => optionData.value == newValue);
 		if (!optionData) {
@@ -182,5 +182,5 @@ class PlayerFilter extends Input<FilterData, number> {
 
 		this.buttonElem.innerHTML = '';
 		this.buttonElem.appendChild(this.makeOptionElem(optionData));
-  }
+	}
 }

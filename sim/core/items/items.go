@@ -50,7 +50,6 @@ func init() {
 		{Name: "Amber Cape of Shadow Wrath", WowheadID: 25043, ID: -20, Type: proto.ItemType_ItemTypeBack, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 45}},
 		{Name: "Elementalist Gloves of Shadow Wrath", WowheadID: 24688, ID: -21, Type: proto.ItemType_ItemTypeHands, Phase: 1, Quality: proto.ItemQuality_ItemQualityUncommon, Stats: stats.Stats{stats.ShadowSpellPower: 60}},
 		{Name: "Nethersteel-Lined Handwraps of Shadow Wrath", WowheadID: 31166, ID: -22, Type: proto.ItemType_ItemTypeHands, Phase: 1, Quality: proto.ItemQuality_ItemQualityRare, Stats: stats.Stats{stats.ShadowSpellPower: 62}},
-		{Name: "Dragonstrike P5", WowheadID: 28439, ID: -23, Type: proto.ItemType_ItemTypeWeapon, WeaponType: proto.WeaponType_WeaponTypeMace, HandType: proto.HandType_HandTypeOffHand, WeaponDamageMin: 184.0, WeaponDamageMax: 343.0, SwingSpeed: 2.70, Phase: 5, Quality: proto.ItemQuality_ItemQualityEpic, Stats: stats.Stats{stats.Stamina: 19}, SocketBonus: stats.Stats{}},
 	}...)
 
 	for _, v := range Items {
@@ -87,6 +86,7 @@ type Item struct {
 	Quality    proto.ItemQuality
 	Unique     bool
 	Ilvl       int32
+	SetName    string // Empty string if not part of a set.
 
 	GemSockets  []proto.GemColor
 	SocketBonus stats.Stats
@@ -142,19 +142,23 @@ type Enchant struct {
 	ItemType    proto.ItemType    // Which slot the enchant goes on.
 	EnchantType proto.EnchantType // Additional category when ItemType isn't enough.
 	Phase       int32
+
+	// Used by the UI to filter which enchants are shown.
+	ClassAllowlist []proto.Class
 }
 
 func (enchant Enchant) ToProto() *proto.Enchant {
 	return &proto.Enchant{
-		Id:          enchant.ID,
-		EffectId:    enchant.EffectID,
-		Name:        enchant.Name,
-		IsSpellId:   enchant.IsSpellID,
-		Type:        enchant.ItemType,
-		EnchantType: enchant.EnchantType,
-		Stats:       enchant.Bonus[:],
-		Quality:     enchant.Quality,
-		Phase:       enchant.Phase,
+		Id:             enchant.ID,
+		EffectId:       enchant.EffectID,
+		Name:           enchant.Name,
+		IsSpellId:      enchant.IsSpellID,
+		Type:           enchant.ItemType,
+		EnchantType:    enchant.EnchantType,
+		Stats:          enchant.Bonus[:],
+		Quality:        enchant.Quality,
+		Phase:          enchant.Phase,
+		ClassAllowlist: enchant.ClassAllowlist[:],
 	}
 }
 

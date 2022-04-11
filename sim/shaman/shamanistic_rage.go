@@ -1,7 +1,6 @@
 package shaman
 
 import (
-	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -9,8 +8,6 @@ import (
 )
 
 var ShamanisticRageCD = core.NewCooldownID()
-var ShamanisticRageAuraID = core.NewAuraID()
-
 var ShamanisticRageActionID = core.ActionID{SpellID: 30823}
 
 func (shaman *Shaman) registerShamanisticRageCD() {
@@ -18,8 +15,6 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 		return
 	}
 
-	const proc = 0.3
-	const dur = time.Second * 15
 	const cd = time.Minute * 2
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
@@ -39,25 +34,26 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
+			ppmm := shaman.AutoAttacks.NewPPMManager(15)
+			srAura := shaman.GetOrRegisterAura(&core.Aura{
+				Label:    "Shamanistic Rage",
+				ActionID: ShamanisticRageActionID,
+				Duration: time.Second * 15,
+				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+					// proc mask: 20
+					if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+						return
+					}
+					if !ppmm.Proc(sim, spellEffect.IsMH(), false, "shamanistic rage") {
+						return
+					}
+					mana := shaman.GetStat(stats.AttackPower) * 0.3
+					shaman.AddMana(sim, mana, ShamanisticRageActionID, true)
+				},
+			})
+
 			return func(sim *core.Simulation, character *core.Character) {
-				character.AddAura(sim, core.Aura{
-					ID:       ShamanisticRageAuraID,
-					ActionID: ShamanisticRageActionID,
-					Expires:  sim.CurrentTime + dur,
-					OnMeleeAttack: func(sim *core.Simulation, ability *core.ActiveMeleeAbility, hitEffect *core.SpellHitEffect) {
-						if !hitEffect.Landed() || hitEffect.WeaponInput.DamageMultiplier == 0 {
-							return
-						}
-						if sim.RandomFloat("shamanistic rage") > proc {
-							return
-						}
-						mana := character.GetStat(stats.AttackPower) * 0.3
-						if mana < 0 {
-							log.Printf("Attack power!? %0.1f", character.GetStat(stats.AttackPower))
-						}
-						character.AddMana(sim, mana, ShamanisticRageActionID, true)
-					},
-				})
+				srAura.Activate(sim)
 				character.Metrics.AddInstantCast(ShamanisticRageActionID)
 				character.SetCD(ShamanisticRageCD, sim.CurrentTime+cd)
 			}

@@ -1,137 +1,82 @@
 package mage
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const (
-	CastTagFireballDot int32 = 1
-)
-
 const SpellIDFireball int32 = 27070
 
-func (mage *Mage) newFireballTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDFireball},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 425,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 425,
-				},
-				CastTime:       time.Millisecond * 3500,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+var FireballActionID = core.ActionID{SpellID: SpellIDFireball}
+
+func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
+	baseCost := 425.0
+
+	mage.Fireball = mage.RegisterSpell(core.SpellConfig{
+		ActionID:    FireballActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagMage,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost *
+					(1 - 0.01*float64(mage.Talents.Pyromaniac)) *
+					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
+
+				GCD:      core.GCDDefault,
+				CastTime: time.Millisecond*3500 - time.Millisecond*100*time.Duration(mage.Talents.ImprovedFireball),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					fireballDot := mage.newFireballDot(sim, spellEffect.Target)
-					fireballDot.Cast(sim)
-				},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
+
+			BonusSpellCritRating: 0 +
+				float64(mage.Talents.CriticalMass)*2*core.SpellCritRatingPerCritChance +
+				float64(mage.Talents.Pyromaniac)*1*core.SpellCritRatingPerCritChance,
+
+			DamageMultiplier: mage.spellDamageMultiplier *
+				(1 + 0.02*float64(mage.Talents.FirePower)) *
+				core.TernaryFloat64(ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4), 1.05, 1),
+
+			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
+
+			BaseDamage:     core.BaseDamageConfigMagic(649, 821, 1.0+0.03*float64(mage.Talents.EmpoweredFireball)),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					mage.FireballDot.Apply(sim)
+				}
 			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    649,
-				MaxBaseDamage:    821,
-				SpellCoefficient: 1.0,
-			},
-		},
-	}
+		}),
+	})
 
-	spell.CastTime -= time.Millisecond * 100 * time.Duration(mage.Talents.ImprovedFireball)
-	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
-	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
-	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
-	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
-	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
-	spell.Effect.DirectInput.SpellCoefficient += 0.03 * float64(mage.Talents.EmpoweredFireball)
+	target := sim.GetPrimaryTarget()
+	mage.FireballDot = core.NewDot(core.Dot{
+		Spell: mage.Fireball,
+		Aura: target.RegisterAura(&core.Aura{
+			Label:    "Fireball-" + strconv.Itoa(int(mage.Index)),
+			ActionID: FireballActionID,
+		}),
+		NumberOfTicks: 4,
+		TickLength:    time.Second * 2,
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: mage.spellDamageMultiplier *
+				(1 + 0.02*float64(mage.Talents.FirePower)) *
+				core.TernaryFloat64(ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4), 1.05, 1),
 
-	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
-		spell.Effect.StaticDamageMultiplier *= 1.05
-	}
+			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-var FireballDotDebuffID = core.NewDebuffID()
-
-func (mage *Mage) newFireballDotTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID: SpellIDFireball,
-					Tag:     CastTagFireballDot,
-				},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: mage.spellDamageMultiplier,
-				IgnoreHitCheck:         true,
-			},
-			DotInput: core.DotDamageInput{
-				NumberOfTicks:        4,
-				TickLength:           time.Second * 2,
-				TickBaseDamage:       84 / 4,
-				TickSpellCoefficient: 0,
-				DebuffID:             FireballDotDebuffID,
-			},
-		},
-	}
-
-	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
-
-	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4) {
-		spell.Effect.StaticDamageMultiplier *= 1.05
-	}
-
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (mage *Mage) newFireballDot(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Cancel the current fireball dot.
-	mage.fireballDotSpell.Cancel(sim)
-
-	fireballDot := &mage.fireballDotSpell
-	mage.fireballDotCastTemplate.Apply(fireballDot)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	fireballDot.Effect.Target = target
-	fireballDot.Init(sim)
-
-	return fireballDot
-}
-
-func (mage *Mage) NewFireball(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	fireball := &mage.fireballSpell
-	mage.fireballCastTemplate.Apply(fireball)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	fireball.Effect.Target = target
-	fireball.Init(sim)
-
-	return fireball
+			BaseDamage:     core.BaseDamageConfigFlat(84 / 4),
+			OutcomeApplier: core.OutcomeFuncTick(),
+			IsPeriodic:     true,
+		}),
+	})
 }

@@ -12,20 +12,20 @@ export interface BooleanPickerConfig<ModObject> extends InputConfig<ModObject, b
 export class BooleanPicker<ModObject> extends Input<ModObject, boolean> {
 	private readonly inputElem: HTMLInputElement;
 
-  constructor(parent: HTMLElement, modObject: ModObject, config: BooleanPickerConfig<ModObject>) {
-    super(parent, 'boolean-picker-root', modObject, config);
+	constructor(parent: HTMLElement, modObject: ModObject, config: BooleanPickerConfig<ModObject>) {
+		super(parent, 'boolean-picker-root', modObject, config);
 
-    this.inputElem = document.createElement('input');
-    this.inputElem.type = 'checkbox';
-    this.inputElem.classList.add('boolean-picker-input');
-    this.rootElem.appendChild(this.inputElem);
+		this.inputElem = document.createElement('input');
+		this.inputElem.type = 'checkbox';
+		this.inputElem.classList.add('boolean-picker-input');
+		this.rootElem.appendChild(this.inputElem);
 
 		this.init();
 
-    this.inputElem.addEventListener('input', event => {
+		this.inputElem.addEventListener('change', event => {
 			this.inputChanged(TypedEvent.nextEventID());
-    });
-  }
+		});
+	}
 
 	getInputElem(): HTMLElement {
 		return this.inputElem;

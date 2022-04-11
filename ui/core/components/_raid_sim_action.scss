@@ -7,23 +7,36 @@
 .results-sim-dps {
   text-align: center;
 }
+.results-sim-tps {
+  text-align: center;
+}
 
-.results-sim-dps-avg {
+.topline-result-avg {
   font-size: 30px;
   font-weight: 700;
 }
-.results-sim-dps-avg:after {
-  content: " DPS";
+.topline-result-avg:after {
   font-size: 18px;
 }
+.results-sim-dps .topline-result-avg:after {
+  content: " DPS";
+}
+.results-sim-tps .topline-result-avg:after {
+  content: " TPS";
+}
 
-.results-sim-dps-stdev {
+.topline-result-stdev {
   font-size: 18px;
   font-weight: 700;
 }
-.results-sim-dps-stdev:before {
+.topline-result-stdev:before {
   content: " \00b1";
   padding: 2px;
+}
+
+.topline-result-label {
+  font-size: 18px;
+  font-weight: 700;
 }
 
 .results-sim-reference.has-reference .results-sim-set-reference {
@@ -43,10 +56,12 @@
 	color: blue;
 	cursor: pointer;
 	user-select: none;
+	margin: 5px;
 }
 
 .results-sim-reference-delete {
 	color: red;
 	cursor: pointer;
 	user-select: none;
+	margin: 5px;
 }

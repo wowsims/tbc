@@ -23,11 +23,15 @@ message ShamanTalents {
 
     // Enhancement
     int32 ancestral_knowledge = 15;
+		int32 shield_specialization = 37;
     int32 thundering_strikes = 16;
     int32 enhancing_totems = 17;
     bool shamanistic_focus = 18;
+		int32 anticipation = 38;
     int32 flurry = 19;
+		int32 toughness = 39;
     int32 improved_weapon_totems = 20;
+		bool spirit_weapons = 36;
     int32 elemental_weapons = 21;
     int32 mental_quickness = 22;
     int32 weapon_mastery = 23;

@@ -11,7 +11,7 @@ func (shaman *Shaman) BloodlustActionID() core.ActionID {
 	return core.ActionID{
 		SpellID:    2825,
 		CooldownID: BloodlustCooldownID,
-		Tag:        int32(shaman.RaidIndex),
+		Tag:        int32(shaman.Index),
 	}
 }
 
@@ -20,6 +20,8 @@ func (shaman *Shaman) registerBloodlustCD() {
 		return
 	}
 	actionID := shaman.BloodlustActionID()
+
+	var blAuras []*core.Aura
 
 	bloodlustTemplate := core.SimpleCast{
 		Cast: core.Cast{
@@ -36,8 +38,8 @@ func (shaman *Shaman) registerBloodlustCD() {
 			GCD:      core.GCDDefault,
 			Cooldown: core.BloodlustCD,
 			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				for _, partyMember := range shaman.Party.Players {
-					core.AddBloodlustAura(sim, partyMember.GetCharacter(), actionID.Tag)
+				for _, blAura := range blAuras {
+					blAura.Activate(sim)
 				}
 
 				// All MCDs that use the GCD and have a non-zero cast time must call this.
@@ -65,7 +67,7 @@ func (shaman *Shaman) registerBloodlustCD() {
 			// Need to check if any party member has lust, not just self, because of
 			// major CD ordering issues with the shared bloodlust.
 			for _, partyMember := range character.Party.Players {
-				if partyMember.GetCharacter().HasAura(core.BloodlustAuraID) {
+				if partyMember.GetCharacter().HasActiveAuraWithTag(core.BloodlustAuraTag) {
 					return false
 				}
 			}
@@ -76,6 +78,12 @@ func (shaman *Shaman) registerBloodlustCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			bloodlustMCD = shaman.GetMajorCooldown(actionID)
+
+			blAuras = []*core.Aura{}
+			for _, partyMember := range shaman.Party.Players {
+				blAuras = append(blAuras, core.BloodlustAura(partyMember.GetCharacter(), actionID.Tag))
+			}
+
 			return func(sim *core.Simulation, character *core.Character) {
 				cast := bloodlustTemplate
 

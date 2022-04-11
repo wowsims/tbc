@@ -113,13 +113,13 @@ export const EnhancementShamanRotationConfig = {
 
 function makeBooleanShamanBuffInput(id: ActionId, optionsFieldName: keyof ShamanOptions): IconPickerConfig<Player<any>, boolean> {
 	return {
-	  id: id,
-	  states: 2,
+		id: id,
+		states: 2,
 		changedEvent: (player: Player<Spec.SpecEnhancementShaman>) => player.specOptionsChangeEmitter,
 		getValue: (player: Player<Spec.SpecEnhancementShaman>) => player.getSpecOptions()[optionsFieldName] as boolean,
 		setValue: (eventID: EventID, player: Player<Spec.SpecEnhancementShaman>, newValue: boolean) => {
 			const newOptions = player.getSpecOptions();
-	(newOptions[optionsFieldName] as boolean) = newValue;
+			(newOptions[optionsFieldName] as boolean) = newValue;
 			player.setSpecOptions(eventID, newOptions);
 		},
 	};

@@ -10,63 +10,40 @@ import (
 const SpellIDShadowWordDeath int32 = 32996
 
 var SWDCooldownID = core.NewCooldownID()
+var ShadowWordDeathActionID = core.ActionID{SpellID: SpellIDShadowWordDeath, CooldownID: SWDCooldownID}
 
-func (priest *Priest) newShadowWordDeathTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	baseCast := core.Cast{
-		ActionID: core.ActionID{
-			SpellID:    SpellIDShadowWordDeath,
-			CooldownID: SWDCooldownID,
-		},
-		Character:           &priest.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolShadow,
-		BaseCost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 309,
-		},
-		Cost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 309,
-		},
-		CastTime:       0,
-		GCD:            core.GCDDefault,
-		Cooldown:       time.Second * 12,
-		CritMultiplier: priest.DefaultSpellCritMultiplier(),
-	}
+func (priest *Priest) registerShadowWordDeathSpell(sim *core.Simulation) {
+	baseCost := 309.0
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
-		DirectInput: core.DirectDamageInput{
-			MinBaseDamage:    572,
-			MaxBaseDamage:    664,
-			SpellCoefficient: 0.429,
-		},
-	}
+	priest.ShadowWordDeath = priest.RegisterSpell(core.SpellConfig{
+		ActionID:    ShadowWordDeathActionID,
+		SpellSchool: core.SpellSchoolShadow,
 
-	priest.applyTalentsToShadowSpell(&baseCast, &effect)
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
 
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: baseCast,
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
+				GCD:  core.GCDDefault,
+			},
+			Cooldown: time.Second * 12,
 		},
-		Effect: effect,
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+
+			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
+
+			BonusSpellCritRating: float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance,
+
+			DamageMultiplier: 1 *
+				(1 + float64(priest.Talents.Darkness)*0.02) *
+				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1),
+
+			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
+
+			BaseDamage:     core.BaseDamageConfigMagic(572, 664, 0.429),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
+		}),
 	})
-}
-
-func (priest *Priest) NewShadowWordDeath(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	mf := &priest.swdSpell
-
-	priest.swdCastTemplate.Apply(mf)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Effect.Target = target
-	mf.Init(sim)
-
-	return mf
 }

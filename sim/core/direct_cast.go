@@ -1,366 +1,182 @@
 package core
 
-import (
-	"fmt"
-	"time"
-)
+// Function for calculating the base damage of a spell.
+type BaseDamageCalculator func(*Simulation, *SpellEffect, *Spell) float64
 
-// A direct spell is one that does a single instance of damage once casting is
-// complete, i.e. shadowbolt or fire blast.
-// Note that some spell casts can have more than 1 DirectSpellEffect, e.g.
-// Chain Lightning.
-//
-// This struct holds additional inputs beyond what a SpellEffect already contains,
-// which are necessary for a direct spell damage calculation.
-type DirectDamageInput struct {
-	MinBaseDamage float64
-	MaxBaseDamage float64
+type BaseDamageConfig struct {
+	// Lambda for calculating the base damage.
+	Calculator BaseDamageCalculator
 
-	// Increase in damage per point of spell power (or attack power, if a physical spell).
-	SpellCoefficient float64
-
-	// Adds a fixed amount of damage to the spell, before multipliers.
-	FlatDamageBonus float64
+	// Spell coefficient for +damage effects on the target.
+	TargetSpellCoefficient float64
 }
 
-// DotDamageInput is the data needed to kick of the dot ticking in pendingActions.
-//  For now the only way for a caster to track their dot is to keep a reference to the cast object
-//  that started this and check the DotDamageInput.IsTicking()
-type DotDamageInput struct {
-	NumberOfTicks        int           // number of ticks over the whole duration
-	TickLength           time.Duration // time between each tick
-	TickBaseDamage       float64
-	TickSpellCoefficient float64
-	TicksCanMissAndCrit  bool // Allows individual ticks to hit/miss, and also crit.
-
-	// If true, tick length will be shortened based on casting speed.
-	AffectedByCastSpeed bool
-
-	// Causes all modifications applied by callbacks to the initial damagePerTick
-	// value to be ignored.
-	IgnoreDamageModifiers bool
-
-	// Whether ticks can proc spell hit effects such as Judgement of Wisdom.
-	TicksProcSpellHitEffects bool
-
-	OnBeforePeriodicDamage OnBeforePeriodicDamage // Before-calculation logic for this dot.
-	OnPeriodicDamage       OnPeriodicDamage       // After-calculation logic for this dot.
-
-	// If both of these are set, will display uptime metrics for this dot.
-	DebuffID AuraID
-
-	// Internal fields
-	startTime     time.Duration
-	finalTickTime time.Duration
-	damagePerTick float64
-	tickIndex     int
-}
-
-func (ddi *DotDamageInput) init(spellCast *SpellCast) {
-	if ddi.AffectedByCastSpeed {
-		ddi.TickLength = time.Duration(float64(ddi.TickLength) / spellCast.Character.CastSpeed())
+func BuildBaseDamageConfig(calculator BaseDamageCalculator, coeff float64) BaseDamageConfig {
+	return BaseDamageConfig{
+		Calculator:             calculator,
+		TargetSpellCoefficient: coeff,
 	}
 }
 
-// DamagePerTick returns the cached damage per tick on the spell.
-func (ddi DotDamageInput) DamagePerTick() float64 {
-	return ddi.damagePerTick
+func WrapBaseDamageConfig(config BaseDamageConfig, wrapper func(oldCalculator BaseDamageCalculator) BaseDamageCalculator) BaseDamageConfig {
+	return BaseDamageConfig{
+		Calculator:             wrapper(config.Calculator),
+		TargetSpellCoefficient: config.TargetSpellCoefficient,
+	}
 }
 
-func (ddi DotDamageInput) FullDuration() time.Duration {
-	return ddi.TickLength * time.Duration(ddi.NumberOfTicks)
+// Creates a BaseDamageCalculator function which returns a flat value.
+func BaseDamageFuncFlat(damage float64) BaseDamageCalculator {
+	return func(_ *Simulation, _ *SpellEffect, _ *Spell) float64 {
+		return damage
+	}
+}
+func BaseDamageConfigFlat(damage float64) BaseDamageConfig {
+	return BuildBaseDamageConfig(BaseDamageFuncFlat(damage), 0)
 }
 
-func (ddi DotDamageInput) TimeRemaining(sim *Simulation) time.Duration {
-	return MaxDuration(0, ddi.finalTickTime-sim.CurrentTime)
-}
-
-// Returns the remaining number of times this dot is expected to tick, assuming
-// it lasts for its full duration.
-func (ddi DotDamageInput) RemainingTicks() int {
-	return ddi.NumberOfTicks - ddi.tickIndex
-}
-
-// Returns the amount of additional damage this dot is expected to do, assuming
-// it lasts for its full duration.
-func (ddi DotDamageInput) RemainingDamage() float64 {
-	return float64(ddi.RemainingTicks()) * ddi.DamagePerTick()
-}
-
-func (ddi DotDamageInput) IsTicking(sim *Simulation) bool {
-	// It is possible that both cast and tick are to happen at the same time.
-	//  In this case the dot "time remaining" will be 0 but there will be ticks left.
-	//  If a DOT misses then it will have NumberOfTicks set but never have been started.
-	//  So the case of 'has a final tick time but its now, but it has ticks remaining' looks like this.
-	return (ddi.finalTickTime != 0 && ddi.tickIndex < ddi.NumberOfTicks)
-}
-
-type SpellHitEffect struct {
-	SpellEffect
-	DotInput    DotDamageInput
-	DirectInput DirectDamageInput
-	WeaponInput WeaponDamageInput
-}
-
-// SimpleSpell has a single cast and could have a dot or direct effect (or no effect)
-//  A SimpleSpell without a target or effect will simply be cast and nothing else happens.
-type SimpleSpell struct {
-	// Embedded spell cast.
-	SpellCast
-
-	// Individual direct damage effect of this spell. Use this when there is only 1
-	// effect for the spell.
-	// Only one of this or Effects should be filled, not both.
-	Effect SpellHitEffect
-
-	// Individual direct damage effects of this spell. Use this for spells with
-	// multiple effects, like Arcane Explosion, Chain Lightning, or Consecrate.
-	Effects []SpellHitEffect
-
-	// Maximum amount of pre-crit damage this spell is allowed to do.
-	AOECap float64
-
-	// The action currently used for the dot effects of this spell, or nil if not ticking.
-	currentDotAction *PendingAction
-}
-
-// Init will call any 'OnCast' effects associated with the caster and then apply spell haste to the cast.
-//  Init will panic if the spell or the GCD is still on CD.
-func (spell *SimpleSpell) Init(sim *Simulation) {
-	spell.SpellCast.init(sim)
-
-	if len(spell.Effects) == 0 {
-		if spell.Effect.DotInput.NumberOfTicks > 0 {
-			spell.Effect.DotInput.init(&spell.SpellCast)
-		}
+// Creates a BaseDamageCalculator function with a single damage roll.
+func BaseDamageFuncRoll(minFlatDamage float64, maxFlatDamage float64) BaseDamageCalculator {
+	if minFlatDamage == maxFlatDamage {
+		return BaseDamageFuncFlat(minFlatDamage)
 	} else {
-		for i, _ := range spell.Effects {
-			if spell.Effects[i].DotInput.NumberOfTicks > 0 {
-				spell.Effects[i].DotInput.init(&spell.SpellCast)
-			}
+		deltaDamage := maxFlatDamage - minFlatDamage
+		return func(sim *Simulation, _ *SpellEffect, _ *Spell) float64 {
+			return damageRollOptimized(sim, minFlatDamage, deltaDamage)
 		}
 	}
-
-	if spell.SpellExtras.Matches(SpellExtrasChanneled) {
-		spell.AfterCastDelay += spell.GetChannelDuration()
-	}
+}
+func BaseDamageConfigRoll(minFlatDamage float64, maxFlatDamage float64) BaseDamageConfig {
+	return BuildBaseDamageConfig(BaseDamageFuncRoll(minFlatDamage, maxFlatDamage), 0)
 }
 
-func (spell *SimpleSpell) GetChannelDuration() time.Duration {
-	if len(spell.Effects) == 0 {
-		return spell.Effect.DotInput.FullDuration()
-	} else {
-		return spell.Effects[0].DotInput.FullDuration()
+func BaseDamageFuncMagic(minFlatDamage float64, maxFlatDamage float64, spellCoefficient float64) BaseDamageCalculator {
+	if spellCoefficient == 0 {
+		return BaseDamageFuncRoll(minFlatDamage, maxFlatDamage)
 	}
-}
 
-func (spell *SimpleSpell) GetDuration() time.Duration {
-	if spell.SpellExtras.Matches(SpellExtrasChanneled) {
-		return spell.CastTime + spell.GetChannelDuration()
-	} else {
-		return spell.CastTime
-	}
-}
-
-func (spell *SimpleSpell) Cast(sim *Simulation) bool {
-	return spell.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		if len(spell.Effects) == 0 {
-			hitEffect := &spell.Effect
-			hitEffect.beforeCalculations(sim, &spell.SpellCast)
-
-			if hitEffect.Landed() {
-				// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
-				if hitEffect.DirectInput.MaxBaseDamage != 0 {
-					hitEffect.calculateDirectDamage(sim, &spell.SpellCast)
-				}
-
-				if hitEffect.DotInput.NumberOfTicks != 0 {
-					hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
-
-					pa := sim.pendingActionPool.Get()
-					pa.Priority = ActionPriorityDOT
-					pa.NextActionAt = sim.CurrentTime + hitEffect.DotInput.TickLength
-					pa.OnAction = func(sim *Simulation) {
-						hitEffect.calculateDotDamage(sim, &spell.SpellCast)
-						hitEffect.afterDotTick(sim, &spell.SpellCast)
-
-						if hitEffect.DotInput.tickIndex < hitEffect.DotInput.NumberOfTicks {
-							// Refresh action.
-							pa.NextActionAt = sim.CurrentTime + hitEffect.DotInput.TickLength
-							sim.AddPendingAction(pa)
-						} else {
-							pa.CleanUp(sim)
-						}
-					}
-					pa.CleanUp = func(sim *Simulation) {
-						if pa.cancelled {
-							return
-						}
-						pa.cancelled = true
-						if spell.currentDotAction != nil {
-							spell.currentDotAction.cancelled = true
-							spell.currentDotAction = nil
-						}
-
-						hitEffect.onDotComplete(sim, &spell.SpellCast)
-
-						spell.Character.Metrics.AddSpellCast(&spell.SpellCast)
-						spell.objectInUse = false
-					}
-
-					spell.currentDotAction = pa
-					sim.AddPendingAction(pa)
-				}
-			}
-
-			hitEffect.applyResultsToCast(&spell.SpellCast)
-			hitEffect.afterCalculations(sim, &spell.SpellCast)
-		} else {
-			// Use a separate loop for the beforeCalculations() calls so that they all
-			// come before the first afterCalculations() call. This prevents proc effects
-			// on the first hit from benefitting other hits of the same spell.
-			for effectIdx := range spell.Effects {
-				hitEffect := &spell.Effects[effectIdx]
-				hitEffect.beforeCalculations(sim, &spell.SpellCast)
-			}
-
-			for effectIdx := range spell.Effects {
-				hitEffect := &spell.Effects[effectIdx]
-				if hitEffect.Landed() {
-					// Only apply direct damage if it has damage. Otherwise this is a dot without direct damage.
-					if hitEffect.DirectInput.MaxBaseDamage != 0 {
-						hitEffect.calculateDirectDamage(sim, &spell.SpellCast)
-					}
-
-					if hitEffect.DotInput.NumberOfTicks != 0 {
-						hitEffect.takeDotSnapshot(sim, &spell.SpellCast)
-					}
-				}
-			}
-
-			spell.applyAOECap()
-
-			// Use a separate loop for the afterCalculations() calls so all effect damage
-			// is fully calculated before invoking proc callbacks.
-			for effectIdx := range spell.Effects {
-				hitEffect := &spell.Effects[effectIdx]
-				hitEffect.applyResultsToCast(&spell.SpellCast)
-				hitEffect.afterCalculations(sim, &spell.SpellCast)
-			}
-
-			// This assumes that the effects either all have dots, or none of them do.
-			if spell.Effects[0].DotInput.NumberOfTicks != 0 {
-				pa := sim.pendingActionPool.Get()
-
-				pa.Priority = ActionPriorityDOT
-				pa.NextActionAt = sim.CurrentTime + spell.Effects[0].DotInput.TickLength
-
-				pa.OnAction = func(sim *Simulation) {
-					for i := range spell.Effects {
-						spell.Effects[i].calculateDotDamage(sim, &spell.SpellCast)
-					}
-
-					spell.applyAOECap()
-
-					for i := range spell.Effects {
-						spell.Effects[i].afterDotTick(sim, &spell.SpellCast)
-					}
-
-					// This assumes that all the dots have the same # of ticks and tick length.
-					if spell.Effects[0].DotInput.tickIndex < spell.Effects[0].DotInput.NumberOfTicks {
-						// Refresh action.
-						pa.NextActionAt = sim.CurrentTime + spell.Effects[0].DotInput.TickLength
-						sim.AddPendingAction(pa)
-					} else {
-						pa.CleanUp(sim)
-					}
-				}
-				pa.CleanUp = func(sim *Simulation) {
-					if pa.cancelled {
-						return
-					}
-					pa.cancelled = true
-					if spell.currentDotAction != nil {
-						spell.currentDotAction.cancelled = true
-						spell.currentDotAction = nil
-					}
-					for i := range spell.Effects {
-						spell.Effects[i].onDotComplete(sim, &spell.SpellCast)
-					}
-
-					spell.Character.Metrics.AddSpellCast(&spell.SpellCast)
-					spell.objectInUse = false
-				}
-
-				spell.currentDotAction = pa
-				sim.AddPendingAction(pa)
-			}
+	if minFlatDamage == 0 && maxFlatDamage == 0 {
+		return func(_ *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
+			return hitEffect.SpellPower(spell.Character, spell) * spellCoefficient
 		}
+	} else if minFlatDamage == maxFlatDamage {
+		return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
+			damage := hitEffect.SpellPower(spell.Character, spell) * spellCoefficient
+			return damage + minFlatDamage
+		}
+	} else {
+		deltaDamage := maxFlatDamage - minFlatDamage
+		return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
+			damage := hitEffect.SpellPower(spell.Character, spell) * spellCoefficient
+			damage += damageRollOptimized(sim, minFlatDamage, deltaDamage)
+			return damage
+		}
+	}
+}
+func BaseDamageConfigMagic(minFlatDamage float64, maxFlatDamage float64, spellCoefficient float64) BaseDamageConfig {
+	return BuildBaseDamageConfig(BaseDamageFuncMagic(minFlatDamage, maxFlatDamage, spellCoefficient), spellCoefficient)
+}
+func BaseDamageConfigMagicNoRoll(flatDamage float64, spellCoefficient float64) BaseDamageConfig {
+	return BaseDamageConfigMagic(flatDamage, flatDamage, spellCoefficient)
+}
 
-		if spell.currentDotAction == nil {
-			spell.Character.Metrics.AddSpellCast(&spell.SpellCast)
-			spell.objectInUse = false
+func MultiplyByStacks(config BaseDamageConfig, aura *Aura) BaseDamageConfig {
+	return WrapBaseDamageConfig(config, func(oldCalculator BaseDamageCalculator) BaseDamageCalculator {
+		return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
+			return oldCalculator(sim, hitEffect, spell) * float64(aura.GetStacks())
 		}
 	})
 }
 
-func (spell *SimpleSpell) applyAOECap() {
-	if spell.AOECap == 0 {
-		return
-	}
+type Hand bool
 
-	// Increased damage from crits doesn't count towards the cap, so need to
-	// tally pre-crit damage.
-	totalTowardsCap := 0.0
-	for i, _ := range spell.Effects {
-		effect := &spell.Effects[i]
-		totalTowardsCap += effect.Damage / effect.BeyondAOECapMultiplier
-	}
+const MainHand Hand = true
+const OffHand Hand = false
 
-	if totalTowardsCap <= spell.AOECap {
-		return
-	}
-
-	maxDamagePerHit := spell.AOECap / float64(len(spell.Effects))
-	for i, _ := range spell.Effects {
-		effect := &spell.Effects[i]
-		damageTowardsCap := effect.Damage / effect.BeyondAOECapMultiplier
-		if damageTowardsCap > maxDamagePerHit {
-			effect.Damage -= damageTowardsCap - maxDamagePerHit
+func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, weaponMultiplier float64, includeBonusWeaponDamage bool) BaseDamageCalculator {
+	// Bonus weapon damage applies after OH penalty: https://www.youtube.com/watch?v=bwCIU87hqTs
+	// TODO not all weapon damage based attacks "scale" with +bonusWeaponDamage (e.g. Devastate, Shiv, Mutilate don't)
+	// ... but for other's, BonusAttackPowerOnTarget only applies to weapon damage based attacks
+	if normalized {
+		if hand == MainHand {
+			return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
+				damage := spell.Character.AutoAttacks.MH.calculateNormalizedWeaponDamage(
+					sim, hitEffect.MeleeAttackPower(spell.Character)+hitEffect.MeleeAttackPowerOnTarget())
+				damage += flatBonus
+				if includeBonusWeaponDamage {
+					damage += hitEffect.BonusWeaponDamage(spell.Character)
+				}
+				return damage * weaponMultiplier
+			}
+		} else {
+			return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
+				damage := spell.Character.AutoAttacks.OH.calculateNormalizedWeaponDamage(
+					sim, hitEffect.MeleeAttackPower(spell.Character)+2*hitEffect.MeleeAttackPowerOnTarget())
+				damage = damage*0.5 + flatBonus
+				if includeBonusWeaponDamage {
+					damage += hitEffect.BonusWeaponDamage(spell.Character)
+				}
+				return damage * weaponMultiplier
+			}
+		}
+	} else {
+		if hand == MainHand {
+			return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
+				damage := spell.Character.AutoAttacks.MH.calculateWeaponDamage(
+					sim, hitEffect.MeleeAttackPower(spell.Character)+hitEffect.MeleeAttackPowerOnTarget())
+				damage += flatBonus
+				if includeBonusWeaponDamage {
+					damage += hitEffect.BonusWeaponDamage(spell.Character)
+				}
+				return damage * weaponMultiplier
+			}
+		} else {
+			return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
+				damage := spell.Character.AutoAttacks.OH.calculateWeaponDamage(
+					sim, hitEffect.MeleeAttackPower(spell.Character)+2*hitEffect.MeleeAttackPowerOnTarget())
+				damage = damage*0.5 + flatBonus
+				if includeBonusWeaponDamage {
+					damage += hitEffect.BonusWeaponDamage(spell.Character)
+				}
+				return damage * weaponMultiplier
+			}
 		}
 	}
 }
-
-func (spell *SimpleSpell) Cancel(sim *Simulation) {
-	spell.SpellCast.Cancel()
-	if spell.currentDotAction != nil {
-		spell.currentDotAction.Cancel(sim)
-		spell.currentDotAction = nil
+func BaseDamageConfigMeleeWeapon(hand Hand, normalized bool, flatBonus float64, weaponMultiplier float64, includeBonusWeaponDamage bool) BaseDamageConfig {
+	calculator := BaseDamageFuncMeleeWeapon(hand, normalized, flatBonus, weaponMultiplier, includeBonusWeaponDamage)
+	if includeBonusWeaponDamage {
+		return BuildBaseDamageConfig(calculator, 1)
+	} else {
+		return BuildBaseDamageConfig(calculator, 0)
 	}
 }
 
-type SimpleSpellTemplate struct {
-	template SimpleSpell
-	effects  []SpellHitEffect
+func BaseDamageFuncRangedWeapon(flatBonus float64) BaseDamageCalculator {
+	return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
+		return spell.Character.AutoAttacks.Ranged.calculateWeaponDamage(sim, hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget()) +
+			flatBonus +
+			hitEffect.BonusWeaponDamage(spell.Character)
+	}
+}
+func BaseDamageConfigRangedWeapon(flatBonus float64) BaseDamageConfig {
+	return BuildBaseDamageConfig(BaseDamageFuncRangedWeapon(flatBonus), 1)
 }
 
-func (template *SimpleSpellTemplate) Apply(newAction *SimpleSpell) {
-	if newAction.objectInUse {
-		panic(fmt.Sprintf("Spell (%s) already in use", newAction.ActionID))
-	}
-	*newAction = template.template
-	newAction.Effects = template.effects
-	copy(newAction.Effects, template.template.Effects)
+// Performs an actual damage roll. Keep this internal because the 2nd parameter
+// is the delta rather than maxDamage, which is error-prone.
+func damageRollOptimized(sim *Simulation, minDamage float64, deltaDamage float64) float64 {
+	return minDamage + deltaDamage*sim.RandomFloat("Damage Roll")
 }
 
-// Takes in a cast template and returns a template, so you don't need to keep track of which things to allocate yourself.
-func NewSimpleSpellTemplate(spellTemplate SimpleSpell) SimpleSpellTemplate {
-	if len(spellTemplate.Effects) > 0 && spellTemplate.Effect.StaticDamageMultiplier != 0 {
-		panic("Cannot use both Effect and Effects, pick one!")
-	}
+// For convenience, but try to use damageRollOptimized in most cases.
+func DamageRoll(sim *Simulation, minDamage float64, maxDamage float64) float64 {
+	return damageRollOptimized(sim, minDamage, maxDamage-minDamage)
+}
 
-	return SimpleSpellTemplate{
-		template: spellTemplate,
-		effects:  make([]SpellHitEffect, len(spellTemplate.Effects)),
+func DamageRollFunc(minDamage float64, maxDamage float64) func(*Simulation) float64 {
+	deltaDamage := maxDamage - minDamage
+	return func(sim *Simulation) float64 {
+		return damageRollOptimized(sim, minDamage, deltaDamage)
 	}
 }

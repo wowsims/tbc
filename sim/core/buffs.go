@@ -18,7 +18,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		})
 	}
 
-	gotwAmount := GetTristateValueFloat(raidBuffs.GiftOfTheWild, 14.0, 14.0*1.35)
+	gotwAmount := GetTristateValueFloat(raidBuffs.GiftOfTheWild, 14.0, 18.0)
 	character.AddStats(stats.Stats{
 		stats.Stamina:   gotwAmount,
 		stats.Agility:   gotwAmount,
@@ -42,9 +42,8 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 
 	if partyBuffs.FerociousInspiration > 0 {
-		character.AddPermanentAura(func(sim *Simulation) Aura {
-			return FerociousInspirationAura(partyBuffs.FerociousInspiration)
-		})
+		multiplier := math.Pow(1.03, float64(partyBuffs.FerociousInspiration))
+		character.PseudoStats.DamageDealtMultiplier *= multiplier
 	}
 
 	if partyBuffs.DraeneiRacialMelee {
@@ -111,31 +110,41 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 
 	if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectImproved {
-		character.AddPermanentAura(func(sim *Simulation) Aura {
-			return ImprovedSanctityAura(sim, 2)
-		})
+		character.AddPermanentAura(func(*Simulation) *Aura { return SanctityAura(character, 2) })
+	} else if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectRegular {
+		character.AddPermanentAura(func(*Simulation) *Aura { return SanctityAura(character, 0) })
 	}
 
 	if partyBuffs.BattleShout != proto.TristateEffect_TristateEffectMissing {
-		character.AddStats(stats.Stats{
-			stats.AttackPower: GetTristateValueFloat(partyBuffs.BattleShout, 306, 382.5),
-		})
+		talentMultiplier := GetTristateValueFloat(partyBuffs.BattleShout, 1, 1.25)
+
+		battleShoutAP := 306 * talentMultiplier
 		if partyBuffs.BsSolarianSapphire {
 			partyBuffs.SnapshotBsSolarianSapphire = false
-			character.AddStats(stats.Stats{
-				stats.AttackPower: 70,
-			})
+			battleShoutAP += 70 * talentMultiplier
 		}
+		character.AddStats(stats.Stats{
+			stats.AttackPower: math.Floor(battleShoutAP),
+		})
 
-		snapshotSapphire := partyBuffs.SnapshotBsSolarianSapphire
-		snapshotT2 := partyBuffs.SnapshotBsT2
-		if snapshotSapphire || snapshotT2 {
+		snapshotAP := 0.0
+		if partyBuffs.SnapshotBsSolarianSapphire {
+			snapshotAP += 70 * talentMultiplier
+		}
+		if partyBuffs.SnapshotBsT2 {
+			snapshotAP += 30 * talentMultiplier
+		}
+		if snapshotAP > 0 {
+			snapshotAP = math.Floor(snapshotAP)
 			character.AddPermanentAuraWithOptions(PermanentAura{
-				AuraFactory:       SnapshotBattleShoutAura(character, snapshotSapphire, snapshotT2),
-				RespectExpiration: true,
+				AuraFactory:     func(*Simulation) *Aura { return SnapshotBattleShoutAura(character, snapshotAP) },
+				RespectDuration: true,
 			})
 		}
 	}
+	character.AddStats(stats.Stats{
+		stats.Health: GetTristateValueFloat(partyBuffs.CommandingShout, 1080, 1080*1.25),
+	})
 
 	if partyBuffs.TotemOfWrath > 0 {
 		character.AddStats(stats.Stats{
@@ -144,16 +153,16 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		})
 	}
 	character.AddStats(stats.Stats{
-		stats.SpellPower: GetTristateValueFloat(partyBuffs.WrathOfAirTotem, 101.0, 121.0),
+		stats.SpellPower: GetTristateValueFloat(partyBuffs.WrathOfAirTotem, 101, 121),
 	})
 	if partyBuffs.WrathOfAirTotem == proto.TristateEffect_TristateEffectRegular && partyBuffs.SnapshotImprovedWrathOfAirTotem {
 		character.AddPermanentAuraWithOptions(PermanentAura{
-			AuraFactory:       SnapshotImprovedWrathOfAirTotemAura(character),
-			RespectExpiration: true,
+			AuraFactory:     func(*Simulation) *Aura { return SnapshotImprovedWrathOfAirTotemAura(character) },
+			RespectDuration: true,
 		})
 	}
 	character.AddStats(stats.Stats{
-		stats.Agility: GetTristateValueFloat(partyBuffs.GraceOfAirTotem, 77.0, 88.55),
+		stats.Agility: GetTristateValueFloat(partyBuffs.GraceOfAirTotem, 77, 88),
 	})
 	switch partyBuffs.StrengthOfEarthTotem {
 	case proto.StrengthOfEarthType_Basic:
@@ -161,21 +170,22 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	case proto.StrengthOfEarthType_CycloneBonus:
 		character.AddStat(stats.Strength, 98)
 	case proto.StrengthOfEarthType_EnhancingTotems:
-		character.AddStat(stats.Strength, 98.9)
+		character.AddStat(stats.Strength, 98)
 	case proto.StrengthOfEarthType_EnhancingAndCyclone:
-		character.AddStat(stats.Strength, 110.9)
+		character.AddStat(stats.Strength, 112)
 	}
 	if (partyBuffs.StrengthOfEarthTotem == proto.StrengthOfEarthType_Basic || partyBuffs.StrengthOfEarthTotem == proto.StrengthOfEarthType_EnhancingTotems) && partyBuffs.SnapshotImprovedStrengthOfEarthTotem {
 		character.AddPermanentAuraWithOptions(PermanentAura{
-			AuraFactory:       SnapshotImprovedStrengthOfEarthTotemAura(character),
-			RespectExpiration: true,
+			AuraFactory:     func(*Simulation) *Aura { return SnapshotImprovedStrengthOfEarthTotemAura(character) },
+			RespectDuration: true,
 		})
 	}
 	character.AddStats(stats.Stats{
 		stats.MP5: GetTristateValueFloat(partyBuffs.ManaSpringTotem, 50, 62.5),
 	})
 	if partyBuffs.WindfuryTotemRank > 0 && IsEligibleForWindfuryTotem(character) {
-		character.AddPermanentAura(func(sim *Simulation) Aura {
+		character.HasWFTotem = true
+		character.AddPermanentAura(func(*Simulation) *Aura {
 			return WindfuryTotemAura(character, partyBuffs.WindfuryTotemRank, partyBuffs.WindfuryTotemIwt)
 		})
 	}
@@ -184,7 +194,6 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 
 	if individualBuffs.UnleashedRage {
-		// TODO: This implementation won't give the bonus to temporary effects, like trinket actives.
 		character.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.AttackPower,
 			ModifiedStat: stats.AttackPower,
@@ -219,12 +228,6 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	if partyBuffs.ChainOfTheTwilightOwl {
 		character.AddStats(stats.Stats{stats.SpellCrit: 2 * SpellCritRatingPerCritChance})
 	}
-	if partyBuffs.BattleChickens > 0 {
-		character.AddPermanentAuraWithOptions(PermanentAura{
-			AuraFactory:       BattleChickenAura(character, partyBuffs.BattleChickens),
-			RespectExpiration: true,
-		})
-	}
 }
 
 // Applies buffs to pets.
@@ -248,153 +251,58 @@ func applyPetBuffEffects(petAgent PetAgent, raidBuffs proto.RaidBuffs, partyBuff
 	applyBuffEffects(petAgent, raidBuffs, partyBuffs, individualBuffs)
 }
 
-var SnapshotImprovedStrengthOfEarthTotemAuraID = NewAuraID()
-
-func SnapshotImprovedStrengthOfEarthTotemAura(character *Character) AuraFactory {
-	return func(sim *Simulation) Aura {
-		bonus := character.ApplyStatDependencies(stats.Stats{stats.Strength: 12})
-		bonus[stats.Mana] = 0 // mana is wierd
-		negBonus := bonus.Multiply(-1)
-		character.AddStats(bonus)
-
-		return Aura{
-			ID:       SnapshotImprovedStrengthOfEarthTotemAuraID,
-			ActionID: ActionID{SpellID: 37223},
-			Expires:  sim.CurrentTime + (time.Second * 110),
-			OnExpire: func(sim *Simulation) {
-				character.AddStats(negBonus)
-			},
-		}
-	}
+func SnapshotImprovedStrengthOfEarthTotemAura(character *Character) *Aura {
+	return character.NewTemporaryStatsAura("Strength of Earth Totem Snapshot", ActionID{SpellID: 37223}, stats.Stats{stats.Strength: 12}, time.Second*110)
 }
 
-var SnapshotImprovedWrathOfAirTotemAuraID = NewAuraID()
-
-func SnapshotImprovedWrathOfAirTotemAura(character *Character) AuraFactory {
-	return func(sim *Simulation) Aura {
-		return character.NewAuraWithTemporaryStats(sim, SnapshotImprovedWrathOfAirTotemAuraID, ActionID{SpellID: 37212}, stats.SpellPower, 20, time.Second*110)
-	}
+func SnapshotImprovedWrathOfAirTotemAura(character *Character) *Aura {
+	return character.NewTemporaryStatsAura("Wrath of Air Totem Snapshot", ActionID{SpellID: 37212}, stats.Stats{stats.SpellPower: 20}, time.Second*110)
 }
 
-var SnapshotBattleShoutAuraID = NewAuraID()
-
-func SnapshotBattleShoutAura(character *Character, snapshotSapphire bool, snapshotT2 bool) AuraFactory {
-	amount := 0.0
-	if snapshotSapphire {
-		amount += 70
-	}
-	if snapshotT2 {
-		amount += 30
-	}
-
-	// Do this manually instead of calling NewAuraWithTemporaryStats so that it
-	// only affects melee AP.
-	return func(sim *Simulation) Aura {
-		actionID := ActionID{SpellID: 2048, Tag: 1}
-		if sim.Log != nil {
-			character.Log(sim, "Gained %0.02f %s from %s.", amount, stats.AttackPower.StatName(), actionID)
-		}
-		character.AddStat(stats.AttackPower, amount)
-
-		return Aura{
-			ID:       SnapshotBattleShoutAuraID,
-			ActionID: actionID,
-			Expires:  sim.CurrentTime + time.Second*110,
-			OnExpire: func(sim *Simulation) {
-				if sim.Log != nil {
-					character.Log(sim, "Lost %0.02f %s from fading %s.", amount, stats.AttackPower.StatName(), actionID)
-				}
-				character.AddStat(stats.AttackPower, -amount)
-			},
-		}
-	}
+func SnapshotBattleShoutAura(character *Character, snapshotAp float64) *Aura {
+	return character.NewTemporaryStatsAura("Battle Shout Snapshot", ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: snapshotAp}, time.Second*110)
 }
 
-var BattleChickenAuraID = NewAuraID()
-
-func BattleChickenAura(character *Character, numChickens int32) AuraFactory {
-	bonus := math.Pow(1.05, float64(numChickens))
-	inverseBonus := 1 / bonus
-
-	return func(sim *Simulation) Aura {
-		character.MultiplyMeleeSpeed(sim, bonus)
-
-		return Aura{
-			ID:      BattleChickenAuraID,
-			Expires: sim.CurrentTime + time.Minute*4,
-			OnExpire: func(sim *Simulation) {
-				character.MultiplyMeleeSpeed(sim, inverseBonus)
-			},
-		}
-	}
-}
-
-var FerociousInspirationAuraID = NewAuraID()
-
-func FerociousInspirationAura(numBMHunters int32) Aura {
-	multiplier := math.Pow(1.03, float64(numBMHunters))
-	return Aura{
-		ID:       FerociousInspirationAuraID,
-		ActionID: ActionID{SpellID: 34460, Tag: -1},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
-			hitEffect.DamageMultiplier *= multiplier
-		},
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			spellEffect.DamageMultiplier *= multiplier
-		},
-		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			*tickDamage *= multiplier
-		},
-	}
-}
-
-var ImprovedSanctityAuraID = NewAuraID()
-
-func ImprovedSanctityAura(sim *Simulation, level float64) Aura {
-	return Aura{
-		ID:       ImprovedSanctityAuraID,
+func SanctityAura(character *Character, level float64) *Aura {
+	return character.GetOrRegisterAura(&Aura{
+		Label:    "Sanctity Aura",
 		ActionID: ActionID{SpellID: 31870},
-		OnBeforeMeleeHit: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
-			// unsure if this scaling should be additive or multiplicative
-			// scale 10% for holy damange
-			if ability.SpellSchool.Matches(SpellSchoolHoly) {
-				hitEffect.DamageMultiplier *= 1.1
-			}
-			// scale additional 2% for all damage
-			hitEffect.DamageMultiplier *= 1 + 0.01*level
+		OnGain: func(aura *Aura, sim *Simulation) {
+			aura.Unit.PseudoStats.HolyDamageDealtMultiplier *= 1.1
+			aura.Unit.PseudoStats.DamageDealtMultiplier *= 1 + 0.01*level
 		},
-		OnBeforeSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
-				spellEffect.DamageMultiplier *= 1.1
-			}
-			spellEffect.DamageMultiplier *= 1 + 0.01*level
+		OnExpire: func(aura *Aura, sim *Simulation) {
+			aura.Unit.PseudoStats.HolyDamageDealtMultiplier /= 1.1
+			aura.Unit.PseudoStats.DamageDealtMultiplier /= 1 + 0.01*level
 		},
-		OnBeforePeriodicDamage: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect, tickDamage *float64) {
-			if spellCast.SpellSchool.Matches(SpellSchoolHoly) {
-				*tickDamage *= 1.1
-			}
-			*tickDamage *= 1 + 0.01*level
-		},
+	})
+}
+
+var (
+	WindfuryTotemSpellRanks = []int32{
+		8512,
+		10613,
+		10614,
+		25585,
+		25587,
 	}
-}
 
-var WindfuryTotemAuraID = NewAuraID()
+	windfuryBuffSpellRanks = []int32{
+		8516,
+		10608,
+		10610,
+		25583,
+		25584,
+	}
 
-var WindfurySpellRanks = []int32{
-	8512,
-	10613,
-	10614,
-	25585,
-	25587,
-}
-
-var windfuryAPBonuses = []float64{
-	122,
-	229,
-	315,
-	375,
-	445,
-}
+	windfuryAPBonuses = []float64{
+		122,
+		229,
+		315,
+		375,
+		445,
+	}
+)
 
 func IsEligibleForWindfuryTotem(character *Character) bool {
 	return character.AutoAttacks.IsEnabled() &&
@@ -402,60 +310,78 @@ func IsEligibleForWindfuryTotem(character *Character) bool {
 		!character.HasMHWeaponImbue
 }
 
-func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) Aura {
-	spellID := WindfurySpellRanks[rank-1]
-	actionID := ActionID{SpellID: spellID}
+func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) *Aura {
+	buffActionID := ActionID{SpellID: windfuryBuffSpellRanks[rank-1]}
 	apBonus := windfuryAPBonuses[rank-1]
 	apBonus *= 1 + 0.15*float64(iwtTalentPoints)
 
-	wftempl := ActiveMeleeAbility{
-		Cast: Cast{
-			ActionID:       actionID,
-			Character:      character,
-			SpellSchool:    SpellSchoolPhysical,
-			CritMultiplier: character.AutoAttacks.MHAuto.CritMultiplier,
-		},
-		Effect: SpellHitEffect{
-			SpellEffect: SpellEffect{
-				DamageMultiplier:       1.0,
-				StaticDamageMultiplier: 1.0,
-				BonusAttackPower:       apBonus,
-				ProcMask:               ProcMaskMeleeMHSpecial,
-			},
-			WeaponInput: WeaponDamageInput{
-				DamageMultiplier: 1.0,
-			},
-		},
-	}
+	var charges int32
 
-	wfTemplate := NewMeleeAbilityTemplate(wftempl)
-	wfAtk := ActiveMeleeAbility{}
+	wfBuffAura := character.NewTemporaryStatsAuraWrapped("Windfury Buff", buffActionID, stats.Stats{stats.AttackPower: apBonus}, time.Millisecond*1500, func(config *Aura) {
+		config.OnSpellHit = func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if !spellEffect.ProcMask.Matches(ProcMaskMeleeWhiteHit) || spellEffect.ProcMask.Matches(ProcMaskMeleeSpecial) {
+				return
+			}
+			charges--
+			if charges == 0 {
+				aura.Deactivate(sim)
+			}
+		}
+	})
+
+	wfSpell := character.GetOrRegisterSpell(SpellConfig{
+		Template: SimpleSpell{
+			SpellCast: SpellCast{
+				Cast: Cast{
+					ActionID:    ActionID{SpellID: windfuryBuffSpellRanks[rank-1]}, // temporary buff ("Windfury Attack") spell id
+					Character:   character,
+					SpellSchool: SpellSchoolPhysical,
+					IgnoreHaste: true,
+					SpellExtras: SpellExtrasMeleeMetrics,
+				},
+			},
+		},
+		ApplyEffects: ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
+	})
 
 	const procChance = 0.2
 
-	var icd InternalCD
-	const icdDur = time.Duration(1) // No ICD, but only once per frame.
+	icd := NewICD()
+	const icdDur = time.Duration(1)
 
-	return Aura{
-		ID:       WindfuryTotemAuraID,
-		ActionID: actionID,
-		OnMeleeAttack: func(sim *Simulation, ability *ActiveMeleeAbility, hitEffect *SpellHitEffect) {
-			if !hitEffect.Landed() || !hitEffect.ProcMask.Matches(ProcMaskMeleeMH) || ability.IsPhantom {
+	return character.GetOrRegisterAura(&Aura{
+		Label:    "Windfury Totem",
+		ActionID: ActionID{SpellID: WindfuryTotemSpellRanks[rank-1]}, // totem spell id ("Windfury Totem")
+		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeMHAuto) {
+				return
+			}
+
+			if wfBuffAura.IsActive() {
 				return
 			}
 			if icd.IsOnCD(sim) {
+				// Checking for WF buff aura isn't quite enough now that we refactored auras.
+				// TODO: Clean this up to remove the need for an instant ICD.
 				return
 			}
+
 			if sim.RandomFloat("Windfury Totem") > procChance {
 				return
 			}
+
+			// TODO: the current proc system adds auras after cast and damage, in game they're added after cast
+			startCharges := int32(2)
+			if !spellEffect.ProcMask.Matches(ProcMaskMeleeMHSpecial) {
+				startCharges--
+			}
+			charges = startCharges
+			wfBuffAura.Activate(sim)
 			icd = InternalCD(sim.CurrentTime + icdDur)
 
-			wfTemplate.Apply(&wfAtk)
-			wfAtk.Effect.Target = hitEffect.Target
-			wfAtk.Attack(sim)
+			wfSpell.Cast(sim, spellEffect.Target)
 		},
-	}
+	})
 }
 
 // Used for approximating cooldowns applied by other players to you, such as
@@ -463,7 +389,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 // which can be consecutively applied multiple times to a single player.
 type externalConsecutiveCDApproximation struct {
 	ActionID         ActionID
-	AuraID           AuraID
+	AuraTag          string
 	CooldownID       CooldownID
 	CooldownPriority float64
 	Type             int32
@@ -502,7 +428,7 @@ func registerExternalConsecutiveCDApproximation(agent Agent, config externalCons
 				return false
 			}
 
-			if character.HasAura(config.AuraID) {
+			if character.HasActiveAuraWithTag(config.AuraTag) {
 				return false
 			}
 
@@ -536,125 +462,137 @@ func registerExternalConsecutiveCDApproximation(agent Agent, config externalCons
 	})
 }
 
-var BloodlustAuraID = NewAuraID()
+const BloodlustAuraTag = "Bloodlust"
+
 var sharedBloodlustCooldownID = NewCooldownID() // Different from shaman bloodlust CD.
 const BloodlustDuration = time.Second * 40
 const BloodlustCD = time.Minute * 10
 
 func registerBloodlustCD(agent Agent, numBloodlusts int32) {
+	var bloodlustAura *Aura
+
 	registerExternalConsecutiveCDApproximation(
 		agent,
 		externalConsecutiveCDApproximation{
 			ActionID:         ActionID{SpellID: 2825, Tag: -1},
-			AuraID:           BloodlustAuraID,
+			AuraTag:          BloodlustAuraTag,
 			CooldownID:       sharedBloodlustCooldownID,
 			CooldownPriority: CooldownPriorityBloodlust,
 			AuraDuration:     BloodlustDuration,
 			AuraCD:           BloodlustCD,
 			Type:             CooldownTypeDPS,
 
+			Init: func(sim *Simulation, character *Character) {
+				bloodlustAura = BloodlustAura(character, -1)
+			},
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
 				// Haste portion doesn't stack with Power Infusion, so prefer to wait.
-				if character.HasAura(PowerInfusionAuraID) {
-					return false
-				}
-				return true
+				return !character.HasActiveAuraWithTag(PowerInfusionAuraTag)
 			},
-			AddAura: func(sim *Simulation, character *Character) { AddBloodlustAura(sim, character, -1) },
+			AddAura: func(sim *Simulation, character *Character) { bloodlustAura.Activate(sim) },
 		},
 		numBloodlusts)
 }
 
-func AddBloodlustAura(sim *Simulation, character *Character, actionTag int32) {
+func BloodlustAura(character *Character, actionTag int32) *Aura {
 	const bonus = 1.3
 	const inverseBonus = 1 / bonus
+	actionID := ActionID{SpellID: 2825, Tag: actionTag}
 
-	if character.HasAura(PowerInfusionAuraID) {
-		character.PseudoStats.CastSpeedMultiplier /= 1.2
-	}
-	character.PseudoStats.CastSpeedMultiplier *= bonus
-	character.MultiplyAttackSpeed(sim, bonus)
+	return character.GetOrRegisterAura(&Aura{
+		Label:    "Bloodlust-" + actionID.String(),
+		Tag:      BloodlustAuraTag,
+		ActionID: actionID,
+		Duration: BloodlustDuration,
+		OnGain: func(aura *Aura, sim *Simulation) {
+			if len(character.GetAurasWithTag(PowerInfusionAuraTag)) > 0 {
+				character.PseudoStats.CastSpeedMultiplier /= 1.2
+			}
+			character.PseudoStats.CastSpeedMultiplier *= bonus
+			character.MultiplyAttackSpeed(sim, bonus)
 
-	character.AddAura(sim, Aura{
-		ID:       BloodlustAuraID,
-		ActionID: ActionID{SpellID: 2825, Tag: actionTag},
-		Expires:  sim.CurrentTime + BloodlustDuration,
-		OnExpire: func(sim *Simulation) {
-			character.PseudoStats.CastSpeedMultiplier *= inverseBonus
-			if character.HasAura(PowerInfusionAuraID) {
+			if len(character.Pets) > 0 {
+				for _, petAgent := range character.Pets {
+					pet := petAgent.GetPet()
+					if pet.IsEnabled() {
+						BloodlustAura(&pet.Character, actionTag).Activate(sim)
+					}
+				}
+			}
+		},
+		OnExpire: func(aura *Aura, sim *Simulation) {
+			if len(character.GetAurasWithTag(PowerInfusionAuraTag)) > 0 {
 				character.PseudoStats.CastSpeedMultiplier *= 1.2
 			}
+			character.PseudoStats.CastSpeedMultiplier *= inverseBonus
 			character.MultiplyAttackSpeed(sim, inverseBonus)
 		},
 	})
-
-	if len(character.Pets) > 0 {
-		for _, petAgent := range character.Pets {
-			pet := petAgent.GetPet()
-			if pet.IsEnabled() {
-				AddBloodlustAura(sim, &pet.Character, actionTag)
-			}
-		}
-	}
 }
 
-var PowerInfusionAuraID = NewAuraID()
+var PowerInfusionAuraTag = "PowerInfusion"
 var sharedPowerInfusionCooldownID = NewCooldownID() // Different from priest PI CD.
 const PowerInfusionDuration = time.Second * 15
 const PowerInfusionCD = time.Minute * 3
 
 func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
+	var piAura *Aura
+
 	registerExternalConsecutiveCDApproximation(
 		agent,
 		externalConsecutiveCDApproximation{
 			ActionID:         ActionID{SpellID: 10060, Tag: -1},
-			AuraID:           PowerInfusionAuraID,
+			AuraTag:          PowerInfusionAuraTag,
 			CooldownID:       sharedPowerInfusionCooldownID,
 			CooldownPriority: CooldownPriorityDefault,
 			AuraDuration:     PowerInfusionDuration,
 			AuraCD:           PowerInfusionCD,
 			Type:             CooldownTypeDPS,
 
+			Init: func(sim *Simulation, character *Character) {
+				piAura = PowerInfusionAura(character, -1)
+			},
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
 				// Haste portion doesn't stack with Bloodlust, so prefer to wait.
-				if character.HasAura(BloodlustAuraID) {
-					return false
-				}
-				return true
+				return !character.HasActiveAuraWithTag(BloodlustAuraTag)
 			},
-			AddAura: func(sim *Simulation, character *Character) { AddPowerInfusionAura(sim, character, -1) },
+			AddAura: func(sim *Simulation, character *Character) { piAura.Activate(sim) },
 		},
 		numPowerInfusions)
 }
 
-func AddPowerInfusionAura(sim *Simulation, character *Character, actionTag int32) {
+func PowerInfusionAura(character *Character, actionTag int32) *Aura {
 	const bonus = 1.2
 	const inverseBonus = 1 / bonus
+	actionID := ActionID{SpellID: 10060, Tag: actionTag}
 
-	if !character.HasAura(BloodlustAuraID) {
-		character.PseudoStats.CastSpeedMultiplier *= bonus
-	}
-
-	character.AddAura(sim, Aura{
-		ID:       PowerInfusionAuraID,
-		ActionID: ActionID{SpellID: 10060, Tag: actionTag},
-		Expires:  sim.CurrentTime + PowerInfusionDuration,
-		OnCast: func(sim *Simulation, cast *Cast) {
-			if cast.Cost.Type == stats.Mana {
+	return character.GetOrRegisterAura(&Aura{
+		Label:    "PowerInfusion-" + actionID.String(),
+		Tag:      PowerInfusionAuraTag,
+		ActionID: actionID,
+		Duration: PowerInfusionDuration,
+		OnGain: func(aura *Aura, sim *Simulation) {
+			if character.HasManaBar() {
 				// TODO: Double-check this is how the calculation works.
-				cast.Cost.Value = MaxFloat(0, cast.Cost.Value-cast.BaseCost.Value*0.2)
+				character.PseudoStats.CostMultiplier *= 0.8
+			}
+			if len(character.GetAurasWithTag(BloodlustAuraTag)) == 0 {
+				character.PseudoStats.CastSpeedMultiplier *= bonus
 			}
 		},
-		OnExpire: func(sim *Simulation) {
-			if !character.HasAura(BloodlustAuraID) {
+		OnExpire: func(aura *Aura, sim *Simulation) {
+			if character.HasManaBar() {
+				character.PseudoStats.CostMultiplier /= 0.8
+			}
+			if len(character.GetAurasWithTag(BloodlustAuraTag)) == 0 {
 				character.PseudoStats.CastSpeedMultiplier *= inverseBonus
 			}
 		},
 	})
 }
 
+var InnervateAuraTag = "Innervate"
 var sharedInnervateCooldownID = NewCooldownID()
-var InnervateAuraID = NewAuraID()
 
 const InnervateDuration = time.Second * 20
 const InnervateCD = time.Minute * 6
@@ -669,24 +607,27 @@ func InnervateManaThreshold(character *Character) float64 {
 }
 
 func registerInnervateCD(agent Agent, numInnervates int32) {
-	innervateThreshold := InnervateManaThreshold(agent.GetCharacter())
+	innervateThreshold := 0.0
 	expectedManaPerInnervate := 0.0
 	remainingInnervateUsages := 0
+	var innervateAura *Aura
 
 	registerExternalConsecutiveCDApproximation(
 		agent,
 		externalConsecutiveCDApproximation{
 			ActionID:         ActionID{SpellID: 29166, Tag: -1},
-			AuraID:           InnervateAuraID,
+			AuraTag:          InnervateAuraTag,
 			CooldownID:       sharedInnervateCooldownID,
 			CooldownPriority: CooldownPriorityDefault,
 			AuraDuration:     InnervateDuration,
 			AuraCD:           InnervateCD,
 			Type:             CooldownTypeMana,
 			Init: func(sim *Simulation, character *Character) {
+				innervateThreshold = InnervateManaThreshold(character)
 				expectedManaPerInnervate = character.SpiritManaRegenPerSecond() * 5 * 20
 				remainingInnervateUsages = int(1 + (MaxDuration(0, sim.Duration))/InnervateCD)
 				character.ExpectedBonusMana += expectedManaPerInnervate * float64(remainingInnervateUsages)
+				innervateAura = InnervateAura(character, expectedManaPerInnervate, -1)
 			},
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
 				// Only cast innervate when very low on mana, to make sure all other mana CDs are prioritized.
@@ -696,7 +637,7 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 				return true
 			},
 			AddAura: func(sim *Simulation, character *Character) {
-				AddInnervateAura(sim, character, expectedManaPerInnervate, -1)
+				innervateAura.Activate(sim)
 
 				newRemainingUsages := int(sim.GetRemainingDuration() / InnervateCD)
 				// AddInnervateAura already accounts for 1 usage, which is why we subtract 1 less.
@@ -707,42 +648,38 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 		numInnervates)
 }
 
-func AddInnervateAura(sim *Simulation, character *Character, expectedBonusManaReduction float64, actionTag int32) {
-	character.PseudoStats.ForceFullSpiritRegen = true
-	character.PseudoStats.SpiritRegenMultiplier *= 5.0
-	character.UpdateManaRegenRates()
+func InnervateAura(character *Character, expectedBonusManaReduction float64, actionTag int32) *Aura {
+	actionID := ActionID{SpellID: 29166, Tag: actionTag}
+	return character.GetOrRegisterAura(&Aura{
+		Label:    "Innervate-" + actionID.String(),
+		Tag:      InnervateAuraTag,
+		ActionID: actionID,
+		Duration: InnervateDuration,
+		OnGain: func(aura *Aura, sim *Simulation) {
+			character.PseudoStats.ForceFullSpiritRegen = true
+			character.PseudoStats.SpiritRegenMultiplier *= 5.0
+			character.UpdateManaRegenRates()
 
-	lastUpdateTime := sim.CurrentTime
-	bonusManaSubtracted := 0.0
-
-	character.AddAura(sim, Aura{
-		ID:       InnervateAuraID,
-		ActionID: ActionID{SpellID: 29166, Tag: actionTag},
-		Expires:  sim.CurrentTime + InnervateDuration,
-		OnCast: func(sim *Simulation, cast *Cast) {
-			timeDelta := sim.CurrentTime - lastUpdateTime
-			lastUpdateTime = sim.CurrentTime
-			progressRatio := float64(timeDelta) / float64(InnervateDuration)
-			amount := expectedBonusManaReduction * progressRatio
-
-			character.ExpectedBonusMana -= amount
-			character.Metrics.BonusManaGained += amount
-			bonusManaSubtracted += amount
+			expectedBonusManaPerTick := expectedBonusManaReduction / 10
+			StartPeriodicAction(sim, PeriodicActionOptions{
+				Period:   InnervateDuration / 10,
+				NumTicks: 10,
+				OnAction: func(sim *Simulation) {
+					character.ExpectedBonusMana -= expectedBonusManaPerTick
+					character.Metrics.BonusManaGained += expectedBonusManaPerTick
+				},
+			})
 		},
-		OnExpire: func(sim *Simulation) {
+		OnExpire: func(aura *Aura, sim *Simulation) {
 			character.PseudoStats.ForceFullSpiritRegen = false
 			character.PseudoStats.SpiritRegenMultiplier /= 5.0
 			character.UpdateManaRegenRates()
-
-			remainder := expectedBonusManaReduction - bonusManaSubtracted
-			character.ExpectedBonusMana -= remainder
-			character.Metrics.BonusManaGained += remainder
 		},
 	})
 }
 
+var ManaTideTotemAuraTag = "ManaTideTotem"
 var sharedManaTideTotemCooldownID = NewCooldownID()
-var ManaTideTotemAuraID = NewAuraID()
 
 const ManaTideTotemDuration = time.Second * 12
 const ManaTideTotemCD = time.Minute * 5
@@ -757,12 +694,13 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 	expectedManaPerManaTideTotem := 0.0
 	remainingManaTideTotemUsages := 0
 	initialDelay := time.Duration(0)
+	var mttAura *Aura
 
 	registerExternalConsecutiveCDApproximation(
 		agent,
 		externalConsecutiveCDApproximation{
 			ActionID:         ActionID{SpellID: 16190, Tag: -1},
-			AuraID:           ManaTideTotemAuraID,
+			AuraTag:          ManaTideTotemAuraTag,
 			CooldownID:       sharedManaTideTotemCooldownID,
 			CooldownPriority: CooldownPriorityDefault,
 			AuraDuration:     ManaTideTotemDuration,
@@ -775,6 +713,7 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 				expectedManaPerManaTideTotem = ManaTideTotemAmount(character)
 				remainingManaTideTotemUsages = int(1 + MaxDuration(0, sim.Duration-initialDelay)/ManaTideTotemCD)
 				character.ExpectedBonusMana += expectedManaPerManaTideTotem * float64(remainingManaTideTotemUsages)
+				mttAura = ManaTideTotemAura(character, -1)
 			},
 			ShouldActivate: func(sim *Simulation, character *Character) bool {
 				// A normal resto shaman would wait to use MTT.
@@ -784,7 +723,7 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 				return true
 			},
 			AddAura: func(sim *Simulation, character *Character) {
-				AddManaTideTotemAura(sim, character, -1)
+				mttAura.Activate(sim)
 
 				newRemainingUsages := int(sim.GetRemainingDuration() / ManaTideTotemCD)
 				// AddManaTideTotemAura already accounts for 1 usage, which is why we subtract 1 less.
@@ -795,31 +734,26 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 		numManaTideTotems)
 }
 
-func AddManaTideTotemAura(sim *Simulation, character *Character, actionTag int32) {
-	lastUpdateTime := sim.CurrentTime
-	totalBonusMana := ManaTideTotemAmount(character)
-	bonusManaSubtracted := 0.0
+func ManaTideTotemAura(character *Character, actionTag int32) *Aura {
 	actionID := ActionID{SpellID: 16190, Tag: actionTag}
 
-	character.AddAura(sim, Aura{
-		ID:       ManaTideTotemAuraID,
+	return character.GetOrRegisterAura(&Aura{
+		Label:    "ManaTideTotem-" + actionID.String(),
+		Tag:      ManaTideTotemAuraTag,
 		ActionID: actionID,
-		Expires:  sim.CurrentTime + ManaTideTotemDuration,
-		OnCast: func(sim *Simulation, cast *Cast) {
-			timeDelta := sim.CurrentTime - lastUpdateTime
-			lastUpdateTime = sim.CurrentTime
-			progressRatio := float64(timeDelta) / float64(ManaTideTotemDuration)
-			remainder := totalBonusMana - bonusManaSubtracted
-			amount := MinFloat(remainder, totalBonusMana*progressRatio)
-
-			character.AddMana(sim, amount, actionID, true)
-			character.ExpectedBonusMana -= amount
-			bonusManaSubtracted += amount
-		},
-		OnExpire: func(sim *Simulation) {
-			remainder := totalBonusMana - bonusManaSubtracted
-			character.AddMana(sim, remainder, actionID, true)
-			character.ExpectedBonusMana -= remainder
+		Duration: ManaTideTotemDuration,
+		OnGain: func(aura *Aura, sim *Simulation) {
+			if character.HasManaBar() {
+				manaPerTick := ManaTideTotemAmount(character) / 4
+				StartPeriodicAction(sim, PeriodicActionOptions{
+					Period:   ManaTideTotemDuration / 4,
+					NumTicks: 4,
+					OnAction: func(sim *Simulation) {
+						character.AddMana(sim, manaPerTick, actionID, true)
+						character.ExpectedBonusMana -= manaPerTick
+					},
+				})
+			}
 		},
 	})
 }

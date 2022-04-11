@@ -693,3 +693,199 @@ export const P3_SV_PRESET = {
 		],
 	}),
 };
+
+export const P4_BM_PRESET = {
+	name: 'P4 BM Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<any>) => player.getTalentTree() != 2,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 32235,
+			"enchant": 29192,
+			"gems": [
+				32409,
+				32194
+			]
+		},
+		{
+			"id": 32260
+		},
+		{
+			"id": 31006,
+			"enchant": 28888,
+			"gems": [
+				32222,
+				32212
+			]
+		},
+		{
+			"id": 32323,
+			"enchant": 34004
+		},
+		{
+			"id": 31004,
+			"enchant": 24003,
+			"gems": [
+				32194,
+				32222,
+				32226
+			]
+		},
+		{
+			"id": 32324,
+			"enchant": 34002,
+			"gems": [
+				32222
+			]
+		},
+		{
+			"id": 31001,
+			"enchant": 19445,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 32346
+		},
+		{
+			"id": 31005,
+			"enchant": 29535,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 32366,
+			"enchant": 22544,
+			"gems": [
+				32194,
+				32222
+			]
+		},
+		{
+			"id": 29301
+		},
+		{
+			"id": 33496
+		},
+		{
+			"id": 28830
+		},
+		{
+			"id": 33831
+		},
+		{
+			"id": 33389,
+			"enchant": 33165
+		},
+		{
+			"id": 33389,
+			"enchant": 33165
+		},
+		{
+			"id": 30906,
+			"enchant": 23766
+		}
+	]}`),
+};
+
+export const P4_SV_PRESET = {
+	name: 'P4 SV Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<any>) => player.getTalentTree() == 2,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 32235,
+			"enchant": 29192,
+			"gems": [
+				32409,
+				32194
+			]
+		},
+		{
+			"id": 30017
+		},
+		{
+			"id": 31006,
+			"enchant": 28888,
+			"gems": [
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 29994,
+			"enchant": 34004
+		},
+		{
+			"id": 31004,
+			"enchant": 24003,
+			"gems": [
+				32194,
+				32226,
+				32226
+			]
+		},
+		{
+			"id": 32324,
+			"enchant": 34002,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 31001,
+			"enchant": 19445,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 30879,
+			"gems": [
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 31005,
+			"enchant": 29535,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 32366,
+			"enchant": 22544,
+			"gems": [
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 33496
+		},
+		{
+			"id": 29301
+		},
+		{
+			"id": 33831
+		},
+		{
+			"id": 28830
+		},
+		{
+			"id": 33389,
+			"enchant": 33165
+		},
+		{
+			"id": 33389,
+			"enchant": 33165
+		},
+		{
+			"id": 30906,
+			"enchant": 23766
+		}
+	]}`),
+};

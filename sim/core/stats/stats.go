@@ -46,6 +46,18 @@ const (
 	Rage
 	Armor
 	RangedAttackPower
+	Defense
+	Block
+	BlockValue
+	Dodge
+	Parry
+	Resilience
+	Health
+	ArcaneResistance
+	FireResistance
+	FrostResistance
+	NatureResistance
+	ShadowResistance
 
 	Len
 )
@@ -83,7 +95,7 @@ func (s Stat) StatName() string {
 	case MP5:
 		return "MP5"
 	case SpellPenetration:
-		return "StatSpellPenetration"
+		return "SpellPenetration"
 	case FireSpellPower:
 		return "FireSpellPower"
 	case NatureSpellPower:
@@ -118,6 +130,30 @@ func (s Stat) StatName() string {
 		return "Armor"
 	case RangedAttackPower:
 		return "RangedAttackPower"
+	case Defense:
+		return "Defense"
+	case Block:
+		return "Block"
+	case BlockValue:
+		return "BlockValue"
+	case Dodge:
+		return "Dodge"
+	case Parry:
+		return "Parry"
+	case Resilience:
+		return "Resilience"
+	case Health:
+		return "Health"
+	case FireResistance:
+		return "FireResistance"
+	case NatureResistance:
+		return "NatureResistance"
+	case FrostResistance:
+		return "FrostResistance"
+	case ShadowResistance:
+		return "ShadowResistance"
+	case ArcaneResistance:
+		return "ArcaneResistance"
 	}
 
 	return "none"
@@ -207,6 +243,24 @@ func (stats Stats) String() string {
 	}
 
 	sb.WriteString("\n}")
+	return sb.String()
+}
+
+// Like String() but without the newlines.
+func (stats Stats) FlatString() string {
+	var sb strings.Builder
+	sb.WriteString("{")
+
+	for statIdx, statValue := range stats {
+		name := Stat(statIdx).StatName()
+		if name == "none" || statValue == 0 {
+			continue
+		}
+
+		fmt.Fprintf(&sb, "%s: %0.3f,", name, statValue)
+	}
+
+	sb.WriteString("}")
 	return sb.String()
 }
 
@@ -331,6 +385,14 @@ func (sdm *StatDependencyManager) ApplyStatDependencies(stats Stats) Stats {
 }
 
 type PseudoStats struct {
+	///////////////////////////////////////////////////
+	// Effects that apply when this unit is the attacker.
+	///////////////////////////////////////////////////
+
+	NoCost         bool    // If set, spells cost no mana/energy/rage.
+	CostMultiplier float64 // Multiplies spell cost.
+	CostReduction  float64 // Reduces spell cost.
+
 	CastSpeedMultiplier   float64
 	MeleeSpeedMultiplier  float64
 	RangedSpeedMultiplier float64
@@ -342,18 +404,101 @@ type PseudoStats struct {
 	ForceFullSpiritRegen  bool    // If set, automatically uses full spirit regen regardless of FSR refresh time.
 	SpiritRegenMultiplier float64 // Multiplier on spirit portion of mana regen.
 
-	BonusMeleeDamage  float64 // Comes from '+X Weapon Damage' effects, affects melee hits only.
-	BonusRangedDamage float64 // Comes from '+X Weapon Damage' effects, affects ranged hits only.
+	// "Apply Aura: Mod Damage Done (Physical)", applies to abilities with EffectSpellCoefficient > 0.
+	//  This includes almost all "(Normalized) Weapon Damage", but also some "School Damage (Physical)" abilities.
+	BonusDamage float64 // Comes from '+X Weapon Damage' effects
+
+	BonusRangedHitRating  float64 // Hit rating for ranged only.
+	BonusMeleeCritRating  float64 // Crit rating for melee only (not ranged).
+	BonusRangedCritRating float64 // Crit rating for ranged only.
+	BonusFireCritRating   float64 // Crit rating for fire spells only (Combustion).
+	BonusMHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
+	BonusOHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
+
+	MobTypeAttackPower float64 // Bonus AP against mobs of the current type.
+	MobTypeSpellPower  float64 // Bonus SP against mobs of the current type.
+
+	// For Human and Orc weapon racials
+	BonusMHExpertiseRating float64
+	BonusOHExpertiseRating float64
 
 	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
+
+	DamageDealtMultiplier       float64 // All damage
+	RangedDamageDealtMultiplier float64
+
+	PhysicalDamageDealtMultiplier float64
+	ArcaneDamageDealtMultiplier   float64
+	FireDamageDealtMultiplier     float64
+	FrostDamageDealtMultiplier    float64
+	HolyDamageDealtMultiplier     float64
+	NatureDamageDealtMultiplier   float64
+	ShadowDamageDealtMultiplier   float64
+
+	// Modifiers for spells with the SpellExtrasAgentReserved1 flag set.
+	BonusCritRatingAgentReserved1       float64
+	AgentReserved1DamageDealtMultiplier float64
+
+	///////////////////////////////////////////////////
+	// Effects that apply when this unit is the target.
+	///////////////////////////////////////////////////
+
+	BonusMeleeAttackPower  float64 // Imp Hunters mark, EW
+	BonusRangedAttackPower float64 // Hunters mark, EW
+	BonusCritRating        float64 // Imp Judgement of the Crusader
+	BonusFrostCritRating   float64 // Winter's Chill
+	BonusMeleeHitRating    float64 // Imp FF
+
+	BonusPhysicalDamageTaken float64 // Hemo, Gift of Arthas, etc
+	BonusHolyDamageTaken     float64 // Judgement of the Crusader
+
+	DamageTakenMultiplier float64 // All damage
+
+	PhysicalDamageTakenMultiplier float64
+	ArcaneDamageTakenMultiplier   float64
+	FireDamageTakenMultiplier     float64
+	FrostDamageTakenMultiplier    float64
+	HolyDamageTakenMultiplier     float64
+	NatureDamageTakenMultiplier   float64
+	ShadowDamageTakenMultiplier   float64
+
+	PeriodicPhysicalDamageTakenMultiplier float64
 }
 
 func NewPseudoStats() PseudoStats {
 	return PseudoStats{
+		CostMultiplier: 1,
+
 		CastSpeedMultiplier:  1,
 		MeleeSpeedMultiplier: 1,
 		//RangedSpeedMultiplier: 1, // Leave at 0 so we can use this to ignore ranged stuff for non-hunters.
 		SpiritRegenMultiplier: 1,
 		ThreatMultiplier:      1,
+
+		DamageDealtMultiplier:       1,
+		RangedDamageDealtMultiplier: 1,
+
+		PhysicalDamageDealtMultiplier: 1,
+		ArcaneDamageDealtMultiplier:   1,
+		FireDamageDealtMultiplier:     1,
+		FrostDamageDealtMultiplier:    1,
+		HolyDamageDealtMultiplier:     1,
+		NatureDamageDealtMultiplier:   1,
+		ShadowDamageDealtMultiplier:   1,
+
+		AgentReserved1DamageDealtMultiplier: 1,
+
+		// Target effects.
+		DamageTakenMultiplier: 1,
+
+		PhysicalDamageTakenMultiplier: 1,
+		ArcaneDamageTakenMultiplier:   1,
+		FireDamageTakenMultiplier:     1,
+		FrostDamageTakenMultiplier:    1,
+		HolyDamageTakenMultiplier:     1,
+		NatureDamageTakenMultiplier:   1,
+		ShadowDamageTakenMultiplier:   1,
+
+		PeriodicPhysicalDamageTakenMultiplier: 1,
 	}
 }

@@ -21,41 +21,41 @@ type InternalGear = Record<ItemSlot, EquippedItem | null>;
  * This is an immutable type.
  */
 export class Gear {
-  private readonly gear: InternalGear;
+	private readonly gear: InternalGear;
 
-  constructor(gear: Partial<InternalGear>) {
+	constructor(gear: Partial<InternalGear>) {
 		getEnumValues(ItemSlot).forEach(slot => {
-      if (!gear[slot as ItemSlot])
-        gear[slot as ItemSlot] = null;
-    });
-    this.gear = gear as InternalGear;
-  }
+			if (!gear[slot as ItemSlot])
+				gear[slot as ItemSlot] = null;
+		});
+		this.gear = gear as InternalGear;
+	}
 
-  equals(other: Gear): boolean {
-    return this.asArray().every((thisItem, slot) => equalsOrBothNull(thisItem, other.getEquippedItem(slot), (a, b) => a.equals(b)));
-  }
+	equals(other: Gear): boolean {
+		return this.asArray().every((thisItem, slot) => equalsOrBothNull(thisItem, other.getEquippedItem(slot), (a, b) => a.equals(b)));
+	}
 
 	/**
 	 * Returns a new Gear set with the item equipped.
 	 *
 	 * Checks for validity and removes/exchanges items/gems as needed.
 	 */
-  withEquippedItem(newSlot: ItemSlot, newItem: EquippedItem | null): Gear {
+	withEquippedItem(newSlot: ItemSlot, newItem: EquippedItem | null): Gear {
 		// Create a new identical set of gear
-    const newInternalGear: Partial<InternalGear> = {};
+		const newInternalGear: Partial<InternalGear> = {};
 		getEnumValues(ItemSlot).map(slot => Number(slot) as ItemSlot).forEach(slot => {
 			newInternalGear[slot] = this.getEquippedItem(slot);
-    });
+		});
 
 		if (newItem) {
 			// If the new item has unique gems, remove matching.
 			newItem.gems
-			.filter(gem => gem?.unique)
-			.forEach(gem => {
-				getEnumValues(ItemSlot).map(slot => Number(slot) as ItemSlot).forEach(slot => {
-					newInternalGear[slot] = newInternalGear[slot]?.removeGemsWithId(gem!.id) || null;
+				.filter(gem => gem?.unique)
+				.forEach(gem => {
+					getEnumValues(ItemSlot).map(slot => Number(slot) as ItemSlot).forEach(slot => {
+						newInternalGear[slot] = newInternalGear[slot]?.removeGemsWithId(gem!.id) || null;
+					});
 				});
-			});
 
 			// If the new item is unique, remove matching items.
 			if (newItem.item.unique) {
@@ -79,12 +79,12 @@ export class Gear {
 			}
 		}
 
-    return new Gear(newInternalGear);
-  }
+		return new Gear(newInternalGear);
+	}
 
-  getEquippedItem(slot: ItemSlot): EquippedItem | null {
-    return this.gear[slot];
-  }
+	getEquippedItem(slot: ItemSlot): EquippedItem | null {
+		return this.gear[slot];
+	}
 
 	getTrinkets(): Array<EquippedItem | null> {
 		return [
@@ -93,15 +93,19 @@ export class Gear {
 		];
 	}
 
-  asArray(): Array<EquippedItem | null> {
-    return Object.values(this.gear);
-  }
+	hasTrinket(itemId: number): boolean {
+		return this.getTrinkets().map(t => t?.item.id).includes(itemId);
+	}
 
-  asSpec(): EquipmentSpec {
-    return EquipmentSpec.create({
-      items: this.asArray().map(ei => ei ? ei.asSpec() : ItemSpec.create()),
-    });
-  }
+	asArray(): Array<EquippedItem | null> {
+		return Object.values(this.gear);
+	}
+
+	asSpec(): EquipmentSpec {
+		return EquipmentSpec.create({
+			items: this.asArray().map(ei => ei ? ei.asSpec() : ItemSpec.create()),
+		});
+	}
 
 	getAllGems(): Array<Gem> {
 		return this.asArray()
@@ -126,10 +130,10 @@ export class Gear {
 
 		const gems = this.getAllGems();
 		return isMetaGemActive(
-				metaGem,
-				gems.filter(gem => gemMatchesSocket(gem, GemColor.GemColorRed)).length,
-				gems.filter(gem => gemMatchesSocket(gem, GemColor.GemColorYellow)).length,
-				gems.filter(gem => gemMatchesSocket(gem, GemColor.GemColorBlue)).length);
+			metaGem,
+			gems.filter(gem => gemMatchesSocket(gem, GemColor.GemColorRed)).length,
+			gems.filter(gem => gemMatchesSocket(gem, GemColor.GemColorYellow)).length,
+			gems.filter(gem => gemMatchesSocket(gem, GemColor.GemColorBlue)).length);
 	}
 
 	hasInactiveMetaGem(): boolean {

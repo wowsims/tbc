@@ -12,7 +12,7 @@ var InnervateCooldownID = core.NewCooldownID()
 // Returns the time to wait before the next action, or 0 if innervate is on CD
 // or disabled.
 func (druid *Druid) registerInnervateCD() {
-	actionID := core.ActionID{SpellID: 29166, CooldownID: InnervateCooldownID, Tag: int32(druid.RaidIndex)}
+	actionID := core.ActionID{SpellID: 29166, CooldownID: InnervateCooldownID, Tag: int32(druid.Index)}
 
 	baseManaCost := druid.BaseMana() * 0.04
 	innervateCD := core.InnervateCD
@@ -21,6 +21,7 @@ func (druid *Druid) registerInnervateCD() {
 	}
 
 	var innervateTarget *core.Character
+	var innervateAura *core.Aura
 	expectedManaPerInnervate := 0.0
 	innervateManaThreshold := 0.0
 	remainingInnervateUsages := 0
@@ -41,7 +42,7 @@ func (druid *Druid) registerInnervateCD() {
 			}
 
 			// If target already has another innervate, don't cast.
-			if innervateTarget.HasAura(core.InnervateAuraID) {
+			if innervateTarget.HasActiveAuraWithTag(core.InnervateAuraTag) {
 				return false
 			}
 
@@ -69,6 +70,7 @@ func (druid *Druid) registerInnervateCD() {
 				} else {
 					innervateManaThreshold = core.InnervateManaThreshold(innervateTarget)
 				}
+				innervateAura = core.InnervateAura(innervateTarget, expectedManaPerInnervate, actionID.Tag)
 
 				remainingInnervateUsages = int(1 + (core.MaxDuration(0, sim.Duration))/innervateCD)
 				innervateTarget.ExpectedBonusMana += expectedManaPerInnervate * float64(remainingInnervateUsages)
@@ -91,10 +93,10 @@ func (druid *Druid) registerInnervateCD() {
 					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
 						// Update expected bonus mana
 						newRemainingUsages := int(sim.GetRemainingDuration() / innervateCD)
-						expectedBonusManaReduction := expectedManaPerInnervate * float64(remainingInnervateUsages-newRemainingUsages)
+						//expectedBonusManaReduction := expectedManaPerInnervate * float64(remainingInnervateUsages-newRemainingUsages)
 						remainingInnervateUsages = newRemainingUsages
 
-						core.AddInnervateAura(sim, innervateTarget, expectedBonusManaReduction, actionID.Tag)
+						innervateAura.Activate(sim)
 					},
 				},
 			}

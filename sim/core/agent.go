@@ -19,6 +19,15 @@ type Agent interface {
 	// Updates the input Buffs to include party-wide buffs provided by this Agent.
 	AddPartyBuffs(partyBuffs *proto.PartyBuffs)
 
+	// All talent stats / auras should be added within this callback. This makes sure
+	// talents are applied at the right time so we can calculate groups of stats.
+	ApplyTalents()
+
+	// Called once before Character.Finalize(), but after all effects / auras / cooldowns
+	// have been registered for the whole raid.
+	// Use this for any initialization steps that require other raid members or auras.
+	Finalize(raid *Raid)
+
 	// Called once before the first iteration, after all Agents and Targets are finalized.
 	// Use this to do any precomputations that require access to Sim or Target fields.
 	Init(sim *Simulation)
@@ -34,10 +43,10 @@ type Agent interface {
 	OnManaTick(sim *Simulation)
 
 	// Called after each auto attack performed by this Agent.
-	// This is different from Aura.OnMeleeAttack in that it is invoked fully after
+	// This is different from Aura.OnSpellHit in that it is invoked fully after
 	// everything related to the attack is complete, and it is only invoked for
 	// auto attacks (white hits or white-hit-replacers).
-	OnAutoAttack(sim *Simulation, ability *ActiveMeleeAbility)
+	OnAutoAttack(sim *Simulation, spell *Spell)
 }
 
 type ActionID struct {

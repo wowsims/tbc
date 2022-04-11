@@ -1,0 +1,106 @@
+package rogue
+
+import (
+	"time"
+
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
+)
+
+var MutilateActionID = core.ActionID{SpellID: 34413}
+var MutilateMHActionID = core.ActionID{SpellID: 34419}
+var MutilateOHActionID = core.ActionID{SpellID: 34418}
+var MutilateEnergyCost = 60.0
+
+func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
+	actionID := MutilateMHActionID
+	if !isMH {
+		actionID = MutilateOHActionID
+	}
+
+	effect := core.SpellEffect{
+		ProcMask: core.ProcMaskMeleeMHSpecial,
+
+		BonusCritRating: 5 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.PuncturingWounds),
+		DamageMultiplier: 1 +
+			0.04*float64(rogue.Talents.Opportunity) +
+			core.TernaryFloat64(ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4), 0.06, 0),
+		ThreatMultiplier: 1,
+
+		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 101, 1, true),
+		OutcomeApplier: core.OutcomeFuncMeleeSpecialCritOnly(rogue.critMultiplier(isMH, true)),
+
+		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			rogue.AddComboPoints(sim, 1, actionID)
+		},
+	}
+	if !isMH {
+		effect.ProcMask = core.ProcMaskMeleeOHSpecial
+		effect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.OffHand, true, 101, 1+0.1*float64(rogue.Talents.DualWieldSpecialization), true)
+	}
+
+	effect.BaseDamage = core.WrapBaseDamageConfig(effect.BaseDamage, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
+		return func(sim *core.Simulation, spellEffect *core.SpellEffect, spell *core.Spell) float64 {
+			normalDamage := oldCalculator(sim, spellEffect, spell)
+			if rogue.DeadlyPoisonDot.IsActive() {
+				return normalDamage * 1.5
+			} else {
+				return normalDamage
+			}
+		}
+	})
+
+	return rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+	})
+}
+
+func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
+	mhHitSpell := rogue.newMutilateHitSpell(true)
+	ohHitSpell := rogue.newMutilateHitSpell(false)
+
+	refundAmount := MutilateEnergyCost * 0.8
+
+	rogue.Mutilate = rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    MutilateActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder,
+
+		ResourceType: stats.Energy,
+		BaseCost:     MutilateEnergyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: MutilateEnergyCost,
+				GCD:  time.Second,
+			},
+			IgnoreHaste: true,
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			ThreatMultiplier: 1,
+			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+					return
+				}
+
+				rogue.AddComboPoints(sim, 2, MutilateActionID)
+
+				// TODO: while this is the most natural handling, the oh attack might have effects
+				//  from the mh attack applied
+				mhHitSpell.Cast(sim, spellEffect.Target)
+				ohHitSpell.Cast(sim, spellEffect.Target)
+				rogue.Mutilate.Casts -= 2
+				rogue.Mutilate.Hits--
+			},
+		}),
+	})
+}

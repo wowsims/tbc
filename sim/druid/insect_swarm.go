@@ -1,6 +1,7 @@
 package druid
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -10,60 +11,56 @@ import (
 
 const SpellIDInsectSwarm int32 = 27013
 
-var InsectSwarmDebuffID = core.NewDebuffID()
+var InsectSwarmActionID = core.ActionID{SpellID: SpellIDInsectSwarm}
 
-func (druid *Druid) newInsectSwarmTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	baseCast := core.Cast{
-		ActionID:            core.ActionID{SpellID: SpellIDInsectSwarm},
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolNature,
-		Character:           &druid.Character,
-		BaseCost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 175,
-		},
-		Cost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 175,
-		},
-		GCD: core.GCDDefault,
-	}
+func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
+	baseCost := 175.0
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
+	druid.InsectSwarm = druid.RegisterSpell(core.SpellConfig{
+		ActionID:    InsectSwarmActionID,
+		SpellSchool: core.SpellSchoolNature,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
+			},
 		},
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:        6,
-			TickLength:           time.Second * 2,
-			TickBaseDamage:       792 / 6,
-			TickSpellCoefficient: 0.127,
-			DebuffID:             InsectSwarmDebuffID,
-		},
-	}
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: baseCast,
-		},
-		Effect: effect,
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			OutcomeApplier:   core.OutcomeFuncMagicHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					druid.InsectSwarmDot.Apply(sim)
+				}
+			},
+		}),
+	})
+
+	target := sim.GetPrimaryTarget()
+	druid.InsectSwarmDot = core.NewDot(core.Dot{
+		Spell: druid.InsectSwarm,
+		Aura: target.RegisterAura(&core.Aura{
+			Label:    "InsectSwarm-" + strconv.Itoa(int(druid.Index)),
+			ActionID: InsectSwarmActionID,
+		}),
+		NumberOfTicks: 6,
+		TickLength:    time.Second * 2,
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			IsPeriodic:       true,
+			BaseDamage:       core.BaseDamageConfigMagicNoRoll(792/6, 0.127),
+			OutcomeApplier:   core.OutcomeFuncTick(),
+		}),
 	})
 }
 
-func (druid *Druid) NewInsectSwarm(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	sf := &druid.InsectSwarmSpell
-	druid.insectSwarmCastTemplate.Apply(sf)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sf.Effect.Target = target
-	sf.Init(sim)
-
-	return sf
-}
-
 func (druid *Druid) ShouldCastInsectSwarm(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.InsectSwarm && !druid.InsectSwarmSpell.Effect.DotInput.IsTicking(sim)
+	return rotation.InsectSwarm && !druid.InsectSwarmDot.IsActive()
 }

@@ -16,7 +16,7 @@ import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -37,7 +37,7 @@ import * as WarriorInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecWarrior>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecWarrior>) {
 		super(parentElem, player, {
 			cssClass: 'warrior-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
@@ -97,52 +97,70 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 					giftOfTheWild: TristateEffect.TristateEffectImproved,
 				}),
 				partyBuffs: PartyBuffs.create({
-					drums: Drums.DrumsOfBattle,
 					bloodlust: 1,
-					strengthOfEarthTotem: StrengthOfEarthType.EnhancingAndCyclone,
+					drums: Drums.DrumsOfBattle,
+					graceOfAirTotem: TristateEffect.TristateEffectImproved,
+					strengthOfEarthTotem: StrengthOfEarthType.EnhancingTotems,
 					windfuryTotemRank: 5,
+					windfuryTotemIwt: 2,
+					leaderOfThePack: TristateEffect.TristateEffectImproved,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
 					blessingOfMight: TristateEffect.TristateEffectImproved,
-					innervates: 1,
+					blessingOfSalvation: true,
+					unleashedRage: true,
 				}),
 				debuffs: Debuffs.create({
-					bloodFrenzy: true,
+					mangle: true,
+					sunderArmor: true,
 					curseOfRecklessness: true,
-					exposeArmor: TristateEffect.TristateEffectRegular
+					faerieFire: TristateEffect.TristateEffectImproved,
+					improvedSealOfTheCrusader: true,
+					huntersMark: TristateEffect.TristateEffectImproved,
+					exposeWeaknessUptime: 0.95,
+					exposeWeaknessHunterAgility: 1200,
 				}),
 			},
 
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
 				// TODO: Move reck to cooldown tabs
-				WarriorInputs.Recklessness ,
+				WarriorInputs.Recklessness,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
-				IconInputs.LeaderOfThePack,
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.Bloodlust,
-				// IconInputs.WindfuryTotem,
-				// IconInputs.StrengthOfEarthTotem,
-				// IconInputs.UnleashedRage,
+				IconInputs.StrengthOfEarthTotem,
+				IconInputs.GraceOfAirTotem,
+				IconInputs.WindfuryTotem,
+				IconInputs.BattleShout,
+				IconInputs.LeaderOfThePack,
 				IconInputs.FerociousInspiration,
+				IconInputs.TrueshotAura,
+				IconInputs.SanctityAura,
 				IconInputs.DraeneiRacialMelee,
-				IconInputs.BraidedEterniumChain
+				IconInputs.BraidedEterniumChain,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfMight,
+				IconInputs.BlessingOfSalvation,
+				IconInputs.UnleashedRage,
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
-				// IconInputs.ImprovedHuntersMark,
 				IconInputs.BloodFrenzy,
+				IconInputs.Mangle,
 				IconInputs.ImprovedSealOfTheCrusader,
+				IconInputs.HuntersMark,
+				IconInputs.FaerieFire,
+				IconInputs.SunderArmor,
+				IconInputs.ExposeArmor,
 				IconInputs.CurseOfRecklessness,
 			],
 			// Which options are selectable in the 'Consumes' section.
@@ -177,8 +195,6 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.BattleChicken,
 					IconInputs.ScrollOfAgilityV,
 					IconInputs.ScrollOfStrengthV,
 				],

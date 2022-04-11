@@ -1,6 +1,7 @@
 package priest
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -9,53 +10,48 @@ import (
 const SpellIDStarshards int32 = 25446
 
 var SSCooldownID = core.NewCooldownID()
+var StarshardsActionID = core.ActionID{SpellID: SpellIDStarshards, CooldownID: SSCooldownID}
 
-func (priest *Priest) newStarshardsTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	baseCast := core.Cast{
-		ActionID: core.ActionID{
-			SpellID:    SpellIDStarshards,
-			CooldownID: SSCooldownID,
-		},
-		Character:           &priest.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolArcane,
-		CastTime:            0,
-		GCD:                 core.GCDDefault,
-		Cooldown:            time.Second * 30,
-	}
+func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
+	priest.Starshards = priest.RegisterSpell(core.SpellConfig{
+		ActionID:    StarshardsActionID,
+		SpellSchool: core.SpellSchoolArcane,
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				GCD: core.GCDDefault,
+			},
+			Cooldown: time.Second * 30,
 		},
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:        5,
-			TickLength:           time.Second * 3,
-			TickBaseDamage:       785 / 5,
-			TickSpellCoefficient: 0.167,
-		},
-	}
 
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: baseCast,
-		},
-		Effect: effect,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ThreatMultiplier: 1,
+			OutcomeApplier:   core.OutcomeFuncMagicHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					priest.StarshardsDot.Apply(sim)
+				}
+			},
+		}),
 	})
-}
 
-func (priest *Priest) NewStarshards(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	mf := &priest.StarshardsSpell
+	target := sim.GetPrimaryTarget()
+	priest.StarshardsDot = core.NewDot(core.Dot{
+		Spell: priest.Starshards,
+		Aura: target.RegisterAura(&core.Aura{
+			Label:    "Starshards-" + strconv.Itoa(int(priest.Index)),
+			ActionID: StarshardsActionID,
+		}),
 
-	priest.starshardsTemplate.Apply(mf)
+		NumberOfTicks: 5,
+		TickLength:    time.Second * 3,
 
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Effect.Target = target
-	mf.Init(sim)
-
-	return mf
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			IsPeriodic:       true,
+			BaseDamage:       core.BaseDamageConfigMagicNoRoll(785/5, 0.167),
+			OutcomeApplier:   core.OutcomeFuncTick(),
+		}),
+	})
 }

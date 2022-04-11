@@ -10,69 +10,44 @@ import (
 const SpellIDMindBlast int32 = 25375
 
 var MBCooldownID = core.NewCooldownID()
+var MindBlastActionID = core.ActionID{SpellID: SpellIDMindBlast, CooldownID: MBCooldownID}
 
-func (priest *Priest) newMindBlastTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	baseCast := core.Cast{
-		ActionID: core.ActionID{
-			SpellID:    SpellIDMindBlast,
-			CooldownID: MBCooldownID,
-		},
-		Character:           &priest.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolShadow,
-		BaseCost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 450,
-		},
-		Cost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 450,
-		},
-		CastTime:       time.Millisecond * 1500,
-		GCD:            core.GCDDefault,
-		Cooldown:       time.Second * 8,
-		CritMultiplier: priest.DefaultSpellCritMultiplier(),
-	}
+func (priest *Priest) registerMindBlastSpell(sim *core.Simulation) {
+	baseCost := 450.0
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
+	priest.MindBlast = priest.RegisterSpell(core.SpellConfig{
+		ActionID:    MindBlastActionID,
+		SpellSchool: core.SpellSchoolShadow,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost:     baseCost * (1 - 0.05*float64(priest.Talents.FocusedMind)),
+				GCD:      core.GCDDefault,
+				CastTime: time.Millisecond * 1500,
+			},
+			Cooldown: time.Second*8 - time.Millisecond*500*time.Duration(priest.Talents.ImprovedMindBlast),
 		},
-		DirectInput: core.DirectDamageInput{
-			MinBaseDamage:    711,
-			MaxBaseDamage:    752,
-			SpellCoefficient: 0.429,
-		},
-	}
 
-	priest.applyTalentsToShadowSpell(&baseCast, &effect)
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 
-	baseCast.Cooldown -= time.Millisecond * 500 * time.Duration(priest.Talents.ImprovedMindBlast)
+			BonusSpellHitRating: 0 +
+				float64(priest.Talents.ShadowFocus)*2*core.SpellHitRatingPerHitChance +
+				float64(priest.Talents.FocusedPower)*2*core.SpellHitRatingPerHitChance,
 
-	if ItemSetAbsolution.CharacterHasSetBonus(&priest.Character, 4) { // Absolution 4p adds 10% damage
-		effect.StaticDamageMultiplier *= 1.1
-	}
+			BonusSpellCritRating: float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance,
 
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: baseCast,
-		},
-		Effect: effect,
+			DamageMultiplier: 1 *
+				(1 + float64(priest.Talents.Darkness)*0.02) *
+				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1) *
+				core.TernaryFloat64(ItemSetAbsolution.CharacterHasSetBonus(&priest.Character, 4), 1.1, 1),
+
+			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
+
+			BaseDamage:     core.BaseDamageConfigMagic(711, 752, 0.429),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
+		}),
 	})
-}
-
-func (priest *Priest) NewMindBlast(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	mf := &priest.mindblastSpell
-
-	priest.mindblastCastTemplate.Apply(mf)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Effect.Target = target
-	mf.Init(sim)
-
-	return mf
 }

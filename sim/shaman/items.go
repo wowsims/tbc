@@ -16,14 +16,14 @@ func init() {
 	core.AddItemEffect(33506, ApplySkycallTotem)
 	core.AddItemEffect(33507, ApplyStonebreakersTotem)
 
-	core.AddItemSet(ItemSetTidefury)
-	core.AddItemSet(ItemSetCycloneRegalia)
-	core.AddItemSet(ItemSetCataclysmRegalia)
-	core.AddItemSet(ItemSetSkyshatterRegalia)
+	core.AddItemSet(&ItemSetTidefury)
+	core.AddItemSet(&ItemSetCycloneRegalia)
+	core.AddItemSet(&ItemSetCataclysmRegalia)
+	core.AddItemSet(&ItemSetSkyshatterRegalia)
 
-	core.AddItemSet(ItemSetCycloneHarness)
-	core.AddItemSet(ItemSetCataclysmHarness)
-	core.AddItemSet(ItemSetSkyshatterHarness)
+	core.AddItemSet(&ItemSetCycloneHarness)
+	core.AddItemSet(&ItemSetCataclysmHarness)
+	core.AddItemSet(&ItemSetSkyshatterHarness)
 
 	// Even though these item effects are handled elsewhere, add them so they are
 	// detected for automatic testing.
@@ -31,8 +31,7 @@ func init() {
 }
 
 var ItemSetTidefury = core.ItemSet{
-	Name:  "Tidefury Raiment",
-	Items: map[int32]struct{}{28231: {}, 27510: {}, 28349: {}, 27909: {}, 27802: {}},
+	Name: "Tidefury Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Handled in chain_lightning.go
@@ -51,66 +50,75 @@ var ItemSetTidefury = core.ItemSet{
 	},
 }
 
-var Cyclone4PcAuraID = core.NewAuraID()
-var Cyclone4PcManaRegainAuraID = core.NewAuraID()
 var ItemSetCycloneRegalia = core.ItemSet{
-	Name:  "Cyclone Regalia",
-	Items: map[int32]struct{}{29033: {}, 29035: {}, 29034: {}, 29036: {}, 29037: {}},
+	Name: "Cyclone Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Handled in shaman.go
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				return core.Aura{
-					ID: Cyclone4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+
+			procAura := character.GetOrRegisterAura(&core.Aura{
+				Label:    "Cyclone Regalia 4pc Proc",
+				Duration: time.Second * 15,
+				OnGain: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Unit.PseudoStats.CostReduction += 270
+				},
+				OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Unit.PseudoStats.CostReduction -= 270
+				},
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+					aura.Deactivate(sim)
+				},
+				OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+					aura.Deactivate(sim)
+				},
+			})
+
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Cyclone Regalia 4pc",
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+							return
+						}
 						if !spellEffect.Outcome.Matches(core.OutcomeCrit) || sim.RandomFloat("cycl4p") > 0.11 {
 							return // if not a crit or didn't proc, don't activate
 						}
-						character.AddAura(sim, core.Aura{
-							ID: Cyclone4PcManaRegainAuraID,
-							OnCast: func(sim *core.Simulation, cast *core.Cast) {
-								// TODO: how to make sure this goes in before clearcasting?
-								cast.Cost.Value -= 270
-							},
-							OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-								character.RemoveAura(sim, Cyclone4PcManaRegainAuraID)
-							},
-						})
+						procAura.Activate(sim)
 					},
-				}
+				})
 			})
 		},
 	},
 }
 
-var Cataclysm4PcAuraID = core.NewAuraID()
 var ItemSetCataclysmRegalia = core.ItemSet{
-	Name:  "Cataclysm Regalia",
-	Items: map[int32]struct{}{30169: {}, 30170: {}, 30171: {}, 30172: {}, 30173: {}},
+	Name: "Cataclysm Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				return core.Aura{
-					ID: Cataclysm4PcAuraID,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+				return character.GetOrRegisterAura(&core.Aura{
+					Label: "Cataclysm Regalia 4pc",
+					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+							return
+						}
 						if !spellEffect.Outcome.Matches(core.OutcomeCrit) || sim.RandomFloat("cata4p") > 0.25 {
 							return
 						}
 						character.AddMana(sim, 120, core.ActionID{SpellID: 37237}, false)
 					},
-				}
+				})
 			})
 		},
 	},
 }
 
 var ItemSetSkyshatterRegalia = core.ItemSet{
-	Name:  "Skyshatter Regalia",
-	Items: map[int32]struct{}{34437: {}, 31017: {}, 34542: {}, 31008: {}, 31014: {}, 31020: {}, 31023: {}, 34566: {}},
+	Name: "Skyshatter Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			shamanAgent, ok := agent.(ShamanAgent)
@@ -145,7 +153,22 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 	const cd = time.Minute * 5
 	actionID := core.ActionID{ItemID: 19344}
 
-	agent.GetCharacter().AddMajorCooldown(core.MajorCooldown{
+	character := agent.GetCharacter()
+	activeAura := character.GetOrRegisterAura(&core.Aura{
+		Label:    "Natural Alignment Crystal",
+		ActionID: actionID,
+		Duration: dur,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			character.AddStat(stats.SpellPower, sp)
+			character.PseudoStats.CostMultiplier *= 1.2
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			character.AddStat(stats.SpellPower, -sp)
+			character.PseudoStats.CostMultiplier /= 1.2
+		},
+	})
+
+	character.AddMajorCooldown(core.MajorCooldown{
 		ActionID:         actionID,
 		CooldownID:       NaturalAlignmentCrystalCooldownID,
 		Cooldown:         cd,
@@ -159,21 +182,9 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
+				activeAura.Activate(sim)
 				character.SetCD(NaturalAlignmentCrystalCooldownID, sim.CurrentTime+cd)
-				character.AddStat(stats.SpellPower, sp)
 				character.Metrics.AddInstantCast(actionID)
-
-				character.AddAura(sim, core.Aura{
-					ID:       core.OffensiveTrinketActiveAuraID,
-					ActionID: actionID,
-					Expires:  sim.CurrentTime + dur,
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						cast.Cost.Value += cast.BaseCost.Value * 0.2
-					},
-					OnExpire: func(sim *core.Simulation) {
-						character.AddStat(stats.SpellPower, -sp)
-					},
-				})
 			}
 		},
 	})
@@ -181,17 +192,15 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 
 // ActivateFathomBrooch adds an aura that has a chance on cast of nature spell
 //  to restore 335 mana. 40s ICD
-var FathomBroochOfTheTidewalkerAuraID = core.NewAuraID()
-
 func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		icd := core.NewICD()
 		const icdDur = time.Second * 40
 
-		return core.Aura{
-			ID: FathomBroochOfTheTidewalkerAuraID,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Fathom Brooch of the Tidewalker",
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 				if icd.IsOnCD(sim) {
 					return
 				}
@@ -204,72 +213,100 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 				icd = core.InternalCD(sim.CurrentTime + icdDur)
 				character.AddMana(sim, 335, core.ActionID{ItemID: 30663}, false)
 			},
-		}
+			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				if icd.IsOnCD(sim) {
+					return
+				}
+				if spell.SpellSchool != core.SpellSchoolNature {
+					return
+				}
+				if sim.RandomFloat("Fathom-Brooch of the Tidewalker") > 0.15 {
+					return
+				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				character.AddMana(sim, 335, core.ActionID{ItemID: 30663}, false)
+			},
+		})
 	})
 }
-
-var AshtongueTalismanOfVisionAuraID = core.NewAuraID()
-var AshtongueTalismanOfVisionProcAuraID = core.NewAuraID()
 
 func ApplyAshtongueTalismanOfVision(agent core.Agent) {
-	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const apBonus = 275
-		const dur = time.Second * 10
-		const procChance = 0.5
+	shamanAgent, ok := agent.(ShamanAgent)
+	if !ok {
+		log.Fatalf("Non-shaman attempted to activate Ashtongue Talisman of Vision.")
+	}
+	shaman := shamanAgent.GetShaman()
 
-		return core.Aura{
-			ID: AshtongueTalismanOfVisionAuraID,
-			OnBeforeMelee: func(sim *core.Simulation, ability *core.ActiveMeleeAbility) {
-				if !ability.SameAction(StormstrikeActionID) {
+	shaman.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := shaman.NewTemporaryStatsAura("Ashtongue Talisman of Vision Proc", core.ActionID{ItemID: 32491}, stats.Stats{stats.AttackPower: 275}, time.Second*10)
+		return shaman.GetOrRegisterAura(&core.Aura{
+			Label: "Ashtongue Talisman of Vision",
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+				// Cooldown != 0 makes sure this is the first 'fake' hit of SS.
+				if !cast.SameAction(StormstrikeActionID) || cast.Cooldown == 0 {
 					return
 				}
-				if sim.RandomFloat("Ashtongue Talisman of Vision") > procChance {
+				if sim.RandomFloat("Ashtongue Talisman of Vision") > 0.5 {
 					return
 				}
-				character.AddAuraWithTemporaryStats(sim, AshtongueTalismanOfVisionProcAuraID, core.ActionID{ItemID: 32491}, stats.AttackPower, apBonus, dur)
+				procAura.Activate(sim)
 			},
-		}
+			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				// Note that shaman.Stormstrike is the first 'fake' SS hit.
+				if spell != shaman.Stormstrike {
+					return
+				}
+				if sim.RandomFloat("Ashtongue Talisman of Vision") > 0.5 {
+					return
+				}
+				procAura.Activate(sim)
+			},
+		})
 	})
 }
-
-var SkycallTotemAuraID = core.NewAuraID()
-var EnergizedAuraID = core.NewAuraID()
 
 func ApplySkycallTotem(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const hasteBonus = 101
-		const dur = time.Second * 10
 
-		return core.Aura{
-			ID:      SkycallTotemAuraID,
-			Expires: core.NeverExpires,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if cast.ActionID.SpellID != SpellIDLB12 || sim.RandomFloat("Skycall Totem") > 0.15 {
-					return
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Skycall Totem Proc", core.ActionID{ItemID: 33506}, stats.Stats{stats.SpellHaste: 101}, time.Second*10)
+		return character.GetOrRegisterAura(&core.Aura{
+			Label: "Skycall Totem",
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+				if cast.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("Skycall Totem") < 0.15 {
+					procAura.Activate(sim)
 				}
-				character.AddAuraWithTemporaryStats(sim, EnergizedAuraID, core.ActionID{ItemID: 33506}, stats.SpellHaste, hasteBonus, dur)
 			},
-		}
+			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				if spell.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("Skycall Totem") < 0.15 {
+					procAura.Activate(sim)
+				}
+			},
+		})
 	})
 }
 
-var StonebreakersTotemAuraID = core.NewAuraID()
-var ElementalStrengthAuraID = core.NewAuraID()
-
 func ApplyStonebreakersTotem(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		const apBonus = 110
-		const dur = time.Second * 10
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		procAura := character.NewTemporaryStatsAura("Stonebreakers Totem Proc", core.ActionID{ItemID: 33507}, stats.Stats{stats.AttackPower: 110}, time.Second*10)
+		icd := core.NewICD()
+		const icdDur = time.Second * 10
 		const procChance = 0.5
 
-		return core.Aura{
-			ID:      StonebreakersTotemAuraID,
-			Expires: core.NeverExpires,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				if !cast.IsSpellAction(SpellIDEarthShock) && !cast.IsSpellAction(SpellIDFlameShock) && !cast.IsSpellAction(SpellIDFrostShock) {
+		return character.GetOrRegisterAura(&core.Aura{
+			Label:    "Stonebreakers Totem",
+			Duration: core.NeverExpires,
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+
+				if !spell.SpellExtras.Matches(SpellFlagShock) {
+					return
+				}
+
+				if icd.IsOnCD(sim) {
 					return
 				}
 
@@ -277,9 +314,10 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 					return
 				}
 
-				cast.Character.AddAuraWithTemporaryStats(sim, ElementalStrengthAuraID, core.ActionID{ItemID: 33507}, stats.AttackPower, apBonus, dur)
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				procAura.Activate(sim)
 			},
-		}
+		})
 	})
 }
 
@@ -288,8 +326,7 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 // (4) Set : Your Stormstrike ability does an additional 30 damage per weapon.
 
 var ItemSetCycloneHarness = core.ItemSet{
-	Name:  "Cyclone Harness",
-	Items: map[int32]struct{}{29038: {}, 29039: {}, 29040: {}, 29043: {}, 29042: {}},
+	Name: "Cyclone Harness",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// shaman.go
@@ -305,8 +342,7 @@ var ItemSetCycloneHarness = core.ItemSet{
 // (4) Set : You gain 5% additional haste from your Flurry ability.
 
 var ItemSetCataclysmHarness = core.ItemSet{
-	Name:  "Cataclysm Harness",
-	Items: map[int32]struct{}{30185: {}, 30189: {}, 30190: {}, 30192: {}, 30194: {}},
+	Name: "Cataclysm Harness",
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
 			// shaman.go
@@ -319,8 +355,7 @@ var ItemSetCataclysmHarness = core.ItemSet{
 // 4 pieces: Whenever you use Stormstrike, you gain 70 attack power for 12 sec.
 
 var ItemSetSkyshatterHarness = core.ItemSet{
-	Name:  "Skyshatter Harness",
-	Items: map[int32]struct{}{31018: {}, 31011: {}, 31015: {}, 31021: {}, 31024: {}, 34567: {}, 34439: {}, 34545: {}},
+	Name: "Skyshatter Harness",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// implemented in shocks.go

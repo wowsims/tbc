@@ -16,7 +16,7 @@ import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { TotemsSection } from '/tbc/core/components/totem_inputs.js';
 
-import { Alchohol} from '/tbc/core/proto/common.js';
+import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -37,7 +37,7 @@ import * as ShamanInputs from './inputs.js';
 import * as Presets from './presets.js';
 
 export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancementShaman> {
-  constructor(parentElem: HTMLElement, player: Player<Spec.SpecEnhancementShaman>) {
+	constructor(parentElem: HTMLElement, player: Player<Spec.SpecEnhancementShaman>) {
 		super(parentElem, player, {
 			cssClass: 'enhancement-shaman-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
@@ -112,18 +112,27 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 					giftOfTheWild: TristateEffect.TristateEffectImproved,
 				}),
 				partyBuffs: PartyBuffs.create({
-					
+					battleShout: TristateEffect.TristateEffectImproved,
+					leaderOfThePack: TristateEffect.TristateEffectImproved,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
-					blessingOfWisdom: 2,
-					blessingOfMight: 2,
+					blessingOfWisdom: TristateEffect.TristateEffectImproved,
+					blessingOfMight: TristateEffect.TristateEffectImproved,
+					blessingOfSalvation: true,
 				}),
 				debuffs: Debuffs.create({
-					faerieFire: 2,
-					improvedSealOfTheCrusader: true,
+					bloodFrenzy: true,
 					sunderArmor: true,
 					curseOfRecklessness: true,
+					curseOfElements: TristateEffect.TristateEffectRegular,
+					faerieFire: TristateEffect.TristateEffectImproved,
+					judgementOfWisdom: true,
+					improvedSealOfTheCrusader: true,
+					misery: true,
+					huntersMark: TristateEffect.TristateEffectImproved,
+					exposeWeaknessUptime: 0.95,
+					exposeWeaknessHunterAgility: 1200,
 				}),
 			},
 
@@ -150,7 +159,6 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				IconInputs.FerociousInspiration,
 				IconInputs.TrueshotAura,
 				IconInputs.SanctityAura,
-				IconInputs.BattleChickens,
 				IconInputs.BraidedEterniumChain,
 				IconInputs.EyeOfTheNight,
 				IconInputs.ChainOfTheTwilightOwl,
@@ -159,6 +167,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				IconInputs.BlessingOfKings,
 				IconInputs.BlessingOfWisdom,
 				IconInputs.BlessingOfMight,
+				IconInputs.BlessingOfSalvation,
 			],
 			// IconInputs to include in the 'Debuffs' section on the settings tab.
 			debuffInputs: [
@@ -218,9 +227,6 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 					WeaponImbue.WeaponImbueShamanRockbiter,
 				],
 				other: [
-					IconInputs.DrumsOfBattleConsume,
-					IconInputs.DrumsOfRestorationConsume,
-					IconInputs.BattleChicken,
 					IconInputs.ScrollOfStrengthV,
 					IconInputs.ScrollOfAgilityV,
 				],
@@ -267,6 +273,8 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 					Presets.P1_PRESET,
 					Presets.P2_PRESET,
 					Presets.P3_PRESET,
+					Presets.P4_PRESET,
+					Presets.P5_PRESET,
 				],
 			},
 		});

@@ -91,6 +91,16 @@ func DurationFromSeconds(numSeconds float64) time.Duration {
 	return time.Duration(float64(time.Second) * numSeconds)
 }
 
+func GetTristateValueInt32(effect proto.TristateEffect, regularValue int32, impValue int32) int32 {
+	if effect == proto.TristateEffect_TristateEffectRegular {
+		return regularValue
+	} else if effect == proto.TristateEffect_TristateEffectImproved {
+		return impValue
+	} else {
+		return 0
+	}
+}
+
 func GetTristateValueFloat(effect proto.TristateEffect, regularValue float64, impValue float64) float64 {
 	if effect == proto.TristateEffect_TristateEffectRegular {
 		return regularValue
@@ -105,4 +115,28 @@ func hash(s string) uint32 {
 	h := fnv.New32a()
 	h.Write([]byte(s))
 	return h.Sum32()
+}
+
+func TernaryInt(condition bool, val1 int, val2 int) int {
+	if condition {
+		return val1
+	} else {
+		return val2
+	}
+}
+
+func TernaryInt32(condition bool, val1 int32, val2 int32) int32 {
+	if condition {
+		return val1
+	} else {
+		return val2
+	}
+}
+
+func TernaryFloat64(condition bool, val1 float64, val2 float64) float64 {
+	if condition {
+		return val1
+	} else {
+		return val2
+	}
 }

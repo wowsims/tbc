@@ -11,58 +11,45 @@ import (
 var RaptorStrikeCooldownID = core.NewCooldownID()
 var RaptorStrikeActionID = core.ActionID{SpellID: 27014, CooldownID: RaptorStrikeCooldownID}
 
-func (hunter *Hunter) newRaptorStrikeTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
-	ama := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            RaptorStrikeActionID,
-			Character:           &hunter.Character,
-			OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolPhysical,
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 120,
-			},
-			Cooldown:       time.Second * 6,
-			CritMultiplier: hunter.critMultiplier(false, sim.GetPrimaryTarget()),
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 1,
-				FlatDamageBonus:  170,
+func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
+	cost := core.ResourceCost{Type: stats.Mana, Value: 120}
+	ama := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:    RaptorStrikeActionID,
+				Character:   &hunter.Character,
+				SpellSchool: core.SpellSchoolPhysical,
+				Cost:        cost,
+				BaseCost:    cost,
+				Cooldown:    time.Second * 6,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
 	}
-
 	ama.Cost.Value -= 120 * 0.2 * float64(hunter.Talents.Resourcefulness)
-	ama.Effect.BonusCritRating += float64(hunter.Talents.SavageStrikes) * 10 * core.MeleeCritRatingPerCritChance
 
 	hunter.raptorStrikeCost = ama.Cost.Value
 
-	return core.NewMeleeAbilityTemplate(ama)
-}
+	hunter.RaptorStrike = hunter.RegisterSpell(core.SpellConfig{
+		Template: ama,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask: core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
 
-func (hunter *Hunter) NewRaptorStrike(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
-	rs := &hunter.raptorStrike
-	hunter.raptorStrikeTemplate.Apply(rs)
+			BonusCritRating:  float64(hunter.Talents.SavageStrikes) * 10 * core.MeleeCritRatingPerCritChance,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	rs.Effect.Target = target
-
-	return rs
+			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 170, 1, true),
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(hunter.critMultiplier(false, sim.GetPrimaryTarget())),
+		}),
+	})
 }
 
 // Returns true if the regular melee swing should be used, false otherwise.
-func (hunter *Hunter) TryRaptorStrike(sim *core.Simulation) *core.ActiveMeleeAbility {
+func (hunter *Hunter) TryRaptorStrike(sim *core.Simulation) *core.Spell {
 	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveAutosOnly || hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime) || hunter.CurrentMana() < hunter.raptorStrikeCost {
 		return nil
 	}
 
-	return hunter.NewRaptorStrike(sim, sim.GetPrimaryTarget())
+	return hunter.RaptorStrike
 }

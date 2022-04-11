@@ -152,7 +152,7 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 var FullConsumes = &proto.Consumes{
 	Flask:           proto.Flask_FlaskOfRelentlessAssault,
 	DefaultPotion:   proto.Potions_HastePotion,
-	DefaultConjured: proto.Conjured_ConjuredDarkRune,
+	DefaultConjured: proto.Conjured_ConjuredFlameCap,
 	PetFood:         proto.PetFood_PetFoodKiblersBits,
 }
 
@@ -166,7 +166,7 @@ var FullDebuffs = &proto.Debuffs{
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: FullDebuffs,
-	Armor:   7700,
+	Armor:   7684,
 }
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{

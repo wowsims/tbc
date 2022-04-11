@@ -14,21 +14,21 @@ export interface NumberListPickerConfig<ModObject> extends InputConfig<ModObject
 export class NumberListPicker<ModObject> extends Input<ModObject, Array<number>> {
 	private readonly inputElem: HTMLInputElement;
 
-  constructor(parent: HTMLElement, modObject: ModObject, config: NumberListPickerConfig<ModObject>) {
-    super(parent, 'number-list-picker-root', modObject, config);
+	constructor(parent: HTMLElement, modObject: ModObject, config: NumberListPickerConfig<ModObject>) {
+		super(parent, 'number-list-picker-root', modObject, config);
 
-    this.inputElem = document.createElement('input');
-    this.inputElem.type = 'text';
+		this.inputElem = document.createElement('input');
+		this.inputElem.type = 'text';
 		this.inputElem.placeholder = config.placeholder || '';
-    this.inputElem.classList.add('number-list-picker-input');
-    this.rootElem.appendChild(this.inputElem);
+		this.inputElem.classList.add('number-list-picker-input');
+		this.rootElem.appendChild(this.inputElem);
 
 		this.init();
 
-    this.inputElem.addEventListener('change', event => {
+		this.inputElem.addEventListener('change', event => {
 			this.inputChanged(TypedEvent.nextEventID());
-    });
-  }
+		});
+	}
 
 	getInputElem(): HTMLElement {
 		return this.inputElem;

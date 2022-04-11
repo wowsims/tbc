@@ -242,6 +242,7 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 				<a href="/tbc/balance_druid">Balance Druid Sim</a"><br>
 				<a href="/tbc/hunter">Hunter Sim</a"></body><br>
 				<a href="/tbc/mage">Mage Sim</a"><br>
+				<a href="/tbc/rogue">Rogue Sim</a"><br>
 				<a href="/tbc/shadow_priest">Shadow Priest Sim</a"></body></html>
 		    `))
 			return

@@ -1,6 +1,8 @@
 package rogue
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -23,6 +25,12 @@ func RegisterRogue() {
 	)
 }
 
+const (
+	SpellFlagRogueAbility = core.SpellExtrasAgentReserved1
+	SpellFlagBuilder      = core.SpellExtrasAgentReserved1 | core.SpellExtrasAgentReserved2
+	SpellFlagFinisher     = core.SpellExtrasAgentReserved1 | core.SpellExtrasAgentReserved3
+)
+
 type Rogue struct {
 	core.Character
 
@@ -30,22 +38,50 @@ type Rogue struct {
 	Options  proto.Rogue_Options
 	Rotation proto.Rogue_Rotation
 
-	comboPoints int32
+	// Current rotation plan.
+	plan int
+
+	// Cached values for calculating rotation.
+	energyPerSecondAvg    float64
+	eaBuildTime           time.Duration // Time to build EA following a finisher at ~35 energy
+	sliceAndDiceDurations [6]time.Duration
+
+	doneSND bool // Current SND will last for the rest of the iteration
+	doneEA  bool // Current EA will last for the rest of the iteration, or not using EA
 
 	deathmantle4pcProc bool
+	disabledMCDs       []*core.MajorCooldown
 
+	shivEnergyCost    float64
 	builderEnergyCost float64
-	newBuilder        func(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility
+	CastBuilder       func(sim *core.Simulation, target *core.Target)
 
-	sinisterStrikeTemplate core.MeleeAbilityTemplate
-	sinisterStrike         core.ActiveMeleeAbility
+	eviscerateEnergyCost float64
+	envenomEnergyCost    float64
+
+	Backstab       *core.Spell
+	DeadlyPoison   *core.Spell
+	Envenom        *core.Spell
+	Eviscerate     *core.Spell
+	ExposeArmor    *core.Spell
+	Hemorrhage     *core.Spell
+	InstantPoison  *core.Spell
+	Mutilate       *core.Spell
+	Rupture        *core.Spell
+	Shiv           *core.Spell
+	SinisterStrike *core.Spell
+
+	DeadlyPoisonDot *core.Dot
+	RuptureDot      *core.Dot
+
+	AdrenalineRushAura *core.Aura
+	BladeFlurryAura    *core.Aura
+	ExposeArmorAura    *core.Aura
+	SliceAndDiceAura   *core.Aura
+
+	finishingMoveEffectApplier func(sim *core.Simulation, numPoints int32)
 
 	castSliceAndDice func()
-
-	eviscerateEnergyCost  float64
-	eviscerateDamageCalcs []core.MeleeDamageCalculator
-	eviscerateTemplate    core.MeleeAbilityTemplate
-	eviscerate            core.ActiveMeleeAbility
 }
 
 func (rogue *Rogue) GetCharacter() *core.Character {
@@ -59,37 +95,85 @@ func (rogue *Rogue) GetRogue() *Rogue {
 func (rogue *Rogue) AddRaidBuffs(raidBuffs *proto.RaidBuffs)    {}
 func (rogue *Rogue) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {}
 
+func (rogue *Rogue) Finalize(raid *core.Raid) {
+	// Need to apply poisons now so we can check for WF totem.
+	rogue.applyPoisons()
+}
+
+func (rogue *Rogue) finisherFlags() core.SpellExtras {
+	flags := SpellFlagFinisher
+	if rogue.Talents.SurpriseAttacks {
+		flags |= core.SpellExtrasCannotBeDodged
+	}
+	return flags
+}
+
+func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) {
+	numPoints := rogue.ComboPoints()
+	rogue.SpendComboPoints(sim, actionID)
+	rogue.finishingMoveEffectApplier(sim, numPoints)
+}
+
 func (rogue *Rogue) Init(sim *core.Simulation) {
-	// Precompute all the spell templates.
-	rogue.sinisterStrikeTemplate = rogue.newSinisterStrikeTemplate(sim)
+	rogue.registerBackstabSpell(sim)
+	rogue.registerDeadlyPoisonSpell(sim)
+	rogue.registerEviscerateSpell(sim)
+	rogue.registerExposeArmorSpell(sim)
+	rogue.registerHemorrhageSpell(sim)
+	rogue.registerInstantPoisonSpell(sim)
+	rogue.registerMutilateSpell(sim)
+	rogue.registerRuptureSpell(sim)
+	rogue.registerShivSpell(sim)
+	rogue.registerSinisterStrikeSpell(sim)
+
+	rogue.finishingMoveEffectApplier = rogue.makeFinishingMoveEffectApplier(sim)
 
 	rogue.initSliceAndDice(sim)
-	rogue.eviscerateTemplate = rogue.newEviscerateTemplate(sim)
+
+	rogue.energyPerSecondAvg = core.EnergyPerTick / core.EnergyTickDuration.Seconds()
+
+	// TODO: Currently assumes default combat spec.
+	expectedComboPointsAfterFinisher := 0
+	expectedEnergyAfterFinisher := 25.0
+	comboPointsNeeded := 5 - expectedComboPointsAfterFinisher
+	energyForEA := rogue.builderEnergyCost*float64(comboPointsNeeded) + ExposeArmorEnergyCost
+	rogue.eaBuildTime = time.Duration(((energyForEA - expectedEnergyAfterFinisher) / rogue.energyPerSecondAvg) * float64(time.Second))
 }
 
 func (rogue *Rogue) Reset(sim *core.Simulation) {
-	rogue.comboPoints = 0
+	rogue.plan = PlanOpener
 	rogue.deathmantle4pcProc = false
+	rogue.doneSND = false
+
+	permaEA := rogue.ExposeArmorAura.ExpiresAt() == core.NeverExpires
+	rogue.doneEA = !rogue.Rotation.MaintainExposeArmor || permaEA
+
+	rogue.disabledMCDs = rogue.DisableAllEnabledCooldowns(core.CooldownTypeUnknown)
 }
 
-func (rogue *Rogue) AddComboPoint(sim *core.Simulation) {
-	if rogue.comboPoints == 5 {
-		if sim.Log != nil {
-			rogue.Log(sim, "Failed to gain 1 combo point, already full")
-		}
-	} else {
-		if sim.Log != nil {
-			rogue.Log(sim, "Gained 1 combo point (%d --> %d)", rogue.comboPoints, rogue.comboPoints+1)
-		}
-		rogue.comboPoints++
-	}
-}
+func (rogue *Rogue) critMultiplier(isMH bool, applyLethality bool) float64 {
+	primaryModifier := 1.0
+	secondaryModifier := 0.0
 
-func (rogue *Rogue) SpendComboPoints(sim *core.Simulation) {
-	if sim.Log != nil {
-		rogue.Log(sim, "Spent all combo points.")
+	isMace := false
+	if weapon := rogue.Equip[proto.ItemSlot_ItemSlotMainHand]; isMH && weapon.ID != 0 {
+		if weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
+			isMace = true
+		}
+	} else if weapon := rogue.Equip[proto.ItemSlot_ItemSlotOffHand]; !isMH && weapon.ID != 0 {
+		if weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
+			isMace = true
+		}
 	}
-	rogue.comboPoints = 0
+	if isMace {
+		primaryModifier *= 1 + 0.01*float64(rogue.Talents.MaceSpecialization)
+	}
+
+	if applyLethality {
+		secondaryModifier += 0.06 * float64(rogue.Talents.Lethality)
+	}
+
+	return rogue.MeleeCritMultiplier(primaryModifier, secondaryModifier)
 }
 
 func NewRogue(character core.Character, options proto.Player) *Rogue {
@@ -102,9 +186,70 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		Rotation:  *rogueOptions.Rotation,
 	}
 
-	rogue.builderEnergyCost = rogue.SinisterStrikeEnergyCost()
-	rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.ActiveMeleeAbility {
-		return rogue.NewSinisterStrike(sim, target)
+	// Passive rogue threat reduction: https://tbc.wowhead.com/spell=21184/rogue-passive-dnd
+	rogue.PseudoStats.ThreatMultiplier *= 0.71
+
+	daggerMH := rogue.Equip[proto.ItemSlot_ItemSlotMainHand].WeaponType == proto.WeaponType_WeaponTypeDagger
+	daggerOH := rogue.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType == proto.WeaponType_WeaponTypeDagger
+	dualDagger := daggerMH && daggerOH
+	if rogue.Rotation.Builder == proto.Rogue_Rotation_Unknown {
+		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
+	}
+	if rogue.Rotation.Builder == proto.Rogue_Rotation_Backstab && !daggerMH {
+		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
+	} else if rogue.Rotation.Builder == proto.Rogue_Rotation_Hemorrhage && !rogue.Talents.Hemorrhage {
+		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
+	} else if rogue.Rotation.Builder == proto.Rogue_Rotation_Mutilate && !rogue.Talents.Mutilate {
+		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
+	} else if rogue.Rotation.Builder == proto.Rogue_Rotation_Mutilate && !dualDagger {
+		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
+	}
+	if rogue.Rotation.Builder == proto.Rogue_Rotation_Auto {
+		if rogue.Talents.Mutilate && dualDagger {
+			rogue.Rotation.Builder = proto.Rogue_Rotation_Mutilate
+		} else if rogue.Talents.Hemorrhage {
+			rogue.Rotation.Builder = proto.Rogue_Rotation_Hemorrhage
+		} else if daggerMH {
+			rogue.Rotation.Builder = proto.Rogue_Rotation_Backstab
+		} else {
+			rogue.Rotation.Builder = proto.Rogue_Rotation_SinisterStrike
+		}
+	}
+
+	var CastBuilder func(sim *core.Simulation, target *core.Target)
+	switch rogue.Rotation.Builder {
+	case proto.Rogue_Rotation_SinisterStrike:
+		rogue.builderEnergyCost = rogue.SinisterStrikeEnergyCost()
+		CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			rogue.SinisterStrike.Cast(sim, target)
+		}
+	case proto.Rogue_Rotation_Backstab:
+		rogue.builderEnergyCost = BackstabEnergyCost
+		CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			rogue.Backstab.Cast(sim, target)
+		}
+	case proto.Rogue_Rotation_Hemorrhage:
+		rogue.builderEnergyCost = HemorrhageEnergyCost
+		CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			rogue.Hemorrhage.Cast(sim, target)
+		}
+	case proto.Rogue_Rotation_Mutilate:
+		rogue.builderEnergyCost = MutilateEnergyCost
+		CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			rogue.Mutilate.Cast(sim, target)
+		}
+	}
+
+	if rogue.Rotation.UseShiv && rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueDeadlyPoison {
+		rogue.CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			if rogue.DeadlyPoisonDot.IsActive() && rogue.DeadlyPoisonDot.RemainingDuration(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.shivEnergyCost {
+				rogue.Shiv.Cast(sim, target)
+			} else {
+				CastBuilder(sim, target)
+			}
+		}
+	} else {
+		rogue.CastBuilder = CastBuilder
 	}
 
 	maxEnergy := 100.0
@@ -116,6 +261,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 			rogue.doRotation(sim)
 		}
 	})
+
 	rogue.EnableAutoAttacks(rogue, core.AutoAttackOptions{
 		MainHand:       rogue.WeaponFromMainHand(rogue.critMultiplier(true, false)),
 		OffHand:        rogue.WeaponFromOffHand(rogue.critMultiplier(false, false)),
@@ -146,13 +292,14 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		},
 	})
 
-	rogue.applyTalents()
+	rogue.registerThistleTeaCD()
 
 	return rogue
 }
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  92,
 		stats.Agility:   160,
 		stats.Stamina:   88,
@@ -163,6 +310,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  97,
 		stats.Agility:   154,
 		stats.Stamina:   92,
@@ -173,6 +321,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceGnome, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  90,
 		stats.Agility:   161,
 		stats.Stamina:   88,
@@ -183,6 +332,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  95,
 		stats.Agility:   158,
 		stats.Stamina:   89,
@@ -193,6 +343,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  92,
 		stats.Agility:   163,
 		stats.Stamina:   88,
@@ -203,6 +354,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  98,
 		stats.Agility:   155,
 		stats.Stamina:   91,
@@ -213,6 +365,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	trollStats := stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  96,
 		stats.Agility:   160,
 		stats.Stamina:   90,
@@ -225,6 +378,7 @@ func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassRogue}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassRogue}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceUndead, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  94,
 		stats.Agility:   156,
 		stats.Stamina:   90,

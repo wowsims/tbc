@@ -1,5 +1,6 @@
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
+import { Conjured } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { StrengthOfEarthType } from '/tbc/core/proto/common.js';
@@ -119,24 +120,70 @@ export const NumStartingPotions = {
 	},
 };
 
-export const ShadowPriestDPS = {
-  type: 'number' as const,
-  cssClass: 'shadow-priest-dps-picker',
+export const StartingConjured = {
+	type: 'enum' as const,
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-  config: {
+	config: {
+		extraCssClasses: [
+			'starting-conjured-picker',
+		],
+		label: 'Starting Conjured',
+		labelTooltip: 'If set, this conjured will be used instead of the default conjured for the first few uses.',
+		values: [
+			{ name: 'None', value: Conjured.ConjuredUnknown },
+			{ name: 'Dark Rune', value: Conjured.ConjuredDarkRune },
+			{ name: 'Flame Cap', value: Conjured.ConjuredFlameCap },
+			{ name: 'Mana Gem', value: Conjured.ConjuredMageManaEmerald },
+			{ name: 'Thistle Tea', value: Conjured.ConjuredRogueThistleTea },
+		],
+		changedEvent: (player: Player<any>) => player.consumesChangeEmitter,
+		getValue: (player: Player<any>) => player.getConsumes().startingConjured,
+		setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
+			const newConsumes = player.getConsumes();
+			newConsumes.startingConjured = newValue;
+			player.setConsumes(eventID, newConsumes);
+		},
+	},
+};
+
+export const NumStartingConjured = {
+	type: 'number' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'num-starting-conjureds-picker',
+		],
+		label: '# to use',
+		labelTooltip: 'The number of starting conjured items to use before going back to the default conjured.',
+		changedEvent: (player: Player<any>) => player.consumesChangeEmitter,
+		getValue: (player: Player<any>) => player.getConsumes().numStartingConjured,
+		setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
+			const newConsumes = player.getConsumes();
+			newConsumes.numStartingConjured = newValue;
+			player.setConsumes(eventID, newConsumes);
+		},
+		enableWhen: (player: Player<any>) => player.getConsumes().startingConjured != Conjured.ConjuredUnknown,
+	},
+};
+
+export const ShadowPriestDPS = {
+	type: 'number' as const,
+	cssClass: 'shadow-priest-dps-picker',
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
 		extraCssClasses: [
 			'shadow-priest-dps-picker',
 			'within-raid-sim-hide',
 		],
-    label: 'Shadow Priest DPS',
-    changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
-    getValue: (player: Player<any>) => player.getBuffs().shadowPriestDps,
-    setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
-      const buffs = player.getBuffs();
-      buffs.shadowPriestDps = newValue;
-      player.setBuffs(eventID, buffs);
-    },
-  },
+		label: 'Shadow Priest DPS',
+		changedEvent: (player: Player<any>) => player.buffsChangeEmitter,
+		getValue: (player: Player<any>) => player.getBuffs().shadowPriestDps,
+		setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
+			const buffs = player.getBuffs();
+			buffs.shadowPriestDps = newValue;
+			player.setBuffs(eventID, buffs);
+		},
+	},
 };
 
 export const ISBUptime = {
@@ -148,12 +195,12 @@ export const ISBUptime = {
 			'within-raid-sim-hide',
 		],
 		label: 'Improved Shadowbolt Uptime %',
-		labelTooltip: "Uptime for the Improved Shadowbolt debuff, applied by 1 or more warlocks in your raid.",	
+		labelTooltip: "Uptime for the Improved Shadowbolt debuff, applied by 1 or more warlocks in your raid.",
 		changedEvent: (target: Target) => target.debuffsChangeEmitter,
-		getValue: (target: Target) => Math.round(target.getDebuffs().isbUptime*100),
+		getValue: (target: Target) => Math.round(target.getDebuffs().isbUptime * 100),
 		setValue: (eventID: EventID, target: Target, newValue: number) => {
 			const newDebuffs = target.getDebuffs();
-			newDebuffs.isbUptime = newValue/100;
+			newDebuffs.isbUptime = newValue / 100;
 			target.setDebuffs(eventID, newDebuffs);
 		},
 	},
@@ -170,10 +217,10 @@ export const ExposeWeaknessUptime = {
 		label: 'Expose Weakness Uptime %',
 		labelTooltip: 'Uptime for the Expose Weakness debuff, applied by 1 or more Survival hunters in your raid.',
 		changedEvent: (target: Target) => target.debuffsChangeEmitter,
-		getValue: (target: Target) => Math.round(target.getDebuffs().exposeWeaknessUptime*100),
+		getValue: (target: Target) => Math.round(target.getDebuffs().exposeWeaknessUptime * 100),
 		setValue: (eventID: EventID, target: Target, newValue: number) => {
 			const newDebuffs = target.getDebuffs();
-			newDebuffs.exposeWeaknessUptime = newValue/100;
+			newDebuffs.exposeWeaknessUptime = newValue / 100;
 			target.setDebuffs(eventID, newDebuffs);
 		},
 	},

@@ -9,90 +9,60 @@ import (
 
 var SteadyShotActionID = core.ActionID{SpellID: 34120}
 
-// ActiveMeleeAbility doesn't support cast times, so we wrap it in a SimpleCast.
-func (hunter *Hunter) newSteadyShotCastTemplate(sim *core.Simulation) core.SimpleCast {
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  SteadyShotActionID,
-			Character: hunter.GetCharacter(),
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 110,
-			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 110,
-			},
-			// Cast time is affected by ranged attack speed so set it later.
-			//CastTime:     time.Millisecond * 1500,
-			GCD:         core.GCDDefault,
-			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				target := sim.GetPrimaryTarget()
-				ss := &hunter.steadyShotAbility
-				hunter.steadyShotAbilityTemplate.Apply(ss)
-				ss.Effect.Target = target
-				ss.Attack(sim)
-
-				hunter.killCommandBlocked = false
-				hunter.TryKillCommand(sim, target)
-
-				hunter.rotation(sim, false)
+func (hunter *Hunter) registerSteadyShotSpell(sim *core.Simulation) {
+	ama := core.SimpleSpell{
+		SpellCast: core.SpellCast{
+			Cast: core.Cast{
+				ActionID:  SteadyShotActionID,
+				Character: hunter.GetCharacter(),
+				BaseCost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 110,
+				},
+				Cost: core.ResourceCost{
+					Type:  stats.Mana,
+					Value: 110,
+				},
+				// Cast time is affected by ranged attack speed so set it later.
+				//CastTime:     time.Millisecond * 1500,
+				GCD:         core.GCDDefault + hunter.latency,
+				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+				SpellSchool: core.SpellSchoolPhysical,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
 			},
 		},
-		DisableMetrics: true,
 	}
+	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
 
-	template.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
-
-	return template
-}
-
-func (hunter *Hunter) newSteadyShotAbilityTemplate(sim *core.Simulation) core.MeleeAbilityTemplate {
-	ama := core.ActiveMeleeAbility{
-		Cast: core.Cast{
-			ActionID:            SteadyShotActionID,
-			Character:           &hunter.Character,
-			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-			CritRollCategory:    core.CritRollCategoryPhysical,
-			SpellSchool:         core.SpellSchoolPhysical,
-			CritMultiplier:      hunter.critMultiplier(true, sim.GetPrimaryTarget()),
+	hunter.SteadyShot = hunter.RegisterSpell(core.SpellConfig{
+		Template: ama,
+		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
+			instance.CastTime = hunter.SteadyShotCastTime()
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskRangedSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			WeaponInput: core.WeaponDamageInput{
-				CalculateDamage: func(attackPower float64, bonusWeaponDamage float64) float64 {
-					return attackPower*0.2 +
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask: core.ProcMaskRangedSpecial,
+
+			BonusCritRating:  core.TernaryFloat64(ItemSetRiftStalker.CharacterHasSetBonus(&hunter.Character, 4), 5*core.MeleeCritRatingPerCritChance, 0),
+			DamageMultiplier: 1 * core.TernaryFloat64(ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 4), 1.1, 1),
+			ThreatMultiplier: 1,
+
+			BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					return (hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget())*0.2 +
 						hunter.AutoAttacks.Ranged.BaseDamage(sim)*2.8/hunter.AutoAttacks.Ranged.SwingSpeed +
 						150
 				},
+				TargetSpellCoefficient: 1,
+			}),
+			OutcomeApplier: core.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				hunter.killCommandBlocked = false
+				hunter.TryKillCommand(sim, spellEffect.Target)
+				hunter.rotation(sim, false)
 			},
-		},
-	}
-
-	if ItemSetRiftStalker.CharacterHasSetBonus(&hunter.Character, 4) {
-		ama.Effect.BonusCritRating += 5 * core.MeleeCritRatingPerCritChance
-	}
-	if ItemSetGronnstalker.CharacterHasSetBonus(&hunter.Character, 4) {
-		ama.Effect.DamageMultiplier *= 1.1
-	}
-
-	return core.NewMeleeAbilityTemplate(ama)
-}
-
-func (hunter *Hunter) NewSteadyShot(sim *core.Simulation, target *core.Target) core.SimpleCast {
-	hunter.steadyShotCast = hunter.steadyShotCastTemplate
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hunter.steadyShotCast.CastTime = hunter.SteadyShotCastTime()
-
-	hunter.steadyShotCast.Init(sim)
-	return hunter.steadyShotCast
+		}),
+	})
 }
 
 func (hunter *Hunter) SteadyShotCastTime() time.Duration {

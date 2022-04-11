@@ -1,6 +1,7 @@
 package priest
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -10,58 +11,55 @@ import (
 const SpellIDDevouringPlague int32 = 25467
 
 var DevouringPlagueCooldownID = core.NewCooldownID()
+var DevouringPlagueActionID = core.ActionID{SpellID: SpellIDDevouringPlague, CooldownID: DevouringPlagueCooldownID}
 
-func (priest *Priest) newDevouringPlagueTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 1145}
-	baseCast := core.Cast{
-		ActionID: core.ActionID{
-			SpellID:    SpellIDDevouringPlague,
-			CooldownID: DevouringPlagueCooldownID,
-		},
-		Character:           &priest.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolShadow,
-		BaseCost:            cost,
-		Cost:                cost,
-		CastTime:            0,
-		GCD:                 core.GCDDefault,
-		Cooldown:            time.Minute * 3,
-	}
+func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
+	baseCost := 1145.0
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:        8,
-			TickLength:           time.Second * 3,
-			TickBaseDamage:       1216 / 8,
-			TickSpellCoefficient: 0.1,
-		},
-	}
+	priest.DevouringPlague = priest.RegisterSpell(core.SpellConfig{
+		ActionID:    DevouringPlagueActionID,
+		SpellSchool: core.SpellSchoolShadow,
 
-	priest.applyTalentsToShadowSpell(&baseCast, &effect)
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
 
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: baseCast,
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
+				GCD:  core.GCDDefault,
+			},
+			Cooldown: time.Minute * 3,
 		},
-		Effect: effect,
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
+			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
+			OutcomeApplier:      core.OutcomeFuncMagicHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					priest.DevouringPlagueDot.Apply(sim)
+				}
+			},
+		}),
 	})
-}
 
-func (priest *Priest) NewDevouringPlague(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	mf := &priest.DevouringPlagueSpell
-
-	priest.devouringPlagueTemplate.Apply(mf)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Effect.Target = target
-	mf.Init(sim)
-
-	return mf
+	target := sim.GetPrimaryTarget()
+	priest.DevouringPlagueDot = core.NewDot(core.Dot{
+		Spell: priest.DevouringPlague,
+		Aura: target.RegisterAura(&core.Aura{
+			Label:    "DevouringPlague-" + strconv.Itoa(int(priest.Index)),
+			ActionID: DevouringPlagueActionID,
+		}),
+		NumberOfTicks: 8,
+		TickLength:    time.Second * 3,
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1 *
+				(1 + float64(priest.Talents.Darkness)*0.02) *
+				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1),
+			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
+			IsPeriodic:       true,
+			BaseDamage:       core.BaseDamageConfigMagicNoRoll(1216/8, 0.1),
+			OutcomeApplier:   core.OutcomeFuncTick(),
+		}),
+	})
 }
