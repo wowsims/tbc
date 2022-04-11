@@ -12,28 +12,7 @@ const SpellIDScorch int32 = 27074
 var ScorchActionID = core.ActionID{SpellID: SpellIDScorch}
 
 func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    ScorchActionID,
-				Character:   &mage.Character,
-				SpellSchool: core.SpellSchoolFire,
-				SpellExtras: SpellFlagMage,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 180,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 180,
-				},
-				CastTime: time.Millisecond * 1500,
-				GCD:      core.GCDDefault,
-			},
-		},
-	}
-	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
-	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
+	baseCost := 180.0
 
 	effect := core.SpellEffect{
 		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
@@ -72,7 +51,24 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 	}
 
 	mage.Scorch = mage.RegisterSpell(core.SpellConfig{
-		Template:     spell,
+		ActionID:    ScorchActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagMage,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost *
+					(1 - 0.01*float64(mage.Talents.Pyromaniac)) *
+					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
+
+				GCD:      core.GCDDefault,
+				CastTime: time.Millisecond * 1500,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }

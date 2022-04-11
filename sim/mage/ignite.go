@@ -10,19 +10,10 @@ import (
 var IgniteActionID = core.ActionID{SpellID: 12848}
 
 func (mage *Mage) registerIgniteSpell(sim *core.Simulation) {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    IgniteActionID,
-				Character:   &mage.Character,
-				SpellSchool: core.SpellSchoolFire,
-				SpellExtras: SpellFlagMage | core.SpellExtrasIgnoreModifiers,
-			},
-		},
-	}
-
 	mage.Ignite = mage.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    IgniteActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagMage | core.SpellExtrasIgnoreModifiers,
 	})
 }
 

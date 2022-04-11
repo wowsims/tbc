@@ -16,29 +16,8 @@ const SpellIDFlamestrike int32 = 27086
 var FlamestrikeActionID = core.ActionID{SpellID: SpellIDFlamestrike}
 
 func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    FlamestrikeActionID,
-				Character:   &mage.Character,
-				SpellSchool: core.SpellSchoolFire,
-				SpellExtras: SpellFlagMage,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 1175,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 1175,
-				},
-				CastTime: time.Second * 3,
-				GCD:      core.GCDDefault,
-			},
-		},
-		AOECap: 7830,
-	}
-	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
-	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
+	//AOECap: 7830,
+	baseCost := 1175.0
 
 	applyAOEDamage := core.ApplyEffectFuncAOEDamage(sim, core.SpellEffect{
 		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
@@ -56,7 +35,24 @@ func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
 	})
 
 	mage.Flamestrike = mage.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    FlamestrikeActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagMage,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost *
+					(1 - 0.01*float64(mage.Talents.Pyromaniac)) *
+					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
+
+				GCD:      core.GCDDefault,
+				CastTime: time.Second * 3,
+			},
+		},
+
 		ApplyEffects: func(sim *core.Simulation, target *core.Target, spell *core.Spell) {
 			applyAOEDamage(sim, target, spell)
 			mage.FlamestrikeDot.Apply(sim)

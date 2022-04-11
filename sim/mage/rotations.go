@@ -45,7 +45,7 @@ func (mage *Mage) tryUseGCD(sim *core.Simulation) {
 		mage.Metrics.MarkOOM(&mage.Character, waitTime)
 		mage.WaitUntil(sim, sim.CurrentTime+waitTime)
 	} else {
-		mage.WaitForMana(sim, spell.MostRecentCost)
+		mage.WaitForMana(sim, spell.CurCast.Cost)
 	}
 }
 

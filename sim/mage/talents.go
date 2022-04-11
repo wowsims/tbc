@@ -111,6 +111,16 @@ func (mage *Mage) applyArcaneConcentration() {
 				}
 				curCastIdx++
 			},
+			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				if mage.bonusAMCCCrit != 0 {
+					mage.AddStat(stats.SpellCrit, -mage.bonusAMCCCrit)
+					mage.bonusAMCCCrit = 0
+				}
+				if !spell.SpellExtras.Matches(SpellFlagMage) {
+					return
+				}
+				curCastIdx++
+			},
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SpellExtras.Matches(SpellFlagMage) {
 					return
@@ -190,10 +200,10 @@ func (mage *Mage) registerPresenceOfMindCD() {
 					numStacks := mage.ArcaneBlastAura.GetStacks()
 					spell = mage.ArcaneBlast[numStacks]
 				}
-				normalCastTime := spell.Template.CastTime
-				spell.Template.CastTime = 0
+				normalCastTime := spell.DefaultCast.CastTime
+				spell.DefaultCast.CastTime = 0
 				spell.Cast(sim, sim.GetPrimaryTarget())
-				spell.Template.CastTime = normalCastTime
+				spell.DefaultCast.CastTime = normalCastTime
 
 				character.Metrics.AddInstantCast(actionID)
 				character.SetCD(PresenceOfMindCooldownID, sim.CurrentTime+cooldown)
