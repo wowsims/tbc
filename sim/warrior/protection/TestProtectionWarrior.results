@@ -479,7 +479,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Mana-EtchedRegalia"
  value: {
-  dps: 483.445534497561
+  dps: 483.44553449756097
  }
 }
 dps_results: {
@@ -731,7 +731,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-TheTwinBladesofAzzinoth"
  value: {
-  dps: 769.4609563573784
+  dps: 769.4609563573783
  }
 }
 dps_results: {
@@ -881,7 +881,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-Settings-Orc-P1-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 492.78453383728504
+  dps: 492.78453383728515
  }
 }
 dps_results: {

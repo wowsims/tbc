@@ -6,30 +6,26 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+var FaerieFireActionID = core.ActionID{SpellID: 26993}
+
 func (druid *Druid) registerFaerieFireSpell(sim *core.Simulation) {
+	baseCost := 145.0
 	druid.FaerieFireAura = core.FaerieFireAura(sim.GetPrimaryTarget(), druid.Talents.ImprovedFaerieFire)
 
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: 26993},
-				SpellSchool: core.SpellSchoolNature,
-				Character:   druid.GetCharacter(),
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 145,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 145,
-				},
-				GCD: core.GCDDefault,
+	druid.FaerieFire = druid.RegisterSpell(core.SpellConfig{
+		ActionID:    FaerieFireActionID,
+		SpellSchool: core.SpellSchoolNature,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
 			},
 		},
-	}
 
-	druid.FaerieFire = druid.RegisterSpell(core.SpellConfig{
-		Template: template,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO

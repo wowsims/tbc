@@ -71,7 +71,7 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-AshtongueTalismanofInsight-32488"
  value: {
-  dps: 1509.9882957195318
+  dps: 1509.9882957195323
  }
 }
 dps_results: {
@@ -305,7 +305,7 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-Figurine-LivingRubySerpent-24126"
  value: {
-  dps: 1562.4160764929206
+  dps: 1562.416076492921
  }
 }
 dps_results: {
@@ -365,7 +365,7 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 1593.1901476852302
+  dps: 1593.1901476852304
  }
 }
 dps_results: {
@@ -419,7 +419,7 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-MindQuickeningGem-19339"
  value: {
-  dps: 1510.769816208195
+  dps: 1510.7698162081952
  }
 }
 dps_results: {
@@ -473,19 +473,19 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 1530.2525448655047
+  dps: 1530.2525448655042
  }
 }
 dps_results: {
  key: "TestFire-AllItems-Serpent-CoilBraid-30720"
  value: {
-  dps: 1535.3654172173078
+  dps: 1535.365417217308
  }
 }
 dps_results: {
  key: "TestFire-AllItems-SextantofUnstableCurrents-30626"
  value: {
-  dps: 1569.1972765352432
+  dps: 1569.1972765352434
  }
 }
 dps_results: {
@@ -605,7 +605,7 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-TirisfalRegalia"
  value: {
-  dps: 1554.888458552891
+  dps: 1554.8884585528913
  }
 }
 dps_results: {

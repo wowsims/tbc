@@ -161,7 +161,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-BracingEarthstormDiamond"
  value: {
-  dps: 1936.0925390127034
+  dps: 1936.0925390127031
  }
 }
 dps_results: {
@@ -179,7 +179,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-BrutalEarthstormDiamond"
  value: {
-  dps: 1941.4120621577206
+  dps: 1941.4120621577201
  }
 }
 dps_results: {
@@ -347,7 +347,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-FelstalkerArmor"
  value: {
-  dps: 1798.0526422291368
+  dps: 1798.0526422291366
  }
 }
 dps_results: {
@@ -839,7 +839,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2219.5049946506465
+  dps: 2219.504994650646
  }
 }
 dps_results: {

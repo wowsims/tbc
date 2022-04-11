@@ -305,7 +305,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-EnigmaticSkyfireDiamond"
  value: {
-  dps: 1845.33320478856
+  dps: 1845.3332047885601
  }
 }
 dps_results: {
@@ -425,7 +425,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-KissoftheSpider-22954"
  value: {
-  dps: 1850.8424731289365
+  dps: 1850.8424731289372
  }
 }
 dps_results: {
@@ -785,7 +785,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1234.842316324732
+  dps: 1234.8423163247323
  }
 }
 dps_results: {
@@ -911,13 +911,13 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-Human-P4-Retribution Paladin-NoBuffs-LongMultiTarget"
  value: {
-  dps: 853.617730670849
+  dps: 853.6177306708491
  }
 }
 dps_results: {
  key: "TestRetribution-Settings-Human-P4-Retribution Paladin-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 853.617730670849
+  dps: 853.6177306708491
  }
 }
 dps_results: {
