@@ -101,7 +101,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-BandoftheEternalSage-29305"
  value: {
-  dps: 1068.557794081811
+  dps: 1068.5577940818107
  }
 }
 dps_results: {
@@ -491,7 +491,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 1067.1911817473863
+  dps: 1067.191181747386
  }
 }
 dps_results: {
@@ -515,7 +515,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
-  dps: 1049.2403165096923
+  dps: 1049.240316509692
  }
 }
 dps_results: {
@@ -533,7 +533,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-Sorcerer'sAlchemistStone-35749"
  value: {
-  dps: 1097.3673305167633
+  dps: 1097.3673305167636
  }
 }
 dps_results: {
@@ -635,7 +635,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-Average-Default"
  value: {
-  dps: 1049.7799015254911
+  dps: 1049.779901525491
  }
 }
 dps_results: {

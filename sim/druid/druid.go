@@ -13,8 +13,7 @@ type Druid struct {
 	SelfBuffs
 	Talents proto.DruidTalents
 
-	NaturesGrace bool // when true next spellcast is 0.5s faster
-	RebirthUsed  bool
+	RebirthUsed bool
 
 	FaerieFire  *core.Spell
 	Hurricane   *core.Spell
@@ -28,6 +27,7 @@ type Druid struct {
 	MoonfireDot    *core.Dot
 
 	FaerieFireAura       *core.Aura
+	NaturesGraceProcAura *core.Aura
 	NaturesSwiftnessAura *core.Aura
 }
 

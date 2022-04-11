@@ -14,27 +14,7 @@ var HurricaneCooldownID = core.NewCooldownID()
 var HurricaneActionID = core.ActionID{SpellID: SpellIDHurricane, CooldownID: HurricaneCooldownID}
 
 func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    HurricaneActionID,
-				Character:   &druid.Character,
-				SpellSchool: core.SpellSchoolNature,
-				SpellExtras: core.SpellExtrasChanneled,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 1905,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 1905,
-				},
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Second * 60,
-				ChannelTime: time.Second * 10,
-			},
-		},
-	}
+	baseCost := 1905.0
 
 	hurricaneDot := core.NewDot(core.Dot{
 		Aura: druid.RegisterAura(&core.Aura{
@@ -54,7 +34,22 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 	})
 
 	druid.Hurricane = druid.RegisterSpell(core.SpellConfig{
-		Template:     template,
+		ActionID:    HurricaneActionID,
+		SpellSchool: core.SpellSchoolNature,
+		SpellExtras: core.SpellExtrasChanneled,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost:        baseCost,
+				GCD:         core.GCDDefault,
+				ChannelTime: time.Second * 10,
+			},
+			Cooldown: time.Second * 60,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDot(hurricaneDot),
 	})
 	hurricaneDot.Spell = druid.Hurricane

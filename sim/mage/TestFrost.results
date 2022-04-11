@@ -47,13 +47,13 @@ character_stats_results: {
 dps_results: {
  key: "TestFrost-AllItems-AbacusofViolentOdds-28288"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-AdamantineFigurine-27891"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -65,7 +65,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-AncientAqirArtifact-33830"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -77,13 +77,13 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-BadgeofTenacity-32658"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-BadgeoftheSwarmguard-21670"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -107,7 +107,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Battlemaster'sCruelty-34163"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -119,7 +119,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Battlemaster'sDetermination-33832"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -131,19 +131,19 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Berserker'sCall-33831"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-BlackenedNaaruSliver-34427"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-Bladefist'sBreadth-28041"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -167,7 +167,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-BloodlustBrooch-29383"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -185,7 +185,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-BroochoftheImmortalKing-32534"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -209,25 +209,25 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Coren'sLuckyCoin-38289"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-CoreofAr'kelos-29776"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-Dabiri'sEnigma-30300"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -245,7 +245,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-DarkmoonCard:Wrath-31857"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -263,19 +263,19 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-DragonspineTrophy-28830"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-EmberSkyfireDiamond"
  value: {
-  dps: 1598.102763444187
+  dps: 1598.1027634441864
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-EmptyMugofDirebrew-38287"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -311,25 +311,25 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Figurine-NightseyePanther-24128"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-GnomereganAuto-Blocker600-29387"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-HandofJustice-11815"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -347,13 +347,13 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-HourglassoftheUnraveller-28034"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-IconofUnyieldingCourage-28121"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -377,7 +377,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-KissoftheSpider-22954"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -395,7 +395,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-MadnessoftheBetrayer-32505"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -407,7 +407,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-MarkoftheChampion-23206"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -425,13 +425,13 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Moroes'LuckyPocketWatch-28528"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 1624.5384976119299
+  dps: 1624.53849761193
  }
 }
 dps_results: {
@@ -461,25 +461,25 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-ScarabofDisplacement-30629"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 1580.7101595768931
+  dps: 1580.7101595768936
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-Serpent-CoilBraid-30720"
  value: {
-  dps: 1584.5128543948408
+  dps: 1584.512854394841
  }
 }
 dps_results: {
@@ -491,19 +491,19 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-ShadowmoonInsignia-32501"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-ShardofContempt-34472"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
  key: "TestFrost-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
-  dps: 1602.8749341384193
+  dps: 1602.8749341384196
  }
 }
 dps_results: {
@@ -515,7 +515,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Slayer'sCrest-23041"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -527,7 +527,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 1541.1309571337085
+  dps: 1541.1309571337083
  }
 }
 dps_results: {
@@ -581,7 +581,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-TheSkullofGul'dan-32483"
  value: {
-  dps: 1642.468945989804
+  dps: 1642.4689459898038
  }
 }
 dps_results: {
@@ -611,7 +611,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-TsunamiTalisman-30627"
  value: {
-  dps: 1559.98973110492
+  dps: 1559.9897311049206
  }
 }
 dps_results: {
@@ -635,7 +635,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-Average-Default"
  value: {
-  dps: 1620.443252434984
+  dps: 1620.4432524349838
  }
 }
 dps_results: {

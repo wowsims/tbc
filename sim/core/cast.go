@@ -478,24 +478,26 @@ func (spell *Spell) wrapCastFuncCooldown(config CastConfig, onCastComplete CastF
 func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc) CastFunc {
 	configOnCastComplete := config.OnCastComplete
 	configAfterCast := config.AfterCast
+	oldOnCastComplete1 := onCastComplete
 	onCastComplete = func(sim *Simulation, target *Target) {
 		spell.Character.OnSpellCastComplete(sim, spell)
 		if configOnCastComplete != nil {
 			configOnCastComplete(sim, spell)
 		}
-		onCastComplete(sim, target)
+		oldOnCastComplete1(sim, target)
 		if configAfterCast != nil {
 			configAfterCast(sim, spell)
 		}
 	}
 
 	if spell.ResourceType == stats.Mana && spell.DefaultCast.Cost != 0 {
+		oldOnCastComplete2 := onCastComplete
 		onCastComplete = func(sim *Simulation, target *Target) {
 			if spell.CurCast.Cost > 0 {
 				spell.Character.SpendMana(sim, spell.CurCast.Cost, spell.ActionID)
 				spell.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
 			}
-			onCastComplete(sim, target)
+			oldOnCastComplete2(sim, target)
 		}
 	}
 
@@ -503,7 +505,7 @@ func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc)
 		return func(sim *Simulation, target *Target) {
 			if sim.Log != nil {
 				// Hunter fake cast has no ID.
-				if !spell.ActionID.SameAction(ActionID{}) {
+				if !spell.ActionID.IsEmptyAction() {
 					spell.Character.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
 						spell.ActionID, MaxFloat(0, spell.CurCast.Cost), spell.CurCast.CastTime)
 					spell.Character.Log(sim, "Completed cast %s", spell.ActionID)
@@ -512,6 +514,7 @@ func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc)
 			onCastComplete(sim, target)
 		}
 	} else {
+		oldOnCastComplete3 := onCastComplete
 		onCastComplete = func(sim *Simulation, target *Target) {
 			if sim.Log != nil {
 				// Hunter fake cast has no ID.
@@ -519,7 +522,7 @@ func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc)
 					spell.Character.Log(sim, "Completed cast %s", spell.ActionID)
 				}
 			}
-			onCastComplete(sim, target)
+			oldOnCastComplete3(sim, target)
 		}
 
 		return func(sim *Simulation, target *Target) {

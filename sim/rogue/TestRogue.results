@@ -239,7 +239,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 1417.0294590469794
+  dps: 1417.0294590469791
  }
 }
 dps_results: {
@@ -383,7 +383,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-HourglassoftheUnraveller-28034"
  value: {
-  dps: 1415.2441812147913
+  dps: 1415.2441812147915
  }
 }
 dps_results: {
@@ -521,13 +521,13 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 1422.5011690717129
+  dps: 1422.5011690717126
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-ScarabofDisplacement-30629"
  value: {
-  dps: 1366.8396222600284
+  dps: 1366.8396222600286
  }
 }
 dps_results: {
@@ -677,7 +677,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-TheTwinBladesofAzzinoth"
  value: {
-  dps: 1599.7038645053776
+  dps: 1599.7038645053774
  }
 }
 dps_results: {
@@ -749,7 +749,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Average-Default"
  value: {
-  dps: 1417.3018403829349
+  dps: 1417.3018403829353
  }
 }
 dps_results: {
@@ -809,7 +809,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1743.662471352637
+  dps: 1743.6624713526369
  }
 }
 dps_results: {

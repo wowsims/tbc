@@ -8,6 +8,7 @@ import (
 )
 
 func (druid *Druid) ApplyTalents() {
+	druid.setupNaturesGrace()
 	druid.registerNaturesSwiftnessCD()
 
 	druid.AddStat(stats.SpellHit, float64(druid.Talents.BalanceOfPower)*2*core.SpellHitRatingPerHitChance)
@@ -115,21 +116,54 @@ func (druid *Druid) ApplyTalents() {
 	}
 }
 
-func (druid *Druid) applyOnHitTalents(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-	if druid.Talents.NaturesGrace && spellEffect.Outcome.Matches(core.OutcomeCrit) {
-		druid.NaturesGrace = true
+func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
+	if druid.NaturesGraceProcAura != nil && druid.NaturesGraceProcAura.IsActive() {
+		spellCast.CastTime -= time.Millisecond * 500
+	}
+}
+func (druid *Druid) applyNewNaturesGrace(cast *core.NewCast) {
+	if druid.NaturesGraceProcAura != nil && druid.NaturesGraceProcAura.IsActive() {
+		cast.CastTime -= time.Millisecond * 500
 	}
 }
 
-func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
-	if druid.NaturesGrace {
-		spellCast.CastTime -= time.Millisecond * 500
-		// This applies on cast complete, removing the effect.
-		//  if it crits, during 'onspellhit' then it will be reapplied (see func above)
-		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-			druid.NaturesGrace = false
-		}
+func (druid *Druid) setupNaturesGrace() {
+	if !druid.Talents.NaturesGrace {
+		return
 	}
+
+	druid.NaturesGraceProcAura = druid.RegisterAura(&core.Aura{
+		Label:    "Natures Grace Proc",
+		ActionID: core.ActionID{SpellID: 16886},
+		Duration: core.NeverExpires,
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
+			if cast.ActionID.SpellID != SpellIDWrath && cast.ActionID.SpellID != SpellIDSF8 && cast.ActionID.SpellID != SpellIDSF6 {
+				return
+			}
+
+			aura.Deactivate(sim)
+		},
+		OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			if spell != druid.Wrath && spell != druid.Starfire8 && spell != druid.Starfire6 {
+				return
+			}
+
+			aura.Deactivate(sim)
+		},
+	})
+
+	druid.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
+		return druid.GetOrRegisterAura(&core.Aura{
+			Label: "Natures Grace",
+			//ActionID: core.ActionID{SpellID: 16880},
+			Duration: core.NeverExpires,
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+					druid.NaturesGraceProcAura.Activate(sim)
+				}
+			},
+		})
+	})
 }
 
 var NaturesSwiftnessCooldownID = core.NewCooldownID()
@@ -146,6 +180,16 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 		Duration: core.NeverExpires,
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
 			if cast.ActionID.SpellID != SpellIDWrath && cast.ActionID.SpellID != SpellIDSF8 && cast.ActionID.SpellID != SpellIDSF6 {
+				return
+			}
+
+			// Remove the buff and put skill on CD
+			aura.Deactivate(sim)
+			druid.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
+			druid.UpdateMajorCooldowns()
+		},
+		OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			if spell != druid.Wrath && spell != druid.Starfire8 && spell != druid.Starfire6 {
 				return
 			}
 
@@ -183,5 +227,10 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 func (druid *Druid) applyNaturesSwiftness(spellCast *core.SpellCast) {
 	if druid.NaturesSwiftnessAura != nil && druid.NaturesSwiftnessAura.IsActive() {
 		spellCast.CastTime = 0
+	}
+}
+func (druid *Druid) applyNewNaturesSwiftness(cast *core.NewCast) {
+	if druid.NaturesSwiftnessAura != nil && druid.NaturesSwiftnessAura.IsActive() {
+		cast.CastTime = 0
 	}
 }

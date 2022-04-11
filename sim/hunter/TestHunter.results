@@ -36,7 +36,7 @@ character_stats_results: {
   final_stats: 0
   final_stats: 0
   final_stats: 0
-  final_stats: 7128.000000000001
+  final_stats: 7128
   final_stats: 0
   final_stats: 0
   final_stats: 0
@@ -209,7 +209,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-ChaoticSkyfireDiamond"
  value: {
-  dps: 1612.6140525586013
+  dps: 1612.6140525586015
  }
 }
 dps_results: {
@@ -251,7 +251,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 1605.4336925924538
+  dps: 1605.433692592454
  }
 }
 dps_results: {
@@ -281,7 +281,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-DestructiveSkyfireDiamond"
  value: {
-  dps: 1612.6140525586013
+  dps: 1612.6140525586015
  }
 }
 dps_results: {
@@ -329,7 +329,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-EnigmaticSkyfireDiamond"
  value: {
-  dps: 1618.0601471118193
+  dps: 1618.0601471118196
  }
 }
 dps_results: {
@@ -359,7 +359,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-Figurine-LivingRubySerpent-24126"
  value: {
-  dps: 1583.2119406884617
+  dps: 1583.2119406884613
  }
 }
 dps_results: {
@@ -557,7 +557,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-RodoftheSunKing-29996"
  value: {
-  dps: 1627.6524091971173
+  dps: 1627.652409197117
  }
 }
 dps_results: {
@@ -701,7 +701,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-TheLightningCapacitor-28785"
  value: {
-  dps: 1578.2901815467733
+  dps: 1578.290181546773
  }
 }
 dps_results: {
@@ -845,7 +845,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-French-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1777.9070901026998
+  dps: 1777.9070901026996
  }
 }
 dps_results: {
@@ -1025,7 +1025,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 653.7768329345306
+  dps: 653.7768329345307
  }
 }
 dps_results: {
@@ -1127,19 +1127,19 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-MeleeWeave-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1412.506809781321
+  dps: 1412.5068097813212
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1827.397894173824
+  dps: 1827.3978941738242
  }
 }
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1662.5648107832044
+  dps: 1662.5648107832048
  }
 }
 dps_results: {
@@ -1175,6 +1175,6 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1292.0091980905713
+  dps: 1292.009198090571
  }
 }

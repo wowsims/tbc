@@ -101,7 +101,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Battlemaster'sAudacity-34049"
  value: {
-  dps: 1334.93976532908
+  dps: 1334.9397653290798
  }
 }
 dps_results: {
@@ -125,7 +125,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Battlemaster'sPerseverance-34050"
  value: {
-  dps: 1325.269139985767
+  dps: 1325.2691399857667
  }
 }
 dps_results: {
@@ -149,19 +149,19 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-BladeofUnquenchedThirst-31193"
  value: {
-  dps: 1356.936919460624
+  dps: 1356.9369194606238
  }
 }
 dps_results: {
  key: "TestArcane-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 1328.8436363313783
+  dps: 1328.843636331378
  }
 }
 dps_results: {
  key: "TestArcane-AllItems-Blinkstrike-31332"
  value: {
-  dps: 1356.936919460624
+  dps: 1356.9369194606238
  }
 }
 dps_results: {
@@ -179,7 +179,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-BraidedEterniumChain-24114"
  value: {
-  dps: 1328.8436363313783
+  dps: 1328.843636331378
  }
 }
 dps_results: {
@@ -197,13 +197,13 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-ChaoticSkyfireDiamond"
  value: {
-  dps: 1356.936919460624
+  dps: 1356.9369194606238
  }
 }
 dps_results: {
  key: "TestArcane-AllItems-CloakofDarkness-33122"
  value: {
-  dps: 1313.9184175033668
+  dps: 1313.9184175033663
  }
 }
 dps_results: {
@@ -233,7 +233,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-DarkIronSmokingPipe-38290"
  value: {
-  dps: 1356.936919460624
+  dps: 1356.9369194606238
  }
 }
 dps_results: {
@@ -251,7 +251,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Despair-28573"
  value: {
-  dps: 1189.2727056530189
+  dps: 1189.2727056530186
  }
 }
 dps_results: {
@@ -299,13 +299,13 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-EyeofMagtheridon-28789"
  value: {
-  dps: 1350.2532206140659
+  dps: 1350.2532206140656
  }
 }
 dps_results: {
  key: "TestArcane-AllItems-Figurine-LivingRubySerpent-24126"
  value: {
-  dps: 1345.6437071677833
+  dps: 1345.643707167783
  }
 }
 dps_results: {
@@ -335,13 +335,13 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Heartrazor-29962"
  value: {
-  dps: 1356.936919460624
+  dps: 1356.9369194606238
  }
 }
 dps_results: {
  key: "TestArcane-AllItems-HexShrunkenHead-33829"
  value: {
-  dps: 1371.394976421637
+  dps: 1371.3949764216368
  }
 }
 dps_results: {
@@ -359,7 +359,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-ImbuedUnstableDiamond"
  value: {
-  dps: 1332.028327500878
+  dps: 1332.0283275008778
  }
 }
 dps_results: {
@@ -371,7 +371,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-KhoriumChampion-23541"
  value: {
-  dps: 1189.2727056530189
+  dps: 1189.2727056530186
  }
 }
 dps_results: {
@@ -383,13 +383,13 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-LionheartChampion-28429"
  value: {
-  dps: 1189.2727056530189
+  dps: 1189.2727056530186
  }
 }
 dps_results: {
  key: "TestArcane-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 1189.2727056530189
+  dps: 1189.2727056530186
  }
 }
 dps_results: {
@@ -413,7 +413,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-MarkoftheChampion-23207"
  value: {
-  dps: 1362.747025454811
+  dps: 1362.7470254548107
  }
 }
 dps_results: {
@@ -455,7 +455,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-RobeoftheElderScribes-28602"
  value: {
-  dps: 1349.0049410594274
+  dps: 1349.0049410594272
  }
 }
 dps_results: {
@@ -485,7 +485,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-SextantofUnstableCurrents-30626"
  value: {
-  dps: 1355.4650768654385
+  dps: 1355.4650768654383
  }
 }
 dps_results: {
@@ -503,13 +503,13 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
-  dps: 1347.2756035248174
+  dps: 1347.275603524817
  }
 }
 dps_results: {
  key: "TestArcane-AllItems-ShiftingNaaruSliver-34429"
  value: {
-  dps: 1367.3678460144924
+  dps: 1367.367846014492
  }
 }
 dps_results: {
@@ -527,7 +527,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 1257.957253298524
+  dps: 1257.9572532985242
  }
 }
 dps_results: {
@@ -569,7 +569,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-TheNightBlade-31331"
  value: {
-  dps: 1356.936919460624
+  dps: 1356.9369194606238
  }
 }
 dps_results: {
@@ -605,7 +605,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-TirisfalRegalia"
  value: {
-  dps: 1488.9014946628774
+  dps: 1488.9014946628772
  }
 }
 dps_results: {
@@ -617,7 +617,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-WarpSlicer-30311"
  value: {
-  dps: 1356.936919460624
+  dps: 1356.9369194606238
  }
 }
 dps_results: {
@@ -629,13 +629,13 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Xi'ri'sGift-29179"
  value: {
-  dps: 1340.7162694990445
+  dps: 1340.716269499044
  }
 }
 dps_results: {
  key: "TestArcane-Average-Default"
  value: {
-  dps: 1350.2247808966827
+  dps: 1350.2247808966824
  }
 }
 dps_results: {
@@ -647,25 +647,25 @@ dps_results: {
 dps_results: {
  key: "TestArcane-Settings-Troll10-P1Arcane-ArcaneRotation-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1356.936919460624
+  dps: 1356.9369194606238
  }
 }
 dps_results: {
  key: "TestArcane-Settings-Troll10-P1Arcane-ArcaneRotation-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1356.936919460624
+  dps: 1356.9369194606238
  }
 }
 dps_results: {
  key: "TestArcane-Settings-Troll10-P1Arcane-ArcaneRotation-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1060.4424968642631
+  dps: 1060.442496864263
  }
 }
 dps_results: {
  key: "TestArcane-Settings-Troll10-P1Arcane-ArcaneRotation-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2267.303810826099
+  dps: 2267.303810826098
  }
 }
 dps_results: {
