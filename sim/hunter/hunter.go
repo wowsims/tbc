@@ -48,8 +48,7 @@ type Hunter struct {
 	latency     time.Duration
 	timeToWeave time.Duration
 
-	weaveStartTime   time.Duration
-	raptorStrikeCost float64 // Cached mana cost of raptor strike.
+	weaveStartTime time.Duration
 
 	nextAction   int
 	nextActionAt time.Duration

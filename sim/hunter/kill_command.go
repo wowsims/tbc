@@ -29,26 +29,22 @@ func (hunter *Hunter) applyKillCommand() {
 }
 
 func (hunter *Hunter) registerKillCommandSpell(sim *core.Simulation) {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:  KillCommandActionID,
-				Character: hunter.GetCharacter(),
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 75,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 75,
-				},
-				Cooldown: time.Second * 5,
-			},
-		},
-	}
+	baseCost := 75.0
 
 	hunter.KillCommand = hunter.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    KillCommandActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost,
+			},
+			Cooldown: time.Second * 5,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			OutcomeApplier:   core.OutcomeFuncAlwaysHit(),
@@ -67,19 +63,11 @@ func (hp *HunterPet) registerKillCommandSpell(sim *core.Simulation) {
 		beastLordProcAura = hp.hunterOwner.NewTemporaryStatsAura("Beast Lord Proc", core.ActionID{SpellID: 37483}, stats.Stats{stats.ArmorPenetration: 600}, time.Second*15)
 	}
 
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: 34027},
-				Character:   &hp.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
-
 	hp.KillCommand = hp.RegisterSpell(core.SpellConfig{
-		Template: ama,
+		ActionID:    core.ActionID{SpellID: 34027},
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			BonusCritRating:  float64(hp.hunterOwner.Talents.FocusedFire) * 10 * core.MeleeCritRatingPerCritChance,
