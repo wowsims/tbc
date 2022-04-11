@@ -115,11 +115,6 @@ func (we *WaterElemental) Reset(sim *core.Simulation) {
 }
 
 func (we *WaterElemental) OnGCDReady(sim *core.Simulation) {
-	// There's some edge case where this causes a panic, haven't figured it out yet.
-	if we.Waterbolt.Instance.IsInUse() {
-		we.Waterbolt.Instance.Cancel(sim)
-	}
-
 	spell := we.Waterbolt
 
 	if sim.RandomFloat("Water Elemental Disobey") < we.disobeyChance {
@@ -161,30 +156,26 @@ var waterElementalStatInheritance = func(ownerStats stats.Stats) stats.Stats {
 
 const SpellIDWaterbolt int32 = 31707
 
+var WaterboltActionID = core.ActionID{SpellID: SpellIDWaterbolt}
+
 func (we *WaterElemental) registerWaterboltSpell(sim *core.Simulation) {
-	baseManaCost := we.BaseMana() * 0.1
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDWaterbolt},
-				Character:   &we.Character,
-				SpellSchool: core.SpellSchoolFrost,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: baseManaCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: baseManaCost,
-				},
-				CastTime: time.Second * 3,
-				GCD:      core.GCDDefault,
-			},
-		},
-	}
+	baseCost := we.BaseMana() * 0.1
 
 	we.Waterbolt = we.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    WaterboltActionID,
+		SpellSchool: core.SpellSchoolFrost,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost:     baseCost,
+				GCD:      core.GCDDefault,
+				CastTime: time.Second * 3,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
