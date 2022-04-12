@@ -277,9 +277,11 @@ type Hardcast struct {
 	Target        *Target
 }
 
-func (hc Hardcast) OnExpire(sim *Simulation) {
+func (hc *Hardcast) OnExpire(sim *Simulation) {
 	if hc.NewOnComplete != nil {
-		hc.NewOnComplete(sim, hc.Target)
+		fn := hc.NewOnComplete
+		hc.NewOnComplete = nil
+		fn(sim, hc.Target)
 	} else {
 		hc.Cast.internalOnComplete(sim, hc.OnComplete)
 	}
@@ -347,7 +349,8 @@ func (spell *Spell) ApplyCostModifiers(cost float64) float64 {
 }
 
 func (spell *Spell) wrapCastFuncInit(config CastConfig, onCastComplete CastSuccessFunc) CastSuccessFunc {
-	if config.DefaultCast.GCD == 0 && config.DefaultCast.CastTime == 0 && config.DefaultCast.ChannelTime == 0 && config.DefaultCast.AfterCastDelay == 0 {
+	empty := NewCast{}
+	if config.DefaultCast == empty {
 		return onCastComplete
 	}
 
@@ -367,7 +370,13 @@ func (spell *Spell) wrapCastFuncInit(config CastConfig, onCastComplete CastSucce
 }
 
 func (spell *Spell) wrapCastFuncResources(config CastConfig, onCastComplete CastFunc) CastSuccessFunc {
-	if spell.ResourceType == 0 || spell.DefaultCast.Cost == 0 {
+	if spell.ResourceType == 0 || config.DefaultCast.Cost == 0 {
+		if spell.ResourceType != 0 {
+			panic("ResourceType set for spell " + spell.ActionID.String() + " but no cost")
+		}
+		if config.DefaultCast.Cost != 0 {
+			panic("Cost set for spell " + spell.ActionID.String() + " but no ResourceType")
+		}
 		return func(sim *Simulation, target *Target) bool {
 			onCastComplete(sim, target)
 			return true
@@ -490,7 +499,7 @@ func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc)
 		}
 	}
 
-	if spell.ResourceType == stats.Mana && spell.DefaultCast.Cost != 0 {
+	if spell.ResourceType == stats.Mana && config.DefaultCast.Cost != 0 {
 		oldOnCastComplete2 := onCastComplete
 		onCastComplete = func(sim *Simulation, target *Target) {
 			if spell.CurCast.Cost > 0 {

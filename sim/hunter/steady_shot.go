@@ -22,8 +22,9 @@ func (hunter *Hunter) registerSteadyShotSpell(sim *core.Simulation) {
 
 		Cast: core.CastConfig{
 			DefaultCast: core.NewCast{
-				Cost: baseCost * (1 - 0.02*float64(hunter.Talents.Efficiency)),
-				GCD:  core.GCDDefault + hunter.latency,
+				Cost:     baseCost * (1 - 0.02*float64(hunter.Talents.Efficiency)),
+				GCD:      core.GCDDefault + hunter.latency,
+				CastTime: 1, // Dummy value so core doesn't optimize the cast away
 			},
 			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
 				cast.CastTime = hunter.SteadyShotCastTime()
