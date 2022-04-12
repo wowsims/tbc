@@ -15,17 +15,6 @@ var SealOfBloodProcActionID = core.ActionID{SpellID: 31893}
 
 // Handles the cast, gcd, deducts the mana cost
 func (paladin *Paladin) setupSealOfBlood() {
-	// The proc behaviour
-	sobProcTemplate := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    SealOfBloodProcActionID,
-				Character:   &paladin.Character,
-				SpellSchool: core.SpellSchoolHoly,
-			},
-		},
-	}
-
 	effect := core.SpellEffect{
 		IsPhantom:        true,
 		DamageMultiplier: 1,
@@ -40,7 +29,8 @@ func (paladin *Paladin) setupSealOfBlood() {
 	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
 
 	sobProc := paladin.RegisterSpell(core.SpellConfig{
-		Template:     sobProcTemplate,
+		ActionID:     SealOfBloodProcActionID,
+		SpellSchool:  core.SpellSchoolHoly,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 
@@ -93,16 +83,6 @@ var SealOfCommandCastActionID = core.ActionID{SpellID: 20375}
 var SealOfCommandProcActionID = core.ActionID{SpellID: 20424}
 
 func (paladin *Paladin) SetupSealOfCommand() {
-	socProcTemplate := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    SealOfCommandProcActionID,
-				Character:   &paladin.Character,
-				SpellSchool: core.SpellSchoolHoly,
-			},
-		},
-	}
-
 	effect := core.SpellEffect{
 		ProcMask:         core.ProcMaskMeleeMHSpecial,
 		DamageMultiplier: 1,
@@ -120,7 +100,8 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	}
 
 	socProc := paladin.RegisterSpell(core.SpellConfig{
-		Template:     socProcTemplate,
+		ActionID:     SealOfCommandProcActionID,
+		SpellSchool:  core.SpellSchoolHoly,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 
