@@ -229,59 +229,41 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 		return
 	}
 
-	mhTemplate := SimpleSpell{
-		SpellCast: SpellCast{
-			Cast: Cast{
-				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
-				Character:   aa.character,
-				SpellSchool: SpellSchoolPhysical,
-				IgnoreHaste: true,
-				SpellExtras: SpellExtrasMeleeMetrics,
-			},
-		},
-	}
 	aa.MHAuto = aa.character.GetOrRegisterSpell(SpellConfig{
-		Template:     mhTemplate,
+		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
+		SpellSchool: SpellSchoolPhysical,
+		SpellExtras: SpellExtrasMeleeMetrics,
+
 		ApplyEffects: ApplyEffectFuncDirectDamage(aa.MHEffect),
 	})
 
-	ohTemplate := SimpleSpell{
-		SpellCast: SpellCast{
-			Cast: Cast{
-				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
-				Character:   aa.character,
-				SpellSchool: SpellSchoolPhysical,
-				IgnoreHaste: true,
-				SpellExtras: SpellExtrasMeleeMetrics,
-			},
-		},
-	}
 	aa.OHAuto = aa.character.GetOrRegisterSpell(SpellConfig{
-		Template:     ohTemplate,
+		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
+		SpellSchool: SpellSchoolPhysical,
+		SpellExtras: SpellExtrasMeleeMetrics,
+
 		ApplyEffects: ApplyEffectFuncDirectDamage(aa.OHEffect),
 	})
 
-	rangedTemplate := SimpleSpell{
-		SpellCast: SpellCast{
-			Cast: Cast{
-				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
-				Character:   aa.character,
-				SpellSchool: SpellSchoolPhysical,
-				IgnoreHaste: true, // Affected by ranged haste, not spell haste.
-				SpellExtras: SpellExtrasMeleeMetrics,
+	aa.RangedAuto = aa.character.GetOrRegisterSpell(SpellConfig{
+		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
+		SpellSchool: SpellSchoolPhysical,
+		SpellExtras: SpellExtrasMeleeMetrics,
 
-				AfterCast: func(sim *Simulation, cast *Cast) {
-					aa.RangedSwingInProgress = false
-					aa.agent.OnAutoAttack(sim, aa.RangedAuto)
-				},
+		Cast: CastConfig{
+			DefaultCast: NewCast{
+				CastTime: 1, // Dummy non-zero value so the optimization doesnt remove the cast time.
+			},
+			ModifyCast: func(_ *Simulation, _ *Spell, cast *NewCast) {
+				cast.CastTime = aa.RangedSwingWindup()
+			},
+			IgnoreHaste: true,
+			AfterCast: func(sim *Simulation, spell *Spell) {
+				aa.RangedSwingInProgress = false
+				aa.agent.OnAutoAttack(sim, aa.RangedAuto)
 			},
 		},
-	}
-	aa.RangedAuto = aa.character.GetOrRegisterSpell(SpellConfig{
-		Template: rangedTemplate,
-		ModifyCast: func(_ *Simulation, target *Target, instance *SimpleSpell) {
-			instance.CastTime = aa.RangedSwingWindup()
-		},
+
 		ApplyEffects: ApplyEffectFuncDirectDamage(aa.RangedEffect),
 	})
 
@@ -469,7 +451,7 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 
 	// It's important that we update the GCD timer AFTER starting the ranged auto.
 	// Otherwise the hardcast action won't be created separately.
-	nextGCD := sim.CurrentTime + aa.RangedAuto.Instance.CastTime
+	nextGCD := sim.CurrentTime + aa.RangedAuto.CurCast.CastTime
 	if nextGCD > aa.character.NextGCDAt() {
 		aa.character.SetGCDTimer(sim, nextGCD)
 	}

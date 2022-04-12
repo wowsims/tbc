@@ -12,26 +12,23 @@ var RaptorStrikeCooldownID = core.NewCooldownID()
 var RaptorStrikeActionID = core.ActionID{SpellID: 27014, CooldownID: RaptorStrikeCooldownID}
 
 func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 120}
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    RaptorStrikeActionID,
-				Character:   &hunter.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				Cost:        cost,
-				BaseCost:    cost,
-				Cooldown:    time.Second * 6,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
-	ama.Cost.Value -= 120 * 0.2 * float64(hunter.Talents.Resourcefulness)
-
-	hunter.raptorStrikeCost = ama.Cost.Value
+	baseCost := 120.0
 
 	hunter.RaptorStrike = hunter.RegisterSpell(core.SpellConfig{
-		Template: ama,
+		ActionID:    RaptorStrikeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost * (1 - 0.2*float64(hunter.Talents.Resourcefulness)),
+			},
+			Cooldown: time.Second * 6,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
 
@@ -47,7 +44,7 @@ func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
 
 // Returns true if the regular melee swing should be used, false otherwise.
 func (hunter *Hunter) TryRaptorStrike(sim *core.Simulation) *core.Spell {
-	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveAutosOnly || hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime) || hunter.CurrentMana() < hunter.raptorStrikeCost {
+	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveAutosOnly || hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime) || hunter.CurrentMana() < hunter.RaptorStrike.DefaultCast.Cost {
 		return nil
 	}
 

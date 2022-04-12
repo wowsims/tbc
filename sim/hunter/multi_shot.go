@@ -11,33 +11,7 @@ var MultiShotCooldownID = core.NewCooldownID()
 var MultiShotActionID = core.ActionID{SpellID: 27021, CooldownID: MultiShotCooldownID}
 
 func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:  MultiShotActionID,
-				Character: hunter.GetCharacter(),
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 275,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 275,
-				},
-				// Cast time is affected by ranged attack speed so set it later.
-				//CastTime:     time.Millisecond * 500,
-				GCD:         core.GCDDefault + hunter.latency,
-				Cooldown:    time.Second * 10,
-				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
-				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
-	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
-	if ItemSetDemonStalker.CharacterHasSetBonus(&hunter.Character, 4) {
-		ama.Cost.Value -= 275.0 * 0.1
-	}
+	baseCost := 275.0
 
 	baseEffect := core.SpellEffect{
 		ProcMask: core.ProcMaskRangedSpecial,
@@ -71,10 +45,29 @@ func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 	}
 
 	hunter.MultiShot = hunter.RegisterSpell(core.SpellConfig{
-		Template: ama,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.CastTime = hunter.MultiShotCastTime()
+		ActionID:    MultiShotActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost *
+					(1 - 0.02*float64(hunter.Talents.Efficiency)) *
+					core.TernaryFloat64(ItemSetDemonStalker.CharacterHasSetBonus(&hunter.Character, 4), 0.9, 1),
+
+				GCD:      core.GCDDefault + hunter.latency,
+				CastTime: 1, // Dummy value so core doesn't optimize the cast away
+			},
+			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+				cast.CastTime = hunter.MultiShotCastTime()
+			},
+			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+			Cooldown:    time.Second * 10,
 		},
+
 		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
 	})
 }

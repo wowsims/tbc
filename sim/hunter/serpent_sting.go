@@ -11,24 +11,23 @@ import (
 var SerpentStingActionID = core.ActionID{SpellID: 27016}
 
 func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 275}
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    SerpentStingActionID,
-				Character:   &hunter.Character,
-				SpellSchool: core.SpellSchoolNature,
-				GCD:         core.GCDDefault,
-				Cost:        cost,
-				BaseCost:    cost,
-				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
-			},
-		},
-	}
-	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+	baseCost := 275.0
 
 	hunter.SerpentSting = hunter.RegisterSpell(core.SpellConfig{
-		Template: ama,
+		ActionID:    SerpentStingActionID,
+		SpellSchool: core.SpellSchoolNature,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost * (1 - 0.02*float64(hunter.Talents.Efficiency)),
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			OutcomeApplier:   core.OutcomeFuncRangedHit(),

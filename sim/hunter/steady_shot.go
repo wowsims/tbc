@@ -10,35 +10,28 @@ import (
 var SteadyShotActionID = core.ActionID{SpellID: 34120}
 
 func (hunter *Hunter) registerSteadyShotSpell(sim *core.Simulation) {
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:  SteadyShotActionID,
-				Character: hunter.GetCharacter(),
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 110,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 110,
-				},
-				// Cast time is affected by ranged attack speed so set it later.
-				//CastTime:     time.Millisecond * 1500,
-				GCD:         core.GCDDefault + hunter.latency,
-				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
-				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
-	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+	baseCost := 110.0
 
 	hunter.SteadyShot = hunter.RegisterSpell(core.SpellConfig{
-		Template: ama,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.CastTime = hunter.SteadyShotCastTime()
+		ActionID:    SteadyShotActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost:     baseCost * (1 - 0.02*float64(hunter.Talents.Efficiency)),
+				GCD:      core.GCDDefault + hunter.latency,
+				CastTime: 1, // Dummy value so core doesn't optimize the cast away
+			},
+			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+				cast.CastTime = hunter.SteadyShotCastTime()
+			},
+			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
 		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskRangedSpecial,
 
