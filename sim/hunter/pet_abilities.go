@@ -77,38 +77,35 @@ var PetPrimaryCooldownID = core.NewCooldownID()
 var PetSecondaryCooldownID = core.NewCooldownID()
 
 func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
+	actionID := core.ActionID{SpellID: 27050}
 	cooldown := time.Second * 10
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: 27050},
-				Character:   &hp.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				Cooldown:    cooldown,
-				GCD:         core.GCDDefault,
-				IgnoreHaste: true,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
+	if isPrimary {
+		actionID.CooldownID = PetPrimaryCooldownID
+	} else {
+		actionID.CooldownID = PetSecondaryCooldownID
 	}
 
 	pa := PetAbility{
-		Type:     Bite,
-		Cost:     35,
-		Cooldown: cooldown,
+		ActionID:   actionID,
+		Type:       Bite,
+		Cost:       35,
+		Cooldown:   cooldown,
+		CooldownID: actionID.CooldownID,
 	}
-
-	if isPrimary {
-		ama.ActionID.CooldownID = PetPrimaryCooldownID
-		pa.CooldownID = PetPrimaryCooldownID
-	} else {
-		ama.ActionID.CooldownID = PetSecondaryCooldownID
-		pa.CooldownID = PetSecondaryCooldownID
-	}
-	pa.ActionID = ama.ActionID
 
 	spell := hp.RegisterSpell(core.SpellConfig{
-		Template: ama,
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				GCD: core.GCDDefault,
+			},
+			IgnoreHaste: true,
+			Cooldown:    cooldown,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier: 1,
@@ -125,27 +122,25 @@ func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 }
 
 func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: 27049},
-				Character:   &hp.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				IgnoreHaste: true,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
-
+	actionID := core.ActionID{SpellID: 27049}
 	pa := PetAbility{
-		Type: Claw,
-		Cost: 25,
+		ActionID: actionID,
+		Type:     Claw,
+		Cost:     25,
 	}
-	pa.ActionID = ama.ActionID
 
 	spell := hp.RegisterSpell(core.SpellConfig{
-		Template: ama,
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				GCD: core.GCDDefault,
+			},
+			IgnoreHaste: true,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier: 1,
@@ -162,27 +157,26 @@ func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
 }
 
 func (hp *HunterPet) newGore(sim *core.Simulation, isPrimary bool) PetAbility {
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: 35298},
-				Character:   &hp.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				IgnoreHaste: true,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
+	actionID := core.ActionID{SpellID: 35298}
 
 	pa := PetAbility{
-		Type: Gore,
-		Cost: 25,
+		ActionID: actionID,
+		Type:     Gore,
+		Cost:     25,
 	}
-	pa.ActionID = ama.ActionID
 
 	spell := hp.RegisterSpell(core.SpellConfig{
-		Template: ama,
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				GCD: core.GCDDefault,
+			},
+			IgnoreHaste: true,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier: 1,
@@ -207,25 +201,25 @@ func (hp *HunterPet) newGore(sim *core.Simulation, isPrimary bool) PetAbility {
 }
 
 func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) PetAbility {
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: 25011},
-				Character:   &hp.Character,
-				SpellSchool: core.SpellSchoolNature,
-				GCD:         core.GCDDefault,
-			},
-		},
-	}
+	actionID := core.ActionID{SpellID: 25011}
 
 	pa := PetAbility{
-		Type: LightningBreath,
-		Cost: 50,
+		ActionID: actionID,
+		Type:     LightningBreath,
+		Cost:     50,
 	}
-	pa.ActionID = ama.ActionID
 
 	spell := hp.RegisterSpell(core.SpellConfig{
-		Template: ama,
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolNature,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				GCD: core.GCDDefault,
+			},
+			IgnoreHaste: true,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
@@ -241,26 +235,26 @@ func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) Pe
 }
 
 func (hp *HunterPet) newScreech(sim *core.Simulation, isPrimary bool) PetAbility {
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: 27051},
-				Character:   &hp.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
+	actionID := core.ActionID{SpellID: 27051}
 
 	pa := PetAbility{
-		Type: Screech,
-		Cost: 20,
+		ActionID: actionID,
+		Type:     Screech,
+		Cost:     20,
 	}
-	pa.ActionID = ama.ActionID
 
 	spell := hp.RegisterSpell(core.SpellConfig{
-		Template: ama,
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				GCD: core.GCDDefault,
+			},
+			IgnoreHaste: true,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier: 1,

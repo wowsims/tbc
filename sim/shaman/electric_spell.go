@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 // Totem Item IDs
@@ -33,10 +34,11 @@ const (
 // Shared precomputation logic for LB and CL.
 func (shaman *Shaman) newElectricSpellConfig(actionID core.ActionID, baseCost float64, baseCastTime time.Duration, isLightningOverload bool) core.SpellConfig {
 	spell := core.SpellConfig{
-		ActionID:    actionID,
-		SpellSchool: core.SpellSchoolNature,
-		SpellExtras: SpellFlagElectric,
-		BaseCost:    baseCost,
+		ActionID:     actionID,
+		SpellSchool:  core.SpellSchoolNature,
+		SpellExtras:  SpellFlagElectric,
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.NewCast{
@@ -49,6 +51,7 @@ func (shaman *Shaman) newElectricSpellConfig(actionID core.ActionID, baseCost fl
 
 	if isLightningOverload {
 		spell.ActionID.Tag = CastTagLightningOverload
+		spell.ResourceType = 0
 		spell.Cast.DefaultCast.CastTime = 0
 		spell.Cast.DefaultCast.GCD = 0
 		spell.Cast.DefaultCast.Cost = 0
