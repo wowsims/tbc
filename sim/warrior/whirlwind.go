@@ -11,31 +11,9 @@ var WhirlwindCooldownID = core.NewCooldownID()
 var WhirlwindActionID = core.ActionID{SpellID: 1680, CooldownID: WhirlwindCooldownID}
 
 func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
-	warrior.whirlwindCost = 25.0 - float64(warrior.Talents.FocusedRage)
+	cost := 25.0 - float64(warrior.Talents.FocusedRage)
 	if ItemSetWarbringerBattlegear.CharacterHasSetBonus(&warrior.Character, 2) {
-		warrior.whirlwindCost -= 5
-	}
-
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    WhirlwindActionID,
-				Character:   &warrior.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Second*10 - time.Second*time.Duration(warrior.Talents.ImprovedWhirlwind),
-				IgnoreHaste: true,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.whirlwindCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.whirlwindCost,
-				},
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
+		cost -= 5
 	}
 
 	baseEffect := core.SpellEffect{
@@ -56,11 +34,26 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 	}
 
 	warrior.Whirlwind = warrior.RegisterSpell(core.SpellConfig{
-		Template:     ability,
+		ActionID:    WhirlwindActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Rage,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: cost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true,
+			Cooldown:    time.Second*10 - time.Second*time.Duration(warrior.Talents.ImprovedWhirlwind),
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
 	})
 }
 
 func (warrior *Warrior) CanWhirlwind(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= warrior.whirlwindCost && !warrior.IsOnCD(WhirlwindCooldownID, sim.CurrentTime)
+	return warrior.CurrentRage() >= warrior.Whirlwind.DefaultCast.Cost && !warrior.IsOnCD(WhirlwindCooldownID, sim.CurrentTime)
 }
