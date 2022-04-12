@@ -24,6 +24,7 @@ import { ShadowPriest } from "./priest";
 import { RetributionPaladin } from "./paladin";
 import { Mage } from "./mage";
 import { Hunter } from "./hunter";
+import { FeralDruid } from "./druid";
 import { BalanceDruid } from "./druid";
 import { IndividualBuffs } from "./common";
 import { Consumes } from "./common";
@@ -73,6 +74,12 @@ export interface Player {
          * @generated from protobuf field: proto.BalanceDruid balance_druid = 6;
          */
         balanceDruid: BalanceDruid;
+    } | {
+        oneofKind: "feralDruid";
+        /**
+         * @generated from protobuf field: proto.FeralDruid feral_druid = 22;
+         */
+        feralDruid: FeralDruid;
     } | {
         oneofKind: "hunter";
         /**

@@ -256,6 +256,90 @@ export interface BalanceDruid_Options {
      */
     battleRes: boolean;
 }
+/**
+ * @generated from protobuf message proto.FeralDruid
+ */
+export interface FeralDruid {
+    /**
+     * @generated from protobuf field: proto.FeralDruid.Rotation rotation = 1;
+     */
+    rotation?: FeralDruid_Rotation;
+    /**
+     * @generated from protobuf field: proto.DruidTalents talents = 2;
+     */
+    talents?: DruidTalents;
+    /**
+     * @generated from protobuf field: proto.FeralDruid.Options options = 3;
+     */
+    options?: FeralDruid_Options;
+}
+/**
+ * @generated from protobuf message proto.FeralDruid.Rotation
+ */
+export interface FeralDruid_Rotation {
+    /**
+     * @generated from protobuf field: proto.FeralDruid.Rotation.FinishingMove finishing_move = 1;
+     */
+    finishingMove: FeralDruid_Rotation_FinishingMove;
+    /**
+     * @generated from protobuf field: bool mangle_trick = 2;
+     */
+    mangleTrick: boolean;
+    /**
+     * @generated from protobuf field: bool biteweave = 3;
+     */
+    biteweave: boolean;
+    /**
+     * @generated from protobuf field: bool mangle_bot = 4;
+     */
+    mangleBot: boolean;
+    /**
+     * @generated from protobuf field: int32 rip_cp = 5;
+     */
+    ripCp: number;
+    /**
+     * @generated from protobuf field: int32 bite_cp = 6;
+     */
+    biteCp: number;
+    /**
+     * @generated from protobuf field: bool rake_trick = 7;
+     */
+    rakeTrick: boolean;
+    /**
+     * @generated from protobuf field: bool ripweave = 8;
+     */
+    ripweave: boolean;
+}
+/**
+ * @generated from protobuf enum proto.FeralDruid.Rotation.FinishingMove
+ */
+export declare enum FeralDruid_Rotation_FinishingMove {
+    /**
+     * @generated from protobuf enum value: Rip = 0;
+     */
+    Rip = 0,
+    /**
+     * @generated from protobuf enum value: Bite = 1;
+     */
+    Bite = 1,
+    /**
+     * @generated from protobuf enum value: None = 2;
+     */
+    None = 2
+}
+/**
+ * @generated from protobuf message proto.FeralDruid.Options
+ */
+export interface FeralDruid_Options {
+    /**
+     * @generated from protobuf field: proto.RaidTarget innervate_target = 1;
+     */
+    innervateTarget?: RaidTarget;
+    /**
+     * @generated from protobuf field: int32 latency_ms = 2;
+     */
+    latencyMs: number;
+}
 declare class DruidTalents$Type extends MessageType<DruidTalents> {
     constructor();
     create(value?: PartialMessage<DruidTalents>): DruidTalents;
@@ -296,4 +380,34 @@ declare class BalanceDruid_Options$Type extends MessageType<BalanceDruid_Options
  * @generated MessageType for protobuf message proto.BalanceDruid.Options
  */
 export declare const BalanceDruid_Options: BalanceDruid_Options$Type;
+declare class FeralDruid$Type extends MessageType<FeralDruid> {
+    constructor();
+    create(value?: PartialMessage<FeralDruid>): FeralDruid;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: FeralDruid): FeralDruid;
+    internalBinaryWrite(message: FeralDruid, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.FeralDruid
+ */
+export declare const FeralDruid: FeralDruid$Type;
+declare class FeralDruid_Rotation$Type extends MessageType<FeralDruid_Rotation> {
+    constructor();
+    create(value?: PartialMessage<FeralDruid_Rotation>): FeralDruid_Rotation;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: FeralDruid_Rotation): FeralDruid_Rotation;
+    internalBinaryWrite(message: FeralDruid_Rotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.FeralDruid.Rotation
+ */
+export declare const FeralDruid_Rotation: FeralDruid_Rotation$Type;
+declare class FeralDruid_Options$Type extends MessageType<FeralDruid_Options> {
+    constructor();
+    create(value?: PartialMessage<FeralDruid_Options>): FeralDruid_Options;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: FeralDruid_Options): FeralDruid_Options;
+    internalBinaryWrite(message: FeralDruid_Options, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.FeralDruid.Options
+ */
+export declare const FeralDruid_Options: FeralDruid_Options$Type;
 export {};

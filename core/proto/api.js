@@ -23,6 +23,7 @@ import { ShadowPriest } from './priest.js';
 import { RetributionPaladin } from './paladin.js';
 import { Mage } from './mage.js';
 import { Hunter } from './hunter.js';
+import { FeralDruid } from './druid.js';
 import { BalanceDruid } from './druid.js';
 import { IndividualBuffs } from './common.js';
 import { Consumes } from './common.js';
@@ -71,6 +72,7 @@ class Player$Type extends MessageType {
             { no: 5, name: "bonus_stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 15, name: "buffs", kind: "message", T: () => IndividualBuffs },
             { no: 6, name: "balance_druid", kind: "message", oneof: "spec", T: () => BalanceDruid },
+            { no: 22, name: "feral_druid", kind: "message", oneof: "spec", T: () => FeralDruid },
             { no: 7, name: "hunter", kind: "message", oneof: "spec", T: () => Hunter },
             { no: 8, name: "mage", kind: "message", oneof: "spec", T: () => Mage },
             { no: 9, name: "retribution_paladin", kind: "message", oneof: "spec", T: () => RetributionPaladin },
@@ -127,6 +129,12 @@ class Player$Type extends MessageType {
                     message.spec = {
                         oneofKind: "balanceDruid",
                         balanceDruid: BalanceDruid.internalBinaryRead(reader, reader.uint32(), options, message.spec.balanceDruid)
+                    };
+                    break;
+                case /* proto.FeralDruid feral_druid */ 22:
+                    message.spec = {
+                        oneofKind: "feralDruid",
+                        feralDruid: FeralDruid.internalBinaryRead(reader, reader.uint32(), options, message.spec.feralDruid)
                     };
                     break;
                 case /* proto.Hunter hunter */ 7:
@@ -241,6 +249,9 @@ class Player$Type extends MessageType {
         /* proto.BalanceDruid balance_druid = 6; */
         if (message.spec.oneofKind === "balanceDruid")
             BalanceDruid.internalBinaryWrite(message.spec.balanceDruid, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* proto.FeralDruid feral_druid = 22; */
+        if (message.spec.oneofKind === "feralDruid")
+            FeralDruid.internalBinaryWrite(message.spec.feralDruid, writer.tag(22, WireType.LengthDelimited).fork(), options).join();
         /* proto.Hunter hunter = 7; */
         if (message.spec.oneofKind === "hunter")
             Hunter.internalBinaryWrite(message.spec.hunter, writer.tag(7, WireType.LengthDelimited).fork(), options).join();

@@ -30,6 +30,24 @@ export var BalanceDruid_Rotation_PrimarySpell;
      */
     BalanceDruid_Rotation_PrimarySpell[BalanceDruid_Rotation_PrimarySpell["Adaptive"] = 4] = "Adaptive";
 })(BalanceDruid_Rotation_PrimarySpell || (BalanceDruid_Rotation_PrimarySpell = {}));
+/**
+ * @generated from protobuf enum proto.FeralDruid.Rotation.FinishingMove
+ */
+export var FeralDruid_Rotation_FinishingMove;
+(function (FeralDruid_Rotation_FinishingMove) {
+    /**
+     * @generated from protobuf enum value: Rip = 0;
+     */
+    FeralDruid_Rotation_FinishingMove[FeralDruid_Rotation_FinishingMove["Rip"] = 0] = "Rip";
+    /**
+     * @generated from protobuf enum value: Bite = 1;
+     */
+    FeralDruid_Rotation_FinishingMove[FeralDruid_Rotation_FinishingMove["Bite"] = 1] = "Bite";
+    /**
+     * @generated from protobuf enum value: None = 2;
+     */
+    FeralDruid_Rotation_FinishingMove[FeralDruid_Rotation_FinishingMove["None"] = 2] = "None";
+})(FeralDruid_Rotation_FinishingMove || (FeralDruid_Rotation_FinishingMove = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class DruidTalents$Type extends MessageType {
     constructor() {
@@ -540,3 +558,214 @@ class BalanceDruid_Options$Type extends MessageType {
  * @generated MessageType for protobuf message proto.BalanceDruid.Options
  */
 export const BalanceDruid_Options = new BalanceDruid_Options$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class FeralDruid$Type extends MessageType {
+    constructor() {
+        super("proto.FeralDruid", [
+            { no: 1, name: "rotation", kind: "message", T: () => FeralDruid_Rotation },
+            { no: 2, name: "talents", kind: "message", T: () => DruidTalents },
+            { no: 3, name: "options", kind: "message", T: () => FeralDruid_Options }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.FeralDruid.Rotation rotation */ 1:
+                    message.rotation = FeralDruid_Rotation.internalBinaryRead(reader, reader.uint32(), options, message.rotation);
+                    break;
+                case /* proto.DruidTalents talents */ 2:
+                    message.talents = DruidTalents.internalBinaryRead(reader, reader.uint32(), options, message.talents);
+                    break;
+                case /* proto.FeralDruid.Options options */ 3:
+                    message.options = FeralDruid_Options.internalBinaryRead(reader, reader.uint32(), options, message.options);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.FeralDruid.Rotation rotation = 1; */
+        if (message.rotation)
+            FeralDruid_Rotation.internalBinaryWrite(message.rotation, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.DruidTalents talents = 2; */
+        if (message.talents)
+            DruidTalents.internalBinaryWrite(message.talents, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.FeralDruid.Options options = 3; */
+        if (message.options)
+            FeralDruid_Options.internalBinaryWrite(message.options, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.FeralDruid
+ */
+export const FeralDruid = new FeralDruid$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class FeralDruid_Rotation$Type extends MessageType {
+    constructor() {
+        super("proto.FeralDruid.Rotation", [
+            { no: 1, name: "finishing_move", kind: "enum", T: () => ["proto.FeralDruid.Rotation.FinishingMove", FeralDruid_Rotation_FinishingMove] },
+            { no: 2, name: "mangle_trick", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "biteweave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "mangle_bot", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "rip_cp", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 6, name: "bite_cp", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 7, name: "rake_trick", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 8, name: "ripweave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { finishingMove: 0, mangleTrick: false, biteweave: false, mangleBot: false, ripCp: 0, biteCp: 0, rakeTrick: false, ripweave: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.FeralDruid.Rotation.FinishingMove finishing_move */ 1:
+                    message.finishingMove = reader.int32();
+                    break;
+                case /* bool mangle_trick */ 2:
+                    message.mangleTrick = reader.bool();
+                    break;
+                case /* bool biteweave */ 3:
+                    message.biteweave = reader.bool();
+                    break;
+                case /* bool mangle_bot */ 4:
+                    message.mangleBot = reader.bool();
+                    break;
+                case /* int32 rip_cp */ 5:
+                    message.ripCp = reader.int32();
+                    break;
+                case /* int32 bite_cp */ 6:
+                    message.biteCp = reader.int32();
+                    break;
+                case /* bool rake_trick */ 7:
+                    message.rakeTrick = reader.bool();
+                    break;
+                case /* bool ripweave */ 8:
+                    message.ripweave = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.FeralDruid.Rotation.FinishingMove finishing_move = 1; */
+        if (message.finishingMove !== 0)
+            writer.tag(1, WireType.Varint).int32(message.finishingMove);
+        /* bool mangle_trick = 2; */
+        if (message.mangleTrick !== false)
+            writer.tag(2, WireType.Varint).bool(message.mangleTrick);
+        /* bool biteweave = 3; */
+        if (message.biteweave !== false)
+            writer.tag(3, WireType.Varint).bool(message.biteweave);
+        /* bool mangle_bot = 4; */
+        if (message.mangleBot !== false)
+            writer.tag(4, WireType.Varint).bool(message.mangleBot);
+        /* int32 rip_cp = 5; */
+        if (message.ripCp !== 0)
+            writer.tag(5, WireType.Varint).int32(message.ripCp);
+        /* int32 bite_cp = 6; */
+        if (message.biteCp !== 0)
+            writer.tag(6, WireType.Varint).int32(message.biteCp);
+        /* bool rake_trick = 7; */
+        if (message.rakeTrick !== false)
+            writer.tag(7, WireType.Varint).bool(message.rakeTrick);
+        /* bool ripweave = 8; */
+        if (message.ripweave !== false)
+            writer.tag(8, WireType.Varint).bool(message.ripweave);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.FeralDruid.Rotation
+ */
+export const FeralDruid_Rotation = new FeralDruid_Rotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class FeralDruid_Options$Type extends MessageType {
+    constructor() {
+        super("proto.FeralDruid.Options", [
+            { no: 1, name: "innervate_target", kind: "message", T: () => RaidTarget },
+            { no: 2, name: "latency_ms", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
+        ]);
+    }
+    create(value) {
+        const message = { latencyMs: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.RaidTarget innervate_target */ 1:
+                    message.innervateTarget = RaidTarget.internalBinaryRead(reader, reader.uint32(), options, message.innervateTarget);
+                    break;
+                case /* int32 latency_ms */ 2:
+                    message.latencyMs = reader.int32();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.RaidTarget innervate_target = 1; */
+        if (message.innervateTarget)
+            RaidTarget.internalBinaryWrite(message.innervateTarget, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* int32 latency_ms = 2; */
+        if (message.latencyMs !== 0)
+            writer.tag(2, WireType.Varint).int32(message.latencyMs);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.FeralDruid.Options
+ */
+export const FeralDruid_Options = new FeralDruid_Options$Type();

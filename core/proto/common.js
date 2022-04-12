@@ -21,6 +21,10 @@ export var Spec;
      */
     Spec[Spec["SpecEnhancementShaman"] = 9] = "SpecEnhancementShaman";
     /**
+     * @generated from protobuf enum value: SpecFeralDruid = 12;
+     */
+    Spec[Spec["SpecFeralDruid"] = 12] = "SpecFeralDruid";
+    /**
      * @generated from protobuf enum value: SpecHunter = 8;
      */
     Spec[Spec["SpecHunter"] = 8] = "SpecHunter";
