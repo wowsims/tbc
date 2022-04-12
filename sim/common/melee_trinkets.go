@@ -81,17 +81,9 @@ func ApplyHandOfJustice(agent core.Agent) {
 		icdDur := time.Second * 2
 
 		handOfJusticeSpell := character.GetOrRegisterSpell(core.SpellConfig{
-			Template: core.SimpleSpell{
-				SpellCast: core.SpellCast{
-					Cast: core.Cast{
-						ActionID:    core.ActionID{ItemID: 11815},
-						Character:   character,
-						SpellSchool: core.SpellSchoolPhysical,
-						IgnoreHaste: true,
-						SpellExtras: core.SpellExtrasMeleeMetrics,
-					},
-				},
-			},
+			ActionID:     core.ActionID{ItemID: 11815},
+			SpellSchool:  core.SpellSchoolPhysical,
+			SpellExtras:  core.SpellExtrasMeleeMetrics,
 			ApplyEffects: core.ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
 		})
 
@@ -243,15 +235,8 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 	character := agent.GetCharacter()
 
 	procSpell := character.RegisterSpell(core.SpellConfig{
-		Template: core.SimpleSpell{
-			SpellCast: core.SpellCast{
-				Cast: core.Cast{
-					ActionID:    core.ActionID{ItemID: 28579},
-					Character:   character,
-					SpellSchool: core.SpellSchoolNature,
-				},
-			},
-		},
+		ActionID:    core.ActionID{ItemID: 28579},
+		SpellSchool: core.SpellSchoolNature,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			IsPhantom:        true,
 			DamageMultiplier: 1,

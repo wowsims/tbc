@@ -43,15 +43,8 @@ func ApplyStormGauntlets(agent core.Agent) {
 	character := agent.GetCharacter()
 
 	procSpell := character.RegisterSpell(core.SpellConfig{
-		Template: core.SimpleSpell{
-			SpellCast: core.SpellCast{
-				Cast: core.Cast{
-					ActionID:    core.ActionID{ItemID: 12632},
-					Character:   character,
-					SpellSchool: core.SpellSchoolNature,
-				},
-			},
-		},
+		ActionID:    core.ActionID{ItemID: 12632},
+		SpellSchool: core.SpellSchoolNature,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			IsPhantom:        true,
 			DamageMultiplier: 1,
@@ -81,15 +74,8 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 	character := agent.GetCharacter()
 
 	procSpell := character.RegisterSpell(core.SpellConfig{
-		Template: core.SimpleSpell{
-			SpellCast: core.SpellCast{
-				Cast: core.Cast{
-					ActionID:    core.ActionID{ItemID: 17111},
-					Character:   character,
-					SpellSchool: core.SpellSchoolFire,
-				},
-			},
-		},
+		ActionID:    core.ActionID{ItemID: 17111},
+		SpellSchool: core.SpellSchoolFire,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			IsPhantom:        true,
 			DamageMultiplier: 1,
@@ -321,16 +307,9 @@ func ApplyDespair(agent core.Agent) {
 	actionID := core.ActionID{SpellID: 34580}
 
 	procSpell := character.RegisterSpell(core.SpellConfig{
-		Template: core.SimpleSpell{
-			SpellCast: core.SpellCast{
-				Cast: core.Cast{
-					ActionID:    actionID,
-					Character:   character,
-					SpellSchool: core.SpellSchoolPhysical,
-					SpellExtras: core.SpellExtrasIgnoreResists,
-				},
-			},
-		},
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasIgnoreResists,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			// TODO: This should be removed once we have an attack mask.
 			//  This is only set here to correctly calculate damage.
@@ -370,16 +349,9 @@ func ApplyTheDecapitator(agent core.Agent) {
 	actionID := core.ActionID{ItemID: 28767}
 
 	spell := character.RegisterSpell(core.SpellConfig{
-		Template: core.SimpleSpell{
-			SpellCast: core.SpellCast{
-				Cast: core.Cast{
-					ActionID:    actionID,
-					Character:   character,
-					SpellSchool: core.SpellSchoolPhysical,
-					SpellExtras: core.SpellExtrasIgnoreResists,
-				},
-			},
-		},
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasIgnoreResists,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			IsPhantom:        true,
@@ -420,15 +392,8 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 	character := agent.GetCharacter()
 
 	procSpell := character.RegisterSpell(core.SpellConfig{
-		Template: core.SimpleSpell{
-			SpellCast: core.SpellCast{
-				Cast: core.Cast{
-					ActionID:    core.ActionID{SpellID: 34696},
-					Character:   character,
-					SpellSchool: core.SpellSchoolShadow,
-				},
-			},
-		},
+		ActionID:    core.ActionID{SpellID: 34696},
+		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			IsPhantom:        true,
 			DamageMultiplier: 1,
@@ -677,15 +642,8 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 	procMask := core.GetMeleeProcMaskForHands(mh, oh)
 
 	procSpell := character.RegisterSpell(core.SpellConfig{
-		Template: core.SimpleSpell{
-			SpellCast: core.SpellCast{
-				Cast: core.Cast{
-					ActionID:    core.ActionID{ItemID: 31193},
-					Character:   character,
-					SpellSchool: core.SpellSchoolShadow,
-				},
-			},
-		},
+		ActionID:    core.ActionID{ItemID: 31193},
+		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			IsPhantom:        true,
 			DamageMultiplier: 1,
@@ -755,17 +713,9 @@ func ApplyBlinkstrike(agent core.Agent) {
 		icdDur := time.Millisecond * 1
 
 		blinkstrikeSpell := character.GetOrRegisterSpell(core.SpellConfig{
-			Template: core.SimpleSpell{
-				SpellCast: core.SpellCast{
-					Cast: core.Cast{
-						ActionID:    core.ActionID{ItemID: 31332},
-						Character:   character,
-						SpellSchool: core.SpellSchoolPhysical,
-						IgnoreHaste: true,
-						SpellExtras: core.SpellExtrasMeleeMetrics,
-					},
-				},
-			},
+			ActionID:     core.ActionID{ItemID: 31332},
+			SpellSchool:  core.SpellSchoolPhysical,
+			SpellExtras:  core.SpellExtrasMeleeMetrics,
 			ApplyEffects: core.ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
 		})
 
@@ -837,15 +787,8 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 	}
 
 	procSpell := character.RegisterSpell(core.SpellConfig{
-		Template: core.SimpleSpell{
-			SpellCast: core.SpellCast{
-				Cast: core.Cast{
-					ActionID:    core.ActionID{SpellID: 40291},
-					Character:   character,
-					SpellSchool: core.SpellSchoolShadow,
-				},
-			},
-		},
+		ActionID:    core.ActionID{SpellID: 40291},
+		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			IsPhantom:        true,
 			DamageMultiplier: 1,

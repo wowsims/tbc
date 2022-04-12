@@ -14,17 +14,8 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 	character := agent.GetCharacter()
 
 	tlcSpell := character.RegisterSpell(core.SpellConfig{
-		Template: core.SimpleSpell{
-			SpellCast: core.SpellCast{
-				Cast: core.Cast{
-					ActionID: core.ActionID{
-						ItemID: core.ItemIDTheLightningCapacitor,
-					},
-					Character:   character,
-					SpellSchool: core.SpellSchoolNature,
-				},
-			},
-		},
+		ActionID:    core.ActionID{ItemID: core.ItemIDTheLightningCapacitor},
+		SpellSchool: core.SpellSchoolNature,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			IsPhantom:        true, // TODO: replace with ProcMask
 			DamageMultiplier: 1,
