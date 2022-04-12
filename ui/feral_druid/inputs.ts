@@ -15,18 +15,8 @@ import { ItemSlot } from '/tbc/core/proto/common.js';
 // Helper function for identifying whether 2pT6 is equipped, which impacts allowed rotation options
 function numThunderheartPieces(player: Player<Spec.SpecFeralDruid>): number {
 	const gear = player.getGear();
-	let numPieces = 0;
 	const itemIds = [31048, 31042, 31034, 31044, 31039];
-	getEnumValues(ItemSlot).map(slot => Number(slot)).forEach(slot => {
-		const equippedItem = gear.getEquippedItem(slot)
-		if (equippedItem == null) {
-			numPieces = numPieces;
-		}
-		else if (itemIds.includes(equippedItem!.item.id)) {
-			numPieces = numPieces + 1;
-		}
-	});
-	return numPieces
+	return gear.asArray().map(equippedItem => equippedItem?.item.id).filter(id => itemIds.includes(id!)).length
 }
 
 // Configuration for spec-specific UI elements on the settings tab.
