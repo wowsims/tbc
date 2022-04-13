@@ -14,7 +14,7 @@ var InnervateCooldownID = core.NewCooldownID()
 func (druid *Druid) registerInnervateCD() {
 	actionID := core.ActionID{SpellID: 29166, CooldownID: InnervateCooldownID, Tag: int32(druid.Index)}
 
-	baseManaCost := druid.BaseMana() * 0.04
+	baseCost := druid.BaseMana() * 0.04
 	innervateCD := core.InnervateCD
 	if ItemSetMalorne.CharacterHasSetBonus(druid.GetCharacter(), 4) {
 		innervateCD -= time.Second * 48
@@ -37,7 +37,7 @@ func (druid *Druid) registerInnervateCD() {
 				return false
 			}
 
-			if character.CurrentMana() < baseManaCost {
+			if character.CurrentMana() < baseCost {
 				return false
 			}
 
@@ -76,35 +76,32 @@ func (druid *Druid) registerInnervateCD() {
 				innervateTarget.ExpectedBonusMana += expectedManaPerInnervate * float64(remainingInnervateUsages)
 			}
 
-			castTemplate := core.SimpleCast{
-				Cast: core.Cast{
-					ActionID:  actionID,
-					Character: druid.GetCharacter(),
-					BaseCost: core.ResourceCost{
-						Type:  stats.Mana,
-						Value: baseManaCost,
-					},
-					Cost: core.ResourceCost{
-						Type:  stats.Mana,
-						Value: baseManaCost,
-					},
-					GCD:      core.GCDDefault,
-					Cooldown: innervateCD,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						// Update expected bonus mana
-						newRemainingUsages := int(sim.GetRemainingDuration() / innervateCD)
-						//expectedBonusManaReduction := expectedManaPerInnervate * float64(remainingInnervateUsages-newRemainingUsages)
-						remainingInnervateUsages = newRemainingUsages
+			innervateSpell := druid.GetOrRegisterSpell(core.SpellConfig{
+				ActionID: actionID,
 
-						innervateAura.Activate(sim)
+				ResourceType: stats.Mana,
+				BaseCost:     baseCost,
+
+				Cast: core.CastConfig{
+					DefaultCast: core.Cast{
+						Cost: baseCost,
+						GCD:  core.GCDDefault,
 					},
+					Cooldown: innervateCD,
 				},
-			}
+
+				ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+					// Update expected bonus mana
+					newRemainingUsages := int(sim.GetRemainingDuration() / innervateCD)
+					//expectedBonusManaReduction := expectedManaPerInnervate * float64(remainingInnervateUsages-newRemainingUsages)
+					remainingInnervateUsages = newRemainingUsages
+
+					innervateAura.Activate(sim)
+				},
+			})
 
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := castTemplate
-				cast.Init(sim)
-				cast.StartCast(sim)
+				innervateSpell.Cast(sim, nil)
 			}
 		},
 	})

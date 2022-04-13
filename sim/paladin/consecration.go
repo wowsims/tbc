@@ -39,7 +39,7 @@ func (paladin *Paladin) registerConsecrationSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost,
 				GCD:  core.GCDDefault,
 			},

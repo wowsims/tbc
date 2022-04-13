@@ -68,10 +68,7 @@ var ItemSetCycloneRegalia = core.ItemSet{
 				OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Unit.PseudoStats.CostReduction -= 270
 				},
-				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-					aura.Deactivate(sim)
-				},
-				OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 					aura.Deactivate(sim)
 				},
 			})
@@ -200,20 +197,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 
 		return character.GetOrRegisterAura(&core.Aura{
 			Label: "Fathom Brooch of the Tidewalker",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-				if icd.IsOnCD(sim) {
-					return
-				}
-				if cast.SpellSchool != core.SpellSchoolNature {
-					return
-				}
-				if sim.RandomFloat("Fathom-Brooch of the Tidewalker") > 0.15 {
-					return
-				}
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				character.AddMana(sim, 335, core.ActionID{ItemID: 30663}, false)
-			},
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if icd.IsOnCD(sim) {
 					return
 				}
@@ -241,17 +225,7 @@ func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 		procAura := shaman.NewTemporaryStatsAura("Ashtongue Talisman of Vision Proc", core.ActionID{ItemID: 32491}, stats.Stats{stats.AttackPower: 275}, time.Second*10)
 		return shaman.GetOrRegisterAura(&core.Aura{
 			Label: "Ashtongue Talisman of Vision",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-				// Cooldown != 0 makes sure this is the first 'fake' hit of SS.
-				if !cast.SameAction(StormstrikeActionID) || cast.Cooldown == 0 {
-					return
-				}
-				if sim.RandomFloat("Ashtongue Talisman of Vision") > 0.5 {
-					return
-				}
-				procAura.Activate(sim)
-			},
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				// Note that shaman.Stormstrike is the first 'fake' SS hit.
 				if spell != shaman.Stormstrike {
 					return
@@ -272,12 +246,7 @@ func ApplySkycallTotem(agent core.Agent) {
 		procAura := character.NewTemporaryStatsAura("Skycall Totem Proc", core.ActionID{ItemID: 33506}, stats.Stats{stats.SpellHaste: 101}, time.Second*10)
 		return character.GetOrRegisterAura(&core.Aura{
 			Label: "Skycall Totem",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-				if cast.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("Skycall Totem") < 0.15 {
-					procAura.Activate(sim)
-				}
-			},
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if spell.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("Skycall Totem") < 0.15 {
 					procAura.Activate(sim)
 				}

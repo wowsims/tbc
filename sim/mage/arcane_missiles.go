@@ -29,7 +29,7 @@ func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost * (1 + float64(mage.Talents.EmpoweredArcaneMissiles)*0.02),
 
 				GCD:         core.GCDDefault,

@@ -47,7 +47,7 @@ func (rogue *Rogue) registerHemorrhageSpell(sim *core.Simulation) {
 		BaseCost:     HemorrhageEnergyCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: HemorrhageEnergyCost,
 				GCD:  time.Second,
 			},

@@ -75,16 +75,7 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 		procAura := druid.NewTemporaryStatsAura("Living Root Proc", core.ActionID{ItemID: 30664}, stats.Stats{stats.SpellPower: 209}, time.Second*15)
 		return druid.GetOrRegisterAura(&core.Aura{
 			Label: "Living Root of the Wildheart",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-				// technically only works while in moonkin form... but i think we can assume thats always true.
-				if druid.Talents.MoonkinForm {
-					if sim.RandomFloat("Living Root of the Wildheart") > 0.03 {
-						return
-					}
-					procAura.Activate(sim)
-				}
-			},
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				// technically only works while in moonkin form... but i think we can assume thats always true.
 				if druid.Talents.MoonkinForm {
 					if sim.RandomFloat("Living Root of the Wildheart") > 0.03 {

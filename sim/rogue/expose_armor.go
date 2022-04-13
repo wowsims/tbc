@@ -24,7 +24,7 @@ func (rogue *Rogue) registerExposeArmorSpell(sim *core.Simulation) {
 		BaseCost:     ExposeArmorEnergyCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: ExposeArmorEnergyCost,
 				GCD:  time.Second,
 			},

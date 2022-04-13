@@ -10,24 +10,16 @@ import (
 
 var GnomishFlameTurretActionID = ActionID{ItemID: 23841}
 
-func (character *Character) newGnomishFlameTurretCaster() func(sim *Simulation) {
+func (character *Character) newGnomishFlameTurretSpell() *Spell {
 	gft := character.NewGnomishFlameTurret()
 
-	castTemplate := SimpleCast{
-		Cast: Cast{
-			ActionID:  GnomishFlameTurretActionID,
-			Character: character,
-			OnCastComplete: func(sim *Simulation, cast *Cast) {
-				gft.EnableWithTimeout(sim, gft, time.Second*45)
-			},
-		},
-	}
+	return character.RegisterSpell(SpellConfig{
+		ActionID: GnomishFlameTurretActionID,
 
-	return func(sim *Simulation) {
-		cast := castTemplate
-		cast.Init(sim)
-		cast.StartCast(sim)
-	}
+		ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+			gft.EnableWithTimeout(sim, gft, time.Second*45)
+		},
+	})
 }
 
 type GnomishFlameTurret struct {
@@ -79,7 +71,7 @@ func (gft *GnomishFlameTurret) registerFlameCannonSpell(sim *Simulation) {
 		SpellSchool: SpellSchoolFire,
 
 		Cast: CastConfig{
-			DefaultCast: NewCast{
+			DefaultCast: Cast{
 				// Pretty sure this works the same way as Searing Totem, where the next shot
 				// fires once the previous missile has hit the target. Just give some static
 				// value for now.

@@ -6,29 +6,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func applyAOECap(effects []SpellEffect, aoeCap float64) {
-	// Increased damage from crits doesn't count towards the cap, so need to
-	// tally pre-crit damage.
-	totalTowardsCap := 0.0
-	for i, _ := range effects {
-		effect := &effects[i]
-		totalTowardsCap += effect.Damage
-	}
-
-	if totalTowardsCap <= aoeCap {
-		return
-	}
-
-	maxDamagePerHit := aoeCap / float64(len(effects))
-	for i, _ := range effects {
-		effect := &effects[i]
-		damageTowardsCap := effect.Damage
-		if damageTowardsCap > maxDamagePerHit {
-			effect.Damage -= damageTowardsCap - maxDamagePerHit
-		}
-	}
-}
-
 type ApplySpellEffects func(*Simulation, *Target, *Spell)
 
 type SpellConfig struct {
@@ -83,7 +60,7 @@ type Spell struct {
 	BaseCost float64
 
 	// Default cast parameters with all static effects applied.
-	DefaultCast NewCast
+	DefaultCast Cast
 
 	// Performs a cast of this spell.
 	castFn CastSuccessFunc
@@ -93,48 +70,8 @@ type Spell struct {
 	ApplyEffects ApplySpellEffects
 
 	// The current or most recent cast data.
-	CurCast NewCast
+	CurCast Cast
 }
-
-// Metrics for the current iteration
-func (spell *Spell) CurDamagePerCast() float64 {
-	if spell.Casts == 0 {
-		return 0
-	} else {
-		return spell.TotalDamage / float64(spell.Casts)
-	}
-}
-
-func (spell *Spell) reset(_ *Simulation) {
-	spell.SpellMetrics = SpellMetrics{}
-}
-
-func (spell *Spell) doneIteration() {
-	spell.Character.Metrics.addSpell(spell)
-}
-
-func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
-	return spell.castFn(sim, target)
-}
-
-// Skips the actual cast and applies spell effects immediately.
-func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Target) {
-	if sim.Log != nil {
-		spell.Character.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
-			spell.ActionID, spell.DefaultCast.Cost, 0)
-		spell.Character.Log(sim, "Completed cast %s", spell.ActionID)
-	}
-	spell.applyEffects(sim, target)
-}
-
-func (spell *Spell) applyEffects(sim *Simulation, target *Target) {
-	spell.Casts++
-	spell.ApplyEffects(sim, target, spell)
-}
-
-// User-provided function for performing a cast of a spell. Should return whether
-// the spell was cast (e.g. not blocked by CDs or resources).
-//type SpellCast func(*Simulation, *Spell, *Target) bool
 
 // Registers a new spell to the character. Returns the newly created spell.
 func (character *Character) RegisterSpell(config SpellConfig) *Spell {
@@ -180,6 +117,42 @@ func (character *Character) GetOrRegisterSpell(config SpellConfig) *Spell {
 	} else {
 		return registered
 	}
+}
+
+// Metrics for the current iteration
+func (spell *Spell) CurDamagePerCast() float64 {
+	if spell.Casts == 0 {
+		return 0
+	} else {
+		return spell.TotalDamage / float64(spell.Casts)
+	}
+}
+
+func (spell *Spell) reset(_ *Simulation) {
+	spell.SpellMetrics = SpellMetrics{}
+}
+
+func (spell *Spell) doneIteration() {
+	spell.Character.Metrics.addSpell(spell)
+}
+
+func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
+	return spell.castFn(sim, target)
+}
+
+// Skips the actual cast and applies spell effects immediately.
+func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Target) {
+	if sim.Log != nil {
+		spell.Character.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
+			spell.ActionID, spell.DefaultCast.Cost, 0)
+		spell.Character.Log(sim, "Completed cast %s", spell.ActionID)
+	}
+	spell.applyEffects(sim, target)
+}
+
+func (spell *Spell) applyEffects(sim *Simulation, target *Target) {
+	spell.Casts++
+	spell.ApplyEffects(sim, target, spell)
 }
 
 func ApplyEffectFuncAll(effectFuncs []ApplySpellEffects) ApplySpellEffects {
@@ -275,5 +248,28 @@ func ApplyEffectFuncAOEDamage(sim *Simulation, baseEffect SpellEffect) ApplySpel
 func ApplyEffectFuncDot(dot *Dot) ApplySpellEffects {
 	return func(sim *Simulation, _ *Target, _ *Spell) {
 		dot.Apply(sim)
+	}
+}
+
+func applyAOECap(effects []SpellEffect, aoeCap float64) {
+	// Increased damage from crits doesn't count towards the cap, so need to
+	// tally pre-crit damage.
+	totalTowardsCap := 0.0
+	for i, _ := range effects {
+		effect := &effects[i]
+		totalTowardsCap += effect.Damage
+	}
+
+	if totalTowardsCap <= aoeCap {
+		return
+	}
+
+	maxDamagePerHit := aoeCap / float64(len(effects))
+	for i, _ := range effects {
+		effect := &effects[i]
+		damageTowardsCap := effect.Damage
+		if damageTowardsCap > maxDamagePerHit {
+			effect.Damage -= damageTowardsCap - maxDamagePerHit
+		}
 	}
 }

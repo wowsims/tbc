@@ -43,7 +43,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
 
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
+			paladin.sanctifiedJudgement(sim, paladin.SealOfBlood.DefaultCast.Cost)
 			paladin.SealOfBloodAura.Deactivate(sim)
 			if loaAura != nil {
 				loaAura.Activate(sim)
@@ -60,7 +60,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 		BaseCost:     JudgementManaCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
 			},
 			Cooldown: JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement)),
@@ -87,12 +87,12 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 		BaseCost:     JudgementManaCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
 			},
 			Cooldown: JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement)),
 			OnCastComplete: func(sim *core.Simulation, spell *core.Spell) {
-				paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.Cost.Value)
+				paladin.sanctifiedJudgement(sim, paladin.SealOfTheCrusader.DefaultCast.Cost)
 				paladin.SealOfTheCrusaderAura.Deactivate(sim)
 			},
 		},
@@ -128,12 +128,12 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 		BaseCost:     JudgementManaCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
 			},
 			Cooldown: JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement)),
 			OnCastComplete: func(sim *core.Simulation, spell *core.Spell) {
-				paladin.sanctifiedJudgement(sim, paladin.sealOfWisdom.Cost.Value)
+				paladin.sanctifiedJudgement(sim, paladin.SealOfWisdom.DefaultCast.Cost)
 				paladin.SealOfWisdomAura.Deactivate(sim)
 			},
 		},

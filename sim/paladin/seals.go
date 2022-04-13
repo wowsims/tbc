@@ -49,34 +49,24 @@ func (paladin *Paladin) setupSealOfBlood() {
 		},
 	})
 
-	manaCost := 210 * (1 - 0.03*float64(paladin.Talents.Benediction))
+	baseCost := 210.0
+	paladin.SealOfBlood = paladin.RegisterSpell(core.SpellConfig{
+		ActionID: SealOfBloodCastActionID,
 
-	sob := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  SealOfBloodCastActionID,
-			Character: paladin.GetCharacter(),
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: manaCost,
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+				GCD:  core.GCDDefault,
 			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: manaCost,
-			},
-			GCD: core.GCDDefault,
 		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			paladin.UpdateSeal(sim, paladin.SealOfBloodAura)
 		},
-	}
-
-	paladin.sealOfBlood = sob
-}
-
-func (paladin *Paladin) NewSealOfBlood(sim *core.Simulation) *core.SimpleCast {
-	sob := &paladin.sealOfBlood
-	sob.Init(sim)
-	return sob
+	})
 }
 
 var SealOfCommandCastActionID = core.ActionID{SpellID: 20375}
@@ -132,33 +122,24 @@ func (paladin *Paladin) SetupSealOfCommand() {
 		},
 	})
 
-	manaCost := 65 * (1 - 0.03*float64(paladin.Talents.Benediction))
-	soc := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  SealOfCommandCastActionID,
-			Character: paladin.GetCharacter(),
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: manaCost,
+	baseCost := 65.0
+	paladin.SealOfCommand = paladin.RegisterSpell(core.SpellConfig{
+		ActionID: SealOfCommandCastActionID,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+				GCD:  core.GCDDefault,
 			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: manaCost,
-			},
-			GCD: core.GCDDefault,
 		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			paladin.UpdateSeal(sim, paladin.SealOfCommandAura)
 		},
-	}
-
-	paladin.sealOfCommand = soc
-}
-
-func (paladin *Paladin) NewSealOfCommand(sim *core.Simulation) *core.SimpleCast {
-	soc := &paladin.sealOfCommand
-	soc.Init(sim)
-	return soc
+	})
 }
 
 var SealOfTheCrusaderActionID = core.ActionID{SpellID: 27158}
@@ -175,33 +156,24 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 		Duration: SealDuration,
 	})
 
-	manaCost := 210 * (1 - 0.03*float64(paladin.Talents.Benediction))
-	sotc := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  SealOfTheCrusaderActionID,
-			Character: paladin.GetCharacter(),
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: manaCost,
+	baseCost := 210.0
+	paladin.SealOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
+		ActionID: SealOfTheCrusaderActionID,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+				GCD:  core.GCDDefault,
 			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: manaCost,
-			},
-			GCD: core.GCDDefault,
 		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			paladin.UpdateSeal(sim, paladin.SealOfTheCrusaderAura)
 		},
-	}
-
-	paladin.sealOfTheCrusader = sotc
-}
-
-func (paladin *Paladin) NewSealOfTheCrusader(sim *core.Simulation) *core.SimpleCast {
-	sotc := &paladin.sealOfTheCrusader
-	sotc.Init(sim)
-	return sotc
+	})
 }
 
 // Didn't encode all the functionality of seal of wisdom
@@ -216,33 +188,24 @@ func (paladin *Paladin) setupSealOfWisdom() {
 		Duration: SealDuration,
 	})
 
-	manaCost := 270 * (1 - 0.03*float64(paladin.Talents.Benediction))
-	sow := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  SealOfWisdomActionID,
-			Character: paladin.GetCharacter(),
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: manaCost,
+	baseCost := 270.0
+	paladin.SealOfWisdom = paladin.RegisterSpell(core.SpellConfig{
+		ActionID: SealOfWisdomActionID,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+				GCD:  core.GCDDefault,
 			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: manaCost,
-			},
-			GCD: core.GCDDefault,
 		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			paladin.UpdateSeal(sim, paladin.SealOfWisdomAura)
 		},
-	}
-
-	paladin.sealOfWisdom = sow
-}
-
-func (paladin *Paladin) NewSealOfWisdom(sim *core.Simulation) *core.SimpleCast {
-	sow := &paladin.sealOfWisdom
-	sow.Init(sim)
-	return sow
+	})
 }
 
 func (paladin *Paladin) UpdateSeal(sim *core.Simulation, newSeal *core.Aura) {

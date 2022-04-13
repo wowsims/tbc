@@ -45,7 +45,7 @@ func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost *
 					(1 - 0.05*float64(mage.Talents.FrostChanneling)) *
 					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),

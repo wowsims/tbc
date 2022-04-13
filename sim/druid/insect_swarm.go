@@ -24,7 +24,7 @@ func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost,
 				GCD:  core.GCDDefault,
 			},

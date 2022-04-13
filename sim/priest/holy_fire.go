@@ -23,7 +23,7 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost:     baseCost,
 				GCD:      core.GCDDefault,
 				CastTime: time.Millisecond*3500 - time.Millisecond*100*time.Duration(priest.Talents.DivineFury),

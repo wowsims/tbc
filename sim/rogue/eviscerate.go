@@ -30,7 +30,7 @@ func (rogue *Rogue) registerEviscerateSpell(sim *core.Simulation) {
 		BaseCost:     rogue.eviscerateEnergyCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: rogue.eviscerateEnergyCost,
 				GCD:  time.Second,
 			},

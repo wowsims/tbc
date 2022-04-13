@@ -321,6 +321,10 @@ func (character *Character) CastSpeed() float64 {
 	return character.PseudoStats.CastSpeedMultiplier * (1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100)))
 }
 
+func (character *Character) ApplyCastSpeed(dur time.Duration) time.Duration {
+	return time.Duration(float64(dur) / character.CastSpeed())
+}
+
 func (character *Character) SwingSpeed() float64 {
 	return character.PseudoStats.MeleeSpeedMultiplier * (1 + (character.stats[stats.MeleeHaste] / (HasteRatingPerHastePercent * 100)))
 }
@@ -535,10 +539,7 @@ func (character *Character) doneIteration(sim *Simulation) {
 		}
 	}
 
-	if character.Hardcast.Cast != nil {
-		character.Hardcast.Cast.Cancel()
-		character.Hardcast = Hardcast{}
-	}
+	character.Hardcast = Hardcast{}
 	character.doneIterationGCD(sim.Duration)
 
 	character.Unit.doneIteration(sim)

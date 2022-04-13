@@ -263,28 +263,27 @@ func (hunter *Hunter) registerBestialWrathCD() {
 	manaCost := hunter.BaseMana() * 0.1
 	cooldown := time.Minute * 2
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: hunter.GetCharacter(),
-			Cooldown:  cooldown,
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: manaCost,
-			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: manaCost,
-			},
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				bestialWrathPetAura.Activate(sim)
+	bwSpell := hunter.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
 
-				if hunter.Talents.TheBeastWithin {
-					bestialWrathAura.Activate(sim)
-				}
+		ResourceType: stats.Mana,
+		BaseCost:     manaCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: manaCost,
 			},
+			Cooldown: cooldown,
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			bestialWrathPetAura.Activate(sim)
+
+			if hunter.Talents.TheBeastWithin {
+				bestialWrathAura.Activate(sim)
+			}
+		},
+	})
 
 	hunter.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -302,9 +301,7 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
+				bwSpell.Cast(sim, nil)
 			}
 		},
 	})
@@ -465,23 +462,24 @@ func (hunter *Hunter) registerReadinessCD() {
 	actionID := core.ActionID{SpellID: 23989, CooldownID: ReadinessCooldownID}
 	cooldown := time.Minute * 5
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: hunter.GetCharacter(),
-			Cooldown:  cooldown,
+	readinessSpell := hunter.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		Cast: core.CastConfig{
 			//GCD:         time.Second * 1, TODO: GCD causes panic
 			//IgnoreHaste: true, // Hunter GCD is locked
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				hunter.SetCD(RapidFireCooldownID, 0)
-				hunter.SetCD(MultiShotCooldownID, 0)
-				hunter.SetCD(ArcaneShotCooldownID, 0)
-				hunter.SetCD(AimedShotCooldownID, 0)
-				hunter.SetCD(KillCommandCooldownID, 0)
-				hunter.SetCD(RaptorStrikeCooldownID, 0)
-			},
+			Cooldown: cooldown,
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			hunter.SetCD(RapidFireCooldownID, 0)
+			hunter.SetCD(MultiShotCooldownID, 0)
+			hunter.SetCD(ArcaneShotCooldownID, 0)
+			hunter.SetCD(AimedShotCooldownID, 0)
+			hunter.SetCD(KillCommandCooldownID, 0)
+			hunter.SetCD(RaptorStrikeCooldownID, 0)
+		},
+	})
 
 	hunter.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -501,9 +499,7 @@ func (hunter *Hunter) registerReadinessCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
+				readinessSpell.Cast(sim, nil)
 			}
 		},
 	})

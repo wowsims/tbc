@@ -15,17 +15,16 @@ type Paladin struct {
 	CurrentJudgement *core.Aura
 	sealOfCommandICD core.InternalCD
 
-	sealOfBlood       core.SimpleCast
-	sealOfCommand     core.SimpleCast
-	sealOfTheCrusader core.SimpleCast
-	sealOfWisdom      core.SimpleCast
-
 	Consecration           *core.Spell
 	CrusaderStrike         *core.Spell
 	Exorcism               *core.Spell
 	JudgementOfBlood       *core.Spell
 	JudgementOfTheCrusader *core.Spell
 	JudgementOfWisdom      *core.Spell
+	SealOfBlood            *core.Spell
+	SealOfCommand          *core.Spell
+	SealOfTheCrusader      *core.Spell
+	SealOfWisdom           *core.Spell
 
 	ConsecrationDot *core.Dot
 

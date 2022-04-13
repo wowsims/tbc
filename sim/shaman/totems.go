@@ -8,74 +8,52 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (shaman *Shaman) newTotemCastTemplate(sim *core.Simulation, baseManaCost float64, spellID int32) core.SimpleCast {
-	manaCost := baseManaCost * (1 - float64(shaman.Talents.TotemicFocus)*0.05)
-	manaCost -= baseManaCost * float64(shaman.Talents.MentalQuickness) * 0.02
+func (shaman *Shaman) newTotemSpellConfig(baseCost float64, spellID int32) core.SpellConfig {
+	return core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: spellID},
+		SpellExtras: SpellFlagTotem,
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  core.ActionID{SpellID: spellID},
-			Character: shaman.GetCharacter(),
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: baseManaCost,
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost -
+					(baseCost * float64(shaman.Talents.TotemicFocus) * 0.05) -
+					(baseCost * float64(shaman.Talents.MentalQuickness) * 0.02),
+				GCD: time.Second,
 			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: manaCost,
-			},
-			GCD:         time.Second,
-			SpellExtras: SpellFlagTotem,
+			IgnoreHaste: true,
 		},
 	}
-
-	return template
 }
 
-func (shaman *Shaman) newWrathOfAirTotemTemplate(sim *core.Simulation) core.SimpleCast {
-	cast := shaman.newTotemCastTemplate(sim, 320.0, 3738)
-	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+func (shaman *Shaman) registerWrathOfAirTotemSpell(_ *core.Simulation) {
+	config := shaman.newTotemSpellConfig(320.0, 3738)
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistWindfury(sim)
 	}
-	return cast
+	shaman.WrathOfAirTotem = shaman.RegisterSpell(config)
 }
 
-func (shaman *Shaman) NewWrathOfAirTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.totemSpell = shaman.wrathOfAirTotemTemplate
-	shaman.totemSpell.Init(sim)
-	return &shaman.totemSpell
-}
-
-func (shaman *Shaman) newGraceOfAirTotemTemplate(sim *core.Simulation) core.SimpleCast {
-	cast := shaman.newTotemCastTemplate(sim, 310.0, 25359)
-	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+func (shaman *Shaman) registerGraceOfAirTotemSpell(_ *core.Simulation) {
+	config := shaman.newTotemSpellConfig(310.0, 25359)
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistWindfury(sim)
 	}
-	return cast
+	shaman.GraceOfAirTotem = shaman.RegisterSpell(config)
 }
 
-func (shaman *Shaman) NewGraceOfAirTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.totemSpell = shaman.graceOfAirTotemTemplate
-	shaman.totemSpell.Init(sim)
-	return &shaman.totemSpell
-}
-
-func (shaman *Shaman) newTranquilAirTotemTemplate(sim *core.Simulation) core.SimpleCast {
-	baseManaCost := shaman.BaseMana() * 0.06
-	cast := shaman.newTotemCastTemplate(sim, baseManaCost, 25908)
-	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+func (shaman *Shaman) registerTranquilAirTotemSpell(_ *core.Simulation) {
+	baseCost := shaman.BaseMana() * 0.06
+	config := shaman.newTotemSpellConfig(baseCost, 25908)
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistWindfury(sim)
 	}
-	return cast
-}
-
-func (shaman *Shaman) NewTranquilAirTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.totemSpell = shaman.tranquilAirTotemTemplate
-	shaman.totemSpell.Init(sim)
-	return &shaman.totemSpell
+	shaman.TranquilAirTotem = shaman.RegisterSpell(config)
 }
 
 var windfuryTotemBaseManaCosts = []float64{
@@ -86,27 +64,21 @@ var windfuryTotemBaseManaCosts = []float64{
 	325,
 }
 
-func (shaman *Shaman) newWindfuryTotemTemplate(sim *core.Simulation, rank int32) core.SimpleCast {
+func (shaman *Shaman) registerWindfuryTotemSpell(_ *core.Simulation, rank int32) {
 	if rank == 0 {
 		// This will happen if we're not casting windfury totem. Just return a rank 1
 		// template so we don't error.
 		rank = 1
 	}
 
-	baseManaCost := windfuryTotemBaseManaCosts[rank-1]
+	baseCost := windfuryTotemBaseManaCosts[rank-1]
 	spellID := core.WindfuryTotemSpellRanks[rank-1]
-	cast := shaman.newTotemCastTemplate(sim, baseManaCost, spellID)
-	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+	config := shaman.newTotemSpellConfig(baseCost, spellID)
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistWindfury(sim)
 	}
-	return cast
-}
-
-func (shaman *Shaman) NewWindfuryTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.totemSpell = shaman.windfuryTotemTemplate
-	shaman.totemSpell.Init(sim)
-	return &shaman.totemSpell
+	shaman.WindfuryTotem = shaman.RegisterSpell(config)
 }
 
 func (shaman *Shaman) tryTwistWindfury(sim *core.Simulation) {
@@ -148,62 +120,38 @@ func (shaman *Shaman) tryTwistFireNova(sim *core.Simulation) {
 	}
 }
 
-func (shaman *Shaman) newManaSpringTotemTemplate(sim *core.Simulation) core.SimpleCast {
-	cast := shaman.newTotemCastTemplate(sim, 120, 25570)
-	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+func (shaman *Shaman) registerManaSpringTotemSpell(_ *core.Simulation) {
+	config := shaman.newTotemSpellConfig(120, 25570)
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 		shaman.NextTotemDrops[WaterTotem] = sim.CurrentTime + time.Second*120
 	}
-	return cast
+	shaman.ManaSpringTotem = shaman.RegisterSpell(config)
 }
 
-func (shaman *Shaman) NewManaSpringTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.totemSpell = shaman.manaSpringTotemTemplate
-	shaman.totemSpell.Init(sim)
-	return &shaman.totemSpell
-}
-
-func (shaman *Shaman) newTotemOfWrathTemplate(sim *core.Simulation) core.SimpleCast {
-	baseManaCost := shaman.BaseMana() * 0.05
-	cast := shaman.newTotemCastTemplate(sim, baseManaCost, 30706)
-	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+func (shaman *Shaman) registerTotemOfWrathSpell(_ *core.Simulation) {
+	baseCost := shaman.BaseMana() * 0.05
+	config := shaman.newTotemSpellConfig(baseCost, 30706)
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistFireNova(sim)
 	}
-	return cast
+	shaman.TotemOfWrath = shaman.RegisterSpell(config)
 }
 
-func (shaman *Shaman) NewTotemOfWrath(sim *core.Simulation) *core.SimpleCast {
-	shaman.totemSpell = shaman.totemOfWrathTemplate
-	shaman.totemSpell.Init(sim)
-	return &shaman.totemSpell
-}
-
-func (shaman *Shaman) newStrengthOfEarthTotemTemplate(sim *core.Simulation) core.SimpleCast {
-	cast := shaman.newTotemCastTemplate(sim, 300, 25528)
-	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+func (shaman *Shaman) registerStrengthOfEarthTotemSpell(_ *core.Simulation) {
+	config := shaman.newTotemSpellConfig(300, 25528)
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 		shaman.NextTotemDrops[EarthTotem] = sim.CurrentTime + time.Second*120
 	}
-	return cast
+	shaman.StrengthOfEarthTotem = shaman.RegisterSpell(config)
 }
 
-func (shaman *Shaman) NewStrengthOfEarthTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.totemSpell = shaman.strengthOfEarthTotemTemplate
-	shaman.totemSpell.Init(sim)
-	return &shaman.totemSpell
-}
-
-func (shaman *Shaman) newTremorTotemTemplate(sim *core.Simulation) core.SimpleCast {
-	cast := shaman.newTotemCastTemplate(sim, 60, 8143)
-	cast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
+func (shaman *Shaman) registerTremorTotemSpell(_ *core.Simulation) {
+	config := shaman.newTotemSpellConfig(60, 8143)
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 		shaman.NextTotemDrops[EarthTotem] = sim.CurrentTime + time.Second*120
 	}
-	return cast
-}
-
-func (shaman *Shaman) NewTremorTotem(sim *core.Simulation) *core.SimpleCast {
-	shaman.totemSpell = shaman.tremorTotemTemplate
-	shaman.totemSpell.Init(sim)
-	return &shaman.totemSpell
+	shaman.TremorTotem = shaman.RegisterSpell(config)
 }
 
 func (shaman *Shaman) NextTotemAt(sim *core.Simulation) time.Duration {
@@ -221,11 +169,10 @@ func (shaman *Shaman) NextTotemAt(sim *core.Simulation) time.Duration {
 // TryDropTotems will check to see if totems need to be re-cast.
 //  Returns whether we tried to cast a totem, regardless of whether it succeeded.
 func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
-	var cast *core.SimpleCast
-	var attackCast *core.Spell // if using fire totems this will be an attack cast.
+	var spell *core.Spell
 
 	for totemTypeIdx, totemExpiration := range shaman.NextTotemDrops {
-		if cast != nil || attackCast != nil {
+		if spell != nil {
 			break
 		}
 		nextDrop := shaman.NextTotemDropType[totemTypeIdx]
@@ -234,49 +181,44 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 			case AirTotem:
 				switch proto.AirTotem(nextDrop) {
 				case proto.AirTotem_WrathOfAirTotem:
-					cast = shaman.NewWrathOfAirTotem(sim)
+					spell = shaman.WrathOfAirTotem
 				case proto.AirTotem_WindfuryTotem:
-					cast = shaman.NewWindfuryTotem(sim)
+					spell = shaman.WindfuryTotem
 				case proto.AirTotem_GraceOfAirTotem:
-					cast = shaman.NewGraceOfAirTotem(sim)
+					spell = shaman.GraceOfAirTotem
 				case proto.AirTotem_TranquilAirTotem:
-					cast = shaman.NewTranquilAirTotem(sim)
+					spell = shaman.TranquilAirTotem
 				}
 
 			case EarthTotem:
 				switch proto.EarthTotem(nextDrop) {
 				case proto.EarthTotem_StrengthOfEarthTotem:
-					cast = shaman.NewStrengthOfEarthTotem(sim)
+					spell = shaman.StrengthOfEarthTotem
 				case proto.EarthTotem_TremorTotem:
-					cast = shaman.NewTremorTotem(sim)
+					spell = shaman.TremorTotem
 				}
 
 			case FireTotem:
 				switch proto.FireTotem(nextDrop) {
 				case proto.FireTotem_TotemOfWrath:
-					cast = shaman.NewTotemOfWrath(sim)
+					spell = shaman.TotemOfWrath
 				case proto.FireTotem_SearingTotem:
-					attackCast = shaman.SearingTotem
+					spell = shaman.SearingTotem
 				case proto.FireTotem_MagmaTotem:
-					attackCast = shaman.MagmaTotem
+					spell = shaman.MagmaTotem
 				case proto.FireTotem_FireNovaTotem:
-					attackCast = shaman.FireNovaTotem
+					spell = shaman.FireNovaTotem
 				}
 
 			case WaterTotem:
-				cast = shaman.NewManaSpringTotem(sim)
+				spell = shaman.ManaSpringTotem
 			}
 		}
 	}
 
-	if cast != nil {
-		if success := cast.StartCast(sim); !success {
-			shaman.WaitForMana(sim, cast.Cost.Value)
-		}
-		return true
-	} else if attackCast != nil {
-		if success := attackCast.Cast(sim, sim.GetPrimaryTarget()); !success {
-			shaman.WaitForMana(sim, attackCast.CurCast.Cost)
+	if spell != nil {
+		if success := spell.Cast(sim, sim.GetPrimaryTarget()); !success {
+			shaman.WaitForMana(sim, spell.CurCast.Cost)
 		}
 		return true
 	}

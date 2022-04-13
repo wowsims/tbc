@@ -21,12 +21,12 @@ func (hunter *Hunter) registerSteadyShotSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost:     baseCost * (1 - 0.02*float64(hunter.Talents.Efficiency)),
 				GCD:      core.GCDDefault + hunter.latency,
 				CastTime: 1, // Dummy value so core doesn't optimize the cast away
 			},
-			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
 				cast.CastTime = hunter.SteadyShotCastTime()
 			},
 			IgnoreHaste: true, // Hunter GCD is locked at 1.5s

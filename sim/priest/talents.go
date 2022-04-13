@@ -121,7 +121,7 @@ func (priest *Priest) setupSurgeOfLight() {
 	})
 }
 
-func (priest *Priest) applySurgeOfLight(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+func (priest *Priest) applySurgeOfLight(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
 	if priest.SurgeOfLightProcAura != nil && priest.SurgeOfLightProcAura.IsActive() {
 		cast.CastTime = 0
 		cast.Cost = 0

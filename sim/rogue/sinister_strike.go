@@ -27,7 +27,7 @@ func (rogue *Rogue) registerSinisterStrikeSpell(_ *core.Simulation) {
 		BaseCost:     energyCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: energyCost,
 				GCD:  time.Second,
 			},

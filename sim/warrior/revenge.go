@@ -24,7 +24,7 @@ func (warrior *Warrior) registerRevengeSpell(_ *core.Simulation) {
 		BaseCost:     cost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: cost,
 				GCD:  core.GCDDefault,
 			},

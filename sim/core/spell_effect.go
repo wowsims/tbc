@@ -15,12 +15,6 @@ type OnSpellHit func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *Spe
 // or anything that comes from the final result of a tick.
 type OnPeriodicDamage func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, tickDamage float64)
 
-// A Spell is a type of cast that can hit/miss using spell stats, and has a spell school.
-type SpellCast struct {
-	// Embedded Cast
-	Cast
-}
-
 type SpellEffect struct {
 	// Target of the spell.
 	Target *Target

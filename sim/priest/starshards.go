@@ -18,7 +18,7 @@ func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
 		SpellSchool: core.SpellSchoolArcane,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				GCD: core.GCDDefault,
 			},
 			Cooldown: time.Second * 30,

@@ -86,7 +86,7 @@ var ItemSetDeathmantle = core.ItemSet{
 	},
 }
 
-func (rogue *Rogue) applyDeathmantle(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+func (rogue *Rogue) applyDeathmantle(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
 	//instance.ActionID.Tag = rogue.ComboPoints()
 	if rogue.deathmantle4pcProc {
 		cast.Cost = 0
@@ -156,22 +156,7 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 
 		return rogue.GetOrRegisterAura(&core.Aura{
 			Label: "Ashtongue Talisman",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-				if !cast.SpellExtras.Matches(SpellFlagFinisher) {
-					return
-				}
-
-				// Need to store the points because they get spent before OnSpellHit is called.
-				numPoints = rogue.ComboPoints()
-
-				if cast.SameActionIgnoreTag(SliceAndDiceActionID) {
-					// SND won't call OnSpellHit so we have to add the effect now.
-					if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
-						procAura.Activate(sim)
-					}
-				}
-			},
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if !spell.SpellExtras.Matches(SpellFlagFinisher) {
 					return
 				}

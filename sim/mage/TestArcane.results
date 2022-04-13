@@ -269,7 +269,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-EmberSkyfireDiamond"
  value: {
-  dps: 1343.4838517286614
+  dps: 1345.9180699105948
  }
 }
 dps_results: {
@@ -365,7 +365,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 1362.21433215266
+  dps: 1360.552359416205
  }
 }
 dps_results: {
@@ -401,7 +401,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-Mana-EtchedRegalia"
  value: {
-  dps: 1138.9144040987171
+  dps: 1138.875675326217
  }
 }
 dps_results: {
@@ -431,7 +431,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 1333.0807984802739
+  dps: 1336.7483571902837
  }
 }
 dps_results: {
@@ -455,7 +455,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-RobeoftheElderScribes-28602"
  value: {
-  dps: 1349.0049410594272
+  dps: 1340.5339807247517
  }
 }
 dps_results: {
@@ -527,7 +527,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 1257.9572532985242
+  dps: 1257.868578667274
  }
 }
 dps_results: {
@@ -551,7 +551,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-TempestRegalia"
  value: {
-  dps: 1478.944353252085
+  dps: 1481.5487470863445
  }
 }
 dps_results: {
@@ -635,7 +635,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-Average-Default"
  value: {
-  dps: 1350.2247808966824
+  dps: 1349.888000911983
  }
 }
 dps_results: {
@@ -665,19 +665,19 @@ dps_results: {
 dps_results: {
  key: "TestArcane-Settings-Troll10-P1Arcane-ArcaneRotation-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2267.303810826098
+  dps: 2268.399570782784
  }
 }
 dps_results: {
  key: "TestArcane-Settings-Troll10-P1Arcane-ArcaneRotation-NoBuffs-LongMultiTarget"
  value: {
-  dps: 634.8086413206697
+  dps: 635.2214827200612
  }
 }
 dps_results: {
  key: "TestArcane-Settings-Troll10-P1Arcane-ArcaneRotation-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 634.8086413206697
+  dps: 635.2214827200612
  }
 }
 dps_results: {

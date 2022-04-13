@@ -155,16 +155,17 @@ func (rogue *Rogue) registerColdBloodCD() {
 
 	cooldown := time.Minute * 3
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: rogue.GetCharacter(),
-			Cooldown:  cooldown,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				coldBloodAura.Activate(sim)
-			},
+	coldBloodSpell := rogue.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		Cast: core.CastConfig{
+			Cooldown: cooldown,
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			coldBloodAura.Activate(sim)
+		},
+	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -179,9 +180,7 @@ func (rogue *Rogue) registerColdBloodCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
+				coldBloodSpell.Cast(sim, nil)
 			}
 		},
 	})
@@ -342,22 +341,25 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 		},
 	})
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:    actionID,
-			Character:   rogue.GetCharacter(),
-			Cooldown:    cooldown,
-			GCD:         time.Second,
+	bladeFlurrySpell := rogue.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		ResourceType: stats.Energy,
+		BaseCost:     energyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: energyCost,
+				GCD:  time.Second,
+			},
 			IgnoreHaste: true,
-			Cost: core.ResourceCost{
-				Type:  stats.Energy,
-				Value: energyCost,
-			},
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				rogue.BladeFlurryAura.Activate(sim)
-			},
+			Cooldown:    cooldown,
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			rogue.BladeFlurryAura.Activate(sim)
+		},
+	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -390,9 +392,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
+				bladeFlurrySpell.Cast(sim, nil)
 			}
 		},
 	})
@@ -423,18 +423,21 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 
 	cooldown := time.Minute * 5
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:    actionID,
-			Character:   rogue.GetCharacter(),
-			Cooldown:    cooldown,
-			GCD:         time.Second,
-			IgnoreHaste: true,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				rogue.AdrenalineRushAura.Activate(sim)
+	adrenalineRushSpell := rogue.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				GCD: time.Second,
 			},
+			IgnoreHaste: true,
+			Cooldown:    cooldown,
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			rogue.AdrenalineRushAura.Activate(sim)
+		},
+	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -459,9 +462,7 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
+				adrenalineRushSpell.Cast(sim, nil)
 			}
 		},
 	})

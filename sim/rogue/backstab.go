@@ -23,7 +23,7 @@ func (rogue *Rogue) registerBackstabSpell(_ *core.Simulation) {
 		BaseCost:     BackstabEnergyCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: BackstabEnergyCost,
 				GCD:  time.Second,
 			},

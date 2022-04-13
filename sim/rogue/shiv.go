@@ -25,7 +25,7 @@ func (rogue *Rogue) registerShivSpell(_ *core.Simulation) {
 		BaseCost:     rogue.shivEnergyCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: rogue.shivEnergyCost,
 				GCD:  time.Second,
 			},

@@ -99,7 +99,7 @@ func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				GCD: core.GCDDefault,
 			},
 			IgnoreHaste: true,
@@ -135,7 +135,7 @@ func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				GCD: core.GCDDefault,
 			},
 			IgnoreHaste: true,
@@ -171,7 +171,7 @@ func (hp *HunterPet) newGore(sim *core.Simulation, isPrimary bool) PetAbility {
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				GCD: core.GCDDefault,
 			},
 			IgnoreHaste: true,
@@ -214,7 +214,7 @@ func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) Pe
 		SpellSchool: core.SpellSchoolNature,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				GCD: core.GCDDefault,
 			},
 			IgnoreHaste: true,
@@ -249,7 +249,7 @@ func (hp *HunterPet) newScreech(sim *core.Simulation, isPrimary bool) PetAbility
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				GCD: core.GCDDefault,
 			},
 			IgnoreHaste: true,

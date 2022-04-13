@@ -66,7 +66,7 @@ func (rogue *Rogue) doPlanSliceASAP(sim *core.Simulation) {
 			if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
 				return
 			}
-			rogue.castSliceAndDice()
+			rogue.SliceAndDice.Cast(sim, nil)
 			if rogue.disabledMCDs != nil {
 				rogue.EnableAllCooldowns(rogue.disabledMCDs)
 				rogue.disabledMCDs = nil
@@ -100,7 +100,7 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 			if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
 				return
 			}
-			rogue.castSliceAndDice()
+			rogue.SliceAndDice.Cast(sim, nil)
 			rogue.plan = PlanNone
 		}
 		return
@@ -108,7 +108,7 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 
 	if sndTimeRemaining <= time.Second && comboPoints > 0 {
 		if energy >= SliceAndDiceEnergyCost || rogue.deathmantle4pcProc {
-			rogue.castSliceAndDice()
+			rogue.SliceAndDice.Cast(sim, nil)
 			rogue.plan = PlanNone
 		}
 		return
@@ -127,7 +127,7 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 				if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
 					return
 				}
-				rogue.castSliceAndDice()
+				rogue.SliceAndDice.Cast(sim, nil)
 				rogue.plan = PlanExposeArmor
 				return
 			}
@@ -137,7 +137,7 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 					if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
 						return
 					}
-					rogue.castSliceAndDice()
+					rogue.SliceAndDice.Cast(sim, nil)
 					rogue.plan = PlanFillBeforeEA
 					return
 				}
@@ -151,7 +151,7 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 				if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
 					return
 				}
-				rogue.castSliceAndDice()
+				rogue.SliceAndDice.Cast(sim, nil)
 				rogue.plan = PlanFillBeforeSND
 				return
 			}
