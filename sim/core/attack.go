@@ -114,17 +114,6 @@ func (ahe *SpellEffect) IsMelee() bool {
 	return ahe.ProcMask.Matches(ProcMaskMelee)
 }
 
-// It appears that TBC does not do hasted GCD for abilities.
-//  Leaving this option here in case we want it in the future.
-const EnableAbilityHaste = false
-
-func (ability *SimpleSpell) CalculatedGCD(char *Character) time.Duration {
-	if !EnableAbilityHaste {
-		return ability.GCD
-	}
-	return MaxDuration(GCDMin, time.Duration(float64(ability.GCD)/char.SwingSpeed()))
-}
-
 type AutoAttacks struct {
 	// initialized
 	agent     Agent
