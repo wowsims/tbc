@@ -498,7 +498,7 @@ func BloodlustAura(character *Character, actionTag int32) *Aura {
 		ActionID: actionID,
 		Duration: BloodlustDuration,
 		OnGain: func(aura *Aura, sim *Simulation) {
-			if len(character.GetAurasWithTag(PowerInfusionAuraTag)) > 0 {
+			if character.HasActiveAuraWithTag(PowerInfusionAuraTag) {
 				character.PseudoStats.CastSpeedMultiplier /= 1.2
 			}
 			character.PseudoStats.CastSpeedMultiplier *= bonus
@@ -514,7 +514,7 @@ func BloodlustAura(character *Character, actionTag int32) *Aura {
 			}
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			if len(character.GetAurasWithTag(PowerInfusionAuraTag)) > 0 {
+			if character.HasActiveAuraWithTag(PowerInfusionAuraTag) {
 				character.PseudoStats.CastSpeedMultiplier *= 1.2
 			}
 			character.PseudoStats.CastSpeedMultiplier *= inverseBonus
@@ -555,8 +555,6 @@ func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
 }
 
 func PowerInfusionAura(character *Character, actionTag int32) *Aura {
-	const bonus = 1.2
-	const inverseBonus = 1 / bonus
 	actionID := ActionID{SpellID: 10060, Tag: actionTag}
 
 	return character.GetOrRegisterAura(&Aura{
@@ -569,16 +567,16 @@ func PowerInfusionAura(character *Character, actionTag int32) *Aura {
 				// TODO: Double-check this is how the calculation works.
 				character.PseudoStats.CostMultiplier *= 0.8
 			}
-			if len(character.GetAurasWithTag(BloodlustAuraTag)) == 0 {
-				character.PseudoStats.CastSpeedMultiplier *= bonus
+			if !character.HasActiveAuraWithTag(BloodlustAuraTag) {
+				character.PseudoStats.CastSpeedMultiplier *= 1.2
 			}
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
 			if character.HasManaBar() {
 				character.PseudoStats.CostMultiplier /= 0.8
 			}
-			if len(character.GetAurasWithTag(BloodlustAuraTag)) == 0 {
-				character.PseudoStats.CastSpeedMultiplier *= inverseBonus
+			if !character.HasActiveAuraWithTag(BloodlustAuraTag) {
+				character.PseudoStats.CastSpeedMultiplier /= 1.2
 			}
 		},
 	})
