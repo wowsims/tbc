@@ -94,7 +94,7 @@ type Hunter struct {
 	ScorpidStingAura     *core.Aura
 	TalonOfAlarAura      *core.Aura
 
-	fakeHardcast core.Cast
+	hardcastOnComplete core.CastFunc
 }
 
 func (hunter *Hunter) GetCharacter() *core.Character {
@@ -131,13 +131,8 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.registerSerpentStingSpell(sim)
 	hunter.registerSteadyShotSpell(sim)
 
-	hunter.fakeHardcast = core.Cast{
-		Character:   &hunter.Character,
-		IgnoreHaste: true,
-		CastTime:    hunter.timeToWeave,
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			hunter.rotation(sim, false)
-		},
+	hunter.hardcastOnComplete = func(sim *core.Simulation, _ *core.Target) {
+		hunter.rotation(sim, false)
 	}
 }
 

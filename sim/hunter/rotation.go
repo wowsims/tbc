@@ -79,12 +79,12 @@ func (hunter *Hunter) rotation(sim *core.Simulation, followsRangedAuto bool) {
 			if hunter.Hardcast.Expires <= sim.CurrentTime {
 				hunter.nextAction = OptionShoot
 				hunter.nextActionAt = hunter.AutoAttacks.RangedSwingAt
-				hunter.HardcastWaitUntil(sim, hunter.nextActionAt, &hunter.fakeHardcast)
+				hunter.HardcastWaitUntil(sim, hunter.nextActionAt, hunter.hardcastOnComplete)
 			}
 		}
 	} else if hunter.nextActionAt != hunter.NextGCDAt() {
 		if hunter.Hardcast.Expires <= sim.CurrentTime {
-			hunter.HardcastWaitUntil(sim, hunter.nextActionAt, &hunter.fakeHardcast)
+			hunter.HardcastWaitUntil(sim, hunter.nextActionAt, hunter.hardcastOnComplete)
 		}
 	}
 }
@@ -372,7 +372,7 @@ func (hunter *Hunter) doMeleeWeave(sim *core.Simulation) {
 	}
 
 	hunter.AutoAttacks.TrySwingMH(sim, sim.GetPrimaryTarget())
-	hunter.HardcastWaitUntil(sim, doneWeavingAt, &hunter.fakeHardcast)
+	hunter.HardcastWaitUntil(sim, doneWeavingAt, hunter.hardcastOnComplete)
 }
 
 func (hunter *Hunter) GetPresimOptions() *core.PresimOptions {

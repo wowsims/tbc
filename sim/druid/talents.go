@@ -125,13 +125,6 @@ func (druid *Druid) setupNaturesGrace() {
 		Label:    "Natures Grace Proc",
 		ActionID: core.ActionID{SpellID: 16886},
 		Duration: core.NeverExpires,
-		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-			if cast.ActionID.SpellID != SpellIDWrath && cast.ActionID.SpellID != SpellIDSF8 && cast.ActionID.SpellID != SpellIDSF6 {
-				return
-			}
-
-			aura.Deactivate(sim)
-		},
 		OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 			if spell != druid.Wrath && spell != druid.Starfire8 && spell != druid.Starfire6 {
 				return
@@ -173,16 +166,6 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 		Label:    "Natures Swiftness",
 		ActionID: actionID,
 		Duration: core.NeverExpires,
-		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-			if cast.ActionID.SpellID != SpellIDWrath && cast.ActionID.SpellID != SpellIDSF8 && cast.ActionID.SpellID != SpellIDSF6 {
-				return
-			}
-
-			// Remove the buff and put skill on CD
-			aura.Deactivate(sim)
-			druid.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
-			druid.UpdateMajorCooldowns()
-		},
 		OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 			if spell != druid.Wrath && spell != druid.Starfire8 && spell != druid.Starfire6 {
 				return

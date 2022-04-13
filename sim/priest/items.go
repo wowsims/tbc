@@ -37,14 +37,6 @@ var ItemSetAvatar = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 				return character.GetOrRegisterAura(&core.Aura{
 					Label: "Avatar Regalia 2pc",
-					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-						if sim.RandomFloat("avatar 2p") > 0.06 {
-							return
-						}
-						// This is a cheat...
-						// easier than adding another aura the subtracts 150 mana from next cast.
-						character.AddMana(sim, 150, core.ActionID{SpellID: 37600}, false)
-					},
 					OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 						if sim.RandomFloat("avatar 2p") > 0.06 {
 							return

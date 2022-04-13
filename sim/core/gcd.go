@@ -99,15 +99,14 @@ func (character *Character) WaitUntil(sim *Simulation, readyTime time.Duration) 
 	}
 }
 
-func (character *Character) HardcastWaitUntil(sim *Simulation, readyTime time.Duration, cast *Cast) {
+func (character *Character) HardcastWaitUntil(sim *Simulation, readyTime time.Duration, onComplete CastFunc) {
 	if character.Hardcast.Expires >= sim.CurrentTime {
 		fmt.Printf("Sim current time: %0.2f\n", sim.CurrentTime.Seconds())
 		panic(fmt.Sprintf("Hardcast already in use, will finish at: %0.2f", character.Hardcast.Expires.Seconds()))
 	}
 
 	character.Hardcast.Expires = readyTime
-	character.Hardcast.Cast = cast
-	character.Hardcast.OnComplete = cast.OnCastComplete
+	character.Hardcast.OnComplete = onComplete
 	character.newHardcastAction(sim)
 }
 
