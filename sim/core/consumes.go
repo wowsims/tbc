@@ -309,27 +309,28 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 				auras = append(auras, makeDrumsAura(agent.GetCharacter(), drumsType))
 			}
 
-			drumsTemplate := SimpleCast{
-				Cast: Cast{
-					ActionID:  actionID,
-					Character: character,
-					GCD:       GCDDefault,
-					OnCastComplete: func(sim *Simulation, cast *Cast) {
-						// When a real player is using drums, their cast applies to the whole party.
-						for _, aura := range auras {
-							aura.Activate(sim)
-						}
+			drumsSpell := character.GetOrRegisterSpell(SpellConfig{
+				ActionID: actionID,
 
-						// All MCDs that use the GCD and have a non-zero cast time must call this.
-						character.UpdateMajorCooldowns()
+				Cast: CastConfig{
+					DefaultCast: NewCast{
+						GCD: GCDDefault,
 					},
 				},
-			}
+
+				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+					// When a real player is using drums, their cast applies to the whole party.
+					for _, aura := range auras {
+						aura.Activate(sim)
+					}
+
+					// All MCDs that use the GCD and have a non-zero cast time must call this.
+					character.UpdateMajorCooldowns()
+				},
+			})
 
 			return func(sim *Simulation, character *Character) {
-				cast := drumsTemplate
-				cast.Init(sim)
-				cast.StartCast(sim)
+				drumsSpell.Cast(sim, nil)
 			}
 		}
 	} else {
@@ -852,11 +853,6 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 	}
 	character := agent.GetCharacter()
 
-	var gnomishFlameTurretCaster func(sim *Simulation)
-	if consumes.FillerExplosive == proto.Explosive_ExplosiveGnomishFlameTurret {
-		gnomishFlameTurretCaster = character.newGnomishFlameTurretCaster()
-	}
-
 	character.AddMajorCooldown(MajorCooldown{
 		ActionID:   SuperSapperActionID,
 		CooldownID: ExplosivesCooldownID,
@@ -869,28 +865,23 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 			return true
 		},
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			superSapperCaster := character.newSuperSapperCaster(sim)
-			goblinSapperCaster := character.newGoblinSapperCaster(sim)
+			superSapper := character.newSuperSapperSpell(sim)
+			goblinSapper := character.newGoblinSapperSpell(sim)
 
-			var castFiller func(sim *Simulation)
-			hasFiller := false
+			var fillerExplosive *Spell
 			switch consumes.FillerExplosive {
 			case proto.Explosive_ExplosiveFelIronBomb:
-				hasFiller = true
-				castFiller = character.newFelIronBombCaster(sim)
+				fillerExplosive = character.newFelIronBombSpell(sim)
 			case proto.Explosive_ExplosiveAdamantiteGrenade:
-				hasFiller = true
-				castFiller = character.newAdamantiteGrenadeCaster(sim)
+				fillerExplosive = character.newAdamantiteGrenadeSpell(sim)
 			case proto.Explosive_ExplosiveGnomishFlameTurret:
-				hasFiller = true
-				castFiller = gnomishFlameTurretCaster
+				fillerExplosive = character.newGnomishFlameTurretSpell()
 			case proto.Explosive_ExplosiveHolyWater:
-				hasFiller = true
-				castFiller = character.newHolyWaterCaster(sim)
+				fillerExplosive = character.newHolyWaterSpell(sim)
 			}
 
 			cdAfterGoblinSapper := time.Minute
-			if !hasFiller {
+			if fillerExplosive == nil {
 				if consumes.SuperSapper {
 					cdAfterGoblinSapper = time.Minute * 4
 				} else {
@@ -899,24 +890,24 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 			}
 
 			cdAfterSuperSapper := time.Minute
-			if !hasFiller && !consumes.GoblinSapper {
+			if fillerExplosive == nil && !consumes.GoblinSapper {
 				cdAfterSuperSapper = time.Minute * 5
 			}
 
 			return func(sim *Simulation, character *Character) {
-				var castExplosive func(sim *Simulation)
+				var explosive *Spell
 				var cd time.Duration
 				if consumes.SuperSapper && !character.IsOnCD(SuperSapperCooldownID, sim.CurrentTime) {
-					castExplosive = superSapperCaster
+					explosive = superSapper
 					cd = cdAfterSuperSapper
 				} else if consumes.GoblinSapper && !character.IsOnCD(GoblinSapperCooldownID, sim.CurrentTime) {
-					castExplosive = goblinSapperCaster
+					explosive = goblinSapper
 					cd = cdAfterGoblinSapper
 				} else {
-					castExplosive = castFiller
+					explosive = fillerExplosive
 					cd = time.Minute
 				}
-				castExplosive(sim)
+				explosive.Cast(sim, sim.GetPrimaryTarget())
 				character.SetCD(ExplosivesCooldownID, sim.CurrentTime+cd)
 			}
 		},
@@ -924,7 +915,7 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 }
 
 // Creates a spell object for the common explosive case.
-func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID ActionID, minDamage float64, maxDamage float64, cooldown time.Duration, isHolyWater bool) SpellConfig {
+func (character *Character) newBasicExplosiveSpellConfig(sim *Simulation, actionID ActionID, minDamage float64, maxDamage float64, cooldown time.Duration, isHolyWater bool) SpellConfig {
 	school := SpellSchoolFire
 	damageMultiplier := 1.0
 	if isHolyWater {
@@ -954,33 +945,18 @@ func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID Act
 		}),
 	}
 }
-func (character *Character) newSuperSapperCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, SuperSapperActionID, 900, 1500, time.Minute*5, false))
-	return func(sim *Simulation) {
-		spell.Cast(sim, sim.GetPrimaryTarget())
-	}
+func (character *Character) newSuperSapperSpell(sim *Simulation) *Spell {
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(sim, SuperSapperActionID, 900, 1500, time.Minute*5, false))
 }
-func (character *Character) newGoblinSapperCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, GoblinSapperActionID, 450, 750, time.Minute*5, false))
-	return func(sim *Simulation) {
-		spell.Cast(sim, sim.GetPrimaryTarget())
-	}
+func (character *Character) newGoblinSapperSpell(sim *Simulation) *Spell {
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(sim, GoblinSapperActionID, 450, 750, time.Minute*5, false))
 }
-func (character *Character) newFelIronBombCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, FelIronBombActionID, 330, 770, 0, false))
-	return func(sim *Simulation) {
-		spell.Cast(sim, sim.GetPrimaryTarget())
-	}
+func (character *Character) newFelIronBombSpell(sim *Simulation) *Spell {
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(sim, FelIronBombActionID, 330, 770, 0, false))
 }
-func (character *Character) newAdamantiteGrenadeCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, AdamantiteGrenadeActionID, 450, 750, 0, false))
-	return func(sim *Simulation) {
-		spell.Cast(sim, sim.GetPrimaryTarget())
-	}
+func (character *Character) newAdamantiteGrenadeSpell(sim *Simulation) *Spell {
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(sim, AdamantiteGrenadeActionID, 450, 750, 0, false))
 }
-func (character *Character) newHolyWaterCaster(sim *Simulation) func(sim *Simulation) {
-	spell := character.GetOrRegisterSpell(character.newBasicExplosiveSpell(sim, HolyWaterActionID, 438, 562, 0, true))
-	return func(sim *Simulation) {
-		spell.Cast(sim, sim.GetPrimaryTarget())
-	}
+func (character *Character) newHolyWaterSpell(sim *Simulation) *Spell {
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(sim, HolyWaterActionID, 438, 562, 0, true))
 }

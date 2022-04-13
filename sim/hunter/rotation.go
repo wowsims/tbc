@@ -329,8 +329,7 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 			hunter.permaHawk = true
 		}
 		if hunter.permaHawk || currentMana > hunter.Rotation.ViperStopManaPercent {
-			aspect := hunter.NewAspectOfTheHawk(sim)
-			aspect.StartCast(sim)
+			hunter.AspectOfTheHawk.Cast(sim, nil)
 			return true
 		}
 	} else if hunter.currentAspect != hunter.AspectOfTheViperAura && !hunter.permaHawk && currentMana < hunter.Rotation.ViperStartManaPercent {
@@ -341,8 +340,7 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 			hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
 			hunter.permaHawk = true
 		} else {
-			aspect := hunter.NewAspectOfTheViper(sim)
-			aspect.StartCast(sim)
+			hunter.AspectOfTheViper.Cast(sim, nil)
 			return true
 		}
 	}

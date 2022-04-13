@@ -75,8 +75,8 @@ type Hunter struct {
 	arcaneShotCastTime float64
 	useMultiForCatchup bool
 
-	aspectOfTheHawkTemplate  core.SimpleCast
-	aspectOfTheViperTemplate core.SimpleCast
+	AspectOfTheHawk  *core.Spell
+	AspectOfTheViper *core.Spell
 
 	AimedShot    *core.Spell
 	ArcaneShot   *core.Spell
@@ -119,8 +119,8 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.AutoAttacks.OHEffect.OutcomeApplier = core.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, sim.GetPrimaryTarget()))
 	hunter.AutoAttacks.RangedEffect.OutcomeApplier = core.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget()))
 
-	hunter.aspectOfTheHawkTemplate = hunter.newAspectOfTheHawkTemplate(sim)
-	hunter.aspectOfTheViperTemplate = hunter.newAspectOfTheViperTemplate(sim)
+	hunter.registerAspectOfTheHawkSpell(sim)
+	hunter.registerAspectOfTheViperSpell(sim)
 
 	hunter.registerAimedShotSpell(sim)
 	hunter.registerArcaneShotSpell(sim)

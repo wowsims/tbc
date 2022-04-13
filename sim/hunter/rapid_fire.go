@@ -10,7 +10,7 @@ import (
 var RapidFireCooldownID = core.NewCooldownID()
 
 func (hunter *Hunter) registerRapidFireCD() {
-	cooldown := time.Minute * 5
+	cooldown := time.Minute*5 - time.Minute*time.Duration(hunter.Talents.RapidKilling)
 	actionID := core.ActionID{SpellID: 3045, CooldownID: RapidFireCooldownID}
 
 	rfAura := hunter.RegisterAura(&core.Aura{
@@ -25,26 +25,24 @@ func (hunter *Hunter) registerRapidFireCD() {
 		},
 	})
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: hunter.GetCharacter(),
-			Cooldown:  cooldown,
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 100,
-			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 100,
-			},
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				rfAura.Activate(sim)
-			},
-		},
-	}
+	baseCost := 100.0
+	rfSpell := hunter.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
 
-	template.Cooldown -= time.Minute * time.Duration(hunter.Talents.RapidKilling)
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost,
+			},
+			Cooldown: cooldown,
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			rfAura.Activate(sim)
+		},
+	})
 
 	hunter.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -60,9 +58,7 @@ func (hunter *Hunter) registerRapidFireCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
+				rfSpell.Cast(sim, nil)
 			}
 		},
 	})
