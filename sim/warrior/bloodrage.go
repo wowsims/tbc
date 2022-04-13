@@ -15,17 +15,18 @@ func (warrior *Warrior) registerBloodrageCD() {
 	instantRage := 10.0 + 3*float64(warrior.Talents.ImprovedBloodrage)
 	rageOverTime := 10.0
 
-	bloodrageTemplate := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: warrior.GetCharacter(),
-			Cooldown:  BloodrageCooldown,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				// TODO: Rage over time should be done over time, not immediately.
-				warrior.AddRage(sim, instantRage+rageOverTime, actionID)
-			},
+	brSpell := warrior.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		Cast: core.CastConfig{
+			Cooldown: BloodrageCooldown,
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			// TODO: Rage over time should be done over time, not immediately.
+			warrior.AddRage(sim, instantRage+rageOverTime, actionID)
+		},
+	})
 
 	warrior.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -39,9 +40,7 @@ func (warrior *Warrior) registerBloodrageCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := bloodrageTemplate
-				cast.Init(sim)
-				cast.StartCast(sim)
+				brSpell.Cast(sim, nil)
 			}
 		},
 	})

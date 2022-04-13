@@ -332,7 +332,7 @@ type CastSuccessFunc func(*Simulation, *Target) bool
 func (spell *Spell) makeCastFunc(config CastConfig, onCastComplete CastFunc) CastSuccessFunc {
 	return spell.wrapCastFuncInit(config,
 		spell.wrapCastFuncResources(config,
-			spell.wrapCastFuncCastTime(config,
+			spell.wrapCastFuncHaste(config,
 				spell.wrapCastFuncGCD(config,
 					spell.wrapCastFuncCooldown(config,
 						spell.makeCastFuncWait(config, onCastComplete))))))
@@ -424,13 +424,16 @@ func (spell *Spell) wrapCastFuncResources(config CastConfig, onCastComplete Cast
 	panic("Invalid resource type")
 }
 
-func (spell *Spell) wrapCastFuncCastTime(config CastConfig, onCastComplete CastFunc) CastFunc {
-	if config.DefaultCast.CastTime == 0 || config.IgnoreHaste {
+func (spell *Spell) wrapCastFuncHaste(config CastConfig, onCastComplete CastFunc) CastFunc {
+	if config.IgnoreHaste || (config.DefaultCast.GCD == 0 && config.DefaultCast.CastTime == 0 && config.DefaultCast.ChannelTime == 0) {
 		return onCastComplete
 	}
 
 	return func(sim *Simulation, target *Target) {
+		spell.CurCast.GCD = spell.Character.ApplyCastSpeed(spell.CurCast.GCD)
 		spell.CurCast.CastTime = spell.Character.ApplyCastSpeed(spell.CurCast.CastTime)
+		spell.CurCast.ChannelTime = spell.Character.ApplyCastSpeed(spell.CurCast.ChannelTime)
+
 		onCastComplete(sim, target)
 	}
 }
@@ -440,19 +443,17 @@ func (spell *Spell) wrapCastFuncGCD(config CastConfig, onCastComplete CastFunc) 
 		return onCastComplete
 	}
 
-	ignoreHaste := config.IgnoreHaste
 	return func(sim *Simulation, target *Target) {
 		// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
 		if spell.CurCast.GCD != 0 && spell.Character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
 			panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", spell.ActionID, spell.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime)))
 		}
 
-		if !ignoreHaste {
-			spell.CurCast.GCD = spell.Character.ApplyCastSpeed(spell.CurCast.GCD)
-			spell.CurCast.ChannelTime = spell.Character.ApplyCastSpeed(spell.CurCast.ChannelTime)
+		gcd := spell.CurCast.GCD
+		if spell.CurCast.GCD != 0 {
+			gcd = MaxDuration(GCDMin, gcd)
 		}
 
-		gcd := MaxDuration(GCDMin, spell.CurCast.GCD)
 		fullCastTime := spell.CurCast.CastTime + spell.CurCast.ChannelTime + spell.CurCast.AfterCastDelay
 		spell.Character.SetGCDTimer(sim, sim.CurrentTime+MaxDuration(gcd, fullCastTime))
 

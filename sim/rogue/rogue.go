@@ -70,6 +70,7 @@ type Rogue struct {
 	Rupture        *core.Spell
 	Shiv           *core.Spell
 	SinisterStrike *core.Spell
+	SliceAndDice   *core.Spell
 
 	DeadlyPoisonDot *core.Dot
 	RuptureDot      *core.Dot
@@ -80,8 +81,6 @@ type Rogue struct {
 	SliceAndDiceAura   *core.Aura
 
 	finishingMoveEffectApplier func(sim *core.Simulation, numPoints int32)
-
-	castSliceAndDice func()
 }
 
 func (rogue *Rogue) GetCharacter() *core.Character {
@@ -125,10 +124,9 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 	rogue.registerRuptureSpell(sim)
 	rogue.registerShivSpell(sim)
 	rogue.registerSinisterStrikeSpell(sim)
+	rogue.registerSliceAndDice(sim)
 
 	rogue.finishingMoveEffectApplier = rogue.makeFinishingMoveEffectApplier(sim)
-
-	rogue.initSliceAndDice(sim)
 
 	rogue.energyPerSecondAvg = core.EnergyPerTick / core.EnergyTickDuration.Seconds()
 

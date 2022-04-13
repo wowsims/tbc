@@ -23,22 +23,34 @@ func (mage *Mage) registerEvocationCD() {
 		numTicks = maxTicks
 	}
 
-	castTime := time.Duration(numTicks) * time.Second * 2
+	channelTime := time.Duration(numTicks) * time.Second * 2
 	manaPerTick := 0.0
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: mage.GetCharacter(),
-			Cooldown:  time.Minute * 8,
-			CastTime:  castTime,
-			GCD:       core.GCDDefault,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				// All MCDs that use the GCD and have a non-zero cast time must call this.
-				mage.UpdateMajorCooldowns()
+	evocationSpell := mage.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				GCD:         core.GCDDefault,
+				ChannelTime: channelTime,
 			},
+			Cooldown: cooldown,
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			period := spell.CurCast.ChannelTime / time.Duration(numTicks)
+			core.StartPeriodicAction(sim, core.PeriodicActionOptions{
+				Period:   period,
+				NumTicks: int(numTicks),
+				OnAction: func(sim *core.Simulation) {
+					mage.AddMana(sim, manaPerTick, actionID, true)
+				},
+			})
+
+			// All MCDs that use the GCD and have a non-zero cast time must call this.
+			mage.UpdateMajorCooldowns()
+		},
+	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -74,18 +86,7 @@ func (mage *Mage) registerEvocationCD() {
 			manaThreshold = mage.MaxMana() * 0.2
 
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
-
-				period := cast.CastTime / time.Duration(numTicks)
-				core.StartPeriodicAction(sim, core.PeriodicActionOptions{
-					Period:   period,
-					NumTicks: int(numTicks),
-					OnAction: func(sim *core.Simulation) {
-						mage.AddMana(sim, manaPerTick, actionID, true)
-					},
-				})
+				evocationSpell.Cast(sim, nil)
 			}
 		},
 	})

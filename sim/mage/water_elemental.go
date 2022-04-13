@@ -16,13 +16,38 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 		return
 	}
 
-	manaCost := 0.0
 	actionID := core.ActionID{SpellID: 31687, CooldownID: SummonWaterElementalCooldownID}
+	cooldown := time.Minute * 3
+
+	baseCost := mage.BaseMana() * 0.16
+	summonSpell := mage.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost *
+					(1 - 0.05*float64(mage.Talents.FrostChanneling)) *
+					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
+				GCD: core.GCDDefault,
+			},
+			Cooldown: cooldown,
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
+
+			// All MCDs that use the GCD and have a non-zero cast time must call this.
+			mage.UpdateMajorCooldowns()
+		},
+	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
 		CooldownID: SummonWaterElementalCooldownID,
-		Cooldown:   time.Minute * 3,
+		Cooldown:   cooldown,
 		UsesGCD:    true,
 		Priority:   core.CooldownPriorityDrums + 1, // Always prefer to cast before drums or lust so the ele gets their benefits.
 		Type:       core.CooldownTypeDPS,
@@ -30,7 +55,7 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 			if mage.waterElemental.IsEnabled() {
 				return false
 			}
-			if character.CurrentMana() < manaCost {
+			if character.CurrentMana() < summonSpell.DefaultCast.Cost {
 				return false
 			}
 			return true
@@ -39,37 +64,8 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 			return true
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			baseManaCost := mage.BaseMana() * 0.16
-			castTemplate := core.SimpleCast{
-				Cast: core.Cast{
-					ActionID:  actionID,
-					Character: mage.GetCharacter(),
-					BaseCost: core.ResourceCost{
-						Type:  stats.Mana,
-						Value: baseManaCost,
-					},
-					Cost: core.ResourceCost{
-						Type:  stats.Mana,
-						Value: baseManaCost,
-					},
-					GCD:      core.GCDDefault,
-					Cooldown: time.Minute * 3,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
-
-						// All MCDs that use the GCD and have a non-zero cast time must call this.
-						mage.UpdateMajorCooldowns()
-					},
-				},
-			}
-			castTemplate.Cost.Value -= castTemplate.BaseCost.Value * float64(mage.Talents.FrostChanneling) * 0.05
-			castTemplate.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
-			manaCost = castTemplate.Cost.Value
-
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := castTemplate
-				cast.Init(sim)
-				cast.StartCast(sim)
+				summonSpell.Cast(sim, nil)
 			}
 		},
 	})
