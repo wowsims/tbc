@@ -138,15 +138,8 @@ var ItemSetFistsOfFury = core.ItemSet{
 			character := agent.GetCharacter()
 
 			procSpell := character.RegisterSpell(core.SpellConfig{
-				Template: core.SimpleSpell{
-					SpellCast: core.SpellCast{
-						Cast: core.Cast{
-							ActionID:    core.ActionID{SpellID: 41989},
-							Character:   character,
-							SpellSchool: core.SpellSchoolFire,
-						},
-					},
-				},
+				ActionID:    core.ActionID{SpellID: 41989},
+				SpellSchool: core.SpellSchoolFire,
 				ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 					IsPhantom:        true,
 					DamageMultiplier: 1,

@@ -77,15 +77,8 @@ func ApplyTimbals(agent core.Agent) {
 	character := agent.GetCharacter()
 
 	timbalsSpell := character.RegisterSpell(core.SpellConfig{
-		Template: core.SimpleSpell{
-			SpellCast: core.SpellCast{
-				Cast: core.Cast{
-					Character:   character,
-					ActionID:    core.ActionID{SpellID: 45055},
-					SpellSchool: core.SpellSchoolShadow,
-				},
-			},
-		},
+		ActionID:    core.ActionID{SpellID: 45055},
+		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,

@@ -13,25 +13,24 @@ var CrusaderStrikeActionID = core.ActionID{SpellID: 35395, CooldownID: CrusaderS
 // Do some research on the spell fields to make sure I'm doing this right
 // Need to add in judgement debuff refreshing feature at some point
 func (paladin *Paladin) registerCrusaderStrikeSpell(sim *core.Simulation) {
-	cs := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    CrusaderStrikeActionID,
-				Character:   &paladin.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Second * 6,
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 236,
-				},
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
+	baseCost := 236.0
 
 	paladin.CrusaderStrike = paladin.RegisterSpell(core.SpellConfig{
-		Template: cs,
+		ActionID:    CrusaderStrikeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
+			},
+			Cooldown: time.Second * 6,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:  core.ProcMaskMeleeMHSpecial,
 			IsPhantom: true,

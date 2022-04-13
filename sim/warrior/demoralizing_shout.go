@@ -12,27 +12,7 @@ func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
 	if ItemSetBoldArmor.CharacterHasSetBonus(&warrior.Character, 2) {
 		warrior.shoutCost -= 2
 	}
-	warrior.demoShoutCost = warrior.shoutCost - float64(warrior.Talents.FocusedRage)
-
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    DemoralizingShoutActionID,
-				Character:   &warrior.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				IgnoreHaste: true,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.demoShoutCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.demoShoutCost,
-				},
-			},
-		},
-	}
+	cost := warrior.shoutCost - float64(warrior.Talents.FocusedRage)
 
 	baseEffect := core.SpellEffect{
 		ThreatMultiplier: 1,
@@ -59,11 +39,24 @@ func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
 	}
 
 	warrior.DemoralizingShout = warrior.RegisterSpell(core.SpellConfig{
-		Template:     ability,
+		ActionID:    DemoralizingShoutActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+
+		ResourceType: stats.Rage,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.NewCast{
+				Cost: cost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
 	})
 }
 
 func (warrior *Warrior) CanDemoralizingShout(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= warrior.demoShoutCost
+	return warrior.CurrentRage() >= warrior.DemoralizingShout.DefaultCast.Cost
 }

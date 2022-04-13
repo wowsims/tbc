@@ -787,15 +787,8 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 		actionID := ActionID{ItemID: 22788}
 
 		flameCapProc := character.RegisterSpell(SpellConfig{
-			Template: SimpleSpell{
-				SpellCast: SpellCast{
-					Cast: Cast{
-						ActionID:    actionID,
-						Character:   character,
-						SpellSchool: SpellSchoolFire,
-					},
-				},
-			},
+			ActionID:    actionID,
+			SpellSchool: SpellSchoolFire,
 			ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 				IsPhantom:        true,
 				DamageMultiplier: 1,
@@ -932,27 +925,23 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 
 // Creates a spell object for the common explosive case.
 func (character *Character) newBasicExplosiveSpell(sim *Simulation, actionID ActionID, minDamage float64, maxDamage float64, cooldown time.Duration, isHolyWater bool) SpellConfig {
-	spell := SimpleSpell{
-		SpellCast: SpellCast{
-			Cast: Cast{
-				ActionID:    actionID,
-				Character:   character,
-				SpellSchool: SpellSchoolFire,
-				Cooldown:    cooldown,
-			},
-		},
-	}
-
+	school := SpellSchoolFire
 	damageMultiplier := 1.0
 	if isHolyWater {
-		spell.SpellSchool = SpellSchoolHoly
+		school = SpellSchoolHoly
 		if sim.GetPrimaryTarget().MobType != proto.MobType_MobTypeUndead {
 			damageMultiplier = 0
 		}
 	}
 
 	return SpellConfig{
-		Template: spell,
+		ActionID:    actionID,
+		SpellSchool: school,
+
+		Cast: CastConfig{
+			Cooldown: cooldown,
+		},
+
 		ApplyEffects: ApplyEffectFuncAOEDamage(sim, SpellEffect{
 			// Explosives always have 1% resist chance, so just give them hit cap.
 			BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,

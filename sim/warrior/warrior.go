@@ -29,17 +29,9 @@ type Warrior struct {
 	shoutExpiresAt     time.Duration
 
 	// Cached values
-	shoutDuration    time.Duration
-	bloodthirstCost  float64
-	shoutCost        float64
-	demoShoutCost    float64
-	heroicStrikeCost float64
-	revengeCost      float64
-	shieldSlamCost   float64
-	sunderArmorCost  float64
-	thunderClapCost  float64
-	whirlwindCost    float64
-	canShieldSlam    bool
+	shoutDuration time.Duration
+	shoutCost     float64
+	canShieldSlam bool
 
 	CastShout           func(*core.Simulation)
 	CastBattleStance    func(*core.Simulation)
