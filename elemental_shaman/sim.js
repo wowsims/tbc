@@ -135,6 +135,7 @@ export class ElementalShamanSimUI extends IndividualSimUI {
                 IconInputs.JadePendantOfBlasting,
                 IconInputs.AtieshWarlock,
                 IconInputs.AtieshMage,
+                IconInputs.SanctityAura,
             ],
             playerBuffInputs: [
                 IconInputs.BlessingOfKings,
