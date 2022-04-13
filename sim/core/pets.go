@@ -74,23 +74,20 @@ func (gft *GnomishFlameTurret) OnGCDReady(sim *Simulation) {
 const SpellIDFlameCannon int32 = 30527
 
 func (gft *GnomishFlameTurret) registerFlameCannonSpell(sim *Simulation) {
-	spell := SimpleSpell{
-		SpellCast: SpellCast{
-			Cast: Cast{
-				ActionID:    ActionID{SpellID: SpellIDFlameCannon},
-				Character:   &gft.Character,
-				SpellSchool: SpellSchoolFire,
+	gft.FlameCannon = gft.RegisterSpell(SpellConfig{
+		ActionID:    ActionID{SpellID: SpellIDFlameCannon},
+		SpellSchool: SpellSchoolFire,
+
+		Cast: CastConfig{
+			DefaultCast: NewCast{
 				// Pretty sure this works the same way as Searing Totem, where the next shot
 				// fires once the previous missile has hit the target. Just give some static
 				// value for now.
-				GCD:         time.Millisecond * 800,
-				IgnoreHaste: true,
+				GCD: time.Millisecond * 800,
 			},
+			IgnoreHaste: true,
 		},
-	}
 
-	gft.FlameCannon = gft.RegisterSpell(SpellConfig{
-		Template: spell,
 		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
