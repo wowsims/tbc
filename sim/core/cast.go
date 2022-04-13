@@ -390,7 +390,7 @@ func (spell *Spell) wrapCastFuncResources(config CastConfig, onCastComplete Cast
 			if spell.Character.CurrentMana() < spell.CurCast.Cost {
 				if sim.Log != nil {
 					spell.Character.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.03f, Mana Cost = %0.03f)",
-						spell.ActionID, spell.Character.CurrentMana(), spell.MostRecentCost)
+						spell.ActionID, spell.Character.CurrentMana(), spell.CurCast.Cost)
 				}
 				return false
 			}

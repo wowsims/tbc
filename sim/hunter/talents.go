@@ -377,7 +377,7 @@ func (hunter *Hunter) applyThrillOfTheHunt() {
 			}
 
 			if procChance == 1 || sim.RandomFloat("ThrillOfTheHunt") < procChance {
-				hunter.AddMana(sim, spell.MostRecentCost*0.4, actionID, false)
+				hunter.AddMana(sim, spell.CurCast.Cost*0.4, actionID, false)
 			}
 		},
 	})

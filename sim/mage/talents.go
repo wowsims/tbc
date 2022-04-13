@@ -269,7 +269,7 @@ func (mage *Mage) applyMasterOfElements() {
 				return
 			}
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				mage.AddMana(sim, spell.MostRecentBaseCost*refundCoeff, core.ActionID{SpellID: 29076}, false)
+				mage.AddMana(sim, spell.BaseCost*refundCoeff, core.ActionID{SpellID: 29076}, false)
 			}
 		},
 	})

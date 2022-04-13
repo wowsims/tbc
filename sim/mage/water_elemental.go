@@ -120,7 +120,7 @@ func (we *WaterElemental) OnGCDReady(sim *core.Simulation) {
 	if sim.RandomFloat("Water Elemental Disobey") < we.disobeyChance {
 		// Water ele has decided not to cooperate, so just wait for the cast time
 		// instead of casting.
-		we.WaitUntil(sim, sim.CurrentTime+spell.Template.CastTime)
+		we.WaitUntil(sim, sim.CurrentTime+spell.DefaultCast.CastTime)
 		return
 	}
 
