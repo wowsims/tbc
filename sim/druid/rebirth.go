@@ -20,7 +20,7 @@ func (druid *Druid) registerRebirthSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost:     baseCost,
 				GCD:      core.GCDDefault,
 				CastTime: time.Second*3 + time.Millisecond*500,

@@ -58,7 +58,7 @@ func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 		BaseCost:     cost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: cost,
 				GCD:  core.GCDDefault,
 			},

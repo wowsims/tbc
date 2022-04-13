@@ -32,13 +32,13 @@ func (shaman *Shaman) registerBloodlustCD() {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost * (1 - 0.02*float64(shaman.Talents.MentalQuickness)),
 				GCD:  core.GCDDefault,
 			},
 			Cooldown: core.BloodlustCD,
 
-			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
 				// Needed because of the interaction between enhance GCD scheduler and other bloodlusts.
 				if !bloodlustMCD.UsesGCD {
 					cast.GCD = 0

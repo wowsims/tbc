@@ -53,7 +53,7 @@ func ApplyQuagmirransEye(agent core.Agent) {
 
 		return character.GetOrRegisterAura(&core.Aura{
 			Label: "Quagmirran's Eye",
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("Quagmirran's Eye") > 0.1 {
 					return
 				}

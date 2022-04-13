@@ -183,7 +183,7 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 		Label:    "Natures Swiftness",
 		ActionID: actionID,
 		Duration: core.NeverExpires,
-		OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 			if spell != shaman.LightningBolt {
 				return
 			}
@@ -286,7 +286,7 @@ func (shaman *Shaman) applyShamanisticFocus() {
 		Label:    "Shamanistic Focus Proc",
 		ActionID: core.ActionID{SpellID: 43338},
 		Duration: core.NeverExpires,
-		OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 			if spell.SpellExtras.Matches(SpellFlagShock) {
 				aura.Deactivate(sim)
 			}

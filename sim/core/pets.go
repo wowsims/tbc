@@ -71,7 +71,7 @@ func (gft *GnomishFlameTurret) registerFlameCannonSpell(sim *Simulation) {
 		SpellSchool: SpellSchoolFire,
 
 		Cast: CastConfig{
-			DefaultCast: NewCast{
+			DefaultCast: Cast{
 				// Pretty sure this works the same way as Searing Totem, where the next shot
 				// fires once the previous missile has hit the target. Just give some static
 				// value for now.

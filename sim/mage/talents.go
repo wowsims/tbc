@@ -101,7 +101,7 @@ func (mage *Mage) applyArcaneConcentration() {
 
 		return mage.GetOrRegisterAura(&core.Aura{
 			Label: "Arcane Concentration",
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if mage.bonusAMCCCrit != 0 {
 					mage.AddStat(stats.SpellCrit, -mage.bonusAMCCCrit)
 					mage.bonusAMCCCrit = 0

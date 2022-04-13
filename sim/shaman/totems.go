@@ -17,7 +17,7 @@ func (shaman *Shaman) newTotemSpellConfig(baseCost float64, spellID int32) core.
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost -
 					(baseCost * float64(shaman.Talents.TotemicFocus) * 0.05) -
 					(baseCost * float64(shaman.Talents.MentalQuickness) * 0.02),

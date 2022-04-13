@@ -37,7 +37,7 @@ var ItemSetAvatar = core.ItemSet{
 			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 				return character.GetOrRegisterAura(&core.Aura{
 					Label: "Avatar Regalia 2pc",
-					OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 						if sim.RandomFloat("avatar 2p") > 0.06 {
 							return
 						}

@@ -240,10 +240,10 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 		SpellExtras: SpellExtrasMeleeMetrics,
 
 		Cast: CastConfig{
-			DefaultCast: NewCast{
+			DefaultCast: Cast{
 				CastTime: 1, // Dummy non-zero value so the optimization doesnt remove the cast time.
 			},
-			ModifyCast: func(_ *Simulation, _ *Spell, cast *NewCast) {
+			ModifyCast: func(_ *Simulation, _ *Spell, cast *Cast) {
 				cast.CastTime = aa.RangedSwingWindup()
 			},
 			IgnoreHaste: true,

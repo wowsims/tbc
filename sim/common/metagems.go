@@ -34,7 +34,7 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 
 		return character.GetOrRegisterAura(&core.Aura{
 			Label: "Mystical Skyfire Diamond",
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("Mystical Skyfire Diamond") > 0.15 {
 					return
 				}
@@ -53,7 +53,7 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 
 		return character.GetOrRegisterAura(&core.Aura{
 			Label: "Insightful Earthstorm Diamond",
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("Insightful Earthstorm Diamond") > 0.04 {
 					return
 				}

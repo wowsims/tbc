@@ -12,7 +12,7 @@ import (
 // the effects are applied immediately even though the GCD is still activated.
 
 // Callback for when a cast is finished, i.e. when the in-game castbar reaches full.
-type OnSpellCastComplete func(aura *Aura, sim *Simulation, spell *Spell)
+type OnCastComplete func(aura *Aura, sim *Simulation, spell *Spell)
 
 type Hardcast struct {
 	Expires    time.Duration
@@ -27,10 +27,10 @@ func (hc *Hardcast) OnExpire(sim *Simulation) {
 // Input for constructing the CastSpell function for a spell.
 type CastConfig struct {
 	// Default cast values with all static effects applied.
-	DefaultCast NewCast
+	DefaultCast Cast
 
 	// Dynamic modifications for each cast.
-	ModifyCast func(*Simulation, *Spell, *NewCast)
+	ModifyCast func(*Simulation, *Spell, *Cast)
 
 	// Ignores haste when calculating the GCD and cast time for this cast.
 	IgnoreHaste bool
@@ -44,7 +44,7 @@ type CastConfig struct {
 	AfterCast      func(*Simulation, *Spell)
 }
 
-type NewCast struct {
+type Cast struct {
 	// Amount of resource that will be consumed by this cast.
 	Cost float64
 
@@ -86,7 +86,7 @@ func (spell *Spell) ApplyCostModifiers(cost float64) float64 {
 }
 
 func (spell *Spell) wrapCastFuncInit(config CastConfig, onCastComplete CastSuccessFunc) CastSuccessFunc {
-	empty := NewCast{}
+	empty := Cast{}
 	if config.DefaultCast == empty {
 		return onCastComplete
 	}
@@ -227,7 +227,7 @@ func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc)
 	configAfterCast := config.AfterCast
 	oldOnCastComplete1 := onCastComplete
 	onCastComplete = func(sim *Simulation, target *Target) {
-		spell.Character.OnSpellCastComplete(sim, spell)
+		spell.Character.OnCastComplete(sim, spell)
 		if configOnCastComplete != nil {
 			configOnCastComplete(sim, spell)
 		}

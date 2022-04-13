@@ -86,7 +86,7 @@ var ItemSetDeathmantle = core.ItemSet{
 	},
 }
 
-func (rogue *Rogue) applyDeathmantle(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+func (rogue *Rogue) applyDeathmantle(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
 	//instance.ActionID.Tag = rogue.ComboPoints()
 	if rogue.deathmantle4pcProc {
 		cast.Cost = 0
@@ -156,7 +156,7 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 
 		return rogue.GetOrRegisterAura(&core.Aura{
 			Label: "Ashtongue Talisman",
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if !spell.SpellExtras.Matches(SpellFlagFinisher) {
 					return
 				}

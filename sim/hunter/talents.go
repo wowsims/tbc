@@ -270,7 +270,7 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		BaseCost:     manaCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: manaCost,
 			},
 			Cooldown: cooldown,

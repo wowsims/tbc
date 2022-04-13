@@ -57,7 +57,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
 				GCD:  core.GCDDefault,
 			},
@@ -130,7 +130,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
 				GCD:  core.GCDDefault,
 			},
@@ -164,7 +164,7 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
 				GCD:  core.GCDDefault,
 			},
@@ -196,7 +196,7 @@ func (paladin *Paladin) setupSealOfWisdom() {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
 				GCD:  core.GCDDefault,
 			},

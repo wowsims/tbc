@@ -187,7 +187,7 @@ func applyRaceEffects(agent Agent) {
 			BaseCost:     cost,
 
 			Cast: CastConfig{
-				DefaultCast: NewCast{
+				DefaultCast: Cast{
 					Cost: cost,
 				},
 				Cooldown: cd,

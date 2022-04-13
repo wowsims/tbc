@@ -348,7 +348,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 		BaseCost:     energyCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: energyCost,
 				GCD:  time.Second,
 			},
@@ -427,7 +427,7 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 		ActionID: actionID,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				GCD: time.Second,
 			},
 			IgnoreHaste: true,

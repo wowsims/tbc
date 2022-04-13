@@ -57,7 +57,7 @@ func (hunter *Hunter) registerAspectOfTheHawkSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost,
 				GCD:  core.GCDDefault,
 			},
@@ -91,7 +91,7 @@ func (hunter *Hunter) registerAspectOfTheViperSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost,
 				GCD:  core.GCDDefault,
 			},

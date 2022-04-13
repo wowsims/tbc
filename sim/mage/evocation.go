@@ -30,7 +30,7 @@ func (mage *Mage) registerEvocationCD() {
 		ActionID: actionID,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				GCD:         core.GCDDefault,
 				ChannelTime: channelTime,
 			},

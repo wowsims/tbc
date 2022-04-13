@@ -60,7 +60,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 		BaseCost:     JudgementManaCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
 			},
 			Cooldown: JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement)),
@@ -87,7 +87,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 		BaseCost:     JudgementManaCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
 			},
 			Cooldown: JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement)),
@@ -128,7 +128,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 		BaseCost:     JudgementManaCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
 			},
 			Cooldown: JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement)),

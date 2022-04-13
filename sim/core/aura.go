@@ -58,11 +58,11 @@ type Aura struct {
 	// The unit this aura is attached to.
 	Unit *Unit
 
-	active                   bool
-	activeIndex              int32 // Position of this aura's index in the activeAuras array.
-	onSpellCastCompleteIndex int32 // Position of this aura's index in the onCastCompleteAuras array.
-	onSpellHitIndex          int32 // Position of this aura's index in the onSpellHitAuras array.
-	onPeriodicDamageIndex    int32 // Position of this aura's index in the onPeriodicDamageAuras array.
+	active                bool
+	activeIndex           int32 // Position of this aura's index in the activeAuras array.
+	onCastCompleteIndex   int32 // Position of this aura's index in the onCastCompleteAuras array.
+	onSpellHitIndex       int32 // Position of this aura's index in the onSpellHitAuras array.
+	onPeriodicDamageIndex int32 // Position of this aura's index in the onPeriodicDamageAuras array.
 
 	// The number of stacks, or charges, of this aura. If this aura doesn't care
 	// about charges, is just 0.
@@ -74,7 +74,7 @@ type Aura struct {
 	Priority float64
 
 	// Invoked when a spell cast completes casting, before results are calculated.
-	OnSpellCastComplete OnSpellCastComplete
+	OnCastComplete OnCastComplete
 
 	// Invoked when a spell hits, after results are calculated. Results can be modified by changing
 	// properties of result.
@@ -211,23 +211,23 @@ type auraTracker struct {
 	minExpires time.Duration
 
 	// Auras that have a non-nil XXX function set and are currently active.
-	onSpellCastCompleteAuras []*Aura
-	onSpellHitAuras          []*Aura
-	onPeriodicDamageAuras    []*Aura
+	onCastCompleteAuras   []*Aura
+	onSpellHitAuras       []*Aura
+	onPeriodicDamageAuras []*Aura
 }
 
 func newAuraTracker() auraTracker {
 	return auraTracker{
-		finalizeEffects:          []FinalizeEffect{},
-		resetEffects:             []ResetEffect{},
-		permanentAuras:           []PermanentAura{},
-		activeAuras:              make([]*Aura, 0, 16),
-		onSpellCastCompleteAuras: make([]*Aura, 0, 16),
-		onSpellHitAuras:          make([]*Aura, 0, 16),
-		onPeriodicDamageAuras:    make([]*Aura, 0, 16),
-		auras:                    make([]*Aura, 0, 16),
-		aurasByTag:               make(map[string][]*Aura),
-		cooldowns:                make([]time.Duration, numCooldownIDs),
+		finalizeEffects:       []FinalizeEffect{},
+		resetEffects:          []ResetEffect{},
+		permanentAuras:        []PermanentAura{},
+		activeAuras:           make([]*Aura, 0, 16),
+		onCastCompleteAuras:   make([]*Aura, 0, 16),
+		onSpellHitAuras:       make([]*Aura, 0, 16),
+		onPeriodicDamageAuras: make([]*Aura, 0, 16),
+		auras:                 make([]*Aura, 0, 16),
+		aurasByTag:            make(map[string][]*Aura),
+		cooldowns:             make([]time.Duration, numCooldownIDs),
 	}
 }
 
@@ -280,7 +280,7 @@ func (unit *Unit) GetOrRegisterAura(aura *Aura) *Aura {
 	if curAura == nil {
 		return unit.RegisterAura(aura)
 	} else {
-		curAura.OnSpellCastComplete = aura.OnSpellCastComplete
+		curAura.OnCastComplete = aura.OnCastComplete
 		curAura.OnSpellHit = aura.OnSpellHit
 		curAura.OnPeriodicDamage = aura.OnPeriodicDamage
 		return curAura
@@ -349,7 +349,7 @@ func (at *auraTracker) finalize() {
 func (at *auraTracker) reset(sim *Simulation) {
 	at.cooldowns = make([]time.Duration, numCooldownIDs)
 	at.activeAuras = at.activeAuras[:0]
-	at.onSpellCastCompleteAuras = at.onSpellCastCompleteAuras[:0]
+	at.onCastCompleteAuras = at.onCastCompleteAuras[:0]
 	at.onSpellHitAuras = at.onSpellHitAuras[:0]
 	at.onPeriodicDamageAuras = at.onPeriodicDamageAuras[:0]
 
@@ -477,9 +477,9 @@ func (aura *Aura) Activate(sim *Simulation) {
 		aura.Unit.activeAuras = append(aura.Unit.activeAuras, aura)
 	}
 
-	if aura.OnSpellCastComplete != nil {
-		aura.onSpellCastCompleteIndex = int32(len(aura.Unit.onSpellCastCompleteAuras))
-		aura.Unit.onSpellCastCompleteAuras = append(aura.Unit.onSpellCastCompleteAuras, aura)
+	if aura.OnCastComplete != nil {
+		aura.onCastCompleteIndex = int32(len(aura.Unit.onCastCompleteAuras))
+		aura.Unit.onCastCompleteAuras = append(aura.Unit.onCastCompleteAuras, aura)
 	}
 
 	if aura.OnSpellHit != nil {
@@ -503,12 +503,12 @@ func (aura *Aura) Activate(sim *Simulation) {
 
 // Moves an Aura to the front of the list of active Auras, so its callbacks are invoked first.
 func (aura *Aura) Prioritize() {
-	if aura.onSpellCastCompleteIndex > 0 {
-		otherAura := aura.Unit.onSpellCastCompleteAuras[0]
-		aura.Unit.onSpellCastCompleteAuras[0] = aura
-		aura.Unit.onSpellCastCompleteAuras[len(aura.Unit.onSpellCastCompleteAuras)-1] = otherAura
-		otherAura.onSpellCastCompleteIndex = aura.onSpellCastCompleteIndex
-		aura.onSpellCastCompleteIndex = 0
+	if aura.onCastCompleteIndex > 0 {
+		otherAura := aura.Unit.onCastCompleteAuras[0]
+		aura.Unit.onCastCompleteAuras[0] = aura
+		aura.Unit.onCastCompleteAuras[len(aura.Unit.onCastCompleteAuras)-1] = otherAura
+		otherAura.onCastCompleteIndex = aura.onCastCompleteIndex
+		aura.onCastCompleteIndex = 0
 	}
 
 	if aura.onSpellHitIndex > 0 {
@@ -565,13 +565,13 @@ func (aura *Aura) Deactivate(sim *Simulation) {
 		aura.Unit.minExpires = 0
 	}
 
-	if aura.OnSpellCastComplete != nil {
-		removeOnSpellCastCompleteIndex := aura.onSpellCastCompleteIndex
-		aura.Unit.onSpellCastCompleteAuras = removeBySwappingToBack(aura.Unit.onSpellCastCompleteAuras, removeOnSpellCastCompleteIndex)
-		if removeOnSpellCastCompleteIndex < int32(len(aura.Unit.onSpellCastCompleteAuras)) {
-			aura.Unit.onSpellCastCompleteAuras[removeOnSpellCastCompleteIndex].onSpellCastCompleteIndex = removeOnSpellCastCompleteIndex
+	if aura.OnCastComplete != nil {
+		removeOnCastCompleteIndex := aura.onCastCompleteIndex
+		aura.Unit.onCastCompleteAuras = removeBySwappingToBack(aura.Unit.onCastCompleteAuras, removeOnCastCompleteIndex)
+		if removeOnCastCompleteIndex < int32(len(aura.Unit.onCastCompleteAuras)) {
+			aura.Unit.onCastCompleteAuras[removeOnCastCompleteIndex].onCastCompleteIndex = removeOnCastCompleteIndex
 		}
-		aura.onSpellCastCompleteIndex = Inactive
+		aura.onCastCompleteIndex = Inactive
 	}
 
 	if aura.OnSpellHit != nil {
@@ -618,10 +618,10 @@ func (at *auraTracker) SetCD(id CooldownID, newCD time.Duration) {
 	at.cooldowns[id] = newCD
 }
 
-// Invokes the OnSpellCastComplete event for all tracked Auras.
-func (at *auraTracker) OnSpellCastComplete(sim *Simulation, spell *Spell) {
-	for _, aura := range at.onSpellCastCompleteAuras {
-		aura.OnSpellCastComplete(aura, sim, spell)
+// Invokes the OnCastComplete event for all tracked Auras.
+func (at *auraTracker) OnCastComplete(sim *Simulation, spell *Spell) {
+	for _, aura := range at.onCastCompleteAuras {
+		aura.OnCastComplete(aura, sim, spell)
 	}
 }
 

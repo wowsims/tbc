@@ -23,7 +23,7 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 		BaseCost:     RuptureEnergyCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: RuptureEnergyCost,
 				GCD:  time.Second,
 			},

@@ -21,7 +21,7 @@ func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOv
 		spellConfig.Cast.Cooldown = time.Second * 6
 	}
 
-	spellConfig.Cast.ModifyCast = func(_ *core.Simulation, spell *core.Spell, cast *core.NewCast) {
+	spellConfig.Cast.ModifyCast = func(_ *core.Simulation, spell *core.Spell, cast *core.Cast) {
 		shaman.applyElectricSpellCastInitModifiers(spell, cast)
 	}
 

@@ -30,7 +30,7 @@ var ItemSetManaEtched = core.ItemSet{
 				procAura := character.NewTemporaryStatsAura("Mana-Etched Insight Proc", core.ActionID{SpellID: 37619}, stats.Stats{stats.SpellPower: 110}, time.Second*15)
 				return character.GetOrRegisterAura(&core.Aura{
 					Label: "Mana-Etched Insight",
-					OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 						if sim.RandomFloat("Mana-Etched Insight") > 0.02 {
 							return
 						}
@@ -61,7 +61,7 @@ var ItemSetSpellstrike = core.ItemSet{
 				procAura := character.NewTemporaryStatsAura("Spellstrike Proc", core.ActionID{SpellID: 32106}, stats.Stats{stats.SpellPower: 92}, time.Second*10)
 				return character.GetOrRegisterAura(&core.Aura{
 					Label: "Spellstrike",
-					OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 						if sim.RandomFloat("spellstrike") > 0.05 {
 							return
 						}

@@ -21,7 +21,7 @@ func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
 		BaseCost:     VampiricTouchBaseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost:     VampiricTouchBaseCost,
 				GCD:      core.GCDDefault,
 				CastTime: time.Millisecond * 1500,

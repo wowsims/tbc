@@ -24,7 +24,7 @@ func (shaman *Shaman) registerSearingTotemSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost -
 					baseCost*float64(shaman.Talents.TotemicFocus)*0.05 -
 					baseCost*float64(shaman.Talents.MentalQuickness)*0.02,
@@ -81,7 +81,7 @@ func (shaman *Shaman) registerMagmaTotemSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost -
 					baseCost*float64(shaman.Talents.TotemicFocus)*0.05 -
 					baseCost*float64(shaman.Talents.MentalQuickness)*0.02,
@@ -140,7 +140,7 @@ func (shaman *Shaman) registerNovaTotemSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost -
 					baseCost*float64(shaman.Talents.TotemicFocus)*0.05 -
 					baseCost*float64(shaman.Talents.MentalQuickness)*0.02,

@@ -313,7 +313,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 				ActionID: actionID,
 
 				Cast: CastConfig{
-					DefaultCast: NewCast{
+					DefaultCast: Cast{
 						GCD: GCDDefault,
 					},
 				},

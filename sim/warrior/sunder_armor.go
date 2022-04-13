@@ -23,7 +23,7 @@ func (warrior *Warrior) newSunderArmorSpell(sim *core.Simulation, isDevastateEff
 		BaseCost:     cost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: cost,
 				GCD:  core.GCDDefault,
 			},

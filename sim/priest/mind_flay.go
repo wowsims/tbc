@@ -29,12 +29,12 @@ func (priest *Priest) newMindFlaySpell(sim *core.Simulation, numTicks int) *core
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost:        baseCost * (1 - 0.05*float64(priest.Talents.FocusedMind)),
 				GCD:         core.GCDDefault,
 				ChannelTime: time.Second * time.Duration(numTicks),
 			},
-			ModifyCast: func(sim *core.Simulation, spell *core.Spell, cast *core.NewCast) {
+			ModifyCast: func(sim *core.Simulation, spell *core.Spell, cast *core.Cast) {
 				// if our channel is longer than GCD it will have human latency to end it beause you can't queue the next spell.
 				var wait time.Duration // TODO: I think this got deleted at some point
 				gcd := core.MinDuration(core.GCDMin, time.Duration(float64(core.GCDDefault)/priest.CastSpeed()))

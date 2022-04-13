@@ -33,7 +33,7 @@ func (hunter *Hunter) registerRapidFireCD() {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost,
 			},
 			Cooldown: cooldown,
