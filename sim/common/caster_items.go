@@ -97,7 +97,7 @@ func ApplyTimbals(agent core.Agent) {
 
 		return character.GetOrRegisterAura(&core.Aura{
 			Label: "Timbals",
-			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
+			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("timbals") > proc { // can't activate if on CD or didn't proc
 					return
 				}

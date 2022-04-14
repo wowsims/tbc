@@ -58,7 +58,7 @@ var ItemSetAvatar = core.ItemSet{
 
 				return character.GetOrRegisterAura(&core.Aura{
 					Label: "Avatar Regalia 4pc",
-					OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
+					OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spell.ActionID.SpellID != SpellIDShadowWordPain {
 							return
 						}
@@ -98,7 +98,7 @@ func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
 		procAura := char.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32490}, stats.Stats{stats.SpellPower: 220}, time.Second*10)
 		return char.GetOrRegisterAura(&core.Aura{
 			Label: "Ashtongue Talisman",
-			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
+			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spell.ActionID.SpellID != SpellIDShadowWordPain {
 					return
 				}

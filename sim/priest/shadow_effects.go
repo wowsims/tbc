@@ -31,9 +31,9 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 	priest.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		return priest.GetOrRegisterAura(&core.Aura{
 			Label: "Priest Shadow Effects",
-			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
-				if tickDamage > 0 && priest.VampiricTouchDot.IsActive() {
-					amount := tickDamage * 0.05
+			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Damage > 0 && priest.VampiricTouchDot.IsActive() {
+					amount := spellEffect.Damage * 0.05
 					for _, partyMember := range priest.Party.Players {
 						partyMember.GetCharacter().AddMana(sim, amount, VampiricTouchActionID, false)
 					}

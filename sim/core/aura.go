@@ -635,9 +635,9 @@ func (at *auraTracker) OnSpellHit(sim *Simulation, spell *Spell, spellEffect *Sp
 // Invokes the OnPeriodicDamage
 //   As a debuff when target is being hit by dot.
 //   As a buff when caster's dots are ticking.
-func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spell *Spell, spellEffect *SpellEffect, tickDamage float64) {
+func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 	for _, aura := range at.onPeriodicDamageAuras {
-		aura.OnPeriodicDamage(sim, spell, spellEffect, tickDamage)
+		aura.OnPeriodicDamage(sim, spell, spellEffect)
 	}
 }
 
