@@ -121,7 +121,7 @@ func (druid *Druid) setupNaturesGrace() {
 		return
 	}
 
-	druid.NaturesGraceProcAura = druid.RegisterAura(&core.Aura{
+	druid.NaturesGraceProcAura = druid.RegisterAura(core.Aura{
 		Label:    "Natures Grace Proc",
 		ActionID: core.ActionID{SpellID: 16886},
 		Duration: core.NeverExpires,
@@ -135,7 +135,7 @@ func (druid *Druid) setupNaturesGrace() {
 	})
 
 	druid.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return druid.GetOrRegisterAura(&core.Aura{
+		return druid.GetOrRegisterAura(core.Aura{
 			Label: "Natures Grace",
 			//ActionID: core.ActionID{SpellID: 16880},
 			Duration: core.NeverExpires,
@@ -162,7 +162,7 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 	}
 	actionID := core.ActionID{SpellID: 17116}
 
-	druid.NaturesSwiftnessAura = druid.GetOrRegisterAura(&core.Aura{
+	druid.NaturesSwiftnessAura = druid.GetOrRegisterAura(core.Aura{
 		Label:    "Natures Swiftness",
 		ActionID: actionID,
 		Duration: core.NeverExpires,

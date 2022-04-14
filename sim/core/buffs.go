@@ -264,7 +264,7 @@ func SnapshotBattleShoutAura(character *Character, snapshotAp float64) *Aura {
 }
 
 func SanctityAura(character *Character, level float64) *Aura {
-	return character.GetOrRegisterAura(&Aura{
+	return character.GetOrRegisterAura(Aura{
 		Label:    "Sanctity Aura",
 		ActionID: ActionID{SpellID: 31870},
 		OnGain: func(aura *Aura, sim *Simulation) {
@@ -342,7 +342,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	icd := NewICD()
 	const icdDur = time.Duration(1)
 
-	return character.GetOrRegisterAura(&Aura{
+	return character.GetOrRegisterAura(Aura{
 		Label:    "Windfury Totem",
 		ActionID: ActionID{SpellID: WindfuryTotemSpellRanks[rank-1]}, // totem spell id ("Windfury Totem")
 		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
@@ -492,7 +492,7 @@ func BloodlustAura(character *Character, actionTag int32) *Aura {
 	const inverseBonus = 1 / bonus
 	actionID := ActionID{SpellID: 2825, Tag: actionTag}
 
-	return character.GetOrRegisterAura(&Aura{
+	return character.GetOrRegisterAura(Aura{
 		Label:    "Bloodlust-" + actionID.String(),
 		Tag:      BloodlustAuraTag,
 		ActionID: actionID,
@@ -557,7 +557,7 @@ func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
 func PowerInfusionAura(character *Character, actionTag int32) *Aura {
 	actionID := ActionID{SpellID: 10060, Tag: actionTag}
 
-	return character.GetOrRegisterAura(&Aura{
+	return character.GetOrRegisterAura(Aura{
 		Label:    "PowerInfusion-" + actionID.String(),
 		Tag:      PowerInfusionAuraTag,
 		ActionID: actionID,
@@ -641,7 +641,7 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 
 func InnervateAura(character *Character, expectedBonusManaReduction float64, actionTag int32) *Aura {
 	actionID := ActionID{SpellID: 29166, Tag: actionTag}
-	return character.GetOrRegisterAura(&Aura{
+	return character.GetOrRegisterAura(Aura{
 		Label:    "Innervate-" + actionID.String(),
 		Tag:      InnervateAuraTag,
 		ActionID: actionID,
@@ -728,7 +728,7 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 func ManaTideTotemAura(character *Character, actionTag int32) *Aura {
 	actionID := ActionID{SpellID: 16190, Tag: actionTag}
 
-	return character.GetOrRegisterAura(&Aura{
+	return character.GetOrRegisterAura(Aura{
 		Label:    "ManaTideTotem-" + actionID.String(),
 		Tag:      ManaTideTotemAuraTag,
 		ActionID: actionID,

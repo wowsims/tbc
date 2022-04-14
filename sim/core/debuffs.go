@@ -93,7 +93,7 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 func MiseryAura(target *Target, numPoints int32) *Aura {
 	multiplier := 1.0 + 0.01*float64(numPoints)
 
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "Misery-" + strconv.Itoa(int(numPoints)),
 		Tag:      "Misery",
 		ActionID: ActionID{SpellID: 33195},
@@ -119,7 +119,7 @@ func MiseryAura(target *Target, numPoints int32) *Aura {
 }
 
 func ShadowWeavingAura(target *Target, startingStacks int32) *Aura {
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:     "Shadow Weaving",
 		ActionID:  ActionID{SpellID: 15334},
 		Duration:  time.Second * 15,
@@ -138,7 +138,7 @@ func JudgementOfWisdomAura(target *Target) *Aura {
 	const mana = 74 / 2 // 50% proc
 	actionID := ActionID{SpellID: 27164}
 
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "Judgement of Wisdom",
 		ActionID: actionID,
 		Duration: time.Second * 20,
@@ -166,7 +166,7 @@ func JudgementOfWisdomAura(target *Target) *Aura {
 func JudgementOfTheCrusaderAura(target *Target, level int32) *Aura {
 	bonusCrit := float64(level) * SpellCritRatingPerCritChance
 
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "Judgement of the Crusader-" + strconv.Itoa(int(level)),
 		Tag:      "Judgement of the Crusader",
 		ActionID: ActionID{SpellID: 27159},
@@ -191,7 +191,7 @@ func JudgementOfTheCrusaderAura(target *Target, level int32) *Aura {
 func CurseOfElementsAura(target *Target, points int32) *Aura {
 	multiplier := 1.1 + 0.01*float64(points)
 
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "Curse of Elements-" + strconv.Itoa(int(points)),
 		Tag:      "Curse of Elements",
 		ActionID: ActionID{SpellID: 27228},
@@ -214,7 +214,7 @@ func CurseOfElementsAura(target *Target, points int32) *Aura {
 func ImprovedShadowBoltAura(target *Target, uptime float64) *Aura {
 	multiplier := (1 + uptime*0.2)
 
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:     "Improved Shadow Bolt",
 		ActionID:  ActionID{SpellID: 17803},
 		MaxStacks: 4,
@@ -228,7 +228,7 @@ func ImprovedShadowBoltAura(target *Target, uptime float64) *Aura {
 }
 
 func BloodFrenzyAura(target *Target) *Aura {
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "Blood Frenzy",
 		ActionID: ActionID{SpellID: 29859},
 		OnGain: func(aura *Aura, sim *Simulation) {
@@ -241,7 +241,7 @@ func BloodFrenzyAura(target *Target) *Aura {
 }
 
 func MangleAura(target *Target) *Aura {
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "Mangle",
 		ActionID: ActionID{SpellID: 33876},
 		OnGain: func(aura *Aura, sim *Simulation) {
@@ -256,7 +256,7 @@ func MangleAura(target *Target) *Aura {
 var ImprovedScorchAuraLabel = "Improved Scorch"
 
 func ImprovedScorchAura(target *Target, startingStacks int32) *Aura {
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:     ImprovedScorchAuraLabel,
 		ActionID:  ActionID{SpellID: 12873},
 		Duration:  time.Second * 30,
@@ -274,7 +274,7 @@ func ImprovedScorchAura(target *Target, startingStacks int32) *Aura {
 var WintersChillAuraLabel = "Winter's Chill"
 
 func WintersChillAura(target *Target, startingStacks int32) *Aura {
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:     WintersChillAuraLabel,
 		ActionID:  ActionID{SpellID: 28595},
 		Duration:  time.Second * 15,
@@ -291,7 +291,7 @@ func WintersChillAura(target *Target, startingStacks int32) *Aura {
 func FaerieFireAura(target *Target, level int32) *Aura {
 	const armorReduction = 610
 
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "Faerie Fire-" + strconv.Itoa(int(level)),
 		Tag:      "Faerie Fire",
 		ActionID: ActionID{SpellID: 26993},
@@ -314,7 +314,7 @@ var SunderExposeAuraTag = "SunderExpose"
 func SunderArmorAura(target *Target, startingStacks int32) *Aura {
 	armorReductionPerStack := 520.0
 
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:     SunderArmorAuraLabel,
 		Tag:       SunderExposeAuraTag,
 		ActionID:  ActionID{SpellID: 25225},
@@ -333,7 +333,7 @@ func SunderArmorAura(target *Target, startingStacks int32) *Aura {
 func ExposeArmorAura(target *Target, talentPoints int32) *Aura {
 	armorReduction := 2050.0 * (1.0 + 0.25*float64(talentPoints))
 
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "ExposeArmor-" + strconv.Itoa(int(talentPoints)),
 		Tag:      SunderExposeAuraTag,
 		ActionID: ActionID{SpellID: 26866},
@@ -351,7 +351,7 @@ func ExposeArmorAura(target *Target, talentPoints int32) *Aura {
 func CurseOfRecklessnessAura(target *Target) *Aura {
 	armorReduction := 800.0
 
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "Curse of Recklessness",
 		ActionID: ActionID{SpellID: 27226},
 		Duration: time.Minute * 2,
@@ -368,7 +368,7 @@ func CurseOfRecklessnessAura(target *Target) *Aura {
 func ExposeWeaknessAura(target *Target, hunterAgility float64, multiplier float64) *Aura {
 	apBonus := hunterAgility * 0.25 * multiplier
 
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "ExposeWeakness-" + strconv.Itoa(int(hunterAgility)),
 		Tag:      "ExposeWeakness",
 		ActionID: ActionID{SpellID: 34503},
@@ -402,7 +402,7 @@ func HuntersMarkAura(target *Target, points int32, fullyStacked bool) *Aura {
 		priority += 0.5
 	}
 
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:     "HuntersMark-" + strconv.Itoa(int(points)),
 		Tag:       "HuntersMark",
 		ActionID:  ActionID{SpellID: 14325},
@@ -432,7 +432,7 @@ func HuntersMarkAura(target *Target, points int32, fullyStacked bool) *Aura {
 func DemoralizingShoutAura(target *Target, boomingVoicePts int32, impDemoShoutPts int32) *Aura {
 	duration := time.Duration(float64(time.Second*30) * (1 + 0.1*float64(boomingVoicePts)))
 
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "DemoralizingShout-" + strconv.Itoa(int(impDemoShoutPts)),
 		Tag:      "DemoralizingShout",
 		ActionID: ActionID{SpellID: 25203},
@@ -446,7 +446,7 @@ func DemoralizingShoutAura(target *Target, boomingVoicePts int32, impDemoShoutPt
 }
 
 func ThunderClapAura(target *Target, impThunderClapPts int32) *Aura {
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "ThunderClap-" + strconv.Itoa(int(impThunderClapPts)),
 		Tag:      "ThunderClap",
 		ActionID: ActionID{SpellID: 25264},
@@ -460,7 +460,7 @@ func ThunderClapAura(target *Target, impThunderClapPts int32) *Aura {
 }
 
 func ScorpidStingAura(target *Target) *Aura {
-	return target.GetOrRegisterAura(&Aura{
+	return target.GetOrRegisterAura(Aura{
 		Label:    "Scorpid Sting",
 		ActionID: ActionID{SpellID: 3043},
 		Duration: time.Second * 20,

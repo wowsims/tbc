@@ -154,7 +154,7 @@ func (hunter *Hunter) applyFrenzy() {
 
 	procChance := 0.2 * float64(hunter.Talents.Frenzy)
 
-	procAura := hunter.pet.RegisterAura(&core.Aura{
+	procAura := hunter.pet.RegisterAura(core.Aura{
 		Label:    "Frenzy Proc",
 		ActionID: core.ActionID{SpellID: 19625},
 		Duration: time.Second * 8,
@@ -166,7 +166,7 @@ func (hunter *Hunter) applyFrenzy() {
 		},
 	})
 
-	frenzyAura := hunter.pet.RegisterAura(&core.Aura{
+	frenzyAura := hunter.pet.RegisterAura(core.Aura{
 		Label: "Frenzy",
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
@@ -191,7 +191,7 @@ func (hunter *Hunter) applyFerociousInspiration() {
 	multiplier := 1.0 + 0.01*float64(hunter.Talents.FerociousInspiration)
 
 	makeProcAura := func(character *core.Character) *core.Aura {
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label:    "Ferocious Inspiration-" + strconv.Itoa(int(hunter.Index)),
 			ActionID: core.ActionID{SpellID: 34460, Tag: int32(hunter.Index)},
 			Duration: time.Second * 10,
@@ -210,7 +210,7 @@ func (hunter *Hunter) applyFerociousInspiration() {
 			procAuras[i] = makeProcAura(playerOrPet.GetCharacter())
 		}
 
-		return hunter.GetOrRegisterAura(&core.Aura{
+		return hunter.GetOrRegisterAura(core.Aura{
 			Label: "Ferocious Inspiration",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
@@ -234,7 +234,7 @@ func (hunter *Hunter) registerBestialWrathCD() {
 
 	actionID := core.ActionID{SpellID: 19574, CooldownID: BestialWrathCooldownID}
 
-	bestialWrathPetAura := hunter.pet.RegisterAura(&core.Aura{
+	bestialWrathPetAura := hunter.pet.RegisterAura(core.Aura{
 		Label:    "Bestial Wrath Pet",
 		ActionID: actionID,
 		Duration: time.Second * 18,
@@ -246,7 +246,7 @@ func (hunter *Hunter) registerBestialWrathCD() {
 		},
 	})
 
-	bestialWrathAura := hunter.RegisterAura(&core.Aura{
+	bestialWrathAura := hunter.RegisterAura(core.Aura{
 		Label:    "Bestial Wrath",
 		ActionID: actionID,
 		Duration: time.Second * 18,
@@ -317,7 +317,7 @@ func (hunter *Hunter) applyGoForTheThroat() {
 
 	amount := 25.0 * float64(hunter.Talents.GoForTheThroat)
 
-	aura := hunter.RegisterAura(&core.Aura{
+	aura := hunter.RegisterAura(core.Aura{
 		Label: "Go for the Throat",
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.ProcMask.Matches(core.ProcMaskRanged) || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
@@ -361,7 +361,7 @@ func (hunter *Hunter) applyThrillOfTheHunt() {
 	procChance := float64(hunter.Talents.ThrillOfTheHunt) / 3
 	actionID := core.ActionID{SpellID: 34499}
 
-	aura := hunter.RegisterAura(&core.Aura{
+	aura := hunter.RegisterAura(core.Aura{
 		Label: "Thrill of the Hunt",
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// mask 256
@@ -394,7 +394,7 @@ func (hunter *Hunter) applyExposeWeakness() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		debuffAura := core.ExposeWeaknessAura(sim.GetPrimaryTarget(), float64(hunter.Index), 1.0)
 
-		return hunter.GetOrRegisterAura(&core.Aura{
+		return hunter.GetOrRegisterAura(core.Aura{
 			Label: "Expose Weakness Talent",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.ProcMask.Matches(core.ProcMaskRanged) {
@@ -435,7 +435,7 @@ func (hunter *Hunter) applyMasterTactician() {
 	hunter.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		procAura := hunter.NewTemporaryStatsAura("Master Tactician Proc", core.ActionID{SpellID: 34839}, stats.Stats{stats.MeleeCrit: critBonus}, time.Second*8)
 
-		return hunter.GetOrRegisterAura(&core.Aura{
+		return hunter.GetOrRegisterAura(core.Aura{
 			Label: "Master Tactician",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.ProcMask.Matches(core.ProcMaskRanged) || !spellEffect.Landed() {

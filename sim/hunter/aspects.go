@@ -15,7 +15,7 @@ func (hunter *Hunter) registerAspectOfTheHawkSpell(sim *core.Simulation) {
 	const improvedHawkProcChance = 0.1
 	if hunter.Talents.ImprovedAspectOfTheHawk > 0 {
 		improvedHawkBonus := 1 + 0.03*float64(hunter.Talents.ImprovedAspectOfTheHawk)
-		impHawkAura = hunter.GetOrRegisterAura(&core.Aura{
+		impHawkAura = hunter.GetOrRegisterAura(core.Aura{
 			Label:    "Improved Aspect of the Hawk",
 			ActionID: core.ActionID{SpellID: 19556},
 			Duration: time.Second * 12,
@@ -71,7 +71,7 @@ func (hunter *Hunter) registerAspectOfTheHawkSpell(sim *core.Simulation) {
 }
 
 func (hunter *Hunter) registerAspectOfTheViperSpell(sim *core.Simulation) {
-	hunter.AspectOfTheViperAura = hunter.RegisterAura(&core.Aura{
+	hunter.AspectOfTheViperAura = hunter.RegisterAura(core.Aura{
 		Label:    "Aspect of the Viper",
 		Tag:      "Aspect",
 		ActionID: AspectOfTheViperActionID,

@@ -48,7 +48,7 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 				procAura := character.NewTemporaryStatsAura("Tirisfal 4pc Proc", core.ActionID{SpellID: 37443}, stats.Stats{stats.SpellPower: 70}, time.Second*6)
-				return character.GetOrRegisterAura(&core.Aura{
+				return character.GetOrRegisterAura(core.Aura{
 					Label: "Tirisfal 4pc",
 					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
@@ -86,7 +86,7 @@ func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
 	char.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		procAura := char.NewTemporaryStatsAura("Asghtongue Talisman Proc", core.ActionID{SpellID: 32488}, stats.Stats{stats.SpellHaste: 150}, time.Second*5)
 
-		return char.GetOrRegisterAura(&core.Aura{
+		return char.GetOrRegisterAura(core.Aura{
 			Label: "Ashtongue Talisman",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {

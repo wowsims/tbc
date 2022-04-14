@@ -47,7 +47,7 @@ func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	druid.MoonfireDot = core.NewDot(core.Dot{
 		Spell: druid.Moonfire,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Moonfire-" + strconv.Itoa(int(druid.Index)),
 			ActionID: MoonfireActionID,
 		}),

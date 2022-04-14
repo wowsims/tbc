@@ -49,7 +49,7 @@ func (warrior *Warrior) registerBattleStanceAura() {
 	actionID := core.ActionID{SpellID: 2457}
 	threatMult := 0.8
 
-	warrior.BattleStanceAura = warrior.GetOrRegisterAura(&core.Aura{
+	warrior.BattleStanceAura = warrior.GetOrRegisterAura(core.Aura{
 		Label:    "Battle Stance",
 		Tag:      "Stance",
 		Priority: 1,
@@ -68,7 +68,7 @@ func (warrior *Warrior) registerDefensiveStanceAura() {
 	actionID := core.ActionID{SpellID: 71}
 	threatMult := 1.3 * (1 + 0.05*float64(warrior.Talents.Defiance))
 
-	warrior.DefensiveStanceAura = warrior.GetOrRegisterAura(&core.Aura{
+	warrior.DefensiveStanceAura = warrior.GetOrRegisterAura(core.Aura{
 		Label:    "Defensive Stance",
 		Tag:      "Stance",
 		Priority: 1,
@@ -89,7 +89,7 @@ func (warrior *Warrior) registerBerserkerStanceAura() {
 	threatMult := 0.8 - 0.02*float64(warrior.Talents.ImprovedBerserkerStance)
 	critBonus := core.MeleeCritRatingPerCritChance * 3
 
-	warrior.BerserkerStanceAura = warrior.GetOrRegisterAura(&core.Aura{
+	warrior.BerserkerStanceAura = warrior.GetOrRegisterAura(core.Aura{
 		Label:    "Berserker Stance",
 		Tag:      "Stance",
 		Priority: 1,

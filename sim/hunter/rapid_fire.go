@@ -13,7 +13,7 @@ func (hunter *Hunter) registerRapidFireCD() {
 	cooldown := time.Minute*5 - time.Minute*time.Duration(hunter.Talents.RapidKilling)
 	actionID := core.ActionID{SpellID: 3045, CooldownID: RapidFireCooldownID}
 
-	rfAura := hunter.RegisterAura(&core.Aura{
+	rfAura := hunter.RegisterAura(core.Aura{
 		Label:    "Rapid Fire",
 		ActionID: actionID,
 		Duration: time.Second * 15,

@@ -32,7 +32,7 @@ func (rogue *Rogue) registerSliceAndDice(sim *core.Simulation) {
 	}
 	inverseHasteBonus := 1.0 / hasteBonus
 
-	rogue.SliceAndDiceAura = rogue.RegisterAura(&core.Aura{
+	rogue.SliceAndDiceAura = rogue.RegisterAura(core.Aura{
 		Label:    "Slice and Dice",
 		ActionID: SliceAndDiceActionID,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {

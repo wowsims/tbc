@@ -44,7 +44,7 @@ func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.ShadowWordPainDot = core.NewDot(core.Dot{
 		Spell: priest.ShadowWordPain,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "ShadowWordPain-" + strconv.Itoa(int(priest.Index)),
 			ActionID: ShadowWordPainActionID,
 		}),

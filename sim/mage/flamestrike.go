@@ -61,7 +61,7 @@ func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
 
 	mage.FlamestrikeDot = core.NewDot(core.Dot{
 		Spell: mage.Flamestrike,
-		Aura: mage.RegisterAura(&core.Aura{
+		Aura: mage.RegisterAura(core.Aura{
 			Label:    "Flamestrike",
 			ActionID: FlamestrikeActionID,
 		}),

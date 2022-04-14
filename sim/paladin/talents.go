@@ -82,7 +82,7 @@ func (paladin *Paladin) applyVengeance() {
 	}
 
 	bonusPerStack := 0.01 * float64(paladin.Talents.Vengeance)
-	procAura := paladin.RegisterAura(&core.Aura{
+	procAura := paladin.RegisterAura(core.Aura{
 		Label:     "Vengeance Proc",
 		ActionID:  VengeanceActionID,
 		Duration:  VengeanceDuration,
@@ -93,7 +93,7 @@ func (paladin *Paladin) applyVengeance() {
 		},
 	})
 
-	passiveAura := paladin.RegisterAura(&core.Aura{
+	passiveAura := paladin.RegisterAura(core.Aura{
 		Label: "Vengeance",
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {

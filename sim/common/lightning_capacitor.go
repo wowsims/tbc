@@ -32,7 +32,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 		const icdDur = time.Millisecond * 2500
 		icd := core.NewICD()
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Lightning Capacitor",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if icd.IsOnCD(sim) {

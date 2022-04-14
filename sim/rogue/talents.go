@@ -81,7 +81,7 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim 
 	var fwAura *core.Aura
 	findWeaknessMultiplier := 1.0 + 0.02*float64(rogue.Talents.FindWeakness)
 	if findWeaknessMultiplier != 1 {
-		fwAura = rogue.GetOrRegisterAura(&core.Aura{
+		fwAura = rogue.GetOrRegisterAura(core.Aura{
 			Label:    "Find Weakness",
 			ActionID: core.ActionID{SpellID: 31242},
 			Duration: time.Second * 10,
@@ -138,7 +138,7 @@ func (rogue *Rogue) registerColdBloodCD() {
 
 	actionID := core.ActionID{SpellID: 14177, CooldownID: ColdBloodCooldownID}
 
-	coldBloodAura := rogue.RegisterAura(&core.Aura{
+	coldBloodAura := rogue.RegisterAura(core.Aura{
 		Label:    "Cold Blood",
 		ActionID: actionID,
 		Duration: core.NeverExpires,
@@ -194,7 +194,7 @@ func (rogue *Rogue) applySealFate() {
 	procChance := 0.2 * float64(rogue.Talents.SealFate)
 
 	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return rogue.GetOrRegisterAura(&core.Aura{
+		return rogue.GetOrRegisterAura(core.Aura{
 			Label: "Seal Fate",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SpellExtras.Matches(SpellFlagBuilder) {
@@ -250,7 +250,7 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 				ApplyEffects: core.ApplyEffectFuncDirectDamage(rogue.AutoAttacks.MHEffect),
 			})
 
-			return rogue.GetOrRegisterAura(&core.Aura{
+			return rogue.GetOrRegisterAura(core.Aura{
 				Label: "Sword Specialization",
 				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if !spellEffect.Landed() {
@@ -286,7 +286,7 @@ func (rogue *Rogue) applyCombatPotency() {
 	energyBonus := 3.0 * float64(rogue.Talents.CombatPotency)
 
 	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return rogue.GetOrRegisterAura(&core.Aura{
+		return rogue.GetOrRegisterAura(core.Aura{
 			Label: "Combat Potency",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
@@ -323,7 +323,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 	dur := time.Second * 15
 	cooldown := time.Minute * 2
 
-	rogue.BladeFlurryAura = rogue.RegisterAura(&core.Aura{
+	rogue.BladeFlurryAura = rogue.RegisterAura(core.Aura{
 		Label:    "Blade Flurry",
 		ActionID: actionID,
 		Duration: dur,
@@ -407,7 +407,7 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 
 	actionID := core.ActionID{SpellID: 13750, CooldownID: AdrenalineRushCooldownID}
 
-	rogue.AdrenalineRushAura = rogue.RegisterAura(&core.Aura{
+	rogue.AdrenalineRushAura = rogue.RegisterAura(core.Aura{
 		Label:    "Adrenaline Rush",
 		ActionID: actionID,
 		Duration: time.Second * 15,

@@ -62,7 +62,7 @@ func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	mage.ArcaneMissilesDot = core.NewDot(core.Dot{
 		Spell: mage.ArcaneMissiles,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "ArcaneMissiles-" + strconv.Itoa(int(mage.Index)),
 			ActionID: ArcaneMissilesActionID,
 		}),

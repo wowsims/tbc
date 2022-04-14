@@ -62,7 +62,7 @@ var ItemSetDeathmantle = core.ItemSet{
 			ppmm := rogue.AutoAttacks.NewPPMManager(1.0)
 
 			rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				return rogue.GetOrRegisterAura(&core.Aura{
+				return rogue.GetOrRegisterAura(core.Aura{
 					Label: "Deathmantle 4pc",
 					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
@@ -116,7 +116,7 @@ func ApplyWarpSpringCoil(agent core.Agent) {
 		const icdDur = time.Second * 30
 		icd := core.NewICD()
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Warp Spring Coil",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
@@ -154,7 +154,7 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 		procAura := rogue.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32492}, stats.Stats{stats.MeleeCrit: 145}, time.Second*10)
 		numPoints := int32(0)
 
-		return rogue.GetOrRegisterAura(&core.Aura{
+		return rogue.GetOrRegisterAura(core.Aura{
 			Label: "Ashtongue Talisman",
 			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if !spell.SpellExtras.Matches(SpellFlagFinisher) {

@@ -42,7 +42,7 @@ func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	hunter.SerpentStingDot = core.NewDot(core.Dot{
 		Spell: hunter.SerpentSting,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "SerpentSting-" + strconv.Itoa(int(hunter.Index)),
 			ActionID: SerpentStingActionID,
 		}),

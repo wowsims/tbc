@@ -35,7 +35,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 	})
 
 	// Define the aura
-	paladin.SealOfBloodAura = paladin.RegisterAura(&core.Aura{
+	paladin.SealOfBloodAura = paladin.RegisterAura(core.Aura{
 		Label:    "Seal of Blood",
 		Tag:      "Seal",
 		ActionID: SealOfBloodProcActionID,
@@ -98,7 +98,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	ppmm := paladin.AutoAttacks.NewPPMManager(7.0)
 	const icdDur = time.Second * 1
 
-	paladin.SealOfCommandAura = paladin.RegisterAura(&core.Aura{
+	paladin.SealOfCommandAura = paladin.RegisterAura(core.Aura{
 		Label:    "Seal of Command",
 		Tag:      "Seal",
 		ActionID: SealOfCommandProcActionID,
@@ -149,7 +149,7 @@ var SealOfTheCrusaderActionID = core.ActionID{SpellID: 27158}
 // Seal of the crusader has a bunch of effects that we realistically don't care about (bonus AP, faster swing speed)
 // For now, we'll just use it as a setup to casting Judgement of the Crusader
 func (paladin *Paladin) setupSealOfTheCrusader() {
-	paladin.SealOfTheCrusaderAura = paladin.RegisterAura(&core.Aura{
+	paladin.SealOfTheCrusaderAura = paladin.RegisterAura(core.Aura{
 		Label:    "Seal of the Crusader",
 		Tag:      "Seal",
 		ActionID: SealOfTheCrusaderActionID,
@@ -181,7 +181,7 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 var SealOfWisdomActionID = core.ActionID{SpellID: 27166}
 
 func (paladin *Paladin) setupSealOfWisdom() {
-	paladin.SealOfWisdomAura = paladin.RegisterAura(&core.Aura{
+	paladin.SealOfWisdomAura = paladin.RegisterAura(core.Aura{
 		Label:    "Seal of Wisdom",
 		Tag:      "Seal",
 		ActionID: SealOfWisdomActionID,

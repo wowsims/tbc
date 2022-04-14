@@ -244,7 +244,7 @@ func (at *auraTracker) HasActiveAura(label string) bool {
 	return aura != nil && aura.IsActive()
 }
 
-func (at *auraTracker) registerAura(unit *Unit, aura *Aura) *Aura {
+func (at *auraTracker) registerAura(unit *Unit, aura Aura) *Aura {
 	if unit == nil {
 		panic("Aura unit is required!")
 	}
@@ -261,21 +261,23 @@ func (at *auraTracker) registerAura(unit *Unit, aura *Aura) *Aura {
 		panic(fmt.Sprintf("Over 100 registered auras when registering %s! There is probably an aura being registered every iteration.", aura.Label))
 	}
 
-	aura.Unit = unit
-	aura.metrics.ID = aura.ActionID
+	newAura := &Aura{}
+	*newAura = aura
+	newAura.Unit = unit
+	newAura.metrics.ID = aura.ActionID
 
-	at.auras = append(at.auras, aura)
-	if aura.Tag != "" {
-		at.aurasByTag[aura.Tag] = append(at.aurasByTag[aura.Tag], aura)
+	at.auras = append(at.auras, newAura)
+	if newAura.Tag != "" {
+		at.aurasByTag[newAura.Tag] = append(at.aurasByTag[newAura.Tag], newAura)
 	}
 
-	return aura
+	return newAura
 }
-func (unit *Unit) RegisterAura(aura *Aura) *Aura {
+func (unit *Unit) RegisterAura(aura Aura) *Aura {
 	return unit.auraTracker.registerAura(unit, aura)
 }
 
-func (unit *Unit) GetOrRegisterAura(aura *Aura) *Aura {
+func (unit *Unit) GetOrRegisterAura(aura Aura) *Aura {
 	curAura := unit.GetAura(aura.Label)
 	if curAura == nil {
 		return unit.RegisterAura(aura)
@@ -635,9 +637,9 @@ func (at *auraTracker) OnSpellHit(sim *Simulation, spell *Spell, spellEffect *Sp
 // Invokes the OnPeriodicDamage
 //   As a debuff when target is being hit by dot.
 //   As a buff when caster's dots are ticking.
-func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spell *Spell, spellEffect *SpellEffect, tickDamage float64) {
+func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 	for _, aura := range at.onPeriodicDamageAuras {
-		aura.OnPeriodicDamage(sim, spell, spellEffect, tickDamage)
+		aura.OnPeriodicDamage(sim, spell, spellEffect)
 	}
 }
 
@@ -678,7 +680,7 @@ func (character *Character) NewTemporaryStatsAuraWrapped(auraLabel string, actio
 	buffs := character.ApplyStatDependencies(tempStats)
 	unbuffs := buffs.Multiply(-1)
 
-	config := &Aura{
+	config := Aura{
 		Label:    auraLabel,
 		ActionID: actionID,
 		Duration: duration,
@@ -697,7 +699,7 @@ func (character *Character) NewTemporaryStatsAuraWrapped(auraLabel string, actio
 	}
 
 	if modConfig != nil {
-		modConfig(config)
+		modConfig(&config)
 	}
 
 	return character.GetOrRegisterAura(config)

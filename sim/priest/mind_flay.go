@@ -64,7 +64,7 @@ func (priest *Priest) newMindFlayDot(sim *core.Simulation, numTicks int) *core.D
 	target := sim.GetPrimaryTarget()
 	return core.NewDot(core.Dot{
 		Spell: priest.MindFlay[numTicks],
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "MindFlay-" + strconv.Itoa(numTicks) + "-" + strconv.Itoa(int(priest.Index)),
 			ActionID: priest.MindFlayActionID(numTicks),
 		}),

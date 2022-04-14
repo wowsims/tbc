@@ -43,7 +43,7 @@ func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.VampiricTouchDot = core.NewDot(core.Dot{
 		Spell: priest.VampiricTouch,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "VampiricTouch-" + strconv.Itoa(int(priest.Index)),
 			ActionID: VampiricTouchActionID,
 		}),

@@ -43,7 +43,7 @@ var ItemSetWarbringerArmor = core.ItemSet{
 			character := agent.GetCharacter()
 
 			// TODO: This needs to apply only to specific abilities, not any source of damage.
-			procAura := character.GetOrRegisterAura(&core.Aura{
+			procAura := character.GetOrRegisterAura(core.Aura{
 				Label:    "Warbringer 4pc Proc",
 				ActionID: core.ActionID{SpellID: 37516},
 				Duration: core.NeverExpires,
@@ -60,7 +60,7 @@ var ItemSetWarbringerArmor = core.ItemSet{
 				},
 			})
 
-			passiveAura := character.GetOrRegisterAura(&core.Aura{
+			passiveAura := character.GetOrRegisterAura(core.Aura{
 				Label: "Warbringer 4pc",
 				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if spell.SameAction(RevengeActionID) {
@@ -144,7 +144,7 @@ func ApplyAshtongueTalismanOfValor(agent core.Agent) {
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		procAura := character.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32485}, stats.Stats{stats.Strength: 55}, time.Second*12)
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Ashtongue Talisman",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SameAction(ShieldSlamActionID) && !spell.SameAction(BloodthirstActionID) {

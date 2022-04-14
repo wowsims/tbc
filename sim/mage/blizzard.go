@@ -16,7 +16,7 @@ func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
 	baseCost := 1645.0
 
 	blizzardDot := core.NewDot(core.Dot{
-		Aura: mage.RegisterAura(&core.Aura{
+		Aura: mage.RegisterAura(core.Aura{
 			Label:    "Blizzard",
 			ActionID: BlizzardActionID,
 		}),

@@ -118,7 +118,7 @@ func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	shaman.FlameShockDot = core.NewDot(core.Dot{
 		Spell: shaman.FlameShock,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "FlameShock-" + strconv.Itoa(int(shaman.Index)),
 			ActionID: core.ActionID{SpellID: SpellIDFlameShock},
 		}),
