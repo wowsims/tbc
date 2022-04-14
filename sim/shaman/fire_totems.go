@@ -43,7 +43,7 @@ func (shaman *Shaman) registerSearingTotemSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	shaman.SearingTotemDot = core.NewDot(core.Dot{
 		Spell: shaman.SearingTotem,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "SearingTotem-" + strconv.Itoa(int(shaman.Index)),
 			ActionID: SearingTotemActionID,
 		}),
@@ -99,7 +99,7 @@ func (shaman *Shaman) registerMagmaTotemSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	shaman.MagmaTotemDot = core.NewDot(core.Dot{
 		Spell: shaman.MagmaTotem,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "MagmaTotem-" + strconv.Itoa(int(shaman.Index)),
 			ActionID: MagmaTotemActionID,
 		}),
@@ -159,7 +159,7 @@ func (shaman *Shaman) registerNovaTotemSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	shaman.FireNovaTotemDot = core.NewDot(core.Dot{
 		Spell: shaman.FireNovaTotem,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "FireNovaTotem-" + strconv.Itoa(int(shaman.Index)),
 			ActionID: FireNovaTotemActionID,
 		}),

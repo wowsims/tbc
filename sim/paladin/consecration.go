@@ -15,7 +15,7 @@ func (paladin *Paladin) registerConsecrationSpell(sim *core.Simulation) {
 	baseCost := 660.0
 
 	consecrationDot := core.NewDot(core.Dot{
-		Aura: paladin.RegisterAura(&core.Aura{
+		Aura: paladin.RegisterAura(core.Aura{
 			Label:    "Consecration",
 			ActionID: ConsecrationActionID,
 		}),

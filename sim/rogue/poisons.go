@@ -42,7 +42,7 @@ func (rogue *Rogue) registerDeadlyPoisonSpell(sim *core.Simulation) {
 	})
 
 	target := sim.GetPrimaryTarget()
-	dotAura := target.RegisterAura(&core.Aura{
+	dotAura := target.RegisterAura(core.Aura{
 		Label:     "DeadlyPoison-" + strconv.Itoa(int(rogue.Index)),
 		ActionID:  DeadlyPoisonActionID,
 		MaxStacks: 5,
@@ -76,7 +76,7 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 	procChance := 0.3 + 0.02*float64(rogue.Talents.ImprovedPoisons)
 
 	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return rogue.GetOrRegisterAura(&core.Aura{
+		return rogue.GetOrRegisterAura(core.Aura{
 			Label: "Deadly Poison",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
@@ -120,7 +120,7 @@ func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
 	procChance := 0.2 + 0.02*float64(rogue.Talents.ImprovedPoisons)
 
 	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return rogue.GetOrRegisterAura(&core.Aura{
+		return rogue.GetOrRegisterAura(core.Aura{
 			Label: "Instant Poison",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {

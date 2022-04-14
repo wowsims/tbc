@@ -46,7 +46,7 @@ func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.DevouringPlagueDot = core.NewDot(core.Dot{
 		Spell: priest.DevouringPlague,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "DevouringPlague-" + strconv.Itoa(int(priest.Index)),
 			ActionID: DevouringPlagueActionID,
 		}),

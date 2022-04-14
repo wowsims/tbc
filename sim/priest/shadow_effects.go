@@ -29,7 +29,7 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 	// This is a combined aura for all priest major on hit effects.
 	//  Shadow Weaving, Vampiric Touch, and Misery
 	priest.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return priest.GetOrRegisterAura(&core.Aura{
+		return priest.GetOrRegisterAura(core.Aura{
 			Label: "Priest Shadow Effects",
 			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Damage > 0 && priest.VampiricTouchDot.IsActive() {

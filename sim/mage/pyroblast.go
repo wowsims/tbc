@@ -59,7 +59,7 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	mage.PyroblastDot = core.NewDot(core.Dot{
 		Spell: mage.Pyroblast,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Pyroblast-" + strconv.Itoa(int(mage.Index)),
 			ActionID: PyroblastActionID,
 		}),

@@ -83,7 +83,7 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.ShadowfiendDot = core.NewDot(core.Dot{
 		Spell: priest.Shadowfiend,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Shadowfiend-" + strconv.Itoa(int(priest.Index)),
 			ActionID: ShadowfiendActionID,
 		}),

@@ -166,7 +166,7 @@ func applyRaceEffects(agent Agent) {
 			actionID = ActionID{SpellID: 20554, CooldownID: TrollBerserkingCooldownID}
 		}
 
-		berserkingAura := character.RegisterAura(&Aura{
+		berserkingAura := character.RegisterAura(Aura{
 			Label:    "Berserking",
 			ActionID: actionID,
 			Duration: dur,

@@ -23,7 +23,7 @@ var ItemSetMalorne = core.ItemSet{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				return character.GetOrRegisterAura(&core.Aura{
+				return character.GetOrRegisterAura(core.Aura{
 					Label: "Malorne Raiment 2pc",
 					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
@@ -73,7 +73,7 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 
 	druid.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		procAura := druid.NewTemporaryStatsAura("Living Root Proc", core.ActionID{ItemID: 30664}, stats.Stats{stats.SpellPower: 209}, time.Second*15)
-		return druid.GetOrRegisterAura(&core.Aura{
+		return druid.GetOrRegisterAura(core.Aura{
 			Label: "Living Root of the Wildheart",
 			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				// technically only works while in moonkin form... but i think we can assume thats always true.
@@ -95,7 +95,7 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 	druid := druidAgent.GetDruid()
 	druid.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		procAura := druid.NewTemporaryStatsAura("Idol of the Unseen Moon Proc", actionID, stats.Stats{stats.SpellPower: 140}, time.Second*10)
-		return druid.GetOrRegisterAura(&core.Aura{
+		return druid.GetOrRegisterAura(core.Aura{
 			Label: "Idol of the Unseen Moon",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spell.ActionID.SpellID == SpellIDMoonfire {
@@ -118,7 +118,7 @@ func ApplyAshtongueTalisman(agent core.Agent) {
 	char := agent.GetCharacter()
 	char.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		procAura := char.NewTemporaryStatsAura("Ashtongue Talisman Proc", actionID, stats.Stats{stats.SpellPower: 150}, time.Second*8)
-		return char.GetOrRegisterAura(&core.Aura{
+		return char.GetOrRegisterAura(core.Aura{
 			Label: "Ashtongue Talisman",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spell.ActionID.SpellID == SpellIDSF8 || spell.ActionID.SpellID == SpellIDSF6 {

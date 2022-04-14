@@ -17,7 +17,7 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 	baseCost := 1905.0
 
 	hurricaneDot := core.NewDot(core.Dot{
-		Aura: druid.RegisterAura(&core.Aura{
+		Aura: druid.RegisterAura(core.Aura{
 			Label:    "Hurricane",
 			ActionID: HurricaneActionID,
 		}),

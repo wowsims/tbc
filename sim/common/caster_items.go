@@ -25,7 +25,7 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 		const icdDur = time.Second * 50
 		const proc = 0.2
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Robe of the Elder Scribes",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
@@ -54,7 +54,7 @@ func ApplyEternalSage(agent core.Agent) {
 		const icdDur = time.Second * 60
 		const proc = 0.1
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Band of the Eternal Sage",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
@@ -95,7 +95,7 @@ func ApplyTimbals(agent core.Agent) {
 		const icdDur = time.Second * 15
 		const proc = 0.1
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Timbals",
 			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("timbals") > proc { // can't activate if on CD or didn't proc

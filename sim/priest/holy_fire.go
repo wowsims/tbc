@@ -47,7 +47,7 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.HolyFireDot = core.NewDot(core.Dot{
 		Spell: priest.HolyFire,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "HolyFire-" + strconv.Itoa(int(priest.Index)),
 			ActionID: HolyFireActionID,
 		}),

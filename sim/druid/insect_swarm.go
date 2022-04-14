@@ -45,7 +45,7 @@ func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	druid.InsectSwarmDot = core.NewDot(core.Dot{
 		Spell: druid.InsectSwarm,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "InsectSwarm-" + strconv.Itoa(int(druid.Index)),
 			ActionID: InsectSwarmActionID,
 		}),

@@ -35,7 +35,7 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			ppmm := shaman.AutoAttacks.NewPPMManager(15)
-			srAura := shaman.GetOrRegisterAura(&core.Aura{
+			srAura := shaman.GetOrRegisterAura(core.Aura{
 				Label:    "Shamanistic Rage",
 				ActionID: ShamanisticRageActionID,
 				Duration: time.Second * 15,

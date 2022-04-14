@@ -61,7 +61,7 @@ func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	mage.FireballDot = core.NewDot(core.Dot{
 		Spell: mage.Fireball,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Fireball-" + strconv.Itoa(int(mage.Index)),
 			ActionID: FireballActionID,
 		}),
