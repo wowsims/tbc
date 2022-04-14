@@ -11,7 +11,6 @@ type ApplySpellEffects func(*Simulation, *Target, *Spell)
 type SpellConfig struct {
 	// See definition of Spell (below) for comments on these.
 	ActionID
-	Character    *Character
 	SpellSchool  SpellSchool
 	SpellExtras  SpellExtras
 	ResourceType stats.Stat
@@ -170,20 +169,22 @@ func ApplyEffectFuncAll(effectFuncs []ApplySpellEffects) ApplySpellEffects {
 }
 
 func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
+	effect := &SpellEffect{}
+
 	if baseEffect.BaseDamage.Calculator == nil {
 		// Just a hit check.
 		return func(sim *Simulation, target *Target, spell *Spell) {
-			effect := baseEffect
+			*effect = baseEffect
 			effect.Target = target
 			effect.init(sim, spell)
 
 			damage := 0.0
-			effect.OutcomeApplier(sim, spell, &effect, &damage)
+			effect.OutcomeApplier(sim, spell, effect, &damage)
 			effect.triggerProcs(sim, spell)
 		}
 	} else {
 		return func(sim *Simulation, target *Target, spell *Spell) {
-			effect := baseEffect
+			*effect = baseEffect
 			effect.Target = target
 			effect.init(sim, spell)
 
