@@ -25,9 +25,9 @@ var ItemSetManaEtched = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
+			procAura := character.NewTemporaryStatsAura("Mana-Etched Insight Proc", core.ActionID{SpellID: 37619}, stats.Stats{stats.SpellPower: 110}, time.Second*15)
 
 			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				procAura := character.NewTemporaryStatsAura("Mana-Etched Insight Proc", core.ActionID{SpellID: 37619}, stats.Stats{stats.SpellPower: 110}, time.Second*15)
 				return character.GetOrRegisterAura(core.Aura{
 					Label: "Mana-Etched Insight",
 					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
@@ -56,9 +56,9 @@ var ItemSetSpellstrike = core.ItemSet{
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
+			procAura := character.NewTemporaryStatsAura("Spellstrike Proc", core.ActionID{SpellID: 32106}, stats.Stats{stats.SpellPower: 92}, time.Second*10)
 
 			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				procAura := character.NewTemporaryStatsAura("Spellstrike Proc", core.ActionID{SpellID: 32106}, stats.Stats{stats.SpellPower: 92}, time.Second*10)
 				return character.GetOrRegisterAura(core.Aura{
 					Label: "Spellstrike",
 					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {

@@ -17,9 +17,9 @@ func init() {
 
 func ApplyRobeOfTheElderScribes(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Power of Arcanagos", core.ActionID{ItemID: 28602}, stats.Stats{stats.SpellPower: 130}, time.Second*10)
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Power of Arcanagos", core.ActionID{ItemID: 28602}, stats.Stats{stats.SpellPower: 130}, time.Second*10)
 		// Gives a chance when your harmful spells land to increase the damage of your spells and effects by up to 130 for 10 sec. (Proc chance: 20%, 50s cooldown)
 		icd := core.NewICD()
 		const icdDur = time.Second * 50
@@ -46,9 +46,9 @@ func ApplyRobeOfTheElderScribes(agent core.Agent) {
 
 func ApplyEternalSage(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Band of the Eternal Sage Proc", core.ActionID{ItemID: 29305}, stats.Stats{stats.SpellPower: 95}, time.Second*10)
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Band of the Eternal Sage Proc", core.ActionID{ItemID: 29305}, stats.Stats{stats.SpellPower: 95}, time.Second*10)
 		// Your offensive spells have a chance on hit to increase your spell damage by 95 for 10 secs.
 		icd := core.NewICD()
 		const icdDur = time.Second * 60

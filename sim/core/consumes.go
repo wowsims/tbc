@@ -334,10 +334,10 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 			}
 		}
 	} else {
+		drumsAura := makeDrumsAura(agent.GetCharacter(), drumsType)
 		// When there is no real player using drums, each player gets a fake CD that
 		// gives just themself the buff, with no cast time.
 		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
-			drumsAura := makeDrumsAura(agent.GetCharacter(), drumsType)
 			return func(sim *Simulation, character *Character) {
 				drumsAura.Activate(sim)
 			}

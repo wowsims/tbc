@@ -45,9 +45,9 @@ func ApplyMarkOfTheChampionCaster(agent core.Agent) {
 
 func ApplyQuagmirransEye(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Fungal Frenzy", core.ActionID{ItemID: 27683}, stats.Stats{stats.SpellHaste: 320}, time.Second*6)
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Fungal Frenzy", core.ActionID{ItemID: 27683}, stats.Stats{stats.SpellHaste: 320}, time.Second*6)
 		icd := core.NewICD()
 		const icdDur = time.Second * 45
 
@@ -66,9 +66,9 @@ func ApplyQuagmirransEye(agent core.Agent) {
 
 func ApplyShiffarsNexusHorn(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Call of the Nexus", core.ActionID{ItemID: 28418}, stats.Stats{stats.SpellPower: 225}, time.Second*10)
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Call of the Nexus", core.ActionID{ItemID: 28418}, stats.Stats{stats.SpellPower: 225}, time.Second*10)
 		icd := core.NewICD()
 		const dur = time.Second * 45
 
@@ -93,9 +93,9 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 
 func ApplyEyeOfMagtheridon(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Recurring Power", core.ActionID{ItemID: 28789}, stats.Stats{stats.SpellPower: 170}, time.Second*10)
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Recurring Power", core.ActionID{ItemID: 28789}, stats.Stats{stats.SpellPower: 170}, time.Second*10)
 		return character.GetOrRegisterAura(core.Aura{
 			Label: "Eye of Magtheridon",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -113,9 +113,9 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 
 func ApplySextantOfUnstableCurrents(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Unstable Currents", core.ActionID{ItemID: 30626}, stats.Stats{stats.SpellPower: 190}, time.Second*15)
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Unstable Currents", core.ActionID{ItemID: 30626}, stats.Stats{stats.SpellPower: 190}, time.Second*15)
 		icd := core.NewICD()
 		const icdDur = time.Second * 45
 

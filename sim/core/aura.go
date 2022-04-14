@@ -28,6 +28,8 @@ var GCDCooldownID = NewCooldownID()
 var OffensiveTrinketSharedCooldownID = NewCooldownID()
 var DefensiveTrinketSharedCooldownID = NewCooldownID()
 
+type OnInit func(aura *Aura, sim *Simulation)
+type OnReset func(aura *Aura, sim *Simulation)
 type OnGain func(aura *Aura, sim *Simulation)
 type OnExpire func(aura *Aura, sim *Simulation)
 type OnStacksChange func(aura *Aura, sim *Simulation, oldStacks int32, newStacks int32)
@@ -81,6 +83,8 @@ type Aura struct {
 	OnSpellHit OnSpellHit
 
 	// Invoked when this Aura is added/remvoed. Neither is invoked on refresh.
+	OnInit   OnInit
+	OnReset  OnReset
 	OnGain   OnGain
 	OnExpire OnExpire
 
@@ -92,6 +96,26 @@ type Aura struct {
 
 	// Metrics for this aura.
 	metrics AuraMetrics
+}
+
+func (aura *Aura) init(sim *Simulation) {
+	if aura.OnInit != nil {
+		aura.OnInit(aura, sim)
+	}
+}
+
+func (aura *Aura) reset(sim *Simulation) {
+	if aura.IsActive() {
+		panic("Active aura during reset: " + aura.Label)
+	}
+	if aura.stacks != 0 {
+		panic("Aura nonzero stacks during reset: " + aura.Label)
+	}
+	aura.metrics.reset()
+
+	if aura.OnReset != nil {
+		aura.OnReset(aura, sim)
+	}
 }
 
 func (aura *Aura) IsActive() bool {
@@ -209,6 +233,8 @@ type auraTracker struct {
 
 	// caches the minimum expires time of all active auras; reset to 0 on Activate(), Deactivate(), and Refresh()
 	minExpires time.Duration
+
+	initialized bool
 
 	// Auras that have a non-nil XXX function set and are currently active.
 	onCastCompleteAuras   []*Aura
@@ -348,22 +374,23 @@ func (at *auraTracker) finalize() {
 	}
 }
 
+func (at *auraTracker) init(sim *Simulation) {
+	if at.initialized {
+		return
+	}
+	at.initialized = true
+
+	for _, aura := range at.auras {
+		aura.init(sim)
+	}
+}
+
 func (at *auraTracker) reset(sim *Simulation) {
 	at.cooldowns = make([]time.Duration, numCooldownIDs)
 	at.activeAuras = at.activeAuras[:0]
 	at.onCastCompleteAuras = at.onCastCompleteAuras[:0]
 	at.onSpellHitAuras = at.onSpellHitAuras[:0]
 	at.onPeriodicDamageAuras = at.onPeriodicDamageAuras[:0]
-
-	for _, aura := range at.auras {
-		if aura.IsActive() {
-			panic("Active aura during reset: " + aura.Label)
-		}
-		if aura.stacks != 0 {
-			panic("Aura nonzero stacks during reset: " + aura.Label)
-		}
-		aura.metrics.reset()
-	}
 
 	for _, resetEffect := range at.resetEffects {
 		resetEffect(sim)
@@ -376,7 +403,15 @@ func (at *auraTracker) reset(sim *Simulation) {
 		if !permAura.RespectDuration {
 			aura.Duration = NeverExpires
 		}
-		aura.Activate(sim)
+	}
+
+	for _, aura := range at.auras {
+		aura.reset(sim)
+	}
+
+	for i := range at.permanentAuras {
+		permAura := &at.permanentAuras[i]
+		permAura.aura.Activate(sim)
 	}
 }
 
@@ -677,24 +712,36 @@ func (character *Character) NewTemporaryStatsAura(auraLabel string, actionID Act
 
 // Alternative that allows modifying the Aura config.
 func (character *Character) NewTemporaryStatsAuraWrapped(auraLabel string, actionID ActionID, tempStats stats.Stats, duration time.Duration, modConfig func(*Aura)) *Aura {
-	buffs := character.ApplyStatDependencies(tempStats)
-	unbuffs := buffs.Multiply(-1)
+	var buffs *stats.Stats = &stats.Stats{}
+	var unbuffs *stats.Stats = &stats.Stats{}
+	init := false
 
 	config := Aura{
 		Label:    auraLabel,
 		ActionID: actionID,
 		Duration: duration,
+		OnInit: func(aura *Aura, sim *Simulation) {
+			*buffs = character.ApplyStatDependencies(tempStats)
+			*unbuffs = buffs.Multiply(-1)
+			init = true
+		},
 		OnGain: func(aura *Aura, sim *Simulation) {
-			character.AddStatsDynamic(sim, buffs)
+			if !init {
+				panic("not init: " + actionID.String())
+			}
+			character.AddStatsDynamic(sim, *buffs)
 			if sim.Log != nil {
 				character.Log(sim, "Gained %s from %s.", buffs.FlatString(), actionID)
 			}
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
+			if !init {
+				panic("not init")
+			}
 			if sim.Log != nil {
 				character.Log(sim, "Lost %s from fading %s.", buffs.FlatString(), actionID)
 			}
-			character.AddStatsDynamic(sim, unbuffs)
+			character.AddStatsDynamic(sim, *unbuffs)
 		},
 	}
 

@@ -26,9 +26,9 @@ func ApplyBrutalEarthstormDiamond(agent core.Agent) {
 
 func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Mystic Focus Proc", core.ActionID{ItemID: 25893}, stats.Stats{stats.SpellHaste: 320}, time.Second*4)
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Mystic Focus Proc", core.ActionID{ItemID: 25893}, stats.Stats{stats.SpellHaste: 320}, time.Second*4)
 		const icdDur = time.Second * 35
 		icd := core.NewICD()
 
@@ -76,9 +76,9 @@ func ApplyEmberSkyfireDiamond(agent core.Agent) {
 
 func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Thundering Skyfire Diamond Proc", core.ActionID{ItemID: 32410}, stats.Stats{stats.MeleeHaste: 240}, time.Second*6)
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Thundering Skyfire Diamond Proc", core.ActionID{ItemID: 32410}, stats.Stats{stats.MeleeHaste: 240}, time.Second*6)
 		icd := core.NewICD()
 		const icdDur = time.Second * 40
 		ppmm := character.AutoAttacks.NewPPMManager(1.5)

@@ -110,9 +110,10 @@ var ItemSetSlayers = core.ItemSet{
 
 func ApplyWarpSpringCoil(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Warp Spring Coil Proc", core.ActionID{ItemID: 30450}, stats.Stats{stats.ArmorPenetration: 1000}, time.Second*15)
+	const procChance = 0.25
+
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Warp Spring Coil Proc", core.ActionID{ItemID: 30450}, stats.Stats{stats.ArmorPenetration: 1000}, time.Second*15)
-		const procChance = 0.25
 		const icdDur = time.Second * 30
 		icd := core.NewICD()
 
@@ -149,9 +150,9 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 		log.Fatalf("Non-rogue attempted to activate Ashtongue Talisman of Lethality.")
 	}
 	rogue := rogueAgent.GetRogue()
+	procAura := rogue.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32492}, stats.Stats{stats.MeleeCrit: 145}, time.Second*10)
 
 	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := rogue.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32492}, stats.Stats{stats.MeleeCrit: 145}, time.Second*10)
 		numPoints := int32(0)
 
 		return rogue.GetOrRegisterAura(core.Aura{

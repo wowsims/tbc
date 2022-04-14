@@ -60,12 +60,12 @@ func ApplyCrusader(agent core.Agent) {
 		ppmm.SetProcChance(false, 0)
 	}
 
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		// -4 str per level over 60
-		const strBonus = 100.0 - 4.0*float64(core.CharacterLevel-60)
-		mhAura := character.NewTemporaryStatsAura("Crusader Enchant MH", core.ActionID{SpellID: 20007, Tag: 1}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
-		ohAura := character.NewTemporaryStatsAura("Crusader Enchant OH", core.ActionID{SpellID: 20007, Tag: 2}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
+	// -4 str per level over 60
+	const strBonus = 100.0 - 4.0*float64(core.CharacterLevel-60)
+	mhAura := character.NewTemporaryStatsAura("Crusader Enchant MH", core.ActionID{SpellID: 20007, Tag: 1}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
+	ohAura := character.NewTemporaryStatsAura("Crusader Enchant OH", core.ActionID{SpellID: 20007, Tag: 2}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
 
+	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		return character.GetOrRegisterAura(core.Aura{
 			Label: "Crusader Enchant",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -128,27 +128,29 @@ func ApplyMongoose(agent core.Agent) {
 		ppmm.SetProcChance(false, 0)
 	}
 
+	mhAura := newLightningSpeedAura(character, "Lightning Speed MH", core.ActionID{SpellID: 28093, Tag: 1})
+	ohAura := newLightningSpeedAura(character, "Lightning Speed OH", core.ActionID{SpellID: 28093, Tag: 2})
+
+	mongooseAura := character.GetOrRegisterAura(core.Aura{
+		Label: "Mongoose Enchant",
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				return
+			}
+
+			isMH := spellEffect.IsMH()
+			if ppmm.Proc(sim, isMH, false, "mongoose") {
+				if isMH {
+					mhAura.Activate(sim)
+				} else {
+					ohAura.Activate(sim)
+				}
+			}
+		},
+	})
+
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		mhAura := newLightningSpeedAura(character, "Lightning Speed MH", core.ActionID{SpellID: 28093, Tag: 1})
-		ohAura := newLightningSpeedAura(character, "Lightning Speed OH", core.ActionID{SpellID: 28093, Tag: 2})
-
-		return character.GetOrRegisterAura(core.Aura{
-			Label: "Mongoose Enchant",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
-					return
-				}
-
-				isMH := spellEffect.IsMH()
-				if ppmm.Proc(sim, isMH, false, "mongoose") {
-					if isMH {
-						mhAura.Activate(sim)
-					} else {
-						ohAura.Activate(sim)
-					}
-				}
-			},
-		})
+		return mongooseAura
 	})
 }
 
@@ -187,8 +189,9 @@ func ApplyExecutioner(agent core.Agent) {
 		ppmm.SetProcChance(false, 0)
 	}
 
+	procAura := character.NewTemporaryStatsAura("Executioner Proc", core.ActionID{SpellID: 42976}, stats.Stats{stats.ArmorPenetration: 840}, time.Second*15)
+
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Executioner Proc", core.ActionID{SpellID: 42976}, stats.Stats{stats.ArmorPenetration: 840}, time.Second*15)
 
 		return character.GetOrRegisterAura(core.Aura{
 			Label: "Executioner",

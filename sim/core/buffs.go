@@ -343,8 +343,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	const icdDur = time.Duration(1)
 
 	return character.GetOrRegisterAura(Aura{
-		Label:    "Windfury Totem",
-		ActionID: ActionID{SpellID: WindfuryTotemSpellRanks[rank-1]}, // totem spell id ("Windfury Totem")
+		Label: "Windfury Totem",
 		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeMHAuto) {
 				return

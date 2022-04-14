@@ -41,9 +41,9 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
+			procAura := character.NewTemporaryStatsAura("Desolation Battlegear Proc", core.ActionID{SpellID: 37617}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*15)
 
 			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				procAura := character.NewTemporaryStatsAura("Desolation Battlegear Proc", core.ActionID{SpellID: 37617}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*15)
 				icd := core.NewICD()
 				const icdDur = time.Second * 20
 				const procChance = 0.01
@@ -80,9 +80,9 @@ var ItemSetDoomplateBattlegear = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
+			procAura := character.NewTemporaryStatsAura("Doomplate Battlegear Proc", core.ActionID{SpellID: 37611}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*15)
 
 			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				procAura := character.NewTemporaryStatsAura("Doomplate Battlegear Proc", core.ActionID{SpellID: 37611}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*15)
 				const procChance = 0.02
 				return character.GetOrRegisterAura(core.Aura{
 					Label: "Doomplate Battlegear",
@@ -210,9 +210,9 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 					character.PseudoStats.MobTypeAttackPower += 200
 				}
 			})
+			procAura := character.NewTemporaryStatsAura("Twin Blade of Azzinoth Proc", core.ActionID{SpellID: 41435}, stats.Stats{stats.MeleeHaste: 450}, time.Second*10)
 
 			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				procAura := character.NewTemporaryStatsAura("Twin Blade of Azzinoth Proc", core.ActionID{SpellID: 41435}, stats.Stats{stats.MeleeHaste: 450}, time.Second*10)
 				ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
 				icd := core.NewICD()
@@ -254,9 +254,9 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
+			procAura := character.NewTemporaryStatsAura("Wastewalker Armor Proc", core.ActionID{SpellID: 37618}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*15)
 
 			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				procAura := character.NewTemporaryStatsAura("Wastewalker Armor Proc", core.ActionID{SpellID: 37618}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*15)
 				icd := core.NewICD()
 				const icdDur = time.Second * 20
 				const procChance = 0.02

@@ -220,9 +220,9 @@ func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 		log.Fatalf("Non-shaman attempted to activate Ashtongue Talisman of Vision.")
 	}
 	shaman := shamanAgent.GetShaman()
+	procAura := shaman.NewTemporaryStatsAura("Ashtongue Talisman of Vision Proc", core.ActionID{ItemID: 32491}, stats.Stats{stats.AttackPower: 275}, time.Second*10)
 
 	shaman.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := shaman.NewTemporaryStatsAura("Ashtongue Talisman of Vision Proc", core.ActionID{ItemID: 32491}, stats.Stats{stats.AttackPower: 275}, time.Second*10)
 		return shaman.GetOrRegisterAura(core.Aura{
 			Label: "Ashtongue Talisman of Vision",
 			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
@@ -241,9 +241,9 @@ func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 
 func ApplySkycallTotem(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Skycall Totem Proc", core.ActionID{ItemID: 33506}, stats.Stats{stats.SpellHaste: 101}, time.Second*10)
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Skycall Totem Proc", core.ActionID{ItemID: 33506}, stats.Stats{stats.SpellHaste: 101}, time.Second*10)
 		return character.GetOrRegisterAura(core.Aura{
 			Label: "Skycall Totem",
 			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
@@ -257,8 +257,9 @@ func ApplySkycallTotem(agent core.Agent) {
 
 func ApplyStonebreakersTotem(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Stonebreakers Totem Proc", core.ActionID{ItemID: 33507}, stats.Stats{stats.AttackPower: 110}, time.Second*10)
+
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Stonebreakers Totem Proc", core.ActionID{ItemID: 33507}, stats.Stats{stats.AttackPower: 110}, time.Second*10)
 		icd := core.NewICD()
 		const icdDur = time.Second * 10
 		const procChance = 0.5

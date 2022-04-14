@@ -201,10 +201,10 @@ func ApplyMarkOfTheChampionMelee(agent core.Agent) {
 
 func ApplyHourglassUnraveller(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Rage of the Unraveller", core.ActionID{ItemID: 28034}, stats.Stats{stats.AttackPower: 300, stats.RangedAttackPower: 300}, time.Second*10)
+	const procChance = 0.1
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Rage of the Unraveller", core.ActionID{ItemID: 28034}, stats.Stats{stats.AttackPower: 300, stats.RangedAttackPower: 300}, time.Second*10)
-		const procChance = 0.1
 		icd := core.NewICD()
 		const icdDur = time.Second * 50
 
@@ -269,9 +269,9 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 
 func ApplyDragonspineTrophy(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Dragonspine Trophy Proc", core.ActionID{ItemID: 28830}, stats.Stats{stats.MeleeHaste: 325}, time.Second*10)
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Dragonspine Trophy Proc", core.ActionID{ItemID: 28830}, stats.Stats{stats.MeleeHaste: 325}, time.Second*10)
 		icd := core.NewICD()
 		const icdDur = time.Second * 20
 		ppmm := character.AutoAttacks.NewPPMManager(1.0)
@@ -299,13 +299,12 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 
 func ApplyTsunamiTalisman(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Tsunami Talisman Proc", core.ActionID{ItemID: 30627}, stats.Stats{stats.AttackPower: 340, stats.RangedAttackPower: 340}, time.Second*10)
+	const procChance = 0.1
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Tsunami Talisman Proc", core.ActionID{ItemID: 30627}, stats.Stats{stats.AttackPower: 340, stats.RangedAttackPower: 340}, time.Second*10)
-
 		icd := core.NewICD()
 		const icdDur = time.Second * 45
-		const procChance = 0.1
 
 		return character.GetOrRegisterAura(core.Aura{
 			Label: "Tsunami Talisman",
@@ -366,9 +365,9 @@ func ApplyDarkmoonCardWrath(agent core.Agent) {
 
 func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Madness of the Betrayer Proc", core.ActionID{ItemID: 32505}, stats.Stats{stats.ArmorPenetration: 300}, time.Second*10)
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Madness of the Betrayer Proc", core.ActionID{ItemID: 32505}, stats.Stats{stats.ArmorPenetration: 300}, time.Second*10)
 		ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
 		return character.GetOrRegisterAura(core.Aura{
@@ -437,9 +436,9 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 
 func ApplyShardOfContempt(agent core.Agent) {
 	character := agent.GetCharacter()
+	procAura := character.NewTemporaryStatsAura("Shard of Contempt Proc", core.ActionID{ItemID: 34472}, stats.Stats{stats.AttackPower: 230, stats.RangedAttackPower: 230}, time.Second*20)
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Shard of Contempt Proc", core.ActionID{ItemID: 34472}, stats.Stats{stats.AttackPower: 230, stats.RangedAttackPower: 230}, time.Second*20)
 		icd := core.NewICD()
 		const icdDur = time.Second * 45
 		const procChance = 0.1
