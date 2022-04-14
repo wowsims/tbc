@@ -101,29 +101,31 @@ func NewDot(config Dot) *Dot {
 }
 
 func TickFuncSnapshot(target *Target, baseEffect SpellEffect) TickEffects {
+	snapshotEffect := &SpellEffect{}
 	return func(sim *Simulation, spell *Spell) func() {
-		snapshotEffect := baseEffect
+		*snapshotEffect = baseEffect
 		snapshotEffect.Target = target
 		baseDamage := snapshotEffect.calculateBaseDamage(sim, spell) * snapshotEffect.DamageMultiplier
 		snapshotEffect.DamageMultiplier = 1
 		snapshotEffect.BaseDamage = BaseDamageConfigFlat(baseDamage)
 
-		effectsFunc := ApplyEffectFuncDirectDamage(snapshotEffect)
+		effectsFunc := ApplyEffectFuncDirectDamage(*snapshotEffect)
 		return func() {
 			effectsFunc(sim, target, spell)
 		}
 	}
 }
 func TickFuncAOESnapshot(sim *Simulation, baseEffect SpellEffect) TickEffects {
+	snapshotEffect := &SpellEffect{}
 	return func(sim *Simulation, spell *Spell) func() {
 		target := sim.GetPrimaryTarget()
-		snapshotEffect := baseEffect
+		*snapshotEffect = baseEffect
 		snapshotEffect.Target = target
 		baseDamage := snapshotEffect.calculateBaseDamage(sim, spell) * snapshotEffect.DamageMultiplier
 		snapshotEffect.DamageMultiplier = 1
 		snapshotEffect.BaseDamage = BaseDamageConfigFlat(baseDamage)
 
-		effectsFunc := ApplyEffectFuncAOEDamage(sim, snapshotEffect)
+		effectsFunc := ApplyEffectFuncAOEDamage(sim, *snapshotEffect)
 		return func() {
 			effectsFunc(sim, target, spell)
 		}
