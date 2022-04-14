@@ -117,6 +117,10 @@ func (target *Target) finalize() {
 	target.Unit.finalize()
 }
 
+func (target *Target) init(sim *Simulation) {
+	target.Unit.init(sim)
+}
+
 func (target *Target) Reset(sim *Simulation) {
 	target.Unit.reset(sim)
 }

@@ -96,15 +96,24 @@ type Aura struct {
 
 	// Metrics for this aura.
 	metrics AuraMetrics
+
+	initialized bool
 }
 
 func (aura *Aura) init(sim *Simulation) {
+	if aura.initialized {
+		return
+	}
+	aura.initialized = true
+
 	if aura.OnInit != nil {
 		aura.OnInit(aura, sim)
 	}
 }
 
 func (aura *Aura) reset(sim *Simulation) {
+	aura.init(sim)
+
 	if aura.IsActive() {
 		panic("Active aura during reset: " + aura.Label)
 	}
@@ -233,8 +242,6 @@ type auraTracker struct {
 
 	// caches the minimum expires time of all active auras; reset to 0 on Activate(), Deactivate(), and Refresh()
 	minExpires time.Duration
-
-	initialized bool
 
 	// Auras that have a non-nil XXX function set and are currently active.
 	onCastCompleteAuras   []*Aura
@@ -375,14 +382,16 @@ func (at *auraTracker) finalize() {
 }
 
 func (at *auraTracker) init(sim *Simulation) {
-	if at.initialized {
-		return
+	for i := range at.permanentAuras {
+		permAura := &at.permanentAuras[i]
+		permAura.aura = permAura.AuraFactory(sim)
+		aura := permAura.aura
+		if !permAura.RespectDuration {
+			aura.Duration = NeverExpires
+		}
 	}
-	at.initialized = true
 
-	for _, aura := range at.auras {
-		aura.init(sim)
-	}
+	// Auras are initialized later, on their first reset().
 }
 
 func (at *auraTracker) reset(sim *Simulation) {
@@ -396,22 +405,20 @@ func (at *auraTracker) reset(sim *Simulation) {
 		resetEffect(sim)
 	}
 
-	for i := range at.permanentAuras {
-		permAura := &at.permanentAuras[i]
-		permAura.aura = permAura.AuraFactory(sim)
-		aura := permAura.aura
-		if !permAura.RespectDuration {
-			aura.Duration = NeverExpires
-		}
-	}
-
 	for _, aura := range at.auras {
 		aura.reset(sim)
 	}
 
 	for i := range at.permanentAuras {
 		permAura := &at.permanentAuras[i]
-		permAura.aura.Activate(sim)
+		aura := permAura.aura
+		if aura == nil {
+			panic("Aura not initialized: " + permAura.AuraFactory(sim).ActionID.String())
+		}
+		if !permAura.RespectDuration {
+			aura.Duration = NeverExpires
+		}
+		aura.Activate(sim)
 	}
 }
 
