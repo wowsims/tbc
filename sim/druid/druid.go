@@ -20,6 +20,7 @@ type Druid struct {
 	Hurricane   *core.Spell
 	InsectSwarm *core.Spell
 	Moonfire    *core.Spell
+	Rebirth     *core.Spell
 	Starfire6   *core.Spell
 	Starfire8   *core.Spell
 	Wrath       *core.Spell
@@ -77,6 +78,7 @@ func (druid *Druid) Init(sim *core.Simulation) {
 	druid.registerHurricaneSpell(sim)
 	druid.registerInsectSwarmSpell(sim)
 	druid.registerMoonfireSpell(sim)
+	druid.registerRebirthSpell(sim)
 	druid.Starfire8 = druid.newStarfireSpell(sim, 8)
 	druid.Starfire6 = druid.newStarfireSpell(sim, 6)
 	druid.registerWrathSpell(sim)

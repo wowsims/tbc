@@ -21,7 +21,7 @@ func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
 		BaseCost:     VampiricTouchBaseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost:     VampiricTouchBaseCost,
 				GCD:      core.GCDDefault,
 				CastTime: time.Millisecond * 1500,
@@ -43,7 +43,7 @@ func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.VampiricTouchDot = core.NewDot(core.Dot{
 		Spell: priest.VampiricTouch,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "VampiricTouch-" + strconv.Itoa(int(priest.Index)),
 			ActionID: VampiricTouchActionID,
 		}),

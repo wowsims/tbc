@@ -29,13 +29,13 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost:     baseCost * (1 - 0.03*float64(druid.Talents.Moonglow)),
 				GCD:      core.GCDDefault,
 				CastTime: time.Second*2 - (time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)),
 			},
 
-			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
 				druid.applyNaturesGrace(cast)
 				druid.applyNaturesSwiftness(cast)
 			},

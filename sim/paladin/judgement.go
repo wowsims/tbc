@@ -23,35 +23,14 @@ var JudgementOfBloodActionID = core.ActionID{SpellID: 31898, CooldownID: Judgeme
 var LibramOfAvengementActionID = core.ActionID{SpellID: 34260}
 
 func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
-	loaIsEquipped := paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27484
-
 	var loaAura *core.Aura
-	if loaIsEquipped {
+	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27484 {
 		loaAura = paladin.NewTemporaryStatsAura(
 			"Libram of Avengement",
 			LibramOfAvengementActionID,
 			stats.Stats{stats.MeleeCrit: 53},
 			time.Second*5)
 	}
-
-	job := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    JudgementOfBloodActionID,
-				Character:   &paladin.Character,
-				SpellSchool: core.SpellSchoolHoly,
-			},
-		},
-	}
-
-	// Reduce mana cost if we have Benediction Talent
-	job.Cost = core.ResourceCost{
-		Type:  stats.Mana,
-		Value: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
-	}
-
-	// Reduce CD if we have Improved Judgement Talent
-	job.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
 
 	effect := core.SpellEffect{
 		ProcMask: core.ProcMaskMeleeOrRangedSpecial,
@@ -64,7 +43,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
 
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			paladin.sanctifiedJudgement(sim, paladin.sealOfBlood.Cost.Value)
+			paladin.sanctifiedJudgement(sim, paladin.SealOfBlood.DefaultCast.Cost)
 			paladin.SealOfBloodAura.Deactivate(sim)
 			if loaAura != nil {
 				loaAura.Activate(sim)
@@ -74,7 +53,19 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation) {
 	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
 
 	paladin.JudgementOfBlood = paladin.RegisterSpell(core.SpellConfig{
-		Template:     job,
+		ActionID:    JudgementOfBloodActionID,
+		SpellSchool: core.SpellSchoolHoly,
+
+		ResourceType: stats.Mana,
+		BaseCost:     JudgementManaCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+			},
+			Cooldown: JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement)),
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
@@ -88,36 +79,24 @@ var JudgementOfTheCrusaderActionID = core.ActionID{SpellID: 27159, CooldownID: J
 func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation) {
 	paladin.JudgementOfTheCrusaderAura = core.JudgementOfTheCrusaderAura(sim.GetPrimaryTarget(), paladin.Talents.ImprovedSealOfTheCrusader)
 
-	jotc := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    JudgementOfTheCrusaderActionID,
-				Character:   &paladin.Character,
-				SpellSchool: core.SpellSchoolHoly,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: JudgementManaCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: JudgementManaCost,
-				},
-				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					paladin.sanctifiedJudgement(sim, paladin.sealOfTheCrusader.Cost.Value)
-					paladin.SealOfTheCrusaderAura.Deactivate(sim)
-				},
+	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
+		ActionID:    JudgementOfTheCrusaderActionID,
+		SpellSchool: core.SpellSchoolHoly,
+
+		ResourceType: stats.Mana,
+		BaseCost:     JudgementManaCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+			},
+			Cooldown: JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement)),
+			OnCastComplete: func(sim *core.Simulation, spell *core.Spell) {
+				paladin.sanctifiedJudgement(sim, paladin.SealOfTheCrusader.DefaultCast.Cost)
+				paladin.SealOfTheCrusaderAura.Deactivate(sim)
 			},
 		},
-	}
 
-	// Reduce mana cost if we have Benediction Talent
-	jotc.Cost.Value = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
-
-	// Reduce CD if we have Improved Judgement Talent
-	jotc.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
-
-	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
-		Template: jotc,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			OutcomeApplier: core.OutcomeFuncAlwaysHit(),
 
@@ -141,36 +120,24 @@ var JudgementOfWisdomActionID = core.ActionID{SpellID: 27164, CooldownID: Judgem
 func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation) {
 	paladin.JudgementOfWisdomAura = core.JudgementOfWisdomAura(sim.GetPrimaryTarget())
 
-	jow := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    JudgementOfWisdomActionID,
-				Character:   &paladin.Character,
-				SpellSchool: core.SpellSchoolHoly,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: JudgementManaCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: JudgementManaCost,
-				},
-				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					paladin.sanctifiedJudgement(sim, paladin.sealOfWisdom.Cost.Value)
-					paladin.SealOfWisdomAura.Deactivate(sim)
-				},
+	paladin.JudgementOfWisdom = paladin.RegisterSpell(core.SpellConfig{
+		ActionID:    JudgementOfWisdomActionID,
+		SpellSchool: core.SpellSchoolHoly,
+
+		ResourceType: stats.Mana,
+		BaseCost:     JudgementManaCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+			},
+			Cooldown: JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement)),
+			OnCastComplete: func(sim *core.Simulation, spell *core.Spell) {
+				paladin.sanctifiedJudgement(sim, paladin.SealOfWisdom.DefaultCast.Cost)
+				paladin.SealOfWisdomAura.Deactivate(sim)
 			},
 		},
-	}
 
-	// Reduce mana cost if we have Benediction Talent
-	jow.Cost.Value = JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction))
-
-	// Reduce CD if we have Improved Judgement Talent
-	jow.Cooldown = JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement))
-
-	paladin.JudgementOfWisdom = paladin.RegisterSpell(core.SpellConfig{
-		Template: jow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			OutcomeApplier: core.OutcomeFuncMagicHit(),
 

@@ -62,7 +62,7 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
 				GCD:  core.GCDDefault,
 			},
@@ -83,7 +83,7 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.ShadowfiendDot = core.NewDot(core.Dot{
 		Spell: priest.Shadowfiend,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Shadowfiend-" + strconv.Itoa(int(priest.Index)),
 			ActionID: ShadowfiendActionID,
 		}),
@@ -100,8 +100,8 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 			IsPeriodic:     true,
 			BaseDamage:     core.BaseDamageConfigMagicNoRoll(1191/10, 0.06),
 			OutcomeApplier: core.OutcomeFuncTick(),
-			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
-				priest.AddMana(sim, tickDamage*2.5, ShadowfiendActionID, false)
+			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				priest.AddMana(sim, spellEffect.Damage*2.5, ShadowfiendActionID, false)
 			},
 		}),
 	})

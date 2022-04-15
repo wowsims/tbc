@@ -79,12 +79,12 @@ func (hunter *Hunter) rotation(sim *core.Simulation, followsRangedAuto bool) {
 			if hunter.Hardcast.Expires <= sim.CurrentTime {
 				hunter.nextAction = OptionShoot
 				hunter.nextActionAt = hunter.AutoAttacks.RangedSwingAt
-				hunter.HardcastWaitUntil(sim, hunter.nextActionAt, &hunter.fakeHardcast)
+				hunter.HardcastWaitUntil(sim, hunter.nextActionAt, hunter.hardcastOnComplete)
 			}
 		}
 	} else if hunter.nextActionAt != hunter.NextGCDAt() {
 		if hunter.Hardcast.Expires <= sim.CurrentTime {
-			hunter.HardcastWaitUntil(sim, hunter.nextActionAt, &hunter.fakeHardcast)
+			hunter.HardcastWaitUntil(sim, hunter.nextActionAt, hunter.hardcastOnComplete)
 		}
 	}
 }
@@ -329,8 +329,7 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 			hunter.permaHawk = true
 		}
 		if hunter.permaHawk || currentMana > hunter.Rotation.ViperStopManaPercent {
-			aspect := hunter.NewAspectOfTheHawk(sim)
-			aspect.StartCast(sim)
+			hunter.AspectOfTheHawk.Cast(sim, nil)
 			return true
 		}
 	} else if hunter.currentAspect != hunter.AspectOfTheViperAura && !hunter.permaHawk && currentMana < hunter.Rotation.ViperStartManaPercent {
@@ -341,8 +340,7 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 			hunter.CurrentMana() > hunter.manaSpentPerSecondAtFirstAspectSwap*sim.GetRemainingDuration().Seconds() {
 			hunter.permaHawk = true
 		} else {
-			aspect := hunter.NewAspectOfTheViper(sim)
-			aspect.StartCast(sim)
+			hunter.AspectOfTheViper.Cast(sim, nil)
 			return true
 		}
 	}
@@ -374,7 +372,7 @@ func (hunter *Hunter) doMeleeWeave(sim *core.Simulation) {
 	}
 
 	hunter.AutoAttacks.TrySwingMH(sim, sim.GetPrimaryTarget())
-	hunter.HardcastWaitUntil(sim, doneWeavingAt, &hunter.fakeHardcast)
+	hunter.HardcastWaitUntil(sim, doneWeavingAt, hunter.hardcastOnComplete)
 }
 
 func (hunter *Hunter) GetPresimOptions() *core.PresimOptions {

@@ -2,85 +2,21 @@ package core
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// SimpleSpell has a single cast and could have a dot or direct effect (or no effect)
-//  A SimpleSpell without a target or effect will simply be cast and nothing else happens.
-type SimpleSpell struct {
-	// Embedded spell cast.
-	SpellCast
-
-	// Maximum amount of pre-crit damage this spell is allowed to do.
-	AOECap float64
-}
-
-// Init will call any 'OnCast' effects associated with the caster and then apply spell haste to the cast.
-//  Init will panic if the spell or the GCD is still on CD.
-func (spell *SimpleSpell) Init(sim *Simulation) {
-	spell.SpellCast.init(sim)
-}
-
-func (spell *SimpleSpell) GetDuration() time.Duration {
-	return spell.CastTime + spell.ChannelTime
-}
-
-func (instance *SimpleSpell) Cast(sim *Simulation, target *Target, spell *Spell) bool {
-	return instance.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		spell.Casts++
-		spell.MostRecentCost = cast.Cost.Value
-		spell.MostRecentBaseCost = cast.BaseCost.Value
-
-		spell.Instance.objectInUse = false
-		spell.ApplyEffects(sim, target, spell)
-	})
-}
-
-func applyAOECap(effects []SpellEffect, aoeCap float64) {
-	// Increased damage from crits doesn't count towards the cap, so need to
-	// tally pre-crit damage.
-	totalTowardsCap := 0.0
-	for i, _ := range effects {
-		effect := &effects[i]
-		totalTowardsCap += effect.Damage
-	}
-
-	if totalTowardsCap <= aoeCap {
-		return
-	}
-
-	maxDamagePerHit := aoeCap / float64(len(effects))
-	for i, _ := range effects {
-		effect := &effects[i]
-		damageTowardsCap := effect.Damage
-		if damageTowardsCap > maxDamagePerHit {
-			effect.Damage -= damageTowardsCap - maxDamagePerHit
-		}
-	}
-}
-
-func (instance *SimpleSpell) Cancel(sim *Simulation) {
-	instance.SpellCast.Cancel()
-}
-
-type ModifySpellCast func(*Simulation, *Target, *SimpleSpell)
 type ApplySpellEffects func(*Simulation, *Target, *Spell)
 
 type SpellConfig struct {
 	// See definition of Spell (below) for comments on these.
 	ActionID
-	Character    *Character
 	SpellSchool  SpellSchool
 	SpellExtras  SpellExtras
 	ResourceType stats.Stat
 	BaseCost     float64
 
-	Template SimpleSpell
-
-	Cast       CastConfig
-	ModifyCast ModifySpellCast
+	Cast CastConfig
 
 	ApplyEffects ApplySpellEffects
 }
@@ -123,30 +59,63 @@ type Spell struct {
 	BaseCost float64
 
 	// Default cast parameters with all static effects applied.
-	DefaultCast NewCast
+	DefaultCast Cast
 
 	// Performs a cast of this spell.
 	castFn CastSuccessFunc
 
 	SpellMetrics
 
-	ModifyCast   ModifySpellCast
 	ApplyEffects ApplySpellEffects
 
-	// These fields are manipulated when this spell is cast.
-	// The amount of resource spent by the most recent cast of this spell.
-	// TODO: Find a way to remove this later, as its a bit hacky.
-	MostRecentBaseCost float64
-	MostRecentCost     float64
-
 	// The current or most recent cast data.
-	CurCast NewCast
+	CurCast Cast
+}
 
-	// Templates for creating new casts.
-	Template SimpleSpell
+// Registers a new spell to the character. Returns the newly created spell.
+func (character *Character) RegisterSpell(config SpellConfig) *Spell {
+	if len(character.Spellbook) > 100 {
+		panic(fmt.Sprintf("Over 100 registered spells when registering %s! There is probably a spell being registered every iteration.", config.ActionID))
+	}
 
-	// Current instantiation of this spell. Can only be casting 1 instance of this spell at a time.
-	Instance SimpleSpell
+	spell := &Spell{
+		ActionID:     config.ActionID,
+		Character:    character,
+		SpellSchool:  config.SpellSchool,
+		SpellExtras:  config.SpellExtras,
+		ResourceType: config.ResourceType,
+		BaseCost:     config.BaseCost,
+
+		DefaultCast: config.Cast.DefaultCast,
+
+		ApplyEffects: config.ApplyEffects,
+	}
+
+	spell.castFn = spell.makeCastFunc(config.Cast, spell.applyEffects)
+
+	character.Spellbook = append(character.Spellbook, spell)
+
+	return spell
+}
+
+// Returns the first registered spell with the given ID, or nil if there are none.
+func (character *Character) GetSpell(actionID ActionID) *Spell {
+	for _, spell := range character.Spellbook {
+		if spell.ActionID.SameAction(actionID) {
+			return spell
+		}
+	}
+	return nil
+}
+
+// Retrieves an existing spell with the same ID as the config uses, or registers it if there is none.
+func (character *Character) GetOrRegisterSpell(config SpellConfig) *Spell {
+	registered := character.GetSpell(config.ActionID)
+	if registered == nil {
+		return character.RegisterSpell(config)
+	} else {
+		return registered
+	}
 }
 
 // Metrics for the current iteration
@@ -167,28 +136,7 @@ func (spell *Spell) doneIteration() {
 }
 
 func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
-	if spell.castFn != nil {
-		return spell.castFn(sim, target)
-	} else {
-		// Initialize cast from precomputed template.
-		instance := &spell.Instance
-		if instance.objectInUse {
-			panic(fmt.Sprintf("Spell (%s) already in use", instance.ActionID))
-		}
-		*instance = spell.Template
-
-		if spell.ModifyCast != nil {
-			spell.ModifyCast(sim, target, instance)
-		}
-
-		instance.Init(sim)
-		success := instance.Cast(sim, target, spell)
-
-		spell.MostRecentCost = instance.Cost.Value
-		spell.MostRecentBaseCost = instance.BaseCost.Value
-
-		return success
-	}
+	return spell.castFn(sim, target)
 }
 
 // Skips the actual cast and applies spell effects immediately.
@@ -203,73 +151,7 @@ func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Target) {
 
 func (spell *Spell) applyEffects(sim *Simulation, target *Target) {
 	spell.Casts++
-	spell.MostRecentCost = spell.CurCast.Cost
-	spell.MostRecentBaseCost = spell.BaseCost
-
 	spell.ApplyEffects(sim, target, spell)
-}
-
-// User-provided function for performing a cast of a spell. Should return whether
-// the spell was cast (e.g. not blocked by CDs or resources).
-//type SpellCast func(*Simulation, *Spell, *Target) bool
-
-// Registers a new spell to the character. Returns the newly created spell.
-func (character *Character) RegisterSpell(config SpellConfig) *Spell {
-	if len(character.Spellbook) > 100 {
-		panic(fmt.Sprintf("Over 100 registered spells when registering %s! There is probably a spell being registered every iteration.", config.Template.ActionID))
-	}
-	config.Template.Character = character
-
-	spell := &Spell{
-		ActionID:     config.ActionID,
-		Character:    character,
-		SpellSchool:  config.SpellSchool,
-		SpellExtras:  config.SpellExtras,
-		ResourceType: config.ResourceType,
-		BaseCost:     config.BaseCost,
-
-		DefaultCast: config.Cast.DefaultCast,
-
-		ModifyCast:   config.ModifyCast,
-		ApplyEffects: config.ApplyEffects,
-	}
-
-	if !config.Template.ActionID.IsEmptyAction() {
-		spell.ActionID = config.Template.ActionID
-		spell.SpellSchool = config.Template.SpellSchool
-		spell.SpellExtras = config.Template.SpellExtras
-		spell.Template = config.Template
-	} else {
-		spell.castFn = spell.makeCastFunc(config.Cast, spell.applyEffects)
-	}
-
-	character.Spellbook = append(character.Spellbook, spell)
-
-	return spell
-}
-
-// Returns the first registered spell with the given ID, or nil if there are none.
-func (character *Character) GetSpell(actionID ActionID) *Spell {
-	for _, spell := range character.Spellbook {
-		if spell.ActionID.SameAction(actionID) {
-			return spell
-		}
-	}
-	return nil
-}
-
-// Retrieves an existing spell with the same ID as the config uses, or registers it if there is none.
-func (character *Character) GetOrRegisterSpell(config SpellConfig) *Spell {
-	registered := character.GetSpell(config.Template.ActionID)
-	if registered == nil {
-		registered = character.GetSpell(config.ActionID)
-	}
-
-	if registered == nil {
-		return character.RegisterSpell(config)
-	} else {
-		return registered
-	}
 }
 
 func ApplyEffectFuncAll(effectFuncs []ApplySpellEffects) ApplySpellEffects {
@@ -287,20 +169,22 @@ func ApplyEffectFuncAll(effectFuncs []ApplySpellEffects) ApplySpellEffects {
 }
 
 func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
+	effect := &SpellEffect{}
+
 	if baseEffect.BaseDamage.Calculator == nil {
 		// Just a hit check.
 		return func(sim *Simulation, target *Target, spell *Spell) {
-			effect := baseEffect
+			*effect = baseEffect
 			effect.Target = target
 			effect.init(sim, spell)
 
 			damage := 0.0
-			effect.OutcomeApplier(sim, spell, &effect, &damage)
+			effect.OutcomeApplier(sim, spell, effect, &damage)
 			effect.triggerProcs(sim, spell)
 		}
 	} else {
 		return func(sim *Simulation, target *Target, spell *Spell) {
-			effect := baseEffect
+			*effect = baseEffect
 			effect.Target = target
 			effect.init(sim, spell)
 
@@ -365,5 +249,28 @@ func ApplyEffectFuncAOEDamage(sim *Simulation, baseEffect SpellEffect) ApplySpel
 func ApplyEffectFuncDot(dot *Dot) ApplySpellEffects {
 	return func(sim *Simulation, _ *Target, _ *Spell) {
 		dot.Apply(sim)
+	}
+}
+
+func applyAOECap(effects []SpellEffect, aoeCap float64) {
+	// Increased damage from crits doesn't count towards the cap, so need to
+	// tally pre-crit damage.
+	totalTowardsCap := 0.0
+	for i, _ := range effects {
+		effect := &effects[i]
+		totalTowardsCap += effect.Damage
+	}
+
+	if totalTowardsCap <= aoeCap {
+		return
+	}
+
+	maxDamagePerHit := aoeCap / float64(len(effects))
+	for i, _ := range effects {
+		effect := &effects[i]
+		damageTowardsCap := effect.Damage
+		if damageTowardsCap > maxDamagePerHit {
+			effect.Damage -= damageTowardsCap - maxDamagePerHit
+		}
 	}
 }

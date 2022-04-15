@@ -17,16 +17,17 @@ func (rogue *Rogue) registerThistleTeaCD() {
 	const energyRegen = 40.0
 	cooldown := time.Minute * 5
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: rogue.GetCharacter(),
-			Cooldown:  cooldown,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				rogue.AddEnergy(sim, energyRegen, actionID)
-			},
+	thistleTeaSpell := rogue.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		Cast: core.CastConfig{
+			Cooldown: cooldown,
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			rogue.AddEnergy(sim, energyRegen, actionID)
+		},
+	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -45,9 +46,7 @@ func (rogue *Rogue) registerThistleTeaCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
+				thistleTeaSpell.Cast(sim, nil)
 			}
 		},
 	})

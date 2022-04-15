@@ -75,7 +75,7 @@ func (mage *Mage) applyArcaneConcentration() {
 		var curCastIdx int = 0
 		var lastCheckedCastIdx int = 0
 
-		mage.ClearcastingAura = mage.GetOrRegisterAura(&core.Aura{
+		mage.ClearcastingAura = mage.GetOrRegisterAura(core.Aura{
 			Label:    "Clearcasting",
 			ActionID: core.ActionID{SpellID: 12536},
 			Duration: time.Second * 15,
@@ -99,19 +99,9 @@ func (mage *Mage) applyArcaneConcentration() {
 			},
 		})
 
-		return mage.GetOrRegisterAura(&core.Aura{
+		return mage.GetOrRegisterAura(core.Aura{
 			Label: "Arcane Concentration",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-				if mage.bonusAMCCCrit != 0 {
-					mage.AddStat(stats.SpellCrit, -mage.bonusAMCCCrit)
-					mage.bonusAMCCCrit = 0
-				}
-				if !cast.SpellExtras.Matches(SpellFlagMage) {
-					return
-				}
-				curCastIdx++
-			},
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if mage.bonusAMCCCrit != 0 {
 					mage.AddStat(stats.SpellCrit, -mage.bonusAMCCCrit)
 					mage.bonusAMCCCrit = 0
@@ -220,7 +210,7 @@ func (mage *Mage) registerArcanePowerCD() {
 	}
 	actionID := core.ActionID{SpellID: 12042}
 
-	apAura := mage.RegisterAura(&core.Aura{
+	apAura := mage.RegisterAura(core.Aura{
 		Label:    "Arcane Power",
 		ActionID: actionID,
 		Duration: time.Second * 15,
@@ -262,14 +252,14 @@ func (mage *Mage) applyMasterOfElements() {
 
 	refundCoeff := 0.1 * float64(mage.Talents.MasterOfElements)
 
-	moeAura := mage.RegisterAura(&core.Aura{
+	moeAura := mage.RegisterAura(core.Aura{
 		Label: "Master of Elements",
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				mage.AddMana(sim, spell.MostRecentBaseCost*refundCoeff, core.ActionID{SpellID: 29076}, false)
+				mage.AddMana(sim, spell.BaseCost*refundCoeff, core.ActionID{SpellID: 29076}, false)
 			}
 		},
 	})
@@ -290,7 +280,7 @@ func (mage *Mage) registerCombustionCD() {
 	numCrits := 0
 	const critPerStack = 10 * core.SpellCritRatingPerCritChance
 
-	aura := mage.RegisterAura(&core.Aura{
+	aura := mage.RegisterAura(core.Aura{
 		Label:     "Combustion",
 		ActionID:  actionID,
 		Duration:  core.NeverExpires,
@@ -362,7 +352,7 @@ func (mage *Mage) registerIcyVeinsCD() {
 	actionID := core.ActionID{SpellID: 12472}
 	manaCost := mage.BaseMana() * 0.03
 
-	icyVeinsAura := mage.RegisterAura(&core.Aura{
+	icyVeinsAura := mage.RegisterAura(core.Aura{
 		Label:    "Icy Veins",
 		ActionID: actionID,
 		Duration: time.Second * 20,

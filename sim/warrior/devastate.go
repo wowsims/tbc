@@ -9,34 +9,27 @@ import (
 var DevastateActionID = core.ActionID{SpellID: 30022}
 
 func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
-	warrior.sunderArmorCost = 15.0 - float64(warrior.Talents.ImprovedSunderArmor) - float64(warrior.Talents.FocusedRage)
-	refundAmount := warrior.sunderArmorCost * 0.8
-
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    DevastateActionID,
-				Character:   &warrior.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				IgnoreHaste: true,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.sunderArmorCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.sunderArmorCost,
-				},
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
+	cost := 15.0 - float64(warrior.Talents.ImprovedSunderArmor) - float64(warrior.Talents.FocusedRage)
+	refundAmount := cost * 0.8
 
 	normalBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 0.5, true)
 
 	warrior.Devastate = warrior.RegisterSpell(core.SpellConfig{
-		Template: ability,
+		ActionID:    DevastateActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Rage,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: cost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskMeleeMHSpecial,
 
@@ -73,5 +66,5 @@ func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 }
 
 func (warrior *Warrior) CanDevastate(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= warrior.sunderArmorCost
+	return warrior.CurrentRage() >= warrior.Devastate.DefaultCast.Cost
 }

@@ -43,7 +43,7 @@ func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost *
 					(1 - 0.01*float64(mage.Talents.Pyromaniac)) *
 					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
@@ -61,7 +61,7 @@ func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
 
 	mage.FlamestrikeDot = core.NewDot(core.Dot{
 		Spell: mage.Flamestrike,
-		Aura: mage.RegisterAura(&core.Aura{
+		Aura: mage.RegisterAura(core.Aura{
 			Label:    "Flamestrike",
 			ActionID: FlamestrikeActionID,
 		}),

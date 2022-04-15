@@ -9,30 +9,23 @@ import (
 var HeroicStrikeActionID = core.ActionID{SpellID: 29707}
 
 func (warrior *Warrior) registerHeroicStrikeSpell(_ *core.Simulation) {
-	warrior.heroicStrikeCost = 15.0 - float64(warrior.Talents.ImprovedHeroicStrike) - float64(warrior.Talents.FocusedRage)
-	refundAmount := warrior.heroicStrikeCost * 0.8
-
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    HeroicStrikeActionID,
-				Character:   &warrior.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.heroicStrikeCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.heroicStrikeCost,
-				},
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
+	cost := 15.0 - float64(warrior.Talents.ImprovedHeroicStrike) - float64(warrior.Talents.FocusedRage)
+	refundAmount := cost * 0.8
 
 	warrior.HeroicStrike = warrior.RegisterSpell(core.SpellConfig{
-		Template: ability,
+		ActionID:    HeroicStrikeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Rage,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: cost,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
 
@@ -52,9 +45,12 @@ func (warrior *Warrior) registerHeroicStrikeSpell(_ *core.Simulation) {
 	})
 }
 
-func (warrior *Warrior) QueueHeroicStrike(_ *core.Simulation) {
-	if warrior.CurrentRage() < warrior.heroicStrikeCost {
+func (warrior *Warrior) QueueHeroicStrike(sim *core.Simulation) {
+	if warrior.CurrentRage() < warrior.HeroicStrike.DefaultCast.Cost {
 		panic("Not enough rage for HS")
+	}
+	if sim.Log != nil {
+		warrior.Log(sim, "Heroic strike queued.")
 	}
 	warrior.heroicStrikeQueued = true
 }
@@ -66,7 +62,7 @@ func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.Spell {
 	}
 
 	warrior.heroicStrikeQueued = false
-	if warrior.CurrentRage() < warrior.heroicStrikeCost {
+	if warrior.CurrentRage() < warrior.HeroicStrike.DefaultCast.Cost {
 		return nil
 	}
 
@@ -74,5 +70,5 @@ func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.Spell {
 }
 
 func (warrior *Warrior) CanHeroicStrike(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= warrior.heroicStrikeCost
+	return warrior.CurrentRage() >= warrior.HeroicStrike.DefaultCast.Cost
 }

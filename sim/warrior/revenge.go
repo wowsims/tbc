@@ -12,33 +12,26 @@ var RevengeCooldownID = core.NewCooldownID()
 var RevengeActionID = core.ActionID{SpellID: 30357, CooldownID: RevengeCooldownID}
 
 func (warrior *Warrior) registerRevengeSpell(_ *core.Simulation) {
-	warrior.revengeCost = 5.0 - float64(warrior.Talents.FocusedRage)
-	refundAmount := warrior.revengeCost * 0.8
-
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    RevengeActionID,
-				Character:   &warrior.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Second * 5,
-				IgnoreHaste: true,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.revengeCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.revengeCost,
-				},
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
+	cost := 5.0 - float64(warrior.Talents.FocusedRage)
+	refundAmount := cost * 0.8
 
 	warrior.Revenge = warrior.RegisterSpell(core.SpellConfig{
-		Template: ability,
+		ActionID:    RevengeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Rage,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: cost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true,
+			Cooldown:    time.Second * 5,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskMeleeMHSpecial,
 
@@ -59,5 +52,5 @@ func (warrior *Warrior) registerRevengeSpell(_ *core.Simulation) {
 }
 
 func (warrior *Warrior) CanRevenge(sim *core.Simulation) bool {
-	return warrior.StanceMatches(DefensiveStance) && warrior.revengeTriggered && warrior.CurrentRage() >= warrior.revengeCost && !warrior.IsOnCD(RevengeCooldownID, sim.CurrentTime)
+	return warrior.StanceMatches(DefensiveStance) && warrior.revengeTriggered && warrior.CurrentRage() >= warrior.Revenge.DefaultCast.Cost && !warrior.IsOnCD(RevengeCooldownID, sim.CurrentTime)
 }

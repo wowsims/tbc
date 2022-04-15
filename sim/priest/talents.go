@@ -92,7 +92,7 @@ func (priest *Priest) setupSurgeOfLight() {
 		return
 	}
 
-	priest.SurgeOfLightProcAura = priest.RegisterAura(&core.Aura{
+	priest.SurgeOfLightProcAura = priest.RegisterAura(core.Aura{
 		Label:    "Surge of Light Proc",
 		ActionID: core.ActionID{SpellID: 33151},
 		Duration: core.NeverExpires,
@@ -106,7 +106,7 @@ func (priest *Priest) setupSurgeOfLight() {
 	procChance := 0.25 * float64(priest.Talents.SurgeOfLight)
 
 	priest.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return priest.GetOrRegisterAura(&core.Aura{
+		return priest.GetOrRegisterAura(core.Aura{
 			Label:    "Surge of Light",
 			Duration: core.NeverExpires,
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -121,7 +121,7 @@ func (priest *Priest) setupSurgeOfLight() {
 	})
 }
 
-func (priest *Priest) applySurgeOfLight(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+func (priest *Priest) applySurgeOfLight(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
 	if priest.SurgeOfLightProcAura != nil && priest.SurgeOfLightProcAura.IsActive() {
 		cast.CastTime = 0
 		cast.Cost = 0
@@ -136,7 +136,7 @@ func (priest *Priest) registerInnerFocusAura() {
 		return
 	}
 
-	priest.InnerFocusAura = priest.GetOrRegisterAura(&core.Aura{
+	priest.InnerFocusAura = priest.GetOrRegisterAura(core.Aura{
 		Label:    "Inner Focus",
 		ActionID: InnerFocusActionID,
 		Duration: core.NeverExpires,

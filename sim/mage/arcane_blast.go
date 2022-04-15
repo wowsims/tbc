@@ -12,7 +12,7 @@ const ArcaneBlastBaseManaCost = 195.0
 const ArcaneBlastBaseCastTime = time.Millisecond * 2500
 
 func (mage *Mage) newArcaneBlastSpell(sim *core.Simulation, numStacks int32) *core.Spell {
-	mage.ArcaneBlastAura = mage.GetOrRegisterAura(&core.Aura{
+	mage.ArcaneBlastAura = mage.GetOrRegisterAura(core.Aura{
 		Label:     "Arcane Blast",
 		ActionID:  core.ActionID{SpellID: 36032},
 		Duration:  time.Second * 8,
@@ -36,7 +36,7 @@ func (mage *Mage) newArcaneBlastSpell(sim *core.Simulation, numStacks int32) *co
 		BaseCost:     ArcaneBlastBaseManaCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: ArcaneBlastBaseManaCost * (1 + 0.75*float64(numStacks) + core.TernaryFloat64(mage.hasTristfal, 0.2, 0)),
 
 				GCD:      core.GCDDefault,

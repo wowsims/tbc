@@ -75,8 +75,8 @@ type Hunter struct {
 	arcaneShotCastTime float64
 	useMultiForCatchup bool
 
-	aspectOfTheHawkTemplate  core.SimpleCast
-	aspectOfTheViperTemplate core.SimpleCast
+	AspectOfTheHawk  *core.Spell
+	AspectOfTheViper *core.Spell
 
 	AimedShot    *core.Spell
 	ArcaneShot   *core.Spell
@@ -94,7 +94,7 @@ type Hunter struct {
 	ScorpidStingAura     *core.Aura
 	TalonOfAlarAura      *core.Aura
 
-	fakeHardcast core.Cast
+	hardcastOnComplete core.CastFunc
 }
 
 func (hunter *Hunter) GetCharacter() *core.Character {
@@ -119,8 +119,8 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.AutoAttacks.OHEffect.OutcomeApplier = core.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, sim.GetPrimaryTarget()))
 	hunter.AutoAttacks.RangedEffect.OutcomeApplier = core.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget()))
 
-	hunter.aspectOfTheHawkTemplate = hunter.newAspectOfTheHawkTemplate(sim)
-	hunter.aspectOfTheViperTemplate = hunter.newAspectOfTheViperTemplate(sim)
+	hunter.registerAspectOfTheHawkSpell(sim)
+	hunter.registerAspectOfTheViperSpell(sim)
 
 	hunter.registerAimedShotSpell(sim)
 	hunter.registerArcaneShotSpell(sim)
@@ -131,13 +131,8 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.registerSerpentStingSpell(sim)
 	hunter.registerSteadyShotSpell(sim)
 
-	hunter.fakeHardcast = core.Cast{
-		Character:   &hunter.Character,
-		IgnoreHaste: true,
-		CastTime:    hunter.timeToWeave,
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			hunter.rotation(sim, false)
-		},
+	hunter.hardcastOnComplete = func(sim *core.Simulation, _ *core.Target) {
+		hunter.rotation(sim, false)
 	}
 }
 

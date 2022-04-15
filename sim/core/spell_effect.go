@@ -13,13 +13,7 @@ type OnSpellHit func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *Spe
 
 // OnPeriodicDamage is called when dots tick, after damage is calculated. Use it for proc effects
 // or anything that comes from the final result of a tick.
-type OnPeriodicDamage func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, tickDamage float64)
-
-// A Spell is a type of cast that can hit/miss using spell stats, and has a spell school.
-type SpellCast struct {
-	// Embedded Cast
-	Cast
-}
+type OnPeriodicDamage func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
 
 type SpellEffect struct {
 	// Target of the spell.
@@ -59,7 +53,7 @@ type SpellEffect struct {
 	// Callbacks for providing additional custom behavior.
 	OnInit           func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
 	OnSpellHit       func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
-	OnPeriodicDamage func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage float64)
+	OnPeriodicDamage func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
 
 	// Results
 	Outcome HitOutcome
@@ -204,10 +198,10 @@ func (spellEffect *SpellEffect) triggerProcs(sim *Simulation, spell *Spell) {
 		spellEffect.Target.OnSpellHit(sim, spell, spellEffect)
 	} else {
 		if spellEffect.OnPeriodicDamage != nil {
-			spellEffect.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
+			spellEffect.OnPeriodicDamage(sim, spell, spellEffect)
 		}
-		spell.Character.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
-		spellEffect.Target.OnPeriodicDamage(sim, spell, spellEffect, spellEffect.Damage)
+		spell.Character.OnPeriodicDamage(sim, spell, spellEffect)
+		spellEffect.Target.OnPeriodicDamage(sim, spell, spellEffect)
 	}
 }
 

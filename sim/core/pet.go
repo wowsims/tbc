@@ -136,10 +136,7 @@ func (pet *Pet) Disable(sim *Simulation) {
 
 	// If a pet is immediately re-summoned it might try to use GCD, so we need to
 	// clear it.
-	if pet.Hardcast.Cast != nil {
-		pet.Hardcast.Cast.Cancel()
-		pet.Hardcast = Hardcast{}
-	}
+	pet.Hardcast = Hardcast{}
 
 	// Reset pet mana.
 	pet.stats[stats.Mana] = pet.MaxMana()

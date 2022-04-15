@@ -156,19 +156,6 @@ func (resourceMetrics *ResourceMetrics) ToProto() *proto.ResourceMetrics {
 	}
 }
 
-func (characterMetrics *CharacterMetrics) addCastInternal(actionID ActionID) {
-	actionKey := NewActionKey(actionID)
-	actionMetrics, ok := characterMetrics.actions[actionKey]
-
-	if !ok {
-		actionMetrics.ActionID = actionID
-	}
-
-	actionMetrics.Casts++
-
-	characterMetrics.actions[actionKey] = actionMetrics
-}
-
 func (characterMetrics *CharacterMetrics) AddResourceEvent(actionID ActionID, resourceType proto.ResourceType, gain float64, actualGain float64) {
 	actionKey := NewActionKey(actionID)
 	resourceKey := ResourceKey{
@@ -190,12 +177,16 @@ func (characterMetrics *CharacterMetrics) AddResourceEvent(actionID ActionID, re
 }
 
 func (characterMetrics *CharacterMetrics) AddInstantCast(actionID ActionID) {
-	characterMetrics.addCastInternal(actionID)
-}
+	actionKey := NewActionKey(actionID)
+	actionMetrics, ok := characterMetrics.actions[actionKey]
 
-// Adds the results of a cast to the aggregated metrics.
-func (characterMetrics *CharacterMetrics) AddCast(cast *Cast) {
-	characterMetrics.addCastInternal(cast.ActionID)
+	if !ok {
+		actionMetrics.ActionID = actionID
+	}
+
+	actionMetrics.Casts++
+
+	characterMetrics.actions[actionKey] = actionMetrics
 }
 
 // Adds the results of a spell to the character metrics.

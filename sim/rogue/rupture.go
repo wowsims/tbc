@@ -23,7 +23,7 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 		BaseCost:     RuptureEnergyCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: RuptureEnergyCost,
 				GCD:  time.Second,
 			},
@@ -54,7 +54,7 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	rogue.RuptureDot = core.NewDot(core.Dot{
 		Spell: rogue.Rupture,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Rupture-" + strconv.Itoa(int(rogue.Index)),
 			ActionID: RuptureActionID,
 		}),

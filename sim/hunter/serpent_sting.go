@@ -21,7 +21,7 @@ func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost * (1 - 0.02*float64(hunter.Talents.Efficiency)),
 				GCD:  core.GCDDefault,
 			},
@@ -42,7 +42,7 @@ func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	hunter.SerpentStingDot = core.NewDot(core.Dot{
 		Spell: hunter.SerpentSting,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "SerpentSting-" + strconv.Itoa(int(hunter.Index)),
 			ActionID: SerpentStingActionID,
 		}),

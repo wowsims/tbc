@@ -24,7 +24,7 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost *
 					(1 - 0.01*float64(mage.Talents.Pyromaniac)) *
 					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
@@ -59,7 +59,7 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	mage.PyroblastDot = core.NewDot(core.Dot{
 		Spell: mage.Pyroblast,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Pyroblast-" + strconv.Itoa(int(mage.Index)),
 			ActionID: PyroblastActionID,
 		}),

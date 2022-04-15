@@ -20,7 +20,7 @@ func (hunter *Hunter) registerAimedShotSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost * (1 - 0.02*float64(hunter.Talents.Efficiency)),
 				// Actual aimed shot has a 2.5s cast time, but we only use it as an instant precast.
 				//CastTime:       time.Millisecond * 2500,

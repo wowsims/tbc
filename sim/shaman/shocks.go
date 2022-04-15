@@ -47,14 +47,14 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 			BaseCost:     baseCost,
 
 			Cast: core.CastConfig{
-				DefaultCast: core.NewCast{
+				DefaultCast: core.Cast{
 					Cost: baseCost -
 						baseCost*float64(shaman.Talents.Convection)*0.02 -
 						baseCost*float64(shaman.Talents.MentalQuickness)*0.02 -
 						core.TernaryFloat64(ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 2), baseCost*0.1, 0),
 					GCD: core.GCDDefault,
 				},
-				ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+				ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
 					if shaman.ElementalFocusStacks > 0 {
 						// Reduces mana cost by 40%
 						cast.Cost -= baseCost * 0.4
@@ -118,7 +118,7 @@ func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	shaman.FlameShockDot = core.NewDot(core.Dot{
 		Spell: shaman.FlameShock,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "FlameShock-" + strconv.Itoa(int(shaman.Index)),
 			ActionID: core.ActionID{SpellID: SpellIDFlameShock},
 		}),

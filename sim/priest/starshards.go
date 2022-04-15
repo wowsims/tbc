@@ -18,7 +18,7 @@ func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
 		SpellSchool: core.SpellSchoolArcane,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				GCD: core.GCDDefault,
 			},
 			Cooldown: time.Second * 30,
@@ -38,7 +38,7 @@ func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.StarshardsDot = core.NewDot(core.Dot{
 		Spell: priest.Starshards,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Starshards-" + strconv.Itoa(int(priest.Index)),
 			ActionID: StarshardsActionID,
 		}),

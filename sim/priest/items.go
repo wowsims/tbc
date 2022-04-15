@@ -35,17 +35,9 @@ var ItemSetAvatar = core.ItemSet{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
 			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				return character.GetOrRegisterAura(&core.Aura{
+				return character.GetOrRegisterAura(core.Aura{
 					Label: "Avatar Regalia 2pc",
-					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-						if sim.RandomFloat("avatar 2p") > 0.06 {
-							return
-						}
-						// This is a cheat...
-						// easier than adding another aura the subtracts 150 mana from next cast.
-						character.AddMana(sim, 150, core.ActionID{SpellID: 37600}, false)
-					},
-					OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 						if sim.RandomFloat("avatar 2p") > 0.06 {
 							return
 						}
@@ -64,9 +56,9 @@ var ItemSetAvatar = core.ItemSet{
 					aura.Deactivate(sim)
 				}
 
-				return character.GetOrRegisterAura(&core.Aura{
+				return character.GetOrRegisterAura(core.Aura{
 					Label: "Avatar Regalia 4pc",
-					OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
+					OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if spell.ActionID.SpellID != SpellIDShadowWordPain {
 							return
 						}
@@ -104,9 +96,9 @@ func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
 	char := agent.GetCharacter()
 	char.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		procAura := char.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32490}, stats.Stats{stats.SpellPower: 220}, time.Second*10)
-		return char.GetOrRegisterAura(&core.Aura{
+		return char.GetOrRegisterAura(core.Aura{
 			Label: "Ashtongue Talisman",
-			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
+			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spell.ActionID.SpellID != SpellIDShadowWordPain {
 					return
 				}

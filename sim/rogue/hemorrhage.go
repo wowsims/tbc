@@ -13,7 +13,7 @@ var HemorrhageEnergyCost = 35.0
 
 func (rogue *Rogue) registerHemorrhageSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
-	hemoAura := target.GetOrRegisterAura(&core.Aura{
+	hemoAura := target.GetOrRegisterAura(core.Aura{
 		Label:     "Hemorrhage",
 		ActionID:  HemorrhageActionID,
 		Duration:  time.Second * 15,
@@ -47,7 +47,7 @@ func (rogue *Rogue) registerHemorrhageSpell(sim *core.Simulation) {
 		BaseCost:     HemorrhageEnergyCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: HemorrhageEnergyCost,
 				GCD:  time.Second,
 			},

@@ -51,16 +51,9 @@ func ApplyQuagmirransEye(agent core.Agent) {
 		icd := core.NewICD()
 		const icdDur = time.Second * 45
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Quagmirran's Eye",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-				if icd.IsOnCD(sim) || sim.RandomFloat("Quagmirran's Eye") > 0.1 {
-					return
-				}
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				procAura.Activate(sim)
-			},
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("Quagmirran's Eye") > 0.1 {
 					return
 				}
@@ -79,7 +72,7 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 		icd := core.NewICD()
 		const dur = time.Second * 45
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Shiffar's Nexus Horn",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
@@ -103,7 +96,7 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
 		procAura := character.NewTemporaryStatsAura("Recurring Power", core.ActionID{ItemID: 28789}, stats.Stats{stats.SpellPower: 170}, time.Second*10)
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Eye of Magtheridon",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
@@ -126,7 +119,7 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 		icd := core.NewICD()
 		const icdDur = time.Second * 45
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Sextant of Unstable Currents",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
@@ -148,7 +141,7 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 func ApplyDarkmoonCardCrusade(agent core.Agent) {
 	character := agent.GetCharacter()
 
-	apAura := character.RegisterAura(&core.Aura{
+	apAura := character.RegisterAura(core.Aura{
 		Label:     "DMC Crusade AP",
 		ActionID:  core.ActionID{ItemID: 31856, Tag: 1},
 		Duration:  time.Second * 10,
@@ -158,7 +151,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 			character.AddStat(stats.RangedAttackPower, 6*float64(newStacks-oldStacks))
 		},
 	})
-	spAura := character.RegisterAura(&core.Aura{
+	spAura := character.RegisterAura(core.Aura{
 		Label:     "DMC Crusade SP",
 		ActionID:  core.ActionID{ItemID: 31856, Tag: 2},
 		Duration:  time.Second * 10,
@@ -169,7 +162,7 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 	})
 
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "DMC Crusade",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {

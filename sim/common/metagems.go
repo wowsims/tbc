@@ -32,16 +32,9 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 		const icdDur = time.Second * 35
 		icd := core.NewICD()
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Mystical Skyfire Diamond",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-				if icd.IsOnCD(sim) || sim.RandomFloat("Mystical Skyfire Diamond") > 0.15 {
-					return
-				}
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				procAura.Activate(sim)
-			},
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("Mystical Skyfire Diamond") > 0.15 {
 					return
 				}
@@ -58,16 +51,9 @@ func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 		icd := core.NewICD()
 		const dur = time.Second * 15
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Insightful Earthstorm Diamond",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-				if icd.IsOnCD(sim) || sim.RandomFloat("Insightful Earthstorm Diamond") > 0.04 {
-					return
-				}
-				icd = core.InternalCD(sim.CurrentTime + dur)
-				character.AddMana(sim, 300, core.ActionID{ItemID: 25901}, false)
-			},
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if icd.IsOnCD(sim) || sim.RandomFloat("Insightful Earthstorm Diamond") > 0.04 {
 					return
 				}
@@ -97,7 +83,7 @@ func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 		const icdDur = time.Second * 40
 		ppmm := character.AutoAttacks.NewPPMManager(1.5)
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Thundering Skyfire Diamond",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				// Mask 68, melee or ranged auto attacks.

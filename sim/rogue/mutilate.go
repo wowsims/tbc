@@ -75,7 +75,7 @@ func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
 		BaseCost:     MutilateEnergyCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: MutilateEnergyCost,
 				GCD:  time.Second,
 			},

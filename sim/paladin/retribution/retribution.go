@@ -122,25 +122,23 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 		}
 		if judge != nil {
 			if success := judge.Cast(sim, target); !success {
-				ret.WaitForMana(sim, judge.MostRecentCost)
+				ret.WaitForMana(sim, judge.CurCast.Cost)
 			}
 		}
 	}
 
 	// Cast Seal of Command
 	if !ret.SealOfCommandAura.IsActive() {
-		soc := ret.NewSealOfCommand(sim)
-		if success := soc.StartCast(sim); !success {
-			ret.WaitForMana(sim, soc.GetManaCost())
+		if success := ret.SealOfCommand.Cast(sim, nil); !success {
+			ret.WaitForMana(sim, ret.SealOfCommand.CurCast.Cost)
 		}
 		return
 	}
 
 	// Cast Seal of Blood and enable attacks to twist
 	if !ret.SealOfBloodAura.IsActive() {
-		sob := ret.NewSealOfBlood(sim)
-		if success := sob.StartCast(sim); !success {
-			ret.WaitForMana(sim, sob.GetManaCost())
+		if success := ret.SealOfBlood.Cast(sim, nil); !success {
+			ret.WaitForMana(sim, ret.SealOfBlood.CurCast.Cost)
 		}
 		ret.AutoAttacks.EnableAutoSwing(sim)
 		ret.openerCompleted = true
@@ -183,17 +181,17 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	if gcdCD == 0 {
 		if socActive && inTwistWindow {
 			// If Seal of Command is Active, complete the twist
-			ret.NewSealOfBlood(sim).StartCast(sim)
+			ret.SealOfBlood.Cast(sim, nil)
 		} else if crusaderStrikeCD == 0 && !willTwist &&
 			(sobActive || spellGCD < timeTilNextSwing) {
 			// Cast Crusader Strike if we won't swing naked and we aren't twisting
 			ret.CrusaderStrike.Cast(sim, target)
 		} else if willTwist && !socActive && (nextJudgementCD > latestTwistStart) {
 			// Prep seal of command
-			ret.NewSealOfCommand(sim).StartCast(sim)
+			ret.SealOfCommand.Cast(sim, nil)
 		} else if !sobActive && !socActive && !willTwist {
 			// If no seal is active, cast Seal of Blood
-			ret.NewSealOfBlood(sim).StartCast(sim)
+			ret.SealOfBlood.Cast(sim, nil)
 		}
 	}
 
@@ -249,15 +247,14 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	if ret.CanJudgementOfBlood(sim) {
 		success := ret.JudgementOfBlood.Cast(sim, target)
 		if !success {
-			ret.WaitForMana(sim, ret.JudgementOfBlood.MostRecentCost)
+			ret.WaitForMana(sim, ret.JudgementOfBlood.CurCast.Cost)
 		}
 	}
 
 	// roll seal of blood
 	if !ret.SealOfBloodAura.IsActive() {
-		sob := ret.NewSealOfBlood(sim)
-		if success := sob.StartCast(sim); !success {
-			ret.WaitForMana(sim, sob.GetManaCost())
+		if success := ret.SealOfBlood.Cast(sim, nil); !success {
+			ret.WaitForMana(sim, ret.SealOfBlood.CurCast.Cost)
 		}
 		return
 	}
@@ -266,7 +263,7 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
 		success := ret.CrusaderStrike.Cast(sim, target)
 		if !success {
-			ret.WaitForMana(sim, ret.CrusaderStrike.MostRecentCost)
+			ret.WaitForMana(sim, ret.CrusaderStrike.CurCast.Cost)
 		}
 		return
 	}

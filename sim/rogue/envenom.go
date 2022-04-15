@@ -30,7 +30,7 @@ func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 		BaseCost:     rogue.envenomEnergyCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: rogue.envenomEnergyCost,
 				GCD:  time.Second,
 			},

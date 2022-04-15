@@ -72,14 +72,14 @@ func ApplyTalonOfAlar(agent core.Agent) {
 	}
 	hunter := hunterAgent.GetHunter()
 
-	procAura := hunter.GetOrRegisterAura(&core.Aura{
+	procAura := hunter.GetOrRegisterAura(core.Aura{
 		Label:    "Talon of Alar Proc",
 		ActionID: core.ActionID{ItemID: 30448},
 		// Add 1 in case we use arcane shot exactly off CD.
 		Duration: time.Second*6 + 1,
 	})
 
-	hunter.TalonOfAlarAura = hunter.GetOrRegisterAura(&core.Aura{
+	hunter.TalonOfAlarAura = hunter.GetOrRegisterAura(core.Aura{
 		Label:    "Talon of Alar",
 		Duration: core.NeverExpires,
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -126,7 +126,7 @@ func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 	character := agent.GetCharacter()
 	const manaGain = 8.0
 	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Black Bow of the Betrayer",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskRanged) {
@@ -144,7 +144,7 @@ func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
 		procAura := character.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32487}, stats.Stats{stats.AttackPower: 275, stats.RangedAttackPower: 275}, time.Second*8)
 		const procChance = 0.15
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Ashtongue Talisman",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SameAction(SteadyShotActionID) {

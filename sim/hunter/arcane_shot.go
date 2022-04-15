@@ -22,7 +22,7 @@ func (hunter *Hunter) registerArcaneShotSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost * (1 - 0.02*float64(hunter.Talents.Efficiency)),
 				GCD:  core.GCDDefault + hunter.latency,
 			},

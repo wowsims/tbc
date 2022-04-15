@@ -59,7 +59,7 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost *
 					(1 - 0.01*float64(mage.Talents.Pyromaniac)) *
 					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),

@@ -62,7 +62,7 @@ var ItemSetDeathmantle = core.ItemSet{
 			ppmm := rogue.AutoAttacks.NewPPMManager(1.0)
 
 			rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				return rogue.GetOrRegisterAura(&core.Aura{
+				return rogue.GetOrRegisterAura(core.Aura{
 					Label: "Deathmantle 4pc",
 					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 						if !spellEffect.Landed() {
@@ -86,7 +86,7 @@ var ItemSetDeathmantle = core.ItemSet{
 	},
 }
 
-func (rogue *Rogue) applyDeathmantle(_ *core.Simulation, _ *core.Spell, cast *core.NewCast) {
+func (rogue *Rogue) applyDeathmantle(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
 	//instance.ActionID.Tag = rogue.ComboPoints()
 	if rogue.deathmantle4pcProc {
 		cast.Cost = 0
@@ -116,7 +116,7 @@ func ApplyWarpSpringCoil(agent core.Agent) {
 		const icdDur = time.Second * 30
 		icd := core.NewICD()
 
-		return character.GetOrRegisterAura(&core.Aura{
+		return character.GetOrRegisterAura(core.Aura{
 			Label: "Warp Spring Coil",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
@@ -154,24 +154,9 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 		procAura := rogue.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32492}, stats.Stats{stats.MeleeCrit: 145}, time.Second*10)
 		numPoints := int32(0)
 
-		return rogue.GetOrRegisterAura(&core.Aura{
+		return rogue.GetOrRegisterAura(core.Aura{
 			Label: "Ashtongue Talisman",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-				if !cast.SpellExtras.Matches(SpellFlagFinisher) {
-					return
-				}
-
-				// Need to store the points because they get spent before OnSpellHit is called.
-				numPoints = rogue.ComboPoints()
-
-				if cast.SameActionIgnoreTag(SliceAndDiceActionID) {
-					// SND won't call OnSpellHit so we have to add the effect now.
-					if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
-						procAura.Activate(sim)
-					}
-				}
-			},
-			OnSpellCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 				if !spell.SpellExtras.Matches(SpellFlagFinisher) {
 					return
 				}

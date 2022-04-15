@@ -47,7 +47,7 @@ func (mage *Mage) applyWintersChill() {
 	procChance := float64(mage.Talents.WintersChill) / 5.0
 
 	mage.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return mage.GetOrRegisterAura(&core.Aura{
+		return mage.GetOrRegisterAura(core.Aura{
 			Label: "Winters Chill Talent",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {

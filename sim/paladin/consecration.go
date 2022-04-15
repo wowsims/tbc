@@ -12,29 +12,10 @@ const SpellIDConsecration int32 = 27173
 var ConsecrationActionID = core.ActionID{SpellID: SpellIDConsecration}
 
 func (paladin *Paladin) registerConsecrationSpell(sim *core.Simulation) {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    ConsecrationActionID,
-				Character:   &paladin.Character,
-				SpellSchool: core.SpellSchoolHoly,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 660,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 660,
-				},
-				GCD: core.GCDDefault,
-			},
-		},
-	}
-
-	// TODO: consecration talents here
+	baseCost := 660.0
 
 	consecrationDot := core.NewDot(core.Dot{
-		Aura: paladin.RegisterAura(&core.Aura{
+		Aura: paladin.RegisterAura(core.Aura{
 			Label:    "Consecration",
 			ActionID: ConsecrationActionID,
 		}),
@@ -48,9 +29,22 @@ func (paladin *Paladin) registerConsecrationSpell(sim *core.Simulation) {
 			IsPeriodic:       true,
 		}),
 	})
+	// TODO: consecration talents here
 
 	paladin.Consecration = paladin.RegisterSpell(core.SpellConfig{
-		Template:     spell,
+		ActionID:    ConsecrationActionID,
+		SpellSchool: core.SpellSchoolHoly,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDot(consecrationDot),
 	})
 	consecrationDot.Spell = paladin.Consecration

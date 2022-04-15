@@ -81,7 +81,7 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim 
 	var fwAura *core.Aura
 	findWeaknessMultiplier := 1.0 + 0.02*float64(rogue.Talents.FindWeakness)
 	if findWeaknessMultiplier != 1 {
-		fwAura = rogue.GetOrRegisterAura(&core.Aura{
+		fwAura = rogue.GetOrRegisterAura(core.Aura{
 			Label:    "Find Weakness",
 			ActionID: core.ActionID{SpellID: 31242},
 			Duration: time.Second * 10,
@@ -138,7 +138,7 @@ func (rogue *Rogue) registerColdBloodCD() {
 
 	actionID := core.ActionID{SpellID: 14177, CooldownID: ColdBloodCooldownID}
 
-	coldBloodAura := rogue.RegisterAura(&core.Aura{
+	coldBloodAura := rogue.RegisterAura(core.Aura{
 		Label:    "Cold Blood",
 		ActionID: actionID,
 		Duration: core.NeverExpires,
@@ -155,16 +155,17 @@ func (rogue *Rogue) registerColdBloodCD() {
 
 	cooldown := time.Minute * 3
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: rogue.GetCharacter(),
-			Cooldown:  cooldown,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				coldBloodAura.Activate(sim)
-			},
+	coldBloodSpell := rogue.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		Cast: core.CastConfig{
+			Cooldown: cooldown,
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			coldBloodAura.Activate(sim)
+		},
+	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -179,9 +180,7 @@ func (rogue *Rogue) registerColdBloodCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
+				coldBloodSpell.Cast(sim, nil)
 			}
 		},
 	})
@@ -195,7 +194,7 @@ func (rogue *Rogue) applySealFate() {
 	procChance := 0.2 * float64(rogue.Talents.SealFate)
 
 	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return rogue.GetOrRegisterAura(&core.Aura{
+		return rogue.GetOrRegisterAura(core.Aura{
 			Label: "Seal Fate",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spell.SpellExtras.Matches(SpellFlagBuilder) {
@@ -251,7 +250,7 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 				ApplyEffects: core.ApplyEffectFuncDirectDamage(rogue.AutoAttacks.MHEffect),
 			})
 
-			return rogue.GetOrRegisterAura(&core.Aura{
+			return rogue.GetOrRegisterAura(core.Aura{
 				Label: "Sword Specialization",
 				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if !spellEffect.Landed() {
@@ -287,7 +286,7 @@ func (rogue *Rogue) applyCombatPotency() {
 	energyBonus := 3.0 * float64(rogue.Talents.CombatPotency)
 
 	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return rogue.GetOrRegisterAura(&core.Aura{
+		return rogue.GetOrRegisterAura(core.Aura{
 			Label: "Combat Potency",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
@@ -324,7 +323,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 	dur := time.Second * 15
 	cooldown := time.Minute * 2
 
-	rogue.BladeFlurryAura = rogue.RegisterAura(&core.Aura{
+	rogue.BladeFlurryAura = rogue.RegisterAura(core.Aura{
 		Label:    "Blade Flurry",
 		ActionID: actionID,
 		Duration: dur,
@@ -342,22 +341,25 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 		},
 	})
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:    actionID,
-			Character:   rogue.GetCharacter(),
-			Cooldown:    cooldown,
-			GCD:         time.Second,
+	bladeFlurrySpell := rogue.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		ResourceType: stats.Energy,
+		BaseCost:     energyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: energyCost,
+				GCD:  time.Second,
+			},
 			IgnoreHaste: true,
-			Cost: core.ResourceCost{
-				Type:  stats.Energy,
-				Value: energyCost,
-			},
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				rogue.BladeFlurryAura.Activate(sim)
-			},
+			Cooldown:    cooldown,
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			rogue.BladeFlurryAura.Activate(sim)
+		},
+	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -390,9 +392,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
+				bladeFlurrySpell.Cast(sim, nil)
 			}
 		},
 	})
@@ -407,7 +407,7 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 
 	actionID := core.ActionID{SpellID: 13750, CooldownID: AdrenalineRushCooldownID}
 
-	rogue.AdrenalineRushAura = rogue.RegisterAura(&core.Aura{
+	rogue.AdrenalineRushAura = rogue.RegisterAura(core.Aura{
 		Label:    "Adrenaline Rush",
 		ActionID: actionID,
 		Duration: time.Second * 15,
@@ -423,18 +423,21 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 
 	cooldown := time.Minute * 5
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:    actionID,
-			Character:   rogue.GetCharacter(),
-			Cooldown:    cooldown,
-			GCD:         time.Second,
-			IgnoreHaste: true,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				rogue.AdrenalineRushAura.Activate(sim)
+	adrenalineRushSpell := rogue.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				GCD: time.Second,
 			},
+			IgnoreHaste: true,
+			Cooldown:    cooldown,
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			rogue.AdrenalineRushAura.Activate(sim)
+		},
+	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -459,9 +462,7 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
+				adrenalineRushSpell.Cast(sim, nil)
 			}
 		},
 	})

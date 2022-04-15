@@ -12,36 +12,29 @@ var ShieldSlamCooldownID = core.NewCooldownID()
 var ShieldSlamActionID = core.ActionID{SpellID: 30356, CooldownID: ShieldSlamCooldownID}
 
 func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
-	warrior.shieldSlamCost = 20.0 - float64(warrior.Talents.FocusedRage)
+	cost := 20.0 - float64(warrior.Talents.FocusedRage)
+	refundAmount := cost * 0.8
 	warrior.canShieldSlam = warrior.Talents.ShieldSlam && warrior.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType == proto.WeaponType_WeaponTypeShield
-	refundAmount := warrior.shieldSlamCost * 0.8
-
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    ShieldSlamActionID,
-				Character:   &warrior.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Second * 6,
-				IgnoreHaste: true,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.shieldSlamCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.shieldSlamCost,
-				},
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
 
 	damageRollFunc := core.DamageRollFunc(420, 440)
 
 	warrior.ShieldSlam = warrior.RegisterSpell(core.SpellConfig{
-		Template: ability,
+		ActionID:    ShieldSlamActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Rage,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: cost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true,
+			Cooldown:    time.Second * 6,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskMeleeMHSpecial, // TODO: Is this right?
 
@@ -67,5 +60,5 @@ func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
 }
 
 func (warrior *Warrior) CanShieldSlam(sim *core.Simulation) bool {
-	return warrior.canShieldSlam && warrior.CurrentRage() >= warrior.shieldSlamCost && !warrior.IsOnCD(ShieldSlamCooldownID, sim.CurrentTime)
+	return warrior.canShieldSlam && warrior.CurrentRage() >= warrior.ShieldSlam.DefaultCast.Cost && !warrior.IsOnCD(ShieldSlamCooldownID, sim.CurrentTime)
 }

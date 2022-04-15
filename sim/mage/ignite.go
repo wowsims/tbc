@@ -20,7 +20,7 @@ func (mage *Mage) registerIgniteSpell(sim *core.Simulation) {
 func (mage *Mage) newIgniteDot(sim *core.Simulation, target *core.Target) *core.Dot {
 	return core.NewDot(core.Dot{
 		Spell: mage.Ignite,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Ignite-" + strconv.Itoa(int(mage.Index)),
 			ActionID: IgniteActionID,
 		}),
@@ -64,7 +64,7 @@ func (mage *Mage) applyIgnite() {
 	}
 
 	mage.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return mage.GetOrRegisterAura(&core.Aura{
+		return mage.GetOrRegisterAura(core.Aura{
 			Label: "Ignite Talent",
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {

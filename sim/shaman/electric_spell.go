@@ -41,7 +41,7 @@ func (shaman *Shaman) newElectricSpellConfig(actionID core.ActionID, baseCost fl
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost:     baseCost,
 				CastTime: baseCastTime,
 				GCD:      core.GCDDefault,
@@ -100,7 +100,7 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 }
 
 // Shared LB/CL logic that is dynamic, i.e. can't be precomputed.
-func (shaman *Shaman) applyElectricSpellCastInitModifiers(spell *core.Spell, cast *core.NewCast) {
+func (shaman *Shaman) applyElectricSpellCastInitModifiers(spell *core.Spell, cast *core.Cast) {
 	if shaman.ElementalFocusStacks > 0 {
 		// Reduces mana cost by 40%
 		cast.Cost -= spell.BaseCost * 0.4

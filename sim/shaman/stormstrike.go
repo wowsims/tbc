@@ -12,7 +12,7 @@ var StormstrikeCD = core.NewCooldownID()
 var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeCD}
 
 func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) *core.Aura {
-	return target.GetOrRegisterAura(&core.Aura{
+	return target.GetOrRegisterAura(core.Aura{
 		Label:     "Stormstrike",
 		ActionID:  StormstrikeActionID,
 		Duration:  time.Second * 12,
@@ -86,7 +86,7 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost,
 				GCD:  core.GCDDefault,
 			},

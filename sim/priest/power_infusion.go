@@ -15,7 +15,7 @@ func (priest *Priest) registerPowerInfusionCD() {
 	var powerInfusionTarget *core.Character
 	var powerInfusionAura *core.Aura
 	actionID := core.ActionID{SpellID: 10060, CooldownID: PowerInfusionCooldownID, Tag: int32(priest.Index)}
-	baseManaCost := priest.BaseMana() * 0.16
+	baseCost := priest.BaseMana() * 0.16
 
 	priest.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -27,7 +27,7 @@ func (priest *Priest) registerPowerInfusionCD() {
 			if powerInfusionTarget == nil {
 				return false
 			}
-			if character.CurrentMana() < baseManaCost {
+			if character.CurrentMana() < baseCost {
 				return false
 			}
 			return true
@@ -51,29 +51,26 @@ func (priest *Priest) registerPowerInfusionCD() {
 				powerInfusionAura = core.PowerInfusionAura(powerInfusionTarget, actionID.Tag)
 			}
 
-			castTemplate := core.SimpleCast{
-				Cast: core.Cast{
-					ActionID:  actionID,
-					Character: priest.GetCharacter(),
-					BaseCost: core.ResourceCost{
-						Type:  stats.Mana,
-						Value: baseManaCost,
-					},
-					Cost: core.ResourceCost{
-						Type:  stats.Mana,
-						Value: baseManaCost,
+			piSpell := priest.GetOrRegisterSpell(core.SpellConfig{
+				ActionID: actionID,
+
+				ResourceType: stats.Mana,
+				BaseCost:     baseCost,
+
+				Cast: core.CastConfig{
+					DefaultCast: core.Cast{
+						Cost: baseCost,
 					},
 					Cooldown: core.PowerInfusionCD,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						powerInfusionAura.Activate(sim)
-					},
 				},
-			}
+
+				ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+					powerInfusionAura.Activate(sim)
+				},
+			})
 
 			return func(sim *core.Simulation, character *core.Character) {
-				cast := castTemplate
-				cast.Init(sim)
-				cast.StartCast(sim)
+				piSpell.Cast(sim, nil)
 			}
 		},
 	})

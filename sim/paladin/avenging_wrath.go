@@ -13,7 +13,7 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 	cd := time.Minute * 3
 	var manaCost float64 = 236
 
-	aura := paladin.RegisterAura(&core.Aura{
+	aura := paladin.RegisterAura(core.Aura{
 		Label:    "Avenging Wrath",
 		ActionID: AvengingWrathActionID,
 		Duration: time.Second * 20,

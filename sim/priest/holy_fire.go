@@ -23,7 +23,7 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost:     baseCost,
 				GCD:      core.GCDDefault,
 				CastTime: time.Millisecond*3500 - time.Millisecond*100*time.Duration(priest.Talents.DivineFury),
@@ -47,7 +47,7 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.HolyFireDot = core.NewDot(core.Dot{
 		Spell: priest.HolyFire,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "HolyFire-" + strconv.Itoa(int(priest.Index)),
 			ActionID: HolyFireActionID,
 		}),

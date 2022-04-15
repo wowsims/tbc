@@ -29,7 +29,7 @@ func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
 		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
-			DefaultCast: core.NewCast{
+			DefaultCast: core.Cast{
 				Cost: baseCost * (1 + float64(mage.Talents.EmpoweredArcaneMissiles)*0.02),
 
 				GCD:         core.GCDDefault,
@@ -62,7 +62,7 @@ func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	mage.ArcaneMissilesDot = core.NewDot(core.Dot{
 		Spell: mage.ArcaneMissiles,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "ArcaneMissiles-" + strconv.Itoa(int(mage.Index)),
 			ActionID: ArcaneMissilesActionID,
 		}),
