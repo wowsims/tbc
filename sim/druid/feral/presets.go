@@ -126,7 +126,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 			"Delicate Living Ruby",
 			"Delicate Living Ruby",
 			"Delicate Living Ruby",
-		},Ruby
+		},
 	},
 	{
 		Name:    "Nightfall Wristguards",

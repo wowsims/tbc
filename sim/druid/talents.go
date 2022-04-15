@@ -13,6 +13,11 @@ func (druid *Druid) ApplyTalents() {
 
 	druid.AddStat(stats.SpellHit, float64(druid.Talents.BalanceOfPower)*2*core.SpellHitRatingPerHitChance)
 
+	if druid.CatForm {
+		druid.AddStat(stats.AttackPower, float64(druid.Talents.PredatoryStrikes)*0.5*70)
+		druid.AddStat(stats.MeleeCrit, float64(druid.Talents.SharpenedClaws)*2*core.MeleeCritRatingPerCritChance)
+	}
+
 	if druid.Talents.LunarGuidance > 0 {
 		bonus := (0.25 / 3) * float64(druid.Talents.LunarGuidance)
 		druid.AddStatDependency(stats.StatDependency{
@@ -43,6 +48,10 @@ func (druid *Druid) ApplyTalents() {
 		druid.PseudoStats.ThreatMultiplier *= 1 - 0.04*float64(druid.Talents.Subtlety)
 	}
 
+	if druid.Talents.Naturalist > 0 {
+		druid.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + 0.02*float64(druid.Talents.Naturalist)
+	}
+
 	if druid.Talents.HeartOfTheWild > 0 {
 		bonus := 0.04 * float64(druid.Talents.HeartOfTheWild)
 		druid.AddStatDependency(stats.StatDependency{
@@ -52,6 +61,16 @@ func (druid *Druid) ApplyTalents() {
 				return intellect + intellect*bonus
 			},
 		})
+
+		if druid.CatForm {
+			druid.AddStatDependency(stats.StatDependency{
+				SourceStat:   stats.AttackPower,
+				ModifiedStat: stats.AttackPower,
+				Modifier: func(attackPower float64, _ float64) float64 {
+					return attackPower + attackPower*0.5*bonus
+				},
+			})
+		}
 	}
 
 	if druid.Talents.SurvivalOfTheFittest > 0 {
@@ -73,13 +92,6 @@ func (druid *Druid) ApplyTalents() {
 		druid.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Agility,
 			ModifiedStat: stats.Agility,
-			Modifier: func(stat float64, _ float64) float64 {
-				return stat + stat*bonus
-			},
-		})
-		druid.AddStatDependency(stats.StatDependency{
-			SourceStat:   stats.Intellect,
-			ModifiedStat: stats.Intellect,
 			Modifier: func(stat float64, _ float64) float64 {
 				return stat + stat*bonus
 			},
