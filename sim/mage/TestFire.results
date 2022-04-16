@@ -252,7 +252,7 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-Despair-28573"
  value: {
-  dps: 1298.4885588657653
+  dps: 1298.2866815590423
  }
 }
 dps_results: {
@@ -372,7 +372,7 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-KhoriumChampion-23541"
  value: {
-  dps: 1298.4885588657653
+  dps: 1298.2866815590423
  }
 }
 dps_results: {
@@ -384,13 +384,13 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-LionheartChampion-28429"
  value: {
-  dps: 1298.4885588657653
+  dps: 1298.2866815590423
  }
 }
 dps_results: {
  key: "TestFire-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 1298.4885588657653
+  dps: 1298.2866815590423
  }
 }
 dps_results: {
@@ -432,7 +432,7 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 1532.47750081303
+  dps: 1532.4187846281213
  }
 }
 dps_results: {
@@ -636,7 +636,7 @@ dps_results: {
 dps_results: {
  key: "TestFire-Average-Default"
  value: {
-  dps: 1545.738319687794
+  dps: 1545.7378722673548
  }
 }
 dps_results: {
@@ -660,7 +660,7 @@ dps_results: {
 dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-FireRotation-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1200.8707756633867
+  dps: 1198.9343133343427
  }
 }
 dps_results: {
@@ -672,19 +672,19 @@ dps_results: {
 dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-FireRotation-NoBuffs-LongMultiTarget"
  value: {
-  dps: 670.5823508587617
+  dps: 669.7909678659823
  }
 }
 dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-FireRotation-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 670.5823508587617
+  dps: 669.7909678659823
  }
 }
 dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-FireRotation-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 508.0010170797852
+  dps: 505.78868365394624
  }
 }
 dps_results: {

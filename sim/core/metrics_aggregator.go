@@ -176,19 +176,6 @@ func (characterMetrics *CharacterMetrics) AddResourceEvent(actionID ActionID, re
 	characterMetrics.resources[resourceKey] = resourceMetrics
 }
 
-func (characterMetrics *CharacterMetrics) AddInstantCast(actionID ActionID) {
-	actionKey := NewActionKey(actionID)
-	actionMetrics, ok := characterMetrics.actions[actionKey]
-
-	if !ok {
-		actionMetrics.ActionID = actionID
-	}
-
-	actionMetrics.Casts++
-
-	characterMetrics.actions[actionKey] = actionMetrics
-}
-
 // Adds the results of a spell to the character metrics.
 func (characterMetrics *CharacterMetrics) addSpell(spell *Spell) {
 	actionID := spell.ActionID
