@@ -13,6 +13,11 @@ func (druid *Druid) ApplyTalents() {
 
 	druid.AddStat(stats.SpellHit, float64(druid.Talents.BalanceOfPower)*2*core.SpellHitRatingPerHitChance)
 
+	if druid.CatForm {
+		druid.AddStat(stats.AttackPower, float64(druid.Talents.PredatoryStrikes)*0.5*70)
+		druid.AddStat(stats.MeleeCrit, float64(druid.Talents.SharpenedClaws)*2*core.MeleeCritRatingPerCritChance)
+	}
+
 	if druid.Talents.LunarGuidance > 0 {
 		bonus := (0.25 / 3) * float64(druid.Talents.LunarGuidance)
 		druid.AddStatDependency(stats.StatDependency{
@@ -35,13 +40,9 @@ func (druid *Druid) ApplyTalents() {
 		})
 	}
 
-	if druid.Talents.Intensity > 0 {
-		druid.PseudoStats.SpiritRegenRateCasting = float64(druid.Talents.Intensity) * 0.1
-	}
-
-	if druid.Talents.Subtlety > 0 {
-		druid.PseudoStats.ThreatMultiplier *= 1 - 0.04*float64(druid.Talents.Subtlety)
-	}
+	druid.PseudoStats.SpiritRegenRateCasting = float64(druid.Talents.Intensity) * 0.1
+	druid.PseudoStats.ThreatMultiplier *= 1 - 0.04*float64(druid.Talents.Subtlety)
+	druid.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + 0.02*float64(druid.Talents.Naturalist)
 
 	if druid.Talents.HeartOfTheWild > 0 {
 		bonus := 0.04 * float64(druid.Talents.HeartOfTheWild)
@@ -52,6 +53,16 @@ func (druid *Druid) ApplyTalents() {
 				return intellect + intellect*bonus
 			},
 		})
+
+		if druid.CatForm {
+			druid.AddStatDependency(stats.StatDependency{
+				SourceStat:   stats.AttackPower,
+				ModifiedStat: stats.AttackPower,
+				Modifier: func(attackPower float64, _ float64) float64 {
+					return attackPower + attackPower*0.5*bonus
+				},
+			})
+		}
 	}
 
 	if druid.Talents.SurvivalOfTheFittest > 0 {
@@ -85,13 +96,6 @@ func (druid *Druid) ApplyTalents() {
 			},
 		})
 		druid.AddStatDependency(stats.StatDependency{
-			SourceStat:   stats.Intellect,
-			ModifiedStat: stats.Intellect,
-			Modifier: func(stat float64, _ float64) float64 {
-				return stat + stat*bonus
-			},
-		})
-		druid.AddStatDependency(stats.StatDependency{
 			SourceStat:   stats.Spirit,
 			ModifiedStat: stats.Spirit,
 			Modifier: func(stat float64, _ float64) float64 {
@@ -111,9 +115,7 @@ func (druid *Druid) ApplyTalents() {
 		})
 	}
 
-	if druid.Talents.NaturalPerfection > 0 {
-		druid.AddStat(stats.SpellCrit, float64(druid.Talents.NaturalPerfection)*1*core.SpellCritRatingPerCritChance)
-	}
+	druid.AddStat(stats.SpellCrit, float64(druid.Talents.NaturalPerfection)*1*core.SpellCritRatingPerCritChance)
 }
 
 func (druid *Druid) setupNaturesGrace() {

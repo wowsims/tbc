@@ -19,9 +19,9 @@ character_stats_results: {
   final_stats: 556.9004030226699
   final_stats: 0
   final_stats: 0
+  final_stats: 211.00000000000003
   final_stats: 0
-  final_stats: 0
-  final_stats: 0
+  final_stats: 107.66208
   final_stats: 0
   final_stats: 0
   final_stats: 0
@@ -41,6 +41,7 @@ character_stats_results: {
   final_stats: 0
   final_stats: 0
   final_stats: 10
+  final_stats: 0
   final_stats: 0
  }
 }

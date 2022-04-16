@@ -58,6 +58,7 @@ const (
 	FrostResistance
 	NatureResistance
 	ShadowResistance
+	FeralAttackPower
 
 	Len
 )
@@ -130,6 +131,8 @@ func (s Stat) StatName() string {
 		return "Armor"
 	case RangedAttackPower:
 		return "RangedAttackPower"
+	case FeralAttackPower:
+		return "FeralAttackPower"
 	case Defense:
 		return "Defense"
 	case Block:
