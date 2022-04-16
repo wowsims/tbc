@@ -68,37 +68,40 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 	mhSpell := shaman.newWindfuryImbueSpell(true)
 	ohSpell := shaman.newWindfuryImbueSpell(false)
 
-	shaman.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		var icd core.InternalCD
-		const icdDur = time.Second * 3
+	var icd core.InternalCD
+	const icdDur = time.Second * 3
 
-		return shaman.GetOrRegisterAura(core.Aura{
-			Label: "Windfury Imbue",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				// ProcMask: 20
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
-					return
-				}
+	shaman.RegisterAura(core.Aura{
+		Label:    "Windfury Imbue",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			icd = core.NewICD()
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			// ProcMask: 20
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+				return
+			}
 
-				isMHHit := spellEffect.IsMH()
-				if (!mh && isMHHit) || (!oh && !isMHHit) {
-					return // cant proc if not enchanted
-				}
-				if icd.IsOnCD(sim) {
-					return
-				}
-				if sim.RandomFloat("Windfury Imbue") > proc {
-					return
-				}
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
+			isMHHit := spellEffect.IsMH()
+			if (!mh && isMHHit) || (!oh && !isMHHit) {
+				return // cant proc if not enchanted
+			}
+			if icd.IsOnCD(sim) {
+				return
+			}
+			if sim.RandomFloat("Windfury Imbue") > proc {
+				return
+			}
+			icd = core.InternalCD(sim.CurrentTime + icdDur)
 
-				if isMHHit {
-					mhSpell.Cast(sim, spellEffect.Target)
-				} else {
-					ohSpell.Cast(sim, spellEffect.Target)
-				}
-			},
-		})
+			if isMHHit {
+				mhSpell.Cast(sim, spellEffect.Target)
+			} else {
+				ohSpell.Cast(sim, spellEffect.Target)
+			}
+		},
 	})
 }
 
@@ -137,26 +140,28 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 	mhSpell := shaman.newFlametongueImbueSpell(true)
 	ohSpell := shaman.newFlametongueImbueSpell(false)
 
-	shaman.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return shaman.GetOrRegisterAura(core.Aura{
-			Label: "Flametongue Imbue",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
-					return
-				}
+	shaman.RegisterAura(core.Aura{
+		Label:    "Flametongue Imbue",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+				return
+			}
 
-				isMHHit := spellEffect.IsMH()
-				if (isMHHit && !mh) || (!isMHHit && !oh) {
-					return // cant proc if not enchanted
-				}
+			isMHHit := spellEffect.IsMH()
+			if (isMHHit && !mh) || (!isMHHit && !oh) {
+				return // cant proc if not enchanted
+			}
 
-				if isMHHit {
-					mhSpell.Cast(sim, spellEffect.Target)
-				} else {
-					ohSpell.Cast(sim, spellEffect.Target)
-				}
-			},
-		})
+			if isMHHit {
+				mhSpell.Cast(sim, spellEffect.Target)
+			} else {
+				ohSpell.Cast(sim, spellEffect.Target)
+			}
+		},
 	})
 }
 
@@ -183,32 +188,34 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 
 	mhSpell := shaman.newFrostbrandImbueSpell(true)
 	ohSpell := shaman.newFrostbrandImbueSpell(false)
+	ppmm := shaman.AutoAttacks.NewPPMManager(9.0)
 
-	shaman.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		ppmm := shaman.AutoAttacks.NewPPMManager(9.0)
-		return shaman.GetOrRegisterAura(core.Aura{
-			Label: "Frostbrand Imbue",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
-					return
-				}
+	shaman.RegisterAura(core.Aura{
+		Label:    "Frostbrand Imbue",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+				return
+			}
 
-				isMHHit := spellEffect.IsMH()
-				if (isMHHit && !mh) || (!isMHHit && !oh) {
-					return // cant proc if not enchanted
-				}
+			isMHHit := spellEffect.IsMH()
+			if (isMHHit && !mh) || (!isMHHit && !oh) {
+				return // cant proc if not enchanted
+			}
 
-				if !ppmm.Proc(sim, isMHHit, false, "Frostbrand Weapon") {
-					return
-				}
+			if !ppmm.Proc(sim, isMHHit, false, "Frostbrand Weapon") {
+				return
+			}
 
-				if isMHHit {
-					mhSpell.Cast(sim, spellEffect.Target)
-				} else {
-					ohSpell.Cast(sim, spellEffect.Target)
-				}
-			},
-		})
+			if isMHHit {
+				mhSpell.Cast(sim, spellEffect.Target)
+			} else {
+				ohSpell.Cast(sim, spellEffect.Target)
+			}
+		},
 	})
 }
 

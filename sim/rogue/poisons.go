@@ -10,7 +10,7 @@ import (
 
 // Returns whether any Deadly Poisons are being used.
 func (rogue *Rogue) applyPoisons() {
-	hasWFTotem := rogue.HasWFTotem
+	hasWFTotem := rogue.HasAura(core.WindfuryTotemAuraLabel)
 	rogue.applyDeadlyPoison(hasWFTotem)
 	rogue.applyInstantPoison(hasWFTotem)
 }
@@ -75,20 +75,22 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 
 	procChance := 0.3 + 0.02*float64(rogue.Talents.ImprovedPoisons)
 
-	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return rogue.GetOrRegisterAura(core.Aura{
-			Label: "Deadly Poison",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
-					return
-				}
-				if sim.RandomFloat("Deadly Poison") > procChance {
-					return
-				}
+	rogue.RegisterAura(core.Aura{
+		Label:    "Deadly Poison",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
+				return
+			}
+			if sim.RandomFloat("Deadly Poison") > procChance {
+				return
+			}
 
-				rogue.DeadlyPoison.Cast(sim, spellEffect.Target)
-			},
-		})
+			rogue.DeadlyPoison.Cast(sim, spellEffect.Target)
+		},
 	})
 }
 
@@ -119,20 +121,22 @@ func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
 
 	procChance := 0.2 + 0.02*float64(rogue.Talents.ImprovedPoisons)
 
-	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return rogue.GetOrRegisterAura(core.Aura{
-			Label: "Instant Poison",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
-					return
-				}
-				if sim.RandomFloat("Instant Poison") > procChance {
-					return
-				}
+	rogue.RegisterAura(core.Aura{
+		Label:    "Instant Poison",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
+				return
+			}
+			if sim.RandomFloat("Instant Poison") > procChance {
+				return
+			}
 
-				rogue.procInstantPoison(sim, spellEffect)
-			},
-		})
+			rogue.procInstantPoison(sim, spellEffect)
+		},
 	})
 }
 

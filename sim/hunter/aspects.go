@@ -29,15 +29,7 @@ func (hunter *Hunter) registerAspectOfTheHawkSpell(sim *core.Simulation) {
 	}
 
 	hunter.AspectOfTheHawkAura = hunter.NewTemporaryStatsAuraWrapped("Aspect of the Hawk", AspectOfTheHawkActionID, stats.Stats{stats.RangedAttackPower: 155}, core.NeverExpires, func(aura *core.Aura) {
-
-		aura.Tag = "Aspect"
-		aura.Priority = 1
-
-		oldOnGain := aura.OnGain
-		aura.OnGain = func(aura *core.Aura, sim *core.Simulation) {
-			oldOnGain(aura, sim)
-			hunter.currentAspect = aura
-		}
+		hunter.applySharedAspectConfig(true, aura)
 		aura.OnSpellHit = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.ProcMask.Matches(core.ProcMaskRangedAuto) {
 				return
@@ -71,17 +63,12 @@ func (hunter *Hunter) registerAspectOfTheHawkSpell(sim *core.Simulation) {
 }
 
 func (hunter *Hunter) registerAspectOfTheViperSpell(sim *core.Simulation) {
-	hunter.AspectOfTheViperAura = hunter.RegisterAura(core.Aura{
+	auraConfig := core.Aura{
 		Label:    "Aspect of the Viper",
-		Tag:      "Aspect",
 		ActionID: AspectOfTheViperActionID,
-		Duration: core.NeverExpires,
-		Priority: 1,
-		// Mana gain from viper is handled in rotation.go
-		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			hunter.currentAspect = aura
-		},
-	})
+	}
+	hunter.applySharedAspectConfig(false, &auraConfig)
+	hunter.AspectOfTheViperAura = hunter.RegisterAura(auraConfig)
 
 	baseCost := 40.0
 	hunter.AspectOfTheViper = hunter.RegisterSpell(core.SpellConfig{
@@ -104,12 +91,26 @@ func (hunter *Hunter) registerAspectOfTheViperSpell(sim *core.Simulation) {
 	})
 }
 
-func (hunter *Hunter) applyInitialAspect() {
-	hunter.RegisterResetEffect(func(sim *core.Simulation) {
-		if hunter.Rotation.ViperStartManaPercent >= 1 {
-			hunter.AspectOfTheViperAura.Activate(sim)
-		} else {
-			hunter.AspectOfTheHawkAura.Activate(sim)
+func (hunter *Hunter) applySharedAspectConfig(isHawk bool, aura *core.Aura) {
+	if isHawk != (hunter.Rotation.ViperStartManaPercent >= 1) {
+		aura.OnReset = func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
 		}
-	})
+	}
+
+	aura.Tag = "Aspect"
+	aura.Priority = 1
+	aura.Duration = core.NeverExpires
+
+	oldOnGain := aura.OnGain
+	if oldOnGain == nil {
+		aura.OnGain = func(aura *core.Aura, sim *core.Simulation) {
+			hunter.currentAspect = aura
+		}
+	} else {
+		aura.OnGain = func(aura *core.Aura, sim *core.Simulation) {
+			oldOnGain(aura, sim)
+			hunter.currentAspect = aura
+		}
+	}
 }

@@ -9,7 +9,7 @@ import (
 )
 
 type WarriorInputs struct {
-	Shout                proto.WarriorShout
+	ShoutType            proto.WarriorShout
 	PrecastShout         bool
 	PrecastShoutSapphire bool
 	PrecastShoutT2       bool
@@ -30,13 +30,12 @@ type Warrior struct {
 
 	// Cached values
 	shoutDuration time.Duration
-	shoutCost     float64
 	canShieldSlam bool
 
-	CastShout           func(*core.Simulation)
-	CastBattleStance    func(*core.Simulation)
-	CastDefensiveStance func(*core.Simulation)
-	CastBerserkerStance func(*core.Simulation)
+	Shout           *core.Spell
+	BattleStance    *core.Spell
+	DefensiveStance *core.Spell
+	BerserkerStance *core.Spell
 
 	Bloodthirst          *core.Spell
 	DemoralizingShout    *core.Spell
@@ -64,7 +63,7 @@ func (warrior *Warrior) GetCharacter() *core.Character {
 }
 
 func (warrior *Warrior) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
-	if warrior.Shout == proto.WarriorShout_WarriorShoutBattle {
+	if warrior.ShoutType == proto.WarriorShout_WarriorShoutBattle {
 		partyBuffs.BattleShout = core.MaxTristate(partyBuffs.BattleShout, proto.TristateEffect_TristateEffectRegular)
 		if warrior.Talents.CommandingPresence == 5 {
 			partyBuffs.BattleShout = proto.TristateEffect_TristateEffectImproved
@@ -81,7 +80,7 @@ func (warrior *Warrior) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 				partyBuffs.SnapshotBsT2 = true
 			}
 		}
-	} else if warrior.Shout == proto.WarriorShout_WarriorShoutCommanding {
+	} else if warrior.ShoutType == proto.WarriorShout_WarriorShoutCommanding {
 		partyBuffs.CommandingShout = core.MaxTristate(partyBuffs.CommandingShout, proto.TristateEffect_TristateEffectRegular)
 		if warrior.Talents.CommandingPresence == 5 {
 			partyBuffs.CommandingShout = proto.TristateEffect_TristateEffectImproved
@@ -90,14 +89,14 @@ func (warrior *Warrior) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (warrior *Warrior) Init(sim *core.Simulation) {
-	warrior.CastShout = warrior.makeCastShout()
+	warrior.Shout = warrior.makeShoutSpell()
 
 	warrior.registerBattleStanceAura()
 	warrior.registerDefensiveStanceAura()
 	warrior.registerBerserkerStanceAura()
-	warrior.CastBattleStance = warrior.makeCastStance(sim, BattleStance, warrior.BattleStanceAura)
-	warrior.CastDefensiveStance = warrior.makeCastStance(sim, DefensiveStance, warrior.DefensiveStanceAura)
-	warrior.CastBerserkerStance = warrior.makeCastStance(sim, BerserkerStance, warrior.BerserkerStanceAura)
+	warrior.BattleStance = warrior.makeStanceSpell(sim, BattleStance, warrior.BattleStanceAura)
+	warrior.DefensiveStance = warrior.makeStanceSpell(sim, DefensiveStance, warrior.DefensiveStanceAura)
+	warrior.BerserkerStance = warrior.makeStanceSpell(sim, BerserkerStance, warrior.BerserkerStanceAura)
 
 	warrior.registerBloodthirstSpell(sim)
 	warrior.registerDemoralizingShoutSpell(sim)
@@ -119,10 +118,8 @@ func (warrior *Warrior) Reset(sim *core.Simulation) {
 	warrior.revengeTriggered = false
 
 	warrior.shoutExpiresAt = 0
-	if warrior.Shout != proto.WarriorShout_WarriorShoutNone {
-		if warrior.PrecastShout {
-			warrior.shoutExpiresAt = warrior.shoutDuration - time.Second*10
-		}
+	if warrior.Shout != nil && warrior.PrecastShout {
+		warrior.shoutExpiresAt = warrior.shoutDuration - time.Second*10
 	}
 
 	warrior.applyAngerManagement(sim)

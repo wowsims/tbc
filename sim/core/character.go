@@ -73,7 +73,6 @@ type Character struct {
 	// a MH imbue.
 	// TODO: Figure out a cleaner way to do this.
 	HasMHWeaponImbue bool
-	HasWFTotem       bool
 
 	// GCD-related PendingActions for this character.
 	gcdAction      *PendingAction
@@ -418,7 +417,13 @@ func (character *Character) Finalize(raid *Raid) {
 	}
 }
 
+func (character *Character) init(sim *Simulation, agent Agent) {
+	character.Unit.init(sim)
+	agent.Init(sim)
+}
+
 func (character *Character) reset(sim *Simulation, agent Agent) {
+	character.majorCooldownManager.reset(sim)
 	character.Unit.reset(sim)
 
 	character.ExpectedBonusMana = 0
@@ -427,18 +432,18 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 	character.energyBar.reset(sim)
 	character.rageBar.reset(sim)
 
-	character.majorCooldownManager.reset(sim)
 	character.AutoAttacks.reset(sim)
 
 	for _, petAgent := range character.Pets {
 		petAgent.GetPet().reset(sim, petAgent)
-		petAgent.Reset(sim)
 	}
 
 	if character.gcdAction != nil {
 		sim.pendingActionPool.Put(character.gcdAction)
 	}
 	character.gcdAction = character.newGCDAction(sim, agent)
+
+	agent.Reset(sim)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc

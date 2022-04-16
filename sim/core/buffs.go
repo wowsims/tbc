@@ -110,9 +110,9 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	}
 
 	if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectImproved {
-		character.AddPermanentAura(func(*Simulation) *Aura { return SanctityAura(character, 2) })
+		SanctityAura(character, 2)
 	} else if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectRegular {
-		character.AddPermanentAura(func(*Simulation) *Aura { return SanctityAura(character, 0) })
+		SanctityAura(character, 0)
 	}
 
 	if partyBuffs.BattleShout != proto.TristateEffect_TristateEffectMissing {
@@ -136,10 +136,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		}
 		if snapshotAP > 0 {
 			snapshotAP = math.Floor(snapshotAP)
-			character.AddPermanentAuraWithOptions(PermanentAura{
-				AuraFactory:     func(*Simulation) *Aura { return SnapshotBattleShoutAura(character, snapshotAP) },
-				RespectDuration: true,
-			})
+			SnapshotBattleShoutAura(character, snapshotAP)
 		}
 	}
 	character.AddStats(stats.Stats{
@@ -156,10 +153,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		stats.SpellPower: GetTristateValueFloat(partyBuffs.WrathOfAirTotem, 101, 121),
 	})
 	if partyBuffs.WrathOfAirTotem == proto.TristateEffect_TristateEffectRegular && partyBuffs.SnapshotImprovedWrathOfAirTotem {
-		character.AddPermanentAuraWithOptions(PermanentAura{
-			AuraFactory:     func(*Simulation) *Aura { return SnapshotImprovedWrathOfAirTotemAura(character) },
-			RespectDuration: true,
-		})
+		SnapshotImprovedWrathOfAirTotemAura(character)
 	}
 	character.AddStats(stats.Stats{
 		stats.Agility: GetTristateValueFloat(partyBuffs.GraceOfAirTotem, 77, 88),
@@ -175,19 +169,13 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		character.AddStat(stats.Strength, 112)
 	}
 	if (partyBuffs.StrengthOfEarthTotem == proto.StrengthOfEarthType_Basic || partyBuffs.StrengthOfEarthTotem == proto.StrengthOfEarthType_EnhancingTotems) && partyBuffs.SnapshotImprovedStrengthOfEarthTotem {
-		character.AddPermanentAuraWithOptions(PermanentAura{
-			AuraFactory:     func(*Simulation) *Aura { return SnapshotImprovedStrengthOfEarthTotemAura(character) },
-			RespectDuration: true,
-		})
+		SnapshotImprovedStrengthOfEarthTotemAura(character)
 	}
 	character.AddStats(stats.Stats{
 		stats.MP5: GetTristateValueFloat(partyBuffs.ManaSpringTotem, 50, 62.5),
 	})
 	if partyBuffs.WindfuryTotemRank > 0 && IsEligibleForWindfuryTotem(character) {
-		character.HasWFTotem = true
-		character.AddPermanentAura(func(*Simulation) *Aura {
-			return WindfuryTotemAura(character, partyBuffs.WindfuryTotemRank, partyBuffs.WindfuryTotemIwt)
-		})
+		WindfuryTotemAura(character, partyBuffs.WindfuryTotemRank, partyBuffs.WindfuryTotemIwt)
 	}
 	if partyBuffs.TranquilAirTotem {
 		character.PseudoStats.ThreatMultiplier *= 0.8
@@ -252,21 +240,37 @@ func applyPetBuffEffects(petAgent PetAgent, raidBuffs proto.RaidBuffs, partyBuff
 }
 
 func SnapshotImprovedStrengthOfEarthTotemAura(character *Character) *Aura {
-	return character.NewTemporaryStatsAura("Strength of Earth Totem Snapshot", ActionID{SpellID: 37223}, stats.Stats{stats.Strength: 12}, time.Second*110)
+	return character.NewTemporaryStatsAuraWrapped("Strength of Earth Totem Snapshot", ActionID{SpellID: 37223}, stats.Stats{stats.Strength: 12}, time.Second*110, func(config *Aura) {
+		config.OnReset = func(aura *Aura, sim *Simulation) {
+			aura.Activate(sim)
+		}
+	})
 }
 
 func SnapshotImprovedWrathOfAirTotemAura(character *Character) *Aura {
-	return character.NewTemporaryStatsAura("Wrath of Air Totem Snapshot", ActionID{SpellID: 37212}, stats.Stats{stats.SpellPower: 20}, time.Second*110)
+	return character.NewTemporaryStatsAuraWrapped("Wrath of Air Totem Snapshot", ActionID{SpellID: 37212}, stats.Stats{stats.SpellPower: 20}, time.Second*110, func(config *Aura) {
+		config.OnReset = func(aura *Aura, sim *Simulation) {
+			aura.Activate(sim)
+		}
+	})
 }
 
 func SnapshotBattleShoutAura(character *Character, snapshotAp float64) *Aura {
-	return character.NewTemporaryStatsAura("Battle Shout Snapshot", ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: snapshotAp}, time.Second*110)
+	return character.NewTemporaryStatsAuraWrapped("Battle Shout Snapshot", ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: snapshotAp}, time.Second*110, func(config *Aura) {
+		config.OnReset = func(aura *Aura, sim *Simulation) {
+			aura.Activate(sim)
+		}
+	})
 }
 
 func SanctityAura(character *Character, level float64) *Aura {
 	return character.GetOrRegisterAura(Aura{
 		Label:    "Sanctity Aura",
 		ActionID: ActionID{SpellID: 31870},
+		Duration: NeverExpires,
+		OnReset: func(aura *Aura, sim *Simulation) {
+			aura.Activate(sim)
+		},
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.HolyDamageDealtMultiplier *= 1.1
 			aura.Unit.PseudoStats.DamageDealtMultiplier *= 1 + 0.01*level
@@ -310,6 +314,8 @@ func IsEligibleForWindfuryTotem(character *Character) bool {
 		!character.HasMHWeaponImbue
 }
 
+var WindfuryTotemAuraLabel = "Windfury Totem"
+
 func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) *Aura {
 	buffActionID := ActionID{SpellID: windfuryBuffSpellRanks[rank-1]}
 	apBonus := windfuryAPBonuses[rank-1]
@@ -329,22 +335,27 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 		}
 	})
 
-	wfSpell := character.GetOrRegisterSpell(SpellConfig{
-		ActionID:    ActionID{SpellID: windfuryBuffSpellRanks[rank-1]}, // temporary buff ("Windfury Attack") spell id
-		SpellSchool: SpellSchoolPhysical,
-		SpellExtras: SpellExtrasMeleeMetrics,
-
-		ApplyEffects: ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
-	})
-
+	var wfSpell *Spell
+	var icd InternalCD
+	const icdDur = time.Duration(1)
 	const procChance = 0.2
 
-	icd := NewICD()
-	const icdDur = time.Duration(1)
+	return character.RegisterAura(Aura{
+		Label:    WindfuryTotemAuraLabel,
+		Duration: NeverExpires,
+		OnInit: func(aura *Aura, sim *Simulation) {
+			wfSpell = character.GetOrRegisterSpell(SpellConfig{
+				ActionID:    ActionID{SpellID: windfuryBuffSpellRanks[rank-1]}, // temporary buff ("Windfury Attack") spell id
+				SpellSchool: SpellSchoolPhysical,
+				SpellExtras: SpellExtrasMeleeMetrics,
 
-	return character.GetOrRegisterAura(Aura{
-		Label:    "Windfury Totem",
-		ActionID: ActionID{SpellID: WindfuryTotemSpellRanks[rank-1]}, // totem spell id ("Windfury Totem")
+				ApplyEffects: ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
+			})
+		},
+		OnReset: func(aura *Aura, sim *Simulation) {
+			icd = NewICD()
+			aura.Activate(sim)
+		},
 		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeMHAuto) {
 				return

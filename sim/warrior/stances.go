@@ -20,29 +20,34 @@ func (warrior *Warrior) StanceMatches(other Stance) bool {
 }
 
 var StanceCooldownID = core.NewCooldownID()
-var StanceCooldown = time.Second * 1
 
-func (warrior *Warrior) makeCastStance(sim *core.Simulation, stance Stance, aura *core.Aura) func(sim *core.Simulation) {
+func (warrior *Warrior) makeStanceSpell(sim *core.Simulation, stance Stance, aura *core.Aura) *core.Spell {
 	maxRetainedRage := 10.0 + 5*float64(warrior.Talents.TacticalMastery)
+	actionID := aura.ActionID
+	actionID.CooldownID = StanceCooldownID
 
-	return func(sim *core.Simulation) {
-		if warrior.Stance == stance {
-			panic("Already in stance " + string(stance))
-		}
-		if warrior.IsOnCD(StanceCooldownID, sim.CurrentTime) {
-			panic("Stance on CD")
-		}
+	return warrior.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
 
-		warrior.SetCD(StanceCooldownID, sim.CurrentTime+StanceCooldown)
-		warrior.Metrics.AddInstantCast(aura.ActionID)
-		if warrior.CurrentRage() > maxRetainedRage {
-			warrior.SpendRage(sim, warrior.CurrentRage()-maxRetainedRage, aura.ActionID)
-		}
+		Cast: core.CastConfig{
+			Cooldown:         time.Second,
+			DisableCallbacks: true,
+		},
 
-		// Add new stance aura.
-		aura.Activate(sim)
-		warrior.Stance = stance
-	}
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			if warrior.Stance == stance {
+				panic("Already in stance " + string(stance))
+			}
+
+			if warrior.CurrentRage() > maxRetainedRage {
+				warrior.SpendRage(sim, warrior.CurrentRage()-maxRetainedRage, aura.ActionID)
+			}
+
+			// Add new stance aura.
+			aura.Activate(sim)
+			warrior.Stance = stance
+		},
+	})
 }
 
 func (warrior *Warrior) registerBattleStanceAura() {

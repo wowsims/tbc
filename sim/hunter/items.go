@@ -82,15 +82,14 @@ func ApplyTalonOfAlar(agent core.Agent) {
 	hunter.TalonOfAlarAura = hunter.GetOrRegisterAura(core.Aura{
 		Label:    "Talon of Alar",
 		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell.SameAction(ArcaneShotActionID) {
 				procAura.Activate(sim)
 			}
 		},
-	})
-
-	hunter.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return hunter.TalonOfAlarAura
 	})
 }
 
@@ -125,36 +124,42 @@ func ApplyBeasttamersShoulders(agent core.Agent) {
 func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 	character := agent.GetCharacter()
 	const manaGain = 8.0
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return character.GetOrRegisterAura(core.Aura{
-			Label: "Black Bow of the Betrayer",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskRanged) {
-					return
-				}
-				character.AddMana(sim, manaGain, core.ActionID{SpellID: 46939}, false)
-			},
-		})
+
+	character.RegisterAura(core.Aura{
+		Label:    "Black Bow of the Betrayer",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskRanged) {
+				return
+			}
+			character.AddMana(sim, manaGain, core.ActionID{SpellID: 46939}, false)
+		},
 	})
 }
 
 func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32487}, stats.Stats{stats.AttackPower: 275, stats.RangedAttackPower: 275}, time.Second*8)
-		const procChance = 0.15
 
-		return character.GetOrRegisterAura(core.Aura{
-			Label: "Ashtongue Talisman",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spell.SameAction(SteadyShotActionID) {
-					return
-				}
-				if sim.RandomFloat("Ashtongue Talisman of Swiftness") > procChance {
-					return
-				}
-				procAura.Activate(sim)
-			},
-		})
+	procAura := character.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32487}, stats.Stats{stats.AttackPower: 275, stats.RangedAttackPower: 275}, time.Second*8)
+	const procChance = 0.15
+
+	character.RegisterAura(core.Aura{
+		Label:    "Ashtongue Talisman",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spell.SameAction(SteadyShotActionID) {
+				return
+			}
+			if sim.RandomFloat("Ashtongue Talisman of Swiftness") > procChance {
+				return
+			}
+			procAura.Activate(sim)
+		},
 	})
 }

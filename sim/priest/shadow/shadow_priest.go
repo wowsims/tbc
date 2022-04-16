@@ -123,8 +123,8 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 		}
 
 		if allCDs[mbidx] == 0 {
-			if spriest.Talents.InnerFocus && spriest.GetRemainingCD(priest.InnerFocusCooldownID, sim.CurrentTime) == 0 {
-				spriest.ApplyInnerFocus(sim)
+			if spriest.InnerFocus != nil && spriest.GetRemainingCD(priest.InnerFocusCooldownID, sim.CurrentTime) == 0 {
+				spriest.InnerFocus.Cast(sim, nil)
 			}
 			spell = spriest.MindBlast
 		} else if allCDs[swdidx] == 0 {

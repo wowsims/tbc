@@ -8,11 +8,11 @@ import (
 var DemoralizingShoutActionID = core.ActionID{SpellID: 25203}
 
 func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
-	warrior.shoutCost = 10.0
+	cost := 10.0
+	cost -= float64(warrior.Talents.FocusedRage)
 	if ItemSetBoldArmor.CharacterHasSetBonus(&warrior.Character, 2) {
-		warrior.shoutCost -= 2
+		cost -= 2
 	}
-	cost := warrior.shoutCost - float64(warrior.Talents.FocusedRage)
 
 	baseEffect := core.SpellEffect{
 		ThreatMultiplier: 1,

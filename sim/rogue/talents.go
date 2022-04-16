@@ -193,23 +193,25 @@ func (rogue *Rogue) applySealFate() {
 
 	procChance := 0.2 * float64(rogue.Talents.SealFate)
 
-	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return rogue.GetOrRegisterAura(core.Aura{
-			Label: "Seal Fate",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spell.SpellExtras.Matches(SpellFlagBuilder) {
-					return
-				}
+	rogue.RegisterAura(core.Aura{
+		Label:    "Seal Fate",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spell.SpellExtras.Matches(SpellFlagBuilder) {
+				return
+			}
 
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					return
-				}
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				return
+			}
 
-				if procChance == 1 || sim.RandomFloat("Seal Fate") < procChance {
-					rogue.AddComboPoints(sim, 1, core.ActionID{SpellID: 14195})
-				}
-			},
-		})
+			if procChance == 1 || sim.RandomFloat("Seal Fate") < procChance {
+				rogue.AddComboPoints(sim, 1, core.ActionID{SpellID: 14195})
+			}
+		},
 	})
 }
 
@@ -237,42 +239,47 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 		swordSpecMask |= core.ProcMaskMeleeOH
 	}
 	if rogue.Talents.SwordSpecialization > 0 && swordSpecMask != core.ProcMaskEmpty {
-		rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-			procChance := 0.01 * float64(rogue.Talents.SwordSpecialization)
-			var icd core.InternalCD
-			icdDur := time.Millisecond * 500
+		var swordSpecializationSpell *core.Spell
+		var icd core.InternalCD
+		icdDur := time.Millisecond * 500
+		procChance := 0.01 * float64(rogue.Talents.SwordSpecialization)
 
-			swordSpecializationSpell := rogue.GetOrRegisterSpell(core.SpellConfig{
-				ActionID:    core.ActionID{SpellID: 13964},
-				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
+		rogue.RegisterAura(core.Aura{
+			Label:    "Sword Specialization",
+			Duration: core.NeverExpires,
+			OnInit: func(aura *core.Aura, sim *core.Simulation) {
+				swordSpecializationSpell = rogue.GetOrRegisterSpell(core.SpellConfig{
+					ActionID:    core.ActionID{SpellID: 13964},
+					SpellSchool: core.SpellSchoolPhysical,
+					SpellExtras: core.SpellExtrasMeleeMetrics,
 
-				ApplyEffects: core.ApplyEffectFuncDirectDamage(rogue.AutoAttacks.MHEffect),
-			})
+					ApplyEffects: core.ApplyEffectFuncDirectDamage(rogue.AutoAttacks.MHEffect),
+				})
+			},
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				icd = core.NewICD()
+				aura.Activate(sim)
+			},
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
 
-			return rogue.GetOrRegisterAura(core.Aura{
-				Label: "Sword Specialization",
-				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						return
-					}
+				if !spellEffect.ProcMask.Matches(swordSpecMask) {
+					return
+				}
 
-					if !spellEffect.ProcMask.Matches(swordSpecMask) {
-						return
-					}
+				if icd.IsOnCD(sim) {
+					return
+				}
 
-					if icd.IsOnCD(sim) {
-						return
-					}
+				if sim.RandomFloat("Sword Specialization") > procChance {
+					return
+				}
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
 
-					if sim.RandomFloat("Sword Specialization") > procChance {
-						return
-					}
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
-
-					swordSpecializationSpell.Cast(sim, spellEffect.Target)
-				},
-			})
+				swordSpecializationSpell.Cast(sim, spellEffect.Target)
+			},
 		})
 	}
 }
@@ -285,26 +292,28 @@ func (rogue *Rogue) applyCombatPotency() {
 	const procChance = 0.2
 	energyBonus := 3.0 * float64(rogue.Talents.CombatPotency)
 
-	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return rogue.GetOrRegisterAura(core.Aura{
-			Label: "Combat Potency",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
-					return
-				}
+	rogue.RegisterAura(core.Aura{
+		Label:    "Combat Potency",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() {
+				return
+			}
 
-				// https://tbc.wowhead.com/spell=35553/combat-potency, proc mask = 8838608.
-				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOH) {
-					return
-				}
+			// https://tbc.wowhead.com/spell=35553/combat-potency, proc mask = 8838608.
+			if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOH) {
+				return
+			}
 
-				if sim.RandomFloat("Combat Potency") > procChance {
-					return
-				}
+			if sim.RandomFloat("Combat Potency") > procChance {
+				return
+			}
 
-				rogue.AddEnergy(sim, energyBonus, core.ActionID{SpellID: 35553})
-			},
-		})
+			rogue.AddEnergy(sim, energyBonus, core.ActionID{SpellID: 35553})
+		},
 	})
 }
 

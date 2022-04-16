@@ -42,6 +42,7 @@ character_stats_results: {
   final_stats: 0
   final_stats: 0
   final_stats: 0
+  final_stats: 0
  }
 }
 dps_results: {
@@ -83,7 +84,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-BadgeoftheSwarmguard-21670"
  value: {
-  dps: 1216.8696780873925
+  dps: 1216.7373220078025
  }
 }
 dps_results: {
@@ -137,7 +138,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-BlackenedNaaruSliver-34427"
  value: {
-  dps: 1264.9318201001975
+  dps: 1264.937546396025
  }
 }
 dps_results: {
@@ -209,7 +210,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 1227.920629254315
+  dps: 1227.9206292543147
  }
 }
 dps_results: {
@@ -533,7 +534,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-SwiftWindfireDiamond"
  value: {
-  dps: 1211.5525157019333
+  dps: 1211.5525157019335
  }
 }
 dps_results: {
@@ -611,7 +612,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-WrathofSpellfire"
  value: {
-  dps: 1071.6269058946848
+  dps: 1071.6269058946853
  }
 }
 dps_results: {
@@ -623,13 +624,13 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Average-Default"
  value: {
-  dps: 1224.54125194312
+  dps: 1224.54139716794
  }
 }
 dps_results: {
  key: "TestMutilate-SelfDrums-DPS"
  value: {
-  dps: 1231.6176429995248
+  dps: 1231.5048214123212
  }
 }
 dps_results: {
@@ -653,7 +654,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1494.0190525696526
+  dps: 1494.0533703365363
  }
 }
 dps_results: {
@@ -683,7 +684,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1241.8356356049192
+  dps: 1241.8356356049194
  }
 }
 dps_results: {
@@ -701,7 +702,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1494.1079904891617
+  dps: 1494.1423082560455
  }
 }
 dps_results: {
