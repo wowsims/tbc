@@ -42,6 +42,7 @@ character_stats_results: {
   final_stats: 0
   final_stats: 0
   final_stats: 0
+  final_stats: 0
  }
 }
 dps_results: {
@@ -83,7 +84,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-BandoftheEternalChampion-29301"
  value: {
-  dps: 1977.3861847459673
+  dps: 1977.38731056197
  }
 }
 dps_results: {
@@ -251,7 +252,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 1987.3110511094824
+  dps: 1987.3112364052492
  }
 }
 dps_results: {
@@ -263,7 +264,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-DesolationBattlegear"
  value: {
-  dps: 1636.367020462316
+  dps: 1636.3681520654675
  }
 }
 dps_results: {
@@ -395,7 +396,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-HourglassoftheUnraveller-28034"
  value: {
-  dps: 1963.7410220638087
+  dps: 1963.7494407405475
  }
 }
 dps_results: {
@@ -551,7 +552,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-ShardofContempt-34472"
  value: {
-  dps: 2013.2190993274176
+  dps: 2013.2228178000105
  }
 }
 dps_results: {
@@ -731,13 +732,13 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TsunamiTalisman-30627"
  value: {
-  dps: 1971.5184126789165
+  dps: 1971.526880515009
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-WastewalkerArmor"
  value: {
-  dps: 1650.1453209185163
+  dps: 1650.1462575699622
  }
 }
 dps_results: {

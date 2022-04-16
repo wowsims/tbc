@@ -95,6 +95,10 @@ func (unit *Unit) finalize() {
 	unit.auraTracker.finalize()
 }
 
+func (unit *Unit) init(sim *Simulation) {
+	unit.auraTracker.init(sim)
+}
+
 func (unit *Unit) reset(sim *Simulation) {
 	unit.Metrics.reset()
 	unit.stats = unit.initialStats

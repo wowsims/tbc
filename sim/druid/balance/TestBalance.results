@@ -498,7 +498,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 1270.7991698211931
+  dps: 1271.4758011828496
  }
 }
 dps_results: {
@@ -528,7 +528,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-ShiftingNaaruSliver-34429"
  value: {
-  dps: 1289.890666087526
+  dps: 1291.1038016203663
  }
 }
 dps_results: {
@@ -666,7 +666,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-Xi'ri'sGift-29179"
  value: {
-  dps: 1252.9697472971175
+  dps: 1253.5455771931051
  }
 }
 dps_results: {
@@ -696,7 +696,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-Settings-Tauren-P1-Adaptive-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1034.0314404416617
+  dps: 1026.0212688680672
  }
 }
 dps_results: {

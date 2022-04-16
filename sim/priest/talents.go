@@ -105,19 +105,20 @@ func (priest *Priest) setupSurgeOfLight() {
 
 	procChance := 0.25 * float64(priest.Talents.SurgeOfLight)
 
-	priest.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return priest.GetOrRegisterAura(core.Aura{
-			Label:    "Surge of Light",
-			Duration: core.NeverExpires,
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					if procChance < sim.RandomFloat("SurgeOfLight") {
-						priest.SurgeOfLightProcAura.Activate(sim)
-						priest.SurgeOfLightProcAura.Prioritize()
-					}
+	priest.RegisterAura(core.Aura{
+		Label:    "Surge of Light",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				if procChance < sim.RandomFloat("SurgeOfLight") {
+					priest.SurgeOfLightProcAura.Activate(sim)
+					priest.SurgeOfLightProcAura.Prioritize()
 				}
-			},
-		})
+			}
+		},
 	})
 }
 

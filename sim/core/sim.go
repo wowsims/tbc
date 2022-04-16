@@ -9,8 +9,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-type InitialAura func(*Simulation) Aura
-
 type Simulation struct {
 	Raid              *Raid
 	encounter         Encounter
@@ -151,13 +149,17 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	// 	fmt.Printf(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
 	// }
 
+	for _, target := range sim.encounter.Targets {
+		target.init(sim)
+	}
+
 	for _, party := range sim.Raid.Parties {
 		for _, player := range party.Players {
 			character := player.GetCharacter()
-			player.Init(sim)
+			character.init(sim, player)
 
 			for _, petAgent := range character.Pets {
-				petAgent.Init(sim)
+				petAgent.GetCharacter().init(sim, petAgent)
 			}
 		}
 	}

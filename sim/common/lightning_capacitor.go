@@ -26,34 +26,37 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 		}),
 	})
 
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		charges := 0
+	var charges int
+	var icd core.InternalCD
+	const icdDur = time.Millisecond * 2500
 
-		const icdDur = time.Millisecond * 2500
-		icd := core.NewICD()
+	character.RegisterAura(core.Aura{
+		Label:    "Lightning Capacitor",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			charges = 0
+			icd = core.NewICD()
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if icd.IsOnCD(sim) {
+				return
+			}
 
-		return character.GetOrRegisterAura(core.Aura{
-			Label: "Lightning Capacitor",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if icd.IsOnCD(sim) {
-					return
-				}
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
 
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				return
+			}
 
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					return
-				}
-
-				charges++
-				if charges >= 3 {
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					tlcSpell.Cast(sim, spellEffect.Target)
-					charges = 0
-				}
-			},
-		})
+			charges++
+			if charges >= 3 {
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				tlcSpell.Cast(sim, spellEffect.Target)
+				charges = 0
+			}
+		},
 	})
 }

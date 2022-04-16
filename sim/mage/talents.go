@@ -67,73 +67,77 @@ func (mage *Mage) applyArcaneConcentration() {
 		return
 	}
 
-	mage.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procChance := 0.02 * float64(mage.Talents.ArcaneConcentration)
-		bonusCrit := float64(mage.Talents.ArcanePotency) * 10 * core.SpellCritRatingPerCritChance
+	procChance := 0.02 * float64(mage.Talents.ArcaneConcentration)
+	bonusCrit := float64(mage.Talents.ArcanePotency) * 10 * core.SpellCritRatingPerCritChance
 
-		// Used to make sure we don't try to roll twice for the same cast on aoe spells.
-		var curCastIdx int = 0
-		var lastCheckedCastIdx int = 0
+	// Used to make sure we don't try to roll twice for the same cast on aoe spells.
+	var curCastIdx int
+	var lastCheckedCastIdx int
 
-		mage.ClearcastingAura = mage.GetOrRegisterAura(core.Aura{
-			Label:    "Clearcasting",
-			ActionID: core.ActionID{SpellID: 12536},
-			Duration: time.Second * 15,
-			OnGain: func(aura *core.Aura, sim *core.Simulation) {
-				mage.AddStat(stats.SpellCrit, bonusCrit)
-				mage.PseudoStats.NoCost = true
-			},
-			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-				mage.AddStat(stats.SpellCrit, -bonusCrit)
-				mage.PseudoStats.NoCost = false
-			},
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spell.SpellExtras.Matches(SpellFlagMage) {
-					return
-				}
-				if curCastIdx == lastCheckedCastIdx {
-					// Means this is another hit from the same cast that procced CC.
-					return
-				}
-				aura.Deactivate(sim)
-			},
-		})
+	mage.ClearcastingAura = mage.RegisterAura(core.Aura{
+		Label:    "Clearcasting",
+		ActionID: core.ActionID{SpellID: 12536},
+		Duration: time.Second * 15,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			mage.AddStat(stats.SpellCrit, bonusCrit)
+			mage.PseudoStats.NoCost = true
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			mage.AddStat(stats.SpellCrit, -bonusCrit)
+			mage.PseudoStats.NoCost = false
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spell.SpellExtras.Matches(SpellFlagMage) {
+				return
+			}
+			if curCastIdx == lastCheckedCastIdx {
+				// Means this is another hit from the same cast that procced CC.
+				return
+			}
+			aura.Deactivate(sim)
+		},
+	})
 
-		return mage.GetOrRegisterAura(core.Aura{
-			Label: "Arcane Concentration",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-				if mage.bonusAMCCCrit != 0 {
-					mage.AddStat(stats.SpellCrit, -mage.bonusAMCCCrit)
-					mage.bonusAMCCCrit = 0
-				}
-				if !spell.SpellExtras.Matches(SpellFlagMage) {
-					return
-				}
-				curCastIdx++
-			},
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spell.SpellExtras.Matches(SpellFlagMage) {
-					return
-				}
+	mage.RegisterAura(core.Aura{
+		Label:    "Arcane Concentration",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+			curCastIdx = 0
+			lastCheckedCastIdx = 0
+		},
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			if mage.bonusAMCCCrit != 0 {
+				mage.AddStat(stats.SpellCrit, -mage.bonusAMCCCrit)
+				mage.bonusAMCCCrit = 0
+			}
+			if !spell.SpellExtras.Matches(SpellFlagMage) {
+				return
+			}
+			curCastIdx++
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spell.SpellExtras.Matches(SpellFlagMage) {
+				return
+			}
 
-				if curCastIdx == lastCheckedCastIdx {
-					// Means we already rolled for this cast.
-					return
-				}
-				lastCheckedCastIdx = curCastIdx
+			if curCastIdx == lastCheckedCastIdx {
+				// Means we already rolled for this cast.
+				return
+			}
+			lastCheckedCastIdx = curCastIdx
 
-				if !spellEffect.Landed() {
-					return
-				}
+			if !spellEffect.Landed() {
+				return
+			}
 
-				if sim.RandomFloat("Arcane Concentration") > procChance {
-					return
-				}
+			if sim.RandomFloat("Arcane Concentration") > procChance {
+				return
+			}
 
-				mage.ClearcastingAura.Activate(sim)
-				mage.ClearcastingAura.Prioritize()
-			},
-		})
+			mage.ClearcastingAura.Activate(sim)
+			mage.ClearcastingAura.Prioritize()
+		},
 	})
 }
 
@@ -252,8 +256,12 @@ func (mage *Mage) applyMasterOfElements() {
 
 	refundCoeff := 0.1 * float64(mage.Talents.MasterOfElements)
 
-	moeAura := mage.RegisterAura(core.Aura{
-		Label: "Master of Elements",
+	mage.RegisterAura(core.Aura{
+		Label:    "Master of Elements",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
@@ -262,10 +270,6 @@ func (mage *Mage) applyMasterOfElements() {
 				mage.AddMana(sim, spell.BaseCost*refundCoeff, core.ActionID{SpellID: 29076}, false)
 			}
 		},
-	})
-
-	mage.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return moeAura
 	})
 }
 

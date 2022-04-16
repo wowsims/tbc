@@ -46,19 +46,21 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 		4: func(agent core.Agent) {
 			// Your spell critical strikes grant you up to 70 spell damage for 6 sec.
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				procAura := character.NewTemporaryStatsAura("Tirisfal 4pc Proc", core.ActionID{SpellID: 37443}, stats.Stats{stats.SpellPower: 70}, time.Second*6)
-				return character.GetOrRegisterAura(core.Aura{
-					Label: "Tirisfal 4pc",
-					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-							return
-						}
-						if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-							procAura.Activate(sim)
-						}
-					},
-				})
+			procAura := character.NewTemporaryStatsAura("Tirisfal 4pc Proc", core.ActionID{SpellID: 37443}, stats.Stats{stats.SpellPower: 70}, time.Second*6)
+			character.RegisterAura(core.Aura{
+				Label:    "Tirisfal 4pc",
+				Duration: core.NeverExpires,
+				OnReset: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Activate(sim)
+				},
+				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+					if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+						return
+					}
+					if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+						procAura.Activate(sim)
+					}
+				},
 			})
 		},
 	},
@@ -83,25 +85,27 @@ func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
 	// - No ICD.
 	// - 50% proc rate.
 	char := agent.GetCharacter()
-	char.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := char.NewTemporaryStatsAura("Asghtongue Talisman Proc", core.ActionID{SpellID: 32488}, stats.Stats{stats.SpellHaste: 150}, time.Second*5)
+	procAura := char.NewTemporaryStatsAura("Asghtongue Talisman Proc", core.ActionID{SpellID: 32488}, stats.Stats{stats.SpellHaste: 150}, time.Second*5)
 
-		return char.GetOrRegisterAura(core.Aura{
-			Label: "Ashtongue Talisman",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					return
-				}
+	char.RegisterAura(core.Aura{
+		Label:    "Ashtongue Talisman",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				return
+			}
 
-				if sim.RandomFloat("Ashtongue Talisman of Insight") > 0.5 {
-					return
-				}
+			if sim.RandomFloat("Ashtongue Talisman of Insight") > 0.5 {
+				return
+			}
 
-				procAura.Activate(sim)
-			},
-		})
+			procAura.Activate(sim)
+		},
 	})
 }

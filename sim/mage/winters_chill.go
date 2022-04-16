@@ -46,22 +46,24 @@ func (mage *Mage) applyWintersChill() {
 
 	procChance := float64(mage.Talents.WintersChill) / 5.0
 
-	mage.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return mage.GetOrRegisterAura(core.Aura{
-			Label: "Winters Chill Talent",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
+	mage.RegisterAura(core.Aura{
+		Label:    "Winters Chill Talent",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() {
+				return
+			}
+
+			if spell.SpellSchool == core.SpellSchoolFrost && !spell.SameAction(WintersChillActionID) {
+				if procChance != 1.0 && sim.RandomFloat("Winters Chill") > procChance {
 					return
 				}
 
-				if spell.SpellSchool == core.SpellSchoolFrost && !spell.SameAction(WintersChillActionID) {
-					if procChance != 1.0 && sim.RandomFloat("Winters Chill") > procChance {
-						return
-					}
-
-					mage.WintersChill.Cast(sim, spellEffect.Target)
-				}
-			},
-		})
+				mage.WintersChill.Cast(sim, spellEffect.Target)
+			}
+		},
 	})
 }

@@ -380,8 +380,9 @@ func RegisterTemporaryStatsOnUseCD(agent Agent, auraLabel string, tempStats stat
 	mcd.ShouldActivate = func(sim *Simulation, character *Character) bool { return true }
 	mcd.Type = CooldownTypeDPS
 
+	aura := agent.GetCharacter().NewTemporaryStatsAura(auraLabel, mcd.ActionID, tempStats, duration)
+
 	mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
-		aura := agent.GetCharacter().NewTemporaryStatsAura(auraLabel, mcd.ActionID, tempStats, duration)
 		return func(sim *Simulation, character *Character) {
 			aura.Activate(sim)
 			character.SetCD(mcd.CooldownID, sim.CurrentTime+mcd.Cooldown)

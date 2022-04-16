@@ -136,17 +136,18 @@ func (druid *Druid) setupNaturesGrace() {
 		},
 	})
 
-	druid.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return druid.GetOrRegisterAura(core.Aura{
-			Label: "Natures Grace",
-			//ActionID: core.ActionID{SpellID: 16880},
-			Duration: core.NeverExpires,
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					druid.NaturesGraceProcAura.Activate(sim)
-				}
-			},
-		})
+	druid.RegisterAura(core.Aura{
+		Label: "Natures Grace",
+		//ActionID: core.ActionID{SpellID: 16880},
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				druid.NaturesGraceProcAura.Activate(sim)
+			}
+		},
 	})
 }
 

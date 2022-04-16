@@ -21,39 +21,41 @@ type rageBar struct {
 }
 
 func (character *Character) EnableRageBar(startingRage float64, onRageGain OnRageGain) {
-	character.AddPermanentAura(func(*Simulation) *Aura {
-		return character.GetOrRegisterAura(Aura{
-			Label: "RageBar",
-			OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
-				if !spellEffect.ProcMask.Matches(ProcMaskWhiteHit) {
-					return
-				}
+	character.RegisterAura(Aura{
+		Label:    "RageBar",
+		Duration: NeverExpires,
+		OnReset: func(aura *Aura, sim *Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if !spellEffect.ProcMask.Matches(ProcMaskWhiteHit) {
+				return
+			}
 
-				// Need separate check to exclude auto replacers (e.g. Heroic Strike and Cleave).
-				if spellEffect.ProcMask.Matches(ProcMaskMeleeMHSpecial) {
-					return
-				}
+			// Need separate check to exclude auto replacers (e.g. Heroic Strike and Cleave).
+			if spellEffect.ProcMask.Matches(ProcMaskMeleeMHSpecial) {
+				return
+			}
 
-				var HitFactor float64
-				var BaseSwingSpeed float64
+			var HitFactor float64
+			var BaseSwingSpeed float64
 
-				if spellEffect.IsMH() {
-					HitFactor = 3.5 / 2
-					BaseSwingSpeed = character.AutoAttacks.MH.SwingSpeed
-				} else {
-					HitFactor = 1.75 / 2
-					BaseSwingSpeed = character.AutoAttacks.OH.SwingSpeed
-				}
+			if spellEffect.IsMH() {
+				HitFactor = 3.5 / 2
+				BaseSwingSpeed = character.AutoAttacks.MH.SwingSpeed
+			} else {
+				HitFactor = 1.75 / 2
+				BaseSwingSpeed = character.AutoAttacks.OH.SwingSpeed
+			}
 
-				if spellEffect.Outcome.Matches(OutcomeCrit) {
-					HitFactor *= 2
-				}
+			if spellEffect.Outcome.Matches(OutcomeCrit) {
+				HitFactor *= 2
+			}
 
-				generatedRage := spellEffect.Damage*RageFactor + HitFactor*BaseSwingSpeed
+			generatedRage := spellEffect.Damage*RageFactor + HitFactor*BaseSwingSpeed
 
-				character.AddRage(sim, generatedRage, spell.ActionID)
-			},
-		})
+			character.AddRage(sim, generatedRage, spell.ActionID)
+		},
 	})
 
 	character.rageBar = rageBar{
