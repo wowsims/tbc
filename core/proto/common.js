@@ -330,6 +330,10 @@ export var Stat;
      * @generated from protobuf enum value: StatShadowResistance = 40;
      */
     Stat[Stat["StatShadowResistance"] = 40] = "StatShadowResistance";
+    /**
+     * @generated from protobuf enum value: StatFeralAttackPower = 41;
+     */
+    Stat[Stat["StatFeralAttackPower"] = 41] = "StatFeralAttackPower";
 })(Stat || (Stat = {}));
 /**
  * @generated from protobuf enum proto.ItemType

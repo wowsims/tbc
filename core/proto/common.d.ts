@@ -1019,7 +1019,11 @@ export declare enum Stat {
     /**
      * @generated from protobuf enum value: StatShadowResistance = 40;
      */
-    StatShadowResistance = 40
+    StatShadowResistance = 40,
+    /**
+     * @generated from protobuf enum value: StatFeralAttackPower = 41;
+     */
+    StatFeralAttackPower = 41
 }
 /**
  * @generated from protobuf enum proto.ItemType

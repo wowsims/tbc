@@ -382,7 +382,10 @@ export class Player {
         if (item.weaponType != WeaponType.WeaponTypeUnknown) {
             // Add weapon dps as attack power, so the EP is appropriate.
             const weaponDps = getWeaponDPS(item);
-            const effectiveAttackPower = itemStats.getStat(Stat.StatAttackPower) + weaponDps * 14;
+            let effectiveAttackPower = itemStats.getStat(Stat.StatAttackPower);
+            if (this.spec != Spec.SpecFeralDruid) {
+                effectiveAttackPower += weaponDps * 14;
+            }
             itemStats = itemStats.withStat(Stat.StatAttackPower, effectiveAttackPower);
         }
         else if (![RangedWeaponType.RangedWeaponTypeUnknown, RangedWeaponType.RangedWeaponTypeThrown].includes(item.rangedWeaponType)) {
