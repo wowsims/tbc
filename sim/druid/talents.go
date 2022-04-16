@@ -163,7 +163,7 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 	if !druid.Talents.NaturesSwiftness {
 		return
 	}
-	actionID := core.ActionID{SpellID: 17116}
+	actionID := core.ActionID{SpellID: 17116, CooldownID: NaturesSwiftnessCooldownID}
 
 	druid.NaturesSwiftnessAura = druid.GetOrRegisterAura(core.Aura{
 		Label:    "Natures Swiftness",
@@ -178,6 +178,17 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 			aura.Deactivate(sim)
 			druid.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
 			druid.UpdateMajorCooldowns()
+		},
+	})
+
+	spell := druid.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+		Cast: core.CastConfig{
+			Cooldown:         time.Minute * 3,
+			DisableCallbacks: true,
+		},
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			druid.NaturesSwiftnessAura.Activate(sim)
 		},
 	})
 
@@ -198,8 +209,7 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				druid.NaturesSwiftnessAura.Activate(sim)
-				druid.Metrics.AddInstantCast(actionID)
+				spell.Cast(sim, nil)
 			}
 		},
 	})

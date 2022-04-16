@@ -838,7 +838,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 
 // Mana-related consumes need to know this so they can wait for the Mage to use
 // gems first.
-var MageManaGemMCDActionID = ActionID{ItemID: 22044}
+var MageManaGemMCDActionID = ActionID{ItemID: 22044, CooldownID: ConjuredCooldownID}
 
 var ExplosivesCooldownID = NewCooldownID()
 var SuperSapperCooldownID = NewCooldownID()

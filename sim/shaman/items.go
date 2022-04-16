@@ -152,7 +152,7 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 	const sp = 250
 	const dur = time.Second * 20
 	const cd = time.Minute * 5
-	actionID := core.ActionID{ItemID: 19344}
+	actionID := core.ActionID{ItemID: 19344, CooldownID: NaturalAlignmentCrystalCooldownID}
 
 	character := agent.GetCharacter()
 	activeAura := character.GetOrRegisterAura(core.Aura{
@@ -166,6 +166,17 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			character.AddStat(stats.SpellPower, -sp)
 			character.PseudoStats.CostMultiplier /= 1.2
+		},
+	})
+
+	spell := character.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+		Cast: core.CastConfig{
+			Cooldown:         cd,
+			DisableCallbacks: true,
+		},
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			activeAura.Activate(sim)
 		},
 	})
 
@@ -183,9 +194,7 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				activeAura.Activate(sim)
-				character.SetCD(NaturalAlignmentCrystalCooldownID, sim.CurrentTime+cd)
-				character.Metrics.AddInstantCast(actionID)
+				spell.Cast(sim, nil)
 			}
 		},
 	})

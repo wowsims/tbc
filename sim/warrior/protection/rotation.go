@@ -20,7 +20,7 @@ func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 		} else if war.CanRevenge(sim) {
 			war.Revenge.Cast(sim, target)
 		} else if war.ShouldShout(sim) {
-			war.CastShout(sim)
+			war.Shout.Cast(sim, nil)
 		} else if (war.Rotation.ThunderClap == proto.ProtectionWarrior_Rotation_ThunderClapOnCD || (war.Rotation.ThunderClap == proto.ProtectionWarrior_Rotation_ThunderClapMaintain && war.ThunderClapAura.RemainingDuration(sim) < time.Second*2)) && war.CanThunderClap(sim) {
 			war.ThunderClap.Cast(sim, target)
 		} else if (war.Rotation.DemoShout == proto.ProtectionWarrior_Rotation_DemoShoutFiller || (war.Rotation.DemoShout == proto.ProtectionWarrior_Rotation_DemoShoutMaintain && war.DemoralizingShoutAura.RemainingDuration(sim) < time.Second*2)) && war.CanDemoralizingShout(sim) {
