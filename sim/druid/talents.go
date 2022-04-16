@@ -40,17 +40,9 @@ func (druid *Druid) ApplyTalents() {
 		})
 	}
 
-	if druid.Talents.Intensity > 0 {
-		druid.PseudoStats.SpiritRegenRateCasting = float64(druid.Talents.Intensity) * 0.1
-	}
-
-	if druid.Talents.Subtlety > 0 {
-		druid.PseudoStats.ThreatMultiplier *= 1 - 0.04*float64(druid.Talents.Subtlety)
-	}
-
-	if druid.Talents.Naturalist > 0 {
-		druid.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + 0.02*float64(druid.Talents.Naturalist)
-	}
+	druid.PseudoStats.SpiritRegenRateCasting = float64(druid.Talents.Intensity) * 0.1
+	druid.PseudoStats.ThreatMultiplier *= 1 - 0.04*float64(druid.Talents.Subtlety)
+	druid.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + 0.02*float64(druid.Talents.Naturalist)
 
 	if druid.Talents.HeartOfTheWild > 0 {
 		bonus := 0.04 * float64(druid.Talents.HeartOfTheWild)
@@ -123,9 +115,7 @@ func (druid *Druid) ApplyTalents() {
 		})
 	}
 
-	if druid.Talents.NaturalPerfection > 0 {
-		druid.AddStat(stats.SpellCrit, float64(druid.Talents.NaturalPerfection)*1*core.SpellCritRatingPerCritChance)
-	}
+	druid.AddStat(stats.SpellCrit, float64(druid.Talents.NaturalPerfection)*1*core.SpellCritRatingPerCritChance)
 }
 
 func (druid *Druid) setupNaturesGrace() {
