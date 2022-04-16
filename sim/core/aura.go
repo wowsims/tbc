@@ -714,19 +714,19 @@ func (character *Character) NewTemporaryStatsAura(auraLabel string, actionID Act
 
 // Alternative that allows modifying the Aura config.
 func (character *Character) NewTemporaryStatsAuraWrapped(auraLabel string, actionID ActionID, tempStats stats.Stats, duration time.Duration, modConfig func(*Aura)) *Aura {
-	var buffs *stats.Stats = &stats.Stats{}
-	var unbuffs *stats.Stats = &stats.Stats{}
+	var buffs stats.Stats
+	var unbuffs stats.Stats
 
 	config := Aura{
 		Label:    auraLabel,
 		ActionID: actionID,
 		Duration: duration,
 		OnInit: func(aura *Aura, sim *Simulation) {
-			*buffs = character.ApplyStatDependencies(tempStats)
-			*unbuffs = buffs.Multiply(-1)
+			buffs = character.ApplyStatDependencies(tempStats)
+			unbuffs = buffs.Multiply(-1)
 		},
 		OnGain: func(aura *Aura, sim *Simulation) {
-			character.AddStatsDynamic(sim, *buffs)
+			character.AddStatsDynamic(sim, buffs)
 			if sim.Log != nil {
 				character.Log(sim, "Gained %s from %s.", buffs.FlatString(), actionID)
 			}
@@ -735,7 +735,7 @@ func (character *Character) NewTemporaryStatsAuraWrapped(auraLabel string, actio
 			if sim.Log != nil {
 				character.Log(sim, "Lost %s from fading %s.", buffs.FlatString(), actionID)
 			}
-			character.AddStatsDynamic(sim, *unbuffs)
+			character.AddStatsDynamic(sim, unbuffs)
 		},
 	}
 
