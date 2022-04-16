@@ -47,6 +47,10 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		target.AddPermanentAura(func(*Simulation) *Aura { return BloodFrenzyAura(target) })
 	}
 
+	if debuffs.GiftOfArthas {
+		target.AddPermanentAura(func(*Simulation) *Aura { return GiftOfArthasAura(target) })
+	}
+
 	if debuffs.Mangle {
 		target.AddPermanentAura(func(*Simulation) *Aura { return MangleAura(target) })
 	}
@@ -236,6 +240,19 @@ func BloodFrenzyAura(target *Target) *Aura {
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.PhysicalDamageTakenMultiplier /= 1.04
+		},
+	})
+}
+
+func GiftOfArthasAura(target *Target) *Aura {
+	return target.GetOrRegisterAura(Aura{
+		Label:    "Gift of Arthas",
+		ActionID: ActionID{SpellID: 11374},
+		OnGain: func(aura *Aura, sim *Simulation) {
+			aura.Unit.PseudoStats.BonusPhysicalDamageTaken += 8
+		},
+		OnExpire: func(aura *Aura, sim *Simulation) {
+			aura.Unit.PseudoStats.BonusPhysicalDamageTaken -= 8
 		},
 	})
 }
