@@ -176,6 +176,18 @@ type PermanentAura struct {
 	// as permanent but which are actually averaged versions of the real buff.
 	UptimeMultiplier float64
 
+	// By default, permanent auras are applied at the very start of each sim
+	// iteration. This option disables that behavior, creating an aura that is
+	// applied only after a specified length of time. This is used for modeling
+	// realistic time delays on armor debuffs without the need for a full raid sim.
+	ActivationDelay time.Duration
+
+	// By default, permanent auras are applied at their maximum stack count. This
+	// option allows for stacks to be built up over time at a specified frequency,
+	// and can be used to model stackable debuffs like Sunder Armor that take an
+	// appreciable amount of time to max out.
+	ApplicationFrequency time.Duration
+
 	// The aura created by AuraFactory.
 	aura *Aura
 }
@@ -192,6 +204,9 @@ type auraTracker struct {
 	// Auras that never expire and should always be active.
 	// These are automatically applied on each Sim reset.
 	permanentAuras []PermanentAura
+
+	// A subset of permanentAuras that are applied only after specified time delays.
+	scheduledAuras []*PermanentAura
 
 	// Whether finalize() has been called for this object.
 	finalized bool
@@ -221,6 +236,7 @@ func newAuraTracker() auraTracker {
 		finalizeEffects:       []FinalizeEffect{},
 		resetEffects:          []ResetEffect{},
 		permanentAuras:        []PermanentAura{},
+		scheduledAuras:        []*PermanentAura{},
 		activeAuras:           make([]*Aura, 0, 16),
 		onCastCompleteAuras:   make([]*Aura, 0, 16),
 		onSpellHitAuras:       make([]*Aura, 0, 16),
@@ -354,6 +370,7 @@ func (at *auraTracker) reset(sim *Simulation) {
 	at.onCastCompleteAuras = at.onCastCompleteAuras[:0]
 	at.onSpellHitAuras = at.onSpellHitAuras[:0]
 	at.onPeriodicDamageAuras = at.onPeriodicDamageAuras[:0]
+	at.scheduledAuras = at.scheduledAuras[:0]
 
 	for _, aura := range at.auras {
 		if aura.IsActive() {
@@ -376,11 +393,30 @@ func (at *auraTracker) reset(sim *Simulation) {
 		if !permAura.RespectDuration {
 			aura.Duration = NeverExpires
 		}
-		aura.Activate(sim)
+		if permAura.ActivationDelay == 0 {
+			aura.Activate(sim)
+		}
+		if permAura.ActivationDelay > 0 || permAura.ApplicationFrequency > 0 {
+			at.scheduledAuras = append(at.scheduledAuras, permAura)
+		}
 	}
 }
 
 func (at *auraTracker) advance(sim *Simulation) {
+	for _, permAura := range at.scheduledAuras {
+		aura := permAura.aura
+		if !aura.active && permAura.ActivationDelay <= sim.CurrentTime {
+			aura.Activate(sim)
+		}
+		if aura.active && aura.MaxStacks > 0 && permAura.ApplicationFrequency > 0 {
+			stacks := aura.GetStacks()
+			nextApplication := time.Duration(stacks) * permAura.ApplicationFrequency
+			if stacks < aura.MaxStacks && sim.CurrentTime >= nextApplication {
+				aura.AddStack(sim)
+			}
+		}
+	}
+
 	if at.minExpires > sim.CurrentTime {
 		return
 	}

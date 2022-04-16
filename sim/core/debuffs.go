@@ -56,13 +56,34 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	}
 
 	if debuffs.ExposeArmor != proto.TristateEffect_TristateEffectMissing {
-		target.AddPermanentAura(func(*Simulation) *Aura {
-			return ExposeArmorAura(target, GetTristateValueInt32(debuffs.ExposeArmor, 0, 2))
-		})
+		talentPoints := GetTristateValueInt32(debuffs.ExposeArmor, 0, 2)
+		if debuffs.DelayedArmorDebuffs {
+			target.AddPermanentAuraWithOptions(PermanentAura{
+				AuraFactory: func(*Simulation) *Aura {
+					return ExposeArmorAura(target, talentPoints)
+				},
+				ActivationDelay: time.Duration(15.0 * float64(time.Second)),
+			})
+		} else {
+			target.AddPermanentAura(func(*Simulation) *Aura {
+				return ExposeArmorAura(target, talentPoints)
+			})
+		}
 	}
 
 	if debuffs.SunderArmor {
-		target.AddPermanentAura(func(*Simulation) *Aura { return SunderArmorAura(target, 5) })
+		if debuffs.DelayedArmorDebuffs {
+			target.AddPermanentAuraWithOptions(PermanentAura{
+				AuraFactory: func(*Simulation) *Aura {
+					return SunderArmorAura(target, 1)
+				},
+				ApplicationFrequency: time.Duration(1.5 * float64(time.Second)),
+			})
+		} else {
+			target.AddPermanentAura(func(*Simulation) *Aura {
+				return SunderArmorAura(target, 5)
+			})
+		}
 	}
 
 	if debuffs.FaerieFire != proto.TristateEffect_TristateEffectMissing {
