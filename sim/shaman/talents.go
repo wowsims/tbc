@@ -229,54 +229,59 @@ func (shaman *Shaman) applyUnleashedRage() {
 	}
 	level := shaman.Talents.UnleashedRage
 
-	shaman.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		bonusCoeff := 0.02 * float64(level)
-		currentAPBonuses := make([]float64, len(shaman.Party.PlayersAndPets))
+	bonusCoeff := 0.02 * float64(level)
+	var currentAPBonuses []float64
+	var urAuras []*core.Aura
 
-		urAuras := make([]*core.Aura, len(shaman.Party.PlayersAndPets))
-		for i, playerOrPet := range shaman.Party.PlayersAndPets {
-			char := playerOrPet.GetCharacter()
-			idx := i
-			urAuras[i] = char.GetOrRegisterAura(core.Aura{
-				Label:    "Unleahed Rage Proc",
-				ActionID: core.ActionID{SpellID: 30811},
-				Duration: time.Second * 10,
-				OnGain: func(aura *core.Aura, sim *core.Simulation) {
-					buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: currentAPBonuses[idx]})
-					char.AddStats(buffs)
-				},
-				OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-					buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: currentAPBonuses[idx]})
-					unbuffs := buffs.Multiply(-1)
-					char.AddStats(unbuffs)
-				},
-			})
-		}
+	shaman.RegisterAura(core.Aura{
+		Label:    "Unleashed Rage",
+		Duration: core.NeverExpires,
+		OnInit: func(aura *core.Aura, sim *core.Simulation) {
+			urAuras = make([]*core.Aura, len(shaman.Party.PlayersAndPets))
+			for i, playerOrPet := range shaman.Party.PlayersAndPets {
+				char := playerOrPet.GetCharacter()
+				idx := i
+				urAuras[i] = char.GetOrRegisterAura(core.Aura{
+					Label:    "Unleahed Rage Proc",
+					ActionID: core.ActionID{SpellID: 30811},
+					Duration: time.Second * 10,
+					OnGain: func(aura *core.Aura, sim *core.Simulation) {
+						buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: currentAPBonuses[idx]})
+						char.AddStats(buffs)
+					},
+					OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+						buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: currentAPBonuses[idx]})
+						unbuffs := buffs.Multiply(-1)
+						char.AddStats(unbuffs)
+					},
+				})
+			}
+		},
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			currentAPBonuses = make([]float64, len(shaman.Party.PlayersAndPets))
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			// proc mask = 20 (melee auto & special)
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				return
+			}
 
-		return shaman.GetOrRegisterAura(core.Aura{
-			Label: "Unleashed Rage",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				// proc mask = 20 (melee auto & special)
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
-					return
+			for i, playerOrPet := range shaman.Party.PlayersAndPets {
+				char := playerOrPet.GetCharacter()
+				prevBonus := currentAPBonuses[i]
+				newBonus := (char.GetStat(stats.AttackPower) - prevBonus) * bonusCoeff
+
+				if prevBonus != newBonus {
+					urAuras[i].Deactivate(sim)
+					currentAPBonuses[i] = newBonus
+					urAuras[i].Activate(sim)
+				} else if newBonus != 0 {
+					// If the bonus is the same, we can just refresh.
+					urAuras[i].Refresh(sim)
 				}
-
-				for i, playerOrPet := range shaman.Party.PlayersAndPets {
-					char := playerOrPet.GetCharacter()
-					prevBonus := currentAPBonuses[i]
-					newBonus := (char.GetStat(stats.AttackPower) - prevBonus) * bonusCoeff
-
-					if prevBonus != newBonus {
-						urAuras[i].Deactivate(sim)
-						currentAPBonuses[i] = newBonus
-						urAuras[i].Activate(sim)
-					} else if newBonus != 0 {
-						// If the bonus is the same, we can just refresh.
-						urAuras[i].Refresh(sim)
-					}
-				}
-			},
-		})
+			}
+		},
 	})
 }
 

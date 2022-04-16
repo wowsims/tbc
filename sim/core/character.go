@@ -73,7 +73,6 @@ type Character struct {
 	// a MH imbue.
 	// TODO: Figure out a cleaner way to do this.
 	HasMHWeaponImbue bool
-	HasWFTotem       bool
 
 	// GCD-related PendingActions for this character.
 	gcdAction      *PendingAction

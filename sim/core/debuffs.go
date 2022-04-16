@@ -10,82 +10,78 @@ import (
 
 func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	if debuffs.Misery {
-		target.AddPermanentAura(func(*Simulation) *Aura { return MiseryAura(target, 5) })
+		MakePermanent(MiseryAura(target, 5))
 	}
 
 	if debuffs.JudgementOfWisdom {
-		target.AddPermanentAura(func(*Simulation) *Aura { return JudgementOfWisdomAura(target) })
+		MakePermanent(JudgementOfWisdomAura(target))
 	}
 
 	if debuffs.ImprovedSealOfTheCrusader {
-		target.AddPermanentAura(func(*Simulation) *Aura { return JudgementOfTheCrusaderAura(target, 3) })
+		MakePermanent(JudgementOfTheCrusaderAura(target, 3))
 	}
 
 	if debuffs.CurseOfElements != proto.TristateEffect_TristateEffectMissing {
-		target.AddPermanentAura(func(*Simulation) *Aura {
-			return CurseOfElementsAura(target, GetTristateValueInt32(debuffs.CurseOfElements, 0, 3))
-		})
+		MakePermanent(CurseOfElementsAura(target, GetTristateValueInt32(debuffs.CurseOfElements, 0, 3)))
 	}
 
 	if debuffs.IsbUptime > 0.0 {
 		uptime := MinFloat(1.0, debuffs.IsbUptime)
-		target.AddPermanentAuraWithOptions(PermanentAura{
-			AuraFactory:      func(*Simulation) *Aura { return ImprovedShadowBoltAura(target, uptime) },
-			UptimeMultiplier: uptime,
-		})
+		isbAura := MakePermanent(ImprovedShadowBoltAura(target, uptime))
+		if uptime != 1.0 {
+			isbAura.OnDoneIteration = func(aura *Aura, _ *Simulation) {
+				aura.metrics.Uptime = time.Duration(float64(aura.metrics.Uptime) * uptime)
+			}
+		}
 	}
 
 	if debuffs.ImprovedScorch {
-		target.AddPermanentAura(func(*Simulation) *Aura { return ImprovedScorchAura(target, 5) })
+		MakePermanent(ImprovedScorchAura(target, 5))
 	}
 
 	if debuffs.WintersChill {
-		target.AddPermanentAura(func(*Simulation) *Aura { return WintersChillAura(target, 5) })
+		MakePermanent(WintersChillAura(target, 5))
 	}
 
 	if debuffs.BloodFrenzy {
-		target.AddPermanentAura(func(*Simulation) *Aura { return BloodFrenzyAura(target) })
+		MakePermanent(BloodFrenzyAura(target))
 	}
 
 	if debuffs.Mangle {
-		target.AddPermanentAura(func(*Simulation) *Aura { return MangleAura(target) })
+		MakePermanent(MangleAura(target))
 	}
 
 	if debuffs.ExposeArmor != proto.TristateEffect_TristateEffectMissing {
-		target.AddPermanentAura(func(*Simulation) *Aura {
-			return ExposeArmorAura(target, GetTristateValueInt32(debuffs.ExposeArmor, 0, 2))
-		})
+		MakePermanent(ExposeArmorAura(target, GetTristateValueInt32(debuffs.ExposeArmor, 0, 2)))
 	}
 
 	if debuffs.SunderArmor {
-		target.AddPermanentAura(func(*Simulation) *Aura { return SunderArmorAura(target, 5) })
+		MakePermanent(SunderArmorAura(target, 5))
 	}
 
 	if debuffs.FaerieFire != proto.TristateEffect_TristateEffectMissing {
-		target.AddPermanentAura(func(*Simulation) *Aura {
-			return FaerieFireAura(target, GetTristateValueInt32(debuffs.FaerieFire, 0, 3))
-		})
+		MakePermanent(FaerieFireAura(target, GetTristateValueInt32(debuffs.FaerieFire, 0, 3)))
 	}
 
 	if debuffs.CurseOfRecklessness {
-		target.AddPermanentAura(func(*Simulation) *Aura { return CurseOfRecklessnessAura(target) })
+		MakePermanent(CurseOfRecklessnessAura(target))
 	}
 
 	if debuffs.ExposeWeaknessUptime > 0 && debuffs.ExposeWeaknessHunterAgility > 0 {
 		uptime := MinFloat(1.0, debuffs.ExposeWeaknessUptime)
-		target.AddPermanentAuraWithOptions(PermanentAura{
-			AuraFactory: func(*Simulation) *Aura {
-				return ExposeWeaknessAura(target, debuffs.ExposeWeaknessHunterAgility, uptime)
-			},
-			UptimeMultiplier: uptime,
-		})
+		ewAura := MakePermanent(ExposeWeaknessAura(target, debuffs.ExposeWeaknessHunterAgility, uptime))
+		if uptime != 1.0 {
+			ewAura.OnDoneIteration = func(aura *Aura, _ *Simulation) {
+				aura.metrics.Uptime = time.Duration(float64(aura.metrics.Uptime) * uptime)
+			}
+		}
 	}
 
 	if debuffs.HuntersMark != proto.TristateEffect_TristateEffectMissing {
 		if debuffs.HuntersMark == proto.TristateEffect_TristateEffectImproved {
-			target.AddPermanentAura(func(*Simulation) *Aura { return HuntersMarkAura(target, 5, true) })
+			MakePermanent(HuntersMarkAura(target, 5, true))
 		} else {
-			target.AddPermanentAura(func(*Simulation) *Aura { return HuntersMarkAura(target, 0, true) })
+			MakePermanent(HuntersMarkAura(target, 0, true))
 		}
 	}
 }

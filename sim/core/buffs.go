@@ -175,7 +175,6 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		stats.MP5: GetTristateValueFloat(partyBuffs.ManaSpringTotem, 50, 62.5),
 	})
 	if partyBuffs.WindfuryTotemRank > 0 && IsEligibleForWindfuryTotem(character) {
-		character.HasWFTotem = true
 		WindfuryTotemAura(character, partyBuffs.WindfuryTotemRank, partyBuffs.WindfuryTotemIwt)
 	}
 	if partyBuffs.TranquilAirTotem {
@@ -315,6 +314,8 @@ func IsEligibleForWindfuryTotem(character *Character) bool {
 		!character.HasMHWeaponImbue
 }
 
+var WindfuryTotemAuraLabel = "Windfury Totem"
+
 func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) *Aura {
 	buffActionID := ActionID{SpellID: windfuryBuffSpellRanks[rank-1]}
 	apBonus := windfuryAPBonuses[rank-1]
@@ -340,7 +341,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	const procChance = 0.2
 
 	return character.RegisterAura(Aura{
-		Label:    "Windfury Totem",
+		Label:    WindfuryTotemAuraLabel,
 		Duration: NeverExpires,
 		OnInit: func(aura *Aura, sim *Simulation) {
 			wfSpell = character.GetOrRegisterSpell(SpellConfig{
