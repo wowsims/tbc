@@ -9,7 +9,7 @@ import (
 
 func (priest *Priest) ApplyTalents() {
 	priest.setupSurgeOfLight()
-	priest.registerInnerFocusAura()
+	priest.registerInnerFocus()
 
 	if priest.Talents.Meditation > 0 {
 		priest.PseudoStats.SpiritRegenRateCasting = float64(priest.Talents.Meditation) * 0.1
@@ -130,14 +130,15 @@ func (priest *Priest) applySurgeOfLight(_ *core.Simulation, _ *core.Spell, cast 
 }
 
 var InnerFocusCooldownID = core.NewCooldownID()
-var InnerFocusActionID = core.ActionID{SpellID: 14751}
+var InnerFocusActionID = core.ActionID{SpellID: 14751, CooldownID: InnerFocusCooldownID}
 
-func (priest *Priest) registerInnerFocusAura() {
+func (priest *Priest) registerInnerFocus() {
 	if !priest.Talents.InnerFocus {
 		return
 	}
+	cd := time.Minute * 3
 
-	priest.InnerFocusAura = priest.GetOrRegisterAura(core.Aura{
+	priest.InnerFocusAura = priest.RegisterAura(core.Aura{
 		Label:    "Inner Focus",
 		ActionID: InnerFocusActionID,
 		Duration: core.NeverExpires,
@@ -152,14 +153,20 @@ func (priest *Priest) registerInnerFocusAura() {
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// Remove the buff and put skill on CD
 			aura.Deactivate(sim)
-			priest.SetCD(InnerFocusCooldownID, sim.CurrentTime+time.Minute*3)
+			priest.SetCD(InnerFocusCooldownID, sim.CurrentTime+cd)
 		},
 	})
-}
 
-func (priest *Priest) ApplyInnerFocus(sim *core.Simulation) {
-	if priest.InnerFocusAura != nil {
-		priest.InnerFocusAura.Activate(sim)
-		priest.Metrics.AddInstantCast(InnerFocusActionID)
-	}
+	priest.InnerFocus = priest.RegisterSpell(core.SpellConfig{
+		ActionID: InnerFocusActionID,
+
+		Cast: core.CastConfig{
+			Cooldown:         cd,
+			DisableCallbacks: true,
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			priest.InnerFocusAura.Activate(sim)
+		},
+	})
 }

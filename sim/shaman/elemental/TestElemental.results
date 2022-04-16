@@ -51,19 +51,19 @@ stat_weights_results: {
   weights: 0
   weights: 0
   weights: 0
-  weights: 0.18488468886124337
+  weights: 0.18489002579179215
   weights: 0
-  weights: 0.67969470922239
-  weights: 0
-  weights: 0
+  weights: 0.6796947092223854
   weights: 0
   weights: 0
   weights: 0
   weights: 0
   weights: 0
   weights: 0
-  weights: 1.6396983514654722
-  weights: 0.5557867143039471
+  weights: 0
+  weights: 0
+  weights: 1.6396527347562142
+  weights: 0.5558221859919468
   weights: 0
   weights: 0
   weights: 0
@@ -473,7 +473,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 1494.5725758174187
+  dps: 1494.6058922649186
  }
 }
 dps_results: {
@@ -647,7 +647,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-SkyshatterRegalia"
  value: {
-  dps: 1622.093560504672
+  dps: 1622.0917721669844
  }
 }
 dps_results: {
@@ -779,7 +779,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-TotemofthePulsingEarth-29389"
  value: {
-  dps: 1507.1452233527066
+  dps: 1507.2093125331228
  }
 }
 dps_results: {
@@ -821,7 +821,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Average-Default"
  value: {
-  dps: 1537.3234428245428
+  dps: 1537.324506677778
  }
 }
 dps_results: {
@@ -971,7 +971,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-Fixed3LBCL-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2002.4874635317954
+  dps: 2002.5361757217497
  }
 }
 dps_results: {
@@ -1271,7 +1271,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-LBOnly-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1458.3650334124045
+  dps: 1458.3323786339547
  }
 }
 dps_results: {

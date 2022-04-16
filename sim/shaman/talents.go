@@ -130,7 +130,8 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 	if !shaman.Talents.ElementalMastery {
 		return
 	}
-	actionID := core.ActionID{SpellID: 16166}
+	actionID := core.ActionID{SpellID: 16166, CooldownID: ElementalMasteryCooldownID}
+	cd := time.Minute * 3
 
 	shaman.ElementalMasteryAura = shaman.RegisterAura(core.Aura{
 		Label:    "Elemental Mastery",
@@ -148,15 +149,27 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 			}
 			// Remove the buff and put skill on CD
 			aura.Deactivate(sim)
-			shaman.SetCD(ElementalMasteryCooldownID, sim.CurrentTime+time.Minute*3)
+			shaman.SetCD(ElementalMasteryCooldownID, sim.CurrentTime+cd)
 			shaman.UpdateMajorCooldowns()
+		},
+	})
+
+	spell := shaman.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+		Cast: core.CastConfig{
+			Cooldown:         cd,
+			DisableCallbacks: true,
+		},
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			shaman.ElementalMasteryAura.Activate(sim)
+			shaman.ElementalMasteryAura.Prioritize()
 		},
 	})
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
 		CooldownID: ElementalMasteryCooldownID,
-		Cooldown:   time.Minute * 3,
+		Cooldown:   cd,
 		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return true
@@ -166,9 +179,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				character.Metrics.AddInstantCast(actionID)
-				shaman.ElementalMasteryAura.Activate(sim)
-				shaman.ElementalMasteryAura.Prioritize()
+				spell.Cast(sim, nil)
 			}
 		},
 	})
@@ -180,7 +191,8 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 	if !shaman.Talents.NaturesSwiftness {
 		return
 	}
-	actionID := core.ActionID{SpellID: 16188}
+	actionID := core.ActionID{SpellID: 16188, CooldownID: NaturesSwiftnessCooldownID}
+	cd := time.Minute * 3
 
 	shaman.NaturesSwiftnessAura = shaman.RegisterAura(core.Aura{
 		Label:    "Natures Swiftness",
@@ -193,15 +205,26 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 
 			// Remove the buff and put skill on CD
 			aura.Deactivate(sim)
-			shaman.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
+			shaman.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+cd)
 			shaman.UpdateMajorCooldowns()
+		},
+	})
+
+	spell := shaman.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+		Cast: core.CastConfig{
+			Cooldown:         cd,
+			DisableCallbacks: true,
+		},
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			shaman.NaturesSwiftnessAura.Activate(sim)
 		},
 	})
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
 		CooldownID: NaturesSwiftnessCooldownID,
-		Cooldown:   time.Minute * 3,
+		Cooldown:   cd,
 		Type:       core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Don't use NS unless we're casting a full-length lightning bolt, which is
@@ -216,8 +239,7 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				shaman.NaturesSwiftnessAura.Activate(sim)
-				character.Metrics.AddInstantCast(actionID)
+				spell.Cast(sim, nil)
 			}
 		},
 	})

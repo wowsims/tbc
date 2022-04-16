@@ -19,6 +19,7 @@ type Priest struct {
 	// TODO: aoe multi-target situations will need multiple spells ticking for each target.
 	DevouringPlague *core.Spell
 	HolyFire        *core.Spell
+	InnerFocus      *core.Spell
 	MindBlast       *core.Spell
 	MindFlay        []*core.Spell
 	ShadowWordDeath *core.Spell

@@ -153,7 +153,33 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		cooldown -= time.Second * 24
 	}
 
-	actionID := core.ActionID{SpellID: 12043}
+	actionID := core.ActionID{SpellID: 12043, CooldownID: PresenceOfMindCooldownID}
+
+	spell := mage.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+		Cast: core.CastConfig{
+			Cooldown:         cooldown,
+			DisableCallbacks: true,
+		},
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			var spell *core.Spell
+			if mage.Talents.Pyroblast {
+				spell = mage.Pyroblast
+			} else if mage.RotationType == proto.Mage_Rotation_Fire {
+				spell = mage.Fireball
+			} else if mage.RotationType == proto.Mage_Rotation_Frost {
+				spell = mage.Frostbolt
+			} else {
+				numStacks := mage.ArcaneBlastAura.GetStacks()
+				spell = mage.ArcaneBlast[numStacks]
+			}
+
+			normalCastTime := spell.DefaultCast.CastTime
+			spell.DefaultCast.CastTime = 0
+			spell.Cast(sim, sim.GetPrimaryTarget())
+			spell.DefaultCast.CastTime = normalCastTime
+		},
+	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -164,11 +190,14 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			var manaCost float64
 			if mage.Talents.Pyroblast {
-				manaCost = 500
+				manaCost = mage.Pyroblast.DefaultCast.Cost
 			} else if mage.RotationType == proto.Mage_Rotation_Fire {
-				manaCost = 425
+				manaCost = mage.Fireball.DefaultCast.Cost
+			} else if mage.RotationType == proto.Mage_Rotation_Frost {
+				manaCost = mage.Frostbolt.DefaultCast.Cost
 			} else {
-				manaCost = 330
+				numStacks := mage.ArcaneBlastAura.GetStacks()
+				manaCost = mage.ArcaneBlast[numStacks].DefaultCast.Cost
 			}
 			manaCost *= character.PseudoStats.CostMultiplier
 
@@ -183,24 +212,7 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				var spell *core.Spell
-				if mage.Talents.Pyroblast {
-					spell = mage.Pyroblast
-				} else if mage.RotationType == proto.Mage_Rotation_Fire {
-					spell = mage.Fireball
-				} else if mage.RotationType == proto.Mage_Rotation_Frost {
-					spell = mage.Frostbolt
-				} else {
-					numStacks := mage.ArcaneBlastAura.GetStacks()
-					spell = mage.ArcaneBlast[numStacks]
-				}
-				normalCastTime := spell.DefaultCast.CastTime
-				spell.DefaultCast.CastTime = 0
-				spell.Cast(sim, sim.GetPrimaryTarget())
-				spell.DefaultCast.CastTime = normalCastTime
-
-				character.Metrics.AddInstantCast(actionID)
-				character.SetCD(PresenceOfMindCooldownID, sim.CurrentTime+cooldown)
+				spell.Cast(sim, nil)
 			}
 		},
 	})
@@ -212,7 +224,7 @@ func (mage *Mage) registerArcanePowerCD() {
 	if !mage.Talents.ArcanePower {
 		return
 	}
-	actionID := core.ActionID{SpellID: 12042}
+	actionID := core.ActionID{SpellID: 12042, CooldownID: ArcanePowerCooldownID}
 
 	apAura := mage.RegisterAura(core.Aura{
 		Label:    "Arcane Power",
@@ -225,6 +237,17 @@ func (mage *Mage) registerArcanePowerCD() {
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			mage.PseudoStats.DamageDealtMultiplier /= 1.3
 			mage.PseudoStats.CostMultiplier /= 1.3
+		},
+	})
+
+	spell := mage.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+		Cast: core.CastConfig{
+			Cooldown:         time.Minute * 3,
+			DisableCallbacks: true,
+		},
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			apAura.Activate(sim)
 		},
 	})
 
@@ -241,9 +264,7 @@ func (mage *Mage) registerArcanePowerCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				apAura.Activate(sim)
-				character.Metrics.AddInstantCast(actionID)
-				character.SetCD(ArcanePowerCooldownID, sim.CurrentTime+time.Minute*3)
+				spell.Cast(sim, nil)
 			}
 		},
 	})
@@ -279,7 +300,7 @@ func (mage *Mage) registerCombustionCD() {
 	if !mage.Talents.Combustion {
 		return
 	}
-	actionID := core.ActionID{SpellID: 11129}
+	actionID := core.ActionID{SpellID: 11129, CooldownID: CombustionCooldownID}
 
 	numCrits := 0
 	const critPerStack = 10 * core.SpellCritRatingPerCritChance
@@ -325,6 +346,18 @@ func (mage *Mage) registerCombustionCD() {
 		},
 	})
 
+	spell := mage.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+		Cast: core.CastConfig{
+			Cooldown:         time.Minute * 3,
+			DisableCallbacks: true,
+		},
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			aura.Activate(sim)
+			aura.Prioritize()
+		},
+	})
+
 	mage.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
 		CooldownID: CombustionCooldownID,
@@ -338,9 +371,7 @@ func (mage *Mage) registerCombustionCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				aura.Activate(sim)
-				aura.Prioritize()
-				character.Metrics.AddInstantCast(actionID)
+				spell.Cast(sim, nil)
 			}
 		},
 	})
@@ -353,7 +384,7 @@ func (mage *Mage) registerIcyVeinsCD() {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 12472}
+	actionID := core.ActionID{SpellID: 12472, CooldownID: IcyVeinsCooldownID}
 	manaCost := mage.BaseMana() * 0.03
 
 	icyVeinsAura := mage.RegisterAura(core.Aura{
@@ -365,6 +396,23 @@ func (mage *Mage) registerIcyVeinsCD() {
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Unit.PseudoStats.CastSpeedMultiplier *= 1 / 1.2
+		},
+	})
+
+	spell := mage.RegisterSpell(core.SpellConfig{
+		ActionID:     actionID,
+		ResourceType: stats.Mana,
+		BaseCost:     manaCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: manaCost,
+			},
+			Cooldown:         time.Minute * 3,
+			DisableCallbacks: true,
+		},
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			icyVeinsAura.Activate(sim)
 		},
 	})
 
@@ -390,10 +438,7 @@ func (mage *Mage) registerIcyVeinsCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				character.SpendMana(sim, manaCost, actionID)
-				icyVeinsAura.Activate(sim)
-				character.Metrics.AddInstantCast(actionID)
-				character.SetCD(IcyVeinsCooldownID, sim.CurrentTime+time.Minute*3)
+				spell.Cast(sim, nil)
 			}
 		},
 	})
@@ -407,7 +452,20 @@ func (mage *Mage) registerColdSnapCD() {
 	}
 
 	cooldown := time.Duration(float64(time.Minute*8) * (1.0 - float64(mage.Talents.IceFloes)*0.1))
-	actionID := core.ActionID{SpellID: 11958}
+	actionID := core.ActionID{SpellID: 11958, CooldownID: ColdSnapCooldownID}
+
+	spell := mage.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		Cast: core.CastConfig{
+			Cooldown:         cooldown,
+			DisableCallbacks: true,
+		},
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			mage.SetCD(IcyVeinsCooldownID, 0)
+			mage.SetCD(SummonWaterElementalCooldownID, 0)
+		},
+	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
 		ActionID:   actionID,
@@ -434,11 +492,7 @@ func (mage *Mage) registerColdSnapCD() {
 		},
 		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
 			return func(sim *core.Simulation, character *core.Character) {
-				character.SetCD(IcyVeinsCooldownID, 0)
-				character.SetCD(SummonWaterElementalCooldownID, 0)
-
-				character.Metrics.AddInstantCast(actionID)
-				character.SetCD(ColdSnapCooldownID, sim.CurrentTime+cooldown)
+				spell.Cast(sim, nil)
 			}
 		},
 	})

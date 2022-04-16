@@ -42,6 +42,8 @@ type CastConfig struct {
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete func(*Simulation, *Spell)
 	AfterCast      func(*Simulation, *Spell)
+
+	DisableCallbacks bool
 }
 
 type Cast struct {
@@ -223,17 +225,19 @@ func (spell *Spell) wrapCastFuncCooldown(config CastConfig, onCastComplete CastF
 }
 
 func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc) CastFunc {
-	configOnCastComplete := config.OnCastComplete
-	configAfterCast := config.AfterCast
-	oldOnCastComplete1 := onCastComplete
-	onCastComplete = func(sim *Simulation, target *Target) {
-		spell.Character.OnCastComplete(sim, spell)
-		if configOnCastComplete != nil {
-			configOnCastComplete(sim, spell)
-		}
-		oldOnCastComplete1(sim, target)
-		if configAfterCast != nil {
-			configAfterCast(sim, spell)
+	if !config.DisableCallbacks {
+		configOnCastComplete := config.OnCastComplete
+		configAfterCast := config.AfterCast
+		oldOnCastComplete1 := onCastComplete
+		onCastComplete = func(sim *Simulation, target *Target) {
+			spell.Character.OnCastComplete(sim, spell)
+			if configOnCastComplete != nil {
+				configOnCastComplete(sim, spell)
+			}
+			oldOnCastComplete1(sim, target)
+			if configAfterCast != nil {
+				configAfterCast(sim, spell)
+			}
 		}
 	}
 

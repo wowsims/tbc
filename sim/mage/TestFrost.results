@@ -480,7 +480,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Serpent-CoilBraid-30720"
  value: {
-  dps: 1588.9785666397586
+  dps: 1588.9694212672587
  }
 }
 dps_results: {
@@ -660,7 +660,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1381.6042515477693
+  dps: 1381.8205205907493
  }
 }
 dps_results: {
@@ -672,19 +672,19 @@ dps_results: {
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1029.4411595560816
+  dps: 1025.7944894324403
  }
 }
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1029.4411595560816
+  dps: 1025.7944894324403
  }
 }
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 684.3648980110236
+  dps: 685.9290199697996
  }
 }
 dps_results: {
