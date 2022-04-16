@@ -63,17 +63,19 @@ func (mage *Mage) applyIgnite() {
 		return
 	}
 
-	mage.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return mage.GetOrRegisterAura(core.Aura{
-			Label: "Ignite Talent",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
-				if spell.SpellSchool == core.SpellSchoolFire && spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					mage.procIgnite(sim, spellEffect.Target, spellEffect.Damage)
-				}
-			},
-		})
+	mage.RegisterAura(core.Aura{
+		Label:    "Ignite Talent",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+			if spell.SpellSchool == core.SpellSchoolFire && spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				mage.procIgnite(sim, spellEffect.Target, spellEffect.Damage)
+			}
+		},
 	})
 }

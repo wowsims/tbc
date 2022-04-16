@@ -100,24 +100,27 @@ func (shaman *Shaman) applyElementalDevastation() {
 		return
 	}
 
-	shaman.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		critBonus := 3.0 * float64(shaman.Talents.ElementalDevastation) * core.SpellCritRatingPerCritChance
-		procAura := shaman.NewTemporaryStatsAura("Elemental Devastation Proc", core.ActionID{SpellID: 30160}, stats.Stats{stats.MeleeCrit: critBonus}, time.Second*10)
-		return shaman.GetOrRegisterAura(core.Aura{
-			Label: "Elemental Devastation",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
-				if spellEffect.IsPhantom {
-					return
-				}
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					return
-				}
-				procAura.Activate(sim)
-			},
-		})
+	critBonus := 3.0 * float64(shaman.Talents.ElementalDevastation) * core.SpellCritRatingPerCritChance
+	procAura := shaman.NewTemporaryStatsAura("Elemental Devastation Proc", core.ActionID{SpellID: 30160}, stats.Stats{stats.MeleeCrit: critBonus}, time.Second*10)
+
+	shaman.RegisterAura(core.Aura{
+		Label:    "Elemental Devastation",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+			if spellEffect.IsPhantom {
+				return
+			}
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				return
+			}
+			procAura.Activate(sim)
+		},
 	})
 }
 
@@ -293,19 +296,21 @@ func (shaman *Shaman) applyShamanisticFocus() {
 		},
 	})
 
-	shaman.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return shaman.GetOrRegisterAura(core.Aura{
-			Label: "Shamanistic Focus",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
-					return
-				}
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					return
-				}
-				shaman.ShamanisticFocusAura.Activate(sim)
-			},
-		})
+	shaman.RegisterAura(core.Aura{
+		Label:    "Shamanistic Focus",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				return
+			}
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				return
+			}
+			shaman.ShamanisticFocusAura.Activate(sim)
+		},
 	})
 }
 
@@ -333,30 +338,33 @@ func (shaman *Shaman) applyFlurry() {
 		},
 	})
 
-	shaman.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		var icd core.InternalCD
-		icdDur := time.Millisecond * 500
+	var icd core.InternalCD
+	icdDur := time.Millisecond * 500
 
-		return shaman.GetOrRegisterAura(core.Aura{
-			Label: "Flurry",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
-					return
-				}
+	shaman.RegisterAura(core.Aura{
+		Label:    "Flurry",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			icd = core.NewICD()
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				return
+			}
 
-				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					procAura.Activate(sim)
-					procAura.SetStacks(sim, 3)
-					icd = 0 // the "charge protection" ICD isn't up yet
-					return
-				}
+			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				procAura.Activate(sim)
+				procAura.SetStacks(sim, 3)
+				icd = 0 // the "charge protection" ICD isn't up yet
+				return
+			}
 
-				// Remove a stack.
-				if procAura.IsActive() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) && !icd.IsOnCD(sim) {
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					procAura.RemoveStack(sim)
-				}
-			},
-		})
+			// Remove a stack.
+			if procAura.IsActive() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) && !icd.IsOnCD(sim) {
+				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				procAura.RemoveStack(sim)
+			}
+		},
 	})
 }

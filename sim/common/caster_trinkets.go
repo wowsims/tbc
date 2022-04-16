@@ -47,20 +47,23 @@ func ApplyQuagmirransEye(agent core.Agent) {
 	character := agent.GetCharacter()
 	procAura := character.NewTemporaryStatsAura("Fungal Frenzy", core.ActionID{ItemID: 27683}, stats.Stats{stats.SpellHaste: 320}, time.Second*6)
 
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		icd := core.NewICD()
-		const icdDur = time.Second * 45
+	var icd core.InternalCD
+	const icdDur = time.Second * 45
 
-		return character.GetOrRegisterAura(core.Aura{
-			Label: "Quagmirran's Eye",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-				if icd.IsOnCD(sim) || sim.RandomFloat("Quagmirran's Eye") > 0.1 {
-					return
-				}
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				procAura.Activate(sim)
-			},
-		})
+	character.RegisterAura(core.Aura{
+		Label:    "Quagmirran's Eye",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			icd = core.NewICD()
+			aura.Activate(sim)
+		},
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			if icd.IsOnCD(sim) || sim.RandomFloat("Quagmirran's Eye") > 0.1 {
+				return
+			}
+			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			procAura.Activate(sim)
+		},
 	})
 }
 
@@ -68,26 +71,29 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 	character := agent.GetCharacter()
 	procAura := character.NewTemporaryStatsAura("Call of the Nexus", core.ActionID{ItemID: 28418}, stats.Stats{stats.SpellPower: 225}, time.Second*10)
 
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		icd := core.NewICD()
-		const dur = time.Second * 45
+	var icd core.InternalCD
+	const dur = time.Second * 45
 
-		return character.GetOrRegisterAura(core.Aura{
-			Label: "Shiffar's Nexus Horn",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
-				if icd.IsOnCD(sim) || !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellEffect.IsPhantom {
-					return
-				}
-				if sim.RandomFloat("Shiffar's Nexus-Horn") > 0.2 {
-					return
-				}
-				icd = core.InternalCD(sim.CurrentTime + dur)
-				procAura.Activate(sim)
-			},
-		})
+	character.RegisterAura(core.Aura{
+		Label:    "Shiffar's Nexus Horn",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			icd = core.NewICD()
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+			if icd.IsOnCD(sim) || !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellEffect.IsPhantom {
+				return
+			}
+			if sim.RandomFloat("Shiffar's Nexus-Horn") > 0.2 {
+				return
+			}
+			icd = core.InternalCD(sim.CurrentTime + dur)
+			procAura.Activate(sim)
+		},
 	})
 }
 
@@ -95,19 +101,21 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 	character := agent.GetCharacter()
 	procAura := character.NewTemporaryStatsAura("Recurring Power", core.ActionID{ItemID: 28789}, stats.Stats{stats.SpellPower: 170}, time.Second*10)
 
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return character.GetOrRegisterAura(core.Aura{
-			Label: "Eye of Magtheridon",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
-				if !spellEffect.Outcome.Matches(core.OutcomeMiss) {
-					return
-				}
-				procAura.Activate(sim)
-			},
-		})
+	character.RegisterAura(core.Aura{
+		Label:    "Eye of Magtheridon",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+			if !spellEffect.Outcome.Matches(core.OutcomeMiss) {
+				return
+			}
+			procAura.Activate(sim)
+		},
 	})
 }
 
@@ -115,26 +123,29 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 	character := agent.GetCharacter()
 	procAura := character.NewTemporaryStatsAura("Unstable Currents", core.ActionID{ItemID: 30626}, stats.Stats{stats.SpellPower: 190}, time.Second*15)
 
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		icd := core.NewICD()
-		const icdDur = time.Second * 45
+	var icd core.InternalCD
+	const icdDur = time.Second * 45
 
-		return character.GetOrRegisterAura(core.Aura{
-			Label: "Sextant of Unstable Currents",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || icd.IsOnCD(sim) || spellEffect.IsPhantom {
-					return
-				}
-				if sim.RandomFloat("Sextant of Unstable Currents") > 0.2 {
-					return
-				}
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				procAura.Activate(sim)
-			},
-		})
+	character.RegisterAura(core.Aura{
+		Label:    "Sextant of Unstable Currents",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			icd = core.NewICD()
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) || icd.IsOnCD(sim) || spellEffect.IsPhantom {
+				return
+			}
+			if sim.RandomFloat("Sextant of Unstable Currents") > 0.2 {
+				return
+			}
+			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			procAura.Activate(sim)
+		},
 	})
 }
 
@@ -161,26 +172,28 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 		},
 	})
 
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return character.GetOrRegisterAura(core.Aura{
-			Label: "DMC Crusade",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					if spellEffect.IsPhantom {
-						return
-					}
-					apAura.Activate(sim)
-					apAura.AddStack(sim)
-					apAura.Refresh(sim)
-				} else {
-					if !spellEffect.Landed() {
-						return
-					}
-					spAura.Activate(sim)
-					spAura.AddStack(sim)
-					spAura.Refresh(sim)
+	character.RegisterAura(core.Aura{
+		Label:    "DMC Crusade",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				if spellEffect.IsPhantom {
+					return
 				}
-			},
-		})
+				apAura.Activate(sim)
+				apAura.AddStack(sim)
+				apAura.Refresh(sim)
+			} else {
+				if !spellEffect.Landed() {
+					return
+				}
+				spAura.Activate(sim)
+				spAura.AddStack(sim)
+				spAura.Refresh(sim)
+			}
+		},
 	})
 }

@@ -27,16 +27,18 @@ var ItemSetManaEtched = core.ItemSet{
 			character := agent.GetCharacter()
 			procAura := character.NewTemporaryStatsAura("Mana-Etched Insight Proc", core.ActionID{SpellID: 37619}, stats.Stats{stats.SpellPower: 110}, time.Second*15)
 
-			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				return character.GetOrRegisterAura(core.Aura{
-					Label: "Mana-Etched Insight",
-					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-						if sim.RandomFloat("Mana-Etched Insight") > 0.02 {
-							return
-						}
-						procAura.Activate(sim)
-					},
-				})
+			character.RegisterAura(core.Aura{
+				Label:    "Mana-Etched Insight",
+				Duration: core.NeverExpires,
+				OnReset: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Activate(sim)
+				},
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+					if sim.RandomFloat("Mana-Etched Insight") > 0.02 {
+						return
+					}
+					procAura.Activate(sim)
+				},
 			})
 		},
 	},
@@ -58,16 +60,18 @@ var ItemSetSpellstrike = core.ItemSet{
 			character := agent.GetCharacter()
 			procAura := character.NewTemporaryStatsAura("Spellstrike Proc", core.ActionID{SpellID: 32106}, stats.Stats{stats.SpellPower: 92}, time.Second*10)
 
-			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				return character.GetOrRegisterAura(core.Aura{
-					Label: "Spellstrike",
-					OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-						if sim.RandomFloat("spellstrike") > 0.05 {
-							return
-						}
-						procAura.Activate(sim)
-					},
-				})
+			character.RegisterAura(core.Aura{
+				Label:    "Spellstrike",
+				Duration: core.NeverExpires,
+				OnReset: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Activate(sim)
+				},
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+					if sim.RandomFloat("spellstrike") > 0.05 {
+						return
+					}
+					procAura.Activate(sim)
+				},
 			})
 		},
 	},

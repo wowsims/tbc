@@ -42,6 +42,7 @@ character_stats_results: {
   final_stats: 0
   final_stats: 0
   final_stats: 0
+  final_stats: 0
  }
 }
 dps_results: {
@@ -749,7 +750,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Average-Default"
  value: {
-  dps: 1410.1585917160248
+  dps: 1410.2151069798583
  }
 }
 dps_results: {

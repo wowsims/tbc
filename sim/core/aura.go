@@ -382,15 +382,6 @@ func (at *auraTracker) finalize() {
 }
 
 func (at *auraTracker) init(sim *Simulation) {
-	for i := range at.permanentAuras {
-		permAura := &at.permanentAuras[i]
-		permAura.aura = permAura.AuraFactory(sim)
-		aura := permAura.aura
-		if !permAura.RespectDuration {
-			aura.Duration = NeverExpires
-		}
-	}
-
 	// Auras are initialized later, on their first reset().
 }
 
@@ -411,12 +402,16 @@ func (at *auraTracker) reset(sim *Simulation) {
 
 	for i := range at.permanentAuras {
 		permAura := &at.permanentAuras[i]
+		permAura.aura = permAura.AuraFactory(sim)
 		aura := permAura.aura
 		if aura == nil {
 			panic("Aura not initialized: " + permAura.AuraFactory(sim).ActionID.String())
 		}
 		if !permAura.RespectDuration {
 			aura.Duration = NeverExpires
+		}
+		if !aura.initialized {
+			aura.reset(sim)
 		}
 		aura.Activate(sim)
 	}
@@ -721,7 +716,6 @@ func (character *Character) NewTemporaryStatsAura(auraLabel string, actionID Act
 func (character *Character) NewTemporaryStatsAuraWrapped(auraLabel string, actionID ActionID, tempStats stats.Stats, duration time.Duration, modConfig func(*Aura)) *Aura {
 	var buffs *stats.Stats = &stats.Stats{}
 	var unbuffs *stats.Stats = &stats.Stats{}
-	init := false
 
 	config := Aura{
 		Label:    auraLabel,
@@ -730,21 +724,14 @@ func (character *Character) NewTemporaryStatsAuraWrapped(auraLabel string, actio
 		OnInit: func(aura *Aura, sim *Simulation) {
 			*buffs = character.ApplyStatDependencies(tempStats)
 			*unbuffs = buffs.Multiply(-1)
-			init = true
 		},
 		OnGain: func(aura *Aura, sim *Simulation) {
-			if !init {
-				panic("not init: " + actionID.String())
-			}
 			character.AddStatsDynamic(sim, *buffs)
 			if sim.Log != nil {
 				character.Log(sim, "Gained %s from %s.", buffs.FlatString(), actionID)
 			}
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			if !init {
-				panic("not init")
-			}
 			if sim.Log != nil {
 				character.Log(sim, "Lost %s from fading %s.", buffs.FlatString(), actionID)
 			}

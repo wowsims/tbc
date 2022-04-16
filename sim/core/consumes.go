@@ -306,7 +306,9 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 
 			auras := []*Aura{}
 			for _, agent := range character.Party.Players {
-				auras = append(auras, makeDrumsAura(agent.GetCharacter(), drumsType))
+				drumsAura := makeDrumsAura(agent.GetCharacter(), drumsType)
+				drumsAura.reset(sim)
+				auras = append(auras, drumsAura)
 			}
 
 			drumsSpell := character.GetOrRegisterSpell(SpellConfig{

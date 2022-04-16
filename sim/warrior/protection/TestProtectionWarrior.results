@@ -42,12 +42,13 @@ character_stats_results: {
   final_stats: 0
   final_stats: 0
   final_stats: 0
+  final_stats: 0
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-AllItems-AbacusofViolentOdds-28288"
  value: {
-  dps: 574.2468351643549
+  dps: 574.0160581418288
  }
 }
 dps_results: {
@@ -71,13 +72,13 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BadgeofTenacity-32658"
  value: {
-  dps: 564.6654670088124
+  dps: 563.8485054759319
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BadgeoftheSwarmguard-21670"
  value: {
-  dps: 565.5881046715702
+  dps: 565.6017800457524
  }
 }
 dps_results: {
@@ -125,7 +126,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Berserker'sCall-33831"
  value: {
-  dps: 581.3011011245536
+  dps: 580.9741098505249
  }
 }
 dps_results: {
@@ -143,7 +144,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Bladefist'sBreadth-28041"
  value: {
-  dps: 568.8496512172867
+  dps: 568.899007422167
  }
 }
 dps_results: {
@@ -167,7 +168,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BloodlustBrooch-29383"
  value: {
-  dps: 577.084579215676
+  dps: 575.3628630055103
  }
 }
 dps_results: {
@@ -227,13 +228,13 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-CoreofAr'kelos-29776"
  value: {
-  dps: 570.0375995171842
+  dps: 572.9535656968033
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 573.468978645857
+  dps: 569.5975569447183
  }
 }
 dps_results: {
@@ -245,7 +246,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-DarkIronSmokingPipe-38290"
  value: {
-  dps: 558.1374225856339
+  dps: 555.254709798003
  }
 }
 dps_results: {
@@ -335,7 +336,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-EmptyMugofDirebrew-38287"
  value: {
-  dps: 577.084579215676
+  dps: 575.3628630055103
  }
 }
 dps_results: {
@@ -383,19 +384,19 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Figurine-LivingRubySerpent-24126"
  value: {
-  dps: 558.1374225856339
+  dps: 559.1827973334537
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Figurine-NightseyePanther-24128"
  value: {
-  dps: 570.0961804454344
+  dps: 567.8312626867952
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
-  dps: 577.5153350554737
+  dps: 576.5114748391848
  }
 }
 dps_results: {
@@ -419,7 +420,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-HexShrunkenHead-33829"
  value: {
-  dps: 558.1374225856339
+  dps: 555.254709798003
  }
 }
 dps_results: {
@@ -431,7 +432,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-IconoftheSilverCrescent-29370"
  value: {
-  dps: 558.1374225856339
+  dps: 555.254709798003
  }
 }
 dps_results: {
@@ -455,7 +456,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-KissoftheSpider-22954"
  value: {
-  dps: 570.7962417986236
+  dps: 568.8098760451884
  }
 }
 dps_results: {
@@ -587,7 +588,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 557.7704605870276
+  dps: 555.799414264259
  }
 }
 dps_results: {
@@ -617,7 +618,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-ShiftingNaaruSliver-34429"
  value: {
-  dps: 557.4737560894489
+  dps: 557.2394355355073
  }
 }
 dps_results: {
@@ -629,7 +630,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Slayer'sCrest-23041"
  value: {
-  dps: 576.008191769745
+  dps: 575.4554239218629
  }
 }
 dps_results: {
@@ -719,13 +720,13 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-TheRestrainedEssenceofSapphiron-23046"
  value: {
-  dps: 558.1374225856339
+  dps: 555.254709798003
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-AllItems-TheSkullofGul'dan-32483"
  value: {
-  dps: 557.7793897187239
+  dps: 556.3488893710229
  }
 }
 dps_results: {
@@ -803,19 +804,19 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Xi'ri'sGift-29179"
  value: {
-  dps: 557.4737560894489
+  dps: 557.2394355355073
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-Average-Default"
  value: {
-  dps: 567.9296384758376
+  dps: 567.9530159250137
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-SelfDrums-DPS"
  value: {
-  dps: 567.5514006661119
+  dps: 566.0832565726433
  }
 }
 dps_results: {

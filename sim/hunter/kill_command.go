@@ -15,16 +15,18 @@ func (hunter *Hunter) applyKillCommand() {
 		return
 	}
 
-	hunter.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return hunter.GetOrRegisterAura(core.Aura{
-			Label: "Kill Command Trigger",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					hunter.killCommandEnabledUntil = sim.CurrentTime + time.Second*5
-					hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
-				}
-			},
-		})
+	hunter.RegisterAura(core.Aura{
+		Label:    "Kill Command Trigger",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				hunter.killCommandEnabledUntil = sim.CurrentTime + time.Second*5
+				hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
+			}
+		},
 	})
 }
 
