@@ -130,6 +130,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 					judgementOfWisdom: true,
 					improvedSealOfTheCrusader: true,
 	  				bloodFrenzy: true,
+					giftOfArthas: true,
 					exposeArmor: TristateEffect.TristateEffectImproved,
 	  				faerieFire: TristateEffect.TristateEffectImproved,
 	  				sunderArmor: true,
@@ -137,6 +138,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 	  				huntersMark: TristateEffect.TristateEffectImproved,
 	  				exposeWeaknessUptime: 1.0,
 	  				exposeWeaknessHunterAgility: 1000,
+					delayedArmorDebuffs: true,
 				}),
 			},
 
@@ -179,6 +181,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 	  			IconInputs.FaerieFire,
 	  			IconInputs.ExposeArmor,
 	  			IconInputs.SunderArmor,
+				IconInputs.GiftOfArthas,
 			],
 			// Which options are selectable in the 'Consumes' section.
 			consumeOptions: {
@@ -226,7 +229,8 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 					OtherInputs.NumStartingPotions,
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
-					OtherInputs.SnapshotBsSolarianSapphire,
+	  				OtherInputs.SnapshotBsSolarianSapphire,
+					OtherInputs.DelayedArmorDebuffs,
 				],
 			},
 			encounterPicker: {

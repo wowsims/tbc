@@ -47,16 +47,29 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		MakePermanent(BloodFrenzyAura(target))
 	}
 
+	if debuffs.GiftOfArthas {
+		MakePermanent(GiftOfArthasAura(target))
+	}
+
 	if debuffs.Mangle {
 		MakePermanent(MangleAura(target))
 	}
 
 	if debuffs.ExposeArmor != proto.TristateEffect_TristateEffectMissing {
-		MakePermanent(ExposeArmorAura(target, GetTristateValueInt32(debuffs.ExposeArmor, 0, 2)))
+		talentPoints := GetTristateValueInt32(debuffs.ExposeArmor, 0, 2)
+		if debuffs.DelayedArmorDebuffs {
+			ScheduledExposeArmorAura(target, talentPoints)
+		} else {
+			MakePermanent(ExposeArmorAura(target, talentPoints))
+		}
 	}
 
 	if debuffs.SunderArmor {
-		MakePermanent(SunderArmorAura(target, 5))
+		if debuffs.DelayedArmorDebuffs {
+			ScheduledSunderArmorAura(target)
+		} else {
+			MakePermanent(SunderArmorAura(target, 5))
+		}
 	}
 
 	if debuffs.FaerieFire != proto.TristateEffect_TristateEffectMissing {
@@ -236,6 +249,19 @@ func BloodFrenzyAura(target *Target) *Aura {
 	})
 }
 
+func GiftOfArthasAura(target *Target) *Aura {
+	return target.GetOrRegisterAura(Aura{
+		Label:    "Gift of Arthas",
+		ActionID: ActionID{SpellID: 11374},
+		OnGain: func(aura *Aura, sim *Simulation) {
+			aura.Unit.PseudoStats.BonusPhysicalDamageTaken += 8
+		},
+		OnExpire: func(aura *Aura, sim *Simulation) {
+			aura.Unit.PseudoStats.BonusPhysicalDamageTaken -= 8
+		},
+	})
+}
+
 func MangleAura(target *Target) *Aura {
 	return target.GetOrRegisterAura(Aura{
 		Label:    "Mangle",
@@ -326,6 +352,22 @@ func SunderArmorAura(target *Target, startingStacks int32) *Aura {
 	})
 }
 
+func ScheduledSunderArmorAura(target *Target) *Aura {
+	aura := SunderArmorAura(target, 1)
+	aura.Duration = NeverExpires
+	aura.OnReset = func(aura *Aura, sim *Simulation) {
+		aura.Activate(sim)
+		StartPeriodicAction(sim, PeriodicActionOptions{
+			Period:   time.Duration(1.5 * float64(time.Second)),
+			NumTicks: 4,
+			OnAction: func(sim *Simulation) {
+				aura.AddStack(sim)
+			},
+		})
+	}
+	return aura
+}
+
 func ExposeArmorAura(target *Target, talentPoints int32) *Aura {
 	armorReduction := 2050.0 * (1.0 + 0.25*float64(talentPoints))
 
@@ -342,6 +384,21 @@ func ExposeArmorAura(target *Target, talentPoints int32) *Aura {
 			target.AddStat(stats.Armor, armorReduction)
 		},
 	})
+}
+
+func ScheduledExposeArmorAura(target *Target, talentPoints int32) * Aura {
+	aura := ExposeArmorAura(target, talentPoints)
+	aura.Duration = NeverExpires
+	aura.OnReset = func(aura *Aura, sim *Simulation) {
+		StartPeriodicAction(sim, PeriodicActionOptions{
+			Period:   time.Duration(15.0 * float64(time.Second)),
+			NumTicks: 1,
+			OnAction: func(sim *Simulation) {
+				aura.Activate(sim)
+			},
+		})
+	}
+	return aura
 }
 
 func CurseOfRecklessnessAura(target *Target) *Aura {
