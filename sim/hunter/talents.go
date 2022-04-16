@@ -190,7 +190,7 @@ func (hunter *Hunter) applyFerociousInspiration() {
 	multiplier := 1.0 + 0.01*float64(hunter.Talents.FerociousInspiration)
 
 	makeProcAura := func(character *core.Character) *core.Aura {
-		return character.GetOrRegisterAura(core.Aura{
+		return character.RegisterAura(core.Aura{
 			Label:    "Ferocious Inspiration-" + strconv.Itoa(int(hunter.Index)),
 			ActionID: core.ActionID{SpellID: 34460, Tag: int32(hunter.Index)},
 			Duration: time.Second * 10,
@@ -203,24 +203,28 @@ func (hunter *Hunter) applyFerociousInspiration() {
 		})
 	}
 
-	hunter.pet.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAuras := make([]*core.Aura, len(hunter.Party.PlayersAndPets))
-		for i, playerOrPet := range hunter.Party.PlayersAndPets {
-			procAuras[i] = makeProcAura(playerOrPet.GetCharacter())
-		}
+	var procAuras []*core.Aura
+	hunter.RegisterAura(core.Aura{
+		Label:    "Ferocious Inspiration",
+		Duration: core.NeverExpires,
+		OnInit: func(aura *core.Aura, sim *core.Simulation) {
+			procAuras = make([]*core.Aura, len(hunter.Party.PlayersAndPets))
+			for i, playerOrPet := range hunter.Party.PlayersAndPets {
+				procAuras[i] = makeProcAura(playerOrPet.GetCharacter())
+			}
+		},
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				return
+			}
 
-		return hunter.GetOrRegisterAura(core.Aura{
-			Label: "Ferocious Inspiration",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					return
-				}
-
-				for _, procAura := range procAuras {
-					procAura.Activate(sim)
-				}
-			},
-		})
+			for _, procAura := range procAuras {
+				procAura.Activate(sim)
+			}
+		},
 	})
 }
 

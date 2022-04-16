@@ -10,7 +10,7 @@ import (
 
 // Returns whether any Deadly Poisons are being used.
 func (rogue *Rogue) applyPoisons() {
-	hasWFTotem := rogue.HasWFTotem
+	hasWFTotem := rogue.HasAura(core.WindfuryTotemAuraLabel)
 	rogue.applyDeadlyPoison(hasWFTotem)
 	rogue.applyInstantPoison(hasWFTotem)
 }
