@@ -130,6 +130,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 					judgementOfWisdom: true,
 					improvedSealOfTheCrusader: true,
 	  				bloodFrenzy: true,
+					giftOfArthas: true,
 					exposeArmor: TristateEffect.TristateEffectImproved,
 	  				faerieFire: TristateEffect.TristateEffectImproved,
 	  				sunderArmor: true,
@@ -137,6 +138,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 	  				huntersMark: TristateEffect.TristateEffectImproved,
 	  				exposeWeaknessUptime: 1.0,
 	  				exposeWeaknessHunterAgility: 1000,
+					delayedArmorDebuffs: true,
 				}),
 			},
 
@@ -179,12 +181,13 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 				IconInputs.FaerieFire,
 				IconInputs.ExposeArmor,
 				IconInputs.SunderArmor,
+				IconInputs.GiftOfArthas,
 			],
 			// Which options are selectable in the 'Consumes' section.
 			consumeOptions: {
 				potions: [
 					Potions.SuperManaPotion,
-	  				Potions.FelManaPotion,
+					Potions.FelManaPotion,
 					Potions.HastePotion,
 				],
 				conjured: [
@@ -194,7 +197,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 					Flask.FlaskOfRelentlessAssault,
 				],
 				battleElixirs: [
-	  				BattleElixir.ElixirOfMajorAgility,
+					BattleElixir.ElixirOfMajorAgility,
 					BattleElixir.ElixirOfDemonslaying,
 				],
 				guardianElixirs: [
@@ -202,7 +205,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 					GuardianElixir.ElixirOfMajorMageblood,
 				],
 				food: [
-	  				Food.FoodGrilledMudfish,
+					Food.FoodGrilledMudfish,
 					Food.FoodSpicyHotTalbuk,
 				],
 				alcohol: [
@@ -212,7 +215,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
 				],
 				other: [
-	  				IconInputs.ScrollOfAgilityV,
+					IconInputs.ScrollOfAgilityV,
 					IconInputs.ScrollOfStrengthV,
 				],
 			},
@@ -221,12 +224,13 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
-	  				DruidInputs.LatencyMs,
-	  				OtherInputs.StartingPotion,
+					DruidInputs.LatencyMs,
+					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.SnapshotBsSolarianSapphire,
+					OtherInputs.DelayedArmorDebuffs,
 				],
 			},
 			encounterPicker: {

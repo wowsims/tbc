@@ -422,11 +422,13 @@ message Debuffs {
     bool winters_chill = 7;
 
     bool blood_frenzy = 8; // Blood Frenzy: +4% phy dmg
+    bool gift_of_arthas = 17; // Gift of Arthas: +8 phy dmg
     bool mangle = 16;
     TristateEffect expose_armor = 9; // Expose Armor (If you have a rogue):    5 points: 2050 armor / imp 5 points: 3075 armor
     TristateEffect faerie_fire = 10; // Faerie Fire: -610 armor / imp 3% hit
     bool sunder_armor = 11; // Number of stacks of sunder armor: -520 armor per stack, 5 max
     bool curse_of_recklessness = 12; // -800 armor
+    bool delayed_armor_debuffs = 18; // Schedules 1 Sunder stack every 1.5 seconds, and EA after 15 seconds
 
 		TristateEffect hunters_mark = 15;
 		double expose_weakness_uptime = 13;

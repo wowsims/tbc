@@ -176,6 +176,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				IconInputs.CurseOfRecklessness,
 				IconInputs.CurseOfElements,
 				IconInputs.Misery,
+				IconInputs.GiftOfArthas,
 			],
 			// Which options are selectable in the 'Consumes' section.
 			consumeOptions: {

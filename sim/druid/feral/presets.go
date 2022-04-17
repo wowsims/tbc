@@ -62,6 +62,7 @@ var FullDebuffs = &proto.Debuffs{
 	JudgementOfWisdom:           true,
 	ImprovedSealOfTheCrusader:   true,
 	BloodFrenzy:                 true,
+	GiftOfArthas:                true,
 	ExposeArmor:                 proto.TristateEffect_TristateEffectImproved,
 	FaerieFire:                  proto.TristateEffect_TristateEffectImproved,
 	SunderArmor:                 true,
@@ -113,7 +114,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	{
-		Name: "Vengeance Wrap",
+		Name:    "Vengeance Wrap",
 		Enchant: "Enchant Cloak - Greater Agility",
 		Gems: []string{
 			"Delicate Living Ruby",
@@ -157,7 +158,7 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	{
-		Name: "Edgewalker Longboots",
+		Name:    "Edgewalker Longboots",
 		Enchant: "Enchant Boots - Cat's Swiftness",
 		Gems: []string{
 			"Delicate Living Ruby",
