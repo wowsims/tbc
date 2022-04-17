@@ -139,6 +139,7 @@ export class WarriorSimUI extends IndividualSimUI {
                 IconInputs.SunderArmor,
                 IconInputs.ExposeArmor,
                 IconInputs.CurseOfRecklessness,
+                IconInputs.GiftOfArthas,
             ],
             // Which options are selectable in the 'Consumes' section.
             consumeOptions: {

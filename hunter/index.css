@@ -2853,7 +2853,7 @@ input, select {
 }
 
 .hunter-sim-ui .debuffs-section {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .hunter-sim-ui .PetBuffs-section {

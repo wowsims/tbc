@@ -1413,7 +1413,11 @@ export declare enum Drums {
     /**
      * @generated from protobuf enum value: DrumsOfRestoration = 2;
      */
-    DrumsOfRestoration = 2
+    DrumsOfRestoration = 2,
+    /**
+     * @generated from protobuf enum value: DrumsOfWar = 3;
+     */
+    DrumsOfWar = 3
 }
 /**
  * @generated from protobuf enum proto.Explosive

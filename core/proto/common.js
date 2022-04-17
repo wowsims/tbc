@@ -726,6 +726,10 @@ export var Drums;
      * @generated from protobuf enum value: DrumsOfRestoration = 2;
      */
     Drums[Drums["DrumsOfRestoration"] = 2] = "DrumsOfRestoration";
+    /**
+     * @generated from protobuf enum value: DrumsOfWar = 3;
+     */
+    Drums[Drums["DrumsOfWar"] = 3] = "DrumsOfWar";
 })(Drums || (Drums = {}));
 /**
  * @generated from protobuf enum proto.Explosive

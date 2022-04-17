@@ -38,8 +38,8 @@ export const SanctityAura = makeTristatePartyBuffInput(ActionId.fromSpellId(2021
 export const TotemOfWrath = makeMultistatePartyBuffInput(ActionId.fromSpellId(30706), 5, 'totemOfWrath');
 export const TrueshotAura = makeBooleanPartyBuffInput(ActionId.fromSpellId(27066), 'trueshotAura');
 export const WrathOfAirTotem = makeTristatePartyBuffInput(ActionId.fromSpellId(3738), ActionId.fromSpellId(37212), 'wrathOfAirTotem');
-export const DrumsOfBattleBuff = makeEnumValuePartyBuffInput(ActionId.fromSpellId(35476), 'drums', Drums.DrumsOfBattle, ['Drums']);
-export const DrumsOfRestorationBuff = makeEnumValuePartyBuffInput(ActionId.fromSpellId(35478), 'drums', Drums.DrumsOfRestoration, ['Drums']);
+export const DrumsOfBattleBuff = makeEnumValuePartyBuffInput(ActionId.fromItemId(185848), 'drums', Drums.DrumsOfBattle, ['Drums']);
+export const DrumsOfRestorationBuff = makeEnumValuePartyBuffInput(ActionId.fromItemId(185850), 'drums', Drums.DrumsOfRestoration, ['Drums']);
 // Individual Buffs
 export const BlessingOfKings = makeBooleanIndividualBuffInput(ActionId.fromSpellId(25898), 'blessingOfKings');
 export const BlessingOfMight = makeTristateIndividualBuffInput(ActionId.fromSpellId(27140), ActionId.fromSpellId(20048), 'blessingOfMight');
@@ -435,8 +435,9 @@ function onSetDrums(eventID, player, newValue) {
 }
 ;
 export const DrumsInput = makeConsumeInput('drums', [
-    { actionId: ActionId.fromSpellId(35476), value: Drums.DrumsOfBattle },
-    { actionId: ActionId.fromSpellId(35478), value: Drums.DrumsOfRestoration },
+    { actionId: ActionId.fromItemId(185848), value: Drums.DrumsOfBattle },
+    { actionId: ActionId.fromItemId(185850), value: Drums.DrumsOfRestoration },
+    { actionId: ActionId.fromItemId(185852), value: Drums.DrumsOfWar },
 ], onSetDrums);
 function onSetExplosives(eventID, player, newValue) {
     if (newValue) {
