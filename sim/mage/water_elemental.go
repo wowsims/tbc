@@ -45,12 +45,9 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: SummonWaterElementalCooldownID,
-		Cooldown:   cooldown,
-		UsesGCD:    true,
-		Priority:   core.CooldownPriorityDrums + 1, // Always prefer to cast before drums or lust so the ele gets their benefits.
-		Type:       core.CooldownTypeDPS,
+		Spell:    summonSpell,
+		Priority: core.CooldownPriorityDrums + 1, // Always prefer to cast before drums or lust so the ele gets their benefits.
+		Type:     core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if mage.waterElemental.IsEnabled() {
 				return false
@@ -59,14 +56,6 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 				return false
 			}
 			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				summonSpell.Cast(sim, nil)
-			}
 		},
 	})
 }

@@ -8,6 +8,8 @@ import (
 )
 
 func (shaman *Shaman) ApplyTalents() {
+	shaman.registerBloodlustCD()
+
 	if shaman.Talents.NaturesGuidance > 0 {
 		shaman.AddStat(stats.SpellHit, float64(shaman.Talents.NaturesGuidance)*1*core.SpellHitRatingPerHitChance)
 		shaman.AddStat(stats.MeleeHit, float64(shaman.Talents.NaturesGuidance)*1*core.MeleeHitRatingPerHitChance)
@@ -167,21 +169,8 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 	})
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: ElementalMasteryCooldownID,
-		Cooldown:   cd,
-		Type:       core.CooldownTypeDPS,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, nil)
-			}
-		},
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
 	})
 }
 
@@ -222,25 +211,12 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 	})
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: NaturesSwiftnessCooldownID,
-		Cooldown:   cd,
-		Type:       core.CooldownTypeDPS,
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Don't use NS unless we're casting a full-length lightning bolt, which is
 			// the only spell shamans have with a cast longer than GCD.
-			if character.HasTemporarySpellCastSpeedIncrease() {
-				return false
-			}
-			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, nil)
-			}
+			return !character.HasTemporarySpellCastSpeedIncrease()
 		},
 	})
 }

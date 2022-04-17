@@ -8,6 +8,7 @@ import (
 )
 
 type Party struct {
+	Raid  *Raid
 	Index int
 
 	Players []Agent
@@ -18,8 +19,9 @@ type Party struct {
 	dpsMetrics DistributionMetrics
 }
 
-func NewParty(index int, partyConfig proto.Party) *Party {
+func NewParty(raid *Raid, index int, partyConfig proto.Party) *Party {
 	party := &Party{
+		Raid:       raid,
 		Index:      index,
 		dpsMetrics: NewDistributionMetrics(),
 	}
@@ -141,7 +143,7 @@ func NewRaid(raidConfig proto.Raid) *Raid {
 
 	for partyIndex, partyConfig := range raidConfig.Parties {
 		if partyConfig != nil {
-			raid.Parties = append(raid.Parties, NewParty(partyIndex, *partyConfig))
+			raid.Parties = append(raid.Parties, NewParty(raid, partyIndex, *partyConfig))
 		}
 	}
 

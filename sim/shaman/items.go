@@ -173,6 +173,8 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 		ActionID: actionID,
 		Cast: core.CastConfig{
 			Cooldown:         cd,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+			SharedCooldown:   dur,
 			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
@@ -181,22 +183,8 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 	})
 
 	character.AddMajorCooldown(core.MajorCooldown{
-		ActionID:         actionID,
-		CooldownID:       NaturalAlignmentCrystalCooldownID,
-		Cooldown:         cd,
-		SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		SharedCooldown:   dur,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, nil)
-			}
-		},
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
 	})
 }
 

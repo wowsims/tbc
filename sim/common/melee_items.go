@@ -368,12 +368,20 @@ var TheDecapitatorCooldownID = core.NewCooldownID()
 
 func ApplyTheDecapitator(agent core.Agent) {
 	character := agent.GetCharacter()
-	actionID := core.ActionID{ItemID: 28767}
+	actionID := core.ActionID{ItemID: 28767, CooldownID: TheDecapitatorCooldownID}
 
 	spell := character.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasIgnoreResists,
+
+		Cast: core.CastConfig{
+			Cooldown:         time.Minute * 3,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+			SharedCooldown:   time.Second * 10,
+			DisableCallbacks: true,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			IsPhantom:        true,
@@ -386,27 +394,9 @@ func ApplyTheDecapitator(agent core.Agent) {
 	})
 
 	character.AddMajorCooldown(core.MajorCooldown{
-		ActionID:         actionID,
-		CooldownID:       TheDecapitatorCooldownID,
-		Cooldown:         time.Minute * 3,
-		SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		SharedCooldown:   time.Second * 10,
-		Priority:         core.CooldownPriorityLow, // Use low prio so other actives get used first.
-		Type:             core.CooldownTypeDPS,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, sim.GetPrimaryTarget())
-
-				character.SetCD(TheDecapitatorCooldownID, sim.CurrentTime+time.Minute*3)
-				character.SetCD(core.OffensiveTrinketSharedCooldownID, sim.CurrentTime+time.Second*10)
-			}
-		},
+		Spell:    spell,
+		Priority: core.CooldownPriorityLow, // Use low prio so other actives get used first.
+		Type:     core.CooldownTypeDPS,
 	})
 }
 

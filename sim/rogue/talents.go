@@ -168,21 +168,8 @@ func (rogue *Rogue) registerColdBloodCD() {
 	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: ColdBloodCooldownID,
-		Cooldown:   cooldown,
-		Type:       core.CooldownTypeDPS,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				coldBloodSpell.Cast(sim, nil)
-			}
-		},
+		Spell: coldBloodSpell,
+		Type:  core.CooldownTypeDPS,
 	})
 }
 
@@ -371,17 +358,11 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: BladeFlurryCooldownID,
-		Cooldown:   cooldown,
-		UsesGCD:    true,
-		Type:       core.CooldownTypeDPS,
-		Priority:   core.CooldownPriorityLow,
+		Spell:    bladeFlurrySpell,
+		Type:     core.CooldownTypeDPS,
+		Priority: core.CooldownPriorityLow,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if rogue.CurrentEnergy() < energyCost {
-				return false
-			}
-			return true
+			return rogue.CurrentEnergy() >= energyCost
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if sim.GetRemainingDuration() > cooldown+dur {
@@ -398,11 +379,6 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 			// TODO: Wait for dst/mongoose procs
 
 			return false
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				bladeFlurrySpell.Cast(sim, nil)
-			}
 		},
 	})
 }
@@ -449,15 +425,9 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: AdrenalineRushCooldownID,
-		Cooldown:   cooldown,
-		UsesGCD:    true,
-		Type:       core.CooldownTypeDPS,
-		Priority:   core.CooldownPriorityBloodlust,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
+		Spell:    adrenalineRushSpell,
+		Type:     core.CooldownTypeDPS,
+		Priority: core.CooldownPriorityBloodlust,
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Make sure we have plenty of room so the big ticks dont get wasted.
 			thresh := 85.0
@@ -468,11 +438,6 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 				return false
 			}
 			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				adrenalineRushSpell.Cast(sim, nil)
-			}
 		},
 	})
 }

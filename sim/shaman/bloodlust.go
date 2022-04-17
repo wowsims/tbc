@@ -21,8 +21,15 @@ func (shaman *Shaman) registerBloodlustCD() {
 	}
 	actionID := shaman.BloodlustActionID()
 
-	var blAuras []*core.Aura
 	var bloodlustMCD *core.MajorCooldown
+	shaman.RegisterResetEffect(func(_ *core.Simulation) {
+		bloodlustMCD = shaman.GetMajorCooldown(actionID)
+	})
+
+	blAuras := []*core.Aura{}
+	for _, partyMember := range shaman.Party.Players {
+		blAuras = append(blAuras, core.BloodlustAura(partyMember.GetCharacter(), actionID.Tag))
+	}
 
 	baseCost := 750.0
 	bloodlustSpell := shaman.RegisterSpell(core.SpellConfig{
@@ -57,12 +64,9 @@ func (shaman *Shaman) registerBloodlustCD() {
 	})
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: BloodlustCooldownID,
-		Cooldown:   core.BloodlustCD,
-		UsesGCD:    true,
-		Priority:   core.CooldownPriorityBloodlust,
-		Type:       core.CooldownTypeDPS,
+		Spell:    bloodlustSpell,
+		Priority: core.CooldownPriorityBloodlust,
+		Type:     core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if character.CurrentMana() < bloodlustSpell.DefaultCast.Cost {
 				return false
@@ -76,21 +80,6 @@ func (shaman *Shaman) registerBloodlustCD() {
 				}
 			}
 			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			bloodlustMCD = shaman.GetMajorCooldown(actionID)
-
-			blAuras = []*core.Aura{}
-			for _, partyMember := range shaman.Party.Players {
-				blAuras = append(blAuras, core.BloodlustAura(partyMember.GetCharacter(), actionID.Tag))
-			}
-
-			return func(sim *core.Simulation, character *core.Character) {
-				bloodlustSpell.Cast(sim, nil)
-			}
 		},
 	})
 }

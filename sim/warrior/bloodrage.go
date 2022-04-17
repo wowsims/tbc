@@ -29,19 +29,9 @@ func (warrior *Warrior) registerBloodrageCD() {
 	})
 
 	warrior.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: BloodrageCooldownID,
-		Cooldown:   BloodrageCooldown,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
+		Spell: brSpell,
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return warrior.CurrentRage() < 70
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				brSpell.Cast(sim, nil)
-			}
 		},
 	})
 }

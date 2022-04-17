@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -61,6 +62,11 @@ type Spell struct {
 	// Default cast parameters with all static effects applied.
 	DefaultCast Cast
 
+	SharedCooldownID CooldownID
+
+	Cooldown       time.Duration
+	SharedCooldown time.Duration
+
 	// Performs a cast of this spell.
 	castFn CastSuccessFunc
 
@@ -86,7 +92,10 @@ func (character *Character) RegisterSpell(config SpellConfig) *Spell {
 		ResourceType: config.ResourceType,
 		BaseCost:     config.BaseCost,
 
-		DefaultCast: config.Cast.DefaultCast,
+		DefaultCast:      config.Cast.DefaultCast,
+		Cooldown:         config.Cast.Cooldown,
+		SharedCooldownID: config.Cast.SharedCooldownID,
+		SharedCooldown:   config.Cast.SharedCooldown,
 
 		ApplyEffects: config.ApplyEffects,
 	}
@@ -133,6 +142,17 @@ func (spell *Spell) reset(_ *Simulation) {
 
 func (spell *Spell) doneIteration() {
 	spell.Character.Metrics.addSpell(spell)
+}
+
+func (spell *Spell) IsOnCD(sim *Simulation) bool {
+	// Even if SharedCooldownID == 0 this will work since we never call SetCD(0, currentTime)
+	return spell.Character.IsOnCD(spell.ActionID.CooldownID, sim.CurrentTime) || spell.Character.IsOnCD(spell.SharedCooldownID, sim.CurrentTime)
+}
+
+func (spell *Spell) GetRemainingCD(currentTime time.Duration) time.Duration {
+	return MaxDuration(
+		spell.Character.GetRemainingCD(spell.ActionID.CooldownID, currentTime),
+		spell.Character.GetRemainingCD(spell.SharedCooldownID, currentTime))
 }
 
 func (spell *Spell) Cast(sim *Simulation, target *Target) bool {

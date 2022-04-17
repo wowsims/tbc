@@ -80,8 +80,6 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, totems pro
 		shaman.AddStat(stats.MP5, 50)
 	}
 
-	shaman.registerBloodlustCD()
-
 	return shaman
 }
 
