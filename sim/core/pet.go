@@ -156,10 +156,11 @@ func (pet *Pet) EnableWithTimeout(sim *Simulation, petAgent PetAgent, petDuratio
 	pet.EnableGCDTimer(sim, petAgent)
 	pet.Enable(sim, petAgent)
 
-	pet.timeoutAction = sim.pendingActionPool.Get()
-	pet.timeoutAction.NextActionAt = sim.CurrentTime + petDuration
-	pet.timeoutAction.OnAction = func(sim *Simulation) {
-		pet.Disable(sim)
+	pet.timeoutAction = &PendingAction{
+		NextActionAt: sim.CurrentTime + petDuration,
+		OnAction: func(sim *Simulation) {
+			pet.Disable(sim)
+		},
 	}
 	sim.AddPendingAction(pet.timeoutAction)
 }

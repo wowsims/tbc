@@ -292,8 +292,10 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 		aa.autoSwingAction.Cancel(sim)
 	}
 
-	pa := sim.pendingActionPool.Get()
-	pa.Priority = ActionPriorityAuto
+	pa := &PendingAction{
+		NextActionAt: aa.NextAttackAt(),
+		Priority:     ActionPriorityAuto,
+	}
 
 	pa.OnAction = func(sim *Simulation) {
 		aa.SwingMelee(sim, sim.GetPrimaryTarget())
@@ -302,11 +304,8 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 		// Cancelled means we made a new one because of a swing speed change.
 		if !pa.cancelled {
 			sim.AddPendingAction(pa)
-		} else {
-			sim.pendingActionPool.Put(pa)
 		}
 	}
-	pa.NextActionAt = aa.NextAttackAt()
 
 	aa.autoSwingAction = pa
 	sim.AddPendingAction(pa)

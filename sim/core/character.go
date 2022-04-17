@@ -438,9 +438,6 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 		petAgent.GetPet().reset(sim, petAgent)
 	}
 
-	if character.gcdAction != nil {
-		sim.pendingActionPool.Put(character.gcdAction)
-	}
 	character.gcdAction = character.newGCDAction(sim, agent)
 
 	agent.Reset(sim)

@@ -135,9 +135,9 @@ func ProtoToActionID(protoID proto.ActionID) ActionID {
 type AgentFactory func(Character, proto.Player) Agent
 type SpecSetter func(*proto.Player, interface{})
 
-var agentFactories map[string]AgentFactory = make(map[string]AgentFactory)
-var specSetters map[string]SpecSetter = make(map[string]SpecSetter)
-var configSpecs map[string]proto.Spec = make(map[string]proto.Spec)
+var agentFactories = make(map[string]AgentFactory)
+var specSetters = make(map[string]SpecSetter)
+var configSpecs = make(map[string]proto.Spec)
 
 func PlayerProtoToSpec(player proto.Player) proto.Spec {
 	typeName := reflect.TypeOf(player.GetSpec()).Elem().Name()
