@@ -187,10 +187,8 @@ func (sim *Simulation) initManaTickAction() {
 
 	interval := time.Second * 2
 	pa := &PendingAction{
-		Name:     "Mana Tick",
-		Priority: ActionPriorityRegen,
-
 		NextActionAt: interval,
+		Priority:     ActionPriorityRegen,
 	}
 	pa.OnAction = func(sim *Simulation) {
 		for _, player := range playersWithManaBars {

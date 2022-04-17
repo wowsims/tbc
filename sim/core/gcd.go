@@ -6,16 +6,16 @@ import (
 )
 
 func (character *Character) newGCDAction(sim *Simulation, agent Agent) *PendingAction {
-	pa := sim.pendingActionPool.Get()
-	pa.Priority = ActionPriorityGCD
-	pa.OnAction = func(sim *Simulation) {
-		character := agent.GetCharacter()
-		character.TryUseCooldowns(sim)
-		if !character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
-			agent.OnGCDReady(sim)
-		}
+	return &PendingAction{
+		Priority: ActionPriorityGCD,
+		OnAction: func(sim *Simulation) {
+			character := agent.GetCharacter()
+			character.TryUseCooldowns(sim)
+			if !character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
+				agent.OnGCDReady(sim)
+			}
+		},
 	}
-	return pa
 }
 
 // Note that this is only used when the hardcast and GCD actions
@@ -24,12 +24,13 @@ func (character *Character) newHardcastAction(sim *Simulation) {
 		character.hardcastAction.Cancel(sim)
 	}
 
-	pa := sim.pendingActionPool.Get()
-	pa.OnAction = func(sim *Simulation) {
-		// Don't need to do anything, the Advance() call will take care of the hardcast.
-		character.hardcastAction = nil
+	pa := &PendingAction{
+		NextActionAt: character.Hardcast.Expires,
+		OnAction: func(sim *Simulation) {
+			// Don't need to do anything, the Advance() call will take care of the hardcast.
+			character.hardcastAction = nil
+		},
 	}
-	pa.NextActionAt = character.Hardcast.Expires
 
 	character.hardcastAction = pa
 	sim.AddPendingAction(pa)
@@ -45,10 +46,11 @@ func (character *Character) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duratio
 	character.gcdAction.Cancel(sim)
 	oldAction := character.gcdAction.OnAction
 
-	character.gcdAction = sim.pendingActionPool.Get()
-	character.gcdAction.Priority = ActionPriorityGCD
-	character.gcdAction.OnAction = oldAction
-	character.gcdAction.NextActionAt = gcdReadyAt
+	character.gcdAction = &PendingAction{
+		NextActionAt: gcdReadyAt,
+		Priority:     ActionPriorityGCD,
+		OnAction:     oldAction,
+	}
 	sim.AddPendingAction(character.gcdAction)
 }
 

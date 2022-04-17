@@ -24,9 +24,8 @@ type Simulation struct {
 	testRands map[string]Rand
 
 	// Current Simulation State
-	pendingActions    []*PendingAction
-	pendingActionPool *paPool
-	CurrentTime       time.Duration // duration that has elapsed in the sim since starting
+	pendingActions []*PendingAction
+	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
 
 	ProgressReport func(*proto.ProgressMetrics)
 
@@ -59,7 +58,7 @@ func NewSim(rsr proto.RaidSimRequest) *Simulation {
 
 	rseed := simOptions.RandomSeed
 	if rseed == 0 {
-		rseed = time.Now().Unix()
+		rseed = time.Now().UnixNano()
 	}
 
 	return &Simulation{
@@ -74,8 +73,6 @@ func NewSim(rsr proto.RaidSimRequest) *Simulation {
 
 		isTest:    simOptions.IsTest,
 		testRands: make(map[string]Rand),
-
-		pendingActionPool: newPAPool(),
 	}
 }
 
@@ -202,19 +199,15 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 func (sim *Simulation) runOnce() {
 	sim.reset()
 
-	for true {
+	for {
 		last := len(sim.pendingActions) - 1
 		pa := sim.pendingActions[last]
 		sim.pendingActions = sim.pendingActions[:last]
 		if pa.cancelled {
-			sim.pendingActionPool.Put(pa)
 			continue
 		}
 
 		if pa.NextActionAt > sim.Duration {
-			if pa.CleanUp != nil {
-				pa.CleanUp(sim)
-			}
 			break
 		}
 
@@ -226,9 +219,6 @@ func (sim *Simulation) runOnce() {
 	}
 
 	for _, pa := range sim.pendingActions {
-		if pa == nil {
-			continue
-		}
 		if pa.CleanUp != nil {
 			pa.CleanUp(sim)
 		}
@@ -239,28 +229,15 @@ func (sim *Simulation) runOnce() {
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
-	oldlen := len(sim.pendingActions)
-
-	// The logic to calculate the index to insert at can be replaced with sort.Search() which uses a binary search.
-	//   However I haven't found any cases yet in our simulator that it is faster.
-	var index = 0
-	for _, v := range sim.pendingActions {
+	for index, v := range sim.pendingActions {
 		if v.NextActionAt < pa.NextActionAt || (v.NextActionAt == pa.NextActionAt && v.Priority >= pa.Priority) {
-			break
+			sim.pendingActions = append(sim.pendingActions, pa)
+			copy(sim.pendingActions[index+1:], sim.pendingActions[index:])
+			sim.pendingActions[index] = pa
+			return
 		}
-		index++
 	}
-
 	sim.pendingActions = append(sim.pendingActions, pa)
-	if index == oldlen { // if the insert was at the end, just return now.
-		return
-	} else if oldlen == 1 { // simple case we can just swap the two
-		sim.pendingActions[0], sim.pendingActions[1] = sim.pendingActions[1], sim.pendingActions[0]
-		return
-	}
-
-	copy(sim.pendingActions[index+1:], sim.pendingActions[index:])
-	sim.pendingActions[index] = pa
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
