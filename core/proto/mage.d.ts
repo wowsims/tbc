@@ -422,12 +422,6 @@ export interface Mage_Options {
      * @generated from protobuf field: int32 evocation_ticks = 2;
      */
     evocationTicks: number;
-    /**
-     * Deprecated, use ConjuredMageManaEmerald instead.
-     *
-     * @generated from protobuf field: bool use_mana_emeralds = 3;
-     */
-    useManaEmeralds: boolean;
 }
 /**
  * @generated from protobuf enum proto.Mage.Options.ArmorType

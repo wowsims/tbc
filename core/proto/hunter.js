@@ -588,14 +588,12 @@ class Hunter_Rotation$Type extends MessageType {
             { no: 6, name: "viper_start_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 7, name: "viper_stop_mana_percent", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 11, name: "weave", kind: "enum", T: () => ["proto.Hunter.Rotation.WeaveType", Hunter_Rotation_WeaveType] },
-            { no: 4, name: "melee_weave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 8, name: "use_raptor_strike", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 9, name: "time_to_weave_ms", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 10, name: "percent_weaved", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { useMultiShot: false, useArcaneShot: false, precastAimedShot: false, lazyRotation: false, sting: 0, viperStartManaPercent: 0, viperStopManaPercent: 0, weave: 0, meleeWeave: false, useRaptorStrike: false, timeToWeaveMs: 0, percentWeaved: 0 };
+        const message = { useMultiShot: false, useArcaneShot: false, precastAimedShot: false, lazyRotation: false, sting: 0, viperStartManaPercent: 0, viperStopManaPercent: 0, weave: 0, timeToWeaveMs: 0, percentWeaved: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -629,12 +627,6 @@ class Hunter_Rotation$Type extends MessageType {
                     break;
                 case /* proto.Hunter.Rotation.WeaveType weave */ 11:
                     message.weave = reader.int32();
-                    break;
-                case /* bool melee_weave */ 4:
-                    message.meleeWeave = reader.bool();
-                    break;
-                case /* bool use_raptor_strike */ 8:
-                    message.useRaptorStrike = reader.bool();
                     break;
                 case /* int32 time_to_weave_ms */ 9:
                     message.timeToWeaveMs = reader.int32();
@@ -678,12 +670,6 @@ class Hunter_Rotation$Type extends MessageType {
         /* proto.Hunter.Rotation.WeaveType weave = 11; */
         if (message.weave !== 0)
             writer.tag(11, WireType.Varint).int32(message.weave);
-        /* bool melee_weave = 4; */
-        if (message.meleeWeave !== false)
-            writer.tag(4, WireType.Varint).bool(message.meleeWeave);
-        /* bool use_raptor_strike = 8; */
-        if (message.useRaptorStrike !== false)
-            writer.tag(8, WireType.Varint).bool(message.useRaptorStrike);
         /* int32 time_to_weave_ms = 9; */
         if (message.timeToWeaveMs !== 0)
             writer.tag(9, WireType.Varint).int32(message.timeToWeaveMs);

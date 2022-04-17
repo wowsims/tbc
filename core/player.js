@@ -1,5 +1,4 @@
 import { Cooldowns } from '/tbc/core/proto/common.js';
-import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { RangedWeaponType } from '/tbc/core/proto/common.js';
@@ -9,7 +8,6 @@ import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { WeaponType } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
-import { Hunter_Rotation_WeaveType as WeaveType } from '/tbc/core/proto/hunter.js';
 import { getWeaponDPS } from '/tbc/core/proto_utils/equipped_item.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { gemMatchesSocket, } from '/tbc/core/proto_utils/gems.js';
@@ -458,49 +456,6 @@ export class Player {
     }
     fromProto(eventID, proto) {
         TypedEvent.freezeAllAndDo(() => {
-            let rotation = this.specTypeFunctions.rotationFromPlayer(proto);
-            let options = this.specTypeFunctions.optionsFromPlayer(proto);
-            // TODO: Remove this on 3/14/2022 (1 month).
-            if (this.spec == Spec.SpecHunter) {
-                const hunterRotation = rotation;
-                const hunterOptions = options;
-                if (hunterOptions.petUptime == 0) {
-                    hunterOptions.petUptime = 1;
-                }
-                if (hunterRotation.meleeWeave) {
-                    hunterRotation.meleeWeave = false;
-                    if (hunterRotation.useRaptorStrike) {
-                        hunterRotation.weave = WeaveType.WeaveFull;
-                    }
-                    else {
-                        hunterRotation.weave = WeaveType.WeaveAutosOnly;
-                    }
-                }
-                options = hunterOptions;
-                rotation = hunterRotation;
-            }
-            // TODO: Remove this on 3/21 (1 month).
-            if (this.spec == Spec.SpecMage) {
-                const mageOptions = options;
-                if (mageOptions.useManaEmeralds && proto.consumes) {
-                    proto.consumes.defaultConjured = Conjured.ConjuredMageManaEmerald;
-                    mageOptions.useManaEmeralds = false;
-                }
-                options = mageOptions;
-            }
-            // TODO: Remove this on 3/21 (1 month).
-            if (this.spec == Spec.SpecEnhancementShaman) {
-                const enhOptions = options;
-                if (proto.consumes && enhOptions.mainHandImbue != 0) {
-                    proto.consumes.mainHandImbue = 5 + enhOptions.mainHandImbue;
-                    enhOptions.mainHandImbue = 0;
-                }
-                if (proto.consumes && enhOptions.offHandImbue != 0) {
-                    proto.consumes.offHandImbue = 5 + enhOptions.offHandImbue;
-                    enhOptions.offHandImbue = 0;
-                }
-                options = enhOptions;
-            }
             this.setName(eventID, proto.name);
             this.setRace(eventID, proto.race);
             this.setGear(eventID, proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));
@@ -509,9 +464,9 @@ export class Player {
             this.setBuffs(eventID, proto.buffs || IndividualBuffs.create());
             this.setCooldowns(eventID, proto.cooldowns || Cooldowns.create());
             this.setTalentsString(eventID, proto.talentsString);
-            this.setRotation(eventID, rotation);
+            this.setRotation(eventID, this.specTypeFunctions.rotationFromPlayer(proto));
             this.setTalents(eventID, this.specTypeFunctions.talentsFromPlayer(proto));
-            this.setSpecOptions(eventID, options);
+            this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
         });
     }
     clone(eventID) {

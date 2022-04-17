@@ -862,12 +862,11 @@ class Mage_Options$Type extends MessageType {
     constructor() {
         super("proto.Mage.Options", [
             { no: 1, name: "armor", kind: "enum", T: () => ["proto.Mage.Options.ArmorType", Mage_Options_ArmorType] },
-            { no: 2, name: "evocation_ticks", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "use_mana_emeralds", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 2, name: "evocation_ticks", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { armor: 0, evocationTicks: 0, useManaEmeralds: false };
+        const message = { armor: 0, evocationTicks: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -883,9 +882,6 @@ class Mage_Options$Type extends MessageType {
                     break;
                 case /* int32 evocation_ticks */ 2:
                     message.evocationTicks = reader.int32();
-                    break;
-                case /* bool use_mana_emeralds */ 3:
-                    message.useManaEmeralds = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -905,9 +901,6 @@ class Mage_Options$Type extends MessageType {
         /* int32 evocation_ticks = 2; */
         if (message.evocationTicks !== 0)
             writer.tag(2, WireType.Varint).int32(message.evocationTicks);
-        /* bool use_mana_emeralds = 3; */
-        if (message.useManaEmeralds !== false)
-            writer.tag(3, WireType.Varint).bool(message.useManaEmeralds);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

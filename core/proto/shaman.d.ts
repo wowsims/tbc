@@ -398,16 +398,6 @@ export interface EnhancementShaman_Options {
      */
     delayOffhandSwings: boolean;
     /**
-     * TODO: Deprecate on 3/21 (1 month). Use consumes main_hand_imbue and off_hand_imbue instead.
-     *
-     * @generated from protobuf field: proto.ShamanWeaponImbue main_hand_imbue = 3;
-     */
-    mainHandImbue: ShamanWeaponImbue;
-    /**
-     * @generated from protobuf field: proto.ShamanWeaponImbue off_hand_imbue = 4;
-     */
-    offHandImbue: ShamanWeaponImbue;
-    /**
      * Indicates the shaman will be dropping an improved strength of earth totem before
      * the fight by snapshotting the T4 2pc bonus.
      *
@@ -494,31 +484,6 @@ export declare enum WaterTotem {
      * @generated from protobuf enum value: ManaSpringTotem = 1;
      */
     ManaSpringTotem = 1
-}
-/**
- * @generated from protobuf enum proto.ShamanWeaponImbue
- */
-export declare enum ShamanWeaponImbue {
-    /**
-     * @generated from protobuf enum value: ImbueNone = 0;
-     */
-    ImbueNone = 0,
-    /**
-     * @generated from protobuf enum value: ImbueFlametongue = 1;
-     */
-    ImbueFlametongue = 1,
-    /**
-     * @generated from protobuf enum value: ImbueFrostbrand = 2;
-     */
-    ImbueFrostbrand = 2,
-    /**
-     * @generated from protobuf enum value: ImbueRockbiter = 3;
-     */
-    ImbueRockbiter = 3,
-    /**
-     * @generated from protobuf enum value: ImbueWindfury = 4;
-     */
-    ImbueWindfury = 4
 }
 declare class ShamanTalents$Type extends MessageType<ShamanTalents> {
     constructor();

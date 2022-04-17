@@ -257,16 +257,6 @@ export interface Hunter_Rotation {
      */
     weave: Hunter_Rotation_WeaveType;
     /**
-     * Deprecate these options on 3/14 (1 month).
-     *
-     * @generated from protobuf field: bool melee_weave = 4;
-     */
-    meleeWeave: boolean;
-    /**
-     * @generated from protobuf field: bool use_raptor_strike = 8;
-     */
-    useRaptorStrike: boolean;
-    /**
      * Time in milliseconds from when the hunter starts moving to when they reengage their ranged autos.
      *
      * @generated from protobuf field: int32 time_to_weave_ms = 9;
