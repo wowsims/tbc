@@ -73,6 +73,11 @@ func (ret *RetributionPaladin) GetPaladin() *paladin.Paladin {
 	return ret.Paladin
 }
 
+func (ret *RetributionPaladin) Init(sim *core.Simulation) {
+	ret.Paladin.Init(sim)
+	ret.DelayCooldownsForArmorDebuffs(sim)
+}
+
 func (ret *RetributionPaladin) Reset(sim *core.Simulation) {
 	ret.Paladin.Reset(sim)
 

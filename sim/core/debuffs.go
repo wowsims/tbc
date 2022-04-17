@@ -56,20 +56,11 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	}
 
 	if debuffs.ExposeArmor != proto.TristateEffect_TristateEffectMissing {
-		talentPoints := GetTristateValueInt32(debuffs.ExposeArmor, 0, 2)
-		if debuffs.DelayedArmorDebuffs {
-			ScheduledExposeArmorAura(target, talentPoints)
-		} else {
-			MakePermanent(ExposeArmorAura(target, talentPoints))
-		}
+		ScheduledExposeArmorAura(target, GetTristateValueInt32(debuffs.ExposeArmor, 0, 2))
 	}
 
 	if debuffs.SunderArmor {
-		if debuffs.DelayedArmorDebuffs {
-			ScheduledSunderArmorAura(target)
-		} else {
-			MakePermanent(SunderArmorAura(target, 5))
-		}
+		ScheduledSunderArmorAura(target)
 	}
 
 	if debuffs.FaerieFire != proto.TristateEffect_TristateEffectMissing {
@@ -361,7 +352,9 @@ func ScheduledSunderArmorAura(target *Target) *Aura {
 			Period:   time.Duration(1.5 * float64(time.Second)),
 			NumTicks: 4,
 			OnAction: func(sim *Simulation) {
-				aura.AddStack(sim)
+				if aura.IsActive() {
+					aura.AddStack(sim)
+				}
 			},
 		})
 	}
@@ -391,7 +384,7 @@ func ScheduledExposeArmorAura(target *Target, talentPoints int32) *Aura {
 	aura.Duration = NeverExpires
 	aura.OnReset = func(aura *Aura, sim *Simulation) {
 		StartPeriodicAction(sim, PeriodicActionOptions{
-			Period:   time.Duration(15.0 * float64(time.Second)),
+			Period:   time.Duration(10.0 * float64(time.Second)),
 			NumTicks: 1,
 			OnAction: func(sim *Simulation) {
 				aura.Activate(sim)

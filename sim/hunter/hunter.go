@@ -134,6 +134,8 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.hardcastOnComplete = func(sim *core.Simulation, _ *core.Target) {
 		hunter.rotation(sim, false)
 	}
+
+	hunter.DelayCooldownsForArmorDebuffs(sim)
 }
 
 func (hunter *Hunter) Reset(sim *core.Simulation) {

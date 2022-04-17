@@ -317,6 +317,10 @@ func (at *auraTracker) GetAurasWithTag(tag string) []*Aura {
 	return at.aurasByTag[tag]
 }
 
+func (at *auraTracker) HasAuraWithTag(tag string) bool {
+	return len(at.aurasByTag[tag]) > 0
+}
+
 func (at *auraTracker) HasActiveAuraWithTag(tag string) bool {
 	for _, aura := range at.aurasByTag[tag] {
 		if aura.active {

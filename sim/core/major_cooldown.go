@@ -226,6 +226,24 @@ func (mcdm *majorCooldownManager) finalize(character *Character) {
 	mcdm.majorCooldowns = make([]*MajorCooldown, len(mcdm.initialMajorCooldowns))
 }
 
+// Adds a delay to the first usage of all CDs so that armor debuffs have time
+// to be applied. MCDs that have a user-specified timing are not delayed.
+//
+// This function should be called from Agent.Init().
+func (mcdm *majorCooldownManager) DelayCooldownsForArmorDebuffs(sim *Simulation) {
+	if !sim.GetPrimaryTarget().HasAuraWithTag(SunderExposeAuraTag) {
+		return
+	}
+
+	const delay = time.Second * 10
+	for i, _ := range mcdm.initialMajorCooldowns {
+		mcd := &mcdm.initialMajorCooldowns[i]
+		if len(mcd.timings) == 0 {
+			mcd.timings = append(mcd.timings, delay)
+		}
+	}
+}
+
 func (mcdm *majorCooldownManager) reset(sim *Simulation) {
 	// Need to create all cooldowns before calling ActivationFactory on any of them,
 	// so that any cooldown can do lookups on other cooldowns.

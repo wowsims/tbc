@@ -138,7 +138,6 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 	  				huntersMark: TristateEffect.TristateEffectImproved,
 	  				exposeWeaknessUptime: 1.0,
 	  				exposeWeaknessHunterAgility: 1000,
-					delayedArmorDebuffs: true,
 				}),
 			},
 
@@ -230,7 +229,6 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.SnapshotBsSolarianSapphire,
-					OtherInputs.DelayedArmorDebuffs,
 				],
 			},
 			encounterPicker: {
