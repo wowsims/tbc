@@ -365,10 +365,6 @@ export interface Debuffs {
      */
     curseOfRecklessness: boolean;
     /**
-     * @generated from protobuf field: bool delayed_armor_debuffs = 18;
-     */
-    delayedArmorDebuffs: boolean;
-    /**
      * @generated from protobuf field: proto.TristateEffect hunters_mark = 15;
      */
     huntersMark: TristateEffect;

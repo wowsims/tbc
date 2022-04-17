@@ -306,22 +306,3 @@ export const SnapshotBsT2 = {
         enableWhen: (party) => party.getBuffs().battleShout > 0,
     },
 };
-export const DelayedArmorDebuffs = {
-    type: 'boolean',
-    getModObject: (simUI) => simUI.sim.encounter.primaryTarget,
-    config: {
-        extraCssClasses: [
-            'delayed-armor-debuffs-picker',
-            'within-raid-sim-hide',
-        ],
-        label: 'Delayed armor debuffs',
-        labelTooltip: 'Model delays in armor debuff applications: 1.5 seconds per Sunder stack, and 15 seconds for EA.',
-        changedEvent: (target) => target.debuffsChangeEmitter,
-        getValue: (target) => target.getDebuffs().delayedArmorDebuffs,
-        setValue: (eventID, target, newValue) => {
-            const newDebuffs = target.getDebuffs();
-            newDebuffs.delayedArmorDebuffs = newValue;
-            target.setDebuffs(eventID, newDebuffs);
-        },
-    },
-};

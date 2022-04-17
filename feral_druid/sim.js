@@ -119,7 +119,6 @@ export class FeralDruidSimUI extends IndividualSimUI {
                     huntersMark: TristateEffect.TristateEffectImproved,
                     exposeWeaknessUptime: 1.0,
                     exposeWeaknessHunterAgility: 1000,
-                    delayedArmorDebuffs: true,
                 }),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
@@ -210,7 +209,6 @@ export class FeralDruidSimUI extends IndividualSimUI {
                     OtherInputs.ExposeWeaknessUptime,
                     OtherInputs.ExposeWeaknessHunterAgility,
                     OtherInputs.SnapshotBsSolarianSapphire,
-                    OtherInputs.DelayedArmorDebuffs,
                 ],
             },
             encounterPicker: {
