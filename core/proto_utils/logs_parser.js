@@ -100,6 +100,7 @@ export class SimLog {
             return DamageDealtLog.parse(params)
                 || ResourceChangedLog.parse(params)
                 || AuraEventLog.parse(params)
+                || AuraStacksChangeLog.parse(params)
                 || MajorCooldownUsedLog.parse(params)
                 || CastBeganLog.parse(params)
                 || CastCompletedLog.parse(params)
@@ -115,6 +116,9 @@ export class SimLog {
     }
     isAuraEvent() {
         return this instanceof AuraEventLog;
+    }
+    isAuraStacksChange() {
+        return this instanceof AuraStacksChangeLog;
     }
     isMajorCooldownUsed() {
         return this instanceof MajorCooldownUsedLog;
@@ -295,6 +299,28 @@ export class AuraEventLog extends SimLog {
                 params.actionId = aura;
                 const event = match[1];
                 return new AuraEventLog(params, event == 'gained', event == 'faded', event == 'refreshed');
+            });
+        }
+        else {
+            return null;
+        }
+    }
+}
+export class AuraStacksChangeLog extends SimLog {
+    constructor(params, oldStacks, newStacks) {
+        super(params);
+        this.oldStacks = oldStacks;
+        this.newStacks = newStacks;
+    }
+    toString() {
+        return `${this.toStringPrefix()} ${this.actionId.name} stacks: ${this.oldStacks} --> ${this.newStacks}.`;
+    }
+    static parse(params) {
+        const match = params.raw.match(/(.*) stacks: ([0-9]+) --> ([0-9]+)/);
+        if (match && match[1]) {
+            return ActionId.fromLogString(match[1]).fill(params.source?.index).then(aura => {
+                params.actionId = aura;
+                return new AuraStacksChangeLog(params, parseInt(match[2]), parseInt(match[3]));
             });
         }
         else {

@@ -38,6 +38,7 @@ export declare class SimLog {
     isDamageDealt(): this is DamageDealtLog;
     isResourceChanged(): this is ResourceChangedLog;
     isAuraEvent(): this is AuraEventLog;
+    isAuraStacksChange(): this is AuraStacksChangeLog;
     isMajorCooldownUsed(): this is MajorCooldownUsedLog;
     isCastBegan(): this is CastBeganLog;
     isCastCompleted(): this is CastCompletedLog;
@@ -83,6 +84,13 @@ export declare class AuraEventLog extends SimLog {
     constructor(params: SimLogParams, isGained: boolean, isFaded: boolean, isRefreshed: boolean);
     toString(): string;
     static parse(params: SimLogParams): Promise<AuraEventLog> | null;
+}
+export declare class AuraStacksChangeLog extends SimLog {
+    readonly oldStacks: number;
+    readonly newStacks: number;
+    constructor(params: SimLogParams, oldStacks: number, newStacks: number);
+    toString(): string;
+    static parse(params: SimLogParams): Promise<AuraStacksChangeLog> | null;
 }
 export declare class AuraUptimeLog extends SimLog {
     readonly gainedAt: number;
