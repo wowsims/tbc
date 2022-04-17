@@ -111,8 +111,7 @@ var castersWithElemental = &proto.Party{
 				Mage: &proto.Mage{
 					Talents: mage.ArcaneTalents,
 					Options: &proto.Mage_Options{
-						Armor:           proto.Mage_Options_MageArmor,
-						UseManaEmeralds: true,
+						Armor: proto.Mage_Options_MageArmor,
 					},
 					Rotation: &proto.Mage_Rotation{
 						Arcane: &proto.Mage_Rotation_ArcaneRotation{
@@ -258,8 +257,6 @@ func BenchmarkSimulate(b *testing.B) {
 										PrimaryShock: proto.EnhancementShaman_Rotation_Frost,
 									},
 									Options: &proto.EnhancementShaman_Options{
-										MainHandImbue:      proto.ShamanWeaponImbue_ImbueWindfury,
-										OffHandImbue:       proto.ShamanWeaponImbue_ImbueWindfury,
 										WaterShield:        true,
 										Bloodlust:          true,
 										DelayOffhandSwings: true,

@@ -609,52 +609,6 @@ export class Player<SpecType extends Spec> {
 
 	fromProto(eventID: EventID, proto: PlayerProto) {
 		TypedEvent.freezeAllAndDo(() => {
-			let rotation = this.specTypeFunctions.rotationFromPlayer(proto);
-			let options = this.specTypeFunctions.optionsFromPlayer(proto);
-
-			// TODO: Remove this on 3/14/2022 (1 month).
-			if (this.spec == Spec.SpecHunter) {
-				const hunterRotation = rotation as SpecRotation<Spec.SpecHunter>;
-				const hunterOptions = options as SpecOptions<Spec.SpecHunter>;
-				if (hunterOptions.petUptime == 0) {
-					hunterOptions.petUptime = 1;
-				}
-				if (hunterRotation.meleeWeave) {
-					hunterRotation.meleeWeave = false;
-					if (hunterRotation.useRaptorStrike) {
-						hunterRotation.weave = WeaveType.WeaveFull;
-					} else {
-						hunterRotation.weave = WeaveType.WeaveAutosOnly;
-					}
-				}
-				options = hunterOptions as SpecOptions<SpecType>;
-				rotation = hunterRotation as SpecRotation<SpecType>;
-			}
-
-			// TODO: Remove this on 3/21 (1 month).
-			if (this.spec == Spec.SpecMage) {
-				const mageOptions = options as SpecOptions<Spec.SpecMage>;
-				if (mageOptions.useManaEmeralds && proto.consumes) {
-					proto.consumes.defaultConjured = Conjured.ConjuredMageManaEmerald;
-					mageOptions.useManaEmeralds = false;
-				}
-				options = mageOptions as SpecOptions<SpecType>;
-			}
-
-			// TODO: Remove this on 3/21 (1 month).
-			if (this.spec == Spec.SpecEnhancementShaman) {
-				const enhOptions = options as SpecOptions<Spec.SpecEnhancementShaman>;
-				if (proto.consumes && enhOptions.mainHandImbue != 0) {
-					proto.consumes.mainHandImbue = 5 + enhOptions.mainHandImbue;
-					enhOptions.mainHandImbue = 0;
-				}
-				if (proto.consumes && enhOptions.offHandImbue != 0) {
-					proto.consumes.offHandImbue = 5 + enhOptions.offHandImbue;
-					enhOptions.offHandImbue = 0;
-				}
-				options = enhOptions as SpecOptions<SpecType>;
-			}
-
 			this.setName(eventID, proto.name);
 			this.setRace(eventID, proto.race);
 			this.setGear(eventID, proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));
@@ -663,9 +617,9 @@ export class Player<SpecType extends Spec> {
 			this.setBuffs(eventID, proto.buffs || IndividualBuffs.create());
 			this.setCooldowns(eventID, proto.cooldowns || Cooldowns.create());
 			this.setTalentsString(eventID, proto.talentsString);
-			this.setRotation(eventID, rotation);
+			this.setRotation(eventID, this.specTypeFunctions.rotationFromPlayer(proto));
 			this.setTalents(eventID, this.specTypeFunctions.talentsFromPlayer(proto));
-			this.setSpecOptions(eventID, options);
+			this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
 		});
 	}
 

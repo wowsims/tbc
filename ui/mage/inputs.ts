@@ -402,16 +402,16 @@ export const MageRotationConfig = {
 	],
 };
 
-function makeBooleanMageBuffInput(id: ActionId, optionsFieldName: keyof MageOptions): IconPickerConfig<Player<any>, boolean> {
-	return {
-		id: id,
-		states: 2,
-		changedEvent: (player: Player<Spec.SpecMage>) => player.specOptionsChangeEmitter,
-		getValue: (player: Player<Spec.SpecMage>) => player.getSpecOptions()[optionsFieldName] as boolean,
-		setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => {
-			const newOptions = player.getSpecOptions();
-			(newOptions[optionsFieldName] as boolean) = newValue;
-			player.setSpecOptions(eventID, newOptions);
-		},
-	}
-}
+//function makeBooleanMageBuffInput(id: ActionId, optionsFieldName: keyof MageOptions): IconPickerConfig<Player<any>, boolean> {
+//	return {
+//		id: id,
+//		states: 2,
+//		changedEvent: (player: Player<Spec.SpecMage>) => player.specOptionsChangeEmitter,
+//		getValue: (player: Player<Spec.SpecMage>) => player.getSpecOptions()[optionsFieldName] as boolean,
+//		setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => {
+//			const newOptions = player.getSpecOptions();
+//			(newOptions[optionsFieldName] as boolean) = newValue;
+//			player.setSpecOptions(eventID, newOptions);
+//		},
+//	}
+//}

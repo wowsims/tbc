@@ -109,14 +109,6 @@ message ShamanTotems {
 		bool recall_totems = 10;
 }
 
-enum ShamanWeaponImbue {
-	ImbueNone = 0;
-	ImbueFlametongue = 1;
-	ImbueFrostbrand = 2;
-	ImbueRockbiter = 3;
-	ImbueWindfury = 4;
-}
-
 message ElementalShaman {
     message Rotation {
 			ShamanTotems totems = 3;
@@ -173,10 +165,6 @@ message EnhancementShaman {
 		bool water_shield = 1;
 		bool bloodlust = 2;
 		bool delay_offhand_swings = 5;
-
-		// TODO: Deprecate on 3/21 (1 month). Use consumes main_hand_imbue and off_hand_imbue instead.
-		ShamanWeaponImbue main_hand_imbue = 3;
-		ShamanWeaponImbue off_hand_imbue = 4;
 
 		// Indicates the shaman will be dropping an improved strength of earth totem before
 		// the fight by snapshotting the T4 2pc bonus.
