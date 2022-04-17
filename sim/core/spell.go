@@ -174,27 +174,11 @@ func (spell *Spell) applyEffects(sim *Simulation, target *Target) {
 	spell.ApplyEffects(sim, target, spell)
 }
 
-func ApplyEffectFuncAll(effectFuncs []ApplySpellEffects) ApplySpellEffects {
-	if len(effectFuncs) == 0 {
-		return nil
-	} else if len(effectFuncs) == 1 {
-		return effectFuncs[0]
-	} else {
-		return func(sim *Simulation, target *Target, spell *Spell) {
-			for _, effectFunc := range effectFuncs {
-				effectFunc(sim, target, spell)
-			}
-		}
-	}
-}
-
 func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
-	effect := &SpellEffect{}
-
 	if baseEffect.BaseDamage.Calculator == nil {
 		// Just a hit check.
 		return func(sim *Simulation, target *Target, spell *Spell) {
-			*effect = baseEffect
+			effect := &baseEffect
 			effect.Target = target
 			effect.init(sim, spell)
 
@@ -204,7 +188,7 @@ func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
 		}
 	} else {
 		return func(sim *Simulation, target *Target, spell *Spell) {
-			*effect = baseEffect
+			effect := &baseEffect
 			effect.Target = target
 			effect.init(sim, spell)
 
@@ -223,13 +207,13 @@ func ApplyEffectFuncDamageMultiple(baseEffects []SpellEffect) ApplySpellEffects 
 	}
 
 	return func(sim *Simulation, _ *Target, spell *Spell) {
-		for i, _ := range baseEffects {
+		for i := range baseEffects {
 			effect := &baseEffects[i]
 			effect.init(sim, spell)
 			damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
 			effect.calcDamageSingle(sim, spell, damage)
 		}
-		for i, _ := range baseEffects {
+		for i := range baseEffects {
 			effect := &baseEffects[i]
 			effect.finalize(sim, spell)
 		}
@@ -243,14 +227,14 @@ func ApplyEffectFuncDamageMultipleTargeted(baseEffects []SpellEffect) ApplySpell
 	}
 
 	return func(sim *Simulation, target *Target, spell *Spell) {
-		for i, _ := range baseEffects {
+		for i := range baseEffects {
 			effect := &baseEffects[i]
 			effect.Target = target
 			effect.init(sim, spell)
 			damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
 			effect.calcDamageSingle(sim, spell, damage)
 		}
-		for i, _ := range baseEffects {
+		for i := range baseEffects {
 			effect := &baseEffects[i]
 			effect.finalize(sim, spell)
 		}
@@ -258,9 +242,9 @@ func ApplyEffectFuncDamageMultipleTargeted(baseEffects []SpellEffect) ApplySpell
 }
 func ApplyEffectFuncAOEDamage(sim *Simulation, baseEffect SpellEffect) ApplySpellEffects {
 	numHits := sim.GetNumTargets()
-	effects := make([]SpellEffect, 0, numHits)
+	effects := make([]SpellEffect, numHits)
 	for i := int32(0); i < numHits; i++ {
-		effects = append(effects, baseEffect)
+		effects[i] = baseEffect
 		effects[i].Target = sim.GetTarget(i)
 	}
 	return ApplyEffectFuncDamageMultiple(effects)

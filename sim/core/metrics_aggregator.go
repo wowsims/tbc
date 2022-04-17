@@ -7,19 +7,9 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-// A unique number based on an ActionID.
-// This works by making item IDs negative to avoid collisions, and assumes
-// there are no collisions with OtherID. Tag adds decimals.
-// Actual key values dont matter, just need something unique and fast to compute.
-type ActionKey float64
-
-func NewActionKey(actionID ActionID) ActionKey {
-	return ActionKey(float64((int32(actionID.OtherID) + actionID.SpellID - actionID.ItemID)) + (float64(actionID.Tag) / 256))
-}
-
 type ResourceKey struct {
-	ActionKey ActionKey
-	Type      proto.ResourceType
+	ActionID ActionID
+	Type     proto.ResourceType
 }
 
 type DistributionMetrics struct {
@@ -74,8 +64,8 @@ type CharacterMetrics struct {
 
 	// Aggregate values. These are updated after each iteration.
 	oomTimeSum float64
-	actions    map[ActionKey]ActionMetrics
-	resources  map[ResourceKey]ResourceMetrics
+	actions    map[ActionID]*ActionMetrics
+	resources  map[ResourceKey]*ResourceMetrics
 }
 
 // Metrics for the current iteration, for 1 agent. Keep this as a separate
@@ -91,8 +81,7 @@ type CharacterIterationMetrics struct {
 }
 
 type ActionMetrics struct {
-	ActionID ActionID
-	IsMelee  bool // True if melee action, false if spell action.
+	IsMelee bool // True if melee action, false if spell action.
 
 	Casts  int32
 	Hits   int32
@@ -109,9 +98,9 @@ type ActionMetrics struct {
 	Threat float64
 }
 
-func (actionMetrics *ActionMetrics) ToProto() *proto.ActionMetrics {
+func (actionMetrics *ActionMetrics) ToProto(actionID ActionID) *proto.ActionMetrics {
 	return &proto.ActionMetrics{
-		Id:      actionMetrics.ActionID.ToProto(),
+		Id:      actionID.ToProto(),
 		IsMelee: actionMetrics.IsMelee,
 
 		Casts:   actionMetrics.Casts,
@@ -131,24 +120,21 @@ func NewCharacterMetrics() CharacterMetrics {
 	return CharacterMetrics{
 		dps:       NewDistributionMetrics(),
 		threat:    NewDistributionMetrics(),
-		actions:   make(map[ActionKey]ActionMetrics),
-		resources: make(map[ResourceKey]ResourceMetrics),
+		actions:   make(map[ActionID]*ActionMetrics),
+		resources: make(map[ResourceKey]*ResourceMetrics),
 	}
 }
 
 type ResourceMetrics struct {
-	ActionID ActionID
-	Type     proto.ResourceType
-
 	Events     int32
 	Gain       float64
 	ActualGain float64
 }
 
-func (resourceMetrics *ResourceMetrics) ToProto() *proto.ResourceMetrics {
+func (resourceMetrics *ResourceMetrics) ToProto(actionID ActionID, resourceType proto.ResourceType) *proto.ResourceMetrics {
 	return &proto.ResourceMetrics{
-		Id:   resourceMetrics.ActionID.ToProto(),
-		Type: resourceMetrics.Type,
+		Id:   actionID.ToProto(),
+		Type: resourceType,
 
 		Events:     resourceMetrics.Events,
 		Gain:       resourceMetrics.Gain,
@@ -157,34 +143,29 @@ func (resourceMetrics *ResourceMetrics) ToProto() *proto.ResourceMetrics {
 }
 
 func (characterMetrics *CharacterMetrics) AddResourceEvent(actionID ActionID, resourceType proto.ResourceType, gain float64, actualGain float64) {
-	actionKey := NewActionKey(actionID)
 	resourceKey := ResourceKey{
-		ActionKey: actionKey,
-		Type:      resourceType,
+		ActionID: actionID,
+		Type:     resourceType,
 	}
 	resourceMetrics, ok := characterMetrics.resources[resourceKey]
 
 	if !ok {
-		resourceMetrics.ActionID = actionID
-		resourceMetrics.Type = resourceType
+		resourceMetrics = &ResourceMetrics{}
+		characterMetrics.resources[resourceKey] = resourceMetrics
 	}
 
 	resourceMetrics.Events++
 	resourceMetrics.Gain += gain
 	resourceMetrics.ActualGain += actualGain
-
-	characterMetrics.resources[resourceKey] = resourceMetrics
 }
 
 // Adds the results of a spell to the character metrics.
 func (characterMetrics *CharacterMetrics) addSpell(spell *Spell) {
-	actionID := spell.ActionID
-	actionKey := NewActionKey(actionID)
-	actionMetrics, ok := characterMetrics.actions[actionKey]
+	actionMetrics, ok := characterMetrics.actions[spell.ActionID]
 
 	if !ok {
-		actionMetrics.ActionID = actionID
-		actionMetrics.IsMelee = spell.SpellExtras.Matches(SpellExtrasMeleeMetrics)
+		actionMetrics = &ActionMetrics{IsMelee: spell.SpellExtras.Matches(SpellExtrasMeleeMetrics)}
+		characterMetrics.actions[spell.ActionID] = actionMetrics
 	}
 
 	actionMetrics.Casts += spell.Casts
@@ -199,8 +180,6 @@ func (characterMetrics *CharacterMetrics) addSpell(spell *Spell) {
 	actionMetrics.Threat += spell.TotalThreat
 	characterMetrics.dps.Total += spell.TotalDamage
 	characterMetrics.threat.Total += spell.TotalThreat
-
-	characterMetrics.actions[actionKey] = actionMetrics
 }
 
 // This should be called at the end of each iteration, to include metrics from Pets in
@@ -235,11 +214,11 @@ func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.Pl
 		SecondsOomAvg: characterMetrics.oomTimeSum / float64(numIterations),
 	}
 
-	for _, action := range characterMetrics.actions {
-		protoMetrics.Actions = append(protoMetrics.Actions, action.ToProto())
+	for actionID, action := range characterMetrics.actions {
+		protoMetrics.Actions = append(protoMetrics.Actions, action.ToProto(actionID))
 	}
-	for _, resource := range characterMetrics.resources {
-		protoMetrics.Resources = append(protoMetrics.Resources, resource.ToProto())
+	for rk, resource := range characterMetrics.resources {
+		protoMetrics.Resources = append(protoMetrics.Resources, resource.ToProto(rk.ActionID, rk.Type))
 	}
 
 	return protoMetrics
