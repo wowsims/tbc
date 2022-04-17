@@ -45,21 +45,14 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 	})
 
 	paladin.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   AvengingWrathActionID,
-		CooldownID: AvengingWrathCD,
-		Cooldown:   cd,
-		Type:       core.CooldownTypeDPS,
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return character.CurrentMana() >= spell.DefaultCast.Cost
 		},
 		// modify this logic if it should ever not be spammed on CD / maybe should synced with other CDs
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, nil)
-			}
 		},
 	})
 }

@@ -289,23 +289,10 @@ func (hunter *Hunter) registerBestialWrathCD() {
 	})
 
 	hunter.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: BestialWrathCooldownID,
-		Cooldown:   cooldown,
-		Type:       core.CooldownTypeDPS,
+		Spell: bwSpell,
+		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if hunter.CurrentMana() < manaCost {
-				return false
-			}
-			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				bwSpell.Cast(sim, nil)
-			}
+			return hunter.CurrentMana() >= manaCost
 		},
 	})
 }
@@ -491,25 +478,11 @@ func (hunter *Hunter) registerReadinessCD() {
 	})
 
 	hunter.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: ReadinessCooldownID,
-		Cooldown:   cooldown,
-		//UsesGCD:    true,
-		Type: core.CooldownTypeDPS,
+		Spell: readinessSpell,
+		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Don't use if there are no cooldowns to reset.
-			if !character.IsOnCD(RapidFireCooldownID, sim.CurrentTime) {
-				return false
-			}
-			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				readinessSpell.Cast(sim, nil)
-			}
+			return character.IsOnCD(RapidFireCooldownID, sim.CurrentTime)
 		},
 	})
 }

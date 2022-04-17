@@ -8,6 +8,9 @@ import (
 )
 
 func (priest *Priest) ApplyTalents() {
+	priest.registerShadowfiendCD()
+	priest.registerPowerInfusionCD()
+
 	priest.setupSurgeOfLight()
 	priest.registerInnerFocus()
 

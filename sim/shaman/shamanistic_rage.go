@@ -47,13 +47,8 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 	})
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   ShamanisticRageActionID,
-		CooldownID: ShamanisticRageCD,
-		Cooldown:   cd,
-		Type:       core.CooldownTypeMana,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
+		Spell: spell,
+		Type:  core.CooldownTypeMana,
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			const manaReserve = 1000 // If mana goes under 1000 we will need more soon. Pop shamanistic rage.
 			if character.CurrentMana() > manaReserve {
@@ -61,11 +56,6 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 			}
 
 			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, nil)
-			}
 		},
 	})
 }

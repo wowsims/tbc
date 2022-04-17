@@ -182,11 +182,8 @@ func (mage *Mage) registerPresenceOfMindCD() {
 	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: PresenceOfMindCooldownID,
-		Cooldown:   cooldown,
-		UsesGCD:    true,
-		Type:       core.CooldownTypeDPS,
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			var manaCost float64
 			if mage.Talents.Pyroblast {
@@ -206,14 +203,6 @@ func (mage *Mage) registerPresenceOfMindCD() {
 			}
 
 			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, nil)
-			}
 		},
 	})
 }
@@ -252,21 +241,8 @@ func (mage *Mage) registerArcanePowerCD() {
 	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: ArcanePowerCooldownID,
-		Cooldown:   time.Minute * 3,
-		Type:       core.CooldownTypeDPS,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, nil)
-			}
-		},
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
 	})
 }
 
@@ -359,20 +335,10 @@ func (mage *Mage) registerCombustionCD() {
 	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: CombustionCooldownID,
-		Cooldown:   time.Minute * 3,
-		Type:       core.CooldownTypeDPS,
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return !aura.IsActive()
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, nil)
-			}
 		},
 	})
 }
@@ -417,10 +383,8 @@ func (mage *Mage) registerIcyVeinsCD() {
 	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: IcyVeinsCooldownID,
-		Cooldown:   time.Minute * 3,
-		Type:       core.CooldownTypeDPS,
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Need to check for icy veins already active in case Cold Snap is used right after.
 			if icyVeinsAura.IsActive() {
@@ -432,14 +396,6 @@ func (mage *Mage) registerIcyVeinsCD() {
 			}
 
 			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, nil)
-			}
 		},
 	})
 }
@@ -468,16 +424,11 @@ func (mage *Mage) registerColdSnapCD() {
 	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: ColdSnapCooldownID,
-		Cooldown:   cooldown,
-		Type:       core.CooldownTypeDPS,
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Don't use if there are no cooldowns to reset.
-			if !character.IsOnCD(IcyVeinsCooldownID, sim.CurrentTime) && !character.IsOnCD(SummonWaterElementalCooldownID, sim.CurrentTime) {
-				return false
-			}
-			return true
+			return character.IsOnCD(IcyVeinsCooldownID, sim.CurrentTime) || character.IsOnCD(SummonWaterElementalCooldownID, sim.CurrentTime)
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Ideally wait for both water ele and icy veins so we can reset both.
@@ -489,11 +440,6 @@ func (mage *Mage) registerColdSnapCD() {
 			}
 
 			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, nil)
-			}
 		},
 	})
 }

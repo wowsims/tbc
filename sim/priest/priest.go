@@ -118,10 +118,6 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) 
 		},
 	})
 
-	priest.registerShadowfiendCD()
-
-	priest.registerPowerInfusionCD()
-
 	return priest
 }
 

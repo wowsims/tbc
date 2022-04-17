@@ -8,6 +8,7 @@ import (
 )
 
 func (druid *Druid) ApplyTalents() {
+	druid.registerInnervateCD()
 	druid.setupNaturesGrace()
 	druid.registerNaturesSwiftnessCD()
 
@@ -193,24 +194,11 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 	})
 
 	druid.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: NaturesSwiftnessCooldownID,
-		Cooldown:   time.Minute * 3,
-		Type:       core.CooldownTypeDPS,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Don't use NS unless we're casting a full-length starfire or wrath.
-			if character.HasTemporarySpellCastSpeedIncrease() {
-				return false
-			}
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, nil)
-			}
+			return !character.HasTemporarySpellCastSpeedIncrease()
 		},
 	})
 }

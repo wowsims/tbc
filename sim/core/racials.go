@@ -95,21 +95,8 @@ func applyRaceEffects(agent Agent) {
 			})
 
 			character.AddMajorCooldown(MajorCooldown{
-				ActionID:   actionID,
-				CooldownID: OrcBloodFuryCooldownID,
-				Cooldown:   cd,
-				Type:       CooldownTypeDPS,
-				CanActivate: func(sim *Simulation, character *Character) bool {
-					return true
-				},
-				ShouldActivate: func(sim *Simulation, character *Character) bool {
-					return true
-				},
-				ActivationFactory: func(sim *Simulation) CooldownActivation {
-					return func(sim *Simulation, character *Character) {
-						spell.Cast(sim, nil)
-					}
-				},
+				Spell: spell,
+				Type:  CooldownTypeDPS,
 			})
 		})
 
@@ -208,10 +195,8 @@ func applyRaceEffects(agent Agent) {
 		})
 
 		character.AddMajorCooldown(MajorCooldown{
-			ActionID:   actionID,
-			CooldownID: TrollBerserkingCooldownID,
-			Cooldown:   cd,
-			Type:       CooldownTypeDPS,
+			Spell: berserkingSpell,
+			Type:  CooldownTypeDPS,
 			CanActivate: func(sim *Simulation, character *Character) bool {
 				if character.Class == proto.Class_ClassRogue {
 					return character.CurrentEnergy() >= cost
@@ -219,14 +204,6 @@ func applyRaceEffects(agent Agent) {
 					return character.CurrentRage() >= cost
 				} else {
 					return character.CurrentMana() >= cost
-				}
-			},
-			ShouldActivate: func(sim *Simulation, character *Character) bool {
-				return true
-			},
-			ActivationFactory: func(sim *Simulation) CooldownActivation {
-				return func(sim *Simulation, character *Character) {
-					berserkingSpell.Cast(sim, nil)
 				}
 			},
 		})

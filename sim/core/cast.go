@@ -39,6 +39,12 @@ type CastConfig struct {
 	// Note that the GCD CD will be activated even if this is not set.
 	Cooldown time.Duration
 
+	// Secondary cooldown ID, used for shared cooldowns.
+	SharedCooldownID CooldownID
+
+	// Duration of secondary cooldown.
+	SharedCooldown time.Duration
+
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete func(*Simulation, *Spell)
 	AfterCast      func(*Simulation, *Spell)
@@ -74,7 +80,8 @@ func (spell *Spell) makeCastFunc(config CastConfig, onCastComplete CastFunc) Cas
 			spell.wrapCastFuncHaste(config,
 				spell.wrapCastFuncGCD(config,
 					spell.wrapCastFuncCooldown(config,
-						spell.makeCastFuncWait(config, onCastComplete))))))
+						spell.wrapCastFuncSharedCooldown(config,
+							spell.makeCastFuncWait(config, onCastComplete)))))))
 }
 
 func (spell *Spell) ApplyCostModifiers(cost float64) float64 {
@@ -219,6 +226,31 @@ func (spell *Spell) wrapCastFuncCooldown(config CastConfig, onCastComplete CastF
 		}
 
 		spell.Character.SetCD(spell.ActionID.CooldownID, sim.CurrentTime+spell.CurCast.CastTime+cooldownDur)
+
+		onCastComplete(sim, target)
+	}
+}
+
+func (spell *Spell) wrapCastFuncSharedCooldown(config CastConfig, onCastComplete CastFunc) CastFunc {
+	if config.SharedCooldown != 0 && config.SharedCooldownID == 0 {
+		panic("SharedCooldown specified but no SharedCooldownID!")
+	}
+
+	if config.SharedCooldown == 0 {
+		return onCastComplete
+	}
+
+	// Store separately so the lambda doesn't capture the entire config.
+	cooldownDur := config.SharedCooldown
+	cooldownID := config.SharedCooldownID
+
+	return func(sim *Simulation, target *Target) {
+		// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
+		if spell.Character.IsOnCD(cooldownID, sim.CurrentTime) {
+			panic(fmt.Sprintf("Trying to cast %s but is still on shared cooldown for %s", spell.ActionID, spell.Character.GetRemainingCD(cooldownID, sim.CurrentTime)))
+		}
+
+		spell.Character.SetCD(cooldownID, sim.CurrentTime+spell.CurCast.CastTime+cooldownDur)
 
 		onCastComplete(sim, target)
 	}

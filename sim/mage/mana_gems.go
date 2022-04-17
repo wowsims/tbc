@@ -70,11 +70,9 @@ func (mage *Mage) registerManaGemsCD() {
 	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   core.MageManaGemMCDActionID,
-		CooldownID: core.ConjuredCooldownID,
-		Cooldown:   time.Minute * 2,
-		Priority:   core.CooldownPriorityDefault,
-		Type:       core.CooldownTypeMana,
+		Spell:    spell,
+		Priority: core.CooldownPriorityDefault,
+		Type:     core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return remainingManaGems != 0
 		},
@@ -90,11 +88,6 @@ func (mage *Mage) registerManaGemsCD() {
 			}
 
 			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				spell.Cast(sim, nil)
-			}
 		},
 	})
 }

@@ -30,24 +30,11 @@ func (rogue *Rogue) registerThistleTeaCD() {
 	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: core.ConjuredCooldownID,
-		Cooldown:   cooldown,
-		Type:       core.CooldownTypeDPS,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
+		Spell: thistleTeaSpell,
+		Type:  core.CooldownTypeDPS,
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Make sure we have plenty of room so we dont energy cap right after using.
-			if rogue.CurrentEnergy() > 40 {
-				return false
-			}
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				thistleTeaSpell.Cast(sim, nil)
-			}
+			return rogue.CurrentEnergy() <= 40
 		},
 	})
 }

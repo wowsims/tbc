@@ -45,21 +45,11 @@ func (hunter *Hunter) registerRapidFireCD() {
 	})
 
 	hunter.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: RapidFireCooldownID,
-		Cooldown:   cooldown,
-		Type:       core.CooldownTypeDPS,
+		Spell: rfSpell,
+		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Make sure we don't reuse after a Readiness cast.
 			return !rfAura.IsActive()
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				rfSpell.Cast(sim, nil)
-			}
 		},
 	})
 }

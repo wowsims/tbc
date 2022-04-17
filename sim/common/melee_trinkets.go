@@ -134,7 +134,7 @@ func ApplyCrystalforgedTrinket(agent core.Agent) {
 }
 
 var BadgeOfTheSwarmguardCooldownID = core.NewCooldownID()
-var BadgeOfTheSwarmguardActionID = core.ActionID{ItemID: 21670}
+var BadgeOfTheSwarmguardActionID = core.ActionID{ItemID: 21670, CooldownID: BadgeOfTheSwarmguardCooldownID}
 
 func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 	character := agent.GetCharacter()
@@ -149,49 +149,49 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 		},
 	})
 
-	character.AddMajorCooldown(core.MajorCooldown{
-		ActionID:         BadgeOfTheSwarmguardActionID,
-		CooldownID:       BadgeOfTheSwarmguardCooldownID,
-		Cooldown:         time.Minute * 3,
-		SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-		Type:             core.CooldownTypeDPS,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
+	ppmm := character.AutoAttacks.NewPPMManager(10.0)
+	activeAura := character.RegisterAura(core.Aura{
+		Label:    "Badge of the Swarmguard",
+		ActionID: BadgeOfTheSwarmguardActionID,
+		Duration: time.Second * 30,
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			procAura.Deactivate(sim)
 		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			ppmm := character.AutoAttacks.NewPPMManager(10.0)
-			activeAura := character.GetOrRegisterAura(core.Aura{
-				Label:    "Badge of the Swarmguard",
-				ActionID: BadgeOfTheSwarmguardActionID,
-				Duration: time.Second * 30,
-				OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-					procAura.Deactivate(sim)
-				},
-				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						return
-					}
-					if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-						return
-					}
-
-					if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Badge of the Swarmguard") {
-						return
-					}
-
-					procAura.Activate(sim)
-					procAura.AddStack(sim)
-				},
-			})
-
-			return func(sim *core.Simulation, character *core.Character) {
-				activeAura.Activate(sim)
-				character.SetCD(BadgeOfTheSwarmguardCooldownID, sim.CurrentTime+time.Minute*3)
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() {
+				return
 			}
+			if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+
+			if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Badge of the Swarmguard") {
+				return
+			}
+
+			procAura.Activate(sim)
+			procAura.AddStack(sim)
 		},
+	})
+
+	spell := character.RegisterSpell(core.SpellConfig{
+		ActionID: BadgeOfTheSwarmguardActionID,
+
+		Cast: core.CastConfig{
+			Cooldown:         time.Minute * 3,
+			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
+			SharedCooldown:   time.Second * 30,
+			DisableCallbacks: true,
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			activeAura.Activate(sim)
+		},
+	})
+
+	character.AddMajorCooldown(core.MajorCooldown{
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
 	})
 }
 

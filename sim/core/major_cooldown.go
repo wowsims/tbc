@@ -36,6 +36,9 @@ type CooldownActivation func(*Simulation, *Character)
 type CooldownActivationFactory func(*Simulation) CooldownActivation
 
 type MajorCooldown struct {
+	// Spell that is cast when this MCD is activated.
+	Spell *Spell
+
 	// Unique ID for this cooldown, used to look it up.
 	ActionID
 
@@ -250,12 +253,37 @@ func (mcdm *majorCooldownManager) AddMajorCooldown(mcd MajorCooldown) {
 		panic("Major cooldowns may not be added once finalized!")
 	}
 
+	spell := mcd.Spell
+	if spell != nil {
+		mcd.ActionID = spell.ActionID
+		mcd.CooldownID = spell.ActionID.CooldownID
+		mcd.Cooldown = spell.Cooldown
+		mcd.SharedCooldownID = spell.SharedCooldownID
+		mcd.SharedCooldown = spell.SharedCooldown
+		mcd.UsesGCD = spell.DefaultCast.GCD > 0
+		mcd.CastTime = spell.DefaultCast.CastTime
+		if mcd.ActivationFactory == nil {
+			mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
+				return func(sim *Simulation, character *Character) {
+					spell.Cast(sim, sim.GetPrimaryTarget())
+				}
+			}
+		}
+	}
+
 	if mcd.IsEmptyAction() {
 		panic("Major cooldown must have an ActionID!")
 	}
 
-	if mcd.CanActivate == nil || mcd.ShouldActivate == nil {
-		panic("Major cooldown must provide CanActivate and ShouldActivate callbacks!")
+	if mcd.CanActivate == nil {
+		mcd.CanActivate = func(sim *Simulation, character *Character) bool {
+			return true
+		}
+	}
+	if mcd.ShouldActivate == nil {
+		mcd.ShouldActivate = func(sim *Simulation, character *Character) bool {
+			return true
+		}
 	}
 
 	mcdm.initialMajorCooldowns = append(mcdm.initialMajorCooldowns, mcd)
@@ -380,15 +408,26 @@ func RegisterTemporaryStatsOnUseCD(agent Agent, auraLabel string, tempStats stat
 	mcd.ShouldActivate = func(sim *Simulation, character *Character) bool { return true }
 	mcd.Type = CooldownTypeDPS
 
-	aura := agent.GetCharacter().NewTemporaryStatsAura(auraLabel, mcd.ActionID, tempStats, duration)
+	character := agent.GetCharacter()
+	mcd.ActionID.CooldownID = mcd.CooldownID
+	aura := character.NewTemporaryStatsAura(auraLabel, mcd.ActionID, tempStats, duration)
+
+	spell := character.RegisterSpell(SpellConfig{
+		ActionID: mcd.ActionID,
+		Cast: CastConfig{
+			Cooldown:         mcd.Cooldown,
+			SharedCooldownID: mcd.SharedCooldownID,
+			SharedCooldown:   mcd.SharedCooldown,
+			DisableCallbacks: true,
+		},
+		ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+			aura.Activate(sim)
+		},
+	})
 
 	mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
 		return func(sim *Simulation, character *Character) {
-			aura.Activate(sim)
-			character.SetCD(mcd.CooldownID, sim.CurrentTime+mcd.Cooldown)
-			if mcd.SharedCooldownID != 0 {
-				character.SetCD(mcd.SharedCooldownID, sim.CurrentTime+mcd.SharedCooldown)
-			}
+			spell.Cast(sim, nil)
 		}
 	}
 

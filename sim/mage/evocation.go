@@ -10,7 +10,6 @@ var EvocationCooldownID = core.NewCooldownID()
 
 func (mage *Mage) registerEvocationCD() {
 	cooldown := time.Minute * 8
-	manaThreshold := 0.0
 	actionID := core.ActionID{SpellID: 12051, CooldownID: EvocationCooldownID}
 
 	maxTicks := int32(4)
@@ -25,6 +24,11 @@ func (mage *Mage) registerEvocationCD() {
 
 	channelTime := time.Duration(numTicks) * time.Second * 2
 	manaPerTick := 0.0
+	manaThreshold := 0.0
+	mage.RegisterResetEffect(func(_ *core.Simulation) {
+		manaPerTick = mage.MaxMana() * 0.15
+		manaThreshold = mage.MaxMana() * 0.2
+	})
 
 	evocationSpell := mage.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
@@ -53,14 +57,8 @@ func (mage *Mage) registerEvocationCD() {
 	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: EvocationCooldownID,
-		Cooldown:   cooldown,
-		UsesGCD:    true,
-		Type:       core.CooldownTypeMana,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
+		Spell: evocationSpell,
+		Type:  core.CooldownTypeMana,
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if character.HasActiveAuraWithTag(core.InnervateAuraTag) || character.HasActiveAuraWithTag(core.ManaTideTotemAuraTag) {
 				return false
@@ -80,14 +78,6 @@ func (mage *Mage) registerEvocationCD() {
 			}
 
 			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			manaPerTick = mage.MaxMana() * 0.15
-			manaThreshold = mage.MaxMana() * 0.2
-
-			return func(sim *core.Simulation, character *core.Character) {
-				evocationSpell.Cast(sim, nil)
-			}
 		},
 	})
 }
