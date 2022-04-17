@@ -341,6 +341,10 @@ export interface Debuffs {
      */
     bloodFrenzy: boolean;
     /**
+     * @generated from protobuf field: bool gift_of_arthas = 17;
+     */
+    giftOfArthas: boolean;
+    /**
      * @generated from protobuf field: bool mangle = 16;
      */
     mangle: boolean;
@@ -360,6 +364,10 @@ export interface Debuffs {
      * @generated from protobuf field: bool curse_of_recklessness = 12;
      */
     curseOfRecklessness: boolean;
+    /**
+     * @generated from protobuf field: bool delayed_armor_debuffs = 18;
+     */
+    delayedArmorDebuffs: boolean;
     /**
      * @generated from protobuf field: proto.TristateEffect hunters_mark = 15;
      */

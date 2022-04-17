@@ -61,6 +61,7 @@ export declare const FaerieFire: IndividualSimIconPickerConfig<Target, number>;
 export declare const ExposeArmor: IndividualSimIconPickerConfig<Target, number>;
 export declare const SunderArmor: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const WintersChill: IndividualSimIconPickerConfig<Target, boolean>;
+export declare const GiftOfArthas: IndividualSimIconPickerConfig<Target, boolean>;
 export declare const SuperSapper: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const GoblinSapper: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const KiblersBits: IndividualSimIconPickerConfig<Player<any>, boolean>;

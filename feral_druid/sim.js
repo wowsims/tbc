@@ -111,6 +111,7 @@ export class FeralDruidSimUI extends IndividualSimUI {
                     judgementOfWisdom: true,
                     improvedSealOfTheCrusader: true,
                     bloodFrenzy: true,
+                    giftOfArthas: true,
                     exposeArmor: TristateEffect.TristateEffectImproved,
                     faerieFire: TristateEffect.TristateEffectImproved,
                     sunderArmor: true,
@@ -118,6 +119,7 @@ export class FeralDruidSimUI extends IndividualSimUI {
                     huntersMark: TristateEffect.TristateEffectImproved,
                     exposeWeaknessUptime: 1.0,
                     exposeWeaknessHunterAgility: 1000,
+                    delayedArmorDebuffs: true,
                 }),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
@@ -159,6 +161,7 @@ export class FeralDruidSimUI extends IndividualSimUI {
                 IconInputs.FaerieFire,
                 IconInputs.ExposeArmor,
                 IconInputs.SunderArmor,
+                IconInputs.GiftOfArthas,
             ],
             // Which options are selectable in the 'Consumes' section.
             consumeOptions: {
@@ -207,6 +210,7 @@ export class FeralDruidSimUI extends IndividualSimUI {
                     OtherInputs.ExposeWeaknessUptime,
                     OtherInputs.ExposeWeaknessHunterAgility,
                     OtherInputs.SnapshotBsSolarianSapphire,
+                    OtherInputs.DelayedArmorDebuffs,
                 ],
             },
             encounterPicker: {

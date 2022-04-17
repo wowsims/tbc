@@ -170,3 +170,15 @@ export declare const SnapshotBsT2: {
         enableWhen: (party: Party) => boolean;
     };
 };
+export declare const DelayedArmorDebuffs: {
+    type: "boolean";
+    getModObject: (simUI: IndividualSimUI<any>) => Target;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (target: Target) => TypedEvent<void>;
+        getValue: (target: Target) => boolean;
+        setValue: (eventID: EventID, target: Target, newValue: boolean) => void;
+    };
+};
