@@ -170,6 +170,8 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 		enh.scheduler.ScheduleMCD(sim, enh.GetCharacter(), core.DrumsOfBattleActionID)
 	} else if enh.Consumes.Drums == proto.Drums_DrumsOfRestoration {
 		enh.scheduler.ScheduleMCD(sim, enh.GetCharacter(), core.DrumsOfRestorationActionID)
+	} else if enh.Consumes.Drums == proto.Drums_DrumsOfWar {
+		enh.scheduler.ScheduleMCD(sim, enh.GetCharacter(), core.DrumsOfWarActionID)
 	}
 	enh.scheduler.ScheduleMCD(sim, enh.GetCharacter(), enh.BloodlustActionID())
 
