@@ -72,11 +72,11 @@ export const DefaultFrostRotation = MageRotation.create({
 
 export const DefaultFrostOptions = MageOptions.create({
 	armor: ArmorType.MageArmor,
-	useManaEmeralds: true,
 });
 
 export const DefaultFrostConsumes = Consumes.create({
 	defaultPotion: Potions.SuperManaPotion,
+	defaultConjured: Conjured.ConjuredMageManaEmerald,
 	flask: Flask.FlaskOfPureDeath,
 	food: Food.FoodBlackenedBasilisk,
 	mainHandImbue: WeaponImbue.WeaponImbueBrilliantWizardOil,
@@ -94,11 +94,11 @@ export const DefaultArcaneRotation = MageRotation.create({
 
 export const DefaultArcaneOptions = MageOptions.create({
 	armor: ArmorType.MageArmor,
-	useManaEmeralds: true,
 });
 
 export const DefaultArcaneConsumes = Consumes.create({
 	defaultPotion: Potions.SuperManaPotion,
+	defaultConjured: Conjured.ConjuredMageManaEmerald,
 	flask: Flask.FlaskOfBlindingLight,
 	food: Food.FoodBlackenedBasilisk,
 	mainHandImbue: WeaponImbue.WeaponImbueBrilliantWizardOil,

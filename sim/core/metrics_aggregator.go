@@ -293,7 +293,11 @@ func GetActionDPS(playerMetrics proto.PlayerMetrics, iterations int32, duration 
 func GetActionAvgCast(playerMetrics proto.PlayerMetrics, actionID ActionID) float64 {
 	for _, action := range playerMetrics.Actions {
 		if actionID.SameAction(ProtoToActionID(*action.Id)) {
-			return action.Damage / float64(action.Casts)
+			if action.Casts == 0 {
+				return 0
+			} else {
+				return action.Damage / float64(action.Casts)
+			}
 		}
 	}
 	return 0
