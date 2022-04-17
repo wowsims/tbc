@@ -242,8 +242,9 @@ var DrumsAuraTag = "Drums"
 var DrumsCooldownID = NewCooldownID()
 
 const DrumsCD = time.Minute * 2 // Tinnitus
-var DrumsOfBattleActionID = ActionID{SpellID: 35476}
-var DrumsOfRestorationActionID = ActionID{SpellID: 35478}
+var DrumsOfBattleActionID = ActionID{SpellID: 351355}
+var DrumsOfRestorationActionID = ActionID{SpellID: 351358}
+var DrumsOfWarActionID = ActionID{SpellID: 351360}
 
 // Adds drums as a major cooldown to the character, if it's being used.
 func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Consumes) {
@@ -284,6 +285,9 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 	} else if drumsType == proto.Drums_DrumsOfRestoration {
 		actionID = DrumsOfRestorationActionID
 		cooldownType = CooldownTypeMana
+	} else if drumsType == proto.Drums_DrumsOfWar {
+		actionID = DrumsOfWarActionID
+		cooldownType = CooldownTypeDPS
 	} else {
 		return
 	}
@@ -371,6 +375,27 @@ func makeDrumsAura(character *Character, drumsType proto.Drums) *Aura {
 		}
 
 		return character.NewTemporaryStatsAuraWrapped("Drums of Restoration", DrumsOfRestorationActionID, stats.Stats{stats.MP5: mp5Bonus}, time.Second*15, func(aura *Aura) {
+			oldOnGain := aura.OnGain
+			aura.OnGain = func(aura *Aura, sim *Simulation) {
+				oldOnGain(aura, sim)
+				character.SetCD(DrumsCooldownID, sim.CurrentTime+DrumsCD)
+
+				for i, petAgent := range character.Party.Pets {
+					pet := petAgent.GetPet()
+					if pet.IsEnabled() {
+						petAuras[i].Activate(sim)
+					}
+				}
+			}
+		})
+	} else if drumsType == proto.Drums_DrumsOfWar {
+		petAuras := []*Aura{}
+		for _, petAgent := range character.Party.Pets {
+			pet := petAgent.GetPet()
+			petAuras = append(petAuras, pet.NewTemporaryStatsAura("Drums of War", DrumsOfWarActionID, stats.Stats{stats.AttackPower: 60, stats.RangedAttackPower: 60, stats.SpellPower: 30}, time.Second*30))
+		}
+
+		return character.NewTemporaryStatsAuraWrapped("Drums of War", DrumsOfWarActionID, stats.Stats{stats.AttackPower: 60, stats.RangedAttackPower: 60, stats.SpellPower: 30}, time.Second*30, func(aura *Aura) {
 			oldOnGain := aura.OnGain
 			aura.OnGain = func(aura *Aura, sim *Simulation) {
 				oldOnGain(aura, sim)

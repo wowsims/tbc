@@ -203,6 +203,7 @@ enum Drums {
 	DrumsUnknown = 0;
 	DrumsOfBattle = 1;
 	DrumsOfRestoration = 2;
+	DrumsOfWar = 3;
 }
 
 enum Explosive {

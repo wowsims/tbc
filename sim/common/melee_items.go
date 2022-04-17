@@ -113,7 +113,7 @@ func ApplyEmpyreanDemolisher(agent core.Agent) {
 
 	procAura := character.NewTemporaryStatsAura("Empyrean Demolisher Proc", core.ActionID{ItemID: 17112}, stats.Stats{stats.MeleeHaste: 212}, time.Second*10)
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Empyrean Demolisher",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -138,7 +138,7 @@ func ApplyKhoriumChampion(agent core.Agent) {
 	const procChance = 0.5 * 3.3 / 60.0
 	procAura := character.NewTemporaryStatsAura("Khorium Champion Proc", core.ActionID{ItemID: 23541}, stats.Stats{stats.Strength: 120}, time.Second*30)
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Khorium Champion",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -170,7 +170,7 @@ func ApplyBlackoutTruncheon(agent core.Agent) {
 	const procChance = 1.5 * 0.8 / 60.0
 	procAura := character.NewTemporaryStatsAura("Blackout Truncheon Proc", core.ActionID{ItemID: 27901}, stats.Stats{stats.MeleeHaste: 132}, time.Second*10)
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Blackout Truncheon",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -196,7 +196,7 @@ func ApplyLionheartChampion(agent core.Agent) {
 	const procChance = 3.6 / 60.0
 	procAura := character.NewTemporaryStatsAura("Lionheart Champion Proc", core.ActionID{ItemID: 28429}, stats.Stats{stats.Strength: 100}, time.Second*10)
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Lionheart Champion",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -222,7 +222,7 @@ func ApplyLionheartExecutioner(agent core.Agent) {
 	const procChance = 3.6 / 60.0
 	procAura := character.NewTemporaryStatsAura("Lionheart Executioner Proc", core.ActionID{ItemID: 28430}, stats.Stats{stats.Strength: 100}, time.Second*10)
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Lionheart Executioner",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -249,7 +249,7 @@ func ApplyDrakefistHammer(agent core.Agent) {
 	const procChance = 2.7 / 60.0
 	procAura := character.NewTemporaryStatsAura("Drakefist Hammer Proc", core.ActionID{ItemID: 28437}, stats.Stats{stats.MeleeHaste: 212}, time.Second*10)
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Drakefist Hammer",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -276,7 +276,7 @@ func ApplyDragonmaw(agent core.Agent) {
 	const procChance = 2.7 / 60.0
 	procAura := character.NewTemporaryStatsAura("Dragonmaw Proc", core.ActionID{ItemID: 28438}, stats.Stats{stats.MeleeHaste: 212}, time.Second*10)
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Dragonmaw",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -303,7 +303,7 @@ func ApplyDragonstrike(agent core.Agent) {
 	const procChance = 2.7 / 60.0
 	procAura := character.NewTemporaryStatsAura("Dragonstrike Proc", core.ActionID{ItemID: 28439}, stats.Stats{stats.MeleeHaste: 212}, time.Second*10)
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Dragonstrike",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -326,7 +326,7 @@ func ApplyDespair(agent core.Agent) {
 	character := agent.GetCharacter()
 	actionID := core.ActionID{SpellID: 34580}
 
-	procSpell := character.RegisterSpell(core.SpellConfig{
+	procSpell := character.GetOrRegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasIgnoreResists,
@@ -344,7 +344,7 @@ func ApplyDespair(agent core.Agent) {
 	})
 
 	const procChance = 0.5 * 3.5 / 60.0
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Despair",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -370,7 +370,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 	character := agent.GetCharacter()
 	actionID := core.ActionID{ItemID: 28767, CooldownID: TheDecapitatorCooldownID}
 
-	spell := character.RegisterSpell(core.SpellConfig{
+	spell := character.GetOrRegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasIgnoreResists,
@@ -403,7 +403,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 func ApplyGlaiveOfThePit(agent core.Agent) {
 	character := agent.GetCharacter()
 
-	procSpell := character.RegisterSpell(core.SpellConfig{
+	procSpell := character.GetOrRegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 34696},
 		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
@@ -419,7 +419,7 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 	const hasteBonus = 212.0
 	const procChance = 3.7 / 60.0
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Glaive of the Pit",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -447,7 +447,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 	var icd core.InternalCD
 	const icdDur = time.Second * 60
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Band of the Eternal Champion",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -478,7 +478,7 @@ func ApplyTheBladefist(agent core.Agent) {
 	const procChance = 2.7 / 60.0
 	procAura := character.NewTemporaryStatsAura("The Bladefist Proc", core.ActionID{ItemID: 29348}, stats.Stats{stats.MeleeHaste: 180}, time.Second*10)
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "The Bladefist",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -505,7 +505,7 @@ func ApplyHeartrazor(agent core.Agent) {
 	procAura := character.NewTemporaryStatsAura("Heartrazor Proc", core.ActionID{ItemID: 29962}, stats.Stats{stats.AttackPower: 270, stats.RangedAttackPower: 270}, time.Second*10)
 	ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Heartrazor",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -533,7 +533,7 @@ func ApplyRodOfTheSunKing(agent core.Agent) {
 	const procChance = 2.7 / 60.0
 	actionID := core.ActionID{ItemID: 29996}
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Rod of the Sun King",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -595,7 +595,7 @@ func ApplyWarpSlicer(agent core.Agent) {
 	const inverseBonus = 1 / 1.2
 	const procChance = 0.5
 
-	procAura := character.RegisterAura(core.Aura{
+	procAura := character.GetOrRegisterAura(core.Aura{
 		Label:    "Warp Slicer Proc",
 		ActionID: core.ActionID{ItemID: 30311},
 		Duration: time.Second * 30,
@@ -607,7 +607,7 @@ func ApplyWarpSlicer(agent core.Agent) {
 		},
 	})
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Warp Slicer",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -633,7 +633,7 @@ func ApplyDevastation(agent core.Agent) {
 	const inverseBonus = 1 / 1.2
 	const procChance = 0.5
 
-	procAura := character.RegisterAura(core.Aura{
+	procAura := character.GetOrRegisterAura(core.Aura{
 		Label:    "Devastation Proc",
 		ActionID: core.ActionID{ItemID: 30316},
 		Duration: time.Second * 30,
@@ -645,7 +645,7 @@ func ApplyDevastation(agent core.Agent) {
 		},
 	})
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Devastation",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -669,7 +669,7 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 	mh, oh := character.GetWeaponHands(31193)
 	procMask := core.GetMeleeProcMaskForHands(mh, oh)
 
-	procSpell := character.RegisterSpell(core.SpellConfig{
+	procSpell := character.GetOrRegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{ItemID: 31193},
 		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
@@ -683,7 +683,7 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 	})
 
 	const procChance = 0.02
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Blade of Unquenched Thirst",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -708,7 +708,7 @@ func ApplySingingCrystalAxe(agent core.Agent) {
 	const procChance = 3.5 / 60.0
 	procAura := character.NewTemporaryStatsAura("Singing Crystal Axe Proc", core.ActionID{ItemID: 31318}, stats.Stats{stats.MeleeHaste: 400}, time.Second*10)
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Singing Crystal Axe",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -744,7 +744,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 	var icd core.InternalCD
 	icdDur := time.Millisecond * 1
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Blinkstrike",
 		Duration: core.NeverExpires,
 		OnInit: func(aura *core.Aura, sim *core.Simulation) {
@@ -783,7 +783,7 @@ func ApplyTheNightBlade(agent core.Agent) {
 	mh, oh := character.GetWeaponHands(31331)
 	procMask := core.GetMeleeProcMaskForHands(mh, oh)
 
-	procAura := character.RegisterAura(core.Aura{
+	procAura := character.GetOrRegisterAura(core.Aura{
 		Label:     "The Night Blade Proc",
 		ActionID:  core.ActionID{ItemID: 31331},
 		Duration:  time.Second * 10,
@@ -794,7 +794,7 @@ func ApplyTheNightBlade(agent core.Agent) {
 	})
 
 	const procChance = 2 * 1.8 / 60.0
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "The Night Blade",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -825,7 +825,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		ppmm.SetProcChance(false, 0)
 	}
 
-	procSpell := character.RegisterSpell(core.SpellConfig{
+	procSpell := character.GetOrRegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 40291},
 		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
@@ -838,7 +838,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		}),
 	})
 
-	procAura := character.RegisterAura(core.Aura{
+	procAura := character.GetOrRegisterAura(core.Aura{
 		Label:    "Siphon Essence",
 		ActionID: core.ActionID{SpellID: 40291},
 		Duration: time.Second * 6,
@@ -851,7 +851,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		},
 	})
 
-	character.RegisterAura(core.Aura{
+	character.GetOrRegisterAura(core.Aura{
 		Label:    "Syphon of the Nathrezim",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {

@@ -149,21 +149,21 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
 				IconInputs.ArcaneBrilliance,
-	  			IconInputs.DivineSpirit,
+				IconInputs.DivineSpirit,
 				IconInputs.GiftOfTheWild,
 			],
 			partyBuffInputs: [
 				IconInputs.DrumsOfBattleBuff,
-	  			IconInputs.Bloodlust,
+				IconInputs.Bloodlust,
 				IconInputs.StrengthOfEarthTotem,
-	  			IconInputs.GraceOfAirTotem,
-	  			IconInputs.ManaSpringTotem,
+				IconInputs.GraceOfAirTotem,
+				IconInputs.ManaSpringTotem,
 				IconInputs.BattleShout,
 				IconInputs.BraidedEterniumChain,
-	  			IconInputs.DraeneiRacialMelee,
-	  			IconInputs.FerociousInspiration,
-	  			IconInputs.SanctityAura,
-	  			IconInputs.TrueshotAura,
+				IconInputs.DraeneiRacialMelee,
+				IconInputs.FerociousInspiration,
+				IconInputs.SanctityAura,
+				IconInputs.TrueshotAura,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
@@ -176,18 +176,18 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 				IconInputs.JudgementOfWisdom,
 				IconInputs.ImprovedSealOfTheCrusader,
 				IconInputs.BloodFrenzy,
-	  			IconInputs.HuntersMark,
+				IconInputs.HuntersMark,
 				IconInputs.CurseOfRecklessness,
-	  			IconInputs.FaerieFire,
-	  			IconInputs.ExposeArmor,
-	  			IconInputs.SunderArmor,
+				IconInputs.FaerieFire,
+				IconInputs.ExposeArmor,
+				IconInputs.SunderArmor,
 				IconInputs.GiftOfArthas,
 			],
 			// Which options are selectable in the 'Consumes' section.
 			consumeOptions: {
 				potions: [
 					Potions.SuperManaPotion,
-	  				Potions.FelManaPotion,
+					Potions.FelManaPotion,
 					Potions.HastePotion,
 				],
 				conjured: [
@@ -197,7 +197,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 					Flask.FlaskOfRelentlessAssault,
 				],
 				battleElixirs: [
-	  				BattleElixir.ElixirOfMajorAgility,
+					BattleElixir.ElixirOfMajorAgility,
 					BattleElixir.ElixirOfDemonslaying,
 				],
 				guardianElixirs: [
@@ -205,7 +205,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 					GuardianElixir.ElixirOfMajorMageblood,
 				],
 				food: [
-	  				Food.FoodGrilledMudfish,
+					Food.FoodGrilledMudfish,
 					Food.FoodSpicyHotTalbuk,
 				],
 				alcohol: [
@@ -215,7 +215,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
 				],
 				other: [
-	  				IconInputs.ScrollOfAgilityV,
+					IconInputs.ScrollOfAgilityV,
 					IconInputs.ScrollOfStrengthV,
 				],
 			},
@@ -224,12 +224,12 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
-	  				DruidInputs.LatencyMs,
-	  				OtherInputs.StartingPotion,
+					DruidInputs.LatencyMs,
+					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
-	  				OtherInputs.SnapshotBsSolarianSapphire,
+					OtherInputs.SnapshotBsSolarianSapphire,
 					OtherInputs.DelayedArmorDebuffs,
 				],
 			},

@@ -386,7 +386,7 @@ func ExposeArmorAura(target *Target, talentPoints int32) *Aura {
 	})
 }
 
-func ScheduledExposeArmorAura(target *Target, talentPoints int32) * Aura {
+func ScheduledExposeArmorAura(target *Target, talentPoints int32) *Aura {
 	aura := ExposeArmorAura(target, talentPoints)
 	aura.Duration = NeverExpires
 	aura.OnReset = func(aura *Aura, sim *Simulation) {

@@ -183,6 +183,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 				IconInputs.Misery,
 				IconInputs.ImprovedScorch,
 				IconInputs.WintersChill,
+				IconInputs.GiftOfArthas,
 			],
 			// Which options are selectable in the 'Consumes' section.
 			consumeOptions: {

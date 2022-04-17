@@ -208,6 +208,7 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 				IconInputs.ExposeArmor,
 				IconInputs.CurseOfRecklessness,
 				IconInputs.Misery,
+				IconInputs.GiftOfArthas,
 			],
 			// Which options are selectable in the 'Consumes' section.
 			consumeOptions: {
