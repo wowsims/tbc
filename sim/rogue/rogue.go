@@ -136,6 +136,8 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 	comboPointsNeeded := 5 - expectedComboPointsAfterFinisher
 	energyForEA := rogue.builderEnergyCost*float64(comboPointsNeeded) + ExposeArmorEnergyCost
 	rogue.eaBuildTime = time.Duration(((energyForEA - expectedEnergyAfterFinisher) / rogue.energyPerSecondAvg) * float64(time.Second))
+
+	rogue.DelayCooldownsForArmorDebuffs(sim)
 }
 
 func (rogue *Rogue) Reset(sim *core.Simulation) {

@@ -70,6 +70,11 @@ func (war *DpsWarrior) GetWarrior() *warrior.Warrior {
 	return war.Warrior
 }
 
+func (war *DpsWarrior) Init(sim *core.Simulation) {
+	war.Warrior.Init(sim)
+	war.DelayCooldownsForArmorDebuffs(sim)
+}
+
 func (war *DpsWarrior) Reset(sim *core.Simulation) {
 	war.Warrior.Reset(sim)
 	war.BerserkerStanceAura.Activate(sim)
