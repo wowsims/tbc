@@ -94,36 +94,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestEnhancement-AllItems-Battlemaster'sAudacity-34049"
- value: {
-  dps: 1924.8396136329807
- }
-}
-dps_results: {
- key: "TestEnhancement-AllItems-Battlemaster'sCruelty-34163"
- value: {
-  dps: 1939.1221089100932
- }
-}
-dps_results: {
- key: "TestEnhancement-AllItems-Battlemaster'sDepravity-34162"
- value: {
-  dps: 1920.0104318044098
- }
-}
-dps_results: {
- key: "TestEnhancement-AllItems-Battlemaster'sDetermination-33832"
- value: {
-  dps: 1948.9850698989476
- }
-}
-dps_results: {
- key: "TestEnhancement-AllItems-Battlemaster'sPerseverance-34050"
- value: {
-  dps: 1922.5005353994284
- }
-}
-dps_results: {
  key: "TestEnhancement-AllItems-Berserker'sCall-33831"
  value: {
   dps: 1981.8007457617673
