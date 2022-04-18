@@ -148,10 +148,10 @@ type CLOnCDRotation struct {
 
 func (rotation *CLOnCDRotation) DoAction(eleShaman *ElementalShaman, sim *core.Simulation) {
 	var spell *core.Spell
-	if eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) {
-		spell = eleShaman.LightningBolt
-	} else {
+	if eleShaman.ChainLightning.IsReady(sim) {
 		spell = eleShaman.ChainLightning
+	} else {
+		spell = eleShaman.LightningBolt
 	}
 
 	if !spell.Cast(sim, sim.GetPrimaryTarget()) {
@@ -179,7 +179,7 @@ func (rotation *FixedRotation) DoAction(eleShaman *ElementalShaman, sim *core.Si
 	if rotation.numLBsSinceLastCL < rotation.numLBsPerCL {
 		spell = eleShaman.LightningBolt
 		rotation.numLBsSinceLastCL++
-	} else if !eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) {
+	} else if eleShaman.ChainLightning.IsReady(sim) {
 		spell = eleShaman.ChainLightning
 		rotation.numLBsSinceLastCL = 0
 	} else if eleShaman.HasTemporarySpellCastSpeedIncrease() {
@@ -190,7 +190,7 @@ func (rotation *FixedRotation) DoAction(eleShaman *ElementalShaman, sim *core.Si
 	}
 
 	if spell == nil {
-		common.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.GetRemainingCD(shaman.ChainLightningCooldownID, sim.CurrentTime), common.WaitReasonRotation).Cast(sim)
+		common.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.ChainLightning.TimeToReady(sim), common.WaitReasonRotation).Cast(sim)
 	} else {
 		if !spell.Cast(sim, sim.GetPrimaryTarget()) {
 			eleShaman.WaitForMana(sim, spell.CurCast.Cost)
@@ -220,7 +220,7 @@ type CLOnClearcastRotation struct {
 
 func (rotation *CLOnClearcastRotation) DoAction(eleShaman *ElementalShaman, sim *core.Simulation) {
 	var spell *core.Spell
-	if eleShaman.IsOnCD(shaman.ChainLightningCooldownID, sim.CurrentTime) || !rotation.prevPrevCastProccedCC {
+	if !eleShaman.ChainLightning.IsReady(sim) || !rotation.prevPrevCastProccedCC {
 		spell = eleShaman.LightningBolt
 	} else {
 		spell = eleShaman.ChainLightning

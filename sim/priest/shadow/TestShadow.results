@@ -106,36 +106,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestShadow-AllItems-Battlemaster'sAudacity-34049"
- value: {
-  dps: 1478.2277707887272
- }
-}
-dps_results: {
- key: "TestShadow-AllItems-Battlemaster'sCruelty-34163"
- value: {
-  dps: 1450.8529354506927
- }
-}
-dps_results: {
- key: "TestShadow-AllItems-Battlemaster'sDepravity-34162"
- value: {
-  dps: 1454.238692211069
- }
-}
-dps_results: {
- key: "TestShadow-AllItems-Battlemaster'sDetermination-33832"
- value: {
-  dps: 1450.8529354506927
- }
-}
-dps_results: {
- key: "TestShadow-AllItems-Battlemaster'sPerseverance-34050"
- value: {
-  dps: 1467.5760856926127
- }
-}
-dps_results: {
  key: "TestShadow-AllItems-Berserker'sCall-33831"
  value: {
   dps: 1450.8529354506927
@@ -228,7 +198,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 1452.345196827672
+  dps: 1450.8529354506927
  }
 }
 dps_results: {
@@ -330,7 +300,7 @@ dps_results: {
 dps_results: {
  key: "TestShadow-AllItems-Figurine-LivingRubySerpent-24126"
  value: {
-  dps: 1455.2315378691005
+  dps: 1455.442770779366
  }
 }
 dps_results: {

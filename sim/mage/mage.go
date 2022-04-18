@@ -69,6 +69,9 @@ type Mage struct {
 	Scorch          *core.Spell
 	WintersChill    *core.Spell
 
+	IcyVeins             *core.Spell
+	SummonWaterElemental *core.Spell
+
 	ArcaneMissilesDot *core.Dot
 	IgniteDots        []*core.Dot
 	FireballDot       *core.Dot

@@ -12,16 +12,19 @@ func (rogue *Rogue) registerThistleTeaCD() {
 		return
 	}
 
-	actionID := core.ActionID{ItemID: 7676, CooldownID: core.ConjuredCooldownID}
+	actionID := core.ActionID{ItemID: 7676}
 
 	const energyRegen = 40.0
-	cooldown := time.Minute * 5
 
 	thistleTeaSpell := rogue.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 
 		Cast: core.CastConfig{
-			Cooldown: cooldown,
+			// TODO: Thistle tea might only put conjured on shorter CD
+			CD: core.Cooldown{
+				Timer:    rogue.GetConjuredCD(),
+				Duration: time.Minute * 5,
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {

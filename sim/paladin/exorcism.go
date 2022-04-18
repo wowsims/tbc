@@ -8,8 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ExorcismCD = core.NewCooldownID()
-var ExorcismActionID = core.ActionID{SpellID: 10314, CooldownID: ExorcismCD}
+var ExorcismActionID = core.ActionID{SpellID: 10314}
 
 func (paladin *Paladin) registerExorcismSpell(sim *core.Simulation) {
 	baseCost := 295.0
@@ -25,7 +24,10 @@ func (paladin *Paladin) registerExorcismSpell(sim *core.Simulation) {
 			DefaultCast: core.Cast{
 				Cost: baseCost,
 			},
-			Cooldown: time.Second * 15,
+			CD: core.Cooldown{
+				Timer:    paladin.NewTimer(),
+				Duration: time.Second * 15,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{

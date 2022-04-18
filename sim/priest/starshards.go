@@ -9,8 +9,7 @@ import (
 
 const SpellIDStarshards int32 = 25446
 
-var SSCooldownID = core.NewCooldownID()
-var StarshardsActionID = core.ActionID{SpellID: SpellIDStarshards, CooldownID: SSCooldownID}
+var StarshardsActionID = core.ActionID{SpellID: SpellIDStarshards}
 
 func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
 	priest.Starshards = priest.RegisterSpell(core.SpellConfig{
@@ -21,7 +20,10 @@ func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
 			DefaultCast: core.Cast{
 				GCD: core.GCDDefault,
 			},
-			Cooldown: time.Second * 30,
+			CD: core.Cooldown{
+				Timer:    priest.NewTimer(),
+				Duration: time.Second * 30,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{

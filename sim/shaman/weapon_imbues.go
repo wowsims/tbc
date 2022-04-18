@@ -68,14 +68,15 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 	mhSpell := shaman.newWindfuryImbueSpell(true)
 	ohSpell := shaman.newWindfuryImbueSpell(false)
 
-	var icd core.InternalCD
-	const icdDur = time.Second * 3
+	icd := core.Cooldown{
+		Timer:    shaman.NewTimer(),
+		Duration: time.Second * 3,
+	}
 
 	shaman.RegisterAura(core.Aura{
 		Label:    "Windfury Imbue",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -88,13 +89,13 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 			if (!mh && isMHHit) || (!oh && !isMHHit) {
 				return // cant proc if not enchanted
 			}
-			if icd.IsOnCD(sim) {
+			if !icd.IsReady(sim) {
 				return
 			}
 			if sim.RandomFloat("Windfury Imbue") > proc {
 				return
 			}
-			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			icd.Use(sim)
 
 			if isMHHit {
 				mhSpell.Cast(sim, spellEffect.Target)

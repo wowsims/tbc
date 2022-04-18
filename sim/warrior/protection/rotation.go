@@ -14,7 +14,7 @@ func (war *ProtectionWarrior) OnGCDReady(sim *core.Simulation) {
 func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
-	if !war.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+	if war.GCD.IsReady(sim) {
 		if war.CanShieldSlam(sim) {
 			war.ShieldSlam.Cast(sim, target)
 		} else if war.CanRevenge(sim) {

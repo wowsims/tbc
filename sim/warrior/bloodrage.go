@@ -6,11 +6,8 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-var BloodrageCooldownID = core.NewCooldownID()
-var BloodrageCooldown = time.Minute
-
 func (warrior *Warrior) registerBloodrageCD() {
-	actionID := core.ActionID{SpellID: 2687, CooldownID: BloodrageCooldownID}
+	actionID := core.ActionID{SpellID: 2687}
 
 	instantRage := 10.0 + 3*float64(warrior.Talents.ImprovedBloodrage)
 	rageOverTime := 10.0
@@ -19,7 +16,10 @@ func (warrior *Warrior) registerBloodrageCD() {
 		ActionID: actionID,
 
 		Cast: core.CastConfig{
-			Cooldown: BloodrageCooldown,
+			CD: core.Cooldown{
+				Timer:    warrior.NewTimer(),
+				Duration: time.Minute,
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {

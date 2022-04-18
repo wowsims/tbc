@@ -8,8 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ShieldSlamCooldownID = core.NewCooldownID()
-var ShieldSlamActionID = core.ActionID{SpellID: 30356, CooldownID: ShieldSlamCooldownID}
+var ShieldSlamActionID = core.ActionID{SpellID: 30356}
 
 func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
 	cost := 20.0 - float64(warrior.Talents.FocusedRage)
@@ -32,7 +31,10 @@ func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
 				GCD:  core.GCDDefault,
 			},
 			IgnoreHaste: true,
-			Cooldown:    time.Second * 6,
+			CD: core.Cooldown{
+				Timer:    warrior.NewTimer(),
+				Duration: time.Second * 6,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
@@ -60,5 +62,5 @@ func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
 }
 
 func (warrior *Warrior) CanShieldSlam(sim *core.Simulation) bool {
-	return warrior.canShieldSlam && warrior.CurrentRage() >= warrior.ShieldSlam.DefaultCast.Cost && !warrior.IsOnCD(ShieldSlamCooldownID, sim.CurrentTime)
+	return warrior.canShieldSlam && warrior.CurrentRage() >= warrior.ShieldSlam.DefaultCast.Cost && warrior.ShieldSlam.IsReady(sim)
 }

@@ -7,9 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var OrcBloodFuryCooldownID = NewCooldownID()
-var TrollBerserkingCooldownID = NewCooldownID()
-
 func applyRaceEffects(agent Agent) {
 	character := agent.GetCharacter()
 
@@ -76,17 +73,18 @@ func applyRaceEffects(agent Agent) {
 
 		character.RegisterFinalizeEffect(func() {
 			// Blood Fury
-			const cd = time.Minute * 2
-			const dur = time.Second * 15
+			actionID := ActionID{SpellID: 33697}
 			apBonus := float64(character.Level)*4 + 2
 			spBonus := float64(character.Level)*2 + 3
-			actionID := ActionID{SpellID: 33697, CooldownID: OrcBloodFuryCooldownID}
-			bloodFuryAura := character.NewTemporaryStatsAura("Blood Fury", actionID, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus, stats.SpellPower: spBonus}, dur)
+			bloodFuryAura := character.NewTemporaryStatsAura("Blood Fury", actionID, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus, stats.SpellPower: spBonus}, time.Second*15)
 
 			spell := character.RegisterSpell(SpellConfig{
 				ActionID: actionID,
 				Cast: CastConfig{
-					Cooldown:         cd,
+					CD: Cooldown{
+						Timer:    character.NewTimer(),
+						Duration: time.Minute * 2,
+					},
 					DisableCallbacks: true,
 				},
 				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
@@ -142,8 +140,6 @@ func applyRaceEffects(agent Agent) {
 			hasteBonus = 1.3
 		}
 		inverseBonus := 1 / hasteBonus
-		const dur = time.Second * 10
-		const cd = time.Minute * 3
 
 		var resourceType stats.Stat
 		var cost float64
@@ -151,21 +147,21 @@ func applyRaceEffects(agent Agent) {
 		if character.Class == proto.Class_ClassRogue {
 			resourceType = stats.Energy
 			cost = 10
-			actionID = ActionID{SpellID: 26297, CooldownID: TrollBerserkingCooldownID}
+			actionID = ActionID{SpellID: 26297}
 		} else if character.Class == proto.Class_ClassWarrior {
 			resourceType = stats.Rage
 			cost = 5
-			actionID = ActionID{SpellID: 26296, CooldownID: TrollBerserkingCooldownID}
+			actionID = ActionID{SpellID: 26296}
 		} else {
 			resourceType = stats.Mana
 			cost = character.BaseMana() * 0.06
-			actionID = ActionID{SpellID: 20554, CooldownID: TrollBerserkingCooldownID}
+			actionID = ActionID{SpellID: 20554}
 		}
 
 		berserkingAura := character.RegisterAura(Aura{
 			Label:    "Berserking",
 			ActionID: actionID,
-			Duration: dur,
+			Duration: time.Second * 10,
 			OnGain: func(aura *Aura, sim *Simulation) {
 				character.PseudoStats.CastSpeedMultiplier *= hasteBonus
 				character.MultiplyAttackSpeed(sim, hasteBonus)
@@ -186,7 +182,10 @@ func applyRaceEffects(agent Agent) {
 				DefaultCast: Cast{
 					Cost: cost,
 				},
-				Cooldown: cd,
+				CD: Cooldown{
+					Timer:    character.NewTimer(),
+					Duration: time.Minute * 3,
+				},
 			},
 
 			ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {

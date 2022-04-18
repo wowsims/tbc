@@ -9,8 +9,7 @@ import (
 
 const SpellIDMindBlast int32 = 25375
 
-var MBCooldownID = core.NewCooldownID()
-var MindBlastActionID = core.ActionID{SpellID: SpellIDMindBlast, CooldownID: MBCooldownID}
+var MindBlastActionID = core.ActionID{SpellID: SpellIDMindBlast}
 
 func (priest *Priest) registerMindBlastSpell(sim *core.Simulation) {
 	baseCost := 450.0
@@ -28,7 +27,10 @@ func (priest *Priest) registerMindBlastSpell(sim *core.Simulation) {
 				GCD:      core.GCDDefault,
 				CastTime: time.Millisecond * 1500,
 			},
-			Cooldown: time.Second*8 - time.Millisecond*500*time.Duration(priest.Talents.ImprovedMindBlast),
+			CD: core.Cooldown{
+				Timer:    priest.NewTimer(),
+				Duration: time.Second*8 - time.Millisecond*500*time.Duration(priest.Talents.ImprovedMindBlast),
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{

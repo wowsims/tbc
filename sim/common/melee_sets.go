@@ -43,15 +43,16 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 			character := agent.GetCharacter()
 			procAura := character.NewTemporaryStatsAura("Desolation Battlegear Proc", core.ActionID{SpellID: 37617}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*15)
 
-			var icd core.InternalCD
-			const icdDur = time.Second * 20
+			icd := core.Cooldown{
+				Timer:    character.NewTimer(),
+				Duration: time.Second * 20,
+			}
 			const procChance = 0.01
 
 			character.RegisterAura(core.Aura{
 				Label:    "Desolation Battlegear",
 				Duration: core.NeverExpires,
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
-					icd = core.NewICD()
 					aura.Activate(sim)
 				},
 				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -61,13 +62,13 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 					if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 						return
 					}
-					if icd.IsOnCD(sim) {
+					if !icd.IsReady(sim) {
 						return
 					}
 					if sim.RandomFloat("Desolation Battlegear") > procChance {
 						return
 					}
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
+					icd.Use(sim)
 					procAura.Activate(sim)
 				},
 			})
@@ -220,14 +221,15 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 			procAura := character.NewTemporaryStatsAura("Twin Blade of Azzinoth Proc", core.ActionID{SpellID: 41435}, stats.Stats{stats.MeleeHaste: 450}, time.Second*10)
 
 			ppmm := character.AutoAttacks.NewPPMManager(1.0)
-			var icd core.InternalCD
-			const icdDur = time.Second * 45
+			icd := core.Cooldown{
+				Timer:    character.NewTimer(),
+				Duration: time.Second * 45,
+			}
 
 			character.RegisterAura(core.Aura{
 				Label:    "Twin Blades of Azzinoth",
 				Duration: core.NeverExpires,
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
-					icd = core.NewICD()
 					aura.Activate(sim)
 				},
 				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -240,14 +242,14 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 						return
 					}
 
-					if icd.IsOnCD(sim) {
+					if !icd.IsReady(sim) {
 						return
 					}
 
 					if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Twin Blades of Azzinoth") {
 						return
 					}
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
+					icd.Use(sim)
 					procAura.Activate(sim)
 				},
 			})
@@ -265,15 +267,16 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 			character := agent.GetCharacter()
 			procAura := character.NewTemporaryStatsAura("Wastewalker Armor Proc", core.ActionID{SpellID: 37618}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*15)
 
-			var icd core.InternalCD
-			const icdDur = time.Second * 20
+			icd := core.Cooldown{
+				Timer:    character.NewTimer(),
+				Duration: time.Second * 20,
+			}
 			const procChance = 0.02
 
 			character.RegisterAura(core.Aura{
 				Label:    "Wastewalker Armor",
 				Duration: core.NeverExpires,
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
-					icd = core.NewICD()
 					aura.Activate(sim)
 				},
 				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -283,13 +286,13 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 					if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 						return
 					}
-					if icd.IsOnCD(sim) {
+					if !icd.IsReady(sim) {
 						return
 					}
 					if sim.RandomFloat("Wastewalker Armor") > procChance {
 						return
 					}
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
+					icd.Use(sim)
 					procAura.Activate(sim)
 				},
 			})

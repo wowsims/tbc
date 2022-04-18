@@ -141,8 +141,6 @@ func (mage *Mage) applyArcaneConcentration() {
 	})
 }
 
-var PresenceOfMindCooldownID = core.NewCooldownID()
-
 func (mage *Mage) registerPresenceOfMindCD() {
 	if !mage.Talents.PresenceOfMind {
 		return
@@ -153,12 +151,15 @@ func (mage *Mage) registerPresenceOfMindCD() {
 		cooldown -= time.Second * 24
 	}
 
-	actionID := core.ActionID{SpellID: 12043, CooldownID: PresenceOfMindCooldownID}
+	actionID := core.ActionID{SpellID: 12043}
 
 	spell := mage.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 		Cast: core.CastConfig{
-			Cooldown:         cooldown,
+			CD: core.Cooldown{
+				Timer:    mage.NewTimer(),
+				Duration: cooldown,
+			},
 			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
@@ -207,13 +208,11 @@ func (mage *Mage) registerPresenceOfMindCD() {
 	})
 }
 
-var ArcanePowerCooldownID = core.NewCooldownID()
-
 func (mage *Mage) registerArcanePowerCD() {
 	if !mage.Talents.ArcanePower {
 		return
 	}
-	actionID := core.ActionID{SpellID: 12042, CooldownID: ArcanePowerCooldownID}
+	actionID := core.ActionID{SpellID: 12042}
 
 	apAura := mage.RegisterAura(core.Aura{
 		Label:    "Arcane Power",
@@ -232,7 +231,10 @@ func (mage *Mage) registerArcanePowerCD() {
 	spell := mage.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 		Cast: core.CastConfig{
-			Cooldown:         time.Minute * 3,
+			CD: core.Cooldown{
+				Timer:    mage.NewTimer(),
+				Duration: time.Minute * 3,
+			},
 			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
@@ -270,13 +272,15 @@ func (mage *Mage) applyMasterOfElements() {
 	})
 }
 
-var CombustionCooldownID = core.NewCooldownID()
-
 func (mage *Mage) registerCombustionCD() {
 	if !mage.Talents.Combustion {
 		return
 	}
-	actionID := core.ActionID{SpellID: 11129, CooldownID: CombustionCooldownID}
+	actionID := core.ActionID{SpellID: 11129}
+	cd := core.Cooldown{
+		Timer:    mage.NewTimer(),
+		Duration: time.Minute * 3,
+	}
 
 	numCrits := 0
 	const critPerStack = 10 * core.SpellCritRatingPerCritChance
@@ -290,7 +294,7 @@ func (mage *Mage) registerCombustionCD() {
 			numCrits = 0
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			mage.SetCD(CombustionCooldownID, sim.CurrentTime+time.Minute*3)
+			cd.Use(sim)
 			mage.UpdateMajorCooldowns()
 		},
 		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
@@ -325,7 +329,7 @@ func (mage *Mage) registerCombustionCD() {
 	spell := mage.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 		Cast: core.CastConfig{
-			Cooldown:         time.Minute * 3,
+			CD:               cd,
 			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
@@ -343,14 +347,12 @@ func (mage *Mage) registerCombustionCD() {
 	})
 }
 
-var IcyVeinsCooldownID = core.NewCooldownID()
-
 func (mage *Mage) registerIcyVeinsCD() {
 	if !mage.Talents.IcyVeins {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 12472, CooldownID: IcyVeinsCooldownID}
+	actionID := core.ActionID{SpellID: 12472}
 	manaCost := mage.BaseMana() * 0.03
 
 	icyVeinsAura := mage.RegisterAura(core.Aura{
@@ -365,7 +367,7 @@ func (mage *Mage) registerIcyVeinsCD() {
 		},
 	})
 
-	spell := mage.RegisterSpell(core.SpellConfig{
+	mage.IcyVeins = mage.RegisterSpell(core.SpellConfig{
 		ActionID:     actionID,
 		ResourceType: stats.Mana,
 		BaseCost:     manaCost,
@@ -374,7 +376,10 @@ func (mage *Mage) registerIcyVeinsCD() {
 			DefaultCast: core.Cast{
 				Cost: manaCost,
 			},
-			Cooldown:         time.Minute * 3,
+			CD: core.Cooldown{
+				Timer:    mage.NewTimer(),
+				Duration: time.Minute * 3,
+			},
 			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
@@ -383,7 +388,7 @@ func (mage *Mage) registerIcyVeinsCD() {
 	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		Spell: spell,
+		Spell: mage.IcyVeins,
 		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Need to check for icy veins already active in case Cold Snap is used right after.
@@ -400,26 +405,31 @@ func (mage *Mage) registerIcyVeinsCD() {
 	})
 }
 
-var ColdSnapCooldownID = core.NewCooldownID()
-
 func (mage *Mage) registerColdSnapCD() {
 	if !mage.Talents.ColdSnap {
 		return
 	}
 
 	cooldown := time.Duration(float64(time.Minute*8) * (1.0 - float64(mage.Talents.IceFloes)*0.1))
-	actionID := core.ActionID{SpellID: 11958, CooldownID: ColdSnapCooldownID}
+	actionID := core.ActionID{SpellID: 11958}
 
 	spell := mage.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 
 		Cast: core.CastConfig{
-			Cooldown:         cooldown,
+			CD: core.Cooldown{
+				Timer:    mage.NewTimer(),
+				Duration: cooldown,
+			},
 			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
-			mage.SetCD(IcyVeinsCooldownID, 0)
-			mage.SetCD(SummonWaterElementalCooldownID, 0)
+			if mage.IcyVeins != nil {
+				mage.IcyVeins.CD.Reset()
+			}
+			if mage.SummonWaterElemental != nil {
+				mage.SummonWaterElemental.CD.Reset()
+			}
 		},
 	})
 
@@ -428,14 +438,15 @@ func (mage *Mage) registerColdSnapCD() {
 		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Don't use if there are no cooldowns to reset.
-			return character.IsOnCD(IcyVeinsCooldownID, sim.CurrentTime) || character.IsOnCD(SummonWaterElementalCooldownID, sim.CurrentTime)
+			return (mage.IcyVeins != nil && !mage.IcyVeins.IsReady(sim)) ||
+				(mage.SummonWaterElemental != nil && !mage.SummonWaterElemental.IsReady(sim))
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Ideally wait for both water ele and icy veins so we can reset both.
-			if mage.Talents.IcyVeins && !character.IsOnCD(IcyVeinsCooldownID, sim.CurrentTime) {
+			if mage.IcyVeins != nil && mage.IcyVeins.IsReady(sim) {
 				return false
 			}
-			if mage.Talents.SummonWaterElemental && !character.IsOnCD(SummonWaterElementalCooldownID, sim.CurrentTime) {
+			if mage.SummonWaterElemental != nil && mage.SummonWaterElemental.IsReady(sim) {
 				return false
 			}
 

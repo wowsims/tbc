@@ -64,6 +64,7 @@ func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanc
 		statInheritance: statInheritance,
 		initialEnabled:  enabledOnStart,
 	}
+	pet.GCD = pet.NewTimer()
 	pet.currentStatInheritance = func(ownerStats stats.Stats) stats.Stats {
 		return stats.Stats{}
 	}

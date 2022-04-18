@@ -129,14 +129,12 @@ func (rogue *Rogue) applyMurder() {
 	})
 }
 
-var ColdBloodCooldownID = core.NewCooldownID()
-
 func (rogue *Rogue) registerColdBloodCD() {
 	if !rogue.Talents.ColdBlood {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 14177, CooldownID: ColdBloodCooldownID}
+	actionID := core.ActionID{SpellID: 14177}
 
 	coldBloodAura := rogue.RegisterAura(core.Aura{
 		Label:    "Cold Blood",
@@ -153,13 +151,14 @@ func (rogue *Rogue) registerColdBloodCD() {
 		},
 	})
 
-	cooldown := time.Minute * 3
-
 	coldBloodSpell := rogue.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 
 		Cast: core.CastConfig{
-			Cooldown: cooldown,
+			CD: core.Cooldown{
+				Timer:    rogue.NewTimer(),
+				Duration: time.Minute * 3,
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
@@ -227,8 +226,10 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 	}
 	if rogue.Talents.SwordSpecialization > 0 && swordSpecMask != core.ProcMaskEmpty {
 		var swordSpecializationSpell *core.Spell
-		var icd core.InternalCD
-		icdDur := time.Millisecond * 500
+		icd := core.Cooldown{
+			Timer:    rogue.NewTimer(),
+			Duration: time.Millisecond * 500,
+		}
 		procChance := 0.01 * float64(rogue.Talents.SwordSpecialization)
 
 		rogue.RegisterAura(core.Aura{
@@ -244,7 +245,6 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 				})
 			},
 			OnReset: func(aura *core.Aura, sim *core.Simulation) {
-				icd = core.NewICD()
 				aura.Activate(sim)
 			},
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -256,14 +256,14 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 					return
 				}
 
-				if icd.IsOnCD(sim) {
+				if !icd.IsReady(sim) {
 					return
 				}
 
 				if sim.RandomFloat("Sword Specialization") > procChance {
 					return
 				}
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				icd.Use(sim)
 
 				swordSpecializationSpell.Cast(sim, spellEffect.Target)
 			},
@@ -304,20 +304,17 @@ func (rogue *Rogue) applyCombatPotency() {
 	})
 }
 
-var BladeFlurryCooldownID = core.NewCooldownID()
-
 func (rogue *Rogue) registerBladeFlurryCD() {
 	if !rogue.Talents.BladeFlurry {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 13877, CooldownID: BladeFlurryCooldownID}
+	actionID := core.ActionID{SpellID: 13877}
 	const hasteBonus = 1.2
 	const inverseHasteBonus = 1 / 1.2
 	const energyCost = 25.0
 
 	dur := time.Second * 15
-	cooldown := time.Minute * 2
 
 	rogue.BladeFlurryAura = rogue.RegisterAura(core.Aura{
 		Label:    "Blade Flurry",
@@ -337,6 +334,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 		},
 	})
 
+	cooldownDur := time.Minute * 2
 	bladeFlurrySpell := rogue.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 
@@ -349,7 +347,10 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 				GCD:  time.Second,
 			},
 			IgnoreHaste: true,
-			Cooldown:    cooldown,
+			CD: core.Cooldown{
+				Timer:    rogue.NewTimer(),
+				Duration: cooldownDur,
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
@@ -365,7 +366,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 			return rogue.CurrentEnergy() >= energyCost
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if sim.GetRemainingDuration() > cooldown+dur {
+			if sim.GetRemainingDuration() > cooldownDur+dur {
 				// We'll have enough time to cast another BF, so use it immediately to make sure we get the 2nd one.
 				return true
 			}
@@ -383,14 +384,12 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 	})
 }
 
-var AdrenalineRushCooldownID = core.NewCooldownID()
-
 func (rogue *Rogue) registerAdrenalineRushCD() {
 	if !rogue.Talents.AdrenalineRush {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 13750, CooldownID: AdrenalineRushCooldownID}
+	actionID := core.ActionID{SpellID: 13750}
 
 	rogue.AdrenalineRushAura = rogue.RegisterAura(core.Aura{
 		Label:    "Adrenaline Rush",
@@ -406,8 +405,6 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 		},
 	})
 
-	cooldown := time.Minute * 5
-
 	adrenalineRushSpell := rogue.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 
@@ -416,7 +413,10 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 				GCD: time.Second,
 			},
 			IgnoreHaste: true,
-			Cooldown:    cooldown,
+			CD: core.Cooldown{
+				Timer:    rogue.NewTimer(),
+				Duration: time.Minute * 5,
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {

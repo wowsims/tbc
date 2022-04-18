@@ -6,11 +6,8 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-var EvocationCooldownID = core.NewCooldownID()
-
 func (mage *Mage) registerEvocationCD() {
-	cooldown := time.Minute * 8
-	actionID := core.ActionID{SpellID: 12051, CooldownID: EvocationCooldownID}
+	actionID := core.ActionID{SpellID: 12051}
 
 	maxTicks := int32(4)
 	if ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 2) {
@@ -38,7 +35,10 @@ func (mage *Mage) registerEvocationCD() {
 				GCD:         core.GCDDefault,
 				ChannelTime: channelTime,
 			},
-			Cooldown: cooldown,
+			CD: core.Cooldown{
+				Timer:    mage.NewTimer(),
+				Duration: time.Minute * 8,
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {

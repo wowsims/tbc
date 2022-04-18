@@ -9,7 +9,7 @@ func (war *DpsWarrior) OnGCDReady(sim *core.Simulation) {
 }
 
 func (war *DpsWarrior) doRotation(sim *core.Simulation) {
-	if war.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+	if !war.GCD.IsReady(sim) {
 		if war.CanHeroicStrike(sim) {
 			war.QueueHeroicStrike(sim)
 		}

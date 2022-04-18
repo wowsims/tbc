@@ -115,14 +115,15 @@ func ApplyWarpSpringCoil(agent core.Agent) {
 	procAura := character.NewTemporaryStatsAura("Warp Spring Coil Proc", core.ActionID{ItemID: 30450}, stats.Stats{stats.ArmorPenetration: 1000}, time.Second*15)
 	const procChance = 0.25
 
-	var icd core.InternalCD
-	const icdDur = time.Second * 30
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 30,
+	}
 
 	character.RegisterAura(core.Aura{
 		Label:    "Warp Spring Coil",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -135,7 +136,7 @@ func ApplyWarpSpringCoil(agent core.Agent) {
 				return
 			}
 
-			if icd.IsOnCD(sim) {
+			if !icd.IsReady(sim) {
 				return
 			}
 
@@ -143,7 +144,7 @@ func ApplyWarpSpringCoil(agent core.Agent) {
 				return
 			}
 
-			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			icd.Use(sim)
 			procAura.Activate(sim)
 		},
 	})

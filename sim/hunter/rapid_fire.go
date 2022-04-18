@@ -7,11 +7,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var RapidFireCooldownID = core.NewCooldownID()
-
 func (hunter *Hunter) registerRapidFireCD() {
-	cooldown := time.Minute*5 - time.Minute*time.Duration(hunter.Talents.RapidKilling)
-	actionID := core.ActionID{SpellID: 3045, CooldownID: RapidFireCooldownID}
+	actionID := core.ActionID{SpellID: 3045}
 
 	rfAura := hunter.RegisterAura(core.Aura{
 		Label:    "Rapid Fire",
@@ -26,7 +23,7 @@ func (hunter *Hunter) registerRapidFireCD() {
 	})
 
 	baseCost := 100.0
-	rfSpell := hunter.RegisterSpell(core.SpellConfig{
+	hunter.RapidFire = hunter.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 
 		ResourceType: stats.Mana,
@@ -36,7 +33,10 @@ func (hunter *Hunter) registerRapidFireCD() {
 			DefaultCast: core.Cast{
 				Cost: baseCost,
 			},
-			Cooldown: cooldown,
+			CD: core.Cooldown{
+				Timer:    hunter.NewTimer(),
+				Duration: time.Minute*5 - time.Minute*time.Duration(hunter.Talents.RapidKilling),
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
@@ -45,7 +45,7 @@ func (hunter *Hunter) registerRapidFireCD() {
 	})
 
 	hunter.AddMajorCooldown(core.MajorCooldown{
-		Spell: rfSpell,
+		Spell: hunter.RapidFire,
 		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Make sure we don't reuse after a Readiness cast.

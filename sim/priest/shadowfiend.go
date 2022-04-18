@@ -12,8 +12,7 @@ import (
 
 const SpellIDShadowfiend int32 = 34433
 
-var ShadowfiendCD = core.NewCooldownID()
-var ShadowfiendActionID = core.ActionID{SpellID: SpellIDShadowfiend, CooldownID: ShadowfiendCD}
+var ShadowfiendActionID = core.ActionID{SpellID: SpellIDShadowfiend}
 
 func (priest *Priest) registerShadowfiendCD() {
 	if !priest.UseShadowfiend {
@@ -21,11 +20,13 @@ func (priest *Priest) registerShadowfiendCD() {
 	}
 
 	priest.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   ShadowfiendActionID,
-		CooldownID: ShadowfiendCD,
-		Cooldown:   time.Minute * 5,
-		UsesGCD:    true,
-		Type:       core.CooldownTypeMana,
+		ActionID: ShadowfiendActionID,
+		Cooldown: core.Cooldown{
+			Timer:    priest.NewTimer(),
+			Duration: time.Minute * 5,
+		},
+		UsesGCD: true,
+		Type:    core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if character.CurrentMana() < 575 {
 				return false
@@ -53,6 +54,7 @@ func (priest *Priest) registerShadowfiendCD() {
 
 func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 	baseCost := priest.BaseMana() * 0.06
+	shadowfiendMCD := priest.GetInitialMajorCooldown(ShadowfiendActionID)
 
 	priest.Shadowfiend = priest.RegisterSpell(core.SpellConfig{
 		ActionID:    ShadowfiendActionID,
@@ -66,7 +68,7 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
 				GCD:  core.GCDDefault,
 			},
-			Cooldown: time.Minute * 5,
+			CD: shadowfiendMCD.Cooldown,
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{

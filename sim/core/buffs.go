@@ -336,8 +336,10 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	})
 
 	var wfSpell *Spell
-	var icd InternalCD
-	const icdDur = time.Duration(1)
+	icd := Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: 1,
+	}
 	const procChance = 0.2
 
 	return character.RegisterAura(Aura{
@@ -353,7 +355,6 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			})
 		},
 		OnReset: func(aura *Aura, sim *Simulation) {
-			icd = NewICD()
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
@@ -364,7 +365,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			if wfBuffAura.IsActive() {
 				return
 			}
-			if icd.IsOnCD(sim) {
+			if !icd.IsReady(sim) {
 				// Checking for WF buff aura isn't quite enough now that we refactored auras.
 				// TODO: Clean this up to remove the need for an instant ICD.
 				return
@@ -381,7 +382,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			}
 			charges = startCharges
 			wfBuffAura.Activate(sim)
-			icd = InternalCD(sim.CurrentTime + icdDur)
+			icd.Use(sim)
 
 			wfSpell.Cast(sim, spellEffect.Target)
 		},
@@ -394,7 +395,6 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 type externalConsecutiveCDApproximation struct {
 	ActionID         ActionID
 	AuraTag          string
-	CooldownID       CooldownID
 	CooldownPriority float64
 	Type             int32
 	AuraDuration     time.Duration
@@ -416,19 +416,27 @@ func registerExternalConsecutiveCDApproximation(agent Agent, config externalCons
 	if numSources == 0 {
 		return
 	}
+	character := agent.GetCharacter()
 
-	externalCDs := make([]InternalCD, numSources)
-	nextExternalIndex := 0
+	var nextExternalIndex int
 
-	agent.GetCharacter().AddMajorCooldown(MajorCooldown{
-		ActionID:   config.ActionID,
-		CooldownID: config.CooldownID,
-		Cooldown:   config.AuraDuration, // Assumes that multiple buffs are different sources.
-		Priority:   config.CooldownPriority,
-		Type:       config.Type,
+	externalTimers := make([]*Timer, numSources)
+	for i := 0; i < int(numSources); i++ {
+		externalTimers[i] = character.NewTimer()
+	}
+	sharedTimer := character.NewTimer()
+
+	character.AddMajorCooldown(MajorCooldown{
+		ActionID: config.ActionID,
+		Cooldown: Cooldown{
+			Timer:    sharedTimer,
+			Duration: config.AuraDuration, // Assumes that multiple buffs are different sources.
+		},
+		Priority: config.CooldownPriority,
+		Type:     config.Type,
 
 		CanActivate: func(sim *Simulation, character *Character) bool {
-			if externalCDs[nextExternalIndex].IsOnCD(sim) {
+			if !externalTimers[nextExternalIndex].IsReady(sim) {
 				return false
 			}
 
@@ -441,25 +449,22 @@ func registerExternalConsecutiveCDApproximation(agent Agent, config externalCons
 		ShouldActivate: config.ShouldActivate,
 
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			for i := 0; i < int(numSources); i++ {
-				externalCDs[i] = NewICD()
-			}
 			nextExternalIndex = 0
 
 			if config.Init != nil {
-				config.Init(sim, agent.GetCharacter())
+				config.Init(sim, character)
 			}
 
 			return func(sim *Simulation, character *Character) {
 				config.AddAura(sim, character)
 
-				externalCDs[nextExternalIndex] = InternalCD(sim.CurrentTime + config.AuraCD)
-				nextExternalIndex = (nextExternalIndex + 1) % len(externalCDs)
+				nextExternalIndex = (nextExternalIndex + 1) % len(externalTimers)
+				externalTimers[nextExternalIndex].Set(sim.CurrentTime + config.AuraCD)
 
-				if externalCDs[nextExternalIndex].IsOnCD(sim) {
-					character.SetCD(config.CooldownID, sim.CurrentTime+externalCDs[nextExternalIndex].GetRemainingCD(sim))
+				if externalTimers[nextExternalIndex].IsReady(sim) {
+					sharedTimer.Set(sim.CurrentTime + config.AuraDuration)
 				} else {
-					character.SetCD(config.CooldownID, sim.CurrentTime+config.AuraDuration)
+					sharedTimer.Set(sim.CurrentTime + externalTimers[nextExternalIndex].TimeToReady(sim))
 				}
 			}
 		},
@@ -468,7 +473,6 @@ func registerExternalConsecutiveCDApproximation(agent Agent, config externalCons
 
 const BloodlustAuraTag = "Bloodlust"
 
-var sharedBloodlustCooldownID = NewCooldownID() // Different from shaman bloodlust CD.
 const BloodlustDuration = time.Second * 40
 const BloodlustCD = time.Minute * 10
 
@@ -480,7 +484,6 @@ func registerBloodlustCD(agent Agent, numBloodlusts int32) {
 		externalConsecutiveCDApproximation{
 			ActionID:         ActionID{SpellID: 2825, Tag: -1},
 			AuraTag:          BloodlustAuraTag,
-			CooldownID:       sharedBloodlustCooldownID,
 			CooldownPriority: CooldownPriorityBloodlust,
 			AuraDuration:     BloodlustDuration,
 			AuraCD:           BloodlustCD,
@@ -535,7 +538,7 @@ func BloodlustAura(character *Character, actionTag int32) *Aura {
 }
 
 var PowerInfusionAuraTag = "PowerInfusion"
-var sharedPowerInfusionCooldownID = NewCooldownID() // Different from priest PI CD.
+
 const PowerInfusionDuration = time.Second * 15
 const PowerInfusionCD = time.Minute * 3
 
@@ -547,7 +550,6 @@ func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
 		externalConsecutiveCDApproximation{
 			ActionID:         ActionID{SpellID: 10060, Tag: -1},
 			AuraTag:          PowerInfusionAuraTag,
-			CooldownID:       sharedPowerInfusionCooldownID,
 			CooldownPriority: CooldownPriorityDefault,
 			AuraDuration:     PowerInfusionDuration,
 			AuraCD:           PowerInfusionCD,
@@ -594,7 +596,6 @@ func PowerInfusionAura(character *Character, actionTag int32) *Aura {
 }
 
 var InnervateAuraTag = "Innervate"
-var sharedInnervateCooldownID = NewCooldownID()
 
 const InnervateDuration = time.Second * 20
 const InnervateCD = time.Minute * 6
@@ -619,7 +620,6 @@ func registerInnervateCD(agent Agent, numInnervates int32) {
 		externalConsecutiveCDApproximation{
 			ActionID:         ActionID{SpellID: 29166, Tag: -1},
 			AuraTag:          InnervateAuraTag,
-			CooldownID:       sharedInnervateCooldownID,
 			CooldownPriority: CooldownPriorityDefault,
 			AuraDuration:     InnervateDuration,
 			AuraCD:           InnervateCD,
@@ -681,7 +681,6 @@ func InnervateAura(character *Character, expectedBonusManaReduction float64, act
 }
 
 var ManaTideTotemAuraTag = "ManaTideTotem"
-var sharedManaTideTotemCooldownID = NewCooldownID()
 
 const ManaTideTotemDuration = time.Second * 12
 const ManaTideTotemCD = time.Minute * 5
@@ -703,7 +702,6 @@ func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
 		externalConsecutiveCDApproximation{
 			ActionID:         ActionID{SpellID: 16190, Tag: -1},
 			AuraTag:          ManaTideTotemAuraTag,
-			CooldownID:       sharedManaTideTotemCooldownID,
 			CooldownPriority: CooldownPriorityDefault,
 			AuraDuration:     ManaTideTotemDuration,
 			AuraCD:           ManaTideTotemCD,

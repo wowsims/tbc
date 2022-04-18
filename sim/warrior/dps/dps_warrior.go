@@ -40,7 +40,7 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 	}
 
 	war.EnableRageBar(warOptions.Options.StartingRage, func(sim *core.Simulation) {
-		if !war.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		if war.GCD.IsReady(sim) {
 			war.doRotation(sim)
 		}
 	})

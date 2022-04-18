@@ -8,17 +8,18 @@ import (
 
 const SpellIDCL6 int32 = 25442
 
-var ChainLightningCooldownID = core.NewCooldownID()
-
 func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOverload bool) *core.Spell {
 	spellConfig := shaman.newElectricSpellConfig(
-		core.ActionID{SpellID: SpellIDCL6, CooldownID: ChainLightningCooldownID},
+		core.ActionID{SpellID: SpellIDCL6},
 		760.0,
 		time.Millisecond*2000,
 		isLightningOverload)
 
 	if !isLightningOverload {
-		spellConfig.Cast.Cooldown = time.Second * 6
+		spellConfig.Cast.CD = core.Cooldown{
+			Timer:    shaman.NewTimer(),
+			Duration: time.Second * 6,
+		}
 	}
 
 	spellConfig.Cast.ModifyCast = func(_ *core.Simulation, spell *core.Spell, cast *core.Cast) {

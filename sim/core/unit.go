@@ -54,6 +54,10 @@ type Unit struct {
 
 	// Statistics describing the results of the sim.
 	Metrics CharacterMetrics
+
+	cdTimers []*Timer
+
+	GCD *Timer
 }
 
 func (unit *Unit) Log(sim *Simulation, message string, vals ...interface{}) {
@@ -120,6 +124,7 @@ func (unit *Unit) doneIteration(sim *Simulation) {
 		spell.doneIteration()
 	}
 	unit.Metrics.doneIteration(sim.Duration.Seconds())
+	unit.resetCDs(sim)
 }
 
 // ArmorDamageReduction currently assumes a level 70 attacker

@@ -7,8 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var WhirlwindCooldownID = core.NewCooldownID()
-var WhirlwindActionID = core.ActionID{SpellID: 1680, CooldownID: WhirlwindCooldownID}
+var WhirlwindActionID = core.ActionID{SpellID: 1680}
 
 func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 	cost := 25.0 - float64(warrior.Talents.FocusedRage)
@@ -47,7 +46,10 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 				GCD:  core.GCDDefault,
 			},
 			IgnoreHaste: true,
-			Cooldown:    time.Second*10 - time.Second*time.Duration(warrior.Talents.ImprovedWhirlwind),
+			CD: core.Cooldown{
+				Timer:    warrior.NewTimer(),
+				Duration: time.Second*10 - time.Second*time.Duration(warrior.Talents.ImprovedWhirlwind),
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
@@ -55,5 +57,5 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 }
 
 func (warrior *Warrior) CanWhirlwind(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= warrior.Whirlwind.DefaultCast.Cost && !warrior.IsOnCD(WhirlwindCooldownID, sim.CurrentTime)
+	return warrior.CurrentRage() >= warrior.Whirlwind.DefaultCast.Cost && warrior.Whirlwind.IsReady(sim)
 }

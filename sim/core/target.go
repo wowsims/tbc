@@ -90,6 +90,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		},
 		MobType: options.MobType,
 	}
+	target.GCD = target.NewTimer()
 	if target.Level == 0 {
 		target.Level = 73
 	}
