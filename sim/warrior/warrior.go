@@ -91,13 +91,7 @@ func (warrior *Warrior) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.Shout = warrior.makeShoutSpell()
 
-	warrior.registerBattleStanceAura()
-	warrior.registerDefensiveStanceAura()
-	warrior.registerBerserkerStanceAura()
-	warrior.BattleStance = warrior.makeStanceSpell(sim, BattleStance, warrior.BattleStanceAura)
-	warrior.DefensiveStance = warrior.makeStanceSpell(sim, DefensiveStance, warrior.DefensiveStanceAura)
-	warrior.BerserkerStance = warrior.makeStanceSpell(sim, BerserkerStance, warrior.BerserkerStanceAura)
-
+	warrior.registerStances(sim)
 	warrior.registerBloodthirstSpell(sim)
 	warrior.registerDemoralizingShoutSpell(sim)
 	warrior.registerDevastateSpell(sim)
