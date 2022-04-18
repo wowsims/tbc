@@ -923,6 +923,8 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 	character := agent.GetCharacter()
 	explosivesTimer := character.NewTimer()
 
+	var superSapper *Spell
+	var goblinSapper *Spell
 	var gnomishFlameTurretSpell *Spell
 	if consumes.FillerExplosive == proto.Explosive_ExplosiveGnomishFlameTurret {
 		gnomishFlameTurretSpell = character.newGnomishFlameTurretSpell()
@@ -942,8 +944,10 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 			return true
 		},
 		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			superSapper := character.newSuperSapperSpell(sim)
-			goblinSapper := character.newGoblinSapperSpell(sim)
+			if superSapper == nil {
+				superSapper = character.newSuperSapperSpell(sim)
+				goblinSapper = character.newGoblinSapperSpell(sim)
+			}
 
 			var fillerExplosive *Spell
 			switch consumes.FillerExplosive {
