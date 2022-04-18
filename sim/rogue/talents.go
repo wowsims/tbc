@@ -9,8 +9,7 @@ import (
 )
 
 func (rogue *Rogue) ApplyTalents() {
-	// TODO: Puncturing Wounds, IEA, poisons, mutilate, blade flurry, adrenaline rush
-	// Everything in the sub tree
+	// TODO: Last few talents in the sub tree.
 
 	rogue.applyMurder()
 	rogue.applySealFate()
@@ -208,7 +207,8 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 		} else if weapon.WeaponType == proto.WeaponType_WeaponTypeDagger {
 			rogue.PseudoStats.BonusMHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.DaggerSpecialization)
 		}
-	} else if weapon := rogue.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
+	}
+	if weapon := rogue.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
 		if weapon.WeaponType == proto.WeaponType_WeaponTypeFist {
 			rogue.PseudoStats.BonusOHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.FistWeaponSpecialization)
 		} else if weapon.WeaponType == proto.WeaponType_WeaponTypeDagger {
