@@ -126,13 +126,12 @@ func (shaman *Shaman) applyElementalDevastation() {
 	})
 }
 
-var ElementalMasteryCooldownID = core.NewCooldownID()
-
 func (shaman *Shaman) registerElementalMasteryCD() {
 	if !shaman.Talents.ElementalMastery {
 		return
 	}
-	actionID := core.ActionID{SpellID: 16166, CooldownID: ElementalMasteryCooldownID}
+	actionID := core.ActionID{SpellID: 16166}
+	cdTimer := shaman.NewTimer()
 	cd := time.Minute * 3
 
 	shaman.ElementalMasteryAura = shaman.RegisterAura(core.Aura{
@@ -151,7 +150,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 			}
 			// Remove the buff and put skill on CD
 			aura.Deactivate(sim)
-			shaman.SetCD(ElementalMasteryCooldownID, sim.CurrentTime+cd)
+			cdTimer.Set(sim.CurrentTime + cd)
 			shaman.UpdateMajorCooldowns()
 		},
 	})
@@ -159,7 +158,10 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 	spell := shaman.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 		Cast: core.CastConfig{
-			Cooldown:         cd,
+			CD: core.Cooldown{
+				Timer:    cdTimer,
+				Duration: cd,
+			},
 			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
@@ -174,13 +176,12 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 	})
 }
 
-var NaturesSwiftnessCooldownID = core.NewCooldownID()
-
 func (shaman *Shaman) registerNaturesSwiftnessCD() {
 	if !shaman.Talents.NaturesSwiftness {
 		return
 	}
-	actionID := core.ActionID{SpellID: 16188, CooldownID: NaturesSwiftnessCooldownID}
+	actionID := core.ActionID{SpellID: 16188}
+	cdTimer := shaman.NewTimer()
 	cd := time.Minute * 3
 
 	shaman.NaturesSwiftnessAura = shaman.RegisterAura(core.Aura{
@@ -194,7 +195,7 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 
 			// Remove the buff and put skill on CD
 			aura.Deactivate(sim)
-			shaman.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+cd)
+			cdTimer.Set(sim.CurrentTime + cd)
 			shaman.UpdateMajorCooldowns()
 		},
 	})
@@ -202,7 +203,10 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 	spell := shaman.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 		Cast: core.CastConfig{
-			Cooldown:         cd,
+			CD: core.Cooldown{
+				Timer:    cdTimer,
+				Duration: cd,
+			},
 			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
@@ -341,14 +345,15 @@ func (shaman *Shaman) applyFlurry() {
 		},
 	})
 
-	var icd core.InternalCD
-	icdDur := time.Millisecond * 500
+	icd := core.Cooldown{
+		Timer:    shaman.NewTimer(),
+		Duration: time.Millisecond * 500,
+	}
 
 	shaman.RegisterAura(core.Aura{
 		Label:    "Flurry",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -359,13 +364,13 @@ func (shaman *Shaman) applyFlurry() {
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				procAura.Activate(sim)
 				procAura.SetStacks(sim, 3)
-				icd = 0 // the "charge protection" ICD isn't up yet
+				icd.Reset() // the "charge protection" ICD isn't up yet
 				return
 			}
 
 			// Remove a stack.
-			if procAura.IsActive() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) && !icd.IsOnCD(sim) {
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
+			if procAura.IsActive() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) && icd.IsReady(sim) {
+				icd.Use(sim)
 				procAura.RemoveStack(sim)
 			}
 		},

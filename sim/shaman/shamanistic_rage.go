@@ -7,15 +7,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ShamanisticRageCD = core.NewCooldownID()
-var ShamanisticRageActionID = core.ActionID{SpellID: 30823, CooldownID: ShamanisticRageCD}
+var ShamanisticRageActionID = core.ActionID{SpellID: 30823}
 
 func (shaman *Shaman) registerShamanisticRageCD() {
 	if !shaman.Talents.ShamanisticRage {
 		return
 	}
-
-	const cd = time.Minute * 2
 
 	ppmm := shaman.AutoAttacks.NewPPMManager(15)
 	srAura := shaman.RegisterAura(core.Aura{
@@ -38,7 +35,10 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 	spell := shaman.RegisterSpell(core.SpellConfig{
 		ActionID: ShamanisticRageActionID,
 		Cast: core.CastConfig{
-			Cooldown:         cd,
+			CD: core.Cooldown{
+				Timer:    shaman.NewTimer(),
+				Duration: time.Minute * 2,
+			},
 			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {

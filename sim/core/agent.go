@@ -56,8 +56,6 @@ type ActionID struct {
 	OtherID proto.OtherAction
 
 	Tag int32
-
-	CooldownID CooldownID // used only for tracking CDs internally
 }
 
 func (actionID ActionID) IsEmptyAction() bool {

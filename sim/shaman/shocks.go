@@ -13,15 +13,13 @@ const SpellIDEarthShock int32 = 25454
 const SpellIDFlameShock int32 = 25457
 const SpellIDFrostShock int32 = 25464
 
-var ShockCooldownID = core.NewCooldownID() // shared CD for all shocks
-
 func (shaman *Shaman) ShockCD() time.Duration {
 	return time.Second*6 - time.Millisecond*200*time.Duration(shaman.Talents.Reverberation)
 }
 
 // Shared logic for all shocks.
-func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, spellSchool core.SpellSchool, baseCost float64) (core.SpellConfig, core.SpellEffect) {
-	actionID := core.ActionID{SpellID: spellID, CooldownID: ShockCooldownID}
+func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, spellSchool core.SpellSchool, baseCost float64, shockTimer *core.Timer) (core.SpellConfig, core.SpellEffect) {
+	actionID := core.ActionID{SpellID: spellID}
 
 	var onCastComplete func(*core.Simulation, *core.Spell)
 	var onSpellHit func(*core.Simulation, *core.Spell, *core.SpellEffect)
@@ -66,7 +64,10 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 						cast.Cost = 0
 					}
 				},
-				Cooldown:       shaman.ShockCD(),
+				CD: core.Cooldown{
+					Timer:    shockTimer,
+					Duration: shaman.ShockCD(),
+				},
 				OnCastComplete: onCastComplete,
 			},
 		}, core.SpellEffect{
@@ -80,8 +81,8 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 		}
 }
 
-func (shaman *Shaman) registerEarthShockSpell(sim *core.Simulation) {
-	config, effect := shaman.newShockSpellConfig(sim, SpellIDEarthShock, core.SpellSchoolNature, 535.0)
+func (shaman *Shaman) registerEarthShockSpell(sim *core.Simulation, shockTimer *core.Timer) {
+	config, effect := shaman.newShockSpellConfig(sim, SpellIDEarthShock, core.SpellSchoolNature, 535.0, shockTimer)
 	config.SpellExtras |= core.SpellExtrasBinary
 
 	effect.BaseDamage = core.BaseDamageConfigMagic(661, 696, 0.386)
@@ -91,8 +92,8 @@ func (shaman *Shaman) registerEarthShockSpell(sim *core.Simulation) {
 	shaman.EarthShock = shaman.RegisterSpell(config)
 }
 
-func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation) {
-	config, effect := shaman.newShockSpellConfig(sim, SpellIDFlameShock, core.SpellSchoolFire, 500.0)
+func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation, shockTimer *core.Timer) {
+	config, effect := shaman.newShockSpellConfig(sim, SpellIDFlameShock, core.SpellSchoolFire, 500.0, shockTimer)
 
 	effect.BaseDamage = core.BaseDamageConfigMagic(377, 377, 0.214)
 	effect.OutcomeApplier = core.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
@@ -134,8 +135,8 @@ func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation) {
 	})
 }
 
-func (shaman *Shaman) registerFrostShockSpell(sim *core.Simulation) {
-	config, effect := shaman.newShockSpellConfig(sim, SpellIDFrostShock, core.SpellSchoolFrost, 525.0)
+func (shaman *Shaman) registerFrostShockSpell(sim *core.Simulation, shockTimer *core.Timer) {
+	config, effect := shaman.newShockSpellConfig(sim, SpellIDFrostShock, core.SpellSchoolFrost, 525.0, shockTimer)
 	config.SpellExtras |= core.SpellExtrasBinary
 
 	effect.ThreatMultiplier *= 2
@@ -144,4 +145,11 @@ func (shaman *Shaman) registerFrostShockSpell(sim *core.Simulation) {
 	config.ApplyEffects = core.ApplyEffectFuncDirectDamage(effect)
 
 	shaman.FrostShock = shaman.RegisterSpell(config)
+}
+
+func (shaman *Shaman) registerShocks(sim *core.Simulation) {
+	shockTimer := shaman.NewTimer()
+	shaman.registerEarthShockSpell(sim, shockTimer)
+	shaman.registerFlameShockSpell(sim, shockTimer)
+	shaman.registerFrostShockSpell(sim, shockTimer)
 }

@@ -5,13 +5,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var BloodlustCooldownID = core.NewCooldownID()
-
 func (shaman *Shaman) BloodlustActionID() core.ActionID {
 	return core.ActionID{
-		SpellID:    2825,
-		CooldownID: BloodlustCooldownID,
-		Tag:        int32(shaman.Index),
+		SpellID: 2825,
+		Tag:     int32(shaman.Index),
 	}
 }
 
@@ -43,7 +40,10 @@ func (shaman *Shaman) registerBloodlustCD() {
 				Cost: baseCost * (1 - 0.02*float64(shaman.Talents.MentalQuickness)),
 				GCD:  core.GCDDefault,
 			},
-			Cooldown: core.BloodlustCD,
+			CD: core.Cooldown{
+				Timer:    shaman.NewTimer(),
+				Duration: core.BloodlustCD,
+			},
 
 			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
 				// Needed because of the interaction between enhance GCD scheduler and other bloodlusts.

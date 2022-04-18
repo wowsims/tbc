@@ -28,21 +28,22 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
 	procAura := character.NewTemporaryStatsAura("Mystic Focus Proc", core.ActionID{ItemID: 25893}, stats.Stats{stats.SpellHaste: 320}, time.Second*4)
 
-	var icd core.InternalCD
-	const icdDur = time.Second * 35
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 35,
+	}
 
 	character.RegisterAura(core.Aura{
 		Label:    "Mystical Skyfire Diamond",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			if icd.IsOnCD(sim) || sim.RandomFloat("Mystical Skyfire Diamond") > 0.15 {
+			if !icd.IsReady(sim) || sim.RandomFloat("Mystical Skyfire Diamond") > 0.15 {
 				return
 			}
-			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			icd.Use(sim)
 			procAura.Activate(sim)
 		},
 	})
@@ -50,21 +51,22 @@ func ApplyMysticalSkyfireDiamond(agent core.Agent) {
 
 func ApplyInsightfulEarthstormDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
-	var icd core.InternalCD
-	const dur = time.Second * 15
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 15,
+	}
 
 	character.RegisterAura(core.Aura{
 		Label:    "Insightful Earthstorm Diamond",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			if icd.IsOnCD(sim) || sim.RandomFloat("Insightful Earthstorm Diamond") > 0.04 {
+			if !icd.IsReady(sim) || sim.RandomFloat("Insightful Earthstorm Diamond") > 0.04 {
 				return
 			}
-			icd = core.InternalCD(sim.CurrentTime + dur)
+			icd.Use(sim)
 			character.AddMana(sim, 300, core.ActionID{ItemID: 25901}, false)
 		},
 	})
@@ -84,15 +86,16 @@ func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 	character := agent.GetCharacter()
 	procAura := character.NewTemporaryStatsAura("Thundering Skyfire Diamond Proc", core.ActionID{ItemID: 32410}, stats.Stats{stats.MeleeHaste: 240}, time.Second*6)
 
-	var icd core.InternalCD
-	const icdDur = time.Second * 40
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 40,
+	}
 	ppmm := character.AutoAttacks.NewPPMManager(1.5)
 
 	character.RegisterAura(core.Aura{
 		Label:    "Thundering Skyfire Diamond",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -100,13 +103,13 @@ func ApplyThunderingSkyfireDiamond(agent core.Agent) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskWhiteHit) || spellEffect.IsPhantom {
 				return
 			}
-			if icd.IsOnCD(sim) {
+			if !icd.IsReady(sim) {
 				return
 			}
 			if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Thundering Skyfire Diamond") {
 				return
 			}
-			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			icd.Use(sim)
 			procAura.Activate(sim)
 		},
 	})

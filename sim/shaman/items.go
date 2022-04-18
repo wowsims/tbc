@@ -146,13 +146,9 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 	},
 }
 
-var NaturalAlignmentCrystalCooldownID = core.NewCooldownID()
-
 func ApplyNaturalAlignmentCrystal(agent core.Agent) {
-	const sp = 250
 	const dur = time.Second * 20
-	const cd = time.Minute * 5
-	actionID := core.ActionID{ItemID: 19344, CooldownID: NaturalAlignmentCrystalCooldownID}
+	actionID := core.ActionID{ItemID: 19344}
 
 	character := agent.GetCharacter()
 	activeAura := character.GetOrRegisterAura(core.Aura{
@@ -160,11 +156,11 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 		ActionID: actionID,
 		Duration: dur,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			character.AddStat(stats.SpellPower, sp)
+			character.AddStat(stats.SpellPower, 250)
 			character.PseudoStats.CostMultiplier *= 1.2
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			character.AddStat(stats.SpellPower, -sp)
+			character.AddStat(stats.SpellPower, -250)
 			character.PseudoStats.CostMultiplier /= 1.2
 		},
 	})
@@ -172,9 +168,14 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 	spell := character.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 		Cast: core.CastConfig{
-			Cooldown:         cd,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-			SharedCooldown:   dur,
+			CD: core.Cooldown{
+				Timer:    character.NewTimer(),
+				Duration: time.Minute * 5,
+			},
+			SharedCD: core.Cooldown{
+				Timer:    character.GetOffensiveTrinketCD(),
+				Duration: dur,
+			},
 			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
@@ -192,18 +193,19 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 //  to restore 335 mana. 40s ICD
 func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 	character := agent.GetCharacter()
-	var icd core.InternalCD
-	const icdDur = time.Second * 40
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 40,
+	}
 
 	character.RegisterAura(core.Aura{
 		Label:    "Fathom Brooch of the Tidewalker",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
-			icd = core.NewICD()
 		},
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			if icd.IsOnCD(sim) {
+			if !icd.IsReady(sim) {
 				return
 			}
 			if spell.SpellSchool != core.SpellSchoolNature {
@@ -212,7 +214,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 			if sim.RandomFloat("Fathom-Brooch of the Tidewalker") > 0.15 {
 				return
 			}
-			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			icd.Use(sim)
 			character.AddMana(sim, 335, core.ActionID{ItemID: 30663}, false)
 		},
 	})
@@ -267,15 +269,16 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 	character := agent.GetCharacter()
 	procAura := character.NewTemporaryStatsAura("Stonebreakers Totem Proc", core.ActionID{ItemID: 33507}, stats.Stats{stats.AttackPower: 110}, time.Second*10)
 
-	var icd core.InternalCD
-	const icdDur = time.Second * 10
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 10,
+	}
 	const procChance = 0.5
 
 	character.RegisterAura(core.Aura{
 		Label:    "Stonebreakers Totem",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -287,7 +290,7 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 				return
 			}
 
-			if icd.IsOnCD(sim) {
+			if !icd.IsReady(sim) {
 				return
 			}
 
@@ -295,7 +298,7 @@ func ApplyStonebreakersTotem(agent core.Agent) {
 				return
 			}
 
-			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			icd.Use(sim)
 			procAura.Activate(sim)
 		},
 	})

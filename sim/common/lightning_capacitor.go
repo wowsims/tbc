@@ -27,19 +27,20 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 	})
 
 	var charges int
-	var icd core.InternalCD
-	const icdDur = time.Millisecond * 2500
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Millisecond * 2500,
+	}
 
 	character.RegisterAura(core.Aura{
 		Label:    "Lightning Capacitor",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			charges = 0
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if icd.IsOnCD(sim) {
+			if !icd.IsReady(sim) {
 				return
 			}
 
@@ -53,7 +54,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 
 			charges++
 			if charges >= 3 {
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
+				icd.Use(sim)
 				tlcSpell.Cast(sim, spellEffect.Target)
 				charges = 0
 			}

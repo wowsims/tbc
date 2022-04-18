@@ -17,17 +17,19 @@ func init() {
 	core.AddItemEffect(30626, ApplySextantOfUnstableCurrents)
 	core.AddItemEffect(31856, ApplyDarkmoonCardCrusade)
 
-	// Activatable effects. Keep these in order by item ID.
-	AddSimpleStatItemActiveEffect(23046, stats.Stats{stats.SpellPower: 130}, time.Second*20, time.Minute*2, core.OffensiveTrinketSharedCooldownID)  // Restrained Essence of Sapphiron
-	AddSimpleStatItemActiveEffect(24126, stats.Stats{stats.SpellPower: 150}, time.Second*20, time.Minute*5, core.OffensiveTrinketSharedCooldownID)  // Living Ruby Serpent
-	AddSimpleStatItemActiveEffect(29132, stats.Stats{stats.SpellPower: 150}, time.Second*15, time.Second*90, core.OffensiveTrinketSharedCooldownID) // Scryer's Bloodgem
-	AddSimpleStatItemActiveEffect(29179, stats.Stats{stats.SpellPower: 150}, time.Second*15, time.Second*90, core.OffensiveTrinketSharedCooldownID) // Xiri's Gift
-	AddSimpleStatItemActiveEffect(29370, stats.Stats{stats.SpellPower: 155}, time.Second*20, time.Minute*2, core.OffensiveTrinketSharedCooldownID)  // Icon of the Silver Crescent
-	AddSimpleStatItemActiveEffect(29376, stats.Stats{stats.SpellPower: 99}, time.Second*20, time.Minute*2, core.DefensiveTrinketSharedCooldownID)   // Essence of the Marytr
-	AddSimpleStatItemActiveEffect(32483, stats.Stats{stats.SpellHaste: 175}, time.Second*20, time.Minute*2, core.OffensiveTrinketSharedCooldownID)  // Skull of Gul'dan
-	AddSimpleStatItemActiveEffect(33829, stats.Stats{stats.SpellPower: 211}, time.Second*20, time.Minute*2, core.OffensiveTrinketSharedCooldownID)  // Hex Shrunken Head
-	AddSimpleStatItemActiveEffect(34429, stats.Stats{stats.SpellPower: 320}, time.Second*15, time.Second*90, core.OffensiveTrinketSharedCooldownID) // Shifting Naaru Sliver
-	AddSimpleStatItemActiveEffect(38290, stats.Stats{stats.SpellPower: 155}, time.Second*20, time.Minute*2, core.OffensiveTrinketSharedCooldownID)  // Dark Iron Smoking Pipe
+	// Offensive trinkets. Keep these in order by item ID.
+	AddSimpleStatOffensiveTrinketEffect(23046, stats.Stats{stats.SpellPower: 130}, time.Second*20, time.Minute*2)  // Restrained Essence of Sapphiron
+	AddSimpleStatOffensiveTrinketEffect(24126, stats.Stats{stats.SpellPower: 150}, time.Second*20, time.Minute*5)  // Living Ruby Serpent
+	AddSimpleStatOffensiveTrinketEffect(29132, stats.Stats{stats.SpellPower: 150}, time.Second*15, time.Second*90) // Scryer's Bloodgem
+	AddSimpleStatOffensiveTrinketEffect(29179, stats.Stats{stats.SpellPower: 150}, time.Second*15, time.Second*90) // Xiri's Gift
+	AddSimpleStatOffensiveTrinketEffect(29370, stats.Stats{stats.SpellPower: 155}, time.Second*20, time.Minute*2)  // Icon of the Silver Crescent
+	AddSimpleStatOffensiveTrinketEffect(32483, stats.Stats{stats.SpellHaste: 175}, time.Second*20, time.Minute*2)  // Skull of Gul'dan
+	AddSimpleStatOffensiveTrinketEffect(33829, stats.Stats{stats.SpellPower: 211}, time.Second*20, time.Minute*2)  // Hex Shrunken Head
+	AddSimpleStatOffensiveTrinketEffect(34429, stats.Stats{stats.SpellPower: 320}, time.Second*15, time.Second*90) // Shifting Naaru Sliver
+	AddSimpleStatOffensiveTrinketEffect(38290, stats.Stats{stats.SpellPower: 155}, time.Second*20, time.Minute*2)  // Dark Iron Smoking Pipe
+
+	// Defensive trinkets. Keep these in order by item ID.
+	AddSimpleStatDefensiveTrinketEffect(29376, stats.Stats{stats.SpellPower: 99}, time.Second*20, time.Minute*2) // Essence of the Marytr
 
 	// Even though these item effects are handled elsewhere, add them so they are
 	// detected for automatic testing.
@@ -47,21 +49,22 @@ func ApplyQuagmirransEye(agent core.Agent) {
 	character := agent.GetCharacter()
 	procAura := character.NewTemporaryStatsAura("Fungal Frenzy", core.ActionID{ItemID: 27683}, stats.Stats{stats.SpellHaste: 320}, time.Second*6)
 
-	var icd core.InternalCD
-	const icdDur = time.Second * 45
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 45,
+	}
 
 	character.RegisterAura(core.Aura{
 		Label:    "Quagmirran's Eye",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			if icd.IsOnCD(sim) || sim.RandomFloat("Quagmirran's Eye") > 0.1 {
+			if !icd.IsReady(sim) || sim.RandomFloat("Quagmirran's Eye") > 0.1 {
 				return
 			}
-			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			icd.Use(sim)
 			procAura.Activate(sim)
 		},
 	})
@@ -71,27 +74,28 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 	character := agent.GetCharacter()
 	procAura := character.NewTemporaryStatsAura("Call of the Nexus", core.ActionID{ItemID: 28418}, stats.Stats{stats.SpellPower: 225}, time.Second*10)
 
-	var icd core.InternalCD
-	const dur = time.Second * 45
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 45,
+	}
 
 	character.RegisterAura(core.Aura{
 		Label:    "Shiffar's Nexus Horn",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
-			if icd.IsOnCD(sim) || !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellEffect.IsPhantom {
+			if !icd.IsReady(sim) || !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellEffect.IsPhantom {
 				return
 			}
 			if sim.RandomFloat("Shiffar's Nexus-Horn") > 0.2 {
 				return
 			}
-			icd = core.InternalCD(sim.CurrentTime + dur)
+			icd.Use(sim)
 			procAura.Activate(sim)
 		},
 	})
@@ -123,27 +127,28 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 	character := agent.GetCharacter()
 	procAura := character.NewTemporaryStatsAura("Unstable Currents", core.ActionID{ItemID: 30626}, stats.Stats{stats.SpellPower: 190}, time.Second*15)
 
-	var icd core.InternalCD
-	const icdDur = time.Second * 45
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 45,
+	}
 
 	character.RegisterAura(core.Aura{
 		Label:    "Sextant of Unstable Currents",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
-			if !spellEffect.Outcome.Matches(core.OutcomeCrit) || icd.IsOnCD(sim) || spellEffect.IsPhantom {
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) || !icd.IsReady(sim) || spellEffect.IsPhantom {
 				return
 			}
 			if sim.RandomFloat("Sextant of Unstable Currents") > 0.2 {
 				return
 			}
-			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			icd.Use(sim)
 			procAura.Activate(sim)
 		},
 	})

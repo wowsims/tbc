@@ -117,8 +117,7 @@ func (shaman *Shaman) registerMagmaTotemSpell(sim *core.Simulation) {
 
 const SpellIDNovaTotem int32 = 25537
 
-var CooldownIDNovaTotem = core.NewCooldownID()
-var FireNovaTotemActionID = core.ActionID{SpellID: SpellIDNovaTotem, CooldownID: CooldownIDNovaTotem}
+var FireNovaTotemActionID = core.ActionID{SpellID: SpellIDNovaTotem}
 
 func (shaman *Shaman) FireNovaTickLength() time.Duration {
 	return time.Second * time.Duration(4-shaman.Talents.ImprovedFireTotems)
@@ -146,7 +145,10 @@ func (shaman *Shaman) registerNovaTotemSpell(sim *core.Simulation) {
 					baseCost*float64(shaman.Talents.MentalQuickness)*0.02,
 				GCD: time.Second,
 			},
-			Cooldown: time.Second * 15,
+			CD: core.Cooldown{
+				Timer:    shaman.NewTimer(),
+				Duration: time.Second * 15,
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {

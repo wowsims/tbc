@@ -42,7 +42,10 @@ func (mage *Mage) registerManaGemsCD() {
 		ActionID: core.MageManaGemMCDActionID,
 
 		Cast: core.CastConfig{
-			Cooldown:         time.Minute * 2,
+			Cooldown: core.Cooldown{
+				Timer:    mage.GetConjuredCD(),
+				Duration: time.Minute * 2,
+			},
 			DisableCallbacks: true,
 		},
 

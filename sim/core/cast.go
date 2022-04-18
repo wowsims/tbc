@@ -35,15 +35,8 @@ type CastConfig struct {
 	// Ignores haste when calculating the GCD and cast time for this cast.
 	IgnoreHaste bool
 
-	// If set, this action will start a cooldown using its cooldown ID.
-	// Note that the GCD CD will be activated even if this is not set.
-	Cooldown time.Duration
-
-	// Secondary cooldown ID, used for shared cooldowns.
-	SharedCooldownID CooldownID
-
-	// Duration of secondary cooldown.
-	SharedCooldown time.Duration
+	CD       Cooldown
+	SharedCD Cooldown
 
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete func(*Simulation, *Spell)
@@ -191,8 +184,8 @@ func (spell *Spell) wrapCastFuncGCD(config CastConfig, onCastComplete CastFunc) 
 
 	return func(sim *Simulation, target *Target) {
 		// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
-		if spell.CurCast.GCD != 0 && spell.Character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
-			panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", spell.ActionID, spell.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime)))
+		if spell.CurCast.GCD != 0 && !spell.Character.GCD.IsReady(sim) {
+			panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", spell.ActionID, spell.Character.GCD.TimeToReady(sim)))
 		}
 
 		gcd := spell.CurCast.GCD
@@ -201,56 +194,49 @@ func (spell *Spell) wrapCastFuncGCD(config CastConfig, onCastComplete CastFunc) 
 		}
 
 		fullCastTime := spell.CurCast.CastTime + spell.CurCast.ChannelTime + spell.CurCast.AfterCastDelay
-		spell.Character.SetGCDTimer(sim, sim.CurrentTime+MaxDuration(gcd, fullCastTime))
+		spell.Character.GCD.Set(sim.CurrentTime + MaxDuration(gcd, fullCastTime))
 
 		onCastComplete(sim, target)
 	}
 }
 
 func (spell *Spell) wrapCastFuncCooldown(config CastConfig, onCastComplete CastFunc) CastFunc {
-	if config.Cooldown != 0 && spell.ActionID.CooldownID == 0 {
-		panic("Cooldown specified but no CooldownID!")
-	}
-
-	if config.Cooldown == 0 {
+	if config.CD.Timer == nil {
 		return onCastComplete
 	}
 
-	// Store separately so the lambda doesn't capture the entire config.
-	cooldownDur := config.Cooldown
+	if config.CD.Duration == 0 {
+		panic("Cooldown specified but no duration!")
+	}
 
 	return func(sim *Simulation, target *Target) {
 		// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
-		if spell.Character.IsOnCD(spell.ActionID.CooldownID, sim.CurrentTime) {
-			panic(fmt.Sprintf("Trying to cast %s but is still on cooldown for %s", spell.ActionID, spell.Character.GetRemainingCD(spell.ActionID.CooldownID, sim.CurrentTime)))
+		if !spell.CD.IsReady(sim) {
+			panic(fmt.Sprintf("Trying to cast %s but is still on cooldown for %s", spell.ActionID, spell.CD.TimeToReady(sim)))
 		}
 
-		spell.Character.SetCD(spell.ActionID.CooldownID, sim.CurrentTime+spell.CurCast.CastTime+cooldownDur)
+		spell.CD.Set(sim.CurrentTime + spell.CurCast.CastTime + spell.CD.Duration)
 
 		onCastComplete(sim, target)
 	}
 }
 
 func (spell *Spell) wrapCastFuncSharedCooldown(config CastConfig, onCastComplete CastFunc) CastFunc {
-	if config.SharedCooldown != 0 && config.SharedCooldownID == 0 {
-		panic("SharedCooldown specified but no SharedCooldownID!")
-	}
-
-	if config.SharedCooldown == 0 {
+	if config.SharedCD.Timer == nil {
 		return onCastComplete
 	}
 
-	// Store separately so the lambda doesn't capture the entire config.
-	cooldownDur := config.SharedCooldown
-	cooldownID := config.SharedCooldownID
+	if config.SharedCD.Duration == 0 {
+		panic("SharedCooldown specified but no duration!")
+	}
 
 	return func(sim *Simulation, target *Target) {
 		// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
-		if spell.Character.IsOnCD(cooldownID, sim.CurrentTime) {
-			panic(fmt.Sprintf("Trying to cast %s but is still on shared cooldown for %s", spell.ActionID, spell.Character.GetRemainingCD(cooldownID, sim.CurrentTime)))
+		if !spell.SharedCD.IsReady(sim) {
+			panic(fmt.Sprintf("Trying to cast %s but is still on shared cooldown for %s", spell.ActionID, spell.SharedCD.TimeToReady(sim)))
 		}
 
-		spell.Character.SetCD(cooldownID, sim.CurrentTime+spell.CurCast.CastTime+cooldownDur)
+		spell.SharedCD.Set(sim.CurrentTime + spell.CurCast.CastTime + spell.SharedCD.Duration)
 
 		onCastComplete(sim, target)
 	}

@@ -239,10 +239,7 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 		shaman.ChainLightningLOs = append(shaman.ChainLightningLOs, shaman.newChainLightningSpell(sim, true))
 	}
 
-	shaman.registerEarthShockSpell(sim)
-	shaman.registerFlameShockSpell(sim)
-	shaman.registerFrostShockSpell(sim)
-
+	shaman.registerShocks(sim)
 	shaman.registerGraceOfAirTotemSpell(sim)
 	shaman.registerMagmaTotemSpell(sim)
 	shaman.registerManaSpringTotemSpell(sim)

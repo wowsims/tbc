@@ -364,11 +364,9 @@ func ApplyDespair(agent core.Agent) {
 	})
 }
 
-var TheDecapitatorCooldownID = core.NewCooldownID()
-
 func ApplyTheDecapitator(agent core.Agent) {
 	character := agent.GetCharacter()
-	actionID := core.ActionID{ItemID: 28767, CooldownID: TheDecapitatorCooldownID}
+	actionID := core.ActionID{ItemID: 28767}
 
 	spell := character.GetOrRegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
@@ -376,9 +374,14 @@ func ApplyTheDecapitator(agent core.Agent) {
 		SpellExtras: core.SpellExtrasIgnoreResists,
 
 		Cast: core.CastConfig{
-			Cooldown:         time.Minute * 3,
-			SharedCooldownID: core.OffensiveTrinketSharedCooldownID,
-			SharedCooldown:   time.Second * 10,
+			CD: core.Cooldown{
+				Timer:    character.NewTimer(),
+				Duration: time.Minute * 3,
+			},
+			SharedCD: core.Cooldown{
+				Timer:    character.GetOffensiveTrinketCD(),
+				Duration: time.Second * 10,
+			},
 			DisableCallbacks: true,
 		},
 
@@ -444,14 +447,15 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 	procAura := character.NewTemporaryStatsAura("Band of the Eternal Champion Proc", core.ActionID{ItemID: 29301}, stats.Stats{stats.AttackPower: 160, stats.RangedAttackPower: 160}, time.Second*10)
 	ppmm := character.AutoAttacks.NewPPMManager(1.0)
 
-	var icd core.InternalCD
-	const icdDur = time.Second * 60
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 60,
+	}
 
 	character.GetOrRegisterAura(core.Aura{
 		Label:    "Band of the Eternal Champion",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -459,14 +463,14 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 				return
 			}
-			if icd.IsOnCD(sim) {
+			if !icd.IsReady(sim) {
 				return
 			}
 			if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Band of the Eternal Champion") {
 				return
 			}
 
-			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			icd.Use(sim)
 			procAura.Activate(sim)
 		},
 	})
@@ -741,8 +745,10 @@ func ApplyBlinkstrike(agent core.Agent) {
 	}
 
 	var blinkstrikeSpell *core.Spell
-	var icd core.InternalCD
-	icdDur := time.Millisecond * 1
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Millisecond,
+	}
 
 	character.GetOrRegisterAura(core.Aura{
 		Label:    "Blinkstrike",
@@ -756,7 +762,6 @@ func ApplyBlinkstrike(agent core.Agent) {
 			})
 		},
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			icd = core.NewICD()
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -764,14 +769,14 @@ func ApplyBlinkstrike(agent core.Agent) {
 				return
 			}
 
-			if icd.IsOnCD(sim) {
+			if !icd.IsReady(sim) {
 				return
 			}
 
 			if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Blinkstrike") {
 				return
 			}
-			icd = core.InternalCD(sim.CurrentTime + icdDur)
+			icd.Use(sim)
 
 			blinkstrikeSpell.Cast(sim, spellEffect.Target)
 		},
