@@ -20,10 +20,13 @@ func (rogue *Rogue) registerThistleTeaCD() {
 		ActionID: actionID,
 
 		Cast: core.CastConfig{
-			// TODO: Thistle tea might only put conjured on shorter CD
 			CD: core.Cooldown{
-				Timer:    rogue.GetConjuredCD(),
+				Timer:    rogue.NewTimer(),
 				Duration: time.Minute * 5,
+			},
+			SharedCD: core.Cooldown{
+				Timer:    rogue.GetConjuredCD(),
+				Duration: time.Minute * 2,
 			},
 		},
 

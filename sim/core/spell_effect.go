@@ -121,9 +121,9 @@ func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spell *
 		critRating += character.PseudoStats.BonusCritRatingAgentReserved1
 	}
 	if spellEffect.ProcMask.Matches(ProcMaskMeleeMH) {
-		spellEffect.BonusCritRating += character.PseudoStats.BonusMHCritRating
+		critRating += character.PseudoStats.BonusMHCritRating
 	} else if spellEffect.ProcMask.Matches(ProcMaskMeleeOH) {
-		spellEffect.BonusCritRating += character.PseudoStats.BonusOHCritRating
+		critRating += character.PseudoStats.BonusOHCritRating
 	}
 
 	return (critRating / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
