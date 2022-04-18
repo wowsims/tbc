@@ -69,6 +69,7 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	{ /** Idol of the Unseen Moon */ ID: 33510, Phase: 4},
 	{ /** Magnified Moon Specs */ ID: 32480, ClassAllowlist: []proto.Class{proto.Class_ClassDruid}},
 	{ /** Skycall Totem */ ID: 33506, Phase: 4},
+	{ /** Quad Deathblow X44 Goggles */ ID: 34353, ClassAllowlist: []proto.Class{proto.Class_ClassDruid, proto.Class_ClassRogue}},
 	{ /** Vindicator's Band of Triumph */ ID: 33919, Phase: 3},
 	{ /** Vindicator's Pendant of Reprieve */ ID: 35317, Phase: 4},
 	{ /** Vindicator's Pendant of Subjugation */ ID: 35319, Phase: 4},
