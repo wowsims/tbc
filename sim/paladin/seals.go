@@ -96,7 +96,10 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	})
 
 	ppmm := paladin.AutoAttacks.NewPPMManager(7.0)
-	const icdDur = time.Second * 1
+	icd := core.Cooldown{
+		Timer:    paladin.NewTimer(),
+		Duration: time.Second * 1,
+	}
 
 	paladin.SealOfCommandAura = paladin.RegisterAura(core.Aura{
 		Label:    "Seal of Command",
@@ -108,7 +111,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 				return
 			}
 
-			if paladin.sealOfCommandICD.IsOnCD(sim) {
+			if !icd.IsReady(sim) {
 				return
 			}
 
@@ -116,8 +119,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 				return
 			}
 
-			paladin.sealOfCommandICD = core.InternalCD(sim.CurrentTime + icdDur)
-
+			icd.Use(sim)
 			socProc.Cast(sim, spellEffect.Target)
 		},
 	})

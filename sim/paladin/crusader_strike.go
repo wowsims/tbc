@@ -7,8 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var CrusaderStrikeCD = core.NewCooldownID()
-var CrusaderStrikeActionID = core.ActionID{SpellID: 35395, CooldownID: CrusaderStrikeCD}
+var CrusaderStrikeActionID = core.ActionID{SpellID: 35395}
 
 // Do some research on the spell fields to make sure I'm doing this right
 // Need to add in judgement debuff refreshing feature at some point
@@ -28,7 +27,10 @@ func (paladin *Paladin) registerCrusaderStrikeSpell(sim *core.Simulation) {
 				Cost: baseCost,
 				GCD:  core.GCDDefault,
 			},
-			Cooldown: time.Second * 6,
+			CD: core.Cooldown{
+				Timer:    paladin.NewTimer(),
+				Duration: time.Second * 6,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{

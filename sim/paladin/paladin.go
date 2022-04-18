@@ -13,7 +13,6 @@ type Paladin struct {
 
 	CurrentSeal      *core.Aura
 	CurrentJudgement *core.Aura
-	sealOfCommandICD core.InternalCD
 
 	Consecration           *core.Spell
 	CrusaderStrike         *core.Spell
@@ -58,13 +57,10 @@ func (paladin *Paladin) Init(sim *core.Simulation) {
 	paladin.registerConsecrationSpell(sim)
 	paladin.registerCrusaderStrikeSpell(sim)
 	paladin.registerExorcismSpell(sim)
-	paladin.registerJudgementOfBloodSpell(sim)
-	paladin.registerJudgementOfTheCrusaderSpell(sim)
-	paladin.registerJudgementOfWisdomSpell(sim)
+	paladin.registerJudgements(sim)
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {
-	paladin.sealOfCommandICD = 0
 	paladin.CurrentSeal = nil
 	paladin.CurrentJudgement = nil
 }
