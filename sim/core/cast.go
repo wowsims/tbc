@@ -194,7 +194,7 @@ func (spell *Spell) wrapCastFuncGCD(config CastConfig, onCastComplete CastFunc) 
 		}
 
 		fullCastTime := spell.CurCast.CastTime + spell.CurCast.ChannelTime + spell.CurCast.AfterCastDelay
-		spell.Character.GCD.Set(sim.CurrentTime + MaxDuration(gcd, fullCastTime))
+		spell.Character.SetGCDTimer(sim, sim.CurrentTime+MaxDuration(gcd, fullCastTime))
 
 		onCastComplete(sim, target)
 	}
