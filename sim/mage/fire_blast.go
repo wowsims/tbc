@@ -9,8 +9,7 @@ import (
 
 const SpellIDFireBlast int32 = 27079
 
-var FireBlastCooldownID = core.NewCooldownID()
-var FireBlastActionID = core.ActionID{SpellID: SpellIDFireBlast, CooldownID: FireBlastCooldownID}
+var FireBlastActionID = core.ActionID{SpellID: SpellIDFireBlast}
 
 func (mage *Mage) registerFireBlastSpell(sim *core.Simulation) {
 	baseCost := 465.0
@@ -31,7 +30,10 @@ func (mage *Mage) registerFireBlastSpell(sim *core.Simulation) {
 
 				GCD: core.GCDDefault,
 			},
-			Cooldown: time.Second*8 - time.Millisecond*500*time.Duration(mage.Talents.ImprovedFireBlast),
+			CD: core.Cooldown{
+				Timer:    mage.NewTimer(),
+				Duration: time.Second*8 - time.Millisecond*500*time.Duration(mage.Talents.ImprovedFireBlast),
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{

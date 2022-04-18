@@ -7,8 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ArcaneShotCooldownID = core.NewCooldownID()
-var ArcaneShotActionID = core.ActionID{SpellID: 27019, CooldownID: ArcaneShotCooldownID}
+var ArcaneShotActionID = core.ActionID{SpellID: 27019}
 
 func (hunter *Hunter) registerArcaneShotSpell(sim *core.Simulation) {
 	baseCost := 230.0
@@ -27,7 +26,10 @@ func (hunter *Hunter) registerArcaneShotSpell(sim *core.Simulation) {
 				GCD:  core.GCDDefault + hunter.latency,
 			},
 			IgnoreHaste: true,
-			Cooldown:    time.Second*6 - time.Millisecond*200*time.Duration(hunter.Talents.ImprovedArcaneShot),
+			CD: core.Cooldown{
+				Timer:    hunter.NewTimer(),
+				Duration: time.Second*6 - time.Millisecond*200*time.Duration(hunter.Talents.ImprovedArcaneShot),
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{

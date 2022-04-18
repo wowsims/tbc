@@ -7,8 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var KillCommandCooldownID = core.NewCooldownID()
-var KillCommandActionID = core.ActionID{SpellID: 34026, CooldownID: KillCommandCooldownID}
+var KillCommandActionID = core.ActionID{SpellID: 34026}
 
 func (hunter *Hunter) applyKillCommand() {
 	if hunter.pet == nil {
@@ -44,7 +43,10 @@ func (hunter *Hunter) registerKillCommandSpell(sim *core.Simulation) {
 			DefaultCast: core.Cast{
 				Cost: baseCost,
 			},
-			Cooldown: time.Second * 5,
+			CD: core.Cooldown{
+				Timer:    hunter.NewTimer(),
+				Duration: time.Second * 5,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
@@ -101,7 +103,7 @@ func (hunter *Hunter) TryKillCommand(sim *core.Simulation, target *core.Target) 
 		return
 	}
 
-	if !hunter.IsOnCD(KillCommandCooldownID, sim.CurrentTime) {
+	if hunter.KillCommand.IsReady(sim) {
 		hunter.KillCommand.Cast(sim, target)
 	}
 }

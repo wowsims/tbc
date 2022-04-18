@@ -82,6 +82,7 @@ type Hunter struct {
 	ArcaneShot   *core.Spell
 	KillCommand  *core.Spell
 	MultiShot    *core.Spell
+	RapidFire    *core.Spell
 	RaptorStrike *core.Spell
 	ScorpidSting *core.Spell
 	SerpentSting *core.Spell

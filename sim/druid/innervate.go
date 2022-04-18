@@ -7,8 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var InnervateCooldownID = core.NewCooldownID()
-
 // Returns the time to wait before the next action, or 0 if innervate is on CD
 // or disabled.
 func (druid *Druid) registerInnervateCD() {
@@ -18,7 +16,7 @@ func (druid *Druid) registerInnervateCD() {
 	}
 	innervateTarget := innervateTargetAgent.GetCharacter()
 
-	actionID := core.ActionID{SpellID: 29166, CooldownID: InnervateCooldownID, Tag: int32(druid.Index)}
+	actionID := core.ActionID{SpellID: 29166, Tag: int32(druid.Index)}
 
 	baseCost := druid.BaseMana() * 0.04
 	innervateCD := core.InnervateCD
@@ -55,7 +53,10 @@ func (druid *Druid) registerInnervateCD() {
 				Cost: baseCost,
 				GCD:  core.GCDDefault,
 			},
-			Cooldown: innervateCD,
+			CD: core.Cooldown{
+				Timer:    druid.NewTimer(),
+				Duration: innervateCD,
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {

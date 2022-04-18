@@ -160,7 +160,7 @@ func (mage *Mage) doFireRotation(sim *core.Simulation) *core.Spell {
 		return mage.doAoeRotation(sim)
 	}
 
-	if mage.FireRotation.WeaveFireBlast && !mage.IsOnCD(FireBlastCooldownID, sim.CurrentTime) {
+	if mage.FireRotation.WeaveFireBlast && mage.FireBlast.IsReady(sim) {
 		return mage.FireBlast
 	}
 

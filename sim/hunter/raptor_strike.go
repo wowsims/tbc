@@ -8,8 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var RaptorStrikeCooldownID = core.NewCooldownID()
-var RaptorStrikeActionID = core.ActionID{SpellID: 27014, CooldownID: RaptorStrikeCooldownID}
+var RaptorStrikeActionID = core.ActionID{SpellID: 27014}
 
 func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
 	baseCost := 120.0
@@ -26,7 +25,10 @@ func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
 			DefaultCast: core.Cast{
 				Cost: baseCost * (1 - 0.2*float64(hunter.Talents.Resourcefulness)),
 			},
-			Cooldown: time.Second * 6,
+			CD: core.Cooldown{
+				Timer:    hunter.NewTimer(),
+				Duration: time.Second * 6,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
@@ -44,7 +46,7 @@ func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
 
 // Returns true if the regular melee swing should be used, false otherwise.
 func (hunter *Hunter) TryRaptorStrike(sim *core.Simulation) *core.Spell {
-	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveAutosOnly || hunter.IsOnCD(RaptorStrikeCooldownID, sim.CurrentTime) || hunter.CurrentMana() < hunter.RaptorStrike.DefaultCast.Cost {
+	if hunter.Rotation.Weave == proto.Hunter_Rotation_WeaveAutosOnly || !hunter.RaptorStrike.IsReady(sim) || hunter.CurrentMana() < hunter.RaptorStrike.DefaultCast.Cost {
 		return nil
 	}
 
