@@ -5,14 +5,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var PowerInfusionCooldownID = core.NewCooldownID()
-
 func (priest *Priest) registerPowerInfusionCD() {
 	if !priest.Talents.PowerInfusion {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 10060, CooldownID: PowerInfusionCooldownID, Tag: int32(priest.Index)}
+	actionID := core.ActionID{SpellID: 10060, Tag: int32(priest.Index)}
 	baseCost := priest.BaseMana() * 0.16
 
 	powerInfusionTargetAgent := priest.Party.Raid.GetPlayerFromRaidTarget(priest.SelfBuffs.PowerInfusionTarget)
@@ -32,7 +30,10 @@ func (priest *Priest) registerPowerInfusionCD() {
 			DefaultCast: core.Cast{
 				Cost: baseCost,
 			},
-			Cooldown: core.PowerInfusionCD,
+			CD: core.Cooldown{
+				Timer:    priest.NewTimer(),
+				Duration: core.PowerInfusionCD,
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {

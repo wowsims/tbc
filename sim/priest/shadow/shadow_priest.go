@@ -109,21 +109,21 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 		spell = spriest.VampiricTouch
 	} else if !spriest.ShadowWordPainDot.IsActive() {
 		spell = spriest.ShadowWordPain
-	} else if spriest.rotation.UseStarshards && spriest.GetRemainingCD(priest.SSCooldownID, sim.CurrentTime) == 0 {
+	} else if spriest.rotation.UseStarshards && spriest.Starshards.IsReady(sim) {
 		spell = spriest.Starshards
-	} else if spriest.rotation.UseDevPlague && spriest.GetRemainingCD(priest.DevouringPlagueCooldownID, sim.CurrentTime) == 0 {
+	} else if spriest.rotation.UseDevPlague && spriest.DevouringPlague.IsReady(sim) {
 		spell = spriest.DevouringPlague
 	} else if spriest.Talents.MindFlay {
 
 		allCDs := []time.Duration{
-			mbidx:  spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime),
-			swdidx: spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime),
+			mbidx:  spriest.MindBlast.TimeToReady(sim),
+			swdidx: spriest.ShadowWordDeath.TimeToReady(sim),
 			vtidx:  spriest.VampiricTouchDot.RemainingDuration(sim) - vtCastTime,
 			swpidx: spriest.ShadowWordPainDot.RemainingDuration(sim),
 		}
 
 		if allCDs[mbidx] == 0 {
-			if spriest.InnerFocus != nil && spriest.GetRemainingCD(priest.InnerFocusCooldownID, sim.CurrentTime) == 0 {
+			if spriest.InnerFocus != nil && spriest.InnerFocus.IsReady(sim) {
 				spriest.InnerFocus.Cast(sim, nil)
 			}
 			spell = spriest.MindBlast
@@ -159,8 +159,8 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 		}
 	} else {
 		// what do you even do... i guess just sit around
-		mbcd := spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime)
-		swdcd := spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime)
+		mbcd := spriest.MindBlast.TimeToReady(sim)
+		swdcd := spriest.ShadowWordDeath.TimeToReady(sim)
 		vtidx := spriest.VampiricTouchDot.RemainingDuration(sim) - vtCastTime
 		swpidx := spriest.ShadowWordPainDot.RemainingDuration(sim)
 		wait1 = core.MinDuration(mbcd, swdcd)

@@ -132,14 +132,12 @@ func (priest *Priest) applySurgeOfLight(_ *core.Simulation, _ *core.Spell, cast 
 	}
 }
 
-var InnerFocusCooldownID = core.NewCooldownID()
-var InnerFocusActionID = core.ActionID{SpellID: 14751, CooldownID: InnerFocusCooldownID}
+var InnerFocusActionID = core.ActionID{SpellID: 14751}
 
 func (priest *Priest) registerInnerFocus() {
 	if !priest.Talents.InnerFocus {
 		return
 	}
-	cd := time.Minute * 3
 
 	priest.InnerFocusAura = priest.RegisterAura(core.Aura{
 		Label:    "Inner Focus",
@@ -156,7 +154,7 @@ func (priest *Priest) registerInnerFocus() {
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// Remove the buff and put skill on CD
 			aura.Deactivate(sim)
-			priest.SetCD(InnerFocusCooldownID, sim.CurrentTime+cd)
+			priest.InnerFocus.CD.Use(sim)
 		},
 	})
 
@@ -164,7 +162,10 @@ func (priest *Priest) registerInnerFocus() {
 		ActionID: InnerFocusActionID,
 
 		Cast: core.CastConfig{
-			Cooldown:         cd,
+			CD: core.Cooldown{
+				Timer:    priest.NewTimer(),
+				Duration: time.Minute * 3,
+			},
 			DisableCallbacks: true,
 		},
 
