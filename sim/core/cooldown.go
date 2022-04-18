@@ -25,9 +25,15 @@ func (unit *Unit) NewTimer() *Timer {
 	return newTimer
 }
 
-func (unit *Unit) resetCDs() {
+func (unit *Unit) resetCDs(sim *Simulation) {
+	if sim.Log != nil {
+		unit.Log(sim, "Starting reset: %d", len(unit.cdTimers))
+	}
 	for _, timer := range unit.cdTimers {
 		timer.Reset()
+	}
+	if sim.Log != nil {
+		unit.Log(sim, "Done reset: %d", len(unit.cdTimers))
 	}
 }
 

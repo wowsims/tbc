@@ -124,7 +124,7 @@ func (unit *Unit) doneIteration(sim *Simulation) {
 		spell.doneIteration()
 	}
 	unit.Metrics.doneIteration(sim.Duration.Seconds())
-	unit.resetCDs()
+	unit.resetCDs(sim)
 }
 
 // ArmorDamageReduction currently assumes a level 70 attacker
