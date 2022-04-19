@@ -424,6 +424,7 @@ type PseudoStats struct {
 	// For Human and Orc weapon racials
 	BonusMHExpertiseRating float64
 	BonusOHExpertiseRating float64
+	DodgeReduction         float64 // Used by Warrior talent 'Weapon Mastery'
 
 	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
 

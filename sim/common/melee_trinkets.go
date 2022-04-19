@@ -146,7 +146,7 @@ var BadgeOfTheSwarmguardActionID = core.ActionID{ItemID: 21670}
 func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 	character := agent.GetCharacter()
 
-	procAura := character.GetOrRegisterAura(core.Aura{
+	procAura := character.RegisterAura(core.Aura{
 		Label:     "Badge of the Swarmguard Proc",
 		ActionID:  core.ActionID{SpellID: 26481},
 		Duration:  core.NeverExpires,

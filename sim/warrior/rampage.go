@@ -1,0 +1,65 @@
+package warrior
+
+import (
+	"time"
+
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
+)
+
+func (warrior *Warrior) registerRampageSpell() {
+	actionID := core.ActionID{SpellID: 30033}
+
+	var bonusPerStack stats.Stats
+	warrior.RampageAura = warrior.RegisterAura(core.Aura{
+		Label:     "Rampage",
+		ActionID:  core.ActionID{SpellID: 30032},
+		Duration:  time.Second * 30,
+		MaxStacks: 5,
+		OnInit: func(aura *core.Aura, sim *core.Simulation) {
+			bonusPerStack = warrior.ApplyStatDependencies(stats.Stats{stats.AttackPower: 50})
+		},
+		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
+			warrior.AddStatsDynamic(sim, bonusPerStack.Multiply(float64(newStacks-oldStacks)))
+		},
+	})
+
+	warrior.RegisterAura(core.Aura{
+		Label:    "Rampage Talent",
+		ActionID: actionID,
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				warrior.rampageTriggered = true
+			}
+		},
+	})
+
+	warrior.Rampage = warrior.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		ResourceType: stats.Rage,
+		BaseCost:     20,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: 20,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true,
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			warrior.rampageTriggered = false
+			warrior.RampageAura.Activate(sim)
+			warrior.RampageAura.AddStack(sim)
+		},
+	})
+}
+
+func (warrior *Warrior) ShouldRampage(sim *core.Simulation) bool {
+	return warrior.rampageTriggered && warrior.CurrentRage() >= 20 && (warrior.RampageAura.GetStacks() < 5 || warrior.RampageAura.RemainingDuration(sim) < time.Second*3)
+}

@@ -10,7 +10,6 @@ func (warrior *Warrior) registerBloodrageCD() {
 	actionID := core.ActionID{SpellID: 2687}
 
 	instantRage := 10.0 + 3*float64(warrior.Talents.ImprovedBloodrage)
-	rageOverTime := 10.0
 
 	brSpell := warrior.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
@@ -23,8 +22,15 @@ func (warrior *Warrior) registerBloodrageCD() {
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
-			// TODO: Rage over time should be done over time, not immediately.
-			warrior.AddRage(sim, instantRage+rageOverTime, actionID)
+			warrior.AddRage(sim, instantRage, actionID)
+
+			core.StartPeriodicAction(sim, core.PeriodicActionOptions{
+				NumTicks: 10,
+				Period:   time.Second * 1,
+				OnAction: func(sim *core.Simulation) {
+					warrior.AddRage(sim, 1, actionID)
+				},
+			})
 		},
 	})
 

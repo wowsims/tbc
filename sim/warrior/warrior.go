@@ -13,6 +13,8 @@ type WarriorInputs struct {
 	PrecastShout         bool
 	PrecastShoutSapphire bool
 	PrecastShoutT2       bool
+	UseCleave            bool // Cleave instead of HS
+	UseRecklessness      bool
 }
 
 type Warrior struct {
@@ -25,6 +27,7 @@ type Warrior struct {
 	// Current state
 	Stance             Stance
 	heroicStrikeQueued bool
+	rampageTriggered   bool
 	revengeTriggered   bool
 	shoutExpiresAt     time.Duration
 
@@ -37,12 +40,18 @@ type Warrior struct {
 	DefensiveStance *core.Spell
 	BerserkerStance *core.Spell
 
+	BerserkerRage        *core.Spell
 	Bloodthirst          *core.Spell
+	Cleave               *core.Spell
 	DemoralizingShout    *core.Spell
 	Devastate            *core.Spell
+	Execute              *core.Spell
 	HeroicStrike         *core.Spell
+	MortalStrike         *core.Spell
+	Rampage              *core.Spell
 	Revenge              *core.Spell
 	ShieldSlam           *core.Spell
+	Slam                 *core.Spell
 	SunderArmor          *core.Spell
 	SunderArmorDevastate *core.Spell
 	ThunderClap          *core.Spell
@@ -53,9 +62,11 @@ type Warrior struct {
 	BerserkerStanceAura *core.Aura
 
 	DemoralizingShoutAura *core.Aura
+	BloodFrenzyAuras      []*core.Aura
+	ExposeArmorAura       *core.Aura // Warriors don't cast this but they need to check it.
+	RampageAura           *core.Aura
 	SunderArmorAura       *core.Aura
 	ThunderClapAura       *core.Aura
-	ExposeArmorAura       *core.Aura // Warriors don't cast this but they need to check it.
 }
 
 func (warrior *Warrior) GetCharacter() *core.Character {
@@ -92,12 +103,18 @@ func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.Shout = warrior.makeShoutSpell()
 
 	warrior.registerStances(sim)
+	warrior.registerBerserkerRageSpell()
 	warrior.registerBloodthirstSpell(sim)
+	warrior.registerCleaveSpell(sim)
 	warrior.registerDemoralizingShoutSpell(sim)
 	warrior.registerDevastateSpell(sim)
+	warrior.registerExecuteSpell(sim)
 	warrior.registerHeroicStrikeSpell(sim)
+	warrior.registerMortalStrikeSpell(sim)
+	warrior.registerRampageSpell()
 	warrior.registerRevengeSpell(sim)
 	warrior.registerShieldSlamSpell(sim)
+	warrior.registerSlamSpell(sim)
 	warrior.registerThunderClapSpell(sim)
 	warrior.registerWhirlwindSpell(sim)
 
@@ -110,13 +127,12 @@ func (warrior *Warrior) Init(sim *core.Simulation) {
 func (warrior *Warrior) Reset(sim *core.Simulation) {
 	warrior.heroicStrikeQueued = false
 	warrior.revengeTriggered = false
+	warrior.rampageTriggered = false
 
 	warrior.shoutExpiresAt = 0
 	if warrior.Shout != nil && warrior.PrecastShout {
 		warrior.shoutExpiresAt = warrior.shoutDuration - time.Second*10
 	}
-
-	warrior.applyAngerManagement(sim)
 }
 
 func NewWarrior(character core.Character, talents proto.WarriorTalents, inputs WarriorInputs) *Warrior {
@@ -126,28 +142,28 @@ func NewWarrior(character core.Character, talents proto.WarriorTalents, inputs W
 		WarriorInputs: inputs,
 	}
 
-	warrior.Character.AddStatDependency(stats.StatDependency{
+	warrior.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.MeleeCrit,
 		Modifier: func(agility float64, meleecrit float64) float64 {
 			return meleecrit + (agility/33)*core.MeleeCritRatingPerCritChance
 		},
 	})
-	warrior.Character.AddStatDependency(stats.StatDependency{
+	warrior.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.Dodge,
 		Modifier: func(agility float64, dodge float64) float64 {
 			return dodge + (agility/30)*core.DodgeRatingPerDodgeChance
 		},
 	})
-	warrior.Character.AddStatDependency(stats.StatDependency{
+	warrior.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Strength,
 		ModifiedStat: stats.AttackPower,
 		Modifier: func(strength float64, attackPower float64) float64 {
 			return attackPower + strength*2
 		},
 	})
-	warrior.Character.AddStatDependency(stats.StatDependency{
+	warrior.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Strength,
 		ModifiedStat: stats.BlockValue,
 		Modifier: func(strength float64, blockValue float64) float64 {
@@ -277,6 +293,6 @@ func init() {
 }
 
 // Agent is a generic way to access underlying warrior on any of the agents.
-type Agent interface {
+type WarriorAgent interface {
 	GetWarrior() *Warrior
 }

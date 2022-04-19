@@ -70,5 +70,5 @@ func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.Spell {
 }
 
 func (warrior *Warrior) CanHeroicStrike(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= warrior.HeroicStrike.DefaultCast.Cost
+	return !warrior.UseCleave && warrior.CurrentRage() >= warrior.HeroicStrike.DefaultCast.Cost
 }
