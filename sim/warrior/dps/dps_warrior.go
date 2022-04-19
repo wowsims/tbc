@@ -3,6 +3,7 @@ package dps
 import (
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/warrior"
 )
 
@@ -39,7 +40,7 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 		war.FuryRotation = *warOptions.Rotation.Fury
 	}
 
-	war.EnableRageBar(warOptions.Options.StartingRage, func(sim *core.Simulation) {
+	war.EnableRageBar(warOptions.Options.StartingRage, core.TernaryFloat64(war.Talents.EndlessRage, 1.25, 1), func(sim *core.Simulation) {
 		if war.GCD.IsReady(sim) {
 			war.doRotation(sim)
 		}
@@ -49,9 +50,25 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 		OffHand:        war.WeaponFromOffHand(war.DefaultMeleeCritMultiplier()),
 		AutoSwingMelee: true,
 		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
-			return war.TryHeroicStrike(sim)
+			if war.UseCleave {
+				return war.TryCleave(sim)
+			} else {
+				return war.TryHeroicStrike(sim)
+			}
 		},
 	})
+
+	// TODO: This should only be applied while berserker stance is active.
+	if war.Talents.ImprovedBerserkerStance > 0 {
+		bonus := 1 + 0.02*float64(war.Talents.ImprovedBerserkerStance)
+		war.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.AttackPower,
+			ModifiedStat: stats.AttackPower,
+			Modifier: func(ap float64, _ float64) float64 {
+				return ap * bonus
+			},
+		})
+	}
 
 	return war
 }

@@ -76,7 +76,7 @@ func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 		}
 
 		// Dodge
-		chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character))
+		chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character)-character.PseudoStats.DodgeReduction)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeDodge
 			spell.Dodges++
@@ -137,7 +137,7 @@ func OutcomeFuncMeleeSpecialHit() OutcomeApplier {
 
 		// Dodge
 		if !spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
-			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character))
+			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character)-character.PseudoStats.DodgeReduction)
 			if roll < chance {
 				spellEffect.Outcome = OutcomeDodge
 				spell.Dodges++
@@ -175,7 +175,7 @@ func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
 
 		// Dodge
 		if !spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
-			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character))
+			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character)-character.PseudoStats.DodgeReduction)
 			if roll < chance {
 				spellEffect.Outcome = OutcomeDodge
 				spell.Dodges++

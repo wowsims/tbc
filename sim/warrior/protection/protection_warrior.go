@@ -37,7 +37,7 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 		Options:  *warOptions.Options,
 	}
 
-	war.EnableRageBar(warOptions.Options.StartingRage, func(sim *core.Simulation) {
+	war.EnableRageBar(warOptions.Options.StartingRage, core.TernaryFloat64(war.Talents.EndlessRage, 1.25, 1), func(sim *core.Simulation) {
 		if war.GCD.IsReady(sim) {
 			war.doRotation(sim)
 		}
@@ -47,7 +47,11 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 		OffHand:        war.WeaponFromOffHand(war.DefaultMeleeCritMultiplier()),
 		AutoSwingMelee: true,
 		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
-			return war.TryHeroicStrike(sim)
+			if war.UseCleave {
+				return war.TryCleave(sim)
+			} else {
+				return war.TryHeroicStrike(sim)
+			}
 		},
 	})
 

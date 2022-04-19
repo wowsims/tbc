@@ -44,7 +44,7 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	}
 
 	if debuffs.BloodFrenzy {
-		MakePermanent(BloodFrenzyAura(target))
+		MakePermanent(BloodFrenzyAura(target, 2))
 	}
 
 	if debuffs.GiftOfArthas {
@@ -212,7 +212,7 @@ func CurseOfElementsAura(target *Target, points int32) *Aura {
 }
 
 func ImprovedShadowBoltAura(target *Target, uptime float64) *Aura {
-	multiplier := (1 + uptime*0.2)
+	multiplier := 1 + uptime*0.2
 
 	return target.GetOrRegisterAura(Aura{
 		Label:     "Improved Shadow Bolt",
@@ -227,15 +227,19 @@ func ImprovedShadowBoltAura(target *Target, uptime float64) *Aura {
 	})
 }
 
-func BloodFrenzyAura(target *Target) *Aura {
+var BloodFrenzyActionID = ActionID{SpellID: 29859}
+
+func BloodFrenzyAura(target *Target, points int32) *Aura {
+	multiplier := 1 + 0.02*float64(points)
 	return target.GetOrRegisterAura(Aura{
-		Label:    "Blood Frenzy",
-		ActionID: ActionID{SpellID: 29859},
+		Label:    "Blood Frenzy-" + strconv.Itoa(int(points)),
+		ActionID: BloodFrenzyActionID,
+		Duration: time.Second * 6, // TODO
 		OnGain: func(aura *Aura, sim *Simulation) {
-			aura.Unit.PseudoStats.PhysicalDamageTakenMultiplier *= 1.04
+			aura.Unit.PseudoStats.PhysicalDamageTakenMultiplier *= multiplier
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			aura.Unit.PseudoStats.PhysicalDamageTakenMultiplier /= 1.04
+			aura.Unit.PseudoStats.PhysicalDamageTakenMultiplier /= multiplier
 		},
 	})
 }

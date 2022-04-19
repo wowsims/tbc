@@ -17,6 +17,10 @@ func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 	if war.GCD.IsReady(sim) {
 		if war.CanShieldSlam(sim) {
 			war.ShieldSlam.Cast(sim, target)
+		} else if war.CanBloodthirst(sim) {
+			war.Bloodthirst.Cast(sim, sim.GetPrimaryTarget())
+		} else if war.CanMortalStrike(sim) {
+			war.MortalStrike.Cast(sim, sim.GetPrimaryTarget())
 		} else if war.CanRevenge(sim) {
 			war.Revenge.Cast(sim, target)
 		} else if war.ShouldShout(sim) {
@@ -32,7 +36,11 @@ func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 		}
 	}
 
-	if war.CurrentRage() >= float64(war.Rotation.HeroicStrikeThreshold) && war.CanHeroicStrike(sim) {
-		war.QueueHeroicStrike(sim)
+	if war.CurrentRage() >= float64(war.Rotation.HeroicStrikeThreshold) {
+		if war.CanHeroicStrike(sim) {
+			war.QueueHeroicStrike(sim)
+		} else if war.CanCleave(sim) {
+			war.QueueCleave(sim)
+		}
 	}
 }

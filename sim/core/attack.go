@@ -88,6 +88,10 @@ func (weapon Weapon) BaseDamage(sim *Simulation) float64 {
 	return weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("Weapon Base Damage")
 }
 
+func (weapon Weapon) AverageDamage() float64 {
+	return (weapon.BaseDamageMin + weapon.BaseDamageMax) / 2
+}
+
 func (weapon Weapon) calculateWeaponDamage(sim *Simulation, attackPower float64) float64 {
 	return weapon.BaseDamage(sim) + (weapon.SwingSpeed*attackPower)/MeleeAttackRatingPerDamage
 }

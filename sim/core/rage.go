@@ -20,7 +20,7 @@ type rageBar struct {
 	onRageGain OnRageGain
 }
 
-func (character *Character) EnableRageBar(startingRage float64, onRageGain OnRageGain) {
+func (character *Character) EnableRageBar(startingRage float64, rageMultiplier float64, onRageGain OnRageGain) {
 	character.RegisterAura(Aura{
 		Label:    "RageBar",
 		Duration: NeverExpires,
@@ -52,7 +52,7 @@ func (character *Character) EnableRageBar(startingRage float64, onRageGain OnRag
 				HitFactor *= 2
 			}
 
-			generatedRage := spellEffect.Damage*RageFactor + HitFactor*BaseSwingSpeed
+			generatedRage := spellEffect.Damage*RageFactor + HitFactor*BaseSwingSpeed*rageMultiplier
 
 			character.AddRage(sim, generatedRage, spell.ActionID)
 		},

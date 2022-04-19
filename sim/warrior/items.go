@@ -1,6 +1,7 @@
 package warrior
 
 import (
+	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -85,6 +86,19 @@ var ItemSetWarbringerBattlegear = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			// You gain an additional 2 rage each time one of your attacks is parried or dodged.
+			character := agent.GetCharacter()
+			character.RegisterAura(core.Aura{
+				Label:    "Warbringer 4pc",
+				Duration: core.NeverExpires,
+				OnReset: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Activate(sim)
+				},
+				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+					if spellEffect.Outcome.Matches(core.OutcomeDodge | core.OutcomeParry) {
+						character.AddRage(sim, 2, core.ActionID{SpellID: 37519})
+					}
+				},
+			})
 		},
 	},
 }
@@ -109,6 +123,7 @@ var ItemSetDestroyerBattlegear = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			// Your Bloodthirst and Mortal Strike abilities cost 5 less rage.
+			// Handled in bloodthirst.go and mortal_strike.go.
 		},
 	},
 }
@@ -140,17 +155,21 @@ var ItemSetOnslaughtBattlegear = core.ItemSet{
 }
 
 func ApplyAshtongueTalismanOfValor(agent core.Agent) {
-	character := agent.GetCharacter()
-	procAura := character.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32485}, stats.Stats{stats.Strength: 55}, time.Second*12)
+	warriorAgent, ok := agent.(WarriorAgent)
+	if !ok {
+		log.Fatalf("Non-warrior attempted to activate Ashtongue Talisman of Valor.")
+	}
+	warrior := warriorAgent.GetWarrior()
+	procAura := warrior.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32485}, stats.Stats{stats.Strength: 55}, time.Second*12)
 
-	character.RegisterAura(core.Aura{
+	warrior.RegisterAura(core.Aura{
 		Label:    "Ashtongue Talisman",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spell.SameAction(ShieldSlamActionID) && !spell.SameAction(BloodthirstActionID) {
+			if spell != warrior.ShieldSlam && spell != warrior.Bloodthirst && spell != warrior.MortalStrike {
 				return
 			}
 
