@@ -27,7 +27,7 @@ type Warrior struct {
 	// Current state
 	Stance             Stance
 	heroicStrikeQueued bool
-	rampageTriggered   bool
+	rampageValidUntil  time.Duration
 	revengeTriggered   bool
 	shoutExpiresAt     time.Duration
 
@@ -121,13 +121,19 @@ func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.SunderArmor = warrior.newSunderArmorSpell(sim, false)
 	warrior.SunderArmorDevastate = warrior.newSunderArmorSpell(sim, true)
 
+	warrior.BloodFrenzyAuras = nil
+	for i := int32(0); i < sim.GetNumTargets(); i++ {
+		target := sim.GetTarget(i)
+		warrior.BloodFrenzyAuras = append(warrior.BloodFrenzyAuras, core.BloodFrenzyAura(target, warrior.Talents.BloodFrenzy))
+	}
+
 	warrior.shoutDuration = time.Duration(float64(time.Minute*2) * (1 + 0.1*float64(warrior.Talents.BoomingVoice)))
 }
 
 func (warrior *Warrior) Reset(sim *core.Simulation) {
 	warrior.heroicStrikeQueued = false
 	warrior.revengeTriggered = false
-	warrior.rampageTriggered = false
+	warrior.rampageValidUntil = 0
 
 	warrior.shoutExpiresAt = 0
 	if warrior.Shout != nil && warrior.PrecastShout {

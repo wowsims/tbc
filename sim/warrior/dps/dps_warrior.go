@@ -89,7 +89,7 @@ func (war *DpsWarrior) GetWarrior() *warrior.Warrior {
 
 func (war *DpsWarrior) Init(sim *core.Simulation) {
 	war.Warrior.Init(sim)
-	war.DelayCooldownsForArmorDebuffs(sim)
+	war.DelayDPSCooldownsForArmorDebuffs(sim)
 }
 
 func (war *DpsWarrior) Reset(sim *core.Simulation) {

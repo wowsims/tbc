@@ -233,8 +233,10 @@ func BloodFrenzyAura(target *Target, points int32) *Aura {
 	multiplier := 1 + 0.02*float64(points)
 	return target.GetOrRegisterAura(Aura{
 		Label:    "Blood Frenzy-" + strconv.Itoa(int(points)),
+		Tag:      "Blood Frenzy",
 		ActionID: BloodFrenzyActionID,
-		Duration: time.Second * 6, // TODO
+		// No fixed duration, lasts as long as the bleed that activates it.
+		Priority: float64(points),
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.PhysicalDamageTakenMultiplier *= multiplier
 		},

@@ -63,7 +63,7 @@ func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 
 		// Miss
 		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
-		if character.AutoAttacks.IsDualWielding {
+		if character.AutoAttacks.IsDualWielding && !character.PseudoStats.DisableDWMissPenalty {
 			missChance += 0.19
 		}
 

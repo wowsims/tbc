@@ -1,7 +1,6 @@
 package warrior
 
 import (
-	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -69,7 +68,6 @@ func (warrior *Warrior) ApplyTalents() {
 
 	warrior.applyAngerManagement()
 	warrior.applyDeepWounds()
-	warrior.applyBloodFrenzy()
 	warrior.applyOneHandedWeaponSpecialization()
 	warrior.applyTwoHandedWeaponSpecialization()
 	warrior.applyWeaponSpecializations()
@@ -94,87 +92,10 @@ func (warrior *Warrior) applyAngerManagement() {
 	})
 }
 
-var DeepWoundsActionID = core.ActionID{SpellID: 12867}
-
-func (warrior *Warrior) applyDeepWounds() {
-	if warrior.Talents.DeepWounds == 0 {
-		return
-	}
-
-	deepWoundsSpell := warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    DeepWoundsActionID,
-		SpellSchool: core.SpellSchoolPhysical,
-	})
-
-	var dwDots []*core.Dot
-
-	warrior.RegisterAura(core.Aura{
-		Label:    "Deep Wounds",
-		ActionID: DeepWoundsActionID,
-		Duration: core.NeverExpires,
-		OnInit: func(aura *core.Aura, sim *core.Simulation) {
-			dwDots = nil
-			tickDamage := warrior.AutoAttacks.MH.AverageDamage()
-			for i := int32(0); i < sim.GetNumTargets(); i++ {
-				target := sim.GetTarget(i)
-				dotAura := target.RegisterAura(core.Aura{
-					Label:    "DeepWounds-" + strconv.Itoa(int(warrior.Index)),
-					ActionID: DeepWoundsActionID,
-					Duration: time.Second * 12,
-				})
-				dot := core.NewDot(core.Dot{
-					Spell:         deepWoundsSpell,
-					Aura:          dotAura,
-					NumberOfTicks: 4,
-					TickLength:    time.Second * 3,
-					TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-						DamageMultiplier: 0.2 * float64(warrior.Talents.DeepWounds),
-						ThreatMultiplier: 1,
-						IsPeriodic:       true,
-						IsPhantom:        true,
-						BaseDamage:       core.BaseDamageConfigFlat(tickDamage),
-						OutcomeApplier:   core.OutcomeFuncTick(),
-					})),
-				})
-				dwDots = append(dwDots, dot)
-			}
-		},
-		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Activate(sim)
-		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				dwDots[spellEffect.Target.Index].Apply(sim)
-			}
-		},
-	})
-}
-
-func (warrior *Warrior) applyBloodFrenzy() {
-	if warrior.Talents.BloodFrenzy == 0 {
-		return
-	}
-
-	warrior.RegisterAura(core.Aura{
-		Label:    "Blood Frenzy Talent",
-		ActionID: core.BloodFrenzyActionID,
-		Duration: core.NeverExpires,
-		OnInit: func(aura *core.Aura, sim *core.Simulation) {
-			warrior.BloodFrenzyAuras = nil
-			for i := int32(0); i < sim.GetNumTargets(); i++ {
-				target := sim.GetTarget(i)
-				warrior.BloodFrenzyAuras = append(warrior.BloodFrenzyAuras, core.BloodFrenzyAura(target, warrior.Talents.BloodFrenzy))
-			}
-		},
-		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Activate(sim)
-		},
-		OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spell.SameAction(DeepWoundsActionID) {
-				warrior.BloodFrenzyAuras[spellEffect.Target.Index].Activate(sim)
-			}
-		},
-	})
+func (warrior *Warrior) procBloodFrenzy(sim *core.Simulation, effect *core.SpellEffect, dur time.Duration) {
+	aura := warrior.BloodFrenzyAuras[effect.Target.Index]
+	aura.Duration = dur
+	aura.Activate(sim)
 }
 
 func (warrior *Warrior) applyTwoHandedWeaponSpecialization() {
@@ -222,7 +143,7 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 	}
 
 	if warrior.Talents.MaceSpecialization > 0 && maceSpecMask != core.ProcMaskEmpty {
-		procChance := 0.01 * float64(warrior.Talents.MaceSpecialization)
+		ppmm := warrior.AutoAttacks.NewPPMManager(1.5)
 
 		warrior.RegisterAura(core.Aura{
 			Label:    "Mace Specialization",
@@ -239,7 +160,7 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 					return
 				}
 
-				if sim.RandomFloat("Mace Specialization") > procChance {
+				if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Mace Specialization") {
 					return
 				}
 
