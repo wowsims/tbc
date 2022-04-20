@@ -73,5 +73,8 @@ func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 }
 
 func (warrior *Warrior) CanThunderClap(sim *core.Simulation) bool {
-	return warrior.StanceMatches(BattleStance|DefensiveStance) && warrior.CurrentRage() >= warrior.ThunderClap.DefaultCast.Cost && warrior.ThunderClap.IsReady(sim)
+	return warrior.StanceMatches(BattleStance|DefensiveStance) && warrior.CanThunderClapIgnoreStance(sim)
+}
+func (warrior *Warrior) CanThunderClapIgnoreStance(sim *core.Simulation) bool {
+	return warrior.CurrentRage() >= warrior.ThunderClap.DefaultCast.Cost && warrior.ThunderClap.IsReady(sim)
 }

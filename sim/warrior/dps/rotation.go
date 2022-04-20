@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/warrior"
 )
 
 func (war *DpsWarrior) OnGCDReady(sim *core.Simulation) {
@@ -11,6 +13,10 @@ func (war *DpsWarrior) OnGCDReady(sim *core.Simulation) {
 }
 
 func (war *DpsWarrior) doRotation(sim *core.Simulation) {
+	if !war.StanceMatches(warrior.BerserkerStance) && war.BerserkerStance.IsReady(sim) {
+		war.BerserkerStance.Cast(sim, nil)
+	}
+
 	if sim.IsExecutePhase() {
 		war.executeRotation(sim)
 	} else {
@@ -30,6 +36,14 @@ func (war *DpsWarrior) normalRotation(sim *core.Simulation) {
 			war.MortalStrike.Cast(sim, sim.GetPrimaryTarget())
 		} else if !war.Rotation.PrioritizeWw && war.CanWhirlwind(sim) {
 			war.Whirlwind.Cast(sim, sim.GetPrimaryTarget())
+		} else if war.Rotation.UseOverpower && war.CurrentRage() < war.Rotation.OverpowerRageThreshold && war.ShouldOverpower(sim) {
+			if !war.StanceMatches(warrior.BattleStance) {
+				if !war.BattleStance.IsReady(sim) {
+					return
+				}
+				war.BattleStance.Cast(sim, nil)
+			}
+			war.Overpower.Cast(sim, sim.GetPrimaryTarget())
 		} else if war.ShouldBerserkerRage(sim) {
 			war.BerserkerRage.Cast(sim, nil)
 		} else if war.tryMaintainDebuffs(sim) {
@@ -68,11 +82,26 @@ func (war *DpsWarrior) executeRotation(sim *core.Simulation) {
 
 // Returns whether any ability was cast.
 func (war *DpsWarrior) tryMaintainDebuffs(sim *core.Simulation) bool {
-	if war.Rotation.MaintainThunderClap && war.ThunderClapAura.RemainingDuration(sim) < time.Second*2 && war.CanThunderClap(sim) {
-		war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
+	if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorOnce && !war.castFirstSunder {
+		war.SunderArmor.Cast(sim, sim.GetPrimaryTarget())
+		war.castFirstSunder = true
+		return true
+	} else if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorMaintain &&
+		!war.ExposeArmorAura.IsActive() &&
+		(war.SunderArmorAura.GetStacks() < 5 || war.SunderArmorAura.RemainingDuration(sim) < time.Second*3) {
+		war.SunderArmor.Cast(sim, sim.GetPrimaryTarget())
 		return true
 	} else if war.Rotation.MaintainDemoShout && war.DemoralizingShoutAura.RemainingDuration(sim) < time.Second*2 && war.CanDemoralizingShout(sim) {
 		war.DemoralizingShout.Cast(sim, sim.GetPrimaryTarget())
+		return true
+	} else if war.Rotation.MaintainThunderClap && war.ThunderClapAura.RemainingDuration(sim) < time.Second*2 && war.CanThunderClapIgnoreStance(sim) {
+		if !war.StanceMatches(warrior.BattleStance) {
+			if !war.BattleStance.IsReady(sim) {
+				return false
+			}
+			war.BattleStance.Cast(sim, nil)
+		}
+		war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
 		return true
 	}
 	return false

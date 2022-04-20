@@ -80,6 +80,8 @@ type DpsWarrior struct {
 
 	Options  proto.Warrior_Options
 	Rotation proto.Warrior_Rotation
+
+	castFirstSunder bool
 }
 
 func (war *DpsWarrior) GetWarrior() *warrior.Warrior {
@@ -94,4 +96,5 @@ func (war *DpsWarrior) Init(sim *core.Simulation) {
 func (war *DpsWarrior) Reset(sim *core.Simulation) {
 	war.Warrior.Reset(sim)
 	war.BerserkerStanceAura.Activate(sim)
+	war.castFirstSunder = false
 }

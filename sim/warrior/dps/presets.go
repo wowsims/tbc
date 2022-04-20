@@ -34,12 +34,12 @@ var PlayerOptionsBasic = &proto.Player_Warrior{
 }
 
 var warriorRotation = &proto.Warrior_Rotation{
-	UseOverpower: false,
+	UseOverpower: true,
 	UseHamstring: false,
 
 	HsRageThreshold:        70,
 	HamstringRageThreshold: 75,
-	OverpowerRageThreshold: 30,
+	OverpowerRageThreshold: 20,
 	RampageCdThreshold:     5,
 
 	UseHsDuringExecute: true,
