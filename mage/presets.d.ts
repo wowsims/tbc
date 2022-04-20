@@ -100,3 +100,21 @@ export declare const P4_FROST_PRESET: {
     enableWhen: (player: Player<Spec.SpecMage>) => boolean;
     gear: EquipmentSpec;
 };
+export declare const P5_ARCANE_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<Spec.SpecMage>) => boolean;
+    gear: EquipmentSpec;
+};
+export declare const P5_FIRE_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<Spec.SpecMage>) => boolean;
+    gear: EquipmentSpec;
+};
+export declare const P5_FROST_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<Spec.SpecMage>) => boolean;
+    gear: EquipmentSpec;
+};
