@@ -199,6 +199,17 @@ func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
 	}
 }
 
+func ApplyEffectFuncDirectDamageTargetModifiersOnly(baseEffect SpellEffect) ApplySpellEffects {
+	return func(sim *Simulation, target *Target, spell *Spell) {
+		effect := &baseEffect
+		effect.Target = target
+
+		damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
+		effect.calcDamageTargetOnly(sim, spell, damage)
+		effect.finalize(sim, spell)
+	}
+}
+
 func ApplyEffectFuncDamageMultiple(baseEffects []SpellEffect) ApplySpellEffects {
 	if len(baseEffects) == 0 {
 		panic("Multiple damage requires hits")

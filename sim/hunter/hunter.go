@@ -136,7 +136,7 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 		hunter.rotation(sim, false)
 	}
 
-	hunter.DelayCooldownsForArmorDebuffs(sim)
+	hunter.DelayDPSCooldownsForArmorDebuffs(sim)
 }
 
 func (hunter *Hunter) Reset(sim *core.Simulation) {

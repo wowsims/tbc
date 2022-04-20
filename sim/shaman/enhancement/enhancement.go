@@ -95,7 +95,7 @@ func (enh *EnhancementShaman) GetShaman() *shaman.Shaman {
 
 func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 	enh.Shaman.Init(sim)
-	enh.DelayCooldownsForArmorDebuffs(sim)
+	enh.DelayDPSCooldownsForArmorDebuffs(sim)
 
 	// Fill the GCD schedule based on our settings.
 	maxDuration := sim.GetMaxDuration()

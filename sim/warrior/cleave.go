@@ -51,10 +51,14 @@ func (warrior *Warrior) QueueCleave(sim *core.Simulation) {
 	if warrior.CurrentRage() < warrior.Cleave.DefaultCast.Cost {
 		panic("Not enough rage for Cleave")
 	}
+	if warrior.heroicStrikeQueued {
+		return
+	}
 	if sim.Log != nil {
 		warrior.Log(sim, "Cleave queued.")
 	}
 	warrior.heroicStrikeQueued = true
+	warrior.PseudoStats.DisableDWMissPenalty = true
 }
 
 // Returns true if the regular melee swing should be used, false otherwise.
@@ -64,6 +68,10 @@ func (warrior *Warrior) TryCleave(sim *core.Simulation) *core.Spell {
 	}
 
 	warrior.heroicStrikeQueued = false
+	warrior.PseudoStats.DisableDWMissPenalty = false
+	if sim.Log != nil {
+		warrior.Log(sim, "Cleave unqueued.")
+	}
 	if warrior.CurrentRage() < warrior.Cleave.DefaultCast.Cost {
 		return nil
 	}

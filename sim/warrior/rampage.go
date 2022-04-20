@@ -26,14 +26,13 @@ func (warrior *Warrior) registerRampageSpell() {
 
 	warrior.RegisterAura(core.Aura{
 		Label:    "Rampage Talent",
-		ActionID: actionID,
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				warrior.rampageTriggered = true
+				warrior.rampageValidUntil = sim.CurrentTime + time.Second*5
 			}
 		},
 	})
@@ -53,7 +52,7 @@ func (warrior *Warrior) registerRampageSpell() {
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
-			warrior.rampageTriggered = false
+			warrior.rampageValidUntil = 0
 			warrior.RampageAura.Activate(sim)
 			warrior.RampageAura.AddStack(sim)
 		},
@@ -61,5 +60,7 @@ func (warrior *Warrior) registerRampageSpell() {
 }
 
 func (warrior *Warrior) ShouldRampage(sim *core.Simulation) bool {
-	return warrior.rampageTriggered && warrior.CurrentRage() >= 20 && (warrior.RampageAura.GetStacks() < 5 || warrior.RampageAura.RemainingDuration(sim) < time.Second*3)
+	return sim.CurrentTime >= warrior.rampageValidUntil &&
+		warrior.CurrentRage() >= 20 &&
+		(warrior.RampageAura.GetStacks() < 5 || warrior.RampageAura.RemainingDuration(sim) < time.Second*10)
 }

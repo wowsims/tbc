@@ -166,6 +166,12 @@ func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, 
 	}
 	spellEffect.Damage = damage
 }
+func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spell, damage float64) {
+	spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
+	spellEffect.applyResistances(sim, spell, &damage)
+	spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
+	spellEffect.Damage = damage
+}
 
 func (spellEffect *SpellEffect) calcThreat(character *Character) float64 {
 	if spellEffect.Landed() {
@@ -277,7 +283,7 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, 
 
 	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
 		// Physical resistance (armor).
-		*damage *= 1 - spellEffect.Target.ArmorDamageReduction(spell.Character.stats[stats.ArmorPenetration])
+		*damage *= spellEffect.Target.ArmorDamageReduction(spell.Character.stats[stats.ArmorPenetration])
 	} else if !spell.SpellExtras.Matches(SpellExtrasBinary) {
 		// Magical resistance.
 		// https://royalgiraffe.github.io/resist-guide

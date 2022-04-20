@@ -25,9 +25,11 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 		}
 	}
 
-	if war.CanHeroicStrike(sim) {
-		war.QueueHeroicStrike(sim)
-	} else if war.CanCleave(sim) {
-		war.QueueCleave(sim)
+	if war.CurrentRage() >= float64(war.Rotation.HsRageThreshold) {
+		if war.CanHeroicStrike(sim) {
+			war.QueueHeroicStrike(sim)
+		} else if war.CanCleave(sim) {
+			war.QueueCleave(sim)
+		}
 	}
 }
