@@ -33,17 +33,9 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 			PrecastShout:         warOptions.Options.PrecastShout,
 			PrecastShoutSapphire: warOptions.Options.PrecastShoutSapphire,
 			PrecastShoutT2:       warOptions.Options.PrecastShoutT2,
+			RampageCDThreshold:   core.DurationFromSeconds(warOptions.Rotation.RampageCdThreshold),
 		}),
-		Rotation:     *warOptions.Rotation,
-		RotationType: warOptions.Rotation.Type,
-	}
-
-	if war.RotationType == proto.Warrior_Rotation_ArmsSlam && warOptions.Rotation.ArmsSlam != nil {
-		war.ArmsSlamRotation = *warOptions.Rotation.ArmsSlam
-	} else if war.RotationType == proto.Warrior_Rotation_ArmsDW && warOptions.Rotation.ArmsDw != nil {
-		war.ArmsDwRotation = *warOptions.Rotation.ArmsDw
-	} else if war.RotationType == proto.Warrior_Rotation_Fury && warOptions.Rotation.Fury != nil {
-		war.FuryRotation = *warOptions.Rotation.Fury
+		Rotation: *warOptions.Rotation,
 	}
 
 	war.EnableRageBar(warOptions.Options.StartingRage, core.TernaryFloat64(war.Talents.EndlessRage, 1.25, 1), func(sim *core.Simulation) {
@@ -56,7 +48,7 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 		OffHand:        war.WeaponFromOffHand(war.DefaultMeleeCritMultiplier()),
 		AutoSwingMelee: true,
 		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
-			if war.UseCleave {
+			if war.Rotation.UseCleave {
 				return war.TryCleave(sim)
 			} else {
 				return war.TryHeroicStrike(sim)
@@ -76,18 +68,18 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 		})
 	}
 
+	if war.Options.UseRecklessness {
+		war.RegisterRecklessnessCD()
+	}
+
 	return war
 }
 
 type DpsWarrior struct {
 	*warrior.Warrior
 
-	Options          proto.Warrior_Options
-	Rotation         proto.Warrior_Rotation
-	RotationType     proto.Warrior_Rotation_Type
-	ArmsSlamRotation proto.Warrior_Rotation_ArmsSlamRotation
-	ArmsDwRotation   proto.Warrior_Rotation_ArmsDWRotation
-	FuryRotation     proto.Warrior_Rotation_FuryRotation
+	Options  proto.Warrior_Options
+	Rotation proto.Warrior_Rotation
 }
 
 func (war *DpsWarrior) GetWarrior() *warrior.Warrior {

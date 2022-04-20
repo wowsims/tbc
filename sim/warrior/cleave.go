@@ -80,5 +80,5 @@ func (warrior *Warrior) TryCleave(sim *core.Simulation) *core.Spell {
 }
 
 func (warrior *Warrior) CanCleave(sim *core.Simulation) bool {
-	return warrior.UseCleave && warrior.CurrentRage() >= warrior.Cleave.DefaultCast.Cost
+	return warrior.CurrentRage() >= warrior.Cleave.DefaultCast.Cost
 }

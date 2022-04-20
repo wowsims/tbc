@@ -13,8 +13,7 @@ type WarriorInputs struct {
 	PrecastShout         bool
 	PrecastShoutSapphire bool
 	PrecastShoutT2       bool
-	UseCleave            bool // Cleave instead of HS
-	UseRecklessness      bool
+	RampageCDThreshold   time.Duration
 }
 
 type Warrior struct {

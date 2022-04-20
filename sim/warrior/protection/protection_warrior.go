@@ -47,7 +47,7 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 		OffHand:        war.WeaponFromOffHand(war.DefaultMeleeCritMultiplier()),
 		AutoSwingMelee: true,
 		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
-			if war.UseCleave {
+			if war.Rotation.UseCleave {
 				return war.TryCleave(sim)
 			} else {
 				return war.TryHeroicStrike(sim)

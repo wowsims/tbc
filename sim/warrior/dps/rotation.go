@@ -1,6 +1,8 @@
 package dps
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 )
 
@@ -9,27 +11,83 @@ func (war *DpsWarrior) OnGCDReady(sim *core.Simulation) {
 }
 
 func (war *DpsWarrior) doRotation(sim *core.Simulation) {
+	if sim.IsExecutePhase() {
+		war.executeRotation(sim)
+	} else {
+		war.normalRotation(sim)
+	}
+}
+
+func (war *DpsWarrior) normalRotation(sim *core.Simulation) {
 	if war.GCD.IsReady(sim) {
 		if war.ShouldRampage(sim) {
 			war.Rampage.Cast(sim, nil)
-		} else if war.CanExecute(sim) {
-			war.Execute.Cast(sim, sim.GetPrimaryTarget())
+		} else if war.Rotation.PrioritizeWw && war.CanWhirlwind(sim) {
+			war.Whirlwind.Cast(sim, sim.GetPrimaryTarget())
 		} else if war.CanBloodthirst(sim) {
 			war.Bloodthirst.Cast(sim, sim.GetPrimaryTarget())
 		} else if war.CanMortalStrike(sim) {
 			war.MortalStrike.Cast(sim, sim.GetPrimaryTarget())
-		} else if war.CanWhirlwind(sim) {
+		} else if !war.Rotation.PrioritizeWw && war.CanWhirlwind(sim) {
 			war.Whirlwind.Cast(sim, sim.GetPrimaryTarget())
+		} else if war.ShouldBerserkerRage(sim) {
+			war.BerserkerRage.Cast(sim, nil)
+		} else if war.tryMaintainDebuffs(sim) {
+			// Do nothing, already cast
+		}
+	}
+
+	war.tryQueueHsCleave(sim)
+}
+
+func (war *DpsWarrior) executeRotation(sim *core.Simulation) {
+	if war.GCD.IsReady(sim) {
+		if war.ShouldRampage(sim) {
+			war.Rampage.Cast(sim, nil)
+		} else if war.Rotation.PrioritizeWw && war.Rotation.UseWwDuringExecute && war.CanWhirlwind(sim) {
+			war.Whirlwind.Cast(sim, sim.GetPrimaryTarget())
+		} else if war.Rotation.UseBtDuringExecute && war.CanBloodthirst(sim) {
+			war.Bloodthirst.Cast(sim, sim.GetPrimaryTarget())
+		} else if war.Rotation.UseMsDuringExecute && war.CanMortalStrike(sim) {
+			war.MortalStrike.Cast(sim, sim.GetPrimaryTarget())
+		} else if !war.Rotation.PrioritizeWw && war.Rotation.UseWwDuringExecute && war.CanWhirlwind(sim) {
+			war.Whirlwind.Cast(sim, sim.GetPrimaryTarget())
+		} else if war.tryMaintainDebuffs(sim) {
+			// Do nothing, already cast
+		} else if war.CanExecute() {
+			war.Execute.Cast(sim, sim.GetPrimaryTarget())
 		} else if war.ShouldBerserkerRage(sim) {
 			war.BerserkerRage.Cast(sim, nil)
 		}
 	}
 
+	if war.Rotation.UseHsDuringExecute {
+		war.tryQueueHsCleave(sim)
+	}
+}
+
+// Returns whether any ability was cast.
+func (war *DpsWarrior) tryMaintainDebuffs(sim *core.Simulation) bool {
+	if war.Rotation.MaintainThunderClap && war.ThunderClapAura.RemainingDuration(sim) < time.Second*2 && war.CanThunderClap(sim) {
+		war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
+		return true
+	} else if war.Rotation.MaintainDemoShout && war.DemoralizingShoutAura.RemainingDuration(sim) < time.Second*2 && war.CanDemoralizingShout(sim) {
+		war.DemoralizingShout.Cast(sim, sim.GetPrimaryTarget())
+		return true
+	}
+	return false
+}
+
+func (war *DpsWarrior) tryQueueHsCleave(sim *core.Simulation) {
 	if war.CurrentRage() >= float64(war.Rotation.HsRageThreshold) {
-		if war.CanHeroicStrike(sim) {
-			war.QueueHeroicStrike(sim)
-		} else if war.CanCleave(sim) {
-			war.QueueCleave(sim)
+		if war.Rotation.UseCleave {
+			if war.CanCleave(sim) {
+				war.QueueCleave(sim)
+			}
+		} else {
+			if war.CanHeroicStrike(sim) {
+				war.QueueHeroicStrike(sim)
+			}
 		}
 	}
 }
