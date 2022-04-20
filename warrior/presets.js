@@ -4,9 +4,10 @@ import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
-import { Warrior_Rotation as WarriorRotation, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
-import { Warrior_Rotation_Type as RotationType, Warrior_Rotation_ArmsSlamRotation as ArmsSlamRotation, Warrior_Rotation_ArmsDWRotation as ArmsDWRotation, Warrior_Rotation_FuryRotation as FuryRotation } from '/tbc/core/proto/warrior.js';
-import { Warrior_Rotation_FuryRotation_PrimaryInstant as PrimaryInstant } from '/tbc/core/proto/warrior.js';
+import { WarriorShout, Warrior_Rotation as WarriorRotation, Warrior_Rotation_Type as RotationType, Warrior_Rotation_ArmsSlamRotation as ArmsSlamRotation, Warrior_Rotation_ArmsDWRotation as ArmsDWRotation, Warrior_Rotation_FuryRotation as FuryRotation, 
+//Warrior_Rotation_DemoShout as DemoShout,
+//Warrior_Rotation_ThunderClap as ThunderClap,
+Warrior_Options as WarriorOptions, Warrior_Rotation_FuryRotation_PrimaryInstant as PrimaryInstant, } from '/tbc/core/proto/warrior.js';
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
@@ -44,8 +45,11 @@ export const DefaultFuryRotation = WarriorRotation.create({
 });
 export const DefaultFuryOptions = WarriorOptions.create({
     startingRage: 0,
-    precastSapphire: false,
-    precastT2: false,
+    recklessness: true,
+    shout: WarriorShout.WarriorShoutBattle,
+    precastShout: true,
+    precastShoutSapphire: false,
+    precastShoutT2: false,
 });
 export const DefaultFuryConsumes = Consumes.create({
     flask: Flask.FlaskOfRelentlessAssault,
@@ -69,8 +73,11 @@ export const DefaultArmsSlamRotation = WarriorRotation.create({
 });
 export const DefaultArmsSlamOptions = WarriorOptions.create({
     startingRage: 0,
-    precastSapphire: false,
-    precastT2: false,
+    recklessness: true,
+    shout: WarriorShout.WarriorShoutBattle,
+    precastShout: true,
+    precastShoutSapphire: false,
+    precastShoutT2: false,
 });
 export const DefaultArmsSlamConsumes = Consumes.create({
     defaultPotion: Potions.HastePotion,
@@ -92,8 +99,11 @@ export const DefaultArmsDWRotation = WarriorRotation.create({
 });
 export const DefaultArmsDWOptions = WarriorOptions.create({
     startingRage: 0,
-    precastSapphire: false,
-    precastT2: false,
+    recklessness: true,
+    shout: WarriorShout.WarriorShoutBattle,
+    precastShout: true,
+    precastShoutSapphire: false,
+    precastShoutT2: false,
 });
 export const DefaultArmsDWConsumes = Consumes.create({
     defaultPotion: Potions.HastePotion,

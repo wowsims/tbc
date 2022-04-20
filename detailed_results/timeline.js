@@ -838,7 +838,10 @@ const idToCategoryMap = {
     [10614]: SPELL_ACTION_CATEGORY + 0.3,
     [25585]: SPELL_ACTION_CATEGORY + 0.3,
     [25587]: SPELL_ACTION_CATEGORY + 0.3,
-    [2825]: DEFAULT_ACTION_CATEGORY + 0.1, // Bloodlust
+    [2825]: DEFAULT_ACTION_CATEGORY + 0.1,
+    // Warrior
+    [25231]: 0.1,
+    [29707]: 0.1, // Heroic Strike
 };
 const idsToGroupForRotation = [
     6774,

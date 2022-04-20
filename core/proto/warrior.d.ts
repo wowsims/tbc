@@ -261,33 +261,33 @@ export interface Warrior_Rotation {
      */
     fury?: Warrior_Rotation_FuryRotation;
     /**
-     * @generated from protobuf field: bool use_ww_during_execute = 5;
-     */
-    useWwDuringExecute: boolean;
-    /**
-     * @generated from protobuf field: bool use_hs_during_execute = 6;
-     */
-    useHsDuringExecute: boolean;
-    /**
-     * @generated from protobuf field: double hs_rage_threshold = 7;
-     */
-    hsRageThreshold: number;
-    /**
      * @generated from protobuf field: bool use_overpower = 8;
      */
     useOverpower: boolean;
-    /**
-     * @generated from protobuf field: double overpower_rage_threshold = 9;
-     */
-    overpowerRageThreshold: number;
     /**
      * @generated from protobuf field: bool use_hamstring = 10;
      */
     useHamstring: boolean;
     /**
+     * @generated from protobuf field: double hs_rage_threshold = 7;
+     */
+    hsRageThreshold: number;
+    /**
+     * @generated from protobuf field: double overpower_rage_threshold = 9;
+     */
+    overpowerRageThreshold: number;
+    /**
      * @generated from protobuf field: double hamstring_rage_threshold = 11;
      */
     hamstringRageThreshold: number;
+    /**
+     * @generated from protobuf field: bool use_hs_during_execute = 6;
+     */
+    useHsDuringExecute: boolean;
+    /**
+     * @generated from protobuf field: bool use_ww_during_execute = 5;
+     */
+    useWwDuringExecute: boolean;
 }
 /**
  * @generated from protobuf message proto.Warrior.Rotation.ArmsSlamRotation
@@ -371,17 +371,25 @@ export interface Warrior_Options {
      */
     startingRage: number;
     /**
-     * @generated from protobuf field: bool precast_t2 = 2;
-     */
-    precastT2: boolean;
-    /**
-     * @generated from protobuf field: bool precast_sapphire = 3;
-     */
-    precastSapphire: boolean;
-    /**
-     * @generated from protobuf field: bool recklessness = 4;
+     * @generated from protobuf field: bool recklessness = 2;
      */
     recklessness: boolean;
+    /**
+     * @generated from protobuf field: proto.WarriorShout shout = 3;
+     */
+    shout: WarriorShout;
+    /**
+     * @generated from protobuf field: bool precast_shout = 4;
+     */
+    precastShout: boolean;
+    /**
+     * @generated from protobuf field: bool precast_shout_t2 = 5;
+     */
+    precastShoutT2: boolean;
+    /**
+     * @generated from protobuf field: bool precast_shout_sapphire = 6;
+     */
+    precastShoutSapphire: boolean;
 }
 /**
  * @generated from protobuf message proto.ProtectionWarrior
@@ -415,9 +423,9 @@ export interface ProtectionWarrior_Rotation {
     /**
      * Minimum rage to queue HS or Cleave.
      *
-     * @generated from protobuf field: int32 heroic_strike_threshold = 3;
+     * @generated from protobuf field: int32 hs_rage_threshold = 3;
      */
-    heroicStrikeThreshold: number;
+    hsRageThreshold: number;
 }
 /**
  * @generated from protobuf enum proto.ProtectionWarrior.Rotation.DemoShout
@@ -458,6 +466,10 @@ export declare enum ProtectionWarrior_Rotation_ThunderClap {
  */
 export interface ProtectionWarrior_Options {
     /**
+     * @generated from protobuf field: double starting_rage = 1;
+     */
+    startingRage: number;
+    /**
      * @generated from protobuf field: proto.WarriorShout shout = 4;
      */
     shout: WarriorShout;
@@ -473,10 +485,6 @@ export interface ProtectionWarrior_Options {
      * @generated from protobuf field: bool precast_shout_sapphire = 3;
      */
     precastShoutSapphire: boolean;
-    /**
-     * @generated from protobuf field: double starting_rage = 1;
-     */
-    startingRage: number;
 }
 /**
  * @generated from protobuf enum proto.WarriorShout
