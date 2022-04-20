@@ -51,6 +51,9 @@ func (warrior *Warrior) QueueCleave(sim *core.Simulation) {
 	if warrior.CurrentRage() < warrior.Cleave.DefaultCast.Cost {
 		panic("Not enough rage for Cleave")
 	}
+	if warrior.heroicStrikeQueued {
+		return
+	}
 	if sim.Log != nil {
 		warrior.Log(sim, "Cleave queued.")
 	}

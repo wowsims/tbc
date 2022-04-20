@@ -49,6 +49,9 @@ func (warrior *Warrior) QueueHeroicStrike(sim *core.Simulation) {
 	if warrior.CurrentRage() < warrior.HeroicStrike.DefaultCast.Cost {
 		panic("Not enough rage for HS")
 	}
+	if warrior.heroicStrikeQueued {
+		return
+	}
 	if sim.Log != nil {
 		warrior.Log(sim, "Heroic strike queued.")
 	}

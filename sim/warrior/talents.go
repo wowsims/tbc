@@ -74,6 +74,7 @@ func (warrior *Warrior) ApplyTalents() {
 	warrior.applyUnbridledWrath()
 	warrior.applyFlurry()
 	warrior.registerDeathWishCD()
+	warrior.registerSweepingStrikesCD()
 }
 
 // Unlike most other applyXXX() talent appliers, this is meant to be called from Reset().

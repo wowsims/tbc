@@ -28,7 +28,13 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 	warOptions := options.GetWarrior()
 
 	war := &DpsWarrior{
-		Warrior:      warrior.NewWarrior(character, *warOptions.Talents, warrior.WarriorInputs{}),
+		Warrior: warrior.NewWarrior(character, *warOptions.Talents, warrior.WarriorInputs{
+			ShoutType:            warOptions.Options.Shout,
+			PrecastShout:         warOptions.Options.PrecastShout,
+			PrecastShoutSapphire: warOptions.Options.PrecastShoutSapphire,
+			PrecastShoutT2:       warOptions.Options.PrecastShoutT2,
+		}),
+		Rotation:     *warOptions.Rotation,
 		RotationType: warOptions.Rotation.Type,
 	}
 
@@ -77,6 +83,7 @@ type DpsWarrior struct {
 	*warrior.Warrior
 
 	Options          proto.Warrior_Options
+	Rotation         proto.Warrior_Rotation
 	RotationType     proto.Warrior_Rotation_Type
 	ArmsSlamRotation proto.Warrior_Rotation_ArmsSlamRotation
 	ArmsDwRotation   proto.Warrior_Rotation_ArmsDWRotation

@@ -134,6 +134,14 @@ func (target *Target) doneIteration(sim *Simulation) {
 	target.Unit.doneIteration(sim)
 }
 
+func (target *Target) NextTarget(sim *Simulation) *Target {
+	nextIndex := target.Index + 1
+	if nextIndex >= sim.GetNumTargets() {
+		nextIndex = 0
+	}
+	return sim.GetTarget(nextIndex)
+}
+
 func (target *Target) GetMetricsProto(numIterations int32) *proto.TargetMetrics {
 	return &proto.TargetMetrics{
 		Auras: target.auraTracker.GetMetricsProto(numIterations),

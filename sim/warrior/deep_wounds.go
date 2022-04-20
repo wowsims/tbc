@@ -23,7 +23,6 @@ func (warrior *Warrior) applyDeepWounds() {
 
 	warrior.RegisterAura(core.Aura{
 		Label:    "Deep Wounds",
-		ActionID: DeepWoundsActionID,
 		Duration: core.NeverExpires,
 		OnInit: func(aura *core.Aura, sim *core.Simulation) {
 			dwDots = nil

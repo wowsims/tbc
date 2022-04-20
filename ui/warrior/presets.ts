@@ -9,9 +9,20 @@ import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
-import { Warrior, Warrior_Rotation as WarriorRotation, WarriorTalents as WarriorTalents, Warrior_Options as WarriorOptions } from '/tbc/core/proto/warrior.js';
-import { Warrior_Rotation_Type as RotationType, Warrior_Rotation_ArmsSlamRotation as ArmsSlamRotation, Warrior_Rotation_ArmsDWRotation as ArmsDWRotation, Warrior_Rotation_FuryRotation as FuryRotation } from '/tbc/core/proto/warrior.js';
-import { Warrior_Rotation_FuryRotation_PrimaryInstant as PrimaryInstant } from '/tbc/core/proto/warrior.js';
+import {
+	WarriorShout,
+	WarriorTalents as WarriorTalents,
+	Warrior,
+	Warrior_Rotation as WarriorRotation,
+	Warrior_Rotation_Type as RotationType,
+	Warrior_Rotation_ArmsSlamRotation as ArmsSlamRotation,
+	Warrior_Rotation_ArmsDWRotation as ArmsDWRotation,
+	Warrior_Rotation_FuryRotation as FuryRotation,
+	//Warrior_Rotation_DemoShout as DemoShout,
+	//Warrior_Rotation_ThunderClap as ThunderClap,
+	Warrior_Options as WarriorOptions,
+	Warrior_Rotation_FuryRotation_PrimaryInstant as PrimaryInstant,
+} from '/tbc/core/proto/warrior.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
@@ -54,8 +65,11 @@ export const DefaultFuryRotation = WarriorRotation.create({
 
 export const DefaultFuryOptions = WarriorOptions.create({
 	startingRage: 0,
-	precastSapphire: false,
-	precastT2: false,
+	recklessness: true,
+	shout: WarriorShout.WarriorShoutBattle,
+	precastShout: true,
+	precastShoutSapphire: false,
+	precastShoutT2: false,
 });
 
 export const DefaultFuryConsumes = Consumes.create({
@@ -82,8 +96,11 @@ export const DefaultArmsSlamRotation = WarriorRotation.create({
 
 export const DefaultArmsSlamOptions = WarriorOptions.create({
 	startingRage: 0,
-	precastSapphire: false,
-	precastT2: false,
+	recklessness: true,
+	shout: WarriorShout.WarriorShoutBattle,
+	precastShout: true,
+	precastShoutSapphire: false,
+	precastShoutT2: false,
 });
 
 export const DefaultArmsSlamConsumes = Consumes.create({
@@ -108,8 +125,11 @@ export const DefaultArmsDWRotation = WarriorRotation.create({
 
 export const DefaultArmsDWOptions = WarriorOptions.create({
 	startingRage: 0,
-	precastSapphire: false,
-	precastT2: false,
+	recklessness: true,
+	shout: WarriorShout.WarriorShoutBattle,
+	precastShout: true,
+	precastShoutSapphire: false,
+	precastShoutT2: false,
 });
 
 export const DefaultArmsDWConsumes = Consumes.create({

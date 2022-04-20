@@ -131,5 +131,5 @@ func (unit *Unit) doneIteration(sim *Simulation) {
 func (unit *Unit) ArmorDamageReduction(armorPen float64) float64 {
 	// TODO: Cache this somehow so we dont have to recalculate every time.
 	effectiveArmor := MaxFloat(0, unit.stats[stats.Armor]-armorPen)
-	return effectiveArmor / (effectiveArmor + 10557.5)
+	return 1 - (effectiveArmor / (effectiveArmor + 10557.5))
 }

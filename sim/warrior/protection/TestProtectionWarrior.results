@@ -672,7 +672,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-TheFistsofFury"
  value: {
-  dps: 702.8040053634046
+  dps: 709.2584039248623
  }
 }
 dps_results: {
@@ -702,7 +702,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-TheTwinBladesofAzzinoth"
  value: {
-  dps: 788.0659697683
+  dps: 800.4134624413964
  }
 }
 dps_results: {

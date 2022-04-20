@@ -152,10 +152,10 @@ export const ProtectionWarriorRotationConfig = {
 				label: 'HS Threshold',
 				labelTooltip: 'Minimum Rage requires to queue Heroic Strike or Cleave.',
 				changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getRotation().heroicStrikeThreshold,
+				getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getRotation().hsRageThreshold,
 				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
 					const newRotation = player.getRotation();
-					newRotation.heroicStrikeThreshold = newValue;
+					newRotation.hsRageThreshold = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},

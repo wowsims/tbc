@@ -931,6 +931,10 @@ const idToCategoryMap: Record<number, number> = {
 	[25585]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r4
 	[25587]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r5
 	[2825]: DEFAULT_ACTION_CATEGORY + 0.1, // Bloodlust
+
+	// Warrior
+	[25231]: 0.1, // Cleave
+	[29707]: 0.1, // Heroic Strike
 };
 
 const idsToGroupForRotation: Array<number> = [

@@ -48,10 +48,12 @@ var warriorRotation = &proto.Warrior_Rotation{
 }
 
 var warriorOptions = &proto.Warrior_Options{
-	StartingRage:    0,
-	PrecastT2:       false,
-	PrecastSapphire: false,
-	Recklessness:    false,
+	StartingRage:         50,
+	Recklessness:         true,
+	Shout:                proto.WarriorShout_WarriorShoutBattle,
+	PrecastShout:         false,
+	PrecastShoutT2:       false,
+	PrecastShoutSapphire: false,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{
