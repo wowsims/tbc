@@ -5,6 +5,31 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
+var ArmsTalents = &proto.WarriorTalents{
+	ImprovedHeroicStrike:          3,
+	Deflection:                    2,
+	ImprovedThunderClap:           3,
+	AngerManagement:               true,
+	DeepWounds:                    3,
+	TwoHandedWeaponSpecialization: 5,
+	Impale:                        2,
+	DeathWish:                     true,
+	SwordSpecialization:           5,
+
+	Cruelty:                 5,
+	UnbridledWrath:          5,
+	CommandingPresence:      5,
+	DualWieldSpecialization: 5,
+	SweepingStrikes:         true,
+	WeaponMastery:           2,
+	Flurry:                  5,
+	Precision:               3,
+	Bloodthirst:             true,
+	ImprovedWhirlwind:       1,
+	ImprovedBerserkerStance: 5,
+	Rampage:                 true,
+}
+
 var FuryTalents = &proto.WarriorTalents{
 	ImprovedHeroicStrike: 3,
 	AngerManagement:      true,

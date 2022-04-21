@@ -12,15 +12,37 @@ func (war *DpsWarrior) OnGCDReady(sim *core.Simulation) {
 	war.doRotation(sim)
 }
 
+func (war *DpsWarrior) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
+	if war.doSlamNext && war.castSlamAt == 0 {
+		war.castSlamAt = sim.CurrentTime + war.slamLatency
+		war.WaitUntil(sim, war.castSlamAt) // Pause GCD until slam time
+	}
+}
+
 func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 	if !war.StanceMatches(warrior.BerserkerStance) && war.BerserkerStance.IsReady(sim) {
 		war.BerserkerStance.Cast(sim, nil)
+	}
+
+	if war.doSlamNext {
+		if sim.CurrentTime < war.castSlamAt {
+			return
+		} else if war.CanSlam() {
+			war.Slam.Cast(sim, sim.GetPrimaryTarget())
+		}
+		war.castSlamAt = 0
+		war.doSlamNext = false
+		return
 	}
 
 	if sim.IsExecutePhase() {
 		war.executeRotation(sim)
 	} else {
 		war.normalRotation(sim)
+	}
+
+	if war.Rotation.UseSlam {
+		war.doSlamNext = true
 	}
 }
 
