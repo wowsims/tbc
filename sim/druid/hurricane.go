@@ -10,8 +10,7 @@ import (
 
 const SpellIDHurricane int32 = 27012
 
-var HurricaneCooldownID = core.NewCooldownID()
-var HurricaneActionID = core.ActionID{SpellID: SpellIDHurricane, CooldownID: HurricaneCooldownID}
+var HurricaneActionID = core.ActionID{SpellID: SpellIDHurricane}
 
 func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 	baseCost := 1905.0
@@ -47,7 +46,10 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 				GCD:         core.GCDDefault,
 				ChannelTime: time.Second * 10,
 			},
-			Cooldown: time.Second * 60,
+			CD: core.Cooldown{
+				Timer:    druid.NewTimer(),
+				Duration: time.Second * 60,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDot(hurricaneDot),
@@ -56,5 +58,5 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 }
 
 func (druid *Druid) ShouldCastHurricane(sim *core.Simulation, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.Hurricane && !druid.IsOnCD(HurricaneCooldownID, sim.CurrentTime)
+	return rotation.Hurricane && druid.Hurricane.IsReady(sim)
 }

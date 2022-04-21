@@ -10,8 +10,8 @@ const manaBuffer = 500.0
 const manaTrackingWindowSeconds = 60
 const manaTrackingWindow = time.Second * manaTrackingWindowSeconds
 
-// 2 * (# of seconds) should be plenty of slots
-const manaSnapshotsBufferSize = manaTrackingWindowSeconds * 2
+// 3 * (# of seconds) should be plenty of slots
+const manaSnapshotsBufferSize = manaTrackingWindowSeconds * 3
 
 // Tracks how fast mana is being spent. This is used by some specs to decide
 // whether to use more mana-efficient or higher-dps spells.

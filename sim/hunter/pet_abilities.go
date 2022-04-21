@@ -27,10 +27,7 @@ type PetAbility struct {
 	// Focus cost
 	Cost float64
 
-	// 0 if no cooldown
-	Cooldown time.Duration
-
-	CooldownID core.CooldownID
+	CD core.Cooldown
 
 	Cast func(target *core.Target)
 }
@@ -40,7 +37,7 @@ func (ability *PetAbility) TryCast(sim *core.Simulation, target *core.Target, hp
 	if hp.currentFocus < ability.Cost {
 		return false
 	}
-	if ability.Cooldown != 0 && hp.IsOnCD(ability.CooldownID, sim.CurrentTime) {
+	if ability.CD.Duration != 0 && !ability.CD.IsReady(sim) {
 		return false
 	}
 
@@ -73,24 +70,18 @@ func (hp *HunterPet) NewPetAbility(sim *core.Simulation, abilityType PetAbilityT
 	return PetAbility{}
 }
 
-var PetPrimaryCooldownID = core.NewCooldownID()
-var PetSecondaryCooldownID = core.NewCooldownID()
-
 func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 	actionID := core.ActionID{SpellID: 27050}
-	cooldown := time.Second * 10
-	if isPrimary {
-		actionID.CooldownID = PetPrimaryCooldownID
-	} else {
-		actionID.CooldownID = PetSecondaryCooldownID
+	cd := core.Cooldown{
+		Timer:    hp.NewTimer(),
+		Duration: time.Second * 10,
 	}
 
 	pa := PetAbility{
-		ActionID:   actionID,
-		Type:       Bite,
-		Cost:       35,
-		Cooldown:   cooldown,
-		CooldownID: actionID.CooldownID,
+		ActionID: actionID,
+		Type:     Bite,
+		Cost:     35,
+		CD:       cd,
 	}
 
 	spell := hp.RegisterSpell(core.SpellConfig{
@@ -103,7 +94,7 @@ func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 				GCD: core.GCDDefault,
 			},
 			IgnoreHaste: true,
-			Cooldown:    cooldown,
+			CD:          cd,
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{

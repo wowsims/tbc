@@ -85,6 +85,10 @@ type Character struct {
 	// Cached mana return values per tick.
 	manaTickWhileCasting    float64
 	manaTickWhileNotCasting float64
+
+	defensiveTrinketCD *Timer
+	offensiveTrinketCD *Timer
+	conjuredCD         *Timer
 }
 
 func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
@@ -108,6 +112,8 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 
 		majorCooldownManager: newMajorCooldownManager(player.Cooldowns),
 	}
+
+	character.GCD = character.NewTimer()
 
 	character.Label = fmt.Sprintf("%s (#%d)", character.Name, character.Index+1)
 
@@ -593,3 +599,13 @@ var BaseStats = map[BaseStatsKey]stats.Stats{}
 // Base mana can be looked up here: https://wowwiki-archive.fandom.com/wiki/Base_mana
 
 // I assume a similar processes can be applied for other stats.
+
+func (character *Character) GetDefensiveTrinketCD() *Timer {
+	return character.GetOrInitTimer(&character.defensiveTrinketCD)
+}
+func (character *Character) GetOffensiveTrinketCD() *Timer {
+	return character.GetOrInitTimer(&character.offensiveTrinketCD)
+}
+func (character *Character) GetConjuredCD() *Timer {
+	return character.GetOrInitTimer(&character.conjuredCD)
+}

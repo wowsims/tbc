@@ -7,8 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ThunderClapCooldownID = core.NewCooldownID()
-var ThunderClapActionID = core.ActionID{SpellID: 25264, CooldownID: ThunderClapCooldownID}
+var ThunderClapActionID = core.ActionID{SpellID: 25264}
 
 func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 	cost := 20.0 - float64(warrior.Talents.FocusedRage)
@@ -63,7 +62,10 @@ func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 				GCD:  core.GCDDefault,
 			},
 			IgnoreHaste: true,
-			Cooldown:    time.Second * 4,
+			CD: core.Cooldown{
+				Timer:    warrior.NewTimer(),
+				Duration: time.Second * 4,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
@@ -71,5 +73,8 @@ func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 }
 
 func (warrior *Warrior) CanThunderClap(sim *core.Simulation) bool {
-	return warrior.StanceMatches(BattleStance|DefensiveStance) && warrior.CurrentRage() >= warrior.ThunderClap.DefaultCast.Cost && !warrior.IsOnCD(ThunderClapCooldownID, sim.CurrentTime)
+	return warrior.StanceMatches(BattleStance|DefensiveStance) && warrior.CanThunderClapIgnoreStance(sim)
+}
+func (warrior *Warrior) CanThunderClapIgnoreStance(sim *core.Simulation) bool {
+	return warrior.CurrentRage() >= warrior.ThunderClap.DefaultCast.Cost && warrior.ThunderClap.IsReady(sim)
 }

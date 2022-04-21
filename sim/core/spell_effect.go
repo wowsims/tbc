@@ -121,9 +121,9 @@ func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spell *
 		critRating += character.PseudoStats.BonusCritRatingAgentReserved1
 	}
 	if spellEffect.ProcMask.Matches(ProcMaskMeleeMH) {
-		spellEffect.BonusCritRating += character.PseudoStats.BonusMHCritRating
+		critRating += character.PseudoStats.BonusMHCritRating
 	} else if spellEffect.ProcMask.Matches(ProcMaskMeleeOH) {
-		spellEffect.BonusCritRating += character.PseudoStats.BonusOHCritRating
+		critRating += character.PseudoStats.BonusOHCritRating
 	}
 
 	return (critRating / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
@@ -164,6 +164,12 @@ func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, 
 		spellEffect.applyResistances(sim, spell, &damage)
 		spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
 	}
+	spellEffect.Damage = damage
+}
+func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spell, damage float64) {
+	spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
+	spellEffect.applyResistances(sim, spell, &damage)
+	spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
 	spellEffect.Damage = damage
 }
 
@@ -277,7 +283,7 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, 
 
 	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
 		// Physical resistance (armor).
-		*damage *= 1 - spellEffect.Target.ArmorDamageReduction(spell.Character.stats[stats.ArmorPenetration])
+		*damage *= spellEffect.Target.ArmorDamageReduction(spell.Character.stats[stats.ArmorPenetration])
 	} else if !spell.SpellExtras.Matches(SpellExtrasBinary) {
 		// Magical resistance.
 		// https://royalgiraffe.github.io/resist-guide

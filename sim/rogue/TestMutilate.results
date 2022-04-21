@@ -84,7 +84,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-BadgeoftheSwarmguard-21670"
  value: {
-  dps: 1212.3397358548284
+  dps: 1212.2691076609171
  }
 }
 dps_results: {
@@ -97,36 +97,6 @@ dps_results: {
  key: "TestMutilate-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1201.9218973700342
- }
-}
-dps_results: {
- key: "TestMutilate-AllItems-Battlemaster'sAudacity-34049"
- value: {
-  dps: 1194.0246062284562
- }
-}
-dps_results: {
- key: "TestMutilate-AllItems-Battlemaster'sCruelty-34163"
- value: {
-  dps: 1211.4371140100734
- }
-}
-dps_results: {
- key: "TestMutilate-AllItems-Battlemaster'sDepravity-34162"
- value: {
-  dps: 1194.0910602248866
- }
-}
-dps_results: {
- key: "TestMutilate-AllItems-Battlemaster'sDetermination-33832"
- value: {
-  dps: 1214.3824952685072
- }
-}
-dps_results: {
- key: "TestMutilate-AllItems-Battlemaster'sPerseverance-34050"
- value: {
-  dps: 1194.0246062284562
  }
 }
 dps_results: {
@@ -630,7 +600,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-SelfDrums-DPS"
  value: {
-  dps: 1230.1622804125739
+  dps: 1232.5950733226446
  }
 }
 dps_results: {
@@ -654,7 +624,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1466.2132412819221
+  dps: 1465.7923759458301
  }
 }
 dps_results: {
@@ -702,7 +672,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1465.9008577703064
+  dps: 1465.4799924342144
  }
 }
 dps_results: {

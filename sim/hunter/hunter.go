@@ -82,6 +82,7 @@ type Hunter struct {
 	ArcaneShot   *core.Spell
 	KillCommand  *core.Spell
 	MultiShot    *core.Spell
+	RapidFire    *core.Spell
 	RaptorStrike *core.Spell
 	ScorpidSting *core.Spell
 	SerpentSting *core.Spell
@@ -135,7 +136,7 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 		hunter.rotation(sim, false)
 	}
 
-	hunter.DelayCooldownsForArmorDebuffs(sim)
+	hunter.DelayDPSCooldownsForArmorDebuffs(sim)
 }
 
 func (hunter *Hunter) Reset(sim *core.Simulation) {

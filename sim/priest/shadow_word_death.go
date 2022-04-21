@@ -9,8 +9,7 @@ import (
 
 const SpellIDShadowWordDeath int32 = 32996
 
-var SWDCooldownID = core.NewCooldownID()
-var ShadowWordDeathActionID = core.ActionID{SpellID: SpellIDShadowWordDeath, CooldownID: SWDCooldownID}
+var ShadowWordDeathActionID = core.ActionID{SpellID: SpellIDShadowWordDeath}
 
 func (priest *Priest) registerShadowWordDeathSpell(sim *core.Simulation) {
 	baseCost := 309.0
@@ -27,7 +26,10 @@ func (priest *Priest) registerShadowWordDeathSpell(sim *core.Simulation) {
 				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
 				GCD:  core.GCDDefault,
 			},
-			Cooldown: time.Second * 12,
+			CD: core.Cooldown{
+				Timer:    priest.NewTimer(),
+				Duration: time.Second * 12,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{

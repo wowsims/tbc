@@ -11,7 +11,7 @@ func (character *Character) newGCDAction(sim *Simulation, agent Agent) *PendingA
 		OnAction: func(sim *Simulation) {
 			character := agent.GetCharacter()
 			character.TryUseCooldowns(sim)
-			if !character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
+			if character.GCD.IsReady(sim) {
 				agent.OnGCDReady(sim)
 			}
 		},
@@ -41,7 +41,7 @@ func (character *Character) NextGCDAt() time.Duration {
 }
 
 func (character *Character) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duration) {
-	character.SetCD(GCDCooldownID, gcdReadyAt)
+	character.GCD.Set(gcdReadyAt)
 
 	character.gcdAction.Cancel(sim)
 	oldAction := character.gcdAction.OnAction
@@ -90,7 +90,7 @@ func (character *Character) FinishedWaitingForManaAndGCDReady(sim *Simulation) b
 		return false
 	}
 
-	return !character.IsOnCD(GCDCooldownID, sim.CurrentTime)
+	return character.GCD.IsReady(sim)
 }
 
 func (character *Character) WaitUntil(sim *Simulation, readyTime time.Duration) {

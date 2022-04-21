@@ -37,7 +37,7 @@ export const ImpaleProtTalents = {
 export const DefaultRotation = ProtectionWarriorRotation.create({
 	demoShout: DemoShout.DemoShoutMaintain,
 	thunderClap: ThunderClap.ThunderClapMaintain,
-	heroicStrikeThreshold: 30,
+	hsRageThreshold: 30,
 });
 
 export const DefaultOptions = ProtectionWarriorOptions.create({

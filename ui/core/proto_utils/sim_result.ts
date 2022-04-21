@@ -144,7 +144,7 @@ export class SimResult {
 	}
 
 	getDebuffMetrics(filter: SimResultFilter): Array<AuraMetrics> {
-		return AuraMetrics.joinById(this.getTargets(filter).map(target => target.auras).flat());
+		return AuraMetrics.joinById(this.getTargets(filter).map(target => target.auras).flat()).filter(aura => aura.uptimePercent != 0);
 	}
 
 	toProto(): SimRun {

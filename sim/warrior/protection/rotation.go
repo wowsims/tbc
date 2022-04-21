@@ -14,9 +14,13 @@ func (war *ProtectionWarrior) OnGCDReady(sim *core.Simulation) {
 func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
-	if !war.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+	if war.GCD.IsReady(sim) {
 		if war.CanShieldSlam(sim) {
 			war.ShieldSlam.Cast(sim, target)
+		} else if war.CanBloodthirst(sim) {
+			war.Bloodthirst.Cast(sim, sim.GetPrimaryTarget())
+		} else if war.CanMortalStrike(sim) {
+			war.MortalStrike.Cast(sim, sim.GetPrimaryTarget())
 		} else if war.CanRevenge(sim) {
 			war.Revenge.Cast(sim, target)
 		} else if war.ShouldShout(sim) {
@@ -27,12 +31,16 @@ func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 			war.DemoralizingShout.Cast(sim, target)
 		} else if war.CanDevastate(sim) {
 			war.Devastate.Cast(sim, target)
-		} else if war.CanSunderArmor(sim, target) {
+		} else if war.CanSunderArmor(sim) {
 			war.SunderArmor.Cast(sim, target)
 		}
 	}
 
-	if war.CurrentRage() >= float64(war.Rotation.HeroicStrikeThreshold) && war.CanHeroicStrike(sim) {
-		war.QueueHeroicStrike(sim)
+	if war.CurrentRage() >= float64(war.Rotation.HsRageThreshold) {
+		if war.CanHeroicStrike(sim) {
+			war.QueueHeroicStrike(sim)
+		} else if war.CanCleave(sim) {
+			war.QueueCleave(sim)
+		}
 	}
 }

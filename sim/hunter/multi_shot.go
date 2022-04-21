@@ -7,8 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var MultiShotCooldownID = core.NewCooldownID()
-var MultiShotActionID = core.ActionID{SpellID: 27021, CooldownID: MultiShotCooldownID}
+var MultiShotActionID = core.ActionID{SpellID: 27021}
 
 func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 	baseCost := 275.0
@@ -65,7 +64,10 @@ func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 				cast.CastTime = hunter.MultiShotCastTime()
 			},
 			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
-			Cooldown:    time.Second * 10,
+			CD: core.Cooldown{
+				Timer:    hunter.NewTimer(),
+				Duration: time.Second * 10,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),

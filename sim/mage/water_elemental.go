@@ -9,18 +9,15 @@ import (
 
 // The numbers in this file are VERY rough approximations based on logs.
 
-var SummonWaterElementalCooldownID = core.NewCooldownID()
-
 func (mage *Mage) registerSummonWaterElementalCD() {
 	if !mage.Talents.SummonWaterElemental {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 31687, CooldownID: SummonWaterElementalCooldownID}
-	cooldown := time.Minute * 3
+	actionID := core.ActionID{SpellID: 31687}
 
 	baseCost := mage.BaseMana() * 0.16
-	summonSpell := mage.RegisterSpell(core.SpellConfig{
+	mage.SummonWaterElemental = mage.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
 
 		ResourceType: stats.Mana,
@@ -33,7 +30,10 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
 				GCD: core.GCDDefault,
 			},
-			Cooldown: cooldown,
+			CD: core.Cooldown{
+				Timer:    mage.NewTimer(),
+				Duration: time.Minute * 3,
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
@@ -45,14 +45,14 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		Spell:    summonSpell,
+		Spell:    mage.SummonWaterElemental,
 		Priority: core.CooldownPriorityDrums + 1, // Always prefer to cast before drums or lust so the ele gets their benefits.
 		Type:     core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if mage.waterElemental.IsEnabled() {
 				return false
 			}
-			if character.CurrentMana() < summonSpell.DefaultCast.Cost {
+			if character.CurrentMana() < mage.SummonWaterElemental.DefaultCast.Cost {
 				return false
 			}
 			return true

@@ -75,7 +75,7 @@ func (ret *RetributionPaladin) GetPaladin() *paladin.Paladin {
 
 func (ret *RetributionPaladin) Init(sim *core.Simulation) {
 	ret.Paladin.Init(sim)
-	ret.DelayCooldownsForArmorDebuffs(sim)
+	ret.DelayDPSCooldownsForArmorDebuffs(sim)
 }
 
 func (ret *RetributionPaladin) Reset(sim *core.Simulation) {
@@ -116,7 +116,7 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
 	// Cast selected judgement to keep on the boss
-	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) &&
+	if ret.JudgementOfWisdom.IsReady(sim) &&
 		ret.judgement != proto.RetributionPaladin_Options_None {
 		var judge *core.Spell
 		switch ret.judgement {
@@ -154,10 +154,10 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	// Setup
 	target := sim.GetPrimaryTarget()
 
-	gcdCD := ret.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	crusaderStrikeCD := ret.GetRemainingCD(paladin.CrusaderStrikeCD, sim.CurrentTime)
-	nextCrusaderStrikeCD := ret.CDReadyAt(paladin.CrusaderStrikeCD)
-	judgementCD := ret.GetRemainingCD(paladin.JudgementCD, sim.CurrentTime)
+	gcdCD := ret.GCD.TimeToReady(sim)
+	crusaderStrikeCD := ret.CrusaderStrike.TimeToReady(sim)
+	nextCrusaderStrikeCD := ret.CrusaderStrike.CD.ReadyAt()
+	judgementCD := ret.JudgementOfWisdom.TimeToReady(sim)
 
 	sobActive := ret.SealOfBloodAura.IsActive()
 	socActive := ret.SealOfCommandAura.IsActive()
@@ -181,7 +181,7 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	}
 
 	// Judgement can affect active seals and CDs
-	nextJudgementCD := ret.CDReadyAt(paladin.JudgementCD)
+	nextJudgementCD := ret.JudgementOfWisdom.CD.ReadyAt()
 
 	if gcdCD == 0 {
 		if socActive && inTwistWindow {
@@ -205,9 +205,9 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	events := []time.Duration{
 		nextSwingAt,
 		nextSwingAt - twistWindow,
-		ret.CDReadyAt(core.GCDCooldownID),
-		ret.CDReadyAt(paladin.JudgementCD),
-		ret.CDReadyAt(paladin.CrusaderStrikeCD),
+		ret.GCD.ReadyAt(),
+		ret.JudgementOfWisdom.CD.ReadyAt(),
+		ret.CrusaderStrike.CD.ReadyAt(),
 	}
 
 	// Time has to move forward... so exclude any events that are at current time
@@ -225,7 +225,7 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	sort.Slice(filteredEvents, func(i, j int) bool { return events[i] < events[j] })
 
 	// If the next action is  the GCD, just return
-	if filteredEvents[0] == ret.CDReadyAt(core.GCDCooldownID) {
+	if filteredEvents[0] == ret.GCD.ReadyAt() {
 		return
 	}
 
@@ -265,7 +265,7 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	}
 
 	// Crusader strike if we can
-	if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) {
+	if ret.CrusaderStrike.IsReady(sim) {
 		success := ret.CrusaderStrike.Cast(sim, target)
 		if !success {
 			ret.WaitForMana(sim, ret.CrusaderStrike.CurCast.Cost)
@@ -274,7 +274,7 @@ func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
 	}
 
 	// Proceed until SoB expires, CrusaderStrike comes off GCD, or Judgement comes off GCD
-	nextEventAt := ret.CDReadyAt(paladin.CrusaderStrikeCD)
+	nextEventAt := ret.CrusaderStrike.CD.ReadyAt()
 	sobExpiration := sim.CurrentTime + ret.SealOfBloodAura.RemainingDuration(sim)
 	nextEventAt = core.MinDuration(nextEventAt, sobExpiration)
 	// Waiting for judgement CD causes a bug that infinite loops for some reason

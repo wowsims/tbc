@@ -90,6 +90,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		},
 		MobType: options.MobType,
 	}
+	target.GCD = target.NewTimer()
 	if target.Level == 0 {
 		target.Level = 73
 	}
@@ -131,6 +132,14 @@ func (target *Target) Advance(sim *Simulation, elapsedTime time.Duration) {
 
 func (target *Target) doneIteration(sim *Simulation) {
 	target.Unit.doneIteration(sim)
+}
+
+func (target *Target) NextTarget(sim *Simulation) *Target {
+	nextIndex := target.Index + 1
+	if nextIndex >= sim.GetNumTargets() {
+		nextIndex = 0
+	}
+	return sim.GetTarget(nextIndex)
 }
 
 func (target *Target) GetMetricsProto(numIterations int32) *proto.TargetMetrics {

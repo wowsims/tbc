@@ -88,6 +88,10 @@ func (weapon Weapon) BaseDamage(sim *Simulation) float64 {
 	return weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("Weapon Base Damage")
 }
 
+func (weapon Weapon) AverageDamage() float64 {
+	return (weapon.BaseDamageMin + weapon.BaseDamageMax) / 2
+}
+
 func (weapon Weapon) calculateWeaponDamage(sim *Simulation, attackPower float64) float64 {
 	return weapon.BaseDamage(sim) + (weapon.SwingSpeed*attackPower)/MeleeAttackRatingPerDamage
 }
@@ -531,7 +535,7 @@ func (aa *AutoAttacks) NextEventAt(sim *Simulation) time.Duration {
 		panic(fmt.Sprintf("Returned 0 from next attack at %s, mh: %s, oh: %s", sim.CurrentTime, aa.MainhandSwingAt, aa.OffhandSwingAt))
 	}
 	return MinDuration(
-		sim.CurrentTime+aa.character.GetRemainingCD(GCDCooldownID, sim.CurrentTime),
+		sim.CurrentTime+aa.character.GCD.TimeToReady(sim),
 		aa.NextAttackAt())
 }
 

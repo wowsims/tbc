@@ -10,8 +10,7 @@ import (
 
 const SpellIDDevouringPlague int32 = 25467
 
-var DevouringPlagueCooldownID = core.NewCooldownID()
-var DevouringPlagueActionID = core.ActionID{SpellID: SpellIDDevouringPlague, CooldownID: DevouringPlagueCooldownID}
+var DevouringPlagueActionID = core.ActionID{SpellID: SpellIDDevouringPlague}
 
 func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
 	baseCost := 1145.0
@@ -28,7 +27,10 @@ func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
 				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
 				GCD:  core.GCDDefault,
 			},
-			Cooldown: time.Minute * 3,
+			CD: core.Cooldown{
+				Timer:    priest.NewTimer(),
+				Duration: time.Minute * 3,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{

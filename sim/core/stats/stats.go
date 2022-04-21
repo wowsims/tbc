@@ -418,12 +418,15 @@ type PseudoStats struct {
 	BonusMHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
 	BonusOHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
 
+	DisableDWMissPenalty bool // Used by Heroic Strike and Cleave
+
 	MobTypeAttackPower float64 // Bonus AP against mobs of the current type.
 	MobTypeSpellPower  float64 // Bonus SP against mobs of the current type.
 
 	// For Human and Orc weapon racials
 	BonusMHExpertiseRating float64
 	BonusOHExpertiseRating float64
+	DodgeReduction         float64 // Used by Warrior talent 'Weapon Mastery'
 
 	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
 

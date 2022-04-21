@@ -11,23 +11,6 @@ import (
 
 const NeverExpires = time.Duration(math.MaxInt64)
 
-type CooldownID int32
-
-// Reserve the default value so no cooldown uses it.
-const UnknownCooldownID = CooldownID(0)
-
-var numCooldownIDs = 1
-
-func NewCooldownID() CooldownID {
-	newCooldownID := CooldownID(numCooldownIDs)
-	numCooldownIDs++
-	return newCooldownID
-}
-
-var GCDCooldownID = NewCooldownID()
-var OffensiveTrinketSharedCooldownID = NewCooldownID()
-var DefensiveTrinketSharedCooldownID = NewCooldownID()
-
 type OnInit func(aura *Aura, sim *Simulation)
 type OnReset func(aura *Aura, sim *Simulation)
 type OnDoneIteration func(aura *Aura, sim *Simulation)
@@ -247,7 +230,6 @@ func newAuraTracker() auraTracker {
 		onPeriodicDamageAuras: make([]*Aura, 0, 16),
 		auras:                 make([]*Aura, 0, 16),
 		aurasByTag:            make(map[string][]*Aura),
-		cooldowns:             make([]time.Duration, numCooldownIDs),
 	}
 }
 
@@ -366,7 +348,6 @@ func (at *auraTracker) init(sim *Simulation) {
 }
 
 func (at *auraTracker) reset(sim *Simulation) {
-	at.cooldowns = make([]time.Duration, numCooldownIDs)
 	at.activeAuras = at.activeAuras[:0]
 	at.onCastCompleteAuras = at.onCastCompleteAuras[:0]
 	at.onSpellHitAuras = at.onSpellHitAuras[:0]
@@ -589,25 +570,6 @@ func removeBySwappingToBack(arr []*Aura, removeIdx int32) []*Aura {
 	return arr[:len(arr)-1]
 }
 
-func (at *auraTracker) IsOnCD(id CooldownID, currentTime time.Duration) bool {
-	return at.cooldowns[id] > currentTime
-}
-
-func (at *auraTracker) CDReadyAt(id CooldownID) time.Duration {
-	return at.cooldowns[id]
-}
-
-func (at *auraTracker) GetRemainingCD(id CooldownID, currentTime time.Duration) time.Duration {
-	return MaxDuration(0, at.cooldowns[id]-currentTime)
-}
-
-func (at *auraTracker) SetCD(id CooldownID, newCD time.Duration) {
-	if id == 0 {
-		panic("Trying to set CD with ID 0!")
-	}
-	at.cooldowns[id] = newCD
-}
-
 // Invokes the OnCastComplete event for all tracked Auras.
 func (at *auraTracker) OnCastComplete(sim *Simulation, spell *Spell) {
 	for _, aura := range at.onCastCompleteAuras {
@@ -641,21 +603,6 @@ func (at *auraTracker) GetMetricsProto(numIterations int32) []*proto.AuraMetrics
 	}
 
 	return metrics
-}
-
-// Stored value is the time at which the ICD will be off CD
-type InternalCD time.Duration
-
-func (icd InternalCD) IsOnCD(sim *Simulation) bool {
-	return time.Duration(icd) > sim.CurrentTime
-}
-
-func (icd InternalCD) GetRemainingCD(sim *Simulation) time.Duration {
-	return MaxDuration(0, time.Duration(icd)-sim.CurrentTime)
-}
-
-func NewICD() InternalCD {
-	return InternalCD(0)
 }
 
 // Returns the same Aura for chaining.

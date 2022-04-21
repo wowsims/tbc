@@ -8,8 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var BloodthirstCooldownID = core.NewCooldownID()
-var BloodthirstActionID = core.ActionID{SpellID: 30335, CooldownID: BloodthirstCooldownID}
+var BloodthirstActionID = core.ActionID{SpellID: 30335}
 
 func (warrior *Warrior) registerBloodthirstSpell(_ *core.Simulation) {
 	cost := 30.0
@@ -32,7 +31,10 @@ func (warrior *Warrior) registerBloodthirstSpell(_ *core.Simulation) {
 				GCD:  core.GCDDefault,
 			},
 			IgnoreHaste: true,
-			Cooldown:    time.Second * 6,
+			CD: core.Cooldown{
+				Timer:    warrior.NewTimer(),
+				Duration: time.Second * 6,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
@@ -64,5 +66,5 @@ func (warrior *Warrior) registerBloodthirstSpell(_ *core.Simulation) {
 }
 
 func (warrior *Warrior) CanBloodthirst(sim *core.Simulation) bool {
-	return warrior.Talents.Bloodthirst && warrior.CurrentRage() >= warrior.Bloodthirst.DefaultCast.Cost && !warrior.IsOnCD(BloodthirstCooldownID, sim.CurrentTime)
+	return warrior.Talents.Bloodthirst && warrior.CurrentRage() >= warrior.Bloodthirst.DefaultCast.Cost && warrior.Bloodthirst.IsReady(sim)
 }

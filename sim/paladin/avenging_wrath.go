@@ -7,8 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var AvengingWrathCD = core.NewCooldownID()
-var AvengingWrathActionID = core.ActionID{SpellID: 31884, CooldownID: AvengingWrathCD}
+var AvengingWrathActionID = core.ActionID{SpellID: 31884}
 
 func (paladin *Paladin) registerAvengingWrathCD() {
 	aura := paladin.RegisterAura(core.Aura{
@@ -23,7 +22,6 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 		},
 	})
 
-	cd := time.Minute * 3
 	baseCost := 236.0
 
 	spell := paladin.RegisterSpell(core.SpellConfig{
@@ -36,7 +34,10 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 			DefaultCast: core.Cast{
 				Cost: baseCost,
 			},
-			Cooldown:         cd,
+			CD: core.Cooldown{
+				Timer:    paladin.NewTimer(),
+				Duration: time.Minute * 3,
+			},
 			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {

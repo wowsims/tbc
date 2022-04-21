@@ -11,7 +11,7 @@ import (
 const SerpentCoilBraidID = 30720
 
 func init() {
-	common.AddSimpleStatItemActiveEffect(19339, stats.Stats{stats.SpellHaste: 330}, time.Second*20, time.Minute*5, core.OffensiveTrinketSharedCooldownID) // MQG
+	common.AddSimpleStatOffensiveTrinketEffect(19339, stats.Stats{stats.SpellHaste: 330}, time.Second*20, time.Minute*5) // MQG
 
 	core.AddItemEffect(32488, ApplyAshtongueTalismanOfInsight)
 

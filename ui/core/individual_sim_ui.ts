@@ -295,6 +295,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			this.addDetailedResultsTab();
 			this.addLogTab();
 		}
+
+		this.player.changeEmitter.on(() => this.recomputeSettingsLayout());
 	}
 
 	private loadSettings() {
@@ -695,9 +697,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			content: Tooltips.COOLDOWNS_SECTION,
 			allowHTML: true,
 			placement: 'left',
-		});
-		this.player.cooldownsChangeEmitter.on(() => {
-			this.recomputeSettingsLayout();
 		});
 
 		// Init Muuri layout only when settings tab is clicked, because it needs the elements

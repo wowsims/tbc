@@ -106,36 +106,6 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestSmite-AllItems-Battlemaster'sAudacity-34049"
- value: {
-  dps: 1005.7327474942593
- }
-}
-dps_results: {
- key: "TestSmite-AllItems-Battlemaster'sCruelty-34163"
- value: {
-  dps: 984.0317206194807
- }
-}
-dps_results: {
- key: "TestSmite-AllItems-Battlemaster'sDepravity-34162"
- value: {
-  dps: 990.0530423859086
- }
-}
-dps_results: {
- key: "TestSmite-AllItems-Battlemaster'sDetermination-33832"
- value: {
-  dps: 984.0317206194807
- }
-}
-dps_results: {
- key: "TestSmite-AllItems-Battlemaster'sPerseverance-34050"
- value: {
-  dps: 998.3192380604601
- }
-}
-dps_results: {
  key: "TestSmite-AllItems-Berserker'sCall-33831"
  value: {
   dps: 984.0317206194807
@@ -228,7 +198,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 985.5095756219924
+  dps: 984.0317206194807
  }
 }
 dps_results: {
@@ -330,7 +300,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-Figurine-LivingRubySerpent-24126"
  value: {
-  dps: 1007.8161784151981
+  dps: 1003.9282640717298
  }
 }
 dps_results: {
@@ -342,7 +312,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
-  dps: 987.2518301380991
+  dps: 984.5771485131485
  }
 }
 dps_results: {
@@ -492,7 +462,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 1025.4169211606359
+  dps: 1017.8203426227458
  }
 }
 dps_results: {
@@ -522,7 +492,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-ShiftingNaaruSliver-34429"
  value: {
-  dps: 1009.3509369691757
+  dps: 1004.4703059095792
  }
 }
 dps_results: {
@@ -630,7 +600,7 @@ dps_results: {
 dps_results: {
  key: "TestSmite-AllItems-Xi'ri'sGift-29179"
  value: {
-  dps: 1000.6843424922996
+  dps: 998.4795612685193
  }
 }
 dps_results: {

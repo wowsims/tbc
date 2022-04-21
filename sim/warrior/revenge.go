@@ -8,8 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var RevengeCooldownID = core.NewCooldownID()
-var RevengeActionID = core.ActionID{SpellID: 30357, CooldownID: RevengeCooldownID}
+var RevengeActionID = core.ActionID{SpellID: 30357}
 
 func (warrior *Warrior) registerRevengeSpell(_ *core.Simulation) {
 	cost := 5.0 - float64(warrior.Talents.FocusedRage)
@@ -29,7 +28,10 @@ func (warrior *Warrior) registerRevengeSpell(_ *core.Simulation) {
 				GCD:  core.GCDDefault,
 			},
 			IgnoreHaste: true,
-			Cooldown:    time.Second * 5,
+			CD: core.Cooldown{
+				Timer:    warrior.NewTimer(),
+				Duration: time.Second * 5,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
@@ -52,5 +54,5 @@ func (warrior *Warrior) registerRevengeSpell(_ *core.Simulation) {
 }
 
 func (warrior *Warrior) CanRevenge(sim *core.Simulation) bool {
-	return warrior.StanceMatches(DefensiveStance) && warrior.revengeTriggered && warrior.CurrentRage() >= warrior.Revenge.DefaultCast.Cost && !warrior.IsOnCD(RevengeCooldownID, sim.CurrentTime)
+	return warrior.StanceMatches(DefensiveStance) && warrior.revengeTriggered && warrior.CurrentRage() >= warrior.Revenge.DefaultCast.Cost && warrior.Revenge.IsReady(sim)
 }

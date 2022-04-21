@@ -63,7 +63,7 @@ func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 
 		// Miss
 		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
-		if character.AutoAttacks.IsDualWielding {
+		if character.AutoAttacks.IsDualWielding && !character.PseudoStats.DisableDWMissPenalty {
 			missChance += 0.19
 		}
 
@@ -76,7 +76,7 @@ func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 		}
 
 		// Dodge
-		chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character))
+		chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character)-character.PseudoStats.DodgeReduction)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeDodge
 			spell.Dodges++
@@ -137,7 +137,7 @@ func OutcomeFuncMeleeSpecialHit() OutcomeApplier {
 
 		// Dodge
 		if !spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
-			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character))
+			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character)-character.PseudoStats.DodgeReduction)
 			if roll < chance {
 				spellEffect.Outcome = OutcomeDodge
 				spell.Dodges++
@@ -175,7 +175,7 @@ func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
 
 		// Dodge
 		if !spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
-			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character))
+			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character)-character.PseudoStats.DodgeReduction)
 			if roll < chance {
 				spellEffect.Outcome = OutcomeDodge
 				spell.Dodges++
@@ -194,6 +194,35 @@ func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
 		// If the target is a mob:
 		// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
 		// If we actually implement blocks, ranged hits can be blocked.
+
+		// Crit (separate roll)
+		if spellEffect.physicalCritRoll(sim, spell) {
+			spellEffect.Outcome = OutcomeCrit
+			spell.Crits++
+			*damage *= critMultiplier
+			return
+		}
+
+		// Hit
+		spellEffect.Outcome = OutcomeHit
+		spell.Hits++
+	}
+}
+
+func OutcomeFuncMeleeSpecialNoBlockDodgeParry(critMultiplier float64) OutcomeApplier {
+	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+		character := spell.Character
+		roll := sim.RandomFloat("White Hit Table")
+
+		// Miss
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
+		chance := MaxFloat(0, missChance)
+		if roll < chance {
+			spellEffect.Outcome = OutcomeMiss
+			spell.Misses++
+			*damage = 0
+			return
+		}
 
 		// Crit (separate roll)
 		if spellEffect.physicalCritRoll(sim, spell) {

@@ -8,8 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var StormstrikeCD = core.NewCooldownID()
-var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeCD}
+var StormstrikeActionID = core.ActionID{SpellID: 17364}
 
 func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) *core.Aura {
 	return target.GetOrRegisterAura(core.Aura{
@@ -91,7 +90,10 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 				GCD:  core.GCDDefault,
 			},
 			IgnoreHaste: true,
-			Cooldown:    time.Second * 10,
+			CD: core.Cooldown{
+				Timer:    shaman.NewTimer(),
+				Duration: time.Second * 10,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{

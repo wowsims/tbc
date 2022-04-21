@@ -137,7 +137,7 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 	energyForEA := rogue.builderEnergyCost*float64(comboPointsNeeded) + ExposeArmorEnergyCost
 	rogue.eaBuildTime = time.Duration(((energyForEA - expectedEnergyAfterFinisher) / rogue.energyPerSecondAvg) * float64(time.Second))
 
-	rogue.DelayCooldownsForArmorDebuffs(sim)
+	rogue.DelayDPSCooldownsForArmorDebuffs(sim)
 }
 
 func (rogue *Rogue) Reset(sim *core.Simulation) {
@@ -257,7 +257,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		maxEnergy = 110
 	}
 	rogue.EnableEnergyBar(maxEnergy, func(sim *core.Simulation) {
-		if !rogue.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		if rogue.GCD.IsReady(sim) {
 			rogue.doRotation(sim)
 		}
 	})

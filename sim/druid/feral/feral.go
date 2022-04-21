@@ -5,8 +5,8 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/druid"
 	"github.com/wowsims/tbc/sim/core/stats"
+	"github.com/wowsims/tbc/sim/druid"
 )
 
 func RegisterFeralDruid() {
@@ -47,7 +47,7 @@ func NewFeralDruid(character core.Character, options proto.Player) *FeralDruid {
 	cat.PseudoStats.ThreatMultiplier *= 0.71
 
 	cat.EnableEnergyBar(100.0, func(sim *core.Simulation) {
-		if !cat.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		if cat.GCD.IsReady(sim) {
 			cat.doRotation(sim)
 		}
 	})
@@ -79,7 +79,7 @@ func NewFeralDruid(character core.Character, options proto.Player) *FeralDruid {
 	})
 
 	cat.AddStatDependency(stats.StatDependency{
-		SourceStat: stats.FeralAttackPower,
+		SourceStat:   stats.FeralAttackPower,
 		ModifiedStat: stats.AttackPower,
 		Modifier: func(feralAttackPower float64, attackPower float64) float64 {
 			return attackPower + feralAttackPower*1

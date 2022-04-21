@@ -228,14 +228,12 @@ func (hunter *Hunter) applyFerociousInspiration() {
 	})
 }
 
-var BestialWrathCooldownID = core.NewCooldownID()
-
 func (hunter *Hunter) registerBestialWrathCD() {
 	if !hunter.Talents.BestialWrath {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 19574, CooldownID: BestialWrathCooldownID}
+	actionID := core.ActionID{SpellID: 19574}
 
 	bestialWrathPetAura := hunter.pet.RegisterAura(core.Aura{
 		Label:    "Bestial Wrath Pet",
@@ -264,7 +262,6 @@ func (hunter *Hunter) registerBestialWrathCD() {
 	})
 
 	manaCost := hunter.BaseMana() * 0.1
-	cooldown := time.Minute * 2
 
 	bwSpell := hunter.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
@@ -276,7 +273,10 @@ func (hunter *Hunter) registerBestialWrathCD() {
 			DefaultCast: core.Cast{
 				Cost: manaCost,
 			},
-			Cooldown: cooldown,
+			CD: core.Cooldown{
+				Timer:    hunter.NewTimer(),
+				Duration: time.Minute * 2,
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
@@ -448,15 +448,12 @@ func (hunter *Hunter) applyMasterTactician() {
 	})
 }
 
-var ReadinessCooldownID = core.NewCooldownID()
-
 func (hunter *Hunter) registerReadinessCD() {
 	if !hunter.Talents.Readiness {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 23989, CooldownID: ReadinessCooldownID}
-	cooldown := time.Minute * 5
+	actionID := core.ActionID{SpellID: 23989}
 
 	readinessSpell := hunter.RegisterSpell(core.SpellConfig{
 		ActionID: actionID,
@@ -464,16 +461,18 @@ func (hunter *Hunter) registerReadinessCD() {
 		Cast: core.CastConfig{
 			//GCD:         time.Second * 1, TODO: GCD causes panic
 			//IgnoreHaste: true, // Hunter GCD is locked
-			Cooldown: cooldown,
+			CD: core.Cooldown{
+				Timer:    hunter.NewTimer(),
+				Duration: time.Minute * 5,
+			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
-			hunter.SetCD(RapidFireCooldownID, 0)
-			hunter.SetCD(MultiShotCooldownID, 0)
-			hunter.SetCD(ArcaneShotCooldownID, 0)
-			hunter.SetCD(AimedShotCooldownID, 0)
-			hunter.SetCD(KillCommandCooldownID, 0)
-			hunter.SetCD(RaptorStrikeCooldownID, 0)
+			hunter.RapidFire.CD.Reset()
+			hunter.MultiShot.CD.Reset()
+			hunter.ArcaneShot.CD.Reset()
+			hunter.KillCommand.CD.Reset()
+			hunter.RaptorStrike.CD.Reset()
 		},
 	})
 
@@ -482,7 +481,7 @@ func (hunter *Hunter) registerReadinessCD() {
 		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Don't use if there are no cooldowns to reset.
-			return character.IsOnCD(RapidFireCooldownID, sim.CurrentTime)
+			return !hunter.RapidFire.IsReady(sim)
 		},
 	})
 }
