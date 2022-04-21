@@ -441,7 +441,7 @@ export const P4_PRESET = {
 };
 
 export const P5_ALLIANCE_PRESET = {
-	name: 'P5 Preset',
+	name: 'P5 Alliance Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	enableWhen: (player: Player<any>) => player.getFaction() == Faction.Alliance,
 	gear: EquipmentSpec.fromJsonString(`{"items": [
@@ -545,7 +545,7 @@ export const P5_ALLIANCE_PRESET = {
 };
 
 export const P5_HORDE_PRESET = {
-	name: 'P5 Preset',
+	name: 'P5 Horde Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	enableWhen: (player: Player<any>) => player.getFaction() == Faction.Horde,
 	gear: EquipmentSpec.fromJsonString(`{"items": [
