@@ -48,6 +48,8 @@ func (war *DpsWarrior) normalRotation(sim *core.Simulation) {
 			war.BerserkerRage.Cast(sim, nil)
 		} else if war.tryMaintainDebuffs(sim) {
 			// Do nothing, already cast
+		} else if war.Rotation.UseHamstring && war.CurrentRage() >= war.Rotation.HamstringRageThreshold && war.ShouldHamstring(sim) {
+			war.Hamstring.Cast(sim, sim.GetPrimaryTarget())
 		}
 	}
 

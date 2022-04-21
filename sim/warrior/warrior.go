@@ -46,6 +46,7 @@ type Warrior struct {
 	DemoralizingShout    *core.Spell
 	Devastate            *core.Spell
 	Execute              *core.Spell
+	Hamstring            *core.Spell
 	HeroicStrike         *core.Spell
 	MortalStrike         *core.Spell
 	Overpower            *core.Spell
@@ -110,6 +111,7 @@ func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.registerDemoralizingShoutSpell(sim)
 	warrior.registerDevastateSpell(sim)
 	warrior.registerExecuteSpell(sim)
+	warrior.registerHamstringSpell()
 	warrior.registerHeroicStrikeSpell(sim)
 	warrior.registerMortalStrikeSpell(sim)
 	warrior.registerOverpowerSpell()

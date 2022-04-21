@@ -102,9 +102,10 @@ message Warrior {
 			double slam_latency = 9;
 
 			bool use_hs_during_execute = 10;
-			bool use_ww_during_execute = 11;
-			bool use_ms_during_execute = 12;
 			bool use_bt_during_execute = 13;
+			bool use_ms_during_execute = 12;
+			bool use_ww_during_execute = 11;
+			bool use_slam_during_execute = 18;
     }
     Rotation rotation = 1;
 
