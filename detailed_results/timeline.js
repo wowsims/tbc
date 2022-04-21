@@ -841,7 +841,18 @@ const idToCategoryMap = {
     [2825]: DEFAULT_ACTION_CATEGORY + 0.1,
     // Warrior
     [25231]: 0.1,
-    [29707]: 0.1, // Heroic Strike
+    [29707]: 0.1,
+    [25242]: MELEE_ACTION_CATEGORY + 0.05,
+    [30335]: MELEE_ACTION_CATEGORY + 0.1,
+    [30330]: MELEE_ACTION_CATEGORY + 0.1,
+    [30356]: MELEE_ACTION_CATEGORY + 0.1,
+    [1680]: MELEE_ACTION_CATEGORY + 0.2,
+    [11585]: MELEE_ACTION_CATEGORY + 0.3,
+    [25212]: MELEE_ACTION_CATEGORY + 0.4,
+    [25236]: MELEE_ACTION_CATEGORY + 0.5,
+    [71]: DEFAULT_ACTION_CATEGORY + 0.1,
+    [2457]: DEFAULT_ACTION_CATEGORY + 0.1,
+    [2458]: DEFAULT_ACTION_CATEGORY + 0.1, // Berserker Stance
 };
 const idsToGroupForRotation = [
     6774,

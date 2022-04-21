@@ -168,13 +168,14 @@ export const WarriorRotationConfig = {
             config: {
                 label: 'Use Slam',
                 labelTooltip: 'Use Slam whenever possible.',
-                changedEvent: (player) => player.rotationChangeEmitter,
+                changedEvent: (player) => TypedEvent.onAny([player.rotationChangeEmitter, player.talentsChangeEmitter]),
                 getValue: (player) => player.getRotation().useSlam,
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.useSlam = newValue;
                     player.setRotation(eventID, newRotation);
                 },
+                showWhen: (player) => player.getTalents().improvedSlam == 2,
             },
         },
         {
@@ -250,14 +251,14 @@ export const WarriorRotationConfig = {
             config: {
                 label: 'Slam Latency',
                 labelTooltip: 'Time between MH swing and start of the Slam cast, in milliseconds.',
-                changedEvent: (player) => player.rotationChangeEmitter,
+                changedEvent: (player) => TypedEvent.onAny([player.rotationChangeEmitter, player.talentsChangeEmitter]),
                 getValue: (player) => player.getRotation().slamLatency,
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.slamLatency = newValue;
                     player.setRotation(eventID, newRotation);
                 },
-                showWhen: (player) => player.getRotation().useSlam,
+                showWhen: (player) => player.getRotation().useSlam && player.getTalents().improvedSlam == 2,
             },
         },
         {
@@ -350,14 +351,14 @@ export const WarriorRotationConfig = {
             config: {
                 label: 'Slam during Execute Phase',
                 labelTooltip: 'Use Slam during Execute Phase.',
-                changedEvent: (player) => player.rotationChangeEmitter,
+                changedEvent: (player) => TypedEvent.onAny([player.rotationChangeEmitter, player.talentsChangeEmitter]),
                 getValue: (player) => player.getRotation().useSlamDuringExecute,
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.useSlamDuringExecute = newValue;
                     player.setRotation(eventID, newRotation);
                 },
-                showWhen: (player) => player.getRotation().useSlam,
+                showWhen: (player) => player.getRotation().useSlam && player.getTalents().improvedSlam == 2,
             },
         },
         {
@@ -366,7 +367,7 @@ export const WarriorRotationConfig = {
             config: {
                 label: 'Sunder Armor',
                 values: [
-                    { name: 'None', value: SunderArmor.SunderArmorNone },
+                    { name: 'Never', value: SunderArmor.SunderArmorNone },
                     { name: 'Once', value: SunderArmor.SunderArmorOnce },
                     { name: 'Maintain Debuff', value: SunderArmor.SunderArmorMaintain },
                 ],

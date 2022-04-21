@@ -88,7 +88,7 @@ export class SimResult {
         return AuraMetrics.joinById(this.getPlayers(filter).map(player => player.auras).flat());
     }
     getDebuffMetrics(filter) {
-        return AuraMetrics.joinById(this.getTargets(filter).map(target => target.auras).flat());
+        return AuraMetrics.joinById(this.getTargets(filter).map(target => target.auras).flat()).filter(aura => aura.uptimePercent != 0);
     }
     toProto() {
         return SimRun.create({
