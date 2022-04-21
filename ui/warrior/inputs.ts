@@ -221,57 +221,6 @@ export const WarriorRotationConfig = {
 			},
 		},
 		{
-			type: 'enum' as const, cssClass: 'sunder-armor-picker',
-			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-			config: {
-				label: 'Sunder Armor',
-				values: [
-					{ name: 'None', value: SunderArmor.SunderArmorNone },
-					{ name: 'Once', value: SunderArmor.SunderArmorOnce },
-					{ name: 'Maintain Debuff', value: SunderArmor.SunderArmorMaintain },
-				],
-				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().sunderArmor,
-				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
-					const newRotation = player.getRotation();
-					newRotation.sunderArmor = newValue;
-					player.setRotation(eventID, newRotation);
-				},
-			},
-		},
-		{
-			type: 'boolean' as const,
-			cssClass: 'maintain-demo-shout-picker',
-			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-			config: {
-				label: 'Maintain Demo Shout',
-				labelTooltip: 'Keep Demo Shout active on the primary target.',
-				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().maintainDemoShout,
-				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
-					const newRotation = player.getRotation();
-					newRotation.maintainDemoShout = newValue;
-					player.setRotation(eventID, newRotation);
-				},
-			},
-		},
-		{
-			type: 'boolean' as const,
-			cssClass: 'maintain-thunder-clap-picker',
-			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-			config: {
-				label: 'Maintain Thunder Clap',
-				labelTooltip: 'Keep Thunder Clap active on the primary target.',
-				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().maintainThunderClap,
-				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
-					const newRotation = player.getRotation();
-					newRotation.maintainThunderClap = newValue;
-					player.setRotation(eventID, newRotation);
-				},
-			},
-		},
-		{
 			type: 'number' as const,
 			cssClass: 'hs-rage-threshold',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
@@ -436,6 +385,57 @@ export const WarriorRotationConfig = {
 					player.setRotation(eventID, newRotation);
 				},
 				showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useSlam,
+			},
+		},
+		{
+			type: 'enum' as const, cssClass: 'sunder-armor-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Sunder Armor',
+				values: [
+					{ name: 'None', value: SunderArmor.SunderArmorNone },
+					{ name: 'Once', value: SunderArmor.SunderArmorOnce },
+					{ name: 'Maintain Debuff', value: SunderArmor.SunderArmorMaintain },
+				],
+				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().sunderArmor,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.sunderArmor = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'boolean' as const,
+			cssClass: 'maintain-demo-shout-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Maintain Demo Shout',
+				labelTooltip: 'Keep Demo Shout active on the primary target.',
+				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().maintainDemoShout,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.maintainDemoShout = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'boolean' as const,
+			cssClass: 'maintain-thunder-clap-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Maintain Thunder Clap',
+				labelTooltip: 'Keep Thunder Clap active on the primary target.',
+				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().maintainThunderClap,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.maintainThunderClap = newValue;
+					player.setRotation(eventID, newRotation);
+				},
 			},
 		},
 	],
