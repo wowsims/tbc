@@ -220,7 +220,8 @@ export class ElementalShamanSimUI extends IndividualSimUI {
                     Presets.P2_PRESET,
                     Presets.P3_PRESET,
                     Presets.P4_PRESET,
-                    Presets.P5_PRESET,
+                    Presets.P5_ALLIANCE_PRESET,
+                    Presets.P5_HORDE_PRESET,
                 ],
             },
         });
