@@ -935,6 +935,17 @@ const idToCategoryMap: Record<number, number> = {
 	// Warrior
 	[25231]: 0.1, // Cleave
 	[29707]: 0.1, // Heroic Strike
+	[25242]: MELEE_ACTION_CATEGORY + 0.05, // Slam
+	[30335]: MELEE_ACTION_CATEGORY + 0.1, // Bloodthirst
+	[30330]: MELEE_ACTION_CATEGORY + 0.1, // Mortal Strike
+	[30356]: MELEE_ACTION_CATEGORY + 0.1, // Shield Slam
+	[1680]: MELEE_ACTION_CATEGORY + 0.2, // Whirlwind
+	[11585]: MELEE_ACTION_CATEGORY + 0.3, // Overpower
+	[25212]: MELEE_ACTION_CATEGORY + 0.4, // Hamstring
+	[25236]: MELEE_ACTION_CATEGORY + 0.5, // Execute
+	[71]:   DEFAULT_ACTION_CATEGORY + 0.1, // Defensive Stance
+	[2457]: DEFAULT_ACTION_CATEGORY + 0.1, // Battle Stance
+	[2458]: DEFAULT_ACTION_CATEGORY + 0.1, // Berserker Stance
 };
 
 const idsToGroupForRotation: Array<number> = [

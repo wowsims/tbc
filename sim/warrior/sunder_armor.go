@@ -67,6 +67,6 @@ func (warrior *Warrior) newSunderArmorSpell(sim *core.Simulation, isDevastateEff
 	return warrior.RegisterSpell(config)
 }
 
-func (warrior *Warrior) CanSunderArmor(sim *core.Simulation, target *core.Target) bool {
+func (warrior *Warrior) CanSunderArmor(sim *core.Simulation) bool {
 	return warrior.CurrentRage() >= warrior.SunderArmor.DefaultCast.Cost && !warrior.ExposeArmorAura.IsActive()
 }

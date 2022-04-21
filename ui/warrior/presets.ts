@@ -44,7 +44,7 @@ export const FuryTalents = {
 export const DefaultRotation = WarriorRotation.create({
 	useOverpower: false,
 	useHamstring: false,
-	prioritizeWw: true,
+	prioritizeWw: false,
 	sunderArmor: SunderArmor.SunderArmorOnce,
 	hsRageThreshold: 60,
 	overpowerRageThreshold: 25,

@@ -84,12 +84,15 @@ func (war *DpsWarrior) executeRotation(sim *core.Simulation) {
 
 // Returns whether any ability was cast.
 func (war *DpsWarrior) tryMaintainDebuffs(sim *core.Simulation) bool {
-	if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorOnce && !war.castFirstSunder {
+	if war.ShouldShout(sim) {
+		war.Shout.Cast(sim, nil)
+		return true
+	} else if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorOnce && !war.castFirstSunder && war.CanSunderArmor(sim) {
 		war.SunderArmor.Cast(sim, sim.GetPrimaryTarget())
 		war.castFirstSunder = true
 		return true
 	} else if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorMaintain &&
-		!war.ExposeArmorAura.IsActive() &&
+		!war.CanSunderArmor(sim) &&
 		(war.SunderArmorAura.GetStacks() < 5 || war.SunderArmorAura.RemainingDuration(sim) < time.Second*3) {
 		war.SunderArmor.Cast(sim, sim.GetPrimaryTarget())
 		return true

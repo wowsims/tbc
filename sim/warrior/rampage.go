@@ -13,7 +13,7 @@ func (warrior *Warrior) registerRampageSpell() {
 	var bonusPerStack stats.Stats
 	warrior.RampageAura = warrior.RegisterAura(core.Aura{
 		Label:     "Rampage",
-		ActionID:  core.ActionID{SpellID: 30032},
+		ActionID:  actionID,
 		Duration:  time.Second * 30,
 		MaxStacks: 5,
 		OnInit: func(aura *core.Aura, sim *core.Simulation) {
