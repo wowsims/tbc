@@ -9,17 +9,27 @@ import (
 
 type Warlock struct {
 	core.Character
+	Talents proto.WarlockTalents
 
-	malediction int // bonus level of coe
+	Shadowbolt *core.Spell
+
+	// for reference
+	copymespell *core.Spell
+	copymedot   *core.Dot
+	copymeaura  *core.Aura
 }
 
 func (warlock *Warlock) GetCharacter() *core.Character {
 	return &warlock.Character
 }
 
-func (warlock *Warlock) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
-	//sim.AddAura(sim, CurseOfElementsAura(warlock.malediction))
+func (warlock *Warlock) Init(sim *core.Simulation) {
+	warlock.Shadowbolt = warlock.newShadowboltSpell(sim)
 }
+
+func (warlock *Warlock) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
+}
+
 func (warlock *Warlock) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 

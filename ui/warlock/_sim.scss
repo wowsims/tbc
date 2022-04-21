@@ -1,0 +1,20 @@
+// Set color variables which control the site theme.
+.warlock-sim-ui {
+	--theme-color-primary: #a35ec0;
+	--theme-color-background: #1d1510;
+	--theme-color-background-raw: 29, 21, 16;
+	--theme-background-image: url('/tbc/assets/warlock_background.jpg');
+	--theme-background-opacity: 0.95;
+	--main-text-color: White;
+}
+
+// Set grid width for icon sections based on how many buffs we configured.
+.warlock-sim-ui .self-buffs-section {
+  grid-template-columns: repeat(1, 1fr);
+}
+.warlock-sim-ui .buffs-section {
+  grid-template-columns: repeat(5, 1fr);
+}
+.warlock-sim-ui .debuffs-section {
+  grid-template-columns: repeat(2, 1fr);
+}
