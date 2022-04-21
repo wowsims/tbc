@@ -63,13 +63,13 @@ export class WarriorSimUI extends IndividualSimUI {
                     [Stat.StatArmorPenetration]: 0.5,
                 }),
                 // Default consumes settings.
-                consumes: Presets.DefaultFuryConsumes,
+                consumes: Presets.DefaultConsumes,
                 // Default rotation settings.
-                rotation: Presets.DefaultFuryRotation,
+                rotation: Presets.DefaultRotation,
                 // Default talents.
                 talents: Presets.FuryTalents.data,
                 // Default spec-specific settings.
-                specOptions: Presets.DefaultFuryOptions,
+                specOptions: Presets.DefaultOptions,
                 // Default raid/party buffs settings.
                 raidBuffs: RaidBuffs.create({
                     giftOfTheWild: TristateEffect.TristateEffectImproved,
@@ -102,7 +102,7 @@ export class WarriorSimUI extends IndividualSimUI {
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
             selfBuffInputs: [
-                // TODO: Move reck to cooldown tabs
+                WarriorInputs.ShoutPicker,
                 WarriorInputs.Recklessness,
             ],
             // IconInputs to include in the 'Other Buffs' section on the settings tab.
@@ -145,6 +145,7 @@ export class WarriorSimUI extends IndividualSimUI {
             consumeOptions: {
                 potions: [
                     Potions.HastePotion,
+                    Potions.MightyRagePotion,
                 ],
                 conjured: [
                     Conjured.ConjuredFlameCap,
@@ -157,6 +158,7 @@ export class WarriorSimUI extends IndividualSimUI {
                     BattleElixir.ElixirOfMajorStrength,
                     BattleElixir.ElixirOfMajorAgility,
                     BattleElixir.ElixirOfTheMongoose,
+                    BattleElixir.FelStrengthElixir,
                 ],
                 guardianElixirs: [],
                 food: [
@@ -169,6 +171,7 @@ export class WarriorSimUI extends IndividualSimUI {
                 weaponImbues: [
                     WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
                     WeaponImbue.WeaponImbueAdamantiteWeightstone,
+                    WeaponImbue.WeaponImbueElementalSharpeningStone,
                 ],
                 other: [
                     IconInputs.ScrollOfAgilityV,
@@ -180,6 +183,10 @@ export class WarriorSimUI extends IndividualSimUI {
             // Inputs to include in the 'Other' section on the settings tab.
             otherInputs: {
                 inputs: [
+                    WarriorInputs.StartingRage,
+                    WarriorInputs.PrecastShout,
+                    WarriorInputs.PrecastShoutWithSapphire,
+                    WarriorInputs.PrecastShoutWithT2,
                     OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
                 ],
             },
@@ -204,8 +211,7 @@ export class WarriorSimUI extends IndividualSimUI {
                 // Preset gear configurations that the user can quickly select.
                 gear: [
                     Presets.P1_FURY_PRESET,
-                    Presets.P1_ARMSSLAM_PRESET,
-                    Presets.P1_ARMSDW_PRESET,
+                    Presets.P1_ARMS_PRESET,
                 ],
             },
         });

@@ -2834,7 +2834,7 @@ input, select {
 }
 
 .warrior-sim-ui .self-buffs-section {
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .warrior-sim-ui .buffs-section {

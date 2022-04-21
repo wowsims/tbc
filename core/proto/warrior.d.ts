@@ -245,122 +245,104 @@ export interface Warrior {
  */
 export interface Warrior_Rotation {
     /**
-     * @generated from protobuf field: proto.Warrior.Rotation.Type type = 1;
+     * @generated from protobuf field: bool use_cleave = 14;
      */
-    type: Warrior_Rotation_Type;
+    useCleave: boolean;
     /**
-     * @generated from protobuf field: proto.Warrior.Rotation.ArmsSlamRotation arms_slam = 2;
-     */
-    armsSlam?: Warrior_Rotation_ArmsSlamRotation;
-    /**
-     * @generated from protobuf field: proto.Warrior.Rotation.ArmsDWRotation arms_dw = 3;
-     */
-    armsDw?: Warrior_Rotation_ArmsDWRotation;
-    /**
-     * @generated from protobuf field: proto.Warrior.Rotation.FuryRotation fury = 4;
-     */
-    fury?: Warrior_Rotation_FuryRotation;
-    /**
-     * @generated from protobuf field: bool use_overpower = 8;
+     * @generated from protobuf field: bool use_overpower = 1;
      */
     useOverpower: boolean;
     /**
-     * @generated from protobuf field: bool use_hamstring = 10;
+     * @generated from protobuf field: bool use_hamstring = 2;
      */
     useHamstring: boolean;
     /**
-     * @generated from protobuf field: double hs_rage_threshold = 7;
+     * @generated from protobuf field: bool use_slam = 3;
+     */
+    useSlam: boolean;
+    /**
+     * @generated from protobuf field: bool prioritize_ww = 4;
+     */
+    prioritizeWw: boolean;
+    /**
+     * @generated from protobuf field: proto.Warrior.Rotation.SunderArmor sunderArmor = 15;
+     */
+    sunderArmor: Warrior_Rotation_SunderArmor;
+    /**
+     * @generated from protobuf field: bool maintain_demo_shout = 16;
+     */
+    maintainDemoShout: boolean;
+    /**
+     * @generated from protobuf field: bool maintain_thunder_clap = 17;
+     */
+    maintainThunderClap: boolean;
+    /**
+     * Queue HS or Cleave when over this threshold.
+     *
+     * @generated from protobuf field: double hs_rage_threshold = 5;
      */
     hsRageThreshold: number;
     /**
-     * @generated from protobuf field: double overpower_rage_threshold = 9;
+     * Swap for overpower after reducing rage below this threshold.
+     *
+     * @generated from protobuf field: double overpower_rage_threshold = 6;
      */
     overpowerRageThreshold: number;
     /**
-     * @generated from protobuf field: double hamstring_rage_threshold = 11;
+     * Use Hamstring in unused GCDs when over this threshold.
+     *
+     * @generated from protobuf field: double hamstring_rage_threshold = 7;
      */
     hamstringRageThreshold: number;
     /**
-     * @generated from protobuf field: bool use_hs_during_execute = 6;
+     * Refresh Rampage when remaining duration is less than this threshold.
+     *
+     * @generated from protobuf field: double rampage_cd_threshold = 8;
      */
-    useHsDuringExecute: boolean;
+    rampageCdThreshold: number;
     /**
-     * @generated from protobuf field: bool use_ww_during_execute = 5;
-     */
-    useWwDuringExecute: boolean;
-}
-/**
- * @generated from protobuf message proto.Warrior.Rotation.ArmsSlamRotation
- */
-export interface Warrior_Rotation_ArmsSlamRotation {
-    /**
-     * @generated from protobuf field: bool use_slam_during_execute = 1;
-     */
-    useSlamDuringExecute: boolean;
-    /**
-     * @generated from protobuf field: double slam_latency = 2;
+     * Time between MH swing and start of Slam cast.
+     *
+     * @generated from protobuf field: double slam_latency = 9;
      */
     slamLatency: number;
     /**
-     * @generated from protobuf field: bool use_ms_during_execute = 3;
+     * @generated from protobuf field: bool use_hs_during_execute = 10;
      */
-    useMsDuringExecute: boolean;
-}
-/**
- * @generated from protobuf message proto.Warrior.Rotation.ArmsDWRotation
- */
-export interface Warrior_Rotation_ArmsDWRotation {
+    useHsDuringExecute: boolean;
     /**
-     * @generated from protobuf field: bool use_ms_during_execute = 1;
-     */
-    useMsDuringExecute: boolean;
-}
-/**
- * @generated from protobuf message proto.Warrior.Rotation.FuryRotation
- */
-export interface Warrior_Rotation_FuryRotation {
-    /**
-     * @generated from protobuf field: proto.Warrior.Rotation.FuryRotation.PrimaryInstant primary_instant = 1;
-     */
-    primaryInstant: Warrior_Rotation_FuryRotation_PrimaryInstant;
-    /**
-     * @generated from protobuf field: bool use_bt_during_execute = 2;
+     * @generated from protobuf field: bool use_bt_during_execute = 13;
      */
     useBtDuringExecute: boolean;
     /**
-     * @generated from protobuf field: double rampage_cd_threshold = 10;
+     * @generated from protobuf field: bool use_ms_during_execute = 12;
      */
-    rampageCdThreshold: number;
+    useMsDuringExecute: boolean;
+    /**
+     * @generated from protobuf field: bool use_ww_during_execute = 11;
+     */
+    useWwDuringExecute: boolean;
+    /**
+     * @generated from protobuf field: bool use_slam_during_execute = 18;
+     */
+    useSlamDuringExecute: boolean;
 }
 /**
- * @generated from protobuf enum proto.Warrior.Rotation.FuryRotation.PrimaryInstant
+ * @generated from protobuf enum proto.Warrior.Rotation.SunderArmor
  */
-export declare enum Warrior_Rotation_FuryRotation_PrimaryInstant {
+export declare enum Warrior_Rotation_SunderArmor {
     /**
-     * @generated from protobuf enum value: Bloodthirst = 0;
+     * @generated from protobuf enum value: SunderArmorNone = 0;
      */
-    Bloodthirst = 0,
+    SunderArmorNone = 0,
     /**
-     * @generated from protobuf enum value: Whirlwind = 1;
+     * @generated from protobuf enum value: SunderArmorOnce = 1;
      */
-    Whirlwind = 1
-}
-/**
- * @generated from protobuf enum proto.Warrior.Rotation.Type
- */
-export declare enum Warrior_Rotation_Type {
+    SunderArmorOnce = 1,
     /**
-     * @generated from protobuf enum value: ArmsSlam = 0;
+     * @generated from protobuf enum value: SunderArmorMaintain = 2;
      */
-    ArmsSlam = 0,
-    /**
-     * @generated from protobuf enum value: ArmsDW = 1;
-     */
-    ArmsDW = 1,
-    /**
-     * @generated from protobuf enum value: Fury = 2;
-     */
-    Fury = 2
+    SunderArmorMaintain = 2
 }
 /**
  * @generated from protobuf message proto.Warrior.Options
@@ -371,9 +353,9 @@ export interface Warrior_Options {
      */
     startingRage: number;
     /**
-     * @generated from protobuf field: bool recklessness = 2;
+     * @generated from protobuf field: bool use_recklessness = 2;
      */
-    recklessness: boolean;
+    useRecklessness: boolean;
     /**
      * @generated from protobuf field: proto.WarriorShout shout = 3;
      */
@@ -420,6 +402,10 @@ export interface ProtectionWarrior_Rotation {
      * @generated from protobuf field: proto.ProtectionWarrior.Rotation.ThunderClap thunder_clap = 2;
      */
     thunderClap: ProtectionWarrior_Rotation_ThunderClap;
+    /**
+     * @generated from protobuf field: bool use_cleave = 4;
+     */
+    useCleave: boolean;
     /**
      * Minimum rage to queue HS or Cleave.
      *
@@ -533,36 +519,6 @@ declare class Warrior_Rotation$Type extends MessageType<Warrior_Rotation> {
  * @generated MessageType for protobuf message proto.Warrior.Rotation
  */
 export declare const Warrior_Rotation: Warrior_Rotation$Type;
-declare class Warrior_Rotation_ArmsSlamRotation$Type extends MessageType<Warrior_Rotation_ArmsSlamRotation> {
-    constructor();
-    create(value?: PartialMessage<Warrior_Rotation_ArmsSlamRotation>): Warrior_Rotation_ArmsSlamRotation;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Warrior_Rotation_ArmsSlamRotation): Warrior_Rotation_ArmsSlamRotation;
-    internalBinaryWrite(message: Warrior_Rotation_ArmsSlamRotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.Warrior.Rotation.ArmsSlamRotation
- */
-export declare const Warrior_Rotation_ArmsSlamRotation: Warrior_Rotation_ArmsSlamRotation$Type;
-declare class Warrior_Rotation_ArmsDWRotation$Type extends MessageType<Warrior_Rotation_ArmsDWRotation> {
-    constructor();
-    create(value?: PartialMessage<Warrior_Rotation_ArmsDWRotation>): Warrior_Rotation_ArmsDWRotation;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Warrior_Rotation_ArmsDWRotation): Warrior_Rotation_ArmsDWRotation;
-    internalBinaryWrite(message: Warrior_Rotation_ArmsDWRotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.Warrior.Rotation.ArmsDWRotation
- */
-export declare const Warrior_Rotation_ArmsDWRotation: Warrior_Rotation_ArmsDWRotation$Type;
-declare class Warrior_Rotation_FuryRotation$Type extends MessageType<Warrior_Rotation_FuryRotation> {
-    constructor();
-    create(value?: PartialMessage<Warrior_Rotation_FuryRotation>): Warrior_Rotation_FuryRotation;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: Warrior_Rotation_FuryRotation): Warrior_Rotation_FuryRotation;
-    internalBinaryWrite(message: Warrior_Rotation_FuryRotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.Warrior.Rotation.FuryRotation
- */
-export declare const Warrior_Rotation_FuryRotation: Warrior_Rotation_FuryRotation$Type;
 declare class Warrior_Options$Type extends MessageType<Warrior_Options> {
     constructor();
     create(value?: PartialMessage<Warrior_Options>): Warrior_Options;

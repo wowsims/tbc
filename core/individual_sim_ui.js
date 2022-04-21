@@ -119,6 +119,7 @@ export class IndividualSimUI extends SimUI {
             this.addDetailedResultsTab();
             this.addLogTab();
         }
+        this.player.changeEmitter.on(() => this.recomputeSettingsLayout());
     }
     loadSettings() {
         const initEventID = TypedEvent.nextEventID();
@@ -471,9 +472,6 @@ export class IndividualSimUI extends SimUI {
             content: Tooltips.COOLDOWNS_SECTION,
             allowHTML: true,
             placement: 'left',
-        });
-        this.player.cooldownsChangeEmitter.on(() => {
-            this.recomputeSettingsLayout();
         });
         // Init Muuri layout only when settings tab is clicked, because it needs the elements
         // to be shown so it can calculate sizes.

@@ -4,37 +4,23 @@ import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
 /**
- * @generated from protobuf enum proto.Warrior.Rotation.FuryRotation.PrimaryInstant
+ * @generated from protobuf enum proto.Warrior.Rotation.SunderArmor
  */
-export var Warrior_Rotation_FuryRotation_PrimaryInstant;
-(function (Warrior_Rotation_FuryRotation_PrimaryInstant) {
+export var Warrior_Rotation_SunderArmor;
+(function (Warrior_Rotation_SunderArmor) {
     /**
-     * @generated from protobuf enum value: Bloodthirst = 0;
+     * @generated from protobuf enum value: SunderArmorNone = 0;
      */
-    Warrior_Rotation_FuryRotation_PrimaryInstant[Warrior_Rotation_FuryRotation_PrimaryInstant["Bloodthirst"] = 0] = "Bloodthirst";
+    Warrior_Rotation_SunderArmor[Warrior_Rotation_SunderArmor["SunderArmorNone"] = 0] = "SunderArmorNone";
     /**
-     * @generated from protobuf enum value: Whirlwind = 1;
+     * @generated from protobuf enum value: SunderArmorOnce = 1;
      */
-    Warrior_Rotation_FuryRotation_PrimaryInstant[Warrior_Rotation_FuryRotation_PrimaryInstant["Whirlwind"] = 1] = "Whirlwind";
-})(Warrior_Rotation_FuryRotation_PrimaryInstant || (Warrior_Rotation_FuryRotation_PrimaryInstant = {}));
-/**
- * @generated from protobuf enum proto.Warrior.Rotation.Type
- */
-export var Warrior_Rotation_Type;
-(function (Warrior_Rotation_Type) {
+    Warrior_Rotation_SunderArmor[Warrior_Rotation_SunderArmor["SunderArmorOnce"] = 1] = "SunderArmorOnce";
     /**
-     * @generated from protobuf enum value: ArmsSlam = 0;
+     * @generated from protobuf enum value: SunderArmorMaintain = 2;
      */
-    Warrior_Rotation_Type[Warrior_Rotation_Type["ArmsSlam"] = 0] = "ArmsSlam";
-    /**
-     * @generated from protobuf enum value: ArmsDW = 1;
-     */
-    Warrior_Rotation_Type[Warrior_Rotation_Type["ArmsDW"] = 1] = "ArmsDW";
-    /**
-     * @generated from protobuf enum value: Fury = 2;
-     */
-    Warrior_Rotation_Type[Warrior_Rotation_Type["Fury"] = 2] = "Fury";
-})(Warrior_Rotation_Type || (Warrior_Rotation_Type = {}));
+    Warrior_Rotation_SunderArmor[Warrior_Rotation_SunderArmor["SunderArmorMaintain"] = 2] = "SunderArmorMaintain";
+})(Warrior_Rotation_SunderArmor || (Warrior_Rotation_SunderArmor = {}));
 /**
  * @generated from protobuf enum proto.ProtectionWarrior.Rotation.DemoShout
  */
@@ -558,21 +544,28 @@ export const Warrior = new Warrior$Type();
 class Warrior_Rotation$Type extends MessageType {
     constructor() {
         super("proto.Warrior.Rotation", [
-            { no: 1, name: "type", kind: "enum", T: () => ["proto.Warrior.Rotation.Type", Warrior_Rotation_Type] },
-            { no: 2, name: "arms_slam", kind: "message", T: () => Warrior_Rotation_ArmsSlamRotation },
-            { no: 3, name: "arms_dw", kind: "message", T: () => Warrior_Rotation_ArmsDWRotation },
-            { no: 4, name: "fury", kind: "message", T: () => Warrior_Rotation_FuryRotation },
-            { no: 8, name: "use_overpower", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 10, name: "use_hamstring", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 7, name: "hs_rage_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 9, name: "overpower_rage_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 11, name: "hamstring_rage_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 6, name: "use_hs_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 5, name: "use_ww_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 14, name: "use_cleave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 1, name: "use_overpower", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "use_hamstring", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "use_slam", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "prioritize_ww", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 15, name: "sunderArmor", kind: "enum", T: () => ["proto.Warrior.Rotation.SunderArmor", Warrior_Rotation_SunderArmor] },
+            { no: 16, name: "maintain_demo_shout", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 17, name: "maintain_thunder_clap", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "hs_rage_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 6, name: "overpower_rage_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 7, name: "hamstring_rage_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 8, name: "rampage_cd_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 9, name: "slam_latency", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 10, name: "use_hs_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 13, name: "use_bt_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 12, name: "use_ms_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 11, name: "use_ww_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 18, name: "use_slam_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { type: 0, useOverpower: false, useHamstring: false, hsRageThreshold: 0, overpowerRageThreshold: 0, hamstringRageThreshold: 0, useHsDuringExecute: false, useWwDuringExecute: false };
+        const message = { useCleave: false, useOverpower: false, useHamstring: false, useSlam: false, prioritizeWw: false, sunderArmor: 0, maintainDemoShout: false, maintainThunderClap: false, hsRageThreshold: 0, overpowerRageThreshold: 0, hamstringRageThreshold: 0, rampageCdThreshold: 0, slamLatency: 0, useHsDuringExecute: false, useBtDuringExecute: false, useMsDuringExecute: false, useWwDuringExecute: false, useSlamDuringExecute: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -583,38 +576,59 @@ class Warrior_Rotation$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* proto.Warrior.Rotation.Type type */ 1:
-                    message.type = reader.int32();
+                case /* bool use_cleave */ 14:
+                    message.useCleave = reader.bool();
                     break;
-                case /* proto.Warrior.Rotation.ArmsSlamRotation arms_slam */ 2:
-                    message.armsSlam = Warrior_Rotation_ArmsSlamRotation.internalBinaryRead(reader, reader.uint32(), options, message.armsSlam);
-                    break;
-                case /* proto.Warrior.Rotation.ArmsDWRotation arms_dw */ 3:
-                    message.armsDw = Warrior_Rotation_ArmsDWRotation.internalBinaryRead(reader, reader.uint32(), options, message.armsDw);
-                    break;
-                case /* proto.Warrior.Rotation.FuryRotation fury */ 4:
-                    message.fury = Warrior_Rotation_FuryRotation.internalBinaryRead(reader, reader.uint32(), options, message.fury);
-                    break;
-                case /* bool use_overpower */ 8:
+                case /* bool use_overpower */ 1:
                     message.useOverpower = reader.bool();
                     break;
-                case /* bool use_hamstring */ 10:
+                case /* bool use_hamstring */ 2:
                     message.useHamstring = reader.bool();
                     break;
-                case /* double hs_rage_threshold */ 7:
+                case /* bool use_slam */ 3:
+                    message.useSlam = reader.bool();
+                    break;
+                case /* bool prioritize_ww */ 4:
+                    message.prioritizeWw = reader.bool();
+                    break;
+                case /* proto.Warrior.Rotation.SunderArmor sunderArmor */ 15:
+                    message.sunderArmor = reader.int32();
+                    break;
+                case /* bool maintain_demo_shout */ 16:
+                    message.maintainDemoShout = reader.bool();
+                    break;
+                case /* bool maintain_thunder_clap */ 17:
+                    message.maintainThunderClap = reader.bool();
+                    break;
+                case /* double hs_rage_threshold */ 5:
                     message.hsRageThreshold = reader.double();
                     break;
-                case /* double overpower_rage_threshold */ 9:
+                case /* double overpower_rage_threshold */ 6:
                     message.overpowerRageThreshold = reader.double();
                     break;
-                case /* double hamstring_rage_threshold */ 11:
+                case /* double hamstring_rage_threshold */ 7:
                     message.hamstringRageThreshold = reader.double();
                     break;
-                case /* bool use_hs_during_execute */ 6:
+                case /* double rampage_cd_threshold */ 8:
+                    message.rampageCdThreshold = reader.double();
+                    break;
+                case /* double slam_latency */ 9:
+                    message.slamLatency = reader.double();
+                    break;
+                case /* bool use_hs_during_execute */ 10:
                     message.useHsDuringExecute = reader.bool();
                     break;
-                case /* bool use_ww_during_execute */ 5:
+                case /* bool use_bt_during_execute */ 13:
+                    message.useBtDuringExecute = reader.bool();
+                    break;
+                case /* bool use_ms_during_execute */ 12:
+                    message.useMsDuringExecute = reader.bool();
+                    break;
+                case /* bool use_ww_during_execute */ 11:
                     message.useWwDuringExecute = reader.bool();
+                    break;
+                case /* bool use_slam_during_execute */ 18:
+                    message.useSlamDuringExecute = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -628,39 +642,60 @@ class Warrior_Rotation$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* proto.Warrior.Rotation.Type type = 1; */
-        if (message.type !== 0)
-            writer.tag(1, WireType.Varint).int32(message.type);
-        /* proto.Warrior.Rotation.ArmsSlamRotation arms_slam = 2; */
-        if (message.armsSlam)
-            Warrior_Rotation_ArmsSlamRotation.internalBinaryWrite(message.armsSlam, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Warrior.Rotation.ArmsDWRotation arms_dw = 3; */
-        if (message.armsDw)
-            Warrior_Rotation_ArmsDWRotation.internalBinaryWrite(message.armsDw, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
-        /* proto.Warrior.Rotation.FuryRotation fury = 4; */
-        if (message.fury)
-            Warrior_Rotation_FuryRotation.internalBinaryWrite(message.fury, writer.tag(4, WireType.LengthDelimited).fork(), options).join();
-        /* bool use_overpower = 8; */
+        /* bool use_cleave = 14; */
+        if (message.useCleave !== false)
+            writer.tag(14, WireType.Varint).bool(message.useCleave);
+        /* bool use_overpower = 1; */
         if (message.useOverpower !== false)
-            writer.tag(8, WireType.Varint).bool(message.useOverpower);
-        /* bool use_hamstring = 10; */
+            writer.tag(1, WireType.Varint).bool(message.useOverpower);
+        /* bool use_hamstring = 2; */
         if (message.useHamstring !== false)
-            writer.tag(10, WireType.Varint).bool(message.useHamstring);
-        /* double hs_rage_threshold = 7; */
+            writer.tag(2, WireType.Varint).bool(message.useHamstring);
+        /* bool use_slam = 3; */
+        if (message.useSlam !== false)
+            writer.tag(3, WireType.Varint).bool(message.useSlam);
+        /* bool prioritize_ww = 4; */
+        if (message.prioritizeWw !== false)
+            writer.tag(4, WireType.Varint).bool(message.prioritizeWw);
+        /* proto.Warrior.Rotation.SunderArmor sunderArmor = 15; */
+        if (message.sunderArmor !== 0)
+            writer.tag(15, WireType.Varint).int32(message.sunderArmor);
+        /* bool maintain_demo_shout = 16; */
+        if (message.maintainDemoShout !== false)
+            writer.tag(16, WireType.Varint).bool(message.maintainDemoShout);
+        /* bool maintain_thunder_clap = 17; */
+        if (message.maintainThunderClap !== false)
+            writer.tag(17, WireType.Varint).bool(message.maintainThunderClap);
+        /* double hs_rage_threshold = 5; */
         if (message.hsRageThreshold !== 0)
-            writer.tag(7, WireType.Bit64).double(message.hsRageThreshold);
-        /* double overpower_rage_threshold = 9; */
+            writer.tag(5, WireType.Bit64).double(message.hsRageThreshold);
+        /* double overpower_rage_threshold = 6; */
         if (message.overpowerRageThreshold !== 0)
-            writer.tag(9, WireType.Bit64).double(message.overpowerRageThreshold);
-        /* double hamstring_rage_threshold = 11; */
+            writer.tag(6, WireType.Bit64).double(message.overpowerRageThreshold);
+        /* double hamstring_rage_threshold = 7; */
         if (message.hamstringRageThreshold !== 0)
-            writer.tag(11, WireType.Bit64).double(message.hamstringRageThreshold);
-        /* bool use_hs_during_execute = 6; */
+            writer.tag(7, WireType.Bit64).double(message.hamstringRageThreshold);
+        /* double rampage_cd_threshold = 8; */
+        if (message.rampageCdThreshold !== 0)
+            writer.tag(8, WireType.Bit64).double(message.rampageCdThreshold);
+        /* double slam_latency = 9; */
+        if (message.slamLatency !== 0)
+            writer.tag(9, WireType.Bit64).double(message.slamLatency);
+        /* bool use_hs_during_execute = 10; */
         if (message.useHsDuringExecute !== false)
-            writer.tag(6, WireType.Varint).bool(message.useHsDuringExecute);
-        /* bool use_ww_during_execute = 5; */
+            writer.tag(10, WireType.Varint).bool(message.useHsDuringExecute);
+        /* bool use_bt_during_execute = 13; */
+        if (message.useBtDuringExecute !== false)
+            writer.tag(13, WireType.Varint).bool(message.useBtDuringExecute);
+        /* bool use_ms_during_execute = 12; */
+        if (message.useMsDuringExecute !== false)
+            writer.tag(12, WireType.Varint).bool(message.useMsDuringExecute);
+        /* bool use_ww_during_execute = 11; */
         if (message.useWwDuringExecute !== false)
-            writer.tag(5, WireType.Varint).bool(message.useWwDuringExecute);
+            writer.tag(11, WireType.Varint).bool(message.useWwDuringExecute);
+        /* bool use_slam_during_execute = 18; */
+        if (message.useSlamDuringExecute !== false)
+            writer.tag(18, WireType.Varint).bool(message.useSlamDuringExecute);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -672,180 +707,11 @@ class Warrior_Rotation$Type extends MessageType {
  */
 export const Warrior_Rotation = new Warrior_Rotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class Warrior_Rotation_ArmsSlamRotation$Type extends MessageType {
-    constructor() {
-        super("proto.Warrior.Rotation.ArmsSlamRotation", [
-            { no: 1, name: "use_slam_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "slam_latency", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 3, name: "use_ms_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
-        ]);
-    }
-    create(value) {
-        const message = { useSlamDuringExecute: false, slamLatency: 0, useMsDuringExecute: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* bool use_slam_during_execute */ 1:
-                    message.useSlamDuringExecute = reader.bool();
-                    break;
-                case /* double slam_latency */ 2:
-                    message.slamLatency = reader.double();
-                    break;
-                case /* bool use_ms_during_execute */ 3:
-                    message.useMsDuringExecute = reader.bool();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* bool use_slam_during_execute = 1; */
-        if (message.useSlamDuringExecute !== false)
-            writer.tag(1, WireType.Varint).bool(message.useSlamDuringExecute);
-        /* double slam_latency = 2; */
-        if (message.slamLatency !== 0)
-            writer.tag(2, WireType.Bit64).double(message.slamLatency);
-        /* bool use_ms_during_execute = 3; */
-        if (message.useMsDuringExecute !== false)
-            writer.tag(3, WireType.Varint).bool(message.useMsDuringExecute);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.Warrior.Rotation.ArmsSlamRotation
- */
-export const Warrior_Rotation_ArmsSlamRotation = new Warrior_Rotation_ArmsSlamRotation$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class Warrior_Rotation_ArmsDWRotation$Type extends MessageType {
-    constructor() {
-        super("proto.Warrior.Rotation.ArmsDWRotation", [
-            { no: 1, name: "use_ms_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
-        ]);
-    }
-    create(value) {
-        const message = { useMsDuringExecute: false };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* bool use_ms_during_execute */ 1:
-                    message.useMsDuringExecute = reader.bool();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* bool use_ms_during_execute = 1; */
-        if (message.useMsDuringExecute !== false)
-            writer.tag(1, WireType.Varint).bool(message.useMsDuringExecute);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.Warrior.Rotation.ArmsDWRotation
- */
-export const Warrior_Rotation_ArmsDWRotation = new Warrior_Rotation_ArmsDWRotation$Type();
-// @generated message type with reflection information, may provide speed optimized methods
-class Warrior_Rotation_FuryRotation$Type extends MessageType {
-    constructor() {
-        super("proto.Warrior.Rotation.FuryRotation", [
-            { no: 1, name: "primary_instant", kind: "enum", T: () => ["proto.Warrior.Rotation.FuryRotation.PrimaryInstant", Warrior_Rotation_FuryRotation_PrimaryInstant] },
-            { no: 2, name: "use_bt_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 10, name: "rampage_cd_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
-        ]);
-    }
-    create(value) {
-        const message = { primaryInstant: 0, useBtDuringExecute: false, rampageCdThreshold: 0 };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* proto.Warrior.Rotation.FuryRotation.PrimaryInstant primary_instant */ 1:
-                    message.primaryInstant = reader.int32();
-                    break;
-                case /* bool use_bt_during_execute */ 2:
-                    message.useBtDuringExecute = reader.bool();
-                    break;
-                case /* double rampage_cd_threshold */ 10:
-                    message.rampageCdThreshold = reader.double();
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* proto.Warrior.Rotation.FuryRotation.PrimaryInstant primary_instant = 1; */
-        if (message.primaryInstant !== 0)
-            writer.tag(1, WireType.Varint).int32(message.primaryInstant);
-        /* bool use_bt_during_execute = 2; */
-        if (message.useBtDuringExecute !== false)
-            writer.tag(2, WireType.Varint).bool(message.useBtDuringExecute);
-        /* double rampage_cd_threshold = 10; */
-        if (message.rampageCdThreshold !== 0)
-            writer.tag(10, WireType.Bit64).double(message.rampageCdThreshold);
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.Warrior.Rotation.FuryRotation
- */
-export const Warrior_Rotation_FuryRotation = new Warrior_Rotation_FuryRotation$Type();
-// @generated message type with reflection information, may provide speed optimized methods
 class Warrior_Options$Type extends MessageType {
     constructor() {
         super("proto.Warrior.Options", [
             { no: 1, name: "starting_rage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 2, name: "recklessness", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 2, name: "use_recklessness", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "shout", kind: "enum", T: () => ["proto.WarriorShout", WarriorShout] },
             { no: 4, name: "precast_shout", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 5, name: "precast_shout_t2", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -853,7 +719,7 @@ class Warrior_Options$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { startingRage: 0, recklessness: false, shout: 0, precastShout: false, precastShoutT2: false, precastShoutSapphire: false };
+        const message = { startingRage: 0, useRecklessness: false, shout: 0, precastShout: false, precastShoutT2: false, precastShoutSapphire: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -867,8 +733,8 @@ class Warrior_Options$Type extends MessageType {
                 case /* double starting_rage */ 1:
                     message.startingRage = reader.double();
                     break;
-                case /* bool recklessness */ 2:
-                    message.recklessness = reader.bool();
+                case /* bool use_recklessness */ 2:
+                    message.useRecklessness = reader.bool();
                     break;
                 case /* proto.WarriorShout shout */ 3:
                     message.shout = reader.int32();
@@ -897,9 +763,9 @@ class Warrior_Options$Type extends MessageType {
         /* double starting_rage = 1; */
         if (message.startingRage !== 0)
             writer.tag(1, WireType.Bit64).double(message.startingRage);
-        /* bool recklessness = 2; */
-        if (message.recklessness !== false)
-            writer.tag(2, WireType.Varint).bool(message.recklessness);
+        /* bool use_recklessness = 2; */
+        if (message.useRecklessness !== false)
+            writer.tag(2, WireType.Varint).bool(message.useRecklessness);
         /* proto.WarriorShout shout = 3; */
         if (message.shout !== 0)
             writer.tag(3, WireType.Varint).int32(message.shout);
@@ -989,11 +855,12 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
         super("proto.ProtectionWarrior.Rotation", [
             { no: 1, name: "demo_shout", kind: "enum", T: () => ["proto.ProtectionWarrior.Rotation.DemoShout", ProtectionWarrior_Rotation_DemoShout] },
             { no: 2, name: "thunder_clap", kind: "enum", T: () => ["proto.ProtectionWarrior.Rotation.ThunderClap", ProtectionWarrior_Rotation_ThunderClap] },
+            { no: 4, name: "use_cleave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "hs_rage_threshold", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { demoShout: 0, thunderClap: 0, hsRageThreshold: 0 };
+        const message = { demoShout: 0, thunderClap: 0, useCleave: false, hsRageThreshold: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1009,6 +876,9 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
                     break;
                 case /* proto.ProtectionWarrior.Rotation.ThunderClap thunder_clap */ 2:
                     message.thunderClap = reader.int32();
+                    break;
+                case /* bool use_cleave */ 4:
+                    message.useCleave = reader.bool();
                     break;
                 case /* int32 hs_rage_threshold */ 3:
                     message.hsRageThreshold = reader.int32();
@@ -1031,6 +901,9 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
         /* proto.ProtectionWarrior.Rotation.ThunderClap thunder_clap = 2; */
         if (message.thunderClap !== 0)
             writer.tag(2, WireType.Varint).int32(message.thunderClap);
+        /* bool use_cleave = 4; */
+        if (message.useCleave !== false)
+            writer.tag(4, WireType.Varint).bool(message.useCleave);
         /* int32 hs_rage_threshold = 3; */
         if (message.hsRageThreshold !== 0)
             writer.tag(3, WireType.Varint).int32(message.hsRageThreshold);
