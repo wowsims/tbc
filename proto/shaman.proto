@@ -23,10 +23,13 @@ message ShamanTalents {
 
     // Enhancement
     int32 ancestral_knowledge = 15;
+		int32 shield_specialization = 37;
     int32 thundering_strikes = 16;
     int32 enhancing_totems = 17;
     bool shamanistic_focus = 18;
+		int32 anticipation = 38;
     int32 flurry = 19;
+		int32 toughness = 39;
     int32 improved_weapon_totems = 20;
 		bool spirit_weapons = 36;
     int32 elemental_weapons = 21;
@@ -106,14 +109,6 @@ message ShamanTotems {
 		bool recall_totems = 10;
 }
 
-enum ShamanWeaponImbue {
-	ImbueNone = 0;
-	ImbueFlametongue = 1;
-	ImbueFrostbrand = 2;
-	ImbueRockbiter = 3;
-	ImbueWindfury = 4;
-}
-
 message ElementalShaman {
     message Rotation {
 			ShamanTotems totems = 3;
@@ -170,10 +165,6 @@ message EnhancementShaman {
 		bool water_shield = 1;
 		bool bloodlust = 2;
 		bool delay_offhand_swings = 5;
-
-		// TODO: Deprecate on 3/21 (1 month). Use consumes main_hand_imbue and off_hand_imbue instead.
-		ShamanWeaponImbue main_hand_imbue = 3;
-		ShamanWeaponImbue off_hand_imbue = 4;
 
 		// Indicates the shaman will be dropping an improved strength of earth totem before
 		// the fight by snapshotting the T4 2pc bonus.

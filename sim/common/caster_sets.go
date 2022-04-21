@@ -9,46 +9,43 @@ import (
 
 // Keep these (and their functions) in alphabetical order.
 func init() {
-	core.AddItemSet(ItemSetManaEtched)
-	core.AddItemSet(ItemSetNetherstrike)
-	core.AddItemSet(ItemSetSpellstrike)
-	core.AddItemSet(ItemSetTheTwinStars)
-	core.AddItemSet(ItemSetWindhawk)
-	core.AddItemSet(ItemSetSpellfire)
+	core.AddItemSet(&ItemSetManaEtched)
+	core.AddItemSet(&ItemSetNetherstrike)
+	core.AddItemSet(&ItemSetSpellstrike)
+	core.AddItemSet(&ItemSetTheTwinStars)
+	core.AddItemSet(&ItemSetWindhawk)
+	core.AddItemSet(&ItemSetSpellfire)
 }
 
-var ManaEtchedAuraID = core.NewAuraID()
-var ManaEtchedInsightAuraID = core.NewAuraID()
 var ItemSetManaEtched = core.ItemSet{
-	Name:  "Mana-Etched Regalia",
-	Items: map[int32]struct{}{28193: {}, 27465: {}, 27907: {}, 27796: {}, 28191: {}},
+	Name: "Mana-Etched Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.SpellHit, 35)
 		},
 		4: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				const spellBonus = 110.0
-				const duration = time.Second * 15
-				applyStatAura := character.NewTemporaryStatsAuraApplier(ManaEtchedInsightAuraID, core.ActionID{SpellID: 37619}, stats.Stats{stats.SpellPower: spellBonus}, duration)
-				return core.Aura{
-					ID: ManaEtchedAuraID,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						if sim.RandomFloat("Mana-Etched Insight") > 0.02 {
-							return
-						}
-						applyStatAura(sim)
-					},
-				}
+			procAura := character.NewTemporaryStatsAura("Mana-Etched Insight Proc", core.ActionID{SpellID: 37619}, stats.Stats{stats.SpellPower: 110}, time.Second*15)
+
+			character.RegisterAura(core.Aura{
+				Label:    "Mana-Etched Insight",
+				Duration: core.NeverExpires,
+				OnReset: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Activate(sim)
+				},
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+					if sim.RandomFloat("Mana-Etched Insight") > 0.02 {
+						return
+					}
+					procAura.Activate(sim)
+				},
 			})
 		},
 	},
 }
 
 var ItemSetNetherstrike = core.ItemSet{
-	Name:  "Netherstrike Armor",
-	Items: map[int32]struct{}{29519: {}, 29521: {}, 29520: {}},
+	Name: "Netherstrike Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.SpellPower, 23)
@@ -56,36 +53,32 @@ var ItemSetNetherstrike = core.ItemSet{
 	},
 }
 
-var SpellstrikeAuraID = core.NewAuraID()
-var SpellstrikeInfusionAuraID = core.NewAuraID()
 var ItemSetSpellstrike = core.ItemSet{
-	Name:  "Spellstrike Infusion",
-	Items: map[int32]struct{}{24266: {}, 24262: {}},
+	Name: "Spellstrike Infusion",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-				const spellBonus = 92.0
-				const duration = time.Second * 10
-				applyStatAura := character.NewTemporaryStatsAuraApplier(SpellstrikeInfusionAuraID, core.ActionID{SpellID: 32106}, stats.Stats{stats.SpellPower: spellBonus}, duration)
+			procAura := character.NewTemporaryStatsAura("Spellstrike Proc", core.ActionID{SpellID: 32106}, stats.Stats{stats.SpellPower: 92}, time.Second*10)
 
-				return core.Aura{
-					ID: SpellstrikeAuraID,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						if sim.RandomFloat("spellstrike") > 0.05 {
-							return
-						}
-						applyStatAura(sim)
-					},
-				}
+			character.RegisterAura(core.Aura{
+				Label:    "Spellstrike",
+				Duration: core.NeverExpires,
+				OnReset: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Activate(sim)
+				},
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+					if sim.RandomFloat("spellstrike") > 0.05 {
+						return
+					}
+					procAura.Activate(sim)
+				},
 			})
 		},
 	},
 }
 
 var ItemSetTheTwinStars = core.ItemSet{
-	Name:  "The Twin Stars",
-	Items: map[int32]struct{}{31338: {}, 31339: {}},
+	Name: "The Twin Stars",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.SpellPower, 15)
@@ -94,8 +87,7 @@ var ItemSetTheTwinStars = core.ItemSet{
 }
 
 var ItemSetWindhawk = core.ItemSet{
-	Name:  "Windhawk Armor",
-	Items: map[int32]struct{}{29524: {}, 29523: {}, 29522: {}},
+	Name: "Windhawk Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			agent.GetCharacter().AddStat(stats.MP5, 8)
@@ -104,8 +96,7 @@ var ItemSetWindhawk = core.ItemSet{
 }
 
 var ItemSetSpellfire = core.ItemSet{
-	Name:  "Spellfire Set",
-	Items: map[int32]struct{}{21848: {}, 21847: {}, 21846: {}},
+	Name: "Wrath of Spellfire",
 	Bonuses: map[int32]core.ApplyEffect{
 		3: func(agent core.Agent) {
 			character := agent.GetCharacter()

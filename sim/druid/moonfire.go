@@ -1,6 +1,7 @@
 package druid
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -10,79 +11,58 @@ import (
 
 const SpellIDMoonfire int32 = 26988
 
-var MoonfireDebuffID = core.NewDebuffID()
+var MoonfireActionID = core.ActionID{SpellID: SpellIDMoonfire}
 
-func (druid *Druid) newMoonfireTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	baseCast := core.Cast{
-		ActionID:            core.ActionID{SpellID: SpellIDMoonfire},
-		Character:           &druid.Character,
-		CritRollCategory:    core.CritRollCategoryMagical,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolArcane,
-		BaseCost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 495,
-		},
-		Cost: core.ResourceCost{
-			Type:  stats.Mana,
-			Value: 495,
-		},
-		GCD:            core.GCDDefault,
-		CritMultiplier: druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance)),
-	}
+func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
+	baseCost := 495.0
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
-		DirectInput: core.DirectDamageInput{
-			MinBaseDamage:    305,
-			MaxBaseDamage:    357,
-			SpellCoefficient: 0.15,
-		},
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:        4,
-			TickLength:           time.Second * 3,
-			TickBaseDamage:       600 / 4,
-			TickSpellCoefficient: 0.13,
-			DebuffID:             MoonfireDebuffID,
-		},
-	}
+	druid.Moonfire = druid.RegisterSpell(core.SpellConfig{
+		ActionID:    MoonfireActionID,
+		SpellSchool: core.SpellSchoolArcane,
 
-	baseCast.Cost.Value -= baseCast.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
 
-	effect.StaticDamageMultiplier *= 1 + 0.05*float64(druid.Talents.ImprovedMoonfire)
-	effect.StaticDamageMultiplier *= 1 + 0.02*float64(druid.Talents.Moonfury)
-	effect.BonusSpellCritRating += float64(druid.Talents.ImprovedMoonfire) * 5 * core.SpellCritRatingPerCritChance
-	if ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 2) { // Thunderheart 2p adds 1 extra tick to moonfire
-		effect.DotInput.NumberOfTicks += 1
-	}
-
-	// moonfire can proc the on hit but doesn't consume charges (i think)
-	effect.OnSpellHit = druid.applyOnHitTalents
-
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: baseCast,
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.03*float64(druid.Talents.Moonglow)),
+				GCD:  core.GCDDefault,
+			},
 		},
-		Effect: effect,
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			BonusSpellCritRating: float64(druid.Talents.ImprovedMoonfire) * 5 * core.SpellCritRatingPerCritChance,
+			DamageMultiplier:     1 * (1 + 0.05*float64(druid.Talents.ImprovedMoonfire)) * (1 + 0.02*float64(druid.Talents.Moonfury)),
+			ThreatMultiplier:     1,
+			BaseDamage:           core.BaseDamageConfigMagic(305, 357, 0.15),
+			OutcomeApplier:       core.OutcomeFuncMagicHitAndCrit(druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance))),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					druid.MoonfireDot.Apply(sim)
+				}
+			},
+		}),
+	})
+
+	target := sim.GetPrimaryTarget()
+	druid.MoonfireDot = core.NewDot(core.Dot{
+		Spell: druid.Moonfire,
+		Aura: target.RegisterAura(core.Aura{
+			Label:    "Moonfire-" + strconv.Itoa(int(druid.Index)),
+			ActionID: MoonfireActionID,
+		}),
+		NumberOfTicks: 4 + core.TernaryInt(ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 2), 1, 0),
+		TickLength:    time.Second * 3,
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1 * (1 + 0.05*float64(druid.Talents.ImprovedMoonfire)) * (1 + 0.02*float64(druid.Talents.Moonfury)),
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagicNoRoll(600/4, 0.13),
+			OutcomeApplier:   core.OutcomeFuncTick(),
+			IsPeriodic:       true,
+		}),
 	})
 }
 
-func (druid *Druid) NewMoonfire(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	sf := &druid.MoonfireSpell
-	druid.moonfireCastTemplate.Apply(sf)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sf.Effect.Target = target
-	sf.Init(sim)
-
-	return sf
-}
-
 func (druid *Druid) ShouldCastMoonfire(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.Moonfire && !druid.MoonfireSpell.Effect.DotInput.IsTicking(sim)
+	return rotation.Moonfire && !druid.MoonfireDot.IsActive()
 }

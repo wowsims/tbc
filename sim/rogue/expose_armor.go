@@ -4,56 +4,55 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var ExposeArmorActionID = core.ActionID{SpellID: 26866, Tag: 5}
 var ExposeArmorEnergyCost = 25.0
 
-func (rogue *Rogue) newExposeArmorTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerExposeArmorSpell(sim *core.Simulation) {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
-	ability := rogue.newAbility(ExposeArmorActionID, ExposeArmorEnergyCost, SpellFlagFinisher, core.ProcMaskMeleeMHSpecial)
-	ability.SpellCast.Cast.CritRollCategory = core.CritRollCategoryNone
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-		if spellEffect.Landed() {
-			spellEffect.Target.ReplaceAura(sim, core.ExposeArmorAura(sim, spellEffect.Target, rogue.Talents.ImprovedExposeArmor))
-			rogue.ApplyFinisher(sim, spellCast.ActionID)
-			if sim.GetRemainingDuration() <= time.Second*30 {
-				rogue.doneEA = true
-			}
-		} else {
-			if refundAmount > 0 {
-				rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
-			}
-		}
-	}
+	rogue.ExposeArmorAura = core.ExposeArmorAura(sim.GetPrimaryTarget(), rogue.Talents.ImprovedExposeArmor)
 
-	if rogue.Talents.SurpriseAttacks {
-		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
-	}
+	rogue.ExposeArmor = rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    ExposeArmorActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | rogue.finisherFlags(),
 
-	return core.NewSimpleSpellTemplate(ability)
-}
+		ResourceType: stats.Energy,
+		BaseCost:     ExposeArmorEnergyCost,
 
-func (rogue *Rogue) NewExposeArmor(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	if rogue.ComboPoints() != 5 {
-		panic("Expose Armor requires 5 combo points!")
-	}
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: ExposeArmorEnergyCost,
+				GCD:  time.Second,
+			},
+			ModifyCast:  rogue.applyDeathmantle,
+			IgnoreHaste: true,
+		},
 
-	ea := &rogue.exposeArmor
-	rogue.exposeArmorTemplate.Apply(ea)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ea.Effect.Target = target
-
-	if rogue.deathmantle4pcProc {
-		ea.Cost.Value = 0
-		rogue.deathmantle4pcProc = false
-	}
-
-	return ea
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			ThreatMultiplier: 1,
+			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					rogue.ExposeArmorAura.Activate(sim)
+					rogue.ApplyFinisher(sim, spell.ActionID)
+					if sim.GetRemainingDuration() <= time.Second*30 {
+						rogue.doneEA = true
+					}
+				} else {
+					if refundAmount > 0 {
+						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, core.ActionID{SpellID: 31245})
+					}
+				}
+			},
+		}),
+	})
 }
 
 func (rogue *Rogue) MaintainingExpose(target *core.Target) bool {
-	return !rogue.doneEA && (rogue.Talents.ImprovedExposeArmor == 2 || !target.HasAura(core.SunderArmorDebuffID))
+	return !rogue.doneEA && (rogue.Talents.ImprovedExposeArmor == 2 || !target.HasActiveAura(core.SunderArmorAuraLabel))
 }

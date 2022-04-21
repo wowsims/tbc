@@ -5,80 +5,56 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var PowerInfusionCooldownID = core.NewCooldownID()
-
 func (priest *Priest) registerPowerInfusionCD() {
-
 	if !priest.Talents.PowerInfusion {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 10060, CooldownID: PowerInfusionCooldownID, Tag: int32(priest.RaidIndex)}
+	actionID := core.ActionID{SpellID: 10060, Tag: int32(priest.Index)}
+	baseCost := priest.BaseMana() * 0.16
 
-	baseManaCost := priest.BaseMana() * 0.16
+	powerInfusionTargetAgent := priest.Party.Raid.GetPlayerFromRaidTarget(priest.SelfBuffs.PowerInfusionTarget)
+	if powerInfusionTargetAgent == nil {
+		return
+	}
+	powerInfusionTarget := powerInfusionTargetAgent.GetCharacter()
+	powerInfusionAura := core.PowerInfusionAura(powerInfusionTarget, actionID.Tag)
 
-	powerInfusionCD := core.PowerInfusionCD
+	piSpell := priest.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
 
-	var powerInfusionTarget *core.Character
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+			},
+			CD: core.Cooldown{
+				Timer:    priest.NewTimer(),
+				Duration: core.PowerInfusionCD,
+			},
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			powerInfusionAura.Activate(sim)
+		},
+	})
 
 	priest.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: PowerInfusionCooldownID,
-		Cooldown:   powerInfusionCD,
-		Priority:   core.CooldownPriorityBloodlust,
-		Type:       core.CooldownTypeMana,
+		Spell:    piSpell,
+		Priority: core.CooldownPriorityBloodlust,
+		Type:     core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if powerInfusionTarget == nil {
-				return false
-			}
-			if character.CurrentMana() < baseManaCost {
-				return false
-			}
-			return true
+			return character.CurrentMana() >= baseCost
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-
 			// How can we determine the target will be able to continue casting
 			// 	for the next 15s at 20% reduced mana cost? Arbitrary value until then.
 			//if powerInfusionTarget.CurrentMana() < 3000 {
 			//	return false
 			//}
-			if character.HasAura(core.BloodlustAuraID) {
-				return false
-			}
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			powerInfusionTargetAgent := sim.Raid.GetPlayerFromRaidTarget(priest.SelfBuffs.PowerInfusionTarget)
-
-			if powerInfusionTargetAgent != nil {
-				powerInfusionTarget = powerInfusionTargetAgent.GetCharacter()
-			}
-
-			castTemplate := core.SimpleCast{
-				Cast: core.Cast{
-					ActionID:  actionID,
-					Character: priest.GetCharacter(),
-					BaseCost: core.ResourceCost{
-						Type:  stats.Mana,
-						Value: baseManaCost,
-					},
-					Cost: core.ResourceCost{
-						Type:  stats.Mana,
-						Value: baseManaCost,
-					},
-					Cooldown: powerInfusionCD,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						core.AddPowerInfusionAura(sim, powerInfusionTarget, actionID.Tag)
-					},
-				},
-			}
-
-			return func(sim *core.Simulation, character *core.Character) {
-				cast := castTemplate
-				cast.Init(sim)
-				cast.StartCast(sim)
-			}
+			return !powerInfusionTarget.HasActiveAuraWithTag(core.BloodlustAuraTag)
 		},
 	})
 }

@@ -7,115 +7,87 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var KillCommandCooldownID = core.NewCooldownID()
-var KillCommandActionID = core.ActionID{SpellID: 34026, CooldownID: KillCommandCooldownID}
-
-var KillCommandAuraID = core.NewAuraID()
+var KillCommandActionID = core.ActionID{SpellID: 34026}
 
 func (hunter *Hunter) applyKillCommand() {
 	if hunter.pet == nil {
 		return
 	}
 
-	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: KillCommandAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					hunter.killCommandEnabledUntil = sim.CurrentTime + time.Second*5
-					hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
-				}
-			},
-		}
+	hunter.RegisterAura(core.Aura{
+		Label:    "Kill Command Trigger",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				hunter.killCommandEnabledUntil = sim.CurrentTime + time.Second*5
+				hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
+			}
+		},
 	})
 }
 
-// ActiveMeleeAbility doesn't support cast times, so we wrap it in a SimpleCast.
-func (hunter *Hunter) newKillCommandTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:  KillCommandActionID,
-				Character: hunter.GetCharacter(),
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 75,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 75,
-				},
-				Cooldown: time.Second * 5,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ThreatMultiplier: 1,
-			},
-		},
-	}
+func (hunter *Hunter) registerKillCommandSpell(sim *core.Simulation) {
+	baseCost := 75.0
 
-	return core.NewSimpleSpellTemplate(spell)
+	hunter.KillCommand = hunter.RegisterSpell(core.SpellConfig{
+		ActionID:    KillCommandActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+			},
+			CD: core.Cooldown{
+				Timer:    hunter.NewTimer(),
+				Duration: time.Second * 5,
+			},
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ThreatMultiplier: 1,
+			OutcomeApplier:   core.OutcomeFuncAlwaysHit(),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				hunter.killCommandEnabledUntil = 0
+				hunter.pet.KillCommand.Cast(sim, sim.GetPrimaryTarget())
+			},
+		}),
+	})
 }
 
-func (hp *HunterPet) newKillCommandTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	hasBeastLord4Pc := ItemSetBeastLord.CharacterHasSetBonus(&hp.hunterOwner.Character, 4)
-	beastLordStatApplier := hp.hunterOwner.NewTemporaryStatsAuraApplier(BeastLord4PcAuraID, core.ActionID{SpellID: 37483}, stats.Stats{stats.ArmorPenetration: 600}, time.Second*15)
-
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 34027},
-				Character:           &hp.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				CritMultiplier:      2,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-				OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-					if hasBeastLord4Pc {
-						beastLordStatApplier(sim)
-					}
-				},
-			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 1,
-				FlatDamageBonus:  127,
-			},
-		},
+func (hp *HunterPet) registerKillCommandSpell(sim *core.Simulation) {
+	var beastLordProcAura *core.Aura
+	if ItemSetBeastLord.CharacterHasSetBonus(&hp.hunterOwner.Character, 4) {
+		beastLordProcAura = hp.hunterOwner.NewTemporaryStatsAura("Beast Lord Proc", core.ActionID{SpellID: 37483}, stats.Stats{stats.ArmorPenetration: 600}, time.Second*15)
 	}
 
-	ama.Effect.DamageMultiplier *= hp.config.DamageMultiplier
-	ama.Effect.BonusCritRating += float64(hp.hunterOwner.Talents.FocusedFire) * 10 * core.MeleeCritRatingPerCritChance
+	hp.KillCommand = hp.RegisterSpell(core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: 34027},
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
 
-	return core.NewSimpleSpellTemplate(ama)
-}
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			BonusCritRating:  float64(hp.hunterOwner.Talents.FocusedFire) * 10 * core.MeleeCritRatingPerCritChance,
+			DamageMultiplier: hp.config.DamageMultiplier,
+			ThreatMultiplier: 1,
 
-func (hunter *Hunter) NewKillCommand(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	killCommand := &hunter.killCommand
-	hunter.killCommandTemplate.Apply(killCommand)
+			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 127, 1, true),
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(2),
 
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	killCommand.Effect.Target = target
-	killCommand.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-		hunter.killCommandEnabledUntil = 0
-
-		kc := &hunter.pet.killCommand
-		hunter.pet.killCommandTemplate.Apply(kc)
-		kc.Effect.Target = target
-		kc.Init(sim)
-		kc.Cast(sim)
-	}
-
-	killCommand.Init(sim)
-	return killCommand
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if beastLordProcAura != nil {
+					beastLordProcAura.Activate(sim)
+				}
+			},
+		}),
+	})
 }
 
 func (hunter *Hunter) TryKillCommand(sim *core.Simulation, target *core.Target) {
@@ -131,8 +103,7 @@ func (hunter *Hunter) TryKillCommand(sim *core.Simulation, target *core.Target) 
 		return
 	}
 
-	if !hunter.IsOnCD(KillCommandCooldownID, sim.CurrentTime) {
-		kc := hunter.NewKillCommand(sim, target)
-		kc.Cast(sim)
+	if hunter.KillCommand.IsReady(sim) {
+		hunter.KillCommand.Cast(sim, target)
 	}
 }

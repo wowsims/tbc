@@ -236,6 +236,11 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 
 	itemStr += fmt.Sprintf("SocketBonus: %s", statsToGoString(itemResponse.GetSocketBonus(), Stats{}))
 
+	setName := itemResponse.GetItemSetName()
+	if setName != "" {
+		itemStr += fmt.Sprintf(", SetName: \"%s\"", setName)
+	}
+
 	itemStr += "}"
 	return itemStr
 }
@@ -301,4 +306,5 @@ var allowList = map[int]bool{
 	33143: true, // Stone of Blades
 	33144: true, // Facet of Eternity
 	6360:  true, // Steelscale Crushfish
+	8345:  true, // Wolfshead Helm
 }

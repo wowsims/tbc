@@ -40,8 +40,6 @@ type Mage struct {
 	AoeRotation    proto.Mage_Rotation_AoeRotation
 	UseAoeRotation bool
 
-	remainingManaGems int
-
 	isDoingRegenRotation bool
 	tryingToDropStacks   bool
 	numCastsDone         int32
@@ -55,51 +53,36 @@ type Mage struct {
 	// Cached values for a few mechanics.
 	spellDamageMultiplier float64
 
-	// cached cast stuff
-	arcaneBlastSpell        core.SimpleSpell
-	arcaneBlastCastTemplate core.SimpleSpellTemplate
+	// Current bonus crit from AM+CC interaction.
+	bonusAMCCCrit float64
 
-	arcaneExplosionSpell        core.SimpleSpell
-	arcaneExplosionCastTemplate core.SimpleSpellTemplate
+	ArcaneBlast     []*core.Spell
+	ArcaneExplosion *core.Spell
+	ArcaneMissiles  *core.Spell
+	Blizzard        *core.Spell
+	Ignite          *core.Spell
+	Fireball        *core.Spell
+	FireBlast       *core.Spell
+	Flamestrike     *core.Spell
+	Frostbolt       *core.Spell
+	Pyroblast       *core.Spell
+	Scorch          *core.Spell
+	WintersChill    *core.Spell
 
-	arcaneMissilesSpell        core.SimpleSpell
-	arcaneMissilesCastTemplate core.SimpleSpellTemplate
+	IcyVeins             *core.Spell
+	SummonWaterElemental *core.Spell
 
-	blizzardSpell        core.SimpleSpell
-	blizzardCastTemplate core.SimpleSpellTemplate
+	ArcaneMissilesDot *core.Dot
+	IgniteDots        []*core.Dot
+	FireballDot       *core.Dot
+	FlamestrikeDot    *core.Dot
+	PyroblastDot      *core.Dot
 
-	igniteSpells       []core.SimpleSpell
-	igniteCastTemplate core.SimpleSpellTemplate
+	ArcaneBlastAura  *core.Aura
+	ClearcastingAura *core.Aura
+	ScorchAura       *core.Aura
 
-	fireballSpell        core.SimpleSpell
-	fireballCastTemplate core.SimpleSpellTemplate
-
-	fireballDotSpell        core.SimpleSpell
-	fireballDotCastTemplate core.SimpleSpellTemplate
-
-	fireBlastSpell        core.SimpleSpell
-	fireBlastCastTemplate core.SimpleSpellTemplate
-
-	flamestrikeSpell        core.SimpleSpell
-	flamestrikeCastTemplate core.SimpleSpellTemplate
-
-	flamestrikeDotSpell        core.SimpleSpell
-	flamestrikeDotCastTemplate core.SimpleSpellTemplate
-
-	frostboltSpell        core.SimpleSpell
-	frostboltCastTemplate core.SimpleSpellTemplate
-
-	pyroblastSpell        core.SimpleSpell
-	pyroblastCastTemplate core.SimpleSpellTemplate
-
-	pyroblastDotSpell        core.SimpleSpell
-	pyroblastDotCastTemplate core.SimpleSpellTemplate
-
-	scorchSpell        core.SimpleSpell
-	scorchCastTemplate core.SimpleSpellTemplate
-
-	wintersChillSpell        core.SimpleSpell
-	wintersChillCastTemplate core.SimpleSpellTemplate
+	IgniteTickDamage []float64
 
 	manaTracker common.ManaSpendingRateTracker
 }
@@ -115,33 +98,42 @@ func (mage *Mage) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (mage *Mage) Init(sim *core.Simulation) {
-	mage.arcaneBlastCastTemplate = mage.newArcaneBlastTemplate(sim)
-	mage.arcaneExplosionCastTemplate = mage.newArcaneExplosionTemplate(sim)
-	mage.arcaneMissilesCastTemplate = mage.newArcaneMissilesTemplate(sim)
-	mage.blizzardCastTemplate = mage.newBlizzardTemplate(sim)
-	mage.igniteCastTemplate = mage.newIgniteTemplate(sim)
-	mage.fireballCastTemplate = mage.newFireballTemplate(sim)
-	mage.fireballDotCastTemplate = mage.newFireballDotTemplate(sim)
-	mage.fireBlastCastTemplate = mage.newFireBlastTemplate(sim)
-	mage.flamestrikeCastTemplate = mage.newFlamestrikeTemplate(sim)
-	mage.flamestrikeDotCastTemplate = mage.newFlamestrikeDotTemplate(sim)
-	mage.frostboltCastTemplate = mage.newFrostboltTemplate(sim)
-	mage.pyroblastCastTemplate = mage.newPyroblastTemplate(sim)
-	mage.pyroblastDotCastTemplate = mage.newPyroblastDotTemplate(sim)
-	mage.scorchCastTemplate = mage.newScorchTemplate(sim)
-	mage.wintersChillCastTemplate = mage.newWintersChillTemplate(sim)
+	mage.ArcaneBlast = []*core.Spell{
+		mage.newArcaneBlastSpell(sim, 0),
+		mage.newArcaneBlastSpell(sim, 1),
+		mage.newArcaneBlastSpell(sim, 2),
+		mage.newArcaneBlastSpell(sim, 3),
+	}
+	mage.registerArcaneExplosionSpell(sim)
+	mage.registerArcaneMissilesSpell(sim)
+	mage.registerBlizzardSpell(sim)
+	mage.registerFireballSpell(sim)
+	mage.registerFireBlastSpell(sim)
+	mage.registerFlamestrikeSpell(sim)
+	mage.registerFrostboltSpell(sim)
+	mage.registerIgniteSpell(sim)
+	mage.registerPyroblastSpell(sim)
+	mage.registerScorchSpell(sim)
+	mage.registerWintersChillSpell(sim)
 
-	mage.igniteSpells = make([]core.SimpleSpell, sim.GetNumTargets())
+	mage.IgniteDots = []*core.Dot{}
+	mage.IgniteTickDamage = []float64{}
+	for i := int32(0); i < sim.GetNumTargets(); i++ {
+		mage.IgniteTickDamage = append(mage.IgniteTickDamage, 0)
+	}
+	for i := int32(0); i < sim.GetNumTargets(); i++ {
+		mage.IgniteDots = append(mage.IgniteDots, mage.newIgniteDot(sim, sim.GetTarget(i)))
+	}
 }
 
 func (mage *Mage) Reset(newsim *core.Simulation) {
-	mage.remainingManaGems = 4
 	mage.isDoingRegenRotation = false
 	mage.tryingToDropStacks = false
 	mage.numCastsDone = 0
 	mage.isBlastSpamming = false
 	mage.manaTracker.Reset()
 	mage.disabledMCDs = nil
+	mage.bonusAMCCCrit = 0
 }
 
 func NewMage(character core.Character, options proto.Player) *Mage {
@@ -206,6 +198,7 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassMage}] = stats.Stats{
+		stats.Health:    3213,
 		stats.Strength:  30,
 		stats.Agility:   41,
 		stats.Stamina:   50,
@@ -215,6 +208,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 0.926,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassMage}] = stats.Stats{
+		stats.Health:    3213,
 		stats.Strength:  34,
 		stats.Agility:   36,
 		stats.Stamina:   50,
@@ -224,15 +218,17 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 0.933,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceGnome, Class: proto.Class_ClassMage}] = stats.Stats{
+		stats.Health:    3213,
 		stats.Strength:  28,
 		stats.Agility:   42,
 		stats.Stamina:   50,
 		stats.Intellect: 154.3, // Gnomes start with 162 int, we assume this include racial so / 1.05
 		stats.Spirit:    145,
 		stats.Mana:      2241,
-		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.029,
+		stats.SpellCrit: core.SpellCritRatingPerCritChance * 0.93,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassMage}] = stats.Stats{
+		stats.Health:    3213,
 		stats.Strength:  33,
 		stats.Agility:   39,
 		stats.Stamina:   51,
@@ -242,6 +238,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 0.926,
 	}
 	trollStats := stats.Stats{
+		stats.Health:    3213,
 		stats.Strength:  34,
 		stats.Agility:   41,
 		stats.Stamina:   52,
@@ -253,6 +250,7 @@ func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassMage}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassMage}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceUndead, Class: proto.Class_ClassMage}] = stats.Stats{
+		stats.Health:    3213,
 		stats.Strength:  32,
 		stats.Agility:   37,
 		stats.Stamina:   52,

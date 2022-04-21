@@ -110,7 +110,7 @@ const (
 
 const (
 	OutcomePartial = OutcomePartial1_4 | OutcomePartial2_4 | OutcomePartial3_4
-	OutcomeLanded  = OutcomeHit | OutcomeCrit | OutcomeGlance | OutcomeBlock | OutcomePartial
+	OutcomeLanded  = OutcomeHit | OutcomeCrit | OutcomeGlance | OutcomeBlock
 )
 
 func (ho HitOutcome) String() string {
@@ -146,9 +146,6 @@ func (ho HitOutcome) PartialResistString() string {
 }
 
 // Other flags
-// Ignore Resistance (armor or magical, use school)
-// Always Hits
-
 type SpellExtras uint16
 
 // Returns whether there is any overlap between the given masks.
@@ -157,49 +154,19 @@ func (se SpellExtras) Matches(other SpellExtras) bool {
 }
 
 const (
-	SpellExtrasNone           SpellExtras = 0
-	SpellExtrasIgnoreResists  SpellExtras = 1 << iota // skip spell resist/armor
-	SpellExtrasCannotBeDodged                         // Ignores dodge in physical hit rolls
-	SpellExtrasAlwaysHits                             // Can't miss the hit roll
-	SpellExtrasBinary                                 // Does not do partial resists and could need a different hit roll.
-	SpellExtrasChanneled                              // Spell is channeled
+	SpellExtrasNone            SpellExtras = 0
+	SpellExtrasIgnoreResists   SpellExtras = 1 << iota // skip spell resist/armor
+	SpellExtrasCannotBeDodged                          // Ignores dodge in physical hit rolls
+	SpellExtrasBinary                                  // Does not do partial resists and could need a different hit roll.
+	SpellExtrasChanneled                               // Spell is channeled
+	SpellExtrasIgnoreModifiers                         // Only used by Ignite
+	SpellExtrasMeleeMetrics                            // Marks a spell as a melee ability for metrics.
 
 	// Used to let agents categorize their spells.
 	SpellExtrasAgentReserved1
 	SpellExtrasAgentReserved2
 	SpellExtrasAgentReserved3
 	SpellExtrasAgentReserved4
-)
-
-// OutcomeRollCategory is the mask for what kind of hit roll to perform
-type OutcomeRollCategory byte
-
-// Returns whether there is any overlap between the given masks.
-func (at OutcomeRollCategory) Matches(other OutcomeRollCategory) bool {
-	return (at & other) != 0
-}
-
-const (
-	OutcomeRollCategoryNone    OutcomeRollCategory = 0         // No outcome roll needed
-	OutcomeRollCategoryWhite   OutcomeRollCategory = 1 << iota // White hit roll rules
-	OutcomeRollCategorySpecial                                 // Melee special attack
-	OutcomeRollCategoryRanged                                  // Ranged attack roll
-	OutcomeRollCategoryMagic                                   // Spell Hit roll
-
-	OutcomeRollCategoryPhysical = OutcomeRollCategoryWhite | OutcomeRollCategorySpecial | OutcomeRollCategoryRanged
-)
-
-type CritRollCategory byte
-
-// Returns whether there is any overlap between the given masks.
-func (at CritRollCategory) Matches(other CritRollCategory) bool {
-	return (at & other) != 0
-}
-
-const (
-	CritRollCategoryNone     CritRollCategory = 0         // cannot crit
-	CritRollCategoryPhysical CritRollCategory = 1 << iota // uses MeleeCrit for roll
-	CritRollCategoryMagical                               // Uses SpellCrit for crit roll
 )
 
 type SpellSchool byte
@@ -219,7 +186,7 @@ func (ss SpellSchool) Stat() stats.Stat {
 	case SpellSchoolShadow:
 		return stats.ShadowSpellPower
 	case SpellSchoolPhysical:
-		return stats.AttackPower
+		return 0 // should be weapon damage (mod_damage_done (physical))
 	}
 
 	return 0

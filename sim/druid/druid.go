@@ -13,28 +13,24 @@ type Druid struct {
 	SelfBuffs
 	Talents proto.DruidTalents
 
-	NaturesGrace bool // when true next spellcast is 0.5s faster
-	RebirthUsed  bool
+	RebirthUsed bool
+	CatForm     bool
 
-	// cached cast stuff
-	starfireSpell         core.SimpleSpell
-	starfire8CastTemplate core.SimpleSpellTemplate
-	starfire6CastTemplate core.SimpleSpellTemplate
+	FaerieFire  *core.Spell
+	Hurricane   *core.Spell
+	InsectSwarm *core.Spell
+	Moonfire    *core.Spell
+	Rebirth     *core.Spell
+	Starfire6   *core.Spell
+	Starfire8   *core.Spell
+	Wrath       *core.Spell
 
-	MoonfireSpell        core.SimpleSpell
-	moonfireCastTemplate core.SimpleSpellTemplate
+	InsectSwarmDot *core.Dot
+	MoonfireDot    *core.Dot
 
-	wrathSpell        core.SimpleSpell
-	wrathCastTemplate core.SimpleSpellTemplate
-
-	InsectSwarmSpell        core.SimpleSpell
-	insectSwarmCastTemplate core.SimpleSpellTemplate
-
-	FaerieFireSpell        core.SimpleSpell
-	faerieFireCastTemplate core.SimpleSpellTemplate
-
-	HurricaneSpell        core.SimpleSpell
-	hurricaneCastTemplate core.SimpleSpellTemplate
+	FaerieFireAura       *core.Aura
+	NaturesGraceProcAura *core.Aura
+	NaturesSwiftnessAura *core.Aura
 }
 
 type SelfBuffs struct {
@@ -66,16 +62,26 @@ func (druid *Druid) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 			}
 		}
 	}
+	if druid.Talents.LeaderOfThePack {
+		partyBuffs.LeaderOfThePack = core.MaxTristate(partyBuffs.LeaderOfThePack, proto.TristateEffect_TristateEffectRegular)
+		for _, e := range druid.Equip {
+			if e.ID == ravenGoddessItemID {
+				partyBuffs.LeaderOfThePack = proto.TristateEffect_TristateEffectImproved
+				break
+			}
+		}
+	}
 }
 
 func (druid *Druid) Init(sim *core.Simulation) {
-	druid.starfire8CastTemplate = druid.newStarfireTemplate(sim, 8)
-	druid.starfire6CastTemplate = druid.newStarfireTemplate(sim, 6)
-	druid.moonfireCastTemplate = druid.newMoonfireTemplate(sim)
-	druid.wrathCastTemplate = druid.newWrathTemplate(sim)
-	druid.insectSwarmCastTemplate = druid.newInsectSwarmTemplate(sim)
-	druid.faerieFireCastTemplate = druid.newFaerieFireTemplate(sim)
-	druid.hurricaneCastTemplate = druid.newHurricaneTemplate(sim)
+	druid.registerFaerieFireSpell(sim)
+	druid.registerHurricaneSpell(sim)
+	druid.registerInsectSwarmSpell(sim)
+	druid.registerMoonfireSpell(sim)
+	druid.registerRebirthSpell(sim)
+	druid.Starfire8 = druid.newStarfireSpell(sim, 8)
+	druid.Starfire6 = druid.newStarfireSpell(sim, 6)
+	druid.registerWrathSpell(sim)
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {
@@ -86,23 +92,13 @@ func (druid *Druid) Act(sim *core.Simulation) time.Duration {
 	return core.NeverExpires // does nothing
 }
 
-func (druid *Druid) applyNaturesGrace(spellCast *core.SpellCast) {
-	if druid.NaturesGrace {
-		spellCast.CastTime -= time.Millisecond * 500
-		// This applies on cast complete, removing the effect.
-		//  if it crits, during 'onspellhit' then it will be reapplied (see func above)
-		spellCast.OnCastComplete = func(sim *core.Simulation, cast *core.Cast) {
-			druid.NaturesGrace = false
-		}
-	}
-}
-
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) *Druid {
 	druid := &Druid{
 		Character:   char,
 		SelfBuffs:   selfBuffs,
 		Talents:     talents,
 		RebirthUsed: false,
+		CatForm:     false,
 	}
 	druid.EnableManaBar()
 
@@ -114,31 +110,49 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) *
 		},
 	})
 
-	druid.registerInnervateCD()
+	druid.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Strength,
+		ModifiedStat: stats.AttackPower,
+		Modifier: func(strength float64, attackPower float64) float64 {
+			return attackPower + strength*2
+		},
+	})
+
+	druid.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Agility,
+		ModifiedStat: stats.MeleeCrit,
+		Modifier: func(agility float64, meleeCrit float64) float64 {
+			return meleeCrit + (agility/25)*core.MeleeCritRatingPerCritChance
+		},
+	})
 
 	return druid
 }
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTauren, Class: proto.Class_ClassDruid}] = stats.Stats{
-		stats.Strength:  81,
-		stats.Agility:   65,
-		stats.Stamina:   85,
-		stats.Intellect: 115,
-		stats.Spirit:    135,
-		stats.Mana:      2370,
-		stats.SpellCrit: 40.66, // 3.29% chance to crit shown on naked character screen
-		// 4498 health shown on naked character (would include tauren bonus)
+		stats.Health:      3434, // 4498 health shown on naked character (would include tauren bonus)
+		stats.Strength:    81,
+		stats.Agility:     65,
+		stats.Stamina:     85,
+		stats.Intellect:   115,
+		stats.Spirit:      135,
+		stats.Mana:        2370,
+		stats.SpellCrit:   40.66,                                    // 3.29% chance to crit shown on naked character screen
+		stats.AttackPower: -20,                                      // accounts for the fact that the first 20 points in Str only provide 1 AP rather than 2
+		stats.MeleeCrit:   0.96 * core.MeleeCritRatingPerCritChance, // 3.56% chance to crit shown on naked character screen
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassDruid}] = stats.Stats{
-		stats.Strength:  73,
-		stats.Agility:   75,
-		stats.Stamina:   82,
-		stats.Intellect: 120,
-		stats.Spirit:    133,
-		stats.Mana:      2370,
-		stats.SpellCrit: 40.60, // 3.35% chance to crit shown on naked character screen
-		// 4254 health shown on naked character
+		stats.Health:      3434, // 4254 health shown on naked character
+		stats.Strength:    73,
+		stats.Agility:     75,
+		stats.Stamina:     82,
+		stats.Intellect:   120,
+		stats.Spirit:      133,
+		stats.Mana:        2370,
+		stats.SpellCrit:   40.60,                                    // 3.35% chance to crit shown on naked character screen
+		stats.AttackPower: -20,                                      // accounts for the fact that the first 20 points in Str only provide 1 AP rather than 2
+		stats.MeleeCrit:   0.96 * core.MeleeCritRatingPerCritChance, // 3.96% chance to crit shown on naked character screen
 	}
 }
 

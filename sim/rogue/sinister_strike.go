@@ -1,8 +1,11 @@
 package rogue
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var SinisterStrikeActionID = core.ActionID{SpellID: 26862}
@@ -11,41 +14,42 @@ func (rogue *Rogue) SinisterStrikeEnergyCost() float64 {
 	return []float64{45, 42, 40}[rogue.Talents.ImprovedSinisterStrike]
 }
 
-func (rogue *Rogue) newSinisterStrikeTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerSinisterStrikeSpell(_ *core.Simulation) {
 	energyCost := rogue.SinisterStrikeEnergyCost()
 	refundAmount := energyCost * 0.8
-	ability := rogue.newAbility(SinisterStrikeActionID, energyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-		if spellEffect.Landed() {
-			rogue.AddComboPoints(sim, 1, SinisterStrikeActionID)
-		} else {
-			rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
-		}
-	}
-	ability.Effect.WeaponInput = core.WeaponDamageInput{
-		Normalized:       true,
-		FlatDamageBonus:  98,
-		DamageMultiplier: 1,
-	}
 
-	// cp. backstab
-	ability.Effect.StaticDamageMultiplier += 0.02 * float64(rogue.Talents.Aggression)
-	if rogue.Talents.SurpriseAttacks {
-		ability.Effect.StaticDamageMultiplier += 0.1
-	}
-	if ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4) {
-		ability.Effect.StaticDamageMultiplier += 0.06
-	}
+	rogue.SinisterStrike = rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    SinisterStrikeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder,
 
-	return core.NewSimpleSpellTemplate(ability)
-}
+		ResourceType: stats.Energy,
+		BaseCost:     energyCost,
 
-func (rogue *Rogue) NewSinisterStrike(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	ss := &rogue.sinisterStrike
-	rogue.sinisterStrikeTemplate.Apply(ss)
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: energyCost,
+				GCD:  time.Second,
+			},
+			IgnoreHaste: true,
+		},
 
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ss.Effect.Target = target
-
-	return ss
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask: core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1 +
+				0.02*float64(rogue.Talents.Aggression) +
+				core.TernaryFloat64(rogue.Talents.SurpriseAttacks, 0.1, 0) +
+				core.TernaryFloat64(ItemSetSlayers.CharacterHasSetBonus(&rogue.Character, 4), 0.06, 0),
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 98, 1, true),
+			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, true)),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					rogue.AddComboPoints(sim, 1, SinisterStrikeActionID)
+				} else {
+					rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+				}
+			},
+		}),
+	})
 }

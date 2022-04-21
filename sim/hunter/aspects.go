@@ -8,132 +8,109 @@ import (
 )
 
 var AspectOfTheHawkActionID = core.ActionID{SpellID: 27044}
-var AspectOfTheHawkAuraID = core.NewAuraID()
-var ImprovedAspectOfTheHawkAuraID = core.NewAuraID()
-
 var AspectOfTheViperActionID = core.ActionID{SpellID: 34074}
-var AspectOfTheViperAuraID = core.NewAuraID()
 
-func (hunter *Hunter) aspectOfTheHawkAura() core.Aura {
+func (hunter *Hunter) registerAspectOfTheHawkSpell(sim *core.Simulation) {
+	var impHawkAura *core.Aura
 	const improvedHawkProcChance = 0.1
-	improvedHawkBonus := 1 + 0.03*float64(hunter.Talents.ImprovedAspectOfTheHawk)
-	impHawkAura := core.Aura{
-		ID:       ImprovedAspectOfTheHawkAuraID,
-		ActionID: core.ActionID{SpellID: 19556},
-		Duration: time.Second * 12,
-		OnGain: func(sim *core.Simulation) {
-			hunter.PseudoStats.RangedSpeedMultiplier *= improvedHawkBonus
-		},
-		OnExpire: func(sim *core.Simulation) {
-			hunter.PseudoStats.RangedSpeedMultiplier /= improvedHawkBonus
-		},
+	if hunter.Talents.ImprovedAspectOfTheHawk > 0 {
+		improvedHawkBonus := 1 + 0.03*float64(hunter.Talents.ImprovedAspectOfTheHawk)
+		impHawkAura = hunter.GetOrRegisterAura(core.Aura{
+			Label:    "Improved Aspect of the Hawk",
+			ActionID: core.ActionID{SpellID: 19556},
+			Duration: time.Second * 12,
+			OnGain: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Unit.PseudoStats.RangedSpeedMultiplier *= improvedHawkBonus
+			},
+			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Unit.PseudoStats.RangedSpeedMultiplier /= improvedHawkBonus
+			},
+		})
 	}
 
-	aura := core.Aura{
-		ID:       AspectOfTheHawkAuraID,
-		ActionID: AspectOfTheHawkActionID,
-		Duration: core.NeverExpires,
-		OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-			spellEffect.BonusAttackPower += 155
-		},
-		OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
+	hunter.AspectOfTheHawkAura = hunter.NewTemporaryStatsAuraWrapped("Aspect of the Hawk", AspectOfTheHawkActionID, stats.Stats{stats.RangedAttackPower: 155}, core.NeverExpires, func(aura *core.Aura) {
+		hunter.applySharedAspectConfig(true, aura)
+		aura.OnSpellHit = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.ProcMask.Matches(core.ProcMaskRangedAuto) {
 				return
 			}
 
-			if improvedHawkBonus > 1 && sim.RandomFloat("Imp Aspect of the Hawk") < improvedHawkProcChance {
-				hunter.ReplaceAura(sim, impHawkAura)
+			if impHawkAura != nil && sim.RandomFloat("Imp Aspect of the Hawk") < improvedHawkProcChance {
+				impHawkAura.Activate(sim)
 			}
-		},
-	}
-	return aura
-}
-
-func (hunter *Hunter) newAspectOfTheHawkTemplate(sim *core.Simulation) core.SimpleCast {
-	aura := hunter.aspectOfTheHawkAura()
-
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  AspectOfTheHawkActionID,
-			Character: hunter.GetCharacter(),
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 140,
-			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 140,
-			},
-			GCD:         core.GCDDefault,
-			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				hunter.aspectOfTheViper = false
-				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheViperAuraID)
-				hunter.AddAuraOnNextAdvance(sim, aura)
-			},
-		},
-	}
-
-	return template
-}
-
-func (hunter *Hunter) NewAspectOfTheHawk(sim *core.Simulation) core.SimpleCast {
-	v := hunter.aspectOfTheHawkTemplate
-	v.Init(sim)
-	return v
-}
-
-func (hunter *Hunter) aspectOfTheViperAura() core.Aura {
-	aura := core.Aura{
-		ID:       AspectOfTheViperAuraID,
-		ActionID: AspectOfTheViperActionID,
-		Duration: core.NeverExpires,
-		// Mana gain from viper is handled in rotation.go
-	}
-	return aura
-}
-
-func (hunter *Hunter) newAspectOfTheViperTemplate(sim *core.Simulation) core.SimpleCast {
-	aura := hunter.aspectOfTheViperAura()
-
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  core.ActionID{SpellID: 34074},
-			Character: hunter.GetCharacter(),
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 40,
-			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 40,
-			},
-			GCD:         core.GCDDefault,
-			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				hunter.aspectOfTheViper = true
-				hunter.RemoveAuraOnNextAdvance(sim, AspectOfTheHawkAuraID)
-				hunter.AddAuraOnNextAdvance(sim, aura)
-			},
-		},
-	}
-
-	return template
-}
-
-func (hunter *Hunter) NewAspectOfTheViper(sim *core.Simulation) core.SimpleCast {
-	v := hunter.aspectOfTheViperTemplate
-	v.Init(sim)
-	return v
-}
-
-func (hunter *Hunter) applyInitialAspect() {
-	aura := hunter.aspectOfTheHawkAura()
-	if hunter.Rotation.ViperStartManaPercent >= 1 {
-		aura = hunter.aspectOfTheViperAura()
-	}
-
-	hunter.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return aura
+		}
 	})
+
+	baseCost := 140.0
+	hunter.AspectOfTheHawk = hunter.RegisterSpell(core.SpellConfig{
+		ActionID: AspectOfTheHawkActionID,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			hunter.AspectOfTheHawkAura.Activate(sim)
+		},
+	})
+}
+
+func (hunter *Hunter) registerAspectOfTheViperSpell(sim *core.Simulation) {
+	auraConfig := core.Aura{
+		Label:    "Aspect of the Viper",
+		ActionID: AspectOfTheViperActionID,
+	}
+	hunter.applySharedAspectConfig(false, &auraConfig)
+	hunter.AspectOfTheViperAura = hunter.RegisterAura(auraConfig)
+
+	baseCost := 40.0
+	hunter.AspectOfTheViper = hunter.RegisterSpell(core.SpellConfig{
+		ActionID: core.ActionID{SpellID: 34074},
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			hunter.AspectOfTheViperAura.Activate(sim)
+		},
+	})
+}
+
+func (hunter *Hunter) applySharedAspectConfig(isHawk bool, aura *core.Aura) {
+	if isHawk != (hunter.Rotation.ViperStartManaPercent >= 1) {
+		aura.OnReset = func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		}
+	}
+
+	aura.Tag = "Aspect"
+	aura.Priority = 1
+	aura.Duration = core.NeverExpires
+
+	oldOnGain := aura.OnGain
+	if oldOnGain == nil {
+		aura.OnGain = func(aura *core.Aura, sim *core.Simulation) {
+			hunter.currentAspect = aura
+		}
+	} else {
+		aura.OnGain = func(aura *core.Aura, sim *core.Simulation) {
+			oldOnGain(aura, sim)
+			hunter.currentAspect = aura
+		}
+	}
 }

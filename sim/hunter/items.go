@@ -14,16 +14,14 @@ func init() {
 	core.AddItemEffect(32336, ApplyBlackBowOfTheBetrayer)
 	core.AddItemEffect(32487, ApplyAshtongueTalismanOfSwiftness)
 
-	core.AddItemSet(ItemSetBeastLord)
-	core.AddItemSet(ItemSetDemonStalker)
-	core.AddItemSet(ItemSetRiftStalker)
-	core.AddItemSet(ItemSetGronnstalker)
+	core.AddItemSet(&ItemSetBeastLord)
+	core.AddItemSet(&ItemSetDemonStalker)
+	core.AddItemSet(&ItemSetRiftStalker)
+	core.AddItemSet(&ItemSetGronnstalker)
 }
 
-var BeastLord4PcAuraID = core.NewAuraID()
 var ItemSetBeastLord = core.ItemSet{
-	Name:  "Beast Lord Armor",
-	Items: map[int32]struct{}{28228: {}, 27474: {}, 28275: {}, 27874: {}, 27801: {}},
+	Name: "Beast Lord Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 		},
@@ -34,8 +32,7 @@ var ItemSetBeastLord = core.ItemSet{
 }
 
 var ItemSetDemonStalker = core.ItemSet{
-	Name:  "Demon Stalker Armor",
-	Items: map[int32]struct{}{29081: {}, 29082: {}, 29083: {}, 29084: {}, 29085: {}},
+	Name: "Demon Stalker Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 		},
@@ -46,8 +43,7 @@ var ItemSetDemonStalker = core.ItemSet{
 }
 
 var ItemSetRiftStalker = core.ItemSet{
-	Name:  "Rift Stalker Armor",
-	Items: map[int32]struct{}{30139: {}, 30140: {}, 30141: {}, 30142: {}, 30143: {}},
+	Name: "Rift Stalker Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 		},
@@ -58,8 +54,7 @@ var ItemSetRiftStalker = core.ItemSet{
 }
 
 var ItemSetGronnstalker = core.ItemSet{
-	Name:  "Gronnstalker's Armor",
-	Items: map[int32]struct{}{31001: {}, 31003: {}, 31004: {}, 31005: {}, 31006: {}, 34443: {}, 34549: {}, 34570: {}},
+	Name: "Gronnstalker's Armor",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Handled in rotation.go
@@ -70,39 +65,49 @@ var ItemSetGronnstalker = core.ItemSet{
 	},
 }
 
-var TalonOfAlarAuraID = core.NewAuraID()
-var TalonOfAlarProcAuraID = core.NewAuraID()
-
 func ApplyTalonOfAlar(agent core.Agent) {
-	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		procAura := core.Aura{
-			ID:       TalonOfAlarProcAuraID,
-			ActionID: core.ActionID{ItemID: 30448},
-			// Add 1 in case we use arcane shot exactly off CD.
-			Duration: time.Second*6 + 1,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if !spellCast.SameAction(SteadyShotActionID) &&
-					!spellCast.SameAction(MultiShotActionID) &&
-					!spellCast.SameAction(ArcaneShotActionID) &&
-					!spellCast.SameAction(AimedShotActionID) {
-					return
-				}
-				spellEffect.DirectInput.FlatDamageBonus += 40
-			},
-		}
+	hunterAgent, ok := agent.(Agent)
+	if !ok {
+		log.Fatalf("Non-hunter attempted to activate hunter item effect.")
+	}
+	hunter := hunterAgent.GetHunter()
 
-		return core.Aura{
-			ID: TalonOfAlarAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.SameAction(ArcaneShotActionID) {
-					return
-				}
-
-				character.AddAura(sim, procAura)
-			},
-		}
+	procAura := hunter.GetOrRegisterAura(core.Aura{
+		Label:    "Talon of Alar Proc",
+		ActionID: core.ActionID{ItemID: 30448},
+		// Add 1 in case we use arcane shot exactly off CD.
+		Duration: time.Second*6 + 1,
 	})
+
+	hunter.TalonOfAlarAura = hunter.GetOrRegisterAura(core.Aura{
+		Label:    "Talon of Alar",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell.SameAction(ArcaneShotActionID) {
+				procAura.Activate(sim)
+			}
+		},
+	})
+}
+
+func (hunter *Hunter) talonOfAlarDamageMod(baseDamageConfig core.BaseDamageConfig) core.BaseDamageConfig {
+	if hunter.HasTrinketEquipped(30448) {
+		return core.WrapBaseDamageConfig(baseDamageConfig, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
+			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+				normalDamage := oldCalculator(sim, hitEffect, spell)
+				if hunter.TalonOfAlarAura != nil && hunter.TalonOfAlarAura.IsActive() {
+					return normalDamage + 40
+				} else {
+					return normalDamage
+				}
+			}
+		})
+	} else {
+		return baseDamageConfig
+	}
 }
 
 func ApplyBeasttamersShoulders(agent core.Agent) {
@@ -112,48 +117,49 @@ func ApplyBeasttamersShoulders(agent core.Agent) {
 	}
 	hunter := hunterAgent.GetHunter()
 
-	hunter.pet.damageMultiplier *= 1.03
+	hunter.pet.PseudoStats.DamageDealtMultiplier *= 1.03
 	hunter.pet.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*2)
 }
-
-var BlackBowOfTheBetrayerAuraID = core.NewAuraID()
 
 func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 	character := agent.GetCharacter()
 	const manaGain = 8.0
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: BlackBowOfTheBetrayerAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryRanged) {
-					return
-				}
-				character.AddMana(sim, manaGain, core.ActionID{SpellID: 46939}, false)
-			},
-		}
+
+	character.RegisterAura(core.Aura{
+		Label:    "Black Bow of the Betrayer",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskRanged) {
+				return
+			}
+			character.AddMana(sim, manaGain, core.ActionID{SpellID: 46939}, false)
+		},
 	})
 }
 
-var AshtongueTalismanOfSwiftnessAuraID = core.NewAuraID()
-var AshtongueTalismanOfSwiftnessProcAuraID = core.NewAuraID()
-
 func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		applyStatAura := character.NewTemporaryStatsAuraApplier(AshtongueTalismanOfSwiftnessProcAuraID, core.ActionID{ItemID: 32487}, stats.Stats{stats.AttackPower: 275, stats.RangedAttackPower: 275}, time.Second*8)
-		const procChance = 0.15
 
-		return core.Aura{
-			ID: AshtongueTalismanOfSwiftnessAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellCast.SameAction(SteadyShotActionID) {
-					return
-				}
-				if sim.RandomFloat("Ashtongue Talisman of Swiftness") > procChance {
-					return
-				}
-				applyStatAura(sim)
-			},
-		}
+	procAura := character.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32487}, stats.Stats{stats.AttackPower: 275, stats.RangedAttackPower: 275}, time.Second*8)
+	const procChance = 0.15
+
+	character.RegisterAura(core.Aura{
+		Label:    "Ashtongue Talisman",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spell.SameAction(SteadyShotActionID) {
+				return
+			}
+			if sim.RandomFloat("Ashtongue Talisman of Swiftness") > procChance {
+				return
+			}
+			procAura.Activate(sim)
+		},
 	})
 }

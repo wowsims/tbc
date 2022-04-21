@@ -1,10 +1,10 @@
 // Set color variables which control the site theme.
 .protection-warrior-sim-ui {
-	--theme-color-primary: #e2563f;
-	--theme-color-background: #1e0f0c;
-	--theme-color-background-raw: 29, 21, 16;
-	--theme-background-image: url('/tbc/assets/warrior_background.jpg');
-	--theme-background-opacity: 0.9;
+	--theme-color-primary: #745221;
+	--theme-color-background: #1c1408;
+	--theme-color-background-raw: 28, 20, 8;
+	--theme-background-image: url('/tbc/assets/protection_warrior_background.jpg');
+	--theme-background-opacity: 0.95;
 	--main-text-color: White;
 }
 
@@ -17,4 +17,24 @@
 }
 .protection-warrior-sim-ui .debuffs-section {
   grid-template-columns: repeat(3, 1fr);
+}
+
+// Prot has a lot of EP stats, so make the text smaller so it fits vertically.
+.protection-warrior-sim-ui .character-stats-table-row {
+  font-size: 11px;
+}
+.protection-warrior-sim-ui .results-ep-table tr td:nth-child(1) {
+  font-size: 11px;
+}
+.protection-warrior-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
+  font-size: 11px;
+}
+.protection-warrior-sim-ui .results-ep-table tr td:nth-child(2):after {
+  font-size: 11px;
+}
+.protection-warrior-sim-ui .results-ep-table tr td:nth-child(4):after {
+  font-size: 11px;
+}
+.protection-warrior-sim-ui .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
+  font-size: 10px;
 }

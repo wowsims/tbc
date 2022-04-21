@@ -90,12 +90,19 @@ export const statNames: Record<Stat, string> = {
 	[Stat.StatRage]: 'Rage',
 	[Stat.StatArmor]: 'Armor',
 	[Stat.StatRangedAttackPower]: 'Ranged AP',
+	[Stat.StatFeralAttackPower]: 'Feral AP',
 	[Stat.StatDefense]: 'Defense',
 	[Stat.StatBlock]: 'Block',
 	[Stat.StatBlockValue]: 'Block Value',
 	[Stat.StatDodge]: 'Dodge',
 	[Stat.StatParry]: 'Parry',
 	[Stat.StatResilience]: 'Resilience',
+	[Stat.StatHealth]: 'Health',
+	[Stat.StatArcaneResistance]: 'Arcane Resistance',
+	[Stat.StatFireResistance]: 'Fire Resistance',
+	[Stat.StatFrostResistance]: 'Frost Resistance',
+	[Stat.StatNatureResistance]: 'Nature Resistance',
+	[Stat.StatShadowResistance]: 'Shadow Resistance',
 };
 
 export const slotNames: Record<ItemSlot, string> = {

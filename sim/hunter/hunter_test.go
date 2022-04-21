@@ -31,12 +31,15 @@ func TestBestialWrath(t *testing.T) {
 	})
 	h := sim.Raid.Parties[0].Players[0].(*Hunter)
 	h.Init(sim)
+	for _, pa := range h.Pets {
+		pa.Init(sim)
+	}
 
 	sim.Reset()
 	h.TryUseCooldowns(sim)
-	as := h.NewAimedShot(sim, sim.GetPrimaryTarget())
-	if as.Cost.Value != 259 {
-		t.Logf("cost is wrong, expected: %0.1f, actual: %0.1f", 259.0, as.Cost.Value)
+	h.AimedShot.Cast(sim, sim.GetPrimaryTarget())
+	if h.AimedShot.CurCast.Cost != 259 {
+		t.Logf("cost is wrong, expected: %0.1f, actual: %0.1f", 259.0, h.AimedShot.CurCast.Cost)
 	}
 }
 

@@ -15,120 +15,108 @@ func init() {
 	core.AddItemEffect(34470, ApplyTimbals)
 }
 
-var RobeOfTheElderScribeAuraID = core.NewAuraID()
-var PowerOfArcanagosAuraID = core.NewAuraID()
-
 func ApplyRobeOfTheElderScribes(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		// Gives a chance when your harmful spells land to increase the damage of your spells and effects by up to 130 for 10 sec. (Proc chance: 20%, 50s cooldown)
-		icd := core.NewICD()
-		const spellBonus = 130.0
-		const dur = time.Second * 10
-		const icdDur = time.Second * 50
-		const proc = 0.2
+	procAura := character.NewTemporaryStatsAura("Power of Arcanagos", core.ActionID{ItemID: 28602}, stats.Stats{stats.SpellPower: 130}, time.Second*10)
 
-		applyStatAura := character.NewTemporaryStatsAuraApplier(PowerOfArcanagosAuraID, core.ActionID{ItemID: 28602}, stats.Stats{stats.SpellPower: spellBonus}, dur)
-		return core.Aura{
-			ID: RobeOfTheElderScribeAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
-				if !spellEffect.Landed() {
-					return
-				}
-				if icd.IsOnCD(sim) || sim.RandomFloat("Robe of the Elder Scribe") > proc { // can't activate if on CD or didn't proc
-					return
-				}
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				applyStatAura(sim)
-			},
-		}
+	// Gives a chance when your harmful spells land to increase the damage of your spells and effects by up to 130 for 10 sec. (Proc chance: 20%, 50s cooldown)
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 50,
+	}
+	const proc = 0.2
+
+	character.RegisterAura(core.Aura{
+		Label:    "Robe of the Elder Scribes",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+			if !spellEffect.Landed() {
+				return
+			}
+			if !icd.IsReady(sim) || sim.RandomFloat("Robe of the Elder Scribe") > proc { // can't activate if on CD or didn't proc
+				return
+			}
+			icd.Use(sim)
+			procAura.Activate(sim)
+		},
 	})
 }
-
-var EternalSageItemAuraID = core.NewAuraID()
-var BandOfTheEternalSageAuraID = core.NewAuraID()
 
 func ApplyEternalSage(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		// Your offensive spells have a chance on hit to increase your spell damage by 95 for 10 secs.
-		icd := core.NewICD()
-		const spellBonus = 95.0
-		const dur = time.Second * 10
-		const icdDur = time.Second * 60
-		const proc = 0.1
-		applyStatAura := character.NewTemporaryStatsAuraApplier(BandOfTheEternalSageAuraID, core.ActionID{ItemID: 29305}, stats.Stats{stats.SpellPower: spellBonus}, dur)
+	procAura := character.NewTemporaryStatsAura("Band of the Eternal Sage Proc", core.ActionID{ItemID: 29305}, stats.Stats{stats.SpellPower: 95}, time.Second*10)
 
-		return core.Aura{
-			ID: EternalSageItemAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
-				if !spellEffect.Landed() {
-					return
-				}
-				if icd.IsOnCD(sim) || sim.RandomFloat("Band of the Eternal Sage") > proc { // can't activate if on CD or didn't proc
-					return
-				}
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				applyStatAura(sim)
-			},
-		}
+	// Your offensive spells have a chance on hit to increase your spell damage by 95 for 10 secs.
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 60,
+	}
+	const proc = 0.1
+
+	character.RegisterAura(core.Aura{
+		Label:    "Band of the Eternal Sage",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+			if !spellEffect.Landed() {
+				return
+			}
+			if !icd.IsReady(sim) || sim.RandomFloat("Band of the Eternal Sage") > proc { // can't activate if on CD or didn't proc
+				return
+			}
+			icd.Use(sim)
+			procAura.Activate(sim)
+		},
 	})
 }
 
-var AugmentPainAuraID = core.NewAuraID()
-
 func ApplyTimbals(agent core.Agent) {
-	timbalsTemplate := core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 45055},
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				SpellSchool:         core.SpellSchoolShadow,
-				CritMultiplier:      agent.GetCharacter().DefaultSpellCritMultiplier(),
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 285,
-				MaxBaseDamage: 475,
-			},
-		},
-	})
 	character := agent.GetCharacter()
-	character.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		var shadowBolt = &core.SimpleSpell{}
 
-		// Each time one of your spells deals periodic damage,
-		// there is a chance 285 to 475 additional damage will be dealt. (Proc chance: 10%, 15s cooldown)
-		icd := core.NewICD()
-		const icdDur = time.Second * 15
-		const proc = 0.1
+	timbalsSpell := character.RegisterSpell(core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: 45055},
+		SpellSchool: core.SpellSchoolShadow,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 
-		return core.Aura{
-			ID: AugmentPainAuraID,
-			OnPeriodicDamage: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect, tickDamage float64) {
-				if icd.IsOnCD(sim) || sim.RandomFloat("timbals") > proc { // can't activate if on CD or didn't proc
-					return
-				}
-				icd = core.InternalCD(sim.CurrentTime + icdDur)
-				timbalsTemplate.Apply(shadowBolt)
-				// Apply the caster/target from the cast that procd this.
-				shadowBolt.Character = spellCast.Character
-				shadowBolt.Effect.Target = spellEffect.Target
-				shadowBolt.Cast(sim)
-			},
-		}
+			BaseDamage:     core.BaseDamageConfigRoll(285, 475),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+		}),
+	})
+
+	// Each time one of your spells deals periodic damage,
+	// there is a chance 285 to 475 additional damage will be dealt. (Proc chance: 10%, 15s cooldown)
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 15,
+	}
+	const proc = 0.1
+
+	character.RegisterAura(core.Aura{
+		Label:    "Timbals",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !icd.IsReady(sim) || sim.RandomFloat("timbals") > proc { // can't activate if on CD or didn't proc
+				return
+			}
+			icd.Use(sim)
+
+			timbalsSpell.Cast(sim, spellEffect.Target)
+		},
 	})
 }

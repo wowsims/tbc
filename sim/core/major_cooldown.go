@@ -36,21 +36,17 @@ type CooldownActivation func(*Simulation, *Character)
 type CooldownActivationFactory func(*Simulation) CooldownActivation
 
 type MajorCooldown struct {
+	// Spell that is cast when this MCD is activated.
+	Spell *Spell
+
 	// Unique ID for this cooldown, used to look it up.
 	ActionID
 
-	// Primary cooldown ID for checking whether this cooldown is ready.
-	CooldownID CooldownID
+	// Primary cooldown for checking whether this cooldown is ready.
+	Cooldown Cooldown
 
-	// Amount of time before activation can be used again, after a successful
-	// activation.
-	Cooldown time.Duration
-
-	// Secondary cooldown ID, used for shared cooldowns.
-	SharedCooldownID CooldownID
-
-	// Duration of secondary cooldown.
-	SharedCooldown time.Duration
+	// Secondary cooldown, used for shared cooldowns.
+	SharedCooldown Cooldown
 
 	// Whether this MCD requires the GCD.
 	UsesGCD bool
@@ -97,15 +93,16 @@ type MajorCooldown struct {
 	disabled bool
 }
 
-func (mcd *MajorCooldown) IsOnCD(sim *Simulation, character *Character) bool {
-	// Even if SharedCooldownID == 0 this will work since we never call SetCD(0, currentTime)
-	return character.IsOnCD(mcd.CooldownID, sim.CurrentTime) || character.IsOnCD(mcd.SharedCooldownID, sim.CurrentTime)
+func (mcd *MajorCooldown) ReadyAt() time.Duration {
+	return BothTimersReadyAt(mcd.Cooldown.Timer, mcd.SharedCooldown.Timer)
 }
 
-func (mcd *MajorCooldown) GetRemainingCD(currentTime time.Duration, character *Character) time.Duration {
-	return MaxDuration(
-		character.GetRemainingCD(mcd.CooldownID, currentTime),
-		character.GetRemainingCD(mcd.SharedCooldownID, currentTime))
+func (mcd *MajorCooldown) IsReady(sim *Simulation) bool {
+	return BothTimersReady(mcd.Cooldown.Timer, mcd.SharedCooldown.Timer, sim)
+}
+
+func (mcd *MajorCooldown) TimeToReady(sim *Simulation) time.Duration {
+	return MaxTimeToReady(mcd.Cooldown.Timer, mcd.SharedCooldown.Timer, sim)
 }
 
 func (mcd *MajorCooldown) IsEnabled() bool {
@@ -133,7 +130,7 @@ func (mcd *MajorCooldown) tryActivateInternal(sim *Simulation, character *Charac
 // Activates this MCD, if all the conditions pass.
 // Returns whether the MCD was activated.
 func (mcd *MajorCooldown) tryActivateHelper(sim *Simulation, character *Character) bool {
-	if mcd.UsesGCD && character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
+	if mcd.UsesGCD && !character.GCD.IsReady(sim) {
 		return false
 	}
 
@@ -223,6 +220,24 @@ func (mcdm *majorCooldownManager) finalize(character *Character) {
 	mcdm.majorCooldowns = make([]*MajorCooldown, len(mcdm.initialMajorCooldowns))
 }
 
+// Adds a delay to the first usage of all CDs so that armor debuffs have time
+// to be applied. MCDs that have a user-specified timing are not delayed.
+//
+// This function should be called from Agent.Init().
+func (mcdm *majorCooldownManager) DelayDPSCooldownsForArmorDebuffs(sim *Simulation) {
+	if !sim.GetPrimaryTarget().HasAuraWithTag(SunderExposeAuraTag) {
+		return
+	}
+
+	const delay = time.Second * 10
+	for i, _ := range mcdm.initialMajorCooldowns {
+		mcd := &mcdm.initialMajorCooldowns[i]
+		if len(mcd.timings) == 0 && mcd.Type == CooldownTypeDPS {
+			mcd.timings = append(mcd.timings, delay)
+		}
+	}
+}
+
 func (mcdm *majorCooldownManager) reset(sim *Simulation) {
 	// Need to create all cooldowns before calling ActivationFactory on any of them,
 	// so that any cooldown can do lookups on other cooldowns.
@@ -250,12 +265,35 @@ func (mcdm *majorCooldownManager) AddMajorCooldown(mcd MajorCooldown) {
 		panic("Major cooldowns may not be added once finalized!")
 	}
 
+	spell := mcd.Spell
+	if spell != nil {
+		mcd.ActionID = spell.ActionID
+		mcd.Cooldown = spell.CD
+		mcd.SharedCooldown = spell.SharedCD
+		mcd.UsesGCD = spell.DefaultCast.GCD > 0
+		mcd.CastTime = spell.DefaultCast.CastTime
+		if mcd.ActivationFactory == nil {
+			mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
+				return func(sim *Simulation, character *Character) {
+					spell.Cast(sim, sim.GetPrimaryTarget())
+				}
+			}
+		}
+	}
+
 	if mcd.IsEmptyAction() {
 		panic("Major cooldown must have an ActionID!")
 	}
 
-	if mcd.CanActivate == nil || mcd.ShouldActivate == nil {
-		panic("Major cooldown must provide CanActivate and ShouldActivate callbacks!")
+	if mcd.CanActivate == nil {
+		mcd.CanActivate = func(sim *Simulation, character *Character) bool {
+			return true
+		}
+	}
+	if mcd.ShouldActivate == nil {
+		mcd.ShouldActivate = func(sim *Simulation, character *Character) bool {
+			return true
+		}
 	}
 
 	mcdm.initialMajorCooldowns = append(mcdm.initialMajorCooldowns, mcd)
@@ -334,7 +372,7 @@ func (mcdm *majorCooldownManager) EnableAllCooldowns(mcdsToEnable []*MajorCooldo
 
 func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 	anyCooldownsUsed := false
-	for curIdx := 0; curIdx < len(mcdm.majorCooldowns) && !mcdm.majorCooldowns[curIdx].IsOnCD(sim, mcdm.character); curIdx++ {
+	for curIdx := 0; curIdx < len(mcdm.majorCooldowns) && mcdm.majorCooldowns[curIdx].IsReady(sim); curIdx++ {
 		mcd := mcdm.majorCooldowns[curIdx]
 		if mcd.tryActivateInternal(sim, mcdm.character) {
 			anyCooldownsUsed = true
@@ -360,43 +398,39 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 func (mcdm *majorCooldownManager) UpdateMajorCooldowns() {
 	sort.Slice(mcdm.majorCooldowns, func(i, j int) bool {
 		// Since we're just comparing and don't actually care about the remaining CD, ok to use 0 instead of sim.CurrentTime.
-		cdA := mcdm.majorCooldowns[i].GetRemainingCD(0, mcdm.character)
-		cdB := mcdm.majorCooldowns[j].GetRemainingCD(0, mcdm.character)
+		cdA := mcdm.majorCooldowns[i].ReadyAt()
+		cdB := mcdm.majorCooldowns[j].ReadyAt()
 		return cdA < cdB || (cdA == cdB && mcdm.majorCooldowns[i].Priority > mcdm.majorCooldowns[j].Priority)
 	})
 }
 
 // Add a major cooldown to the given agent, which provides a temporary boost to a single stat.
 // This is use for effects like Icon of the Silver Crescent and Bloodlust Brooch.
-func RegisterTemporaryStatsOnUseCD(agent Agent, auraID AuraID, tempStats stats.Stats, duration time.Duration, mcd MajorCooldown) {
-	// If shared cooldown ID is set but shared cooldown isn't, default to duration.
-	// Most items on a shared cooldown put each other on that cooldown for the
-	// duration of their active effect.
-	if mcd.SharedCooldownID != 0 && mcd.SharedCooldown == 0 {
-		mcd.SharedCooldown = duration
+func RegisterTemporaryStatsOnUseCD(character *Character, auraLabel string, tempStats stats.Stats, duration time.Duration, config SpellConfig) {
+	aura := character.NewTemporaryStatsAura(auraLabel, config.ActionID, tempStats, duration)
+
+	config.Cast.DisableCallbacks = true
+	config.ApplyEffects = func(sim *Simulation, _ *Target, _ *Spell) {
+		aura.Activate(sim)
 	}
+	spell := character.RegisterSpell(config)
 
-	mcd.CanActivate = func(sim *Simulation, character *Character) bool { return true }
-	mcd.ShouldActivate = func(sim *Simulation, character *Character) bool { return true }
-	mcd.Type = CooldownTypeDPS
-
-	mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
-		applier := agent.GetCharacter().NewTemporaryStatsAuraApplier(auraID, mcd.ActionID, tempStats, duration)
-		return func(sim *Simulation, character *Character) {
-			applier(sim)
-			character.SetCD(mcd.CooldownID, sim.CurrentTime+mcd.Cooldown)
-			if mcd.SharedCooldownID != 0 {
-				character.SetCD(mcd.SharedCooldownID, sim.CurrentTime+mcd.SharedCooldown)
-			}
-		}
-	}
-
-	agent.GetCharacter().AddMajorCooldown(mcd)
+	character.AddMajorCooldown(MajorCooldown{
+		Spell: spell,
+		Type:  CooldownTypeDPS,
+	})
 }
 
 // Helper function to make an ApplyEffect for a temporary stats on-use cooldown.
-func MakeTemporaryStatsOnUseCDRegistration(auraID AuraID, tempStats stats.Stats, duration time.Duration, mcd MajorCooldown) ApplyEffect {
+func MakeTemporaryStatsOnUseCDRegistration(auraLabel string, tempStats stats.Stats, duration time.Duration, config SpellConfig, cdFunc func(*Character) Cooldown, sharedCDFunc func(*Character) Cooldown) ApplyEffect {
 	return func(agent Agent) {
-		RegisterTemporaryStatsOnUseCD(agent, auraID, tempStats, duration, mcd)
+		character := agent.GetCharacter()
+		if cdFunc != nil {
+			config.Cast.CD = cdFunc(character)
+		}
+		if sharedCDFunc != nil {
+			config.Cast.SharedCD = sharedCDFunc(character)
+		}
+		RegisterTemporaryStatsOnUseCD(character, auraLabel, tempStats, duration, config)
 	}
 }

@@ -78,3 +78,30 @@ message BalanceDruid {
   }
   Options options = 3;
 }
+
+message FeralDruid {
+  message Rotation {
+    enum FinishingMove {
+	Rip = 0;
+	Bite = 1;
+	None = 2;
+    }
+
+    FinishingMove finishing_move = 1;
+    bool mangle_trick = 2;
+    bool biteweave = 3;
+    bool mangle_bot = 4;
+    int32 rip_cp = 5;
+    int32 bite_cp = 6;
+    bool rake_trick = 7;
+    bool ripweave = 8;
+  }
+  Rotation rotation = 1;
+  DruidTalents talents = 2;
+
+  message Options {
+    RaidTarget innervate_target = 1;
+    int32 latency_ms = 2;
+  }
+  Options options = 3;
+}

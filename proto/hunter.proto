@@ -42,6 +42,7 @@ message HunterTalents {
 	int32 monster_slaying = 30;
 	int32 humanoid_slaying = 31;
 	int32 savage_strikes = 32;
+	int32 deflection = 46;
 	int32 clever_traps = 33;
 	int32 survivalist = 34;
 	int32 trap_mastery = 35;
@@ -82,10 +83,6 @@ message Hunter {
 					WeaveFull = 3;
 			}
 			WeaveType weave = 11;
-
-			// Deprecate these options on 3/14 (1 month).
-			bool melee_weave = 4;
-			bool use_raptor_strike = 8;
 
 			// Time in milliseconds from when the hunter starts moving to when they reengage their ranged autos.
 			int32 time_to_weave_ms = 9;

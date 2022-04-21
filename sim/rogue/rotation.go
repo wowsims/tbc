@@ -59,14 +59,14 @@ func (rogue *Rogue) doPlanSliceASAP(sim *core.Simulation) {
 	energy := rogue.CurrentEnergy()
 	comboPoints := rogue.ComboPoints()
 	target := sim.GetPrimaryTarget()
-	sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
+	sndTimeRemaining := rogue.SliceAndDiceAura.RemainingDuration(sim)
 
 	if comboPoints > 0 {
 		if energy >= SliceAndDiceEnergyCost || rogue.deathmantle4pcProc {
 			if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
 				return
 			}
-			rogue.castSliceAndDice()
+			rogue.SliceAndDice.Cast(sim, nil)
 			if rogue.disabledMCDs != nil {
 				rogue.EnableAllCooldowns(rogue.disabledMCDs)
 				rogue.disabledMCDs = nil
@@ -76,7 +76,7 @@ func (rogue *Rogue) doPlanSliceASAP(sim *core.Simulation) {
 		return
 	} else {
 		if energy >= rogue.builderEnergyCost {
-			rogue.newBuilder(sim, target).Cast(sim)
+			rogue.CastBuilder(sim, target)
 		}
 	}
 }
@@ -92,7 +92,7 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 	energy := rogue.CurrentEnergy()
 	comboPoints := rogue.ComboPoints()
 	target := sim.GetPrimaryTarget()
-	sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
+	sndTimeRemaining := rogue.SliceAndDiceAura.RemainingDuration(sim)
 
 	remainingSimDuration := sim.GetRemainingDuration()
 	if rogue.sliceAndDiceDurations[comboPoints] >= remainingSimDuration {
@@ -100,7 +100,7 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 			if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
 				return
 			}
-			rogue.castSliceAndDice()
+			rogue.SliceAndDice.Cast(sim, nil)
 			rogue.plan = PlanNone
 		}
 		return
@@ -108,14 +108,14 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 
 	if sndTimeRemaining <= time.Second && comboPoints > 0 {
 		if energy >= SliceAndDiceEnergyCost || rogue.deathmantle4pcProc {
-			rogue.castSliceAndDice()
+			rogue.SliceAndDice.Cast(sim, nil)
 			rogue.plan = PlanNone
 		}
 		return
 	}
 
 	if rogue.MaintainingExpose(target) {
-		eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
+		eaTimeRemaining := rogue.ExposeArmorAura.RemainingDuration(sim)
 		if rogue.eaBuildTime+buildTimeBuffer > eaTimeRemaining {
 			// Cast our slice and start prepping for EA.
 			if comboPoints == 0 {
@@ -127,7 +127,7 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 				if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
 					return
 				}
-				rogue.castSliceAndDice()
+				rogue.SliceAndDice.Cast(sim, nil)
 				rogue.plan = PlanExposeArmor
 				return
 			}
@@ -137,12 +137,12 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 					if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
 						return
 					}
-					rogue.castSliceAndDice()
+					rogue.SliceAndDice.Cast(sim, nil)
 					rogue.plan = PlanFillBeforeEA
 					return
 				}
 			} else if energy >= rogue.builderEnergyCost {
-				rogue.newBuilder(sim, target).Cast(sim)
+				rogue.CastBuilder(sim, target)
 			}
 		}
 	} else {
@@ -151,12 +151,12 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 				if rogue.canPoolEnergy(sim, energy) && sndTimeRemaining > time.Second*2 {
 					return
 				}
-				rogue.castSliceAndDice()
+				rogue.SliceAndDice.Cast(sim, nil)
 				rogue.plan = PlanFillBeforeSND
 				return
 			}
 		} else if energy >= rogue.builderEnergyCost {
-			rogue.newBuilder(sim, target).Cast(sim)
+			rogue.CastBuilder(sim, target)
 		}
 	}
 }
@@ -175,17 +175,17 @@ func (rogue *Rogue) doPlanExposeArmor(sim *core.Simulation) {
 
 	if comboPoints == 5 {
 		if energy >= ExposeArmorEnergyCost || rogue.deathmantle4pcProc {
-			eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
+			eaTimeRemaining := rogue.ExposeArmorAura.RemainingDuration(sim)
 			if rogue.canPoolEnergy(sim, energy) && eaTimeRemaining > time.Second*2 {
 				return
 			}
-			rogue.NewExposeArmor(sim, target).Cast(sim)
+			rogue.ExposeArmor.Cast(sim, target)
 			rogue.plan = PlanNone
 		}
 		return
 	} else {
 		if energy >= rogue.builderEnergyCost {
-			rogue.newBuilder(sim, target).Cast(sim)
+			rogue.CastBuilder(sim, target)
 		}
 	}
 }
@@ -195,7 +195,7 @@ func (rogue *Rogue) doPlanFillBeforeEA(sim *core.Simulation) {
 	energy := rogue.CurrentEnergy()
 	comboPoints := rogue.ComboPoints()
 	target := sim.GetPrimaryTarget()
-	eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
+	eaTimeRemaining := rogue.ExposeArmorAura.RemainingDuration(sim)
 
 	if rogue.eaBuildTime+buildTimeBuffer > eaTimeRemaining {
 		// Cast our finisher and start prepping for EA.
@@ -217,7 +217,7 @@ func (rogue *Rogue) doPlanFillBeforeEA(sim *core.Simulation) {
 		if comboPoints == 5 {
 			rogue.tryUseDamageFinisher(sim, energy, comboPoints)
 		} else if energy >= rogue.builderEnergyCost {
-			rogue.newBuilder(sim, target).Cast(sim)
+			rogue.CastBuilder(sim, target)
 		}
 	}
 }
@@ -227,7 +227,7 @@ func (rogue *Rogue) doPlanFillBeforeSND(sim *core.Simulation) {
 	energy := rogue.CurrentEnergy()
 	comboPoints := rogue.ComboPoints()
 	target := sim.GetPrimaryTarget()
-	sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
+	sndTimeRemaining := rogue.SliceAndDiceAura.RemainingDuration(sim)
 
 	if !rogue.doneSND && rogue.eaBuildTime+buildTimeBuffer > sndTimeRemaining {
 		// Cast our finisher and start prepping for SND.
@@ -249,7 +249,7 @@ func (rogue *Rogue) doPlanFillBeforeSND(sim *core.Simulation) {
 		if comboPoints == 5 || (comboPoints > 0 && sim.GetRemainingDuration() < time.Second*2) {
 			rogue.tryUseDamageFinisher(sim, energy, comboPoints)
 		} else if energy >= rogue.builderEnergyCost {
-			rogue.newBuilder(sim, target).Cast(sim)
+			rogue.CastBuilder(sim, target)
 		}
 	}
 }
@@ -267,12 +267,12 @@ func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 	if comboPoints == 0 {
 		// No option other than using a builder.
 		if energy >= rogue.builderEnergyCost {
-			rogue.newBuilder(sim, target).Cast(sim)
+			rogue.CastBuilder(sim, target)
 		}
 		return
 	}
 
-	sndTimeRemaining := rogue.RemainingAuraDuration(sim, SliceAndDiceAuraID)
+	sndTimeRemaining := rogue.SliceAndDiceAura.RemainingDuration(sim)
 
 	if !rogue.MaintainingExpose(target) {
 		if rogue.doneSND || sndTimeRemaining > rogue.eaBuildTime+buildTimeBuffer {
@@ -285,7 +285,7 @@ func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 		return
 	}
 
-	eaTimeRemaining := target.RemainingAuraDuration(sim, core.ExposeArmorDebuffID)
+	eaTimeRemaining := rogue.ExposeArmorAura.RemainingDuration(sim)
 	energyForEANext := rogue.builderEnergyCost*float64(5-comboPoints) + ExposeArmorEnergyCost
 	eaNextBuildTime := core.MaxDuration(0, time.Duration(((energyForEANext-energy)/rogue.energyPerSecondAvg)*float64(time.Second)))
 	spareTime := core.MaxDuration(0, eaTimeRemaining-eaNextBuildTime)
@@ -318,22 +318,22 @@ func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 }
 
 func (rogue *Rogue) canPoolEnergy(sim *core.Simulation, energy float64) bool {
-	return sim.GetRemainingDuration() >= time.Second*6 && energy <= 50 && (!rogue.HasAura(AdrenalineRushAuraID) || energy <= 30)
+	return sim.GetRemainingDuration() >= time.Second*6 && energy <= 50 && ((rogue.AdrenalineRushAura == nil || !rogue.AdrenalineRushAura.IsActive()) || energy <= 30)
 }
 
 func (rogue *Rogue) tryUseDamageFinisher(sim *core.Simulation, energy float64, comboPoints int32) bool {
 	if rogue.Rotation.UseRupture &&
-		!rogue.rupture.IsInUse() &&
+		!rogue.RuptureDot.IsActive() &&
 		sim.GetRemainingDuration() >= rogue.RuptureDuration(comboPoints) &&
-		(sim.GetNumTargets() == 1 || !rogue.HasAura(BladeFlurryAuraID)) {
+		(sim.GetNumTargets() == 1 || (rogue.BladeFlurryAura == nil || !rogue.BladeFlurryAura.IsActive())) {
 		if energy >= RuptureEnergyCost || rogue.deathmantle4pcProc {
-			rogue.NewRupture(sim, sim.GetPrimaryTarget()).Cast(sim)
+			rogue.Rupture.Cast(sim, sim.GetPrimaryTarget())
 		}
 		return true
 	}
 
 	if energy >= rogue.eviscerateEnergyCost || rogue.deathmantle4pcProc {
-		rogue.NewEviscerate(sim, sim.GetPrimaryTarget()).Cast(sim)
+		rogue.Eviscerate.Cast(sim, sim.GetPrimaryTarget())
 		return true
 	}
 	return false

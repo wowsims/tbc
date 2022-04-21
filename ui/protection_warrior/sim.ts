@@ -66,6 +66,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 			epReferenceStat: Stat.StatAttackPower,
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
+				Stat.StatHealth,
 				Stat.StatStamina,
 				Stat.StatStrength,
 				Stat.StatAgility,
@@ -171,6 +172,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 				IconInputs.SunderArmor,
 				IconInputs.ExposeArmor,
 				IconInputs.CurseOfRecklessness,
+				IconInputs.GiftOfArthas,
 			],
 			// Which options are selectable in the 'Consumes' section.
 			consumeOptions: {
@@ -213,6 +215,12 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					ProtectionWarriorInputs.ShoutPicker,
+					ProtectionWarriorInputs.PrecastShout,
+					ProtectionWarriorInputs.PrecastShoutWithSapphire,
+					ProtectionWarriorInputs.PrecastShoutWithT2,
+					OtherInputs.ExposeWeaknessUptime,
+					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
 				],
 			},

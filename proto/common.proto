@@ -7,6 +7,7 @@ enum Spec {
     SpecBalanceDruid = 0;
     SpecElementalShaman = 1;
     SpecEnhancementShaman = 9;
+    SpecFeralDruid = 12;
     SpecHunter = 8;
     SpecMage = 2;
     SpecRetributionPaladin = 3;
@@ -82,6 +83,13 @@ enum Stat {
 		StatDodge = 32;
 		StatParry = 33;
 		StatResilience = 34;
+		StatHealth = 35;
+    StatArcaneResistance = 36;
+    StatFireResistance = 37;
+    StatFrostResistance = 38;
+    StatNatureResistance = 39;
+    StatShadowResistance = 40;
+    StatFeralAttackPower = 41;
 }
 
 enum ItemType {
@@ -195,6 +203,7 @@ enum Drums {
 	DrumsUnknown = 0;
 	DrumsOfBattle = 1;
 	DrumsOfRestoration = 2;
+	DrumsOfWar = 3;
 }
 
 enum Explosive {
@@ -336,6 +345,9 @@ message PartyBuffs {
 		bool bs_solarian_sapphire = 28;
 		bool snapshot_bs_solarian_sapphire = 29;
 		bool snapshot_bs_t2 = 30;
+
+		// Mitigation buffs
+    TristateEffect commanding_shout = 32;
 }
 
 enum StrengthOfEarthType {
@@ -410,6 +422,7 @@ message Debuffs {
     bool winters_chill = 7;
 
     bool blood_frenzy = 8; // Blood Frenzy: +4% phy dmg
+    bool gift_of_arthas = 17; // Gift of Arthas: +8 phy dmg
     bool mangle = 16;
     TristateEffect expose_armor = 9; // Expose Armor (If you have a rogue):    5 points: 2050 armor / imp 5 points: 3075 armor
     TristateEffect faerie_fire = 10; // Faerie Fire: -610 armor / imp 3% hit

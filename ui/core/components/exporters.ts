@@ -189,12 +189,19 @@ class Individual70UEPExporter<SpecType extends Spec> extends Exporter {
 		[Stat.StatRage]: 'rage',
 		[Stat.StatArmor]: 'armor',
 		[Stat.StatRangedAttackPower]: 'rangedAttackPower',
+		[Stat.StatFeralAttackPower]: 'feralAttackPower',
 		[Stat.StatDefense]: 'defenseRating',
 		[Stat.StatBlock]: 'blockRating',
 		[Stat.StatBlockValue]: 'blockValue',
 		[Stat.StatDodge]: 'dodgeRating',
 		[Stat.StatParry]: 'parryRating',
 		[Stat.StatResilience]: 'resilienceRating',
+		[Stat.StatHealth]: 'health',
+		[Stat.StatArcaneResistance]: 'arcaneResistance',
+		[Stat.StatFireResistance]: 'fireResistance',
+		[Stat.StatFrostResistance]: 'frostResistance',
+		[Stat.StatNatureResistance]: 'natureResistance',
+		[Stat.StatShadowResistance]: 'shadowResistance',
 	}
 }
 
@@ -247,11 +254,18 @@ class IndividualPawnEPExporter<SpecType extends Spec> extends Exporter {
 		[Stat.StatRage]: 'Rage',
 		[Stat.StatArmor]: 'Armor',
 		[Stat.StatRangedAttackPower]: 'Rap',
+		[Stat.StatFeralAttackPower]: 'FeralAp',
 		[Stat.StatDefense]: 'DefenseRating',
 		[Stat.StatBlock]: 'BlockRating',
 		[Stat.StatBlockValue]: 'BlockValue',
 		[Stat.StatDodge]: 'DodgeRating',
 		[Stat.StatParry]: 'ParryRating',
 		[Stat.StatResilience]: 'ResilienceRating',
+		[Stat.StatHealth]: 'Health',
+		[Stat.StatArcaneResistance]: 'ArcaneResistance',
+		[Stat.StatFireResistance]: 'FireResistance',
+		[Stat.StatFrostResistance]: 'FrostResistance',
+		[Stat.StatNatureResistance]: 'NatureResistance',
+		[Stat.StatShadowResistance]: 'ShadowResistance',
 	}
 }

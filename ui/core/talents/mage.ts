@@ -53,7 +53,7 @@ export const mageTalentsConfig: TalentsConfig<Spec.SpecMage> = [
 				maxPoints: 2,
 			},
 			{
-				//fieldName: 'magicAbsorption'',
+				fieldName: 'magicAbsorption',
 				location: {
 					rowIdx: 1,
 					colIdx: 1,

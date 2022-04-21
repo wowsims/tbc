@@ -86,6 +86,7 @@ type Item struct {
 	Quality    proto.ItemQuality
 	Unique     bool
 	Ilvl       int32
+	SetName    string // Empty string if not part of a set.
 
 	GemSockets  []proto.GemColor
 	SocketBonus stats.Stats

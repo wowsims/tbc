@@ -1,6 +1,7 @@
 package priest
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -11,61 +12,56 @@ const SpellIDShadowWordPain int32 = 25368
 
 var ShadowWordPainActionID = core.ActionID{SpellID: SpellIDShadowWordPain}
 
-var ShadowWordPainDebuffID = core.NewDebuffID()
+func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
+	baseCost := 575.0
 
-func (priest *Priest) newShadowWordPainTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 575}
-	baseCast := core.Cast{
-		ActionID:            ShadowWordPainActionID,
-		Character:           &priest.Character,
-		OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-		SpellSchool:         core.SpellSchoolShadow,
-		BaseCost:            cost,
-		Cost:                cost,
-		CastTime:            0,
-		GCD:                 core.GCDDefault,
-	}
+	priest.ShadowWordPain = priest.RegisterSpell(core.SpellConfig{
+		ActionID:    ShadowWordPainActionID,
+		SpellSchool: core.SpellSchoolShadow,
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
+				GCD:  core.GCDDefault,
+			},
 		},
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:        6,
-			TickLength:           time.Second * 3,
-			TickBaseDamage:       1236 / 6,
-			TickSpellCoefficient: 0.183,
-			DebuffID:             ShadowWordPainDebuffID,
-		},
-	}
 
-	effect.DotInput.NumberOfTicks += int(priest.Talents.ImprovedShadowWordPain) // extra tick per point
-
-	if ItemSetAbsolution.CharacterHasSetBonus(&priest.Character, 2) { // Absolution 2p adds 1 extra tick to swp
-		effect.DotInput.NumberOfTicks += 1
-	}
-
-	priest.applyTalentsToShadowSpell(&baseCast, &effect)
-
-	return core.NewSimpleSpellTemplate(core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: baseCast,
-		},
-		Effect: effect,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
+			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
+			OutcomeApplier:      core.OutcomeFuncMagicHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					priest.ShadowWordPainDot.Apply(sim)
+				}
+			},
+		}),
 	})
-}
 
-func (priest *Priest) NewShadowWordPain(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	mf := &priest.SWPSpell
+	target := sim.GetPrimaryTarget()
+	priest.ShadowWordPainDot = core.NewDot(core.Dot{
+		Spell: priest.ShadowWordPain,
+		Aura: target.RegisterAura(core.Aura{
+			Label:    "ShadowWordPain-" + strconv.Itoa(int(priest.Index)),
+			ActionID: ShadowWordPainActionID,
+		}),
 
-	priest.swpCastTemplate.Apply(mf)
+		NumberOfTicks: 6 +
+			int(priest.Talents.ImprovedShadowWordPain) +
+			core.TernaryInt(ItemSetAbsolution.CharacterHasSetBonus(&priest.Character, 2), 1, 0),
+		TickLength: time.Second * 3,
 
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	mf.Effect.Target = target
-	mf.Init(sim)
-
-	return mf
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1 *
+				(1 + float64(priest.Talents.Darkness)*0.02) *
+				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1),
+			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
+			IsPeriodic:       true,
+			BaseDamage:       core.BaseDamageConfigMagicNoRoll(1236/6, 0.183),
+			OutcomeApplier:   core.OutcomeFuncTick(),
+		}),
+	})
 }

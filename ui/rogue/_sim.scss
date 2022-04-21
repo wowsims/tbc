@@ -6,7 +6,7 @@
 	--theme-color-background: #19190c;
 	--theme-color-background-raw: 25, 25, 12;
 	--theme-background-image: url('/tbc/assets/rogue_background.jpg');
-	--theme-background-opacity: 0.9;
+	--theme-background-opacity: 0.95;
 	--main-text-color: White;
 }
 
@@ -18,7 +18,7 @@
   grid-template-columns: repeat(6, 1fr);
 }
 .rogue-sim-ui .debuffs-section {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 
 // Rogue has a lot of EP stats, so make the text smaller so it fits vertically.

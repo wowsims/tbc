@@ -1,11 +1,11 @@
 character_stats_results: {
  key: "TestWarrior-CharacterStats-Default"
  value: {
-  final_stats: 514.69
-  final_stats: 306.79
-  final_stats: 570.7900000000001
-  final_stats: 104.39000000000001
-  final_stats: 86.79
+  final_stats: 513.7
+  final_stats: 305.8
+  final_stats: 569.8000000000001
+  final_stats: 103.4
+  final_stats: 85.80000000000001
   final_stats: 0
   final_stats: 0
   final_stats: 0
@@ -19,21 +19,28 @@ character_stats_results: {
   final_stats: 0
   final_stats: 0
   final_stats: 0
-  final_stats: 2400.068
+  final_stats: 2866.9740000000006
   final_stats: 159.31
-  final_stats: 756.0704
+  final_stats: 780.5791999999999
   final_stats: 0
   final_stats: 0
   final_stats: 20
   final_stats: 0
   final_stats: 0
   final_stats: 0
-  final_stats: 8441.58
+  final_stats: 8439.6
   final_stats: 770
   final_stats: 0
   final_stats: 0
-  final_stats: 25.734500000000004
-  final_stats: 193.51392830000003
+  final_stats: 25.685000000000002
+  final_stats: 207.08179100000004
+  final_stats: 0
+  final_stats: 0
+  final_stats: 9962
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
   final_stats: 0
   final_stats: 0
  }
@@ -41,696 +48,828 @@ character_stats_results: {
 dps_results: {
  key: "TestWarrior-AllItems-AbacusofViolentOdds-28288"
  value: {
-  dps: 498.70034649102115
+  dps: 946.5239588292778
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-AdamantineFigurine-27891"
+ value: {
+  dps: 910.6989720184638
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-AncientAqirArtifact-33830"
+ value: {
+  dps: 910.6989720184638
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-AshtongueTalismanofValor-32485"
+ value: {
+  dps: 923.4169531683245
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-BadgeofTenacity-32658"
  value: {
-  dps: 504.3308114711293
+  dps: 925.0609619176122
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-BadgeoftheSwarmguard-21670"
  value: {
-  dps: 506.5011492256507
+  dps: 926.3206175892253
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-BandoftheEternalChampion-29301"
  value: {
-  dps: 511.3176216893644
+  dps: 952.6273362052167
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-BandoftheEternalSage-29305"
  value: {
-  dps: 507.29467918786844
+  dps: 930.4583947612217
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Berserker'sCall-33831"
  value: {
-  dps: 537.8684181091867
+  dps: 961.1665122009425
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-BlackenedNaaruSliver-34427"
  value: {
-  dps: 531.7547906009194
+  dps: 970.0728001099639
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-BlackoutTruncheon-27901"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Bladefist'sBreadth-28041"
  value: {
-  dps: 490.3535829508152
+  dps: 934.3841163496049
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-BladeofUnquenchedThirst-31193"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 506.1727940556044
+  dps: 934.8649450109145
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Blinkstrike-31332"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-BoldArmor"
+ value: {
+  dps: 735.0460293048174
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-BracingEarthstormDiamond"
  value: {
-  dps: 500.0545548018357
+  dps: 925.4780531996809
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-BraidedEterniumChain-24114"
  value: {
-  dps: 519.0260260359217
+  dps: 951.7528066615803
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-BroochoftheImmortalKing-32534"
+ value: {
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-BrutalEarthstormDiamond"
  value: {
-  dps: 510.18564914138403
+  dps: 928.4153044686608
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-BurningRage"
+ value: {
+  dps: 857.1279781859491
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-ChaoticSkyfireDiamond"
  value: {
-  dps: 525.6490192163892
+  dps: 945.5063921340284
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-CloakofDarkness-33122"
  value: {
-  dps: 526.1992366133144
+  dps: 946.042490534167
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-Coren'sLuckyCoin-38289"
+ value: {
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-CoreofAr'kelos-29776"
  value: {
-  dps: 514.6719807553588
+  dps: 937.6334972351667
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 511.1445383599621
+  dps: 929.668927375735
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-Dabiri'sEnigma-30300"
+ value: {
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-DarkIronSmokingPipe-38290"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 524.183024009565
+  dps: 942.3570824593877
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-DarkmoonCard:Wrath-31857"
  value: {
-  dps: 506.7961723725723
+  dps: 922.1513829015404
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-DesolationBattlegear"
  value: {
-  dps: 389.0287544876815
+  dps: 771.1724742423678
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Despair-28573"
  value: {
-  dps: 424.65542975956674
+  dps: 754.890035176733
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-DestroyerArmor"
+ value: {
+  dps: 758.4551151530654
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-DestroyerBattlegear"
+ value: {
+  dps: 884.7111295838148
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-DestructiveSkyfireDiamond"
  value: {
-  dps: 500.0545548018357
+  dps: 925.4780531996809
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Devastation-30316"
  value: {
-  dps: 551.0574258932212
+  dps: 984.6599502450858
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-DoomplateBattlegear"
+ value: {
+  dps: 793.3616889308337
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Dragonstrike-28439"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 510.75530494660876
- }
-}
-dps_results: {
- key: "TestWarrior-AllItems-EbonNetherscale"
- value: {
-  dps: 465.65608977606314
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-EmberSkyfireDiamond"
  value: {
-  dps: 500.0545548018357
+  dps: 925.4780531996809
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-EmptyMugofDirebrew-38287"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-EmpyreanDemolisher-17112"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-EnigmaticSkyfireDiamond"
  value: {
-  dps: 500.0545548018357
+  dps: 929.3443795372755
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-EssenceoftheMartyr-29376"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-EternalEarthstormDiamond"
  value: {
-  dps: 500.0545548018357
+  dps: 925.4780531996809
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-EyeofMagtheridon-28789"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
  }
 }
 dps_results: {
- key: "TestWarrior-AllItems-Felstalker"
+ key: "TestWarrior-AllItems-FaithinFelsteel"
  value: {
-  dps: 469.84747819031395
+  dps: 767.0848317426952
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-FelstalkerArmor"
+ value: {
+  dps: 884.666649274722
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Figurine-LivingRubySerpent-24126"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Figurine-NightseyePanther-24128"
  value: {
-  dps: 510.230912856115
+  dps: 941.4764932327093
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
-  dps: 521.4461974695006
+  dps: 951.8996334590119
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-FlameGuard"
+ value: {
+  dps: 726.6018912513987
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-GnomereganAuto-Blocker600-29387"
+ value: {
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-HandofJustice-11815"
  value: {
-  dps: 521.9586683450257
+  dps: 934.0776895931692
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Heartrazor-29962"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-HexShrunkenHead-33829"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-HourglassoftheUnraveller-28034"
  value: {
-  dps: 475.7777838910917
+  dps: 938.133699765454
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-IconofUnyieldingCourage-28121"
  value: {
-  dps: 537.8037288904721
+  dps: 930.5087097862865
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-IconoftheSilverCrescent-29370"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-ImbuedUnstableDiamond"
  value: {
-  dps: 500.0545548018357
+  dps: 925.4780531996809
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 500.0545548018357
+  dps: 925.4780531996809
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-KhoriumChampion-23541"
  value: {
-  dps: 389.85801214488606
+  dps: 744.0192577144268
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-KissoftheSpider-22954"
  value: {
-  dps: 497.3569795732555
+  dps: 939.9349064097592
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-LionheartChampion-28429"
  value: {
-  dps: 401.0452106781264
+  dps: 764.3136989033962
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 420.2827862055216
+  dps: 780.3963416881653
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-MadnessoftheBetrayer-32505"
  value: {
-  dps: 498.7984331196015
+  dps: 947.2478712987487
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Mana-EtchedRegalia"
  value: {
-  dps: 346.57984521525856
+  dps: 655.0072616705345
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-MarkoftheChampion-23206"
  value: {
-  dps: 506.9822137959322
+  dps: 943.8552821664493
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-MarkoftheChampion-23207"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-Moroes'LuckyPocketWatch-28528"
+ value: {
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 500.0545548018357
+  dps: 926.372583447085
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-NetherscaleArmor"
+ value: {
+  dps: 903.3812302506793
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-NetherstrikeArmor"
  value: {
-  dps: 426.59620656152316
+  dps: 823.6129886104691
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-OnslaughtArmor"
+ value: {
+  dps: 627.7116753867566
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-OnslaughtBattlegear"
+ value: {
+  dps: 967.8868692098021
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-PotentUnstableDiamond"
  value: {
-  dps: 513.8903742175823
+  dps: 928.342147677468
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-PowerfulEarthstormDiamond"
  value: {
-  dps: 500.0545548018357
+  dps: 925.4780531996809
  }
 }
 dps_results: {
- key: "TestWarrior-AllItems-Primalstrike"
+ key: "TestWarrior-AllItems-PrimalIntent"
  value: {
-  dps: 519.6880301730015
+  dps: 927.5266328652218
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Quagmirran'sEye-27683"
  value: {
-  dps: 504.3308114711293
+  dps: 909.5323024452346
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-RelentlessEarthstormDiamond"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-RobeoftheElderScribes-28602"
  value: {
-  dps: 486.86222387079596
+  dps: 897.0925056773739
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-RodoftheSunKing-29996"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 506.93715496964217
+  dps: 935.6100444664382
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-ScarabofDisplacement-30629"
+ value: {
+  dps: 904.1749330795578
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-SextantofUnstableCurrents-30626"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-ShadowmoonInsignia-32501"
+ value: {
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-ShardofContempt-34472"
  value: {
-  dps: 524.1072744499262
+  dps: 964.5021346904886
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-ShiftingNaaruSliver-34429"
  value: {
-  dps: 504.3308114711293
+  dps: 914.495452947883
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-SingingCrystalAxe-31318"
  value: {
-  dps: 395.03520015383674
+  dps: 740.1082104729794
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Slayer'sCrest-23041"
  value: {
-  dps: 517.3976261099588
+  dps: 939.4212803134224
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Sorcerer'sAlchemistStone-35749"
  value: {
-  dps: 504.3308114711293
- }
-}
-dps_results: {
- key: "TestWarrior-AllItems-SpellfireSet"
- value: {
-  dps: 441.16512121556843
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 429.0170150961086
+  dps: 796.6379910523177
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-StormGauntlets-12632"
  value: {
-  dps: 464.46237149926884
+  dps: 902.878758836254
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-StrengthoftheClefthoof"
+ value: {
+  dps: 801.0916981988229
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-SwiftSkyfireDiamond"
  value: {
-  dps: 513.8903742175823
+  dps: 928.342147677468
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-SwiftStarfireDiamond"
  value: {
-  dps: 500.0545548018357
+  dps: 925.4780531996809
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-SwiftWindfireDiamond"
  value: {
-  dps: 521.3245737231292
+  dps: 930.1095804630552
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-SyphonoftheNathrezim-32262"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-TenaciousEarthstormDiamond"
  value: {
-  dps: 500.0545548018357
+  dps: 925.4780531996809
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-TheBladefist-29348"
  value: {
-  dps: 469.4350240042147
+  dps: 913.5706815233217
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-TheDecapitator-28767"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-TheFistsofFury"
  value: {
-  dps: 504.50859489436357
+  dps: 939.3528545804985
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-TheLightningCapacitor-28785"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-TheNightBlade-31331"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-TheRestrainedEssenceofSapphiron-23046"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-TheSkullofGul'dan-32483"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-TheTwinBladesofAzzinoth"
  value: {
-  dps: 622.7620793726591
+  dps: 1049.0003967936782
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-TheTwinStars"
  value: {
-  dps: 481.7176403337999
+  dps: 906.7326496972087
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-ThunderingSkyfireDiamond"
  value: {
-  dps: 503.50233044325375
+  dps: 937.4525017346299
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 504.3308114711293
+  dps: 914.1147198563475
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-TsunamiTalisman-30627"
  value: {
-  dps: 494.96656651025677
+  dps: 949.701385167462
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-WarbringerArmor"
+ value: {
+  dps: 725.416613186381
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-WarbringerBattlegear"
+ value: {
+  dps: 843.0849569317916
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-WarpSlicer-30311"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-WastewalkerArmor"
  value: {
-  dps: 400.75656375639045
+  dps: 790.4629988007613
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-WindhawkArmor"
  value: {
-  dps: 426.59620656152316
+  dps: 823.6129886104691
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-WorldBreaker-30090"
  value: {
-  dps: 442.05375328802074
+  dps: 774.5623314047258
+ }
+}
+dps_results: {
+ key: "TestWarrior-AllItems-WrathofSpellfire"
+ value: {
+  dps: 807.9959710744656
  }
 }
 dps_results: {
  key: "TestWarrior-AllItems-Xi'ri'sGift-29179"
  value: {
-  dps: 504.3308114711293
+  dps: 910.6989720184638
  }
 }
 dps_results: {
  key: "TestWarrior-Average-Default"
  value: {
-  dps: 531.7553046825294
+  dps: 946.9465402644277
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Human-Fury P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 637.4869244405877
+  dps: 1358.9321308825886
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Human-Fury P1-Basic-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 529.1426182934024
+  dps: 945.2255375934176
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Human-Fury P1-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 436.18634061013705
+  dps: 821.7966106778804
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Human-Fury P1-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 624.1619811051759
+  dps: 1039.6394250276346
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Human-Fury P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 389.805328068984
+  dps: 1096.061904220461
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Human-Fury P1-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 332.9476099322607
+  dps: 761.6009624392483
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Human-Fury P1-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 292.7991006872161
+  dps: 659.901227416163
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Human-Fury P1-Basic-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 414.4087420760646
+  dps: 832.1913093718738
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Orc-Fury P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 603.9691448053657
+  dps: 1362.1328410686872
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Orc-Fury P1-Basic-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 510.75530494660876
+  dps: 951.2870847148142
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Orc-Fury P1-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 420.28709459052476
+  dps: 832.835827611381
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Orc-Fury P1-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 603.2390449266172
+  dps: 1058.1884804381077
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Orc-Fury P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 384.0012892106381
+  dps: 1108.7630208796556
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Orc-Fury P1-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 337.1840527948998
+  dps: 766.270941747342
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Orc-Fury P1-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 293.57176356139666
+  dps: 660.8931734292153
  }
 }
 dps_results: {
  key: "TestWarrior-Settings-Orc-Fury P1-Basic-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 408.93204104358483
+  dps: 848.9338476348173
  }
 }

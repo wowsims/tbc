@@ -8,6 +8,7 @@ import (
 )
 
 type Party struct {
+	Raid  *Raid
 	Index int
 
 	Players []Agent
@@ -18,8 +19,9 @@ type Party struct {
 	dpsMetrics DistributionMetrics
 }
 
-func NewParty(index int, partyConfig proto.Party) *Party {
+func NewParty(raid *Raid, index int, partyConfig proto.Party) *Party {
 	party := &Party{
+		Raid:       raid,
 		Index:      index,
 		dpsMetrics: NewDistributionMetrics(),
 	}
@@ -41,12 +43,6 @@ func (party *Party) IsFull() bool {
 	return party.Size() >= 5
 }
 
-func (party *Party) AddAura(sim *Simulation, aura Aura) {
-	for _, agent := range party.Players {
-		agent.GetCharacter().AddAura(sim, aura)
-	}
-}
-
 func (party *Party) AddStats(newStats stats.Stats) {
 	for _, agent := range party.Players {
 		agent.GetCharacter().AddStats(newStats)
@@ -62,7 +58,6 @@ func (party *Party) AddStat(stat stats.Stat, amount float64) {
 func (party *Party) reset(sim *Simulation) {
 	for _, agent := range party.Players {
 		agent.GetCharacter().reset(sim, agent)
-		agent.Reset(sim)
 
 		agent.GetCharacter().SetGCDTimer(sim, 0)
 		for _, petAgent := range agent.GetCharacter().Pets {
@@ -75,13 +70,13 @@ func (party *Party) reset(sim *Simulation) {
 	party.dpsMetrics.reset()
 }
 
-func (party *Party) doneIteration(simDuration time.Duration) {
+func (party *Party) doneIteration(sim *Simulation) {
 	for _, agent := range party.Players {
-		agent.GetCharacter().doneIteration(simDuration)
+		agent.GetCharacter().doneIteration(sim)
 		party.dpsMetrics.Total += agent.GetCharacter().Metrics.dps.Total
 	}
 
-	party.dpsMetrics.doneIteration(simDuration.Seconds())
+	party.dpsMetrics.doneIteration(sim.Duration.Seconds())
 }
 
 func (party *Party) GetMetrics(numIterations int32) *proto.PartyMetrics {
@@ -148,7 +143,7 @@ func NewRaid(raidConfig proto.Raid) *Raid {
 
 	for partyIndex, partyConfig := range raidConfig.Parties {
 		if partyConfig != nil {
-			raid.Parties = append(raid.Parties, NewParty(partyIndex, *partyConfig))
+			raid.Parties = append(raid.Parties, NewParty(raid, partyIndex, *partyConfig))
 		}
 	}
 
@@ -264,13 +259,13 @@ func (raid *Raid) reset(sim *Simulation) {
 	raid.dpsMetrics.reset()
 }
 
-func (raid *Raid) doneIteration(simDuration time.Duration) {
+func (raid *Raid) doneIteration(sim *Simulation) {
 	for _, party := range raid.Parties {
-		party.doneIteration(simDuration)
+		party.doneIteration(sim)
 		raid.dpsMetrics.Total += party.dpsMetrics.Total
 	}
 
-	raid.dpsMetrics.doneIteration(simDuration.Seconds())
+	raid.dpsMetrics.doneIteration(sim.Duration.Seconds())
 }
 
 func (raid *Raid) GetMetrics(numIterations int32) *proto.RaidMetrics {

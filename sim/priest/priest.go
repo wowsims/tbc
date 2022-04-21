@@ -13,38 +13,34 @@ type Priest struct {
 
 	SurgeOfLight bool
 
+	Latency float64
+
 	// cached cast stuff
 	// TODO: aoe multi-target situations will need multiple spells ticking for each target.
-	MindFlaySpell        core.SimpleSpell
-	mindflayCastTemplate core.SimpleSpellTemplate
+	DevouringPlague *core.Spell
+	HolyFire        *core.Spell
+	InnerFocus      *core.Spell
+	MindBlast       *core.Spell
+	MindFlay        []*core.Spell
+	ShadowWordDeath *core.Spell
+	ShadowWordPain  *core.Spell
+	Shadowfiend     *core.Spell
+	Smite           *core.Spell
+	Starshards      *core.Spell
+	VampiricTouch   *core.Spell
 
-	mindblastSpell        core.SimpleSpell
-	mindblastCastTemplate core.SimpleSpellTemplate
+	DevouringPlagueDot *core.Dot
+	HolyFireDot        *core.Dot
+	MindFlayDot        []*core.Dot
+	ShadowWordPainDot  *core.Dot
+	ShadowfiendDot     *core.Dot
+	StarshardsDot      *core.Dot
+	VampiricTouchDot   *core.Dot
 
-	swdSpell        core.SimpleSpell
-	swdCastTemplate core.SimpleSpellTemplate
-
-	SWPSpell        core.SimpleSpell
-	swpCastTemplate core.SimpleSpellTemplate
-
-	VTSpell        *core.SimpleSpell
-	VTSpellCasting *core.SimpleSpell
-	vtCastTemplate core.SimpleSpellTemplate
-
-	ShadowfiendSpell    core.SimpleSpell
-	shadowfiendTemplate core.SimpleSpellTemplate
-
-	DevouringPlagueSpell    core.SimpleSpell
-	devouringPlagueTemplate core.SimpleSpellTemplate
-
-	StarshardsSpell    core.SimpleSpell
-	starshardsTemplate core.SimpleSpellTemplate
-
-	smiteSpell        core.SimpleSpell
-	smiteCastTemplate core.SimpleSpellTemplate
-
-	holyFireSpell        core.SimpleSpell
-	holyFireCastTemplate core.SimpleSpellTemplate
+	InnerFocusAura       *core.Aura
+	MiseryAura           *core.Aura
+	ShadowWeavingAura    *core.Aura
+	SurgeOfLightProcAura *core.Aura
 }
 
 type SelfBuffs struct {
@@ -72,23 +68,38 @@ func (priest *Priest) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (priest *Priest) Init(sim *core.Simulation) {
-	priest.mindflayCastTemplate = priest.newMindflayTemplate(sim)
-	priest.mindblastCastTemplate = priest.newMindBlastTemplate(sim)
-	priest.swpCastTemplate = priest.newShadowWordPainTemplate(sim)
-	priest.vtCastTemplate = priest.newVampiricTouchTemplate(sim)
-	priest.swdCastTemplate = priest.newShadowWordDeathTemplate(sim)
-	priest.shadowfiendTemplate = priest.newShadowfiendTemplate(sim)
-	priest.devouringPlagueTemplate = priest.newDevouringPlagueTemplate(sim)
-	priest.starshardsTemplate = priest.newStarshardsTemplate(sim)
-	priest.smiteCastTemplate = priest.newSmiteTemplate(sim)
-	priest.holyFireCastTemplate = priest.newHolyFireTemplate(sim)
+	priest.registerDevouringPlagueSpell(sim)
+	priest.registerHolyFireSpell(sim)
+	priest.registerMindBlastSpell(sim)
+	priest.registerShadowWordDeathSpell(sim)
+	priest.registerShadowWordPainSpell(sim)
+	priest.registerShadowfiendSpell(sim)
+	priest.registerSmiteSpell(sim)
+	priest.registerStarshardsSpell(sim)
+	priest.registerVampiricTouchSpell(sim)
+
+	priest.MindFlay = []*core.Spell{
+		nil, // So we can use # of ticks as the index
+		priest.newMindFlaySpell(sim, 1),
+		priest.newMindFlaySpell(sim, 2),
+		priest.newMindFlaySpell(sim, 3),
+	}
+	priest.MindFlayDot = []*core.Dot{
+		nil, // So we can use # of ticks as the index
+		priest.newMindFlayDot(sim, 1),
+		priest.newMindFlayDot(sim, 2),
+		priest.newMindFlayDot(sim, 3),
+	}
+
+	if priest.Talents.Misery > 0 {
+		priest.MiseryAura = core.MiseryAura(sim.GetPrimaryTarget(), priest.Talents.Misery)
+	}
+	if priest.Talents.ShadowWeaving > 0 {
+		priest.ShadowWeavingAura = core.ShadowWeavingAura(sim.GetPrimaryTarget(), 0)
+	}
 }
 
 func (priest *Priest) Reset(newsim *core.Simulation) {
-	// These spells still need special cleanup because they're wierd.
-	priest.VTSpell = &core.SimpleSpell{}
-	priest.VTSpellCasting = &core.SimpleSpell{}
-
 }
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) *Priest {
@@ -107,15 +118,12 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) 
 		},
 	})
 
-	priest.registerShadowfiendCD()
-
-	priest.registerPowerInfusionCD()
-
 	return priest
 }
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassPriest}] = stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  39,
 		stats.Agility:   45,
 		stats.Stamina:   58,
@@ -125,6 +133,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassPriest}] = stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  41,
 		stats.Agility:   41,
 		stats.Stamina:   61,
@@ -134,6 +143,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassPriest}] = stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  36,
 		stats.Agility:   50,
 		stats.Stamina:   57,
@@ -143,6 +153,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassPriest}] = stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  40,
 		stats.Agility:   42,
 		stats.Stamina:   57,
@@ -152,6 +163,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceUndead, Class: proto.Class_ClassPriest}] = stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  38,
 		stats.Agility:   43,
 		stats.Stamina:   59,
@@ -161,6 +173,7 @@ func init() {
 		stats.SpellCrit: core.SpellCritRatingPerCritChance * 1.24,
 	}
 	trollStats := stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  40,
 		stats.Agility:   47,
 		stats.Stamina:   59,
@@ -172,6 +185,7 @@ func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassPriest}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassPriest}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassPriest}] = stats.Stats{
+		stats.Health:    3211,
 		stats.Strength:  36,
 		stats.Agility:   47,
 		stats.Stamina:   57,

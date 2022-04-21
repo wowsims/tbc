@@ -8,6 +8,8 @@ import (
 )
 
 func (shaman *Shaman) ApplyTalents() {
+	shaman.registerBloodlustCD()
+
 	if shaman.Talents.NaturesGuidance > 0 {
 		shaman.AddStat(stats.SpellHit, float64(shaman.Talents.NaturesGuidance)*1*core.SpellHitRatingPerHitChance)
 		shaman.AddStat(stats.MeleeHit, float64(shaman.Talents.NaturesGuidance)*1*core.MeleeHitRatingPerHitChance)
@@ -15,6 +17,22 @@ func (shaman *Shaman) ApplyTalents() {
 
 	if shaman.Talents.ThunderingStrikes > 0 {
 		shaman.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(shaman.Talents.ThunderingStrikes))
+	}
+
+	shaman.AddStat(stats.Dodge, core.DodgeRatingPerDodgeChance*1*float64(shaman.Talents.Anticipation))
+	shaman.AddStat(stats.Block, core.BlockRatingPerBlockChance*1*float64(shaman.Talents.ShieldSpecialization))
+	shaman.AddStat(stats.Armor, shaman.Equip.Stats()[stats.Armor]*0.02*float64(shaman.Talents.Toughness))
+	shaman.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + 0.02*float64(shaman.Talents.WeaponMastery)
+
+	if shaman.Talents.ShieldSpecialization > 0 {
+		bonus := 1 + 0.05*float64(shaman.Talents.ShieldSpecialization)
+		shaman.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.BlockValue,
+			ModifiedStat: stats.BlockValue,
+			Modifier: func(bv float64, _ float64) float64 {
+				return bv * bonus
+			},
+		})
 	}
 
 	if shaman.Talents.DualWieldSpecialization > 0 && shaman.HasOHWeapon() {
@@ -66,22 +84,18 @@ func (shaman *Shaman) ApplyTalents() {
 	}
 
 	if shaman.Talents.SpiritWeapons {
-		shaman.AutoAttacks.MHAuto.Effect.ThreatMultiplier *= 0.7
-		shaman.AutoAttacks.OHAuto.Effect.ThreatMultiplier *= 0.7
+		shaman.AutoAttacks.MHEffect.ThreatMultiplier *= 0.7
+		shaman.AutoAttacks.OHEffect.ThreatMultiplier *= 0.7
 	}
 
 	shaman.applyElementalDevastation()
 	shaman.applyFlurry()
 	shaman.applyShamanisticFocus()
-	shaman.applyWeaponMastery()
 	shaman.applyUnleashedRage()
 	shaman.registerElementalMasteryCD()
 	shaman.registerNaturesSwiftnessCD()
 	shaman.registerShamanisticRageCD()
 }
-
-var ElementalDevastationTalentAuraID = core.NewAuraID()
-var ElementalDevastationAuraID = core.NewAuraID()
 
 func (shaman *Shaman) applyElementalDevastation() {
 	if shaman.Talents.ElementalDevastation == 0 {
@@ -89,160 +103,127 @@ func (shaman *Shaman) applyElementalDevastation() {
 	}
 
 	critBonus := 3.0 * float64(shaman.Talents.ElementalDevastation) * core.SpellCritRatingPerCritChance
-	const dur = time.Second * 10
+	procAura := shaman.NewTemporaryStatsAura("Elemental Devastation Proc", core.ActionID{SpellID: 30160}, stats.Stats{stats.MeleeCrit: critBonus}, time.Second*10)
 
-	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		applyStatAura := shaman.NewTemporaryStatsAuraApplier(ElementalDevastationAuraID, core.ActionID{SpellID: 30160}, stats.Stats{stats.MeleeCrit: critBonus}, dur)
-		return core.Aura{
-			ID: ElementalDevastationTalentAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
-				if spellCast.IsPhantom {
-					return
-				}
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					return
-				}
-				applyStatAura(sim)
-			},
-		}
+	shaman.RegisterAura(core.Aura{
+		Label:    "Elemental Devastation",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+			if spellEffect.IsPhantom {
+				return
+			}
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				return
+			}
+			procAura.Activate(sim)
+		},
 	})
 }
-
-var ElementalMasteryAuraID = core.NewAuraID()
-var ElementalMasteryCooldownID = core.NewCooldownID()
 
 func (shaman *Shaman) registerElementalMasteryCD() {
 	if !shaman.Talents.ElementalMastery {
 		return
 	}
 	actionID := core.ActionID{SpellID: 16166}
+	cdTimer := shaman.NewTimer()
+	cd := time.Minute * 3
 
-	shaman.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: ElementalMasteryCooldownID,
-		Cooldown:   time.Minute * 3,
-		Type:       core.CooldownTypeDPS,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
+	shaman.ElementalMasteryAura = shaman.RegisterAura(core.Aura{
+		Label:    "Elemental Mastery",
+		ActionID: actionID,
+		Duration: core.NeverExpires,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			shaman.AddStat(stats.SpellCrit, 100*core.SpellCritRatingPerCritChance)
 		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			shaman.AddStat(stats.SpellCrit, -100*core.SpellCritRatingPerCritChance)
 		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				character.Metrics.AddInstantCast(actionID)
-
-				character.AddAura(sim, core.Aura{
-					ID:       ElementalMasteryAuraID,
-					ActionID: actionID,
-					Duration: core.NeverExpires,
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						if !cast.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
-							return
-						}
-						cast.Cost.Value = 0
-						cast.BonusCritRating = 100.0 * core.SpellCritRatingPerCritChance
-					},
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						if !cast.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
-							return
-						}
-						// Remove the buff and put skill on CD
-						character.SetCD(ElementalMasteryCooldownID, sim.CurrentTime+time.Minute*3)
-						character.RemoveAura(sim, ElementalMasteryAuraID)
-						character.UpdateMajorCooldowns()
-					},
-				})
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spell.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
+				return
 			}
+			// Remove the buff and put skill on CD
+			aura.Deactivate(sim)
+			cdTimer.Set(sim.CurrentTime + cd)
+			shaman.UpdateMajorCooldowns()
 		},
 	})
-}
 
-var NaturesSwiftnessAuraID = core.NewAuraID()
-var NaturesSwiftnessCooldownID = core.NewCooldownID()
+	spell := shaman.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+		Cast: core.CastConfig{
+			CD: core.Cooldown{
+				Timer:    cdTimer,
+				Duration: cd,
+			},
+			DisableCallbacks: true,
+		},
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			shaman.ElementalMasteryAura.Activate(sim)
+			shaman.ElementalMasteryAura.Prioritize()
+		},
+	})
+
+	shaman.AddMajorCooldown(core.MajorCooldown{
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
+	})
+}
 
 func (shaman *Shaman) registerNaturesSwiftnessCD() {
 	if !shaman.Talents.NaturesSwiftness {
 		return
 	}
 	actionID := core.ActionID{SpellID: 16188}
+	cdTimer := shaman.NewTimer()
+	cd := time.Minute * 3
+
+	shaman.NaturesSwiftnessAura = shaman.RegisterAura(core.Aura{
+		Label:    "Natures Swiftness",
+		ActionID: actionID,
+		Duration: core.NeverExpires,
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			if spell != shaman.LightningBolt {
+				return
+			}
+
+			// Remove the buff and put skill on CD
+			aura.Deactivate(sim)
+			cdTimer.Set(sim.CurrentTime + cd)
+			shaman.UpdateMajorCooldowns()
+		},
+	})
+
+	spell := shaman.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+		Cast: core.CastConfig{
+			CD: core.Cooldown{
+				Timer:    cdTimer,
+				Duration: cd,
+			},
+			DisableCallbacks: true,
+		},
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			shaman.NaturesSwiftnessAura.Activate(sim)
+		},
+	})
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: NaturesSwiftnessCooldownID,
-		Cooldown:   time.Minute * 3,
-		Type:       core.CooldownTypeDPS,
+		Spell: spell,
+		Type:  core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Don't use NS unless we're casting a full-length lightning bolt, which is
 			// the only spell shamans have with a cast longer than GCD.
-			if character.HasTemporarySpellCastSpeedIncrease() {
-				return false
-			}
-			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				character.AddAura(sim, core.Aura{
-					ID:       NaturesSwiftnessAuraID,
-					ActionID: actionID,
-					Duration: core.NeverExpires,
-					OnCast: func(sim *core.Simulation, cast *core.Cast) {
-						if cast.ActionID.SpellID != SpellIDLB12 {
-							return
-						}
-
-						cast.CastTime = 0
-					},
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						if cast.ActionID.SpellID != SpellIDLB12 {
-							return
-						}
-
-						// Remove the buff and put skill on CD
-						character.SetCD(NaturesSwiftnessCooldownID, sim.CurrentTime+time.Minute*3)
-						character.RemoveAura(sim, NaturesSwiftnessAuraID)
-						character.UpdateMajorCooldowns()
-						character.Metrics.AddInstantCast(actionID)
-					},
-				})
-			}
+			return !character.HasTemporarySpellCastSpeedIncrease()
 		},
 	})
 }
-
-var WeaponMasteryAuraID = core.NewAuraID()
-
-func (shaman *Shaman) applyWeaponMastery() {
-	if shaman.Talents.WeaponMastery == 0 {
-		return
-	}
-
-	multiplier := 1 + 0.02*float64(shaman.Talents.WeaponMastery)
-
-	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: WeaponMasteryAuraID,
-			OnBeforeSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-				if !spellCast.OutcomeRollCategory.Matches(core.OutcomeRollCategoryPhysical) {
-					return
-				}
-				if spellEffect.WeaponInput.DamageMultiplier == 0 {
-					return
-				}
-				spellEffect.DamageMultiplier *= multiplier
-			},
-		}
-	})
-}
-
-var UnleashedRageTalentAuraID = core.NewAuraID()
-var UnleashedRageProcAuraID = core.NewAuraID()
 
 func (shaman *Shaman) applyUnleashedRage() {
 	if shaman.Talents.UnleashedRage == 0 {
@@ -250,99 +231,95 @@ func (shaman *Shaman) applyUnleashedRage() {
 	}
 	level := shaman.Talents.UnleashedRage
 
-	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		bonusCoeff := 0.02 * float64(level)
+	bonusCoeff := 0.02 * float64(level)
+	var currentAPBonuses []float64
+	var urAuras []*core.Aura
 
-		currentAPBonuses := make([]float64, len(shaman.Party.PlayersAndPets))
-		currentAuras := make([]core.Aura, len(shaman.Party.PlayersAndPets))
-		return core.Aura{
-			ID: UnleashedRageTalentAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				// proc mask = 20 (melee auto & special)
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
-					return
-				}
-
-				for i, playerOrPet := range shaman.Party.PlayersAndPets {
-					char := playerOrPet.GetCharacter()
-					prevBonus := currentAPBonuses[i]
-					newBonus := (char.GetStat(stats.AttackPower) - prevBonus) * bonusCoeff
-
-					if prevBonus != newBonus {
-						buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: newBonus})
+	shaman.RegisterAura(core.Aura{
+		Label:    "Unleashed Rage",
+		Duration: core.NeverExpires,
+		OnInit: func(aura *core.Aura, sim *core.Simulation) {
+			urAuras = make([]*core.Aura, len(shaman.Party.PlayersAndPets))
+			for i, playerOrPet := range shaman.Party.PlayersAndPets {
+				char := playerOrPet.GetCharacter()
+				idx := i
+				urAuras[i] = char.GetOrRegisterAura(core.Aura{
+					Label:    "Unleahed Rage Proc",
+					ActionID: core.ActionID{SpellID: 30811},
+					Duration: time.Second * 10,
+					OnGain: func(aura *core.Aura, sim *core.Simulation) {
+						buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: currentAPBonuses[idx]})
+						char.AddStats(buffs)
+					},
+					OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+						buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: currentAPBonuses[idx]})
 						unbuffs := buffs.Multiply(-1)
+						char.AddStats(unbuffs)
+					},
+				})
+			}
+		},
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			currentAPBonuses = make([]float64, len(shaman.Party.PlayersAndPets))
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			// proc mask = 20 (melee auto & special)
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				return
+			}
 
-						currentAuras[i] = core.Aura{
-							ID:       UnleashedRageProcAuraID,
-							ActionID: core.ActionID{SpellID: 30811},
-							Duration: time.Second * 10,
-							OnGain: func(sim *core.Simulation) {
-								char.AddStats(buffs)
-							},
-							OnExpire: func(sim *core.Simulation) {
-								char.AddStats(unbuffs)
-							},
-						}
-						currentAPBonuses[i] = newBonus
-						if char.HasAura(UnleashedRageProcAuraID) {
-							char.RemoveAura(sim, UnleashedRageProcAuraID)
-						}
-						char.AddAura(sim, currentAuras[i])
-					} else if newBonus != 0 {
-						// If the bonus is the same, we can just update.
-						char.ReplaceAura(sim, currentAuras[i])
-					}
+			for i, playerOrPet := range shaman.Party.PlayersAndPets {
+				char := playerOrPet.GetCharacter()
+				prevBonus := currentAPBonuses[i]
+				newBonus := (char.GetStat(stats.AttackPower) - prevBonus) * bonusCoeff
+
+				if prevBonus != newBonus {
+					urAuras[i].Deactivate(sim)
+					currentAPBonuses[i] = newBonus
+					urAuras[i].Activate(sim)
+				} else if newBonus != 0 {
+					// If the bonus is the same, we can just refresh.
+					urAuras[i].Refresh(sim)
 				}
-			},
-		}
+			}
+		},
 	})
 }
-
-var ShamanisticFocusTalentAuraID = core.NewAuraID()
-var ShamanisticFocusAuraID = core.NewAuraID()
 
 func (shaman *Shaman) applyShamanisticFocus() {
 	if !shaman.Talents.ShamanisticFocus {
 		return
 	}
 
-	focusedAura := core.Aura{
-		ID:       ShamanisticFocusAuraID,
+	shaman.ShamanisticFocusAura = shaman.RegisterAura(core.Aura{
+		Label:    "Shamanistic Focus Proc",
 		ActionID: core.ActionID{SpellID: 43338},
 		Duration: core.NeverExpires,
-		OnCast: func(sim *core.Simulation, cast *core.Cast) {
-			// Shaman use spell extras agent reserved for shamanistic rage checking.
-			if !cast.SpellExtras.Matches(SpellFlagShock) {
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			if spell.SpellExtras.Matches(SpellFlagShock) {
+				aura.Deactivate(sim)
+			}
+		},
+	})
+
+	shaman.RegisterAura(core.Aura{
+		Label:    "Shamanistic Focus",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
-
-			cast.Cost.Value -= cast.BaseCost.Value * 0.6
-		},
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			if cast.IsSpellAction(SpellIDEarthShock) || cast.IsSpellAction(SpellIDFlameShock) || cast.IsSpellAction(SpellIDFrostShock) {
-				cast.Character.RemoveAura(sim, ShamanisticFocusAuraID)
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				return
 			}
+			shaman.ShamanisticFocusAura.Activate(sim)
 		},
-	}
-
-	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: ShamanisticFocusTalentAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
-					return
-				}
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					return
-				}
-				spellCast.Character.ReplaceAura(sim, focusedAura)
-			},
-		}
 	})
 }
-
-var FlurryTalentAuraID = core.NewAuraID()
-var FlurryProcAuraID = core.NewAuraID()
 
 func (shaman *Shaman) applyFlurry() {
 	if shaman.Talents.Flurry == 0 {
@@ -355,47 +332,47 @@ func (shaman *Shaman) applyFlurry() {
 	}
 	inverseBonus := 1 / bonus
 
-	shaman.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		flurryStacks := 0
-		icdDur := time.Millisecond * 500
-		var icd core.InternalCD
+	procAura := shaman.RegisterAura(core.Aura{
+		Label:     "Flurry Proc",
+		ActionID:  core.ActionID{SpellID: 16280},
+		Duration:  core.NeverExpires,
+		MaxStacks: 3,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			shaman.MultiplyMeleeSpeed(sim, bonus)
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			shaman.MultiplyMeleeSpeed(sim, inverseBonus)
+		},
+	})
 
-		return core.Aura{
-			ID: FlurryTalentAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
-					return
-				}
+	icd := core.Cooldown{
+		Timer:    shaman.NewTimer(),
+		Duration: time.Millisecond * 500,
+	}
 
-				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					if flurryStacks == 0 {
-						shaman.AddAura(sim, core.Aura{
-							ID:       FlurryProcAuraID,
-							ActionID: core.ActionID{SpellID: 16280},
-							Duration: core.NeverExpires,
-							OnGain: func(sim *core.Simulation) {
-								shaman.MultiplyMeleeSpeed(sim, bonus)
-							},
-							OnExpire: func(sim *core.Simulation) {
-								shaman.MultiplyMeleeSpeed(sim, inverseBonus)
-							},
-						})
-					}
-					icd = 0 // the "charge protection" ICD isn't up yet
-					flurryStacks = 3
-					return
-				}
+	shaman.RegisterAura(core.Aura{
+		Label:    "Flurry",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				return
+			}
 
-				// Remove a stack.
-				if flurryStacks > 0 && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) && !icd.IsOnCD(sim) {
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					flurryStacks--
-					if flurryStacks == 0 {
-						// RemoveAura will reset attack speed via OnExpire
-						shaman.RemoveAura(sim, FlurryProcAuraID)
-					}
-				}
-			},
-		}
+			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				procAura.Activate(sim)
+				procAura.SetStacks(sim, 3)
+				icd.Reset() // the "charge protection" ICD isn't up yet
+				return
+			}
+
+			// Remove a stack.
+			if procAura.IsActive() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) && icd.IsReady(sim) {
+				icd.Use(sim)
+				procAura.RemoveStack(sim)
+			}
+		},
 	})
 }

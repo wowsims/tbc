@@ -13,10 +13,9 @@ import (
 // class logic shares.
 // All players have stats, equipment, auras, etc
 type Character struct {
-	// Label for logging.
-	Name  string
-	Label string
+	Unit
 
+	Name  string // Different from Label, needed for returned results.
 	Race  proto.Race
 	Class proto.Class
 
@@ -35,11 +34,6 @@ type Character struct {
 	// Base stats for this Character.
 	baseStats stats.Stats
 
-	// Stats this Character will have at the very start of each Sim iteration.
-	// Includes all equipment / buffs / permanent effects but not temporary
-	// effects from items / abilities.
-	initialStats stats.Stats
-
 	// Cast speed without any temporary effects.
 	initialCastSpeed float64
 
@@ -52,9 +46,6 @@ type Character struct {
 	// Provides stat dependency management behavior.
 	stats.StatDependencyManager
 
-	// Provides aura tracking behavior.
-	auraTracker
-
 	// Provides major cooldown management behavior.
 	majorCooldownManager
 
@@ -63,20 +54,6 @@ type Character struct {
 
 	// This character's index within its party [0-4].
 	PartyIndex int
-
-	// This character's index within the raid [0-24].
-	RaidIndex int
-
-	// Whether Finalize() has been called yet for this Character.
-	// All fields above this may not be altered once finalized is set.
-	finalized bool
-
-	// Current stats, including temporary effects.
-	stats stats.Stats
-
-	// pseudoStats are modifiers that aren't directly a stat
-	initialPseudoStats stats.PseudoStats
-	PseudoStats        stats.PseudoStats
 
 	// Used for applying the effects of hardcast / channeled spells at a later time.
 	// By definition there can be only 1 hardcast spell being cast at any moment.
@@ -92,14 +69,10 @@ type Character struct {
 	// innervates / etc.
 	ExpectedBonusMana float64
 
-	// Statistics describing the results of the sim.
-	Metrics CharacterMetrics
-
 	// Hack for ensuring we don't apply windfury totem aura if there's already
 	// a MH imbue.
 	// TODO: Figure out a cleaner way to do this.
 	HasMHWeaponImbue bool
-	HasWFTotem       bool
 
 	// GCD-related PendingActions for this character.
 	gcdAction      *PendingAction
@@ -112,28 +85,37 @@ type Character struct {
 	// Cached mana return values per tick.
 	manaTickWhileCasting    float64
 	manaTickWhileNotCasting float64
+
+	defensiveTrinketCD *Timer
+	offensiveTrinketCD *Timer
+	conjuredCD         *Timer
 }
 
 func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 	character := Character{
+		Unit: Unit{
+			Type:        PlayerUnit,
+			Index:       int32(party.Index*5 + partyIndex),
+			Level:       CharacterLevel,
+			auraTracker: newAuraTracker(),
+			PseudoStats: stats.NewPseudoStats(),
+			Metrics:     NewCharacterMetrics(),
+		},
+
 		Name:  player.Name,
 		Race:  player.Race,
 		Class: player.Class,
 		Equip: items.ProtoToEquipment(*player.Equipment),
 
-		PseudoStats: stats.NewPseudoStats(),
-
 		Party:      party,
 		PartyIndex: partyIndex,
-		RaidIndex:  party.Index*5 + partyIndex,
 
-		auraTracker:          newAuraTracker(false),
 		majorCooldownManager: newMajorCooldownManager(player.Cooldowns),
-
-		Metrics: NewCharacterMetrics(),
 	}
 
-	character.Label = fmt.Sprintf("%s (#%d)", character.Name, character.RaidIndex+1)
+	character.GCD = character.NewTimer()
+
+	character.Label = fmt.Sprintf("%s (#%d)", character.Name, character.Index+1)
 
 	if player.Consumes != nil {
 		character.Consumes = *player.Consumes
@@ -155,16 +137,19 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 
 func (character *Character) addUniversalStatDependencies() {
 	character.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Stamina,
+		ModifiedStat: stats.Health,
+		Modifier: func(stamina float64, health float64) float64 {
+			return health + stamina*10
+		},
+	})
+	character.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.Armor,
 		Modifier: func(agility float64, armor float64) float64 {
 			return armor + agility*2
 		},
 	})
-}
-
-func (character *Character) Log(sim *Simulation, message string, vals ...interface{}) {
-	sim.Log("[%s] "+message, append([]interface{}{character.Label}, vals...)...)
 }
 
 func (character *Character) applyAllEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.PartyBuffs, individualBuffs proto.IndividualBuffs) {
@@ -208,7 +193,7 @@ func (character *Character) applyItemEffects(agent Agent) {
 }
 
 func (character *Character) AddPet(pet PetAgent) {
-	if character.finalized {
+	if character.Unit.finalized {
 		panic("Pets must be added before finalization!")
 	}
 
@@ -242,7 +227,7 @@ func (character *Character) AddStatsDynamic(sim *Simulation, stat stats.Stats) {
 	}
 }
 func (character *Character) AddStat(stat stats.Stat, amount float64) {
-	if character.finalized {
+	if character.Unit.finalized {
 		if stat == stats.Mana {
 			panic("Use AddMana!")
 		}
@@ -334,11 +319,15 @@ func (character *Character) InitialCastSpeed() float64 {
 }
 
 func (character *Character) SpellGCD() time.Duration {
-	return MinDuration(GCDMin, time.Duration(float64(GCDDefault)/character.CastSpeed()))
+	return MaxDuration(GCDMin, time.Duration(float64(GCDDefault)/character.CastSpeed()))
 }
 
 func (character *Character) CastSpeed() float64 {
 	return character.PseudoStats.CastSpeedMultiplier * (1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100)))
+}
+
+func (character *Character) ApplyCastSpeed(dur time.Duration) time.Duration {
+	return time.Duration(float64(dur) / character.CastSpeed())
 }
 
 func (character *Character) SwingSpeed() float64 {
@@ -413,26 +402,20 @@ func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (character *Character) Finalize(raid *Raid) {
-	if character.finalized {
+	if character.Unit.finalized {
 		return
 	}
-	character.finalized = true
 
-	// Make sure we dont accidentally set initial stats instead of stats.
-	if !character.initialStats.Equals(stats.Stats{}) {
-		panic("Initial stats may not be set before finalized!")
-	}
 	character.StatDependencyManager.Finalize()
 	character.stats = character.ApplyStatDependencies(character.stats)
 
+	character.Unit.finalize()
+
 	// All stats added up to this point are part of the 'initial' stats.
-	character.initialStats = character.stats
-	character.initialPseudoStats = character.PseudoStats
 	character.initialCastSpeed = character.CastSpeed()
 	character.initialMeleeSwingSpeed = character.SwingSpeed()
 	character.initialRangedSwingSpeed = character.RangedSwingSpeed()
 
-	character.auraTracker.finalize()
 	character.majorCooldownManager.finalize(character)
 
 	for _, petAgent := range character.Pets {
@@ -440,35 +423,35 @@ func (character *Character) Finalize(raid *Raid) {
 	}
 }
 
+func (character *Character) init(sim *Simulation, agent Agent) {
+	character.Unit.init(sim)
+	agent.Init(sim)
+}
+
 func (character *Character) reset(sim *Simulation, agent Agent) {
-	character.stats = character.initialStats
-	character.PseudoStats = character.initialPseudoStats
+	character.majorCooldownManager.reset(sim)
+	character.Unit.reset(sim)
+
 	character.ExpectedBonusMana = 0
 	character.UpdateManaRegenRates()
 
 	character.energyBar.reset(sim)
 	character.rageBar.reset(sim)
 
-	character.auraTracker.reset(sim)
-	character.majorCooldownManager.reset(sim)
 	character.AutoAttacks.reset(sim)
-	character.Metrics.reset()
 
 	for _, petAgent := range character.Pets {
 		petAgent.GetPet().reset(sim, petAgent)
-		petAgent.Reset(sim)
 	}
 
-	if character.gcdAction != nil {
-		sim.pendingActionPool.Put(character.gcdAction)
-	}
 	character.gcdAction = character.newGCDAction(sim, agent)
+
+	agent.Reset(sim)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
 func (character *Character) advance(sim *Simulation, elapsedTime time.Duration) {
-	// Advance CDs and Auras
-	character.auraTracker.advance(sim)
+	character.Unit.advance(sim, elapsedTime)
 
 	if character.Hardcast.Expires != 0 && character.Hardcast.Expires <= sim.CurrentTime {
 		character.Hardcast.Expires = 0
@@ -554,23 +537,20 @@ func (character *Character) GetWeaponHands(itemID int32) (bool, bool) {
 	return mh, oh
 }
 
-func (character *Character) doneIteration(simDuration time.Duration) {
+func (character *Character) doneIteration(sim *Simulation) {
 	// Need to do pets first so we can add their results to the owners.
 	if len(character.Pets) > 0 {
 		for _, petAgent := range character.Pets {
 			pet := petAgent.GetPet()
-			pet.doneIteration(simDuration)
+			pet.doneIteration(sim)
 			character.Metrics.AddFinalPetMetrics(&pet.Metrics)
 		}
 	}
 
-	if character.Hardcast.Cast != nil {
-		character.Hardcast.Cast.Cancel()
-		character.Hardcast = Hardcast{}
-	}
-	character.doneIterationGCD(simDuration)
-	character.Metrics.doneIteration(simDuration.Seconds())
-	character.auraTracker.doneIteration(simDuration)
+	character.Hardcast = Hardcast{}
+	character.doneIterationGCD(sim.Duration)
+
+	character.Unit.doneIteration(sim)
 }
 
 func (character *Character) GetStatsProto() *proto.PlayerStats {
@@ -619,3 +599,13 @@ var BaseStats = map[BaseStatsKey]stats.Stats{}
 // Base mana can be looked up here: https://wowwiki-archive.fandom.com/wiki/Base_mana
 
 // I assume a similar processes can be applied for other stats.
+
+func (character *Character) GetDefensiveTrinketCD() *Timer {
+	return character.GetOrInitTimer(&character.defensiveTrinketCD)
+}
+func (character *Character) GetOffensiveTrinketCD() *Timer {
+	return character.GetOrInitTimer(&character.offensiveTrinketCD)
+}
+func (character *Character) GetConjuredCD() *Timer {
+	return character.GetOrInitTimer(&character.conjuredCD)
+}

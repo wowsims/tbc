@@ -1,68 +1,78 @@
 package rogue
 
 import (
-	"github.com/wowsims/tbc/sim/core/stats"
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var RuptureActionID = core.ActionID{SpellID: 26867}
-var RuptureDebuffID = core.NewDebuffID()
 var RuptureEnergyCost = 25.0
 
-func (rogue *Rogue) newRuptureTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
-	ability := rogue.newAbility(RuptureActionID, RuptureEnergyCost, SpellFlagFinisher|core.SpellExtrasBinary, core.ProcMaskMeleeMHSpecial)
-	ability.SpellCast.Cast.CritRollCategory = core.CritRollCategoryNone
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-		if spellEffect.Landed() {
-			rogue.ApplyFinisher(sim, spellCast.ActionID)
-		} else {
-			if refundAmount > 0 {
-				rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
-			}
-		}
-	}
-	ability.Effect.DotInput = core.DotDamageInput{
-		NumberOfTicks:  0, // Set dynamically.
-		TickLength:     time.Second * 2,
-		TickBaseDamage: 0, // Set dynamically.
-		DebuffID:       RuptureDebuffID,
-	}
+	rogue.Rupture = rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    RuptureActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasIgnoreResists | rogue.finisherFlags(),
 
-	ability.Effect.StaticDamageMultiplier += 0.1 * float64(rogue.Talents.SerratedBlades)
-	if rogue.Talents.SurpriseAttacks {
-		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
-	}
+		ResourceType: stats.Energy,
+		BaseCost:     RuptureEnergyCost,
 
-	return core.NewSimpleSpellTemplate(ability)
-}
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: RuptureEnergyCost,
+				GCD:  time.Second,
+			},
+			ModifyCast:  rogue.applyDeathmantle,
+			IgnoreHaste: true,
+		},
 
-func (rogue *Rogue) NewRupture(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	comboPoints := rogue.ComboPoints()
-	if comboPoints == 0 {
-		panic("Rupture requires combo points!")
-	}
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					rogue.RuptureDot.NumberOfTicks = int(rogue.ComboPoints()) + 3
+					rogue.RuptureDot.RecomputeAuraDuration()
+					rogue.RuptureDot.Apply(sim)
+					rogue.ApplyFinisher(sim, spell.ActionID)
+				} else {
+					if refundAmount > 0 {
+						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, core.ActionID{SpellID: 31245})
+					}
+				}
+			},
+		}),
+	})
 
-	rp := &rogue.rupture
-	rogue.ruptureTemplate.Apply(rp)
+	target := sim.GetPrimaryTarget()
+	rogue.RuptureDot = core.NewDot(core.Dot{
+		Spell: rogue.Rupture,
+		Aura: target.RegisterAura(core.Aura{
+			Label:    "Rupture-" + strconv.Itoa(int(rogue.Index)),
+			ActionID: RuptureActionID,
+		}),
+		NumberOfTicks: 0, // Set dynamically
+		TickLength:    time.Second * 2,
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1 + 0.1*float64(rogue.Talents.SerratedBlades),
+			ThreatMultiplier: 1,
+			IsPeriodic:       true,
+			BaseDamage: core.BuildBaseDamageConfig(func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+				comboPoints := rogue.ComboPoints()
+				attackPower := hitEffect.MeleeAttackPower(spell.Character) + hitEffect.MeleeAttackPowerOnTarget()
 
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	rp.ActionID.Tag = comboPoints
-	rp.Effect.Target = target
-	rp.Effect.DotInput.NumberOfTicks = int(comboPoints) + 3
-	// TODO: this is missing BonusAttackPower for snapshotting
-	rp.Effect.DotInput.TickBaseDamage = 70 + float64(comboPoints)*11 + rogue.GetStat(stats.AttackPower)*[]float64{0.01, 0.02, 0.03, 0.03, 0.03}[comboPoints-1]
-
-	if rogue.deathmantle4pcProc {
-		rp.Cost.Value = 0
-		rogue.deathmantle4pcProc = false
-	}
-
-	rp.Init(sim)
-	return rp
+				return 70 + float64(comboPoints)*11 + attackPower*[]float64{0.01, 0.02, 0.03, 0.03, 0.03}[comboPoints-1]
+			}, 0),
+			OutcomeApplier: core.OutcomeFuncTick(),
+		}),
+	})
 }
 
 func (rogue *Rogue) RuptureDuration(comboPoints int32) time.Duration {

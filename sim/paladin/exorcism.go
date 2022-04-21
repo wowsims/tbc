@@ -8,58 +8,40 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ExorcismCD = core.NewCooldownID()
-var ExorcismActionID = core.ActionID{SpellID: 10314, CooldownID: ExorcismCD}
+var ExorcismActionID = core.ActionID{SpellID: 10314}
 
-func (paladin *Paladin) newExorcismTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	exo := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            ExorcismActionID,
-				Character:           &paladin.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolHoly,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 295,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 295,
-				},
-				Cooldown:       time.Second * 15,
-				CritMultiplier: paladin.SpellCritMultiplier(1, 0.25), // look up crit multiplier in the future
+func (paladin *Paladin) registerExorcismSpell(sim *core.Simulation) {
+	baseCost := 295.0
+
+	paladin.Exorcism = paladin.RegisterSpell(core.SpellConfig{
+		ActionID:    ExorcismActionID,
+		SpellSchool: core.SpellSchoolHoly,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+			},
+			CD: core.Cooldown{
+				Timer:    paladin.NewTimer(),
+				Duration: time.Second * 15,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    521,
-				MaxBaseDamage:    579,
-				SpellCoefficient: 1,
-			},
-		},
-	}
 
-	return core.NewSimpleSpellTemplate(exo)
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage: core.BaseDamageConfigMagic(521, 579, 1),
+			// look up crit multiplier in the future
+			// TODO: What is this 0.25?
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(paladin.SpellCritMultiplier(1, 0.25)),
+		}),
+	})
 }
 
-func (paladin *Paladin) NewExorcism(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	if target.MobType != proto.MobType_MobTypeUndead && target.MobType != proto.MobType_MobTypeDemon {
-		return nil
-	}
-
-	exo := &paladin.exorcismSpell
-	paladin.exorcismTemplate.Apply(exo)
-
-	exo.Effect.Target = target
-
-	exo.Init(sim)
-
-	return exo
+func (paladin *Paladin) CanExorcism(target *core.Target) bool {
+	return target.MobType == proto.MobType_MobTypeUndead || target.MobType == proto.MobType_MobTypeDemon
 }

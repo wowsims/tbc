@@ -27,10 +27,7 @@ type PetAbility struct {
 	// Focus cost
 	Cost float64
 
-	// 0 if no cooldown
-	Cooldown time.Duration
-
-	CooldownID core.CooldownID
+	CD core.Cooldown
 
 	Cast func(target *core.Target)
 }
@@ -40,7 +37,7 @@ func (ability *PetAbility) TryCast(sim *core.Simulation, target *core.Target, hp
 	if hp.currentFocus < ability.Cost {
 		return false
 	}
-	if ability.Cooldown != 0 && hp.IsOnCD(ability.CooldownID, sim.CurrentTime) {
+	if ability.CD.Duration != 0 && !ability.CD.IsReady(sim) {
 		return false
 	}
 
@@ -73,258 +70,193 @@ func (hp *HunterPet) NewPetAbility(sim *core.Simulation, abilityType PetAbilityT
 	return PetAbility{}
 }
 
-var PetPrimaryCooldownID = core.NewCooldownID()
-var PetSecondaryCooldownID = core.NewCooldownID()
-
 func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
-	cooldown := time.Second * 10
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 27050},
-				Character:           &hp.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				Cooldown:            cooldown,
-				GCD:                 core.GCDDefault,
-				IgnoreHaste:         true,
-				CritMultiplier:      2,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 108,
-				MaxBaseDamage: 132,
-			},
-		},
+	actionID := core.ActionID{SpellID: 27050}
+	cd := core.Cooldown{
+		Timer:    hp.NewTimer(),
+		Duration: time.Second * 10,
 	}
 
 	pa := PetAbility{
+		ActionID: actionID,
 		Type:     Bite,
 		Cost:     35,
-		Cooldown: cooldown,
+		CD:       cd,
 	}
 
-	if isPrimary {
-		ama.ActionID.CooldownID = PetPrimaryCooldownID
-		pa.CooldownID = PetPrimaryCooldownID
-	} else {
-		ama.ActionID.CooldownID = PetSecondaryCooldownID
-		pa.CooldownID = PetSecondaryCooldownID
-	}
-	pa.ActionID = ama.ActionID
+	spell := hp.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
 
-	template := core.NewSimpleSpellTemplate(ama)
-	cast := core.SimpleSpell{}
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				GCD: core.GCDDefault,
+			},
+			IgnoreHaste: true,
+			CD:          cd,
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigRoll(108, 132),
+			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(2),
+		}),
+	})
 
 	pa.Cast = func(target *core.Target) {
-		template.Apply(&cast)
-
-		// Set dynamic fields, i.e. the stuff we couldn't precompute.
-		cast.Effect.Target = target
-
-		cast.Cast(sim)
+		spell.Cast(sim, target)
 	}
 	return pa
 }
 
 func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 27049},
-				Character:           &hp.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				IgnoreHaste:         true,
-				CritMultiplier:      2,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 54,
-				MaxBaseDamage: 76,
-			},
-		},
-	}
-
+	actionID := core.ActionID{SpellID: 27049}
 	pa := PetAbility{
-		Type: Claw,
-		Cost: 25,
+		ActionID: actionID,
+		Type:     Claw,
+		Cost:     25,
 	}
-	pa.ActionID = ama.ActionID
 
-	template := core.NewSimpleSpellTemplate(ama)
-	cast := core.SimpleSpell{}
+	spell := hp.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				GCD: core.GCDDefault,
+			},
+			IgnoreHaste: true,
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigRoll(54, 76),
+			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(2),
+		}),
+	})
 
 	pa.Cast = func(target *core.Target) {
-		template.Apply(&cast)
-
-		// Set dynamic fields, i.e. the stuff we couldn't precompute.
-		cast.Effect.Target = target
-
-		cast.Cast(sim)
+		spell.Cast(sim, target)
 	}
 	return pa
 }
 
 func (hp *HunterPet) newGore(sim *core.Simulation, isPrimary bool) PetAbility {
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 35298},
-				Character:           &hp.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				IgnoreHaste:         true,
-				CritMultiplier:      2,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 37,
-				MaxBaseDamage: 61,
-			},
-		},
-	}
+	actionID := core.ActionID{SpellID: 35298}
 
 	pa := PetAbility{
-		Type: Gore,
-		Cost: 25,
+		ActionID: actionID,
+		Type:     Gore,
+		Cost:     25,
 	}
-	pa.ActionID = ama.ActionID
 
-	template := core.NewSimpleSpellTemplate(ama)
-	cast := core.SimpleSpell{}
+	spell := hp.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				GCD: core.GCDDefault,
+			},
+			IgnoreHaste: true,
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage: core.WrapBaseDamageConfig(core.BaseDamageConfigRoll(37, 61), func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
+				return func(sim *core.Simulation, spellEffect *core.SpellEffect, spell *core.Spell) float64 {
+					damage := oldCalculator(sim, spellEffect, spell)
+					if sim.RandomFloat("Gore") < 0.5 {
+						damage *= 2
+					}
+					return damage
+				}
+			}),
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(2),
+		}),
+	})
 
 	pa.Cast = func(target *core.Target) {
-		template.Apply(&cast)
-
-		// Set dynamic fields, i.e. the stuff we couldn't precompute.
-		cast.Effect.Target = target
-		if sim.RandomFloat("Gore") < 0.5 {
-			cast.Effect.DamageMultiplier *= 2
-		}
-
-		cast.Cast(sim)
+		spell.Cast(sim, target)
 	}
 	return pa
 }
 
 func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) PetAbility {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 25011},
-				Character:           &hp.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolNature,
-				GCD:                 core.GCDDefault,
-				CritMultiplier:      1.5,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    80,
-				MaxBaseDamage:    93,
-				SpellCoefficient: 0.05,
-			},
-		},
-	}
+	actionID := core.ActionID{SpellID: 25011}
 
 	pa := PetAbility{
-		Type: LightningBreath,
-		Cost: 50,
+		ActionID: actionID,
+		Type:     LightningBreath,
+		Cost:     50,
 	}
-	pa.ActionID = spell.ActionID
 
-	template := core.NewSimpleSpellTemplate(spell)
-	cast := core.SimpleSpell{}
+	spell := hp.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolNature,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				GCD: core.GCDDefault,
+			},
+			IgnoreHaste: true,
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagic(80, 93, 0.05),
+			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(1.5),
+		}),
+	})
 
 	pa.Cast = func(target *core.Target) {
-		template.Apply(&cast)
-
-		// Set dynamic fields, i.e. the stuff we couldn't precompute.
-		cast.Effect.Target = target
-
-		cast.Init(sim)
-		cast.Cast(sim)
+		spell.Cast(sim, target)
 	}
 	return pa
 }
 
 func (hp *HunterPet) newScreech(sim *core.Simulation, isPrimary bool) PetAbility {
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: 27051},
-				Character:           &hp.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				CritMultiplier:      2,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage: 33,
-				MaxBaseDamage: 61,
-			},
-		},
-	}
+	actionID := core.ActionID{SpellID: 27051}
 
 	pa := PetAbility{
-		Type: Screech,
-		Cost: 20,
+		ActionID: actionID,
+		Type:     Screech,
+		Cost:     20,
 	}
-	pa.ActionID = ama.ActionID
 
-	template := core.NewSimpleSpellTemplate(ama)
-	cast := core.SimpleSpell{}
+	spell := hp.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				GCD: core.GCDDefault,
+			},
+			IgnoreHaste: true,
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigRoll(33, 61),
+			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(2),
+		}),
+	})
 
 	pa.Cast = func(target *core.Target) {
-		template.Apply(&cast)
-
-		// Set dynamic fields, i.e. the stuff we couldn't precompute.
-		cast.Effect.Target = target
-
-		cast.Cast(sim)
+		spell.Cast(sim, target)
 	}
 	return pa
 }

@@ -12,43 +12,35 @@ func (rogue *Rogue) registerThistleTeaCD() {
 		return
 	}
 
-	actionID := core.ActionID{ItemID: 7676, CooldownID: core.ConjuredCooldownID}
+	actionID := core.ActionID{ItemID: 7676}
 
 	const energyRegen = 40.0
-	cooldown := time.Minute * 5
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: rogue.GetCharacter(),
-			Cooldown:  cooldown,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				rogue.AddEnergy(sim, energyRegen, actionID)
+	thistleTeaSpell := rogue.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		Cast: core.CastConfig{
+			CD: core.Cooldown{
+				Timer:    rogue.NewTimer(),
+				Duration: time.Minute * 5,
+			},
+			SharedCD: core.Cooldown{
+				Timer:    rogue.GetConjuredCD(),
+				Duration: time.Minute * 2,
 			},
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			rogue.AddEnergy(sim, energyRegen, actionID)
+		},
+	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: core.ConjuredCooldownID,
-		Cooldown:   cooldown,
-		Type:       core.CooldownTypeDPS,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
+		Spell: thistleTeaSpell,
+		Type:  core.CooldownTypeDPS,
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Make sure we have plenty of room so we dont energy cap right after using.
-			if rogue.CurrentEnergy() > 40 {
-				return false
-			}
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
-			}
+			return rogue.CurrentEnergy() <= 40
 		},
 	})
 }

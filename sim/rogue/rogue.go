@@ -26,8 +26,9 @@ func RegisterRogue() {
 }
 
 const (
-	SpellFlagBuilder  = core.SpellExtrasAgentReserved1
-	SpellFlagFinisher = core.SpellExtrasAgentReserved2
+	SpellFlagRogueAbility = core.SpellExtrasAgentReserved1
+	SpellFlagBuilder      = core.SpellExtrasAgentReserved1 | core.SpellExtrasAgentReserved2
+	SpellFlagFinisher     = core.SpellExtrasAgentReserved1 | core.SpellExtrasAgentReserved3
 )
 
 type Rogue struct {
@@ -53,50 +54,33 @@ type Rogue struct {
 
 	shivEnergyCost    float64
 	builderEnergyCost float64
-	newBuilder        func(sim *core.Simulation, target *core.Target) *core.SimpleSpell
-
-	sinisterStrikeTemplate core.SimpleSpellTemplate
-	sinisterStrike         core.SimpleSpell
-
-	backstabTemplate core.SimpleSpellTemplate
-	backstab         core.SimpleSpell
-
-	hemorrhageTemplate core.SimpleSpellTemplate
-	hemorrhage         core.SimpleSpell
-
-	mutilateTemplate core.SimpleSpellTemplate
-	mutilate         core.SimpleSpell
-
-	shivTemplate core.SimpleSpellTemplate
-	shiv         core.SimpleSpell
-
-	finishingMoveEffectApplier func(sim *core.Simulation, numPoints int32)
-
-	castSliceAndDice func()
+	CastBuilder       func(sim *core.Simulation, target *core.Target)
 
 	eviscerateEnergyCost float64
-	eviscerateTemplate   core.SimpleSpellTemplate
-	eviscerate           core.SimpleSpell
+	envenomEnergyCost    float64
 
-	envenomEnergyCost float64
-	envenomTemplate   core.SimpleSpellTemplate
-	envenom           core.SimpleSpell
+	Backstab       *core.Spell
+	DeadlyPoison   *core.Spell
+	Envenom        *core.Spell
+	Eviscerate     *core.Spell
+	ExposeArmor    *core.Spell
+	Hemorrhage     *core.Spell
+	InstantPoison  *core.Spell
+	Mutilate       *core.Spell
+	Rupture        *core.Spell
+	Shiv           *core.Spell
+	SinisterStrike *core.Spell
+	SliceAndDice   *core.Spell
 
-	exposeArmorTemplate core.SimpleSpellTemplate
-	exposeArmor         core.SimpleSpell
+	DeadlyPoisonDot *core.Dot
+	RuptureDot      *core.Dot
 
-	ruptureTemplate core.SimpleSpellTemplate
-	rupture         core.SimpleSpell
+	AdrenalineRushAura *core.Aura
+	BladeFlurryAura    *core.Aura
+	ExposeArmorAura    *core.Aura
+	SliceAndDiceAura   *core.Aura
 
-	deadlyPoisonStacks   int
-	deadlyPoisonTemplate core.SimpleSpellTemplate
-	deadlyPoison         core.SimpleSpell
-
-	deadlyPoisonRefreshTemplate core.SimpleSpellTemplate
-	deadlyPoisonRefresh         core.SimpleSpell
-
-	instantPoisonTemplate core.SimpleSpellTemplate
-	instantPoison         core.SimpleSpell
+	finishingMoveEffectApplier func(sim *core.Simulation, numPoints int32)
 }
 
 func (rogue *Rogue) GetCharacter() *core.Character {
@@ -115,38 +99,12 @@ func (rogue *Rogue) Finalize(raid *core.Raid) {
 	rogue.applyPoisons()
 }
 
-func (rogue *Rogue) newAbility(actionID core.ActionID, cost float64, spellExtras core.SpellExtras, procMask core.ProcMask) core.SimpleSpell {
-	return core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            actionID,
-				Character:           &rogue.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 time.Second,
-				IgnoreHaste:         true,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: cost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Energy,
-					Value: cost,
-				},
-				CritMultiplier: rogue.critMultiplier(procMask.Matches(core.ProcMaskMeleeMH), spellExtras.Matches(SpellFlagBuilder)),
-				SpellExtras:    spellExtras,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               procMask,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-		},
+func (rogue *Rogue) finisherFlags() core.SpellExtras {
+	flags := SpellFlagFinisher
+	if rogue.Talents.SurpriseAttacks {
+		flags |= core.SpellExtrasCannotBeDodged
 	}
+	return flags
 }
 
 func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) {
@@ -156,22 +114,19 @@ func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) 
 }
 
 func (rogue *Rogue) Init(sim *core.Simulation) {
-	// Precompute all the spell templates.
-	rogue.sinisterStrikeTemplate = rogue.newSinisterStrikeTemplate(sim)
-	rogue.backstabTemplate = rogue.newBackstabTemplate(sim)
-	rogue.hemorrhageTemplate = rogue.newHemorrhageTemplate(sim)
-	rogue.mutilateTemplate = rogue.newMutilateTemplate(sim)
-	rogue.shivTemplate = rogue.newShivTemplate(sim)
+	rogue.registerBackstabSpell(sim)
+	rogue.registerDeadlyPoisonSpell(sim)
+	rogue.registerEviscerateSpell(sim)
+	rogue.registerExposeArmorSpell(sim)
+	rogue.registerHemorrhageSpell(sim)
+	rogue.registerInstantPoisonSpell(sim)
+	rogue.registerMutilateSpell(sim)
+	rogue.registerRuptureSpell(sim)
+	rogue.registerShivSpell(sim)
+	rogue.registerSinisterStrikeSpell(sim)
+	rogue.registerSliceAndDice(sim)
 
 	rogue.finishingMoveEffectApplier = rogue.makeFinishingMoveEffectApplier(sim)
-
-	rogue.initSliceAndDice(sim)
-	rogue.eviscerateTemplate = rogue.newEviscerateTemplate(sim)
-	rogue.exposeArmorTemplate = rogue.newExposeArmorTemplate(sim)
-	rogue.ruptureTemplate = rogue.newRuptureTemplate(sim)
-	rogue.deadlyPoisonTemplate = rogue.newDeadlyPoisonTemplate(sim)
-	rogue.deadlyPoisonRefreshTemplate = rogue.newDeadlyPoisonRefreshTemplate(sim)
-	rogue.instantPoisonTemplate = rogue.newInstantPoisonTemplate(sim)
 
 	rogue.energyPerSecondAvg = core.EnergyPerTick / core.EnergyTickDuration.Seconds()
 
@@ -181,15 +136,16 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 	comboPointsNeeded := 5 - expectedComboPointsAfterFinisher
 	energyForEA := rogue.builderEnergyCost*float64(comboPointsNeeded) + ExposeArmorEnergyCost
 	rogue.eaBuildTime = time.Duration(((energyForEA - expectedEnergyAfterFinisher) / rogue.energyPerSecondAvg) * float64(time.Second))
+
+	rogue.DelayDPSCooldownsForArmorDebuffs(sim)
 }
 
 func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.plan = PlanOpener
 	rogue.deathmantle4pcProc = false
-	rogue.deadlyPoisonStacks = 0
 	rogue.doneSND = false
 
-	permaEA := sim.GetPrimaryTarget().AuraExpiresAt(core.ExposeArmorDebuffID) == core.NeverExpires
+	permaEA := rogue.ExposeArmorAura.ExpiresAt() == core.NeverExpires
 	rogue.doneEA = !rogue.Rotation.MaintainExposeArmor || permaEA
 
 	rogue.disabledMCDs = rogue.DisableAllEnabledCooldowns(core.CooldownTypeUnknown)
@@ -234,6 +190,8 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 	rogue.PseudoStats.ThreatMultiplier *= 0.71
 
 	daggerMH := rogue.Equip[proto.ItemSlot_ItemSlotMainHand].WeaponType == proto.WeaponType_WeaponTypeDagger
+	daggerOH := rogue.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType == proto.WeaponType_WeaponTypeDagger
+	dualDagger := daggerMH && daggerOH
 	if rogue.Rotation.Builder == proto.Rogue_Rotation_Unknown {
 		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
 	}
@@ -243,9 +201,11 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
 	} else if rogue.Rotation.Builder == proto.Rogue_Rotation_Mutilate && !rogue.Talents.Mutilate {
 		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
+	} else if rogue.Rotation.Builder == proto.Rogue_Rotation_Mutilate && !dualDagger {
+		rogue.Rotation.Builder = proto.Rogue_Rotation_Auto
 	}
 	if rogue.Rotation.Builder == proto.Rogue_Rotation_Auto {
-		if rogue.Talents.Mutilate {
+		if rogue.Talents.Mutilate && dualDagger {
 			rogue.Rotation.Builder = proto.Rogue_Rotation_Mutilate
 		} else if rogue.Talents.Hemorrhage {
 			rogue.Rotation.Builder = proto.Rogue_Rotation_Hemorrhage
@@ -256,40 +216,40 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		}
 	}
 
-	var newBuilder func(sim *core.Simulation, target *core.Target) *core.SimpleSpell
+	var CastBuilder func(sim *core.Simulation, target *core.Target)
 	switch rogue.Rotation.Builder {
 	case proto.Rogue_Rotation_SinisterStrike:
 		rogue.builderEnergyCost = rogue.SinisterStrikeEnergyCost()
-		newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-			return rogue.NewSinisterStrike(sim, target)
+		CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			rogue.SinisterStrike.Cast(sim, target)
 		}
 	case proto.Rogue_Rotation_Backstab:
 		rogue.builderEnergyCost = BackstabEnergyCost
-		newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-			return rogue.NewBackstab(sim, target)
+		CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			rogue.Backstab.Cast(sim, target)
 		}
 	case proto.Rogue_Rotation_Hemorrhage:
 		rogue.builderEnergyCost = HemorrhageEnergyCost
-		newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-			return rogue.NewHemorrhage(sim, target)
+		CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			rogue.Hemorrhage.Cast(sim, target)
 		}
 	case proto.Rogue_Rotation_Mutilate:
 		rogue.builderEnergyCost = MutilateEnergyCost
-		newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-			return rogue.NewMutilate(sim, target)
+		CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			rogue.Mutilate.Cast(sim, target)
 		}
 	}
 
 	if rogue.Rotation.UseShiv && rogue.Consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueRogueDeadlyPoison {
-		rogue.newBuilder = func(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-			if rogue.deadlyPoison.Effect.DotInput.IsTicking(sim) && rogue.deadlyPoison.Effect.DotInput.TimeRemaining(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.shivEnergyCost {
-				return rogue.NewShiv(sim, target)
+		rogue.CastBuilder = func(sim *core.Simulation, target *core.Target) {
+			if rogue.DeadlyPoisonDot.IsActive() && rogue.DeadlyPoisonDot.RemainingDuration(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.shivEnergyCost {
+				rogue.Shiv.Cast(sim, target)
 			} else {
-				return newBuilder(sim, target)
+				CastBuilder(sim, target)
 			}
 		}
 	} else {
-		rogue.newBuilder = newBuilder
+		rogue.CastBuilder = CastBuilder
 	}
 
 	maxEnergy := 100.0
@@ -297,10 +257,11 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		maxEnergy = 110
 	}
 	rogue.EnableEnergyBar(maxEnergy, func(sim *core.Simulation) {
-		if !rogue.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		if rogue.GCD.IsReady(sim) {
 			rogue.doRotation(sim)
 		}
 	})
+
 	rogue.EnableAutoAttacks(rogue, core.AutoAttackOptions{
 		MainHand:       rogue.WeaponFromMainHand(rogue.critMultiplier(true, false)),
 		OffHand:        rogue.WeaponFromOffHand(rogue.critMultiplier(false, false)),
@@ -338,6 +299,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  92,
 		stats.Agility:   160,
 		stats.Stamina:   88,
@@ -348,6 +310,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  97,
 		stats.Agility:   154,
 		stats.Stamina:   92,
@@ -358,6 +321,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceGnome, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  90,
 		stats.Agility:   161,
 		stats.Stamina:   88,
@@ -368,6 +332,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  95,
 		stats.Agility:   158,
 		stats.Stamina:   89,
@@ -378,6 +343,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  92,
 		stats.Agility:   163,
 		stats.Stamina:   88,
@@ -388,6 +354,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  98,
 		stats.Agility:   155,
 		stats.Stamina:   91,
@@ -398,6 +365,7 @@ func init() {
 		stats.MeleeCrit:   -0.3 * core.MeleeCritRatingPerCritChance,
 	}
 	trollStats := stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  96,
 		stats.Agility:   160,
 		stats.Stamina:   90,
@@ -410,6 +378,7 @@ func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll10, Class: proto.Class_ClassRogue}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceTroll30, Class: proto.Class_ClassRogue}] = trollStats
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceUndead, Class: proto.Class_ClassRogue}] = stats.Stats{
+		stats.Health:    3524,
 		stats.Strength:  94,
 		stats.Agility:   156,
 		stats.Stamina:   90,

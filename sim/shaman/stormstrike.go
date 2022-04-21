@@ -8,123 +8,114 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var StormstrikeCD = core.NewCooldownID()
-var StormstrikeDebuffID = core.NewDebuffID()
-var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeCD}
-var SkyshatterAPBonusAuraID = core.NewAuraID()
+var StormstrikeActionID = core.ActionID{SpellID: 17364}
 
-func (shaman *Shaman) newStormstrikeTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	ssDebuffAura := core.Aura{
-		ID:       StormstrikeDebuffID,
-		ActionID: StormstrikeActionID,
-		Duration: time.Second * 12,
-		Stacks:   2,
-	}
-	ssDebuffAura.OnBeforeSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellHitEffect) {
-		if spellCast.SpellSchool != core.SpellSchoolNature {
-			return
-		}
-		spellEffect.DamageMultiplier *= 1.2
-	}
-	ssDebuffAura.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-		if spellCast.SpellSchool != core.SpellSchoolNature {
-			return
-		}
-		if !spellEffect.Landed() || spellEffect.Damage == 0 {
-			return
-		}
-
-		stacks := spellEffect.Target.NumStacks(StormstrikeDebuffID) - 1
-		if stacks == 0 {
-			spellEffect.Target.RemoveAura(sim, StormstrikeDebuffID)
-		} else {
-			ssDebuffAura.Stacks = stacks
-			spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
-		}
-	}
-
-	hasSkyshatter4p := ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4)
-	skyshatterAuraApplier := shaman.NewTemporaryStatsAuraApplier(SkyshatterAPBonusAuraID, core.ActionID{SpellID: 38432}, stats.Stats{stats.AttackPower: 70}, time.Second*12)
-
-	ss := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            StormstrikeActionID,
-				Character:           &shaman.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				GCD:                 core.GCDDefault,
-				IgnoreHaste:         true,
-				Cooldown:            time.Second * 10,
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 237,
-				},
-				CritMultiplier: shaman.DefaultMeleeCritMultiplier(),
-			},
+func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) *core.Aura {
+	return target.GetOrRegisterAura(core.Aura{
+		Label:     "Stormstrike",
+		ActionID:  StormstrikeActionID,
+		Duration:  time.Second * 12,
+		MaxStacks: 2,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			target.PseudoStats.NatureDamageTakenMultiplier *= 1.2
 		},
-		Effects: []core.SpellHitEffect{
-			{
-				SpellEffect: core.SpellEffect{
-					ProcMask:               core.ProcMaskMeleeMHSpecial,
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-					OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-						if !spellEffect.Landed() {
-							return
-						}
-
-						ssDebuffAura.Stacks = 2
-						spellEffect.Target.ReplaceAura(sim, ssDebuffAura)
-						if hasSkyshatter4p {
-							skyshatterAuraApplier(sim)
-						}
-					},
-				},
-				WeaponInput: core.WeaponDamageInput{
-					DamageMultiplier: 1,
-				},
-			},
-			{
-				SpellEffect: core.SpellEffect{
-					ProcMask:               core.ProcMaskMeleeOHSpecial,
-					DamageMultiplier:       1,
-					StaticDamageMultiplier: 1,
-					ThreatMultiplier:       1,
-					ReuseMainHitRoll:       true,
-				},
-				WeaponInput: core.WeaponDamageInput{
-					Offhand:          true,
-					DamageMultiplier: 1,
-				},
-			},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			target.PseudoStats.NatureDamageTakenMultiplier /= 1.2
 		},
-	}
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell.SpellSchool != core.SpellSchoolNature {
+				return
+			}
+			if !spellEffect.Landed() || spellEffect.Damage == 0 {
+				return
+			}
 
-	if shaman.Equip[items.ItemSlotRanged].ID == StormfuryTotem {
-		ss.Cost.Value -= 22
-	}
-
-	if ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4) {
-		ss.Effects[0].WeaponInput.FlatDamageBonus += 30
-		ss.Effects[1].WeaponInput.FlatDamageBonus += 30
-	}
-
-	if shaman.Talents.SpiritWeapons {
-		ss.Effects[0].ThreatMultiplier *= 0.7
-		ss.Effects[1].ThreatMultiplier *= 0.7
-	}
-
-	return core.NewSimpleSpellTemplate(ss)
+			aura.RemoveStack(sim)
+		},
+	})
 }
 
-func (shaman *Shaman) NewStormstrike(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	ss := &shaman.stormstrikeSpell
-	shaman.stormstrikeTemplate.Apply(ss)
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ss.Effects[0].Target = target
-	ss.Effects[1].Target = target
-	return ss
+func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
+	effect := core.SpellEffect{
+		DamageMultiplier: 1,
+		ThreatMultiplier: core.TernaryFloat64(shaman.Talents.SpiritWeapons, 0.7, 1),
+		OutcomeApplier:   core.OutcomeFuncMeleeSpecialCritOnly(shaman.DefaultMeleeCritMultiplier()),
+	}
+
+	flatDamageBonus := core.TernaryFloat64(ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4), 30, 0)
+	if isMH {
+		effect.ProcMask = core.ProcMaskMeleeMHSpecial
+		effect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.MainHand, false, flatDamageBonus, 1, true)
+	} else {
+		effect.ProcMask = core.ProcMaskMeleeOHSpecial
+		effect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.OffHand, false, flatDamageBonus, 1, true)
+	}
+
+	return shaman.RegisterSpell(core.SpellConfig{
+		ActionID:    StormstrikeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+	})
+}
+
+func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
+	mhHit := shaman.newStormstrikeHitSpell(true)
+	ohHit := shaman.newStormstrikeHitSpell(false)
+
+	baseCost := 237.0
+	if shaman.Equip[items.ItemSlotRanged].ID == StormfuryTotem {
+		baseCost -= 22
+	}
+
+	ssDebuffAura := shaman.stormstrikeDebuffAura(sim.GetPrimaryTarget())
+
+	var skyshatterAura *core.Aura
+	if ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4) {
+		skyshatterAura = shaman.NewTemporaryStatsAura("Skyshatter 4pc AP Bonus", core.ActionID{SpellID: 38432}, stats.Stats{stats.AttackPower: 70}, time.Second*12)
+	}
+
+	shaman.Stormstrike = shaman.RegisterSpell(core.SpellConfig{
+		ActionID:    StormstrikeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true,
+			CD: core.Cooldown{
+				Timer:    shaman.NewTimer(),
+				Duration: time.Second * 10,
+			},
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ThreatMultiplier: 1,
+			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+
+				ssDebuffAura.Activate(sim)
+				ssDebuffAura.SetStacks(sim, 2)
+
+				if skyshatterAura != nil {
+					skyshatterAura.Activate(sim)
+				}
+
+				mhHit.Cast(sim, spellEffect.Target)
+				ohHit.Cast(sim, spellEffect.Target)
+				shaman.Stormstrike.Casts -= 2
+				shaman.Stormstrike.Hits--
+			},
+		}),
+	})
 }

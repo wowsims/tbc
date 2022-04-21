@@ -8,11 +8,10 @@ import (
 )
 
 var SliceAndDiceActionID = core.ActionID{SpellID: 6774}
-var SliceAndDiceAuraID = core.NewAuraID()
 
 const SliceAndDiceEnergyCost = 25.0
 
-func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
+func (rogue *Rogue) registerSliceAndDice(sim *core.Simulation) {
 	durationMultiplier := 1.0 + 0.15*float64(rogue.Talents.ImprovedSliceAndDice)
 	durationBonus := time.Duration(0)
 	if ItemSetNetherblade.CharacterHasSetBonus(&rogue.Character, 2) {
@@ -32,59 +31,48 @@ func (rogue *Rogue) initSliceAndDice(sim *core.Simulation) {
 		hasteBonus += 0.05
 	}
 	inverseHasteBonus := 1.0 / hasteBonus
-	sliceAndDiceAura := core.Aura{
-		ID:       SliceAndDiceAuraID,
+
+	rogue.SliceAndDiceAura = rogue.RegisterAura(core.Aura{
+		Label:    "Slice and Dice",
 		ActionID: SliceAndDiceActionID,
-		OnGain: func(sim *core.Simulation) {
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, hasteBonus)
 		},
-		OnExpire: func(sim *core.Simulation) {
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
 		},
-	}
+	})
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  SliceAndDiceActionID,
-			Character: rogue.GetCharacter(),
-			Cost: core.ResourceCost{
-				Type:  stats.Energy,
-				Value: SliceAndDiceEnergyCost,
+	baseCost := SliceAndDiceEnergyCost
+	rogue.SliceAndDice = rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    SliceAndDiceActionID,
+		SpellExtras: SpellFlagFinisher,
+
+		ResourceType: stats.Energy,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+				GCD:  time.Second,
 			},
-			GCD:         time.Second,
+			ModifyCast:  rogue.applyDeathmantle,
 			IgnoreHaste: true,
-			SpellExtras: SpellFlagFinisher,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				numPoints := rogue.ComboPoints()
-				aura := sliceAndDiceAura
-				aura.Duration = rogue.sliceAndDiceDurations[numPoints]
-				rogue.ReplaceAura(sim, aura)
-
-				rogue.ApplyFinisher(sim, cast.ActionID)
-
-				if aura.Duration >= sim.GetRemainingDuration() {
-					rogue.doneSND = true
-				}
-			},
 		},
-	}
 
-	var cast core.SimpleCast
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			numPoints := rogue.ComboPoints()
+			if numPoints == 0 {
+				panic("SliceAndDice requires combo points!")
+			}
+			rogue.SliceAndDiceAura.Duration = rogue.sliceAndDiceDurations[numPoints]
+			rogue.SliceAndDiceAura.Activate(sim)
 
-	rogue.castSliceAndDice = func() {
-		comboPoints := rogue.ComboPoints()
-		if comboPoints == 0 {
-			panic("SliceAndDice requires combo points!")
-		}
+			rogue.ApplyFinisher(sim, spell.ActionID)
 
-		cast = template
-		cast.ActionID.Tag = comboPoints
-
-		if rogue.deathmantle4pcProc {
-			cast.Cost.Value = 0
-			rogue.deathmantle4pcProc = false
-		}
-
-		cast.StartCast(sim)
-	}
+			if rogue.SliceAndDiceAura.Duration >= sim.GetRemainingDuration() {
+				rogue.doneSND = true
+			}
+		},
+	})
 }

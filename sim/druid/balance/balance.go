@@ -150,29 +150,29 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 
 	target := sim.GetPrimaryTarget()
 
-	var spell *core.SimpleSpell
+	var spell *core.Spell
 
 	if moonkin.ShouldCastFaerieFire(sim, target, rotation) {
-		spell = moonkin.NewFaerieFire(sim, target)
+		spell = moonkin.FaerieFire
 	} else if moonkin.ShouldCastHurricane(sim, rotation) {
-		spell = moonkin.NewHurricane(sim)
+		spell = moonkin.Hurricane
 	} else if moonkin.ShouldCastInsectSwarm(sim, target, rotation) {
-		spell = moonkin.NewInsectSwarm(sim, target)
+		spell = moonkin.InsectSwarm
 	} else if moonkin.ShouldCastMoonfire(sim, target, rotation) {
-		spell = moonkin.NewMoonfire(sim, target)
+		spell = moonkin.Moonfire
 	} else {
 		switch rotation.PrimarySpell {
 		case proto.BalanceDruid_Rotation_Starfire:
-			spell = moonkin.NewStarfire(sim, target, 8)
+			spell = moonkin.Starfire8
 		case proto.BalanceDruid_Rotation_Starfire6:
-			spell = moonkin.NewStarfire(sim, target, 6)
+			spell = moonkin.Starfire6
 		case proto.BalanceDruid_Rotation_Wrath:
-			spell = moonkin.NewWrath(sim, target)
+			spell = moonkin.Wrath
 		}
 	}
 
-	if success := spell.Cast(sim); !success {
-		moonkin.WaitForMana(sim, spell.GetManaCost())
+	if success := spell.Cast(sim, target); !success {
+		moonkin.WaitForMana(sim, spell.CurCast.Cost)
 	}
 }
 

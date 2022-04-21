@@ -7,275 +7,317 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-type ResourceCost struct {
-	Type  stats.Stat // stats.Mana, stats.Energy, stats.Rage
-	Value float64
-}
-
 // A cast corresponds to any action which causes the in-game castbar to be
 // shown, and activates the GCD. Note that a cast can also be instant, i.e.
 // the effects are applied immediately even though the GCD is still activated.
 
-// Callback for when a cast begins, i.e. when the in-game castbar starts filling up.
-type OnCast func(sim *Simulation, cast *Cast)
-
 // Callback for when a cast is finished, i.e. when the in-game castbar reaches full.
-type OnCastComplete func(sim *Simulation, cast *Cast)
+type OnCastComplete func(aura *Aura, sim *Simulation, spell *Spell)
 
-// Callback for when a cast is finished and all its immediate effects have taken effect.
-type AfterCast func(sim *Simulation, cast *Cast)
+type Hardcast struct {
+	Expires    time.Duration
+	OnComplete func(*Simulation, *Target)
+	Target     *Target
+}
 
-// A basic cast that costs mana and performs a callback when complete.
-// Manages cooldowns and the GCD.
-type Cast struct {
-	// ID for the action.
-	ActionID
+func (hc *Hardcast) OnExpire(sim *Simulation) {
+	hc.OnComplete(sim, hc.Target)
+}
 
-	// The character performing this action.
-	Character *Character
+// Input for constructing the CastSpell function for a spell.
+type CastConfig struct {
+	// Default cast values with all static effects applied.
+	DefaultCast Cast
 
-	// If set, this action will start a cooldown using its cooldown ID.
-	// Note that the GCD CD will be activated even if this is not set.
-	Cooldown time.Duration
-
-	// The amount of GCD time incurred by this cast. This is almost always 0, 1s, or 1.5s.
-	GCD time.Duration
-
-	// Whether this is a phantom cast. Phantom casts are usually casts triggered by some effect,
-	// like The Lightning Capacitor or Shaman Flametongue Weapon. Many on-hit effects do not
-	// proc from phantom casts, only regular casts.
-	IsPhantom bool
-
-	OutcomeRollCategory OutcomeRollCategory
-	CritRollCategory    CritRollCategory
-	SpellSchool         SpellSchool
-	SpellExtras         SpellExtras
-
-	// Base cost. Many effects in the game which 'reduce mana cost by X%'
-	// are calculated using the base mana cost. Any effects which reduce the base
-	// mana cost should be applied before setting this value, and OnCast()
-	// callbacks should not modify it.
-	BaseCost ResourceCost
-
-	// Actual mana cost of the spell.
-	Cost ResourceCost
-
-	CastTime time.Duration
-
-	// Adds additional delay to the GCD after the cast is completed. This is usually
-	// used for adding latency following the cast.
-	AfterCastDelay time.Duration
-
-	// How much to multiply damage by, if this cast crits.
-	CritMultiplier float64
-
-	// Bonus crit to be applied to all effects resulting from this cast.
-	BonusCritRating float64 // TODO: move this off cast and move to SpellEffect or something.
-
-	// Callbacks for providing additional custom behavior.
-	OnCastComplete OnCastComplete
-
-	// Callbacks for providing additional custom behavior.
-	AfterCast AfterCast
+	// Dynamic modifications for each cast.
+	ModifyCast func(*Simulation, *Spell, *Cast)
 
 	// Ignores haste when calculating the GCD and cast time for this cast.
 	IgnoreHaste bool
 
-	// Internal field only, used to prevent cast pool objects from being used by
-	// multiple casts simultaneously.
-	objectInUse bool
+	CD       Cooldown
+	SharedCD Cooldown
+
+	// Callbacks for providing additional custom behavior.
+	OnCastComplete func(*Simulation, *Spell)
+	AfterCast      func(*Simulation, *Spell)
+
+	DisableCallbacks bool
 }
 
-// AgentAction functions for actions that embed a Cast.
+type Cast struct {
+	// Amount of resource that will be consumed by this cast.
+	Cost float64
 
-func (cast *Cast) GetActionID() ActionID {
-	return cast.ActionID
+	// The length of time the GCD will be on CD as a result of this cast.
+	GCD time.Duration
+
+	// The amount of time between the call to spell.Cast() and when the spell
+	// effects are invoked.
+	CastTime time.Duration
+
+	// Additional GCD delay after the cast completes.
+	ChannelTime time.Duration
+
+	// Additional GCD delay after the cast ends. Never affected by cast speed.
+	// This is typically used for latency.
+	AfterCastDelay time.Duration
 }
 
-func (cast *Cast) GetCharacter() *Character {
-	return cast.Character
+type CastFunc func(*Simulation, *Target)
+type CastSuccessFunc func(*Simulation, *Target) bool
+
+func (spell *Spell) makeCastFunc(config CastConfig, onCastComplete CastFunc) CastSuccessFunc {
+	return spell.wrapCastFuncInit(config,
+		spell.wrapCastFuncResources(config,
+			spell.wrapCastFuncHaste(config,
+				spell.wrapCastFuncGCD(config,
+					spell.wrapCastFuncCooldown(config,
+						spell.wrapCastFuncSharedCooldown(config,
+							spell.makeCastFuncWait(config, onCastComplete)))))))
 }
 
-func (cast *Cast) GetManaCost() float64 {
-	return cast.Cost.Value
-}
-
-func (cast *Cast) GetDuration() time.Duration {
-	return cast.CastTime
-}
-
-func (cast *Cast) IsInUse() bool {
-	return cast.objectInUse
-}
-
-// Cancel will disable 'in use' so the cast can be reused. Useful if deciding not to cast.
-func (cast *Cast) Cancel() {
-	cast.objectInUse = false
-}
-
-// Should be called exactly once after creation.
-func (cast *Cast) init(sim *Simulation) {
-	if cast.Character == nil {
-		panic("Character not set on cast")
+func (spell *Spell) ApplyCostModifiers(cost float64) float64 {
+	if spell.Character.PseudoStats.NoCost {
+		return 0
+	} else {
+		cost -= spell.BaseCost * (1 - spell.Character.PseudoStats.CostMultiplier)
+		cost -= spell.Character.PseudoStats.CostReduction
+		return MaxFloat(0, cost)
 	}
-	if cast.objectInUse {
-		panic("Cast object already in use")
-	}
-	cast.objectInUse = true
+}
 
-	if !cast.IgnoreHaste {
-		cast.CastTime = time.Duration(float64(cast.CastTime) / cast.Character.CastSpeed())
-	}
-
-	// Apply on-cast effects.
-	cast.Character.OnCast(sim, cast)
-
-	// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
-	if cast.GCD != 0 && cast.Character.IsOnCD(GCDCooldownID, sim.CurrentTime) {
-		panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", cast.ActionID, cast.Character.GetRemainingCD(GCDCooldownID, sim.CurrentTime)))
+func (spell *Spell) wrapCastFuncInit(config CastConfig, onCastComplete CastSuccessFunc) CastSuccessFunc {
+	empty := Cast{}
+	if config.DefaultCast == empty {
+		return onCastComplete
 	}
 
-	if cast.Cooldown != 0 {
-		cooldownID := cast.ActionID.CooldownID
-		if cast.Character.IsOnCD(cooldownID, sim.CurrentTime) {
-			panic(fmt.Sprintf("Trying to cast %s but is still on cooldown for %s", cast.ActionID, cast.Character.GetRemainingCD(cooldownID, sim.CurrentTime)))
+	if config.ModifyCast == nil {
+		return func(sim *Simulation, target *Target) bool {
+			spell.CurCast = spell.DefaultCast
+			return onCastComplete(sim, target)
+		}
+	} else {
+		modifyCast := config.ModifyCast
+		return func(sim *Simulation, target *Target) bool {
+			spell.CurCast = spell.DefaultCast
+			modifyCast(sim, spell, &spell.CurCast)
+			return onCastComplete(sim, target)
 		}
 	}
 }
 
-// Start casting the spell. Return value indicates whether the spell successfully
-// started casting.
-func (cast *Cast) startCasting(sim *Simulation, onCastComplete OnCastComplete) bool {
-	switch cast.Cost.Type {
+func (spell *Spell) wrapCastFuncResources(config CastConfig, onCastComplete CastFunc) CastSuccessFunc {
+	if spell.ResourceType == 0 || config.DefaultCast.Cost == 0 {
+		if spell.ResourceType != 0 {
+			panic("ResourceType set for spell " + spell.ActionID.String() + " but no cost")
+		}
+		if config.DefaultCast.Cost != 0 {
+			panic("Cost set for spell " + spell.ActionID.String() + " but no ResourceType")
+		}
+		return func(sim *Simulation, target *Target) bool {
+			onCastComplete(sim, target)
+			return true
+		}
+	}
+
+	switch spell.ResourceType {
 	case stats.Mana:
-		if cast.Character.CurrentMana() < cast.Cost.Value {
-			if sim.Log != nil {
-				cast.Character.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.03f, Mana Cost = %0.03f)",
-					cast.ActionID, cast.Character.CurrentMana(), cast.Cost.Value)
+		return func(sim *Simulation, target *Target) bool {
+			spell.CurCast.Cost = spell.ApplyCostModifiers(spell.CurCast.Cost)
+			if spell.Character.CurrentMana() < spell.CurCast.Cost {
+				if sim.Log != nil {
+					spell.Character.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.03f, Mana Cost = %0.03f)",
+						spell.ActionID, spell.Character.CurrentMana(), spell.CurCast.Cost)
+				}
+				return false
 			}
-			cast.objectInUse = false
-			return false
+
+			// Mana is subtracted at the end of the cast.
+			onCastComplete(sim, target)
+			return true
 		}
 	case stats.Rage:
-		if cast.Character.CurrentRage() < cast.Cost.Value {
-			return false
+		return func(sim *Simulation, target *Target) bool {
+			spell.CurCast.Cost = spell.ApplyCostModifiers(spell.CurCast.Cost)
+			if spell.Character.CurrentRage() < spell.CurCast.Cost {
+				return false
+			}
+			spell.Character.SpendRage(sim, spell.CurCast.Cost, spell.ActionID)
+			onCastComplete(sim, target)
+			return true
 		}
-		cast.Character.SpendRage(sim, cast.Cost.Value, cast.ActionID)
 	case stats.Energy:
-		if cast.Character.CurrentEnergy() < cast.Cost.Value {
-			return false
+		return func(sim *Simulation, target *Target) bool {
+			spell.CurCast.Cost = spell.ApplyCostModifiers(spell.CurCast.Cost)
+			if spell.Character.CurrentEnergy() < spell.CurCast.Cost {
+				return false
+			}
+			spell.Character.SpendEnergy(sim, spell.CurCast.Cost, spell.ActionID)
+			onCastComplete(sim, target)
+			return true
 		}
-		cast.Character.SpendEnergy(sim, cast.Cost.Value, cast.ActionID)
 	}
 
-	if sim.Log != nil {
-		cast.Character.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
-			cast.ActionID, MaxFloat(0, cast.Cost.Value), cast.CastTime)
+	panic("Invalid resource type")
+}
+
+func (spell *Spell) wrapCastFuncHaste(config CastConfig, onCastComplete CastFunc) CastFunc {
+	if config.IgnoreHaste || (config.DefaultCast.GCD == 0 && config.DefaultCast.CastTime == 0 && config.DefaultCast.ChannelTime == 0) {
+		return onCastComplete
 	}
 
-	// This needs to come before the internalOnComplete() call so that changes to
-	// casting speed caused by the cast don't affect the GCD CD.
-	if cast.GCD != 0 {
-		// Prevent any actions on the GCD until the cast AND the GCD are done.
-		gcdCD := MaxDuration(cast.CalculatedGCD(cast.Character), cast.CastTime+cast.AfterCastDelay)
-		cast.Character.SetGCDTimer(sim, sim.CurrentTime+gcdCD)
+	return func(sim *Simulation, target *Target) {
+		spell.CurCast.GCD = spell.Character.ApplyCastSpeed(spell.CurCast.GCD)
+		spell.CurCast.CastTime = spell.Character.ApplyCastSpeed(spell.CurCast.CastTime)
+		spell.CurCast.ChannelTime = spell.Character.ApplyCastSpeed(spell.CurCast.ChannelTime)
+
+		onCastComplete(sim, target)
+	}
+}
+
+func (spell *Spell) wrapCastFuncGCD(config CastConfig, onCastComplete CastFunc) CastFunc {
+	if config.DefaultCast.GCD == 0 {
+		return onCastComplete
 	}
 
-	if cast.Cooldown > 0 {
-		cast.Character.SetCD(cast.ActionID.CooldownID, sim.CurrentTime+cast.CastTime+cast.Cooldown)
+	return func(sim *Simulation, target *Target) {
+		// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
+		if spell.CurCast.GCD != 0 && !spell.Character.GCD.IsReady(sim) {
+			panic(fmt.Sprintf("Trying to cast %s but GCD on cooldown for %s", spell.ActionID, spell.Character.GCD.TimeToReady(sim)))
+		}
+
+		gcd := spell.CurCast.GCD
+		if spell.CurCast.GCD != 0 {
+			gcd = MaxDuration(GCDMin, gcd)
+		}
+
+		fullCastTime := spell.CurCast.CastTime + spell.CurCast.ChannelTime + spell.CurCast.AfterCastDelay
+		spell.Character.SetGCDTimer(sim, sim.CurrentTime+MaxDuration(gcd, fullCastTime))
+
+		onCastComplete(sim, target)
+	}
+}
+
+func (spell *Spell) wrapCastFuncCooldown(config CastConfig, onCastComplete CastFunc) CastFunc {
+	if config.CD.Timer == nil {
+		return onCastComplete
 	}
 
-	// For instant-cast spells we can skip creating an aura.
-	if cast.CastTime == 0 {
-		cast.internalOnComplete(sim, onCastComplete)
+	if config.CD.Duration == 0 {
+		panic("Cooldown specified but no duration!")
+	}
+
+	return func(sim *Simulation, target *Target) {
+		// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
+		if !spell.CD.IsReady(sim) {
+			panic(fmt.Sprintf("Trying to cast %s but is still on cooldown for %s", spell.ActionID, spell.CD.TimeToReady(sim)))
+		}
+
+		spell.CD.Set(sim.CurrentTime + spell.CurCast.CastTime + spell.CD.Duration)
+
+		onCastComplete(sim, target)
+	}
+}
+
+func (spell *Spell) wrapCastFuncSharedCooldown(config CastConfig, onCastComplete CastFunc) CastFunc {
+	if config.SharedCD.Timer == nil {
+		return onCastComplete
+	}
+
+	if config.SharedCD.Duration == 0 {
+		panic("SharedCooldown specified but no duration!")
+	}
+
+	return func(sim *Simulation, target *Target) {
+		// By panicking if spell is on CD, we force each sim to properly check for their own CDs.
+		if !spell.SharedCD.IsReady(sim) {
+			panic(fmt.Sprintf("Trying to cast %s but is still on shared cooldown for %s", spell.ActionID, spell.SharedCD.TimeToReady(sim)))
+		}
+
+		spell.SharedCD.Set(sim.CurrentTime + spell.CurCast.CastTime + spell.SharedCD.Duration)
+
+		onCastComplete(sim, target)
+	}
+}
+
+func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc) CastFunc {
+	if !config.DisableCallbacks {
+		configOnCastComplete := config.OnCastComplete
+		configAfterCast := config.AfterCast
+		oldOnCastComplete1 := onCastComplete
+		onCastComplete = func(sim *Simulation, target *Target) {
+			spell.Character.OnCastComplete(sim, spell)
+			if configOnCastComplete != nil {
+				configOnCastComplete(sim, spell)
+			}
+			oldOnCastComplete1(sim, target)
+			if configAfterCast != nil {
+				configAfterCast(sim, spell)
+			}
+		}
+	}
+
+	if spell.ResourceType == stats.Mana && config.DefaultCast.Cost != 0 {
+		oldOnCastComplete2 := onCastComplete
+		onCastComplete = func(sim *Simulation, target *Target) {
+			if spell.CurCast.Cost > 0 {
+				spell.Character.SpendMana(sim, spell.CurCast.Cost, spell.ActionID)
+				spell.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
+			}
+			oldOnCastComplete2(sim, target)
+		}
+	}
+
+	if config.DefaultCast.CastTime == 0 {
+		return func(sim *Simulation, target *Target) {
+			if sim.Log != nil {
+				// Hunter fake cast has no ID.
+				if !spell.ActionID.IsEmptyAction() {
+					spell.Character.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
+						spell.ActionID, MaxFloat(0, spell.CurCast.Cost), spell.CurCast.CastTime)
+					spell.Character.Log(sim, "Completed cast %s", spell.ActionID)
+				}
+			}
+			onCastComplete(sim, target)
+		}
 	} else {
-		cast.Character.Hardcast.Expires = sim.CurrentTime + cast.CastTime
-		cast.Character.Hardcast.Cast = cast
-		cast.Character.Hardcast.OnComplete = onCastComplete
-
-		// If hardcast and GCD happen at the same time then we don't need a separate action.
-		if cast.Character.Hardcast.Expires != cast.Character.NextGCDAt() {
-			cast.Character.newHardcastAction(sim)
+		oldOnCastComplete3 := onCastComplete
+		onCastComplete = func(sim *Simulation, target *Target) {
+			if sim.Log != nil {
+				// Hunter fake cast has no ID.
+				if !spell.ActionID.SameAction(ActionID{}) {
+					spell.Character.Log(sim, "Completed cast %s", spell.ActionID)
+				}
+			}
+			oldOnCastComplete3(sim, target)
 		}
 
-		if cast.Character.AutoAttacks.IsEnabled() {
-			// Delay autoattacks until the cast is complete.
-			cast.Character.AutoAttacks.DelayAllUntil(sim, cast.Character.Hardcast.Expires)
+		return func(sim *Simulation, target *Target) {
+			if sim.Log != nil {
+				spell.Character.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
+					spell.ActionID, MaxFloat(0, spell.CurCast.Cost), spell.CurCast.CastTime)
+			}
+
+			// For instant-cast spells we can skip creating an aura.
+			if spell.CurCast.CastTime == 0 {
+				onCastComplete(sim, target)
+			} else {
+				spell.Character.Hardcast.Expires = sim.CurrentTime + spell.CurCast.CastTime
+				spell.Character.Hardcast.OnComplete = onCastComplete
+				spell.Character.Hardcast.Target = target
+
+				// If hardcast and GCD happen at the same time then we don't need a separate action.
+				if spell.Character.Hardcast.Expires != spell.Character.NextGCDAt() {
+					spell.Character.newHardcastAction(sim)
+				}
+
+				if spell.Character.AutoAttacks.IsEnabled() {
+					// Delay autoattacks until the cast is complete.
+					spell.Character.AutoAttacks.DelayAllUntil(sim, spell.Character.Hardcast.Expires)
+				}
+			}
 		}
 	}
-
-	return true
-}
-
-func (cast *Cast) CalculatedGCD(char *Character) time.Duration {
-	// TODO: switch on melee or physical, to apply spell haste to GCD or not?
-	//   Or does spell haste always decrease GCD (its just most non-casters dont have spell haste?)
-
-	if cast.IgnoreHaste {
-		return cast.GCD
-	} else {
-		return MaxDuration(GCDMin, time.Duration(float64(cast.GCD)/char.CastSpeed()))
-	}
-}
-
-// Cast has finished, activate the effects of the cast.
-func (cast *Cast) internalOnComplete(sim *Simulation, onCastComplete OnCastComplete) {
-	if sim.Log != nil {
-		// Hunter fake cast has no ID.
-		if !cast.ActionID.SameAction(ActionID{}) {
-			cast.Character.Log(sim, "Completed cast %s", cast.ActionID)
-		}
-	}
-
-	if cast.Cost.Value > 0 && cast.Cost.Type == stats.Mana {
-		cast.Character.SpendMana(sim, cast.Cost.Value, cast.ActionID)
-		cast.Character.PseudoStats.FiveSecondRuleRefreshTime = sim.CurrentTime + time.Second*5
-	}
-
-	cast.Character.OnCastComplete(sim, cast)
-	if cast.OnCastComplete != nil {
-		cast.OnCastComplete(sim, cast)
-	}
-	onCastComplete(sim, cast)
-	if cast.AfterCast != nil {
-		cast.AfterCast(sim, cast)
-	}
-}
-
-// A simple cast is just a cast with a callback, no calculations or damage.
-type SimpleCast struct {
-	// Embedded Cast
-	Cast
-
-	OnCastComplete OnCastComplete
-
-	// Turns off metrics recording for this cast.
-	DisableMetrics bool
-}
-
-func (simpleCast *SimpleCast) Init(sim *Simulation) {
-	simpleCast.Cast.init(sim)
-}
-
-// TODO: Need to rename this. Cant call it Cast() because of conflict with field of the same name.
-func (simpleCast *SimpleCast) StartCast(sim *Simulation) bool {
-	return simpleCast.Cast.startCasting(sim, func(sim *Simulation, cast *Cast) {
-		if !simpleCast.DisableMetrics {
-			cast.Character.Metrics.AddCast(cast)
-		}
-		if simpleCast.OnCastComplete != nil {
-			simpleCast.OnCastComplete(sim, cast)
-		}
-		simpleCast.objectInUse = false
-	})
-}
-
-type Hardcast struct {
-	Cast       *Cast
-	Expires    time.Duration
-	OnComplete OnCastComplete
-}
-
-func (hc Hardcast) OnExpire(sim *Simulation) {
-	hc.Cast.internalOnComplete(sim, hc.OnComplete)
 }

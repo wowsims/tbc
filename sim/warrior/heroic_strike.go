@@ -8,80 +8,75 @@ import (
 
 var HeroicStrikeActionID = core.ActionID{SpellID: 29707}
 
-func (warrior *Warrior) newHeroicStrikeTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
-	warrior.heroicStrikeCost = 15.0
+func (warrior *Warrior) registerHeroicStrikeSpell(_ *core.Simulation) {
+	cost := 15.0 - float64(warrior.Talents.ImprovedHeroicStrike) - float64(warrior.Talents.FocusedRage)
+	refundAmount := cost * 0.8
 
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            HeroicStrikeActionID,
-				Character:           &warrior.Character,
-				OutcomeRollCategory: core.OutcomeRollCategorySpecial,
-				CritRollCategory:    core.CritRollCategoryPhysical,
-				SpellSchool:         core.SpellSchoolPhysical,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.heroicStrikeCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.heroicStrikeCost,
-				},
-				CritMultiplier: warrior.critMultiplier(true),
+	warrior.HeroicStrike = warrior.RegisterSpell(core.SpellConfig{
+		ActionID:    HeroicStrikeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Rage,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: cost,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				ProcMask:               core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			WeaponInput: core.WeaponDamageInput{
-				DamageMultiplier: 1,
-				FlatDamageBonus:  176,
-			},
-		},
-	}
 
-	refundAmount := warrior.heroicStrikeCost * 0.8
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-		if !spellEffect.Landed() {
-			warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
-		}
-	}
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask: core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
 
-	return core.NewSimpleSpellTemplate(ability)
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			FlatThreatBonus:  194,
+
+			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 176, 1, true),
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+				}
+			},
+		}),
+	})
 }
 
-func (warrior *Warrior) QueueHeroicStrike(_ *core.Simulation) {
-	if warrior.CurrentRage() < warrior.heroicStrikeCost {
+func (warrior *Warrior) QueueHeroicStrike(sim *core.Simulation) {
+	if warrior.CurrentRage() < warrior.HeroicStrike.DefaultCast.Cost {
 		panic("Not enough rage for HS")
 	}
+	if warrior.heroicStrikeQueued {
+		return
+	}
+	if sim.Log != nil {
+		warrior.Log(sim, "Heroic strike queued.")
+	}
 	warrior.heroicStrikeQueued = true
+	warrior.PseudoStats.DisableDWMissPenalty = true
 }
 
 // Returns true if the regular melee swing should be used, false otherwise.
-func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.SimpleSpell {
+func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.Spell {
 	if !warrior.heroicStrikeQueued {
 		return nil
 	}
 
 	warrior.heroicStrikeQueued = false
-	if warrior.CurrentRage() < warrior.heroicStrikeCost {
+	warrior.PseudoStats.DisableDWMissPenalty = false
+	if sim.Log != nil {
+		warrior.Log(sim, "Heroic strike unqueued.")
+	}
+	if warrior.CurrentRage() < warrior.HeroicStrike.DefaultCast.Cost {
 		return nil
 	}
 
-	target := sim.GetPrimaryTarget()
-	hs := &warrior.heroicStrike
-	warrior.heroicStrikeTemplate.Apply(hs)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hs.Effect.Target = target
-
-	return hs
+	return warrior.HeroicStrike
 }
 
 func (warrior *Warrior) CanHeroicStrike(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= warrior.heroicStrikeCost
+	return warrior.CurrentRage() >= warrior.HeroicStrike.DefaultCast.Cost
 }

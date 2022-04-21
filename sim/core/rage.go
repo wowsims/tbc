@@ -8,8 +8,6 @@ const MaxRage = 100.0
 
 const RageFactor = 3.75 / 274.7
 
-var RageBarAuraID = NewAuraID()
-
 // OnRageGain is called any time rage is increased.
 type OnRageGain func(sim *Simulation)
 
@@ -22,36 +20,44 @@ type rageBar struct {
 	onRageGain OnRageGain
 }
 
-func (character *Character) EnableRageBar(startingRage float64, onRageGain OnRageGain) {
-	character.AddPermanentAura(func(sim *Simulation) Aura {
-		return Aura{
-			ID: RageBarAuraID,
-			OnSpellHit: func(sim *Simulation, spellCast *SpellCast, spellEffect *SpellEffect) {
-				if !spellEffect.ProcMask.Matches(ProcMaskWhiteHit) {
-					return
-				}
+func (character *Character) EnableRageBar(startingRage float64, rageMultiplier float64, onRageGain OnRageGain) {
+	character.RegisterAura(Aura{
+		Label:    "RageBar",
+		Duration: NeverExpires,
+		OnReset: func(aura *Aura, sim *Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if !spellEffect.ProcMask.Matches(ProcMaskWhiteHit) {
+				return
+			}
 
-				var HitFactor float64
-				var BaseSwingSpeed float64
+			// Need separate check to exclude auto replacers (e.g. Heroic Strike and Cleave).
+			if spellEffect.ProcMask.Matches(ProcMaskMeleeMHSpecial) {
+				return
+			}
 
-				if spellEffect.IsMH() {
-					HitFactor = 3.5 / 2
-					BaseSwingSpeed = character.AutoAttacks.MH.SwingSpeed
-				} else {
-					HitFactor = 1.75 / 2
-					BaseSwingSpeed = character.AutoAttacks.OH.SwingSpeed
-				}
+			var HitFactor float64
+			var BaseSwingSpeed float64
 
-				if spellEffect.Outcome.Matches(OutcomeCrit) {
-					HitFactor *= 2
-				}
+			if spellEffect.IsMH() {
+				HitFactor = 3.5 / 2
+				BaseSwingSpeed = character.AutoAttacks.MH.SwingSpeed
+			} else {
+				HitFactor = 1.75 / 2
+				BaseSwingSpeed = character.AutoAttacks.OH.SwingSpeed
+			}
 
-				generatedRage := spellEffect.Damage*RageFactor + HitFactor*BaseSwingSpeed
+			if spellEffect.Outcome.Matches(OutcomeCrit) {
+				HitFactor *= 2
+			}
 
-				character.AddRage(sim, generatedRage, spellCast.ActionID)
-			},
-		}
+			generatedRage := spellEffect.Damage*RageFactor + HitFactor*BaseSwingSpeed*rageMultiplier
+
+			character.AddRage(sim, generatedRage, spell.ActionID)
+		},
 	})
+
 	character.rageBar = rageBar{
 		character:    character,
 		startingRage: MaxFloat(0, MinFloat(startingRage, MaxRage)),

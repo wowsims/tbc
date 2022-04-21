@@ -46,20 +46,25 @@ type Pet struct {
 func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritance PetStatInheritance, enabledOnStart bool) Pet {
 	pet := Pet{
 		Character: Character{
-			Name:        name,
-			Label:       fmt.Sprintf("%s - %s", owner.Label, name),
-			PseudoStats: stats.NewPseudoStats(),
-			Party:       owner.Party,
-			PartyIndex:  owner.PartyIndex,
-			RaidIndex:   owner.RaidIndex,
-			auraTracker: newAuraTracker(false),
-			baseStats:   baseStats,
-			Metrics:     NewCharacterMetrics(),
+			Unit: Unit{
+				Type:        PetUnit,
+				Index:       owner.Index,
+				Label:       fmt.Sprintf("%s - %s", owner.Label, name),
+				Level:       CharacterLevel,
+				PseudoStats: stats.NewPseudoStats(),
+				auraTracker: newAuraTracker(),
+				Metrics:     NewCharacterMetrics(),
+			},
+			Name:       name,
+			Party:      owner.Party,
+			PartyIndex: owner.PartyIndex,
+			baseStats:  baseStats,
 		},
 		Owner:           owner,
 		statInheritance: statInheritance,
 		initialEnabled:  enabledOnStart,
 	}
+	pet.GCD = pet.NewTimer()
 	pet.currentStatInheritance = func(ownerStats stats.Stats) stats.Stats {
 		return stats.Stats{}
 	}
@@ -99,8 +104,8 @@ func (pet *Pet) reset(sim *Simulation, agent Agent) {
 func (pet *Pet) advance(sim *Simulation, elapsedTime time.Duration) {
 	pet.Character.advance(sim, elapsedTime)
 }
-func (pet *Pet) doneIteration(simDuration time.Duration) {
-	pet.Character.doneIteration(simDuration)
+func (pet *Pet) doneIteration(sim *Simulation) {
+	pet.Character.doneIteration(sim)
 }
 
 func (pet *Pet) IsEnabled() bool {
@@ -132,10 +137,7 @@ func (pet *Pet) Disable(sim *Simulation) {
 
 	// If a pet is immediately re-summoned it might try to use GCD, so we need to
 	// clear it.
-	if pet.Hardcast.Cast != nil {
-		pet.Hardcast.Cast.Cancel()
-		pet.Hardcast = Hardcast{}
-	}
+	pet.Hardcast = Hardcast{}
 
 	// Reset pet mana.
 	pet.stats[stats.Mana] = pet.MaxMana()
@@ -155,10 +157,11 @@ func (pet *Pet) EnableWithTimeout(sim *Simulation, petAgent PetAgent, petDuratio
 	pet.EnableGCDTimer(sim, petAgent)
 	pet.Enable(sim, petAgent)
 
-	pet.timeoutAction = sim.pendingActionPool.Get()
-	pet.timeoutAction.NextActionAt = sim.CurrentTime + petDuration
-	pet.timeoutAction.OnAction = func(sim *Simulation) {
-		pet.Disable(sim)
+	pet.timeoutAction = &PendingAction{
+		NextActionAt: sim.CurrentTime + petDuration,
+		OnAction: func(sim *Simulation) {
+			pet.Disable(sim)
+		},
 	}
 	sim.AddPendingAction(pet.timeoutAction)
 }

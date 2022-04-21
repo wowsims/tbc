@@ -10,74 +10,53 @@ import (
 
 const SpellIDHurricane int32 = 27012
 
-var HurricaneCooldownID = core.NewCooldownID()
-var HurricaneDebuffID = core.NewDebuffID()
+var HurricaneActionID = core.ActionID{SpellID: SpellIDHurricane}
 
-func (druid *Druid) newHurricaneTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID:    SpellIDHurricane,
-					CooldownID: HurricaneCooldownID,
-				},
-				Character:           &druid.Character,
-				SpellSchool:         core.SpellSchoolNature,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellExtras:         core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 1905,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 1905,
-				},
-				GCD:      core.GCDDefault,
-				Cooldown: time.Second * 60,
+func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
+	baseCost := 1905.0
+
+	hurricaneDot := core.NewDot(core.Dot{
+		Aura: druid.RegisterAura(core.Aura{
+			Label:    "Hurricane",
+			ActionID: HurricaneActionID,
+		}),
+		NumberOfTicks:       10,
+		TickLength:          time.Second * 1,
+		AffectedByCastSpeed: true,
+		TickEffects: core.TickFuncAOESnapshot(sim, core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagicNoRoll(206, 0.107),
+			OutcomeApplier:   core.OutcomeFuncTick(),
+			IsPeriodic:       true,
+		}),
+	})
+
+	druid.Hurricane = druid.RegisterSpell(core.SpellConfig{
+		ActionID:    HurricaneActionID,
+		SpellSchool: core.SpellSchoolNature,
+		SpellExtras: core.SpellExtrasChanneled,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost:        baseCost,
+				GCD:         core.GCDDefault,
+				ChannelTime: time.Second * 10,
+			},
+			CD: core.Cooldown{
+				Timer:    druid.NewTimer(),
+				Duration: time.Second * 60,
 			},
 		},
-	}
 
-	baseEffect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-			ThreatMultiplier:       1,
-		},
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:        10,
-			TickLength:           time.Second * 1,
-			TickBaseDamage:       206,
-			TickSpellCoefficient: 0.107,
-			DebuffID:             HurricaneDebuffID,
-			AffectedByCastSpeed:  true,
-		},
-	}
-
-	numHits := sim.GetNumTargets()
-	effects := make([]core.SpellHitEffect, 0, numHits)
-	for i := int32(0); i < numHits; i++ {
-		effects = append(effects, baseEffect)
-		effects[i].Target = sim.GetTarget(i)
-	}
-	spell.Effects = effects
-
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (druid *Druid) NewHurricane(sim *core.Simulation) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	hurricane := &druid.HurricaneSpell
-	druid.hurricaneCastTemplate.Apply(hurricane)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	hurricane.Init(sim)
-
-	return hurricane
+		ApplyEffects: core.ApplyEffectFuncDot(hurricaneDot),
+	})
+	hurricaneDot.Spell = druid.Hurricane
 }
 
 func (druid *Druid) ShouldCastHurricane(sim *core.Simulation, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.Hurricane && !druid.IsOnCD(HurricaneCooldownID, sim.CurrentTime)
+	return rotation.Hurricane && druid.Hurricane.IsReady(sim)
 }

@@ -9,66 +9,43 @@ import (
 
 const SpellIDConsecration int32 = 27173
 
-func (paladin *Paladin) newConsecrationTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
+var ConsecrationActionID = core.ActionID{SpellID: SpellIDConsecration}
 
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID: SpellIDConsecration,
-				},
-				Character:           &paladin.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolHoly,
-				SpellExtras:         core.SpellExtrasAlwaysHits,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 660,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 660,
-				},
-				GCD: core.GCDDefault,
-			},
-		},
-	}
+func (paladin *Paladin) registerConsecrationSpell(sim *core.Simulation) {
+	baseCost := 660.0
 
-	effect := core.SpellHitEffect{
-		SpellEffect: core.SpellEffect{
-			DamageMultiplier:       1,
-			StaticDamageMultiplier: 1,
-		},
-		DotInput: core.DotDamageInput{
-			NumberOfTicks:        8,
-			TickLength:           time.Second,
-			TickBaseDamage:       64,
-			TickSpellCoefficient: 0.119,
-		},
-	}
-
+	consecrationDot := core.NewDot(core.Dot{
+		Aura: paladin.RegisterAura(core.Aura{
+			Label:    "Consecration",
+			ActionID: ConsecrationActionID,
+		}),
+		NumberOfTicks: 8,
+		TickLength:    time.Second * 1,
+		TickEffects: core.TickFuncAOESnapshot(sim, core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagicNoRoll(64, 0.119),
+			OutcomeApplier:   core.OutcomeFuncTick(),
+			IsPeriodic:       true,
+		}),
+	})
 	// TODO: consecration talents here
 
-	numHits := sim.GetNumTargets()
-	effects := make([]core.SpellHitEffect, 0, numHits)
-	for i := int32(0); i < numHits; i++ {
-		effects = append(effects, effect)
-		effects[i].Target = sim.GetTarget(i)
-	}
-	spell.Effects = effects
+	paladin.Consecration = paladin.RegisterSpell(core.SpellConfig{
+		ActionID:    ConsecrationActionID,
+		SpellSchool: core.SpellSchoolHoly,
 
-	return core.NewSimpleSpellTemplate(spell)
-}
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
 
-func (paladin *Paladin) NewConsecration(sim *core.Simulation) *core.SimpleSpell {
-	paladin.ConsecrationSpell.Cancel(sim)
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
+			},
+		},
 
-	consecration := &paladin.ConsecrationSpell
-	paladin.consecrationTemplate.Apply(consecration)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	consecration.Init(sim)
-
-	return consecration
+		ApplyEffects: core.ApplyEffectFuncDot(consecrationDot),
+	})
+	consecrationDot.Spell = paladin.Consecration
 }

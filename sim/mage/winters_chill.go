@@ -6,55 +6,38 @@ import (
 
 const SpellIDWintersChill int32 = 28595
 
+var WintersChillActionID = core.ActionID{SpellID: SpellIDWintersChill}
+
 // Winters Chill has a separate hit check from frostbolt, so it needs its own spell.
-func (mage *Mage) newWintersChillTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDWintersChill},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFrost,
-				SpellExtras:         SpellFlagMage,
-			},
-		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{},
-		},
+func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
+	effect := core.SpellEffect{
+		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
+		ThreatMultiplier:    1,
+		OutcomeApplier:      core.OutcomeFuncMagicHit(),
 	}
 
-	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-
-	spell.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-		if !spellEffect.Landed() {
-			return
+	if mage.Talents.WintersChill > 0 {
+		wcAura := sim.GetPrimaryTarget().GetAura(core.WintersChillAuraLabel)
+		if wcAura == nil {
+			wcAura = core.WintersChillAura(sim.GetPrimaryTarget(), 0)
 		}
 
-		// Don't overwrite the permanent version.
-		if spellEffect.Target.RemainingAuraDuration(sim, core.WintersChillDebuffID) == core.NeverExpires {
-			return
+		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Landed() {
+				wcAura.Activate(sim)
+				wcAura.AddStack(sim)
+			}
 		}
-
-		newNumStacks := core.MinInt32(5, spellEffect.Target.NumStacks(core.WintersChillDebuffID)+1)
-		spellEffect.Target.ReplaceAura(sim, core.WintersChillAura(sim, newNumStacks))
 	}
 
-	return core.NewSimpleSpellTemplate(spell)
+	mage.WintersChill = mage.RegisterSpell(core.SpellConfig{
+		ActionID:    WintersChillActionID,
+		SpellSchool: core.SpellSchoolFrost,
+		SpellExtras: SpellFlagMage,
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+	})
 }
-
-func (mage *Mage) procWintersChill(sim *core.Simulation, target *core.Target) {
-	// Initialize cast from precomputed template.
-	wintersChill := &mage.wintersChillSpell
-	mage.wintersChillCastTemplate.Apply(wintersChill)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	wintersChill.Effect.Target = target
-	wintersChill.Init(sim)
-	wintersChill.Cast(sim)
-}
-
-var WintersChillAuraID = core.NewAuraID()
 
 func (mage *Mage) applyWintersChill() {
 	if mage.Talents.WintersChill == 0 {
@@ -63,22 +46,24 @@ func (mage *Mage) applyWintersChill() {
 
 	procChance := float64(mage.Talents.WintersChill) / 5.0
 
-	mage.AddPermanentAura(func(sim *core.Simulation) core.Aura {
-		return core.Aura{
-			ID: WintersChillAuraID,
-			OnSpellHit: func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
+	mage.RegisterAura(core.Aura{
+		Label:    "Winters Chill Talent",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() {
+				return
+			}
+
+			if spell.SpellSchool == core.SpellSchoolFrost && !spell.SameAction(WintersChillActionID) {
+				if procChance != 1.0 && sim.RandomFloat("Winters Chill") > procChance {
 					return
 				}
 
-				if spellCast.SpellSchool == core.SpellSchoolFrost && spellCast.ActionID.SpellID != SpellIDWintersChill {
-					if procChance != 1.0 && sim.RandomFloat("Winters Chill") > procChance {
-						return
-					}
-
-					mage.procWintersChill(sim, spellEffect.Target)
-				}
-			},
-		}
+				mage.WintersChill.Cast(sim, spellEffect.Target)
+			}
+		},
 	})
 }

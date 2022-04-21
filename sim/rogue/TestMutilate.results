@@ -1,0 +1,701 @@
+character_stats_results: {
+ key: "TestMutilate-CharacterStats-Default"
+ value: {
+  final_stats: 130.9
+  final_stats: 762.3000000000001
+  final_stats: 501.6
+  final_stats: 69.30000000000001
+  final_stats: 99.22000000000001
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 2707.2000000000003
+  final_stats: 361.85
+  final_stats: 702.9656
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 3628.6000000000004
+  final_stats: 1312
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 3
+  final_stats: 0
+  final_stats: 0
+  final_stats: 8540
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+  final_stats: 0
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-AbacusofViolentOdds-28288"
+ value: {
+  dps: 1226.330990790708
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-AdamantineFigurine-27891"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-AncientAqirArtifact-33830"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-AshtongueTalismanofLethality-32492"
+ value: {
+  dps: 1254.2959870100055
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-AssassinationArmor"
+ value: {
+  dps: 1055.1737675152538
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-BadgeofTenacity-32658"
+ value: {
+  dps: 1213.177123321038
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-BadgeoftheSwarmguard-21670"
+ value: {
+  dps: 1212.2691076609171
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-BandoftheEternalChampion-29301"
+ value: {
+  dps: 1237.0804922795944
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-BandoftheEternalSage-29305"
+ value: {
+  dps: 1201.9218973700342
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Berserker'sCall-33831"
+ value: {
+  dps: 1238.449804757848
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-BlackenedNaaruSliver-34427"
+ value: {
+  dps: 1260.8063643499922
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Bladefist'sBreadth-28041"
+ value: {
+  dps: 1214.8309806892523
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-BladeofUnquenchedThirst-31193"
+ value: {
+  dps: 1228.966915791988
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-BlazefuryMedallion-17111"
+ value: {
+  dps: 1212.657408393456
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-BracingEarthstormDiamond"
+ value: {
+  dps: 1202.534796034271
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-BraidedEterniumChain-24114"
+ value: {
+  dps: 1238.3116365037556
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-BroochoftheImmortalKing-32534"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-BrutalEarthstormDiamond"
+ value: {
+  dps: 1210.7213511190666
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-ChaoticSkyfireDiamond"
+ value: {
+  dps: 1222.8564953358073
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-CloakofDarkness-33122"
+ value: {
+  dps: 1216.2764553714542
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Coren'sLuckyCoin-38289"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-CoreofAr'kelos-29776"
+ value: {
+  dps: 1219.2142193041198
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-CrystalforgedTrinket-32654"
+ value: {
+  dps: 1223.566780568533
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Dabiri'sEnigma-30300"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-DarkIronSmokingPipe-38290"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-DarkmoonCard:Crusade-31856"
+ value: {
+  dps: 1224.1861755303303
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-DarkmoonCard:Wrath-31857"
+ value: {
+  dps: 1208.5720301753736
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Deathmantle"
+ value: {
+  dps: 1171.163570388666
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-DestructiveSkyfireDiamond"
+ value: {
+  dps: 1202.534796034271
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-EmberSkyfireDiamond"
+ value: {
+  dps: 1202.534796034271
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-EmptyMugofDirebrew-38287"
+ value: {
+  dps: 1228.966915791988
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-EnigmaticSkyfireDiamond"
+ value: {
+  dps: 1206.8680520977614
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-EssenceoftheMartyr-29376"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-EternalEarthstormDiamond"
+ value: {
+  dps: 1202.534796034271
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-EyeofMagtheridon-28789"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Figurine-LivingRubySerpent-24126"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Figurine-NightseyePanther-24128"
+ value: {
+  dps: 1215.3530961320191
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Figurine-ShadowsongPanther-35702"
+ value: {
+  dps: 1231.7595601006399
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-GnomereganAuto-Blocker600-29387"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-HandofJustice-11815"
+ value: {
+  dps: 1220.9096586625683
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Heartrazor-29962"
+ value: {
+  dps: 1228.966915791988
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-HexShrunkenHead-33829"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-HourglassoftheUnraveller-28034"
+ value: {
+  dps: 1221.0664023200886
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-IconofUnyieldingCourage-28121"
+ value: {
+  dps: 1224.861767674831
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-IconoftheSilverCrescent-29370"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-ImbuedUnstableDiamond"
+ value: {
+  dps: 1202.534796034271
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-InsightfulEarthstormDiamond"
+ value: {
+  dps: 1202.534796034271
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-KissoftheSpider-22954"
+ value: {
+  dps: 1221.3581794001468
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-MadnessoftheBetrayer-32505"
+ value: {
+  dps: 1238.8775357865954
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Mana-EtchedRegalia"
+ value: {
+  dps: 912.4863600921904
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-MarkoftheChampion-23206"
+ value: {
+  dps: 1232.195648178551
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-MarkoftheChampion-23207"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Moroes'LuckyPocketWatch-28528"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-MysticalSkyfireDiamond"
+ value: {
+  dps: 1202.534796034271
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Netherblade"
+ value: {
+  dps: 1103.2575968172541
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-PotentUnstableDiamond"
+ value: {
+  dps: 1208.51921562604
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-PowerfulEarthstormDiamond"
+ value: {
+  dps: 1202.534796034271
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-PrimalIntent"
+ value: {
+  dps: 1206.717217022586
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Quagmirran'sEye-27683"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-RelentlessEarthstormDiamond"
+ value: {
+  dps: 1228.966915791988
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-RobeoftheElderScribes-28602"
+ value: {
+  dps: 1156.9826567228706
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Romulo'sPoisonVial-28579"
+ value: {
+  dps: 1230.25514103601
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-ScarabofDisplacement-30629"
+ value: {
+  dps: 1184.1788733825845
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Scryer'sBloodgem-29132"
+ value: {
+  dps: 1195.7306522236045
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-SextantofUnstableCurrents-30626"
+ value: {
+  dps: 1194.0910602248866
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-ShadowmoonInsignia-32501"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-ShardofContempt-34472"
+ value: {
+  dps: 1245.8636724511002
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Shiffar'sNexus-Horn-28418"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-ShiftingNaaruSliver-34429"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Slayer'sArmor"
+ value: {
+  dps: 1325.0457438498365
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Slayer'sCrest-23041"
+ value: {
+  dps: 1225.8549982200163
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Sorcerer'sAlchemistStone-35749"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-SpellstrikeInfusion"
+ value: {
+  dps: 1057.9362609103355
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-StrengthoftheClefthoof"
+ value: {
+  dps: 1046.5659756989912
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-SwiftSkyfireDiamond"
+ value: {
+  dps: 1208.51921562604
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-SwiftStarfireDiamond"
+ value: {
+  dps: 1202.534796034271
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-SwiftWindfireDiamond"
+ value: {
+  dps: 1207.521812360745
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-TenaciousEarthstormDiamond"
+ value: {
+  dps: 1202.534796034271
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-TheLightningCapacitor-28785"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-TheNightBlade-31331"
+ value: {
+  dps: 1228.966915791988
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-TheRestrainedEssenceofSapphiron-23046"
+ value: {
+  dps: 1194.0246062284562
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-TheSkullofGul'dan-32483"
+ value: {
+  dps: 1195.6931315943116
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-TheTwinStars"
+ value: {
+  dps: 1171.3123568746457
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-ThunderingSkyfireDiamond"
+ value: {
+  dps: 1217.4302954246878
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Timbal'sFocusingCrystal-34470"
+ value: {
+  dps: 1202.0783767043445
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-TsunamiTalisman-30627"
+ value: {
+  dps: 1227.8057678498287
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Warp-SpringCoil-30450"
+ value: {
+  dps: 1241.8621689954928
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-WastewalkerArmor"
+ value: {
+  dps: 1070.2300714258702
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-WindhawkArmor"
+ value: {
+  dps: 1093.0518917846875
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-WrathofSpellfire"
+ value: {
+  dps: 1074.2115078049205
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-Xi'ri'sGift-29179"
+ value: {
+  dps: 1194.0910602248866
+ }
+}
+dps_results: {
+ key: "TestMutilate-Average-Default"
+ value: {
+  dps: 1222.050168799269
+ }
+}
+dps_results: {
+ key: "TestMutilate-SelfDrums-DPS"
+ value: {
+  dps: 1232.5950733226446
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 1238.1270332849715
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1229.0729321454828
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1109.6649122750848
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1465.7923759458301
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 622.9962514322477
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 622.9962514322477
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 556.9346335707486
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 668.0006568480501
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 1238.2316464400506
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1228.966915791988
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1109.3985689867652
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1465.4799924342144
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 622.9834486182843
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 622.9834486182843
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 556.9813272344901
+ }
+}
+dps_results: {
+ key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 668.1146835752463
+ }
+}

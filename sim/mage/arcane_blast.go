@@ -11,100 +11,76 @@ const SpellIDArcaneBlast int32 = 30451
 const ArcaneBlastBaseManaCost = 195.0
 const ArcaneBlastBaseCastTime = time.Millisecond * 2500
 
-func (mage *Mage) newArcaneBlastTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	abAura := core.Aura{
-		ID:       ArcaneBlastAuraID,
-		ActionID: core.ActionID{SpellID: 36032},
-		Duration: time.Second * 8,
-		Stacks:   0,
-		OnExpire: func(sim *core.Simulation) {
+func (mage *Mage) newArcaneBlastSpell(sim *core.Simulation, numStacks int32) *core.Spell {
+	mage.ArcaneBlastAura = mage.GetOrRegisterAura(core.Aura{
+		Label:     "Arcane Blast",
+		ActionID:  core.ActionID{SpellID: 36032},
+		Duration:  time.Second * 8,
+		MaxStacks: 3,
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			// Reset the mana cost on expiration.
-			if mage.arcaneBlastSpell.IsInUse() {
-				mage.arcaneBlastSpell.Cost.Value = core.MaxFloat(0, mage.arcaneBlastSpell.Cost.Value-3.0*ArcaneBlastBaseManaCost*0.75)
-				mage.arcaneBlastSpell.ActionID.Tag = 1
+			for i := int32(0); i < 4; i++ {
+				mage.ArcaneBlast[i].CurCast.Cost = core.MaxFloat(0, mage.ArcaneBlast[i].CurCast.Cost-3.0*ArcaneBlastBaseManaCost*0.75)
 			}
 		},
-	}
+	})
 
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDArcaneBlast},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolArcane,
-				SpellExtras:         SpellFlagMage,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: ArcaneBlastBaseManaCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: ArcaneBlastBaseManaCost,
-				},
-				CastTime:       ArcaneBlastBaseCastTime,
-				GCD:            core.GCDDefault,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
-				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					abAura.Stacks = core.MinInt32(3, mage.NumStacks(ArcaneBlastAuraID)+1)
-					cast.Character.ReplaceAura(sim, abAura)
-				},
+	actionID := core.ActionID{SpellID: SpellIDArcaneBlast, Tag: numStacks + 1}
+
+	return mage.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolArcane,
+		SpellExtras: SpellFlagMage,
+
+		ResourceType: stats.Mana,
+		BaseCost:     ArcaneBlastBaseManaCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: ArcaneBlastBaseManaCost * (1 + 0.75*float64(numStacks) + core.TernaryFloat64(mage.hasTristfal, 0.2, 0)),
+
+				GCD:      core.GCDDefault,
+				CastTime: ArcaneBlastBaseCastTime - time.Duration(numStacks)*time.Second/3,
+			},
+			OnCastComplete: func(_ *core.Simulation, _ *core.Spell) {
+				mage.ArcaneBlastAura.Activate(sim)
+				mage.ArcaneBlastAura.AddStack(sim)
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier:       1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    668,
-				MaxBaseDamage:    772,
-				SpellCoefficient: 2.5 / 3.5,
-			},
-		},
-	}
 
-	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance
-	spell.Effect.BonusSpellCritRating += float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			BonusSpellHitRating:  float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance,
+			BonusSpellCritRating: float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance,
 
-	if mage.hasTristfal {
-		spell.Effect.StaticDamageMultiplier *= 1.2
-		spell.Cost.Value += 0.2 * ArcaneBlastBaseManaCost
-	}
+			DamageMultiplier: mage.spellDamageMultiplier * core.TernaryFloat64(mage.hasTristfal, 1.2, 1),
+			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 
-	return core.NewSimpleSpellTemplate(spell)
+			BaseDamage:     core.BaseDamageConfigMagic(668, 772, 2.5/3.5),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
+		}),
+	})
 }
 
-func (mage *Mage) NewArcaneBlast(sim *core.Simulation, target *core.Target) (*core.SimpleSpell, int32) {
-	// Initialize cast from precomputed template.
-	arcaneBlast := &mage.arcaneBlastSpell
-	mage.arcaneBlastCastTemplate.Apply(arcaneBlast)
-
-	numStacks := mage.NumStacks(ArcaneBlastAuraID)
-	arcaneBlast.CastTime -= time.Duration(numStacks) * time.Second / 3
-	arcaneBlast.Cost.Value += float64(numStacks) * ArcaneBlastBaseManaCost * 0.75
-	arcaneBlast.ActionID.Tag = numStacks + 1
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	arcaneBlast.Effect.Target = target
-	arcaneBlast.Init(sim)
-
-	return arcaneBlast, numStacks
+func (mage *Mage) ArcaneBlastCastTime(numStacks int32) time.Duration {
+	castTime := mage.ArcaneBlast[numStacks].DefaultCast.CastTime
+	castTime = mage.ApplyCastSpeed(castTime)
+	return castTime
 }
 
-var ArcaneBlastAuraID = core.NewAuraID()
+func (mage *Mage) ArcaneBlastManaCost(numStacks int32) float64 {
+	cost := mage.ArcaneBlast[numStacks].DefaultCast.Cost
+	cost = mage.ArcaneBlast[numStacks].ApplyCostModifiers(cost)
+	return cost
+}
 
 // Whether Arcane Blast stacks will fall off before a new blast could finish casting.
-func (mage *Mage) willDropArcaneBlastStacks(sim *core.Simulation, curArcaneBlast *core.SimpleSpell, numStacks int32) bool {
-	remainingBuffTime := mage.RemainingAuraDuration(sim, ArcaneBlastAuraID)
-
-	return numStacks == 0 || remainingBuffTime < curArcaneBlast.CastTime
+func (mage *Mage) willDropArcaneBlastStacks(sim *core.Simulation, castTime time.Duration, numStacks int32) bool {
+	remainingBuffTime := mage.ArcaneBlastAura.RemainingDuration(sim)
+	return numStacks == 0 || remainingBuffTime < castTime
 }
 
 // Determines whether we can spam arcane blast for the remainder of the encounter.
-func (mage *Mage) canBlast(sim *core.Simulation, curArcaneBlast *core.SimpleSpell, numStacks int32, willDropStacks bool) bool {
+func (mage *Mage) canBlast(sim *core.Simulation, curManaCost float64, curCastTime time.Duration, numStacks int32, willDropStacks bool) bool {
 	numStacksAfterFirstCast := numStacks + 1
 	if willDropStacks {
 		numStacksAfterFirstCast = 1
@@ -120,8 +96,8 @@ func (mage *Mage) canBlast(sim *core.Simulation, curArcaneBlast *core.SimpleSpel
 	}
 
 	// First cast, which is curArcaneBlast
-	projectedRemainingMana -= curArcaneBlast.Cost.Value
-	remainingDuration -= curArcaneBlast.CastTime
+	projectedRemainingMana -= curManaCost
+	remainingDuration -= curCastTime
 	if projectedRemainingMana < 0 {
 		return false
 	} else if remainingDuration < 0 {

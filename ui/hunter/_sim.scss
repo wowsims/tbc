@@ -6,7 +6,7 @@
 	--theme-color-background: #0c190f;
 	--theme-color-background-raw: 12, 25, 15;
 	--theme-background-image: url('/tbc/assets/hunter_background.jpg');
-	--theme-background-opacity: 0.8;
+	--theme-background-opacity: 0.9;
 	--main-text-color: White;
 }
 
@@ -18,7 +18,7 @@
   grid-template-columns: repeat(7, 1fr);
 }
 .hunter-sim-ui .debuffs-section {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 .hunter-sim-ui .PetBuffs-section {
   grid-template-columns: repeat(3, 1fr);

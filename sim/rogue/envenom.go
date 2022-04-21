@@ -1,66 +1,65 @@
 package rogue
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var EnvenomActionID = core.ActionID{SpellID: 32684}
 
-func (rogue *Rogue) newEnvenomTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 	rogue.envenomEnergyCost = 35
 	if ItemSetAssassination.CharacterHasSetBonus(&rogue.Character, 4) {
 		rogue.envenomEnergyCost -= 10
 	}
-
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
-	hasDeathmantle2pc := ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2)
 
-	ability := rogue.newAbility(EnvenomActionID, rogue.envenomEnergyCost, SpellFlagFinisher|core.SpellExtrasIgnoreResists, core.ProcMaskMeleeMHSpecial)
-	ability.SpellCast.SpellSchool = core.SpellSchoolNature
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-		if spellEffect.Landed() {
-			rogue.ApplyFinisher(sim, spellCast.ActionID)
-		} else {
-			if refundAmount > 0 {
-				rogue.AddEnergy(sim, spellCast.Cost.Value*refundAmount, core.ActionID{SpellID: 31245})
-			}
-		}
-	}
-	// Envenom doesn't have partial resists
-	ability.Effect.WeaponInput.CalculateDamage = func(attackPower float64, bonusWeaponDamage float64) float64 {
-		comboPoints := rogue.ComboPoints()
-		base := 180 * float64(comboPoints)
-		if hasDeathmantle2pc {
-			base += 40 * float64(comboPoints)
-		}
-		return base + (attackPower*0.03)*float64(comboPoints)
+	basePerComboPoint := 180.0
+	if ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2) {
+		basePerComboPoint += 40
 	}
 
-	// cp. backstab
-	ability.Effect.StaticDamageMultiplier += 0.04 * float64(rogue.Talents.VilePoisons)
-	if rogue.Talents.SurpriseAttacks {
-		ability.SpellExtras |= core.SpellExtrasCannotBeDodged
-	}
+	rogue.Envenom = rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    EnvenomActionID,
+		SpellSchool: core.SpellSchoolNature,
+		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasIgnoreResists | rogue.finisherFlags(),
 
-	return core.NewSimpleSpellTemplate(ability)
-}
+		ResourceType: stats.Energy,
+		BaseCost:     rogue.envenomEnergyCost,
 
-func (rogue *Rogue) NewEnvenom(_ *core.Simulation, target *core.Target) *core.SimpleSpell {
-	comboPoints := rogue.ComboPoints()
-	if comboPoints == 0 {
-		panic("Envenom requires combo points!")
-	}
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: rogue.envenomEnergyCost,
+				GCD:  time.Second,
+			},
+			ModifyCast:  rogue.applyDeathmantle,
+			IgnoreHaste: true,
+		},
 
-	ev := &rogue.envenom
-	rogue.envenomTemplate.Apply(ev)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	ev.ActionID.Tag = comboPoints
-	ev.Effect.Target = target
-	if rogue.deathmantle4pcProc {
-		ev.Cost.Value = 0
-		rogue.deathmantle4pcProc = false
-	}
-
-	return ev
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
+			DamageMultiplier: 1 + 0.04*float64(rogue.Talents.VilePoisons),
+			ThreatMultiplier: 1,
+			BaseDamage: core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					comboPoints := rogue.ComboPoints()
+					base := basePerComboPoint * float64(comboPoints)
+					return base + (hitEffect.MeleeAttackPower(spell.Character)*0.03)*float64(comboPoints)
+				},
+				TargetSpellCoefficient: 0,
+			},
+			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, false)),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					rogue.ApplyFinisher(sim, spell.ActionID)
+				} else {
+					if refundAmount > 0 {
+						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, core.ActionID{SpellID: 31245})
+					}
+				}
+			},
+		}),
+	})
 }

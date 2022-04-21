@@ -68,6 +68,7 @@ import { newIndividualExporters } from '/tbc/core/components/exporters.js';
 import { newIndividualImporters } from '/tbc/core/components/importers.js';
 import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { raceNames } from '/tbc/core/proto_utils/names.js';
+import { isTankSpec } from '/tbc/core/proto_utils/utils.js';
 import { specNames } from '/tbc/core/proto_utils/utils.js';
 import { specToEligibleRaces } from '/tbc/core/proto_utils/utils.js';
 import { specToLocalStorageKey } from '/tbc/core/proto_utils/utils.js';
@@ -294,6 +295,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			this.addDetailedResultsTab();
 			this.addLogTab();
 		}
+
+		this.player.changeEmitter.on(() => this.recomputeSettingsLayout());
 	}
 
 	private loadSettings() {
@@ -695,9 +698,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			allowHTML: true,
 			placement: 'left',
 		});
-		this.player.cooldownsChangeEmitter.on(() => {
-			this.recomputeSettingsLayout();
-		});
 
 		// Init Muuri layout only when settings tab is clicked, because it needs the elements
 		// to be shown so it can calculate sizes.
@@ -864,7 +864,9 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 	applyDefaults(eventID: EventID) {
 		TypedEvent.freezeAllAndDo(() => {
+			this.player.setRace(eventID, specToEligibleRaces[this.player.spec][0]);
 			this.player.setGear(eventID, this.sim.lookupEquipmentSpec(this.individualConfig.defaults.gear));
+			this.player.setBonusStats(eventID, new Stats());
 			this.player.setConsumes(eventID, this.individualConfig.defaults.consumes);
 			this.player.setRotation(eventID, this.individualConfig.defaults.rotation);
 			this.player.setTalentsString(eventID, this.individualConfig.defaults.talents);
@@ -877,7 +879,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 			this.sim.encounter.applyDefaults(eventID);
 			this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
-			this.sim.applyDefaults(eventID);
+			this.sim.applyDefaults(eventID, isTankSpec(this.player.spec));
 		});
 	}
 

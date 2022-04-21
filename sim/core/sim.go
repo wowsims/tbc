@@ -2,15 +2,12 @@ package core
 
 import (
 	"fmt"
-	"math/rand"
 	"runtime"
 	"strings"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
 )
-
-type InitialAura func(*Simulation) Aura
 
 type Simulation struct {
 	Raid              *Raid
@@ -20,23 +17,23 @@ type Simulation struct {
 	DurationVariation time.Duration // variation per duration
 	Duration          time.Duration // Duration of current iteration
 
-	rand *rand.Rand
+	rand Rand
 
 	// Used for testing only, see RandomFloat().
 	isTest    bool
-	testRands map[string]*rand.Rand
+	testRands map[string]Rand
 
 	// Current Simulation State
-	pendingActions    []*PendingAction
-	pendingActionPool *paPool
-	CurrentTime       time.Duration // duration that has elapsed in the sim since starting
+	pendingActions []*PendingAction
+	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
 
 	ProgressReport func(*proto.ProgressMetrics)
 
 	Log  func(string, ...interface{})
 	logs []string
 
-	emptyAuras []Aura
+	executePhase          bool
+	executePhaseCallbacks []func(*Simulation)
 }
 
 func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) *proto.RaidSimResult {
@@ -61,7 +58,7 @@ func NewSim(rsr proto.RaidSimRequest) *Simulation {
 
 	rseed := simOptions.RandomSeed
 	if rseed == 0 {
-		rseed = time.Now().Unix()
+		rseed = time.Now().UnixNano()
 	}
 
 	return &Simulation{
@@ -72,14 +69,10 @@ func NewSim(rsr proto.RaidSimRequest) *Simulation {
 		DurationVariation: encounter.DurationVariation,
 		Log:               nil,
 
-		rand: rand.New(rand.NewSource(rseed)),
+		rand: NewSplitMix(uint64(rseed)),
 
 		isTest:    simOptions.IsTest,
-		testRands: make(map[string]*rand.Rand),
-
-		emptyAuras: make([]Aura, numAuraIDs),
-
-		pendingActionPool: newPAPool(),
+		testRands: make(map[string]Rand),
 	}
 }
 
@@ -91,15 +84,15 @@ func NewSim(rsr proto.RaidSimRequest) *Simulation {
 // distinguished by the label string.
 func (sim *Simulation) RandomFloat(label string) float64 {
 	if !sim.isTest {
-		return sim.rand.Float64()
+		return sim.rand.NextFloat64()
 	}
 
 	labelRand, isPresent := sim.testRands[label]
 	if !isPresent {
-		labelRand = rand.New(rand.NewSource(int64(hash(label))))
+		labelRand = NewSplitMix(uint64(hash(label)))
 		sim.testRands[label] = labelRand
 	}
-	v := labelRand.Float64()
+	v := labelRand.NextFloat64()
 	// if sim.Log != nil {
 	// 	sim.Log("FLOAT64 '%s': %0.5f", label, v)
 	// }
@@ -124,6 +117,9 @@ func (sim *Simulation) reset() {
 
 	sim.pendingActions = make([]*PendingAction, 0, 64)
 
+	sim.executePhase = false
+	sim.executePhaseCallbacks = []func(*Simulation){}
+
 	// Targets need to be reset before the raid, so that players can check for
 	// the presence of permanent target auras in their Reset handlers.
 	for _, target := range sim.encounter.Targets {
@@ -146,31 +142,23 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	}
 
 	// Uncomment this to print logs directly to console.
+	// sim.Options.Debug = true
 	// sim.Log = func(message string, vals ...interface{}) {
 	// 	fmt.Printf(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
 	// }
 
+	for _, target := range sim.encounter.Targets {
+		target.init(sim)
+	}
+
 	for _, party := range sim.Raid.Parties {
 		for _, player := range party.Players {
 			character := player.GetCharacter()
-			character.auraTracker.logFn = func(message string, vals ...interface{}) {
-				character.Log(sim, message, vals...)
-			}
-			player.Init(sim)
+			character.init(sim, player)
 
 			for _, petAgent := range character.Pets {
-				petCharacter := petAgent.GetCharacter()
-				petCharacter.auraTracker.logFn = func(message string, vals ...interface{}) {
-					petCharacter.Log(sim, message, vals...)
-				}
-				petAgent.Init(sim)
+				petAgent.GetCharacter().init(sim, petAgent)
 			}
-		}
-	}
-
-	for _, target := range sim.encounter.Targets {
-		target.auraTracker.logFn = func(message string, vals ...interface{}) {
-			target.Log(sim, message, vals...)
 		}
 	}
 
@@ -212,19 +200,15 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 func (sim *Simulation) runOnce() {
 	sim.reset()
 
-	for true {
+	for {
 		last := len(sim.pendingActions) - 1
 		pa := sim.pendingActions[last]
 		sim.pendingActions = sim.pendingActions[:last]
 		if pa.cancelled {
-			sim.pendingActionPool.Put(pa)
 			continue
 		}
 
 		if pa.NextActionAt > sim.Duration {
-			if pa.CleanUp != nil {
-				pa.CleanUp(sim)
-			}
 			break
 		}
 
@@ -236,46 +220,37 @@ func (sim *Simulation) runOnce() {
 	}
 
 	for _, pa := range sim.pendingActions {
-		if pa == nil {
-			continue
-		}
 		if pa.CleanUp != nil {
 			pa.CleanUp(sim)
 		}
 	}
 
-	sim.Raid.doneIteration(sim.Duration)
-	sim.encounter.doneIteration(sim.Duration)
+	sim.Raid.doneIteration(sim)
+	sim.encounter.doneIteration(sim)
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
-	oldlen := len(sim.pendingActions)
-
-	// The logic to calculate the index to insert at can be replaced with sort.Search() which uses a binary search.
-	//   However I haven't found any cases yet in our simulator that it is faster.
-	var index = 0
-	for _, v := range sim.pendingActions {
+	for index, v := range sim.pendingActions {
 		if v.NextActionAt < pa.NextActionAt || (v.NextActionAt == pa.NextActionAt && v.Priority >= pa.Priority) {
-			break
+			sim.pendingActions = append(sim.pendingActions, pa)
+			copy(sim.pendingActions[index+1:], sim.pendingActions[index:])
+			sim.pendingActions[index] = pa
+			return
 		}
-		index++
 	}
-
 	sim.pendingActions = append(sim.pendingActions, pa)
-	if index == oldlen { // if the insert was at the end, just return now.
-		return
-	} else if oldlen == 1 { // simple case we can just swap the two
-		sim.pendingActions[0], sim.pendingActions[1] = sim.pendingActions[1], sim.pendingActions[0]
-		return
-	}
-
-	copy(sim.pendingActions[index+1:], sim.pendingActions[index:])
-	sim.pendingActions[index] = pa
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
 func (sim *Simulation) advance(elapsedTime time.Duration) {
 	sim.CurrentTime += elapsedTime
+
+	if !sim.executePhase && sim.CurrentTime >= sim.encounter.executePhaseBegins {
+		sim.executePhase = true
+		for _, callback := range sim.executePhaseCallbacks {
+			callback(sim)
+		}
+	}
 
 	for _, party := range sim.Raid.Parties {
 		for _, agent := range party.Players {
@@ -288,8 +263,11 @@ func (sim *Simulation) advance(elapsedTime time.Duration) {
 	}
 }
 
+func (sim *Simulation) RegisterExecutePhaseCallback(callback func(*Simulation)) {
+	sim.executePhaseCallbacks = append(sim.executePhaseCallbacks, callback)
+}
 func (sim *Simulation) IsExecutePhase() bool {
-	return sim.CurrentTime > sim.encounter.executePhaseBegins
+	return sim.executePhase
 }
 
 func (sim *Simulation) GetRemainingDuration() time.Duration {

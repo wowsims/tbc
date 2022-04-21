@@ -9,67 +9,46 @@ import (
 
 const SpellIDFireBlast int32 = 27079
 
-var FireBlastCooldownID = core.NewCooldownID()
+var FireBlastActionID = core.ActionID{SpellID: SpellIDFireBlast}
 
-func (mage *Mage) newFireBlastTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID: core.ActionID{
-					SpellID:    SpellIDFireBlast,
-					CooldownID: FireBlastCooldownID,
-				},
-				Character:           &mage.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFire,
-				SpellExtras:         SpellFlagMage,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 465,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 465,
-				},
-				GCD:            core.GCDDefault,
-				Cooldown:       time.Second * 8,
-				CritMultiplier: mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)),
+func (mage *Mage) registerFireBlastSpell(sim *core.Simulation) {
+	baseCost := 465.0
+
+	mage.FireBlast = mage.RegisterSpell(core.SpellConfig{
+		ActionID:    FireBlastActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagMage,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost *
+					(1 - 0.01*float64(mage.Talents.Pyromaniac)) *
+					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
+
+				GCD: core.GCDDefault,
+			},
+			CD: core.Cooldown{
+				Timer:    mage.NewTimer(),
+				Duration: time.Second*8 - time.Millisecond*500*time.Duration(mage.Talents.ImprovedFireBlast),
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: mage.spellDamageMultiplier,
-				ThreatMultiplier:       1 - 0.05*float64(mage.Talents.BurningSoul),
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    664,
-				MaxBaseDamage:    786,
-				SpellCoefficient: 1.5 / 3.5,
-			},
-		},
-	}
 
-	spell.CastTime -= time.Millisecond * 500 * time.Duration(mage.Talents.ImprovedFireBlast)
-	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
-	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
-	spell.Effect.BonusSpellHitRating += float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance
-	spell.Effect.BonusSpellCritRating += float64(mage.Talents.CriticalMass) * 2 * core.SpellCritRatingPerCritChance
-	spell.Effect.BonusSpellCritRating += float64(mage.Talents.Pyromaniac) * 1 * core.SpellCritRatingPerCritChance
-	spell.Effect.StaticDamageMultiplier *= 1 + 0.02*float64(mage.Talents.FirePower)
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
 
-	return core.NewSimpleSpellTemplate(spell)
-}
+			BonusSpellCritRating: 0 +
+				float64(mage.Talents.CriticalMass)*2*core.SpellCritRatingPerCritChance +
+				float64(mage.Talents.Pyromaniac)*1*core.SpellCritRatingPerCritChance,
 
-func (mage *Mage) NewFireBlast(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	fireBlast := &mage.fireBlastSpell
-	mage.fireBlastCastTemplate.Apply(fireBlast)
+			DamageMultiplier: mage.spellDamageMultiplier * (1 + 0.02*float64(mage.Talents.FirePower)),
 
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	fireBlast.Effect.Target = target
-	fireBlast.Init(sim)
+			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 
-	return fireBlast
+			BaseDamage:     core.BaseDamageConfigMagic(664, 786, 1.5/3.5),
+			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
+		}),
+	})
 }

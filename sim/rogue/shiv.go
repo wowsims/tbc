@@ -1,51 +1,55 @@
 package rogue
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var ShivActionID = core.ActionID{SpellID: 5938}
 
-func (rogue *Rogue) newShivTemplate(_ *core.Simulation) core.SimpleSpellTemplate {
+func (rogue *Rogue) registerShivSpell(_ *core.Simulation) {
 	rogue.shivEnergyCost = 20
 	if rogue.GetOHWeapon() != nil {
 		rogue.shivEnergyCost = 20 + 10*rogue.GetOHWeapon().SwingSpeed
 	}
 
-	ability := rogue.newAbility(ShivActionID, rogue.shivEnergyCost, SpellFlagBuilder|core.SpellExtrasCannotBeDodged, core.ProcMaskMeleeOHSpecial)
-	ability.Effect.OnSpellHit = func(sim *core.Simulation, spellCast *core.SpellCast, spellEffect *core.SpellEffect) {
-		if spellEffect.Landed() {
-			rogue.AddComboPoints(sim, 1, ShivActionID)
+	rogue.Shiv = rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    ShivActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder | core.SpellExtrasCannotBeDodged,
 
-			switch rogue.Consumes.OffHandImbue {
-			case proto.WeaponImbue_WeaponImbueRogueDeadlyPoison:
-				rogue.procDeadlyPoison(sim, spellEffect)
-			case proto.WeaponImbue_WeaponImbueRogueInstantPoison:
-				rogue.procInstantPoison(sim, spellEffect)
-			}
-		}
-	}
-	ability.Effect.WeaponInput = core.WeaponDamageInput{
-		Normalized:       true,
-		Offhand:          true,
-		DamageMultiplier: 1 + 0.1*float64(rogue.Talents.DualWieldSpecialization),
-	}
+		ResourceType: stats.Energy,
+		BaseCost:     rogue.shivEnergyCost,
 
-	if rogue.Talents.SurpriseAttacks {
-		ability.Effect.StaticDamageMultiplier += 0.1
-	}
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: rogue.shivEnergyCost,
+				GCD:  time.Second,
+			},
+			IgnoreHaste: true,
+		},
 
-	return core.NewSimpleSpellTemplate(ability)
-}
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeOHSpecial,
+			DamageMultiplier: 1 + core.TernaryFloat64(rogue.Talents.SurpriseAttacks, 0.1, 0),
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.OffHand, true, 0, 1+0.1*float64(rogue.Talents.DualWieldSpecialization), true),
+			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(false, true)),
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					rogue.AddComboPoints(sim, 1, ShivActionID)
 
-func (rogue *Rogue) NewShiv(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	sh := &rogue.shiv
-	rogue.shivTemplate.Apply(sh)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	sh.Effect.Target = target
-	sh.Init(sim)
-
-	return sh
+					switch rogue.Consumes.OffHandImbue {
+					case proto.WeaponImbue_WeaponImbueRogueDeadlyPoison:
+						rogue.DeadlyPoison.Cast(sim, spellEffect.Target)
+					case proto.WeaponImbue_WeaponImbueRogueInstantPoison:
+						rogue.procInstantPoison(sim, spellEffect)
+					}
+				}
+			},
+		}),
+	})
 }

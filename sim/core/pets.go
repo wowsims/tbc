@@ -10,31 +10,22 @@ import (
 
 var GnomishFlameTurretActionID = ActionID{ItemID: 23841}
 
-func (character *Character) newGnomishFlameTurretCaster() func(sim *Simulation) {
+func (character *Character) newGnomishFlameTurretSpell() *Spell {
 	gft := character.NewGnomishFlameTurret()
 
-	castTemplate := SimpleCast{
-		Cast: Cast{
-			ActionID:  GnomishFlameTurretActionID,
-			Character: character,
-			OnCastComplete: func(sim *Simulation, cast *Cast) {
-				gft.EnableWithTimeout(sim, gft, time.Second*45)
-			},
-		},
-	}
+	return character.RegisterSpell(SpellConfig{
+		ActionID: GnomishFlameTurretActionID,
 
-	return func(sim *Simulation) {
-		cast := castTemplate
-		cast.Init(sim)
-		cast.StartCast(sim)
-	}
+		ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+			gft.EnableWithTimeout(sim, gft, time.Second*45)
+		},
+	})
 }
 
 type GnomishFlameTurret struct {
 	Pet
 
-	flameCannon         SimpleSpell
-	flameCannonTemplate SimpleSpellTemplate
+	FlameCannon *Spell
 }
 
 func (character *Character) NewGnomishFlameTurret() *GnomishFlameTurret {
@@ -62,59 +53,39 @@ func (gft *GnomishFlameTurret) GetPet() *Pet {
 }
 
 func (gft *GnomishFlameTurret) Init(sim *Simulation) {
-	gft.flameCannonTemplate = gft.newFlameCannonTemplate(sim)
+	gft.registerFlameCannonSpell(sim)
 }
 
 func (gft *GnomishFlameTurret) Reset(sim *Simulation) {
 }
 
 func (gft *GnomishFlameTurret) OnGCDReady(sim *Simulation) {
-	gft.NewFlameCannon(sim, sim.GetPrimaryTarget()).Cast(sim)
+	gft.FlameCannon.Cast(sim, sim.GetPrimaryTarget())
 }
 
 const SpellIDFlameCannon int32 = 30527
 
-func (gft *GnomishFlameTurret) newFlameCannonTemplate(sim *Simulation) SimpleSpellTemplate {
-	spell := SimpleSpell{
-		SpellCast: SpellCast{
-			Cast: Cast{
-				ActionID:            ActionID{SpellID: SpellIDFlameCannon},
-				Character:           &gft.Character,
-				CritRollCategory:    CritRollCategoryMagical,
-				OutcomeRollCategory: OutcomeRollCategoryMagic,
-				SpellSchool:         SpellSchoolFire,
+func (gft *GnomishFlameTurret) registerFlameCannonSpell(sim *Simulation) {
+	gft.FlameCannon = gft.RegisterSpell(SpellConfig{
+		ActionID:    ActionID{SpellID: SpellIDFlameCannon},
+		SpellSchool: SpellSchoolFire,
+
+		Cast: CastConfig{
+			DefaultCast: Cast{
 				// Pretty sure this works the same way as Searing Totem, where the next shot
 				// fires once the previous missile has hit the target. Just give some static
 				// value for now.
-				GCD:            time.Millisecond * 800,
-				CritMultiplier: gft.DefaultSpellCritMultiplier(),
-				IgnoreHaste:    true,
+				GCD: time.Millisecond * 800,
 			},
+			IgnoreHaste: true,
 		},
-		Effect: SpellHitEffect{
-			SpellEffect: SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: DirectDamageInput{
-				MinBaseDamage: 31,
-				MaxBaseDamage: 36,
-			},
-		},
-	}
 
-	return NewSimpleSpellTemplate(spell)
-}
+		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
 
-func (gft *GnomishFlameTurret) NewFlameCannon(sim *Simulation, target *Target) *SimpleSpell {
-	// Initialize cast from precomputed template.
-	fc := &gft.flameCannon
-	gft.flameCannonTemplate.Apply(fc)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	fc.Effect.Target = target
-	fc.Init(sim)
-
-	return fc
+			BaseDamage:     BaseDamageConfigRoll(31, 36),
+			OutcomeApplier: OutcomeFuncMagicHitAndCrit(gft.DefaultSpellCritMultiplier()),
+		}),
+	})
 }

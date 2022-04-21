@@ -9,68 +9,53 @@ import (
 
 // The numbers in this file are VERY rough approximations based on logs.
 
-var SummonWaterElementalCooldownID = core.NewCooldownID()
-
 func (mage *Mage) registerSummonWaterElementalCD() {
 	if !mage.Talents.SummonWaterElemental {
 		return
 	}
 
-	manaCost := 0.0
-	actionID := core.ActionID{SpellID: 31687, CooldownID: SummonWaterElementalCooldownID}
+	actionID := core.ActionID{SpellID: 31687}
+
+	baseCost := mage.BaseMana() * 0.16
+	mage.SummonWaterElemental = mage.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost *
+					(1 - 0.05*float64(mage.Talents.FrostChanneling)) *
+					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
+				GCD: core.GCDDefault,
+			},
+			CD: core.Cooldown{
+				Timer:    mage.NewTimer(),
+				Duration: time.Minute * 3,
+			},
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
+
+			// All MCDs that use the GCD and have a non-zero cast time must call this.
+			mage.UpdateMajorCooldowns()
+		},
+	})
 
 	mage.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: SummonWaterElementalCooldownID,
-		Cooldown:   time.Minute * 3,
-		UsesGCD:    true,
-		Priority:   core.CooldownPriorityDrums + 1, // Always prefer to cast before drums or lust so the ele gets their benefits.
-		Type:       core.CooldownTypeDPS,
+		Spell:    mage.SummonWaterElemental,
+		Priority: core.CooldownPriorityDrums + 1, // Always prefer to cast before drums or lust so the ele gets their benefits.
+		Type:     core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if mage.waterElemental.IsEnabled() {
 				return false
 			}
-			if character.CurrentMana() < manaCost {
+			if character.CurrentMana() < mage.SummonWaterElemental.DefaultCast.Cost {
 				return false
 			}
 			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			baseManaCost := mage.BaseMana() * 0.16
-			castTemplate := core.SimpleCast{
-				Cast: core.Cast{
-					ActionID:  actionID,
-					Character: mage.GetCharacter(),
-					BaseCost: core.ResourceCost{
-						Type:  stats.Mana,
-						Value: baseManaCost,
-					},
-					Cost: core.ResourceCost{
-						Type:  stats.Mana,
-						Value: baseManaCost,
-					},
-					GCD:      core.GCDDefault,
-					Cooldown: time.Minute * 3,
-					OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-						mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
-
-						// All MCDs that use the GCD and have a non-zero cast time must call this.
-						mage.UpdateMajorCooldowns()
-					},
-				},
-			}
-			castTemplate.Cost.Value -= castTemplate.BaseCost.Value * float64(mage.Talents.FrostChanneling) * 0.05
-			castTemplate.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
-			manaCost = castTemplate.Cost.Value
-
-			return func(sim *core.Simulation, character *core.Character) {
-				cast := castTemplate
-				cast.Init(sim)
-				cast.StartCast(sim)
-			}
 		},
 	})
 }
@@ -82,8 +67,7 @@ type WaterElemental struct {
 	// does its own thing. This controls how much it does that.
 	disobeyChance float64
 
-	waterboltSpell        core.SimpleSpell
-	waterboltCastTemplate core.SimpleSpellTemplate
+	Waterbolt *core.Spell
 }
 
 func (mage *Mage) NewWaterElemental(disobeyChance float64) *WaterElemental {
@@ -109,28 +93,23 @@ func (we *WaterElemental) GetPet() *core.Pet {
 }
 
 func (we *WaterElemental) Init(sim *core.Simulation) {
-	we.waterboltCastTemplate = we.newWaterboltTemplate(sim)
+	we.registerWaterboltSpell(sim)
 }
 
 func (we *WaterElemental) Reset(sim *core.Simulation) {
 }
 
 func (we *WaterElemental) OnGCDReady(sim *core.Simulation) {
-	// There's some edge case where this causes a panic, haven't figured it out yet.
-	if we.waterboltSpell.IsInUse() {
-		we.waterboltSpell.Cancel(sim)
-	}
-
-	spell := we.NewWaterbolt(sim, sim.GetPrimaryTarget())
+	spell := we.Waterbolt
 
 	if sim.RandomFloat("Water Elemental Disobey") < we.disobeyChance {
 		// Water ele has decided not to cooperate, so just wait for the cast time
 		// instead of casting.
-		we.WaitUntil(sim, sim.CurrentTime+spell.GetDuration())
+		we.WaitUntil(sim, sim.CurrentTime+spell.DefaultCast.CastTime)
 		return
 	}
 
-	if success := spell.Cast(sim); !success {
+	if success := spell.Cast(sim, sim.GetPrimaryTarget()); !success {
 		// If water ele has gone OOM then there won't be enough time left for meaningful
 		// regen to occur before the ele expires. So just murder itself.
 		we.Disable(sim)
@@ -162,54 +141,31 @@ var waterElementalStatInheritance = func(ownerStats stats.Stats) stats.Stats {
 
 const SpellIDWaterbolt int32 = 31707
 
-func (we *WaterElemental) newWaterboltTemplate(sim *core.Simulation) core.SimpleSpellTemplate {
-	baseManaCost := we.BaseMana() * 0.1
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:            core.ActionID{SpellID: SpellIDWaterbolt},
-				Character:           &we.Character,
-				CritRollCategory:    core.CritRollCategoryMagical,
-				OutcomeRollCategory: core.OutcomeRollCategoryMagic,
-				SpellSchool:         core.SpellSchoolFrost,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: baseManaCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: baseManaCost,
-				},
-				CastTime:       time.Millisecond * 3000,
-				GCD:            core.GCDDefault,
-				CritMultiplier: we.DefaultSpellCritMultiplier(),
+var WaterboltActionID = core.ActionID{SpellID: SpellIDWaterbolt}
+
+func (we *WaterElemental) registerWaterboltSpell(sim *core.Simulation) {
+	baseCost := we.BaseMana() * 0.1
+
+	we.Waterbolt = we.RegisterSpell(core.SpellConfig{
+		ActionID:    WaterboltActionID,
+		SpellSchool: core.SpellSchoolFrost,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost:     baseCost,
+				GCD:      core.GCDDefault,
+				CastTime: time.Second * 3,
 			},
 		},
-		Effect: core.SpellHitEffect{
-			SpellEffect: core.SpellEffect{
-				DamageMultiplier:       1,
-				StaticDamageMultiplier: 1,
-				ThreatMultiplier:       1,
-			},
-			DirectInput: core.DirectDamageInput{
-				MinBaseDamage:    256,
-				MaxBaseDamage:    328,
-				SpellCoefficient: 3.0 / 3.5,
-			},
-		},
-	}
 
-	return core.NewSimpleSpellTemplate(spell)
-}
-
-func (we *WaterElemental) NewWaterbolt(sim *core.Simulation, target *core.Target) *core.SimpleSpell {
-	// Initialize cast from precomputed template.
-	waterbolt := &we.waterboltSpell
-	we.waterboltCastTemplate.Apply(waterbolt)
-
-	// Set dynamic fields, i.e. the stuff we couldn't precompute.
-	waterbolt.Effect.Target = target
-	waterbolt.Init(sim)
-
-	return waterbolt
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       core.BaseDamageConfigMagic(256, 328, 3.0/3.5),
+			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(we.DefaultSpellCritMultiplier()),
+		}),
+	})
 }
