@@ -209,6 +209,35 @@ func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
 	}
 }
 
+func OutcomeFuncMeleeSpecialNoBlockDodgeParry(critMultiplier float64) OutcomeApplier {
+	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+		character := spell.Character
+		roll := sim.RandomFloat("White Hit Table")
+
+		// Miss
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
+		chance := MaxFloat(0, missChance)
+		if roll < chance {
+			spellEffect.Outcome = OutcomeMiss
+			spell.Misses++
+			*damage = 0
+			return
+		}
+
+		// Crit (separate roll)
+		if spellEffect.physicalCritRoll(sim, spell) {
+			spellEffect.Outcome = OutcomeCrit
+			spell.Crits++
+			*damage *= critMultiplier
+			return
+		}
+
+		// Hit
+		spellEffect.Outcome = OutcomeHit
+		spell.Hits++
+	}
+}
+
 func OutcomeFuncMeleeSpecialCritOnly(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		if spellEffect.physicalCritRoll(sim, spell) {

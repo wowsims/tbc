@@ -13,8 +13,7 @@ type WarriorInputs struct {
 	PrecastShout         bool
 	PrecastShoutSapphire bool
 	PrecastShoutT2       bool
-	UseCleave            bool // Cleave instead of HS
-	UseRecklessness      bool
+	RampageCDThreshold   time.Duration
 }
 
 type Warrior struct {
@@ -25,11 +24,12 @@ type Warrior struct {
 	WarriorInputs
 
 	// Current state
-	Stance             Stance
-	heroicStrikeQueued bool
-	rampageValidUntil  time.Duration
-	revengeTriggered   bool
-	shoutExpiresAt     time.Duration
+	Stance              Stance
+	heroicStrikeQueued  bool
+	overpowerValidUntil time.Duration
+	rampageValidUntil   time.Duration
+	revengeTriggered    bool
+	shoutExpiresAt      time.Duration
 
 	// Cached values
 	shoutDuration time.Duration
@@ -46,8 +46,10 @@ type Warrior struct {
 	DemoralizingShout    *core.Spell
 	Devastate            *core.Spell
 	Execute              *core.Spell
+	Hamstring            *core.Spell
 	HeroicStrike         *core.Spell
 	MortalStrike         *core.Spell
+	Overpower            *core.Spell
 	Rampage              *core.Spell
 	Revenge              *core.Spell
 	ShieldSlam           *core.Spell
@@ -109,8 +111,10 @@ func (warrior *Warrior) Init(sim *core.Simulation) {
 	warrior.registerDemoralizingShoutSpell(sim)
 	warrior.registerDevastateSpell(sim)
 	warrior.registerExecuteSpell(sim)
+	warrior.registerHamstringSpell()
 	warrior.registerHeroicStrikeSpell(sim)
 	warrior.registerMortalStrikeSpell(sim)
+	warrior.registerOverpowerSpell()
 	warrior.registerRampageSpell()
 	warrior.registerRevengeSpell(sim)
 	warrior.registerShieldSlamSpell(sim)
@@ -133,6 +137,7 @@ func (warrior *Warrior) Init(sim *core.Simulation) {
 func (warrior *Warrior) Reset(sim *core.Simulation) {
 	warrior.heroicStrikeQueued = false
 	warrior.revengeTriggered = false
+	warrior.overpowerValidUntil = 0
 	warrior.rampageValidUntil = 0
 
 	warrior.shoutExpiresAt = 0

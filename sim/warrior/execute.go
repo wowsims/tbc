@@ -65,6 +65,6 @@ func (warrior *Warrior) registerExecuteSpell(_ *core.Simulation) {
 	})
 }
 
-func (warrior *Warrior) CanExecute(sim *core.Simulation) bool {
-	return sim.IsExecutePhase() && warrior.CurrentRage() >= warrior.Execute.BaseCost
+func (warrior *Warrior) CanExecute() bool {
+	return warrior.CurrentRage() >= warrior.Execute.BaseCost
 }

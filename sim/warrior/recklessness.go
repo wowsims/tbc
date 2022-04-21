@@ -7,11 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warrior *Warrior) registerRecklessnessCD() {
-	if !warrior.UseRecklessness {
-		return
-	}
-
+func (warrior *Warrior) RegisterRecklessnessCD() {
 	actionID := core.ActionID{SpellID: 1719}
 	reckAura := warrior.RegisterAura(core.Aura{
 		Label:    "Recklessness",

@@ -34,22 +34,22 @@ var PlayerOptionsBasic = &proto.Player_Warrior{
 }
 
 var warriorRotation = &proto.Warrior_Rotation{
-	Fury: &proto.Warrior_Rotation_FuryRotation{
-		UseBtDuringExecute: true,
-		RampageCdThreshold: 5,
-	},
-	UseWwDuringExecute:     true,
-	UseHsDuringExecute:     true,
+	UseOverpower: true,
+	UseHamstring: true,
+
 	HsRageThreshold:        70,
-	UseOverpower:           false,
-	OverpowerRageThreshold: 30,
-	UseHamstring:           false,
 	HamstringRageThreshold: 75,
+	OverpowerRageThreshold: 20,
+	RampageCdThreshold:     5,
+
+	UseHsDuringExecute: true,
+	UseWwDuringExecute: true,
+	UseBtDuringExecute: true,
 }
 
 var warriorOptions = &proto.Warrior_Options{
 	StartingRage:         50,
-	Recklessness:         true,
+	UseRecklessness:      true,
 	Shout:                proto.WarriorShout_WarriorShoutBattle,
 	PrecastShout:         false,
 	PrecastShoutT2:       false,
