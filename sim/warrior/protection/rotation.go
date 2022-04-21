@@ -31,7 +31,7 @@ func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 			war.DemoralizingShout.Cast(sim, target)
 		} else if war.CanDevastate(sim) {
 			war.Devastate.Cast(sim, target)
-		} else if war.CanSunderArmor(sim, target) {
+		} else if war.CanSunderArmor(sim) {
 			war.SunderArmor.Cast(sim, target)
 		}
 	}

@@ -13,7 +13,9 @@ func (warrior *Warrior) registerHamstringSpell() {
 	refundAmount := cost * 0.8
 
 	warrior.Hamstring = warrior.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
 
 		ResourceType: stats.Rage,
 		BaseCost:     cost,
@@ -49,7 +51,7 @@ func (warrior *Warrior) registerHamstringSpell() {
 
 func (warrior *Warrior) ShouldHamstring(sim *core.Simulation) bool {
 	return warrior.CurrentRage() >= warrior.Hamstring.DefaultCast.Cost &&
-		warrior.Bloodthirst.TimeToReady(sim) > core.GCDDefault &&
-		warrior.MortalStrike.TimeToReady(sim) > core.GCDDefault &&
+		(!warrior.Talents.Bloodthirst || warrior.Bloodthirst.TimeToReady(sim) > core.GCDDefault) &&
+		(!warrior.Talents.MortalStrike || warrior.MortalStrike.TimeToReady(sim) > core.GCDDefault) &&
 		warrior.Whirlwind.TimeToReady(sim) > core.GCDDefault
 }
