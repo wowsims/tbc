@@ -93,8 +93,10 @@ func NewDot(config Dot) *Dot {
 		sim.AddPendingAction(dot.tickAction)
 	}
 	dot.Aura.OnExpire = func(aura *Aura, sim *Simulation) {
-		dot.tickAction.Cancel(sim)
-		dot.tickAction = nil
+		if dot.tickAction != nil {
+			dot.tickAction.Cancel(sim)
+			dot.tickAction = nil
+		}
 	}
 
 	return dot
