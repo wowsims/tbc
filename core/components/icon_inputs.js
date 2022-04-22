@@ -56,6 +56,7 @@ export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput(ActionId.fromSpe
 export const JudgementOfWisdom = makeBooleanDebuffInput(ActionId.fromSpellId(27164), 'judgementOfWisdom');
 export const Mangle = makeBooleanDebuffInput(ActionId.fromSpellId(33876), 'mangle');
 export const Misery = makeBooleanDebuffInput(ActionId.fromSpellId(33195), 'misery');
+export const ShadowWeaving = makeBooleanDebuffInput(ActionId.fromSpellId(15334), 'shadowWeaving');
 export const CurseOfElements = makeTristateDebuffInput(ActionId.fromSpellId(27228), ActionId.fromSpellId(32484), 'curseOfElements');
 export const CurseOfRecklessness = makeBooleanDebuffInput(ActionId.fromSpellId(27226), 'curseOfRecklessness');
 export const FaerieFire = makeTristateDebuffInput(ActionId.fromSpellId(26993), ActionId.fromSpellId(33602), 'faerieFire');

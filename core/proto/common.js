@@ -1788,6 +1788,7 @@ class Debuffs$Type extends MessageType {
             { no: 3, name: "misery", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "curse_of_elements", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 5, name: "isb_uptime", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 18, name: "shadow_weaving", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 6, name: "improved_scorch", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 7, name: "winters_chill", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 8, name: "blood_frenzy", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -1803,7 +1804,7 @@ class Debuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, improvedScorch: false, wintersChill: false, bloodFrenzy: false, giftOfArthas: false, mangle: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false, huntersMark: 0, exposeWeaknessUptime: 0, exposeWeaknessHunterAgility: 0 };
+        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, shadowWeaving: false, improvedScorch: false, wintersChill: false, bloodFrenzy: false, giftOfArthas: false, mangle: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false, huntersMark: 0, exposeWeaknessUptime: 0, exposeWeaknessHunterAgility: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1828,6 +1829,9 @@ class Debuffs$Type extends MessageType {
                     break;
                 case /* double isb_uptime */ 5:
                     message.isbUptime = reader.double();
+                    break;
+                case /* bool shadow_weaving */ 18:
+                    message.shadowWeaving = reader.bool();
                     break;
                 case /* bool improved_scorch */ 6:
                     message.improvedScorch = reader.bool();
@@ -1892,6 +1896,9 @@ class Debuffs$Type extends MessageType {
         /* double isb_uptime = 5; */
         if (message.isbUptime !== 0)
             writer.tag(5, WireType.Bit64).double(message.isbUptime);
+        /* bool shadow_weaving = 18; */
+        if (message.shadowWeaving !== false)
+            writer.tag(18, WireType.Varint).bool(message.shadowWeaving);
         /* bool improved_scorch = 6; */
         if (message.improvedScorch !== false)
             writer.tag(6, WireType.Varint).bool(message.improvedScorch);

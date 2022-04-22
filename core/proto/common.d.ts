@@ -329,6 +329,10 @@ export interface Debuffs {
      */
     isbUptime: number;
     /**
+     * @generated from protobuf field: bool shadow_weaving = 18;
+     */
+    shadowWeaving: boolean;
+    /**
      * @generated from protobuf field: bool improved_scorch = 6;
      */
     improvedScorch: boolean;

@@ -3,6 +3,102 @@ import { UnknownFieldHandler } from '/tbc/protobuf-ts/index.js';
 import { reflectionMergePartial } from '/tbc/protobuf-ts/index.js';
 import { MESSAGE_TYPE } from '/tbc/protobuf-ts/index.js';
 import { MessageType } from '/tbc/protobuf-ts/index.js';
+/**
+ * @generated from protobuf enum proto.Warlock.Rotation.PrimarySpell
+ */
+export var Warlock_Rotation_PrimarySpell;
+(function (Warlock_Rotation_PrimarySpell) {
+    /**
+     * @generated from protobuf enum value: UnknownSpell = 0;
+     */
+    Warlock_Rotation_PrimarySpell[Warlock_Rotation_PrimarySpell["UnknownSpell"] = 0] = "UnknownSpell";
+    /**
+     * @generated from protobuf enum value: Shadowbolt = 1;
+     */
+    Warlock_Rotation_PrimarySpell[Warlock_Rotation_PrimarySpell["Shadowbolt"] = 1] = "Shadowbolt";
+    /**
+     * @generated from protobuf enum value: Incinerate = 2;
+     */
+    Warlock_Rotation_PrimarySpell[Warlock_Rotation_PrimarySpell["Incinerate"] = 2] = "Incinerate";
+})(Warlock_Rotation_PrimarySpell || (Warlock_Rotation_PrimarySpell = {}));
+/**
+ * @generated from protobuf enum proto.Warlock.Rotation.Curse
+ */
+export var Warlock_Rotation_Curse;
+(function (Warlock_Rotation_Curse) {
+    /**
+     * @generated from protobuf enum value: NoCurse = 0;
+     */
+    Warlock_Rotation_Curse[Warlock_Rotation_Curse["NoCurse"] = 0] = "NoCurse";
+    /**
+     * @generated from protobuf enum value: Elements = 1;
+     */
+    Warlock_Rotation_Curse[Warlock_Rotation_Curse["Elements"] = 1] = "Elements";
+    /**
+     * @generated from protobuf enum value: Recklessness = 2;
+     */
+    Warlock_Rotation_Curse[Warlock_Rotation_Curse["Recklessness"] = 2] = "Recklessness";
+    /**
+     * @generated from protobuf enum value: Doom = 3;
+     */
+    Warlock_Rotation_Curse[Warlock_Rotation_Curse["Doom"] = 3] = "Doom";
+    /**
+     * @generated from protobuf enum value: Agony = 4;
+     */
+    Warlock_Rotation_Curse[Warlock_Rotation_Curse["Agony"] = 4] = "Agony";
+    /**
+     * @generated from protobuf enum value: Tongues = 5;
+     */
+    Warlock_Rotation_Curse[Warlock_Rotation_Curse["Tongues"] = 5] = "Tongues";
+})(Warlock_Rotation_Curse || (Warlock_Rotation_Curse = {}));
+/**
+ * @generated from protobuf enum proto.Warlock.Options.Summon
+ */
+export var Warlock_Options_Summon;
+(function (Warlock_Options_Summon) {
+    /**
+     * @generated from protobuf enum value: NoSummon = 0;
+     */
+    Warlock_Options_Summon[Warlock_Options_Summon["NoSummon"] = 0] = "NoSummon";
+    /**
+     * @generated from protobuf enum value: Imp = 1;
+     */
+    Warlock_Options_Summon[Warlock_Options_Summon["Imp"] = 1] = "Imp";
+    /**
+     * @generated from protobuf enum value: Voidwalker = 2;
+     */
+    Warlock_Options_Summon[Warlock_Options_Summon["Voidwalker"] = 2] = "Voidwalker";
+    /**
+     * @generated from protobuf enum value: Succubus = 3;
+     */
+    Warlock_Options_Summon[Warlock_Options_Summon["Succubus"] = 3] = "Succubus";
+    /**
+     * @generated from protobuf enum value: Felhound = 4;
+     */
+    Warlock_Options_Summon[Warlock_Options_Summon["Felhound"] = 4] = "Felhound";
+    /**
+     * @generated from protobuf enum value: Felgaurd = 5;
+     */
+    Warlock_Options_Summon[Warlock_Options_Summon["Felgaurd"] = 5] = "Felgaurd";
+})(Warlock_Options_Summon || (Warlock_Options_Summon = {}));
+/**
+ * @generated from protobuf enum proto.Warlock.Options.Armor
+ */
+export var Warlock_Options_Armor;
+(function (Warlock_Options_Armor) {
+    /**
+     * @generated from protobuf enum value: NoArmor = 0;
+     */
+    Warlock_Options_Armor[Warlock_Options_Armor["NoArmor"] = 0] = "NoArmor";
+    /**
+     * @generated from protobuf enum value: FelArmor = 1;
+     */
+    Warlock_Options_Armor[Warlock_Options_Armor["FelArmor"] = 1] = "FelArmor";
+    /**
+     * @generated from protobuf enum value: DemonArmor = 2;
+     */
+    Warlock_Options_Armor[Warlock_Options_Armor["DemonArmor"] = 2] = "DemonArmor";
+})(Warlock_Options_Armor || (Warlock_Options_Armor = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class WarlockTalents$Type extends MessageType {
     constructor() {
@@ -43,6 +139,7 @@ class WarlockTalents$Type extends MessageType {
             { no: 34, name: "bane", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 35, name: "improved_firebolt", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 36, name: "improved_lash_of_pain", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 48, name: "destructive_reach", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 37, name: "devastation", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 38, name: "shadowburn", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 39, name: "improved_searing_pain", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -57,7 +154,7 @@ class WarlockTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { suppression: 0, improvedCorruption: 0, improvedLifeTap: 0, soulSiphon: 0, improvedCurseOfAgony: 0, amplifyCurse: false, nightfall: 0, empoweredCorruption: 0, siphonLife: false, shadowMastery: 0, contagion: 0, darkPact: false, malediction: 0, unstableAffliction: false, improvedImp: 0, demonicEmbrace: 0, improvedVoidwalker: 0, felIntellect: 0, improvedSuccubus: 0, felStamina: 0, demonicAegis: 0, unholyPower: 0, improvedEnslaveDemon: 0, demonicSacrifice: false, masterConjuror: 0, manaFeed: 0, masterDemonologist: 0, soulLink: false, demonicKnowledge: 0, demonicTactics: 0, summonFelguard: false, improvedShadowBolt: 0, cataclysm: 0, bane: 0, improvedFirebolt: 0, improvedLashOfPain: 0, devastation: 0, shadowburn: false, improvedSearingPain: 0, improvedImmolate: 0, ruin: false, emberstorm: 0, backlash: 0, conflagrate: false, soulLeech: 0, shadowAndFlame: 0, shadowfury: false };
+        const message = { suppression: 0, improvedCorruption: 0, improvedLifeTap: 0, soulSiphon: 0, improvedCurseOfAgony: 0, amplifyCurse: false, nightfall: 0, empoweredCorruption: 0, siphonLife: false, shadowMastery: 0, contagion: 0, darkPact: false, malediction: 0, unstableAffliction: false, improvedImp: 0, demonicEmbrace: 0, improvedVoidwalker: 0, felIntellect: 0, improvedSuccubus: 0, felStamina: 0, demonicAegis: 0, unholyPower: 0, improvedEnslaveDemon: 0, demonicSacrifice: false, masterConjuror: 0, manaFeed: 0, masterDemonologist: 0, soulLink: false, demonicKnowledge: 0, demonicTactics: 0, summonFelguard: false, improvedShadowBolt: 0, cataclysm: 0, bane: 0, improvedFirebolt: 0, improvedLashOfPain: 0, destructiveReach: 0, devastation: 0, shadowburn: false, improvedSearingPain: 0, improvedImmolate: 0, ruin: false, emberstorm: 0, backlash: 0, conflagrate: false, soulLeech: 0, shadowAndFlame: 0, shadowfury: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -175,6 +272,9 @@ class WarlockTalents$Type extends MessageType {
                     break;
                 case /* int32 improved_lash_of_pain */ 36:
                     message.improvedLashOfPain = reader.int32();
+                    break;
+                case /* int32 destructive_reach */ 48:
+                    message.destructiveReach = reader.int32();
                     break;
                 case /* int32 devastation */ 37:
                     message.devastation = reader.int32();
@@ -329,6 +429,9 @@ class WarlockTalents$Type extends MessageType {
         /* int32 improved_lash_of_pain = 36; */
         if (message.improvedLashOfPain !== 0)
             writer.tag(36, WireType.Varint).int32(message.improvedLashOfPain);
+        /* int32 destructive_reach = 48; */
+        if (message.destructiveReach !== 0)
+            writer.tag(48, WireType.Varint).int32(message.destructiveReach);
         /* int32 devastation = 37; */
         if (message.devastation !== 0)
             writer.tag(37, WireType.Varint).int32(message.devastation);
@@ -436,19 +539,61 @@ export const Warlock = new Warlock$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Warlock_Rotation$Type extends MessageType {
     constructor() {
-        super("proto.Warlock.Rotation", []);
+        super("proto.Warlock.Rotation", [
+            { no: 1, name: "primary_spell", kind: "enum", T: () => ["proto.Warlock.Rotation.PrimarySpell", Warlock_Rotation_PrimarySpell] },
+            { no: 2, name: "curse", kind: "enum", T: () => ["proto.Warlock.Rotation.Curse", Warlock_Rotation_Curse] },
+            { no: 3, name: "immolate", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "corruption", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { primarySpell: 0, curse: 0, immolate: false, corruption: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.Warlock.Rotation.PrimarySpell primary_spell */ 1:
+                    message.primarySpell = reader.int32();
+                    break;
+                case /* proto.Warlock.Rotation.Curse curse */ 2:
+                    message.curse = reader.int32();
+                    break;
+                case /* bool immolate */ 3:
+                    message.immolate = reader.bool();
+                    break;
+                case /* bool corruption */ 4:
+                    message.corruption = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* proto.Warlock.Rotation.PrimarySpell primary_spell = 1; */
+        if (message.primarySpell !== 0)
+            writer.tag(1, WireType.Varint).int32(message.primarySpell);
+        /* proto.Warlock.Rotation.Curse curse = 2; */
+        if (message.curse !== 0)
+            writer.tag(2, WireType.Varint).int32(message.curse);
+        /* bool immolate = 3; */
+        if (message.immolate !== false)
+            writer.tag(3, WireType.Varint).bool(message.immolate);
+        /* bool corruption = 4; */
+        if (message.corruption !== false)
+            writer.tag(4, WireType.Varint).bool(message.corruption);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -462,19 +607,54 @@ export const Warlock_Rotation = new Warlock_Rotation$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class Warlock_Options$Type extends MessageType {
     constructor() {
-        super("proto.Warlock.Options", []);
+        super("proto.Warlock.Options", [
+            { no: 1, name: "armor", kind: "enum", T: () => ["proto.Warlock.Options.Armor", Warlock_Options_Armor] },
+            { no: 2, name: "summon", kind: "enum", T: () => ["proto.Warlock.Options.Summon", Warlock_Options_Summon] },
+            { no: 3, name: "sacrifice_summon", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
     }
     create(value) {
-        const message = {};
+        const message = { armor: 0, summon: 0, sacrificeSummon: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
         return message;
     }
     internalBinaryRead(reader, length, options, target) {
-        return target ?? this.create();
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.Warlock.Options.Armor armor */ 1:
+                    message.armor = reader.int32();
+                    break;
+                case /* proto.Warlock.Options.Summon summon */ 2:
+                    message.summon = reader.int32();
+                    break;
+                case /* bool sacrifice_summon */ 3:
+                    message.sacrificeSummon = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* proto.Warlock.Options.Armor armor = 1; */
+        if (message.armor !== 0)
+            writer.tag(1, WireType.Varint).int32(message.armor);
+        /* proto.Warlock.Options.Summon summon = 2; */
+        if (message.summon !== 0)
+            writer.tag(2, WireType.Varint).int32(message.summon);
+        /* bool sacrifice_summon = 3; */
+        if (message.sacrificeSummon !== false)
+            writer.tag(3, WireType.Varint).bool(message.sacrificeSummon);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
