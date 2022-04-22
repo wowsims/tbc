@@ -152,6 +152,8 @@ func (shaman *Shaman) registerNovaTotemSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			shaman.MagmaTotemDot.Cancel(sim)
+			shaman.SearingTotemDot.Cancel(sim)
 			shaman.FireNovaTotemDot.Apply(sim)
 			shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + tickLength + 1
 			shaman.tryTwistFireNova(sim)

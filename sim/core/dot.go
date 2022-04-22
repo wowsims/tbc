@@ -31,9 +31,7 @@ type Dot struct {
 }
 
 func (dot *Dot) Apply(sim *Simulation) {
-	if dot.Aura.IsActive() {
-		dot.Aura.Deactivate(sim)
-	}
+	dot.Cancel(sim)
 
 	dot.TickCount = 0
 	if dot.AffectedByCastSpeed {
@@ -42,6 +40,12 @@ func (dot *Dot) Apply(sim *Simulation) {
 		dot.Aura.Duration = dot.tickPeriod * time.Duration(dot.NumberOfTicks)
 	}
 	dot.Aura.Activate(sim)
+}
+
+func (dot *Dot) Cancel(sim *Simulation) {
+	if dot.Aura.IsActive() {
+		dot.Aura.Deactivate(sim)
+	}
 }
 
 // Call this after manually changing NumberOfTicks or TickLength.
