@@ -103,6 +103,10 @@ func (character *Character) RegisterSpell(config SpellConfig) *Spell {
 
 	spell.castFn = spell.makeCastFunc(config.Cast, spell.applyEffects)
 
+	if spell.ApplyEffects == nil {
+		spell.ApplyEffects = func(*Simulation, *Target, *Spell) {}
+	}
+
 	character.Spellbook = append(character.Spellbook, spell)
 
 	return spell

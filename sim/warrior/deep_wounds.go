@@ -17,6 +17,9 @@ func (warrior *Warrior) applyDeepWounds() {
 	deepWoundsSpell := warrior.RegisterSpell(core.SpellConfig{
 		ActionID:    DeepWoundsActionID,
 		SpellSchool: core.SpellSchoolPhysical,
+		Cast: core.CastConfig{
+			DisableCallbacks: true,
+		},
 	})
 
 	var dwDots []*core.Dot
@@ -59,6 +62,7 @@ func (warrior *Warrior) applyDeepWounds() {
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				deepWoundsSpell.Cast(sim, nil)
 				dwDots[spellEffect.Target.Index].Apply(sim)
 				warrior.procBloodFrenzy(sim, spellEffect, time.Second*12)
 			}

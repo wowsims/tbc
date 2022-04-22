@@ -268,11 +268,6 @@ func (warrior *Warrior) applyFlurry() {
 		},
 	})
 
-	icd := core.Cooldown{
-		Timer:    warrior.NewTimer(),
-		Duration: time.Millisecond * 500,
-	}
-
 	warrior.RegisterAura(core.Aura{
 		Label:    "Flurry",
 		Duration: core.NeverExpires,
@@ -287,13 +282,11 @@ func (warrior *Warrior) applyFlurry() {
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				procAura.Activate(sim)
 				procAura.SetStacks(sim, 3)
-				icd.Reset() // the "charge protection" ICD isn't up yet
 				return
 			}
 
 			// Remove a stack.
-			if procAura.IsActive() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) && icd.IsReady(sim) {
-				icd.Use(sim)
+			if procAura.IsActive() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) {
 				procAura.RemoveStack(sim)
 			}
 		},
