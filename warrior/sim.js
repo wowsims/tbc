@@ -211,7 +211,13 @@ export class WarriorSimUI extends IndividualSimUI {
                 // Preset gear configurations that the user can quickly select.
                 gear: [
                     Presets.P1_FURY_PRESET,
+                    Presets.P2_FURY_PRESET,
+                    Presets.P3_FURY_PRESET,
+                    Presets.P4_FURY_PRESET,
                     Presets.P1_ARMS_PRESET,
+                    Presets.P2_ARMS_PRESET,
+                    Presets.P3_ARMS_PRESET,
+                    Presets.P4_ARMS_PRESET,
                 ],
             },
         });

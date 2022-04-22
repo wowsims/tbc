@@ -24,7 +24,49 @@ export declare const P1_FURY_PRESET: {
     enableWhen: (player: Player<Spec.SpecWarrior>) => boolean;
     gear: EquipmentSpec;
 };
+export declare const P2_FURY_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<Spec.SpecWarrior>) => boolean;
+    gear: EquipmentSpec;
+};
+export declare const P3_FURY_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<Spec.SpecWarrior>) => boolean;
+    gear: EquipmentSpec;
+};
+export declare const P4_FURY_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<Spec.SpecWarrior>) => boolean;
+    gear: EquipmentSpec;
+};
+export declare const P5_FURY_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<Spec.SpecWarrior>) => boolean;
+    gear: EquipmentSpec;
+};
 export declare const P1_ARMS_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<Spec.SpecWarrior>) => boolean;
+    gear: EquipmentSpec;
+};
+export declare const P2_ARMS_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<Spec.SpecWarrior>) => boolean;
+    gear: EquipmentSpec;
+};
+export declare const P3_ARMS_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<Spec.SpecWarrior>) => boolean;
+    gear: EquipmentSpec;
+};
+export declare const P4_ARMS_PRESET: {
     name: string;
     tooltip: string;
     enableWhen: (player: Player<Spec.SpecWarrior>) => boolean;
