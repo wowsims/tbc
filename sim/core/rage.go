@@ -52,7 +52,13 @@ func (character *Character) EnableRageBar(startingRage float64, rageMultiplier f
 				HitFactor *= 2
 			}
 
-			generatedRage := spellEffect.Damage*RageFactor + HitFactor*BaseSwingSpeed*rageMultiplier
+			damage := spellEffect.Damage
+			if spellEffect.Outcome.Matches(OutcomeDodge | OutcomeParry) {
+				// Rage is still generated for dodges/parries, based on the damage it WOULD have done.
+				damage = spellEffect.PreoutcomeDamage
+			}
+
+			generatedRage := damage*RageFactor + HitFactor*BaseSwingSpeed*rageMultiplier
 
 			character.AddRage(sim, generatedRage, spell.ActionID)
 		},

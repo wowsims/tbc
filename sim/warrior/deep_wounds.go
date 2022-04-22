@@ -25,11 +25,14 @@ func (warrior *Warrior) applyDeepWounds() {
 		Label:    "Deep Wounds",
 		Duration: core.NeverExpires,
 		OnInit: func(aura *core.Aura, sim *core.Simulation) {
-			dwDots = nil
+			if len(dwDots) > 0 {
+				return
+			}
+
 			tickDamage := warrior.AutoAttacks.MH.AverageDamage()
 			for i := int32(0); i < sim.GetNumTargets(); i++ {
 				target := sim.GetTarget(i)
-				dotAura := target.RegisterAura(core.Aura{
+				dotAura := target.GetOrRegisterAura(core.Aura{
 					Label:    "DeepWounds-" + strconv.Itoa(int(warrior.Index)),
 					ActionID: DeepWoundsActionID,
 					Duration: time.Second * 12,
