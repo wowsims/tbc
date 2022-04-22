@@ -457,9 +457,9 @@ func registerExternalConsecutiveCDApproximation(agent Agent, config externalCons
 
 			return func(sim *Simulation, character *Character) {
 				config.AddAura(sim, character)
+				externalTimers[nextExternalIndex].Set(sim.CurrentTime + config.AuraCD)
 
 				nextExternalIndex = (nextExternalIndex + 1) % len(externalTimers)
-				externalTimers[nextExternalIndex].Set(sim.CurrentTime + config.AuraCD)
 
 				if externalTimers[nextExternalIndex].IsReady(sim) {
 					sharedTimer.Set(sim.CurrentTime + config.AuraDuration)

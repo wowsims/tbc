@@ -38,7 +38,7 @@ export const ArmsDWTalents = {
 };
 export const FuryTalents = {
 	name: 'Fury',
-	data: '32003301302-055000055050120531151',
+	data: '3500501130201-05050005505012050115',
 };
 
 export const DefaultRotation = WarriorRotation.create({
@@ -471,6 +471,108 @@ export const P5_FURY_PRESET = {
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
 	enableWhen: (player: Player<Spec.SpecWarrior>) => player.getTalents().bloodthirst,
 	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 34333,
+			"enchant": 29192,
+			"gems": [
+				32193,
+				32409
+			]
+		},
+		{
+			"id": 34358,
+			"gems": [
+				32217
+			]
+		},
+		{
+			"id": 34392,
+			"enchant": 28910,
+			"gems": [
+				32193,
+				32211
+			]
+		},
+		{
+			"id": 34241,
+			"enchant": 34004,
+			"gems": [
+				33143
+			]
+		},
+		{
+			"id": 34397,
+			"enchant": 24003,
+			"gems": [
+				32211,
+				32217,
+				32193
+			]
+		},
+		{
+			"id": 34441,
+			"enchant": 27899,
+			"gems": [
+				32193
+			]
+		},
+		{
+			"id": 34343,
+			"enchant": 33995,
+			"gems": [
+				32193,
+				32217
+			]
+		},
+		{
+			"id": 34546,
+			"gems": [
+				32217
+			]
+		},
+		{
+			"id": 34188,
+			"enchant": 29535,
+			"gems": [
+				32193,
+				32193,
+				32193
+			]
+		},
+		{
+			"id": 34569,
+			"enchant": 28279,
+			"gems": [
+				32217
+			]
+		},
+		{
+			"id": 34189
+		},
+		{
+			"id": 34361
+		},
+		{
+			"id": 28830
+		},
+		{
+			"id": 34427
+		},
+		{
+			"id": 34331,
+			"enchant": 33307,
+			"gems": [
+				32205,
+				32205
+			]
+		},
+		{
+			"id": 34203,
+			"enchant": 22559
+		},
+		{
+			"id": 34196
+		}
 	]}`),
 };
 
