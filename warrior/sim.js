@@ -216,6 +216,7 @@ export class WarriorSimUI extends IndividualSimUI {
                     Presets.P2_FURY_PRESET,
                     Presets.P3_FURY_PRESET,
                     Presets.P4_FURY_PRESET,
+                    Presets.P5_FURY_PRESET,
                     Presets.P1_ARMS_PRESET,
                     Presets.P2_ARMS_PRESET,
                     Presets.P3_ARMS_PRESET,

@@ -618,7 +618,6 @@ const warlockRaces = [
     Race.RaceUndead,
 ];
 const warriorRaces = [
-    Race.RaceBloodElf,
     Race.RaceDraenei,
     Race.RaceDwarf,
     Race.RaceGnome,
