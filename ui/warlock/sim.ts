@@ -27,7 +27,7 @@ import { PetFood } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 
-import { Warlock, Warlock_Rotation as WarlockRotation, WarlockTalents as WarlockTalents, Warlock_Options as WarlockOptions } from '/tbc/core/proto/warlock.js';
+import { Warlock, Warlock_Rotation as WarlockRotation, WarlockTalents as WarlockTalents, Warlock_Options as WarlockOptions, Warlock_Options_Armor, Warlock_Options_Summon } from '/tbc/core/proto/warlock.js';
 
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
@@ -78,13 +78,13 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 				// TODO: FIND EPS FOR WARLOCKS
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
-					[Stat.StatIntellect]: 0.54,
+					[Stat.StatIntellect]: 0.4,
 					[Stat.StatSpirit]: 0.1,
 					[Stat.StatSpellPower]: 1,
-					[Stat.StatArcaneSpellPower]: 1,
-					[Stat.StatNatureSpellPower]: 0,
-					[Stat.StatSpellCrit]: 0.84,
-					[Stat.StatSpellHaste]: 1.29,
+					[Stat.StatShadowSpellPower]: 1,
+					[Stat.StatFireSpellPower]: 1,
+					[Stat.StatSpellCrit]: 0.8,
+					[Stat.StatSpellHaste]: 1.2,
 					[Stat.StatMP5]: 0.00,
 				}),
 				// Default consumes settings.
@@ -95,9 +95,9 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 				talents: Presets.StandardTalents.data,
 				// Default spec-specific settings.
 				specOptions: WarlockOptions.create({
-					innervateTarget: RaidTarget.create({
-						targetIndex: 0, // In an individual sim the 0-indexed player is ourself.
-					}),
+					armor: Warlock_Options_Armor.FelArmor,
+					sacrificeSummon: true,
+					summon: Warlock_Options_Summon.Succubus,
 				}),
 				// Default raid/party buffs settings.
 				raidBuffs: RaidBuffs.create({
@@ -119,13 +119,16 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 				debuffs: Debuffs.create({
 					judgementOfWisdom: true,
 					misery: true,
-					curseOfElements: TristateEffect.TristateEffectRegular,
+					shadowWeaving: true,
 				}),
 			},
 
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
-				// WarlockInputs.SelfInnervate,
+				WarlockInputs.FelArmor,
+				WarlockInputs.DemonArmor,
+				WarlockInputs.DemonSummon,
+				WarlockInputs.Sacrifice,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
@@ -133,6 +136,7 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 				IconInputs.DivineSpirit,
 			],
 			partyBuffInputs: [
+				IconInputs.MoonkinAura,
 				IconInputs.DrumsOfBattleBuff,
 				IconInputs.DrumsOfRestorationBuff,
 				IconInputs.Bloodlust,
@@ -140,6 +144,7 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 				IconInputs.TotemOfWrath,
 				IconInputs.ManaSpringTotem,
 				IconInputs.ManaTideTotem,
+				IconInputs.SanctityAura,
 				IconInputs.DraeneiRacialCaster,
 				IconInputs.EyeOfTheNight,
 				IconInputs.ChainOfTheTwilightOwl,
@@ -158,8 +163,10 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 			debuffInputs: [
 				IconInputs.JudgementOfWisdom,
 				IconInputs.ImprovedSealOfTheCrusader,
-				IconInputs.CurseOfElements,
+				IconInputs.ShadowWeaving,
 				IconInputs.Misery,
+				IconInputs.ImprovedScorch,
+				IconInputs.CurseOfElements,
 			],
 			// Which options are selectable in the 'Consumes' section.
 			consumeOptions: {

@@ -7,53 +7,41 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Starfire spell IDs
 const SpellIDSB11 int32 = 27209
 
 var ShadowBolt11ActionID = core.ActionID{SpellID: SpellIDSB11}
 
-// Shadow Bolt	Rank 11
-// 420 Mana	30 yd range
-// 3 sec cast
-// Requires Warlock
-// Requires level 69
-// Sends a shadowy bolt at the enemy, causing 544 to 607 Shadow damage.
-
-func (warlock *Warlock) newShadowboltSpell(sim *core.Simulation) *core.Spell {
+func (warlock *Warlock) registerShadowboltSpell(sim *core.Simulation) {
 	baseCost := 420.0
-	// minBaseDamage := 544.0
-	// maxBaseDamage := 607.0
-	// spellCoefficient := 0.857
+	minBaseDamage := 544.0
+	maxBaseDamage := 607.0
+	bonusFlatDamage := 0.0
+	spellCoefficient := 0.857
 
-	// // This seems to be unaffected by wrath of cenarius so it needs to come first.
-	// bonusFlatDamage := core.TernaryFloat64(druid.Equip[items.ItemSlotRanged].ID == IvoryMoongoddess, 55*spellCoefficient, 0)
-	// spellCoefficient += 0.04 * float64(druid.Talents.WrathOfCenarius)
+	debuffAura := warlock.impShadowboltDebuffAura(sim.GetPrimaryTarget())
+
+	has4pMal := ItemSetMaleficRaiment.CharacterHasSetBonus(&warlock.Character, 4)
 
 	effect := core.SpellEffect{
-		// BonusSpellCritRating: (float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance) + core.TernaryFloat64(ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 4), 5*core.SpellCritRatingPerCritChance, 0),
-		// DamageMultiplier:     1 + 0.02*float64(druid.Talents.Moonfury),
-		// ThreatMultiplier:     1,
-		// BaseDamage:           core.BaseDamageConfigMagic(minBaseDamage+bonusFlatDamage, maxBaseDamage+bonusFlatDamage, spellCoefficient),
-		// OutcomeApplier:       core.OutcomeFuncMagicHitAndCrit(druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance))),
+		BonusSpellCritRating: float64(warlock.Talents.Devastation)*1*core.SpellCritRatingPerCritChance +
+			float64(warlock.Talents.Backlash)*1*core.SpellCritRatingPerCritChance,
+		DamageMultiplier: 1 * core.TernaryFloat64(has4pMal, 1.06, 1.0),
+		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.DestructiveReach),
+		// TODO: so this would mean SB ratio is 1.057?
+		BaseDamage:     core.BaseDamageConfigMagic(minBaseDamage+bonusFlatDamage, maxBaseDamage+bonusFlatDamage, spellCoefficient+0.04*float64(warlock.Talents.ShadowAndFlame)),
+		OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
+	}
+	if warlock.Talents.ImprovedShadowBolt > 0 {
+		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				return
+			}
+			debuffAura.Activate(sim)
+			debuffAura.SetStacks(sim, 4)
+		}
 	}
 
-	// if ItemSetNordrassil.CharacterHasSetBonus(&druid.Character, 4) {
-	// 	effect.BaseDamage = core.WrapBaseDamageConfig(effect.BaseDamage, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
-	// 		return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
-	// 			normalDamage := oldCalculator(sim, hitEffect, spell)
-
-	// 			// Check if moonfire/insectswarm is ticking on the target.
-	// 			// TODO: in a raid simulator we need to be able to see which dots are ticking from other druids.
-	// 			if druid.MoonfireDot.IsActive() || druid.InsectSwarmDot.IsActive() {
-	// 				return normalDamage * 1.1
-	// 			} else {
-	// 				return normalDamage
-	// 			}
-	// 		}
-	// 	})
-	// }
-
-	return warlock.RegisterSpell(core.SpellConfig{
+	warlock.Shadowbolt = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:    ShadowBolt11ActionID,
 		SpellSchool: core.SpellSchoolShadow,
 
@@ -62,15 +50,10 @@ func (warlock *Warlock) newShadowboltSpell(sim *core.Simulation) *core.Spell {
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost:     baseCost, // * (1 - 0.03*float64(druid.Talents.Moonglow)),
+				Cost:     baseCost * (1 - 0.01*float64(warlock.Talents.Cataclysm)),
 				GCD:      core.GCDDefault,
-				CastTime: time.Millisecond * 3000, //*3500 - (time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)),
+				CastTime: time.Millisecond*3000 - (time.Millisecond * 100 * time.Duration(warlock.Talents.Bane)),
 			},
-
-			// ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
-			// 	druid.applyNaturesGrace(cast)
-			// 	druid.applyNaturesSwiftness(cast)
-			// },
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
@@ -78,16 +61,17 @@ func (warlock *Warlock) newShadowboltSpell(sim *core.Simulation) *core.Spell {
 }
 
 func (warlock *Warlock) impShadowboltDebuffAura(target *core.Target) *core.Aura {
+	bonus := 1 + 0.04*float64(warlock.Talents.ImprovedShadowBolt)
 	return target.GetOrRegisterAura(core.Aura{
 		Label:     "Improved Shadow Bolt",
-		ActionID:  ShadowBolt11ActionID,
-		Duration:  time.Second * 10,
+		ActionID:  core.ActionID{SpellID: 17803},
+		Duration:  time.Second * 12,
 		MaxStacks: 4,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			target.PseudoStats.ShadowDamageTakenMultiplier *= 1.2
+			target.PseudoStats.ShadowDamageTakenMultiplier *= bonus
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			target.PseudoStats.ShadowDamageTakenMultiplier /= 1.2
+			target.PseudoStats.ShadowDamageTakenMultiplier /= bonus
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell.SpellSchool != core.SpellSchoolShadow {
@@ -96,7 +80,6 @@ func (warlock *Warlock) impShadowboltDebuffAura(target *core.Target) *core.Aura 
 			if !spellEffect.Landed() || spellEffect.Damage == 0 {
 				return
 			}
-
 			aura.RemoveStack(sim)
 		},
 	})

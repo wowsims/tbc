@@ -13,6 +13,10 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 		MakePermanent(MiseryAura(target, 5))
 	}
 
+	if debuffs.ShadowWeaving {
+		MakePermanent(ShadowWeavingAura(target, 5))
+	}
+
 	if debuffs.JudgementOfWisdom {
 		MakePermanent(JudgementOfWisdomAura(target))
 	}

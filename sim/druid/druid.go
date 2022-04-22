@@ -1,8 +1,6 @@
 package druid
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -86,10 +84,6 @@ func (druid *Druid) Init(sim *core.Simulation) {
 
 func (druid *Druid) Reset(sim *core.Simulation) {
 	druid.RebirthUsed = false
-}
-
-func (druid *Druid) Act(sim *core.Simulation) time.Duration {
-	return core.NeverExpires // does nothing
 }
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) *Druid {
