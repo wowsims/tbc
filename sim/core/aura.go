@@ -271,6 +271,10 @@ func (at *auraTracker) registerAura(unit *Unit, aura Aura) *Aura {
 	*newAura = aura
 	newAura.Unit = unit
 	newAura.metrics.ID = aura.ActionID
+	newAura.activeIndex = Inactive
+	newAura.onCastCompleteIndex = Inactive
+	newAura.onSpellHitIndex = Inactive
+	newAura.onPeriodicDamageIndex = Inactive
 
 	at.auras = append(at.auras, newAura)
 	if newAura.Tag != "" {
@@ -525,7 +529,7 @@ func (aura *Aura) Deactivate(sim *Simulation) {
 		aura.Unit.Log(sim, "Aura faded: %s", aura.ActionID)
 	}
 
-	if aura.Duration != NeverExpires {
+	if aura.activeIndex != Inactive {
 		removeActiveIndex := aura.activeIndex
 		aura.Unit.activeAuras = removeBySwappingToBack(aura.Unit.activeAuras, removeActiveIndex)
 		if removeActiveIndex < int32(len(aura.Unit.activeAuras)) {
@@ -536,7 +540,7 @@ func (aura *Aura) Deactivate(sim *Simulation) {
 		aura.Unit.minExpires = 0
 	}
 
-	if aura.OnCastComplete != nil {
+	if aura.onCastCompleteIndex != Inactive {
 		removeOnCastCompleteIndex := aura.onCastCompleteIndex
 		aura.Unit.onCastCompleteAuras = removeBySwappingToBack(aura.Unit.onCastCompleteAuras, removeOnCastCompleteIndex)
 		if removeOnCastCompleteIndex < int32(len(aura.Unit.onCastCompleteAuras)) {
@@ -545,7 +549,7 @@ func (aura *Aura) Deactivate(sim *Simulation) {
 		aura.onCastCompleteIndex = Inactive
 	}
 
-	if aura.OnSpellHit != nil {
+	if aura.onSpellHitIndex != Inactive {
 		removeOnSpellHitIndex := aura.onSpellHitIndex
 		aura.Unit.onSpellHitAuras = removeBySwappingToBack(aura.Unit.onSpellHitAuras, removeOnSpellHitIndex)
 		if removeOnSpellHitIndex < int32(len(aura.Unit.onSpellHitAuras)) {
@@ -554,7 +558,7 @@ func (aura *Aura) Deactivate(sim *Simulation) {
 		aura.onSpellHitIndex = Inactive
 	}
 
-	if aura.OnPeriodicDamage != nil {
+	if aura.onPeriodicDamageIndex != Inactive {
 		removeOnPeriodicDamage := aura.onPeriodicDamageIndex
 		aura.Unit.onPeriodicDamageAuras = removeBySwappingToBack(aura.Unit.onPeriodicDamageAuras, removeOnPeriodicDamage)
 		if removeOnPeriodicDamage < int32(len(aura.Unit.onPeriodicDamageAuras)) {

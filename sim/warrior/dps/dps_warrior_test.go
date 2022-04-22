@@ -12,7 +12,7 @@ func init() {
 	RegisterDpsWarrior()
 }
 
-func TestWarrior(t *testing.T) {
+func TestFury(t *testing.T) {
 	core.RunTestSuite(t, t.Name(), core.FullCharacterTestSuiteGenerator(core.CharacterSuiteConfig{
 		Class: proto.Class_ClassWarrior,
 
@@ -21,7 +21,38 @@ func TestWarrior(t *testing.T) {
 
 		GearSet: core.GearSetCombo{Label: "Fury P1", GearSet: FuryP1Gear},
 
-		SpecOptions: core.SpecOptionsCombo{Label: "Basic", SpecOptions: PlayerOptionsBasic},
+		SpecOptions: core.SpecOptionsCombo{Label: "Basic", SpecOptions: PlayerOptionsFury},
+
+		RaidBuffs:   FullRaidBuffs,
+		PartyBuffs:  FullPartyBuffs,
+		PlayerBuffs: FullIndividualBuffs,
+		Consumes:    FullConsumes,
+		Debuffs:     FullDebuffs,
+
+		ItemFilter: core.ItemFilter{
+			ArmorType: proto.ArmorType_ArmorTypePlate,
+
+			WeaponTypes: []proto.WeaponType{
+				proto.WeaponType_WeaponTypeAxe,
+				proto.WeaponType_WeaponTypeSword,
+				proto.WeaponType_WeaponTypeMace,
+				proto.WeaponType_WeaponTypeDagger,
+				proto.WeaponType_WeaponTypeFist,
+			},
+		},
+	}))
+}
+
+func TestArms(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), core.FullCharacterTestSuiteGenerator(core.CharacterSuiteConfig{
+		Class: proto.Class_ClassWarrior,
+
+		Race:       proto.Race_RaceOrc,
+		OtherRaces: []proto.Race{proto.Race_RaceHuman},
+
+		GearSet: core.GearSetCombo{Label: "Arms P1", GearSet: FuryP1Gear},
+
+		SpecOptions: core.SpecOptionsCombo{Label: "Basic", SpecOptions: PlayerOptionsArmsSlam},
 
 		RaidBuffs:   FullRaidBuffs,
 		PartyBuffs:  FullPartyBuffs,
@@ -51,7 +82,7 @@ func BenchmarkSimulate(b *testing.B) {
 				Class:     proto.Class_ClassHunter,
 				Equipment: FuryP1Gear,
 				Consumes:  FullConsumes,
-				Spec:      PlayerOptionsBasic,
+				Spec:      PlayerOptionsFury,
 				Buffs:     FullIndividualBuffs,
 			},
 			FullPartyBuffs,

@@ -5,7 +5,23 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-var ArmsTalents = &proto.WarriorTalents{
+var PlayerOptionsArmsSlam = &proto.Player_Warrior{
+	Warrior: &proto.Warrior{
+		Talents:  ArmsSlamTalents,
+		Options:  warriorOptions,
+		Rotation: armsSlamRotation,
+	},
+}
+
+var PlayerOptionsFury = &proto.Player_Warrior{
+	Warrior: &proto.Warrior{
+		Talents:  FuryTalents,
+		Options:  warriorOptions,
+		Rotation: warriorRotation,
+	},
+}
+
+var ArmsSlamTalents = &proto.WarriorTalents{
 	ImprovedHeroicStrike:          3,
 	Deflection:                    2,
 	ImprovedThunderClap:           3,
@@ -15,19 +31,17 @@ var ArmsTalents = &proto.WarriorTalents{
 	Impale:                        2,
 	DeathWish:                     true,
 	SwordSpecialization:           5,
+	ImprovedDisciplines:           2,
+	BloodFrenzy:                   2,
+	MortalStrike:                  true,
 
-	Cruelty:                 5,
-	UnbridledWrath:          5,
-	CommandingPresence:      5,
-	DualWieldSpecialization: 5,
-	SweepingStrikes:         true,
-	WeaponMastery:           2,
-	Flurry:                  5,
-	Precision:               3,
-	Bloodthirst:             true,
-	ImprovedWhirlwind:       1,
-	ImprovedBerserkerStance: 5,
-	Rampage:                 true,
+	Cruelty:                   5,
+	ImprovedDemoralizingShout: 5,
+	CommandingPresence:        5,
+	ImprovedSlam:              2,
+	SweepingStrikes:           true,
+	WeaponMastery:             2,
+	Flurry:                    3,
 }
 
 var FuryTalents = &proto.WarriorTalents{
@@ -50,12 +64,20 @@ var FuryTalents = &proto.WarriorTalents{
 	Rampage:                 true,
 }
 
-var PlayerOptionsBasic = &proto.Player_Warrior{
-	Warrior: &proto.Warrior{
-		Talents:  FuryTalents,
-		Options:  warriorOptions,
-		Rotation: warriorRotation,
-	},
+var armsSlamRotation = &proto.Warrior_Rotation{
+	UseOverpower: true,
+	UseHamstring: true,
+	UseSlam:      true,
+
+	HsRageThreshold:        70,
+	HamstringRageThreshold: 75,
+	OverpowerRageThreshold: 20,
+	SlamLatency:            100,
+
+	UseSlamDuringExecute: true,
+	UseWwDuringExecute:   true,
+	UseMsDuringExecute:   true,
+	UseHsDuringExecute:   true,
 }
 
 var warriorRotation = &proto.Warrior_Rotation{
