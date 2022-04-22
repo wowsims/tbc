@@ -72,4 +72,5 @@ func (war *ProtectionWarrior) GetWarrior() *warrior.Warrior {
 func (war *ProtectionWarrior) Reset(sim *core.Simulation) {
 	war.Warrior.Reset(sim)
 	war.DefensiveStanceAura.Activate(sim)
+	war.Stance = warrior.DefensiveStance
 }

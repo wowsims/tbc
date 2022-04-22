@@ -108,6 +108,7 @@ func (war *DpsWarrior) Init(sim *core.Simulation) {
 func (war *DpsWarrior) Reset(sim *core.Simulation) {
 	war.Warrior.Reset(sim)
 	war.BerserkerStanceAura.Activate(sim)
+	war.Stance = warrior.BerserkerStance
 	war.castFirstSunder = false
 	war.doSlamNext = war.Rotation.UseSlam
 	war.castSlamAt = 0

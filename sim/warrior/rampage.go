@@ -8,6 +8,9 @@ import (
 )
 
 func (warrior *Warrior) registerRampageSpell() {
+	if !warrior.Talents.Rampage {
+		return
+	}
 	actionID := core.ActionID{SpellID: 30033}
 
 	var bonusPerStack stats.Stats
@@ -60,7 +63,8 @@ func (warrior *Warrior) registerRampageSpell() {
 }
 
 func (warrior *Warrior) ShouldRampage(sim *core.Simulation) bool {
-	return sim.CurrentTime < warrior.rampageValidUntil &&
+	return warrior.Rampage != nil &&
+		sim.CurrentTime < warrior.rampageValidUntil &&
 		warrior.CurrentRage() >= 20 &&
 		(warrior.RampageAura.GetStacks() < 5 || warrior.RampageAura.RemainingDuration(sim) <= warrior.RampageCDThreshold)
 }
