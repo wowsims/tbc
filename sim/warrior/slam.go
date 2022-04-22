@@ -49,6 +49,6 @@ func (warrior *Warrior) registerSlamSpell(_ *core.Simulation) {
 	})
 }
 
-func (warrior *Warrior) CanSlam(sim *core.Simulation) bool {
+func (warrior *Warrior) CanSlam() bool {
 	return warrior.CurrentRage() >= warrior.Slam.DefaultCast.Cost
 }

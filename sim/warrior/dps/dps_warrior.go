@@ -1,6 +1,8 @@
 package dps
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -37,6 +39,8 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 		}),
 		Rotation: *warOptions.Rotation,
 		Options:  *warOptions.Options,
+
+		slamLatency: core.DurationFromSeconds(warOptions.Rotation.SlamLatency / 1000),
 	}
 	if war.Talents.ImprovedSlam != 2 {
 		war.Rotation.UseSlam = false
@@ -86,6 +90,10 @@ type DpsWarrior struct {
 	Rotation proto.Warrior_Rotation
 
 	castFirstSunder bool
+
+	doSlamNext  bool // Whether Slam should be the next cast.
+	castSlamAt  time.Duration
+	slamLatency time.Duration
 }
 
 func (war *DpsWarrior) GetWarrior() *warrior.Warrior {
@@ -101,4 +109,6 @@ func (war *DpsWarrior) Reset(sim *core.Simulation) {
 	war.Warrior.Reset(sim)
 	war.BerserkerStanceAura.Activate(sim)
 	war.castFirstSunder = false
+	war.doSlamNext = war.Rotation.UseSlam
+	war.castSlamAt = 0
 }

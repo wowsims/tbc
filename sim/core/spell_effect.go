@@ -59,6 +59,8 @@ type SpellEffect struct {
 	Outcome HitOutcome
 	Damage  float64 // Damage done by this cast.
 	Threat  float64
+
+	PreoutcomeDamage float64 // Damage done by this cast.
 }
 
 func (spellEffect *SpellEffect) Landed() bool {
@@ -162,6 +164,7 @@ func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, 
 		spellEffect.applyAttackerModifiers(sim, spell, &damage)
 		spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
 		spellEffect.applyResistances(sim, spell, &damage)
+		spellEffect.PreoutcomeDamage = damage
 		spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
 	}
 	spellEffect.Damage = damage
