@@ -50,10 +50,10 @@ export const PrecastShoutWithSapphire = {
         label: 'Precast with Sapphire',
         labelTooltip: 'Snapshot bonus from Solarian\'s Sapphire (+70 attack power) with precast shout.',
         changedEvent: (player) => TypedEvent.onAny([player.specOptionsChangeEmitter, player.gearChangeEmitter]),
-        getValue: (player) => player.getSpecOptions().precastShoutT2,
+        getValue: (player) => player.getSpecOptions().precastShoutSapphire,
         setValue: (eventID, player, newValue) => {
             const newOptions = player.getSpecOptions();
-            newOptions.precastShoutT2 = newValue;
+            newOptions.precastShoutSapphire = newValue;
             player.setSpecOptions(eventID, newOptions);
         },
         enableWhen: (player) => player.getSpecOptions().shout == WarriorShout.WarriorShoutBattle && player.getSpecOptions().precastShout && !player.getGear().hasTrinket(30446),
