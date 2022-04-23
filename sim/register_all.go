@@ -7,6 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/hunter"
 	"github.com/wowsims/tbc/sim/mage"
 	"github.com/wowsims/tbc/sim/paladin/retribution"
+	protectionPaladin "github.com/wowsims/tbc/sim/paladin/protection"
 	"github.com/wowsims/tbc/sim/priest/shadow"
 	"github.com/wowsims/tbc/sim/priest/smite"
 	"github.com/wowsims/tbc/sim/rogue"
