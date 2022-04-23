@@ -3,7 +3,7 @@ import { RogueTalents as RogueTalents } from '/tbc/core/proto/rogue.js';
 import { RogueSpecs } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
-import { TalentsConfig, TalentsPicker } from './talents_picker.js';
+import { TalentsConfig, TalentsPicker, newTalentsConfig } from './talents_picker.js';
 
 export class RogueTalentsPicker extends TalentsPicker<Spec.SpecRogue> {
 	constructor(parent: HTMLElement, player: Player<Spec.SpecRogue>) {
@@ -11,7 +11,7 @@ export class RogueTalentsPicker extends TalentsPicker<Spec.SpecRogue> {
 	}
 }
 
-export const rogueTalentsConfig: TalentsConfig<Spec.SpecRogue> = [
+export const rogueTalentsConfig: TalentsConfig<Spec.SpecRogue> = newTalentsConfig([
 	{
 		name: 'Assassination',
 		backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/182.jpg',
@@ -673,4 +673,4 @@ export const rogueTalentsConfig: TalentsConfig<Spec.SpecRogue> = [
 			},
 		],
 	},
-];
+]);

@@ -48,7 +48,9 @@ func (warrior *Warrior) newSunderArmorSpell(sim *core.Simulation, isDevastateEff
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				warrior.SunderArmorAura.Activate(sim)
-				warrior.SunderArmorAura.AddStack(sim)
+				if warrior.SunderArmorAura.IsActive() {
+					warrior.SunderArmorAura.AddStack(sim)
+				}
 			} else {
 				warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 			}

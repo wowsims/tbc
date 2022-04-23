@@ -3,7 +3,7 @@ import { DruidTalents as DruidTalents } from '/tbc/core/proto/druid.js';
 import { DruidSpecs } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
-import { TalentsConfig, TalentsPicker } from './talents_picker.js';
+import { TalentsConfig, TalentsPicker, newTalentsConfig } from './talents_picker.js';
 
 // Talents are the same for all Druid specs, so its ok to just use BalanceDruid here
 export class DruidTalentsPicker extends TalentsPicker<Spec.SpecBalanceDruid> {
@@ -12,7 +12,7 @@ export class DruidTalentsPicker extends TalentsPicker<Spec.SpecBalanceDruid> {
 	}
 }
 
-export const druidTalentsConfig: TalentsConfig<Spec.SpecBalanceDruid> = [
+export const druidTalentsConfig: TalentsConfig<Spec.SpecBalanceDruid> = newTalentsConfig([
 	{
 		name: 'Balance',
 		backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/283.jpg',
@@ -625,4 +625,4 @@ export const druidTalentsConfig: TalentsConfig<Spec.SpecBalanceDruid> = [
 			},
 		],
 	},
-];
+]);

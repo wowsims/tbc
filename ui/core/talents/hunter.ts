@@ -3,7 +3,7 @@ import { HunterTalents as HunterTalents } from '/tbc/core/proto/hunter.js';
 import { HunterSpecs } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
-import { TalentsConfig, TalentsPicker } from './talents_picker.js';
+import { TalentsConfig, TalentsPicker, newTalentsConfig } from './talents_picker.js';
 
 export class HunterTalentsPicker extends TalentsPicker<Spec.SpecHunter> {
 	constructor(parent: HTMLElement, player: Player<Spec.SpecHunter>) {
@@ -11,7 +11,7 @@ export class HunterTalentsPicker extends TalentsPicker<Spec.SpecHunter> {
 	}
 }
 
-export const hunterTalentsConfig: TalentsConfig<Spec.SpecHunter> = [
+export const hunterTalentsConfig: TalentsConfig<Spec.SpecHunter> = newTalentsConfig([
 	{
 		name: 'Beast Mastery',
 		backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/361.jpg',
@@ -646,4 +646,4 @@ export const hunterTalentsConfig: TalentsConfig<Spec.SpecHunter> = [
 			},
 		],
 	},
-];
+]);

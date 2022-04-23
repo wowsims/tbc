@@ -1,6 +1,11 @@
 import { Player } from '/tbc/core/player.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
+import {
+	SpecTalents,
+	specToClass,
+	specTypeFunctions,
+} from '/tbc/core/proto_utils/utils.js';
 
 import { druidTalentsConfig, DruidTalentsPicker } from './druid.js';
 import { hunterTalentsConfig, HunterTalentsPicker } from './hunter.js';
@@ -65,18 +70,7 @@ export function talentSpellIdsToTalentString(playerClass: Class, talentIds: Arra
 
 	const talentsStr = talentsConfig.map(treeConfig => {
 		const treeStr = treeConfig.talents.map(talentConfig => {
-			const talentSpellIds = [];
-			let lastSeenId = -1;
-			for (let i = 0; i < talentConfig.maxPoints; i++) {
-				let curId = i < talentConfig.spellIds.length ? talentConfig.spellIds[i] : lastSeenId;
-				if (curId == lastSeenId) {
-					curId++;
-				}
-				talentSpellIds.push(curId);
-				lastSeenId = curId;
-			}
-
-			const spellIdIndex = talentSpellIds.findIndex(spellId => talentIds.includes(spellId));
+			const spellIdIndex = talentConfig.spellIds.findIndex(spellId => talentIds.includes(spellId));
 			if (spellIdIndex == -1) {
 				return '0';
 			} else {
@@ -88,4 +82,28 @@ export function talentSpellIdsToTalentString(playerClass: Class, talentIds: Arra
 	}).join('-').replace(/-+$/g, '');
 
 	return talentsStr
+}
+
+export function talentStringToProto<SpecType extends Spec>(spec: Spec, talentString: string): SpecTalents<SpecType> {
+	const talentsConfig = classTalentsConfig[specToClass[spec]] as TalentsConfig<SpecType>;
+
+	const specFunctions = specTypeFunctions[spec];
+	const proto = specFunctions.talentsCreate() as SpecTalents<SpecType>;
+
+	talentString.split('-').forEach((treeString, treeIdx) => {
+		const treeConfig = talentsConfig[treeIdx];
+		[...treeString].forEach((talentString, i) => {
+			const talentConfig = treeConfig.talents[i];
+			const points = parseInt(talentString);
+			if (talentConfig.fieldName) {
+				if (talentConfig.maxPoints == 1) {
+					(proto[talentConfig.fieldName] as unknown as boolean) = points == 1;
+				} else {
+					(proto[talentConfig.fieldName] as unknown as number) = points;
+				}
+			}
+		});
+	});
+
+	return proto;
 }

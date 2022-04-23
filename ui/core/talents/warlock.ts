@@ -3,7 +3,7 @@ import { WarlockTalents as WarlockTalents } from '/tbc/core/proto/warlock.js';
 import { WarlockSpecs } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
-import { TalentsConfig, TalentsPicker } from './talents_picker.js';
+import { TalentsConfig, TalentsPicker, newTalentsConfig } from './talents_picker.js';
 
 export class WarlockTalentsPicker extends TalentsPicker<Spec.SpecWarlock> {
 	constructor(parent: HTMLElement, player: Player<Spec.SpecWarlock>) {
@@ -11,7 +11,7 @@ export class WarlockTalentsPicker extends TalentsPicker<Spec.SpecWarlock> {
 	}
 }
 
-export const warlockTalentsConfig: TalentsConfig<Spec.SpecWarlock> = [
+export const warlockTalentsConfig: TalentsConfig<Spec.SpecWarlock> = newTalentsConfig([
 	{
 		name: 'Affliction',
 		backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/302.jpg',
@@ -646,4 +646,4 @@ export const warlockTalentsConfig: TalentsConfig<Spec.SpecWarlock> = [
 			},
 		],
 	},
-];
+]);

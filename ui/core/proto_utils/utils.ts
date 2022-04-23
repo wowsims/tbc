@@ -344,7 +344,7 @@ export type SpecTypeFunctions<SpecType extends Spec> = {
 	optionsFromPlayer: (player: Player) => SpecOptions<SpecType>;
 };
 
-export const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>> = {
+export const specTypeFunctions: Record<Spec, SpecTypeFunctions<any>> = {
 	[Spec.SpecBalanceDruid]: {
 		rotationCreate: () => BalanceDruidRotation.create(),
 		rotationEquals: (a, b) => BalanceDruidRotation.equals(a as BalanceDruidRotation, b as BalanceDruidRotation),
