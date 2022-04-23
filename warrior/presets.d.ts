@@ -16,6 +16,7 @@ export declare const FuryTalents: {
     data: string;
 };
 export declare const DefaultRotation: WarriorRotation;
+export declare const ArmsRotation: WarriorRotation;
 export declare const DefaultOptions: WarriorOptions;
 export declare const DefaultConsumes: Consumes;
 export declare const P1_FURY_PRESET: {
@@ -67,6 +68,12 @@ export declare const P3_ARMS_PRESET: {
     gear: EquipmentSpec;
 };
 export declare const P4_ARMS_PRESET: {
+    name: string;
+    tooltip: string;
+    enableWhen: (player: Player<Spec.SpecWarrior>) => boolean;
+    gear: EquipmentSpec;
+};
+export declare const P5_ARMS_PRESET: {
     name: string;
     tooltip: string;
     enableWhen: (player: Player<Spec.SpecWarrior>) => boolean;
