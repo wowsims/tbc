@@ -77,7 +77,6 @@ func (warrior *Warrior) ApplyTalents() {
 	warrior.registerSweepingStrikesCD()
 }
 
-// Unlike most other applyXXX() talent appliers, this is meant to be called from Reset().
 func (warrior *Warrior) applyAngerManagement() {
 	if !warrior.Talents.AngerManagement {
 		return

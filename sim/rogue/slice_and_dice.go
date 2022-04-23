@@ -11,7 +11,42 @@ var SliceAndDiceActionID = core.ActionID{SpellID: 6774}
 
 const SliceAndDiceEnergyCost = 25.0
 
-func (rogue *Rogue) registerSliceAndDice(sim *core.Simulation) {
+func (rogue *Rogue) makeSliceAndDice(comboPoints int32) *core.Spell {
+	actionID := SliceAndDiceActionID
+	actionID.Tag = comboPoints
+	baseCost := SliceAndDiceEnergyCost
+	duration := rogue.sliceAndDiceDurations[comboPoints]
+
+	return rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellExtras: SpellFlagFinisher,
+
+		ResourceType: stats.Energy,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+				GCD:  time.Second,
+			},
+			ModifyCast:  rogue.applyDeathmantle,
+			IgnoreHaste: true,
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			rogue.SliceAndDiceAura.Duration = duration
+			rogue.SliceAndDiceAura.Activate(sim)
+
+			rogue.ApplyFinisher(sim, spell.ActionID)
+
+			if duration >= sim.GetRemainingDuration() {
+				rogue.doneSND = true
+			}
+		},
+	})
+}
+
+func (rogue *Rogue) registerSliceAndDice() {
 	durationMultiplier := 1.0 + 0.15*float64(rogue.Talents.ImprovedSliceAndDice)
 	durationBonus := time.Duration(0)
 	if ItemSetNetherblade.CharacterHasSetBonus(&rogue.Character, 2) {
@@ -43,36 +78,12 @@ func (rogue *Rogue) registerSliceAndDice(sim *core.Simulation) {
 		},
 	})
 
-	baseCost := SliceAndDiceEnergyCost
-	rogue.SliceAndDice = rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    SliceAndDiceActionID,
-		SpellExtras: SpellFlagFinisher,
-
-		ResourceType: stats.Energy,
-		BaseCost:     baseCost,
-
-		Cast: core.CastConfig{
-			DefaultCast: core.Cast{
-				Cost: baseCost,
-				GCD:  time.Second,
-			},
-			ModifyCast:  rogue.applyDeathmantle,
-			IgnoreHaste: true,
-		},
-
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
-			numPoints := rogue.ComboPoints()
-			if numPoints == 0 {
-				panic("SliceAndDice requires combo points!")
-			}
-			rogue.SliceAndDiceAura.Duration = rogue.sliceAndDiceDurations[numPoints]
-			rogue.SliceAndDiceAura.Activate(sim)
-
-			rogue.ApplyFinisher(sim, spell.ActionID)
-
-			if rogue.SliceAndDiceAura.Duration >= sim.GetRemainingDuration() {
-				rogue.doneSND = true
-			}
-		},
-	})
+	rogue.SliceAndDice = [6]*core.Spell{
+		nil,
+		rogue.makeSliceAndDice(1),
+		rogue.makeSliceAndDice(2),
+		rogue.makeSliceAndDice(3),
+		rogue.makeSliceAndDice(4),
+		rogue.makeSliceAndDice(5),
+	}
 }

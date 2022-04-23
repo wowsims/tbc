@@ -59,6 +59,12 @@ var ItemSetDeathmantle = core.ItemSet{
 			}
 			rogue := rogueAgent.GetRogue()
 
+			rogue.DeathmantleProcAura = rogue.RegisterAura(core.Aura{
+				Label:    "Deathmantle 4pc Proc",
+				ActionID: core.ActionID{SpellID: 37171},
+				Duration: time.Second * 15,
+			})
+
 			ppmm := rogue.AutoAttacks.NewPPMManager(1.0)
 
 			rogue.RegisterAura(core.Aura{
@@ -81,18 +87,21 @@ var ItemSetDeathmantle = core.ItemSet{
 						return
 					}
 
-					rogue.deathmantle4pcProc = true
+					rogue.DeathmantleProcAura.Activate(sim)
 				},
 			})
 		},
 	},
 }
 
-func (rogue *Rogue) applyDeathmantle(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
-	//instance.ActionID.Tag = rogue.ComboPoints()
-	if rogue.deathmantle4pcProc {
+func (rogue *Rogue) deathmantleActive() bool {
+	return rogue.DeathmantleProcAura != nil && rogue.DeathmantleProcAura.IsActive()
+}
+
+func (rogue *Rogue) applyDeathmantle(sim *core.Simulation, _ *core.Spell, cast *core.Cast) {
+	if rogue.deathmantleActive() {
 		cast.Cost = 0
-		rogue.deathmantle4pcProc = false
+		rogue.DeathmantleProcAura.Deactivate(sim)
 	}
 }
 

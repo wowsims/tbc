@@ -9,29 +9,30 @@ import (
 
 var EnvenomActionID = core.ActionID{SpellID: 32684}
 
-func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
-	rogue.envenomEnergyCost = 35
-	if ItemSetAssassination.CharacterHasSetBonus(&rogue.Character, 4) {
-		rogue.envenomEnergyCost -= 10
-	}
+func (rogue *Rogue) makeEnvenom(comboPoints int32) *core.Spell {
+	actionID := EnvenomActionID
+	actionID.Tag = comboPoints
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
-	basePerComboPoint := 180.0
-	if ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2) {
-		basePerComboPoint += 40
+	baseDamage := 60.0 + (180+core.TernaryFloat64(ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2), 40, 0))*float64(comboPoints)
+	apRatio := 0.03 * float64(comboPoints)
+
+	cost := 35.0
+	if ItemSetAssassination.CharacterHasSetBonus(&rogue.Character, 4) {
+		cost -= 10
 	}
 
-	rogue.Envenom = rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    EnvenomActionID,
+	return rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolNature,
 		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasIgnoreResists | rogue.finisherFlags(),
 
 		ResourceType: stats.Energy,
-		BaseCost:     rogue.envenomEnergyCost,
+		BaseCost:     cost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: rogue.envenomEnergyCost,
+				Cost: cost,
 				GCD:  time.Second,
 			},
 			ModifyCast:  rogue.applyDeathmantle,
@@ -44,9 +45,7 @@ func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 			ThreatMultiplier: 1,
 			BaseDamage: core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
-					comboPoints := rogue.ComboPoints()
-					base := basePerComboPoint * float64(comboPoints)
-					return base + (hitEffect.MeleeAttackPower(spell.Character)*0.03)*float64(comboPoints)
+					return baseDamage + apRatio*hitEffect.MeleeAttackPower(spell.Character)
 				},
 				TargetSpellCoefficient: 0,
 			},
@@ -62,4 +61,15 @@ func (rogue *Rogue) registerEnvenomSpell(_ *core.Simulation) {
 			},
 		}),
 	})
+}
+
+func (rogue *Rogue) registerEnvenom() {
+	rogue.Envenom = [6]*core.Spell{
+		nil,
+		rogue.makeEnvenom(1),
+		rogue.makeEnvenom(2),
+		rogue.makeEnvenom(3),
+		rogue.makeEnvenom(4),
+		rogue.makeEnvenom(5),
+	}
 }
