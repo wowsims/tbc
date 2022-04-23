@@ -435,7 +435,7 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 			character.AddStat(stats.RangedAttackPower, 44*float64(newStacks-oldStacks))
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
 			aura.AddStack(sim)
