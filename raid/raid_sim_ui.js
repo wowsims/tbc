@@ -289,7 +289,7 @@ export class RaidSimUI extends SimUI {
     toProto() {
         return RaidSimSettings.create({
             settings: this.sim.toProto(),
-            raid: this.sim.raid.toProto(),
+            raid: this.sim.raid.toProto(true),
             buffBots: this.getBuffBots().map(b => b.toProto()),
             blessings: this.blessingsPicker.getAssignments(),
             encounter: this.sim.encounter.toProto(),

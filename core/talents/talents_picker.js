@@ -14,7 +14,7 @@ export class TalentsPicker extends Component {
         this.trees = treeConfigs.map(treeConfig => new TalentTreePicker(this.rootElem, player, treeConfig, this));
         this.trees.forEach(tree => tree.talents.forEach(talent => talent.setPoints(0, false)));
         this.setTalentsString(TypedEvent.nextEventID(), this.player.getTalentsString());
-        this.player.talentsStringChangeEmitter.on(eventID => {
+        this.player.talentsChangeEmitter.on(eventID => {
             this.setTalentsString(eventID, this.player.getTalentsString());
         });
     }
@@ -34,22 +34,7 @@ export class TalentsPicker extends Component {
         this.trees.forEach(tree => tree.update());
         TypedEvent.freezeAllAndDo(() => {
             this.player.setTalentsString(eventID, this.getTalentsString());
-            this.player.setTalents(eventID, this.getTalents());
         });
-    }
-    getTalents() {
-        const talents = this.player.specTypeFunctions.talentsCreate();
-        this.trees.forEach(tree => tree.talents.forEach(talent => {
-            if (talent.config.fieldName) {
-                if (talent.config.maxPoints == 1) {
-                    talents[talent.config.fieldName] = talent.getPoints() > 0;
-                }
-                else {
-                    talents[talent.config.fieldName] = talent.getPoints();
-                }
-            }
-        }));
-        return talents;
     }
     getTalentsString() {
         return this.trees.map(tree => tree.getTalentsString()).join('-').replace(/-+$/g, '');

@@ -81,9 +81,9 @@ export class Party {
         this.buffs = PartyBuffs.clone(newBuffs);
         this.buffsChangeEmitter.emit(eventID);
     }
-    toProto() {
+    toProto(forExport) {
         return PartyProto.create({
-            players: this.players.map(player => player == null ? PlayerProto.create() : player.toProto()),
+            players: this.players.map(player => player == null ? PlayerProto.create() : player.toProto(forExport)),
             buffs: this.buffs,
         });
     }

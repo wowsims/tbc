@@ -30,6 +30,6 @@ export declare class Raid {
     setBuffs(eventID: EventID, newBuffs: RaidBuffs): void;
     getStaggerStormstrikes(): boolean;
     setStaggerStormstrikes(eventID: EventID, newValue: boolean): void;
-    toProto(): RaidProto;
+    toProto(forExport?: boolean): RaidProto;
     fromProto(eventID: EventID, proto: RaidProto): void;
 }

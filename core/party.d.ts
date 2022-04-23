@@ -24,6 +24,6 @@ export declare class Party {
     setPlayer(eventID: EventID, playerIndex: number, newPlayer: Player<any> | null): void;
     getBuffs(): PartyBuffs;
     setBuffs(eventID: EventID, newBuffs: PartyBuffs): void;
-    toProto(): PartyProto;
+    toProto(forExport?: boolean): PartyProto;
     fromProto(eventID: EventID, proto: PartyProto): void;
 }

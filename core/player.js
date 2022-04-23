@@ -9,6 +9,7 @@ import { WeaponType } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { getWeaponDPS } from '/tbc/core/proto_utils/equipped_item.js';
+import { talentStringToProto } from '/tbc/core/talents/factory.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { gemMatchesSocket, } from '/tbc/core/proto_utils/gems.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
@@ -40,8 +41,6 @@ export class Player {
         this.raceChangeEmitter = new TypedEvent('PlayerRace');
         this.rotationChangeEmitter = new TypedEvent('PlayerRotation');
         this.talentsChangeEmitter = new TypedEvent('PlayerTalents');
-        // Talents dont have all fields so we need this.
-        this.talentsStringChangeEmitter = new TypedEvent('PlayerTalentsString');
         this.specOptionsChangeEmitter = new TypedEvent('PlayerSpecOptions');
         this.cooldownsChangeEmitter = new TypedEvent('PlayerCooldowns');
         this.epWeightsChangeEmitter = new TypedEvent('PlayerEpWeights');
@@ -53,7 +52,6 @@ export class Player {
         this.race = specToEligibleRaces[this.spec][0];
         this.specTypeFunctions = specTypeFunctions[this.spec];
         this.rotation = this.specTypeFunctions.rotationCreate();
-        this.talents = this.specTypeFunctions.talentsCreate();
         this.specOptions = this.specTypeFunctions.optionsCreate();
         this.changeEmitter = TypedEvent.onAny([
             this.nameChangeEmitter,
@@ -64,7 +62,6 @@ export class Player {
             this.raceChangeEmitter,
             this.rotationChangeEmitter,
             this.talentsChangeEmitter,
-            this.talentsStringChangeEmitter,
             this.specOptionsChangeEmitter,
             this.cooldownsChangeEmitter,
             this.epWeightsChangeEmitter,
@@ -309,13 +306,7 @@ export class Player {
         this.rotationChangeEmitter.emit(eventID);
     }
     getTalents() {
-        return this.specTypeFunctions.talentsCopy(this.talents);
-    }
-    setTalents(eventID, newTalents) {
-        if (this.specTypeFunctions.talentsEquals(newTalents, this.talents))
-            return;
-        this.talents = this.specTypeFunctions.talentsCopy(newTalents);
-        this.talentsChangeEmitter.emit(eventID);
+        return talentStringToProto(this.spec, this.talentsString);
     }
     getTalentsString() {
         return this.talentsString;
@@ -324,7 +315,7 @@ export class Player {
         if (newTalentsString == this.talentsString)
             return;
         this.talentsString = newTalentsString;
-        this.talentsStringChangeEmitter.emit(eventID);
+        this.talentsChangeEmitter.emit(eventID);
     }
     getTalentTree() {
         return getTalentTree(this.getTalentsString());
@@ -441,7 +432,7 @@ export class Player {
         parts.push('pcs=' + this.gear.asArray().filter(ei => ei != null).map(ei => ei.item.id).join(':'));
         elem.setAttribute('data-wowhead', parts.join('&'));
     }
-    toProto() {
+    toProto(forExport) {
         return withSpecProto(this.spec, PlayerProto.create({
             name: this.getName(),
             race: this.getRace(),
@@ -452,7 +443,7 @@ export class Player {
             buffs: this.getBuffs(),
             cooldowns: this.getCooldowns(),
             talentsString: this.getTalentsString(),
-        }), this.getRotation(), this.getTalents(), this.getSpecOptions());
+        }), this.getRotation(), forExport ? this.specTypeFunctions.talentsCreate() : this.getTalents(), this.getSpecOptions());
     }
     fromProto(eventID, proto) {
         TypedEvent.freezeAllAndDo(() => {
@@ -465,7 +456,6 @@ export class Player {
             this.setCooldowns(eventID, proto.cooldowns || Cooldowns.create());
             this.setTalentsString(eventID, proto.talentsString);
             this.setRotation(eventID, this.specTypeFunctions.rotationFromPlayer(proto));
-            this.setTalents(eventID, this.specTypeFunctions.talentsFromPlayer(proto));
             this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
         });
     }

@@ -81,9 +81,9 @@ export class Raid {
         this.staggerStormstrikes = newValue;
         this.staggerStormstrikesChangeEmitter.emit(eventID);
     }
-    toProto() {
+    toProto(forExport) {
         return RaidProto.create({
-            parties: this.parties.map(party => party.toProto()),
+            parties: this.parties.map(party => party.toProto(forExport)),
             buffs: this.buffs,
             staggerStormstrikes: this.staggerStormstrikes,
         });

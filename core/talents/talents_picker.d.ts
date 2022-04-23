@@ -11,7 +11,6 @@ export declare abstract class TalentsPicker<SpecType extends Spec> extends Compo
     get numPoints(): number;
     isFull(): boolean;
     update(eventID: EventID): void;
-    getTalents(): SpecTalents<SpecType>;
     getTalentsString(): string;
     setTalentsString(eventID: EventID, str: string): void;
     freeze(): void;

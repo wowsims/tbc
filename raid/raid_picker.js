@@ -9,7 +9,6 @@ import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { newRaidTarget } from '/tbc/core/proto_utils/utils.js';
-import { newTalentsPicker } from '/tbc/core/talents/factory.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 import { hexToRgba } from '/tbc/core/utils.js';
@@ -530,8 +529,6 @@ class NewPlayerPicker extends Component {
                         newPlayer.setRace(eventID, matchingPreset.defaultFactionRaces[this.raidPicker.getCurrentFaction()]);
                         newPlayer.setRotation(eventID, matchingPreset.rotation);
                         newPlayer.setTalentsString(eventID, matchingPreset.talents);
-                        // TalentPicker needed to convert from talents string into talents proto.
-                        newTalentsPicker(document.createElement('div'), newPlayer);
                         newPlayer.setSpecOptions(eventID, matchingPreset.specOptions);
                         newPlayer.setConsumes(eventID, matchingPreset.consumes);
                         newPlayer.setName(eventID, matchingPreset.defaultName);

@@ -582,7 +582,7 @@ export class IndividualSimUI extends SimUI {
                 talentsString: player.getTalentsString(),
             }),
             setData: (eventID, player, newTalents) => player.setTalentsString(eventID, newTalents.talentsString),
-            changeEmitters: [this.player.talentsStringChangeEmitter],
+            changeEmitters: [this.player.talentsChangeEmitter],
             equals: (a, b) => SavedTalents.equals(a, b),
             toJson: (a) => SavedTalents.toJson(a),
             fromJson: (obj) => SavedTalents.fromJson(obj),
@@ -685,7 +685,7 @@ export class IndividualSimUI extends SimUI {
     toProto() {
         return IndividualSimSettings.create({
             settings: this.sim.toProto(),
-            player: this.player.toProto(),
+            player: this.player.toProto(true),
             raidBuffs: this.sim.raid.getBuffs(),
             partyBuffs: this.player.getParty()?.getBuffs() || PartyBuffs.create(),
             encounter: this.sim.encounter.toProto(),

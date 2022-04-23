@@ -33,7 +33,6 @@ export declare class Player<SpecType extends Spec> {
     private gear;
     private race;
     private rotation;
-    private talents;
     private talentsString;
     private specOptions;
     private cooldowns;
@@ -52,7 +51,6 @@ export declare class Player<SpecType extends Spec> {
     readonly raceChangeEmitter: TypedEvent<void>;
     readonly rotationChangeEmitter: TypedEvent<void>;
     readonly talentsChangeEmitter: TypedEvent<void>;
-    readonly talentsStringChangeEmitter: TypedEvent<void>;
     readonly specOptionsChangeEmitter: TypedEvent<void>;
     readonly cooldownsChangeEmitter: TypedEvent<void>;
     readonly epWeightsChangeEmitter: TypedEvent<void>;
@@ -97,7 +95,6 @@ export declare class Player<SpecType extends Spec> {
     getRotation(): SpecRotation<SpecType>;
     setRotation(eventID: EventID, newRotation: SpecRotation<SpecType>): void;
     getTalents(): SpecTalents<SpecType>;
-    setTalents(eventID: EventID, newTalents: SpecTalents<SpecType>): void;
     getTalentsString(): string;
     setTalentsString(eventID: EventID, newTalentsString: string): void;
     getTalentTree(): number;
@@ -109,7 +106,7 @@ export declare class Player<SpecType extends Spec> {
     computeEnchantEP(enchant: Enchant): number;
     computeItemEP(item: Item): number;
     setWowheadData(equippedItem: EquippedItem, elem: HTMLElement): void;
-    toProto(): PlayerProto;
+    toProto(forExport?: boolean): PlayerProto;
     fromProto(eventID: EventID, proto: PlayerProto): void;
     clone(eventID: EventID): Player<SpecType>;
 }
