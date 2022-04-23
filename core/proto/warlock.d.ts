@@ -19,6 +19,10 @@ export interface WarlockTalents {
      */
     improvedCorruption: number;
     /**
+     * @generated from protobuf field: int32 improved_drain_soul = 49;
+     */
+    improvedDrainSoul: number;
+    /**
      * @generated from protobuf field: int32 improved_life_tap = 3;
      */
     improvedLifeTap: number;

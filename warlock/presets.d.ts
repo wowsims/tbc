@@ -1,7 +1,15 @@
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Warlock_Rotation as WarlockRotation, Warlock_Options as WarlockOptions } from '/tbc/core/proto/warlock.js';
-export declare const StandardTalents: {
+export declare const DestructionTalents: {
+    name: string;
+    data: string;
+};
+export declare const AfflicationTalents: {
+    name: string;
+    data: string;
+};
+export declare const DemonologistTalents: {
     name: string;
     data: string;
 };

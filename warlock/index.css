@@ -2826,10 +2826,10 @@ input, select {
 
 .warlock-sim-ui {
   --theme-color-primary: #a35ec0;
-  --theme-color-background: #1d1510;
-  --theme-color-background-raw: 29, 21, 16;
+  --theme-color-background: rgb(24, 18, 27);
+  --theme-color-background-raw: 24, 18, 27;
   --theme-background-image: url("/tbc/assets/warlock_background.jpg");
-  --theme-background-opacity: 0.95;
+  --theme-background-opacity: 0.93;
   --main-text-color: White;
 }
 

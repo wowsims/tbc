@@ -115,6 +115,24 @@ export const WarlockRotationConfig = {
             },
         },
         {
+            type: 'boolean',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                extraCssClasses: [
+                    'corruption-picker',
+                ],
+                label: 'Use Corruption',
+                labelTooltip: 'Use Corruption as the next cast after the dot expires.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().corruption,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.corruption = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
+        {
             type: 'enum',
             getModObject: (simUI) => simUI.player,
             config: {

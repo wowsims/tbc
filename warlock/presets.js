@@ -11,9 +11,17 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // keep them in a separate file.
 // Default talents. Uses the wowhead calculator format, make the talents on
 // https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
-export const StandardTalents = {
-    name: 'Standard',
+export const DestructionTalents = {
+    name: 'Destruction',
     data: '-20501301332001-50500051220051053105',
+};
+export const AfflicationTalents = {
+    name: 'Afflication',
+    data: '55022000102351055103--50500051220001',
+};
+export const DemonologistTalents = {
+    name: 'Demonologist',
+    data: '01-2050030133250101501351-5050005112',
 };
 export const DefaultRotation = WarlockRotation.create({
     primarySpell: Warlock_Rotation_PrimarySpell.Shadowbolt,

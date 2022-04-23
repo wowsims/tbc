@@ -105,6 +105,7 @@ class WarlockTalents$Type extends MessageType {
         super("proto.WarlockTalents", [
             { no: 1, name: "suppression", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "improved_corruption", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 49, name: "improved_drain_soul", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "improved_life_tap", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 4, name: "soul_siphon", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 5, name: "improved_curse_of_agony", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -154,7 +155,7 @@ class WarlockTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { suppression: 0, improvedCorruption: 0, improvedLifeTap: 0, soulSiphon: 0, improvedCurseOfAgony: 0, amplifyCurse: false, nightfall: 0, empoweredCorruption: 0, siphonLife: false, shadowMastery: 0, contagion: 0, darkPact: false, malediction: 0, unstableAffliction: false, improvedImp: 0, demonicEmbrace: 0, improvedVoidwalker: 0, felIntellect: 0, improvedSuccubus: 0, felStamina: 0, demonicAegis: 0, unholyPower: 0, improvedEnslaveDemon: 0, demonicSacrifice: false, masterConjuror: 0, manaFeed: 0, masterDemonologist: 0, soulLink: false, demonicKnowledge: 0, demonicTactics: 0, summonFelguard: false, improvedShadowBolt: 0, cataclysm: 0, bane: 0, improvedFirebolt: 0, improvedLashOfPain: 0, destructiveReach: 0, devastation: 0, shadowburn: false, improvedSearingPain: 0, improvedImmolate: 0, ruin: false, emberstorm: 0, backlash: 0, conflagrate: false, soulLeech: 0, shadowAndFlame: 0, shadowfury: false };
+        const message = { suppression: 0, improvedCorruption: 0, improvedDrainSoul: 0, improvedLifeTap: 0, soulSiphon: 0, improvedCurseOfAgony: 0, amplifyCurse: false, nightfall: 0, empoweredCorruption: 0, siphonLife: false, shadowMastery: 0, contagion: 0, darkPact: false, malediction: 0, unstableAffliction: false, improvedImp: 0, demonicEmbrace: 0, improvedVoidwalker: 0, felIntellect: 0, improvedSuccubus: 0, felStamina: 0, demonicAegis: 0, unholyPower: 0, improvedEnslaveDemon: 0, demonicSacrifice: false, masterConjuror: 0, manaFeed: 0, masterDemonologist: 0, soulLink: false, demonicKnowledge: 0, demonicTactics: 0, summonFelguard: false, improvedShadowBolt: 0, cataclysm: 0, bane: 0, improvedFirebolt: 0, improvedLashOfPain: 0, destructiveReach: 0, devastation: 0, shadowburn: false, improvedSearingPain: 0, improvedImmolate: 0, ruin: false, emberstorm: 0, backlash: 0, conflagrate: false, soulLeech: 0, shadowAndFlame: 0, shadowfury: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -170,6 +171,9 @@ class WarlockTalents$Type extends MessageType {
                     break;
                 case /* int32 improved_corruption */ 2:
                     message.improvedCorruption = reader.int32();
+                    break;
+                case /* int32 improved_drain_soul */ 49:
+                    message.improvedDrainSoul = reader.int32();
                     break;
                 case /* int32 improved_life_tap */ 3:
                     message.improvedLifeTap = reader.int32();
@@ -327,6 +331,9 @@ class WarlockTalents$Type extends MessageType {
         /* int32 improved_corruption = 2; */
         if (message.improvedCorruption !== 0)
             writer.tag(2, WireType.Varint).int32(message.improvedCorruption);
+        /* int32 improved_drain_soul = 49; */
+        if (message.improvedDrainSoul !== 0)
+            writer.tag(49, WireType.Varint).int32(message.improvedDrainSoul);
         /* int32 improved_life_tap = 3; */
         if (message.improvedLifeTap !== 0)
             writer.tag(3, WireType.Varint).int32(message.improvedLifeTap);
