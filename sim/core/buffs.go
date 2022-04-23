@@ -136,7 +136,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		}
 		if snapshotAP > 0 {
 			snapshotAP = math.Floor(snapshotAP)
-			SnapshotBattleShoutAura(character, snapshotAP)
+			SnapshotBattleShoutAura(character, snapshotAP, partyBuffs.SnapshotBsBoomingVoiceRank)
 		}
 	}
 	character.AddStats(stats.Stats{
@@ -255,8 +255,9 @@ func SnapshotImprovedWrathOfAirTotemAura(character *Character) *Aura {
 	})
 }
 
-func SnapshotBattleShoutAura(character *Character, snapshotAp float64) *Aura {
-	return character.NewTemporaryStatsAuraWrapped("Battle Shout Snapshot", ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: snapshotAp}, time.Second*110, func(config *Aura) {
+func SnapshotBattleShoutAura(character *Character, snapshotAp float64, boomingVoiceRank int32) *Aura {
+	shoutDuration := time.Duration(float64(time.Minute*2)*(1+0.1*float64(boomingVoiceRank))) - time.Second*10
+	return character.NewTemporaryStatsAuraWrapped("Battle Shout Snapshot", ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: snapshotAp}, shoutDuration, func(config *Aura) {
 		config.OnReset = func(aura *Aura, sim *Simulation) {
 			aura.Activate(sim)
 		}
