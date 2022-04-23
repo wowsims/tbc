@@ -12,6 +12,8 @@ var MutilateActionID = core.ActionID{SpellID: 34413}
 var MutilateMHActionID = core.ActionID{SpellID: 34419}
 var MutilateOHActionID = core.ActionID{SpellID: 34418}
 var MutilateEnergyCost = 60.0
+var MHOutcome = core.OutcomeHit
+var OHOutcome = core.OutcomeHit
 
 func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
 	actionID := MutilateMHActionID
@@ -32,7 +34,12 @@ func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
 		OutcomeApplier: core.OutcomeFuncMeleeSpecialCritOnly(rogue.critMultiplier(isMH, true)),
 
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			rogue.AddComboPoints(sim, 1, actionID)
+			if isMH {
+				MHOutcome = spellEffect.Outcome
+			} else {
+				OHOutcome = spellEffect.Outcome
+			}
+			return
 		},
 	}
 	if !isMH {
@@ -43,6 +50,7 @@ func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
 	effect.BaseDamage = core.WrapBaseDamageConfig(effect.BaseDamage, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
 		return func(sim *core.Simulation, spellEffect *core.SpellEffect, spell *core.Spell) float64 {
 			normalDamage := oldCalculator(sim, spellEffect, spell)
+			// TODO: Add support for all poison effects
 			if rogue.DeadlyPoisonDot.IsActive() {
 				return normalDamage * 1.5
 			} else {
@@ -98,8 +106,11 @@ func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
 				//  from the mh attack applied
 				mhHitSpell.Cast(sim, spellEffect.Target)
 				ohHitSpell.Cast(sim, spellEffect.Target)
-				rogue.Mutilate.Casts -= 2
-				rogue.Mutilate.Hits--
+
+				if MHOutcome == core.OutcomeCrit || OHOutcome == core.OutcomeCrit {
+					//rogue.Mutilate.ApplyEffects.Outcome = core.OutcomeCrit
+					spellEffect.Outcome = core.OutcomeCrit
+				}
 			},
 		}),
 	})
