@@ -1,4 +1,4 @@
-package retribution
+package protection
 
 import (
 	"github.com/wowsims/tbc/sim/core/items"
