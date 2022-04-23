@@ -20,6 +20,7 @@ func (war *DpsWarrior) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
 			war.WaitUntil(sim, slamAt) // Pause GCD until slam time
 		}
 	}
+	war.tryQueueHsCleave(sim)
 }
 
 func (war *DpsWarrior) doRotation(sim *core.Simulation) {
