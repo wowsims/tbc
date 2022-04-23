@@ -1,10 +1,10 @@
-import { TalentsPicker } from './talents_picker.js';
+import { TalentsPicker, newTalentsConfig } from './talents_picker.js';
 export class HunterTalentsPicker extends TalentsPicker {
     constructor(parent, player) {
         super(parent, player, hunterTalentsConfig);
     }
 }
-export const hunterTalentsConfig = [
+export const hunterTalentsConfig = newTalentsConfig([
     {
         name: 'Beast Mastery',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/361.jpg',
@@ -639,4 +639,4 @@ export const hunterTalentsConfig = [
             },
         ],
     },
-];
+]);

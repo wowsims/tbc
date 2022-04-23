@@ -61,4 +61,5 @@ export declare type TalentConfig<SpecType extends Spec> = {
     spellIds: Array<number>;
     maxPoints: number;
 };
+export declare function newTalentsConfig<SpecType extends Spec>(talents: TalentsConfig<SpecType>): TalentsConfig<SpecType>;
 export {};

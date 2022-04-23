@@ -1,11 +1,11 @@
-import { TalentsPicker } from './talents_picker.js';
+import { TalentsPicker, newTalentsConfig } from './talents_picker.js';
 // Talents are the same for all Paladin specs, so its ok to just use RetributionPaladin here
 export class PaladinTalentsPicker extends TalentsPicker {
     constructor(parent, player) {
         super(parent, player, paladinTalentsConfig);
     }
 }
-export const paladinTalentsConfig = [
+export const paladinTalentsConfig = newTalentsConfig([
     {
         name: 'Holy',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/classic/382.jpg',
@@ -632,4 +632,4 @@ export const paladinTalentsConfig = [
             },
         ],
     },
-];
+]);

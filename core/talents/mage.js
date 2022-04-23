@@ -1,10 +1,10 @@
-import { TalentsPicker } from './talents_picker.js';
+import { TalentsPicker, newTalentsConfig } from './talents_picker.js';
 export class MageTalentsPicker extends TalentsPicker {
     constructor(parent, player) {
         super(parent, player, mageTalentsConfig);
     }
 }
-export const mageTalentsConfig = [
+export const mageTalentsConfig = newTalentsConfig([
     {
         name: 'Arcane',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/81.jpg',
@@ -102,8 +102,8 @@ export const mageTalentsConfig = [
             {
                 //fieldName: 'improvedCounterspell',
                 location: {
-                    rowIdx: 1,
-                    colIdx: 0,
+                    rowIdx: 3,
+                    colIdx: 1,
                 },
                 spellIds: [11255, 12598],
                 maxPoints: 2,
@@ -658,4 +658,4 @@ export const mageTalentsConfig = [
             },
         ],
     },
-];
+]);

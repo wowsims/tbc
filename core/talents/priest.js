@@ -1,11 +1,11 @@
-import { TalentsPicker } from './talents_picker.js';
+import { TalentsPicker, newTalentsConfig } from './talents_picker.js';
 // Talents are the same for all Priest specs, so its ok to just use ShadowPriest here
 export class PriestTalentsPicker extends TalentsPicker {
     constructor(parent, player) {
         super(parent, player, priestTalentsConfig);
     }
 }
-export const priestTalentsConfig = [
+export const priestTalentsConfig = newTalentsConfig([
     {
         name: 'Discipline',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/201.jpg',
@@ -632,4 +632,4 @@ export const priestTalentsConfig = [
             },
         ],
     },
-];
+]);

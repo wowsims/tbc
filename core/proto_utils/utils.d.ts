@@ -70,7 +70,7 @@ export declare type SpecTypeFunctions<SpecType extends Spec> = {
     optionsFromJson: (obj: any) => SpecOptions<SpecType>;
     optionsFromPlayer: (player: Player) => SpecOptions<SpecType>;
 };
-export declare const specTypeFunctions: Partial<Record<Spec, SpecTypeFunctions<any>>>;
+export declare const specTypeFunctions: Record<Spec, SpecTypeFunctions<any>>;
 export declare enum Faction {
     Unknown = 0,
     Alliance = 1,

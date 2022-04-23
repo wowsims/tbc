@@ -1,10 +1,10 @@
-import { TalentsPicker } from './talents_picker.js';
+import { TalentsPicker, newTalentsConfig } from './talents_picker.js';
 export class RogueTalentsPicker extends TalentsPicker {
     constructor(parent, player) {
         super(parent, player, rogueTalentsConfig);
     }
 }
-export const rogueTalentsConfig = [
+export const rogueTalentsConfig = newTalentsConfig([
     {
         name: 'Assassination',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/182.jpg',
@@ -666,4 +666,4 @@ export const rogueTalentsConfig = [
             },
         ],
     },
-];
+]);

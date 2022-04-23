@@ -1,11 +1,11 @@
-import { TalentsPicker } from './talents_picker.js';
+import { TalentsPicker, newTalentsConfig } from './talents_picker.js';
 // Talents are the same for all Druid specs, so its ok to just use BalanceDruid here
 export class DruidTalentsPicker extends TalentsPicker {
     constructor(parent, player) {
         super(parent, player, druidTalentsConfig);
     }
 }
-export const druidTalentsConfig = [
+export const druidTalentsConfig = newTalentsConfig([
     {
         name: 'Balance',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/283.jpg',
@@ -618,4 +618,4 @@ export const druidTalentsConfig = [
             },
         ],
     },
-];
+]);

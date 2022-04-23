@@ -1,10 +1,10 @@
-import { TalentsPicker } from './talents_picker.js';
+import { TalentsPicker, newTalentsConfig } from './talents_picker.js';
 export class WarlockTalentsPicker extends TalentsPicker {
     constructor(parent, player) {
         super(parent, player, warlockTalentsConfig);
     }
 }
-export const warlockTalentsConfig = [
+export const warlockTalentsConfig = newTalentsConfig([
     {
         name: 'Affliction',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/302.jpg',
@@ -639,4 +639,4 @@ export const warlockTalentsConfig = [
             },
         ],
     },
-];
+]);

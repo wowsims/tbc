@@ -1,10 +1,10 @@
-import { TalentsPicker } from './talents_picker.js';
+import { TalentsPicker, newTalentsConfig } from './talents_picker.js';
 export class WarriorTalentsPicker extends TalentsPicker {
     constructor(parent, player) {
         super(parent, player, warriorTalentsConfig);
     }
 }
-export const warriorTalentsConfig = [
+export const warriorTalentsConfig = newTalentsConfig([
     {
         name: 'Arms',
         backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/161.jpg',
@@ -649,4 +649,4 @@ export const warriorTalentsConfig = [
             },
         ],
     },
-];
+]);

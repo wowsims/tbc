@@ -244,12 +244,12 @@ class TalentPicker extends Component {
     getSpellIdForPoints(numPoints) {
         // 0-indexed rank of talent
         const rank = Math.max(0, numPoints - 1);
-        if (this.config.spellIds[rank])
+        if (this.config.spellIds[rank]) {
             return this.config.spellIds[rank];
-        // Increment from the last provided rank id
-        const lastRank = this.config.spellIds.length - 1;
-        const lastRankId = this.config.spellIds[lastRank];
-        return lastRankId + (rank - lastRank);
+        }
+        else {
+            throw new Error('No rank ' + numPoints + ' for talent ' + this.config.fieldName);
+        }
     }
     update() {
         if (this.canSetPoints(this.getPoints() + 1)) {
@@ -259,4 +259,26 @@ class TalentPicker extends Component {
             this.rootElem.classList.remove('talent-picker-can-add');
         }
     }
+}
+export function newTalentsConfig(talents) {
+    talents.forEach(tree => {
+        tree.talents.forEach((talent, i) => {
+            // Validate that talents are given in the correct order (left-to-right top-to-bottom).
+            if (i != 0) {
+                const prevTalent = tree.talents[i - 1];
+                if (talent.location.rowIdx < prevTalent.location.rowIdx || (talent.location.rowIdx == prevTalent.location.rowIdx && talent.location.colIdx <= prevTalent.location.colIdx)) {
+                    throw new Error('Out-of-order talent: ' + talent.fieldName);
+                }
+            }
+            // Infer omitted spell IDs.
+            if (talent.spellIds.length < talent.maxPoints) {
+                let curSpellId = talent.spellIds[talent.spellIds.length - 1];
+                for (let pointIdx = talent.spellIds.length; pointIdx < talent.maxPoints; pointIdx++) {
+                    curSpellId++;
+                    talent.spellIds.push(curSpellId);
+                }
+            }
+        });
+    });
+    return talents;
 }
