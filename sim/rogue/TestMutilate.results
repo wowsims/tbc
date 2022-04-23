@@ -138,7 +138,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-BraidedEterniumChain-24114"
  value: {
-  dps: 1226.2891085634242
+  dps: 1226.2891085634244
  }
 }
 dps_results: {
@@ -210,7 +210,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-Deathmantle"
  value: {
-  dps: 1145.7500470975685
+  dps: 1142.0737469211706
  }
 }
 dps_results: {
@@ -534,13 +534,13 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-TheSkullofGul'dan-32483"
  value: {
-  dps: 1187.6014466976649
+  dps: 1187.6014466976646
  }
 }
 dps_results: {
  key: "TestMutilate-AllItems-TheTwinStars"
  value: {
-  dps: 1160.888171054868
+  dps: 1160.8881710548678
  }
 }
 dps_results: {
