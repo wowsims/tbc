@@ -113,8 +113,6 @@ type Shaman struct {
 	NextTotemDropType [4]int32
 	NextTotemDrops    [4]time.Duration
 
-	ElementalFocusStacks byte
-
 	LightningBolt   *core.Spell
 	LightningBoltLO *core.Spell
 
@@ -144,6 +142,7 @@ type Shaman struct {
 	MagmaTotemDot    *core.Dot
 	FireNovaTotemDot *core.Dot
 
+	ClearcastingAura     *core.Aura
 	ElementalMasteryAura *core.Aura
 	NaturesSwiftnessAura *core.Aura
 	ShamanisticFocusAura *core.Aura
@@ -289,8 +288,6 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 			}
 		}
 	}
-
-	shaman.ElementalFocusStacks = 0
 }
 
 func (shaman *Shaman) ElementalCritMultiplier() float64 {

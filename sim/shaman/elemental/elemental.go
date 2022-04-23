@@ -229,7 +229,7 @@ func (rotation *CLOnClearcastRotation) DoAction(eleShaman *ElementalShaman, sim 
 	if !spell.Cast(sim, sim.GetPrimaryTarget()) {
 		eleShaman.WaitForMana(sim, spell.CurCast.Cost)
 	} else {
-		rotation.prevPrevCastProccedCC = eleShaman.ElementalFocusStacks == 2
+		rotation.prevPrevCastProccedCC = eleShaman.ClearcastingAura.GetStacks() == 2
 	}
 }
 

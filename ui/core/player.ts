@@ -90,6 +90,7 @@ export class Player<SpecType extends Spec> {
 	private itemEPCache: Map<number, number> = new Map<number, number>();
 	private gemEPCache: Map<number, number> = new Map<number, number>();
 	private enchantEPCache: Map<number, number> = new Map<number, number>();
+	private talents: SpecTalents<SpecType> | null = null;
 
 	readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
 
@@ -424,7 +425,10 @@ export class Player<SpecType extends Spec> {
 	}
 
 	getTalents(): SpecTalents<SpecType> {
-		return talentStringToProto(this.spec, this.talentsString);
+		if (this.talents == null) {
+			this.talents = talentStringToProto(this.spec, this.talentsString) as SpecTalents<SpecType>;
+		}
+		return this.talents;
 	}
 
 	getTalentsString(): string {
@@ -436,6 +440,7 @@ export class Player<SpecType extends Spec> {
 			return;
 
 		this.talentsString = newTalentsString;
+		this.talents = null;
 		this.talentsChangeEmitter.emit(eventID);
 	}
 

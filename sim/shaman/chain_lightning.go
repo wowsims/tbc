@@ -35,24 +35,13 @@ func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOv
 				if !spellEffect.Landed() {
 					return
 				}
-				if shaman.Talents.ElementalFocus && spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					shaman.ElementalFocusStacks = 2
-				}
-
 				if sim.RandomFloat("CL Lightning Overload") > lightningOverloadChance {
 					return
-				}
-				if sim.Log != nil {
-					sim.Log("LO #%d", hitIndex)
 				}
 				shaman.ChainLightningLOs[hitIndex].Cast(sim, spellEffect.Target)
 			}
 		} else {
-			return func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if shaman.Talents.ElementalFocus && spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					shaman.ElementalFocusStacks = 2
-				}
-			}
+			return nil
 		}
 	}
 
