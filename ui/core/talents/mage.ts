@@ -3,7 +3,7 @@ import { MageTalents as MageTalents } from '/tbc/core/proto/mage.js';
 import { MageSpecs } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
-import { TalentsConfig, TalentsPicker } from './talents_picker.js';
+import { TalentsConfig, TalentsPicker, newTalentsConfig } from './talents_picker.js';
 
 export class MageTalentsPicker extends TalentsPicker<Spec.SpecMage> {
 	constructor(parent: HTMLElement, player: Player<Spec.SpecMage>) {
@@ -11,7 +11,7 @@ export class MageTalentsPicker extends TalentsPicker<Spec.SpecMage> {
 	}
 }
 
-export const mageTalentsConfig: TalentsConfig<Spec.SpecMage> = [
+export const mageTalentsConfig: TalentsConfig<Spec.SpecMage> = newTalentsConfig([
 	{
 		name: 'Arcane',
 		backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/81.jpg',
@@ -109,8 +109,8 @@ export const mageTalentsConfig: TalentsConfig<Spec.SpecMage> = [
 			{
 				//fieldName: 'improvedCounterspell',
 				location: {
-					rowIdx: 1,
-					colIdx: 0,
+					rowIdx: 3,
+					colIdx: 1,
 				},
 				spellIds: [11255, 12598],
 				maxPoints: 2,
@@ -665,4 +665,4 @@ export const mageTalentsConfig: TalentsConfig<Spec.SpecMage> = [
 			},
 		],
 	},
-];
+]);

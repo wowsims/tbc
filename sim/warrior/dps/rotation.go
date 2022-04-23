@@ -123,7 +123,7 @@ func (war *DpsWarrior) shouldSunder(sim *core.Simulation) bool {
 		war.castFirstSunder = true
 		return true
 	} else if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorMaintain &&
-		!war.CanSunderArmor(sim) &&
+		war.CanSunderArmor(sim) &&
 		(war.SunderArmorAura.GetStacks() < 5 || war.SunderArmorAura.RemainingDuration(sim) < time.Second*3) {
 		return true
 	}

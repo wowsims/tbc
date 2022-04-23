@@ -3,7 +3,7 @@ import { PaladinTalents as PaladinTalents } from '/tbc/core/proto/paladin.js';
 import { PaladinSpecs } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
-import { TalentsConfig, TalentsPicker } from './talents_picker.js';
+import { TalentsConfig, TalentsPicker, newTalentsConfig } from './talents_picker.js';
 
 // Talents are the same for all Paladin specs, so its ok to just use RetributionPaladin here
 export class PaladinTalentsPicker extends TalentsPicker<Spec.SpecRetributionPaladin> {
@@ -12,7 +12,7 @@ export class PaladinTalentsPicker extends TalentsPicker<Spec.SpecRetributionPala
 	}
 }
 
-export const paladinTalentsConfig: TalentsConfig<Spec.SpecRetributionPaladin> = [
+export const paladinTalentsConfig: TalentsConfig<Spec.SpecRetributionPaladin> = newTalentsConfig([
 	{
 		name: 'Holy',
 		backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/classic/382.jpg',
@@ -639,4 +639,4 @@ export const paladinTalentsConfig: TalentsConfig<Spec.SpecRetributionPaladin> = 
 			},
 		],
 	},
-];
+]);
