@@ -36,6 +36,7 @@ func RegisterAll() {
 	dpsWarrior.RegisterDpsWarrior()
 	protectionWarrior.RegisterProtectionWarrior()
 	retribution.RegisterRetributionPaladin()
+	protectionPaladin.RegisterProtectionPaladin()
 	smite.RegisterSmitePriest()
 	warlock.RegisterWarlock()
 }

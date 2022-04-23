@@ -9,29 +9,30 @@ import (
 
 var EviscerateActionID = core.ActionID{SpellID: 26865}
 
-func (rogue *Rogue) registerEviscerateSpell(sim *core.Simulation) {
-	rogue.eviscerateEnergyCost = 35
+func (rogue *Rogue) makeEviscerate(comboPoints int32) *core.Spell {
+	actionID := EviscerateActionID
+	actionID.Tag = comboPoints
+
+	baseDamage := 60.0 + (185+core.TernaryFloat64(ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2), 40, 0))*float64(comboPoints)
+	apRatio := 0.03 * float64(comboPoints)
+
+	cost := 35.0
 	if ItemSetAssassination.CharacterHasSetBonus(&rogue.Character, 4) {
-		rogue.eviscerateEnergyCost -= 10
+		cost -= 10
 	}
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
-	basePerComboPoint := 185.0
-	if ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2) {
-		basePerComboPoint += 40
-	}
-
-	rogue.Eviscerate = rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    EviscerateActionID,
+	return rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics | rogue.finisherFlags(),
 
 		ResourceType: stats.Energy,
-		BaseCost:     rogue.eviscerateEnergyCost,
+		BaseCost:     cost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: rogue.eviscerateEnergyCost,
+				Cost: cost,
 				GCD:  time.Second,
 			},
 			ModifyCast:  rogue.applyDeathmantle,
@@ -44,10 +45,8 @@ func (rogue *Rogue) registerEviscerateSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1,
 			BaseDamage: core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
-					comboPoints := rogue.ComboPoints()
-					base := 60.0 + basePerComboPoint*float64(comboPoints)
 					roll := sim.RandomFloat("Eviscerate") * 120.0
-					return base + roll + (hitEffect.MeleeAttackPower(spell.Character)*0.03)*float64(comboPoints) + hitEffect.BonusWeaponDamage(spell.Character)
+					return baseDamage + roll + hitEffect.MeleeAttackPower(spell.Character)*apRatio + hitEffect.BonusWeaponDamage(spell.Character)
 				},
 				TargetSpellCoefficient: 1,
 			},
@@ -63,4 +62,15 @@ func (rogue *Rogue) registerEviscerateSpell(sim *core.Simulation) {
 			},
 		}),
 	})
+}
+
+func (rogue *Rogue) registerEviscerate() {
+	rogue.Eviscerate = [6]*core.Spell{
+		nil,
+		rogue.makeEviscerate(1),
+		rogue.makeEviscerate(2),
+		rogue.makeEviscerate(3),
+		rogue.makeEviscerate(4),
+		rogue.makeEviscerate(5),
+	}
 }

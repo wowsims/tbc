@@ -11,9 +11,9 @@ import (
 var ShivActionID = core.ActionID{SpellID: 5938}
 
 func (rogue *Rogue) registerShivSpell(_ *core.Simulation) {
-	rogue.shivEnergyCost = 20
+	cost := 20.0
 	if rogue.GetOHWeapon() != nil {
-		rogue.shivEnergyCost = 20 + 10*rogue.GetOHWeapon().SwingSpeed
+		cost = 20 + 10*rogue.GetOHWeapon().SwingSpeed
 	}
 
 	rogue.Shiv = rogue.RegisterSpell(core.SpellConfig{
@@ -22,11 +22,11 @@ func (rogue *Rogue) registerShivSpell(_ *core.Simulation) {
 		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder | core.SpellExtrasCannotBeDodged,
 
 		ResourceType: stats.Energy,
-		BaseCost:     rogue.shivEnergyCost,
+		BaseCost:     cost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: rogue.shivEnergyCost,
+				Cost: cost,
 				GCD:  time.Second,
 			},
 			IgnoreHaste: true,

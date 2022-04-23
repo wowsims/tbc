@@ -11,6 +11,10 @@ func (war *ProtectionWarrior) OnGCDReady(sim *core.Simulation) {
 	war.doRotation(sim)
 }
 
+func (war *ProtectionWarrior) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
+	war.tryQueueHsCleave(sim)
+}
+
 func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
@@ -36,11 +40,19 @@ func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 		}
 	}
 
+	war.tryQueueHsCleave(sim)
+}
+
+func (war *ProtectionWarrior) tryQueueHsCleave(sim *core.Simulation) {
 	if war.CurrentRage() >= float64(war.Rotation.HsRageThreshold) {
-		if war.CanHeroicStrike(sim) {
-			war.QueueHeroicStrike(sim)
-		} else if war.CanCleave(sim) {
-			war.QueueCleave(sim)
+		if war.Rotation.UseCleave {
+			if war.CanCleave(sim) {
+				war.QueueCleave(sim)
+			}
+		} else {
+			if war.CanHeroicStrike(sim) {
+				war.QueueHeroicStrike(sim)
+			}
 		}
 	}
 }
