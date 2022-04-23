@@ -15,7 +15,7 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 		cost -= 5
 	}
 
-	baseEffect := core.SpellEffect{
+	baseEffectMH := core.SpellEffect{
 		ProcMask: core.ProcMaskMeleeMHSpecial,
 
 		DamageMultiplier: 1,
@@ -24,12 +24,33 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 0, 1, true),
 		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 	}
+	baseEffectOH := core.SpellEffect{
+		ProcMask: core.ProcMaskMeleeOHSpecial,
+
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+
+		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.OffHand, true, 0, 1, true),
+		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())
-	effects := make([]core.SpellEffect, 0, numHits)
+	numTotalHits := numHits
+	if warrior.AutoAttacks.IsDualWielding {
+		numTotalHits *= 2
+	}
+
+	effects := make([]core.SpellEffect, 0, numTotalHits)
 	for i := int32(0); i < numHits; i++ {
-		effects = append(effects, baseEffect)
-		effects[i].Target = sim.GetTarget(i)
+		mhEffect := baseEffectMH
+		mhEffect.Target = sim.GetTarget(i)
+		effects = append(effects, mhEffect)
+
+		if warrior.AutoAttacks.IsDualWielding {
+			ohEffect := baseEffectOH
+			ohEffect.Target = sim.GetTarget(i)
+			effects = append(effects, ohEffect)
+		}
 	}
 
 	warrior.Whirlwind = warrior.RegisterSpell(core.SpellConfig{

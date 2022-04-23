@@ -5,7 +5,6 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/warrior"
 )
 
@@ -63,18 +62,6 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 			}
 		},
 	})
-
-	// TODO: This should only be applied while berserker stance is active.
-	if war.Talents.ImprovedBerserkerStance > 0 {
-		bonus := 1 + 0.02*float64(war.Talents.ImprovedBerserkerStance)
-		war.AddStatDependency(stats.StatDependency{
-			SourceStat:   stats.AttackPower,
-			ModifiedStat: stats.AttackPower,
-			Modifier: func(ap float64, _ float64) float64 {
-				return ap * bonus
-			},
-		})
-	}
 
 	if war.Options.UseRecklessness {
 		war.RegisterRecklessnessCD()
