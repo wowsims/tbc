@@ -21,21 +21,6 @@ func (shaman *Shaman) ShockCD() time.Duration {
 func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, spellSchool core.SpellSchool, baseCost float64, shockTimer *core.Timer) (core.SpellConfig, core.SpellEffect) {
 	actionID := core.ActionID{SpellID: spellID}
 
-	var onCastComplete func(*core.Simulation, *core.Spell)
-	var onSpellHit func(*core.Simulation, *core.Spell, *core.SpellEffect)
-	if shaman.Talents.ElementalFocus {
-		onCastComplete = func(*core.Simulation, *core.Spell) {
-			if shaman.ElementalFocusStacks > 0 {
-				shaman.ElementalFocusStacks--
-			}
-		}
-		onSpellHit = func(_ *core.Simulation, _ *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				shaman.ElementalFocusStacks = 2
-			}
-		}
-	}
-
 	return core.SpellConfig{
 			ActionID:    actionID,
 			SpellSchool: spellSchool,
@@ -52,11 +37,8 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 						core.TernaryFloat64(ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 2), baseCost*0.1, 0),
 					GCD: core.GCDDefault,
 				},
-				ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
-					if shaman.ElementalFocusStacks > 0 {
-						// Reduces mana cost by 40%
-						cast.Cost -= baseCost * 0.4
-					}
+				ModifyCast: func(_ *core.Simulation, spell *core.Spell, cast *core.Cast) {
+					shaman.modifyCastClearcasting(spell, cast)
 					if shaman.ShamanisticFocusAura != nil && shaman.ShamanisticFocusAura.IsActive() {
 						cast.Cost -= baseCost * 0.6
 					}
@@ -68,7 +50,6 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 					Timer:    shockTimer,
 					Duration: shaman.ShockCD(),
 				},
-				OnCastComplete: onCastComplete,
 			},
 		}, core.SpellEffect{
 			BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
@@ -77,7 +58,6 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 				core.TernaryFloat64(shaman.Equip[items.ItemSlotRanged].ID == TotemOfImpact, 46, 0),
 			DamageMultiplier: 1 * (1 + 0.01*float64(shaman.Talents.Concussion)),
 			ThreatMultiplier: 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision),
-			OnSpellHit:       onSpellHit,
 		}
 }
 

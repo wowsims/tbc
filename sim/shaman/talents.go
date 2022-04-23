@@ -88,6 +88,7 @@ func (shaman *Shaman) ApplyTalents() {
 		shaman.AutoAttacks.OHEffect.ThreatMultiplier *= 0.7
 	}
 
+	shaman.applyElementalFocus()
 	shaman.applyElementalDevastation()
 	shaman.applyFlurry()
 	shaman.applyShamanisticFocus()
@@ -95,6 +96,53 @@ func (shaman *Shaman) ApplyTalents() {
 	shaman.registerElementalMasteryCD()
 	shaman.registerNaturesSwiftnessCD()
 	shaman.registerShamanisticRageCD()
+}
+
+func (shaman *Shaman) applyElementalFocus() {
+	if !shaman.Talents.ElementalFocus {
+		return
+	}
+
+	shaman.ClearcastingAura = shaman.RegisterAura(core.Aura{
+		Label:     "Clearcasting",
+		ActionID:  core.ActionID{SpellID: 16246},
+		Duration:  time.Second * 15,
+		MaxStacks: 2,
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			if !spell.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
+				return
+			}
+			if spell.ActionID.Tag != 0 { // Filter LO casts
+				return
+			}
+			aura.RemoveStack(sim)
+		},
+	})
+
+	shaman.RegisterAura(core.Aura{
+		Label:    "Elemental Focus",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spell.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
+				return
+			}
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				return
+			}
+			shaman.ClearcastingAura.Activate(sim)
+			shaman.ClearcastingAura.SetStacks(sim, 2)
+		},
+	})
+}
+
+func (shaman *Shaman) modifyCastClearcasting(spell *core.Spell, cast *core.Cast) {
+	if shaman.ClearcastingAura != nil && shaman.ClearcastingAura.IsActive() {
+		// Reduces mana cost by 40%
+		cast.Cost -= spell.BaseCost * 0.4
+	}
 }
 
 func (shaman *Shaman) applyElementalDevastation() {

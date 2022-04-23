@@ -732,7 +732,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1709.8047184147138
+  dps: 1700.7218715612905
  }
 }
 dps_results: {
@@ -756,7 +756,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 910.288134172318
+  dps: 911.5159700781545
  }
 }
 dps_results: {
@@ -780,7 +780,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1729.3099525432806
+  dps: 1740.9677228799221
  }
 }
 dps_results: {
@@ -804,7 +804,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-NoBuffs-LongMultiTarget"
  value: {
-  dps: 954.2327630387142
+  dps: 965.7822449997929
  }
 }
 dps_results: {
@@ -828,7 +828,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1723.947709682258
+  dps: 1714.797197497279
  }
 }
 dps_results: {
@@ -852,7 +852,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 917.7465575710906
+  dps: 918.9574349349123
  }
 }
 dps_results: {
@@ -876,7 +876,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1757.619463249669
+  dps: 1770.3619793107462
  }
 }
 dps_results: {
@@ -900,7 +900,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-NoBuffs-LongMultiTarget"
  value: {
-  dps: 969.4863406420442
+  dps: 982.5532604355966
  }
 }
 dps_results: {

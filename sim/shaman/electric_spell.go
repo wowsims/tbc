@@ -61,16 +61,6 @@ func (shaman *Shaman) newElectricSpellConfig(actionID core.ActionID, baseCost fl
 		spell.Cast.DefaultCast.CastTime -= time.Millisecond * 100 * time.Duration(shaman.Talents.LightningMastery)
 	}
 
-	if !isLightningOverload && shaman.Talents.ElementalFocus {
-		spell.Cast.OnCastComplete = func(sim *core.Simulation, spell *core.Spell) {
-			if shaman.ElementalFocusStacks > 0 {
-				shaman.ElementalFocusStacks--
-			}
-		}
-	} else {
-		spell.Cast.OnCastComplete = func(sim *core.Simulation, spell *core.Spell) {}
-	}
-
 	return spell
 }
 
@@ -101,10 +91,7 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 
 // Shared LB/CL logic that is dynamic, i.e. can't be precomputed.
 func (shaman *Shaman) applyElectricSpellCastInitModifiers(spell *core.Spell, cast *core.Cast) {
-	if shaman.ElementalFocusStacks > 0 {
-		// Reduces mana cost by 40%
-		cast.Cost -= spell.BaseCost * 0.4
-	}
+	shaman.modifyCastClearcasting(spell, cast)
 	if shaman.ElementalMasteryAura != nil && shaman.ElementalMasteryAura.IsActive() {
 		cast.Cost = 0
 	}

@@ -310,6 +310,32 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 	}
 
 	actionID := core.ActionID{SpellID: 13877}
+
+	var curDmg float64
+	bfHit := rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		Cast: core.CastConfig{
+			DisableCallbacks: true,
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamageTargetModifiersOnly(core.SpellEffect{
+			// No proc mask, so it won't proc itself.
+
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage: core.BaseDamageConfig{
+				Calculator: func(_ *core.Simulation, _ *core.SpellEffect, _ *core.Spell) float64 {
+					return curDmg
+				},
+			},
+			OutcomeApplier: core.OutcomeFuncAlwaysHit(),
+		}),
+	})
+
 	const hasteBonus = 1.2
 	const inverseHasteBonus = 1 / 1.2
 	const energyCost = 25.0
@@ -322,15 +348,23 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 		Duration: dur,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, hasteBonus)
-			if sim.GetNumTargets() > 1 {
-				rogue.PseudoStats.DamageDealtMultiplier *= 2
-			}
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
-			if sim.GetNumTargets() > 1 {
-				rogue.PseudoStats.DamageDealtMultiplier /= 2
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if sim.GetNumTargets() < 2 {
+				return
 			}
+			if spellEffect.Damage == 0 || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				return
+			}
+
+			// Undo armor reduction to get the raw damage value.
+			curDmg = spellEffect.Damage / spellEffect.Target.ArmorDamageReduction(rogue.GetStat(stats.ArmorPenetration))
+
+			bfHit.Cast(sim, spellEffect.Target.NextTarget(sim))
+			bfHit.Casts--
 		},
 	})
 

@@ -41,20 +41,10 @@ func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOve
 			if !spellEffect.Landed() {
 				return
 			}
-			if shaman.Talents.ElementalFocus && spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				shaman.ElementalFocusStacks = 2
-			}
-
 			if sim.RandomFloat("LB Lightning Overload") > lightningOverloadChance {
 				return
 			}
 			shaman.LightningBoltLO.Cast(sim, spellEffect.Target)
-		}
-	} else {
-		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if shaman.Talents.ElementalFocus && spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				shaman.ElementalFocusStacks = 2
-			}
 		}
 	}
 

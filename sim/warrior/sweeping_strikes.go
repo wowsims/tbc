@@ -18,6 +18,7 @@ func (warrior *Warrior) registerSweepingStrikesCD() {
 	ssHit := warrior.RegisterSpell(core.SpellConfig{
 		ActionID:    SweepingStrikesActionID,
 		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
 
 		Cast: core.CastConfig{
 			DisableCallbacks: true,
