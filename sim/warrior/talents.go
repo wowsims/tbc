@@ -24,6 +24,7 @@ func (warrior *Warrior) ApplyTalents() {
 		warrior.AutoAttacks.OHEffect.BaseDamage.Calculator = core.BaseDamageFuncMeleeWeapon(core.OffHand, false, 0, 1+0.05*float64(warrior.Talents.DualWieldSpecialization), true)
 	}
 
+	// TODO: This should only be applied while berserker stance is active.
 	if warrior.Talents.ImprovedBerserkerStance > 0 {
 		bonus := 1 + 0.02*float64(warrior.Talents.ImprovedBerserkerStance)
 		warrior.AddStatDependency(stats.StatDependency{
