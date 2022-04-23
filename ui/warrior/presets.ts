@@ -43,11 +43,29 @@ export const FuryTalents = {
 
 export const DefaultRotation = WarriorRotation.create({
 	useOverpower: false,
-	useHamstring: false,
+	useHamstring: true,
 	prioritizeWw: false,
-	sunderArmor: SunderArmor.SunderArmorOnce,
+	sunderArmor: SunderArmor.SunderArmorMaintain,
 	hsRageThreshold: 60,
-	overpowerRageThreshold: 25,
+	overpowerRageThreshold: 10,
+	hamstringRageThreshold: 75,
+	rampageCdThreshold: 5,
+	slamLatency: 150,
+	useHsDuringExecute: true,
+	useMsDuringExecute: true,
+	useBtDuringExecute: true,
+	useWwDuringExecute: true,
+	useSlamDuringExecute: true,
+});
+
+export const ArmsRotation = WarriorRotation.create({
+	useOverpower: false,
+	useHamstring: true,
+	useSlam: true,
+	prioritizeWw: false,
+	sunderArmor: SunderArmor.SunderArmorMaintain,
+	hsRageThreshold: 60,
+	overpowerRageThreshold: 10,
 	hamstringRageThreshold: 75,
 	rampageCdThreshold: 5,
 	slamLatency: 150,
@@ -959,10 +977,109 @@ export const P4_ARMS_PRESET = {
 	]}`),
 };
 
-//export const P5_ARMS_PRESET = {
-//	name: 'P5 Arms Preset',
-//	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-//	enableWhen: (player: Player<Spec.SpecWarrior>) => player.getTalents().mortalStrike,
-//	gear: EquipmentSpec.fromJsonString(`{"items": [
-//	]}`),
-//};
+export const P5_ARMS_PRESET = {
+	name: 'P5 Arms Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<Spec.SpecWarrior>) => player.getTalents().mortalStrike,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 34333,
+			"enchant": 29192,
+			"gems": [
+				32193,
+				32409
+			]
+		},
+		{
+			"id": 34358,
+			"gems": [
+				32217
+			]
+		},
+		{
+			"id": 34392,
+			"enchant": 28910,
+			"gems": [
+				32193,
+				32211
+			]
+		},
+		{
+			"id": 34241,
+			"enchant": 34004,
+			"gems": [
+				33143
+			]
+		},
+		{
+			"id": 34397,
+			"enchant": 24003,
+			"gems": [
+				32211,
+				32217,
+				32193
+			]
+		},
+		{
+			"id": 34441,
+			"enchant": 27899,
+			"gems": [
+				32193
+			]
+		},
+		{
+			"id": 34343,
+			"enchant": 33995,
+			"gems": [
+				32193,
+				32217
+			]
+		},
+		{
+			"id": 34546,
+			"gems": [
+				32217
+			]
+		},
+		{
+			"id": 34188,
+			"enchant": 29535,
+			"gems": [
+				32193,
+				32193,
+				32193
+			]
+		},
+		{
+			"id": 34569,
+			"enchant": 28279,
+			"gems": [
+				32217
+			]
+		},
+		{
+			"id": 34189
+		},
+		{
+			"id": 34361
+		},
+		{
+			"id": 28830
+		},
+		{
+			"id": 34427
+		},
+		{
+			"id": 34247,
+			"enchant": 33307,
+			"gems": [
+				32205,
+				32205,
+				32205
+			]
+		},
+		{
+			"id": 34196
+		}
+	]}`),
+};
