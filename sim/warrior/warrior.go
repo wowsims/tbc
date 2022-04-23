@@ -86,11 +86,11 @@ func (warrior *Warrior) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 			partyBuffs.SnapshotBsSolarianSapphire = false
 		}
 		if warrior.PrecastShout {
-			if warrior.PrecastShoutSapphire {
-				partyBuffs.SnapshotBsSolarianSapphire = true
-			}
-			if warrior.PrecastShoutT2 {
-				partyBuffs.SnapshotBsT2 = true
+			if (warrior.PrecastShoutSapphire || !partyBuffs.SnapshotBsSolarianSapphire) &&
+				(warrior.PrecastShoutT2 || !partyBuffs.SnapshotBsT2) {
+				partyBuffs.SnapshotBsSolarianSapphire = warrior.PrecastShoutSapphire
+				partyBuffs.SnapshotBsT2 = warrior.PrecastShoutT2
+				partyBuffs.SnapshotBsBoomingVoiceRank = warrior.Talents.BoomingVoice
 			}
 		}
 	} else if warrior.ShoutType == proto.WarriorShout_WarriorShoutCommanding {
