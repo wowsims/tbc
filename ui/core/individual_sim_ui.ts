@@ -921,7 +921,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		return this.getStorageKey(SAVED_TALENTS_STORAGE_KEY);
 	}
 
-	recomputeSettingsLayout() {
+	private recomputeSettingsLayout() {
 		if (this.settingsMuuri) {
 			//this.settingsMuuri.refreshItems();
 		}
