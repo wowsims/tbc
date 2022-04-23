@@ -92,7 +92,7 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 				// Default rotation settings.
 				rotation: Presets.DefaultRotation,
 				// Default talents.
-				talents: Presets.StandardTalents.data,
+				talents: Presets.DestructionTalents.data,
 				// Default spec-specific settings.
 				specOptions: WarlockOptions.create({
 					armor: Warlock_Options_Armor.FelArmor,
@@ -231,7 +231,9 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 			presets: {
 				// Preset talents that the user can quickly select.
 				talents: [
-					Presets.StandardTalents,
+					Presets.DestructionTalents,
+					Presets.AfflicationTalents,
+					Presets.DemonologistTalents,
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [

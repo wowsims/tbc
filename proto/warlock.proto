@@ -7,6 +7,7 @@ message WarlockTalents {
 		// Affliction
 		int32 suppression = 1;
 		int32 improved_corruption = 2;
+		int32 improved_drain_soul = 49;
 		int32 improved_life_tap = 3;
 		int32 soul_siphon = 4;
 		int32 improved_curse_of_agony = 5;

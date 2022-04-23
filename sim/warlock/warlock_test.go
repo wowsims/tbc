@@ -1,41 +1,48 @@
 package warlock
 
+import (
+	"testing"
+
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
+)
+
 func init() {
 	RegisterWarlock()
 }
 
-// func TestDestruction(t *testing.T) {
-// 	core.RunTestSuite(t, t.Name(), core.FullCharacterTestSuiteGenerator(core.CharacterSuiteConfig{
-// 		Class: proto.Class_ClassWarlock,
+func TestDestruction(t *testing.T) {
+	core.RunTestSuite(t, t.Name(), core.FullCharacterTestSuiteGenerator(core.CharacterSuiteConfig{
+		Class: proto.Class_ClassWarlock,
 
-// 		Race:       proto.Race_RaceBloodElf,
-// 		OtherRaces: []proto.Race{proto.Race_RaceHuman, proto.Race_RaceGnome, proto.Race_RaceOrc, proto.Race_RaceUndead},
+		Race:       proto.Race_RaceBloodElf,
+		OtherRaces: []proto.Race{proto.Race_RaceHuman, proto.Race_RaceGnome, proto.Race_RaceOrc, proto.Race_RaceUndead},
 
-// 		GearSet: core.GearSetCombo{Label: "P4", GearSet: Phase4Gear},
+		GearSet: core.GearSetCombo{Label: "P4", GearSet: Phase4Gear},
 
-// 		SpecOptions: core.SpecOptionsCombo{Label: "Destro Warlock", SpecOptions: DefaultOptions},
+		SpecOptions: core.SpecOptionsCombo{Label: "Destro Warlock", SpecOptions: DefaultOptions},
 
-// 		RaidBuffs:   FullRaidBuffs,
-// 		PartyBuffs:  FullPartyBuffs,
-// 		PlayerBuffs: FullIndividualBuffs,
-// 		Consumes:    FullConsumes,
-// 		Debuffs:     FullDebuffs,
+		RaidBuffs:   FullRaidBuffs,
+		PartyBuffs:  FullPartyBuffs,
+		PlayerBuffs: FullIndividualBuffs,
+		Consumes:    FullConsumes,
+		Debuffs:     FullDebuffs,
 
-// 		ItemFilter: core.ItemFilter{
-// 			WeaponTypes: []proto.WeaponType{
-// 				proto.WeaponType_WeaponTypeSword,
-// 				proto.WeaponType_WeaponTypeDagger,
-// 			},
-// 			HandTypes: []proto.HandType{
-// 				proto.HandType_HandTypeOffHand,
-// 			},
-// 			ArmorType: proto.ArmorType_ArmorTypePlate,
-// 			RangedWeaponTypes: []proto.RangedWeaponType{
-// 				proto.RangedWeaponType_RangedWeaponTypeWand,
-// 			},
-// 		},
-// 	}))
-// }
+		ItemFilter: core.ItemFilter{
+			WeaponTypes: []proto.WeaponType{
+				proto.WeaponType_WeaponTypeSword,
+				proto.WeaponType_WeaponTypeDagger,
+			},
+			HandTypes: []proto.HandType{
+				proto.HandType_HandTypeOffHand,
+			},
+			ArmorType: proto.ArmorType_ArmorTypePlate,
+			RangedWeaponTypes: []proto.RangedWeaponType{
+				proto.RangedWeaponType_RangedWeaponTypeWand,
+			},
+		},
+	}))
+}
 
 // func BenchmarkSimulate(b *testing.B) {
 // 	rsr := &proto.RaidSimRequest{

@@ -7,6 +7,7 @@ import (
 var LifeTapActionID = core.ActionID{SpellID: 27222}
 
 func (warlock *Warlock) registerLifeTapSpell(sim *core.Simulation) {
+	mana := 582.0 * (1.0 + 0.1*float64(warlock.Talents.ImprovedLifeTap))
 	warlock.LifeTap = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:    LifeTapActionID,
 		SpellSchool: core.SpellSchoolShadow,
@@ -20,7 +21,7 @@ func (warlock *Warlock) registerLifeTapSpell(sim *core.Simulation) {
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   core.OutcomeFuncMagicHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				warlock.AddMana(sim, 582, LifeTapActionID, true)
+				warlock.AddMana(sim, mana, LifeTapActionID, true)
 			},
 		}),
 	})

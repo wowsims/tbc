@@ -13,12 +13,7 @@ const SpellIDImmolate9 int32 = 27215
 var Immolate9ActionID = core.ActionID{SpellID: SpellIDImmolate9}
 
 func (warlock *Warlock) registerImmolateSpell(sim *core.Simulation) {
-	bonusFlatDamage := 0.0
 	baseCost := 445.0
-	minBaseDamage := 332.0
-	maxBaseDamage := 332.0
-	spellCoefficient := 0.2
-
 	effect := core.SpellEffect{
 		BonusSpellCritRating: float64(warlock.Talents.Devastation)*1*core.SpellCritRatingPerCritChance +
 			float64(warlock.Talents.Backlash)*1*core.SpellCritRatingPerCritChance,
@@ -26,7 +21,7 @@ func (warlock *Warlock) registerImmolateSpell(sim *core.Simulation) {
 			(1 + (0.05 * float64(warlock.Talents.ImprovedImmolate))) *
 			(1 + (0.02 * float64(warlock.Talents.Emberstorm))),
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.DestructiveReach),
-		BaseDamage:       core.BaseDamageConfigMagic(minBaseDamage+bonusFlatDamage, maxBaseDamage+bonusFlatDamage, spellCoefficient+0.04*float64(warlock.Talents.ShadowAndFlame)),
+		BaseDamage:       core.BaseDamageConfigMagic(332.0, 332.0, 0.2+0.04*float64(warlock.Talents.ShadowAndFlame)),
 		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 0, 1))),
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
