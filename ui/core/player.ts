@@ -588,7 +588,7 @@ export class Player<SpecType extends Spec> {
 				talentsString: this.getTalentsString(),
 			}),
 			this.getRotation(),
-			forExport ? this.getTalents() : this.specTypeFunctions.talentsCreate(),
+			forExport ? this.specTypeFunctions.talentsCreate() : this.getTalents(),
 			this.getSpecOptions());
 	}
 
