@@ -48,7 +48,7 @@ character_stats_results: {
 dps_results: {
  key: "TestArms-AllItems-AbacusofViolentOdds-28288"
  value: {
-  dps: 864.5093183916964
+  dps: 865.4244592557859
  }
 }
 dps_results: {
@@ -114,7 +114,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-Bladefist'sBreadth-28041"
  value: {
-  dps: 853.06893391601
+  dps: 860.564752447385
  }
 }
 dps_results: {
@@ -216,7 +216,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 862.8169085069333
+  dps: 863.1095541917676
  }
 }
 dps_results: {
@@ -726,7 +726,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-WarbringerArmor"
  value: {
-  dps: 661.9140584259974
+  dps: 661.0644926314536
  }
 }
 dps_results: {
@@ -762,7 +762,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-WrathofSpellfire"
  value: {
-  dps: 750.2051592354561
+  dps: 752.7553554821302
  }
 }
 dps_results: {
@@ -774,7 +774,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-Average-Default"
  value: {
-  dps: 861.7230572244047
+  dps: 861.6469156630696
  }
 }
 dps_results: {
@@ -786,7 +786,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-Settings-Human-Arms P1-Basic-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 862.4875746471183
+  dps: 863.3791394514128
  }
 }
 dps_results: {
