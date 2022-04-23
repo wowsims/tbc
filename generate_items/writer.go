@@ -307,4 +307,5 @@ var allowList = map[int]bool{
 	33144: true, // Facet of Eternity
 	6360:  true, // Steelscale Crushfish
 	8345:  true, // Wolfshead Helm
+	28032: true, // Delicate Green Poncho
 }
