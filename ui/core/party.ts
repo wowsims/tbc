@@ -118,9 +118,9 @@ export class Party {
 		this.buffsChangeEmitter.emit(eventID);
 	}
 
-	toProto(): PartyProto {
+	toProto(forExport?: boolean): PartyProto {
 		return PartyProto.create({
-			players: this.players.map(player => player == null ? PlayerProto.create() : player.toProto()),
+			players: this.players.map(player => player == null ? PlayerProto.create() : player.toProto(forExport)),
 			buffs: this.buffs,
 		});
 	}

@@ -24,7 +24,7 @@ export abstract class TalentsPicker<SpecType extends Spec> extends Component {
 		this.trees.forEach(tree => tree.talents.forEach(talent => talent.setPoints(0, false)));
 
 		this.setTalentsString(TypedEvent.nextEventID(), this.player.getTalentsString());
-		this.player.talentsStringChangeEmitter.on(eventID => {
+		this.player.talentsChangeEmitter.on(eventID => {
 			this.setTalentsString(eventID, this.player.getTalentsString());
 		});
 	}
@@ -48,24 +48,7 @@ export abstract class TalentsPicker<SpecType extends Spec> extends Component {
 
 		TypedEvent.freezeAllAndDo(() => {
 			this.player.setTalentsString(eventID, this.getTalentsString());
-			this.player.setTalents(eventID, this.getTalents());
 		});
-	}
-
-	getTalents(): SpecTalents<SpecType> {
-		const talents = this.player.specTypeFunctions.talentsCreate();
-
-		this.trees.forEach(tree => tree.talents.forEach(talent => {
-			if (talent.config.fieldName) {
-				if (talent.config.maxPoints == 1) {
-					(talents[talent.config.fieldName] as unknown as boolean) = talent.getPoints() > 0;
-				} else {
-					(talents[talent.config.fieldName] as unknown as number) = talent.getPoints();
-				}
-			}
-		}));
-
-		return talents;
 	}
 
 	getTalentsString(): string {
