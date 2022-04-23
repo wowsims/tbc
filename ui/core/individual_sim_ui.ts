@@ -816,7 +816,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				talentsString: player.getTalentsString(),
 			}),
 			setData: (eventID: EventID, player: Player<any>, newTalents: SavedTalents) => player.setTalentsString(eventID, newTalents.talentsString),
-			changeEmitters: [this.player.talentsStringChangeEmitter],
+			changeEmitters: [this.player.talentsChangeEmitter],
 			equals: (a: SavedTalents, b: SavedTalents) => SavedTalents.equals(a, b),
 			toJson: (a: SavedTalents) => SavedTalents.toJson(a),
 			fromJson: (obj: any) => SavedTalents.fromJson(obj),
@@ -938,7 +938,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 	toProto(): IndividualSimSettings {
 		return IndividualSimSettings.create({
 			settings: this.sim.toProto(),
-			player: this.player.toProto(),
+			player: this.player.toProto(true),
 			raidBuffs: this.sim.raid.getBuffs(),
 			partyBuffs: this.player.getParty()?.getBuffs() || PartyBuffs.create(),
 			encounter: this.sim.encounter.toProto(),
