@@ -11,11 +11,14 @@ import (
 var RuptureActionID = core.ActionID{SpellID: 26867}
 var RuptureEnergyCost = 25.0
 
-func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
+func (rogue *Rogue) makeRupture(comboPoints int32) *core.Spell {
+	actionID := RuptureActionID
+	actionID.Tag = comboPoints
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
+	numTicks := int(comboPoints) + 3
 
-	rogue.Rupture = rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    RuptureActionID,
+	return rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasIgnoreResists | rogue.finisherFlags(),
 
@@ -38,7 +41,8 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
-					rogue.RuptureDot.NumberOfTicks = int(rogue.ComboPoints()) + 3
+					rogue.RuptureDot.Spell = spell
+					rogue.RuptureDot.NumberOfTicks = numTicks
 					rogue.RuptureDot.RecomputeAuraDuration()
 					rogue.RuptureDot.Apply(sim)
 					rogue.ApplyFinisher(sim, spell.ActionID)
@@ -50,10 +54,25 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 			},
 		}),
 	})
+}
+
+func (rogue *Rogue) RuptureDuration(comboPoints int32) time.Duration {
+	return time.Second*6 + time.Second*2*time.Duration(comboPoints)
+}
+
+func (rogue *Rogue) registerRupture(sim *core.Simulation) {
+	rogue.Rupture = [6]*core.Spell{
+		rogue.makeRupture(0), // Just for metrics
+		rogue.makeRupture(1),
+		rogue.makeRupture(2),
+		rogue.makeRupture(3),
+		rogue.makeRupture(4),
+		rogue.makeRupture(5),
+	}
 
 	target := sim.GetPrimaryTarget()
 	rogue.RuptureDot = core.NewDot(core.Dot{
-		Spell: rogue.Rupture,
+		Spell: rogue.Rupture[0],
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "Rupture-" + strconv.Itoa(int(rogue.Index)),
 			ActionID: RuptureActionID,
@@ -73,8 +92,4 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 			OutcomeApplier: core.OutcomeFuncTick(),
 		}),
 	})
-}
-
-func (rogue *Rogue) RuptureDuration(comboPoints int32) time.Duration {
-	return time.Second*6 + time.Second*2*time.Duration(comboPoints)
 }
