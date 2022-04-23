@@ -1259,11 +1259,12 @@ class PartyBuffs$Type extends MessageType {
             { no: 28, name: "bs_solarian_sapphire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 29, name: "snapshot_bs_solarian_sapphire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 30, name: "snapshot_bs_t2", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 33, name: "snapshot_bs_booming_voice_rank", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 32, name: "commanding_shout", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
         ]);
     }
     create(value) {
-        const message = { bloodlust: 0, ferociousInspiration: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, snapshotImprovedStrengthOfEarthTotem: false, tranquilAirTotem: false, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0, bsSolarianSapphire: false, snapshotBsSolarianSapphire: false, snapshotBsT2: false, commandingShout: 0 };
+        const message = { bloodlust: 0, ferociousInspiration: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, snapshotImprovedStrengthOfEarthTotem: false, tranquilAirTotem: false, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0, bsSolarianSapphire: false, snapshotBsSolarianSapphire: false, snapshotBsT2: false, snapshotBsBoomingVoiceRank: 0, commandingShout: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1363,6 +1364,9 @@ class PartyBuffs$Type extends MessageType {
                     break;
                 case /* bool snapshot_bs_t2 */ 30:
                     message.snapshotBsT2 = reader.bool();
+                    break;
+                case /* int32 snapshot_bs_booming_voice_rank */ 33:
+                    message.snapshotBsBoomingVoiceRank = reader.int32();
                     break;
                 case /* proto.TristateEffect commanding_shout */ 32:
                     message.commandingShout = reader.int32();
@@ -1469,6 +1473,9 @@ class PartyBuffs$Type extends MessageType {
         /* bool snapshot_bs_t2 = 30; */
         if (message.snapshotBsT2 !== false)
             writer.tag(30, WireType.Varint).bool(message.snapshotBsT2);
+        /* int32 snapshot_bs_booming_voice_rank = 33; */
+        if (message.snapshotBsBoomingVoiceRank !== 0)
+            writer.tag(33, WireType.Varint).int32(message.snapshotBsBoomingVoiceRank);
         /* proto.TristateEffect commanding_shout = 32; */
         if (message.commandingShout !== 0)
             writer.tag(32, WireType.Varint).int32(message.commandingShout);

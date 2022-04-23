@@ -156,6 +156,10 @@ export interface PartyBuffs {
      */
     snapshotBsT2: boolean;
     /**
+     * @generated from protobuf field: int32 snapshot_bs_booming_voice_rank = 33;
+     */
+    snapshotBsBoomingVoiceRank: number;
+    /**
      * Mitigation buffs
      *
      * @generated from protobuf field: proto.TristateEffect commanding_shout = 32;
