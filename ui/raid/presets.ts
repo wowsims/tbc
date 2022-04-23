@@ -28,6 +28,7 @@ import * as MagePresets from '/tbc/mage/presets.js';
 import * as RoguePresets from '/tbc/rogue/presets.js';
 import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
 import * as SmitePriestPresets from '/tbc/smite_priest/presets.js';
+import * as WarriorPresets from '/tbc/warrior/presets.js';
 
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
 import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
@@ -37,6 +38,7 @@ import { MageSimUI } from '/tbc/mage/sim.js';
 import { RogueSimUI } from '/tbc/rogue/sim.js';
 import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
 import { SmitePriestSimUI } from '/tbc/smite_priest/sim.js';
+import { WarriorSimUI } from '/tbc/warrior/sim.js';
 
 export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, player: Player<any>) => IndividualSimUI<any>>> = {
 	[Spec.SpecBalanceDruid]: (parentElem: HTMLElement, player: Player<any>) => new BalanceDruidSimUI(parentElem, player),
@@ -47,6 +49,7 @@ export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, pl
 	[Spec.SpecRogue]: (parentElem: HTMLElement, player: Player<any>) => new RogueSimUI(parentElem, player),
 	[Spec.SpecShadowPriest]: (parentElem: HTMLElement, player: Player<any>) => new ShadowPriestSimUI(parentElem, player),
 	[Spec.SpecSmitePriest]: (parentElem: HTMLElement, player: Player<any>) => new SmitePriestSimUI(parentElem, player),
+	[Spec.SpecWarrior]: (parentElem: HTMLElement, player: Player<any>) => new WarriorSimUI(parentElem, player),
 };
 
 // Configuration necessary for creating new players.
@@ -460,6 +463,70 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 		tooltip: specNames[Spec.SpecSmitePriest],
 		iconUrl: specIconsLarge[Spec.SpecSmitePriest],
 	},
+	{
+		spec: Spec.SpecWarrior,
+		rotation: WarriorPresets.ArmsRotation,
+		talents: WarriorPresets.ArmsSlamTalents.data,
+		specOptions: WarriorPresets.DefaultOptions,
+		consumes: WarriorPresets.DefaultConsumes,
+		defaultName: 'Arms Warrior',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceHuman,
+			[Faction.Horde]: Race.RaceOrc,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: WarriorPresets.P1_ARMS_PRESET.gear,
+				2: WarriorPresets.P2_ARMS_PRESET.gear,
+				3: WarriorPresets.P3_ARMS_PRESET.gear,
+				4: WarriorPresets.P4_ARMS_PRESET.gear,
+				5: WarriorPresets.P5_ARMS_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: WarriorPresets.P1_ARMS_PRESET.gear,
+				2: WarriorPresets.P2_ARMS_PRESET.gear,
+				3: WarriorPresets.P3_ARMS_PRESET.gear,
+				4: WarriorPresets.P4_ARMS_PRESET.gear,
+				5: WarriorPresets.P5_ARMS_PRESET.gear,
+			},
+		},
+		tooltip: 'Arms Warrior',
+		iconUrl: talentTreeIcons[Class.ClassWarrior][0],
+	},
+	{
+		spec: Spec.SpecWarrior,
+		rotation: WarriorPresets.DefaultRotation,
+		talents: WarriorPresets.FuryTalents.data,
+		specOptions: WarriorPresets.DefaultOptions,
+		consumes: WarriorPresets.DefaultConsumes,
+		defaultName: 'Fury Warrior',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceHuman,
+			[Faction.Horde]: Race.RaceOrc,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: WarriorPresets.P1_FURY_PRESET.gear,
+				2: WarriorPresets.P2_FURY_PRESET.gear,
+				3: WarriorPresets.P3_FURY_PRESET.gear,
+				4: WarriorPresets.P4_FURY_PRESET.gear,
+				5: WarriorPresets.P5_FURY_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: WarriorPresets.P1_FURY_PRESET.gear,
+				2: WarriorPresets.P2_FURY_PRESET.gear,
+				3: WarriorPresets.P3_FURY_PRESET.gear,
+				4: WarriorPresets.P4_FURY_PRESET.gear,
+				5: WarriorPresets.P5_FURY_PRESET.gear,
+			},
+		},
+		tooltip: 'Fury Warrior',
+		iconUrl: talentTreeIcons[Class.ClassWarrior][1],
+	},
 ];
 
 export const implementedSpecs: Array<Spec> = [...new Set(playerPresets.map(preset => preset.spec))];
@@ -667,6 +734,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 	{
 		// The value of this field must never change, to preserve local storage data.
 		buffBotId: 'Arms Warrior',
+		deprecated: true,
 		spec: Spec.SpecWarrior,
 		name: 'Arms Warrior',
 		tooltip: 'Arms Warrior: Adds Sunder Armor, Blood Frenzy, and Improved Battle Shout.',
@@ -683,6 +751,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 	{
 		// The value of this field must never change, to preserve local storage data.
 		buffBotId: 'Fury Warrior',
+		deprecated: true,
 		spec: Spec.SpecWarrior,
 		name: 'Fury Warrior',
 		tooltip: 'Fury Warrior: Adds Sunder Armor and Improved Battle Shout.',

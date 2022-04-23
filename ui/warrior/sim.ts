@@ -14,6 +14,7 @@ import { TristateEffect } from '/tbc/core/proto/common.js'
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
 import { Alchohol } from '/tbc/core/proto/common.js';
@@ -42,6 +43,15 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 			cssClass: 'warrior-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
+			],
+			warnings: [
+				(simUI: IndividualSimUI<Spec.SpecWarrior>) => {
+					return {
+						updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter]),
+						shouldDisplay: () => true,
+						getContent: () => 'This sim is newly released, and there are likely a few bugs. Please let us know if you encounter any issues!',
+					};
+				},
 			],
 
 			// All stats for which EP should be calculated.
@@ -248,6 +258,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 					Presets.P2_ARMS_PRESET,
 					Presets.P3_ARMS_PRESET,
 					Presets.P4_ARMS_PRESET,
+					Presets.P5_ARMS_PRESET,
 				],
 			},
 		});
