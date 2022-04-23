@@ -38,7 +38,7 @@ export declare const EvocationTicks: {
 export declare const MageRotationConfig: {
     inputs: ({
         type: "enum";
-        getModObject: (simUI: IndividualSimUI<any>) => IndividualSimUI<any>;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
             extraCssClasses: string[];
             label: string;
@@ -47,9 +47,9 @@ export declare const MageRotationConfig: {
                 name: string;
                 value: RotationType;
             }[];
-            changedEvent: (simUI: IndividualSimUI<Spec.SpecMage>) => TypedEvent<void>;
-            getValue: (simUI: IndividualSimUI<Spec.SpecMage>) => RotationType;
-            setValue: (eventID: EventID, simUI: IndividualSimUI<Spec.SpecMage>, newValue: number) => void;
+            changedEvent: (player: Player<Spec.SpecMage>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecMage>) => RotationType;
+            setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => void;
             showWhen?: undefined;
             enableWhen?: undefined;
         };
@@ -57,13 +57,13 @@ export declare const MageRotationConfig: {
     } | {
         type: "boolean";
         cssClass: string;
-        getModObject: (simUI: IndividualSimUI<any>) => IndividualSimUI<any>;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
             label: string;
             labelTooltip: string;
-            changedEvent: (simUI: IndividualSimUI<Spec.SpecMage>) => TypedEvent<void>;
-            getValue: (simUI: IndividualSimUI<Spec.SpecMage>) => boolean;
-            setValue: (eventID: EventID, simUI: IndividualSimUI<Spec.SpecMage>, newValue: boolean) => void;
+            changedEvent: (player: Player<Spec.SpecMage>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecMage>) => boolean;
+            setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => void;
             extraCssClasses?: undefined;
             values?: undefined;
             showWhen?: undefined;

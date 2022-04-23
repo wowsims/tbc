@@ -147,7 +147,7 @@ export declare abstract class IndividualSimUI<SpecType extends Spec> extends Sim
     getSavedRotationStorageKey(): string;
     getSavedSettingsStorageKey(): string;
     getSavedTalentsStorageKey(): string;
-    recomputeSettingsLayout(): void;
+    private recomputeSettingsLayout;
     getStorageKey(keyPart: string): string;
     toProto(): IndividualSimSettings;
     fromProto(eventID: EventID, settings: IndividualSimSettings): void;

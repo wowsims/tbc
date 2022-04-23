@@ -58,7 +58,7 @@ export const MageRotationConfig = {
     inputs: [
         {
             type: 'enum',
-            getModObject: (simUI) => simUI,
+            getModObject: (simUI) => simUI.player,
             config: {
                 extraCssClasses: [
                     'rotation-type-enum-picker',
@@ -76,33 +76,32 @@ export const MageRotationConfig = {
                         name: 'Frost', value: RotationType.Frost,
                     },
                 ],
-                changedEvent: (simUI) => simUI.player.rotationChangeEmitter,
-                getValue: (simUI) => simUI.player.getRotation().type,
-                setValue: (eventID, simUI, newValue) => {
-                    const newRotation = simUI.player.getRotation();
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().type,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
                     newRotation.type = newValue;
                     TypedEvent.freezeAllAndDo(() => {
                         if (newRotation.type == RotationType.Arcane) {
-                            simUI.player.setTalentsString(eventID, Presets.ArcaneTalents.data);
+                            player.setTalentsString(eventID, Presets.ArcaneTalents.data);
                             if (!newRotation.arcane) {
                                 newRotation.arcane = ArcaneRotation.clone(Presets.DefaultArcaneRotation.arcane);
                             }
                         }
                         else if (newRotation.type == RotationType.Fire) {
-                            simUI.player.setTalentsString(eventID, Presets.FireTalents.data);
+                            player.setTalentsString(eventID, Presets.FireTalents.data);
                             if (!newRotation.fire) {
                                 newRotation.fire = FireRotation.clone(Presets.DefaultFireRotation.fire);
                             }
                         }
                         else {
-                            simUI.player.setTalentsString(eventID, Presets.DeepFrostTalents.data);
+                            player.setTalentsString(eventID, Presets.DeepFrostTalents.data);
                             if (!newRotation.frost) {
                                 newRotation.frost = FrostRotation.clone(Presets.DefaultFrostRotation.frost);
                             }
                         }
-                        simUI.player.setRotation(eventID, newRotation);
+                        player.setRotation(eventID, newRotation);
                     });
-                    simUI.recomputeSettingsLayout();
                 },
             },
         },
@@ -112,17 +111,16 @@ export const MageRotationConfig = {
         {
             type: 'boolean',
             cssClass: 'multi-target-rotation-picker',
-            getModObject: (simUI) => simUI,
+            getModObject: (simUI) => simUI.player,
             config: {
                 label: 'AOE Rotation',
                 labelTooltip: 'Use multi-target spells.',
-                changedEvent: (simUI) => simUI.player.rotationChangeEmitter,
-                getValue: (simUI) => simUI.player.getRotation().multiTargetRotation,
-                setValue: (eventID, simUI, newValue) => {
-                    const newRotation = simUI.player.getRotation();
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().multiTargetRotation,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
                     newRotation.multiTargetRotation = newValue;
-                    simUI.player.setRotation(eventID, newRotation);
-                    simUI.recomputeSettingsLayout();
+                    player.setRotation(eventID, newRotation);
                 },
             },
         },
