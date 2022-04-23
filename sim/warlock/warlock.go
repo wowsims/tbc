@@ -12,14 +12,25 @@ type Warlock struct {
 	Options  proto.Warlock_Options
 	Rotation proto.Warlock_Rotation
 
-	Shadowbolt  *core.Spell
-	Immolate    *core.Spell
-	ImmolateDot *core.Dot
+	Shadowbolt     *core.Spell
+	Incinerate     *core.Spell
+	Immolate       *core.Spell
+	ImmolateDot    *core.Dot
+	UnstableAff    *core.Spell
+	UnstableAffDot *core.Dot
+	Corruption     *core.Spell
+	CorruptionDot  *core.Dot
+	SiphonLife     *core.Spell
+	SiphonLifeDot  *core.Dot
 
 	LifeTap *core.Spell
 
 	CurseOfElements     *core.Spell
 	CurseOfElementsAura *core.Aura
+
+	NightfallProcAura *core.Aura
+
+	DoingRegen bool
 }
 
 func (warlock *Warlock) GetCharacter() *core.Character {
@@ -27,10 +38,18 @@ func (warlock *Warlock) GetCharacter() *core.Character {
 }
 
 func (warlock *Warlock) Init(sim *core.Simulation) {
+	warlock.registerIncinerateSpell(sim)
 	warlock.registerShadowboltSpell(sim)
 	warlock.registerImmolateSpell(sim)
+	warlock.registerCorruptionSpell(sim)
 	warlock.registerCurseOfElementsSpell(sim)
 	warlock.registerLifeTapSpell(sim)
+	if warlock.Talents.UnstableAffliction {
+		warlock.registerUnstableAffSpell(sim)
+	}
+	if warlock.Talents.SiphonLife {
+		warlock.registerSiphonLifeSpell(sim)
+	}
 }
 
 func (warlock *Warlock) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
@@ -39,7 +58,9 @@ func (warlock *Warlock) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 func (warlock *Warlock) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
-func (warlock *Warlock) Reset(sim *core.Simulation) {}
+func (warlock *Warlock) Reset(sim *core.Simulation) {
+
+}
 
 func NewWarlock(character core.Character, options proto.Player) *Warlock {
 	warlockOptions := options.GetWarlock()

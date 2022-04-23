@@ -52,4 +52,49 @@ func (warlock *Warlock) ApplyTalents() {
 
 	// demonic tactics, applies even without pet out
 	warlock.PseudoStats.BonusCritRating += float64(warlock.Talents.DemonicTactics) * 1 * core.SpellCritRatingPerCritChance
+
+	warlock.setupNightfall()
+}
+
+func (warlock *Warlock) setupNightfall() {
+	if warlock.Talents.Nightfall == 0 {
+		return
+	}
+
+	warlock.NightfallProcAura = warlock.RegisterAura(core.Aura{
+		Label:    "Nightfall Shadow Trance",
+		ActionID: core.ActionID{SpellID: 17941},
+		Duration: core.NeverExpires,
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			// Check for an instant cast shadowbolt to disable aura
+			if spell != warlock.Shadowbolt || spell.CurCast.CastTime != 0 {
+				return
+			}
+			aura.Deactivate(sim)
+		},
+	})
+
+	warlock.RegisterAura(core.Aura{
+		Label: "Nightfall",
+		// ActionID: core.ActionID{SpellID: 18095},
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell != warlock.Corruption { // TODO: also works on drain life...
+				return
+			}
+			if sim.RandomFloat("nightfall") > 0.04 {
+				return
+			}
+			warlock.NightfallProcAura.Activate(sim)
+		},
+	})
+}
+
+func (warlock *Warlock) applyNightfall(cast *core.Cast) {
+	if warlock.NightfallProcAura.IsActive() {
+		cast.CastTime = 0
+	}
 }

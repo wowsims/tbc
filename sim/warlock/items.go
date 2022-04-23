@@ -20,7 +20,7 @@ var ItemSetMaleficRaiment = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			// Increases damage done by shadowbolt and incinerate by 6%.
-			// Implemented in lightning_bolt.go.
+			// Implemented in shadowbolt.go and incinerate.go
 		},
 	},
 }
