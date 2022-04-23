@@ -39,6 +39,7 @@ export declare class Player<SpecType extends Spec> {
     private itemEPCache;
     private gemEPCache;
     private enchantEPCache;
+    private talents;
     readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
     private epWeights;
     private epWeightsForCalc;

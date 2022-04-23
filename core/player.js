@@ -30,6 +30,7 @@ export class Player {
         this.itemEPCache = new Map();
         this.gemEPCache = new Map();
         this.enchantEPCache = new Map();
+        this.talents = null;
         this.epWeights = new Stats();
         this.epWeightsForCalc = new Stats();
         this.currentStats = PlayerStats.create();
@@ -306,7 +307,10 @@ export class Player {
         this.rotationChangeEmitter.emit(eventID);
     }
     getTalents() {
-        return talentStringToProto(this.spec, this.talentsString);
+        if (this.talents == null) {
+            this.talents = talentStringToProto(this.spec, this.talentsString);
+        }
+        return this.talents;
     }
     getTalentsString() {
         return this.talentsString;
@@ -315,6 +319,7 @@ export class Player {
         if (newTalentsString == this.talentsString)
             return;
         this.talentsString = newTalentsString;
+        this.talents = null;
         this.talentsChangeEmitter.emit(eventID);
     }
     getTalentTree() {
