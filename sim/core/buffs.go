@@ -255,9 +255,11 @@ func SnapshotImprovedWrathOfAirTotemAura(character *Character) *Aura {
 	})
 }
 
+var SnapshotBattleShoutAuraLabel = "Battle Shout Snapshot"
+
 func SnapshotBattleShoutAura(character *Character, snapshotAp float64, boomingVoiceRank int32) *Aura {
 	shoutDuration := time.Duration(float64(time.Minute*2)*(1+0.1*float64(boomingVoiceRank))) - time.Second*10
-	return character.NewTemporaryStatsAuraWrapped("Battle Shout Snapshot", ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: snapshotAp}, shoutDuration, func(config *Aura) {
+	return character.NewTemporaryStatsAuraWrapped(SnapshotBattleShoutAuraLabel, ActionID{SpellID: 2048, Tag: 1}, stats.Stats{stats.AttackPower: snapshotAp}, shoutDuration, func(config *Aura) {
 		config.OnReset = func(aura *Aura, sim *Simulation) {
 			aura.Activate(sim)
 		}

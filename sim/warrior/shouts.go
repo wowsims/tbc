@@ -8,6 +8,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+const ShoutExpirationThreshold = time.Second * 3
+
 func (warrior *Warrior) makeShoutSpellHelper(actionID core.ActionID) *core.Spell {
 	cost := 10.0
 	if ItemSetBoldArmor.CharacterHasSetBonus(&warrior.Character, 2) {
@@ -47,5 +49,5 @@ func (warrior *Warrior) makeShoutSpell() *core.Spell {
 }
 
 func (warrior *Warrior) ShouldShout(sim *core.Simulation) bool {
-	return warrior.Shout != nil && warrior.CurrentRage() >= warrior.Shout.DefaultCast.Cost && sim.CurrentTime+time.Second*3 > warrior.shoutExpiresAt
+	return warrior.Shout != nil && warrior.CurrentRage() >= warrior.Shout.DefaultCast.Cost && sim.CurrentTime+ShoutExpirationThreshold > warrior.shoutExpiresAt
 }
