@@ -169,7 +169,11 @@ func (paladin *Paladin) CanJudgementOfWisdom(sim *core.Simulation) bool {
 func (paladin *Paladin) setupJudgementRefresh() {
 	const mana = 74 / 2
 	paladin.RegisterAura(core.Aura{
-		Label: "Refresh Judgement",
+		Label:    "Refresh Judgement",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) {
 				if paladin.CurrentJudgement != nil && paladin.CurrentJudgement.IsActive() {
