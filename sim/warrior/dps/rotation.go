@@ -13,14 +13,32 @@ func (war *DpsWarrior) OnGCDReady(sim *core.Simulation) {
 }
 
 func (war *DpsWarrior) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
-	if war.doSlamNext && war.castSlamAt == 0 && spell != war.AutoAttacks.OHAuto {
+	war.tryQueueSlam(sim)
+	war.tryQueueHsCleave(sim)
+}
+
+const SlamThreshold = time.Millisecond * 500
+
+func (war *DpsWarrior) tryQueueSlam(sim *core.Simulation) {
+	if war.doSlamNext &&
+		war.castSlamAt == 0 &&
+		(war.AutoAttacks.MainhandSwingAt <= sim.CurrentTime || war.AutoAttacks.MainhandSwingAt == sim.CurrentTime+war.AutoAttacks.MainhandSwingSpeed()) {
 		slamAt := sim.CurrentTime + war.slamLatency
-		if slamAt >= war.GCD.ReadyAt() && war.CanSlam() {
+
+		gcdAt := war.GCD.ReadyAt()
+		if slamAt < gcdAt {
+			if gcdAt-slamAt <= SlamThreshold {
+				slamAt = gcdAt
+			} else {
+				return
+			}
+		}
+
+		if war.CanSlam() && !war.shouldSunder(sim) {
 			war.castSlamAt = slamAt
 			war.WaitUntil(sim, slamAt) // Pause GCD until slam time
 		}
 	}
-	war.tryQueueHsCleave(sim)
 }
 
 func (war *DpsWarrior) doRotation(sim *core.Simulation) {
@@ -28,32 +46,38 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 		war.BerserkerStance.Cast(sim, nil)
 	}
 	if war.shouldSunder(sim) {
+		war.castSlamAt = 0
+		war.doSlamNext = false
 		war.SunderArmor.Cast(sim, sim.GetPrimaryTarget())
 		war.tryQueueHsCleave(sim)
 		return
 	}
 
-	if war.doSlamNext {
-		if war.castSlamAt == 0 && war.AutoAttacks.MainhandSwingAt < sim.CurrentTime+time.Millisecond*100 {
+	if war.doSlamNext && war.castSlamAt != 0 {
+		if sim.CurrentTime < war.castSlamAt {
 			return
-		} else {
-			if sim.CurrentTime > war.castSlamAt {
-				war.castSlamAt = 0
-				war.doSlamNext = false
-			} else if war.CanSlam() {
+		} else if sim.CurrentTime == war.castSlamAt {
+			war.castSlamAt = 0
+			war.doSlamNext = false
+			if war.CanSlam() {
 				war.CastSlam(sim, sim.GetPrimaryTarget())
-				war.castSlamAt = 0
-				war.doSlamNext = false
 				war.tryQueueHsCleave(sim)
 				return
 			}
+		} else {
+			war.castSlamAt = 0
+			war.doSlamNext = false
+			return
 		}
 	}
 
+	// If using a GCD will clip the next slam, only allow high priority spells like BT/MS/WW/debuffs.
+	highPrioSpellsOnly := war.Rotation.UseSlam && sim.CurrentTime+core.GCDDefault-SlamThreshold > war.AutoAttacks.MainhandSwingAt+war.slamLatency
+
 	if sim.IsExecutePhase() {
-		war.executeRotation(sim)
+		war.executeRotation(sim, highPrioSpellsOnly)
 	} else {
-		war.normalRotation(sim)
+		war.normalRotation(sim, highPrioSpellsOnly)
 	}
 
 	if war.Rotation.UseSlam {
@@ -68,7 +92,7 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 	}
 }
 
-func (war *DpsWarrior) normalRotation(sim *core.Simulation) {
+func (war *DpsWarrior) normalRotation(sim *core.Simulation, highPrioSpellsOnly bool) {
 	if war.GCD.IsReady(sim) {
 		if war.ShouldRampage(sim) {
 			war.Rampage.Cast(sim, nil)
@@ -80,27 +104,29 @@ func (war *DpsWarrior) normalRotation(sim *core.Simulation) {
 			war.MortalStrike.Cast(sim, sim.GetPrimaryTarget())
 		} else if !war.Rotation.PrioritizeWw && war.CanWhirlwind(sim) {
 			war.Whirlwind.Cast(sim, sim.GetPrimaryTarget())
-		} else if war.Rotation.UseOverpower && war.CurrentRage() < war.Rotation.OverpowerRageThreshold && war.ShouldOverpower(sim) {
-			if !war.StanceMatches(warrior.BattleStance) {
-				if !war.BattleStance.IsReady(sim) {
-					return
+		} else if !highPrioSpellsOnly {
+			if war.tryMaintainDebuffs(sim) {
+				// Do nothing, already cast
+			} else if war.Rotation.UseOverpower && war.CurrentRage() < war.Rotation.OverpowerRageThreshold && war.ShouldOverpower(sim) {
+				if !war.StanceMatches(warrior.BattleStance) {
+					if !war.BattleStance.IsReady(sim) {
+						return
+					}
+					war.BattleStance.Cast(sim, nil)
 				}
-				war.BattleStance.Cast(sim, nil)
+				war.Overpower.Cast(sim, sim.GetPrimaryTarget())
+			} else if war.ShouldBerserkerRage(sim) {
+				war.BerserkerRage.Cast(sim, nil)
+			} else if war.Rotation.UseHamstring && war.CurrentRage() >= war.Rotation.HamstringRageThreshold && war.ShouldHamstring(sim) {
+				war.Hamstring.Cast(sim, sim.GetPrimaryTarget())
 			}
-			war.Overpower.Cast(sim, sim.GetPrimaryTarget())
-		} else if war.ShouldBerserkerRage(sim) {
-			war.BerserkerRage.Cast(sim, nil)
-		} else if war.tryMaintainDebuffs(sim) {
-			// Do nothing, already cast
-		} else if war.Rotation.UseHamstring && war.CurrentRage() >= war.Rotation.HamstringRageThreshold && war.ShouldHamstring(sim) {
-			war.Hamstring.Cast(sim, sim.GetPrimaryTarget())
 		}
 	}
 
 	war.tryQueueHsCleave(sim)
 }
 
-func (war *DpsWarrior) executeRotation(sim *core.Simulation) {
+func (war *DpsWarrior) executeRotation(sim *core.Simulation, highPrioSpellsOnly bool) {
 	if war.GCD.IsReady(sim) {
 		if war.ShouldRampage(sim) {
 			war.Rampage.Cast(sim, nil)
@@ -112,12 +138,14 @@ func (war *DpsWarrior) executeRotation(sim *core.Simulation) {
 			war.MortalStrike.Cast(sim, sim.GetPrimaryTarget())
 		} else if !war.Rotation.PrioritizeWw && war.Rotation.UseWwDuringExecute && war.CanWhirlwind(sim) {
 			war.Whirlwind.Cast(sim, sim.GetPrimaryTarget())
-		} else if war.tryMaintainDebuffs(sim) {
-			// Do nothing, already cast
-		} else if war.CanExecute() {
-			war.Execute.Cast(sim, sim.GetPrimaryTarget())
-		} else if war.ShouldBerserkerRage(sim) {
-			war.BerserkerRage.Cast(sim, nil)
+		} else if !highPrioSpellsOnly {
+			if war.tryMaintainDebuffs(sim) {
+				// Do nothing, already cast
+			} else if war.CanExecute() {
+				war.Execute.Cast(sim, sim.GetPrimaryTarget())
+			} else if war.ShouldBerserkerRage(sim) {
+				war.BerserkerRage.Cast(sim, nil)
+			}
 		}
 	}
 

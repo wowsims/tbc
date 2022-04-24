@@ -49,6 +49,7 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 		if war.GCD.IsReady(sim) {
 			war.TryUseCooldowns(sim)
 			if war.GCD.IsReady(sim) {
+				war.tryQueueSlam(sim)
 				war.doRotation(sim)
 			}
 		}
@@ -91,7 +92,7 @@ type DpsWarrior struct {
 
 	castFirstSunder bool
 
-	doSlamNext  bool // Whether Slam should be the next cast.
+	doSlamNext  bool
 	castSlamAt  time.Duration
 	slamLatency time.Duration
 }
@@ -109,7 +110,8 @@ func (war *DpsWarrior) Reset(sim *core.Simulation) {
 	war.Warrior.Reset(sim)
 	war.BerserkerStanceAura.Activate(sim)
 	war.Stance = warrior.BerserkerStance
+
+	war.doSlamNext = false
 	war.castFirstSunder = false
-	war.doSlamNext = war.Rotation.UseSlam
 	war.castSlamAt = 0
 }
