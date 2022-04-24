@@ -69,7 +69,7 @@ class PlayerFilter extends Input {
                 iconUrl: player.iconUrl,
                 text: player.label,
                 color: player.classColor,
-                value: player.raidIndex,
+                value: player.index,
             };
         }));
         const hasSameOption = this.currentOptions.find(option => option.value == this.getInputValue()) != null;

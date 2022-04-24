@@ -42,9 +42,9 @@ export class AuraMetricsTable extends MetricsTable {
         }
     }
     mergeMetrics(metrics) {
-        return AuraMetrics.merge(metrics, true, metrics[0].player?.petActionId || undefined);
+        return AuraMetrics.merge(metrics, true, metrics[0].unit?.petActionId || undefined);
     }
     shouldCollapse(metric) {
-        return !metric.player?.isPet;
+        return !metric.unit?.isPet;
     }
 }

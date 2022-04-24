@@ -85,6 +85,6 @@ export class TypedResourceMetricsTable extends MetricsTable {
         return resourceGroups;
     }
     mergeMetrics(metrics) {
-        return ResourceMetrics.merge(metrics, true, metrics[0].player?.petActionId || undefined);
+        return ResourceMetrics.merge(metrics, true, metrics[0].unit?.petActionId || undefined);
     }
 }

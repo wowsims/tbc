@@ -252,8 +252,8 @@ export class Timeline extends ResultComponent {
         });
     }
     // Returns a function for drawing the tooltip, or null if no series was added.
-    addDpsSeries(player, options, colorOverride) {
-        const dpsLogs = player.dpsLogs;
+    addDpsSeries(unit, options, colorOverride) {
+        const dpsLogs = unit.dpsLogs;
         options.colors.push(colorOverride || dpsColor);
         options.series.push({
             name: 'DPS',
@@ -269,13 +269,13 @@ export class Timeline extends ResultComponent {
             maxDps: dpsLogs[maxIndex(dpsLogs.map(l => l.dps))].dps,
             tooltipHandler: (dataPointIndex) => {
                 const log = dpsLogs[dataPointIndex];
-                return this.dpsTooltip(log, true, player, colorOverride);
+                return this.dpsTooltip(log, true, unit, colorOverride);
             },
         };
     }
     // Returns a function for drawing the tooltip, or null if no series was added.
-    addManaSeries(player, options) {
-        const manaLogs = player.groupedResourceLogs[ResourceType.ResourceTypeMana];
+    addManaSeries(unit, options) {
+        const manaLogs = unit.groupedResourceLogs[ResourceType.ResourceTypeMana];
         if (manaLogs.length == 0) {
             return null;
         }
@@ -327,12 +327,12 @@ export class Timeline extends ResultComponent {
         };
     }
     // Returns a function for drawing the tooltip, or null if no series was added.
-    addThreatSeries(player, options, colorOverride) {
+    addThreatSeries(unit, options, colorOverride) {
         options.colors.push(colorOverride || threatColor);
         options.series.push({
             name: 'Threat',
             type: 'line',
-            data: player.threatLogs.map(log => {
+            data: unit.threatLogs.map(log => {
                 return {
                     x: this.toDatetime(log.timestamp),
                     y: log.threatAfter,
@@ -340,13 +340,13 @@ export class Timeline extends ResultComponent {
             }),
         });
         return (dataPointIndex) => {
-            const log = player.threatLogs[dataPointIndex];
-            return this.threatTooltip(log, true, player, colorOverride);
+            const log = unit.threatLogs[dataPointIndex];
+            return this.threatTooltip(log, true, unit, colorOverride);
         };
     }
-    addMajorCooldownAnnotations(player, options) {
-        const mcdLogs = player.majorCooldownLogs;
-        const mcdAuraLogs = player.majorCooldownAuraUptimeLogs;
+    addMajorCooldownAnnotations(unit, options) {
+        const mcdLogs = unit.majorCooldownLogs;
+        const mcdAuraLogs = unit.majorCooldownAuraUptimeLogs;
         // Figure out how much to vertically offset cooldown icons, for cooldowns
         // used very close to each other. This is so the icons don't overlap.
         const MAX_ALLOWED_DIST = 10;

@@ -836,9 +836,9 @@ class DistributionMetrics$Type extends MessageType {
  */
 export const DistributionMetrics = new DistributionMetrics$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class PlayerMetrics$Type extends MessageType {
+class UnitMetrics$Type extends MessageType {
     constructor() {
-        super("proto.PlayerMetrics", [
+        super("proto.UnitMetrics", [
             { no: 9, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 1, name: "dps", kind: "message", T: () => DistributionMetrics },
             { no: 8, name: "threat", kind: "message", T: () => DistributionMetrics },
@@ -846,7 +846,7 @@ class PlayerMetrics$Type extends MessageType {
             { no: 5, name: "actions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionMetrics },
             { no: 6, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics },
             { no: 10, name: "resources", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ResourceMetrics },
-            { no: 7, name: "pets", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PlayerMetrics }
+            { no: 7, name: "pets", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => UnitMetrics }
         ]);
     }
     create(value) {
@@ -882,8 +882,8 @@ class PlayerMetrics$Type extends MessageType {
                 case /* repeated proto.ResourceMetrics resources */ 10:
                     message.resources.push(ResourceMetrics.internalBinaryRead(reader, reader.uint32(), options));
                     break;
-                case /* repeated proto.PlayerMetrics pets */ 7:
-                    message.pets.push(PlayerMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated proto.UnitMetrics pets */ 7:
+                    message.pets.push(UnitMetrics.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -918,9 +918,9 @@ class PlayerMetrics$Type extends MessageType {
         /* repeated proto.ResourceMetrics resources = 10; */
         for (let i = 0; i < message.resources.length; i++)
             ResourceMetrics.internalBinaryWrite(message.resources[i], writer.tag(10, WireType.LengthDelimited).fork(), options).join();
-        /* repeated proto.PlayerMetrics pets = 7; */
+        /* repeated proto.UnitMetrics pets = 7; */
         for (let i = 0; i < message.pets.length; i++)
-            PlayerMetrics.internalBinaryWrite(message.pets[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
+            UnitMetrics.internalBinaryWrite(message.pets[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -928,15 +928,15 @@ class PlayerMetrics$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message proto.PlayerMetrics
+ * @generated MessageType for protobuf message proto.UnitMetrics
  */
-export const PlayerMetrics = new PlayerMetrics$Type();
+export const UnitMetrics = new UnitMetrics$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class PartyMetrics$Type extends MessageType {
     constructor() {
         super("proto.PartyMetrics", [
             { no: 1, name: "dps", kind: "message", T: () => DistributionMetrics },
-            { no: 2, name: "players", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => PlayerMetrics }
+            { no: 2, name: "players", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => UnitMetrics }
         ]);
     }
     create(value) {
@@ -954,8 +954,8 @@ class PartyMetrics$Type extends MessageType {
                 case /* proto.DistributionMetrics dps */ 1:
                     message.dps = DistributionMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dps);
                     break;
-                case /* repeated proto.PlayerMetrics players */ 2:
-                    message.players.push(PlayerMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated proto.UnitMetrics players */ 2:
+                    message.players.push(UnitMetrics.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -972,9 +972,9 @@ class PartyMetrics$Type extends MessageType {
         /* proto.DistributionMetrics dps = 1; */
         if (message.dps)
             DistributionMetrics.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* repeated proto.PlayerMetrics players = 2; */
+        /* repeated proto.UnitMetrics players = 2; */
         for (let i = 0; i < message.players.length; i++)
-            PlayerMetrics.internalBinaryWrite(message.players[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+            UnitMetrics.internalBinaryWrite(message.players[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1040,57 +1040,10 @@ class RaidMetrics$Type extends MessageType {
  */
 export const RaidMetrics = new RaidMetrics$Type();
 // @generated message type with reflection information, may provide speed optimized methods
-class TargetMetrics$Type extends MessageType {
-    constructor() {
-        super("proto.TargetMetrics", [
-            { no: 1, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics }
-        ]);
-    }
-    create(value) {
-        const message = { auras: [] };
-        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
-        if (value !== undefined)
-            reflectionMergePartial(this, message, value);
-        return message;
-    }
-    internalBinaryRead(reader, length, options, target) {
-        let message = target ?? this.create(), end = reader.pos + length;
-        while (reader.pos < end) {
-            let [fieldNo, wireType] = reader.tag();
-            switch (fieldNo) {
-                case /* repeated proto.AuraMetrics auras */ 1:
-                    message.auras.push(AuraMetrics.internalBinaryRead(reader, reader.uint32(), options));
-                    break;
-                default:
-                    let u = options.readUnknownField;
-                    if (u === "throw")
-                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
-                    let d = reader.skip(wireType);
-                    if (u !== false)
-                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
-            }
-        }
-        return message;
-    }
-    internalBinaryWrite(message, writer, options) {
-        /* repeated proto.AuraMetrics auras = 1; */
-        for (let i = 0; i < message.auras.length; i++)
-            AuraMetrics.internalBinaryWrite(message.auras[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        let u = options.writeUnknownFields;
-        if (u !== false)
-            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
-        return writer;
-    }
-}
-/**
- * @generated MessageType for protobuf message proto.TargetMetrics
- */
-export const TargetMetrics = new TargetMetrics$Type();
-// @generated message type with reflection information, may provide speed optimized methods
 class EncounterMetrics$Type extends MessageType {
     constructor() {
         super("proto.EncounterMetrics", [
-            { no: 1, name: "targets", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => TargetMetrics }
+            { no: 1, name: "targets", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => UnitMetrics }
         ]);
     }
     create(value) {
@@ -1105,8 +1058,8 @@ class EncounterMetrics$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
-                case /* repeated proto.TargetMetrics targets */ 1:
-                    message.targets.push(TargetMetrics.internalBinaryRead(reader, reader.uint32(), options));
+                case /* repeated proto.UnitMetrics targets */ 1:
+                    message.targets.push(UnitMetrics.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1120,9 +1073,9 @@ class EncounterMetrics$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
-        /* repeated proto.TargetMetrics targets = 1; */
+        /* repeated proto.UnitMetrics targets = 1; */
         for (let i = 0; i < message.targets.length; i++)
-            TargetMetrics.internalBinaryWrite(message.targets[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+            UnitMetrics.internalBinaryWrite(message.targets[i], writer.tag(1, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

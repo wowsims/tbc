@@ -1,3 +1,4 @@
+export declare const EXPERTISE_PER_QUARTER_PERCENT_REDUCTION = 3.94;
 export declare const MELEE_CRIT_RATING_PER_CRIT_CHANCE = 22.08;
 export declare const MELEE_HIT_RATING_PER_HIT_CHANCE = 15.77;
 export declare const SPELL_CRIT_RATING_PER_CRIT_CHANCE = 22.08;

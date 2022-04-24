@@ -52,7 +52,7 @@ export class SimResult {
         return this.getPlayers()[0] || null;
     }
     getPlayerWithRaidIndex(raidIndex) {
-        return this.getPlayers().find(player => player.raidIndex == raidIndex) || null;
+        return this.getPlayers().find(player => player.index == raidIndex) || null;
     }
     getTargets(filter) {
         if (filter?.target || filter?.target === 0) {
@@ -135,19 +135,20 @@ export class PartyMetrics {
         const numPlayers = Math.min(party.players.length, metrics.players.length);
         const players = await Promise.all([...new Array(numPlayers).keys()]
             .filter(i => party.players[i].class != Class.ClassUnknown)
-            .map(i => PlayerMetrics.makeNew(resultData, party.players[i], metrics.players[i], partyIndex * 5 + i, false, logs)));
+            .map(i => UnitMetrics.makeNewPlayer(resultData, party.players[i], metrics.players[i], partyIndex * 5 + i, false, logs)));
         return new PartyMetrics(party, metrics, partyIndex, players);
     }
 }
-export class PlayerMetrics {
-    constructor(player, petActionId, metrics, raidIndex, actions, auras, resources, pets, logs, resultData) {
+export class UnitMetrics {
+    constructor(player, target, petActionId, metrics, index, actions, auras, resources, pets, logs, resultData) {
         this.player = player;
+        this.target = target;
         this.metrics = metrics;
-        this.raidIndex = raidIndex;
+        this.index = index;
         this.name = metrics.name;
-        this.spec = playerToSpec(player);
+        this.spec = player ? playerToSpec(player) : 0;
         this.petActionId = petActionId;
-        this.iconUrl = getTalentTreeIcon(this.spec, player.talentsString);
+        this.iconUrl = player ? getTalentTreeIcon(this.spec, player.talentsString) : '';
         this.classColor = classColors[specToClass[this.spec]];
         this.dps = this.metrics.dps;
         this.tps = this.metrics.threat;
@@ -162,7 +163,7 @@ export class PlayerMetrics {
         this.dpsLogs = DpsLog.fromLogs(this.damageDealtLogs);
         this.castLogs = CastLog.fromLogs(this.logs);
         this.threatLogs = ThreatLogGroup.fromLogs(this.logs);
-        this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet), resultData.firstIterationDuration);
+        this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.index, false, this.isPet), resultData.firstIterationDuration);
         this.majorCooldownLogs = this.logs.filter((log) => log.isMajorCooldownUsed());
         this.groupedResourceLogs = ResourceChangedLogGroup.fromLogs(this.logs);
         AuraUptimeLog.populateActiveAuras(this.dpsLogs, this.auraUptimeLogs);
@@ -170,7 +171,12 @@ export class PlayerMetrics {
         this.majorCooldownAuraUptimeLogs = this.auraUptimeLogs.filter(auraLog => this.majorCooldownLogs.find(mcdLog => mcdLog.actionId.equals(auraLog.actionId)));
     }
     get label() {
-        return `${this.name} (#${this.raidIndex + 1})`;
+        if (this.target == null) {
+            return `${this.name} (#${this.index + 1})`;
+        }
+        else {
+            return this.name;
+        }
     }
     get isPet() {
         return this.petActionId != null;
@@ -196,12 +202,12 @@ export class PlayerMetrics {
     getResourceMetrics(resourceType) {
         return this.resources.filter(resource => resource.type == resourceType);
     }
-    static async makeNew(resultData, player, metrics, raidIndex, isPet, logs) {
+    static async makeNewPlayer(resultData, player, metrics, raidIndex, isPet, logs) {
         const playerLogs = logs.filter(log => log.source && (!log.source.isTarget && (isPet == log.source.isPet) && log.source.index == raidIndex));
         const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(null, resultData, actionMetrics, raidIndex)));
         const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(null, resultData, auraMetrics, raidIndex)));
         const resourcesPromise = Promise.all(metrics.resources.map(resourceMetrics => ResourceMetrics.makeNew(null, resultData, resourceMetrics, raidIndex)));
-        const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(resultData, player, petMetrics, raidIndex, true, playerLogs)));
+        const petsPromise = Promise.all(metrics.pets.map(petMetrics => UnitMetrics.makeNewPlayer(resultData, player, petMetrics, raidIndex, true, playerLogs)));
         let petIdPromise = Promise.resolve(null);
         if (isPet) {
             petIdPromise = ActionId.fromPetName(metrics.name).fill(raidIndex);
@@ -211,11 +217,16 @@ export class PlayerMetrics {
         const resources = await resourcesPromise;
         const pets = await petsPromise;
         const petActionId = await petIdPromise;
-        const playerMetrics = new PlayerMetrics(player, petActionId, metrics, raidIndex, actions, auras, resources, pets, playerLogs, resultData);
-        actions.forEach(action => action.player = playerMetrics);
-        auras.forEach(aura => aura.player = playerMetrics);
-        resources.forEach(resource => resource.player = playerMetrics);
+        const playerMetrics = new UnitMetrics(player, null, petActionId, metrics, raidIndex, actions, auras, resources, pets, playerLogs, resultData);
+        actions.forEach(action => action.unit = playerMetrics);
+        auras.forEach(aura => aura.unit = playerMetrics);
+        resources.forEach(resource => resource.unit = playerMetrics);
         return playerMetrics;
+    }
+    static async makeNewTarget(resultData, target, metrics, index, logs) {
+        const targetLogs = logs.filter(log => log.source && (log.source.isTarget && log.source.index == index));
+        const auras = await Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(null, resultData, auraMetrics)));
+        return new UnitMetrics(null, target, null, metrics, index, [], auras, [], [], targetLogs, resultData);
     }
 }
 export class EncounterMetrics {
@@ -227,31 +238,16 @@ export class EncounterMetrics {
     static async makeNew(resultData, encounter, metrics, logs) {
         const numTargets = Math.min(encounter.targets.length, metrics.targets.length);
         const targets = await Promise.all([...new Array(numTargets).keys()]
-            .map(i => TargetMetrics.makeNew(resultData, encounter.targets[i], metrics.targets[i], i, logs)));
+            .map(i => UnitMetrics.makeNewTarget(resultData, encounter.targets[i], metrics.targets[i], i, logs)));
         return new EncounterMetrics(encounter, metrics, targets);
     }
     get durationSeconds() {
         return this.encounter.duration;
     }
 }
-export class TargetMetrics {
-    constructor(target, metrics, index, auras, logs, resultData) {
-        this.target = target;
-        this.metrics = metrics;
-        this.index = index;
-        this.auras = auras;
-        this.logs = logs;
-        this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity('Target ' + (this.index + 1), '', this.index, true, false), resultData.firstIterationDuration);
-    }
-    static async makeNew(resultData, target, metrics, index, logs) {
-        const targetLogs = logs.filter(log => log.source && (log.source.isTarget && log.source.index == index));
-        const auras = await Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(null, resultData, auraMetrics)));
-        return new TargetMetrics(target, metrics, index, auras, targetLogs, resultData);
-    }
-}
 export class AuraMetrics {
-    constructor(player, actionId, data, resultData) {
-        this.player = player;
+    constructor(unit, actionId, data, resultData) {
+        this.unit = unit;
         this.actionId = actionId;
         this.name = actionId.name;
         this.iconUrl = actionId.iconUrl;
@@ -263,19 +259,19 @@ export class AuraMetrics {
     get uptimePercent() {
         return this.data.uptimeSecondsAvg / this.duration * 100;
     }
-    static async makeNew(player, resultData, auraMetrics, playerIndex) {
+    static async makeNew(unit, resultData, auraMetrics, playerIndex) {
         const actionId = await ActionId.fromProto(auraMetrics.id).fill(playerIndex);
-        return new AuraMetrics(player, actionId, auraMetrics, resultData);
+        return new AuraMetrics(unit, actionId, auraMetrics, resultData);
     }
     // Merges an array of metrics into a single metrics.
     static merge(auras, removeTag, actionIdOverride) {
         const firstAura = auras[0];
-        const player = auras.every(aura => aura.player == firstAura.player) ? firstAura.player : null;
+        const unit = auras.every(aura => aura.unit == firstAura.unit) ? firstAura.unit : null;
         let actionId = actionIdOverride || firstAura.actionId;
         if (removeTag) {
             actionId = actionId.withoutTag();
         }
-        return new AuraMetrics(player, actionId, AuraMetricsProto.create({
+        return new AuraMetrics(unit, actionId, AuraMetricsProto.create({
             uptimeSecondsAvg: Math.max(...auras.map(a => a.data.uptimeSecondsAvg)),
         }), firstAura.resultData);
     }
@@ -296,8 +292,8 @@ export class AuraMetrics {
 }
 ;
 export class ResourceMetrics {
-    constructor(player, actionId, data, resultData) {
-        this.player = player;
+    constructor(unit, actionId, data, resultData) {
+        this.unit = unit;
         this.actionId = actionId;
         this.name = actionId.name;
         this.iconUrl = actionId.iconUrl;
@@ -322,19 +318,19 @@ export class ResourceMetrics {
     get wastedGain() {
         return (this.data.gain - this.data.actualGain) / this.iterations;
     }
-    static async makeNew(player, resultData, resourceMetrics, playerIndex) {
+    static async makeNew(unit, resultData, resourceMetrics, playerIndex) {
         const actionId = await ActionId.fromProto(resourceMetrics.id).fill(playerIndex);
-        return new ResourceMetrics(player, actionId, resourceMetrics, resultData);
+        return new ResourceMetrics(unit, actionId, resourceMetrics, resultData);
     }
     // Merges an array of metrics into a single metrics.
     static merge(resources, removeTag, actionIdOverride) {
         const firstResource = resources[0];
-        const player = resources.every(resource => resource.player == firstResource.player) ? firstResource.player : null;
+        const unit = resources.every(resource => resource.unit == firstResource.unit) ? firstResource.unit : null;
         let actionId = actionIdOverride || firstResource.actionId;
         if (removeTag) {
             actionId = actionId.withoutTag();
         }
-        return new ResourceMetrics(player, actionId, ResourceMetricsProto.create({
+        return new ResourceMetrics(unit, actionId, ResourceMetricsProto.create({
             events: sum(resources.map(a => a.data.events)),
             gain: sum(resources.map(a => a.data.gain)),
             actualGain: sum(resources.map(a => a.data.actualGain)),
@@ -356,10 +352,10 @@ export class ResourceMetrics {
     }
 }
 ;
-// Manages the metrics for a single player action (e.g. Lightning Bolt).
+// Manages the metrics for a single unit action (e.g. Lightning Bolt).
 export class ActionMetrics {
-    constructor(player, actionId, data, resultData) {
-        this.player = player;
+    constructor(unit, actionId, data, resultData) {
+        this.unit = unit;
         this.actionId = actionId;
         this.name = actionId.name;
         this.iconUrl = actionId.iconUrl;
@@ -446,19 +442,19 @@ export class ActionMetrics {
     get glancePercent() {
         return (this.data.glances / this.hitAttempts) * 100;
     }
-    static async makeNew(player, resultData, actionMetrics, playerIndex) {
+    static async makeNew(unit, resultData, actionMetrics, playerIndex) {
         const actionId = await ActionId.fromProto(actionMetrics.id).fill(playerIndex);
-        return new ActionMetrics(player, actionId, actionMetrics, resultData);
+        return new ActionMetrics(unit, actionId, actionMetrics, resultData);
     }
     // Merges an array of metrics into a single metric.
     static merge(actions, removeTag, actionIdOverride) {
         const firstAction = actions[0];
-        const player = actions.every(action => action.player == firstAction.player) ? firstAction.player : null;
+        const unit = actions.every(action => action.unit == firstAction.unit) ? firstAction.unit : null;
         let actionId = actionIdOverride || firstAction.actionId;
         if (removeTag) {
             actionId = actionId.withoutTag();
         }
-        return new ActionMetrics(player, actionId, ActionMetricsProto.create({
+        return new ActionMetrics(unit, actionId, ActionMetricsProto.create({
             isMelee: firstAction.isMeleeAction,
             casts: sum(actions.map(a => a.data.casts)),
             hits: sum(actions.map(a => a.data.hits)),

@@ -100,9 +100,9 @@ export class MeleeMetricsTable extends MetricsTable {
         return actionGroups.concat(petGroups);
     }
     mergeMetrics(metrics) {
-        return ActionMetrics.merge(metrics, true, metrics[0].player?.petActionId || undefined);
+        return ActionMetrics.merge(metrics, true, metrics[0].unit?.petActionId || undefined);
     }
     shouldCollapse(metric) {
-        return !metric.player?.isPet;
+        return !metric.unit?.isPet;
     }
 }

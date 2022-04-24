@@ -366,11 +366,11 @@ export interface DistributionMetrics {
     };
 }
 /**
- * All the results for a single Player.
+ * All the results for a single Unit (player, target, or pet).
  *
- * @generated from protobuf message proto.PlayerMetrics
+ * @generated from protobuf message proto.UnitMetrics
  */
-export interface PlayerMetrics {
+export interface UnitMetrics {
     /**
      * @generated from protobuf field: string name = 9;
      */
@@ -402,9 +402,9 @@ export interface PlayerMetrics {
      */
     resources: ResourceMetrics[];
     /**
-     * @generated from protobuf field: repeated proto.PlayerMetrics pets = 7;
+     * @generated from protobuf field: repeated proto.UnitMetrics pets = 7;
      */
-    pets: PlayerMetrics[];
+    pets: UnitMetrics[];
 }
 /**
  * Results for a whole raid.
@@ -417,9 +417,9 @@ export interface PartyMetrics {
      */
     dps?: DistributionMetrics;
     /**
-     * @generated from protobuf field: repeated proto.PlayerMetrics players = 2;
+     * @generated from protobuf field: repeated proto.UnitMetrics players = 2;
      */
-    players: PlayerMetrics[];
+    players: UnitMetrics[];
 }
 /**
  * Results for a whole raid.
@@ -437,22 +437,13 @@ export interface RaidMetrics {
     parties: PartyMetrics[];
 }
 /**
- * @generated from protobuf message proto.TargetMetrics
- */
-export interface TargetMetrics {
-    /**
-     * @generated from protobuf field: repeated proto.AuraMetrics auras = 1;
-     */
-    auras: AuraMetrics[];
-}
-/**
  * @generated from protobuf message proto.EncounterMetrics
  */
 export interface EncounterMetrics {
     /**
-     * @generated from protobuf field: repeated proto.TargetMetrics targets = 1;
+     * @generated from protobuf field: repeated proto.UnitMetrics targets = 1;
      */
-    targets: TargetMetrics[];
+    targets: UnitMetrics[];
 }
 /**
  * RPC RaidSim
@@ -806,16 +797,16 @@ declare class DistributionMetrics$Type extends MessageType<DistributionMetrics> 
  * @generated MessageType for protobuf message proto.DistributionMetrics
  */
 export declare const DistributionMetrics: DistributionMetrics$Type;
-declare class PlayerMetrics$Type extends MessageType<PlayerMetrics> {
+declare class UnitMetrics$Type extends MessageType<UnitMetrics> {
     constructor();
-    create(value?: PartialMessage<PlayerMetrics>): PlayerMetrics;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PlayerMetrics): PlayerMetrics;
-    internalBinaryWrite(message: PlayerMetrics, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+    create(value?: PartialMessage<UnitMetrics>): UnitMetrics;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: UnitMetrics): UnitMetrics;
+    internalBinaryWrite(message: UnitMetrics, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
 }
 /**
- * @generated MessageType for protobuf message proto.PlayerMetrics
+ * @generated MessageType for protobuf message proto.UnitMetrics
  */
-export declare const PlayerMetrics: PlayerMetrics$Type;
+export declare const UnitMetrics: UnitMetrics$Type;
 declare class PartyMetrics$Type extends MessageType<PartyMetrics> {
     constructor();
     create(value?: PartialMessage<PartyMetrics>): PartyMetrics;
@@ -836,16 +827,6 @@ declare class RaidMetrics$Type extends MessageType<RaidMetrics> {
  * @generated MessageType for protobuf message proto.RaidMetrics
  */
 export declare const RaidMetrics: RaidMetrics$Type;
-declare class TargetMetrics$Type extends MessageType<TargetMetrics> {
-    constructor();
-    create(value?: PartialMessage<TargetMetrics>): TargetMetrics;
-    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TargetMetrics): TargetMetrics;
-    internalBinaryWrite(message: TargetMetrics, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
-}
-/**
- * @generated MessageType for protobuf message proto.TargetMetrics
- */
-export declare const TargetMetrics: TargetMetrics$Type;
 declare class EncounterMetrics$Type extends MessageType<EncounterMetrics> {
     constructor();
     create(value?: PartialMessage<EncounterMetrics>): EncounterMetrics;

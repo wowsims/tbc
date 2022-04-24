@@ -89,6 +89,9 @@ export class CharacterStats extends Component {
         else if (stat == Stat.StatMeleeHaste || stat == Stat.StatSpellHaste) {
             displayStr += ` (${(rawValue / Mechanics.HASTE_RATING_PER_HASTE_PERCENT).toFixed(2)}%)`;
         }
+        else if (stat == Stat.StatExpertise) {
+            displayStr += ` (${(Math.floor(rawValue / Mechanics.EXPERTISE_PER_QUARTER_PERCENT_REDUCTION)).toFixed(0)})`;
+        }
         return displayStr;
     }
 }

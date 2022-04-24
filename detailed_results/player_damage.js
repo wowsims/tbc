@@ -57,7 +57,7 @@ export class PlayerDamageMetricsTable extends MetricsTable {
     customizeRowElem(player, rowElem) {
         rowElem.classList.add('player-damage-row');
         rowElem.addEventListener('click', event => {
-            this.resultsFilter.setPlayer(this.getLastSimResult().eventID, player.raidIndex);
+            this.resultsFilter.setPlayer(this.getLastSimResult().eventID, player.index);
         });
     }
     getGroupedMetrics(resultData) {
