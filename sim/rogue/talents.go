@@ -364,7 +364,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 			curDmg = spellEffect.Damage / spellEffect.Target.ArmorDamageReduction(rogue.GetStat(stats.ArmorPenetration))
 
 			bfHit.Cast(sim, spellEffect.Target.NextTarget(sim))
-			bfHit.Casts--
+			bfHit.SpellMetrics[spellEffect.Target.Index].Casts--
 		},
 	})
 

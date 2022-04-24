@@ -69,7 +69,7 @@ type Spell struct {
 	// Performs a cast of this spell.
 	castFn CastSuccessFunc
 
-	SpellMetrics
+	SpellMetrics []SpellMetrics
 
 	ApplyEffects ApplySpellEffects
 
@@ -134,15 +134,21 @@ func (character *Character) GetOrRegisterSpell(config SpellConfig) *Spell {
 
 // Metrics for the current iteration
 func (spell *Spell) CurDamagePerCast() float64 {
-	if spell.Casts == 0 {
+	if spell.SpellMetrics[0].Casts == 0 {
 		return 0
 	} else {
-		return spell.TotalDamage / float64(spell.Casts)
+		casts := int32(0)
+		damage := 0.0
+		for _, targetMetrics := range spell.SpellMetrics {
+			casts += targetMetrics.Casts
+			damage += targetMetrics.TotalDamage
+		}
+		return damage / float64(casts)
 	}
 }
 
-func (spell *Spell) reset(_ *Simulation) {
-	spell.SpellMetrics = SpellMetrics{}
+func (spell *Spell) reset(sim *Simulation) {
+	spell.SpellMetrics = make([]SpellMetrics, sim.GetNumTargets())
 }
 
 func (spell *Spell) doneIteration() {
@@ -174,7 +180,13 @@ func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Target) {
 }
 
 func (spell *Spell) applyEffects(sim *Simulation, target *Target) {
-	spell.Casts++
+	if spell.SpellMetrics == nil {
+		spell.reset(sim)
+	}
+	if target == nil {
+		target = sim.GetPrimaryTarget()
+	}
+	spell.SpellMetrics[target.Index].Casts++
 	spell.ApplyEffects(sim, target, spell)
 }
 

@@ -185,8 +185,8 @@ func (spellEffect *SpellEffect) calcThreat(character *Character) float64 {
 }
 
 func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell) {
-	spell.TotalDamage += spellEffect.Damage
-	spell.TotalThreat += spellEffect.calcThreat(spell.Character)
+	spell.SpellMetrics[spellEffect.Target.Index].TotalDamage += spellEffect.Damage
+	spell.SpellMetrics[spellEffect.Target.Index].TotalThreat += spellEffect.calcThreat(spell.Character)
 	spellEffect.triggerProcs(sim, spell)
 }
 

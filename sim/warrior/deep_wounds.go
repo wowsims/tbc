@@ -63,7 +63,7 @@ func (warrior *Warrior) applyDeepWounds() {
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				deepWoundsSpell.Cast(sim, nil)
-				deepWoundsSpell.Hits++
+				deepWoundsSpell.SpellMetrics[spellEffect.Target.Index].Hits++
 				dwDots[spellEffect.Target.Index].Apply(sim)
 				warrior.procBloodFrenzy(sim, spellEffect, time.Second*12)
 			}

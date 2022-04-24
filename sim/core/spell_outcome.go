@@ -13,7 +13,7 @@ type OutcomeApplier func(sim *Simulation, spell *Spell, spellEffect *SpellEffect
 func OutcomeFuncAlwaysHit() OutcomeApplier {
 	return func(_ *Simulation, spell *Spell, spellEffect *SpellEffect, _ *float64) {
 		spellEffect.Outcome = OutcomeHit
-		spell.Hits++
+		spell.SpellMetrics[spellEffect.Target.Index].Hits++
 	}
 }
 
@@ -29,15 +29,15 @@ func OutcomeFuncMagicHitAndCrit(critMultiplier float64) OutcomeApplier {
 		if spellEffect.magicHitCheck(sim, spell) {
 			if spellEffect.magicCritCheck(sim, spell) {
 				spellEffect.Outcome = OutcomeCrit
-				spell.Crits++
+				spell.SpellMetrics[spellEffect.Target.Index].Crits++
 				*damage *= critMultiplier
 			} else {
 				spellEffect.Outcome = OutcomeHit
-				spell.Hits++
+				spell.SpellMetrics[spellEffect.Target.Index].Hits++
 			}
 		} else {
 			spellEffect.Outcome = OutcomeMiss
-			spell.Misses++
+			spell.SpellMetrics[spellEffect.Target.Index].Misses++
 			*damage = 0
 		}
 	}
@@ -47,10 +47,10 @@ func OutcomeFuncMagicHit() OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		if spellEffect.magicHitCheck(sim, spell) {
 			spellEffect.Outcome = OutcomeHit
-			spell.Hits++
+			spell.SpellMetrics[spellEffect.Target.Index].Hits++
 		} else {
 			spellEffect.Outcome = OutcomeMiss
-			spell.Misses++
+			spell.SpellMetrics[spellEffect.Target.Index].Misses++
 			*damage = 0
 		}
 	}
@@ -70,7 +70,7 @@ func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 		chance := MaxFloat(0, missChance)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeMiss
-			spell.Misses++
+			spell.SpellMetrics[spellEffect.Target.Index].Misses++
 			*damage = 0
 			return
 		}
@@ -79,7 +79,7 @@ func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 		chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character)-character.PseudoStats.DodgeReduction)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeDodge
-			spell.Dodges++
+			spell.SpellMetrics[spellEffect.Target.Index].Dodges++
 			*damage = 0
 			return
 		}
@@ -99,7 +99,7 @@ func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 		chance += spellEffect.Target.Glance
 		if roll < chance {
 			spellEffect.Outcome = OutcomeGlance
-			spell.Glances++
+			spell.SpellMetrics[spellEffect.Target.Index].Glances++
 			// TODO glancing blow damage reduction is actually a range ([65%, 85%] vs. 73)
 			*damage *= 0.75
 			return
@@ -109,14 +109,14 @@ func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 		chance += spellEffect.PhysicalCritChance(character, spell)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeCrit
-			spell.Crits++
+			spell.SpellMetrics[spellEffect.Target.Index].Crits++
 			*damage *= critMultiplier
 			return
 		}
 
 		// Hit
 		spellEffect.Outcome = OutcomeHit
-		spell.Hits++
+		spell.SpellMetrics[spellEffect.Target.Index].Hits++
 	}
 }
 
@@ -130,7 +130,7 @@ func OutcomeFuncMeleeSpecialHit() OutcomeApplier {
 		chance := MaxFloat(0, missChance)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeMiss
-			spell.Misses++
+			spell.SpellMetrics[spellEffect.Target.Index].Misses++
 			*damage = 0
 			return
 		}
@@ -140,7 +140,7 @@ func OutcomeFuncMeleeSpecialHit() OutcomeApplier {
 			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character)-character.PseudoStats.DodgeReduction)
 			if roll < chance {
 				spellEffect.Outcome = OutcomeDodge
-				spell.Dodges++
+				spell.SpellMetrics[spellEffect.Target.Index].Dodges++
 				*damage = 0
 				return
 			}
@@ -154,7 +154,7 @@ func OutcomeFuncMeleeSpecialHit() OutcomeApplier {
 
 		// Hit
 		spellEffect.Outcome = OutcomeHit
-		spell.Hits++
+		spell.SpellMetrics[spellEffect.Target.Index].Hits++
 	}
 }
 
@@ -168,7 +168,7 @@ func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
 		chance := MaxFloat(0, missChance)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeMiss
-			spell.Misses++
+			spell.SpellMetrics[spellEffect.Target.Index].Misses++
 			*damage = 0
 			return
 		}
@@ -178,7 +178,7 @@ func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
 			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character)-character.PseudoStats.DodgeReduction)
 			if roll < chance {
 				spellEffect.Outcome = OutcomeDodge
-				spell.Dodges++
+				spell.SpellMetrics[spellEffect.Target.Index].Dodges++
 				*damage = 0
 				return
 			}
@@ -198,14 +198,14 @@ func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
 		// Crit (separate roll)
 		if spellEffect.physicalCritRoll(sim, spell) {
 			spellEffect.Outcome = OutcomeCrit
-			spell.Crits++
+			spell.SpellMetrics[spellEffect.Target.Index].Crits++
 			*damage *= critMultiplier
 			return
 		}
 
 		// Hit
 		spellEffect.Outcome = OutcomeHit
-		spell.Hits++
+		spell.SpellMetrics[spellEffect.Target.Index].Hits++
 	}
 }
 
@@ -219,7 +219,7 @@ func OutcomeFuncMeleeSpecialNoBlockDodgeParry(critMultiplier float64) OutcomeApp
 		chance := MaxFloat(0, missChance)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeMiss
-			spell.Misses++
+			spell.SpellMetrics[spellEffect.Target.Index].Misses++
 			*damage = 0
 			return
 		}
@@ -227,14 +227,14 @@ func OutcomeFuncMeleeSpecialNoBlockDodgeParry(critMultiplier float64) OutcomeApp
 		// Crit (separate roll)
 		if spellEffect.physicalCritRoll(sim, spell) {
 			spellEffect.Outcome = OutcomeCrit
-			spell.Crits++
+			spell.SpellMetrics[spellEffect.Target.Index].Crits++
 			*damage *= critMultiplier
 			return
 		}
 
 		// Hit
 		spellEffect.Outcome = OutcomeHit
-		spell.Hits++
+		spell.SpellMetrics[spellEffect.Target.Index].Hits++
 	}
 }
 
@@ -242,14 +242,14 @@ func OutcomeFuncMeleeSpecialCritOnly(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		if spellEffect.physicalCritRoll(sim, spell) {
 			spellEffect.Outcome = OutcomeCrit
-			spell.Crits++
+			spell.SpellMetrics[spellEffect.Target.Index].Crits++
 			*damage *= critMultiplier
 			return
 		}
 
 		// Hit
 		spellEffect.Outcome = OutcomeHit
-		spell.Hits++
+		spell.SpellMetrics[spellEffect.Target.Index].Hits++
 	}
 }
 
@@ -263,14 +263,14 @@ func OutcomeFuncRangedHit() OutcomeApplier {
 		chance := MaxFloat(0, missChance)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeMiss
-			spell.Misses++
+			spell.SpellMetrics[spellEffect.Target.Index].Misses++
 			*damage = 0
 			return
 		}
 
 		// Hit
 		spellEffect.Outcome = OutcomeHit
-		spell.Hits++
+		spell.SpellMetrics[spellEffect.Target.Index].Hits++
 	}
 }
 
@@ -284,7 +284,7 @@ func OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApplier {
 		chance := MaxFloat(0, missChance)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeMiss
-			spell.Misses++
+			spell.SpellMetrics[spellEffect.Target.Index].Misses++
 			*damage = 0
 			return
 		}
@@ -297,14 +297,14 @@ func OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApplier {
 		// Crit (separate roll)
 		if spellEffect.physicalCritRoll(sim, spell) {
 			spellEffect.Outcome = OutcomeCrit
-			spell.Crits++
+			spell.SpellMetrics[spellEffect.Target.Index].Crits++
 			*damage *= critMultiplier
 			return
 		}
 
 		// Hit
 		spellEffect.Outcome = OutcomeHit
-		spell.Hits++
+		spell.SpellMetrics[spellEffect.Target.Index].Hits++
 	}
 }
 
