@@ -41,7 +41,7 @@ export const DefaultRotation = RetributionPaladinRotation.create({
 export const DefaultOptions = RetributionPaladinOptions.create({
 	judgement: Judgement.Crusader,
 	crusaderStrikeDelayMs: 1700,
-	hasteLeewayMs: 100,
+	hasteLeewayMs: 0,
 	damageTakenPerSecond: 0,
 });
 
