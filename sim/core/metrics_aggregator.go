@@ -83,12 +83,28 @@ type CharacterIterationMetrics struct {
 type ActionMetrics struct {
 	IsMelee bool // True if melee action, false if spell action.
 
-	Casts  int32
-	Hits   int32
-	Crits  int32
-	Misses int32
+	// Metrics for this action, for each possible target.
+	Targets []TargetedActionMetrics
+}
 
-	// These will be 0 for spell actions.
+func (actionMetrics *ActionMetrics) ToProto(actionID ActionID) *proto.ActionMetrics {
+	var targetMetrics []*proto.TargetedActionMetrics
+	for _, tam := range actionMetrics.Targets {
+		targetMetrics = append(targetMetrics, tam.ToProto())
+	}
+
+	return &proto.ActionMetrics{
+		Id:      actionID.ToProto(),
+		IsMelee: actionMetrics.IsMelee,
+		Targets: targetMetrics,
+	}
+}
+
+type TargetedActionMetrics struct {
+	Casts   int32
+	Hits    int32
+	Crits   int32
+	Misses  int32
 	Dodges  int32
 	Parries int32
 	Blocks  int32
@@ -98,21 +114,18 @@ type ActionMetrics struct {
 	Threat float64
 }
 
-func (actionMetrics *ActionMetrics) ToProto(actionID ActionID) *proto.ActionMetrics {
-	return &proto.ActionMetrics{
-		Id:      actionID.ToProto(),
-		IsMelee: actionMetrics.IsMelee,
-
-		Casts:   actionMetrics.Casts,
-		Hits:    actionMetrics.Hits,
-		Crits:   actionMetrics.Crits,
-		Misses:  actionMetrics.Misses,
-		Dodges:  actionMetrics.Dodges,
-		Parries: actionMetrics.Parries,
-		Blocks:  actionMetrics.Blocks,
-		Glances: actionMetrics.Glances,
-		Damage:  actionMetrics.Damage,
-		Threat:  actionMetrics.Threat,
+func (tam *TargetedActionMetrics) ToProto() *proto.TargetedActionMetrics {
+	return &proto.TargetedActionMetrics{
+		Casts:   tam.Casts,
+		Hits:    tam.Hits,
+		Crits:   tam.Crits,
+		Misses:  tam.Misses,
+		Dodges:  tam.Dodges,
+		Parries: tam.Parries,
+		Blocks:  tam.Blocks,
+		Glances: tam.Glances,
+		Damage:  tam.Damage,
+		Threat:  tam.Threat,
 	}
 }
 
@@ -168,18 +181,25 @@ func (characterMetrics *CharacterMetrics) addSpell(spell *Spell) {
 		characterMetrics.actions[spell.ActionID] = actionMetrics
 	}
 
-	actionMetrics.Casts += spell.Casts
-	actionMetrics.Misses += spell.Misses
-	actionMetrics.Hits += spell.Hits
-	actionMetrics.Crits += spell.Crits
-	actionMetrics.Dodges += spell.Dodges
-	actionMetrics.Parries += spell.Parries
-	actionMetrics.Blocks += spell.Blocks
-	actionMetrics.Glances += spell.Glances
-	actionMetrics.Damage += spell.TotalDamage
-	actionMetrics.Threat += spell.TotalThreat
-	characterMetrics.dps.Total += spell.TotalDamage
-	characterMetrics.threat.Total += spell.TotalThreat
+	if len(actionMetrics.Targets) == 0 {
+		actionMetrics.Targets = make([]TargetedActionMetrics, len(spell.SpellMetrics))
+	}
+
+	for i, spellTargetMetrics := range spell.SpellMetrics {
+		tam := &actionMetrics.Targets[i]
+		tam.Casts += spellTargetMetrics.Casts
+		tam.Misses += spellTargetMetrics.Misses
+		tam.Hits += spellTargetMetrics.Hits
+		tam.Crits += spellTargetMetrics.Crits
+		tam.Dodges += spellTargetMetrics.Dodges
+		tam.Parries += spellTargetMetrics.Parries
+		tam.Blocks += spellTargetMetrics.Blocks
+		tam.Glances += spellTargetMetrics.Glances
+		tam.Damage += spellTargetMetrics.TotalDamage
+		tam.Threat += spellTargetMetrics.TotalThreat
+		characterMetrics.dps.Total += spellTargetMetrics.TotalDamage
+		characterMetrics.threat.Total += spellTargetMetrics.TotalThreat
+	}
 }
 
 // This should be called at the end of each iteration, to include metrics from Pets in
@@ -262,7 +282,9 @@ func GetActionDPS(playerMetrics proto.UnitMetrics, iterations int32, duration ti
 	for _, action := range playerMetrics.Actions {
 		metricsActionID := ProtoToActionID(*action.Id)
 		if actionID.SameAction(metricsActionID) || (ignoreTag && actionID.SameActionIgnoreTag(metricsActionID)) {
-			totalDPS += action.Damage / float64(iterations) / duration.Seconds()
+			for _, tam := range action.Targets {
+				totalDPS += tam.Damage / float64(iterations) / duration.Seconds()
+			}
 		}
 	}
 	return totalDPS
@@ -272,10 +294,16 @@ func GetActionDPS(playerMetrics proto.UnitMetrics, iterations int32, duration ti
 func GetActionAvgCast(playerMetrics proto.UnitMetrics, actionID ActionID) float64 {
 	for _, action := range playerMetrics.Actions {
 		if actionID.SameAction(ProtoToActionID(*action.Id)) {
-			if action.Casts == 0 {
+			casts := int32(0)
+			damage := 0.0
+			for _, tam := range action.Targets {
+				casts += tam.Casts
+				damage += tam.Damage
+			}
+			if casts == 0 {
 				return 0
 			} else {
-				return action.Damage / float64(action.Casts)
+				return damage / float64(casts)
 			}
 		}
 	}

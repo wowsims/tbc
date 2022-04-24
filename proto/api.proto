@@ -77,37 +77,45 @@ message ActionMetrics {
 		ActionID id = 1;
 
 		// True if a melee action, false if a spell action.
-		bool is_melee = 11;
+		bool is_melee = 2;
 
+		// Metrics for this action for each target.
+		// Note that some spells are untargeted, these will always have a single
+		// element in this array.
+		repeated TargetedActionMetrics targets = 3;
+}
+
+// Metrics for a specific action, when cast at a particular target.
+message TargetedActionMetrics {
 		// # of times this action was used by the agent.
-    int32 casts = 2;
+    int32 casts = 1;
 
 		// # of times this action hit a target. For cleave spells this can be larger than casts.
-    int32 hits = 3;
+    int32 hits = 2;
 
 		// # of times this action was a critical strike.
-    int32 crits = 4;
+    int32 crits = 3;
 
 		// # of times this action was a Miss or Resist.
-    int32 misses = 5;
+    int32 misses = 4;
 
 		// # of times this action was a Dodge.
-    int32 dodges = 7;
+    int32 dodges = 5;
 
 		// # of times this action was a Parry.
-    int32 parries = 8;
+    int32 parries = 6;
 
 		// # of times this action was a Block.
-    int32 blocks = 9;
+    int32 blocks = 7;
 
 		// # of times this action was a Glance.
-    int32 glances = 10;
+    int32 glances = 8;
 
 		// Total damage done to all targets by this action.
-    double damage = 6;
+    double damage = 9;
 
 		// Total threat done to all targets by this action.
-    double threat = 12;
+    double threat = 10;
 }
 
 message AuraMetrics {
