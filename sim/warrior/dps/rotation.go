@@ -58,6 +58,13 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 
 	if war.Rotation.UseSlam {
 		war.doSlamNext = true
+	} else if war.GCD.IsReady(sim) {
+		// We didn't cast anything, so wait for the next CD.
+		// Note that BT/MS share a CD timer so we don't need to check MS.
+		nextCD := core.MinDuration(war.Bloodthirst.CD.ReadyAt(), war.Whirlwind.CD.ReadyAt())
+		if nextCD > sim.CurrentTime {
+			war.WaitUntil(sim, nextCD)
+		}
 	}
 }
 

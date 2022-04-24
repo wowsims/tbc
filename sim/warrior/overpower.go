@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warrior *Warrior) registerOverpowerSpell() {
+func (warrior *Warrior) registerOverpowerSpell(cdTimer *core.Timer) {
 	actionID := core.ActionID{SpellID: 11585}
 
 	warrior.RegisterAura(core.Aura{
@@ -59,7 +59,7 @@ func (warrior *Warrior) registerOverpowerSpell() {
 			},
 			IgnoreHaste: true,
 			CD: core.Cooldown{
-				Timer:    warrior.NewTimer(),
+				Timer:    cdTimer,
 				Duration: time.Second * 5,
 			},
 		},
