@@ -155,13 +155,14 @@ func (paladin *Paladin) registerConsecrationSpellRank1(sim *core.Simulation, cdT
 	consecrationDot.Spell = paladin.ConsecrationRank1
 }
 
-func (paladin *Paladin) CastConsecrationRank(sim *core.Simulation, target *core.Target, rank proto.RetributionPaladin_Rotation_ConsecrationRank) {
+func (paladin *Paladin) CastConsecrationRank(sim *core.Simulation, target *core.Target, rank proto.RetributionPaladin_Rotation_ConsecrationRank) bool {
 	switch rank {
 	case proto.RetributionPaladin_Rotation_Rank1:
-		paladin.ConsecrationRank1.Cast(sim, target)
+		return paladin.ConsecrationRank1.Cast(sim, target)
 	case proto.RetributionPaladin_Rotation_Rank4:
-		paladin.ConsecrationRank4.Cast(sim, target)
+		return paladin.ConsecrationRank4.Cast(sim, target)
 	case proto.RetributionPaladin_Rotation_Rank6:
-		paladin.ConsecrationRank6.Cast(sim, target)
+		return paladin.ConsecrationRank6.Cast(sim, target)
 	}
+	return false
 }
