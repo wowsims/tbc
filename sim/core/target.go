@@ -49,7 +49,7 @@ func (encounter *Encounter) doneIteration(sim *Simulation) {
 
 func (encounter *Encounter) GetMetricsProto(numIterations int32) *proto.EncounterMetrics {
 	metrics := &proto.EncounterMetrics{
-		Targets: make([]*proto.TargetMetrics, len(encounter.Targets)),
+		Targets: make([]*proto.UnitMetrics, len(encounter.Targets)),
 	}
 
 	i := 0
@@ -142,8 +142,9 @@ func (target *Target) NextTarget(sim *Simulation) *Target {
 	return sim.GetTarget(nextIndex)
 }
 
-func (target *Target) GetMetricsProto(numIterations int32) *proto.TargetMetrics {
-	return &proto.TargetMetrics{
+func (target *Target) GetMetricsProto(numIterations int32) *proto.UnitMetrics {
+	return &proto.UnitMetrics{
+		Name:  target.Label,
 		Auras: target.auraTracker.GetMetricsProto(numIterations),
 	}
 }

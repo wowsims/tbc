@@ -92,7 +92,7 @@ func (party *Party) GetMetrics(numIterations int32) *proto.PartyMetrics {
 			metrics.Players = append(metrics.Players, player.GetCharacter().GetMetricsProto(numIterations))
 			playerIdx++
 		} else {
-			metrics.Players = append(metrics.Players, &proto.PlayerMetrics{})
+			metrics.Players = append(metrics.Players, &proto.UnitMetrics{})
 		}
 		i++
 	}

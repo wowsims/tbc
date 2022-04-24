@@ -388,7 +388,7 @@ func (hunter *Hunter) GetPresimOptions() *core.PresimOptions {
 			player.Spec.(*proto.Player_Hunter).Hunter.Options.RemoveRandomness = true
 		},
 
-		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32, duration time.Duration) bool {
+		OnPresimResult: func(presimResult proto.UnitMetrics, iterations int32, duration time.Duration) bool {
 			hunter.avgShootDmg = core.GetActionAvgCast(presimResult, core.ActionID{OtherID: proto.OtherAction_OtherActionShoot})
 			hunter.avgWeaveDmg = core.GetActionAvgCast(presimResult, RaptorStrikeActionID) +
 				core.GetActionAvgCast(presimResult, core.ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1})
