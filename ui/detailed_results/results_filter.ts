@@ -109,7 +109,7 @@ class PlayerFilter extends Input<FilterData, number> {
 				iconUrl: player.iconUrl,
 				text: player.label,
 				color: player.classColor,
-				value: player.raidIndex,
+				value: player.index,
 			};
 		}));
 

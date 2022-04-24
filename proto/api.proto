@@ -179,12 +179,8 @@ message RaidMetrics {
 		repeated PartyMetrics parties = 2;
 }
 
-message TargetMetrics {
-		repeated AuraMetrics auras = 1;
-}
-
 message EncounterMetrics {
-		repeated TargetMetrics targets = 1;
+		repeated UnitMetrics targets = 1;
 }
 
 // RPC RaidSim
