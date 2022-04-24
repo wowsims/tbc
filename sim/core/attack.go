@@ -396,19 +396,28 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 		return
 	}
 
-	attackSpell := aa.MHAuto
-	if aa.ReplaceMHSwing != nil {
-		// Allow MH swing to be overridden for abilities like Heroic Strike.
-		replacementSpell := aa.ReplaceMHSwing(sim)
-		if replacementSpell != nil {
-			attackSpell = replacementSpell
-		}
-	}
+	attackSpell := aa.MaybeReplaceMHSwing(sim, aa.MHAuto)
 
 	attackSpell.Cast(sim, target)
 	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	aa.previousMHSwingAt = sim.CurrentTime
 	aa.agent.OnAutoAttack(sim, attackSpell)
+}
+
+// Optionally replaces the given swing spell with an Agent-specified MH Swing replacer.
+// This is for effects like Heroic Strike or Raptor Strike.
+func (aa *AutoAttacks) MaybeReplaceMHSwing(sim *Simulation, mhSwingSpell *Spell) *Spell {
+	if aa.ReplaceMHSwing == nil {
+		return mhSwingSpell
+	}
+
+	// Allow MH swing to be overridden for abilities like Heroic Strike.
+	replacementSpell := aa.ReplaceMHSwing(sim)
+	if replacementSpell == nil {
+		return mhSwingSpell
+	} else {
+		return replacementSpell
+	}
 }
 
 // Performs an autoattack using the main hand weapon, if the OH CD is ready.

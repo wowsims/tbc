@@ -10,7 +10,7 @@ import (
 
 var MortalStrikeActionID = core.ActionID{SpellID: 30330}
 
-func (warrior *Warrior) registerMortalStrikeSpell(_ *core.Simulation) {
+func (warrior *Warrior) registerMortalStrikeSpell(_ *core.Simulation, cdTimer *core.Timer) {
 	cost := 30.0
 	if ItemSetDestroyerBattlegear.CharacterHasSetBonus(&warrior.Character, 4) {
 		cost -= 5
@@ -32,7 +32,7 @@ func (warrior *Warrior) registerMortalStrikeSpell(_ *core.Simulation) {
 			},
 			IgnoreHaste: true,
 			CD: core.Cooldown{
-				Timer:    warrior.NewTimer(),
+				Timer:    cdTimer,
 				Duration: time.Second*6 - time.Millisecond*200*time.Duration(warrior.Talents.ImprovedMortalStrike),
 			},
 		},

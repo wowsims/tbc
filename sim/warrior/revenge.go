@@ -10,7 +10,7 @@ import (
 
 var RevengeActionID = core.ActionID{SpellID: 30357}
 
-func (warrior *Warrior) registerRevengeSpell(_ *core.Simulation) {
+func (warrior *Warrior) registerRevengeSpell(cdTimer *core.Timer) {
 	cost := 5.0 - float64(warrior.Talents.FocusedRage)
 	refundAmount := cost * 0.8
 
@@ -29,7 +29,7 @@ func (warrior *Warrior) registerRevengeSpell(_ *core.Simulation) {
 			},
 			IgnoreHaste: true,
 			CD: core.Cooldown{
-				Timer:    warrior.NewTimer(),
+				Timer:    cdTimer,
 				Duration: time.Second * 5,
 			},
 		},
