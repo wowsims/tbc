@@ -144,7 +144,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BoldArmor"
  value: {
-  dps: 547.5772227983332
+  dps: 546.3429886064336
  }
 }
 dps_results: {
@@ -186,7 +186,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-CloakofDarkness-33122"
  value: {
-  dps: 573.0386829695129
+  dps: 575.9850593074163
  }
 }
 dps_results: {
@@ -240,7 +240,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Despair-28573"
  value: {
-  dps: 659.4878793512603
+  dps: 655.3974008972104
  }
 }
 dps_results: {
@@ -264,7 +264,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Devastation-30316"
  value: {
-  dps: 857.227639155913
+  dps: 858.5109141908208
  }
 }
 dps_results: {
@@ -342,7 +342,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-FaithinFelsteel"
  value: {
-  dps: 531.7725027657136
+  dps: 532.2082046700348
  }
 }
 dps_results: {
@@ -372,7 +372,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-FlameGuard"
  value: {
-  dps: 507.50418407606173
+  dps: 507.6428138148239
  }
 }
 dps_results: {
@@ -432,13 +432,13 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-LionheartChampion-28429"
  value: {
-  dps: 673.0958978217699
+  dps: 669.1794383426117
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 690.2082807445929
+  dps: 691.7823422563328
  }
 }
 dps_results: {
@@ -450,7 +450,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Mana-EtchedRegalia"
  value: {
-  dps: 486.2799270247561
+  dps: 485.74347847076643
  }
 }
 dps_results: {
@@ -492,7 +492,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-OnslaughtArmor"
  value: {
-  dps: 520.7605310902892
+  dps: 520.8616990778172
  }
 }
 dps_results: {
@@ -594,7 +594,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-SingingCrystalAxe-31318"
  value: {
-  dps: 644.9835899001861
+  dps: 646.542643395743
  }
 }
 dps_results: {
@@ -612,7 +612,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 541.7733383462805
+  dps: 541.206434197564
  }
 }
 dps_results: {
@@ -660,7 +660,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-TheBladefist-29348"
  value: {
-  dps: 587.3402648958813
+  dps: 584.79878145261
  }
 }
 dps_results: {
@@ -672,7 +672,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-TheFistsofFury"
  value: {
-  dps: 704.382134079602
+  dps: 691.8860713249938
  }
 }
 dps_results: {
@@ -702,7 +702,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-TheTwinBladesofAzzinoth"
  value: {
-  dps: 791.7372928348149
+  dps: 781.6930958269596
  }
 }
 dps_results: {
@@ -732,7 +732,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-WarbringerArmor"
  value: {
-  dps: 543.9965358304322
+  dps: 546.4304746932354
  }
 }
 dps_results: {
@@ -762,7 +762,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-WorldBreaker-30090"
  value: {
-  dps: 677.3690973891245
+  dps: 671.135578522808
  }
 }
 dps_results: {
@@ -804,7 +804,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-Settings-Human-P1-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 493.0129495719777
+  dps: 494.1219773958401
  }
 }
 dps_results: {
@@ -828,7 +828,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-Settings-Human-P1-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 224.2220716820735
+  dps: 224.2451095130042
  }
 }
 dps_results: {
@@ -852,7 +852,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-Settings-Orc-P1-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 493.6561227392764
+  dps: 491.2673126497521
  }
 }
 dps_results: {
@@ -876,7 +876,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-Settings-Orc-P1-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 226.23717441265282
+  dps: 225.41393238861215
  }
 }
 dps_results: {
