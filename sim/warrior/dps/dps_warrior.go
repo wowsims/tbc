@@ -92,6 +92,7 @@ type DpsWarrior struct {
 
 	castFirstSunder bool
 
+	doSlamNext  bool
 	castSlamAt  time.Duration
 	slamLatency time.Duration
 }
@@ -109,6 +110,8 @@ func (war *DpsWarrior) Reset(sim *core.Simulation) {
 	war.Warrior.Reset(sim)
 	war.BerserkerStanceAura.Activate(sim)
 	war.Stance = warrior.BerserkerStance
+
+	war.doSlamNext = false
 	war.castFirstSunder = false
 	war.castSlamAt = 0
 }
