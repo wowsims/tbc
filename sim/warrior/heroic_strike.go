@@ -53,10 +53,18 @@ func (warrior *Warrior) QueueHeroicStrike(sim *core.Simulation) {
 		return
 	}
 	if sim.Log != nil {
-		warrior.Log(sim, "Heroic strike queued.")
+		warrior.Log(sim, "Heroic Strike queued.")
 	}
 	warrior.heroicStrikeQueued = true
 	warrior.PseudoStats.DisableDWMissPenalty = true
+}
+
+func (warrior *Warrior) DequeueHeroicStrike(sim *core.Simulation) {
+	warrior.heroicStrikeQueued = false
+	warrior.PseudoStats.DisableDWMissPenalty = false
+	if sim.Log != nil {
+		warrior.Log(sim, "Heroic Strike dequeued.")
+	}
 }
 
 // Returns true if the regular melee swing should be used, false otherwise.
@@ -65,11 +73,7 @@ func (warrior *Warrior) TryHeroicStrike(sim *core.Simulation) *core.Spell {
 		return nil
 	}
 
-	warrior.heroicStrikeQueued = false
-	warrior.PseudoStats.DisableDWMissPenalty = false
-	if sim.Log != nil {
-		warrior.Log(sim, "Heroic strike unqueued.")
-	}
+	warrior.DequeueHeroicStrike(sim)
 	if warrior.CurrentRage() < warrior.HeroicStrike.DefaultCast.Cost {
 		return nil
 	}

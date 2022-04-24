@@ -227,7 +227,7 @@ export const WarriorRotationConfig = {
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'HS rage threshold',
-				labelTooltip: 'Queue HS when rage is above:',
+				labelTooltip: 'Heroic Strike when rage is above:',
 				changedEvent: (player: Player<Spec.SpecWarrior>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().hsRageThreshold,
 				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
