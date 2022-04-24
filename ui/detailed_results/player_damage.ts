@@ -1,4 +1,4 @@
-import { PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
+import { UnitMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { maxIndex } from '/tbc/core/utils.js';
 
 import { ColumnSortType, MetricsTable } from './metrics_table.js';
@@ -9,7 +9,7 @@ import { SourceChart } from './source_chart.js';
 declare var $: any;
 declare var tippy: any;
 
-export class PlayerDamageMetricsTable extends MetricsTable<PlayerMetrics> {
+export class PlayerDamageMetricsTable extends MetricsTable<UnitMetrics> {
 	private readonly resultsFilter: ResultsFilter;
 
 	// Cached values from most recent result.
@@ -24,7 +24,7 @@ export class PlayerDamageMetricsTable extends MetricsTable<PlayerMetrics> {
 				name: 'Amount',
 				tooltip: 'Player Damage / Raid Damage',
 				headerCellClass: 'amount-header-cell',
-				fillCell: (player: PlayerMetrics, cellElem: HTMLElement, rowElem: HTMLElement) => {
+				fillCell: (player: UnitMetrics, cellElem: HTMLElement, rowElem: HTMLElement) => {
 					cellElem.classList.add('amount-cell');
 
 					let chart: HTMLElement | null = null;
@@ -63,8 +63,8 @@ export class PlayerDamageMetricsTable extends MetricsTable<PlayerMetrics> {
 				name: 'DPS',
 				tooltip: 'Damage / Encounter Duration',
 				sort: ColumnSortType.Descending,
-				getValue: (metric: PlayerMetrics) => metric.dps.avg,
-				getDisplayString: (metric: PlayerMetrics) => metric.dps.avg.toFixed(1),
+				getValue: (metric: UnitMetrics) => metric.dps.avg,
+				getDisplayString: (metric: UnitMetrics) => metric.dps.avg.toFixed(1),
 			},
 		]);
 		this.resultsFilter = resultsFilter;
@@ -72,14 +72,14 @@ export class PlayerDamageMetricsTable extends MetricsTable<PlayerMetrics> {
 		this.maxDps = 0;
 	}
 
-	customizeRowElem(player: PlayerMetrics, rowElem: HTMLElement) {
+	customizeRowElem(player: UnitMetrics, rowElem: HTMLElement) {
 		rowElem.classList.add('player-damage-row');
 		rowElem.addEventListener('click', event => {
-			this.resultsFilter.setPlayer(this.getLastSimResult().eventID, player.raidIndex);
+			this.resultsFilter.setPlayer(this.getLastSimResult().eventID, player.index);
 		});
 	}
 
-	getGroupedMetrics(resultData: SimResultData): Array<Array<PlayerMetrics>> {
+	getGroupedMetrics(resultData: SimResultData): Array<Array<UnitMetrics>> {
 		const players = resultData.result.getPlayers(resultData.filter);
 
 		this.raidDps = resultData.result.raidMetrics.dps.avg;

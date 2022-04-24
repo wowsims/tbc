@@ -12,7 +12,7 @@ const ArcaneBlastBaseManaCost = 195.0
 const ArcaneBlastBaseCastTime = time.Millisecond * 2500
 
 func (mage *Mage) newArcaneBlastSpell(sim *core.Simulation, numStacks int32) *core.Spell {
-	mage.ArcaneBlastAura = mage.GetOrRegisterAura(&core.Aura{
+	mage.ArcaneBlastAura = mage.GetOrRegisterAura(core.Aura{
 		Label:     "Arcane Blast",
 		ActionID:  core.ActionID{SpellID: 36032},
 		Duration:  time.Second * 8,
@@ -20,48 +20,34 @@ func (mage *Mage) newArcaneBlastSpell(sim *core.Simulation, numStacks int32) *co
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			// Reset the mana cost on expiration.
 			for i := int32(0); i < 4; i++ {
-				if mage.ArcaneBlast[i].Instance.IsInUse() {
-					mage.ArcaneBlast[i].Instance.Cost.Value = core.MaxFloat(0, mage.ArcaneBlast[i].Instance.Cost.Value-3.0*ArcaneBlastBaseManaCost*0.75)
-					mage.ArcaneBlast[i].Instance.ActionID.Tag = 1
-				}
+				mage.ArcaneBlast[i].CurCast.Cost = core.MaxFloat(0, mage.ArcaneBlast[i].CurCast.Cost-3.0*ArcaneBlastBaseManaCost*0.75)
 			}
 		},
 	})
 
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDArcaneBlast},
-				Character:   &mage.Character,
-				SpellSchool: core.SpellSchoolArcane,
-				SpellExtras: SpellFlagMage,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: ArcaneBlastBaseManaCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: ArcaneBlastBaseManaCost,
-				},
-				CastTime: ArcaneBlastBaseCastTime,
-				GCD:      core.GCDDefault,
-				OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-					mage.ArcaneBlastAura.Activate(sim)
-					mage.ArcaneBlastAura.AddStack(sim)
-				},
-			},
-		},
-	}
-	spell.CastTime -= time.Duration(numStacks) * time.Second / 3
-	spell.Cost.Value += float64(numStacks) * ArcaneBlastBaseManaCost * 0.75
-	spell.ActionID.Tag = numStacks + 1
-
-	if mage.hasTristfal {
-		spell.Cost.Value += 0.2 * ArcaneBlastBaseManaCost
-	}
+	actionID := core.ActionID{SpellID: SpellIDArcaneBlast, Tag: numStacks + 1}
 
 	return mage.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolArcane,
+		SpellExtras: SpellFlagMage,
+
+		ResourceType: stats.Mana,
+		BaseCost:     ArcaneBlastBaseManaCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: ArcaneBlastBaseManaCost * (1 + 0.75*float64(numStacks) + core.TernaryFloat64(mage.hasTristfal, 0.2, 0)),
+
+				GCD:      core.GCDDefault,
+				CastTime: ArcaneBlastBaseCastTime - time.Duration(numStacks)*time.Second/3,
+			},
+			OnCastComplete: func(_ *core.Simulation, _ *core.Spell) {
+				mage.ArcaneBlastAura.Activate(sim)
+				mage.ArcaneBlastAura.AddStack(sim)
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating:  float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance,
 			BonusSpellCritRating: float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance,
@@ -76,14 +62,14 @@ func (mage *Mage) newArcaneBlastSpell(sim *core.Simulation, numStacks int32) *co
 }
 
 func (mage *Mage) ArcaneBlastCastTime(numStacks int32) time.Duration {
-	castTime := mage.ArcaneBlast[numStacks].Template.CastTime
-	castTime = time.Duration(float64(castTime) / mage.CastSpeed())
+	castTime := mage.ArcaneBlast[numStacks].DefaultCast.CastTime
+	castTime = mage.ApplyCastSpeed(castTime)
 	return castTime
 }
 
 func (mage *Mage) ArcaneBlastManaCost(numStacks int32) float64 {
-	cost := mage.ArcaneBlast[numStacks].Template.Cost.Value
-	mage.ArcaneBlast[numStacks].Template.ApplyCostModifiers(&cost)
+	cost := mage.ArcaneBlast[numStacks].DefaultCast.Cost
+	cost = mage.ArcaneBlast[numStacks].ApplyCostModifiers(cost)
 	return cost
 }
 

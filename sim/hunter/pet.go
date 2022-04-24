@@ -50,7 +50,7 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 	hp.PseudoStats.DamageDealtMultiplier *= 1.25
 
 	hp.EnableFocusBar(1.0+0.5*float64(hunter.Talents.BestialDiscipline), func(sim *core.Simulation) {
-		if !hp.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+		if hp.GCD.IsReady(sim) {
 			hp.OnGCDReady(sim)
 		}
 	})
@@ -68,8 +68,8 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 
 	// Cobra reflexes
 	hp.PseudoStats.MeleeSpeedMultiplier *= 1.3
-	hp.AutoAttacks.MHAuto.Template.Effect.DamageMultiplier *= petConfig.DamageMultiplier
-	hp.AutoAttacks.MHAuto.Template.Effect.DamageMultiplier *= 0.85
+	hp.AutoAttacks.MHEffect.DamageMultiplier *= petConfig.DamageMultiplier
+	hp.AutoAttacks.MHEffect.DamageMultiplier *= 0.85
 
 	hp.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Strength,

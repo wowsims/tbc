@@ -28,7 +28,7 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 
 	war := &ProtectionWarrior{
 		Warrior: warrior.NewWarrior(character, *warOptions.Talents, warrior.WarriorInputs{
-			Shout:                warOptions.Options.Shout,
+			ShoutType:            warOptions.Options.Shout,
 			PrecastShout:         warOptions.Options.PrecastShout,
 			PrecastShoutSapphire: warOptions.Options.PrecastShoutSapphire,
 			PrecastShoutT2:       warOptions.Options.PrecastShoutT2,
@@ -37,9 +37,12 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 		Options:  *warOptions.Options,
 	}
 
-	war.EnableRageBar(warOptions.Options.StartingRage, func(sim *core.Simulation) {
-		if !war.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
-			war.doRotation(sim)
+	war.EnableRageBar(warOptions.Options.StartingRage, core.TernaryFloat64(war.Talents.EndlessRage, 1.25, 1), func(sim *core.Simulation) {
+		if war.GCD.IsReady(sim) {
+			war.TryUseCooldowns(sim)
+			if war.GCD.IsReady(sim) {
+				war.doRotation(sim)
+			}
 		}
 	})
 	war.EnableAutoAttacks(war, core.AutoAttackOptions{
@@ -47,7 +50,11 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 		OffHand:        war.WeaponFromOffHand(war.DefaultMeleeCritMultiplier()),
 		AutoSwingMelee: true,
 		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
-			return war.TryHeroicStrike(sim)
+			if war.Rotation.UseCleave {
+				return war.TryCleave(sim)
+			} else {
+				return war.TryHeroicStrike(sim)
+			}
 		},
 	})
 
@@ -68,4 +75,5 @@ func (war *ProtectionWarrior) GetWarrior() *warrior.Warrior {
 func (war *ProtectionWarrior) Reset(sim *core.Simulation) {
 	war.Warrior.Reset(sim)
 	war.DefensiveStanceAura.Activate(sim)
+	war.Stance = warrior.DefensiveStance
 }

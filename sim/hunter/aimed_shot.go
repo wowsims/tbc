@@ -5,31 +5,32 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var AimedShotCooldownID = core.NewCooldownID()
-var AimedShotActionID = core.ActionID{SpellID: 27065, CooldownID: AimedShotCooldownID}
+var AimedShotActionID = core.ActionID{SpellID: 27065}
 
 func (hunter *Hunter) registerAimedShotSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 370}
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    AimedShotActionID,
-				Character:   &hunter.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				// Actual aimed shot has a 2.5s cast time, but we only use it as an instant precast.
-				//CastTime:       time.Millisecond * 2500,
-				//Cooldown:       time.Second * 6,
-				//GCD:            core.GCDDefault,
-				Cost:        cost,
-				BaseCost:    cost,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
-	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+	baseCost := 370.0
 
 	hunter.AimedShot = hunter.RegisterSpell(core.SpellConfig{
-		Template: ama,
+		ActionID:    AimedShotActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.02*float64(hunter.Talents.Efficiency)),
+				// Actual aimed shot has a 2.5s cast time, but we only use it as an instant precast.
+				//CastTime:       time.Millisecond * 2500,
+				//GCD:            core.GCDDefault,
+			},
+			//CD: core.Cooldown{
+			//	Timer:    hunter.NewTimer(),
+			//	Duration: time.Second * 6,
+			//},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskRangedSpecial,
 			DamageMultiplier: 1,

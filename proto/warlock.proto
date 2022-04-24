@@ -7,6 +7,7 @@ message WarlockTalents {
 		// Affliction
 		int32 suppression = 1;
 		int32 improved_corruption = 2;
+		int32 improved_drain_soul = 49;
 		int32 improved_life_tap = 3;
 		int32 soul_siphon = 4;
 		int32 improved_curse_of_agony = 5;
@@ -45,6 +46,7 @@ message WarlockTalents {
 		int32 bane = 34;
 		int32 improved_firebolt = 35;
 		int32 improved_lash_of_pain = 36;
+		int32 destructive_reach = 48;
 		int32 devastation = 37;
 		bool shadowburn = 38;
 		int32 improved_searing_pain = 39;
@@ -60,12 +62,45 @@ message WarlockTalents {
 
 message Warlock {
     message Rotation {
+		enum PrimarySpell {
+			UnknownSpell = 0;
+			Shadowbolt = 1;
+			Incinerate = 2;
+		}
+		enum Curse {
+			NoCurse = 0;
+			Elements = 1;
+			Recklessness = 2;
+			Doom = 3;
+			Agony = 4;
+			Tongues = 5;
+		}
+		PrimarySpell primary_spell = 1;
+		Curse curse = 2;
+		bool immolate = 3;
+		bool corruption = 4;
     }
     Rotation rotation = 1;
 
     WarlockTalents talents = 2;
     
     message Options {
+		enum Summon {
+			NoSummon = 0;
+			Imp = 1;
+			Voidwalker = 2;
+			Succubus = 3;
+			Felhound = 4;
+			Felgaurd = 5;
+		}
+		enum Armor {
+			NoArmor = 0;
+			FelArmor = 1;
+			DemonArmor = 2;
+		}
+		Armor armor = 1;
+		Summon summon = 2;
+		bool sacrifice_summon = 3;
     }
     Options options = 3;
 }

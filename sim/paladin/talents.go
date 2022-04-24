@@ -64,9 +64,7 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecializationToSpell(spellEffect *c
 // TO-DO: Maybe should put this in the partybuff section instead at some point
 func (paladin *Paladin) applySanctityAura() {
 	if paladin.Talents.SanctityAura {
-		paladin.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-			return core.SanctityAura(&paladin.Character, float64(paladin.Talents.ImprovedSanctityAura))
-		})
+		core.SanctityAura(&paladin.Character, float64(paladin.Talents.ImprovedSanctityAura))
 	}
 }
 
@@ -82,7 +80,7 @@ func (paladin *Paladin) applyVengeance() {
 	}
 
 	bonusPerStack := 0.01 * float64(paladin.Talents.Vengeance)
-	procAura := paladin.RegisterAura(&core.Aura{
+	procAura := paladin.RegisterAura(core.Aura{
 		Label:     "Vengeance Proc",
 		ActionID:  VengeanceActionID,
 		Duration:  VengeanceDuration,
@@ -93,18 +91,18 @@ func (paladin *Paladin) applyVengeance() {
 		},
 	})
 
-	passiveAura := paladin.RegisterAura(&core.Aura{
-		Label: "Vengeance",
+	paladin.RegisterAura(core.Aura{
+		Label:    "Vengeance",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				procAura.Activate(sim)
 				procAura.AddStack(sim)
 			}
 		},
-	})
-
-	paladin.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return passiveAura
 	})
 }
 

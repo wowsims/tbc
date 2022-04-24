@@ -11,19 +11,22 @@ const SpellIDLB12 int32 = 25449
 
 // newLightningBoltTemplate returns a cast generator for Lightning Bolt with as many fields precomputed as possible.
 func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOverload bool) *core.Spell {
-	baseManaCost := 300.0
+	baseCost := 300.0
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfThePulsingEarth {
-		baseManaCost -= 27.0
+		baseCost -= 27.0
 	}
 
-	spellTemplate := core.SimpleSpell{
-		SpellCast: shaman.newElectricSpellCast(
-			core.ActionID{
-				SpellID: SpellIDLB12,
-			},
-			baseManaCost,
-			time.Millisecond*2500,
-			isLightningOverload),
+	spellConfig := shaman.newElectricSpellConfig(
+		core.ActionID{SpellID: SpellIDLB12},
+		baseCost,
+		time.Millisecond*2500,
+		isLightningOverload)
+
+	spellConfig.Cast.ModifyCast = func(sim *core.Simulation, spell *core.Spell, cast *core.Cast) {
+		shaman.applyElectricSpellCastInitModifiers(spell, cast)
+		if shaman.NaturesSwiftnessAura != nil && shaman.NaturesSwiftnessAura.IsActive() {
+			cast.CastTime = 0
+		}
 	}
 
 	effect := shaman.newElectricSpellEffect(571, 652, 0.794, isLightningOverload)
@@ -38,32 +41,13 @@ func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOve
 			if !spellEffect.Landed() {
 				return
 			}
-			if shaman.Talents.ElementalFocus && spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				shaman.ElementalFocusStacks = 2
-			}
-
 			if sim.RandomFloat("LB Lightning Overload") > lightningOverloadChance {
 				return
 			}
 			shaman.LightningBoltLO.Cast(sim, spellEffect.Target)
 		}
-	} else {
-		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if shaman.Talents.ElementalFocus && spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				shaman.ElementalFocusStacks = 2
-			}
-		}
 	}
 
-	return shaman.RegisterSpell(core.SpellConfig{
-		Template: spellTemplate,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.Effect.Target = target
-			shaman.applyElectricSpellCastInitModifiers(&instance.SpellCast)
-			if shaman.NaturesSwiftnessAura != nil && shaman.NaturesSwiftnessAura.IsActive() {
-				instance.CastTime = 0
-			}
-		},
-		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
-	})
+	spellConfig.ApplyEffects = core.ApplyEffectFuncDirectDamage(effect)
+	return shaman.RegisterSpell(spellConfig)
 }

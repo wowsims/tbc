@@ -5,25 +5,35 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var RuptureActionID = core.ActionID{SpellID: 26867}
 var RuptureEnergyCost = 25.0
 
-func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
+func (rogue *Rogue) makeRupture(comboPoints int32) *core.Spell {
+	actionID := RuptureActionID
+	actionID.Tag = comboPoints
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
-	ability := rogue.newAbility(RuptureActionID, RuptureEnergyCost, SpellFlagFinisher|core.SpellExtrasIgnoreResists, core.ProcMaskMeleeMHSpecial)
+	numTicks := int(comboPoints) + 3
 
-	rogue.Rupture = rogue.RegisterSpell(core.SpellConfig{
-		Template: ability,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.ActionID.Tag = rogue.ComboPoints()
-			instance.Effect.Target = target
-			if rogue.deathmantle4pcProc {
-				instance.Cost.Value = 0
-				rogue.deathmantle4pcProc = false
-			}
+	return rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasIgnoreResists | rogue.finisherFlags(),
+
+		ResourceType: stats.Energy,
+		BaseCost:     RuptureEnergyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: RuptureEnergyCost,
+				GCD:  time.Second,
+			},
+			ModifyCast:  rogue.applyDeathmantle,
+			IgnoreHaste: true,
 		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier: 1,
@@ -31,23 +41,39 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
-					rogue.RuptureDot.NumberOfTicks = int(rogue.ComboPoints()) + 3
+					rogue.RuptureDot.Spell = spell
+					rogue.RuptureDot.NumberOfTicks = numTicks
 					rogue.RuptureDot.RecomputeAuraDuration()
 					rogue.RuptureDot.Apply(sim)
 					rogue.ApplyFinisher(sim, spell.ActionID)
 				} else {
 					if refundAmount > 0 {
-						rogue.AddEnergy(sim, spell.MostRecentCost*refundAmount, core.ActionID{SpellID: 31245})
+						rogue.AddEnergy(sim, spell.CurCast.Cost*refundAmount, core.ActionID{SpellID: 31245})
 					}
 				}
 			},
 		}),
 	})
+}
+
+func (rogue *Rogue) RuptureDuration(comboPoints int32) time.Duration {
+	return time.Second*6 + time.Second*2*time.Duration(comboPoints)
+}
+
+func (rogue *Rogue) registerRupture(sim *core.Simulation) {
+	rogue.Rupture = [6]*core.Spell{
+		rogue.makeRupture(0), // Just for metrics
+		rogue.makeRupture(1),
+		rogue.makeRupture(2),
+		rogue.makeRupture(3),
+		rogue.makeRupture(4),
+		rogue.makeRupture(5),
+	}
 
 	target := sim.GetPrimaryTarget()
 	rogue.RuptureDot = core.NewDot(core.Dot{
-		Spell: rogue.Rupture,
-		Aura: target.RegisterAura(&core.Aura{
+		Spell: rogue.Rupture[0],
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Rupture-" + strconv.Itoa(int(rogue.Index)),
 			ActionID: RuptureActionID,
 		}),
@@ -66,8 +92,4 @@ func (rogue *Rogue) registerRuptureSpell(sim *core.Simulation) {
 			OutcomeApplier: core.OutcomeFuncTick(),
 		}),
 	})
-}
-
-func (rogue *Rogue) RuptureDuration(comboPoints int32) time.Duration {
-	return time.Second*6 + time.Second*2*time.Duration(comboPoints)
 }

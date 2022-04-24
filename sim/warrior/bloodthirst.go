@@ -8,39 +8,35 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var BloodthirstCooldownID = core.NewCooldownID()
-var BloodthirstActionID = core.ActionID{SpellID: 30335, CooldownID: BloodthirstCooldownID}
+var BloodthirstActionID = core.ActionID{SpellID: 30335}
 
 func (warrior *Warrior) registerBloodthirstSpell(_ *core.Simulation) {
-	warrior.bloodthirstCost = 30
+	cost := 30.0
 	if ItemSetDestroyerBattlegear.CharacterHasSetBonus(&warrior.Character, 4) {
-		warrior.bloodthirstCost -= 5
+		cost -= 5
 	}
-	refundAmount := warrior.bloodthirstCost * 0.8
-
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    BloodthirstActionID,
-				Character:   &warrior.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Second * 6,
-				IgnoreHaste: true,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.bloodthirstCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.bloodthirstCost,
-				},
-			},
-		},
-	}
+	refundAmount := cost * 0.8
 
 	warrior.Bloodthirst = warrior.RegisterSpell(core.SpellConfig{
-		Template: ability,
+		ActionID:    BloodthirstActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Rage,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: cost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true,
+			CD: core.Cooldown{
+				Timer:    warrior.NewTimer(),
+				Duration: time.Second * 6,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskMeleeMHSpecial,
 
@@ -70,5 +66,5 @@ func (warrior *Warrior) registerBloodthirstSpell(_ *core.Simulation) {
 }
 
 func (warrior *Warrior) CanBloodthirst(sim *core.Simulation) bool {
-	return warrior.Talents.Bloodthirst && warrior.CurrentRage() >= warrior.bloodthirstCost && !warrior.IsOnCD(BloodthirstCooldownID, sim.CurrentTime)
+	return warrior.Talents.Bloodthirst && warrior.CurrentRage() >= warrior.Bloodthirst.DefaultCast.Cost && warrior.Bloodthirst.IsReady(sim)
 }

@@ -10,24 +10,24 @@ import (
 
 var VampiricTouchActionID = core.ActionID{SpellID: 34917}
 
+const VampiricTouchBaseCost = 425.0
+
 func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 425}
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    VampiricTouchActionID,
-				Character:   &priest.Character,
-				SpellSchool: core.SpellSchoolShadow,
-				BaseCost:    cost,
-				Cost:        cost,
-				CastTime:    time.Millisecond * 1500,
-				GCD:         core.GCDDefault,
+	priest.VampiricTouch = priest.RegisterSpell(core.SpellConfig{
+		ActionID:    VampiricTouchActionID,
+		SpellSchool: core.SpellSchoolShadow,
+
+		ResourceType: stats.Mana,
+		BaseCost:     VampiricTouchBaseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost:     VampiricTouchBaseCost,
+				GCD:      core.GCDDefault,
+				CastTime: time.Millisecond * 1500,
 			},
 		},
-	}
 
-	priest.VampiricTouch = priest.RegisterSpell(core.SpellConfig{
-		Template: template,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
@@ -43,7 +43,7 @@ func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.VampiricTouchDot = core.NewDot(core.Dot{
 		Spell: priest.VampiricTouch,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "VampiricTouch-" + strconv.Itoa(int(priest.Index)),
 			ActionID: VampiricTouchActionID,
 		}),

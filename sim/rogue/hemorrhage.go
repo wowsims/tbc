@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var HemorrhageActionID = core.ActionID{SpellID: 26864}
@@ -12,7 +13,7 @@ var HemorrhageEnergyCost = 35.0
 
 func (rogue *Rogue) registerHemorrhageSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
-	hemoAura := target.GetOrRegisterAura(&core.Aura{
+	hemoAura := target.GetOrRegisterAura(core.Aura{
 		Label:     "Hemorrhage",
 		ActionID:  HemorrhageActionID,
 		Duration:  time.Second * 15,
@@ -36,11 +37,23 @@ func (rogue *Rogue) registerHemorrhageSpell(sim *core.Simulation) {
 	})
 
 	refundAmount := HemorrhageEnergyCost * 0.8
-	ability := rogue.newAbility(HemorrhageActionID, HemorrhageEnergyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
 
 	rogue.Hemorrhage = rogue.RegisterSpell(core.SpellConfig{
-		Template:   ability,
-		ModifyCast: core.ModifyCastAssignTarget,
+		ActionID:    HemorrhageActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder,
+
+		ResourceType: stats.Energy,
+		BaseCost:     HemorrhageEnergyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: HemorrhageEnergyCost,
+				GCD:  time.Second,
+			},
+			IgnoreHaste: true,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier: 1 +

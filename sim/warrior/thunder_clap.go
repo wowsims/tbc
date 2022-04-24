@@ -7,43 +7,20 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ThunderClapCooldownID = core.NewCooldownID()
-var ThunderClapActionID = core.ActionID{SpellID: 25264, CooldownID: ThunderClapCooldownID}
+var ThunderClapActionID = core.ActionID{SpellID: 25264}
 
 func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
-	warrior.thunderClapCost = 20.0 - float64(warrior.Talents.FocusedRage)
+	cost := 20.0 - float64(warrior.Talents.FocusedRage)
 	impTCDamageMult := 1.0
 	if warrior.Talents.ImprovedThunderClap == 1 {
-		warrior.thunderClapCost -= 1
+		cost -= 1
 		impTCDamageMult = 1.4
 	} else if warrior.Talents.ImprovedThunderClap == 2 {
-		warrior.thunderClapCost -= 2
+		cost -= 2
 		impTCDamageMult = 1.7
 	} else if warrior.Talents.ImprovedThunderClap == 3 {
-		warrior.thunderClapCost -= 4
+		cost -= 4
 		impTCDamageMult = 2
-	}
-
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    ThunderClapActionID,
-				Character:   &warrior.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Second * 4,
-				IgnoreHaste: true,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.thunderClapCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.thunderClapCost,
-				},
-				SpellExtras: core.SpellExtrasBinary,
-			},
-		},
 	}
 
 	baseEffect := core.SpellEffect{
@@ -72,11 +49,32 @@ func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 	}
 
 	warrior.ThunderClap = warrior.RegisterSpell(core.SpellConfig{
-		Template:     ability,
+		ActionID:    ThunderClapActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasBinary,
+
+		ResourceType: stats.Rage,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: cost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true,
+			CD: core.Cooldown{
+				Timer:    warrior.NewTimer(),
+				Duration: time.Second * 4,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
 	})
 }
 
 func (warrior *Warrior) CanThunderClap(sim *core.Simulation) bool {
-	return warrior.StanceMatches(BattleStance|DefensiveStance) && warrior.CurrentRage() >= warrior.thunderClapCost && !warrior.IsOnCD(ThunderClapCooldownID, sim.CurrentTime)
+	return warrior.StanceMatches(BattleStance|DefensiveStance) && warrior.CanThunderClapIgnoreStance(sim)
+}
+func (warrior *Warrior) CanThunderClapIgnoreStance(sim *core.Simulation) bool {
+	return warrior.CurrentRage() >= warrior.ThunderClap.DefaultCast.Cost && warrior.ThunderClap.IsReady(sim)
 }

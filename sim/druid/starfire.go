@@ -12,45 +12,25 @@ import (
 const SpellIDSF8 int32 = 26986
 const SpellIDSF6 int32 = 9876
 
+var Starfire8ActionID = core.ActionID{SpellID: SpellIDSF8}
+var Starfire6ActionID = core.ActionID{SpellID: SpellIDSF6}
+
 // Idol IDs
 const IvoryMoongoddess int32 = 27518
 
 func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Spell {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDSF8},
-				Character:   &druid.Character,
-				SpellSchool: core.SpellSchoolArcane,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 370,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 370,
-				},
-				CastTime: time.Millisecond * 3500,
-				GCD:      core.GCDDefault,
-			},
-		},
-	}
-
+	actionID := Starfire8ActionID
+	baseCost := 370.0
 	minBaseDamage := 550.0
 	maxBaseDamage := 647.0
 	spellCoefficient := 1.0
 	if rank == 6 {
-		template.BaseCost.Value = 315
-		template.Cost.Value = 315
-		template.ActionID = core.ActionID{
-			SpellID: SpellIDSF6,
-		}
+		actionID = Starfire6ActionID
+		baseCost = 315
 		minBaseDamage = 463
 		maxBaseDamage = 543
 		spellCoefficient = 0.99
 	}
-	template.Cost.Value -= template.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
-	template.CastTime -= time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)
 
 	// This seems to be unaffected by wrath of cenarius so it needs to come first.
 	bonusFlatDamage := core.TernaryFloat64(druid.Equip[items.ItemSlotRanged].ID == IvoryMoongoddess, 55*spellCoefficient, 0)
@@ -62,7 +42,6 @@ func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Spell
 		ThreatMultiplier:     1,
 		BaseDamage:           core.BaseDamageConfigMagic(minBaseDamage+bonusFlatDamage, maxBaseDamage+bonusFlatDamage, spellCoefficient),
 		OutcomeApplier:       core.OutcomeFuncMagicHitAndCrit(druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance))),
-		OnSpellHit:           druid.applyOnHitTalents,
 	}
 
 	if ItemSetNordrassil.CharacterHasSetBonus(&druid.Character, 4) {
@@ -82,12 +61,25 @@ func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Spell
 	}
 
 	return druid.RegisterSpell(core.SpellConfig{
-		Template: template,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			instance.Effect.Target = target
-			druid.applyNaturesGrace(&instance.SpellCast)
-			druid.applyNaturesSwiftness(&instance.SpellCast)
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolArcane,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost:     baseCost * (1 - 0.03*float64(druid.Talents.Moonglow)),
+				GCD:      core.GCDDefault,
+				CastTime: time.Millisecond*3500 - (time.Millisecond * 100 * time.Duration(druid.Talents.StarlightWrath)),
+			},
+
+			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
+				druid.applyNaturesGrace(cast)
+				druid.applyNaturesSwiftness(cast)
+			},
 		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }

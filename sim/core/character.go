@@ -73,7 +73,6 @@ type Character struct {
 	// a MH imbue.
 	// TODO: Figure out a cleaner way to do this.
 	HasMHWeaponImbue bool
-	HasWFTotem       bool
 
 	// GCD-related PendingActions for this character.
 	gcdAction      *PendingAction
@@ -86,6 +85,10 @@ type Character struct {
 	// Cached mana return values per tick.
 	manaTickWhileCasting    float64
 	manaTickWhileNotCasting float64
+
+	defensiveTrinketCD *Timer
+	offensiveTrinketCD *Timer
+	conjuredCD         *Timer
 }
 
 func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
@@ -109,6 +112,8 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 
 		majorCooldownManager: newMajorCooldownManager(player.Cooldowns),
 	}
+
+	character.GCD = character.NewTimer()
 
 	character.Label = fmt.Sprintf("%s (#%d)", character.Name, character.Index+1)
 
@@ -321,6 +326,10 @@ func (character *Character) CastSpeed() float64 {
 	return character.PseudoStats.CastSpeedMultiplier * (1 + (character.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100)))
 }
 
+func (character *Character) ApplyCastSpeed(dur time.Duration) time.Duration {
+	return time.Duration(float64(dur) / character.CastSpeed())
+}
+
 func (character *Character) SwingSpeed() float64 {
 	return character.PseudoStats.MeleeSpeedMultiplier * (1 + (character.stats[stats.MeleeHaste] / (HasteRatingPerHastePercent * 100)))
 }
@@ -414,7 +423,13 @@ func (character *Character) Finalize(raid *Raid) {
 	}
 }
 
+func (character *Character) init(sim *Simulation, agent Agent) {
+	character.Unit.init(sim)
+	agent.Init(sim)
+}
+
 func (character *Character) reset(sim *Simulation, agent Agent) {
+	character.majorCooldownManager.reset(sim)
 	character.Unit.reset(sim)
 
 	character.ExpectedBonusMana = 0
@@ -423,18 +438,15 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 	character.energyBar.reset(sim)
 	character.rageBar.reset(sim)
 
-	character.majorCooldownManager.reset(sim)
 	character.AutoAttacks.reset(sim)
 
 	for _, petAgent := range character.Pets {
 		petAgent.GetPet().reset(sim, petAgent)
-		petAgent.Reset(sim)
 	}
 
-	if character.gcdAction != nil {
-		sim.pendingActionPool.Put(character.gcdAction)
-	}
 	character.gcdAction = character.newGCDAction(sim, agent)
+
+	agent.Reset(sim)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
@@ -535,10 +547,7 @@ func (character *Character) doneIteration(sim *Simulation) {
 		}
 	}
 
-	if character.Hardcast.Cast != nil {
-		character.Hardcast.Cast.Cancel()
-		character.Hardcast = Hardcast{}
-	}
+	character.Hardcast = Hardcast{}
 	character.doneIterationGCD(sim.Duration)
 
 	character.Unit.doneIteration(sim)
@@ -558,12 +567,12 @@ func (character *Character) GetStatsProto() *proto.PlayerStats {
 	}
 }
 
-func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMetrics {
+func (character *Character) GetMetricsProto(numIterations int32) *proto.UnitMetrics {
 	metrics := character.Metrics.ToProto(numIterations)
 	metrics.Name = character.Name
 	metrics.Auras = character.auraTracker.GetMetricsProto(numIterations)
 
-	metrics.Pets = []*proto.PlayerMetrics{}
+	metrics.Pets = []*proto.UnitMetrics{}
 	for _, petAgent := range character.Pets {
 		metrics.Pets = append(metrics.Pets, petAgent.GetPet().GetMetricsProto(numIterations))
 	}
@@ -590,3 +599,13 @@ var BaseStats = map[BaseStatsKey]stats.Stats{}
 // Base mana can be looked up here: https://wowwiki-archive.fandom.com/wiki/Base_mana
 
 // I assume a similar processes can be applied for other stats.
+
+func (character *Character) GetDefensiveTrinketCD() *Timer {
+	return character.GetOrInitTimer(&character.defensiveTrinketCD)
+}
+func (character *Character) GetOffensiveTrinketCD() *Timer {
+	return character.GetOrInitTimer(&character.offensiveTrinketCD)
+}
+func (character *Character) GetConjuredCD() *Timer {
+	return character.GetOrInitTimer(&character.conjuredCD)
+}

@@ -9,8 +9,7 @@ import (
 )
 
 func (rogue *Rogue) ApplyTalents() {
-	// TODO: Puncturing Wounds, IEA, poisons, mutilate, blade flurry, adrenaline rush
-	// Everything in the sub tree
+	// TODO: Last few talents in the sub tree.
 
 	rogue.applyMurder()
 	rogue.applySealFate()
@@ -23,6 +22,10 @@ func (rogue *Rogue) ApplyTalents() {
 	rogue.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*1*float64(rogue.Talents.Precision))
 	rogue.AddStat(stats.Expertise, core.ExpertisePerQuarterPercentReduction*5*float64(rogue.Talents.WeaponExpertise))
 	rogue.AddStat(stats.ArmorPenetration, 186*float64(rogue.Talents.SerratedBlades))
+
+	if rogue.Talents.DualWieldSpecialization > 0 {
+		rogue.AutoAttacks.OHEffect.BaseDamage.Calculator = core.BaseDamageFuncMeleeWeapon(core.OffHand, false, 0, 1+0.1*float64(rogue.Talents.DualWieldSpecialization), true)
+	}
 
 	if rogue.Talents.Vitality > 0 {
 		agiBonus := 1 + 0.01*float64(rogue.Talents.Vitality)
@@ -77,7 +80,7 @@ func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim 
 	var fwAura *core.Aura
 	findWeaknessMultiplier := 1.0 + 0.02*float64(rogue.Talents.FindWeakness)
 	if findWeaknessMultiplier != 1 {
-		fwAura = rogue.GetOrRegisterAura(&core.Aura{
+		fwAura = rogue.GetOrRegisterAura(core.Aura{
 			Label:    "Find Weakness",
 			ActionID: core.ActionID{SpellID: 31242},
 			Duration: time.Second * 10,
@@ -125,16 +128,14 @@ func (rogue *Rogue) applyMurder() {
 	})
 }
 
-var ColdBloodCooldownID = core.NewCooldownID()
-
 func (rogue *Rogue) registerColdBloodCD() {
 	if !rogue.Talents.ColdBlood {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 14177, CooldownID: ColdBloodCooldownID}
+	actionID := core.ActionID{SpellID: 14177}
 
-	coldBloodAura := rogue.RegisterAura(&core.Aura{
+	coldBloodAura := rogue.RegisterAura(core.Aura{
 		Label:    "Cold Blood",
 		ActionID: actionID,
 		Duration: core.NeverExpires,
@@ -149,37 +150,24 @@ func (rogue *Rogue) registerColdBloodCD() {
 		},
 	})
 
-	cooldown := time.Minute * 3
+	coldBloodSpell := rogue.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: rogue.GetCharacter(),
-			Cooldown:  cooldown,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				coldBloodAura.Activate(sim)
+		Cast: core.CastConfig{
+			CD: core.Cooldown{
+				Timer:    rogue.NewTimer(),
+				Duration: time.Minute * 3,
 			},
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			coldBloodAura.Activate(sim)
+		},
+	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: ColdBloodCooldownID,
-		Cooldown:   cooldown,
-		Type:       core.CooldownTypeDPS,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
-			}
-		},
+		Spell: coldBloodSpell,
+		Type:  core.CooldownTypeDPS,
 	})
 }
 
@@ -190,23 +178,25 @@ func (rogue *Rogue) applySealFate() {
 
 	procChance := 0.2 * float64(rogue.Talents.SealFate)
 
-	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return rogue.GetOrRegisterAura(&core.Aura{
-			Label: "Seal Fate",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spell.SpellExtras.Matches(SpellFlagBuilder) {
-					return
-				}
+	rogue.RegisterAura(core.Aura{
+		Label:    "Seal Fate",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spell.SpellExtras.Matches(SpellFlagBuilder) {
+				return
+			}
 
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					return
-				}
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				return
+			}
 
-				if procChance == 1 || sim.RandomFloat("Seal Fate") < procChance {
-					rogue.AddComboPoints(sim, 1, core.ActionID{SpellID: 14195})
-				}
-			},
-		})
+			if procChance == 1 || sim.RandomFloat("Seal Fate") < procChance {
+				rogue.AddComboPoints(sim, 1, core.ActionID{SpellID: 14195})
+			}
+		},
 	})
 }
 
@@ -217,7 +207,8 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 		} else if weapon.WeaponType == proto.WeaponType_WeaponTypeDagger {
 			rogue.PseudoStats.BonusMHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.DaggerSpecialization)
 		}
-	} else if weapon := rogue.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
+	}
+	if weapon := rogue.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
 		if weapon.WeaponType == proto.WeaponType_WeaponTypeFist {
 			rogue.PseudoStats.BonusOHCritRating += 1 * core.MeleeCritRatingPerCritChance * float64(rogue.Talents.FistWeaponSpecialization)
 		} else if weapon.WeaponType == proto.WeaponType_WeaponTypeDagger {
@@ -234,41 +225,48 @@ func (rogue *Rogue) applyWeaponSpecializations() {
 		swordSpecMask |= core.ProcMaskMeleeOH
 	}
 	if rogue.Talents.SwordSpecialization > 0 && swordSpecMask != core.ProcMaskEmpty {
-		rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-			procChance := 0.01 * float64(rogue.Talents.SwordSpecialization)
-			var icd core.InternalCD
-			icdDur := time.Millisecond * 500
+		var swordSpecializationSpell *core.Spell
+		icd := core.Cooldown{
+			Timer:    rogue.NewTimer(),
+			Duration: time.Millisecond * 500,
+		}
+		procChance := 0.01 * float64(rogue.Talents.SwordSpecialization)
 
-			template := rogue.AutoAttacks.MHAuto.Template
-			template.ActionID = core.ActionID{SpellID: 13964}
-			swordSpecializationSpell := rogue.GetOrRegisterSpell(core.SpellConfig{
-				Template:   template,
-				ModifyCast: core.ModifyCastAssignTarget,
-			})
+		rogue.RegisterAura(core.Aura{
+			Label:    "Sword Specialization",
+			Duration: core.NeverExpires,
+			OnInit: func(aura *core.Aura, sim *core.Simulation) {
+				swordSpecializationSpell = rogue.GetOrRegisterSpell(core.SpellConfig{
+					ActionID:    core.ActionID{SpellID: 13964},
+					SpellSchool: core.SpellSchoolPhysical,
+					SpellExtras: core.SpellExtrasMeleeMetrics,
 
-			return rogue.GetOrRegisterAura(&core.Aura{
-				Label: "Sword Specialization",
-				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-					if !spellEffect.Landed() {
-						return
-					}
+					ApplyEffects: core.ApplyEffectFuncDirectDamage(rogue.AutoAttacks.MHEffect),
+				})
+			},
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Activate(sim)
+			},
+			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
 
-					if !spellEffect.ProcMask.Matches(swordSpecMask) {
-						return
-					}
+				if !spellEffect.ProcMask.Matches(swordSpecMask) {
+					return
+				}
 
-					if icd.IsOnCD(sim) {
-						return
-					}
+				if !icd.IsReady(sim) {
+					return
+				}
 
-					if sim.RandomFloat("Sword Specialization") > procChance {
-						return
-					}
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
+				if sim.RandomFloat("Sword Specialization") > procChance {
+					return
+				}
+				icd.Use(sim)
 
-					swordSpecializationSpell.Cast(sim, spellEffect.Target)
-				},
-			})
+				swordSpecializationSpell.Cast(sim, spellEffect.Target)
+			},
 		})
 	}
 }
@@ -281,94 +279,128 @@ func (rogue *Rogue) applyCombatPotency() {
 	const procChance = 0.2
 	energyBonus := 3.0 * float64(rogue.Talents.CombatPotency)
 
-	rogue.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return rogue.GetOrRegisterAura(&core.Aura{
-			Label: "Combat Potency",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
-					return
-				}
+	rogue.RegisterAura(core.Aura{
+		Label:    "Combat Potency",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() {
+				return
+			}
 
-				// https://tbc.wowhead.com/spell=35553/combat-potency, proc mask = 8838608.
-				if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOH) {
-					return
-				}
+			// https://tbc.wowhead.com/spell=35553/combat-potency, proc mask = 8838608.
+			if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOH) {
+				return
+			}
 
-				if sim.RandomFloat("Combat Potency") > procChance {
-					return
-				}
+			if sim.RandomFloat("Combat Potency") > procChance {
+				return
+			}
 
-				rogue.AddEnergy(sim, energyBonus, core.ActionID{SpellID: 35553})
-			},
-		})
+			rogue.AddEnergy(sim, energyBonus, core.ActionID{SpellID: 35553})
+		},
 	})
 }
-
-var BladeFlurryCooldownID = core.NewCooldownID()
 
 func (rogue *Rogue) registerBladeFlurryCD() {
 	if !rogue.Talents.BladeFlurry {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 13877, CooldownID: BladeFlurryCooldownID}
+	actionID := core.ActionID{SpellID: 13877}
+
+	var curDmg float64
+	bfHit := rogue.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		Cast: core.CastConfig{
+			DisableCallbacks: true,
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamageTargetModifiersOnly(core.SpellEffect{
+			// No proc mask, so it won't proc itself.
+
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage: core.BaseDamageConfig{
+				Calculator: func(_ *core.Simulation, _ *core.SpellEffect, _ *core.Spell) float64 {
+					return curDmg
+				},
+			},
+			OutcomeApplier: core.OutcomeFuncAlwaysHit(),
+		}),
+	})
+
 	const hasteBonus = 1.2
 	const inverseHasteBonus = 1 / 1.2
 	const energyCost = 25.0
 
 	dur := time.Second * 15
-	cooldown := time.Minute * 2
 
-	rogue.BladeFlurryAura = rogue.RegisterAura(&core.Aura{
+	rogue.BladeFlurryAura = rogue.RegisterAura(core.Aura{
 		Label:    "Blade Flurry",
 		ActionID: actionID,
 		Duration: dur,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, hasteBonus)
-			if sim.GetNumTargets() > 1 {
-				rogue.PseudoStats.DamageDealtMultiplier *= 2
-			}
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			rogue.MultiplyMeleeSpeed(sim, inverseHasteBonus)
-			if sim.GetNumTargets() > 1 {
-				rogue.PseudoStats.DamageDealtMultiplier /= 2
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if sim.GetNumTargets() < 2 {
+				return
 			}
+			if spellEffect.Damage == 0 || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				return
+			}
+
+			// Undo armor reduction to get the raw damage value.
+			curDmg = spellEffect.Damage / spellEffect.Target.ArmorDamageReduction(rogue.GetStat(stats.ArmorPenetration))
+
+			bfHit.Cast(sim, spellEffect.Target.NextTarget(sim))
+			bfHit.SpellMetrics[spellEffect.Target.Index].Casts--
 		},
 	})
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:    actionID,
-			Character:   rogue.GetCharacter(),
-			Cooldown:    cooldown,
-			GCD:         time.Second,
-			IgnoreHaste: true,
-			Cost: core.ResourceCost{
-				Type:  stats.Energy,
-				Value: energyCost,
+	cooldownDur := time.Minute * 2
+	bladeFlurrySpell := rogue.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		ResourceType: stats.Energy,
+		BaseCost:     energyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: energyCost,
+				GCD:  time.Second,
 			},
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				rogue.BladeFlurryAura.Activate(sim)
+			IgnoreHaste: true,
+			CD: core.Cooldown{
+				Timer:    rogue.NewTimer(),
+				Duration: cooldownDur,
 			},
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			rogue.BladeFlurryAura.Activate(sim)
+		},
+	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: BladeFlurryCooldownID,
-		Cooldown:   cooldown,
-		UsesGCD:    true,
-		Type:       core.CooldownTypeDPS,
-		Priority:   core.CooldownPriorityLow,
+		Spell:    bladeFlurrySpell,
+		Type:     core.CooldownTypeDPS,
+		Priority: core.CooldownPriorityLow,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if rogue.CurrentEnergy() < energyCost {
-				return false
-			}
-			return true
+			return rogue.CurrentEnergy() >= energyCost
 		},
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if sim.GetRemainingDuration() > cooldown+dur {
+			if sim.GetRemainingDuration() > cooldownDur+dur {
 				// We'll have enough time to cast another BF, so use it immediately to make sure we get the 2nd one.
 				return true
 			}
@@ -383,26 +415,17 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 
 			return false
 		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
-			}
-		},
 	})
 }
-
-var AdrenalineRushCooldownID = core.NewCooldownID()
 
 func (rogue *Rogue) registerAdrenalineRushCD() {
 	if !rogue.Talents.AdrenalineRush {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 13750, CooldownID: AdrenalineRushCooldownID}
+	actionID := core.ActionID{SpellID: 13750}
 
-	rogue.AdrenalineRushAura = rogue.RegisterAura(&core.Aura{
+	rogue.AdrenalineRushAura = rogue.RegisterAura(core.Aura{
 		Label:    "Adrenaline Rush",
 		ActionID: actionID,
 		Duration: time.Second * 15,
@@ -416,31 +439,29 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 		},
 	})
 
-	cooldown := time.Minute * 5
+	adrenalineRushSpell := rogue.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
 
-	template := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:    actionID,
-			Character:   rogue.GetCharacter(),
-			Cooldown:    cooldown,
-			GCD:         time.Second,
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				GCD: time.Second,
+			},
 			IgnoreHaste: true,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				rogue.AdrenalineRushAura.Activate(sim)
+			CD: core.Cooldown{
+				Timer:    rogue.NewTimer(),
+				Duration: time.Minute * 5,
 			},
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+			rogue.AdrenalineRushAura.Activate(sim)
+		},
+	})
 
 	rogue.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: AdrenalineRushCooldownID,
-		Cooldown:   cooldown,
-		UsesGCD:    true,
-		Type:       core.CooldownTypeDPS,
-		Priority:   core.CooldownPriorityBloodlust,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
+		Spell:    adrenalineRushSpell,
+		Type:     core.CooldownTypeDPS,
+		Priority: core.CooldownPriorityBloodlust,
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			// Make sure we have plenty of room so the big ticks dont get wasted.
 			thresh := 85.0
@@ -451,13 +472,6 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 				return false
 			}
 			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				cast := template
-				cast.Init(sim)
-				cast.StartCast(sim)
-			}
 		},
 	})
 }

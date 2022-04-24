@@ -80,8 +80,6 @@ func NewShaman(character core.Character, talents proto.ShamanTalents, totems pro
 		shaman.AddStat(stats.MP5, 50)
 	}
 
-	shaman.registerBloodlustCD()
-
 	return shaman
 }
 
@@ -115,9 +113,6 @@ type Shaman struct {
 	NextTotemDropType [4]int32
 	NextTotemDrops    [4]time.Duration
 
-	ElementalFocusStacks byte
-
-	// Precomputed templated cast generator for quickly resetting cast fields.
 	LightningBolt   *core.Spell
 	LightningBoltLO *core.Spell
 
@@ -126,30 +121,28 @@ type Shaman struct {
 
 	Stormstrike *core.Spell
 
-	// Shocks
 	EarthShock *core.Spell
-	FrostShock *core.Spell
 	FlameShock *core.Spell
+	FrostShock *core.Spell
 
-	strengthOfEarthTotemTemplate core.SimpleCast
-	tremorTotemTemplate          core.SimpleCast
-	graceOfAirTotemTemplate      core.SimpleCast
-	wrathOfAirTotemTemplate      core.SimpleCast
-	tranquilAirTotemTemplate     core.SimpleCast
-	windfuryTotemTemplate        core.SimpleCast
-	totemOfWrathTemplate         core.SimpleCast
-	manaSpringTotemTemplate      core.SimpleCast
-	totemSpell                   core.SimpleCast
-
-	SearingTotem  *core.Spell
-	MagmaTotem    *core.Spell
-	FireNovaTotem *core.Spell
+	FireNovaTotem        *core.Spell
+	GraceOfAirTotem      *core.Spell
+	MagmaTotem           *core.Spell
+	ManaSpringTotem      *core.Spell
+	SearingTotem         *core.Spell
+	StrengthOfEarthTotem *core.Spell
+	TotemOfWrath         *core.Spell
+	TranquilAirTotem     *core.Spell
+	TremorTotem          *core.Spell
+	WindfuryTotem        *core.Spell
+	WrathOfAirTotem      *core.Spell
 
 	FlameShockDot    *core.Dot
 	SearingTotemDot  *core.Dot
 	MagmaTotemDot    *core.Dot
 	FireNovaTotemDot *core.Dot
 
+	ClearcastingAura     *core.Aura
 	ElementalMasteryAura *core.Aura
 	NaturesSwiftnessAura *core.Aura
 	ShamanisticFocusAura *core.Aura
@@ -245,22 +238,18 @@ func (shaman *Shaman) Init(sim *core.Simulation) {
 		shaman.ChainLightningLOs = append(shaman.ChainLightningLOs, shaman.newChainLightningSpell(sim, true))
 	}
 
-	shaman.registerEarthShockSpell(sim)
-	shaman.registerFlameShockSpell(sim)
-	shaman.registerFrostShockSpell(sim)
-
-	shaman.strengthOfEarthTotemTemplate = shaman.newStrengthOfEarthTotemTemplate(sim)
-	shaman.tremorTotemTemplate = shaman.newTremorTotemTemplate(sim)
-	shaman.wrathOfAirTotemTemplate = shaman.newWrathOfAirTotemTemplate(sim)
-	shaman.tranquilAirTotemTemplate = shaman.newTranquilAirTotemTemplate(sim)
-	shaman.graceOfAirTotemTemplate = shaman.newGraceOfAirTotemTemplate(sim)
-	shaman.windfuryTotemTemplate = shaman.newWindfuryTotemTemplate(sim, shaman.Totems.WindfuryTotemRank)
-	shaman.manaSpringTotemTemplate = shaman.newManaSpringTotemTemplate(sim)
-	shaman.totemOfWrathTemplate = shaman.newTotemOfWrathTemplate(sim)
-
-	shaman.registerSearingTotemSpell(sim)
+	shaman.registerShocks(sim)
+	shaman.registerGraceOfAirTotemSpell(sim)
 	shaman.registerMagmaTotemSpell(sim)
+	shaman.registerManaSpringTotemSpell(sim)
 	shaman.registerNovaTotemSpell(sim)
+	shaman.registerSearingTotemSpell(sim)
+	shaman.registerStrengthOfEarthTotemSpell(sim)
+	shaman.registerTotemOfWrathSpell(sim)
+	shaman.registerTranquilAirTotemSpell(sim)
+	shaman.registerTremorTotemSpell(sim)
+	shaman.registerWindfuryTotemSpell(sim, shaman.Totems.WindfuryTotemRank)
+	shaman.registerWrathOfAirTotemSpell(sim)
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {
@@ -299,8 +288,6 @@ func (shaman *Shaman) Reset(sim *core.Simulation) {
 			}
 		}
 	}
-
-	shaman.ElementalFocusStacks = 0
 }
 
 func (shaman *Shaman) ElementalCritMultiplier() float64 {

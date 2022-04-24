@@ -1,4 +1,4 @@
-import { ActionMetrics, PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
+import { ActionMetrics, UnitMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
@@ -200,10 +200,10 @@ export abstract class MetricsTable<T> extends ResultComponent {
 		};
 	}
 
-	static playerNameCellConfig(): MetricsColumnConfig<PlayerMetrics> {
+	static playerNameCellConfig(): MetricsColumnConfig<UnitMetrics> {
 		return {
 			name: 'Name',
-			fillCell: (player: PlayerMetrics, cellElem: HTMLElement, rowElem: HTMLElement) => {
+			fillCell: (player: UnitMetrics, cellElem: HTMLElement, rowElem: HTMLElement) => {
 				cellElem.innerHTML = `
 				<img class="metrics-action-icon" src="${player.iconUrl}"></img>
 				<span class="metrics-action-name" style="color:${player.classColor}">${player.label}</span>

@@ -22,22 +22,24 @@ var ItemSetMalorne = core.ItemSet{
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
-			character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-				return character.GetOrRegisterAura(&core.Aura{
-					Label: "Malorne Raiment 2pc",
-					OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-						if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-							return
-						}
-						if !spellEffect.Landed() {
-							return
-						}
-						if sim.RandomFloat("malorne 2p") > 0.05 {
-							return
-						}
-						spell.Character.AddMana(sim, 120, core.ActionID{SpellID: 37295}, false)
-					},
-				})
+			character.RegisterAura(core.Aura{
+				Label:    "Malorne Raiment 2pc",
+				Duration: core.NeverExpires,
+				OnReset: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Activate(sim)
+				},
+				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+					if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+						return
+					}
+					if !spellEffect.Landed() {
+						return
+					}
+					if sim.RandomFloat("malorne 2p") > 0.05 {
+						return
+					}
+					spell.Character.AddMana(sim, 120, core.ActionID{SpellID: 37295}, false)
+				},
 			})
 		},
 		4: func(agent core.Agent) {
@@ -71,63 +73,72 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 	druidAgent := agent.(Agent)
 	druid := druidAgent.GetDruid()
 
-	druid.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := druid.NewTemporaryStatsAura("Living Root Proc", core.ActionID{ItemID: 30664}, stats.Stats{stats.SpellPower: 209}, time.Second*15)
-		return druid.GetOrRegisterAura(&core.Aura{
-			Label: "Living Root of the Wildheart",
-			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, cast *core.Cast) {
-				// technically only works while in moonkin form... but i think we can assume thats always true.
-				if druid.Talents.MoonkinForm {
-					if sim.RandomFloat("Living Root of the Wildheart") > 0.03 {
-						return
-					}
-					procAura.Activate(sim)
+	procAura := druid.NewTemporaryStatsAura("Living Root Proc", core.ActionID{ItemID: 30664}, stats.Stats{stats.SpellPower: 209}, time.Second*15)
+
+	druid.RegisterAura(core.Aura{
+		Label:    "Living Root of the Wildheart",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			// technically only works while in moonkin form... but i think we can assume thats always true.
+			if druid.Talents.MoonkinForm {
+				if sim.RandomFloat("Living Root of the Wildheart") > 0.03 {
+					return
 				}
-			},
-		})
+				procAura.Activate(sim)
+			}
+		},
 	})
 }
 
 func ApplyIdoloftheUnseenMoon(agent core.Agent) {
-	actionID := core.ActionID{ItemID: 33510}
-
 	druidAgent := agent.(Agent)
 	druid := druidAgent.GetDruid()
-	druid.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := druid.NewTemporaryStatsAura("Idol of the Unseen Moon Proc", actionID, stats.Stats{stats.SpellPower: 140}, time.Second*10)
-		return druid.GetOrRegisterAura(&core.Aura{
-			Label: "Idol of the Unseen Moon",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spell.ActionID.SpellID == SpellIDMoonfire {
-					if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
-						return
-					}
-					procAura.Activate(sim)
+
+	actionID := core.ActionID{ItemID: 33510}
+	procAura := druid.NewTemporaryStatsAura("Idol of the Unseen Moon Proc", actionID, stats.Stats{stats.SpellPower: 140}, time.Second*10)
+
+	druid.RegisterAura(core.Aura{
+		Label:    "Idol of the Unseen Moon",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell.ActionID.SpellID == SpellIDMoonfire {
+				if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
+					return
 				}
-			},
-		})
+				procAura.Activate(sim)
+			}
+		},
 	})
 }
 
 func ApplyAshtongueTalisman(agent core.Agent) {
+	char := agent.GetCharacter()
+
 	// Not in the game yet so cant test; this logic assumes that:
 	// - does not affect the starfire which procs it
 	// - can proc off of any completed cast, not just hits
 	actionID := core.ActionID{ItemID: 32486}
+	procAura := char.NewTemporaryStatsAura("Ashtongue Talisman Proc", actionID, stats.Stats{stats.SpellPower: 150}, time.Second*8)
 
-	char := agent.GetCharacter()
-	char.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := char.NewTemporaryStatsAura("Ashtongue Talisman Proc", actionID, stats.Stats{stats.SpellPower: 150}, time.Second*8)
-		return char.GetOrRegisterAura(&core.Aura{
-			Label: "Ashtongue Talisman",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spell.ActionID.SpellID == SpellIDSF8 || spell.ActionID.SpellID == SpellIDSF6 {
-					if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
-						return
-					}
-					procAura.Activate(sim)
+	char.RegisterAura(core.Aura{
+		Label:    "Ashtongue Talisman",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell.ActionID.SpellID == SpellIDSF8 || spell.ActionID.SpellID == SpellIDSF6 {
+				if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
+					return
 				}
-			},
-		})
+				procAura.Activate(sim)
+			}
+		},
 	})
 }

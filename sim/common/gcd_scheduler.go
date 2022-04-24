@@ -250,7 +250,7 @@ func (gs *GCDScheduler) ScheduleMCD(sim *core.Simulation, character *core.Charac
 
 		actualCastAt := gs.Schedule(ability)
 
-		curTime = actualCastAt + mcd.Cooldown
+		curTime = actualCastAt + mcd.Cooldown.Duration
 		i++
 		if len(timings) > i {
 			curTime = core.MaxDuration(curTime, timings[i])

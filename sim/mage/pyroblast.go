@@ -13,31 +13,27 @@ const SpellIDPyroblast int32 = 33938
 var PyroblastActionID = core.ActionID{SpellID: SpellIDPyroblast}
 
 func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    PyroblastActionID,
-				Character:   &mage.Character,
-				SpellSchool: core.SpellSchoolFire,
-				SpellExtras: SpellFlagMage,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 500,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 500,
-				},
-				CastTime: time.Millisecond * 6000,
-				GCD:      core.GCDDefault,
-			},
-		},
-	}
-	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
-	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
+	baseCost := 500.0
 
 	mage.Pyroblast = mage.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    PyroblastActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagMage,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost *
+					(1 - 0.01*float64(mage.Talents.Pyromaniac)) *
+					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
+
+				GCD:      core.GCDDefault,
+				CastTime: time.Second * 6,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
 
@@ -63,7 +59,7 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	mage.PyroblastDot = core.NewDot(core.Dot{
 		Spell: mage.Pyroblast,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Pyroblast-" + strconv.Itoa(int(mage.Index)),
 			ActionID: PyroblastActionID,
 		}),

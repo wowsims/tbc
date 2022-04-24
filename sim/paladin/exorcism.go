@@ -8,31 +8,28 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ExorcismCD = core.NewCooldownID()
-var ExorcismActionID = core.ActionID{SpellID: 10314, CooldownID: ExorcismCD}
+var ExorcismActionID = core.ActionID{SpellID: 10314}
 
 func (paladin *Paladin) registerExorcismSpell(sim *core.Simulation) {
-	exo := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    ExorcismActionID,
-				Character:   &paladin.Character,
-				SpellSchool: core.SpellSchoolHoly,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 295,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 295,
-				},
-				Cooldown: time.Second * 15,
-			},
-		},
-	}
+	baseCost := 295.0
 
 	paladin.Exorcism = paladin.RegisterSpell(core.SpellConfig{
-		Template: exo,
+		ActionID:    ExorcismActionID,
+		SpellSchool: core.SpellSchoolHoly,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+			},
+			CD: core.Cooldown{
+				Timer:    paladin.NewTimer(),
+				Duration: time.Second * 15,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,

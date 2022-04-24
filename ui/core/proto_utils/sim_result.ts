@@ -6,12 +6,12 @@ import { EncounterMetrics as EncounterMetricsProto } from '/tbc/core/proto/api.j
 import { Party as PartyProto } from '/tbc/core/proto/api.js';
 import { PartyMetrics as PartyMetricsProto } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
-import { PlayerMetrics as PlayerMetricsProto } from '/tbc/core/proto/api.js';
+import { UnitMetrics as UnitMetricsProto } from '/tbc/core/proto/api.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidMetrics as RaidMetricsProto } from '/tbc/core/proto/api.js';
 import { ResourceMetrics as ResourceMetricsProto, ResourceType } from '/tbc/core/proto/api.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
-import { TargetMetrics as TargetMetricsProto } from '/tbc/core/proto/api.js';
+import { TargetedActionMetrics as TargetedActionMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
@@ -84,7 +84,7 @@ export class SimResult {
 		this.logs = logs;
 	}
 
-	getPlayers(filter?: SimResultFilter): Array<PlayerMetrics> {
+	getPlayers(filter?: SimResultFilter): Array<UnitMetrics> {
 		if (filter?.player || filter?.player === 0) {
 			const player = this.getPlayerWithRaidIndex(filter.player);
 			return player ? [player] : [];
@@ -94,15 +94,15 @@ export class SimResult {
 	}
 
 	// Returns the first player, regardless of which party / raid slot its in.
-	getFirstPlayer(): PlayerMetrics | null {
+	getFirstPlayer(): UnitMetrics | null {
 		return this.getPlayers()[0] || null;
 	}
 
-	getPlayerWithRaidIndex(raidIndex: number): PlayerMetrics | null {
-		return this.getPlayers().find(player => player.raidIndex == raidIndex) || null;
+	getPlayerWithRaidIndex(raidIndex: number): UnitMetrics | null {
+		return this.getPlayers().find(player => player.index == raidIndex) || null;
 	}
 
-	getTargets(filter?: SimResultFilter): Array<TargetMetrics> {
+	getTargets(filter?: SimResultFilter): Array<UnitMetrics> {
 		if (filter?.target || filter?.target === 0) {
 			const target = this.getTargetWithIndex(filter.target);
 			return target ? [target] : [];
@@ -111,7 +111,7 @@ export class SimResult {
 		}
 	}
 
-	getTargetWithIndex(index: number): TargetMetrics | null {
+	getTargetWithIndex(index: number): UnitMetrics | null {
 		return this.getTargets().find(target => target.index == index) || null;
 	}
 
@@ -144,7 +144,7 @@ export class SimResult {
 	}
 
 	getDebuffMetrics(filter: SimResultFilter): Array<AuraMetrics> {
-		return AuraMetrics.joinById(this.getTargets(filter).map(target => target.auras).flat());
+		return AuraMetrics.joinById(this.getTargets(filter).map(target => target.auras).flat()).filter(aura => aura.uptimePercent != 0);
 	}
 
 	toProto(): SimRun {
@@ -208,9 +208,9 @@ export class PartyMetrics {
 
 	readonly partyIndex: number;
 	readonly dps: DistributionMetricsProto;
-	readonly players: Array<PlayerMetrics>;
+	readonly players: Array<UnitMetrics>;
 
-	private constructor(party: PartyProto, metrics: PartyMetricsProto, partyIndex: number, players: Array<PlayerMetrics>) {
+	private constructor(party: PartyProto, metrics: PartyMetricsProto, partyIndex: number, players: Array<UnitMetrics>) {
 		this.party = party;
 		this.metrics = metrics;
 		this.partyIndex = partyIndex;
@@ -223,7 +223,7 @@ export class PartyMetrics {
 		const players = await Promise.all(
 			[...new Array(numPlayers).keys()]
 				.filter(i => party.players[i].class != Class.ClassUnknown)
-				.map(i => PlayerMetrics.makeNew(
+				.map(i => UnitMetrics.makeNewPlayer(
 					resultData,
 					party.players[i],
 					metrics.players[i],
@@ -235,12 +235,13 @@ export class PartyMetrics {
 	}
 }
 
-export class PlayerMetrics {
-	// If this Player is a pet, player is the owner.
-	private readonly player: PlayerProto;
-	private readonly metrics: PlayerMetricsProto;
+export class UnitMetrics {
+	// If this Unit is a pet, player is the owner. If it's a target, player is null.
+	private readonly player: PlayerProto | null;
+	private readonly target: TargetProto | null;
+	private readonly metrics: UnitMetricsProto;
 
-	readonly raidIndex: number;
+	readonly index: number;
 	readonly name: string;
 	readonly spec: Spec;
 	readonly petActionId: ActionId | null;
@@ -251,7 +252,7 @@ export class PlayerMetrics {
 	readonly actions: Array<ActionMetrics>;
 	readonly auras: Array<AuraMetrics>;
 	readonly resources: Array<ResourceMetrics>;
-	readonly pets: Array<PlayerMetrics>;
+	readonly pets: Array<UnitMetrics>;
 	private readonly iterations: number;
 	private readonly duration: number;
 
@@ -269,24 +270,26 @@ export class PlayerMetrics {
 	readonly majorCooldownAuraUptimeLogs: Array<AuraUptimeLog>;
 
 	private constructor(
-		player: PlayerProto,
+		player: PlayerProto | null,
+		target: TargetProto | null,
 		petActionId: ActionId | null,
-		metrics: PlayerMetricsProto,
-		raidIndex: number,
+		metrics: UnitMetricsProto,
+		index: number,
 		actions: Array<ActionMetrics>,
 		auras: Array<AuraMetrics>,
 		resources: Array<ResourceMetrics>,
-		pets: Array<PlayerMetrics>,
+		pets: Array<UnitMetrics>,
 		logs: Array<SimLog>,
 		resultData: SimResultData) {
 		this.player = player;
+		this.target = target;
 		this.metrics = metrics;
 
-		this.raidIndex = raidIndex;
+		this.index = index;
 		this.name = metrics.name;
-		this.spec = playerToSpec(player);
+		this.spec = player ? playerToSpec(player) : 0;
 		this.petActionId = petActionId;
-		this.iconUrl = getTalentTreeIcon(this.spec, player.talentsString);
+		this.iconUrl = player ? getTalentTreeIcon(this.spec, player.talentsString) : '';
 		this.classColor = classColors[specToClass[this.spec]];
 		this.dps = this.metrics.dps!;
 		this.tps = this.metrics.threat!;
@@ -303,7 +306,7 @@ export class PlayerMetrics {
 		this.castLogs = CastLog.fromLogs(this.logs);
 		this.threatLogs = ThreatLogGroup.fromLogs(this.logs);
 
-		this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.raidIndex, false, this.isPet), resultData.firstIterationDuration);
+		this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity(this.name, '', this.index, false, this.isPet), resultData.firstIterationDuration);
 		this.majorCooldownLogs = this.logs.filter((log): log is MajorCooldownUsedLog => log.isMajorCooldownUsed());
 
 		this.groupedResourceLogs = ResourceChangedLogGroup.fromLogs(this.logs);
@@ -314,7 +317,11 @@ export class PlayerMetrics {
 	}
 
 	get label() {
-		return `${this.name} (#${this.raidIndex + 1})`;
+		if (this.target == null) {
+			return `${this.name} (#${this.index + 1})`;
+		} else {
+			return this.name;
+		}
 	}
 
 	get isPet() {
@@ -349,13 +356,13 @@ export class PlayerMetrics {
 		return this.resources.filter(resource => resource.type == resourceType);
 	}
 
-	static async makeNew(resultData: SimResultData, player: PlayerProto, metrics: PlayerMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<PlayerMetrics> {
+	static async makeNewPlayer(resultData: SimResultData, player: PlayerProto, metrics: UnitMetricsProto, raidIndex: number, isPet: boolean, logs: Array<SimLog>): Promise<UnitMetrics> {
 		const playerLogs = logs.filter(log => log.source && (!log.source.isTarget && (isPet == log.source.isPet) && log.source.index == raidIndex));
 
 		const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(null, resultData, actionMetrics, raidIndex)));
 		const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(null, resultData, auraMetrics, raidIndex)));
 		const resourcesPromise = Promise.all(metrics.resources.map(resourceMetrics => ResourceMetrics.makeNew(null, resultData, resourceMetrics, raidIndex)));
-		const petsPromise = Promise.all(metrics.pets.map(petMetrics => PlayerMetrics.makeNew(resultData, player, petMetrics, raidIndex, true, playerLogs)));
+		const petsPromise = Promise.all(metrics.pets.map(petMetrics => UnitMetrics.makeNewPlayer(resultData, player, petMetrics, raidIndex, true, playerLogs)));
 
 		let petIdPromise: Promise<ActionId | null> = Promise.resolve(null);
 		if (isPet) {
@@ -368,11 +375,17 @@ export class PlayerMetrics {
 		const pets = await petsPromise;
 		const petActionId = await petIdPromise;
 
-		const playerMetrics = new PlayerMetrics(player, petActionId, metrics, raidIndex, actions, auras, resources, pets, playerLogs, resultData);
-		actions.forEach(action => action.player = playerMetrics);
-		auras.forEach(aura => aura.player = playerMetrics);
-		resources.forEach(resource => resource.player = playerMetrics);
+		const playerMetrics = new UnitMetrics(player, null, petActionId, metrics, raidIndex, actions, auras, resources, pets, playerLogs, resultData);
+		actions.forEach(action => action.unit = playerMetrics);
+		auras.forEach(aura => aura.unit = playerMetrics);
+		resources.forEach(resource => resource.unit = playerMetrics);
 		return playerMetrics;
+	}
+
+	static async makeNewTarget(resultData: SimResultData, target: TargetProto, metrics: UnitMetricsProto, index: number, logs: Array<SimLog>): Promise<UnitMetrics> {
+		const targetLogs = logs.filter(log => log.source && (log.source.isTarget && log.source.index == index));
+		const auras = await Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(null, resultData, auraMetrics)));
+		return new UnitMetrics(null, target, null, metrics, index, [], auras, [], [], targetLogs, resultData);
 	}
 }
 
@@ -380,9 +393,9 @@ export class EncounterMetrics {
 	private readonly encounter: EncounterProto;
 	private readonly metrics: EncounterMetricsProto;
 
-	readonly targets: Array<TargetMetrics>;
+	readonly targets: Array<UnitMetrics>;
 
-	private constructor(encounter: EncounterProto, metrics: EncounterMetricsProto, targets: Array<TargetMetrics>) {
+	private constructor(encounter: EncounterProto, metrics: EncounterMetricsProto, targets: Array<UnitMetrics>) {
 		this.encounter = encounter;
 		this.metrics = metrics;
 		this.targets = targets;
@@ -392,7 +405,7 @@ export class EncounterMetrics {
 		const numTargets = Math.min(encounter.targets.length, metrics.targets.length);
 		const targets = await Promise.all(
 			[...new Array(numTargets).keys()]
-				.map(i => TargetMetrics.makeNew(
+				.map(i => UnitMetrics.makeNewTarget(
 					resultData,
 					encounter.targets[i],
 					metrics.targets[i],
@@ -407,36 +420,8 @@ export class EncounterMetrics {
 	}
 }
 
-export class TargetMetrics {
-	private readonly target: TargetProto;
-	private readonly metrics: TargetMetricsProto;
-
-	readonly index: number;
-	readonly auras: Array<AuraMetrics>;
-
-	readonly logs: Array<SimLog>;
-	readonly auraUptimeLogs: Array<AuraUptimeLog>;
-
-	private constructor(target: TargetProto, metrics: TargetMetricsProto, index: number, auras: Array<AuraMetrics>, logs: Array<SimLog>, resultData: SimResultData) {
-		this.target = target;
-		this.metrics = metrics;
-
-		this.index = index;
-		this.auras = auras;
-		this.logs = logs;
-
-		this.auraUptimeLogs = AuraUptimeLog.fromLogs(this.logs, new Entity('Target ' + (this.index + 1), '', this.index, true, false), resultData.firstIterationDuration);
-	}
-
-	static async makeNew(resultData: SimResultData, target: TargetProto, metrics: TargetMetricsProto, index: number, logs: Array<SimLog>): Promise<TargetMetrics> {
-		const targetLogs = logs.filter(log => log.source && (log.source.isTarget && log.source.index == index));
-		const auras = await Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(null, resultData, auraMetrics)));
-		return new TargetMetrics(target, metrics, index, auras, targetLogs, resultData);
-	}
-}
-
 export class AuraMetrics {
-	player: PlayerMetrics | null;
+	unit: UnitMetrics | null;
 	readonly actionId: ActionId;
 	readonly name: string;
 	readonly iconUrl: string;
@@ -445,8 +430,8 @@ export class AuraMetrics {
 	private readonly duration: number;
 	private readonly data: AuraMetricsProto;
 
-	private constructor(player: PlayerMetrics | null, actionId: ActionId, data: AuraMetricsProto, resultData: SimResultData) {
-		this.player = player;
+	private constructor(unit: UnitMetrics | null, actionId: ActionId, data: AuraMetricsProto, resultData: SimResultData) {
+		this.unit = unit;
 		this.actionId = actionId;
 		this.name = actionId.name;
 		this.iconUrl = actionId.iconUrl;
@@ -460,21 +445,21 @@ export class AuraMetrics {
 		return this.data.uptimeSecondsAvg / this.duration * 100;
 	}
 
-	static async makeNew(player: PlayerMetrics | null, resultData: SimResultData, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics> {
+	static async makeNew(unit: UnitMetrics | null, resultData: SimResultData, auraMetrics: AuraMetricsProto, playerIndex?: number): Promise<AuraMetrics> {
 		const actionId = await ActionId.fromProto(auraMetrics.id!).fill(playerIndex);
-		return new AuraMetrics(player, actionId, auraMetrics, resultData);
+		return new AuraMetrics(unit, actionId, auraMetrics, resultData);
 	}
 
 	// Merges an array of metrics into a single metrics.
 	static merge(auras: Array<AuraMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): AuraMetrics {
 		const firstAura = auras[0];
-		const player = auras.every(aura => aura.player == firstAura.player) ? firstAura.player : null;
+		const unit = auras.every(aura => aura.unit == firstAura.unit) ? firstAura.unit : null;
 		let actionId = actionIdOverride || firstAura.actionId;
 		if (removeTag) {
 			actionId = actionId.withoutTag();
 		}
 		return new AuraMetrics(
-			player,
+			unit,
 			actionId,
 			AuraMetricsProto.create({
 				uptimeSecondsAvg: Math.max(...auras.map(a => a.data.uptimeSecondsAvg)),
@@ -499,7 +484,7 @@ export class AuraMetrics {
 };
 
 export class ResourceMetrics {
-	player: PlayerMetrics | null;
+	unit: UnitMetrics | null;
 	readonly actionId: ActionId;
 	readonly name: string;
 	readonly iconUrl: string;
@@ -509,8 +494,8 @@ export class ResourceMetrics {
 	private readonly duration: number;
 	private readonly data: ResourceMetricsProto;
 
-	private constructor(player: PlayerMetrics | null, actionId: ActionId, data: ResourceMetricsProto, resultData: SimResultData) {
-		this.player = player;
+	private constructor(unit: UnitMetrics | null, actionId: ActionId, data: ResourceMetricsProto, resultData: SimResultData) {
+		this.unit = unit;
 		this.actionId = actionId;
 		this.name = actionId.name;
 		this.iconUrl = actionId.iconUrl;
@@ -541,21 +526,21 @@ export class ResourceMetrics {
 		return (this.data.gain - this.data.actualGain) / this.iterations;
 	}
 
-	static async makeNew(player: PlayerMetrics | null, resultData: SimResultData, resourceMetrics: ResourceMetricsProto, playerIndex?: number): Promise<ResourceMetrics> {
+	static async makeNew(unit: UnitMetrics | null, resultData: SimResultData, resourceMetrics: ResourceMetricsProto, playerIndex?: number): Promise<ResourceMetrics> {
 		const actionId = await ActionId.fromProto(resourceMetrics.id!).fill(playerIndex);
-		return new ResourceMetrics(player, actionId, resourceMetrics, resultData);
+		return new ResourceMetrics(unit, actionId, resourceMetrics, resultData);
 	}
 
 	// Merges an array of metrics into a single metrics.
 	static merge(resources: Array<ResourceMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ResourceMetrics {
 		const firstResource = resources[0];
-		const player = resources.every(resource => resource.player == firstResource.player) ? firstResource.player : null;
+		const unit = resources.every(resource => resource.unit == firstResource.unit) ? firstResource.unit : null;
 		let actionId = actionIdOverride || firstResource.actionId;
 		if (removeTag) {
 			actionId = actionId.withoutTag();
 		}
 		return new ResourceMetrics(
-			player,
+			unit,
 			actionId,
 			ResourceMetricsProto.create({
 				events: sum(resources.map(a => a.data.events)),
@@ -581,19 +566,21 @@ export class ResourceMetrics {
 	}
 };
 
-// Manages the metrics for a single player action (e.g. Lightning Bolt).
+// Manages the metrics for a single unit action (e.g. Lightning Bolt).
 export class ActionMetrics {
-	player: PlayerMetrics | null;
+	unit: UnitMetrics | null;
 	readonly actionId: ActionId;
 	readonly name: string;
 	readonly iconUrl: string;
+	readonly targets: Array<TargetedActionMetrics>;
 	private readonly resultData: SimResultData;
 	private readonly iterations: number;
 	private readonly duration: number;
 	private readonly data: ActionMetricsProto;
+	private readonly combinedMetrics: TargetedActionMetrics;
 
-	private constructor(player: PlayerMetrics | null, actionId: ActionId, data: ActionMetricsProto, resultData: SimResultData) {
-		this.player = player;
+	private constructor(unit: UnitMetrics | null, actionId: ActionId, data: ActionMetricsProto, resultData: SimResultData) {
+		this.unit = unit;
 		this.actionId = actionId;
 		this.name = actionId.name;
 		this.iconUrl = actionId.iconUrl;
@@ -601,10 +588,155 @@ export class ActionMetrics {
 		this.iterations = resultData.iterations;
 		this.duration = resultData.duration;
 		this.data = data;
+		this.targets = data.targets.map(tam => new TargetedActionMetrics(this.iterations, this.duration, tam));
+		this.combinedMetrics = TargetedActionMetrics.merge(this.targets);
 	}
 
 	get isMeleeAction() {
 		return this.data.isMelee;
+	}
+
+	get damage() {
+		return this.combinedMetrics.damage;
+	}
+
+	get dps() {
+		return this.combinedMetrics.dps;
+	}
+
+	get tps() {
+		return this.combinedMetrics.tps;
+	}
+
+	get casts() {
+		return this.combinedMetrics.casts;
+	}
+
+	get castsPerMinute() {
+		return this.combinedMetrics.castsPerMinute;
+	}
+
+	get avgCast() {
+		return this.combinedMetrics.avgCast;
+	}
+
+	get avgCastThreat() {
+		return this.combinedMetrics.avgCastThreat;
+	}
+
+	get landedHits() {
+		return this.combinedMetrics.landedHits;
+	}
+
+	get hitAttempts() {
+		return this.combinedMetrics.hitAttempts;
+	}
+
+	get avgHit() {
+		return this.combinedMetrics.avgHit;
+	}
+
+	get avgHitThreat() {
+		return this.combinedMetrics.avgHitThreat;
+	}
+
+	get critPercent() {
+		return this.combinedMetrics.critPercent;
+	}
+
+	get misses() {
+		return this.combinedMetrics.misses;
+	}
+
+	get missPercent() {
+		return this.combinedMetrics.missPercent;
+	}
+
+	get dodges() {
+		return this.combinedMetrics.dodges;
+	}
+
+	get dodgePercent() {
+		return this.combinedMetrics.dodgePercent;
+	}
+
+	get parries() {
+		return this.combinedMetrics.parries;
+	}
+
+	get parryPercent() {
+		return this.combinedMetrics.parryPercent;
+	}
+
+	get blocks() {
+		return this.combinedMetrics.blocks;
+	}
+
+	get blockPercent() {
+		return this.combinedMetrics.blockPercent;
+	}
+
+	get glances() {
+		return this.combinedMetrics.glances;
+	}
+
+	get glancePercent() {
+		return this.combinedMetrics.glancePercent;
+	}
+
+	static async makeNew(unit: UnitMetrics | null, resultData: SimResultData, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics> {
+		const actionId = await ActionId.fromProto(actionMetrics.id!).fill(playerIndex);
+		return new ActionMetrics(unit, actionId, actionMetrics, resultData);
+	}
+
+	// Merges an array of metrics into a single metric.
+	static merge(actions: Array<ActionMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ActionMetrics {
+		const firstAction = actions[0];
+		const unit = actions.every(action => action.unit == firstAction.unit) ? firstAction.unit : null;
+		let actionId = actionIdOverride || firstAction.actionId;
+		if (removeTag) {
+			actionId = actionId.withoutTag();
+		}
+
+		const maxTargets = Math.max(...actions.map(action => action.targets.length));
+		const mergedTargets = [...Array(maxTargets).keys()].map(i => TargetedActionMetrics.merge(actions.map(action => action.targets[i])));
+
+		return new ActionMetrics(
+			unit,
+			actionId,
+			ActionMetricsProto.create({
+				isMelee: firstAction.isMeleeAction,
+				targets: mergedTargets.map(t => t.data),
+			}),
+			firstAction.resultData);
+	}
+
+	// Groups similar metrics, i.e. metrics with the same item/spell/other ID but
+	// different tags, and returns them as separate arrays.
+	static groupById(actions: Array<ActionMetrics>, useTag?: boolean): Array<Array<ActionMetrics>> {
+		if (useTag) {
+			return Object.values(bucket(actions, action => action.actionId.toString()));
+		} else {
+			return Object.values(bucket(actions, action => action.actionId.toStringIgnoringTag()));
+		}
+	}
+
+	// Merges action metrics that have the same name/ID, adding their stats together.
+	static joinById(actions: Array<ActionMetrics>, useTag?: boolean): Array<ActionMetrics> {
+		return ActionMetrics.groupById(actions, useTag).map(actionsToJoin => ActionMetrics.merge(actionsToJoin));
+	}
+}
+
+// Manages the metrics for a single action applied to a specific target.
+export class TargetedActionMetrics {
+	private readonly iterations: number;
+	private readonly duration: number;
+	readonly data: TargetedActionMetricsProto;
+
+	constructor(iterations: number, duration: number, data: TargetedActionMetricsProto) {
+		this.iterations = iterations;
+		this.duration = duration;
+		this.data = data;
 	}
 
 	get damage() {
@@ -704,24 +836,12 @@ export class ActionMetrics {
 		return (this.data.glances / this.hitAttempts) * 100;
 	}
 
-	static async makeNew(player: PlayerMetrics | null, resultData: SimResultData, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics> {
-		const actionId = await ActionId.fromProto(actionMetrics.id!).fill(playerIndex);
-		return new ActionMetrics(player, actionId, actionMetrics, resultData);
-	}
-
 	// Merges an array of metrics into a single metric.
-	static merge(actions: Array<ActionMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ActionMetrics {
-		const firstAction = actions[0];
-		const player = actions.every(action => action.player == firstAction.player) ? firstAction.player : null;
-		let actionId = actionIdOverride || firstAction.actionId;
-		if (removeTag) {
-			actionId = actionId.withoutTag();
-		}
-		return new ActionMetrics(
-			player,
-			actionId,
-			ActionMetricsProto.create({
-				isMelee: firstAction.isMeleeAction,
+	static merge(actions: Array<TargetedActionMetrics>): TargetedActionMetrics {
+		return new TargetedActionMetrics(
+			actions[0].iterations,
+			actions[0].duration,
+			TargetedActionMetricsProto.create({
 				casts: sum(actions.map(a => a.data.casts)),
 				hits: sum(actions.map(a => a.data.hits)),
 				crits: sum(actions.map(a => a.data.crits)),
@@ -732,22 +852,6 @@ export class ActionMetrics {
 				glances: sum(actions.map(a => a.data.glances)),
 				damage: sum(actions.map(a => a.data.damage)),
 				threat: sum(actions.map(a => a.data.threat)),
-			}),
-			firstAction.resultData);
-	}
-
-	// Groups similar metrics, i.e. metrics with the same item/spell/other ID but
-	// different tags, and returns them as separate arrays.
-	static groupById(actions: Array<ActionMetrics>, useTag?: boolean): Array<Array<ActionMetrics>> {
-		if (useTag) {
-			return Object.values(bucket(actions, action => action.actionId.toString()));
-		} else {
-			return Object.values(bucket(actions, action => action.actionId.toStringIgnoringTag()));
-		}
-	}
-
-	// Merges action metrics that have the same name/ID, adding their stats together.
-	static joinById(actions: Array<ActionMetrics>, useTag?: boolean): Array<ActionMetrics> {
-		return ActionMetrics.groupById(actions, useTag).map(actionsToJoin => ActionMetrics.merge(actionsToJoin));
+			}));
 	}
 }

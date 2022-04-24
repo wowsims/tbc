@@ -10,30 +10,29 @@ import (
 
 const SpellIDDevouringPlague int32 = 25467
 
-var DevouringPlagueCooldownID = core.NewCooldownID()
-var DevouringPlagueActionID = core.ActionID{SpellID: SpellIDDevouringPlague, CooldownID: DevouringPlagueCooldownID}
+var DevouringPlagueActionID = core.ActionID{SpellID: SpellIDDevouringPlague}
 
 func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 1145}
-
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    DevouringPlagueActionID,
-				Character:   &priest.Character,
-				SpellSchool: core.SpellSchoolShadow,
-				BaseCost:    cost,
-				Cost:        cost,
-				CastTime:    0,
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Minute * 3,
-			},
-		},
-	}
-	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
+	baseCost := 1145.0
 
 	priest.DevouringPlague = priest.RegisterSpell(core.SpellConfig{
-		Template: template,
+		ActionID:    DevouringPlagueActionID,
+		SpellSchool: core.SpellSchoolShadow,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
+				GCD:  core.GCDDefault,
+			},
+			CD: core.Cooldown{
+				Timer:    priest.NewTimer(),
+				Duration: time.Minute * 3,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
@@ -49,7 +48,7 @@ func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.DevouringPlagueDot = core.NewDot(core.Dot{
 		Spell: priest.DevouringPlague,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "DevouringPlague-" + strconv.Itoa(int(priest.Index)),
 			ActionID: DevouringPlagueActionID,
 		}),

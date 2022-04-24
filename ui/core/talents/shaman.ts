@@ -2,7 +2,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { ShamanTalents as ShamanTalents } from '/tbc/core/proto/shaman.js';
 import { Player } from '/tbc/core/player.js';
 
-import { TalentsConfig, TalentsPicker } from './talents_picker.js';
+import { TalentsConfig, TalentsPicker, newTalentsConfig } from './talents_picker.js';
 
 // Talents are the same for all Shaman specs, so its ok to just use ElementalShaman here
 export class ShamanTalentsPicker extends TalentsPicker<Spec.SpecElementalShaman> {
@@ -11,7 +11,7 @@ export class ShamanTalentsPicker extends TalentsPicker<Spec.SpecElementalShaman>
 	}
 }
 
-export const shamanTalentsConfig: TalentsConfig<Spec.SpecElementalShaman> = [
+export const shamanTalentsConfig: TalentsConfig<Spec.SpecElementalShaman> = newTalentsConfig([
 	{
 		name: 'Elemental',
 		backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/classic/261.jpg',
@@ -615,4 +615,4 @@ export const shamanTalentsConfig: TalentsConfig<Spec.SpecElementalShaman> = [
 			},
 		],
 	},
-];
+]);

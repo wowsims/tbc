@@ -48,8 +48,7 @@ type Hunter struct {
 	latency     time.Duration
 	timeToWeave time.Duration
 
-	weaveStartTime   time.Duration
-	raptorStrikeCost float64 // Cached mana cost of raptor strike.
+	weaveStartTime time.Duration
 
 	nextAction   int
 	nextActionAt time.Duration
@@ -76,13 +75,14 @@ type Hunter struct {
 	arcaneShotCastTime float64
 	useMultiForCatchup bool
 
-	aspectOfTheHawkTemplate  core.SimpleCast
-	aspectOfTheViperTemplate core.SimpleCast
+	AspectOfTheHawk  *core.Spell
+	AspectOfTheViper *core.Spell
 
 	AimedShot    *core.Spell
 	ArcaneShot   *core.Spell
 	KillCommand  *core.Spell
 	MultiShot    *core.Spell
+	RapidFire    *core.Spell
 	RaptorStrike *core.Spell
 	ScorpidSting *core.Spell
 	SerpentSting *core.Spell
@@ -95,7 +95,7 @@ type Hunter struct {
 	ScorpidStingAura     *core.Aura
 	TalonOfAlarAura      *core.Aura
 
-	fakeHardcast core.Cast
+	hardcastOnComplete core.CastFunc
 }
 
 func (hunter *Hunter) GetCharacter() *core.Character {
@@ -116,14 +116,12 @@ func (hunter *Hunter) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (hunter *Hunter) Init(sim *core.Simulation) {
 	// Update auto crit multipliers now that we have the targets.
-	hunter.AutoAttacks.MH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
-	hunter.AutoAttacks.OH.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
-	hunter.AutoAttacks.MHAuto.Template.Effect.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
-	hunter.AutoAttacks.OHAuto.Template.Effect.CritMultiplier = hunter.critMultiplier(false, sim.GetPrimaryTarget())
-	hunter.AutoAttacks.Ranged.CritMultiplier = hunter.critMultiplier(true, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.MHEffect.OutcomeApplier = core.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, sim.GetPrimaryTarget()))
+	hunter.AutoAttacks.OHEffect.OutcomeApplier = core.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, sim.GetPrimaryTarget()))
+	hunter.AutoAttacks.RangedEffect.OutcomeApplier = core.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget()))
 
-	hunter.aspectOfTheHawkTemplate = hunter.newAspectOfTheHawkTemplate(sim)
-	hunter.aspectOfTheViperTemplate = hunter.newAspectOfTheViperTemplate(sim)
+	hunter.registerAspectOfTheHawkSpell(sim)
+	hunter.registerAspectOfTheViperSpell(sim)
 
 	hunter.registerAimedShotSpell(sim)
 	hunter.registerArcaneShotSpell(sim)
@@ -134,14 +132,11 @@ func (hunter *Hunter) Init(sim *core.Simulation) {
 	hunter.registerSerpentStingSpell(sim)
 	hunter.registerSteadyShotSpell(sim)
 
-	hunter.fakeHardcast = core.Cast{
-		Character:   &hunter.Character,
-		IgnoreHaste: true,
-		CastTime:    hunter.timeToWeave,
-		OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-			hunter.rotation(sim, false)
-		},
+	hunter.hardcastOnComplete = func(sim *core.Simulation, _ *core.Target) {
+		hunter.rotation(sim, false)
 	}
+
+	hunter.DelayDPSCooldownsForArmorDebuffs(sim)
 }
 
 func (hunter *Hunter) Reset(sim *core.Simulation) {
@@ -224,7 +219,6 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		}
 	}
 
-	rangedWeapon.BaseDamageOverride = core.BaseDamageFuncRangedWeapon(hunter.AmmoDamageBonus)
 	hunter.EnableAutoAttacks(hunter, core.AutoAttackOptions{
 		// We don't know crit multiplier until later when we see the target so just
 		// use 0 for now.
@@ -235,6 +229,8 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 			return hunter.TryRaptorStrike(sim)
 		},
 	})
+	hunter.AutoAttacks.RangedEffect.BaseDamage.Calculator = core.BaseDamageFuncRangedWeapon(hunter.AmmoDamageBonus)
+
 	if hunter.Options.RemoveRandomness {
 		weaponAvg := (hunter.AutoAttacks.Ranged.BaseDamageMin + hunter.AutoAttacks.Ranged.BaseDamageMax) / 2
 		hunter.AutoAttacks.Ranged.BaseDamageMin = weaponAvg

@@ -74,7 +74,7 @@ export const MageRotationConfig = {
 	inputs: [
 		{
 			type: 'enum' as const,
-			getModObject: (simUI: IndividualSimUI<any>) => simUI,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				extraCssClasses: [
 					'rotation-type-enum-picker',
@@ -92,34 +92,32 @@ export const MageRotationConfig = {
 						name: 'Frost', value: RotationType.Frost,
 					},
 				],
-				changedEvent: (simUI: IndividualSimUI<Spec.SpecMage>) => simUI.player.rotationChangeEmitter,
-				getValue: (simUI: IndividualSimUI<Spec.SpecMage>) => simUI.player.getRotation().type,
-				setValue: (eventID: EventID, simUI: IndividualSimUI<Spec.SpecMage>, newValue: number) => {
-					const newRotation = simUI.player.getRotation();
+				changedEvent: (player: Player<Spec.SpecMage>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecMage>) => player.getRotation().type,
+				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: number) => {
+					const newRotation = player.getRotation();
 					newRotation.type = newValue;
 
 					TypedEvent.freezeAllAndDo(() => {
 						if (newRotation.type == RotationType.Arcane) {
-							simUI.player.setTalentsString(eventID, Presets.ArcaneTalents.data);
+							player.setTalentsString(eventID, Presets.ArcaneTalents.data);
 							if (!newRotation.arcane) {
 								newRotation.arcane = ArcaneRotation.clone(Presets.DefaultArcaneRotation.arcane!);
 							}
 						} else if (newRotation.type == RotationType.Fire) {
-							simUI.player.setTalentsString(eventID, Presets.FireTalents.data);
+							player.setTalentsString(eventID, Presets.FireTalents.data);
 							if (!newRotation.fire) {
 								newRotation.fire = FireRotation.clone(Presets.DefaultFireRotation.fire!);
 							}
 						} else {
-							simUI.player.setTalentsString(eventID, Presets.DeepFrostTalents.data);
+							player.setTalentsString(eventID, Presets.DeepFrostTalents.data);
 							if (!newRotation.frost) {
 								newRotation.frost = FrostRotation.clone(Presets.DefaultFrostRotation.frost!);
 							}
 						}
 
-						simUI.player.setRotation(eventID, newRotation);
+						player.setRotation(eventID, newRotation);
 					});
-
-					simUI.recomputeSettingsLayout();
 				},
 			},
 		},
@@ -129,17 +127,16 @@ export const MageRotationConfig = {
 		{
 			type: 'boolean' as const,
 			cssClass: 'multi-target-rotation-picker',
-			getModObject: (simUI: IndividualSimUI<any>) => simUI,
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'AOE Rotation',
 				labelTooltip: 'Use multi-target spells.',
-				changedEvent: (simUI: IndividualSimUI<Spec.SpecMage>) => simUI.player.rotationChangeEmitter,
-				getValue: (simUI: IndividualSimUI<Spec.SpecMage>) => simUI.player.getRotation().multiTargetRotation,
-				setValue: (eventID: EventID, simUI: IndividualSimUI<Spec.SpecMage>, newValue: boolean) => {
-					const newRotation = simUI.player.getRotation();
+				changedEvent: (player: Player<Spec.SpecMage>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecMage>) => player.getRotation().multiTargetRotation,
+				setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => {
+					const newRotation = player.getRotation();
 					newRotation.multiTargetRotation = newValue;
-					simUI.player.setRotation(eventID, newRotation);
-					simUI.recomputeSettingsLayout();
+					player.setRotation(eventID, newRotation);
 				},
 			},
 		},
@@ -402,16 +399,16 @@ export const MageRotationConfig = {
 	],
 };
 
-function makeBooleanMageBuffInput(id: ActionId, optionsFieldName: keyof MageOptions): IconPickerConfig<Player<any>, boolean> {
-	return {
-		id: id,
-		states: 2,
-		changedEvent: (player: Player<Spec.SpecMage>) => player.specOptionsChangeEmitter,
-		getValue: (player: Player<Spec.SpecMage>) => player.getSpecOptions()[optionsFieldName] as boolean,
-		setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => {
-			const newOptions = player.getSpecOptions();
-			(newOptions[optionsFieldName] as boolean) = newValue;
-			player.setSpecOptions(eventID, newOptions);
-		},
-	}
-}
+//function makeBooleanMageBuffInput(id: ActionId, optionsFieldName: keyof MageOptions): IconPickerConfig<Player<any>, boolean> {
+//	return {
+//		id: id,
+//		states: 2,
+//		changedEvent: (player: Player<Spec.SpecMage>) => player.specOptionsChangeEmitter,
+//		getValue: (player: Player<Spec.SpecMage>) => player.getSpecOptions()[optionsFieldName] as boolean,
+//		setValue: (eventID: EventID, player: Player<Spec.SpecMage>, newValue: boolean) => {
+//			const newOptions = player.getSpecOptions();
+//			(newOptions[optionsFieldName] as boolean) = newValue;
+//			player.setSpecOptions(eventID, newOptions);
+//		},
+//	}
+//}

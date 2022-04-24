@@ -7,19 +7,9 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
-// A unique number based on an ActionID.
-// This works by making item IDs negative to avoid collisions, and assumes
-// there are no collisions with OtherID. Tag adds decimals.
-// Actual key values dont matter, just need something unique and fast to compute.
-type ActionKey float64
-
-func NewActionKey(actionID ActionID) ActionKey {
-	return ActionKey(float64((int32(actionID.OtherID) + actionID.SpellID - actionID.ItemID)) + (float64(actionID.Tag) / 256))
-}
-
 type ResourceKey struct {
-	ActionKey ActionKey
-	Type      proto.ResourceType
+	ActionID ActionID
+	Type     proto.ResourceType
 }
 
 type DistributionMetrics struct {
@@ -74,8 +64,8 @@ type CharacterMetrics struct {
 
 	// Aggregate values. These are updated after each iteration.
 	oomTimeSum float64
-	actions    map[ActionKey]ActionMetrics
-	resources  map[ResourceKey]ResourceMetrics
+	actions    map[ActionID]*ActionMetrics
+	resources  map[ResourceKey]*ResourceMetrics
 }
 
 // Metrics for the current iteration, for 1 agent. Keep this as a separate
@@ -91,15 +81,30 @@ type CharacterIterationMetrics struct {
 }
 
 type ActionMetrics struct {
-	ActionID ActionID
-	IsMelee  bool // True if melee action, false if spell action.
+	IsMelee bool // True if melee action, false if spell action.
 
-	Casts  int32
-	Hits   int32
-	Crits  int32
-	Misses int32
+	// Metrics for this action, for each possible target.
+	Targets []TargetedActionMetrics
+}
 
-	// These will be 0 for spell actions.
+func (actionMetrics *ActionMetrics) ToProto(actionID ActionID) *proto.ActionMetrics {
+	var targetMetrics []*proto.TargetedActionMetrics
+	for _, tam := range actionMetrics.Targets {
+		targetMetrics = append(targetMetrics, tam.ToProto())
+	}
+
+	return &proto.ActionMetrics{
+		Id:      actionID.ToProto(),
+		IsMelee: actionMetrics.IsMelee,
+		Targets: targetMetrics,
+	}
+}
+
+type TargetedActionMetrics struct {
+	Casts   int32
+	Hits    int32
+	Crits   int32
+	Misses  int32
 	Dodges  int32
 	Parries int32
 	Blocks  int32
@@ -109,21 +114,18 @@ type ActionMetrics struct {
 	Threat float64
 }
 
-func (actionMetrics *ActionMetrics) ToProto() *proto.ActionMetrics {
-	return &proto.ActionMetrics{
-		Id:      actionMetrics.ActionID.ToProto(),
-		IsMelee: actionMetrics.IsMelee,
-
-		Casts:   actionMetrics.Casts,
-		Hits:    actionMetrics.Hits,
-		Crits:   actionMetrics.Crits,
-		Misses:  actionMetrics.Misses,
-		Dodges:  actionMetrics.Dodges,
-		Parries: actionMetrics.Parries,
-		Blocks:  actionMetrics.Blocks,
-		Glances: actionMetrics.Glances,
-		Damage:  actionMetrics.Damage,
-		Threat:  actionMetrics.Threat,
+func (tam *TargetedActionMetrics) ToProto() *proto.TargetedActionMetrics {
+	return &proto.TargetedActionMetrics{
+		Casts:   tam.Casts,
+		Hits:    tam.Hits,
+		Crits:   tam.Crits,
+		Misses:  tam.Misses,
+		Dodges:  tam.Dodges,
+		Parries: tam.Parries,
+		Blocks:  tam.Blocks,
+		Glances: tam.Glances,
+		Damage:  tam.Damage,
+		Threat:  tam.Threat,
 	}
 }
 
@@ -131,24 +133,21 @@ func NewCharacterMetrics() CharacterMetrics {
 	return CharacterMetrics{
 		dps:       NewDistributionMetrics(),
 		threat:    NewDistributionMetrics(),
-		actions:   make(map[ActionKey]ActionMetrics),
-		resources: make(map[ResourceKey]ResourceMetrics),
+		actions:   make(map[ActionID]*ActionMetrics),
+		resources: make(map[ResourceKey]*ResourceMetrics),
 	}
 }
 
 type ResourceMetrics struct {
-	ActionID ActionID
-	Type     proto.ResourceType
-
 	Events     int32
 	Gain       float64
 	ActualGain float64
 }
 
-func (resourceMetrics *ResourceMetrics) ToProto() *proto.ResourceMetrics {
+func (resourceMetrics *ResourceMetrics) ToProto(actionID ActionID, resourceType proto.ResourceType) *proto.ResourceMetrics {
 	return &proto.ResourceMetrics{
-		Id:   resourceMetrics.ActionID.ToProto(),
-		Type: resourceMetrics.Type,
+		Id:   actionID.ToProto(),
+		Type: resourceType,
 
 		Events:     resourceMetrics.Events,
 		Gain:       resourceMetrics.Gain,
@@ -156,75 +155,51 @@ func (resourceMetrics *ResourceMetrics) ToProto() *proto.ResourceMetrics {
 	}
 }
 
-func (characterMetrics *CharacterMetrics) addCastInternal(actionID ActionID) {
-	actionKey := NewActionKey(actionID)
-	actionMetrics, ok := characterMetrics.actions[actionKey]
-
-	if !ok {
-		actionMetrics.ActionID = actionID
-	}
-
-	actionMetrics.Casts++
-
-	characterMetrics.actions[actionKey] = actionMetrics
-}
-
 func (characterMetrics *CharacterMetrics) AddResourceEvent(actionID ActionID, resourceType proto.ResourceType, gain float64, actualGain float64) {
-	actionKey := NewActionKey(actionID)
 	resourceKey := ResourceKey{
-		ActionKey: actionKey,
-		Type:      resourceType,
+		ActionID: actionID,
+		Type:     resourceType,
 	}
 	resourceMetrics, ok := characterMetrics.resources[resourceKey]
 
 	if !ok {
-		resourceMetrics.ActionID = actionID
-		resourceMetrics.Type = resourceType
+		resourceMetrics = &ResourceMetrics{}
+		characterMetrics.resources[resourceKey] = resourceMetrics
 	}
 
 	resourceMetrics.Events++
 	resourceMetrics.Gain += gain
 	resourceMetrics.ActualGain += actualGain
-
-	characterMetrics.resources[resourceKey] = resourceMetrics
-}
-
-func (characterMetrics *CharacterMetrics) AddInstantCast(actionID ActionID) {
-	characterMetrics.addCastInternal(actionID)
-}
-
-// Adds the results of a cast to the aggregated metrics.
-func (characterMetrics *CharacterMetrics) AddCast(cast *Cast) {
-	characterMetrics.addCastInternal(cast.ActionID)
 }
 
 // Adds the results of a spell to the character metrics.
 func (characterMetrics *CharacterMetrics) addSpell(spell *Spell) {
-	actionID := spell.ActionID
-	actionKey := NewActionKey(actionID)
-	actionMetrics, ok := characterMetrics.actions[actionKey]
+	actionMetrics, ok := characterMetrics.actions[spell.ActionID]
 
 	if !ok {
-		actionMetrics.ActionID = actionID
-		actionMetrics.IsMelee = spell.SpellExtras.Matches(SpellExtrasMeleeMetrics) ||
-			spell.Template.Effect.ProcMask.Matches(ProcMaskMeleeOrRanged) ||
-			(len(spell.Template.Effects) > 0 && spell.Template.Effects[0].ProcMask.Matches(ProcMaskMeleeOrRanged))
+		actionMetrics = &ActionMetrics{IsMelee: spell.SpellExtras.Matches(SpellExtrasMeleeMetrics)}
+		characterMetrics.actions[spell.ActionID] = actionMetrics
 	}
 
-	actionMetrics.Casts += spell.Casts
-	actionMetrics.Misses += spell.Misses
-	actionMetrics.Hits += spell.Hits
-	actionMetrics.Crits += spell.Crits
-	actionMetrics.Dodges += spell.Dodges
-	actionMetrics.Parries += spell.Parries
-	actionMetrics.Blocks += spell.Blocks
-	actionMetrics.Glances += spell.Glances
-	actionMetrics.Damage += spell.TotalDamage
-	actionMetrics.Threat += spell.TotalThreat
-	characterMetrics.dps.Total += spell.TotalDamage
-	characterMetrics.threat.Total += spell.TotalThreat
+	if len(actionMetrics.Targets) == 0 {
+		actionMetrics.Targets = make([]TargetedActionMetrics, len(spell.SpellMetrics))
+	}
 
-	characterMetrics.actions[actionKey] = actionMetrics
+	for i, spellTargetMetrics := range spell.SpellMetrics {
+		tam := &actionMetrics.Targets[i]
+		tam.Casts += spellTargetMetrics.Casts
+		tam.Misses += spellTargetMetrics.Misses
+		tam.Hits += spellTargetMetrics.Hits
+		tam.Crits += spellTargetMetrics.Crits
+		tam.Dodges += spellTargetMetrics.Dodges
+		tam.Parries += spellTargetMetrics.Parries
+		tam.Blocks += spellTargetMetrics.Blocks
+		tam.Glances += spellTargetMetrics.Glances
+		tam.Damage += spellTargetMetrics.TotalDamage
+		tam.Threat += spellTargetMetrics.TotalThreat
+		characterMetrics.dps.Total += spellTargetMetrics.TotalDamage
+		characterMetrics.threat.Total += spellTargetMetrics.TotalThreat
+	}
 }
 
 // This should be called at the end of each iteration, to include metrics from Pets in
@@ -252,18 +227,18 @@ func (characterMetrics *CharacterMetrics) doneIteration(encounterDurationSeconds
 	characterMetrics.oomTimeSum += float64(characterMetrics.OOMTime.Seconds())
 }
 
-func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.PlayerMetrics {
-	protoMetrics := &proto.PlayerMetrics{
+func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.UnitMetrics {
+	protoMetrics := &proto.UnitMetrics{
 		Dps:           characterMetrics.dps.ToProto(numIterations),
 		Threat:        characterMetrics.threat.ToProto(numIterations),
 		SecondsOomAvg: characterMetrics.oomTimeSum / float64(numIterations),
 	}
 
-	for _, action := range characterMetrics.actions {
-		protoMetrics.Actions = append(protoMetrics.Actions, action.ToProto())
+	for actionID, action := range characterMetrics.actions {
+		protoMetrics.Actions = append(protoMetrics.Actions, action.ToProto(actionID))
 	}
-	for _, resource := range characterMetrics.resources {
-		protoMetrics.Resources = append(protoMetrics.Resources, resource.ToProto())
+	for rk, resource := range characterMetrics.resources {
+		protoMetrics.Resources = append(protoMetrics.Resources, resource.ToProto(rk.ActionID, rk.Type))
 	}
 
 	return protoMetrics
@@ -302,22 +277,34 @@ func (auraMetrics *AuraMetrics) ToProto(numIterations int32) *proto.AuraMetrics 
 }
 
 // Calculates DPS for an action.
-func GetActionDPS(playerMetrics proto.PlayerMetrics, iterations int32, duration time.Duration, actionID ActionID, ignoreTag bool) float64 {
+func GetActionDPS(playerMetrics proto.UnitMetrics, iterations int32, duration time.Duration, actionID ActionID, ignoreTag bool) float64 {
 	totalDPS := 0.0
 	for _, action := range playerMetrics.Actions {
 		metricsActionID := ProtoToActionID(*action.Id)
 		if actionID.SameAction(metricsActionID) || (ignoreTag && actionID.SameActionIgnoreTag(metricsActionID)) {
-			totalDPS += action.Damage / float64(iterations) / duration.Seconds()
+			for _, tam := range action.Targets {
+				totalDPS += tam.Damage / float64(iterations) / duration.Seconds()
+			}
 		}
 	}
 	return totalDPS
 }
 
 // Calculates average cast damage for an action.
-func GetActionAvgCast(playerMetrics proto.PlayerMetrics, actionID ActionID) float64 {
+func GetActionAvgCast(playerMetrics proto.UnitMetrics, actionID ActionID) float64 {
 	for _, action := range playerMetrics.Actions {
 		if actionID.SameAction(ProtoToActionID(*action.Id)) {
-			return action.Damage / float64(action.Casts)
+			casts := int32(0)
+			damage := 0.0
+			for _, tam := range action.Targets {
+				casts += tam.Casts
+				damage += tam.Damage
+			}
+			if casts == 0 {
+				return 0
+			} else {
+				return damage / float64(casts)
+			}
 		}
 	}
 	return 0

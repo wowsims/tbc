@@ -19,6 +19,7 @@ type Priest struct {
 	// TODO: aoe multi-target situations will need multiple spells ticking for each target.
 	DevouringPlague *core.Spell
 	HolyFire        *core.Spell
+	InnerFocus      *core.Spell
 	MindBlast       *core.Spell
 	MindFlay        []*core.Spell
 	ShadowWordDeath *core.Spell
@@ -36,9 +37,10 @@ type Priest struct {
 	StarshardsDot      *core.Dot
 	VampiricTouchDot   *core.Dot
 
-	InnerFocusAura    *core.Aura
-	MiseryAura        *core.Aura
-	ShadowWeavingAura *core.Aura
+	InnerFocusAura       *core.Aura
+	MiseryAura           *core.Aura
+	ShadowWeavingAura    *core.Aura
+	SurgeOfLightProcAura *core.Aura
 }
 
 type SelfBuffs struct {
@@ -115,10 +117,6 @@ func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) 
 			return spellCrit + (intellect/80)*core.SpellCritRatingPerCritChance
 		},
 	})
-
-	priest.registerShadowfiendCD()
-
-	priest.registerPowerInfusionCD()
 
 	return priest
 }

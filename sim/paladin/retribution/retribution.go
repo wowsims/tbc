@@ -73,6 +73,11 @@ func (ret *RetributionPaladin) GetPaladin() *paladin.Paladin {
 	return ret.Paladin
 }
 
+func (ret *RetributionPaladin) Init(sim *core.Simulation) {
+	ret.Paladin.Init(sim)
+	ret.DelayDPSCooldownsForArmorDebuffs(sim)
+}
+
 func (ret *RetributionPaladin) Reset(sim *core.Simulation) {
 	ret.Paladin.Reset(sim)
 
@@ -111,7 +116,7 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
 	// Cast selected judgement to keep on the boss
-	if !ret.IsOnCD(paladin.JudgementCD, sim.CurrentTime) &&
+	if ret.JudgementOfWisdom.IsReady(sim) &&
 		ret.judgement != proto.RetributionPaladin_Options_None {
 		var judge *core.Spell
 		switch ret.judgement {
@@ -122,25 +127,23 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 		}
 		if judge != nil {
 			if success := judge.Cast(sim, target); !success {
-				ret.WaitForMana(sim, judge.Instance.GetManaCost())
+				ret.WaitForMana(sim, judge.CurCast.Cost)
 			}
 		}
 	}
 
 	// Cast Seal of Command
 	if !ret.SealOfCommandAura.IsActive() {
-		soc := ret.NewSealOfCommand(sim)
-		if success := soc.StartCast(sim); !success {
-			ret.WaitForMana(sim, soc.GetManaCost())
+		if success := ret.SealOfCommand.Cast(sim, nil); !success {
+			ret.WaitForMana(sim, ret.SealOfCommand.CurCast.Cost)
 		}
 		return
 	}
 
 	// Cast Seal of Blood and enable attacks to twist
 	if !ret.SealOfBloodAura.IsActive() {
-		sob := ret.NewSealOfBlood(sim)
-		if success := sob.StartCast(sim); !success {
-			ret.WaitForMana(sim, sob.GetManaCost())
+		if success := ret.SealOfBlood.Cast(sim, nil); !success {
+			ret.WaitForMana(sim, ret.SealOfBlood.CurCast.Cost)
 		}
 		ret.AutoAttacks.EnableAutoSwing(sim)
 		ret.openerCompleted = true
@@ -160,10 +163,10 @@ func (ret *RetributionPaladin) rotation(sim *core.Simulation) {
 	// Setup
 	target := sim.GetPrimaryTarget()
 
-	gcdCD := ret.GetRemainingCD(core.GCDCooldownID, sim.CurrentTime)
-	crusaderStrikeCD := ret.GetRemainingCD(paladin.CrusaderStrikeCD, sim.CurrentTime)
-	nextCrusaderStrikeCD := ret.CDReadyAt(paladin.CrusaderStrikeCD)
-	judgementCD := ret.GetRemainingCD(paladin.JudgementCD, sim.CurrentTime)
+	gcdCD := ret.GCD.TimeToReady(sim)
+	crusaderStrikeCD := ret.CrusaderStrike.TimeToReady(sim)
+	nextCrusaderStrikeCD := ret.CrusaderStrike.CD.ReadyAt()
+	judgementCD := ret.JudgementOfWisdom.TimeToReady(sim)
 
 	sobActive := ret.SealOfBloodAura.IsActive()
 
@@ -186,22 +189,22 @@ func (ret *RetributionPaladin) rotation(sim *core.Simulation) {
 	}
 
 	// Judgement can affect active seals and CDs
-	nextJudgementCD := ret.CDReadyAt(paladin.JudgementCD)
+	nextJudgementCD := ret.JudgementOfWisdom.CD.ReadyAt()
 
 	if gcdCD == 0 {
 		if socActive && inTwistWindow {
 			// If Seal of Command is Active, complete the twist
-			ret.NewSealOfBlood(sim).StartCast(sim)
+			ret.SealOfBlood.Cast(sim, nil)
 		} else if crusaderStrikeCD == 0 && !willTwist &&
 			(sobActive || spellGCD < timeTilNextSwing) {
 			// Cast Crusader Strike if we won't swing naked and we aren't twisting
 			ret.CrusaderStrike.Cast(sim, target)
 		} else if willTwist && !socActive && (nextJudgementCD > latestTwistStart) {
 			// Prep seal of command
-			ret.NewSealOfCommand(sim).StartCast(sim)
+			ret.SealOfCommand.Cast(sim, nil)
 		} else if !sobActive && !socActive && !willTwist {
 			// If no seal is active, cast Seal of Blood
-			ret.NewSealOfBlood(sim).StartCast(sim)
+			ret.SealOfBlood.Cast(sim, nil)
 		}
 	}
 
@@ -209,16 +212,15 @@ func (ret *RetributionPaladin) rotation(sim *core.Simulation) {
 	events := []time.Duration{
 		nextSwingAt,
 		nextSwingAt - twistWindow,
-		ret.CDReadyAt(core.GCDCooldownID),
-		ret.CDReadyAt(paladin.JudgementCD),
-		ret.CDReadyAt(paladin.CrusaderStrikeCD),
+		ret.GCD.ReadyAt(),
+		ret.JudgementOfWisdom.CD.ReadyAt(),
+		ret.CrusaderStrike.CD.ReadyAt(),
 	}
 
 	ret.waitUntilNextEvent(sim, events)
 }
 
 func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Target, sobActive bool) {
-
 }
 
 // Just roll seal of blood and cast crusader strike on CD to conserve mana
@@ -230,24 +232,21 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 
 	spellGCD := ret.SpellGCD()
 
-	sobAndCSCost := ret.CrusaderStrike.Template.GetManaCost() + ret.SealOfBlood.Cost.Value
-	sobAndJudgementCost := ret.JudgementOfBlood.Template.GetManaCost() + ret.SealOfBlood.Cost.Value
+	sobAndCSCost := ret.CrusaderStrike.DefaultCast.Cost + ret.SealOfBlood.DefaultCast.Cost
+	sobAndJudgementCost := ret.JudgementOfBlood.DefaultCast.Cost + ret.SealOfBlood.DefaultCast.Cost
 
-	if !ret.IsOnCD(core.GCDCooldownID, sim.CurrentTime) {
+	if !ret.GCD.IsReady(sim) {
 		// Roll seal of blood
 		if sim.CurrentTime+time.Second >= sobExpiration {
 			if ret.CanJudgementOfBlood(sim) && ret.CurrentMana() >= sobAndJudgementCost {
 				ret.JudgementOfBlood.Cast(sim, target)
 			}
-			sob := ret.NewSealOfBlood(sim)
-			if success := sob.StartCast(sim); !success {
-				ret.WaitForMana(sim, sob.GetManaCost())
-			}
+			ret.SealOfBlood.Cast(sim, target)
 		}
 
 		// Crusader strike unless it will cause seal of blood to drop
 		// Or we won't have enough mana to reseal
-		if !ret.IsOnCD(paladin.CrusaderStrikeCD, sim.CurrentTime) &&
+		if !ret.CrusaderStrike.CD.IsReady(sim) &&
 			!(spellGCD+sim.CurrentTime > nextSwingAt && sobExpiration < nextSwingAt) &&
 			(ret.CurrentMana() >= sobAndCSCost) {
 			ret.CrusaderStrike.Cast(sim, target)
@@ -255,8 +254,8 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 	}
 
 	events := []time.Duration{
-		ret.CDReadyAt(core.GCDCooldownID),
-		ret.CDReadyAt(paladin.CrusaderStrikeCD),
+		ret.GCD.ReadyAt(),
+		ret.CrusaderStrike.CD.ReadyAt(),
 		// ret.TimeUntilManaRegen(sobAndCSCost),
 		sobExpiration - time.Second,
 	}
@@ -274,13 +273,12 @@ func (ret *RetributionPaladin) waitUntilNextEvent(sim *core.Simulation, events [
 		}
 	}
 	// If the next action is  the GCD, just return
-	if nextEventAt == ret.CDReadyAt(core.GCDCooldownID) {
+	if nextEventAt == ret.GCD.ReadyAt() {
 		return
 	}
 
 	// Otherwise add a pending action for the next time
 	pa := &core.PendingAction{
-		Name:         "Next Ret Rotation Event",
 		Priority:     core.ActionPriorityLow,
 		OnAction:     ret.rotation,
 		NextActionAt: nextEventAt,

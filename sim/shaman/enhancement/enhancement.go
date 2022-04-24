@@ -95,6 +95,7 @@ func (enh *EnhancementShaman) GetShaman() *shaman.Shaman {
 
 func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 	enh.Shaman.Init(sim)
+	enh.DelayDPSCooldownsForArmorDebuffs(sim)
 
 	// Fill the GCD schedule based on our settings.
 	maxDuration := sim.GetMaxDuration()
@@ -108,7 +109,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				ss := enh.Stormstrike
 				success := ss.Cast(sim, sim.GetPrimaryTarget())
 				if !success {
-					enh.WaitForMana(sim, ss.Instance.Cost.Value)
+					enh.WaitForMana(sim, ss.CurCast.Cost)
 				}
 				return success
 			},
@@ -137,7 +138,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 
 			success := shock.Cast(sim, sim.GetPrimaryTarget())
 			if !success {
-				enh.WaitForMana(sim, shock.Instance.Cost.Value)
+				enh.WaitForMana(sim, shock.CurCast.Cost)
 			}
 			return success
 		},
@@ -170,6 +171,8 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 		enh.scheduler.ScheduleMCD(sim, enh.GetCharacter(), core.DrumsOfBattleActionID)
 	} else if enh.Consumes.Drums == proto.Drums_DrumsOfRestoration {
 		enh.scheduler.ScheduleMCD(sim, enh.GetCharacter(), core.DrumsOfRestorationActionID)
+	} else if enh.Consumes.Drums == proto.Drums_DrumsOfWar {
+		enh.scheduler.ScheduleMCD(sim, enh.GetCharacter(), core.DrumsOfWarActionID)
 	}
 	enh.scheduler.ScheduleMCD(sim, enh.GetCharacter(), enh.BloodlustActionID())
 
@@ -210,13 +213,13 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 	scheduleSpellTotem := func(duration time.Duration, spell *core.Spell) {
 		scheduleTotem(duration, false, false, func(sim *core.Simulation) (bool, float64) {
 			success := spell.Cast(sim, sim.GetPrimaryTarget())
-			return success, spell.Instance.Cost.Value
+			return success, spell.CurCast.Cost
 		})
 	}
-	schedule2MTotem := func(castFactory func(sim *core.Simulation) *core.SimpleCast) {
+	schedule2MTotem := func(castFactory func(sim *core.Simulation) *core.Spell) {
 		scheduleTotem(time.Minute*2, true, true, func(sim *core.Simulation) (bool, float64) {
-			cast := castFactory(sim)
-			return cast.StartCast(sim), cast.Cost.Value
+			spell := castFactory(sim)
+			return spell.Cast(sim, sim.GetPrimaryTarget()), spell.CurCast.Cost
 		})
 	}
 
@@ -232,7 +235,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.MagmaTotem
 				success := cast.Cast(sim, nil)
 				if !success {
-					enh.WaitForMana(sim, cast.Instance.Cost.Value)
+					enh.WaitForMana(sim, cast.CurCast.Cost)
 				}
 			}
 		case proto.FireTotem_SearingTotem:
@@ -244,7 +247,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.SearingTotem
 				success := cast.Cast(sim, sim.GetPrimaryTarget())
 				if !success {
-					enh.WaitForMana(sim, cast.Instance.Cost.Value)
+					enh.WaitForMana(sim, cast.CurCast.Cost)
 				}
 			}
 		case proto.FireTotem_TotemOfWrath:
@@ -254,10 +257,10 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 					return
 				}
 
-				cast := enh.NewTotemOfWrath(sim)
-				success := cast.StartCast(sim)
+				cast := enh.TotemOfWrath
+				success := cast.Cast(sim, nil)
 				if !success {
-					enh.WaitForMana(sim, cast.Cost.Value)
+					enh.WaitForMana(sim, cast.CurCast.Cost)
 				}
 			}
 		}
@@ -272,7 +275,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				cast := enh.FireNovaTotem
 				success := cast.Cast(sim, nil)
 				if !success {
-					enh.WaitForMana(sim, cast.Instance.Cost.Value)
+					enh.WaitForMana(sim, cast.CurCast.Cost)
 				}
 				return success
 			},
@@ -319,21 +322,21 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 		case proto.FireTotem_SearingTotem:
 			scheduleSpellTotem(time.Minute*1+1, enh.SearingTotem)
 		case proto.FireTotem_TotemOfWrath:
-			schedule2MTotem(func(sim *core.Simulation) *core.SimpleCast { return enh.NewTotemOfWrath(sim) })
+			schedule2MTotem(func(sim *core.Simulation) *core.Spell { return enh.TotemOfWrath })
 		}
 	}
 
 	if enh.Totems.Air != proto.AirTotem_NoAirTotem {
-		var defaultCastFactory func(sim *core.Simulation) *core.SimpleCast
+		var defaultCastFactory func(sim *core.Simulation) *core.Spell
 		switch enh.Totems.Air {
 		case proto.AirTotem_GraceOfAirTotem:
-			defaultCastFactory = func(sim *core.Simulation) *core.SimpleCast { return enh.NewGraceOfAirTotem(sim) }
+			defaultCastFactory = func(sim *core.Simulation) *core.Spell { return enh.GraceOfAirTotem }
 		case proto.AirTotem_TranquilAirTotem:
-			defaultCastFactory = func(sim *core.Simulation) *core.SimpleCast { return enh.NewTranquilAirTotem(sim) }
+			defaultCastFactory = func(sim *core.Simulation) *core.Spell { return enh.TranquilAirTotem }
 		case proto.AirTotem_WindfuryTotem:
-			defaultCastFactory = func(sim *core.Simulation) *core.SimpleCast { return enh.NewWindfuryTotem(sim) }
+			defaultCastFactory = func(sim *core.Simulation) *core.Spell { return enh.WindfuryTotem }
 		case proto.AirTotem_WrathOfAirTotem:
-			defaultCastFactory = func(sim *core.Simulation) *core.SimpleCast { return enh.NewWrathOfAirTotem(sim) }
+			defaultCastFactory = func(sim *core.Simulation) *core.Spell { return enh.WrathOfAirTotem }
 		}
 
 		if enh.Totems.TwistWindfury {
@@ -344,10 +347,10 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 						return false
 					}
 
-					cast := enh.NewWindfuryTotem(sim)
-					success := cast.StartCast(sim)
+					cast := enh.WindfuryTotem
+					success := cast.Cast(sim, nil)
 					if !success {
-						enh.WaitForMana(sim, cast.Cost.Value)
+						enh.WaitForMana(sim, cast.CurCast.Cost)
 					}
 					return success
 				},
@@ -362,9 +365,9 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 					}
 
 					cast := defaultCastFactory(sim)
-					success := cast.StartCast(sim)
+					success := cast.Cast(sim, sim.GetPrimaryTarget())
 					if !success {
-						enh.WaitForMana(sim, cast.Cost.Value)
+						enh.WaitForMana(sim, cast.CurCast.Cost)
 					}
 					return success
 				},
@@ -391,15 +394,15 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 	if enh.Totems.Earth != proto.EarthTotem_NoEarthTotem {
 		switch enh.Totems.Earth {
 		case proto.EarthTotem_StrengthOfEarthTotem:
-			schedule2MTotem(func(sim *core.Simulation) *core.SimpleCast { return enh.NewStrengthOfEarthTotem(sim) })
+			schedule2MTotem(func(sim *core.Simulation) *core.Spell { return enh.StrengthOfEarthTotem })
 		case proto.EarthTotem_TremorTotem:
-			schedule2MTotem(func(sim *core.Simulation) *core.SimpleCast { return enh.NewTremorTotem(sim) })
+			schedule2MTotem(func(sim *core.Simulation) *core.Spell { return enh.TremorTotem })
 		}
 	}
 
 	if enh.Totems.Water != proto.WaterTotem_NoWaterTotem {
 		if enh.Totems.Water == proto.WaterTotem_ManaSpringTotem {
-			schedule2MTotem(func(sim *core.Simulation) *core.SimpleCast { return enh.NewManaSpringTotem(sim) })
+			schedule2MTotem(func(sim *core.Simulation) *core.Spell { return enh.ManaSpringTotem })
 		}
 	}
 }

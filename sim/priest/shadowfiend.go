@@ -12,8 +12,7 @@ import (
 
 const SpellIDShadowfiend int32 = 34433
 
-var ShadowfiendCD = core.NewCooldownID()
-var ShadowfiendActionID = core.ActionID{SpellID: SpellIDShadowfiend, CooldownID: ShadowfiendCD}
+var ShadowfiendActionID = core.ActionID{SpellID: SpellIDShadowfiend}
 
 func (priest *Priest) registerShadowfiendCD() {
 	if !priest.UseShadowfiend {
@@ -21,11 +20,13 @@ func (priest *Priest) registerShadowfiendCD() {
 	}
 
 	priest.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   ShadowfiendActionID,
-		CooldownID: ShadowfiendCD,
-		Cooldown:   time.Minute * 5,
-		UsesGCD:    true,
-		Type:       core.CooldownTypeMana,
+		ActionID: ShadowfiendActionID,
+		Cooldown: core.Cooldown{
+			Timer:    priest.NewTimer(),
+			Duration: time.Minute * 5,
+		},
+		UsesGCD: true,
+		Type:    core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if character.CurrentMana() < 575 {
 				return false
@@ -52,25 +53,24 @@ func (priest *Priest) registerShadowfiendCD() {
 }
 
 func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: priest.BaseMana() * 0.06}
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    ShadowfiendActionID,
-				Character:   &priest.Character,
-				SpellSchool: core.SpellSchoolShadow,
-				BaseCost:    cost,
-				Cost:        cost,
-				CastTime:    0,
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Minute * 5,
-			},
-		},
-	}
-	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.MentalAgility) * 0.02
+	baseCost := priest.BaseMana() * 0.06
+	shadowfiendMCD := priest.GetInitialMajorCooldown(ShadowfiendActionID)
 
 	priest.Shadowfiend = priest.RegisterSpell(core.SpellConfig{
-		Template: template,
+		ActionID:    ShadowfiendActionID,
+		SpellSchool: core.SpellSchoolShadow,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.02*float64(priest.Talents.MentalAgility)),
+				GCD:  core.GCDDefault,
+			},
+			CD: shadowfiendMCD.Cooldown,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			OutcomeApplier:      core.OutcomeFuncMagicHit(),
@@ -85,7 +85,7 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.ShadowfiendDot = core.NewDot(core.Dot{
 		Spell: priest.Shadowfiend,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Shadowfiend-" + strconv.Itoa(int(priest.Index)),
 			ActionID: ShadowfiendActionID,
 		}),
@@ -102,8 +102,8 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 			IsPeriodic:     true,
 			BaseDamage:     core.BaseDamageConfigMagicNoRoll(1191/10, 0.06),
 			OutcomeApplier: core.OutcomeFuncTick(),
-			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, tickDamage float64) {
-				priest.AddMana(sim, tickDamage*2.5, ShadowfiendActionID, false)
+			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				priest.AddMana(sim, spellEffect.Damage*2.5, ShadowfiendActionID, false)
 			},
 		}),
 	})

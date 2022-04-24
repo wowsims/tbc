@@ -1,5 +1,5 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { ActionMetrics, PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
+import { ActionMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 
 import { ColumnSortType, MetricsTable } from './metrics_table.js';
 import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
@@ -41,18 +41,18 @@ export class CastMetricsTable extends MetricsTable<ActionMetrics> {
 		}
 		const player = players[0];
 
-		const actions = player.actions;
+		const actions = player.actions.filter(action => action.casts != 0);
 		const actionGroups = ActionMetrics.groupById(actions);
-		const petGroups = player.pets.map(pet => pet.actions);
+		const petGroups = player.pets.map(pet => pet.actions.filter(action => action.casts != 0));
 
 		return actionGroups.concat(petGroups);
 	}
 
 	mergeMetrics(metrics: Array<ActionMetrics>): ActionMetrics {
-		return ActionMetrics.merge(metrics, true, metrics[0].player?.petActionId || undefined);
+		return ActionMetrics.merge(metrics, true, metrics[0].unit?.petActionId || undefined);
 	}
 
 	shouldCollapse(metric: ActionMetrics): boolean {
-		return !metric.player?.isPet;
+		return !metric.unit?.isPet;
 	}
 }

@@ -49,7 +49,7 @@ func (encounter *Encounter) doneIteration(sim *Simulation) {
 
 func (encounter *Encounter) GetMetricsProto(numIterations int32) *proto.EncounterMetrics {
 	metrics := &proto.EncounterMetrics{
-		Targets: make([]*proto.TargetMetrics, len(encounter.Targets)),
+		Targets: make([]*proto.UnitMetrics, len(encounter.Targets)),
 	}
 
 	i := 0
@@ -90,6 +90,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		},
 		MobType: options.MobType,
 	}
+	target.GCD = target.NewTimer()
 	if target.Level == 0 {
 		target.Level = 73
 	}
@@ -117,6 +118,10 @@ func (target *Target) finalize() {
 	target.Unit.finalize()
 }
 
+func (target *Target) init(sim *Simulation) {
+	target.Unit.init(sim)
+}
+
 func (target *Target) Reset(sim *Simulation) {
 	target.Unit.reset(sim)
 }
@@ -129,8 +134,17 @@ func (target *Target) doneIteration(sim *Simulation) {
 	target.Unit.doneIteration(sim)
 }
 
-func (target *Target) GetMetricsProto(numIterations int32) *proto.TargetMetrics {
-	return &proto.TargetMetrics{
+func (target *Target) NextTarget(sim *Simulation) *Target {
+	nextIndex := target.Index + 1
+	if nextIndex >= sim.GetNumTargets() {
+		nextIndex = 0
+	}
+	return sim.GetTarget(nextIndex)
+}
+
+func (target *Target) GetMetricsProto(numIterations int32) *proto.UnitMetrics {
+	return &proto.UnitMetrics{
+		Name:  target.Label,
 		Auras: target.auraTracker.GetMetricsProto(numIterations),
 	}
 }

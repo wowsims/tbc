@@ -38,9 +38,9 @@ var PlayerOptionsBasic = &proto.Player_ProtectionWarrior{
 }
 
 var warriorRotation = &proto.ProtectionWarrior_Rotation{
-	DemoShout:             proto.ProtectionWarrior_Rotation_DemoShoutMaintain,
-	ThunderClap:           proto.ProtectionWarrior_Rotation_ThunderClapMaintain,
-	HeroicStrikeThreshold: 30,
+	DemoShout:       proto.ProtectionWarrior_Rotation_DemoShoutMaintain,
+	ThunderClap:     proto.ProtectionWarrior_Rotation_ThunderClapMaintain,
+	HsRageThreshold: 30,
 }
 
 var warriorOptions = &proto.ProtectionWarrior_Options{

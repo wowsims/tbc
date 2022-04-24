@@ -10,26 +10,17 @@ import (
 var IgniteActionID = core.ActionID{SpellID: 12848}
 
 func (mage *Mage) registerIgniteSpell(sim *core.Simulation) {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    IgniteActionID,
-				Character:   &mage.Character,
-				SpellSchool: core.SpellSchoolFire,
-				SpellExtras: SpellFlagMage | core.SpellExtrasIgnoreModifiers,
-			},
-		},
-	}
-
 	mage.Ignite = mage.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    IgniteActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagMage | core.SpellExtrasIgnoreModifiers,
 	})
 }
 
 func (mage *Mage) newIgniteDot(sim *core.Simulation, target *core.Target) *core.Dot {
 	return core.NewDot(core.Dot{
 		Spell: mage.Ignite,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Ignite-" + strconv.Itoa(int(mage.Index)),
 			ActionID: IgniteActionID,
 		}),
@@ -53,8 +44,8 @@ func (mage *Mage) procIgnite(sim *core.Simulation, target *core.Target, damageFr
 		mage.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)", IgniteActionID, 0.0, time.Duration(0))
 		mage.Log(sim, "Completed cast %s", IgniteActionID)
 	}
-	mage.Ignite.Casts++
-	mage.Ignite.Hits++
+	mage.Ignite.SpellMetrics[target.Index].Casts++
+	mage.Ignite.SpellMetrics[target.Index].Hits++
 
 	// Reassign the effect to apply the new damage value.
 	igniteDot.TickEffects = core.TickFuncSnapshot(target, core.SpellEffect{
@@ -72,17 +63,19 @@ func (mage *Mage) applyIgnite() {
 		return
 	}
 
-	mage.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		return mage.GetOrRegisterAura(&core.Aura{
-			Label: "Ignite Talent",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
-				if spell.SpellSchool == core.SpellSchoolFire && spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					mage.procIgnite(sim, spellEffect.Target, spellEffect.Damage)
-				}
-			},
-		})
+	mage.RegisterAura(core.Aura{
+		Label:    "Ignite Talent",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+			if spell.SpellSchool == core.SpellSchoolFire && spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				mage.procIgnite(sim, spellEffect.Target, spellEffect.Damage)
+			}
+		},
 	})
 }

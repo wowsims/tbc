@@ -9,36 +9,33 @@ import (
 
 const SpellIDFireBlast int32 = 27079
 
-var FireBlastCooldownID = core.NewCooldownID()
-var FireBlastActionID = core.ActionID{SpellID: SpellIDFireBlast, CooldownID: FireBlastCooldownID}
+var FireBlastActionID = core.ActionID{SpellID: SpellIDFireBlast}
 
 func (mage *Mage) registerFireBlastSpell(sim *core.Simulation) {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    FireBlastActionID,
-				Character:   &mage.Character,
-				SpellSchool: core.SpellSchoolFire,
-				SpellExtras: SpellFlagMage,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 465,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 465,
-				},
-				GCD:      core.GCDDefault,
-				Cooldown: time.Second * 8,
-			},
-		},
-	}
-	spell.CastTime -= time.Millisecond * 500 * time.Duration(mage.Talents.ImprovedFireBlast)
-	spell.Cost.Value -= spell.BaseCost.Value * float64(mage.Talents.Pyromaniac) * 0.01
-	spell.Cost.Value *= 1 - float64(mage.Talents.ElementalPrecision)*0.01
+	baseCost := 465.0
 
 	mage.FireBlast = mage.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    FireBlastActionID,
+		SpellSchool: core.SpellSchoolFire,
+		SpellExtras: SpellFlagMage,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost *
+					(1 - 0.01*float64(mage.Talents.Pyromaniac)) *
+					(1 - 0.01*float64(mage.Talents.ElementalPrecision)),
+
+				GCD: core.GCDDefault,
+			},
+			CD: core.Cooldown{
+				Timer:    mage.NewTimer(),
+				Duration: time.Second*8 - time.Millisecond*500*time.Duration(mage.Talents.ImprovedFireBlast),
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
 

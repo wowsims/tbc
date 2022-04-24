@@ -1,5 +1,5 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { ResourceMetrics, PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
+import { ResourceMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { ResourceType } from '/tbc/core/proto/api.js';
 import { resourceNames } from '/tbc/core/proto_utils/names.js';
 import { getEnumValues } from '/tbc/core/utils.js';
@@ -99,6 +99,6 @@ export class TypedResourceMetricsTable extends MetricsTable<ResourceMetrics> {
 	}
 
 	mergeMetrics(metrics: Array<ResourceMetrics>): ResourceMetrics {
-		return ResourceMetrics.merge(metrics, true, metrics[0].player?.petActionId || undefined);
+		return ResourceMetrics.merge(metrics, true, metrics[0].unit?.petActionId || undefined);
 	}
 }

@@ -14,17 +14,8 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 	character := agent.GetCharacter()
 
 	tlcSpell := character.RegisterSpell(core.SpellConfig{
-		Template: core.SimpleSpell{
-			SpellCast: core.SpellCast{
-				Cast: core.Cast{
-					ActionID: core.ActionID{
-						ItemID: core.ItemIDTheLightningCapacitor,
-					},
-					Character:   character,
-					SpellSchool: core.SpellSchoolNature,
-				},
-			},
-		},
+		ActionID:    core.ActionID{ItemID: core.ItemIDTheLightningCapacitor},
+		SpellSchool: core.SpellSchoolNature,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			IsPhantom:        true, // TODO: replace with ProcMask
 			DamageMultiplier: 1,
@@ -35,34 +26,38 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 		}),
 	})
 
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		charges := 0
+	var charges int
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Millisecond * 2500,
+	}
 
-		const icdDur = time.Millisecond * 2500
-		icd := core.NewICD()
+	character.RegisterAura(core.Aura{
+		Label:    "Lightning Capacitor",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			charges = 0
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !icd.IsReady(sim) {
+				return
+			}
 
-		return character.GetOrRegisterAura(&core.Aura{
-			Label: "Lightning Capacitor",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if icd.IsOnCD(sim) {
-					return
-				}
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
 
-				if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-					return
-				}
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+				return
+			}
 
-				if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-					return
-				}
-
-				charges++
-				if charges >= 3 {
-					icd = core.InternalCD(sim.CurrentTime + icdDur)
-					tlcSpell.Cast(sim, spellEffect.Target)
-					charges = 0
-				}
-			},
-		})
+			charges++
+			if charges >= 3 {
+				icd.Use(sim)
+				tlcSpell.Cast(sim, spellEffect.Target)
+				charges = 0
+			}
+		},
 	})
 }

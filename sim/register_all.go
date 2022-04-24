@@ -3,6 +3,7 @@ package sim
 import (
 	_ "github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/druid/balance"
+	"github.com/wowsims/tbc/sim/druid/feral"
 	"github.com/wowsims/tbc/sim/hunter"
 	"github.com/wowsims/tbc/sim/mage"
 	"github.com/wowsims/tbc/sim/paladin/retribution"
@@ -11,6 +12,7 @@ import (
 	"github.com/wowsims/tbc/sim/rogue"
 	"github.com/wowsims/tbc/sim/shaman/elemental"
 	"github.com/wowsims/tbc/sim/shaman/enhancement"
+	"github.com/wowsims/tbc/sim/warlock"
 	dpsWarrior "github.com/wowsims/tbc/sim/warrior/dps"
 	protectionWarrior "github.com/wowsims/tbc/sim/warrior/protection"
 )
@@ -24,6 +26,7 @@ func RegisterAll() {
 	registered = true
 
 	balance.RegisterBalanceDruid()
+	feral.RegisterFeralDruid()
 	elemental.RegisterElementalShaman()
 	enhancement.RegisterEnhancementShaman()
 	hunter.RegisterHunter()
@@ -34,4 +37,5 @@ func RegisterAll() {
 	protectionWarrior.RegisterProtectionWarrior()
 	retribution.RegisterRetributionPaladin()
 	smite.RegisterSmitePriest()
+	warlock.RegisterWarlock()
 }

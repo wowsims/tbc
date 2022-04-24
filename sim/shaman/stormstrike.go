@@ -8,11 +8,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var StormstrikeCD = core.NewCooldownID()
-var StormstrikeActionID = core.ActionID{SpellID: 17364, CooldownID: StormstrikeCD}
+var StormstrikeActionID = core.ActionID{SpellID: 17364}
 
 func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) *core.Aura {
-	return target.GetOrRegisterAura(&core.Aura{
+	return target.GetOrRegisterAura(core.Aura{
 		Label:     "Stormstrike",
 		ActionID:  StormstrikeActionID,
 		Duration:  time.Second * 12,
@@ -37,17 +36,6 @@ func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) *core.Aura {
 }
 
 func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    StormstrikeActionID,
-				Character:   &shaman.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
-
 	effect := core.SpellEffect{
 		DamageMultiplier: 1,
 		ThreatMultiplier: core.TernaryFloat64(shaman.Talents.SpiritWeapons, 0.7, 1),
@@ -64,8 +52,10 @@ func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
 	}
 
 	return shaman.RegisterSpell(core.SpellConfig{
-		Template:     template,
-		ModifyCast:   core.ModifyCastAssignTarget,
+		ActionID:    StormstrikeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 }
@@ -74,25 +64,9 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 	mhHit := shaman.newStormstrikeHitSpell(true)
 	ohHit := shaman.newStormstrikeHitSpell(false)
 
-	ss := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    StormstrikeActionID,
-				Character:   &shaman.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				IgnoreHaste: true,
-				Cooldown:    time.Second * 10,
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 237,
-				},
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
+	baseCost := 237.0
 	if shaman.Equip[items.ItemSlotRanged].ID == StormfuryTotem {
-		ss.Cost.Value -= 22
+		baseCost -= 22
 	}
 
 	ssDebuffAura := shaman.stormstrikeDebuffAura(sim.GetPrimaryTarget())
@@ -103,8 +77,25 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 	}
 
 	shaman.Stormstrike = shaman.RegisterSpell(core.SpellConfig{
-		Template:   ss,
-		ModifyCast: core.ModifyCastAssignTarget,
+		ActionID:    StormstrikeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true,
+			CD: core.Cooldown{
+				Timer:    shaman.NewTimer(),
+				Duration: time.Second * 10,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),
@@ -122,8 +113,8 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 
 				mhHit.Cast(sim, spellEffect.Target)
 				ohHit.Cast(sim, spellEffect.Target)
-				shaman.Stormstrike.Casts -= 2
-				shaman.Stormstrike.Hits--
+				shaman.Stormstrike.SpellMetrics[spellEffect.Target.Index].Casts -= 2
+				shaman.Stormstrike.SpellMetrics[spellEffect.Target.Index].Hits--
 			},
 		}),
 	})

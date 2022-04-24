@@ -14,6 +14,7 @@ import { TristateEffect } from '/tbc/core/proto/common.js'
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
 import { Alchohol } from '/tbc/core/proto/common.js';
@@ -42,6 +43,15 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 			cssClass: 'warrior-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
+			],
+			warnings: [
+				(simUI: IndividualSimUI<Spec.SpecWarrior>) => {
+					return {
+						updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter]),
+						shouldDisplay: () => true,
+						getContent: () => 'This sim is newly released, and there are likely a few bugs. Please let us know if you encounter any issues!',
+					};
+				},
 			],
 
 			// All stats for which EP should be calculated.
@@ -75,23 +85,23 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 				gear: Presets.P1_FURY_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
-					[Stat.StatStrength]: 2.5,
-					[Stat.StatAgility]: 1.75,
+					[Stat.StatStrength]: 2.17,
+					[Stat.StatAgility]: 1.4,
 					[Stat.StatAttackPower]: 1,
-					[Stat.StatExpertise]: 3.75,
-					[Stat.StatMeleeHit]: 1.5,
-					[Stat.StatMeleeCrit]: 2.5,
-					[Stat.StatMeleeHaste]: 3,
+					[Stat.StatExpertise]: 3.29,
+					[Stat.StatMeleeHit]: 0.41,
+					[Stat.StatMeleeCrit]: 1.83,
+					[Stat.StatMeleeHaste]: 2.07,
 					[Stat.StatArmorPenetration]: 0.5,
 				}),
 				// Default consumes settings.
-				consumes: Presets.DefaultFuryConsumes,
+				consumes: Presets.DefaultConsumes,
 				// Default rotation settings.
-				rotation: Presets.DefaultFuryRotation,
+				rotation: Presets.DefaultRotation,
 				// Default talents.
 				talents: Presets.FuryTalents.data,
 				// Default spec-specific settings.
-				specOptions: Presets.DefaultFuryOptions,
+				specOptions: Presets.DefaultOptions,
 				// Default raid/party buffs settings.
 				raidBuffs: RaidBuffs.create({
 					giftOfTheWild: TristateEffect.TristateEffectImproved,
@@ -125,7 +135,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 
 			// IconInputs to include in the 'Self Buffs' section on the settings tab.
 			selfBuffInputs: [
-				// TODO: Move reck to cooldown tabs
+				WarriorInputs.ShoutPicker,
 				WarriorInputs.Recklessness,
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
@@ -162,11 +172,13 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 				IconInputs.SunderArmor,
 				IconInputs.ExposeArmor,
 				IconInputs.CurseOfRecklessness,
+				IconInputs.GiftOfArthas,
 			],
 			// Which options are selectable in the 'Consumes' section.
 			consumeOptions: {
 				potions: [
 					Potions.HastePotion,
+					Potions.MightyRagePotion,
 				],
 				conjured: [
 					Conjured.ConjuredFlameCap,
@@ -179,6 +191,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 					BattleElixir.ElixirOfMajorStrength,
 					BattleElixir.ElixirOfMajorAgility,
 					BattleElixir.ElixirOfTheMongoose,
+					BattleElixir.FelStrengthElixir,
 				],
 				guardianElixirs: [
 				],
@@ -193,6 +206,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 				weaponImbues: [
 					WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
+					WeaponImbue.WeaponImbueElementalSharpeningStone,
 				],
 				other: [
 					IconInputs.ScrollOfAgilityV,
@@ -204,6 +218,12 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					WarriorInputs.StartingRage,
+					WarriorInputs.PrecastShout,
+					WarriorInputs.PrecastShoutWithSapphire,
+					WarriorInputs.PrecastShoutWithT2,
+					OtherInputs.ExposeWeaknessUptime,
+					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
 				],
 			},
@@ -230,8 +250,15 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 				// Preset gear configurations that the user can quickly select.
 				gear: [
 					Presets.P1_FURY_PRESET,
-					Presets.P1_ARMSSLAM_PRESET,
-					Presets.P1_ARMSDW_PRESET,
+					Presets.P2_FURY_PRESET,
+					Presets.P3_FURY_PRESET,
+					Presets.P4_FURY_PRESET,
+					Presets.P5_FURY_PRESET,
+					Presets.P1_ARMS_PRESET,
+					Presets.P2_ARMS_PRESET,
+					Presets.P3_ARMS_PRESET,
+					Presets.P4_ARMS_PRESET,
+					Presets.P5_ARMS_PRESET,
 				],
 			},
 		});

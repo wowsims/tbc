@@ -72,11 +72,11 @@ export const DefaultFrostRotation = MageRotation.create({
 
 export const DefaultFrostOptions = MageOptions.create({
 	armor: ArmorType.MageArmor,
-	useManaEmeralds: true,
 });
 
 export const DefaultFrostConsumes = Consumes.create({
 	defaultPotion: Potions.SuperManaPotion,
+	defaultConjured: Conjured.ConjuredMageManaEmerald,
 	flask: Flask.FlaskOfPureDeath,
 	food: Food.FoodBlackenedBasilisk,
 	mainHandImbue: WeaponImbue.WeaponImbueBrilliantWizardOil,
@@ -94,11 +94,11 @@ export const DefaultArcaneRotation = MageRotation.create({
 
 export const DefaultArcaneOptions = MageOptions.create({
 	armor: ArmorType.MageArmor,
-	useManaEmeralds: true,
 });
 
 export const DefaultArcaneConsumes = Consumes.create({
 	defaultPotion: Potions.SuperManaPotion,
+	defaultConjured: Conjured.ConjuredMageManaEmerald,
 	flask: Flask.FlaskOfBlindingLight,
 	food: Food.FoodBlackenedBasilisk,
 	mainHandImbue: WeaponImbue.WeaponImbueBrilliantWizardOil,
@@ -1269,6 +1269,323 @@ export const P4_FROST_PRESET = {
 		},
 		{
 			"id": 29982
+		}
+	]}`),
+};
+
+export const P5_ARCANE_PRESET = {
+	name: 'P5 Arcane Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Arcane,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 34405,
+			"enchant": 29191,
+			"gems": [
+				34220,
+				32196
+			]
+		},
+		{
+			"id": 33281
+		},
+		{
+			"id": 30210,
+			"enchant": 28886,
+			"gems": [
+				32204,
+				32215
+			]
+		},
+		{
+			"id": 34242,
+			"enchant": 33150,
+			"gems": [
+				32204
+			]
+		},
+		{
+			"id": 34399,
+			"enchant": 24003,
+			"gems": [
+				32204,
+				32215,
+				32204
+			]
+		},
+		{
+			"id": 34447,
+			"enchant": 22534,
+			"gems": [
+				32204
+			]
+		},
+		{
+			"id": 30205,
+			"enchant": 28272
+		},
+		{
+			"id": 34557,
+			"gems": [
+				32204
+			]
+		},
+		{
+			"id": 34386,
+			"enchant": 24274,
+			"gems": [
+				32196,
+				32204,
+				32204
+			]
+		},
+		{
+			"id": 34574,
+			"enchant": 35297,
+			"gems": [
+				32204
+			]
+		},
+		{
+			"id": 34230,
+			"enchant": 22536
+		},
+		{
+			"id": 34362,
+			"enchant": 22536
+		},
+		{
+			"id": 32483
+		},
+		{
+			"id": 30720
+		},
+		{
+			"id": 34336,
+			"enchant": 22560
+		},
+		{
+			"id": 34179
+		},
+		{
+			"id": 34347,
+			"gems": [
+				32204
+			]
+		}
+	]}`),
+};
+
+export const P5_FIRE_PRESET = {
+	name: 'P5 Fire Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Fire,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 34340,
+			"enchant": 29191,
+			"gems": [
+				34220,
+				32215
+			]
+		},
+		{
+			"id": 34204
+		},
+		{
+			"id": 34210,
+			"enchant": 28886,
+			"gems": [
+				32196,
+				35760
+			]
+		},
+		{
+			"id": 34242,
+			"enchant": 33150,
+			"gems": [
+				32196
+			]
+		},
+		{
+			"id": 34232,
+			"enchant": 24003,
+			"gems": [
+				32196,
+				35760,
+				35760
+			]
+		},
+		{
+			"id": 34447,
+			"enchant": 22534,
+			"gems": [
+				32215
+			]
+		},
+		{
+			"id": 34344,
+			"enchant": 28272,
+			"gems": [
+				35760,
+				32196
+			]
+		},
+		{
+			"id": 34557,
+			"gems": [
+				32221
+			]
+		},
+		{
+			"id": 34181,
+			"enchant": 24274,
+			"gems": [
+				32196,
+				32196,
+				32221
+			]
+		},
+		{
+			"id": 34574,
+			"enchant": 35297,
+			"gems": [
+				32221
+			]
+		},
+		{
+			"id": 34230,
+			"enchant": 22536
+		},
+		{
+			"id": 32527,
+			"enchant": 22536
+		},
+		{
+			"id": 34429
+		},
+		{
+			"id": 32483
+		},
+		{
+			"id": 34336,
+			"enchant": 22560
+		},
+		{
+			"id": 34179
+		},
+		{
+			"id": 34347,
+			"gems": [
+				35760
+			]
+		}
+	]}`),
+};
+
+export const P5_FROST_PRESET = {
+	name: 'P5 Frost Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	enableWhen: (player: Player<Spec.SpecMage>) => player.getRotation().type == RotationType.Frost,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 34340,
+			"enchant": 29191,
+			"gems": [
+				34220,
+				32215
+			]
+		},
+		{
+			"id": 34204
+		},
+		{
+			"id": 34210,
+			"enchant": 28886,
+			"gems": [
+				32196,
+				35760
+			]
+		},
+		{
+			"id": 34242,
+			"enchant": 33150,
+			"gems": [
+				32196
+			]
+		},
+		{
+			"id": 34232,
+			"enchant": 24003,
+			"gems": [
+				32196,
+				35760,
+				35760
+			]
+		},
+		{
+			"id": 34447,
+			"enchant": 22534,
+			"gems": [
+				32215
+			]
+		},
+		{
+			"id": 34344,
+			"enchant": 28272,
+			"gems": [
+				35760,
+				32196
+			]
+		},
+		{
+			"id": 34557,
+			"gems": [
+				32221
+			]
+		},
+		{
+			"id": 34181,
+			"enchant": 24274,
+			"gems": [
+				32196,
+				32196,
+				32221
+			]
+		},
+		{
+			"id": 34574,
+			"enchant": 35297,
+			"gems": [
+				32221
+			]
+		},
+		{
+			"id": 34230,
+			"enchant": 22536
+		},
+		{
+			"id": 32527,
+			"enchant": 22536
+		},
+		{
+			"id": 34429
+		},
+		{
+			"id": 32483
+		},
+		{
+			"id": 34336,
+			"enchant": 22560
+		},
+		{
+			"id": 34179
+		},
+		{
+			"id": 34347,
+			"gems": [
+				35760
+			]
 		}
 	]}`),
 };

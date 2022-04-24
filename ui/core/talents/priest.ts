@@ -3,7 +3,7 @@ import { PriestTalents as PriestTalents } from '/tbc/core/proto/priest.js';
 import { PriestSpecs } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
-import { TalentsConfig, TalentsPicker } from './talents_picker.js';
+import { TalentsConfig, TalentsPicker, newTalentsConfig } from './talents_picker.js';
 
 // Talents are the same for all Priest specs, so its ok to just use ShadowPriest here
 export class PriestTalentsPicker extends TalentsPicker<Spec.SpecShadowPriest> {
@@ -12,7 +12,7 @@ export class PriestTalentsPicker extends TalentsPicker<Spec.SpecShadowPriest> {
 	}
 }
 
-export const priestTalentsConfig: TalentsConfig<Spec.SpecShadowPriest> = [
+export const priestTalentsConfig: TalentsConfig<Spec.SpecShadowPriest> = newTalentsConfig([
 	{
 		name: 'Discipline',
 		backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/201.jpg',
@@ -640,4 +640,4 @@ export const priestTalentsConfig: TalentsConfig<Spec.SpecShadowPriest> = [
 			},
 		],
 	},
-];
+]);

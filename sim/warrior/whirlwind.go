@@ -7,37 +7,15 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var WhirlwindCooldownID = core.NewCooldownID()
-var WhirlwindActionID = core.ActionID{SpellID: 1680, CooldownID: WhirlwindCooldownID}
+var WhirlwindActionID = core.ActionID{SpellID: 1680}
 
 func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
-	warrior.whirlwindCost = 25.0 - float64(warrior.Talents.FocusedRage)
+	cost := 25.0 - float64(warrior.Talents.FocusedRage)
 	if ItemSetWarbringerBattlegear.CharacterHasSetBonus(&warrior.Character, 2) {
-		warrior.whirlwindCost -= 5
+		cost -= 5
 	}
 
-	ability := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    WhirlwindActionID,
-				Character:   &warrior.Character,
-				SpellSchool: core.SpellSchoolPhysical,
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Second*10 - time.Second*time.Duration(warrior.Talents.ImprovedWhirlwind),
-				IgnoreHaste: true,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.whirlwindCost,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Rage,
-					Value: warrior.whirlwindCost,
-				},
-			},
-		},
-	}
-
-	baseEffect := core.SpellEffect{
+	baseEffectMH := core.SpellEffect{
 		ProcMask: core.ProcMaskMeleeMHSpecial,
 
 		DamageMultiplier: 1,
@@ -46,20 +24,59 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 0, 1, true),
 		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 	}
+	baseEffectOH := core.SpellEffect{
+		ProcMask: core.ProcMaskMeleeOHSpecial,
+
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+
+		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.OffHand, true, 0, 1, true),
+		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())
-	effects := make([]core.SpellEffect, 0, numHits)
+	numTotalHits := numHits
+	if warrior.AutoAttacks.IsDualWielding {
+		numTotalHits *= 2
+	}
+
+	effects := make([]core.SpellEffect, 0, numTotalHits)
 	for i := int32(0); i < numHits; i++ {
-		effects = append(effects, baseEffect)
-		effects[i].Target = sim.GetTarget(i)
+		mhEffect := baseEffectMH
+		mhEffect.Target = sim.GetTarget(i)
+		effects = append(effects, mhEffect)
+
+		if warrior.AutoAttacks.IsDualWielding {
+			ohEffect := baseEffectOH
+			ohEffect.Target = sim.GetTarget(i)
+			effects = append(effects, ohEffect)
+		}
 	}
 
 	warrior.Whirlwind = warrior.RegisterSpell(core.SpellConfig{
-		Template:     ability,
+		ActionID:    WhirlwindActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Rage,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: cost,
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true,
+			CD: core.Cooldown{
+				Timer:    warrior.NewTimer(),
+				Duration: time.Second*10 - time.Second*time.Duration(warrior.Talents.ImprovedWhirlwind),
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
 	})
 }
 
 func (warrior *Warrior) CanWhirlwind(sim *core.Simulation) bool {
-	return warrior.CurrentRage() >= warrior.whirlwindCost && !warrior.IsOnCD(WhirlwindCooldownID, sim.CurrentTime)
+	return warrior.CurrentRage() >= warrior.Whirlwind.DefaultCast.Cost && warrior.Whirlwind.IsReady(sim)
 }

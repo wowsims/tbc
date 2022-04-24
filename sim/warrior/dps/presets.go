@@ -5,6 +5,45 @@ import (
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
+var PlayerOptionsArmsSlam = &proto.Player_Warrior{
+	Warrior: &proto.Warrior{
+		Talents:  ArmsSlamTalents,
+		Options:  warriorOptions,
+		Rotation: armsSlamRotation,
+	},
+}
+
+var PlayerOptionsFury = &proto.Player_Warrior{
+	Warrior: &proto.Warrior{
+		Talents:  FuryTalents,
+		Options:  warriorOptions,
+		Rotation: warriorRotation,
+	},
+}
+
+var ArmsSlamTalents = &proto.WarriorTalents{
+	ImprovedHeroicStrike:          3,
+	Deflection:                    2,
+	ImprovedThunderClap:           3,
+	AngerManagement:               true,
+	DeepWounds:                    3,
+	TwoHandedWeaponSpecialization: 5,
+	Impale:                        2,
+	DeathWish:                     true,
+	SwordSpecialization:           5,
+	ImprovedDisciplines:           2,
+	BloodFrenzy:                   2,
+	MortalStrike:                  true,
+
+	Cruelty:                   5,
+	ImprovedDemoralizingShout: 5,
+	CommandingPresence:        5,
+	ImprovedSlam:              2,
+	SweepingStrikes:           true,
+	WeaponMastery:             2,
+	Flurry:                    3,
+}
+
 var FuryTalents = &proto.WarriorTalents{
 	ImprovedHeroicStrike: 3,
 	AngerManagement:      true,
@@ -25,33 +64,43 @@ var FuryTalents = &proto.WarriorTalents{
 	Rampage:                 true,
 }
 
-var PlayerOptionsBasic = &proto.Player_Warrior{
-	Warrior: &proto.Warrior{
-		Talents:  FuryTalents,
-		Options:  warriorOptions,
-		Rotation: warriorRotation,
-	},
+var armsSlamRotation = &proto.Warrior_Rotation{
+	UseOverpower: true,
+	UseHamstring: true,
+	UseSlam:      true,
+
+	HsRageThreshold:        70,
+	HamstringRageThreshold: 75,
+	OverpowerRageThreshold: 20,
+	SlamLatency:            100,
+
+	UseSlamDuringExecute: true,
+	UseWwDuringExecute:   true,
+	UseMsDuringExecute:   true,
+	UseHsDuringExecute:   true,
 }
 
 var warriorRotation = &proto.Warrior_Rotation{
-	Fury: &proto.Warrior_Rotation_FuryRotation{
-		UseBtDuringExecute: true,
-		RampageCdThreshold: 5,
-	},
-	UseWwDuringExecute:     true,
-	UseHsDuringExecute:     true,
+	UseOverpower: true,
+	UseHamstring: true,
+
 	HsRageThreshold:        70,
-	UseOverpower:           false,
-	OverpowerRageThreshold: 30,
-	UseHamstring:           false,
 	HamstringRageThreshold: 75,
+	OverpowerRageThreshold: 20,
+	RampageCdThreshold:     5,
+
+	UseHsDuringExecute: true,
+	UseWwDuringExecute: true,
+	UseBtDuringExecute: true,
 }
 
 var warriorOptions = &proto.Warrior_Options{
-	StartingRage:    0,
-	PrecastT2:       false,
-	PrecastSapphire: false,
-	Recklessness:    false,
+	StartingRage:         50,
+	UseRecklessness:      true,
+	Shout:                proto.WarriorShout_WarriorShoutBattle,
+	PrecastShout:         false,
+	PrecastShoutT2:       false,
+	PrecastShoutSapphire: false,
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{

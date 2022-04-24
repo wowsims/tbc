@@ -1,6 +1,6 @@
 import { ResourceType } from '/tbc/core/proto/api.js';
 import { OtherAction } from '/tbc/core/proto/common.js';
-import { PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
+import { UnitMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 import { ActionId, resourceTypeToIcon } from '/tbc/core/proto_utils/action_id.js';
 import { resourceColors, resourceNames } from '/tbc/core/proto_utils/names.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -303,8 +303,8 @@ export class Timeline extends ResultComponent {
 	}
 
 	// Returns a function for drawing the tooltip, or null if no series was added.
-	private addDpsSeries(player: PlayerMetrics, options: any, colorOverride: string): { maxDps: number, tooltipHandler: TooltipHandler } {
-		const dpsLogs = player.dpsLogs;
+	private addDpsSeries(unit: UnitMetrics, options: any, colorOverride: string): { maxDps: number, tooltipHandler: TooltipHandler } {
+		const dpsLogs = unit.dpsLogs;
 
 		options.colors.push(colorOverride || dpsColor);
 		options.series.push({
@@ -322,14 +322,14 @@ export class Timeline extends ResultComponent {
 			maxDps: dpsLogs[maxIndex(dpsLogs.map(l => l.dps))!].dps,
 			tooltipHandler: (dataPointIndex: number) => {
 				const log = dpsLogs[dataPointIndex];
-				return this.dpsTooltip(log, true, player, colorOverride);
+				return this.dpsTooltip(log, true, unit, colorOverride);
 			},
 		};
 	}
 
 	// Returns a function for drawing the tooltip, or null if no series was added.
-	private addManaSeries(player: PlayerMetrics, options: any): TooltipHandler | null {
-		const manaLogs = player.groupedResourceLogs[ResourceType.ResourceTypeMana];
+	private addManaSeries(unit: UnitMetrics, options: any): TooltipHandler | null {
+		const manaLogs = unit.groupedResourceLogs[ResourceType.ResourceTypeMana];
 		if (manaLogs.length == 0) {
 			return null;
 		}
@@ -384,12 +384,12 @@ export class Timeline extends ResultComponent {
 	}
 
 	// Returns a function for drawing the tooltip, or null if no series was added.
-	private addThreatSeries(player: PlayerMetrics, options: any, colorOverride: string): TooltipHandler | null {
+	private addThreatSeries(unit: UnitMetrics, options: any, colorOverride: string): TooltipHandler | null {
 		options.colors.push(colorOverride || threatColor);
 		options.series.push({
 			name: 'Threat',
 			type: 'line',
-			data: player.threatLogs.map(log => {
+			data: unit.threatLogs.map(log => {
 				return {
 					x: this.toDatetime(log.timestamp),
 					y: log.threatAfter,
@@ -398,14 +398,14 @@ export class Timeline extends ResultComponent {
 		});
 
 		return (dataPointIndex: number) => {
-			const log = player.threatLogs[dataPointIndex];
-			return this.threatTooltip(log, true, player, colorOverride);
+			const log = unit.threatLogs[dataPointIndex];
+			return this.threatTooltip(log, true, unit, colorOverride);
 		};
 	}
 
-	private addMajorCooldownAnnotations(player: PlayerMetrics, options: any) {
-		const mcdLogs = player.majorCooldownLogs;
-		const mcdAuraLogs = player.majorCooldownAuraUptimeLogs;
+	private addMajorCooldownAnnotations(unit: UnitMetrics, options: any) {
+		const mcdLogs = unit.majorCooldownLogs;
+		const mcdAuraLogs = unit.majorCooldownAuraUptimeLogs;
 
 		// Figure out how much to vertically offset cooldown icons, for cooldowns
 		// used very close to each other. This is so the icons don't overlap.
@@ -454,7 +454,7 @@ export class Timeline extends ResultComponent {
 		this.hiddenIdsChangeEmitter = new TypedEvent<void>();
 	}
 
-	private updateRotationChart(player: PlayerMetrics, duration: number) {
+	private updateRotationChart(player: UnitMetrics, duration: number) {
 		const targets = this.resultData!.result.getTargets(this.resultData!.filter);
 		if (targets.length == 0) {
 			return;
@@ -767,7 +767,7 @@ export class Timeline extends ResultComponent {
 		ctx.stroke();
 	}
 
-	private dpsTooltip(log: DpsLog, includeAuras: boolean, player: PlayerMetrics, colorOverride: string): string {
+	private dpsTooltip(log: DpsLog, includeAuras: boolean, player: UnitMetrics, colorOverride: string): string {
 		const showPlayerLabel = colorOverride != '';
 		return `<div class="timeline-tooltip dps">
 			<div class="timeline-tooltip-header">
@@ -789,7 +789,7 @@ export class Timeline extends ResultComponent {
 		</div>`;
 	}
 
-	private threatTooltip(log: ThreatLogGroup, includeAuras: boolean, player: PlayerMetrics, colorOverride: string): string {
+	private threatTooltip(log: ThreatLogGroup, includeAuras: boolean, player: UnitMetrics, colorOverride: string): string {
 		const showPlayerLabel = colorOverride != '';
 		return `<div class="timeline-tooltip threat">
 			<div class="timeline-tooltip-header">
@@ -931,6 +931,21 @@ const idToCategoryMap: Record<number, number> = {
 	[25585]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r4
 	[25587]: SPELL_ACTION_CATEGORY + 0.3, // Windfury Totem r5
 	[2825]: DEFAULT_ACTION_CATEGORY + 0.1, // Bloodlust
+
+	// Warrior
+	[25231]: 0.1, // Cleave
+	[29707]: 0.1, // Heroic Strike
+	[25242]: MELEE_ACTION_CATEGORY + 0.05, // Slam
+	[30335]: MELEE_ACTION_CATEGORY + 0.1, // Bloodthirst
+	[30330]: MELEE_ACTION_CATEGORY + 0.1, // Mortal Strike
+	[30356]: MELEE_ACTION_CATEGORY + 0.1, // Shield Slam
+	[1680]: MELEE_ACTION_CATEGORY + 0.2, // Whirlwind
+	[11585]: MELEE_ACTION_CATEGORY + 0.3, // Overpower
+	[25212]: MELEE_ACTION_CATEGORY + 0.4, // Hamstring
+	[25236]: MELEE_ACTION_CATEGORY + 0.5, // Execute
+	[71]:   DEFAULT_ACTION_CATEGORY + 0.1, // Defensive Stance
+	[2457]: DEFAULT_ACTION_CATEGORY + 0.1, // Battle Stance
+	[2458]: DEFAULT_ACTION_CATEGORY + 0.1, // Berserker Stance
 };
 
 const idsToGroupForRotation: Array<number> = [

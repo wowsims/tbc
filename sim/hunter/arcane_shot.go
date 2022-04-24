@@ -7,31 +7,31 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ArcaneShotCooldownID = core.NewCooldownID()
-var ArcaneShotActionID = core.ActionID{SpellID: 27019, CooldownID: ArcaneShotCooldownID}
+var ArcaneShotActionID = core.ActionID{SpellID: 27019}
 
 func (hunter *Hunter) registerArcaneShotSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 230}
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    ArcaneShotActionID,
-				Character:   &hunter.Character,
-				SpellSchool: core.SpellSchoolArcane,
-				GCD:         core.GCDDefault + hunter.latency,
-				IgnoreHaste: true,
-				Cooldown:    time.Second * 6,
-				Cost:        cost,
-				BaseCost:    cost,
-				SpellExtras: core.SpellExtrasMeleeMetrics,
-			},
-		},
-	}
-	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
-	ama.Cooldown -= time.Millisecond * 200 * time.Duration(hunter.Talents.ImprovedArcaneShot)
+	baseCost := 230.0
 
 	hunter.ArcaneShot = hunter.RegisterSpell(core.SpellConfig{
-		Template: ama,
+		ActionID:    ArcaneShotActionID,
+		SpellSchool: core.SpellSchoolArcane,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.02*float64(hunter.Talents.Efficiency)),
+				GCD:  core.GCDDefault + hunter.latency,
+			},
+			IgnoreHaste: true,
+			CD: core.Cooldown{
+				Timer:    hunter.NewTimer(),
+				Duration: time.Second*6 - time.Millisecond*200*time.Duration(hunter.Talents.ImprovedArcaneShot),
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskRangedSpecial,
 			DamageMultiplier: 1,

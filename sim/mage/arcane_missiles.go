@@ -16,32 +16,27 @@ var ArcaneMissilesActionID = core.ActionID{SpellID: SpellIDArcaneMissiles}
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
 func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    ArcaneMissilesActionID,
-				Character:   &mage.Character,
-				SpellSchool: core.SpellSchoolArcane,
-				SpellExtras: SpellFlagMage | core.SpellExtrasChanneled,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 740,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 740,
-				},
-				GCD:         core.GCDDefault,
-				ChannelTime: time.Second * 5,
-			},
-		},
-	}
-	spell.Cost.Value += spell.BaseCost.Value * float64(mage.Talents.EmpoweredArcaneMissiles) * 0.02
+	baseCost := 740.0
 
 	bonusCrit := float64(mage.Talents.ArcanePotency) * 10 * core.SpellCritRatingPerCritChance
 
 	mage.ArcaneMissiles = mage.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    ArcaneMissilesActionID,
+		SpellSchool: core.SpellSchoolArcane,
+		SpellExtras: SpellFlagMage | core.SpellExtrasChanneled,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 + float64(mage.Talents.EmpoweredArcaneMissiles)*0.02),
+
+				GCD:         core.GCDDefault,
+				ChannelTime: time.Second * 5,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance,
 
@@ -67,7 +62,7 @@ func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	mage.ArcaneMissilesDot = core.NewDot(core.Dot{
 		Spell: mage.ArcaneMissiles,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "ArcaneMissiles-" + strconv.Itoa(int(mage.Index)),
 			ActionID: ArcaneMissilesActionID,
 		}),

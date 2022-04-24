@@ -28,11 +28,9 @@ import { WeaponType } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
 import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { StatWeightsResult } from '/tbc/core/proto/api.js';
-import { ShamanTotems, EarthTotem, AirTotem, FireTotem, WaterTotem } from '/tbc/core/proto/shaman.js';
-import { Hunter_Rotation_WeaveType as WeaveType } from '/tbc/core/proto/hunter.js';
-import { Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
-
 import { EquippedItem, getWeaponDPS } from '/tbc/core/proto_utils/equipped_item.js';
+
+import { talentStringToProto } from '/tbc/core/talents/factory.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import {
 	gemEligibleForSocket,
@@ -85,7 +83,6 @@ export class Player<SpecType extends Spec> {
 	private gear: Gear = new Gear({});
 	private race: Race;
 	private rotation: SpecRotation<SpecType>;
-	private talents: SpecTalents<SpecType>;
 	private talentsString: string = '';
 	private specOptions: SpecOptions<SpecType>;
 	private cooldowns: Cooldowns = Cooldowns.create();
@@ -93,6 +90,7 @@ export class Player<SpecType extends Spec> {
 	private itemEPCache: Map<number, number> = new Map<number, number>();
 	private gemEPCache: Map<number, number> = new Map<number, number>();
 	private enchantEPCache: Map<number, number> = new Map<number, number>();
+	private talents: SpecTalents<SpecType> | null = null;
 
 	readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
 
@@ -108,8 +106,6 @@ export class Player<SpecType extends Spec> {
 	readonly raceChangeEmitter = new TypedEvent<void>('PlayerRace');
 	readonly rotationChangeEmitter = new TypedEvent<void>('PlayerRotation');
 	readonly talentsChangeEmitter = new TypedEvent<void>('PlayerTalents');
-	// Talents dont have all fields so we need this.
-	readonly talentsStringChangeEmitter = new TypedEvent<void>('PlayerTalentsString');
 	readonly specOptionsChangeEmitter = new TypedEvent<void>('PlayerSpecOptions');
 	readonly cooldownsChangeEmitter = new TypedEvent<void>('PlayerCooldowns');
 	readonly epWeightsChangeEmitter = new TypedEvent<void>('PlayerEpWeights');
@@ -128,7 +124,6 @@ export class Player<SpecType extends Spec> {
 		this.race = specToEligibleRaces[this.spec][0];
 		this.specTypeFunctions = specTypeFunctions[this.spec] as SpecTypeFunctions<SpecType>;
 		this.rotation = this.specTypeFunctions.rotationCreate();
-		this.talents = this.specTypeFunctions.talentsCreate();
 		this.specOptions = this.specTypeFunctions.optionsCreate();
 
 		this.changeEmitter = TypedEvent.onAny([
@@ -140,7 +135,6 @@ export class Player<SpecType extends Spec> {
 			this.raceChangeEmitter,
 			this.rotationChangeEmitter,
 			this.talentsChangeEmitter,
-			this.talentsStringChangeEmitter,
 			this.specOptionsChangeEmitter,
 			this.cooldownsChangeEmitter,
 			this.epWeightsChangeEmitter,
@@ -431,15 +425,10 @@ export class Player<SpecType extends Spec> {
 	}
 
 	getTalents(): SpecTalents<SpecType> {
-		return this.specTypeFunctions.talentsCopy(this.talents);
-	}
-
-	setTalents(eventID: EventID, newTalents: SpecTalents<SpecType>) {
-		if (this.specTypeFunctions.talentsEquals(newTalents, this.talents))
-			return;
-
-		this.talents = this.specTypeFunctions.talentsCopy(newTalents);
-		this.talentsChangeEmitter.emit(eventID);
+		if (this.talents == null) {
+			this.talents = talentStringToProto(this.spec, this.talentsString) as SpecTalents<SpecType>;
+		}
+		return this.talents;
 	}
 
 	getTalentsString(): string {
@@ -451,7 +440,8 @@ export class Player<SpecType extends Spec> {
 			return;
 
 		this.talentsString = newTalentsString;
-		this.talentsStringChangeEmitter.emit(eventID);
+		this.talents = null;
+		this.talentsChangeEmitter.emit(eventID);
 	}
 
 	getTalentTree(): number {
@@ -521,7 +511,10 @@ export class Player<SpecType extends Spec> {
 		if (item.weaponType != WeaponType.WeaponTypeUnknown) {
 			// Add weapon dps as attack power, so the EP is appropriate.
 			const weaponDps = getWeaponDPS(item);
-			const effectiveAttackPower = itemStats.getStat(Stat.StatAttackPower) + weaponDps * 14;
+			let effectiveAttackPower = itemStats.getStat(Stat.StatAttackPower);
+			if (this.spec != Spec.SpecFeralDruid) {
+				effectiveAttackPower += weaponDps * 14;
+			}
 			itemStats = itemStats.withStat(Stat.StatAttackPower, effectiveAttackPower);
 		} else if (![RangedWeaponType.RangedWeaponTypeUnknown, RangedWeaponType.RangedWeaponTypeThrown].includes(item.rangedWeaponType)) {
 			const weaponDps = getWeaponDPS(item);
@@ -585,7 +578,7 @@ export class Player<SpecType extends Spec> {
 		elem.setAttribute('data-wowhead', parts.join('&'));
 	}
 
-	toProto(): PlayerProto {
+	toProto(forExport?: boolean): PlayerProto {
 		return withSpecProto(
 			this.spec,
 			PlayerProto.create({
@@ -600,58 +593,12 @@ export class Player<SpecType extends Spec> {
 				talentsString: this.getTalentsString(),
 			}),
 			this.getRotation(),
-			this.getTalents(),
+			forExport ? this.specTypeFunctions.talentsCreate() : this.getTalents(),
 			this.getSpecOptions());
 	}
 
 	fromProto(eventID: EventID, proto: PlayerProto) {
 		TypedEvent.freezeAllAndDo(() => {
-			let rotation = this.specTypeFunctions.rotationFromPlayer(proto);
-			let options = this.specTypeFunctions.optionsFromPlayer(proto);
-
-			// TODO: Remove this on 3/14/2022 (1 month).
-			if (this.spec == Spec.SpecHunter) {
-				const hunterRotation = rotation as SpecRotation<Spec.SpecHunter>;
-				const hunterOptions = options as SpecOptions<Spec.SpecHunter>;
-				if (hunterOptions.petUptime == 0) {
-					hunterOptions.petUptime = 1;
-				}
-				if (hunterRotation.meleeWeave) {
-					hunterRotation.meleeWeave = false;
-					if (hunterRotation.useRaptorStrike) {
-						hunterRotation.weave = WeaveType.WeaveFull;
-					} else {
-						hunterRotation.weave = WeaveType.WeaveAutosOnly;
-					}
-				}
-				options = hunterOptions as SpecOptions<SpecType>;
-				rotation = hunterRotation as SpecRotation<SpecType>;
-			}
-
-			// TODO: Remove this on 3/21 (1 month).
-			if (this.spec == Spec.SpecMage) {
-				const mageOptions = options as SpecOptions<Spec.SpecMage>;
-				if (mageOptions.useManaEmeralds && proto.consumes) {
-					proto.consumes.defaultConjured = Conjured.ConjuredMageManaEmerald;
-					mageOptions.useManaEmeralds = false;
-				}
-				options = mageOptions as SpecOptions<SpecType>;
-			}
-
-			// TODO: Remove this on 3/21 (1 month).
-			if (this.spec == Spec.SpecEnhancementShaman) {
-				const enhOptions = options as SpecOptions<Spec.SpecEnhancementShaman>;
-				if (proto.consumes && enhOptions.mainHandImbue != 0) {
-					proto.consumes.mainHandImbue = 5 + enhOptions.mainHandImbue;
-					enhOptions.mainHandImbue = 0;
-				}
-				if (proto.consumes && enhOptions.offHandImbue != 0) {
-					proto.consumes.offHandImbue = 5 + enhOptions.offHandImbue;
-					enhOptions.offHandImbue = 0;
-				}
-				options = enhOptions as SpecOptions<SpecType>;
-			}
-
 			this.setName(eventID, proto.name);
 			this.setRace(eventID, proto.race);
 			this.setGear(eventID, proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));
@@ -660,9 +607,8 @@ export class Player<SpecType extends Spec> {
 			this.setBuffs(eventID, proto.buffs || IndividualBuffs.create());
 			this.setCooldowns(eventID, proto.cooldowns || Cooldowns.create());
 			this.setTalentsString(eventID, proto.talentsString);
-			this.setRotation(eventID, rotation);
-			this.setTalents(eventID, this.specTypeFunctions.talentsFromPlayer(proto));
-			this.setSpecOptions(eventID, options);
+			this.setRotation(eventID, this.specTypeFunctions.rotationFromPlayer(proto));
+			this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
 		});
 	}
 

@@ -3,7 +3,7 @@ import { WarriorTalents as WarriorTalents } from '/tbc/core/proto/warrior.js';
 import { WarriorSpecs } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
-import { TalentsConfig, TalentsPicker } from './talents_picker.js';
+import { TalentsConfig, TalentsPicker, newTalentsConfig } from './talents_picker.js';
 
 export class WarriorTalentsPicker extends TalentsPicker<Spec.SpecWarrior> {
 	constructor(parent: HTMLElement, player: Player<Spec.SpecWarrior>) {
@@ -11,7 +11,7 @@ export class WarriorTalentsPicker extends TalentsPicker<Spec.SpecWarrior> {
 	}
 }
 
-export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = [
+export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = newTalentsConfig([
 	{
 		name: 'Arms',
 		backgroundUrl: 'https://wow.zamimg.com/images/wow/talents/backgrounds/tbc/161.jpg',
@@ -656,4 +656,4 @@ export const warriorTalentsConfig: TalentsConfig<Spec.SpecWarrior> = [
 			},
 		],
 	},
-];
+]);

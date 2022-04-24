@@ -78,6 +78,7 @@ var Enchants = []Enchant{
 	{ID: 22552, EffectID: 963, Name: "Weapon - Major Striking", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{}, ItemType: proto.ItemType_ItemTypeWeapon},
 	{ID: 16252, EffectID: 1900, Name: "Weapon - Crusader", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{}, ItemType: proto.ItemType_ItemTypeWeapon},
 	{ID: 22551, EffectID: 2666, Name: "Weapon - Major Intellect", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Intellect: 30}, ItemType: proto.ItemType_ItemTypeWeapon},
+	{ID: 22554, EffectID: 2667, Name: "Savagery", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.AttackPower: 70, stats.RangedAttackPower: 70}, ItemType: proto.ItemType_ItemTypeWeapon, EnchantType: proto.EnchantType_EnchantTypeTwoHand},
 	{ID: 22555, EffectID: 2669, Name: "Weapon - Major Spellpower", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.SpellPower: 40}, ItemType: proto.ItemType_ItemTypeWeapon},
 	{ID: 22560, EffectID: 2671, Name: "Sunfire", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.ArcaneSpellPower: 50, stats.FireSpellPower: 50}, ItemType: proto.ItemType_ItemTypeWeapon},
 	{ID: 22561, EffectID: 2672, Name: "Soulfrost", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.FrostSpellPower: 54, stats.ShadowSpellPower: 54}, ItemType: proto.ItemType_ItemTypeWeapon},

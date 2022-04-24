@@ -14,28 +14,22 @@ const SpellIDInsectSwarm int32 = 27013
 var InsectSwarmActionID = core.ActionID{SpellID: SpellIDInsectSwarm}
 
 func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    InsectSwarmActionID,
-				SpellSchool: core.SpellSchoolNature,
-				Character:   &druid.Character,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 175,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 175,
-				},
-				GCD: core.GCDDefault,
-			},
-		},
-	}
+	baseCost := 175.0
 
 	druid.InsectSwarm = druid.RegisterSpell(core.SpellConfig{
-		Template:   template,
-		ModifyCast: core.ModifyCastAssignTarget,
+		ActionID:    InsectSwarmActionID,
+		SpellSchool: core.SpellSchoolNature,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
@@ -51,7 +45,7 @@ func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	druid.InsectSwarmDot = core.NewDot(core.Dot{
 		Spell: druid.InsectSwarm,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "InsectSwarm-" + strconv.Itoa(int(druid.Index)),
 			ActionID: InsectSwarmActionID,
 		}),

@@ -11,41 +11,23 @@ import (
 var SerpentStingActionID = core.ActionID{SpellID: 27016}
 
 func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
-	cost := core.ResourceCost{Type: stats.Mana, Value: 275}
-	ama := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    SerpentStingActionID,
-				Character:   &hunter.Character,
-				SpellSchool: core.SpellSchoolNature,
-				GCD:         core.GCDDefault,
-				Cost:        cost,
-				BaseCost:    cost,
-				IgnoreHaste: true, // Hunter GCD is locked at 1.5s
-			},
-		},
-		Effect: core.SpellEffect{
-			OutcomeRollCategory: core.OutcomeRollCategoryRanged,
-			CritRollCategory:    core.CritRollCategoryNone,
-			ProcMask:            core.ProcMaskRangedSpecial,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			DotInput: core.DotDamageInput{
-				NumberOfTicks: 5,
-				TickLength:    time.Second * 3,
-				TickBaseDamage: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
-					attackPower := hitEffect.RangedAttackPower(spell.Character) + hitEffect.RangedAttackPowerOnTarget()
-					return 132 + attackPower*0.02
-				},
-				Aura: hunter.NewDotAura("Serpent String", SerpentStingActionID),
-			},
-		},
-	}
-	ama.Cost.Value *= 1 - 0.02*float64(hunter.Talents.Efficiency)
+	baseCost := 275.0
 
 	hunter.SerpentSting = hunter.RegisterSpell(core.SpellConfig{
-		Template:   ama,
-		ModifyCast: core.ModifyCastAssignTarget,
+		ActionID:    SerpentStingActionID,
+		SpellSchool: core.SpellSchoolNature,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.02*float64(hunter.Talents.Efficiency)),
+				GCD:  core.GCDDefault,
+			},
+			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			OutcomeApplier:   core.OutcomeFuncRangedHit(),
@@ -60,7 +42,7 @@ func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	hunter.SerpentStingDot = core.NewDot(core.Dot{
 		Spell: hunter.SerpentSting,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "SerpentSting-" + strconv.Itoa(int(hunter.Index)),
 			ActionID: SerpentStingActionID,
 		}),

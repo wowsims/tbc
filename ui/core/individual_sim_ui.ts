@@ -295,6 +295,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			this.addDetailedResultsTab();
 			this.addLogTab();
 		}
+
+		this.player.changeEmitter.on(() => this.recomputeSettingsLayout());
 	}
 
 	private loadSettings() {
@@ -696,9 +698,6 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			allowHTML: true,
 			placement: 'left',
 		});
-		this.player.cooldownsChangeEmitter.on(() => {
-			this.recomputeSettingsLayout();
-		});
 
 		// Init Muuri layout only when settings tab is clicked, because it needs the elements
 		// to be shown so it can calculate sizes.
@@ -817,7 +816,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				talentsString: player.getTalentsString(),
 			}),
 			setData: (eventID: EventID, player: Player<any>, newTalents: SavedTalents) => player.setTalentsString(eventID, newTalents.talentsString),
-			changeEmitters: [this.player.talentsStringChangeEmitter],
+			changeEmitters: [this.player.talentsChangeEmitter],
 			equals: (a: SavedTalents, b: SavedTalents) => SavedTalents.equals(a, b),
 			toJson: (a: SavedTalents) => SavedTalents.toJson(a),
 			fromJson: (obj: any) => SavedTalents.fromJson(obj),
@@ -922,7 +921,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		return this.getStorageKey(SAVED_TALENTS_STORAGE_KEY);
 	}
 
-	recomputeSettingsLayout() {
+	private recomputeSettingsLayout() {
 		if (this.settingsMuuri) {
 			//this.settingsMuuri.refreshItems();
 		}
@@ -939,7 +938,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 	toProto(): IndividualSimSettings {
 		return IndividualSimSettings.create({
 			settings: this.sim.toProto(),
-			player: this.player.toProto(),
+			player: this.player.toProto(true),
 			raidBuffs: this.sim.raid.getBuffs(),
 			partyBuffs: this.player.getParty()?.getBuffs() || PartyBuffs.create(),
 			encounter: this.sim.encounter.toProto(),

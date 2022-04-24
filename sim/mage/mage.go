@@ -40,8 +40,6 @@ type Mage struct {
 	AoeRotation    proto.Mage_Rotation_AoeRotation
 	UseAoeRotation bool
 
-	remainingManaGems int
-
 	isDoingRegenRotation bool
 	tryingToDropStacks   bool
 	numCastsDone         int32
@@ -70,6 +68,9 @@ type Mage struct {
 	Pyroblast       *core.Spell
 	Scorch          *core.Spell
 	WintersChill    *core.Spell
+
+	IcyVeins             *core.Spell
+	SummonWaterElemental *core.Spell
 
 	ArcaneMissilesDot *core.Dot
 	IgniteDots        []*core.Dot
@@ -126,7 +127,6 @@ func (mage *Mage) Init(sim *core.Simulation) {
 }
 
 func (mage *Mage) Reset(newsim *core.Simulation) {
-	mage.remainingManaGems = 4
 	mage.isDoingRegenRotation = false
 	mage.tryingToDropStacks = false
 	mage.numCastsDone = 0

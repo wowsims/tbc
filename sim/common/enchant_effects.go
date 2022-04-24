@@ -60,29 +60,31 @@ func ApplyCrusader(agent core.Agent) {
 		ppmm.SetProcChance(false, 0)
 	}
 
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		// -4 str per level over 60
-		const strBonus = 100.0 - 4.0*float64(core.CharacterLevel-60)
-		mhAura := character.NewTemporaryStatsAura("Crusader Enchant MH", core.ActionID{SpellID: 20007, Tag: 1}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
-		ohAura := character.NewTemporaryStatsAura("Crusader Enchant OH", core.ActionID{SpellID: 20007, Tag: 2}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
+	// -4 str per level over 60
+	const strBonus = 100.0 - 4.0*float64(core.CharacterLevel-60)
+	mhAura := character.NewTemporaryStatsAura("Crusader Enchant MH", core.ActionID{SpellID: 20007, Tag: 1}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
+	ohAura := character.NewTemporaryStatsAura("Crusader Enchant OH", core.ActionID{SpellID: 20007, Tag: 2}, stats.Stats{stats.Strength: strBonus}, time.Second*15)
 
-		return character.GetOrRegisterAura(&core.Aura{
-			Label: "Crusader Enchant",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
-					return
-				}
+	character.GetOrRegisterAura(core.Aura{
+		Label:    "Crusader Enchant",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				return
+			}
 
-				isMH := spellEffect.IsMH()
-				if ppmm.Proc(sim, isMH, false, "Crusader") {
-					if isMH {
-						mhAura.Activate(sim)
-					} else {
-						ohAura.Activate(sim)
-					}
+			isMH := spellEffect.IsMH()
+			if ppmm.Proc(sim, isMH, false, "Crusader") {
+				if isMH {
+					mhAura.Activate(sim)
+				} else {
+					ohAura.Activate(sim)
 				}
-			},
-		})
+			}
+		},
 	})
 }
 
@@ -128,27 +130,29 @@ func ApplyMongoose(agent core.Agent) {
 		ppmm.SetProcChance(false, 0)
 	}
 
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		mhAura := newLightningSpeedAura(character, "Lightning Speed MH", core.ActionID{SpellID: 28093, Tag: 1})
-		ohAura := newLightningSpeedAura(character, "Lightning Speed OH", core.ActionID{SpellID: 28093, Tag: 2})
+	mhAura := newLightningSpeedAura(character, "Lightning Speed MH", core.ActionID{SpellID: 28093, Tag: 1})
+	ohAura := newLightningSpeedAura(character, "Lightning Speed OH", core.ActionID{SpellID: 28093, Tag: 2})
 
-		return character.GetOrRegisterAura(&core.Aura{
-			Label: "Mongoose Enchant",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
-					return
-				}
+	character.GetOrRegisterAura(core.Aura{
+		Label:    "Mongoose Enchant",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				return
+			}
 
-				isMH := spellEffect.IsMH()
-				if ppmm.Proc(sim, isMH, false, "mongoose") {
-					if isMH {
-						mhAura.Activate(sim)
-					} else {
-						ohAura.Activate(sim)
-					}
+			isMH := spellEffect.IsMH()
+			if ppmm.Proc(sim, isMH, false, "mongoose") {
+				if isMH {
+					mhAura.Activate(sim)
+				} else {
+					ohAura.Activate(sim)
 				}
-			},
-		})
+			}
+		},
 	})
 }
 
@@ -187,20 +191,22 @@ func ApplyExecutioner(agent core.Agent) {
 		ppmm.SetProcChance(false, 0)
 	}
 
-	character.AddPermanentAura(func(sim *core.Simulation) *core.Aura {
-		procAura := character.NewTemporaryStatsAura("Executioner Proc", core.ActionID{SpellID: 42976}, stats.Stats{stats.ArmorPenetration: 840}, time.Second*15)
+	procAura := character.NewTemporaryStatsAura("Executioner Proc", core.ActionID{SpellID: 42976}, stats.Stats{stats.ArmorPenetration: 840}, time.Second*15)
 
-		return character.GetOrRegisterAura(&core.Aura{
-			Label: "Executioner",
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
-					return
-				}
+	character.GetOrRegisterAura(core.Aura{
+		Label:    "Executioner",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				return
+			}
 
-				if ppmm.Proc(sim, spellEffect.IsMH(), false, "Executioner") {
-					procAura.Activate(sim)
-				}
-			},
-		})
+			if ppmm.Proc(sim, spellEffect.IsMH(), false, "Executioner") {
+				procAura.Activate(sim)
+			}
+		},
 	})
 }

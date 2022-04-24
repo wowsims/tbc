@@ -14,29 +14,22 @@ const SpellIDMoonfire int32 = 26988
 var MoonfireActionID = core.ActionID{SpellID: SpellIDMoonfire}
 
 func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    MoonfireActionID,
-				Character:   &druid.Character,
-				SpellSchool: core.SpellSchoolArcane,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 495,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 495,
-				},
-				GCD: core.GCDDefault,
-			},
-		},
-	}
-	template.Cost.Value -= template.BaseCost.Value * 0.03 * float64(druid.Talents.Moonglow)
+	baseCost := 495.0
 
 	druid.Moonfire = druid.RegisterSpell(core.SpellConfig{
-		Template:   template,
-		ModifyCast: core.ModifyCastAssignTarget,
+		ActionID:    MoonfireActionID,
+		SpellSchool: core.SpellSchoolArcane,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.03*float64(druid.Talents.Moonglow)),
+				GCD:  core.GCDDefault,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellCritRating: float64(druid.Talents.ImprovedMoonfire) * 5 * core.SpellCritRatingPerCritChance,
 			DamageMultiplier:     1 * (1 + 0.05*float64(druid.Talents.ImprovedMoonfire)) * (1 + 0.02*float64(druid.Talents.Moonfury)),
@@ -47,7 +40,6 @@ func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
 				if spellEffect.Landed() {
 					druid.MoonfireDot.Apply(sim)
 				}
-				druid.applyOnHitTalents(sim, spell, spellEffect)
 			},
 		}),
 	})
@@ -55,7 +47,7 @@ func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	druid.MoonfireDot = core.NewDot(core.Dot{
 		Spell: druid.Moonfire,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "Moonfire-" + strconv.Itoa(int(druid.Index)),
 			ActionID: MoonfireActionID,
 		}),

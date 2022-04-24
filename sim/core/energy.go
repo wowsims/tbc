@@ -130,9 +130,8 @@ func (eb *energyBar) newTickAction(sim *Simulation, randomTickTime bool) {
 	}
 
 	pa := &PendingAction{
-		Name:         "Energy Tick",
-		Priority:     ActionPriorityRegen,
 		NextActionAt: sim.CurrentTime + nextTickDuration,
+		Priority:     ActionPriorityRegen,
 	}
 	pa.OnAction = func(sim *Simulation) {
 		eb.addEnergyInternal(sim, EnergyPerTick*eb.EnergyTickMultiplier, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})

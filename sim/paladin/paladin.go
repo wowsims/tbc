@@ -13,13 +13,6 @@ type Paladin struct {
 
 	CurrentSeal      *core.Aura
 	CurrentJudgement *core.Aura
-	sealOfCommandICD core.InternalCD
-
-	// I should probably make these *core.Spell
-	SealOfBlood       core.SimpleCast
-	SealOfCommand     core.SimpleCast
-	SealOfTheCrusader core.SimpleCast
-	SealOfWisdom      core.SimpleCast
 
 	Consecration           *core.Spell
 	CrusaderStrike         *core.Spell
@@ -27,6 +20,10 @@ type Paladin struct {
 	JudgementOfBlood       *core.Spell
 	JudgementOfTheCrusader *core.Spell
 	JudgementOfWisdom      *core.Spell
+	SealOfBlood            *core.Spell
+	SealOfCommand          *core.Spell
+	SealOfTheCrusader      *core.Spell
+	SealOfWisdom           *core.Spell
 
 	ConsecrationDot *core.Dot
 
@@ -60,18 +57,15 @@ func (paladin *Paladin) Init(sim *core.Simulation) {
 	paladin.registerConsecrationSpell(sim)
 	paladin.registerCrusaderStrikeSpell(sim)
 	paladin.registerExorcismSpell(sim)
-	paladin.registerJudgementOfBloodSpell(sim)
-	paladin.registerJudgementOfTheCrusaderSpell(sim)
-	paladin.registerJudgementOfWisdomSpell(sim)
+	paladin.registerJudgements(sim)
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {
-	paladin.sealOfCommandICD = 0
 	paladin.CurrentSeal = nil
 	paladin.CurrentJudgement = nil
 }
 
-func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, ability *core.SimpleSpell) {
+func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
 }
 
 // maybe need to add stat dependencies

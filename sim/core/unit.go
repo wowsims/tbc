@@ -54,6 +54,10 @@ type Unit struct {
 
 	// Statistics describing the results of the sim.
 	Metrics CharacterMetrics
+
+	cdTimers []*Timer
+
+	GCD *Timer
 }
 
 func (unit *Unit) Log(sim *Simulation, message string, vals ...interface{}) {
@@ -95,6 +99,10 @@ func (unit *Unit) finalize() {
 	unit.auraTracker.finalize()
 }
 
+func (unit *Unit) init(sim *Simulation) {
+	unit.auraTracker.init(sim)
+}
+
 func (unit *Unit) reset(sim *Simulation) {
 	unit.Metrics.reset()
 	unit.stats = unit.initialStats
@@ -116,11 +124,12 @@ func (unit *Unit) doneIteration(sim *Simulation) {
 		spell.doneIteration()
 	}
 	unit.Metrics.doneIteration(sim.Duration.Seconds())
+	unit.resetCDs(sim)
 }
 
 // ArmorDamageReduction currently assumes a level 70 attacker
 func (unit *Unit) ArmorDamageReduction(armorPen float64) float64 {
 	// TODO: Cache this somehow so we dont have to recalculate every time.
 	effectiveArmor := MaxFloat(0, unit.stats[stats.Armor]-armorPen)
-	return effectiveArmor / (effectiveArmor + 10557.5)
+	return 1 - (effectiveArmor / (effectiveArmor + 10557.5))
 }

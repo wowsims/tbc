@@ -64,6 +64,7 @@ func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanc
 		statInheritance: statInheritance,
 		initialEnabled:  enabledOnStart,
 	}
+	pet.GCD = pet.NewTimer()
 	pet.currentStatInheritance = func(ownerStats stats.Stats) stats.Stats {
 		return stats.Stats{}
 	}
@@ -136,10 +137,7 @@ func (pet *Pet) Disable(sim *Simulation) {
 
 	// If a pet is immediately re-summoned it might try to use GCD, so we need to
 	// clear it.
-	if pet.Hardcast.Cast != nil {
-		pet.Hardcast.Cast.Cancel()
-		pet.Hardcast = Hardcast{}
-	}
+	pet.Hardcast = Hardcast{}
 
 	// Reset pet mana.
 	pet.stats[stats.Mana] = pet.MaxMana()
@@ -159,10 +157,11 @@ func (pet *Pet) EnableWithTimeout(sim *Simulation, petAgent PetAgent, petDuratio
 	pet.EnableGCDTimer(sim, petAgent)
 	pet.Enable(sim, petAgent)
 
-	pet.timeoutAction = sim.pendingActionPool.Get()
-	pet.timeoutAction.NextActionAt = sim.CurrentTime + petDuration
-	pet.timeoutAction.OnAction = func(sim *Simulation) {
-		pet.Disable(sim)
+	pet.timeoutAction = &PendingAction{
+		NextActionAt: sim.CurrentTime + petDuration,
+		OnAction: func(sim *Simulation) {
+			pet.Disable(sim)
+		},
 	}
 	sim.AddPendingAction(pet.timeoutAction)
 }

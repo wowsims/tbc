@@ -13,32 +13,23 @@ const SpellIDHolyFire int32 = 25384
 var HolyFireActionID = core.ActionID{SpellID: SpellIDHolyFire}
 
 func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    HolyFireActionID,
-				Character:   &priest.Character,
-				SpellSchool: core.SpellSchoolHoly,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 290,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 290,
-				},
-				CastTime: time.Millisecond * 3500,
-				GCD:      core.GCDDefault,
-			},
-		},
-	}
-	template.CastTime -= time.Millisecond * 100 * time.Duration(priest.Talents.DivineFury)
+	baseCost := 290.0
 
 	priest.HolyFire = priest.RegisterSpell(core.SpellConfig{
-		Template: template,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			priest.applySurgeOfLight(&instance.SpellCast)
+		ActionID:    HolyFireActionID,
+		SpellSchool: core.SpellSchoolHoly,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost:     baseCost,
+				GCD:      core.GCDDefault,
+				CastTime: time.Millisecond*3500 - time.Millisecond*100*time.Duration(priest.Talents.DivineFury),
+			},
 		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellCritRating: float64(priest.Talents.HolySpecialization) * 1 * core.SpellCritRatingPerCritChance,
 			DamageMultiplier:     1 + 0.05*float64(priest.Talents.SearingLight),
@@ -49,7 +40,6 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 				if spellEffect.Landed() {
 					priest.HolyFireDot.Apply(sim)
 				}
-				priest.applyOnHitTalents(sim, spell, spellEffect)
 			},
 		}),
 	})
@@ -57,7 +47,7 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	priest.HolyFireDot = core.NewDot(core.Dot{
 		Spell: priest.HolyFire,
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "HolyFire-" + strconv.Itoa(int(priest.Index)),
 			ActionID: HolyFireActionID,
 		}),

@@ -79,7 +79,7 @@ func (moonkin *BalanceDruid) GetPresimOptions() *core.PresimOptions {
 			*player.Spec.(*proto.Player_BalanceDruid).BalanceDruid.Rotation = rotations[rotationIdx]
 		},
 
-		OnPresimResult: func(presimResult proto.PlayerMetrics, iterations int32, duration time.Duration) bool {
+		OnPresimResult: func(presimResult proto.UnitMetrics, iterations int32, duration time.Duration) bool {
 			if float64(presimResult.SecondsOomAvg) <= 0.03*duration.Seconds() {
 				moonkin.primaryRotation = rotations[rotationIdx]
 
@@ -172,7 +172,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 	}
 
 	if success := spell.Cast(sim, target); !success {
-		moonkin.WaitForMana(sim, spell.Instance.GetManaCost())
+		moonkin.WaitForMana(sim, spell.CurCast.Cost)
 	}
 }
 

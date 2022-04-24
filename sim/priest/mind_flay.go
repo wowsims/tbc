@@ -18,42 +18,36 @@ func (priest *Priest) MindFlayActionID(numTicks int) core.ActionID {
 }
 
 func (priest *Priest) newMindFlaySpell(sim *core.Simulation, numTicks int) *core.Spell {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    priest.MindFlayActionID(numTicks),
-				Character:   &priest.Character,
-				SpellSchool: core.SpellSchoolShadow,
-				SpellExtras: core.SpellExtrasBinary | core.SpellExtrasChanneled,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 230,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 230,
-				},
-				CastTime:    0,
-				ChannelTime: time.Second * time.Duration(numTicks),
-				GCD:         core.GCDDefault,
-			},
-		},
-	}
-	template.Cost.Value -= template.BaseCost.Value * float64(priest.Talents.FocusedMind) * 0.05
+	baseCost := 230.0
+	channelTime := time.Second * time.Duration(numTicks)
 
 	return priest.RegisterSpell(core.SpellConfig{
-		Template: template,
-		ModifyCast: func(sim *core.Simulation, target *core.Target, instance *core.SimpleSpell) {
-			// if our channel is longer than GCD it will have human latency to end it beause you can't queue the next spell.
-			var wait time.Duration // TODO: I think this got deleted at some point
-			gcd := core.MinDuration(core.GCDMin, time.Duration(float64(core.GCDDefault)/priest.CastSpeed()))
-			if wait > gcd && priest.Latency > 0 {
-				base := priest.Latency * 0.66
-				variation := base + sim.RandomFloat("spriest latency")*base // should vary from 0.66 - 1.33 of given latency
-				variation = core.MaxFloat(variation, 10)                    // no player can go under XXXms response time
-				instance.AfterCastDelay += time.Duration(variation) * time.Millisecond
-			}
+		ActionID:    priest.MindFlayActionID(numTicks),
+		SpellSchool: core.SpellSchoolShadow,
+		SpellExtras: core.SpellExtrasBinary | core.SpellExtrasChanneled,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost:        baseCost * (1 - 0.05*float64(priest.Talents.FocusedMind)),
+				GCD:         core.GCDDefault,
+				ChannelTime: channelTime,
+			},
+			ModifyCast: func(sim *core.Simulation, spell *core.Spell, cast *core.Cast) {
+				// if our channel is longer than GCD it will have human latency to end it beause you can't queue the next spell.
+				wait := priest.ApplyCastSpeed(channelTime)
+				gcd := core.MaxDuration(core.GCDMin, priest.ApplyCastSpeed(core.GCDDefault))
+				if wait > gcd && priest.Latency > 0 {
+					base := priest.Latency * 0.66
+					variation := base + sim.RandomFloat("spriest latency")*base // should vary from 0.66 - 1.33 of given latency
+					variation = core.MaxFloat(variation, 10)                    // no player can go under XXXms response time
+					cast.AfterCastDelay += time.Duration(variation) * time.Millisecond
+				}
+			},
 		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
@@ -71,7 +65,7 @@ func (priest *Priest) newMindFlayDot(sim *core.Simulation, numTicks int) *core.D
 	target := sim.GetPrimaryTarget()
 	return core.NewDot(core.Dot{
 		Spell: priest.MindFlay[numTicks],
-		Aura: target.RegisterAura(&core.Aura{
+		Aura: target.RegisterAura(core.Aura{
 			Label:    "MindFlay-" + strconv.Itoa(numTicks) + "-" + strconv.Itoa(int(priest.Index)),
 			ActionID: priest.MindFlayActionID(numTicks),
 		}),

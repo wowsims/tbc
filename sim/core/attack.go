@@ -23,8 +23,6 @@ type Weapon struct {
 	NormalizedSwingSpeed float64
 	SwingDuration        time.Duration // Duration between 2 swings.
 	CritMultiplier       float64
-
-	BaseDamageOverride BaseDamageCalculator
 }
 
 func newWeaponFromUnarmed(critMultiplier float64) Weapon {
@@ -90,6 +88,10 @@ func (weapon Weapon) BaseDamage(sim *Simulation) float64 {
 	return weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("Weapon Base Damage")
 }
 
+func (weapon Weapon) AverageDamage() float64 {
+	return (weapon.BaseDamageMin + weapon.BaseDamageMax) / 2
+}
+
 func (weapon Weapon) calculateWeaponDamage(sim *Simulation, attackPower float64) float64 {
 	return weapon.BaseDamage(sim) + (weapon.SwingSpeed*attackPower)/MeleeAttackRatingPerDamage
 }
@@ -114,17 +116,6 @@ func (ahe *SpellEffect) IsOH() bool {
 // Returns whether this hit effect is associated with either melee weapon.
 func (ahe *SpellEffect) IsMelee() bool {
 	return ahe.ProcMask.Matches(ProcMaskMelee)
-}
-
-// It appears that TBC does not do hasted GCD for abilities.
-//  Leaving this option here in case we want it in the future.
-const EnableAbilityHaste = false
-
-func (ability *SimpleSpell) CalculatedGCD(char *Character) time.Duration {
-	if !EnableAbilityHaste {
-		return ability.GCD
-	}
-	return MaxDuration(GCDMin, time.Duration(float64(ability.GCD)/char.SwingSpeed()))
 }
 
 type AutoAttacks struct {
@@ -154,6 +145,10 @@ type AutoAttacks struct {
 	OffhandSwingAt  time.Duration
 	RangedSwingAt   time.Duration
 
+	MHEffect     SpellEffect
+	OHEffect     SpellEffect
+	RangedEffect SpellEffect
+
 	MHAuto     *Spell
 	OHAuto     *Spell
 	RangedAuto *Spell
@@ -181,7 +176,7 @@ type AutoAttackOptions struct {
 }
 
 func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOptions) {
-	aa := AutoAttacks{
+	character.AutoAttacks = AutoAttacks{
 		agent:          agent,
 		character:      character,
 		MH:             options.MainHand,
@@ -190,89 +185,29 @@ func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOpt
 		AutoSwingMelee: options.AutoSwingMelee,
 		DelayOHSwings:  options.DelayOHSwings,
 		ReplaceMHSwing: options.ReplaceMHSwing,
-	}
-
-	mhTemplate := SimpleSpell{
-		SpellCast: SpellCast{
-			Cast: Cast{
-				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
-				Character:   character,
-				SpellSchool: SpellSchoolPhysical,
-				IgnoreHaste: true,
-			},
+		IsDualWielding: options.MainHand.SwingSpeed != 0 && options.OffHand.SwingSpeed != 0,
+		MHEffect: SpellEffect{
+			ProcMask:         ProcMaskMeleeMHAuto,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       BaseDamageConfigMeleeWeapon(MainHand, false, 0, 1, true),
+			OutcomeApplier:   OutcomeFuncMeleeWhite(options.MainHand.CritMultiplier),
 		},
-		Effect: SpellEffect{
-			OutcomeRollCategory: OutcomeRollCategoryWhite,
-			CritMultiplier:      options.MainHand.CritMultiplier,
-			ProcMask:            ProcMaskMeleeMHAuto,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			BaseDamage:          BaseDamageConfigMeleeWeapon(MainHand, false, 0, 1, true),
+		OHEffect: SpellEffect{
+			ProcMask:         ProcMaskMeleeOHAuto,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       BaseDamageConfigMeleeWeapon(OffHand, false, 0, 1, true),
+			OutcomeApplier:   OutcomeFuncMeleeWhite(options.OffHand.CritMultiplier),
 		},
-	}
-	if options.MainHand.BaseDamageOverride != nil {
-		mhTemplate.Effect.BaseDamage.Calculator = options.MainHand.BaseDamageOverride
-	}
-	aa.MHAuto = character.RegisterSpell(SpellConfig{
-		Template:   mhTemplate,
-		ModifyCast: ModifyCastAssignTarget,
-	})
-
-	ohTemplate := SimpleSpell{
-		SpellCast: SpellCast{
-			Cast: Cast{
-				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
-				Character:   character,
-				SpellSchool: SpellSchoolPhysical,
-				IgnoreHaste: true,
-			},
-		},
-		Effect: SpellEffect{
-			OutcomeRollCategory: OutcomeRollCategoryWhite,
-			CritMultiplier:      options.OffHand.CritMultiplier,
-			ProcMask:            ProcMaskMeleeOHAuto,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			BaseDamage:          BaseDamageConfigMeleeWeapon(OffHand, false, 0, 1, true),
+		RangedEffect: SpellEffect{
+			ProcMask:         ProcMaskRangedAuto,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       BaseDamageConfigRangedWeapon(0),
+			OutcomeApplier:   OutcomeFuncRangedHitAndCrit(options.Ranged.CritMultiplier),
 		},
 	}
-	if options.OffHand.BaseDamageOverride != nil {
-		ohTemplate.Effect.BaseDamage.Calculator = options.OffHand.BaseDamageOverride
-	}
-	aa.OHAuto = character.RegisterSpell(SpellConfig{
-		Template:   ohTemplate,
-		ModifyCast: ModifyCastAssignTarget,
-	})
-
-	rangedTemplate := SimpleSpell{
-		SpellCast: SpellCast{
-			Cast: Cast{
-				ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
-				Character:   character,
-				SpellSchool: SpellSchoolPhysical,
-				IgnoreHaste: true, // Affected by ranged haste, not spell haste.
-			},
-		},
-		Effect: SpellEffect{
-			OutcomeRollCategory: OutcomeRollCategoryRanged,
-			CritRollCategory:    CritRollCategoryPhysical,
-			ProcMask:            ProcMaskRangedAuto,
-			DamageMultiplier:    1,
-			ThreatMultiplier:    1,
-			BaseDamage:          BaseDamageConfigRangedWeapon(0),
-		},
-	}
-	if options.Ranged.BaseDamageOverride != nil {
-		rangedTemplate.Effect.BaseDamage.Calculator = options.Ranged.BaseDamageOverride
-	}
-	aa.RangedAuto = character.RegisterSpell(SpellConfig{
-		Template:   rangedTemplate,
-		ModifyCast: ModifyCastAssignTarget,
-	})
-
-	aa.IsDualWielding = aa.MH.SwingSpeed != 0 && aa.OH.SwingSpeed != 0
-
-	character.AutoAttacks = aa
 }
 
 func (aa *AutoAttacks) IsEnabled() bool {
@@ -280,12 +215,50 @@ func (aa *AutoAttacks) IsEnabled() bool {
 }
 
 // Empty handler so Agents don't have to provide one if they have no logic to add.
-func (character *Character) OnAutoAttack(sim *Simulation, ability *SimpleSpell) {}
+func (character *Character) OnAutoAttack(sim *Simulation, spell *Spell) {}
 
 func (aa *AutoAttacks) reset(sim *Simulation) {
 	if !aa.IsEnabled() {
 		return
 	}
+
+	aa.MHAuto = aa.character.GetOrRegisterSpell(SpellConfig{
+		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
+		SpellSchool: SpellSchoolPhysical,
+		SpellExtras: SpellExtrasMeleeMetrics,
+
+		ApplyEffects: ApplyEffectFuncDirectDamage(aa.MHEffect),
+	})
+
+	aa.OHAuto = aa.character.GetOrRegisterSpell(SpellConfig{
+		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
+		SpellSchool: SpellSchoolPhysical,
+		SpellExtras: SpellExtrasMeleeMetrics,
+
+		ApplyEffects: ApplyEffectFuncDirectDamage(aa.OHEffect),
+	})
+
+	aa.RangedAuto = aa.character.GetOrRegisterSpell(SpellConfig{
+		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
+		SpellSchool: SpellSchoolPhysical,
+		SpellExtras: SpellExtrasMeleeMetrics,
+
+		Cast: CastConfig{
+			DefaultCast: Cast{
+				CastTime: 1, // Dummy non-zero value so the optimization doesnt remove the cast time.
+			},
+			ModifyCast: func(_ *Simulation, _ *Spell, cast *Cast) {
+				cast.CastTime = aa.RangedSwingWindup()
+			},
+			IgnoreHaste: true,
+			AfterCast: func(sim *Simulation, spell *Spell) {
+				aa.RangedSwingInProgress = false
+				aa.agent.OnAutoAttack(sim, aa.RangedAuto)
+			},
+		},
+
+		ApplyEffects: ApplyEffectFuncDirectDamage(aa.RangedEffect),
+	})
 
 	aa.MainhandSwingAt = 0
 	aa.OffhandSwingAt = 0
@@ -310,19 +283,8 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 	aa.autoSwingCancelled = false
 	aa.resetAutoSwing(sim)
 
-	// Can precompute this.
-	aa.RangedAuto.Template.Effect.CritMultiplier = aa.Ranged.CritMultiplier
-
 	aa.RangedSwingAt = 0
 	aa.RangedSwingInProgress = false
-	aa.RangedAuto.ModifyCast = func(_ *Simulation, target *Target, instance *SimpleSpell) {
-		instance.CastTime = aa.RangedSwingWindup()
-		instance.Effect.Target = target
-	}
-	aa.RangedAuto.Template.AfterCast = func(sim *Simulation, cast *Cast) {
-		aa.RangedSwingInProgress = false
-		aa.agent.OnAutoAttack(sim, &aa.RangedAuto.Instance)
-	}
 }
 
 func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
@@ -334,8 +296,10 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 		aa.autoSwingAction.Cancel(sim)
 	}
 
-	pa := sim.pendingActionPool.Get()
-	pa.Priority = ActionPriorityAuto
+	pa := &PendingAction{
+		NextActionAt: aa.NextAttackAt(),
+		Priority:     ActionPriorityAuto,
+	}
 
 	pa.OnAction = func(sim *Simulation) {
 		aa.SwingMelee(sim, sim.GetPrimaryTarget())
@@ -344,11 +308,8 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 		// Cancelled means we made a new one because of a swing speed change.
 		if !pa.cancelled {
 			sim.AddPendingAction(pa)
-		} else {
-			sim.pendingActionPool.Put(pa)
 		}
 	}
-	pa.NextActionAt = aa.NextAttackAt()
 
 	aa.autoSwingAction = pa
 	sim.AddPendingAction(pa)
@@ -447,7 +408,7 @@ func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
 	attackSpell.Cast(sim, target)
 	aa.MainhandSwingAt = sim.CurrentTime + aa.MainhandSwingSpeed()
 	aa.previousMHSwingAt = sim.CurrentTime
-	aa.agent.OnAutoAttack(sim, &attackSpell.Instance)
+	aa.agent.OnAutoAttack(sim, attackSpell)
 }
 
 // Performs an autoattack using the main hand weapon, if the OH CD is ready.
@@ -467,7 +428,7 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 
 	aa.OHAuto.Cast(sim, target)
 	aa.OffhandSwingAt = sim.CurrentTime + aa.OffhandSwingSpeed()
-	aa.agent.OnAutoAttack(sim, &aa.OHAuto.Instance)
+	aa.agent.OnAutoAttack(sim, aa.OHAuto)
 }
 
 // Performs an autoattack using the ranged weapon, if the ranged CD is ready.
@@ -482,7 +443,7 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 
 	// It's important that we update the GCD timer AFTER starting the ranged auto.
 	// Otherwise the hardcast action won't be created separately.
-	nextGCD := sim.CurrentTime + aa.RangedAuto.Instance.CastTime
+	nextGCD := sim.CurrentTime + aa.RangedAuto.CurCast.CastTime
 	if nextGCD > aa.character.NextGCDAt() {
 		aa.character.SetGCDTimer(sim, nextGCD)
 	}
@@ -574,7 +535,7 @@ func (aa *AutoAttacks) NextEventAt(sim *Simulation) time.Duration {
 		panic(fmt.Sprintf("Returned 0 from next attack at %s, mh: %s, oh: %s", sim.CurrentTime, aa.MainhandSwingAt, aa.OffhandSwingAt))
 	}
 	return MinDuration(
-		sim.CurrentTime+aa.character.GetRemainingCD(GCDCooldownID, sim.CurrentTime),
+		sim.CurrentTime+aa.character.GCD.TimeToReady(sim),
 		aa.NextAttackAt())
 }
 

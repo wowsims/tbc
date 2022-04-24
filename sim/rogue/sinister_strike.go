@@ -1,8 +1,11 @@
 package rogue
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var SinisterStrikeActionID = core.ActionID{SpellID: 26862}
@@ -14,11 +17,23 @@ func (rogue *Rogue) SinisterStrikeEnergyCost() float64 {
 func (rogue *Rogue) registerSinisterStrikeSpell(_ *core.Simulation) {
 	energyCost := rogue.SinisterStrikeEnergyCost()
 	refundAmount := energyCost * 0.8
-	ability := rogue.newAbility(SinisterStrikeActionID, energyCost, SpellFlagBuilder, core.ProcMaskMeleeMHSpecial)
 
 	rogue.SinisterStrike = rogue.RegisterSpell(core.SpellConfig{
-		Template:   ability,
-		ModifyCast: core.ModifyCastAssignTarget,
+		ActionID:    SinisterStrikeActionID,
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder,
+
+		ResourceType: stats.Energy,
+		BaseCost:     energyCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: energyCost,
+				GCD:  time.Second,
+			},
+			IgnoreHaste: true,
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier: 1 +

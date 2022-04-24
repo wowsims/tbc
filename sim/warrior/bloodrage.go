@@ -6,43 +6,38 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-var BloodrageCooldownID = core.NewCooldownID()
-var BloodrageCooldown = time.Minute
-
 func (warrior *Warrior) registerBloodrageCD() {
-	actionID := core.ActionID{SpellID: 2687, CooldownID: BloodrageCooldownID}
+	actionID := core.ActionID{SpellID: 2687}
 
 	instantRage := 10.0 + 3*float64(warrior.Talents.ImprovedBloodrage)
-	rageOverTime := 10.0
 
-	bloodrageTemplate := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: warrior.GetCharacter(),
-			Cooldown:  BloodrageCooldown,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				// TODO: Rage over time should be done over time, not immediately.
-				warrior.AddRage(sim, instantRage+rageOverTime, actionID)
+	brSpell := warrior.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		Cast: core.CastConfig{
+			CD: core.Cooldown{
+				Timer:    warrior.NewTimer(),
+				Duration: time.Minute,
 			},
 		},
-	}
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			warrior.AddRage(sim, instantRage, actionID)
+
+			core.StartPeriodicAction(sim, core.PeriodicActionOptions{
+				NumTicks: 10,
+				Period:   time.Second * 1,
+				OnAction: func(sim *core.Simulation) {
+					warrior.AddRage(sim, 1, actionID)
+				},
+			})
+		},
+	})
 
 	warrior.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: BloodrageCooldownID,
-		Cooldown:   BloodrageCooldown,
-		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
+		Spell: brSpell,
 		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
 			return warrior.CurrentRage() < 70
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				cast := bloodrageTemplate
-				cast.Init(sim)
-				cast.StartCast(sim)
-			}
 		},
 	})
 }

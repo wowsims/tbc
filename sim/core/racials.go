@@ -7,9 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var OrcBloodFuryCooldownID = NewCooldownID()
-var TrollBerserkingCooldownID = NewCooldownID()
-
 func applyRaceEffects(agent Agent) {
 	character := agent.GetCharacter()
 
@@ -76,31 +73,28 @@ func applyRaceEffects(agent Agent) {
 
 		character.RegisterFinalizeEffect(func() {
 			// Blood Fury
-			const cd = time.Minute * 2
-			const dur = time.Second * 15
-			const apBonus = float64(CharacterLevel)*4 + 2
-			const spBonus = float64(CharacterLevel)*2 + 3
 			actionID := ActionID{SpellID: 33697}
-			bloodFuryAura := character.NewTemporaryStatsAura("Blood Fury", actionID, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus, stats.SpellPower: spBonus}, dur)
+			apBonus := float64(character.Level)*4 + 2
+			spBonus := float64(character.Level)*2 + 3
+			bloodFuryAura := character.NewTemporaryStatsAura("Blood Fury", actionID, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus, stats.SpellPower: spBonus}, time.Second*15)
+
+			spell := character.RegisterSpell(SpellConfig{
+				ActionID: actionID,
+				Cast: CastConfig{
+					CD: Cooldown{
+						Timer:    character.NewTimer(),
+						Duration: time.Minute * 2,
+					},
+					DisableCallbacks: true,
+				},
+				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+					bloodFuryAura.Activate(sim)
+				},
+			})
 
 			character.AddMajorCooldown(MajorCooldown{
-				ActionID:   actionID,
-				CooldownID: OrcBloodFuryCooldownID,
-				Cooldown:   cd,
-				Type:       CooldownTypeDPS,
-				CanActivate: func(sim *Simulation, character *Character) bool {
-					return true
-				},
-				ShouldActivate: func(sim *Simulation, character *Character) bool {
-					return true
-				},
-				ActivationFactory: func(sim *Simulation) CooldownActivation {
-					return func(sim *Simulation, character *Character) {
-						bloodFuryAura.Activate(sim)
-						character.SetCD(OrcBloodFuryCooldownID, sim.CurrentTime+cd)
-						character.Metrics.AddInstantCast(actionID)
-					}
-				},
+				Spell: spell,
+				Type:  CooldownTypeDPS,
 			})
 		})
 
@@ -146,76 +140,69 @@ func applyRaceEffects(agent Agent) {
 			hasteBonus = 1.3
 		}
 		inverseBonus := 1 / hasteBonus
-		const dur = time.Second * 10
-		const cd = time.Minute * 3
 
-		var cost ResourceCost
+		var resourceType stats.Stat
+		var cost float64
 		var actionID ActionID
 		if character.Class == proto.Class_ClassRogue {
-			actionID = ActionID{SpellID: 26297, CooldownID: TrollBerserkingCooldownID}
+			resourceType = stats.Energy
+			cost = 10
+			actionID = ActionID{SpellID: 26297}
 		} else if character.Class == proto.Class_ClassWarrior {
-			actionID = ActionID{SpellID: 26296, CooldownID: TrollBerserkingCooldownID}
+			resourceType = stats.Rage
+			cost = 5
+			actionID = ActionID{SpellID: 26296}
 		} else {
-			actionID = ActionID{SpellID: 20554, CooldownID: TrollBerserkingCooldownID}
+			resourceType = stats.Mana
+			cost = character.BaseMana() * 0.06
+			actionID = ActionID{SpellID: 20554}
 		}
 
+		berserkingAura := character.RegisterAura(Aura{
+			Label:    "Berserking",
+			ActionID: actionID,
+			Duration: time.Second * 10,
+			OnGain: func(aura *Aura, sim *Simulation) {
+				character.PseudoStats.CastSpeedMultiplier *= hasteBonus
+				character.MultiplyAttackSpeed(sim, hasteBonus)
+			},
+			OnExpire: func(aura *Aura, sim *Simulation) {
+				character.PseudoStats.CastSpeedMultiplier /= hasteBonus
+				character.MultiplyAttackSpeed(sim, inverseBonus)
+			},
+		})
+
+		berserkingSpell := character.RegisterSpell(SpellConfig{
+			ActionID: actionID,
+
+			ResourceType: resourceType,
+			BaseCost:     cost,
+
+			Cast: CastConfig{
+				DefaultCast: Cast{
+					Cost: cost,
+				},
+				CD: Cooldown{
+					Timer:    character.NewTimer(),
+					Duration: time.Minute * 3,
+				},
+			},
+
+			ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+				berserkingAura.Activate(sim)
+			},
+		})
+
 		character.AddMajorCooldown(MajorCooldown{
-			ActionID:   actionID,
-			CooldownID: TrollBerserkingCooldownID,
-			Cooldown:   cd,
-			Type:       CooldownTypeDPS,
+			Spell: berserkingSpell,
+			Type:  CooldownTypeDPS,
 			CanActivate: func(sim *Simulation, character *Character) bool {
 				if character.Class == proto.Class_ClassRogue {
-					return character.CurrentEnergy() >= cost.Value
+					return character.CurrentEnergy() >= cost
 				} else if character.Class == proto.Class_ClassWarrior {
-					return character.CurrentRage() >= cost.Value
+					return character.CurrentRage() >= cost
 				} else {
-					return character.CurrentMana() >= cost.Value
-				}
-			},
-			ShouldActivate: func(sim *Simulation, character *Character) bool {
-				return true
-			},
-			ActivationFactory: func(sim *Simulation) CooldownActivation {
-				if character.Class == proto.Class_ClassRogue {
-					cost = ResourceCost{Type: stats.Energy, Value: 10}
-				} else if character.Class == proto.Class_ClassWarrior {
-					cost = ResourceCost{Type: stats.Rage, Value: 5}
-				} else {
-					cost = ResourceCost{Type: stats.Mana, Value: character.BaseMana() * 0.06}
-				}
-
-				berserkingAura := character.GetOrRegisterAura(&Aura{
-					Label:    "Berserking",
-					ActionID: actionID,
-					Duration: dur,
-					OnGain: func(aura *Aura, sim *Simulation) {
-						character.PseudoStats.CastSpeedMultiplier *= hasteBonus
-						character.MultiplyAttackSpeed(sim, hasteBonus)
-					},
-					OnExpire: func(aura *Aura, sim *Simulation) {
-						character.PseudoStats.CastSpeedMultiplier /= hasteBonus
-						character.MultiplyAttackSpeed(sim, inverseBonus)
-					},
-				})
-
-				castTemplate := SimpleCast{
-					Cast: Cast{
-						ActionID:  actionID,
-						Character: character,
-						BaseCost:  cost,
-						Cost:      cost,
-						Cooldown:  cd,
-						OnCastComplete: func(sim *Simulation, cast *Cast) {
-							berserkingAura.Activate(sim)
-						},
-					},
-				}
-
-				return func(sim *Simulation, character *Character) {
-					cast := castTemplate
-					cast.Init(sim)
-					cast.StartCast(sim)
+					return character.CurrentMana() >= cost
 				}
 			},
 		})

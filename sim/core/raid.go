@@ -8,6 +8,7 @@ import (
 )
 
 type Party struct {
+	Raid  *Raid
 	Index int
 
 	Players []Agent
@@ -18,8 +19,9 @@ type Party struct {
 	dpsMetrics DistributionMetrics
 }
 
-func NewParty(index int, partyConfig proto.Party) *Party {
+func NewParty(raid *Raid, index int, partyConfig proto.Party) *Party {
 	party := &Party{
+		Raid:       raid,
 		Index:      index,
 		dpsMetrics: NewDistributionMetrics(),
 	}
@@ -56,7 +58,6 @@ func (party *Party) AddStat(stat stats.Stat, amount float64) {
 func (party *Party) reset(sim *Simulation) {
 	for _, agent := range party.Players {
 		agent.GetCharacter().reset(sim, agent)
-		agent.Reset(sim)
 
 		agent.GetCharacter().SetGCDTimer(sim, 0)
 		for _, petAgent := range agent.GetCharacter().Pets {
@@ -91,7 +92,7 @@ func (party *Party) GetMetrics(numIterations int32) *proto.PartyMetrics {
 			metrics.Players = append(metrics.Players, player.GetCharacter().GetMetricsProto(numIterations))
 			playerIdx++
 		} else {
-			metrics.Players = append(metrics.Players, &proto.PlayerMetrics{})
+			metrics.Players = append(metrics.Players, &proto.UnitMetrics{})
 		}
 		i++
 	}
@@ -142,7 +143,7 @@ func NewRaid(raidConfig proto.Raid) *Raid {
 
 	for partyIndex, partyConfig := range raidConfig.Parties {
 		if partyConfig != nil {
-			raid.Parties = append(raid.Parties, NewParty(partyIndex, *partyConfig))
+			raid.Parties = append(raid.Parties, NewParty(raid, partyIndex, *partyConfig))
 		}
 	}
 

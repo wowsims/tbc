@@ -7,29 +7,27 @@ import (
 
 const SpellIDArcaneExplosion int32 = 10202
 
+var ArcaneExplosionActionID = core.ActionID{SpellID: SpellIDArcaneExplosion}
+
 func (mage *Mage) registerArcaneExplosionSpell(sim *core.Simulation) {
-	spell := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    core.ActionID{SpellID: SpellIDArcaneExplosion},
-				Character:   &mage.Character,
-				SpellSchool: core.SpellSchoolArcane,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 390,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 390,
-				},
-				GCD: core.GCDDefault,
-			},
-		},
-		AOECap: 10180,
-	}
+	//AOECap: 10180,
+	baseCost := 390.0
 
 	mage.ArcaneExplosion = mage.RegisterSpell(core.SpellConfig{
-		Template: spell,
+		ActionID:    ArcaneExplosionActionID,
+		SpellSchool: core.SpellSchoolArcane,
+		SpellExtras: SpellFlagMage,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncAOEDamage(sim, core.SpellEffect{
 			BonusSpellHitRating:  float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance,
 			BonusSpellCritRating: float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance,

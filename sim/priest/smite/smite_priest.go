@@ -106,16 +106,16 @@ func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 	if !spriest.ShadowWordPainDot.IsActive() {
 		spell = spriest.ShadowWordPain
 		// Favor star shards for NE if off cooldown first
-	} else if spriest.rotation.UseStarshards && spriest.GetRemainingCD(priest.SSCooldownID, sim.CurrentTime) == 0 {
+	} else if spriest.rotation.UseStarshards && spriest.Starshards.IsReady(sim) {
 		spell = spriest.Starshards
 		// Allow for undead to use devouring plague off CD
-	} else if spriest.rotation.UseDevPlague && spriest.GetRemainingCD(priest.DevouringPlagueCooldownID, sim.CurrentTime) == 0 {
+	} else if spriest.rotation.UseDevPlague && spriest.DevouringPlague.IsReady(sim) {
 		spell = spriest.DevouringPlague
 		// If setting enabled, throw mind blast into our rotation off CD
-	} else if spriest.rotation.UseMindBlast && spriest.Character.GetRemainingCD(priest.MBCooldownID, sim.CurrentTime) == 0 {
+	} else if spriest.rotation.UseMindBlast && spriest.MindBlast.IsReady(sim) {
 		spell = spriest.MindBlast
 		// If setting enabled, cast Shadow Word: Death on cooldown
-	} else if spriest.rotation.UseShadowWordDeath && spriest.Character.GetRemainingCD(priest.SWDCooldownID, sim.CurrentTime) == 0 {
+	} else if spriest.rotation.UseShadowWordDeath && spriest.ShadowWordDeath.IsReady(sim) {
 		spell = spriest.ShadowWordDeath
 		// Consider HF if SWP will fall off after 1 smite but before 2 smites from now finishes
 		//	and swp falls off after hf finishes (assumption never worth clipping)
@@ -127,6 +127,6 @@ func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 	}
 
 	if success := spell.Cast(sim, sim.GetPrimaryTarget()); !success {
-		spriest.WaitForMana(sim, spell.Instance.GetManaCost())
+		spriest.WaitForMana(sim, spell.CurCast.Cost)
 	}
 }

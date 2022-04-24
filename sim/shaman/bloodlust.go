@@ -5,13 +5,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var BloodlustCooldownID = core.NewCooldownID()
-
 func (shaman *Shaman) BloodlustActionID() core.ActionID {
 	return core.ActionID{
-		SpellID:    2825,
-		CooldownID: BloodlustCooldownID,
-		Tag:        int32(shaman.Index),
+		SpellID: 2825,
+		Tag:     int32(shaman.Index),
 	}
 }
 
@@ -21,46 +18,57 @@ func (shaman *Shaman) registerBloodlustCD() {
 	}
 	actionID := shaman.BloodlustActionID()
 
-	var blAuras []*core.Aura
+	var bloodlustMCD *core.MajorCooldown
+	shaman.RegisterResetEffect(func(_ *core.Simulation) {
+		bloodlustMCD = shaman.GetMajorCooldown(actionID)
+	})
 
-	bloodlustTemplate := core.SimpleCast{
-		Cast: core.Cast{
-			ActionID:  actionID,
-			Character: shaman.GetCharacter(),
-			BaseCost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 750,
-			},
-			Cost: core.ResourceCost{
-				Type:  stats.Mana,
-				Value: 750,
-			},
-			GCD:      core.GCDDefault,
-			Cooldown: core.BloodlustCD,
-			OnCastComplete: func(sim *core.Simulation, cast *core.Cast) {
-				for _, blAura := range blAuras {
-					blAura.Activate(sim)
-				}
-
-				// All MCDs that use the GCD and have a non-zero cast time must call this.
-				shaman.UpdateMajorCooldowns()
-			},
-		},
+	blAuras := []*core.Aura{}
+	for _, partyMember := range shaman.Party.Players {
+		blAuras = append(blAuras, core.BloodlustAura(partyMember.GetCharacter(), actionID.Tag))
 	}
 
-	bloodlustTemplate.Cost.Value -= bloodlustTemplate.BaseCost.Value * float64(shaman.Talents.MentalQuickness) * 0.02
-	manaCost := bloodlustTemplate.Cost.Value
-	var bloodlustMCD *core.MajorCooldown
+	baseCost := 750.0
+	bloodlustSpell := shaman.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.02*float64(shaman.Talents.MentalQuickness)),
+				GCD:  core.GCDDefault,
+			},
+			CD: core.Cooldown{
+				Timer:    shaman.NewTimer(),
+				Duration: core.BloodlustCD,
+			},
+
+			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
+				// Needed because of the interaction between enhance GCD scheduler and other bloodlusts.
+				if !bloodlustMCD.UsesGCD {
+					cast.GCD = 0
+				}
+			},
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			for _, blAura := range blAuras {
+				blAura.Activate(sim)
+			}
+
+			// All MCDs that use the GCD and have a non-zero cast time must call this.
+			shaman.UpdateMajorCooldowns()
+		},
+	})
 
 	shaman.AddMajorCooldown(core.MajorCooldown{
-		ActionID:   actionID,
-		CooldownID: BloodlustCooldownID,
-		Cooldown:   core.BloodlustCD,
-		UsesGCD:    true,
-		Priority:   core.CooldownPriorityBloodlust,
-		Type:       core.CooldownTypeDPS,
+		Spell:    bloodlustSpell,
+		Priority: core.CooldownPriorityBloodlust,
+		Type:     core.CooldownTypeDPS,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
-			if character.CurrentMana() < manaCost {
+			if character.CurrentMana() < bloodlustSpell.DefaultCast.Cost {
 				return false
 			}
 
@@ -72,29 +80,6 @@ func (shaman *Shaman) registerBloodlustCD() {
 				}
 			}
 			return true
-		},
-		ShouldActivate: func(sim *core.Simulation, character *core.Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			bloodlustMCD = shaman.GetMajorCooldown(actionID)
-
-			blAuras = []*core.Aura{}
-			for _, partyMember := range shaman.Party.Players {
-				blAuras = append(blAuras, core.BloodlustAura(partyMember.GetCharacter(), actionID.Tag))
-			}
-
-			return func(sim *core.Simulation, character *core.Character) {
-				cast := bloodlustTemplate
-
-				// Needed because of the interaction between enhance GCD scheduler and other bloodlusts.
-				if !bloodlustMCD.UsesGCD {
-					cast.GCD = 0
-				}
-
-				cast.Init(sim)
-				cast.StartCast(sim)
-			}
 		},
 	})
 }

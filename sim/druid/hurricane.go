@@ -10,34 +10,13 @@ import (
 
 const SpellIDHurricane int32 = 27012
 
-var HurricaneCooldownID = core.NewCooldownID()
-var HurricaneActionID = core.ActionID{SpellID: SpellIDHurricane, CooldownID: HurricaneCooldownID}
+var HurricaneActionID = core.ActionID{SpellID: SpellIDHurricane}
 
 func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
-	template := core.SimpleSpell{
-		SpellCast: core.SpellCast{
-			Cast: core.Cast{
-				ActionID:    HurricaneActionID,
-				Character:   &druid.Character,
-				SpellSchool: core.SpellSchoolNature,
-				SpellExtras: core.SpellExtrasChanneled | core.SpellExtrasAlwaysHits,
-				BaseCost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 1905,
-				},
-				Cost: core.ResourceCost{
-					Type:  stats.Mana,
-					Value: 1905,
-				},
-				GCD:         core.GCDDefault,
-				Cooldown:    time.Second * 60,
-				ChannelTime: time.Second * 10,
-			},
-		},
-	}
+	baseCost := 1905.0
 
 	hurricaneDot := core.NewDot(core.Dot{
-		Aura: druid.RegisterAura(&core.Aura{
+		Aura: druid.RegisterAura(core.Aura{
 			Label:    "Hurricane",
 			ActionID: HurricaneActionID,
 		}),
@@ -54,12 +33,30 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 	})
 
 	druid.Hurricane = druid.RegisterSpell(core.SpellConfig{
-		Template:     template,
+		ActionID:    HurricaneActionID,
+		SpellSchool: core.SpellSchoolNature,
+		SpellExtras: core.SpellExtrasChanneled,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost:        baseCost,
+				GCD:         core.GCDDefault,
+				ChannelTime: time.Second * 10,
+			},
+			CD: core.Cooldown{
+				Timer:    druid.NewTimer(),
+				Duration: time.Second * 60,
+			},
+		},
+
 		ApplyEffects: core.ApplyEffectFuncDot(hurricaneDot),
 	})
 	hurricaneDot.Spell = druid.Hurricane
 }
 
 func (druid *Druid) ShouldCastHurricane(sim *core.Simulation, rotation proto.BalanceDruid_Rotation) bool {
-	return rotation.Hurricane && !druid.IsOnCD(HurricaneCooldownID, sim.CurrentTime)
+	return rotation.Hurricane && druid.Hurricane.IsReady(sim)
 }

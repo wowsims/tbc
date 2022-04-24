@@ -19,37 +19,42 @@ func (warrior *Warrior) StanceMatches(other Stance) bool {
 	return (warrior.Stance & other) != 0
 }
 
-var StanceCooldownID = core.NewCooldownID()
-var StanceCooldown = time.Second * 1
-
-func (warrior *Warrior) makeCastStance(sim *core.Simulation, stance Stance, aura *core.Aura) func(sim *core.Simulation) {
+func (warrior *Warrior) makeStanceSpell(sim *core.Simulation, stance Stance, aura *core.Aura, stanceCD *core.Timer) *core.Spell {
 	maxRetainedRage := 10.0 + 5*float64(warrior.Talents.TacticalMastery)
+	actionID := aura.ActionID
 
-	return func(sim *core.Simulation) {
-		if warrior.Stance == stance {
-			panic("Already in stance " + string(stance))
-		}
-		if warrior.IsOnCD(StanceCooldownID, sim.CurrentTime) {
-			panic("Stance on CD")
-		}
+	return warrior.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
 
-		warrior.SetCD(StanceCooldownID, sim.CurrentTime+StanceCooldown)
-		warrior.Metrics.AddInstantCast(aura.ActionID)
-		if warrior.CurrentRage() > maxRetainedRage {
-			warrior.SpendRage(sim, warrior.CurrentRage()-maxRetainedRage, aura.ActionID)
-		}
+		Cast: core.CastConfig{
+			CD: core.Cooldown{
+				Timer:    stanceCD,
+				Duration: time.Second,
+			},
+			DisableCallbacks: true,
+		},
 
-		// Add new stance aura.
-		aura.Activate(sim)
-		warrior.Stance = stance
-	}
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			if warrior.Stance == stance {
+				panic("Already in stance " + string(stance))
+			}
+
+			if warrior.CurrentRage() > maxRetainedRage {
+				warrior.SpendRage(sim, warrior.CurrentRage()-maxRetainedRage, aura.ActionID)
+			}
+
+			// Add new stance aura.
+			aura.Activate(sim)
+			warrior.Stance = stance
+		},
+	})
 }
 
 func (warrior *Warrior) registerBattleStanceAura() {
 	actionID := core.ActionID{SpellID: 2457}
 	threatMult := 0.8
 
-	warrior.BattleStanceAura = warrior.GetOrRegisterAura(&core.Aura{
+	warrior.BattleStanceAura = warrior.GetOrRegisterAura(core.Aura{
 		Label:    "Battle Stance",
 		Tag:      "Stance",
 		Priority: 1,
@@ -68,7 +73,7 @@ func (warrior *Warrior) registerDefensiveStanceAura() {
 	actionID := core.ActionID{SpellID: 71}
 	threatMult := 1.3 * (1 + 0.05*float64(warrior.Talents.Defiance))
 
-	warrior.DefensiveStanceAura = warrior.GetOrRegisterAura(&core.Aura{
+	warrior.DefensiveStanceAura = warrior.GetOrRegisterAura(core.Aura{
 		Label:    "Defensive Stance",
 		Tag:      "Stance",
 		Priority: 1,
@@ -89,7 +94,7 @@ func (warrior *Warrior) registerBerserkerStanceAura() {
 	threatMult := 0.8 - 0.02*float64(warrior.Talents.ImprovedBerserkerStance)
 	critBonus := core.MeleeCritRatingPerCritChance * 3
 
-	warrior.BerserkerStanceAura = warrior.GetOrRegisterAura(&core.Aura{
+	warrior.BerserkerStanceAura = warrior.GetOrRegisterAura(core.Aura{
 		Label:    "Berserker Stance",
 		Tag:      "Stance",
 		Priority: 1,
@@ -104,4 +109,14 @@ func (warrior *Warrior) registerBerserkerStanceAura() {
 			aura.Unit.AddStat(stats.MeleeCrit, -critBonus)
 		},
 	})
+}
+
+func (warrior *Warrior) registerStances(sim *core.Simulation) {
+	stanceCD := warrior.NewTimer()
+	warrior.registerBattleStanceAura()
+	warrior.registerDefensiveStanceAura()
+	warrior.registerBerserkerStanceAura()
+	warrior.BattleStance = warrior.makeStanceSpell(sim, BattleStance, warrior.BattleStanceAura, stanceCD)
+	warrior.DefensiveStance = warrior.makeStanceSpell(sim, DefensiveStance, warrior.DefensiveStanceAura, stanceCD)
+	warrior.BerserkerStance = warrior.makeStanceSpell(sim, BerserkerStance, warrior.BerserkerStanceAura, stanceCD)
 }
