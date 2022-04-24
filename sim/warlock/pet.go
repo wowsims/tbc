@@ -264,6 +264,4 @@ var PetConfigs = map[proto.Warlock_Options_Summon]PetConfig{
 // Felhunter 	~9.5 						~11.5
 // Felguard 	~11.0 						~11.5
 
-// double Pet::GetSpellCritChance(SpellType) { return 0.0125 * GetIntellect() + 0.91 + stats.spell_crit_chance; }
-
 // Spell hit 	Spell hit, physical hit, expertise, being capped will cap your minion for all three stats, see below for details
