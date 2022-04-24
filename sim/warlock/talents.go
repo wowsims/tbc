@@ -2,6 +2,7 @@ package warlock
 
 import (
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -27,31 +28,51 @@ func (warlock *Warlock) ApplyTalents() {
 	}
 	// fel intellect
 	if warlock.Talents.FelIntellect > 0 {
-		bonus := 1 + (0.01)*float64(warlock.Talents.FelIntellect)
+		bonus := (0.01) * float64(warlock.Talents.FelIntellect)
+		// Adding a second 3% bonus int->mana dependency
 		warlock.AddStatDependency(stats.StatDependency{
-			SourceStat:   stats.Mana,
+			SourceStat:   stats.Intellect,
 			ModifiedStat: stats.Mana,
-			Modifier: func(in float64, out float64) float64 {
-				return in * bonus
+			Modifier: func(intellect float64, mana float64) float64 {
+				return mana + intellect*(15*bonus)
 			},
 		})
 	}
+
+	warlock.PseudoStats.BonusCritRating += float64(warlock.Talents.DemonicTactics) * 1 * core.SpellCritRatingPerCritChance
+
 	//  TODO: fel stamina increases max health (might be useful for warlock tanking sim)
 
-	// if pet is out:
-	// master demonologist -
-	// 		Grants both the Warlock and the summoned demon an effect as long as that demon is active.
-	// 		Imp - Reduces threat caused by 4%.
-	// 		Voidwalker - Reduces physical damage taken by 2%.
-	// 		Succubus/Incubus - Increases all damage caused by 2%.
-	// 		Felhunter - Increases all resistances by .2 per level.
-	// 		Felguard - Increases all damage caused by 1% and all resistances by .1 per level.
-	// demonic knowledge -
-	// 		Increases your spell damage by an amount equal to 4%(per point of talent) of
-	//		the total of your active demon's Stamina plus Intellect.
+	if !warlock.Options.SacrificeSummon && warlock.Options.Summon != proto.Warlock_Options_NoSummon {
+		warlock.AddStats(stats.Stats{
+			stats.MeleeCrit: float64(warlock.Talents.DemonicTactics) * 5 * core.MeleeCritRatingPerCritChance,
+			stats.SpellCrit: float64(warlock.Talents.DemonicTactics) * 5 * core.SpellCritRatingPerCritChance,
+		})
+
+		if warlock.Talents.MasterDemonologist > 0 {
+			switch warlock.Options.Summon {
+			case proto.Warlock_Options_Imp:
+				warlock.PseudoStats.ThreatMultiplier *= 0.96 * float64(warlock.Talents.MasterDemonologist)
+			case proto.Warlock_Options_Succubus:
+				warlock.PseudoStats.DamageDealtMultiplier *= 1.0 + 0.02*float64(warlock.Talents.MasterDemonologist)
+			case proto.Warlock_Options_Felgaurd:
+				warlock.PseudoStats.DamageDealtMultiplier *= 1.0 + 0.01*float64(warlock.Talents.MasterDemonologist)
+				// 		Felguard - Increases all damage caused by 1% and all resistances by .1 per level.
+				// 		Voidwalker - Reduces physical damage taken by 2%.
+				// 		Felhunter - Increases all resistances by .2 per level.
+			}
+		}
+
+		// Create the pet
+		warlock.NewWarlockPet()
+
+		// Extract stats for demonic knowledge
+		petChar := warlock.Pets[0].GetCharacter()
+		bonus := (petChar.GetStat(stats.Stamina) + petChar.GetStat(stats.Intellect)) * (0.04 * float64(warlock.Talents.DemonicKnowledge))
+		warlock.AddStat(stats.SpellPower, bonus)
+	}
 
 	// demonic tactics, applies even without pet out
-	warlock.PseudoStats.BonusCritRating += float64(warlock.Talents.DemonicTactics) * 1 * core.SpellCritRatingPerCritChance
 
 	warlock.setupNightfall()
 }
