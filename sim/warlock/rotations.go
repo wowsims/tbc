@@ -52,10 +52,9 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 	if !warlock.DoingRegen && nextBigCD-sim.CurrentTime < time.Second*15 && sim.Duration-sim.CurrentTime > time.Second*20 {
 		if warlock.GetStat(stats.SpellPower) > warlock.GetInitialStat(stats.SpellPower) || warlock.CastSpeed() > warlock.InitialCastSpeed() {
 			// never start regen if you have boosted sp or boosted cast speed
-		} else if warlock.CurrentManaPercent() < 0.25 {
+		} else if warlock.CurrentManaPercent() < 0.2 {
 			warlock.DoingRegen = true
 			// Try to make sure at least immolate is ticking while doing regen.
-			// TODO: might be different logic for aff warlock.Rotation.Immolate
 			if warlock.ImmolateDot.RemainingDuration(sim) < time.Second*10 {
 				if sucess := warlock.Immolate.Cast(sim, target); sucess {
 					return
@@ -70,7 +69,7 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 			warlock.DoingRegen = false
 		} else {
 			warlock.LifeTap.Cast(sim, target)
-			if warlock.CurrentManaPercent() > 0.8 {
+			if warlock.CurrentManaPercent() > 0.6 {
 				warlock.DoingRegen = false
 			}
 			return
@@ -83,7 +82,7 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 		spell = warlock.UnstableAff
 	} else if warlock.Rotation.Corruption && !warlock.CorruptionDot.IsActive() {
 		spell = warlock.Corruption
-	} else if warlock.Talents.SiphonLife && !warlock.SiphonLifeDot.IsActive() && target.HasActiveAura("Improved Shadow Bolt") {
+	} else if warlock.Talents.SiphonLife && !warlock.SiphonLifeDot.IsActive() && warlock.ImpShadowboltAura.IsActive() {
 		spell = warlock.SiphonLife
 	} else if warlock.Rotation.Immolate && !warlock.ImmolateDot.IsActive() {
 		spell = warlock.Immolate

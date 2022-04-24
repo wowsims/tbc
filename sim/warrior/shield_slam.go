@@ -10,7 +10,7 @@ import (
 
 var ShieldSlamActionID = core.ActionID{SpellID: 30356}
 
-func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
+func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation, cdTimer *core.Timer) {
 	cost := 20.0 - float64(warrior.Talents.FocusedRage)
 	refundAmount := cost * 0.8
 	warrior.canShieldSlam = warrior.Talents.ShieldSlam && warrior.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType == proto.WeaponType_WeaponTypeShield
@@ -32,7 +32,7 @@ func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation) {
 			},
 			IgnoreHaste: true,
 			CD: core.Cooldown{
-				Timer:    warrior.NewTimer(),
+				Timer:    cdTimer,
 				Duration: time.Second * 6,
 			},
 		},
