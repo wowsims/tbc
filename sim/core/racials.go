@@ -49,13 +49,27 @@ func applyRaceEffects(agent Agent) {
 		})
 
 		const expertiseBonus = 5 * ExpertisePerQuarterPercentReduction
+		mh := false
+		oh := false
+		isDW := false
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
 			if weapon.WeaponType == proto.WeaponType_WeaponTypeSword || weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
-				character.PseudoStats.BonusMHExpertiseRating += expertiseBonus
+				mh = true
 			}
 		}
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
+			isDW = true
 			if weapon.WeaponType == proto.WeaponType_WeaponTypeSword || weapon.WeaponType == proto.WeaponType_WeaponTypeMace {
+				oh = true
+			}
+		}
+		if mh && (oh || !isDW) {
+			character.AddStat(stats.Expertise, expertiseBonus)
+		} else {
+			if mh {
+				character.PseudoStats.BonusMHExpertiseRating += expertiseBonus
+			}
+			if oh {
 				character.PseudoStats.BonusOHExpertiseRating += expertiseBonus
 			}
 		}
@@ -99,15 +113,29 @@ func applyRaceEffects(agent Agent) {
 		})
 
 		// Axe specialization
+		mh := false
+		oh := false
+		isDW := false
 		const expertiseBonus = 5 * ExpertisePerQuarterPercentReduction
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotMainHand]; weapon.ID != 0 {
 			if weapon.WeaponType == proto.WeaponType_WeaponTypeAxe {
-				character.PseudoStats.BonusMHExpertiseRating += expertiseBonus
+				mh = true
 			}
 		}
 		if weapon := character.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
+			isDW = true
 			if weapon.WeaponType == proto.WeaponType_WeaponTypeAxe {
+				oh = true
+			}
+		}
+		if mh && (oh || !isDW) {
+			character.AddStat(stats.Expertise, expertiseBonus)
+		} else {
+			if mh {
 				character.PseudoStats.BonusMHExpertiseRating += expertiseBonus
+			}
+			if oh {
+				character.PseudoStats.BonusOHExpertiseRating += expertiseBonus
 			}
 		}
 	case proto.Race_RaceTauren:
