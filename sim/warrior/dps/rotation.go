@@ -41,7 +41,7 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 				war.castSlamAt = 0
 				war.doSlamNext = false
 			} else if war.CanSlam() {
-				war.Slam.Cast(sim, sim.GetPrimaryTarget())
+				war.CastSlam(sim, sim.GetPrimaryTarget())
 				war.castSlamAt = 0
 				war.doSlamNext = false
 				war.tryQueueHsCleave(sim)

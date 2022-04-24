@@ -714,7 +714,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1878.1825175489291
+  dps: 1878.1825175489294
  }
 }
 dps_results: {
@@ -762,7 +762,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1883.7596146656188
+  dps: 1883.7596146656185
  }
 }
 dps_results: {
