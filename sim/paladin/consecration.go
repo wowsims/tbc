@@ -9,17 +9,19 @@ import (
 )
 
 func (paladin *Paladin) registerConsecrationSpell(sim *core.Simulation) {
-	paladin.registerConsecrationSpellRank6(sim)
-	paladin.registerConsecrationSpellRank4(sim)
-	paladin.registerConsecrationSpellRank1(sim)
+	cdTimer := paladin.NewTimer()
+	paladin.registerConsecrationSpellRank6(sim, cdTimer)
+	paladin.registerConsecrationSpellRank4(sim, cdTimer)
+	paladin.registerConsecrationSpellRank1(sim, cdTimer)
 
 }
 
+const ConsecrationCDTime = time.Second * 8
 const SpellIDConsecrationRank6 int32 = 27173
 
 var ConsecrationRank6ActionID = core.ActionID{SpellID: SpellIDConsecrationRank6}
 
-func (paladin *Paladin) registerConsecrationSpellRank6(sim *core.Simulation) {
+func (paladin *Paladin) registerConsecrationSpellRank6(sim *core.Simulation, cdTimer *core.Timer) {
 	baseCost := 660.0
 
 	consecrationDot := core.NewDot(core.Dot{
@@ -50,6 +52,10 @@ func (paladin *Paladin) registerConsecrationSpellRank6(sim *core.Simulation) {
 				Cost: baseCost,
 				GCD:  core.GCDDefault,
 			},
+			CD: core.Cooldown{
+				Timer:    cdTimer,
+				Duration: ConsecrationCDTime,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDot(consecrationDot),
@@ -61,7 +67,7 @@ const SpellIDConsecrationRank4 int32 = 20923
 
 var ConsecrationRank4ActionID = core.ActionID{SpellID: SpellIDConsecrationRank4}
 
-func (paladin *Paladin) registerConsecrationSpellRank4(sim *core.Simulation) {
+func (paladin *Paladin) registerConsecrationSpellRank4(sim *core.Simulation, cdTimer *core.Timer) {
 	baseCost := 390.0
 
 	consecrationDot := core.NewDot(core.Dot{
@@ -92,6 +98,10 @@ func (paladin *Paladin) registerConsecrationSpellRank4(sim *core.Simulation) {
 				Cost: baseCost,
 				GCD:  core.GCDDefault,
 			},
+			CD: core.Cooldown{
+				Timer:    cdTimer,
+				Duration: ConsecrationCDTime,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDot(consecrationDot),
@@ -103,7 +113,7 @@ const SpellIDConsecrationRank1 int32 = 26573
 
 var ConsecrationRank1ActionID = core.ActionID{SpellID: SpellIDConsecrationRank1}
 
-func (paladin *Paladin) registerConsecrationSpellRank1(sim *core.Simulation) {
+func (paladin *Paladin) registerConsecrationSpellRank1(sim *core.Simulation, cdTimer *core.Timer) {
 	baseCost := 120.0
 
 	consecrationDot := core.NewDot(core.Dot{
@@ -134,6 +144,10 @@ func (paladin *Paladin) registerConsecrationSpellRank1(sim *core.Simulation) {
 				Cost: baseCost,
 				GCD:  core.GCDDefault,
 			},
+			CD: core.Cooldown{
+				Timer:    cdTimer,
+				Duration: ConsecrationCDTime,
+			},
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDot(consecrationDot),
@@ -141,6 +155,13 @@ func (paladin *Paladin) registerConsecrationSpellRank1(sim *core.Simulation) {
 	consecrationDot.Spell = paladin.ConsecrationRank1
 }
 
-func (paladin *Paladin) CastConsecrateRank(sim *core.Simulation, target *core.Target, rank proto.RetributionPaladin_Rotation_ConsecrationRank) {
-
+func (paladin *Paladin) CastConsecrationRank(sim *core.Simulation, target *core.Target, rank proto.RetributionPaladin_Rotation_ConsecrationRank) {
+	switch rank {
+	case proto.RetributionPaladin_Rotation_Rank1:
+		paladin.ConsecrationRank1.Cast(sim, target)
+	case proto.RetributionPaladin_Rotation_Rank4:
+		paladin.ConsecrationRank4.Cast(sim, target)
+	case proto.RetributionPaladin_Rotation_Rank6:
+		paladin.ConsecrationRank6.Cast(sim, target)
+	}
 }

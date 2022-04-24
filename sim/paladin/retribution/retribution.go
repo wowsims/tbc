@@ -109,7 +109,7 @@ func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 		ret.openingRotation(sim)
 		return
 	}
-	ret.rotation(sim)
+	ret.mainRotation(sim)
 }
 
 func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
@@ -150,7 +150,7 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	}
 }
 
-func (ret *RetributionPaladin) rotation(sim *core.Simulation) {
+func (ret *RetributionPaladin) mainRotation(sim *core.Simulation) {
 	// Need to check for SoC early
 	socActive := ret.SealOfCommandAura.IsActive()
 
@@ -241,14 +241,7 @@ func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Tar
 	// If we can't exorcise, try to consecrate
 	if ret.Rotation.ConsecrationRank != proto.RetributionPaladin_Rotation_None &&
 		ret.ConsecrationRank6.IsReady(sim) {
-		switch ret.Rotation.ConsecrationRank {
-		case proto.RetributionPaladin_Rotation_Rank1:
-			ret.ConsecrationRank1.Cast(sim, target)
-		case proto.RetributionPaladin_Rotation_Rank4:
-			ret.ConsecrationRank4.Cast(sim, target)
-		case proto.RetributionPaladin_Rotation_Rank6:
-			ret.ConsecrationRank6.Cast(sim, target)
-		}
+		ret.CastConsecrationRank(sim, target, ret.Rotation.ConsecrationRank)
 		return
 	}
 }
@@ -310,7 +303,7 @@ func (ret *RetributionPaladin) waitUntilNextEvent(sim *core.Simulation, events [
 	// Otherwise add a pending action for the next time
 	pa := &core.PendingAction{
 		Priority:     core.ActionPriorityLow,
-		OnAction:     ret.rotation,
+		OnAction:     ret.mainRotation,
 		NextActionAt: nextEventAt,
 	}
 
