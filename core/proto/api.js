@@ -496,21 +496,12 @@ class ActionMetrics$Type extends MessageType {
     constructor() {
         super("proto.ActionMetrics", [
             { no: 1, name: "id", kind: "message", T: () => ActionID },
-            { no: 11, name: "is_melee", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 2, name: "casts", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 3, name: "hits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 4, name: "crits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 5, name: "misses", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 7, name: "dodges", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 8, name: "parries", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 9, name: "blocks", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 10, name: "glances", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 6, name: "damage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 12, name: "threat", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 2, name: "is_melee", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "targets", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => TargetedActionMetrics }
         ]);
     }
     create(value) {
-        const message = { isMelee: false, casts: 0, hits: 0, crits: 0, misses: 0, dodges: 0, parries: 0, blocks: 0, glances: 0, damage: 0, threat: 0 };
+        const message = { isMelee: false, targets: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -524,38 +515,11 @@ class ActionMetrics$Type extends MessageType {
                 case /* proto.ActionID id */ 1:
                     message.id = ActionID.internalBinaryRead(reader, reader.uint32(), options, message.id);
                     break;
-                case /* bool is_melee */ 11:
+                case /* bool is_melee */ 2:
                     message.isMelee = reader.bool();
                     break;
-                case /* int32 casts */ 2:
-                    message.casts = reader.int32();
-                    break;
-                case /* int32 hits */ 3:
-                    message.hits = reader.int32();
-                    break;
-                case /* int32 crits */ 4:
-                    message.crits = reader.int32();
-                    break;
-                case /* int32 misses */ 5:
-                    message.misses = reader.int32();
-                    break;
-                case /* int32 dodges */ 7:
-                    message.dodges = reader.int32();
-                    break;
-                case /* int32 parries */ 8:
-                    message.parries = reader.int32();
-                    break;
-                case /* int32 blocks */ 9:
-                    message.blocks = reader.int32();
-                    break;
-                case /* int32 glances */ 10:
-                    message.glances = reader.int32();
-                    break;
-                case /* double damage */ 6:
-                    message.damage = reader.double();
-                    break;
-                case /* double threat */ 12:
-                    message.threat = reader.double();
+                case /* repeated proto.TargetedActionMetrics targets */ 3:
+                    message.targets.push(TargetedActionMetrics.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -572,39 +536,12 @@ class ActionMetrics$Type extends MessageType {
         /* proto.ActionID id = 1; */
         if (message.id)
             ActionID.internalBinaryWrite(message.id, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
-        /* bool is_melee = 11; */
+        /* bool is_melee = 2; */
         if (message.isMelee !== false)
-            writer.tag(11, WireType.Varint).bool(message.isMelee);
-        /* int32 casts = 2; */
-        if (message.casts !== 0)
-            writer.tag(2, WireType.Varint).int32(message.casts);
-        /* int32 hits = 3; */
-        if (message.hits !== 0)
-            writer.tag(3, WireType.Varint).int32(message.hits);
-        /* int32 crits = 4; */
-        if (message.crits !== 0)
-            writer.tag(4, WireType.Varint).int32(message.crits);
-        /* int32 misses = 5; */
-        if (message.misses !== 0)
-            writer.tag(5, WireType.Varint).int32(message.misses);
-        /* int32 dodges = 7; */
-        if (message.dodges !== 0)
-            writer.tag(7, WireType.Varint).int32(message.dodges);
-        /* int32 parries = 8; */
-        if (message.parries !== 0)
-            writer.tag(8, WireType.Varint).int32(message.parries);
-        /* int32 blocks = 9; */
-        if (message.blocks !== 0)
-            writer.tag(9, WireType.Varint).int32(message.blocks);
-        /* int32 glances = 10; */
-        if (message.glances !== 0)
-            writer.tag(10, WireType.Varint).int32(message.glances);
-        /* double damage = 6; */
-        if (message.damage !== 0)
-            writer.tag(6, WireType.Bit64).double(message.damage);
-        /* double threat = 12; */
-        if (message.threat !== 0)
-            writer.tag(12, WireType.Bit64).double(message.threat);
+            writer.tag(2, WireType.Varint).bool(message.isMelee);
+        /* repeated proto.TargetedActionMetrics targets = 3; */
+        for (let i = 0; i < message.targets.length; i++)
+            TargetedActionMetrics.internalBinaryWrite(message.targets[i], writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -615,6 +552,116 @@ class ActionMetrics$Type extends MessageType {
  * @generated MessageType for protobuf message proto.ActionMetrics
  */
 export const ActionMetrics = new ActionMetrics$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class TargetedActionMetrics$Type extends MessageType {
+    constructor() {
+        super("proto.TargetedActionMetrics", [
+            { no: 1, name: "casts", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 2, name: "hits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 3, name: "crits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 4, name: "misses", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 5, name: "dodges", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 6, name: "parries", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 7, name: "blocks", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 8, name: "glances", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 9, name: "damage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 10, name: "threat", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
+    }
+    create(value) {
+        const message = { casts: 0, hits: 0, crits: 0, misses: 0, dodges: 0, parries: 0, blocks: 0, glances: 0, damage: 0, threat: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* int32 casts */ 1:
+                    message.casts = reader.int32();
+                    break;
+                case /* int32 hits */ 2:
+                    message.hits = reader.int32();
+                    break;
+                case /* int32 crits */ 3:
+                    message.crits = reader.int32();
+                    break;
+                case /* int32 misses */ 4:
+                    message.misses = reader.int32();
+                    break;
+                case /* int32 dodges */ 5:
+                    message.dodges = reader.int32();
+                    break;
+                case /* int32 parries */ 6:
+                    message.parries = reader.int32();
+                    break;
+                case /* int32 blocks */ 7:
+                    message.blocks = reader.int32();
+                    break;
+                case /* int32 glances */ 8:
+                    message.glances = reader.int32();
+                    break;
+                case /* double damage */ 9:
+                    message.damage = reader.double();
+                    break;
+                case /* double threat */ 10:
+                    message.threat = reader.double();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* int32 casts = 1; */
+        if (message.casts !== 0)
+            writer.tag(1, WireType.Varint).int32(message.casts);
+        /* int32 hits = 2; */
+        if (message.hits !== 0)
+            writer.tag(2, WireType.Varint).int32(message.hits);
+        /* int32 crits = 3; */
+        if (message.crits !== 0)
+            writer.tag(3, WireType.Varint).int32(message.crits);
+        /* int32 misses = 4; */
+        if (message.misses !== 0)
+            writer.tag(4, WireType.Varint).int32(message.misses);
+        /* int32 dodges = 5; */
+        if (message.dodges !== 0)
+            writer.tag(5, WireType.Varint).int32(message.dodges);
+        /* int32 parries = 6; */
+        if (message.parries !== 0)
+            writer.tag(6, WireType.Varint).int32(message.parries);
+        /* int32 blocks = 7; */
+        if (message.blocks !== 0)
+            writer.tag(7, WireType.Varint).int32(message.blocks);
+        /* int32 glances = 8; */
+        if (message.glances !== 0)
+            writer.tag(8, WireType.Varint).int32(message.glances);
+        /* double damage = 9; */
+        if (message.damage !== 0)
+            writer.tag(9, WireType.Bit64).double(message.damage);
+        /* double threat = 10; */
+        if (message.threat !== 0)
+            writer.tag(10, WireType.Bit64).double(message.threat);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.TargetedActionMetrics
+ */
+export const TargetedActionMetrics = new TargetedActionMetrics$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class AuraMetrics$Type extends MessageType {
     constructor() {

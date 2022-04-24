@@ -2,6 +2,7 @@ import { ActionMetrics as ActionMetricsProto } from '/tbc/core/proto/api.js';
 import { AuraMetrics as AuraMetricsProto } from '/tbc/core/proto/api.js';
 import { DistributionMetrics as DistributionMetricsProto } from '/tbc/core/proto/api.js';
 import { ResourceMetrics as ResourceMetricsProto, ResourceType } from '/tbc/core/proto/api.js';
+import { TargetedActionMetrics as TargetedActionMetricsProto } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { SimRun } from '/tbc/core/proto/ui.js';
@@ -363,9 +364,118 @@ export class ActionMetrics {
         this.iterations = resultData.iterations;
         this.duration = resultData.duration;
         this.data = data;
+        this.targets = data.targets.map(tam => new TargetedActionMetrics(this.iterations, this.duration, tam));
+        this.combinedMetrics = TargetedActionMetrics.merge(this.targets);
     }
     get isMeleeAction() {
         return this.data.isMelee;
+    }
+    get damage() {
+        return this.combinedMetrics.damage;
+    }
+    get dps() {
+        return this.combinedMetrics.dps;
+    }
+    get tps() {
+        return this.combinedMetrics.tps;
+    }
+    get casts() {
+        return this.combinedMetrics.casts;
+    }
+    get castsPerMinute() {
+        return this.combinedMetrics.castsPerMinute;
+    }
+    get avgCast() {
+        return this.combinedMetrics.avgCast;
+    }
+    get avgCastThreat() {
+        return this.combinedMetrics.avgCastThreat;
+    }
+    get landedHits() {
+        return this.combinedMetrics.landedHits;
+    }
+    get hitAttempts() {
+        return this.combinedMetrics.hitAttempts;
+    }
+    get avgHit() {
+        return this.combinedMetrics.avgHit;
+    }
+    get avgHitThreat() {
+        return this.combinedMetrics.avgHitThreat;
+    }
+    get critPercent() {
+        return this.combinedMetrics.critPercent;
+    }
+    get misses() {
+        return this.combinedMetrics.misses;
+    }
+    get missPercent() {
+        return this.combinedMetrics.missPercent;
+    }
+    get dodges() {
+        return this.combinedMetrics.dodges;
+    }
+    get dodgePercent() {
+        return this.combinedMetrics.dodgePercent;
+    }
+    get parries() {
+        return this.combinedMetrics.parries;
+    }
+    get parryPercent() {
+        return this.combinedMetrics.parryPercent;
+    }
+    get blocks() {
+        return this.combinedMetrics.blocks;
+    }
+    get blockPercent() {
+        return this.combinedMetrics.blockPercent;
+    }
+    get glances() {
+        return this.combinedMetrics.glances;
+    }
+    get glancePercent() {
+        return this.combinedMetrics.glancePercent;
+    }
+    static async makeNew(unit, resultData, actionMetrics, playerIndex) {
+        const actionId = await ActionId.fromProto(actionMetrics.id).fill(playerIndex);
+        return new ActionMetrics(unit, actionId, actionMetrics, resultData);
+    }
+    // Merges an array of metrics into a single metric.
+    static merge(actions, removeTag, actionIdOverride) {
+        const firstAction = actions[0];
+        const unit = actions.every(action => action.unit == firstAction.unit) ? firstAction.unit : null;
+        let actionId = actionIdOverride || firstAction.actionId;
+        if (removeTag) {
+            actionId = actionId.withoutTag();
+        }
+        const maxTargets = Math.max(...actions.map(action => action.targets.length));
+        const mergedTargets = [...Array(maxTargets).keys()].map(i => TargetedActionMetrics.merge(actions.map(action => action.targets[i])));
+        return new ActionMetrics(unit, actionId, ActionMetricsProto.create({
+            isMelee: firstAction.isMeleeAction,
+            targets: mergedTargets.map(t => t.data),
+        }), firstAction.resultData);
+    }
+    // Groups similar metrics, i.e. metrics with the same item/spell/other ID but
+    // different tags, and returns them as separate arrays.
+    static groupById(actions, useTag) {
+        if (useTag) {
+            return Object.values(bucket(actions, action => action.actionId.toString()));
+        }
+        else {
+            return Object.values(bucket(actions, action => action.actionId.toStringIgnoringTag()));
+        }
+    }
+    // Merges action metrics that have the same name/ID, adding their stats together.
+    static joinById(actions, useTag) {
+        return ActionMetrics.groupById(actions, useTag).map(actionsToJoin => ActionMetrics.merge(actionsToJoin));
+    }
+}
+// Manages the metrics for a single action applied to a specific target.
+export class TargetedActionMetrics {
+    constructor(iterations, duration, data) {
+        this.iterations = iterations;
+        this.duration = duration;
+        this.data = data;
     }
     get damage() {
         return this.data.damage;
@@ -442,20 +552,9 @@ export class ActionMetrics {
     get glancePercent() {
         return (this.data.glances / this.hitAttempts) * 100;
     }
-    static async makeNew(unit, resultData, actionMetrics, playerIndex) {
-        const actionId = await ActionId.fromProto(actionMetrics.id).fill(playerIndex);
-        return new ActionMetrics(unit, actionId, actionMetrics, resultData);
-    }
     // Merges an array of metrics into a single metric.
-    static merge(actions, removeTag, actionIdOverride) {
-        const firstAction = actions[0];
-        const unit = actions.every(action => action.unit == firstAction.unit) ? firstAction.unit : null;
-        let actionId = actionIdOverride || firstAction.actionId;
-        if (removeTag) {
-            actionId = actionId.withoutTag();
-        }
-        return new ActionMetrics(unit, actionId, ActionMetricsProto.create({
-            isMelee: firstAction.isMeleeAction,
+    static merge(actions) {
+        return new TargetedActionMetrics(actions[0].iterations, actions[0].duration, TargetedActionMetricsProto.create({
             casts: sum(actions.map(a => a.data.casts)),
             hits: sum(actions.map(a => a.data.hits)),
             crits: sum(actions.map(a => a.data.crits)),
@@ -466,20 +565,6 @@ export class ActionMetrics {
             glances: sum(actions.map(a => a.data.glances)),
             damage: sum(actions.map(a => a.data.damage)),
             threat: sum(actions.map(a => a.data.threat)),
-        }), firstAction.resultData);
-    }
-    // Groups similar metrics, i.e. metrics with the same item/spell/other ID but
-    // different tags, and returns them as separate arrays.
-    static groupById(actions, useTag) {
-        if (useTag) {
-            return Object.values(bucket(actions, action => action.actionId.toString()));
-        }
-        else {
-            return Object.values(bucket(actions, action => action.actionId.toStringIgnoringTag()));
-        }
-    }
-    // Merges action metrics that have the same name/ID, adding their stats together.
-    static joinById(actions, useTag) {
-        return ActionMetrics.groupById(actions, useTag).map(actionsToJoin => ActionMetrics.merge(actionsToJoin));
+        }));
     }
 }

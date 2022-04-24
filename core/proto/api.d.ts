@@ -230,67 +230,82 @@ export interface ActionMetrics {
     /**
      * True if a melee action, false if a spell action.
      *
-     * @generated from protobuf field: bool is_melee = 11;
+     * @generated from protobuf field: bool is_melee = 2;
      */
     isMelee: boolean;
     /**
+     * Metrics for this action for each target.
+     * Note that some spells are untargeted, these will always have a single
+     * element in this array.
+     *
+     * @generated from protobuf field: repeated proto.TargetedActionMetrics targets = 3;
+     */
+    targets: TargetedActionMetrics[];
+}
+/**
+ * Metrics for a specific action, when cast at a particular target.
+ *
+ * @generated from protobuf message proto.TargetedActionMetrics
+ */
+export interface TargetedActionMetrics {
+    /**
      * # of times this action was used by the agent.
      *
-     * @generated from protobuf field: int32 casts = 2;
+     * @generated from protobuf field: int32 casts = 1;
      */
     casts: number;
     /**
      * # of times this action hit a target. For cleave spells this can be larger than casts.
      *
-     * @generated from protobuf field: int32 hits = 3;
+     * @generated from protobuf field: int32 hits = 2;
      */
     hits: number;
     /**
      * # of times this action was a critical strike.
      *
-     * @generated from protobuf field: int32 crits = 4;
+     * @generated from protobuf field: int32 crits = 3;
      */
     crits: number;
     /**
      * # of times this action was a Miss or Resist.
      *
-     * @generated from protobuf field: int32 misses = 5;
+     * @generated from protobuf field: int32 misses = 4;
      */
     misses: number;
     /**
      * # of times this action was a Dodge.
      *
-     * @generated from protobuf field: int32 dodges = 7;
+     * @generated from protobuf field: int32 dodges = 5;
      */
     dodges: number;
     /**
      * # of times this action was a Parry.
      *
-     * @generated from protobuf field: int32 parries = 8;
+     * @generated from protobuf field: int32 parries = 6;
      */
     parries: number;
     /**
      * # of times this action was a Block.
      *
-     * @generated from protobuf field: int32 blocks = 9;
+     * @generated from protobuf field: int32 blocks = 7;
      */
     blocks: number;
     /**
      * # of times this action was a Glance.
      *
-     * @generated from protobuf field: int32 glances = 10;
+     * @generated from protobuf field: int32 glances = 8;
      */
     glances: number;
     /**
      * Total damage done to all targets by this action.
      *
-     * @generated from protobuf field: double damage = 6;
+     * @generated from protobuf field: double damage = 9;
      */
     damage: number;
     /**
      * Total threat done to all targets by this action.
      *
-     * @generated from protobuf field: double threat = 12;
+     * @generated from protobuf field: double threat = 10;
      */
     threat: number;
 }
@@ -766,6 +781,16 @@ declare class ActionMetrics$Type extends MessageType<ActionMetrics> {
  * @generated MessageType for protobuf message proto.ActionMetrics
  */
 export declare const ActionMetrics: ActionMetrics$Type;
+declare class TargetedActionMetrics$Type extends MessageType<TargetedActionMetrics> {
+    constructor();
+    create(value?: PartialMessage<TargetedActionMetrics>): TargetedActionMetrics;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: TargetedActionMetrics): TargetedActionMetrics;
+    internalBinaryWrite(message: TargetedActionMetrics, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.TargetedActionMetrics
+ */
+export declare const TargetedActionMetrics: TargetedActionMetrics$Type;
 declare class AuraMetrics$Type extends MessageType<AuraMetrics> {
     constructor();
     create(value?: PartialMessage<AuraMetrics>): AuraMetrics;
