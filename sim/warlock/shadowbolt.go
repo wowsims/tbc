@@ -12,7 +12,7 @@ const SpellIDSB11 int32 = 27209
 var ShadowBolt11ActionID = core.ActionID{SpellID: SpellIDSB11}
 
 func (warlock *Warlock) registerShadowboltSpell(sim *core.Simulation) {
-	debuffAura := warlock.impShadowboltDebuffAura(sim.GetPrimaryTarget())
+	warlock.ImpShadowboltAura = warlock.impShadowboltDebuffAura(sim.GetPrimaryTarget())
 	has4pMal := ItemSetMaleficRaiment.CharacterHasSetBonus(&warlock.Character, 4)
 
 	effect := core.SpellEffect{
@@ -29,8 +29,8 @@ func (warlock *Warlock) registerShadowboltSpell(sim *core.Simulation) {
 			if !spellEffect.Landed() || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				return
 			}
-			debuffAura.Activate(sim)
-			debuffAura.SetStacks(sim, 4)
+			warlock.ImpShadowboltAura.Activate(sim)
+			warlock.ImpShadowboltAura.SetStacks(sim, 4)
 		}
 	}
 

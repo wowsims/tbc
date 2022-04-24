@@ -29,6 +29,7 @@ type Warlock struct {
 	CurseOfElementsAura *core.Aura
 
 	NightfallProcAura *core.Aura
+	ImpShadowboltAura *core.Aura
 
 	DoingRegen bool
 }
