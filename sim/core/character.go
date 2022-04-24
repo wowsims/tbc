@@ -567,12 +567,12 @@ func (character *Character) GetStatsProto() *proto.PlayerStats {
 	}
 }
 
-func (character *Character) GetMetricsProto(numIterations int32) *proto.PlayerMetrics {
+func (character *Character) GetMetricsProto(numIterations int32) *proto.UnitMetrics {
 	metrics := character.Metrics.ToProto(numIterations)
 	metrics.Name = character.Name
 	metrics.Auras = character.auraTracker.GetMetricsProto(numIterations)
 
-	metrics.Pets = []*proto.PlayerMetrics{}
+	metrics.Pets = []*proto.UnitMetrics{}
 	for _, petAgent := range character.Pets {
 		metrics.Pets = append(metrics.Pets, petAgent.GetPet().GetMetricsProto(numIterations))
 	}

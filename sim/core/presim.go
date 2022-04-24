@@ -28,7 +28,7 @@ type PresimOptions struct {
 	// Called once after each presim round to provide the results.
 	//
 	// Should return true if this Agent is done running presims, and false otherwise.
-	OnPresimResult func(presimResult proto.PlayerMetrics, iterations int32, duration time.Duration) bool
+	OnPresimResult func(presimResult proto.UnitMetrics, iterations int32, duration time.Duration) bool
 }
 
 func (sim *Simulation) runPresims(request proto.RaidSimRequest) {

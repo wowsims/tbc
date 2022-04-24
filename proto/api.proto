@@ -148,8 +148,8 @@ message DistributionMetrics {
     map<int32, int32> hist = 4;
 }
 
-// All the results for a single Player.
-message PlayerMetrics {
+// All the results for a single Unit (player, target, or pet).
+message UnitMetrics {
 		string name = 9;
 
 		DistributionMetrics dps = 1;
@@ -162,14 +162,14 @@ message PlayerMetrics {
 		repeated AuraMetrics auras = 6;
 		repeated ResourceMetrics resources = 10;
 
-		repeated PlayerMetrics pets = 7;
+		repeated UnitMetrics pets = 7;
 }
 
 // Results for a whole raid.
 message PartyMetrics {
 		DistributionMetrics dps = 1;
 
-		repeated PlayerMetrics players = 2;
+		repeated UnitMetrics players = 2;
 }
 
 // Results for a whole raid.

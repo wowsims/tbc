@@ -1,5 +1,5 @@
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
-import { AuraMetrics, PlayerMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
+import { AuraMetrics, SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js';
 
 import { ColumnSortType, MetricsTable } from './metrics_table.js';
 import { ResultComponent, ResultComponentConfig, SimResultData } from './result_component.js';
@@ -53,10 +53,10 @@ export class AuraMetricsTable extends MetricsTable<AuraMetrics> {
 	}
 
 	mergeMetrics(metrics: Array<AuraMetrics>): AuraMetrics {
-		return AuraMetrics.merge(metrics, true, metrics[0].player?.petActionId || undefined);
+		return AuraMetrics.merge(metrics, true, metrics[0].unit?.petActionId || undefined);
 	}
 
 	shouldCollapse(metric: AuraMetrics): boolean {
-		return !metric.player?.isPet;
+		return !metric.unit?.isPet;
 	}
 }
