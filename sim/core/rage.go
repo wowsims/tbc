@@ -28,6 +28,9 @@ func (character *Character) EnableRageBar(startingRage float64, rageMultiplier f
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if spellEffect.Outcome.Matches(OutcomeMiss) {
+				return
+			}
 			if !spellEffect.ProcMask.Matches(ProcMaskWhiteHit) {
 				return
 			}

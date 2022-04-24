@@ -61,17 +61,21 @@ func (warrior *Warrior) QueueCleave(sim *core.Simulation) {
 	warrior.PseudoStats.DisableDWMissPenalty = true
 }
 
+func (warrior *Warrior) DequeueCleave(sim *core.Simulation) {
+	warrior.heroicStrikeQueued = false
+	warrior.PseudoStats.DisableDWMissPenalty = false
+	if sim.Log != nil {
+		warrior.Log(sim, "Cleave dequeued.")
+	}
+}
+
 // Returns true if the regular melee swing should be used, false otherwise.
 func (warrior *Warrior) TryCleave(sim *core.Simulation) *core.Spell {
 	if !warrior.heroicStrikeQueued {
 		return nil
 	}
 
-	warrior.heroicStrikeQueued = false
-	warrior.PseudoStats.DisableDWMissPenalty = false
-	if sim.Log != nil {
-		warrior.Log(sim, "Cleave unqueued.")
-	}
+	warrior.DequeueCleave(sim)
 	if warrior.CurrentRage() < warrior.Cleave.DefaultCast.Cost {
 		return nil
 	}

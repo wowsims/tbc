@@ -59,9 +59,19 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 		AutoSwingMelee: true,
 		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
 			if war.Rotation.UseCleave {
-				return war.TryCleave(sim)
+				if war.CurrentRage() < float64(war.Rotation.HsRageThreshold) {
+					war.DequeueCleave(sim)
+					return nil
+				} else {
+					return war.TryCleave(sim)
+				}
 			} else {
-				return war.TryHeroicStrike(sim)
+				if war.CurrentRage() < float64(war.Rotation.HsRageThreshold) {
+					war.DequeueHeroicStrike(sim)
+					return nil
+				} else {
+					return war.TryHeroicStrike(sim)
+				}
 			}
 		},
 	})
