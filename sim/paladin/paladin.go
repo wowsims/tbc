@@ -14,7 +14,9 @@ type Paladin struct {
 	CurrentSeal      *core.Aura
 	CurrentJudgement *core.Aura
 
-	Consecration           *core.Spell
+	ConsecrationRank6      *core.Spell
+	ConsecrationRank4      *core.Spell
+	ConsecrationRank1      *core.Spell
 	CrusaderStrike         *core.Spell
 	Exorcism               *core.Spell
 	JudgementOfBlood       *core.Spell
@@ -25,7 +27,9 @@ type Paladin struct {
 	SealOfTheCrusader      *core.Spell
 	SealOfWisdom           *core.Spell
 
-	ConsecrationDot *core.Dot
+	ConsecrationRank6Dot *core.Dot
+	ConsecrationRank4Dot *core.Dot
+	ConsecrationRank1Dot *core.Dot
 
 	JudgementOfTheCrusaderAura *core.Aura
 	JudgementOfWisdomAura      *core.Aura

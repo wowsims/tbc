@@ -172,7 +172,7 @@ func (ret *RetributionPaladin) rotation(sim *core.Simulation) {
 
 	nextSwingAt := ret.AutoAttacks.NextAttackAt()
 	timeTilNextSwing := nextSwingAt - sim.CurrentTime
-	//weaponSpeed := ret.AutoAttacks.MainhandSwingSpeed()
+	weaponSpeed := ret.AutoAttacks.MainhandSwingSpeed()
 
 	spellGCD := ret.SpellGCD()
 
@@ -182,6 +182,8 @@ func (ret *RetributionPaladin) rotation(sim *core.Simulation) {
 	willTwist := possibleTwist && (nextSwingAt+spellGCD <= nextCrusaderStrikeCD+ret.crusaderStrikeDelay)
 
 	// Use Judgement if we will prep Seal of Command
+	// TO-DO: Add more aggressive judgment logic
+	// Should judge on crusader strike swings as well if we have enough time to refresh seal
 	if judgementCD == 0 && sobActive && willTwist {
 		ret.JudgementOfBlood.Cast(sim, target)
 		sobActive = false
@@ -204,6 +206,11 @@ func (ret *RetributionPaladin) rotation(sim *core.Simulation) {
 		} else if !sobActive && !socActive && !willTwist {
 			// If no seal is active, cast Seal of Blood
 			ret.SealOfBlood.Cast(sim, nil)
+		} else if !willTwist && !socActive &&
+			weaponSpeed > spellGCD*2 && spellGCD < crusaderStrikeCD {
+			// If there is literally nothing else to-do, cast fillers
+			// Only if it won't clip crusader strike
+			ret.useFillers(sim, target)
 		}
 	}
 
@@ -219,7 +226,31 @@ func (ret *RetributionPaladin) rotation(sim *core.Simulation) {
 	ret.waitUntilNextEvent(sim, events)
 }
 
-func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Target, sobActive bool) {
+//
+func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Target) {
+
+	// If the target is a demon and exorcism is up, cast exorcism
+	if ret.Rotation.UseExorcism &&
+		target.MobType == proto.MobType_MobTypeDemon &&
+		ret.Exorcism.IsReady(sim) {
+
+		ret.Exorcism.Cast(sim, target)
+		return
+	}
+
+	// If we can't exorcise, try to consecrate
+	if ret.Rotation.ConsecrationRank != proto.RetributionPaladin_Rotation_None &&
+		ret.ConsecrationRank6.IsReady(sim) {
+		switch ret.Rotation.ConsecrationRank {
+		case proto.RetributionPaladin_Rotation_Rank1:
+			ret.ConsecrationRank1.Cast(sim, target)
+		case proto.RetributionPaladin_Rotation_Rank4:
+			ret.ConsecrationRank4.Cast(sim, target)
+		case proto.RetributionPaladin_Rotation_Rank6:
+			ret.ConsecrationRank6.Cast(sim, target)
+		}
+		return
+	}
 }
 
 // Just roll seal of blood and cast crusader strike on CD to conserve mana
