@@ -182,7 +182,6 @@ func (ret *RetributionPaladin) rotation(sim *core.Simulation) {
 	willTwist := possibleTwist && (nextSwingAt+spellGCD <= nextCrusaderStrikeCD+ret.crusaderStrikeDelay)
 
 	// Use Judgement if we will prep Seal of Command
-	// Or if we can squeeze it in on a Crusader Strike Swing
 	if judgementCD == 0 && sobActive && willTwist {
 		ret.JudgementOfBlood.Cast(sim, target)
 		sobActive = false
@@ -235,7 +234,7 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 	sobAndCSCost := ret.CrusaderStrike.DefaultCast.Cost + ret.SealOfBlood.DefaultCast.Cost
 	sobAndJudgementCost := ret.JudgementOfBlood.DefaultCast.Cost + ret.SealOfBlood.DefaultCast.Cost
 
-	if !ret.GCD.IsReady(sim) {
+	if ret.GCD.IsReady(sim) {
 		// Roll seal of blood
 		if sim.CurrentTime+time.Second >= sobExpiration {
 			if ret.CanJudgementOfBlood(sim) && ret.CurrentMana() >= sobAndJudgementCost {
@@ -246,7 +245,7 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 
 		// Crusader strike unless it will cause seal of blood to drop
 		// Or we won't have enough mana to reseal
-		if !ret.CrusaderStrike.CD.IsReady(sim) &&
+		if ret.CrusaderStrike.CD.IsReady(sim) &&
 			!(spellGCD+sim.CurrentTime > nextSwingAt && sobExpiration < nextSwingAt) &&
 			(ret.CurrentMana() >= sobAndCSCost) {
 			ret.CrusaderStrike.Cast(sim, target)
