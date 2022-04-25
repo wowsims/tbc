@@ -146,6 +146,12 @@ export class WarlockSimUI extends IndividualSimUI {
                 IconInputs.Misery,
                 IconInputs.ImprovedScorch,
                 IconInputs.CurseOfElements,
+                IconInputs.ExposeArmor,
+                IconInputs.SunderArmor,
+                IconInputs.BloodFrenzy,
+                IconInputs.HuntersMark,
+                IconInputs.FaerieFire,
+                IconInputs.CurseOfRecklessness,
             ],
             // Which options are selectable in the 'Consumes' section.
             consumeOptions: {
