@@ -40,6 +40,9 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 	case proto.Warlock_Rotation_Tongues:
 		castCurse(warlock.CurseOfTongues, warlock.CurseOfTonguesAura)
 	case proto.Warlock_Rotation_Doom:
+		if warlock.Talents.AmplifyCurse && warlock.AmplifyCurse.CD.IsReady(sim) {
+			warlock.AmplifyCurse.Cast(sim, sim.GetPrimaryTarget())
+		}
 		if sim.Duration-sim.CurrentTime < time.Minute {
 			if !warlock.CurseOfAgonyDot.IsActive() {
 				spell = warlock.CurseOfAgony

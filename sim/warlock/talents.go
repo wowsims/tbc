@@ -96,13 +96,10 @@ func (warlock *Warlock) setupAmplifyCurse() {
 			aura.Deactivate(sim)
 		},
 	})
-	warlock.RegisterSpell(core.SpellConfig{
+	warlock.AmplifyCurse = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 18288},
 		SpellSchool: core.SpellSchoolShadow,
 		Cast: core.CastConfig{
-			DefaultCast: core.Cast{
-				GCD: core.GCDDefault,
-			},
 			CD: core.Cooldown{
 				Timer:    warlock.NewTimer(),
 				Duration: time.Minute * 3,

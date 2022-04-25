@@ -129,7 +129,6 @@ func (warlock *Warlock) registerCurseOfAgonySpell(sim *core.Simulation) {
 		effect.BaseDamage = core.WrapBaseDamageConfig(effect.BaseDamage, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
 			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 				if warlock.AmplifyCurseAura.IsActive() {
-					panic("not implemented")
 					return oldCalculator(sim, hitEffect, spell) * 1.5
 				} else {
 					return oldCalculator(sim, hitEffect, spell)
@@ -188,7 +187,6 @@ func (warlock *Warlock) registerCurseOfDoomSpell(sim *core.Simulation) {
 		effect.BaseDamage = core.WrapBaseDamageConfig(effect.BaseDamage, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
 			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 				if warlock.AmplifyCurseAura.IsActive() {
-					panic("not implemented")
 					return oldCalculator(sim, hitEffect, spell) * 1.5
 				} else {
 					return oldCalculator(sim, hitEffect, spell)
