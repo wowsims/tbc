@@ -16,6 +16,9 @@ var CurseOfAgonyActionID = core.ActionID{SpellID: 27218}
 var CurseOfDoomActionID = core.ActionID{SpellID: 30910}
 
 func (warlock *Warlock) registerCurseOfElementsSpell(sim *core.Simulation) {
+	if warlock.Rotation.Curse != proto.Warlock_Rotation_Elements {
+		return
+	}
 	baseCost := 145.0
 	auras := sim.GetPrimaryTarget().GetAurasWithTag("Curse of Elements")
 	for _, aura := range auras {
@@ -56,6 +59,9 @@ func (warlock *Warlock) ShouldCastCurseOfElements(sim *core.Simulation, target *
 }
 
 func (warlock *Warlock) registerCurseOfRecklessnessSpell(sim *core.Simulation) {
+	if warlock.Rotation.Curse != proto.Warlock_Rotation_Recklessness {
+		return
+	}
 	baseCost := 160.0
 	warlock.CurseOfRecklessnessAura = core.CurseOfRecklessnessAura(sim.GetPrimaryTarget())
 	warlock.CurseOfRecklessnessAura.Duration = time.Minute * 2
@@ -82,6 +88,9 @@ func (warlock *Warlock) registerCurseOfRecklessnessSpell(sim *core.Simulation) {
 
 // https://tbc.wowhead.com/spell=11719/curse-of-tongues
 func (warlock *Warlock) registerCurseOfTonguesSpell(sim *core.Simulation) {
+	if warlock.Rotation.Curse != proto.Warlock_Rotation_Tongues {
+		return
+	}
 	baseCost := 110.0
 	// Empty aura so we can simulate cost/time to keep tongues up
 	warlock.CurseOfTonguesAura = sim.GetPrimaryTarget().GetOrRegisterAura(core.Aura{
@@ -112,6 +121,9 @@ func (warlock *Warlock) registerCurseOfTonguesSpell(sim *core.Simulation) {
 
 // https://tbc.wowhead.com/spell=27218/curse-of-agony
 func (warlock *Warlock) registerCurseOfAgonySpell(sim *core.Simulation) {
+	if warlock.Rotation.Curse != proto.Warlock_Rotation_Agony && warlock.Rotation.Curse != proto.Warlock_Rotation_Doom {
+		return
+	}
 	baseCost := 265.0
 	target := sim.GetPrimaryTarget()
 	effect := core.SpellEffect{
@@ -171,6 +183,9 @@ func (warlock *Warlock) registerCurseOfAgonySpell(sim *core.Simulation) {
 }
 
 func (warlock *Warlock) registerCurseOfDoomSpell(sim *core.Simulation) {
+	if warlock.Rotation.Curse != proto.Warlock_Rotation_Doom {
+		return
+	}
 	baseCost := 380.0
 	target := sim.GetPrimaryTarget()
 	effect := core.SpellEffect{
