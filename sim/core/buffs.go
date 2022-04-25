@@ -234,6 +234,7 @@ func applyPetBuffEffects(petAgent PetAgent, raidBuffs proto.RaidBuffs, partyBuff
 
 	// For some reason pets don't benefit from buffs that are ratings, e.g. crit rating or haste rating.
 	partyBuffs.LeaderOfThePack = MinTristate(partyBuffs.LeaderOfThePack, proto.TristateEffect_TristateEffectRegular)
+	partyBuffs.MoonkinAura = MinTristate(partyBuffs.MoonkinAura, proto.TristateEffect_TristateEffectRegular)
 	partyBuffs.BraidedEterniumChain = false
 
 	applyBuffEffects(petAgent, raidBuffs, partyBuffs, individualBuffs)

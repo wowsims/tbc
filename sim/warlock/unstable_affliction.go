@@ -14,15 +14,6 @@ var UnstableAff3ActionID = core.ActionID{SpellID: SpellIDUnstableAff3}
 
 func (warlock *Warlock) registerUnstableAffSpell(sim *core.Simulation) {
 	baseCost := 400.0
-	effect := core.SpellEffect{
-		OutcomeApplier: core.OutcomeFuncMagicHit(),
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.Landed() {
-				warlock.UnstableAffDot.Apply(sim)
-			}
-		},
-	}
-
 	warlock.UnstableAff = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:     UnstableAff3ActionID,
 		SpellSchool:  core.SpellSchoolShadow,
@@ -35,12 +26,14 @@ func (warlock *Warlock) registerUnstableAffSpell(sim *core.Simulation) {
 				CastTime: time.Millisecond * 1500,
 			},
 		},
-		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			OutcomeApplier: core.OutcomeFuncMagicHit(),
+			OnSpellHit:     applyDotOnLanded(&warlock.UnstableAffDot),
+		}),
 	})
 
 	target := sim.GetPrimaryTarget()
 	spellCoefficient := 0.2
-
 	warlock.UnstableAffDot = core.NewDot(core.Dot{
 		Spell: warlock.UnstableAff,
 		Aura: target.RegisterAura(core.Aura{

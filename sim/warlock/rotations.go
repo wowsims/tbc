@@ -25,14 +25,38 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 
 	// Apply curses first
 	// TODO: should this be part of setup instead of during main rotation?
+	castCurse := func(spellToCast *core.Spell, aura *core.Aura) bool {
+		if !aura.IsActive() {
+			spell = spellToCast
+			return true
+		}
+		return false
+	}
 	switch warlock.Rotation.Curse {
 	case proto.Warlock_Rotation_Elements:
-		if !warlock.CurseOfElementsAura.IsActive() {
-			if !warlock.CurseOfElements.Cast(sim, target) {
-				warlock.LifeTap.Cast(sim, target)
+		castCurse(warlock.CurseOfElements, warlock.CurseOfElementsAura)
+	case proto.Warlock_Rotation_Recklessness:
+		castCurse(warlock.CurseOfRecklessness, warlock.CurseOfRecklessnessAura)
+	case proto.Warlock_Rotation_Tongues:
+		castCurse(warlock.CurseOfTongues, warlock.CurseOfTonguesAura)
+	case proto.Warlock_Rotation_Doom:
+		if sim.Duration-sim.CurrentTime < time.Minute {
+			if !warlock.CurseOfAgonyDot.IsActive() {
+				spell = warlock.CurseOfAgony
 			}
-			return
+		} else if warlock.CurseOfDoom.CD.IsReady(sim) && !warlock.CurseOfDoomDot.IsActive() {
+			spell = warlock.CurseOfDoom
 		}
+	case proto.Warlock_Rotation_Agony:
+		if !warlock.CurseOfAgonyDot.IsActive() {
+			spell = warlock.CurseOfAgony
+		}
+	}
+	if spell != nil {
+		if !spell.Cast(sim, target) {
+			warlock.LifeTap.Cast(sim, target)
+		}
+		return
 	}
 
 	bigCDs := warlock.GetMajorCooldowns()
@@ -54,12 +78,6 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 			// never start regen if you have boosted sp or boosted cast speed
 		} else if warlock.CurrentManaPercent() < 0.2 {
 			warlock.DoingRegen = true
-			// Try to make sure at least immolate is ticking while doing regen.
-			if warlock.ImmolateDot.RemainingDuration(sim) < time.Second*10 {
-				if sucess := warlock.Immolate.Cast(sim, target); sucess {
-					return
-				}
-			}
 		}
 	}
 
