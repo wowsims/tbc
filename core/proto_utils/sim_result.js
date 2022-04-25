@@ -554,7 +554,7 @@ export class TargetedActionMetrics {
     }
     // Merges an array of metrics into a single metric.
     static merge(actions) {
-        return new TargetedActionMetrics(actions[0].iterations, actions[0].duration, TargetedActionMetricsProto.create({
+        return new TargetedActionMetrics(actions[0]?.iterations || 1, actions[0]?.duration || 1, TargetedActionMetricsProto.create({
             casts: sum(actions.map(a => a.data.casts)),
             hits: sum(actions.map(a => a.data.hits)),
             crits: sum(actions.map(a => a.data.crits)),
