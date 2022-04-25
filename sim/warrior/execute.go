@@ -37,7 +37,7 @@ func (warrior *Warrior) registerExecuteSpell(_ *core.Simulation) {
 			},
 			IgnoreHaste: true,
 			ModifyCast: func(_ *core.Simulation, spell *core.Spell, cast *core.Cast) {
-				cast.Cost = spell.Character.CurrentRage()
+				cast.Cost = spell.Unit.CurrentRage()
 				extraRage = cast.Cost - spell.BaseCost
 			},
 		},

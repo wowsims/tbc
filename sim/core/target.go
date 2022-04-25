@@ -123,7 +123,7 @@ func (target *Target) init(sim *Simulation) {
 }
 
 func (target *Target) Reset(sim *Simulation) {
-	target.Unit.reset(sim)
+	target.Unit.reset(sim, nil)
 }
 
 func (target *Target) Advance(sim *Simulation, elapsedTime time.Duration) {

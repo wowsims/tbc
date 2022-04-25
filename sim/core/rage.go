@@ -12,7 +12,7 @@ const RageFactor = 3.75 / 274.7
 type OnRageGain func(sim *Simulation)
 
 type rageBar struct {
-	character *Character
+	unit *Unit
 
 	startingRage float64
 	currentRage  float64
@@ -20,8 +20,8 @@ type rageBar struct {
 	onRageGain OnRageGain
 }
 
-func (character *Character) EnableRageBar(startingRage float64, rageMultiplier float64, onRageGain OnRageGain) {
-	character.RegisterAura(Aura{
+func (unit *Unit) EnableRageBar(startingRage float64, rageMultiplier float64, onRageGain OnRageGain) {
+	unit.RegisterAura(Aura{
 		Label:    "RageBar",
 		Duration: NeverExpires,
 		OnReset: func(aura *Aura, sim *Simulation) {
@@ -45,10 +45,10 @@ func (character *Character) EnableRageBar(startingRage float64, rageMultiplier f
 
 			if spellEffect.IsMH() {
 				HitFactor = 3.5 / 2
-				BaseSwingSpeed = character.AutoAttacks.MH.SwingSpeed
+				BaseSwingSpeed = unit.AutoAttacks.MH.SwingSpeed
 			} else {
 				HitFactor = 1.75 / 2
-				BaseSwingSpeed = character.AutoAttacks.OH.SwingSpeed
+				BaseSwingSpeed = unit.AutoAttacks.OH.SwingSpeed
 			}
 
 			if spellEffect.Outcome.Matches(OutcomeCrit) {
@@ -63,19 +63,19 @@ func (character *Character) EnableRageBar(startingRage float64, rageMultiplier f
 
 			generatedRage := damage*RageFactor + HitFactor*BaseSwingSpeed*rageMultiplier
 
-			character.AddRage(sim, generatedRage, spell.ActionID)
+			unit.AddRage(sim, generatedRage, spell.ActionID)
 		},
 	})
 
-	character.rageBar = rageBar{
-		character:    character,
+	unit.rageBar = rageBar{
+		unit:         unit,
 		startingRage: MaxFloat(0, MinFloat(startingRage, MaxRage)),
 		onRageGain:   onRageGain,
 	}
 }
 
-func (character *Character) HasRageBar() bool {
-	return character.rageBar.character != nil
+func (unit *Unit) HasRageBar() bool {
+	return unit.rageBar.unit != nil
 }
 
 func (rb *rageBar) CurrentRage() float64 {
@@ -88,10 +88,10 @@ func (rb *rageBar) AddRage(sim *Simulation, amount float64, actionID ActionID) {
 	}
 
 	newRage := MinFloat(rb.currentRage+amount, MaxRage)
-	rb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeRage, amount, newRage-rb.currentRage)
+	rb.unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeRage, amount, newRage-rb.currentRage)
 
 	if sim.Log != nil {
-		rb.character.Log(sim, "Gained %0.3f rage from %s (%0.3f --> %0.3f).", amount, actionID, rb.currentRage, newRage)
+		rb.unit.Log(sim, "Gained %0.3f rage from %s (%0.3f --> %0.3f).", amount, actionID, rb.currentRage, newRage)
 	}
 
 	rb.currentRage = newRage
@@ -104,17 +104,17 @@ func (rb *rageBar) SpendRage(sim *Simulation, amount float64, actionID ActionID)
 	}
 
 	newRage := rb.currentRage - amount
-	rb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeRage, -amount, -amount)
+	rb.unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeRage, -amount, -amount)
 
 	if sim.Log != nil {
-		rb.character.Log(sim, "Spent %0.3f rage from %s (%0.3f --> %0.3f).", amount, actionID, rb.currentRage, newRage)
+		rb.unit.Log(sim, "Spent %0.3f rage from %s (%0.3f --> %0.3f).", amount, actionID, rb.currentRage, newRage)
 	}
 
 	rb.currentRage = newRage
 }
 
 func (rb *rageBar) reset(sim *Simulation) {
-	if rb.character == nil {
+	if rb.unit == nil {
 		return
 	}
 

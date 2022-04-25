@@ -17,7 +17,7 @@ const (
 )
 
 type WaitAction struct {
-	character *core.Character
+	unit *core.Unit
 
 	duration time.Duration
 	reason   WaitReason
@@ -37,8 +37,8 @@ func (action WaitAction) GetTag() int32 {
 	return 0
 }
 
-func (action WaitAction) GetCharacter() *core.Character {
-	return action.character
+func (action WaitAction) GetUnit() *core.Unit {
+	return action.unit
 }
 
 func (action WaitAction) GetDuration() time.Duration {
@@ -53,31 +53,31 @@ func (action WaitAction) Cast(sim *core.Simulation) bool {
 	switch action.reason {
 	case WaitReasonNone:
 		if sim.Log != nil {
-			action.character.Log(sim, "Idling for %s seconds, for no particular reason.", action.GetDuration())
+			action.unit.Log(sim, "Idling for %s seconds, for no particular reason.", action.GetDuration())
 		}
 	case WaitReasonOOM:
-		action.character.Metrics.MarkOOM(action.character, action.GetDuration())
+		action.unit.Metrics.MarkOOM(action.unit, action.GetDuration())
 		if sim.Log != nil {
-			action.character.Log(sim, "Not enough mana to cast, regenerating for %s.", action.GetDuration())
+			action.unit.Log(sim, "Not enough mana to cast, regenerating for %s.", action.GetDuration())
 		}
 	case WaitReasonRotation:
 		if sim.Log != nil {
-			action.character.Log(sim, "Waiting for %s due to rotation / CDs.", action.GetDuration())
+			action.unit.Log(sim, "Waiting for %s due to rotation / CDs.", action.GetDuration())
 		}
 	case WaitReasonOptimal:
 		if sim.Log != nil {
-			action.character.Log(sim, "Waiting for %s because its more dps.", action.GetDuration())
+			action.unit.Log(sim, "Waiting for %s because its more dps.", action.GetDuration())
 		}
 	}
-	action.character.SetGCDTimer(sim, sim.CurrentTime+action.GetDuration())
+	action.unit.SetGCDTimer(sim, sim.CurrentTime+action.GetDuration())
 
 	return true
 }
 
-func NewWaitAction(sim *core.Simulation, character *core.Character, duration time.Duration, reason WaitReason) WaitAction {
+func NewWaitAction(sim *core.Simulation, unit *core.Unit, duration time.Duration, reason WaitReason) WaitAction {
 	return WaitAction{
-		character: character,
-		duration:  duration,
-		reason:    reason,
+		unit:     unit,
+		duration: duration,
+		reason:   reason,
 	}
 }

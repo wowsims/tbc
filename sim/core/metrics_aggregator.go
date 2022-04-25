@@ -209,7 +209,7 @@ func (characterMetrics *CharacterMetrics) AddFinalPetMetrics(petMetrics *Charact
 	characterMetrics.dps.Total += petMetrics.dps.Total
 }
 
-func (characterMetrics *CharacterMetrics) MarkOOM(character *Character, dur time.Duration) {
+func (characterMetrics *CharacterMetrics) MarkOOM(unit *Unit, dur time.Duration) {
 	characterMetrics.CharacterIterationMetrics.OOMTime += dur
 	characterMetrics.CharacterIterationMetrics.WentOOM = true
 }

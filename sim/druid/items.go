@@ -38,7 +38,7 @@ var ItemSetMalorne = core.ItemSet{
 					if sim.RandomFloat("malorne 2p") > 0.05 {
 						return
 					}
-					spell.Character.AddMana(sim, 120, core.ActionID{SpellID: 37295}, false)
+					spell.Unit.AddMana(sim, 120, core.ActionID{SpellID: 37295}, false)
 				},
 			})
 		},

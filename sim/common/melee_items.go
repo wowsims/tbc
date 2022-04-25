@@ -548,16 +548,16 @@ func ApplyRodOfTheSunKing(agent core.Agent) {
 				return
 			}
 
-			if spell.Character.HasRageBar() {
+			if spell.Unit.HasRageBar() {
 				if sim.RandomFloat("Rod of the Sun King") > procChance {
 					return
 				}
-				spell.Character.AddRage(sim, 5, actionID)
-			} else if spell.Character.HasEnergyBar() {
+				spell.Unit.AddRage(sim, 5, actionID)
+			} else if spell.Unit.HasEnergyBar() {
 				if sim.RandomFloat("Rod of the Sun King") > procChance {
 					return
 				}
-				spell.Character.AddEnergy(sim, 10, actionID)
+				spell.Unit.AddEnergy(sim, 10, actionID)
 			}
 		},
 	})

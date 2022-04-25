@@ -47,6 +47,7 @@ func NewFeralDruid(character core.Character, options proto.Player) *FeralDruid {
 	cat.PseudoStats.ThreatMultiplier *= 0.71
 
 	cat.EnableEnergyBar(100.0, func(sim *core.Simulation) {
+		cat.TryUseCooldowns(sim)
 		if cat.GCD.IsReady(sim) {
 			cat.doRotation(sim)
 		}
