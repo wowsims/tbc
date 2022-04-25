@@ -46,11 +46,6 @@ func (warlock *Warlock) ApplyTalents() {
 	//  TODO: fel stamina increases max health (might be useful for warlock tanking sim)
 
 	if !warlock.Options.SacrificeSummon && warlock.Options.Summon != proto.Warlock_Options_NoSummon {
-		warlock.AddStats(stats.Stats{
-			stats.MeleeCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.MeleeCritRatingPerCritChance,
-			stats.SpellCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.SpellCritRatingPerCritChance,
-		})
-
 		if warlock.Talents.MasterDemonologist > 0 {
 			switch warlock.Options.Summon {
 			case proto.Warlock_Options_Imp:
@@ -65,6 +60,10 @@ func (warlock *Warlock) ApplyTalents() {
 			}
 		}
 
+		if warlock.Talents.SoulLink {
+			warlock.PseudoStats.DamageDealtMultiplier *= 1.05
+		}
+
 		// Create the pet
 		warlock.NewWarlockPet()
 
@@ -75,6 +74,10 @@ func (warlock *Warlock) ApplyTalents() {
 	}
 
 	// demonic tactics, applies even without pet out
+	warlock.AddStats(stats.Stats{
+		stats.MeleeCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.MeleeCritRatingPerCritChance,
+		stats.SpellCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.SpellCritRatingPerCritChance,
+	})
 
 	warlock.setupNightfall()
 	warlock.setupAmplifyCurse()
