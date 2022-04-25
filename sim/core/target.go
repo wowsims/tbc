@@ -98,14 +98,14 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		target.AddStat(stats.Armor, 7684)
 	}
 
-	const skill = 350.0
-	skillDifference := float64(target.Level*5) - skill
+	const attackerLevel = CharacterLevel
+	levelDifference := float64(target.Level - attackerLevel)
 
-	target.MissChance = 0.05 + skillDifference*0.002
-	target.HitSuppression = (skillDifference - 10) * 0.002
-	target.CritSuppression = (skillDifference * 0.002) + 0.018
-	target.Dodge = 0.05 + skillDifference*0.001
-	target.Glance = math.Max(0.06+skillDifference*0.012, 0)
+	target.MissChance = 0.05 + levelDifference*0.01
+	target.HitSuppression = (levelDifference - 2) * 0.01
+	target.CritSuppression = (levelDifference * 0.01) + 0.018
+	target.Dodge = 0.05 + levelDifference*0.005
+	target.Glance = math.Max(0.06+levelDifference*0.06, 0)
 
 	if options.Debuffs != nil {
 		applyDebuffEffects(target, *options.Debuffs)
