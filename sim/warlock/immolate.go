@@ -23,20 +23,14 @@ func (warlock *Warlock) registerImmolateSpell(sim *core.Simulation) {
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.DestructiveReach),
 		BaseDamage:       core.BaseDamageConfigMagic(332.0, 332.0, 0.2+0.04*float64(warlock.Talents.ShadowAndFlame)),
 		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 0, 1))),
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.Landed() {
-				warlock.ImmolateDot.Apply(sim)
-			}
-		},
+		OnSpellHit:       applyDotOnLanded(&warlock.ImmolateDot),
 	}
 
 	warlock.Immolate = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:    Immolate9ActionID,
-		SpellSchool: core.SpellSchoolFire,
-
+		ActionID:     Immolate9ActionID,
+		SpellSchool:  core.SpellSchoolFire,
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
-
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
 				Cost:     baseCost * (1 - 0.01*float64(warlock.Talents.Cataclysm)),
@@ -44,7 +38,6 @@ func (warlock *Warlock) registerImmolateSpell(sim *core.Simulation) {
 				CastTime: time.Millisecond*2000 - (time.Millisecond * 100 * time.Duration(warlock.Talents.Bane)),
 			},
 		},
-
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 

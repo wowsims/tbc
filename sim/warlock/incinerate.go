@@ -26,7 +26,7 @@ func (warlock *Warlock) registerIncinerateSpell(sim *core.Simulation) {
 
 	warlock.Incinerate = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:    Incinerate2ActionID,
-		SpellSchool: core.SpellSchoolShadow,
+		SpellSchool: core.SpellSchoolFire,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

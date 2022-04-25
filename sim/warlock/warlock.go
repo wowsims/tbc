@@ -25,8 +25,19 @@ type Warlock struct {
 
 	LifeTap *core.Spell
 
-	CurseOfElements     *core.Spell
-	CurseOfElementsAura *core.Aura
+	CurseOfElements         *core.Spell
+	CurseOfElementsAura     *core.Aura
+	CurseOfRecklessness     *core.Spell
+	CurseOfRecklessnessAura *core.Aura
+	CurseOfTongues          *core.Spell
+	CurseOfTonguesAura      *core.Aura
+	CurseOfAgony            *core.Spell
+	CurseOfAgonyDot         *core.Dot
+	CurseOfDoom             *core.Spell
+	CurseOfDoomDot          *core.Dot
+
+	AmplifyCurse     *core.Spell
+	AmplifyCurseAura *core.Aura
 
 	NightfallProcAura *core.Aura
 	ImpShadowboltAura *core.Aura
@@ -44,6 +55,10 @@ func (warlock *Warlock) Init(sim *core.Simulation) {
 	warlock.registerImmolateSpell(sim)
 	warlock.registerCorruptionSpell(sim)
 	warlock.registerCurseOfElementsSpell(sim)
+	warlock.registerCurseOfRecklessnessSpell(sim)
+	warlock.registerCurseOfTonguesSpell(sim)
+	warlock.registerCurseOfAgonySpell(sim)
+	warlock.registerCurseOfDoomSpell(sim)
 	warlock.registerLifeTapSpell(sim)
 	if warlock.Talents.UnstableAffliction {
 		warlock.registerUnstableAffSpell(sim)

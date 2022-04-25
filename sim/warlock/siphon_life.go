@@ -14,15 +14,6 @@ var SiphonLife6ActionID = core.ActionID{SpellID: SpellIDSiphonLife6}
 
 func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
 	baseCost := 370.0
-	effect := core.SpellEffect{
-		OutcomeApplier: core.OutcomeFuncMagicHit(),
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.Landed() {
-				warlock.SiphonLifeDot.Apply(sim)
-			}
-		},
-	}
-
 	warlock.SiphonLife = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:     SiphonLife6ActionID,
 		SpellSchool:  core.SpellSchoolShadow,
@@ -35,12 +26,14 @@ func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
 				CastTime: time.Millisecond * 2000,
 			},
 		},
-		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			OutcomeApplier: core.OutcomeFuncMagicHit(),
+			OnSpellHit:     applyDotOnLanded(&warlock.SiphonLifeDot),
+		}),
 	})
 
 	target := sim.GetPrimaryTarget()
 	spellCoefficient := 0.1
-
 	warlock.SiphonLifeDot = core.NewDot(core.Dot{
 		Spell: warlock.SiphonLife,
 		Aura: target.RegisterAura(core.Aura{
