@@ -233,6 +233,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 		maxEnergy = 110
 	}
 	rogue.EnableEnergyBar(maxEnergy, func(sim *core.Simulation) {
+		rogue.TryUseCooldowns(sim)
 		if rogue.GCD.IsReady(sim) {
 			rogue.doRotation(sim)
 		}

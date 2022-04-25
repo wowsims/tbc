@@ -67,78 +67,78 @@ func (spellEffect *SpellEffect) Landed() bool {
 	return spellEffect.Outcome.Matches(OutcomeLanded)
 }
 
-func (spellEffect *SpellEffect) TotalThreatMultiplier(character *Character) float64 {
-	return spellEffect.ThreatMultiplier * character.PseudoStats.ThreatMultiplier
+func (spellEffect *SpellEffect) TotalThreatMultiplier(unit *Unit) float64 {
+	return spellEffect.ThreatMultiplier * unit.PseudoStats.ThreatMultiplier
 }
 
-func (spellEffect *SpellEffect) MeleeAttackPower(character *Character) float64 {
-	return character.stats[stats.AttackPower] + character.PseudoStats.MobTypeAttackPower + spellEffect.BonusAttackPower
+func (spellEffect *SpellEffect) MeleeAttackPower(unit *Unit) float64 {
+	return unit.stats[stats.AttackPower] + unit.PseudoStats.MobTypeAttackPower + spellEffect.BonusAttackPower
 }
 
 func (spellEffect *SpellEffect) MeleeAttackPowerOnTarget() float64 {
 	return spellEffect.Target.PseudoStats.BonusMeleeAttackPower
 }
 
-func (spellEffect *SpellEffect) RangedAttackPower(character *Character) float64 {
-	return character.stats[stats.RangedAttackPower] + character.PseudoStats.MobTypeAttackPower + spellEffect.BonusAttackPower
+func (spellEffect *SpellEffect) RangedAttackPower(unit *Unit) float64 {
+	return unit.stats[stats.RangedAttackPower] + unit.PseudoStats.MobTypeAttackPower + spellEffect.BonusAttackPower
 }
 
 func (spellEffect *SpellEffect) RangedAttackPowerOnTarget() float64 {
 	return spellEffect.Target.PseudoStats.BonusRangedAttackPower
 }
 
-func (spellEffect *SpellEffect) BonusWeaponDamage(character *Character) float64 {
-	return character.PseudoStats.BonusDamage
+func (spellEffect *SpellEffect) BonusWeaponDamage(unit *Unit) float64 {
+	return unit.PseudoStats.BonusDamage
 }
 
-func (spellEffect *SpellEffect) ExpertisePercentage(character *Character) float64 {
-	expertiseRating := character.stats[stats.Expertise]
+func (spellEffect *SpellEffect) ExpertisePercentage(unit *Unit) float64 {
+	expertiseRating := unit.stats[stats.Expertise]
 	if spellEffect.ProcMask.Matches(ProcMaskMeleeMH) {
-		expertiseRating += character.PseudoStats.BonusMHExpertiseRating
+		expertiseRating += unit.PseudoStats.BonusMHExpertiseRating
 	} else if spellEffect.ProcMask.Matches(ProcMaskMeleeOH) {
-		expertiseRating += character.PseudoStats.BonusOHExpertiseRating
+		expertiseRating += unit.PseudoStats.BonusOHExpertiseRating
 	}
 	return math.Floor(expertiseRating/ExpertisePerQuarterPercentReduction) / 400
 }
 
-func (spellEffect *SpellEffect) PhysicalHitChance(character *Character) float64 {
-	hitRating := character.stats[stats.MeleeHit] + spellEffect.Target.PseudoStats.BonusMeleeHitRating
+func (spellEffect *SpellEffect) PhysicalHitChance(unit *Unit) float64 {
+	hitRating := unit.stats[stats.MeleeHit] + spellEffect.Target.PseudoStats.BonusMeleeHitRating
 
 	if spellEffect.ProcMask.Matches(ProcMaskRanged) {
-		hitRating += character.PseudoStats.BonusRangedHitRating
+		hitRating += unit.PseudoStats.BonusRangedHitRating
 	}
 
 	return (hitRating / (MeleeHitRatingPerHitChance * 100)) - spellEffect.Target.HitSuppression
 }
 
-func (spellEffect *SpellEffect) PhysicalCritChance(character *Character, spell *Spell) float64 {
-	critRating := character.stats[stats.MeleeCrit] + spellEffect.BonusCritRating + spellEffect.Target.PseudoStats.BonusCritRating
+func (spellEffect *SpellEffect) PhysicalCritChance(unit *Unit, spell *Spell) float64 {
+	critRating := unit.stats[stats.MeleeCrit] + spellEffect.BonusCritRating + spellEffect.Target.PseudoStats.BonusCritRating
 
 	if spellEffect.ProcMask.Matches(ProcMaskRanged) {
-		critRating += character.PseudoStats.BonusRangedCritRating
+		critRating += unit.PseudoStats.BonusRangedCritRating
 	} else {
-		critRating += character.PseudoStats.BonusMeleeCritRating
+		critRating += unit.PseudoStats.BonusMeleeCritRating
 	}
 	if spell.SpellExtras.Matches(SpellExtrasAgentReserved1) {
-		critRating += character.PseudoStats.BonusCritRatingAgentReserved1
+		critRating += unit.PseudoStats.BonusCritRatingAgentReserved1
 	}
 	if spellEffect.ProcMask.Matches(ProcMaskMeleeMH) {
-		critRating += character.PseudoStats.BonusMHCritRating
+		critRating += unit.PseudoStats.BonusMHCritRating
 	} else if spellEffect.ProcMask.Matches(ProcMaskMeleeOH) {
-		critRating += character.PseudoStats.BonusOHCritRating
+		critRating += unit.PseudoStats.BonusOHCritRating
 	}
 
 	return (critRating / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
 }
 
-func (spellEffect *SpellEffect) SpellPower(character *Character, spell *Spell) float64 {
-	return character.GetStat(stats.SpellPower) + character.GetStat(spell.SpellSchool.Stat()) + character.PseudoStats.MobTypeSpellPower + spellEffect.BonusSpellPower
+func (spellEffect *SpellEffect) SpellPower(unit *Unit, spell *Spell) float64 {
+	return unit.GetStat(stats.SpellPower) + unit.GetStat(spell.SpellSchool.Stat()) + unit.PseudoStats.MobTypeSpellPower + spellEffect.BonusSpellPower
 }
 
-func (spellEffect *SpellEffect) SpellCritChance(character *Character, spell *Spell) float64 {
-	critRating := (character.GetStat(stats.SpellCrit) + spellEffect.BonusSpellCritRating + spellEffect.Target.PseudoStats.BonusCritRating)
+func (spellEffect *SpellEffect) SpellCritChance(unit *Unit, spell *Spell) float64 {
+	critRating := (unit.GetStat(stats.SpellCrit) + spellEffect.BonusSpellCritRating + spellEffect.Target.PseudoStats.BonusCritRating)
 	if spell.SpellSchool.Matches(SpellSchoolFire) {
-		critRating += character.PseudoStats.BonusFireCritRating
+		critRating += unit.PseudoStats.BonusFireCritRating
 	} else if spell.SpellSchool.Matches(SpellSchoolFrost) {
 		critRating += spellEffect.Target.PseudoStats.BonusFrostCritRating
 	}
@@ -176,9 +176,9 @@ func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spe
 	spellEffect.Damage = damage
 }
 
-func (spellEffect *SpellEffect) calcThreat(character *Character) float64 {
+func (spellEffect *SpellEffect) calcThreat(unit *Unit) float64 {
 	if spellEffect.Landed() {
-		return (spellEffect.Damage + spellEffect.FlatThreatBonus) * spellEffect.TotalThreatMultiplier(character)
+		return (spellEffect.Damage + spellEffect.FlatThreatBonus) * spellEffect.TotalThreatMultiplier(unit)
 	} else {
 		return 0
 	}
@@ -186,16 +186,16 @@ func (spellEffect *SpellEffect) calcThreat(character *Character) float64 {
 
 func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell) {
 	spell.SpellMetrics[spellEffect.Target.Index].TotalDamage += spellEffect.Damage
-	spell.SpellMetrics[spellEffect.Target.Index].TotalThreat += spellEffect.calcThreat(spell.Character)
+	spell.SpellMetrics[spellEffect.Target.Index].TotalThreat += spellEffect.calcThreat(spell.Unit)
 	spellEffect.triggerProcs(sim, spell)
 }
 
 func (spellEffect *SpellEffect) triggerProcs(sim *Simulation, spell *Spell) {
 	if sim.Log != nil {
 		if spellEffect.IsPeriodic {
-			spell.Character.Log(sim, "%s tick %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Character))
+			spell.Unit.Log(sim, "%s tick %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Unit))
 		} else {
-			spell.Character.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Character))
+			spell.Unit.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Unit))
 		}
 	}
 
@@ -203,13 +203,13 @@ func (spellEffect *SpellEffect) triggerProcs(sim *Simulation, spell *Spell) {
 		if spellEffect.OnSpellHit != nil {
 			spellEffect.OnSpellHit(sim, spell, spellEffect)
 		}
-		spell.Character.OnSpellHit(sim, spell, spellEffect)
+		spell.Unit.OnSpellHit(sim, spell, spellEffect)
 		spellEffect.Target.OnSpellHit(sim, spell, spellEffect)
 	} else {
 		if spellEffect.OnPeriodicDamage != nil {
 			spellEffect.OnPeriodicDamage(sim, spell, spellEffect)
 		}
-		spell.Character.OnPeriodicDamage(sim, spell, spellEffect)
+		spell.Unit.OnPeriodicDamage(sim, spell, spellEffect)
 		spellEffect.Target.OnPeriodicDamage(sim, spell, spellEffect)
 	}
 }
@@ -223,7 +223,7 @@ func (spellEffect *SpellEffect) String() string {
 }
 
 func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *Spell, damage *float64) {
-	attacker := spell.Character
+	attacker := spell.Unit
 
 	if spellEffect.ProcMask.Matches(ProcMaskRanged) {
 		*damage *= attacker.PseudoStats.RangedDamageDealtMultiplier
@@ -286,7 +286,7 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, 
 
 	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
 		// Physical resistance (armor).
-		*damage *= spellEffect.Target.ArmorDamageReduction(spell.Character.stats[stats.ArmorPenetration])
+		*damage *= spellEffect.Target.ArmorDamageReduction(spell.Unit.stats[stats.ArmorPenetration])
 	} else if !spell.SpellExtras.Matches(SpellExtrasBinary) {
 		// Magical resistance.
 		// https://royalgiraffe.github.io/resist-guide

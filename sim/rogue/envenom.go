@@ -45,7 +45,7 @@ func (rogue *Rogue) makeEnvenom(comboPoints int32) *core.Spell {
 			ThreatMultiplier: 1,
 			BaseDamage: core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
-					return baseDamage + apRatio*hitEffect.MeleeAttackPower(spell.Character)
+					return baseDamage + apRatio*hitEffect.MeleeAttackPower(spell.Unit)
 				},
 				TargetSpellCoefficient: 0,
 			},

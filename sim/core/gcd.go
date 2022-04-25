@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func (character *Character) newGCDAction(sim *Simulation, agent Agent) *PendingAction {
+func (unit *Unit) newGCDAction(sim *Simulation, agent Agent) *PendingAction {
 	return &PendingAction{
 		Priority: ActionPriorityGCD,
 		OnAction: func(sim *Simulation) {
@@ -19,115 +19,115 @@ func (character *Character) newGCDAction(sim *Simulation, agent Agent) *PendingA
 }
 
 // Note that this is only used when the hardcast and GCD actions
-func (character *Character) newHardcastAction(sim *Simulation) {
-	if character.hardcastAction != nil {
-		character.hardcastAction.Cancel(sim)
+func (unit *Unit) newHardcastAction(sim *Simulation) {
+	if unit.hardcastAction != nil {
+		unit.hardcastAction.Cancel(sim)
 	}
 
 	pa := &PendingAction{
-		NextActionAt: character.Hardcast.Expires,
+		NextActionAt: unit.Hardcast.Expires,
 		OnAction: func(sim *Simulation) {
 			// Don't need to do anything, the Advance() call will take care of the hardcast.
-			character.hardcastAction = nil
+			unit.hardcastAction = nil
 		},
 	}
 
-	character.hardcastAction = pa
+	unit.hardcastAction = pa
 	sim.AddPendingAction(pa)
 }
 
-func (character *Character) NextGCDAt() time.Duration {
-	return character.gcdAction.NextActionAt
+func (unit *Unit) NextGCDAt() time.Duration {
+	return unit.gcdAction.NextActionAt
 }
 
-func (character *Character) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duration) {
-	character.GCD.Set(gcdReadyAt)
+func (unit *Unit) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duration) {
+	unit.GCD.Set(gcdReadyAt)
 
-	character.gcdAction.Cancel(sim)
-	oldAction := character.gcdAction.OnAction
+	unit.gcdAction.Cancel(sim)
+	oldAction := unit.gcdAction.OnAction
 
-	character.gcdAction = &PendingAction{
+	unit.gcdAction = &PendingAction{
 		NextActionAt: gcdReadyAt,
 		Priority:     ActionPriorityGCD,
 		OnAction:     oldAction,
 	}
-	sim.AddPendingAction(character.gcdAction)
+	sim.AddPendingAction(unit.gcdAction)
 }
 
-func (character *Character) EnableGCDTimer(sim *Simulation, agent Agent) {
-	character.gcdAction = character.newGCDAction(sim, agent)
+func (unit *Unit) EnableGCDTimer(sim *Simulation, agent Agent) {
+	unit.gcdAction = unit.newGCDAction(sim, agent)
 }
 
-// Call this to stop the GCD loop for a character.
+// Call this to stop the GCD loop for a unit.
 // This is mostly used for pets that get summoned / expire.
-func (character *Character) CancelGCDTimer(sim *Simulation) {
-	character.gcdAction.Cancel(sim)
-	character.gcdAction = nil
+func (unit *Unit) CancelGCDTimer(sim *Simulation) {
+	unit.gcdAction.Cancel(sim)
+	unit.gcdAction = nil
 }
 
-func (character *Character) IsWaiting() bool {
-	return character.waitStartTime != 0
+func (unit *Unit) IsWaiting() bool {
+	return unit.waitStartTime != 0
 }
-func (character *Character) IsWaitingForMana() bool {
-	return character.waitingForMana != 0
+func (unit *Unit) IsWaitingForMana() bool {
+	return unit.waitingForMana != 0
 }
 
 // Assumes that IsWaitingForMana() == true
-func (character *Character) DoneWaitingForMana(sim *Simulation) bool {
-	if character.CurrentMana() >= character.waitingForMana {
-		character.Metrics.MarkOOM(character, sim.CurrentTime-character.waitStartTime)
-		character.waitStartTime = 0
-		character.waitingForMana = 0
+func (unit *Unit) DoneWaitingForMana(sim *Simulation) bool {
+	if unit.CurrentMana() >= unit.waitingForMana {
+		unit.Metrics.MarkOOM(unit, sim.CurrentTime-unit.waitStartTime)
+		unit.waitStartTime = 0
+		unit.waitingForMana = 0
 		return true
 	}
 	return false
 }
 
-// Returns true if the character was waiting for mana but is now finished AND
+// Returns true if the unit was waiting for mana but is now finished AND
 // the GCD is also ready.
-func (character *Character) FinishedWaitingForManaAndGCDReady(sim *Simulation) bool {
-	if !character.IsWaitingForMana() || !character.DoneWaitingForMana(sim) {
+func (unit *Unit) FinishedWaitingForManaAndGCDReady(sim *Simulation) bool {
+	if !unit.IsWaitingForMana() || !unit.DoneWaitingForMana(sim) {
 		return false
 	}
 
-	return character.GCD.IsReady(sim)
+	return unit.GCD.IsReady(sim)
 }
 
-func (character *Character) WaitUntil(sim *Simulation, readyTime time.Duration) {
-	character.waitStartTime = sim.CurrentTime
-	character.SetGCDTimer(sim, readyTime)
+func (unit *Unit) WaitUntil(sim *Simulation, readyTime time.Duration) {
+	unit.waitStartTime = sim.CurrentTime
+	unit.SetGCDTimer(sim, readyTime)
 	if sim.Log != nil {
-		character.Log(sim, "Pausing GCD for %s due to rotation / CDs.", readyTime-sim.CurrentTime)
+		unit.Log(sim, "Pausing GCD for %s due to rotation / CDs.", readyTime-sim.CurrentTime)
 	}
 }
 
-func (character *Character) HardcastWaitUntil(sim *Simulation, readyTime time.Duration, onComplete CastFunc) {
-	if character.Hardcast.Expires >= sim.CurrentTime {
+func (unit *Unit) HardcastWaitUntil(sim *Simulation, readyTime time.Duration, onComplete CastFunc) {
+	if unit.Hardcast.Expires >= sim.CurrentTime {
 		fmt.Printf("Sim current time: %0.2f\n", sim.CurrentTime.Seconds())
-		panic(fmt.Sprintf("Hardcast already in use, will finish at: %0.2f", character.Hardcast.Expires.Seconds()))
+		panic(fmt.Sprintf("Hardcast already in use, will finish at: %0.2f", unit.Hardcast.Expires.Seconds()))
 	}
 
-	character.Hardcast.Expires = readyTime
-	character.Hardcast.OnComplete = onComplete
-	character.newHardcastAction(sim)
+	unit.Hardcast.Expires = readyTime
+	unit.Hardcast.OnComplete = onComplete
+	unit.newHardcastAction(sim)
 }
 
-func (character *Character) WaitForMana(sim *Simulation, desiredMana float64) {
-	if !character.IsWaitingForMana() {
-		character.waitStartTime = sim.CurrentTime
+func (unit *Unit) WaitForMana(sim *Simulation, desiredMana float64) {
+	if !unit.IsWaitingForMana() {
+		unit.waitStartTime = sim.CurrentTime
 	}
-	character.waitingForMana = desiredMana
+	unit.waitingForMana = desiredMana
 	if sim.Log != nil {
-		character.Log(sim, "Not enough mana to cast, pausing GCD until mana >= %0.01f.", desiredMana)
+		unit.Log(sim, "Not enough mana to cast, pausing GCD until mana >= %0.01f.", desiredMana)
 	}
 }
 
-func (character *Character) doneIterationGCD(simDuration time.Duration) {
-	if character.IsWaitingForMana() {
-		character.Metrics.MarkOOM(character, simDuration-character.waitStartTime)
-		character.waitStartTime = 0
-		character.waitingForMana = 0
-	} else if character.IsWaiting() {
-		character.waitStartTime = 0
+func (unit *Unit) doneIterationGCD(simDuration time.Duration) {
+	if unit.IsWaitingForMana() {
+		unit.Metrics.MarkOOM(unit, simDuration-unit.waitStartTime)
+		unit.waitStartTime = 0
+		unit.waitingForMana = 0
+	} else if unit.IsWaiting() {
+		unit.waitStartTime = 0
 	}
 }

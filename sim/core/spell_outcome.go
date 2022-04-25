@@ -58,12 +58,12 @@ func OutcomeFuncMagicHit() OutcomeApplier {
 
 func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
-		character := spell.Character
+		unit := spell.Unit
 		roll := sim.RandomFloat("White Hit Table")
 
 		// Miss
-		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
-		if character.AutoAttacks.IsDualWielding && !character.PseudoStats.DisableDWMissPenalty {
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(unit)
+		if unit.AutoAttacks.IsDualWielding && !unit.PseudoStats.DisableDWMissPenalty {
 			missChance += 0.19
 		}
 
@@ -76,7 +76,7 @@ func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 		}
 
 		// Dodge
-		chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character)-character.PseudoStats.DodgeReduction)
+		chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(unit)-unit.PseudoStats.DodgeReduction)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeDodge
 			spell.SpellMetrics[spellEffect.Target.Index].Dodges++
@@ -106,7 +106,7 @@ func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 		}
 
 		// Crit
-		chance += spellEffect.PhysicalCritChance(character, spell)
+		chance += spellEffect.PhysicalCritChance(unit, spell)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeCrit
 			spell.SpellMetrics[spellEffect.Target.Index].Crits++
@@ -122,11 +122,11 @@ func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 
 func OutcomeFuncMeleeSpecialHit() OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
-		character := spell.Character
+		unit := spell.Unit
 		roll := sim.RandomFloat("White Hit Table")
 
 		// Miss
-		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(unit)
 		chance := MaxFloat(0, missChance)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeMiss
@@ -137,7 +137,7 @@ func OutcomeFuncMeleeSpecialHit() OutcomeApplier {
 
 		// Dodge
 		if !spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
-			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character)-character.PseudoStats.DodgeReduction)
+			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(unit)-unit.PseudoStats.DodgeReduction)
 			if roll < chance {
 				spellEffect.Outcome = OutcomeDodge
 				spell.SpellMetrics[spellEffect.Target.Index].Dodges++
@@ -160,11 +160,11 @@ func OutcomeFuncMeleeSpecialHit() OutcomeApplier {
 
 func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
-		character := spell.Character
+		unit := spell.Unit
 		roll := sim.RandomFloat("White Hit Table")
 
 		// Miss
-		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(unit)
 		chance := MaxFloat(0, missChance)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeMiss
@@ -175,7 +175,7 @@ func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
 
 		// Dodge
 		if !spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) {
-			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(character)-character.PseudoStats.DodgeReduction)
+			chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(unit)-unit.PseudoStats.DodgeReduction)
 			if roll < chance {
 				spellEffect.Outcome = OutcomeDodge
 				spell.SpellMetrics[spellEffect.Target.Index].Dodges++
@@ -211,11 +211,11 @@ func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
 
 func OutcomeFuncMeleeSpecialNoBlockDodgeParry(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
-		character := spell.Character
+		unit := spell.Unit
 		roll := sim.RandomFloat("White Hit Table")
 
 		// Miss
-		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(unit)
 		chance := MaxFloat(0, missChance)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeMiss
@@ -255,11 +255,11 @@ func OutcomeFuncMeleeSpecialCritOnly(critMultiplier float64) OutcomeApplier {
 
 func OutcomeFuncRangedHit() OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
-		character := spell.Character
+		unit := spell.Unit
 		roll := sim.RandomFloat("White Hit Table")
 
 		// Miss
-		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(unit)
 		chance := MaxFloat(0, missChance)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeMiss
@@ -276,11 +276,11 @@ func OutcomeFuncRangedHit() OutcomeApplier {
 
 func OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
-		character := spell.Character
+		unit := spell.Unit
 		roll := sim.RandomFloat("White Hit Table")
 
 		// Miss
-		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(character)
+		missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(unit)
 		chance := MaxFloat(0, missChance)
 		if roll < chance {
 			spellEffect.Outcome = OutcomeMiss
@@ -310,17 +310,17 @@ func OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApplier {
 
 // Calculates a hit check using the stats from this spell.
 func (spellEffect *SpellEffect) magicHitCheck(sim *Simulation, spell *Spell) bool {
-	hit := 0.83 + (spell.Character.GetStat(stats.SpellHit)+spellEffect.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
+	hit := 0.83 + (spell.Unit.GetStat(stats.SpellHit)+spellEffect.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
 	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
 
 	return sim.RandomFloat("Magical Hit Roll") < hit
 }
 
 func (spellEffect *SpellEffect) magicCritCheck(sim *Simulation, spell *Spell) bool {
-	critChance := spellEffect.SpellCritChance(spell.Character, spell)
+	critChance := spellEffect.SpellCritChance(spell.Unit, spell)
 	return sim.RandomFloat("Magical Crit Roll") < critChance
 }
 
 func (spellEffect *SpellEffect) physicalCritRoll(sim *Simulation, spell *Spell) bool {
-	return sim.RandomFloat("Physical Crit Roll") < spellEffect.PhysicalCritChance(spell.Character, spell)
+	return sim.RandomFloat("Physical Crit Roll") < spellEffect.PhysicalCritChance(spell.Unit, spell)
 }

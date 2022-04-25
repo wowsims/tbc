@@ -120,11 +120,11 @@ func (ahe *SpellEffect) IsMelee() bool {
 
 type AutoAttacks struct {
 	// initialized
-	agent     Agent
-	character *Character
-	MH        Weapon
-	OH        Weapon
-	Ranged    Weapon
+	agent  Agent
+	unit   *Unit
+	MH     Weapon
+	OH     Weapon
+	Ranged Weapon
 
 	IsDualWielding bool
 
@@ -175,10 +175,10 @@ type AutoAttackOptions struct {
 	ReplaceMHSwing ReplaceMHSwing
 }
 
-func (character *Character) EnableAutoAttacks(agent Agent, options AutoAttackOptions) {
-	character.AutoAttacks = AutoAttacks{
+func (unit *Unit) EnableAutoAttacks(agent Agent, options AutoAttackOptions) {
+	unit.AutoAttacks = AutoAttacks{
 		agent:          agent,
-		character:      character,
+		unit:           unit,
 		MH:             options.MainHand,
 		OH:             options.OffHand,
 		Ranged:         options.Ranged,
@@ -215,14 +215,14 @@ func (aa *AutoAttacks) IsEnabled() bool {
 }
 
 // Empty handler so Agents don't have to provide one if they have no logic to add.
-func (character *Character) OnAutoAttack(sim *Simulation, spell *Spell) {}
+func (unit *Unit) OnAutoAttack(sim *Simulation, spell *Spell) {}
 
 func (aa *AutoAttacks) reset(sim *Simulation) {
 	if !aa.IsEnabled() {
 		return
 	}
 
-	aa.MHAuto = aa.character.GetOrRegisterSpell(SpellConfig{
+	aa.MHAuto = aa.unit.GetOrRegisterSpell(SpellConfig{
 		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
 		SpellSchool: SpellSchoolPhysical,
 		SpellExtras: SpellExtrasMeleeMetrics,
@@ -230,7 +230,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 		ApplyEffects: ApplyEffectFuncDirectDamage(aa.MHEffect),
 	})
 
-	aa.OHAuto = aa.character.GetOrRegisterSpell(SpellConfig{
+	aa.OHAuto = aa.unit.GetOrRegisterSpell(SpellConfig{
 		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
 		SpellSchool: SpellSchoolPhysical,
 		SpellExtras: SpellExtrasMeleeMetrics,
@@ -238,7 +238,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 		ApplyEffects: ApplyEffectFuncDirectDamage(aa.OHEffect),
 	})
 
-	aa.RangedAuto = aa.character.GetOrRegisterSpell(SpellConfig{
+	aa.RangedAuto = aa.unit.GetOrRegisterSpell(SpellConfig{
 		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
 		SpellSchool: SpellSchoolPhysical,
 		SpellExtras: SpellExtrasMeleeMetrics,
@@ -351,28 +351,28 @@ func (aa *AutoAttacks) EnableAutoSwing(sim *Simulation) {
 
 // The amount of time between two MH swings.
 func (aa *AutoAttacks) MainhandSwingSpeed() time.Duration {
-	return time.Duration(float64(aa.MH.SwingDuration) / aa.character.SwingSpeed())
+	return time.Duration(float64(aa.MH.SwingDuration) / aa.unit.SwingSpeed())
 }
 
 // The amount of time between two OH swings.
 func (aa *AutoAttacks) OffhandSwingSpeed() time.Duration {
-	return time.Duration(float64(aa.OH.SwingDuration) / aa.character.SwingSpeed())
+	return time.Duration(float64(aa.OH.SwingDuration) / aa.unit.SwingSpeed())
 }
 
 // The amount of time between two ranged swings.
 func (aa *AutoAttacks) RangedSwingSpeed() time.Duration {
-	return time.Duration(float64(aa.Ranged.SwingDuration) / aa.character.RangedSwingSpeed())
+	return time.Duration(float64(aa.Ranged.SwingDuration) / aa.unit.RangedSwingSpeed())
 }
 
 // Ranged swings have a 0.5s 'windup' time before they can fire, affected by haste.
 // This function computes the amount of windup time based on the current haste.
 func (aa *AutoAttacks) RangedSwingWindup() time.Duration {
-	return time.Duration(float64(time.Millisecond*500) / aa.character.RangedSwingSpeed())
+	return time.Duration(float64(time.Millisecond*500) / aa.unit.RangedSwingSpeed())
 }
 
 // Time between a ranged auto finishes casting and the next one becomes available.
 func (aa *AutoAttacks) RangedSwingGap() time.Duration {
-	return time.Duration(float64(aa.Ranged.SwingDuration-time.Millisecond*500) / aa.character.RangedSwingSpeed())
+	return time.Duration(float64(aa.Ranged.SwingDuration-time.Millisecond*500) / aa.unit.RangedSwingSpeed())
 }
 
 // Returns the amount of time available before ranged auto will be clipped.
@@ -430,7 +430,7 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 		// Delay the OH swing for later, so it follows the MH swing.
 		aa.OffhandSwingAt = aa.MainhandSwingAt + time.Millisecond*100
 		if sim.Log != nil {
-			aa.character.Log(sim, "Delaying OH swing by %s", aa.OffhandSwingAt-sim.CurrentTime)
+			aa.unit.Log(sim, "Delaying OH swing by %s", aa.OffhandSwingAt-sim.CurrentTime)
 		}
 		return
 	}
@@ -453,8 +453,8 @@ func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
 	// It's important that we update the GCD timer AFTER starting the ranged auto.
 	// Otherwise the hardcast action won't be created separately.
 	nextGCD := sim.CurrentTime + aa.RangedAuto.CurCast.CastTime
-	if nextGCD > aa.character.NextGCDAt() {
-		aa.character.SetGCDTimer(sim, nextGCD)
+	if nextGCD > aa.unit.NextGCDAt() {
+		aa.unit.SetGCDTimer(sim, nextGCD)
 	}
 }
 
@@ -544,7 +544,7 @@ func (aa *AutoAttacks) NextEventAt(sim *Simulation) time.Duration {
 		panic(fmt.Sprintf("Returned 0 from next attack at %s, mh: %s, oh: %s", sim.CurrentTime, aa.MainhandSwingAt, aa.OffhandSwingAt))
 	}
 	return MinDuration(
-		sim.CurrentTime+aa.character.GCD.TimeToReady(sim),
+		sim.CurrentTime+aa.unit.GCD.TimeToReady(sim),
 		aa.NextAttackAt())
 }
 
@@ -592,10 +592,10 @@ func (ppmm *PPMManager) ProcRanged(sim *Simulation, label string) bool {
 	return ppmm.rangedProcChance > 0 && sim.RandomFloat(label) < ppmm.rangedProcChance
 }
 
-// PPMToChance converts a character proc-per-minute into mh/oh proc chances
+// PPMToChance converts a unit proc-per-minute into mh/oh proc chances
 func (aa *AutoAttacks) NewPPMManager(ppm float64) PPMManager {
 	if aa.MH.SwingSpeed == 0 {
-		// Means this character didn't enable autoattacks.
+		// Means this unit didn't enable autoattacks.
 		return PPMManager{
 			mhProcChance:     0,
 			ohProcChance:     0,

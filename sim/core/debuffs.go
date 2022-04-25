@@ -155,9 +155,9 @@ func JudgementOfWisdomAura(target *Target) *Aura {
 				return // Phantom spells (Romulo's, Lightning Capacitor, etc) don't proc JoW.
 			}
 
-			character := spell.Character
-			if character.HasManaBar() {
-				character.AddMana(sim, mana, actionID, false)
+			unit := spell.Unit
+			if unit.HasManaBar() {
+				unit.AddMana(sim, mana, actionID, false)
 			}
 
 			if spell.ActionID.SpellID == 35395 {

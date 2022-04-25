@@ -10,7 +10,7 @@ import (
 
 // TODO: Make this into an object like rageBar or energyBar.
 func (character *Character) EnableManaBar() {
-	// Assumes all characters have >= 20 intellect.
+	// Assumes all units have >= 20 intellect.
 	// See https://wowwiki-archive.fandom.com/wiki/Base_mana.
 	// Subtract out the non-linear part of the formula separately, so that weird
 	// mana values are not included when using the stat dependency manager.
@@ -24,82 +24,82 @@ func (character *Character) EnableManaBar() {
 	})
 }
 
-func (character *Character) HasManaBar() bool {
-	return character.MaxMana() > 0
+func (unit *Unit) HasManaBar() bool {
+	return unit.MaxMana() > 0
 }
 
 // Empty handler so Agents don't have to provide one if they have no logic to add.
-func (character *Character) OnManaTick(sim *Simulation) {}
+func (unit *Unit) OnManaTick(sim *Simulation) {}
 
 func (character *Character) BaseMana() float64 {
 	return character.GetBaseStats()[stats.Mana]
 }
-func (character *Character) MaxMana() float64 {
-	return character.GetInitialStat(stats.Mana)
+func (unit *Unit) MaxMana() float64 {
+	return unit.GetInitialStat(stats.Mana)
 }
-func (character *Character) CurrentMana() float64 {
-	return character.stats[stats.Mana]
+func (unit *Unit) CurrentMana() float64 {
+	return unit.stats[stats.Mana]
 }
-func (character *Character) CurrentManaPercent() float64 {
-	return character.CurrentMana() / character.MaxMana()
+func (unit *Unit) CurrentManaPercent() float64 {
+	return unit.CurrentMana() / unit.MaxMana()
 }
 
-func (character *Character) AddMana(sim *Simulation, amount float64, actionID ActionID, isBonusMana bool) {
+func (unit *Unit) AddMana(sim *Simulation, amount float64, actionID ActionID, isBonusMana bool) {
 	if amount < 0 {
 		panic("Trying to add negative mana!")
 	}
 
-	oldMana := character.CurrentMana()
-	newMana := MinFloat(oldMana+amount, character.MaxMana())
-	character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeMana, amount, newMana-oldMana)
+	oldMana := unit.CurrentMana()
+	newMana := MinFloat(oldMana+amount, unit.MaxMana())
+	unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeMana, amount, newMana-oldMana)
 
 	if sim.Log != nil {
-		character.Log(sim, "Gained %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, oldMana, newMana)
+		unit.Log(sim, "Gained %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, oldMana, newMana)
 	}
 
-	character.stats[stats.Mana] = newMana
-	character.Metrics.ManaGained += newMana - oldMana
+	unit.stats[stats.Mana] = newMana
+	unit.Metrics.ManaGained += newMana - oldMana
 	if isBonusMana {
-		character.Metrics.BonusManaGained += newMana - oldMana
+		unit.Metrics.BonusManaGained += newMana - oldMana
 	}
 }
 
-func (character *Character) SpendMana(sim *Simulation, amount float64, actionID ActionID) {
+func (unit *Unit) SpendMana(sim *Simulation, amount float64, actionID ActionID) {
 	if amount < 0 {
 		panic("Trying to spend negative mana!")
 	}
 
-	newMana := character.CurrentMana() - amount
-	character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeMana, -amount, -amount)
+	newMana := unit.CurrentMana() - amount
+	unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeMana, -amount, -amount)
 
 	if sim.Log != nil {
-		character.Log(sim, "Spent %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, character.CurrentMana(), newMana)
+		unit.Log(sim, "Spent %0.3f mana from %s (%0.3f --> %0.3f).", amount, actionID, unit.CurrentMana(), newMana)
 	}
 
-	character.stats[stats.Mana] = newMana
-	character.Metrics.ManaSpent += amount
+	unit.stats[stats.Mana] = newMana
+	unit.Metrics.ManaSpent += amount
 }
 
 // Returns the rate of mana regen per second from mp5.
-func (character *Character) MP5ManaRegenPerSecond() float64 {
-	return character.stats[stats.MP5] / 5.0
+func (unit *Unit) MP5ManaRegenPerSecond() float64 {
+	return unit.stats[stats.MP5] / 5.0
 }
 
 // Returns the rate of mana regen per second from spirit.
-func (character *Character) SpiritManaRegenPerSecond() float64 {
-	return 0.001 + character.stats[stats.Spirit]*math.Sqrt(character.stats[stats.Intellect])*0.009327
+func (unit *Unit) SpiritManaRegenPerSecond() float64 {
+	return 0.001 + unit.stats[stats.Spirit]*math.Sqrt(unit.stats[stats.Intellect])*0.009327
 }
 
-// Returns the rate of mana regen per second, assuming this character is
+// Returns the rate of mana regen per second, assuming this unit is
 // considered to be casting.
-func (character *Character) ManaRegenPerSecondWhileCasting() float64 {
-	regenRate := character.MP5ManaRegenPerSecond()
+func (unit *Unit) ManaRegenPerSecondWhileCasting() float64 {
+	regenRate := unit.MP5ManaRegenPerSecond()
 
 	spiritRegenRate := 0.0
-	if character.PseudoStats.SpiritRegenRateCasting != 0 || character.PseudoStats.ForceFullSpiritRegen {
-		spiritRegenRate = character.SpiritManaRegenPerSecond() * character.PseudoStats.SpiritRegenMultiplier
-		if !character.PseudoStats.ForceFullSpiritRegen {
-			spiritRegenRate *= character.PseudoStats.SpiritRegenRateCasting
+	if unit.PseudoStats.SpiritRegenRateCasting != 0 || unit.PseudoStats.ForceFullSpiritRegen {
+		spiritRegenRate = unit.SpiritManaRegenPerSecond() * unit.PseudoStats.SpiritRegenMultiplier
+		if !unit.PseudoStats.ForceFullSpiritRegen {
+			spiritRegenRate *= unit.PseudoStats.SpiritRegenRateCasting
 		}
 	}
 	regenRate += spiritRegenRate
@@ -107,55 +107,55 @@ func (character *Character) ManaRegenPerSecondWhileCasting() float64 {
 	return regenRate
 }
 
-// Returns the rate of mana regen per second, assuming this character is
+// Returns the rate of mana regen per second, assuming this unit is
 // considered to be not casting.
-func (character *Character) ManaRegenPerSecondWhileNotCasting() float64 {
-	regenRate := character.MP5ManaRegenPerSecond()
+func (unit *Unit) ManaRegenPerSecondWhileNotCasting() float64 {
+	regenRate := unit.MP5ManaRegenPerSecond()
 
-	regenRate += character.SpiritManaRegenPerSecond() * character.PseudoStats.SpiritRegenMultiplier
+	regenRate += unit.SpiritManaRegenPerSecond() * unit.PseudoStats.SpiritRegenMultiplier
 
 	return regenRate
 }
 
-func (character *Character) UpdateManaRegenRates() {
-	character.manaTickWhileCasting = character.ManaRegenPerSecondWhileCasting() * 2
-	character.manaTickWhileNotCasting = character.ManaRegenPerSecondWhileNotCasting() * 2
+func (unit *Unit) UpdateManaRegenRates() {
+	unit.manaTickWhileCasting = unit.ManaRegenPerSecondWhileCasting() * 2
+	unit.manaTickWhileNotCasting = unit.ManaRegenPerSecondWhileNotCasting() * 2
 }
 
 // Applies 1 'tick' of mana regen, which worth 2s of regeneration based on mp5/int/spirit/etc.
-func (character *Character) ManaTick(sim *Simulation) {
-	if sim.CurrentTime < character.PseudoStats.FiveSecondRuleRefreshTime {
-		regen := character.manaTickWhileCasting
-		character.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: 1}, false)
+func (unit *Unit) ManaTick(sim *Simulation) {
+	if sim.CurrentTime < unit.PseudoStats.FiveSecondRuleRefreshTime {
+		regen := unit.manaTickWhileCasting
+		unit.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: 1}, false)
 	} else {
-		regen := character.manaTickWhileNotCasting
-		character.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: 2}, false)
+		regen := unit.manaTickWhileNotCasting
+		unit.AddMana(sim, regen, ActionID{OtherID: proto.OtherAction_OtherActionManaRegen, Tag: 2}, false)
 	}
 }
 
-// Returns the amount of time this Character would need to wait in order to reach
+// Returns the amount of time this Unit would need to wait in order to reach
 // the desired amount of mana, via mana regen.
 //
-// Assumes that desiredMana > currentMana. Calculation assumes the Character
+// Assumes that desiredMana > currentMana. Calculation assumes the Unit
 // will not take any actions during this period that would reset the 5-second rule.
-func (character *Character) TimeUntilManaRegen(desiredMana float64) time.Duration {
+func (unit *Unit) TimeUntilManaRegen(desiredMana float64) time.Duration {
 	// +1 at the end is to deal with floating point math rounding errors.
-	manaNeeded := desiredMana - character.CurrentMana()
+	manaNeeded := desiredMana - unit.CurrentMana()
 	regenTime := NeverExpires
 
-	regenWhileCasting := character.ManaRegenPerSecondWhileCasting()
+	regenWhileCasting := unit.ManaRegenPerSecondWhileCasting()
 	if regenWhileCasting != 0 {
 		regenTime = DurationFromSeconds(manaNeeded/regenWhileCasting) + 1
 	}
 
-	// TODO: this needs to have access to the sim to see current time vs character.PseudoStats.FiveSecondRule.
+	// TODO: this needs to have access to the sim to see current time vs unit.PseudoStats.FiveSecondRule.
 	//  it is possible that we have been waiting.
 	//  In practice this function is always used right after a previous cast so no big deal for now.
 	if regenTime > time.Second*5 {
 		regenTime = time.Second * 5
 		manaNeeded -= regenWhileCasting * 5
 		// now we move into spirit based regen.
-		regenTime += DurationFromSeconds(manaNeeded / character.ManaRegenPerSecondWhileNotCasting())
+		regenTime += DurationFromSeconds(manaNeeded / unit.ManaRegenPerSecondWhileNotCasting())
 	}
 
 	return regenTime
