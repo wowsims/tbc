@@ -140,3 +140,15 @@ func TernaryFloat64(condition bool, val1 float64, val2 float64) float64 {
 		return val2
 	}
 }
+
+func UnitLevelFloat64(unitLevel int32, maxLevelPlus0Val float64, maxLevelPlus1Val float64, maxLevelPlus2Val float64, maxLevelPlus3Val float64) float64 {
+	if unitLevel == CharacterLevel {
+		return maxLevelPlus0Val
+	} else if unitLevel == CharacterLevel+1 {
+		return maxLevelPlus1Val
+	} else if unitLevel == CharacterLevel+2 {
+		return maxLevelPlus2Val
+	} else {
+		return maxLevelPlus3Val
+	}
+}
