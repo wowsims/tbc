@@ -14,9 +14,7 @@ type Paladin struct {
 	CurrentSeal      *core.Aura
 	CurrentJudgement *core.Aura
 
-	ConsecrationRank6      *core.Spell
-	ConsecrationRank4      *core.Spell
-	ConsecrationRank1      *core.Spell
+	Consecration           *core.Spell
 	CrusaderStrike         *core.Spell
 	Exorcism               *core.Spell
 	JudgementOfBlood       *core.Spell
@@ -27,9 +25,7 @@ type Paladin struct {
 	SealOfTheCrusader      *core.Spell
 	SealOfWisdom           *core.Spell
 
-	ConsecrationRank6Dot *core.Dot
-	ConsecrationRank4Dot *core.Dot
-	ConsecrationRank1Dot *core.Dot
+	ConsecrationDot *core.Dot
 
 	JudgementOfTheCrusaderAura *core.Aura
 	JudgementOfWisdomAura      *core.Aura
@@ -58,7 +54,6 @@ func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (paladin *Paladin) Init(sim *core.Simulation) {
-	paladin.registerConsecrationSpell(sim)
 	paladin.registerCrusaderStrikeSpell(sim)
 	paladin.registerExorcismSpell(sim)
 	paladin.registerJudgements(sim)

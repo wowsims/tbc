@@ -103,6 +103,8 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			IsPhantom: true,
+
 			OutcomeApplier: core.OutcomeFuncAlwaysHit(),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -181,8 +183,7 @@ func (paladin *Paladin) setupJudgementRefresh() {
 					paladin.CurrentJudgement.Refresh(sim)
 
 					// Check if current judgement is not JoW and also that JoW is on the target
-					if paladin.CurrentJudgement.ActionID.SpellID != 27164 &&
-						spellEffect.Target.HasActiveAura(paladin.JudgementOfWisdomAura.Label) {
+					if paladin.CurrentJudgement != paladin.JudgementOfWisdomAura && paladin.JudgementOfWisdomAura.IsActive() {
 						// Just trigger a second JoW
 						paladin.AddMana(sim, mana, core.ActionID{SpellID: 27164}, false)
 					}

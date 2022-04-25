@@ -76,6 +76,16 @@ func (ret *RetributionPaladin) GetPaladin() *paladin.Paladin {
 func (ret *RetributionPaladin) Init(sim *core.Simulation) {
 	ret.Paladin.Init(sim)
 	ret.DelayDPSCooldownsForArmorDebuffs(sim)
+
+	// Register Consecration here so we can setup the right rank based on UI input
+	switch ret.Rotation.ConsecrationRank {
+	case proto.RetributionPaladin_Rotation_Rank6:
+		ret.RegisterConsecrationSpell(sim, 6)
+	case proto.RetributionPaladin_Rotation_Rank4:
+		ret.RegisterConsecrationSpell(sim, 4)
+	case proto.RetributionPaladin_Rotation_Rank1:
+		ret.RegisterConsecrationSpell(sim, 1)
+	}
 }
 
 func (ret *RetributionPaladin) Reset(sim *core.Simulation) {
@@ -240,8 +250,8 @@ func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Tar
 
 	// If we can't exorcise, try to consecrate
 	if ret.Rotation.ConsecrationRank != proto.RetributionPaladin_Rotation_None &&
-		ret.ConsecrationRank6.IsReady(sim) {
-		ret.CastConsecrationRank(sim, target, ret.Rotation.ConsecrationRank)
+		ret.Consecration.IsReady(sim) {
+		ret.Consecration.Cast(sim, target)
 		return
 	}
 }
