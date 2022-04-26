@@ -48,6 +48,8 @@ $icon-active-border-color: lawngreen;
   background-color: black;
   color: $icon-active-border-color;
   border: none;
+	width: auto;
+	padding: 0 2px;
 }
 .icon-input:not(.use-counter) .icon-input-counter {
   display: none;
