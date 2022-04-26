@@ -54,7 +54,7 @@ func (unit *Unit) resistCoeff(school SpellSchool, attackerLevel int32, attackerS
 
 	levelBasedResistance := 0.0
 	if unit.Type == EnemyUnit {
-		levelBasedResistance = 8 * float64(MaxInt32(0, unit.Level-attackerLevel))
+		levelBasedResistance = LevelBasedNPCSpellResistancePerLevel * float64(MaxInt32(0, unit.Level-attackerLevel))
 	}
 
 	resistance := MaxFloat(0, unit.GetStat(school.ResistanceStat())-attackerSpellPen)
@@ -72,9 +72,9 @@ func (unit *Unit) partialResistRollThresholds(school SpellSchool, attackerLevel 
 
 	// Based on the piecewise linear regression estimates at https://royalgiraffe.github.io/partial-resist-table.
 	//partialResistChance00 := piecewiseLinear3(resistCoeff, 1, 0.24, 0.00, 0.00)
-	partialResistChance25 := piecewiseLinear3(resistCoeff, 0, 0.55, 0.20, 0.04)
-	partialResistChance50 := piecewiseLinear3(resistCoeff, 0, 0.17, 0.57, 0.15)
-	partialResistChance75 := piecewiseLinear3(resistCoeff, 0, 0.04, 0.23, 0.81)
+	partialResistChance25 := piecewiseLinear3(resistCoeff, 0, 0.55, 0.22, 0.04)
+	partialResistChance50 := piecewiseLinear3(resistCoeff, 0, 0.18, 0.56, 0.16)
+	partialResistChance75 := piecewiseLinear3(resistCoeff, 0, 0.03, 0.22, 0.80)
 
 	return partialResistChance25 + partialResistChance50 + partialResistChance75,
 		partialResistChance50 + partialResistChance75,

@@ -126,7 +126,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 712.0423402559952
+  dps: 712.0259350559951
  }
 }
 dps_results: {
@@ -552,7 +552,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 730.1880103918953
+  dps: 730.0997476672873
  }
 }
 dps_results: {
@@ -624,7 +624,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-StormGauntlets-12632"
  value: {
-  dps: 696.2247714343071
+  dps: 696.199953634307
  }
 }
 dps_results: {
@@ -678,7 +678,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-TheFistsofFury"
  value: {
-  dps: 652.4756237846037
+  dps: 652.401714331232
  }
 }
 dps_results: {
@@ -726,7 +726,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 709.8053336380392
+  dps: 709.7970722750853
  }
 }
 dps_results: {
