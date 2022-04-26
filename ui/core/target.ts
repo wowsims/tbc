@@ -2,6 +2,8 @@ import { Debuffs } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
 
+import * as Mechanics from '/tbc/core/constants/mechanics.js';
+
 import { Listener } from './typed_event.js';
 import { Sim } from './sim.js';
 import { EventID, TypedEvent } from './typed_event.js';
@@ -12,10 +14,12 @@ import { wait } from './utils.js';
 export class Target {
 	private readonly sim: Sim;
 
+	private level: number = Mechanics.BOSS_LEVEL;
 	private armor: number = 7684;
 	private mobType: MobType = MobType.MobTypeDemon;
 	private debuffs: Debuffs = Debuffs.create();
 
+	readonly levelChangeEmitter = new TypedEvent<void>();
 	readonly armorChangeEmitter = new TypedEvent<void>();
 	readonly mobTypeChangeEmitter = new TypedEvent<void>();
 	readonly debuffsChangeEmitter = new TypedEvent<void>();
@@ -27,10 +31,23 @@ export class Target {
 		this.sim = sim;
 
 		[
+			this.levelChangeEmitter,
 			this.armorChangeEmitter,
 			this.mobTypeChangeEmitter,
 			this.debuffsChangeEmitter,
 		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+	}
+
+	getLevel(): number {
+		return this.level;
+	}
+
+	setLevel(eventID: EventID, newLevel: number) {
+		if (newLevel == this.level)
+			return;
+
+		this.level = newLevel;
+		this.levelChangeEmitter.emit(eventID);
 	}
 
 	getArmor(): number {
@@ -73,6 +90,7 @@ export class Target {
 
 	toProto(): TargetProto {
 		return TargetProto.create({
+			level: this.level,
 			armor: this.armor,
 			mobType: this.mobType,
 			debuffs: this.debuffs,
@@ -81,6 +99,7 @@ export class Target {
 
 	fromProto(eventID: EventID, proto: TargetProto) {
 		TypedEvent.freezeAllAndDo(() => {
+			this.setLevel(eventID, proto.level);
 			this.setArmor(eventID, proto.armor);
 			this.setMobType(eventID, proto.mobType);
 			this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
