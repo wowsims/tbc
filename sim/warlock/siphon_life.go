@@ -27,6 +27,7 @@ func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
 			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:       core.ProcMaskEmpty,
 			OutcomeApplier: core.OutcomeFuncMagicHit(),
 			OnSpellHit:     applyDotOnLanded(&warlock.SiphonLifeDot),
 		}),
@@ -48,6 +49,7 @@ func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(63, spellCoefficient),
 			OutcomeApplier:   core.OutcomeFuncTick(),
 			IsPeriodic:       true,
+			ProcMask:         core.ProcMaskPeriodicDamage,
 		}),
 	})
 }

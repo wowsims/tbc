@@ -79,6 +79,7 @@ func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamag
 		ThreatMultiplier: 1 - (0.1/3)*float64(shaman.Talents.ElementalPrecision),
 		BaseDamage:       core.BaseDamageConfigMagic(minBaseDamage, maxBaseDamage, spellCoefficient),
 		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier()),
+		ProcMask:         core.ProcMaskSpellDamage,
 	}
 
 	if isLightningOverload {

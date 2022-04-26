@@ -49,6 +49,7 @@ func (mage *Mage) newArcaneBlastSpell(sim *core.Simulation, numStacks int32) *co
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:             core.ProcMaskSpellDamage,
 			BonusSpellHitRating:  float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance,
 			BonusSpellCritRating: float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance,
 

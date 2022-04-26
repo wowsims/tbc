@@ -31,6 +31,7 @@ func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:             core.ProcMaskSpellDamage,
 			BonusSpellCritRating: float64(druid.Talents.ImprovedMoonfire) * 5 * core.SpellCritRatingPerCritChance,
 			DamageMultiplier:     1 * (1 + 0.05*float64(druid.Talents.ImprovedMoonfire)) * (1 + 0.02*float64(druid.Talents.Moonfury)),
 			ThreatMultiplier:     1,

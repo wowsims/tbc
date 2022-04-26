@@ -31,6 +31,7 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:             core.ProcMaskSpellDamage,
 			BonusSpellCritRating: float64(priest.Talents.HolySpecialization) * 1 * core.SpellCritRatingPerCritChance,
 			DamageMultiplier:     1 + 0.05*float64(priest.Talents.SearingLight),
 			ThreatMultiplier:     1 - 0.04*float64(priest.Talents.SilentResolve),

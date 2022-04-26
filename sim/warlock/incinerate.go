@@ -22,6 +22,7 @@ func (warlock *Warlock) registerIncinerateSpell(sim *core.Simulation) {
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.DestructiveReach),
 		BaseDamage:       warlock.incinerateDamage(),
 		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
+		ProcMask:         core.ProcMaskSpellDamage,
 	}
 
 	warlock.Incinerate = warlock.RegisterSpell(core.SpellConfig{

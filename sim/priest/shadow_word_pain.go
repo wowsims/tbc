@@ -30,6 +30,7 @@ func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:            core.ProcMaskEmpty,
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
 			OutcomeApplier:      core.OutcomeFuncMagicHit(),
@@ -60,6 +61,7 @@ func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
 				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1),
 			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
 			IsPeriodic:       true,
+			ProcMask:         core.ProcMaskPeriodicDamage,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(1236/6, 0.183),
 			OutcomeApplier:   core.OutcomeFuncTick(),
 		}),

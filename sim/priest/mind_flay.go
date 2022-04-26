@@ -22,10 +22,9 @@ func (priest *Priest) newMindFlaySpell(sim *core.Simulation, numTicks int) *core
 	channelTime := time.Second * time.Duration(numTicks)
 
 	return priest.RegisterSpell(core.SpellConfig{
-		ActionID:    priest.MindFlayActionID(numTicks),
-		SpellSchool: core.SpellSchoolShadow,
-		SpellExtras: core.SpellExtrasBinary | core.SpellExtrasChanneled,
-
+		ActionID:     priest.MindFlayActionID(numTicks),
+		SpellSchool:  core.SpellSchoolShadow,
+		SpellExtras:  core.SpellExtrasBinary | core.SpellExtrasChanneled,
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
 
@@ -49,6 +48,7 @@ func (priest *Priest) newMindFlaySpell(sim *core.Simulation, numTicks int) *core
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:            core.ProcMaskEmpty,
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
 			OutcomeApplier:      core.OutcomeFuncMagicHit(),
@@ -83,6 +83,7 @@ func (priest *Priest) newMindFlayDot(sim *core.Simulation, numTicks int) *core.D
 			IsPeriodic:       true,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(528/3, 0.19),
 			OutcomeApplier:   core.OutcomeFuncTick(),
+			ProcMask:         core.ProcMaskPeriodicDamage,
 		}),
 	})
 }

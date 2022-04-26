@@ -135,6 +135,7 @@ func (warlock *Warlock) registerCurseOfAgonySpell(sim *core.Simulation) {
 		BaseDamage:       core.BaseDamageConfigMagicNoRoll(1356/12, 0.1),
 		OutcomeApplier:   core.OutcomeFuncTick(),
 		IsPeriodic:       true,
+		ProcMask:         core.ProcMaskPeriodicDamage,
 	}
 	// Amplify Curse talent
 	if warlock.Talents.AmplifyCurse {
@@ -168,6 +169,7 @@ func (warlock *Warlock) registerCurseOfAgonySpell(sim *core.Simulation) {
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   core.OutcomeFuncMagicHit(),
 			OnSpellHit:       applyDotOnLanded(&warlock.CurseOfAgonyDot),
+			ProcMask:         core.ProcMaskEmpty,
 		}),
 	})
 	warlock.CurseOfAgonyDot = core.NewDot(core.Dot{
@@ -196,6 +198,7 @@ func (warlock *Warlock) registerCurseOfDoomSpell(sim *core.Simulation) {
 		BaseDamage:       core.BaseDamageConfigMagicNoRoll(4200, 2),
 		OutcomeApplier:   core.OutcomeFuncTick(),
 		IsPeriodic:       true,
+		ProcMask:         core.ProcMaskPeriodicDamage,
 	}
 	// Amplify Curse talent
 	if warlock.Talents.AmplifyCurse {
@@ -234,6 +237,7 @@ func (warlock *Warlock) registerCurseOfDoomSpell(sim *core.Simulation) {
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   core.OutcomeFuncMagicHit(),
 			OnSpellHit:       applyDotOnLanded(&warlock.CurseOfDoomDot),
+			ProcMask:         core.ProcMaskEmpty,
 		}),
 	})
 

@@ -72,6 +72,7 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:            core.ProcMaskEmpty,
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			OutcomeApplier:      core.OutcomeFuncMagicHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -82,6 +83,7 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 		}),
 	})
 
+	// TODO: not sure if it matters but sfiend technically does melee attacks not periodic dot dmg.
 	target := sim.GetPrimaryTarget()
 	priest.ShadowfiendDot = core.NewDot(core.Dot{
 		Spell: priest.Shadowfiend,

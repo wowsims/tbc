@@ -34,6 +34,7 @@ func (mage *Mage) registerFrostboltSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:             core.ProcMaskSpellDamage,
 			BonusSpellHitRating:  float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
 			BonusSpellCritRating: float64(mage.Talents.EmpoweredFrostbolt) * 1 * core.SpellCritRatingPerCritChance,
 

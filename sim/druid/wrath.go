@@ -42,6 +42,7 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:             core.ProcMaskSpellDamage,
 			BonusSpellCritRating: float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance, // 2% crit per point
 			DamageMultiplier:     1 + 0.02*float64(druid.Talents.Moonfury),
 			ThreatMultiplier:     1,

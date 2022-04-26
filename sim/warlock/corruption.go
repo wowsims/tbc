@@ -27,6 +27,7 @@ func (warlock *Warlock) registerCorruptionSpell(sim *core.Simulation) {
 			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:       core.ProcMaskEmpty, // no damage done by application.
 			OutcomeApplier: core.OutcomeFuncMagicHit(),
 			OnSpellHit:     applyDotOnLanded(&warlock.CorruptionDot),
 		}),
@@ -48,6 +49,7 @@ func (warlock *Warlock) registerCorruptionSpell(sim *core.Simulation) {
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(900/6, spellCoefficient),
 			OutcomeApplier:   core.OutcomeFuncTick(),
 			IsPeriodic:       true,
+			ProcMask:         core.ProcMaskPeriodicDamage,
 		}),
 	})
 }

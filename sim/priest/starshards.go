@@ -27,6 +27,7 @@ func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
 			ThreatMultiplier: 1,
 			OutcomeApplier:   core.OutcomeFuncMagicHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {

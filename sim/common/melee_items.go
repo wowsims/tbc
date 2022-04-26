@@ -413,9 +413,9 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
-
-			BaseDamage:     core.BaseDamageConfigRoll(285, 315),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			ProcMask:         core.ProcMaskEmpty,
+			BaseDamage:       core.BaseDamageConfigRoll(285, 315),
+			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 
@@ -680,9 +680,9 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
-
-			BaseDamage:     core.BaseDamageConfigMagic(48, 54, 1),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			ProcMask:         core.ProcMaskEmpty,
+			BaseDamage:       core.BaseDamageConfigMagic(48, 54, 1),
+			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 
@@ -837,9 +837,9 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
-
-			BaseDamage:     core.BaseDamageConfigFlat(20),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			ProcMask:         core.ProcMaskEmpty,
+			BaseDamage:       core.BaseDamageConfigFlat(20),
+			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 
