@@ -87,7 +87,8 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 			Level:       options.Level,
 			auraTracker: newAuraTracker(),
 			stats: stats.Stats{
-				stats.Armor: float64(options.Armor),
+				stats.Armor:      float64(options.Armor),
+				stats.BlockValue: 54, // Not thoroughly tested for non-bosses.
 			},
 			PseudoStats: stats.NewPseudoStats(),
 			Metrics:     NewCharacterMetrics(),
