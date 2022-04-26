@@ -161,10 +161,10 @@ func OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApplier {
 
 // Calculates a hit check using the stats from this spell.
 func (spellEffect *SpellEffect) magicHitCheck(sim *Simulation, spell *Spell) bool {
-	hit := 0.83 + (spell.Unit.GetStat(stats.SpellHit)+spellEffect.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
-	hit = MinFloat(hit, 0.99) // can't get away from the 1% miss
+	hit := spellEffect.Target.BaseSpellMissChance - (spell.Unit.GetStat(stats.SpellHit)+spellEffect.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
+	hit = MaxFloat(hit, 0.01) // can't get away from the 1% miss
 
-	return sim.RandomFloat("Magical Hit Roll") < hit
+	return sim.RandomFloat("Magical Hit Roll") > hit
 }
 
 func (spellEffect *SpellEffect) magicCritCheck(sim *Simulation, spell *Spell) bool {
@@ -177,7 +177,7 @@ func (spellEffect *SpellEffect) physicalCritRoll(sim *Simulation, spell *Spell) 
 }
 
 func (spellEffect *SpellEffect) applyAttackTableMiss(spell *Spell, unit *Unit, roll float64, chance *float64, damage *float64) bool {
-	missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(unit)
+	missChance := spellEffect.Target.BaseMissChance - spellEffect.PhysicalHitChance(unit)
 	if unit.AutoAttacks.IsDualWielding && !unit.PseudoStats.DisableDWMissPenalty {
 		missChance += 0.19
 	}
@@ -193,7 +193,7 @@ func (spellEffect *SpellEffect) applyAttackTableMiss(spell *Spell, unit *Unit, r
 }
 
 func (spellEffect *SpellEffect) applyAttackTableMissNoDWPenalty(spell *Spell, unit *Unit, roll float64, chance *float64, damage *float64) bool {
-	missChance := spellEffect.Target.MissChance - spellEffect.PhysicalHitChance(unit)
+	missChance := spellEffect.Target.BaseMissChance - spellEffect.PhysicalHitChance(unit)
 	*chance = MaxFloat(0, missChance)
 
 	if roll < *chance {
@@ -206,7 +206,7 @@ func (spellEffect *SpellEffect) applyAttackTableMissNoDWPenalty(spell *Spell, un
 }
 
 func (spellEffect *SpellEffect) applyAttackTableDodge(spell *Spell, unit *Unit, roll float64, chance *float64, damage *float64) bool {
-	*chance += MaxFloat(0, spellEffect.Target.Dodge-spellEffect.ExpertisePercentage(unit)-unit.PseudoStats.DodgeReduction)
+	*chance += MaxFloat(0, spellEffect.Target.BaseDodgeChance-spellEffect.ExpertisePercentage(unit)-unit.PseudoStats.DodgeReduction)
 
 	if roll < *chance {
 		spellEffect.Outcome = OutcomeDodge
@@ -218,13 +218,13 @@ func (spellEffect *SpellEffect) applyAttackTableDodge(spell *Spell, unit *Unit, 
 }
 
 func (spellEffect *SpellEffect) applyAttackTableGlance(spell *Spell, unit *Unit, roll float64, chance *float64, damage *float64) bool {
-	*chance += spellEffect.Target.Glance
+	*chance += spellEffect.Target.BaseGlanceChance
 
 	if roll < *chance {
 		spellEffect.Outcome = OutcomeGlance
 		spell.SpellMetrics[spellEffect.Target.Index].Glances++
 		// TODO glancing blow damage reduction is actually a range ([65%, 85%] vs. 73)
-		*damage *= 0.75
+		*damage *= spellEffect.Target.GlanceMultiplier
 		return true
 	}
 	return false

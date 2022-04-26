@@ -1,7 +1,6 @@
 package core
 
 import (
-	"math"
 	"strconv"
 	"time"
 
@@ -67,11 +66,16 @@ type Target struct {
 
 	MobType proto.MobType
 
-	MissChance      float64
-	HitSuppression  float64
-	CritSuppression float64
-	Dodge           float64
-	Glance          float64
+	BaseMissChance      float64
+	BaseSpellMissChance float64
+	BaseBlockChance     float64
+	BaseDodgeChance     float64
+	BaseParryChance     float64
+	BaseGlanceChance    float64
+
+	GlanceMultiplier float64
+	HitSuppression   float64
+	CritSuppression  float64
 }
 
 func NewTarget(options proto.Target, targetIndex int32) *Target {
@@ -98,14 +102,15 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		target.AddStat(stats.Armor, 7684)
 	}
 
-	const attackerLevel = CharacterLevel
-	levelDifference := float64(target.Level - attackerLevel)
-
-	target.MissChance = 0.05 + levelDifference*0.01
-	target.HitSuppression = (levelDifference - 2) * 0.01
-	target.CritSuppression = (levelDifference * 0.01) + 0.018
-	target.Dodge = 0.05 + levelDifference*0.005
-	target.Glance = math.Max(0.06+levelDifference*0.06, 0)
+	target.BaseMissChance = UnitLevelFloat64(target.Level, 0.05, 0.055, 0.06, 0.08)
+	target.BaseSpellMissChance = UnitLevelFloat64(target.Level, 0.04, 0.05, 0.06, 0.17)
+	target.BaseBlockChance = 0.05
+	target.BaseDodgeChance = UnitLevelFloat64(target.Level, 0.05, 0.055, 0.06, 0.065)
+	target.BaseParryChance = UnitLevelFloat64(target.Level, 0.05, 0.055, 0.06, 0.14)
+	target.BaseGlanceChance = UnitLevelFloat64(target.Level, 0.06, 0.12, 0.18, 0.24)
+	target.GlanceMultiplier = UnitLevelFloat64(target.Level, 0.95, 0.95, 0.85, 0.75)
+	target.HitSuppression = UnitLevelFloat64(target.Level, 0, 0, 0, 0.01)
+	target.CritSuppression = UnitLevelFloat64(target.Level, 0, 0.01, 0.02, 0.048)
 
 	if options.Debuffs != nil {
 		applyDebuffEffects(target, *options.Debuffs)
