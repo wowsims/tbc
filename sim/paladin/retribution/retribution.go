@@ -168,6 +168,7 @@ func (ret *RetributionPaladin) mainRotation(sim *core.Simulation) {
 	// Don't do the low mana rotation in the middle of a twist
 	if ret.CurrentMana() <= 1000 && !socActive {
 		ret.lowManaRotation(sim)
+		return
 	}
 
 	// Setup
@@ -261,8 +262,9 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
 	sobExpiration := ret.SealOfBloodAura.ExpiresAt()
-
 	nextSwingAt := ret.AutoAttacks.NextAttackAt()
+
+	manaRegenAt := sim.Duration + 1
 	// Roll seal of blood
 	if sim.CurrentTime+time.Second >= sobExpiration {
 		sobAndJudgementCost := ret.JudgementOfBlood.DefaultCast.Cost + ret.SealOfBlood.DefaultCast.Cost
@@ -270,7 +272,10 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 			ret.JudgementOfBlood.Cast(sim, target)
 		}
 		if ret.GCD.IsReady(sim) {
-			ret.SealOfBlood.Cast(sim, target)
+			if success := ret.SealOfBlood.Cast(sim, target); !success {
+				// This should only happen in VERY BAD mana situations.
+				manaRegenAt = ret.TimeUntilManaRegen(ret.SealOfBlood.CurCast.Cost)
+			}
 		}
 	} else if ret.GCD.IsReady(sim) && ret.CrusaderStrike.CD.IsReady(sim) {
 		spellGCD := ret.SpellGCD()
@@ -287,7 +292,7 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 	events := []time.Duration{
 		ret.GCD.ReadyAt(),
 		ret.CrusaderStrike.CD.ReadyAt(),
-		// ret.TimeUntilManaRegen(sobAndCSCost),
+		manaRegenAt,
 		sobExpiration - time.Second,
 	}
 
@@ -297,7 +302,7 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 // Helper function for finding the next event
 func (ret *RetributionPaladin) waitUntilNextEvent(sim *core.Simulation, events []time.Duration) {
 	// Find the minimum possible next event that is greater than the current time
-	nextEventAt := events[0]
+	nextEventAt := sim.Duration + 1
 	for _, elem := range events {
 		if elem > sim.CurrentTime && elem < nextEventAt {
 			nextEventAt = elem
