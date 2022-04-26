@@ -51,16 +51,17 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation, cdTi
 	}
 	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
 
+	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfBlood = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    JudgementOfBloodActionID,
 		SpellSchool: core.SpellSchoolHoly,
 
 		ResourceType: stats.Mana,
-		BaseCost:     JudgementManaCost,
+		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+				Cost: baseCost - JudgementManaCost*(0.03*float64(paladin.Talents.Benediction)),
 			},
 			CD: core.Cooldown{
 				Timer:    cdTimer,
@@ -79,18 +80,29 @@ func (paladin *Paladin) CanJudgementOfBlood(sim *core.Simulation) bool {
 var JudgementOfTheCrusaderActionID = core.ActionID{SpellID: 27159}
 
 func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation, cdTimer *core.Timer) {
-	paladin.JudgementOfTheCrusaderAura = core.JudgementOfTheCrusaderAura(sim.GetPrimaryTarget(), paladin.Talents.ImprovedSealOfTheCrusader)
+	percentBonus := 1.0
+	if ItemSetJusticarBattlegear.CharacterHasSetBonus(&paladin.Character, 2) {
+		percentBonus = 1.15
+	}
+	flatBonus := 0.0
+	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 23203 {
+		flatBonus += 33.0
+	} else if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27949 {
+		flatBonus += 47.0
+	}
+	paladin.JudgementOfTheCrusaderAura = core.JudgementOfTheCrusaderAura(sim.GetPrimaryTarget(), paladin.Talents.ImprovedSealOfTheCrusader, flatBonus, percentBonus)
 
+	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    JudgementOfTheCrusaderActionID,
 		SpellSchool: core.SpellSchoolHoly,
 
 		ResourceType: stats.Mana,
-		BaseCost:     JudgementManaCost,
+		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+				Cost: baseCost - JudgementManaCost*(0.03*float64(paladin.Talents.Benediction)),
 			},
 			CD: core.Cooldown{
 				Timer:    cdTimer,
@@ -127,16 +139,17 @@ var JudgementOfWisdomActionID = core.ActionID{SpellID: 27164}
 func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation, cdTimer *core.Timer) {
 	paladin.JudgementOfWisdomAura = core.JudgementOfWisdomAura(sim.GetPrimaryTarget())
 
+	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfWisdom = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    JudgementOfWisdomActionID,
 		SpellSchool: core.SpellSchoolHoly,
 
 		ResourceType: stats.Mana,
-		BaseCost:     JudgementManaCost,
+		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: JudgementManaCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+				Cost: baseCost - JudgementManaCost*(0.03*float64(paladin.Talents.Benediction)),
 			},
 			CD: core.Cooldown{
 				Timer:    cdTimer,

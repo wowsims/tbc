@@ -22,7 +22,7 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	}
 
 	if debuffs.ImprovedSealOfTheCrusader {
-		MakePermanent(JudgementOfTheCrusaderAura(target, 3))
+		MakePermanent(JudgementOfTheCrusaderAura(target, 3, 0, 1.0))
 	}
 
 	if debuffs.CurseOfElements != proto.TristateEffect_TristateEffectMissing {
@@ -167,9 +167,10 @@ func JudgementOfWisdomAura(target *Target) *Aura {
 	})
 }
 
-func JudgementOfTheCrusaderAura(target *Target, level int32) *Aura {
+func JudgementOfTheCrusaderAura(target *Target, level int32, flatBonus float64, percentBonus float64) *Aura {
 	bonusCrit := float64(level) * SpellCritRatingPerCritChance
 
+	totalSP := 219*percentBonus + flatBonus
 	return target.GetOrRegisterAura(Aura{
 		Label:    "Judgement of the Crusader-" + strconv.Itoa(int(level)),
 		Tag:      "Judgement of the Crusader",
@@ -177,11 +178,11 @@ func JudgementOfTheCrusaderAura(target *Target, level int32) *Aura {
 		Duration: time.Second * 20,
 		Priority: float64(level),
 		OnGain: func(aura *Aura, sim *Simulation) {
-			aura.Unit.PseudoStats.BonusHolyDamageTaken += 219
+			aura.Unit.PseudoStats.BonusHolyDamageTaken += totalSP
 			aura.Unit.PseudoStats.BonusCritRating += bonusCrit
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			aura.Unit.PseudoStats.BonusHolyDamageTaken -= 219
+			aura.Unit.PseudoStats.BonusHolyDamageTaken -= totalSP
 			aura.Unit.PseudoStats.BonusCritRating -= bonusCrit
 		},
 		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {

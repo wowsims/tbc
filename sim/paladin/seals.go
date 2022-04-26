@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -50,6 +51,10 @@ func (paladin *Paladin) setupSealOfBlood() {
 	})
 
 	baseCost := 210.0
+	cost := baseCost
+	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 22401 {
+		cost -= 20
+	}
 	paladin.SealOfBlood = paladin.RegisterSpell(core.SpellConfig{
 		ActionID: SealOfBloodCastActionID,
 
@@ -58,7 +63,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+				Cost: cost - baseCost*(0.03*float64(paladin.Talents.Benediction)),
 				GCD:  core.GCDDefault,
 			},
 		},
@@ -125,6 +130,10 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	})
 
 	baseCost := 65.0
+	cost := baseCost
+	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 22401 {
+		cost -= 20
+	}
 	paladin.SealOfCommand = paladin.RegisterSpell(core.SpellConfig{
 		ActionID: SealOfCommandCastActionID,
 
@@ -133,7 +142,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+				Cost: cost - baseCost*(0.03*float64(paladin.Talents.Benediction)),
 				GCD:  core.GCDDefault,
 			},
 		},
@@ -151,14 +160,33 @@ var SealOfTheCrusaderActionID = core.ActionID{SpellID: 27158}
 // Seal of the crusader has a bunch of effects that we realistically don't care about (bonus AP, faster swing speed)
 // For now, we'll just use it as a setup to casting Judgement of the Crusader
 func (paladin *Paladin) setupSealOfTheCrusader() {
+	apBonus := 495.0
+	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 23203 {
+		apBonus += 48
+	} else if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27949 {
+		apBonus += 68
+	}
 	paladin.SealOfTheCrusaderAura = paladin.RegisterAura(core.Aura{
 		Label:    "Seal of the Crusader",
 		Tag:      "Seal",
 		ActionID: SealOfTheCrusaderActionID,
 		Duration: SealDuration,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			paladin.AddStat(stats.AttackPower, apBonus)
+			paladin.PseudoStats.MeleeSpeedMultiplier *= 1.4
+			paladin.AutoAttacks.MHEffect.DamageMultiplier *= 0.6
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			paladin.AddStat(stats.AttackPower, -apBonus)
+			paladin.PseudoStats.MeleeSpeedMultiplier /= 1.4
+			paladin.AutoAttacks.MHEffect.DamageMultiplier /= 0.6
+		},
 	})
-
 	baseCost := 210.0
+	cost := baseCost
+	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 22401 {
+		cost -= 20
+	}
 	paladin.SealOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
 		ActionID: SealOfTheCrusaderActionID,
 
@@ -167,7 +195,7 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+				Cost: cost - baseCost*(0.03*float64(paladin.Talents.Benediction)),
 				GCD:  core.GCDDefault,
 			},
 		},
@@ -191,6 +219,10 @@ func (paladin *Paladin) setupSealOfWisdom() {
 	})
 
 	baseCost := 270.0
+	cost := baseCost
+	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 22401 {
+		cost -= 20
+	}
 	paladin.SealOfWisdom = paladin.RegisterSpell(core.SpellConfig{
 		ActionID: SealOfWisdomActionID,
 
@@ -199,7 +231,7 @@ func (paladin *Paladin) setupSealOfWisdom() {
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+				Cost: cost - baseCost*(0.03*float64(paladin.Talents.Benediction)),
 				GCD:  core.GCDDefault,
 			},
 		},
