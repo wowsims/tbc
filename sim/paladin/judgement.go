@@ -57,7 +57,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation, cdTi
 		SpellSchool: core.SpellSchoolHoly,
 
 		ResourceType: stats.Mana,
-		BaseCost:     baseCost,
+		BaseCost:     JudgementManaCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
@@ -98,7 +98,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 		SpellSchool: core.SpellSchoolHoly,
 
 		ResourceType: stats.Mana,
-		BaseCost:     baseCost,
+		BaseCost:     JudgementManaCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
@@ -145,7 +145,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation, cdT
 		SpellSchool: core.SpellSchoolHoly,
 
 		ResourceType: stats.Mana,
-		BaseCost:     baseCost,
+		BaseCost:     JudgementManaCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
