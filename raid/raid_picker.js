@@ -484,6 +484,7 @@ class NewPlayerPicker extends Component {
                 { name: '2', value: 2 },
                 { name: '3', value: 3 },
                 { name: '4', value: 4 },
+                { name: '5', value: 5 },
             ],
             changedEvent: (picker) => this.raidPicker.raid.sim.phaseChangeEmitter,
             getValue: (picker) => this.raidPicker.raid.sim.getPhase(),

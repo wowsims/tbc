@@ -601,3 +601,105 @@ export const P4_PRESET = {
 		}
 	]}`),
 };
+export const P5_PRESET = {
+    name: 'P5 Preset',
+    tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+    gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 34403,
+			"enchant": 29191,
+			"gems": [
+				34220,
+				32196
+			]
+		},
+		{
+			"id": 34204
+		},
+		{
+			"id": 34391,
+			"enchant": 28886,
+			"gems": [
+				32221,
+				32196
+			]
+		},
+		{
+			"id": 34242,
+			"enchant": 33150,
+			"gems": [
+				32196
+			]
+		},
+		{
+			"id": 31043,
+			"enchant": 24003,
+			"gems": [
+				32215,
+				32215,
+				32221
+			]
+		},
+		{
+			"id": 34446,
+			"enchant": 22534,
+			"gems": [
+				35760
+			]
+		},
+		{
+			"id": 34407,
+			"enchant": 28272,
+			"gems": [
+				32196,
+				35760
+			]
+		},
+		{
+			"id": 34555,
+			"gems": [
+				32196
+			]
+		},
+		{
+			"id": 34169,
+			"enchant": 24274,
+			"gems": [
+				32196,
+				32196,
+				35760
+			]
+		},
+		{
+			"id": 34572,
+			"enchant": 35297,
+			"gems": [
+				32196
+			]
+		},
+		{
+			"id": 34230,
+			"enchant": 22536
+		},
+		{
+			"id": 34362,
+			"enchant": 22536
+		},
+		{
+			"id": 32483
+		},
+		{
+			"id": 34429
+		},
+		{
+			"id": 34336,
+			"enchant": 22560
+		},
+		{
+			"id": 34179
+		},
+		{
+			"id": 32387
+		}
+	]}`),
+};
