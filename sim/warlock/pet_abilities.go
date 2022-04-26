@@ -82,7 +82,7 @@ func (wp *WarlockPet) newFirebolt(sim *core.Simulation) PetAbility {
 			DamageMultiplier: 1.0 + (0.1 * float64(wp.owner.Talents.ImprovedImp)),
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagic(112, 127, 0.571),
-			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(2),
+			OutcomeApplier:   wp.OutcomeFuncMagicHitAndCrit(2),
 		}),
 	})
 
@@ -121,7 +121,7 @@ func (wp *WarlockPet) newCleave(sim *core.Simulation) PetAbility {
 			DamageMultiplier: 1.0,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 78, 1.0, true),
-			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(2),
+			OutcomeApplier:   wp.OutcomeFuncMeleeSpecialHitAndCrit(2),
 		}),
 	})
 
@@ -156,10 +156,10 @@ func (wp *WarlockPet) newLashOfPain(sim *core.Simulation) PetAbility {
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskSpellDamage,
-			DamageMultiplier: 1.0 * (1.0 + (0.1 * float64(wp.owner.Talents.ImprovedSayaad))),
+			DamageMultiplier: 1.0 * (1.0 + (0.1 * float64(wp.owner.Talents.ImprovedSuccubus))),
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagic(123, 123, 0.429),
-			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(2),
+			OutcomeApplier:   wp.OutcomeFuncMagicHitAndCrit(2),
 		}),
 	})
 

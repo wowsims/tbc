@@ -42,7 +42,7 @@ func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
 
 			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 
-			OutcomeApplier: core.OutcomeFuncMagicHit(),
+			OutcomeApplier: mage.OutcomeFuncMagicHit(),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
@@ -78,7 +78,7 @@ func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 
 			BaseDamage:     core.BaseDamageConfigMagicNoRoll(265, 1/3.5+0.15*float64(mage.Talents.EmpoweredArcaneMissiles)),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
+			OutcomeApplier: mage.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
 		})),
 	})
 }

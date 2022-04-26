@@ -22,7 +22,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 
 		// should deal 35% weapon deamage
 		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
-		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
 	}
 
 	// Apply 2 Handed Weapon Specialization talent
@@ -77,7 +77,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 		ProcMask:         core.ProcMaskMeleeMHSpecial,
 		DamageMultiplier: 1,
 		ThreatMultiplier: 1,
-		OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+		OutcomeApplier:   paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
 	}
 	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
 

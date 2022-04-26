@@ -41,7 +41,7 @@ func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Spell
 		DamageMultiplier:     1 + 0.02*float64(druid.Talents.Moonfury),
 		ThreatMultiplier:     1,
 		BaseDamage:           core.BaseDamageConfigMagic(minBaseDamage+bonusFlatDamage, maxBaseDamage+bonusFlatDamage, spellCoefficient),
-		OutcomeApplier:       core.OutcomeFuncMagicHitAndCrit(druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance))),
+		OutcomeApplier:       druid.OutcomeFuncMagicHitAndCrit(druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance))),
 	}
 
 	if ItemSetNordrassil.CharacterHasSetBonus(&druid.Character, 4) {

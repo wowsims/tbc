@@ -54,7 +54,7 @@ func (warrior *Warrior) registerExecuteSpell(_ *core.Simulation) {
 				},
 				TargetSpellCoefficient: 0, // Doesn't scale with +damage on target?
 			},
-			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+			OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {

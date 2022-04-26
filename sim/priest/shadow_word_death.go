@@ -45,7 +45,7 @@ func (priest *Priest) registerShadowWordDeathSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
 
 			BaseDamage:     core.BaseDamageConfigMagic(572, 664, 0.429),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
+			OutcomeApplier: priest.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
 		}),
 	})
 }

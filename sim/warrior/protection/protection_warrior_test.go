@@ -29,6 +29,8 @@ func TestProtectionWarrior(t *testing.T) {
 		Consumes:    FullConsumes,
 		Debuffs:     FullDebuffs,
 
+		InFrontOfTarget: true,
+
 		ItemFilter: core.ItemFilter{
 			ArmorType: proto.ArmorType_ArmorTypePlate,
 
@@ -53,6 +55,8 @@ func BenchmarkSimulate(b *testing.B) {
 				Consumes:  FullConsumes,
 				Spec:      PlayerOptionsBasic,
 				Buffs:     FullIndividualBuffs,
+
+				InFrontOfTarget: true,
 			},
 			FullPartyBuffs,
 			FullRaidBuffs),

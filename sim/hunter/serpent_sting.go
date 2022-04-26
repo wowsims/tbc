@@ -30,7 +30,7 @@ func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
-			OutcomeApplier:   core.OutcomeFuncRangedHit(),
+			OutcomeApplier:   hunter.OutcomeFuncRangedHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					hunter.SerpentStingDot.Apply(sim)
@@ -57,7 +57,7 @@ func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
 				attackPower := spellEffect.RangedAttackPower(spell.Unit) + spellEffect.RangedAttackPowerOnTarget()
 				return 132 + attackPower*0.02
 			}, 0),
-			OutcomeApplier: core.OutcomeFuncTick(),
+			OutcomeApplier: hunter.OutcomeFuncTick(),
 		}),
 	})
 }

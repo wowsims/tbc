@@ -33,7 +33,7 @@ func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
-			OutcomeApplier:   core.OutcomeFuncMagicHit(),
+			OutcomeApplier:   druid.OutcomeFuncMagicHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					druid.InsectSwarmDot.Apply(sim)
@@ -56,7 +56,7 @@ func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1,
 			IsPeriodic:       true,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(792/6, 0.127),
-			OutcomeApplier:   core.OutcomeFuncTick(),
+			OutcomeApplier:   druid.OutcomeFuncTick(),
 		}),
 	})
 }

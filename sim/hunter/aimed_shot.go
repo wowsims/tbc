@@ -46,7 +46,7 @@ func (hunter *Hunter) registerAimedShotSpell(sim *core.Simulation) {
 				},
 				TargetSpellCoefficient: 1,
 			}),
-			OutcomeApplier: core.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
+			OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
 		}),
 	})
 }

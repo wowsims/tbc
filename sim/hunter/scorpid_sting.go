@@ -29,7 +29,7 @@ func (hunter *Hunter) registerScorpidStingSpell(sim *core.Simulation) {
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
-			OutcomeApplier:   core.OutcomeFuncRangedHit(),
+			OutcomeApplier:   hunter.OutcomeFuncRangedHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					hunter.ScorpidStingAura.Activate(sim)

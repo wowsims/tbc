@@ -27,7 +27,7 @@ func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
 			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			OutcomeApplier: core.OutcomeFuncMagicHit(),
+			OutcomeApplier: warlock.OutcomeFuncMagicHit(),
 			OnSpellHit:     applyDotOnLanded(&warlock.SiphonLifeDot),
 		}),
 	})
@@ -46,7 +46,7 @@ func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
 			DamageMultiplier: 1 * (1 + 0.02*float64(warlock.Talents.ShadowMastery)) * (1 + 0.01*float64(warlock.Talents.Contagion)),
 			ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.ImprovedDrainSoul),
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(63, spellCoefficient),
-			OutcomeApplier:   core.OutcomeFuncTick(),
+			OutcomeApplier:   warlock.OutcomeFuncTick(),
 			IsPeriodic:       true,
 		}),
 	})

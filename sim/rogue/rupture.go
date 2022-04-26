@@ -38,7 +38,7 @@ func (rogue *Rogue) makeRupture(comboPoints int32) *core.Spell {
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
-			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),
+			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					rogue.RuptureDot.Spell = spell
@@ -89,7 +89,7 @@ func (rogue *Rogue) registerRupture(sim *core.Simulation) {
 
 				return 70 + float64(comboPoints)*11 + attackPower*[]float64{0.01, 0.02, 0.03, 0.03, 0.03}[comboPoints-1]
 			}, 0),
-			OutcomeApplier: core.OutcomeFuncTick(),
+			OutcomeApplier: rogue.OutcomeFuncTick(),
 		}),
 	})
 }

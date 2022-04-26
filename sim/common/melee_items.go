@@ -51,7 +51,7 @@ func ApplyStormGauntlets(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigFlat(3),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 
@@ -84,7 +84,7 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigFlat(2),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 
@@ -339,7 +339,7 @@ func ApplyDespair(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigFlat(600),
-			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(character.DefaultMeleeCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMeleeSpecialHitAndCrit(character.DefaultMeleeCritMultiplier()),
 		}),
 	})
 
@@ -392,7 +392,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigRoll(513, 567),
-			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(character.DefaultMeleeCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMeleeSpecialHitAndCrit(character.DefaultMeleeCritMultiplier()),
 		}),
 	})
 
@@ -415,7 +415,7 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigRoll(285, 315),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 
@@ -682,7 +682,7 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigMagic(48, 54, 1),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 
@@ -839,7 +839,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigFlat(20),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 

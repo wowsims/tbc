@@ -23,7 +23,7 @@ func (shaman *Shaman) newWindfuryImbueSpell(isMH bool) *core.Spell {
 		IsPhantom:        true,
 		DamageMultiplier: 1.0,
 		ThreatMultiplier: core.TernaryFloat64(shaman.Talents.SpiritWeapons, 0.7, 1),
-		OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(shaman.DefaultMeleeCritMultiplier()),
+		OutcomeApplier:   shaman.OutcomeFuncMeleeSpecialHitAndCrit(shaman.DefaultMeleeCritMultiplier()),
 	}
 
 	weaponDamageMultiplier := 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
@@ -111,7 +111,7 @@ func (shaman *Shaman) newFlametongueImbueSpell(isMH bool) *core.Spell {
 		IsPhantom:        true,
 		DamageMultiplier: 1 + 0.05*float64(shaman.Talents.ElementalWeapons),
 		ThreatMultiplier: 1,
-		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(shaman.DefaultSpellCritMultiplier()),
+		OutcomeApplier:   shaman.OutcomeFuncMagicHitAndCrit(shaman.DefaultSpellCritMultiplier()),
 	}
 
 	if isMH {
@@ -177,7 +177,7 @@ func (shaman *Shaman) newFrostbrandImbueSpell(isMH bool) *core.Spell {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigMagic(246, 246, 0.1),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(shaman.DefaultSpellCritMultiplier()),
+			OutcomeApplier: shaman.OutcomeFuncMagicHitAndCrit(shaman.DefaultSpellCritMultiplier()),
 		}),
 	})
 }

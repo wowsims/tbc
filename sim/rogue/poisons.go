@@ -26,7 +26,7 @@ func (rogue *Rogue) registerDeadlyPoisonSpell(sim *core.Simulation) {
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
 			ThreatMultiplier:    1,
 			IsPhantom:           true,
-			OutcomeApplier:      core.OutcomeFuncMagicHit(),
+			OutcomeApplier:      rogue.OutcomeFuncMagicHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					if rogue.DeadlyPoisonDot.IsActive() {
@@ -59,7 +59,7 @@ func (rogue *Rogue) registerDeadlyPoisonSpell(sim *core.Simulation) {
 			IsPeriodic:       true,
 			IsPhantom:        true,
 			BaseDamage:       core.MultiplyByStacks(core.BaseDamageConfigFlat(180/4), dotAura),
-			OutcomeApplier:   core.OutcomeFuncTick(),
+			OutcomeApplier:   rogue.OutcomeFuncTick(),
 		})),
 	})
 }
@@ -105,7 +105,7 @@ func (rogue *Rogue) registerInstantPoisonSpell(_ *core.Simulation) {
 			ThreatMultiplier:    1,
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
 			BaseDamage:          core.BaseDamageConfigRoll(146, 194),
-			OutcomeApplier:      core.OutcomeFuncMagicHitAndCrit(rogue.DefaultSpellCritMultiplier()),
+			OutcomeApplier:      rogue.OutcomeFuncMagicHitAndCrit(rogue.DefaultSpellCritMultiplier()),
 		}),
 	})
 }
