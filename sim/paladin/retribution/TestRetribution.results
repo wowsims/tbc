@@ -84,7 +84,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-BandoftheEternalSage-29305"
  value: {
-  dps: 1992.836414559691
+  dps: 1993.017536330508
  }
 }
 dps_results: {
@@ -108,7 +108,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 2030.0965570372969
+  dps: 2030.1063358959393
  }
 }
 dps_results: {
@@ -187,6 +187,12 @@ dps_results: {
  key: "TestRetribution-AllItems-CoreofAr'kelos-29776"
  value: {
   dps: 2031.8007193781339
+ }
+}
+dps_results: {
+ key: "TestRetribution-AllItems-CrystalforgeBattlegear"
+ value: {
+  dps: 1765.2376330505172
  }
 }
 dps_results: {
@@ -348,7 +354,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-GlaiveofthePit-28774"
  value: {
-  dps: 1838.559228070585
+  dps: 1838.7133578153487
  }
 }
 dps_results: {
@@ -397,6 +403,12 @@ dps_results: {
  key: "TestRetribution-AllItems-InsightfulEarthstormDiamond"
  value: {
   dps: 2006.416909547932
+ }
+}
+dps_results: {
+ key: "TestRetribution-AllItems-JusticarBattlegear"
+ value: {
+  dps: 1726.6861158077875
  }
 }
 dps_results: {
@@ -504,7 +516,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-RobeoftheElderScribes-28602"
  value: {
-  dps: 1945.4719707026295
+  dps: 1945.5970677190596
  }
 }
 dps_results: {
@@ -516,7 +528,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 2005.5912809986871
+  dps: 2005.6489568897512
  }
 }
 dps_results: {
@@ -588,7 +600,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-StormGauntlets-12632"
  value: {
-  dps: 1958.2289542749254
+  dps: 1958.2488648901112
  }
 }
 dps_results: {
@@ -636,7 +648,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-TheLightningCapacitor-28785"
  value: {
-  dps: 2040.3965614407537
+  dps: 2040.6385211914662
  }
 }
 dps_results: {
@@ -714,7 +726,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Average-Default"
  value: {
-  dps: 2047.2363676601935
+  dps: 2047.2492374654378
  }
 }
 dps_results: {
@@ -870,7 +882,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-Human-P4-Retribution Paladin-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2099.2505528987754
+  dps: 2099.3681350370794
  }
 }
 dps_results: {
