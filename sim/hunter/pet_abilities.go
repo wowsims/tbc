@@ -102,7 +102,7 @@ func (hp *HunterPet) newBite(sim *core.Simulation, isPrimary bool) PetAbility {
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigRoll(108, 132),
-			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(2),
+			OutcomeApplier:   hp.OutcomeFuncMeleeSpecialHitAndCrit(2),
 		}),
 	})
 
@@ -137,7 +137,7 @@ func (hp *HunterPet) newClaw(sim *core.Simulation, isPrimary bool) PetAbility {
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigRoll(54, 76),
-			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(2),
+			OutcomeApplier:   hp.OutcomeFuncMeleeSpecialHitAndCrit(2),
 		}),
 	})
 
@@ -181,7 +181,7 @@ func (hp *HunterPet) newGore(sim *core.Simulation, isPrimary bool) PetAbility {
 					return damage
 				}
 			}),
-			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(2),
+			OutcomeApplier: hp.OutcomeFuncMeleeSpecialHitAndCrit(2),
 		}),
 	})
 
@@ -215,7 +215,7 @@ func (hp *HunterPet) newLightningBreath(sim *core.Simulation, isPrimary bool) Pe
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagic(80, 93, 0.05),
-			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(1.5),
+			OutcomeApplier:   hp.OutcomeFuncMagicHitAndCrit(1.5),
 		}),
 	})
 
@@ -251,7 +251,7 @@ func (hp *HunterPet) newScreech(sim *core.Simulation, isPrimary bool) PetAbility
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigRoll(33, 61),
-			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(2),
+			OutcomeApplier:   hp.OutcomeFuncMeleeSpecialHitAndCrit(2),
 		}),
 	})
 

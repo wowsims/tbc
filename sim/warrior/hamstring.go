@@ -38,7 +38,7 @@ func (warrior *Warrior) registerHamstringSpell() {
 				Calculator:             core.BaseDamageFuncFlat(63),
 				TargetSpellCoefficient: 1,
 			},
-			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+			OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {

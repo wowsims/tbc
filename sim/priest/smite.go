@@ -14,8 +14,8 @@ var SmiteActionID = core.ActionID{SpellID: SpellIDSmite}
 func (priest *Priest) registerSmiteSpell(sim *core.Simulation) {
 	baseCost := 385.0
 
-	normalOutcome := core.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier())
-	surgeOfLightOutcome := core.OutcomeFuncMagicHit()
+	normalOutcome := priest.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier())
+	surgeOfLightOutcome := priest.OutcomeFuncMagicHit()
 
 	priest.Smite = priest.RegisterSpell(core.SpellConfig{
 		ActionID:    SmiteActionID,

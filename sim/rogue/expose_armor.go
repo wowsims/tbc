@@ -35,7 +35,7 @@ func (rogue *Rogue) registerExposeArmorSpell(sim *core.Simulation) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			ThreatMultiplier: 1,
-			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),
+			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					rogue.ExposeArmorAura.Activate(sim)

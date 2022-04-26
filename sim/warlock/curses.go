@@ -48,7 +48,7 @@ func (warlock *Warlock) registerCurseOfElementsSpell(sim *core.Simulation) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
-			OutcomeApplier:   core.OutcomeFuncMagicHit(),
+			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
 			OnSpellHit:       applyAuraOnLanded(warlock.CurseOfElementsAura),
 		}),
 	})
@@ -80,7 +80,7 @@ func (warlock *Warlock) registerCurseOfRecklessnessSpell(sim *core.Simulation) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
-			OutcomeApplier:   core.OutcomeFuncMagicHit(),
+			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
 			OnSpellHit:       applyAuraOnLanded(warlock.CurseOfRecklessnessAura),
 		}),
 	})
@@ -113,7 +113,7 @@ func (warlock *Warlock) registerCurseOfTonguesSpell(sim *core.Simulation) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
-			OutcomeApplier:   core.OutcomeFuncMagicHit(),
+			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
 			OnSpellHit:       applyAuraOnLanded(warlock.CurseOfTonguesAura),
 		}),
 	})
@@ -133,7 +133,7 @@ func (warlock *Warlock) registerCurseOfAgonySpell(sim *core.Simulation) {
 			(1 + 0.02*float64(warlock.Talents.ImprovedCurseOfAgony)),
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.ImprovedDrainSoul),
 		BaseDamage:       core.BaseDamageConfigMagicNoRoll(1356/12, 0.1),
-		OutcomeApplier:   core.OutcomeFuncTick(),
+		OutcomeApplier:   warlock.OutcomeFuncTick(),
 		IsPeriodic:       true,
 		ProcMask:         core.ProcMaskPeriodicDamage,
 	}
@@ -167,7 +167,7 @@ func (warlock *Warlock) registerCurseOfAgonySpell(sim *core.Simulation) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
-			OutcomeApplier:   core.OutcomeFuncMagicHit(),
+			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
 			OnSpellHit:       applyDotOnLanded(&warlock.CurseOfAgonyDot),
 			ProcMask:         core.ProcMaskEmpty,
 		}),
@@ -196,7 +196,7 @@ func (warlock *Warlock) registerCurseOfDoomSpell(sim *core.Simulation) {
 			(1 + 0.01*float64(warlock.Talents.Contagion)),
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.ImprovedDrainSoul),
 		BaseDamage:       core.BaseDamageConfigMagicNoRoll(4200, 2),
-		OutcomeApplier:   core.OutcomeFuncTick(),
+		OutcomeApplier:   warlock.OutcomeFuncTick(),
 		IsPeriodic:       true,
 		ProcMask:         core.ProcMaskPeriodicDamage,
 	}
@@ -235,7 +235,7 @@ func (warlock *Warlock) registerCurseOfDoomSpell(sim *core.Simulation) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
-			OutcomeApplier:   core.OutcomeFuncMagicHit(),
+			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
 			OnSpellHit:       applyDotOnLanded(&warlock.CurseOfDoomDot),
 			ProcMask:         core.ProcMaskEmpty,
 		}),

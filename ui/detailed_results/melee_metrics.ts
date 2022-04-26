@@ -70,12 +70,6 @@ export class MeleeMetricsTable extends MetricsTable<ActionMetrics> {
 				getDisplayString: (metric: ActionMetrics) => metric.landedHits.toFixed(1),
 			},
 			{
-				name: 'Crit %',
-				tooltip: 'Crits / Swings',
-				getValue: (metric: ActionMetrics) => metric.critPercent,
-				getDisplayString: (metric: ActionMetrics) => metric.critPercent.toFixed(2) + '%',
-			},
-			{
 				name: 'Miss %',
 				tooltip: 'Misses / Swings',
 				getValue: (metric: ActionMetrics) => metric.missPercent,
@@ -88,10 +82,30 @@ export class MeleeMetricsTable extends MetricsTable<ActionMetrics> {
 				getDisplayString: (metric: ActionMetrics) => metric.dodgePercent.toFixed(2) + '%',
 			},
 			{
+				name: 'Parry %',
+				tooltip: 'Parries / Swings',
+				columnClass: 'in-front-of-target',
+				getValue: (metric: ActionMetrics) => metric.parryPercent,
+				getDisplayString: (metric: ActionMetrics) => metric.parryPercent.toFixed(2) + '%',
+			},
+			{
+				name: 'Block %',
+				tooltip: 'Blocks / Swings',
+				columnClass: 'in-front-of-target',
+				getValue: (metric: ActionMetrics) => metric.blockPercent,
+				getDisplayString: (metric: ActionMetrics) => metric.blockPercent.toFixed(2) + '%',
+			},
+			{
 				name: 'Glance %',
 				tooltip: 'Glances / Swings',
 				getValue: (metric: ActionMetrics) => metric.glancePercent,
 				getDisplayString: (metric: ActionMetrics) => metric.glancePercent.toFixed(2) + '%',
+			},
+			{
+				name: 'Crit %',
+				tooltip: 'Crits / Swings',
+				getValue: (metric: ActionMetrics) => metric.critPercent,
+				getDisplayString: (metric: ActionMetrics) => metric.critPercent.toFixed(2) + '%',
 			},
 		]);
 	}
@@ -102,6 +116,12 @@ export class MeleeMetricsTable extends MetricsTable<ActionMetrics> {
 			return [];
 		}
 		const player = players[0];
+
+		if (player.inFrontOfTarget) {
+			this.rootElem.classList.remove('hide-in-front-of-target');
+		} else {
+			this.rootElem.classList.add('hide-in-front-of-target');
+		}
 
 		const actions = player.getMeleeActions();
 		const actionGroups = ActionMetrics.groupById(actions);

@@ -411,6 +411,8 @@ type CharacterSuiteConfig struct {
 	Consumes    *proto.Consumes
 	Debuffs     *proto.Debuffs
 
+	InFrontOfTarget bool
+
 	OtherRaces       []proto.Race
 	OtherGearSets    []GearSetCombo
 	OtherSpecOptions []SpecOptionsCombo
@@ -433,6 +435,8 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 			Equipment: config.GearSet.GearSet,
 			Consumes:  config.Consumes,
 			Buffs:     config.PlayerBuffs,
+
+			InFrontOfTarget: config.InFrontOfTarget,
 		},
 		config.SpecOptions.SpecOptions)
 
@@ -485,6 +489,21 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 			},
 		},
 	}
+
+	newRaid := googleProto.Clone(defaultRaid).(*proto.Raid)
+	newRaid.Parties[0].Players[0].InFrontOfTarget = !newRaid.Parties[0].Players[0].InFrontOfTarget
+
+	generator.subgenerators = append(generator.subgenerators, SubGenerator{
+		name: "SwitchInFrontOfTarget",
+		generator: &SingleDpsTestGenerator{
+			Name: "Default",
+			Request: &proto.RaidSimRequest{
+				Raid:       newRaid,
+				Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs, 0),
+				SimOptions: DefaultSimTestOptions,
+			},
+		},
+	})
 
 	if len(config.StatsToWeigh) > 0 {
 		generator.subgenerators = append(generator.subgenerators, SubGenerator{

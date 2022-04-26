@@ -49,7 +49,7 @@ func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 
 			BaseDamage:     core.BaseDamageConfigMagic(649, 821, 1.0+0.03*float64(mage.Talents.EmpoweredFireball)),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
+			OutcomeApplier: mage.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
@@ -76,7 +76,7 @@ func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 
 			BaseDamage:     core.BaseDamageConfigFlat(84 / 4),
-			OutcomeApplier: core.OutcomeFuncTick(),
+			OutcomeApplier: mage.OutcomeFuncTick(),
 			IsPeriodic:     true,
 		}),
 	})

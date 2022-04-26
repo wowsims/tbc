@@ -76,6 +76,10 @@ type Target struct {
 	GlanceMultiplier float64
 	HitSuppression   float64
 	CritSuppression  float64
+
+	PartialResistRollThreshold00 float64
+	PartialResistRollThreshold25 float64
+	PartialResistRollThreshold50 float64
 }
 
 func NewTarget(options proto.Target, targetIndex int32) *Target {
@@ -87,7 +91,8 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 			Level:       options.Level,
 			auraTracker: newAuraTracker(),
 			stats: stats.Stats{
-				stats.Armor: float64(options.Armor),
+				stats.Armor:      float64(options.Armor),
+				stats.BlockValue: 54, // Not thoroughly tested for non-bosses.
 			},
 			PseudoStats: stats.NewPseudoStats(),
 			Metrics:     NewCharacterMetrics(),
@@ -102,15 +107,21 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		target.AddStat(stats.Armor, 7684)
 	}
 
+	target.PseudoStats.InFrontOfTarget = true
+
 	target.BaseMissChance = UnitLevelFloat64(target.Level, 0.05, 0.055, 0.06, 0.08)
 	target.BaseSpellMissChance = UnitLevelFloat64(target.Level, 0.04, 0.05, 0.06, 0.17)
 	target.BaseBlockChance = 0.05
 	target.BaseDodgeChance = UnitLevelFloat64(target.Level, 0.05, 0.055, 0.06, 0.065)
 	target.BaseParryChance = UnitLevelFloat64(target.Level, 0.05, 0.055, 0.06, 0.14)
 	target.BaseGlanceChance = UnitLevelFloat64(target.Level, 0.06, 0.12, 0.18, 0.24)
+
 	target.GlanceMultiplier = UnitLevelFloat64(target.Level, 0.95, 0.95, 0.85, 0.75)
 	target.HitSuppression = UnitLevelFloat64(target.Level, 0, 0, 0, 0.01)
 	target.CritSuppression = UnitLevelFloat64(target.Level, 0, 0.01, 0.02, 0.048)
+
+	// TODO: This needs to be refactored to actually use the spell's school, and change on changes to resistance/spell pen.
+	target.PartialResistRollThreshold00, target.PartialResistRollThreshold25, target.PartialResistRollThreshold50 = target.partialResistRollThresholds(SpellSchoolFire, CharacterLevel, 0)
 
 	if options.Debuffs != nil {
 		applyDebuffEffects(target, *options.Debuffs)

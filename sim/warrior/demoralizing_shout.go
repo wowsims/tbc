@@ -17,7 +17,7 @@ func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
 	baseEffect := core.SpellEffect{
 		ThreatMultiplier: 1,
 		FlatThreatBonus:  56,
-		OutcomeApplier:   core.OutcomeFuncMagicHit(),
+		OutcomeApplier:   warrior.OutcomeFuncMagicHit(),
 	}
 
 	numHits := sim.GetNumTargets()

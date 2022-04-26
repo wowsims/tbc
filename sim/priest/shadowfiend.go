@@ -74,7 +74,7 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:            core.ProcMaskEmpty,
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
-			OutcomeApplier:      core.OutcomeFuncMagicHit(),
+			OutcomeApplier:      priest.OutcomeFuncMagicHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					priest.ShadowfiendDot.Apply(sim)
@@ -103,7 +103,7 @@ func (priest *Priest) registerShadowfiendSpell(sim *core.Simulation) {
 				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1),
 			IsPeriodic:     true,
 			BaseDamage:     core.BaseDamageConfigMagicNoRoll(1191/10, 0.06),
-			OutcomeApplier: core.OutcomeFuncTick(),
+			OutcomeApplier: priest.OutcomeFuncTick(),
 			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				priest.AddMana(sim, spellEffect.Damage*2.5, ShadowfiendActionID, false)
 			},

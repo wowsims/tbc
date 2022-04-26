@@ -54,7 +54,6 @@ func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (paladin *Paladin) Init(sim *core.Simulation) {
-	paladin.registerConsecrationSpell(sim)
 	paladin.registerCrusaderStrikeSpell(sim)
 	paladin.registerExorcismSpell(sim)
 	paladin.registerJudgements(sim)
@@ -66,9 +65,6 @@ func (paladin *Paladin) Reset(sim *core.Simulation) {
 }
 
 func (paladin *Paladin) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
-	if paladin.CurrentJudgement != nil && paladin.CurrentJudgement.IsActive() {
-		paladin.CurrentJudgement.UpdateExpires(sim.CurrentTime + JudgementDuration)
-	}
 }
 
 // maybe need to add stat dependencies
@@ -110,6 +106,8 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 	paladin.setupSealOfWisdom()
 
 	paladin.registerAvengingWrathCD()
+
+	paladin.setupJudgementRefresh()
 
 	return paladin
 }

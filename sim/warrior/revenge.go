@@ -42,7 +42,7 @@ func (warrior *Warrior) registerRevengeSpell(cdTimer *core.Timer) {
 			FlatThreatBonus:  200,
 
 			BaseDamage:     core.BaseDamageConfigRoll(414, 506),
-			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+			OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {

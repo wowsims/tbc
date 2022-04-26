@@ -47,7 +47,7 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 
 			BaseDamage:     core.BaseDamageConfigMagic(939, 1191, 1.15),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
+			OutcomeApplier: mage.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
@@ -72,7 +72,7 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 
 			BaseDamage:     core.BaseDamageConfigFlat(356 / 4),
-			OutcomeApplier: core.OutcomeFuncTick(),
+			OutcomeApplier: mage.OutcomeFuncTick(),
 			IsPeriodic:     true,
 		}),
 	})

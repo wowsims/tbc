@@ -864,6 +864,8 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 	applyDefaults(eventID: EventID) {
 		TypedEvent.freezeAllAndDo(() => {
+			const tankSpec = isTankSpec(this.player.spec);
+
 			this.player.setRace(eventID, specToEligibleRaces[this.player.spec][0]);
 			this.player.setGear(eventID, this.sim.lookupEquipmentSpec(this.individualConfig.defaults.gear));
 			this.player.setBonusStats(eventID, new Stats());
@@ -876,10 +878,11 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			this.player.getParty()!.setBuffs(eventID, this.individualConfig.defaults.partyBuffs);
 			this.player.getRaid()!.setBuffs(eventID, this.individualConfig.defaults.raidBuffs);
 			this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
+			this.player.setInFrontOfTarget(eventID, tankSpec);
 
 			this.sim.encounter.applyDefaults(eventID);
 			this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
-			this.sim.applyDefaults(eventID, isTankSpec(this.player.spec));
+			this.sim.applyDefaults(eventID, tankSpec);
 		});
 	}
 

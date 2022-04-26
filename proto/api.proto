@@ -29,7 +29,7 @@ message Player {
 
     oneof spec {
         BalanceDruid balance_druid = 6;
-	FeralDruid feral_druid = 22;
+				FeralDruid feral_druid = 22;
         Hunter hunter = 7;
         Mage mage = 8;
         RetributionPaladin retribution_paladin = 9;
@@ -47,6 +47,8 @@ message Player {
 		string talentsString = 17;
 
 		Cooldowns cooldowns = 19;
+
+		bool in_front_of_target = 23;
 }
 
 message Party {

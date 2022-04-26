@@ -34,15 +34,14 @@ func (paladin *Paladin) registerCrusaderStrikeSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:  core.ProcMaskMeleeMHSpecial,
-			IsPhantom: true,
+			ProcMask: core.ProcMaskMeleeMHSpecial,
 
 			DamageMultiplier: 1, // Need to review to make sure I set these properly
 			ThreatMultiplier: 1,
 
 			// maybe this isn't the one that should be set to 1.1
 			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 1.1, true),
-			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+			OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {

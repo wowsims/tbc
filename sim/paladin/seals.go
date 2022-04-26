@@ -22,7 +22,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 
 		// should deal 35% weapon deamage
 		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
-		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
 	}
 
 	// Apply 2 Handed Weapon Specialization talent
@@ -42,7 +42,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 		Duration: SealDuration,
 
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) || spellEffect.IsPhantom {
 				return
 			}
 			sobProc.Cast(sim, spellEffect.Target)
@@ -74,10 +74,10 @@ var SealOfCommandProcActionID = core.ActionID{SpellID: 20424}
 
 func (paladin *Paladin) SetupSealOfCommand() {
 	effect := core.SpellEffect{
-		ProcMask:         core.ProcMaskMeleeMHSpecial,
+		ProcMask:         core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
 		DamageMultiplier: 1,
 		ThreatMultiplier: 1,
-		OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+		OutcomeApplier:   paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
 	}
 	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
 

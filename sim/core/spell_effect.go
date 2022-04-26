@@ -277,32 +277,3 @@ func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Spe
 		*damage *= target.PseudoStats.ShadowDamageTakenMultiplier
 	}
 }
-
-// Modifies damage based on Armor or Magic resistances, depending on the damage type.
-func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, damage *float64) {
-	if spell.SpellExtras.Matches(SpellExtrasIgnoreResists) {
-		return
-	}
-
-	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
-		// Physical resistance (armor).
-		*damage *= spellEffect.Target.ArmorDamageReduction(spell.Unit.stats[stats.ArmorPenetration])
-	} else if !spell.SpellExtras.Matches(SpellExtrasBinary) {
-		// Magical resistance.
-		// https://royalgiraffe.github.io/resist-guide
-
-		resistanceRoll := sim.RandomFloat("Partial Resist")
-		if resistanceRoll > 0.18 { // 13% chance for 25% resist, 4% for 50%, 1% for 75%
-			// No partial resist.
-		} else if resistanceRoll > 0.05 {
-			spellEffect.Outcome |= OutcomePartial1_4
-			*damage *= 0.75
-		} else if resistanceRoll > 0.01 {
-			spellEffect.Outcome |= OutcomePartial2_4
-			*damage *= 0.5
-		} else {
-			spellEffect.Outcome |= OutcomePartial3_4
-			*damage *= 0.25
-		}
-	}
-}

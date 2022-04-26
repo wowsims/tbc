@@ -10,7 +10,7 @@ import (
 //  3. Modify the damage if necessary.
 type OutcomeApplier func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64)
 
-func OutcomeFuncAlwaysHit() OutcomeApplier {
+func (unit *Unit) OutcomeFuncAlwaysHit() OutcomeApplier {
 	return func(_ *Simulation, spell *Spell, spellEffect *SpellEffect, _ *float64) {
 		spellEffect.Outcome = OutcomeHit
 		spell.SpellMetrics[spellEffect.Target.Index].Hits++
@@ -18,13 +18,13 @@ func OutcomeFuncAlwaysHit() OutcomeApplier {
 }
 
 // A tick always hits, but we don't count them as hits in the metrics.
-func OutcomeFuncTick() OutcomeApplier {
+func (unit *Unit) OutcomeFuncTick() OutcomeApplier {
 	return func(_ *Simulation, _ *Spell, spellEffect *SpellEffect, _ *float64) {
 		spellEffect.Outcome = OutcomeHit
 	}
 }
 
-func OutcomeFuncMagicHitAndCrit(critMultiplier float64) OutcomeApplier {
+func (unit *Unit) OutcomeFuncMagicHitAndCrit(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		if spellEffect.magicHitCheck(sim, spell) {
 			if spellEffect.magicCritCheck(sim, spell) {
@@ -43,7 +43,7 @@ func OutcomeFuncMagicHitAndCrit(critMultiplier float64) OutcomeApplier {
 	}
 }
 
-func OutcomeFuncMagicHit() OutcomeApplier {
+func (unit *Unit) OutcomeFuncMagicHit() OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		if spellEffect.magicHitCheck(sim, spell) {
 			spellEffect.Outcome = OutcomeHit
@@ -56,76 +56,113 @@ func OutcomeFuncMagicHit() OutcomeApplier {
 	}
 }
 
-func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
-	// TODO: Block and parry if in front
-	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
-		unit := spell.Unit
-		roll := sim.RandomFloat("White Hit Table")
-		chance := 0.0
+func (unit *Unit) OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
+	if unit.PseudoStats.InFrontOfTarget {
+		return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+			unit := spell.Unit
+			roll := sim.RandomFloat("White Hit Table")
+			chance := 0.0
 
-		if !spellEffect.applyAttackTableMiss(spell, unit, roll, &chance, damage) &&
-			!spellEffect.applyAttackTableDodge(spell, unit, roll, &chance, damage) &&
-			!spellEffect.applyAttackTableGlance(spell, unit, roll, &chance, damage) &&
-			!spellEffect.applyAttackTableCrit(spell, unit, roll, critMultiplier, &chance, damage) {
-			spellEffect.applyAttackTableHit(spell)
+			if !spellEffect.applyAttackTableMiss(spell, unit, roll, &chance, damage) &&
+				!spellEffect.applyAttackTableDodge(spell, unit, roll, &chance, damage) &&
+				!spellEffect.applyAttackTableParry(spell, unit, roll, &chance, damage) &&
+				!spellEffect.applyAttackTableGlance(spell, unit, roll, &chance, damage) &&
+				!spellEffect.applyAttackTableBlock(spell, unit, roll, &chance, damage) &&
+				!spellEffect.applyAttackTableCrit(spell, unit, roll, critMultiplier, &chance, damage) {
+				spellEffect.applyAttackTableHit(spell)
+			}
 		}
+	} else {
+		return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+			unit := spell.Unit
+			roll := sim.RandomFloat("White Hit Table")
+			chance := 0.0
 
-		// Parry (if in front)
-		// If the target is a mob and defense minus weapon skill is 11 or more:
-		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.6%
-		// If the target is a mob and defense minus weapon skill is 10 or less:
-		// ParryChance = 5% + (TargetLevel*5 - AttackerSkill) * 0.1%
-
-		// Block (if in front)
-		// If the target is a mob:
-		// BlockChance = MIN(5%, 5% + (TargetLevel*5 - AttackerSkill) * 0.1%)
-		// If we actually implement blocks, ranged hits can be blocked.
+			if !spellEffect.applyAttackTableMiss(spell, unit, roll, &chance, damage) &&
+				!spellEffect.applyAttackTableDodge(spell, unit, roll, &chance, damage) &&
+				!spellEffect.applyAttackTableGlance(spell, unit, roll, &chance, damage) &&
+				!spellEffect.applyAttackTableCrit(spell, unit, roll, critMultiplier, &chance, damage) {
+				spellEffect.applyAttackTableHit(spell)
+			}
+		}
 	}
 }
 
-func OutcomeFuncMeleeSpecialHit() OutcomeApplier {
-	// TODO: Parry if in front
+func (unit *Unit) OutcomeFuncMeleeSpecialHit() OutcomeApplier {
+	if unit.PseudoStats.InFrontOfTarget {
+		return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+			unit := spell.Unit
+			roll := sim.RandomFloat("White Hit Table")
+			chance := 0.0
+
+			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, roll, &chance, damage) &&
+				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, roll, &chance, damage)) &&
+				!spellEffect.applyAttackTableParry(spell, unit, roll, &chance, damage) {
+				spellEffect.applyAttackTableHit(spell)
+			}
+		}
+	} else {
+		return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+			unit := spell.Unit
+			roll := sim.RandomFloat("White Hit Table")
+			chance := 0.0
+
+			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, roll, &chance, damage) &&
+				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, roll, &chance, damage)) {
+				spellEffect.applyAttackTableHit(spell)
+			}
+		}
+	}
+}
+
+func (unit *Unit) OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
+	if unit.PseudoStats.InFrontOfTarget {
+		return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+			unit := spell.Unit
+			roll := sim.RandomFloat("White Hit Table")
+			chance := 0.0
+
+			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, roll, &chance, damage) &&
+				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, roll, &chance, damage)) &&
+				!spellEffect.applyAttackTableParry(spell, unit, roll, &chance, damage) {
+				if !spellEffect.applyAttackTableCritSeparateRoll(sim, spell, critMultiplier, damage) {
+					if !spellEffect.applyAttackTableBlock(spell, unit, roll, &chance, damage) {
+						spellEffect.applyAttackTableHit(spell)
+					}
+				} else {
+					spellEffect.applyAttackTableBlock(spell, unit, roll, &chance, damage)
+				}
+			}
+		}
+	} else {
+		return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+			unit := spell.Unit
+			roll := sim.RandomFloat("White Hit Table")
+			chance := 0.0
+
+			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, roll, &chance, damage) &&
+				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, roll, &chance, damage)) &&
+				!spellEffect.applyAttackTableCritSeparateRoll(sim, spell, critMultiplier, damage) {
+				spellEffect.applyAttackTableHit(spell)
+			}
+		}
+	}
+}
+
+func (unit *Unit) OutcomeFuncMeleeSpecialNoBlockDodgeParry(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		unit := spell.Unit
 		roll := sim.RandomFloat("White Hit Table")
 		chance := 0.0
 
 		if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, roll, &chance, damage) &&
-			(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, roll, &chance, damage)) {
-			spellEffect.applyAttackTableHit(spell)
-		}
-	}
-}
-
-func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
-	// TODO: Block and Parry if in front
-	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
-		unit := spell.Unit
-		roll := sim.RandomFloat("White Hit Table")
-		chance := 0.0
-
-		if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, roll, &chance, damage) &&
-			(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, roll, &chance, damage)) &&
 			!spellEffect.applyAttackTableCritSeparateRoll(sim, spell, critMultiplier, damage) {
 			spellEffect.applyAttackTableHit(spell)
 		}
 	}
 }
 
-func OutcomeFuncMeleeSpecialNoBlockDodgeParry(critMultiplier float64) OutcomeApplier {
-	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
-		unit := spell.Unit
-		roll := sim.RandomFloat("White Hit Table")
-		chance := 0.0
-
-		if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, roll, &chance, damage) &&
-			!spellEffect.applyAttackTableCritSeparateRoll(sim, spell, critMultiplier, damage) {
-			spellEffect.applyAttackTableHit(spell)
-		}
-	}
-}
-
-func OutcomeFuncMeleeSpecialCritOnly(critMultiplier float64) OutcomeApplier {
+func (unit *Unit) OutcomeFuncMeleeSpecialCritOnly(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		if !spellEffect.applyAttackTableCritSeparateRoll(sim, spell, critMultiplier, damage) {
 			spellEffect.applyAttackTableHit(spell)
@@ -133,7 +170,7 @@ func OutcomeFuncMeleeSpecialCritOnly(critMultiplier float64) OutcomeApplier {
 	}
 }
 
-func OutcomeFuncRangedHit() OutcomeApplier {
+func (unit *Unit) OutcomeFuncRangedHit() OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		unit := spell.Unit
 		roll := sim.RandomFloat("White Hit Table")
@@ -145,16 +182,33 @@ func OutcomeFuncRangedHit() OutcomeApplier {
 	}
 }
 
-func OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApplier {
-	// TODO: Block if in front, includes critical block
-	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
-		unit := spell.Unit
-		roll := sim.RandomFloat("White Hit Table")
-		chance := 0.0
+func (unit *Unit) OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApplier {
+	if unit.PseudoStats.InFrontOfTarget {
+		return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+			unit := spell.Unit
+			roll := sim.RandomFloat("White Hit Table")
+			chance := 0.0
 
-		if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, roll, &chance, damage) &&
-			!spellEffect.applyAttackTableCritSeparateRoll(sim, spell, critMultiplier, damage) {
-			spellEffect.applyAttackTableHit(spell)
+			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, roll, &chance, damage) {
+				if !spellEffect.applyAttackTableCritSeparateRoll(sim, spell, critMultiplier, damage) {
+					if !spellEffect.applyAttackTableBlock(spell, unit, roll, &chance, damage) {
+						spellEffect.applyAttackTableHit(spell)
+					}
+				} else {
+					spellEffect.applyAttackTableBlock(spell, unit, roll, &chance, damage)
+				}
+			}
+		}
+	} else {
+		return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
+			unit := spell.Unit
+			roll := sim.RandomFloat("White Hit Table")
+			chance := 0.0
+
+			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, roll, &chance, damage) &&
+				!spellEffect.applyAttackTableCritSeparateRoll(sim, spell, critMultiplier, damage) {
+				spellEffect.applyAttackTableHit(spell)
+			}
 		}
 	}
 }
@@ -205,12 +259,36 @@ func (spellEffect *SpellEffect) applyAttackTableMissNoDWPenalty(spell *Spell, un
 	return false
 }
 
+func (spellEffect *SpellEffect) applyAttackTableBlock(spell *Spell, unit *Unit, roll float64, chance *float64, damage *float64) bool {
+	*chance += spellEffect.Target.BaseBlockChance
+
+	if roll < *chance {
+		spellEffect.Outcome |= OutcomeBlock
+		spell.SpellMetrics[spellEffect.Target.Index].Blocks++
+		*damage -= spellEffect.Target.GetStat(stats.BlockValue)
+		return true
+	}
+	return false
+}
+
 func (spellEffect *SpellEffect) applyAttackTableDodge(spell *Spell, unit *Unit, roll float64, chance *float64, damage *float64) bool {
 	*chance += MaxFloat(0, spellEffect.Target.BaseDodgeChance-spellEffect.ExpertisePercentage(unit)-unit.PseudoStats.DodgeReduction)
 
 	if roll < *chance {
 		spellEffect.Outcome = OutcomeDodge
 		spell.SpellMetrics[spellEffect.Target.Index].Dodges++
+		*damage = 0
+		return true
+	}
+	return false
+}
+
+func (spellEffect *SpellEffect) applyAttackTableParry(spell *Spell, unit *Unit, roll float64, chance *float64, damage *float64) bool {
+	*chance += MaxFloat(0, spellEffect.Target.BaseParryChance-spellEffect.ExpertisePercentage(unit))
+
+	if roll < *chance {
+		spellEffect.Outcome = OutcomeParry
+		spell.SpellMetrics[spellEffect.Target.Index].Parries++
 		*damage = 0
 		return true
 	}

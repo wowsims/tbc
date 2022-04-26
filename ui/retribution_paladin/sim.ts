@@ -126,6 +126,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 					isbUptime: 1,
 					bloodFrenzy: true,
 					exposeArmor: TristateEffect.TristateEffectImproved,
+					sunderArmor: true,
 					faerieFire: TristateEffect.TristateEffectImproved,
 					curseOfRecklessness: true,
 					huntersMark: TristateEffect.TristateEffectImproved,
@@ -228,11 +229,11 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				inputs: [
 					RetributionPaladinInputs.JudgementSelection,
 					RetributionPaladinInputs.CrusaderStrikeDelayMS,
-					RetributionPaladinInputs.HasteLeewayMS,
 					RetributionPaladinInputs.DamgeTakenPerSecond,
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.ISBUptime,
+					OtherInputs.InFrontOfTarget,
 				],
 			},
 			encounterPicker: {

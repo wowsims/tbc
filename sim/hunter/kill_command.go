@@ -51,7 +51,7 @@ func (hunter *Hunter) registerKillCommandSpell(sim *core.Simulation) {
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
-			OutcomeApplier:   core.OutcomeFuncAlwaysHit(),
+			OutcomeApplier:   hunter.OutcomeFuncAlwaysHit(),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				hunter.killCommandEnabledUntil = 0
@@ -79,7 +79,7 @@ func (hp *HunterPet) registerKillCommandSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 127, 1, true),
-			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(2),
+			OutcomeApplier: hp.OutcomeFuncMeleeSpecialHitAndCrit(2),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if beastLordProcAura != nil {

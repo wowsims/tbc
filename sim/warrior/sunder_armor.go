@@ -43,7 +43,7 @@ func (warrior *Warrior) newSunderArmorSpell(sim *core.Simulation, isDevastateEff
 		ThreatMultiplier: 1,
 		FlatThreatBonus:  301.5,
 
-		OutcomeApplier: core.OutcomeFuncMeleeSpecialHit(),
+		OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHit(),
 
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
@@ -57,7 +57,7 @@ func (warrior *Warrior) newSunderArmorSpell(sim *core.Simulation, isDevastateEff
 		},
 	}
 	if isDevastateEffect {
-		effect.OutcomeApplier = core.OutcomeFuncAlwaysHit()
+		effect.OutcomeApplier = warrior.OutcomeFuncAlwaysHit()
 		effect.OnInit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if warrior.SunderArmorAura.GetStacks() == 5 {
 				spellEffect.ThreatMultiplier = 0

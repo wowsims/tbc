@@ -59,7 +59,7 @@ func (shaman *Shaman) registerSearingTotemSpell(sim *core.Simulation) {
 			DamageMultiplier:    1 + float64(shaman.Talents.CallOfFlame)*0.05,
 			IsPhantom:           true,
 			BaseDamage:          core.BaseDamageConfigMagic(50, 66, 0.167),
-			OutcomeApplier:      core.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier()),
+			OutcomeApplier:      shaman.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier()),
 		})),
 	})
 }
@@ -110,7 +110,7 @@ func (shaman *Shaman) registerMagmaTotemSpell(sim *core.Simulation) {
 			DamageMultiplier:    1 + float64(shaman.Talents.CallOfFlame)*0.05,
 			IsPhantom:           true,
 			BaseDamage:          core.BaseDamageConfigMagicNoRoll(97, 0.067),
-			OutcomeApplier:      core.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier()),
+			OutcomeApplier:      shaman.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier()),
 		})),
 	})
 }
@@ -174,7 +174,7 @@ func (shaman *Shaman) registerNovaTotemSpell(sim *core.Simulation) {
 			DamageMultiplier:    1 + float64(shaman.Talents.CallOfFlame)*0.05,
 			IsPhantom:           true,
 			BaseDamage:          core.BaseDamageConfigMagic(654, 730, 0.214),
-			OutcomeApplier:      core.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier()),
+			OutcomeApplier:      shaman.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier()),
 		})),
 	})
 }

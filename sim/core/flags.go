@@ -123,7 +123,11 @@ func (ho HitOutcome) String() string {
 	} else if ho.Matches(OutcomeGlance) {
 		return "Glance"
 	} else if ho.Matches(OutcomeBlock) {
-		return "Block"
+		if ho.Matches(OutcomeCrit) {
+			return "CriticalBlock"
+		} else {
+			return "Block"
+		}
 	} else if ho.Matches(OutcomeCrit) {
 		return "Crit" + ho.PartialResistString()
 	} else if ho.Matches(OutcomeHit) {
@@ -187,6 +191,27 @@ func (ss SpellSchool) Stat() stats.Stat {
 		return stats.ShadowSpellPower
 	case SpellSchoolPhysical:
 		return 0 // should be weapon damage (mod_damage_done (physical))
+	}
+
+	return 0
+}
+
+func (ss SpellSchool) ResistanceStat() stats.Stat {
+	switch ss {
+	case SpellSchoolArcane:
+		return stats.ArcaneResistance
+	case SpellSchoolFire:
+		return stats.FireResistance
+	case SpellSchoolFrost:
+		return stats.FrostResistance
+	case SpellSchoolHoly:
+		return 0 // Holy resistance doesn't exist.
+	case SpellSchoolNature:
+		return stats.NatureResistance
+	case SpellSchoolShadow:
+		return stats.ShadowResistance
+	case SpellSchoolPhysical:
+		return stats.Armor
 	}
 
 	return 0

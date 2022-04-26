@@ -51,7 +51,7 @@ func (warrior *Warrior) applyDeepWounds() {
 						IsPeriodic:       true,
 						IsPhantom:        true,
 						BaseDamage:       core.BaseDamageConfigFlat(tickDamage),
-						OutcomeApplier:   core.OutcomeFuncTick(),
+						OutcomeApplier:   warrior.OutcomeFuncTick(),
 					})),
 				})
 				dwDots = append(dwDots, dot)

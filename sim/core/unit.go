@@ -249,10 +249,3 @@ func (unit *Unit) doneIteration(sim *Simulation) {
 	unit.Metrics.doneIteration(sim.Duration.Seconds())
 	unit.resetCDs(sim)
 }
-
-// ArmorDamageReduction currently assumes a level 70 attacker
-func (unit *Unit) ArmorDamageReduction(armorPen float64) float64 {
-	// TODO: Cache this somehow so we dont have to recalculate every time.
-	effectiveArmor := MaxFloat(0, unit.stats[stats.Armor]-armorPen)
-	return 1 - (effectiveArmor / (effectiveArmor + 10557.5))
-}

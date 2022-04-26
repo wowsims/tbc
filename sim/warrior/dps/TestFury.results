@@ -126,7 +126,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 890.7638495387305
+  dps: 890.769541763731
  }
 }
 dps_results: {
@@ -163,6 +163,18 @@ dps_results: {
  key: "TestFury-AllItems-BrutalEarthstormDiamond"
  value: {
   dps: 888.9518314635285
+ }
+}
+dps_results: {
+ key: "TestFury-AllItems-BulwarkofKings-28484"
+ value: {
+  dps: 909.2744377519427
+ }
+}
+dps_results: {
+ key: "TestFury-AllItems-BulwarkoftheAncientKings-28485"
+ value: {
+  dps: 911.821147438445
  }
 }
 dps_results: {
@@ -540,7 +552,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 903.5245785214505
+  dps: 903.5794901533352
  }
 }
 dps_results: {
@@ -612,7 +624,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-StormGauntlets-12632"
  value: {
-  dps: 869.4806526043596
+  dps: 869.4892434418595
  }
 }
 dps_results: {
@@ -666,7 +678,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-TheFistsofFury"
  value: {
-  dps: 890.1697266571547
+  dps: 890.2111173221198
  }
 }
 dps_results: {
@@ -714,7 +726,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 882.2704721792636
+  dps: 882.2759200456941
  }
 }
 dps_results: {
@@ -871,5 +883,11 @@ dps_results: {
  key: "TestFury-Settings-Orc-Fury P1-Basic-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
   dps: 811.0907620928921
+ }
+}
+dps_results: {
+ key: "TestFury-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 788.2561081091288
  }
 }

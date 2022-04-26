@@ -16,13 +16,13 @@ func (warlock *Warlock) registerIncinerateSpell(sim *core.Simulation) {
 	has4pMal := ItemSetMaleficRaiment.CharacterHasSetBonus(&warlock.Character, 4)
 
 	effect := core.SpellEffect{
+		ProcMask: core.ProcMaskSpellDamage,
 		BonusSpellCritRating: float64(warlock.Talents.Devastation)*1*core.SpellCritRatingPerCritChance +
 			float64(warlock.Talents.Backlash)*1*core.SpellCritRatingPerCritChance,
 		DamageMultiplier: 1 * core.TernaryFloat64(has4pMal, 1.06, 1.0),
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.DestructiveReach),
 		BaseDamage:       warlock.incinerateDamage(),
-		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
-		ProcMask:         core.ProcMaskSpellDamage,
+		OutcomeApplier:   warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
 	}
 
 	warlock.Incinerate = warlock.RegisterSpell(core.SpellConfig{
