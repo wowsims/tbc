@@ -34,6 +34,20 @@ export class EncounterPicker extends Component {
 			},
 		});
 
+		new EnumPicker<Target>(this.rootElem, modEncounter.primaryTarget, {
+			label: 'Target Level',
+			values: [
+				{ name: '73', value: 73 },
+				{ name: '72', value: 72 },
+				{ name: '71', value: 71 },
+				{ name: '70', value: 70 },
+			],
+			changedEvent: (target: Target) => target.levelChangeEmitter,
+			getValue: (target: Target) => target.getLevel(),
+			setValue: (eventID: EventID, target: Target, newValue: number) => {
+				target.setLevel(eventID, newValue);
+			},
+		});
 		if (config.showTargetArmor) {
 			new NumberPicker(this.rootElem, modEncounter.primaryTarget, {
 				label: 'Target Armor',
