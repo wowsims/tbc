@@ -5,16 +5,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDArcaneExplosion int32 = 10202
-
-var ArcaneExplosionActionID = core.ActionID{SpellID: SpellIDArcaneExplosion}
-
 func (mage *Mage) registerArcaneExplosionSpell(sim *core.Simulation) {
 	//AOECap: 10180,
 	baseCost := 390.0
 
 	mage.ArcaneExplosion = mage.RegisterSpell(core.SpellConfig{
-		ActionID:    ArcaneExplosionActionID,
+		ActionID:    core.ActionID{SpellID: 10202},
 		SpellSchool: core.SpellSchoolArcane,
 		SpellExtras: SpellFlagMage,
 

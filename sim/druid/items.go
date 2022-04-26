@@ -107,7 +107,7 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spell.ActionID.SpellID == SpellIDMoonfire {
+			if spell == druid.Moonfire {
 				if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
 					return
 				}
@@ -118,22 +118,23 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 }
 
 func ApplyAshtongueTalisman(agent core.Agent) {
-	char := agent.GetCharacter()
+	druidAgent := agent.(Agent)
+	druid := druidAgent.GetDruid()
 
 	// Not in the game yet so cant test; this logic assumes that:
 	// - does not affect the starfire which procs it
 	// - can proc off of any completed cast, not just hits
 	actionID := core.ActionID{ItemID: 32486}
-	procAura := char.NewTemporaryStatsAura("Ashtongue Talisman Proc", actionID, stats.Stats{stats.SpellPower: 150}, time.Second*8)
+	procAura := druid.NewTemporaryStatsAura("Ashtongue Talisman Proc", actionID, stats.Stats{stats.SpellPower: 150}, time.Second*8)
 
-	char.RegisterAura(core.Aura{
+	druid.RegisterAura(core.Aura{
 		Label:    "Ashtongue Talisman",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spell.ActionID.SpellID == SpellIDSF8 || spell.ActionID.SpellID == SpellIDSF6 {
+			if spell == druid.Starfire8 || spell == druid.Starfire6 {
 				if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
 					return
 				}

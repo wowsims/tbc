@@ -8,17 +8,14 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDHurricane int32 = 27012
-
-var HurricaneActionID = core.ActionID{SpellID: SpellIDHurricane}
-
 func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 27012}
 	baseCost := 1905.0
 
 	hurricaneDot := core.NewDot(core.Dot{
 		Aura: druid.RegisterAura(core.Aura{
 			Label:    "Hurricane",
-			ActionID: HurricaneActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks:       10,
 		TickLength:          time.Second * 1,
@@ -33,7 +30,7 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 	})
 
 	druid.Hurricane = druid.RegisterSpell(core.SpellConfig{
-		ActionID:    HurricaneActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolNature,
 		SpellExtras: core.SpellExtrasChanneled,
 

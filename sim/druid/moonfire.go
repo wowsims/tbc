@@ -9,15 +9,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDMoonfire int32 = 26988
-
-var MoonfireActionID = core.ActionID{SpellID: SpellIDMoonfire}
-
 func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 26988}
 	baseCost := 495.0
 
 	druid.Moonfire = druid.RegisterSpell(core.SpellConfig{
-		ActionID:    MoonfireActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolArcane,
 
 		ResourceType: stats.Mana,
@@ -50,7 +47,7 @@ func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
 		Spell: druid.Moonfire,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "Moonfire-" + strconv.Itoa(int(druid.Index)),
-			ActionID: MoonfireActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 4 + core.TernaryInt(ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 2), 1, 0),
 		TickLength:    time.Second * 3,

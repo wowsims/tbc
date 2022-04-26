@@ -7,7 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDArcaneBlast int32 = 30451
 const ArcaneBlastBaseManaCost = 195.0
 const ArcaneBlastBaseCastTime = time.Millisecond * 2500
 
@@ -25,7 +24,7 @@ func (mage *Mage) newArcaneBlastSpell(sim *core.Simulation, numStacks int32) *co
 		},
 	})
 
-	actionID := core.ActionID{SpellID: SpellIDArcaneBlast, Tag: numStacks + 1}
+	actionID := core.ActionID{SpellID: 30451, Tag: numStacks + 1}
 
 	return mage.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,

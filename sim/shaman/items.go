@@ -221,10 +221,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 }
 
 func ApplyAshtongueTalismanOfVision(agent core.Agent) {
-	shamanAgent, ok := agent.(ShamanAgent)
-	if !ok {
-		log.Fatalf("Non-shaman attempted to activate Ashtongue Talisman of Vision.")
-	}
+	shamanAgent := agent.(ShamanAgent)
 	shaman := shamanAgent.GetShaman()
 	procAura := shaman.NewTemporaryStatsAura("Ashtongue Talisman of Vision Proc", core.ActionID{ItemID: 32491}, stats.Stats{stats.AttackPower: 275}, time.Second*10)
 
@@ -248,17 +245,18 @@ func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 }
 
 func ApplySkycallTotem(agent core.Agent) {
-	character := agent.GetCharacter()
-	procAura := character.NewTemporaryStatsAura("Skycall Totem Proc", core.ActionID{ItemID: 33506}, stats.Stats{stats.SpellHaste: 101}, time.Second*10)
+	shamanAgent := agent.(ShamanAgent)
+	shaman := shamanAgent.GetShaman()
+	procAura := shaman.NewTemporaryStatsAura("Skycall Totem Proc", core.ActionID{ItemID: 33506}, stats.Stats{stats.SpellHaste: 101}, time.Second*10)
 
-	character.RegisterAura(core.Aura{
+	shaman.RegisterAura(core.Aura{
 		Label:    "Skycall Totem",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			if spell.ActionID.SpellID == SpellIDLB12 && sim.RandomFloat("Skycall Totem") < 0.15 {
+			if (spell == shaman.LightningBolt || spell == shaman.LightningBoltLO) && sim.RandomFloat("Skycall Totem") < 0.15 {
 				procAura.Activate(sim)
 			}
 		},
