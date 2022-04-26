@@ -278,7 +278,7 @@ export const warlockTalentsConfig: TalentsConfig<Spec.SpecWarlock> = newTalentsC
 				maxPoints: 3,
 			},
 			{
-				fieldName: 'improvedSuccubus',
+				fieldName: 'improvedSayaad',
 				location: {
 					rowIdx: 2,
 					colIdx: 0,
@@ -521,7 +521,7 @@ export const warlockTalentsConfig: TalentsConfig<Spec.SpecWarlock> = newTalentsC
 				maxPoints: 2,
 			},
 			{
-				//fieldName: 'destructiveReach',
+				fieldName: 'destructiveReach',
 				location: {
 					rowIdx: 3,
 					colIdx: 1,
