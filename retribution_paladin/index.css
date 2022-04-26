@@ -1623,6 +1623,8 @@ input, select {
   background-color: black;
   color: lawngreen;
   border: none;
+  width: auto;
+  padding: 0 2px;
 }
 
 .icon-input:not(.use-counter) .icon-input-counter {
