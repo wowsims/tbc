@@ -233,6 +233,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
 					OtherInputs.SnapshotBsSolarianSapphire,
 					OtherInputs.SnapshotBsT2,
+					OtherInputs.InFrontOfTarget,
 				],
 			},
 			encounterPicker: {

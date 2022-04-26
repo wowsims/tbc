@@ -260,6 +260,7 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
 					OtherInputs.SnapshotBsSolarianSapphire,
 					OtherInputs.SnapshotBsT2,
+					OtherInputs.InFrontOfTarget,
 				],
 			},
 			additionalIconSections: {

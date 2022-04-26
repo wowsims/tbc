@@ -86,6 +86,7 @@ export class Player<SpecType extends Spec> {
 	private talentsString: string = '';
 	private specOptions: SpecOptions<SpecType>;
 	private cooldowns: Cooldowns = Cooldowns.create();
+	private inFrontOfTarget: boolean = false;
 
 	private itemEPCache: Map<number, number> = new Map<number, number>();
 	private gemEPCache: Map<number, number> = new Map<number, number>();
@@ -108,6 +109,7 @@ export class Player<SpecType extends Spec> {
 	readonly talentsChangeEmitter = new TypedEvent<void>('PlayerTalents');
 	readonly specOptionsChangeEmitter = new TypedEvent<void>('PlayerSpecOptions');
 	readonly cooldownsChangeEmitter = new TypedEvent<void>('PlayerCooldowns');
+	readonly inFrontOfTargetChangeEmitter = new TypedEvent<void>('PlayerInFrontOfTarget');
 	readonly epWeightsChangeEmitter = new TypedEvent<void>('PlayerEpWeights');
 
 	readonly currentStatsEmitter = new TypedEvent<void>('PlayerCurrentStats');
@@ -137,6 +139,7 @@ export class Player<SpecType extends Spec> {
 			this.talentsChangeEmitter,
 			this.specOptionsChangeEmitter,
 			this.cooldownsChangeEmitter,
+			this.inFrontOfTargetChangeEmitter,
 			this.epWeightsChangeEmitter,
 		], 'PlayerChange');
 	}
@@ -464,6 +467,18 @@ export class Player<SpecType extends Spec> {
 		this.specOptionsChangeEmitter.emit(eventID);
 	}
 
+	getInFrontOfTarget(): boolean {
+		return this.inFrontOfTarget;
+	}
+
+	setInFrontOfTarget(eventID: EventID, newInFrontOfTarget: boolean) {
+		if (newInFrontOfTarget == this.inFrontOfTarget)
+			return;
+
+		this.inFrontOfTarget = newInFrontOfTarget;
+		this.inFrontOfTargetChangeEmitter.emit(eventID);
+	}
+
 	computeStatsEP(stats?: Stats): number {
 		if (stats == undefined) {
 			return 0;
@@ -591,6 +606,7 @@ export class Player<SpecType extends Spec> {
 				buffs: this.getBuffs(),
 				cooldowns: this.getCooldowns(),
 				talentsString: this.getTalentsString(),
+				inFrontOfTarget: this.getInFrontOfTarget(),
 			}),
 			this.getRotation(),
 			forExport ? this.specTypeFunctions.talentsCreate() : this.getTalents(),
@@ -607,6 +623,7 @@ export class Player<SpecType extends Spec> {
 			this.setBuffs(eventID, proto.buffs || IndividualBuffs.create());
 			this.setCooldowns(eventID, proto.cooldowns || Cooldowns.create());
 			this.setTalentsString(eventID, proto.talentsString);
+			this.setInFrontOfTarget(eventID, proto.inFrontOfTarget);
 			this.setRotation(eventID, this.specTypeFunctions.rotationFromPlayer(proto));
 			this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
 		});
