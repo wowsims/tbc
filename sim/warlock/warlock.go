@@ -118,6 +118,8 @@ func NewWarlock(character core.Character, options proto.Player) *Warlock {
 			warlock.PseudoStats.ShadowDamageDealtMultiplier *= 1.15
 		case proto.Warlock_Options_Imp:
 			warlock.PseudoStats.FireDamageDealtMultiplier *= 1.15
+		case proto.Warlock_Options_Felgaurd:
+			warlock.PseudoStats.ShadowDamageDealtMultiplier *= 1.10
 		}
 	}
 
@@ -143,7 +145,7 @@ func RegisterWarlock() {
 
 func init() {
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceBloodElf, Class: proto.Class_ClassWarlock}] = stats.Stats{
-		stats.Health:      2005,
+		stats.Health:      3310,
 		stats.Strength:    48,
 		stats.Agility:     60,
 		stats.Stamina:     75,
@@ -156,7 +158,7 @@ func init() {
 		// stats.MeleeCrit:   4.43 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceOrc, Class: proto.Class_ClassWarlock}] = stats.Stats{
-		stats.Health:      2005,
+		stats.Health:      3310,
 		stats.Strength:    54,
 		stats.Agility:     55,
 		stats.Stamina:     78,
@@ -169,7 +171,7 @@ func init() {
 		// stats.MeleeCrit:   4.43 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceUndead, Class: proto.Class_ClassWarlock}] = stats.Stats{
-		stats.Health:      2005,
+		stats.Health:      3310,
 		stats.Strength:    50,
 		stats.Agility:     56,
 		stats.Stamina:     77,
@@ -182,7 +184,7 @@ func init() {
 		// stats.MeleeCrit:   4.43 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassWarlock}] = stats.Stats{
-		stats.Health:      2005,
+		stats.Health:      3300,
 		stats.Strength:    51,
 		stats.Agility:     58,
 		stats.Stamina:     76,
@@ -195,7 +197,7 @@ func init() {
 		// stats.MeleeCrit:   4.43 * core.MeleeCritRatingPerCritChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceGnome, Class: proto.Class_ClassWarlock}] = stats.Stats{
-		stats.Health:      2005,
+		stats.Health:      3310,
 		stats.Strength:    46,
 		stats.Agility:     61,
 		stats.Stamina:     75,
