@@ -102,6 +102,8 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		target.AddStat(stats.Armor, 7684)
 	}
 
+	target.PseudoStats.InFrontOfTarget = true
+
 	target.BaseMissChance = UnitLevelFloat64(target.Level, 0.05, 0.055, 0.06, 0.08)
 	target.BaseSpellMissChance = UnitLevelFloat64(target.Level, 0.04, 0.05, 0.06, 0.17)
 	target.BaseBlockChance = 0.05

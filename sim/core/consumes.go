@@ -862,7 +862,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				ThreatMultiplier: 1,
 
 				BaseDamage:     BaseDamageConfigFlat(40),
-				OutcomeApplier: OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+				OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 			}),
 		})
 
@@ -1022,7 +1022,7 @@ func (character *Character) newBasicExplosiveSpellConfig(sim *Simulation, action
 			ThreatMultiplier: 1,
 
 			BaseDamage:     BaseDamageConfigRoll(minDamage, maxDamage),
-			OutcomeApplier: OutcomeFuncMagicHitAndCrit(2),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(2),
 		}),
 	}
 }

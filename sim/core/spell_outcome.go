@@ -10,7 +10,7 @@ import (
 //  3. Modify the damage if necessary.
 type OutcomeApplier func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64)
 
-func OutcomeFuncAlwaysHit() OutcomeApplier {
+func (unit *Unit) OutcomeFuncAlwaysHit() OutcomeApplier {
 	return func(_ *Simulation, spell *Spell, spellEffect *SpellEffect, _ *float64) {
 		spellEffect.Outcome = OutcomeHit
 		spell.SpellMetrics[spellEffect.Target.Index].Hits++
@@ -18,13 +18,13 @@ func OutcomeFuncAlwaysHit() OutcomeApplier {
 }
 
 // A tick always hits, but we don't count them as hits in the metrics.
-func OutcomeFuncTick() OutcomeApplier {
+func (unit *Unit) OutcomeFuncTick() OutcomeApplier {
 	return func(_ *Simulation, _ *Spell, spellEffect *SpellEffect, _ *float64) {
 		spellEffect.Outcome = OutcomeHit
 	}
 }
 
-func OutcomeFuncMagicHitAndCrit(critMultiplier float64) OutcomeApplier {
+func (unit *Unit) OutcomeFuncMagicHitAndCrit(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		if spellEffect.magicHitCheck(sim, spell) {
 			if spellEffect.magicCritCheck(sim, spell) {
@@ -43,7 +43,7 @@ func OutcomeFuncMagicHitAndCrit(critMultiplier float64) OutcomeApplier {
 	}
 }
 
-func OutcomeFuncMagicHit() OutcomeApplier {
+func (unit *Unit) OutcomeFuncMagicHit() OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		if spellEffect.magicHitCheck(sim, spell) {
 			spellEffect.Outcome = OutcomeHit
@@ -56,7 +56,7 @@ func OutcomeFuncMagicHit() OutcomeApplier {
 	}
 }
 
-func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
+func (unit *Unit) OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 	// TODO: Block and parry if in front
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		unit := spell.Unit
@@ -83,7 +83,7 @@ func OutcomeFuncMeleeWhite(critMultiplier float64) OutcomeApplier {
 	}
 }
 
-func OutcomeFuncMeleeSpecialHit() OutcomeApplier {
+func (unit *Unit) OutcomeFuncMeleeSpecialHit() OutcomeApplier {
 	// TODO: Parry if in front
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		unit := spell.Unit
@@ -97,7 +97,7 @@ func OutcomeFuncMeleeSpecialHit() OutcomeApplier {
 	}
 }
 
-func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
+func (unit *Unit) OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
 	// TODO: Block and Parry if in front
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		unit := spell.Unit
@@ -112,7 +112,7 @@ func OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) OutcomeApplier {
 	}
 }
 
-func OutcomeFuncMeleeSpecialNoBlockDodgeParry(critMultiplier float64) OutcomeApplier {
+func (unit *Unit) OutcomeFuncMeleeSpecialNoBlockDodgeParry(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		unit := spell.Unit
 		roll := sim.RandomFloat("White Hit Table")
@@ -125,7 +125,7 @@ func OutcomeFuncMeleeSpecialNoBlockDodgeParry(critMultiplier float64) OutcomeApp
 	}
 }
 
-func OutcomeFuncMeleeSpecialCritOnly(critMultiplier float64) OutcomeApplier {
+func (unit *Unit) OutcomeFuncMeleeSpecialCritOnly(critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		if !spellEffect.applyAttackTableCritSeparateRoll(sim, spell, critMultiplier, damage) {
 			spellEffect.applyAttackTableHit(spell)
@@ -133,7 +133,7 @@ func OutcomeFuncMeleeSpecialCritOnly(critMultiplier float64) OutcomeApplier {
 	}
 }
 
-func OutcomeFuncRangedHit() OutcomeApplier {
+func (unit *Unit) OutcomeFuncRangedHit() OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		unit := spell.Unit
 		roll := sim.RandomFloat("White Hit Table")
@@ -145,7 +145,7 @@ func OutcomeFuncRangedHit() OutcomeApplier {
 	}
 }
 
-func OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApplier {
+func (unit *Unit) OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApplier {
 	// TODO: Block if in front, includes critical block
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, damage *float64) {
 		unit := spell.Unit
@@ -211,6 +211,18 @@ func (spellEffect *SpellEffect) applyAttackTableDodge(spell *Spell, unit *Unit, 
 	if roll < *chance {
 		spellEffect.Outcome = OutcomeDodge
 		spell.SpellMetrics[spellEffect.Target.Index].Dodges++
+		*damage = 0
+		return true
+	}
+	return false
+}
+
+func (spellEffect *SpellEffect) applyAttackTableParry(spell *Spell, unit *Unit, roll float64, chance *float64, damage *float64) bool {
+	*chance += MaxFloat(0, spellEffect.Target.BaseParryChance-spellEffect.ExpertisePercentage(unit))
+
+	if roll < *chance {
+		spellEffect.Outcome = OutcomeParry
+		spell.SpellMetrics[spellEffect.Target.Index].Parries++
 		*damage = 0
 		return true
 	}
