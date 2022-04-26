@@ -492,7 +492,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 1935.8289765646564
+  dps: 1937.9367487226427
  }
 }
 dps_results: {
@@ -588,7 +588,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-StormGauntlets-12632"
  value: {
-  dps: 1821.981007685862
+  dps: 1847.1931690690203
  }
 }
 dps_results: {
@@ -648,7 +648,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TheLightningCapacitor-28785"
  value: {
-  dps: 1922.521760854636
+  dps: 1923.1821463910385
  }
 }
 dps_results: {
