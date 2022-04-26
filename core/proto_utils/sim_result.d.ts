@@ -99,6 +99,7 @@ export declare class UnitMetrics {
     private constructor();
     get label(): string;
     get isPet(): boolean;
+    get inFrontOfTarget(): boolean;
     get maxThreat(): number;
     get secondsOomAvg(): number;
     get totalDamage(): number;

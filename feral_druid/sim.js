@@ -209,6 +209,7 @@ export class FeralDruidSimUI extends IndividualSimUI {
                     OtherInputs.ExposeWeaknessUptime,
                     OtherInputs.ExposeWeaknessHunterAgility,
                     OtherInputs.SnapshotBsSolarianSapphire,
+                    OtherInputs.InFrontOfTarget,
                 ],
             },
             encounterPicker: {

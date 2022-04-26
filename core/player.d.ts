@@ -36,6 +36,7 @@ export declare class Player<SpecType extends Spec> {
     private talentsString;
     private specOptions;
     private cooldowns;
+    private inFrontOfTarget;
     private itemEPCache;
     private gemEPCache;
     private enchantEPCache;
@@ -54,6 +55,7 @@ export declare class Player<SpecType extends Spec> {
     readonly talentsChangeEmitter: TypedEvent<void>;
     readonly specOptionsChangeEmitter: TypedEvent<void>;
     readonly cooldownsChangeEmitter: TypedEvent<void>;
+    readonly inFrontOfTargetChangeEmitter: TypedEvent<void>;
     readonly epWeightsChangeEmitter: TypedEvent<void>;
     readonly currentStatsEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
@@ -102,6 +104,8 @@ export declare class Player<SpecType extends Spec> {
     getTalentTreeIcon(): string;
     getSpecOptions(): SpecOptions<SpecType>;
     setSpecOptions(eventID: EventID, newSpecOptions: SpecOptions<SpecType>): void;
+    getInFrontOfTarget(): boolean;
+    setInFrontOfTarget(eventID: EventID, newInFrontOfTarget: boolean): void;
     computeStatsEP(stats?: Stats): number;
     computeGemEP(gem: Gem): number;
     computeEnchantEP(enchant: Enchant): number;

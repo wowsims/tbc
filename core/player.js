@@ -27,6 +27,7 @@ export class Player {
         this.gear = new Gear({});
         this.talentsString = '';
         this.cooldowns = Cooldowns.create();
+        this.inFrontOfTarget = false;
         this.itemEPCache = new Map();
         this.gemEPCache = new Map();
         this.enchantEPCache = new Map();
@@ -44,6 +45,7 @@ export class Player {
         this.talentsChangeEmitter = new TypedEvent('PlayerTalents');
         this.specOptionsChangeEmitter = new TypedEvent('PlayerSpecOptions');
         this.cooldownsChangeEmitter = new TypedEvent('PlayerCooldowns');
+        this.inFrontOfTargetChangeEmitter = new TypedEvent('PlayerInFrontOfTarget');
         this.epWeightsChangeEmitter = new TypedEvent('PlayerEpWeights');
         this.currentStatsEmitter = new TypedEvent('PlayerCurrentStats');
         this.sim = sim;
@@ -65,6 +67,7 @@ export class Player {
             this.talentsChangeEmitter,
             this.specOptionsChangeEmitter,
             this.cooldownsChangeEmitter,
+            this.inFrontOfTargetChangeEmitter,
             this.epWeightsChangeEmitter,
         ], 'PlayerChange');
     }
@@ -337,6 +340,15 @@ export class Player {
         this.specOptions = this.specTypeFunctions.optionsCopy(newSpecOptions);
         this.specOptionsChangeEmitter.emit(eventID);
     }
+    getInFrontOfTarget() {
+        return this.inFrontOfTarget;
+    }
+    setInFrontOfTarget(eventID, newInFrontOfTarget) {
+        if (newInFrontOfTarget == this.inFrontOfTarget)
+            return;
+        this.inFrontOfTarget = newInFrontOfTarget;
+        this.inFrontOfTargetChangeEmitter.emit(eventID);
+    }
     computeStatsEP(stats) {
         if (stats == undefined) {
             return 0;
@@ -448,6 +460,7 @@ export class Player {
             buffs: this.getBuffs(),
             cooldowns: this.getCooldowns(),
             talentsString: this.getTalentsString(),
+            inFrontOfTarget: this.getInFrontOfTarget(),
         }), this.getRotation(), forExport ? this.specTypeFunctions.talentsCreate() : this.getTalents(), this.getSpecOptions());
     }
     fromProto(eventID, proto) {
@@ -460,6 +473,7 @@ export class Player {
             this.setBuffs(eventID, proto.buffs || IndividualBuffs.create());
             this.setCooldowns(eventID, proto.cooldowns || Cooldowns.create());
             this.setTalentsString(eventID, proto.talentsString);
+            this.setInFrontOfTarget(eventID, proto.inFrontOfTarget);
             this.setRotation(eventID, this.specTypeFunctions.rotationFromPlayer(proto));
             this.setSpecOptions(eventID, this.specTypeFunctions.optionsFromPlayer(proto));
         });

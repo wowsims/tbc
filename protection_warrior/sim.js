@@ -195,6 +195,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                     OtherInputs.ExposeWeaknessUptime,
                     OtherInputs.ExposeWeaknessHunterAgility,
                     OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
+                    OtherInputs.InFrontOfTarget,
                 ],
             },
             encounterPicker: {

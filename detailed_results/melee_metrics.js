@@ -81,6 +81,20 @@ export class MeleeMetricsTable extends MetricsTable {
                 getDisplayString: (metric) => metric.dodgePercent.toFixed(2) + '%',
             },
             {
+                name: 'Parry %',
+                tooltip: 'Parries / Swings',
+                columnClass: 'in-front-of-target',
+                getValue: (metric) => metric.parryPercent,
+                getDisplayString: (metric) => metric.parryPercent.toFixed(2) + '%',
+            },
+            {
+                name: 'Block %',
+                tooltip: 'Blocks / Swings',
+                columnClass: 'in-front-of-target',
+                getValue: (metric) => metric.blockPercent,
+                getDisplayString: (metric) => metric.blockPercent.toFixed(2) + '%',
+            },
+            {
                 name: 'Glance %',
                 tooltip: 'Glances / Swings',
                 getValue: (metric) => metric.glancePercent,
@@ -94,6 +108,12 @@ export class MeleeMetricsTable extends MetricsTable {
             return [];
         }
         const player = players[0];
+        if (player.inFrontOfTarget) {
+            this.rootElem.classList.remove('hide-in-front-of-target');
+        }
+        else {
+            this.rootElem.classList.add('hide-in-front-of-target');
+        }
         const actions = player.getMeleeActions();
         const actionGroups = ActionMetrics.groupById(actions);
         const petGroups = player.pets.map(pet => pet.getMeleeActions());

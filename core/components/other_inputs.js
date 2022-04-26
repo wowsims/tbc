@@ -306,3 +306,19 @@ export const SnapshotBsT2 = {
         enableWhen: (party) => party.getBuffs().battleShout > 0,
     },
 };
+export const InFrontOfTarget = {
+    type: 'boolean',
+    getModObject: (simUI) => simUI.player,
+    config: {
+        extraCssClasses: [
+            'in-front-of-target-picker',
+        ],
+        label: 'In Front of Target',
+        labelTooltip: 'Stand in front of the target, causing Blocks and Parries to be included in the attack table.',
+        changedEvent: (player) => player.inFrontOfTargetChangeEmitter,
+        getValue: (player) => player.getInFrontOfTarget(),
+        setValue: (eventID, player, newValue) => {
+            player.setInFrontOfTarget(eventID, newValue);
+        },
+    },
+};

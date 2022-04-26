@@ -172,8 +172,8 @@ export class DamageDealtLog extends SimLog {
             : this.dodge ? 'Dodge'
                 : this.parry ? 'Parry'
                     : this.glance ? 'Glance'
-                        : this.crit ? 'Crit'
-                            : this.block ? 'Block'
+                        : this.block ? (this.crit ? 'Critical Block' : 'Block')
+                            : this.crit ? 'Crit'
                                 : this.tick ? 'Tick'
                                     : 'Hit';
         if (!this.miss && !this.dodge && !this.parry) {
@@ -195,15 +195,15 @@ export class DamageDealtLog extends SimLog {
         return `${this.toStringPrefix()} ${this.actionId.name} ${this.resultString()} (${this.threat.toFixed(2)} Threat)`;
     }
     static parse(params) {
-        const match = params.raw.match(/] (.*?) (tick )?((Miss)|(Hit)|(Crit)|(Glance)|(Dodge)|(Parry)|(Block))( \((\d+)% Resist\))?( for (\d+\.\d+) damage)?/);
+        const match = params.raw.match(/] (.*?) (tick )?((Miss)|(Hit)|(Crit)|(Glance)|(Dodge)|(Parry)|(Block)|(CriticalBlock))( \((\d+)% Resist\))?( for (\d+\.\d+) damage)?/);
         if (match) {
             return ActionId.fromLogString(match[1]).fill(params.source?.index).then(cause => {
                 params.actionId = cause;
                 let amount = 0;
-                if (match[14]) {
-                    amount = parseFloat(match[14]);
+                if (match[15]) {
+                    amount = parseFloat(match[15]);
                 }
-                return new DamageDealtLog(params, amount, match[3] == 'Miss', match[3] == 'Crit', match[3] == 'Glance', match[3] == 'Dodge', match[3] == 'Parry', match[3] == 'Block', Boolean(match[2]) && match[2].includes('tick'), match[12] == '25', match[12] == '50', match[12] == '75');
+                return new DamageDealtLog(params, amount, match[3] == 'Miss', match[3] == 'Crit' || match[3] == 'CriticalBlock', match[3] == 'Glance', match[3] == 'Dodge', match[3] == 'Parry', match[3] == 'Block' || match[3] == 'CriticalBlock', Boolean(match[2]) && match[2].includes('tick'), match[13] == '25', match[13] == '50', match[13] == '75');
             });
         }
         else {

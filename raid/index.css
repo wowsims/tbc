@@ -757,6 +757,10 @@ input, select {
   display: none !important;
 }
 
+.hide-in-front-of-target .in-front-of-target {
+  display: none !important;
+}
+
 .bonus-stats-root {
   margin: 10px;
 }

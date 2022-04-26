@@ -182,6 +182,17 @@ export class UnitMetrics {
     get isPet() {
         return this.petActionId != null;
     }
+    get inFrontOfTarget() {
+        if (this.target != null) {
+            return true;
+        }
+        else if (this.player != null) {
+            return this.player.inFrontOfTarget;
+        }
+        else {
+            return false; // TODO pets
+        }
+    }
     get maxThreat() {
         return this.threatLogs[this.threatLogs.length - 1]?.threatAfter || 0;
     }

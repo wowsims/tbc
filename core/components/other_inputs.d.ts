@@ -170,3 +170,15 @@ export declare const SnapshotBsT2: {
         enableWhen: (party: Party) => boolean;
     };
 };
+export declare const InFrontOfTarget: {
+    type: "boolean";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        changedEvent: (player: Player<any>) => TypedEvent<void>;
+        getValue: (player: Player<any>) => boolean;
+        setValue: (eventID: EventID, player: Player<any>, newValue: boolean) => void;
+    };
+};
