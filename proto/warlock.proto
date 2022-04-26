@@ -26,7 +26,7 @@ message WarlockTalents {
 		int32 demonic_embrace = 16;
 		int32 improved_voidwalker = 17;
 		int32 fel_intellect = 18;
-		int32 improved_succubus = 19;
+		int32 improved_sayaad = 19;
 		int32 fel_stamina = 20;
 		int32 demonic_aegis = 21;
 		int32 unholy_power = 22;

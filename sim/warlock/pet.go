@@ -43,6 +43,10 @@ func (warlock *Warlock) NewWarlockPet() *WarlockPet {
 		stats.MeleeCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.MeleeCritRatingPerCritChance,
 		stats.SpellCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.SpellCritRatingPerCritChance,
 	})
+
+	if warlock.Talents.SoulLink {
+		warlock.PseudoStats.DamageDealtMultiplier *= 1.05
+	}
 	wp.PseudoStats.DamageDealtMultiplier *= 1.0 + (0.04 * float64(warlock.Talents.UnholyPower))
 
 	wp.EnableManaBar()
@@ -99,7 +103,7 @@ func (warlock *Warlock) NewWarlockPet() *WarlockPet {
 		SourceStat:   stats.Strength,
 		ModifiedStat: stats.AttackPower,
 		Modifier: func(strength float64, attackPower float64) float64 {
-			return attackPower + strength*2
+			return attackPower + (strength-10)*2
 		},
 	})
 	wp.AddStatDependency(stats.StatDependency{
