@@ -34,7 +34,7 @@ func (priest *Priest) registerMindBlastSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-
+			ProcMask: core.ProcMaskSpellDamage,
 			BonusSpellHitRating: 0 +
 				float64(priest.Talents.ShadowFocus)*2*core.SpellHitRatingPerHitChance +
 				float64(priest.Talents.FocusedPower)*2*core.SpellHitRatingPerHitChance,

@@ -27,6 +27,7 @@ func (warlock *Warlock) registerUnstableAffSpell(sim *core.Simulation) {
 			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:       core.ProcMaskEmpty,
 			OutcomeApplier: warlock.OutcomeFuncMagicHit(),
 			OnSpellHit:     applyDotOnLanded(&warlock.UnstableAffDot),
 		}),
@@ -48,6 +49,7 @@ func (warlock *Warlock) registerUnstableAffSpell(sim *core.Simulation) {
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(1050/6, spellCoefficient),
 			OutcomeApplier:   warlock.OutcomeFuncTick(),
 			IsPeriodic:       true,
+			ProcMask:         core.ProcMaskPeriodicDamage,
 		}),
 	})
 }

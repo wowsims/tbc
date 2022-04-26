@@ -37,6 +37,7 @@ func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
 					priest.VampiricTouchDot.Apply(sim)
 				}
 			},
+			ProcMask: core.ProcMaskEmpty,
 		}),
 	})
 
@@ -57,6 +58,7 @@ func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
 				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1),
 			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
 			IsPeriodic:       true,
+			ProcMask:         core.ProcMaskPeriodicDamage,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(650/5, 0.2),
 			OutcomeApplier:   priest.OutcomeFuncTick(),
 		}),

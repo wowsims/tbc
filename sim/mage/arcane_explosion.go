@@ -29,6 +29,7 @@ func (mage *Mage) registerArcaneExplosionSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncAOEDamage(sim, core.SpellEffect{
+			ProcMask:             core.ProcMaskSpellDamage,
 			BonusSpellHitRating:  float64(mage.Talents.ArcaneFocus) * 2 * core.SpellHitRatingPerHitChance,
 			BonusSpellCritRating: float64(mage.Talents.ArcaneImpact) * 2 * core.SpellCritRatingPerCritChance,
 

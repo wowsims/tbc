@@ -33,19 +33,15 @@ func (priest *Priest) registerShadowWordDeathSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-
-			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
-
+			ProcMask:             core.ProcMaskSpellDamage,
+			BonusSpellHitRating:  float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			BonusSpellCritRating: float64(priest.Talents.ShadowPower) * 3 * core.SpellCritRatingPerCritChance,
-
 			DamageMultiplier: 1 *
 				(1 + float64(priest.Talents.Darkness)*0.02) *
 				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1),
-
 			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
-
-			BaseDamage:     core.BaseDamageConfigMagic(572, 664, 0.429),
-			OutcomeApplier: priest.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
+			BaseDamage:       core.BaseDamageConfigMagic(572, 664, 0.429),
+			OutcomeApplier:   priest.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
 		}),
 	})
 }

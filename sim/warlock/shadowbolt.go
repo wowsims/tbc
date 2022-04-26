@@ -16,13 +16,13 @@ func (warlock *Warlock) registerShadowboltSpell(sim *core.Simulation) {
 	has4pMal := ItemSetMaleficRaiment.CharacterHasSetBonus(&warlock.Character, 4)
 
 	effect := core.SpellEffect{
+		ProcMask: core.ProcMaskSpellDamage,
 		BonusSpellCritRating: float64(warlock.Talents.Devastation)*1*core.SpellCritRatingPerCritChance +
 			float64(warlock.Talents.Backlash)*1*core.SpellCritRatingPerCritChance,
 		DamageMultiplier: 1 * core.TernaryFloat64(has4pMal, 1.06, 1.0) * (1 + 0.02*float64(warlock.Talents.ShadowMastery)),
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.DestructiveReach),
-		// TODO: so this would mean SB ratio is 1.057?
-		BaseDamage:     core.BaseDamageConfigMagic(544.0, 607.0, 0.857+0.04*float64(warlock.Talents.ShadowAndFlame)),
-		OutcomeApplier: warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
+		BaseDamage:       core.BaseDamageConfigMagic(544.0, 607.0, 0.857+0.04*float64(warlock.Talents.ShadowAndFlame)),
+		OutcomeApplier:   warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
 	}
 	if warlock.Talents.ImprovedShadowBolt > 0 {
 		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -81,7 +81,7 @@ func (warlock *Warlock) impShadowboltDebuffAura(target *core.Target) *core.Aura 
 			if spell.SpellSchool != core.SpellSchoolShadow {
 				return
 			}
-			if !spellEffect.Landed() || spellEffect.Damage == 0 {
+			if !spellEffect.Landed() || spellEffect.Damage == 0 || spellEffect.IsPhantom || spellEffect.ProcMask == 0 {
 				return
 			}
 			aura.RemoveStack(sim)

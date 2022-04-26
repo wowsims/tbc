@@ -34,7 +34,7 @@ func (priest *Priest) registerSmiteSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-
+			ProcMask:            core.ProcMaskSpellDamage,
 			BonusSpellHitRating: float64(priest.Talents.FocusedPower) * 2 * core.SpellHitRatingPerHitChance,
 
 			BonusSpellCritRating: float64(priest.Talents.HolySpecialization) * 1 * core.SpellCritRatingPerCritChance,

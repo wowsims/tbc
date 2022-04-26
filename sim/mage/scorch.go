@@ -15,6 +15,7 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 	baseCost := 180.0
 
 	effect := core.SpellEffect{
+		ProcMask:            core.ProcMaskSpellDamage,
 		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
 
 		BonusSpellCritRating: 0 +

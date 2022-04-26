@@ -29,7 +29,6 @@ func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) *core.Aura {
 			if !spellEffect.Landed() || spellEffect.Damage == 0 {
 				return
 			}
-
 			aura.RemoveStack(sim)
 		},
 	})

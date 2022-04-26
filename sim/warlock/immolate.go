@@ -24,6 +24,7 @@ func (warlock *Warlock) registerImmolateSpell(sim *core.Simulation) {
 		BaseDamage:       core.BaseDamageConfigMagic(332.0, 332.0, 0.2+0.04*float64(warlock.Talents.ShadowAndFlame)),
 		OutcomeApplier:   warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 0, 1))),
 		OnSpellHit:       applyDotOnLanded(&warlock.ImmolateDot),
+		ProcMask:         core.ProcMaskSpellDamage,
 	}
 
 	warlock.Immolate = warlock.RegisterSpell(core.SpellConfig{
@@ -58,6 +59,7 @@ func (warlock *Warlock) registerImmolateSpell(sim *core.Simulation) {
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(615/5, 0.13),
 			OutcomeApplier:   warlock.OutcomeFuncTick(),
 			IsPeriodic:       true,
+			ProcMask:         core.ProcMaskPeriodicDamage,
 		}),
 	})
 }

@@ -67,6 +67,7 @@ func (shaman *Shaman) newElectricSpellConfig(actionID core.ActionID, baseCost fl
 // Helper for precomputing spell effects.
 func (shaman *Shaman) newElectricSpellEffect(minBaseDamage float64, maxBaseDamage float64, spellCoefficient float64, isLightningOverload bool) core.SpellEffect {
 	effect := core.SpellEffect{
+		ProcMask:            core.ProcMaskSpellDamage,
 		BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
 		BonusSpellCritRating: 0 +
 			(float64(shaman.Talents.TidalMastery) * 1 * core.SpellCritRatingPerCritChance) +
