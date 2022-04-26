@@ -1149,3 +1149,9 @@ dps_results: {
   dps: 1291.7481792421445
  }
 }
+dps_results: {
+ key: "TestHunter-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 1544.871260342635
+ }
+}

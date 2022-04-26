@@ -915,3 +915,9 @@ dps_results: {
   dps: 1227.8321213966635
  }
 }
+dps_results: {
+ key: "TestRetribution-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 1595.7246404388216
+ }
+}

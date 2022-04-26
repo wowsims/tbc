@@ -1274,3 +1274,9 @@ dps_results: {
   dps: 1541.3041379026547
  }
 }
+dps_results: {
+ key: "TestElemental-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 1541.453678097859
+ }
+}

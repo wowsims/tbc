@@ -885,3 +885,9 @@ dps_results: {
   dps: 745.8540069345432
  }
 }
+dps_results: {
+ key: "TestArms-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 631.5891117969794
+ }
+}

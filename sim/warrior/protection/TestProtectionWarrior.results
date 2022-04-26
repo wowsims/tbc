@@ -897,3 +897,9 @@ dps_results: {
   dps: 254.90832761536342
  }
 }
+dps_results: {
+ key: "TestProtectionWarrior-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 571.9758647274016
+ }
+}

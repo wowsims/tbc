@@ -837,3 +837,9 @@ dps_results: {
   dps: 1062.6008675139979
  }
 }
+dps_results: {
+ key: "TestEnhancement-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 1712.515296232239
+ }
+}
