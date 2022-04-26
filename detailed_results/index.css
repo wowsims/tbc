@@ -1739,6 +1739,19 @@ body.new-tab {
 .metrics-table {
   color: var(--main-text-color);
   width: 100%;
+  font-size: 16px;
+}
+
+.melee-metrics-root .metrics-table {
+  font-size: 12px;
+}
+
+.hide-in-front-of-target.melee-metrics-root .metrics-table, .hide-threat-metrics .melee-metrics-root .metrics-table {
+  font-size: 14px;
+}
+
+.hide-threat-metrics .hide-in-front-of-target.melee-metrics-root .metrics-table {
+  font-size: 16px;
 }
 
 .metrics-table-header-row {

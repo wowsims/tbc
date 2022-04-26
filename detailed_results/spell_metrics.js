@@ -63,16 +63,16 @@ export class SpellMetricsTable extends MetricsTable {
                 getDisplayString: (metric) => metric.landedHits.toFixed(1),
             },
             {
-                name: 'Crit %',
-                tooltip: 'Crits / Hits',
-                getValue: (metric) => metric.critPercent,
-                getDisplayString: (metric) => metric.critPercent.toFixed(2) + '%',
-            },
-            {
                 name: 'Miss %',
                 tooltip: 'Misses / (Hits + Misses)',
                 getValue: (metric) => metric.missPercent,
                 getDisplayString: (metric) => metric.missPercent.toFixed(2) + '%',
+            },
+            {
+                name: 'Crit %',
+                tooltip: 'Crits / Hits',
+                getValue: (metric) => metric.critPercent,
+                getDisplayString: (metric) => metric.critPercent.toFixed(2) + '%',
             },
         ]);
     }

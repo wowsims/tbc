@@ -63,12 +63,6 @@ export class MeleeMetricsTable extends MetricsTable {
                 getDisplayString: (metric) => metric.landedHits.toFixed(1),
             },
             {
-                name: 'Crit %',
-                tooltip: 'Crits / Swings',
-                getValue: (metric) => metric.critPercent,
-                getDisplayString: (metric) => metric.critPercent.toFixed(2) + '%',
-            },
-            {
                 name: 'Miss %',
                 tooltip: 'Misses / Swings',
                 getValue: (metric) => metric.missPercent,
@@ -99,6 +93,12 @@ export class MeleeMetricsTable extends MetricsTable {
                 tooltip: 'Glances / Swings',
                 getValue: (metric) => metric.glancePercent,
                 getDisplayString: (metric) => metric.glancePercent.toFixed(2) + '%',
+            },
+            {
+                name: 'Crit %',
+                tooltip: 'Crits / Swings',
+                getValue: (metric) => metric.critPercent,
+                getDisplayString: (metric) => metric.critPercent.toFixed(2) + '%',
             },
         ]);
     }
