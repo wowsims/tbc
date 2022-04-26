@@ -85,11 +85,12 @@ class Player$Type extends MessageType {
             { no: 14, name: "warrior", kind: "message", oneof: "spec", T: () => Warrior },
             { no: 21, name: "protection_warrior", kind: "message", oneof: "spec", T: () => ProtectionWarrior },
             { no: 17, name: "talentsString", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
-            { no: 19, name: "cooldowns", kind: "message", T: () => Cooldowns }
+            { no: 19, name: "cooldowns", kind: "message", T: () => Cooldowns },
+            { no: 23, name: "in_front_of_target", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { name: "", race: 0, class: 0, bonusStats: [], spec: { oneofKind: undefined }, talentsString: "" };
+        const message = { name: "", race: 0, class: 0, bonusStats: [], spec: { oneofKind: undefined }, talentsString: "", inFrontOfTarget: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -209,6 +210,9 @@ class Player$Type extends MessageType {
                 case /* proto.Cooldowns cooldowns */ 19:
                     message.cooldowns = Cooldowns.internalBinaryRead(reader, reader.uint32(), options, message.cooldowns);
                     break;
+                case /* bool in_front_of_target */ 23:
+                    message.inFrontOfTarget = reader.bool();
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -291,6 +295,9 @@ class Player$Type extends MessageType {
         /* proto.Cooldowns cooldowns = 19; */
         if (message.cooldowns)
             Cooldowns.internalBinaryWrite(message.cooldowns, writer.tag(19, WireType.LengthDelimited).fork(), options).join();
+        /* bool in_front_of_target = 23; */
+        if (message.inFrontOfTarget !== false)
+            writer.tag(23, WireType.Varint).bool(message.inFrontOfTarget);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

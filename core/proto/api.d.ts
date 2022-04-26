@@ -159,6 +159,10 @@ export interface Player {
      * @generated from protobuf field: proto.Cooldowns cooldowns = 19;
      */
     cooldowns?: Cooldowns;
+    /**
+     * @generated from protobuf field: bool in_front_of_target = 23;
+     */
+    inFrontOfTarget: boolean;
 }
 /**
  * @generated from protobuf message proto.Party
