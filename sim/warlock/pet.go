@@ -277,7 +277,7 @@ var PetConfigs = map[proto.Warlock_Options_Summon]PetConfig{
 // Minion 		Health per bonus stamina 	Mana per bonus intellect
 // Imp 			~8.4 						~4.9
 // Voidwalker 	~11.0 						~11.5
-// Succubus		~9.1 						~11.5
+// Sayaad			~9.1 						~11.5
 // Felhunter 	~9.5 						~11.5
 // Felguard 	~11.0 						~11.5
 

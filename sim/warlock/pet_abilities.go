@@ -156,7 +156,7 @@ func (wp *WarlockPet) newLashOfPain(sim *core.Simulation) PetAbility {
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskSpellDamage,
-			DamageMultiplier: 1.0 * (1.0 + (0.1 * float64(wp.owner.Talents.ImprovedSuccubus))),
+			DamageMultiplier: 1.0 * (1.0 + (0.1 * float64(wp.owner.Talents.ImprovedSayaad))),
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagic(123, 123, 0.429),
 			OutcomeApplier:   wp.OutcomeFuncMagicHitAndCrit(2),
