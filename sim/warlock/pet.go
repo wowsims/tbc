@@ -48,6 +48,7 @@ func (warlock *Warlock) NewWarlockPet() *WarlockPet {
 		warlock.PseudoStats.DamageDealtMultiplier *= 1.05
 	}
 	wp.PseudoStats.DamageDealtMultiplier *= 1.0 + (0.04 * float64(warlock.Talents.UnholyPower))
+	wp.PseudoStats.InFrontOfTarget = warlock.PseudoStats.InFrontOfTarget
 
 	wp.EnableManaBar()
 

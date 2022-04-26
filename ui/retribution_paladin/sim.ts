@@ -233,6 +233,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.ISBUptime,
+					OtherInputs.InFrontOfTarget,
 				],
 			},
 			encounterPicker: {

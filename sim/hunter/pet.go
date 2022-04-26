@@ -48,6 +48,7 @@ func (hunter *Hunter) NewHunterPet() *HunterPet {
 
 	// Happiness
 	hp.PseudoStats.DamageDealtMultiplier *= 1.25
+	hp.PseudoStats.InFrontOfTarget = hunter.PseudoStats.InFrontOfTarget
 
 	hp.EnableFocusBar(1.0+0.5*float64(hunter.Talents.BestialDiscipline), func(sim *core.Simulation) {
 		if hp.GCD.IsReady(sim) {
