@@ -1,7 +1,6 @@
 package retribution
 
 import (
-	"sort"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -51,6 +50,7 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 		AutoSwingMelee: true,
 	})
 
+	// Setup Seal of Command after autos are enabled so that the PPM works
 	ret.SetupSealOfCommand()
 
 	return ret
@@ -76,6 +76,16 @@ func (ret *RetributionPaladin) GetPaladin() *paladin.Paladin {
 func (ret *RetributionPaladin) Init(sim *core.Simulation) {
 	ret.Paladin.Init(sim)
 	ret.DelayDPSCooldownsForArmorDebuffs(sim)
+
+	// Register Consecration here so we can setup the right rank based on UI input
+	switch ret.Rotation.ConsecrationRank {
+	case proto.RetributionPaladin_Rotation_Rank6:
+		ret.RegisterConsecrationSpell(sim, 6)
+	case proto.RetributionPaladin_Rotation_Rank4:
+		ret.RegisterConsecrationSpell(sim, 4)
+	case proto.RetributionPaladin_Rotation_Rank1:
+		ret.RegisterConsecrationSpell(sim, 1)
+	}
 }
 
 func (ret *RetributionPaladin) Reset(sim *core.Simulation) {
@@ -109,7 +119,7 @@ func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 		ret.openingRotation(sim)
 		return
 	}
-	ret.ActRotation(sim)
+	ret.mainRotation(sim)
 }
 
 func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
@@ -150,7 +160,16 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 	}
 }
 
-func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
+func (ret *RetributionPaladin) mainRotation(sim *core.Simulation) {
+	// Need to check for SoC early
+	socActive := ret.SealOfCommandAura.IsActive()
+
+	// If mana is low, do the low mana rotation instead
+	// Don't do the low mana rotation in the middle of a twist
+	if ret.CurrentMana() <= 1000 && !socActive {
+		ret.lowManaRotation(sim)
+	}
+
 	// Setup
 	target := sim.GetPrimaryTarget()
 
@@ -160,11 +179,10 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	judgementCD := ret.JudgementOfWisdom.TimeToReady(sim)
 
 	sobActive := ret.SealOfBloodAura.IsActive()
-	socActive := ret.SealOfCommandAura.IsActive()
 
 	nextSwingAt := ret.AutoAttacks.NextAttackAt()
 	timeTilNextSwing := nextSwingAt - sim.CurrentTime
-	//weaponSpeed := ret.AutoAttacks.MainhandSwingSpeed()
+	weaponSpeed := ret.AutoAttacks.MainhandSwingSpeed()
 
 	spellGCD := ret.SpellGCD()
 
@@ -174,7 +192,8 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 	willTwist := possibleTwist && (nextSwingAt+spellGCD <= nextCrusaderStrikeCD+ret.crusaderStrikeDelay)
 
 	// Use Judgement if we will prep Seal of Command
-	// Or if we can squeeze it in on a Crusader Strike Swing
+	// TO-DO: Add more aggressive judgment logic
+	// Should judge on crusader strike swings as well if we have enough time to refresh seal
 	if judgementCD == 0 && sobActive && willTwist {
 		ret.JudgementOfBlood.Cast(sim, target)
 		sobActive = false
@@ -197,11 +216,15 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 		} else if !sobActive && !socActive && !willTwist {
 			// If no seal is active, cast Seal of Blood
 			ret.SealOfBlood.Cast(sim, nil)
+		} else if !willTwist && !socActive &&
+			weaponSpeed > spellGCD*2 && spellGCD < crusaderStrikeCD {
+			// If there is literally nothing else to-do, cast fillers
+			// Only if it won't clip crusader strike
+			ret.useFillers(sim, target)
 		}
 	}
 
-	// Determine when next action is available
-	// Throw everything into an array then filter and sort compared to doing individual comparisons
+	// All possible next events
 	events := []time.Duration{
 		nextSwingAt,
 		nextSwingAt - twistWindow,
@@ -210,74 +233,87 @@ func (ret *RetributionPaladin) ActRotation(sim *core.Simulation) {
 		ret.CrusaderStrike.CD.ReadyAt(),
 	}
 
-	// Time has to move forward... so exclude any events that are at current time
-	n := 0
-	for _, elem := range events {
-		if elem > sim.CurrentTime {
-			events[n] = elem
-			n++
+	ret.waitUntilNextEvent(sim, events)
+}
+
+//
+func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Target) {
+
+	// If the target is a demon and exorcism is up, cast exorcism
+	if ret.Rotation.UseExorcism &&
+		target.MobType == proto.MobType_MobTypeDemon &&
+		ret.Exorcism.IsReady(sim) {
+
+		ret.Exorcism.Cast(sim, target)
+		return
+	}
+
+	// If we can't exorcise, try to consecrate
+	if ret.Rotation.ConsecrationRank != proto.RetributionPaladin_Rotation_None &&
+		ret.Consecration.IsReady(sim) {
+		ret.Consecration.Cast(sim, target)
+		return
+	}
+}
+
+// Just roll seal of blood and cast crusader strike on CD to conserve mana
+func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
+	target := sim.GetPrimaryTarget()
+
+	sobExpiration := ret.SealOfBloodAura.ExpiresAt()
+
+	nextSwingAt := ret.AutoAttacks.NextAttackAt()
+	// Roll seal of blood
+	if sim.CurrentTime+time.Second >= sobExpiration {
+		sobAndJudgementCost := ret.JudgementOfBlood.DefaultCast.Cost + ret.SealOfBlood.DefaultCast.Cost
+		if ret.CanJudgementOfBlood(sim) && ret.CurrentMana() >= sobAndJudgementCost {
+			ret.JudgementOfBlood.Cast(sim, target)
+		}
+		if ret.GCD.IsReady(sim) {
+			ret.SealOfBlood.Cast(sim, target)
+		}
+	} else if ret.GCD.IsReady(sim) && ret.CrusaderStrike.CD.IsReady(sim) {
+		spellGCD := ret.SpellGCD()
+		sobAndCSCost := ret.CrusaderStrike.DefaultCast.Cost + ret.SealOfBlood.DefaultCast.Cost
+
+		if !(spellGCD+sim.CurrentTime > nextSwingAt && sobExpiration < nextSwingAt) &&
+			(ret.CurrentMana() >= sobAndCSCost) {
+			// Crusader strike unless it will cause seal of blood to drop
+			// Or we won't have enough mana to reseal
+			ret.CrusaderStrike.Cast(sim, target)
 		}
 	}
 
-	filteredEvents := events[:n]
+	events := []time.Duration{
+		ret.GCD.ReadyAt(),
+		ret.CrusaderStrike.CD.ReadyAt(),
+		// ret.TimeUntilManaRegen(sobAndCSCost),
+		sobExpiration - time.Second,
+	}
 
-	// Sort it to get minimum element
-	sort.Slice(filteredEvents, func(i, j int) bool { return events[i] < events[j] })
+	ret.waitUntilNextEvent(sim, events)
+}
 
+// Helper function for finding the next event
+func (ret *RetributionPaladin) waitUntilNextEvent(sim *core.Simulation, events []time.Duration) {
+	// Find the minimum possible next event that is greater than the current time
+	nextEventAt := events[0]
+	for _, elem := range events {
+		if elem > sim.CurrentTime && elem < nextEventAt {
+			nextEventAt = elem
+		}
+	}
 	// If the next action is  the GCD, just return
-	if filteredEvents[0] == ret.GCD.ReadyAt() {
+	if nextEventAt == ret.GCD.ReadyAt() {
 		return
 	}
 
 	// Otherwise add a pending action for the next time
 	pa := &core.PendingAction{
 		Priority:     core.ActionPriorityLow,
-		OnAction:     ret.ActRotation,
-		NextActionAt: filteredEvents[0],
+		OnAction:     ret.mainRotation,
+		NextActionAt: nextEventAt,
 	}
 
 	sim.AddPendingAction(pa)
-}
-
-func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Target, sobActive bool) {
-
-}
-
-// Once filler moves are implemented, experiment with various mana settings
-// See if its needed to use 2007 rotation or a variation at low mana
-func (ret *RetributionPaladin) _2007Rotation(sim *core.Simulation) {
-	target := sim.GetPrimaryTarget()
-
-	// judge blood whenever we can
-	if ret.CanJudgementOfBlood(sim) {
-		success := ret.JudgementOfBlood.Cast(sim, target)
-		if !success {
-			ret.WaitForMana(sim, ret.JudgementOfBlood.CurCast.Cost)
-		}
-	}
-
-	// roll seal of blood
-	if !ret.SealOfBloodAura.IsActive() {
-		if success := ret.SealOfBlood.Cast(sim, nil); !success {
-			ret.WaitForMana(sim, ret.SealOfBlood.CurCast.Cost)
-		}
-		return
-	}
-
-	// Crusader strike if we can
-	if ret.CrusaderStrike.IsReady(sim) {
-		success := ret.CrusaderStrike.Cast(sim, target)
-		if !success {
-			ret.WaitForMana(sim, ret.CrusaderStrike.CurCast.Cost)
-		}
-		return
-	}
-
-	// Proceed until SoB expires, CrusaderStrike comes off GCD, or Judgement comes off GCD
-	nextEventAt := ret.CrusaderStrike.CD.ReadyAt()
-	sobExpiration := sim.CurrentTime + ret.SealOfBloodAura.RemainingDuration(sim)
-	nextEventAt = core.MinDuration(nextEventAt, sobExpiration)
-	// Waiting for judgement CD causes a bug that infinite loops for some reason
-	// nextEventAt = core.MinDuration(nextEventAt, ret.CDReadyAt(paladin.JudgementCD))
-	ret.WaitUntil(sim, nextEventAt)
 }
