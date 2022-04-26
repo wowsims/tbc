@@ -44,7 +44,7 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 			warlock.AmplifyCurse.Cast(sim, sim.GetPrimaryTarget())
 		}
 		if sim.Duration-sim.CurrentTime < time.Minute {
-			if !warlock.CurseOfAgonyDot.IsActive() {
+			if sim.Duration-sim.CurrentTime > time.Second*30 && !warlock.CurseOfAgonyDot.IsActive() {
 				spell = warlock.CurseOfAgony
 			}
 		} else if warlock.CurseOfDoom.CD.IsReady(sim) && !warlock.CurseOfDoomDot.IsActive() {
