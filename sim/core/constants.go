@@ -29,6 +29,8 @@ const ParryRatingPerParryChance = 23.6538
 const ResilienceRatingPerCritReductionChance = 39.4231
 const ResilienceRatingPerCritDamageReductionPercent = 39.4231 / 2
 
+const LevelBasedNPCSpellResistancePerLevel = 28.0 / 3
+
 // IDs for items used in core
 const (
 	ItemIDAtieshMage            = 22589
