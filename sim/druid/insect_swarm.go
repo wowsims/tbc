@@ -31,6 +31,7 @@ func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			OutcomeApplier:   druid.OutcomeFuncMagicHit(),

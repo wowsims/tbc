@@ -115,8 +115,8 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			IsPhantom: true,
-
+			IsPhantom:      true,
+			ProcMask:       core.ProcMaskEmpty,
 			OutcomeApplier: paladin.OutcomeFuncAlwaysHit(),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {

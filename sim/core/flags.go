@@ -196,6 +196,27 @@ func (ss SpellSchool) Stat() stats.Stat {
 	return 0
 }
 
+func (ss SpellSchool) ResistanceStat() stats.Stat {
+	switch ss {
+	case SpellSchoolArcane:
+		return stats.ArcaneResistance
+	case SpellSchoolFire:
+		return stats.FireResistance
+	case SpellSchoolFrost:
+		return stats.FrostResistance
+	case SpellSchoolHoly:
+		return 0 // Holy resistance doesn't exist.
+	case SpellSchoolNature:
+		return stats.NatureResistance
+	case SpellSchoolShadow:
+		return stats.ShadowResistance
+	case SpellSchoolPhysical:
+		return stats.Armor
+	}
+
+	return 0
+}
+
 // Returns whether there is any overlap between the given masks.
 func (ss SpellSchool) Matches(other SpellSchool) bool {
 	return (ss & other) != 0

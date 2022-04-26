@@ -16,6 +16,7 @@ func (warlock *Warlock) registerIncinerateSpell(sim *core.Simulation) {
 	has4pMal := ItemSetMaleficRaiment.CharacterHasSetBonus(&warlock.Character, 4)
 
 	effect := core.SpellEffect{
+		ProcMask: core.ProcMaskSpellDamage,
 		BonusSpellCritRating: float64(warlock.Talents.Devastation)*1*core.SpellCritRatingPerCritChance +
 			float64(warlock.Talents.Backlash)*1*core.SpellCritRatingPerCritChance,
 		DamageMultiplier: 1 * core.TernaryFloat64(has4pMal, 1.06, 1.0),

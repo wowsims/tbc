@@ -52,6 +52,7 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 				},
 			},
 		}, core.SpellEffect{
+			ProcMask:            core.ProcMaskSpellDamage,
 			BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
 			BonusSpellPower: 0 +
 				core.TernaryFloat64(shaman.Equip[items.ItemSlotRanged].ID == TotemOfRage, 30, 0) +
@@ -111,6 +112,7 @@ func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation, shockTimer *
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(420/4, 0.1),
 			OutcomeApplier:   shaman.OutcomeFuncTick(),
 			IsPeriodic:       true,
+			ProcMask:         core.ProcMaskPeriodicDamage,
 		}),
 	})
 }

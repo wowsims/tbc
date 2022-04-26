@@ -34,6 +34,7 @@ func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:            core.ProcMaskEmpty,
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
 			OutcomeApplier:      priest.OutcomeFuncMagicHit(),
@@ -62,6 +63,7 @@ func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
 			IsPeriodic:       true,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(1216/8, 0.1),
 			OutcomeApplier:   priest.OutcomeFuncTick(),
+			ProcMask:         core.ProcMaskPeriodicDamage,
 		}),
 	})
 }

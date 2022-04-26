@@ -37,6 +37,7 @@ func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Spell
 	spellCoefficient += 0.04 * float64(druid.Talents.WrathOfCenarius)
 
 	effect := core.SpellEffect{
+		ProcMask:             core.ProcMaskSpellDamage,
 		BonusSpellCritRating: (float64(druid.Talents.FocusedStarlight) * 2 * core.SpellCritRatingPerCritChance) + core.TernaryFloat64(ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 4), 5*core.SpellCritRatingPerCritChance, 0),
 		DamageMultiplier:     1 + 0.02*float64(druid.Talents.Moonfury),
 		ThreatMultiplier:     1,

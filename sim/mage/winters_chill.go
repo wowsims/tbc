@@ -11,6 +11,7 @@ var WintersChillActionID = core.ActionID{SpellID: SpellIDWintersChill}
 // Winters Chill has a separate hit check from frostbolt, so it needs its own spell.
 func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 	effect := core.SpellEffect{
+		ProcMask:            core.ProcMaskEmpty,
 		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
 		ThreatMultiplier:    1,
 		OutcomeApplier:      mage.OutcomeFuncMagicHit(),

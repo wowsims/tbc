@@ -90,9 +90,9 @@ func ApplyTimbals(agent core.Agent) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
-
-			BaseDamage:     core.BaseDamageConfigRoll(285, 475),
-			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			ProcMask:         core.ProcMaskEmpty,
+			BaseDamage:       core.BaseDamageConfigRoll(285, 475),
+			OutcomeApplier:   character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 
