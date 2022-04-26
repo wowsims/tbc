@@ -53,7 +53,7 @@ func (mage *Mage) procIgnite(sim *core.Simulation, target *core.Target, damageFr
 		ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 		IsPeriodic:       true,
 		BaseDamage:       core.BaseDamageConfigFlat(newTickDamage),
-		OutcomeApplier:   core.OutcomeFuncTick(),
+		OutcomeApplier:   mage.OutcomeFuncTick(),
 	})
 	igniteDot.Apply(sim)
 }

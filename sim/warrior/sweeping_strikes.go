@@ -35,7 +35,7 @@ func (warrior *Warrior) registerSweepingStrikesCD() {
 					return curDmg
 				},
 			},
-			OutcomeApplier: core.OutcomeFuncAlwaysHit(),
+			OutcomeApplier: warrior.OutcomeFuncAlwaysHit(),
 		}),
 	})
 

@@ -22,7 +22,7 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 		ThreatMultiplier: 1,
 
 		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 0, 1, true),
-		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+		OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 	}
 	baseEffectOH := core.SpellEffect{
 		ProcMask: core.ProcMaskMeleeOHSpecial,
@@ -31,7 +31,7 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 		ThreatMultiplier: 1,
 
 		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.OffHand, true, 0, 1, true),
-		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+		OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())

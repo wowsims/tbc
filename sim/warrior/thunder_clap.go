@@ -27,7 +27,7 @@ func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 		DamageMultiplier: impTCDamageMult,
 		ThreatMultiplier: 1.75,
 		BaseDamage:       core.BaseDamageConfigFlat(123),
-		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(warrior.spellCritMultiplier(true)),
+		OutcomeApplier:   warrior.OutcomeFuncMagicHitAndCrit(warrior.spellCritMultiplier(true)),
 	}
 
 	numHits := core.MinInt32(4, sim.GetNumTargets())

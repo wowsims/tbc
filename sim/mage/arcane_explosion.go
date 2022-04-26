@@ -36,7 +36,7 @@ func (mage *Mage) registerArcaneExplosionSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 
 			BaseDamage:     core.BaseDamageConfigMagic(249, 270, 0.214),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
+			OutcomeApplier: mage.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
 		}),
 	})
 }

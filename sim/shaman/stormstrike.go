@@ -39,7 +39,7 @@ func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
 	effect := core.SpellEffect{
 		DamageMultiplier: 1,
 		ThreatMultiplier: core.TernaryFloat64(shaman.Talents.SpiritWeapons, 0.7, 1),
-		OutcomeApplier:   core.OutcomeFuncMeleeSpecialCritOnly(shaman.DefaultMeleeCritMultiplier()),
+		OutcomeApplier:   shaman.OutcomeFuncMeleeSpecialCritOnly(shaman.DefaultMeleeCritMultiplier()),
 	}
 
 	flatDamageBonus := core.TernaryFloat64(ItemSetCycloneHarness.CharacterHasSetBonus(&shaman.Character, 4), 30, 0)
@@ -98,7 +98,7 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
-			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHit(),
+			OutcomeApplier:   shaman.OutcomeFuncMeleeSpecialHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return

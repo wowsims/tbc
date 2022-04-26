@@ -56,7 +56,7 @@ func (mage *Mage) newArcaneBlastSpell(sim *core.Simulation, numStacks int32) *co
 			ThreatMultiplier: 1 - 0.2*float64(mage.Talents.ArcaneSubtlety),
 
 			BaseDamage:     core.BaseDamageConfigMagic(668, 772, 2.5/3.5),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
+			OutcomeApplier: mage.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
 		}),
 	})
 }

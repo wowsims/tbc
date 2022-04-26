@@ -27,7 +27,7 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(206, 0.107),
-			OutcomeApplier:   core.OutcomeFuncTick(),
+			OutcomeApplier:   druid.OutcomeFuncTick(),
 			IsPeriodic:       true,
 		}),
 	})

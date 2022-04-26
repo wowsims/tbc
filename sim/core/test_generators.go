@@ -411,6 +411,8 @@ type CharacterSuiteConfig struct {
 	Consumes    *proto.Consumes
 	Debuffs     *proto.Debuffs
 
+	InFrontOfTarget bool
+
 	OtherRaces       []proto.Race
 	OtherGearSets    []GearSetCombo
 	OtherSpecOptions []SpecOptionsCombo
@@ -433,6 +435,8 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 			Equipment: config.GearSet.GearSet,
 			Consumes:  config.Consumes,
 			Buffs:     config.PlayerBuffs,
+
+			InFrontOfTarget: config.InFrontOfTarget,
 		},
 		config.SpecOptions.SpecOptions)
 

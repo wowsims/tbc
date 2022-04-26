@@ -31,7 +31,7 @@ func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
 
 			BaseDamage:     core.BaseDamageConfigMagicNoRoll(184, 0.119),
-			OutcomeApplier: core.OutcomeFuncTick(),
+			OutcomeApplier: mage.OutcomeFuncTick(),
 			IsPeriodic:     true,
 		}),
 	})

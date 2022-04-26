@@ -26,7 +26,7 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 		ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 
 		BaseDamage:     core.BaseDamageConfigMagic(305, 361, 1.5/3.5),
-		OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
+		OutcomeApplier: mage.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
 	}
 
 	if mage.Talents.ImprovedScorch > 0 {

@@ -49,7 +49,7 @@ func (rogue *Rogue) makeEnvenom(comboPoints int32) *core.Spell {
 				},
 				TargetSpellCoefficient: 0,
 			},
-			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, false)),
+			OutcomeApplier: rogue.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, false)),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					rogue.ApplyFinisher(sim, spell.ActionID)

@@ -332,7 +332,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 					return curDmg
 				},
 			},
-			OutcomeApplier: core.OutcomeFuncAlwaysHit(),
+			OutcomeApplier: rogue.OutcomeFuncAlwaysHit(),
 		}),
 	})
 

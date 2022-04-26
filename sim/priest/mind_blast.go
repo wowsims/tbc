@@ -49,7 +49,7 @@ func (priest *Priest) registerMindBlastSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
 
 			BaseDamage:     core.BaseDamageConfigMagic(711, 752, 0.429),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
+			OutcomeApplier: priest.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
 		}),
 	})
 }

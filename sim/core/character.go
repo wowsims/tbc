@@ -99,6 +99,8 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 	character.AddStats(bonusStats)
 	character.addUniversalStatDependencies()
 
+	character.PseudoStats.InFrontOfTarget = player.InFrontOfTarget
+
 	return character
 }
 
