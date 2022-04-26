@@ -39,7 +39,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation, cdTi
 		ThreatMultiplier: 1,
 
 		BaseDamage:     core.BaseDamageConfigMagic(295, 325, 0.429),
-		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
 
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			paladin.sanctifiedJudgement(sim, paladin.SealOfBlood.DefaultCast.Cost)
@@ -105,7 +105,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			IsPhantom: true,
 
-			OutcomeApplier: core.OutcomeFuncAlwaysHit(),
+			OutcomeApplier: paladin.OutcomeFuncAlwaysHit(),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
@@ -149,7 +149,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation, cdT
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			OutcomeApplier: core.OutcomeFuncMagicHit(),
+			OutcomeApplier: paladin.OutcomeFuncMagicHit(),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {

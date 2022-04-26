@@ -328,6 +328,16 @@ export class UnitMetrics {
 		return this.petActionId != null;
 	}
 
+	get inFrontOfTarget() {
+		if (this.target != null) {
+			return true;
+		} else if (this.player != null) {
+			return this.player.inFrontOfTarget;
+		} else {
+			return false; // TODO pets
+		}
+	}
+
 	get maxThreat() {
 		return this.threatLogs[this.threatLogs.length - 1]?.threatAfter || 0;
 	}
@@ -839,8 +849,8 @@ export class TargetedActionMetrics {
 	// Merges an array of metrics into a single metric.
 	static merge(actions: Array<TargetedActionMetrics>): TargetedActionMetrics {
 		return new TargetedActionMetrics(
-			actions[0].iterations,
-			actions[0].duration,
+			actions[0]?.iterations || 1,
+			actions[0]?.duration || 1,
 			TargetedActionMetricsProto.create({
 				casts: sum(actions.map(a => a.data.casts)),
 				hits: sum(actions.map(a => a.data.hits)),

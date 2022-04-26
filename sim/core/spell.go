@@ -44,8 +44,8 @@ type Spell struct {
 	// ID for this spell.
 	ActionID
 
-	// The character who will perform this spell.
-	Character *Character
+	// The unit who will perform this spell.
+	Unit *Unit
 
 	// Fire, Frost, Shadow, etc.
 	SpellSchool SpellSchool
@@ -79,15 +79,15 @@ type Spell struct {
 	DisableMetrics bool
 }
 
-// Registers a new spell to the character. Returns the newly created spell.
-func (character *Character) RegisterSpell(config SpellConfig) *Spell {
-	if len(character.Spellbook) > 100 {
+// Registers a new spell to the unit. Returns the newly created spell.
+func (unit *Unit) RegisterSpell(config SpellConfig) *Spell {
+	if len(unit.Spellbook) > 100 {
 		panic(fmt.Sprintf("Over 100 registered spells when registering %s! There is probably a spell being registered every iteration.", config.ActionID))
 	}
 
 	spell := &Spell{
 		ActionID:     config.ActionID,
-		Character:    character,
+		Unit:         unit,
 		SpellSchool:  config.SpellSchool,
 		SpellExtras:  config.SpellExtras,
 		ResourceType: config.ResourceType,
@@ -107,14 +107,14 @@ func (character *Character) RegisterSpell(config SpellConfig) *Spell {
 		spell.ApplyEffects = func(*Simulation, *Target, *Spell) {}
 	}
 
-	character.Spellbook = append(character.Spellbook, spell)
+	unit.Spellbook = append(unit.Spellbook, spell)
 
 	return spell
 }
 
 // Returns the first registered spell with the given ID, or nil if there are none.
-func (character *Character) GetSpell(actionID ActionID) *Spell {
-	for _, spell := range character.Spellbook {
+func (unit *Unit) GetSpell(actionID ActionID) *Spell {
+	for _, spell := range unit.Spellbook {
 		if spell.ActionID.SameAction(actionID) {
 			return spell
 		}
@@ -123,10 +123,10 @@ func (character *Character) GetSpell(actionID ActionID) *Spell {
 }
 
 // Retrieves an existing spell with the same ID as the config uses, or registers it if there is none.
-func (character *Character) GetOrRegisterSpell(config SpellConfig) *Spell {
-	registered := character.GetSpell(config.ActionID)
+func (unit *Unit) GetOrRegisterSpell(config SpellConfig) *Spell {
+	registered := unit.GetSpell(config.ActionID)
 	if registered == nil {
-		return character.RegisterSpell(config)
+		return unit.RegisterSpell(config)
 	} else {
 		return registered
 	}
@@ -153,7 +153,7 @@ func (spell *Spell) reset(sim *Simulation) {
 
 func (spell *Spell) doneIteration() {
 	if !spell.DisableMetrics {
-		spell.Character.Metrics.addSpell(spell)
+		spell.Unit.Metrics.addSpell(spell)
 	}
 }
 
@@ -172,9 +172,9 @@ func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
 // Skips the actual cast and applies spell effects immediately.
 func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Target) {
 	if sim.Log != nil {
-		spell.Character.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
+		spell.Unit.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
 			spell.ActionID, spell.DefaultCast.Cost, 0)
-		spell.Character.Log(sim, "Completed cast %s", spell.ActionID)
+		spell.Unit.Log(sim, "Completed cast %s", spell.ActionID)
 	}
 	spell.applyEffects(sim, target)
 }

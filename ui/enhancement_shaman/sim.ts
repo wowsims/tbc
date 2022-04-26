@@ -245,6 +245,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 					ShamanInputs.SnapshotT42Pc,
 					OtherInputs.SnapshotBsSolarianSapphire,
 					OtherInputs.SnapshotBsT2,
+					OtherInputs.InFrontOfTarget,
 				],
 			},
 			customSections: [

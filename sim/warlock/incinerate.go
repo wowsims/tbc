@@ -21,12 +21,12 @@ func (warlock *Warlock) registerIncinerateSpell(sim *core.Simulation) {
 		DamageMultiplier: 1 * core.TernaryFloat64(has4pMal, 1.06, 1.0),
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.DestructiveReach),
 		BaseDamage:       warlock.incinerateDamage(),
-		OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
+		OutcomeApplier:   warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
 	}
 
 	warlock.Incinerate = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:    Incinerate2ActionID,
-		SpellSchool: core.SpellSchoolShadow,
+		SpellSchool: core.SpellSchoolFire,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

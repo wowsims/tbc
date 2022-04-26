@@ -16,7 +16,7 @@ const EnergyPerTick = 20.2
 type OnEnergyGain func(sim *Simulation)
 
 type energyBar struct {
-	character *Character
+	unit *Unit
 
 	maxEnergy     float64
 	currentEnergy float64
@@ -30,16 +30,16 @@ type energyBar struct {
 	EnergyTickMultiplier float64
 }
 
-func (character *Character) EnableEnergyBar(maxEnergy float64, onEnergyGain OnEnergyGain) {
-	character.energyBar = energyBar{
-		character:    character,
+func (unit *Unit) EnableEnergyBar(maxEnergy float64, onEnergyGain OnEnergyGain) {
+	unit.energyBar = energyBar{
+		unit:         unit,
 		maxEnergy:    MaxFloat(100, maxEnergy),
 		onEnergyGain: onEnergyGain,
 	}
 }
 
-func (character *Character) HasEnergyBar() bool {
-	return character.energyBar.character != nil
+func (unit *Unit) HasEnergyBar() bool {
+	return unit.energyBar.unit != nil
 }
 
 func (eb *energyBar) CurrentEnergy() float64 {
@@ -56,10 +56,10 @@ func (eb *energyBar) addEnergyInternal(sim *Simulation, amount float64, actionID
 	}
 
 	newEnergy := MinFloat(eb.currentEnergy+amount, eb.maxEnergy)
-	eb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeEnergy, amount, newEnergy-eb.currentEnergy)
+	eb.unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeEnergy, amount, newEnergy-eb.currentEnergy)
 
 	if sim.Log != nil {
-		eb.character.Log(sim, "Gained %0.3f energy from %s (%0.3f --> %0.3f).", amount, actionID, eb.currentEnergy, newEnergy)
+		eb.unit.Log(sim, "Gained %0.3f energy from %s (%0.3f --> %0.3f).", amount, actionID, eb.currentEnergy, newEnergy)
 	}
 
 	eb.currentEnergy = newEnergy
@@ -75,10 +75,10 @@ func (eb *energyBar) SpendEnergy(sim *Simulation, amount float64, actionID Actio
 	}
 
 	newEnergy := eb.currentEnergy - amount
-	eb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeEnergy, -amount, -amount)
+	eb.unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeEnergy, -amount, -amount)
 
 	if sim.Log != nil {
-		eb.character.Log(sim, "Spent %0.3f energy from %s (%0.3f --> %0.3f).", amount, actionID, eb.currentEnergy, newEnergy)
+		eb.unit.Log(sim, "Spent %0.3f energy from %s (%0.3f --> %0.3f).", amount, actionID, eb.currentEnergy, newEnergy)
 	}
 
 	eb.currentEnergy = newEnergy
@@ -90,10 +90,10 @@ func (eb *energyBar) ComboPoints() int32 {
 
 func (eb *energyBar) AddComboPoints(sim *Simulation, pointsToAdd int32, actionID ActionID) {
 	newComboPoints := MinInt32(eb.comboPoints+pointsToAdd, 5)
-	eb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, float64(pointsToAdd), float64(newComboPoints-eb.comboPoints))
+	eb.unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, float64(pointsToAdd), float64(newComboPoints-eb.comboPoints))
 
 	if sim.Log != nil {
-		eb.character.Log(sim, "Gained %d combo points from %s (%d --> %d)", pointsToAdd, actionID, eb.comboPoints, newComboPoints)
+		eb.unit.Log(sim, "Gained %d combo points from %s (%d --> %d)", pointsToAdd, actionID, eb.comboPoints, newComboPoints)
 	}
 
 	eb.comboPoints = newComboPoints
@@ -105,7 +105,6 @@ func (eb *energyBar) ResetEnergyTick(sim *Simulation) {
 	partialTickAmount := (EnergyPerTick * eb.EnergyTickMultiplier) * (float64(timeSinceLastTick) / float64(EnergyTickDuration))
 
 	eb.addEnergyInternal(sim, partialTickAmount, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
-	eb.character.TryUseCooldowns(sim)
 	eb.onEnergyGain(sim)
 
 	eb.newTickAction(sim, false)
@@ -113,9 +112,9 @@ func (eb *energyBar) ResetEnergyTick(sim *Simulation) {
 
 func (eb *energyBar) SpendComboPoints(sim *Simulation, actionID ActionID) {
 	if sim.Log != nil {
-		eb.character.Log(sim, "Spent %d combo points from %s (%d --> %d).", eb.comboPoints, actionID, eb.comboPoints, 0)
+		eb.unit.Log(sim, "Spent %d combo points from %s (%d --> %d).", eb.comboPoints, actionID, eb.comboPoints, 0)
 	}
-	eb.character.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, float64(-eb.comboPoints), float64(-eb.comboPoints))
+	eb.unit.Metrics.AddResourceEvent(actionID, proto.ResourceType_ResourceTypeComboPoints, float64(-eb.comboPoints), float64(-eb.comboPoints))
 	eb.comboPoints = 0
 }
 
@@ -135,7 +134,6 @@ func (eb *energyBar) newTickAction(sim *Simulation, randomTickTime bool) {
 	}
 	pa.OnAction = func(sim *Simulation) {
 		eb.addEnergyInternal(sim, EnergyPerTick*eb.EnergyTickMultiplier, ActionID{OtherID: proto.OtherAction_OtherActionEnergyRegen})
-		eb.character.TryUseCooldowns(sim)
 		eb.onEnergyGain(sim)
 
 		pa.NextActionAt = sim.CurrentTime + EnergyTickDuration
@@ -146,7 +144,7 @@ func (eb *energyBar) newTickAction(sim *Simulation, randomTickTime bool) {
 }
 
 func (eb *energyBar) reset(sim *Simulation) {
-	if eb.character == nil {
+	if eb.unit == nil {
 		return
 	}
 

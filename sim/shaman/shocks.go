@@ -66,7 +66,7 @@ func (shaman *Shaman) registerEarthShockSpell(sim *core.Simulation, shockTimer *
 	config.SpellExtras |= core.SpellExtrasBinary
 
 	effect.BaseDamage = core.BaseDamageConfigMagic(661, 696, 0.386)
-	effect.OutcomeApplier = core.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
+	effect.OutcomeApplier = shaman.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
 	config.ApplyEffects = core.ApplyEffectFuncDirectDamage(effect)
 
 	shaman.EarthShock = shaman.RegisterSpell(config)
@@ -76,7 +76,7 @@ func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation, shockTimer *
 	config, effect := shaman.newShockSpellConfig(sim, SpellIDFlameShock, core.SpellSchoolFire, 500.0, shockTimer)
 
 	effect.BaseDamage = core.BaseDamageConfigMagic(377, 377, 0.214)
-	effect.OutcomeApplier = core.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
+	effect.OutcomeApplier = shaman.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
 	if effect.OnSpellHit == nil {
 		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
@@ -109,7 +109,7 @@ func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation, shockTimer *
 			DamageMultiplier: 1 * (1 + 0.01*float64(shaman.Talents.Concussion)),
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(420/4, 0.1),
-			OutcomeApplier:   core.OutcomeFuncTick(),
+			OutcomeApplier:   shaman.OutcomeFuncTick(),
 			IsPeriodic:       true,
 		}),
 	})
@@ -121,7 +121,7 @@ func (shaman *Shaman) registerFrostShockSpell(sim *core.Simulation, shockTimer *
 
 	effect.ThreatMultiplier *= 2
 	effect.BaseDamage = core.BaseDamageConfigMagic(647, 683, 0.386)
-	effect.OutcomeApplier = core.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
+	effect.OutcomeApplier = shaman.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
 	config.ApplyEffects = core.ApplyEffectFuncDirectDamage(effect)
 
 	shaman.FrostShock = shaman.RegisterSpell(config)

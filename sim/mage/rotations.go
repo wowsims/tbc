@@ -42,7 +42,7 @@ func (mage *Mage) tryUseGCD(sim *core.Simulation) {
 		if sim.Log != nil {
 			mage.Log(sim, "Waiting for AB stacks to drop: %0.02f", waitTime.Seconds())
 		}
-		mage.Metrics.MarkOOM(&mage.Character, waitTime)
+		mage.Metrics.MarkOOM(&mage.Unit, waitTime)
 		mage.WaitUntil(sim, sim.CurrentTime+waitTime)
 	} else {
 		mage.WaitForMana(sim, spell.CurCast.Cost)

@@ -13,7 +13,7 @@ func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 	effect := core.SpellEffect{
 		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
 		ThreatMultiplier:    1,
-		OutcomeApplier:      core.OutcomeFuncMagicHit(),
+		OutcomeApplier:      mage.OutcomeFuncMagicHit(),
 	}
 
 	if mage.Talents.WintersChill > 0 {

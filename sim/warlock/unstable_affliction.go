@@ -14,15 +14,6 @@ var UnstableAff3ActionID = core.ActionID{SpellID: SpellIDUnstableAff3}
 
 func (warlock *Warlock) registerUnstableAffSpell(sim *core.Simulation) {
 	baseCost := 400.0
-	effect := core.SpellEffect{
-		OutcomeApplier: core.OutcomeFuncMagicHit(),
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.Landed() {
-				warlock.UnstableAffDot.Apply(sim)
-			}
-		},
-	}
-
 	warlock.UnstableAff = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:     UnstableAff3ActionID,
 		SpellSchool:  core.SpellSchoolShadow,
@@ -35,12 +26,14 @@ func (warlock *Warlock) registerUnstableAffSpell(sim *core.Simulation) {
 				CastTime: time.Millisecond * 1500,
 			},
 		},
-		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			OutcomeApplier: warlock.OutcomeFuncMagicHit(),
+			OnSpellHit:     applyDotOnLanded(&warlock.UnstableAffDot),
+		}),
 	})
 
 	target := sim.GetPrimaryTarget()
 	spellCoefficient := 0.2
-
 	warlock.UnstableAffDot = core.NewDot(core.Dot{
 		Spell: warlock.UnstableAff,
 		Aura: target.RegisterAura(core.Aura{
@@ -53,7 +46,7 @@ func (warlock *Warlock) registerUnstableAffSpell(sim *core.Simulation) {
 			DamageMultiplier: 1 * (1 + 0.02*float64(warlock.Talents.ShadowMastery)),
 			ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.ImprovedDrainSoul),
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(1050/6, spellCoefficient),
-			OutcomeApplier:   core.OutcomeFuncTick(),
+			OutcomeApplier:   warlock.OutcomeFuncTick(),
 			IsPeriodic:       true,
 		}),
 	})

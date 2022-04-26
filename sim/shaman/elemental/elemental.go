@@ -190,7 +190,7 @@ func (rotation *FixedRotation) DoAction(eleShaman *ElementalShaman, sim *core.Si
 	}
 
 	if spell == nil {
-		common.NewWaitAction(sim, eleShaman.GetCharacter(), eleShaman.ChainLightning.TimeToReady(sim), common.WaitReasonRotation).Cast(sim)
+		common.NewWaitAction(sim, &eleShaman.Unit, eleShaman.ChainLightning.TimeToReady(sim), common.WaitReasonRotation).Cast(sim)
 	} else {
 		if !spell.Cast(sim, sim.GetPrimaryTarget()) {
 			eleShaman.WaitForMana(sim, spell.CurCast.Cost)

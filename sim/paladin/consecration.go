@@ -57,7 +57,7 @@ func (paladin *Paladin) RegisterConsecrationSpell(sim *core.Simulation, rank int
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(baseDamage, 0.119),
-			OutcomeApplier:   core.OutcomeFuncTick(),
+			OutcomeApplier:   paladin.OutcomeFuncTick(),
 			IsPeriodic:       true,
 		}),
 	})

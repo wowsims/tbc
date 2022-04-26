@@ -22,7 +22,7 @@ func (warlock *Warlock) registerShadowboltSpell(sim *core.Simulation) {
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.DestructiveReach),
 		// TODO: so this would mean SB ratio is 1.057?
 		BaseDamage:     core.BaseDamageConfigMagic(544.0, 607.0, 0.857+0.04*float64(warlock.Talents.ShadowAndFlame)),
-		OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
+		OutcomeApplier: warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
 	}
 	if warlock.Talents.ImprovedShadowBolt > 0 {
 		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {

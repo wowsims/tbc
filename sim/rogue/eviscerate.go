@@ -46,11 +46,11 @@ func (rogue *Rogue) makeEviscerate(comboPoints int32) *core.Spell {
 			BaseDamage: core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 					roll := sim.RandomFloat("Eviscerate") * 120.0
-					return baseDamage + roll + hitEffect.MeleeAttackPower(spell.Character)*apRatio + hitEffect.BonusWeaponDamage(spell.Character)
+					return baseDamage + roll + hitEffect.MeleeAttackPower(spell.Unit)*apRatio + hitEffect.BonusWeaponDamage(spell.Unit)
 				},
 				TargetSpellCoefficient: 1,
 			},
-			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, false)),
+			OutcomeApplier: rogue.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, false)),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					rogue.ApplyFinisher(sim, spell.ActionID)

@@ -264,7 +264,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigRoll(222, 332),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 

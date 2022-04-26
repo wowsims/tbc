@@ -40,28 +40,33 @@ func (warlock *Warlock) NewWarlockPet() *WarlockPet {
 		owner:  warlock,
 	}
 	wp.AddStats(stats.Stats{
-		stats.MeleeCrit: float64(warlock.Talents.DemonicTactics) * 5 * core.MeleeCritRatingPerCritChance,
-		stats.SpellCrit: float64(warlock.Talents.DemonicTactics) * 5 * core.SpellCritRatingPerCritChance,
+		stats.MeleeCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.MeleeCritRatingPerCritChance,
+		stats.SpellCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.SpellCritRatingPerCritChance,
 	})
+
+	if warlock.Talents.SoulLink {
+		warlock.PseudoStats.DamageDealtMultiplier *= 1.05
+	}
 	wp.PseudoStats.DamageDealtMultiplier *= 1.0 + (0.04 * float64(warlock.Talents.UnholyPower))
 
 	wp.EnableManaBar()
 
 	if petConfig.Melee {
 		wp.EnableAutoAttacks(wp, core.AutoAttackOptions{
-			MainHand: core.Weapon{
-				// TODO: validate base weapon damage.
-				BaseDamageMin:  176,
-				BaseDamageMax:  232,
-				SwingSpeed:     2,
-				SwingDuration:  time.Second * 2,
-				CritMultiplier: 2,
-			},
+			MainHand:       petConfig.Weapon,
 			AutoSwingMelee: true,
 		})
 	}
 	// wp.AutoAttacks.MHEffect.DamageMultiplier *= petConfig.DamageMultiplier
 	switch warlock.Options.Summon {
+	case proto.Warlock_Options_Imp:
+		wp.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Intellect,
+			ModifiedStat: stats.SpellCrit,
+			Modifier: func(intellect float64, spellCrit float64) float64 {
+				return spellCrit + (0.0125*intellect/100)*core.SpellCritRatingPerCritChance
+			},
+		})
 	case proto.Warlock_Options_Felgaurd:
 		wp.PseudoStats.DamageDealtMultiplier *= 1.0 + (0.01 * float64(warlock.Talents.MasterDemonologist))
 		// Simulates a pre-stacked demonic frenzy
@@ -89,14 +94,6 @@ func (warlock *Warlock) NewWarlockPet() *WarlockPet {
 
 	wp.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Intellect,
-		ModifiedStat: stats.SpellCrit,
-		Modifier: func(intellect float64, spellCrit float64) float64 {
-			return spellCrit + (intellect/81)*core.SpellCritRatingPerCritChance
-		},
-	})
-
-	wp.AddStatDependency(stats.StatDependency{
-		SourceStat:   stats.Intellect,
 		ModifiedStat: stats.Mana,
 		Modifier: func(intellect float64, mana float64) float64 {
 			return mana + intellect*petConfig.ManaIntRatio
@@ -106,14 +103,14 @@ func (warlock *Warlock) NewWarlockPet() *WarlockPet {
 		SourceStat:   stats.Strength,
 		ModifiedStat: stats.AttackPower,
 		Modifier: func(strength float64, attackPower float64) float64 {
-			return attackPower + strength*2
+			return attackPower + (strength-10)*2
 		},
 	})
 	wp.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.MeleeCrit,
 		Modifier: func(agility float64, meleeCrit float64) float64 {
-			return meleeCrit + (agility/33)*core.MeleeCritRatingPerCritChance
+			return meleeCrit + (agility*0.0004)*core.MeleeCritRatingPerCritChance
 		},
 	})
 
@@ -181,9 +178,6 @@ var petStatInheritance = func(ownerStats stats.Stats) stats.Stats {
 		stats.AttackPower:      (ownerStats[stats.SpellPower] + ownerStats[stats.ShadowSpellPower]) * 0.57,
 		stats.SpellPower:       (ownerStats[stats.SpellPower] + ownerStats[stats.ShadowSpellPower]) * 0.15,
 		stats.SpellPenetration: ownerStats[stats.SpellPenetration],
-		stats.SpellHit:         ownerStats[stats.SpellHit],
-		stats.MeleeHit:         ownerStats[stats.MeleeHit],
-
 		// Resists, 40%
 	}
 }
@@ -194,7 +188,7 @@ type PetConfig struct {
 	Melee        bool
 	Stats        stats.Stats
 	ManaIntRatio float64
-	// Weapon
+	Weapon       core.Weapon
 
 	// Randomly select between abilities instead of using a prio.
 	RandomSelection bool
@@ -212,13 +206,24 @@ var PetConfigs = map[proto.Warlock_Options_Summon]PetConfig{
 		SecondaryAbility: Intercept,
 		ManaIntRatio:     11.5,
 		Stats: stats.Stats{
-			stats.Strength:  153,
-			stats.Agility:   108,
-			stats.Intellect: 196,
-			stats.Mana:      893,
-			stats.Spirit:    122,
+			stats.AttackPower: 20,
+			stats.Stamina:     328,
+			stats.Strength:    138,
+			stats.Agility:     91,
+			stats.Intellect:   158,
+			stats.Mana:        893,
+			stats.Spirit:      81,
+			stats.MP5:         48,
 			// Add 1.8% because pets aren't affected by that component of crit suppression.
 			stats.MeleeCrit: (1.1515 + 1.8) * core.MeleeCritRatingPerCritChance,
+		},
+		Weapon: core.Weapon{
+			// TODO: validate base weapon damage.
+			BaseDamageMin:  51.7,
+			BaseDamageMax:  51.7,
+			SwingSpeed:     2,
+			SwingDuration:  time.Second * 2,
+			CritMultiplier: 2,
 		},
 	},
 	proto.Warlock_Options_Imp: {
@@ -229,11 +234,13 @@ var PetConfigs = map[proto.Warlock_Options_Summon]PetConfig{
 		PrimaryAbility: Firebolt,
 		// TODO: no idea if these stats are correct
 		Stats: stats.Stats{
-			stats.Strength:  153,
-			stats.Agility:   108,
-			stats.Intellect: 196,
+			stats.MP5:       123,
+			stats.Stamina:   230,
+			stats.Strength:  130,
+			stats.Agility:   21,
+			stats.Intellect: 381,
 			stats.Mana:      756,
-			stats.Spirit:    122,
+			stats.Spirit:    222,
 			// Add 1.8% because pets aren't affected by that component of crit suppression.
 			stats.MeleeCrit: (1.1515 + 1.8) * core.MeleeCritRatingPerCritChance,
 		},
@@ -244,15 +251,25 @@ var PetConfigs = map[proto.Warlock_Options_Summon]PetConfig{
 		ManaIntRatio:   11.5,
 		Melee:          true,
 		PrimaryAbility: LashOfPain,
-		// TODO: no idea if these stats are correct
 		Stats: stats.Stats{
-			stats.Strength:  153,
-			stats.Agility:   108,
-			stats.Intellect: 196,
-			stats.Mana:      849,
-			stats.Spirit:    122,
+			stats.AttackPower: 20,
+			stats.Stamina:     328,
+			stats.Strength:    138,
+			stats.Agility:     91,
+			stats.Intellect:   158,
+			stats.Mana:        893,
+			stats.Spirit:      81,
+			stats.MP5:         48,
 			// Add 1.8% because pets aren't affected by that component of crit suppression.
 			stats.MeleeCrit: (1.1515 + 1.8) * core.MeleeCritRatingPerCritChance,
+		},
+		Weapon: core.Weapon{
+			// TODO: validate base weapon damage.
+			BaseDamageMin:  50,
+			BaseDamageMax:  50,
+			SwingSpeed:     2,
+			SwingDuration:  time.Second * 2,
+			CritMultiplier: 2,
 		},
 	},
 }
@@ -260,7 +277,7 @@ var PetConfigs = map[proto.Warlock_Options_Summon]PetConfig{
 // Minion 		Health per bonus stamina 	Mana per bonus intellect
 // Imp 			~8.4 						~4.9
 // Voidwalker 	~11.0 						~11.5
-// Sayaad 		~9.1 						~11.5
+// Sayaad			~9.1 						~11.5
 // Felhunter 	~9.5 						~11.5
 // Felguard 	~11.0 						~11.5
 

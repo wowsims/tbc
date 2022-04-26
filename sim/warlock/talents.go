@@ -1,6 +1,8 @@
 package warlock
 
 import (
+	"time"
+
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -44,11 +46,6 @@ func (warlock *Warlock) ApplyTalents() {
 	//  TODO: fel stamina increases max health (might be useful for warlock tanking sim)
 
 	if !warlock.Options.SacrificeSummon && warlock.Options.Summon != proto.Warlock_Options_NoSummon {
-		warlock.AddStats(stats.Stats{
-			stats.MeleeCrit: float64(warlock.Talents.DemonicTactics) * 5 * core.MeleeCritRatingPerCritChance,
-			stats.SpellCrit: float64(warlock.Talents.DemonicTactics) * 5 * core.SpellCritRatingPerCritChance,
-		})
-
 		if warlock.Talents.MasterDemonologist > 0 {
 			switch warlock.Options.Summon {
 			case proto.Warlock_Options_Imp:
@@ -63,6 +60,10 @@ func (warlock *Warlock) ApplyTalents() {
 			}
 		}
 
+		if warlock.Talents.SoulLink {
+			warlock.PseudoStats.DamageDealtMultiplier *= 1.05
+		}
+
 		// Create the pet
 		warlock.NewWarlockPet()
 
@@ -73,8 +74,44 @@ func (warlock *Warlock) ApplyTalents() {
 	}
 
 	// demonic tactics, applies even without pet out
+	warlock.AddStats(stats.Stats{
+		stats.MeleeCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.MeleeCritRatingPerCritChance,
+		stats.SpellCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.SpellCritRatingPerCritChance,
+	})
 
 	warlock.setupNightfall()
+	warlock.setupAmplifyCurse()
+}
+
+func (warlock *Warlock) setupAmplifyCurse() {
+	if !warlock.Talents.AmplifyCurse {
+		return
+	}
+	warlock.AmplifyCurseAura = warlock.RegisterAura(core.Aura{
+		Label:    "Amplify Curse",
+		ActionID: core.ActionID{SpellID: 17941},
+		Duration: time.Second * 30,
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			// Check for an instant cast shadowbolt to disable aura
+			if spell != warlock.Shadowbolt || spell.CurCast.CastTime != 0 {
+				return
+			}
+			aura.Deactivate(sim)
+		},
+	})
+	warlock.AmplifyCurse = warlock.RegisterSpell(core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: 18288},
+		SpellSchool: core.SpellSchoolShadow,
+		Cast: core.CastConfig{
+			CD: core.Cooldown{
+				Timer:    warlock.NewTimer(),
+				Duration: time.Minute * 3,
+			},
+		},
+		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+			warlock.AmplifyCurseAura.Activate(sim)
+		},
+	})
 }
 
 func (warlock *Warlock) setupNightfall() {

@@ -48,7 +48,7 @@ func (mage *Mage) registerFireBlastSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),
 
 			BaseDamage:     core.BaseDamageConfigMagic(664, 786, 1.5/3.5),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
+			OutcomeApplier: mage.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
 		}),
 	})
 }

@@ -14,15 +14,6 @@ var Corruption8ActionID = core.ActionID{SpellID: SpellIDCorruption8}
 
 func (warlock *Warlock) registerCorruptionSpell(sim *core.Simulation) {
 	baseCost := 370.0
-	effect := core.SpellEffect{
-		OutcomeApplier: core.OutcomeFuncMagicHit(),
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.Landed() {
-				warlock.CorruptionDot.Apply(sim)
-			}
-		},
-	}
-
 	warlock.Corruption = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:     Corruption8ActionID,
 		SpellSchool:  core.SpellSchoolShadow,
@@ -35,9 +26,11 @@ func (warlock *Warlock) registerCorruptionSpell(sim *core.Simulation) {
 				CastTime: time.Millisecond*2000 - (time.Millisecond * 400 * time.Duration(warlock.Talents.ImprovedCorruption)),
 			},
 		},
-		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			OutcomeApplier: warlock.OutcomeFuncMagicHit(),
+			OnSpellHit:     applyDotOnLanded(&warlock.CorruptionDot),
+		}),
 	})
-
 	target := sim.GetPrimaryTarget()
 	spellCoefficient := 0.156 + (0.12 * float64(warlock.Talents.EmpoweredCorruption))
 
@@ -53,8 +46,16 @@ func (warlock *Warlock) registerCorruptionSpell(sim *core.Simulation) {
 			DamageMultiplier: 1 * (1 + 0.02*float64(warlock.Talents.ShadowMastery)) * (1 + 0.01*float64(warlock.Talents.Contagion)),
 			ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.ImprovedDrainSoul),
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(900/6, spellCoefficient),
-			OutcomeApplier:   core.OutcomeFuncTick(),
+			OutcomeApplier:   warlock.OutcomeFuncTick(),
 			IsPeriodic:       true,
 		}),
 	})
+}
+
+func applyDotOnLanded(dot **core.Dot) func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+	return func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		if spellEffect.Landed() {
+			(*dot).Apply(sim)
+		}
+	}
 }

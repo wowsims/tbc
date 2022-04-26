@@ -37,6 +37,9 @@ func init() {
 	core.AddItemEffect(31331, ApplyTheNightBlade)
 	core.AddItemEffect(32262, ApplySyphonOfTheNathrezim)
 	core.AddItemEffect(33122, ApplyCloakOfDarkness)
+
+	AddSimpleStatItemEffect(28484, stats.Stats{stats.Health: 1500, stats.Strength: 150}, time.Second*15, time.Minute*30) // Bulwark of Kings
+	AddSimpleStatItemEffect(28485, stats.Stats{stats.Health: 1500, stats.Strength: 150}, time.Second*15, time.Minute*30) // Bulwark of Ancient Kings
 }
 
 func ApplyStormGauntlets(agent core.Agent) {
@@ -51,7 +54,7 @@ func ApplyStormGauntlets(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigFlat(3),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 
@@ -84,7 +87,7 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigFlat(2),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 
@@ -339,7 +342,7 @@ func ApplyDespair(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigFlat(600),
-			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(character.DefaultMeleeCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMeleeSpecialHitAndCrit(character.DefaultMeleeCritMultiplier()),
 		}),
 	})
 
@@ -392,7 +395,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigRoll(513, 567),
-			OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(character.DefaultMeleeCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMeleeSpecialHitAndCrit(character.DefaultMeleeCritMultiplier()),
 		}),
 	})
 
@@ -415,7 +418,7 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigRoll(285, 315),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 
@@ -548,16 +551,16 @@ func ApplyRodOfTheSunKing(agent core.Agent) {
 				return
 			}
 
-			if spell.Character.HasRageBar() {
+			if spell.Unit.HasRageBar() {
 				if sim.RandomFloat("Rod of the Sun King") > procChance {
 					return
 				}
-				spell.Character.AddRage(sim, 5, actionID)
-			} else if spell.Character.HasEnergyBar() {
+				spell.Unit.AddRage(sim, 5, actionID)
+			} else if spell.Unit.HasEnergyBar() {
 				if sim.RandomFloat("Rod of the Sun King") > procChance {
 					return
 				}
-				spell.Character.AddEnergy(sim, 10, actionID)
+				spell.Unit.AddEnergy(sim, 10, actionID)
 			}
 		},
 	})
@@ -682,7 +685,7 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigMagic(48, 54, 1),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 
@@ -839,7 +842,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigFlat(20),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 

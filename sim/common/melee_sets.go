@@ -152,7 +152,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 					ThreatMultiplier: 1,
 
 					BaseDamage:     core.BaseDamageConfigRoll(100, 150),
-					OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+					OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 				}),
 			})
 

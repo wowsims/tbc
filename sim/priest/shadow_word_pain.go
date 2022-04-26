@@ -32,7 +32,7 @@ func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
-			OutcomeApplier:      core.OutcomeFuncMagicHit(),
+			OutcomeApplier:      priest.OutcomeFuncMagicHit(),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					priest.ShadowWordPainDot.Apply(sim)
@@ -61,7 +61,7 @@ func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1 - 0.08*float64(priest.Talents.ShadowAffinity),
 			IsPeriodic:       true,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(1236/6, 0.183),
-			OutcomeApplier:   core.OutcomeFuncTick(),
+			OutcomeApplier:   priest.OutcomeFuncTick(),
 		}),
 	})
 }

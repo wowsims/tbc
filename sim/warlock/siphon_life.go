@@ -14,15 +14,6 @@ var SiphonLife6ActionID = core.ActionID{SpellID: SpellIDSiphonLife6}
 
 func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
 	baseCost := 370.0
-	effect := core.SpellEffect{
-		OutcomeApplier: core.OutcomeFuncMagicHit(),
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.Landed() {
-				warlock.SiphonLifeDot.Apply(sim)
-			}
-		},
-	}
-
 	warlock.SiphonLife = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:     SiphonLife6ActionID,
 		SpellSchool:  core.SpellSchoolShadow,
@@ -35,12 +26,14 @@ func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
 				CastTime: time.Millisecond * 2000,
 			},
 		},
-		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			OutcomeApplier: warlock.OutcomeFuncMagicHit(),
+			OnSpellHit:     applyDotOnLanded(&warlock.SiphonLifeDot),
+		}),
 	})
 
 	target := sim.GetPrimaryTarget()
 	spellCoefficient := 0.1
-
 	warlock.SiphonLifeDot = core.NewDot(core.Dot{
 		Spell: warlock.SiphonLife,
 		Aura: target.RegisterAura(core.Aura{
@@ -53,7 +46,7 @@ func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
 			DamageMultiplier: 1 * (1 + 0.02*float64(warlock.Talents.ShadowMastery)) * (1 + 0.01*float64(warlock.Talents.Contagion)),
 			ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.ImprovedDrainSoul),
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(63, spellCoefficient),
-			OutcomeApplier:   core.OutcomeFuncTick(),
+			OutcomeApplier:   warlock.OutcomeFuncTick(),
 			IsPeriodic:       true,
 		}),
 	})

@@ -39,11 +39,11 @@ func (hunter *Hunter) registerArcaneShotSpell(sim *core.Simulation) {
 
 			BaseDamage: hunter.talonOfAlarDamageMod(core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
-					return (hitEffect.RangedAttackPower(spell.Character)+hitEffect.RangedAttackPowerOnTarget())*0.15 + 273
+					return (hitEffect.RangedAttackPower(spell.Unit)+hitEffect.RangedAttackPowerOnTarget())*0.15 + 273
 				},
 				TargetSpellCoefficient: 1,
 			}),
-			OutcomeApplier: core.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
+			OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
 		}),
 	})
 }

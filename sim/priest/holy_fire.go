@@ -35,7 +35,7 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 			DamageMultiplier:     1 + 0.05*float64(priest.Talents.SearingLight),
 			ThreatMultiplier:     1 - 0.04*float64(priest.Talents.SilentResolve),
 			BaseDamage:           core.BaseDamageConfigMagic(426, 537, 0.8571),
-			OutcomeApplier:       core.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
+			OutcomeApplier:       priest.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					priest.HolyFireDot.Apply(sim)
@@ -58,7 +58,7 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1 - 0.04*float64(priest.Talents.SilentResolve),
 
 			BaseDamage:     core.BaseDamageConfigMagicNoRoll(33, 0.17),
-			OutcomeApplier: core.OutcomeFuncTick(),
+			OutcomeApplier: priest.OutcomeFuncTick(),
 			IsPeriodic:     true,
 		}),
 	})

@@ -165,7 +165,7 @@ func (we *WaterElemental) registerWaterboltSpell(sim *core.Simulation) {
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagic(256, 328, 3.0/3.5),
-			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(we.DefaultSpellCritMultiplier()),
+			OutcomeApplier:   we.OutcomeFuncMagicHitAndCrit(we.DefaultSpellCritMultiplier()),
 		}),
 	})
 }

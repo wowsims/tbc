@@ -73,16 +73,16 @@ func (wp *WarlockPet) newFirebolt(sim *core.Simulation) PetAbility {
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
 				GCD:      core.GCDDefault,
-				CastTime: time.Millisecond * 2000,
+				CastTime: time.Millisecond*2000 - (time.Millisecond * time.Duration(250*wp.owner.Talents.ImprovedFirebolt)),
 			},
 			IgnoreHaste: true,
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskSpellDamage,
-			DamageMultiplier: 1.0,
+			DamageMultiplier: 1.0 + (0.1 * float64(wp.owner.Talents.ImprovedImp)),
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagic(112, 127, 0.571),
-			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(2),
+			OutcomeApplier:   wp.OutcomeFuncMagicHitAndCrit(2),
 		}),
 	})
 
@@ -121,7 +121,7 @@ func (wp *WarlockPet) newCleave(sim *core.Simulation) PetAbility {
 			DamageMultiplier: 1.0,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 78, 1.0, true),
-			OutcomeApplier:   core.OutcomeFuncMeleeSpecialHitAndCrit(2),
+			OutcomeApplier:   wp.OutcomeFuncMeleeSpecialHitAndCrit(2),
 		}),
 	})
 
@@ -135,7 +135,7 @@ func (wp *WarlockPet) newLashOfPain(sim *core.Simulation) PetAbility {
 	actionID := core.ActionID{SpellID: 27274}
 	cd := core.Cooldown{
 		Timer:    wp.NewTimer(),
-		Duration: time.Second * 12,
+		Duration: time.Second*12 - (time.Second * time.Duration(3*wp.owner.Talents.ImprovedLashOfPain)),
 	}
 
 	pa := PetAbility{
@@ -156,10 +156,10 @@ func (wp *WarlockPet) newLashOfPain(sim *core.Simulation) PetAbility {
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskSpellDamage,
-			DamageMultiplier: 1.0,
+			DamageMultiplier: 1.0 * (1.0 + (0.1 * float64(wp.owner.Talents.ImprovedSayaad))),
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagic(123, 123, 0.429),
-			OutcomeApplier:   core.OutcomeFuncMagicHitAndCrit(2),
+			OutcomeApplier:   wp.OutcomeFuncMagicHitAndCrit(2),
 		}),
 	})
 

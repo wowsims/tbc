@@ -22,7 +22,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigRoll(694, 807),
-			OutcomeApplier: core.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
 	})
 

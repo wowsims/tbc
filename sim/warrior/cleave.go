@@ -19,7 +19,7 @@ func (warrior *Warrior) registerCleaveSpell(sim *core.Simulation) {
 		FlatThreatBonus:  125,
 
 		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, flatDamageBonus, 1, true),
-		OutcomeApplier: core.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+		OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 	}
 
 	numHits := core.MinInt32(2, sim.GetNumTargets())
