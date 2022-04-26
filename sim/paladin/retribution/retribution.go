@@ -260,28 +260,26 @@ func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Tar
 func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
-	nextSwingAt := ret.AutoAttacks.NextAttackAt()
 	sobExpiration := ret.SealOfBloodAura.ExpiresAt()
 
-	spellGCD := ret.SpellGCD()
-
-	sobAndCSCost := ret.CrusaderStrike.DefaultCast.Cost + ret.SealOfBlood.DefaultCast.Cost
-	sobAndJudgementCost := ret.JudgementOfBlood.DefaultCast.Cost + ret.SealOfBlood.DefaultCast.Cost
-
-	if ret.GCD.IsReady(sim) {
-		// Roll seal of blood
-		if sim.CurrentTime+time.Second >= sobExpiration {
-			if ret.CanJudgementOfBlood(sim) && ret.CurrentMana() >= sobAndJudgementCost {
-				ret.JudgementOfBlood.Cast(sim, target)
-			}
+	nextSwingAt := ret.AutoAttacks.NextAttackAt()
+	// Roll seal of blood
+	if sim.CurrentTime+time.Second >= sobExpiration {
+		sobAndJudgementCost := ret.JudgementOfBlood.DefaultCast.Cost + ret.SealOfBlood.DefaultCast.Cost
+		if ret.CanJudgementOfBlood(sim) && ret.CurrentMana() >= sobAndJudgementCost {
+			ret.JudgementOfBlood.Cast(sim, target)
+		}
+		if ret.GCD.IsReady(sim) {
 			ret.SealOfBlood.Cast(sim, target)
 		}
+	} else if ret.GCD.IsReady(sim) && ret.CrusaderStrike.CD.IsReady(sim) {
+		spellGCD := ret.SpellGCD()
+		sobAndCSCost := ret.CrusaderStrike.DefaultCast.Cost + ret.SealOfBlood.DefaultCast.Cost
 
-		// Crusader strike unless it will cause seal of blood to drop
-		// Or we won't have enough mana to reseal
-		if ret.CrusaderStrike.CD.IsReady(sim) &&
-			!(spellGCD+sim.CurrentTime > nextSwingAt && sobExpiration < nextSwingAt) &&
+		if !(spellGCD+sim.CurrentTime > nextSwingAt && sobExpiration < nextSwingAt) &&
 			(ret.CurrentMana() >= sobAndCSCost) {
+			// Crusader strike unless it will cause seal of blood to drop
+			// Or we won't have enough mana to reseal
 			ret.CrusaderStrike.Cast(sim, target)
 		}
 	}
