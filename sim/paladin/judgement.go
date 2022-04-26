@@ -19,15 +19,15 @@ func (paladin *Paladin) canJudgement(sim *core.Simulation) bool {
 
 var JudgementOfBloodActionID = core.ActionID{SpellID: 31898}
 
-var LibramOfAvengementActionID = core.ActionID{SpellID: 34260}
+var LibramOfAvengementProcActionID = core.ActionID{SpellID: 34260}
 
 func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation, cdTimer *core.Timer) {
 	var loaAura *core.Aura
 	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27484 {
 		loaAura = paladin.NewTemporaryStatsAura(
 			"Libram of Avengement",
-			LibramOfAvengementActionID,
-			stats.Stats{stats.MeleeCrit: 53},
+			LibramOfAvengementProcActionID,
+			stats.Stats{stats.MeleeCrit: 53, stats.SpellCrit: 53},
 			time.Second*5)
 	}
 

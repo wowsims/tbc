@@ -1,17 +1,12 @@
 package paladin
 
 import (
-	"time"
-
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func init() {
 	core.AddItemSet(&ItemSetJusticarBattlegear)
 	core.AddItemSet(&ItemSetCrystalforgeBattlegear)
-
-	core.AddItemEffect(27484, ApplyAvengementLibramEffect)
 }
 
 var ItemSetJusticarBattlegear = core.ItemSet{
@@ -64,25 +59,6 @@ var ItemSetLightbringerBattlegear = core.ItemSet{
 			// TODO: if we implemented hammer of wrath.. this ups dmg
 		},
 	},
-}
-
-// https://tbc.wowhead.com/item=27484/libram-of-avengement
-func ApplyAvengementLibramEffect(agent core.Agent) {
-	character := agent.GetCharacter()
-	procAura := character.NewTemporaryStatsAura("Justice", core.ActionID{SpellID: 34260}, stats.Stats{stats.MeleeCrit: 53, stats.SpellCrit: 53}, time.Second*6)
-
-	character.RegisterAura(core.Aura{
-		Label:    "Libram Of Avengement",
-		Duration: core.NeverExpires,
-		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Activate(sim)
-		},
-		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			if spell.ActionID.SpellID == JudgementOfBloodActionID.SpellID {
-				procAura.Activate(sim)
-			}
-		},
-	})
 }
 
 // Librams implemented in seals.go and judgement.go

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -39,6 +40,11 @@ func (paladin *Paladin) RegisterConsecrationSpell(sim *core.Simulation, rank int
 		baseDamage = 8
 	default:
 		manaCost = 0.0
+	}
+
+	switch paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID {
+	case 27917:
+		baseDamage += (47 * 0.952) // applies 47 "spell power" to the spell
 	}
 
 	// Check for bad input

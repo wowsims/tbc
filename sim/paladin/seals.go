@@ -51,10 +51,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 	})
 
 	baseCost := 210.0
-	cost := baseCost
-	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 22401 {
-		cost -= 20
-	}
+	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfBlood = paladin.RegisterSpell(core.SpellConfig{
 		ActionID: SealOfBloodCastActionID,
 
@@ -130,10 +127,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	})
 
 	baseCost := 65.0
-	cost := baseCost
-	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 22401 {
-		cost -= 20
-	}
+	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfCommand = paladin.RegisterSpell(core.SpellConfig{
 		ActionID: SealOfCommandCastActionID,
 
@@ -183,10 +177,7 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 		},
 	})
 	baseCost := 210.0
-	cost := baseCost
-	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 22401 {
-		cost -= 20
-	}
+	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
 		ActionID: SealOfTheCrusaderActionID,
 
@@ -219,10 +210,7 @@ func (paladin *Paladin) setupSealOfWisdom() {
 	})
 
 	baseCost := 270.0
-	cost := baseCost
-	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 22401 {
-		cost -= 20
-	}
+	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfWisdom = paladin.RegisterSpell(core.SpellConfig{
 		ActionID: SealOfWisdomActionID,
 
@@ -262,4 +250,14 @@ func (paladin *Paladin) UpdateSeal(sim *core.Simulation, newSeal *core.Aura) {
 
 	paladin.CurrentSeal = newSeal
 	newSeal.Activate(sim)
+}
+
+func (paladin *Paladin) sealCostReduction() float64 {
+	switch paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID {
+	case 22401: // libram of hope
+		return -20
+	case 186067: // communal book of righteousness
+		return -5
+	}
+	return 0
 }
