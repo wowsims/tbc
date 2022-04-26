@@ -26,7 +26,7 @@ func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) *core.Aura {
 			if spell.SpellSchool != core.SpellSchoolNature {
 				return
 			}
-			if !spellEffect.Landed() || spellEffect.Damage == 0 || spellEffect.IsPhantom || spellEffect.ProcMask == 0 {
+			if !spellEffect.Landed() || spellEffect.Damage == 0 {
 				return
 			}
 			aura.RemoveStack(sim)
