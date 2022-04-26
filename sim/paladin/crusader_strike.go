@@ -34,8 +34,7 @@ func (paladin *Paladin) registerCrusaderStrikeSpell(sim *core.Simulation) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:  core.ProcMaskMeleeMHSpecial,
-			IsPhantom: true,
+			ProcMask: core.ProcMaskMeleeMHSpecial,
 
 			DamageMultiplier: 1, // Need to review to make sure I set these properly
 			ThreatMultiplier: 1,

@@ -103,6 +103,8 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			IsPhantom: true,
+
 			OutcomeApplier: paladin.OutcomeFuncAlwaysHit(),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -162,6 +164,33 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation, cdT
 
 func (paladin *Paladin) CanJudgementOfWisdom(sim *core.Simulation) bool {
 	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfWisdomAura
+}
+
+// Defines judgement refresh behavior from attacks
+// Returns extra mana if a different pally applied Judgement of Wisdom
+func (paladin *Paladin) setupJudgementRefresh() {
+	const mana = 74 / 2
+	paladin.RegisterAura(core.Aura{
+		Label:    "Refresh Judgement",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) {
+				if paladin.CurrentJudgement != nil && paladin.CurrentJudgement.IsActive() {
+					// Refresh the judgement
+					paladin.CurrentJudgement.Refresh(sim)
+
+					// Check if current judgement is not JoW and also that JoW is on the target
+					if paladin.CurrentJudgement != paladin.JudgementOfWisdomAura && paladin.JudgementOfWisdomAura.IsActive() {
+						// Just trigger a second JoW
+						paladin.AddMana(sim, mana, core.ActionID{SpellID: 27164}, false)
+					}
+				}
+			}
+		},
+	})
 }
 
 var SanctifiedJudgementActionID = core.ActionID{SpellID: 31930}
