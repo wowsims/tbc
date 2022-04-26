@@ -122,7 +122,7 @@ class WarlockTalents$Type extends MessageType {
             { no: 16, name: "demonic_embrace", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 17, name: "improved_voidwalker", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 18, name: "fel_intellect", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
-            { no: 19, name: "improved_succubus", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 19, name: "improved_sayaad", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 20, name: "fel_stamina", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 21, name: "demonic_aegis", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 22, name: "unholy_power", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -155,7 +155,7 @@ class WarlockTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { suppression: 0, improvedCorruption: 0, improvedDrainSoul: 0, improvedLifeTap: 0, soulSiphon: 0, improvedCurseOfAgony: 0, amplifyCurse: false, nightfall: 0, empoweredCorruption: 0, siphonLife: false, shadowMastery: 0, contagion: 0, darkPact: false, malediction: 0, unstableAffliction: false, improvedImp: 0, demonicEmbrace: 0, improvedVoidwalker: 0, felIntellect: 0, improvedSuccubus: 0, felStamina: 0, demonicAegis: 0, unholyPower: 0, improvedEnslaveDemon: 0, demonicSacrifice: false, masterConjuror: 0, manaFeed: 0, masterDemonologist: 0, soulLink: false, demonicKnowledge: 0, demonicTactics: 0, summonFelguard: false, improvedShadowBolt: 0, cataclysm: 0, bane: 0, improvedFirebolt: 0, improvedLashOfPain: 0, destructiveReach: 0, devastation: 0, shadowburn: false, improvedSearingPain: 0, improvedImmolate: 0, ruin: false, emberstorm: 0, backlash: 0, conflagrate: false, soulLeech: 0, shadowAndFlame: 0, shadowfury: false };
+        const message = { suppression: 0, improvedCorruption: 0, improvedDrainSoul: 0, improvedLifeTap: 0, soulSiphon: 0, improvedCurseOfAgony: 0, amplifyCurse: false, nightfall: 0, empoweredCorruption: 0, siphonLife: false, shadowMastery: 0, contagion: 0, darkPact: false, malediction: 0, unstableAffliction: false, improvedImp: 0, demonicEmbrace: 0, improvedVoidwalker: 0, felIntellect: 0, improvedSayaad: 0, felStamina: 0, demonicAegis: 0, unholyPower: 0, improvedEnslaveDemon: 0, demonicSacrifice: false, masterConjuror: 0, manaFeed: 0, masterDemonologist: 0, soulLink: false, demonicKnowledge: 0, demonicTactics: 0, summonFelguard: false, improvedShadowBolt: 0, cataclysm: 0, bane: 0, improvedFirebolt: 0, improvedLashOfPain: 0, destructiveReach: 0, devastation: 0, shadowburn: false, improvedSearingPain: 0, improvedImmolate: 0, ruin: false, emberstorm: 0, backlash: 0, conflagrate: false, soulLeech: 0, shadowAndFlame: 0, shadowfury: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -223,8 +223,8 @@ class WarlockTalents$Type extends MessageType {
                 case /* int32 fel_intellect */ 18:
                     message.felIntellect = reader.int32();
                     break;
-                case /* int32 improved_succubus */ 19:
-                    message.improvedSuccubus = reader.int32();
+                case /* int32 improved_sayaad */ 19:
+                    message.improvedSayaad = reader.int32();
                     break;
                 case /* int32 fel_stamina */ 20:
                     message.felStamina = reader.int32();
@@ -382,9 +382,9 @@ class WarlockTalents$Type extends MessageType {
         /* int32 fel_intellect = 18; */
         if (message.felIntellect !== 0)
             writer.tag(18, WireType.Varint).int32(message.felIntellect);
-        /* int32 improved_succubus = 19; */
-        if (message.improvedSuccubus !== 0)
-            writer.tag(19, WireType.Varint).int32(message.improvedSuccubus);
+        /* int32 improved_sayaad = 19; */
+        if (message.improvedSayaad !== 0)
+            writer.tag(19, WireType.Varint).int32(message.improvedSayaad);
         /* int32 fel_stamina = 20; */
         if (message.felStamina !== 0)
             writer.tag(20, WireType.Varint).int32(message.felStamina);

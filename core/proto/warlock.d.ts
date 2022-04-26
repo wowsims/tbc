@@ -89,9 +89,9 @@ export interface WarlockTalents {
      */
     felIntellect: number;
     /**
-     * @generated from protobuf field: int32 improved_succubus = 19;
+     * @generated from protobuf field: int32 improved_sayaad = 19;
      */
-    improvedSuccubus: number;
+    improvedSayaad: number;
     /**
      * @generated from protobuf field: int32 fel_stamina = 20;
      */
