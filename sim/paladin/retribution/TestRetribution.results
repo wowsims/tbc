@@ -148,6 +148,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRetribution-AllItems-BulwarkofKings-28484"
+ value: {
+  dps: 1829.6568438653248
+ }
+}
+dps_results: {
+ key: "TestRetribution-AllItems-BulwarkoftheAncientKings-28485"
+ value: {
+  dps: 1835.998112207259
+ }
+}
+dps_results: {
  key: "TestRetribution-AllItems-BurningRage"
  value: {
   dps: 1598.7914126981557

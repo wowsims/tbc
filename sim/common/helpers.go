@@ -26,6 +26,13 @@ func AddSimpleStatItemActiveEffect(itemID int32, bonus stats.Stats, duration tim
 	))
 }
 
+// No shared CD
+func AddSimpleStatItemEffect(itemID int32, bonus stats.Stats, duration time.Duration, cooldown time.Duration) {
+	AddSimpleStatItemActiveEffect(itemID, bonus, duration, cooldown, func(character *core.Character) core.Cooldown {
+		return core.Cooldown{}
+	})
+}
+
 func AddSimpleStatOffensiveTrinketEffect(itemID int32, bonus stats.Stats, duration time.Duration, cooldown time.Duration) {
 	AddSimpleStatItemActiveEffect(itemID, bonus, duration, cooldown, func(character *core.Character) core.Cooldown {
 		return core.Cooldown{
