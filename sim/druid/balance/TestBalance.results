@@ -939,3 +939,9 @@ dps_results: {
   dps: 1210.7726377971396
  }
 }
+dps_results: {
+ key: "TestBalance-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 1262.9338510803007
+ }
+}

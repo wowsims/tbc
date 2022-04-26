@@ -663,3 +663,9 @@ dps_results: {
   dps: 1468.3050034619594
  }
 }
+dps_results: {
+ key: "TestFire-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 1566.1722711347322
+ }
+}

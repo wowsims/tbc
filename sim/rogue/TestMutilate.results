@@ -699,3 +699,9 @@ dps_results: {
   dps: 644.6062747513756
  }
 }
+dps_results: {
+ key: "TestMutilate-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 1083.0288928593022
+ }
+}

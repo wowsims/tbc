@@ -921,3 +921,9 @@ dps_results: {
   dps: 886.9911741324343
  }
 }
+dps_results: {
+ key: "TestRogue-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 1276.644706821259
+ }
+}

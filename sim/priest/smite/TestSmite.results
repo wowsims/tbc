@@ -663,3 +663,9 @@ dps_results: {
   dps: 1052.50324176918
  }
 }
+dps_results: {
+ key: "TestSmite-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 1021.5732813552896
+ }
+}

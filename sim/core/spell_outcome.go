@@ -126,9 +126,12 @@ func (unit *Unit) OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) Outc
 				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, roll, &chance, damage)) &&
 				!spellEffect.applyAttackTableParry(spell, unit, roll, &chance, damage) {
 				if !spellEffect.applyAttackTableCritSeparateRoll(sim, spell, critMultiplier, damage) {
-					spellEffect.applyAttackTableHit(spell)
+					if !spellEffect.applyAttackTableBlock(spell, unit, roll, &chance, damage) {
+						spellEffect.applyAttackTableHit(spell)
+					}
+				} else {
+					spellEffect.applyAttackTableBlock(spell, unit, roll, &chance, damage)
 				}
-				spellEffect.applyAttackTableBlock(spell, unit, roll, &chance, damage)
 			}
 		}
 	} else {
@@ -188,9 +191,12 @@ func (unit *Unit) OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApp
 
 			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, roll, &chance, damage) {
 				if !spellEffect.applyAttackTableCritSeparateRoll(sim, spell, critMultiplier, damage) {
-					spellEffect.applyAttackTableHit(spell)
+					if !spellEffect.applyAttackTableBlock(spell, unit, roll, &chance, damage) {
+						spellEffect.applyAttackTableHit(spell)
+					}
+				} else {
+					spellEffect.applyAttackTableBlock(spell, unit, roll, &chance, damage)
 				}
-				spellEffect.applyAttackTableBlock(spell, unit, roll, &chance, damage)
 			}
 		}
 	} else {

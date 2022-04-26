@@ -1479,3 +1479,9 @@ dps_results: {
   dps: 1340.0507733063998
  }
 }
+dps_results: {
+ key: "TestShadow-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 1486.8996501794213
+ }
+}

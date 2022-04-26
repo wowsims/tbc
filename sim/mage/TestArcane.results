@@ -663,3 +663,9 @@ dps_results: {
   dps: 1485.0401755703983
  }
 }
+dps_results: {
+ key: "TestArcane-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 1355.883488055119
+ }
+}

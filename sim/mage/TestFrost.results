@@ -663,3 +663,9 @@ dps_results: {
   dps: 1456.939483917036
  }
 }
+dps_results: {
+ key: "TestFrost-SwitchInFrontOfTarget-Default"
+ value: {
+  dps: 1632.6331886256269
+ }
+}
