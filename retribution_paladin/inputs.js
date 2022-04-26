@@ -90,21 +90,22 @@ export const CrusaderStrikeDelayMS = {
         },
     },
 };
-export const HasteLeewayMS = {
-    type: 'number', cssClass: 'haste-leeway-picker',
-    getModObject: (simUI) => simUI.player,
-    config: {
-        label: 'Haste Leeway (MS)',
-        labelTooltip: "Arbitrary value used to account for haste procs preventing seal twists. Experiment with values between 100 - 200 miliseconds.\nDo not modify this value if you do not understand it's use.",
-        changedEvent: (player) => player.specOptionsChangeEmitter,
-        getValue: (player) => player.getSpecOptions().hasteLeewayMs,
-        setValue: (eventID, player, newValue) => {
-            const newOptions = player.getSpecOptions();
-            newOptions.hasteLeewayMs = newValue;
-            player.setSpecOptions(eventID, newOptions);
-        },
-    },
-};
+/*** Leave this for now. We'll ignore HasteLeeway for initial release, but we might come back to it at some point  ***/
+// export const HasteLeewayMS = {
+// 	type: 'number' as const, cssClass: 'haste-leeway-picker',
+// 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+// 	config: {
+// 		label: 'Haste Leeway (MS)',
+// 		labelTooltip: "Arbitrary value used to account for haste procs preventing seal twists. Experiment with values between 100 - 200 miliseconds.\nDo not modify this value if you do not understand it's use.",
+// 		changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.specOptionsChangeEmitter,
+// 		getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getSpecOptions().hasteLeewayMs,
+// 		setValue: (eventID: EventID, player: Player<Spec.SpecRetributionPaladin>, newValue: number) => {
+// 			const newOptions = player.getSpecOptions();
+// 			newOptions.hasteLeewayMs = newValue;
+// 			player.setSpecOptions(eventID, newOptions);
+// 		},
+// 	},
+// }
 export const DamgeTakenPerSecond = {
     type: 'number', cssClass: 'damage-taken-picker',
     getModObject: (simUI) => simUI.player,
