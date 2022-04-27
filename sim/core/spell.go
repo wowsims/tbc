@@ -289,16 +289,12 @@ func applyAOECap(effects []SpellEffect, outcomeMultipliers []float64, aoeCap flo
 	// Increased damage from crits doesn't count towards the cap, so need to
 	// tally pre-crit damage.
 	totalTowardsCap := 0.0
-	numHits := 0
 	for i, _ := range effects {
 		effect := &effects[i]
-		if effect.Landed() {
-			numHits++
-			if effect.Outcome.Matches(OutcomeCrit) {
-				totalTowardsCap += effect.Damage / outcomeMultipliers[i]
-			} else {
-				totalTowardsCap += effect.Damage
-			}
+		if effect.Outcome.Matches(OutcomeCrit) {
+			totalTowardsCap += effect.Damage / outcomeMultipliers[i]
+		} else {
+			totalTowardsCap += effect.Damage
 		}
 	}
 
@@ -306,18 +302,10 @@ func applyAOECap(effects []SpellEffect, outcomeMultipliers []float64, aoeCap flo
 		return
 	}
 
-	maxDamagePerHit := aoeCap / float64(numHits)
+	capMultiplier := aoeCap / totalTowardsCap
 	for i, _ := range effects {
 		effect := &effects[i]
-		if effect.Landed() {
-			if effect.Outcome.Matches(OutcomeCrit) {
-				preCritDamage := effect.Damage / outcomeMultipliers[i]
-				capped := MinFloat(preCritDamage, maxDamagePerHit)
-				effect.Damage = capped * outcomeMultipliers[i]
-			} else {
-				effect.Damage = MinFloat(effect.Damage, maxDamagePerHit)
-			}
-		}
+		effect.Damage *= capMultiplier
 	}
 }
 func ApplyEffectFuncDamageMultipleAOECapped(sim *Simulation, baseEffect SpellEffect, aoeCap float64) ApplySpellEffects {
