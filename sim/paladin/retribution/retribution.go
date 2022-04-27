@@ -302,7 +302,7 @@ func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
 // Helper function for finding the next event
 func (ret *RetributionPaladin) waitUntilNextEvent(sim *core.Simulation, events []time.Duration) {
 	// Find the minimum possible next event that is greater than the current time
-	nextEventAt := sim.Duration + 1
+	nextEventAt := sim.Duration + 1 // setting this to sim.Duration will result in an infinite loop where we keep putting actions and it never advances.
 	for _, elem := range events {
 		if elem > sim.CurrentTime && elem < nextEventAt {
 			nextEventAt = elem

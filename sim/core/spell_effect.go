@@ -108,7 +108,13 @@ func (spellEffect *SpellEffect) PhysicalHitChance(unit *Unit) float64 {
 		hitRating += unit.PseudoStats.BonusRangedHitRating
 	}
 
-	return (hitRating / (MeleeHitRatingPerHitChance * 100)) - spellEffect.Target.HitSuppression
+	percent := (hitRating / (MeleeHitRatingPerHitChance * 100)) - spellEffect.Target.HitSuppression
+
+	if percent < 0 {
+		return 0
+	}
+
+	return percent
 }
 
 func (spellEffect *SpellEffect) PhysicalCritChance(unit *Unit, spell *Spell) float64 {
