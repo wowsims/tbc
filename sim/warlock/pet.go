@@ -210,8 +210,7 @@ type PetConfig struct {
 
 var PetConfigs = map[proto.Warlock_Options_Summon]PetConfig{
 	proto.Warlock_Options_Felgaurd: {
-		Name: "Felguard",
-		// DamageMultiplier: 1,
+		Name:             "Felguard",
 		Melee:            true,
 		PrimaryAbility:   Cleave,
 		SecondaryAbility: Intercept,
@@ -225,17 +224,13 @@ var PetConfigs = map[proto.Warlock_Options_Summon]PetConfig{
 			stats.Mana:        893,
 			stats.Spirit:      122,
 			stats.MP5:         48,
-			// Add 1.8% because pets aren't affected by that component of crit suppression.
-			// stats.MeleeCrit: 1.8 * core.MeleeCritRatingPerCritChance,
 		},
 	},
 	proto.Warlock_Options_Imp: {
-		Name: "Imp",
-		// DamageMultiplier: 1,
+		Name:           "Imp",
 		ManaIntRatio:   4.9,
 		Melee:          false,
 		PrimaryAbility: Firebolt,
-		// TODO: no idea if these stats are correct
 		Stats: stats.Stats{
 			stats.MP5:       123,
 			stats.Stamina:   101,
@@ -244,27 +239,22 @@ var PetConfigs = map[proto.Warlock_Options_Summon]PetConfig{
 			stats.Intellect: 327,
 			stats.Mana:      756,
 			stats.Spirit:    263,
-			// Add 1.8% because pets aren't affected by that component of crit suppression.
-			// stats.MeleeCrit: 1.8 * core.MeleeCritRatingPerCritChance,
 		},
 	},
 	proto.Warlock_Options_Succubus: {
-		Name: "Succubus",
-		// DamageMultiplier: 1,
+		Name:           "Succubus",
 		ManaIntRatio:   11.5,
 		Melee:          true,
 		PrimaryAbility: LashOfPain,
 		Stats: stats.Stats{
 			stats.AttackPower: 20,
-			stats.Stamina:     328,
-			stats.Strength:    138,
-			stats.Agility:     91,
-			stats.Intellect:   158,
+			stats.Stamina:     280,
+			stats.Strength:    153,
+			stats.Agility:     108,
+			stats.Intellect:   133,
 			stats.Mana:        893,
-			stats.Spirit:      81,
+			stats.Spirit:      122,
 			stats.MP5:         48,
-			// Add 1.8% because pets aren't affected by that component of crit suppression.
-			// stats.MeleeCrit: 1.8 * core.MeleeCritRatingPerCritChance,
 		},
 	},
 }
