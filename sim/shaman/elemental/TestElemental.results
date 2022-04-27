@@ -539,7 +539,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-RobeoftheElderScribes-28602"
  value: {
-  dps: 1522.1191040253755
+  dps: 1522.1191040253752
  }
 }
 dps_results: {
@@ -641,7 +641,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-Stonebreaker'sTotem-33507"
  value: {
-  dps: 1508.0015085229115
+  dps: 1508.001508522912
  }
 }
 dps_results: {
@@ -749,7 +749,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-TotemofthePulsingEarth-29389"
  value: {
-  dps: 1508.0015085229115
+  dps: 1508.001508522912
  }
 }
 dps_results: {
@@ -863,7 +863,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-CLOnClearcast-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1867.5291566027506
+  dps: 1867.5291566027508
  }
 }
 dps_results: {
@@ -989,13 +989,13 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-LBOnly-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1499.9267146150555
+  dps: 1499.9267146150553
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Orc-P1-LBOnly-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1499.9267146150555
+  dps: 1499.9267146150553
  }
 }
 dps_results: {
@@ -1253,13 +1253,13 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-LBOnly-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1004.9287702941077
+  dps: 1004.9287702941078
  }
 }
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-LBOnly-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1004.9287702941077
+  dps: 1004.9287702941078
  }
 }
 dps_results: {

@@ -90,7 +90,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-BandoftheEternalSage-29305"
  value: {
-  dps: 891.8563802091594
+  dps: 891.8563802091593
  }
 }
 dps_results: {
@@ -126,7 +126,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 890.769541763731
+  dps: 890.7695417637308
  }
 }
 dps_results: {
@@ -168,7 +168,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-BulwarkofKings-28484"
  value: {
-  dps: 909.2744377519427
+  dps: 909.2744377519429
  }
 }
 dps_results: {
@@ -210,7 +210,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 894.6493361691221
+  dps: 894.6493361691223
  }
 }
 dps_results: {
@@ -252,13 +252,13 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-DestroyerArmor"
  value: {
-  dps: 717.6908180770412
+  dps: 717.6908180770411
  }
 }
 dps_results: {
  key: "TestFury-AllItems-DestroyerBattlegear"
  value: {
-  dps: 846.7574796071418
+  dps: 846.757479607142
  }
 }
 dps_results: {
@@ -276,7 +276,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-DoomplateBattlegear"
  value: {
-  dps: 754.85501825877
+  dps: 754.8550182587701
  }
 }
 dps_results: {
@@ -462,7 +462,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-MarkoftheChampion-23206"
  value: {
-  dps: 914.5300617491678
+  dps: 914.530061749168
  }
 }
 dps_results: {
@@ -630,7 +630,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-StrengthoftheClefthoof"
  value: {
-  dps: 770.704084314175
+  dps: 770.7040843141747
  }
 }
 dps_results: {
@@ -792,7 +792,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-Settings-Human-Fury P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1392.1559840077875
+  dps: 1392.1559840077878
  }
 }
 dps_results: {

@@ -283,6 +283,8 @@ func ApplyEffectFuncDot(dot *Dot) ApplySpellEffects {
 	}
 }
 
+// AOE Cap Mechanics:
+// http://web.archive.org/web/20081023033855/http://elitistjerks.com/f47/t25902-aoe_spell_cap_mechanics/
 func applyAOECap(effects []SpellEffect, aoeCap float64) {
 	// Increased damage from crits doesn't count towards the cap, so need to
 	// tally pre-crit damage.

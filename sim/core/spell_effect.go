@@ -162,16 +162,16 @@ func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spel
 func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, damage float64) {
 	if !spell.SpellExtras.Matches(SpellExtrasIgnoreModifiers) {
 		spellEffect.applyAttackerModifiers(sim, spell, &damage)
-		spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
 		spellEffect.applyResistances(sim, spell, &damage)
+		spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
 		spellEffect.PreoutcomeDamage = damage
 		spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
 	}
 	spellEffect.Damage = damage
 }
 func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spell, damage float64) {
-	spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	spellEffect.applyResistances(sim, spell, &damage)
+	spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
 	spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
 	spellEffect.Damage = damage
 }
