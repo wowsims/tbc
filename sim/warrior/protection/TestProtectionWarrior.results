@@ -72,13 +72,13 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BadgeofTenacity-32658"
  value: {
-  dps: 505.1142747949648
+  dps: 505.11427479496473
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BadgeoftheSwarmguard-21670"
  value: {
-  dps: 508.81599678303445
+  dps: 508.81599678303434
  }
 }
 dps_results: {
@@ -138,7 +138,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BloodlustBrooch-29383"
  value: {
-  dps: 515.4470796510102
+  dps: 515.4470796510103
  }
 }
 dps_results: {
@@ -168,7 +168,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BrutalEarthstormDiamond"
  value: {
-  dps: 515.0138309128776
+  dps: 515.0138309128777
  }
 }
 dps_results: {
@@ -180,7 +180,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BulwarkoftheAncientKings-28485"
  value: {
-  dps: 523.6789717601346
+  dps: 523.6789717601347
  }
 }
 dps_results: {
@@ -246,7 +246,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-DesolationBattlegear"
  value: {
-  dps: 488.0726497284226
+  dps: 488.07264972842256
  }
 }
 dps_results: {
@@ -318,7 +318,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-EmptyMugofDirebrew-38287"
  value: {
-  dps: 515.4470796510102
+  dps: 515.4470796510103
  }
 }
 dps_results: {
@@ -384,7 +384,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-FlameGuard"
  value: {
-  dps: 452.06440852491687
+  dps: 452.0644085249168
  }
 }
 dps_results: {
@@ -450,7 +450,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 612.0611676092932
+  dps: 612.0611676092933
  }
 }
 dps_results: {
@@ -516,7 +516,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-PotentUnstableDiamond"
  value: {
-  dps: 514.2442642066775
+  dps: 514.2442642066774
  }
 }
 dps_results: {
@@ -546,7 +546,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-RobeoftheElderScribes-28602"
  value: {
-  dps: 495.279880632174
+  dps: 495.2798806321741
  }
 }
 dps_results: {
@@ -570,7 +570,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 500.56371354110985
+  dps: 500.56371354110973
  }
 }
 dps_results: {
@@ -588,13 +588,13 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-ShardofContempt-34472"
  value: {
-  dps: 543.7333739009555
+  dps: 543.7333739009556
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
-  dps: 498.5067597598761
+  dps: 498.5067597598762
  }
 }
 dps_results: {
@@ -606,7 +606,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-SingingCrystalAxe-31318"
  value: {
-  dps: 581.7386725048585
+  dps: 581.7386725048586
  }
 }
 dps_results: {
@@ -642,7 +642,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-SwiftSkyfireDiamond"
  value: {
-  dps: 514.2442642066775
+  dps: 514.2442642066774
  }
 }
 dps_results: {
@@ -720,7 +720,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-TheTwinStars"
  value: {
-  dps: 489.8081057007187
+  dps: 489.8081057007186
  }
 }
 dps_results: {
@@ -822,7 +822,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-Settings-Human-P1-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 617.9746673067533
+  dps: 617.9746673067532
  }
 }
 dps_results: {
@@ -870,7 +870,7 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-Settings-Orc-P1-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 634.9610849980303
+  dps: 634.9610849980302
  }
 }
 dps_results: {

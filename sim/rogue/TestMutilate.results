@@ -84,7 +84,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-BadgeoftheSwarmguard-21670"
  value: {
-  dps: 1201.9974389420631
+  dps: 1201.997438942063
  }
 }
 dps_results: {
@@ -114,19 +114,19 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-Bladefist'sBreadth-28041"
  value: {
-  dps: 1203.6073441479582
+  dps: 1203.6073441479584
  }
 }
 dps_results: {
  key: "TestMutilate-AllItems-BladeofUnquenchedThirst-31193"
  value: {
-  dps: 1218.6398619154595
+  dps: 1218.6398619154597
  }
 }
 dps_results: {
  key: "TestMutilate-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 1195.188719815128
+  dps: 1195.1887198151278
  }
 }
 dps_results: {
@@ -174,7 +174,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-CoreofAr'kelos-29776"
  value: {
-  dps: 1208.9051006275756
+  dps: 1208.9051006275754
  }
 }
 dps_results: {
@@ -216,7 +216,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-DestructiveSkyfireDiamond"
  value: {
-  dps: 1192.8238583961474
+  dps: 1192.8238583961472
  }
 }
 dps_results: {
@@ -228,7 +228,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-EmptyMugofDirebrew-38287"
  value: {
-  dps: 1218.6398619154595
+  dps: 1218.6398619154597
  }
 }
 dps_results: {
@@ -264,7 +264,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-Figurine-NightseyePanther-24128"
  value: {
-  dps: 1205.0695790687994
+  dps: 1205.0695790687996
  }
 }
 dps_results: {
@@ -288,7 +288,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-Heartrazor-29962"
  value: {
-  dps: 1218.6398619154595
+  dps: 1218.6398619154597
  }
 }
 dps_results: {
@@ -336,7 +336,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-MadnessoftheBetrayer-32505"
  value: {
-  dps: 1228.9837360474216
+  dps: 1228.9837360474214
  }
 }
 dps_results: {
@@ -402,7 +402,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-RelentlessEarthstormDiamond"
  value: {
-  dps: 1218.6398619154595
+  dps: 1218.6398619154597
  }
 }
 dps_results: {
@@ -420,7 +420,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-ScarabofDisplacement-30629"
  value: {
-  dps: 1173.9125313511604
+  dps: 1173.9125313511606
  }
 }
 dps_results: {
@@ -462,7 +462,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-Slayer'sArmor"
  value: {
-  dps: 1287.1301805256803
+  dps: 1287.13018052568
  }
 }
 dps_results: {
@@ -522,7 +522,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-TheNightBlade-31331"
  value: {
-  dps: 1218.6398619154595
+  dps: 1218.6398619154597
  }
 }
 dps_results: {
@@ -546,7 +546,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-ThunderingSkyfireDiamond"
  value: {
-  dps: 1206.2276810423948
+  dps: 1206.227681042395
  }
 }
 dps_results: {
@@ -564,7 +564,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-AllItems-Warp-SpringCoil-30450"
  value: {
-  dps: 1228.0522156312115
+  dps: 1228.052215631211
  }
 }
 dps_results: {
@@ -600,7 +600,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-SelfDrums-DPS"
  value: {
-  dps: 1219.8657441222906
+  dps: 1219.8657441222908
  }
 }
 dps_results: {
@@ -654,13 +654,13 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1227.566300670869
+  dps: 1227.5663006708687
  }
 }
 dps_results: {
  key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1218.6398619154595
+  dps: 1218.6398619154597
  }
 }
 dps_results: {

@@ -78,7 +78,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-BadgeoftheSwarmguard-21670"
  value: {
-  dps: 1593.1941270503748
+  dps: 1593.194127050375
  }
 }
 dps_results: {
@@ -90,13 +90,13 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-BandoftheEternalSage-29305"
  value: {
-  dps: 1591.2829479764814
+  dps: 1591.2829479764819
  }
 }
 dps_results: {
  key: "TestHunter-AllItems-Beast-tamer'sShoulders-30892"
  value: {
-  dps: 1596.8927243967325
+  dps: 1596.8927243967328
  }
 }
 dps_results: {
@@ -336,7 +336,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-Figurine-NightseyePanther-24128"
  value: {
-  dps: 1602.1681449725752
+  dps: 1602.168144972575
  }
 }
 dps_results: {
@@ -408,7 +408,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 1638.472092668559
+  dps: 1638.4720926685593
  }
 }
 dps_results: {
@@ -498,7 +498,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-PrimalIntent"
  value: {
-  dps: 1587.812706577498
+  dps: 1587.8127065774981
  }
 }
 dps_results: {
@@ -534,7 +534,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 1600.0216231058948
+  dps: 1600.0216231058946
  }
 }
 dps_results: {
@@ -612,7 +612,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-StrengthoftheClefthoof"
  value: {
-  dps: 1399.7172193766744
+  dps: 1399.717219376674
  }
 }
 dps_results: {
@@ -690,13 +690,13 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-TheSkullofGul'dan-32483"
  value: {
-  dps: 1574.4725201321708
+  dps: 1574.4725201321714
  }
 }
 dps_results: {
  key: "TestHunter-AllItems-TheTwinStars"
  value: {
-  dps: 1563.2108238037808
+  dps: 1563.2108238037813
  }
 }
 dps_results: {
@@ -708,7 +708,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 1588.9294205237572
+  dps: 1588.9294205237575
  }
 }
 dps_results: {
@@ -774,7 +774,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-Basic-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1581.441781925258
+  dps: 1581.4417819252585
  }
 }
 dps_results: {
@@ -786,7 +786,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1936.1016794214086
+  dps: 1936.101679421409
  }
 }
 dps_results: {
@@ -1002,7 +1002,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-Basic-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1234.073123942027
+  dps: 1234.0731239420268
  }
 }
 dps_results: {
@@ -1146,7 +1146,7 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1292.3192500126345
+  dps: 1292.3192500126343
  }
 }
 dps_results: {
