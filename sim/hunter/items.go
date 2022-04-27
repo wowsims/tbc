@@ -65,8 +65,7 @@ var ItemSetGronnstalker = core.ItemSet{
 }
 
 func ApplyTalonOfAlar(agent core.Agent) {
-	hunterAgent := agent.(Agent)
-	hunter := hunterAgent.GetHunter()
+	hunter := agent.(HunterAgent).GetHunter()
 
 	procAura := hunter.GetOrRegisterAura(core.Aura{
 		Label:    "Talon of Alar Proc",
@@ -107,17 +106,17 @@ func (hunter *Hunter) talonOfAlarDamageMod(baseDamageConfig core.BaseDamageConfi
 }
 
 func ApplyBeasttamersShoulders(agent core.Agent) {
-	hunter := agent.(Agent).GetHunter()
+	hunter := agent.(HunterAgent).GetHunter()
 
 	hunter.pet.PseudoStats.DamageDealtMultiplier *= 1.03
 	hunter.pet.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*2)
 }
 
 func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
-	character := agent.GetCharacter()
+	hunter := agent.(HunterAgent).GetHunter()
 	const manaGain = 8.0
 
-	character.RegisterAura(core.Aura{
+	hunter.RegisterAura(core.Aura{
 		Label:    "Black Bow of the Betrayer",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -127,13 +126,13 @@ func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskRanged) {
 				return
 			}
-			character.AddMana(sim, manaGain, core.ActionID{SpellID: 46939}, false)
+			hunter.AddMana(sim, manaGain, core.ActionID{SpellID: 46939}, false)
 		},
 	})
 }
 
 func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
-	hunter := agent.(Agent).GetHunter()
+	hunter := agent.(HunterAgent).GetHunter()
 
 	procAura := hunter.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32487}, stats.Stats{stats.AttackPower: 275, stats.RangedAttackPower: 275}, time.Second*8)
 	const procChance = 0.15

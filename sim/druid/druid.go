@@ -151,6 +151,6 @@ func init() {
 }
 
 // Agent is a generic way to access underlying druid on any of the agents (for example balance druid.)
-type Agent interface {
+type DruidAgent interface {
 	GetDruid() *Druid
 }

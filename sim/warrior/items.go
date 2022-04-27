@@ -85,8 +85,8 @@ var ItemSetWarbringerBattlegear = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			// You gain an additional 2 rage each time one of your attacks is parried or dodged.
-			character := agent.GetCharacter()
-			character.RegisterAura(core.Aura{
+			warrior := agent.(WarriorAgent).GetWarrior()
+			warrior.RegisterAura(core.Aura{
 				Label:    "Warbringer 4pc",
 				Duration: core.NeverExpires,
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -94,7 +94,7 @@ var ItemSetWarbringerBattlegear = core.ItemSet{
 				},
 				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if spellEffect.Outcome.Matches(core.OutcomeDodge | core.OutcomeParry) {
-						character.AddRage(sim, 2, core.ActionID{SpellID: 37519})
+						warrior.AddRage(sim, 2, core.ActionID{SpellID: 37519})
 					}
 				},
 			})

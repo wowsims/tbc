@@ -374,6 +374,6 @@ func init() {
 }
 
 // Agent is a generic way to access underlying hunter on any of the agents.
-type Agent interface {
+type HunterAgent interface {
 	GetHunter() *Hunter
 }
