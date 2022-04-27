@@ -33,8 +33,8 @@ var ItemSetAvatar = core.ItemSet{
 	Name: "Avatar Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			character := agent.GetCharacter()
-			character.RegisterAura(core.Aura{
+			priest := agent.(PriestAgent).GetPriest()
+			priest.RegisterAura(core.Aura{
 				Label:    "Avatar Regalia 2pc",
 				Duration: core.NeverExpires,
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -46,12 +46,12 @@ var ItemSetAvatar = core.ItemSet{
 					}
 					// This is a cheat...
 					// easier than adding another aura the subtracts 150 mana from next cast.
-					character.AddMana(sim, 150, core.ActionID{SpellID: 37600}, false)
+					priest.AddMana(sim, 150, core.ActionID{SpellID: 37600}, false)
 				},
 			})
 		},
 		4: func(agent core.Agent) {
-			priest := agent.(Agent).GetPriest()
+			priest := agent.(PriestAgent).GetPriest()
 
 			procAura := priest.NewTemporaryStatsAura("Avatar Regalia 4pc Proc", core.ActionID{SpellID: 37604}, stats.Stats{stats.SpellPower: 100}, time.Second*15)
 			procAura.OnSpellHit = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -93,7 +93,7 @@ var ItemSetAbsolution = core.ItemSet{
 }
 
 func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
-	priest := agent.(Agent).GetPriest()
+	priest := agent.(PriestAgent).GetPriest()
 	// Not in the game yet so cant test; this logic assumes that:
 	// - procrate is 10%
 	// - no ICD on proc

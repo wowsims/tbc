@@ -115,16 +115,16 @@ var ItemSetSlayers = core.ItemSet{
 }
 
 func ApplyWarpSpringCoil(agent core.Agent) {
-	character := agent.GetCharacter()
-	procAura := character.NewTemporaryStatsAura("Warp Spring Coil Proc", core.ActionID{ItemID: 30450}, stats.Stats{stats.ArmorPenetration: 1000}, time.Second*15)
+	rogue := agent.(RogueAgent).GetRogue()
+	procAura := rogue.NewTemporaryStatsAura("Warp Spring Coil Proc", core.ActionID{ItemID: 30450}, stats.Stats{stats.ArmorPenetration: 1000}, time.Second*15)
 	const procChance = 0.25
 
 	icd := core.Cooldown{
-		Timer:    character.NewTimer(),
+		Timer:    rogue.NewTimer(),
 		Duration: time.Second * 30,
 	}
 
-	character.RegisterAura(core.Aura{
+	rogue.RegisterAura(core.Aura{
 		Label:    "Warp Spring Coil",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {

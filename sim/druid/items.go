@@ -21,8 +21,8 @@ var ItemSetMalorne = core.ItemSet{
 	Name: "Malorne Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			character := agent.GetCharacter()
-			character.RegisterAura(core.Aura{
+			druid := agent.(DruidAgent).GetDruid()
+			druid.RegisterAura(core.Aura{
 				Label:    "Malorne Raiment 2pc",
 				Duration: core.NeverExpires,
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -70,7 +70,7 @@ var ItemSetThunderheart = core.ItemSet{
 }
 
 func ApplyLivingRootoftheWildheart(agent core.Agent) {
-	druid := agent.(Agent).GetDruid()
+	druid := agent.(DruidAgent).GetDruid()
 
 	procAura := druid.NewTemporaryStatsAura("Living Root Proc", core.ActionID{ItemID: 30664}, stats.Stats{stats.SpellPower: 209}, time.Second*15)
 
@@ -93,7 +93,7 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 }
 
 func ApplyIdoloftheUnseenMoon(agent core.Agent) {
-	druid := agent.(Agent).GetDruid()
+	druid := agent.(DruidAgent).GetDruid()
 
 	actionID := core.ActionID{ItemID: 33510}
 	procAura := druid.NewTemporaryStatsAura("Idol of the Unseen Moon Proc", actionID, stats.Stats{stats.SpellPower: 140}, time.Second*10)
@@ -116,7 +116,7 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 }
 
 func ApplyAshtongueTalisman(agent core.Agent) {
-	druid := agent.(Agent).GetDruid()
+	druid := agent.(DruidAgent).GetDruid()
 
 	// Not in the game yet so cant test; this logic assumes that:
 	// - does not affect the starfire which procs it

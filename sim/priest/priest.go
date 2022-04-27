@@ -197,6 +197,6 @@ func init() {
 }
 
 // Agent is a generic way to access underlying priest on any of the agents.
-type Agent interface {
+type PriestAgent interface {
 	GetPriest() *Priest
 }
