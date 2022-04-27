@@ -285,25 +285,80 @@ func ApplyEffectFuncDot(dot *Dot) ApplySpellEffects {
 
 // AOE Cap Mechanics:
 // http://web.archive.org/web/20081023033855/http://elitistjerks.com/f47/t25902-aoe_spell_cap_mechanics/
-func applyAOECap(effects []SpellEffect, aoeCap float64) {
+func applyAOECap(effects []SpellEffect, outcomeMultipliers []float64, aoeCap float64) {
 	// Increased damage from crits doesn't count towards the cap, so need to
 	// tally pre-crit damage.
 	totalTowardsCap := 0.0
+	numHits := 0
 	for i, _ := range effects {
 		effect := &effects[i]
-		totalTowardsCap += effect.Damage
+		if effect.Landed() {
+			numHits++
+			if effect.Outcome.Matches(OutcomeCrit) {
+				totalTowardsCap += effect.Damage / outcomeMultipliers[i]
+			} else {
+				totalTowardsCap += effect.Damage
+			}
+		}
 	}
 
 	if totalTowardsCap <= aoeCap {
 		return
 	}
 
-	maxDamagePerHit := aoeCap / float64(len(effects))
+	maxDamagePerHit := aoeCap / float64(numHits)
 	for i, _ := range effects {
 		effect := &effects[i]
-		damageTowardsCap := effect.Damage
-		if damageTowardsCap > maxDamagePerHit {
-			effect.Damage -= damageTowardsCap - maxDamagePerHit
+		if effect.Landed() {
+			if effect.Outcome.Matches(OutcomeCrit) {
+				preCritDamage := effect.Damage / outcomeMultipliers[i]
+				capped := MinFloat(preCritDamage, maxDamagePerHit)
+				effect.Damage = capped * outcomeMultipliers[i]
+			} else {
+				effect.Damage = MinFloat(effect.Damage, maxDamagePerHit)
+			}
+		}
+	}
+}
+func ApplyEffectFuncDamageMultipleAOECapped(sim *Simulation, baseEffect SpellEffect, aoeCap float64) ApplySpellEffects {
+	numHits := sim.GetNumTargets()
+	if numHits == 0 {
+		return nil
+	} else if numHits == 1 {
+		return ApplyEffectFuncDirectDamage(baseEffect)
+	} else if numHits < 4 {
+		// Just assume its impossible to hit AOE cap with <4 targets.
+		return ApplyEffectFuncAOEDamage(sim, baseEffect)
+	}
+
+	baseEffects := make([]SpellEffect, numHits)
+	outcomeMultipliers := make([]float64, numHits)
+	for i := int32(0); i < numHits; i++ {
+		baseEffects[i] = baseEffect
+		baseEffects[i].Target = sim.GetTarget(i)
+	}
+
+	return func(sim *Simulation, _ *Target, spell *Spell) {
+		for i := range baseEffects {
+			effect := &baseEffects[i]
+			effect.init(sim, spell)
+			damage := effect.calculateBaseDamage(sim, spell) * effect.DamageMultiplier
+
+			effect.applyAttackerModifiers(sim, spell, &damage)
+			effect.applyResistances(sim, spell, &damage)
+			damageBefore := damage
+			effect.OutcomeApplier(sim, spell, effect, &damage)
+			outcomeMultipliers[i] = damage / damageBefore
+			effect.Damage = damage
+		}
+		applyAOECap(baseEffects, outcomeMultipliers, aoeCap)
+		for i := range baseEffects {
+			effect := &baseEffects[i]
+			effect.applyTargetModifiers(sim, spell, effect.BaseDamage.TargetSpellCoefficient, &effect.Damage)
+		}
+		for i := range baseEffects {
+			effect := &baseEffects[i]
+			effect.finalize(sim, spell)
 		}
 	}
 }

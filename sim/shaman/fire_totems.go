@@ -63,7 +63,7 @@ func (shaman *Shaman) registerSearingTotemSpell(sim *core.Simulation) {
 
 func (shaman *Shaman) registerMagmaTotemSpell(sim *core.Simulation) {
 	actionID := core.ActionID{SpellID: 25552}
-	//AOECap: 1600,
+	//AOECap: 1550,
 	baseCost := 800.0
 
 	shaman.MagmaTotem = shaman.RegisterSpell(core.SpellConfig{
