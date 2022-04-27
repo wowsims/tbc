@@ -4,10 +4,6 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-const SpellIDWintersChill int32 = 28595
-
-var WintersChillActionID = core.ActionID{SpellID: SpellIDWintersChill}
-
 // Winters Chill has a separate hit check from frostbolt, so it needs its own spell.
 func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 	effect := core.SpellEffect{
@@ -32,7 +28,7 @@ func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 	}
 
 	mage.WintersChill = mage.RegisterSpell(core.SpellConfig{
-		ActionID:    WintersChillActionID,
+		ActionID:    core.ActionID{SpellID: 28595},
 		SpellSchool: core.SpellSchoolFrost,
 		SpellExtras: SpellFlagMage,
 
@@ -58,7 +54,7 @@ func (mage *Mage) applyWintersChill() {
 				return
 			}
 
-			if spell.SpellSchool == core.SpellSchoolFrost && !spell.SameAction(WintersChillActionID) {
+			if spell.SpellSchool == core.SpellSchoolFrost && spell != mage.WintersChill {
 				if procChance != 1.0 && sim.RandomFloat("Winters Chill") > procChance {
 					return
 				}

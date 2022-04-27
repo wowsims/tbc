@@ -8,24 +8,17 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Starfire spell IDs
-const SpellIDSF8 int32 = 26986
-const SpellIDSF6 int32 = 9876
-
-var Starfire8ActionID = core.ActionID{SpellID: SpellIDSF8}
-var Starfire6ActionID = core.ActionID{SpellID: SpellIDSF6}
-
 // Idol IDs
 const IvoryMoongoddess int32 = 27518
 
 func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Spell {
-	actionID := Starfire8ActionID
+	actionID := core.ActionID{SpellID: 26986}
 	baseCost := 370.0
 	minBaseDamage := 550.0
 	maxBaseDamage := 647.0
 	spellCoefficient := 1.0
 	if rank == 6 {
-		actionID = Starfire6ActionID
+		actionID = core.ActionID{SpellID: 9876}
 		baseCost = 315
 		minBaseDamage = 463
 		maxBaseDamage = 543

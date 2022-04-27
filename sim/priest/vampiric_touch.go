@@ -8,21 +8,20 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var VampiricTouchActionID = core.ActionID{SpellID: 34917}
-
-const VampiricTouchBaseCost = 425.0
-
 func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 34917}
+	baseCost := 425.0
+
 	priest.VampiricTouch = priest.RegisterSpell(core.SpellConfig{
-		ActionID:    VampiricTouchActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolShadow,
 
 		ResourceType: stats.Mana,
-		BaseCost:     VampiricTouchBaseCost,
+		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost:     VampiricTouchBaseCost,
+				Cost:     baseCost,
 				GCD:      core.GCDDefault,
 				CastTime: time.Millisecond * 1500,
 			},
@@ -46,7 +45,7 @@ func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
 		Spell: priest.VampiricTouch,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "VampiricTouch-" + strconv.Itoa(int(priest.Index)),
-			ActionID: VampiricTouchActionID,
+			ActionID: actionID,
 		}),
 
 		NumberOfTicks: 5,

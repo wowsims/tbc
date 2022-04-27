@@ -7,13 +7,10 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-const SpellIDStarshards int32 = 25446
-
-var StarshardsActionID = core.ActionID{SpellID: SpellIDStarshards}
-
 func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 25446}
 	priest.Starshards = priest.RegisterSpell(core.SpellConfig{
-		ActionID:    StarshardsActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolArcane,
 
 		Cast: core.CastConfig{
@@ -43,7 +40,7 @@ func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
 		Spell: priest.Starshards,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "Starshards-" + strconv.Itoa(int(priest.Index)),
-			ActionID: StarshardsActionID,
+			ActionID: actionID,
 		}),
 
 		NumberOfTicks: 5,

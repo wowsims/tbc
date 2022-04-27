@@ -8,17 +8,13 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var MutilateActionID = core.ActionID{SpellID: 34413}
-var MutilateMHActionID = core.ActionID{SpellID: 34419}
-var MutilateOHActionID = core.ActionID{SpellID: 34418}
-var MutilateEnergyCost = 60.0
 var MHOutcome = core.OutcomeHit
 var OHOutcome = core.OutcomeHit
 
 func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
-	actionID := MutilateMHActionID
+	actionID := core.ActionID{SpellID: 34419}
 	if !isMH {
-		actionID = MutilateOHActionID
+		actionID = core.ActionID{SpellID: 34418}
 	}
 
 	effect := core.SpellEffect{
@@ -72,19 +68,20 @@ func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
 	mhHitSpell := rogue.newMutilateHitSpell(true)
 	ohHitSpell := rogue.newMutilateHitSpell(false)
 
-	refundAmount := MutilateEnergyCost * 0.8
+	baseCost := 60.0
+	refundAmount := baseCost * 0.8
 
 	rogue.Mutilate = rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    MutilateActionID,
+		ActionID:    core.ActionID{SpellID: 34413},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder,
 
 		ResourceType: stats.Energy,
-		BaseCost:     MutilateEnergyCost,
+		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: MutilateEnergyCost,
+				Cost: baseCost,
 				GCD:  time.Second,
 			},
 			IgnoreHaste: true,
@@ -100,7 +97,7 @@ func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
 					return
 				}
 
-				rogue.AddComboPoints(sim, 2, MutilateActionID)
+				rogue.AddComboPoints(sim, 2, spell.ActionID)
 
 				// TODO: while this is the most natural handling, the oh attack might have effects
 				//  from the mh attack applied

@@ -8,14 +8,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDCorruption8 int32 = 27216
-
-var Corruption8ActionID = core.ActionID{SpellID: SpellIDCorruption8}
-
 func (warlock *Warlock) registerCorruptionSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 27216}
 	baseCost := 370.0
+
 	warlock.Corruption = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:     Corruption8ActionID,
+		ActionID:     actionID,
 		SpellSchool:  core.SpellSchoolShadow,
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -39,7 +37,7 @@ func (warlock *Warlock) registerCorruptionSpell(sim *core.Simulation) {
 		Spell: warlock.Corruption,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "Corruption-" + strconv.Itoa(int(warlock.Index)),
-			ActionID: Corruption8ActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 6,
 		TickLength:    time.Second * 3,

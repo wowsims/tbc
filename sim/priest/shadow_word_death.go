@@ -7,15 +7,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDShadowWordDeath int32 = 32996
-
-var ShadowWordDeathActionID = core.ActionID{SpellID: SpellIDShadowWordDeath}
-
 func (priest *Priest) registerShadowWordDeathSpell(sim *core.Simulation) {
 	baseCost := 309.0
 
 	priest.ShadowWordDeath = priest.RegisterSpell(core.SpellConfig{
-		ActionID:    ShadowWordDeathActionID,
+		ActionID:    core.ActionID{SpellID: 32996},
 		SpellSchool: core.SpellSchoolShadow,
 
 		ResourceType: stats.Mana,

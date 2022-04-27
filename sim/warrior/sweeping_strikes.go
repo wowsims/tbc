@@ -7,16 +7,16 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var SweepingStrikesActionID = core.ActionID{SpellID: 12328}
-
 func (warrior *Warrior) registerSweepingStrikesCD() {
 	if !warrior.Talents.SweepingStrikes {
 		return
 	}
 
+	actionID := core.ActionID{SpellID: 12328}
+
 	var curDmg float64
 	ssHit := warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    SweepingStrikesActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 
@@ -41,7 +41,7 @@ func (warrior *Warrior) registerSweepingStrikesCD() {
 
 	ssAura := warrior.RegisterAura(core.Aura{
 		Label:     "Sweeping Strikes",
-		ActionID:  SweepingStrikesActionID,
+		ActionID:  actionID,
 		Duration:  core.NeverExpires,
 		MaxStacks: 10,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
@@ -65,7 +65,7 @@ func (warrior *Warrior) registerSweepingStrikesCD() {
 
 	cost := 30.0
 	ssCD := warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    SweepingStrikesActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
 
 		ResourceType: stats.Rage,

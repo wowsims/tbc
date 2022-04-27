@@ -6,8 +6,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var DevastateActionID = core.ActionID{SpellID: 30022}
-
 func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 	cost := 15.0 - float64(warrior.Talents.ImprovedSunderArmor) - float64(warrior.Talents.FocusedRage)
 	refundAmount := cost * 0.8
@@ -15,7 +13,7 @@ func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
 	normalBaseDamage := core.BaseDamageFuncMeleeWeapon(core.MainHand, true, 0, 0.5, true)
 
 	warrior.Devastate = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    DevastateActionID,
+		ActionID:    core.ActionID{SpellID: 30022},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

@@ -8,8 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var MortalStrikeActionID = core.ActionID{SpellID: 30330}
-
 func (warrior *Warrior) registerMortalStrikeSpell(_ *core.Simulation, cdTimer *core.Timer) {
 	cost := 30.0
 	if ItemSetDestroyerBattlegear.CharacterHasSetBonus(&warrior.Character, 4) {
@@ -18,7 +16,7 @@ func (warrior *Warrior) registerMortalStrikeSpell(_ *core.Simulation, cdTimer *c
 	refundAmount := cost * 0.8
 
 	warrior.MortalStrike = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    MortalStrikeActionID,
+		ActionID:    core.ActionID{SpellID: 30330},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

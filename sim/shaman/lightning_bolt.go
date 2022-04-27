@@ -7,8 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/items"
 )
 
-const SpellIDLB12 int32 = 25449
-
 // newLightningBoltTemplate returns a cast generator for Lightning Bolt with as many fields precomputed as possible.
 func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOverload bool) *core.Spell {
 	baseCost := 300.0
@@ -17,7 +15,7 @@ func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOve
 	}
 
 	spellConfig := shaman.newElectricSpellConfig(
-		core.ActionID{SpellID: SpellIDLB12},
+		core.ActionID{SpellID: 25449},
 		baseCost,
 		time.Millisecond*2500,
 		isLightningOverload)

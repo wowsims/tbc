@@ -8,13 +8,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var RaptorStrikeActionID = core.ActionID{SpellID: 27014}
-
 func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
 	baseCost := 120.0
 
 	hunter.RaptorStrike = hunter.RegisterSpell(core.SpellConfig{
-		ActionID:    RaptorStrikeActionID,
+		ActionID:    core.ActionID{SpellID: 27014},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

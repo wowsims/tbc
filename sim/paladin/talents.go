@@ -68,10 +68,6 @@ func (paladin *Paladin) applySanctityAura() {
 	}
 }
 
-var VengeanceActionID = core.ActionID{SpellID: 20059}
-
-const VengeanceDuration = time.Second * 30
-
 // I don't know if the new stack of vengeance applies to the crit that triggered it or not
 // Need to check this
 func (paladin *Paladin) applyVengeance() {
@@ -82,8 +78,8 @@ func (paladin *Paladin) applyVengeance() {
 	bonusPerStack := 0.01 * float64(paladin.Talents.Vengeance)
 	procAura := paladin.RegisterAura(core.Aura{
 		Label:     "Vengeance Proc",
-		ActionID:  VengeanceActionID,
-		Duration:  VengeanceDuration,
+		ActionID:  core.ActionID{SpellID: 20059},
+		Duration:  time.Second * 30,
 		MaxStacks: 3,
 		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
 			aura.Unit.PseudoStats.DamageDealtMultiplier /= 1 + (bonusPerStack * float64(oldStacks))

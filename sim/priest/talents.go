@@ -132,16 +132,16 @@ func (priest *Priest) applySurgeOfLight(_ *core.Simulation, _ *core.Spell, cast 
 	}
 }
 
-var InnerFocusActionID = core.ActionID{SpellID: 14751}
-
 func (priest *Priest) registerInnerFocus() {
 	if !priest.Talents.InnerFocus {
 		return
 	}
 
+	actionID := core.ActionID{SpellID: 14751}
+
 	priest.InnerFocusAura = priest.RegisterAura(core.Aura{
 		Label:    "Inner Focus",
-		ActionID: InnerFocusActionID,
+		ActionID: actionID,
 		Duration: core.NeverExpires,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			priest.AddStat(stats.SpellCrit, 25*core.SpellCritRatingPerCritChance)
@@ -159,7 +159,7 @@ func (priest *Priest) registerInnerFocus() {
 	})
 
 	priest.InnerFocus = priest.RegisterSpell(core.SpellConfig{
-		ActionID: InnerFocusActionID,
+		ActionID: actionID,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{

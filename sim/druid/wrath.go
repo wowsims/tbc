@@ -8,11 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-// Starfire spell IDs
-const SpellIDWrath int32 = 26985
-
-var WrathActionID = core.ActionID{SpellID: SpellIDWrath}
-
 const IdolAvenger int32 = 31025
 
 func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
@@ -22,7 +17,7 @@ func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
 	bonusFlatDamage := core.TernaryFloat64(druid.Equip[items.ItemSlotRanged].ID == IdolAvenger, 25*0.571, 0)
 
 	druid.Wrath = druid.RegisterSpell(core.SpellConfig{
-		ActionID:    WrathActionID,
+		ActionID:    core.ActionID{SpellID: 26985},
 		SpellSchool: core.SpellSchoolNature,
 
 		ResourceType: stats.Mana,

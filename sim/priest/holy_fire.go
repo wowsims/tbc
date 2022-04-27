@@ -8,15 +8,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDHolyFire int32 = 25384
-
-var HolyFireActionID = core.ActionID{SpellID: SpellIDHolyFire}
-
 func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 25384}
 	baseCost := 290.0
 
 	priest.HolyFire = priest.RegisterSpell(core.SpellConfig{
-		ActionID:    HolyFireActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolHoly,
 
 		ResourceType: stats.Mana,
@@ -50,7 +47,7 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 		Spell: priest.HolyFire,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "HolyFire-" + strconv.Itoa(int(priest.Index)),
-			ActionID: HolyFireActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 5,
 		TickLength:    time.Second * 2,

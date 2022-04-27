@@ -8,14 +8,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDUnstableAff3 int32 = 30405
-
-var UnstableAff3ActionID = core.ActionID{SpellID: SpellIDUnstableAff3}
-
 func (warlock *Warlock) registerUnstableAffSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 30405}
 	baseCost := 400.0
+
 	warlock.UnstableAff = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:     UnstableAff3ActionID,
+		ActionID:     actionID,
 		SpellSchool:  core.SpellSchoolShadow,
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -39,7 +37,7 @@ func (warlock *Warlock) registerUnstableAffSpell(sim *core.Simulation) {
 		Spell: warlock.UnstableAff,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "unstableaff-" + strconv.Itoa(int(warlock.Index)),
-			ActionID: UnstableAff3ActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 6,
 		TickLength:    time.Second * 3,

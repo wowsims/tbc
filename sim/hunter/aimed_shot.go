@@ -5,13 +5,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var AimedShotActionID = core.ActionID{SpellID: 27065}
-
 func (hunter *Hunter) registerAimedShotSpell(sim *core.Simulation) {
 	baseCost := 370.0
 
 	hunter.AimedShot = hunter.RegisterSpell(core.SpellConfig{
-		ActionID:    AimedShotActionID,
+		ActionID:    core.ActionID{SpellID: 27065},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

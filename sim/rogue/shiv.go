@@ -8,8 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ShivActionID = core.ActionID{SpellID: 5938}
-
 func (rogue *Rogue) registerShivSpell(_ *core.Simulation) {
 	cost := 20.0
 	if rogue.GetOHWeapon() != nil {
@@ -17,7 +15,7 @@ func (rogue *Rogue) registerShivSpell(_ *core.Simulation) {
 	}
 
 	rogue.Shiv = rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    ShivActionID,
+		ActionID:    core.ActionID{SpellID: 5938},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder | core.SpellExtrasCannotBeDodged,
 
@@ -40,7 +38,7 @@ func (rogue *Rogue) registerShivSpell(_ *core.Simulation) {
 			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(false, true)),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
-					rogue.AddComboPoints(sim, 1, ShivActionID)
+					rogue.AddComboPoints(sim, 1, spell.ActionID)
 
 					switch rogue.Consumes.OffHandImbue {
 					case proto.WeaponImbue_WeaponImbueRogueDeadlyPoison:

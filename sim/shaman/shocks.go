@@ -9,10 +9,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDEarthShock int32 = 25454
-const SpellIDFlameShock int32 = 25457
-const SpellIDFrostShock int32 = 25464
-
 func (shaman *Shaman) ShockCD() time.Duration {
 	return time.Second*6 - time.Millisecond*200*time.Duration(shaman.Talents.Reverberation)
 }
@@ -63,7 +59,7 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 }
 
 func (shaman *Shaman) registerEarthShockSpell(sim *core.Simulation, shockTimer *core.Timer) {
-	config, effect := shaman.newShockSpellConfig(sim, SpellIDEarthShock, core.SpellSchoolNature, 535.0, shockTimer)
+	config, effect := shaman.newShockSpellConfig(sim, 25454, core.SpellSchoolNature, 535.0, shockTimer)
 	config.SpellExtras |= core.SpellExtrasBinary
 
 	effect.BaseDamage = core.BaseDamageConfigMagic(661, 696, 0.386)
@@ -74,7 +70,8 @@ func (shaman *Shaman) registerEarthShockSpell(sim *core.Simulation, shockTimer *
 }
 
 func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation, shockTimer *core.Timer) {
-	config, effect := shaman.newShockSpellConfig(sim, SpellIDFlameShock, core.SpellSchoolFire, 500.0, shockTimer)
+	const spellID = 25457
+	config, effect := shaman.newShockSpellConfig(sim, spellID, core.SpellSchoolFire, 500.0, shockTimer)
 
 	effect.BaseDamage = core.BaseDamageConfigMagic(377, 377, 0.214)
 	effect.OutcomeApplier = shaman.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
@@ -102,7 +99,7 @@ func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation, shockTimer *
 		Spell: shaman.FlameShock,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "FlameShock-" + strconv.Itoa(int(shaman.Index)),
-			ActionID: core.ActionID{SpellID: SpellIDFlameShock},
+			ActionID: core.ActionID{SpellID: spellID},
 		}),
 		NumberOfTicks: 4,
 		TickLength:    time.Second * 3,
@@ -118,7 +115,7 @@ func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation, shockTimer *
 }
 
 func (shaman *Shaman) registerFrostShockSpell(sim *core.Simulation, shockTimer *core.Timer) {
-	config, effect := shaman.newShockSpellConfig(sim, SpellIDFrostShock, core.SpellSchoolFrost, 525.0, shockTimer)
+	config, effect := shaman.newShockSpellConfig(sim, 25464, core.SpellSchoolFrost, 525.0, shockTimer)
 	config.SpellExtras |= core.SpellExtrasBinary
 
 	effect.ThreatMultiplier *= 2

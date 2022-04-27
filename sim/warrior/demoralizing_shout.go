@@ -5,8 +5,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var DemoralizingShoutActionID = core.ActionID{SpellID: 25203}
-
 func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
 	cost := 10.0
 	cost -= float64(warrior.Talents.FocusedRage)
@@ -39,7 +37,7 @@ func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
 	}
 
 	warrior.DemoralizingShout = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    DemoralizingShoutActionID,
+		ActionID:    core.ActionID{SpellID: 25203},
 		SpellSchool: core.SpellSchoolPhysical,
 
 		ResourceType: stats.Rage,

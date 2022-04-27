@@ -6,11 +6,9 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-const SpellIDCL6 int32 = 25442
-
 func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOverload bool) *core.Spell {
 	spellConfig := shaman.newElectricSpellConfig(
-		core.ActionID{SpellID: SpellIDCL6},
+		core.ActionID{SpellID: 25442},
 		760.0,
 		time.Millisecond*2000,
 		isLightningOverload)

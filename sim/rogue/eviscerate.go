@@ -7,12 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var EviscerateActionID = core.ActionID{SpellID: 26865}
-
 func (rogue *Rogue) makeEviscerate(comboPoints int32) *core.Spell {
-	actionID := EviscerateActionID
-	actionID.Tag = comboPoints
-
 	baseDamage := 60.0 + (185+core.TernaryFloat64(ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2), 40, 0))*float64(comboPoints)
 	apRatio := 0.03 * float64(comboPoints)
 
@@ -23,7 +18,7 @@ func (rogue *Rogue) makeEviscerate(comboPoints int32) *core.Spell {
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	return rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
+		ActionID:    core.ActionID{SpellID: 26865, Tag: comboPoints},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics | rogue.finisherFlags(),
 

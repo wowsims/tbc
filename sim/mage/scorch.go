@@ -7,10 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDScorch int32 = 27074
-
-var ScorchActionID = core.ActionID{SpellID: SpellIDScorch}
-
 func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 	baseCost := 180.0
 
@@ -52,7 +48,7 @@ func (mage *Mage) registerScorchSpell(sim *core.Simulation) {
 	}
 
 	mage.Scorch = mage.RegisterSpell(core.SpellConfig{
-		ActionID:    ScorchActionID,
+		ActionID:    core.ActionID{SpellID: 27074},
 		SpellSchool: core.SpellSchoolFire,
 		SpellExtras: SpellFlagMage,
 

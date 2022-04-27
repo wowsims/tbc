@@ -1,7 +1,6 @@
 package warrior
 
 import (
-	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -41,10 +40,10 @@ var ItemSetWarbringerArmor = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			// Your Revenge ability causes your next damaging ability to do 10% more damage.
-			character := agent.GetCharacter()
+			warrior := agent.(WarriorAgent).GetWarrior()
 
 			// TODO: This needs to apply only to specific abilities, not any source of damage.
-			procAura := character.RegisterAura(core.Aura{
+			procAura := warrior.RegisterAura(core.Aura{
 				Label:    "Warbringer 4pc Proc",
 				ActionID: core.ActionID{SpellID: 37516},
 				Duration: core.NeverExpires,
@@ -61,14 +60,14 @@ var ItemSetWarbringerArmor = core.ItemSet{
 				},
 			})
 
-			character.RegisterAura(core.Aura{
+			warrior.RegisterAura(core.Aura{
 				Label:    "Warbringer 4pc",
 				Duration: core.NeverExpires,
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Activate(sim)
 				},
 				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-					if spell.SameAction(RevengeActionID) {
+					if spell == warrior.Revenge {
 						procAura.Activate(sim)
 					}
 				},
@@ -155,11 +154,7 @@ var ItemSetOnslaughtBattlegear = core.ItemSet{
 }
 
 func ApplyAshtongueTalismanOfValor(agent core.Agent) {
-	warriorAgent, ok := agent.(WarriorAgent)
-	if !ok {
-		log.Fatalf("Non-warrior attempted to activate Ashtongue Talisman of Valor.")
-	}
-	warrior := warriorAgent.GetWarrior()
+	warrior := agent.(WarriorAgent).GetWarrior()
 	procAura := warrior.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32485}, stats.Stats{stats.Strength: 55}, time.Second*12)
 
 	warrior.RegisterAura(core.Aura{

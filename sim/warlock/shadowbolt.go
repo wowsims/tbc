@@ -7,10 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDSB11 int32 = 27209
-
-var ShadowBolt11ActionID = core.ActionID{SpellID: SpellIDSB11}
-
 func (warlock *Warlock) registerShadowboltSpell(sim *core.Simulation) {
 	warlock.ImpShadowboltAura = warlock.impShadowboltDebuffAura(sim.GetPrimaryTarget())
 	has4pMal := ItemSetMaleficRaiment.CharacterHasSetBonus(&warlock.Character, 4)
@@ -44,7 +40,7 @@ func (warlock *Warlock) registerShadowboltSpell(sim *core.Simulation) {
 
 	baseCost := 420.0
 	warlock.Shadowbolt = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:    ShadowBolt11ActionID,
+		ActionID:    core.ActionID{SpellID: 27209},
 		SpellSchool: core.SpellSchoolShadow,
 
 		ResourceType: stats.Mana,

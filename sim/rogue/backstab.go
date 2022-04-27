@@ -8,23 +8,21 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var BackstabActionID = core.ActionID{SpellID: 26863}
-var BackstabEnergyCost = 60.0
-
 func (rogue *Rogue) registerBackstabSpell(_ *core.Simulation) {
-	refundAmount := BackstabEnergyCost * 0.8
+	baseCost := 60.0
+	refundAmount := baseCost * 0.8
 
 	rogue.Backstab = rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    BackstabActionID,
+		ActionID:    core.ActionID{SpellID: 26863},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder,
 
 		ResourceType: stats.Energy,
-		BaseCost:     BackstabEnergyCost,
+		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: BackstabEnergyCost,
+				Cost: baseCost,
 				GCD:  time.Second,
 			},
 			IgnoreHaste: true,
@@ -44,7 +42,7 @@ func (rogue *Rogue) registerBackstabSpell(_ *core.Simulation) {
 			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, true)),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
-					rogue.AddComboPoints(sim, 1, BackstabActionID)
+					rogue.AddComboPoints(sim, 1, spell.ActionID)
 				} else {
 					rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 				}

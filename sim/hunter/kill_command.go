@@ -7,8 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var KillCommandActionID = core.ActionID{SpellID: 34026}
-
 func (hunter *Hunter) applyKillCommand() {
 	if hunter.pet == nil {
 		return
@@ -33,7 +31,7 @@ func (hunter *Hunter) registerKillCommandSpell(sim *core.Simulation) {
 	baseCost := 75.0
 
 	hunter.KillCommand = hunter.RegisterSpell(core.SpellConfig{
-		ActionID:    KillCommandActionID,
+		ActionID:    core.ActionID{SpellID: 34026},
 		SpellSchool: core.SpellSchoolPhysical,
 
 		ResourceType: stats.Mana,

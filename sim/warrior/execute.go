@@ -6,8 +6,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ExecuteActionID = core.ActionID{SpellID: 25236}
-
 func (warrior *Warrior) registerExecuteSpell(_ *core.Simulation) {
 	cost := 15.0 - float64(warrior.Talents.FocusedRage)
 	if warrior.Talents.ImprovedExecute == 1 {
@@ -23,7 +21,7 @@ func (warrior *Warrior) registerExecuteSpell(_ *core.Simulation) {
 	var extraRage float64
 
 	warrior.Execute = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    ExecuteActionID,
+		ActionID:    core.ActionID{SpellID: 25236},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

@@ -8,13 +8,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var SerpentStingActionID = core.ActionID{SpellID: 27016}
-
 func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 27016}
 	baseCost := 275.0
 
 	hunter.SerpentSting = hunter.RegisterSpell(core.SpellConfig{
-		ActionID:    SerpentStingActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolNature,
 
 		ResourceType: stats.Mana,
@@ -44,7 +43,7 @@ func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
 		Spell: hunter.SerpentSting,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "SerpentSting-" + strconv.Itoa(int(hunter.Index)),
-			ActionID: SerpentStingActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 5,
 		TickLength:    time.Second * 3,

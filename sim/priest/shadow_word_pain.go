@@ -8,15 +8,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDShadowWordPain int32 = 25368
-
-var ShadowWordPainActionID = core.ActionID{SpellID: SpellIDShadowWordPain}
-
 func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 25368}
 	baseCost := 575.0
 
 	priest.ShadowWordPain = priest.RegisterSpell(core.SpellConfig{
-		ActionID:    ShadowWordPainActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolShadow,
 
 		ResourceType: stats.Mana,
@@ -47,7 +44,7 @@ func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
 		Spell: priest.ShadowWordPain,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "ShadowWordPain-" + strconv.Itoa(int(priest.Index)),
-			ActionID: ShadowWordPainActionID,
+			ActionID: actionID,
 		}),
 
 		NumberOfTicks: 6 +
