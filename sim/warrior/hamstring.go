@@ -7,13 +7,11 @@ import (
 )
 
 func (warrior *Warrior) registerHamstringSpell() {
-	actionID := core.ActionID{SpellID: 25212}
-
 	cost := 10 - float64(warrior.Talents.FocusedRage)
 	refundAmount := cost * 0.8
 
 	warrior.Hamstring = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
+		ActionID:    core.ActionID{SpellID: 25212},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

@@ -8,16 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const ConsecrationCDTime = time.Second * 8
-
-const SpellIDConsecrationRank6 = 27173
-const SpellIDConsecrationRank4 = 20923
-const SpellIDConsecrationRank1 = 26573
-
-var ConsecrationRank6ActionID = core.ActionID{SpellID: SpellIDConsecrationRank6}
-var ConsecrationRank4ActionID = core.ActionID{SpellID: SpellIDConsecrationRank4}
-var ConsecrationRank1ActionID = core.ActionID{SpellID: SpellIDConsecrationRank1}
-
 // Maybe could switch "rank" parameter type to some proto thing. Would require updates to proto files.
 // Prot guys do whatever you want here I guess
 func (paladin *Paladin) RegisterConsecrationSpell(sim *core.Simulation, rank int32) {
@@ -28,15 +18,15 @@ func (paladin *Paladin) RegisterConsecrationSpell(sim *core.Simulation, rank int
 	switch rank {
 	case 6:
 		manaCost = 660
-		actionID = ConsecrationRank6ActionID
+		actionID.SpellID = 27173
 		baseDamage = 64
 	case 4:
 		manaCost = 390
-		actionID = ConsecrationRank4ActionID
+		actionID.SpellID = 20923
 		baseDamage = 35
 	case 1:
 		manaCost = 120
-		actionID = ConsecrationRank1ActionID
+		actionID.SpellID = 26573
 		baseDamage = 8
 	default:
 		manaCost = 0.0
@@ -82,7 +72,7 @@ func (paladin *Paladin) RegisterConsecrationSpell(sim *core.Simulation, rank int
 			},
 			CD: core.Cooldown{
 				Timer:    paladin.NewTimer(),
-				Duration: ConsecrationCDTime,
+				Duration: time.Second * 8,
 			},
 		},
 

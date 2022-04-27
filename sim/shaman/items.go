@@ -1,7 +1,6 @@
 package shaman
 
 import (
-	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -37,11 +36,7 @@ var ItemSetTidefury = core.ItemSet{
 			// Handled in chain_lightning.go
 		},
 		4: func(agent core.Agent) {
-			shamanAgent, ok := agent.(ShamanAgent)
-			if !ok {
-				log.Fatalf("Non-shaman attempted to activate shaman cyclone set bonus.")
-			}
-			shaman := shamanAgent.GetShaman()
+			shaman := agent.(ShamanAgent).GetShaman()
 
 			if shaman.SelfBuffs.WaterShield {
 				shaman.AddStat(stats.MP5, 3)
@@ -122,11 +117,7 @@ var ItemSetSkyshatterRegalia = core.ItemSet{
 	Name: "Skyshatter Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			shamanAgent, ok := agent.(ShamanAgent)
-			if !ok {
-				log.Fatalf("Non-shaman attempted to activate shaman t6 2p bonus.")
-			}
-			shaman := shamanAgent.GetShaman()
+			shaman := agent.(ShamanAgent).GetShaman()
 
 			if shaman.Totems.Air == proto.AirTotem_NoAirTotem ||
 				shaman.Totems.Water == proto.WaterTotem_NoWaterTotem ||
@@ -221,8 +212,7 @@ func ApplyFathomBroochOfTheTidewalker(agent core.Agent) {
 }
 
 func ApplyAshtongueTalismanOfVision(agent core.Agent) {
-	shamanAgent := agent.(ShamanAgent)
-	shaman := shamanAgent.GetShaman()
+	shaman := agent.(ShamanAgent).GetShaman()
 	procAura := shaman.NewTemporaryStatsAura("Ashtongue Talisman of Vision Proc", core.ActionID{ItemID: 32491}, stats.Stats{stats.AttackPower: 275}, time.Second*10)
 
 	shaman.RegisterAura(core.Aura{
@@ -245,8 +235,7 @@ func ApplyAshtongueTalismanOfVision(agent core.Agent) {
 }
 
 func ApplySkycallTotem(agent core.Agent) {
-	shamanAgent := agent.(ShamanAgent)
-	shaman := shamanAgent.GetShaman()
+	shaman := agent.(ShamanAgent).GetShaman()
 	procAura := shaman.NewTemporaryStatsAura("Skycall Totem Proc", core.ActionID{ItemID: 33506}, stats.Stats{stats.SpellHaste: 101}, time.Second*10)
 
 	shaman.RegisterAura(core.Aura{

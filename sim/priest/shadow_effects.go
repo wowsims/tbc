@@ -38,12 +38,12 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 			if spellEffect.Damage > 0 && priest.VampiricTouchDot.IsActive() {
 				amount := spellEffect.Damage * 0.05
 				for _, partyMember := range priest.Party.Players {
-					partyMember.GetCharacter().AddMana(sim, amount, VampiricTouchActionID, false)
+					partyMember.GetCharacter().AddMana(sim, amount, priest.VampiricTouch.ActionID, false)
 				}
 				for _, petAgent := range priest.Party.Pets {
 					pet := petAgent.GetPet()
 					if pet.IsEnabled() {
-						pet.Character.AddMana(sim, amount, VampiricTouchActionID, false)
+						pet.Character.AddMana(sim, amount, priest.VampiricTouch.ActionID, false)
 					}
 				}
 			}
@@ -56,17 +56,17 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 			if spellEffect.Damage > 0 && priest.VampiricTouchDot.IsActive() {
 				amount := spellEffect.Damage * 0.05
 				for _, partyMember := range priest.Party.Players {
-					partyMember.GetCharacter().AddMana(sim, amount, VampiricTouchActionID, false)
+					partyMember.GetCharacter().AddMana(sim, amount, priest.VampiricTouch.ActionID, false)
 				}
 				for _, petAgent := range priest.Party.Pets {
 					pet := petAgent.GetPet()
 					if pet.IsEnabled() {
-						pet.Character.AddMana(sim, amount, VampiricTouchActionID, false)
+						pet.Character.AddMana(sim, amount, priest.VampiricTouch.ActionID, false)
 					}
 				}
 			}
 
-			if spell.ActionID.SpellID == SpellIDShadowWordPain || spell.ActionID.SpellID == VampiricTouchActionID.SpellID || spell.ActionID.SpellID == SpellIDMindFlay {
+			if spell == priest.ShadowWordPain || spell == priest.VampiricTouch || spell.ActionID.SpellID == priest.MindFlay[1].ActionID.SpellID {
 				priest.ApplyMisery(sim, spellEffect.Target)
 			}
 		},

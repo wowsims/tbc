@@ -8,14 +8,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var RevengeActionID = core.ActionID{SpellID: 30357}
-
 func (warrior *Warrior) registerRevengeSpell(cdTimer *core.Timer) {
 	cost := 5.0 - float64(warrior.Talents.FocusedRage)
 	refundAmount := cost * 0.8
 
 	warrior.Revenge = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    RevengeActionID,
+		ActionID:    core.ActionID{SpellID: 30357},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

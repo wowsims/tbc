@@ -8,12 +8,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDImmolate9 int32 = 27215
-
-var Immolate9ActionID = core.ActionID{SpellID: SpellIDImmolate9}
-
 func (warlock *Warlock) registerImmolateSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 27215}
 	baseCost := 445.0
+
 	effect := core.SpellEffect{
 		BonusSpellCritRating: float64(warlock.Talents.Devastation)*1*core.SpellCritRatingPerCritChance +
 			float64(warlock.Talents.Backlash)*1*core.SpellCritRatingPerCritChance,
@@ -28,7 +26,7 @@ func (warlock *Warlock) registerImmolateSpell(sim *core.Simulation) {
 	}
 
 	warlock.Immolate = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:     Immolate9ActionID,
+		ActionID:     actionID,
 		SpellSchool:  core.SpellSchoolFire,
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -49,7 +47,7 @@ func (warlock *Warlock) registerImmolateSpell(sim *core.Simulation) {
 		Spell: warlock.Immolate,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "immolate-" + strconv.Itoa(int(warlock.Index)),
-			ActionID: Immolate9ActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 5 + core.TernaryInt(ItemSetVoidheartRaiment.CharacterHasSetBonus(&warlock.Character, 4), 1, 0), // voidheart 4p gives 1 extra tick
 		TickLength:    time.Second * 3,

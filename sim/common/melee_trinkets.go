@@ -141,8 +141,6 @@ func ApplyCrystalforgedTrinket(agent core.Agent) {
 	)
 }
 
-var BadgeOfTheSwarmguardActionID = core.ActionID{ItemID: 21670}
-
 func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 	character := agent.GetCharacter()
 
@@ -156,10 +154,11 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 		},
 	})
 
+	actionID := core.ActionID{ItemID: 21670}
 	ppmm := character.AutoAttacks.NewPPMManager(10.0)
 	activeAura := character.RegisterAura(core.Aura{
 		Label:    "Badge of the Swarmguard",
-		ActionID: BadgeOfTheSwarmguardActionID,
+		ActionID: actionID,
 		Duration: time.Second * 30,
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			procAura.Deactivate(sim)
@@ -182,7 +181,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 	})
 
 	spell := character.RegisterSpell(core.SpellConfig{
-		ActionID: BadgeOfTheSwarmguardActionID,
+		ActionID: actionID,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{

@@ -28,7 +28,7 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 
 		bonusPer5Seconds := hunter.GetStat(stats.Intellect)*scaling + 0.35*70
 		manaGain := bonusPer5Seconds * 2 / 5
-		hunter.AddMana(sim, manaGain, AspectOfTheViperActionID, false)
+		hunter.AddMana(sim, manaGain, hunter.AspectOfTheViper.ActionID, false)
 	}
 
 	if hunter.IsWaitingForMana() && hunter.DoneWaitingForMana(sim) {
@@ -390,11 +390,11 @@ func (hunter *Hunter) GetPresimOptions() *core.PresimOptions {
 
 		OnPresimResult: func(presimResult proto.UnitMetrics, iterations int32, duration time.Duration) bool {
 			hunter.avgShootDmg = core.GetActionAvgCast(presimResult, core.ActionID{OtherID: proto.OtherAction_OtherActionShoot})
-			hunter.avgWeaveDmg = core.GetActionAvgCast(presimResult, RaptorStrikeActionID) +
+			hunter.avgWeaveDmg = core.GetActionAvgCast(presimResult, core.ActionID{SpellID: 27014}) +
 				core.GetActionAvgCast(presimResult, core.ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1})
-			hunter.avgSteadyDmg = core.GetActionAvgCast(presimResult, SteadyShotActionID)
-			hunter.avgMultiDmg = core.GetActionAvgCast(presimResult, MultiShotActionID)
-			hunter.avgArcaneDmg = core.GetActionAvgCast(presimResult, ArcaneShotActionID)
+			hunter.avgSteadyDmg = core.GetActionAvgCast(presimResult, core.ActionID{SpellID: 34120})
+			hunter.avgMultiDmg = core.GetActionAvgCast(presimResult, core.ActionID{SpellID: 27021})
+			hunter.avgArcaneDmg = core.GetActionAvgCast(presimResult, core.ActionID{SpellID: 27019})
 			return true
 		},
 	}

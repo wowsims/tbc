@@ -7,18 +7,15 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDBlizzard int32 = 27085
-
-var BlizzardActionID = core.ActionID{SpellID: SpellIDBlizzard}
-
 func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 27085}
 	//AOECap: 3620,
 	baseCost := 1645.0
 
 	blizzardDot := core.NewDot(core.Dot{
 		Aura: mage.RegisterAura(core.Aura{
 			Label:    "Blizzard",
-			ActionID: BlizzardActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks:       8,
 		TickLength:          time.Second * 1,
@@ -37,7 +34,7 @@ func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
 	})
 
 	mage.Blizzard = mage.RegisterSpell(core.SpellConfig{
-		ActionID:    BlizzardActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFrost,
 		SpellExtras: SpellFlagMage | core.SpellExtrasChanneled,
 

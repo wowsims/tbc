@@ -6,14 +6,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var HeroicStrikeActionID = core.ActionID{SpellID: 29707}
-
 func (warrior *Warrior) registerHeroicStrikeSpell(_ *core.Simulation) {
 	cost := 15.0 - float64(warrior.Talents.ImprovedHeroicStrike) - float64(warrior.Talents.FocusedRage)
 	refundAmount := cost * 0.8
 
 	warrior.HeroicStrike = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    HeroicStrikeActionID,
+		ActionID:    core.ActionID{SpellID: 29707},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

@@ -7,25 +7,23 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ExposeArmorActionID = core.ActionID{SpellID: 26866, Tag: 5}
-var ExposeArmorEnergyCost = 25.0
-
 func (rogue *Rogue) registerExposeArmorSpell(sim *core.Simulation) {
+	baseCost := 25.0
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
 	rogue.ExposeArmorAura = core.ExposeArmorAura(sim.GetPrimaryTarget(), rogue.Talents.ImprovedExposeArmor)
 
 	rogue.ExposeArmor = rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    ExposeArmorActionID,
+		ActionID:    core.ActionID{SpellID: 26866, Tag: 5},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics | rogue.finisherFlags(),
 
 		ResourceType: stats.Energy,
-		BaseCost:     ExposeArmorEnergyCost,
+		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: ExposeArmorEnergyCost,
+				Cost: baseCost,
 				GCD:  time.Second,
 			},
 			ModifyCast:  rogue.applyDeathmantle,

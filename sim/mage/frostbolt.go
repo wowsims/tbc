@@ -7,15 +7,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDFrostbolt int32 = 27072
-
-var FrostboltActionID = core.ActionID{SpellID: SpellIDFrostbolt}
-
 func (mage *Mage) registerFrostboltSpell(sim *core.Simulation) {
 	baseCost := 330.0
 
 	mage.Frostbolt = mage.RegisterSpell(core.SpellConfig{
-		ActionID:    FrostboltActionID,
+		ActionID:    core.ActionID{SpellID: 27072},
 		SpellSchool: core.SpellSchoolFrost,
 		SpellExtras: SpellFlagMage | core.SpellExtrasBinary,
 

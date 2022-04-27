@@ -51,21 +51,21 @@ var ItemSetAvatar = core.ItemSet{
 			})
 		},
 		4: func(agent core.Agent) {
-			character := agent.GetCharacter()
+			priest := agent.(Agent).GetPriest()
 
-			procAura := character.NewTemporaryStatsAura("Avatar Regalia 4pc Proc", core.ActionID{SpellID: 37604}, stats.Stats{stats.SpellPower: 100}, time.Second*15)
+			procAura := priest.NewTemporaryStatsAura("Avatar Regalia 4pc Proc", core.ActionID{SpellID: 37604}, stats.Stats{stats.SpellPower: 100}, time.Second*15)
 			procAura.OnSpellHit = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				aura.Deactivate(sim)
 			}
 
-			character.RegisterAura(core.Aura{
+			priest.RegisterAura(core.Aura{
 				Label:    "Avatar Regalia 4pc",
 				Duration: core.NeverExpires,
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Activate(sim)
 				},
 				OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-					if spell.ActionID.SpellID != SpellIDShadowWordPain {
+					if spell != priest.ShadowWordPain {
 						return
 					}
 
@@ -93,21 +93,21 @@ var ItemSetAbsolution = core.ItemSet{
 }
 
 func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
-	char := agent.GetCharacter()
+	priest := agent.(Agent).GetPriest()
 	// Not in the game yet so cant test; this logic assumes that:
 	// - procrate is 10%
 	// - no ICD on proc
 	const procrate = 0.1
-	procAura := char.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32490}, stats.Stats{stats.SpellPower: 220}, time.Second*10)
+	procAura := priest.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32490}, stats.Stats{stats.SpellPower: 220}, time.Second*10)
 
-	char.RegisterAura(core.Aura{
+	priest.RegisterAura(core.Aura{
 		Label:    "Ashtongue Talisman",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
 		OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spell.ActionID.SpellID != SpellIDShadowWordPain {
+			if spell != priest.ShadowWordPain {
 				return
 			}
 

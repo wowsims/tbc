@@ -7,10 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDSmite int32 = 25364
-
-var SmiteActionID = core.ActionID{SpellID: SpellIDSmite}
-
 func (priest *Priest) registerSmiteSpell(sim *core.Simulation) {
 	baseCost := 385.0
 
@@ -18,7 +14,7 @@ func (priest *Priest) registerSmiteSpell(sim *core.Simulation) {
 	surgeOfLightOutcome := priest.OutcomeFuncMagicHit()
 
 	priest.Smite = priest.RegisterSpell(core.SpellConfig{
-		ActionID:    SmiteActionID,
+		ActionID:    core.ActionID{SpellID: 25364},
 		SpellSchool: core.SpellSchoolHoly,
 
 		ResourceType: stats.Mana,

@@ -7,10 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDIncinerate2 int32 = 32231
-
-var Incinerate2ActionID = core.ActionID{SpellID: SpellIDIncinerate2}
-
 func (warlock *Warlock) registerIncinerateSpell(sim *core.Simulation) {
 	baseCost := 355.0
 	has4pMal := ItemSetMaleficRaiment.CharacterHasSetBonus(&warlock.Character, 4)
@@ -26,7 +22,7 @@ func (warlock *Warlock) registerIncinerateSpell(sim *core.Simulation) {
 	}
 
 	warlock.Incinerate = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:    Incinerate2ActionID,
+		ActionID:    core.ActionID{SpellID: 32231},
 		SpellSchool: core.SpellSchoolFire,
 
 		ResourceType: stats.Mana,

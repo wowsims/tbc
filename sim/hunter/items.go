@@ -1,7 +1,6 @@
 package hunter
 
 import (
-	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -66,10 +65,7 @@ var ItemSetGronnstalker = core.ItemSet{
 }
 
 func ApplyTalonOfAlar(agent core.Agent) {
-	hunterAgent, ok := agent.(Agent)
-	if !ok {
-		log.Fatalf("Non-hunter attempted to activate hunter item effect.")
-	}
+	hunterAgent := agent.(Agent)
 	hunter := hunterAgent.GetHunter()
 
 	procAura := hunter.GetOrRegisterAura(core.Aura{
@@ -86,7 +82,7 @@ func ApplyTalonOfAlar(agent core.Agent) {
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spell.SameAction(ArcaneShotActionID) {
+			if spell == hunter.ArcaneShot {
 				procAura.Activate(sim)
 			}
 		},
@@ -111,11 +107,7 @@ func (hunter *Hunter) talonOfAlarDamageMod(baseDamageConfig core.BaseDamageConfi
 }
 
 func ApplyBeasttamersShoulders(agent core.Agent) {
-	hunterAgent, ok := agent.(Agent)
-	if !ok {
-		log.Fatalf("Non-hunter attempted to activate hunter item effect.")
-	}
-	hunter := hunterAgent.GetHunter()
+	hunter := agent.(Agent).GetHunter()
 
 	hunter.pet.PseudoStats.DamageDealtMultiplier *= 1.03
 	hunter.pet.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*2)
@@ -141,19 +133,19 @@ func ApplyBlackBowOfTheBetrayer(agent core.Agent) {
 }
 
 func ApplyAshtongueTalismanOfSwiftness(agent core.Agent) {
-	character := agent.GetCharacter()
+	hunter := agent.(Agent).GetHunter()
 
-	procAura := character.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32487}, stats.Stats{stats.AttackPower: 275, stats.RangedAttackPower: 275}, time.Second*8)
+	procAura := hunter.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32487}, stats.Stats{stats.AttackPower: 275, stats.RangedAttackPower: 275}, time.Second*8)
 	const procChance = 0.15
 
-	character.RegisterAura(core.Aura{
+	hunter.RegisterAura(core.Aura{
 		Label:    "Ashtongue Talisman",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spell.SameAction(SteadyShotActionID) {
+			if spell != hunter.SteadyShot {
 				return
 			}
 			if sim.RandomFloat("Ashtongue Talisman of Swiftness") > procChance {

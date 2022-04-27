@@ -1,7 +1,6 @@
 package rogue
 
 import (
-	"log"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -53,11 +52,7 @@ var ItemSetDeathmantle = core.ItemSet{
 		},
 		4: func(agent core.Agent) {
 			// Your attacks have a chance to make your next finishing move cost no energy.
-			rogueAgent, ok := agent.(RogueAgent)
-			if !ok {
-				log.Fatalf("Non-rogue attempted to activate rogue t5 4p bonus.")
-			}
-			rogue := rogueAgent.GetRogue()
+			rogue := agent.(RogueAgent).GetRogue()
 
 			rogue.DeathmantleProcAura = rogue.RegisterAura(core.Aura{
 				Label:    "Deathmantle 4pc Proc",
@@ -160,11 +155,7 @@ func ApplyWarpSpringCoil(agent core.Agent) {
 }
 
 func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
-	rogueAgent, ok := agent.(RogueAgent)
-	if !ok {
-		log.Fatalf("Non-rogue attempted to activate Ashtongue Talisman of Lethality.")
-	}
-	rogue := rogueAgent.GetRogue()
+	rogue := agent.(RogueAgent).GetRogue()
 	procAura := rogue.NewTemporaryStatsAura("Ashtongue Talisman Proc", core.ActionID{ItemID: 32492}, stats.Stats{stats.MeleeCrit: 145}, time.Second*10)
 
 	var numPoints int32
@@ -184,7 +175,7 @@ func ApplyAshtongueTalismanOfLethality(agent core.Agent) {
 			// Need to store the points because they get spent before OnSpellHit is called.
 			numPoints = rogue.ComboPoints()
 
-			if spell.SameActionIgnoreTag(SliceAndDiceActionID) {
+			if spell.SameActionIgnoreTag(rogue.SliceAndDice[1].ActionID) {
 				// SND won't call OnSpellHit so we have to add the effect now.
 				if numPoints == 5 || sim.RandomFloat("AshtongueTalismanOfLethality") < 0.2*float64(numPoints) {
 					procAura.Activate(sim)

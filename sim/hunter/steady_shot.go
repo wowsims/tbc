@@ -7,13 +7,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var SteadyShotActionID = core.ActionID{SpellID: 34120}
-
 func (hunter *Hunter) registerSteadyShotSpell(sim *core.Simulation) {
 	baseCost := 110.0
 
 	hunter.SteadyShot = hunter.RegisterSpell(core.SpellConfig{
-		ActionID:    SteadyShotActionID,
+		ActionID:    core.ActionID{SpellID: 34120},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

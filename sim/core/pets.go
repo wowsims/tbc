@@ -8,13 +8,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var GnomishFlameTurretActionID = ActionID{ItemID: 23841}
-
 func (character *Character) newGnomishFlameTurretSpell() *Spell {
 	gft := character.NewGnomishFlameTurret()
 
 	return character.RegisterSpell(SpellConfig{
-		ActionID: GnomishFlameTurretActionID,
+		ActionID: ActionID{ItemID: 23841},
 
 		ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
 			gft.EnableWithTimeout(sim, gft, time.Second*45)
@@ -63,11 +61,9 @@ func (gft *GnomishFlameTurret) OnGCDReady(sim *Simulation) {
 	gft.FlameCannon.Cast(sim, sim.GetPrimaryTarget())
 }
 
-const SpellIDFlameCannon int32 = 30527
-
 func (gft *GnomishFlameTurret) registerFlameCannonSpell(sim *Simulation) {
 	gft.FlameCannon = gft.RegisterSpell(SpellConfig{
-		ActionID:    ActionID{SpellID: SpellIDFlameCannon},
+		ActionID:    ActionID{SpellID: 30527},
 		SpellSchool: SpellSchoolFire,
 
 		Cast: CastConfig{

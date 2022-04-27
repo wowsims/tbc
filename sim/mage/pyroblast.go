@@ -8,15 +8,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDPyroblast int32 = 33938
-
-var PyroblastActionID = core.ActionID{SpellID: SpellIDPyroblast}
-
 func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 33938}
 	baseCost := 500.0
 
 	mage.Pyroblast = mage.RegisterSpell(core.SpellConfig{
-		ActionID:    PyroblastActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFire,
 		SpellExtras: SpellFlagMage,
 
@@ -62,7 +59,7 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 		Spell: mage.Pyroblast,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "Pyroblast-" + strconv.Itoa(int(mage.Index)),
-			ActionID: PyroblastActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 4,
 		TickLength:    time.Second * 3,

@@ -5,15 +5,13 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ScorpidStingActionID = core.ActionID{SpellID: 3043}
-
 func (hunter *Hunter) registerScorpidStingSpell(sim *core.Simulation) {
 	hunter.ScorpidStingAura = core.ScorpidStingAura(sim.GetPrimaryTarget())
 
 	baseCost := hunter.BaseMana() * 0.09
 
 	hunter.ScorpidSting = hunter.RegisterSpell(core.SpellConfig{
-		ActionID:    ScorpidStingActionID,
+		ActionID:    core.ActionID{SpellID: 3043},
 		SpellSchool: core.SpellSchoolNature,
 
 		ResourceType: stats.Mana,

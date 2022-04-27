@@ -7,8 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ThunderClapActionID = core.ActionID{SpellID: 25264}
-
 func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 	cost := 20.0 - float64(warrior.Talents.FocusedRage)
 	impTCDamageMult := 1.0
@@ -49,7 +47,7 @@ func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 	}
 
 	warrior.ThunderClap = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    ThunderClapActionID,
+		ActionID:    core.ActionID{SpellID: 25264},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasBinary,
 

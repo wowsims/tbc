@@ -7,12 +7,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var AvengingWrathActionID = core.ActionID{SpellID: 31884}
-
 func (paladin *Paladin) registerAvengingWrathCD() {
+	actionID := core.ActionID{SpellID: 31884}
+
 	aura := paladin.RegisterAura(core.Aura{
 		Label:    "Avenging Wrath",
-		ActionID: AvengingWrathActionID,
+		ActionID: actionID,
 		Duration: time.Second * 20,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Unit.PseudoStats.DamageDealtMultiplier *= 1.3
@@ -25,7 +25,7 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 	baseCost := 236.0
 
 	spell := paladin.RegisterSpell(core.SpellConfig{
-		ActionID: AvengingWrathActionID,
+		ActionID: actionID,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

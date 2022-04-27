@@ -8,8 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var BloodthirstActionID = core.ActionID{SpellID: 30335}
-
 func (warrior *Warrior) registerBloodthirstSpell(_ *core.Simulation, cdTimer *core.Timer) {
 	cost := 30.0
 	if ItemSetDestroyerBattlegear.CharacterHasSetBonus(&warrior.Character, 4) {
@@ -18,7 +16,7 @@ func (warrior *Warrior) registerBloodthirstSpell(_ *core.Simulation, cdTimer *co
 	refundAmount := cost * 0.8
 
 	warrior.Bloodthirst = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    BloodthirstActionID,
+		ActionID:    core.ActionID{SpellID: 30335},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

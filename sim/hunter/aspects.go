@@ -7,9 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var AspectOfTheHawkActionID = core.ActionID{SpellID: 27044}
-var AspectOfTheViperActionID = core.ActionID{SpellID: 34074}
-
 func (hunter *Hunter) registerAspectOfTheHawkSpell(sim *core.Simulation) {
 	var impHawkAura *core.Aura
 	const improvedHawkProcChance = 0.1
@@ -28,7 +25,8 @@ func (hunter *Hunter) registerAspectOfTheHawkSpell(sim *core.Simulation) {
 		})
 	}
 
-	hunter.AspectOfTheHawkAura = hunter.NewTemporaryStatsAuraWrapped("Aspect of the Hawk", AspectOfTheHawkActionID, stats.Stats{stats.RangedAttackPower: 155}, core.NeverExpires, func(aura *core.Aura) {
+	actionID := core.ActionID{SpellID: 27044}
+	hunter.AspectOfTheHawkAura = hunter.NewTemporaryStatsAuraWrapped("Aspect of the Hawk", actionID, stats.Stats{stats.RangedAttackPower: 155}, core.NeverExpires, func(aura *core.Aura) {
 		hunter.applySharedAspectConfig(true, aura)
 		aura.OnSpellHit = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.ProcMask.Matches(core.ProcMaskRangedAuto) {
@@ -43,7 +41,7 @@ func (hunter *Hunter) registerAspectOfTheHawkSpell(sim *core.Simulation) {
 
 	baseCost := 140.0
 	hunter.AspectOfTheHawk = hunter.RegisterSpell(core.SpellConfig{
-		ActionID: AspectOfTheHawkActionID,
+		ActionID: actionID,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -63,16 +61,17 @@ func (hunter *Hunter) registerAspectOfTheHawkSpell(sim *core.Simulation) {
 }
 
 func (hunter *Hunter) registerAspectOfTheViperSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 34074}
 	auraConfig := core.Aura{
 		Label:    "Aspect of the Viper",
-		ActionID: AspectOfTheViperActionID,
+		ActionID: actionID,
 	}
 	hunter.applySharedAspectConfig(false, &auraConfig)
 	hunter.AspectOfTheViperAura = hunter.RegisterAura(auraConfig)
 
 	baseCost := 40.0
 	hunter.AspectOfTheViper = hunter.RegisterSpell(core.SpellConfig{
-		ActionID: core.ActionID{SpellID: 34074},
+		ActionID: actionID,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

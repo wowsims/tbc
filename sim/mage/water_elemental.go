@@ -14,11 +14,9 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 		return
 	}
 
-	actionID := core.ActionID{SpellID: 31687}
-
 	baseCost := mage.BaseMana() * 0.16
 	mage.SummonWaterElemental = mage.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID: core.ActionID{SpellID: 31687},
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -139,15 +137,11 @@ var waterElementalStatInheritance = func(ownerStats stats.Stats) stats.Stats {
 	})
 }
 
-const SpellIDWaterbolt int32 = 31707
-
-var WaterboltActionID = core.ActionID{SpellID: SpellIDWaterbolt}
-
 func (we *WaterElemental) registerWaterboltSpell(sim *core.Simulation) {
 	baseCost := we.BaseMana() * 0.1
 
 	we.Waterbolt = we.RegisterSpell(core.SpellConfig{
-		ActionID:    WaterboltActionID,
+		ActionID:    core.ActionID{SpellID: 31707},
 		SpellSchool: core.SpellSchoolFrost,
 
 		ResourceType: stats.Mana,

@@ -9,12 +9,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var CurseOfElementsActionID = core.ActionID{SpellID: 27228}
-var CurseOfRecklessnessActionID = core.ActionID{SpellID: 27226}
-var CurseOfTonguesActionID = core.ActionID{SpellID: 11719}
-var CurseOfAgonyActionID = core.ActionID{SpellID: 27218}
-var CurseOfDoomActionID = core.ActionID{SpellID: 30910}
-
 func (warlock *Warlock) registerCurseOfElementsSpell(sim *core.Simulation) {
 	if warlock.Rotation.Curse != proto.Warlock_Rotation_Elements {
 		return
@@ -32,7 +26,7 @@ func (warlock *Warlock) registerCurseOfElementsSpell(sim *core.Simulation) {
 	warlock.CurseOfElementsAura.Duration = time.Minute * 5
 
 	warlock.CurseOfElements = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:    CurseOfElementsActionID,
+		ActionID:    core.ActionID{SpellID: 27228},
 		SpellSchool: core.SpellSchoolShadow,
 
 		ResourceType: stats.Mana,
@@ -67,7 +61,7 @@ func (warlock *Warlock) registerCurseOfRecklessnessSpell(sim *core.Simulation) {
 	warlock.CurseOfRecklessnessAura.Duration = time.Minute * 2
 
 	warlock.CurseOfRecklessness = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:     CurseOfElementsActionID,
+		ActionID:     core.ActionID{SpellID: 27226},
 		SpellSchool:  core.SpellSchoolShadow,
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -91,16 +85,18 @@ func (warlock *Warlock) registerCurseOfTonguesSpell(sim *core.Simulation) {
 	if warlock.Rotation.Curse != proto.Warlock_Rotation_Tongues {
 		return
 	}
+	actionID := core.ActionID{SpellID: 11719}
 	baseCost := 110.0
+
 	// Empty aura so we can simulate cost/time to keep tongues up
 	warlock.CurseOfTonguesAura = sim.GetPrimaryTarget().GetOrRegisterAura(core.Aura{
 		Label:    "Curse of Tongues",
-		ActionID: CurseOfTonguesActionID,
+		ActionID: actionID,
 		Duration: time.Second * 30,
 	})
 
 	warlock.CurseOfTongues = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:     CurseOfTonguesActionID,
+		ActionID:     actionID,
 		SpellSchool:  core.SpellSchoolShadow,
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -124,7 +120,9 @@ func (warlock *Warlock) registerCurseOfAgonySpell(sim *core.Simulation) {
 	if warlock.Rotation.Curse != proto.Warlock_Rotation_Agony && warlock.Rotation.Curse != proto.Warlock_Rotation_Doom {
 		return
 	}
+	actionID := core.ActionID{SpellID: 27218}
 	baseCost := 265.0
+
 	target := sim.GetPrimaryTarget()
 	effect := core.SpellEffect{
 		DamageMultiplier: 1 *
@@ -154,7 +152,7 @@ func (warlock *Warlock) registerCurseOfAgonySpell(sim *core.Simulation) {
 		}
 	}
 	warlock.CurseOfAgony = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:     CurseOfAgonyActionID,
+		ActionID:     actionID,
 		SpellSchool:  core.SpellSchoolShadow,
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -176,7 +174,7 @@ func (warlock *Warlock) registerCurseOfAgonySpell(sim *core.Simulation) {
 		Spell: warlock.CurseOfAgony,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "CurseofAgony-" + strconv.Itoa(int(warlock.Index)),
-			ActionID: CurseOfAgonyActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 12,
 		TickLength:    time.Second * 2,
@@ -188,7 +186,9 @@ func (warlock *Warlock) registerCurseOfDoomSpell(sim *core.Simulation) {
 	if warlock.Rotation.Curse != proto.Warlock_Rotation_Doom {
 		return
 	}
+	actionID := core.ActionID{SpellID: 30910}
 	baseCost := 380.0
+
 	target := sim.GetPrimaryTarget()
 	effect := core.SpellEffect{
 		DamageMultiplier: 1 *
@@ -218,7 +218,7 @@ func (warlock *Warlock) registerCurseOfDoomSpell(sim *core.Simulation) {
 	}
 
 	warlock.CurseOfDoom = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:     CurseOfDoomActionID,
+		ActionID:     actionID,
 		SpellSchool:  core.SpellSchoolShadow,
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -245,7 +245,7 @@ func (warlock *Warlock) registerCurseOfDoomSpell(sim *core.Simulation) {
 		Spell: warlock.CurseOfDoom,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "CurseofDoom-" + strconv.Itoa(int(warlock.Index)),
-			ActionID: CurseOfDoomActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 1,
 		TickLength:    time.Minute,

@@ -7,8 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var MultiShotActionID = core.ActionID{SpellID: 27021}
-
 func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 	baseCost := 275.0
 
@@ -44,7 +42,7 @@ func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 	}
 
 	hunter.MultiShot = hunter.RegisterSpell(core.SpellConfig{
-		ActionID:    MultiShotActionID,
+		ActionID:    core.ActionID{SpellID: 27021},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

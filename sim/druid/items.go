@@ -70,8 +70,7 @@ var ItemSetThunderheart = core.ItemSet{
 }
 
 func ApplyLivingRootoftheWildheart(agent core.Agent) {
-	druidAgent := agent.(Agent)
-	druid := druidAgent.GetDruid()
+	druid := agent.(Agent).GetDruid()
 
 	procAura := druid.NewTemporaryStatsAura("Living Root Proc", core.ActionID{ItemID: 30664}, stats.Stats{stats.SpellPower: 209}, time.Second*15)
 
@@ -94,8 +93,7 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 }
 
 func ApplyIdoloftheUnseenMoon(agent core.Agent) {
-	druidAgent := agent.(Agent)
-	druid := druidAgent.GetDruid()
+	druid := agent.(Agent).GetDruid()
 
 	actionID := core.ActionID{ItemID: 33510}
 	procAura := druid.NewTemporaryStatsAura("Idol of the Unseen Moon Proc", actionID, stats.Stats{stats.SpellPower: 140}, time.Second*10)
@@ -118,8 +116,7 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 }
 
 func ApplyAshtongueTalisman(agent core.Agent) {
-	druidAgent := agent.(Agent)
-	druid := druidAgent.GetDruid()
+	druid := agent.(Agent).GetDruid()
 
 	// Not in the game yet so cant test; this logic assumes that:
 	// - does not affect the starfire which procs it

@@ -7,8 +7,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var WhirlwindActionID = core.ActionID{SpellID: 1680}
-
 func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 	cost := 25.0 - float64(warrior.Talents.FocusedRage)
 	if ItemSetWarbringerBattlegear.CharacterHasSetBonus(&warrior.Character, 2) {
@@ -54,7 +52,7 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 	}
 
 	warrior.Whirlwind = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    WhirlwindActionID,
+		ActionID:    core.ActionID{SpellID: 1680},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

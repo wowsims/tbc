@@ -7,15 +7,15 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-var DeepWoundsActionID = core.ActionID{SpellID: 12867}
-
 func (warrior *Warrior) applyDeepWounds() {
 	if warrior.Talents.DeepWounds == 0 {
 		return
 	}
 
+	actionID := core.ActionID{SpellID: 12867}
+
 	deepWoundsSpell := warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    DeepWoundsActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
 		Cast: core.CastConfig{
 			DisableCallbacks: true,
@@ -37,7 +37,7 @@ func (warrior *Warrior) applyDeepWounds() {
 				target := sim.GetTarget(i)
 				dotAura := target.GetOrRegisterAura(core.Aura{
 					Label:    "DeepWounds-" + strconv.Itoa(int(warrior.Index)),
-					ActionID: DeepWoundsActionID,
+					ActionID: actionID,
 					Duration: time.Second * 12,
 				})
 				dot := core.NewDot(core.Dot{
