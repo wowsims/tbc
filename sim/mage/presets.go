@@ -89,6 +89,18 @@ var PlayerOptionsFire = &proto.Player_Mage{
 		},
 	},
 }
+var PlayerOptionsFireAOE = &proto.Player_Mage{
+	Mage: &proto.Mage{
+		Talents: FireTalents,
+		Options: fireMageOptions,
+		Rotation: &proto.Mage_Rotation{
+			MultiTargetRotation: true,
+			Aoe: &proto.Mage_Rotation_AoeRotation{
+				Rotation: proto.Mage_Rotation_AoeRotation_Flamestrike,
+			},
+		},
+	},
+}
 
 var frostMageOptions = &proto.Mage_Options{
 	Armor: proto.Mage_Options_MageArmor,
@@ -100,6 +112,18 @@ var PlayerOptionsFrost = &proto.Player_Mage{
 		Rotation: &proto.Mage_Rotation{
 			Type:  proto.Mage_Rotation_Frost,
 			Frost: &proto.Mage_Rotation_FrostRotation{},
+		},
+	},
+}
+var PlayerOptionsFrostAOE = &proto.Player_Mage{
+	Mage: &proto.Mage{
+		Talents: FrostTalents,
+		Options: frostMageOptions,
+		Rotation: &proto.Mage_Rotation{
+			MultiTargetRotation: true,
+			Aoe: &proto.Mage_Rotation_AoeRotation{
+				Rotation: proto.Mage_Rotation_AoeRotation_Blizzard,
+			},
 		},
 	},
 }
@@ -118,6 +142,18 @@ var PlayerOptionsArcane = &proto.Player_Mage{
 				ArcaneBlastsBetweenFillers: 3,
 				StartRegenRotationPercent:  0.2,
 				StopRegenRotationPercent:   0.3,
+			},
+		},
+	},
+}
+var PlayerOptionsArcaneAOE = &proto.Player_Mage{
+	Mage: &proto.Mage{
+		Talents: ArcaneTalents,
+		Options: arcaneMageOptions,
+		Rotation: &proto.Mage_Rotation{
+			MultiTargetRotation: true,
+			Aoe: &proto.Mage_Rotation_AoeRotation{
+				Rotation: proto.Mage_Rotation_AoeRotation_ArcaneExplosion,
 			},
 		},
 	},

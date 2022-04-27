@@ -744,7 +744,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2167.519741944127
+  dps: 3807.030481691954
  }
 }
 dps_results: {
@@ -768,7 +768,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1059.6412011396224
+  dps: 2132.64738801331
  }
 }
 dps_results: {
@@ -792,7 +792,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2160.897298182359
+  dps: 3790.5911278174885
  }
 }
 dps_results: {
@@ -816,7 +816,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1053.5836593253532
+  dps: 2112.3355012495904
  }
 }
 dps_results: {
