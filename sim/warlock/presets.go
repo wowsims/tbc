@@ -28,22 +28,22 @@ var defaultDestroTalents = &proto.WarlockTalents{
 	DemonicSacrifice: true,
 }
 
-var defaultWarlockRotation = &proto.Warlock_Rotation{
+var defaultDestroRotation = &proto.Warlock_Rotation{
 	PrimarySpell: proto.Warlock_Rotation_Shadowbolt,
 	Immolate:     true,
 }
 
-var defaultWarlockOptions = &proto.Warlock_Options{
+var defaultDestroOptions = &proto.Warlock_Options{
 	Armor:           proto.Warlock_Options_FelArmor,
 	Summon:          proto.Warlock_Options_Succubus,
 	SacrificeSummon: true,
 }
 
-var DefaultOptions = &proto.Player_Warlock{
+var DefaultDestroWarlock = &proto.Player_Warlock{
 	Warlock: &proto.Warlock{
 		Talents:  defaultDestroTalents,
-		Options:  defaultWarlockOptions,
-		Rotation: defaultWarlockRotation,
+		Options:  defaultDestroOptions,
+		Rotation: defaultDestroRotation,
 	},
 }
 

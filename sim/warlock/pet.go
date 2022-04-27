@@ -39,13 +39,34 @@ func (warlock *Warlock) NewWarlockPet() *WarlockPet {
 		config: petConfig,
 		owner:  warlock,
 	}
+	wp.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Intellect,
+		ModifiedStat: stats.Mana,
+		Modifier: func(intellect float64, mana float64) float64 {
+			return mana + intellect*petConfig.ManaIntRatio
+		},
+	})
+	wp.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Strength,
+		ModifiedStat: stats.AttackPower,
+		Modifier: func(strength float64, attackPower float64) float64 {
+			return attackPower + (strength-10)*2
+		},
+	})
+	wp.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Agility,
+		ModifiedStat: stats.MeleeCrit,
+		Modifier: func(agility float64, meleeCrit float64) float64 {
+			return meleeCrit + (agility*0.04)*core.MeleeCritRatingPerCritChance
+		},
+	})
 	wp.AddStats(stats.Stats{
 		stats.MeleeCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.MeleeCritRatingPerCritChance,
 		stats.SpellCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.SpellCritRatingPerCritChance,
 	})
 
 	if warlock.Talents.SoulLink {
-		warlock.PseudoStats.DamageDealtMultiplier *= 1.05
+		wp.PseudoStats.DamageDealtMultiplier *= 1.05
 	}
 	wp.PseudoStats.DamageDealtMultiplier *= 1.0 + (0.04 * float64(warlock.Talents.UnholyPower))
 
@@ -53,7 +74,13 @@ func (warlock *Warlock) NewWarlockPet() *WarlockPet {
 
 	if petConfig.Melee {
 		wp.EnableAutoAttacks(wp, core.AutoAttackOptions{
-			MainHand:       petConfig.Weapon,
+			MainHand: core.Weapon{
+				BaseDamageMin:  83.4,
+				BaseDamageMax:  123.4,
+				SwingSpeed:     2,
+				SwingDuration:  time.Second * 2,
+				CritMultiplier: 2,
+			},
 			AutoSwingMelee: true,
 		})
 	}
@@ -74,11 +101,18 @@ func (warlock *Warlock) NewWarlockPet() *WarlockPet {
 			SourceStat:   stats.AttackPower,
 			ModifiedStat: stats.AttackPower,
 			Modifier: func(ap float64, _ float64) float64 {
-				return ap * 1.5
+				return ap * 1.5 * 1.1 // demonic frenzy + hidden 10% boost
 			},
 		})
 	case proto.Warlock_Options_Succubus:
 		wp.PseudoStats.DamageDealtMultiplier *= 1.0 + (0.02 * float64(warlock.Talents.MasterDemonologist))
+		wp.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.AttackPower,
+			ModifiedStat: stats.AttackPower,
+			Modifier: func(ap float64, _ float64) float64 {
+				return ap * 1.05 // hidden 5% boost
+			},
+		})
 	}
 
 	if warlock.Talents.FelIntellect > 0 {
@@ -91,28 +125,6 @@ func (warlock *Warlock) NewWarlockPet() *WarlockPet {
 			},
 		})
 	}
-
-	wp.AddStatDependency(stats.StatDependency{
-		SourceStat:   stats.Intellect,
-		ModifiedStat: stats.Mana,
-		Modifier: func(intellect float64, mana float64) float64 {
-			return mana + intellect*petConfig.ManaIntRatio
-		},
-	})
-	wp.AddStatDependency(stats.StatDependency{
-		SourceStat:   stats.Strength,
-		ModifiedStat: stats.AttackPower,
-		Modifier: func(strength float64, attackPower float64) float64 {
-			return attackPower + (strength-10)*2
-		},
-	})
-	wp.AddStatDependency(stats.StatDependency{
-		SourceStat:   stats.Agility,
-		ModifiedStat: stats.MeleeCrit,
-		Modifier: func(agility float64, meleeCrit float64) float64 {
-			return meleeCrit + (agility*0.0004)*core.MeleeCritRatingPerCritChance
-		},
-	})
 
 	core.ApplyPetConsumeEffects(&wp.Character, warlock.Consumes)
 
@@ -188,7 +200,6 @@ type PetConfig struct {
 	Melee        bool
 	Stats        stats.Stats
 	ManaIntRatio float64
-	Weapon       core.Weapon
 
 	// Randomly select between abilities instead of using a prio.
 	RandomSelection bool
@@ -199,77 +210,51 @@ type PetConfig struct {
 
 var PetConfigs = map[proto.Warlock_Options_Summon]PetConfig{
 	proto.Warlock_Options_Felgaurd: {
-		Name: "Felguard",
-		// DamageMultiplier: 1,
+		Name:             "Felguard",
 		Melee:            true,
 		PrimaryAbility:   Cleave,
 		SecondaryAbility: Intercept,
 		ManaIntRatio:     11.5,
 		Stats: stats.Stats{
 			stats.AttackPower: 20,
-			stats.Stamina:     328,
-			stats.Strength:    138,
-			stats.Agility:     91,
-			stats.Intellect:   158,
+			stats.Stamina:     280,
+			stats.Strength:    153,
+			stats.Agility:     108,
+			stats.Intellect:   133,
 			stats.Mana:        893,
-			stats.Spirit:      81,
+			stats.Spirit:      122,
 			stats.MP5:         48,
-			// Add 1.8% because pets aren't affected by that component of crit suppression.
-			stats.MeleeCrit: (1.1515 + 1.8) * core.MeleeCritRatingPerCritChance,
-		},
-		Weapon: core.Weapon{
-			// TODO: validate base weapon damage.
-			BaseDamageMin:  51.7,
-			BaseDamageMax:  51.7,
-			SwingSpeed:     2,
-			SwingDuration:  time.Second * 2,
-			CritMultiplier: 2,
 		},
 	},
 	proto.Warlock_Options_Imp: {
-		Name: "Imp",
-		// DamageMultiplier: 1,
+		Name:           "Imp",
 		ManaIntRatio:   4.9,
 		Melee:          false,
 		PrimaryAbility: Firebolt,
-		// TODO: no idea if these stats are correct
 		Stats: stats.Stats{
 			stats.MP5:       123,
-			stats.Stamina:   230,
-			stats.Strength:  130,
-			stats.Agility:   21,
-			stats.Intellect: 381,
+			stats.Stamina:   101,
+			stats.Strength:  145,
+			stats.Agility:   38,
+			stats.Intellect: 327,
 			stats.Mana:      756,
-			stats.Spirit:    222,
-			// Add 1.8% because pets aren't affected by that component of crit suppression.
-			stats.MeleeCrit: (1.1515 + 1.8) * core.MeleeCritRatingPerCritChance,
+			stats.Spirit:    263,
 		},
 	},
 	proto.Warlock_Options_Succubus: {
-		Name: "Succubus",
-		// DamageMultiplier: 1,
+		Name:           "Succubus",
 		ManaIntRatio:   11.5,
 		Melee:          true,
 		PrimaryAbility: LashOfPain,
 		Stats: stats.Stats{
 			stats.AttackPower: 20,
-			stats.Stamina:     328,
-			stats.Strength:    138,
-			stats.Agility:     91,
-			stats.Intellect:   158,
+			stats.Stamina:     280,
+			stats.Strength:    153,
+			stats.Agility:     108,
+			stats.Intellect:   133,
 			stats.Mana:        893,
-			stats.Spirit:      81,
+			stats.Spirit:      122,
 			stats.MP5:         48,
-			// Add 1.8% because pets aren't affected by that component of crit suppression.
-			stats.MeleeCrit: (1.1515 + 1.8) * core.MeleeCritRatingPerCritChance,
-		},
-		Weapon: core.Weapon{
-			// TODO: validate base weapon damage.
-			BaseDamageMin:  50,
-			BaseDamageMax:  50,
-			SwingSpeed:     2,
-			SwingDuration:  time.Second * 2,
-			CritMultiplier: 2,
 		},
 	},
 }
