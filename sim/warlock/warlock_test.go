@@ -20,7 +20,7 @@ func TestDestruction(t *testing.T) {
 
 		GearSet: core.GearSetCombo{Label: "P4", GearSet: Phase4Gear},
 
-		SpecOptions: core.SpecOptionsCombo{Label: "Destro Warlock", SpecOptions: DefaultOptions},
+		SpecOptions: core.SpecOptionsCombo{Label: "Destro Warlock", SpecOptions: DefaultDestroWarlock},
 
 		RaidBuffs:   FullRaidBuffs,
 		PartyBuffs:  FullPartyBuffs,
