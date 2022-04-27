@@ -51,6 +51,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation, cdTi
 	paladin.JudgementOfBlood = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 31898},
 		SpellSchool: core.SpellSchoolHoly,
+		SpellExtras: core.SpellExtrasCannotBeDodged,
 
 		ResourceType: stats.Mana,
 		BaseCost:     JudgementManaCost,

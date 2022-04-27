@@ -30,6 +30,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 	sobProc := paladin.RegisterSpell(core.SpellConfig{
 		ActionID:     procActionID,
 		SpellSchool:  core.SpellSchoolHoly,
+		SpellExtras:  core.SpellExtrasMeleeMetrics,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 
@@ -90,6 +91,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	socProc := paladin.RegisterSpell(core.SpellConfig{
 		ActionID:     procActionID,
 		SpellSchool:  core.SpellSchoolHoly,
+		SpellExtras:  core.SpellExtrasMeleeMetrics,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 
