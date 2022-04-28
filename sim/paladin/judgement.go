@@ -35,7 +35,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation, cdTi
 		ThreatMultiplier: 1,
 
 		BaseDamage:     core.BaseDamageConfigMagic(295, 325, 0.429),
-		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialCritOnly(paladin.DefaultMeleeCritMultiplier()),
 
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			paladin.sanctifiedJudgement(sim, paladin.SealOfBlood.DefaultCast.Cost)
