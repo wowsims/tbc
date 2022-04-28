@@ -21,21 +21,26 @@ func (warlock *Warlock) OnManaTick(sim *core.Simulation) {
 func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 	var spell *core.Spell
 
+	// If doing seed, that is the priority spell.
 	mainSpell := warlock.Rotation.PrimarySpell
 	if mainSpell == proto.Warlock_Rotation_Seed {
 		for i := 0; i < int(sim.GetNumTargets()); i++ {
 			if !warlock.SeedDots[i].IsActive() {
-				warlock.Seeds[i].Cast(sim, sim.GetTarget(int32(i)))
-				return
+				if success := warlock.Seeds[i].Cast(sim, sim.GetTarget(int32(i))); success {
+					return
+				} else {
+					break
+				}
 			}
 		}
+		// If every target has seed, fire a shadowbolt at main target so we start some explosions
+		// This could also mean we didn't have mana to cast seed, and so dropping down we will end up lifetapping.
 		mainSpell = proto.Warlock_Rotation_Shadowbolt
 	}
 
 	var target = sim.GetPrimaryTarget()
 
 	// Apply curses first
-	// TODO: should this be part of setup instead of during main rotation?
 	castCurse := func(spellToCast *core.Spell, aura *core.Aura) bool {
 		if !aura.IsActive() {
 			spell = spellToCast

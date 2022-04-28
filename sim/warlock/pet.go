@@ -15,9 +15,6 @@ type WarlockPet struct {
 
 	owner *Warlock
 
-	// Time when pet should die, as per petUptime.
-	deathTime time.Duration
-
 	primaryAbility   PetAbility
 	secondaryAbility PetAbility
 }

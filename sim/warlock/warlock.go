@@ -73,6 +73,7 @@ func (warlock *Warlock) Init(sim *core.Simulation) {
 	if warlock.Talents.SiphonLife {
 		warlock.registerSiphonLifeSpell(sim)
 	}
+	warlock.registerSeedSpell(sim)
 }
 
 func (warlock *Warlock) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {

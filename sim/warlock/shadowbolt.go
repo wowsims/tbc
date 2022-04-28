@@ -25,7 +25,9 @@ func (warlock *Warlock) registerShadowboltSpell(sim *core.Simulation) {
 			if !spellEffect.Landed() || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				return
 			}
-			warlock.ImpShadowboltAura.Activate(sim)
+			if !warlock.ImpShadowboltAura.IsActive() {
+				warlock.ImpShadowboltAura.Activate(sim)
+			}
 			warlock.ImpShadowboltAura.SetStacks(sim, 4)
 		}
 	}
@@ -72,6 +74,7 @@ func (warlock *Warlock) impShadowboltDebuffAura(target *core.Target) *core.Aura 
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			target.PseudoStats.ShadowDamageTakenMultiplier /= bonus
+			aura.SetStacks(sim, 0)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell.SpellSchool != core.SpellSchoolShadow {
