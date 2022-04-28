@@ -7,13 +7,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ArcaneShotActionID = core.ActionID{SpellID: 27019}
-
 func (hunter *Hunter) registerArcaneShotSpell(sim *core.Simulation) {
 	baseCost := 230.0
 
 	hunter.ArcaneShot = hunter.RegisterSpell(core.SpellConfig{
-		ActionID:    ArcaneShotActionID,
+		ActionID:    core.ActionID{SpellID: 27019},
 		SpellSchool: core.SpellSchoolArcane,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

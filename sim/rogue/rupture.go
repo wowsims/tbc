@@ -8,26 +8,24 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var RuptureActionID = core.ActionID{SpellID: 26867}
-var RuptureEnergyCost = 25.0
+const RuptureEnergyCost = 25.0
 
 func (rogue *Rogue) makeRupture(comboPoints int32) *core.Spell {
-	actionID := RuptureActionID
-	actionID.Tag = comboPoints
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 	numTicks := int(comboPoints) + 3
+	baseCost := RuptureEnergyCost
 
 	return rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
+		ActionID:    core.ActionID{SpellID: 26867, Tag: comboPoints},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasIgnoreResists | rogue.finisherFlags(),
 
 		ResourceType: stats.Energy,
-		BaseCost:     RuptureEnergyCost,
+		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: RuptureEnergyCost,
+				Cost: baseCost,
 				GCD:  time.Second,
 			},
 			ModifyCast:  rogue.applyDeathmantle,
@@ -75,7 +73,7 @@ func (rogue *Rogue) registerRupture(sim *core.Simulation) {
 		Spell: rogue.Rupture[0],
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "Rupture-" + strconv.Itoa(int(rogue.Index)),
-			ActionID: RuptureActionID,
+			ActionID: rogue.Rupture[0].ActionID,
 		}),
 		NumberOfTicks: 0, // Set dynamically
 		TickLength:    time.Second * 2,

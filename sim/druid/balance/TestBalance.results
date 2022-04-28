@@ -432,7 +432,7 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-PrimalIntent"
  value: {
-  dps: 1052.5814195679627
+  dps: 1052.5814195679625
  }
 }
 dps_results: {
@@ -652,6 +652,54 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestBalance-Settings-Tauren-P1-AOE-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 2111.124869613251
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P1-AOE-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1049.8223675646475
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P1-AOE-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 809.2965296661464
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P1-AOE-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1096.0063086782257
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P1-AOE-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 1059.8574163751725
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P1-AOE-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 387.63221103359234
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P1-AOE-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 298.31884425899176
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P1-AOE-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 955.1121970946234
+ }
+}
+dps_results: {
  key: "TestBalance-Settings-Tauren-P1-Adaptive-FullBuffs-LongMultiTarget"
  value: {
   dps: 1266.531595738452
@@ -793,6 +841,54 @@ dps_results: {
  key: "TestBalance-Settings-Tauren-P1-Wrath-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
   dps: 1029.4631757777038
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P2-AOE-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 2342.781040468479
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P2-AOE-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 1219.115362283195
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P2-AOE-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 1026.6878173658415
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P2-AOE-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1227.6867164857692
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P2-AOE-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 1396.2914602398569
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P2-AOE-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 561.069347258167
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P2-AOE-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 444.10925635379635
+ }
+}
+dps_results: {
+ key: "TestBalance-Settings-Tauren-P2-AOE-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 1072.1803210431658
  }
 }
 dps_results: {

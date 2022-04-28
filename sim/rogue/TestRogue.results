@@ -150,7 +150,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-BraidedEterniumChain-24114"
  value: {
-  dps: 1418.9687856325377
+  dps: 1418.968785632537
  }
 }
 dps_results: {
@@ -162,7 +162,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-BrutalEarthstormDiamond"
  value: {
-  dps: 1389.109662465987
+  dps: 1389.1096624659872
  }
 }
 dps_results: {
@@ -312,13 +312,13 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Figurine-NightseyePanther-24128"
  value: {
-  dps: 1392.6131769516257
+  dps: 1392.613176951626
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
-  dps: 1411.8456918174331
+  dps: 1411.845691817433
  }
 }
 dps_results: {
@@ -384,19 +384,19 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-KhoriumChampion-23541"
  value: {
-  dps: 943.1953071424454
+  dps: 943.1953071424455
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-KissoftheSpider-22954"
  value: {
-  dps: 1407.993028842613
+  dps: 1407.9930288426133
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-LionheartChampion-28429"
  value: {
-  dps: 999.0478020545794
+  dps: 999.0478020545795
  }
 }
 dps_results: {
@@ -450,7 +450,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-PotentUnstableDiamond"
  value: {
-  dps: 1387.9474634537971
+  dps: 1387.9474634537974
  }
 }
 dps_results: {
@@ -540,13 +540,13 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-SingingCrystalAxe-31318"
  value: {
-  dps: 907.7860160205121
+  dps: 907.7860160205122
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-Slayer'sArmor"
  value: {
-  dps: 1520.3237857253043
+  dps: 1520.323785725304
  }
 }
 dps_results: {
@@ -576,7 +576,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-SwiftSkyfireDiamond"
  value: {
-  dps: 1387.9474634537971
+  dps: 1387.9474634537974
  }
 }
 dps_results: {
@@ -666,7 +666,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 1377.1428849773804
+  dps: 1377.1428849773802
  }
 }
 dps_results: {
@@ -690,7 +690,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-WastewalkerArmor"
  value: {
-  dps: 1211.3498102795363
+  dps: 1211.3498102795365
  }
 }
 dps_results: {
@@ -720,19 +720,19 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Average-Default"
  value: {
-  dps: 1407.0191882953152
+  dps: 1407.0191882953154
  }
 }
 dps_results: {
  key: "TestRogue-SelfDrums-DPS"
  value: {
-  dps: 1405.4198608274403
+  dps: 1405.4198608274396
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1692.9297156479881
+  dps: 1773.8662525554987
  }
 }
 dps_results: {
@@ -780,55 +780,55 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1745.9306433300417
+  dps: 1851.835659751705
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1442.770570746967
+  dps: 1473.170326411114
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1137.926319910134
+  dps: 1171.3828758873847
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1773.3179799312693
+  dps: 1810.8012715368252
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-NoBuffs-LongMultiTarget"
  value: {
-  dps: 962.389328433925
+  dps: 991.4470978585875
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 816.8950414491139
+  dps: 841.6425068224021
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 618.6214130647973
+  dps: 645.8275752230553
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 886.1538214926981
+  dps: 912.7625183773009
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1724.4446739268506
+  dps: 1796.108503762397
  }
 }
 dps_results: {
@@ -876,54 +876,54 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1768.9930244297232
+  dps: 1871.3455640499292
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1459.1343401211448
+  dps: 1489.7864122607384
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1153.0409935561636
+  dps: 1186.9548365526555
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1779.1066853229797
+  dps: 1817.2032493261574
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-NoBuffs-LongMultiTarget"
  value: {
-  dps: 975.9425175475983
+  dps: 1005.5126201915674
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 828.6669002669339
+  dps: 853.7199675800438
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 625.6928331984777
+  dps: 653.1859561668231
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 886.9911741324343
+  dps: 913.8074553324452
  }
 }
 dps_results: {
  key: "TestRogue-SwitchInFrontOfTarget-Default"
  value: {
-  dps: 1276.9004210289472
+  dps: 1276.9004210289477
  }
 }

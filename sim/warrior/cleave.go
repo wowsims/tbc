@@ -5,8 +5,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var CleaveActionID = core.ActionID{SpellID: 25231}
-
 func (warrior *Warrior) registerCleaveSpell(sim *core.Simulation) {
 	cost := 20.0 - float64(warrior.Talents.FocusedRage)
 
@@ -30,7 +28,7 @@ func (warrior *Warrior) registerCleaveSpell(sim *core.Simulation) {
 	}
 
 	warrior.Cleave = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    CleaveActionID,
+		ActionID:    core.ActionID{SpellID: 25231},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

@@ -41,12 +41,12 @@ var ItemSetVoidheartRaiment = core.ItemSet{
 	Name: "Voidheart Raiment",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
-			character := agent.GetCharacter()
+			warlock := agent.(WarlockAgent).GetWarlock()
 
-			shadowBonus := character.NewTemporaryStatsAura("Shadowflame", core.ActionID{SpellID: 37377}, stats.Stats{stats.ShadowSpellPower: 135}, time.Second*15)
-			fireBonus := character.NewTemporaryStatsAura("Shadowflame Hellfire", core.ActionID{SpellID: 39437}, stats.Stats{stats.ShadowSpellPower: 135}, time.Second*15)
+			shadowBonus := warlock.NewTemporaryStatsAura("Shadowflame", core.ActionID{SpellID: 37377}, stats.Stats{stats.ShadowSpellPower: 135}, time.Second*15)
+			fireBonus := warlock.NewTemporaryStatsAura("Shadowflame Hellfire", core.ActionID{SpellID: 39437}, stats.Stats{stats.ShadowSpellPower: 135}, time.Second*15)
 
-			character.RegisterAura(core.Aura{
+			warlock.RegisterAura(core.Aura{
 				Label:    "Voidheart Raiment 2pc",
 				Duration: core.NeverExpires,
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {

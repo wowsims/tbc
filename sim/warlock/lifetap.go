@@ -5,13 +5,13 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var LifeTapActionID = core.ActionID{SpellID: 27222}
-
 func (warlock *Warlock) registerLifeTapSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 27222}
 	mana := 582.0 * (1.0 + 0.1*float64(warlock.Talents.ImprovedLifeTap))
 	petRestore := 0.3333 * float64(warlock.Talents.ManaFeed)
+
 	warlock.LifeTap = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:    LifeTapActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolShadow,
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
@@ -26,11 +26,11 @@ func (warlock *Warlock) registerLifeTapSpell(sim *core.Simulation) {
 				// Life tap adds 0.8*sp to mana restore
 				// TODO: does AddMana generate threat correctly?
 				restore := mana + (warlock.GetStat(stats.SpellPower)+warlock.GetStat(stats.ShadowSpellPower))*0.8
-				warlock.AddMana(sim, restore, LifeTapActionID, true)
+				warlock.AddMana(sim, restore, actionID, true)
 
 				if warlock.Talents.ManaFeed > 0 {
 					for _, pet := range warlock.Pets {
-						pet.GetPet().AddMana(sim, restore*petRestore, LifeTapActionID, true)
+						pet.GetPet().AddMana(sim, restore*petRestore, actionID, true)
 					}
 				}
 			},

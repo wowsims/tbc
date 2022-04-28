@@ -108,7 +108,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-BlackoutTruncheon-27901"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
@@ -120,7 +120,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-BladeofUnquenchedThirst-31193"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
@@ -132,7 +132,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-Blinkstrike-31332"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
@@ -228,7 +228,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 731.2156046339542
+  dps: 731.2156046339541
  }
 }
 dps_results: {
@@ -282,13 +282,13 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-Dragonstrike-28439"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
  key: "TestArms-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
@@ -300,13 +300,13 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-EmptyMugofDirebrew-38287"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
  key: "TestArms-AllItems-EmpyreanDemolisher-17112"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
@@ -354,7 +354,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-Figurine-NightseyePanther-24128"
  value: {
-  dps: 723.1079644534029
+  dps: 723.1079644534032
  }
 }
 dps_results: {
@@ -384,7 +384,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-Heartrazor-29962"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
@@ -402,7 +402,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-IconofUnyieldingCourage-28121"
  value: {
-  dps: 721.4868141870746
+  dps: 721.4868141870747
  }
 }
 dps_results: {
@@ -426,7 +426,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-KhoriumChampion-23541"
  value: {
-  dps: 801.5165434057642
+  dps: 801.5165434057644
  }
 }
 dps_results: {
@@ -450,7 +450,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-MadnessoftheBetrayer-32505"
  value: {
-  dps: 731.0645414118189
+  dps: 731.0645414118188
  }
 }
 dps_results: {
@@ -534,7 +534,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-RelentlessEarthstormDiamond"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
@@ -546,7 +546,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-RodoftheSunKing-29996"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
@@ -600,13 +600,13 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-SingingCrystalAxe-31318"
  value: {
-  dps: 761.2585820998211
+  dps: 761.258582099821
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Slayer'sCrest-23041"
  value: {
-  dps: 729.5598298926166
+  dps: 729.5598298926164
  }
 }
 dps_results: {
@@ -654,7 +654,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-SyphonoftheNathrezim-32262"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
@@ -672,13 +672,13 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-TheDecapitator-28767"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
  key: "TestArms-AllItems-TheFistsofFury"
  value: {
-  dps: 652.401714331232
+  dps: 652.4017143312323
  }
 }
 dps_results: {
@@ -690,7 +690,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-TheNightBlade-31331"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
@@ -732,7 +732,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-TsunamiTalisman-30627"
  value: {
-  dps: 728.3684229139246
+  dps: 728.3684229139244
  }
 }
 dps_results: {
@@ -750,7 +750,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-WarpSlicer-30311"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
@@ -792,7 +792,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-Settings-Human-Arms P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1051.7909174614135
+  dps: 1119.6400732243037
  }
 }
 dps_results: {
@@ -816,7 +816,7 @@ dps_results: {
 dps_results: {
  key: "TestArms-Settings-Human-Arms P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 820.5587161467238
+  dps: 875.9147136991857
  }
 }
 dps_results: {
@@ -840,13 +840,13 @@ dps_results: {
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1048.4226145022003
+  dps: 1137.5153859263062
  }
 }
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 736.1064169386532
+  dps: 736.106416938653
  }
 }
 dps_results: {
@@ -864,19 +864,19 @@ dps_results: {
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 832.1984647637466
+  dps: 898.727296874134
  }
 }
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 592.8803075610931
+  dps: 592.880307561093
  }
 }
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 538.5414656037455
+  dps: 538.5414656037456
  }
 }
 dps_results: {

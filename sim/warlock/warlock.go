@@ -52,6 +52,10 @@ func (warlock *Warlock) GetCharacter() *core.Character {
 	return &warlock.Character
 }
 
+func (warlock *Warlock) GetWarlock() *Warlock {
+	return warlock
+}
+
 func (warlock *Warlock) Init(sim *core.Simulation) {
 	warlock.registerIncinerateSpell(sim)
 	warlock.registerShadowboltSpell(sim)
@@ -212,4 +216,9 @@ func init() {
 		// Not sure how stats modify the crit chance.
 		// stats.MeleeCrit:   4.43 * core.MeleeCritRatingPerCritChance,
 	}
+}
+
+// Agent is a generic way to access underlying warlock on any of the agents.
+type WarlockAgent interface {
+	GetWarlock() *Warlock
 }

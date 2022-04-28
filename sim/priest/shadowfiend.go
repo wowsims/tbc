@@ -9,10 +9,7 @@ import (
 )
 
 // https://web.archive.org/web/20071201221602/http://www.shadowpriest.com/viewtopic.php?t=7616
-
-const SpellIDShadowfiend int32 = 34433
-
-var ShadowfiendActionID = core.ActionID{SpellID: SpellIDShadowfiend}
+var ShadowfiendActionID = core.ActionID{SpellID: 34433}
 
 func (priest *Priest) registerShadowfiendCD() {
 	if !priest.UseShadowfiend {

@@ -91,6 +91,10 @@ func (mage *Mage) GetCharacter() *core.Character {
 	return &mage.Character
 }
 
+func (mage *Mage) GetMage() *Mage {
+	return mage
+}
+
 func (mage *Mage) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 	raidBuffs.ArcaneBrilliance = true
 }
@@ -262,6 +266,6 @@ func init() {
 }
 
 // Agent is a generic way to access underlying mage on any of the agents.
-type Agent interface {
+type MageAgent interface {
 	GetMage() *Mage
 }

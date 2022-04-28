@@ -44,10 +44,10 @@ var ItemSetTirisfalRegalia = core.ItemSet{
 			// Implemented in arcane_blast.go.
 		},
 		4: func(agent core.Agent) {
+			mage := agent.(MageAgent).GetMage()
 			// Your spell critical strikes grant you up to 70 spell damage for 6 sec.
-			character := agent.GetCharacter()
-			procAura := character.NewTemporaryStatsAura("Tirisfal 4pc Proc", core.ActionID{SpellID: 37443}, stats.Stats{stats.SpellPower: 70}, time.Second*6)
-			character.RegisterAura(core.Aura{
+			procAura := mage.NewTemporaryStatsAura("Tirisfal 4pc Proc", core.ActionID{SpellID: 37443}, stats.Stats{stats.SpellPower: 70}, time.Second*6)
+			mage.RegisterAura(core.Aura{
 				Label:    "Tirisfal 4pc",
 				Duration: core.NeverExpires,
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
@@ -81,13 +81,10 @@ var ItemSetTempestRegalia = core.ItemSet{
 }
 
 func ApplyAshtongueTalismanOfInsight(agent core.Agent) {
-	// Not in the game yet so cant test; this logic assumes that:
-	// - No ICD.
-	// - 50% proc rate.
-	char := agent.GetCharacter()
-	procAura := char.NewTemporaryStatsAura("Asghtongue Talisman Proc", core.ActionID{SpellID: 32488}, stats.Stats{stats.SpellHaste: 150}, time.Second*5)
+	mage := agent.(MageAgent).GetMage()
+	procAura := mage.NewTemporaryStatsAura("Asghtongue Talisman Proc", core.ActionID{SpellID: 32488}, stats.Stats{stats.SpellHaste: 150}, time.Second*5)
 
-	char.RegisterAura(core.Aura{
+	mage.RegisterAura(core.Aura{
 		Label:    "Ashtongue Talisman",
 		Duration: core.NeverExpires,
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {

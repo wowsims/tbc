@@ -8,14 +8,13 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var HemorrhageActionID = core.ActionID{SpellID: 26864}
-var HemorrhageEnergyCost = 35.0
-
 func (rogue *Rogue) registerHemorrhageSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 26864}
+
 	target := sim.GetPrimaryTarget()
 	hemoAura := target.GetOrRegisterAura(core.Aura{
 		Label:     "Hemorrhage",
-		ActionID:  HemorrhageActionID,
+		ActionID:  actionID,
 		Duration:  time.Second * 15,
 		MaxStacks: 10,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
@@ -36,19 +35,20 @@ func (rogue *Rogue) registerHemorrhageSpell(sim *core.Simulation) {
 		},
 	})
 
-	refundAmount := HemorrhageEnergyCost * 0.8
+	baseCost := 35.0
+	refundAmount := baseCost * 0.8
 
 	rogue.Hemorrhage = rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    HemorrhageActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder,
 
 		ResourceType: stats.Energy,
-		BaseCost:     HemorrhageEnergyCost,
+		BaseCost:     baseCost,
 
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				Cost: HemorrhageEnergyCost,
+				Cost: baseCost,
 				GCD:  time.Second,
 			},
 			IgnoreHaste: true,
@@ -63,7 +63,7 @@ func (rogue *Rogue) registerHemorrhageSpell(sim *core.Simulation) {
 			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, true)),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
-					rogue.AddComboPoints(sim, 1, HemorrhageActionID)
+					rogue.AddComboPoints(sim, 1, spell.ActionID)
 
 					hemoAura.Activate(sim)
 					hemoAura.SetStacks(sim, 10)

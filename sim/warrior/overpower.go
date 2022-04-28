@@ -9,8 +9,6 @@ import (
 )
 
 func (warrior *Warrior) registerOverpowerSpell(cdTimer *core.Timer) {
-	actionID := core.ActionID{SpellID: 11585}
-
 	warrior.RegisterAura(core.Aura{
 		Label:    "Overpower Trigger",
 		Duration: core.NeverExpires,
@@ -45,7 +43,7 @@ func (warrior *Warrior) registerOverpowerSpell(cdTimer *core.Timer) {
 	})
 
 	warrior.Overpower = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
+		ActionID:    core.ActionID{SpellID: 11585},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

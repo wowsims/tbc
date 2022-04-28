@@ -7,13 +7,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var EnvenomActionID = core.ActionID{SpellID: 32684}
-
 func (rogue *Rogue) makeEnvenom(comboPoints int32) *core.Spell {
-	actionID := EnvenomActionID
-	actionID.Tag = comboPoints
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
-
 	baseDamage := 60.0 + (180+core.TernaryFloat64(ItemSetDeathmantle.CharacterHasSetBonus(&rogue.Character, 2), 40, 0))*float64(comboPoints)
 	apRatio := 0.03 * float64(comboPoints)
 
@@ -23,7 +18,7 @@ func (rogue *Rogue) makeEnvenom(comboPoints int32) *core.Spell {
 	}
 
 	return rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
+		ActionID:    core.ActionID{SpellID: 32684, Tag: comboPoints},
 		SpellSchool: core.SpellSchoolNature,
 		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasIgnoreResists | rogue.finisherFlags(),
 

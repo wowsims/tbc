@@ -48,7 +48,7 @@ character_stats_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-AbacusofViolentOdds-28288"
  value: {
-  dps: 1954.1414283180534
+  dps: 1954.1414283180532
  }
 }
 dps_results: {
@@ -84,7 +84,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-BandoftheEternalChampion-29301"
  value: {
-  dps: 1960.6786954288568
+  dps: 1960.6786954288573
  }
 }
 dps_results: {
@@ -138,7 +138,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-BraidedEterniumChain-24114"
  value: {
-  dps: 1962.214672473032
+  dps: 1962.2146724730326
  }
 }
 dps_results: {
@@ -174,7 +174,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-CloakofDarkness-33122"
  value: {
-  dps: 1954.6455673933478
+  dps: 1954.645567393348
  }
 }
 dps_results: {
@@ -450,13 +450,13 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-NetherstrikeArmor"
  value: {
-  dps: 1715.8362674988384
+  dps: 1715.8362674988387
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-PotentUnstableDiamond"
  value: {
-  dps: 1925.1896660663351
+  dps: 1925.1896660663353
  }
 }
 dps_results: {
@@ -486,7 +486,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-RobeoftheElderScribes-28602"
  value: {
-  dps: 1833.2086797223903
+  dps: 1833.2086797223906
  }
 }
 dps_results: {
@@ -522,7 +522,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-ShardofContempt-34472"
  value: {
-  dps: 2006.0628726777138
+  dps: 2006.0628726777134
  }
 }
 dps_results: {
@@ -546,7 +546,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-SkycallTotem-33506"
  value: {
-  dps: 1954.6792526375375
+  dps: 1954.6792526375377
  }
 }
 dps_results: {
@@ -594,13 +594,13 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-StrengthoftheClefthoof"
  value: {
-  dps: 1665.830675462242
+  dps: 1665.8306754622422
  }
 }
 dps_results: {
  key: "TestEnhancement-AllItems-SwiftSkyfireDiamond"
  value: {
-  dps: 1925.1896660663351
+  dps: 1925.1896660663353
  }
 }
 dps_results: {
@@ -666,7 +666,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TheSkullofGul'dan-32483"
  value: {
-  dps: 1928.2983204012085
+  dps: 1928.298320401208
  }
 }
 dps_results: {
@@ -696,7 +696,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-TotemofthePulsingEarth-29389"
  value: {
-  dps: 1954.6792526375375
+  dps: 1954.6792526375377
  }
 }
 dps_results: {
@@ -708,7 +708,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-WastewalkerArmor"
  value: {
-  dps: 1641.6833173357538
+  dps: 1641.6833173357536
  }
 }
 dps_results: {
@@ -726,7 +726,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-WrathofSpellfire"
  value: {
-  dps: 1683.655033936046
+  dps: 1683.6550339360463
  }
 }
 dps_results: {
@@ -744,7 +744,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2167.519741944127
+  dps: 2883.507938682466
  }
 }
 dps_results: {
@@ -768,7 +768,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1059.6412011396224
+  dps: 1678.186059675546
  }
 }
 dps_results: {
@@ -786,13 +786,13 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1076.4426980602793
+  dps: 1076.442698060279
  }
 }
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2160.897298182359
+  dps: 2884.4016114671376
  }
 }
 dps_results: {
@@ -816,7 +816,7 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1053.583659325353
+  dps: 1666.0778374941758
  }
 }
 dps_results: {

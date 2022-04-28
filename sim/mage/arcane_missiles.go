@@ -8,20 +8,17 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDArcaneMissiles int32 = 38699
-
-var ArcaneMissilesActionID = core.ActionID{SpellID: SpellIDArcaneMissiles}
-
 // Note: AM doesn't charge its mana up-front, instead it charges 1/5 of the mana on each tick.
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
 func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 38699}
 	baseCost := 740.0
 
 	bonusCrit := float64(mage.Talents.ArcanePotency) * 10 * core.SpellCritRatingPerCritChance
 
 	mage.ArcaneMissiles = mage.RegisterSpell(core.SpellConfig{
-		ActionID:    ArcaneMissilesActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolArcane,
 		SpellExtras: SpellFlagMage | core.SpellExtrasChanneled,
 
@@ -64,7 +61,7 @@ func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
 		Spell: mage.ArcaneMissiles,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "ArcaneMissiles-" + strconv.Itoa(int(mage.Index)),
-			ActionID: ArcaneMissilesActionID,
+			ActionID: actionID,
 		}),
 
 		NumberOfTicks:       5,

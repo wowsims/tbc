@@ -7,15 +7,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDMindBlast int32 = 25375
-
-var MindBlastActionID = core.ActionID{SpellID: SpellIDMindBlast}
-
 func (priest *Priest) registerMindBlastSpell(sim *core.Simulation) {
 	baseCost := 450.0
 
 	priest.MindBlast = priest.RegisterSpell(core.SpellConfig{
-		ActionID:    MindBlastActionID,
+		ActionID:    core.ActionID{SpellID: 25375},
 		SpellSchool: core.SpellSchoolShadow,
 
 		ResourceType: stats.Mana,

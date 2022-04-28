@@ -8,15 +8,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDDevouringPlague int32 = 25467
-
-var DevouringPlagueActionID = core.ActionID{SpellID: SpellIDDevouringPlague}
-
 func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 25467}
 	baseCost := 1145.0
 
 	priest.DevouringPlague = priest.RegisterSpell(core.SpellConfig{
-		ActionID:    DevouringPlagueActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolShadow,
 
 		ResourceType: stats.Mana,
@@ -51,7 +48,7 @@ func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
 		Spell: priest.DevouringPlague,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "DevouringPlague-" + strconv.Itoa(int(priest.Index)),
-			ActionID: DevouringPlagueActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 8,
 		TickLength:    time.Second * 3,

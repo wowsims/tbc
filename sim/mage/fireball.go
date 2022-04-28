@@ -8,15 +8,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDFireball int32 = 27070
-
-var FireballActionID = core.ActionID{SpellID: SpellIDFireball}
-
 func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 27070}
 	baseCost := 425.0
 
 	mage.Fireball = mage.RegisterSpell(core.SpellConfig{
-		ActionID:    FireballActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFire,
 		SpellExtras: SpellFlagMage,
 
@@ -64,7 +61,7 @@ func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
 		Spell: mage.Fireball,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "Fireball-" + strconv.Itoa(int(mage.Index)),
-			ActionID: FireballActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 4,
 		TickLength:    time.Second * 2,

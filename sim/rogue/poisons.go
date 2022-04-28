@@ -15,11 +15,11 @@ func (rogue *Rogue) applyPoisons() {
 	rogue.applyInstantPoison(hasWFTotem)
 }
 
-var DeadlyPoisonActionID = core.ActionID{SpellID: 27186}
-
 func (rogue *Rogue) registerDeadlyPoisonSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 27186}
+
 	rogue.DeadlyPoison = rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    DeadlyPoisonActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolNature,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
@@ -44,7 +44,7 @@ func (rogue *Rogue) registerDeadlyPoisonSpell(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	dotAura := target.RegisterAura(core.Aura{
 		Label:     "DeadlyPoison-" + strconv.Itoa(int(rogue.Index)),
-		ActionID:  DeadlyPoisonActionID,
+		ActionID:  actionID,
 		MaxStacks: 5,
 		Duration:  time.Second * 12,
 	})

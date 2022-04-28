@@ -8,13 +8,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var ExorcismActionID = core.ActionID{SpellID: 10314}
-
 func (paladin *Paladin) registerExorcismSpell(sim *core.Simulation) {
 	baseCost := 295.0
 
 	paladin.Exorcism = paladin.RegisterSpell(core.SpellConfig{
-		ActionID:    ExorcismActionID,
+		ActionID:    core.ActionID{SpellID: 10314},
 		SpellSchool: core.SpellSchoolHoly,
 
 		ResourceType: stats.Mana,

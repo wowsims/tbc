@@ -27,6 +27,7 @@ func TestBalance(t *testing.T) {
 		OtherSpecOptions: []core.SpecOptionsCombo{
 			core.SpecOptionsCombo{Label: "Wrath", SpecOptions: PlayerOptionsWrath},
 			core.SpecOptionsCombo{Label: "Adaptive", SpecOptions: PlayerOptionsAdaptive},
+			core.SpecOptionsCombo{Label: "AOE", SpecOptions: PlayerOptionsAOE},
 		},
 
 		RaidBuffs:   FullRaidBuffs,

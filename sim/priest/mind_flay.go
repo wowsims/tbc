@@ -8,13 +8,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDMindFlay int32 = 25387
-
 func (priest *Priest) MindFlayActionID(numTicks int) core.ActionID {
-	return core.ActionID{
-		SpellID: SpellIDMindFlay,
-		Tag:     int32(numTicks),
-	}
+	return core.ActionID{SpellID: 25387, Tag: int32(numTicks)}
 }
 
 func (priest *Priest) newMindFlaySpell(sim *core.Simulation, numTicks int) *core.Spell {

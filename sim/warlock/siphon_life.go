@@ -8,14 +8,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDSiphonLife6 int32 = 30911
-
-var SiphonLife6ActionID = core.ActionID{SpellID: SpellIDSiphonLife6}
-
 func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 30911}
 	baseCost := 370.0
+
 	warlock.SiphonLife = warlock.RegisterSpell(core.SpellConfig{
-		ActionID:     SiphonLife6ActionID,
+		ActionID:     actionID,
 		SpellSchool:  core.SpellSchoolShadow,
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -39,7 +37,7 @@ func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
 		Spell: warlock.SiphonLife,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "SiphonLife-" + strconv.Itoa(int(warlock.Index)),
-			ActionID: SiphonLife6ActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 10,
 		TickLength:    time.Second * 3,

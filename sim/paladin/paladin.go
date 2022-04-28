@@ -37,14 +37,15 @@ type Paladin struct {
 
 // Implemented by each Paladin spec.
 type PaladinAgent interface {
-	core.Agent
-
-	// The Paladin controlled by this Agent.
 	GetPaladin() *Paladin
 }
 
 func (paladin *Paladin) GetCharacter() *core.Character {
 	return &paladin.Character
+}
+
+func (paladin *Paladin) GetPaladin() *Paladin {
+	return paladin
 }
 
 func (paladin *Paladin) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {

@@ -7,19 +7,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const (
-	CastTagFlamestrikeDot int32 = 1
-)
-
-const SpellIDFlamestrike int32 = 27086
-
-var FlamestrikeActionID = core.ActionID{SpellID: SpellIDFlamestrike}
-
 func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
-	//AOECap: 7830,
+	actionID := core.ActionID{SpellID: 27086}
 	baseCost := 1175.0
 
-	applyAOEDamage := core.ApplyEffectFuncAOEDamage(sim, core.SpellEffect{
+	applyAOEDamage := core.ApplyEffectFuncAOEDamageCapped(sim, 7830, core.SpellEffect{
 		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
 
 		BonusSpellCritRating: 0 +
@@ -35,7 +27,7 @@ func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
 	})
 
 	mage.Flamestrike = mage.RegisterSpell(core.SpellConfig{
-		ActionID:    FlamestrikeActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFire,
 		SpellExtras: SpellFlagMage,
 
@@ -63,7 +55,7 @@ func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
 		Spell: mage.Flamestrike,
 		Aura: mage.RegisterAura(core.Aura{
 			Label:    "Flamestrike",
-			ActionID: FlamestrikeActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 4,
 		TickLength:    time.Second * 2,

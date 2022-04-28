@@ -8,8 +8,6 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var SinisterStrikeActionID = core.ActionID{SpellID: 26862}
-
 func (rogue *Rogue) SinisterStrikeEnergyCost() float64 {
 	return []float64{45, 42, 40}[rogue.Talents.ImprovedSinisterStrike]
 }
@@ -19,7 +17,7 @@ func (rogue *Rogue) registerSinisterStrikeSpell(_ *core.Simulation) {
 	refundAmount := energyCost * 0.8
 
 	rogue.SinisterStrike = rogue.RegisterSpell(core.SpellConfig{
-		ActionID:    SinisterStrikeActionID,
+		ActionID:    core.ActionID{SpellID: 26862},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics | SpellFlagBuilder,
 
@@ -45,7 +43,7 @@ func (rogue *Rogue) registerSinisterStrikeSpell(_ *core.Simulation) {
 			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, true)),
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
-					rogue.AddComboPoints(sim, 1, SinisterStrikeActionID)
+					rogue.AddComboPoints(sim, 1, spell.ActionID)
 				} else {
 					rogue.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 				}

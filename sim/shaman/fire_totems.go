@@ -8,15 +8,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDSearingTotem int32 = 25533
-
-var SearingTotemActionID = core.ActionID{SpellID: SpellIDSearingTotem}
-
 func (shaman *Shaman) registerSearingTotemSpell(sim *core.Simulation) {
+	actionID := core.ActionID{SpellID: 25533}
 	baseCost := 205.0
 
 	shaman.SearingTotem = shaman.RegisterSpell(core.SpellConfig{
-		ActionID:    SearingTotemActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFire,
 		SpellExtras: SpellFlagTotem,
 
@@ -45,7 +42,7 @@ func (shaman *Shaman) registerSearingTotemSpell(sim *core.Simulation) {
 		Spell: shaman.SearingTotem,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "SearingTotem-" + strconv.Itoa(int(shaman.Index)),
-			ActionID: SearingTotemActionID,
+			ActionID: actionID,
 		}),
 		// These are the real tick values, but searing totem doesn't start its next
 		// cast until the previous missile hits the target. We don't have an option
@@ -64,16 +61,12 @@ func (shaman *Shaman) registerSearingTotemSpell(sim *core.Simulation) {
 	})
 }
 
-const SpellIDMagmaTotem int32 = 25552
-
-var MagmaTotemActionID = core.ActionID{SpellID: SpellIDMagmaTotem}
-
 func (shaman *Shaman) registerMagmaTotemSpell(sim *core.Simulation) {
-	//AOECap: 1600,
+	actionID := core.ActionID{SpellID: 25552}
 	baseCost := 800.0
 
 	shaman.MagmaTotem = shaman.RegisterSpell(core.SpellConfig{
-		ActionID:    MagmaTotemActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFire,
 		SpellExtras: SpellFlagTotem,
 
@@ -101,11 +94,11 @@ func (shaman *Shaman) registerMagmaTotemSpell(sim *core.Simulation) {
 		Spell: shaman.MagmaTotem,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "MagmaTotem-" + strconv.Itoa(int(shaman.Index)),
-			ActionID: MagmaTotemActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 10,
 		TickLength:    time.Second * 2,
-		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncAOEDamage(sim, core.SpellEffect{
+		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncAOEDamageCapped(sim, 1550, core.SpellEffect{
 			BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
 			DamageMultiplier:    1 + float64(shaman.Talents.CallOfFlame)*0.05,
 			IsPhantom:           true,
@@ -115,10 +108,6 @@ func (shaman *Shaman) registerMagmaTotemSpell(sim *core.Simulation) {
 	})
 }
 
-const SpellIDNovaTotem int32 = 25537
-
-var FireNovaTotemActionID = core.ActionID{SpellID: SpellIDNovaTotem}
-
 func (shaman *Shaman) FireNovaTickLength() time.Duration {
 	return time.Second * time.Duration(4-shaman.Talents.ImprovedFireTotems)
 }
@@ -126,12 +115,12 @@ func (shaman *Shaman) FireNovaTickLength() time.Duration {
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
 func (shaman *Shaman) registerNovaTotemSpell(sim *core.Simulation) {
-	//AOECap: 9975,
+	actionID := core.ActionID{SpellID: 25537}
 	baseCost := 765.0
 
 	tickLength := shaman.FireNovaTickLength()
 	shaman.FireNovaTotem = shaman.RegisterSpell(core.SpellConfig{
-		ActionID:    FireNovaTotemActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolFire,
 		SpellExtras: SpellFlagTotem,
 
@@ -165,11 +154,11 @@ func (shaman *Shaman) registerNovaTotemSpell(sim *core.Simulation) {
 		Spell: shaman.FireNovaTotem,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "FireNovaTotem-" + strconv.Itoa(int(shaman.Index)),
-			ActionID: FireNovaTotemActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 1,
 		TickLength:    tickLength,
-		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncAOEDamage(sim, core.SpellEffect{
+		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncAOEDamageCapped(sim, 9975, core.SpellEffect{
 			BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
 			DamageMultiplier:    1 + float64(shaman.Talents.CallOfFlame)*0.05,
 			IsPhantom:           true,

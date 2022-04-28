@@ -174,7 +174,7 @@ func (rogue *Rogue) doPlanExposeArmor(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 
 	if comboPoints == 5 {
-		if energy >= ExposeArmorEnergyCost || rogue.deathmantleActive() {
+		if energy >= rogue.ExposeArmor.DefaultCast.Cost || rogue.deathmantleActive() {
 			eaTimeRemaining := rogue.ExposeArmorAura.RemainingDuration(sim)
 			if rogue.canPoolEnergy(sim, energy) && eaTimeRemaining > time.Second*2 {
 				return
@@ -286,7 +286,7 @@ func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 	}
 
 	eaTimeRemaining := rogue.ExposeArmorAura.RemainingDuration(sim)
-	energyForEANext := rogue.Builder.DefaultCast.Cost*float64(5-comboPoints) + ExposeArmorEnergyCost
+	energyForEANext := rogue.Builder.DefaultCast.Cost*float64(5-comboPoints) + rogue.ExposeArmor.DefaultCast.Cost
 	eaNextBuildTime := core.MaxDuration(0, time.Duration(((energyForEANext-energy)/rogue.energyPerSecondAvg)*float64(time.Second)))
 	spareTime := core.MaxDuration(0, eaTimeRemaining-eaNextBuildTime)
 	if spareTime <= buildTimeBuffer {

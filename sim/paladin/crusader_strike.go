@@ -7,15 +7,13 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var CrusaderStrikeActionID = core.ActionID{SpellID: 35395}
-
 // Do some research on the spell fields to make sure I'm doing this right
 // Need to add in judgement debuff refreshing feature at some point
 func (paladin *Paladin) registerCrusaderStrikeSpell(sim *core.Simulation) {
 	baseCost := 236.0
 
 	paladin.CrusaderStrike = paladin.RegisterSpell(core.SpellConfig{
-		ActionID:    CrusaderStrikeActionID,
+		ActionID:    core.ActionID{SpellID: 35395},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

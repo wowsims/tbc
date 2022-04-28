@@ -8,14 +8,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-var SlamActionID = core.ActionID{SpellID: 25242}
-
 func (warrior *Warrior) registerSlamSpell(_ *core.Simulation) {
 	cost := 15.0 - float64(warrior.Talents.FocusedRage)
 	refundAmount := cost * 0.8
 
 	warrior.Slam = warrior.RegisterSpell(core.SpellConfig{
-		ActionID:    SlamActionID,
+		ActionID:    core.ActionID{SpellID: 25242},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 

@@ -17,16 +17,12 @@ func (paladin *Paladin) canJudgement(sim *core.Simulation) bool {
 	return paladin.CurrentSeal != nil && paladin.CurrentSeal.IsActive() && paladin.JudgementOfWisdom.IsReady(sim)
 }
 
-var JudgementOfBloodActionID = core.ActionID{SpellID: 31898}
-
-var LibramOfAvengementProcActionID = core.ActionID{SpellID: 34260}
-
 func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation, cdTimer *core.Timer) {
 	var loaAura *core.Aura
 	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27484 {
 		loaAura = paladin.NewTemporaryStatsAura(
 			"Libram of Avengement",
-			LibramOfAvengementProcActionID,
+			core.ActionID{SpellID: 34260},
 			stats.Stats{stats.MeleeCrit: 53, stats.SpellCrit: 53},
 			time.Second*5)
 	}
@@ -53,7 +49,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation, cdTi
 
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfBlood = paladin.RegisterSpell(core.SpellConfig{
-		ActionID:    JudgementOfBloodActionID,
+		ActionID:    core.ActionID{SpellID: 31898},
 		SpellSchool: core.SpellSchoolHoly,
 
 		ResourceType: stats.Mana,
@@ -77,8 +73,6 @@ func (paladin *Paladin) CanJudgementOfBlood(sim *core.Simulation) bool {
 	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfBloodAura
 }
 
-var JudgementOfTheCrusaderActionID = core.ActionID{SpellID: 27159}
-
 func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation, cdTimer *core.Timer) {
 	percentBonus := 1.0
 	if ItemSetJusticarBattlegear.CharacterHasSetBonus(&paladin.Character, 2) {
@@ -94,7 +88,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
-		ActionID:    JudgementOfTheCrusaderActionID,
+		ActionID:    core.ActionID{SpellID: 27159},
 		SpellSchool: core.SpellSchoolHoly,
 
 		ResourceType: stats.Mana,
@@ -134,14 +128,12 @@ func (paladin *Paladin) CanJudgementOfTheCrusader(sim *core.Simulation) bool {
 	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfTheCrusaderAura
 }
 
-var JudgementOfWisdomActionID = core.ActionID{SpellID: 27164}
-
 func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation, cdTimer *core.Timer) {
 	paladin.JudgementOfWisdomAura = core.JudgementOfWisdomAura(sim.GetPrimaryTarget())
 
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfWisdom = paladin.RegisterSpell(core.SpellConfig{
-		ActionID:    JudgementOfWisdomActionID,
+		ActionID:    core.ActionID{SpellID: 27164},
 		SpellSchool: core.SpellSchoolHoly,
 
 		ResourceType: stats.Mana,
@@ -206,8 +198,6 @@ func (paladin *Paladin) setupJudgementRefresh() {
 	})
 }
 
-var SanctifiedJudgementActionID = core.ActionID{SpellID: 31930}
-
 // Helper function to implement Sanctified Seals talent
 func (paladin *Paladin) sanctifiedJudgement(sim *core.Simulation, mana float64) {
 	if paladin.Talents.SanctifiedJudgement == 0 {
@@ -222,7 +212,7 @@ func (paladin *Paladin) sanctifiedJudgement(sim *core.Simulation, mana float64) 
 	}
 
 	if sim.RandomFloat("Sanctified Judgement") < proc {
-		paladin.AddMana(sim, 0.8*mana, SanctifiedJudgementActionID, false)
+		paladin.AddMana(sim, 0.8*mana, core.ActionID{SpellID: 31930}, false)
 	}
 }
 

@@ -11,9 +11,6 @@ import (
 const TwistWindow = time.Millisecond * 400
 const SealDuration = time.Second * 30
 
-var SealOfBloodCastActionID = core.ActionID{SpellID: 31892}
-var SealOfBloodProcActionID = core.ActionID{SpellID: 31893}
-
 // Handles the cast, gcd, deducts the mana cost
 func (paladin *Paladin) setupSealOfBlood() {
 	effect := core.SpellEffect{
@@ -29,8 +26,9 @@ func (paladin *Paladin) setupSealOfBlood() {
 	// Apply 2 Handed Weapon Specialization talent
 	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
 
+	procActionID := core.ActionID{SpellID: 31893}
 	sobProc := paladin.RegisterSpell(core.SpellConfig{
-		ActionID:     SealOfBloodProcActionID,
+		ActionID:     procActionID,
 		SpellSchool:  core.SpellSchoolHoly,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
@@ -39,7 +37,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 	paladin.SealOfBloodAura = paladin.RegisterAura(core.Aura{
 		Label:    "Seal of Blood",
 		Tag:      "Seal",
-		ActionID: SealOfBloodProcActionID,
+		ActionID: procActionID,
 		Duration: SealDuration,
 
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -53,7 +51,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 	baseCost := 210.0
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfBlood = paladin.RegisterSpell(core.SpellConfig{
-		ActionID: SealOfBloodCastActionID,
+		ActionID: core.ActionID{SpellID: 31892},
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -70,9 +68,6 @@ func (paladin *Paladin) setupSealOfBlood() {
 		},
 	})
 }
-
-var SealOfCommandCastActionID = core.ActionID{SpellID: 20375}
-var SealOfCommandProcActionID = core.ActionID{SpellID: 20424}
 
 func (paladin *Paladin) SetupSealOfCommand() {
 	effect := core.SpellEffect{
@@ -91,8 +86,9 @@ func (paladin *Paladin) SetupSealOfCommand() {
 		TargetSpellCoefficient: 0.29,
 	}
 
+	procActionID := core.ActionID{SpellID: 20424}
 	socProc := paladin.RegisterSpell(core.SpellConfig{
-		ActionID:     SealOfCommandProcActionID,
+		ActionID:     procActionID,
 		SpellSchool:  core.SpellSchoolHoly,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
@@ -106,7 +102,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	paladin.SealOfCommandAura = paladin.RegisterAura(core.Aura{
 		Label:    "Seal of Command",
 		Tag:      "Seal",
-		ActionID: SealOfCommandProcActionID,
+		ActionID: procActionID,
 		Duration: SealDuration,
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) || spellEffect.IsPhantom {
@@ -129,7 +125,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	baseCost := 65.0
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfCommand = paladin.RegisterSpell(core.SpellConfig{
-		ActionID: SealOfCommandCastActionID,
+		ActionID: core.ActionID{SpellID: 20375},
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -147,23 +143,23 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	})
 }
 
-var SealOfTheCrusaderActionID = core.ActionID{SpellID: 27158}
-
 // TODO: Make a universal setup seals function
 
 // Seal of the crusader has a bunch of effects that we realistically don't care about (bonus AP, faster swing speed)
 // For now, we'll just use it as a setup to casting Judgement of the Crusader
 func (paladin *Paladin) setupSealOfTheCrusader() {
+	actionID := core.ActionID{SpellID: 27158}
 	apBonus := 495.0
 	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 23203 {
 		apBonus += 48
 	} else if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27949 {
 		apBonus += 68
 	}
+
 	paladin.SealOfTheCrusaderAura = paladin.RegisterAura(core.Aura{
 		Label:    "Seal of the Crusader",
 		Tag:      "Seal",
-		ActionID: SealOfTheCrusaderActionID,
+		ActionID: actionID,
 		Duration: SealDuration,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			paladin.AddStat(stats.AttackPower, apBonus)
@@ -179,7 +175,7 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 	baseCost := 210.0
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
-		ActionID: SealOfTheCrusaderActionID,
+		ActionID: actionID,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -199,20 +195,20 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 
 // Didn't encode all the functionality of seal of wisdom
 // For now, we'll just use it as a setup to casting Judgement of Wisdom
-var SealOfWisdomActionID = core.ActionID{SpellID: 27166}
 
 func (paladin *Paladin) setupSealOfWisdom() {
+	actionID := core.ActionID{SpellID: 27166}
 	paladin.SealOfWisdomAura = paladin.RegisterAura(core.Aura{
 		Label:    "Seal of Wisdom",
 		Tag:      "Seal",
-		ActionID: SealOfWisdomActionID,
+		ActionID: actionID,
 		Duration: SealDuration,
 	})
 
 	baseCost := 270.0
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfWisdom = paladin.RegisterSpell(core.SpellConfig{
-		ActionID: SealOfWisdomActionID,
+		ActionID: actionID,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
