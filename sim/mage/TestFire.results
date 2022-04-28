@@ -616,6 +616,54 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFire-Settings-Troll10-P1Fire-AOE-FullBuffs-LongMultiTarget"
+ value: {
+  dps: 6309.260768127051
+ }
+}
+dps_results: {
+ key: "TestFire-Settings-Troll10-P1Fire-AOE-FullBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 289.9224681179652
+ }
+}
+dps_results: {
+ key: "TestFire-Settings-Troll10-P1Fire-AOE-FullBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 244.85452423753628
+ }
+}
+dps_results: {
+ key: "TestFire-Settings-Troll10-P1Fire-AOE-FullBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 639.7066796183975
+ }
+}
+dps_results: {
+ key: "TestFire-Settings-Troll10-P1Fire-AOE-NoBuffs-LongMultiTarget"
+ value: {
+  dps: 5637.330786320309
+ }
+}
+dps_results: {
+ key: "TestFire-Settings-Troll10-P1Fire-AOE-NoBuffs-LongSingleTargetFullDebuffs"
+ value: {
+  dps: 143.66764185543568
+ }
+}
+dps_results: {
+ key: "TestFire-Settings-Troll10-P1Fire-AOE-NoBuffs-LongSingleTargetNoDebuffs"
+ value: {
+  dps: 119.62066833903684
+ }
+}
+dps_results: {
+ key: "TestFire-Settings-Troll10-P1Fire-AOE-NoBuffs-ShortSingleTargetFullDebuffs"
+ value: {
+  dps: 422.90392549061403
+ }
+}
+dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-FireRotation-FullBuffs-LongMultiTarget"
  value: {
   dps: 1569.76282485599

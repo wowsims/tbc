@@ -21,6 +21,9 @@ func TestArcane(t *testing.T) {
 		GearSet: core.GearSetCombo{Label: "P1Arcane", GearSet: P1ArcaneGear},
 
 		SpecOptions: core.SpecOptionsCombo{Label: "ArcaneRotation", SpecOptions: PlayerOptionsArcane},
+		OtherSpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "AOE", SpecOptions: PlayerOptionsArcaneAOE},
+		},
 
 		RaidBuffs:   FullRaidBuffs,
 		PartyBuffs:  FullArcanePartyBuffs,
@@ -52,6 +55,9 @@ func TestFire(t *testing.T) {
 		GearSet: core.GearSetCombo{Label: "P1Fire", GearSet: P1FireGear},
 
 		SpecOptions: core.SpecOptionsCombo{Label: "FireRotation", SpecOptions: PlayerOptionsFire},
+		OtherSpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "AOE", SpecOptions: PlayerOptionsFireAOE},
+		},
 
 		RaidBuffs:   FullRaidBuffs,
 		PartyBuffs:  FullFirePartyBuffs,
@@ -83,6 +89,9 @@ func TestFrost(t *testing.T) {
 		GearSet: core.GearSetCombo{Label: "P1Frost", GearSet: P1FrostGear},
 
 		SpecOptions: core.SpecOptionsCombo{Label: "FrostRotation", SpecOptions: PlayerOptionsFrost},
+		OtherSpecOptions: []core.SpecOptionsCombo{
+			core.SpecOptionsCombo{Label: "AOE", SpecOptions: PlayerOptionsFrostAOE},
+		},
 
 		RaidBuffs:   FullRaidBuffs,
 		PartyBuffs:  FullFrostPartyBuffs,

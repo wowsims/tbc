@@ -792,7 +792,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-Settings-Human-Fury P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1392.1559840077878
+  dps: 1515.4520305943704
  }
 }
 dps_results: {
@@ -816,7 +816,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-Settings-Human-Fury P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1128.818770662859
+  dps: 1226.2118682142516
  }
 }
 dps_results: {
@@ -840,7 +840,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-Settings-Orc-Fury P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1394.0274850376318
+  dps: 1520.3381904038758
  }
 }
 dps_results: {
@@ -864,7 +864,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-Settings-Orc-Fury P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1128.8798427277347
+  dps: 1240.9641312644576
  }
 }
 dps_results: {

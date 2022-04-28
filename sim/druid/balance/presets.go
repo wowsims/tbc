@@ -102,6 +102,21 @@ var PlayerOptionsWrath = &proto.Player_BalanceDruid{
 	},
 }
 
+var PlayerOptionsAOE = &proto.Player_BalanceDruid{
+	BalanceDruid: &proto.BalanceDruid{
+		Talents: StandardTalents,
+		Options: &proto.BalanceDruid_Options{
+			InnervateTarget: &proto.RaidTarget{TargetIndex: 0}, // self innervate
+		},
+		Rotation: &proto.BalanceDruid_Rotation{
+			PrimarySpell: proto.BalanceDruid_Rotation_Starfire,
+			Moonfire:     true,
+			FaerieFire:   true,
+			Hurricane:    true,
+		},
+	},
+}
+
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{
 		Name:    "Antlers of Malorne",

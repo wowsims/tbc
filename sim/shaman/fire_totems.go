@@ -63,7 +63,6 @@ func (shaman *Shaman) registerSearingTotemSpell(sim *core.Simulation) {
 
 func (shaman *Shaman) registerMagmaTotemSpell(sim *core.Simulation) {
 	actionID := core.ActionID{SpellID: 25552}
-	//AOECap: 1600,
 	baseCost := 800.0
 
 	shaman.MagmaTotem = shaman.RegisterSpell(core.SpellConfig{
@@ -99,7 +98,7 @@ func (shaman *Shaman) registerMagmaTotemSpell(sim *core.Simulation) {
 		}),
 		NumberOfTicks: 10,
 		TickLength:    time.Second * 2,
-		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncAOEDamage(sim, core.SpellEffect{
+		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncAOEDamageCapped(sim, 1550, core.SpellEffect{
 			BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
 			DamageMultiplier:    1 + float64(shaman.Talents.CallOfFlame)*0.05,
 			IsPhantom:           true,
@@ -117,7 +116,6 @@ func (shaman *Shaman) FireNovaTickLength() time.Duration {
 // even a popular choice for arcane mages.
 func (shaman *Shaman) registerNovaTotemSpell(sim *core.Simulation) {
 	actionID := core.ActionID{SpellID: 25537}
-	//AOECap: 9975,
 	baseCost := 765.0
 
 	tickLength := shaman.FireNovaTickLength()
@@ -160,7 +158,7 @@ func (shaman *Shaman) registerNovaTotemSpell(sim *core.Simulation) {
 		}),
 		NumberOfTicks: 1,
 		TickLength:    tickLength,
-		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncAOEDamage(sim, core.SpellEffect{
+		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncAOEDamageCapped(sim, 9975, core.SpellEffect{
 			BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
 			DamageMultiplier:    1 + float64(shaman.Talents.CallOfFlame)*0.05,
 			IsPhantom:           true,

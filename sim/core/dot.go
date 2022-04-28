@@ -137,6 +137,22 @@ func TickFuncAOESnapshot(sim *Simulation, baseEffect SpellEffect) TickEffects {
 		}
 	}
 }
+func TickFuncAOESnapshotCapped(sim *Simulation, aoeCap float64, baseEffect SpellEffect) TickEffects {
+	snapshotEffect := &SpellEffect{}
+	return func(sim *Simulation, spell *Spell) func() {
+		target := sim.GetPrimaryTarget()
+		*snapshotEffect = baseEffect
+		snapshotEffect.Target = target
+		baseDamage := snapshotEffect.calculateBaseDamage(sim, spell) * snapshotEffect.DamageMultiplier
+		snapshotEffect.DamageMultiplier = 1
+		snapshotEffect.BaseDamage = BaseDamageConfigFlat(baseDamage)
+
+		effectsFunc := ApplyEffectFuncAOEDamageCapped(sim, aoeCap, *snapshotEffect)
+		return func() {
+			effectsFunc(sim, target, spell)
+		}
+	}
+}
 
 func TickFuncApplyEffects(effectsFunc ApplySpellEffects) TickEffects {
 	return func(sim *Simulation, spell *Spell) func() {

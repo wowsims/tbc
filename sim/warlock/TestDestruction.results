@@ -390,19 +390,19 @@ dps_results: {
 dps_results: {
  key: "TestDestruction-Settings-Undead-P4-Destro Warlock-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2274.3407828813647
+  dps: 2274.3407828813642
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Undead-P4-Destro Warlock-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1362.1201450000651
+  dps: 1362.120145000065
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Undead-P4-Destro Warlock-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1362.1201450000651
+  dps: 1362.120145000065
  }
 }
 dps_results: {
