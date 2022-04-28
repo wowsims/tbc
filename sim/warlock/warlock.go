@@ -39,6 +39,9 @@ type Warlock struct {
 	AmplifyCurse     *core.Spell
 	AmplifyCurseAura *core.Aura
 
+	Seeds    []*core.Spell
+	SeedDots []*core.Dot
+
 	NightfallProcAura *core.Aura
 	ImpShadowboltAura *core.Aura
 

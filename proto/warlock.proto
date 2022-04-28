@@ -66,6 +66,7 @@ message Warlock {
 			UnknownSpell = 0;
 			Shadowbolt = 1;
 			Incinerate = 2;
+			Seed = 3;
 		}
 		enum Curse {
 			NoCurse = 0;

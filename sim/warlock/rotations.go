@@ -19,8 +19,19 @@ func (warlock *Warlock) OnManaTick(sim *core.Simulation) {
 }
 
 func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
-
 	var spell *core.Spell
+
+	mainSpell := warlock.Rotation.PrimarySpell
+	if mainSpell == proto.Warlock_Rotation_Seed {
+		for i := 0; i < int(sim.GetNumTargets()); i++ {
+			if !warlock.SeedDots[i].IsActive() {
+				warlock.Seeds[i].Cast(sim, sim.GetTarget(int32(i)))
+				return
+			}
+		}
+		mainSpell = proto.Warlock_Rotation_Shadowbolt
+	}
+
 	var target = sim.GetPrimaryTarget()
 
 	// Apply curses first
@@ -108,7 +119,7 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 	} else if warlock.Rotation.Immolate && !warlock.ImmolateDot.IsActive() {
 		spell = warlock.Immolate
 	} else {
-		switch warlock.Rotation.PrimarySpell {
+		switch mainSpell {
 		case proto.Warlock_Rotation_Shadowbolt:
 			spell = warlock.Shadowbolt
 		case proto.Warlock_Rotation_Incinerate:

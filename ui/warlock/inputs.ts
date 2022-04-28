@@ -100,6 +100,9 @@ export const WarlockRotationConfig = {
 				{
 					name: 'Incinerate', value: PrimarySpell.Incinerate,
 				},
+				{
+					name: 'Seed of Corruption', value: PrimarySpell.Seed,
+				},
 			],
 			changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
 			getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().primarySpell,
