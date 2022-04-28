@@ -618,7 +618,7 @@ dps_results: {
 dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-AOE-FullBuffs-LongMultiTarget"
  value: {
-  dps: 13431.996236698293
+  dps: 6309.260768127051
  }
 }
 dps_results: {
@@ -642,7 +642,7 @@ dps_results: {
 dps_results: {
  key: "TestFire-Settings-Troll10-P1Fire-AOE-NoBuffs-LongMultiTarget"
  value: {
-  dps: 10979.110231742035
+  dps: 5637.330786320309
  }
 }
 dps_results: {
