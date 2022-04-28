@@ -9,7 +9,6 @@ import (
 
 func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
 	actionID := core.ActionID{SpellID: 27085}
-	//AOECap: 3620,
 	baseCost := 1645.0
 
 	blizzardDot := core.NewDot(core.Dot{
@@ -20,7 +19,7 @@ func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
 		NumberOfTicks:       8,
 		TickLength:          time.Second * 1,
 		AffectedByCastSpeed: true,
-		TickEffects: core.TickFuncAOESnapshot(sim, core.SpellEffect{
+		TickEffects: core.TickFuncAOESnapshotCapped(sim, 3620, core.SpellEffect{
 			DamageMultiplier: mage.spellDamageMultiplier *
 				(1 + 0.02*float64(mage.Talents.PiercingIce)) *
 				(1 + 0.01*float64(mage.Talents.ArcticWinds)),

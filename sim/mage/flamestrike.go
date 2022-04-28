@@ -9,10 +9,9 @@ import (
 
 func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
 	actionID := core.ActionID{SpellID: 27086}
-	//AOECap: 7830,
 	baseCost := 1175.0
 
-	applyAOEDamage := core.ApplyEffectFuncAOEDamage(sim, core.SpellEffect{
+	applyAOEDamage := core.ApplyEffectFuncAOEDamageCapped(sim, 7830, core.SpellEffect{
 		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
 
 		BonusSpellCritRating: 0 +

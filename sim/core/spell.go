@@ -308,7 +308,7 @@ func applyAOECap(effects []SpellEffect, outcomeMultipliers []float64, aoeCap flo
 		effect.Damage *= capMultiplier
 	}
 }
-func ApplyEffectFuncDamageMultipleAOECapped(sim *Simulation, baseEffect SpellEffect, aoeCap float64) ApplySpellEffects {
+func ApplyEffectFuncAOEDamageCapped(sim *Simulation, aoeCap float64, baseEffect SpellEffect) ApplySpellEffects {
 	numHits := sim.GetNumTargets()
 	if numHits == 0 {
 		return nil
