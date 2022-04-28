@@ -738,7 +738,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2058.146858532207
+  dps: 2189.297564936424
  }
 }
 dps_results: {
@@ -786,7 +786,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2052.658457873624
+  dps: 2181.0605092539877
  }
 }
 dps_results: {
@@ -834,7 +834,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2059.4611437446383
+  dps: 2197.596431982044
  }
 }
 dps_results: {
@@ -882,7 +882,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-Human-P4-Retribution Paladin-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2098.8055648115255
+  dps: 2231.229068349654
  }
 }
 dps_results: {
