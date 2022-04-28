@@ -21,6 +21,7 @@ func (paladin *Paladin) registerExorcismSpell(sim *core.Simulation) {
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
 				Cost: baseCost,
+				GCD:  core.GCDDefault,
 			},
 			CD: core.Cooldown{
 				Timer:    paladin.NewTimer(),

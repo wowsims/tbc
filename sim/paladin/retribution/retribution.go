@@ -136,25 +136,19 @@ func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
 			judge = ret.JudgementOfTheCrusader
 		}
 		if judge != nil {
-			if success := judge.Cast(sim, target); !success {
-				ret.WaitForMana(sim, judge.CurCast.Cost)
-			}
+			judge.Cast(sim, target)
 		}
 	}
 
 	// Cast Seal of Command
 	if !ret.SealOfCommandAura.IsActive() {
-		if success := ret.SealOfCommand.Cast(sim, nil); !success {
-			ret.WaitForMana(sim, ret.SealOfCommand.CurCast.Cost)
-		}
+		ret.SealOfCommand.Cast(sim, nil)
 		return
 	}
 
 	// Cast Seal of Blood and enable attacks to twist
 	if !ret.SealOfBloodAura.IsActive() {
-		if success := ret.SealOfBlood.Cast(sim, nil); !success {
-			ret.WaitForMana(sim, ret.SealOfBlood.CurCast.Cost)
-		}
+		ret.SealOfBlood.Cast(sim, nil)
 		ret.AutoAttacks.EnableAutoSwing(sim)
 		ret.openerCompleted = true
 	}
@@ -218,7 +212,7 @@ func (ret *RetributionPaladin) mainRotation(sim *core.Simulation) {
 			// If no seal is active, cast Seal of Blood
 			ret.SealOfBlood.Cast(sim, nil)
 		} else if !willTwist && !socActive &&
-			weaponSpeed > spellGCD*2 && spellGCD < crusaderStrikeCD {
+			float64(weaponSpeed) > float64(spellGCD)*1.5 && spellGCD < crusaderStrikeCD {
 			// If there is literally nothing else to-do, cast fillers
 			// Only if it won't clip crusader strike
 			ret.useFillers(sim, target)
@@ -241,17 +235,20 @@ func (ret *RetributionPaladin) mainRotation(sim *core.Simulation) {
 func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Target) {
 
 	// If the target is a demon and exorcism is up, cast exorcism
+	// Only cast exorcism when above 40% mana
 	if ret.Rotation.UseExorcism &&
 		target.MobType == proto.MobType_MobTypeDemon &&
-		ret.Exorcism.IsReady(sim) {
+		ret.Exorcism.IsReady(sim) &&
+		ret.CurrentMana() > ret.GetStat(stats.Mana)*0.4 {
 
 		ret.Exorcism.Cast(sim, target)
 		return
 	}
 
 	// If we can't exorcise, try to consecrate
+	// Only cast consecration when above 60% mana
 	if ret.Rotation.ConsecrationRank != proto.RetributionPaladin_Rotation_None &&
-		ret.Consecration.IsReady(sim) {
+		ret.Consecration.IsReady(sim) && ret.CurrentMana() > ret.GetStat(stats.Mana)*0.4 {
 		ret.Consecration.Cast(sim, target)
 		return
 	}
