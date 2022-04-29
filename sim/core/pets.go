@@ -5,13 +5,21 @@ package core
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (character *Character) newGnomishFlameTurretSpell() *Spell {
-	gft := character.NewGnomishFlameTurret()
+// Creates any pets that come from item / consume effects.
+func (character *Character) addEffectPets() {
+	if character.Consumes.FillerExplosive == proto.Explosive_ExplosiveGnomishFlameTurret {
+		character.NewGnomishFlameTurret()
+	}
+}
 
-	return character.RegisterSpell(SpellConfig{
+func (character *Character) newGnomishFlameTurretSpell() *Spell {
+	gft := character.GetPet(GnomishFlameTurretName).(*GnomishFlameTurret)
+
+	return character.GetOrRegisterSpell(SpellConfig{
 		ActionID: ActionID{ItemID: 23841},
 
 		ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
@@ -19,6 +27,8 @@ func (character *Character) newGnomishFlameTurretSpell() *Spell {
 		},
 	})
 }
+
+const GnomishFlameTurretName = "Gnomish Flame Turret"
 
 type GnomishFlameTurret struct {
 	Pet
@@ -29,7 +39,7 @@ type GnomishFlameTurret struct {
 func (character *Character) NewGnomishFlameTurret() *GnomishFlameTurret {
 	gft := &GnomishFlameTurret{
 		Pet: NewPet(
-			"Gnomish Flame Turret",
+			GnomishFlameTurretName,
 			character,
 			stats.Stats{
 				stats.SpellCrit: 1 * SpellCritRatingPerCritChance,

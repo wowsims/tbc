@@ -33,10 +33,10 @@ func GetGearList(request *proto.GearListRequest) *proto.GearListResult {
  * Returns character stats taking into account gear / buffs / consumes / etc
  */
 func ComputeStats(csr *proto.ComputeStatsRequest) *proto.ComputeStatsResult {
-	raid := NewRaid(*csr.Raid)
+	env := NewEnvironment(*csr.Raid, proto.Encounter{})
 
 	return &proto.ComputeStatsResult{
-		RaidStats: raid.GetStats(),
+		RaidStats: env.Raid.GetStats(),
 	}
 }
 

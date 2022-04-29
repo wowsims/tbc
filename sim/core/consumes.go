@@ -925,10 +925,6 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 
 	var superSapper *Spell
 	var goblinSapper *Spell
-	var gnomishFlameTurretSpell *Spell
-	if consumes.FillerExplosive == proto.Explosive_ExplosiveGnomishFlameTurret {
-		gnomishFlameTurretSpell = character.newGnomishFlameTurretSpell()
-	}
 
 	character.AddMajorCooldown(MajorCooldown{
 		ActionID: SuperSapperActionID,
@@ -956,7 +952,7 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 			case proto.Explosive_ExplosiveAdamantiteGrenade:
 				fillerExplosive = character.newAdamantiteGrenadeSpell(sim)
 			case proto.Explosive_ExplosiveGnomishFlameTurret:
-				fillerExplosive = gnomishFlameTurretSpell
+				fillerExplosive = character.newGnomishFlameTurretSpell()
 			case proto.Explosive_ExplosiveHolyWater:
 				fillerExplosive = character.newHolyWaterSpell(sim)
 			}

@@ -43,6 +43,19 @@ func (party *Party) IsFull() bool {
 	return party.Size() >= 5
 }
 
+func (party *Party) GetPartyBuffs(basePartyBuffs *proto.PartyBuffs) proto.PartyBuffs {
+	// Compute the full party buffs for this party.
+	partyBuffs := proto.PartyBuffs{}
+	if basePartyBuffs != nil {
+		partyBuffs = *basePartyBuffs
+	}
+	for _, player := range party.Players {
+		player.AddPartyBuffs(&partyBuffs)
+		player.GetCharacter().AddPartyBuffs(&partyBuffs)
+	}
+	return partyBuffs
+}
+
 func (party *Party) AddStats(newStats stats.Stats) {
 	for _, agent := range party.Players {
 		agent.GetCharacter().AddStats(newStats)
@@ -122,6 +135,8 @@ type Raid struct {
 	Parties []*Party
 
 	dpsMetrics DistributionMetrics
+
+	AllUnits []*Unit // Cached list of all Units (players and pets) in the raid.
 }
 
 // Makes a new raid.
@@ -147,8 +162,6 @@ func NewRaid(raidConfig proto.Raid) *Raid {
 		}
 	}
 
-	raid.finalize(raidConfig)
-
 	return raid
 }
 
@@ -164,29 +177,11 @@ func (raid *Raid) IsFull() bool {
 	return raid.Size() >= 25
 }
 
-// Finalize the raid.
-func (raid *Raid) finalize(raidConfig proto.Raid) {
-	// Precompute the playersAndPets array for each party.
-	for _, party := range raid.Parties {
-		party.Pets = []PetAgent{}
-		for _, player := range party.Players {
-			for _, petAgent := range player.GetCharacter().Pets {
-				party.Pets = append(party.Pets, petAgent)
-			}
-		}
-		party.PlayersAndPets = make([]Agent, len(party.Players)+len(party.Pets))
-		for i, player := range party.Players {
-			party.PlayersAndPets[i] = player
-		}
-		for i, pet := range party.Pets {
-			party.PlayersAndPets[len(party.Players)+i] = pet
-		}
-	}
-
+func (raid *Raid) GetRaidBuffs(baseRaidBuffs *proto.RaidBuffs) proto.RaidBuffs {
 	// Compute the full raid buffs from the raid.
 	raidBuffs := proto.RaidBuffs{}
-	if raidConfig.Buffs != nil {
-		raidBuffs = *raidConfig.Buffs
+	if baseRaidBuffs != nil {
+		raidBuffs = *baseRaidBuffs
 	}
 	for _, party := range raid.Parties {
 		for _, player := range party.Players {
@@ -194,18 +189,41 @@ func (raid *Raid) finalize(raidConfig proto.Raid) {
 			player.GetCharacter().AddRaidBuffs(&raidBuffs)
 		}
 	}
+	return raidBuffs
+}
+
+// Precompute the playersAndPets array for each party.
+func (raid *Raid) updatePlayersAndPets() {
+	raidPlayers := []*Unit{}
+	raidPets := []*Unit{}
+
+	for _, party := range raid.Parties {
+		party.Pets = []PetAgent{}
+		for _, player := range party.Players {
+			for _, petAgent := range player.GetCharacter().Pets {
+				party.Pets = append(party.Pets, petAgent)
+				raidPets = append(raidPets, &petAgent.GetPet().Unit)
+			}
+		}
+		party.PlayersAndPets = make([]Agent, len(party.Players)+len(party.Pets))
+		for i, player := range party.Players {
+			party.PlayersAndPets[i] = player
+			raidPlayers = append(raidPlayers, &player.GetCharacter().Unit)
+		}
+		for i, pet := range party.Pets {
+			party.PlayersAndPets[len(party.Players)+i] = pet
+		}
+	}
+
+	raid.AllUnits = append(raidPlayers, raidPets...)
+}
+
+func (raid *Raid) finalize(raidConfig proto.Raid) {
+	raidBuffs := raid.GetRaidBuffs(raidConfig.Buffs)
 
 	for partyIdx, party := range raid.Parties {
-		// Compute the full party buffs for this party.
 		partyConfig := *raidConfig.Parties[partyIdx]
-		partyBuffs := proto.PartyBuffs{}
-		if partyConfig.Buffs != nil {
-			partyBuffs = *partyConfig.Buffs
-		}
-		for _, player := range party.Players {
-			player.AddPartyBuffs(&partyBuffs)
-			player.GetCharacter().AddPartyBuffs(&partyBuffs)
-		}
+		partyBuffs := party.GetPartyBuffs(partyConfig.Buffs)
 
 		// Apply all buffs to the players in this party.
 		for playerIdx, player := range party.Players {
