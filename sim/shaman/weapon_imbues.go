@@ -108,7 +108,9 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 func (shaman *Shaman) newFlametongueImbueSpell(isMH bool) *core.Spell {
 	effect := core.SpellEffect{
-		IsPhantom:        true,
+		IsPhantom:           true,
+		BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
+
 		DamageMultiplier: 1 + 0.05*float64(shaman.Talents.ElementalWeapons),
 		ThreatMultiplier: 1,
 		OutcomeApplier:   shaman.OutcomeFuncMagicHitAndCrit(shaman.DefaultSpellCritMultiplier()),
@@ -172,7 +174,9 @@ func (shaman *Shaman) newFrostbrandImbueSpell(isMH bool) *core.Spell {
 		SpellSchool: core.SpellSchoolFrost,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			IsPhantom:        true,
+			IsPhantom:           true,
+			BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
+
 			DamageMultiplier: 1 + 0.05*float64(shaman.Talents.ElementalWeapons),
 			ThreatMultiplier: 1,
 
