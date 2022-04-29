@@ -47,8 +47,9 @@ func (shaman *Shaman) registerSearingTotemSpell(sim *core.Simulation) {
 		// These are the real tick values, but searing totem doesn't start its next
 		// cast until the previous missile hits the target. We don't have an option
 		// for target distance yet so just pretend the tick rate is lower.
+		// https://tbc.wowhead.com/spell=25530/attack
 		//NumberOfTicks:        30,
-		//TickLength:           time.Second * 2,
+		//TickLength:           time.Second * 2.2,
 		NumberOfTicks: 24,
 		TickLength:    time.Second * 60 / 24,
 		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncDirectDamage(core.SpellEffect{
