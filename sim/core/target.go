@@ -28,8 +28,6 @@ func NewEncounter(options proto.Encounter) Encounter {
 		encounter.Targets = append(encounter.Targets, target)
 	}
 
-	encounter.finalize()
-
 	return encounter
 }
 

@@ -100,6 +100,7 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 	character.addUniversalStatDependencies()
 
 	character.PseudoStats.InFrontOfTarget = player.InFrontOfTarget
+	character.addEffectPets()
 
 	return character
 }
@@ -162,11 +163,20 @@ func (character *Character) applyItemEffects(agent Agent) {
 }
 
 func (character *Character) AddPet(pet PetAgent) {
-	if character.Unit.finalized {
-		panic("Pets must be added before finalization!")
+	if character.Environment != nil {
+		panic("Pets must be added during construction!")
 	}
 
 	character.Pets = append(character.Pets, pet)
+}
+
+func (character *Character) GetPet(name string) PetAgent {
+	for _, petAgent := range character.Pets {
+		if petAgent.GetPet().Name == name {
+			return petAgent
+		}
+	}
+	panic(character.Name + " has no pet with name " + name)
 }
 
 func (character *Character) AddStats(stat stats.Stats) {
