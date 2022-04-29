@@ -74,7 +74,6 @@ func (warlock *Warlock) impShadowboltDebuffAura(target *core.Target) *core.Aura 
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			target.PseudoStats.ShadowDamageTakenMultiplier /= bonus
-			aura.SetStacks(sim, 0)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell.SpellSchool != core.SpellSchoolShadow {
@@ -83,7 +82,9 @@ func (warlock *Warlock) impShadowboltDebuffAura(target *core.Target) *core.Aura 
 			if !spellEffect.Landed() || spellEffect.Damage == 0 || spellEffect.IsPhantom || spellEffect.ProcMask == 0 {
 				return
 			}
-			aura.RemoveStack(sim)
+			if aura.IsActive() {
+				aura.RemoveStack(sim)
+			}
 		},
 	})
 }

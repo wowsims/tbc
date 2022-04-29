@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -109,7 +110,7 @@ func (aura *Aura) doneIteration(sim *Simulation) {
 		panic("Active aura during doneIter: " + aura.Label)
 	}
 	if aura.stacks != 0 {
-		panic("Aura nonzero stacks during doneIter: " + aura.Label)
+		panic("Aura nonzero stacks (" + strconv.Itoa(int(aura.stacks)) + ") during doneIter: " + aura.Label)
 	}
 
 	aura.startTime = 0
