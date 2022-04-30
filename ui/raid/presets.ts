@@ -545,7 +545,7 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 		talents: RetributionPaladinPresets.RetKingsPaladinTalents.data,
 		specOptions: RetributionPaladinPresets.DefaultOptions,
 		consumes: RetributionPaladinPresets.DefaultConsumes,
-		defaultName: 'Retribution Paladin',
+		defaultName: 'Ret Paladin',
 		defaultFactionRaces: {
 			[Faction.Unknown]: Race.RaceUnknown,
 			[Faction.Alliance]: Race.RaceHuman,
@@ -568,7 +568,7 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 				5: RetributionPaladinPresets.P5_PRESET.gear,
 			},
 		},
-		tooltip: 'Retribution Paladin',
+		tooltip: 'Ret Paladin',
 		iconUrl: talentTreeIcons[Class.ClassPaladin][2],
 	},
 ];
