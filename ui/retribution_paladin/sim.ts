@@ -8,6 +8,7 @@ import { TristateEffect } from '/tbc/core/proto/common.js'
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
@@ -32,7 +33,19 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			cssClass: 'retribution-paladin-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
-				"Basically everything is WIP"
+				"<p>Rotation logic can be optimized to use Judgement of Blood more frequently.</p>\
+				<p>Including fillers in rotation sometimes causes seal twists to be prevented at high haste values.</p>\
+				<p>Seal of Command aura will log at expiring at a longer duration than 400ms when changing seals.\
+				However, the 400ms duration is correctly calculated internally for determining procs and damage.</p>"
+			],
+			warnings: [
+				(simUI: IndividualSimUI<Spec.SpecRetributionPaladin>) => {
+					return {
+						updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter]),
+						shouldDisplay: () => true,
+						getContent: () => 'This sim is newly released, and there are likely a few bugs. Please let us know if you encounter any issues!',
+					};
+				},
 			],
 
 			// All stats for which EP should be calculated.
@@ -73,7 +86,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			],
 			defaults: {
 				// Default equipped gear.
-				gear: Presets.P3_PRESET.gear,
+				gear: Presets.P4_PRESET.gear,
 				// Default EP weights for sorting gear in the gear picker.
 				epWeights: Stats.fromMap({
 					[Stat.StatStrength]: 2.42,
@@ -106,10 +119,10 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				partyBuffs: PartyBuffs.create({
 					bloodlust: 1,
 					drums: Drums.DrumsOfBattle,
-					braidedEterniumChain: true,
 					manaSpringTotem: TristateEffect.TristateEffectRegular,
 					strengthOfEarthTotem: StrengthOfEarthType.EnhancingTotems,
 					windfuryTotemRank: 5,
+					graceOfAirTotem: TristateEffect.TristateEffectImproved,
 					battleShout: TristateEffect.TristateEffectImproved,
 					windfuryTotemIwt: 2,
 				}),
@@ -122,16 +135,16 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				debuffs: Debuffs.create({
 					judgementOfWisdom: true,
 					misery: true,
-					curseOfElements: TristateEffect.TristateEffectImproved,
-					isbUptime: 1,
+					curseOfElements: TristateEffect.TristateEffectRegular,
+					isbUptime: 0.95,
 					bloodFrenzy: true,
 					exposeArmor: TristateEffect.TristateEffectImproved,
 					sunderArmor: true,
 					faerieFire: TristateEffect.TristateEffectImproved,
 					curseOfRecklessness: true,
 					huntersMark: TristateEffect.TristateEffectImproved,
-					exposeWeaknessUptime: 1,
-					exposeWeaknessHunterAgility: 800,
+					exposeWeaknessUptime: 0.95,
+					exposeWeaknessHunterAgility: 1200,
 				}),
 			},
 
