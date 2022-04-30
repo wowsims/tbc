@@ -53,7 +53,7 @@ func (paladin *Paladin) RegisterConsecrationSpell(rank int32) {
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(baseDamage, 0.119),
-			OutcomeApplier:   paladin.OutcomeFuncTick(),
+			OutcomeApplier:   paladin.OutcomeFuncMagicHit(),
 			IsPeriodic:       true,
 		}),
 	})
