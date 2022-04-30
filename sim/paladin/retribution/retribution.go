@@ -249,7 +249,8 @@ func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Tar
 	// If we can't exorcise, try to consecrate
 	// Only cast consecration when above 60% mana
 	if ret.Rotation.ConsecrationRank != proto.RetributionPaladin_Rotation_None &&
-		ret.Consecration.IsReady(sim) && ret.CurrentMana() > ret.GetStat(stats.Mana)*0.6 {
+		ret.Consecration.IsReady(sim) &&
+		ret.CurrentMana() > ret.GetStat(stats.Mana)*0.6 {
 		ret.Consecration.Cast(sim, target)
 		return
 	}
