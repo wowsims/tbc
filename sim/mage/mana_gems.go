@@ -39,14 +39,14 @@ func (mage *Mage) registerManaGemsCD() {
 	})
 
 	spell := mage.RegisterSpell(core.SpellConfig{
-		ActionID: core.MageManaGemMCDActionID,
+		ActionID:    core.MageManaGemMCDActionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    mage.GetConjuredCD(),
 				Duration: time.Minute * 2,
 			},
-			DisableCallbacks: true,
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {

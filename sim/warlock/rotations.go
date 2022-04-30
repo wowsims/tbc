@@ -68,7 +68,7 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 		if cd == nil {
 			continue // not on cooldown right now.
 		}
-		cdReadyAt := cd.Cooldown.ReadyAt()
+		cdReadyAt := cd.Spell.CD.ReadyAt()
 		if cd.Type == core.CooldownTypeDPS && cdReadyAt < nextBigCD {
 			nextBigCD = cdReadyAt
 		}

@@ -92,13 +92,13 @@ func applyRaceEffects(agent Agent) {
 		bloodFuryAura := character.NewTemporaryStatsAura("Blood Fury", actionID, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus, stats.SpellPower: spBonus}, time.Second*15)
 
 		spell := character.RegisterSpell(SpellConfig{
-			ActionID: actionID,
+			ActionID:    actionID,
+			SpellExtras: SpellExtrasNoOnCastComplete,
 			Cast: CastConfig{
 				CD: Cooldown{
 					Timer:    character.NewTimer(),
 					Duration: time.Minute * 2,
 				},
-				DisableCallbacks: true,
 			},
 			ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
 				bloodFuryAura.Activate(sim)

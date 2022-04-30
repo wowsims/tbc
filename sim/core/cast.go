@@ -41,8 +41,6 @@ type CastConfig struct {
 	// Callbacks for providing additional custom behavior.
 	OnCastComplete func(*Simulation, *Spell)
 	AfterCast      func(*Simulation, *Spell)
-
-	DisableCallbacks bool
 }
 
 type Cast struct {
@@ -127,7 +125,7 @@ func (spell *Spell) wrapCastFuncResources(config CastConfig, onCastComplete Cast
 		return func(sim *Simulation, target *Target) bool {
 			spell.CurCast.Cost = spell.ApplyCostModifiers(spell.CurCast.Cost)
 			if spell.Unit.CurrentMana() < spell.CurCast.Cost {
-				if sim.Log != nil {
+				if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasNoLogs) {
 					spell.Unit.Log(sim, "Failed casting %s, not enough mana. (Current Mana = %0.03f, Mana Cost = %0.03f)",
 						spell.ActionID, spell.Unit.CurrentMana(), spell.CurCast.Cost)
 				}
@@ -243,7 +241,7 @@ func (spell *Spell) wrapCastFuncSharedCooldown(config CastConfig, onCastComplete
 }
 
 func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc) CastFunc {
-	if !config.DisableCallbacks {
+	if !spell.SpellExtras.Matches(SpellExtrasNoOnCastComplete) {
 		configOnCastComplete := config.OnCastComplete
 		configAfterCast := config.AfterCast
 		oldOnCastComplete1 := onCastComplete
@@ -271,31 +269,37 @@ func (spell *Spell) makeCastFuncWait(config CastConfig, onCastComplete CastFunc)
 	}
 
 	if config.DefaultCast.CastTime == 0 {
-		return func(sim *Simulation, target *Target) {
-			if sim.Log != nil {
-				// Hunter fake cast has no ID.
-				if !spell.ActionID.IsEmptyAction() {
-					spell.Unit.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
-						spell.ActionID, MaxFloat(0, spell.CurCast.Cost), spell.CurCast.CastTime)
-					spell.Unit.Log(sim, "Completed cast %s", spell.ActionID)
+		if spell.SpellExtras.Matches(SpellExtrasNoLogs) {
+			return onCastComplete
+		} else {
+			return func(sim *Simulation, target *Target) {
+				if sim.Log != nil {
+					// Hunter fake cast has no ID.
+					if !spell.ActionID.IsEmptyAction() {
+						spell.Unit.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
+							spell.ActionID, MaxFloat(0, spell.CurCast.Cost), spell.CurCast.CastTime)
+						spell.Unit.Log(sim, "Completed cast %s", spell.ActionID)
+					}
 				}
+				onCastComplete(sim, target)
 			}
-			onCastComplete(sim, target)
 		}
 	} else {
-		oldOnCastComplete3 := onCastComplete
-		onCastComplete = func(sim *Simulation, target *Target) {
-			if sim.Log != nil {
-				// Hunter fake cast has no ID.
-				if !spell.ActionID.SameAction(ActionID{}) {
-					spell.Unit.Log(sim, "Completed cast %s", spell.ActionID)
+		if !spell.SpellExtras.Matches(SpellExtrasNoLogs) {
+			oldOnCastComplete3 := onCastComplete
+			onCastComplete = func(sim *Simulation, target *Target) {
+				if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasNoLogs) {
+					// Hunter fake cast has no ID.
+					if !spell.ActionID.SameAction(ActionID{}) {
+						spell.Unit.Log(sim, "Completed cast %s", spell.ActionID)
+					}
 				}
+				oldOnCastComplete3(sim, target)
 			}
-			oldOnCastComplete3(sim, target)
 		}
 
 		return func(sim *Simulation, target *Target) {
-			if sim.Log != nil {
+			if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasNoLogs) {
 				spell.Unit.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
 					spell.ActionID, MaxFloat(0, spell.CurCast.Cost), spell.CurCast.CastTime)
 			}

@@ -23,6 +23,7 @@ type Simulation struct {
 	// Current Simulation State
 	pendingActions []*PendingAction
 	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
+	Duration       time.Duration // Duration of current iteration
 
 	ProgressReport func(*proto.ProgressMetrics)
 

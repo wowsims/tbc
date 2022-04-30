@@ -17,7 +17,8 @@ func (warrior *Warrior) makeShoutSpellHelper(actionID core.ActionID) *core.Spell
 	}
 
 	return warrior.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 
 		ResourceType: stats.Rage,
 		BaseCost:     cost,
@@ -27,8 +28,7 @@ func (warrior *Warrior) makeShoutSpellHelper(actionID core.ActionID) *core.Spell
 				Cost: cost,
 				GCD:  core.GCDDefault,
 			},
-			IgnoreHaste:      true,
-			DisableCallbacks: true,
+			IgnoreHaste: true,
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
