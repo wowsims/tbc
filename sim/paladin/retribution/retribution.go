@@ -75,7 +75,6 @@ func (ret *RetributionPaladin) GetPaladin() *paladin.Paladin {
 
 func (ret *RetributionPaladin) Initialize() {
 	ret.Paladin.Initialize()
-	ret.DelayDPSCooldownsForArmorDebuffs()
 
 	// Register Consecration here so we can setup the right rank based on UI input
 	switch ret.Rotation.ConsecrationRank {
@@ -86,6 +85,8 @@ func (ret *RetributionPaladin) Initialize() {
 	case proto.RetributionPaladin_Rotation_Rank1:
 		ret.RegisterConsecrationSpell(1)
 	}
+
+	ret.DelayDPSCooldownsForArmorDebuffs()
 }
 
 func (ret *RetributionPaladin) Reset(sim *core.Simulation) {

@@ -248,6 +248,3 @@ func (unit *Unit) doneIteration(sim *Simulation) {
 	unit.Metrics.doneIteration(sim.Duration.Seconds())
 	unit.resetCDs(sim)
 }
-
-// Empty implementations so it can be optional in each of the agents.
-func (unit *Unit) Init(*Simulation) {}
