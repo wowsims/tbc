@@ -9,12 +9,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warlock *Warlock) registerCurseOfElementsSpell(sim *core.Simulation) {
+func (warlock *Warlock) registerCurseOfElementsSpell() {
 	if warlock.Rotation.Curse != proto.Warlock_Rotation_Elements {
 		return
 	}
 	baseCost := 145.0
-	auras := sim.GetPrimaryTarget().GetAurasWithTag("Curse of Elements")
+	auras := warlock.Env.GetPrimaryTarget().GetAurasWithTag("Curse of Elements")
 	for _, aura := range auras {
 		if int32(aura.Priority) >= warlock.Talents.Malediction {
 			// Someone else with at least as good of curse is already doing it... lets not.
@@ -22,7 +22,7 @@ func (warlock *Warlock) registerCurseOfElementsSpell(sim *core.Simulation) {
 			return
 		}
 	}
-	warlock.CurseOfElementsAura = core.CurseOfElementsAura(sim.GetPrimaryTarget(), warlock.Talents.Malediction)
+	warlock.CurseOfElementsAura = core.CurseOfElementsAura(warlock.Env.GetPrimaryTarget(), warlock.Talents.Malediction)
 	warlock.CurseOfElementsAura.Duration = time.Minute * 5
 
 	warlock.CurseOfElements = warlock.RegisterSpell(core.SpellConfig{
@@ -52,12 +52,12 @@ func (warlock *Warlock) ShouldCastCurseOfElements(sim *core.Simulation, target *
 	return curse == proto.Warlock_Rotation_Elements && !warlock.CurseOfElementsAura.IsActive()
 }
 
-func (warlock *Warlock) registerCurseOfRecklessnessSpell(sim *core.Simulation) {
+func (warlock *Warlock) registerCurseOfRecklessnessSpell() {
 	if warlock.Rotation.Curse != proto.Warlock_Rotation_Recklessness {
 		return
 	}
 	baseCost := 160.0
-	warlock.CurseOfRecklessnessAura = core.CurseOfRecklessnessAura(sim.GetPrimaryTarget())
+	warlock.CurseOfRecklessnessAura = core.CurseOfRecklessnessAura(warlock.Env.GetPrimaryTarget())
 	warlock.CurseOfRecklessnessAura.Duration = time.Minute * 2
 
 	warlock.CurseOfRecklessness = warlock.RegisterSpell(core.SpellConfig{
@@ -81,7 +81,7 @@ func (warlock *Warlock) registerCurseOfRecklessnessSpell(sim *core.Simulation) {
 }
 
 // https://tbc.wowhead.com/spell=11719/curse-of-tongues
-func (warlock *Warlock) registerCurseOfTonguesSpell(sim *core.Simulation) {
+func (warlock *Warlock) registerCurseOfTonguesSpell() {
 	if warlock.Rotation.Curse != proto.Warlock_Rotation_Tongues {
 		return
 	}
@@ -89,7 +89,7 @@ func (warlock *Warlock) registerCurseOfTonguesSpell(sim *core.Simulation) {
 	baseCost := 110.0
 
 	// Empty aura so we can simulate cost/time to keep tongues up
-	warlock.CurseOfTonguesAura = sim.GetPrimaryTarget().GetOrRegisterAura(core.Aura{
+	warlock.CurseOfTonguesAura = warlock.Env.GetPrimaryTarget().GetOrRegisterAura(core.Aura{
 		Label:    "Curse of Tongues",
 		ActionID: actionID,
 		Duration: time.Second * 30,
@@ -116,14 +116,14 @@ func (warlock *Warlock) registerCurseOfTonguesSpell(sim *core.Simulation) {
 }
 
 // https://tbc.wowhead.com/spell=27218/curse-of-agony
-func (warlock *Warlock) registerCurseOfAgonySpell(sim *core.Simulation) {
+func (warlock *Warlock) registerCurseOfAgonySpell() {
 	if warlock.Rotation.Curse != proto.Warlock_Rotation_Agony && warlock.Rotation.Curse != proto.Warlock_Rotation_Doom {
 		return
 	}
 	actionID := core.ActionID{SpellID: 27218}
 	baseCost := 265.0
 
-	target := sim.GetPrimaryTarget()
+	target := warlock.Env.GetPrimaryTarget()
 	effect := core.SpellEffect{
 		DamageMultiplier: 1 *
 			(1 + 0.02*float64(warlock.Talents.ShadowMastery)) *
@@ -182,14 +182,14 @@ func (warlock *Warlock) registerCurseOfAgonySpell(sim *core.Simulation) {
 	})
 }
 
-func (warlock *Warlock) registerCurseOfDoomSpell(sim *core.Simulation) {
+func (warlock *Warlock) registerCurseOfDoomSpell() {
 	if warlock.Rotation.Curse != proto.Warlock_Rotation_Doom {
 		return
 	}
 	actionID := core.ActionID{SpellID: 30910}
 	baseCost := 380.0
 
-	target := sim.GetPrimaryTarget()
+	target := warlock.Env.GetPrimaryTarget()
 	effect := core.SpellEffect{
 		DamageMultiplier: 1 *
 			(1 + 0.02*float64(warlock.Talents.ShadowMastery)) *

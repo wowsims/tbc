@@ -90,8 +90,8 @@ func (we *WaterElemental) GetPet() *core.Pet {
 	return &we.Pet
 }
 
-func (we *WaterElemental) Init(sim *core.Simulation) {
-	we.registerWaterboltSpell(sim)
+func (we *WaterElemental) Initialize() {
+	we.registerWaterboltSpell()
 }
 
 func (we *WaterElemental) Reset(sim *core.Simulation) {
@@ -137,7 +137,7 @@ var waterElementalStatInheritance = func(ownerStats stats.Stats) stats.Stats {
 	})
 }
 
-func (we *WaterElemental) registerWaterboltSpell(sim *core.Simulation) {
+func (we *WaterElemental) registerWaterboltSpell() {
 	baseCost := we.BaseMana() * 0.1
 
 	we.Waterbolt = we.RegisterSpell(core.SpellConfig{

@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warrior *Warrior) registerShieldSlamSpell(_ *core.Simulation, cdTimer *core.Timer) {
+func (warrior *Warrior) registerShieldSlamSpell(cdTimer *core.Timer) {
 	cost := 20.0 - float64(warrior.Talents.FocusedRage)
 	refundAmount := cost * 0.8
 	warrior.canShieldSlam = warrior.Talents.ShieldSlam && warrior.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType == proto.WeaponType_WeaponTypeShield

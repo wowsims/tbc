@@ -5,7 +5,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warrior *Warrior) registerCleaveSpell(sim *core.Simulation) {
+func (warrior *Warrior) registerCleaveSpell() {
 	cost := 20.0 - float64(warrior.Talents.FocusedRage)
 
 	flatDamageBonus := 70 * (1 + 0.4*float64(warrior.Talents.ImprovedCleave))
@@ -20,11 +20,11 @@ func (warrior *Warrior) registerCleaveSpell(sim *core.Simulation) {
 		OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 	}
 
-	numHits := core.MinInt32(2, sim.GetNumTargets())
+	numHits := core.MinInt32(2, warrior.Env.GetNumTargets())
 	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
-		effects[i].Target = sim.GetTarget(i)
+		effects[i].Target = warrior.Env.GetTarget(i)
 	}
 
 	warrior.Cleave = warrior.RegisterSpell(core.SpellConfig{

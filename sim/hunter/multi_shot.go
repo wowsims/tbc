@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
+func (hunter *Hunter) registerMultiShotSpell() {
 	baseCost := 275.0
 
 	baseEffect := core.SpellEffect{
@@ -27,18 +27,18 @@ func (hunter *Hunter) registerMultiShotSpell(sim *core.Simulation) {
 			},
 			TargetSpellCoefficient: 1,
 		}),
-		OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
+		OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, hunter.Env.GetPrimaryTarget())),
 
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			hunter.rotation(sim, false)
 		},
 	}
 
-	numHits := core.MinInt32(3, sim.GetNumTargets())
+	numHits := core.MinInt32(3, hunter.Env.GetNumTargets())
 	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
-		effects[i].Target = sim.GetTarget(i)
+		effects[i].Target = hunter.Env.GetTarget(i)
 	}
 
 	hunter.MultiShot = hunter.RegisterSpell(core.SpellConfig{

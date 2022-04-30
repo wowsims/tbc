@@ -10,7 +10,7 @@ import (
 const ArcaneBlastBaseManaCost = 195.0
 const ArcaneBlastBaseCastTime = time.Millisecond * 2500
 
-func (mage *Mage) newArcaneBlastSpell(sim *core.Simulation, numStacks int32) *core.Spell {
+func (mage *Mage) newArcaneBlastSpell(numStacks int32) *core.Spell {
 	mage.ArcaneBlastAura = mage.GetOrRegisterAura(core.Aura{
 		Label:     "Arcane Blast",
 		ActionID:  core.ActionID{SpellID: 36032},
@@ -41,7 +41,7 @@ func (mage *Mage) newArcaneBlastSpell(sim *core.Simulation, numStacks int32) *co
 				GCD:      core.GCDDefault,
 				CastTime: ArcaneBlastBaseCastTime - time.Duration(numStacks)*time.Second/3,
 			},
-			OnCastComplete: func(_ *core.Simulation, _ *core.Spell) {
+			OnCastComplete: func(sim *core.Simulation, _ *core.Spell) {
 				mage.ArcaneBlastAura.Activate(sim)
 				mage.ArcaneBlastAura.AddStack(sim)
 			},

@@ -9,7 +9,7 @@ import (
 
 // Do some research on the spell fields to make sure I'm doing this right
 // Need to add in judgement debuff refreshing feature at some point
-func (paladin *Paladin) registerCrusaderStrikeSpell(sim *core.Simulation) {
+func (paladin *Paladin) registerCrusaderStrikeSpell() {
 	baseCost := 236.0
 
 	paladin.CrusaderStrike = paladin.RegisterSpell(core.SpellConfig{

@@ -7,11 +7,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (rogue *Rogue) registerExposeArmorSpell(sim *core.Simulation) {
+func (rogue *Rogue) registerExposeArmorSpell() {
 	baseCost := 25.0
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
-	rogue.ExposeArmorAura = core.ExposeArmorAura(sim.GetPrimaryTarget(), rogue.Talents.ImprovedExposeArmor)
+	rogue.ExposeArmorAura = core.ExposeArmorAura(rogue.Env.GetPrimaryTarget(), rogue.Talents.ImprovedExposeArmor)
 
 	rogue.ExposeArmor = rogue.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 26866, Tag: 5},

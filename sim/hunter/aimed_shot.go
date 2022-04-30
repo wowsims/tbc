@@ -5,7 +5,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (hunter *Hunter) registerAimedShotSpell(sim *core.Simulation) {
+func (hunter *Hunter) registerAimedShotSpell() {
 	baseCost := 370.0
 
 	hunter.AimedShot = hunter.RegisterSpell(core.SpellConfig{
@@ -44,7 +44,7 @@ func (hunter *Hunter) registerAimedShotSpell(sim *core.Simulation) {
 				},
 				TargetSpellCoefficient: 1,
 			}),
-			OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
+			OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, hunter.Env.GetPrimaryTarget())),
 		}),
 	})
 }

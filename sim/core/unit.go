@@ -32,7 +32,7 @@ type Unit struct {
 
 	// Environment in which this Unit exists. This will be nil until after the
 	// construction phase.
-	Environment *Environment
+	Env *Environment
 
 	// Stats this Unit will have at the very start of each Sim iteration.
 	// Includes all equipment / buffs / permanent effects but not temporary
@@ -190,13 +190,13 @@ func (unit *Unit) MultiplyAttackSpeed(sim *Simulation, amount float64) {
 }
 
 func (unit *Unit) finalize() {
-	if unit.Environment.State >= Finalized {
+	if unit.Env.IsFinalized() {
 		panic("Unit already finalized!")
 	}
 
 	// Make sure we dont accidentally set initial stats instead of stats.
 	if !unit.initialStats.Equals(stats.Stats{}) {
-		panic("Initial stats may not be set before finalized!")
+		panic("Initial stats may not be set before finalized: " + unit.initialStats.String())
 	}
 
 	// All stats added up to this point are part of the 'initial' stats.
@@ -205,8 +205,6 @@ func (unit *Unit) finalize() {
 	unit.initialCastSpeed = unit.CastSpeed()
 	unit.initialMeleeSwingSpeed = unit.SwingSpeed()
 	unit.initialRangedSwingSpeed = unit.RangedSwingSpeed()
-
-	unit.auraTracker.finalize()
 }
 
 func (unit *Unit) init(sim *Simulation) {

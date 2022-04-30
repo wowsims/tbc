@@ -14,7 +14,7 @@ func (shaman *Shaman) ShockCD() time.Duration {
 }
 
 // Shared logic for all shocks.
-func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, spellSchool core.SpellSchool, baseCost float64, shockTimer *core.Timer) (core.SpellConfig, core.SpellEffect) {
+func (shaman *Shaman) newShockSpellConfig(spellID int32, spellSchool core.SpellSchool, baseCost float64, shockTimer *core.Timer) (core.SpellConfig, core.SpellEffect) {
 	actionID := core.ActionID{SpellID: spellID}
 
 	return core.SpellConfig{
@@ -58,8 +58,8 @@ func (shaman *Shaman) newShockSpellConfig(sim *core.Simulation, spellID int32, s
 		}
 }
 
-func (shaman *Shaman) registerEarthShockSpell(sim *core.Simulation, shockTimer *core.Timer) {
-	config, effect := shaman.newShockSpellConfig(sim, 25454, core.SpellSchoolNature, 535.0, shockTimer)
+func (shaman *Shaman) registerEarthShockSpell(shockTimer *core.Timer) {
+	config, effect := shaman.newShockSpellConfig(25454, core.SpellSchoolNature, 535.0, shockTimer)
 	config.SpellExtras |= core.SpellExtrasBinary
 
 	effect.BaseDamage = core.BaseDamageConfigMagic(661, 696, 0.386)
@@ -69,9 +69,9 @@ func (shaman *Shaman) registerEarthShockSpell(sim *core.Simulation, shockTimer *
 	shaman.EarthShock = shaman.RegisterSpell(config)
 }
 
-func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation, shockTimer *core.Timer) {
+func (shaman *Shaman) registerFlameShockSpell(shockTimer *core.Timer) {
 	const spellID = 25457
-	config, effect := shaman.newShockSpellConfig(sim, spellID, core.SpellSchoolFire, 500.0, shockTimer)
+	config, effect := shaman.newShockSpellConfig(spellID, core.SpellSchoolFire, 500.0, shockTimer)
 
 	effect.BaseDamage = core.BaseDamageConfigMagic(377, 377, 0.214)
 	effect.OutcomeApplier = shaman.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
@@ -94,7 +94,7 @@ func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation, shockTimer *
 	config.ApplyEffects = core.ApplyEffectFuncDirectDamage(effect)
 	shaman.FlameShock = shaman.RegisterSpell(config)
 
-	target := sim.GetPrimaryTarget()
+	target := shaman.Env.GetPrimaryTarget()
 	shaman.FlameShockDot = core.NewDot(core.Dot{
 		Spell: shaman.FlameShock,
 		Aura: target.RegisterAura(core.Aura{
@@ -114,8 +114,8 @@ func (shaman *Shaman) registerFlameShockSpell(sim *core.Simulation, shockTimer *
 	})
 }
 
-func (shaman *Shaman) registerFrostShockSpell(sim *core.Simulation, shockTimer *core.Timer) {
-	config, effect := shaman.newShockSpellConfig(sim, 25464, core.SpellSchoolFrost, 525.0, shockTimer)
+func (shaman *Shaman) registerFrostShockSpell(shockTimer *core.Timer) {
+	config, effect := shaman.newShockSpellConfig(25464, core.SpellSchoolFrost, 525.0, shockTimer)
 	config.SpellExtras |= core.SpellExtrasBinary
 
 	effect.ThreatMultiplier *= 2
@@ -126,9 +126,9 @@ func (shaman *Shaman) registerFrostShockSpell(sim *core.Simulation, shockTimer *
 	shaman.FrostShock = shaman.RegisterSpell(config)
 }
 
-func (shaman *Shaman) registerShocks(sim *core.Simulation) {
+func (shaman *Shaman) registerShocks() {
 	shockTimer := shaman.NewTimer()
-	shaman.registerEarthShockSpell(sim, shockTimer)
-	shaman.registerFlameShockSpell(sim, shockTimer)
-	shaman.registerFrostShockSpell(sim, shockTimer)
+	shaman.registerEarthShockSpell(shockTimer)
+	shaman.registerFlameShockSpell(shockTimer)
+	shaman.registerFrostShockSpell(shockTimer)
 }

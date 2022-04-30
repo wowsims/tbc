@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
+func (warrior *Warrior) registerThunderClapSpell() {
 	cost := 20.0 - float64(warrior.Talents.FocusedRage)
 	impTCDamageMult := 1.0
 	if warrior.Talents.ImprovedThunderClap == 1 {
@@ -28,11 +28,11 @@ func (warrior *Warrior) registerThunderClapSpell(sim *core.Simulation) {
 		OutcomeApplier:   warrior.OutcomeFuncMagicHitAndCrit(warrior.spellCritMultiplier(true)),
 	}
 
-	numHits := core.MinInt32(4, sim.GetNumTargets())
+	numHits := core.MinInt32(4, warrior.Env.GetNumTargets())
 	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
-		effects[i].Target = sim.GetTarget(i)
+		effects[i].Target = warrior.Env.GetTarget(i)
 
 		tcAura := core.ThunderClapAura(effects[i].Target, warrior.Talents.ImprovedThunderClap)
 		if i == 0 {

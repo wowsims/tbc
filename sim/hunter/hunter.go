@@ -114,29 +114,29 @@ func (hunter *Hunter) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	}
 }
 
-func (hunter *Hunter) Init(sim *core.Simulation) {
+func (hunter *Hunter) Initialize() {
 	// Update auto crit multipliers now that we have the targets.
-	hunter.AutoAttacks.MHEffect.OutcomeApplier = hunter.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, sim.GetPrimaryTarget()))
-	hunter.AutoAttacks.OHEffect.OutcomeApplier = hunter.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, sim.GetPrimaryTarget()))
-	hunter.AutoAttacks.RangedEffect.OutcomeApplier = hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget()))
+	hunter.AutoAttacks.MHEffect.OutcomeApplier = hunter.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, hunter.Env.GetPrimaryTarget()))
+	hunter.AutoAttacks.OHEffect.OutcomeApplier = hunter.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, hunter.Env.GetPrimaryTarget()))
+	hunter.AutoAttacks.RangedEffect.OutcomeApplier = hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, hunter.Env.GetPrimaryTarget()))
 
-	hunter.registerAspectOfTheHawkSpell(sim)
-	hunter.registerAspectOfTheViperSpell(sim)
+	hunter.registerAspectOfTheHawkSpell()
+	hunter.registerAspectOfTheViperSpell()
 
-	hunter.registerAimedShotSpell(sim)
-	hunter.registerArcaneShotSpell(sim)
-	hunter.registerKillCommandSpell(sim)
-	hunter.registerMultiShotSpell(sim)
-	hunter.registerRaptorStrikeSpell(sim)
-	hunter.registerScorpidStingSpell(sim)
-	hunter.registerSerpentStingSpell(sim)
-	hunter.registerSteadyShotSpell(sim)
+	hunter.registerAimedShotSpell()
+	hunter.registerArcaneShotSpell()
+	hunter.registerKillCommandSpell()
+	hunter.registerMultiShotSpell()
+	hunter.registerRaptorStrikeSpell()
+	hunter.registerScorpidStingSpell()
+	hunter.registerSerpentStingSpell()
+	hunter.registerSteadyShotSpell()
 
 	hunter.hardcastOnComplete = func(sim *core.Simulation, _ *core.Target) {
 		hunter.rotation(sim, false)
 	}
 
-	hunter.DelayDPSCooldownsForArmorDebuffs(sim)
+	hunter.DelayDPSCooldownsForArmorDebuffs()
 }
 
 func (hunter *Hunter) Reset(sim *core.Simulation) {

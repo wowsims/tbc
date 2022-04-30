@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
+func (priest *Priest) registerShadowWordPainSpell() {
 	actionID := core.ActionID{SpellID: 25368}
 	baseCost := 575.0
 
@@ -39,7 +39,7 @@ func (priest *Priest) registerShadowWordPainSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := priest.Env.GetPrimaryTarget()
 	priest.ShadowWordPainDot = core.NewDot(core.Dot{
 		Spell: priest.ShadowWordPain,
 		Aura: target.RegisterAura(core.Aura{

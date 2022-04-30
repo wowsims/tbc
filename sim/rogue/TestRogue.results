@@ -48,7 +48,7 @@ character_stats_results: {
 dps_results: {
  key: "TestRogue-AllItems-AbacusofViolentOdds-28288"
  value: {
-  dps: 1403.0492847087341
+  dps: 1403.121457431238
  }
 }
 dps_results: {
@@ -132,7 +132,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 1387.681739498431
+  dps: 1387.785025635788
  }
 }
 dps_results: {
@@ -216,7 +216,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-DarkmoonCard:Wrath-31857"
  value: {
-  dps: 1382.8724461141862
+  dps: 1382.8724461141867
  }
 }
 dps_results: {
@@ -318,13 +318,13 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
-  dps: 1411.845691817433
+  dps: 1411.8456918174331
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-GlaiveofthePit-28774"
  value: {
-  dps: 922.1313777596446
+  dps: 922.0660557994634
  }
 }
 dps_results: {
@@ -504,7 +504,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 1372.2804632080117
+  dps: 1372.280463208012
  }
 }
 dps_results: {
@@ -546,7 +546,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Slayer'sArmor"
  value: {
-  dps: 1520.323785725304
+  dps: 1520.311326441927
  }
 }
 dps_results: {
@@ -606,7 +606,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-TheBladefist-29348"
  value: {
-  dps: 1307.8712510785806
+  dps: 1307.8601945785806
  }
 }
 dps_results: {
@@ -618,7 +618,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-TheFistsofFury"
  value: {
-  dps: 1303.998847975385
+  dps: 1304.0248522403508
  }
 }
 dps_results: {
@@ -654,7 +654,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-TheTwinStars"
  value: {
-  dps: 1333.297931419797
+  dps: 1333.2911274197968
  }
 }
 dps_results: {
@@ -690,7 +690,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-WastewalkerArmor"
  value: {
-  dps: 1211.3498102795365
+  dps: 1211.3430062795364
  }
 }
 dps_results: {
@@ -702,7 +702,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-WorldBreaker-30090"
  value: {
-  dps: 967.010567200633
+  dps: 967.0422148638994
  }
 }
 dps_results: {
@@ -720,7 +720,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Average-Default"
  value: {
-  dps: 1407.0191882953154
+  dps: 1407.2202841211622
  }
 }
 dps_results: {
@@ -780,7 +780,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1851.835659751705
+  dps: 1851.826209751705
  }
 }
 dps_results: {
@@ -828,7 +828,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1796.108503762397
+  dps: 1796.1085037623968
  }
 }
 dps_results: {
@@ -876,7 +876,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1871.3455640499292
+  dps: 1871.3455640499287
  }
 }
 dps_results: {

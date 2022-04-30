@@ -5,8 +5,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (hunter *Hunter) registerScorpidStingSpell(sim *core.Simulation) {
-	hunter.ScorpidStingAura = core.ScorpidStingAura(sim.GetPrimaryTarget())
+func (hunter *Hunter) registerScorpidStingSpell() {
+	hunter.ScorpidStingAura = core.ScorpidStingAura(hunter.Env.GetPrimaryTarget())
 
 	baseCost := hunter.BaseMana() * 0.09
 

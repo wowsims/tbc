@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (rogue *Rogue) registerShivSpell(_ *core.Simulation) {
+func (rogue *Rogue) registerShivSpell() {
 	cost := 20.0
 	if rogue.GetOHWeapon() != nil {
 		cost = 20 + 10*rogue.GetOHWeapon().SwingSpeed

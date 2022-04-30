@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
+func (hunter *Hunter) registerSerpentStingSpell() {
 	actionID := core.ActionID{SpellID: 27016}
 	baseCost := 275.0
 
@@ -38,7 +38,7 @@ func (hunter *Hunter) registerSerpentStingSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := hunter.Env.GetPrimaryTarget()
 	hunter.SerpentStingDot = core.NewDot(core.Dot{
 		Spell: hunter.SerpentSting,
 		Aura: target.RegisterAura(core.Aura{

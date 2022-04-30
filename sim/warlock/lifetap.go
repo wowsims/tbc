@@ -5,7 +5,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warlock *Warlock) registerLifeTapSpell(sim *core.Simulation) {
+func (warlock *Warlock) registerLifeTapSpell() {
 	actionID := core.ActionID{SpellID: 27222}
 	mana := 582.0 * (1.0 + 0.1*float64(warlock.Talents.ImprovedLifeTap))
 	petRestore := 0.3333 * float64(warlock.Talents.ManaFeed)

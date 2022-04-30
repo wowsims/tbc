@@ -8,8 +8,6 @@ import (
 )
 
 func (shaman *Shaman) ApplyTalents() {
-	shaman.registerBloodlustCD()
-
 	if shaman.Talents.NaturesGuidance > 0 {
 		shaman.AddStat(stats.SpellHit, float64(shaman.Talents.NaturesGuidance)*1*core.SpellHitRatingPerHitChance)
 		shaman.AddStat(stats.MeleeHit, float64(shaman.Talents.NaturesGuidance)*1*core.MeleeHitRatingPerHitChance)

@@ -14,6 +14,11 @@ type Agent interface {
 	// The Character controlled by this Agent.
 	GetCharacter() *Character
 
+	// Called once after all Players/Pets/Targets have finished the construction phase.
+	// Use this to register spells and any initialization steps that require
+	// other raid members or auras.
+	Initialize()
+
 	// Updates the input Buffs to include raid-wide buffs provided by this Agent.
 	AddRaidBuffs(raidBuffs *proto.RaidBuffs)
 	// Updates the input Buffs to include party-wide buffs provided by this Agent.
@@ -22,15 +27,6 @@ type Agent interface {
 	// All talent stats / auras should be added within this callback. This makes sure
 	// talents are applied at the right time so we can calculate groups of stats.
 	ApplyTalents()
-
-	// Called once before Character.Finalize(), but after all effects / auras / cooldowns
-	// have been registered for the whole raid.
-	// Use this for any initialization steps that require other raid members or auras.
-	Finalize(raid *Raid)
-
-	// Called once before the first iteration, after all Agents and Targets are finalized.
-	// Use this to do any precomputations that require access to Sim or Target fields.
-	Init(sim *Simulation)
 
 	// Returns this Agent to its initial state. Called before each Sim iteration
 	// and once after the final iteration.

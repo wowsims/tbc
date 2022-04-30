@@ -9,8 +9,6 @@ import (
 )
 
 func (warrior *Warrior) ApplyTalents() {
-	warrior.registerBloodrageCD()
-
 	warrior.AddStat(stats.Parry, core.ParryRatingPerParryChance*1*float64(warrior.Talents.Deflection))
 	warrior.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(warrior.Talents.Cruelty))
 	warrior.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*1*float64(warrior.Talents.Precision))

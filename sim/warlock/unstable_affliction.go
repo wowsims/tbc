@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warlock *Warlock) registerUnstableAffSpell(sim *core.Simulation) {
+func (warlock *Warlock) registerUnstableAffSpell() {
 	actionID := core.ActionID{SpellID: 30405}
 	baseCost := 400.0
 
@@ -31,7 +31,7 @@ func (warlock *Warlock) registerUnstableAffSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := warlock.Env.GetPrimaryTarget()
 	spellCoefficient := 0.2
 	warlock.UnstableAffDot = core.NewDot(core.Dot{
 		Spell: warlock.UnstableAff,

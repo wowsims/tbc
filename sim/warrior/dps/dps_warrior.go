@@ -77,10 +77,6 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 		},
 	})
 
-	if war.Options.UseRecklessness {
-		war.RegisterRecklessnessCD()
-	}
-
 	return war
 }
 
@@ -101,9 +97,14 @@ func (war *DpsWarrior) GetWarrior() *warrior.Warrior {
 	return war.Warrior
 }
 
-func (war *DpsWarrior) Init(sim *core.Simulation) {
-	war.Warrior.Init(sim)
-	war.DelayDPSCooldownsForArmorDebuffs(sim)
+func (war *DpsWarrior) Initialize() {
+	war.Warrior.Initialize()
+
+	if war.Options.UseRecklessness {
+		war.RegisterRecklessnessCD()
+	}
+
+	war.DelayDPSCooldownsForArmorDebuffs()
 }
 
 func (war *DpsWarrior) Reset(sim *core.Simulation) {

@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
+func (priest *Priest) registerHolyFireSpell() {
 	actionID := core.ActionID{SpellID: 25384}
 	baseCost := 290.0
 
@@ -42,7 +42,7 @@ func (priest *Priest) registerHolyFireSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := priest.Env.GetPrimaryTarget()
 	priest.HolyFireDot = core.NewDot(core.Dot{
 		Spell: priest.HolyFire,
 		Aura: target.RegisterAura(core.Aura{

@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
+func (hunter *Hunter) registerRaptorStrikeSpell() {
 	baseCost := 120.0
 
 	hunter.RaptorStrike = hunter.RegisterSpell(core.SpellConfig{
@@ -37,7 +37,7 @@ func (hunter *Hunter) registerRaptorStrikeSpell(sim *core.Simulation) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 170, 1, true),
-			OutcomeApplier: hunter.OutcomeFuncMeleeSpecialHitAndCrit(hunter.critMultiplier(false, sim.GetPrimaryTarget())),
+			OutcomeApplier: hunter.OutcomeFuncMeleeSpecialHitAndCrit(hunter.critMultiplier(false, hunter.Env.GetPrimaryTarget())),
 		}),
 	})
 }

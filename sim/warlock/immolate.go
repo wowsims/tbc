@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warlock *Warlock) registerImmolateSpell(sim *core.Simulation) {
+func (warlock *Warlock) registerImmolateSpell() {
 	actionID := core.ActionID{SpellID: 27215}
 	baseCost := 445.0
 
@@ -40,7 +40,7 @@ func (warlock *Warlock) registerImmolateSpell(sim *core.Simulation) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := warlock.Env.GetPrimaryTarget()
 
 	// DOT: 615 dmg over 15s (123 every 3 sec, mod 0.13)
 	warlock.ImmolateDot = core.NewDot(core.Dot{

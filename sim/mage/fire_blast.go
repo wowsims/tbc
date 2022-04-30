@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (mage *Mage) registerFireBlastSpell(sim *core.Simulation) {
+func (mage *Mage) registerFireBlastSpell() {
 	baseCost := 465.0
 
 	mage.FireBlast = mage.RegisterSpell(core.SpellConfig{

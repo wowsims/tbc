@@ -218,7 +218,7 @@ func (raid *Raid) updatePlayersAndPets() {
 	raid.AllUnits = append(raidPlayers, raidPets...)
 }
 
-func (raid *Raid) finalize(raidConfig proto.Raid) {
+func (raid *Raid) applyCharacterEffects(raidConfig proto.Raid) {
 	raidBuffs := raid.GetRaidBuffs(raidConfig.Buffs)
 
 	for partyIdx, party := range raid.Parties {
@@ -236,11 +236,12 @@ func (raid *Raid) finalize(raidConfig proto.Raid) {
 			player.GetCharacter().applyAllEffects(player, raidBuffs, partyBuffs, individualBuffs)
 		}
 	}
+}
 
+func (raid *Raid) finalize() {
 	for _, party := range raid.Parties {
 		for _, player := range party.Players {
-			player.Finalize(raid)
-			player.GetCharacter().Finalize(raid)
+			player.GetCharacter().Finalize()
 		}
 	}
 }

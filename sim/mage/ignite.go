@@ -9,7 +9,7 @@ import (
 
 var IgniteActionID = core.ActionID{SpellID: 12848}
 
-func (mage *Mage) registerIgniteSpell(sim *core.Simulation) {
+func (mage *Mage) registerIgniteSpell() {
 	mage.Ignite = mage.RegisterSpell(core.SpellConfig{
 		ActionID:    IgniteActionID,
 		SpellSchool: core.SpellSchoolFire,
@@ -17,7 +17,7 @@ func (mage *Mage) registerIgniteSpell(sim *core.Simulation) {
 	})
 }
 
-func (mage *Mage) newIgniteDot(sim *core.Simulation, target *core.Target) *core.Dot {
+func (mage *Mage) newIgniteDot(target *core.Target) *core.Dot {
 	return core.NewDot(core.Dot{
 		Spell: mage.Ignite,
 		Aura: target.RegisterAura(core.Aura{

@@ -166,9 +166,6 @@ type majorCooldownManager struct {
 	// Cached list of major cooldowns sorted by priority, for resetting quickly.
 	initialMajorCooldowns []MajorCooldown
 
-	// Whether finalize() has been called on this object.
-	finalized bool
-
 	// Major cooldowns, ordered by next available. This should always contain
 	// the same cooldows as initialMajorCooldowns, but the order will change over
 	// the course of the sim.
@@ -186,14 +183,11 @@ func newMajorCooldownManager(cooldowns *proto.Cooldowns) majorCooldownManager {
 	}
 }
 
-func (mcdm *majorCooldownManager) finalize(character *Character) {
-	if mcdm.finalized {
-		return
-	}
-	mcdm.finalized = true
-
+func (mcdm *majorCooldownManager) initialize(character *Character) {
 	mcdm.character = character
+}
 
+func (mcdm *majorCooldownManager) finalize(character *Character) {
 	if mcdm.initialMajorCooldowns == nil {
 		mcdm.initialMajorCooldowns = []MajorCooldown{}
 	}
@@ -224,18 +218,20 @@ func (mcdm *majorCooldownManager) finalize(character *Character) {
 // to be applied. MCDs that have a user-specified timing are not delayed.
 //
 // This function should be called from Agent.Init().
-func (mcdm *majorCooldownManager) DelayDPSCooldownsForArmorDebuffs(sim *Simulation) {
-	if !sim.GetPrimaryTarget().HasAuraWithTag(SunderExposeAuraTag) {
+func (mcdm *majorCooldownManager) DelayDPSCooldownsForArmorDebuffs() {
+	if !mcdm.character.Env.GetPrimaryTarget().HasAuraWithTag(SunderExposeAuraTag) {
 		return
 	}
 
-	const delay = time.Second * 10
-	for i, _ := range mcdm.initialMajorCooldowns {
-		mcd := &mcdm.initialMajorCooldowns[i]
-		if len(mcd.timings) == 0 && mcd.Type == CooldownTypeDPS {
-			mcd.timings = append(mcd.timings, delay)
+	mcdm.character.Env.RegisterPostFinalizeEffect(func() {
+		const delay = time.Second * 10
+		for i, _ := range mcdm.initialMajorCooldowns {
+			mcd := &mcdm.initialMajorCooldowns[i]
+			if len(mcd.timings) == 0 && mcd.Type == CooldownTypeDPS {
+				mcd.timings = append(mcd.timings, delay)
+			}
 		}
-	}
+	})
 }
 
 func (mcdm *majorCooldownManager) reset(sim *Simulation) {
@@ -261,7 +257,7 @@ func (mcdm *majorCooldownManager) reset(sim *Simulation) {
 // Registers a major cooldown to the Character, which will be automatically
 // used when available.
 func (mcdm *majorCooldownManager) AddMajorCooldown(mcd MajorCooldown) {
-	if mcdm.finalized {
+	if mcdm.character.Env.IsFinalized() {
 		panic("Major cooldowns may not be added once finalized!")
 	}
 

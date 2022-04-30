@@ -101,36 +101,39 @@ func (mage *Mage) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 func (mage *Mage) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
-func (mage *Mage) Init(sim *core.Simulation) {
+func (mage *Mage) Initialize() {
 	mage.ArcaneBlast = []*core.Spell{
-		mage.newArcaneBlastSpell(sim, 0),
-		mage.newArcaneBlastSpell(sim, 1),
-		mage.newArcaneBlastSpell(sim, 2),
-		mage.newArcaneBlastSpell(sim, 3),
+		mage.newArcaneBlastSpell(0),
+		mage.newArcaneBlastSpell(1),
+		mage.newArcaneBlastSpell(2),
+		mage.newArcaneBlastSpell(3),
 	}
-	mage.registerArcaneExplosionSpell(sim)
-	mage.registerArcaneMissilesSpell(sim)
-	mage.registerBlizzardSpell(sim)
-	mage.registerFireballSpell(sim)
-	mage.registerFireBlastSpell(sim)
-	mage.registerFlamestrikeSpell(sim)
-	mage.registerFrostboltSpell(sim)
-	mage.registerIgniteSpell(sim)
-	mage.registerPyroblastSpell(sim)
-	mage.registerScorchSpell(sim)
-	mage.registerWintersChillSpell(sim)
+	mage.registerArcaneExplosionSpell()
+	mage.registerArcaneMissilesSpell()
+	mage.registerBlizzardSpell()
+	mage.registerFireballSpell()
+	mage.registerFireBlastSpell()
+	mage.registerFlamestrikeSpell()
+	mage.registerFrostboltSpell()
+	mage.registerIgniteSpell()
+	mage.registerPyroblastSpell()
+	mage.registerScorchSpell()
+	mage.registerWintersChillSpell()
+
+	mage.registerEvocationCD()
+	mage.registerManaGemsCD()
 
 	mage.IgniteDots = []*core.Dot{}
 	mage.IgniteTickDamage = []float64{}
-	for i := int32(0); i < sim.GetNumTargets(); i++ {
+	for i := int32(0); i < mage.Env.GetNumTargets(); i++ {
 		mage.IgniteTickDamage = append(mage.IgniteTickDamage, 0)
 	}
-	for i := int32(0); i < sim.GetNumTargets(); i++ {
-		mage.IgniteDots = append(mage.IgniteDots, mage.newIgniteDot(sim, sim.GetTarget(i)))
+	for i := int32(0); i < mage.Env.GetNumTargets(); i++ {
+		mage.IgniteDots = append(mage.IgniteDots, mage.newIgniteDot(mage.Env.GetTarget(i)))
 	}
 }
 
-func (mage *Mage) Reset(newsim *core.Simulation) {
+func (mage *Mage) Reset(_ *core.Simulation) {
 	mage.isDoingRegenRotation = false
 	mage.tryingToDropStacks = false
 	mage.numCastsDone = 0
@@ -192,9 +195,6 @@ func NewMage(character core.Character, options proto.Player) *Mage {
 	if mage.Talents.SummonWaterElemental {
 		mage.waterElemental = mage.NewWaterElemental(mage.FrostRotation.WaterElementalDisobeyChance)
 	}
-
-	mage.registerEvocationCD()
-	mage.registerManaGemsCD()
 
 	mage.hasTristfal = ItemSetTirisfalRegalia.CharacterHasSetBonus(&mage.Character, 2)
 	return mage

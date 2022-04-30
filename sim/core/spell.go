@@ -267,12 +267,12 @@ func ApplyEffectFuncDamageMultipleTargeted(baseEffects []SpellEffect) ApplySpell
 		}
 	}
 }
-func ApplyEffectFuncAOEDamage(sim *Simulation, baseEffect SpellEffect) ApplySpellEffects {
-	numHits := sim.GetNumTargets()
+func ApplyEffectFuncAOEDamage(env *Environment, baseEffect SpellEffect) ApplySpellEffects {
+	numHits := env.GetNumTargets()
 	effects := make([]SpellEffect, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects[i] = baseEffect
-		effects[i].Target = sim.GetTarget(i)
+		effects[i].Target = env.GetTarget(i)
 	}
 	return ApplyEffectFuncDamageMultiple(effects)
 }
@@ -308,22 +308,22 @@ func applyAOECap(effects []SpellEffect, outcomeMultipliers []float64, aoeCap flo
 		effect.Damage *= capMultiplier
 	}
 }
-func ApplyEffectFuncAOEDamageCapped(sim *Simulation, aoeCap float64, baseEffect SpellEffect) ApplySpellEffects {
-	numHits := sim.GetNumTargets()
+func ApplyEffectFuncAOEDamageCapped(env *Environment, aoeCap float64, baseEffect SpellEffect) ApplySpellEffects {
+	numHits := env.GetNumTargets()
 	if numHits == 0 {
 		return nil
 	} else if numHits == 1 {
 		return ApplyEffectFuncDirectDamage(baseEffect)
 	} else if numHits < 4 {
 		// Just assume its impossible to hit AOE cap with <4 targets.
-		return ApplyEffectFuncAOEDamage(sim, baseEffect)
+		return ApplyEffectFuncAOEDamage(env, baseEffect)
 	}
 
 	baseEffects := make([]SpellEffect, numHits)
 	outcomeMultipliers := make([]float64, numHits)
 	for i := int32(0); i < numHits; i++ {
 		baseEffects[i] = baseEffect
-		baseEffects[i].Target = sim.GetTarget(i)
+		baseEffects[i].Target = env.GetTarget(i)
 	}
 
 	return func(sim *Simulation, _ *Target, spell *Spell) {

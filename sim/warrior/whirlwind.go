@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
+func (warrior *Warrior) registerWhirlwindSpell() {
 	cost := 25.0 - float64(warrior.Talents.FocusedRage)
 	if ItemSetWarbringerBattlegear.CharacterHasSetBonus(&warrior.Character, 2) {
 		cost -= 5
@@ -32,7 +32,7 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 		OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 	}
 
-	numHits := core.MinInt32(4, sim.GetNumTargets())
+	numHits := core.MinInt32(4, warrior.Env.GetNumTargets())
 	numTotalHits := numHits
 	if warrior.AutoAttacks.IsDualWielding {
 		numTotalHits *= 2
@@ -41,12 +41,12 @@ func (warrior *Warrior) registerWhirlwindSpell(sim *core.Simulation) {
 	effects := make([]core.SpellEffect, 0, numTotalHits)
 	for i := int32(0); i < numHits; i++ {
 		mhEffect := baseEffectMH
-		mhEffect.Target = sim.GetTarget(i)
+		mhEffect.Target = warrior.Env.GetTarget(i)
 		effects = append(effects, mhEffect)
 
 		if warrior.AutoAttacks.IsDualWielding {
 			ohEffect := baseEffectOH
-			ohEffect.Target = sim.GetTarget(i)
+			ohEffect.Target = warrior.Env.GetTarget(i)
 			effects = append(effects, ohEffect)
 		}
 	}

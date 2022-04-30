@@ -67,39 +67,41 @@ func (priest *Priest) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 func (priest *Priest) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
-func (priest *Priest) Init(sim *core.Simulation) {
-	priest.registerDevouringPlagueSpell(sim)
-	priest.registerHolyFireSpell(sim)
-	priest.registerMindBlastSpell(sim)
-	priest.registerShadowWordDeathSpell(sim)
-	priest.registerShadowWordPainSpell(sim)
-	priest.registerShadowfiendSpell(sim)
-	priest.registerSmiteSpell(sim)
-	priest.registerStarshardsSpell(sim)
-	priest.registerVampiricTouchSpell(sim)
+func (priest *Priest) Initialize() {
+	priest.registerDevouringPlagueSpell()
+	priest.registerHolyFireSpell()
+	priest.registerMindBlastSpell()
+	priest.registerShadowWordDeathSpell()
+	priest.registerShadowWordPainSpell()
+	priest.registerShadowfiendSpell()
+	priest.registerSmiteSpell()
+	priest.registerStarshardsSpell()
+	priest.registerVampiricTouchSpell()
+
+	priest.registerPowerInfusionCD()
 
 	priest.MindFlay = []*core.Spell{
 		nil, // So we can use # of ticks as the index
-		priest.newMindFlaySpell(sim, 1),
-		priest.newMindFlaySpell(sim, 2),
-		priest.newMindFlaySpell(sim, 3),
+		priest.newMindFlaySpell(1),
+		priest.newMindFlaySpell(2),
+		priest.newMindFlaySpell(3),
 	}
 	priest.MindFlayDot = []*core.Dot{
 		nil, // So we can use # of ticks as the index
-		priest.newMindFlayDot(sim, 1),
-		priest.newMindFlayDot(sim, 2),
-		priest.newMindFlayDot(sim, 3),
+		priest.newMindFlayDot(1),
+		priest.newMindFlayDot(2),
+		priest.newMindFlayDot(3),
 	}
 
 	if priest.Talents.Misery > 0 {
-		priest.MiseryAura = core.MiseryAura(sim.GetPrimaryTarget(), priest.Talents.Misery)
+		priest.MiseryAura = core.MiseryAura(priest.Env.GetPrimaryTarget(), priest.Talents.Misery)
 	}
 	if priest.Talents.ShadowWeaving > 0 {
-		priest.ShadowWeavingAura = core.ShadowWeavingAura(sim.GetPrimaryTarget(), 0)
+		priest.ShadowWeavingAura = core.ShadowWeavingAura(priest.Env.GetPrimaryTarget(), 0)
 	}
 }
 
-func (priest *Priest) Reset(newsim *core.Simulation) {
+func (priest *Priest) Reset(_ *core.Simulation) {
 }
 
 func New(char core.Character, selfBuffs SelfBuffs, talents proto.PriestTalents) *Priest {

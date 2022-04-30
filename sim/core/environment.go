@@ -15,6 +15,9 @@ const (
 	Finalized
 )
 
+// Callback for doing something after finalization.
+type PostFinalizeEffect func()
+
 type Environment struct {
 	State EnvironmentState
 
@@ -24,6 +27,9 @@ type Environment struct {
 	BaseDuration      time.Duration // base duration
 	DurationVariation time.Duration // variation per duration
 	Duration          time.Duration // Duration of current iteration
+
+	// Effects to invoke when the Env is finalized.
+	postFinalizeEffects []PostFinalizeEffect
 }
 
 func NewEnvironment(raidProto proto.Raid, encounterProto proto.Encounter) *Environment {
@@ -48,10 +54,10 @@ func (env *Environment) construct(raidProto proto.Raid, encounterProto proto.Enc
 	env.Raid.updatePlayersAndPets()
 
 	for _, unit := range env.Raid.AllUnits {
-		unit.Environment = env
+		unit.Env = env
 	}
 	for _, target := range env.Encounter.Targets {
-		target.Environment = env
+		target.Env = env
 	}
 
 	env.State = Constructed
@@ -59,15 +65,38 @@ func (env *Environment) construct(raidProto proto.Raid, encounterProto proto.Enc
 
 // The initialization phase.
 func (env *Environment) initialize(raidProto proto.Raid, encounterProto proto.Encounter) {
+	for _, party := range env.Raid.Parties {
+		for _, playerOrPet := range party.PlayersAndPets {
+			playerOrPet.GetCharacter().initialize()
+		}
+	}
+
+	env.Raid.applyCharacterEffects(raidProto)
+
+	for _, party := range env.Raid.Parties {
+		for _, playerOrPet := range party.PlayersAndPets {
+			playerOrPet.Initialize()
+		}
+	}
+
 	env.State = Initialized
 }
 
 // The finalization phase.
 func (env *Environment) finalize(raidProto proto.Raid, encounterProto proto.Encounter) {
 	env.Encounter.finalize()
-	env.Raid.finalize(raidProto)
+	env.Raid.finalize()
+
+	for _, finalizeEffect := range env.postFinalizeEffects {
+		finalizeEffect()
+	}
+	env.postFinalizeEffects = nil
 
 	env.State = Finalized
+}
+
+func (env *Environment) IsFinalized() bool {
+	return env.State >= Finalized
 }
 
 // The maximum possible duration for any iteration.
@@ -85,4 +114,14 @@ func (env *Environment) GetTarget(index int32) *Target {
 
 func (env *Environment) GetPrimaryTarget() *Target {
 	return env.GetTarget(0)
+}
+
+// Registers a callback to this Character which will be invoked after all Units
+// are finalized.
+func (env *Environment) RegisterPostFinalizeEffect(postFinalizeEffect PostFinalizeEffect) {
+	if env.IsFinalized() {
+		panic("Finalize effects may not be added once finalized!")
+	}
+
+	env.postFinalizeEffects = append(env.postFinalizeEffects, postFinalizeEffect)
 }

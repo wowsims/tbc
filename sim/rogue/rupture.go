@@ -58,7 +58,7 @@ func (rogue *Rogue) RuptureDuration(comboPoints int32) time.Duration {
 	return time.Second*6 + time.Second*2*time.Duration(comboPoints)
 }
 
-func (rogue *Rogue) registerRupture(sim *core.Simulation) {
+func (rogue *Rogue) registerRupture() {
 	rogue.Rupture = [6]*core.Spell{
 		rogue.makeRupture(0), // Just for metrics
 		rogue.makeRupture(1),
@@ -68,7 +68,7 @@ func (rogue *Rogue) registerRupture(sim *core.Simulation) {
 		rogue.makeRupture(5),
 	}
 
-	target := sim.GetPrimaryTarget()
+	target := rogue.Env.GetPrimaryTarget()
 	rogue.RuptureDot = core.NewDot(core.Dot{
 		Spell: rogue.Rupture[0],
 		Aura: target.RegisterAura(core.Aura{

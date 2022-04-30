@@ -11,7 +11,7 @@ import (
 // Note: AM doesn't charge its mana up-front, instead it charges 1/5 of the mana on each tick.
 // This is probably not worth simming since no other spell in the game does this and AM isn't
 // even a popular choice for arcane mages.
-func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
+func (mage *Mage) registerArcaneMissilesSpell() {
 	actionID := core.ActionID{SpellID: 38699}
 	baseCost := 740.0
 
@@ -56,7 +56,7 @@ func (mage *Mage) registerArcaneMissilesSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := mage.Env.GetPrimaryTarget()
 	mage.ArcaneMissilesDot = core.NewDot(core.Dot{
 		Spell: mage.ArcaneMissiles,
 		Aura: target.RegisterAura(core.Aura{

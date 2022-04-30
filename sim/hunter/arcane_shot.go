@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (hunter *Hunter) registerArcaneShotSpell(sim *core.Simulation) {
+func (hunter *Hunter) registerArcaneShotSpell() {
 	baseCost := 230.0
 
 	hunter.ArcaneShot = hunter.RegisterSpell(core.SpellConfig{
@@ -41,7 +41,7 @@ func (hunter *Hunter) registerArcaneShotSpell(sim *core.Simulation) {
 				},
 				TargetSpellCoefficient: 1,
 			}),
-			OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
+			OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, hunter.Env.GetPrimaryTarget())),
 		}),
 	})
 }

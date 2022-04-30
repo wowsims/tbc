@@ -50,9 +50,6 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 		AutoSwingMelee: true,
 	})
 
-	// Setup Seal of Command after autos are enabled so that the PPM works
-	ret.SetupSealOfCommand()
-
 	return ret
 }
 
@@ -73,19 +70,23 @@ func (ret *RetributionPaladin) GetPaladin() *paladin.Paladin {
 	return ret.Paladin
 }
 
-func (ret *RetributionPaladin) Init(sim *core.Simulation) {
-	ret.Paladin.Init(sim)
-	ret.DelayDPSCooldownsForArmorDebuffs(sim)
+func (ret *RetributionPaladin) Initialize() {
+	ret.Paladin.Initialize()
+
+	// Setup Seal of Command after autos are enabled so that the PPM works
+	ret.SetupSealOfCommand()
 
 	// Register Consecration here so we can setup the right rank based on UI input
 	switch ret.Rotation.ConsecrationRank {
 	case proto.RetributionPaladin_Rotation_Rank6:
-		ret.RegisterConsecrationSpell(sim, 6)
+		ret.RegisterConsecrationSpell(6)
 	case proto.RetributionPaladin_Rotation_Rank4:
-		ret.RegisterConsecrationSpell(sim, 4)
+		ret.RegisterConsecrationSpell(4)
 	case proto.RetributionPaladin_Rotation_Rank1:
-		ret.RegisterConsecrationSpell(sim, 1)
+		ret.RegisterConsecrationSpell(1)
 	}
+
+	ret.DelayDPSCooldownsForArmorDebuffs()
 }
 
 func (ret *RetributionPaladin) Reset(sim *core.Simulation) {

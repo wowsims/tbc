@@ -7,8 +7,8 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warlock *Warlock) registerShadowboltSpell(sim *core.Simulation) {
-	warlock.ImpShadowboltAura = warlock.impShadowboltDebuffAura(sim.GetPrimaryTarget())
+func (warlock *Warlock) registerShadowboltSpell() {
+	warlock.ImpShadowboltAura = warlock.impShadowboltDebuffAura(warlock.Env.GetPrimaryTarget())
 	has4pMal := ItemSetMaleficRaiment.CharacterHasSetBonus(&warlock.Character, 4)
 
 	effect := core.SpellEffect{

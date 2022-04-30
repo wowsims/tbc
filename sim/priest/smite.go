@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (priest *Priest) registerSmiteSpell(sim *core.Simulation) {
+func (priest *Priest) registerSmiteSpell() {
 	baseCost := 385.0
 
 	normalOutcome := priest.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier())

@@ -73,7 +73,7 @@ func (rogue *Rogue) ApplyTalents() {
 	rogue.registerAdrenalineRushCD()
 }
 
-func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim *core.Simulation, numPoints int32) {
+func (rogue *Rogue) makeFinishingMoveEffectApplier() func(sim *core.Simulation, numPoints int32) {
 	ruthlessnessChance := 0.2 * float64(rogue.Talents.Ruthlessness)
 	relentlessStrikes := rogue.Talents.RelentlessStrikes
 
