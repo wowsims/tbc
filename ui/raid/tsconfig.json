@@ -18,5 +18,6 @@
 		{ "path": "../shadow_priest" },
 		{ "path": "../smite_priest" },
 		{ "path": "../warrior" },
+		{ "path": "../retribution_paladin" }
 	],
 }

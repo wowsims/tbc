@@ -10,12 +10,9 @@ import (
 )
 
 type Simulation struct {
-	Raid              *Raid
-	encounter         Encounter
-	Options           proto.SimOptions
-	BaseDuration      time.Duration // base duration
-	DurationVariation time.Duration // variation per duration
-	Duration          time.Duration // Duration of current iteration
+	*Environment
+
+	Options proto.SimOptions
 
 	rand Rand
 
@@ -26,6 +23,7 @@ type Simulation struct {
 	// Current Simulation State
 	pendingActions []*PendingAction
 	CurrentTime    time.Duration // duration that has elapsed in the sim since starting
+	Duration       time.Duration // Duration of current iteration
 
 	ProgressReport func(*proto.ProgressMetrics)
 
@@ -48,26 +46,15 @@ func RunSim(rsr proto.RaidSimRequest, progress chan *proto.ProgressMetrics) *pro
 }
 
 func NewSim(rsr proto.RaidSimRequest) *Simulation {
-	raid := NewRaid(*rsr.Raid)
-	encounter := NewEncounter(*rsr.Encounter)
 	simOptions := *rsr.SimOptions
-
-	if len(encounter.Targets) == 0 {
-		panic("Must have at least 1 target!")
-	}
-
 	rseed := simOptions.RandomSeed
 	if rseed == 0 {
 		rseed = time.Now().UnixNano()
 	}
 
 	return &Simulation{
-		Raid:              raid,
-		encounter:         encounter,
-		Options:           simOptions,
-		BaseDuration:      encounter.Duration,
-		DurationVariation: encounter.DurationVariation,
-		Log:               nil,
+		Environment: NewEnvironment(*rsr.Raid, *rsr.Encounter),
+		Options:     simOptions,
 
 		rand: NewSplitMix(uint64(rseed)),
 
@@ -122,7 +109,7 @@ func (sim *Simulation) reset() {
 
 	// Targets need to be reset before the raid, so that players can check for
 	// the presence of permanent target auras in their Reset handlers.
-	for _, target := range sim.encounter.Targets {
+	for _, target := range sim.Encounter.Targets {
 		target.Reset(sim)
 	}
 
@@ -147,7 +134,7 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	// 	fmt.Printf(fmt.Sprintf("[%0.1f] "+message+"\n", append([]interface{}{sim.CurrentTime.Seconds()}, vals...)...))
 	// }
 
-	for _, target := range sim.encounter.Targets {
+	for _, target := range sim.Encounter.Targets {
 		target.init(sim)
 	}
 
@@ -182,7 +169,7 @@ func (sim *Simulation) run() *proto.RaidSimResult {
 	}
 	result := &proto.RaidSimResult{
 		RaidMetrics:      sim.Raid.GetMetrics(sim.Options.Iterations),
-		EncounterMetrics: sim.encounter.GetMetricsProto(sim.Options.Iterations),
+		EncounterMetrics: sim.Encounter.GetMetricsProto(sim.Options.Iterations),
 
 		Logs:                   logsBuffer.String(),
 		FirstIterationDuration: firstIterationDuration.Seconds(),
@@ -226,7 +213,7 @@ func (sim *Simulation) runOnce() {
 	}
 
 	sim.Raid.doneIteration(sim)
-	sim.encounter.doneIteration(sim)
+	sim.Encounter.doneIteration(sim)
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
@@ -245,7 +232,7 @@ func (sim *Simulation) AddPendingAction(pa *PendingAction) {
 func (sim *Simulation) advance(elapsedTime time.Duration) {
 	sim.CurrentTime += elapsedTime
 
-	if !sim.executePhase && sim.CurrentTime >= sim.encounter.executePhaseBegins {
+	if !sim.executePhase && sim.CurrentTime >= sim.Encounter.executePhaseBegins {
 		sim.executePhase = true
 		for _, callback := range sim.executePhaseCallbacks {
 			callback(sim)
@@ -258,7 +245,7 @@ func (sim *Simulation) advance(elapsedTime time.Duration) {
 		}
 	}
 
-	for _, target := range sim.encounter.Targets {
+	for _, target := range sim.Encounter.Targets {
 		target.Advance(sim, elapsedTime)
 	}
 }
@@ -277,21 +264,4 @@ func (sim *Simulation) GetRemainingDuration() time.Duration {
 // Returns the percentage of time remaining in the current iteration, as a value from 0-1.
 func (sim *Simulation) GetRemainingDurationPercent() float64 {
 	return float64(sim.Duration-sim.CurrentTime) / float64(sim.Duration)
-}
-
-// The maximum possible duration for any iteration.
-func (sim *Simulation) GetMaxDuration() time.Duration {
-	return sim.BaseDuration + sim.DurationVariation
-}
-
-func (sim *Simulation) GetNumTargets() int32 {
-	return int32(len(sim.encounter.Targets))
-}
-
-func (sim *Simulation) GetTarget(index int32) *Target {
-	return sim.encounter.Targets[index]
-}
-
-func (sim *Simulation) GetPrimaryTarget() *Target {
-	return sim.GetTarget(0)
 }

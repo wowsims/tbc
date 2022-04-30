@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (hunter *Hunter) registerAspectOfTheHawkSpell(sim *core.Simulation) {
+func (hunter *Hunter) registerAspectOfTheHawkSpell() {
 	var impHawkAura *core.Aura
 	const improvedHawkProcChance = 0.1
 	if hunter.Talents.ImprovedAspectOfTheHawk > 0 {
@@ -60,7 +60,7 @@ func (hunter *Hunter) registerAspectOfTheHawkSpell(sim *core.Simulation) {
 	})
 }
 
-func (hunter *Hunter) registerAspectOfTheViperSpell(sim *core.Simulation) {
+func (hunter *Hunter) registerAspectOfTheViperSpell() {
 	actionID := core.ActionID{SpellID: 34074}
 	auraConfig := core.Aura{
 		Label:    "Aspect of the Viper",

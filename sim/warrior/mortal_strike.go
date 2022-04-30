@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warrior *Warrior) registerMortalStrikeSpell(_ *core.Simulation, cdTimer *core.Timer) {
+func (warrior *Warrior) registerMortalStrikeSpell(cdTimer *core.Timer) {
 	cost := 30.0
 	if ItemSetDestroyerBattlegear.CharacterHasSetBonus(&warrior.Character, 4) {
 		cost -= 5

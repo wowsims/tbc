@@ -29,6 +29,8 @@ import * as RoguePresets from '/tbc/rogue/presets.js';
 import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
 import * as SmitePriestPresets from '/tbc/smite_priest/presets.js';
 import * as WarriorPresets from '/tbc/warrior/presets.js';
+import * as RetributionPaladinPresets from '/tbc/retribution_paladin/presets.js';
+
 
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
 import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
@@ -536,6 +538,38 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 		},
 		tooltip: 'Fury Warrior',
 		iconUrl: talentTreeIcons[Class.ClassWarrior][1],
+	},
+	{
+		spec: Spec.SpecRetributionPaladin,
+		rotation: RetributionPaladinPresets.DefaultRotation,
+		talents: RetributionPaladinPresets.RetKingsPaladinTalents.data,
+		specOptions: RetributionPaladinPresets.DefaultOptions,
+		consumes: RetributionPaladinPresets.DefaultConsumes,
+		defaultName: 'Ret Paladin',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceHuman,
+			[Faction.Horde]: Race.RaceBloodElf,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: RetributionPaladinPresets.P1_PRESET.gear,
+				2: RetributionPaladinPresets.P2_PRESET.gear,
+				3: RetributionPaladinPresets.P3_PRESET.gear,
+				4: RetributionPaladinPresets.P4_PRESET.gear,
+				5: RetributionPaladinPresets.P5_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: RetributionPaladinPresets.P1_PRESET.gear,
+				2: RetributionPaladinPresets.P2_PRESET.gear,
+				3: RetributionPaladinPresets.P3_PRESET.gear,
+				4: RetributionPaladinPresets.P4_PRESET.gear,
+				5: RetributionPaladinPresets.P5_PRESET.gear,
+			},
+		},
+		tooltip: 'Ret Paladin',
+		iconUrl: talentTreeIcons[Class.ClassPaladin][2],
 	},
 ];
 

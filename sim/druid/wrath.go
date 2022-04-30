@@ -10,7 +10,7 @@ import (
 
 const IdolAvenger int32 = 31025
 
-func (druid *Druid) registerWrathSpell(sim *core.Simulation) {
+func (druid *Druid) registerWrathSpell() {
 	baseCost := 255.0
 
 	// This seems to be unaffected by wrath of cenarius.

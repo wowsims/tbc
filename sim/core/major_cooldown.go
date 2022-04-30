@@ -39,23 +39,6 @@ type MajorCooldown struct {
 	// Spell that is cast when this MCD is activated.
 	Spell *Spell
 
-	// Unique ID for this cooldown, used to look it up.
-	ActionID
-
-	// Primary cooldown for checking whether this cooldown is ready.
-	Cooldown Cooldown
-
-	// Secondary cooldown, used for shared cooldowns.
-	SharedCooldown Cooldown
-
-	// Whether this MCD requires the GCD.
-	UsesGCD bool
-
-	// How long before this cooldown takes effect after activation.
-	// Not used yet, but will eventually be important for planning cooldown
-	// schedules.
-	CastTime time.Duration
-
 	// Cooldowns with higher priority get used first. This is important when some
 	// cooldowns have a non-zero cast time. For example, Drums should be used
 	// before Bloodlust.
@@ -94,15 +77,15 @@ type MajorCooldown struct {
 }
 
 func (mcd *MajorCooldown) ReadyAt() time.Duration {
-	return BothTimersReadyAt(mcd.Cooldown.Timer, mcd.SharedCooldown.Timer)
+	return mcd.Spell.ReadyAt()
 }
 
 func (mcd *MajorCooldown) IsReady(sim *Simulation) bool {
-	return BothTimersReady(mcd.Cooldown.Timer, mcd.SharedCooldown.Timer, sim)
+	return mcd.Spell.IsReady(sim)
 }
 
 func (mcd *MajorCooldown) TimeToReady(sim *Simulation) time.Duration {
-	return MaxTimeToReady(mcd.Cooldown.Timer, mcd.SharedCooldown.Timer, sim)
+	return mcd.Spell.TimeToReady(sim)
 }
 
 func (mcd *MajorCooldown) IsEnabled() bool {
@@ -130,7 +113,7 @@ func (mcd *MajorCooldown) tryActivateInternal(sim *Simulation, character *Charac
 // Activates this MCD, if all the conditions pass.
 // Returns whether the MCD was activated.
 func (mcd *MajorCooldown) tryActivateHelper(sim *Simulation, character *Character) bool {
-	if mcd.UsesGCD && !character.GCD.IsReady(sim) {
+	if mcd.Spell.DefaultCast.GCD > 0 && !character.GCD.IsReady(sim) {
 		return false
 	}
 
@@ -149,7 +132,7 @@ func (mcd *MajorCooldown) tryActivateHelper(sim *Simulation, character *Characte
 		mcd.activate(sim, character)
 		mcd.numUsages++
 		if sim.Log != nil {
-			character.Log(sim, "Major cooldown used: %s", mcd.ActionID)
+			character.Log(sim, "Major cooldown used: %s", mcd.Spell.ActionID)
 		}
 	}
 
@@ -165,9 +148,6 @@ type majorCooldownManager struct {
 
 	// Cached list of major cooldowns sorted by priority, for resetting quickly.
 	initialMajorCooldowns []MajorCooldown
-
-	// Whether finalize() has been called on this object.
-	finalized bool
 
 	// Major cooldowns, ordered by next available. This should always contain
 	// the same cooldows as initialMajorCooldowns, but the order will change over
@@ -186,14 +166,11 @@ func newMajorCooldownManager(cooldowns *proto.Cooldowns) majorCooldownManager {
 	}
 }
 
-func (mcdm *majorCooldownManager) finalize(character *Character) {
-	if mcdm.finalized {
-		return
-	}
-	mcdm.finalized = true
-
+func (mcdm *majorCooldownManager) initialize(character *Character) {
 	mcdm.character = character
+}
 
+func (mcdm *majorCooldownManager) finalize(character *Character) {
 	if mcdm.initialMajorCooldowns == nil {
 		mcdm.initialMajorCooldowns = []MajorCooldown{}
 	}
@@ -206,7 +183,7 @@ func (mcdm *majorCooldownManager) finalize(character *Character) {
 		if mcdm.cooldownConfigs.Cooldowns != nil {
 			for _, cooldownConfig := range mcdm.cooldownConfigs.Cooldowns {
 				configID := ProtoToActionID(*cooldownConfig.Id)
-				if configID.SameAction(mcd.ActionID) {
+				if configID.SameAction(mcd.Spell.ActionID) {
 					mcd.timings = make([]time.Duration, len(cooldownConfig.Timings))
 					for t, timing := range cooldownConfig.Timings {
 						mcd.timings[t] = DurationFromSeconds(timing)
@@ -224,18 +201,20 @@ func (mcdm *majorCooldownManager) finalize(character *Character) {
 // to be applied. MCDs that have a user-specified timing are not delayed.
 //
 // This function should be called from Agent.Init().
-func (mcdm *majorCooldownManager) DelayDPSCooldownsForArmorDebuffs(sim *Simulation) {
-	if !sim.GetPrimaryTarget().HasAuraWithTag(SunderExposeAuraTag) {
+func (mcdm *majorCooldownManager) DelayDPSCooldownsForArmorDebuffs() {
+	if !mcdm.character.Env.GetPrimaryTarget().HasAuraWithTag(SunderExposeAuraTag) {
 		return
 	}
 
-	const delay = time.Second * 10
-	for i, _ := range mcdm.initialMajorCooldowns {
-		mcd := &mcdm.initialMajorCooldowns[i]
-		if len(mcd.timings) == 0 && mcd.Type == CooldownTypeDPS {
-			mcd.timings = append(mcd.timings, delay)
+	mcdm.character.Env.RegisterPostFinalizeEffect(func() {
+		const delay = time.Second * 10
+		for i, _ := range mcdm.initialMajorCooldowns {
+			mcd := &mcdm.initialMajorCooldowns[i]
+			if len(mcd.timings) == 0 && mcd.Type == CooldownTypeDPS {
+				mcd.timings = append(mcd.timings, delay)
+			}
 		}
-	}
+	})
 }
 
 func (mcdm *majorCooldownManager) reset(sim *Simulation) {
@@ -261,28 +240,20 @@ func (mcdm *majorCooldownManager) reset(sim *Simulation) {
 // Registers a major cooldown to the Character, which will be automatically
 // used when available.
 func (mcdm *majorCooldownManager) AddMajorCooldown(mcd MajorCooldown) {
-	if mcdm.finalized {
+	if mcdm.character.Env.IsFinalized() {
 		panic("Major cooldowns may not be added once finalized!")
+	}
+	if mcd.Spell == nil {
+		panic("Major cooldown must have a Spell!")
 	}
 
 	spell := mcd.Spell
-	if spell != nil {
-		mcd.ActionID = spell.ActionID
-		mcd.Cooldown = spell.CD
-		mcd.SharedCooldown = spell.SharedCD
-		mcd.UsesGCD = spell.DefaultCast.GCD > 0
-		mcd.CastTime = spell.DefaultCast.CastTime
-		if mcd.ActivationFactory == nil {
-			mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
-				return func(sim *Simulation, character *Character) {
-					spell.Cast(sim, sim.GetPrimaryTarget())
-				}
+	if mcd.ActivationFactory == nil {
+		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
+			return func(sim *Simulation, character *Character) {
+				spell.Cast(sim, sim.GetPrimaryTarget())
 			}
 		}
-	}
-
-	if mcd.IsEmptyAction() {
-		panic("Major cooldown must have an ActionID!")
 	}
 
 	if mcd.CanActivate == nil {
@@ -301,7 +272,7 @@ func (mcdm *majorCooldownManager) AddMajorCooldown(mcd MajorCooldown) {
 
 func (mcdm *majorCooldownManager) GetInitialMajorCooldown(actionID ActionID) MajorCooldown {
 	for _, mcd := range mcdm.initialMajorCooldowns {
-		if mcd.SameAction(actionID) {
+		if mcd.Spell.SameAction(actionID) {
 			return mcd
 		}
 	}
@@ -311,7 +282,7 @@ func (mcdm *majorCooldownManager) GetInitialMajorCooldown(actionID ActionID) Maj
 
 func (mcdm *majorCooldownManager) GetMajorCooldown(actionID ActionID) *MajorCooldown {
 	for _, mcd := range mcdm.majorCooldowns {
-		if mcd.SameAction(actionID) {
+		if mcd.Spell.SameAction(actionID) {
 			return mcd
 		}
 	}
@@ -327,7 +298,7 @@ func (mcdm *majorCooldownManager) GetMajorCooldowns() []*MajorCooldown {
 func (mcdm *majorCooldownManager) GetMajorCooldownIDs() []*proto.ActionID {
 	ids := make([]*proto.ActionID, len(mcdm.initialMajorCooldowns))
 	for i, mcd := range mcdm.initialMajorCooldowns {
-		ids[i] = mcd.ActionID.ToProto()
+		ids[i] = mcd.Spell.ActionID.ToProto()
 	}
 	return ids
 }
@@ -357,7 +328,7 @@ func (mcdm *majorCooldownManager) DisableAllEnabledCooldowns(cooldownType int32)
 	disabledMCDs := []*MajorCooldown{}
 	for _, mcd := range mcdm.majorCooldowns {
 		if mcd.IsEnabled() && (cooldownType == CooldownTypeUnknown || mcd.Type == cooldownType) {
-			mcdm.DisableMajorCooldown(mcd.ActionID)
+			mcdm.DisableMajorCooldown(mcd.Spell.ActionID)
 			disabledMCDs = append(disabledMCDs, mcd)
 		}
 	}
@@ -366,7 +337,7 @@ func (mcdm *majorCooldownManager) DisableAllEnabledCooldowns(cooldownType int32)
 
 func (mcdm *majorCooldownManager) EnableAllCooldowns(mcdsToEnable []*MajorCooldown) {
 	for _, mcd := range mcdsToEnable {
-		mcdm.EnableMajorCooldown(mcd.ActionID)
+		mcdm.EnableMajorCooldown(mcd.Spell.ActionID)
 	}
 }
 
@@ -377,7 +348,7 @@ func (mcdm *majorCooldownManager) TryUseCooldowns(sim *Simulation) {
 		if mcd.tryActivateInternal(sim, mcdm.character) {
 			anyCooldownsUsed = true
 
-			if mcd.UsesGCD {
+			if mcd.Spell.DefaultCast.GCD > 0 {
 				// If we used a MCD that uses the GCD (like drums), hold off on using
 				// any remaining MCDs so they aren't wasted.
 				break
@@ -409,7 +380,7 @@ func (mcdm *majorCooldownManager) UpdateMajorCooldowns() {
 func RegisterTemporaryStatsOnUseCD(character *Character, auraLabel string, tempStats stats.Stats, duration time.Duration, config SpellConfig) {
 	aura := character.NewTemporaryStatsAura(auraLabel, config.ActionID, tempStats, duration)
 
-	config.Cast.DisableCallbacks = true
+	config.SpellExtras |= SpellExtrasNoOnCastComplete
 	config.ApplyEffects = func(sim *Simulation, _ *Target, _ *Spell) {
 		aura.Activate(sim)
 	}

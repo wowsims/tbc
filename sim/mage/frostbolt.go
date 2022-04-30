@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (mage *Mage) registerFrostboltSpell(sim *core.Simulation) {
+func (mage *Mage) registerFrostboltSpell() {
 	baseCost := 330.0
 
 	mage.Frostbolt = mage.RegisterSpell(core.SpellConfig{

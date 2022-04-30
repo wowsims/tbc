@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
+func (warlock *Warlock) registerSiphonLifeSpell() {
 	actionID := core.ActionID{SpellID: 30911}
 	baseCost := 370.0
 
@@ -31,7 +31,7 @@ func (warlock *Warlock) registerSiphonLifeSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := warlock.Env.GetPrimaryTarget()
 	spellCoefficient := 0.1
 	warlock.SiphonLifeDot = core.NewDot(core.Dot{
 		Spell: warlock.SiphonLife,

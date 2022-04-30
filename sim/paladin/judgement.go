@@ -17,7 +17,7 @@ func (paladin *Paladin) canJudgement(sim *core.Simulation) bool {
 	return paladin.CurrentSeal != nil && paladin.CurrentSeal.IsActive() && paladin.JudgementOfWisdom.IsReady(sim)
 }
 
-func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation, cdTimer *core.Timer) {
+func (paladin *Paladin) registerJudgementOfBloodSpell(cdTimer *core.Timer) {
 	var loaAura *core.Aura
 	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27484 {
 		loaAura = paladin.NewTemporaryStatsAura(
@@ -35,7 +35,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(sim *core.Simulation, cdTi
 		ThreatMultiplier: 1,
 
 		BaseDamage:     core.BaseDamageConfigMagic(295, 325, 0.429),
-		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialCritOnly(paladin.DefaultMeleeCritMultiplier()),
 
 		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			paladin.sanctifiedJudgement(sim, paladin.SealOfBlood.DefaultCast.Cost)
@@ -73,7 +73,7 @@ func (paladin *Paladin) CanJudgementOfBlood(sim *core.Simulation) bool {
 	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfBloodAura
 }
 
-func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation, cdTimer *core.Timer) {
+func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(cdTimer *core.Timer) {
 	percentBonus := 1.0
 	if ItemSetJusticarBattlegear.CharacterHasSetBonus(&paladin.Character, 2) {
 		percentBonus = 1.15
@@ -84,7 +84,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(sim *core.Simulation
 	} else if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27949 {
 		flatBonus += 47.0
 	}
-	paladin.JudgementOfTheCrusaderAura = core.JudgementOfTheCrusaderAura(sim.GetPrimaryTarget(), paladin.Talents.ImprovedSealOfTheCrusader, flatBonus, percentBonus)
+	paladin.JudgementOfTheCrusaderAura = core.JudgementOfTheCrusaderAura(paladin.Env.GetPrimaryTarget(), paladin.Talents.ImprovedSealOfTheCrusader, flatBonus, percentBonus)
 
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
@@ -128,8 +128,8 @@ func (paladin *Paladin) CanJudgementOfTheCrusader(sim *core.Simulation) bool {
 	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfTheCrusaderAura
 }
 
-func (paladin *Paladin) registerJudgementOfWisdomSpell(sim *core.Simulation, cdTimer *core.Timer) {
-	paladin.JudgementOfWisdomAura = core.JudgementOfWisdomAura(sim.GetPrimaryTarget())
+func (paladin *Paladin) registerJudgementOfWisdomSpell(cdTimer *core.Timer) {
+	paladin.JudgementOfWisdomAura = core.JudgementOfWisdomAura(paladin.Env.GetPrimaryTarget())
 
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfWisdom = paladin.RegisterSpell(core.SpellConfig{
@@ -216,9 +216,9 @@ func (paladin *Paladin) sanctifiedJudgement(sim *core.Simulation, mana float64) 
 	}
 }
 
-func (paladin *Paladin) registerJudgements(sim *core.Simulation) {
+func (paladin *Paladin) registerJudgements() {
 	cdTimer := paladin.NewTimer()
-	paladin.registerJudgementOfBloodSpell(sim, cdTimer)
-	paladin.registerJudgementOfTheCrusaderSpell(sim, cdTimer)
-	paladin.registerJudgementOfWisdomSpell(sim, cdTimer)
+	paladin.registerJudgementOfBloodSpell(cdTimer)
+	paladin.registerJudgementOfTheCrusaderSpell(cdTimer)
+	paladin.registerJudgementOfWisdomSpell(cdTimer)
 }

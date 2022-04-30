@@ -11,7 +11,7 @@ import (
 // Idol IDs
 const IvoryMoongoddess int32 = 27518
 
-func (druid *Druid) newStarfireSpell(sim *core.Simulation, rank int) *core.Spell {
+func (druid *Druid) newStarfireSpell(rank int) *core.Spell {
 	actionID := core.ActionID{SpellID: 26986}
 	baseCost := 370.0
 	minBaseDamage := 550.0

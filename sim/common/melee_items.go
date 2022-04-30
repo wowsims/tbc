@@ -374,7 +374,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 	spell := character.GetOrRegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasIgnoreResists,
+		SpellExtras: core.SpellExtrasIgnoreResists | core.SpellExtrasNoOnCastComplete,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
@@ -385,7 +385,6 @@ func ApplyTheDecapitator(agent core.Agent) {
 				Timer:    character.GetOffensiveTrinketCD(),
 				Duration: time.Second * 10,
 			},
-			DisableCallbacks: true,
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
@@ -781,7 +780,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 			}
 			icd.Use(sim)
 
-			blinkstrikeSpell.Cast(sim, spellEffect.Target)
+			aura.Unit.AutoAttacks.MaybeReplaceMHSwing(sim, blinkstrikeSpell).SkipCastAndApplyEffects(sim, spellEffect.Target)
 		},
 	})
 }

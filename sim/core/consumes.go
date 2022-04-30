@@ -162,10 +162,8 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	}
 	applyAdamantiteSharpeningStoneAura(character, consumes, allowMHImbue)
 
-	character.RegisterFinalizeEffect(func() {
-		registerPotionCD(agent, consumes)
-		registerConjuredCD(agent, consumes)
-	})
+	registerPotionCD(agent, consumes)
+	registerConjuredCD(agent, consumes)
 	registerDrumsCD(agent, partyBuffs, consumes)
 	registerExplosivesCD(agent, consumes)
 }
@@ -291,68 +289,52 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 		return
 	}
 
-	drumsTimer := character.NewTimer()
 	mcd := MajorCooldown{
-		ActionID: actionID,
-		Cooldown: Cooldown{
-			Timer:    drumsTimer,
-			Duration: DrumsCD,
-		},
 		Priority: CooldownPriorityDrums,
 		Type:     cooldownType,
-
-		CanActivate:    func(sim *Simulation, character *Character) bool { return true },
-		ShouldActivate: func(sim *Simulation, character *Character) bool { return true },
 	}
 
 	if drumsSelfCast {
-		mcd.UsesGCD = true
-		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
-			auras := []*Aura{}
-			for _, partyMember := range character.Party.Players {
-				drumsAura := makeDrumsAura(partyMember.GetCharacter(), drumsType)
-				drumsAura.reset(sim)
-				auras = append(auras, drumsAura)
-			}
-
-			drumsSpell := character.GetOrRegisterSpell(SpellConfig{
-				ActionID: actionID,
-
-				Cast: CastConfig{
-					DefaultCast: Cast{
-						GCD: GCDDefault,
-					},
-					CD: Cooldown{
-						Timer:    drumsTimer,
-						Duration: DrumsCD,
-					},
-				},
-
-				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
-					// When a real player is using drums, their cast applies to the whole party.
-					for _, aura := range auras {
-						aura.Activate(sim)
-					}
-
-					// All MCDs that use the GCD and have a non-zero cast time must call this.
-					character.UpdateMajorCooldowns()
-				},
-			})
-
-			return func(sim *Simulation, character *Character) {
-				drumsSpell.Cast(sim, nil)
-			}
+		auras := []*Aura{}
+		for _, partyMember := range character.Party.Players {
+			drumsAura := makeDrumsAura(partyMember.GetCharacter(), drumsType)
+			auras = append(auras, drumsAura)
 		}
+
+		mcd.Spell = character.RegisterSpell(SpellConfig{
+			ActionID: actionID,
+
+			Cast: CastConfig{
+				DefaultCast: Cast{
+					GCD: GCDDefault,
+				},
+				CD: Cooldown{
+					Timer:    character.NewTimer(),
+					Duration: DrumsCD,
+				},
+			},
+
+			ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+				// When a real player is using drums, their cast applies to the whole party.
+				for _, aura := range auras {
+					aura.Activate(sim)
+				}
+
+				// All MCDs that use the GCD and have a non-zero cast time must call this.
+				character.UpdateMajorCooldowns()
+			},
+		})
 	} else {
 		// When there is no real player using drums, each player gets a fake CD that
 		// gives just themself the buff, with no cast time.
 		drumsAura := makeDrumsAura(agent.GetCharacter(), drumsType)
 		mcd.Spell = character.RegisterSpell(SpellConfig{
-			ActionID: actionID,
+			ActionID:    actionID,
+			SpellExtras: SpellExtrasNoMetrics,
 
 			Cast: CastConfig{
 				CD: Cooldown{
-					Timer:    drumsTimer,
+					Timer:    character.NewTimer(),
 					Duration: DrumsCD,
 				},
 			},
@@ -360,7 +342,6 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 			ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
 				drumsAura.Activate(sim)
 			},
-			DisableMetrics: true,
 		})
 	}
 
@@ -579,13 +560,13 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID: actionID,
+				ActionID:    actionID,
+				SpellExtras: SpellExtrasNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
 						Duration: time.Minute * 2,
 					},
-					DisableCallbacks: true,
 				},
 				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
 					aura.Activate(sim)
@@ -610,13 +591,13 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID: actionID,
+				ActionID:    actionID,
+				SpellExtras: SpellExtrasNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
 						Duration: time.Minute * 2,
 					},
-					DisableCallbacks: true,
 				},
 				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
 					// Restores 1800 to 3000 mana. (2 Min Cooldown)
@@ -640,13 +621,13 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID: actionID,
+				ActionID:    actionID,
+				SpellExtras: SpellExtrasNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
 						Duration: time.Minute * 2,
 					},
-					DisableCallbacks: true,
 				},
 				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
 					aura.Activate(sim)
@@ -668,13 +649,13 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID: actionID,
+				ActionID:    actionID,
+				SpellExtras: SpellExtrasNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
 						Duration: time.Minute * 2,
 					},
-					DisableCallbacks: true,
 				},
 				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
 					aura.Activate(sim)
@@ -699,8 +680,7 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 		debuffAura := character.NewTemporaryStatsAura("Fel Mana Potion Debuff", ActionID{SpellID: 38927}, stats.Stats{stats.SpellPower: -25}, time.Minute*15)
 
 		return MajorCooldown{
-				ActionID: actionID,
-				Type:     CooldownTypeMana,
+				Type: CooldownTypeMana,
 				CanActivate: func(sim *Simulation, character *Character) bool {
 					return true
 				},
@@ -715,13 +695,13 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID: actionID,
+				ActionID:    actionID,
+				SpellExtras: SpellExtrasNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    potionCD,
 						Duration: time.Minute * 2,
 					},
-					DisableCallbacks: true,
 				},
 				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
 					buffAura.Activate(sim)
@@ -836,13 +816,13 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID: actionID,
+				ActionID:    actionID,
+				SpellExtras: SpellExtrasNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    character.GetConjuredCD(),
 						Duration: time.Minute * 2,
 					},
-					DisableCallbacks: true,
 				},
 				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
 					// Restores 900 to 1500 mana. (2 Min Cooldown)
@@ -889,13 +869,13 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 				},
 			},
 			character.RegisterSpell(SpellConfig{
-				ActionID: actionID,
+				ActionID:    actionID,
+				SpellExtras: SpellExtrasNoOnCastComplete,
 				Cast: CastConfig{
 					CD: Cooldown{
 						Timer:    character.GetConjuredCD(),
 						Duration: time.Minute * 3,
 					},
-					DisableCallbacks: true,
 				},
 				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
 					flameCapAura.Activate(sim)
@@ -924,84 +904,78 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 	explosivesTimer := character.NewTimer()
 
 	var superSapper *Spell
+	if consumes.SuperSapper {
+		superSapper = character.newSuperSapperSpell()
+	}
 	var goblinSapper *Spell
-	var gnomishFlameTurretSpell *Spell
-	if consumes.FillerExplosive == proto.Explosive_ExplosiveGnomishFlameTurret {
-		gnomishFlameTurretSpell = character.newGnomishFlameTurretSpell()
+	if consumes.GoblinSapper {
+		goblinSapper = character.newGoblinSapperSpell()
 	}
 
+	var fillerExplosive *Spell
+	switch consumes.FillerExplosive {
+	case proto.Explosive_ExplosiveFelIronBomb:
+		fillerExplosive = character.newFelIronBombSpell()
+	case proto.Explosive_ExplosiveAdamantiteGrenade:
+		fillerExplosive = character.newAdamantiteGrenadeSpell()
+	case proto.Explosive_ExplosiveGnomishFlameTurret:
+		fillerExplosive = character.newGnomishFlameTurretSpell()
+	case proto.Explosive_ExplosiveHolyWater:
+		fillerExplosive = character.newHolyWaterSpell()
+	}
+
+	cdAfterGoblinSapper := time.Minute
+	if fillerExplosive == nil {
+		if consumes.SuperSapper {
+			cdAfterGoblinSapper = time.Minute * 4
+		} else {
+			cdAfterGoblinSapper = time.Minute * 5
+		}
+	}
+
+	cdAfterSuperSapper := time.Minute
+	if fillerExplosive == nil && !consumes.GoblinSapper {
+		cdAfterSuperSapper = time.Minute * 5
+	}
+
+	spell := character.RegisterSpell(SpellConfig{
+		ActionID:    SuperSapperActionID,
+		SpellExtras: SpellExtrasNoOnCastComplete | SpellExtrasNoMetrics | SpellExtrasNoLogs,
+
+		Cast: CastConfig{
+			CD: Cooldown{
+				Timer:    explosivesTimer,
+				Duration: time.Minute,
+			},
+		},
+
+		ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+			if superSapper != nil && superSapper.IsReady(sim) {
+				superSapper.Cast(sim, sim.GetPrimaryTarget())
+				explosivesTimer.Set(sim.CurrentTime + cdAfterSuperSapper)
+			} else if goblinSapper != nil && goblinSapper.IsReady(sim) {
+				goblinSapper.Cast(sim, sim.GetPrimaryTarget())
+				explosivesTimer.Set(sim.CurrentTime + cdAfterGoblinSapper)
+			} else {
+				fillerExplosive.Cast(sim, sim.GetPrimaryTarget())
+				explosivesTimer.Set(sim.CurrentTime + time.Minute)
+			}
+		},
+	})
+
 	character.AddMajorCooldown(MajorCooldown{
-		ActionID: SuperSapperActionID,
-		Cooldown: Cooldown{
-			Timer:    explosivesTimer,
-			Duration: time.Minute,
-		},
-		Type: CooldownTypeDPS,
-		CanActivate: func(sim *Simulation, character *Character) bool {
-			return true
-		},
-		ShouldActivate: func(sim *Simulation, character *Character) bool {
-			return true
-		},
-		ActivationFactory: func(sim *Simulation) CooldownActivation {
-			if superSapper == nil {
-				superSapper = character.newSuperSapperSpell(sim)
-				goblinSapper = character.newGoblinSapperSpell(sim)
-			}
-
-			var fillerExplosive *Spell
-			switch consumes.FillerExplosive {
-			case proto.Explosive_ExplosiveFelIronBomb:
-				fillerExplosive = character.newFelIronBombSpell(sim)
-			case proto.Explosive_ExplosiveAdamantiteGrenade:
-				fillerExplosive = character.newAdamantiteGrenadeSpell(sim)
-			case proto.Explosive_ExplosiveGnomishFlameTurret:
-				fillerExplosive = gnomishFlameTurretSpell
-			case proto.Explosive_ExplosiveHolyWater:
-				fillerExplosive = character.newHolyWaterSpell(sim)
-			}
-
-			cdAfterGoblinSapper := time.Minute
-			if fillerExplosive == nil {
-				if consumes.SuperSapper {
-					cdAfterGoblinSapper = time.Minute * 4
-				} else {
-					cdAfterGoblinSapper = time.Minute * 5
-				}
-			}
-
-			cdAfterSuperSapper := time.Minute
-			if fillerExplosive == nil && !consumes.GoblinSapper {
-				cdAfterSuperSapper = time.Minute * 5
-			}
-
-			return func(sim *Simulation, character *Character) {
-				var explosive *Spell
-				var cd time.Duration
-				if consumes.SuperSapper && superSapper.IsReady(sim) {
-					explosive = superSapper
-					cd = cdAfterSuperSapper
-				} else if consumes.GoblinSapper && goblinSapper.IsReady(sim) {
-					explosive = goblinSapper
-					cd = cdAfterGoblinSapper
-				} else {
-					explosive = fillerExplosive
-					cd = time.Minute
-				}
-				explosive.Cast(sim, sim.GetPrimaryTarget())
-				explosivesTimer.Set(sim.CurrentTime + cd)
-			}
-		},
+		Spell: spell,
+		Type:  CooldownTypeDPS,
 	})
 }
 
 // Creates a spell object for the common explosive case.
-func (character *Character) newBasicExplosiveSpellConfig(sim *Simulation, actionID ActionID, minDamage float64, maxDamage float64, cooldown Cooldown, isHolyWater bool) SpellConfig {
+func (character *Character) newBasicExplosiveSpellConfig(actionID ActionID, minDamage float64, maxDamage float64, cooldown Cooldown, isHolyWater bool) SpellConfig {
 	school := SpellSchoolFire
 	damageMultiplier := 1.0
 	if isHolyWater {
 		school = SpellSchoolHoly
-		if sim.GetPrimaryTarget().MobType != proto.MobType_MobTypeUndead {
+		if character.Env.GetPrimaryTarget().MobType != proto.MobType_MobTypeUndead {
 			damageMultiplier = 0
 		}
 	}
@@ -1014,7 +988,7 @@ func (character *Character) newBasicExplosiveSpellConfig(sim *Simulation, action
 			CD: cooldown,
 		},
 
-		ApplyEffects: ApplyEffectFuncAOEDamage(sim, SpellEffect{
+		ApplyEffects: ApplyEffectFuncAOEDamage(character.Env, SpellEffect{
 			// Explosives always have 1% resist chance, so just give them hit cap.
 			BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,
 
@@ -1026,18 +1000,18 @@ func (character *Character) newBasicExplosiveSpellConfig(sim *Simulation, action
 		}),
 	}
 }
-func (character *Character) newSuperSapperSpell(sim *Simulation) *Spell {
-	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(sim, SuperSapperActionID, 900, 1500, Cooldown{Timer: character.NewTimer(), Duration: time.Minute * 5}, false))
+func (character *Character) newSuperSapperSpell() *Spell {
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(SuperSapperActionID, 900, 1500, Cooldown{Timer: character.NewTimer(), Duration: time.Minute * 5}, false))
 }
-func (character *Character) newGoblinSapperSpell(sim *Simulation) *Spell {
-	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(sim, GoblinSapperActionID, 450, 750, Cooldown{Timer: character.NewTimer(), Duration: time.Minute * 5}, false))
+func (character *Character) newGoblinSapperSpell() *Spell {
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(GoblinSapperActionID, 450, 750, Cooldown{Timer: character.NewTimer(), Duration: time.Minute * 5}, false))
 }
-func (character *Character) newFelIronBombSpell(sim *Simulation) *Spell {
-	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(sim, FelIronBombActionID, 330, 770, Cooldown{}, false))
+func (character *Character) newFelIronBombSpell() *Spell {
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(FelIronBombActionID, 330, 770, Cooldown{}, false))
 }
-func (character *Character) newAdamantiteGrenadeSpell(sim *Simulation) *Spell {
-	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(sim, AdamantiteGrenadeActionID, 450, 750, Cooldown{}, false))
+func (character *Character) newAdamantiteGrenadeSpell() *Spell {
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(AdamantiteGrenadeActionID, 450, 750, Cooldown{}, false))
 }
-func (character *Character) newHolyWaterSpell(sim *Simulation) *Spell {
-	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(sim, HolyWaterActionID, 438, 562, Cooldown{}, true))
+func (character *Character) newHolyWaterSpell() *Spell {
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(HolyWaterActionID, 438, 562, Cooldown{}, true))
 }

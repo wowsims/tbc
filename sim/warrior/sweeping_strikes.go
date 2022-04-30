@@ -18,11 +18,7 @@ func (warrior *Warrior) registerSweepingStrikesCD() {
 	ssHit := warrior.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
-
-		Cast: core.CastConfig{
-			DisableCallbacks: true,
-		},
+		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasNoOnCastComplete,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamageTargetModifiersOnly(core.SpellEffect{
 			// No proc mask, so it won't proc itself.

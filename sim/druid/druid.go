@@ -71,15 +71,15 @@ func (druid *Druid) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	}
 }
 
-func (druid *Druid) Init(sim *core.Simulation) {
-	druid.registerFaerieFireSpell(sim)
-	druid.registerHurricaneSpell(sim)
-	druid.registerInsectSwarmSpell(sim)
-	druid.registerMoonfireSpell(sim)
-	druid.registerRebirthSpell(sim)
-	druid.Starfire8 = druid.newStarfireSpell(sim, 8)
-	druid.Starfire6 = druid.newStarfireSpell(sim, 6)
-	druid.registerWrathSpell(sim)
+func (druid *Druid) Initialize() {
+	druid.registerFaerieFireSpell()
+	druid.registerHurricaneSpell()
+	druid.registerInsectSwarmSpell()
+	druid.registerMoonfireSpell()
+	druid.registerRebirthSpell()
+	druid.Starfire8 = druid.newStarfireSpell(8)
+	druid.Starfire6 = druid.newStarfireSpell(6)
+	druid.registerWrathSpell()
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {

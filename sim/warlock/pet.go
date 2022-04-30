@@ -15,8 +15,8 @@ type WarlockPet struct {
 
 	owner *Warlock
 
-	primaryAbility   PetAbility
-	secondaryAbility PetAbility
+	primaryAbility   *core.Spell
+	secondaryAbility *core.Spell
 }
 
 func (warlock *Warlock) NewWarlockPet() *WarlockPet {
@@ -134,9 +134,9 @@ func (wp *WarlockPet) GetPet() *core.Pet {
 	return &wp.Pet
 }
 
-func (wp *WarlockPet) Init(sim *core.Simulation) {
-	wp.primaryAbility = wp.NewPetAbility(sim, wp.config.PrimaryAbility, true)
-	wp.secondaryAbility = wp.NewPetAbility(sim, wp.config.SecondaryAbility, false)
+func (wp *WarlockPet) Initialize() {
+	wp.primaryAbility = wp.NewPetAbility(wp.config.PrimaryAbility, true)
+	wp.secondaryAbility = wp.NewPetAbility(wp.config.SecondaryAbility, false)
 }
 
 func (wp *WarlockPet) Reset(sim *core.Simulation) {
@@ -159,20 +159,20 @@ func (wp *WarlockPet) OnGCDReady(sim *core.Simulation) {
 	target := sim.GetPrimaryTarget()
 	if wp.config.RandomSelection {
 		if sim.RandomFloat("Warlock Pet Ability") < 0.5 {
-			if !wp.primaryAbility.TryCast(sim, target, wp) {
-				wp.secondaryAbility.TryCast(sim, target, wp)
+			if !wp.TryCast(sim, target, wp.primaryAbility) {
+				wp.TryCast(sim, target, wp.secondaryAbility)
 			}
 		} else {
-			if !wp.secondaryAbility.TryCast(sim, target, wp) {
-				wp.primaryAbility.TryCast(sim, target, wp)
+			if !wp.TryCast(sim, target, wp.secondaryAbility) {
+				wp.TryCast(sim, target, wp.primaryAbility)
 			}
 		}
 		return
 	}
 
-	if !wp.primaryAbility.TryCast(sim, target, wp) {
-		if wp.secondaryAbility.Type != Unknown {
-			wp.secondaryAbility.TryCast(sim, target, wp)
+	if !wp.TryCast(sim, target, wp.primaryAbility) {
+		if wp.secondaryAbility != nil {
+			wp.TryCast(sim, target, wp.secondaryAbility)
 		} else {
 			wp.WaitUntil(sim, wp.primaryAbility.CD.ReadyAt())
 		}

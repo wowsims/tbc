@@ -25,6 +25,19 @@ func RegisterDpsWarrior() {
 	)
 }
 
+type DpsWarrior struct {
+	*warrior.Warrior
+
+	Options  proto.Warrior_Options
+	Rotation proto.Warrior_Rotation
+
+	castFirstSunder bool
+
+	doSlamNext  bool
+	castSlamAt  time.Duration
+	slamLatency time.Duration
+}
+
 func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 	warOptions := options.GetWarrior()
 
@@ -58,52 +71,33 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 		MainHand:       war.WeaponFromMainHand(war.DefaultMeleeCritMultiplier()),
 		OffHand:        war.WeaponFromOffHand(war.DefaultMeleeCritMultiplier()),
 		AutoSwingMelee: true,
-		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
-			if war.Rotation.UseCleave {
-				if war.CurrentRage() < float64(war.Rotation.HsRageThreshold) {
-					war.DequeueCleave(sim)
-					return nil
-				} else {
-					return war.TryCleave(sim)
-				}
+		ReplaceMHSwing: func(sim *core.Simulation, mhSwingSpell *core.Spell) *core.Spell {
+			if war.CurrentRage() < war.HSRageThreshold {
+				war.DequeueHSOrCleave(sim)
+				return nil
 			} else {
-				if war.CurrentRage() < float64(war.Rotation.HsRageThreshold) {
-					war.DequeueHeroicStrike(sim)
-					return nil
-				} else {
-					return war.TryHeroicStrike(sim)
-				}
+				return war.TryHSOrCleave(sim, mhSwingSpell)
 			}
 		},
 	})
 
-	if war.Options.UseRecklessness {
-		war.RegisterRecklessnessCD()
-	}
-
 	return war
-}
-
-type DpsWarrior struct {
-	*warrior.Warrior
-
-	Options  proto.Warrior_Options
-	Rotation proto.Warrior_Rotation
-
-	castFirstSunder bool
-
-	doSlamNext  bool
-	castSlamAt  time.Duration
-	slamLatency time.Duration
 }
 
 func (war *DpsWarrior) GetWarrior() *warrior.Warrior {
 	return war.Warrior
 }
 
-func (war *DpsWarrior) Init(sim *core.Simulation) {
-	war.Warrior.Init(sim)
-	war.DelayDPSCooldownsForArmorDebuffs(sim)
+func (war *DpsWarrior) Initialize() {
+	war.Warrior.Initialize()
+
+	war.RegisterHSOrCleave(war.Rotation.UseCleave, war.Rotation.HsRageThreshold)
+
+	if war.Options.UseRecklessness {
+		war.RegisterRecklessnessCD()
+	}
+
+	war.DelayDPSCooldownsForArmorDebuffs()
 }
 
 func (war *DpsWarrior) Reset(sim *core.Simulation) {

@@ -9,15 +9,12 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-const SpellIDInsectSwarm int32 = 27013
-
-var InsectSwarmActionID = core.ActionID{SpellID: SpellIDInsectSwarm}
-
-func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
+func (druid *Druid) registerInsectSwarmSpell() {
+	actionID := core.ActionID{SpellID: 27013}
 	baseCost := 175.0
 
 	druid.InsectSwarm = druid.RegisterSpell(core.SpellConfig{
-		ActionID:    InsectSwarmActionID,
+		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolNature,
 
 		ResourceType: stats.Mana,
@@ -43,12 +40,12 @@ func (druid *Druid) registerInsectSwarmSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := druid.Env.GetPrimaryTarget()
 	druid.InsectSwarmDot = core.NewDot(core.Dot{
 		Spell: druid.InsectSwarm,
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "InsectSwarm-" + strconv.Itoa(int(druid.Index)),
-			ActionID: InsectSwarmActionID,
+			ActionID: actionID,
 		}),
 		NumberOfTicks: 6,
 		TickLength:    time.Second * 2,

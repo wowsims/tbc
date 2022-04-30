@@ -12,7 +12,7 @@ func (priest *Priest) MindFlayActionID(numTicks int) core.ActionID {
 	return core.ActionID{SpellID: 25387, Tag: int32(numTicks)}
 }
 
-func (priest *Priest) newMindFlaySpell(sim *core.Simulation, numTicks int) *core.Spell {
+func (priest *Priest) newMindFlaySpell(numTicks int) *core.Spell {
 	baseCost := 230.0
 	channelTime := time.Second * time.Duration(numTicks)
 
@@ -56,8 +56,8 @@ func (priest *Priest) newMindFlaySpell(sim *core.Simulation, numTicks int) *core
 	})
 }
 
-func (priest *Priest) newMindFlayDot(sim *core.Simulation, numTicks int) *core.Dot {
-	target := sim.GetPrimaryTarget()
+func (priest *Priest) newMindFlayDot(numTicks int) *core.Dot {
+	target := priest.Env.GetPrimaryTarget()
 	return core.NewDot(core.Dot{
 		Spell: priest.MindFlay[numTicks],
 		Aura: target.RegisterAura(core.Aura{

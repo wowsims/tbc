@@ -27,16 +27,13 @@ func NewEncounter(options proto.Encounter) Encounter {
 		target := NewTarget(*targetOptions, int32(targetIndex))
 		encounter.Targets = append(encounter.Targets, target)
 	}
-
-	encounter.finalize()
+	if len(encounter.Targets) == 0 {
+		// Add a dummy target. The only case where targets aren't specified is when
+		// computing character stats, and targets won't matter there.
+		encounter.Targets = append(encounter.Targets, NewTarget(proto.Target{}, 0))
+	}
 
 	return encounter
-}
-
-func (encounter *Encounter) finalize() {
-	for _, target := range encounter.Targets {
-		target.finalize()
-	}
 }
 
 func (encounter *Encounter) doneIteration(sim *Simulation) {

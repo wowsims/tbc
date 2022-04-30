@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (priest *Priest) registerShadowWordDeathSpell(sim *core.Simulation) {
+func (priest *Priest) registerShadowWordDeathSpell() {
 	baseCost := 309.0
 
 	priest.ShadowWordDeath = priest.RegisterSpell(core.SpellConfig{

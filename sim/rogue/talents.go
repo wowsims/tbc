@@ -73,7 +73,7 @@ func (rogue *Rogue) ApplyTalents() {
 	rogue.registerAdrenalineRushCD()
 }
 
-func (rogue *Rogue) makeFinishingMoveEffectApplier(_ *core.Simulation) func(sim *core.Simulation, numPoints int32) {
+func (rogue *Rogue) makeFinishingMoveEffectApplier() func(sim *core.Simulation, numPoints int32) {
 	ruthlessnessChance := 0.2 * float64(rogue.Talents.Ruthlessness)
 	relentlessStrikes := rogue.Talents.RelentlessStrikes
 
@@ -315,11 +315,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 	bfHit := rogue.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
-
-		Cast: core.CastConfig{
-			DisableCallbacks: true,
-		},
+		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasNoOnCastComplete,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamageTargetModifiersOnly(core.SpellEffect{
 			// No proc mask, so it won't proc itself.

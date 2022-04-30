@@ -51,18 +51,18 @@ stat_weights_results: {
   weights: 0
   weights: 0
   weights: 0
-  weights: 0.17745941580468752
+  weights: 0.17745941580468755
   weights: 0
-  weights: 0.6807780309500935
-  weights: 0
-  weights: 0
+  weights: 0.6807780309500936
   weights: 0
   weights: 0
   weights: 0
   weights: 0
   weights: 0
   weights: 0
-  weights: 1.5933947103868378
+  weights: 0
+  weights: 0
+  weights: 1.5940600578431485
   weights: 0.5787725919395166
   weights: 0
   weights: 0
@@ -215,7 +215,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-AllItems-CataclysmRegalia"
  value: {
-  dps: 1383.1809465820363
+  dps: 1380.3711451559436
  }
 }
 dps_results: {
@@ -1241,7 +1241,7 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-LBOnly-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1461.2700204546154
+  dps: 1461.2714518667249
  }
 }
 dps_results: {

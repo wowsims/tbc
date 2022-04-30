@@ -9,10 +9,10 @@ import (
 )
 
 // ReplaceMHSwing is called right before an auto attack fires
-//  If it returns nil, the attack takes place as normal. If it returns an ability,
-//  that ability is used in place of the attack.
+//  If it returns nil, the attack takes place as normal. If it returns a Spell,
+//  that Spell is used in place of the attack.
 //  This allows for abilities that convert a white attack into yellow attack.
-type ReplaceMHSwing func(sim *Simulation) *Spell
+type ReplaceMHSwing func(sim *Simulation, mhSwingSpell *Spell) *Spell
 
 // Represents a generic weapon. Pets / unarmed / various other cases dont use
 // actual weapon items so this is an abstraction of a Weapon.
@@ -412,7 +412,7 @@ func (aa *AutoAttacks) MaybeReplaceMHSwing(sim *Simulation, mhSwingSpell *Spell)
 	}
 
 	// Allow MH swing to be overridden for abilities like Heroic Strike.
-	replacementSpell := aa.ReplaceMHSwing(sim)
+	replacementSpell := aa.ReplaceMHSwing(sim, mhSwingSpell)
 	if replacementSpell == nil {
 		return mhSwingSpell
 	} else {

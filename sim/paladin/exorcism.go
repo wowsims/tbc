@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (paladin *Paladin) registerExorcismSpell(sim *core.Simulation) {
+func (paladin *Paladin) registerExorcismSpell() {
 	baseCost := 295.0
 
 	paladin.Exorcism = paladin.RegisterSpell(core.SpellConfig{
@@ -21,6 +21,7 @@ func (paladin *Paladin) registerExorcismSpell(sim *core.Simulation) {
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
 				Cost: baseCost,
+				GCD:  core.GCDDefault,
 			},
 			CD: core.Cooldown{
 				Timer:    paladin.NewTimer(),

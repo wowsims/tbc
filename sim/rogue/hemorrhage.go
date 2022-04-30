@@ -8,10 +8,10 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (rogue *Rogue) registerHemorrhageSpell(sim *core.Simulation) {
+func (rogue *Rogue) registerHemorrhageSpell() {
 	actionID := core.ActionID{SpellID: 26864}
 
-	target := sim.GetPrimaryTarget()
+	target := rogue.Env.GetPrimaryTarget()
 	hemoAura := target.GetOrRegisterAura(core.Aura{
 		Label:     "Hemorrhage",
 		ActionID:  actionID,

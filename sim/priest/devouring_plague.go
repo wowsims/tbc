@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
+func (priest *Priest) registerDevouringPlagueSpell() {
 	actionID := core.ActionID{SpellID: 25467}
 	baseCost := 1145.0
 
@@ -43,7 +43,7 @@ func (priest *Priest) registerDevouringPlagueSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := priest.Env.GetPrimaryTarget()
 	priest.DevouringPlagueDot = core.NewDot(core.Dot{
 		Spell: priest.DevouringPlague,
 		Aura: target.RegisterAura(core.Aura{

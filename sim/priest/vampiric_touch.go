@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
+func (priest *Priest) registerVampiricTouchSpell() {
 	actionID := core.ActionID{SpellID: 34917}
 	baseCost := 425.0
 
@@ -40,7 +40,7 @@ func (priest *Priest) registerVampiricTouchSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := priest.Env.GetPrimaryTarget()
 	priest.VampiricTouchDot = core.NewDot(core.Dot{
 		Spell: priest.VampiricTouch,
 		Aura: target.RegisterAura(core.Aura{

@@ -6,7 +6,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warrior *Warrior) registerExecuteSpell(_ *core.Simulation) {
+func (warrior *Warrior) registerExecuteSpell() {
 	cost := 15.0 - float64(warrior.Talents.FocusedRage)
 	if warrior.Talents.ImprovedExecute == 1 {
 		cost -= 2

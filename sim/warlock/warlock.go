@@ -56,22 +56,22 @@ func (warlock *Warlock) GetWarlock() *Warlock {
 	return warlock
 }
 
-func (warlock *Warlock) Init(sim *core.Simulation) {
-	warlock.registerIncinerateSpell(sim)
-	warlock.registerShadowboltSpell(sim)
-	warlock.registerImmolateSpell(sim)
-	warlock.registerCorruptionSpell(sim)
-	warlock.registerCurseOfElementsSpell(sim)
-	warlock.registerCurseOfRecklessnessSpell(sim)
-	warlock.registerCurseOfTonguesSpell(sim)
-	warlock.registerCurseOfAgonySpell(sim)
-	warlock.registerCurseOfDoomSpell(sim)
-	warlock.registerLifeTapSpell(sim)
+func (warlock *Warlock) Initialize() {
+	warlock.registerIncinerateSpell()
+	warlock.registerShadowboltSpell()
+	warlock.registerImmolateSpell()
+	warlock.registerCorruptionSpell()
+	warlock.registerCurseOfElementsSpell()
+	warlock.registerCurseOfRecklessnessSpell()
+	warlock.registerCurseOfTonguesSpell()
+	warlock.registerCurseOfAgonySpell()
+	warlock.registerCurseOfDoomSpell()
+	warlock.registerLifeTapSpell()
 	if warlock.Talents.UnstableAffliction {
-		warlock.registerUnstableAffSpell(sim)
+		warlock.registerUnstableAffSpell()
 	}
 	if warlock.Talents.SiphonLife {
-		warlock.registerSiphonLifeSpell(sim)
+		warlock.registerSiphonLifeSpell()
 	}
 	warlock.registerSeedSpell(sim)
 }

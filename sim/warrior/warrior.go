@@ -25,7 +25,6 @@ type Warrior struct {
 
 	// Current state
 	Stance              Stance
-	heroicStrikeQueued  bool
 	overpowerValidUntil time.Duration
 	rampageValidUntil   time.Duration
 	revengeTriggered    bool
@@ -42,12 +41,10 @@ type Warrior struct {
 
 	BerserkerRage        *core.Spell
 	Bloodthirst          *core.Spell
-	Cleave               *core.Spell
 	DemoralizingShout    *core.Spell
 	Devastate            *core.Spell
 	Execute              *core.Spell
 	Hamstring            *core.Spell
-	HeroicStrike         *core.Spell
 	MortalStrike         *core.Spell
 	Overpower            *core.Spell
 	Rampage              *core.Spell
@@ -58,6 +55,10 @@ type Warrior struct {
 	SunderArmorDevastate *core.Spell
 	ThunderClap          *core.Spell
 	Whirlwind            *core.Spell
+
+	HeroicStrikeOrCleave *core.Spell
+	HSOrCleaveQueueAura  *core.Aura
+	HSRageThreshold      float64
 
 	BattleStanceAura    *core.Aura
 	DefensiveStanceAura *core.Aura
@@ -101,44 +102,43 @@ func (warrior *Warrior) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	}
 }
 
-func (warrior *Warrior) Init(sim *core.Simulation) {
+func (warrior *Warrior) Initialize() {
 	warrior.Shout = warrior.makeShoutSpell()
 
 	primaryTimer := warrior.NewTimer()
 	overpowerRevengeTimer := warrior.NewTimer()
 
-	warrior.registerStances(sim)
+	warrior.registerStances()
 	warrior.registerBerserkerRageSpell()
-	warrior.registerBloodthirstSpell(sim, primaryTimer)
-	warrior.registerCleaveSpell(sim)
-	warrior.registerDemoralizingShoutSpell(sim)
-	warrior.registerDevastateSpell(sim)
-	warrior.registerExecuteSpell(sim)
+	warrior.registerBloodthirstSpell(primaryTimer)
+	warrior.registerDemoralizingShoutSpell()
+	warrior.registerDevastateSpell()
+	warrior.registerExecuteSpell()
 	warrior.registerHamstringSpell()
-	warrior.registerHeroicStrikeSpell(sim)
-	warrior.registerMortalStrikeSpell(sim, primaryTimer)
+	warrior.registerMortalStrikeSpell(primaryTimer)
 	warrior.registerOverpowerSpell(overpowerRevengeTimer)
 	warrior.registerRampageSpell()
 	warrior.registerRevengeSpell(overpowerRevengeTimer)
-	warrior.registerShieldSlamSpell(sim, primaryTimer)
-	warrior.registerSlamSpell(sim)
-	warrior.registerThunderClapSpell(sim)
-	warrior.registerWhirlwindSpell(sim)
+	warrior.registerShieldSlamSpell(primaryTimer)
+	warrior.registerSlamSpell()
+	warrior.registerThunderClapSpell()
+	warrior.registerWhirlwindSpell()
 
-	warrior.SunderArmor = warrior.newSunderArmorSpell(sim, false)
-	warrior.SunderArmorDevastate = warrior.newSunderArmorSpell(sim, true)
+	warrior.SunderArmor = warrior.newSunderArmorSpell(false)
+	warrior.SunderArmorDevastate = warrior.newSunderArmorSpell(true)
 
 	warrior.BloodFrenzyAuras = nil
-	for i := int32(0); i < sim.GetNumTargets(); i++ {
-		target := sim.GetTarget(i)
+	for i := int32(0); i < warrior.Env.GetNumTargets(); i++ {
+		target := warrior.Env.GetTarget(i)
 		warrior.BloodFrenzyAuras = append(warrior.BloodFrenzyAuras, core.BloodFrenzyAura(target, warrior.Talents.BloodFrenzy))
 	}
 
 	warrior.shoutDuration = time.Duration(float64(time.Minute*2) * (1 + 0.1*float64(warrior.Talents.BoomingVoice)))
+
+	warrior.registerBloodrageCD()
 }
 
 func (warrior *Warrior) Reset(sim *core.Simulation) {
-	warrior.heroicStrikeQueued = false
 	warrior.revengeTriggered = false
 	warrior.overpowerValidUntil = 0
 	warrior.rampageValidUntil = 0

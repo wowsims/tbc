@@ -26,9 +26,9 @@ func RegisterRogue() {
 }
 
 const (
-	SpellFlagRogueAbility = core.SpellExtrasAgentReserved1
-	SpellFlagBuilder      = core.SpellExtrasAgentReserved1 | core.SpellExtrasAgentReserved2
-	SpellFlagFinisher     = core.SpellExtrasAgentReserved1 | core.SpellExtrasAgentReserved3
+	SpellFlagBuilder      = core.SpellExtrasAgentReserved1
+	SpellFlagFinisher     = core.SpellExtrasAgentReserved2
+	SpellFlagRogueAbility = SpellFlagBuilder | SpellFlagFinisher
 )
 
 type Rogue struct {
@@ -91,11 +91,6 @@ func (rogue *Rogue) GetRogue() *Rogue {
 func (rogue *Rogue) AddRaidBuffs(raidBuffs *proto.RaidBuffs)    {}
 func (rogue *Rogue) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {}
 
-func (rogue *Rogue) Finalize(raid *core.Raid) {
-	// Need to apply poisons now so we can check for WF totem.
-	rogue.applyPoisons()
-}
-
 func (rogue *Rogue) finisherFlags() core.SpellExtras {
 	flags := SpellFlagFinisher
 	if rogue.Talents.SurpriseAttacks {
@@ -110,19 +105,22 @@ func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) 
 	rogue.finishingMoveEffectApplier(sim, numPoints)
 }
 
-func (rogue *Rogue) Init(sim *core.Simulation) {
-	rogue.registerBackstabSpell(sim)
-	rogue.registerDeadlyPoisonSpell(sim)
+func (rogue *Rogue) Initialize() {
+	rogue.registerBackstabSpell()
+	rogue.registerDeadlyPoisonSpell()
 	rogue.registerEnvenom()
 	rogue.registerEviscerate()
-	rogue.registerExposeArmorSpell(sim)
-	rogue.registerHemorrhageSpell(sim)
-	rogue.registerInstantPoisonSpell(sim)
-	rogue.registerMutilateSpell(sim)
-	rogue.registerRupture(sim)
-	rogue.registerShivSpell(sim)
-	rogue.registerSinisterStrikeSpell(sim)
+	rogue.registerExposeArmorSpell()
+	rogue.registerHemorrhageSpell()
+	rogue.registerInstantPoisonSpell()
+	rogue.registerMutilateSpell()
+	rogue.registerRupture()
+	rogue.registerShivSpell()
+	rogue.registerSinisterStrikeSpell()
 	rogue.registerSliceAndDice()
+
+	rogue.registerThistleTeaCD()
+	rogue.applyPoisons()
 
 	switch rogue.Rotation.Builder {
 	case proto.Rogue_Rotation_SinisterStrike:
@@ -135,7 +133,7 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 		rogue.Builder = rogue.Mutilate
 	}
 
-	rogue.finishingMoveEffectApplier = rogue.makeFinishingMoveEffectApplier(sim)
+	rogue.finishingMoveEffectApplier = rogue.makeFinishingMoveEffectApplier()
 
 	rogue.energyPerSecondAvg = core.EnergyPerTick / core.EnergyTickDuration.Seconds()
 
@@ -146,7 +144,7 @@ func (rogue *Rogue) Init(sim *core.Simulation) {
 	energyForEA := rogue.Builder.DefaultCast.Cost*float64(comboPointsNeeded) + rogue.ExposeArmor.DefaultCast.Cost
 	rogue.eaBuildTime = time.Duration(((energyForEA - expectedEnergyAfterFinisher) / rogue.energyPerSecondAvg) * float64(time.Second))
 
-	rogue.DelayDPSCooldownsForArmorDebuffs(sim)
+	rogue.DelayDPSCooldownsForArmorDebuffs()
 }
 
 func (rogue *Rogue) Reset(sim *core.Simulation) {
@@ -268,8 +266,6 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 			return meleeCrit + (agility/40)*core.MeleeCritRatingPerCritChance
 		},
 	})
-
-	rogue.registerThistleTeaCD()
 
 	return rogue
 }

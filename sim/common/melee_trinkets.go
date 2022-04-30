@@ -112,7 +112,7 @@ func ApplyHandOfJustice(agent core.Agent) {
 			}
 			icd.Use(sim)
 
-			handOfJusticeSpell.Cast(sim, spellEffect.Target)
+			aura.Unit.AutoAttacks.MaybeReplaceMHSwing(sim, handOfJusticeSpell).SkipCastAndApplyEffects(sim, spellEffect.Target)
 		},
 	})
 }
@@ -181,7 +181,8 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 	})
 
 	spell := character.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
@@ -192,7 +193,6 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 				Timer:    character.GetOffensiveTrinketCD(),
 				Duration: time.Second * 30,
 			},
-			DisableCallbacks: true,
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {

@@ -19,8 +19,7 @@ type SpellConfig struct {
 
 	Cast CastConfig
 
-	ApplyEffects   ApplySpellEffects
-	DisableMetrics bool
+	ApplyEffects ApplySpellEffects
 }
 
 type SpellMetrics struct {
@@ -75,8 +74,6 @@ type Spell struct {
 
 	// The current or most recent cast data.
 	CurCast Cast
-
-	DisableMetrics bool
 }
 
 // Registers a new spell to the unit. Returns the newly created spell.
@@ -97,8 +94,7 @@ func (unit *Unit) RegisterSpell(config SpellConfig) *Spell {
 		CD:          config.Cast.CD,
 		SharedCD:    config.Cast.SharedCD,
 
-		ApplyEffects:   config.ApplyEffects,
-		DisableMetrics: config.DisableMetrics,
+		ApplyEffects: config.ApplyEffects,
 	}
 
 	spell.castFn = spell.makeCastFunc(config.Cast, spell.applyEffects)
@@ -152,9 +148,13 @@ func (spell *Spell) reset(sim *Simulation) {
 }
 
 func (spell *Spell) doneIteration() {
-	if !spell.DisableMetrics {
+	if !spell.SpellExtras.Matches(SpellExtrasNoMetrics) {
 		spell.Unit.Metrics.addSpell(spell)
 	}
+}
+
+func (spell *Spell) ReadyAt() time.Duration {
+	return BothTimersReadyAt(spell.CD.Timer, spell.SharedCD.Timer)
 }
 
 func (spell *Spell) IsReady(sim *Simulation) bool {
@@ -171,9 +171,9 @@ func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
 
 // Skips the actual cast and applies spell effects immediately.
 func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Target) {
-	if sim.Log != nil {
+	if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasNoLogs) {
 		spell.Unit.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
-			spell.ActionID, spell.DefaultCast.Cost, 0)
+			spell.ActionID, spell.DefaultCast.Cost, time.Duration(0))
 		spell.Unit.Log(sim, "Completed cast %s", spell.ActionID)
 	}
 	spell.applyEffects(sim, target)
@@ -267,12 +267,12 @@ func ApplyEffectFuncDamageMultipleTargeted(baseEffects []SpellEffect) ApplySpell
 		}
 	}
 }
-func ApplyEffectFuncAOEDamage(sim *Simulation, baseEffect SpellEffect) ApplySpellEffects {
-	numHits := sim.GetNumTargets()
+func ApplyEffectFuncAOEDamage(env *Environment, baseEffect SpellEffect) ApplySpellEffects {
+	numHits := env.GetNumTargets()
 	effects := make([]SpellEffect, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects[i] = baseEffect
-		effects[i].Target = sim.GetTarget(i)
+		effects[i].Target = env.GetTarget(i)
 	}
 	return ApplyEffectFuncDamageMultiple(effects)
 }
@@ -308,22 +308,22 @@ func applyAOECap(effects []SpellEffect, outcomeMultipliers []float64, aoeCap flo
 		effect.Damage *= capMultiplier
 	}
 }
-func ApplyEffectFuncAOEDamageCapped(sim *Simulation, aoeCap float64, baseEffect SpellEffect) ApplySpellEffects {
-	numHits := sim.GetNumTargets()
+func ApplyEffectFuncAOEDamageCapped(env *Environment, aoeCap float64, baseEffect SpellEffect) ApplySpellEffects {
+	numHits := env.GetNumTargets()
 	if numHits == 0 {
 		return nil
 	} else if numHits == 1 {
 		return ApplyEffectFuncDirectDamage(baseEffect)
 	} else if numHits < 4 {
 		// Just assume its impossible to hit AOE cap with <4 targets.
-		return ApplyEffectFuncAOEDamage(sim, baseEffect)
+		return ApplyEffectFuncAOEDamage(env, baseEffect)
 	}
 
 	baseEffects := make([]SpellEffect, numHits)
 	outcomeMultipliers := make([]float64, numHits)
 	for i := int32(0); i < numHits; i++ {
 		baseEffects[i] = baseEffect
-		baseEffects[i].Target = sim.GetTarget(i)
+		baseEffects[i].Target = env.GetTarget(i)
 	}
 
 	return func(sim *Simulation, _ *Target, spell *Spell) {

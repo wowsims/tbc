@@ -7,11 +7,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
+func (mage *Mage) registerFlamestrikeSpell() {
 	actionID := core.ActionID{SpellID: 27086}
 	baseCost := 1175.0
 
-	applyAOEDamage := core.ApplyEffectFuncAOEDamageCapped(sim, 7830, core.SpellEffect{
+	applyAOEDamage := core.ApplyEffectFuncAOEDamageCapped(mage.Env, 7830, core.SpellEffect{
 		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
 
 		BonusSpellCritRating: 0 +
@@ -59,7 +59,7 @@ func (mage *Mage) registerFlamestrikeSpell(sim *core.Simulation) {
 		}),
 		NumberOfTicks: 4,
 		TickLength:    time.Second * 2,
-		TickEffects: core.TickFuncAOESnapshot(sim, core.SpellEffect{
+		TickEffects: core.TickFuncAOESnapshot(mage.Env, core.SpellEffect{
 			DamageMultiplier: mage.spellDamageMultiplier * (1 + 0.02*float64(mage.Talents.FirePower)),
 
 			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),

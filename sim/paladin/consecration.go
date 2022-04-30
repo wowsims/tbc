@@ -10,7 +10,7 @@ import (
 
 // Maybe could switch "rank" parameter type to some proto thing. Would require updates to proto files.
 // Prot guys do whatever you want here I guess
-func (paladin *Paladin) RegisterConsecrationSpell(sim *core.Simulation, rank int32) {
+func (paladin *Paladin) RegisterConsecrationSpell(rank int32) {
 	var manaCost float64
 	var actionID core.ActionID
 	var baseDamage float64
@@ -49,11 +49,11 @@ func (paladin *Paladin) RegisterConsecrationSpell(sim *core.Simulation, rank int
 		}),
 		NumberOfTicks: 8,
 		TickLength:    time.Second * 1,
-		TickEffects: core.TickFuncAOESnapshot(sim, core.SpellEffect{
+		TickEffects: core.TickFuncAOESnapshot(paladin.Env, core.SpellEffect{
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(baseDamage, 0.119),
-			OutcomeApplier:   paladin.OutcomeFuncTick(),
+			OutcomeApplier:   paladin.OutcomeFuncMagicHit(),
 			IsPeriodic:       true,
 		}),
 	})

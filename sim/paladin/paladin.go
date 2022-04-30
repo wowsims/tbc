@@ -54,10 +54,16 @@ func (paladin *Paladin) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
-func (paladin *Paladin) Init(sim *core.Simulation) {
-	paladin.registerCrusaderStrikeSpell(sim)
-	paladin.registerExorcismSpell(sim)
-	paladin.registerJudgements(sim)
+func (paladin *Paladin) Initialize() {
+	paladin.setupSealOfBlood()
+	paladin.setupSealOfTheCrusader()
+	paladin.setupSealOfWisdom()
+	paladin.setupJudgementRefresh()
+
+	paladin.registerCrusaderStrikeSpell()
+	paladin.registerExorcismSpell()
+	paladin.registerJudgements()
+	paladin.registerAvengingWrathCD()
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {
@@ -101,14 +107,6 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 			return meleeCrit + (agility/25)*core.MeleeCritRatingPerCritChance
 		},
 	})
-
-	paladin.setupSealOfBlood()
-	paladin.setupSealOfTheCrusader()
-	paladin.setupSealOfWisdom()
-
-	paladin.registerAvengingWrathCD()
-
-	paladin.setupJudgementRefresh()
 
 	return paladin
 }

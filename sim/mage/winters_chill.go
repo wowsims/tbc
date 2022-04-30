@@ -5,7 +5,7 @@ import (
 )
 
 // Winters Chill has a separate hit check from frostbolt, so it needs its own spell.
-func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
+func (mage *Mage) registerWintersChillSpell() {
 	effect := core.SpellEffect{
 		ProcMask:            core.ProcMaskEmpty,
 		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
@@ -14,9 +14,9 @@ func (mage *Mage) registerWintersChillSpell(sim *core.Simulation) {
 	}
 
 	if mage.Talents.WintersChill > 0 {
-		wcAura := sim.GetPrimaryTarget().GetAura(core.WintersChillAuraLabel)
+		wcAura := mage.Env.GetPrimaryTarget().GetAura(core.WintersChillAuraLabel)
 		if wcAura == nil {
-			wcAura = core.WintersChillAura(sim.GetPrimaryTarget(), 0)
+			wcAura = core.WintersChillAura(mage.Env.GetPrimaryTarget(), 0)
 		}
 
 		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {

@@ -9,7 +9,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
+func (druid *Druid) registerMoonfireSpell() {
 	actionID := core.ActionID{SpellID: 26988}
 	baseCost := 495.0
 
@@ -42,7 +42,7 @@ func (druid *Druid) registerMoonfireSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := druid.Env.GetPrimaryTarget()
 	druid.MoonfireDot = core.NewDot(core.Dot{
 		Spell: druid.Moonfire,
 		Aura: target.RegisterAura(core.Aura{

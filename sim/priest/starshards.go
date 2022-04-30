@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
+func (priest *Priest) registerStarshardsSpell() {
 	actionID := core.ActionID{SpellID: 25446}
 	priest.Starshards = priest.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
@@ -35,7 +35,7 @@ func (priest *Priest) registerStarshardsSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := priest.Env.GetPrimaryTarget()
 	priest.StarshardsDot = core.NewDot(core.Dot{
 		Spell: priest.Starshards,
 		Aura: target.RegisterAura(core.Aura{

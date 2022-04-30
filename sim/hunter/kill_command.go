@@ -27,7 +27,7 @@ func (hunter *Hunter) applyKillCommand() {
 	})
 }
 
-func (hunter *Hunter) registerKillCommandSpell(sim *core.Simulation) {
+func (hunter *Hunter) registerKillCommandSpell() {
 	baseCost := 75.0
 
 	hunter.KillCommand = hunter.RegisterSpell(core.SpellConfig{
@@ -59,7 +59,7 @@ func (hunter *Hunter) registerKillCommandSpell(sim *core.Simulation) {
 	})
 }
 
-func (hp *HunterPet) registerKillCommandSpell(sim *core.Simulation) {
+func (hp *HunterPet) registerKillCommandSpell() {
 	var beastLordProcAura *core.Aura
 	if ItemSetBeastLord.CharacterHasSetBonus(&hp.hunterOwner.Character, 4) {
 		beastLordProcAura = hp.hunterOwner.NewTemporaryStatsAura("Beast Lord Proc", core.ActionID{SpellID: 37483}, stats.Stats{stats.ArmorPenetration: 600}, time.Second*15)

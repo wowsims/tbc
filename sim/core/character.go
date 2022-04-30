@@ -100,6 +100,7 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 	character.addUniversalStatDependencies()
 
 	character.PseudoStats.InFrontOfTarget = player.InFrontOfTarget
+	character.addEffectPets()
 
 	return character
 }
@@ -162,11 +163,20 @@ func (character *Character) applyItemEffects(agent Agent) {
 }
 
 func (character *Character) AddPet(pet PetAgent) {
-	if character.Unit.finalized {
-		panic("Pets must be added before finalization!")
+	if character.Env != nil {
+		panic("Pets must be added during construction!")
 	}
 
 	character.Pets = append(character.Pets, pet)
+}
+
+func (character *Character) GetPet(name string) PetAgent {
+	for _, petAgent := range character.Pets {
+		if petAgent.GetPet().Name == name {
+			return petAgent
+		}
+	}
+	panic(character.Name + " has no pet with name " + name)
 }
 
 func (character *Character) AddStats(stat stats.Stats) {
@@ -196,15 +206,6 @@ func (character *Character) AddStatsDynamic(sim *Simulation, stat stats.Stats) {
 	}
 }
 func (character *Character) AddStat(stat stats.Stat, amount float64) {
-	if character.Unit.finalized {
-		if stat == stats.Mana {
-			panic("Use AddMana!")
-		}
-		if stat == stats.MeleeHaste {
-			panic("Use AddMeleeHaste!")
-		}
-	}
-
 	character.stats[stat] += amount
 
 	if stat == stats.MP5 || stat == stats.Intellect || stat == stats.Spirit {
@@ -285,8 +286,12 @@ func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	}
 }
 
-func (character *Character) Finalize(raid *Raid) {
-	if character.Unit.finalized {
+func (character *Character) initialize() {
+	character.majorCooldownManager.initialize(character)
+}
+
+func (character *Character) Finalize() {
+	if character.Env.IsFinalized() {
 		return
 	}
 
@@ -296,15 +301,10 @@ func (character *Character) Finalize(raid *Raid) {
 	character.Unit.finalize()
 
 	character.majorCooldownManager.finalize(character)
-
-	for _, petAgent := range character.Pets {
-		petAgent.GetPet().Finalize(raid)
-	}
 }
 
 func (character *Character) init(sim *Simulation, agent Agent) {
 	character.Unit.init(sim)
-	agent.Init(sim)
 }
 
 func (character *Character) reset(sim *Simulation, agent Agent) {

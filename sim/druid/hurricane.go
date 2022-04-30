@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
+func (druid *Druid) registerHurricaneSpell() {
 	actionID := core.ActionID{SpellID: 27012}
 	baseCost := 1905.0
 
@@ -20,7 +20,7 @@ func (druid *Druid) registerHurricaneSpell(sim *core.Simulation) {
 		NumberOfTicks:       10,
 		TickLength:          time.Second * 1,
 		AffectedByCastSpeed: true,
-		TickEffects: core.TickFuncAOESnapshot(sim, core.SpellEffect{
+		TickEffects: core.TickFuncAOESnapshot(druid.Env, core.SpellEffect{
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(206, 0.107),

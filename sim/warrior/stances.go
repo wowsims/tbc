@@ -19,19 +19,19 @@ func (warrior *Warrior) StanceMatches(other Stance) bool {
 	return (warrior.Stance & other) != 0
 }
 
-func (warrior *Warrior) makeStanceSpell(sim *core.Simulation, stance Stance, aura *core.Aura, stanceCD *core.Timer) *core.Spell {
+func (warrior *Warrior) makeStanceSpell(stance Stance, aura *core.Aura, stanceCD *core.Timer) *core.Spell {
 	maxRetainedRage := 10.0 + 5*float64(warrior.Talents.TacticalMastery)
 	actionID := aura.ActionID
 
 	return warrior.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    stanceCD,
 				Duration: time.Second,
 			},
-			DisableCallbacks: true,
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
@@ -111,12 +111,12 @@ func (warrior *Warrior) registerBerserkerStanceAura() {
 	})
 }
 
-func (warrior *Warrior) registerStances(sim *core.Simulation) {
+func (warrior *Warrior) registerStances() {
 	stanceCD := warrior.NewTimer()
 	warrior.registerBattleStanceAura()
 	warrior.registerDefensiveStanceAura()
 	warrior.registerBerserkerStanceAura()
-	warrior.BattleStance = warrior.makeStanceSpell(sim, BattleStance, warrior.BattleStanceAura, stanceCD)
-	warrior.DefensiveStance = warrior.makeStanceSpell(sim, DefensiveStance, warrior.DefensiveStanceAura, stanceCD)
-	warrior.BerserkerStance = warrior.makeStanceSpell(sim, BerserkerStance, warrior.BerserkerStanceAura, stanceCD)
+	warrior.BattleStance = warrior.makeStanceSpell(BattleStance, warrior.BattleStanceAura, stanceCD)
+	warrior.DefensiveStance = warrior.makeStanceSpell(DefensiveStance, warrior.DefensiveStanceAura, stanceCD)
+	warrior.BerserkerStance = warrior.makeStanceSpell(BerserkerStance, warrior.BerserkerStanceAura, stanceCD)
 }
