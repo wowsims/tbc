@@ -444,7 +444,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-Mana-EtchedRegalia"
  value: {
-  dps: 1472.7415342666407
+  dps: 1472.6195369807858
  }
 }
 dps_results: {
@@ -468,7 +468,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 1999.1345584050757
+  dps: 2000.7242512276405
  }
 }
 dps_results: {
@@ -504,7 +504,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-Quagmirran'sEye-27683"
  value: {
-  dps: 1983.1150606451952
+  dps: 1983.3880803332283
  }
 }
 dps_results: {
@@ -594,7 +594,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 1751.9568680059515
+  dps: 1751.8594325272602
  }
 }
 dps_results: {

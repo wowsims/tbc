@@ -90,9 +90,6 @@ func (warrior *Warrior) QueueHSOrCleave(sim *core.Simulation) {
 	if warrior.HSOrCleaveQueueAura.IsActive() {
 		return
 	}
-	if sim.Log != nil {
-		warrior.Log(sim, "Heroic Strike / Cleave queued.")
-	}
 	warrior.HSOrCleaveQueueAura.Activate(sim)
 	warrior.PseudoStats.DisableDWMissPenalty = true
 }
@@ -100,15 +97,18 @@ func (warrior *Warrior) QueueHSOrCleave(sim *core.Simulation) {
 func (warrior *Warrior) DequeueHSOrCleave(sim *core.Simulation) {
 	warrior.HSOrCleaveQueueAura.Deactivate(sim)
 	warrior.PseudoStats.DisableDWMissPenalty = false
-	if sim.Log != nil {
-		warrior.Log(sim, "Heroic Strike / Cleave dequeued.")
-	}
 }
 
 // Returns true if the regular melee swing should be used, false otherwise.
-func (warrior *Warrior) TryHSOrCleave(sim *core.Simulation) *core.Spell {
+func (warrior *Warrior) TryHSOrCleave(sim *core.Simulation, mhSwingSpell *core.Spell) *core.Spell {
 	if !warrior.HSOrCleaveQueueAura.IsActive() {
 		return nil
+	}
+
+	if mhSwingSpell != warrior.AutoAttacks.MHAuto {
+		// This happens for extra MH attack procs, like sword specialization / windfury.
+		// Rage is not consumed in these cases so just return the spell.
+		return warrior.HeroicStrikeOrCleave
 	}
 
 	warrior.DequeueHSOrCleave(sim)

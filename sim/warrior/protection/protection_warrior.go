@@ -56,12 +56,12 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 		MainHand:       war.WeaponFromMainHand(war.DefaultMeleeCritMultiplier()),
 		OffHand:        war.WeaponFromOffHand(war.DefaultMeleeCritMultiplier()),
 		AutoSwingMelee: true,
-		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
+		ReplaceMHSwing: func(sim *core.Simulation, mhSwingSpell *core.Spell) *core.Spell {
 			if war.CurrentRage() < war.HSRageThreshold {
 				war.DequeueHSOrCleave(sim)
 				return nil
 			} else {
-				return war.TryHSOrCleave(sim)
+				return war.TryHSOrCleave(sim, mhSwingSpell)
 			}
 		},
 	})

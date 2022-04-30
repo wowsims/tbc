@@ -173,7 +173,7 @@ func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
 func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Target) {
 	if sim.Log != nil {
 		spell.Unit.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
-			spell.ActionID, spell.DefaultCast.Cost, 0)
+			spell.ActionID, spell.DefaultCast.Cost, time.Duration(0))
 		spell.Unit.Log(sim, "Completed cast %s", spell.ActionID)
 	}
 	spell.applyEffects(sim, target)
