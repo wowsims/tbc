@@ -202,13 +202,13 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 	})
 
 	spell := shaman.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    cdTimer,
 				Duration: cd,
 			},
-			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			shaman.ElementalMasteryAura.Activate(sim)
@@ -247,13 +247,13 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 	})
 
 	spell := shaman.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    cdTimer,
 				Duration: cd,
 			},
-			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			shaman.NaturesSwiftnessAura.Activate(sim)

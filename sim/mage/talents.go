@@ -154,13 +154,13 @@ func (mage *Mage) registerPresenceOfMindCD() {
 	actionID := core.ActionID{SpellID: 12043}
 
 	spell := mage.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    mage.NewTimer(),
 				Duration: cooldown,
 			},
-			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			var spell *core.Spell
@@ -229,13 +229,13 @@ func (mage *Mage) registerArcanePowerCD() {
 	})
 
 	spell := mage.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    mage.NewTimer(),
 				Duration: time.Minute * 3,
 			},
-			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			apAura.Activate(sim)
@@ -327,10 +327,10 @@ func (mage *Mage) registerCombustionCD() {
 	})
 
 	spell := mage.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 		Cast: core.CastConfig{
-			CD:               cd,
-			DisableCallbacks: true,
+			CD: cd,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			aura.Activate(sim)
@@ -368,7 +368,9 @@ func (mage *Mage) registerIcyVeinsCD() {
 	})
 
 	mage.IcyVeins = mage.RegisterSpell(core.SpellConfig{
-		ActionID:     actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
+
 		ResourceType: stats.Mana,
 		BaseCost:     manaCost,
 
@@ -380,7 +382,6 @@ func (mage *Mage) registerIcyVeinsCD() {
 				Timer:    mage.NewTimer(),
 				Duration: time.Minute * 3,
 			},
-			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			icyVeinsAura.Activate(sim)
@@ -414,14 +415,14 @@ func (mage *Mage) registerColdSnapCD() {
 	actionID := core.ActionID{SpellID: 11958}
 
 	spell := mage.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    mage.NewTimer(),
 				Duration: cooldown,
 			},
-			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			if mage.IcyVeins != nil {

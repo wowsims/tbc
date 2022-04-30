@@ -76,10 +76,8 @@ func (priest *Priest) registerShadowfiendSpell() {
 	})
 
 	priest.AddMajorCooldown(core.MajorCooldown{
-		ActionID: actionID,
-		Cooldown: priest.Shadowfiend.CD,
-		UsesGCD:  true,
-		Type:     core.CooldownTypeMana,
+		Spell: priest.Shadowfiend,
+		Type:  core.CooldownTypeMana,
 		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
 			if character.CurrentMana() < 575 {
 				return false
@@ -93,14 +91,6 @@ func (priest *Priest) registerShadowfiendSpell() {
 			}
 
 			return true
-		},
-		ActivationFactory: func(sim *core.Simulation) core.CooldownActivation {
-			return func(sim *core.Simulation, character *core.Character) {
-				priest.Shadowfiend.Cast(sim, sim.GetPrimaryTarget())
-
-				// All MCDs that use the GCD and have a non-zero cast time must call this.
-				priest.UpdateMajorCooldowns()
-			}
 		},
 	})
 }

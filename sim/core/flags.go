@@ -158,13 +158,16 @@ func (se SpellExtras) Matches(other SpellExtras) bool {
 }
 
 const (
-	SpellExtrasNone            SpellExtras = 0
-	SpellExtrasIgnoreResists   SpellExtras = 1 << iota // skip spell resist/armor
-	SpellExtrasCannotBeDodged                          // Ignores dodge in physical hit rolls
-	SpellExtrasBinary                                  // Does not do partial resists and could need a different hit roll.
-	SpellExtrasChanneled                               // Spell is channeled
-	SpellExtrasIgnoreModifiers                         // Only used by Ignite
-	SpellExtrasMeleeMetrics                            // Marks a spell as a melee ability for metrics.
+	SpellExtrasNone             SpellExtras = 0
+	SpellExtrasIgnoreResists    SpellExtras = 1 << iota // skip spell resist/armor
+	SpellExtrasCannotBeDodged                           // Ignores dodge in physical hit rolls
+	SpellExtrasBinary                                   // Does not do partial resists and could need a different hit roll.
+	SpellExtrasChanneled                                // Spell is channeled
+	SpellExtrasIgnoreModifiers                          // Only used by Ignite
+	SpellExtrasMeleeMetrics                             // Marks a spell as a melee ability for metrics.
+	SpellExtrasNoOnCastComplete                         // Disables OnCastComplete callbacks.
+	SpellExtrasNoMetrics                                // Disables metrics for a spell.
+	SpellExtrasNoLogs                                   // Disables logs for a spell.
 
 	// Used to let agents categorize their spells.
 	SpellExtrasAgentReserved1

@@ -32,13 +32,13 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 	})
 
 	spell := shaman.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    shaman.NewTimer(),
 				Duration: time.Minute * 2,
 			},
-			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			srAura.Activate(sim)

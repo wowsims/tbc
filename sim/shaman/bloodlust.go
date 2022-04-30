@@ -18,11 +18,6 @@ func (shaman *Shaman) registerBloodlustCD() {
 	}
 	actionID := shaman.BloodlustActionID()
 
-	var bloodlustMCD *core.MajorCooldown
-	shaman.RegisterResetEffect(func(_ *core.Simulation) {
-		bloodlustMCD = shaman.GetMajorCooldown(actionID)
-	})
-
 	blAuras := []*core.Aura{}
 	for _, partyMember := range shaman.Party.Players {
 		blAuras = append(blAuras, core.BloodlustAura(partyMember.GetCharacter(), actionID.Tag))
@@ -43,13 +38,6 @@ func (shaman *Shaman) registerBloodlustCD() {
 			CD: core.Cooldown{
 				Timer:    shaman.NewTimer(),
 				Duration: core.BloodlustCD,
-			},
-
-			ModifyCast: func(_ *core.Simulation, _ *core.Spell, cast *core.Cast) {
-				// Needed because of the interaction between enhance GCD scheduler and other bloodlusts.
-				if !bloodlustMCD.UsesGCD {
-					cast.GCD = 0
-				}
 			},
 		},
 
