@@ -423,7 +423,7 @@ type externalConsecutiveCDApproximation struct {
 // E.g. the number of other shaman in the group using bloodlust.
 func registerExternalConsecutiveCDApproximation(agent Agent, config externalConsecutiveCDApproximation, numSources int32) {
 	if numSources == 0 {
-		return
+		panic("Need at least 1 source!")
 	}
 	character := agent.GetCharacter()
 
@@ -486,6 +486,10 @@ const BloodlustDuration = time.Second * 40
 const BloodlustCD = time.Minute * 10
 
 func registerBloodlustCD(agent Agent, numBloodlusts int32) {
+	if numBloodlusts == 0 {
+		return
+	}
+
 	bloodlustAura := BloodlustAura(agent.GetCharacter(), -1)
 
 	registerExternalConsecutiveCDApproximation(
@@ -549,6 +553,10 @@ const PowerInfusionDuration = time.Second * 15
 const PowerInfusionCD = time.Minute * 3
 
 func registerPowerInfusionCD(agent Agent, numPowerInfusions int32) {
+	if numPowerInfusions == 0 {
+		return
+	}
+
 	piAura := PowerInfusionAura(agent.GetCharacter(), -1)
 
 	registerExternalConsecutiveCDApproximation(
@@ -613,6 +621,10 @@ func InnervateManaThreshold(character *Character) float64 {
 }
 
 func registerInnervateCD(agent Agent, numInnervates int32) {
+	if numInnervates == 0 {
+		return
+	}
+
 	innervateThreshold := 0.0
 	expectedManaPerInnervate := 0.0
 	remainingInnervateUsages := 0
@@ -697,6 +709,10 @@ func ManaTideTotemAmount(character *Character) float64 {
 }
 
 func registerManaTideTotemCD(agent Agent, numManaTideTotems int32) {
+	if numManaTideTotems == 0 {
+		return
+	}
+
 	expectedManaPerManaTideTotem := 0.0
 	remainingManaTideTotemUsages := 0
 	initialDelay := time.Duration(0)
