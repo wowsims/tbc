@@ -50,9 +50,6 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 		AutoSwingMelee: true,
 	})
 
-	// Setup Seal of Command after autos are enabled so that the PPM works
-	ret.SetupSealOfCommand()
-
 	return ret
 }
 
@@ -75,6 +72,9 @@ func (ret *RetributionPaladin) GetPaladin() *paladin.Paladin {
 
 func (ret *RetributionPaladin) Initialize() {
 	ret.Paladin.Initialize()
+
+	// Setup Seal of Command after autos are enabled so that the PPM works
+	ret.SetupSealOfCommand()
 
 	// Register Consecration here so we can setup the right rank based on UI input
 	switch ret.Rotation.ConsecrationRank {
