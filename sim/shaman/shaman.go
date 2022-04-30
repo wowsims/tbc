@@ -194,14 +194,18 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		}
 		partyBuffs.GraceOfAirTotem = core.MaxTristate(partyBuffs.GraceOfAirTotem, value)
 	case proto.AirTotem_WindfuryTotem:
+		break
+	case proto.AirTotem_TranquilAirTotem:
+		partyBuffs.TranquilAirTotem = true
+	}
+
+	if shaman.Totems.TwistWindfury || shaman.Totems.Air == proto.AirTotem_WindfuryTotem {
 		if shaman.Totems.WindfuryTotemRank > partyBuffs.WindfuryTotemRank {
 			partyBuffs.WindfuryTotemRank = shaman.Totems.WindfuryTotemRank
 			partyBuffs.WindfuryTotemIwt = shaman.Talents.ImprovedWeaponTotems
 		} else if shaman.Totems.WindfuryTotemRank == partyBuffs.WindfuryTotemRank {
 			partyBuffs.WindfuryTotemIwt = core.MaxInt32(partyBuffs.WindfuryTotemIwt, shaman.Talents.ImprovedWeaponTotems)
 		}
-	case proto.AirTotem_TranquilAirTotem:
-		partyBuffs.TranquilAirTotem = true
 	}
 
 	switch shaman.Totems.Earth {
