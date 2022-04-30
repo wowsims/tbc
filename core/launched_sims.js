@@ -12,4 +12,5 @@ export const launchedSpecs = [
     Spec.SpecShadowPriest,
     Spec.SpecSmitePriest,
     Spec.SpecWarrior,
+    Spec.SpecRetributionPaladin,
 ];
