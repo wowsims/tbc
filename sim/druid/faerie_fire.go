@@ -8,9 +8,9 @@ import (
 
 var FaerieFireActionID = core.ActionID{SpellID: 26993}
 
-func (druid *Druid) registerFaerieFireSpell(sim *core.Simulation) {
+func (druid *Druid) registerFaerieFireSpell() {
 	baseCost := 145.0
-	druid.FaerieFireAura = core.FaerieFireAura(sim.GetPrimaryTarget(), druid.Talents.ImprovedFaerieFire)
+	druid.FaerieFireAura = core.FaerieFireAura(druid.Env.GetPrimaryTarget(), druid.Talents.ImprovedFaerieFire)
 
 	druid.FaerieFire = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    FaerieFireActionID,

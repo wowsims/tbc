@@ -159,7 +159,7 @@ func (gs *GCDScheduler) scheduleAfter(newAbility ScheduledAbility, desiredIndex 
 
 // Schedules a group of abilities that must be cast back-to-back.
 // Most settings are taken from the first ability.
-func (gs *GCDScheduler) ScheduleGroup(sim *core.Simulation, newAbilities []ScheduledAbility) time.Duration {
+func (gs *GCDScheduler) ScheduleGroup(newAbilities []ScheduledAbility) time.Duration {
 	if len(newAbilities) == 0 {
 		panic("Empty ability group!")
 	}
@@ -214,7 +214,7 @@ func (gs *GCDScheduler) ScheduleGroup(sim *core.Simulation, newAbilities []Sched
 
 // Takes ownership of a MCD, adding it to the schedule and removing it from the
 // character's managed cooldowns.
-func (gs *GCDScheduler) ScheduleMCD(sim *core.Simulation, character *core.Character, mcdID core.ActionID) {
+func (gs *GCDScheduler) ScheduleMCD(character *core.Character, mcdID core.ActionID) {
 	mcd := character.GetInitialMajorCooldown(mcdID)
 	if !mcd.ActionID.SameAction(mcdID) {
 		return
@@ -237,7 +237,7 @@ func (gs *GCDScheduler) ScheduleMCD(sim *core.Simulation, character *core.Charac
 	}
 	timings := mcd.GetTimings()
 	curTime := time.Duration(0)
-	maxDuration := sim.GetMaxDuration()
+	maxDuration := character.Env.GetMaxDuration()
 	i := 0
 	if len(timings) > 0 {
 		curTime = core.MaxDuration(curTime, timings[0])

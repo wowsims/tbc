@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warlock *Warlock) registerIncinerateSpell(sim *core.Simulation) {
+func (warlock *Warlock) registerIncinerateSpell() {
 	baseCost := 355.0
 	has4pMal := ItemSetMaleficRaiment.CharacterHasSetBonus(&warlock.Character, 4)
 

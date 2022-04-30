@@ -6,7 +6,7 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOverload bool) *core.Spell {
+func (shaman *Shaman) newChainLightningSpell(isLightningOverload bool) *core.Spell {
 	spellConfig := shaman.newElectricSpellConfig(
 		core.ActionID{SpellID: 25442},
 		760.0,
@@ -44,16 +44,16 @@ func (shaman *Shaman) newChainLightningSpell(sim *core.Simulation, isLightningOv
 	}
 
 	hasTidefury := ItemSetTidefury.CharacterHasSetBonus(&shaman.Character, 2)
-	numHits := core.MinInt32(3, sim.GetNumTargets())
+	numHits := core.MinInt32(3, shaman.Env.GetNumTargets())
 	effects := make([]core.SpellEffect, 0, numHits)
 
-	effect.Target = sim.GetTarget(0)
+	effect.Target = shaman.Env.GetTarget(0)
 	effect.OnSpellHit = makeOnSpellHit(0)
 	effects = append(effects, effect)
 
 	for i := int32(1); i < numHits; i++ {
 		bounceEffect := effects[i-1] // Makes a copy of the previous bounce
-		bounceEffect.Target = sim.GetTarget(i)
+		bounceEffect.Target = shaman.Env.GetTarget(i)
 		if hasTidefury {
 			bounceEffect.DamageMultiplier *= 0.83
 		} else {

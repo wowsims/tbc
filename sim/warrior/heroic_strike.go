@@ -6,7 +6,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warrior *Warrior) registerHeroicStrikeSpell(_ *core.Simulation) {
+func (warrior *Warrior) registerHeroicStrikeSpell() {
 	cost := 15.0 - float64(warrior.Talents.ImprovedHeroicStrike) - float64(warrior.Talents.FocusedRage)
 	refundAmount := cost * 0.8
 

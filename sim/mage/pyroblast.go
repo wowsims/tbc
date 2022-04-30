@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
+func (mage *Mage) registerPyroblastSpell() {
 	actionID := core.ActionID{SpellID: 33938}
 	baseCost := 500.0
 
@@ -54,7 +54,7 @@ func (mage *Mage) registerPyroblastSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := mage.Env.GetPrimaryTarget()
 	mage.PyroblastDot = core.NewDot(core.Dot{
 		Spell: mage.Pyroblast,
 		Aura: target.RegisterAura(core.Aura{

@@ -97,15 +97,15 @@ func (hp *HunterPet) GetPet() *core.Pet {
 	return &hp.Pet
 }
 
-func (hp *HunterPet) Init(sim *core.Simulation) {
-	hp.registerKillCommandSpell(sim)
+func (hp *HunterPet) Initialize() {
+	hp.registerKillCommandSpell()
 
 	if hp.hunterOwner.Options.PetSingleAbility {
-		hp.primaryAbility = hp.NewPetAbility(sim, hp.config.SecondaryAbility, true)
+		hp.primaryAbility = hp.NewPetAbility(hp.config.SecondaryAbility, true)
 		hp.config.RandomSelection = false
 	} else {
-		hp.primaryAbility = hp.NewPetAbility(sim, hp.config.PrimaryAbility, true)
-		hp.secondaryAbility = hp.NewPetAbility(sim, hp.config.SecondaryAbility, false)
+		hp.primaryAbility = hp.NewPetAbility(hp.config.PrimaryAbility, true)
+		hp.secondaryAbility = hp.NewPetAbility(hp.config.SecondaryAbility, false)
 	}
 }
 

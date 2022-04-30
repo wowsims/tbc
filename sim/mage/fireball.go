@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
+func (mage *Mage) registerFireballSpell() {
 	actionID := core.ActionID{SpellID: 27070}
 	baseCost := 425.0
 
@@ -56,7 +56,7 @@ func (mage *Mage) registerFireballSpell(sim *core.Simulation) {
 		}),
 	})
 
-	target := sim.GetPrimaryTarget()
+	target := mage.Env.GetPrimaryTarget()
 	mage.FireballDot = core.NewDot(core.Dot{
 		Spell: mage.Fireball,
 		Aura: target.RegisterAura(core.Aura{

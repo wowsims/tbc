@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
+func (mage *Mage) registerBlizzardSpell() {
 	actionID := core.ActionID{SpellID: 27085}
 	baseCost := 1645.0
 
@@ -19,7 +19,7 @@ func (mage *Mage) registerBlizzardSpell(sim *core.Simulation) {
 		NumberOfTicks:       8,
 		TickLength:          time.Second * 1,
 		AffectedByCastSpeed: true,
-		TickEffects: core.TickFuncAOESnapshotCapped(sim, 3620, core.SpellEffect{
+		TickEffects: core.TickFuncAOESnapshotCapped(mage.Env, 3620, core.SpellEffect{
 			DamageMultiplier: mage.spellDamageMultiplier *
 				(1 + 0.02*float64(mage.Talents.PiercingIce)) *
 				(1 + 0.01*float64(mage.Talents.ArcticWinds)),

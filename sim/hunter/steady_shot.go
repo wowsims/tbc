@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (hunter *Hunter) registerSteadyShotSpell(sim *core.Simulation) {
+func (hunter *Hunter) registerSteadyShotSpell() {
 	baseCost := 110.0
 
 	hunter.SteadyShot = hunter.RegisterSpell(core.SpellConfig{
@@ -45,7 +45,7 @@ func (hunter *Hunter) registerSteadyShotSpell(sim *core.Simulation) {
 				},
 				TargetSpellCoefficient: 1,
 			}),
-			OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, sim.GetPrimaryTarget())),
+			OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, hunter.Env.GetPrimaryTarget())),
 
 			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				hunter.killCommandBlocked = false

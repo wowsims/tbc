@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (priest *Priest) registerMindBlastSpell(sim *core.Simulation) {
+func (priest *Priest) registerMindBlastSpell() {
 	baseCost := 450.0
 
 	priest.MindBlast = priest.RegisterSpell(core.SpellConfig{

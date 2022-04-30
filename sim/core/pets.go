@@ -60,18 +60,11 @@ func (gft *GnomishFlameTurret) GetPet() *Pet {
 	return &gft.Pet
 }
 
-func (gft *GnomishFlameTurret) Init(sim *Simulation) {
-	gft.registerFlameCannonSpell(sim)
+func (gft *GnomishFlameTurret) Initialize() {
+	gft.registerFlameCannonSpell()
 }
 
-func (gft *GnomishFlameTurret) Reset(sim *Simulation) {
-}
-
-func (gft *GnomishFlameTurret) OnGCDReady(sim *Simulation) {
-	gft.FlameCannon.Cast(sim, sim.GetPrimaryTarget())
-}
-
-func (gft *GnomishFlameTurret) registerFlameCannonSpell(sim *Simulation) {
+func (gft *GnomishFlameTurret) registerFlameCannonSpell() {
 	gft.FlameCannon = gft.RegisterSpell(SpellConfig{
 		ActionID:    ActionID{SpellID: 30527},
 		SpellSchool: SpellSchoolFire,
@@ -94,4 +87,11 @@ func (gft *GnomishFlameTurret) registerFlameCannonSpell(sim *Simulation) {
 			OutcomeApplier: gft.OutcomeFuncMagicHitAndCrit(gft.DefaultSpellCritMultiplier()),
 		}),
 	})
+}
+
+func (gft *GnomishFlameTurret) Reset(sim *Simulation) {
+}
+
+func (gft *GnomishFlameTurret) OnGCDReady(sim *Simulation) {
+	gft.FlameCannon.Cast(sim, sim.GetPrimaryTarget())
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warlock *Warlock) registerCorruptionSpell(sim *core.Simulation) {
+func (warlock *Warlock) registerCorruptionSpell() {
 	actionID := core.ActionID{SpellID: 27216}
 	baseCost := 370.0
 
@@ -30,7 +30,7 @@ func (warlock *Warlock) registerCorruptionSpell(sim *core.Simulation) {
 			OnSpellHit:     applyDotOnLanded(&warlock.CorruptionDot),
 		}),
 	})
-	target := sim.GetPrimaryTarget()
+	target := warlock.Env.GetPrimaryTarget()
 	spellCoefficient := 0.156 + (0.12 * float64(warlock.Talents.EmpoweredCorruption))
 
 	warlock.CorruptionDot = core.NewDot(core.Dot{

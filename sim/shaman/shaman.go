@@ -225,31 +225,33 @@ func (shaman *Shaman) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	}
 }
 
-func (shaman *Shaman) Init(sim *core.Simulation) {
+func (shaman *Shaman) Initialize() {
 	// Precompute all the spell templates.
-	shaman.registerStormstrikeSpell(sim)
-	shaman.LightningBolt = shaman.newLightningBoltSpell(sim, false)
-	shaman.LightningBoltLO = shaman.newLightningBoltSpell(sim, true)
+	shaman.registerStormstrikeSpell()
+	shaman.LightningBolt = shaman.newLightningBoltSpell(false)
+	shaman.LightningBoltLO = shaman.newLightningBoltSpell(true)
 
-	shaman.ChainLightning = shaman.newChainLightningSpell(sim, false)
-	numHits := core.MinInt32(3, sim.GetNumTargets())
+	shaman.ChainLightning = shaman.newChainLightningSpell(false)
+	numHits := core.MinInt32(3, shaman.Env.GetNumTargets())
 	shaman.ChainLightningLOs = []*core.Spell{}
 	for i := int32(0); i < numHits; i++ {
-		shaman.ChainLightningLOs = append(shaman.ChainLightningLOs, shaman.newChainLightningSpell(sim, true))
+		shaman.ChainLightningLOs = append(shaman.ChainLightningLOs, shaman.newChainLightningSpell(true))
 	}
 
-	shaman.registerShocks(sim)
-	shaman.registerGraceOfAirTotemSpell(sim)
-	shaman.registerMagmaTotemSpell(sim)
-	shaman.registerManaSpringTotemSpell(sim)
-	shaman.registerNovaTotemSpell(sim)
-	shaman.registerSearingTotemSpell(sim)
-	shaman.registerStrengthOfEarthTotemSpell(sim)
-	shaman.registerTotemOfWrathSpell(sim)
-	shaman.registerTranquilAirTotemSpell(sim)
-	shaman.registerTremorTotemSpell(sim)
-	shaman.registerWindfuryTotemSpell(sim, shaman.Totems.WindfuryTotemRank)
-	shaman.registerWrathOfAirTotemSpell(sim)
+	shaman.registerShocks()
+	shaman.registerGraceOfAirTotemSpell()
+	shaman.registerMagmaTotemSpell()
+	shaman.registerManaSpringTotemSpell()
+	shaman.registerNovaTotemSpell()
+	shaman.registerSearingTotemSpell()
+	shaman.registerStrengthOfEarthTotemSpell()
+	shaman.registerTotemOfWrathSpell()
+	shaman.registerTranquilAirTotemSpell()
+	shaman.registerTremorTotemSpell()
+	shaman.registerWindfuryTotemSpell(shaman.Totems.WindfuryTotemRank)
+	shaman.registerWrathOfAirTotemSpell()
+
+	shaman.registerBloodlustCD()
 }
 
 func (shaman *Shaman) Reset(sim *core.Simulation) {

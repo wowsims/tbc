@@ -5,7 +5,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
+func (warrior *Warrior) registerDemoralizingShoutSpell() {
 	cost := 10.0
 	cost -= float64(warrior.Talents.FocusedRage)
 	if ItemSetBoldArmor.CharacterHasSetBonus(&warrior.Character, 2) {
@@ -18,11 +18,11 @@ func (warrior *Warrior) registerDemoralizingShoutSpell(sim *core.Simulation) {
 		OutcomeApplier:   warrior.OutcomeFuncMagicHit(),
 	}
 
-	numHits := sim.GetNumTargets()
+	numHits := warrior.Env.GetNumTargets()
 	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
-		effects[i].Target = sim.GetTarget(i)
+		effects[i].Target = warrior.Env.GetTarget(i)
 
 		demoShoutAura := core.DemoralizingShoutAura(effects[i].Target, warrior.Talents.BoomingVoice, warrior.Talents.ImprovedDemoralizingShout)
 		if i == 0 {

@@ -48,10 +48,10 @@ func (env *Environment) construct(raidProto proto.Raid, encounterProto proto.Enc
 	env.Raid.updatePlayersAndPets()
 
 	for _, unit := range env.Raid.AllUnits {
-		unit.Environment = env
+		unit.Env = env
 	}
 	for _, target := range env.Encounter.Targets {
-		target.Environment = env
+		target.Env = env
 	}
 
 	env.State = Constructed
@@ -59,15 +59,33 @@ func (env *Environment) construct(raidProto proto.Raid, encounterProto proto.Enc
 
 // The initialization phase.
 func (env *Environment) initialize(raidProto proto.Raid, encounterProto proto.Encounter) {
+	for _, party := range env.Raid.Parties {
+		for _, playerOrPet := range party.PlayersAndPets {
+			playerOrPet.GetCharacter().initialize()
+		}
+	}
+
+	env.Raid.applyCharacterEffects(raidProto)
+
+	for _, party := range env.Raid.Parties {
+		for _, playerOrPet := range party.PlayersAndPets {
+			playerOrPet.Initialize()
+		}
+	}
+
 	env.State = Initialized
 }
 
 // The finalization phase.
 func (env *Environment) finalize(raidProto proto.Raid, encounterProto proto.Encounter) {
 	env.Encounter.finalize()
-	env.Raid.finalize(raidProto)
+	env.Raid.finalize()
 
 	env.State = Finalized
+}
+
+func (env *Environment) IsFinalized() bool {
+	return env.State >= Finalized
 }
 
 // The maximum possible duration for any iteration.

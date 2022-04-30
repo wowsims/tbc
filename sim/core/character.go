@@ -163,7 +163,7 @@ func (character *Character) applyItemEffects(agent Agent) {
 }
 
 func (character *Character) AddPet(pet PetAgent) {
-	if character.Environment != nil {
+	if character.Env != nil {
 		panic("Pets must be added during construction!")
 	}
 
@@ -206,15 +206,6 @@ func (character *Character) AddStatsDynamic(sim *Simulation, stat stats.Stats) {
 	}
 }
 func (character *Character) AddStat(stat stats.Stat, amount float64) {
-	if character.Unit.finalized {
-		if stat == stats.Mana {
-			panic("Use AddMana!")
-		}
-		if stat == stats.MeleeHaste {
-			panic("Use AddMeleeHaste!")
-		}
-	}
-
 	character.stats[stat] += amount
 
 	if stat == stats.MP5 || stat == stats.Intellect || stat == stats.Spirit {
@@ -295,8 +286,12 @@ func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	}
 }
 
-func (character *Character) Finalize(raid *Raid) {
-	if character.Unit.finalized {
+func (character *Character) initialize() {
+	character.majorCooldownManager.initialize(character)
+}
+
+func (character *Character) Finalize() {
+	if character.Env.IsFinalized() {
 		return
 	}
 
@@ -308,13 +303,12 @@ func (character *Character) Finalize(raid *Raid) {
 	character.majorCooldownManager.finalize(character)
 
 	for _, petAgent := range character.Pets {
-		petAgent.GetPet().Finalize(raid)
+		petAgent.GetPet().Finalize()
 	}
 }
 
 func (character *Character) init(sim *Simulation, agent Agent) {
 	character.Unit.init(sim)
-	agent.Init(sim)
 }
 
 func (character *Character) reset(sim *Simulation, agent Agent) {

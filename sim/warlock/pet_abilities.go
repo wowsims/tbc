@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 type PetAbilityType byte
@@ -16,62 +17,52 @@ const (
 	Firebolt
 )
 
-type PetAbility struct {
-	Type     PetAbilityType
-	ActionID core.ActionID
-
-	// Mana cost
-	Cost float64
-	CD   core.Cooldown
-	Cast func(target *core.Target)
-}
-
 // Returns whether the ability was successfully cast.
-func (ability *PetAbility) TryCast(sim *core.Simulation, target *core.Target, wp *WarlockPet) bool {
-	if wp.CurrentMana() < ability.Cost {
+func (wp *WarlockPet) TryCast(sim *core.Simulation, target *core.Target, spell *core.Spell) bool {
+	if wp.CurrentMana() < spell.DefaultCast.Cost {
 		return false
 	}
-	if ability.CD.Duration != 0 && !ability.CD.IsReady(sim) {
+	if !spell.IsReady(sim) {
 		return false
 	}
 
-	wp.SpendMana(sim, ability.Cost, ability.ActionID)
-	ability.Cast(target)
+	spell.Cast(sim, target)
 	return true
 }
 
-func (wp *WarlockPet) NewPetAbility(sim *core.Simulation, abilityType PetAbilityType, isPrimary bool) PetAbility {
+func (wp *WarlockPet) NewPetAbility(abilityType PetAbilityType, isPrimary bool) *core.Spell {
 	switch abilityType {
 	case Cleave:
-		return wp.newCleave(sim)
+		return wp.newCleave()
 	case Intercept:
-		return wp.newIntercept(sim)
+		return wp.newIntercept()
 	case LashOfPain:
-		return wp.newLashOfPain(sim)
+		return wp.newLashOfPain()
 	case Firebolt:
-		return wp.newFirebolt(sim)
+		return wp.newFirebolt()
 	case Unknown:
-		return PetAbility{}
+		return nil
 	default:
 		panic("Invalid pet ability type")
 	}
 }
 
-func (wp *WarlockPet) newIntercept(sim *core.Simulation) PetAbility {
-	return PetAbility{}
+func (wp *WarlockPet) newIntercept() *core.Spell {
+	return nil
 }
-func (wp *WarlockPet) newFirebolt(sim *core.Simulation) PetAbility {
-	actionID := core.ActionID{SpellID: 27267}
-	pa := PetAbility{
-		ActionID: actionID,
-		Cost:     190,
-	}
 
-	spell := wp.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
+func (wp *WarlockPet) newFirebolt() *core.Spell {
+	baseCost := 190.0
+	return wp.RegisterSpell(core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: 27267},
 		SpellSchool: core.SpellSchoolFire,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
+				Cost:     baseCost,
 				GCD:      core.GCDDefault,
 				CastTime: time.Millisecond*2000 - (time.Millisecond * time.Duration(250*wp.owner.Talents.ImprovedFirebolt)),
 			},
@@ -85,36 +76,27 @@ func (wp *WarlockPet) newFirebolt(sim *core.Simulation) PetAbility {
 			OutcomeApplier:   wp.OutcomeFuncMagicHitAndCrit(2),
 		}),
 	})
-
-	pa.Cast = func(target *core.Target) {
-		spell.Cast(sim, target)
-	}
-	return pa
 }
-func (wp *WarlockPet) newCleave(sim *core.Simulation) PetAbility {
-	actionID := core.ActionID{SpellID: 30223}
-	cd := core.Cooldown{
-		Timer:    wp.NewTimer(),
-		Duration: time.Second * 6,
-	}
-
-	pa := PetAbility{
-		ActionID: actionID,
-		Cost:     295, // 10% of base
-		CD:       cd,
-	}
-
-	spell := wp.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
+func (wp *WarlockPet) newCleave() *core.Spell {
+	baseCost := 295.0 // 10% of base
+	return wp.RegisterSpell(core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: 30223},
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				GCD: core.GCDDefault,
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
 			},
 			IgnoreHaste: true,
-			CD:          cd,
+			CD: core.Cooldown{
+				Timer:    wp.NewTimer(),
+				Duration: time.Second * 6,
+			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
@@ -124,35 +106,27 @@ func (wp *WarlockPet) newCleave(sim *core.Simulation) PetAbility {
 			OutcomeApplier:   wp.OutcomeFuncMeleeSpecialHitAndCrit(2),
 		}),
 	})
-
-	pa.Cast = func(target *core.Target) {
-		spell.Cast(sim, target)
-	}
-	return pa
 }
 
-func (wp *WarlockPet) newLashOfPain(sim *core.Simulation) PetAbility {
-	actionID := core.ActionID{SpellID: 27274}
-	cd := core.Cooldown{
-		Timer:    wp.NewTimer(),
-		Duration: time.Second*12 - (time.Second * time.Duration(3*wp.owner.Talents.ImprovedLashOfPain)),
-	}
-
-	pa := PetAbility{
-		ActionID: actionID,
-		Cost:     190,
-		CD:       cd,
-	}
-
-	spell := wp.RegisterSpell(core.SpellConfig{
-		ActionID:    actionID,
+func (wp *WarlockPet) newLashOfPain() *core.Spell {
+	baseCost := 190.0
+	return wp.RegisterSpell(core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: 27274},
 		SpellSchool: core.SpellSchoolShadow,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
 		Cast: core.CastConfig{
 			DefaultCast: core.Cast{
-				GCD: core.GCDDefault,
+				Cost: baseCost,
+				GCD:  core.GCDDefault,
 			},
 			IgnoreHaste: true,
-			CD:          cd,
+			CD: core.Cooldown{
+				Timer:    wp.NewTimer(),
+				Duration: time.Second*12 - (time.Second * time.Duration(3*wp.owner.Talents.ImprovedLashOfPain)),
+			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskSpellDamage,
@@ -162,9 +136,4 @@ func (wp *WarlockPet) newLashOfPain(sim *core.Simulation) PetAbility {
 			OutcomeApplier:   wp.OutcomeFuncMagicHitAndCrit(2),
 		}),
 	})
-
-	pa.Cast = func(target *core.Target) {
-		spell.Cast(sim, target)
-	}
-	return pa
 }

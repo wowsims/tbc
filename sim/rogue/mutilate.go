@@ -64,7 +64,7 @@ func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
 	})
 }
 
-func (rogue *Rogue) registerMutilateSpell(_ *core.Simulation) {
+func (rogue *Rogue) registerMutilateSpell() {
 	mhHitSpell := rogue.newMutilateHitSpell(true)
 	ohHitSpell := rogue.newMutilateHitSpell(false)
 

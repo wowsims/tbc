@@ -8,7 +8,7 @@ import (
 )
 
 // newLightningBoltTemplate returns a cast generator for Lightning Bolt with as many fields precomputed as possible.
-func (shaman *Shaman) newLightningBoltSpell(sim *core.Simulation, isLightningOverload bool) *core.Spell {
+func (shaman *Shaman) newLightningBoltSpell(isLightningOverload bool) *core.Spell {
 	baseCost := 300.0
 	if shaman.Equip[items.ItemSlotRanged].ID == TotemOfThePulsingEarth {
 		baseCost -= 27.0

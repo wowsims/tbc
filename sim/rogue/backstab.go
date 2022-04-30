@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (rogue *Rogue) registerBackstabSpell(_ *core.Simulation) {
+func (rogue *Rogue) registerBackstabSpell() {
 	baseCost := 60.0
 	refundAmount := baseCost * 0.8
 

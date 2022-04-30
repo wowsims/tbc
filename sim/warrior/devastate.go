@@ -6,7 +6,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (warrior *Warrior) registerDevastateSpell(_ *core.Simulation) {
+func (warrior *Warrior) registerDevastateSpell() {
 	cost := 15.0 - float64(warrior.Talents.ImprovedSunderArmor) - float64(warrior.Talents.FocusedRage)
 	refundAmount := cost * 0.8
 

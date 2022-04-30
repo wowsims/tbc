@@ -59,7 +59,7 @@ func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
 	})
 }
 
-func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
+func (shaman *Shaman) registerStormstrikeSpell() {
 	mhHit := shaman.newStormstrikeHitSpell(true)
 	ohHit := shaman.newStormstrikeHitSpell(false)
 
@@ -68,7 +68,7 @@ func (shaman *Shaman) registerStormstrikeSpell(sim *core.Simulation) {
 		baseCost -= 22
 	}
 
-	ssDebuffAura := shaman.stormstrikeDebuffAura(sim.GetPrimaryTarget())
+	ssDebuffAura := shaman.stormstrikeDebuffAura(shaman.Env.GetPrimaryTarget())
 
 	var skyshatterAura *core.Aura
 	if ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4) {

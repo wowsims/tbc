@@ -12,7 +12,7 @@ func (rogue *Rogue) SinisterStrikeEnergyCost() float64 {
 	return []float64{45, 42, 40}[rogue.Talents.ImprovedSinisterStrike]
 }
 
-func (rogue *Rogue) registerSinisterStrikeSpell(_ *core.Simulation) {
+func (rogue *Rogue) registerSinisterStrikeSpell() {
 	energyCost := rogue.SinisterStrikeEnergyCost()
 	refundAmount := energyCost * 0.8
 

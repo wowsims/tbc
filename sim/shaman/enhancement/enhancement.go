@@ -93,12 +93,12 @@ func (enh *EnhancementShaman) GetShaman() *shaman.Shaman {
 	return enh.Shaman
 }
 
-func (enh *EnhancementShaman) Init(sim *core.Simulation) {
-	enh.Shaman.Init(sim)
-	enh.DelayDPSCooldownsForArmorDebuffs(sim)
+func (enh *EnhancementShaman) Initialize() {
+	enh.Shaman.Initialize()
+	enh.DelayDPSCooldownsForArmorDebuffs()
 
 	// Fill the GCD schedule based on our settings.
-	maxDuration := sim.GetMaxDuration()
+	maxDuration := enh.Env.GetMaxDuration()
 
 	var curTime time.Duration
 
@@ -168,13 +168,13 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 
 	// We need to directly manage all GCD-bound CDs ourself.
 	if enh.Consumes.Drums == proto.Drums_DrumsOfBattle {
-		enh.scheduler.ScheduleMCD(sim, enh.GetCharacter(), core.DrumsOfBattleActionID)
+		enh.scheduler.ScheduleMCD(enh.GetCharacter(), core.DrumsOfBattleActionID)
 	} else if enh.Consumes.Drums == proto.Drums_DrumsOfRestoration {
-		enh.scheduler.ScheduleMCD(sim, enh.GetCharacter(), core.DrumsOfRestorationActionID)
+		enh.scheduler.ScheduleMCD(enh.GetCharacter(), core.DrumsOfRestorationActionID)
 	} else if enh.Consumes.Drums == proto.Drums_DrumsOfWar {
-		enh.scheduler.ScheduleMCD(sim, enh.GetCharacter(), core.DrumsOfWarActionID)
+		enh.scheduler.ScheduleMCD(enh.GetCharacter(), core.DrumsOfWarActionID)
 	}
-	enh.scheduler.ScheduleMCD(sim, enh.GetCharacter(), enh.BloodlustActionID())
+	enh.scheduler.ScheduleMCD(enh.GetCharacter(), enh.BloodlustActionID())
 
 	scheduleTotem := func(duration time.Duration, prioritizeEarlier bool, precast bool, tryCast func(sim *core.Simulation) (bool, float64)) {
 		totemAction := common.ScheduledAbility{
@@ -380,7 +380,7 @@ func (enh *EnhancementShaman) Init(sim *core.Simulation) {
 				ability.MinCastAt = curTime - time.Second*8
 				ability.MaxCastAt = curTime + time.Second*20
 				defaultAbility := defaultAction
-				castAt := enh.scheduler.ScheduleGroup(sim, []common.ScheduledAbility{ability, defaultAbility})
+				castAt := enh.scheduler.ScheduleGroup([]common.ScheduledAbility{ability, defaultAbility})
 				if castAt == common.Unresolved {
 					panic(fmt.Sprintf("No timeslot found for air totem, desired: %s", curTime))
 				}
