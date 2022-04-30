@@ -26,9 +26,9 @@ func RegisterRogue() {
 }
 
 const (
-	SpellFlagRogueAbility = core.SpellExtrasAgentReserved1
-	SpellFlagBuilder      = core.SpellExtrasAgentReserved1 | core.SpellExtrasAgentReserved2
-	SpellFlagFinisher     = core.SpellExtrasAgentReserved1 | core.SpellExtrasAgentReserved3
+	SpellFlagBuilder      = core.SpellExtrasAgentReserved1
+	SpellFlagFinisher     = core.SpellExtrasAgentReserved2
+	SpellFlagRogueAbility = SpellFlagBuilder | SpellFlagFinisher
 )
 
 type Rogue struct {
