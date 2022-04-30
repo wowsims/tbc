@@ -4,6 +4,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import {
 	classColors,
 	getSpecSiteUrl,
+	naturalSpecOrder,
 	raidSimSiteUrl,
 	specNames,
 	specToClass,
@@ -41,14 +42,16 @@ export class Title extends Component {
 			event.preventDefault();
 		});
 
+		const orderedLaunchedSpecs = naturalSpecOrder.filter(spec => launchedSpecs.includes(spec));
+
 		let currentOption = null;
 		let otherOptions = [];
 		if (currentSpec == null) {
 			currentOption = this.makeOptionData(null, true);
-			otherOptions = launchedSpecs.map(spec => this.makeOptionData(spec, false));
+			otherOptions = orderedLaunchedSpecs.map(spec => this.makeOptionData(spec, false));
 		} else {
 			currentOption = this.makeOptionData(currentSpec, true);
-			otherOptions = launchedSpecs
+			otherOptions = orderedLaunchedSpecs
 				.filter(spec => spec != currentSpec)
 				.map(spec => this.makeOptionData(spec, false))
 				.concat([this.makeOptionData(null, false)]);
