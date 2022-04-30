@@ -216,7 +216,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-DarkmoonCard:Wrath-31857"
  value: {
-  dps: 1382.7960433633614
+  dps: 1382.8724461141867
  }
 }
 dps_results: {
@@ -492,7 +492,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 1413.7915244165533
+  dps: 1413.5994699443734
  }
 }
 dps_results: {
@@ -672,7 +672,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-TsunamiTalisman-30627"
  value: {
-  dps: 1414.1580605854751
+  dps: 1414.1895668010995
  }
 }
 dps_results: {

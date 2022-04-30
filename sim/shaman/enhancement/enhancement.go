@@ -97,6 +97,12 @@ func (enh *EnhancementShaman) Initialize() {
 	enh.Shaman.Initialize()
 	enh.DelayDPSCooldownsForArmorDebuffs()
 
+	// This needs to be called after DPS cooldowns are delayed, which also happens
+	// after finalization.
+	enh.Env.RegisterPostFinalizeEffect(enh.SetupRotationSchedule)
+}
+
+func (enh *EnhancementShaman) SetupRotationSchedule() {
 	// Fill the GCD schedule based on our settings.
 	maxDuration := enh.Env.GetMaxDuration()
 

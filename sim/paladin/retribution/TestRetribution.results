@@ -642,7 +642,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-TheDecapitator-28767"
  value: {
-  dps: 2068.481499600899
+  dps: 2070.27272629802
  }
 }
 dps_results: {
@@ -732,7 +732,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-SelfDrums-DPS"
  value: {
-  dps: 2032.000703076202
+  dps: 2033.8556944042093
  }
 }
 dps_results: {

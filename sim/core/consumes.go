@@ -162,10 +162,8 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	}
 	applyAdamantiteSharpeningStoneAura(character, consumes, allowMHImbue)
 
-	character.RegisterFinalizeEffect(func() {
-		registerPotionCD(agent, consumes)
-		registerConjuredCD(agent, consumes)
-	})
+	registerPotionCD(agent, consumes)
+	registerConjuredCD(agent, consumes)
 	registerDrumsCD(agent, partyBuffs, consumes)
 	registerExplosivesCD(agent, consumes)
 }

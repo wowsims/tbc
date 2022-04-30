@@ -85,31 +85,29 @@ func applyRaceEffects(agent Agent) {
 			}
 		}
 
-		character.RegisterFinalizeEffect(func() {
-			// Blood Fury
-			actionID := ActionID{SpellID: 33697}
-			apBonus := float64(character.Level)*4 + 2
-			spBonus := float64(character.Level)*2 + 3
-			bloodFuryAura := character.NewTemporaryStatsAura("Blood Fury", actionID, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus, stats.SpellPower: spBonus}, time.Second*15)
+		// Blood Fury
+		actionID := ActionID{SpellID: 33697}
+		apBonus := float64(character.Level)*4 + 2
+		spBonus := float64(character.Level)*2 + 3
+		bloodFuryAura := character.NewTemporaryStatsAura("Blood Fury", actionID, stats.Stats{stats.AttackPower: apBonus, stats.RangedAttackPower: apBonus, stats.SpellPower: spBonus}, time.Second*15)
 
-			spell := character.RegisterSpell(SpellConfig{
-				ActionID: actionID,
-				Cast: CastConfig{
-					CD: Cooldown{
-						Timer:    character.NewTimer(),
-						Duration: time.Minute * 2,
-					},
-					DisableCallbacks: true,
+		spell := character.RegisterSpell(SpellConfig{
+			ActionID: actionID,
+			Cast: CastConfig{
+				CD: Cooldown{
+					Timer:    character.NewTimer(),
+					Duration: time.Minute * 2,
 				},
-				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
-					bloodFuryAura.Activate(sim)
-				},
-			})
+				DisableCallbacks: true,
+			},
+			ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+				bloodFuryAura.Activate(sim)
+			},
+		})
 
-			character.AddMajorCooldown(MajorCooldown{
-				Spell: spell,
-				Type:  CooldownTypeDPS,
-			})
+		character.AddMajorCooldown(MajorCooldown{
+			Spell: spell,
+			Type:  CooldownTypeDPS,
 		})
 
 		// Axe specialization

@@ -184,21 +184,14 @@ func (aura *Aura) ExpiresAt() time.Duration {
 
 type AuraFactory func(*Simulation) *Aura
 
-// Callbacks for doing something on finalize/reset.
-type FinalizeEffect func()
+// Callback for doing something on reset.
 type ResetEffect func(*Simulation)
 
 // auraTracker is a centralized implementation of CD and Aura tracking.
 //  This is used by all Units.
 type auraTracker struct {
-	// Effects to invoke when the Unit is finalized.
-	finalizeEffects []FinalizeEffect
-
 	// Effects to invoke on every sim reset.
 	resetEffects []ResetEffect
-
-	// Whether finalize() has been called for this object.
-	finalized bool
 
 	// Maps MagicIDs to sim duration at which CD is done. Using array for perf.
 	cooldowns []time.Duration
@@ -222,7 +215,6 @@ type auraTracker struct {
 
 func newAuraTracker() auraTracker {
 	return auraTracker{
-		finalizeEffects:       []FinalizeEffect{},
 		resetEffects:          []ResetEffect{},
 		activeAuras:           make([]*Aura, 0, 16),
 		onCastCompleteAuras:   make([]*Aura, 0, 16),
@@ -318,33 +310,8 @@ func (at *auraTracker) HasActiveAuraWithTag(tag string) bool {
 
 // Registers a callback to this Character which will be invoked on
 // every Sim reset.
-func (at *auraTracker) RegisterFinalizeEffect(finalizeEffect FinalizeEffect) {
-	if at.finalized {
-		panic("Finalize effects may not be added once finalized!")
-	}
-
-	at.finalizeEffects = append(at.finalizeEffects, finalizeEffect)
-}
-
-// Registers a callback to this Character which will be invoked on
-// every Sim reset.
 func (at *auraTracker) RegisterResetEffect(resetEffect ResetEffect) {
-	if at.finalized {
-		panic("Reset effects may not be added once finalized!")
-	}
-
 	at.resetEffects = append(at.resetEffects, resetEffect)
-}
-
-func (at *auraTracker) finalize() {
-	if at.finalized {
-		return
-	}
-	at.finalized = true
-
-	for _, finalizeEffect := range at.finalizeEffects {
-		finalizeEffect()
-	}
 }
 
 func (at *auraTracker) init(sim *Simulation) {

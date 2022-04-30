@@ -600,7 +600,7 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-SelfDrums-DPS"
  value: {
-  dps: 1219.9111196763974
+  dps: 1219.8657441222908
  }
 }
 dps_results: {

@@ -170,8 +170,6 @@ type majorCooldownManager struct {
 	// the same cooldows as initialMajorCooldowns, but the order will change over
 	// the course of the sim.
 	majorCooldowns []*MajorCooldown
-
-	delayDPSCooldowns bool
 }
 
 func newMajorCooldownManager(cooldowns *proto.Cooldowns) majorCooldownManager {
@@ -213,10 +211,6 @@ func (mcdm *majorCooldownManager) finalize(character *Character) {
 		}
 	}
 
-	if mcdm.delayDPSCooldowns {
-		mcdm.delayDPSCooldownsForArmorDebuffsInternal()
-	}
-
 	mcdm.majorCooldowns = make([]*MajorCooldown, len(mcdm.initialMajorCooldowns))
 }
 
@@ -225,16 +219,19 @@ func (mcdm *majorCooldownManager) finalize(character *Character) {
 //
 // This function should be called from Agent.Init().
 func (mcdm *majorCooldownManager) DelayDPSCooldownsForArmorDebuffs() {
-	mcdm.delayDPSCooldowns = mcdm.character.Env.GetPrimaryTarget().HasAuraWithTag(SunderExposeAuraTag)
-}
-func (mcdm *majorCooldownManager) delayDPSCooldownsForArmorDebuffsInternal() {
-	const delay = time.Second * 10
-	for i, _ := range mcdm.initialMajorCooldowns {
-		mcd := &mcdm.initialMajorCooldowns[i]
-		if len(mcd.timings) == 0 && mcd.Type == CooldownTypeDPS {
-			mcd.timings = append(mcd.timings, delay)
-		}
+	if !mcdm.character.Env.GetPrimaryTarget().HasAuraWithTag(SunderExposeAuraTag) {
+		return
 	}
+
+	mcdm.character.Env.RegisterPostFinalizeEffect(func() {
+		const delay = time.Second * 10
+		for i, _ := range mcdm.initialMajorCooldowns {
+			mcd := &mcdm.initialMajorCooldowns[i]
+			if len(mcd.timings) == 0 && mcd.Type == CooldownTypeDPS {
+				mcd.timings = append(mcd.timings, delay)
+			}
+		}
+	})
 }
 
 func (mcdm *majorCooldownManager) reset(sim *Simulation) {
