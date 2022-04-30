@@ -238,14 +238,6 @@ func (raid *Raid) applyCharacterEffects(raidConfig proto.Raid) {
 	}
 }
 
-func (raid *Raid) finalize() {
-	for _, party := range raid.Parties {
-		for _, player := range party.Players {
-			player.GetCharacter().Finalize()
-		}
-	}
-}
-
 func (raid Raid) AddStats(s stats.Stats) {
 	for _, party := range raid.Parties {
 		party.AddStats(s)

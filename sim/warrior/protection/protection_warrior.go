@@ -23,6 +23,13 @@ func RegisterProtectionWarrior() {
 	)
 }
 
+type ProtectionWarrior struct {
+	*warrior.Warrior
+
+	Rotation proto.ProtectionWarrior_Rotation
+	Options  proto.ProtectionWarrior_Options
+}
+
 func NewProtectionWarrior(character core.Character, options proto.Player) *ProtectionWarrior {
 	warOptions := options.GetProtectionWarrior()
 
@@ -50,20 +57,11 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 		OffHand:        war.WeaponFromOffHand(war.DefaultMeleeCritMultiplier()),
 		AutoSwingMelee: true,
 		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
-			if war.Rotation.UseCleave {
-				if war.CurrentRage() < float64(war.Rotation.HsRageThreshold) {
-					war.DequeueCleave(sim)
-					return nil
-				} else {
-					return war.TryCleave(sim)
-				}
+			if war.CurrentRage() < war.HSRageThreshold {
+				war.DequeueHSOrCleave(sim)
+				return nil
 			} else {
-				if war.CurrentRage() < float64(war.Rotation.HsRageThreshold) {
-					war.DequeueHeroicStrike(sim)
-					return nil
-				} else {
-					return war.TryHeroicStrike(sim)
-				}
+				return war.TryHSOrCleave(sim)
 			}
 		},
 	})
@@ -71,15 +69,14 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 	return war
 }
 
-type ProtectionWarrior struct {
-	*warrior.Warrior
-
-	Rotation proto.ProtectionWarrior_Rotation
-	Options  proto.ProtectionWarrior_Options
-}
-
 func (war *ProtectionWarrior) GetWarrior() *warrior.Warrior {
 	return war.Warrior
+}
+
+func (war *ProtectionWarrior) Initialize() {
+	war.Warrior.Initialize()
+
+	war.RegisterHSOrCleave(war.Rotation.UseCleave, float64(war.Rotation.HsRageThreshold))
 }
 
 func (war *ProtectionWarrior) Reset(sim *core.Simulation) {

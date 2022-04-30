@@ -25,7 +25,6 @@ type Warrior struct {
 
 	// Current state
 	Stance              Stance
-	heroicStrikeQueued  bool
 	overpowerValidUntil time.Duration
 	rampageValidUntil   time.Duration
 	revengeTriggered    bool
@@ -42,12 +41,10 @@ type Warrior struct {
 
 	BerserkerRage        *core.Spell
 	Bloodthirst          *core.Spell
-	Cleave               *core.Spell
 	DemoralizingShout    *core.Spell
 	Devastate            *core.Spell
 	Execute              *core.Spell
 	Hamstring            *core.Spell
-	HeroicStrike         *core.Spell
 	MortalStrike         *core.Spell
 	Overpower            *core.Spell
 	Rampage              *core.Spell
@@ -58,6 +55,10 @@ type Warrior struct {
 	SunderArmorDevastate *core.Spell
 	ThunderClap          *core.Spell
 	Whirlwind            *core.Spell
+
+	HeroicStrikeOrCleave *core.Spell
+	HSOrCleaveQueueAura  *core.Aura
+	HSRageThreshold      float64
 
 	BattleStanceAura    *core.Aura
 	DefensiveStanceAura *core.Aura
@@ -110,12 +111,10 @@ func (warrior *Warrior) Initialize() {
 	warrior.registerStances()
 	warrior.registerBerserkerRageSpell()
 	warrior.registerBloodthirstSpell(primaryTimer)
-	warrior.registerCleaveSpell()
 	warrior.registerDemoralizingShoutSpell()
 	warrior.registerDevastateSpell()
 	warrior.registerExecuteSpell()
 	warrior.registerHamstringSpell()
-	warrior.registerHeroicStrikeSpell()
 	warrior.registerMortalStrikeSpell(primaryTimer)
 	warrior.registerOverpowerSpell(overpowerRevengeTimer)
 	warrior.registerRampageSpell()
@@ -140,7 +139,6 @@ func (warrior *Warrior) Initialize() {
 }
 
 func (warrior *Warrior) Reset(sim *core.Simulation) {
-	warrior.heroicStrikeQueued = false
 	warrior.revengeTriggered = false
 	warrior.overpowerValidUntil = 0
 	warrior.rampageValidUntil = 0

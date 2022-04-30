@@ -84,8 +84,20 @@ func (env *Environment) initialize(raidProto proto.Raid, encounterProto proto.En
 
 // The finalization phase.
 func (env *Environment) finalize(raidProto proto.Raid, encounterProto proto.Encounter) {
-	env.Encounter.finalize()
-	env.Raid.finalize()
+	for _, target := range env.Encounter.Targets {
+		target.finalize()
+	}
+
+	for _, party := range env.Raid.Parties {
+		for _, player := range party.Players {
+			character := player.GetCharacter()
+			character.Finalize()
+
+			for _, petAgent := range character.Pets {
+				petAgent.GetPet().Finalize()
+			}
+		}
+	}
 
 	for _, finalizeEffect := range env.postFinalizeEffects {
 		finalizeEffect()

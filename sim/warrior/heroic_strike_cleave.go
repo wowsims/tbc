@@ -1,0 +1,140 @@
+package warrior
+
+import (
+	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
+)
+
+func (warrior *Warrior) registerHeroicStrikeSpell() {
+	cost := 15.0 - float64(warrior.Talents.ImprovedHeroicStrike) - float64(warrior.Talents.FocusedRage)
+	refundAmount := cost * 0.8
+
+	warrior.HeroicStrikeOrCleave = warrior.RegisterSpell(core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: 29707},
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Rage,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: cost,
+			},
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask: core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
+
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			FlatThreatBonus:  194,
+
+			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 176, 1, true),
+			OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+
+			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+				}
+			},
+		}),
+	})
+}
+
+func (warrior *Warrior) registerCleaveSpell() {
+	cost := 20.0 - float64(warrior.Talents.FocusedRage)
+
+	flatDamageBonus := 70 * (1 + 0.4*float64(warrior.Talents.ImprovedCleave))
+	baseEffect := core.SpellEffect{
+		ProcMask: core.ProcMaskMeleeMHAuto | core.ProcMaskMeleeMHSpecial,
+
+		DamageMultiplier: 1,
+		ThreatMultiplier: 1,
+		FlatThreatBonus:  125,
+
+		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, flatDamageBonus, 1, true),
+		OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+	}
+
+	numHits := core.MinInt32(2, warrior.Env.GetNumTargets())
+	effects := make([]core.SpellEffect, 0, numHits)
+	for i := int32(0); i < numHits; i++ {
+		effects = append(effects, baseEffect)
+		effects[i].Target = warrior.Env.GetTarget(i)
+	}
+
+	warrior.HeroicStrikeOrCleave = warrior.RegisterSpell(core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: 25231},
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Rage,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: cost,
+			},
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDamageMultiple(effects),
+	})
+}
+
+func (warrior *Warrior) QueueHSOrCleave(sim *core.Simulation) {
+	if warrior.CurrentRage() < warrior.HeroicStrikeOrCleave.DefaultCast.Cost {
+		panic("Not enough rage for HS")
+	}
+	if warrior.HSOrCleaveQueueAura.IsActive() {
+		return
+	}
+	if sim.Log != nil {
+		warrior.Log(sim, "Heroic Strike / Cleave queued.")
+	}
+	warrior.HSOrCleaveQueueAura.Activate(sim)
+	warrior.PseudoStats.DisableDWMissPenalty = true
+}
+
+func (warrior *Warrior) DequeueHSOrCleave(sim *core.Simulation) {
+	warrior.HSOrCleaveQueueAura.Deactivate(sim)
+	warrior.PseudoStats.DisableDWMissPenalty = false
+	if sim.Log != nil {
+		warrior.Log(sim, "Heroic Strike / Cleave dequeued.")
+	}
+}
+
+// Returns true if the regular melee swing should be used, false otherwise.
+func (warrior *Warrior) TryHSOrCleave(sim *core.Simulation) *core.Spell {
+	if !warrior.HSOrCleaveQueueAura.IsActive() {
+		return nil
+	}
+
+	warrior.DequeueHSOrCleave(sim)
+	if warrior.CurrentRage() < warrior.HeroicStrikeOrCleave.DefaultCast.Cost {
+		return nil
+	}
+
+	return warrior.HeroicStrikeOrCleave
+}
+
+func (warrior *Warrior) ShouldQueueHSOrCleave(sim *core.Simulation) bool {
+	return warrior.CurrentRage() >= warrior.HSRageThreshold
+}
+
+func (warrior *Warrior) RegisterHSOrCleave(useCleave bool, rageThreshold float64) {
+	if useCleave {
+		warrior.registerCleaveSpell()
+	} else {
+		warrior.registerHeroicStrikeSpell()
+	}
+
+	warrior.HSOrCleaveQueueAura = warrior.RegisterAura(core.Aura{
+		Label:    "HS Queue Aura",
+		ActionID: warrior.HeroicStrikeOrCleave.ActionID,
+		Duration: core.NeverExpires,
+	})
+
+	warrior.HSRageThreshold = core.MaxFloat(warrior.HeroicStrikeOrCleave.DefaultCast.Cost, rageThreshold)
+}

@@ -44,15 +44,7 @@ func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 }
 
 func (war *ProtectionWarrior) tryQueueHsCleave(sim *core.Simulation) {
-	if war.CurrentRage() >= float64(war.Rotation.HsRageThreshold) {
-		if war.Rotation.UseCleave {
-			if war.CanCleave(sim) {
-				war.QueueCleave(sim)
-			}
-		} else {
-			if war.CanHeroicStrike(sim) {
-				war.QueueHeroicStrike(sim)
-			}
-		}
+	if war.ShouldQueueHSOrCleave(sim) {
+		war.QueueHSOrCleave(sim)
 	}
 }
