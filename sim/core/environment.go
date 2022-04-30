@@ -26,7 +26,6 @@ type Environment struct {
 
 	BaseDuration      time.Duration // base duration
 	DurationVariation time.Duration // variation per duration
-	Duration          time.Duration // Duration of current iteration
 
 	// Effects to invoke when the Env is finalized.
 	postFinalizeEffects []PostFinalizeEffect

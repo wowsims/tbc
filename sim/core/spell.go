@@ -19,8 +19,7 @@ type SpellConfig struct {
 
 	Cast CastConfig
 
-	ApplyEffects   ApplySpellEffects
-	DisableMetrics bool
+	ApplyEffects ApplySpellEffects
 }
 
 type SpellMetrics struct {
@@ -75,8 +74,6 @@ type Spell struct {
 
 	// The current or most recent cast data.
 	CurCast Cast
-
-	DisableMetrics bool
 }
 
 // Registers a new spell to the unit. Returns the newly created spell.
@@ -97,8 +94,7 @@ func (unit *Unit) RegisterSpell(config SpellConfig) *Spell {
 		CD:          config.Cast.CD,
 		SharedCD:    config.Cast.SharedCD,
 
-		ApplyEffects:   config.ApplyEffects,
-		DisableMetrics: config.DisableMetrics,
+		ApplyEffects: config.ApplyEffects,
 	}
 
 	spell.castFn = spell.makeCastFunc(config.Cast, spell.applyEffects)
@@ -152,9 +148,13 @@ func (spell *Spell) reset(sim *Simulation) {
 }
 
 func (spell *Spell) doneIteration() {
-	if !spell.DisableMetrics {
+	if !spell.SpellExtras.Matches(SpellExtrasNoMetrics) {
 		spell.Unit.Metrics.addSpell(spell)
 	}
+}
+
+func (spell *Spell) ReadyAt() time.Duration {
+	return BothTimersReadyAt(spell.CD.Timer, spell.SharedCD.Timer)
 }
 
 func (spell *Spell) IsReady(sim *Simulation) bool {
@@ -171,7 +171,7 @@ func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
 
 // Skips the actual cast and applies spell effects immediately.
 func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Target) {
-	if sim.Log != nil {
+	if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasNoLogs) {
 		spell.Unit.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
 			spell.ActionID, spell.DefaultCast.Cost, time.Duration(0))
 		spell.Unit.Log(sim, "Completed cast %s", spell.ActionID)

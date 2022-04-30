@@ -25,7 +25,8 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 	baseCost := 236.0
 
 	spell := paladin.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -38,7 +39,6 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 				Timer:    paladin.NewTimer(),
 				Duration: time.Minute * 3,
 			},
-			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			aura.Activate(sim)

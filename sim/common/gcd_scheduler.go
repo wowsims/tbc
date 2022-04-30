@@ -216,7 +216,7 @@ func (gs *GCDScheduler) ScheduleGroup(newAbilities []ScheduledAbility) time.Dura
 // character's managed cooldowns.
 func (gs *GCDScheduler) ScheduleMCD(character *core.Character, mcdID core.ActionID) {
 	mcd := character.GetInitialMajorCooldown(mcdID)
-	if !mcd.ActionID.SameAction(mcdID) {
+	if !mcd.Spell.ActionID.SameAction(mcdID) {
 		return
 	}
 
@@ -230,7 +230,7 @@ func (gs *GCDScheduler) ScheduleMCD(character *core.Character, mcdID core.Action
 			success := gs.managedMCDs[mcdIdx].TryActivate(sim, character)
 			if !success {
 				character.EnableMajorCooldown(gs.managedMCDIDs[mcdIdx])
-				gs.managedMCDs[mcdIdx].UsesGCD = false
+				gs.managedMCDs[mcdIdx].Spell.DefaultCast.GCD = 0
 			}
 			return success
 		},
@@ -250,7 +250,7 @@ func (gs *GCDScheduler) ScheduleMCD(character *core.Character, mcdID core.Action
 
 		actualCastAt := gs.Schedule(ability)
 
-		curTime = actualCastAt + mcd.Cooldown.Duration
+		curTime = actualCastAt + mcd.Spell.CD.Duration
 		i++
 		if len(timings) > i {
 			curTime = core.MaxDuration(curTime, timings[i])

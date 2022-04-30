@@ -17,9 +17,7 @@ func (warrior *Warrior) applyDeepWounds() {
 	deepWoundsSpell := warrior.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
-		Cast: core.CastConfig{
-			DisableCallbacks: true,
-		},
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 	})
 
 	var dwDots []*core.Dot

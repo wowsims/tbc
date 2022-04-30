@@ -165,13 +165,13 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 	actionID := core.ActionID{SpellID: 17116}
 
 	spell := druid.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    druid.NewTimer(),
 				Duration: time.Minute * 3,
 			},
-			DisableCallbacks: true,
 		},
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
 			druid.NaturesSwiftnessAura.Activate(sim)

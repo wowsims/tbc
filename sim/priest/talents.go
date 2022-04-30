@@ -156,14 +156,14 @@ func (priest *Priest) registerInnerFocus() {
 	})
 
 	priest.InnerFocus = priest.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: core.SpellExtrasNoOnCastComplete,
 
 		Cast: core.CastConfig{
 			CD: core.Cooldown{
 				Timer:    priest.NewTimer(),
 				Duration: time.Minute * 3,
 			},
-			DisableCallbacks: true,
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
