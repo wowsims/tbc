@@ -225,7 +225,7 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		MainHand: hunter.WeaponFromMainHand(0),
 		OffHand:  hunter.WeaponFromOffHand(0),
 		Ranged:   rangedWeapon,
-		ReplaceMHSwing: func(sim *core.Simulation) *core.Spell {
+		ReplaceMHSwing: func(sim *core.Simulation, _ *core.Spell) *core.Spell {
 			return hunter.TryRaptorStrike(sim)
 		},
 	})

@@ -781,7 +781,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 			}
 			icd.Use(sim)
 
-			blinkstrikeSpell.Cast(sim, spellEffect.Target)
+			aura.Unit.AutoAttacks.MaybeReplaceMHSwing(sim, blinkstrikeSpell).SkipCastAndApplyEffects(sim, spellEffect.Target)
 		},
 	})
 }

@@ -208,7 +208,7 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 				}
 				icd.Use(sim)
 
-				swordSpecializationSpell.Cast(sim, spellEffect.Target)
+				aura.Unit.AutoAttacks.MaybeReplaceMHSwing(sim, swordSpecializationSpell).SkipCastAndApplyEffects(sim, spellEffect.Target)
 			},
 		})
 	}

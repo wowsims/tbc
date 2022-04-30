@@ -301,10 +301,6 @@ func (character *Character) Finalize() {
 	character.Unit.finalize()
 
 	character.majorCooldownManager.finalize(character)
-
-	for _, petAgent := range character.Pets {
-		petAgent.GetPet().Finalize()
-	}
 }
 
 func (character *Character) init(sim *Simulation, agent Agent) {

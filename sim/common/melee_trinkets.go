@@ -112,7 +112,7 @@ func ApplyHandOfJustice(agent core.Agent) {
 			}
 			icd.Use(sim)
 
-			handOfJusticeSpell.Cast(sim, spellEffect.Target)
+			aura.Unit.AutoAttacks.MaybeReplaceMHSwing(sim, handOfJusticeSpell).SkipCastAndApplyEffects(sim, spellEffect.Target)
 		},
 	})
 }

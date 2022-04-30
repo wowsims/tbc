@@ -355,7 +355,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 		Duration: NeverExpires,
 		OnInit: func(aura *Aura, sim *Simulation) {
 			wfSpell = character.GetOrRegisterSpell(SpellConfig{
-				ActionID:    ActionID{SpellID: windfuryBuffSpellRanks[rank-1]}, // temporary buff ("Windfury Attack") spell id
+				ActionID:    buffActionID, // temporary buff ("Windfury Attack") spell id
 				SpellSchool: SpellSchoolPhysical,
 				SpellExtras: SpellExtrasMeleeMetrics,
 
@@ -396,7 +396,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 			wfBuffAura.Activate(sim)
 			icd.Use(sim)
 
-			wfSpell.Cast(sim, spellEffect.Target)
+			aura.Unit.AutoAttacks.MaybeReplaceMHSwing(sim, wfSpell).SkipCastAndApplyEffects(sim, spellEffect.Target)
 		},
 	})
 }

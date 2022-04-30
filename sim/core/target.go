@@ -36,12 +36,6 @@ func NewEncounter(options proto.Encounter) Encounter {
 	return encounter
 }
 
-func (encounter *Encounter) finalize() {
-	for _, target := range encounter.Targets {
-		target.finalize()
-	}
-}
-
 func (encounter *Encounter) doneIteration(sim *Simulation) {
 	for i, _ := range encounter.Targets {
 		target := encounter.Targets[i]
