@@ -157,23 +157,31 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 func ApplyDarkmoonCardCrusade(agent core.Agent) {
 	character := agent.GetCharacter()
 
+	var apBonusPerStack stats.Stats
 	apAura := character.RegisterAura(core.Aura{
 		Label:     "DMC Crusade AP",
 		ActionID:  core.ActionID{ItemID: 31856, Tag: 1},
 		Duration:  time.Second * 10,
 		MaxStacks: 20,
+		OnInit: func(aura *core.Aura, sim *core.Simulation) {
+			apBonusPerStack = character.ApplyStatDependencies(stats.Stats{stats.AttackPower: 6, stats.RangedAttackPower: 6})
+		},
 		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
-			character.AddStat(stats.AttackPower, 6*float64(newStacks-oldStacks))
-			character.AddStat(stats.RangedAttackPower, 6*float64(newStacks-oldStacks))
+			character.AddStatsDynamic(sim, apBonusPerStack.Multiply(float64(newStacks-oldStacks)))
 		},
 	})
+
+	var spBonusPerStack stats.Stats
 	spAura := character.RegisterAura(core.Aura{
 		Label:     "DMC Crusade SP",
 		ActionID:  core.ActionID{ItemID: 31856, Tag: 2},
 		Duration:  time.Second * 10,
 		MaxStacks: 10,
+		OnInit: func(aura *core.Aura, sim *core.Simulation) {
+			spBonusPerStack = character.ApplyStatDependencies(stats.Stats{stats.SpellPower: 8})
+		},
 		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
-			character.AddStat(stats.SpellPower, 8*float64(newStacks-oldStacks))
+			character.AddStatsDynamic(sim, spBonusPerStack.Multiply(float64(newStacks-oldStacks)))
 		},
 	})
 

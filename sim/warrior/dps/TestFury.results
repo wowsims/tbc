@@ -102,7 +102,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-BlackenedNaaruSliver-34427"
  value: {
-  dps: 928.4371469696641
+  dps: 937.9211372918982
  }
 }
 dps_results: {
@@ -228,7 +228,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 909.5319609754208
+  dps: 904.1327883992562
  }
 }
 dps_results: {
