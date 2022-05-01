@@ -424,6 +424,12 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRetribution-AllItems-LightbringerBattlegear"
+ value: {
+  dps: 1849.4443094391893
+ }
+}
+dps_results: {
  key: "TestRetribution-AllItems-LionheartChampion-28429"
  value: {
   dps: 1884.3379334050564
