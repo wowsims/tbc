@@ -43,6 +43,10 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(cdTimer *core.Timer) {
 			if loaAura != nil {
 				loaAura.Activate(sim)
 			}
+
+			// Add mana from Spiritual Attunement
+			// 33% of damage is self-inflicted, 10% of self-inflicted damage is returned as mana
+			paladin.AddMana(sim, spellEffect.Damage*0.33*0.1, core.ActionID{SpellID: 33776}, false)
 		},
 	}
 	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
