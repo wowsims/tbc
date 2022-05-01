@@ -7,6 +7,7 @@ import (
 func init() {
 	core.AddItemSet(&ItemSetJusticarBattlegear)
 	core.AddItemSet(&ItemSetCrystalforgeBattlegear)
+	core.AddItemSet(&ItemSetLightbringerBattlegear)
 }
 
 var ItemSetJusticarBattlegear = core.ItemSet{
