@@ -709,6 +709,31 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 					debuffAura.Refresh(sim)
 				},
 			})
+	} else if potionType == proto.Potions_InsaneStrengthPotion {
+		actionID := ActionID{ItemID: 22828}
+		aura := character.NewTemporaryStatsAura("Insane Strength Potion", actionID, stats.Stats{stats.Strength: 120, stats.Defense: -75}, time.Second*15)
+		return MajorCooldown{
+				Type: CooldownTypeDPS,
+				CanActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+				ShouldActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+			},
+			character.RegisterSpell(SpellConfig{
+				ActionID:    actionID,
+				SpellExtras: SpellExtrasNoOnCastComplete,
+				Cast: CastConfig{
+					CD: Cooldown{
+						Timer:    potionCD,
+						Duration: time.Minute * 2,
+					},
+				},
+				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+					aura.Activate(sim)
+				},
+			})
 	} else {
 		return MajorCooldown{}, nil
 	}
