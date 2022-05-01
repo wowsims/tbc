@@ -241,7 +241,7 @@ func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Tar
 	if ret.Rotation.UseExorcism &&
 		target.MobType == proto.MobType_MobTypeDemon &&
 		ret.Exorcism.IsReady(sim) &&
-		ret.CurrentMana() > ret.GetStat(stats.Mana)*0.4 {
+		ret.CurrentMana() > ret.MaxMana()*0.4 {
 
 		ret.Exorcism.Cast(sim, target)
 		return
@@ -251,7 +251,7 @@ func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Tar
 	// Only cast consecration when above 60% mana
 	if ret.Rotation.ConsecrationRank != proto.RetributionPaladin_Rotation_None &&
 		ret.Consecration.IsReady(sim) &&
-		ret.CurrentMana() > ret.GetStat(stats.Mana)*0.6 {
+		ret.CurrentMana() > ret.MaxMana()*0.6 {
 		ret.Consecration.Cast(sim, target)
 		return
 	}
