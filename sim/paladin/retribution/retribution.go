@@ -213,9 +213,10 @@ func (ret *RetributionPaladin) mainRotation(sim *core.Simulation) {
 			// If no seal is active, cast Seal of Blood
 			ret.SealOfBlood.Cast(sim, nil)
 		} else if !willTwist && !socActive &&
-			float64(weaponSpeed) > float64(spellGCD)*1.5 && spellGCD < crusaderStrikeCD {
+			timeTilNextSwing+weaponSpeed > spellGCD*2 &&
+			spellGCD < crusaderStrikeCD {
 			// If there is literally nothing else to-do, cast fillers
-			// Only if it won't clip crusader strike
+			// Only if it won't clip crusader strike or seal twist
 			ret.useFillers(sim, target)
 		}
 	}
