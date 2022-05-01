@@ -31,6 +31,9 @@ type DpsWarrior struct {
 	Options  proto.Warrior_Options
 	Rotation proto.Warrior_Rotation
 
+	// Prevent swapping stances until this time, to account for human reaction time.
+	canSwapStanceAt time.Duration
+
 	castFirstSunder bool
 	thunderClapNext bool
 
@@ -66,6 +69,8 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 				war.tryQueueSlam(sim)
 				war.doRotation(sim)
 			}
+		} else if !war.thunderClapNext {
+			war.trySwapToBerserker(sim)
 		}
 	})
 	war.EnableAutoAttacks(war, core.AutoAttackOptions{
@@ -106,6 +111,7 @@ func (war *DpsWarrior) Reset(sim *core.Simulation) {
 	war.BerserkerStanceAura.Activate(sim)
 	war.Stance = warrior.BerserkerStance
 
+	war.canSwapStanceAt = 0
 	war.doSlamNext = false
 	war.castFirstSunder = false
 	war.castSlamAt = 0

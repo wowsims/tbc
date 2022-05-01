@@ -8,6 +8,8 @@ import (
 	"github.com/wowsims/tbc/sim/warrior"
 )
 
+const DebuffRefreshWindow = time.Second * 2
+
 func (war *DpsWarrior) OnGCDReady(sim *core.Simulation) {
 	war.doRotation(sim)
 }
@@ -17,43 +19,21 @@ func (war *DpsWarrior) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
 	war.tryQueueHsCleave(sim)
 }
 
-const SlamThreshold = time.Millisecond * 500
-
-func (war *DpsWarrior) tryQueueSlam(sim *core.Simulation) {
-	if war.doSlamNext &&
-		war.castSlamAt == 0 &&
-		(war.AutoAttacks.MainhandSwingAt <= sim.CurrentTime || war.AutoAttacks.MainhandSwingAt == sim.CurrentTime+war.AutoAttacks.MainhandSwingSpeed()) {
-		slamAt := sim.CurrentTime + war.slamLatency
-
-		gcdAt := war.GCD.ReadyAt()
-		if slamAt < gcdAt {
-			if gcdAt-slamAt <= SlamThreshold {
-				slamAt = gcdAt
-			} else {
-				return
-			}
-		}
-
-		if war.CanSlam() && !war.shouldSunder(sim) {
-			war.castSlamAt = slamAt
-			war.WaitUntil(sim, slamAt) // Pause GCD until slam time
-		}
-	}
-}
-
 func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 	if war.thunderClapNext {
 		if war.CanThunderClap(sim) {
-			war.thunderClapNext = false
 			war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
-			if !war.StanceMatches(warrior.BerserkerStance) && war.BerserkerStance.IsReady(sim) {
-				war.BerserkerStance.Cast(sim, nil)
+			if war.ThunderClapAura.RemainingDuration(sim) > DebuffRefreshWindow {
+				war.thunderClapNext = false
+
+				// Switching back to berserker immediately is unrealistic because the player needs
+				// to visually confirm the TC landed. Instead we add a delay to model that.
+				war.canSwapStanceAt = sim.CurrentTime + time.Millisecond*300
 			}
+			return
 		}
-		return
-	} else if !war.StanceMatches(warrior.BerserkerStance) && war.BerserkerStance.IsReady(sim) {
-		war.BerserkerStance.Cast(sim, nil)
 	}
+	war.trySwapToBerserker(sim)
 
 	if war.shouldSunder(sim) {
 		war.castSlamAt = 0
@@ -179,15 +159,47 @@ func (war *DpsWarrior) shouldSunder(sim *core.Simulation) bool {
 	return false
 }
 
+const SlamThreshold = time.Millisecond * 500
+
+func (war *DpsWarrior) tryQueueSlam(sim *core.Simulation) {
+	if war.doSlamNext &&
+		war.castSlamAt == 0 &&
+		(war.AutoAttacks.MainhandSwingAt <= sim.CurrentTime || war.AutoAttacks.MainhandSwingAt == sim.CurrentTime+war.AutoAttacks.MainhandSwingSpeed()) {
+		slamAt := sim.CurrentTime + war.slamLatency
+
+		gcdAt := war.GCD.ReadyAt()
+		if slamAt < gcdAt {
+			if gcdAt-slamAt <= SlamThreshold {
+				slamAt = gcdAt
+			} else {
+				return
+			}
+		}
+
+		if war.CanSlam() && !war.shouldSunder(sim) {
+			war.castSlamAt = slamAt
+			war.WaitUntil(sim, slamAt) // Pause GCD until slam time
+		}
+	}
+}
+
+func (war *DpsWarrior) trySwapToBerserker(sim *core.Simulation) bool {
+	if !war.StanceMatches(warrior.BerserkerStance) && war.BerserkerStance.IsReady(sim) && sim.CurrentTime >= war.canSwapStanceAt {
+		war.BerserkerStance.Cast(sim, nil)
+		return true
+	}
+	return false
+}
+
 // Returns whether any ability was cast.
 func (war *DpsWarrior) tryMaintainDebuffs(sim *core.Simulation) bool {
 	if war.ShouldShout(sim) {
 		war.Shout.Cast(sim, nil)
 		return true
-	} else if war.Rotation.MaintainDemoShout && war.DemoralizingShoutAura.RemainingDuration(sim) < time.Second*2 && war.CanDemoralizingShout(sim) {
+	} else if war.Rotation.MaintainDemoShout && war.DemoralizingShoutAura.RemainingDuration(sim) < DebuffRefreshWindow && war.CanDemoralizingShout(sim) {
 		war.DemoralizingShout.Cast(sim, sim.GetPrimaryTarget())
 		return true
-	} else if war.Rotation.MaintainThunderClap && war.ThunderClapAura.RemainingDuration(sim) < time.Second*2 && war.CanThunderClapIgnoreStance(sim) {
+	} else if war.Rotation.MaintainThunderClap && war.ThunderClapAura.RemainingDuration(sim) < DebuffRefreshWindow && war.CanThunderClapIgnoreStance(sim) {
 		if !war.StanceMatches(warrior.BattleStance) {
 			if !war.BattleStance.IsReady(sim) {
 				return false
