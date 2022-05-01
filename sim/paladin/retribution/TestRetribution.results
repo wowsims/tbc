@@ -252,7 +252,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-DoomplateBattlegear"
  value: {
-  dps: 1683.687088522004
+  dps: 1675.3919524167827
  }
 }
 dps_results: {
@@ -606,7 +606,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-StrengthoftheClefthoof"
  value: {
-  dps: 1738.9929141438834
+  dps: 1741.0811759464577
  }
 }
 dps_results: {
@@ -726,7 +726,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Average-Default"
  value: {
-  dps: 2051.555026269311
+  dps: 2052.0530514631687
  }
 }
 dps_results: {
@@ -750,7 +750,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1233.4772502077412
+  dps: 1251.2243621877562
  }
 }
 dps_results: {
@@ -798,7 +798,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1257.9149133162905
+  dps: 1269.987488403242
  }
 }
 dps_results: {
@@ -846,7 +846,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1231.9365776058235
+  dps: 1216.9629774892087
  }
 }
 dps_results: {
@@ -894,7 +894,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-Human-P4-Retribution Paladin-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1279.864512657921
+  dps: 1290.9522413956877
  }
 }
 dps_results: {

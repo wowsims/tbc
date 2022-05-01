@@ -856,8 +856,10 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 
 					if character.Class == proto.Class_ClassPaladin {
 						// Paladins gain extra mana from self-inflicted damage
-						manaGain = 60 + (sim.RandomFloat("dark rune paladin") * 40)
-						character.AddMana(sim, manaGain, ActionID{SpellID: 33776}, false)
+						// TO-DO: It is possible for damage to be resisted or to crit
+						// This would affect mana returns for Paladins
+						manaFromDamage := manaGain * 2.0 / 3.0 * 0.1
+						character.AddMana(sim, manaFromDamage, ActionID{SpellID: 33776}, false)
 					}
 				},
 			})
@@ -1030,8 +1032,10 @@ func (character *Character) newBasicExplosiveSpellConfig(actionID ActionID, minD
 			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(2),
 			OnSpellHit: func(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 				// Paladins gain extra mana from self-inflicted damage
+				// TO-DO: Check if self-inflicted damage can be resisted or crit
+				// This affects mana returns for Paladins
 				if character.Class == proto.Class_ClassPaladin && maxSelfDamage > 0 {
-					manaGain := minSelfDamage*0.1 + (sim.RandomFloat("sapper paladin") * 0.1 * (maxSelfDamage - minSelfDamage))
+					manaGain := (minSelfDamage + (sim.RandomFloat("sapper paladin") * (maxSelfDamage - minSelfDamage))) * 0.1
 					character.AddMana(sim, manaGain, ActionID{SpellID: 33776}, false)
 				}
 			},
