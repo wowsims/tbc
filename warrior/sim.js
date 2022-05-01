@@ -155,6 +155,7 @@ export class WarriorSimUI extends IndividualSimUI {
             consumeOptions: {
                 potions: [
                     Potions.HastePotion,
+                    Potions.InsaneStrengthPotion,
                     Potions.MightyRagePotion,
                 ],
                 conjured: [

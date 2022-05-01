@@ -358,6 +358,7 @@ export const makePotionsInput = makeConsumeInputFactory('defaultPotion', [
     { actionId: ActionId.fromItemId(13442), value: Potions.MightyRagePotion },
     { actionId: ActionId.fromItemId(22832), value: Potions.SuperManaPotion },
     { actionId: ActionId.fromItemId(31677), value: Potions.FelManaPotion },
+    { actionId: ActionId.fromItemId(22828), value: Potions.InsaneStrengthPotion },
 ]);
 export const makeConjuredInput = makeConsumeInputFactory('defaultConjured', [
     { actionId: ActionId.fromItemId(12662), value: Conjured.ConjuredDarkRune },
