@@ -42,9 +42,19 @@ func (war *DpsWarrior) tryQueueSlam(sim *core.Simulation) {
 }
 
 func (war *DpsWarrior) doRotation(sim *core.Simulation) {
-	if !war.StanceMatches(warrior.BerserkerStance) && war.BerserkerStance.IsReady(sim) {
+	if war.thunderClapNext {
+		if war.CanThunderClap(sim) {
+			war.thunderClapNext = false
+			war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
+			if !war.StanceMatches(warrior.BerserkerStance) && war.BerserkerStance.IsReady(sim) {
+				war.BerserkerStance.Cast(sim, nil)
+			}
+		}
+		return
+	} else if !war.StanceMatches(warrior.BerserkerStance) && war.BerserkerStance.IsReady(sim) {
 		war.BerserkerStance.Cast(sim, nil)
 	}
+
 	if war.shouldSunder(sim) {
 		war.castSlamAt = 0
 		war.doSlamNext = false
@@ -85,7 +95,7 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 
 	if war.Rotation.UseSlam {
 		war.doSlamNext = true
-	} else if war.GCD.IsReady(sim) {
+	} else if war.GCD.IsReady(sim) && !war.thunderClapNext {
 		// We didn't cast anything, so wait for the next CD.
 		// Note that BT/MS share a CD timer so we don't need to check MS.
 		nextCD := core.MinDuration(war.Bloodthirst.CD.ReadyAt(), war.Whirlwind.CD.ReadyAt())
@@ -184,7 +194,13 @@ func (war *DpsWarrior) tryMaintainDebuffs(sim *core.Simulation) bool {
 			}
 			war.BattleStance.Cast(sim, nil)
 		}
-		war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
+		// Need to check again because we might have lost rage from switching stances.
+		if war.CanThunderClap(sim) {
+			war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
+			war.thunderClapNext = false
+		} else {
+			war.thunderClapNext = true
+		}
 		return true
 	}
 	return false
