@@ -54,7 +54,8 @@ export const JudgementSelection = {
     getModObject: (simUI) => simUI.player,
     config: {
         label: 'Judgement',
-        labelTooltip: 'Judgement debuff you will use on the target during the encounter.',
+        labelTooltip: 'Judgement debuff you will use on the target during the encounter. \
+		If Improved Seal of the Crusader is talented, the Improved Judgement of the Crusader debuff will be applied.',
         values: [
             {
                 name: 'None', value: Judgement.None,
