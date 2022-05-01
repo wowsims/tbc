@@ -853,6 +853,12 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 					// Restores 900 to 1500 mana. (2 Min Cooldown)
 					manaGain := 900 + (sim.RandomFloat("dark rune") * 600)
 					character.AddMana(sim, manaGain, actionID, true)
+
+					if character.Class == proto.Class_ClassPaladin {
+						// Paladins gain extra mana from self-inflicted damage
+						manaGain = 60 + (sim.RandomFloat("dark rune paladin") * 40)
+						character.AddMana(sim, manaGain, ActionID{SpellID: 33776}, false)
+					}
 				},
 			})
 	} else if conjuredType == proto.Conjured_ConjuredFlameCap {
@@ -995,7 +1001,7 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 }
 
 // Creates a spell object for the common explosive case.
-func (character *Character) newBasicExplosiveSpellConfig(actionID ActionID, minDamage float64, maxDamage float64, cooldown Cooldown, isHolyWater bool) SpellConfig {
+func (character *Character) newBasicExplosiveSpellConfig(actionID ActionID, minDamage float64, maxDamage float64, cooldown Cooldown, isHolyWater bool, minSelfDamage float64, maxSelfDamage float64) SpellConfig {
 	school := SpellSchoolFire
 	damageMultiplier := 1.0
 	if isHolyWater {
@@ -1022,21 +1028,28 @@ func (character *Character) newBasicExplosiveSpellConfig(actionID ActionID, minD
 
 			BaseDamage:     BaseDamageConfigRoll(minDamage, maxDamage),
 			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(2),
+			OnSpellHit: func(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+				// Paladins gain extra mana from self-inflicted damage
+				if maxSelfDamage > 0 {
+					manaGain := minSelfDamage*0.1 + (sim.RandomFloat("sapper paladin") * 0.1 * (maxSelfDamage - minSelfDamage))
+					character.AddMana(sim, manaGain, ActionID{SpellID: 33776}, false)
+				}
+			},
 		}),
 	}
 }
 func (character *Character) newSuperSapperSpell() *Spell {
-	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(SuperSapperActionID, 900, 1500, Cooldown{Timer: character.NewTimer(), Duration: time.Minute * 5}, false))
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(SuperSapperActionID, 900, 1500, Cooldown{Timer: character.NewTimer(), Duration: time.Minute * 5}, false, 675, 1125))
 }
 func (character *Character) newGoblinSapperSpell() *Spell {
-	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(GoblinSapperActionID, 450, 750, Cooldown{Timer: character.NewTimer(), Duration: time.Minute * 5}, false))
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(GoblinSapperActionID, 450, 750, Cooldown{Timer: character.NewTimer(), Duration: time.Minute * 5}, false, 375, 625))
 }
 func (character *Character) newFelIronBombSpell() *Spell {
-	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(FelIronBombActionID, 330, 770, Cooldown{}, false))
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(FelIronBombActionID, 330, 770, Cooldown{}, false, 0, 0))
 }
 func (character *Character) newAdamantiteGrenadeSpell() *Spell {
-	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(AdamantiteGrenadeActionID, 450, 750, Cooldown{}, false))
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(AdamantiteGrenadeActionID, 450, 750, Cooldown{}, false, 0, 0))
 }
 func (character *Character) newHolyWaterSpell() *Spell {
-	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(HolyWaterActionID, 438, 562, Cooldown{}, true))
+	return character.GetOrRegisterSpell(character.newBasicExplosiveSpellConfig(HolyWaterActionID, 438, 562, Cooldown{}, true, 0, 0))
 }
