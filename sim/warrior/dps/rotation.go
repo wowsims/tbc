@@ -32,8 +32,9 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 			}
 			return
 		}
+	} else {
+		war.trySwapToBerserker(sim)
 	}
-	war.trySwapToBerserker(sim)
 
 	if war.shouldSunder(sim) {
 		war.castSlamAt = 0
@@ -200,6 +201,7 @@ func (war *DpsWarrior) tryMaintainDebuffs(sim *core.Simulation) bool {
 		war.DemoralizingShout.Cast(sim, sim.GetPrimaryTarget())
 		return true
 	} else if war.Rotation.MaintainThunderClap && war.ThunderClapAura.RemainingDuration(sim) < DebuffRefreshWindow && war.CanThunderClapIgnoreStance(sim) {
+		war.thunderClapNext = true
 		if !war.StanceMatches(warrior.BattleStance) {
 			if !war.BattleStance.IsReady(sim) {
 				return false
@@ -209,9 +211,9 @@ func (war *DpsWarrior) tryMaintainDebuffs(sim *core.Simulation) bool {
 		// Need to check again because we might have lost rage from switching stances.
 		if war.CanThunderClap(sim) {
 			war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
-			war.thunderClapNext = false
-		} else {
-			war.thunderClapNext = true
+			if war.ThunderClapAura.RemainingDuration(sim) > DebuffRefreshWindow {
+				war.thunderClapNext = false
+			}
 		}
 		return true
 	}
