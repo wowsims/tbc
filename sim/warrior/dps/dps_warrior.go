@@ -32,6 +32,7 @@ type DpsWarrior struct {
 	Rotation proto.Warrior_Rotation
 
 	castFirstSunder bool
+	thunderClapNext bool
 
 	doSlamNext  bool
 	castSlamAt  time.Duration
@@ -108,4 +109,5 @@ func (war *DpsWarrior) Reset(sim *core.Simulation) {
 	war.doSlamNext = false
 	war.castFirstSunder = false
 	war.castSlamAt = 0
+	war.thunderClapNext = false
 }
