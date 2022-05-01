@@ -403,6 +403,7 @@ export const makePotionsInput = makeConsumeInputFactory('defaultPotion', [
 	{ actionId: ActionId.fromItemId(13442), value: Potions.MightyRagePotion },
 	{ actionId: ActionId.fromItemId(22832), value: Potions.SuperManaPotion },
 	{ actionId: ActionId.fromItemId(31677), value: Potions.FelManaPotion },
+	{ actionId: ActionId.fromItemId(22828), value: Potions.InsaneStrengthPotion },
 ] as Array<IconEnumValueConfig<Player<any>, Potions>>);
 
 export const makeConjuredInput = makeConsumeInputFactory('defaultConjured', [
