@@ -90,7 +90,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-BlackenedNaaruSliver-34427"
  value: {
-  dps: 2052.352741564346
+  dps: 2055.854900673421
  }
 }
 dps_results: {
@@ -216,7 +216,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 2013.7844922608554
+  dps: 2017.6875093374497
  }
 }
 dps_results: {
