@@ -158,21 +158,19 @@ func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spel
 	}
 }
 
-func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, damage float64) {
+func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell) {
 	if !spell.SpellExtras.Matches(SpellExtrasIgnoreModifiers) {
-		spellEffect.applyAttackerModifiers(sim, spell, &damage)
-		spellEffect.applyResistances(sim, spell, &damage)
-		spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
-		spellEffect.PreoutcomeDamage = damage
-		spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
+		spellEffect.applyAttackerModifiers(sim, spell)
+		spellEffect.applyResistances(sim, spell)
+		spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient)
+		spellEffect.PreoutcomeDamage = spellEffect.Damage
+		spellEffect.OutcomeApplier(sim, spell, spellEffect)
 	}
-	spellEffect.Damage = damage
 }
-func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spell, damage float64) {
-	spellEffect.applyResistances(sim, spell, &damage)
-	spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient, &damage)
-	spellEffect.OutcomeApplier(sim, spell, spellEffect, &damage)
-	spellEffect.Damage = damage
+func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spell) {
+	spellEffect.applyResistances(sim, spell)
+	spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient)
+	spellEffect.OutcomeApplier(sim, spell, spellEffect)
 }
 
 func (spellEffect *SpellEffect) calcThreat(unit *Unit) float64 {
@@ -186,10 +184,7 @@ func (spellEffect *SpellEffect) calcThreat(unit *Unit) float64 {
 func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell) {
 	spell.SpellMetrics[spellEffect.Target.Index].TotalDamage += spellEffect.Damage
 	spell.SpellMetrics[spellEffect.Target.Index].TotalThreat += spellEffect.calcThreat(spell.Unit)
-	spellEffect.triggerProcs(sim, spell)
-}
 
-func (spellEffect *SpellEffect) triggerProcs(sim *Simulation, spell *Spell) {
 	if sim.Log != nil {
 		if spellEffect.IsPeriodic {
 			spell.Unit.Log(sim, "%s tick %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Unit))
@@ -221,58 +216,58 @@ func (spellEffect *SpellEffect) String() string {
 	return fmt.Sprintf("%s for %0.3f damage", outcomeStr, spellEffect.Damage)
 }
 
-func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *Spell, damage *float64) {
+func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *Spell) {
 	attacker := spell.Unit
 
 	if spellEffect.ProcMask.Matches(ProcMaskRanged) {
-		*damage *= attacker.PseudoStats.RangedDamageDealtMultiplier
+		spellEffect.Damage *= attacker.PseudoStats.RangedDamageDealtMultiplier
 	}
 	if spell.SpellExtras.Matches(SpellExtrasAgentReserved1) {
-		*damage *= attacker.PseudoStats.AgentReserved1DamageDealtMultiplier
+		spellEffect.Damage *= attacker.PseudoStats.AgentReserved1DamageDealtMultiplier
 	}
 
-	*damage *= attacker.PseudoStats.DamageDealtMultiplier
+	spellEffect.Damage *= attacker.PseudoStats.DamageDealtMultiplier
 	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
-		*damage *= attacker.PseudoStats.PhysicalDamageDealtMultiplier
+		spellEffect.Damage *= attacker.PseudoStats.PhysicalDamageDealtMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolArcane) {
-		*damage *= attacker.PseudoStats.ArcaneDamageDealtMultiplier
+		spellEffect.Damage *= attacker.PseudoStats.ArcaneDamageDealtMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolFire) {
-		*damage *= attacker.PseudoStats.FireDamageDealtMultiplier
+		spellEffect.Damage *= attacker.PseudoStats.FireDamageDealtMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolFrost) {
-		*damage *= attacker.PseudoStats.FrostDamageDealtMultiplier
+		spellEffect.Damage *= attacker.PseudoStats.FrostDamageDealtMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolHoly) {
-		*damage *= attacker.PseudoStats.HolyDamageDealtMultiplier
+		spellEffect.Damage *= attacker.PseudoStats.HolyDamageDealtMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolNature) {
-		*damage *= attacker.PseudoStats.NatureDamageDealtMultiplier
+		spellEffect.Damage *= attacker.PseudoStats.NatureDamageDealtMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolShadow) {
-		*damage *= attacker.PseudoStats.ShadowDamageDealtMultiplier
+		spellEffect.Damage *= attacker.PseudoStats.ShadowDamageDealtMultiplier
 	}
 }
 
-func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Spell, targetCoeff float64, damage *float64) {
+func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Spell, targetCoeff float64) {
 	target := spellEffect.Target
 
-	*damage *= target.PseudoStats.DamageTakenMultiplier
+	spellEffect.Damage *= target.PseudoStats.DamageTakenMultiplier
 	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
 		if targetCoeff > 0 {
-			*damage += target.PseudoStats.BonusPhysicalDamageTaken
+			spellEffect.Damage += target.PseudoStats.BonusPhysicalDamageTaken
 		}
-		*damage *= target.PseudoStats.PhysicalDamageTakenMultiplier
+		spellEffect.Damage *= target.PseudoStats.PhysicalDamageTakenMultiplier
 		if spellEffect.IsPeriodic {
-			*damage *= target.PseudoStats.PeriodicPhysicalDamageTakenMultiplier
+			spellEffect.Damage *= target.PseudoStats.PeriodicPhysicalDamageTakenMultiplier
 		}
 	} else if spell.SpellSchool.Matches(SpellSchoolArcane) {
-		*damage *= target.PseudoStats.ArcaneDamageTakenMultiplier
+		spellEffect.Damage *= target.PseudoStats.ArcaneDamageTakenMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolFire) {
-		*damage *= target.PseudoStats.FireDamageTakenMultiplier
+		spellEffect.Damage *= target.PseudoStats.FireDamageTakenMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolFrost) {
-		*damage *= target.PseudoStats.FrostDamageTakenMultiplier
+		spellEffect.Damage *= target.PseudoStats.FrostDamageTakenMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolHoly) {
-		*damage += target.PseudoStats.BonusHolyDamageTaken * targetCoeff
-		*damage *= target.PseudoStats.HolyDamageTakenMultiplier
+		spellEffect.Damage += target.PseudoStats.BonusHolyDamageTaken * targetCoeff
+		spellEffect.Damage *= target.PseudoStats.HolyDamageTakenMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolNature) {
-		*damage *= target.PseudoStats.NatureDamageTakenMultiplier
+		spellEffect.Damage *= target.PseudoStats.NatureDamageTakenMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolShadow) {
-		*damage *= target.PseudoStats.ShadowDamageTakenMultiplier
+		spellEffect.Damage *= target.PseudoStats.ShadowDamageTakenMultiplier
 	}
 }
