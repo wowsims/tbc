@@ -54,8 +54,9 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 	}
 
 	isExecutePhase := sim.IsExecutePhase()
+	canSlam := !isExecutePhase || war.Rotation.UseSlamDuringExecute
 
-	if (!isExecutePhase || war.Rotation.UseSlamDuringExecute) && war.doSlamNext && war.castSlamAt != 0 {
+	if war.doSlamNext && canSlam && war.castSlamAt != 0 {
 		if sim.CurrentTime < war.castSlamAt {
 			return
 		} else if sim.CurrentTime == war.castSlamAt {
@@ -74,7 +75,7 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 	}
 
 	// If using a GCD will clip the next slam, only allow high priority spells like BT/MS/WW/debuffs.
-	highPrioSpellsOnly := war.Rotation.UseSlam && sim.CurrentTime+core.GCDDefault-SlamThreshold > war.AutoAttacks.MainhandSwingAt+war.slamLatency
+	highPrioSpellsOnly := war.Rotation.UseSlam && canSlam && sim.CurrentTime+core.GCDDefault-SlamThreshold > war.AutoAttacks.MainhandSwingAt+war.slamLatency
 
 	if isExecutePhase {
 		war.executeRotation(sim, highPrioSpellsOnly)
