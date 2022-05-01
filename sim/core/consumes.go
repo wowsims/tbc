@@ -1030,7 +1030,7 @@ func (character *Character) newBasicExplosiveSpellConfig(actionID ActionID, minD
 			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(2),
 			OnSpellHit: func(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 				// Paladins gain extra mana from self-inflicted damage
-				if maxSelfDamage > 0 {
+				if character.Class == proto.Class_ClassPaladin && maxSelfDamage > 0 {
 					manaGain := minSelfDamage*0.1 + (sim.RandomFloat("sapper paladin") * 0.1 * (maxSelfDamage - minSelfDamage))
 					character.AddMana(sim, manaGain, ActionID{SpellID: 33776}, false)
 				}
