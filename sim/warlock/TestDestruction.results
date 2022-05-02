@@ -48,378 +48,378 @@ character_stats_results: {
 dps_results: {
  key: "TestDestruction-AllItems-BracingEarthstormDiamond"
  value: {
-  dps: 1813.1499559093863
+  dps: 1779.1720549343395
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-BrutalEarthstormDiamond"
  value: {
-  dps: 1805.4370051249907
+  dps: 1772.2095871280171
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-ChaoticSkyfireDiamond"
  value: {
-  dps: 1814.2762425431422
+  dps: 1780.5417504496652
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-DestructiveSkyfireDiamond"
  value: {
-  dps: 1816.7992181546504
+  dps: 1783.0107035904498
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-EmberSkyfireDiamond"
  value: {
-  dps: 1815.8506485688317
+  dps: 1783.945323774142
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-EnigmaticSkyfireDiamond"
  value: {
-  dps: 1805.4370051249907
+  dps: 1772.2095871280171
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-EternalEarthstormDiamond"
  value: {
-  dps: 1805.4370051249907
+  dps: 1772.2095871280171
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-ImbuedUnstableDiamond"
  value: {
-  dps: 1815.8506485688317
+  dps: 1783.945323774142
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 1806.5478406390864
+  dps: 1772.922737616028
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-MaleficRaiment"
  value: {
-  dps: 1600.8723147358492
+  dps: 1576.4964800838463
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 1805.4370051249907
+  dps: 1772.2095871280171
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-PotentUnstableDiamond"
  value: {
-  dps: 1805.4370051249907
+  dps: 1772.2095871280171
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-PowerfulEarthstormDiamond"
  value: {
-  dps: 1805.4370051249907
+  dps: 1772.2095871280171
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-RelentlessEarthstormDiamond"
  value: {
-  dps: 1805.4370051249907
+  dps: 1772.2095871280171
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-SwiftSkyfireDiamond"
  value: {
-  dps: 1805.4370051249907
+  dps: 1772.2095871280171
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-SwiftStarfireDiamond"
  value: {
-  dps: 1816.1733942449252
+  dps: 1783.3892389795062
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-SwiftWindfireDiamond"
  value: {
-  dps: 1805.4370051249907
+  dps: 1772.2095871280171
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-TenaciousEarthstormDiamond"
  value: {
-  dps: 1805.4370051249907
+  dps: 1772.2095871280171
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-ThunderingSkyfireDiamond"
  value: {
-  dps: 1805.4370051249907
+  dps: 1772.2095871280171
  }
 }
 dps_results: {
  key: "TestDestruction-AllItems-VoidheartRaiment"
  value: {
-  dps: 1380.9548860958964
+  dps: 1359.793706138246
  }
 }
 dps_results: {
  key: "TestDestruction-Average-Default"
  value: {
-  dps: 1801.6290217181236
+  dps: 1770.1586712034054
  }
 }
 dps_results: {
  key: "TestDestruction-SelfDrums-DPS"
  value: {
-  dps: 1789.8343914813754
+  dps: 1755.808474431494
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-BloodElf-P4-Destro Warlock-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1809.152004176176
+  dps: 1776.946716829633
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-BloodElf-P4-Destro Warlock-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1809.152004176176
+  dps: 1776.946716829633
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-BloodElf-P4-Destro Warlock-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1705.9799396618616
+  dps: 1674.576117661314
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-BloodElf-P4-Destro Warlock-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2296.6918613263424
+  dps: 2270.3804572092395
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-BloodElf-P4-Destro Warlock-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1362.6428720910003
+  dps: 1338.7822906643225
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-BloodElf-P4-Destro Warlock-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1362.6428720910003
+  dps: 1338.7822906643225
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-BloodElf-P4-Destro Warlock-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1279.1477874705013
+  dps: 1255.9802220040883
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-BloodElf-P4-Destro Warlock-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1505.6417701373657
+  dps: 1482.317309603531
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Gnome-P4-Destro Warlock-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1826.0441899375114
+  dps: 1793.2910400690648
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Gnome-P4-Destro Warlock-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1826.0441899375114
+  dps: 1793.2910400690648
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Gnome-P4-Destro Warlock-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1712.742931857678
+  dps: 1680.704309208767
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Gnome-P4-Destro Warlock-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2329.8103663907996
+  dps: 2303.3495973958725
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Gnome-P4-Destro Warlock-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1365.9667065233114
+  dps: 1341.0705057052387
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Gnome-P4-Destro Warlock-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1365.9667065233114
+  dps: 1341.0705057052387
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Gnome-P4-Destro Warlock-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1282.8301118957816
+  dps: 1259.678836758776
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Gnome-P4-Destro Warlock-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1516.9770634928948
+  dps: 1492.802614291155
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Human-P4-Destro Warlock-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1809.1773046058202
+  dps: 1775.8950336972737
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Human-P4-Destro Warlock-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1809.1773046058202
+  dps: 1775.8950336972737
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Human-P4-Destro Warlock-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1702.2593814293507
+  dps: 1671.3878287780162
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Human-P4-Destro Warlock-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2282.397164371979
+  dps: 2257.2804247110776
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Human-P4-Destro Warlock-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1361.0524533043936
+  dps: 1337.2499044886913
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Human-P4-Destro Warlock-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1361.0524533043936
+  dps: 1337.2499044886913
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Human-P4-Destro Warlock-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1277.3111150333018
+  dps: 1254.3317046149118
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Human-P4-Destro Warlock-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1503.1165107162221
+  dps: 1479.9572315383894
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Orc-P4-Destro Warlock-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1826.6817985044358
+  dps: 1794.4325674293877
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Orc-P4-Destro Warlock-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1826.6817985044358
+  dps: 1794.4325674293877
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Orc-P4-Destro Warlock-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1721.9064659216356
+  dps: 1689.7038896402755
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Orc-P4-Destro Warlock-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2293.6972038049375
+  dps: 2268.936829413257
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Orc-P4-Destro Warlock-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1370.7235918612619
+  dps: 1347.191049808729
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Orc-P4-Destro Warlock-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1370.7235918612619
+  dps: 1347.191049808729
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Orc-P4-Destro Warlock-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1289.1624089071627
+  dps: 1267.1668857509387
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Orc-P4-Destro Warlock-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1530.848963448782
+  dps: 1507.6896842709486
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Undead-P4-Destro Warlock-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1810.2710853927028
+  dps: 1777.9489364782057
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Undead-P4-Destro Warlock-FullBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1810.2710853927028
+  dps: 1777.9489364782057
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Undead-P4-Destro Warlock-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1698.3051344392995
+  dps: 1667.0709537565338
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Undead-P4-Destro Warlock-FullBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 2274.3407828813642
+  dps: 2248.4885934963245
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Undead-P4-Destro Warlock-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1362.120145000065
+  dps: 1337.4363713106968
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Undead-P4-Destro Warlock-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1362.120145000065
+  dps: 1337.4363713106968
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Undead-P4-Destro Warlock-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1277.9062810591377
+  dps: 1255.8666369693278
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Undead-P4-Destro Warlock-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1505.4123264998652
+  dps: 1482.0878659660311
  }
 }
 dps_results: {
  key: "TestDestruction-SwitchInFrontOfTarget-Default"
  value: {
-  dps: 1809.152004176176
+  dps: 1776.946716829633
  }
 }
