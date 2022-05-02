@@ -189,10 +189,6 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 				Timer:    character.NewTimer(),
 				Duration: time.Minute * 3,
 			},
-			SharedCD: core.Cooldown{
-				Timer:    character.GetOffensiveTrinketCD(),
-				Duration: time.Second * 30,
-			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
