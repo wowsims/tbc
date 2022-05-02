@@ -1,6 +1,7 @@
 package core
 
 import (
+	"sort"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -137,12 +138,15 @@ type Raid struct {
 	dpsMetrics DistributionMetrics
 
 	AllUnits []*Unit // Cached list of all Units (players and pets) in the raid.
+
+	nextPetIndex int32
 }
 
 // Makes a new raid.
 func NewRaid(raidConfig proto.Raid) *Raid {
 	raid := &Raid{
-		dpsMetrics: NewDistributionMetrics(),
+		dpsMetrics:   NewDistributionMetrics(),
+		nextPetIndex: 25,
 	}
 
 	if raidConfig.StaggerStormstrikes {
@@ -175,6 +179,12 @@ func (raid *Raid) Size() int {
 
 func (raid *Raid) IsFull() bool {
 	return raid.Size() >= 25
+}
+
+func (raid *Raid) getNextPetIndex() int32 {
+	petIndex := raid.nextPetIndex
+	raid.nextPetIndex++
+	return petIndex
 }
 
 func (raid *Raid) GetRaidBuffs(baseRaidBuffs *proto.RaidBuffs) proto.RaidBuffs {
@@ -216,6 +226,10 @@ func (raid *Raid) updatePlayersAndPets() {
 	}
 
 	raid.AllUnits = append(raidPlayers, raidPets...)
+
+	sort.Slice(raid.AllUnits, func(i, j int) bool {
+		return raid.AllUnits[i].Index < raid.AllUnits[j].Index
+	})
 }
 
 func (raid *Raid) applyCharacterEffects(raidConfig proto.Raid) {

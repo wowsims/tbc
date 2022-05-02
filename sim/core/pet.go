@@ -48,7 +48,7 @@ func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanc
 		Character: Character{
 			Unit: Unit{
 				Type:        PetUnit,
-				Index:       owner.Index,
+				Index:       owner.Party.Raid.getNextPetIndex(),
 				Label:       fmt.Sprintf("%s - %s", owner.Label, name),
 				Level:       CharacterLevel,
 				PseudoStats: stats.NewPseudoStats(),

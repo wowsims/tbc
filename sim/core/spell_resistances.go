@@ -5,7 +5,7 @@ import (
 )
 
 // Modifies damage based on Armor or Magic resistances, depending on the damage type.
-func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell) {
+func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, attackTable *AttackTable) {
 	if spell.SpellExtras.Matches(SpellExtrasIgnoreResists) {
 		return
 	}
@@ -15,21 +15,20 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell) 
 		spellEffect.Damage *= spellEffect.Target.ArmorDamageReduction(spell.Unit.stats[stats.ArmorPenetration])
 	} else if !spell.SpellExtras.Matches(SpellExtrasBinary) {
 		// Magical resistance.
-		target := spellEffect.Target
 
 		resistanceRoll := sim.RandomFloat("Partial Resist")
 		if sim.Log != nil {
 			sim.Log("Resist thresholds: %0.04f, %0.04f, %0.04f",
-				target.PartialResistRollThreshold00,
-				target.PartialResistRollThreshold25,
-				target.PartialResistRollThreshold50)
+				attackTable.PartialResistRollThreshold00,
+				attackTable.PartialResistRollThreshold25,
+				attackTable.PartialResistRollThreshold50)
 		}
-		if resistanceRoll > target.PartialResistRollThreshold00 {
+		if resistanceRoll > attackTable.PartialResistRollThreshold00 {
 			// No partial resist.
-		} else if resistanceRoll > target.PartialResistRollThreshold25 {
+		} else if resistanceRoll > attackTable.PartialResistRollThreshold25 {
 			spellEffect.Outcome |= OutcomePartial1_4
 			spellEffect.Damage *= 0.75
-		} else if resistanceRoll > target.PartialResistRollThreshold50 {
+		} else if resistanceRoll > attackTable.PartialResistRollThreshold50 {
 			spellEffect.Outcome |= OutcomePartial2_4
 			spellEffect.Damage *= 0.5
 		} else {
