@@ -189,10 +189,6 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 				Timer:    character.NewTimer(),
 				Duration: time.Minute * 3,
 			},
-			SharedCD: core.Cooldown{
-				Timer:    character.GetOffensiveTrinketCD(),
-				Duration: time.Second * 30,
-			},
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
@@ -424,20 +420,22 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 func ApplyBlackenedNaaruSliver(agent core.Agent) {
 	character := agent.GetCharacter()
 
+	var bonusPerStack stats.Stats
 	procAura := character.RegisterAura(core.Aura{
 		Label:     "Blackened Naaru Sliver Proc",
 		ActionID:  core.ActionID{ItemID: 34427},
 		Duration:  time.Second * 20,
 		MaxStacks: 10,
+		OnInit: func(aura *core.Aura, sim *core.Simulation) {
+			bonusPerStack = character.ApplyStatDependencies(stats.Stats{stats.AttackPower: 44, stats.RangedAttackPower: 44})
+		},
 		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
-			character.AddStat(stats.AttackPower, 44*float64(newStacks-oldStacks))
-			character.AddStat(stats.RangedAttackPower, 44*float64(newStacks-oldStacks))
+			character.AddStatsDynamic(sim, bonusPerStack.Multiply(float64(newStacks-oldStacks)))
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-				return
+			if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				aura.AddStack(sim)
 			}
-			aura.AddStack(sim)
 		},
 	})
 

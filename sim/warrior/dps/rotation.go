@@ -8,6 +8,8 @@ import (
 	"github.com/wowsims/tbc/sim/warrior"
 )
 
+const DebuffRefreshWindow = time.Second * 2
+
 func (war *DpsWarrior) OnGCDReady(sim *core.Simulation) {
 	war.doRotation(sim)
 }
@@ -17,48 +19,39 @@ func (war *DpsWarrior) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
 	war.tryQueueHsCleave(sim)
 }
 
-const SlamThreshold = time.Millisecond * 500
-
-func (war *DpsWarrior) tryQueueSlam(sim *core.Simulation) {
-	if war.doSlamNext &&
-		war.castSlamAt == 0 &&
-		(war.AutoAttacks.MainhandSwingAt <= sim.CurrentTime || war.AutoAttacks.MainhandSwingAt == sim.CurrentTime+war.AutoAttacks.MainhandSwingSpeed()) {
-		slamAt := sim.CurrentTime + war.slamLatency
-
-		gcdAt := war.GCD.ReadyAt()
-		if slamAt < gcdAt {
-			if gcdAt-slamAt <= SlamThreshold {
-				slamAt = gcdAt
-			} else {
-				return
-			}
-		}
-
-		if war.CanSlam() && !war.shouldSunder(sim) {
-			war.castSlamAt = slamAt
-			war.WaitUntil(sim, slamAt) // Pause GCD until slam time
-		}
-	}
-}
-
 func (war *DpsWarrior) doRotation(sim *core.Simulation) {
-	if !war.StanceMatches(warrior.BerserkerStance) && war.BerserkerStance.IsReady(sim) {
-		war.BerserkerStance.Cast(sim, nil)
+	if war.thunderClapNext {
+		if war.CanThunderClap(sim) {
+			war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
+			if war.ThunderClapAura.RemainingDuration(sim) > DebuffRefreshWindow {
+				war.thunderClapNext = false
+
+				// Switching back to berserker immediately is unrealistic because the player needs
+				// to visually confirm the TC landed. Instead we add a delay to model that.
+				war.canSwapStanceAt = sim.CurrentTime + time.Millisecond*300
+			}
+			return
+		}
+	} else {
+		war.trySwapToBerserker(sim)
 	}
+
 	if war.shouldSunder(sim) {
 		war.castSlamAt = 0
-		war.doSlamNext = false
 		war.SunderArmor.Cast(sim, sim.GetPrimaryTarget())
+		war.castFirstSunder = true
 		war.tryQueueHsCleave(sim)
 		return
 	}
 
-	if war.doSlamNext && war.castSlamAt != 0 {
+	isExecutePhase := sim.IsExecutePhase()
+	canSlam := war.Rotation.UseSlam && !isExecutePhase || war.Rotation.UseSlamDuringExecute
+
+	if war.castSlamAt != 0 {
 		if sim.CurrentTime < war.castSlamAt {
 			return
 		} else if sim.CurrentTime == war.castSlamAt {
 			war.castSlamAt = 0
-			war.doSlamNext = false
 			if war.CanSlam() {
 				war.CastSlam(sim, sim.GetPrimaryTarget())
 				war.tryQueueHsCleave(sim)
@@ -66,28 +59,29 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 			}
 		} else {
 			war.castSlamAt = 0
-			war.doSlamNext = false
 			return
 		}
 	}
 
 	// If using a GCD will clip the next slam, only allow high priority spells like BT/MS/WW/debuffs.
-	highPrioSpellsOnly := war.Rotation.UseSlam && sim.CurrentTime+core.GCDDefault-SlamThreshold > war.AutoAttacks.MainhandSwingAt+war.slamLatency
+	highPrioSpellsOnly := canSlam && sim.CurrentTime+core.GCDDefault-SlamThreshold > war.AutoAttacks.MainhandSwingAt+war.slamLatency
 
-	if sim.IsExecutePhase() {
+	if isExecutePhase {
 		war.executeRotation(sim, highPrioSpellsOnly)
 	} else {
 		war.normalRotation(sim, highPrioSpellsOnly)
 	}
 
-	if war.Rotation.UseSlam {
-		war.doSlamNext = true
-	} else if war.GCD.IsReady(sim) {
+	if war.GCD.IsReady(sim) && !war.thunderClapNext {
 		// We didn't cast anything, so wait for the next CD.
 		// Note that BT/MS share a CD timer so we don't need to check MS.
 		nextCD := core.MinDuration(war.Bloodthirst.CD.ReadyAt(), war.Whirlwind.CD.ReadyAt())
 		if nextCD > sim.CurrentTime {
-			war.WaitUntil(sim, nextCD)
+			if canSlam {
+				war.WaitUntil(sim, core.MinDuration(nextCD, war.AutoAttacks.MainhandSwingAt))
+			} else {
+				war.WaitUntil(sim, nextCD)
+			}
 		}
 	}
 }
@@ -156,11 +150,94 @@ func (war *DpsWarrior) executeRotation(sim *core.Simulation, highPrioSpellsOnly 
 
 func (war *DpsWarrior) shouldSunder(sim *core.Simulation) bool {
 	if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorOnce && !war.castFirstSunder && war.CanSunderArmor(sim) {
-		war.castFirstSunder = true
 		return true
 	} else if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorMaintain &&
 		war.CanSunderArmor(sim) &&
 		(war.SunderArmorAura.GetStacks() < 5 || war.SunderArmorAura.RemainingDuration(sim) < time.Second*3) {
+		return true
+	}
+	return false
+}
+
+const SlamThreshold = time.Millisecond * 400
+
+func (war *DpsWarrior) slamInRotation(sim *core.Simulation) bool {
+	return war.Rotation.UseSlam && (!sim.IsExecutePhase() || war.Rotation.UseSlamDuringExecute)
+}
+
+func (war *DpsWarrior) tryQueueSlam(sim *core.Simulation) {
+	if !war.slamInRotation(sim) {
+		return
+	}
+
+	if sim.Log != nil {
+		sim.Log("Trying slam")
+	}
+	if war.castSlamAt != 0 {
+		// Slam already queued.
+		if sim.Log != nil {
+			sim.Log("Slam already queued")
+		}
+		return
+	}
+
+	// Check that we just finished a MH swing or a MH swing replacement.
+	if war.AutoAttacks.MainhandSwingAt > sim.CurrentTime && war.AutoAttacks.MainhandSwingAt != sim.CurrentTime+war.AutoAttacks.MainhandSwingSpeed() {
+		if sim.Log != nil {
+			sim.Log("Slam not MH Swing")
+		}
+		return
+	}
+
+	if !war.CanSlam() || war.shouldSunder(sim) {
+		if sim.Log != nil {
+			sim.Log("Cant slam")
+		}
+		return
+	}
+
+	gcdAt := war.GCD.ReadyAt()
+	slamAt := sim.CurrentTime + war.slamLatency
+	if slamAt < gcdAt {
+		if gcdAt-slamAt <= SlamThreshold {
+			slamAt = gcdAt
+		} else {
+			// We would have to wait too long for the GCD in order to slam, so don't use it.
+			if sim.Log != nil {
+				sim.Log("GCD too long")
+			}
+			return
+		}
+	}
+
+	gcdReadyAgainAt := slamAt + core.GCDDefault
+	msDelay := core.MaxDuration(0, gcdReadyAgainAt-core.MaxDuration(sim.CurrentTime, war.MortalStrike.ReadyAt()))
+	wwDelay := core.MaxDuration(0, gcdReadyAgainAt-core.MaxDuration(sim.CurrentTime, war.Whirlwind.ReadyAt()))
+	if sim.IsExecutePhase() {
+		if !war.Rotation.UseMsDuringExecute {
+			msDelay = 0
+		}
+		if !war.Rotation.UseWwDuringExecute {
+			wwDelay = 0
+		}
+	}
+
+	if msDelay+wwDelay > time.Millisecond*2000 {
+		if sim.Log != nil {
+			sim.Log("MS/WW too long")
+		}
+		return
+	}
+
+	war.castSlamAt = slamAt
+	if slamAt != gcdAt {
+		war.WaitUntil(sim, slamAt) // Pause GCD until slam time
+	}
+}
+
+func (war *DpsWarrior) trySwapToBerserker(sim *core.Simulation) bool {
+	if !war.StanceMatches(warrior.BerserkerStance) && war.BerserkerStance.IsReady(sim) && sim.CurrentTime >= war.canSwapStanceAt {
+		war.BerserkerStance.Cast(sim, nil)
 		return true
 	}
 	return false
@@ -171,17 +248,24 @@ func (war *DpsWarrior) tryMaintainDebuffs(sim *core.Simulation) bool {
 	if war.ShouldShout(sim) {
 		war.Shout.Cast(sim, nil)
 		return true
-	} else if war.Rotation.MaintainDemoShout && war.DemoralizingShoutAura.RemainingDuration(sim) < time.Second*2 && war.CanDemoralizingShout(sim) {
+	} else if war.Rotation.MaintainDemoShout && war.DemoralizingShoutAura.RemainingDuration(sim) < DebuffRefreshWindow && war.CanDemoralizingShout(sim) {
 		war.DemoralizingShout.Cast(sim, sim.GetPrimaryTarget())
 		return true
-	} else if war.Rotation.MaintainThunderClap && war.ThunderClapAura.RemainingDuration(sim) < time.Second*2 && war.CanThunderClapIgnoreStance(sim) {
+	} else if war.Rotation.MaintainThunderClap && war.ThunderClapAura.RemainingDuration(sim) < DebuffRefreshWindow && war.CanThunderClapIgnoreStance(sim) {
+		war.thunderClapNext = true
 		if !war.StanceMatches(warrior.BattleStance) {
 			if !war.BattleStance.IsReady(sim) {
 				return false
 			}
 			war.BattleStance.Cast(sim, nil)
 		}
-		war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
+		// Need to check again because we might have lost rage from switching stances.
+		if war.CanThunderClap(sim) {
+			war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
+			if war.ThunderClapAura.RemainingDuration(sim) > DebuffRefreshWindow {
+				war.thunderClapNext = false
+			}
+		}
 		return true
 	}
 	return false

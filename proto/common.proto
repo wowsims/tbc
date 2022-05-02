@@ -221,6 +221,7 @@ enum Potions {
 	HastePotion = 3;
 	MightyRagePotion = 4;
 	FelManaPotion = 5;
+	InsaneStrengthPotion = 6;
 }
 
 enum Conjured {

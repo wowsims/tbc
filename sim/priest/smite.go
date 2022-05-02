@@ -40,11 +40,11 @@ func (priest *Priest) registerSmiteSpell() {
 			ThreatMultiplier: 1 - 0.04*float64(priest.Talents.SilentResolve),
 
 			BaseDamage: core.BaseDamageConfigMagic(549, 616, 0.7143),
-			OutcomeApplier: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect, damage *float64) {
+			OutcomeApplier: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if priest.SurgeOfLightProcAura.IsActive() {
-					surgeOfLightOutcome(sim, spell, spellEffect, damage)
+					surgeOfLightOutcome(sim, spell, spellEffect)
 				} else {
-					normalOutcome(sim, spell, spellEffect, damage)
+					normalOutcome(sim, spell, spellEffect)
 				}
 			},
 		}),

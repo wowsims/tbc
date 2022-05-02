@@ -213,9 +213,10 @@ func (ret *RetributionPaladin) mainRotation(sim *core.Simulation) {
 			// If no seal is active, cast Seal of Blood
 			ret.SealOfBlood.Cast(sim, nil)
 		} else if !willTwist && !socActive &&
-			float64(weaponSpeed) > float64(spellGCD)*1.5 && spellGCD < crusaderStrikeCD {
+			timeTilNextSwing+weaponSpeed > spellGCD*2 &&
+			spellGCD < crusaderStrikeCD {
 			// If there is literally nothing else to-do, cast fillers
-			// Only if it won't clip crusader strike
+			// Only if it won't clip crusader strike or seal twist
 			ret.useFillers(sim, target)
 		}
 	}
@@ -240,7 +241,7 @@ func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Tar
 	if ret.Rotation.UseExorcism &&
 		target.MobType == proto.MobType_MobTypeDemon &&
 		ret.Exorcism.IsReady(sim) &&
-		ret.CurrentMana() > ret.GetStat(stats.Mana)*0.4 {
+		ret.CurrentMana() > ret.MaxMana()*0.4 {
 
 		ret.Exorcism.Cast(sim, target)
 		return
@@ -250,7 +251,7 @@ func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Tar
 	// Only cast consecration when above 60% mana
 	if ret.Rotation.ConsecrationRank != proto.RetributionPaladin_Rotation_None &&
 		ret.Consecration.IsReady(sim) &&
-		ret.CurrentMana() > ret.GetStat(stats.Mana)*0.6 {
+		ret.CurrentMana() > ret.MaxMana()*0.6 {
 		ret.Consecration.Cast(sim, target)
 		return
 	}

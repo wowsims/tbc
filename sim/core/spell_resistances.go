@@ -5,14 +5,14 @@ import (
 )
 
 // Modifies damage based on Armor or Magic resistances, depending on the damage type.
-func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, damage *float64) {
+func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell) {
 	if spell.SpellExtras.Matches(SpellExtrasIgnoreResists) {
 		return
 	}
 
 	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
 		// Physical resistance (armor).
-		*damage *= spellEffect.Target.ArmorDamageReduction(spell.Unit.stats[stats.ArmorPenetration])
+		spellEffect.Damage *= spellEffect.Target.ArmorDamageReduction(spell.Unit.stats[stats.ArmorPenetration])
 	} else if !spell.SpellExtras.Matches(SpellExtrasBinary) {
 		// Magical resistance.
 		target := spellEffect.Target
@@ -28,13 +28,13 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, 
 			// No partial resist.
 		} else if resistanceRoll > target.PartialResistRollThreshold25 {
 			spellEffect.Outcome |= OutcomePartial1_4
-			*damage *= 0.75
+			spellEffect.Damage *= 0.75
 		} else if resistanceRoll > target.PartialResistRollThreshold50 {
 			spellEffect.Outcome |= OutcomePartial2_4
-			*damage *= 0.5
+			spellEffect.Damage *= 0.5
 		} else {
 			spellEffect.Outcome |= OutcomePartial3_4
-			*damage *= 0.25
+			spellEffect.Damage *= 0.25
 		}
 	}
 }

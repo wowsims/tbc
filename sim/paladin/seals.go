@@ -21,6 +21,13 @@ func (paladin *Paladin) setupSealOfBlood() {
 		// should deal 35% weapon deamage
 		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
 		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
+		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Landed() {
+				// Add mana from Spiritual Attunement
+				// 10% of damage is self-inflicted, 10% of self-inflicted damage is returned as mana
+				paladin.AddMana(sim, spellEffect.Damage*0.1*0.1, core.ActionID{SpellID: 33776}, false)
+			}
+		},
 	}
 
 	// Apply 2 Handed Weapon Specialization talent
