@@ -8,7 +8,6 @@ import (
 )
 
 func (warlock *Warlock) registerShadowboltSpell() {
-	warlock.ImpShadowboltAura = warlock.impShadowboltDebuffAura(warlock.Env.GetPrimaryTarget())
 	has4pMal := ItemSetMaleficRaiment.CharacterHasSetBonus(&warlock.Character, 4)
 
 	effect := core.SpellEffect{
@@ -20,7 +19,9 @@ func (warlock *Warlock) registerShadowboltSpell() {
 		BaseDamage:       core.BaseDamageConfigMagic(544.0, 607.0, 0.857+0.04*float64(warlock.Talents.ShadowAndFlame)),
 		OutcomeApplier:   warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
 	}
-	if warlock.Talents.ImprovedShadowBolt > 0 {
+	// Don't add ISB debuff aura if the target is initialized with the 'estimated ISB uptime' debuff.
+	if warlock.Talents.ImprovedShadowBolt > 0 && !warlock.Env.Encounter.Targets[0].HasAura("Improved Shadow Bolt") {
+		warlock.ImpShadowboltAura = warlock.impShadowboltDebuffAura(warlock.Env.GetPrimaryTarget())
 		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				return

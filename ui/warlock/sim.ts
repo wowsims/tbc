@@ -219,6 +219,7 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
 					OtherInputs.SnapshotImprovedWrathOfAirTotem,
+					OtherInputs.ISBUptime,
 				],
 			},
 			encounterPicker: {
