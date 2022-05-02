@@ -319,12 +319,15 @@ func ApplyEffectFuncAOEDamageCapped(env *Environment, aoeCap float64, baseEffect
 	}
 
 	baseEffects := make([]SpellEffect, numHits)
-	outcomeMultipliers := make([]float64, numHits)
 	for i := int32(0); i < numHits; i++ {
 		baseEffects[i] = baseEffect
 		baseEffects[i].Target = env.GetTarget(i)
 	}
+	return ApplyEffectFuncMultipleDamageCapped(baseEffects, aoeCap)
+}
 
+func ApplyEffectFuncMultipleDamageCapped(baseEffects []SpellEffect, aoeCap float64) ApplySpellEffects {
+	outcomeMultipliers := make([]float64, len(baseEffects))
 	return func(sim *Simulation, _ *Target, spell *Spell) {
 		for i := range baseEffects {
 			effect := &baseEffects[i]

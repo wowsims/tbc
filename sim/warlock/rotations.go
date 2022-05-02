@@ -20,10 +20,18 @@ func (warlock *Warlock) OnManaTick(sim *core.Simulation) {
 
 func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 	var spell *core.Spell
+	var target = sim.GetPrimaryTarget()
 
 	// If doing seed, that is the priority spell.
 	mainSpell := warlock.Rotation.PrimarySpell
 	if mainSpell == proto.Warlock_Rotation_Seed {
+		if warlock.Rotation.DetonateSeed {
+			if success := warlock.Seeds[0].Cast(sim, target); !success {
+				warlock.LifeTap.Cast(sim, target)
+			}
+			return
+		}
+
 		for i := 0; i < int(sim.GetNumTargets()); i++ {
 			if !warlock.SeedDots[i].IsActive() {
 				if success := warlock.Seeds[i].Cast(sim, sim.GetTarget(int32(i))); success {
@@ -39,8 +47,6 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 		// This could also mean we didn't have mana to cast seed, and so dropping down we will end up lifetapping.
 		mainSpell = proto.Warlock_Rotation_Shadowbolt
 	}
-
-	var target = sim.GetPrimaryTarget()
 
 	// Apply curses first
 	castCurse := func(spellToCast *core.Spell, aura *core.Aura) bool {

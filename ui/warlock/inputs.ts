@@ -55,7 +55,11 @@ export const Sacrifice = {
 		newOptions.sacrificeSummon = newValue;
 		player.setSpecOptions(eventID, newOptions);
 	},
-	enableWhen: (player: Player<Spec.SpecWarlock>) => player.getTalents().demonicSacrifice && player.getSpecOptions().summon != Summon.NoSummon,
+	enableWhen: function(player: Player<Spec.SpecWarlock>) { 
+		var enable = player.getTalents().demonicSacrifice && player.getSpecOptions().summon != Summon.NoSummon;
+		console.log("should enable sacrifice ui?", enable);
+		return enable;
+	}
 };
 
 export const DemonSummon = {
@@ -146,6 +150,29 @@ export const WarlockRotationConfig = {
 				const newRotation = player.getRotation();
 				newRotation.corruption = newValue;
 				player.setRotation(eventID, newRotation);
+			},
+		},
+	},
+	{
+		type: 'boolean' as const,
+		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+		config: {
+			extraCssClasses: [
+				'detonate-seed-picker',
+			],
+			label: 'Detonate Seed on Cast',
+			labelTooltip: 'This would simulate raid doing damage to targets such that seed detonates immediately on cast.',
+			changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
+			getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().detonateSeed,
+			setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => {
+				const newRotation = player.getRotation();
+				newRotation.detonateSeed = newValue;
+				player.setRotation(eventID, newRotation);
+			},
+			enableWhen: function(player: Player<Spec.SpecWarlock>) { 
+				var enable = player.getRotation().primarySpell == PrimarySpell.Seed;
+				console.log("should enable seed options?", enable);
+				return enable;
 			},
 		},
 	},

@@ -129,6 +129,9 @@ func NewWarlock(character core.Character, options proto.Player) *Warlock {
 		case proto.Warlock_Options_Felgaurd:
 			warlock.PseudoStats.ShadowDamageDealtMultiplier *= 1.10
 		}
+	} else if warlock.Options.Summon != proto.Warlock_Options_NoSummon {
+		// Create the pet
+		warlock.NewWarlockPet()
 	}
 
 	return warlock

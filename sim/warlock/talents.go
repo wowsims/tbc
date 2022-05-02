@@ -64,9 +64,6 @@ func (warlock *Warlock) ApplyTalents() {
 			warlock.PseudoStats.DamageDealtMultiplier *= 1.05
 		}
 
-		// Create the pet
-		warlock.NewWarlockPet()
-
 		// Extract stats for demonic knowledge
 		petChar := warlock.Pets[0].GetCharacter()
 		bonus := (petChar.GetStat(stats.Stamina) + petChar.GetStat(stats.Intellect)) * (0.04 * float64(warlock.Talents.DemonicKnowledge))
