@@ -48,14 +48,13 @@ export const Sacrifice = {
 	extraCssClasses: [
 		'sac-picker',
 	],
-	changedEvent: (player: Player<Spec.SpecWarlock>) => player.specOptionsChangeEmitter,
-	getValue: (player: Player<Spec.SpecWarlock>) => player.getSpecOptions().sacrificeSummon == true,
+	changedEvent: (player: Player<Spec.SpecWarlock>) => player.changeEmitter,
+	getValue: (player: Player<Spec.SpecWarlock>) => player.getSpecOptions().sacrificeSummon&&player.getTalents().demonicSacrifice&&player.getSpecOptions().summon != Summon.NoSummon,
 	setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => {
 		const newOptions = player.getSpecOptions();
 		newOptions.sacrificeSummon = newValue;
 		player.setSpecOptions(eventID, newOptions);
 	},
-	enableWhen: (player: Player<Spec.SpecWarlock>) => player.getTalents().demonicSacrifice && player.getSpecOptions().summon != Summon.NoSummon,
 };
 
 export const DemonSummon = {
@@ -99,6 +98,9 @@ export const WarlockRotationConfig = {
 				},
 				{
 					name: 'Incinerate', value: PrimarySpell.Incinerate,
+				},
+				{
+					name: 'Seed of Corruption', value: PrimarySpell.Seed,
 				},
 			],
 			changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
@@ -144,6 +146,25 @@ export const WarlockRotationConfig = {
 				newRotation.corruption = newValue;
 				player.setRotation(eventID, newRotation);
 			},
+		},
+	},
+	{
+		type: 'boolean' as const,
+		getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+		config: {
+			extraCssClasses: [
+				'detonate-seed-picker',
+			],
+			label: 'Detonate Seed on Cast',
+			labelTooltip: 'This would simulate raid doing damage to targets such that seed detonates immediately on cast.',
+			changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
+			getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().detonateSeed,
+			setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => {
+				const newRotation = player.getRotation();
+				newRotation.detonateSeed = newValue;
+				player.setRotation(eventID, newRotation);
+			},
+			enableWhen: (player: Player<Spec.SpecWarlock>) => player.getRotation().primarySpell == PrimarySpell.Seed,
 		},
 	},
 	{

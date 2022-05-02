@@ -32,8 +32,8 @@ source $HOME/.bashrc
 # Install protobuf compiler and Go plugins
 sudo apt update && sudo apt upgrade
 sudo apt install protobuf-compiler
-go get -u -v github.com/golang/protobuf/proto
-go get -u -v github.com/golang/protobuf/protoc-gen-go
+go get -u -v google.golang.org/protobuf
+go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
 # Install node
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash

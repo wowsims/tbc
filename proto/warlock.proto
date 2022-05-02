@@ -66,6 +66,7 @@ message Warlock {
 			UnknownSpell = 0;
 			Shadowbolt = 1;
 			Incinerate = 2;
+			Seed = 3;
 		}
 		enum Curse {
 			NoCurse = 0;
@@ -79,6 +80,7 @@ message Warlock {
 		Curse curse = 2;
 		bool immolate = 3;
 		bool corruption = 4;
+		bool detonate_seed = 5;
     }
     Rotation rotation = 1;
 

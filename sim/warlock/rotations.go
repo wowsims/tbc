@@ -19,12 +19,36 @@ func (warlock *Warlock) OnManaTick(sim *core.Simulation) {
 }
 
 func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
-
 	var spell *core.Spell
 	var target = sim.GetPrimaryTarget()
 
+	// If doing seed, that is the priority spell.
+	mainSpell := warlock.Rotation.PrimarySpell
+	if mainSpell == proto.Warlock_Rotation_Seed {
+		if warlock.Rotation.DetonateSeed {
+			if success := warlock.Seeds[0].Cast(sim, target); !success {
+				warlock.LifeTap.Cast(sim, target)
+			}
+			return
+		}
+
+		for i := 0; i < int(sim.GetNumTargets()); i++ {
+			if !warlock.SeedDots[i].IsActive() {
+				if success := warlock.Seeds[i].Cast(sim, sim.GetTarget(int32(i))); success {
+					return
+				} else {
+					warlock.LifeTap.Cast(sim, sim.GetTarget(int32(i)))
+					return
+				}
+			}
+		}
+
+		// If every target has seed, fire a shadowbolt at main target so we start some explosions
+		// This could also mean we didn't have mana to cast seed, and so dropping down we will end up lifetapping.
+		mainSpell = proto.Warlock_Rotation_Shadowbolt
+	}
+
 	// Apply curses first
-	// TODO: should this be part of setup instead of during main rotation?
 	castCurse := func(spellToCast *core.Spell, aura *core.Aura) bool {
 		if !aura.IsActive() {
 			spell = spellToCast
@@ -108,7 +132,7 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 	} else if warlock.Rotation.Immolate && !warlock.ImmolateDot.IsActive() {
 		spell = warlock.Immolate
 	} else {
-		switch warlock.Rotation.PrimarySpell {
+		switch mainSpell {
 		case proto.Warlock_Rotation_Shadowbolt:
 			spell = warlock.Shadowbolt
 		case proto.Warlock_Rotation_Incinerate:

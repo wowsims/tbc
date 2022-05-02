@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1
 
-FROM golang:1.16
+FROM golang:1.18
 
 WORKDIR /tbc
 
 RUN apt-get update
 RUN apt-get install -y protobuf-compiler
-RUN go get -u -v github.com/golang/protobuf/proto
-RUN go get -u -v github.com/golang/protobuf/protoc-gen-go
+RUN go get -u google.golang.org/protobuf
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
 
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 

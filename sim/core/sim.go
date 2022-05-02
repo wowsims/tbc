@@ -214,6 +214,7 @@ func (sim *Simulation) runOnce() {
 
 	sim.Raid.doneIteration(sim)
 	sim.Encounter.doneIteration(sim)
+
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {

@@ -39,6 +39,9 @@ type Warlock struct {
 	AmplifyCurse     *core.Spell
 	AmplifyCurseAura *core.Aura
 
+	Seeds    []*core.Spell
+	SeedDots []*core.Dot
+
 	NightfallProcAura *core.Aura
 	ImpShadowboltAura *core.Aura
 
@@ -70,6 +73,7 @@ func (warlock *Warlock) Initialize() {
 	if warlock.Talents.SiphonLife {
 		warlock.registerSiphonLifeSpell()
 	}
+	warlock.registerSeedSpell()
 }
 
 func (warlock *Warlock) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
@@ -125,6 +129,9 @@ func NewWarlock(character core.Character, options proto.Player) *Warlock {
 		case proto.Warlock_Options_Felgaurd:
 			warlock.PseudoStats.ShadowDamageDealtMultiplier *= 1.10
 		}
+	} else if warlock.Options.Summon != proto.Warlock_Options_NoSummon {
+		// Create the pet
+		warlock.NewWarlockPet()
 	}
 
 	return warlock

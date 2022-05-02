@@ -25,7 +25,9 @@ func (warlock *Warlock) registerShadowboltSpell() {
 			if !spellEffect.Landed() || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				return
 			}
-			warlock.ImpShadowboltAura.Activate(sim)
+			if !warlock.ImpShadowboltAura.IsActive() {
+				warlock.ImpShadowboltAura.Activate(sim)
+			}
 			warlock.ImpShadowboltAura.SetStacks(sim, 4)
 		}
 	}
