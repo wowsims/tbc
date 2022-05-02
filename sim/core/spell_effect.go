@@ -101,16 +101,16 @@ func (spellEffect *SpellEffect) ExpertisePercentage(unit *Unit) float64 {
 	return math.Floor(expertiseRating/ExpertisePerQuarterPercentReduction) / 400
 }
 
-func (spellEffect *SpellEffect) PhysicalHitChance(unit *Unit) float64 {
+func (spellEffect *SpellEffect) PhysicalHitChance(unit *Unit, attackTable *AttackTable) float64 {
 	hitRating := unit.stats[stats.MeleeHit] + spellEffect.Target.PseudoStats.BonusMeleeHitRating
 
 	if spellEffect.ProcMask.Matches(ProcMaskRanged) {
 		hitRating += unit.PseudoStats.BonusRangedHitRating
 	}
-	return MaxFloat((hitRating/(MeleeHitRatingPerHitChance*100))-spellEffect.Target.HitSuppression, 0)
+	return MaxFloat((hitRating/(MeleeHitRatingPerHitChance*100))-attackTable.HitSuppression, 0)
 }
 
-func (spellEffect *SpellEffect) PhysicalCritChance(unit *Unit, spell *Spell) float64 {
+func (spellEffect *SpellEffect) PhysicalCritChance(unit *Unit, spell *Spell, attackTable *AttackTable) float64 {
 	critRating := unit.stats[stats.MeleeCrit] + spellEffect.BonusCritRating + spellEffect.Target.PseudoStats.BonusCritRating
 
 	if spellEffect.ProcMask.Matches(ProcMaskRanged) {
@@ -127,7 +127,7 @@ func (spellEffect *SpellEffect) PhysicalCritChance(unit *Unit, spell *Spell) flo
 		critRating += unit.PseudoStats.BonusOHCritRating
 	}
 
-	return (critRating / (MeleeCritRatingPerCritChance * 100)) - spellEffect.Target.CritSuppression
+	return (critRating / (MeleeCritRatingPerCritChance * 100)) - attackTable.CritSuppression
 }
 
 func (spellEffect *SpellEffect) SpellPower(unit *Unit, spell *Spell) float64 {
@@ -158,19 +158,19 @@ func (spellEffect *SpellEffect) calculateBaseDamage(sim *Simulation, spell *Spel
 	}
 }
 
-func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell) {
+func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, attackTable *AttackTable) {
 	if !spell.SpellExtras.Matches(SpellExtrasIgnoreModifiers) {
 		spellEffect.applyAttackerModifiers(sim, spell)
-		spellEffect.applyResistances(sim, spell)
+		spellEffect.applyResistances(sim, spell, attackTable)
 		spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient)
 		spellEffect.PreoutcomeDamage = spellEffect.Damage
-		spellEffect.OutcomeApplier(sim, spell, spellEffect)
+		spellEffect.OutcomeApplier(sim, spell, spellEffect, attackTable)
 	}
 }
-func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spell) {
-	spellEffect.applyResistances(sim, spell)
+func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spell, attackTable *AttackTable) {
+	spellEffect.applyResistances(sim, spell, attackTable)
 	spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient)
-	spellEffect.OutcomeApplier(sim, spell, spellEffect)
+	spellEffect.OutcomeApplier(sim, spell, spellEffect, attackTable)
 }
 
 func (spellEffect *SpellEffect) calcThreat(unit *Unit) float64 {

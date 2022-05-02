@@ -103,6 +103,10 @@ func (env *Environment) finalize(raidProto proto.Raid, encounterProto proto.Enco
 	}
 	env.postFinalizeEffects = nil
 
+	for _, target := range env.Encounter.Targets {
+		target.setupAttackTables()
+	}
+
 	env.State = Finalized
 }
 

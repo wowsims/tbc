@@ -73,6 +73,8 @@ type Unit struct {
 
 	cdTimers []*Timer
 
+	attackTables []*AttackTable
+
 	GCD *Timer
 
 	// Used for applying the effects of hardcast / channeled spells at a later time.

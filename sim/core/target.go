@@ -62,21 +62,6 @@ type Target struct {
 	Unit
 
 	MobType proto.MobType
-
-	BaseMissChance      float64
-	BaseSpellMissChance float64
-	BaseBlockChance     float64
-	BaseDodgeChance     float64
-	BaseParryChance     float64
-	BaseGlanceChance    float64
-
-	GlanceMultiplier float64
-	HitSuppression   float64
-	CritSuppression  float64
-
-	PartialResistRollThreshold00 float64
-	PartialResistRollThreshold25 float64
-	PartialResistRollThreshold50 float64
 }
 
 func NewTarget(options proto.Target, targetIndex int32) *Target {
@@ -106,20 +91,6 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 
 	target.PseudoStats.InFrontOfTarget = true
 
-	target.BaseMissChance = UnitLevelFloat64(target.Level, 0.05, 0.055, 0.06, 0.08)
-	target.BaseSpellMissChance = UnitLevelFloat64(target.Level, 0.04, 0.05, 0.06, 0.17)
-	target.BaseBlockChance = 0.05
-	target.BaseDodgeChance = UnitLevelFloat64(target.Level, 0.05, 0.055, 0.06, 0.065)
-	target.BaseParryChance = UnitLevelFloat64(target.Level, 0.05, 0.055, 0.06, 0.14)
-	target.BaseGlanceChance = UnitLevelFloat64(target.Level, 0.06, 0.12, 0.18, 0.24)
-
-	target.GlanceMultiplier = UnitLevelFloat64(target.Level, 0.95, 0.95, 0.85, 0.75)
-	target.HitSuppression = UnitLevelFloat64(target.Level, 0, 0, 0, 0.01)
-	target.CritSuppression = UnitLevelFloat64(target.Level, 0, 0.01, 0.02, 0.048)
-
-	// TODO: This needs to be refactored to actually use the spell's school, and change on changes to resistance/spell pen.
-	target.PartialResistRollThreshold00, target.PartialResistRollThreshold25, target.PartialResistRollThreshold50 = target.partialResistRollThresholds(SpellSchoolFire, CharacterLevel, 0)
-
 	if options.Debuffs != nil {
 		applyDebuffEffects(target, *options.Debuffs)
 	}
@@ -129,6 +100,22 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 
 func (target *Target) finalize() {
 	target.Unit.finalize()
+}
+
+func (target *Target) setupAttackTables() {
+	raidUnits := target.Env.Raid.AllUnits
+	numTables := raidUnits[len(raidUnits)-1].Index + 1
+	target.attackTables = make([]*AttackTable, numTables)
+
+	for _, attacker := range raidUnits {
+		table := NewAttackTable(attacker, &target.Unit)
+		target.attackTables[attacker.Index] = table
+
+		if attacker.attackTables == nil {
+			attacker.attackTables = make([]*AttackTable, target.Env.GetNumTargets())
+		}
+		attacker.attackTables[target.Index] = table
+	}
 }
 
 func (target *Target) init(sim *Simulation) {
@@ -160,4 +147,44 @@ func (target *Target) GetMetricsProto(numIterations int32) *proto.UnitMetrics {
 		Name:  target.Label,
 		Auras: target.auraTracker.GetMetricsProto(numIterations),
 	}
+}
+
+// Holds cached values for outcome/damage calculations, for a specific attacker+defender pair.
+//
+// These are updated dynamically when attacker or defender stats change.
+type AttackTable struct {
+	BaseMissChance      float64
+	BaseSpellMissChance float64
+	BaseBlockChance     float64
+	BaseDodgeChance     float64
+	BaseParryChance     float64
+	BaseGlanceChance    float64
+
+	GlanceMultiplier float64
+	HitSuppression   float64
+	CritSuppression  float64
+
+	PartialResistRollThreshold00 float64
+	PartialResistRollThreshold25 float64
+	PartialResistRollThreshold50 float64
+}
+
+// Currently assumes attacker is level 70.
+func NewAttackTable(attacker *Unit, defender *Unit) *AttackTable {
+	table := &AttackTable{}
+	table.BaseMissChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.08)
+	table.BaseSpellMissChance = UnitLevelFloat64(defender.Level, 0.04, 0.05, 0.06, 0.17)
+	table.BaseBlockChance = 0.05
+	table.BaseDodgeChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.065)
+	table.BaseParryChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.14)
+	table.BaseGlanceChance = UnitLevelFloat64(defender.Level, 0.06, 0.12, 0.18, 0.24)
+
+	table.GlanceMultiplier = UnitLevelFloat64(defender.Level, 0.95, 0.95, 0.85, 0.75)
+	table.HitSuppression = UnitLevelFloat64(defender.Level, 0, 0, 0, 0.01)
+	table.CritSuppression = UnitLevelFloat64(defender.Level, 0, 0.01, 0.02, 0.048)
+
+	// TODO: This needs to be refactored to actually use the spell's school, and change on changes to resistance/spell pen.
+	table.PartialResistRollThreshold00, table.PartialResistRollThreshold25, table.PartialResistRollThreshold50 = defender.partialResistRollThresholds(SpellSchoolFire, CharacterLevel, 0)
+
+	return table
 }
