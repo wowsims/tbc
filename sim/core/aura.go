@@ -138,6 +138,9 @@ func (aura *Aura) GetStacks() int32 {
 }
 
 func (aura *Aura) SetStacks(sim *Simulation, newStacks int32) {
+	if newStacks < 0 {
+		panic("SetStacks newStacks cannot be negative")
+	}
 	if aura.MaxStacks == 0 {
 		panic("MaxStacks required to set Aura stacks: " + aura.Label)
 	}
@@ -551,6 +554,10 @@ func (at *auraTracker) OnCastComplete(sim *Simulation, spell *Spell) {
 // Invokes the OnSpellHit event for all tracked Auras.
 func (at *auraTracker) OnSpellHit(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 	for _, aura := range at.onSpellHitAuras {
+		// this check is to handle a case where auras are deactivated during iteration.
+		if !aura.active {
+			continue
+		}
 		aura.OnSpellHit(aura, sim, spell, spellEffect)
 	}
 }

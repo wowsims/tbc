@@ -29,10 +29,12 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 				if success := warlock.Seeds[i].Cast(sim, sim.GetTarget(int32(i))); success {
 					return
 				} else {
-					break
+					warlock.LifeTap.Cast(sim, sim.GetTarget(int32(i)))
+					return
 				}
 			}
 		}
+
 		// If every target has seed, fire a shadowbolt at main target so we start some explosions
 		// This could also mean we didn't have mana to cast seed, and so dropping down we will end up lifetapping.
 		mainSpell = proto.Warlock_Rotation_Shadowbolt

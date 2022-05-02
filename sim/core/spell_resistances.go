@@ -18,12 +18,12 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, 
 		target := spellEffect.Target
 
 		resistanceRoll := sim.RandomFloat("Partial Resist")
-		if sim.Log != nil {
-			sim.Log("Resist thresholds: %0.04f, %0.04f, %0.04f",
-				target.PartialResistRollThreshold00,
-				target.PartialResistRollThreshold25,
-				target.PartialResistRollThreshold50)
-		}
+		// if sim.Log != nil {
+		// 	sim.Log("Resist thresholds: %0.04f, %0.04f, %0.04f",
+		// 		target.PartialResistRollThreshold00,
+		// 		target.PartialResistRollThreshold25,
+		// 		target.PartialResistRollThreshold50)
+		// }
 		if resistanceRoll > target.PartialResistRollThreshold00 {
 			// No partial resist.
 		} else if resistanceRoll > target.PartialResistRollThreshold25 {
