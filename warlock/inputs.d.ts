@@ -27,7 +27,6 @@ export declare const Sacrifice: {
     changedEvent: (player: Player<Spec.SpecWarlock>) => TypedEvent<void>;
     getValue: (player: Player<Spec.SpecWarlock>) => boolean;
     setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => void;
-    enableWhen: (player: Player<Spec.SpecWarlock>) => boolean;
 };
 export declare const DemonSummon: {
     extraCssClasses: string[];
@@ -62,6 +61,7 @@ export declare const WarlockRotationConfig: {
             changedEvent: (player: Player<Spec.SpecWarlock>) => TypedEvent<void>;
             getValue: (player: Player<Spec.SpecWarlock>) => PrimarySpell;
             setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: number) => void;
+            enableWhen?: undefined;
         };
     } | {
         type: "boolean";
@@ -73,6 +73,20 @@ export declare const WarlockRotationConfig: {
             changedEvent: (player: Player<Spec.SpecWarlock>) => TypedEvent<void>;
             getValue: (player: Player<Spec.SpecWarlock>) => boolean;
             setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => void;
+            values?: undefined;
+            enableWhen?: undefined;
+        };
+    } | {
+        type: "boolean";
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+        config: {
+            extraCssClasses: string[];
+            label: string;
+            labelTooltip: string;
+            changedEvent: (player: Player<Spec.SpecWarlock>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecWarlock>) => boolean;
+            setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => void;
+            enableWhen: (player: Player<Spec.SpecWarlock>) => boolean;
             values?: undefined;
         };
     } | {
@@ -89,6 +103,7 @@ export declare const WarlockRotationConfig: {
             changedEvent: (player: Player<Spec.SpecWarlock>) => TypedEvent<void>;
             getValue: (player: Player<Spec.SpecWarlock>) => Curse;
             setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: number) => void;
+            enableWhen?: undefined;
         };
     })[];
 };

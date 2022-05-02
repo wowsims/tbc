@@ -36,14 +36,13 @@ export const Sacrifice = {
     extraCssClasses: [
         'sac-picker',
     ],
-    changedEvent: (player) => player.specOptionsChangeEmitter,
-    getValue: (player) => player.getSpecOptions().sacrificeSummon == true,
+    changedEvent: (player) => player.changeEmitter,
+    getValue: (player) => player.getSpecOptions().sacrificeSummon && player.getTalents().demonicSacrifice && player.getSpecOptions().summon != Summon.NoSummon,
     setValue: (eventID, player, newValue) => {
         const newOptions = player.getSpecOptions();
         newOptions.sacrificeSummon = newValue;
         player.setSpecOptions(eventID, newOptions);
     },
-    enableWhen: (player) => player.getTalents().demonicSacrifice && player.getSpecOptions().summon != Summon.NoSummon,
 };
 export const DemonSummon = {
     extraCssClasses: [
@@ -85,6 +84,9 @@ export const WarlockRotationConfig = {
                     },
                     {
                         name: 'Incinerate', value: PrimarySpell.Incinerate,
+                    },
+                    {
+                        name: 'Seed of Corruption', value: PrimarySpell.Seed,
                     },
                 ],
                 changedEvent: (player) => player.rotationChangeEmitter,
@@ -130,6 +132,25 @@ export const WarlockRotationConfig = {
                     newRotation.corruption = newValue;
                     player.setRotation(eventID, newRotation);
                 },
+            },
+        },
+        {
+            type: 'boolean',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                extraCssClasses: [
+                    'detonate-seed-picker',
+                ],
+                label: 'Detonate Seed on Cast',
+                labelTooltip: 'This would simulate raid doing damage to targets such that seed detonates immediately on cast.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().detonateSeed,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.detonateSeed = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+                enableWhen: (player) => player.getRotation().primarySpell == PrimarySpell.Seed,
             },
         },
         {

@@ -189,6 +189,14 @@ export class ActionId {
                     name += ' (Snapshot)';
                 }
                 break;
+            case 'Seed of Corruption':
+                if (this.tag == 0) {
+                    name += ' (DoT)';
+                }
+                else if (this.tag == 1) {
+                    name += ' (Explosion)';
+                }
+                break;
             default:
                 if (this.tag) {
                     name += ' (??)';

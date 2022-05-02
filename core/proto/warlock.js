@@ -20,6 +20,10 @@ export var Warlock_Rotation_PrimarySpell;
      * @generated from protobuf enum value: Incinerate = 2;
      */
     Warlock_Rotation_PrimarySpell[Warlock_Rotation_PrimarySpell["Incinerate"] = 2] = "Incinerate";
+    /**
+     * @generated from protobuf enum value: Seed = 3;
+     */
+    Warlock_Rotation_PrimarySpell[Warlock_Rotation_PrimarySpell["Seed"] = 3] = "Seed";
 })(Warlock_Rotation_PrimarySpell || (Warlock_Rotation_PrimarySpell = {}));
 /**
  * @generated from protobuf enum proto.Warlock.Rotation.Curse
@@ -550,11 +554,12 @@ class Warlock_Rotation$Type extends MessageType {
             { no: 1, name: "primary_spell", kind: "enum", T: () => ["proto.Warlock.Rotation.PrimarySpell", Warlock_Rotation_PrimarySpell] },
             { no: 2, name: "curse", kind: "enum", T: () => ["proto.Warlock.Rotation.Curse", Warlock_Rotation_Curse] },
             { no: 3, name: "immolate", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 4, name: "corruption", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 4, name: "corruption", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 5, name: "detonate_seed", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { primarySpell: 0, curse: 0, immolate: false, corruption: false };
+        const message = { primarySpell: 0, curse: 0, immolate: false, corruption: false, detonateSeed: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -576,6 +581,9 @@ class Warlock_Rotation$Type extends MessageType {
                     break;
                 case /* bool corruption */ 4:
                     message.corruption = reader.bool();
+                    break;
+                case /* bool detonate_seed */ 5:
+                    message.detonateSeed = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -601,6 +609,9 @@ class Warlock_Rotation$Type extends MessageType {
         /* bool corruption = 4; */
         if (message.corruption !== false)
             writer.tag(4, WireType.Varint).bool(message.corruption);
+        /* bool detonate_seed = 5; */
+        if (message.detonateSeed !== false)
+            writer.tag(5, WireType.Varint).bool(message.detonateSeed);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

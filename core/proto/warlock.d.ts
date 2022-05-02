@@ -248,6 +248,10 @@ export interface Warlock_Rotation {
      * @generated from protobuf field: bool corruption = 4;
      */
     corruption: boolean;
+    /**
+     * @generated from protobuf field: bool detonate_seed = 5;
+     */
+    detonateSeed: boolean;
 }
 /**
  * @generated from protobuf enum proto.Warlock.Rotation.PrimarySpell
@@ -264,7 +268,11 @@ export declare enum Warlock_Rotation_PrimarySpell {
     /**
      * @generated from protobuf enum value: Incinerate = 2;
      */
-    Incinerate = 2
+    Incinerate = 2,
+    /**
+     * @generated from protobuf enum value: Seed = 3;
+     */
+    Seed = 3
 }
 /**
  * @generated from protobuf enum proto.Warlock.Rotation.Curse
