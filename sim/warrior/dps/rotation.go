@@ -38,21 +38,20 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 
 	if war.shouldSunder(sim) {
 		war.castSlamAt = 0
-		war.doSlamNext = false
 		war.SunderArmor.Cast(sim, sim.GetPrimaryTarget())
+		war.castFirstSunder = true
 		war.tryQueueHsCleave(sim)
 		return
 	}
 
 	isExecutePhase := sim.IsExecutePhase()
-	canSlam := !isExecutePhase || war.Rotation.UseSlamDuringExecute
+	canSlam := war.Rotation.UseSlam && !isExecutePhase || war.Rotation.UseSlamDuringExecute
 
-	if war.doSlamNext && canSlam && war.castSlamAt != 0 {
+	if war.castSlamAt != 0 {
 		if sim.CurrentTime < war.castSlamAt {
 			return
 		} else if sim.CurrentTime == war.castSlamAt {
 			war.castSlamAt = 0
-			war.doSlamNext = false
 			if war.CanSlam() {
 				war.CastSlam(sim, sim.GetPrimaryTarget())
 				war.tryQueueHsCleave(sim)
@@ -60,13 +59,12 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 			}
 		} else {
 			war.castSlamAt = 0
-			war.doSlamNext = false
 			return
 		}
 	}
 
 	// If using a GCD will clip the next slam, only allow high priority spells like BT/MS/WW/debuffs.
-	highPrioSpellsOnly := war.Rotation.UseSlam && canSlam && sim.CurrentTime+core.GCDDefault-SlamThreshold > war.AutoAttacks.MainhandSwingAt+war.slamLatency
+	highPrioSpellsOnly := canSlam && sim.CurrentTime+core.GCDDefault-SlamThreshold > war.AutoAttacks.MainhandSwingAt+war.slamLatency
 
 	if isExecutePhase {
 		war.executeRotation(sim, highPrioSpellsOnly)
@@ -74,14 +72,16 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 		war.normalRotation(sim, highPrioSpellsOnly)
 	}
 
-	if war.Rotation.UseSlam {
-		war.doSlamNext = true
-	} else if war.GCD.IsReady(sim) && !war.thunderClapNext {
+	if war.GCD.IsReady(sim) && !war.thunderClapNext {
 		// We didn't cast anything, so wait for the next CD.
 		// Note that BT/MS share a CD timer so we don't need to check MS.
 		nextCD := core.MinDuration(war.Bloodthirst.CD.ReadyAt(), war.Whirlwind.CD.ReadyAt())
 		if nextCD > sim.CurrentTime {
-			war.WaitUntil(sim, nextCD)
+			if canSlam {
+				war.WaitUntil(sim, core.MinDuration(nextCD, war.AutoAttacks.MainhandSwingAt))
+			} else {
+				war.WaitUntil(sim, nextCD)
+			}
 		}
 	}
 }
@@ -150,7 +150,6 @@ func (war *DpsWarrior) executeRotation(sim *core.Simulation, highPrioSpellsOnly 
 
 func (war *DpsWarrior) shouldSunder(sim *core.Simulation) bool {
 	if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorOnce && !war.castFirstSunder && war.CanSunderArmor(sim) {
-		war.castFirstSunder = true
 		return true
 	} else if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorMaintain &&
 		war.CanSunderArmor(sim) &&
@@ -160,27 +159,79 @@ func (war *DpsWarrior) shouldSunder(sim *core.Simulation) bool {
 	return false
 }
 
-const SlamThreshold = time.Millisecond * 500
+const SlamThreshold = time.Millisecond * 400
+
+func (war *DpsWarrior) slamInRotation(sim *core.Simulation) bool {
+	return war.Rotation.UseSlam && (!sim.IsExecutePhase() || war.Rotation.UseSlamDuringExecute)
+}
 
 func (war *DpsWarrior) tryQueueSlam(sim *core.Simulation) {
-	if war.doSlamNext &&
-		war.castSlamAt == 0 &&
-		(war.AutoAttacks.MainhandSwingAt <= sim.CurrentTime || war.AutoAttacks.MainhandSwingAt == sim.CurrentTime+war.AutoAttacks.MainhandSwingSpeed()) {
-		slamAt := sim.CurrentTime + war.slamLatency
+	if !war.slamInRotation(sim) {
+		return
+	}
 
-		gcdAt := war.GCD.ReadyAt()
-		if slamAt < gcdAt {
-			if gcdAt-slamAt <= SlamThreshold {
-				slamAt = gcdAt
-			} else {
-				return
+	if sim.Log != nil {
+		sim.Log("Trying slam")
+	}
+	if war.castSlamAt != 0 {
+		// Slam already queued.
+		if sim.Log != nil {
+			sim.Log("Slam already queued")
+		}
+		return
+	}
+
+	// Check that we just finished a MH swing or a MH swing replacement.
+	if war.AutoAttacks.MainhandSwingAt > sim.CurrentTime && war.AutoAttacks.MainhandSwingAt != sim.CurrentTime+war.AutoAttacks.MainhandSwingSpeed() {
+		if sim.Log != nil {
+			sim.Log("Slam not MH Swing")
+		}
+		return
+	}
+
+	if !war.CanSlam() || war.shouldSunder(sim) {
+		if sim.Log != nil {
+			sim.Log("Cant slam")
+		}
+		return
+	}
+
+	gcdAt := war.GCD.ReadyAt()
+	slamAt := sim.CurrentTime + war.slamLatency
+	if slamAt < gcdAt {
+		if gcdAt-slamAt <= SlamThreshold {
+			slamAt = gcdAt
+		} else {
+			// We would have to wait too long for the GCD in order to slam, so don't use it.
+			if sim.Log != nil {
+				sim.Log("GCD too long")
 			}
+			return
 		}
+	}
 
-		if war.CanSlam() && !war.shouldSunder(sim) {
-			war.castSlamAt = slamAt
-			war.WaitUntil(sim, slamAt) // Pause GCD until slam time
+	gcdReadyAgainAt := slamAt + core.GCDDefault
+	msDelay := core.MaxDuration(0, gcdReadyAgainAt-core.MaxDuration(sim.CurrentTime, war.MortalStrike.ReadyAt()))
+	wwDelay := core.MaxDuration(0, gcdReadyAgainAt-core.MaxDuration(sim.CurrentTime, war.Whirlwind.ReadyAt()))
+	if sim.IsExecutePhase() {
+		if !war.Rotation.UseMsDuringExecute {
+			msDelay = 0
 		}
+		if !war.Rotation.UseWwDuringExecute {
+			wwDelay = 0
+		}
+	}
+
+	if msDelay+wwDelay > time.Millisecond*2000 {
+		if sim.Log != nil {
+			sim.Log("MS/WW too long")
+		}
+		return
+	}
+
+	war.castSlamAt = slamAt
+	if slamAt != gcdAt {
+		war.WaitUntil(sim, slamAt) // Pause GCD until slam time
 	}
 }
 
