@@ -48,18 +48,13 @@ export const Sacrifice = {
 	extraCssClasses: [
 		'sac-picker',
 	],
-	changedEvent: (player: Player<Spec.SpecWarlock>) => player.specOptionsChangeEmitter,
-	getValue: (player: Player<Spec.SpecWarlock>) => player.getSpecOptions().sacrificeSummon == true,
+	changedEvent: (player: Player<Spec.SpecWarlock>) => player.changeEmitter,
+	getValue: (player: Player<Spec.SpecWarlock>) => player.getSpecOptions().sacrificeSummon&&player.getTalents().demonicSacrifice&&player.getSpecOptions().summon != Summon.NoSummon,
 	setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => {
 		const newOptions = player.getSpecOptions();
 		newOptions.sacrificeSummon = newValue;
 		player.setSpecOptions(eventID, newOptions);
 	},
-	enableWhen: function(player: Player<Spec.SpecWarlock>) { 
-		var enable = player.getTalents().demonicSacrifice && player.getSpecOptions().summon != Summon.NoSummon;
-		console.log("should enable sacrifice ui?", enable);
-		return enable;
-	}
 };
 
 export const DemonSummon = {
@@ -169,11 +164,7 @@ export const WarlockRotationConfig = {
 				newRotation.detonateSeed = newValue;
 				player.setRotation(eventID, newRotation);
 			},
-			enableWhen: function(player: Player<Spec.SpecWarlock>) { 
-				var enable = player.getRotation().primarySpell == PrimarySpell.Seed;
-				console.log("should enable seed options?", enable);
-				return enable;
-			},
+			enableWhen: (player: Player<Spec.SpecWarlock>) => player.getRotation().primarySpell == PrimarySpell.Seed,
 		},
 	},
 	{

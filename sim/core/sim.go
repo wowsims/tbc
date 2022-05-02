@@ -215,9 +215,6 @@ func (sim *Simulation) runOnce() {
 	sim.Raid.doneIteration(sim)
 	sim.Encounter.doneIteration(sim)
 
-	sim.Options.RandomSeed += 1
-	sim.rand = NewSplitMix(uint64(sim.Options.RandomSeed))
-
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {
