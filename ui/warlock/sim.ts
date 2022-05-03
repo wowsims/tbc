@@ -190,6 +190,8 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 				],
 				battleElixirs: [
 					BattleElixir.AdeptsElixir,
+					BattleElixir.ElixirOfMajorShadowPower,
+					BattleElixir.ElixirOfMajorFirePower,
 				],
 				guardianElixirs: [
 					GuardianElixir.ElixirOfDraenicWisdom,
@@ -238,12 +240,14 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 			presets: {
 				// Preset talents that the user can quickly select.
 				talents: [
-					Presets.DestructionTalents,
 					Presets.AfflicationTalents,
 					Presets.DemonologistTalents,
+					Presets.DestructionTalents,	
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
+					Presets.P1_DESTRO,
+					Presets.P2_DESTRO,
 					Presets.P3_DESTRO,
 					Presets.P4_DESTRO,
 				],
