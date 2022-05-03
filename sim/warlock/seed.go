@@ -110,7 +110,7 @@ func (warlock *Warlock) makeSeed(targetIdx int, cap float64) {
 				}
 				trySeedPop(sim, spellEffect.Damage)
 			},
-			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnPeriodicDamage: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				trySeedPop(sim, spellEffect.Damage)
 			},
 			OnGain: func(aura *core.Aura, sim *core.Simulation) {

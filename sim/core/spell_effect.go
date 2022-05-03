@@ -13,7 +13,7 @@ type OnSpellHit func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *Spe
 
 // OnPeriodicDamage is called when dots tick, after damage is calculated. Use it for proc effects
 // or anything that comes from the final result of a tick.
-type OnPeriodicDamage func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
+type OnPeriodicDamage func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect)
 
 type SpellEffect struct {
 	// Target of the spell.
@@ -162,14 +162,14 @@ func (spellEffect *SpellEffect) calcDamageSingle(sim *Simulation, spell *Spell, 
 	if !spell.SpellExtras.Matches(SpellExtrasIgnoreModifiers) {
 		spellEffect.applyAttackerModifiers(sim, spell)
 		spellEffect.applyResistances(sim, spell, attackTable)
-		spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient)
+		spellEffect.applyTargetModifiers(sim, spell)
 		spellEffect.PreoutcomeDamage = spellEffect.Damage
 		spellEffect.OutcomeApplier(sim, spell, spellEffect, attackTable)
 	}
 }
 func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spell, attackTable *AttackTable) {
 	spellEffect.applyResistances(sim, spell, attackTable)
-	spellEffect.applyTargetModifiers(sim, spell, spellEffect.BaseDamage.TargetSpellCoefficient)
+	spellEffect.applyTargetModifiers(sim, spell)
 	spellEffect.OutcomeApplier(sim, spell, spellEffect, attackTable)
 }
 
@@ -244,12 +244,12 @@ func (spellEffect *SpellEffect) applyAttackerModifiers(sim *Simulation, spell *S
 	}
 }
 
-func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Spell, targetCoeff float64) {
+func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Spell) {
 	target := spellEffect.Target
 
 	spellEffect.Damage *= target.PseudoStats.DamageTakenMultiplier
 	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
-		if targetCoeff > 0 {
+		if spellEffect.BaseDamage.TargetSpellCoefficient > 0 {
 			spellEffect.Damage += target.PseudoStats.BonusPhysicalDamageTaken
 		}
 		spellEffect.Damage *= target.PseudoStats.PhysicalDamageTakenMultiplier
@@ -263,7 +263,7 @@ func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Spe
 	} else if spell.SpellSchool.Matches(SpellSchoolFrost) {
 		spellEffect.Damage *= target.PseudoStats.FrostDamageTakenMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolHoly) {
-		spellEffect.Damage += target.PseudoStats.BonusHolyDamageTaken * targetCoeff
+		spellEffect.Damage += target.PseudoStats.BonusHolyDamageTaken * spellEffect.BaseDamage.TargetSpellCoefficient
 		spellEffect.Damage *= target.PseudoStats.HolyDamageTakenMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolNature) {
 		spellEffect.Damage *= target.PseudoStats.NatureDamageTakenMultiplier

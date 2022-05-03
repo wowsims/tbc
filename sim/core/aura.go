@@ -567,7 +567,7 @@ func (at *auraTracker) OnSpellHit(sim *Simulation, spell *Spell, spellEffect *Sp
 //   As a buff when caster's dots are ticking.
 func (at *auraTracker) OnPeriodicDamage(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 	for _, aura := range at.onPeriodicDamageAuras {
-		aura.OnPeriodicDamage(sim, spell, spellEffect)
+		aura.OnPeriodicDamage(aura, sim, spell, spellEffect)
 	}
 }
 

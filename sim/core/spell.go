@@ -349,7 +349,7 @@ func ApplyEffectFuncMultipleDamageCapped(baseEffects []SpellEffect, aoeCap float
 		applyAOECap(baseEffects, outcomeMultipliers, aoeCap)
 		for i := range baseEffects {
 			effect := &baseEffects[i]
-			effect.applyTargetModifiers(sim, spell, effect.BaseDamage.TargetSpellCoefficient)
+			effect.applyTargetModifiers(sim, spell)
 		}
 		for i := range baseEffects {
 			effect := &baseEffects[i]
