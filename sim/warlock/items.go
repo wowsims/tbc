@@ -71,3 +71,15 @@ var ItemSetVoidheartRaiment = core.ItemSet{
 		},
 	},
 }
+
+var ItemSetOblivionRaiment = core.ItemSet{
+	Name: "Oblivion Raiment",
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			// in pet.go constructor
+		},
+		4: func(agent core.Agent) {
+			// in seed.go
+		},
+	},
+}

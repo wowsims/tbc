@@ -27,11 +27,15 @@ func (warlock *Warlock) registerSeedSpell() {
 func (warlock *Warlock) makeSeed(targetIdx int, cap float64) {
 	baseCost := 882.0
 
+	flatBonus := 0.0
+	if ItemSetOblivionRaiment.CharacterHasSetBonus(&warlock.Character, 4) {
+		flatBonus += 180
+	}
 	baseSeedExplosionEffect := core.SpellEffect{
 		ProcMask:         core.ProcMaskSpellDamage,
 		DamageMultiplier: 1 * (1 + 0.02*float64(warlock.Talents.ShadowMastery)) * (1 + 0.01*float64(warlock.Talents.Contagion)),
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.ImprovedDrainSoul),
-		BaseDamage:       core.BaseDamageConfigMagic(1110, 1290, 0.143),
+		BaseDamage:       core.BaseDamageConfigMagic(1110+flatBonus, 1290+flatBonus, 0.143),
 		OutcomeApplier:   warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
 	}
 

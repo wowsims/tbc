@@ -123,6 +123,10 @@ func (warlock *Warlock) NewWarlockPet() *WarlockPet {
 		})
 	}
 
+	if ItemSetOblivionRaiment.CharacterHasSetBonus(&warlock.Character, 2) {
+		wp.AddStat(stats.MP5, 45)
+	}
+
 	core.ApplyPetConsumeEffects(&wp.Character, warlock.Consumes)
 
 	warlock.AddPet(wp)
