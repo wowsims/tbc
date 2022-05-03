@@ -16,6 +16,16 @@ export declare const DemonologistTalents: {
 export declare const DefaultRotation: WarlockRotation;
 export declare const DefaultOptions: WarlockOptions;
 export declare const DefaultConsumes: Consumes;
+export declare const P1_DESTRO: {
+    name: string;
+    tooltip: string;
+    gear: EquipmentSpec;
+};
+export declare const P2_DESTRO: {
+    name: string;
+    tooltip: string;
+    gear: EquipmentSpec;
+};
 export declare const P3_DESTRO: {
     name: string;
     tooltip: string;
