@@ -65,7 +65,7 @@ export const DefaultOptions = WarlockOptions.create({
 
 export const AfflictionOptions = WarlockOptions.create({
 	armor: Armor.FelArmor,
-	sacrificeSummon: true,
+	sacrificeSummon: false,
 	summon: Summon.Imp,
 });
 
