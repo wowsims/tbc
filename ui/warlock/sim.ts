@@ -1,20 +1,14 @@
 import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
-import { Class } from '/tbc/core/proto/common.js';
-import { Consumes } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
-import { Encounter } from '/tbc/core/proto/common.js';
-import { ItemSlot } from '/tbc/core/proto/common.js';
-import { MobType } from '/tbc/core/proto/common.js';
-import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js'
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
-import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
@@ -23,7 +17,6 @@ import { Food } from '/tbc/core/proto/common.js';
 import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { Conjured } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
-import { PetFood } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 
@@ -42,6 +35,16 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 			cssClass: 'warlock-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
+
+			],
+			warnings: [
+				(simUI: IndividualSimUI<Spec.SpecWarlock>) => {
+					return {
+						updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter]),
+						shouldDisplay: () => true,
+						getContent: () => 'This sim is newly released, and there are likely a few bugs. Please let us know if you encounter any issues!',
+					};
+				},
 			],
 
 			// All stats for which EP should be calculated.
@@ -253,6 +256,7 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 					Presets.P2_DESTRO,
 					Presets.P3_DESTRO,
 					Presets.P4_DESTRO,
+					Presets.P5_DESTRO,
 				],
 			},
 		});
