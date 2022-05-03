@@ -100,6 +100,9 @@ export class WarlockSimUI extends IndividualSimUI {
                     judgementOfWisdom: true,
                     misery: true,
                     shadowWeaving: true,
+                    curseOfElements: TristateEffect.TristateEffectRegular,
+                    faerieFire: TristateEffect.TristateEffectImproved,
+                    sunderArmor: true,
                 }),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
@@ -196,11 +199,11 @@ export class WarlockSimUI extends IndividualSimUI {
             // Inputs to include in the 'Other' section on the settings tab.
             otherInputs: {
                 inputs: [
+                    OtherInputs.ISBUptime,
                     OtherInputs.ShadowPriestDPS,
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,
                     OtherInputs.SnapshotImprovedWrathOfAirTotem,
-                    OtherInputs.ISBUptime,
                 ],
             },
             encounterPicker: {
