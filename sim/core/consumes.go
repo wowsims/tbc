@@ -160,7 +160,6 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	if character.HasOHWeapon() {
 		addImbueStats(character, consumes.OffHandImbue)
 	}
-	applyAdamantiteSharpeningStoneAura(character, consumes, allowMHImbue)
 
 	registerPotionCD(agent, consumes)
 	registerConjuredCD(agent, consumes)
@@ -188,12 +187,16 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 
 	if imbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
 		character.PseudoStats.BonusDamage += 12
-		// Melee crit component handled separately because its melee-only.
+		// Crit rating for sharpening stone applies to melee only.
+		if character.Class != proto.Class_ClassHunter {
+			// For non-hunters just give direct crit so it shows on the stats panel.
+			character.AddStats(stats.Stats{stats.MeleeCrit: 14})
+		} else {
+			character.PseudoStats.BonusMeleeCritRating += 14
+		}
 	} else if imbue == proto.WeaponImbue_WeaponImbueAdamantiteWeightstone {
 		character.PseudoStats.BonusDamage += 12
-		character.AddStats(stats.Stats{
-			stats.MeleeCrit: 14,
-		})
+		character.AddStats(stats.Stats{stats.MeleeCrit: 14})
 	} else if imbue == proto.WeaponImbue_WeaponImbueElementalSharpeningStone {
 		character.AddStats(stats.Stats{
 			stats.MeleeCrit: 28,
@@ -209,30 +212,6 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 			stats.SpellPower:   42,
 			stats.HealingPower: 42,
 		})
-	}
-}
-
-func applyAdamantiteSharpeningStoneAura(character *Character, consumes proto.Consumes, allowMHImbue bool) {
-	critBonus := 0.0
-	if consumes.MainHandImbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone && allowMHImbue {
-		critBonus += 14
-	}
-	if consumes.OffHandImbue == proto.WeaponImbue_WeaponImbueAdamantiteSharpeningStone {
-		critBonus += 14
-	}
-
-	if critBonus == 0 {
-		return
-	}
-
-	// Crit rating for sharpening stone applies to melee only.
-	if character.Class != proto.Class_ClassHunter {
-		// For non-hunters just give direct crit so it shows on the stats panel.
-		character.AddStats(stats.Stats{
-			stats.MeleeCrit: critBonus,
-		})
-	} else {
-		character.PseudoStats.BonusMeleeCritRating += critBonus
 	}
 }
 
