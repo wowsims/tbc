@@ -11,7 +11,7 @@ const manaTrackingWindowSeconds = 60
 const manaTrackingWindow = time.Second * manaTrackingWindowSeconds
 
 // 3 * (# of seconds) should be plenty of slots
-const manaSnapshotsBufferSize = manaTrackingWindowSeconds * 3
+const manaSnapshotsBufferSize = manaTrackingWindowSeconds
 
 // Tracks how fast mana is being spent. This is used by some specs to decide
 // whether to use more mana-efficient or higher-dps spells.
@@ -101,6 +101,8 @@ func (tracker *ManaSpendingRateTracker) Update(sim *core.Simulation, character *
 	tracker.manaGainedDuringWindow += snapshot.manaGainedDelta
 	tracker.manaSnapshots[nextIndex] = snapshot
 	tracker.numSnapshots++
+
+	tracker.purgeExpiredSnapshots(sim)
 }
 
 func (tracker *ManaSpendingRateTracker) ManaSpentPerSecond(sim *core.Simulation, character *core.Character) float64 {

@@ -91,7 +91,7 @@ export const WarlockRotationConfig = {
 				'primary-spell-enum-picker',
 			],
 			label: 'Primary Spell',
-			labelTooltip: 'No tooltip yet',
+			labelTooltip: 'Choose primary spell to cast',
 			values: [
 				{
 					name: 'Shadowbolt', value: PrimarySpell.Shadowbolt,
@@ -156,7 +156,7 @@ export const WarlockRotationConfig = {
 				'detonate-seed-picker',
 			],
 			label: 'Detonate Seed on Cast',
-			labelTooltip: 'This would simulate raid doing damage to targets such that seed detonates immediately on cast.',
+			labelTooltip: 'Simulates raid doing damage to targets such that seed detonates immediately on cast.',
 			changedEvent: (player: Player<Spec.SpecWarlock>) => player.rotationChangeEmitter,
 			getValue: (player: Player<Spec.SpecWarlock>) => player.getRotation().detonateSeed,
 			setValue: (eventID: EventID, player: Player<Spec.SpecWarlock>, newValue: boolean) => {
