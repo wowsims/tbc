@@ -154,11 +154,9 @@ func applyRaceEffects(agent Agent) {
 		}
 
 		// Beast Slaying (+5% damage to beasts)
-		character.RegisterResetEffect(func(sim *Simulation) {
-			if sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeBeast {
-				character.PseudoStats.DamageDealtMultiplier *= 1.05
-			}
-		})
+		if character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeBeast {
+			character.PseudoStats.DamageDealtMultiplier *= 1.05
+		}
 
 		// Berserking
 		hasteBonus := 1.1

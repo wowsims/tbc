@@ -120,12 +120,10 @@ func (rogue *Rogue) applyMurder() {
 
 	damageMultiplier := 1.0 + 0.01*float64(rogue.Talents.Murder)
 
-	rogue.RegisterResetEffect(func(sim *core.Simulation) {
-		switch sim.GetPrimaryTarget().MobType {
-		case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
-			rogue.PseudoStats.DamageDealtMultiplier *= damageMultiplier
-		}
-	})
+	switch rogue.Env.GetPrimaryTarget().MobType {
+	case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
+		rogue.PseudoStats.DamageDealtMultiplier *= damageMultiplier
+	}
 }
 
 func (rogue *Rogue) registerColdBloodCD() {

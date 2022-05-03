@@ -204,11 +204,9 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 
 func ApplyMarkOfTheChampionMelee(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.RegisterResetEffect(func(sim *core.Simulation) {
-		if sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon || sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeUndead {
-			character.PseudoStats.MobTypeAttackPower += 150
-		}
-	})
+	if character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon || character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeUndead {
+		character.PseudoStats.MobTypeAttackPower += 150
+	}
 }
 
 func ApplyHourglassUnraveller(agent core.Agent) {

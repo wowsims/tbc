@@ -80,6 +80,7 @@ func (druid *Druid) Initialize() {
 	druid.Starfire8 = druid.newStarfireSpell(8)
 	druid.Starfire6 = druid.newStarfireSpell(6)
 	druid.registerWrathSpell()
+	druid.registerInnervateCD()
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {

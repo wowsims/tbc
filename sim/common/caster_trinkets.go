@@ -38,11 +38,9 @@ func init() {
 
 func ApplyMarkOfTheChampionCaster(agent core.Agent) {
 	character := agent.GetCharacter()
-	character.RegisterResetEffect(func(sim *core.Simulation) {
-		if sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon || sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeUndead {
-			character.PseudoStats.MobTypeSpellPower += 85
-		}
-	})
+	if character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon || character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeUndead {
+		character.PseudoStats.MobTypeSpellPower += 85
+	}
 }
 
 func ApplyQuagmirransEye(agent core.Agent) {

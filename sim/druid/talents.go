@@ -8,7 +8,6 @@ import (
 )
 
 func (druid *Druid) ApplyTalents() {
-	druid.registerInnervateCD()
 	druid.setupNaturesGrace()
 	druid.registerNaturesSwiftnessCD()
 

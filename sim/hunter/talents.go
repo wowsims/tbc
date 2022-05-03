@@ -333,14 +333,12 @@ func (hunter *Hunter) applySlaying() {
 	monsterMultiplier := 1.0 + 0.01*float64(hunter.Talents.MonsterSlaying)
 	humanoidMultiplier := 1.0 + 0.01*float64(hunter.Talents.HumanoidSlaying)
 
-	hunter.RegisterResetEffect(func(sim *core.Simulation) {
-		switch sim.GetPrimaryTarget().MobType {
-		case proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
-			hunter.PseudoStats.DamageDealtMultiplier *= monsterMultiplier
-		case proto.MobType_MobTypeHumanoid:
-			hunter.PseudoStats.DamageDealtMultiplier *= humanoidMultiplier
-		}
-	})
+	switch hunter.Env.GetPrimaryTarget().MobType {
+	case proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
+		hunter.PseudoStats.DamageDealtMultiplier *= monsterMultiplier
+	case proto.MobType_MobTypeHumanoid:
+		hunter.PseudoStats.DamageDealtMultiplier *= humanoidMultiplier
+	}
 }
 
 func (hunter *Hunter) applyThrillOfTheHunt() {

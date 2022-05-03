@@ -49,11 +49,9 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 				stats.HealingPower: 24,
 			})
 		case proto.BattleElixir_ElixirOfDemonslaying:
-			character.RegisterResetEffect(func(sim *Simulation) {
-				if sim.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon {
-					character.PseudoStats.MobTypeAttackPower += 265
-				}
-			})
+			if character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon {
+				character.PseudoStats.MobTypeAttackPower += 265
+			}
 		case proto.BattleElixir_ElixirOfMajorAgility:
 			character.AddStats(stats.Stats{
 				stats.Agility:   35,

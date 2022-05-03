@@ -22,7 +22,7 @@ func (mage *Mage) registerEvocationCD() {
 	channelTime := time.Duration(numTicks) * time.Second * 2
 	manaPerTick := 0.0
 	manaThreshold := 0.0
-	mage.RegisterResetEffect(func(_ *core.Simulation) {
+	mage.Env.RegisterPostFinalizeEffect(func() {
 		manaPerTick = mage.MaxMana() * 0.15
 		manaThreshold = mage.MaxMana() * 0.2
 	})
