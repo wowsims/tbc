@@ -127,7 +127,7 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 		spell = warlock.UnstableAff
 	} else if warlock.Rotation.Corruption && !warlock.CorruptionDot.IsActive() {
 		spell = warlock.Corruption
-	} else if warlock.Talents.SiphonLife && !warlock.SiphonLifeDot.IsActive() && warlock.ImpShadowboltAura.IsActive() {
+	} else if warlock.Talents.SiphonLife && !warlock.SiphonLifeDot.IsActive() && (warlock.ImpShadowboltAura == nil || warlock.ImpShadowboltAura.IsActive()) {
 		spell = warlock.SiphonLife
 	} else if warlock.Rotation.Immolate && !warlock.ImmolateDot.IsActive() {
 		spell = warlock.Immolate

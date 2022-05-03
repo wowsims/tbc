@@ -56,6 +56,191 @@ export const DefaultConsumes = Consumes.create({
 	defaultPotion: Potions.DestructionPotion,
 });
 
+export const P1_DESTRO = {
+	name: 'P1 Destro',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+	{
+	  "id": 28963,
+	  "enchant": 29191,
+	  "gems": [
+		34220,
+		31867
+	  ]
+	},
+	{
+	  "id": 28762
+	},
+	{
+	  "id": 28967,
+	  "enchant": 28886,
+	  "gems": [
+		24056,
+		31861
+	]
+	},
+	{
+	  "id": 28766,
+	  "enchant": 33150
+	},
+	{
+	  "id": 28964,
+	  "enchant": 24003,
+	  "gems": [
+		31861,
+		24059,
+		24030
+	  ]
+	},
+	{
+	  "id": 24250,
+	  "enchant": 22534,
+	  "gems": [
+		31867
+	  ]
+	},
+	{
+	  "id": 28968,
+	  "enchant": 28272
+	},
+	{
+	  "id": 24256,
+	  "gems": [
+		31867,
+		31867
+	  ]
+	},
+	{
+	  "id": 24262,
+	  "enchant": 24274,
+	  "gems": [
+		31867,
+		31867,
+		31867
+	  ]
+	},
+	{
+	  "id": 21870,
+	  "enchant": 35297,
+	  "gems": [
+		31861,
+		24057
+	  ]
+	},
+	{
+	  "id": 28753
+	},
+	{
+	  "id": 28793
+	},
+	{
+	  "id": 27683
+	},
+	{
+	  "id": 29370
+	},
+	{
+	  "id": 28802,
+	  "enchant": 22561
+	},
+	{
+	  "id": 29273
+	},
+	{
+	  "id": 28783
+	}
+  ]}`),
+};
+
+export const P2_DESTRO = {
+	name: 'P2 Destro',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+	{
+	  "id": 30212,
+	  "enchant": 29191,
+	  "gems": [
+		34220,
+		30606
+	  ]
+	},
+	{
+	  "id": 30015
+	},
+	{
+	  "id": 28967,
+	  "enchant": 28886,
+	  "gems": [
+		30600,
+		30564
+	  ]
+	},
+	{
+	  "id": 29992,
+	  "enchant": 33150
+	},
+	{
+	  "id": 30107,
+	  "enchant": 24003,
+	  "gems": [
+		31867,
+		31867,
+		30605
+	  ]
+	},
+	{
+	  "id": 29918,
+	  "enchant": 22534
+	},
+	{
+	  "id": 28968,
+	  "enchant": 28272
+	},
+	{
+	  "id": 30038,
+	  "gems": [
+		24030,
+		24030
+	  ]
+	},
+	{
+	  "id": 24262,
+	  "enchant": 24274,
+	  "gems": [
+		31867,
+		31867,
+		31867
+	  ]
+	},
+	{
+	  "id": 30037,
+	  "enchant": 35297
+	},
+	{
+	  "id": 30109
+	},
+	{
+	  "id": 29302
+	},
+	{
+	  "id": 27683
+	},
+	{
+	  "id": 29370
+	},
+	{
+	  "id": 30095,
+	  "enchant": 22561
+	},
+	{
+	  "id": 30049
+	},
+	{
+	  "id": 29982
+	}
+  ]}`),
+};
+
 export const P3_DESTRO = {
 	name: 'P3 Destro',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
@@ -248,3 +433,4 @@ export const P4_DESTRO = {
 		}
 	]}`),
 };
+
