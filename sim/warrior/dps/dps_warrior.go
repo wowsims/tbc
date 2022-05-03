@@ -37,8 +37,10 @@ type DpsWarrior struct {
 	castFirstSunder bool
 	thunderClapNext bool
 
-	castSlamAt  time.Duration
-	slamLatency time.Duration
+	castSlamAt    time.Duration
+	slamLatency   time.Duration
+	slamGCDDelay  time.Duration
+	slamMSWWDelay time.Duration
 }
 
 func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
@@ -55,10 +57,18 @@ func NewDpsWarrior(character core.Character, options proto.Player) *DpsWarrior {
 		Rotation: *warOptions.Rotation,
 		Options:  *warOptions.Options,
 
-		slamLatency: core.DurationFromSeconds(warOptions.Rotation.SlamLatency / 1000),
+		slamLatency:   core.DurationFromSeconds(warOptions.Rotation.SlamLatency / 1000),
+		slamGCDDelay:  core.DurationFromSeconds(warOptions.Rotation.SlamGcdDelay / 1000),
+		slamMSWWDelay: core.DurationFromSeconds(warOptions.Rotation.SlamMsWwDelay / 1000),
 	}
 	if war.Talents.ImprovedSlam != 2 {
 		war.Rotation.UseSlam = false
+	}
+	if war.slamGCDDelay == 0 {
+		war.slamGCDDelay = time.Millisecond * 400
+	}
+	if war.slamMSWWDelay == 0 {
+		war.slamMSWWDelay = time.Millisecond * 2000
 	}
 
 	war.EnableRageBar(warOptions.Options.StartingRage, core.TernaryFloat64(war.Talents.EndlessRage, 1.25, 1), func(sim *core.Simulation) {

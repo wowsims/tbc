@@ -290,6 +290,46 @@ export const WarriorRotationConfig = {
 		},
 		{
 			type: 'number' as const,
+			cssClass: 'slam-gcd-delay',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				extraCssClasses: [
+					'experimental',
+				],
+				label: 'Slam GCD Delay',
+				labelTooltip: 'Amount of time Slam may delay the GCD, in milliseconds.',
+				changedEvent: (player: Player<Spec.SpecWarrior>) => TypedEvent.onAny([player.rotationChangeEmitter, player.talentsChangeEmitter]),
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().slamGcdDelay,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.slamGcdDelay = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useSlam && player.getTalents().improvedSlam == 2,
+			},
+		},
+		{
+			type: 'number' as const,
+			cssClass: 'slam-ms-ww-delay',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				extraCssClasses: [
+					'experimental',
+				],
+				label: 'Slam MS+WW Delay',
+				labelTooltip: 'Amount of time Slam may delay MS+WW, in milliseconds.',
+				changedEvent: (player: Player<Spec.SpecWarrior>) => TypedEvent.onAny([player.rotationChangeEmitter, player.talentsChangeEmitter]),
+				getValue: (player: Player<Spec.SpecWarrior>) => player.getRotation().slamMsWwDelay,
+				setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.slamMsWwDelay = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+				showWhen: (player: Player<Spec.SpecWarrior>) => player.getRotation().useSlam && player.getTalents().improvedSlam == 2,
+			},
+		},
+		{
+			type: 'number' as const,
 			cssClass: 'rampage-duration-threshold',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {

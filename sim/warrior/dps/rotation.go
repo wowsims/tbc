@@ -64,7 +64,7 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 	}
 
 	// If using a GCD will clip the next slam, only allow high priority spells like BT/MS/WW/debuffs.
-	highPrioSpellsOnly := canSlam && sim.CurrentTime+core.GCDDefault-SlamThreshold > war.AutoAttacks.MainhandSwingAt+war.slamLatency
+	highPrioSpellsOnly := canSlam && sim.CurrentTime+core.GCDDefault-war.slamGCDDelay > war.AutoAttacks.MainhandSwingAt+war.slamLatency
 
 	if isExecutePhase {
 		war.executeRotation(sim, highPrioSpellsOnly)
@@ -159,8 +159,6 @@ func (war *DpsWarrior) shouldSunder(sim *core.Simulation) bool {
 	return false
 }
 
-const SlamThreshold = time.Millisecond * 400
-
 func (war *DpsWarrior) slamInRotation(sim *core.Simulation) bool {
 	return war.Rotation.UseSlam && (!sim.IsExecutePhase() || war.Rotation.UseSlamDuringExecute)
 }
@@ -187,7 +185,7 @@ func (war *DpsWarrior) tryQueueSlam(sim *core.Simulation) {
 	gcdAt := war.GCD.ReadyAt()
 	slamAt := sim.CurrentTime + war.slamLatency
 	if slamAt < gcdAt {
-		if gcdAt-slamAt <= SlamThreshold {
+		if gcdAt-slamAt <= war.slamGCDDelay {
 			slamAt = gcdAt
 		} else {
 			// We would have to wait too long for the GCD in order to slam, so don't use it.
@@ -207,7 +205,7 @@ func (war *DpsWarrior) tryQueueSlam(sim *core.Simulation) {
 		}
 	}
 
-	if msDelay+wwDelay > time.Millisecond*2000 {
+	if msDelay+wwDelay > war.slamMSWWDelay {
 		return
 	}
 

@@ -73,6 +73,8 @@ var armsSlamRotation = &proto.Warrior_Rotation{
 	HamstringRageThreshold: 75,
 	OverpowerRageThreshold: 20,
 	SlamLatency:            100,
+	SlamGcdDelay:           400,
+	SlamMsWwDelay:          2000,
 
 	UseSlamDuringExecute: true,
 	UseWwDuringExecute:   true,
