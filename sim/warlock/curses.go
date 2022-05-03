@@ -122,15 +122,16 @@ func (warlock *Warlock) registerCurseOfAgonySpell() {
 	}
 	actionID := core.ActionID{SpellID: 27218}
 	baseCost := 265.0
-
 	target := warlock.Env.GetPrimaryTarget()
+	baseDmg := 1356.0 / 12.0
+	baseDmg *= (1 + 0.02*float64(warlock.Talents.ImprovedCurseOfAgony))
+
 	effect := core.SpellEffect{
 		DamageMultiplier: 1 *
 			(1 + 0.02*float64(warlock.Talents.ShadowMastery)) *
-			(1 + 0.01*float64(warlock.Talents.Contagion)) *
-			(1 + 0.02*float64(warlock.Talents.ImprovedCurseOfAgony)),
+			(1 + 0.01*float64(warlock.Talents.Contagion)),
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.ImprovedDrainSoul),
-		BaseDamage:       core.BaseDamageConfigMagicNoRoll(1356/12, 0.1),
+		BaseDamage:       core.BaseDamageConfigMagicNoRoll(baseDmg, 0.1),
 		OutcomeApplier:   warlock.OutcomeFuncTick(),
 		IsPeriodic:       true,
 		ProcMask:         core.ProcMaskPeriodicDamage,
