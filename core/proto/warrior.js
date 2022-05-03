@@ -557,6 +557,8 @@ class Warrior_Rotation$Type extends MessageType {
             { no: 7, name: "hamstring_rage_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 8, name: "rampage_cd_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 9, name: "slam_latency", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 19, name: "slam_gcd_delay", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 20, name: "slam_ms_ww_delay", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 10, name: "use_hs_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 13, name: "use_bt_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 12, name: "use_ms_during_execute", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -565,7 +567,7 @@ class Warrior_Rotation$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { useCleave: false, useOverpower: false, useHamstring: false, useSlam: false, prioritizeWw: false, sunderArmor: 0, maintainDemoShout: false, maintainThunderClap: false, hsRageThreshold: 0, overpowerRageThreshold: 0, hamstringRageThreshold: 0, rampageCdThreshold: 0, slamLatency: 0, useHsDuringExecute: false, useBtDuringExecute: false, useMsDuringExecute: false, useWwDuringExecute: false, useSlamDuringExecute: false };
+        const message = { useCleave: false, useOverpower: false, useHamstring: false, useSlam: false, prioritizeWw: false, sunderArmor: 0, maintainDemoShout: false, maintainThunderClap: false, hsRageThreshold: 0, overpowerRageThreshold: 0, hamstringRageThreshold: 0, rampageCdThreshold: 0, slamLatency: 0, slamGcdDelay: 0, slamMsWwDelay: 0, useHsDuringExecute: false, useBtDuringExecute: false, useMsDuringExecute: false, useWwDuringExecute: false, useSlamDuringExecute: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -614,6 +616,12 @@ class Warrior_Rotation$Type extends MessageType {
                     break;
                 case /* double slam_latency */ 9:
                     message.slamLatency = reader.double();
+                    break;
+                case /* double slam_gcd_delay */ 19:
+                    message.slamGcdDelay = reader.double();
+                    break;
+                case /* double slam_ms_ww_delay */ 20:
+                    message.slamMsWwDelay = reader.double();
                     break;
                 case /* bool use_hs_during_execute */ 10:
                     message.useHsDuringExecute = reader.bool();
@@ -681,6 +689,12 @@ class Warrior_Rotation$Type extends MessageType {
         /* double slam_latency = 9; */
         if (message.slamLatency !== 0)
             writer.tag(9, WireType.Bit64).double(message.slamLatency);
+        /* double slam_gcd_delay = 19; */
+        if (message.slamGcdDelay !== 0)
+            writer.tag(19, WireType.Bit64).double(message.slamGcdDelay);
+        /* double slam_ms_ww_delay = 20; */
+        if (message.slamMsWwDelay !== 0)
+            writer.tag(20, WireType.Bit64).double(message.slamMsWwDelay);
         /* bool use_hs_during_execute = 10; */
         if (message.useHsDuringExecute !== false)
             writer.tag(10, WireType.Varint).bool(message.useHsDuringExecute);

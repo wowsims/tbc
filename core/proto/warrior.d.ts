@@ -307,6 +307,16 @@ export interface Warrior_Rotation {
      */
     slamLatency: number;
     /**
+     * Amount of time Slam is allowed to  delay the GCD, and MS+WW, by.
+     *
+     * @generated from protobuf field: double slam_gcd_delay = 19;
+     */
+    slamGcdDelay: number;
+    /**
+     * @generated from protobuf field: double slam_ms_ww_delay = 20;
+     */
+    slamMsWwDelay: number;
+    /**
      * @generated from protobuf field: bool use_hs_during_execute = 10;
      */
     useHsDuringExecute: boolean;

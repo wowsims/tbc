@@ -263,6 +263,46 @@ export const WarriorRotationConfig = {
         },
         {
             type: 'number',
+            cssClass: 'slam-gcd-delay',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                extraCssClasses: [
+                    'experimental',
+                ],
+                label: 'Slam GCD Delay',
+                labelTooltip: 'Amount of time Slam may delay the GCD, in milliseconds.',
+                changedEvent: (player) => TypedEvent.onAny([player.rotationChangeEmitter, player.talentsChangeEmitter]),
+                getValue: (player) => player.getRotation().slamGcdDelay,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.slamGcdDelay = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+                showWhen: (player) => player.getRotation().useSlam && player.getTalents().improvedSlam == 2,
+            },
+        },
+        {
+            type: 'number',
+            cssClass: 'slam-ms-ww-delay',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                extraCssClasses: [
+                    'experimental',
+                ],
+                label: 'Slam MS+WW Delay',
+                labelTooltip: 'Amount of time Slam may delay MS+WW, in milliseconds.',
+                changedEvent: (player) => TypedEvent.onAny([player.rotationChangeEmitter, player.talentsChangeEmitter]),
+                getValue: (player) => player.getRotation().slamMsWwDelay,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.slamMsWwDelay = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+                showWhen: (player) => player.getRotation().useSlam && player.getTalents().improvedSlam == 2,
+            },
+        },
+        {
+            type: 'number',
             cssClass: 'rampage-duration-threshold',
             getModObject: (simUI) => simUI.player,
             config: {

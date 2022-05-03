@@ -92,6 +92,7 @@ export declare const WarriorRotationConfig: {
             getValue: (player: Player<Spec.SpecWarrior>) => boolean;
             setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => void;
             showWhen?: undefined;
+            extraCssClasses?: undefined;
             values?: undefined;
         };
     } | {
@@ -105,6 +106,7 @@ export declare const WarriorRotationConfig: {
             getValue: (player: Player<Spec.SpecWarrior>) => boolean;
             setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => void;
             showWhen: (player: Player<Spec.SpecWarrior>) => boolean;
+            extraCssClasses?: undefined;
             values?: undefined;
         };
     } | {
@@ -118,6 +120,7 @@ export declare const WarriorRotationConfig: {
             getValue: (player: Player<Spec.SpecWarrior>) => number;
             setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => void;
             showWhen?: undefined;
+            extraCssClasses?: undefined;
             values?: undefined;
         };
     } | {
@@ -125,6 +128,21 @@ export declare const WarriorRotationConfig: {
         cssClass: string;
         getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
+            label: string;
+            labelTooltip: string;
+            changedEvent: (player: Player<Spec.SpecWarrior>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecWarrior>) => number;
+            setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => void;
+            showWhen: (player: Player<Spec.SpecWarrior>) => boolean;
+            extraCssClasses?: undefined;
+            values?: undefined;
+        };
+    } | {
+        type: "number";
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+        config: {
+            extraCssClasses: string[];
             label: string;
             labelTooltip: string;
             changedEvent: (player: Player<Spec.SpecWarrior>) => TypedEvent<void>;
@@ -148,6 +166,7 @@ export declare const WarriorRotationConfig: {
             setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => void;
             labelTooltip?: undefined;
             showWhen?: undefined;
+            extraCssClasses?: undefined;
         };
     })[];
 };
