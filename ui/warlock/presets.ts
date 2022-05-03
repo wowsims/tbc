@@ -464,7 +464,7 @@ export const P4_DESTRO = {
 export const P5_DESTRO = {
 	name: 'P5 Destro',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-	gear: EquipmentSpec.fromJsonString(`{      "items": [
+	gear: EquipmentSpec.fromJsonString(`{"items": [
         {
           "id": 34340,
           "enchant": 29191,
@@ -534,7 +534,7 @@ export const P5_DESTRO = {
           "id": 34564,
           "enchant": 35297,
           "gems": [
-            32218
+            35760
           ]
         },
         {
@@ -556,7 +556,7 @@ export const P5_DESTRO = {
           "enchant": 22561
         },
         {
-          "id": 30872
+          "id": 34179
         },
         {
           "id": 34347,
