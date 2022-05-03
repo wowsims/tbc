@@ -818,6 +818,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		// The value of this field must never change, to preserve local storage data.
 		buffBotId: 'Resto Shaman',
 		spec: Spec.SpecElementalShaman,
+		deprecated: true,
 		name: 'Resto Shaman',
 		tooltip: 'Resto Shaman: Adds Bloodlust, Mana Spring Totem, Wrath of Air Totem, Mana Tide Totem, and Drums of Battle.',
 		iconUrl: talentTreeIcons[Class.ClassShaman][2],
@@ -829,6 +830,53 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 			partyProto.buffs!.drums = Drums.DrumsOfBattle;
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+		},
+	},
+	{
+		// The value of this field must never change, to preserve local storage data.
+		buffBotId: 'CoE Warlock',
+		spec: Spec.SpecWarlock,
+		deprecated: true,
+		name: 'CoE Warlock',
+		tooltip: 'CoE Warlock: Adds Curse of Elements (regular). Also adds +20% uptime to ISB.',
+		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_chilltouch.jpg',
+		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
+		},
+		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+			const debuffs = encounterProto.targets[0].debuffs!;
+			debuffs.curseOfElements = Math.max(debuffs.curseOfElements, TristateEffect.TristateEffectRegular);
+			debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
+		},
+	},
+	{
+		// The value of this field must never change, to preserve local storage data.
+		buffBotId: 'Malediction Warlock',
+		spec: Spec.SpecWarlock,
+		name: 'Aff Warlock',
+		tooltip: 'Afflication Warlock: Adds Curse of Elements (improved). Also adds +20% uptime to ISB.',
+		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_curseofachimonde.jpg',
+		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
+		},
+		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+			const debuffs = encounterProto.targets[0].debuffs!;
+			debuffs.curseOfElements = TristateEffect.TristateEffectImproved;
+			debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
+		},
+	},
+	{
+		// The value of this field must never change, to preserve local storage data.
+		buffBotId: 'CoR Warlock',
+		spec: Spec.SpecWarlock,
+		deprecated: true,
+		name: 'CoR Warlock',
+		tooltip: 'CoR Warlock: Adds Curse of Recklessness. Also adds +20% uptime to ISB.',
+		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_unholystrength.jpg',
+		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
+		},
+		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+			const debuffs = encounterProto.targets[0].debuffs!;
+			debuffs.curseOfRecklessness = true;
+			debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
 		},
 	},
 	{

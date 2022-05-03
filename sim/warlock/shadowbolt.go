@@ -20,7 +20,7 @@ func (warlock *Warlock) registerShadowboltSpell() {
 		OutcomeApplier:   warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
 	}
 	// Don't add ISB debuff aura if the target is initialized with the 'estimated ISB uptime' debuff.
-	if warlock.Talents.ImprovedShadowBolt > 0 && !warlock.Env.Encounter.Targets[0].HasAura("Improved Shadow Bolt") {
+	if warlock.Talents.ImprovedShadowBolt > 0 && (!warlock.Env.Encounter.Targets[0].HasAura("Improved Shadow Bolt") || warlock.Env.Encounter.Targets[0].GetAura("Improved Shadow Bolt").MaxStacks != 0) {
 		warlock.ImpShadowboltAura = warlock.impShadowboltDebuffAura(warlock.Env.GetPrimaryTarget())
 		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
