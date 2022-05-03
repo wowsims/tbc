@@ -6,6 +6,7 @@ import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
@@ -26,6 +27,15 @@ export class WarlockSimUI extends IndividualSimUI {
             cssClass: 'warlock-sim-ui',
             // List any known bugs / issues here and they'll be shown on the site.
             knownIssues: [],
+            warnings: [
+                (simUI) => {
+                    return {
+                        updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter]),
+                        shouldDisplay: () => true,
+                        getContent: () => 'This sim is newly released, and there are likely a few bugs. Please let us know if you encounter any issues!',
+                    };
+                },
+            ],
             // All stats for which EP should be calculated.
             epStats: [
                 Stat.StatIntellect,
@@ -230,6 +240,7 @@ export class WarlockSimUI extends IndividualSimUI {
                     Presets.P2_DESTRO,
                     Presets.P3_DESTRO,
                     Presets.P4_DESTRO,
+                    Presets.P5_DESTRO,
                 ],
             },
         });

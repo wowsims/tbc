@@ -18,6 +18,7 @@ import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
 import * as SmitePriestPresets from '/tbc/smite_priest/presets.js';
 import * as WarriorPresets from '/tbc/warrior/presets.js';
 import * as RetributionPaladinPresets from '/tbc/retribution_paladin/presets.js';
+import * as WarlockPresets from '/tbc/warlock/presets.js';
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
 import { EnhancementShamanSimUI } from '/tbc/enhancement_shaman/sim.js';
 import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
@@ -27,6 +28,8 @@ import { RogueSimUI } from '/tbc/rogue/sim.js';
 import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
 import { SmitePriestSimUI } from '/tbc/smite_priest/sim.js';
 import { WarriorSimUI } from '/tbc/warrior/sim.js';
+import { WarlockSimUI } from '/tbc/warlock/sim.js';
+import { RetributionPaladinSimUI } from '/tbc/retribution_paladin/sim.js';
 export const specSimFactories = {
     [Spec.SpecBalanceDruid]: (parentElem, player) => new BalanceDruidSimUI(parentElem, player),
     [Spec.SpecElementalShaman]: (parentElem, player) => new ElementalShamanSimUI(parentElem, player),
@@ -37,6 +40,8 @@ export const specSimFactories = {
     [Spec.SpecShadowPriest]: (parentElem, player) => new ShadowPriestSimUI(parentElem, player),
     [Spec.SpecSmitePriest]: (parentElem, player) => new SmitePriestSimUI(parentElem, player),
     [Spec.SpecWarrior]: (parentElem, player) => new WarriorSimUI(parentElem, player),
+    [Spec.SpecWarlock]: (parentElem, player) => new WarlockSimUI(parentElem, player),
+    [Spec.SpecRetributionPaladin]: (parentElem, player) => new RetributionPaladinSimUI(parentElem, player),
 };
 export const playerPresets = [
     {
@@ -519,6 +524,102 @@ export const playerPresets = [
         tooltip: 'Ret Paladin',
         iconUrl: talentTreeIcons[Class.ClassPaladin][2],
     },
+    {
+        spec: Spec.SpecWarlock,
+        rotation: WarlockPresets.DefaultRotation,
+        talents: WarlockPresets.DestructionTalents.data,
+        specOptions: WarlockPresets.DefaultOptions,
+        consumes: WarlockPresets.DefaultConsumes,
+        defaultName: 'Destro Warlock',
+        defaultFactionRaces: {
+            [Faction.Unknown]: Race.RaceUnknown,
+            [Faction.Alliance]: Race.RaceHuman,
+            [Faction.Horde]: Race.RaceBloodElf,
+        },
+        defaultGear: {
+            [Faction.Unknown]: {},
+            [Faction.Alliance]: {
+                1: WarlockPresets.P1_DESTRO.gear,
+                2: WarlockPresets.P2_DESTRO.gear,
+                3: WarlockPresets.P3_DESTRO.gear,
+                4: WarlockPresets.P4_DESTRO.gear,
+                5: WarlockPresets.P5_DESTRO.gear,
+            },
+            [Faction.Horde]: {
+                1: WarlockPresets.P1_DESTRO.gear,
+                2: WarlockPresets.P2_DESTRO.gear,
+                3: WarlockPresets.P3_DESTRO.gear,
+                4: WarlockPresets.P4_DESTRO.gear,
+                5: WarlockPresets.P5_DESTRO.gear,
+            },
+        },
+        tooltip: 'Destruction Warlock: defaults to casting Curse of Doom.',
+        iconUrl: talentTreeIcons[Class.ClassWarlock][2],
+    },
+    {
+        spec: Spec.SpecWarlock,
+        rotation: WarlockPresets.AfflictionRotation,
+        talents: WarlockPresets.AfflicationTalents.data,
+        specOptions: WarlockPresets.AfflictionOptions,
+        consumes: WarlockPresets.DefaultConsumes,
+        defaultName: 'Aff Warlock',
+        defaultFactionRaces: {
+            [Faction.Unknown]: Race.RaceUnknown,
+            [Faction.Alliance]: Race.RaceHuman,
+            [Faction.Horde]: Race.RaceBloodElf,
+        },
+        defaultGear: {
+            [Faction.Unknown]: {},
+            [Faction.Alliance]: {
+                1: WarlockPresets.P1_DESTRO.gear,
+                2: WarlockPresets.P2_DESTRO.gear,
+                3: WarlockPresets.P3_DESTRO.gear,
+                4: WarlockPresets.P4_DESTRO.gear,
+                5: WarlockPresets.P5_DESTRO.gear,
+            },
+            [Faction.Horde]: {
+                1: WarlockPresets.P1_DESTRO.gear,
+                2: WarlockPresets.P2_DESTRO.gear,
+                3: WarlockPresets.P3_DESTRO.gear,
+                4: WarlockPresets.P4_DESTRO.gear,
+                5: WarlockPresets.P5_DESTRO.gear,
+            },
+        },
+        tooltip: 'Affliction Warlock: by default casts CoE with Malediction',
+        iconUrl: talentTreeIcons[Class.ClassWarlock][0],
+    },
+    {
+        spec: Spec.SpecWarlock,
+        rotation: WarlockPresets.DemonologyRotation,
+        talents: WarlockPresets.DemonologistTalents.data,
+        specOptions: WarlockPresets.DemonologyOptions,
+        consumes: WarlockPresets.DefaultConsumes,
+        defaultName: 'Demo Warlock',
+        defaultFactionRaces: {
+            [Faction.Unknown]: Race.RaceUnknown,
+            [Faction.Alliance]: Race.RaceHuman,
+            [Faction.Horde]: Race.RaceBloodElf,
+        },
+        defaultGear: {
+            [Faction.Unknown]: {},
+            [Faction.Alliance]: {
+                1: WarlockPresets.P1_DESTRO.gear,
+                2: WarlockPresets.P2_DESTRO.gear,
+                3: WarlockPresets.P3_DESTRO.gear,
+                4: WarlockPresets.P4_DESTRO.gear,
+                5: WarlockPresets.P5_DESTRO.gear,
+            },
+            [Faction.Horde]: {
+                1: WarlockPresets.P1_DESTRO.gear,
+                2: WarlockPresets.P2_DESTRO.gear,
+                3: WarlockPresets.P3_DESTRO.gear,
+                4: WarlockPresets.P4_DESTRO.gear,
+                5: WarlockPresets.P5_DESTRO.gear,
+            },
+        },
+        tooltip: 'Demonology Warlock',
+        iconUrl: talentTreeIcons[Class.ClassWarlock][1],
+    },
 ];
 export const implementedSpecs = [...new Set(playerPresets.map(preset => preset.spec))];
 export const buffBotPresets = [
@@ -660,6 +761,7 @@ export const buffBotPresets = [
         // The value of this field must never change, to preserve local storage data.
         buffBotId: 'Resto Shaman',
         spec: Spec.SpecElementalShaman,
+        deprecated: true,
         name: 'Resto Shaman',
         tooltip: 'Resto Shaman: Adds Bloodlust, Mana Spring Totem, Wrath of Air Totem, Mana Tide Totem, and Drums of Battle.',
         iconUrl: talentTreeIcons[Class.ClassShaman][2],
@@ -677,6 +779,7 @@ export const buffBotPresets = [
         // The value of this field must never change, to preserve local storage data.
         buffBotId: 'CoE Warlock',
         spec: Spec.SpecWarlock,
+        deprecated: true,
         name: 'CoE Warlock',
         tooltip: 'CoE Warlock: Adds Curse of Elements (regular). Also adds +20% uptime to ISB.',
         iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_chilltouch.jpg',
@@ -707,6 +810,7 @@ export const buffBotPresets = [
         // The value of this field must never change, to preserve local storage data.
         buffBotId: 'CoR Warlock',
         spec: Spec.SpecWarlock,
+        deprecated: true,
         name: 'CoR Warlock',
         tooltip: 'CoR Warlock: Adds Curse of Recklessness. Also adds +20% uptime to ISB.',
         iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_unholystrength.jpg',
