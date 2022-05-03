@@ -870,13 +870,13 @@ dps_results: {
 dps_results: {
  key: "TestFury-Settings-Orc-Fury P1-Basic-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 731.5260092543609
+  dps: 733.5415699992277
  }
 }
 dps_results: {
  key: "TestFury-Settings-Orc-Fury P1-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 631.2384530915724
+  dps: 634.7554604155265
  }
 }
 dps_results: {
