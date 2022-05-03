@@ -101,6 +101,10 @@ message Warrior {
 			// Time between MH swing and start of Slam cast.
 			double slam_latency = 9;
 
+			// Amount of time Slam is allowed to  delay the GCD, and MS+WW, by.
+			double slam_gcd_delay = 19;
+			double slam_ms_ww_delay = 20;
+
 			bool use_hs_during_execute = 10;
 			bool use_bt_during_execute = 13;
 			bool use_ms_during_execute = 12;
