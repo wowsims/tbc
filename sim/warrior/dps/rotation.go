@@ -170,29 +170,17 @@ func (war *DpsWarrior) tryQueueSlam(sim *core.Simulation) {
 		return
 	}
 
-	if sim.Log != nil {
-		sim.Log("Trying slam")
-	}
 	if war.castSlamAt != 0 {
 		// Slam already queued.
-		if sim.Log != nil {
-			sim.Log("Slam already queued")
-		}
 		return
 	}
 
 	// Check that we just finished a MH swing or a MH swing replacement.
 	if war.AutoAttacks.MainhandSwingAt > sim.CurrentTime && war.AutoAttacks.MainhandSwingAt != sim.CurrentTime+war.AutoAttacks.MainhandSwingSpeed() {
-		if sim.Log != nil {
-			sim.Log("Slam not MH Swing")
-		}
 		return
 	}
 
-	if !war.CanSlam() || war.shouldSunder(sim) {
-		if sim.Log != nil {
-			sim.Log("Cant slam")
-		}
+	if war.thunderClapNext || !war.CanSlam() || war.shouldSunder(sim) {
 		return
 	}
 
@@ -203,9 +191,6 @@ func (war *DpsWarrior) tryQueueSlam(sim *core.Simulation) {
 			slamAt = gcdAt
 		} else {
 			// We would have to wait too long for the GCD in order to slam, so don't use it.
-			if sim.Log != nil {
-				sim.Log("GCD too long")
-			}
 			return
 		}
 	}
@@ -223,9 +208,6 @@ func (war *DpsWarrior) tryQueueSlam(sim *core.Simulation) {
 	}
 
 	if msDelay+wwDelay > time.Millisecond*2000 {
-		if sim.Log != nil {
-			sim.Log("MS/WW too long")
-		}
 		return
 	}
 

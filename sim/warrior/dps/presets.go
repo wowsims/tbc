@@ -78,6 +78,9 @@ var armsSlamRotation = &proto.Warrior_Rotation{
 	UseWwDuringExecute:   true,
 	UseMsDuringExecute:   true,
 	UseHsDuringExecute:   true,
+
+	MaintainDemoShout:   true,
+	MaintainThunderClap: true,
 }
 
 var warriorRotation = &proto.Warrior_Rotation{
