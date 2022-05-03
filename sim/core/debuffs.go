@@ -220,9 +220,8 @@ func ImprovedShadowBoltAura(target *Target, uptime float64) *Aura {
 	multiplier := 1 + uptime*0.2
 
 	return target.GetOrRegisterAura(Aura{
-		Label:     "Improved Shadow Bolt",
-		ActionID:  ActionID{SpellID: 17803},
-		MaxStacks: 4,
+		Label:    "Improved Shadow Bolt",
+		ActionID: ActionID{SpellID: 17803},
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.ShadowDamageTakenMultiplier *= multiplier
 		},
