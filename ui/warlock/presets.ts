@@ -40,6 +40,20 @@ export const DemonologistTalents = {
 export const DefaultRotation = WarlockRotation.create({
 	primarySpell: Warlock_Rotation_PrimarySpell.Shadowbolt,
 	immolate: true,
+	curse: Warlock_Rotation_Curse.Doom,
+});
+
+export const AfflictionRotation = WarlockRotation.create({
+	primarySpell: Warlock_Rotation_PrimarySpell.Shadowbolt,
+	immolate: true,
+	corruption: true,
+	curse: Warlock_Rotation_Curse.Elements,
+});
+
+export const DemonologyRotation = WarlockRotation.create({
+	primarySpell: Warlock_Rotation_PrimarySpell.Shadowbolt,
+	immolate: true,
+	corruption: true,
 	curse: Warlock_Rotation_Curse.Elements,
 });
 
@@ -47,6 +61,18 @@ export const DefaultOptions = WarlockOptions.create({
 	armor: Armor.FelArmor,
 	sacrificeSummon: true,
 	summon: Summon.Succubus,
+});
+
+export const AfflictionOptions = WarlockOptions.create({
+	armor: Armor.FelArmor,
+	sacrificeSummon: true,
+	summon: Summon.Imp,
+});
+
+export const DemonologyOptions = WarlockOptions.create({
+	armor: Armor.FelArmor,
+	sacrificeSummon: false,
+	summon: Summon.Felgaurd,
 });
 
 export const DefaultConsumes = Consumes.create({
@@ -434,3 +460,109 @@ export const P4_DESTRO = {
 	]}`),
 };
 
+
+export const P5_DESTRO = {
+	name: 'P5 Destro',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.fromJsonString(`{      "items": [
+        {
+          "id": 34340,
+          "enchant": 29191,
+          "gems": [
+            34220,
+            32215
+          ]
+        },
+        {
+          "id": 34204
+        },
+        {
+          "id": 31054,
+          "enchant": 28886,
+          "gems": [
+            32215,
+            35760
+          ]
+        },
+        {
+          "id": 34242,
+          "enchant": 33150,
+          "gems": [
+            32196
+          ]
+        },
+        {
+          "id": 34232,
+          "enchant": 24003,
+          "gems": [
+            32196,
+            35760,
+            35760
+          ]
+        },
+        {
+          "id": 34436,
+          "enchant": 22534,
+          "gems": [
+            35760
+          ]
+        },
+        {
+          "id": 34344,
+          "enchant": 28272,
+          "gems": [
+            35760,
+            32196
+          ]
+        },
+        {
+          "id": 34541,
+          "gems": [
+            35760
+          ]
+        },
+        {
+          "id": 34181,
+          "enchant": 24274,
+          "gems": [
+            32196,
+            32196,
+            35760
+          ]
+        },
+        {
+          "id": 34564,
+          "enchant": 35297,
+          "gems": [
+            32218
+          ]
+        },
+        {
+          "id": 34362,
+          "enchant": 22536
+        },
+        {
+          "id": 34230,
+          "enchant": 22536
+        },
+        {
+          "id": 32483
+        },
+        {
+          "id": 34429
+        },
+        {
+          "id": 34336,
+          "enchant": 22561
+        },
+        {
+          "id": 30872
+        },
+        {
+          "id": 34347,
+          "gems": [
+            35760
+          ]
+        }
+      ]}`),
+};

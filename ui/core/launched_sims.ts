@@ -8,11 +8,12 @@ export const launchedSpecs: Array<Spec> = [
 	Spec.SpecBalanceDruid,
 	Spec.SpecHunter,
 	Spec.SpecMage,
+	Spec.SpecRetributionPaladin,
+	Spec.SpecShadowPriest,
+	Spec.SpecSmitePriest,
 	Spec.SpecRogue,
 	Spec.SpecElementalShaman,
 	Spec.SpecEnhancementShaman,
-	Spec.SpecShadowPriest,
-	Spec.SpecSmitePriest,
 	Spec.SpecWarrior,
-	Spec.SpecRetributionPaladin,
+	Spec.SpecWarlock
 ];
