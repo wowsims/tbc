@@ -59,14 +59,15 @@ func main() {
 			body, err := ioutil.ReadAll(resp.Body)
 
 			result := struct {
-				Tag string `json:"tag_name"`
-				URL string `json:"html_url"`
+				Tag  string `json:"tag_name"`
+				URL  string `json:"html_url"`
+				Name string `json:"name"`
 			}{}
 			json.Unmarshal(body, &result)
 
 			if result.Tag != Version {
 				outdated = 2
-				fmt.Printf("New version of simulator available: %s\n", result.URL)
+				fmt.Printf("New version of simulator available: %s\n\tDownload at: %s\n", result.Name, result.URL)
 			} else {
 				outdated = 1
 			}
