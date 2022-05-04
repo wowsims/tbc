@@ -151,7 +151,7 @@ export const titleIcons = {
     [Spec.SpecRogue]: '/tbc/assets/rogue_icon.png',
     [Spec.SpecRetributionPaladin]: '/tbc/assets/retribution_icon.png',
     [Spec.SpecShadowPriest]: '/tbc/assets/shadow_priest_icon.png',
-    [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
+    [Spec.SpecWarlock]: '/tbc/assets/warlock_icon.png',
     [Spec.SpecWarrior]: '/tbc/assets/warrior_icon.png',
     [Spec.SpecProtectionWarrior]: '/tbc/assets/protection_warrior_icon.png',
     [Spec.SpecSmitePriest]: '/tbc/assets/smite_priest_icon.png',
