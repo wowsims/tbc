@@ -37,6 +37,7 @@ func init() {
 	core.AddItemEffect(31331, ApplyTheNightBlade)
 	core.AddItemEffect(32262, ApplySyphonOfTheNathrezim)
 	core.AddItemEffect(33122, ApplyCloakOfDarkness)
+	core.AddItemEffect(34679, ApplyShatteredSunPendantofMight)
 
 	AddSimpleStatItemEffect(28484, stats.Stats{stats.Health: 1500, stats.Strength: 150}, time.Second*15, time.Minute*30) // Bulwark of Kings
 	AddSimpleStatItemEffect(28485, stats.Stats{stats.Health: 1500, stats.Strength: 150}, time.Second*15, time.Minute*30) // Bulwark of Ancient Kings
