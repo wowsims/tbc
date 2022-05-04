@@ -26,15 +26,20 @@ export const DestructionTalents = {
 	data: '-20501301332001-50500051220051053105',
 };
 
+export const T6DestroTalents = {
+	name: 'T6 Destro',
+	data: '-20501301332001-55500051221001303025',
+};
+
 export const AfflicationTalents = {
 	name: 'Afflication',
 	data: '55022000102351055103--50500051220001',
-}
+};
 
 export const DemonologistTalents = {
 	name: 'Demonologist',
 	data: '01-2050030133250101501351-5050005112',
-}
+};
 
 
 export const DefaultRotation = WarlockRotation.create({
