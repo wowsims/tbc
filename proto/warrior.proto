@@ -79,7 +79,7 @@ message Warrior {
 
 			enum SunderArmor {
 				SunderArmorNone = 0;
-				SunderArmorOnce = 1;
+				SunderArmorHelpStack = 1;
 				SunderArmorMaintain = 2;
 			}
 			SunderArmor sunderArmor = 15;

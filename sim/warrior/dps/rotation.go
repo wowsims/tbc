@@ -39,7 +39,6 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 	if war.shouldSunder(sim) {
 		war.castSlamAt = 0
 		war.SunderArmor.Cast(sim, sim.GetPrimaryTarget())
-		war.castFirstSunder = true
 		war.tryQueueHsCleave(sim)
 		return
 	}
@@ -152,19 +151,6 @@ func (war *DpsWarrior) executeRotation(sim *core.Simulation, highPrioSpellsOnly 
 	war.tryQueueHsCleave(sim)
 }
 
-const SunderWindow = time.Second * 3
-
-func (war *DpsWarrior) shouldSunder(sim *core.Simulation) bool {
-	if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorOnce && !war.castFirstSunder && war.CanSunderArmor(sim) {
-		return true
-	} else if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorMaintain &&
-		war.CanSunderArmor(sim) &&
-		(war.SunderArmorAura.GetStacks() < 5 || war.SunderArmorAura.RemainingDuration(sim) < SunderWindow) {
-		return true
-	}
-	return false
-}
-
 func (war *DpsWarrior) slamInRotation(sim *core.Simulation) bool {
 	return war.Rotation.UseSlam && (!sim.IsExecutePhase() || war.Rotation.UseSlamDuringExecute)
 }
@@ -227,6 +213,25 @@ func (war *DpsWarrior) trySwapToBerserker(sim *core.Simulation) bool {
 		return true
 	}
 	return false
+}
+
+const SunderWindow = time.Second * 3
+
+func (war *DpsWarrior) shouldSunder(sim *core.Simulation) bool {
+	if !war.maintainSunder {
+		return false
+	}
+
+	if !war.CanSunderArmor(sim) {
+		return false
+	}
+
+	stacks := war.SunderArmorAura.GetStacks()
+	if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorHelpStack && stacks == 5 {
+		war.maintainSunder = false
+	}
+
+	return stacks < 5 || war.SunderArmorAura.RemainingDuration(sim) < SunderWindow
 }
 
 // Returns whether any ability was cast.

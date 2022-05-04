@@ -34,7 +34,7 @@ type DpsWarrior struct {
 	// Prevent swapping stances until this time, to account for human reaction time.
 	canSwapStanceAt time.Duration
 
-	castFirstSunder bool
+	maintainSunder  bool
 	thunderClapNext bool
 
 	castSlamAt    time.Duration
@@ -121,7 +121,7 @@ func (war *DpsWarrior) Reset(sim *core.Simulation) {
 	war.Stance = warrior.BerserkerStance
 
 	war.canSwapStanceAt = 0
-	war.castFirstSunder = false
+	war.maintainSunder = war.Rotation.SunderArmor != proto.Warrior_Rotation_SunderArmorNone
 	war.castSlamAt = 0
 	war.thunderClapNext = false
 }
