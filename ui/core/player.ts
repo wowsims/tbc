@@ -23,7 +23,6 @@ import { Gear } from '/tbc/core/proto_utils/gear.js';
 import {
 	gemEligibleForSocket,
 	gemMatchesSocket,
-	THUNDERING_SKYFIRE_DIAMOND,
 } from '/tbc/core/proto_utils/gems.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 
