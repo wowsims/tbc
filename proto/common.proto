@@ -35,8 +35,8 @@ enum Race {
 }
 
 enum ShattrathFaction {
-  ShattrathFactionScryer = 0;
-  ShattrathFactionAldor = 1;
+  ShattrathFactionAldor = 0;
+  ShattrathFactionScryer = 1;
 }
 
 enum Class {
