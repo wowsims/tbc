@@ -1,17 +1,8 @@
 Welcome to the WoW TBC Classic simulator! If you have questions or are thinking about contributing, [join our discord](https://discord.gg/jJMPr9JWwx "https://discord.gg/jJMPr9JWwx") to chat!
 
-The primary goal of this project is to provide a framework that makes it easy to build a DPS sim for any class/spec, with a polished UI and accurate results. Each community will have ownership / responsibility over their portion of the sim, to ensure accuracy and that their community is represented. When enough classes/specs are implemented, we also hope to build a "raid sim".
+The primary goal of this project is to provide a framework that makes it easy to build a DPS sim for any class/spec, with a polished UI and accurate results. Each community will have ownership / responsibility over their portion of the sim, to ensure accuracy and that their community is represented. By having all the individual sims on the same engine, we can also have a combined 'raid sim' for testing raid compositions.
 
-Live sims:
- - [Balance Druid](https://wowsims.github.io/tbc/balance_druid/ "https://wowsims.github.io/tbc/balance_druid/")
- - [Hunter](https://wowsims.github.io/tbc/hunter/ "https://wowsims.github.io/tbc/hunter/")
- - [Mage](https://wowsims.github.io/tbc/mage/ "https://wowsims.github.io/tbc/mage/")
- - [Rogue](https://wowsims.github.io/tbc/rogue/ "https://wowsims.github.io/tbc/rogue/")
- - [Elemental Shaman](https://wowsims.github.io/tbc/elemental_shaman/ "https://wowsims.github.io/tbc/elemental_shaman/")
- - [Enhancement Shaman](https://wowsims.github.io/tbc/enhancement_shaman/ "https://wowsims.github.io/tbc/enhancement_shaman/")
- - [Shadow Priest](https://wowsims.github.io/tbc/shadow_priest/ "https://wowsims.github.io/tbc/shadow_priest/")
- - [Smite Priest](https://wowsims.github.io/tbc/smite_priest/ "https://wowsims.github.io/tbc/smite_priest/")
- - [Raid Sim](https://wowsims.github.io/tbc/raid/ "https://wowsims.github.io/tbc/raid/")
+[Live sims can be found here.](https://wowsims.github.io/tbc "https://wowsims.github.io/tbc")
 
 # Installation
 This project has dependencies on Go >=1.16, protobuf-compiler and the corresponding Go plugins, and node >= 14.0.
