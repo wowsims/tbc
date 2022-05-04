@@ -75,7 +75,14 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 		// We didn't cast anything, so wait for the next CD.
 		// Note that BT/MS share a CD timer so we don't need to check MS.
 		nextCD := core.MinDuration(war.Bloodthirst.CD.ReadyAt(), war.Whirlwind.CD.ReadyAt())
+
+		if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorMaintain {
+			nextSunderAt := war.SunderArmorAura.ExpiresAt() - SunderWindow
+			nextCD = core.MinDuration(nextCD, nextSunderAt)
+		}
+
 		if nextCD > sim.CurrentTime {
+
 			if canSlam {
 				war.WaitUntil(sim, core.MinDuration(nextCD, war.AutoAttacks.MainhandSwingAt))
 			} else {
@@ -145,12 +152,14 @@ func (war *DpsWarrior) executeRotation(sim *core.Simulation, highPrioSpellsOnly 
 	war.tryQueueHsCleave(sim)
 }
 
+const SunderWindow = time.Second * 3
+
 func (war *DpsWarrior) shouldSunder(sim *core.Simulation) bool {
 	if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorOnce && !war.castFirstSunder && war.CanSunderArmor(sim) {
 		return true
 	} else if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorMaintain &&
 		war.CanSunderArmor(sim) &&
-		(war.SunderArmorAura.GetStacks() < 5 || war.SunderArmorAura.RemainingDuration(sim) < time.Second*3) {
+		(war.SunderArmorAura.GetStacks() < 5 || war.SunderArmorAura.RemainingDuration(sim) < SunderWindow) {
 		return true
 	}
 	return false
