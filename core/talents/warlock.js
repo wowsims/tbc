@@ -600,7 +600,7 @@ export const warlockTalentsConfig = newTalentsConfig([
                     colIdx: 1,
                 },
                 prereqLocation: {
-                    rowIdx: 6,
+                    rowIdx: 4,
                     colIdx: 1,
                 },
                 spellIds: [17962],
