@@ -252,8 +252,8 @@ export const P3_DESTRO = {
           "id": 31051,
           "enchant": 29191,
           "gems": [
-            32218,
-            34220
+            34220,
+            32218
           ]
         },
         {
@@ -331,7 +331,7 @@ export const P3_DESTRO = {
         },
         {
           "id": 32374,
-          "enchant": 22560
+          "enchant": 22561
         },
         {},
         {
@@ -347,8 +347,8 @@ export const P4_DESTRO = {
 		  "id": 31051,
 		  "enchant": 29191,
 		  "gems": [
-			32218,
-			34220
+			34220,
+			32218
 		  ]
 		},
 		{
@@ -424,7 +424,7 @@ export const P4_DESTRO = {
 		},
 		{
 		  "id": 32374,
-		  "enchant": 22560
+		  "enchant": 22561
 		},
 		{},
 		{
