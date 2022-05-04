@@ -37,9 +37,68 @@ func init() {
 	core.AddItemEffect(31331, ApplyTheNightBlade)
 	core.AddItemEffect(32262, ApplySyphonOfTheNathrezim)
 	core.AddItemEffect(33122, ApplyCloakOfDarkness)
+	core.AddItemEffect(34679, ApplyShatteredSunPendantofMight)
 
 	AddSimpleStatItemEffect(28484, stats.Stats{stats.Health: 1500, stats.Strength: 150}, time.Second*15, time.Minute*30) // Bulwark of Kings
 	AddSimpleStatItemEffect(28485, stats.Stats{stats.Health: 1500, stats.Strength: 150}, time.Second*15, time.Minute*30) // Bulwark of Ancient Kings
+}
+
+func ApplyShatteredSunPendantofMight(agent core.Agent) {
+	character := agent.GetCharacter()
+	const proc = 0.15
+
+	var aldorAura *core.Aura
+	var scryerSpell *core.Spell
+
+	if character.ShattFaction == proto.ShattrathFaction_ShattrathFactionAldor {
+		aldorAura = character.NewTemporaryStatsAura("Light's Strength", core.ActionID{SpellID: 45480}, stats.Stats{stats.AttackPower: 200}, time.Second*10)
+	} else if character.ShattFaction == proto.ShattrathFaction_ShattrathFactionScryer {
+		scryerSpell = character.RegisterSpell(core.SpellConfig{
+			ActionID:    core.ActionID{SpellID: 45428},
+			SpellSchool: core.SpellSchoolArcane,
+			ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+				ProcMask:         core.ProcMaskEmpty,
+				IsPhantom:        true,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigRoll(333, 367),
+				// TODO: validate this is a melee hit roll
+				OutcomeApplier: character.OutcomeFuncMeleeSpecialHitAndCrit(character.DefaultMeleeCritMultiplier()),
+			}),
+		})
+	}
+
+	// Gives a chance when your harmful spells land to increase the damage of your spells and effects by up to 130 for 10 sec. (Proc chance: 20%, 50s cooldown)
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 45,
+	}
+
+	character.RegisterAura(core.Aura{
+		Label:    "Shattered Sun Pendant of Acumen",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+			if !spellEffect.Landed() {
+				return
+			}
+			if !icd.IsReady(sim) || sim.RandomFloat("pendant of acumen") > proc { // can't activate if on CD or didn't proc
+				return
+			}
+			icd.Use(sim)
+
+			if character.ShattFaction == proto.ShattrathFaction_ShattrathFactionAldor {
+				aldorAura.Activate(sim)
+			} else if character.ShattFaction == proto.ShattrathFaction_ShattrathFactionScryer {
+				scryerSpell.Cast(sim, spellEffect.Target)
+			}
+		},
+	})
 }
 
 func ApplyStormGauntlets(agent core.Agent) {

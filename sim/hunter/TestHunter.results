@@ -568,6 +568,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestHunter-AllItems-ShatteredSunPendantofAcumen-34678"
+ value: {
+  dps: 1591.308855858162
+ }
+}
+dps_results: {
+ key: "TestHunter-AllItems-ShatteredSunPendantofMight-34679"
+ value: {
+  dps: 1611.903724590018
+ }
+}
+dps_results: {
  key: "TestHunter-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
   dps: 1575.4411201114483

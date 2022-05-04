@@ -24,6 +24,7 @@ import { GearPicker } from '/tbc/core/components/gear_picker.js';
 import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { IconEnumPicker, IconEnumPickerConfig } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPicker, IconPickerConfig } from '/tbc/core/components/icon_picker.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { Input } from '/tbc/core/components/input.js';
@@ -45,12 +46,13 @@ import { SavedGearSet } from '/tbc/core/proto/ui.js';
 import { SavedSettings } from '/tbc/core/proto/ui.js';
 import { SavedTalents } from '/tbc/core/proto/ui.js';
 import { SettingsMenu } from '/tbc/core/components/settings_menu.js';
+import { ShattrathFaction } from '/tbc/core/proto/common.js';
 import { Sim } from './sim.js';
 import { SimOptions } from '/tbc/core/proto/api.js';
 import { SimSettings as SimSettingsProto } from '/tbc/core/proto/ui.js';
 import { SimUI, SimWarning } from './sim_ui.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
+import { nameToShattFaction, SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { StatWeightsRequest } from '/tbc/core/proto/api.js';
@@ -443,7 +445,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 						<legend>Encounter</legend>
 					</fieldset>
 					<fieldset class="settings-section race-section">
-						<legend>Race</legend>
+						<legend>Player</legend>
 					</fieldset>
 					<fieldset class="settings-section rotation-section">
 						<legend>Rotation</legend>
@@ -676,6 +678,18 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			getValue: sim => sim.getRace(),
 			setValue: (eventID, sim, newValue) => sim.setRace(eventID, newValue),
 		});
+		const shattFactionPicker = new EnumPicker(this.rootElem.getElementsByClassName('race-section')[0] as HTMLElement, this.player, {
+			values: ["Scryer", "Aldor"].map(faction => {
+				return {
+					name: faction,
+					value: nameToShattFaction[faction],
+				};
+			}),
+			changedEvent: sim => sim.gearChangeEmitter,
+			getValue: sim => sim.getShattFaction(),
+			setValue: (eventID, sim, newValue) => sim.setShattFaction(eventID, newValue),
+			showWhen: (player: Player<any>) => this.player.getEquippedItem(ItemSlot.ItemSlotNeck)?.item.id == 34678 || this.player.getEquippedItem(ItemSlot.ItemSlotNeck)?.item.id == 34679,
+		});
 
 		const encounterSectionElem = settingsTab.getElementsByClassName('encounter-section')[0] as HTMLElement;
 		new EncounterPicker(encounterSectionElem, this.sim.encounter, this.individualConfig.encounterPicker);
@@ -867,6 +881,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			const tankSpec = isTankSpec(this.player.spec);
 
 			this.player.setRace(eventID, specToEligibleRaces[this.player.spec][0]);
+			this.player.setShattFaction(eventID, ShattrathFaction.ShattrathFactionAldor);
 			this.player.setGear(eventID, this.sim.lookupEquipmentSpec(this.individualConfig.defaults.gear));
 			this.player.setBonusStats(eventID, new Stats());
 			this.player.setConsumes(eventID, this.individualConfig.defaults.consumes);

@@ -1,25 +1,13 @@
-import { ActionID as ActionIdProto } from '/tbc/core/proto/common.js';
 import { Class } from '/tbc/core/proto/common.js';
-import { Alchohol } from '/tbc/core/proto/common.js';
-import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Cooldowns } from '/tbc/core/proto/common.js';
-import { Conjured } from '/tbc/core/proto/common.js';
 import { Consumes } from '/tbc/core/proto/common.js';
 import { Enchant } from '/tbc/core/proto/common.js';
-import { Encounter } from '/tbc/core/proto/common.js';
-import { EquipmentSpec } from '/tbc/core/proto/common.js';
-import { Flask } from '/tbc/core/proto/common.js';
-import { Food } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
-import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
-import { ItemQuality } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
-import { ItemSpec } from '/tbc/core/proto/common.js';
-import { ItemType } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
-import { Race } from '/tbc/core/proto/common.js';
+import { Race, ShattrathFaction } from '/tbc/core/proto/common.js';
 import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -82,6 +70,7 @@ export class Player<SpecType extends Spec> {
 	private bonusStats: Stats = new Stats();
 	private gear: Gear = new Gear({});
 	private race: Race;
+	private shattFaction: ShattrathFaction;
 	private rotation: SpecRotation<SpecType>;
 	private talentsString: string = '';
 	private specOptions: SpecOptions<SpecType>;
@@ -124,6 +113,7 @@ export class Player<SpecType extends Spec> {
 
 		this.spec = spec;
 		this.race = specToEligibleRaces[this.spec][0];
+		this.shattFaction = 0;
 		this.specTypeFunctions = specTypeFunctions[this.spec] as SpecTypeFunctions<SpecType>;
 		this.rotation = this.specTypeFunctions.rotationCreate();
 		this.specOptions = this.specTypeFunctions.optionsCreate();
@@ -282,6 +272,16 @@ export class Player<SpecType extends Spec> {
 	setRace(eventID: EventID, newRace: Race) {
 		if (newRace != this.race) {
 			this.race = newRace;
+			this.raceChangeEmitter.emit(eventID);
+		}
+	}
+
+	getShattFaction(): ShattrathFaction {
+		return this.shattFaction;
+	}
+	setShattFaction(eventID: EventID, newFaction: ShattrathFaction) {
+		if (newFaction != this.shattFaction) {
+			this.shattFaction = newFaction;
 			this.raceChangeEmitter.emit(eventID);
 		}
 	}
@@ -599,6 +599,7 @@ export class Player<SpecType extends Spec> {
 			PlayerProto.create({
 				name: this.getName(),
 				race: this.getRace(),
+				shattFaction: this.getShattFaction(),
 				class: this.getClass(),
 				equipment: this.getGear().asSpec(),
 				consumes: this.getConsumes(),
@@ -617,6 +618,7 @@ export class Player<SpecType extends Spec> {
 		TypedEvent.freezeAllAndDo(() => {
 			this.setName(eventID, proto.name);
 			this.setRace(eventID, proto.race);
+			this.setShattFaction(eventID, proto.shattFaction);
 			this.setGear(eventID, proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));
 			this.setConsumes(eventID, proto.consumes || Consumes.create());
 			this.setBonusStats(eventID, new Stats(proto.bonusStats));
