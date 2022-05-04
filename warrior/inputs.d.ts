@@ -94,6 +94,7 @@ export declare const WarriorRotationConfig: {
             showWhen?: undefined;
             extraCssClasses?: undefined;
             values?: undefined;
+            tooltip?: undefined;
         };
     } | {
         type: "boolean";
@@ -108,6 +109,7 @@ export declare const WarriorRotationConfig: {
             showWhen: (player: Player<Spec.SpecWarrior>) => boolean;
             extraCssClasses?: undefined;
             values?: undefined;
+            tooltip?: undefined;
         };
     } | {
         type: "number";
@@ -122,6 +124,7 @@ export declare const WarriorRotationConfig: {
             showWhen?: undefined;
             extraCssClasses?: undefined;
             values?: undefined;
+            tooltip?: undefined;
         };
     } | {
         type: "number";
@@ -136,6 +139,7 @@ export declare const WarriorRotationConfig: {
             showWhen: (player: Player<Spec.SpecWarrior>) => boolean;
             extraCssClasses?: undefined;
             values?: undefined;
+            tooltip?: undefined;
         };
     } | {
         type: "number";
@@ -150,12 +154,14 @@ export declare const WarriorRotationConfig: {
             setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => void;
             showWhen: (player: Player<Spec.SpecWarrior>) => boolean;
             values?: undefined;
+            tooltip?: undefined;
         };
     } | {
         type: "enum";
         cssClass: string;
         getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
         config: {
+            extraCssClasses: string[];
             label: string;
             values: {
                 name: string;
@@ -166,7 +172,22 @@ export declare const WarriorRotationConfig: {
             setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: number) => void;
             labelTooltip?: undefined;
             showWhen?: undefined;
-            extraCssClasses?: undefined;
+            tooltip?: undefined;
+        };
+    } | {
+        type: "boolean";
+        cssClass: string;
+        getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+        config: {
+            extraCssClasses: string[];
+            label: string;
+            tooltip: string;
+            changedEvent: (player: Player<Spec.SpecWarrior>) => TypedEvent<void>;
+            getValue: (player: Player<Spec.SpecWarrior>) => boolean;
+            setValue: (eventID: EventID, player: Player<Spec.SpecWarrior>, newValue: boolean) => void;
+            labelTooltip?: undefined;
+            showWhen?: undefined;
+            values?: undefined;
         };
     })[];
 };

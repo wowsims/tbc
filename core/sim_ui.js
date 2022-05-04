@@ -9,6 +9,9 @@ export class SimUI extends Component {
         this.sim = sim;
         this.rootElem.innerHTML = simHTML;
         this.isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
+        if (!this.isWithinRaidSim) {
+            this.rootElem.classList.add('not-within-raid-sim');
+        }
         this.changeEmitter = TypedEvent.onAny([
             this.sim.changeEmitter,
         ], 'SimUIChange');

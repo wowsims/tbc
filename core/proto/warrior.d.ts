@@ -346,9 +346,9 @@ export declare enum Warrior_Rotation_SunderArmor {
      */
     SunderArmorNone = 0,
     /**
-     * @generated from protobuf enum value: SunderArmorOnce = 1;
+     * @generated from protobuf enum value: SunderArmorHelpStack = 1;
      */
-    SunderArmorOnce = 1,
+    SunderArmorHelpStack = 1,
     /**
      * @generated from protobuf enum value: SunderArmorMaintain = 2;
      */

@@ -13,9 +13,9 @@ export var Warrior_Rotation_SunderArmor;
      */
     Warrior_Rotation_SunderArmor[Warrior_Rotation_SunderArmor["SunderArmorNone"] = 0] = "SunderArmorNone";
     /**
-     * @generated from protobuf enum value: SunderArmorOnce = 1;
+     * @generated from protobuf enum value: SunderArmorHelpStack = 1;
      */
-    Warrior_Rotation_SunderArmor[Warrior_Rotation_SunderArmor["SunderArmorOnce"] = 1] = "SunderArmorOnce";
+    Warrior_Rotation_SunderArmor[Warrior_Rotation_SunderArmor["SunderArmorHelpStack"] = 1] = "SunderArmorHelpStack";
     /**
      * @generated from protobuf enum value: SunderArmorMaintain = 2;
      */

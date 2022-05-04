@@ -2616,6 +2616,10 @@ input, select {
   display: none;
 }
 
+.not-within-raid-sim .not-within-raid-sim-hide {
+  display: none;
+}
+
 .character-stats-header {
   padding: 5px;
   font-size: 14px;
