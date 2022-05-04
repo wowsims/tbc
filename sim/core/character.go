@@ -15,9 +15,10 @@ import (
 type Character struct {
 	Unit
 
-	Name  string // Different from Label, needed for returned results.
-	Race  proto.Race
-	Class proto.Class
+	Name         string // Different from Label, needed for returned results.
+	Race         proto.Race
+	ShattFaction proto.ShattrathFaction
+	Class        proto.Class
 
 	// Current gear.
 	Equip items.Equipment
@@ -69,10 +70,11 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 			Metrics:     NewCharacterMetrics(),
 		},
 
-		Name:  player.Name,
-		Race:  player.Race,
-		Class: player.Class,
-		Equip: items.ProtoToEquipment(*player.Equipment),
+		Name:         player.Name,
+		Race:         player.Race,
+		ShattFaction: player.ShattFaction,
+		Class:        player.Class,
+		Equip:        items.ProtoToEquipment(*player.Equipment),
 
 		Party:      party,
 		PartyIndex: partyIndex,

@@ -34,6 +34,11 @@ enum Race {
     RaceUndead = 11;
 }
 
+enum ShattrathFaction {
+  ShattrathFactionScryer = 0;
+  ShattrathFactionAldor = 1;
+}
+
 enum Class {
     ClassUnknown = 0;
     ClassDruid = 1;

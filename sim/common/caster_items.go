@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -13,6 +14,65 @@ func init() {
 	core.AddItemEffect(28602, ApplyRobeOfTheElderScribes)
 	core.AddItemEffect(29305, ApplyEternalSage)
 	core.AddItemEffect(34470, ApplyTimbals)
+	core.AddItemEffect(34678, ApplyShatteredSunPendantofAcumen)
+
+}
+
+func ApplyShatteredSunPendantofAcumen(agent core.Agent) {
+	character := agent.GetCharacter()
+	const proc = 0.15
+
+	var aldorAura *core.Aura
+	var scryerSpell *core.Spell
+
+	if character.ShattFaction == proto.ShattrathFaction_ShattrathFactionAldor {
+		aldorAura = character.NewTemporaryStatsAura("Light's Wrath", core.ActionID{SpellID: 45479}, stats.Stats{stats.SpellPower: 120}, time.Second*10)
+	} else if character.ShattFaction == proto.ShattrathFaction_ShattrathFactionScryer {
+		scryerSpell = character.RegisterSpell(core.SpellConfig{
+			ActionID:    core.ActionID{SpellID: 45429},
+			SpellSchool: core.SpellSchoolArcane,
+			ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+				ProcMask:         core.ProcMaskEmpty,
+				IsPhantom:        true,
+				DamageMultiplier: 1,
+				ThreatMultiplier: 1,
+				BaseDamage:       core.BaseDamageConfigRoll(333, 367),
+				OutcomeApplier:   character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
+			}),
+		})
+	}
+
+	// Gives a chance when your harmful spells land to increase the damage of your spells and effects by up to 130 for 10 sec. (Proc chance: 20%, 50s cooldown)
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 45,
+	}
+
+	character.RegisterAura(core.Aura{
+		Label:    "Shattered Sun Pendant of Acumen",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskSpellDamage) {
+				return
+			}
+			if !spellEffect.Landed() {
+				return
+			}
+			if !icd.IsReady(sim) || sim.RandomFloat("pendant of acumen") > proc { // can't activate if on CD or didn't proc
+				return
+			}
+			icd.Use(sim)
+
+			if character.ShattFaction == proto.ShattrathFaction_ShattrathFactionAldor {
+				aldorAura.Activate(sim)
+			} else if character.ShattFaction == proto.ShattrathFaction_ShattrathFactionScryer {
+				scryerSpell.Cast(sim, spellEffect.Target)
+			}
+		},
+	})
 }
 
 func ApplyRobeOfTheElderScribes(agent core.Agent) {

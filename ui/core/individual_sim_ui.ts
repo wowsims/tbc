@@ -50,7 +50,7 @@ import { SimOptions } from '/tbc/core/proto/api.js';
 import { SimSettings as SimSettingsProto } from '/tbc/core/proto/ui.js';
 import { SimUI, SimWarning } from './sim_ui.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
+import { nameToShattFaction, SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { StatWeightsRequest } from '/tbc/core/proto/api.js';
@@ -443,7 +443,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 						<legend>Encounter</legend>
 					</fieldset>
 					<fieldset class="settings-section race-section">
-						<legend>Race</legend>
+						<legend>Player</legend>
 					</fieldset>
 					<fieldset class="settings-section rotation-section">
 						<legend>Rotation</legend>
@@ -675,6 +675,17 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			changedEvent: sim => sim.raceChangeEmitter,
 			getValue: sim => sim.getRace(),
 			setValue: (eventID, sim, newValue) => sim.setRace(eventID, newValue),
+		});
+		const shattFactionPicker = new EnumPicker(this.rootElem.getElementsByClassName('race-section')[0] as HTMLElement, this.player, {
+			values: ["Scryer", "Aldor"].map(faction => {
+				return {
+					name: faction,
+					value: nameToShattFaction[faction],
+				};
+			}),
+			changedEvent: sim => sim.raceChangeEmitter,
+			getValue: sim => sim.getShattFaction(),
+			setValue: (eventID, sim, newValue) => sim.setShattFaction(eventID, newValue),
 		});
 
 		const encounterSectionElem = settingsTab.getElementsByClassName('encounter-section')[0] as HTMLElement;
