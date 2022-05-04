@@ -5,6 +5,10 @@ export declare const DestructionTalents: {
     name: string;
     data: string;
 };
+export declare const T6DestroTalents: {
+    name: string;
+    data: string;
+};
 export declare const AfflicationTalents: {
     name: string;
     data: string;

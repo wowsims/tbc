@@ -233,6 +233,7 @@ export class WarlockSimUI extends IndividualSimUI {
                     Presets.AfflicationTalents,
                     Presets.DemonologistTalents,
                     Presets.DestructionTalents,
+                    Presets.T6DestroTalents,
                 ],
                 // Preset gear configurations that the user can quickly select.
                 gear: [

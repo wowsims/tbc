@@ -15,6 +15,10 @@ export const DestructionTalents = {
     name: 'Destruction',
     data: '-20501301332001-50500051220051053105',
 };
+export const T6DestroTalents = {
+    name: 'T6 Destro',
+    data: '-20501301332001-55500051221001303025',
+};
 export const AfflicationTalents = {
     name: 'Afflication',
     data: '55022000102351055103--50500051220001',
@@ -27,18 +31,21 @@ export const DefaultRotation = WarlockRotation.create({
     primarySpell: Warlock_Rotation_PrimarySpell.Shadowbolt,
     immolate: true,
     curse: Warlock_Rotation_Curse.Doom,
+    detonateSeed: true,
 });
 export const AfflictionRotation = WarlockRotation.create({
     primarySpell: Warlock_Rotation_PrimarySpell.Shadowbolt,
     immolate: true,
     corruption: true,
     curse: Warlock_Rotation_Curse.Elements,
+    detonateSeed: true,
 });
 export const DemonologyRotation = WarlockRotation.create({
     primarySpell: Warlock_Rotation_PrimarySpell.Shadowbolt,
     immolate: true,
     corruption: true,
     curse: Warlock_Rotation_Curse.Elements,
+    detonateSeed: true,
 });
 export const DefaultOptions = WarlockOptions.create({
     armor: Armor.FelArmor,
