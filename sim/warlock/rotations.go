@@ -32,19 +32,17 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 			return
 		}
 
-		for i := 0; i < int(sim.GetNumTargets()); i++ {
-			if !warlock.SeedDots[i].IsActive() {
-				if success := warlock.Seeds[i].Cast(sim, sim.GetTarget(int32(i))); success {
-					return
-				} else {
-					warlock.LifeTap.Cast(sim, sim.GetTarget(int32(i)))
-					return
-				}
+		// If we aren't "auto popping" just put seed on and shadowbolt it.
+		if !warlock.SeedDots[0].IsActive() {
+			if success := warlock.Seeds[0].Cast(sim, target); success {
+				return
+			} else {
+				warlock.LifeTap.Cast(sim, target)
+				return
 			}
 		}
 
-		// If every target has seed, fire a shadowbolt at main target so we start some explosions
-		// This could also mean we didn't have mana to cast seed, and so dropping down we will end up lifetapping.
+		// If target has seed, fire a shadowbolt at main target so we start some explosions
 		mainSpell = proto.Warlock_Rotation_Shadowbolt
 	}
 

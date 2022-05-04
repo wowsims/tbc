@@ -41,6 +41,7 @@ export const DefaultRotation = WarlockRotation.create({
 	primarySpell: Warlock_Rotation_PrimarySpell.Shadowbolt,
 	immolate: true,
 	curse: Warlock_Rotation_Curse.Doom,
+	detonateSeed: true,
 });
 
 export const AfflictionRotation = WarlockRotation.create({
@@ -48,6 +49,7 @@ export const AfflictionRotation = WarlockRotation.create({
 	immolate: true,
 	corruption: true,
 	curse: Warlock_Rotation_Curse.Elements,
+	detonateSeed: true,
 });
 
 export const DemonologyRotation = WarlockRotation.create({
@@ -55,6 +57,7 @@ export const DemonologyRotation = WarlockRotation.create({
 	immolate: true,
 	corruption: true,
 	curse: Warlock_Rotation_Curse.Elements,
+	detonateSeed: true,
 });
 
 export const DefaultOptions = WarlockOptions.create({

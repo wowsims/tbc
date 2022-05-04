@@ -36,7 +36,7 @@ func (warlock *Warlock) makeSeed(targetIdx int, cap float64) {
 		DamageMultiplier: 1 * (1 + 0.02*float64(warlock.Talents.ShadowMastery)) * (1 + 0.01*float64(warlock.Talents.Contagion)),
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.ImprovedDrainSoul),
 		BaseDamage:       core.BaseDamageConfigMagic(1110+flatBonus, 1290+flatBonus, 0.143),
-		OutcomeApplier:   warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
+		OutcomeApplier:   warlock.OutcomeFuncMagicHitAndCrit(1.5),
 	}
 
 	// Use a custom aoe effect list that does not include the seeded target.
@@ -111,6 +111,9 @@ func (warlock *Warlock) makeSeed(targetIdx int, cap float64) {
 			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
+				}
+				if spell.ActionID.SpellID == seedActionID.SpellID {
+					return // Seed can't pop seed.
 				}
 				trySeedPop(sim, spellEffect.Damage)
 			},
