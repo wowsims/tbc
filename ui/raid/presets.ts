@@ -682,7 +682,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		buffBotId: 'Bear',
 		spec: Spec.SpecBalanceDruid,
 		name: 'Bear',
-		tooltip: 'Bear: Adds Gift of the Wild, an Innervate, and Leader of the Pack.',
+		tooltip: 'Bear: Adds Gift of the Wild, an Innervate, Faerie Fire, and Leader of the Pack.',
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/ability_racial_bearform.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			raidProto.buffs!.giftOfTheWild = Math.max(raidProto.buffs!.giftOfTheWild, TristateEffect.TristateEffectRegular);
@@ -699,6 +699,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 			}
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+			encounterProto.targets[0].debuffs!.faerieFire = Math.max(encounterProto.targets[0].debuffs!.faerieFire, TristateEffect.TristateEffectRegular);
 		},
 	},
 	{
@@ -722,6 +723,30 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 			}
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+		},
+	},
+	{
+		// The value of this field must never change, to preserve local storage data.
+		buffBotId: 'Dreamstate',
+		spec: Spec.SpecBalanceDruid,
+		name: 'Dreamstate',
+		tooltip: 'Dreamstate: Adds Improved Gift of the Wild, an Innervate, and Improved Faerie Fire.',
+		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_faeriefire.jpg',
+		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
+			raidProto.buffs!.giftOfTheWild = Math.max(raidProto.buffs!.giftOfTheWild, TristateEffect.TristateEffectRegular);
+
+			const innervateIndex = buffBot.getInnervateAssignment().targetIndex;
+			if (innervateIndex != NO_TARGET) {
+				const partyIndex = Math.floor(innervateIndex / 5);
+				const playerIndex = innervateIndex % 5;
+				const playerProto = raidProto.parties[partyIndex].players[playerIndex];
+				if (playerProto.buffs) {
+					playerProto.buffs.innervates++;
+				}
+			}
+		},
+		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
+			encounterProto.targets[0].debuffs!.faerieFire = TristateEffect.TristateEffectImproved;
 		},
 	},
 	{
