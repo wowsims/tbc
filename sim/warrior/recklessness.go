@@ -53,5 +53,8 @@ func (warrior *Warrior) RegisterRecklessnessCD() {
 	warrior.AddMajorCooldown(core.MajorCooldown{
 		Spell: reckSpell,
 		Type:  core.CooldownTypeDPS,
+		CanActivate: func(sim *core.Simulation, character *core.Character) bool {
+			return warrior.StanceMatches(BerserkerStance)
+		},
 	})
 }
