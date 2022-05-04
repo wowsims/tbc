@@ -761,7 +761,6 @@ export const buffBotPresets = [
         // The value of this field must never change, to preserve local storage data.
         buffBotId: 'Resto Shaman',
         spec: Spec.SpecElementalShaman,
-        deprecated: true,
         name: 'Resto Shaman',
         tooltip: 'Resto Shaman: Adds Bloodlust, Mana Spring Totem, Wrath of Air Totem, Mana Tide Totem, and Drums of Battle.',
         iconUrl: talentTreeIcons[Class.ClassShaman][2],
@@ -796,6 +795,7 @@ export const buffBotPresets = [
         buffBotId: 'Malediction Warlock',
         spec: Spec.SpecWarlock,
         name: 'Aff Warlock',
+        deprecated: true,
         tooltip: 'Afflication Warlock: Adds Curse of Elements (improved). Also adds +20% uptime to ISB.',
         iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_curseofachimonde.jpg',
         modifyRaidProto: (buffBot, raidProto, partyProto) => {
