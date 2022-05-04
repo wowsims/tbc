@@ -448,6 +448,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestMutilate-AllItems-ShatteredSunPendantofAcumen-34678"
+ value: {
+  dps: 1187.9365720634044
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-ShatteredSunPendantofMight-34679"
+ value: {
+  dps: 1224.6460801405894
+ }
+}
+dps_results: {
  key: "TestMutilate-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
   dps: 1186.7056255401299

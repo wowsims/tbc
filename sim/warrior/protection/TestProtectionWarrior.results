@@ -592,6 +592,18 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestProtectionWarrior-AllItems-ShatteredSunPendantofAcumen-34678"
+ value: {
+  dps: 504.6378630729043
+ }
+}
+dps_results: {
+ key: "TestProtectionWarrior-AllItems-ShatteredSunPendantofMight-34679"
+ value: {
+  dps: 524.2630196866506
+ }
+}
+dps_results: {
  key: "TestProtectionWarrior-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
   dps: 498.5211843639726
