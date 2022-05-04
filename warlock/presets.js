@@ -16,7 +16,7 @@ export const DestructionTalents = {
     data: '-20501301332001-50500051220051053105',
 };
 export const T6DestroTalents = {
-    name: 'T6 Destro',
+    name: 'Catabolt',
     data: '-20501301332001-55500051221001303025',
 };
 export const AfflicationTalents = {

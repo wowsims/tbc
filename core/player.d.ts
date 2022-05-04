@@ -7,7 +7,7 @@ import { GemColor } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
-import { Race } from '/tbc/core/proto/common.js';
+import { Race, ShattrathFaction } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
@@ -32,6 +32,7 @@ export declare class Player<SpecType extends Spec> {
     private bonusStats;
     private gear;
     private race;
+    private shattFaction;
     private rotation;
     private talentsString;
     private specOptions;
@@ -82,6 +83,8 @@ export declare class Player<SpecType extends Spec> {
     getLabel(): string;
     getRace(): Race;
     setRace(eventID: EventID, newRace: Race): void;
+    getShattFaction(): ShattrathFaction;
+    setShattFaction(eventID: EventID, newFaction: ShattrathFaction): void;
     getFaction(): Faction;
     getBuffs(): IndividualBuffs;
     setBuffs(eventID: EventID, newBuffs: IndividualBuffs): void;

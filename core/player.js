@@ -53,6 +53,7 @@ export class Player {
         this.raid = null;
         this.spec = spec;
         this.race = specToEligibleRaces[this.spec][0];
+        this.shattFaction = 0;
         this.specTypeFunctions = specTypeFunctions[this.spec];
         this.rotation = this.specTypeFunctions.rotationCreate();
         this.specOptions = this.specTypeFunctions.optionsCreate();
@@ -187,6 +188,15 @@ export class Player {
     setRace(eventID, newRace) {
         if (newRace != this.race) {
             this.race = newRace;
+            this.raceChangeEmitter.emit(eventID);
+        }
+    }
+    getShattFaction() {
+        return this.shattFaction;
+    }
+    setShattFaction(eventID, newFaction) {
+        if (newFaction != this.shattFaction) {
+            this.shattFaction = newFaction;
             this.raceChangeEmitter.emit(eventID);
         }
     }
@@ -453,6 +463,7 @@ export class Player {
         return withSpecProto(this.spec, PlayerProto.create({
             name: this.getName(),
             race: this.getRace(),
+            shattFaction: this.getShattFaction(),
             class: this.getClass(),
             equipment: this.getGear().asSpec(),
             consumes: this.getConsumes(),
@@ -467,6 +478,7 @@ export class Player {
         TypedEvent.freezeAllAndDo(() => {
             this.setName(eventID, proto.name);
             this.setRace(eventID, proto.race);
+            this.setShattFaction(eventID, proto.shattFaction);
             this.setGear(eventID, proto.equipment ? this.sim.lookupEquipmentSpec(proto.equipment) : new Gear({}));
             this.setConsumes(eventID, proto.consumes || Consumes.create());
             this.setBonusStats(eventID, new Stats(proto.bonusStats));

@@ -30,6 +30,7 @@ import { IndividualBuffs } from "./common";
 import { Consumes } from "./common";
 import { EquipmentSpec } from "./common";
 import { Class } from "./common";
+import { ShattrathFaction } from "./common";
 import { Race } from "./common";
 /**
  * @generated from protobuf message proto.Player
@@ -45,6 +46,10 @@ export interface Player {
      * @generated from protobuf field: proto.Race race = 1;
      */
     race: Race;
+    /**
+     * @generated from protobuf field: proto.ShattrathFaction shatt_faction = 24;
+     */
+    shattFaction: ShattrathFaction;
     /**
      * @generated from protobuf field: proto.Class class = 2;
      */

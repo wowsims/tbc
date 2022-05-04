@@ -29,6 +29,7 @@ import { IndividualBuffs } from './common.js';
 import { Consumes } from './common.js';
 import { EquipmentSpec } from './common.js';
 import { Class } from './common.js';
+import { ShattrathFaction } from './common.js';
 import { Race } from './common.js';
 /**
  * @generated from protobuf enum proto.ResourceType
@@ -66,6 +67,7 @@ class Player$Type extends MessageType {
         super("proto.Player", [
             { no: 16, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 1, name: "race", kind: "enum", T: () => ["proto.Race", Race] },
+            { no: 24, name: "shatt_faction", kind: "enum", T: () => ["proto.ShattrathFaction", ShattrathFaction] },
             { no: 2, name: "class", kind: "enum", T: () => ["proto.Class", Class] },
             { no: 3, name: "equipment", kind: "message", T: () => EquipmentSpec },
             { no: 4, name: "consumes", kind: "message", T: () => Consumes },
@@ -90,7 +92,7 @@ class Player$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { name: "", race: 0, class: 0, bonusStats: [], spec: { oneofKind: undefined }, talentsString: "", inFrontOfTarget: false };
+        const message = { name: "", race: 0, shattFaction: 0, class: 0, bonusStats: [], spec: { oneofKind: undefined }, talentsString: "", inFrontOfTarget: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -106,6 +108,9 @@ class Player$Type extends MessageType {
                     break;
                 case /* proto.Race race */ 1:
                     message.race = reader.int32();
+                    break;
+                case /* proto.ShattrathFaction shatt_faction */ 24:
+                    message.shattFaction = reader.int32();
                     break;
                 case /* proto.Class class */ 2:
                     message.class = reader.int32();
@@ -231,6 +236,9 @@ class Player$Type extends MessageType {
         /* proto.Race race = 1; */
         if (message.race !== 0)
             writer.tag(1, WireType.Varint).int32(message.race);
+        /* proto.ShattrathFaction shatt_faction = 24; */
+        if (message.shattFaction !== 0)
+            writer.tag(24, WireType.Varint).int32(message.shattFaction);
         /* proto.Class class = 2; */
         if (message.class !== 0)
             writer.tag(2, WireType.Varint).int32(message.class);

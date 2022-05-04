@@ -820,6 +820,19 @@ export declare enum Race {
     RaceUndead = 11
 }
 /**
+ * @generated from protobuf enum proto.ShattrathFaction
+ */
+export declare enum ShattrathFaction {
+    /**
+     * @generated from protobuf enum value: ShattrathFactionAldor = 0;
+     */
+    ShattrathFactionAldor = 0,
+    /**
+     * @generated from protobuf enum value: ShattrathFactionScryer = 1;
+     */
+    ShattrathFactionScryer = 1
+}
+/**
  * @generated from protobuf enum proto.Class
  */
 export declare enum Class {

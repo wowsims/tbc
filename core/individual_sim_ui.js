@@ -13,6 +13,7 @@ import { TypedEvent } from './typed_event.js';
 import { GearPicker } from '/tbc/core/components/gear_picker.js';
 import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
 import { IconPicker } from '/tbc/core/components/icon_picker.js';
+import { ItemSlot } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { IndividualSimSettings } from '/tbc/core/proto/ui.js';
 import { LogRunner } from '/tbc/core/components/log_runner.js';
@@ -25,7 +26,9 @@ import { SavedGearSet } from '/tbc/core/proto/ui.js';
 import { SavedSettings } from '/tbc/core/proto/ui.js';
 import { SavedTalents } from '/tbc/core/proto/ui.js';
 import { SettingsMenu } from '/tbc/core/components/settings_menu.js';
+import { ShattrathFaction } from '/tbc/core/proto/common.js';
 import { SimUI } from './sim_ui.js';
+import { nameToShattFaction } from '/tbc/core/proto_utils/utils.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
 import { addStatWeightsAction } from '/tbc/core/components/stat_weights_action.js';
@@ -248,7 +251,7 @@ export class IndividualSimUI extends SimUI {
 						<legend>Encounter</legend>
 					</fieldset>
 					<fieldset class="settings-section race-section">
-						<legend>Race</legend>
+						<legend>Player</legend>
 					</fieldset>
 					<fieldset class="settings-section rotation-section">
 						<legend>Rotation</legend>
@@ -453,6 +456,18 @@ export class IndividualSimUI extends SimUI {
             getValue: sim => sim.getRace(),
             setValue: (eventID, sim, newValue) => sim.setRace(eventID, newValue),
         });
+        const shattFactionPicker = new EnumPicker(this.rootElem.getElementsByClassName('race-section')[0], this.player, {
+            values: ["Scryer", "Aldor"].map(faction => {
+                return {
+                    name: faction,
+                    value: nameToShattFaction[faction],
+                };
+            }),
+            changedEvent: sim => sim.gearChangeEmitter,
+            getValue: sim => sim.getShattFaction(),
+            setValue: (eventID, sim, newValue) => sim.setShattFaction(eventID, newValue),
+            showWhen: (player) => this.player.getEquippedItem(ItemSlot.ItemSlotNeck)?.item.id == 34678 || this.player.getEquippedItem(ItemSlot.ItemSlotNeck)?.item.id == 34679,
+        });
         const encounterSectionElem = settingsTab.getElementsByClassName('encounter-section')[0];
         new EncounterPicker(encounterSectionElem, this.sim.encounter, this.individualConfig.encounterPicker);
         const savedEncounterManager = new SavedDataManager(this.rootElem.getElementsByClassName('saved-encounter-manager')[0], this.sim.encounter, {
@@ -625,6 +640,7 @@ export class IndividualSimUI extends SimUI {
         TypedEvent.freezeAllAndDo(() => {
             const tankSpec = isTankSpec(this.player.spec);
             this.player.setRace(eventID, specToEligibleRaces[this.player.spec][0]);
+            this.player.setShattFaction(eventID, ShattrathFaction.ShattrathFactionAldor);
             this.player.setGear(eventID, this.sim.lookupEquipmentSpec(this.individualConfig.defaults.gear));
             this.player.setBonusStats(eventID, new Stats());
             this.player.setConsumes(eventID, this.individualConfig.defaults.consumes);
