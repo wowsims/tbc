@@ -90,7 +90,7 @@ func ApplyHandOfJustice(agent core.Agent) {
 			handOfJusticeSpell = character.GetOrRegisterSpell(core.SpellConfig{
 				ActionID:     core.ActionID{ItemID: 11815},
 				SpellSchool:  core.SpellSchoolPhysical,
-				SpellExtras:  core.SpellExtrasMeleeMetrics,
+				SpellExtras:  core.SpellExtrasMeleeMetrics | core.SpellExtrasNoOnCastComplete,
 				ApplyEffects: core.ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
 			})
 		},
@@ -112,7 +112,7 @@ func ApplyHandOfJustice(agent core.Agent) {
 			}
 			icd.Use(sim)
 
-			aura.Unit.AutoAttacks.MaybeReplaceMHSwing(sim, handOfJusticeSpell).SkipCastAndApplyEffects(sim, spellEffect.Target)
+			aura.Unit.AutoAttacks.MaybeReplaceMHSwing(sim, handOfJusticeSpell).Cast(sim, spellEffect.Target)
 		},
 	})
 }

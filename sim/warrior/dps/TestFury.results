@@ -378,7 +378,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-HandofJustice-11815"
  value: {
-  dps: 896.1809022118483
+  dps: 902.4332600843211
  }
 }
 dps_results: {
@@ -480,7 +480,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 889.1004255197385
+  dps: 890.6417249970932
  }
 }
 dps_results: {
@@ -528,7 +528,7 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-Quagmirran'sEye-27683"
  value: {
-  dps: 875.5896481437817
+  dps: 880.2374611008938
  }
 }
 dps_results: {

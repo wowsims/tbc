@@ -818,7 +818,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 			blinkstrikeSpell = character.GetOrRegisterSpell(core.SpellConfig{
 				ActionID:     core.ActionID{ItemID: 31332},
 				SpellSchool:  core.SpellSchoolPhysical,
-				SpellExtras:  core.SpellExtrasMeleeMetrics,
+				SpellExtras:  core.SpellExtrasMeleeMetrics | core.SpellExtrasNoOnCastComplete,
 				ApplyEffects: core.ApplyEffectFuncDirectDamage(character.AutoAttacks.MHEffect),
 			})
 		},
@@ -839,7 +839,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 			}
 			icd.Use(sim)
 
-			aura.Unit.AutoAttacks.MaybeReplaceMHSwing(sim, blinkstrikeSpell).SkipCastAndApplyEffects(sim, spellEffect.Target)
+			aura.Unit.AutoAttacks.MaybeReplaceMHSwing(sim, blinkstrikeSpell).Cast(sim, spellEffect.Target)
 		},
 	})
 }
