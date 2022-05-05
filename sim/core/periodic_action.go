@@ -12,6 +12,8 @@ type PeriodicActionOptions struct {
 	// 0 indicates a permanent periodic action.
 	NumTicks int
 
+	Priority ActionPriority
+
 	OnAction func(*Simulation)
 	CleanUp  func(*Simulation)
 }
@@ -19,7 +21,7 @@ type PeriodicActionOptions struct {
 func NewPeriodicAction(sim *Simulation, options PeriodicActionOptions) *PendingAction {
 	pa := &PendingAction{
 		NextActionAt: sim.CurrentTime + options.Period,
-		//Priority:     ActionPriorityDOT,
+		Priority:     options.Priority,
 	}
 
 	tickIndex := 0

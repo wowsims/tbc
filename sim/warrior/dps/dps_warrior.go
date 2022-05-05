@@ -112,6 +112,14 @@ func (war *DpsWarrior) Initialize() {
 		war.RegisterRecklessnessCD()
 	}
 
+	if war.Env.Raid.Size() == 1 {
+		if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorHelpStack {
+			war.SunderArmorAura.Duration = core.NeverExpires
+		} else if war.Rotation.SunderArmor == proto.Warrior_Rotation_SunderArmorMaintain {
+			war.SunderArmorAura.Duration = time.Second * 30
+		}
+	}
+
 	war.DelayDPSCooldownsForArmorDebuffs()
 }
 
