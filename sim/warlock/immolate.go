@@ -13,8 +13,7 @@ func (warlock *Warlock) registerImmolateSpell() {
 	baseCost := 445.0
 
 	effect := core.SpellEffect{
-		BonusSpellCritRating: float64(warlock.Talents.Devastation)*1*core.SpellCritRatingPerCritChance +
-			float64(warlock.Talents.Backlash)*1*core.SpellCritRatingPerCritChance,
+		BonusSpellCritRating: float64(warlock.Talents.Devastation) * 1 * core.SpellCritRatingPerCritChance,
 		DamageMultiplier: 1 *
 			(1 + (0.05 * float64(warlock.Talents.ImprovedImmolate))) *
 			(1 + (0.02 * float64(warlock.Talents.Emberstorm))),
