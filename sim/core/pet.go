@@ -79,14 +79,14 @@ func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanc
 // Updates the stats for this pet in response to a stat change on the owner.
 // addedStats is the amount of stats added to the owner (will be negative if the
 // owner lost stats).
-func (pet *Pet) addOwnerStats(addedStats stats.Stats) {
+func (pet *Pet) addOwnerStats(sim *Simulation, addedStats stats.Stats) {
 	inheritedChange := pet.currentStatInheritance(addedStats)
-	pet.AddStats(inheritedChange)
+	pet.AddStatsDynamic(sim, inheritedChange)
 }
-func (pet *Pet) addOwnerStat(stat stats.Stat, addedAmount float64) {
+func (pet *Pet) addOwnerStat(sim *Simulation, stat stats.Stat, addedAmount float64) {
 	s := stats.Stats{}
 	s[stat] = addedAmount
-	pet.addOwnerStats(s)
+	pet.addOwnerStats(sim, s)
 }
 
 // This needs to be called after owner stats are finalized so we can inherit the

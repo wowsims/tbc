@@ -147,11 +147,11 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 		ActionID: actionID,
 		Duration: dur,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			shaman.AddStat(stats.SpellPower, 250)
+			shaman.AddStatDynamic(sim, stats.SpellPower, 250)
 			shaman.PseudoStats.CostMultiplier *= 1.2
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			shaman.AddStat(stats.SpellPower, -250)
+			shaman.AddStatDynamic(sim, stats.SpellPower, -250)
 			shaman.PseudoStats.CostMultiplier /= 1.2
 		},
 	})

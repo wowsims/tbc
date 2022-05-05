@@ -321,11 +321,11 @@ func FaerieFireAura(target *Target, level int32) *Aura {
 		Duration: time.Second * 40,
 		Priority: float64(level),
 		OnGain: func(aura *Aura, sim *Simulation) {
-			target.AddStat(stats.Armor, -armorReduction)
+			target.AddStatDynamic(sim, stats.Armor, -armorReduction)
 			target.PseudoStats.BonusMeleeHitRating += float64(level) * MeleeHitRatingPerHitChance
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			target.AddStat(stats.Armor, armorReduction)
+			target.AddStatDynamic(sim, stats.Armor, armorReduction)
 			target.PseudoStats.BonusMeleeHitRating -= float64(level) * MeleeHitRatingPerHitChance
 		},
 	})
@@ -348,7 +348,7 @@ func SunderArmorAura(target *Target, startingStacks int32) *Aura {
 			aura.SetStacks(sim, startingStacks)
 		},
 		OnStacksChange: func(aura *Aura, sim *Simulation, oldStacks int32, newStacks int32) {
-			target.AddStat(stats.Armor, float64(oldStacks-newStacks)*armorReductionPerStack)
+			target.AddStatDynamic(sim, stats.Armor, float64(oldStacks-newStacks)*armorReductionPerStack)
 		},
 	})
 }
@@ -382,10 +382,10 @@ func ExposeArmorAura(target *Target, talentPoints int32) *Aura {
 		Duration: time.Second * 30,
 		Priority: armorReduction,
 		OnGain: func(aura *Aura, sim *Simulation) {
-			target.AddStat(stats.Armor, -armorReduction)
+			target.AddStatDynamic(sim, stats.Armor, -armorReduction)
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			target.AddStat(stats.Armor, armorReduction)
+			target.AddStatDynamic(sim, stats.Armor, armorReduction)
 		},
 	})
 }
@@ -413,10 +413,10 @@ func CurseOfRecklessnessAura(target *Target) *Aura {
 		ActionID: ActionID{SpellID: 27226},
 		Duration: time.Minute * 2,
 		OnGain: func(aura *Aura, sim *Simulation) {
-			target.AddStat(stats.Armor, -armorReduction)
+			target.AddStatDynamic(sim, stats.Armor, -armorReduction)
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			target.AddStat(stats.Armor, armorReduction)
+			target.AddStatDynamic(sim, stats.Armor, armorReduction)
 		},
 	})
 }

@@ -102,11 +102,11 @@ func (warrior *Warrior) registerBerserkerStanceAura() {
 		Duration: core.NeverExpires,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Unit.PseudoStats.ThreatMultiplier *= threatMult
-			aura.Unit.AddStat(stats.MeleeCrit, critBonus)
+			aura.Unit.AddStatDynamic(sim, stats.MeleeCrit, critBonus)
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Unit.PseudoStats.ThreatMultiplier /= threatMult
-			aura.Unit.AddStat(stats.MeleeCrit, -critBonus)
+			aura.Unit.AddStatDynamic(sim, stats.MeleeCrit, -critBonus)
 		},
 	})
 }

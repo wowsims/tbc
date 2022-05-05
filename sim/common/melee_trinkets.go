@@ -150,7 +150,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 		Duration:  core.NeverExpires,
 		MaxStacks: 6,
 		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
-			character.AddStat(stats.ArmorPenetration, 200*float64(newStacks-oldStacks))
+			character.AddStatDynamic(sim, stats.ArmorPenetration, 200*float64(newStacks-oldStacks))
 		},
 	})
 
@@ -362,8 +362,8 @@ func ApplyDarkmoonCardWrath(agent core.Agent) {
 		Duration:  time.Second * 10,
 		MaxStacks: 1000,
 		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
-			character.AddStat(stats.MeleeCrit, 17*float64(newStacks-oldStacks))
-			character.AddStat(stats.SpellCrit, 17*float64(newStacks-oldStacks))
+			character.AddStatDynamic(sim, stats.MeleeCrit, 17*float64(newStacks-oldStacks))
+			character.AddStatDynamic(sim, stats.SpellCrit, 17*float64(newStacks-oldStacks))
 		},
 	})
 

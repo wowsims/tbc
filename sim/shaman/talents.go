@@ -185,10 +185,10 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 		ActionID: actionID,
 		Duration: core.NeverExpires,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			shaman.AddStat(stats.SpellCrit, 100*core.SpellCritRatingPerCritChance)
+			shaman.AddStatDynamic(sim, stats.SpellCrit, 100*core.SpellCritRatingPerCritChance)
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			shaman.AddStat(stats.SpellCrit, -100*core.SpellCritRatingPerCritChance)
+			shaman.AddStatDynamic(sim, stats.SpellCrit, -100*core.SpellCritRatingPerCritChance)
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spell.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
@@ -295,12 +295,12 @@ func (shaman *Shaman) applyUnleashedRage() {
 					Duration: time.Second * 10,
 					OnGain: func(aura *core.Aura, sim *core.Simulation) {
 						buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: currentAPBonuses[idx]})
-						char.AddStats(buffs)
+						char.AddStatsDynamic(sim, buffs)
 					},
 					OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 						buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: currentAPBonuses[idx]})
 						unbuffs := buffs.Multiply(-1)
-						char.AddStats(unbuffs)
+						char.AddStatsDynamic(sim, unbuffs)
 					},
 				})
 			}

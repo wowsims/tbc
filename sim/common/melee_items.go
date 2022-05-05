@@ -855,7 +855,7 @@ func ApplyTheNightBlade(agent core.Agent) {
 		Duration:  time.Second * 10,
 		MaxStacks: 3,
 		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
-			character.AddStat(stats.ArmorPenetration, 435*float64(newStacks-oldStacks))
+			character.AddStatDynamic(sim, stats.ArmorPenetration, 435*float64(newStacks-oldStacks))
 		},
 	})
 
