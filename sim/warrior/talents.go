@@ -182,7 +182,7 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 				swordSpecializationSpell = warrior.GetOrRegisterSpell(core.SpellConfig{
 					ActionID:    core.ActionID{SpellID: 12815},
 					SpellSchool: core.SpellSchoolPhysical,
-					SpellExtras: core.SpellExtrasMeleeMetrics,
+					SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasNoOnCastComplete,
 
 					ApplyEffects: core.ApplyEffectFuncDirectDamage(warrior.AutoAttacks.MHEffect),
 				})
@@ -208,7 +208,7 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 				}
 				icd.Use(sim)
 
-				aura.Unit.AutoAttacks.MaybeReplaceMHSwing(sim, swordSpecializationSpell).SkipCastAndApplyEffects(sim, spellEffect.Target)
+				aura.Unit.AutoAttacks.MaybeReplaceMHSwing(sim, swordSpecializationSpell).Cast(sim, spellEffect.Target)
 			},
 		})
 	}

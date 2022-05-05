@@ -13,7 +13,7 @@ func (warrior *Warrior) registerHeroicStrikeSpell() {
 	warrior.HeroicStrikeOrCleave = warrior.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 29707},
 		SpellSchool: core.SpellSchoolPhysical,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
+		SpellExtras: core.SpellExtrasMeleeMetrics | core.SpellExtrasNoOnCastComplete,
 
 		ResourceType: stats.Rage,
 		BaseCost:     cost,
@@ -105,17 +105,17 @@ func (warrior *Warrior) TryHSOrCleave(sim *core.Simulation, mhSwingSpell *core.S
 		return nil
 	}
 
-	if mhSwingSpell != warrior.AutoAttacks.MHAuto {
-		// This happens for extra MH attack procs, like sword specialization / windfury.
-		// Rage is not consumed in these cases so just return the spell.
-		return warrior.HeroicStrikeOrCleave
+	if warrior.CurrentRage() < warrior.HeroicStrikeOrCleave.DefaultCast.Cost {
+		warrior.DequeueHSOrCleave(sim)
+		return nil
+	} else if warrior.CurrentRage() < warrior.HSRageThreshold {
+		if mhSwingSpell == warrior.AutoAttacks.MHAuto {
+			warrior.DequeueHSOrCleave(sim)
+			return nil
+		}
 	}
 
 	warrior.DequeueHSOrCleave(sim)
-	if warrior.CurrentRage() < warrior.HeroicStrikeOrCleave.DefaultCast.Cost {
-		return nil
-	}
-
 	return warrior.HeroicStrikeOrCleave
 }
 
