@@ -405,9 +405,6 @@ export const WarriorRotationConfig = {
             type: 'enum', cssClass: 'sunder-armor-picker',
             getModObject: (simUI) => simUI.player,
             config: {
-                extraCssClasses: [
-                    'not-within-raid-sim-hide',
-                ],
                 label: 'Sunder Armor',
                 values: [
                     { name: 'Never', value: SunderArmor.SunderArmorNone },
@@ -419,24 +416,6 @@ export const WarriorRotationConfig = {
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.sunderArmor = newValue;
-                    player.setRotation(eventID, newRotation);
-                },
-            },
-        },
-        {
-            type: 'boolean', cssClass: 'sunder-armor-picker-individual',
-            getModObject: (simUI) => simUI.player,
-            config: {
-                extraCssClasses: [
-                    'within-raid-sim-hide',
-                ],
-                label: 'Maintain Sunder Armor',
-                tooltip: 'Keep Sunder Armor active on the primary target. Using this with the Sunder Armor option in \'Debuffs\' will cause this Warrior to use 2-3 sunders and then stop.',
-                changedEvent: (player) => player.rotationChangeEmitter,
-                getValue: (player) => player.getRotation().sunderArmor != SunderArmor.SunderArmorNone,
-                setValue: (eventID, player, newValue) => {
-                    const newRotation = player.getRotation();
-                    newRotation.sunderArmor = newValue ? SunderArmor.SunderArmorMaintain : SunderArmor.SunderArmorNone;
                     player.setRotation(eventID, newRotation);
                 },
             },
