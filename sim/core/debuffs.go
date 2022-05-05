@@ -361,6 +361,7 @@ func ScheduledSunderArmorAura(target *Target) *Aura {
 		StartPeriodicAction(sim, PeriodicActionOptions{
 			Period:   time.Duration(1.5 * float64(time.Second)),
 			NumTicks: 4,
+			Priority: ActionPriorityDOT, // High prio so it comes before actual warrior sunders.
 			OnAction: func(sim *Simulation) {
 				if aura.IsActive() {
 					aura.AddStack(sim)
