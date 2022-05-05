@@ -396,13 +396,13 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-LionheartChampion-28429"
  value: {
-  dps: 999.0478020545795
+  dps: 999.1507031398011
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 1024.3688482549499
+  dps: 1024.4746238055604
  }
 }
 dps_results: {
