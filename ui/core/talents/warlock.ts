@@ -619,7 +619,7 @@ export const warlockTalentsConfig: TalentsConfig<Spec.SpecWarlock> = newTalentsC
 					rowIdx: 6,
 					colIdx: 2,
 				},
-				spellIds: [30293],
+				spellIds: [30293, 30295],
 				maxPoints: 3,
 			},
 			{
