@@ -113,6 +113,7 @@ export class WarlockSimUI extends IndividualSimUI {
                     curseOfElements: TristateEffect.TristateEffectRegular,
                     faerieFire: TristateEffect.TristateEffectImproved,
                     sunderArmor: true,
+                    isbUptime: 0.65,
                 }),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
