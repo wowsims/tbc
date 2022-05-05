@@ -79,11 +79,11 @@ func (mage *Mage) applyArcaneConcentration() {
 		ActionID: core.ActionID{SpellID: 12536},
 		Duration: time.Second * 15,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			mage.AddStat(stats.SpellCrit, bonusCrit)
+			mage.AddStatDynamic(sim, stats.SpellCrit, bonusCrit)
 			mage.PseudoStats.NoCost = true
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			mage.AddStat(stats.SpellCrit, -bonusCrit)
+			mage.AddStatDynamic(sim, stats.SpellCrit, -bonusCrit)
 			mage.PseudoStats.NoCost = false
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -108,7 +108,7 @@ func (mage *Mage) applyArcaneConcentration() {
 		},
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 			if mage.bonusAMCCCrit != 0 {
-				mage.AddStat(stats.SpellCrit, -mage.bonusAMCCCrit)
+				mage.AddStatDynamic(sim, stats.SpellCrit, -mage.bonusAMCCCrit)
 				mage.bonusAMCCCrit = 0
 			}
 			if !spell.SpellExtras.Matches(SpellFlagMage) {

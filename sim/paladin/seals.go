@@ -171,13 +171,13 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 		ActionID: actionID,
 		Duration: SealDuration,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			paladin.AddStat(stats.AttackPower, apBonus)
-			paladin.PseudoStats.MeleeSpeedMultiplier *= 1.4
+			paladin.AddStatDynamic(sim, stats.AttackPower, apBonus)
+			paladin.MultiplyMeleeSpeed(sim, 1.4)
 			paladin.AutoAttacks.MHEffect.DamageMultiplier *= 0.6
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			paladin.AddStat(stats.AttackPower, -apBonus)
-			paladin.PseudoStats.MeleeSpeedMultiplier /= 1.4
+			paladin.AddStatDynamic(sim, stats.AttackPower, -apBonus)
+			paladin.MultiplyMeleeSpeed(sim, 1/1.4)
 			paladin.AutoAttacks.MHEffect.DamageMultiplier /= 0.6
 		},
 	})

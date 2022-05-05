@@ -141,11 +141,11 @@ func (priest *Priest) registerInnerFocus() {
 		ActionID: actionID,
 		Duration: core.NeverExpires,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			priest.AddStat(stats.SpellCrit, 25*core.SpellCritRatingPerCritChance)
+			priest.AddStatDynamic(sim, stats.SpellCrit, 25*core.SpellCritRatingPerCritChance)
 			priest.PseudoStats.NoCost = true
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			priest.AddStat(stats.SpellCrit, -25*core.SpellCritRatingPerCritChance)
+			priest.AddStatDynamic(sim, stats.SpellCrit, -25*core.SpellCritRatingPerCritChance)
 			priest.PseudoStats.NoCost = false
 		},
 		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {

@@ -109,10 +109,46 @@ func (unit *Unit) GetStat(stat stats.Stat) float64 {
 }
 
 func (unit *Unit) AddStats(stat stats.Stats) {
+	if unit.Env != nil && unit.Env.IsFinalized() {
+		panic("Already finalized, used AddStatsDynamic instead!")
+	}
 	unit.stats = unit.stats.Add(stat)
 }
 func (unit *Unit) AddStat(stat stats.Stat, amount float64) {
+	if unit.Env != nil && unit.Env.IsFinalized() {
+		panic("Already finalized, used AddStatDynamic instead!")
+	}
 	unit.stats[stat] += amount
+}
+
+func (unit *Unit) AddStatsDynamic(sim *Simulation, stat stats.Stats) {
+	if unit.Env == nil || !unit.Env.IsFinalized() {
+		panic("Not finalized, used AddStats instead!")
+	}
+
+	stat[stats.Mana] = 0 // TODO: Mana needs special treatment
+
+	if stat[stats.MeleeHaste] != 0 {
+		unit.AddMeleeHaste(sim, stat[stats.MeleeHaste])
+		stat[stats.MeleeHaste] = 0
+	}
+
+	unit.stats = unit.stats.Add(stat)
+
+	if stat[stats.MP5] != 0 || stat[stats.Intellect] != 0 || stat[stats.Spirit] != 0 {
+		unit.UpdateManaRegenRates()
+	}
+}
+func (unit *Unit) AddStatDynamic(sim *Simulation, stat stats.Stat, amount float64) {
+	if unit.Env == nil || !unit.Env.IsFinalized() {
+		panic("Not finalized, used AddStats instead!")
+	}
+
+	unit.stats[stat] += amount
+
+	if stat == stats.MP5 || stat == stats.Intellect || stat == stats.Spirit {
+		unit.UpdateManaRegenRates()
+	}
 }
 
 // Returns whether the indicates stat is currently modified by a temporary bonus.

@@ -181,42 +181,21 @@ func (character *Character) GetPet(name string) PetAgent {
 	panic(character.Name + " has no pet with name " + name)
 }
 
-func (character *Character) AddStats(stat stats.Stats) {
-	character.stats = character.stats.Add(stat)
-
-	if len(character.Pets) > 0 {
-		for _, petAgent := range character.Pets {
-			petAgent.GetPet().addOwnerStats(stat)
-		}
-	}
-}
 func (character *Character) AddStatsDynamic(sim *Simulation, stat stats.Stats) {
-	directStats := stat
-	directStats[stats.Mana] = 0 // TODO: Mana needs special treatment
-
-	if directStats[stats.MeleeHaste] != 0 {
-		character.AddMeleeHaste(sim, directStats[stats.MeleeHaste])
-		directStats[stats.MeleeHaste] = 0
-	}
-
-	character.stats = character.stats.Add(directStats)
+	character.Unit.AddStatsDynamic(sim, stat)
 
 	if len(character.Pets) > 0 {
 		for _, petAgent := range character.Pets {
-			petAgent.GetPet().addOwnerStats(stat)
+			petAgent.GetPet().addOwnerStats(sim, stat)
 		}
 	}
 }
-func (character *Character) AddStat(stat stats.Stat, amount float64) {
-	character.stats[stat] += amount
-
-	if stat == stats.MP5 || stat == stats.Intellect || stat == stats.Spirit {
-		character.UpdateManaRegenRates()
-	}
+func (character *Character) AddStatDynamic(sim *Simulation, stat stats.Stat, amount float64) {
+	character.Unit.AddStatDynamic(sim, stat, amount)
 
 	if len(character.Pets) > 0 {
 		for _, petAgent := range character.Pets {
-			petAgent.GetPet().addOwnerStat(stat, amount)
+			petAgent.GetPet().addOwnerStat(sim, stat, amount)
 		}
 	}
 }
