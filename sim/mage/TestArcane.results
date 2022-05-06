@@ -630,7 +630,7 @@ dps_results: {
 dps_results: {
  key: "TestArcane-Settings-Troll10-P1Arcane-AOE-FullBuffs-LongMultiTarget"
  value: {
-  dps: 11758.427212502087
+  dps: 11752.200718399277
  }
 }
 dps_results: {

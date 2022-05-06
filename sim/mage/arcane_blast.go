@@ -88,7 +88,6 @@ func (mage *Mage) canBlast(sim *core.Simulation, curManaCost float64, curCastTim
 
 	remainingDuration := sim.GetRemainingDuration()
 	projectedRemainingMana := mage.manaTracker.ProjectedRemainingMana(sim, mage.GetCharacter())
-	inverseCastSpeed := 1 / mage.CastSpeed()
 
 	extraManaCost := 0.0
 	if mage.hasTristfal {
@@ -107,7 +106,7 @@ func (mage *Mage) canBlast(sim *core.Simulation, curManaCost float64, curCastTim
 	// Second cast
 	if numStacksAfterFirstCast == 1 {
 		projectedRemainingMana -= ArcaneBlastBaseManaCost + (1.0 * ArcaneBlastBaseManaCost * 0.75) + extraManaCost
-		remainingDuration -= time.Duration(float64(ArcaneBlastBaseCastTime-(1*time.Second/3)) * inverseCastSpeed)
+		remainingDuration -= mage.ApplyCastSpeed(ArcaneBlastBaseCastTime - (1 * time.Second / 3))
 		if projectedRemainingMana < 0 {
 			return false
 		} else if remainingDuration < 0 {
@@ -118,7 +117,7 @@ func (mage *Mage) canBlast(sim *core.Simulation, curManaCost float64, curCastTim
 	// Third cast
 	if numStacksAfterFirstCast < 3 {
 		projectedRemainingMana -= ArcaneBlastBaseManaCost + (2.0 * ArcaneBlastBaseManaCost * 0.75) + extraManaCost
-		remainingDuration -= time.Duration(float64(ArcaneBlastBaseCastTime-(2*time.Second/3)) * inverseCastSpeed)
+		remainingDuration -= mage.ApplyCastSpeed(ArcaneBlastBaseCastTime - (2 * time.Second / 3))
 		if projectedRemainingMana < 0 {
 			return false
 		} else if remainingDuration < 0 {
@@ -128,7 +127,7 @@ func (mage *Mage) canBlast(sim *core.Simulation, curManaCost float64, curCastTim
 
 	// Everything after this will be full stack blasts.
 	manaCost := ArcaneBlastBaseManaCost + (3.0 * ArcaneBlastBaseManaCost * 0.75) + extraManaCost
-	castTime := time.Duration(float64(ArcaneBlastBaseCastTime-(3*time.Second/3)) * inverseCastSpeed)
+	castTime := mage.ApplyCastSpeed(ArcaneBlastBaseCastTime - (3 * time.Second / 3))
 	numCasts := remainingDuration / castTime // time.Duration is an integer so we don't need to call math.Floor()
 	totalManaCost := manaCost * float64(numCasts)
 

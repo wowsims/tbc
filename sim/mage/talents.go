@@ -360,10 +360,10 @@ func (mage *Mage) registerIcyVeinsCD() {
 		ActionID: actionID,
 		Duration: time.Second * 20,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Unit.PseudoStats.CastSpeedMultiplier *= 1.2
+			aura.Unit.MultiplyCastSpeed(1.2)
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Unit.PseudoStats.CastSpeedMultiplier *= 1 / 1.2
+			aura.Unit.MultiplyCastSpeed(1 / 1.2)
 		},
 	})
 
