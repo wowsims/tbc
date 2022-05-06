@@ -12,7 +12,7 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, 
 
 	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
 		// Physical resistance (armor).
-		spellEffect.Damage *= spellEffect.Target.ArmorDamageReduction(spell.Unit.stats[stats.ArmorPenetration])
+		spellEffect.Damage *= attackTable.ArmorDamageReduction
 	} else if !spell.SpellExtras.Matches(SpellExtrasBinary) {
 		// Magical resistance.
 
@@ -39,10 +39,9 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, 
 }
 
 // ArmorDamageReduction currently assumes a level 70 attacker
-func (unit *Unit) ArmorDamageReduction(armorPen float64) float64 {
-	// TODO: Cache this somehow so we dont have to recalculate every time.
-	effectiveArmor := MaxFloat(0, unit.stats[stats.Armor]-armorPen)
-	return 1 - (effectiveArmor / (effectiveArmor + 10557.5))
+func (at *AttackTable) UpdateArmorDamageReduction() {
+	effectiveArmor := MaxFloat(0, at.Defender.stats[stats.Armor]-at.Attacker.stats[stats.ArmorPenetration])
+	at.ArmorDamageReduction = 1 - (effectiveArmor / (effectiveArmor + 10557.5))
 }
 
 // All of the following calculations are based on this guide:

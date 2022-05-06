@@ -105,16 +105,23 @@ func (target *Target) finalize() {
 func (target *Target) setupAttackTables() {
 	raidUnits := target.Env.Raid.AllUnits
 	numTables := raidUnits[len(raidUnits)-1].Index + 1
-	target.attackTables = make([]*AttackTable, numTables)
+	target.AttackTables = make([]*AttackTable, numTables)
+	target.DefenseTables = make([]*AttackTable, numTables)
 
 	for _, attacker := range raidUnits {
-		table := NewAttackTable(attacker, &target.Unit)
-		target.attackTables[attacker.Index] = table
-
-		if attacker.attackTables == nil {
-			attacker.attackTables = make([]*AttackTable, target.Env.GetNumTargets())
+		if attacker.AttackTables == nil {
+			attacker.AttackTables = make([]*AttackTable, target.Env.GetNumTargets())
+			attacker.DefenseTables = make([]*AttackTable, target.Env.GetNumTargets())
 		}
-		attacker.attackTables[target.Index] = table
+
+		attackTable := NewAttackTable(attacker, &target.Unit)
+		defenseTable := NewAttackTable(&target.Unit, attacker)
+
+		attacker.AttackTables[target.Index] = attackTable
+		attacker.DefenseTables[target.Index] = defenseTable
+
+		target.AttackTables[attacker.Index] = defenseTable
+		target.DefenseTables[attacker.Index] = attackTable
 	}
 }
 
@@ -153,6 +160,9 @@ func (target *Target) GetMetricsProto(numIterations int32) *proto.UnitMetrics {
 //
 // These are updated dynamically when attacker or defender stats change.
 type AttackTable struct {
+	Attacker *Unit
+	Defender *Unit
+
 	BaseMissChance      float64
 	BaseSpellMissChance float64
 	BaseBlockChance     float64
@@ -167,11 +177,17 @@ type AttackTable struct {
 	PartialResistRollThreshold00 float64
 	PartialResistRollThreshold25 float64
 	PartialResistRollThreshold50 float64
+
+	ArmorDamageReduction float64
 }
 
 // Currently assumes attacker is level 70.
 func NewAttackTable(attacker *Unit, defender *Unit) *AttackTable {
-	table := &AttackTable{}
+	table := &AttackTable{
+		Attacker: attacker,
+		Defender: defender,
+	}
+
 	table.BaseMissChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.08)
 	table.BaseSpellMissChance = UnitLevelFloat64(defender.Level, 0.04, 0.05, 0.06, 0.17)
 	table.BaseBlockChance = 0.05
@@ -185,6 +201,8 @@ func NewAttackTable(attacker *Unit, defender *Unit) *AttackTable {
 
 	// TODO: This needs to be refactored to actually use the spell's school, and change on changes to resistance/spell pen.
 	table.PartialResistRollThreshold00, table.PartialResistRollThreshold25, table.PartialResistRollThreshold50 = defender.partialResistRollThresholds(SpellSchoolFire, CharacterLevel, 0)
+
+	table.UpdateArmorDamageReduction()
 
 	return table
 }
