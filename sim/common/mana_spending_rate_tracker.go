@@ -94,7 +94,7 @@ func (tracker *ManaSpendingRateTracker) Update(sim *core.Simulation, character *
 	//}
 
 	nextIndex := (tracker.firstSnapshotIndex + tracker.numSnapshots) % manaSnapshotsBufferSize
-	tracker.previousCastSpeed = character.CastSpeed()
+	tracker.previousCastSpeed = 1 / character.CastSpeed
 	tracker.previousManaSpent = snapshot.manaSpent
 	tracker.previousManaGained = snapshot.manaGained
 	tracker.manaSpentDuringWindow += snapshot.manaSpentDelta

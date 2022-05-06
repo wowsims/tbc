@@ -523,9 +523,9 @@ func BloodlustAura(character *Character, actionTag int32) *Aura {
 		Duration: BloodlustDuration,
 		OnGain: func(aura *Aura, sim *Simulation) {
 			if character.HasActiveAuraWithTag(PowerInfusionAuraTag) {
-				character.PseudoStats.CastSpeedMultiplier /= 1.2
+				character.MultiplyCastSpeed(1 / 1.2)
 			}
-			character.PseudoStats.CastSpeedMultiplier *= bonus
+			character.MultiplyCastSpeed(bonus)
 			character.MultiplyAttackSpeed(sim, bonus)
 
 			if len(character.Pets) > 0 {
@@ -539,9 +539,9 @@ func BloodlustAura(character *Character, actionTag int32) *Aura {
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
 			if character.HasActiveAuraWithTag(PowerInfusionAuraTag) {
-				character.PseudoStats.CastSpeedMultiplier *= 1.2
+				character.MultiplyCastSpeed(1.2)
 			}
-			character.PseudoStats.CastSpeedMultiplier *= inverseBonus
+			character.MultiplyCastSpeed(inverseBonus)
 			character.MultiplyAttackSpeed(sim, inverseBonus)
 		},
 	})
@@ -592,7 +592,7 @@ func PowerInfusionAura(character *Character, actionTag int32) *Aura {
 				character.PseudoStats.CostMultiplier *= 0.8
 			}
 			if !character.HasActiveAuraWithTag(BloodlustAuraTag) {
-				character.PseudoStats.CastSpeedMultiplier *= 1.2
+				character.MultiplyCastSpeed(1.2)
 			}
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
@@ -600,7 +600,7 @@ func PowerInfusionAura(character *Character, actionTag int32) *Aura {
 				character.PseudoStats.CostMultiplier /= 0.8
 			}
 			if !character.HasActiveAuraWithTag(BloodlustAuraTag) {
-				character.PseudoStats.CastSpeedMultiplier /= 1.2
+				character.MultiplyCastSpeed(1 / 1.2)
 			}
 		},
 	})

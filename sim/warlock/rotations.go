@@ -100,7 +100,7 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 	// If big CD coming up and we don't have enough mana for it, lifetap
 	// Also, never do a big regen in the last few seconds of the fight.
 	if !warlock.DoingRegen && nextBigCD-sim.CurrentTime < time.Second*15 && sim.Duration-sim.CurrentTime > time.Second*20 {
-		if warlock.GetStat(stats.SpellPower) > warlock.GetInitialStat(stats.SpellPower) || warlock.CastSpeed() > warlock.InitialCastSpeed() {
+		if warlock.GetStat(stats.SpellPower) > warlock.GetInitialStat(stats.SpellPower) || warlock.HasTemporarySpellCastSpeedIncrease() {
 			// never start regen if you have boosted sp or boosted cast speed
 		} else if warlock.CurrentManaPercent() < 0.2 {
 			warlock.DoingRegen = true

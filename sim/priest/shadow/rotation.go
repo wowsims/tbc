@@ -39,8 +39,7 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 	var wait time.Duration
 
 	// calculate how much time a VT cast would take so we can possibly start casting right before the dot is up.
-	castSpeed := spriest.CastSpeed()
-	vtCastTime := time.Duration(float64(time.Millisecond*1500) / castSpeed)
+	vtCastTime := spriest.ApplyCastSpeed(time.Millisecond * 1500)
 
 	// timeForDots := sim.Duration-sim.CurrentTime > time.Second*12
 	// TODO: stop casting dots near the end?
@@ -70,8 +69,8 @@ func (spriest *ShadowPriest) tryUseGCD(sim *core.Simulation) {
 		} else if allCDs[swdidx] == 0 {
 			spell = spriest.ShadowWordDeath
 		} else {
-			gcd := core.MinDuration(core.GCDMin, time.Duration(float64(core.GCDDefault)/castSpeed))
-			tickLength := time.Duration(float64(time.Second) / castSpeed)
+			gcd := spriest.SpellGCD()
+			tickLength := spriest.ApplyCastSpeed(time.Second)
 
 			var numTicks int
 			switch spriest.rotation.RotationType {

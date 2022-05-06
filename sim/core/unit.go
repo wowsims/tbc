@@ -92,6 +92,8 @@ type Unit struct {
 	// Cached mana return values per tick.
 	manaTickWhileCasting    float64
 	manaTickWhileNotCasting float64
+
+	CastSpeed float64
 }
 
 func (unit *Unit) Log(sim *Simulation, message string, vals ...interface{}) {
@@ -138,16 +140,27 @@ func (unit *Unit) AddStatsDynamic(sim *Simulation, stat stats.Stats) {
 	if stat[stats.MP5] != 0 || stat[stats.Intellect] != 0 || stat[stats.Spirit] != 0 {
 		unit.UpdateManaRegenRates()
 	}
+	if stat[stats.SpellHaste] != 0 {
+		unit.updateCastSpeed()
+	}
 }
 func (unit *Unit) AddStatDynamic(sim *Simulation, stat stats.Stat, amount float64) {
 	if unit.Env == nil || !unit.Env.IsFinalized() {
 		panic("Not finalized, used AddStats instead!")
 	}
 
+	if stat == stats.MeleeHaste {
+		unit.AddMeleeHaste(sim, amount)
+		return
+	}
+
 	unit.stats[stat] += amount
 
 	if stat == stats.MP5 || stat == stats.Intellect || stat == stats.Spirit {
 		unit.UpdateManaRegenRates()
+	}
+	if stat == stats.SpellHaste {
+		unit.updateCastSpeed()
 	}
 }
 
@@ -158,8 +171,7 @@ func (unit *Unit) HasTemporaryBonusForStat(stat stats.Stat) bool {
 
 // Returns if spell casting has any temporary increases active.
 func (unit *Unit) HasTemporarySpellCastSpeedIncrease() bool {
-	return unit.HasTemporaryBonusForStat(stats.SpellHaste) ||
-		unit.PseudoStats.CastSpeedMultiplier != 1
+	return unit.CastSpeed != unit.initialCastSpeed
 }
 
 // Returns if melee swings have any temporary increases active.
@@ -177,15 +189,19 @@ func (unit *Unit) InitialCastSpeed() float64 {
 }
 
 func (unit *Unit) SpellGCD() time.Duration {
-	return MaxDuration(GCDMin, time.Duration(float64(GCDDefault)/unit.CastSpeed()))
+	return MaxDuration(GCDMin, unit.ApplyCastSpeed(GCDDefault))
 }
 
-func (unit *Unit) CastSpeed() float64 {
-	return unit.PseudoStats.CastSpeedMultiplier * (1 + (unit.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100)))
+func (unit *Unit) updateCastSpeed() {
+	unit.CastSpeed = 1 / (unit.PseudoStats.CastSpeedMultiplier * (1 + (unit.stats[stats.SpellHaste] / (HasteRatingPerHastePercent * 100))))
+}
+func (unit *Unit) MultiplyCastSpeed(amount float64) {
+	unit.PseudoStats.CastSpeedMultiplier *= amount
+	unit.updateCastSpeed()
 }
 
 func (unit *Unit) ApplyCastSpeed(dur time.Duration) time.Duration {
-	return time.Duration(float64(dur) / unit.CastSpeed())
+	return time.Duration(float64(dur) * unit.CastSpeed)
 }
 
 func (unit *Unit) SwingSpeed() float64 {
@@ -237,10 +253,12 @@ func (unit *Unit) finalize() {
 		panic("Initial stats may not be set before finalized: " + unit.initialStats.String())
 	}
 
+	unit.updateCastSpeed()
+
 	// All stats added up to this point are part of the 'initial' stats.
 	unit.initialStats = unit.stats
 	unit.initialPseudoStats = unit.PseudoStats
-	unit.initialCastSpeed = unit.CastSpeed()
+	unit.initialCastSpeed = unit.CastSpeed
 	unit.initialMeleeSwingSpeed = unit.SwingSpeed()
 	unit.initialRangedSwingSpeed = unit.RangedSwingSpeed()
 }

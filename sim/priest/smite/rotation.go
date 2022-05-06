@@ -30,13 +30,11 @@ func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 	// Calculate higher SW:P uptime if using HF
 	swpRemaining := spriest.ShadowWordPainDot.RemainingDuration(sim)
 
-	castSpeed := spriest.CastSpeed()
-
 	// smite cast time, talent assumed
-	smiteCastTime := time.Duration(float64(time.Millisecond*2000) / castSpeed)
+	smiteCastTime := spriest.ApplyCastSpeed(time.Millisecond * 2000)
 
 	// holy fire cast time
-	hfCastTime := time.Duration(float64(time.Millisecond*3000) / castSpeed)
+	hfCastTime := spriest.ApplyCastSpeed(time.Millisecond * 3000)
 
 	var spell *core.Spell
 	// Always attempt to keep SW:P up if its down

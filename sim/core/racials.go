@@ -187,11 +187,11 @@ func applyRaceEffects(agent Agent) {
 			ActionID: actionID,
 			Duration: time.Second * 10,
 			OnGain: func(aura *Aura, sim *Simulation) {
-				character.PseudoStats.CastSpeedMultiplier *= hasteBonus
+				character.MultiplyCastSpeed(hasteBonus)
 				character.MultiplyAttackSpeed(sim, hasteBonus)
 			},
 			OnExpire: func(aura *Aura, sim *Simulation) {
-				character.PseudoStats.CastSpeedMultiplier /= hasteBonus
+				character.MultiplyCastSpeed(inverseBonus)
 				character.MultiplyAttackSpeed(sim, inverseBonus)
 			},
 		})
