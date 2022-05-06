@@ -231,7 +231,7 @@ func (war *DpsWarrior) shouldSunder(sim *core.Simulation) bool {
 		war.maintainSunder = false
 	}
 
-	return stacks < 5 || war.SunderArmorAura.RemainingDuration(sim) < SunderWindow
+	return stacks < 5 || war.SunderArmorAura.RemainingDuration(sim) <= SunderWindow
 }
 
 // Returns whether any ability was cast.
