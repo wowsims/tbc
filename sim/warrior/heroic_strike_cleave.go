@@ -102,14 +102,23 @@ func (warrior *Warrior) DequeueHSOrCleave(sim *core.Simulation) {
 // Returns true if the regular melee swing should be used, false otherwise.
 func (warrior *Warrior) TryHSOrCleave(sim *core.Simulation, mhSwingSpell *core.Spell) *core.Spell {
 	if !warrior.HSOrCleaveQueueAura.IsActive() {
+		if sim.Log != nil {
+			sim.Log("HS not queued")
+		}
 		return nil
 	}
 
 	if warrior.CurrentRage() < warrior.HeroicStrikeOrCleave.DefaultCast.Cost {
 		warrior.DequeueHSOrCleave(sim)
+		if sim.Log != nil {
+			sim.Log("HS not enough rage")
+		}
 		return nil
 	} else if warrior.CurrentRage() < warrior.HSRageThreshold {
 		if mhSwingSpell == warrior.AutoAttacks.MHAuto {
+			if sim.Log != nil {
+				sim.Log("HS MS auto below thresh")
+			}
 			warrior.DequeueHSOrCleave(sim)
 			return nil
 		}

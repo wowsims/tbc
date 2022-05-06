@@ -158,6 +158,11 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 					return
 				}
 
+				if spell == warrior.Whirlwind && spellEffect.ProcMask.Matches(core.ProcMaskMeleeOHSpecial) {
+					// OH WW hits cant proc this
+					return
+				}
+
 				if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Mace Specialization") {
 					return
 				}
@@ -196,6 +201,11 @@ func (warrior *Warrior) applyWeaponSpecializations() {
 				}
 
 				if !spellEffect.ProcMask.Matches(swordSpecMask) {
+					return
+				}
+
+				if spell == warrior.Whirlwind && spellEffect.ProcMask.Matches(core.ProcMaskMeleeOHSpecial) {
+					// OH WW hits cant proc this
 					return
 				}
 
