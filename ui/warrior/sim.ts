@@ -230,8 +230,10 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 				],
 			},
 			encounterPicker: {
-				// Whether to include 'Target Armor' in the 'Encounter' section of the settings tab.
-				showTargetArmor: true,
+				// Target stats to show for 'Simple' encounters.
+				simpleTargetStats: [
+					Stat.StatArmor,
+				],
 				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
 				showExecuteProportion: true,
 				// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.

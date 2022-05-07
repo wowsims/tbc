@@ -6,11 +6,12 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
+import { statNames } from '/tbc/core/proto_utils/names.js';
 
 import { Component } from './component.js';
 
 export interface EncounterPickerConfig {
-	showTargetArmor: boolean;
+	simpleTargetStats?: Array<Stat>;
 	showNumTargets: boolean;
 	showExecuteProportion: boolean;
 }
@@ -50,14 +51,17 @@ export class EncounterPicker extends Component {
 				target.setLevel(eventID, newValue);
 			},
 		});
-		if (config.showTargetArmor) {
-			new NumberPicker(this.rootElem, modEncounter.primaryTarget, {
-				label: 'Target Armor',
-				changedEvent: (target: Target) => target.statsChangeEmitter,
-				getValue: (target: Target) => target.getStats().getStat(Stat.StatArmor),
-				setValue: (eventID: EventID, target: Target, newValue: number) => {
-					target.setStats(eventID, target.getStats().withStat(Stat.StatArmor, newValue));
-				},
+
+		if (config.simpleTargetStats) {
+			config.simpleTargetStats.forEach(stat => {
+				new NumberPicker(this.rootElem, modEncounter.primaryTarget, {
+					label: statNames[stat],
+					changedEvent: (target: Target) => target.statsChangeEmitter,
+					getValue: (target: Target) => target.getStats().getStat(stat),
+					setValue: (eventID: EventID, target: Target, newValue: number) => {
+						target.setStats(eventID, target.getStats().withStat(stat, newValue));
+					},
+				});
 			});
 		}
 
