@@ -206,12 +206,14 @@ func CurseOfElementsAura(target *Target, points int32) *Aura {
 			aura.Unit.PseudoStats.FireDamageTakenMultiplier *= multiplier
 			aura.Unit.PseudoStats.FrostDamageTakenMultiplier *= multiplier
 			aura.Unit.PseudoStats.ShadowDamageTakenMultiplier *= multiplier
+			aura.Unit.AddStatsDynamic(sim, stats.Stats{stats.ArcaneResistance: -88, stats.FireResistance: -88, stats.FrostResistance: -88, stats.ShadowResistance: -88})
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.ArcaneDamageTakenMultiplier /= multiplier
 			aura.Unit.PseudoStats.FireDamageTakenMultiplier /= multiplier
 			aura.Unit.PseudoStats.FrostDamageTakenMultiplier /= multiplier
 			aura.Unit.PseudoStats.ShadowDamageTakenMultiplier /= multiplier
+			aura.Unit.AddStatsDynamic(sim, stats.Stats{stats.ArcaneResistance: 88, stats.FireResistance: 88, stats.FrostResistance: 88, stats.ShadowResistance: 88})
 		},
 	})
 }
