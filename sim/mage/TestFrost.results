@@ -588,7 +588,7 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-TirisfalRegalia"
  value: {
-  dps: 1565.9638589773108
+  dps: 1567.7576248951837
  }
 }
 dps_results: {
@@ -702,25 +702,25 @@ dps_results: {
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1024.5277668844385
+  dps: 1031.250413384955
  }
 }
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-NoBuffs-LongSingleTargetFullDebuffs"
  value: {
-  dps: 1024.5277668844385
+  dps: 1031.250413384955
  }
 }
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 684.5313393927307
+  dps: 682.8663439487323
  }
 }
 dps_results: {
  key: "TestFrost-Settings-Troll10-P1Frost-FrostRotation-NoBuffs-ShortSingleTargetFullDebuffs"
  value: {
-  dps: 1458.1589770994774
+  dps: 1452.9490435372627
  }
 }
 dps_results: {
