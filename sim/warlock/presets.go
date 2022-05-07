@@ -2,6 +2,7 @@ package warlock
 
 import (
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var defaultDestroTalents = &proto.WarlockTalents{
@@ -75,7 +76,7 @@ var FullConsumes = &proto.Consumes{
 
 var NoDebuffTarget = &proto.Target{
 	Debuffs: &proto.Debuffs{},
-	Armor:   7700,
+	Stats:   stats.Stats{stats.Armor: 7700}.ToFloatArray(),
 }
 
 var FullDebuffs = &proto.Debuffs{
@@ -92,7 +93,7 @@ var FullDebuffs = &proto.Debuffs{
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: FullDebuffs,
-	Armor:   7700,
+	Stats:   stats.Stats{stats.Armor: 7700}.ToFloatArray(),
 }
 
 var Phase4Gear = &proto.EquipmentSpec{

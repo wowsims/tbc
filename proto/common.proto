@@ -455,9 +455,13 @@ enum MobType {
 }
 
 message Target {
+		// TODO: Deprecate this after 1 month (2022/6/6)
 		double armor = 1;
+
 		int32 level = 4;
 		MobType mob_type = 3;
+    repeated double stats = 5;
+
 		Debuffs debuffs = 2;
 }
 

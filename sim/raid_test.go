@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 
 	balanceDruid "github.com/wowsims/tbc/sim/druid/balance"
 	hunter "github.com/wowsims/tbc/sim/hunter"
@@ -23,7 +24,7 @@ var SimOptions = &proto.SimOptions{
 }
 
 var StandardTarget = &proto.Target{
-	Armor:   7684,
+	Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 	MobType: proto.MobType_MobTypeDemon,
 }
 

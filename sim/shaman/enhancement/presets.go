@@ -3,6 +3,7 @@ package enhancement
 import (
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var BasicRaidBuffs = &proto.RaidBuffs{}
@@ -90,7 +91,7 @@ var FullConsumes = &proto.Consumes{
 
 var NoDebuffTarget = &proto.Target{
 	Debuffs: &proto.Debuffs{},
-	Armor:   6700,
+	Stats:   stats.Stats{stats.Armor: 6700}.ToFloatArray(),
 }
 
 var FullDebuffs = &proto.Debuffs{
@@ -106,7 +107,7 @@ var FullDebuffs = &proto.Debuffs{
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: FullDebuffs,
-	Armor:   7684,
+	Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 }
 
 var Phase2Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{

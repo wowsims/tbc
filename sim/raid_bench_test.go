@@ -5,6 +5,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 	"github.com/wowsims/tbc/sim/druid/balance"
 	"github.com/wowsims/tbc/sim/mage"
 	"github.com/wowsims/tbc/sim/priest/shadow"
@@ -281,7 +282,7 @@ func BenchmarkSimulate(b *testing.B) {
 			ExecuteProportion: 0.1,
 			Targets: []*proto.Target{
 				{
-					Armor:   7684,
+					Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 					MobType: proto.MobType_MobTypeDemon,
 					Debuffs: &proto.Debuffs{
 						JudgementOfWisdom:         true,

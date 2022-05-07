@@ -65,6 +65,17 @@ type Target struct {
 }
 
 func NewTarget(options proto.Target, targetIndex int32) *Target {
+	unitStats := stats.Stats{}
+	if options.Stats != nil {
+		copy(unitStats[:], options.Stats[:])
+	}
+	if unitStats[stats.BlockValue] == 0 {
+		unitStats[stats.BlockValue] = 54 // Not thoroughly tested for non-bosses.
+	}
+	if unitStats[stats.Armor] == 0 {
+		unitStats[stats.Armor] = 7684
+	}
+
 	target := &Target{
 		Unit: Unit{
 			Type:        EnemyUnit,
@@ -72,10 +83,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 			Label:       "Target " + strconv.Itoa(int(targetIndex)+1),
 			Level:       options.Level,
 			auraTracker: newAuraTracker(),
-			stats: stats.Stats{
-				stats.Armor:      float64(options.Armor),
-				stats.BlockValue: 54, // Not thoroughly tested for non-bosses.
-			},
+			stats:       unitStats,
 			PseudoStats: stats.NewPseudoStats(),
 			Metrics:     NewCharacterMetrics(),
 		},
@@ -84,9 +92,6 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	target.GCD = target.NewTimer()
 	if target.Level == 0 {
 		target.Level = 73
-	}
-	if target.GetStat(stats.Armor) == 0 {
-		target.AddStat(stats.Armor, 7684)
 	}
 
 	target.PseudoStats.InFrontOfTarget = true

@@ -1,6 +1,8 @@
 import { Debuffs } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
+import { Stat } from '/tbc/core/proto/common.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
 
 import * as Mechanics from '/tbc/core/constants/mechanics.js';
 
@@ -15,12 +17,12 @@ export class Target {
 	private readonly sim: Sim;
 
 	private level: number = Mechanics.BOSS_LEVEL;
-	private armor: number = 7684;
 	private mobType: MobType = MobType.MobTypeDemon;
+	private stats: Stats = new Stats();
 	private debuffs: Debuffs = Debuffs.create();
 
 	readonly levelChangeEmitter = new TypedEvent<void>();
-	readonly armorChangeEmitter = new TypedEvent<void>();
+	readonly statsChangeEmitter = new TypedEvent<void>();
 	readonly mobTypeChangeEmitter = new TypedEvent<void>();
 	readonly debuffsChangeEmitter = new TypedEvent<void>();
 
@@ -32,7 +34,7 @@ export class Target {
 
 		[
 			this.levelChangeEmitter,
-			this.armorChangeEmitter,
+			this.statsChangeEmitter,
 			this.mobTypeChangeEmitter,
 			this.debuffsChangeEmitter,
 		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
@@ -50,16 +52,16 @@ export class Target {
 		this.levelChangeEmitter.emit(eventID);
 	}
 
-	getArmor(): number {
-		return this.armor;
+	getStats(): Stats {
+		return this.stats;
 	}
 
-	setArmor(eventID: EventID, newArmor: number) {
-		if (newArmor == this.armor)
+	setStats(eventID: EventID, newStats: Stats) {
+		if (newStats.equals(this.stats))
 			return;
 
-		this.armor = newArmor;
-		this.armorChangeEmitter.emit(eventID);
+		this.stats = newStats;
+		this.statsChangeEmitter.emit(eventID);
 	}
 
 	getMobType(): MobType {
@@ -91,7 +93,7 @@ export class Target {
 	toProto(): TargetProto {
 		return TargetProto.create({
 			level: this.level,
-			armor: this.armor,
+			stats: this.stats.asArray(),
 			mobType: this.mobType,
 			debuffs: this.debuffs,
 		});
@@ -99,8 +101,13 @@ export class Target {
 
 	fromProto(eventID: EventID, proto: TargetProto) {
 		TypedEvent.freezeAllAndDo(() => {
+			let stats = new Stats(proto.stats);
+			if (proto.armor) {
+				stats = stats.withStat(Stat.StatArmor, proto.armor);
+			}
+
 			this.setLevel(eventID, proto.level);
-			this.setArmor(eventID, proto.armor);
+			this.setStats(eventID, stats);
 			this.setMobType(eventID, proto.mobType);
 			this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
 		});

@@ -267,6 +267,14 @@ func (stats Stats) FlatString() string {
 	return sb.String()
 }
 
+func (stats Stats) ToFloatArray() []float64 {
+	arr := make([]float64, len(stats))
+	for i, v := range stats {
+		arr[i] = v
+	}
+	return arr
+}
+
 // Given the current values for source and mod stats, should return the new
 // value for the mod stat.
 type StatModifier func(sourceValue float64, modValue float64) float64
