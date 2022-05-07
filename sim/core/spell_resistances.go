@@ -45,24 +45,24 @@ func (at *AttackTable) UpdateArmorDamageReduction() {
 }
 
 func (at *AttackTable) UpdatePartialResists() {
-	at.PartialResistArcaneRollThreshold00, at.PartialResistArcaneRollThreshold25, at.PartialResistArcaneRollThreshold50 = at.Defender.partialResistRollThresholds(SpellSchoolArcane, at.Attacker)
-	at.PartialResistHolyRollThreshold00, at.PartialResistHolyRollThreshold25, at.PartialResistHolyRollThreshold50 = at.Defender.partialResistRollThresholds(SpellSchoolHoly, at.Attacker)
-	at.PartialResistFireRollThreshold00, at.PartialResistFireRollThreshold25, at.PartialResistFireRollThreshold50 = at.Defender.partialResistRollThresholds(SpellSchoolFire, at.Attacker)
-	at.PartialResistFrostRollThreshold00, at.PartialResistFrostRollThreshold25, at.PartialResistFrostRollThreshold50 = at.Defender.partialResistRollThresholds(SpellSchoolFrost, at.Attacker)
-	at.PartialResistNatureRollThreshold00, at.PartialResistNatureRollThreshold25, at.PartialResistNatureRollThreshold50 = at.Defender.partialResistRollThresholds(SpellSchoolNature, at.Attacker)
-	at.PartialResistShadowRollThreshold00, at.PartialResistShadowRollThreshold25, at.PartialResistShadowRollThreshold50 = at.Defender.partialResistRollThresholds(SpellSchoolShadow, at.Attacker)
+	at.PartialResistArcaneRollThreshold00, at.PartialResistArcaneRollThreshold25, at.PartialResistArcaneRollThreshold50, at.BinaryArcaneHitChance = at.Defender.partialResistRollThresholds(SpellSchoolArcane, at.Attacker)
+	at.PartialResistHolyRollThreshold00, at.PartialResistHolyRollThreshold25, at.PartialResistHolyRollThreshold50, _ = at.Defender.partialResistRollThresholds(SpellSchoolHoly, at.Attacker)
+	at.PartialResistFireRollThreshold00, at.PartialResistFireRollThreshold25, at.PartialResistFireRollThreshold50, at.BinaryFireHitChance = at.Defender.partialResistRollThresholds(SpellSchoolFire, at.Attacker)
+	at.PartialResistFrostRollThreshold00, at.PartialResistFrostRollThreshold25, at.PartialResistFrostRollThreshold50, at.BinaryFrostHitChance = at.Defender.partialResistRollThresholds(SpellSchoolFrost, at.Attacker)
+	at.PartialResistNatureRollThreshold00, at.PartialResistNatureRollThreshold25, at.PartialResistNatureRollThreshold50, at.BinaryNatureHitChance = at.Defender.partialResistRollThresholds(SpellSchoolNature, at.Attacker)
+	at.PartialResistShadowRollThreshold00, at.PartialResistShadowRollThreshold25, at.PartialResistShadowRollThreshold50, at.BinaryShadowHitChance = at.Defender.partialResistRollThresholds(SpellSchoolShadow, at.Attacker)
 }
 
 func (at *AttackTable) GetPartialResistThresholds(ss SpellSchool) (float64, float64, float64) {
 	switch ss {
 	case SpellSchoolArcane:
 		return at.PartialResistArcaneRollThreshold00, at.PartialResistArcaneRollThreshold25, at.PartialResistArcaneRollThreshold50
+	case SpellSchoolHoly:
+		return at.PartialResistHolyRollThreshold00, at.PartialResistHolyRollThreshold25, at.PartialResistHolyRollThreshold50
 	case SpellSchoolFire:
 		return at.PartialResistFireRollThreshold00, at.PartialResistFireRollThreshold25, at.PartialResistFireRollThreshold50
 	case SpellSchoolFrost:
 		return at.PartialResistFrostRollThreshold00, at.PartialResistFrostRollThreshold25, at.PartialResistFrostRollThreshold50
-	case SpellSchoolHoly:
-		return at.PartialResistHolyRollThreshold00, at.PartialResistHolyRollThreshold25, at.PartialResistHolyRollThreshold50
 	case SpellSchoolNature:
 		return at.PartialResistNatureRollThreshold00, at.PartialResistNatureRollThreshold25, at.PartialResistNatureRollThreshold50
 	case SpellSchoolShadow:
@@ -71,29 +71,56 @@ func (at *AttackTable) GetPartialResistThresholds(ss SpellSchool) (float64, floa
 	return 0, 0, 0
 }
 
+func (at *AttackTable) GetBinaryHitChance(ss SpellSchool) float64 {
+	switch ss {
+	case SpellSchoolArcane:
+		return at.BinaryArcaneHitChance
+	case SpellSchoolHoly:
+		return 0
+	case SpellSchoolFire:
+		return at.BinaryFireHitChance
+	case SpellSchoolFrost:
+		return at.BinaryFrostHitChance
+	case SpellSchoolNature:
+		return at.BinaryNatureHitChance
+	case SpellSchoolShadow:
+		return at.BinaryShadowHitChance
+	}
+	return 0
+}
+
 // All of the following calculations are based on this guide:
 // https://royalgiraffe.github.io/resist-guide
 
-func (unit *Unit) resistCoeff(school SpellSchool, attacker *Unit) float64 {
+func (unit *Unit) resistCoeff(school SpellSchool, attacker *Unit, binary bool) float64 {
 	resistanceCap := float64(unit.Level * 5)
-
-	levelBasedResistance := 0.0
-	if unit.Type == EnemyUnit {
-		levelBasedResistance = LevelBasedNPCSpellResistancePerLevel * float64(MaxInt32(0, unit.Level-attacker.Level))
-	}
 
 	resistance := MaxFloat(0, unit.GetStat(school.ResistanceStat())-attacker.stats[stats.SpellPenetration])
 	if school == SpellSchoolHoly {
 		resistance = 0
 	}
-	totalResistance := MinFloat(resistanceCap, resistance+levelBasedResistance)
 
-	return totalResistance / resistanceCap
+	effectiveResistance := resistance
+	if !binary {
+		levelBasedResistance := 0.0
+		if unit.Type == EnemyUnit {
+			levelBasedResistance = LevelBasedNPCSpellResistancePerLevel * float64(MaxInt32(0, unit.Level-attacker.Level))
+		}
+		effectiveResistance += levelBasedResistance
+	}
+
+	return MinFloat(resistanceCap, effectiveResistance) / resistanceCap
+}
+
+func (unit *Unit) binaryHitChance(school SpellSchool, attacker *Unit) float64 {
+	resistCoeff := unit.resistCoeff(school, attacker, true)
+	return 1 - 0.75*resistCoeff
 }
 
 // Roll threshold for each type of partial resist.
-func (unit *Unit) partialResistRollThresholds(school SpellSchool, attacker *Unit) (float64, float64, float64) {
-	resistCoeff := unit.resistCoeff(school, attacker)
+// Also returns binary miss chance as 4th value.
+func (unit *Unit) partialResistRollThresholds(school SpellSchool, attacker *Unit) (float64, float64, float64, float64) {
+	resistCoeff := unit.resistCoeff(school, attacker, false)
 
 	// Based on the piecewise linear regression estimates at https://royalgiraffe.github.io/partial-resist-table.
 	//partialResistChance00 := piecewiseLinear3(resistCoeff, 1, 0.24, 0.00, 0.00)
@@ -103,7 +130,8 @@ func (unit *Unit) partialResistRollThresholds(school SpellSchool, attacker *Unit
 
 	return partialResistChance25 + partialResistChance50 + partialResistChance75,
 		partialResistChance50 + partialResistChance75,
-		partialResistChance75
+		partialResistChance75,
+		unit.binaryHitChance(school, attacker)
 }
 
 // Interpolation for a 3-part piecewise linear function (which all the partial resist equations use).
