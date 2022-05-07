@@ -1,4 +1,4 @@
-export const CURRENT_PHASE = 4;
+export const CURRENT_PHASE = 5;
 // Github pages serves our site under the /tbc directory (because the repo name is tbc)
 export const REPO_NAME = 'tbc';
 // Get 'elemental_shaman', the pathname part after the repo name
