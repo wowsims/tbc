@@ -73,7 +73,8 @@ type Unit struct {
 
 	cdTimers []*Timer
 
-	attackTables []*AttackTable
+	AttackTables  []*AttackTable
+	DefenseTables []*AttackTable
 
 	GCD *Timer
 
@@ -143,6 +144,12 @@ func (unit *Unit) AddStatsDynamic(sim *Simulation, stat stats.Stats) {
 	if stat[stats.SpellHaste] != 0 {
 		unit.updateCastSpeed()
 	}
+	if stat[stats.Armor] != 0 {
+		unit.updateArmor()
+	}
+	if stat[stats.ArmorPenetration] != 0 {
+		unit.updateArmorPen()
+	}
 }
 func (unit *Unit) AddStatDynamic(sim *Simulation, stat stats.Stat, amount float64) {
 	if unit.Env == nil || !unit.Env.IsFinalized() {
@@ -158,9 +165,27 @@ func (unit *Unit) AddStatDynamic(sim *Simulation, stat stats.Stat, amount float6
 
 	if stat == stats.MP5 || stat == stats.Intellect || stat == stats.Spirit {
 		unit.UpdateManaRegenRates()
-	}
-	if stat == stats.SpellHaste {
+	} else if stat == stats.SpellHaste {
 		unit.updateCastSpeed()
+	} else if stat == stats.Armor {
+		unit.updateArmor()
+	} else if stat == stats.ArmorPenetration {
+		unit.updateArmorPen()
+	}
+}
+
+func (unit *Unit) updateArmor() {
+	for _, table := range unit.DefenseTables {
+		if table != nil {
+			table.UpdateArmorDamageReduction()
+		}
+	}
+}
+func (unit *Unit) updateArmorPen() {
+	for _, table := range unit.AttackTables {
+		if table != nil {
+			table.UpdateArmorDamageReduction()
+		}
 	}
 }
 
