@@ -43,7 +43,7 @@ func (mage *Mage) registerFrostboltSpell() {
 			ThreatMultiplier: 1 - (0.1/3)*float64(mage.Talents.FrostChanneling),
 
 			BaseDamage:     core.BaseDamageConfigMagic(600, 647, (3.0/3.5)*0.95+0.02*float64(mage.Talents.EmpoweredFrostbolt)),
-			OutcomeApplier: mage.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)+0.2*float64(mage.Talents.IceShards))),
+			OutcomeApplier: mage.OutcomeFuncMagicHitAndCritBinary(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower)+0.2*float64(mage.Talents.IceShards))),
 		}),
 	})
 }

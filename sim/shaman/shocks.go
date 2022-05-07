@@ -63,7 +63,7 @@ func (shaman *Shaman) registerEarthShockSpell(shockTimer *core.Timer) {
 	config.SpellExtras |= core.SpellExtrasBinary
 
 	effect.BaseDamage = core.BaseDamageConfigMagic(661, 696, 0.386)
-	effect.OutcomeApplier = shaman.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
+	effect.OutcomeApplier = shaman.OutcomeFuncMagicHitAndCritBinary(shaman.ElementalCritMultiplier())
 	config.ApplyEffects = core.ApplyEffectFuncDirectDamage(effect)
 
 	shaman.EarthShock = shaman.RegisterSpell(config)
@@ -120,7 +120,7 @@ func (shaman *Shaman) registerFrostShockSpell(shockTimer *core.Timer) {
 
 	effect.ThreatMultiplier *= 2
 	effect.BaseDamage = core.BaseDamageConfigMagic(647, 683, 0.386)
-	effect.OutcomeApplier = shaman.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
+	effect.OutcomeApplier = shaman.OutcomeFuncMagicHitAndCritBinary(shaman.ElementalCritMultiplier())
 	config.ApplyEffects = core.ApplyEffectFuncDirectDamage(effect)
 
 	shaman.FrostShock = shaman.RegisterSpell(config)
