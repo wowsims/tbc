@@ -65,6 +65,17 @@ type Target struct {
 }
 
 func NewTarget(options proto.Target, targetIndex int32) *Target {
+	unitStats := stats.Stats{}
+	if options.Stats != nil {
+		copy(unitStats[:], options.Stats[:])
+	}
+	if unitStats[stats.BlockValue] == 0 {
+		unitStats[stats.BlockValue] = 54 // Not thoroughly tested for non-bosses.
+	}
+	if unitStats[stats.Armor] == 0 {
+		unitStats[stats.Armor] = 7684
+	}
+
 	target := &Target{
 		Unit: Unit{
 			Type:        EnemyUnit,
@@ -72,10 +83,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 			Label:       "Target " + strconv.Itoa(int(targetIndex)+1),
 			Level:       options.Level,
 			auraTracker: newAuraTracker(),
-			stats: stats.Stats{
-				stats.Armor:      float64(options.Armor),
-				stats.BlockValue: 54, // Not thoroughly tested for non-bosses.
-			},
+			stats:       unitStats,
 			PseudoStats: stats.NewPseudoStats(),
 			Metrics:     NewCharacterMetrics(),
 		},
@@ -84,9 +92,6 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	target.GCD = target.NewTimer()
 	if target.Level == 0 {
 		target.Level = 73
-	}
-	if target.GetStat(stats.Armor) == 0 {
-		target.AddStat(stats.Armor, 7684)
 	}
 
 	target.PseudoStats.InFrontOfTarget = true
@@ -174,9 +179,24 @@ type AttackTable struct {
 	HitSuppression   float64
 	CritSuppression  float64
 
-	PartialResistRollThreshold00 float64
-	PartialResistRollThreshold25 float64
-	PartialResistRollThreshold50 float64
+	PartialResistArcaneRollThreshold00 float64
+	PartialResistArcaneRollThreshold25 float64
+	PartialResistArcaneRollThreshold50 float64
+	PartialResistHolyRollThreshold00   float64
+	PartialResistHolyRollThreshold25   float64
+	PartialResistHolyRollThreshold50   float64
+	PartialResistFireRollThreshold00   float64
+	PartialResistFireRollThreshold25   float64
+	PartialResistFireRollThreshold50   float64
+	PartialResistFrostRollThreshold00  float64
+	PartialResistFrostRollThreshold25  float64
+	PartialResistFrostRollThreshold50  float64
+	PartialResistNatureRollThreshold00 float64
+	PartialResistNatureRollThreshold25 float64
+	PartialResistNatureRollThreshold50 float64
+	PartialResistShadowRollThreshold00 float64
+	PartialResistShadowRollThreshold25 float64
+	PartialResistShadowRollThreshold50 float64
 
 	ArmorDamageReduction float64
 }
@@ -199,10 +219,8 @@ func NewAttackTable(attacker *Unit, defender *Unit) *AttackTable {
 	table.HitSuppression = UnitLevelFloat64(defender.Level, 0, 0, 0, 0.01)
 	table.CritSuppression = UnitLevelFloat64(defender.Level, 0, 0.01, 0.02, 0.048)
 
-	// TODO: This needs to be refactored to actually use the spell's school, and change on changes to resistance/spell pen.
-	table.PartialResistRollThreshold00, table.PartialResistRollThreshold25, table.PartialResistRollThreshold50 = defender.partialResistRollThresholds(SpellSchoolFire, CharacterLevel, 0)
-
 	table.UpdateArmorDamageReduction()
+	table.UpdatePartialResists()
 
 	return table
 }

@@ -34,14 +34,14 @@ const LongDuration = 300
 func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
 	var NoDebuffTarget = &proto.Target{
 		Level:   73,
-		Armor:   7684,
+		Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 		MobType: proto.MobType_MobTypeBeast,
 		Debuffs: &proto.Debuffs{},
 	}
 
 	var FullDebuffTarget = &proto.Target{
 		Level:   73,
-		Armor:   7684,
+		Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 		MobType: proto.MobType_MobTypeDemon,
 		Debuffs: debuffs,
 	}
@@ -101,7 +101,7 @@ func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs, variation float
 		Targets: []*proto.Target{
 			&proto.Target{
 				Level:   73,
-				Armor:   7684,
+				Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 				MobType: proto.MobType_MobTypeDemon,
 				Debuffs: debuffs,
 			},

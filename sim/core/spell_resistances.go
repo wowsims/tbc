@@ -17,18 +17,18 @@ func (spellEffect *SpellEffect) applyResistances(sim *Simulation, spell *Spell, 
 		// Magical resistance.
 
 		resistanceRoll := sim.RandomFloat("Partial Resist")
-		if sim.Log != nil {
-			sim.Log("Resist thresholds: %0.04f, %0.04f, %0.04f",
-				attackTable.PartialResistRollThreshold00,
-				attackTable.PartialResistRollThreshold25,
-				attackTable.PartialResistRollThreshold50)
-		}
-		if resistanceRoll > attackTable.PartialResistRollThreshold00 {
+
+		threshold00, threshold25, threshold50 := attackTable.GetPartialResistThresholds(spell.SpellSchool)
+		//if sim.Log != nil {
+		//	sim.Log("Resist thresholds: %0.04f, %0.04f, %0.04f", threshold00, threshold25, threshold50)
+		//}
+
+		if resistanceRoll > threshold00 {
 			// No partial resist.
-		} else if resistanceRoll > attackTable.PartialResistRollThreshold25 {
+		} else if resistanceRoll > threshold25 {
 			spellEffect.Outcome |= OutcomePartial1_4
 			spellEffect.Damage *= 0.75
-		} else if resistanceRoll > attackTable.PartialResistRollThreshold50 {
+		} else if resistanceRoll > threshold50 {
 			spellEffect.Outcome |= OutcomePartial2_4
 			spellEffect.Damage *= 0.5
 		} else {
@@ -44,18 +44,45 @@ func (at *AttackTable) UpdateArmorDamageReduction() {
 	at.ArmorDamageReduction = 1 - (effectiveArmor / (effectiveArmor + 10557.5))
 }
 
+func (at *AttackTable) UpdatePartialResists() {
+	at.PartialResistArcaneRollThreshold00, at.PartialResistArcaneRollThreshold25, at.PartialResistArcaneRollThreshold50 = at.Defender.partialResistRollThresholds(SpellSchoolArcane, at.Attacker)
+	at.PartialResistHolyRollThreshold00, at.PartialResistHolyRollThreshold25, at.PartialResistHolyRollThreshold50 = at.Defender.partialResistRollThresholds(SpellSchoolHoly, at.Attacker)
+	at.PartialResistFireRollThreshold00, at.PartialResistFireRollThreshold25, at.PartialResistFireRollThreshold50 = at.Defender.partialResistRollThresholds(SpellSchoolFire, at.Attacker)
+	at.PartialResistFrostRollThreshold00, at.PartialResistFrostRollThreshold25, at.PartialResistFrostRollThreshold50 = at.Defender.partialResistRollThresholds(SpellSchoolFrost, at.Attacker)
+	at.PartialResistNatureRollThreshold00, at.PartialResistNatureRollThreshold25, at.PartialResistNatureRollThreshold50 = at.Defender.partialResistRollThresholds(SpellSchoolNature, at.Attacker)
+	at.PartialResistShadowRollThreshold00, at.PartialResistShadowRollThreshold25, at.PartialResistShadowRollThreshold50 = at.Defender.partialResistRollThresholds(SpellSchoolShadow, at.Attacker)
+}
+
+func (at *AttackTable) GetPartialResistThresholds(ss SpellSchool) (float64, float64, float64) {
+	switch ss {
+	case SpellSchoolArcane:
+		return at.PartialResistArcaneRollThreshold00, at.PartialResistArcaneRollThreshold25, at.PartialResistArcaneRollThreshold50
+	case SpellSchoolFire:
+		return at.PartialResistFireRollThreshold00, at.PartialResistFireRollThreshold25, at.PartialResistFireRollThreshold50
+	case SpellSchoolFrost:
+		return at.PartialResistFrostRollThreshold00, at.PartialResistFrostRollThreshold25, at.PartialResistFrostRollThreshold50
+	case SpellSchoolHoly:
+		return at.PartialResistHolyRollThreshold00, at.PartialResistHolyRollThreshold25, at.PartialResistHolyRollThreshold50
+	case SpellSchoolNature:
+		return at.PartialResistNatureRollThreshold00, at.PartialResistNatureRollThreshold25, at.PartialResistNatureRollThreshold50
+	case SpellSchoolShadow:
+		return at.PartialResistShadowRollThreshold00, at.PartialResistShadowRollThreshold25, at.PartialResistShadowRollThreshold50
+	}
+	return 0, 0, 0
+}
+
 // All of the following calculations are based on this guide:
 // https://royalgiraffe.github.io/resist-guide
 
-func (unit *Unit) resistCoeff(school SpellSchool, attackerLevel int32, attackerSpellPen float64) float64 {
+func (unit *Unit) resistCoeff(school SpellSchool, attacker *Unit) float64 {
 	resistanceCap := float64(unit.Level * 5)
 
 	levelBasedResistance := 0.0
 	if unit.Type == EnemyUnit {
-		levelBasedResistance = LevelBasedNPCSpellResistancePerLevel * float64(MaxInt32(0, unit.Level-attackerLevel))
+		levelBasedResistance = LevelBasedNPCSpellResistancePerLevel * float64(MaxInt32(0, unit.Level-attacker.Level))
 	}
 
-	resistance := MaxFloat(0, unit.GetStat(school.ResistanceStat())-attackerSpellPen)
+	resistance := MaxFloat(0, unit.GetStat(school.ResistanceStat())-attacker.stats[stats.SpellPenetration])
 	if school == SpellSchoolHoly {
 		resistance = 0
 	}
@@ -65,8 +92,8 @@ func (unit *Unit) resistCoeff(school SpellSchool, attackerLevel int32, attackerS
 }
 
 // Roll threshold for each type of partial resist.
-func (unit *Unit) partialResistRollThresholds(school SpellSchool, attackerLevel int32, attackerSpellPen float64) (float64, float64, float64) {
-	resistCoeff := unit.resistCoeff(school, attackerLevel, attackerSpellPen)
+func (unit *Unit) partialResistRollThresholds(school SpellSchool, attacker *Unit) (float64, float64, float64) {
+	resistCoeff := unit.resistCoeff(school, attacker)
 
 	// Based on the piecewise linear regression estimates at https://royalgiraffe.github.io/partial-resist-table.
 	//partialResistChance00 := piecewiseLinear3(resistCoeff, 1, 0.24, 0.00, 0.00)

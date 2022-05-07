@@ -3,6 +3,7 @@ package rogue
 import (
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var CombatTalents = &proto.RogueTalents{
@@ -140,7 +141,7 @@ var FullDebuffs = &proto.Debuffs{
 
 var FullDebuffTarget = &proto.Target{
 	Debuffs: FullDebuffs,
-	Armor:   7684,
+	Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 }
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
@@ -235,92 +236,92 @@ var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 })
 
 var MutilateP1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
-        {
-                Name:    "Netherblade Facemask",
-                Enchant: "Glyph of Ferocity",
-                Gems: []string{
-                        "Relentless Earthstorm Diamond",
-                        "Glinting Noble Topaz",
-                },
-        },
-        {
-                Name: "Choker of Vile Intent",
-        },
-        {
-                Name:    "Wastewalker Shoulderpads",
-                Enchant: "Greater Inscription of Vengeance",
-                Gems: []string{
-                        "Glinting Noble Topaz",
-                        "Shifting Nightseye",
-                },
-        },
-        {
-                Name: "Drape of the Dark Reavers",
-        },
-        {
-                Name:    "Netherblade Chestpiece",
-                Enchant: "Chest - Exceptional Stats",
-                Gems: []string{
-                        "Glinting Noble Topaz",
-                        "Glinting Noble Topaz",
-                        "Shifting Nightseye",
-                },
-        },
-        {
-                Name:    "Nightfall Wristguards",
-                Enchant: "Bracer - Assault",
-        },
-        {
-                Name:    "Wastewalker Gloves",
-                Enchant: "Gloves - Major Agility",
-                Gems: []string{
-                        "Glinting Noble Topaz",
-                        "Glinting Noble Topaz",
-                },
-        },
-        {
-                Name: "Girdle of the Deathdealer",
-                Gems: []string{},
-        },
-        {
-                Name:    "Skulker's Greaves",
-                Enchant: "Nethercobra Leg Armor",
-                Gems: []string{
-                        "Delicate Living Ruby",
-                        "Glinting Noble Topaz",
-                        "Glinting Noble Topaz",
-                },
-        },
-        {
-                Name:    "Edgewalker Longboots",
-                Enchant: "Enchant Boots - Cat's Swiftness",
-                Gems: []string{
-                        "Glinting Noble Topaz",
-                        "Glinting Noble Topaz",
-                },
-        },
-        {
-                Name: "Ring of a Thousand Marks",
-        },
-        {
-                Name: "Garona's Signet Ring",
-        },
-        {
-                Name: "Dragonspine Trophy",
-        },
-        {
-                Name: "Bloodlust Brooch",
-        },
-        {
-                Name:    "Malchazeen",
-                Enchant: "Weapon - Mongoose",
-        },
-        {
-                Name:    "Riftmaker",
-                Enchant: "Weapon - Mongoose",
-        },
-        {
-                Name:    "Sunfury Bow of the Phoenix",
-                Enchant: "Stabilized Eternium Scope",
-        },
+	{
+		Name:    "Netherblade Facemask",
+		Enchant: "Glyph of Ferocity",
+		Gems: []string{
+			"Relentless Earthstorm Diamond",
+			"Glinting Noble Topaz",
+		},
+	},
+	{
+		Name: "Choker of Vile Intent",
+	},
+	{
+		Name:    "Wastewalker Shoulderpads",
+		Enchant: "Greater Inscription of Vengeance",
+		Gems: []string{
+			"Glinting Noble Topaz",
+			"Shifting Nightseye",
+		},
+	},
+	{
+		Name: "Drape of the Dark Reavers",
+	},
+	{
+		Name:    "Netherblade Chestpiece",
+		Enchant: "Chest - Exceptional Stats",
+		Gems: []string{
+			"Glinting Noble Topaz",
+			"Glinting Noble Topaz",
+			"Shifting Nightseye",
+		},
+	},
+	{
+		Name:    "Nightfall Wristguards",
+		Enchant: "Bracer - Assault",
+	},
+	{
+		Name:    "Wastewalker Gloves",
+		Enchant: "Gloves - Major Agility",
+		Gems: []string{
+			"Glinting Noble Topaz",
+			"Glinting Noble Topaz",
+		},
+	},
+	{
+		Name: "Girdle of the Deathdealer",
+		Gems: []string{},
+	},
+	{
+		Name:    "Skulker's Greaves",
+		Enchant: "Nethercobra Leg Armor",
+		Gems: []string{
+			"Delicate Living Ruby",
+			"Glinting Noble Topaz",
+			"Glinting Noble Topaz",
+		},
+	},
+	{
+		Name:    "Edgewalker Longboots",
+		Enchant: "Enchant Boots - Cat's Swiftness",
+		Gems: []string{
+			"Glinting Noble Topaz",
+			"Glinting Noble Topaz",
+		},
+	},
+	{
+		Name: "Ring of a Thousand Marks",
+	},
+	{
+		Name: "Garona's Signet Ring",
+	},
+	{
+		Name: "Dragonspine Trophy",
+	},
+	{
+		Name: "Bloodlust Brooch",
+	},
+	{
+		Name:    "Malchazeen",
+		Enchant: "Weapon - Mongoose",
+	},
+	{
+		Name:    "Riftmaker",
+		Enchant: "Weapon - Mongoose",
+	},
+	{
+		Name:    "Sunfury Bow of the Phoenix",
+		Enchant: "Stabilized Eternium Scope",
+	},
 })

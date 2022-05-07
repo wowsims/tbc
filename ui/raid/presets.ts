@@ -733,7 +733,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		tooltip: 'Dreamstate: Adds Improved Gift of the Wild, an Innervate, and Improved Faerie Fire.',
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_faeriefire.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
-			raidProto.buffs!.giftOfTheWild = Math.max(raidProto.buffs!.giftOfTheWild, TristateEffect.TristateEffectRegular);
+			raidProto.buffs!.giftOfTheWild = TristateEffect.TristateEffectImproved;
 
 			const innervateIndex = buffBot.getInnervateAssignment().targetIndex;
 			if (innervateIndex != NO_TARGET) {

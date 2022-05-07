@@ -150,6 +150,12 @@ func (unit *Unit) AddStatsDynamic(sim *Simulation, stat stats.Stats) {
 	if stat[stats.ArmorPenetration] != 0 {
 		unit.updateArmorPen()
 	}
+	if stat[stats.SpellPenetration] != 0 {
+		unit.updateSpellPen()
+	}
+	if stat[stats.ArcaneResistance] != 0 || stat[stats.FireResistance] != 0 || stat[stats.FrostResistance] != 0 || stat[stats.NatureResistance] != 0 || stat[stats.ShadowResistance] != 0 {
+		unit.updateResistances()
+	}
 }
 func (unit *Unit) AddStatDynamic(sim *Simulation, stat stats.Stat, amount float64) {
 	if unit.Env == nil || !unit.Env.IsFinalized() {
@@ -171,6 +177,18 @@ func (unit *Unit) AddStatDynamic(sim *Simulation, stat stats.Stat, amount float6
 		unit.updateArmor()
 	} else if stat == stats.ArmorPenetration {
 		unit.updateArmorPen()
+	} else if stat == stats.SpellPenetration {
+		unit.updateSpellPen()
+	} else if stat == stats.ArcaneResistance {
+		unit.updateResistances()
+	} else if stat == stats.FireResistance {
+		unit.updateResistances()
+	} else if stat == stats.FrostResistance {
+		unit.updateResistances()
+	} else if stat == stats.NatureResistance {
+		unit.updateResistances()
+	} else if stat == stats.ShadowResistance {
+		unit.updateResistances()
 	}
 }
 
@@ -185,6 +203,20 @@ func (unit *Unit) updateArmorPen() {
 	for _, table := range unit.AttackTables {
 		if table != nil {
 			table.UpdateArmorDamageReduction()
+		}
+	}
+}
+func (unit *Unit) updateResistances() {
+	for _, table := range unit.DefenseTables {
+		if table != nil {
+			table.UpdatePartialResists()
+		}
+	}
+}
+func (unit *Unit) updateSpellPen() {
+	for _, table := range unit.AttackTables {
+		if table != nil {
+			table.UpdatePartialResists()
 		}
 	}
 }
