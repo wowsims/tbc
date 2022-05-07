@@ -390,6 +390,8 @@ export interface Debuffs {
  */
 export interface Target {
     /**
+     * TODO: Deprecate this after 1 month (2022/6/6)
+     *
      * @generated from protobuf field: double armor = 1;
      */
     armor: number;
@@ -401,6 +403,10 @@ export interface Target {
      * @generated from protobuf field: proto.MobType mob_type = 3;
      */
     mobType: MobType;
+    /**
+     * @generated from protobuf field: repeated double stats = 5;
+     */
+    stats: number[];
     /**
      * @generated from protobuf field: proto.Debuffs debuffs = 2;
      */

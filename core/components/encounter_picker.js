@@ -1,4 +1,5 @@
 import { MobType } from '/tbc/core/proto/common.js';
+import { Stat } from '/tbc/core/proto/common.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { Component } from './component.js';
@@ -38,10 +39,10 @@ export class EncounterPicker extends Component {
         if (config.showTargetArmor) {
             new NumberPicker(this.rootElem, modEncounter.primaryTarget, {
                 label: 'Target Armor',
-                changedEvent: (target) => target.armorChangeEmitter,
-                getValue: (target) => target.getArmor(),
+                changedEvent: (target) => target.statsChangeEmitter,
+                getValue: (target) => target.getStats().getStat(Stat.StatArmor),
                 setValue: (eventID, target, newValue) => {
-                    target.setArmor(eventID, newValue);
+                    target.setStats(eventID, target.getStats().withStat(Stat.StatArmor, newValue));
                 },
             });
         }

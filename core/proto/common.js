@@ -1977,11 +1977,12 @@ class Target$Type extends MessageType {
             { no: 1, name: "armor", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 4, name: "level", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "mob_type", kind: "enum", T: () => ["proto.MobType", MobType] },
+            { no: 5, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 2, name: "debuffs", kind: "message", T: () => Debuffs }
         ]);
     }
     create(value) {
-        const message = { armor: 0, level: 0, mobType: 0 };
+        const message = { armor: 0, level: 0, mobType: 0, stats: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -2000,6 +2001,13 @@ class Target$Type extends MessageType {
                     break;
                 case /* proto.MobType mob_type */ 3:
                     message.mobType = reader.int32();
+                    break;
+                case /* repeated double stats */ 5:
+                    if (wireType === WireType.LengthDelimited)
+                        for (let e = reader.int32() + reader.pos; reader.pos < e;)
+                            message.stats.push(reader.double());
+                    else
+                        message.stats.push(reader.double());
                     break;
                 case /* proto.Debuffs debuffs */ 2:
                     message.debuffs = Debuffs.internalBinaryRead(reader, reader.uint32(), options, message.debuffs);
@@ -2025,6 +2033,13 @@ class Target$Type extends MessageType {
         /* proto.MobType mob_type = 3; */
         if (message.mobType !== 0)
             writer.tag(3, WireType.Varint).int32(message.mobType);
+        /* repeated double stats = 5; */
+        if (message.stats.length) {
+            writer.tag(5, WireType.LengthDelimited).fork();
+            for (let i = 0; i < message.stats.length; i++)
+                writer.double(message.stats[i]);
+            writer.join();
+        }
         /* proto.Debuffs debuffs = 2; */
         if (message.debuffs)
             Debuffs.internalBinaryWrite(message.debuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();

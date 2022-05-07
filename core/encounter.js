@@ -1,7 +1,9 @@
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
+import { Stat } from '/tbc/core/proto/common.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
 import { Target } from '/tbc/core/target.js';
+import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { TypedEvent } from './typed_event.js';
 // Manages all the settings for an Encounter.
 export class Encounter {
@@ -91,7 +93,7 @@ export class Encounter {
             executeProportion: 0.2,
             targets: [TargetProto.create({
                     level: 73,
-                    armor: 7684,
+                    stats: new Stats().withStat(Stat.StatArmor, 7684).asArray(),
                     mobType: MobType.MobTypeDemon,
                 })],
         }));
