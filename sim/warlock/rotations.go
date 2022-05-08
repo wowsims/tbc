@@ -62,19 +62,25 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 	case proto.Warlock_Rotation_Tongues:
 		castCurse(warlock.CurseOfTongues, warlock.CurseOfTonguesAura)
 	case proto.Warlock_Rotation_Doom:
-		if warlock.Talents.AmplifyCurse && warlock.AmplifyCurse.CD.IsReady(sim) {
-			warlock.AmplifyCurse.Cast(sim, sim.GetPrimaryTarget())
-		}
 		if sim.Duration-sim.CurrentTime < time.Minute {
 			// Can't cast agony until we are at end and both agony and doom are not ticking.
 			if sim.Duration-sim.CurrentTime > time.Second*30 && !warlock.CurseOfAgonyDot.IsActive() && !warlock.CurseOfDoomDot.IsActive() {
+				if warlock.Talents.AmplifyCurse && warlock.AmplifyCurse.CD.IsReady(sim) {
+					warlock.AmplifyCurse.Cast(sim, sim.GetPrimaryTarget())
+				}
 				spell = warlock.CurseOfAgony
 			}
 		} else if warlock.CurseOfDoom.CD.IsReady(sim) && !warlock.CurseOfDoomDot.IsActive() {
+			if warlock.Talents.AmplifyCurse && warlock.AmplifyCurse.CD.IsReady(sim) {
+				warlock.AmplifyCurse.Cast(sim, sim.GetPrimaryTarget())
+			}
 			spell = warlock.CurseOfDoom
 		}
 	case proto.Warlock_Rotation_Agony:
 		if !warlock.CurseOfAgonyDot.IsActive() {
+			if warlock.Talents.AmplifyCurse && warlock.AmplifyCurse.CD.IsReady(sim) {
+				warlock.AmplifyCurse.Cast(sim, sim.GetPrimaryTarget())
+			}
 			spell = warlock.CurseOfAgony
 		}
 	}
