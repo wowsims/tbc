@@ -305,6 +305,8 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 	}
 
 	agent.Reset(sim)
+
+	character.SetGCDTimer(sim, 0)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc

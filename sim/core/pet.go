@@ -98,9 +98,12 @@ func (pet *Pet) Finalize() {
 	pet.Character.Finalize()
 }
 
-func (pet *Pet) reset(sim *Simulation, agent Agent) {
+func (pet *Pet) reset(sim *Simulation, agent PetAgent) {
 	pet.Character.reset(sim, agent)
 	pet.enabled = false
+	if pet.initialEnabled {
+		pet.Enable(sim, agent)
+	}
 }
 func (pet *Pet) advance(sim *Simulation, elapsedTime time.Duration) {
 	pet.Character.advance(sim, elapsedTime)
