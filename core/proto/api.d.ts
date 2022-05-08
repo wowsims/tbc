@@ -415,6 +415,10 @@ export interface UnitMetrics {
      */
     threat?: DistributionMetrics;
     /**
+     * @generated from protobuf field: proto.DistributionMetrics dtps = 11;
+     */
+    dtps?: DistributionMetrics;
+    /**
      * average seconds spent oom per iteration
      *
      * @generated from protobuf field: double seconds_oom_avg = 3;

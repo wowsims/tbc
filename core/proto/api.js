@@ -912,6 +912,7 @@ class UnitMetrics$Type extends MessageType {
             { no: 9, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 1, name: "dps", kind: "message", T: () => DistributionMetrics },
             { no: 8, name: "threat", kind: "message", T: () => DistributionMetrics },
+            { no: 11, name: "dtps", kind: "message", T: () => DistributionMetrics },
             { no: 3, name: "seconds_oom_avg", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 5, name: "actions", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => ActionMetrics },
             { no: 6, name: "auras", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => AuraMetrics },
@@ -939,6 +940,9 @@ class UnitMetrics$Type extends MessageType {
                     break;
                 case /* proto.DistributionMetrics threat */ 8:
                     message.threat = DistributionMetrics.internalBinaryRead(reader, reader.uint32(), options, message.threat);
+                    break;
+                case /* proto.DistributionMetrics dtps */ 11:
+                    message.dtps = DistributionMetrics.internalBinaryRead(reader, reader.uint32(), options, message.dtps);
                     break;
                 case /* double seconds_oom_avg */ 3:
                     message.secondsOomAvg = reader.double();
@@ -976,6 +980,9 @@ class UnitMetrics$Type extends MessageType {
         /* proto.DistributionMetrics threat = 8; */
         if (message.threat)
             DistributionMetrics.internalBinaryWrite(message.threat, writer.tag(8, WireType.LengthDelimited).fork(), options).join();
+        /* proto.DistributionMetrics dtps = 11; */
+        if (message.dtps)
+            DistributionMetrics.internalBinaryWrite(message.dtps, writer.tag(11, WireType.LengthDelimited).fork(), options).join();
         /* double seconds_oom_avg = 3; */
         if (message.secondsOomAvg !== 0)
             writer.tag(3, WireType.Bit64).double(message.secondsOomAvg);

@@ -117,11 +117,13 @@ export const StatWeightsTestResult = new StatWeightsTestResult$Type();
 class DpsTestResult$Type extends MessageType {
     constructor() {
         super("proto.DpsTestResult", [
-            { no: 1, name: "dps", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 1, name: "dps", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 2, name: "tps", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 3, name: "dtps", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { dps: 0 };
+        const message = { dps: 0, tps: 0, dtps: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -134,6 +136,12 @@ class DpsTestResult$Type extends MessageType {
             switch (fieldNo) {
                 case /* double dps */ 1:
                     message.dps = reader.double();
+                    break;
+                case /* double tps */ 2:
+                    message.tps = reader.double();
+                    break;
+                case /* double dtps */ 3:
+                    message.dtps = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -150,6 +158,12 @@ class DpsTestResult$Type extends MessageType {
         /* double dps = 1; */
         if (message.dps !== 0)
             writer.tag(1, WireType.Bit64).double(message.dps);
+        /* double tps = 2; */
+        if (message.tps !== 0)
+            writer.tag(2, WireType.Bit64).double(message.tps);
+        /* double dtps = 3; */
+        if (message.dtps !== 0)
+            writer.tag(3, WireType.Bit64).double(message.dtps);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

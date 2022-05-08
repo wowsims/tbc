@@ -30,6 +30,14 @@ export interface DpsTestResult {
      * @generated from protobuf field: double dps = 1;
      */
     dps: number;
+    /**
+     * @generated from protobuf field: double tps = 2;
+     */
+    tps: number;
+    /**
+     * @generated from protobuf field: double dtps = 3;
+     */
+    dtps: number;
 }
 /**
  * @generated from protobuf message proto.TestSuiteResult
