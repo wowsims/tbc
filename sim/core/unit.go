@@ -338,9 +338,12 @@ func (unit *Unit) reset(sim *Simulation, agent Agent) {
 		spell.reset(sim)
 	}
 
-	if agent != nil {
-		unit.gcdAction = unit.newGCDAction(sim, agent)
-	}
+	unit.UpdateManaRegenRates()
+
+	unit.energyBar.reset(sim)
+	unit.rageBar.reset(sim)
+
+	unit.AutoAttacks.reset(sim)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
