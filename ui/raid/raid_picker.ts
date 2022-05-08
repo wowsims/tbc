@@ -15,6 +15,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { BuffBot as BuffBotProto } from '/tbc/core/proto/ui.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
+import { isTankSpec } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { newRaidTarget } from '/tbc/core/proto_utils/utils.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -27,6 +28,7 @@ import { RaidSimUI } from './raid_sim_ui.js';
 import { buffBotPresets, playerPresets, specSimFactories } from './presets.js';
 
 import { BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
+import { SmitePriest_Options as SmitePriestOptions } from '/tbc/core/proto/priest.js';
 
 declare var tippy: any;
 declare var $: any;
@@ -486,8 +488,23 @@ export class PlayerPicker extends Component {
 				this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
 
 				if (dragType == DragType.New) {
+					if (isTankSpec(newPlayer.spec)) {
+						const tanks = this.raidPicker.raid.getTanks();
+						const emptyIdx = tanks.findIndex(tank => this.raidPicker.raid.getPlayerFromRaidTarget(tank) == null);
+						if (emptyIdx == -1) {
+							if (tanks.length < 3) {
+								this.raidPicker.raid.setTanks(eventID, tanks.concat([newPlayer.makeRaidTarget()]));
+							}
+						} else {
+							tanks[emptyIdx] = newPlayer.makeRaidTarget();
+							this.raidPicker.raid.setTanks(eventID, tanks);
+						}
+					}
+
 					// On creation, boomies should default to innervating themselves.
 					if (newPlayer.spec == Spec.SpecBalanceDruid) {
+						setBalanceDruidSelfInnervate(eventID, newPlayer);
+					} else if (newPlayer.spec == Spec.SpecSmitePriest) {
 						setBalanceDruidSelfInnervate(eventID, newPlayer);
 					}
 				}
@@ -733,5 +750,10 @@ class NewPlayerPicker extends Component {
 function setBalanceDruidSelfInnervate(eventID: EventID, player: Player<any>) {
 	const newOptions = player.getSpecOptions() as BalanceDruidOptions;
 	newOptions.innervateTarget = newRaidTarget(player.getRaidIndex());
+	player.setSpecOptions(eventID, newOptions);
+}
+function setSmitePriestSelfPI(eventID: EventID, player: Player<any>) {
+	const newOptions = player.getSpecOptions() as SmitePriestOptions;
+	newOptions.powerInfusionTarget = newRaidTarget(player.getRaidIndex());
 	player.setSpecOptions(eventID, newOptions);
 }

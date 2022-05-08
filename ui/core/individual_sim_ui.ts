@@ -895,9 +895,17 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 			this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
 			this.player.setInFrontOfTarget(eventID, tankSpec);
 
-			this.sim.encounter.applyDefaults(eventID);
-			this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
-			this.sim.applyDefaults(eventID, tankSpec);
+			if (!this.isWithinRaidSim) {
+				this.sim.encounter.applyDefaults(eventID);
+				this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
+				this.sim.applyDefaults(eventID, tankSpec);
+
+				if (tankSpec) {
+					this.sim.raid.setTanks(eventID, [this.player.makeRaidTarget()]);
+				} else {
+					this.sim.raid.setTanks(eventID, []);
+				}
+			}
 		});
 	}
 
