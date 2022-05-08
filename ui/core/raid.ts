@@ -23,6 +23,7 @@ export class Raid {
 	readonly compChangeEmitter = new TypedEvent<void>();
 
 	readonly buffsChangeEmitter = new TypedEvent<void>();
+	readonly tanksChangeEmitter = new TypedEvent<void>();
 	readonly staggerStormstrikesChangeEmitter = new TypedEvent<void>();
 
 	// Emits when anything in the raid changes.

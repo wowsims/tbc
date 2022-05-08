@@ -59,9 +59,15 @@ func (env *Environment) construct(raidProto proto.Raid, encounterProto proto.Enc
 	for _, target := range env.Encounter.Targets {
 		target.Env = env
 		if int32(len(encounterProto.Targets)) > target.Index {
-			raidTargetProto := encounterProto.Targets[target.Index].Target
-			if raidTargetProto != nil {
-				target.CurrentTarget = &env.Raid.GetPlayerFromRaidTarget(*raidTargetProto).GetCharacter().Unit
+			targetProto := encounterProto.Targets[target.Index]
+			if targetProto.TankIndex >= 0 && targetProto.TankIndex < int32(len(raidProto.Tanks)) {
+				raidTargetProto := raidProto.Tanks[targetProto.TankIndex]
+				if raidTargetProto != nil {
+					raidTarget := env.Raid.GetPlayerFromRaidTarget(*raidTargetProto)
+					if raidTarget != nil {
+						target.CurrentTarget = &raidTarget.GetCharacter().Unit
+					}
+				}
 			}
 		}
 	}

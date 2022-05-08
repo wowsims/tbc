@@ -12,7 +12,6 @@ declare var tippy: any;
 export interface RaidTargetPickerConfig<ModObject> extends InputConfig<ModObject, RaidTarget> {
 	noTargetLabel: string,
 	compChangeEmitter: TypedEvent<void>,
-	getOptions: () => Array<RaidTargetOption>,
 }
 
 export interface RaidTargetElemOption {
@@ -23,35 +22,38 @@ export interface RaidTargetElemOption {
 };
 
 export interface RaidTargetOption extends RaidTargetElemOption {
-	value: RaidTarget,
+	value: Player<any> | null,
 };
 
 // Dropdown menu for selecting a player.
 export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 	private readonly config: RaidTargetPickerConfig<ModObject>;
+	private readonly raid: Raid;
 	private readonly noTargetOption: RaidTargetOption;
 
-	private raidTarget: RaidTarget;
+	private curPlayer: Player<any> | null;
+	private curRaidTarget: RaidTarget;
 
 	private currentOptions: Array<RaidTargetOption>;
 
 	private readonly buttonElem: HTMLElement;
 	private readonly dropdownElem: HTMLElement;
 
-	constructor(parent: HTMLElement, modObj: ModObject, config: RaidTargetPickerConfig<ModObject>) {
+	constructor(parent: HTMLElement, raid: Raid, modObj: ModObject, config: RaidTargetPickerConfig<ModObject>) {
 		super(parent, 'raid-target-picker-root', modObj, config);
 		this.rootElem.classList.add('dropdown-root');
 		this.config = config;
-		this.raidTarget = emptyRaidTarget();
+		this.raid = raid;
+		this.curPlayer = this.raid.getPlayerFromRaidTarget(config.getValue(modObj));
+		this.curRaidTarget = this.getInputValue();
 
 		this.noTargetOption = {
 			iconUrl: '',
 			text: config.noTargetLabel,
 			color: 'black',
-			value: emptyRaidTarget(),
+			value: null,
 			isDropdown: true,
 		};
-		this.currentOptions = [this.noTargetOption];
 
 		this.rootElem.innerHTML = `
 			<div class="dropdown-button raid-target-picker-button"></div>
@@ -65,20 +67,34 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 			event.preventDefault();
 		});
 
-		this.setOptions(TypedEvent.nextEventID(), config.getOptions());
+		this.currentOptions = [];
+		this.updateOptions(TypedEvent.nextEventID());
 		config.compChangeEmitter.on(eventID => {
-			this.setOptions(eventID, config.getOptions());
+			this.updateOptions(eventID);
 		});
 
 		this.init();
 	}
 
-	private setOptions(eventID: EventID, options: Array<RaidTargetOption>) {
-		this.currentOptions = [this.noTargetOption].concat(options);
+	private makeTargetOptions(): Array<RaidTargetOption> {
+		const playerOptions = this.raid.getPlayers().filter(player => player != null).map(player => {
+			return {
+				iconUrl: player!.getTalentTreeIcon(),
+				text: player!.getLabel(),
+				color: player!.getClassColor(),
+				isDropdown: true,
+				value: player,
+			};
+		});
+		return [this.noTargetOption].concat(playerOptions);
+	}
 
-		const hasSameOption = this.currentOptions.find(option => RaidTarget.equals(option.value, this.getInputValue())) != null;
-		if (!hasSameOption) {
-			this.raidTarget = this.noTargetOption.value;
+	private updateOptions(eventID: EventID) {
+		this.currentOptions = this.makeTargetOptions();
+
+		const prevRaidTarget = this.curRaidTarget;
+		this.curRaidTarget = this.getInputValue();
+		if (!RaidTarget.equals(prevRaidTarget, this.curRaidTarget)) {
 			this.inputChanged(eventID);
 		}
 
@@ -91,7 +107,8 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 
 		option.addEventListener('click', event => {
 			event.preventDefault();
-			this.raidTarget = data.value;
+			this.curPlayer = data.value;
+			this.curRaidTarget = this.getInputValue();
 			this.inputChanged(TypedEvent.nextEventID());
 		});
 
@@ -103,13 +120,18 @@ export class RaidTargetPicker<ModObject> extends Input<ModObject, RaidTarget> {
 	}
 
 	getInputValue(): RaidTarget {
-		return RaidTarget.clone(this.raidTarget);
+		if (this.curPlayer) {
+			return this.curPlayer.makeRaidTarget();
+		} else {
+			return emptyRaidTarget();
+		}
 	}
 
 	setInputValue(newValue: RaidTarget) {
-		this.raidTarget = RaidTarget.clone(newValue);
+		this.curRaidTarget = RaidTarget.clone(newValue);
+		this.curPlayer = this.raid.getPlayerFromRaidTarget(this.curRaidTarget);
 
-		const optionData = this.currentOptions.find(optionData => RaidTarget.equals(optionData.value, newValue));
+		const optionData = this.currentOptions.find(optionData => optionData.value == this.curPlayer);
 		if (!optionData) {
 			return;
 		}

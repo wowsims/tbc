@@ -91,6 +91,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	if target.Level == 0 {
 		target.Level = 73
 	}
+	target.stats[stats.MeleeCrit] = (5 + 0.2*float64(target.Level-CharacterLevel)) * MeleeCritRatingPerCritChance
 
 	target.PseudoStats.InFrontOfTarget = true
 
@@ -107,6 +108,9 @@ func (target *Target) finalize() {
 
 func (target *Target) setupAttackTables() {
 	raidUnits := target.Env.Raid.AllUnits
+	if len(raidUnits) == 0 {
+		return
+	}
 	numTables := raidUnits[len(raidUnits)-1].Index + 1
 	target.AttackTables = make([]*AttackTable, numTables)
 	target.DefenseTables = make([]*AttackTable, numTables)
@@ -212,16 +216,19 @@ func NewAttackTable(attacker *Unit, defender *Unit) *AttackTable {
 		Defender: defender,
 	}
 
-	table.BaseMissChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.08)
-	table.BaseSpellMissChance = UnitLevelFloat64(defender.Level, 0.04, 0.05, 0.06, 0.17)
-	table.BaseBlockChance = 0.05
-	table.BaseDodgeChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.065)
-	table.BaseParryChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.14)
-	table.BaseGlanceChance = UnitLevelFloat64(defender.Level, 0.06, 0.12, 0.18, 0.24)
+	if defender.Type == EnemyUnit {
+		table.BaseMissChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.08)
+		table.BaseSpellMissChance = UnitLevelFloat64(defender.Level, 0.04, 0.05, 0.06, 0.17)
+		table.BaseBlockChance = 0.05
+		table.BaseDodgeChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.065)
+		table.BaseParryChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.14)
+		table.BaseGlanceChance = UnitLevelFloat64(defender.Level, 0.06, 0.12, 0.18, 0.24)
 
-	table.GlanceMultiplier = UnitLevelFloat64(defender.Level, 0.95, 0.95, 0.85, 0.75)
-	table.HitSuppression = UnitLevelFloat64(defender.Level, 0, 0, 0, 0.01)
-	table.CritSuppression = UnitLevelFloat64(defender.Level, 0, 0.01, 0.02, 0.048)
+		table.GlanceMultiplier = UnitLevelFloat64(defender.Level, 0.95, 0.95, 0.85, 0.75)
+		table.HitSuppression = UnitLevelFloat64(defender.Level, 0, 0, 0, 0.01)
+		table.CritSuppression = UnitLevelFloat64(defender.Level, 0, 0.01, 0.02, 0.048)
+	} else {
+	}
 
 	table.UpdateArmorDamageReduction()
 	table.UpdatePartialResists()
