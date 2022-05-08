@@ -75,15 +75,15 @@ func (shaman *Shaman) registerFlameShockSpell(shockTimer *core.Timer) {
 
 	effect.BaseDamage = core.BaseDamageConfigMagic(377, 377, 0.214)
 	effect.OutcomeApplier = shaman.OutcomeFuncMagicHitAndCrit(shaman.ElementalCritMultiplier())
-	if effect.OnSpellHit == nil {
-		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+	if effect.OnSpellHitDealt == nil {
+		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				shaman.FlameShockDot.Apply(sim)
 			}
 		}
 	} else {
-		oldSpellHit := effect.OnSpellHit
-		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		oldSpellHit := effect.OnSpellHitDealt
+		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			oldSpellHit(sim, spell, spellEffect)
 			if spellEffect.Landed() {
 				shaman.FlameShockDot.Apply(sim)

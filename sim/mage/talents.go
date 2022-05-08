@@ -86,7 +86,7 @@ func (mage *Mage) applyArcaneConcentration() {
 			mage.AddStatDynamic(sim, stats.SpellCrit, -bonusCrit)
 			mage.PseudoStats.NoCost = false
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spell.SpellExtras.Matches(SpellFlagMage) {
 				return
 			}
@@ -116,7 +116,7 @@ func (mage *Mage) applyArcaneConcentration() {
 			}
 			curCastIdx++
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spell.SpellExtras.Matches(SpellFlagMage) {
 				return
 			}
@@ -261,7 +261,7 @@ func (mage *Mage) applyMasterOfElements() {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
@@ -300,7 +300,7 @@ func (mage *Mage) registerCombustionCD() {
 		OnStacksChange: func(aura *core.Aura, sim *core.Simulation, oldStacks int32, newStacks int32) {
 			aura.Unit.PseudoStats.BonusFireCritRating += critPerStack * float64(newStacks-oldStacks)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell.SpellSchool != core.SpellSchoolFire {
 				return
 			}

@@ -28,7 +28,7 @@ func (hunter *Hunter) registerAspectOfTheHawkSpell() {
 	actionID := core.ActionID{SpellID: 27044}
 	hunter.AspectOfTheHawkAura = hunter.NewTemporaryStatsAuraWrapped("Aspect of the Hawk", actionID, stats.Stats{stats.RangedAttackPower: 155}, core.NeverExpires, func(aura *core.Aura) {
 		hunter.applySharedAspectConfig(true, aura)
-		aura.OnSpellHit = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		aura.OnSpellHitDealt = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.ProcMask.Matches(core.ProcMaskRangedAuto) {
 				return
 			}

@@ -25,9 +25,9 @@ func (warlock *Warlock) registerCorruptionSpell() {
 			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:       core.ProcMaskEmpty, // no damage done by application.
-			OutcomeApplier: warlock.OutcomeFuncMagicHit(),
-			OnSpellHit:     applyDotOnLanded(&warlock.CorruptionDot),
+			ProcMask:        core.ProcMaskEmpty, // no damage done by application.
+			OutcomeApplier:  warlock.OutcomeFuncMagicHit(),
+			OnSpellHitDealt: applyDotOnLanded(&warlock.CorruptionDot),
 		}),
 	})
 	target := warlock.Env.GetPrimaryTarget()

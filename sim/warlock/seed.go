@@ -66,13 +66,13 @@ func (warlock *Warlock) makeSeed(targetIdx int, cap float64) {
 	})
 
 	effect := core.SpellEffect{
-		ProcMask:       core.ProcMaskEmpty,
-		OutcomeApplier: warlock.OutcomeFuncMagicHit(),
-		OnSpellHit:     applyDotOnLanded(&warlock.SeedDots[targetIdx]),
+		ProcMask:        core.ProcMaskEmpty,
+		OutcomeApplier:  warlock.OutcomeFuncMagicHit(),
+		OnSpellHitDealt: applyDotOnLanded(&warlock.SeedDots[targetIdx]),
 	}
 	if warlock.Rotation.DetonateSeed {
 		// Replace dot application with explosion.
-		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			seedExplosion.Cast(sim, spellEffect.Target)
 		}
 	}
@@ -108,7 +108,7 @@ func (warlock *Warlock) makeSeed(targetIdx int, cap float64) {
 		Aura: target.RegisterAura(core.Aura{
 			Label:    "Seed-" + strconv.Itoa(int(warlock.Index)),
 			ActionID: seedActionID,
-			OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
@@ -117,7 +117,7 @@ func (warlock *Warlock) makeSeed(targetIdx int, cap float64) {
 				}
 				trySeedPop(sim, spellEffect.Damage)
 			},
-			OnPeriodicDamage: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnPeriodicDamageDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				trySeedPop(sim, spellEffect.Damage)
 			},
 			OnGain: func(aura *core.Aura, sim *core.Simulation) {

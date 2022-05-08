@@ -50,7 +50,7 @@ func (warrior *Warrior) registerDevastateSpell() {
 			},
 			OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					if !warrior.ExposeArmorAura.IsActive() {
 						warrior.SunderArmorDevastate.Cast(sim, spellEffect.Target)

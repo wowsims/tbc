@@ -32,7 +32,7 @@ func (druid *Druid) registerInsectSwarmSpell() {
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			OutcomeApplier:   druid.OutcomeFuncMagicHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					druid.InsectSwarmDot.Apply(sim)
 				}

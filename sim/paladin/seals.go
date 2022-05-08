@@ -21,7 +21,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 		// should deal 35% weapon deamage
 		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
 		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				// Add mana from Spiritual Attunement
 				// 10% of damage is self-inflicted, 10% of self-inflicted damage is returned as mana
@@ -48,7 +48,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 		ActionID: procActionID,
 		Duration: SealDuration,
 
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) || spellEffect.IsPhantom {
 				return
 			}
@@ -113,7 +113,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 		Tag:      "Seal",
 		ActionID: procActionID,
 		Duration: SealDuration,
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) || spellEffect.IsPhantom {
 				return
 			}

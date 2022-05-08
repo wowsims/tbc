@@ -33,7 +33,7 @@ func (mage *Mage) registerScorchSpell() {
 		}
 
 		procChance := float64(mage.Talents.ImprovedScorch) / 3.0
-		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() {
 				return
 			}

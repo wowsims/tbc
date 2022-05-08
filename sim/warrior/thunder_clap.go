@@ -39,7 +39,7 @@ func (warrior *Warrior) registerThunderClapSpell() {
 			warrior.ThunderClapAura = tcAura
 		}
 
-		effects[i].OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		effects[i].OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				tcAura.Activate(sim)
 			}

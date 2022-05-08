@@ -45,7 +45,7 @@ func (warrior *Warrior) newSunderArmorSpell(isDevastateEffect bool) *core.Spell 
 
 		OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHit(),
 
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				warrior.SunderArmorAura.Activate(sim)
 				if warrior.SunderArmorAura.IsActive() {

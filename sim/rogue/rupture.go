@@ -37,7 +37,7 @@ func (rogue *Rogue) makeRupture(comboPoints int32) *core.Spell {
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					rogue.RuptureDot.Spell = spell
 					rogue.RuptureDot.NumberOfTicks = numTicks

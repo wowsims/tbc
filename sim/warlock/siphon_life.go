@@ -25,9 +25,9 @@ func (warlock *Warlock) registerSiphonLifeSpell() {
 			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:       core.ProcMaskEmpty,
-			OutcomeApplier: warlock.OutcomeFuncMagicHit(),
-			OnSpellHit:     applyDotOnLanded(&warlock.SiphonLifeDot),
+			ProcMask:        core.ProcMaskEmpty,
+			OutcomeApplier:  warlock.OutcomeFuncMagicHit(),
+			OnSpellHitDealt: applyDotOnLanded(&warlock.SiphonLifeDot),
 		}),
 	})
 

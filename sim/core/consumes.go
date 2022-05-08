@@ -858,7 +858,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 
 		const procChance = 0.185
 		flameCapAura := character.NewTemporaryStatsAura("Flame Cap", actionID, stats.Stats{stats.FireSpellPower: 80}, time.Minute)
-		flameCapAura.OnSpellHit = func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+		flameCapAura.OnSpellHitDealt = func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
 				return
 			}
@@ -1007,7 +1007,7 @@ func (character *Character) newBasicExplosiveSpellConfig(actionID ActionID, minD
 
 			BaseDamage:     BaseDamageConfigRoll(minDamage, maxDamage),
 			OutcomeApplier: character.OutcomeFuncMagicHitAndCrit(2),
-			OnSpellHit: func(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			OnSpellHitDealt: func(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 				// Paladins gain extra mana from self-inflicted damage
 				// TO-DO: Check if self-inflicted damage can be resisted or crit
 				// This affects mana returns for Paladins

@@ -20,7 +20,7 @@ func (warlock *Warlock) registerImmolateSpell() {
 		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.DestructiveReach),
 		BaseDamage:       core.BaseDamageConfigMagic(332.0, 332.0, 0.2+0.04*float64(warlock.Talents.ShadowAndFlame)),
 		OutcomeApplier:   warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 0, 1))),
-		OnSpellHit:       applyDotOnLanded(&warlock.ImmolateDot),
+		OnSpellHitDealt:  applyDotOnLanded(&warlock.ImmolateDot),
 		ProcMask:         core.ProcMaskSpellDamage,
 	}
 

@@ -27,7 +27,7 @@ func (rogue *Rogue) registerDeadlyPoisonSpell() {
 			ThreatMultiplier:    1,
 			IsPhantom:           true,
 			OutcomeApplier:      rogue.OutcomeFuncMagicHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					if rogue.DeadlyPoisonDot.IsActive() {
 						rogue.DeadlyPoisonDot.Refresh(sim)
@@ -81,7 +81,7 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
 				return
 			}
@@ -127,7 +127,7 @@ func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
 				return
 			}

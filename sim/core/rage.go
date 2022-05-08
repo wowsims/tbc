@@ -27,7 +27,7 @@ func (unit *Unit) EnableRageBar(startingRage float64, rageMultiplier float64, on
 		OnReset: func(aura *Aura, sim *Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+		OnSpellHitDealt: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if spellEffect.Outcome.Matches(OutcomeMiss) {
 				return
 			}

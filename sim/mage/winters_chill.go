@@ -19,7 +19,7 @@ func (mage *Mage) registerWintersChillSpell() {
 			wcAura = core.WintersChillAura(mage.Env.GetPrimaryTarget(), 0)
 		}
 
-		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				wcAura.Activate(sim)
 				wcAura.AddStack(sim)
@@ -49,7 +49,7 @@ func (mage *Mage) applyWintersChill() {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() {
 				return
 			}

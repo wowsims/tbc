@@ -30,7 +30,7 @@ func (druid *Druid) registerFaerieFireSpell() {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   druid.OutcomeFuncMagicHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					druid.FaerieFireAura.Activate(sim)
 				}

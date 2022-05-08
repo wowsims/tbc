@@ -46,7 +46,7 @@ func (mage *Mage) registerPyroblastSpell() {
 			BaseDamage:     core.BaseDamageConfigMagic(939, 1191, 1.15),
 			OutcomeApplier: mage.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
 
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					mage.PyroblastDot.Apply(sim)
 				}
