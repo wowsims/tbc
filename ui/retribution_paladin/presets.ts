@@ -1,4 +1,4 @@
-import { Conjured, Consumes } from '/tbc/core/proto/common.js';
+import { BattleElixir, Conjured, Consumes, GuardianElixir } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -35,7 +35,7 @@ export const RetNoKingsPaladinTalents = {
 
 export const DefaultRotation = RetributionPaladinRotation.create({
 	consecrationRank: ConsecrationRank.None,
-	useExorcism: false,
+	useExorcism: true,
 });
 
 export const DefaultOptions = RetributionPaladinOptions.create({
@@ -48,8 +48,11 @@ export const DefaultOptions = RetributionPaladinOptions.create({
 export const DefaultConsumes = Consumes.create({
 	defaultPotion: Potions.HastePotion,
 	defaultConjured: Conjured.ConjuredDarkRune,
-	flask: Flask.FlaskOfRelentlessAssault,
+	battleElixir: BattleElixir.ElixirOfDemonslaying,
+	guardianElixir: GuardianElixir.ElixirOfMajorMageblood,
 	food: Food.FoodRoastedClefthoof,
+	scrollOfAgility: 5,
+	scrollOfStrength: 5,
 });
 
 // Maybe use this later if I can figure out the interactive tooltips from tippy
