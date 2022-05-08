@@ -157,10 +157,10 @@ func (target *Target) NextTarget() *Target {
 }
 
 func (target *Target) GetMetricsProto(numIterations int32) *proto.UnitMetrics {
-	return &proto.UnitMetrics{
-		Name:  target.Label,
-		Auras: target.auraTracker.GetMetricsProto(numIterations),
-	}
+	metrics := target.Metrics.ToProto(numIterations)
+	metrics.Name = target.Label
+	metrics.Auras = target.auraTracker.GetMetricsProto(numIterations)
+	return metrics
 }
 
 // Holds cached values for outcome/damage calculations, for a specific attacker+defender pair.

@@ -300,11 +300,13 @@ func (character *Character) reset(sim *Simulation, agent Agent) {
 
 	character.AutoAttacks.reset(sim)
 
+	agent.Reset(sim)
+
+	character.SetGCDTimer(sim, 0)
+
 	for _, petAgent := range character.Pets {
 		petAgent.GetPet().reset(sim, petAgent)
 	}
-
-	agent.Reset(sim)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
