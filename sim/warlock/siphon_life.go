@@ -21,7 +21,7 @@ func (warlock *Warlock) registerSiphonLifeSpell() {
 			DefaultCast: core.Cast{
 				Cost:     baseCost,
 				GCD:      core.GCDDefault,
-				CastTime: time.Millisecond * 2000,
+				CastTime: 0,
 			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
