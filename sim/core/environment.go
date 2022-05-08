@@ -58,7 +58,7 @@ func (env *Environment) construct(raidProto proto.Raid, encounterProto proto.Enc
 	}
 	for _, target := range env.Encounter.Targets {
 		target.Env = env
-		if int32(len(encounterProto.Targets)) > target.Index {
+		if target.Index < int32(len(encounterProto.Targets)) {
 			targetProto := encounterProto.Targets[target.Index]
 			if targetProto.TankIndex >= 0 && targetProto.TankIndex < int32(len(raidProto.Tanks)) {
 				raidTargetProto := raidProto.Tanks[targetProto.TankIndex]
@@ -77,6 +77,14 @@ func (env *Environment) construct(raidProto proto.Raid, encounterProto proto.Enc
 
 // The initialization phase.
 func (env *Environment) initialize(raidProto proto.Raid, encounterProto proto.Encounter) {
+	for _, target := range env.Encounter.Targets {
+		if target.Index < int32(len(encounterProto.Targets)) {
+			target.initialize(encounterProto.Targets[target.Index])
+		} else {
+			target.initialize(nil)
+		}
+	}
+
 	for _, party := range env.Raid.Parties {
 		for _, playerOrPet := range party.PlayersAndPets {
 			playerOrPet.GetCharacter().initialize(playerOrPet)
