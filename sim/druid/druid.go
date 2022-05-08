@@ -12,7 +12,6 @@ type Druid struct {
 	Talents proto.DruidTalents
 
 	StartingForm DruidForm
-	Form         DruidForm
 
 	RebirthUsed       bool
 	MaulRageThreshold float64
@@ -26,7 +25,6 @@ type Druid struct {
 	Mangle           *core.Spell
 	Maul             *core.Spell
 	Moonfire         *core.Spell
-	Powershift       *core.Spell
 	Rebirth          *core.Spell
 	Rip              *core.Spell
 	Shred            *core.Spell
@@ -34,6 +32,9 @@ type Druid struct {
 	Starfire8        *core.Spell
 	Swipe            *core.Spell
 	Wrath            *core.Spell
+
+	CatForm  *core.Spell
+	BearForm *core.Spell
 
 	InsectSwarmDot *core.Dot
 	LacerateDot    *core.Dot
@@ -46,6 +47,11 @@ type Druid struct {
 	MaulQueueAura        *core.Aura
 	NaturesGraceProcAura *core.Aura
 	NaturesSwiftnessAura *core.Aura
+
+	form              DruidForm // Make private, ensure it is only called using SetForm
+	disabledMCDs      []*core.MajorCooldown
+	energyBeforeShift float64 // Store when shitfing out, to properly apply and calculate gains from powershifting
+
 }
 
 type SelfBuffs struct {
@@ -73,7 +79,7 @@ func (druid *Druid) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 const ravenGoddessItemID = 32387
 
 func (druid *Druid) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
-	if druid.Form.Matches(Moonkin) && druid.Talents.MoonkinForm {
+	if druid.InForm(Moonkin) && druid.Talents.MoonkinForm {
 		partyBuffs.MoonkinAura = core.MaxTristate(partyBuffs.MoonkinAura, proto.TristateEffect_TristateEffectRegular)
 		for _, e := range druid.Equip {
 			if e.ID == ravenGoddessItemID {
@@ -82,7 +88,7 @@ func (druid *Druid) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 			}
 		}
 	}
-	if druid.Form.Matches(Cat|Bear) && druid.Talents.LeaderOfThePack {
+	if druid.InForm(Cat|Bear) && druid.Talents.LeaderOfThePack {
 		partyBuffs.LeaderOfThePack = core.MaxTristate(partyBuffs.LeaderOfThePack, proto.TristateEffect_TristateEffectRegular)
 		for _, e := range druid.Equip {
 			if e.ID == ravenGoddessItemID {
@@ -96,7 +102,7 @@ func (druid *Druid) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 func (druid *Druid) MeleeCritMultiplier() float64 {
 	// Assumes that Predatory Instincts is a primary rather than secondary modifier for now, but this needs to confirmed!
 	primaryModifier := 1.0
-	if druid.Form.Matches(Cat | Bear) {
+	if druid.InForm(Cat | Bear) {
 		primaryModifier = 1 + 0.02*float64(druid.Talents.PredatoryInstincts)
 	}
 	return druid.Character.MeleeCritMultiplier(primaryModifier, 0)
@@ -118,6 +124,7 @@ func (druid *Druid) RegisterBalanceSpells() {
 }
 
 func (druid *Druid) RegisterBearSpells(maulRageThreshold float64) {
+	druid.registerBearFormSpell()
 	druid.registerMangleBearSpell()
 	druid.registerMaulSpell(maulRageThreshold)
 	druid.registerLacerateSpell()
@@ -126,15 +133,17 @@ func (druid *Druid) RegisterBearSpells(maulRageThreshold float64) {
 }
 
 func (druid *Druid) RegisterCatSpells() {
+	druid.registerCatFormSpell()
 	druid.registerFerociousBiteSpell()
 	druid.registerMangleCatSpell()
-	druid.registerPowershiftSpell()
 	druid.registerRipSpell()
 	druid.registerShredSpell()
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {
-	druid.Form = druid.StartingForm
+	druid.form = druid.StartingForm
+	druid.disabledMCDs = []*core.MajorCooldown{}
+	druid.energyBeforeShift = 0
 	druid.RebirthUsed = false
 }
 
@@ -144,7 +153,7 @@ func New(char core.Character, form DruidForm, selfBuffs SelfBuffs, talents proto
 		SelfBuffs:    selfBuffs,
 		Talents:      talents,
 		StartingForm: form,
-		Form:         form,
+		form:         form,
 	}
 	druid.EnableManaBar()
 

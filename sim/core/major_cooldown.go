@@ -15,11 +15,18 @@ const (
 	CooldownPriorityBloodlust = 1.0
 )
 
+type CooldownType byte
+
 const (
-	CooldownTypeUnknown = 0
-	CooldownTypeMana    = 1
-	CooldownTypeDPS     = 2
+	CooldownTypeUnknown CooldownType = 0
+	CooldownTypeMana    CooldownType = 1 << iota
+	CooldownTypeDPS
+	CooldownTypeUsableShapeShifted
 )
+
+func (ct CooldownType) Matches(other CooldownType) bool {
+	return (ct & other) != 0
+}
 
 // Condition for whether a cooldown can/should be activated.
 // Returning false prevents the cooldown from being activated.
@@ -46,7 +53,7 @@ type MajorCooldown struct {
 
 	// Internal category, used for filtering. For example, mages want to disable
 	// all DPS cooldowns during their regen rotation.
-	Type int32
+	Type CooldownType
 
 	// Whether the cooldown meets all hard requirements for activation (e.g. resource cost).
 	// Note chat whether the cooldown is off CD is automatically checked, so it does not
@@ -210,7 +217,7 @@ func (mcdm *majorCooldownManager) DelayDPSCooldownsForArmorDebuffs() {
 		const delay = time.Second * 10
 		for i, _ := range mcdm.initialMajorCooldowns {
 			mcd := &mcdm.initialMajorCooldowns[i]
-			if len(mcd.timings) == 0 && mcd.Type == CooldownTypeDPS {
+			if len(mcd.timings) == 0 && mcd.Type.Matches(CooldownTypeDPS) {
 				mcd.timings = append(mcd.timings, delay)
 			}
 		}
@@ -324,10 +331,10 @@ func (mcdm *majorCooldownManager) EnableMajorCooldown(actionID ActionID) {
 // Disabled all MCDs that are currently enabled, and returns a list of the MCDs
 // which were disabled by this call.
 // If cooldownType is not CooldownTypeUnknown, then will be restricted to cooldowns of that type.
-func (mcdm *majorCooldownManager) DisableAllEnabledCooldowns(cooldownType int32) []*MajorCooldown {
+func (mcdm *majorCooldownManager) DisableAllEnabledCooldowns(cooldownType CooldownType) []*MajorCooldown {
 	disabledMCDs := []*MajorCooldown{}
 	for _, mcd := range mcdm.majorCooldowns {
-		if mcd.IsEnabled() && (cooldownType == CooldownTypeUnknown || mcd.Type == cooldownType) {
+		if mcd.IsEnabled() && (cooldownType == CooldownTypeUnknown || mcd.Type.Matches(cooldownType)) {
 			mcdm.DisableMajorCooldown(mcd.Spell.ActionID)
 			disabledMCDs = append(disabledMCDs, mcd)
 		}
@@ -388,7 +395,7 @@ func RegisterTemporaryStatsOnUseCD(character *Character, auraLabel string, tempS
 
 	character.AddMajorCooldown(MajorCooldown{
 		Spell: spell,
-		Type:  CooldownTypeDPS,
+		Type:  CooldownTypeDPS | CooldownTypeUsableShapeShifted,
 	})
 }
 

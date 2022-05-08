@@ -16,7 +16,7 @@ func (druid *Druid) registerFaerieFireSpell() {
 	ignoreHaste := false
 	cd := core.Cooldown{}
 
-	if druid.Form.Matches(Cat | Bear) {
+	if druid.InForm(Cat | Bear) {
 		if !druid.Talents.FaerieFire {
 			return
 		}

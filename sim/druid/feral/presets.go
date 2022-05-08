@@ -69,6 +69,7 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 
 var FullConsumes = &proto.Consumes{
 	BattleElixir:     proto.BattleElixir_ElixirOfMajorAgility,
+	GuardianElixir:   proto.GuardianElixir_ElixirOfMajorMageblood,
 	Food:             proto.Food_FoodGrilledMudfish,
 	DefaultPotion:    proto.Potions_HastePotion,
 	MainHandImbue:    proto.WeaponImbue_WeaponImbueAdamantiteWeightstone,
@@ -85,6 +86,7 @@ var FullDebuffs = &proto.Debuffs{
 	ExposeArmor:                 proto.TristateEffect_TristateEffectImproved,
 	FaerieFire:                  proto.TristateEffect_TristateEffectImproved,
 	SunderArmor:                 true,
+	Mangle:                      true,
 	CurseOfRecklessness:         true,
 	HuntersMark:                 proto.TristateEffect_TristateEffectImproved,
 	ExposeWeaknessUptime:        1.0,
