@@ -408,6 +408,12 @@ export interface Target {
      */
     stats: number[];
     /**
+     * The raid player tanking this mob.
+     *
+     * @generated from protobuf field: proto.RaidTarget target = 6;
+     */
+    target?: RaidTarget;
+    /**
      * @generated from protobuf field: proto.Debuffs debuffs = 2;
      */
     debuffs?: Debuffs;

@@ -1978,6 +1978,7 @@ class Target$Type extends MessageType {
             { no: 4, name: "level", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "mob_type", kind: "enum", T: () => ["proto.MobType", MobType] },
             { no: 5, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 6, name: "target", kind: "message", T: () => RaidTarget },
             { no: 2, name: "debuffs", kind: "message", T: () => Debuffs }
         ]);
     }
@@ -2008,6 +2009,9 @@ class Target$Type extends MessageType {
                             message.stats.push(reader.double());
                     else
                         message.stats.push(reader.double());
+                    break;
+                case /* proto.RaidTarget target */ 6:
+                    message.target = RaidTarget.internalBinaryRead(reader, reader.uint32(), options, message.target);
                     break;
                 case /* proto.Debuffs debuffs */ 2:
                     message.debuffs = Debuffs.internalBinaryRead(reader, reader.uint32(), options, message.debuffs);
@@ -2040,6 +2044,9 @@ class Target$Type extends MessageType {
                 writer.double(message.stats[i]);
             writer.join();
         }
+        /* proto.RaidTarget target = 6; */
+        if (message.target)
+            RaidTarget.internalBinaryWrite(message.target, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
         /* proto.Debuffs debuffs = 2; */
         if (message.debuffs)
             Debuffs.internalBinaryWrite(message.debuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
