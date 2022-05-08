@@ -134,6 +134,12 @@ func (target *Target) setupAttackTables() {
 
 func (target *Target) init(sim *Simulation) {
 	target.Unit.init(sim)
+
+	target.gcdAction = &PendingAction{
+		Priority: ActionPriorityGCD,
+		OnAction: func(sim *Simulation) {
+		},
+	}
 }
 
 func (target *Target) Reset(sim *Simulation) {

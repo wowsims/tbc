@@ -267,8 +267,18 @@ func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	}
 }
 
-func (character *Character) initialize() {
+func (character *Character) initialize(agent Agent) {
 	character.majorCooldownManager.initialize(character)
+
+	character.gcdAction = &PendingAction{
+		Priority: ActionPriorityGCD,
+		OnAction: func(sim *Simulation) {
+			character.TryUseCooldowns(sim)
+			if character.GCD.IsReady(sim) {
+				agent.OnGCDReady(sim)
+			}
+		},
+	}
 }
 
 func (character *Character) Finalize() {
@@ -289,20 +299,15 @@ func (character *Character) init(sim *Simulation, agent Agent) {
 }
 
 func (character *Character) reset(sim *Simulation, agent Agent) {
+	character.ExpectedBonusMana = 0
 	character.majorCooldownManager.reset(sim)
 	character.Unit.reset(sim, agent)
 
-	character.ExpectedBonusMana = 0
-	character.UpdateManaRegenRates()
-
-	character.energyBar.reset(sim)
-	character.rageBar.reset(sim)
-
-	character.AutoAttacks.reset(sim)
+	if character.Type == PlayerUnit {
+		character.SetGCDTimer(sim, 0)
+	}
 
 	agent.Reset(sim)
-
-	character.SetGCDTimer(sim, 0)
 
 	for _, petAgent := range character.Pets {
 		petAgent.GetPet().reset(sim, petAgent)

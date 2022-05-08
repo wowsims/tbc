@@ -79,7 +79,7 @@ func (env *Environment) construct(raidProto proto.Raid, encounterProto proto.Enc
 func (env *Environment) initialize(raidProto proto.Raid, encounterProto proto.Encounter) {
 	for _, party := range env.Raid.Parties {
 		for _, playerOrPet := range party.PlayersAndPets {
-			playerOrPet.GetCharacter().initialize()
+			playerOrPet.GetCharacter().initialize(playerOrPet)
 		}
 	}
 
