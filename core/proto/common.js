@@ -1978,12 +1978,12 @@ class Target$Type extends MessageType {
             { no: 4, name: "level", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "mob_type", kind: "enum", T: () => ["proto.MobType", MobType] },
             { no: 5, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 6, name: "target", kind: "message", T: () => RaidTarget },
+            { no: 6, name: "tank_index", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "debuffs", kind: "message", T: () => Debuffs }
         ]);
     }
     create(value) {
-        const message = { armor: 0, level: 0, mobType: 0, stats: [] };
+        const message = { armor: 0, level: 0, mobType: 0, stats: [], tankIndex: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -2010,8 +2010,8 @@ class Target$Type extends MessageType {
                     else
                         message.stats.push(reader.double());
                     break;
-                case /* proto.RaidTarget target */ 6:
-                    message.target = RaidTarget.internalBinaryRead(reader, reader.uint32(), options, message.target);
+                case /* int32 tank_index */ 6:
+                    message.tankIndex = reader.int32();
                     break;
                 case /* proto.Debuffs debuffs */ 2:
                     message.debuffs = Debuffs.internalBinaryRead(reader, reader.uint32(), options, message.debuffs);
@@ -2044,9 +2044,9 @@ class Target$Type extends MessageType {
                 writer.double(message.stats[i]);
             writer.join();
         }
-        /* proto.RaidTarget target = 6; */
-        if (message.target)
-            RaidTarget.internalBinaryWrite(message.target, writer.tag(6, WireType.LengthDelimited).fork(), options).join();
+        /* int32 tank_index = 6; */
+        if (message.tankIndex !== 0)
+            writer.tag(6, WireType.Varint).int32(message.tankIndex);
         /* proto.Debuffs debuffs = 2; */
         if (message.debuffs)
             Debuffs.internalBinaryWrite(message.debuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();

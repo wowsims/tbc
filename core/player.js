@@ -13,7 +13,7 @@ import { talentStringToProto } from '/tbc/core/talents/factory.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { gemMatchesSocket, } from '/tbc/core/proto_utils/gems.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { canEquipEnchant, canEquipItem, classColors, getEligibleItemSlots, getTalentTree, getTalentTreeIcon, getMetaGemEffectEP, raceToFaction, specEPTransforms, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
+import { canEquipEnchant, canEquipItem, classColors, emptyRaidTarget, getEligibleItemSlots, getTalentTree, getTalentTreeIcon, getMetaGemEffectEP, newRaidTarget, raceToFaction, specEPTransforms, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
 import { TypedEvent } from './typed_event.js';
 import { MAX_PARTY_SIZE } from './party.js';
 import { sum } from './utils.js';
@@ -458,6 +458,14 @@ export class Player {
         }
         parts.push('pcs=' + this.gear.asArray().filter(ei => ei != null).map(ei => ei.item.id).join(':'));
         elem.setAttribute('data-wowhead', parts.join('&'));
+    }
+    makeRaidTarget() {
+        if (this.party == null) {
+            return emptyRaidTarget();
+        }
+        else {
+            return newRaidTarget(this.getRaidIndex());
+        }
     }
     toProto(forExport) {
         return withSpecProto(this.spec, PlayerProto.create({

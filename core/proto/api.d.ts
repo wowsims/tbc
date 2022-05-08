@@ -10,6 +10,7 @@ import { Enchant } from "./common";
 import { Item } from "./common";
 import { Encounter } from "./common";
 import { ActionID } from "./common";
+import { RaidTarget } from "./common";
 import { RaidBuffs } from "./common";
 import { PartyBuffs } from "./common";
 import { Cooldowns } from "./common";
@@ -194,6 +195,12 @@ export interface Raid {
      * @generated from protobuf field: proto.RaidBuffs buffs = 2;
      */
     buffs?: RaidBuffs;
+    /**
+     * Players who will be tanking mobs.
+     *
+     * @generated from protobuf field: repeated proto.RaidTarget tanks = 4;
+     */
+    tanks: RaidTarget[];
     /**
      * Staggers Stormstrike casts across Enhance Shaman to maximize charge usage.
      *

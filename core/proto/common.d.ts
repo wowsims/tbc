@@ -408,11 +408,12 @@ export interface Target {
      */
     stats: number[];
     /**
-     * The raid player tanking this mob.
+     * Index in Raid.tanks indicating the player tanking this mob.
+     * -1 or invalid index indicates not being tanked.
      *
-     * @generated from protobuf field: proto.RaidTarget target = 6;
+     * @generated from protobuf field: int32 tank_index = 6;
      */
-    target?: RaidTarget;
+    tankIndex: number;
     /**
      * @generated from protobuf field: proto.Debuffs debuffs = 2;
      */

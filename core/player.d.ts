@@ -8,6 +8,7 @@ import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race, ShattrathFaction } from '/tbc/core/proto/common.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { PlayerStats } from '/tbc/core/proto/api.js';
@@ -114,6 +115,7 @@ export declare class Player<SpecType extends Spec> {
     computeEnchantEP(enchant: Enchant): number;
     computeItemEP(item: Item): number;
     setWowheadData(equippedItem: EquippedItem, elem: HTMLElement): void;
+    makeRaidTarget(): RaidTarget;
     toProto(forExport?: boolean): PlayerProto;
     fromProto(eventID: EventID, proto: PlayerProto): void;
     clone(eventID: EventID): Player<SpecType>;

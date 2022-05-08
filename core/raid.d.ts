@@ -12,6 +12,7 @@ export declare class Raid {
     private staggerStormstrikes;
     readonly compChangeEmitter: TypedEvent<void>;
     readonly buffsChangeEmitter: TypedEvent<void>;
+    readonly tanksChangeEmitter: TypedEvent<void>;
     readonly staggerStormstrikesChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
     private parties;

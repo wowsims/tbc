@@ -9,6 +9,7 @@ import { Enchant } from './common.js';
 import { Item } from './common.js';
 import { Encounter } from './common.js';
 import { ActionID } from './common.js';
+import { RaidTarget } from './common.js';
 import { RaidBuffs } from './common.js';
 import { PartyBuffs } from './common.js';
 import { Cooldowns } from './common.js';
@@ -376,11 +377,12 @@ class Raid$Type extends MessageType {
         super("proto.Raid", [
             { no: 1, name: "parties", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Party },
             { no: 2, name: "buffs", kind: "message", T: () => RaidBuffs },
+            { no: 4, name: "tanks", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => RaidTarget },
             { no: 3, name: "stagger_stormstrikes", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { parties: [], staggerStormstrikes: false };
+        const message = { parties: [], tanks: [], staggerStormstrikes: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -396,6 +398,9 @@ class Raid$Type extends MessageType {
                     break;
                 case /* proto.RaidBuffs buffs */ 2:
                     message.buffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.buffs);
+                    break;
+                case /* repeated proto.RaidTarget tanks */ 4:
+                    message.tanks.push(RaidTarget.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* bool stagger_stormstrikes */ 3:
                     message.staggerStormstrikes = reader.bool();
@@ -418,6 +423,9 @@ class Raid$Type extends MessageType {
         /* proto.RaidBuffs buffs = 2; */
         if (message.buffs)
             RaidBuffs.internalBinaryWrite(message.buffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* repeated proto.RaidTarget tanks = 4; */
+        for (let i = 0; i < message.tanks.length; i++)
+            RaidTarget.internalBinaryWrite(message.tanks[i], writer.tag(4, WireType.LengthDelimited).fork(), options).join();
         /* bool stagger_stormstrikes = 3; */
         if (message.staggerStormstrikes !== false)
             writer.tag(3, WireType.Varint).bool(message.staggerStormstrikes);

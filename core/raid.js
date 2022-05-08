@@ -13,6 +13,7 @@ export class Raid {
         // Emits when a raid member is added/removed/moved.
         this.compChangeEmitter = new TypedEvent();
         this.buffsChangeEmitter = new TypedEvent();
+        this.tanksChangeEmitter = new TypedEvent();
         this.staggerStormstrikesChangeEmitter = new TypedEvent();
         this.sim = sim;
         this.parties = [...Array(MAX_NUM_PARTIES).keys()].map(i => {

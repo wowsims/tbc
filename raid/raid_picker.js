@@ -17,10 +17,11 @@ import { buffBotPresets, playerPresets, specSimFactories } from './presets.js';
 const NEW_PLAYER = -1;
 var DragType;
 (function (DragType) {
-    DragType[DragType["New"] = 0] = "New";
-    DragType[DragType["Move"] = 1] = "Move";
-    DragType[DragType["Swap"] = 2] = "Swap";
-    DragType[DragType["Copy"] = 3] = "Copy";
+    DragType[DragType["None"] = 0] = "None";
+    DragType[DragType["New"] = 1] = "New";
+    DragType[DragType["Move"] = 2] = "Move";
+    DragType[DragType["Swap"] = 3] = "Swap";
+    DragType[DragType["Copy"] = 4] = "Copy";
 })(DragType || (DragType = {}));
 export class RaidPicker extends Component {
     constructor(parent, raidSimUI) {
@@ -48,7 +49,7 @@ export class RaidPicker extends Component {
             // Uncomment to remove player when dropped 'off' the raid.
             //if (this.currentDragPlayerFromIndex != NEW_PLAYER) {
             //	const playerPicker = this.getPlayerPicker(this.currentDragPlayerFromIndex);
-            //	playerPicker.setPlayer(null);
+            //	playerPicker.setPlayer(null, null, DragType.None);
             //}
             this.clearDragPlayer();
         };
@@ -72,7 +73,7 @@ export class RaidPicker extends Component {
     }
     setBuffBots(eventID, newBuffBotProtos) {
         TypedEvent.freezeAllAndDo(() => {
-            this.getBuffBots().forEach(buffBot => this.getPlayerPicker(buffBot.getRaidIndex()).setPlayer(eventID, null));
+            this.getBuffBots().forEach(buffBot => this.getPlayerPicker(buffBot.getRaidIndex()).setPlayer(eventID, null, DragType.None));
             newBuffBotProtos.forEach(buffBotProto => {
                 const settings = buffBotPresets.find(preset => preset.buffBotId == buffBotProto.id);
                 if (!settings) {
@@ -81,7 +82,7 @@ export class RaidPicker extends Component {
                 }
                 const buffBot = new BuffBot(buffBotProto.id, this.raid.sim);
                 buffBot.fromProto(eventID, buffBotProto);
-                this.getPlayerPicker(buffBotProto.raidIndex).setPlayer(eventID, buffBot);
+                this.getPlayerPicker(buffBotProto.raidIndex).setPlayer(eventID, buffBot, DragType.None);
             });
         });
     }
@@ -167,7 +168,7 @@ export class PlayerPicker extends Component {
         this.partyPicker.party.compChangeEmitter.on(eventID => {
             const newPlayer = this.partyPicker.party.getPlayer(this.index);
             if (newPlayer != this.player && !(newPlayer == null && this.player instanceof BuffBot)) {
-                this.setPlayer(eventID, newPlayer);
+                this.setPlayer(eventID, newPlayer, DragType.None);
             }
         });
         this.rootElem.innerHTML = `
@@ -272,7 +273,7 @@ export class PlayerPicker extends Component {
             'allowHTML': true,
         });
         deleteElem.addEventListener('click', event => {
-            this.setPlayer(TypedEvent.nextEventID(), null);
+            this.setPlayer(TypedEvent.nextEventID(), null, DragType.None);
         });
         let dragEnterCounter = 0;
         this.rootElem.ondragenter = event => {
@@ -307,18 +308,18 @@ export class PlayerPicker extends Component {
                 if (this.raidPicker.currentDragPlayerFromIndex != NEW_PLAYER) {
                     const fromPlayerPicker = this.raidPicker.getPlayerPicker(this.raidPicker.currentDragPlayerFromIndex);
                     if (dragType == DragType.Swap) {
-                        fromPlayerPicker.setPlayer(eventID, this.player);
+                        fromPlayerPicker.setPlayer(eventID, this.player, dragType);
                         fromPlayerPicker.iconElem.src = this.iconElem.src;
                     }
                     else if (dragType == DragType.Move) {
-                        fromPlayerPicker.setPlayer(eventID, null);
+                        fromPlayerPicker.setPlayer(eventID, null, dragType);
                     }
                 }
                 if (dragType == DragType.Copy) {
-                    this.setPlayer(eventID, this.raidPicker.currentDragPlayer.clone(eventID));
+                    this.setPlayer(eventID, this.raidPicker.currentDragPlayer.clone(eventID), dragType);
                 }
                 else {
-                    this.setPlayer(eventID, this.raidPicker.currentDragPlayer);
+                    this.setPlayer(eventID, this.raidPicker.currentDragPlayer, dragType);
                 }
                 this.iconElem.src = event.dataTransfer.getData('text/plain');
                 this.raidPicker.clearDragPlayer();
@@ -364,7 +365,7 @@ export class PlayerPicker extends Component {
         });
         this.update();
     }
-    setPlayer(eventID, newPlayer) {
+    setPlayer(eventID, newPlayer, dragType) {
         if (newPlayer == this.player) {
             return;
         }
@@ -377,11 +378,12 @@ export class PlayerPicker extends Component {
                 newPlayer.setRaidIndex(eventID, this.raidIndex);
             }
             else if (newPlayer instanceof Player) {
-                const wasInRaid = newPlayer.getRaid() != null;
                 this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
-                // On creation, boomies should default to innervating themselves.
-                if (!wasInRaid && newPlayer.spec == Spec.SpecBalanceDruid) {
-                    setBalanceDruidSelfInnervate(eventID, newPlayer);
+                if (dragType == DragType.New) {
+                    // On creation, boomies should default to innervating themselves.
+                    if (newPlayer.spec == Spec.SpecBalanceDruid) {
+                        setBalanceDruidSelfInnervate(eventID, newPlayer);
+                    }
                 }
             }
             else {
