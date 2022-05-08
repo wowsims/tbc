@@ -215,6 +215,12 @@ func (sim *Simulation) runOnce() {
 	sim.Raid.doneIteration(sim)
 	sim.Encounter.doneIteration(sim)
 
+	for _, unit := range sim.Raid.AllUnits {
+		unit.Metrics.doneIteration(sim.Duration.Seconds())
+	}
+	for _, target := range sim.Encounter.Targets {
+		target.Metrics.doneIteration(sim.Duration.Seconds())
+	}
 }
 
 func (sim *Simulation) AddPendingAction(pa *PendingAction) {

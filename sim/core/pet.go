@@ -53,7 +53,7 @@ func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanc
 				Level:       CharacterLevel,
 				PseudoStats: stats.NewPseudoStats(),
 				auraTracker: newAuraTracker(),
-				Metrics:     NewCharacterMetrics(),
+				Metrics:     NewUnitMetrics(),
 			},
 			Name:       name,
 			Party:      owner.Party,

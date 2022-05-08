@@ -84,7 +84,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 			auraTracker: newAuraTracker(),
 			stats:       unitStats,
 			PseudoStats: stats.NewPseudoStats(),
-			Metrics:     NewCharacterMetrics(),
+			Metrics:     NewUnitMetrics(),
 		},
 	}
 	target.GCD = target.NewTimer()
@@ -134,16 +134,11 @@ func (target *Target) setupAttackTables() {
 
 func (target *Target) init(sim *Simulation) {
 	target.Unit.init(sim)
-
-	target.gcdAction = &PendingAction{
-		Priority: ActionPriorityGCD,
-		OnAction: func(sim *Simulation) {
-		},
-	}
 }
 
 func (target *Target) Reset(sim *Simulation) {
 	target.Unit.reset(sim, nil)
+	//target.SetGCDTimer(sim, 0)
 }
 
 func (target *Target) Advance(sim *Simulation, elapsedTime time.Duration) {

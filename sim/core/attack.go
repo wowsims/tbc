@@ -119,7 +119,6 @@ func (ahe *SpellEffect) IsMelee() bool {
 }
 
 type AutoAttacks struct {
-	// initialized
 	agent  Agent
 	unit   *Unit
 	MH     Weapon

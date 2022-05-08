@@ -56,9 +56,10 @@ func NewDistributionMetrics() DistributionMetrics {
 	}
 }
 
-type CharacterMetrics struct {
+type UnitMetrics struct {
 	dps    DistributionMetrics
 	threat DistributionMetrics
+	dtps   DistributionMetrics
 
 	CharacterIterationMetrics
 
@@ -129,10 +130,11 @@ func (tam *TargetedActionMetrics) ToProto() *proto.TargetedActionMetrics {
 	}
 }
 
-func NewCharacterMetrics() CharacterMetrics {
-	return CharacterMetrics{
+func NewUnitMetrics() UnitMetrics {
+	return UnitMetrics{
 		dps:       NewDistributionMetrics(),
 		threat:    NewDistributionMetrics(),
+		dtps:      NewDistributionMetrics(),
 		actions:   make(map[ActionID]*ActionMetrics),
 		resources: make(map[ResourceKey]*ResourceMetrics),
 	}
@@ -155,16 +157,16 @@ func (resourceMetrics *ResourceMetrics) ToProto(actionID ActionID, resourceType 
 	}
 }
 
-func (characterMetrics *CharacterMetrics) AddResourceEvent(actionID ActionID, resourceType proto.ResourceType, gain float64, actualGain float64) {
+func (unitMetrics *UnitMetrics) AddResourceEvent(actionID ActionID, resourceType proto.ResourceType, gain float64, actualGain float64) {
 	resourceKey := ResourceKey{
 		ActionID: actionID,
 		Type:     resourceType,
 	}
-	resourceMetrics, ok := characterMetrics.resources[resourceKey]
+	resourceMetrics, ok := unitMetrics.resources[resourceKey]
 
 	if !ok {
 		resourceMetrics = &ResourceMetrics{}
-		characterMetrics.resources[resourceKey] = resourceMetrics
+		unitMetrics.resources[resourceKey] = resourceMetrics
 	}
 
 	resourceMetrics.Events++
@@ -173,12 +175,12 @@ func (characterMetrics *CharacterMetrics) AddResourceEvent(actionID ActionID, re
 }
 
 // Adds the results of a spell to the character metrics.
-func (characterMetrics *CharacterMetrics) addSpell(spell *Spell) {
-	actionMetrics, ok := characterMetrics.actions[spell.ActionID]
+func (unitMetrics *UnitMetrics) addSpell(spell *Spell) {
+	actionMetrics, ok := unitMetrics.actions[spell.ActionID]
 
 	if !ok {
 		actionMetrics = &ActionMetrics{IsMelee: spell.SpellExtras.Matches(SpellExtrasMeleeMetrics)}
-		characterMetrics.actions[spell.ActionID] = actionMetrics
+		unitMetrics.actions[spell.ActionID] = actionMetrics
 	}
 
 	if len(actionMetrics.Targets) == 0 {
@@ -197,47 +199,53 @@ func (characterMetrics *CharacterMetrics) addSpell(spell *Spell) {
 		tam.Glances += spellTargetMetrics.Glances
 		tam.Damage += spellTargetMetrics.TotalDamage
 		tam.Threat += spellTargetMetrics.TotalThreat
-		characterMetrics.dps.Total += spellTargetMetrics.TotalDamage
-		characterMetrics.threat.Total += spellTargetMetrics.TotalThreat
+		unitMetrics.dps.Total += spellTargetMetrics.TotalDamage
+		unitMetrics.threat.Total += spellTargetMetrics.TotalThreat
+
+		target := spell.Unit.AttackTables[i].Defender
+		target.Metrics.dtps.Total += spellTargetMetrics.TotalDamage
 	}
 }
 
 // This should be called at the end of each iteration, to include metrics from Pets in
 // those of their owner.
 // Assumes that doneIteration() has already been called on the pet metrics.
-func (characterMetrics *CharacterMetrics) AddFinalPetMetrics(petMetrics *CharacterMetrics) {
-	characterMetrics.dps.Total += petMetrics.dps.Total
+func (unitMetrics *UnitMetrics) AddFinalPetMetrics(petMetrics *UnitMetrics) {
+	unitMetrics.dps.Total += petMetrics.dps.Total
 }
 
-func (characterMetrics *CharacterMetrics) MarkOOM(unit *Unit, dur time.Duration) {
-	characterMetrics.CharacterIterationMetrics.OOMTime += dur
-	characterMetrics.CharacterIterationMetrics.WentOOM = true
+func (unitMetrics *UnitMetrics) MarkOOM(unit *Unit, dur time.Duration) {
+	unitMetrics.CharacterIterationMetrics.OOMTime += dur
+	unitMetrics.CharacterIterationMetrics.WentOOM = true
 }
 
-func (characterMetrics *CharacterMetrics) reset() {
-	characterMetrics.dps.reset()
-	characterMetrics.threat.reset()
-	characterMetrics.CharacterIterationMetrics = CharacterIterationMetrics{}
+func (unitMetrics *UnitMetrics) reset() {
+	unitMetrics.dps.reset()
+	unitMetrics.threat.reset()
+	unitMetrics.dtps.reset()
+	unitMetrics.CharacterIterationMetrics = CharacterIterationMetrics{}
 }
 
 // This should be called when a Sim iteration is complete.
-func (characterMetrics *CharacterMetrics) doneIteration(encounterDurationSeconds float64) {
-	characterMetrics.dps.doneIteration(encounterDurationSeconds)
-	characterMetrics.threat.doneIteration(encounterDurationSeconds)
-	characterMetrics.oomTimeSum += float64(characterMetrics.OOMTime.Seconds())
+func (unitMetrics *UnitMetrics) doneIteration(encounterDurationSeconds float64) {
+	unitMetrics.dps.doneIteration(encounterDurationSeconds)
+	unitMetrics.threat.doneIteration(encounterDurationSeconds)
+	unitMetrics.dtps.doneIteration(encounterDurationSeconds)
+	unitMetrics.oomTimeSum += float64(unitMetrics.OOMTime.Seconds())
 }
 
-func (characterMetrics *CharacterMetrics) ToProto(numIterations int32) *proto.UnitMetrics {
+func (unitMetrics *UnitMetrics) ToProto(numIterations int32) *proto.UnitMetrics {
 	protoMetrics := &proto.UnitMetrics{
-		Dps:           characterMetrics.dps.ToProto(numIterations),
-		Threat:        characterMetrics.threat.ToProto(numIterations),
-		SecondsOomAvg: characterMetrics.oomTimeSum / float64(numIterations),
+		Dps:           unitMetrics.dps.ToProto(numIterations),
+		Threat:        unitMetrics.threat.ToProto(numIterations),
+		Dtps:          unitMetrics.dtps.ToProto(numIterations),
+		SecondsOomAvg: unitMetrics.oomTimeSum / float64(numIterations),
 	}
 
-	for actionID, action := range characterMetrics.actions {
+	for actionID, action := range unitMetrics.actions {
 		protoMetrics.Actions = append(protoMetrics.Actions, action.ToProto(actionID))
 	}
-	for rk, resource := range characterMetrics.resources {
+	for rk, resource := range unitMetrics.resources {
 		protoMetrics.Resources = append(protoMetrics.Resources, resource.ToProto(rk.ActionID, rk.Type))
 	}
 

@@ -168,6 +168,7 @@ message UnitMetrics {
 
 		DistributionMetrics dps = 1;
 		DistributionMetrics threat = 8;
+		DistributionMetrics dtps = 11;
 
     // average seconds spent oom per iteration
     double seconds_oom_avg = 3; 
