@@ -55,7 +55,7 @@ var ItemSetDesolationBattlegear = core.ItemSet{
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Activate(sim)
 				},
-				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if !spellEffect.Landed() {
 						return
 					}
@@ -93,7 +93,7 @@ var ItemSetDoomplateBattlegear = core.ItemSet{
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Activate(sim)
 				},
-				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if !spellEffect.Landed() {
 						return
 					}
@@ -164,7 +164,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Activate(sim)
 				},
-				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 						return
 					}
@@ -230,7 +230,7 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Activate(sim)
 				},
-				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if !spellEffect.Landed() {
 						return
 					}
@@ -277,7 +277,7 @@ var ItemSetWastewalkerArmor = core.ItemSet{
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Activate(sim)
 				},
-				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if !spellEffect.Landed() {
 						return
 					}

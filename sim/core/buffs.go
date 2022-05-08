@@ -328,7 +328,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 	var charges int32
 
 	wfBuffAura := character.NewTemporaryStatsAuraWrapped("Windfury Buff", buffActionID, stats.Stats{stats.AttackPower: apBonus}, time.Millisecond*1500, func(config *Aura) {
-		config.OnSpellHit = func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+		config.OnSpellHitDealt = func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			// *Special Case* Windfury should not proc on Seal of Command
 			if spell.ActionID.SpellID == 20424 {
 				return
@@ -365,7 +365,7 @@ func WindfuryTotemAura(character *Character, rank int32, iwtTalentPoints int32) 
 		OnReset: func(aura *Aura, sim *Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+		OnSpellHitDealt: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			// *Special Case* Windfury should not proc on Seal of Command
 			if spell.ActionID.SpellID == 20424 {
 				return

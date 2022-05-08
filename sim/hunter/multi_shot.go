@@ -29,7 +29,7 @@ func (hunter *Hunter) registerMultiShotSpell() {
 		}),
 		OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, hunter.Env.GetPrimaryTarget())),
 
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			hunter.rotation(sim, false)
 		},
 	}

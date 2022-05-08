@@ -43,7 +43,7 @@ func (warrior *Warrior) registerSweepingStrikesCD() {
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			aura.SetStacks(sim, 10)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if aura.GetStacks() == 0 || spellEffect.Damage == 0 || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}

@@ -41,7 +41,7 @@ func (paladin *Paladin) registerCrusaderStrikeSpell() {
 			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 1.1, true),
 			OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
 
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}

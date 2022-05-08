@@ -22,7 +22,7 @@ func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) *core.Aura {
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			target.PseudoStats.NatureDamageTakenMultiplier /= 1.2
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell.SpellSchool != core.SpellSchoolNature {
 				return
 			}
@@ -98,7 +98,7 @@ func (shaman *Shaman) registerStormstrikeSpell() {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			OutcomeApplier:   shaman.OutcomeFuncMeleeSpecialHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}

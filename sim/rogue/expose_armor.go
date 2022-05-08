@@ -34,7 +34,7 @@ func (rogue *Rogue) registerExposeArmorSpell() {
 			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			ThreatMultiplier: 1,
 			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					rogue.ExposeArmorAura.Activate(sim)
 					rogue.ApplyFinisher(sim, spell.ActionID)

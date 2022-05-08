@@ -29,7 +29,7 @@ func (warrior *Warrior) registerDemoralizingShoutSpell() {
 			warrior.DemoralizingShoutAura = demoShoutAura
 		}
 
-		effects[i].OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		effects[i].OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				demoShoutAura.Activate(sim)
 			}

@@ -34,7 +34,7 @@ func (druid *Druid) registerMoonfireSpell() {
 			ThreatMultiplier:     1,
 			BaseDamage:           core.BaseDamageConfigMagic(305, 357, 0.15),
 			OutcomeApplier:       druid.OutcomeFuncMagicHitAndCrit(druid.SpellCritMultiplier(1, 0.2*float64(druid.Talents.Vengeance))),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					druid.MoonfireDot.Apply(sim)
 				}

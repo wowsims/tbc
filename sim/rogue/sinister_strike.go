@@ -41,7 +41,7 @@ func (rogue *Rogue) registerSinisterStrikeSpell() {
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 98, 1, true),
 			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, true)),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					rogue.AddComboPoints(sim, 1, spell.ActionID)
 				} else {

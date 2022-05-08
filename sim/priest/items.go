@@ -54,7 +54,7 @@ var ItemSetAvatar = core.ItemSet{
 			priest := agent.(PriestAgent).GetPriest()
 
 			procAura := priest.NewTemporaryStatsAura("Avatar Regalia 4pc Proc", core.ActionID{SpellID: 37604}, stats.Stats{stats.SpellPower: 100}, time.Second*15)
-			procAura.OnSpellHit = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			procAura.OnSpellHitDealt = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				aura.Deactivate(sim)
 			}
 
@@ -64,7 +64,7 @@ var ItemSetAvatar = core.ItemSet{
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Activate(sim)
 				},
-				OnPeriodicDamage: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				OnPeriodicDamageDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if spell != priest.ShadowWordPain {
 						return
 					}
@@ -106,7 +106,7 @@ func ApplyAshtongueTalismanOfAcumen(agent core.Agent) {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnPeriodicDamage: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnPeriodicDamageDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell != priest.ShadowWordPain {
 				return
 			}

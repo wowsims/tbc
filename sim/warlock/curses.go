@@ -43,7 +43,7 @@ func (warlock *Warlock) registerCurseOfElementsSpell() {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
-			OnSpellHit:       applyAuraOnLanded(warlock.CurseOfElementsAura),
+			OnSpellHitDealt:  applyAuraOnLanded(warlock.CurseOfElementsAura),
 		}),
 	})
 }
@@ -75,7 +75,7 @@ func (warlock *Warlock) registerCurseOfRecklessnessSpell() {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
-			OnSpellHit:       applyAuraOnLanded(warlock.CurseOfRecklessnessAura),
+			OnSpellHitDealt:  applyAuraOnLanded(warlock.CurseOfRecklessnessAura),
 		}),
 	})
 }
@@ -110,7 +110,7 @@ func (warlock *Warlock) registerCurseOfTonguesSpell() {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
-			OnSpellHit:       applyAuraOnLanded(warlock.CurseOfTonguesAura),
+			OnSpellHitDealt:  applyAuraOnLanded(warlock.CurseOfTonguesAura),
 		}),
 	})
 }
@@ -148,7 +148,7 @@ func (warlock *Warlock) registerCurseOfAgonySpell() {
 			}
 		})
 		// Make sure a hit of this spell deactivates any active amp curse
-		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			warlock.AmplifyCurseAura.Deactivate(sim)
 		}
 	}
@@ -167,7 +167,7 @@ func (warlock *Warlock) registerCurseOfAgonySpell() {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
-			OnSpellHit:       applyDotOnLanded(&warlock.CurseOfAgonyDot),
+			OnSpellHitDealt:  applyDotOnLanded(&warlock.CurseOfAgonyDot),
 			ProcMask:         core.ProcMaskEmpty,
 		}),
 	})
@@ -213,7 +213,7 @@ func (warlock *Warlock) registerCurseOfDoomSpell() {
 			}
 		})
 		// Make sure a hit of this spell deactivates any active amp curse
-		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			warlock.AmplifyCurseAura.Deactivate(sim)
 		}
 	}
@@ -237,7 +237,7 @@ func (warlock *Warlock) registerCurseOfDoomSpell() {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
-			OnSpellHit:       applyDotOnLanded(&warlock.CurseOfDoomDot),
+			OnSpellHitDealt:  applyDotOnLanded(&warlock.CurseOfDoomDot),
 			ProcMask:         core.ProcMaskEmpty,
 		}),
 	})

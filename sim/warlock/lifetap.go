@@ -22,7 +22,7 @@ func (warlock *Warlock) registerLifeTapSpell() {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  1,
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				// Life tap adds 0.8*sp to mana restore
 				// TODO: does AddMana generate threat correctly?
 				restore := mana + (warlock.GetStat(stats.SpellPower)+warlock.GetStat(stats.ShadowSpellPower))*0.8

@@ -34,7 +34,7 @@ func (priest *Priest) registerHolyFireSpell() {
 			ThreatMultiplier:     1 - 0.04*float64(priest.Talents.SilentResolve),
 			BaseDamage:           core.BaseDamageConfigMagic(426, 537, 0.8571),
 			OutcomeApplier:       priest.OutcomeFuncMagicHitAndCrit(priest.DefaultSpellCritMultiplier()),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					priest.HolyFireDot.Apply(sim)
 				}

@@ -23,7 +23,7 @@ func (rogue *Rogue) registerHemorrhageSpell() {
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			target.PseudoStats.BonusPhysicalDamageTaken -= 42
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell.SpellSchool != core.SpellSchoolPhysical {
 				return
 			}
@@ -61,7 +61,7 @@ func (rogue *Rogue) registerHemorrhageSpell() {
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 0, 1.1+0.01*float64(rogue.Talents.SinisterCalling), true),
 			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, true)),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					rogue.AddComboPoints(sim, 1, spell.ActionID)
 

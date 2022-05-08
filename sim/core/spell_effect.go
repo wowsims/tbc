@@ -51,9 +51,9 @@ type SpellEffect struct {
 	ProcMask ProcMask
 
 	// Callbacks for providing additional custom behavior.
-	OnInit           func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
-	OnSpellHit       func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
-	OnPeriodicDamage func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
+	OnInit                func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
+	OnSpellHitDealt       func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
+	OnPeriodicDamageDealt func(sim *Simulation, spell *Spell, spellEffect *SpellEffect)
 
 	// Results
 	Outcome HitOutcome
@@ -194,17 +194,17 @@ func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell) {
 	}
 
 	if !spellEffect.IsPeriodic {
-		if spellEffect.OnSpellHit != nil {
-			spellEffect.OnSpellHit(sim, spell, spellEffect)
+		if spellEffect.OnSpellHitDealt != nil {
+			spellEffect.OnSpellHitDealt(sim, spell, spellEffect)
 		}
-		spell.Unit.OnSpellHit(sim, spell, spellEffect)
-		spellEffect.Target.OnSpellHit(sim, spell, spellEffect)
+		spell.Unit.OnSpellHitDealt(sim, spell, spellEffect)
+		spellEffect.Target.OnSpellHitTaken(sim, spell, spellEffect)
 	} else {
-		if spellEffect.OnPeriodicDamage != nil {
-			spellEffect.OnPeriodicDamage(sim, spell, spellEffect)
+		if spellEffect.OnPeriodicDamageDealt != nil {
+			spellEffect.OnPeriodicDamageDealt(sim, spell, spellEffect)
 		}
-		spell.Unit.OnPeriodicDamage(sim, spell, spellEffect)
-		spellEffect.Target.OnPeriodicDamage(sim, spell, spellEffect)
+		spell.Unit.OnPeriodicDamageDealt(sim, spell, spellEffect)
+		spellEffect.Target.OnPeriodicDamageTaken(sim, spell, spellEffect)
 	}
 }
 

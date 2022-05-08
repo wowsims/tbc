@@ -31,7 +31,7 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 
 	if debuffs.IsbUptime > 0.0 {
 		uptime := MinFloat(1.0, debuffs.IsbUptime)
-		isbAura := MakePermanent(ImprovedShadowBoltAura(target, uptime))
+		isbAura := MakePermanent(ImprovedShadowBoltAura(target, 5, uptime))
 		if uptime != 1.0 {
 			isbAura.OnDoneIteration = func(aura *Aura, _ *Simulation) {
 				aura.metrics.Uptime = time.Duration(float64(aura.metrics.Uptime) * uptime)
@@ -146,7 +146,7 @@ func JudgementOfWisdomAura(target *Target) *Aura {
 		Label:    "Judgement of Wisdom",
 		ActionID: actionID,
 		Duration: time.Second * 20,
-		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			// TODO: This check is purely to maintain behavior during refactoring. Should be removed when possible.
 			if !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) && !spellEffect.Landed() {
 				return
@@ -185,7 +185,7 @@ func JudgementOfTheCrusaderAura(target *Target, level int32, flatBonus float64, 
 			aura.Unit.PseudoStats.BonusHolyDamageTaken -= totalSP
 			aura.Unit.PseudoStats.BonusCritRating -= bonusCrit
 		},
-		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if spell.ActionID.SpellID == 35395 {
 				aura.Refresh(sim)
 			}
@@ -218,19 +218,42 @@ func CurseOfElementsAura(target *Target, points int32) *Aura {
 	})
 }
 
-func ImprovedShadowBoltAura(target *Target, uptime float64) *Aura {
-	multiplier := 1 + uptime*0.2
+// If uptime is 0, makes an aura for a real warlock. Otherwise makes a group approximation.
+func ImprovedShadowBoltAura(target *Target, points int32, uptime float64) *Aura {
+	bonus := 0.04 * float64(points)
+	multiplier := 1 + bonus
+	if uptime != 0 {
+		multiplier = 1 + bonus*uptime
+	}
 
-	return target.GetOrRegisterAura(Aura{
-		Label:    "Improved Shadow Bolt",
-		ActionID: ActionID{SpellID: 17803},
+	config := Aura{
+		Label:     "ImprovedShadowBolt-" + strconv.Itoa(int(points)),
+		Tag:       "ImprovedShadowBolt",
+		ActionID:  ActionID{SpellID: 17803},
+		Duration:  time.Second * 12,
+		Priority:  float64(points),
+		MaxStacks: 4,
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.ShadowDamageTakenMultiplier *= multiplier
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.ShadowDamageTakenMultiplier /= multiplier
 		},
-	})
+	}
+
+	if uptime == 0 {
+		config.OnSpellHitTaken = func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if spell.SpellSchool != SpellSchoolShadow {
+				return
+			}
+			if !spellEffect.Landed() || spellEffect.Damage == 0 || spellEffect.IsPhantom || spellEffect.ProcMask == 0 {
+				return
+			}
+			aura.RemoveStack(sim)
+		}
+	}
+
+	return target.GetOrRegisterAura(config)
 }
 
 var BloodFrenzyActionID = ActionID{SpellID: 29859}
@@ -480,7 +503,7 @@ func HuntersMarkAura(target *Target, points int32, fullyStacked bool) *Aura {
 		OnStacksChange: func(aura *Aura, sim *Simulation, oldStacks int32, newStacks int32) {
 			aura.Unit.PseudoStats.BonusRangedAttackPower += bonusPerStack * float64(newStacks-oldStacks)
 		},
-		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if spellEffect.ProcMask.Matches(ProcMaskRanged) && spellEffect.Landed() {
 				aura.AddStack(sim)
 			}

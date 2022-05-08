@@ -25,9 +25,9 @@ func (warlock *Warlock) registerUnstableAffSpell() {
 			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:       core.ProcMaskEmpty,
-			OutcomeApplier: warlock.OutcomeFuncMagicHit(),
-			OnSpellHit:     applyDotOnLanded(&warlock.UnstableAffDot),
+			ProcMask:        core.ProcMaskEmpty,
+			OutcomeApplier:  warlock.OutcomeFuncMagicHit(),
+			OnSpellHitDealt: applyDotOnLanded(&warlock.UnstableAffDot),
 		}),
 	})
 
