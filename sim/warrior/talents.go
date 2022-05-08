@@ -343,7 +343,7 @@ func (warrior *Warrior) registerDeathWishCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
 			deathWishAura.Activate(sim)
 		},
 	})

@@ -71,7 +71,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			paladin.UpdateSeal(sim, paladin.SealOfBloodAura)
 		},
 	})
@@ -146,7 +146,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			paladin.UpdateSeal(sim, paladin.SealOfCommandAura)
 		},
 	})
@@ -196,7 +196,7 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			paladin.UpdateSeal(sim, paladin.SealOfTheCrusaderAura)
 		},
 	})
@@ -229,7 +229,7 @@ func (paladin *Paladin) setupSealOfWisdom() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			paladin.UpdateSeal(sim, paladin.SealOfWisdomAura)
 		},
 	})

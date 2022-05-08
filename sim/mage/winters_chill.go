@@ -14,9 +14,9 @@ func (mage *Mage) registerWintersChillSpell() {
 	}
 
 	if mage.Talents.WintersChill > 0 {
-		wcAura := mage.Env.GetPrimaryTarget().GetAura(core.WintersChillAuraLabel)
+		wcAura := mage.CurrentTarget.GetAura(core.WintersChillAuraLabel)
 		if wcAura == nil {
-			wcAura = core.WintersChillAura(mage.Env.GetPrimaryTarget(), 0)
+			wcAura = core.WintersChillAura(mage.CurrentTarget, 0)
 		}
 
 		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {

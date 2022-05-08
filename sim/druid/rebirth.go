@@ -27,7 +27,7 @@ func (druid *Druid) registerRebirthSpell() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			druid.RebirthUsed = true
 		},
 	})

@@ -45,7 +45,7 @@ func (hunter *Hunter) registerSteadyShotSpell() {
 				},
 				TargetSpellCoefficient: 1,
 			}),
-			OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, hunter.Env.GetPrimaryTarget())),
+			OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, hunter.CurrentTarget)),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				hunter.killCommandBlocked = false

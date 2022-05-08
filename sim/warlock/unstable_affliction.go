@@ -31,7 +31,7 @@ func (warlock *Warlock) registerUnstableAffSpell() {
 		}),
 	})
 
-	target := warlock.Env.GetPrimaryTarget()
+	target := warlock.CurrentTarget
 	spellCoefficient := 0.2
 	warlock.UnstableAffDot = core.NewDot(core.Dot{
 		Spell: warlock.UnstableAff,

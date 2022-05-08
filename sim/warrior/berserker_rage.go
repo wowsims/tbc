@@ -24,7 +24,7 @@ func (warrior *Warrior) registerBerserkerRageSpell() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			warrior.AddRage(sim, rageBonus, actionID)
 		},
 	})

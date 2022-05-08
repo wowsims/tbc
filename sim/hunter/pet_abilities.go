@@ -29,7 +29,7 @@ type PetAbility struct {
 }
 
 // Returns whether the ability was successfully cast.
-func (ability *PetAbility) TryCast(sim *core.Simulation, target *core.Target, hp *HunterPet) bool {
+func (ability *PetAbility) TryCast(sim *core.Simulation, target *core.Unit, hp *HunterPet) bool {
 	if hp.currentFocus < ability.Cost {
 		return false
 	}

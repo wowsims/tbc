@@ -49,7 +49,7 @@ func (priest *Priest) registerShadowfiendSpell() {
 	})
 
 	// TODO: not sure if it matters but sfiend technically does melee attacks not periodic dot dmg.
-	target := priest.Env.GetPrimaryTarget()
+	target := priest.CurrentTarget
 	priest.ShadowfiendDot = core.NewDot(core.Dot{
 		Spell: priest.Shadowfiend,
 		Aura: target.RegisterAura(core.Aura{

@@ -11,7 +11,7 @@ func (rogue *Rogue) registerExposeArmorSpell() {
 	baseCost := 25.0
 	refundAmount := 0.4 * float64(rogue.Talents.QuickRecovery)
 
-	rogue.ExposeArmorAura = core.ExposeArmorAura(rogue.Env.GetPrimaryTarget(), rogue.Talents.ImprovedExposeArmor)
+	rogue.ExposeArmorAura = core.ExposeArmorAura(rogue.CurrentTarget, rogue.Talents.ImprovedExposeArmor)
 
 	rogue.ExposeArmor = rogue.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 26866, Tag: 5},
@@ -51,6 +51,6 @@ func (rogue *Rogue) registerExposeArmorSpell() {
 	})
 }
 
-func (rogue *Rogue) MaintainingExpose(target *core.Target) bool {
+func (rogue *Rogue) MaintainingExpose(target *core.Unit) bool {
 	return !rogue.doneEA && (rogue.Talents.ImprovedExposeArmor == 2 || !target.HasActiveAura(core.SunderArmorAuraLabel))
 }

@@ -34,7 +34,7 @@ func (warrior *Warrior) makeStanceSpell(stance Stance, aura *core.Aura, stanceCD
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			if warrior.Stance == stance {
 				panic("Already in stance " + string(stance))
 			}

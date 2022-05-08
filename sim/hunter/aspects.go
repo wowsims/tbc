@@ -54,7 +54,7 @@ func (hunter *Hunter) registerAspectOfTheHawkSpell() {
 			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			hunter.AspectOfTheHawkAura.Activate(sim)
 		},
 	})
@@ -84,7 +84,7 @@ func (hunter *Hunter) registerAspectOfTheViperSpell() {
 			IgnoreHaste: true, // Hunter GCD is locked at 1.5s
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			hunter.AspectOfTheViperAura.Activate(sim)
 		},
 	})

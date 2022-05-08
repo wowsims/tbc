@@ -14,7 +14,7 @@ func (warlock *Warlock) registerCurseOfElementsSpell() {
 		return
 	}
 	baseCost := 145.0
-	auras := warlock.Env.GetPrimaryTarget().GetAurasWithTag("Curse of Elements")
+	auras := warlock.CurrentTarget.GetAurasWithTag("Curse of Elements")
 	for _, aura := range auras {
 		if int32(aura.Priority) >= warlock.Talents.Malediction {
 			// Someone else with at least as good of curse is already doing it... lets not.
@@ -22,7 +22,7 @@ func (warlock *Warlock) registerCurseOfElementsSpell() {
 			return
 		}
 	}
-	warlock.CurseOfElementsAura = core.CurseOfElementsAura(warlock.Env.GetPrimaryTarget(), warlock.Talents.Malediction)
+	warlock.CurseOfElementsAura = core.CurseOfElementsAura(warlock.CurrentTarget, warlock.Talents.Malediction)
 	warlock.CurseOfElementsAura.Duration = time.Minute * 5
 
 	warlock.CurseOfElements = warlock.RegisterSpell(core.SpellConfig{
@@ -48,7 +48,7 @@ func (warlock *Warlock) registerCurseOfElementsSpell() {
 	})
 }
 
-func (warlock *Warlock) ShouldCastCurseOfElements(sim *core.Simulation, target *core.Target, curse proto.Warlock_Rotation_Curse) bool {
+func (warlock *Warlock) ShouldCastCurseOfElements(sim *core.Simulation, target *core.Unit, curse proto.Warlock_Rotation_Curse) bool {
 	return curse == proto.Warlock_Rotation_Elements && !warlock.CurseOfElementsAura.IsActive()
 }
 
@@ -57,7 +57,7 @@ func (warlock *Warlock) registerCurseOfRecklessnessSpell() {
 		return
 	}
 	baseCost := 160.0
-	warlock.CurseOfRecklessnessAura = core.CurseOfRecklessnessAura(warlock.Env.GetPrimaryTarget())
+	warlock.CurseOfRecklessnessAura = core.CurseOfRecklessnessAura(warlock.CurrentTarget)
 	warlock.CurseOfRecklessnessAura.Duration = time.Minute * 2
 
 	warlock.CurseOfRecklessness = warlock.RegisterSpell(core.SpellConfig{
@@ -89,7 +89,7 @@ func (warlock *Warlock) registerCurseOfTonguesSpell() {
 	baseCost := 110.0
 
 	// Empty aura so we can simulate cost/time to keep tongues up
-	warlock.CurseOfTonguesAura = warlock.Env.GetPrimaryTarget().GetOrRegisterAura(core.Aura{
+	warlock.CurseOfTonguesAura = warlock.CurrentTarget.GetOrRegisterAura(core.Aura{
 		Label:    "Curse of Tongues",
 		ActionID: actionID,
 		Duration: time.Second * 30,
@@ -122,7 +122,7 @@ func (warlock *Warlock) registerCurseOfAgonySpell() {
 	}
 	actionID := core.ActionID{SpellID: 27218}
 	baseCost := 265.0
-	target := warlock.Env.GetPrimaryTarget()
+	target := warlock.CurrentTarget
 	baseDmg := 1356.0 / 12.0
 	baseDmg *= (1 + 0.02*float64(warlock.Talents.ImprovedCurseOfAgony))
 
@@ -190,7 +190,7 @@ func (warlock *Warlock) registerCurseOfDoomSpell() {
 	actionID := core.ActionID{SpellID: 30910}
 	baseCost := 380.0
 
-	target := warlock.Env.GetPrimaryTarget()
+	target := warlock.CurrentTarget
 	effect := core.SpellEffect{
 		DamageMultiplier: 1 *
 			(1 + 0.02*float64(warlock.Talents.ShadowMastery)) *

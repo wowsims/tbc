@@ -129,7 +129,7 @@ func (warrior *Warrior) Initialize() {
 
 	warrior.BloodFrenzyAuras = nil
 	for i := int32(0); i < warrior.Env.GetNumTargets(); i++ {
-		target := warrior.Env.GetTarget(i)
+		target := warrior.Env.GetTargetUnit(i)
 		warrior.BloodFrenzyAuras = append(warrior.BloodFrenzyAuras, core.BloodFrenzyAura(target, warrior.Talents.BloodFrenzy))
 	}
 

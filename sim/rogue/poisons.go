@@ -41,7 +41,7 @@ func (rogue *Rogue) registerDeadlyPoisonSpell() {
 		}),
 	})
 
-	target := rogue.Env.GetPrimaryTarget()
+	target := rogue.CurrentTarget
 	dotAura := target.RegisterAura(core.Aura{
 		Label:     "DeadlyPoison-" + strconv.Itoa(int(rogue.Index)),
 		ActionID:  actionID,

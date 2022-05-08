@@ -62,7 +62,7 @@ func (warrior *Warrior) registerOverpowerSpell(cdTimer *core.Timer) {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, target *core.Target, spell *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, target *core.Unit, spell *core.Spell) {
 			warrior.overpowerValidUntil = 0
 			damageEffect(sim, target, spell)
 		},

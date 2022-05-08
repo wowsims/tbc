@@ -11,7 +11,7 @@ import (
 func (rogue *Rogue) registerHemorrhageSpell() {
 	actionID := core.ActionID{SpellID: 26864}
 
-	target := rogue.Env.GetPrimaryTarget()
+	target := rogue.CurrentTarget
 	hemoAura := target.GetOrRegisterAura(core.Aura{
 		Label:     "Hemorrhage",
 		ActionID:  actionID,

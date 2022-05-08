@@ -213,7 +213,7 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 		2: func(agent core.Agent) {
 			character := agent.GetCharacter()
 
-			if character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon {
+			if character.CurrentTarget.MobType == proto.MobType_MobTypeDemon {
 				character.PseudoStats.MobTypeAttackPower += 200
 			}
 			procAura := character.NewTemporaryStatsAura("Twin Blade of Azzinoth Proc", core.ActionID{SpellID: 41435}, stats.Stats{stats.MeleeHaste: 450}, time.Second*10)

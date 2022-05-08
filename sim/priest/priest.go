@@ -94,10 +94,10 @@ func (priest *Priest) Initialize() {
 	}
 
 	if priest.Talents.Misery > 0 {
-		priest.MiseryAura = core.MiseryAura(priest.Env.GetPrimaryTarget(), priest.Talents.Misery)
+		priest.MiseryAura = core.MiseryAura(priest.CurrentTarget, priest.Talents.Misery)
 	}
 	if priest.Talents.ShadowWeaving > 0 {
-		priest.ShadowWeavingAura = core.ShadowWeavingAura(priest.Env.GetPrimaryTarget(), 0)
+		priest.ShadowWeavingAura = core.ShadowWeavingAura(priest.CurrentTarget, 0)
 	}
 }
 

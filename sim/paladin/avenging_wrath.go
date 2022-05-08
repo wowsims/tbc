@@ -40,7 +40,7 @@ func (paladin *Paladin) registerAvengingWrathCD() {
 				Duration: time.Minute * 3,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			aura.Activate(sim)
 		},
 	})

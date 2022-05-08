@@ -42,7 +42,7 @@ func (druid *Druid) registerMoonfireSpell() {
 		}),
 	})
 
-	target := druid.Env.GetPrimaryTarget()
+	target := druid.CurrentTarget
 	druid.MoonfireDot = core.NewDot(core.Dot{
 		Spell: druid.Moonfire,
 		Aura: target.RegisterAura(core.Aura{
@@ -61,6 +61,6 @@ func (druid *Druid) registerMoonfireSpell() {
 	})
 }
 
-func (druid *Druid) ShouldCastMoonfire(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
+func (druid *Druid) ShouldCastMoonfire(sim *core.Simulation, target *core.Unit, rotation proto.BalanceDruid_Rotation) bool {
 	return rotation.Moonfire && !druid.MoonfireDot.IsActive()
 }

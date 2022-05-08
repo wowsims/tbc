@@ -61,7 +61,7 @@ func (spriest *SmitePriest) tryUseGCD(sim *core.Simulation) {
 		spell = spriest.Smite
 	}
 
-	if success := spell.Cast(sim, sim.GetPrimaryTarget()); !success {
+	if success := spell.Cast(sim, spriest.CurrentTarget); !success {
 		spriest.WaitForMana(sim, spell.CurCast.Cost)
 	}
 }

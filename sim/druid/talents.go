@@ -172,7 +172,7 @@ func (druid *Druid) registerNaturesSwiftnessCD() {
 				Duration: time.Minute * 3,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			druid.NaturesSwiftnessAura.Activate(sim)
 		},
 	})

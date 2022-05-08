@@ -49,7 +49,7 @@ func (mage *Mage) registerManaGemsCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			if remainingManaGems == 1 {
 				// Mana Ruby: Restores 1073 to 1127 mana. (2 Min Cooldown)
 				manaGain := minManaRubyGain + (sim.RandomFloat("Mana Gem") * manaRubyGainRange)

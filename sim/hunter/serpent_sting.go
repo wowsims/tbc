@@ -38,7 +38,7 @@ func (hunter *Hunter) registerSerpentStingSpell() {
 		}),
 	})
 
-	target := hunter.Env.GetPrimaryTarget()
+	target := hunter.CurrentTarget
 	hunter.SerpentStingDot = core.NewDot(core.Dot{
 		Spell: hunter.SerpentSting,
 		Aura: target.RegisterAura(core.Aura{

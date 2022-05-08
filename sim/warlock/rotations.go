@@ -20,7 +20,7 @@ func (warlock *Warlock) OnManaTick(sim *core.Simulation) {
 
 func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 	var spell *core.Spell
-	var target = sim.GetPrimaryTarget()
+	var target = warlock.CurrentTarget
 
 	// If doing seed, that is the priority spell.
 	mainSpell := warlock.Rotation.PrimarySpell
@@ -63,7 +63,7 @@ func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 		castCurse(warlock.CurseOfTongues, warlock.CurseOfTonguesAura)
 	case proto.Warlock_Rotation_Doom:
 		if warlock.Talents.AmplifyCurse && warlock.AmplifyCurse.CD.IsReady(sim) {
-			warlock.AmplifyCurse.Cast(sim, sim.GetPrimaryTarget())
+			warlock.AmplifyCurse.Cast(sim, warlock.CurrentTarget)
 		}
 		if sim.Duration-sim.CurrentTime < time.Minute {
 			// Can't cast agony until we are at end and both agony and doom are not ticking.

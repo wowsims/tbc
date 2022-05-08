@@ -30,7 +30,7 @@ func (shaman *Shaman) newTotemSpellConfig(baseCost float64, spellID int32) core.
 
 func (shaman *Shaman) registerWrathOfAirTotemSpell() {
 	config := shaman.newTotemSpellConfig(320.0, 3738)
-	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistWindfury(sim)
 	}
@@ -39,7 +39,7 @@ func (shaman *Shaman) registerWrathOfAirTotemSpell() {
 
 func (shaman *Shaman) registerGraceOfAirTotemSpell() {
 	config := shaman.newTotemSpellConfig(310.0, 25359)
-	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistWindfury(sim)
 	}
@@ -49,7 +49,7 @@ func (shaman *Shaman) registerGraceOfAirTotemSpell() {
 func (shaman *Shaman) registerTranquilAirTotemSpell() {
 	baseCost := shaman.BaseMana() * 0.06
 	config := shaman.newTotemSpellConfig(baseCost, 25908)
-	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistWindfury(sim)
 	}
@@ -74,7 +74,7 @@ func (shaman *Shaman) registerWindfuryTotemSpell(rank int32) {
 	baseCost := windfuryTotemBaseManaCosts[rank-1]
 	spellID := core.WindfuryTotemSpellRanks[rank-1]
 	config := shaman.newTotemSpellConfig(baseCost, spellID)
-	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 		shaman.NextTotemDrops[AirTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistWindfury(sim)
 	}
@@ -122,7 +122,7 @@ func (shaman *Shaman) tryTwistFireNova(sim *core.Simulation) {
 
 func (shaman *Shaman) registerManaSpringTotemSpell() {
 	config := shaman.newTotemSpellConfig(120, 25570)
-	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 		shaman.NextTotemDrops[WaterTotem] = sim.CurrentTime + time.Second*120
 	}
 	shaman.ManaSpringTotem = shaman.RegisterSpell(config)
@@ -131,7 +131,7 @@ func (shaman *Shaman) registerManaSpringTotemSpell() {
 func (shaman *Shaman) registerTotemOfWrathSpell() {
 	baseCost := shaman.BaseMana() * 0.05
 	config := shaman.newTotemSpellConfig(baseCost, 30706)
-	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 		shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*120
 		shaman.tryTwistFireNova(sim)
 	}
@@ -140,7 +140,7 @@ func (shaman *Shaman) registerTotemOfWrathSpell() {
 
 func (shaman *Shaman) registerStrengthOfEarthTotemSpell() {
 	config := shaman.newTotemSpellConfig(300, 25528)
-	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 		shaman.NextTotemDrops[EarthTotem] = sim.CurrentTime + time.Second*120
 	}
 	shaman.StrengthOfEarthTotem = shaman.RegisterSpell(config)
@@ -148,7 +148,7 @@ func (shaman *Shaman) registerStrengthOfEarthTotemSpell() {
 
 func (shaman *Shaman) registerTremorTotemSpell() {
 	config := shaman.newTotemSpellConfig(60, 8143)
-	config.ApplyEffects = func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+	config.ApplyEffects = func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 		shaman.NextTotemDrops[EarthTotem] = sim.CurrentTime + time.Second*120
 	}
 	shaman.TremorTotem = shaman.RegisterSpell(config)
@@ -217,7 +217,7 @@ func (shaman *Shaman) TryDropTotems(sim *core.Simulation) bool {
 	}
 
 	if spell != nil {
-		if success := spell.Cast(sim, sim.GetPrimaryTarget()); !success {
+		if success := spell.Cast(sim, shaman.CurrentTarget); !success {
 			shaman.WaitForMana(sim, spell.CurCast.Cost)
 		}
 		return true

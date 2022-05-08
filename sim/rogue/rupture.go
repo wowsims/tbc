@@ -68,7 +68,7 @@ func (rogue *Rogue) registerRupture() {
 		rogue.makeRupture(5),
 	}
 
-	target := rogue.Env.GetPrimaryTarget()
+	target := rogue.CurrentTarget
 	rogue.RuptureDot = core.NewDot(core.Dot{
 		Spell: rogue.Rupture[0],
 		Aura: target.RegisterAura(core.Aura{

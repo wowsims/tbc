@@ -94,7 +94,7 @@ func (shaman *Shaman) registerFlameShockSpell(shockTimer *core.Timer) {
 	config.ApplyEffects = core.ApplyEffectFuncDirectDamage(effect)
 	shaman.FlameShock = shaman.RegisterSpell(config)
 
-	target := shaman.Env.GetPrimaryTarget()
+	target := shaman.CurrentTarget
 	shaman.FlameShockDot = core.NewDot(core.Dot{
 		Spell: shaman.FlameShock,
 		Aura: target.RegisterAura(core.Aura{

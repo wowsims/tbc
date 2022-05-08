@@ -40,7 +40,7 @@ func (priest *Priest) registerVampiricTouchSpell() {
 		}),
 	})
 
-	target := priest.Env.GetPrimaryTarget()
+	target := priest.CurrentTarget
 	priest.VampiricTouchDot = core.NewDot(core.Dot{
 		Spell: priest.VampiricTouch,
 		Aura: target.RegisterAura(core.Aura{

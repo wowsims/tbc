@@ -95,7 +95,7 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	target.PseudoStats.InFrontOfTarget = true
 
 	if options.Debuffs != nil {
-		applyDebuffEffects(target, *options.Debuffs)
+		applyDebuffEffects(&target.Unit, *options.Debuffs)
 	}
 
 	return target
@@ -144,12 +144,12 @@ func (target *Target) doneIteration(sim *Simulation) {
 	target.Unit.doneIteration(sim)
 }
 
-func (target *Target) NextTarget(sim *Simulation) *Target {
+func (target *Target) NextTarget() *Target {
 	nextIndex := target.Index + 1
-	if nextIndex >= sim.GetNumTargets() {
+	if nextIndex >= target.Env.GetNumTargets() {
 		nextIndex = 0
 	}
-	return sim.GetTarget(nextIndex)
+	return target.Env.GetTarget(nextIndex)
 }
 
 func (target *Target) GetMetricsProto(numIterations int32) *proto.UnitMetrics {

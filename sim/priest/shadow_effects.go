@@ -4,13 +4,13 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-func (priest *Priest) ApplyMisery(sim *core.Simulation, target *core.Target) {
+func (priest *Priest) ApplyMisery(sim *core.Simulation, target *core.Unit) {
 	if priest.MiseryAura != nil {
 		priest.MiseryAura.Activate(sim)
 	}
 }
 
-func (priest *Priest) ApplyShadowWeaving(sim *core.Simulation, target *core.Target) {
+func (priest *Priest) ApplyShadowWeaving(sim *core.Simulation, target *core.Unit) {
 	if priest.ShadowWeavingAura == nil {
 		return
 	}

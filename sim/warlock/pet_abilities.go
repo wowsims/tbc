@@ -18,7 +18,7 @@ const (
 )
 
 // Returns whether the ability was successfully cast.
-func (wp *WarlockPet) TryCast(sim *core.Simulation, target *core.Target, spell *core.Spell) bool {
+func (wp *WarlockPet) TryCast(sim *core.Simulation, target *core.Unit, spell *core.Spell) bool {
 	if wp.CurrentMana() < spell.DefaultCast.Cost {
 		return false
 	}
