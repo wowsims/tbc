@@ -126,6 +126,7 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 					curseOfElements: TristateEffect.TristateEffectRegular,
 					faerieFire: TristateEffect.TristateEffectImproved,
 					sunderArmor: true,
+					isbUptime: 0.65,
 				}),
 			},
 

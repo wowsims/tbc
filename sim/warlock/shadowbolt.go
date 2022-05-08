@@ -11,13 +11,12 @@ func (warlock *Warlock) registerShadowboltSpell() {
 	has4pMal := ItemSetMaleficRaiment.CharacterHasSetBonus(&warlock.Character, 4)
 
 	effect := core.SpellEffect{
-		ProcMask: core.ProcMaskSpellDamage,
-		BonusSpellCritRating: float64(warlock.Talents.Devastation)*1*core.SpellCritRatingPerCritChance +
-			float64(warlock.Talents.Backlash)*1*core.SpellCritRatingPerCritChance,
-		DamageMultiplier: 1 * core.TernaryFloat64(has4pMal, 1.06, 1.0) * (1 + 0.02*float64(warlock.Talents.ShadowMastery)),
-		ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.DestructiveReach),
-		BaseDamage:       core.BaseDamageConfigMagic(544.0, 607.0, 0.857+0.04*float64(warlock.Talents.ShadowAndFlame)),
-		OutcomeApplier:   warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
+		ProcMask:             core.ProcMaskSpellDamage,
+		BonusSpellCritRating: float64(warlock.Talents.Devastation) * 1 * core.SpellCritRatingPerCritChance,
+		DamageMultiplier:     1 * core.TernaryFloat64(has4pMal, 1.06, 1.0) * (1 + 0.02*float64(warlock.Talents.ShadowMastery)),
+		ThreatMultiplier:     1 - 0.05*float64(warlock.Talents.DestructiveReach),
+		BaseDamage:           core.BaseDamageConfigMagic(544.0, 607.0, 0.857+0.04*float64(warlock.Talents.ShadowAndFlame)),
+		OutcomeApplier:       warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
 	}
 	// Don't add ISB debuff aura if the target is initialized with the 'estimated ISB uptime' debuff.
 	if warlock.Talents.ImprovedShadowBolt > 0 && (!warlock.Env.Encounter.Targets[0].HasAura("Improved Shadow Bolt") || warlock.Env.Encounter.Targets[0].GetAura("Improved Shadow Bolt").MaxStacks != 0) {
