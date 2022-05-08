@@ -182,3 +182,19 @@ export declare const InFrontOfTarget: {
         setValue: (eventID: EventID, player: Player<any>, newValue: boolean) => void;
     };
 };
+export declare const TankAssignment: {
+    type: "enum";
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        extraCssClasses: string[];
+        label: string;
+        labelTooltip: string;
+        values: {
+            name: string;
+            value: number;
+        }[];
+        changedEvent: (player: Player<any>) => TypedEvent<void>;
+        getValue: (player: Player<any>) => number;
+        setValue: (eventID: EventID, player: Player<any>, newValue: number) => void;
+    };
+};

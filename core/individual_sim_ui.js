@@ -653,9 +653,17 @@ export class IndividualSimUI extends SimUI {
             this.player.getRaid().setBuffs(eventID, this.individualConfig.defaults.raidBuffs);
             this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
             this.player.setInFrontOfTarget(eventID, tankSpec);
-            this.sim.encounter.applyDefaults(eventID);
-            this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
-            this.sim.applyDefaults(eventID, tankSpec);
+            if (!this.isWithinRaidSim) {
+                this.sim.encounter.applyDefaults(eventID);
+                this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
+                this.sim.applyDefaults(eventID, tankSpec);
+                if (tankSpec) {
+                    this.sim.raid.setTanks(eventID, [this.player.makeRaidTarget()]);
+                }
+                else {
+                    this.sim.raid.setTanks(eventID, []);
+                }
+            }
         });
     }
     registerExclusiveEffect(effect) {
