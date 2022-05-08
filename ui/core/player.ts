@@ -8,6 +8,7 @@ import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { ItemSlot } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race, ShattrathFaction } from '/tbc/core/proto/common.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
 import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -35,11 +36,13 @@ import {
 	canEquipEnchant,
 	canEquipItem,
 	classColors,
+	emptyRaidTarget,
 	getEligibleEnchantSlots,
 	getEligibleItemSlots,
 	getTalentTree,
 	getTalentTreeIcon,
 	getMetaGemEffectEP,
+	newRaidTarget,
 	raceToFaction,
 	specEPTransforms,
 	specToClass,
@@ -591,6 +594,14 @@ export class Player<SpecType extends Spec> {
 		parts.push('pcs=' + this.gear.asArray().filter(ei => ei != null).map(ei => ei!.item.id).join(':'));
 
 		elem.setAttribute('data-wowhead', parts.join('&'));
+	}
+
+	makeRaidTarget(): RaidTarget {
+		if (this.party == null) {
+			return emptyRaidTarget();
+		} else {
+			return newRaidTarget(this.getRaidIndex());
+		}
 	}
 
 	toProto(forExport?: boolean): PlayerProto {

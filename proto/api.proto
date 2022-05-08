@@ -63,6 +63,9 @@ message Raid {
 
 		RaidBuffs buffs = 2;
 
+		// Players who will be tanking mobs.
+		repeated RaidTarget tanks = 4;
+
 		// Staggers Stormstrike casts across Enhance Shaman to maximize charge usage.
 		bool stagger_stormstrikes = 3;
 }

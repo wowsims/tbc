@@ -462,8 +462,9 @@ message Target {
 		MobType mob_type = 3;
     repeated double stats = 5;
 
-		// The raid player tanking this mob.
-    RaidTarget target = 6;
+		// Index in Raid.tanks indicating the player tanking this mob.
+		// -1 or invalid index indicates not being tanked.
+    int32 tank_index = 6;
 
 		Debuffs debuffs = 2;
 }
