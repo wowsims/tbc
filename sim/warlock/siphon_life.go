@@ -31,7 +31,7 @@ func (warlock *Warlock) registerSiphonLifeSpell() {
 		}),
 	})
 
-	target := warlock.Env.GetPrimaryTarget()
+	target := warlock.CurrentTarget
 	spellCoefficient := 0.1
 	warlock.SiphonLifeDot = core.NewDot(core.Dot{
 		Spell: warlock.SiphonLife,

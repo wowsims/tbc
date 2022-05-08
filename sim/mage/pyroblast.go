@@ -54,7 +54,7 @@ func (mage *Mage) registerPyroblastSpell() {
 		}),
 	})
 
-	target := mage.Env.GetPrimaryTarget()
+	target := mage.CurrentTarget
 	mage.PyroblastDot = core.NewDot(core.Dot{
 		Spell: mage.Pyroblast,
 		Aura: target.RegisterAura(core.Aura{

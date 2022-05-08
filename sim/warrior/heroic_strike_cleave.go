@@ -62,7 +62,7 @@ func (warrior *Warrior) registerCleaveSpell() {
 	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
-		effects[i].Target = warrior.Env.GetTarget(i)
+		effects[i].Target = warrior.Env.GetTargetUnit(i)
 	}
 
 	warrior.HeroicStrikeOrCleave = warrior.RegisterSpell(core.SpellConfig{

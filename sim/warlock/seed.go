@@ -51,7 +51,7 @@ func (warlock *Warlock) makeSeed(targetIdx int, cap float64) {
 		if skipped {
 			expTarget++
 		}
-		baseEffects[i].Target = warlock.Env.GetTarget(int32(expTarget))
+		baseEffects[i].Target = warlock.Env.GetTargetUnit(int32(expTarget))
 	}
 	seedActionID := core.ActionID{SpellID: 27243}
 
@@ -92,7 +92,7 @@ func (warlock *Warlock) makeSeed(targetIdx int, cap float64) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 
-	target := warlock.Env.GetTarget(int32(targetIdx))
+	target := warlock.Env.GetTargetUnit(int32(targetIdx))
 
 	seedDmgTracker := 0.0
 	trySeedPop := func(sim *core.Simulation, dmg float64) {

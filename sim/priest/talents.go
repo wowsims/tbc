@@ -166,7 +166,7 @@ func (priest *Priest) registerInnerFocus() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			priest.InnerFocusAura.Activate(sim)
 		},
 	})

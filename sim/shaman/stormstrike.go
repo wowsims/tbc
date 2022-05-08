@@ -10,7 +10,7 @@ import (
 
 var StormstrikeActionID = core.ActionID{SpellID: 17364}
 
-func (shaman *Shaman) stormstrikeDebuffAura(target *core.Target) *core.Aura {
+func (shaman *Shaman) stormstrikeDebuffAura(target *core.Unit) *core.Aura {
 	return target.GetOrRegisterAura(core.Aura{
 		Label:     "Stormstrike",
 		ActionID:  StormstrikeActionID,
@@ -68,7 +68,7 @@ func (shaman *Shaman) registerStormstrikeSpell() {
 		baseCost -= 22
 	}
 
-	ssDebuffAura := shaman.stormstrikeDebuffAura(shaman.Env.GetPrimaryTarget())
+	ssDebuffAura := shaman.stormstrikeDebuffAura(shaman.CurrentTarget)
 
 	var skyshatterAura *core.Aura
 	if ItemSetSkyshatterHarness.CharacterHasSetBonus(&shaman.Character, 4) {

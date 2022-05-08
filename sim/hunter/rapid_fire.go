@@ -39,7 +39,7 @@ func (hunter *Hunter) registerRapidFireCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			rfAura.Activate(sim)
 		},
 	})

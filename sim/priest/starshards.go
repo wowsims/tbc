@@ -35,7 +35,7 @@ func (priest *Priest) registerStarshardsSpell() {
 		}),
 	})
 
-	target := priest.Env.GetPrimaryTarget()
+	target := priest.CurrentTarget
 	priest.StarshardsDot = core.NewDot(core.Dot{
 		Spell: priest.Starshards,
 		Aura: target.RegisterAura(core.Aura{

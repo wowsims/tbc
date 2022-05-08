@@ -42,7 +42,7 @@ func (priest *Priest) registerHolyFireSpell() {
 		}),
 	})
 
-	target := priest.Env.GetPrimaryTarget()
+	target := priest.CurrentTarget
 	priest.HolyFireDot = core.NewDot(core.Dot{
 		Spell: priest.HolyFire,
 		Aura: target.RegisterAura(core.Aura{

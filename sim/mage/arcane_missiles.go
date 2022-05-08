@@ -56,7 +56,7 @@ func (mage *Mage) registerArcaneMissilesSpell() {
 		}),
 	})
 
-	target := mage.Env.GetPrimaryTarget()
+	target := mage.CurrentTarget
 	mage.ArcaneMissilesDot = core.NewDot(core.Dot{
 		Spell: mage.ArcaneMissiles,
 		Aura: target.RegisterAura(core.Aura{

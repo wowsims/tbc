@@ -202,7 +202,7 @@ func (mcdm *majorCooldownManager) finalize(character *Character) {
 //
 // This function should be called from Agent.Init().
 func (mcdm *majorCooldownManager) DelayDPSCooldownsForArmorDebuffs() {
-	if !mcdm.character.Env.GetPrimaryTarget().HasAuraWithTag(SunderExposeAuraTag) {
+	if !mcdm.character.CurrentTarget.HasAuraWithTag(SunderExposeAuraTag) {
 		return
 	}
 
@@ -251,7 +251,7 @@ func (mcdm *majorCooldownManager) AddMajorCooldown(mcd MajorCooldown) {
 	if mcd.ActivationFactory == nil {
 		mcd.ActivationFactory = func(sim *Simulation) CooldownActivation {
 			return func(sim *Simulation, character *Character) {
-				spell.Cast(sim, sim.GetPrimaryTarget())
+				spell.Cast(sim, character.CurrentTarget)
 			}
 		}
 	}
@@ -381,7 +381,7 @@ func RegisterTemporaryStatsOnUseCD(character *Character, auraLabel string, tempS
 	aura := character.NewTemporaryStatsAura(auraLabel, config.ActionID, tempStats, duration)
 
 	config.SpellExtras |= SpellExtrasNoOnCastComplete
-	config.ApplyEffects = func(sim *Simulation, _ *Target, _ *Spell) {
+	config.ApplyEffects = func(sim *Simulation, _ *Unit, _ *Spell) {
 		aura.Activate(sim)
 	}
 	spell := character.RegisterSpell(config)

@@ -20,7 +20,7 @@ func (warlock *Warlock) registerShadowboltSpell() {
 	}
 	// Don't add ISB debuff aura if the target is initialized with the 'estimated ISB uptime' debuff.
 	if warlock.Talents.ImprovedShadowBolt > 0 && (!warlock.Env.Encounter.Targets[0].HasAura("Improved Shadow Bolt") || warlock.Env.Encounter.Targets[0].GetAura("Improved Shadow Bolt").MaxStacks != 0) {
-		warlock.ImpShadowboltAura = core.ImprovedShadowBoltAura(warlock.Env.GetPrimaryTarget(), warlock.Talents.ImprovedShadowBolt, 0)
+		warlock.ImpShadowboltAura = core.ImprovedShadowBoltAura(warlock.CurrentTarget, warlock.Talents.ImprovedShadowBolt, 0)
 		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				return

@@ -162,7 +162,7 @@ func (mage *Mage) registerPresenceOfMindCD() {
 				Duration: cooldown,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			var spell *core.Spell
 			if mage.Talents.Pyroblast {
 				spell = mage.Pyroblast
@@ -177,7 +177,7 @@ func (mage *Mage) registerPresenceOfMindCD() {
 
 			normalCastTime := spell.DefaultCast.CastTime
 			spell.DefaultCast.CastTime = 0
-			spell.Cast(sim, sim.GetPrimaryTarget())
+			spell.Cast(sim, mage.CurrentTarget)
 			spell.DefaultCast.CastTime = normalCastTime
 		},
 	})
@@ -237,7 +237,7 @@ func (mage *Mage) registerArcanePowerCD() {
 				Duration: time.Minute * 3,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			apAura.Activate(sim)
 		},
 	})
@@ -332,7 +332,7 @@ func (mage *Mage) registerCombustionCD() {
 		Cast: core.CastConfig{
 			CD: cd,
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			aura.Activate(sim)
 			aura.Prioritize()
 		},
@@ -383,7 +383,7 @@ func (mage *Mage) registerIcyVeinsCD() {
 				Duration: time.Minute * 3,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			icyVeinsAura.Activate(sim)
 		},
 	})
@@ -424,7 +424,7 @@ func (mage *Mage) registerColdSnapCD() {
 				Duration: cooldown,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			if mage.IcyVeins != nil {
 				mage.IcyVeins.CD.Reset()
 			}

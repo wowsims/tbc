@@ -119,7 +119,7 @@ func (hunter *Hunter) ApplyTalents() {
 	hunter.registerRapidFireCD()
 }
 
-func (hunter *Hunter) critMultiplier(isRanged bool, target *core.Target) float64 {
+func (hunter *Hunter) critMultiplier(isRanged bool, target *core.Unit) float64 {
 	primaryModifier := 1.0
 	secondaryModifier := 0.0
 
@@ -279,7 +279,7 @@ func (hunter *Hunter) registerBestialWrathCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			bestialWrathPetAura.Activate(sim)
 
 			if hunter.Talents.TheBeastWithin {
@@ -333,7 +333,7 @@ func (hunter *Hunter) applySlaying() {
 	monsterMultiplier := 1.0 + 0.01*float64(hunter.Talents.MonsterSlaying)
 	humanoidMultiplier := 1.0 + 0.01*float64(hunter.Talents.HumanoidSlaying)
 
-	switch hunter.Env.GetPrimaryTarget().MobType {
+	switch hunter.CurrentTarget.MobType {
 	case proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
 		hunter.PseudoStats.DamageDealtMultiplier *= monsterMultiplier
 	case proto.MobType_MobTypeHumanoid:
@@ -384,7 +384,7 @@ func (hunter *Hunter) applyExposeWeakness() {
 		Label:    "Expose Weakness Talent",
 		Duration: core.NeverExpires,
 		OnInit: func(aura *core.Aura, sim *core.Simulation) {
-			debuffAura = core.ExposeWeaknessAura(sim.GetPrimaryTarget(), float64(hunter.Index), 1.0)
+			debuffAura = core.ExposeWeaknessAura(hunter.CurrentTarget, float64(hunter.Index), 1.0)
 		},
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
@@ -465,7 +465,7 @@ func (hunter *Hunter) registerReadinessCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			hunter.RapidFire.CD.Reset()
 			hunter.MultiShot.CD.Reset()
 			hunter.ArcaneShot.CD.Reset()

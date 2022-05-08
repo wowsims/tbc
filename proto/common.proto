@@ -462,6 +462,9 @@ message Target {
 		MobType mob_type = 3;
     repeated double stats = 5;
 
+		// The raid player tanking this mob.
+    RaidTarget target = 6;
+
 		Debuffs debuffs = 2;
 }
 

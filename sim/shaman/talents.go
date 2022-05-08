@@ -210,7 +210,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 				Duration: cd,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			shaman.ElementalMasteryAura.Activate(sim)
 			shaman.ElementalMasteryAura.Prioritize()
 		},
@@ -255,7 +255,7 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 				Duration: cd,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			shaman.NaturesSwiftnessAura.Activate(sim)
 		},
 	})

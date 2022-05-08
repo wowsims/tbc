@@ -16,15 +16,15 @@ func (war *ProtectionWarrior) OnAutoAttack(sim *core.Simulation, spell *core.Spe
 }
 
 func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
-	target := sim.GetPrimaryTarget()
+	target := war.CurrentTarget
 
 	if war.GCD.IsReady(sim) {
 		if war.CanShieldSlam(sim) {
 			war.ShieldSlam.Cast(sim, target)
 		} else if war.CanBloodthirst(sim) {
-			war.Bloodthirst.Cast(sim, sim.GetPrimaryTarget())
+			war.Bloodthirst.Cast(sim, war.CurrentTarget)
 		} else if war.CanMortalStrike(sim) {
-			war.MortalStrike.Cast(sim, sim.GetPrimaryTarget())
+			war.MortalStrike.Cast(sim, war.CurrentTarget)
 		} else if war.CanRevenge(sim) {
 			war.Revenge.Cast(sim, target)
 		} else if war.ShouldShout(sim) {

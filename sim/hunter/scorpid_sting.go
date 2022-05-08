@@ -6,7 +6,7 @@ import (
 )
 
 func (hunter *Hunter) registerScorpidStingSpell() {
-	hunter.ScorpidStingAura = core.ScorpidStingAura(hunter.Env.GetPrimaryTarget())
+	hunter.ScorpidStingAura = core.ScorpidStingAura(hunter.CurrentTarget)
 
 	baseCost := hunter.BaseMana() * 0.09
 

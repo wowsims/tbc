@@ -17,7 +17,7 @@ type OnPeriodicDamage func(aura *Aura, sim *Simulation, spell *Spell, spellEffec
 
 type SpellEffect struct {
 	// Target of the spell.
-	Target *Target
+	Target *Unit
 
 	BaseDamage     BaseDamageConfig
 	OutcomeApplier OutcomeApplier

@@ -26,7 +26,7 @@ func (ret *RetributionPaladin) tryUseGCD(sim *core.Simulation) {
 }
 
 func (ret *RetributionPaladin) openingRotation(sim *core.Simulation) {
-	target := sim.GetPrimaryTarget()
+	target := ret.CurrentTarget
 
 	// Cast selected judgement to keep on the boss
 	if ret.JudgementOfWisdom.IsReady(sim) &&
@@ -69,7 +69,7 @@ func (ret *RetributionPaladin) mainRotation(sim *core.Simulation) {
 	}
 
 	// Setup
-	target := sim.GetPrimaryTarget()
+	target := ret.CurrentTarget
 
 	gcdCD := ret.GCD.TimeToReady(sim)
 	crusaderStrikeCD := ret.CrusaderStrike.TimeToReady(sim)
@@ -136,7 +136,7 @@ func (ret *RetributionPaladin) mainRotation(sim *core.Simulation) {
 }
 
 //
-func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Target) {
+func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Unit) {
 
 	// If the target is a demon and exorcism is up, cast exorcism
 	// Only cast exorcism when above 40% mana
@@ -161,7 +161,7 @@ func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Tar
 
 // Just roll seal of blood and cast crusader strike on CD to conserve mana
 func (ret *RetributionPaladin) lowManaRotation(sim *core.Simulation) {
-	target := sim.GetPrimaryTarget()
+	target := ret.CurrentTarget
 
 	sobExpiration := ret.SealOfBloodAura.ExpiresAt()
 	nextSwingAt := ret.AutoAttacks.NextAttackAt()

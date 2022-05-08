@@ -27,7 +27,7 @@ func (mage *Mage) tryUseGCD(sim *core.Simulation) {
 		spell = mage.doFrostRotation(sim)
 	}
 
-	if success := spell.Cast(sim, sim.GetPrimaryTarget()); success {
+	if success := spell.Cast(sim, mage.CurrentTarget); success {
 		return
 	}
 

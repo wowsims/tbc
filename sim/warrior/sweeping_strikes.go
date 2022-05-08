@@ -53,7 +53,7 @@ func (warrior *Warrior) registerSweepingStrikesCD() {
 			// Undo armor reduction to get the raw damage value.
 			curDmg = spellEffect.Damage / warrior.AttackTables[spellEffect.Target.Index].ArmorDamageReduction
 
-			ssHit.Cast(sim, spellEffect.Target.NextTarget(sim))
+			ssHit.Cast(sim, warrior.Env.NextTargetUnit(spellEffect.Target))
 			ssHit.SpellMetrics[spellEffect.Target.Index].Casts--
 			aura.RemoveStack(sim)
 		},
@@ -77,7 +77,7 @@ func (warrior *Warrior) registerSweepingStrikesCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
 			ssAura.Activate(sim)
 		},
 	})

@@ -21,7 +21,7 @@ func (warrior *Warrior) registerBloodrageCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			warrior.AddRage(sim, instantRage, actionID)
 
 			core.StartPeriodicAction(sim, core.PeriodicActionOptions{

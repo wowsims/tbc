@@ -29,7 +29,7 @@ func (shaman *Shaman) registerSearingTotemSpell() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			shaman.SearingTotemDot.Apply(sim)
 			// +1 needed because of rounding issues with Searing totem tick time.
 			shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*60 + 1
@@ -37,7 +37,7 @@ func (shaman *Shaman) registerSearingTotemSpell() {
 		},
 	})
 
-	target := shaman.Env.GetPrimaryTarget()
+	target := shaman.CurrentTarget
 	shaman.SearingTotemDot = core.NewDot(core.Dot{
 		Spell: shaman.SearingTotem,
 		Aura: target.RegisterAura(core.Aura{
@@ -83,14 +83,14 @@ func (shaman *Shaman) registerMagmaTotemSpell() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			shaman.MagmaTotemDot.Apply(sim)
 			shaman.NextTotemDrops[FireTotem] = sim.CurrentTime + time.Second*20 + 1
 			shaman.tryTwistFireNova(sim)
 		},
 	})
 
-	target := shaman.Env.GetPrimaryTarget()
+	target := shaman.CurrentTarget
 	shaman.MagmaTotemDot = core.NewDot(core.Dot{
 		Spell: shaman.MagmaTotem,
 		Aura: target.RegisterAura(core.Aura{
@@ -141,7 +141,7 @@ func (shaman *Shaman) registerNovaTotemSpell() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			shaman.MagmaTotemDot.Cancel(sim)
 			shaman.SearingTotemDot.Cancel(sim)
 			shaman.FireNovaTotemDot.Apply(sim)
@@ -150,7 +150,7 @@ func (shaman *Shaman) registerNovaTotemSpell() {
 		},
 	})
 
-	target := shaman.Env.GetPrimaryTarget()
+	target := shaman.CurrentTarget
 	shaman.FireNovaTotemDot = core.NewDot(core.Dot{
 		Spell: shaman.FireNovaTotem,
 		Aura: target.RegisterAura(core.Aura{

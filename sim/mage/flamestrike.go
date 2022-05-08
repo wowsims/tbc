@@ -45,7 +45,7 @@ func (mage *Mage) registerFlamestrikeSpell() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, target *core.Target, spell *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, target *core.Unit, spell *core.Spell) {
 			applyAOEDamage(sim, target, spell)
 			mage.FlamestrikeDot.Apply(sim)
 		},

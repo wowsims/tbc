@@ -38,7 +38,7 @@ func init() {
 
 func ApplyMarkOfTheChampionCaster(agent core.Agent) {
 	character := agent.GetCharacter()
-	if character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon || character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeUndead {
+	if character.CurrentTarget.MobType == proto.MobType_MobTypeDemon || character.CurrentTarget.MobType == proto.MobType_MobTypeUndead {
 		character.PseudoStats.MobTypeSpellPower += 85
 	}
 }

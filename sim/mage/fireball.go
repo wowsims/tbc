@@ -56,7 +56,7 @@ func (mage *Mage) registerFireballSpell() {
 		}),
 	})
 
-	target := mage.Env.GetPrimaryTarget()
+	target := mage.CurrentTarget
 	mage.FireballDot = core.NewDot(core.Dot{
 		Spell: mage.Fireball,
 		Aura: target.RegisterAura(core.Aura{

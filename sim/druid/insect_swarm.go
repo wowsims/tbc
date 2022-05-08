@@ -40,7 +40,7 @@ func (druid *Druid) registerInsectSwarmSpell() {
 		}),
 	})
 
-	target := druid.Env.GetPrimaryTarget()
+	target := druid.CurrentTarget
 	druid.InsectSwarmDot = core.NewDot(core.Dot{
 		Spell: druid.InsectSwarm,
 		Aura: target.RegisterAura(core.Aura{
@@ -59,6 +59,6 @@ func (druid *Druid) registerInsectSwarmSpell() {
 	})
 }
 
-func (druid *Druid) ShouldCastInsectSwarm(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
+func (druid *Druid) ShouldCastInsectSwarm(sim *core.Simulation, target *core.Unit, rotation proto.BalanceDruid_Rotation) bool {
 	return rotation.InsectSwarm && !druid.InsectSwarmDot.IsActive()
 }

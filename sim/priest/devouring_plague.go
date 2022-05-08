@@ -43,7 +43,7 @@ func (priest *Priest) registerDevouringPlagueSpell() {
 		}),
 	})
 
-	target := priest.Env.GetPrimaryTarget()
+	target := priest.CurrentTarget
 	priest.DevouringPlagueDot = core.NewDot(core.Dot{
 		Spell: priest.DevouringPlague,
 		Aura: target.RegisterAura(core.Aura{

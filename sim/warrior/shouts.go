@@ -31,7 +31,7 @@ func (warrior *Warrior) makeShoutSpellHelper(actionID core.ActionID) *core.Spell
 			IgnoreHaste: true,
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			// Actual shout effects are handled in core/buffs.go
 			warrior.shoutExpiresAt = sim.CurrentTime + warrior.shoutDuration
 		},

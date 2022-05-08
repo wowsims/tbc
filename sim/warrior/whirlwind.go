@@ -41,12 +41,12 @@ func (warrior *Warrior) registerWhirlwindSpell() {
 	effects := make([]core.SpellEffect, 0, numTotalHits)
 	for i := int32(0); i < numHits; i++ {
 		mhEffect := baseEffectMH
-		mhEffect.Target = warrior.Env.GetTarget(i)
+		mhEffect.Target = warrior.Env.GetTargetUnit(i)
 		effects = append(effects, mhEffect)
 
 		if warrior.AutoAttacks.IsDualWielding {
 			ohEffect := baseEffectOH
-			ohEffect.Target = warrior.Env.GetTarget(i)
+			ohEffect.Target = warrior.Env.GetTargetUnit(i)
 			effects = append(effects, ohEffect)
 		}
 	}

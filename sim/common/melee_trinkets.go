@@ -191,7 +191,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
 			activeAura.Activate(sim)
 		},
 	})
@@ -204,7 +204,7 @@ func ApplyBadgeOfTheSwarmguard(agent core.Agent) {
 
 func ApplyMarkOfTheChampionMelee(agent core.Agent) {
 	character := agent.GetCharacter()
-	if character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon || character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeUndead {
+	if character.CurrentTarget.MobType == proto.MobType_MobTypeDemon || character.CurrentTarget.MobType == proto.MobType_MobTypeUndead {
 		character.PseudoStats.MobTypeAttackPower += 150
 	}
 }

@@ -120,7 +120,7 @@ func (rogue *Rogue) applyMurder() {
 
 	damageMultiplier := 1.0 + 0.01*float64(rogue.Talents.Murder)
 
-	switch rogue.Env.GetPrimaryTarget().MobType {
+	switch rogue.CurrentTarget.MobType {
 	case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeBeast, proto.MobType_MobTypeGiant, proto.MobType_MobTypeDragonkin:
 		rogue.PseudoStats.DamageDealtMultiplier *= damageMultiplier
 	}
@@ -158,7 +158,7 @@ func (rogue *Rogue) registerColdBloodCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
 			coldBloodAura.Activate(sim)
 		},
 	})
@@ -357,7 +357,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 			// Undo armor reduction to get the raw damage value.
 			curDmg = spellEffect.Damage / rogue.AttackTables[spellEffect.Target.Index].ArmorDamageReduction
 
-			bfHit.Cast(sim, spellEffect.Target.NextTarget(sim))
+			bfHit.Cast(sim, rogue.Env.NextTargetUnit(spellEffect.Target))
 			bfHit.SpellMetrics[spellEffect.Target.Index].Casts--
 		},
 	})
@@ -381,7 +381,7 @@ func (rogue *Rogue) registerBladeFlurryCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
 			rogue.BladeFlurryAura.Activate(sim)
 		},
 	})
@@ -447,7 +447,7 @@ func (rogue *Rogue) registerAdrenalineRushCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
 			rogue.AdrenalineRushAura.Activate(sim)
 		},
 	})

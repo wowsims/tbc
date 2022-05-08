@@ -57,7 +57,7 @@ func (priest *Priest) newMindFlaySpell(numTicks int) *core.Spell {
 }
 
 func (priest *Priest) newMindFlayDot(numTicks int) *core.Dot {
-	target := priest.Env.GetPrimaryTarget()
+	target := priest.CurrentTarget
 	return core.NewDot(core.Dot{
 		Spell: priest.MindFlay[numTicks],
 		Aura: target.RegisterAura(core.Aura{

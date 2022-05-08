@@ -34,7 +34,7 @@ func (mage *Mage) registerSummonWaterElementalCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			mage.waterElemental.EnableWithTimeout(sim, mage.waterElemental, time.Second*45)
 
 			// All MCDs that use the GCD and have a non-zero cast time must call this.
@@ -107,7 +107,7 @@ func (we *WaterElemental) OnGCDReady(sim *core.Simulation) {
 		return
 	}
 
-	if success := spell.Cast(sim, sim.GetPrimaryTarget()); !success {
+	if success := spell.Cast(sim, we.CurrentTarget); !success {
 		// If water ele has gone OOM then there won't be enough time left for meaningful
 		// regen to occur before the ele expires. So just murder itself.
 		we.Disable(sim)

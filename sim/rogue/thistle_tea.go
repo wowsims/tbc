@@ -30,7 +30,7 @@ func (rogue *Rogue) registerThistleTeaCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			rogue.AddEnergy(sim, energyRegen, actionID)
 		},
 	})

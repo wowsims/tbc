@@ -88,7 +88,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(cdTimer *core.Timer)
 	} else if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27949 {
 		flatBonus += 47.0
 	}
-	paladin.JudgementOfTheCrusaderAura = core.JudgementOfTheCrusaderAura(paladin.Env.GetPrimaryTarget(), paladin.Talents.ImprovedSealOfTheCrusader, flatBonus, percentBonus)
+	paladin.JudgementOfTheCrusaderAura = core.JudgementOfTheCrusaderAura(paladin.CurrentTarget, paladin.Talents.ImprovedSealOfTheCrusader, flatBonus, percentBonus)
 
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
@@ -133,7 +133,7 @@ func (paladin *Paladin) CanJudgementOfTheCrusader(sim *core.Simulation) bool {
 }
 
 func (paladin *Paladin) registerJudgementOfWisdomSpell(cdTimer *core.Timer) {
-	paladin.JudgementOfWisdomAura = core.JudgementOfWisdomAura(paladin.Env.GetPrimaryTarget())
+	paladin.JudgementOfWisdomAura = core.JudgementOfWisdomAura(paladin.CurrentTarget)
 
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfWisdom = paladin.RegisterSpell(core.SpellConfig{

@@ -54,9 +54,16 @@ func (env *Environment) construct(raidProto proto.Raid, encounterProto proto.Enc
 
 	for _, unit := range env.Raid.AllUnits {
 		unit.Env = env
+		unit.CurrentTarget = &env.Encounter.Targets[0].Unit
 	}
 	for _, target := range env.Encounter.Targets {
 		target.Env = env
+		if int32(len(encounterProto.Targets)) > target.Index {
+			raidTargetProto := encounterProto.Targets[target.Index].Target
+			if raidTargetProto != nil {
+				target.CurrentTarget = &env.Raid.GetPlayerFromRaidTarget(*raidTargetProto).GetCharacter().Unit
+			}
+		}
 	}
 
 	env.State = Constructed
@@ -126,9 +133,14 @@ func (env *Environment) GetNumTargets() int32 {
 func (env *Environment) GetTarget(index int32) *Target {
 	return env.Encounter.Targets[index]
 }
-
-func (env *Environment) GetPrimaryTarget() *Target {
-	return env.GetTarget(0)
+func (env *Environment) GetTargetUnit(index int32) *Unit {
+	return &env.Encounter.Targets[index].Unit
+}
+func (env *Environment) NextTarget(target *Unit) *Target {
+	return env.Encounter.Targets[target.Index].NextTarget()
+}
+func (env *Environment) NextTargetUnit(target *Unit) *Unit {
+	return &env.NextTarget(target).Unit
 }
 
 // Registers a callback to this Character which will be invoked after all Units

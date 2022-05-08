@@ -54,7 +54,7 @@ func (warrior *Warrior) registerRampageSpell() {
 			IgnoreHaste: true,
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			warrior.rampageValidUntil = 0
 			warrior.RampageAura.Activate(sim)
 			warrior.RampageAura.AddStack(sim)

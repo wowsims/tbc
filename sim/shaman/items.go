@@ -169,7 +169,7 @@ func ApplyNaturalAlignmentCrystal(agent core.Agent) {
 				Duration: dur,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			activeAura.Activate(sim)
 		},
 	})

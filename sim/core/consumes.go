@@ -49,7 +49,7 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 				stats.HealingPower: 24,
 			})
 		case proto.BattleElixir_ElixirOfDemonslaying:
-			if character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeDemon {
+			if character.CurrentTarget.MobType == proto.MobType_MobTypeDemon {
 				character.PseudoStats.MobTypeAttackPower += 265
 			}
 		case proto.BattleElixir_ElixirOfMajorAgility:
@@ -291,7 +291,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 				},
 			},
 
-			ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+			ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 				// When a real player is using drums, their cast applies to the whole party.
 				for _, aura := range auras {
 					aura.Activate(sim)
@@ -316,7 +316,7 @@ func registerDrumsCD(agent Agent, partyBuffs proto.PartyBuffs, consumes proto.Co
 				},
 			},
 
-			ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+			ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 				drumsAura.Activate(sim)
 			},
 		})
@@ -545,7 +545,7 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 						Duration: time.Minute * 2,
 					},
 				},
-				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+				ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 					aura.Activate(sim)
 				},
 			})
@@ -576,7 +576,7 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 						Duration: time.Minute * 2,
 					},
 				},
-				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+				ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 					// Restores 1800 to 3000 mana. (2 Min Cooldown)
 					manaGain := 1800 + (sim.RandomFloat("super mana") * 1200)
 					if alchStoneEquipped {
@@ -606,7 +606,7 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 						Duration: time.Minute * 2,
 					},
 				},
-				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+				ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 					aura.Activate(sim)
 				},
 			})
@@ -634,7 +634,7 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 						Duration: time.Minute * 2,
 					},
 				},
-				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+				ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 					aura.Activate(sim)
 					if character.Class == proto.Class_ClassWarrior {
 						bonusRage := 45.0 + (75.0-45.0)*sim.RandomFloat("Mighty Rage Potion")
@@ -680,7 +680,7 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 						Duration: time.Minute * 2,
 					},
 				},
-				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+				ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 					buffAura.Activate(sim)
 					debuffAura.Activate(sim)
 					debuffAura.Refresh(sim)
@@ -707,7 +707,7 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 						Duration: time.Minute * 2,
 					},
 				},
-				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+				ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 					aura.Activate(sim)
 				},
 			})
@@ -826,7 +826,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 						Duration: time.Minute * 2,
 					},
 				},
-				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+				ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 					// Restores 900 to 1500 mana. (2 Min Cooldown)
 					manaGain := 900 + (sim.RandomFloat("dark rune") * 600)
 					character.AddMana(sim, manaGain, actionID, true)
@@ -887,7 +887,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 						Duration: time.Minute * 3,
 					},
 				},
-				ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+				ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 					flameCapAura.Activate(sim)
 				},
 			})
@@ -959,15 +959,15 @@ func registerExplosivesCD(agent Agent, consumes proto.Consumes) {
 			},
 		},
 
-		ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+		ApplyEffects: func(sim *Simulation, target *Unit, _ *Spell) {
 			if superSapper != nil && superSapper.IsReady(sim) {
-				superSapper.Cast(sim, sim.GetPrimaryTarget())
+				superSapper.Cast(sim, target)
 				explosivesTimer.Set(sim.CurrentTime + cdAfterSuperSapper)
 			} else if goblinSapper != nil && goblinSapper.IsReady(sim) {
-				goblinSapper.Cast(sim, sim.GetPrimaryTarget())
+				goblinSapper.Cast(sim, target)
 				explosivesTimer.Set(sim.CurrentTime + cdAfterGoblinSapper)
 			} else {
-				fillerExplosive.Cast(sim, sim.GetPrimaryTarget())
+				fillerExplosive.Cast(sim, target)
 				explosivesTimer.Set(sim.CurrentTime + time.Minute)
 			}
 		},
@@ -985,7 +985,7 @@ func (character *Character) newBasicExplosiveSpellConfig(actionID ActionID, minD
 	damageMultiplier := 1.0
 	if isHolyWater {
 		school = SpellSchoolHoly
-		if character.Env.GetPrimaryTarget().MobType != proto.MobType_MobTypeUndead {
+		if character.CurrentTarget.MobType != proto.MobType_MobTypeUndead {
 			damageMultiplier = 0
 		}
 	}
