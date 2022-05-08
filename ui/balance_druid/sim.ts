@@ -211,7 +211,7 @@ export class BalanceDruidSimUI extends IndividualSimUI<Spec.SpecBalanceDruid> {
 			encounterPicker: {
 				// Target stats to show for 'Simple' encounters.
 				simpleTargetStats: [
-					Stat.StatNatureResistance,
+					Stat.StatArcaneResistance,
 				],
 				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
 				showExecuteProportion: false,
