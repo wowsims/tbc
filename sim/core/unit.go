@@ -3,6 +3,7 @@ package core
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -29,6 +30,8 @@ type Unit struct {
 	Label string
 
 	Level int32 // Level of Unit, e.g. Bosses are lvl 73.
+
+	MobType proto.MobType
 
 	// Environment in which this Unit exists. This will be nil until after the
 	// construction phase.
@@ -95,6 +98,8 @@ type Unit struct {
 	manaTickWhileNotCasting float64
 
 	CastSpeed float64
+
+	CurrentTarget *Unit
 }
 
 func (unit *Unit) Log(sim *Simulation, message string, vals ...interface{}) {

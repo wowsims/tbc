@@ -22,7 +22,7 @@ func (character *Character) newGnomishFlameTurretSpell() *Spell {
 	return character.GetOrRegisterSpell(SpellConfig{
 		ActionID: ActionID{ItemID: 23841},
 
-		ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+		ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 			gft.EnableWithTimeout(sim, gft, time.Second*45)
 		},
 	})
@@ -93,5 +93,5 @@ func (gft *GnomishFlameTurret) Reset(sim *Simulation) {
 }
 
 func (gft *GnomishFlameTurret) OnGCDReady(sim *Simulation) {
-	gft.FlameCannon.Cast(sim, sim.GetPrimaryTarget())
+	gft.FlameCannon.Cast(sim, gft.CurrentTarget)
 }

@@ -302,7 +302,7 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 	}
 
 	pa.OnAction = func(sim *Simulation) {
-		aa.SwingMelee(sim, sim.GetPrimaryTarget())
+		aa.SwingMelee(sim, aa.unit.CurrentTarget)
 		pa.NextActionAt = aa.NextAttackAt()
 
 		// Cancelled means we made a new one because of a swing speed change.
@@ -381,17 +381,17 @@ func (aa *AutoAttacks) TimeBeforeClippingRanged(sim *Simulation) time.Duration {
 }
 
 // SwingMelee will check any swing timers if they are up, and if so, swing!
-func (aa *AutoAttacks) SwingMelee(sim *Simulation, target *Target) {
+func (aa *AutoAttacks) SwingMelee(sim *Simulation, target *Unit) {
 	aa.TrySwingMH(sim, target)
 	aa.TrySwingOH(sim, target)
 }
 
-func (aa *AutoAttacks) SwingRanged(sim *Simulation, target *Target) {
+func (aa *AutoAttacks) SwingRanged(sim *Simulation, target *Unit) {
 	aa.TrySwingRanged(sim, target)
 }
 
 // Performs an autoattack using the main hand weapon, if the MH CD is ready.
-func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
+func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Unit) {
 	if aa.MainhandSwingAt > sim.CurrentTime {
 		return
 	}
@@ -421,7 +421,7 @@ func (aa *AutoAttacks) MaybeReplaceMHSwing(sim *Simulation, mhSwingSpell *Spell)
 }
 
 // Performs an autoattack using the main hand weapon, if the OH CD is ready.
-func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
+func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Unit) {
 	if !aa.IsDualWielding || aa.OffhandSwingAt > sim.CurrentTime {
 		return
 	}
@@ -441,7 +441,7 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 }
 
 // Performs an autoattack using the ranged weapon, if the ranged CD is ready.
-func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
+func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Unit) {
 	if aa.RangedSwingAt > sim.CurrentTime {
 		return
 	}

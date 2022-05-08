@@ -60,8 +60,6 @@ func (encounter *Encounter) GetMetricsProto(numIterations int32) *proto.Encounte
 // Target is an enemy/boss that can be the target of player attacks/spells.
 type Target struct {
 	Unit
-
-	MobType proto.MobType
 }
 
 func NewTarget(options proto.Target, targetIndex int32) *Target {
@@ -82,12 +80,12 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 			Index:       targetIndex,
 			Label:       "Target " + strconv.Itoa(int(targetIndex)+1),
 			Level:       options.Level,
+			MobType:     options.MobType,
 			auraTracker: newAuraTracker(),
 			stats:       unitStats,
 			PseudoStats: stats.NewPseudoStats(),
 			Metrics:     NewCharacterMetrics(),
 		},
-		MobType: options.MobType,
 	}
 	target.GCD = target.NewTimer()
 	if target.Level == 0 {

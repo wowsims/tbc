@@ -104,7 +104,7 @@ func NewDot(config Dot) *Dot {
 	return dot
 }
 
-func TickFuncSnapshot(target *Target, baseEffect SpellEffect) TickEffects {
+func TickFuncSnapshot(target *Unit, baseEffect SpellEffect) TickEffects {
 	snapshotEffect := &SpellEffect{}
 	return func(sim *Simulation, spell *Spell) func() {
 		*snapshotEffect = baseEffect
@@ -122,7 +122,7 @@ func TickFuncSnapshot(target *Target, baseEffect SpellEffect) TickEffects {
 func TickFuncAOESnapshot(env *Environment, baseEffect SpellEffect) TickEffects {
 	snapshotEffect := &SpellEffect{}
 	return func(sim *Simulation, spell *Spell) func() {
-		target := sim.GetPrimaryTarget()
+		target := spell.Unit.CurrentTarget
 		*snapshotEffect = baseEffect
 		snapshotEffect.Target = target
 		baseDamage := snapshotEffect.calculateBaseDamage(sim, spell) * snapshotEffect.DamageMultiplier
@@ -138,7 +138,7 @@ func TickFuncAOESnapshot(env *Environment, baseEffect SpellEffect) TickEffects {
 func TickFuncAOESnapshotCapped(env *Environment, aoeCap float64, baseEffect SpellEffect) TickEffects {
 	snapshotEffect := &SpellEffect{}
 	return func(sim *Simulation, spell *Spell) func() {
-		target := sim.GetPrimaryTarget()
+		target := spell.Unit.CurrentTarget
 		*snapshotEffect = baseEffect
 		snapshotEffect.Target = target
 		baseDamage := snapshotEffect.calculateBaseDamage(sim, spell) * snapshotEffect.DamageMultiplier
@@ -155,7 +155,7 @@ func TickFuncAOESnapshotCapped(env *Environment, aoeCap float64, baseEffect Spel
 func TickFuncApplyEffects(effectsFunc ApplySpellEffects) TickEffects {
 	return func(sim *Simulation, spell *Spell) func() {
 		return func() {
-			effectsFunc(sim, sim.GetPrimaryTarget(), spell)
+			effectsFunc(sim, spell.Unit.CurrentTarget, spell)
 		}
 	}
 }

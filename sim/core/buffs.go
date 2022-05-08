@@ -446,7 +446,7 @@ func registerExternalConsecutiveCDApproximation(agent Agent, config externalCons
 			},
 		},
 
-		ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+		ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 			config.AddAura(sim, character)
 			externalTimers[nextExternalIndex].Set(sim.CurrentTime + config.AuraCD)
 
