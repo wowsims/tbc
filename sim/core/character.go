@@ -67,7 +67,7 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 			Level:       CharacterLevel,
 			auraTracker: newAuraTracker(),
 			PseudoStats: stats.NewPseudoStats(),
-			Metrics:     NewCharacterMetrics(),
+			Metrics:     NewUnitMetrics(),
 		},
 
 		Name:         player.Name,
@@ -101,6 +101,11 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 	character.AddStats(bonusStats)
 	character.addUniversalStatDependencies()
 
+	if weapon := character.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
+		if weapon.WeaponType == proto.WeaponType_WeaponTypeShield {
+			character.PseudoStats.CanBlock = true
+		}
+	}
 	character.PseudoStats.InFrontOfTarget = player.InFrontOfTarget
 	character.addEffectPets()
 

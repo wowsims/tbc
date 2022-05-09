@@ -29,6 +29,7 @@ func TestProtectionWarrior(t *testing.T) {
 		Consumes:    FullConsumes,
 		Debuffs:     FullDebuffs,
 
+		IsTank:          true,
 		InFrontOfTarget: true,
 
 		ItemFilter: core.ItemFilter{

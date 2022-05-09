@@ -13,6 +13,8 @@ message StatWeightsTestResult {
 
 message DpsTestResult {
 	double dps = 1;
+	double tps = 2;
+	double dtps = 3;
 }
 
 message TestSuiteResult {

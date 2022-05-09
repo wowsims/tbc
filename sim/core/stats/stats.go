@@ -460,6 +460,10 @@ type PseudoStats struct {
 	// Effects that apply when this unit is the target.
 	///////////////////////////////////////////////////
 
+	CanBlock bool
+	CanParry bool
+	CanCrush bool
+
 	BonusMeleeAttackPower  float64 // Imp Hunters mark, EW
 	BonusRangedAttackPower float64 // Hunters mark, EW
 	BonusCritRating        float64 // Imp Judgement of the Crusader

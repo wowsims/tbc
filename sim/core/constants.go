@@ -28,8 +28,12 @@ const DodgeRatingPerDodgeChance = 18.9231
 const ParryRatingPerParryChance = 23.6538
 const ResilienceRatingPerCritReductionChance = 39.4231
 const ResilienceRatingPerCritDamageReductionPercent = 39.4231 / 2
+const DefenseRatingToChanceReduction = (1.0 / DefenseRatingPerDefense) * MissDodgeParryBlockCritChancePerDefense / 100
 
 const LevelBasedNPCSpellResistancePerLevel = 28.0 / 3
+
+const EnemyAutoAttackAPCoefficient = 0.000649375
+const CrushChance = 0.15
 
 // IDs for items used in core
 const (

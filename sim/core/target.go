@@ -70,6 +70,9 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	if unitStats[stats.BlockValue] == 0 {
 		unitStats[stats.BlockValue] = 54 // Not thoroughly tested for non-bosses.
 	}
+	if unitStats[stats.AttackPower] == 0 {
+		unitStats[stats.AttackPower] = 320
+	}
 	if unitStats[stats.Armor] == 0 {
 		unitStats[stats.Armor] = 7684
 	}
@@ -84,16 +87,21 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 			auraTracker: newAuraTracker(),
 			stats:       unitStats,
 			PseudoStats: stats.NewPseudoStats(),
-			Metrics:     NewCharacterMetrics(),
+			Metrics:     NewUnitMetrics(),
 		},
 	}
 	target.GCD = target.NewTimer()
 	if target.Level == 0 {
 		target.Level = 73
 	}
-	target.stats[stats.MeleeCrit] = (5 + 0.2*float64(target.Level-CharacterLevel)) * MeleeCritRatingPerCritChance
+	target.stats[stats.MeleeCrit] = UnitLevelFloat64(target.Level, 0.05, 0.052, 0.054, 0.056) * MeleeCritRatingPerCritChance
 
+	target.PseudoStats.CanBlock = true
+	target.PseudoStats.CanParry = true
 	target.PseudoStats.InFrontOfTarget = true
+	if target.Level == 73 {
+		target.PseudoStats.CanCrush = true
+	}
 
 	if options.Debuffs != nil {
 		applyDebuffEffects(&target.Unit, *options.Debuffs)
@@ -134,16 +142,11 @@ func (target *Target) setupAttackTables() {
 
 func (target *Target) init(sim *Simulation) {
 	target.Unit.init(sim)
-
-	target.gcdAction = &PendingAction{
-		Priority: ActionPriorityGCD,
-		OnAction: func(sim *Simulation) {
-		},
-	}
 }
 
 func (target *Target) Reset(sim *Simulation) {
 	target.Unit.reset(sim, nil)
+	//target.SetGCDTimer(sim, 0)
 }
 
 func (target *Target) Advance(sim *Simulation, elapsedTime time.Duration) {
@@ -215,7 +218,6 @@ type AttackTable struct {
 	ArmorDamageReduction float64
 }
 
-// Currently assumes attacker is level 70.
 func NewAttackTable(attacker *Unit, defender *Unit) *AttackTable {
 	table := &AttackTable{
 		Attacker: attacker,
@@ -223,8 +225,9 @@ func NewAttackTable(attacker *Unit, defender *Unit) *AttackTable {
 	}
 
 	if defender.Type == EnemyUnit {
-		table.BaseMissChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.08)
+		// Assumes attacker (the Player) is level 70.
 		table.BaseSpellMissChance = UnitLevelFloat64(defender.Level, 0.04, 0.05, 0.06, 0.17)
+		table.BaseMissChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.08)
 		table.BaseBlockChance = 0.05
 		table.BaseDodgeChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.065)
 		table.BaseParryChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.14)
@@ -234,6 +237,12 @@ func NewAttackTable(attacker *Unit, defender *Unit) *AttackTable {
 		table.HitSuppression = UnitLevelFloat64(defender.Level, 0, 0, 0, 0.01)
 		table.CritSuppression = UnitLevelFloat64(defender.Level, 0, 0.01, 0.02, 0.048)
 	} else {
+		// Assumes defender (the Player) is level 70.
+		table.BaseSpellMissChance = 0.05
+		table.BaseMissChance = UnitLevelFloat64(attacker.Level, 0.05, 0.048, 0.046, 0.044)
+		table.BaseBlockChance = UnitLevelFloat64(attacker.Level, 0.05, 0.048, 0.046, 0.044)
+		table.BaseDodgeChance = UnitLevelFloat64(attacker.Level, 0.008, 0.006, 0.004, 0.002)
+		table.BaseParryChance = UnitLevelFloat64(attacker.Level, 0.05, 0.048, 0.046, 0.044)
 	}
 
 	table.UpdateArmorDamageReduction()

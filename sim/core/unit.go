@@ -72,7 +72,7 @@ type Unit struct {
 	AutoAttacks AutoAttacks
 
 	// Statistics describing the results of the sim.
-	Metrics CharacterMetrics
+	Metrics UnitMetrics
 
 	cdTimers []*Timer
 
@@ -364,6 +364,5 @@ func (unit *Unit) doneIteration(sim *Simulation) {
 	for _, spell := range unit.Spellbook {
 		spell.doneIteration()
 	}
-	unit.Metrics.doneIteration(sim.Duration.Seconds())
 	unit.resetCDs(sim)
 }
