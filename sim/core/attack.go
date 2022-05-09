@@ -631,3 +631,40 @@ func (aa *AutoAttacks) NewPPMManager(ppm float64) PPMManager {
 		rangedProcChance: (aa.Ranged.SwingSpeed * ppm) / 60.0,
 	}
 }
+
+func (unit *Unit) applyParryHaste() {
+	if !unit.PseudoStats.CanParry || !unit.AutoAttacks.IsEnabled() {
+		return
+	}
+
+	unit.RegisterAura(Aura{
+		Label:    "Parry Haste",
+		Duration: NeverExpires,
+		OnReset: func(aura *Aura, sim *Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if !spellEffect.Outcome.Matches(OutcomeParry) {
+				return
+			}
+
+			remainingTime := aura.Unit.AutoAttacks.MainhandSwingAt - sim.CurrentTime
+			swingSpeed := aura.Unit.AutoAttacks.MainhandSwingSpeed()
+			minRemainingTime := time.Duration(float64(swingSpeed) * 0.2) // 20% of Swing Speed
+			defaultReduction := minRemainingTime * 2                     // 40% of Swing Speed
+
+			if remainingTime <= minRemainingTime {
+				return
+			}
+
+			parryHasteReduction := MinDuration(defaultReduction, remainingTime-minRemainingTime)
+			newReadyAt := aura.Unit.AutoAttacks.MainhandSwingAt - parryHasteReduction
+			if sim.Log != nil {
+				aura.Unit.Log(sim, "MH Swing reduced by %s due to parry haste, will now occur at %s", parryHasteReduction, newReadyAt)
+			}
+
+			aura.Unit.AutoAttacks.MainhandSwingAt = newReadyAt
+			aura.Unit.AutoAttacks.resetAutoSwing(sim)
+		},
+	})
+}
