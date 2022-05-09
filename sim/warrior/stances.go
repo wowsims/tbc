@@ -72,6 +72,7 @@ func (warrior *Warrior) registerBattleStanceAura() {
 func (warrior *Warrior) registerDefensiveStanceAura() {
 	actionID := core.ActionID{SpellID: 71}
 	threatMult := 1.3 * (1 + 0.05*float64(warrior.Talents.Defiance))
+	impDefStanceMultiplier := 1 - 0.02*float64(warrior.Talents.ImprovedDefensiveStance)
 
 	warrior.DefensiveStanceAura = warrior.GetOrRegisterAura(core.Aura{
 		Label:    "Defensive Stance",
@@ -82,10 +83,22 @@ func (warrior *Warrior) registerDefensiveStanceAura() {
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Unit.PseudoStats.ThreatMultiplier *= threatMult
 			aura.Unit.PseudoStats.DamageDealtMultiplier *= 0.9
+			aura.Unit.PseudoStats.ArcaneDamageTakenMultiplier *= impDefStanceMultiplier
+			aura.Unit.PseudoStats.FireDamageTakenMultiplier *= impDefStanceMultiplier
+			aura.Unit.PseudoStats.FrostDamageTakenMultiplier *= impDefStanceMultiplier
+			aura.Unit.PseudoStats.HolyDamageTakenMultiplier *= impDefStanceMultiplier
+			aura.Unit.PseudoStats.NatureDamageTakenMultiplier *= impDefStanceMultiplier
+			aura.Unit.PseudoStats.ShadowDamageTakenMultiplier *= impDefStanceMultiplier
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Unit.PseudoStats.ThreatMultiplier /= threatMult
 			aura.Unit.PseudoStats.DamageDealtMultiplier /= 0.9
+			aura.Unit.PseudoStats.ArcaneDamageTakenMultiplier /= impDefStanceMultiplier
+			aura.Unit.PseudoStats.FireDamageTakenMultiplier /= impDefStanceMultiplier
+			aura.Unit.PseudoStats.FrostDamageTakenMultiplier /= impDefStanceMultiplier
+			aura.Unit.PseudoStats.HolyDamageTakenMultiplier /= impDefStanceMultiplier
+			aura.Unit.PseudoStats.NatureDamageTakenMultiplier /= impDefStanceMultiplier
+			aura.Unit.PseudoStats.ShadowDamageTakenMultiplier /= impDefStanceMultiplier
 		},
 	})
 }

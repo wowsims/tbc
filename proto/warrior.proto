@@ -143,6 +143,13 @@ message ProtectionWarrior {
 			}
 			ThunderClap thunder_clap = 2;
 
+			enum ShieldBlock {
+				ShieldBlockNone = 0;
+				ShieldBlockToProcRevenge = 1;
+				ShieldBlockOnCD = 2;
+			}
+			ShieldBlock shield_block = 5;
+
 			bool use_cleave = 4;
 
 			// Minimum rage to queue HS or Cleave.

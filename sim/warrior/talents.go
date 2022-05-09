@@ -13,7 +13,6 @@ func (warrior *Warrior) ApplyTalents() {
 	warrior.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*1*float64(warrior.Talents.Cruelty))
 	warrior.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*1*float64(warrior.Talents.Precision))
 	warrior.AddStat(stats.Defense, core.DefenseRatingPerDefense*4*float64(warrior.Talents.Anticipation))
-	warrior.AddStat(stats.Block, core.BlockRatingPerBlockChance*1*float64(warrior.Talents.ShieldSpecialization))
 	warrior.AddStat(stats.Armor, warrior.Equip.Stats()[stats.Armor]*0.02*float64(warrior.Talents.Toughness))
 	warrior.AddStat(stats.Expertise, core.ExpertisePerQuarterPercentReduction*2*float64(warrior.Talents.Defiance))
 	warrior.PseudoStats.DodgeReduction += 0.01 * float64(warrior.Talents.WeaponMastery)
@@ -71,6 +70,7 @@ func (warrior *Warrior) ApplyTalents() {
 	warrior.applyWeaponSpecializations()
 	warrior.applyUnbridledWrath()
 	warrior.applyFlurry()
+	warrior.applyShieldSpecialization()
 	warrior.registerDeathWishCD()
 	warrior.registerSweepingStrikesCD()
 }
@@ -296,6 +296,30 @@ func (warrior *Warrior) applyFlurry() {
 			// Remove a stack.
 			if procAura.IsActive() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) {
 				procAura.RemoveStack(sim)
+			}
+		},
+	})
+}
+
+func (warrior *Warrior) applyShieldSpecialization() {
+	if warrior.Talents.ShieldSpecialization == 0 {
+		return
+	}
+
+	warrior.AddStat(stats.Block, core.BlockRatingPerBlockChance*1*float64(warrior.Talents.ShieldSpecialization))
+
+	procChance := 0.2 * float64(warrior.Talents.ShieldSpecialization)
+	warrior.RegisterAura(core.Aura{
+		Label:    "Shield Specialization",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Outcome.Matches(core.OutcomeBlock) {
+				if procChance == 1 || sim.RandomFloat("Shield Specialization") < procChance {
+					warrior.AddRage(sim, 1, core.ActionID{SpellID: 12727})
+				}
 			}
 		},
 	})

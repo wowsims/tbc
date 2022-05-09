@@ -50,6 +50,8 @@ func NewProtectionWarrior(character core.Character, options proto.Player) *Prote
 			if war.GCD.IsReady(sim) {
 				war.doRotation(sim)
 			}
+		} else {
+			war.tryShieldBlock(sim)
 		}
 	})
 	war.EnableAutoAttacks(war, core.AutoAttackOptions{
