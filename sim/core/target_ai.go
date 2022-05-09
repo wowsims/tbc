@@ -16,8 +16,7 @@ func (target *Target) initialize(config *proto.Target) {
 	}
 	target.EnableAutoAttacks(target, AutoAttackOptions{
 		MainHand: Weapon{
-			BaseDamageMin:  42,
-			BaseDamageMax:  68,
+			BaseDamageMin:  4192.05,
 			SwingSpeed:     2,
 			SwingDuration:  time.Second * 2,
 			CritMultiplier: 2,

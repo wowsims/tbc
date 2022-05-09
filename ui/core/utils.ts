@@ -120,3 +120,17 @@ export function downloadString(data: string, fileName: string) {
 	downloadAnchorNode.click();
 	downloadAnchorNode.remove();
 }
+
+export function formatDeltaTextElem(elem: HTMLElement, before: number, after: number) {
+	const delta = after - before;
+	const deltaStr = delta.toFixed(2);
+	if (delta >= 0) {
+		elem.textContent = '+' + deltaStr;
+		elem.classList.remove('negative');
+		elem.classList.add('positive');
+	} else {
+		elem.textContent = '' + deltaStr;
+		elem.classList.remove('positive');
+		elem.classList.add('negative');
+	}
+}

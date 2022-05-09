@@ -84,6 +84,11 @@ func (character *Character) WeaponFromRanged(critMultiplier float64) Weapon {
 	}
 }
 
+func (weapon Weapon) EnemyWeaponDamage(sim *Simulation, attackPower float64) float64 {
+	rand := 1 + 0.5*sim.RandomFloat("Enemy Weapon Damage")
+	return weapon.BaseDamageMin * (rand + attackPower*EnemyAutoAttackAPCoefficient)
+}
+
 func (weapon Weapon) BaseDamage(sim *Simulation) float64 {
 	return weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("Weapon Base Damage")
 }
@@ -185,27 +190,45 @@ func (unit *Unit) EnableAutoAttacks(agent Agent, options AutoAttackOptions) {
 		DelayOHSwings:  options.DelayOHSwings,
 		ReplaceMHSwing: options.ReplaceMHSwing,
 		IsDualWielding: options.MainHand.SwingSpeed != 0 && options.OffHand.SwingSpeed != 0,
-		MHEffect: SpellEffect{
+	}
+
+	if unit.Type == EnemyUnit {
+		unit.AutoAttacks.MHEffect = SpellEffect{
+			ProcMask:         ProcMaskMeleeMHAuto,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       BaseDamageConfigEnemyWeapon(MainHand),
+			OutcomeApplier:   unit.OutcomeFuncMeleeWhite(options.MainHand.CritMultiplier),
+		}
+		unit.AutoAttacks.OHEffect = SpellEffect{
+			ProcMask:         ProcMaskMeleeOHAuto,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       BaseDamageConfigEnemyWeapon(OffHand),
+			OutcomeApplier:   unit.OutcomeFuncMeleeWhite(options.OffHand.CritMultiplier),
+		}
+	} else {
+		unit.AutoAttacks.MHEffect = SpellEffect{
 			ProcMask:         ProcMaskMeleeMHAuto,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       BaseDamageConfigMeleeWeapon(MainHand, false, 0, 1, true),
 			OutcomeApplier:   unit.OutcomeFuncMeleeWhite(options.MainHand.CritMultiplier),
-		},
-		OHEffect: SpellEffect{
+		}
+		unit.AutoAttacks.OHEffect = SpellEffect{
 			ProcMask:         ProcMaskMeleeOHAuto,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       BaseDamageConfigMeleeWeapon(OffHand, false, 0, 1, true),
 			OutcomeApplier:   unit.OutcomeFuncMeleeWhite(options.OffHand.CritMultiplier),
-		},
-		RangedEffect: SpellEffect{
+		}
+		unit.AutoAttacks.RangedEffect = SpellEffect{
 			ProcMask:         ProcMaskRangedAuto,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       BaseDamageConfigRangedWeapon(0),
 			OutcomeApplier:   unit.OutcomeFuncRangedHitAndCrit(options.Ranged.CritMultiplier),
-		},
+		}
 	}
 }
 

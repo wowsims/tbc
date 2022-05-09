@@ -15,8 +15,10 @@ export class ToplineResults extends ResultComponent {
 		let content = RaidSimResultsManager.makeToplineResultsContent(resultData.result, players.length == 1);
 
 		const noManaSpecs = [
+			Spec.SpecFeralDruid,
 			Spec.SpecRogue,
 			Spec.SpecWarrior,
+			Spec.SpecProtectionWarrior,
 		];
 
 		if (players.length == 1 && !noManaSpecs.includes(players[0].spec)) {

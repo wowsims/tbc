@@ -249,6 +249,7 @@ export class UnitMetrics {
 	readonly classColor: string;
 	readonly dps: DistributionMetricsProto;
 	readonly tps: DistributionMetricsProto;
+	readonly dtps: DistributionMetricsProto;
 	readonly actions: Array<ActionMetrics>;
 	readonly auras: Array<AuraMetrics>;
 	readonly resources: Array<ResourceMetrics>;
@@ -293,6 +294,7 @@ export class UnitMetrics {
 		this.classColor = classColors[specToClass[this.spec]];
 		this.dps = this.metrics.dps!;
 		this.tps = this.metrics.threat!;
+		this.dtps = this.metrics.dtps!;
 		this.actions = actions;
 		this.auras = auras;
 		this.resources = resources;

@@ -1,5 +1,9 @@
 package core
 
+import (
+	"github.com/wowsims/tbc/sim/core/stats"
+)
+
 // Function for calculating the base damage of a spell.
 type BaseDamageCalculator func(*Simulation, *SpellEffect, *Spell) float64
 
@@ -161,6 +165,23 @@ func BaseDamageFuncRangedWeapon(flatBonus float64) BaseDamageCalculator {
 }
 func BaseDamageConfigRangedWeapon(flatBonus float64) BaseDamageConfig {
 	return BuildBaseDamageConfig(BaseDamageFuncRangedWeapon(flatBonus), 1)
+}
+
+func BaseDamageFuncEnemyWeapon(hand Hand) BaseDamageCalculator {
+	if hand == MainHand {
+		return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
+			ap := MaxFloat(0, spell.Unit.stats[stats.AttackPower])
+			return spell.Unit.AutoAttacks.MH.EnemyWeaponDamage(sim, ap)
+		}
+	} else {
+		return func(sim *Simulation, hitEffect *SpellEffect, spell *Spell) float64 {
+			ap := MaxFloat(0, spell.Unit.stats[stats.AttackPower])
+			return spell.Unit.AutoAttacks.MH.EnemyWeaponDamage(sim, ap) * 0.5
+		}
+	}
+}
+func BaseDamageConfigEnemyWeapon(hand Hand) BaseDamageConfig {
+	return BuildBaseDamageConfig(BaseDamageFuncEnemyWeapon(hand), 0)
 }
 
 // Performs an actual damage roll. Keep this internal because the 2nd parameter

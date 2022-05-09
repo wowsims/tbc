@@ -31,6 +31,8 @@ const ResilienceRatingPerCritDamageReductionPercent = 39.4231 / 2
 
 const LevelBasedNPCSpellResistancePerLevel = 28.0 / 3
 
+const EnemyAutoAttackAPCoefficient = 0.000649375
+
 // IDs for items used in core
 const (
 	ItemIDAtieshMage            = 22589
