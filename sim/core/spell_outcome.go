@@ -392,7 +392,7 @@ func (spellEffect *SpellEffect) applyAttackTableHit(spell *Spell) {
 }
 
 func (spellEffect *SpellEffect) applyEnemyAttackTableMiss(spell *Spell, unit *Unit, attackTable *AttackTable, roll float64, chance *float64) bool {
-	missChance := attackTable.BaseMissChance - spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
+	missChance := attackTable.BaseMissChance + spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
 	*chance = MaxFloat(0, missChance)
 
 	if roll < *chance {
@@ -409,7 +409,7 @@ func (spellEffect *SpellEffect) applyEnemyAttackTableBlock(spell *Spell, unit *U
 		return false
 	}
 
-	blockChance := attackTable.BaseBlockChance - spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
+	blockChance := attackTable.BaseBlockChance + spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
 	*chance += MaxFloat(0, blockChance)
 
 	if roll < *chance {
@@ -422,7 +422,7 @@ func (spellEffect *SpellEffect) applyEnemyAttackTableBlock(spell *Spell, unit *U
 }
 
 func (spellEffect *SpellEffect) applyEnemyAttackTableDodge(spell *Spell, unit *Unit, attackTable *AttackTable, roll float64, chance *float64) bool {
-	dodgeChance := attackTable.BaseDodgeChance - spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
+	dodgeChance := attackTable.BaseDodgeChance + spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
 	*chance += MaxFloat(0, dodgeChance)
 
 	if roll < *chance {
@@ -439,7 +439,7 @@ func (spellEffect *SpellEffect) applyEnemyAttackTableParry(spell *Spell, unit *U
 		return false
 	}
 
-	parryChance := attackTable.BaseParryChance - spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
+	parryChance := attackTable.BaseParryChance + spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
 	*chance += MaxFloat(0, parryChance)
 
 	if roll < *chance {
