@@ -252,6 +252,9 @@ func runServer(useFS bool, host string, launchBrowser bool, simName string, wasm
 		if strings.HasSuffix(req.URL.Path, ".wasm") {
 			resp.Header().Set("content-type", "application/wasm")
 		}
+		if strings.HasSuffix(req.URL.Path, ".js") {
+			resp.Header().Set("content-type", "application/javascript")
+		}
 		if !useFS || (useFS && !wasm) {
 			if strings.HasSuffix(req.URL.Path, "sim_worker.js") {
 				req.URL.Path = strings.Replace(req.URL.Path, "sim_worker.js", "net_worker.js", 1)
