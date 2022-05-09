@@ -930,17 +930,17 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-Average-Default"
  value: {
-  dps: 510.73979526224446
-  tps: 912.1727406188252
-  dtps: 12.430220610051283
+  dps: 510.59461606169407
+  tps: 911.89673750528
+  dtps: 1380.916693542966
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-SelfDrums-DPS"
  value: {
-  dps: 510.03135459287535
-  tps: 911.490835357857
-  dtps: 12.485958874759628
+  dps: 508.4805263358739
+  tps: 908.6130982231814
+  dtps: 1378.0507732247106
  }
 }
 dps_results: {
@@ -1058,8 +1058,8 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-SwitchInFrontOfTarget-Default"
  value: {
-  dps: 572.1488303692345
-  tps: 1013.9713487597853
-  dtps: 12.436627067313303
+  dps: 570.4118583724686
+  tps: 1010.639975157703
+  dtps: 1386.624330142706
  }
 }
