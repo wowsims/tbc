@@ -82,6 +82,7 @@ func (shaman *Shaman) ApplyTalents() {
 	}
 
 	if shaman.Talents.SpiritWeapons {
+		shaman.PseudoStats.CanParry = true
 		shaman.AutoAttacks.MHEffect.ThreatMultiplier *= 0.7
 		shaman.AutoAttacks.OHEffect.ThreatMultiplier *= 0.7
 	}

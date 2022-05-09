@@ -81,6 +81,8 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 		Talents:   talents,
 	}
 
+	paladin.PseudoStats.CanParry = true
+
 	paladin.EnableManaBar()
 
 	// Add paladin stat dependencies
