@@ -198,14 +198,14 @@ func (unit *Unit) EnableAutoAttacks(agent Agent, options AutoAttackOptions) {
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       BaseDamageConfigEnemyWeapon(MainHand),
-			OutcomeApplier:   unit.OutcomeFuncMeleeWhite(options.MainHand.CritMultiplier),
+			OutcomeApplier:   unit.OutcomeFuncEnemyMeleeWhite(),
 		}
 		unit.AutoAttacks.OHEffect = SpellEffect{
 			ProcMask:         ProcMaskMeleeOHAuto,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       BaseDamageConfigEnemyWeapon(OffHand),
-			OutcomeApplier:   unit.OutcomeFuncMeleeWhite(options.OffHand.CritMultiplier),
+			OutcomeApplier:   unit.OutcomeFuncEnemyMeleeWhite(),
 		}
 	} else {
 		unit.AutoAttacks.MHEffect = SpellEffect{

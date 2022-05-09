@@ -159,6 +159,8 @@ func NewWarrior(character core.Character, talents proto.WarriorTalents, inputs W
 		WarriorInputs: inputs,
 	}
 
+	warrior.PseudoStats.CanParry = true
+
 	warrior.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,
 		ModifiedStat: stats.MeleeCrit,

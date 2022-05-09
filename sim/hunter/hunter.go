@@ -182,6 +182,8 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		hunter.HasMHWeaponImbue = true
 	}
 
+	hunter.PseudoStats.CanParry = true
+
 	rangedWeapon := hunter.WeaponFromRanged(0)
 	hunter.PseudoStats.RangedSpeedMultiplier = 1
 	if hunter.HasRangedWeapon() && hunter.GetRangedWeapon().ID == ThoridalTheStarsFuryItemID {

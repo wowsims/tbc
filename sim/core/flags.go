@@ -103,6 +103,7 @@ const (
 
 	// These bits are set by the crit and damage rolls.
 	OutcomeCrit
+	OutcomeCrush
 	OutcomePartial1_4 // 1/4 of the spell was resisted.
 	OutcomePartial2_4 // 2/4 of the spell was resisted.
 	OutcomePartial3_4 // 3/4 of the spell was resisted.
@@ -110,7 +111,7 @@ const (
 
 const (
 	OutcomePartial = OutcomePartial1_4 | OutcomePartial2_4 | OutcomePartial3_4
-	OutcomeLanded  = OutcomeHit | OutcomeCrit | OutcomeGlance | OutcomeBlock
+	OutcomeLanded  = OutcomeHit | OutcomeCrit | OutcomeCrush | OutcomeGlance | OutcomeBlock
 )
 
 func (ho HitOutcome) String() string {
@@ -132,6 +133,8 @@ func (ho HitOutcome) String() string {
 		return "Crit" + ho.PartialResistString()
 	} else if ho.Matches(OutcomeHit) {
 		return "Hit" + ho.PartialResistString()
+	} else if ho.Matches(OutcomeCrush) {
+		return "Crush"
 	} else {
 		return "Empty"
 	}

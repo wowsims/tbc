@@ -194,6 +194,7 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 
 	// Passive rogue threat reduction: https://tbc.wowhead.com/spell=21184/rogue-passive-dnd
 	rogue.PseudoStats.ThreatMultiplier *= 0.71
+	rogue.PseudoStats.CanParry = true
 
 	daggerMH := rogue.Equip[proto.ItemSlot_ItemSlotMainHand].WeaponType == proto.WeaponType_WeaponTypeDagger
 	daggerOH := rogue.Equip[proto.ItemSlot_ItemSlotOffHand].WeaponType == proto.WeaponType_WeaponTypeDagger
