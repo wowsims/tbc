@@ -583,6 +583,7 @@ enum OtherAction {
 	OtherActionShoot = 4; // Default shoot action using a wand/bow/gun.
 	OtherActionPet = 7; // Represents a grouping of all pet actions. Only used by the UI.
 	OtherActionRefund = 8; // Refund of a resource like Energy or Rage, when the ability didn't land.
+	OtherActionDamageTaken = 9; // Indicates damage taken; used for rage gen.
 }
 
 message ActionID {
