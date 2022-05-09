@@ -141,16 +141,13 @@ func (warlock *Warlock) registerCurseOfAgonySpell() {
 		effect.BaseDamage = core.WrapBaseDamageConfig(effect.BaseDamage, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
 			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 				if warlock.AmplifyCurseAura.IsActive() {
+					warlock.AmplifyCurseAura.Deactivate(sim)
 					return oldCalculator(sim, hitEffect, spell) * 1.5
 				} else {
 					return oldCalculator(sim, hitEffect, spell)
 				}
 			}
 		})
-		// Make sure a hit of this spell deactivates any active amp curse
-		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			warlock.AmplifyCurseAura.Deactivate(sim)
-		}
 	}
 	warlock.CurseOfAgony = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:     actionID,
