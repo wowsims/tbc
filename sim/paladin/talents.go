@@ -32,7 +32,7 @@ func (paladin *Paladin) applyCrusade() {
 	damageMultiplier := 1 + (0.01 * float64(paladin.Talents.Crusade)) // assume multiplicative scaling
 
 	// TO-DO: This doesn't account for multiple targets
-	switch paladin.Env.GetPrimaryTarget().MobType {
+	switch paladin.CurrentTarget.MobType {
 	case proto.MobType_MobTypeHumanoid, proto.MobType_MobTypeDemon, proto.MobType_MobTypeUndead, proto.MobType_MobTypeElemental:
 		paladin.PseudoStats.DamageDealtMultiplier *= damageMultiplier
 	}
@@ -91,7 +91,7 @@ func (paladin *Paladin) applyVengeance() {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				procAura.Activate(sim)
 				procAura.AddStack(sim)

@@ -41,7 +41,7 @@ func (shaman *Shaman) registerBloodlustCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			for _, blAura := range blAuras {
 				blAura.Activate(sim)
 			}

@@ -72,13 +72,6 @@ func (party *Party) AddStat(stat stats.Stat, amount float64) {
 func (party *Party) reset(sim *Simulation) {
 	for _, agent := range party.Players {
 		agent.GetCharacter().reset(sim, agent)
-
-		agent.GetCharacter().SetGCDTimer(sim, 0)
-		for _, petAgent := range agent.GetCharacter().Pets {
-			if petAgent.GetPet().initialEnabled {
-				petAgent.GetPet().Enable(sim, petAgent)
-			}
-		}
 	}
 
 	party.dpsMetrics.reset()

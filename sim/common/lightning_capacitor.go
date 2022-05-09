@@ -40,7 +40,7 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 			charges = 0
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !icd.IsReady(sim) {
 				return
 			}

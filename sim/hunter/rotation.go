@@ -32,7 +32,7 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 	}
 
 	if hunter.IsWaitingForMana() && hunter.DoneWaitingForMana(sim) {
-		hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
+		hunter.TryKillCommand(sim, hunter.CurrentTarget)
 		if hunter.nextAction == OptionNone && hunter.Hardcast.Expires <= sim.CurrentTime {
 			hunter.rotation(sim, false)
 		}
@@ -40,7 +40,7 @@ func (hunter *Hunter) OnManaTick(sim *core.Simulation) {
 }
 
 func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
-	hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
+	hunter.TryKillCommand(sim, hunter.CurrentTarget)
 	if spell == hunter.AutoAttacks.RangedAuto {
 		hunter.TryUseCooldowns(sim)
 		hunter.rotation(sim, true)
@@ -50,9 +50,9 @@ func (hunter *Hunter) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
 func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 	if sim.CurrentTime == 0 {
 		if hunter.Rotation.PrecastAimedShot && hunter.Talents.AimedShot {
-			hunter.AimedShot.Cast(sim, sim.GetPrimaryTarget())
+			hunter.AimedShot.Cast(sim, hunter.CurrentTarget)
 		}
-		hunter.AutoAttacks.SwingRanged(sim, sim.GetPrimaryTarget())
+		hunter.AutoAttacks.SwingRanged(sim, hunter.CurrentTarget)
 		return
 	}
 
@@ -60,7 +60,7 @@ func (hunter *Hunter) OnGCDReady(sim *core.Simulation) {
 		return
 	}
 
-	hunter.TryKillCommand(sim, sim.GetPrimaryTarget())
+	hunter.TryKillCommand(sim, hunter.CurrentTarget)
 
 	hunter.rotation(sim, false)
 }
@@ -278,7 +278,7 @@ func (hunter *Hunter) adaptiveRotation(sim *core.Simulation, followsRangedAuto b
 
 func (hunter *Hunter) doOption(sim *core.Simulation, option int) {
 	hunter.nextAction = OptionNone
-	target := sim.GetPrimaryTarget()
+	target := hunter.CurrentTarget
 	switch option {
 	case OptionShoot:
 		hunter.AutoAttacks.SwingRanged(sim, target)
@@ -346,7 +346,7 @@ func (hunter *Hunter) tryUsePrioGCD(sim *core.Simulation) bool {
 		}
 	}
 
-	target := sim.GetPrimaryTarget()
+	target := hunter.CurrentTarget
 
 	if hunter.Rotation.Sting == proto.Hunter_Rotation_ScorpidSting && !hunter.ScorpidStingAura.IsActive() {
 		success := hunter.ScorpidSting.Cast(sim, target)
@@ -372,7 +372,7 @@ func (hunter *Hunter) doMeleeWeave(sim *core.Simulation) {
 		hunter.SetGCDTimer(sim, doneWeavingAt)
 	}
 
-	hunter.AutoAttacks.TrySwingMH(sim, sim.GetPrimaryTarget())
+	hunter.AutoAttacks.TrySwingMH(sim, hunter.CurrentTarget)
 	hunter.HardcastWaitUntil(sim, doneWeavingAt, hunter.hardcastOnComplete)
 }
 

@@ -25,12 +25,12 @@ func (warlock *Warlock) registerCorruptionSpell() {
 			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:       core.ProcMaskEmpty, // no damage done by application.
-			OutcomeApplier: warlock.OutcomeFuncMagicHit(),
-			OnSpellHit:     applyDotOnLanded(&warlock.CorruptionDot),
+			ProcMask:        core.ProcMaskEmpty, // no damage done by application.
+			OutcomeApplier:  warlock.OutcomeFuncMagicHit(),
+			OnSpellHitDealt: applyDotOnLanded(&warlock.CorruptionDot),
 		}),
 	})
-	target := warlock.Env.GetPrimaryTarget()
+	target := warlock.CurrentTarget
 	spellCoefficient := 0.156 + (0.12 * float64(warlock.Talents.EmpoweredCorruption))
 
 	warlock.CorruptionDot = core.NewDot(core.Dot{

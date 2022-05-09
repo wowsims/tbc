@@ -19,16 +19,20 @@ func (warlock *Warlock) registerShadowboltSpell() {
 		OutcomeApplier:       warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
 	}
 	// Don't add ISB debuff aura if the target is initialized with the 'estimated ISB uptime' debuff.
-	if warlock.Talents.ImprovedShadowBolt > 0 && (!warlock.Env.Encounter.Targets[0].HasAura("Improved Shadow Bolt") || warlock.Env.Encounter.Targets[0].GetAura("Improved Shadow Bolt").MaxStacks != 0) {
-		warlock.ImpShadowboltAura = warlock.impShadowboltDebuffAura(warlock.Env.GetPrimaryTarget())
-		effect.OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				return
+	if warlock.Talents.ImprovedShadowBolt > 0 {
+		existingAura := warlock.Env.Encounter.Targets[0].GetAurasWithTag("ImprovedShadowBolt")
+
+		if len(existingAura) == 0 || existingAura[0].Duration != core.NeverExpires {
+			warlock.ImpShadowboltAura = core.ImprovedShadowBoltAura(warlock.CurrentTarget, warlock.Talents.ImprovedShadowBolt, 0)
+			effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+					return
+				}
+				if !warlock.ImpShadowboltAura.IsActive() {
+					warlock.ImpShadowboltAura.Activate(sim)
+				}
+				warlock.ImpShadowboltAura.SetStacks(sim, 4)
 			}
-			if !warlock.ImpShadowboltAura.IsActive() {
-				warlock.ImpShadowboltAura.Activate(sim)
-			}
-			warlock.ImpShadowboltAura.SetStacks(sim, 4)
 		}
 	}
 
@@ -60,29 +64,4 @@ func (warlock *Warlock) registerShadowboltSpell() {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(effect),
 	})
 
-}
-
-func (warlock *Warlock) impShadowboltDebuffAura(target *core.Target) *core.Aura {
-	bonus := 1 + 0.04*float64(warlock.Talents.ImprovedShadowBolt)
-	return target.GetOrRegisterAura(core.Aura{
-		Label:     "Improved Shadow Bolt",
-		ActionID:  core.ActionID{SpellID: 17803},
-		Duration:  time.Second * 12,
-		MaxStacks: 4,
-		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			target.PseudoStats.ShadowDamageTakenMultiplier *= bonus
-		},
-		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			target.PseudoStats.ShadowDamageTakenMultiplier /= bonus
-		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spell.SpellSchool != core.SpellSchoolShadow {
-				return
-			}
-			if !spellEffect.Landed() || spellEffect.Damage == 0 || spellEffect.IsPhantom || spellEffect.ProcMask == 0 {
-				return
-			}
-			aura.RemoveStack(sim)
-		},
-	})
 }

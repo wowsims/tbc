@@ -41,7 +41,7 @@ func (mage *Mage) registerArcaneMissilesSpell() {
 
 			OutcomeApplier: mage.OutcomeFuncMagicHit(),
 
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					// CC has a special interaction with AM, gets the benefit of CC crit bonus from
 					// the previous cast along with its own.
@@ -56,7 +56,7 @@ func (mage *Mage) registerArcaneMissilesSpell() {
 		}),
 	})
 
-	target := mage.Env.GetPrimaryTarget()
+	target := mage.CurrentTarget
 	mage.ArcaneMissilesDot = core.NewDot(core.Dot{
 		Spell: mage.ArcaneMissiles,
 		Aura: target.RegisterAura(core.Aura{

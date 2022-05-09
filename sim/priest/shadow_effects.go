@@ -4,13 +4,13 @@ import (
 	"github.com/wowsims/tbc/sim/core"
 )
 
-func (priest *Priest) ApplyMisery(sim *core.Simulation, target *core.Target) {
+func (priest *Priest) ApplyMisery(sim *core.Simulation, target *core.Unit) {
 	if priest.MiseryAura != nil {
 		priest.MiseryAura.Activate(sim)
 	}
 }
 
-func (priest *Priest) ApplyShadowWeaving(sim *core.Simulation, target *core.Target) {
+func (priest *Priest) ApplyShadowWeaving(sim *core.Simulation, target *core.Unit) {
 	if priest.ShadowWeavingAura == nil {
 		return
 	}
@@ -34,7 +34,7 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnPeriodicDamage: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnPeriodicDamageDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Damage > 0 && priest.VampiricTouchDot.IsActive() {
 				amount := spellEffect.Damage * 0.05
 				for _, partyMember := range priest.Party.Players {
@@ -48,7 +48,7 @@ func (priest *Priest) ApplyShadowOnHitEffects() {
 				}
 			}
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() {
 				return
 			}

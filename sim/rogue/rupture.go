@@ -37,7 +37,7 @@ func (rogue *Rogue) makeRupture(comboPoints int32) *core.Spell {
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			OutcomeApplier:   rogue.OutcomeFuncMeleeSpecialHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					rogue.RuptureDot.Spell = spell
 					rogue.RuptureDot.NumberOfTicks = numTicks
@@ -68,7 +68,7 @@ func (rogue *Rogue) registerRupture() {
 		rogue.makeRupture(5),
 	}
 
-	target := rogue.Env.GetPrimaryTarget()
+	target := rogue.CurrentTarget
 	rogue.RuptureDot = core.NewDot(core.Dot{
 		Spell: rogue.Rupture[0],
 		Aura: target.RegisterAura(core.Aura{

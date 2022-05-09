@@ -3,6 +3,7 @@ package core
 import (
 	"time"
 
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -29,6 +30,8 @@ type Unit struct {
 	Label string
 
 	Level int32 // Level of Unit, e.g. Bosses are lvl 73.
+
+	MobType proto.MobType
 
 	// Environment in which this Unit exists. This will be nil until after the
 	// construction phase.
@@ -69,7 +72,7 @@ type Unit struct {
 	AutoAttacks AutoAttacks
 
 	// Statistics describing the results of the sim.
-	Metrics CharacterMetrics
+	Metrics UnitMetrics
 
 	cdTimers []*Timer
 
@@ -95,6 +98,8 @@ type Unit struct {
 	manaTickWhileNotCasting float64
 
 	CastSpeed float64
+
+	CurrentTarget *Unit
 }
 
 func (unit *Unit) Log(sim *Simulation, message string, vals ...interface{}) {
@@ -318,6 +323,8 @@ func (unit *Unit) finalize() {
 	unit.initialCastSpeed = unit.CastSpeed
 	unit.initialMeleeSwingSpeed = unit.SwingSpeed()
 	unit.initialRangedSwingSpeed = unit.RangedSwingSpeed()
+
+	unit.applyParryHaste()
 }
 
 func (unit *Unit) init(sim *Simulation) {
@@ -333,9 +340,12 @@ func (unit *Unit) reset(sim *Simulation, agent Agent) {
 		spell.reset(sim)
 	}
 
-	if agent != nil {
-		unit.gcdAction = unit.newGCDAction(sim, agent)
-	}
+	unit.UpdateManaRegenRates()
+
+	unit.energyBar.reset(sim)
+	unit.rageBar.reset(sim)
+
+	unit.AutoAttacks.reset(sim)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
@@ -356,6 +366,5 @@ func (unit *Unit) doneIteration(sim *Simulation) {
 	for _, spell := range unit.Spellbook {
 		spell.doneIteration()
 	}
-	unit.Metrics.doneIteration(sim.Duration.Seconds())
 	unit.resetCDs(sim)
 }

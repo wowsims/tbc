@@ -109,7 +109,7 @@ func (warlock *Warlock) setupAmplifyCurse() {
 				Duration: time.Minute * 3,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			warlock.AmplifyCurseAura.Activate(sim)
 		},
 	})
@@ -140,7 +140,7 @@ func (warlock *Warlock) setupNightfall() {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnPeriodicDamage: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnPeriodicDamageDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell != warlock.Corruption { // TODO: also works on drain life...
 				return
 			}

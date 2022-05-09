@@ -28,7 +28,7 @@ var ItemSetMalorne = core.ItemSet{
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Activate(sim)
 				},
-				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 						return
 					}
@@ -104,7 +104,7 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell == druid.Moonfire {
 				if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
 					return
@@ -130,7 +130,7 @@ func ApplyAshtongueTalisman(agent core.Agent) {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell == druid.Starfire8 || spell == druid.Starfire6 {
 				if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
 					return

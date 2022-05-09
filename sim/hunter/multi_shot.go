@@ -27,9 +27,9 @@ func (hunter *Hunter) registerMultiShotSpell() {
 			},
 			TargetSpellCoefficient: 1,
 		}),
-		OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, hunter.Env.GetPrimaryTarget())),
+		OutcomeApplier: hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, hunter.CurrentTarget)),
 
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			hunter.rotation(sim, false)
 		},
 	}
@@ -38,7 +38,7 @@ func (hunter *Hunter) registerMultiShotSpell() {
 	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
-		effects[i].Target = hunter.Env.GetTarget(i)
+		effects[i].Target = hunter.Env.GetTargetUnit(i)
 	}
 
 	hunter.MultiShot = hunter.RegisterSpell(core.SpellConfig{

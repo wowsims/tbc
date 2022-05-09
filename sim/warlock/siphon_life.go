@@ -25,13 +25,13 @@ func (warlock *Warlock) registerSiphonLifeSpell() {
 			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:       core.ProcMaskEmpty,
-			OutcomeApplier: warlock.OutcomeFuncMagicHit(),
-			OnSpellHit:     applyDotOnLanded(&warlock.SiphonLifeDot),
+			ProcMask:        core.ProcMaskEmpty,
+			OutcomeApplier:  warlock.OutcomeFuncMagicHit(),
+			OnSpellHitDealt: applyDotOnLanded(&warlock.SiphonLifeDot),
 		}),
 	})
 
-	target := warlock.Env.GetPrimaryTarget()
+	target := warlock.CurrentTarget
 	spellCoefficient := 0.1
 	warlock.SiphonLifeDot = core.NewDot(core.Dot{
 		Spell: warlock.SiphonLife,

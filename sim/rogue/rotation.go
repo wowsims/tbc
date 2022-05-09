@@ -58,7 +58,7 @@ func (rogue *Rogue) doPlanSliceASAP(sim *core.Simulation) {
 
 	energy := rogue.CurrentEnergy()
 	comboPoints := rogue.ComboPoints()
-	target := sim.GetPrimaryTarget()
+	target := rogue.CurrentTarget
 	sndTimeRemaining := rogue.SliceAndDiceAura.RemainingDuration(sim)
 
 	if comboPoints > 0 {
@@ -91,7 +91,7 @@ func (rogue *Rogue) doPlanMaximalSlice(sim *core.Simulation) {
 
 	energy := rogue.CurrentEnergy()
 	comboPoints := rogue.ComboPoints()
-	target := sim.GetPrimaryTarget()
+	target := rogue.CurrentTarget
 	sndTimeRemaining := rogue.SliceAndDiceAura.RemainingDuration(sim)
 
 	remainingSimDuration := sim.GetRemainingDuration()
@@ -171,7 +171,7 @@ func (rogue *Rogue) doPlanExposeArmor(sim *core.Simulation) {
 
 	energy := rogue.CurrentEnergy()
 	comboPoints := rogue.ComboPoints()
-	target := sim.GetPrimaryTarget()
+	target := rogue.CurrentTarget
 
 	if comboPoints == 5 {
 		if energy >= rogue.ExposeArmor.DefaultCast.Cost || rogue.deathmantleActive() {
@@ -194,7 +194,7 @@ func (rogue *Rogue) doPlanExposeArmor(sim *core.Simulation) {
 func (rogue *Rogue) doPlanFillBeforeEA(sim *core.Simulation) {
 	energy := rogue.CurrentEnergy()
 	comboPoints := rogue.ComboPoints()
-	target := sim.GetPrimaryTarget()
+	target := rogue.CurrentTarget
 	eaTimeRemaining := rogue.ExposeArmorAura.RemainingDuration(sim)
 
 	if rogue.eaBuildTime+buildTimeBuffer > eaTimeRemaining {
@@ -226,7 +226,7 @@ func (rogue *Rogue) doPlanFillBeforeEA(sim *core.Simulation) {
 func (rogue *Rogue) doPlanFillBeforeSND(sim *core.Simulation) {
 	energy := rogue.CurrentEnergy()
 	comboPoints := rogue.ComboPoints()
-	target := sim.GetPrimaryTarget()
+	target := rogue.CurrentTarget
 	sndTimeRemaining := rogue.SliceAndDiceAura.RemainingDuration(sim)
 
 	if !rogue.doneSND && rogue.eaBuildTime+buildTimeBuffer > sndTimeRemaining {
@@ -262,7 +262,7 @@ func (rogue *Rogue) doPlanNone(sim *core.Simulation) {
 	}
 
 	comboPoints := rogue.ComboPoints()
-	target := sim.GetPrimaryTarget()
+	target := rogue.CurrentTarget
 
 	if comboPoints == 0 {
 		// No option other than using a builder.
@@ -321,7 +321,7 @@ func (rogue *Rogue) canPoolEnergy(sim *core.Simulation, energy float64) bool {
 	return sim.GetRemainingDuration() >= time.Second*6 && energy <= 50 && ((rogue.AdrenalineRushAura == nil || !rogue.AdrenalineRushAura.IsActive()) || energy <= 30)
 }
 
-func (rogue *Rogue) castBuilder(sim *core.Simulation, target *core.Target) {
+func (rogue *Rogue) castBuilder(sim *core.Simulation, target *core.Unit) {
 	if rogue.Rotation.UseShiv && rogue.DeadlyPoisonDot.IsActive() && rogue.DeadlyPoisonDot.RemainingDuration(sim) < time.Second*2 && rogue.CurrentEnergy() >= rogue.Shiv.DefaultCast.Cost {
 		rogue.Shiv.Cast(sim, target)
 	} else {
@@ -335,13 +335,13 @@ func (rogue *Rogue) tryUseDamageFinisher(sim *core.Simulation, energy float64, c
 		sim.GetRemainingDuration() >= rogue.RuptureDuration(comboPoints) &&
 		(sim.GetNumTargets() == 1 || (rogue.BladeFlurryAura == nil || !rogue.BladeFlurryAura.IsActive())) {
 		if energy >= RuptureEnergyCost || rogue.deathmantleActive() {
-			rogue.Rupture[comboPoints].Cast(sim, sim.GetPrimaryTarget())
+			rogue.Rupture[comboPoints].Cast(sim, rogue.CurrentTarget)
 		}
 		return true
 	}
 
 	if energy >= rogue.Eviscerate[comboPoints].DefaultCast.Cost || rogue.deathmantleActive() {
-		rogue.Eviscerate[comboPoints].Cast(sim, sim.GetPrimaryTarget())
+		rogue.Eviscerate[comboPoints].Cast(sim, rogue.CurrentTarget)
 		return true
 	}
 	return false

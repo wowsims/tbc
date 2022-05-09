@@ -22,7 +22,7 @@ func (war *DpsWarrior) OnAutoAttack(sim *core.Simulation, spell *core.Spell) {
 func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 	if war.thunderClapNext {
 		if war.CanThunderClap(sim) {
-			war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
+			war.ThunderClap.Cast(sim, war.CurrentTarget)
 			if war.ThunderClapAura.RemainingDuration(sim) > DebuffRefreshWindow {
 				war.thunderClapNext = false
 
@@ -38,7 +38,7 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 
 	if war.shouldSunder(sim) {
 		war.castSlamAt = 0
-		war.SunderArmor.Cast(sim, sim.GetPrimaryTarget())
+		war.SunderArmor.Cast(sim, war.CurrentTarget)
 		war.tryQueueHsCleave(sim)
 		return
 	}
@@ -49,7 +49,7 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 		} else if sim.CurrentTime == war.castSlamAt {
 			war.castSlamAt = 0
 			if war.CanSlam() {
-				war.CastSlam(sim, sim.GetPrimaryTarget())
+				war.CastSlam(sim, war.CurrentTarget)
 				war.tryQueueHsCleave(sim)
 				return
 			}
@@ -96,13 +96,13 @@ func (war *DpsWarrior) normalRotation(sim *core.Simulation, highPrioSpellsOnly b
 		if war.ShouldRampage(sim) {
 			war.Rampage.Cast(sim, nil)
 		} else if war.Rotation.PrioritizeWw && war.CanWhirlwind(sim) {
-			war.Whirlwind.Cast(sim, sim.GetPrimaryTarget())
+			war.Whirlwind.Cast(sim, war.CurrentTarget)
 		} else if war.CanBloodthirst(sim) {
-			war.Bloodthirst.Cast(sim, sim.GetPrimaryTarget())
+			war.Bloodthirst.Cast(sim, war.CurrentTarget)
 		} else if war.CanMortalStrike(sim) {
-			war.MortalStrike.Cast(sim, sim.GetPrimaryTarget())
+			war.MortalStrike.Cast(sim, war.CurrentTarget)
 		} else if !war.Rotation.PrioritizeWw && war.CanWhirlwind(sim) {
-			war.Whirlwind.Cast(sim, sim.GetPrimaryTarget())
+			war.Whirlwind.Cast(sim, war.CurrentTarget)
 		} else if !highPrioSpellsOnly {
 			if war.tryMaintainDebuffs(sim) {
 				// Do nothing, already cast
@@ -113,11 +113,11 @@ func (war *DpsWarrior) normalRotation(sim *core.Simulation, highPrioSpellsOnly b
 					}
 					war.BattleStance.Cast(sim, nil)
 				}
-				war.Overpower.Cast(sim, sim.GetPrimaryTarget())
+				war.Overpower.Cast(sim, war.CurrentTarget)
 			} else if war.ShouldBerserkerRage(sim) {
 				war.BerserkerRage.Cast(sim, nil)
 			} else if war.Rotation.UseHamstring && war.CurrentRage() >= war.Rotation.HamstringRageThreshold && war.ShouldHamstring(sim) {
-				war.Hamstring.Cast(sim, sim.GetPrimaryTarget())
+				war.Hamstring.Cast(sim, war.CurrentTarget)
 			}
 		}
 	}
@@ -130,18 +130,18 @@ func (war *DpsWarrior) executeRotation(sim *core.Simulation, highPrioSpellsOnly 
 		if war.ShouldRampage(sim) {
 			war.Rampage.Cast(sim, nil)
 		} else if war.Rotation.PrioritizeWw && war.Rotation.UseWwDuringExecute && war.CanWhirlwind(sim) {
-			war.Whirlwind.Cast(sim, sim.GetPrimaryTarget())
+			war.Whirlwind.Cast(sim, war.CurrentTarget)
 		} else if war.Rotation.UseBtDuringExecute && war.CanBloodthirst(sim) {
-			war.Bloodthirst.Cast(sim, sim.GetPrimaryTarget())
+			war.Bloodthirst.Cast(sim, war.CurrentTarget)
 		} else if war.Rotation.UseMsDuringExecute && war.CanMortalStrike(sim) {
-			war.MortalStrike.Cast(sim, sim.GetPrimaryTarget())
+			war.MortalStrike.Cast(sim, war.CurrentTarget)
 		} else if !war.Rotation.PrioritizeWw && war.Rotation.UseWwDuringExecute && war.CanWhirlwind(sim) {
-			war.Whirlwind.Cast(sim, sim.GetPrimaryTarget())
+			war.Whirlwind.Cast(sim, war.CurrentTarget)
 		} else if !highPrioSpellsOnly {
 			if war.tryMaintainDebuffs(sim) {
 				// Do nothing, already cast
 			} else if war.CanExecute() {
-				war.Execute.Cast(sim, sim.GetPrimaryTarget())
+				war.Execute.Cast(sim, war.CurrentTarget)
 			} else if war.ShouldBerserkerRage(sim) {
 				war.BerserkerRage.Cast(sim, nil)
 			}
@@ -240,7 +240,7 @@ func (war *DpsWarrior) tryMaintainDebuffs(sim *core.Simulation) bool {
 		war.Shout.Cast(sim, nil)
 		return true
 	} else if war.Rotation.MaintainDemoShout && war.DemoralizingShoutAura.RemainingDuration(sim) < DebuffRefreshWindow && war.CanDemoralizingShout(sim) {
-		war.DemoralizingShout.Cast(sim, sim.GetPrimaryTarget())
+		war.DemoralizingShout.Cast(sim, war.CurrentTarget)
 		return true
 	} else if war.Rotation.MaintainThunderClap && war.ThunderClapAura.RemainingDuration(sim) < DebuffRefreshWindow && war.CanThunderClapIgnoreStance(sim) {
 		war.thunderClapNext = true
@@ -252,7 +252,7 @@ func (war *DpsWarrior) tryMaintainDebuffs(sim *core.Simulation) bool {
 		}
 		// Need to check again because we might have lost rage from switching stances.
 		if war.CanThunderClap(sim) {
-			war.ThunderClap.Cast(sim, sim.GetPrimaryTarget())
+			war.ThunderClap.Cast(sim, war.CurrentTarget)
 			if war.ThunderClapAura.RemainingDuration(sim) > DebuffRefreshWindow {
 				war.thunderClapNext = false
 			}

@@ -31,7 +31,7 @@ func (priest *Priest) registerShadowWordPainSpell() {
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
 			OutcomeApplier:      priest.OutcomeFuncMagicHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					priest.ShadowWordPainDot.Apply(sim)
 				}
@@ -39,7 +39,7 @@ func (priest *Priest) registerShadowWordPainSpell() {
 		}),
 	})
 
-	target := priest.Env.GetPrimaryTarget()
+	target := priest.CurrentTarget
 	priest.ShadowWordPainDot = core.NewDot(core.Dot{
 		Spell: priest.ShadowWordPain,
 		Aura: target.RegisterAura(core.Aura{

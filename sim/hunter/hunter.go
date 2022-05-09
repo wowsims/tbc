@@ -116,9 +116,9 @@ func (hunter *Hunter) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 
 func (hunter *Hunter) Initialize() {
 	// Update auto crit multipliers now that we have the targets.
-	hunter.AutoAttacks.MHEffect.OutcomeApplier = hunter.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, hunter.Env.GetPrimaryTarget()))
-	hunter.AutoAttacks.OHEffect.OutcomeApplier = hunter.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, hunter.Env.GetPrimaryTarget()))
-	hunter.AutoAttacks.RangedEffect.OutcomeApplier = hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, hunter.Env.GetPrimaryTarget()))
+	hunter.AutoAttacks.MHEffect.OutcomeApplier = hunter.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, hunter.CurrentTarget))
+	hunter.AutoAttacks.OHEffect.OutcomeApplier = hunter.OutcomeFuncMeleeWhite(hunter.critMultiplier(false, hunter.CurrentTarget))
+	hunter.AutoAttacks.RangedEffect.OutcomeApplier = hunter.OutcomeFuncRangedHitAndCrit(hunter.critMultiplier(true, hunter.CurrentTarget))
 
 	hunter.registerAspectOfTheHawkSpell()
 	hunter.registerAspectOfTheViperSpell()
@@ -132,7 +132,7 @@ func (hunter *Hunter) Initialize() {
 	hunter.registerSerpentStingSpell()
 	hunter.registerSteadyShotSpell()
 
-	hunter.hardcastOnComplete = func(sim *core.Simulation, _ *core.Target) {
+	hunter.hardcastOnComplete = func(sim *core.Simulation, _ *core.Unit) {
 		hunter.rotation(sim, false)
 	}
 
@@ -149,7 +149,7 @@ func (hunter *Hunter) Reset(sim *core.Simulation) {
 	hunter.permaHawk = false
 	hunter.weaveStartTime = time.Duration(float64(sim.Duration) * (1 - hunter.Rotation.PercentWeaved))
 
-	huntersMarkAura := core.HuntersMarkAura(sim.GetPrimaryTarget(), hunter.Talents.ImprovedHuntersMark, false)
+	huntersMarkAura := core.HuntersMarkAura(hunter.CurrentTarget, hunter.Talents.ImprovedHuntersMark, false)
 	huntersMarkAura.Activate(sim)
 
 	if sim.Log != nil && !hunter.Rotation.LazyRotation {
@@ -181,6 +181,8 @@ func NewHunter(character core.Character, options proto.Player) *Hunter {
 		// stone can be used.
 		hunter.HasMHWeaponImbue = true
 	}
+
+	hunter.PseudoStats.CanParry = true
 
 	rangedWeapon := hunter.WeaponFromRanged(0)
 	hunter.PseudoStats.RangedSpeedMultiplier = 1

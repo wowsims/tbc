@@ -6,7 +6,7 @@ import (
 
 const MaxRage = 100.0
 
-const RageFactor = 3.75 / 274.7
+const RageFactor = 274.7
 
 // OnRageGain is called any time rage is increased.
 type OnRageGain func(sim *Simulation)
@@ -27,7 +27,7 @@ func (unit *Unit) EnableRageBar(startingRage float64, rageMultiplier float64, on
 		OnReset: func(aura *Aura, sim *Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+		OnSpellHitDealt: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if spellEffect.Outcome.Matches(OutcomeMiss) {
 				return
 			}
@@ -61,9 +61,15 @@ func (unit *Unit) EnableRageBar(startingRage float64, rageMultiplier float64, on
 				damage = spellEffect.PreoutcomeDamage
 			}
 
-			generatedRage := damage*RageFactor + HitFactor*BaseSwingSpeed*rageMultiplier
+			generatedRage := damage*(3.75/RageFactor) + HitFactor*BaseSwingSpeed*rageMultiplier
+			// In practice this cap isn't reached so no need to compute it.
+			//generatedRage = MinFloat(generatedRage, damage * (15/RageFactor))
 
 			unit.AddRage(sim, generatedRage, spell.ActionID)
+		},
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			generatedRage := spellEffect.Damage * 2.5 / RageFactor
+			unit.AddRage(sim, generatedRage, ActionID{OtherID: proto.OtherAction_OtherActionDamageTaken})
 		},
 	})
 

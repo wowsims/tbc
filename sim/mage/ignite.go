@@ -17,7 +17,7 @@ func (mage *Mage) registerIgniteSpell() {
 	})
 }
 
-func (mage *Mage) newIgniteDot(target *core.Target) *core.Dot {
+func (mage *Mage) newIgniteDot(target *core.Unit) *core.Dot {
 	return core.NewDot(core.Dot{
 		Spell: mage.Ignite,
 		Aura: target.RegisterAura(core.Aura{
@@ -29,7 +29,7 @@ func (mage *Mage) newIgniteDot(target *core.Target) *core.Dot {
 	})
 }
 
-func (mage *Mage) procIgnite(sim *core.Simulation, target *core.Target, damageFromProccingSpell float64) {
+func (mage *Mage) procIgnite(sim *core.Simulation, target *core.Unit, damageFromProccingSpell float64) {
 	igniteDot := mage.IgniteDots[target.Index]
 
 	newIgniteDamage := damageFromProccingSpell * float64(mage.Talents.Ignite) * 0.08
@@ -69,7 +69,7 @@ func (mage *Mage) applyIgnite() {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}

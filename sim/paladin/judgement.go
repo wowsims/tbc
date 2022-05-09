@@ -37,7 +37,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(cdTimer *core.Timer) {
 		BaseDamage:     core.BaseDamageConfigMagic(295, 325, 0.429),
 		OutcomeApplier: paladin.OutcomeFuncMeleeSpecialCritOnly(paladin.DefaultMeleeCritMultiplier()),
 
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			paladin.sanctifiedJudgement(sim, paladin.SealOfBlood.DefaultCast.Cost)
 			paladin.SealOfBloodAura.Deactivate(sim)
 			if loaAura != nil {
@@ -88,7 +88,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(cdTimer *core.Timer)
 	} else if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27949 {
 		flatBonus += 47.0
 	}
-	paladin.JudgementOfTheCrusaderAura = core.JudgementOfTheCrusaderAura(paladin.Env.GetPrimaryTarget(), paladin.Talents.ImprovedSealOfTheCrusader, flatBonus, percentBonus)
+	paladin.JudgementOfTheCrusaderAura = core.JudgementOfTheCrusaderAura(paladin.CurrentTarget, paladin.Talents.ImprovedSealOfTheCrusader, flatBonus, percentBonus)
 
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
@@ -117,7 +117,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(cdTimer *core.Timer)
 			ProcMask:       core.ProcMaskEmpty,
 			OutcomeApplier: paladin.OutcomeFuncAlwaysHit(),
 
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
@@ -133,7 +133,7 @@ func (paladin *Paladin) CanJudgementOfTheCrusader(sim *core.Simulation) bool {
 }
 
 func (paladin *Paladin) registerJudgementOfWisdomSpell(cdTimer *core.Timer) {
-	paladin.JudgementOfWisdomAura = core.JudgementOfWisdomAura(paladin.Env.GetPrimaryTarget())
+	paladin.JudgementOfWisdomAura = core.JudgementOfWisdomAura(paladin.CurrentTarget)
 
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfWisdom = paladin.RegisterSpell(core.SpellConfig{
@@ -160,7 +160,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(cdTimer *core.Timer) {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			OutcomeApplier: paladin.OutcomeFuncMagicHit(),
 
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return
 				}
@@ -185,7 +185,7 @@ func (paladin *Paladin) setupJudgementRefresh() {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) {
 				if paladin.CurrentJudgement != nil && paladin.CurrentJudgement.IsActive() {
 					// Refresh the judgement

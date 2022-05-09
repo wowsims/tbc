@@ -6,7 +6,7 @@ import (
 )
 
 func (hunter *Hunter) registerScorpidStingSpell() {
-	hunter.ScorpidStingAura = core.ScorpidStingAura(hunter.Env.GetPrimaryTarget())
+	hunter.ScorpidStingAura = core.ScorpidStingAura(hunter.CurrentTarget)
 
 	baseCost := hunter.BaseMana() * 0.09
 
@@ -28,7 +28,7 @@ func (hunter *Hunter) registerScorpidStingSpell() {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			OutcomeApplier:   hunter.OutcomeFuncRangedHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					hunter.ScorpidStingAura.Activate(sim)
 				}

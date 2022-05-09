@@ -27,7 +27,7 @@ func (priest *Priest) registerStarshardsSpell() {
 			ProcMask:         core.ProcMaskEmpty,
 			ThreatMultiplier: 1,
 			OutcomeApplier:   priest.OutcomeFuncMagicHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					priest.StarshardsDot.Apply(sim)
 				}
@@ -35,7 +35,7 @@ func (priest *Priest) registerStarshardsSpell() {
 		}),
 	})
 
-	target := priest.Env.GetPrimaryTarget()
+	target := priest.CurrentTarget
 	priest.StarshardsDot = core.NewDot(core.Dot{
 		Spell: priest.Starshards,
 		Aura: target.RegisterAura(core.Aura{

@@ -40,7 +40,7 @@ func (priest *Priest) registerShadowfiendSpell() {
 			ProcMask:            core.ProcMaskEmpty,
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			OutcomeApplier:      priest.OutcomeFuncMagicHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					priest.ShadowfiendDot.Apply(sim)
 				}
@@ -49,7 +49,7 @@ func (priest *Priest) registerShadowfiendSpell() {
 	})
 
 	// TODO: not sure if it matters but sfiend technically does melee attacks not periodic dot dmg.
-	target := priest.Env.GetPrimaryTarget()
+	target := priest.CurrentTarget
 	priest.ShadowfiendDot = core.NewDot(core.Dot{
 		Spell: priest.Shadowfiend,
 		Aura: target.RegisterAura(core.Aura{
@@ -69,7 +69,7 @@ func (priest *Priest) registerShadowfiendSpell() {
 			IsPeriodic:     true,
 			BaseDamage:     core.BaseDamageConfigMagicNoRoll(1191/10, 0.06),
 			OutcomeApplier: priest.OutcomeFuncTick(),
-			OnPeriodicDamage: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnPeriodicDamageDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				priest.AddMana(sim, spellEffect.Damage*2.5, spell.ActionID, false)
 			},
 		}),

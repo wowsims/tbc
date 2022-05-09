@@ -100,7 +100,7 @@ func applyRaceEffects(agent Agent) {
 					Duration: time.Minute * 2,
 				},
 			},
-			ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+			ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 				bloodFuryAura.Activate(sim)
 			},
 		})
@@ -154,7 +154,7 @@ func applyRaceEffects(agent Agent) {
 		}
 
 		// Beast Slaying (+5% damage to beasts)
-		if character.Env.GetPrimaryTarget().MobType == proto.MobType_MobTypeBeast {
+		if character.CurrentTarget.MobType == proto.MobType_MobTypeBeast {
 			character.PseudoStats.DamageDealtMultiplier *= 1.05
 		}
 
@@ -212,7 +212,7 @@ func applyRaceEffects(agent Agent) {
 				},
 			},
 
-			ApplyEffects: func(sim *Simulation, _ *Target, _ *Spell) {
+			ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
 				berserkingAura.Activate(sim)
 			},
 		})

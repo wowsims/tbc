@@ -57,7 +57,7 @@ type LBOnlyRotation struct {
 }
 
 func (rotation *LBOnlyRotation) DoAction(eleShaman *ElementalShaman, sim *core.Simulation) {
-	if !eleShaman.LightningBolt.Cast(sim, sim.GetPrimaryTarget()) {
+	if !eleShaman.LightningBolt.Cast(sim, eleShaman.CurrentTarget) {
 		eleShaman.WaitForMana(sim, eleShaman.LightningBolt.CurCast.Cost)
 	}
 }
@@ -83,7 +83,7 @@ func (rotation *CLOnCDRotation) DoAction(eleShaman *ElementalShaman, sim *core.S
 		spell = eleShaman.LightningBolt
 	}
 
-	if !spell.Cast(sim, sim.GetPrimaryTarget()) {
+	if !spell.Cast(sim, eleShaman.CurrentTarget) {
 		eleShaman.WaitForMana(sim, spell.CurCast.Cost)
 	}
 }
@@ -121,7 +121,7 @@ func (rotation *FixedRotation) DoAction(eleShaman *ElementalShaman, sim *core.Si
 	if spell == nil {
 		common.NewWaitAction(sim, &eleShaman.Unit, eleShaman.ChainLightning.TimeToReady(sim), common.WaitReasonRotation).Cast(sim)
 	} else {
-		if !spell.Cast(sim, sim.GetPrimaryTarget()) {
+		if !spell.Cast(sim, eleShaman.CurrentTarget) {
 			eleShaman.WaitForMana(sim, spell.CurCast.Cost)
 		}
 	}
@@ -155,7 +155,7 @@ func (rotation *CLOnClearcastRotation) DoAction(eleShaman *ElementalShaman, sim 
 		spell = eleShaman.ChainLightning
 	}
 
-	if !spell.Cast(sim, sim.GetPrimaryTarget()) {
+	if !spell.Cast(sim, eleShaman.CurrentTarget) {
 		eleShaman.WaitForMana(sim, spell.CurCast.Cost)
 	} else {
 		rotation.prevPrevCastProccedCC = eleShaman.ClearcastingAura.GetStacks() == 2
@@ -192,7 +192,7 @@ func (rotation *AdaptiveRotation) DoAction(eleShaman *ElementalShaman, sim *core
 			lb *= 1.05
 		}
 		if lb+10 >= cl {
-			eleShaman.LightningBolt.Cast(sim, sim.GetPrimaryTarget())
+			eleShaman.LightningBolt.Cast(sim, eleShaman.CurrentTarget)
 			didLB = true
 		}
 	}

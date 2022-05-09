@@ -41,7 +41,7 @@ func (mage *Mage) registerEvocationCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, spell *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
 			period := spell.CurCast.ChannelTime / time.Duration(numTicks)
 			core.StartPeriodicAction(sim, core.PeriodicActionOptions{
 				Period:   period,

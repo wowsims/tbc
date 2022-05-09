@@ -84,6 +84,11 @@ func (character *Character) WeaponFromRanged(critMultiplier float64) Weapon {
 	}
 }
 
+func (weapon Weapon) EnemyWeaponDamage(sim *Simulation, attackPower float64) float64 {
+	rand := 1 + 0.5*sim.RandomFloat("Enemy Weapon Damage")
+	return weapon.BaseDamageMin * (rand + attackPower*EnemyAutoAttackAPCoefficient)
+}
+
 func (weapon Weapon) BaseDamage(sim *Simulation) float64 {
 	return weapon.BaseDamageMin + (weapon.BaseDamageMax-weapon.BaseDamageMin)*sim.RandomFloat("Weapon Base Damage")
 }
@@ -119,7 +124,6 @@ func (ahe *SpellEffect) IsMelee() bool {
 }
 
 type AutoAttacks struct {
-	// initialized
 	agent  Agent
 	unit   *Unit
 	MH     Weapon
@@ -186,27 +190,45 @@ func (unit *Unit) EnableAutoAttacks(agent Agent, options AutoAttackOptions) {
 		DelayOHSwings:  options.DelayOHSwings,
 		ReplaceMHSwing: options.ReplaceMHSwing,
 		IsDualWielding: options.MainHand.SwingSpeed != 0 && options.OffHand.SwingSpeed != 0,
-		MHEffect: SpellEffect{
+	}
+
+	if unit.Type == EnemyUnit {
+		unit.AutoAttacks.MHEffect = SpellEffect{
+			ProcMask:         ProcMaskMeleeMHAuto,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       BaseDamageConfigEnemyWeapon(MainHand),
+			OutcomeApplier:   unit.OutcomeFuncEnemyMeleeWhite(),
+		}
+		unit.AutoAttacks.OHEffect = SpellEffect{
+			ProcMask:         ProcMaskMeleeOHAuto,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+			BaseDamage:       BaseDamageConfigEnemyWeapon(OffHand),
+			OutcomeApplier:   unit.OutcomeFuncEnemyMeleeWhite(),
+		}
+	} else {
+		unit.AutoAttacks.MHEffect = SpellEffect{
 			ProcMask:         ProcMaskMeleeMHAuto,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       BaseDamageConfigMeleeWeapon(MainHand, false, 0, 1, true),
 			OutcomeApplier:   unit.OutcomeFuncMeleeWhite(options.MainHand.CritMultiplier),
-		},
-		OHEffect: SpellEffect{
+		}
+		unit.AutoAttacks.OHEffect = SpellEffect{
 			ProcMask:         ProcMaskMeleeOHAuto,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       BaseDamageConfigMeleeWeapon(OffHand, false, 0, 1, true),
 			OutcomeApplier:   unit.OutcomeFuncMeleeWhite(options.OffHand.CritMultiplier),
-		},
-		RangedEffect: SpellEffect{
+		}
+		unit.AutoAttacks.RangedEffect = SpellEffect{
 			ProcMask:         ProcMaskRangedAuto,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       BaseDamageConfigRangedWeapon(0),
 			OutcomeApplier:   unit.OutcomeFuncRangedHitAndCrit(options.Ranged.CritMultiplier),
-		},
+		}
 	}
 }
 
@@ -302,7 +324,7 @@ func (aa *AutoAttacks) resetAutoSwing(sim *Simulation) {
 	}
 
 	pa.OnAction = func(sim *Simulation) {
-		aa.SwingMelee(sim, sim.GetPrimaryTarget())
+		aa.SwingMelee(sim, aa.unit.CurrentTarget)
 		pa.NextActionAt = aa.NextAttackAt()
 
 		// Cancelled means we made a new one because of a swing speed change.
@@ -381,17 +403,17 @@ func (aa *AutoAttacks) TimeBeforeClippingRanged(sim *Simulation) time.Duration {
 }
 
 // SwingMelee will check any swing timers if they are up, and if so, swing!
-func (aa *AutoAttacks) SwingMelee(sim *Simulation, target *Target) {
+func (aa *AutoAttacks) SwingMelee(sim *Simulation, target *Unit) {
 	aa.TrySwingMH(sim, target)
 	aa.TrySwingOH(sim, target)
 }
 
-func (aa *AutoAttacks) SwingRanged(sim *Simulation, target *Target) {
+func (aa *AutoAttacks) SwingRanged(sim *Simulation, target *Unit) {
 	aa.TrySwingRanged(sim, target)
 }
 
 // Performs an autoattack using the main hand weapon, if the MH CD is ready.
-func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Target) {
+func (aa *AutoAttacks) TrySwingMH(sim *Simulation, target *Unit) {
 	if aa.MainhandSwingAt > sim.CurrentTime {
 		return
 	}
@@ -421,7 +443,7 @@ func (aa *AutoAttacks) MaybeReplaceMHSwing(sim *Simulation, mhSwingSpell *Spell)
 }
 
 // Performs an autoattack using the main hand weapon, if the OH CD is ready.
-func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
+func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Unit) {
 	if !aa.IsDualWielding || aa.OffhandSwingAt > sim.CurrentTime {
 		return
 	}
@@ -441,7 +463,7 @@ func (aa *AutoAttacks) TrySwingOH(sim *Simulation, target *Target) {
 }
 
 // Performs an autoattack using the ranged weapon, if the ranged CD is ready.
-func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Target) {
+func (aa *AutoAttacks) TrySwingRanged(sim *Simulation, target *Unit) {
 	if aa.RangedSwingAt > sim.CurrentTime {
 		return
 	}
@@ -608,4 +630,41 @@ func (aa *AutoAttacks) NewPPMManager(ppm float64) PPMManager {
 		ohProcChance:     (aa.OH.SwingSpeed * ppm) / 60.0,
 		rangedProcChance: (aa.Ranged.SwingSpeed * ppm) / 60.0,
 	}
+}
+
+func (unit *Unit) applyParryHaste() {
+	if !unit.PseudoStats.CanParry || !unit.AutoAttacks.IsEnabled() {
+		return
+	}
+
+	unit.RegisterAura(Aura{
+		Label:    "Parry Haste",
+		Duration: NeverExpires,
+		OnReset: func(aura *Aura, sim *Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if !spellEffect.Outcome.Matches(OutcomeParry) {
+				return
+			}
+
+			remainingTime := aura.Unit.AutoAttacks.MainhandSwingAt - sim.CurrentTime
+			swingSpeed := aura.Unit.AutoAttacks.MainhandSwingSpeed()
+			minRemainingTime := time.Duration(float64(swingSpeed) * 0.2) // 20% of Swing Speed
+			defaultReduction := minRemainingTime * 2                     // 40% of Swing Speed
+
+			if remainingTime <= minRemainingTime {
+				return
+			}
+
+			parryHasteReduction := MinDuration(defaultReduction, remainingTime-minRemainingTime)
+			newReadyAt := aura.Unit.AutoAttacks.MainhandSwingAt - parryHasteReduction
+			if sim.Log != nil {
+				aura.Unit.Log(sim, "MH Swing reduced by %s due to parry haste, will now occur at %s", parryHasteReduction, newReadyAt)
+			}
+
+			aura.Unit.AutoAttacks.MainhandSwingAt = newReadyAt
+			aura.Unit.AutoAttacks.resetAutoSwing(sim)
+		},
+	})
 }

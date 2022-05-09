@@ -59,7 +59,7 @@ func (druid *Druid) registerInnervateCD() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			// Update expected bonus mana
 			newRemainingUsages := int(sim.GetRemainingDuration() / innervateCD)
 			//expectedBonusManaReduction := expectedManaPerInnervate * float64(remainingInnervateUsages-newRemainingUsages)

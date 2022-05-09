@@ -43,7 +43,7 @@ func (moonkin *BalanceDruid) actRotation(sim *core.Simulation, rotation proto.Ba
 		return
 	}
 
-	target := sim.GetPrimaryTarget()
+	target := moonkin.CurrentTarget
 
 	var spell *core.Spell
 

@@ -46,7 +46,7 @@ func (rogue *Rogue) makeEviscerate(comboPoints int32) *core.Spell {
 				TargetSpellCoefficient: 1,
 			},
 			OutcomeApplier: rogue.OutcomeFuncMeleeSpecialHitAndCrit(rogue.critMultiplier(true, false)),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					rogue.ApplyFinisher(sim, spell.ActionID)
 				} else {

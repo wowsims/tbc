@@ -35,7 +35,7 @@ func (priest *Priest) registerDevouringPlagueSpell() {
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
 			OutcomeApplier:      priest.OutcomeFuncMagicHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					priest.DevouringPlagueDot.Apply(sim)
 				}
@@ -43,7 +43,7 @@ func (priest *Priest) registerDevouringPlagueSpell() {
 		}),
 	})
 
-	target := priest.Env.GetPrimaryTarget()
+	target := priest.CurrentTarget
 	priest.DevouringPlagueDot = core.NewDot(core.Dot{
 		Spell: priest.DevouringPlague,
 		Aura: target.RegisterAura(core.Aura{

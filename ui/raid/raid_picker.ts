@@ -15,6 +15,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { BuffBot as BuffBotProto } from '/tbc/core/proto/ui.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
+import { isTankSpec } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { newRaidTarget } from '/tbc/core/proto_utils/utils.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -27,6 +28,7 @@ import { RaidSimUI } from './raid_sim_ui.js';
 import { buffBotPresets, playerPresets, specSimFactories } from './presets.js';
 
 import { BalanceDruid_Options as BalanceDruidOptions } from '/tbc/core/proto/druid.js';
+import { SmitePriest_Options as SmitePriestOptions } from '/tbc/core/proto/priest.js';
 
 declare var tippy: any;
 declare var $: any;
@@ -34,6 +36,7 @@ declare var $: any;
 const NEW_PLAYER: number = -1;
 
 enum DragType {
+	None,
 	New,
 	Move,
 	Swap,
@@ -77,7 +80,7 @@ export class RaidPicker extends Component {
 			// Uncomment to remove player when dropped 'off' the raid.
 			//if (this.currentDragPlayerFromIndex != NEW_PLAYER) {
 			//	const playerPicker = this.getPlayerPicker(this.currentDragPlayerFromIndex);
-			//	playerPicker.setPlayer(null);
+			//	playerPicker.setPlayer(null, null, DragType.None);
 			//}
 
 			this.clearDragPlayer();
@@ -108,7 +111,7 @@ export class RaidPicker extends Component {
 
 	setBuffBots(eventID: EventID, newBuffBotProtos: Array<BuffBotProto>) {
 		TypedEvent.freezeAllAndDo(() => {
-			this.getBuffBots().forEach(buffBot => this.getPlayerPicker(buffBot.getRaidIndex()).setPlayer(eventID, null));
+			this.getBuffBots().forEach(buffBot => this.getPlayerPicker(buffBot.getRaidIndex()).setPlayer(eventID, null, DragType.None));
 
 			newBuffBotProtos.forEach(buffBotProto => {
 				const settings = buffBotPresets.find(preset => preset.buffBotId == buffBotProto.id);
@@ -119,7 +122,7 @@ export class RaidPicker extends Component {
 
 				const buffBot = new BuffBot(buffBotProto.id, this.raid.sim);
 				buffBot.fromProto(eventID, buffBotProto);
-				this.getPlayerPicker(buffBotProto.raidIndex).setPlayer(eventID, buffBot);
+				this.getPlayerPicker(buffBotProto.raidIndex).setPlayer(eventID, buffBot, DragType.None);
 			});
 		});
 	}
@@ -244,7 +247,7 @@ export class PlayerPicker extends Component {
 		this.partyPicker.party.compChangeEmitter.on(eventID => {
 			const newPlayer = this.partyPicker.party.getPlayer(this.index);
 			if (newPlayer != this.player && !(newPlayer == null && this.player instanceof BuffBot)) {
-				this.setPlayer(eventID, newPlayer);
+				this.setPlayer(eventID, newPlayer, DragType.None);
 			}
 		});
 
@@ -362,7 +365,7 @@ export class PlayerPicker extends Component {
 			'allowHTML': true,
 		});
 		deleteElem.addEventListener('click', event => {
-			this.setPlayer(TypedEvent.nextEventID(), null);
+			this.setPlayer(TypedEvent.nextEventID(), null, DragType.None);
 		});
 
 		let dragEnterCounter = 0;
@@ -403,17 +406,17 @@ export class PlayerPicker extends Component {
 					const fromPlayerPicker = this.raidPicker.getPlayerPicker(this.raidPicker.currentDragPlayerFromIndex);
 
 					if (dragType == DragType.Swap) {
-						fromPlayerPicker.setPlayer(eventID, this.player);
+						fromPlayerPicker.setPlayer(eventID, this.player, dragType);
 						fromPlayerPicker.iconElem.src = this.iconElem.src;
 					} else if (dragType == DragType.Move) {
-						fromPlayerPicker.setPlayer(eventID, null);
+						fromPlayerPicker.setPlayer(eventID, null, dragType);
 					}
 				}
 
 				if (dragType == DragType.Copy) {
-					this.setPlayer(eventID, this.raidPicker.currentDragPlayer.clone(eventID));
+					this.setPlayer(eventID, this.raidPicker.currentDragPlayer.clone(eventID), dragType);
 				} else {
-					this.setPlayer(eventID, this.raidPicker.currentDragPlayer);
+					this.setPlayer(eventID, this.raidPicker.currentDragPlayer, dragType);
 				}
 				this.iconElem.src = event.dataTransfer!.getData('text/plain');
 
@@ -468,7 +471,7 @@ export class PlayerPicker extends Component {
 		this.update();
 	}
 
-	setPlayer(eventID: EventID, newPlayer: Player<any> | BuffBot | null) {
+	setPlayer(eventID: EventID, newPlayer: Player<any> | BuffBot | null, dragType: DragType) {
 		if (newPlayer == this.player) {
 			return;
 		}
@@ -482,12 +485,28 @@ export class PlayerPicker extends Component {
 				this.partyPicker.party.setPlayer(eventID, this.index, null);
 				newPlayer.setRaidIndex(eventID, this.raidIndex);
 			} else if (newPlayer instanceof Player) {
-				const wasInRaid = newPlayer.getRaid() != null;
 				this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
 
-				// On creation, boomies should default to innervating themselves.
-				if (!wasInRaid && newPlayer.spec == Spec.SpecBalanceDruid) {
-					setBalanceDruidSelfInnervate(eventID, newPlayer);
+				if (dragType == DragType.New) {
+					if (isTankSpec(newPlayer.spec)) {
+						const tanks = this.raidPicker.raid.getTanks();
+						const emptyIdx = tanks.findIndex(tank => this.raidPicker.raid.getPlayerFromRaidTarget(tank) == null);
+						if (emptyIdx == -1) {
+							if (tanks.length < 3) {
+								this.raidPicker.raid.setTanks(eventID, tanks.concat([newPlayer.makeRaidTarget()]));
+							}
+						} else {
+							tanks[emptyIdx] = newPlayer.makeRaidTarget();
+							this.raidPicker.raid.setTanks(eventID, tanks);
+						}
+					}
+
+					// On creation, boomies should default to innervating themselves.
+					if (newPlayer.spec == Spec.SpecBalanceDruid) {
+						setBalanceDruidSelfInnervate(eventID, newPlayer);
+					} else if (newPlayer.spec == Spec.SpecSmitePriest) {
+						setBalanceDruidSelfInnervate(eventID, newPlayer);
+					}
 				}
 			} else {
 				this.partyPicker.party.setPlayer(eventID, this.index, newPlayer);
@@ -731,5 +750,10 @@ class NewPlayerPicker extends Component {
 function setBalanceDruidSelfInnervate(eventID: EventID, player: Player<any>) {
 	const newOptions = player.getSpecOptions() as BalanceDruidOptions;
 	newOptions.innervateTarget = newRaidTarget(player.getRaidIndex());
+	player.setSpecOptions(eventID, newOptions);
+}
+function setSmitePriestSelfPI(eventID: EventID, player: Player<any>) {
+	const newOptions = player.getSpecOptions() as SmitePriestOptions;
+	newOptions.powerInfusionTarget = newRaidTarget(player.getRaidIndex());
 	player.setSpecOptions(eventID, newOptions);
 }

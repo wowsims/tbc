@@ -54,10 +54,11 @@ func (testSuite *IndividualTestSuite) TestDPS(testName string, rsr *proto.RaidSi
 	testSuite.testNames = append(testSuite.testNames, testName)
 
 	result := RunRaidSim(rsr)
-	dps := result.RaidMetrics.Dps.Avg
 
 	testSuite.testResults.DpsResults[testName] = &proto.DpsTestResult{
-		Dps: dps,
+		Dps:  result.RaidMetrics.Dps.Avg,
+		Tps:  result.RaidMetrics.Parties[0].Players[0].Threat.Avg,
+		Dtps: result.RaidMetrics.Parties[0].Players[0].Dtps.Avg,
 	}
 }
 
@@ -177,6 +178,14 @@ func RunTestSuite(t *testing.T, suiteName string, generator TestGenerator) {
 					if expectedDpsResult, ok := expectedResults.DpsResults[fullTestName]; ok {
 						if actualDpsResult.Dps < expectedDpsResult.Dps-tolerance || actualDpsResult.Dps > expectedDpsResult.Dps+tolerance {
 							t.Logf("DPS expected %0.03f but was %0.03f!.", expectedDpsResult.Dps, actualDpsResult.Dps)
+							t.Fail()
+						}
+						if actualDpsResult.Tps < expectedDpsResult.Tps-tolerance || actualDpsResult.Tps > expectedDpsResult.Tps+tolerance {
+							t.Logf("TPS expected %0.03f but was %0.03f!.", expectedDpsResult.Tps, actualDpsResult.Tps)
+							t.Fail()
+						}
+						if actualDpsResult.Dtps < expectedDpsResult.Dtps-tolerance || actualDpsResult.Dtps > expectedDpsResult.Dtps+tolerance {
+							t.Logf("DTPS expected %0.03f but was %0.03f!.", expectedDpsResult.Dtps, actualDpsResult.Dtps)
 							t.Fail()
 						}
 					} else {

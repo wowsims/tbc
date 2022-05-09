@@ -30,7 +30,7 @@ func (hunter *Hunter) registerSerpentStingSpell() {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ThreatMultiplier: 1,
 			OutcomeApplier:   hunter.OutcomeFuncRangedHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					hunter.SerpentStingDot.Apply(sim)
 				}
@@ -38,7 +38,7 @@ func (hunter *Hunter) registerSerpentStingSpell() {
 		}),
 	})
 
-	target := hunter.Env.GetPrimaryTarget()
+	target := hunter.CurrentTarget
 	hunter.SerpentStingDot = core.NewDot(core.Dot{
 		Spell: hunter.SerpentSting,
 		Aura: target.RegisterAura(core.Aura{

@@ -129,7 +129,7 @@ func (mage *Mage) Initialize() {
 		mage.IgniteTickDamage = append(mage.IgniteTickDamage, 0)
 	}
 	for i := int32(0); i < mage.Env.GetNumTargets(); i++ {
-		mage.IgniteDots = append(mage.IgniteDots, mage.newIgniteDot(mage.Env.GetTarget(i)))
+		mage.IgniteDots = append(mage.IgniteDots, mage.newIgniteDot(mage.Env.GetTargetUnit(i)))
 	}
 }
 

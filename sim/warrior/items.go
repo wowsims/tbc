@@ -53,7 +53,7 @@ var ItemSetWarbringerArmor = core.ItemSet{
 				OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Unit.PseudoStats.DamageDealtMultiplier /= 1.1
 				},
-				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if spellEffect.Damage > 0 {
 						aura.Deactivate(sim)
 					}
@@ -66,7 +66,7 @@ var ItemSetWarbringerArmor = core.ItemSet{
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Activate(sim)
 				},
-				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if spell == warrior.Revenge {
 						procAura.Activate(sim)
 					}
@@ -92,7 +92,7 @@ var ItemSetWarbringerBattlegear = core.ItemSet{
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Activate(sim)
 				},
-				OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 					if spellEffect.Outcome.Matches(core.OutcomeDodge | core.OutcomeParry) {
 						warrior.AddRage(sim, 2, core.ActionID{SpellID: 37519})
 					}
@@ -163,7 +163,7 @@ func ApplyAshtongueTalismanOfValor(agent core.Agent) {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell != warrior.ShieldSlam && spell != warrior.Bloodthirst && spell != warrior.MortalStrike {
 				return
 			}

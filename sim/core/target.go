@@ -60,8 +60,6 @@ func (encounter *Encounter) GetMetricsProto(numIterations int32) *proto.Encounte
 // Target is an enemy/boss that can be the target of player attacks/spells.
 type Target struct {
 	Unit
-
-	MobType proto.MobType
 }
 
 func NewTarget(options proto.Target, targetIndex int32) *Target {
@@ -71,6 +69,9 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	}
 	if unitStats[stats.BlockValue] == 0 {
 		unitStats[stats.BlockValue] = 54 // Not thoroughly tested for non-bosses.
+	}
+	if unitStats[stats.AttackPower] == 0 {
+		unitStats[stats.AttackPower] = 320
 	}
 	if unitStats[stats.Armor] == 0 {
 		unitStats[stats.Armor] = 7684
@@ -82,22 +83,28 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 			Index:       targetIndex,
 			Label:       "Target " + strconv.Itoa(int(targetIndex)+1),
 			Level:       options.Level,
+			MobType:     options.MobType,
 			auraTracker: newAuraTracker(),
 			stats:       unitStats,
 			PseudoStats: stats.NewPseudoStats(),
-			Metrics:     NewCharacterMetrics(),
+			Metrics:     NewUnitMetrics(),
 		},
-		MobType: options.MobType,
 	}
 	target.GCD = target.NewTimer()
 	if target.Level == 0 {
 		target.Level = 73
 	}
+	target.stats[stats.MeleeCrit] = UnitLevelFloat64(target.Level, 0.05, 0.052, 0.054, 0.056) * MeleeCritRatingPerCritChance
 
+	target.PseudoStats.CanBlock = true
+	target.PseudoStats.CanParry = true
 	target.PseudoStats.InFrontOfTarget = true
+	if target.Level == 73 {
+		target.PseudoStats.CanCrush = true
+	}
 
 	if options.Debuffs != nil {
-		applyDebuffEffects(target, *options.Debuffs)
+		applyDebuffEffects(&target.Unit, *options.Debuffs)
 	}
 
 	return target
@@ -109,6 +116,9 @@ func (target *Target) finalize() {
 
 func (target *Target) setupAttackTables() {
 	raidUnits := target.Env.Raid.AllUnits
+	if len(raidUnits) == 0 {
+		return
+	}
 	numTables := raidUnits[len(raidUnits)-1].Index + 1
 	target.AttackTables = make([]*AttackTable, numTables)
 	target.DefenseTables = make([]*AttackTable, numTables)
@@ -136,6 +146,7 @@ func (target *Target) init(sim *Simulation) {
 
 func (target *Target) Reset(sim *Simulation) {
 	target.Unit.reset(sim, nil)
+	//target.SetGCDTimer(sim, 0)
 }
 
 func (target *Target) Advance(sim *Simulation, elapsedTime time.Duration) {
@@ -146,19 +157,19 @@ func (target *Target) doneIteration(sim *Simulation) {
 	target.Unit.doneIteration(sim)
 }
 
-func (target *Target) NextTarget(sim *Simulation) *Target {
+func (target *Target) NextTarget() *Target {
 	nextIndex := target.Index + 1
-	if nextIndex >= sim.GetNumTargets() {
+	if nextIndex >= target.Env.GetNumTargets() {
 		nextIndex = 0
 	}
-	return sim.GetTarget(nextIndex)
+	return target.Env.GetTarget(nextIndex)
 }
 
 func (target *Target) GetMetricsProto(numIterations int32) *proto.UnitMetrics {
-	return &proto.UnitMetrics{
-		Name:  target.Label,
-		Auras: target.auraTracker.GetMetricsProto(numIterations),
-	}
+	metrics := target.Metrics.ToProto(numIterations)
+	metrics.Name = target.Label
+	metrics.Auras = target.auraTracker.GetMetricsProto(numIterations)
+	return metrics
 }
 
 // Holds cached values for outcome/damage calculations, for a specific attacker+defender pair.
@@ -207,23 +218,32 @@ type AttackTable struct {
 	ArmorDamageReduction float64
 }
 
-// Currently assumes attacker is level 70.
 func NewAttackTable(attacker *Unit, defender *Unit) *AttackTable {
 	table := &AttackTable{
 		Attacker: attacker,
 		Defender: defender,
 	}
 
-	table.BaseMissChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.08)
-	table.BaseSpellMissChance = UnitLevelFloat64(defender.Level, 0.04, 0.05, 0.06, 0.17)
-	table.BaseBlockChance = 0.05
-	table.BaseDodgeChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.065)
-	table.BaseParryChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.14)
-	table.BaseGlanceChance = UnitLevelFloat64(defender.Level, 0.06, 0.12, 0.18, 0.24)
+	if defender.Type == EnemyUnit {
+		// Assumes attacker (the Player) is level 70.
+		table.BaseSpellMissChance = UnitLevelFloat64(defender.Level, 0.04, 0.05, 0.06, 0.17)
+		table.BaseMissChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.08)
+		table.BaseBlockChance = 0.05
+		table.BaseDodgeChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.065)
+		table.BaseParryChance = UnitLevelFloat64(defender.Level, 0.05, 0.055, 0.06, 0.14)
+		table.BaseGlanceChance = UnitLevelFloat64(defender.Level, 0.06, 0.12, 0.18, 0.24)
 
-	table.GlanceMultiplier = UnitLevelFloat64(defender.Level, 0.95, 0.95, 0.85, 0.75)
-	table.HitSuppression = UnitLevelFloat64(defender.Level, 0, 0, 0, 0.01)
-	table.CritSuppression = UnitLevelFloat64(defender.Level, 0, 0.01, 0.02, 0.048)
+		table.GlanceMultiplier = UnitLevelFloat64(defender.Level, 0.95, 0.95, 0.85, 0.75)
+		table.HitSuppression = UnitLevelFloat64(defender.Level, 0, 0, 0, 0.01)
+		table.CritSuppression = UnitLevelFloat64(defender.Level, 0, 0.01, 0.02, 0.048)
+	} else {
+		// Assumes defender (the Player) is level 70.
+		table.BaseSpellMissChance = 0.05
+		table.BaseMissChance = UnitLevelFloat64(attacker.Level, 0.05, 0.048, 0.046, 0.044)
+		table.BaseBlockChance = UnitLevelFloat64(attacker.Level, 0.05, 0.048, 0.046, 0.044)
+		table.BaseDodgeChance = UnitLevelFloat64(attacker.Level, 0.008, 0.006, 0.004, 0.002)
+		table.BaseParryChance = UnitLevelFloat64(attacker.Level, 0.05, 0.048, 0.046, 0.044)
+	}
 
 	table.UpdateArmorDamageReduction()
 	table.UpdatePartialResists()

@@ -21,7 +21,7 @@ func (enh *EnhancementShaman) SetupRotationSchedule() {
 			Duration: core.GCDDefault,
 			TryCast: func(sim *core.Simulation) bool {
 				ss := enh.Stormstrike
-				success := ss.Cast(sim, sim.GetPrimaryTarget())
+				success := ss.Cast(sim, enh.CurrentTarget)
 				if !success {
 					enh.WaitForMana(sim, ss.CurCast.Cost)
 				}
@@ -50,7 +50,7 @@ func (enh *EnhancementShaman) SetupRotationSchedule() {
 				shock = enh.FrostShock
 			}
 
-			success := shock.Cast(sim, sim.GetPrimaryTarget())
+			success := shock.Cast(sim, enh.CurrentTarget)
 			if !success {
 				enh.WaitForMana(sim, shock.CurCast.Cost)
 			}
@@ -126,14 +126,14 @@ func (enh *EnhancementShaman) SetupRotationSchedule() {
 	}
 	scheduleSpellTotem := func(duration time.Duration, spell *core.Spell) {
 		scheduleTotem(duration, false, false, func(sim *core.Simulation) (bool, float64) {
-			success := spell.Cast(sim, sim.GetPrimaryTarget())
+			success := spell.Cast(sim, enh.CurrentTarget)
 			return success, spell.CurCast.Cost
 		})
 	}
 	schedule2MTotem := func(castFactory func(sim *core.Simulation) *core.Spell) {
 		scheduleTotem(time.Minute*2, true, true, func(sim *core.Simulation) (bool, float64) {
 			spell := castFactory(sim)
-			return spell.Cast(sim, sim.GetPrimaryTarget()), spell.CurCast.Cost
+			return spell.Cast(sim, enh.CurrentTarget), spell.CurCast.Cost
 		})
 	}
 
@@ -159,7 +159,7 @@ func (enh *EnhancementShaman) SetupRotationSchedule() {
 				}
 
 				cast := enh.SearingTotem
-				success := cast.Cast(sim, sim.GetPrimaryTarget())
+				success := cast.Cast(sim, enh.CurrentTarget)
 				if !success {
 					enh.WaitForMana(sim, cast.CurCast.Cost)
 				}
@@ -279,7 +279,7 @@ func (enh *EnhancementShaman) SetupRotationSchedule() {
 					}
 
 					cast := defaultCastFactory(sim)
-					success := cast.Cast(sim, sim.GetPrimaryTarget())
+					success := cast.Cast(sim, enh.CurrentTarget)
 					if !success {
 						enh.WaitForMana(sim, cast.CurCast.Cost)
 					}

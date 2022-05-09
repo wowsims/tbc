@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
+func applyDebuffEffects(target *Unit, debuffs proto.Debuffs) {
 	if debuffs.Misery {
 		MakePermanent(MiseryAura(target, 5))
 	}
@@ -31,7 +31,7 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 
 	if debuffs.IsbUptime > 0.0 {
 		uptime := MinFloat(1.0, debuffs.IsbUptime)
-		isbAura := MakePermanent(ImprovedShadowBoltAura(target, uptime))
+		isbAura := MakePermanent(ImprovedShadowBoltAura(target, 5, uptime))
 		if uptime != 1.0 {
 			isbAura.OnDoneIteration = func(aura *Aura, _ *Simulation) {
 				aura.metrics.Uptime = time.Duration(float64(aura.metrics.Uptime) * uptime)
@@ -94,7 +94,7 @@ func applyDebuffEffects(target *Target, debuffs proto.Debuffs) {
 	}
 }
 
-func MiseryAura(target *Target, numPoints int32) *Aura {
+func MiseryAura(target *Unit, numPoints int32) *Aura {
 	multiplier := 1.0 + 0.01*float64(numPoints)
 
 	return target.GetOrRegisterAura(Aura{
@@ -122,7 +122,7 @@ func MiseryAura(target *Target, numPoints int32) *Aura {
 	})
 }
 
-func ShadowWeavingAura(target *Target, startingStacks int32) *Aura {
+func ShadowWeavingAura(target *Unit, startingStacks int32) *Aura {
 	return target.GetOrRegisterAura(Aura{
 		Label:     "Shadow Weaving",
 		ActionID:  ActionID{SpellID: 15334},
@@ -138,7 +138,7 @@ func ShadowWeavingAura(target *Target, startingStacks int32) *Aura {
 	})
 }
 
-func JudgementOfWisdomAura(target *Target) *Aura {
+func JudgementOfWisdomAura(target *Unit) *Aura {
 	const mana = 74 / 2 // 50% proc
 	actionID := ActionID{SpellID: 27164}
 
@@ -146,7 +146,7 @@ func JudgementOfWisdomAura(target *Target) *Aura {
 		Label:    "Judgement of Wisdom",
 		ActionID: actionID,
 		Duration: time.Second * 20,
-		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			// TODO: This check is purely to maintain behavior during refactoring. Should be removed when possible.
 			if !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) && !spellEffect.Landed() {
 				return
@@ -167,7 +167,7 @@ func JudgementOfWisdomAura(target *Target) *Aura {
 	})
 }
 
-func JudgementOfTheCrusaderAura(target *Target, level int32, flatBonus float64, percentBonus float64) *Aura {
+func JudgementOfTheCrusaderAura(target *Unit, level int32, flatBonus float64, percentBonus float64) *Aura {
 	bonusCrit := float64(level) * SpellCritRatingPerCritChance
 
 	totalSP := 219*percentBonus + flatBonus
@@ -185,7 +185,7 @@ func JudgementOfTheCrusaderAura(target *Target, level int32, flatBonus float64, 
 			aura.Unit.PseudoStats.BonusHolyDamageTaken -= totalSP
 			aura.Unit.PseudoStats.BonusCritRating -= bonusCrit
 		},
-		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if spell.ActionID.SpellID == 35395 {
 				aura.Refresh(sim)
 			}
@@ -193,7 +193,7 @@ func JudgementOfTheCrusaderAura(target *Target, level int32, flatBonus float64, 
 	})
 }
 
-func CurseOfElementsAura(target *Target, points int32) *Aura {
+func CurseOfElementsAura(target *Unit, points int32) *Aura {
 	multiplier := 1.1 + 0.01*float64(points)
 
 	return target.GetOrRegisterAura(Aura{
@@ -218,24 +218,47 @@ func CurseOfElementsAura(target *Target, points int32) *Aura {
 	})
 }
 
-func ImprovedShadowBoltAura(target *Target, uptime float64) *Aura {
-	multiplier := 1 + uptime*0.2
+// If uptime is 0, makes an aura for a real warlock. Otherwise makes a group approximation.
+func ImprovedShadowBoltAura(target *Unit, points int32, uptime float64) *Aura {
+	bonus := 0.04 * float64(points)
+	multiplier := 1 + bonus
+	if uptime != 0 {
+		multiplier = 1 + bonus*uptime
+	}
 
-	return target.GetOrRegisterAura(Aura{
-		Label:    "Improved Shadow Bolt",
-		ActionID: ActionID{SpellID: 17803},
+	config := Aura{
+		Label:     "ImprovedShadowBolt-" + strconv.Itoa(int(points)),
+		Tag:       "ImprovedShadowBolt",
+		ActionID:  ActionID{SpellID: 17803},
+		Duration:  time.Second * 12,
+		Priority:  float64(points),
+		MaxStacks: 4,
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.ShadowDamageTakenMultiplier *= multiplier
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.ShadowDamageTakenMultiplier /= multiplier
 		},
-	})
+	}
+
+	if uptime == 0 {
+		config.OnSpellHitTaken = func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if spell.SpellSchool != SpellSchoolShadow {
+				return
+			}
+			if !spellEffect.Landed() || spellEffect.Damage == 0 || spellEffect.IsPhantom || spellEffect.ProcMask == 0 {
+				return
+			}
+			aura.RemoveStack(sim)
+		}
+	}
+
+	return target.GetOrRegisterAura(config)
 }
 
 var BloodFrenzyActionID = ActionID{SpellID: 29859}
 
-func BloodFrenzyAura(target *Target, points int32) *Aura {
+func BloodFrenzyAura(target *Unit, points int32) *Aura {
 	multiplier := 1 + 0.02*float64(points)
 	return target.GetOrRegisterAura(Aura{
 		Label:    "Blood Frenzy-" + strconv.Itoa(int(points)),
@@ -252,7 +275,7 @@ func BloodFrenzyAura(target *Target, points int32) *Aura {
 	})
 }
 
-func GiftOfArthasAura(target *Target) *Aura {
+func GiftOfArthasAura(target *Unit) *Aura {
 	return target.GetOrRegisterAura(Aura{
 		Label:    "Gift of Arthas",
 		ActionID: ActionID{SpellID: 11374},
@@ -265,7 +288,7 @@ func GiftOfArthasAura(target *Target) *Aura {
 	})
 }
 
-func MangleAura(target *Target) *Aura {
+func MangleAura(target *Unit) *Aura {
 	return target.GetOrRegisterAura(Aura{
 		Label:    "Mangle",
 		ActionID: ActionID{SpellID: 33876},
@@ -280,7 +303,7 @@ func MangleAura(target *Target) *Aura {
 
 var ImprovedScorchAuraLabel = "Improved Scorch"
 
-func ImprovedScorchAura(target *Target, startingStacks int32) *Aura {
+func ImprovedScorchAura(target *Unit, startingStacks int32) *Aura {
 	return target.GetOrRegisterAura(Aura{
 		Label:     ImprovedScorchAuraLabel,
 		ActionID:  ActionID{SpellID: 12873},
@@ -298,7 +321,7 @@ func ImprovedScorchAura(target *Target, startingStacks int32) *Aura {
 
 var WintersChillAuraLabel = "Winter's Chill"
 
-func WintersChillAura(target *Target, startingStacks int32) *Aura {
+func WintersChillAura(target *Unit, startingStacks int32) *Aura {
 	return target.GetOrRegisterAura(Aura{
 		Label:     WintersChillAuraLabel,
 		ActionID:  ActionID{SpellID: 28595},
@@ -313,7 +336,7 @@ func WintersChillAura(target *Target, startingStacks int32) *Aura {
 	})
 }
 
-func FaerieFireAura(target *Target, level int32) *Aura {
+func FaerieFireAura(target *Unit, level int32) *Aura {
 	const armorReduction = 610
 
 	return target.GetOrRegisterAura(Aura{
@@ -336,7 +359,7 @@ func FaerieFireAura(target *Target, level int32) *Aura {
 var SunderArmorAuraLabel = "Sunder Armor"
 var SunderExposeAuraTag = "SunderExpose"
 
-func SunderArmorAura(target *Target, startingStacks int32) *Aura {
+func SunderArmorAura(target *Unit, startingStacks int32) *Aura {
 	armorReductionPerStack := 520.0
 
 	return target.GetOrRegisterAura(Aura{
@@ -355,7 +378,7 @@ func SunderArmorAura(target *Target, startingStacks int32) *Aura {
 	})
 }
 
-func ScheduledSunderArmorAura(target *Target) *Aura {
+func ScheduledSunderArmorAura(target *Unit) *Aura {
 	aura := SunderArmorAura(target, 1)
 	aura.Duration = NeverExpires
 	aura.OnReset = func(aura *Aura, sim *Simulation) {
@@ -374,7 +397,7 @@ func ScheduledSunderArmorAura(target *Target) *Aura {
 	return aura
 }
 
-func ExposeArmorAura(target *Target, talentPoints int32) *Aura {
+func ExposeArmorAura(target *Unit, talentPoints int32) *Aura {
 	armorReduction := 2050.0 * (1.0 + 0.25*float64(talentPoints))
 
 	return target.GetOrRegisterAura(Aura{
@@ -392,7 +415,7 @@ func ExposeArmorAura(target *Target, talentPoints int32) *Aura {
 	})
 }
 
-func ScheduledExposeArmorAura(target *Target, talentPoints int32) *Aura {
+func ScheduledExposeArmorAura(target *Unit, talentPoints int32) *Aura {
 	aura := ExposeArmorAura(target, talentPoints)
 	aura.Duration = NeverExpires
 	aura.OnReset = func(aura *Aura, sim *Simulation) {
@@ -407,7 +430,7 @@ func ScheduledExposeArmorAura(target *Target, talentPoints int32) *Aura {
 	return aura
 }
 
-func CurseOfRecklessnessAura(target *Target) *Aura {
+func CurseOfRecklessnessAura(target *Unit) *Aura {
 	armorReduction := 800.0
 
 	return target.GetOrRegisterAura(Aura{
@@ -424,7 +447,7 @@ func CurseOfRecklessnessAura(target *Target) *Aura {
 }
 
 // Multiplier is for accomodating uptime %. For a real hunter, always pass 1.0
-func ExposeWeaknessAura(target *Target, hunterAgility float64, multiplier float64) *Aura {
+func ExposeWeaknessAura(target *Unit, hunterAgility float64, multiplier float64) *Aura {
 	apBonus := hunterAgility * 0.25 * multiplier
 
 	return target.GetOrRegisterAura(Aura{
@@ -444,7 +467,7 @@ func ExposeWeaknessAura(target *Target, hunterAgility float64, multiplier float6
 	})
 }
 
-func HuntersMarkAura(target *Target, points int32, fullyStacked bool) *Aura {
+func HuntersMarkAura(target *Unit, points int32, fullyStacked bool) *Aura {
 	const baseRangedBonus = 110.0
 	const bonusPerStack = 11.0
 	const maxStacks = 30
@@ -480,7 +503,7 @@ func HuntersMarkAura(target *Target, points int32, fullyStacked bool) *Aura {
 		OnStacksChange: func(aura *Aura, sim *Simulation, oldStacks int32, newStacks int32) {
 			aura.Unit.PseudoStats.BonusRangedAttackPower += bonusPerStack * float64(newStacks-oldStacks)
 		},
-		OnSpellHit: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if spellEffect.ProcMask.Matches(ProcMaskRanged) && spellEffect.Landed() {
 				aura.AddStack(sim)
 			}
@@ -488,7 +511,7 @@ func HuntersMarkAura(target *Target, points int32, fullyStacked bool) *Aura {
 	})
 }
 
-func DemoralizingShoutAura(target *Target, boomingVoicePts int32, impDemoShoutPts int32) *Aura {
+func DemoralizingShoutAura(target *Unit, boomingVoicePts int32, impDemoShoutPts int32) *Aura {
 	duration := time.Duration(float64(time.Second*30) * (1 + 0.1*float64(boomingVoicePts)))
 
 	return target.GetOrRegisterAura(Aura{
@@ -504,7 +527,7 @@ func DemoralizingShoutAura(target *Target, boomingVoicePts int32, impDemoShoutPt
 	})
 }
 
-func ThunderClapAura(target *Target, impThunderClapPts int32) *Aura {
+func ThunderClapAura(target *Unit, impThunderClapPts int32) *Aura {
 	return target.GetOrRegisterAura(Aura{
 		Label:    "ThunderClap-" + strconv.Itoa(int(impThunderClapPts)),
 		Tag:      "ThunderClap",
@@ -518,7 +541,7 @@ func ThunderClapAura(target *Target, impThunderClapPts int32) *Aura {
 	})
 }
 
-func ScorpidStingAura(target *Target) *Aura {
+func ScorpidStingAura(target *Unit) *Aura {
 	return target.GetOrRegisterAura(Aura{
 		Label:    "Scorpid Sting",
 		ActionID: ActionID{SpellID: 3043},

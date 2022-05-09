@@ -128,7 +128,7 @@ func (hp *HunterPet) OnGCDReady(sim *core.Simulation) {
 		return
 	}
 
-	target := sim.GetPrimaryTarget()
+	target := hp.CurrentTarget
 	if hp.config.RandomSelection {
 		if sim.RandomFloat("Hunter Pet Ability") < 0.5 {
 			if !hp.primaryAbility.TryCast(sim, target, hp) {

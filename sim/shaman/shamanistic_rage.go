@@ -18,7 +18,7 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 		Label:    "Shamanistic Rage",
 		ActionID: actionID,
 		Duration: time.Second * 15,
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// proc mask: 20
 			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
@@ -40,7 +40,7 @@ func (shaman *Shaman) registerShamanisticRageCD() {
 				Duration: time.Minute * 2,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			srAura.Activate(sim)
 		},
 	})

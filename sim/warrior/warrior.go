@@ -27,7 +27,7 @@ type Warrior struct {
 	Stance              Stance
 	overpowerValidUntil time.Duration
 	rampageValidUntil   time.Duration
-	revengeTriggered    bool
+	RevengeValidUntil   time.Duration
 	shoutExpiresAt      time.Duration
 
 	// Cached values
@@ -49,6 +49,7 @@ type Warrior struct {
 	Overpower            *core.Spell
 	Rampage              *core.Spell
 	Revenge              *core.Spell
+	ShieldBlock          *core.Spell
 	ShieldSlam           *core.Spell
 	Slam                 *core.Spell
 	SunderArmor          *core.Spell
@@ -119,6 +120,7 @@ func (warrior *Warrior) Initialize() {
 	warrior.registerOverpowerSpell(overpowerRevengeTimer)
 	warrior.registerRampageSpell()
 	warrior.registerRevengeSpell(overpowerRevengeTimer)
+	warrior.registerShieldBlockSpell()
 	warrior.registerShieldSlamSpell(primaryTimer)
 	warrior.registerSlamSpell()
 	warrior.registerThunderClapSpell()
@@ -129,7 +131,7 @@ func (warrior *Warrior) Initialize() {
 
 	warrior.BloodFrenzyAuras = nil
 	for i := int32(0); i < warrior.Env.GetNumTargets(); i++ {
-		target := warrior.Env.GetTarget(i)
+		target := warrior.Env.GetTargetUnit(i)
 		warrior.BloodFrenzyAuras = append(warrior.BloodFrenzyAuras, core.BloodFrenzyAura(target, warrior.Talents.BloodFrenzy))
 	}
 
@@ -139,9 +141,9 @@ func (warrior *Warrior) Initialize() {
 }
 
 func (warrior *Warrior) Reset(sim *core.Simulation) {
-	warrior.revengeTriggered = false
 	warrior.overpowerValidUntil = 0
 	warrior.rampageValidUntil = 0
+	warrior.RevengeValidUntil = 0
 
 	warrior.shoutExpiresAt = 0
 	if warrior.Shout != nil && warrior.PrecastShout {
@@ -158,6 +160,8 @@ func NewWarrior(character core.Character, talents proto.WarriorTalents, inputs W
 		Talents:       talents,
 		WarriorInputs: inputs,
 	}
+
+	warrior.PseudoStats.CanParry = true
 
 	warrior.AddStatDependency(stats.StatDependency{
 		SourceStat:   stats.Agility,

@@ -63,6 +63,9 @@ message Raid {
 
 		RaidBuffs buffs = 2;
 
+		// Players who will be tanking mobs.
+		repeated RaidTarget tanks = 4;
+
 		// Staggers Stormstrike casts across Enhance Shaman to maximize charge usage.
 		bool stagger_stormstrikes = 3;
 }
@@ -98,6 +101,9 @@ message TargetedActionMetrics {
 
 		// # of times this action was a critical strike.
     int32 crits = 3;
+
+		// # of times this action was a crushing blow.
+    int32 crushes = 11;
 
 		// # of times this action was a Miss or Resist.
     int32 misses = 4;
@@ -165,6 +171,7 @@ message UnitMetrics {
 
 		DistributionMetrics dps = 1;
 		DistributionMetrics threat = 8;
+		DistributionMetrics dtps = 11;
 
     // average seconds spent oom per iteration
     double seconds_oom_avg = 3; 

@@ -160,7 +160,7 @@ func (wp *WarlockPet) OnGCDReady(sim *core.Simulation) {
 	// 	return
 	// }
 
-	target := sim.GetPrimaryTarget()
+	target := wp.CurrentTarget
 	if wp.config.RandomSelection {
 		if sim.RandomFloat("Warlock Pet Ability") < 0.5 {
 			if !wp.TryCast(sim, target, wp.primaryAbility) {

@@ -47,19 +47,19 @@ func (shaman *Shaman) newChainLightningSpell(isLightningOverload bool) *core.Spe
 	numHits := core.MinInt32(3, shaman.Env.GetNumTargets())
 	effects := make([]core.SpellEffect, 0, numHits)
 
-	effect.Target = shaman.Env.GetTarget(0)
-	effect.OnSpellHit = makeOnSpellHit(0)
+	effect.Target = shaman.Env.GetTargetUnit(0)
+	effect.OnSpellHitDealt = makeOnSpellHit(0)
 	effects = append(effects, effect)
 
 	for i := int32(1); i < numHits; i++ {
 		bounceEffect := effects[i-1] // Makes a copy of the previous bounce
-		bounceEffect.Target = shaman.Env.GetTarget(i)
+		bounceEffect.Target = shaman.Env.GetTargetUnit(i)
 		if hasTidefury {
 			bounceEffect.DamageMultiplier *= 0.83
 		} else {
 			bounceEffect.DamageMultiplier *= 0.7
 		}
-		bounceEffect.OnSpellHit = makeOnSpellHit(i)
+		bounceEffect.OnSpellHitDealt = makeOnSpellHit(i)
 
 		effects = append(effects, bounceEffect)
 	}

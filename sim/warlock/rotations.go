@@ -20,7 +20,7 @@ func (warlock *Warlock) OnManaTick(sim *core.Simulation) {
 
 func (warlock *Warlock) tryUseGCD(sim *core.Simulation) {
 	var spell *core.Spell
-	var target = sim.GetPrimaryTarget()
+	var target = warlock.CurrentTarget
 
 	// If doing seed, that is the priority spell.
 	mainSpell := warlock.Rotation.PrimarySpell

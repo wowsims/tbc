@@ -15,7 +15,7 @@ func (warrior *Warrior) registerOverpowerSpell(cdTimer *core.Timer) {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeDodge) {
 				warrior.overpowerValidUntil = sim.CurrentTime + time.Second*5
 			}
@@ -35,7 +35,7 @@ func (warrior *Warrior) registerOverpowerSpell(cdTimer *core.Timer) {
 		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 35, 1, true),
 		OutcomeApplier: warrior.OutcomeFuncMeleeSpecialNoBlockDodgeParry(warrior.critMultiplier(true)),
 
-		OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.Landed() {
 				warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 			}
@@ -62,7 +62,7 @@ func (warrior *Warrior) registerOverpowerSpell(cdTimer *core.Timer) {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, target *core.Target, spell *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, target *core.Unit, spell *core.Spell) {
 			warrior.overpowerValidUntil = 0
 			damageEffect(sim, target, spell)
 		},

@@ -48,7 +48,7 @@ func (mage *Mage) registerFireballSpell() {
 			BaseDamage:     core.BaseDamageConfigMagic(649, 821, 1.0+0.03*float64(mage.Talents.EmpoweredFireball)),
 			OutcomeApplier: mage.OutcomeFuncMagicHitAndCrit(mage.SpellCritMultiplier(1, 0.25*float64(mage.Talents.SpellPower))),
 
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					mage.FireballDot.Apply(sim)
 				}
@@ -56,7 +56,7 @@ func (mage *Mage) registerFireballSpell() {
 		}),
 	})
 
-	target := mage.Env.GetPrimaryTarget()
+	target := mage.CurrentTarget
 	mage.FireballDot = core.NewDot(core.Dot{
 		Spell: mage.Fireball,
 		Aura: target.RegisterAura(core.Aura{

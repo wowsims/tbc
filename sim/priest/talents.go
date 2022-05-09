@@ -96,7 +96,7 @@ func (priest *Priest) setupSurgeOfLight() {
 		Label:    "Surge of Light Proc",
 		ActionID: core.ActionID{SpellID: 33151},
 		Duration: core.NeverExpires,
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell == priest.Smite {
 				aura.Deactivate(sim)
 			}
@@ -111,7 +111,7 @@ func (priest *Priest) setupSurgeOfLight() {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				if procChance < sim.RandomFloat("SurgeOfLight") {
 					priest.SurgeOfLightProcAura.Activate(sim)
@@ -148,7 +148,7 @@ func (priest *Priest) registerInnerFocus() {
 			priest.AddStatDynamic(sim, stats.SpellCrit, -25*core.SpellCritRatingPerCritChance)
 			priest.PseudoStats.NoCost = false
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// Remove the buff and put skill on CD
 			aura.Deactivate(sim)
 			priest.InnerFocus.CD.Use(sim)
@@ -166,7 +166,7 @@ func (priest *Priest) registerInnerFocus() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			priest.InnerFocusAura.Activate(sim)
 		},
 	})

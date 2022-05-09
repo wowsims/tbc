@@ -10,7 +10,7 @@ var FaerieFireActionID = core.ActionID{SpellID: 26993}
 
 func (druid *Druid) registerFaerieFireSpell() {
 	baseCost := 145.0
-	druid.FaerieFireAura = core.FaerieFireAura(druid.Env.GetPrimaryTarget(), druid.Talents.ImprovedFaerieFire)
+	druid.FaerieFireAura = core.FaerieFireAura(druid.CurrentTarget, druid.Talents.ImprovedFaerieFire)
 
 	druid.FaerieFire = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    FaerieFireActionID,
@@ -30,7 +30,7 @@ func (druid *Druid) registerFaerieFireSpell() {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   druid.OutcomeFuncMagicHit(),
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					druid.FaerieFireAura.Activate(sim)
 				}
@@ -39,6 +39,6 @@ func (druid *Druid) registerFaerieFireSpell() {
 	})
 }
 
-func (druid *Druid) ShouldCastFaerieFire(sim *core.Simulation, target *core.Target, rotation proto.BalanceDruid_Rotation) bool {
+func (druid *Druid) ShouldCastFaerieFire(sim *core.Simulation, target *core.Unit, rotation proto.BalanceDruid_Rotation) bool {
 	return rotation.FaerieFire && !druid.FaerieFireAura.IsActive()
 }

@@ -22,14 +22,14 @@ func (warrior *Warrior) registerDemoralizingShoutSpell() {
 	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
-		effects[i].Target = warrior.Env.GetTarget(i)
+		effects[i].Target = warrior.Env.GetTargetUnit(i)
 
 		demoShoutAura := core.DemoralizingShoutAura(effects[i].Target, warrior.Talents.BoomingVoice, warrior.Talents.ImprovedDemoralizingShout)
 		if i == 0 {
 			warrior.DemoralizingShoutAura = demoShoutAura
 		}
 
-		effects[i].OnSpellHit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		effects[i].OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Landed() {
 				demoShoutAura.Activate(sim)
 			}

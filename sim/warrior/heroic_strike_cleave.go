@@ -34,7 +34,7 @@ func (warrior *Warrior) registerHeroicStrikeSpell() {
 			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 176, 1, true),
 			OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 
-			OnSpellHit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 				}
@@ -62,7 +62,7 @@ func (warrior *Warrior) registerCleaveSpell() {
 	effects := make([]core.SpellEffect, 0, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects = append(effects, baseEffect)
-		effects[i].Target = warrior.Env.GetTarget(i)
+		effects[i].Target = warrior.Env.GetTargetUnit(i)
 	}
 
 	warrior.HeroicStrikeOrCleave = warrior.RegisterSpell(core.SpellConfig{
@@ -102,23 +102,14 @@ func (warrior *Warrior) DequeueHSOrCleave(sim *core.Simulation) {
 // Returns true if the regular melee swing should be used, false otherwise.
 func (warrior *Warrior) TryHSOrCleave(sim *core.Simulation, mhSwingSpell *core.Spell) *core.Spell {
 	if !warrior.HSOrCleaveQueueAura.IsActive() {
-		if sim.Log != nil {
-			sim.Log("HS not queued")
-		}
 		return nil
 	}
 
 	if warrior.CurrentRage() < warrior.HeroicStrikeOrCleave.DefaultCast.Cost {
 		warrior.DequeueHSOrCleave(sim)
-		if sim.Log != nil {
-			sim.Log("HS not enough rage")
-		}
 		return nil
 	} else if warrior.CurrentRage() < warrior.HSRageThreshold {
 		if mhSwingSpell == warrior.AutoAttacks.MHAuto {
-			if sim.Log != nil {
-				sim.Log("HS MS auto below thresh")
-			}
 			warrior.DequeueHSOrCleave(sim)
 			return nil
 		}

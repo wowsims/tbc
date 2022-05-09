@@ -53,7 +53,7 @@ func NewPet(name string, owner *Character, baseStats stats.Stats, statInheritanc
 				Level:       CharacterLevel,
 				PseudoStats: stats.NewPseudoStats(),
 				auraTracker: newAuraTracker(),
-				Metrics:     NewCharacterMetrics(),
+				Metrics:     NewUnitMetrics(),
 			},
 			Name:       name,
 			Party:      owner.Party,
@@ -98,9 +98,12 @@ func (pet *Pet) Finalize() {
 	pet.Character.Finalize()
 }
 
-func (pet *Pet) reset(sim *Simulation, agent Agent) {
+func (pet *Pet) reset(sim *Simulation, agent PetAgent) {
 	pet.Character.reset(sim, agent)
 	pet.enabled = false
+	if pet.initialEnabled {
+		pet.Enable(sim, agent)
+	}
 }
 func (pet *Pet) advance(sim *Simulation, elapsedTime time.Duration) {
 	pet.Character.advance(sim, elapsedTime)
@@ -155,7 +158,6 @@ func (pet *Pet) Disable(sim *Simulation) {
 
 // Helper for enabling a pet that will expire after a certain duration.
 func (pet *Pet) EnableWithTimeout(sim *Simulation, petAgent PetAgent, petDuration time.Duration) {
-	pet.EnableGCDTimer(sim, petAgent)
 	pet.Enable(sim, petAgent)
 
 	pet.timeoutAction = &PendingAction{

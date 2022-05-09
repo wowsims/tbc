@@ -16,15 +16,15 @@ func (war *ProtectionWarrior) OnAutoAttack(sim *core.Simulation, spell *core.Spe
 }
 
 func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
-	target := sim.GetPrimaryTarget()
+	target := war.CurrentTarget
 
 	if war.GCD.IsReady(sim) {
 		if war.CanShieldSlam(sim) {
 			war.ShieldSlam.Cast(sim, target)
 		} else if war.CanBloodthirst(sim) {
-			war.Bloodthirst.Cast(sim, sim.GetPrimaryTarget())
+			war.Bloodthirst.Cast(sim, war.CurrentTarget)
 		} else if war.CanMortalStrike(sim) {
-			war.MortalStrike.Cast(sim, sim.GetPrimaryTarget())
+			war.MortalStrike.Cast(sim, war.CurrentTarget)
 		} else if war.CanRevenge(sim) {
 			war.Revenge.Cast(sim, target)
 		} else if war.ShouldShout(sim) {
@@ -40,7 +40,17 @@ func (war *ProtectionWarrior) doRotation(sim *core.Simulation) {
 		}
 	}
 
+	war.tryShieldBlock(sim)
 	war.tryQueueHsCleave(sim)
+}
+
+func (war *ProtectionWarrior) tryShieldBlock(sim *core.Simulation) {
+	if war.Rotation.ShieldBlock == proto.ProtectionWarrior_Rotation_ShieldBlockOnCD ||
+		(war.Rotation.ShieldBlock == proto.ProtectionWarrior_Rotation_ShieldBlockToProcRevenge && war.Revenge.IsReady(sim) && sim.CurrentTime >= war.RevengeValidUntil) {
+		if war.CanShieldBlock(sim) {
+			war.ShieldBlock.Cast(sim, nil)
+		}
+	}
 }
 
 func (war *ProtectionWarrior) tryQueueHsCleave(sim *core.Simulation) {

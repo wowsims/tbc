@@ -245,6 +245,23 @@ func (unit *Unit) OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApp
 	}
 }
 
+func (unit *Unit) OutcomeFuncEnemyMeleeWhite() OutcomeApplier {
+	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, attackTable *AttackTable) {
+		unit := spell.Unit
+		roll := sim.RandomFloat("Enemy White Hit Table")
+		chance := 0.0
+
+		if !spellEffect.applyEnemyAttackTableMiss(spell, unit, attackTable, roll, &chance) &&
+			!spellEffect.applyEnemyAttackTableDodge(spell, unit, attackTable, roll, &chance) &&
+			!spellEffect.applyEnemyAttackTableParry(spell, unit, attackTable, roll, &chance) &&
+			!spellEffect.applyEnemyAttackTableBlock(spell, unit, attackTable, roll, &chance) &&
+			!spellEffect.applyEnemyAttackTableCrit(spell, unit, attackTable, roll, &chance) &&
+			!spellEffect.applyEnemyAttackTableCrush(spell, unit, attackTable, roll, &chance) {
+			spellEffect.applyAttackTableHit(spell)
+		}
+	}
+}
+
 // Calculates a hit check using the stats from this spell.
 func (spellEffect *SpellEffect) magicHitCheck(sim *Simulation, spell *Spell, attackTable *AttackTable) bool {
 	missChance := attackTable.BaseSpellMissChance - (spell.Unit.GetStat(stats.SpellHit)+spellEffect.BonusSpellHitRating)/(SpellHitRatingPerHitChance*100)
@@ -372,4 +389,103 @@ func (spellEffect *SpellEffect) applyAttackTableCritSeparateRoll(sim *Simulation
 func (spellEffect *SpellEffect) applyAttackTableHit(spell *Spell) {
 	spellEffect.Outcome = OutcomeHit
 	spell.SpellMetrics[spellEffect.Target.Index].Hits++
+}
+
+func (spellEffect *SpellEffect) applyEnemyAttackTableMiss(spell *Spell, unit *Unit, attackTable *AttackTable, roll float64, chance *float64) bool {
+	missChance := attackTable.BaseMissChance + spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
+	*chance = MaxFloat(0, missChance)
+
+	if roll < *chance {
+		spellEffect.Outcome = OutcomeMiss
+		spell.SpellMetrics[spellEffect.Target.Index].Misses++
+		spellEffect.Damage = 0
+		return true
+	}
+	return false
+}
+
+func (spellEffect *SpellEffect) applyEnemyAttackTableBlock(spell *Spell, unit *Unit, attackTable *AttackTable, roll float64, chance *float64) bool {
+	if !spellEffect.Target.PseudoStats.CanBlock {
+		return false
+	}
+
+	blockChance := attackTable.BaseBlockChance +
+		spellEffect.Target.stats[stats.Block]/BlockRatingPerBlockChance/100 +
+		spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
+	*chance += MaxFloat(0, blockChance)
+
+	if roll < *chance {
+		spellEffect.Outcome |= OutcomeBlock
+		spell.SpellMetrics[spellEffect.Target.Index].Blocks++
+		spellEffect.Damage = MaxFloat(0, spellEffect.Damage-spellEffect.Target.GetStat(stats.BlockValue))
+		return true
+	}
+	return false
+}
+
+func (spellEffect *SpellEffect) applyEnemyAttackTableDodge(spell *Spell, unit *Unit, attackTable *AttackTable, roll float64, chance *float64) bool {
+	dodgeChance := attackTable.BaseDodgeChance +
+		spellEffect.Target.stats[stats.Dodge]/DodgeRatingPerDodgeChance/100 +
+		spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
+	*chance += MaxFloat(0, dodgeChance)
+
+	if roll < *chance {
+		spellEffect.Outcome = OutcomeDodge
+		spell.SpellMetrics[spellEffect.Target.Index].Dodges++
+		spellEffect.Damage = 0
+		return true
+	}
+	return false
+}
+
+func (spellEffect *SpellEffect) applyEnemyAttackTableParry(spell *Spell, unit *Unit, attackTable *AttackTable, roll float64, chance *float64) bool {
+	if !spellEffect.Target.PseudoStats.CanParry {
+		return false
+	}
+
+	parryChance := attackTable.BaseParryChance +
+		spellEffect.Target.stats[stats.Parry]/ParryRatingPerParryChance/100 +
+		spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
+	*chance += MaxFloat(0, parryChance)
+
+	if roll < *chance {
+		spellEffect.Outcome = OutcomeParry
+		spell.SpellMetrics[spellEffect.Target.Index].Parries++
+		spellEffect.Damage = 0
+		return true
+	}
+	return false
+}
+
+func (spellEffect *SpellEffect) applyEnemyAttackTableCrit(spell *Spell, unit *Unit, attackTable *AttackTable, roll float64, chance *float64) bool {
+	critRating := unit.stats[stats.MeleeCrit] + spellEffect.BonusCritRating
+	critChance := critRating / (MeleeCritRatingPerCritChance * 100)
+	critChance -= spellEffect.Target.stats[stats.Defense] * DefenseRatingToChanceReduction
+	critChance -= spellEffect.Target.stats[stats.Resilience] / ResilienceRatingPerCritReductionChance / 100
+	*chance += MaxFloat(0, critChance)
+
+	if roll < *chance {
+		spellEffect.Outcome = OutcomeCrit
+		spell.SpellMetrics[spellEffect.Target.Index].Crits++
+		resilCritMultiplier := 1 - spellEffect.Target.stats[stats.Resilience]/ResilienceRatingPerCritDamageReductionPercent/100
+		spellEffect.Damage *= 2 * resilCritMultiplier
+		return true
+	}
+	return false
+}
+
+func (spellEffect *SpellEffect) applyEnemyAttackTableCrush(spell *Spell, unit *Unit, attackTable *AttackTable, roll float64, chance *float64) bool {
+	if !unit.PseudoStats.CanCrush {
+		return false
+	}
+
+	*chance += CrushChance
+
+	if roll < *chance {
+		spellEffect.Outcome = OutcomeCrush
+		spell.SpellMetrics[spellEffect.Target.Index].Crushes++
+		spellEffect.Damage *= 1.5
+		return true
+	}
+	return false
 }

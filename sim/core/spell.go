@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-type ApplySpellEffects func(*Simulation, *Target, *Spell)
+type ApplySpellEffects func(*Simulation, *Unit, *Spell)
 
 type SpellConfig struct {
 	// See definition of Spell (below) for comments on these.
@@ -28,6 +28,7 @@ type SpellMetrics struct {
 	Misses             int32
 	Hits               int32
 	Crits              int32
+	Crushes            int32
 	Dodges             int32
 	Glances            int32
 	Parries            int32
@@ -100,7 +101,7 @@ func (unit *Unit) RegisterSpell(config SpellConfig) *Spell {
 	spell.castFn = spell.makeCastFunc(config.Cast, spell.applyEffects)
 
 	if spell.ApplyEffects == nil {
-		spell.ApplyEffects = func(*Simulation, *Target, *Spell) {}
+		spell.ApplyEffects = func(*Simulation, *Unit, *Spell) {}
 	}
 
 	unit.Spellbook = append(unit.Spellbook, spell)
@@ -144,7 +145,7 @@ func (spell *Spell) CurDamagePerCast() float64 {
 }
 
 func (spell *Spell) reset(sim *Simulation) {
-	spell.SpellMetrics = make([]SpellMetrics, sim.GetNumTargets())
+	spell.SpellMetrics = make([]SpellMetrics, len(spell.Unit.AttackTables))
 }
 
 func (spell *Spell) doneIteration() {
@@ -165,12 +166,12 @@ func (spell *Spell) TimeToReady(sim *Simulation) time.Duration {
 	return MaxTimeToReady(spell.CD.Timer, spell.SharedCD.Timer, sim)
 }
 
-func (spell *Spell) Cast(sim *Simulation, target *Target) bool {
+func (spell *Spell) Cast(sim *Simulation, target *Unit) bool {
 	return spell.castFn(sim, target)
 }
 
 // Skips the actual cast and applies spell effects immediately.
-func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Target) {
+func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Unit) {
 	if sim.Log != nil && !spell.SpellExtras.Matches(SpellExtrasNoLogs) {
 		spell.Unit.Log(sim, "Casting %s (Cost = %0.03f, Cast Time = %s)",
 			spell.ActionID, spell.DefaultCast.Cost, time.Duration(0))
@@ -179,12 +180,12 @@ func (spell *Spell) SkipCastAndApplyEffects(sim *Simulation, target *Target) {
 	spell.applyEffects(sim, target)
 }
 
-func (spell *Spell) applyEffects(sim *Simulation, target *Target) {
+func (spell *Spell) applyEffects(sim *Simulation, target *Unit) {
 	if spell.SpellMetrics == nil {
 		spell.reset(sim)
 	}
 	if target == nil {
-		target = sim.GetPrimaryTarget()
+		target = spell.Unit.CurrentTarget
 	}
 	spell.SpellMetrics[target.Index].Casts++
 	spell.ApplyEffects(sim, target, spell)
@@ -193,7 +194,7 @@ func (spell *Spell) applyEffects(sim *Simulation, target *Target) {
 func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
 	if baseEffect.BaseDamage.Calculator == nil {
 		// Just a hit check.
-		return func(sim *Simulation, target *Target, spell *Spell) {
+		return func(sim *Simulation, target *Unit, spell *Spell) {
 			effect := &baseEffect
 			effect.Target = target
 			attackTable := spell.Unit.AttackTables[target.Index]
@@ -203,7 +204,7 @@ func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
 			effect.finalize(sim, spell)
 		}
 	} else {
-		return func(sim *Simulation, target *Target, spell *Spell) {
+		return func(sim *Simulation, target *Unit, spell *Spell) {
 			effect := &baseEffect
 			effect.Target = target
 			attackTable := spell.Unit.AttackTables[target.Index]
@@ -217,7 +218,7 @@ func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
 }
 
 func ApplyEffectFuncDirectDamageTargetModifiersOnly(baseEffect SpellEffect) ApplySpellEffects {
-	return func(sim *Simulation, target *Target, spell *Spell) {
+	return func(sim *Simulation, target *Unit, spell *Spell) {
 		effect := &baseEffect
 		effect.Target = target
 		attackTable := spell.Unit.AttackTables[target.Index]
@@ -235,7 +236,7 @@ func ApplyEffectFuncDamageMultiple(baseEffects []SpellEffect) ApplySpellEffects 
 		return ApplyEffectFuncDirectDamage(baseEffects[0])
 	}
 
-	return func(sim *Simulation, _ *Target, spell *Spell) {
+	return func(sim *Simulation, _ *Unit, spell *Spell) {
 		for i := range baseEffects {
 			effect := &baseEffects[i]
 			effect.init(sim, spell)
@@ -256,7 +257,7 @@ func ApplyEffectFuncDamageMultipleTargeted(baseEffects []SpellEffect) ApplySpell
 		return ApplyEffectFuncDirectDamage(baseEffects[0])
 	}
 
-	return func(sim *Simulation, target *Target, spell *Spell) {
+	return func(sim *Simulation, target *Unit, spell *Spell) {
 		for i := range baseEffects {
 			effect := &baseEffects[i]
 			effect.Target = target
@@ -276,13 +277,13 @@ func ApplyEffectFuncAOEDamage(env *Environment, baseEffect SpellEffect) ApplySpe
 	effects := make([]SpellEffect, numHits)
 	for i := int32(0); i < numHits; i++ {
 		effects[i] = baseEffect
-		effects[i].Target = env.GetTarget(i)
+		effects[i].Target = &env.GetTarget(i).Unit
 	}
 	return ApplyEffectFuncDamageMultiple(effects)
 }
 
 func ApplyEffectFuncDot(dot *Dot) ApplySpellEffects {
-	return func(sim *Simulation, _ *Target, _ *Spell) {
+	return func(sim *Simulation, _ *Unit, _ *Spell) {
 		dot.Apply(sim)
 	}
 }
@@ -326,14 +327,14 @@ func ApplyEffectFuncAOEDamageCapped(env *Environment, aoeCap float64, baseEffect
 	baseEffects := make([]SpellEffect, numHits)
 	for i := int32(0); i < numHits; i++ {
 		baseEffects[i] = baseEffect
-		baseEffects[i].Target = env.GetTarget(i)
+		baseEffects[i].Target = &env.GetTarget(i).Unit
 	}
 	return ApplyEffectFuncMultipleDamageCapped(baseEffects, aoeCap)
 }
 
 func ApplyEffectFuncMultipleDamageCapped(baseEffects []SpellEffect, aoeCap float64) ApplySpellEffects {
 	outcomeMultipliers := make([]float64, len(baseEffects))
-	return func(sim *Simulation, _ *Target, spell *Spell) {
+	return func(sim *Simulation, _ *Unit, spell *Spell) {
 		for i := range baseEffects {
 			effect := &baseEffects[i]
 			effect.init(sim, spell)

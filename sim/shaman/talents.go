@@ -82,6 +82,7 @@ func (shaman *Shaman) ApplyTalents() {
 	}
 
 	if shaman.Talents.SpiritWeapons {
+		shaman.PseudoStats.CanParry = true
 		shaman.AutoAttacks.MHEffect.ThreatMultiplier *= 0.7
 		shaman.AutoAttacks.OHEffect.ThreatMultiplier *= 0.7
 	}
@@ -123,7 +124,7 @@ func (shaman *Shaman) applyElementalFocus() {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spell.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
 				return
 			}
@@ -157,7 +158,7 @@ func (shaman *Shaman) applyElementalDevastation() {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
@@ -190,7 +191,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			shaman.AddStatDynamic(sim, stats.SpellCrit, -100*core.SpellCritRatingPerCritChance)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spell.SpellExtras.Matches(SpellFlagShock | SpellFlagElectric) {
 				return
 			}
@@ -210,7 +211,7 @@ func (shaman *Shaman) registerElementalMasteryCD() {
 				Duration: cd,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			shaman.ElementalMasteryAura.Activate(sim)
 			shaman.ElementalMasteryAura.Prioritize()
 		},
@@ -255,7 +256,7 @@ func (shaman *Shaman) registerNaturesSwiftnessCD() {
 				Duration: cd,
 			},
 		},
-		ApplyEffects: func(sim *core.Simulation, _ *core.Target, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
 			shaman.NaturesSwiftnessAura.Activate(sim)
 		},
 	})
@@ -309,7 +310,7 @@ func (shaman *Shaman) applyUnleashedRage() {
 			currentAPBonuses = make([]float64, len(shaman.Party.PlayersAndPets))
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// proc mask = 20 (melee auto & special)
 			if !spellEffect.Outcome.Matches(core.OutcomeCrit) || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
@@ -355,7 +356,7 @@ func (shaman *Shaman) applyShamanisticFocus() {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
@@ -402,7 +403,7 @@ func (shaman *Shaman) applyFlurry() {
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			aura.Activate(sim)
 		},
-		OnSpellHit: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
