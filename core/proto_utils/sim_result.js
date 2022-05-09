@@ -238,8 +238,14 @@ export class UnitMetrics {
     }
     static async makeNewTarget(resultData, target, metrics, index, logs) {
         const targetLogs = logs.filter(log => log.source && (log.source.isTarget && log.source.index == index));
-        const auras = await Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(null, resultData, auraMetrics)));
-        return new UnitMetrics(null, target, null, metrics, index, [], auras, [], [], targetLogs, resultData);
+        const actionsPromise = Promise.all(metrics.actions.map(actionMetrics => ActionMetrics.makeNew(null, resultData, actionMetrics, index)));
+        const aurasPromise = Promise.all(metrics.auras.map(auraMetrics => AuraMetrics.makeNew(null, resultData, auraMetrics)));
+        const actions = await actionsPromise;
+        const auras = await aurasPromise;
+        const targetMetrics = new UnitMetrics(null, target, null, metrics, index, actions, auras, [], [], targetLogs, resultData);
+        actions.forEach(action => action.unit = targetMetrics);
+        auras.forEach(aura => aura.unit = targetMetrics);
+        return targetMetrics;
     }
 }
 export class EncounterMetrics {
@@ -418,6 +424,9 @@ export class ActionMetrics {
     get critPercent() {
         return this.combinedMetrics.critPercent;
     }
+    get crushPercent() {
+        return this.combinedMetrics.crushPercent;
+    }
     get misses() {
         return this.combinedMetrics.misses;
     }
@@ -447,6 +456,11 @@ export class ActionMetrics {
     }
     get glancePercent() {
         return this.combinedMetrics.glancePercent;
+    }
+    forTarget(index) {
+        const targetData = ActionMetricsProto.clone(this.data);
+        targetData.targets = [targetData.targets[index]];
+        return new ActionMetrics(this.unit, this.actionId, targetData, this.resultData);
     }
     static async makeNew(unit, resultData, actionMetrics, playerIndex) {
         const actionId = await ActionId.fromProto(actionMetrics.id).fill(playerIndex);
@@ -511,7 +525,7 @@ export class TargetedActionMetrics {
         return this.data.threat / this.data.casts;
     }
     get landedHitsRaw() {
-        return this.data.hits + this.data.crits + this.data.blocks + this.data.glances;
+        return this.data.hits + this.data.crits + this.data.crushes + this.data.blocks + this.data.glances;
     }
     get landedHits() {
         return this.landedHitsRaw / this.iterations;
@@ -523,6 +537,7 @@ export class TargetedActionMetrics {
             + this.data.blocks
             + this.data.glances
             + this.data.crits
+            + this.data.crushes
             + this.data.hits;
     }
     get avgHit() {
@@ -533,6 +548,9 @@ export class TargetedActionMetrics {
     }
     get critPercent() {
         return (this.data.crits / this.hitAttempts) * 100;
+    }
+    get crushPercent() {
+        return (this.data.crushes / this.hitAttempts) * 100;
     }
     get misses() {
         return this.data.misses / this.iterations;
@@ -570,6 +588,7 @@ export class TargetedActionMetrics {
             casts: sum(actions.map(a => a.data.casts)),
             hits: sum(actions.map(a => a.data.hits)),
             crits: sum(actions.map(a => a.data.crits)),
+            crushes: sum(actions.map(a => a.data.crushes)),
             misses: sum(actions.map(a => a.data.misses)),
             dodges: sum(actions.map(a => a.data.dodges)),
             parries: sum(actions.map(a => a.data.parries)),

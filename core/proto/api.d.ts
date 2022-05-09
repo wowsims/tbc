@@ -283,6 +283,12 @@ export interface TargetedActionMetrics {
      */
     crits: number;
     /**
+     * # of times this action was a crushing blow.
+     *
+     * @generated from protobuf field: int32 crushes = 11;
+     */
+    crushes: number;
+    /**
      * # of times this action was a Miss or Resist.
      *
      * @generated from protobuf field: int32 misses = 4;

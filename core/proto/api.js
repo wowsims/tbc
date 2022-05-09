@@ -582,6 +582,7 @@ class TargetedActionMetrics$Type extends MessageType {
             { no: 1, name: "casts", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "hits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "crits", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 11, name: "crushes", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 4, name: "misses", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 5, name: "dodges", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 6, name: "parries", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -592,7 +593,7 @@ class TargetedActionMetrics$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { casts: 0, hits: 0, crits: 0, misses: 0, dodges: 0, parries: 0, blocks: 0, glances: 0, damage: 0, threat: 0 };
+        const message = { casts: 0, hits: 0, crits: 0, crushes: 0, misses: 0, dodges: 0, parries: 0, blocks: 0, glances: 0, damage: 0, threat: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -611,6 +612,9 @@ class TargetedActionMetrics$Type extends MessageType {
                     break;
                 case /* int32 crits */ 3:
                     message.crits = reader.int32();
+                    break;
+                case /* int32 crushes */ 11:
+                    message.crushes = reader.int32();
                     break;
                 case /* int32 misses */ 4:
                     message.misses = reader.int32();
@@ -654,6 +658,9 @@ class TargetedActionMetrics$Type extends MessageType {
         /* int32 crits = 3; */
         if (message.crits !== 0)
             writer.tag(3, WireType.Varint).int32(message.crits);
+        /* int32 crushes = 11; */
+        if (message.crushes !== 0)
+            writer.tag(11, WireType.Varint).int32(message.crushes);
         /* int32 misses = 4; */
         if (message.misses !== 0)
             writer.tag(4, WireType.Varint).int32(message.misses);

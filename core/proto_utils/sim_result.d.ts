@@ -181,6 +181,7 @@ export declare class ActionMetrics {
     get avgHit(): number;
     get avgHitThreat(): number;
     get critPercent(): number;
+    get crushPercent(): number;
     get misses(): number;
     get missPercent(): number;
     get dodges(): number;
@@ -191,6 +192,7 @@ export declare class ActionMetrics {
     get blockPercent(): number;
     get glances(): number;
     get glancePercent(): number;
+    forTarget(index: number): ActionMetrics;
     static makeNew(unit: UnitMetrics | null, resultData: SimResultData, actionMetrics: ActionMetricsProto, playerIndex?: number): Promise<ActionMetrics>;
     static merge(actions: Array<ActionMetrics>, removeTag?: boolean, actionIdOverride?: ActionId): ActionMetrics;
     static groupById(actions: Array<ActionMetrics>, useTag?: boolean): Array<Array<ActionMetrics>>;
@@ -214,6 +216,7 @@ export declare class TargetedActionMetrics {
     get avgHit(): number;
     get avgHitThreat(): number;
     get critPercent(): number;
+    get crushPercent(): number;
     get misses(): number;
     get missPercent(): number;
     get dodges(): number;
