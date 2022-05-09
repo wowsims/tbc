@@ -15,6 +15,7 @@ import {
 	ProtectionWarrior,
 	ProtectionWarrior_Rotation as ProtectionWarriorRotation,
 	ProtectionWarrior_Rotation_DemoShout as DemoShout,
+	ProtectionWarrior_Rotation_ShieldBlock as ShieldBlock,
 	ProtectionWarrior_Rotation_ThunderClap as ThunderClap,
 	ProtectionWarrior_Options as ProtectionWarriorOptions
 } from '/tbc/core/proto/warrior.js';
@@ -113,7 +114,7 @@ export const ProtectionWarriorRotationConfig = {
 			config: {
 				label: 'Demo Shout',
 				values: [
-					{ name: 'None', value: DemoShout.DemoShoutNone },
+					{ name: 'Never', value: DemoShout.DemoShoutNone },
 					{ name: 'Maintain Debuff', value: DemoShout.DemoShoutMaintain },
 					{ name: 'Filler', value: DemoShout.DemoShoutFiller },
 				],
@@ -132,7 +133,7 @@ export const ProtectionWarriorRotationConfig = {
 			config: {
 				label: 'Thunder Clap',
 				values: [
-					{ name: 'None', value: ThunderClap.ThunderClapNone },
+					{ name: 'Never', value: ThunderClap.ThunderClapNone },
 					{ name: 'Maintain Debuff', value: ThunderClap.ThunderClapMaintain },
 					{ name: 'On CD', value: ThunderClap.ThunderClapOnCD },
 				],
@@ -141,6 +142,26 @@ export const ProtectionWarriorRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
 					const newRotation = player.getRotation();
 					newRotation.thunderClap = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'enum' as const, cssClass: 'shield-block-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Shield Block',
+				labelTooltip: 'When to use shield block.',
+				values: [
+					{ name: 'Never', value: ShieldBlock.ShieldBlockNone },
+					{ name: 'To Proc Revenge', value: ShieldBlock.ShieldBlockToProcRevenge },
+					{ name: 'On CD', value: ShieldBlock.ShieldBlockOnCD },
+				],
+				changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getRotation().shieldBlock,
+				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.shieldBlock = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},

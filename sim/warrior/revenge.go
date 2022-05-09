@@ -9,6 +9,19 @@ import (
 )
 
 func (warrior *Warrior) registerRevengeSpell(cdTimer *core.Timer) {
+	warrior.RegisterAura(core.Aura{
+		Label:    "Revenge Trigger",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Outcome.Matches(core.OutcomeBlock | core.OutcomeDodge | core.OutcomeParry) {
+				warrior.RevengeValidUntil = sim.CurrentTime + time.Second*5
+			}
+		},
+	})
+
 	cost := 5.0 - float64(warrior.Talents.FocusedRage)
 	refundAmount := cost * 0.8
 
@@ -43,6 +56,7 @@ func (warrior *Warrior) registerRevengeSpell(cdTimer *core.Timer) {
 			OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				warrior.RevengeValidUntil = 0
 				if !spellEffect.Landed() {
 					warrior.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 				}
@@ -52,5 +66,8 @@ func (warrior *Warrior) registerRevengeSpell(cdTimer *core.Timer) {
 }
 
 func (warrior *Warrior) CanRevenge(sim *core.Simulation) bool {
-	return warrior.StanceMatches(DefensiveStance) && warrior.revengeTriggered && warrior.CurrentRage() >= warrior.Revenge.DefaultCast.Cost && warrior.Revenge.IsReady(sim)
+	return sim.CurrentTime < warrior.RevengeValidUntil &&
+		warrior.StanceMatches(DefensiveStance) &&
+		warrior.CurrentRage() >= warrior.Revenge.DefaultCast.Cost &&
+		warrior.Revenge.IsReady(sim)
 }
