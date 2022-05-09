@@ -1953,6 +1953,10 @@ input, select {
   content: " TPS";
 }
 
+.results-sim-dtps .topline-result-avg:after {
+  content: " DTPS";
+}
+
 .topline-result-stdev {
   font-size: 18px;
   font-weight: 700;

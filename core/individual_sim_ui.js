@@ -713,6 +713,7 @@ export class IndividualSimUI extends SimUI {
             settings: this.sim.toProto(),
             player: this.player.toProto(true),
             raidBuffs: this.sim.raid.getBuffs(),
+            tanks: this.sim.raid.getTanks(),
             partyBuffs: this.player.getParty()?.getBuffs() || PartyBuffs.create(),
             encounter: this.sim.encounter.toProto(),
             epWeights: this.player.getEpWeights().asArray(),
@@ -734,6 +735,7 @@ export class IndividualSimUI extends SimUI {
                 this.player.setEpWeights(eventID, this.individualConfig.defaults.epWeights);
             }
             this.sim.raid.setBuffs(eventID, settings.raidBuffs || RaidBuffs.create());
+            this.sim.raid.setTanks(eventID, settings.tanks || []);
             const party = this.player.getParty();
             if (party) {
                 party.setBuffs(eventID, settings.partyBuffs || PartyBuffs.create());

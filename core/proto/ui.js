@@ -6,7 +6,6 @@ import { MessageType } from '/tbc/protobuf-ts/index.js';
 import { RaidSimResult } from './api.js';
 import { RaidSimRequest } from './api.js';
 import { Raid } from './api.js';
-import { RaidTarget } from './common.js';
 import { Cooldowns } from './common.js';
 import { Race } from './common.js';
 import { Consumes } from './common.js';
@@ -15,6 +14,7 @@ import { EquipmentSpec } from './common.js';
 import { Encounter } from './common.js';
 import { Player } from './api.js';
 import { PartyBuffs } from './common.js';
+import { RaidTarget } from './common.js';
 import { RaidBuffs } from './common.js';
 /**
  * @generated from protobuf enum proto.Blessings
@@ -123,6 +123,7 @@ class IndividualSimSettings$Type extends MessageType {
         super("proto.IndividualSimSettings", [
             { no: 5, name: "settings", kind: "message", T: () => SimSettings },
             { no: 1, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
+            { no: 7, name: "tanks", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => RaidTarget },
             { no: 2, name: "party_buffs", kind: "message", T: () => PartyBuffs },
             { no: 3, name: "player", kind: "message", T: () => Player },
             { no: 4, name: "encounter", kind: "message", T: () => Encounter },
@@ -130,7 +131,7 @@ class IndividualSimSettings$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { epWeights: [] };
+        const message = { tanks: [], epWeights: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -146,6 +147,9 @@ class IndividualSimSettings$Type extends MessageType {
                     break;
                 case /* proto.RaidBuffs raid_buffs */ 1:
                     message.raidBuffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.raidBuffs);
+                    break;
+                case /* repeated proto.RaidTarget tanks */ 7:
+                    message.tanks.push(RaidTarget.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* proto.PartyBuffs party_buffs */ 2:
                     message.partyBuffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.partyBuffs);
@@ -181,6 +185,9 @@ class IndividualSimSettings$Type extends MessageType {
         /* proto.RaidBuffs raid_buffs = 1; */
         if (message.raidBuffs)
             RaidBuffs.internalBinaryWrite(message.raidBuffs, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* repeated proto.RaidTarget tanks = 7; */
+        for (let i = 0; i < message.tanks.length; i++)
+            RaidTarget.internalBinaryWrite(message.tanks[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         /* proto.PartyBuffs party_buffs = 2; */
         if (message.partyBuffs)
             PartyBuffs.internalBinaryWrite(message.partyBuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();

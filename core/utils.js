@@ -107,3 +107,17 @@ export function downloadString(data, fileName) {
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
 }
+export function formatDeltaTextElem(elem, before, after) {
+    const delta = after - before;
+    const deltaStr = delta.toFixed(2);
+    if (delta >= 0) {
+        elem.textContent = '+' + deltaStr;
+        elem.classList.remove('negative');
+        elem.classList.add('positive');
+    }
+    else {
+        elem.textContent = '' + deltaStr;
+        elem.classList.remove('positive');
+        elem.classList.add('negative');
+    }
+}

@@ -7,7 +7,6 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { RaidSimResult } from "./api";
 import { RaidSimRequest } from "./api";
 import { Raid } from "./api";
-import { RaidTarget } from "./common";
 import { Cooldowns } from "./common";
 import { Race } from "./common";
 import { Consumes } from "./common";
@@ -16,6 +15,7 @@ import { EquipmentSpec } from "./common";
 import { Encounter } from "./common";
 import { Player } from "./api";
 import { PartyBuffs } from "./common";
+import { RaidTarget } from "./common";
 import { RaidBuffs } from "./common";
 /**
  * @generated from protobuf message proto.SimSettings
@@ -56,6 +56,10 @@ export interface IndividualSimSettings {
      * @generated from protobuf field: proto.RaidBuffs raid_buffs = 1;
      */
     raidBuffs?: RaidBuffs;
+    /**
+     * @generated from protobuf field: repeated proto.RaidTarget tanks = 7;
+     */
+    tanks: RaidTarget[];
     /**
      * @generated from protobuf field: proto.PartyBuffs party_buffs = 2;
      */

@@ -14,3 +14,4 @@ export declare function hexToRgba(hex: string, alpha: number): string;
 export declare function camelToSnakeCase(str: string): string;
 export declare function downloadJson(json: any, fileName: string): void;
 export declare function downloadString(data: string, fileName: string): void;
+export declare function formatDeltaTextElem(elem: HTMLElement, before: number, after: number): void;

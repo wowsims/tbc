@@ -81,6 +81,7 @@ export declare class UnitMetrics {
     readonly classColor: string;
     readonly dps: DistributionMetricsProto;
     readonly tps: DistributionMetricsProto;
+    readonly dtps: DistributionMetricsProto;
     readonly actions: Array<ActionMetrics>;
     readonly auras: Array<AuraMetrics>;
     readonly resources: Array<ResourceMetrics>;

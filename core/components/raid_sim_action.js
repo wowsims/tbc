@@ -2,6 +2,7 @@ import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { SimRunData } from '/tbc/core/proto/ui.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
+import { formatDeltaTextElem } from '/tbc/core/utils.js';
 export function addRaidSimAction(simUI) {
     simUI.addAction('DPS', 'dps-action', async () => simUI.runSim((progress) => {
         resultsManager.setSimProgress(progress);
@@ -55,7 +56,11 @@ export class RaidSimResultsManager {
 				<div class="results-sim-reference">
 					<span class="results-sim-set-reference fa fa-map-pin"></span>
 					<div class="results-sim-reference-bar">
-						<span class="results-sim-reference-diff"></span>
+						<span class="results-sim-reference-dps-diff"></span>
+						<span class="results-sim-reference-diff-separator threat-metrics">/</span>
+						<span class="results-sim-reference-tps-diff threat-metrics"></span>
+						<span class="results-sim-reference-diff-separator threat-metrics">/</span>
+						<span class="results-sim-reference-dtps-diff threat-metrics"></span>
 						<span class="results-sim-reference-text"> vs. reference</span>
 						<span class="results-sim-reference-swap fa fa-retweet"></span>
 						<span class="results-sim-reference-delete fa fa-times"></span>
@@ -63,6 +68,11 @@ export class RaidSimResultsManager {
 				</div>
       </div>
     `);
+        if (!this.simUI.isIndividualSim()) {
+            Array.from(this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-diff-separator')).forEach(e => e.remove());
+            Array.from(this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-tps-diff')).forEach(e => e.remove());
+            Array.from(this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-dtps-diff')).forEach(e => e.remove());
+        }
         const simReferenceElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference')[0];
         const simReferenceDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-diff')[0];
         const simReferenceSetButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-set-reference')[0];
@@ -109,7 +119,7 @@ export class RaidSimResultsManager {
     }
     updateReference() {
         const simReferenceElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference')[0];
-        const simReferenceDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-diff')[0];
+        const simReferenceDpsDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-dps-diff')[0];
         if (!this.referenceData || !this.currentData) {
             simReferenceElem.classList.remove('has-reference');
             return;
@@ -117,17 +127,14 @@ export class RaidSimResultsManager {
         simReferenceElem.classList.add('has-reference');
         const currentDpsMetrics = this.currentData.simResult.raidMetrics.dps;
         const referenceDpsMetrics = this.referenceData.simResult.raidMetrics.dps;
-        const delta = currentDpsMetrics.avg - referenceDpsMetrics.avg;
-        const deltaStr = delta.toFixed(2);
-        if (delta >= 0) {
-            simReferenceDiffElem.textContent = '+' + deltaStr;
-            simReferenceDiffElem.classList.remove('negative');
-            simReferenceDiffElem.classList.add('positive');
-        }
-        else {
-            simReferenceDiffElem.textContent = '' + deltaStr;
-            simReferenceDiffElem.classList.remove('positive');
-            simReferenceDiffElem.classList.add('negative');
+        formatDeltaTextElem(simReferenceDpsDiffElem, referenceDpsMetrics.avg, currentDpsMetrics.avg);
+        if (this.simUI.isIndividualSim()) {
+            const simReferenceTpsDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-tps-diff')[0];
+            const simReferenceDtpsDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-dtps-diff')[0];
+            const curPlayerMetrics = this.currentData.simResult.getPlayers()[0];
+            const refPlayerMetrics = this.referenceData.simResult.getPlayers()[0];
+            formatDeltaTextElem(simReferenceTpsDiffElem, refPlayerMetrics.tps.avg, curPlayerMetrics.tps.avg);
+            formatDeltaTextElem(simReferenceDtpsDiffElem, refPlayerMetrics.dtps.avg, curPlayerMetrics.dtps.avg);
         }
     }
     getRunData() {
@@ -180,6 +187,13 @@ export class RaidSimResultsManager {
 				<div class="results-sim-tps threat-metrics">
 					<span class="topline-result-avg">${tpsMetrics.avg.toFixed(2)}</span>
 					<span class="topline-result-stdev">${tpsMetrics.stdev.toFixed(2)}</span>
+				</div>
+			`;
+            const dtpsMetrics = playerMetrics.dtps;
+            content += `
+				<div class="results-sim-dtps threat-metrics">
+					<span class="topline-result-avg">${dtpsMetrics.avg.toFixed(2)}</span>
+					<span class="topline-result-stdev">${dtpsMetrics.stdev.toFixed(2)}</span>
 				</div>
 			`;
         }
