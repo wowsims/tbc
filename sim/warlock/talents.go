@@ -90,15 +90,8 @@ func (warlock *Warlock) setupAmplifyCurse() {
 	}
 	warlock.AmplifyCurseAura = warlock.RegisterAura(core.Aura{
 		Label:    "Amplify Curse",
-		ActionID: core.ActionID{SpellID: 17941},
+		ActionID: core.ActionID{SpellID: 18288},
 		Duration: time.Second * 30,
-		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			// Check for an instant cast shadowbolt to disable aura
-			if spell != warlock.Shadowbolt || spell.CurCast.CastTime != 0 {
-				return
-			}
-			aura.Deactivate(sim)
-		},
 	})
 	warlock.AmplifyCurse = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 18288},
@@ -123,7 +116,7 @@ func (warlock *Warlock) setupNightfall() {
 	warlock.NightfallProcAura = warlock.RegisterAura(core.Aura{
 		Label:    "Nightfall Shadow Trance",
 		ActionID: core.ActionID{SpellID: 17941},
-		Duration: core.NeverExpires,
+		Duration: time.Second * 10,
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
 			// Check for an instant cast shadowbolt to disable aura
 			if spell != warlock.Shadowbolt || spell.CurCast.CastTime != 0 {
