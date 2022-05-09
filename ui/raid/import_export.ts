@@ -7,7 +7,7 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { RaidSimUI } from './raid_sim_ui.js';
 import { Encounter, EquipmentSpec, Gem, ItemSpec, MobType, Spec, Target } from '../core/proto/common.js';
 import { nameToClass } from '../core/proto_utils/names.js';
-import { Faction, raceToFaction, specToEligibleRaces, specTypeFunctions, withSpecProto } from '../core/proto_utils/utils.js';
+import { Faction, raceToFaction, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto } from '../core/proto_utils/utils.js';
 import { BalanceDruid, BalanceDruid_Rotation_PrimarySpell, FeralDruid } from '../core/proto/druid.js';
 import { ElementalShaman, EnhancementShaman } from '../core/proto/shaman.js';
 import { Hunter } from '../core/proto/hunter.js';
@@ -18,6 +18,7 @@ import { ShadowPriest, SmitePriest } from '../core/proto/priest.js';
 import { Warlock } from '../core/proto/warlock.js';
 import { ProtectionWarrior, Warrior } from '../core/proto/warrior.js';
 import { gemMatchesSocket } from '../core/proto_utils/gems.js';
+import { playerPresets } from './presets.js';
 
 declare var $: any;
 declare var tippy: any;
@@ -196,21 +197,17 @@ class RaidWCLImporter extends Importer {
 					if (spec == null || spec == undefined) {
 						return;
 					}
-					const matchingPresets = playerPresets.filter(preset => specToClass[preset.spec] == wowClass);
+
+					const matchingPresets = playerPresets.filter(preset => preset.spec == spec);
 					if (matchingPresets.length == 0) {
 						return;
 					}
-		
-					const newPlayer = new Player(matchingPreset.spec, this.raidPicker.raid.sim);
-					newPlayer.setRace(eventID, matchingPreset.defaultFactionRaces[this.raidPicker.getCurrentFaction()]);
-					newPlayer.setRotation(eventID, matchingPreset.rotation);
-					newPlayer.setTalentsString(eventID, matchingPreset.talents);
-					newPlayer.setSpecOptions(eventID, matchingPreset.specOptions);
-					newPlayer.setConsumes(eventID, matchingPreset.consumes);
-					newPlayer.setName(eventID, matchingPreset.defaultName);
+					const matchingPreset = matchingPresets[0];
 
 					var specFuncs = specTypeFunctions[spec];
-					player = withSpecProto(spec, player, specFuncs.rotationCreate(), specFuncs.talentsCreate(), specFuncs.optionsCreate());
+					player = withSpecProto(spec, player, matchingPreset.rotation, specFuncs.talentsCreate(), matchingPreset.specOptions);
+					player.talentsString = matchingPreset.talents;
+					player.consumes = matchingPreset.consumes;
 
 					player.name = details.name;
 					player.class = nameToClass(details.type);
@@ -222,18 +219,8 @@ class RaidWCLImporter extends Importer {
 						// TODO: lookup buffbot types
 						return;
 					}
-					player.race = 0;
-					specToEligibleRaces[spec].forEach( race => {
-						if (player.race != 0) {
-							return;
-						}
-						// turns out their IDs are the same as ours.
-						if (raceToFaction[race].valueOf() != data.data.reportData.report.guild.faction.id) {
-							return;
-						}
-						// Assign first race from your faction.
-						player.race = race;
-					});
+					const faction = data.data.reportData.report.guild.faction.id as Faction;
+					player.race = matchingPreset.defaultFactionRaces[faction];
 
 					(info.gear as Array<any>).forEach(gear => {
 						var item = ItemSpec.create();
@@ -251,9 +238,6 @@ class RaidWCLImporter extends Importer {
 						player.equipment!.items.push(item);
 					});
 					
-					// TODO: setup options / rotations
-					// TODO: setup talents
-
 					raid.parties[currentParty].players.push(player);
 					if (raid.parties[currentParty].players.length == 5) {
 						currentParty++;
