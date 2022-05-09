@@ -413,6 +413,10 @@ export interface ProtectionWarrior_Rotation {
      */
     thunderClap: ProtectionWarrior_Rotation_ThunderClap;
     /**
+     * @generated from protobuf field: proto.ProtectionWarrior.Rotation.ShieldBlock shield_block = 5;
+     */
+    shieldBlock: ProtectionWarrior_Rotation_ShieldBlock;
+    /**
      * @generated from protobuf field: bool use_cleave = 4;
      */
     useCleave: boolean;
@@ -456,6 +460,23 @@ export declare enum ProtectionWarrior_Rotation_ThunderClap {
      * @generated from protobuf enum value: ThunderClapOnCD = 2;
      */
     ThunderClapOnCD = 2
+}
+/**
+ * @generated from protobuf enum proto.ProtectionWarrior.Rotation.ShieldBlock
+ */
+export declare enum ProtectionWarrior_Rotation_ShieldBlock {
+    /**
+     * @generated from protobuf enum value: ShieldBlockNone = 0;
+     */
+    ShieldBlockNone = 0,
+    /**
+     * @generated from protobuf enum value: ShieldBlockToProcRevenge = 1;
+     */
+    ShieldBlockToProcRevenge = 1,
+    /**
+     * @generated from protobuf enum value: ShieldBlockOnCD = 2;
+     */
+    ShieldBlockOnCD = 2
 }
 /**
  * @generated from protobuf message proto.ProtectionWarrior.Options

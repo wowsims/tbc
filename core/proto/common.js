@@ -1181,6 +1181,12 @@ export var OtherAction;
      * @generated from protobuf enum value: OtherActionRefund = 8;
      */
     OtherAction[OtherAction["OtherActionRefund"] = 8] = "OtherActionRefund";
+    /**
+     * Indicates damage taken; used for rage gen.
+     *
+     * @generated from protobuf enum value: OtherActionDamageTaken = 9;
+     */
+    OtherAction[OtherAction["OtherActionDamageTaken"] = 9] = "OtherActionDamageTaken";
 })(OtherAction || (OtherAction = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class RaidBuffs$Type extends MessageType {

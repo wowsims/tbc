@@ -1870,7 +1870,13 @@ export declare enum OtherAction {
      *
      * @generated from protobuf enum value: OtherActionRefund = 8;
      */
-    OtherActionRefund = 8
+    OtherActionRefund = 8,
+    /**
+     * Indicates damage taken; used for rage gen.
+     *
+     * @generated from protobuf enum value: OtherActionDamageTaken = 9;
+     */
+    OtherActionDamageTaken = 9
 }
 declare class RaidBuffs$Type extends MessageType<RaidBuffs> {
     constructor();

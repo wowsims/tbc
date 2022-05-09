@@ -58,6 +58,24 @@ export var ProtectionWarrior_Rotation_ThunderClap;
     ProtectionWarrior_Rotation_ThunderClap[ProtectionWarrior_Rotation_ThunderClap["ThunderClapOnCD"] = 2] = "ThunderClapOnCD";
 })(ProtectionWarrior_Rotation_ThunderClap || (ProtectionWarrior_Rotation_ThunderClap = {}));
 /**
+ * @generated from protobuf enum proto.ProtectionWarrior.Rotation.ShieldBlock
+ */
+export var ProtectionWarrior_Rotation_ShieldBlock;
+(function (ProtectionWarrior_Rotation_ShieldBlock) {
+    /**
+     * @generated from protobuf enum value: ShieldBlockNone = 0;
+     */
+    ProtectionWarrior_Rotation_ShieldBlock[ProtectionWarrior_Rotation_ShieldBlock["ShieldBlockNone"] = 0] = "ShieldBlockNone";
+    /**
+     * @generated from protobuf enum value: ShieldBlockToProcRevenge = 1;
+     */
+    ProtectionWarrior_Rotation_ShieldBlock[ProtectionWarrior_Rotation_ShieldBlock["ShieldBlockToProcRevenge"] = 1] = "ShieldBlockToProcRevenge";
+    /**
+     * @generated from protobuf enum value: ShieldBlockOnCD = 2;
+     */
+    ProtectionWarrior_Rotation_ShieldBlock[ProtectionWarrior_Rotation_ShieldBlock["ShieldBlockOnCD"] = 2] = "ShieldBlockOnCD";
+})(ProtectionWarrior_Rotation_ShieldBlock || (ProtectionWarrior_Rotation_ShieldBlock = {}));
+/**
  * @generated from protobuf enum proto.WarriorShout
  */
 export var WarriorShout;
@@ -869,12 +887,13 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
         super("proto.ProtectionWarrior.Rotation", [
             { no: 1, name: "demo_shout", kind: "enum", T: () => ["proto.ProtectionWarrior.Rotation.DemoShout", ProtectionWarrior_Rotation_DemoShout] },
             { no: 2, name: "thunder_clap", kind: "enum", T: () => ["proto.ProtectionWarrior.Rotation.ThunderClap", ProtectionWarrior_Rotation_ThunderClap] },
+            { no: 5, name: "shield_block", kind: "enum", T: () => ["proto.ProtectionWarrior.Rotation.ShieldBlock", ProtectionWarrior_Rotation_ShieldBlock] },
             { no: 4, name: "use_cleave", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "hs_rage_threshold", kind: "scalar", T: 5 /*ScalarType.INT32*/ }
         ]);
     }
     create(value) {
-        const message = { demoShout: 0, thunderClap: 0, useCleave: false, hsRageThreshold: 0 };
+        const message = { demoShout: 0, thunderClap: 0, shieldBlock: 0, useCleave: false, hsRageThreshold: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -890,6 +909,9 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
                     break;
                 case /* proto.ProtectionWarrior.Rotation.ThunderClap thunder_clap */ 2:
                     message.thunderClap = reader.int32();
+                    break;
+                case /* proto.ProtectionWarrior.Rotation.ShieldBlock shield_block */ 5:
+                    message.shieldBlock = reader.int32();
                     break;
                 case /* bool use_cleave */ 4:
                     message.useCleave = reader.bool();
@@ -915,6 +937,9 @@ class ProtectionWarrior_Rotation$Type extends MessageType {
         /* proto.ProtectionWarrior.Rotation.ThunderClap thunder_clap = 2; */
         if (message.thunderClap !== 0)
             writer.tag(2, WireType.Varint).int32(message.thunderClap);
+        /* proto.ProtectionWarrior.Rotation.ShieldBlock shield_block = 5; */
+        if (message.shieldBlock !== 0)
+            writer.tag(5, WireType.Varint).int32(message.shieldBlock);
         /* bool use_cleave = 4; */
         if (message.useCleave !== false)
             writer.tag(4, WireType.Varint).bool(message.useCleave);
