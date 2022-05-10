@@ -3,7 +3,13 @@ import { Player } from '/tbc/core/player.js';
 import { EventID } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 
-import { RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank, RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
+import {
+	PaladinAura as PaladinAura,
+	RetributionPaladin_Rotation as RetributionPaladinRotation,
+	RetributionPaladin_Options as RetributionPaladinOptions,
+	RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank,
+	RetributionPaladin_Options_Judgement as Judgement,
+} from '/tbc/core/proto/paladin.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
@@ -54,6 +60,27 @@ export const RetributionPaladinRotationConfig = {
 			},
 		}
 	],
+}
+
+export const AuraSelection = {
+	type: 'enum' as const, cssClass: 'aura-picker',
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		label: 'Aura',
+		values: [
+			{ name: 'None', value: PaladinAura.NoPaladinAura },
+			{ name: 'Sanctity Aura', value: PaladinAura.SanctityAura },
+			{ name: 'Devotion Aura', value: PaladinAura.DevotionAura },
+			{ name: 'Retribution Aura', value: PaladinAura.RetributionAura },
+		],
+		changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecRetributionPaladin>) => player.getSpecOptions().aura,
+		setValue: (eventID: EventID, player: Player<Spec.SpecRetributionPaladin>, newValue: number) => {
+			const newOptions = player.getSpecOptions();
+			newOptions.aura = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+	},
 }
 
 export const JudgementSelection = {

@@ -111,6 +111,16 @@ func GetTristateValueFloat(effect proto.TristateEffect, regularValue float64, im
 	}
 }
 
+func MakeTristateValue(hasRegular bool, hasImproved bool) proto.TristateEffect {
+	if !hasRegular {
+		return proto.TristateEffect_TristateEffectMissing
+	} else if !hasImproved {
+		return proto.TristateEffect_TristateEffectRegular
+	} else {
+		return proto.TristateEffect_TristateEffectImproved
+	}
+}
+
 func hash(s string) uint32 {
 	h := fnv.New32a()
 	h.Write([]byte(s))

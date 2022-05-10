@@ -3,7 +3,7 @@ character_stats_results: {
  value: {
   final_stats: 68.2
   final_stats: 73.7
-  final_stats: 558.8000000000001
+  final_stats: 645.7
   final_stats: 561
   final_stats: 300.3
   final_stats: 1282
@@ -36,12 +36,12 @@ character_stats_results: {
   final_stats: 0
   final_stats: 0
   final_stats: 0
-  final_stats: 8799
+  final_stats: 9668
   final_stats: 0
   final_stats: 0
   final_stats: 0
   final_stats: 0
-  final_stats: 10
+  final_stats: 80
   final_stats: 0
  }
 }

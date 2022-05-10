@@ -240,6 +240,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					RetributionPaladinInputs.AuraSelection,
 					RetributionPaladinInputs.JudgementSelection,
 					RetributionPaladinInputs.CrusaderStrikeDelayMS,
 					RetributionPaladinInputs.DamgeTakenPerSecond,

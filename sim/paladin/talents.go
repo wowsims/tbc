@@ -12,7 +12,6 @@ func (paladin *Paladin) ApplyTalents() {
 	paladin.applyConviction()
 	paladin.applyCrusade()
 	paladin.applyTwoHandedWeaponSpecialization()
-	paladin.applySanctityAura()
 	paladin.applyVengeance()
 	paladin.applySanctifiedSeals()
 	paladin.applyPrecision()
@@ -55,14 +54,6 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
 func (paladin *Paladin) applyTwoHandedWeaponSpecializationToSpell(spellEffect *core.SpellEffect) {
 	if paladin.GetMHWeapon().HandType == proto.HandType_HandTypeTwoHand {
 		spellEffect.DamageMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization))
-	}
-}
-
-// Apply as permanent aura only to self for now
-// TO-DO: Maybe should put this in the partybuff section instead at some point
-func (paladin *Paladin) applySanctityAura() {
-	if paladin.Talents.SanctityAura {
-		core.SanctityAura(&paladin.Character, float64(paladin.Talents.ImprovedSanctityAura))
 	}
 }
 

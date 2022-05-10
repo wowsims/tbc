@@ -80,6 +80,10 @@ func (warlock *Warlock) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
 
 func (warlock *Warlock) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
+	partyBuffs.BloodPact = core.MaxTristate(partyBuffs.BloodPact, core.MakeTristateValue(
+		warlock.Options.Summon == proto.Warlock_Options_Imp &&
+			(!warlock.Talents.DemonicSacrifice || !warlock.Options.SacrificeSummon),
+		warlock.Talents.ImprovedImp == 2))
 }
 
 func (warlock *Warlock) Reset(sim *core.Simulation) {
