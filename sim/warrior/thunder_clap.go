@@ -76,3 +76,26 @@ func (warrior *Warrior) CanThunderClap(sim *core.Simulation) bool {
 func (warrior *Warrior) CanThunderClapIgnoreStance(sim *core.Simulation) bool {
 	return warrior.CurrentRage() >= warrior.ThunderClap.DefaultCast.Cost && warrior.ThunderClap.IsReady(sim)
 }
+
+func (warrior *Warrior) ShouldThunderClap(sim *core.Simulation, filler bool, maintainOnly bool, ignoreStance bool) bool {
+	if ignoreStance && !warrior.CanThunderClapIgnoreStance(sim) {
+		return false
+	} else if !ignoreStance && !warrior.CanThunderClap(sim) {
+		return false
+	}
+
+	if filler {
+		return true
+	}
+
+	activeDebuff := warrior.CurrentTarget.GetActiveAuraWithTag(core.ThunderClapAuraTag)
+	if activeDebuff != nil && activeDebuff.Priority > warrior.ThunderClapAura.Priority {
+		return false
+	}
+
+	if maintainOnly {
+		return activeDebuff == nil || activeDebuff.Priority < warrior.ThunderClapAura.Priority || activeDebuff.RemainingDuration(sim) < time.Second*2
+	}
+
+	return false
+}

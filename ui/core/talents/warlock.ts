@@ -125,7 +125,7 @@ export const warlockTalentsConfig: TalentsConfig<Spec.SpecWarlock> = newTalentsC
 				maxPoints: 3,
 			},
 			{
-				//fieldName: 'shadowEmbrace',
+				fieldName: 'shadowEmbrace',
 				location: {
 					rowIdx: 4,
 					colIdx: 0,

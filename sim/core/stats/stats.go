@@ -429,7 +429,8 @@ type PseudoStats struct {
 	BonusMHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
 	BonusOHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
 
-	DisableDWMissPenalty bool // Used by Heroic Strike and Cleave
+	DisableDWMissPenalty bool    // Used by Heroic Strike and Cleave
+	IncreasedMissChance  float64 // Insect Swarm and Scorpid Sting
 
 	MobTypeAttackPower float64 // Bonus AP against mobs of the current type.
 	MobTypeSpellPower  float64 // Bonus SP against mobs of the current type.

@@ -57,6 +57,7 @@ var warriorOptions = &proto.ProtectionWarrior_Options{
 var FullRaidBuffs = &proto.RaidBuffs{
 	ArcaneBrilliance: true,
 	GiftOfTheWild:    proto.TristateEffect_TristateEffectImproved,
+	Thorns:           proto.TristateEffect_TristateEffectImproved,
 }
 var FullPartyBuffs = &proto.PartyBuffs{
 	Bloodlust:            1,
@@ -81,6 +82,8 @@ var FullDebuffs = &proto.Debuffs{
 	FaerieFire:                proto.TristateEffect_TristateEffectImproved,
 	ImprovedSealOfTheCrusader: true,
 	Misery:                    true,
+	ShadowEmbrace:             true,
+	ScorpidSting:              true,
 }
 
 var FullDebuffTarget = &proto.Target{

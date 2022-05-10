@@ -92,6 +92,25 @@ func applyDebuffEffects(target *Unit, debuffs proto.Debuffs) {
 			MakePermanent(HuntersMarkAura(target, 0, true))
 		}
 	}
+
+	if debuffs.DemoralizingRoar != proto.TristateEffect_TristateEffectMissing {
+		MakePermanent(DemoralizingRoarAura(target, GetTristateValueInt32(debuffs.DemoralizingRoar, 0, 5)))
+	}
+	if debuffs.DemoralizingShout != proto.TristateEffect_TristateEffectMissing {
+		MakePermanent(DemoralizingShoutAura(target, 0, GetTristateValueInt32(debuffs.DemoralizingShout, 0, 5)))
+	}
+	if debuffs.ThunderClap != proto.TristateEffect_TristateEffectMissing {
+		MakePermanent(ThunderClapAura(target, GetTristateValueInt32(debuffs.ThunderClap, 0, 3)))
+	}
+	if debuffs.InsectSwarm {
+		MakePermanent(InsectSwarmAura(target))
+	}
+	if debuffs.ScorpidSting {
+		MakePermanent(ScorpidStingAura(target))
+	}
+	if debuffs.ShadowEmbrace {
+		MakePermanent(ShadowEmbraceAura(target, 5))
+	}
 }
 
 func MiseryAura(target *Unit, numPoints int32) *Aura {
@@ -346,12 +365,12 @@ func FaerieFireAura(target *Unit, level int32) *Aura {
 		Duration: time.Second * 40,
 		Priority: float64(level),
 		OnGain: func(aura *Aura, sim *Simulation) {
-			target.AddStatDynamic(sim, stats.Armor, -armorReduction)
-			target.PseudoStats.BonusMeleeHitRating += float64(level) * MeleeHitRatingPerHitChance
+			aura.Unit.AddStatDynamic(sim, stats.Armor, -armorReduction)
+			aura.Unit.PseudoStats.BonusMeleeHitRating += float64(level) * MeleeHitRatingPerHitChance
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			target.AddStatDynamic(sim, stats.Armor, armorReduction)
-			target.PseudoStats.BonusMeleeHitRating -= float64(level) * MeleeHitRatingPerHitChance
+			aura.Unit.AddStatDynamic(sim, stats.Armor, armorReduction)
+			aura.Unit.PseudoStats.BonusMeleeHitRating -= float64(level) * MeleeHitRatingPerHitChance
 		},
 	})
 }
@@ -373,7 +392,7 @@ func SunderArmorAura(target *Unit, startingStacks int32) *Aura {
 			aura.SetStacks(sim, startingStacks)
 		},
 		OnStacksChange: func(aura *Aura, sim *Simulation, oldStacks int32, newStacks int32) {
-			target.AddStatDynamic(sim, stats.Armor, float64(oldStacks-newStacks)*armorReductionPerStack)
+			aura.Unit.AddStatDynamic(sim, stats.Armor, float64(oldStacks-newStacks)*armorReductionPerStack)
 		},
 	})
 }
@@ -407,10 +426,10 @@ func ExposeArmorAura(target *Unit, talentPoints int32) *Aura {
 		Duration: time.Second * 30,
 		Priority: armorReduction,
 		OnGain: func(aura *Aura, sim *Simulation) {
-			target.AddStatDynamic(sim, stats.Armor, -armorReduction)
+			aura.Unit.AddStatDynamic(sim, stats.Armor, -armorReduction)
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			target.AddStatDynamic(sim, stats.Armor, armorReduction)
+			aura.Unit.AddStatDynamic(sim, stats.Armor, armorReduction)
 		},
 	})
 }
@@ -431,17 +450,17 @@ func ScheduledExposeArmorAura(target *Unit, talentPoints int32) *Aura {
 }
 
 func CurseOfRecklessnessAura(target *Unit) *Aura {
-	armorReduction := 800.0
+	bonus := stats.Stats{stats.Armor: -800, stats.AttackPower: 135}
 
 	return target.GetOrRegisterAura(Aura{
 		Label:    "Curse of Recklessness",
 		ActionID: ActionID{SpellID: 27226},
 		Duration: time.Minute * 2,
 		OnGain: func(aura *Aura, sim *Simulation) {
-			target.AddStatDynamic(sim, stats.Armor, -armorReduction)
+			aura.Unit.AddStatsDynamic(sim, bonus)
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
-			target.AddStatDynamic(sim, stats.Armor, armorReduction)
+			aura.Unit.AddStatsDynamic(sim, bonus.Multiply(-1))
 		},
 	})
 }
@@ -511,32 +530,87 @@ func HuntersMarkAura(target *Unit, points int32, fullyStacked bool) *Aura {
 	})
 }
 
-func DemoralizingShoutAura(target *Unit, boomingVoicePts int32, impDemoShoutPts int32) *Aura {
-	duration := time.Duration(float64(time.Second*30) * (1 + 0.1*float64(boomingVoicePts)))
+const APReductionAuraTag = "APReduction"
+
+func DemoralizingRoarAura(target *Unit, points int32) *Aura {
+	apReduction := 248 * (1 + 0.08*float64(points))
 
 	return target.GetOrRegisterAura(Aura{
-		Label:    "DemoralizingShout-" + strconv.Itoa(int(impDemoShoutPts)),
-		Tag:      "DemoralizingShout",
-		ActionID: ActionID{SpellID: 25203},
-		Duration: duration,
-		Priority: float64(impDemoShoutPts),
+		Label:    "DemoralizingRoar-" + strconv.Itoa(int(points)),
+		Tag:      APReductionAuraTag,
+		ActionID: ActionID{SpellID: 26998},
+		Duration: time.Second * 30,
+		Priority: apReduction,
 		OnGain: func(aura *Aura, sim *Simulation) {
+			aura.Unit.AddStatDynamic(sim, stats.AttackPower, -apReduction)
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
+			aura.Unit.AddStatDynamic(sim, stats.AttackPower, apReduction)
 		},
 	})
 }
 
-func ThunderClapAura(target *Unit, impThunderClapPts int32) *Aura {
+func DemoralizingShoutAura(target *Unit, boomingVoicePts int32, impDemoShoutPts int32) *Aura {
+	duration := time.Duration(float64(time.Second*30) * (1 + 0.1*float64(boomingVoicePts)))
+	apReduction := 300 * (1 + 0.08*float64(impDemoShoutPts))
+
 	return target.GetOrRegisterAura(Aura{
-		Label:    "ThunderClap-" + strconv.Itoa(int(impThunderClapPts)),
-		Tag:      "ThunderClap",
-		ActionID: ActionID{SpellID: 25264},
-		Duration: time.Second * 30,
-		Priority: float64(impThunderClapPts),
+		Label:    "DemoralizingShout-" + strconv.Itoa(int(impDemoShoutPts)),
+		Tag:      APReductionAuraTag,
+		ActionID: ActionID{SpellID: 25203},
+		Duration: duration,
+		Priority: apReduction,
 		OnGain: func(aura *Aura, sim *Simulation) {
+			aura.Unit.AddStatDynamic(sim, stats.AttackPower, -apReduction)
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
+			aura.Unit.AddStatDynamic(sim, stats.AttackPower, apReduction)
+		},
+	})
+}
+
+const ThunderClapAuraTag = "ThunderClap"
+
+func ThunderClapAura(target *Unit, points int32) *Aura {
+	speedMultiplier := 0.9
+	if points == 1 {
+		speedMultiplier = 0.86
+	} else if points == 2 {
+		speedMultiplier = 0.83
+	} else if points == 3 {
+		speedMultiplier = 0.8
+	}
+	inverseMult := 1 / speedMultiplier
+
+	return target.GetOrRegisterAura(Aura{
+		Label:    "ThunderClap-" + strconv.Itoa(int(points)),
+		Tag:      ThunderClapAuraTag,
+		ActionID: ActionID{SpellID: 25264},
+		Duration: time.Second * 30,
+		Priority: float64(points),
+		OnGain: func(aura *Aura, sim *Simulation) {
+			aura.Unit.MultiplyAttackSpeed(sim, speedMultiplier)
+		},
+		OnExpire: func(aura *Aura, sim *Simulation) {
+			aura.Unit.MultiplyAttackSpeed(sim, inverseMult)
+		},
+	})
+}
+
+func InsectSwarmAura(target *Unit) *Aura {
+	return target.GetOrRegisterAura(Aura{
+		Label:    "InsectSwarmMiss",
+		ActionID: ActionID{SpellID: 27013},
+		Duration: time.Second * 12,
+		OnGain: func(aura *Aura, sim *Simulation) {
+			if !aura.Unit.HasActiveAura("ScorpidSting") {
+				aura.Unit.PseudoStats.IncreasedMissChance += 0.02
+			}
+		},
+		OnExpire: func(aura *Aura, sim *Simulation) {
+			if !aura.Unit.HasActiveAura("ScorpidSting") {
+				aura.Unit.PseudoStats.IncreasedMissChance -= 0.02
+			}
 		},
 	})
 }
@@ -547,8 +621,34 @@ func ScorpidStingAura(target *Unit) *Aura {
 		ActionID: ActionID{SpellID: 3043},
 		Duration: time.Second * 20,
 		OnGain: func(aura *Aura, sim *Simulation) {
+			aura.Unit.PseudoStats.IncreasedMissChance += 0.05
+			if aura.Unit.HasActiveAura("InsectSwarmMiss") {
+				aura.Unit.PseudoStats.IncreasedMissChance -= 0.02
+			}
 		},
 		OnExpire: func(aura *Aura, sim *Simulation) {
+			aura.Unit.PseudoStats.IncreasedMissChance -= 0.05
+			if aura.Unit.HasActiveAura("InsectSwarmMiss") {
+				aura.Unit.PseudoStats.IncreasedMissChance += 0.02
+			}
+		},
+	})
+}
+
+func ShadowEmbraceAura(target *Unit, points int32) *Aura {
+	multiplier := 1 - 0.01*float64(points)
+
+	return target.GetOrRegisterAura(Aura{
+		Label:    "ShadowEmbrace-" + strconv.Itoa(int(points)),
+		Tag:      "ShadowEmbrace",
+		ActionID: ActionID{SpellID: 32394},
+		Duration: time.Second * 30,
+		Priority: float64(points),
+		OnGain: func(aura *Aura, sim *Simulation) {
+			aura.Unit.PseudoStats.PhysicalDamageDealtMultiplier *= multiplier
+		},
+		OnExpire: func(aura *Aura, sim *Simulation) {
+			aura.Unit.PseudoStats.PhysicalDamageDealtMultiplier /= multiplier
 		},
 	})
 }

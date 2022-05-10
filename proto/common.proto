@@ -308,6 +308,7 @@ message RaidBuffs {
     bool arcane_brilliance = 1;
     TristateEffect divine_spirit = 4;
     TristateEffect gift_of_the_wild = 5;
+		TristateEffect thorns = 6;
 }
 
 // Buffs that affect a single party.
@@ -429,17 +430,24 @@ message Debuffs {
     bool improved_scorch = 6;
     bool winters_chill = 7;
 
-    bool blood_frenzy = 8; // Blood Frenzy: +4% phy dmg
-    bool gift_of_arthas = 17; // Gift of Arthas: +8 phy dmg
+    bool blood_frenzy = 8;
+    bool gift_of_arthas = 17;
     bool mangle = 16;
-    TristateEffect expose_armor = 9; // Expose Armor (If you have a rogue):    5 points: 2050 armor / imp 5 points: 3075 armor
-    TristateEffect faerie_fire = 10; // Faerie Fire: -610 armor / imp 3% hit
-    bool sunder_armor = 11; // Number of stacks of sunder armor: -520 armor per stack, 5 max
-    bool curse_of_recklessness = 12; // -800 armor
+    TristateEffect expose_armor = 9;
+    TristateEffect faerie_fire = 10;
+    bool sunder_armor = 11;
+    bool curse_of_recklessness = 12;
 
 		TristateEffect hunters_mark = 15;
 		double expose_weakness_uptime = 13;
 		double expose_weakness_hunter_agility = 14;
+
+		TristateEffect demoralizing_roar = 19;
+		TristateEffect demoralizing_shout = 20;
+		TristateEffect thunder_clap = 21;
+		bool insect_swarm = 22;
+		bool scorpid_sting = 23;
+		bool shadow_embrace = 24;
 }
 
 enum MobType {

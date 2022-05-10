@@ -14,6 +14,7 @@ message WarlockTalents {
 		bool amplify_curse = 6;
 		int32 nightfall = 7;
 		int32 empowered_corruption = 8;
+		int32 shadow_embrace = 50;
 		bool siphon_life = 9;
 		int32 shadow_mastery = 10;
 		int32 contagion = 11;

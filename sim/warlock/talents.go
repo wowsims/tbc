@@ -80,8 +80,37 @@ func (warlock *Warlock) ApplyTalents() {
 		stats.SpellCrit: float64(warlock.Talents.DemonicTactics) * 1 * core.SpellCritRatingPerCritChance,
 	})
 
+	warlock.applyShadowEmbrace()
 	warlock.setupNightfall()
 	warlock.setupAmplifyCurse()
+}
+
+func (warlock *Warlock) applyShadowEmbrace() {
+	if warlock.Talents.ShadowEmbrace == 0 {
+		return
+	}
+
+	var debuffAuras []*core.Aura
+	for _, target := range warlock.Env.Encounter.Targets {
+		debuffAuras = append(debuffAuras, core.ShadowEmbraceAura(&target.Unit, warlock.Talents.ShadowEmbrace))
+	}
+
+	warlock.RegisterAura(core.Aura{
+		Label:    "Shadow Embrace Talent",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() {
+				return
+			}
+
+			if spell == warlock.Corruption || spell == warlock.SiphonLife || spell == warlock.CurseOfAgony || spell.SameAction(warlock.Seeds[0].ActionID) {
+				debuffAuras[spellEffect.Target.Index].Activate(sim)
+			}
+		},
+	})
 }
 
 func (warlock *Warlock) setupAmplifyCurse() {
