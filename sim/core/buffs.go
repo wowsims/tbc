@@ -63,6 +63,18 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 			stats.SpellHit: 1 * SpellHitRatingPerHitChance,
 		})
 	}
+
+	character.AddStats(stats.Stats{
+		stats.Stamina: GetTristateValueFloat(partyBuffs.BloodPact, 70, 91),
+	})
+	character.AddStats(stats.Stats{
+		stats.Stamina: GetTristateValueFloat(raidBuffs.PowerWordFortitude, 79, 102),
+	})
+	if raidBuffs.ShadowProtection {
+		character.AddStats(stats.Stats{
+			stats.ShadowResistance: 70,
+		})
+	}
 	character.AddStats(stats.Stats{
 		stats.Spirit: GetTristateValueFloat(raidBuffs.DivineSpirit, 50.0, 50.0),
 	})
@@ -115,6 +127,14 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		character.PseudoStats.ThreatMultiplier *= 0.7
 	}
 
+	character.AddStats(stats.Stats{
+		stats.Armor: GetTristateValueFloat(partyBuffs.DevotionAura, 861, 1205),
+	})
+	if partyBuffs.RetributionAura == proto.TristateEffect_TristateEffectImproved {
+		RetributionAura(character, 2)
+	} else if partyBuffs.RetributionAura == proto.TristateEffect_TristateEffectRegular {
+		RetributionAura(character, 0)
+	}
 	if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectImproved {
 		SanctityAura(character, 2)
 	} else if partyBuffs.SanctityAura == proto.TristateEffect_TristateEffectRegular {
@@ -292,6 +312,38 @@ func SanctityAura(character *Character, level float64) *Aura {
 	})
 }
 
+func RetributionAura(character *Character, points int32) *Aura {
+	actionID := ActionID{SpellID: 27150}
+
+	procSpell := character.RegisterSpell(SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: SpellSchoolHoly,
+		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
+			ProcMask:         ProcMaskEmpty,
+			IsPhantom:        true,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     BaseDamageConfigFlat(26 * (1 + 0.25*float64(points))),
+			OutcomeApplier: character.OutcomeFuncAlwaysHit(),
+		}),
+	})
+
+	return character.RegisterAura(Aura{
+		Label:    "Retribution Aura",
+		ActionID: actionID,
+		Duration: NeverExpires,
+		OnReset: func(aura *Aura, sim *Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if spellEffect.Landed() && spell.SpellSchool == SpellSchoolPhysical {
+				procSpell.Cast(sim, spell.Unit)
+			}
+		},
+	})
+}
+
 func ThornsAura(character *Character, points int32) *Aura {
 	actionID := ActionID{SpellID: 26992}
 
@@ -311,7 +363,7 @@ func ThornsAura(character *Character, points int32) *Aura {
 
 	return character.RegisterAura(Aura{
 		Label:    "Thorns",
-		ActionID: ActionID{SpellID: 26992},
+		ActionID: actionID,
 		Duration: NeverExpires,
 		OnReset: func(aura *Aura, sim *Simulation) {
 			aura.Activate(sim)

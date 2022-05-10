@@ -45,7 +45,7 @@ export const priestTalentsConfig: TalentsConfig<Spec.SpecShadowPriest> = newTale
 				maxPoints: 5,
 			},
 			{
-				//fieldName: 'improvedPowerWordFortitude',
+				fieldName: 'improvedPowerWordFortitude',
 				location: {
 					rowIdx: 1,
 					colIdx: 1,

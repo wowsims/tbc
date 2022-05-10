@@ -54,14 +54,15 @@ func (priest *Priest) GetCharacter() *core.Character {
 }
 
 func (priest *Priest) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
-	if priest.Talents.DivineSpirit {
-		ds := proto.TristateEffect_TristateEffectRegular
-		if priest.Talents.ImprovedDivineSpirit == 2 {
-			// TODO: handle a larger variety of IDS values.
-			ds = proto.TristateEffect_TristateEffectImproved
-		}
-		raidBuffs.DivineSpirit = core.MaxTristate(raidBuffs.DivineSpirit, ds)
-	}
+	raidBuffs.ShadowProtection = true
+
+	raidBuffs.PowerWordFortitude = core.MaxTristate(raidBuffs.PowerWordFortitude, core.MakeTristateValue(
+		true,
+		priest.Talents.ImprovedPowerWordFortitude == 2))
+
+	raidBuffs.DivineSpirit = core.MaxTristate(raidBuffs.DivineSpirit, core.MakeTristateValue(
+		priest.Talents.DivineSpirit,
+		priest.Talents.ImprovedDivineSpirit == 2))
 }
 
 func (priest *Priest) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
