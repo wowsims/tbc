@@ -22,11 +22,14 @@ export declare const ArcaneBrilliance: IndividualSimIconPickerConfig<Raid, boole
 export declare const DivineSpirit: IndividualSimIconPickerConfig<Raid, number>;
 export declare const GiftOfTheWild: IndividualSimIconPickerConfig<Raid, number>;
 export declare const Thorns: IndividualSimIconPickerConfig<Raid, number>;
+export declare const PowerWordFortitude: IndividualSimIconPickerConfig<Raid, number>;
+export declare const ShadowProtection: IndividualSimIconPickerConfig<Raid, boolean>;
 export declare const AtieshMage: IndividualSimIconPickerConfig<Party, number>;
 export declare const AtieshWarlock: IndividualSimIconPickerConfig<Party, number>;
 export declare const Bloodlust: IndividualSimIconPickerConfig<Party, number>;
 export declare const BraidedEterniumChain: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const ChainOfTheTwilightOwl: IndividualSimIconPickerConfig<Party, boolean>;
+export declare const DevotionAura: IndividualSimIconPickerConfig<Party, number>;
 export declare const DraeneiRacialCaster: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const DraeneiRacialMelee: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const EyeOfTheNight: IndividualSimIconPickerConfig<Party, boolean>;
@@ -36,10 +39,12 @@ export declare const LeaderOfThePack: IndividualSimIconPickerConfig<Party, numbe
 export declare const ManaSpringTotem: IndividualSimIconPickerConfig<Party, number>;
 export declare const ManaTideTotem: IndividualSimIconPickerConfig<Party, number>;
 export declare const MoonkinAura: IndividualSimIconPickerConfig<Party, number>;
+export declare const RetributionAura: IndividualSimIconPickerConfig<Party, number>;
 export declare const SanctityAura: IndividualSimIconPickerConfig<Party, number>;
 export declare const TotemOfWrath: IndividualSimIconPickerConfig<Party, number>;
 export declare const TrueshotAura: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const WrathOfAirTotem: IndividualSimIconPickerConfig<Party, number>;
+export declare const BloodPact: IndividualSimIconPickerConfig<Party, number>;
 export declare const DrumsOfBattleBuff: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const DrumsOfRestorationBuff: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const BlessingOfKings: IndividualSimIconPickerConfig<Player<any>, boolean>;
@@ -76,6 +81,7 @@ export declare const KiblersBits: IndividualSimIconPickerConfig<Player<any>, boo
 export declare const ScrollOfAgilityV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfSpiritV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const ScrollOfStrengthV: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const ScrollOfProtectionV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const PetScrollOfAgilityV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const PetScrollOfStrengthV: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const GraceOfAirTotem: {

@@ -43,6 +43,28 @@ export var RetributionPaladin_Options_Judgement;
      */
     RetributionPaladin_Options_Judgement[RetributionPaladin_Options_Judgement["Crusader"] = 2] = "Crusader";
 })(RetributionPaladin_Options_Judgement || (RetributionPaladin_Options_Judgement = {}));
+/**
+ * @generated from protobuf enum proto.PaladinAura
+ */
+export var PaladinAura;
+(function (PaladinAura) {
+    /**
+     * @generated from protobuf enum value: NoPaladinAura = 0;
+     */
+    PaladinAura[PaladinAura["NoPaladinAura"] = 0] = "NoPaladinAura";
+    /**
+     * @generated from protobuf enum value: SanctityAura = 1;
+     */
+    PaladinAura[PaladinAura["SanctityAura"] = 1] = "SanctityAura";
+    /**
+     * @generated from protobuf enum value: DevotionAura = 2;
+     */
+    PaladinAura[PaladinAura["DevotionAura"] = 2] = "DevotionAura";
+    /**
+     * @generated from protobuf enum value: RetributionAura = 3;
+     */
+    PaladinAura[PaladinAura["RetributionAura"] = 3] = "RetributionAura";
+})(PaladinAura || (PaladinAura = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class PaladinTalents$Type extends MessageType {
     constructor() {
@@ -560,13 +582,14 @@ class RetributionPaladin_Options$Type extends MessageType {
     constructor() {
         super("proto.RetributionPaladin.Options", [
             { no: 1, name: "judgement", kind: "enum", T: () => ["proto.RetributionPaladin.Options.Judgement", RetributionPaladin_Options_Judgement] },
+            { no: 5, name: "aura", kind: "enum", T: () => ["proto.PaladinAura", PaladinAura] },
             { no: 2, name: "crusader_strike_delay_ms", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "haste_leeway_ms", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 4, name: "damage_taken_per_second", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { judgement: 0, crusaderStrikeDelayMs: 0, hasteLeewayMs: 0, damageTakenPerSecond: 0 };
+        const message = { judgement: 0, aura: 0, crusaderStrikeDelayMs: 0, hasteLeewayMs: 0, damageTakenPerSecond: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -579,6 +602,9 @@ class RetributionPaladin_Options$Type extends MessageType {
             switch (fieldNo) {
                 case /* proto.RetributionPaladin.Options.Judgement judgement */ 1:
                     message.judgement = reader.int32();
+                    break;
+                case /* proto.PaladinAura aura */ 5:
+                    message.aura = reader.int32();
                     break;
                 case /* int32 crusader_strike_delay_ms */ 2:
                     message.crusaderStrikeDelayMs = reader.int32();
@@ -604,6 +630,9 @@ class RetributionPaladin_Options$Type extends MessageType {
         /* proto.RetributionPaladin.Options.Judgement judgement = 1; */
         if (message.judgement !== 0)
             writer.tag(1, WireType.Varint).int32(message.judgement);
+        /* proto.PaladinAura aura = 5; */
+        if (message.aura !== 0)
+            writer.tag(5, WireType.Varint).int32(message.aura);
         /* int32 crusader_strike_delay_ms = 2; */
         if (message.crusaderStrikeDelayMs !== 0)
             writer.tag(2, WireType.Varint).int32(message.crusaderStrikeDelayMs);

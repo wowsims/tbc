@@ -46,6 +46,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
             // Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
             displayStats: [
                 Stat.StatHealth,
+                Stat.StatArmor,
                 Stat.StatStamina,
                 Stat.StatStrength,
                 Stat.StatAgility,
@@ -116,6 +117,8 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
             selfBuffInputs: [],
             // IconInputs to include in the 'Other Buffs' section on the settings tab.
             raidBuffInputs: [
+                IconInputs.PowerWordFortitude,
+                IconInputs.ShadowProtection,
                 IconInputs.GiftOfTheWild,
                 IconInputs.Thorns,
             ],
@@ -129,9 +132,12 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                 IconInputs.LeaderOfThePack,
                 IconInputs.FerociousInspiration,
                 IconInputs.TrueshotAura,
+                IconInputs.DevotionAura,
+                IconInputs.RetributionAura,
                 IconInputs.SanctityAura,
                 IconInputs.DraeneiRacialMelee,
                 IconInputs.BraidedEterniumChain,
+                IconInputs.BloodPact,
             ],
             playerBuffInputs: [
                 IconInputs.BlessingOfKings,
@@ -200,6 +206,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                 other: [
                     IconInputs.ScrollOfAgilityV,
                     IconInputs.ScrollOfStrengthV,
+                    IconInputs.ScrollOfProtectionV,
                 ],
             },
             // Inputs to include in the 'Rotation' section on the settings tab.

@@ -4,8 +4,7 @@ import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
-import { RetributionPaladin_Rotation as RetributionPaladinRotation, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
-import { RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank, RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
+import { PaladinAura as PaladinAura, RetributionPaladin_Rotation as RetributionPaladinRotation, RetributionPaladin_Options as RetributionPaladinOptions, RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank, RetributionPaladin_Options_Judgement as Judgement, } from '/tbc/core/proto/paladin.js';
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
@@ -27,6 +26,7 @@ export const DefaultRotation = RetributionPaladinRotation.create({
     useExorcism: false,
 });
 export const DefaultOptions = RetributionPaladinOptions.create({
+    aura: PaladinAura.SanctityAura,
     judgement: Judgement.Crusader,
     crusaderStrikeDelayMs: 1700,
     hasteLeewayMs: 0,

@@ -50,6 +50,7 @@ class PriestTalents$Type extends MessageType {
         super("proto.PriestTalents", [
             { no: 1, name: "wand_specialization", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 31, name: "silent_resolve", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 34, name: "improved_power_word_fortitude", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "inner_focus", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "meditation", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 4, name: "mental_agility", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -84,7 +85,7 @@ class PriestTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { wandSpecialization: 0, silentResolve: 0, innerFocus: false, meditation: 0, mentalAgility: 0, mentalStrength: 0, divineSpirit: false, improvedDivineSpirit: 0, focusedPower: 0, forceOfWill: 0, powerInfusion: false, enlightenment: 0, holySpecialization: 0, divineFury: 0, holyNova: false, searingLight: 0, spiritualGuidance: 0, surgeOfLight: 0, spiritOfRedemption: false, shadowAffinity: 0, improvedShadowWordPain: 0, shadowFocus: 0, improvedMindBlast: 0, mindFlay: false, shadowWeaving: 0, vampiricEmbrace: false, improvedVampiricEmbrace: 0, focusedMind: 0, darkness: 0, shadowform: false, shadowPower: 0, misery: 0, vampiricTouch: false };
+        const message = { wandSpecialization: 0, silentResolve: 0, improvedPowerWordFortitude: 0, innerFocus: false, meditation: 0, mentalAgility: 0, mentalStrength: 0, divineSpirit: false, improvedDivineSpirit: 0, focusedPower: 0, forceOfWill: 0, powerInfusion: false, enlightenment: 0, holySpecialization: 0, divineFury: 0, holyNova: false, searingLight: 0, spiritualGuidance: 0, surgeOfLight: 0, spiritOfRedemption: false, shadowAffinity: 0, improvedShadowWordPain: 0, shadowFocus: 0, improvedMindBlast: 0, mindFlay: false, shadowWeaving: 0, vampiricEmbrace: false, improvedVampiricEmbrace: 0, focusedMind: 0, darkness: 0, shadowform: false, shadowPower: 0, misery: 0, vampiricTouch: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -100,6 +101,9 @@ class PriestTalents$Type extends MessageType {
                     break;
                 case /* int32 silent_resolve */ 31:
                     message.silentResolve = reader.int32();
+                    break;
+                case /* int32 improved_power_word_fortitude */ 34:
+                    message.improvedPowerWordFortitude = reader.int32();
                     break;
                 case /* bool inner_focus */ 2:
                     message.innerFocus = reader.bool();
@@ -212,6 +216,9 @@ class PriestTalents$Type extends MessageType {
         /* int32 silent_resolve = 31; */
         if (message.silentResolve !== 0)
             writer.tag(31, WireType.Varint).int32(message.silentResolve);
+        /* int32 improved_power_word_fortitude = 34; */
+        if (message.improvedPowerWordFortitude !== 0)
+            writer.tag(34, WireType.Varint).int32(message.improvedPowerWordFortitude);
         /* bool inner_focus = 2; */
         if (message.innerFocus !== false)
             writer.tag(2, WireType.Varint).bool(message.innerFocus);

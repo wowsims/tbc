@@ -2,7 +2,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 import { EventID } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
-import { RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank, RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
+import { PaladinAura as PaladinAura, RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank, RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
 export declare const RetributionPaladinRotationConfig: {
     inputs: ({
         type: "enum";
@@ -32,6 +32,21 @@ export declare const RetributionPaladinRotationConfig: {
             values?: undefined;
         };
     })[];
+};
+export declare const AuraSelection: {
+    type: "enum";
+    cssClass: string;
+    getModObject: (simUI: IndividualSimUI<any>) => Player<any>;
+    config: {
+        label: string;
+        values: {
+            name: string;
+            value: PaladinAura;
+        }[];
+        changedEvent: (player: Player<Spec.SpecRetributionPaladin>) => import("/tbc/core/typed_event.js").TypedEvent<void>;
+        getValue: (player: Player<Spec.SpecRetributionPaladin>) => PaladinAura;
+        setValue: (eventID: EventID, player: Player<Spec.SpecRetributionPaladin>, newValue: number) => void;
+    };
 };
 export declare const JudgementSelection: {
     type: "enum";

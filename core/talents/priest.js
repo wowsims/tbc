@@ -38,7 +38,7 @@ export const priestTalentsConfig = newTalentsConfig([
                 maxPoints: 5,
             },
             {
-                //fieldName: 'improvedPowerWordFortitude',
+                fieldName: 'improvedPowerWordFortitude',
                 location: {
                     rowIdx: 1,
                     colIdx: 1,

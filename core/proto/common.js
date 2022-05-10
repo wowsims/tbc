@@ -1229,13 +1229,15 @@ class RaidBuffs$Type extends MessageType {
     constructor() {
         super("proto.RaidBuffs", [
             { no: 1, name: "arcane_brilliance", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 7, name: "power_word_fortitude", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 8, name: "shadow_protection", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "divine_spirit", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 5, name: "gift_of_the_wild", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 6, name: "thorns", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
         ]);
     }
     create(value) {
-        const message = { arcaneBrilliance: false, divineSpirit: 0, giftOfTheWild: 0, thorns: 0 };
+        const message = { arcaneBrilliance: false, powerWordFortitude: 0, shadowProtection: false, divineSpirit: 0, giftOfTheWild: 0, thorns: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1248,6 +1250,12 @@ class RaidBuffs$Type extends MessageType {
             switch (fieldNo) {
                 case /* bool arcane_brilliance */ 1:
                     message.arcaneBrilliance = reader.bool();
+                    break;
+                case /* proto.TristateEffect power_word_fortitude */ 7:
+                    message.powerWordFortitude = reader.int32();
+                    break;
+                case /* bool shadow_protection */ 8:
+                    message.shadowProtection = reader.bool();
                     break;
                 case /* proto.TristateEffect divine_spirit */ 4:
                     message.divineSpirit = reader.int32();
@@ -1273,6 +1281,12 @@ class RaidBuffs$Type extends MessageType {
         /* bool arcane_brilliance = 1; */
         if (message.arcaneBrilliance !== false)
             writer.tag(1, WireType.Varint).bool(message.arcaneBrilliance);
+        /* proto.TristateEffect power_word_fortitude = 7; */
+        if (message.powerWordFortitude !== 0)
+            writer.tag(7, WireType.Varint).int32(message.powerWordFortitude);
+        /* bool shadow_protection = 8; */
+        if (message.shadowProtection !== false)
+            writer.tag(8, WireType.Varint).bool(message.shadowProtection);
         /* proto.TristateEffect divine_spirit = 4; */
         if (message.divineSpirit !== 0)
             writer.tag(4, WireType.Varint).int32(message.divineSpirit);
@@ -1298,9 +1312,12 @@ class PartyBuffs$Type extends MessageType {
         super("proto.PartyBuffs", [
             { no: 1, name: "bloodlust", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 22, name: "ferocious_inspiration", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 34, name: "blood_pact", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 2, name: "moonkin_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 19, name: "leader_of_the_pack", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 20, name: "sanctity_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 35, name: "devotion_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 36, name: "retribution_aura", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 21, name: "trueshot_aura", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "draenei_racial_melee", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "draenei_racial_caster", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
@@ -1331,7 +1348,7 @@ class PartyBuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { bloodlust: 0, ferociousInspiration: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, snapshotImprovedStrengthOfEarthTotem: false, tranquilAirTotem: false, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0, bsSolarianSapphire: false, snapshotBsSolarianSapphire: false, snapshotBsT2: false, snapshotBsBoomingVoiceRank: 0, commandingShout: 0 };
+        const message = { bloodlust: 0, ferociousInspiration: 0, bloodPact: 0, moonkinAura: 0, leaderOfThePack: 0, sanctityAura: 0, devotionAura: 0, retributionAura: 0, trueshotAura: false, draeneiRacialMelee: false, draeneiRacialCaster: false, drums: 0, atieshMage: 0, atieshWarlock: 0, braidedEterniumChain: false, eyeOfTheNight: false, chainOfTheTwilightOwl: false, jadePendantOfBlasting: false, manaSpringTotem: 0, manaTideTotems: 0, totemOfWrath: 0, wrathOfAirTotem: 0, snapshotImprovedWrathOfAirTotem: false, graceOfAirTotem: 0, strengthOfEarthTotem: 0, snapshotImprovedStrengthOfEarthTotem: false, tranquilAirTotem: false, windfuryTotemRank: 0, windfuryTotemIwt: 0, battleShout: 0, bsSolarianSapphire: false, snapshotBsSolarianSapphire: false, snapshotBsT2: false, snapshotBsBoomingVoiceRank: 0, commandingShout: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1348,6 +1365,9 @@ class PartyBuffs$Type extends MessageType {
                 case /* int32 ferocious_inspiration */ 22:
                     message.ferociousInspiration = reader.int32();
                     break;
+                case /* proto.TristateEffect blood_pact */ 34:
+                    message.bloodPact = reader.int32();
+                    break;
                 case /* proto.TristateEffect moonkin_aura */ 2:
                     message.moonkinAura = reader.int32();
                     break;
@@ -1356,6 +1376,12 @@ class PartyBuffs$Type extends MessageType {
                     break;
                 case /* proto.TristateEffect sanctity_aura */ 20:
                     message.sanctityAura = reader.int32();
+                    break;
+                case /* proto.TristateEffect devotion_aura */ 35:
+                    message.devotionAura = reader.int32();
+                    break;
+                case /* proto.TristateEffect retribution_aura */ 36:
+                    message.retributionAura = reader.int32();
                     break;
                 case /* bool trueshot_aura */ 21:
                     message.trueshotAura = reader.bool();
@@ -1456,6 +1482,9 @@ class PartyBuffs$Type extends MessageType {
         /* int32 ferocious_inspiration = 22; */
         if (message.ferociousInspiration !== 0)
             writer.tag(22, WireType.Varint).int32(message.ferociousInspiration);
+        /* proto.TristateEffect blood_pact = 34; */
+        if (message.bloodPact !== 0)
+            writer.tag(34, WireType.Varint).int32(message.bloodPact);
         /* proto.TristateEffect moonkin_aura = 2; */
         if (message.moonkinAura !== 0)
             writer.tag(2, WireType.Varint).int32(message.moonkinAura);
@@ -1465,6 +1494,12 @@ class PartyBuffs$Type extends MessageType {
         /* proto.TristateEffect sanctity_aura = 20; */
         if (message.sanctityAura !== 0)
             writer.tag(20, WireType.Varint).int32(message.sanctityAura);
+        /* proto.TristateEffect devotion_aura = 35; */
+        if (message.devotionAura !== 0)
+            writer.tag(35, WireType.Varint).int32(message.devotionAura);
+        /* proto.TristateEffect retribution_aura = 36; */
+        if (message.retributionAura !== 0)
+            writer.tag(36, WireType.Varint).int32(message.retributionAura);
         /* bool trueshot_aura = 21; */
         if (message.trueshotAura !== false)
             writer.tag(21, WireType.Varint).bool(message.trueshotAura);
@@ -1667,6 +1702,7 @@ class Consumes$Type extends MessageType {
             { no: 44, name: "scroll_of_agility", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 43, name: "scroll_of_strength", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 45, name: "scroll_of_spirit", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 53, name: "scroll_of_protection", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 46, name: "pet_scroll_of_agility", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 47, name: "pet_scroll_of_strength", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 15, name: "default_potion", kind: "enum", T: () => ["proto.Potions", Potions] },
@@ -1682,7 +1718,7 @@ class Consumes$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { flask: 0, battleElixir: 0, guardianElixir: 0, mainHandImbue: 0, offHandImbue: 0, food: 0, petFood: 0, alchohol: 0, scrollOfAgility: 0, scrollOfStrength: 0, scrollOfSpirit: 0, petScrollOfAgility: 0, petScrollOfStrength: 0, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, startingConjured: 0, numStartingConjured: 0, drums: 0, superSapper: false, goblinSapper: false, fillerExplosive: 0 };
+        const message = { flask: 0, battleElixir: 0, guardianElixir: 0, mainHandImbue: 0, offHandImbue: 0, food: 0, petFood: 0, alchohol: 0, scrollOfAgility: 0, scrollOfStrength: 0, scrollOfSpirit: 0, scrollOfProtection: 0, petScrollOfAgility: 0, petScrollOfStrength: 0, defaultPotion: 0, startingPotion: 0, numStartingPotions: 0, defaultConjured: 0, startingConjured: 0, numStartingConjured: 0, drums: 0, superSapper: false, goblinSapper: false, fillerExplosive: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1725,6 +1761,9 @@ class Consumes$Type extends MessageType {
                     break;
                 case /* int32 scroll_of_spirit */ 45:
                     message.scrollOfSpirit = reader.int32();
+                    break;
+                case /* int32 scroll_of_protection */ 53:
+                    message.scrollOfProtection = reader.int32();
                     break;
                 case /* int32 pet_scroll_of_agility */ 46:
                     message.petScrollOfAgility = reader.int32();
@@ -1807,6 +1846,9 @@ class Consumes$Type extends MessageType {
         /* int32 scroll_of_spirit = 45; */
         if (message.scrollOfSpirit !== 0)
             writer.tag(45, WireType.Varint).int32(message.scrollOfSpirit);
+        /* int32 scroll_of_protection = 53; */
+        if (message.scrollOfProtection !== 0)
+            writer.tag(53, WireType.Varint).int32(message.scrollOfProtection);
         /* int32 pet_scroll_of_agility = 46; */
         if (message.petScrollOfAgility !== 0)
             writer.tag(46, WireType.Varint).int32(message.petScrollOfAgility);

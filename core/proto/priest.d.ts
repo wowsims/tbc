@@ -20,6 +20,10 @@ export interface PriestTalents {
      */
     silentResolve: number;
     /**
+     * @generated from protobuf field: int32 improved_power_word_fortitude = 34;
+     */
+    improvedPowerWordFortitude: number;
+    /**
      * @generated from protobuf field: bool inner_focus = 2;
      */
     innerFocus: boolean;

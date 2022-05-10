@@ -15,6 +15,14 @@ export interface RaidBuffs {
      */
     arcaneBrilliance: boolean;
     /**
+     * @generated from protobuf field: proto.TristateEffect power_word_fortitude = 7;
+     */
+    powerWordFortitude: TristateEffect;
+    /**
+     * @generated from protobuf field: bool shadow_protection = 8;
+     */
+    shadowProtection: boolean;
+    /**
      * @generated from protobuf field: proto.TristateEffect divine_spirit = 4;
      */
     divineSpirit: TristateEffect;
@@ -42,6 +50,10 @@ export interface PartyBuffs {
      */
     ferociousInspiration: number;
     /**
+     * @generated from protobuf field: proto.TristateEffect blood_pact = 34;
+     */
+    bloodPact: TristateEffect;
+    /**
      * @generated from protobuf field: proto.TristateEffect moonkin_aura = 2;
      */
     moonkinAura: TristateEffect;
@@ -53,6 +65,14 @@ export interface PartyBuffs {
      * @generated from protobuf field: proto.TristateEffect sanctity_aura = 20;
      */
     sanctityAura: TristateEffect;
+    /**
+     * @generated from protobuf field: proto.TristateEffect devotion_aura = 35;
+     */
+    devotionAura: TristateEffect;
+    /**
+     * @generated from protobuf field: proto.TristateEffect retribution_aura = 36;
+     */
+    retributionAura: TristateEffect;
     /**
      * @generated from protobuf field: bool trueshot_aura = 21;
      */
@@ -263,6 +283,10 @@ export interface Consumes {
      * @generated from protobuf field: int32 scroll_of_spirit = 45;
      */
     scrollOfSpirit: number;
+    /**
+     * @generated from protobuf field: int32 scroll_of_protection = 53;
+     */
+    scrollOfProtection: number;
     /**
      * @generated from protobuf field: int32 pet_scroll_of_agility = 46;
      */

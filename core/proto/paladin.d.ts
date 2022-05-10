@@ -279,6 +279,10 @@ export interface RetributionPaladin_Options {
      */
     judgement: RetributionPaladin_Options_Judgement;
     /**
+     * @generated from protobuf field: proto.PaladinAura aura = 5;
+     */
+    aura: PaladinAura;
+    /**
      * @generated from protobuf field: int32 crusader_strike_delay_ms = 2;
      */
     crusaderStrikeDelayMs: number;
@@ -307,6 +311,27 @@ export declare enum RetributionPaladin_Options_Judgement {
      * @generated from protobuf enum value: Crusader = 2;
      */
     Crusader = 2
+}
+/**
+ * @generated from protobuf enum proto.PaladinAura
+ */
+export declare enum PaladinAura {
+    /**
+     * @generated from protobuf enum value: NoPaladinAura = 0;
+     */
+    NoPaladinAura = 0,
+    /**
+     * @generated from protobuf enum value: SanctityAura = 1;
+     */
+    SanctityAura = 1,
+    /**
+     * @generated from protobuf enum value: DevotionAura = 2;
+     */
+    DevotionAura = 2,
+    /**
+     * @generated from protobuf enum value: RetributionAura = 3;
+     */
+    RetributionAura = 3
 }
 declare class PaladinTalents$Type extends MessageType<PaladinTalents> {
     constructor();
