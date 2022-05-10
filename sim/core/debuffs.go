@@ -298,6 +298,7 @@ func GiftOfArthasAura(target *Unit) *Aura {
 	return target.GetOrRegisterAura(Aura{
 		Label:    "Gift of Arthas",
 		ActionID: ActionID{SpellID: 11374},
+		Duration: time.Minute * 3,
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.BonusPhysicalDamageTaken += 8
 		},

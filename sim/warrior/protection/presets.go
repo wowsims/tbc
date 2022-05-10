@@ -75,7 +75,10 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 	UnleashedRage:   true,
 }
 
-var FullConsumes = &proto.Consumes{}
+var FullConsumes = &proto.Consumes{
+	BattleElixir:   proto.BattleElixir_ElixirOfMastery,
+	GuardianElixir: proto.GuardianElixir_GiftOfArthas,
+}
 
 var FullDebuffs = &proto.Debuffs{
 	BloodFrenzy:               true,

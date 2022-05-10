@@ -227,6 +227,8 @@ enum Potions {
 	MightyRagePotion = 4;
 	FelManaPotion = 5;
 	InsaneStrengthPotion = 6;
+	IronshieldPotion = 7;
+	HeroicPotion = 8;
 }
 
 enum Conjured {
@@ -262,6 +264,7 @@ enum Flask {
 	FlaskOfPureDeath = 3;
 	FlaskOfRelentlessAssault = 4;
 	FlaskOfSupremePower = 5;
+	FlaskOfFortification = 6;
 }
 
 enum BattleElixir {
@@ -273,6 +276,7 @@ enum BattleElixir {
 	ElixirOfMajorFrostPower = 5;
 	ElixirOfMajorShadowPower = 6;
 	ElixirOfMajorStrength = 7;
+	ElixirOfMastery = 10;
 	ElixirOfTheMongoose = 8;
 	FelStrengthElixir = 9;
 }
@@ -280,7 +284,11 @@ enum BattleElixir {
 enum GuardianElixir {
 	GuardianElixirUnknown = 0;
 	ElixirOfDraenicWisdom = 1;
+	ElixirOfIronskin = 5;
+	ElixirOfMajorDefense = 6;
+	ElixirOfMajorFortitude = 4;
 	ElixirOfMajorMageblood = 2;
+	GiftOfArthas = 3;
 }
 
 enum Food {
@@ -291,6 +299,7 @@ enum Food {
 	FoodRoastedClefthoof = 4;
 	FoodSkullfishSoup = 5;
 	FoodSpicyHotTalbuk = 6;
+	FoodFishermansFeast = 7;
 }
 
 enum PetFood {

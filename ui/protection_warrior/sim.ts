@@ -184,27 +184,37 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 			// Which options are selectable in the 'Consumes' section.
 			consumeOptions: {
 				potions: [
+					Potions.IronshieldPotion,
 					Potions.HastePotion,
+					Potions.MightyRagePotion,
+					Potions.InsaneStrengthPotion,
 				],
 				conjured: [
 					Conjured.ConjuredFlameCap,
 				],
 				flasks: [
 					Flask.FlaskOfRelentlessAssault,
+					Flask.FlaskOfFortification,
 				],
 				battleElixirs: [
 					BattleElixir.ElixirOfDemonslaying,
 					BattleElixir.ElixirOfMajorStrength,
 					BattleElixir.ElixirOfMajorAgility,
 					BattleElixir.ElixirOfTheMongoose,
+					BattleElixir.ElixirOfMastery,
 				],
 				guardianElixirs: [
+					GuardianElixir.ElixirOfMajorFortitude,
+					GuardianElixir.ElixirOfMajorDefense,
+					GuardianElixir.ElixirOfIronskin,
+					GuardianElixir.GiftOfArthas,
 				],
 				food: [
 					Food.FoodRoastedClefthoof,
 					Food.FoodGrilledMudfish,
 					Food.FoodSpicyHotTalbuk,
 					Food.FoodRavagerDog,
+					Food.FoodFishermansFeast,
 				],
 				alcohol: [
 				],

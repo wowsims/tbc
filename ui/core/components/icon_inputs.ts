@@ -411,6 +411,8 @@ export const makePotionsInput = makeConsumeInputFactory('defaultPotion', [
 	{ actionId: ActionId.fromItemId(22832), value: Potions.SuperManaPotion },
 	{ actionId: ActionId.fromItemId(31677), value: Potions.FelManaPotion },
 	{ actionId: ActionId.fromItemId(22828), value: Potions.InsaneStrengthPotion },
+	{ actionId: ActionId.fromItemId(22849), value: Potions.IronshieldPotion },
+	{ actionId: ActionId.fromItemId(22837), value: Potions.HeroicPotion },
 ] as Array<IconEnumValueConfig<Player<any>, Potions>>);
 
 export const makeConjuredInput = makeConsumeInputFactory('defaultConjured', [
@@ -426,6 +428,7 @@ export const makeFlasksInput = makeConsumeInputFactory('flask', [
 	{ actionId: ActionId.fromItemId(22866), value: Flask.FlaskOfPureDeath },
 	{ actionId: ActionId.fromItemId(22854), value: Flask.FlaskOfRelentlessAssault },
 	{ actionId: ActionId.fromItemId(13512), value: Flask.FlaskOfSupremePower },
+	{ actionId: ActionId.fromItemId(22851), value: Flask.FlaskOfFortification },
 ] as Array<IconEnumValueConfig<Player<any>, Flask>>, (eventID: EventID, player: Player<any>, newValue: Flask) => {
 	if (newValue) {
 		const newConsumes = player.getConsumes();
@@ -443,6 +446,7 @@ export const makeBattleElixirsInput = makeConsumeInputFactory('battleElixir', [
 	{ actionId: ActionId.fromItemId(22827), value: BattleElixir.ElixirOfMajorFrostPower },
 	{ actionId: ActionId.fromItemId(22835), value: BattleElixir.ElixirOfMajorShadowPower },
 	{ actionId: ActionId.fromItemId(22824), value: BattleElixir.ElixirOfMajorStrength },
+	{ actionId: ActionId.fromItemId(28104), value: BattleElixir.ElixirOfMastery },
 	{ actionId: ActionId.fromItemId(13452), value: BattleElixir.ElixirOfTheMongoose },
 	{ actionId: ActionId.fromItemId(31679), value: BattleElixir.FelStrengthElixir },
 ] as Array<IconEnumValueConfig<Player<any>, BattleElixir>>, (eventID: EventID, player: Player<any>, newValue: BattleElixir) => {
@@ -454,7 +458,11 @@ export const makeBattleElixirsInput = makeConsumeInputFactory('battleElixir', [
 });
 
 export const makeGuardianElixirsInput = makeConsumeInputFactory('guardianElixir', [
+	{ actionId: ActionId.fromItemId(9088), value: GuardianElixir.GiftOfArthas },
 	{ actionId: ActionId.fromItemId(32067), value: GuardianElixir.ElixirOfDraenicWisdom },
+	{ actionId: ActionId.fromItemId(32068), value: GuardianElixir.ElixirOfIronskin },
+	{ actionId: ActionId.fromItemId(22834), value: GuardianElixir.ElixirOfMajorDefense },
+	{ actionId: ActionId.fromItemId(32062), value: GuardianElixir.ElixirOfMajorFortitude },
 	{ actionId: ActionId.fromItemId(22840), value: GuardianElixir.ElixirOfMajorMageblood },
 ] as Array<IconEnumValueConfig<Player<any>, GuardianElixir>>, (eventID: EventID, player: Player<any>, newValue: GuardianElixir) => {
 	if (newValue) {
@@ -471,6 +479,7 @@ export const makeFoodInput = makeConsumeInputFactory('food', [
 	{ actionId: ActionId.fromItemId(27658), value: Food.FoodRoastedClefthoof },
 	{ actionId: ActionId.fromItemId(33872), value: Food.FoodSpicyHotTalbuk },
 	{ actionId: ActionId.fromItemId(33825), value: Food.FoodSkullfishSoup },
+	{ actionId: ActionId.fromItemId(33052), value: Food.FoodFishermansFeast },
 ] as Array<IconEnumValueConfig<Player<any>, Food>>);
 
 export const makeAlcoholInput = makeConsumeInputFactory('alchohol', [
