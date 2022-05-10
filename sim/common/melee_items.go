@@ -36,6 +36,7 @@ func init() {
 	core.AddItemEffect(31332, ApplyBlinkstrike)
 	core.AddItemEffect(31331, ApplyTheNightBlade)
 	core.AddItemEffect(32262, ApplySyphonOfTheNathrezim)
+	core.AddItemEffect(32375, ApplyBulwarkOfAzzinoth)
 	core.AddItemEffect(33122, ApplyCloakOfDarkness)
 	core.AddItemEffect(34679, ApplyShatteredSunPendantofMight)
 
@@ -929,6 +930,26 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 			}
 
 			if ppmm.Proc(sim, spellEffect.IsMH(), false, "Syphon Of The Nathrezim") {
+				procAura.Activate(sim)
+			}
+		},
+	})
+}
+
+func ApplyBulwarkOfAzzinoth(agent core.Agent) {
+	character := agent.GetCharacter()
+
+	const procChance = 0.02
+	procAura := character.NewTemporaryStatsAura("Bulwark Of Azzinoth Proc", core.ActionID{ItemID: 32375}, stats.Stats{stats.Armor: 2000}, time.Second*10)
+
+	character.GetOrRegisterAura(core.Aura{
+		Label:    "Bulwark Of Azzinoth",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Landed() && spell.SpellSchool == core.SpellSchoolPhysical && sim.RandomFloat("Bulwark of Azzinoth") < procChance {
 				procAura.Activate(sim)
 			}
 		},

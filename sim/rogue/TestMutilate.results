@@ -228,6 +228,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestMutilate-AllItems-DarkmoonCard:Vengeance-31858"
+ value: {
+  dps: 1186.6105471669207
+  tps: 830.4311363364677
+ }
+}
+dps_results: {
  key: "TestMutilate-AllItems-DarkmoonCard:Wrath-31857"
  value: {
   dps: 1193.679340189155

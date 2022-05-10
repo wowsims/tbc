@@ -186,6 +186,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-BulwarkofAzzinoth-32375"
+ value: {
+  dps: 834.0253418660009
+  tps: 580.155600090225
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-ChaoticSkyfireDiamond"
  value: {
   dps: 1402.5118593017103
@@ -239,6 +246,13 @@ dps_results: {
  value: {
   dps: 1401.8837931637006
   tps: 983.3138028606093
+ }
+}
+dps_results: {
+ key: "TestRogue-AllItems-DarkmoonCard:Vengeance-31858"
+ value: {
+  dps: 1365.7831483067096
+  tps: 957.6823450121461
  }
 }
 dps_results: {

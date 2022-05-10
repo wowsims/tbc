@@ -242,6 +242,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestArcane-AllItems-DarkmoonCard:Vengeance-31858"
+ value: {
+  dps: 1312.5626357895349
+  tps: 1297.5815983764703
+ }
+}
+dps_results: {
  key: "TestArcane-AllItems-DarkmoonCard:Wrath-31857"
  value: {
   dps: 1312.5626357895349

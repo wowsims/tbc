@@ -226,6 +226,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestElemental-AllItems-BulwarkofAzzinoth-32375"
+ value: {
+  dps: 1513.861168266404
+  tps: 1262.4320904515953
+ }
+}
+dps_results: {
  key: "TestElemental-AllItems-CataclysmHarness"
  value: {
   dps: 1146.1967496619984
@@ -307,6 +314,13 @@ dps_results: {
  value: {
   dps: 1545.4147166777952
   tps: 1289.4738739260235
+ }
+}
+dps_results: {
+ key: "TestElemental-AllItems-DarkmoonCard:Vengeance-31858"
+ value: {
+  dps: 1492.3370123112552
+  tps: 1245.6458196841913
  }
 }
 dps_results: {
