@@ -119,6 +119,21 @@ var ItemSetDestroyerBattlegear = core.ItemSet{
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			// Your Overpower ability now grants you 100 attack power for 5 sec.
+			warrior := agent.(WarriorAgent).GetWarrior()
+			procAura := warrior.NewTemporaryStatsAura("Destroyer 2pc Proc", core.ActionID{SpellID: 37528}, stats.Stats{stats.AttackPower: 100}, time.Second*5)
+
+			warrior.RegisterAura(core.Aura{
+				Label:    "Destroyer 2pc",
+				Duration: core.NeverExpires,
+				OnReset: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Activate(sim)
+				},
+				OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+					if spell == warrior.Overpower {
+						procAura.Activate(sim)
+					}
+				},
+			})
 		},
 		4: func(agent core.Agent) {
 			// Your Bloodthirst and Mortal Strike abilities cost 5 less rage.

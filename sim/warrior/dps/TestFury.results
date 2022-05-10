@@ -293,8 +293,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-DestroyerBattlegear"
  value: {
-  dps: 839.7940544871292
-  tps: 605.0486397996576
+  dps: 843.4549146496786
+  tps: 607.6526481977781
  }
 }
 dps_results: {
