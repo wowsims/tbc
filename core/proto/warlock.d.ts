@@ -47,6 +47,10 @@ export interface WarlockTalents {
      */
     empoweredCorruption: number;
     /**
+     * @generated from protobuf field: int32 shadow_embrace = 50;
+     */
+    shadowEmbrace: number;
+    /**
      * @generated from protobuf field: bool siphon_life = 9;
      */
     siphonLife: boolean;

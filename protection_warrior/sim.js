@@ -116,6 +116,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
             // IconInputs to include in the 'Other Buffs' section on the settings tab.
             raidBuffInputs: [
                 IconInputs.GiftOfTheWild,
+                IconInputs.Thorns,
             ],
             partyBuffInputs: [
                 IconInputs.DrumsOfBattleBuff,
@@ -148,6 +149,12 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                 IconInputs.ExposeArmor,
                 IconInputs.CurseOfRecklessness,
                 IconInputs.GiftOfArthas,
+                IconInputs.DemoralizingRoar,
+                IconInputs.DemoralizingShout,
+                IconInputs.ThunderClap,
+                IconInputs.ShadowEmbrace,
+                IconInputs.InsectSwarm,
+                IconInputs.ScorpidSting,
             ],
             // Which options are selectable in the 'Consumes' section.
             consumeOptions: {

@@ -22,6 +22,10 @@ export interface RaidBuffs {
      * @generated from protobuf field: proto.TristateEffect gift_of_the_wild = 5;
      */
     giftOfTheWild: TristateEffect;
+    /**
+     * @generated from protobuf field: proto.TristateEffect thorns = 6;
+     */
+    thorns: TristateEffect;
 }
 /**
  * Buffs that affect a single party.
@@ -384,6 +388,30 @@ export interface Debuffs {
      * @generated from protobuf field: double expose_weakness_hunter_agility = 14;
      */
     exposeWeaknessHunterAgility: number;
+    /**
+     * @generated from protobuf field: proto.TristateEffect demoralizing_roar = 19;
+     */
+    demoralizingRoar: TristateEffect;
+    /**
+     * @generated from protobuf field: proto.TristateEffect demoralizing_shout = 20;
+     */
+    demoralizingShout: TristateEffect;
+    /**
+     * @generated from protobuf field: proto.TristateEffect thunder_clap = 21;
+     */
+    thunderClap: TristateEffect;
+    /**
+     * @generated from protobuf field: bool insect_swarm = 22;
+     */
+    insectSwarm: boolean;
+    /**
+     * @generated from protobuf field: bool scorpid_sting = 23;
+     */
+    scorpidSting: boolean;
+    /**
+     * @generated from protobuf field: bool shadow_embrace = 24;
+     */
+    shadowEmbrace: boolean;
 }
 /**
  * @generated from protobuf message proto.Target

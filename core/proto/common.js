@@ -1194,11 +1194,12 @@ class RaidBuffs$Type extends MessageType {
         super("proto.RaidBuffs", [
             { no: 1, name: "arcane_brilliance", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "divine_spirit", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
-            { no: 5, name: "gift_of_the_wild", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
+            { no: 5, name: "gift_of_the_wild", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 6, name: "thorns", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] }
         ]);
     }
     create(value) {
-        const message = { arcaneBrilliance: false, divineSpirit: 0, giftOfTheWild: 0 };
+        const message = { arcaneBrilliance: false, divineSpirit: 0, giftOfTheWild: 0, thorns: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1217,6 +1218,9 @@ class RaidBuffs$Type extends MessageType {
                     break;
                 case /* proto.TristateEffect gift_of_the_wild */ 5:
                     message.giftOfTheWild = reader.int32();
+                    break;
+                case /* proto.TristateEffect thorns */ 6:
+                    message.thorns = reader.int32();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1239,6 +1243,9 @@ class RaidBuffs$Type extends MessageType {
         /* proto.TristateEffect gift_of_the_wild = 5; */
         if (message.giftOfTheWild !== 0)
             writer.tag(5, WireType.Varint).int32(message.giftOfTheWild);
+        /* proto.TristateEffect thorns = 6; */
+        if (message.thorns !== 0)
+            writer.tag(6, WireType.Varint).int32(message.thorns);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
@@ -1831,11 +1838,17 @@ class Debuffs$Type extends MessageType {
             { no: 12, name: "curse_of_recklessness", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 15, name: "hunters_mark", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 13, name: "expose_weakness_uptime", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 14, name: "expose_weakness_hunter_agility", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+            { no: 14, name: "expose_weakness_hunter_agility", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 19, name: "demoralizing_roar", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 20, name: "demoralizing_shout", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 21, name: "thunder_clap", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
+            { no: 22, name: "insect_swarm", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 23, name: "scorpid_sting", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 24, name: "shadow_embrace", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
         ]);
     }
     create(value) {
-        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, shadowWeaving: false, improvedScorch: false, wintersChill: false, bloodFrenzy: false, giftOfArthas: false, mangle: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false, huntersMark: 0, exposeWeaknessUptime: 0, exposeWeaknessHunterAgility: 0 };
+        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, shadowWeaving: false, improvedScorch: false, wintersChill: false, bloodFrenzy: false, giftOfArthas: false, mangle: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false, huntersMark: 0, exposeWeaknessUptime: 0, exposeWeaknessHunterAgility: 0, demoralizingRoar: 0, demoralizingShout: 0, thunderClap: 0, insectSwarm: false, scorpidSting: false, shadowEmbrace: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1899,6 +1912,24 @@ class Debuffs$Type extends MessageType {
                     break;
                 case /* double expose_weakness_hunter_agility */ 14:
                     message.exposeWeaknessHunterAgility = reader.double();
+                    break;
+                case /* proto.TristateEffect demoralizing_roar */ 19:
+                    message.demoralizingRoar = reader.int32();
+                    break;
+                case /* proto.TristateEffect demoralizing_shout */ 20:
+                    message.demoralizingShout = reader.int32();
+                    break;
+                case /* proto.TristateEffect thunder_clap */ 21:
+                    message.thunderClap = reader.int32();
+                    break;
+                case /* bool insect_swarm */ 22:
+                    message.insectSwarm = reader.bool();
+                    break;
+                case /* bool scorpid_sting */ 23:
+                    message.scorpidSting = reader.bool();
+                    break;
+                case /* bool shadow_embrace */ 24:
+                    message.shadowEmbrace = reader.bool();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -1966,6 +1997,24 @@ class Debuffs$Type extends MessageType {
         /* double expose_weakness_hunter_agility = 14; */
         if (message.exposeWeaknessHunterAgility !== 0)
             writer.tag(14, WireType.Bit64).double(message.exposeWeaknessHunterAgility);
+        /* proto.TristateEffect demoralizing_roar = 19; */
+        if (message.demoralizingRoar !== 0)
+            writer.tag(19, WireType.Varint).int32(message.demoralizingRoar);
+        /* proto.TristateEffect demoralizing_shout = 20; */
+        if (message.demoralizingShout !== 0)
+            writer.tag(20, WireType.Varint).int32(message.demoralizingShout);
+        /* proto.TristateEffect thunder_clap = 21; */
+        if (message.thunderClap !== 0)
+            writer.tag(21, WireType.Varint).int32(message.thunderClap);
+        /* bool insect_swarm = 22; */
+        if (message.insectSwarm !== false)
+            writer.tag(22, WireType.Varint).bool(message.insectSwarm);
+        /* bool scorpid_sting = 23; */
+        if (message.scorpidSting !== false)
+            writer.tag(23, WireType.Varint).bool(message.scorpidSting);
+        /* bool shadow_embrace = 24; */
+        if (message.shadowEmbrace !== false)
+            writer.tag(24, WireType.Varint).bool(message.shadowEmbrace);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
