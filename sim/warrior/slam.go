@@ -34,7 +34,7 @@ func (warrior *Warrior) registerSlamSpell() {
 
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
-			FlatThreatBonus: 70,
+			FlatThreatBonus:  70,
 
 			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 140, 1, true),
 			OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
