@@ -142,7 +142,7 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 					if spellEffect.Landed() &&
 						spell.SpellSchool == SpellSchoolPhysical &&
 						sim.RandomFloat("Gift of Arthas") < 0.3 {
-						debuffAuras[spellEffect.Target.Index].Activate(sim)
+						debuffAuras[spell.Unit.Index].Activate(sim)
 					}
 				},
 			})
