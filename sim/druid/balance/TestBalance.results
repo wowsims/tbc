@@ -95,6 +95,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestBalance-AllItems-BandoftheEternalDefender-29297"
+ value: {
+  dps: 1224.7271061220804
+  tps: 1224.7271061220804
+ }
+}
+dps_results: {
  key: "TestBalance-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1270.760972191745
@@ -232,6 +239,13 @@ dps_results: {
  value: {
   dps: 1268.2538828472734
   tps: 1268.2538828472734
+ }
+}
+dps_results: {
+ key: "TestBalance-AllItems-DarkmoonCard:Vengeance-31858"
+ value: {
+  dps: 1221.0200012989574
+  tps: 1221.0200012989574
  }
 }
 dps_results: {

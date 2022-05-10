@@ -102,6 +102,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestMutilate-AllItems-BandoftheEternalDefender-29297"
+ value: {
+  dps: 1188.4358812307323
+  tps: 831.7913561550874
+ }
+}
+dps_results: {
  key: "TestMutilate-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1188.4358812307323
@@ -225,6 +232,13 @@ dps_results: {
  value: {
   dps: 1216.6866038774403
   tps: 851.7851366009365
+ }
+}
+dps_results: {
+ key: "TestMutilate-AllItems-DarkmoonCard:Vengeance-31858"
+ value: {
+  dps: 1186.6105471669207
+  tps: 830.4311363364677
  }
 }
 dps_results: {

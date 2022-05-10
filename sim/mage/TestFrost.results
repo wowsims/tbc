@@ -102,6 +102,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFrost-AllItems-BandoftheEternalDefender-29297"
+ value: {
+  dps: 1600.312056687058
+  tps: 1306.3963470200715
+ }
+}
+dps_results: {
  key: "TestFrost-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1659.1895361049903
@@ -239,6 +246,13 @@ dps_results: {
  value: {
   dps: 1632.3349653496923
   tps: 1334.163291438283
+ }
+}
+dps_results: {
+ key: "TestFrost-AllItems-DarkmoonCard:Vengeance-31858"
+ value: {
+  dps: 1563.3016860752514
+  tps: 1275.4907505599479
  }
 }
 dps_results: {

@@ -95,6 +95,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestEnhancement-AllItems-BandoftheEternalDefender-29297"
+ value: {
+  dps: 1909.6072748856989
+  tps: 1350.1402375214786
+ }
+}
+dps_results: {
  key: "TestEnhancement-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1920.4991134206266
@@ -169,6 +176,13 @@ dps_results: {
  value: {
   dps: 1934.278777680499
   tps: 1363.9492822127252
+ }
+}
+dps_results: {
+ key: "TestEnhancement-AllItems-BulwarkofAzzinoth-32375"
+ value: {
+  dps: 1296.324312034815
+  tps: 930.6307428725049
  }
 }
 dps_results: {
@@ -253,6 +267,13 @@ dps_results: {
  value: {
   dps: 1958.6176245733504
   tps: 1383.4792980328982
+ }
+}
+dps_results: {
+ key: "TestEnhancement-AllItems-DarkmoonCard:Vengeance-31858"
+ value: {
+  dps: 1906.7835671778
+  tps: 1346.4032699813336
  }
 }
 dps_results: {

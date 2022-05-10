@@ -95,6 +95,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestProtectionWarrior-AllItems-BandoftheEternalDefender-29297"
+ value: {
+  dps: 472.6526065052471
+  tps: 825.0713242277005
+ }
+}
+dps_results: {
  key: "TestProtectionWarrior-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 468.80225769292645
@@ -267,6 +274,13 @@ dps_results: {
  value: {
   dps: 489.70884357254823
   tps: 856.0661583474082
+ }
+}
+dps_results: {
+ key: "TestProtectionWarrior-AllItems-DarkmoonCard:Vengeance-31858"
+ value: {
+  dps: 473.725263208168
+  tps: 829.1450254859244
  }
 }
 dps_results: {
