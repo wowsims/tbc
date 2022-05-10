@@ -36,6 +36,8 @@ export class EncounterPicker extends Component {
 				encounter.setDurationVariation(eventID, newValue);
 			},
 		});
+		
+		// Simple/Custom/Preset [Edit Button]
 
 		new EnumPicker<Target>(this.rootElem, modEncounter.primaryTarget, {
 			label: 'Target Level',
