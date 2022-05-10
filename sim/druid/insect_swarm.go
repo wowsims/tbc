@@ -13,6 +13,9 @@ func (druid *Druid) registerInsectSwarmSpell() {
 	actionID := core.ActionID{SpellID: 27013}
 	baseCost := 175.0
 
+	target := druid.CurrentTarget
+	missAura := core.InsectSwarmAura(target)
+
 	druid.InsectSwarm = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolNature,
@@ -35,12 +38,12 @@ func (druid *Druid) registerInsectSwarmSpell() {
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					druid.InsectSwarmDot.Apply(sim)
+					missAura.Activate(sim)
 				}
 			},
 		}),
 	})
 
-	target := druid.CurrentTarget
 	druid.InsectSwarmDot = core.NewDot(core.Dot{
 		Spell: druid.InsectSwarm,
 		Aura: target.RegisterAura(core.Aura{

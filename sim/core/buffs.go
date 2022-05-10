@@ -27,6 +27,12 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 		stats.Spirit:    gotwAmount,
 	})
 
+	if raidBuffs.Thorns == proto.TristateEffect_TristateEffectImproved {
+		ThornsAura(character, 3)
+	} else if raidBuffs.Thorns == proto.TristateEffect_TristateEffectRegular {
+		ThornsAura(character, 0)
+	}
+
 	character.AddStats(stats.Stats{
 		stats.SpellCrit: GetTristateValueFloat(partyBuffs.MoonkinAura, 5*SpellCritRatingPerCritChance, 5*SpellCritRatingPerCritChance+20),
 	})
@@ -282,6 +288,38 @@ func SanctityAura(character *Character, level float64) *Aura {
 		OnExpire: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.HolyDamageDealtMultiplier /= 1.1
 			aura.Unit.PseudoStats.DamageDealtMultiplier /= 1 + 0.01*level
+		},
+	})
+}
+
+func ThornsAura(character *Character, points int32) *Aura {
+	actionID := ActionID{SpellID: 26992}
+
+	procSpell := character.RegisterSpell(SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: SpellSchoolNature,
+		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
+			ProcMask:         ProcMaskEmpty,
+			IsPhantom:        true,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     BaseDamageConfigFlat(25 * (1 + 0.25*float64(points))),
+			OutcomeApplier: character.OutcomeFuncAlwaysHit(),
+		}),
+	})
+
+	return character.RegisterAura(Aura{
+		Label:    "Thorns",
+		ActionID: ActionID{SpellID: 26992},
+		Duration: NeverExpires,
+		OnReset: func(aura *Aura, sim *Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if spellEffect.Landed() && spell.SpellSchool == SpellSchoolPhysical {
+				procSpell.Cast(sim, spell.Unit)
+			}
 		},
 	})
 }

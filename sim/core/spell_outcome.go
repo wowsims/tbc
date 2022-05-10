@@ -392,7 +392,7 @@ func (spellEffect *SpellEffect) applyAttackTableHit(spell *Spell) {
 }
 
 func (spellEffect *SpellEffect) applyEnemyAttackTableMiss(spell *Spell, unit *Unit, attackTable *AttackTable, roll float64, chance *float64) bool {
-	missChance := attackTable.BaseMissChance + spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
+	missChance := attackTable.BaseMissChance + unit.PseudoStats.IncreasedMissChance + spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
 	*chance = MaxFloat(0, missChance)
 
 	if roll < *chance {
