@@ -102,6 +102,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-BandoftheEternalDefender-29297"
+ value: {
+  dps: 1372.8621093290885
+  tps: 962.7188868265453
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1372.944845893183

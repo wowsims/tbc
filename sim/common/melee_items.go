@@ -24,6 +24,7 @@ func init() {
 	core.AddItemEffect(28573, ApplyDespair)
 	core.AddItemEffect(28767, ApplyTheDecapitator)
 	core.AddItemEffect(28774, ApplyGlaiveOfThePit)
+	core.AddItemEffect(29297, ApplyBandOfTheEternalDefender)
 	core.AddItemEffect(29301, ApplyBandOfTheEternalChampion)
 	core.AddItemEffect(29348, ApplyTheBladefist)
 	core.AddItemEffect(29962, ApplyHeartrazor)
@@ -499,6 +500,38 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 			}
 
 			procSpell.Cast(sim, spellEffect.Target)
+		},
+	})
+}
+
+func ApplyBandOfTheEternalDefender(agent core.Agent) {
+	character := agent.GetCharacter()
+
+	const procChance = 0.03
+	procAura := character.NewTemporaryStatsAura("Band of the Eternal Defender Proc", core.ActionID{ItemID: 29297}, stats.Stats{stats.Armor: 800}, time.Second*10)
+
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 60,
+	}
+
+	character.GetOrRegisterAura(core.Aura{
+		Label:    "Band of the Eternal Defender",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || spell.SpellSchool != core.SpellSchoolPhysical {
+				return
+			}
+			if !icd.IsReady(sim) {
+				return
+			}
+			if sim.RandomFloat("Band of the Eternal Defender") < procChance {
+				icd.Use(sim)
+				procAura.Activate(sim)
+			}
 		},
 	})
 }

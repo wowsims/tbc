@@ -102,6 +102,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFrost-AllItems-BandoftheEternalDefender-29297"
+ value: {
+  dps: 1600.312056687058
+  tps: 1306.3963470200715
+ }
+}
+dps_results: {
  key: "TestFrost-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1659.1895361049903

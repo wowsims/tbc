@@ -95,6 +95,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestFury-AllItems-BandoftheEternalDefender-29297"
+ value: {
+  dps: 895.1618012786802
+  tps: 676.4288561144386
+ }
+}
+dps_results: {
  key: "TestFury-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 895.1618012786802

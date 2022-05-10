@@ -95,6 +95,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestEnhancement-AllItems-BandoftheEternalDefender-29297"
+ value: {
+  dps: 1909.6072748856989
+  tps: 1350.1402375214786
+ }
+}
+dps_results: {
  key: "TestEnhancement-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1920.4991134206266

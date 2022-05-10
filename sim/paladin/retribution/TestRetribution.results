@@ -88,6 +88,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRetribution-AllItems-BandoftheEternalDefender-29297"
+ value: {
+  dps: 1988.819859898933
+  tps: 1392.1739019292531
+ }
+}
+dps_results: {
  key: "TestRetribution-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1995.6227273842699

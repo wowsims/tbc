@@ -109,6 +109,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestSmite-AllItems-BandoftheEternalDefender-29297"
+ value: {
+  dps: 987.1088155323433
+  tps: 947.1952158850112
+ }
+}
+dps_results: {
  key: "TestSmite-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 1028.5934490978748

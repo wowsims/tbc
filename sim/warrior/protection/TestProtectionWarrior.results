@@ -95,6 +95,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestProtectionWarrior-AllItems-BandoftheEternalDefender-29297"
+ value: {
+  dps: 472.6526065052471
+  tps: 825.0713242277005
+ }
+}
+dps_results: {
  key: "TestProtectionWarrior-AllItems-BandoftheEternalSage-29305"
  value: {
   dps: 468.80225769292645
