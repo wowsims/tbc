@@ -9,6 +9,7 @@ import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { Conjured } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
@@ -159,26 +160,37 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
             // Which options are selectable in the 'Consumes' section.
             consumeOptions: {
                 potions: [
+                    Potions.IronshieldPotion,
                     Potions.HastePotion,
+                    Potions.MightyRagePotion,
+                    Potions.InsaneStrengthPotion,
                 ],
                 conjured: [
                     Conjured.ConjuredFlameCap,
                 ],
                 flasks: [
                     Flask.FlaskOfRelentlessAssault,
+                    Flask.FlaskOfFortification,
                 ],
                 battleElixirs: [
                     BattleElixir.ElixirOfDemonslaying,
                     BattleElixir.ElixirOfMajorStrength,
                     BattleElixir.ElixirOfMajorAgility,
                     BattleElixir.ElixirOfTheMongoose,
+                    BattleElixir.ElixirOfMastery,
                 ],
-                guardianElixirs: [],
+                guardianElixirs: [
+                    GuardianElixir.ElixirOfMajorFortitude,
+                    GuardianElixir.ElixirOfMajorDefense,
+                    GuardianElixir.ElixirOfIronskin,
+                    GuardianElixir.GiftOfArthas,
+                ],
                 food: [
                     Food.FoodRoastedClefthoof,
                     Food.FoodGrilledMudfish,
                     Food.FoodSpicyHotTalbuk,
                     Food.FoodRavagerDog,
+                    Food.FoodFishermansFeast,
                 ],
                 alcohol: [],
                 weaponImbues: [

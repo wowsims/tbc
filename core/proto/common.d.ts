@@ -1533,7 +1533,15 @@ export declare enum Potions {
     /**
      * @generated from protobuf enum value: InsaneStrengthPotion = 6;
      */
-    InsaneStrengthPotion = 6
+    InsaneStrengthPotion = 6,
+    /**
+     * @generated from protobuf enum value: IronshieldPotion = 7;
+     */
+    IronshieldPotion = 7,
+    /**
+     * @generated from protobuf enum value: HeroicPotion = 8;
+     */
+    HeroicPotion = 8
 }
 /**
  * @generated from protobuf enum proto.Conjured
@@ -1640,7 +1648,11 @@ export declare enum Flask {
     /**
      * @generated from protobuf enum value: FlaskOfSupremePower = 5;
      */
-    FlaskOfSupremePower = 5
+    FlaskOfSupremePower = 5,
+    /**
+     * @generated from protobuf enum value: FlaskOfFortification = 6;
+     */
+    FlaskOfFortification = 6
 }
 /**
  * @generated from protobuf enum proto.BattleElixir
@@ -1679,6 +1691,10 @@ export declare enum BattleElixir {
      */
     ElixirOfMajorStrength = 7,
     /**
+     * @generated from protobuf enum value: ElixirOfMastery = 10;
+     */
+    ElixirOfMastery = 10,
+    /**
      * @generated from protobuf enum value: ElixirOfTheMongoose = 8;
      */
     ElixirOfTheMongoose = 8,
@@ -1700,9 +1716,25 @@ export declare enum GuardianElixir {
      */
     ElixirOfDraenicWisdom = 1,
     /**
+     * @generated from protobuf enum value: ElixirOfIronskin = 5;
+     */
+    ElixirOfIronskin = 5,
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorDefense = 6;
+     */
+    ElixirOfMajorDefense = 6,
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorFortitude = 4;
+     */
+    ElixirOfMajorFortitude = 4,
+    /**
      * @generated from protobuf enum value: ElixirOfMajorMageblood = 2;
      */
-    ElixirOfMajorMageblood = 2
+    ElixirOfMajorMageblood = 2,
+    /**
+     * @generated from protobuf enum value: GiftOfArthas = 3;
+     */
+    GiftOfArthas = 3
 }
 /**
  * @generated from protobuf enum proto.Food
@@ -1735,7 +1767,11 @@ export declare enum Food {
     /**
      * @generated from protobuf enum value: FoodSpicyHotTalbuk = 6;
      */
-    FoodSpicyHotTalbuk = 6
+    FoodSpicyHotTalbuk = 6,
+    /**
+     * @generated from protobuf enum value: FoodFishermansFeast = 7;
+     */
+    FoodFishermansFeast = 7
 }
 /**
  * @generated from protobuf enum proto.PetFood

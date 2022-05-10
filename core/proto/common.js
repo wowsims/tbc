@@ -804,6 +804,14 @@ export var Potions;
      * @generated from protobuf enum value: InsaneStrengthPotion = 6;
      */
     Potions[Potions["InsaneStrengthPotion"] = 6] = "InsaneStrengthPotion";
+    /**
+     * @generated from protobuf enum value: IronshieldPotion = 7;
+     */
+    Potions[Potions["IronshieldPotion"] = 7] = "IronshieldPotion";
+    /**
+     * @generated from protobuf enum value: HeroicPotion = 8;
+     */
+    Potions[Potions["HeroicPotion"] = 8] = "HeroicPotion";
 })(Potions || (Potions = {}));
 /**
  * @generated from protobuf enum proto.Conjured
@@ -914,6 +922,10 @@ export var Flask;
      * @generated from protobuf enum value: FlaskOfSupremePower = 5;
      */
     Flask[Flask["FlaskOfSupremePower"] = 5] = "FlaskOfSupremePower";
+    /**
+     * @generated from protobuf enum value: FlaskOfFortification = 6;
+     */
+    Flask[Flask["FlaskOfFortification"] = 6] = "FlaskOfFortification";
 })(Flask || (Flask = {}));
 /**
  * @generated from protobuf enum proto.BattleElixir
@@ -953,6 +965,10 @@ export var BattleElixir;
      */
     BattleElixir[BattleElixir["ElixirOfMajorStrength"] = 7] = "ElixirOfMajorStrength";
     /**
+     * @generated from protobuf enum value: ElixirOfMastery = 10;
+     */
+    BattleElixir[BattleElixir["ElixirOfMastery"] = 10] = "ElixirOfMastery";
+    /**
      * @generated from protobuf enum value: ElixirOfTheMongoose = 8;
      */
     BattleElixir[BattleElixir["ElixirOfTheMongoose"] = 8] = "ElixirOfTheMongoose";
@@ -975,9 +991,25 @@ export var GuardianElixir;
      */
     GuardianElixir[GuardianElixir["ElixirOfDraenicWisdom"] = 1] = "ElixirOfDraenicWisdom";
     /**
+     * @generated from protobuf enum value: ElixirOfIronskin = 5;
+     */
+    GuardianElixir[GuardianElixir["ElixirOfIronskin"] = 5] = "ElixirOfIronskin";
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorDefense = 6;
+     */
+    GuardianElixir[GuardianElixir["ElixirOfMajorDefense"] = 6] = "ElixirOfMajorDefense";
+    /**
+     * @generated from protobuf enum value: ElixirOfMajorFortitude = 4;
+     */
+    GuardianElixir[GuardianElixir["ElixirOfMajorFortitude"] = 4] = "ElixirOfMajorFortitude";
+    /**
      * @generated from protobuf enum value: ElixirOfMajorMageblood = 2;
      */
     GuardianElixir[GuardianElixir["ElixirOfMajorMageblood"] = 2] = "ElixirOfMajorMageblood";
+    /**
+     * @generated from protobuf enum value: GiftOfArthas = 3;
+     */
+    GuardianElixir[GuardianElixir["GiftOfArthas"] = 3] = "GiftOfArthas";
 })(GuardianElixir || (GuardianElixir = {}));
 /**
  * @generated from protobuf enum proto.Food
@@ -1012,6 +1044,10 @@ export var Food;
      * @generated from protobuf enum value: FoodSpicyHotTalbuk = 6;
      */
     Food[Food["FoodSpicyHotTalbuk"] = 6] = "FoodSpicyHotTalbuk";
+    /**
+     * @generated from protobuf enum value: FoodFishermansFeast = 7;
+     */
+    Food[Food["FoodFishermansFeast"] = 7] = "FoodFishermansFeast";
 })(Food || (Food = {}));
 /**
  * @generated from protobuf enum proto.PetFood
