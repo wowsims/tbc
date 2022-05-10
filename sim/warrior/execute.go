@@ -50,7 +50,7 @@ func (warrior *Warrior) registerExecuteSpell() {
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 					return 925 + 21*extraRage
 				},
-				TargetSpellCoefficient: 0, // Doesn't scale with +damage on target?
+				TargetSpellCoefficient: 1,
 			},
 			OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 

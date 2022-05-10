@@ -45,7 +45,7 @@ func (warrior *Warrior) registerBloodthirstSpell(cdTimer *core.Timer) {
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 					return hitEffect.MeleeAttackPower(spell.Unit) * 0.45
 				},
-				TargetSpellCoefficient: 0, // Doesn't scale with +damage on target?
+				TargetSpellCoefficient: 1,
 			},
 			OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
 
