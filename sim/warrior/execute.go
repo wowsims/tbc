@@ -44,7 +44,7 @@ func (warrior *Warrior) registerExecuteSpell() {
 			ProcMask: core.ProcMaskMeleeMHSpecial,
 
 			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			ThreatMultiplier: 1.25,
 
 			BaseDamage: core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
