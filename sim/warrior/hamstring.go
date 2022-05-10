@@ -30,7 +30,8 @@ func (warrior *Warrior) registerHamstringSpell() {
 			ProcMask: core.ProcMaskMeleeMHSpecial,
 
 			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			ThreatMultiplier: 1.25,
+			FlatThreatBonus:  134, //Debuff threat
 
 			BaseDamage: core.BaseDamageConfig{
 				Calculator:             core.BaseDamageFuncFlat(63),
