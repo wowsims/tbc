@@ -162,7 +162,7 @@ export class RaidSimResultsManager {
 
 		const currentDpsMetrics = this.currentData.simResult.raidMetrics.dps;
 		const referenceDpsMetrics = this.referenceData.simResult.raidMetrics.dps;
-		formatDeltaTextElem(simReferenceDpsDiffElem, referenceDpsMetrics.avg, currentDpsMetrics.avg);
+		formatDeltaTextElem(simReferenceDpsDiffElem, referenceDpsMetrics.avg, currentDpsMetrics.avg, 2);
 
 		if (this.simUI.isIndividualSim()) {
 			const simReferenceTpsDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-tps-diff')[0] as HTMLSpanElement;
@@ -170,8 +170,8 @@ export class RaidSimResultsManager {
 
 			const curPlayerMetrics = this.currentData.simResult.getPlayers()[0]!;
 			const refPlayerMetrics = this.referenceData.simResult.getPlayers()[0]!;
-			formatDeltaTextElem(simReferenceTpsDiffElem, refPlayerMetrics.tps.avg, curPlayerMetrics.tps.avg);
-			formatDeltaTextElem(simReferenceDtpsDiffElem, refPlayerMetrics.dtps.avg, curPlayerMetrics.dtps.avg);
+			formatDeltaTextElem(simReferenceTpsDiffElem, refPlayerMetrics.tps.avg, curPlayerMetrics.tps.avg, 2);
+			formatDeltaTextElem(simReferenceDtpsDiffElem, refPlayerMetrics.dtps.avg, curPlayerMetrics.dtps.avg, 2);
 		}
 	}
 

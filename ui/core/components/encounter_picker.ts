@@ -54,6 +54,8 @@ export class EncounterPicker extends Component {
 			},
 		});
 
+		new EnumPicker(this.rootElem, modEncounter.primaryTarget, MobTypePickerConfig);
+
 		if (config.simpleTargetStats) {
 			config.simpleTargetStats.forEach(stat => {
 				new NumberPicker(this.rootElem, modEncounter.primaryTarget, {
@@ -66,8 +68,6 @@ export class EncounterPicker extends Component {
 				});
 			});
 		}
-
-		new EnumPicker(this.rootElem, modEncounter.primaryTarget, MobTypePickerConfig);
 
 		if (config.showNumTargets) {
 			new NumberPicker(this.rootElem, modEncounter, {
@@ -93,6 +93,50 @@ export class EncounterPicker extends Component {
 		}
 	}
 }
+
+class TargetPicker extends Component {
+	constructor(parent: HTMLElement, modTarget: Target) {
+		super(parent, 'target-picker-root');
+
+		new EnumPicker<Target>(this.rootElem, modTarget, {
+			label: 'Level',
+			values: [
+				{ name: '73', value: 73 },
+				{ name: '72', value: 72 },
+				{ name: '71', value: 71 },
+				{ name: '70', value: 70 },
+			],
+			changedEvent: (target: Target) => target.levelChangeEmitter,
+			getValue: (target: Target) => target.getLevel(),
+			setValue: (eventID: EventID, target: Target, newValue: number) => {
+				target.setLevel(eventID, newValue);
+			},
+		});
+
+		new EnumPicker(this.rootElem, modTarget, MobTypePickerConfig);
+
+		ALL_TARGET_STATS.forEach(stat => {
+			new NumberPicker(this.rootElem, modTarget, {
+				label: statNames[stat],
+				changedEvent: (target: Target) => target.statsChangeEmitter,
+				getValue: (target: Target) => target.getStats().getStat(stat),
+				setValue: (eventID: EventID, target: Target, newValue: number) => {
+					target.setStats(eventID, target.getStats().withStat(stat, newValue));
+				},
+			});
+		});
+	}
+}
+
+const ALL_TARGET_STATS: Array<Stat> = [
+	Stat.StatArmor,
+	Stat.StatArcaneResistance,
+	Stat.StatFireResistance,
+	Stat.StatFrostResistance,
+	Stat.StatNatureResistance,
+	Stat.StatShadowResistance,
+	Stat.StatAttackPower,
+];
 
 export const MobTypePickerConfig: EnumPickerConfig<Target> = {
 	label: 'Mob Type',

@@ -14,7 +14,7 @@ import { wait } from './utils.js';
 
 // Manages all the settings for a single Target.
 export class Target {
-	private readonly sim: Sim;
+	readonly sim: Sim;
 
 	private level: number = Mechanics.BOSS_LEVEL;
 	private mobType: MobType = MobType.MobTypeDemon;

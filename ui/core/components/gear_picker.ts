@@ -15,6 +15,7 @@ import { slotNames } from '/tbc/core/proto_utils/names.js';
 import { setItemQualityCssClass } from '/tbc/core/css_utils.js';
 import { Player } from '/tbc/core/player.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
+import { formatDeltaTextElem } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
 import { Component } from './component.js';
@@ -482,16 +483,7 @@ class SelectorModal extends Popup {
 				epDeltaElem.textContent = '';
 				if (listItem) {
 					const listItemEP = computeEP(listItem);
-					const delta = Math.round(listItemEP) - Math.round(newEP);
-					if (delta > 0) {
-						epDeltaElem.textContent = '+' + delta;
-						epDeltaElem.classList.remove('negative');
-						epDeltaElem.classList.add('positive');
-					} else if (delta < 0) {
-						epDeltaElem.textContent = '' + delta;
-						epDeltaElem.classList.remove('positive');
-						epDeltaElem.classList.add('negative');
-					}
+					formatDeltaTextElem(epDeltaElem, newEP, listItemEP, 0);
 				}
 			});
 		};

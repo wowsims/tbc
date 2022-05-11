@@ -121,9 +121,9 @@ export function downloadString(data: string, fileName: string) {
 	downloadAnchorNode.remove();
 }
 
-export function formatDeltaTextElem(elem: HTMLElement, before: number, after: number) {
+export function formatDeltaTextElem(elem: HTMLElement, before: number, after: number, precision: number) {
 	const delta = after - before;
-	const deltaStr = delta.toFixed(2);
+	const deltaStr = delta.toFixed(precision);
 	if (delta >= 0) {
 		elem.textContent = '+' + deltaStr;
 		elem.classList.remove('negative');
