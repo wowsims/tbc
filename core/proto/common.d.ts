@@ -494,6 +494,12 @@ export interface Encounter {
      */
     executeProportion: number;
     /**
+     * @generated from protobuf field: proto.EncounterType type = 5;
+     */
+    type: EncounterType;
+    /**
+     * If type != Simple or Custom, then this may be empty.
+     *
      * @generated from protobuf field: repeated proto.Target targets = 2;
      */
     targets: Target[];
@@ -1888,6 +1894,19 @@ export declare enum MobType {
      * @generated from protobuf enum value: MobTypeUndead = 8;
      */
     MobTypeUndead = 8
+}
+/**
+ * @generated from protobuf enum proto.EncounterType
+ */
+export declare enum EncounterType {
+    /**
+     * @generated from protobuf enum value: EncounterTypeSimple = 0;
+     */
+    EncounterTypeSimple = 0,
+    /**
+     * @generated from protobuf enum value: EncounterTypeCustom = 1;
+     */
+    EncounterTypeCustom = 1
 }
 /**
  * Extra enum for describing which items are eligible for an enchant, when
