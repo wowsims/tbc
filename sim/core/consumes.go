@@ -200,8 +200,8 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	// Scrolls
 	character.AddStat(stats.Agility, []float64{0, 5, 9, 13, 17, 20}[consumes.ScrollOfAgility])
 	character.AddStat(stats.Strength, []float64{0, 5, 9, 13, 17, 20}[consumes.ScrollOfStrength])
-	if partyBuffs.DevotionAura == proto.TristateEffect_TristateEffectMissing {
-		// Doesn't stack with Devotion Aura
+	if !character.HasRingEquipped(29297) {
+		// Proc from Band of Eternal Defender removes scroll.
 		character.AddStat(stats.Armor, []float64{0, 60, 120, 180, 240, 300}[consumes.ScrollOfProtection])
 	}
 	if raidBuffs.DivineSpirit == proto.TristateEffect_TristateEffectMissing {

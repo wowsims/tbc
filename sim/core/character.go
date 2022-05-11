@@ -335,6 +335,11 @@ func (character *Character) HasTrinketEquipped(itemID int32) bool {
 		character.Equip[items.ItemSlotTrinket2].ID == itemID
 }
 
+func (character *Character) HasRingEquipped(itemID int32) bool {
+	return character.Equip[items.ItemSlotFinger1].ID == itemID ||
+		character.Equip[items.ItemSlotFinger2].ID == itemID
+}
+
 func (character *Character) HasMetaGemEquipped(gemID int32) bool {
 	for _, gem := range character.Equip[items.ItemSlotHead].Gems {
 		if gem.ID == gemID {

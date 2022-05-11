@@ -477,6 +477,11 @@ enum MobType {
     MobTypeUndead = 8;
 }
 
+enum EncounterType {
+	EncounterTypeSimple = 0;
+	EncounterTypeCustom = 1;
+}
+
 message Target {
 		// TODO: Deprecate this after 1 month (2022/6/6)
 		double armor = 1;
@@ -503,6 +508,9 @@ message Encounter {
     // Fury, etc.
     double execute_proportion = 3;
 
+		EncounterType type = 5;
+
+		// If type != Simple or Custom, then this may be empty.
     repeated Target targets = 2;
 }
 
