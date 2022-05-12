@@ -39,7 +39,7 @@ export class Target {
 			this.debuffsChangeEmitter,
 		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
 
-		this.changeEmitter.on(eventID => this.sim.encounter.changeEmitter.emit(eventID));
+		this.changeEmitter.on(eventID => this.sim.encounter?.changeEmitter.emit(eventID));
 	}
 
 	getLevel(): number {
@@ -115,17 +115,21 @@ export class Target {
 		});
 	}
 
-	static fromDefaults(sim: Sim): Target {
-		const target = new Target(sim);
-		target.fromProto(TargetProto.create({
+	static defaultProto(): TargetProto {
+		return TargetProto.create({
 			level: Mechanics.BOSS_LEVEL,
 			mobType: MobType.MobTypeDemon,
 			stats: Stats.fromMap({
 				[Stat.StatArmor]: 7683,
 				[Stat.StatBlockValue]: 54,
 				[Stat.StatAttackPower]: 320,
-			}),
-		}));
+			}).asArray(),
+		});
+	}
+
+	static fromDefaults(eventID: EventID, sim: Sim): Target {
+		const target = new Target(sim);
+		target.fromProto(eventID, Target.defaultProto());
 		return target;
 	}
 }

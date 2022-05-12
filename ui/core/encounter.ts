@@ -11,9 +11,9 @@ import { EventID, TypedEvent } from './typed_event.js';
 
 // Manages all the settings for an Encounter.
 export class Encounter {
-	private readonly sim: Sim;
+	readonly sim: Sim;
 
-	private type: EncounterType;
+	private type: EncounterType = EncounterType.EncounterTypeSimple;
 	private duration: number = 180;
 	private durationVariation: number = 5;
 	private numTargets: number = 1;
@@ -31,7 +31,7 @@ export class Encounter {
 
 	constructor(sim: Sim) {
 		this.sim = sim;
-		this.targets = [Target.fromDefaults(sim)];
+		this.targets = [Target.fromDefaults(TypedEvent.nextEventID(), sim)];
 
 		[
 			this.targetsChangeEmitter,
@@ -53,7 +53,7 @@ export class Encounter {
 		if (newType == this.type)
 			return;
 
-		this.typeVariation = newType;
+		this.type = newType;
 		this.typeChangeEmitter.emit(eventID);
 	}
 
@@ -106,7 +106,7 @@ export class Encounter {
 	}
 	setTargets(eventID: EventID, newTargets: Array<Target>) {
 		if (newTargets.length == 0) {
-			newTargets = [Target.fromDefaults(this.sim)];
+			newTargets = [Target.fromDefaults(eventID, this.sim)];
 		}
 		if (newTargets.length == this.targets.length && newTargets.every((target, i) => TargetProto.equals(target.toProto(), this.targets[i].toProto()))) {
 			return;
@@ -148,10 +148,17 @@ export class Encounter {
 			this.setDuration(eventID, proto.duration);
 			this.setDurationVariation(eventID, proto.durationVariation);
 			this.setExecuteProportion(eventID, proto.executeProportion);
-			this.setNumTargets(eventID, proto.targets.length);
+			this.setNumTargets(eventID, Math.max(1, proto.targets.length));
 
 			if (proto.targets.length > 0) {
 				this.primaryTarget.fromProto(eventID, proto.targets[0]);
+				this.setTargets(eventID, proto.targets.map(targetProto => {
+					const target = new Target(this.sim);
+					target.fromProto(eventID, targetProto);
+					return target;
+				}));
+			} else {
+				this.setTargets(eventID, [ Target.fromDefaults(eventID, this.sim) ]);
 			}
 		});
 	}
@@ -161,11 +168,7 @@ export class Encounter {
 			duration: 180,
 			durationVariation: 5,
 			executeProportion: 0.2,
-			targets: [TargetProto.create({
-				level: 73,
-				stats: new Stats().withStat(Stat.StatArmor, 7684).asArray(),
-				mobType: MobType.MobTypeDemon,
-			})],
+			targets: [ Target.defaultProto() ],
 		}));
 	}
 }

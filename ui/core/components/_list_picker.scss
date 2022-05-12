@@ -1,0 +1,34 @@
+
+.list-picker-root {
+}
+
+.list-picker-items {
+}
+
+.list-picker-item-container {
+	border: 1px solid var(--theme-color-primary);
+	margin: 5px;
+}
+
+.list-picker-item-header {
+	display: flex;
+	align-items: center;
+	justify-content: right;
+}
+.list-picker-item-header > span {
+	margin: 3px 15px;
+}
+
+.list-picker-item-header span:hover {
+	text-shadow:
+		0 0 3px red,
+		0 0 3px red,
+		0 0 3px red;
+}
+
+.list-picker-item-delete {
+	color: red;
+}
+
+.list-picker-item {
+}

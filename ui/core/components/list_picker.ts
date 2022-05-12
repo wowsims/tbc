@@ -6,7 +6,7 @@ import { Input, InputConfig } from './input.js';
 export interface ListPickerConfig<ModObject, ItemType> extends InputConfig<ModObject, Array<ItemType>> {
 	itemLabel: string,
 	newItem: () => ItemType,
-	newItemPicker: (item: ItemType) => HTMLElement,
+	newItemPicker: (parent: HTMLElement, item: ItemType) => void,
 }
 
 interface ItemPickerPair<ItemType> {
@@ -74,9 +74,31 @@ export class ListPicker<ModObject, ItemType> extends Input<ModObject, Array<Item
 	}
 
 	private addNewPicker(item: ItemType) {
-		const itemPicker = this.config.newItemPicker(item);
-		this.itemsDiv.appendChild(itemPicker);
+		const itemContainer = document.createElement('div');
+		itemContainer.classList.add('list-picker-item-container');
+		itemContainer.innerHTML = `
+			<div class="list-picker-item-header">
+				<span class="list-picker-item-delete fa fa-times"></span>
+			</div>
+			<div class="list-picker-item">
+			</div>
+		`;
 
-		this.itemPickerPairs.push({ item: item, picker: itemPicker });
+		const deleteButton = itemContainer.getElementsByClassName('list-picker-item-delete')[0] as HTMLElement;
+		deleteButton.addEventListener('click', event => {
+			const index = this.itemPickerPairs.findIndex(ipp => ipp.item == item);
+			if (index == -1) {
+				return;
+			}
+			this.itemPickerPairs[index].picker.remove();
+			this.itemPickerPairs.splice(index, 1);
+			this.inputChanged(TypedEvent.nextEventID());
+		});
+
+		const itemElem = itemContainer.getElementsByClassName('list-picker-item')[0] as HTMLElement;
+		const itemPicker = this.config.newItemPicker(itemElem, item);
+		this.itemsDiv.appendChild(itemContainer);
+
+		this.itemPickerPairs.push({ item: item, picker: itemContainer });
 	}
 }
