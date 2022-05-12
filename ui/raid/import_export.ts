@@ -19,6 +19,7 @@ import { Warlock } from '../core/proto/warlock.js';
 import { ProtectionWarrior, Warrior } from '../core/proto/warrior.js';
 import { gemMatchesSocket } from '../core/proto_utils/gems.js';
 import { playerPresets } from './presets.js';
+import { talentStringToProto } from '../core/talents/factory.js';
 
 declare var $: any;
 declare var tippy: any;
@@ -199,10 +200,29 @@ class RaidWCLImporter extends Importer {
 					}
 
 					const matchingPresets = playerPresets.filter(preset => preset.spec == spec);
+					var presetIdx = 0;
 					if (matchingPresets.length == 0) {
 						return;
+					} else if (matchingPresets.length > 1) {
+						// TODO: match the imported talents with the presets to find closest match.
+						var distance = 100;
+						matchingPresets.forEach((preset, i) => {
+							var presetTalents = [0,0,0];
+							var talentIdx = 0;
+							Array.from(preset.talents).forEach((v) => {
+								if (v == '-') {
+									talentIdx+=1;
+									return;
+								}
+								presetTalents[talentIdx] += parseInt(v)
+							});
+							var newDistance = Math.abs(info.talents[0].id - presetTalents[0]) + Math.abs(info.talents[1].id - presetTalents[1]) + Math.abs(info.talents[2].id - presetTalents[2]);
+							if (newDistance < distance) {
+								presetIdx = i;
+							}
+						})
 					}
-					const matchingPreset = matchingPresets[0];
+					const matchingPreset = matchingPresets[presetIdx];
 
 					var specFuncs = specTypeFunctions[spec];
 					player = withSpecProto(spec, player, matchingPreset.rotation, specFuncs.talentsCreate(), matchingPreset.specOptions);
@@ -248,6 +268,10 @@ class RaidWCLImporter extends Importer {
 						}
 						raid.parties.push(Party.create());
 					}
+
+
+					// TODO: paladin blessing picker needs to be setup.
+					// TODO: innervate setup
 				});
 
 				this.simUI.fromProto(TypedEvent.nextEventID(), settings);
