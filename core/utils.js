@@ -107,9 +107,9 @@ export function downloadString(data, fileName) {
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
 }
-export function formatDeltaTextElem(elem, before, after) {
+export function formatDeltaTextElem(elem, before, after, precision) {
     const delta = after - before;
-    const deltaStr = delta.toFixed(2);
+    const deltaStr = delta.toFixed(precision);
     if (delta >= 0) {
         elem.textContent = '+' + deltaStr;
         elem.classList.remove('negative');

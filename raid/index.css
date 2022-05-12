@@ -936,6 +936,29 @@ input, select {
   margin: 5px;
 }
 
+.list-picker-item-container {
+  border: 1px solid var(--theme-color-primary);
+  margin: 5px;
+}
+
+.list-picker-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: right;
+}
+
+.list-picker-item-header > span {
+  margin: 3px 15px;
+}
+
+.list-picker-item-header span:hover {
+  text-shadow: 0 0 3px red, 0 0 3px red, 0 0 3px red;
+}
+
+.list-picker-item-delete {
+  color: red;
+}
+
 .input-label-div {
   display: inline-block;
   margin: 5px;
@@ -962,7 +985,47 @@ input, select {
   width: 92px;
 }
 
+.encounter-picker-root {
+  text-align: center;
+}
+
 .encounter-picker-root .input-root {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.encounter-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  border-bottom: 1px solid white;
+  margin: 2px;
+}
+
+.encounter-header .input-root {
+  margin: 5px 5px;
+  white-space: nowrap;
+}
+
+.encounter-targets {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.targets-picker {
+  text-align: center;
+}
+
+.target-picker-root {
+  display: flex;
+}
+
+.target-picker-section {
+  margin: 2px 5px;
+}
+
+.target-picker-section .input-root {
   display: flex;
   justify-content: space-between;
   align-items: center;

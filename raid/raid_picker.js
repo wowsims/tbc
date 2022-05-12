@@ -11,6 +11,7 @@ import { isTankSpec } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
 import { newRaidTarget } from '/tbc/core/proto_utils/utils.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
+import { formatDeltaTextElem } from '/tbc/core/utils.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 import { hexToRgba } from '/tbc/core/utils.js';
 import { BuffBot } from './buff_bot.js';
@@ -143,18 +144,7 @@ export class PartyPicker extends Component {
                 referenceDeltaElem.textContent = '';
                 return;
             }
-            const delta = partyDps - referenceDps;
-            const deltaStr = delta.toFixed(1);
-            if (delta >= 0) {
-                referenceDeltaElem.textContent = '+' + deltaStr;
-                referenceDeltaElem.classList.remove('negative');
-                referenceDeltaElem.classList.add('positive');
-            }
-            else {
-                referenceDeltaElem.textContent = '' + deltaStr;
-                referenceDeltaElem.classList.remove('positive');
-                referenceDeltaElem.classList.add('negative');
-            }
+            formatDeltaTextElem(referenceDeltaElem, referenceDps, partyDps, 1);
         });
     }
 }
@@ -351,18 +341,7 @@ export class PlayerPicker extends Component {
                 this.referenceDeltaElem.textContent = '';
                 return;
             }
-            const delta = playerDps - referenceDps;
-            const deltaStr = delta.toFixed(1);
-            if (delta >= 0) {
-                this.referenceDeltaElem.textContent = '+' + deltaStr;
-                this.referenceDeltaElem.classList.remove('negative');
-                this.referenceDeltaElem.classList.add('positive');
-            }
-            else {
-                this.referenceDeltaElem.textContent = '' + deltaStr;
-                this.referenceDeltaElem.classList.remove('positive');
-                this.referenceDeltaElem.classList.add('negative');
-            }
+            formatDeltaTextElem(this.referenceDeltaElem, referenceDps, playerDps, 1);
         });
         this.update();
     }

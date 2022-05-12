@@ -5,7 +5,7 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Sim } from './sim.js';
 import { EventID, TypedEvent } from './typed_event.js';
 export declare class Target {
-    private readonly sim;
+    readonly sim: Sim;
     private level;
     private mobType;
     private stats;
@@ -26,4 +26,6 @@ export declare class Target {
     setDebuffs(eventID: EventID, newDebuffs: Debuffs): void;
     toProto(): TargetProto;
     fromProto(eventID: EventID, proto: TargetProto): void;
+    static defaultProto(): TargetProto;
+    static fromDefaults(eventID: EventID, sim: Sim): Target;
 }
