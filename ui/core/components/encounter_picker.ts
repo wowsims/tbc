@@ -4,6 +4,7 @@ import { Encounter } from '/tbc/core/encounter.js';
 import { Target } from '/tbc/core/target.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { EnumPicker, EnumPickerConfig } from '/tbc/core/components/enum_picker.js';
+import { ListPicker, ListPickerConfig } from '/tbc/core/components/list_picker.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { statNames } from '/tbc/core/proto_utils/names.js';
@@ -36,10 +37,8 @@ export class EncounterPicker extends Component {
 				encounter.setDurationVariation(eventID, newValue);
 			},
 		});
-		
-		// Simple/Custom/Preset [Edit Button]
 
-		new EnumPicker<Target>(this.rootElem, modEncounter.primaryTarget, {
+		new EnumPicker<Encounter>(this.rootElem, modEncounter, {
 			label: 'Target Level',
 			values: [
 				{ name: '73', value: 73 },
@@ -47,23 +46,23 @@ export class EncounterPicker extends Component {
 				{ name: '71', value: 71 },
 				{ name: '70', value: 70 },
 			],
-			changedEvent: (target: Target) => target.levelChangeEmitter,
-			getValue: (target: Target) => target.getLevel(),
-			setValue: (eventID: EventID, target: Target, newValue: number) => {
-				target.setLevel(eventID, newValue);
+			changedEvent: (encounter: Encounter) => encounter.changeEmitter,
+			getValue: (encounter: Encounter) => encounter.primaryTarget.getLevel(),
+			setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+				encounter.primaryTarget.setLevel(eventID, newValue);
 			},
 		});
 
-		new EnumPicker(this.rootElem, modEncounter.primaryTarget, MobTypePickerConfig);
+		new EnumPicker(this.rootElem, modEncounter, MobTypePickerConfig);
 
 		if (config.simpleTargetStats) {
 			config.simpleTargetStats.forEach(stat => {
-				new NumberPicker(this.rootElem, modEncounter.primaryTarget, {
+				new NumberPicker(this.rootElem, modEncounter, {
 					label: statNames[stat],
-					changedEvent: (target: Target) => target.statsChangeEmitter,
-					getValue: (target: Target) => target.getStats().getStat(stat),
-					setValue: (eventID: EventID, target: Target, newValue: number) => {
-						target.setStats(eventID, target.getStats().withStat(stat, newValue));
+					changedEvent: (encounter: Encounter) => encounter.changeEmitter,
+					getValue: (encounter: Encounter) => encounter.primaryTarget.getStats().getStat(stat),
+					setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+						encounter.primaryTarget.setStats(eventID, encounter.primaryTarget.getStats().withStat(stat, newValue));
 					},
 				});
 			});
@@ -91,6 +90,12 @@ export class EncounterPicker extends Component {
 				},
 			});
 		}
+		
+		// Simple/Custom/Preset [Edit Button]
+		const advancedButton = document.createElement('button');
+		advancedButton.classList.add('sim-button', 'advanced-button');
+		advancedButton.textContent = 'ADVANCED';
+		this.rootElem.appendChild(advancedButton);
 	}
 }
 
@@ -138,7 +143,7 @@ const ALL_TARGET_STATS: Array<Stat> = [
 	Stat.StatAttackPower,
 ];
 
-export const MobTypePickerConfig: EnumPickerConfig<Target> = {
+export const MobTypePickerConfig: EnumPickerConfig<Encounter> = {
 	label: 'Mob Type',
 	values: [
 		{ name: 'None', value: MobType.MobTypeUnknown },
@@ -151,9 +156,9 @@ export const MobTypePickerConfig: EnumPickerConfig<Target> = {
 		{ name: 'Mechanical', value: MobType.MobTypeMechanical },
 		{ name: 'Undead', value: MobType.MobTypeUndead },
 	],
-	changedEvent: (target: Target) => target.mobTypeChangeEmitter,
-	getValue: (target: Target) => target.getMobType(),
-	setValue: (eventID: EventID, target: Target, newValue: number) => {
-		target.setMobType(eventID, newValue);
+	changedEvent: (encounter: Encounter) => encounter.changeEmitter,
+	getValue: (encounter: Encounter) => encounter.primaryTarget.getMobType(),
+	setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+		encounter.primaryTarget.setMobType(eventID, newValue);
 	},
 };

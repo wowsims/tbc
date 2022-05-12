@@ -6,7 +6,7 @@ import { Input, InputConfig } from './input.js';
 export interface ListPickerConfig<ModObject, ItemType> extends InputConfig<ModObject, Array<ItemType>> {
 	itemLabel: string,
 	newItem: () => ItemType,
-	newItemPicker: ItemType => HTMLElement,
+	newItemPicker: (item: ItemType) => HTMLElement,
 }
 
 interface ItemPickerPair<ItemType> {
@@ -35,11 +35,7 @@ export class ListPicker<ModObject, ItemType> extends Input<ModObject, Array<Item
 		const newItemButton = this.rootElem.getElementsByClassName('list-picker-new-button')[0] as HTMLElement;
 		newItemButton.addEventListener('click', event => {
 			const newItem = this.config.newItem();
-			const newItemPicker = this.config.newItemPicker(newItem);
-			const newPair = { item: newItem, picker: newItemPicker };
-			this.itemsDiv.addChild(newItemPicker);
-
-			this.itemPickerPairs.push(newPair);
+			this.addNewPicker(newItem);
 			this.inputChanged(TypedEvent.nextEventID());
 		});
 
@@ -56,9 +52,31 @@ export class ListPicker<ModObject, ItemType> extends Input<ModObject, Array<Item
 
 	setInputValue(newValue: Array<ItemType>): void {
 		// Remove items that are no longer in the list.
+		const removePairs = this.itemPickerPairs.filter(ipp => !newValue.includes(ipp.item));
+		removePairs.forEach(ipp => ipp.picker.remove());
+		this.itemPickerPairs = this.itemPickerPairs.filter(ipp => !removePairs.includes(ipp));
 
 		// Add items that were missing.
+		const curItems = this.getInputValue();
+		newValue
+				.filter(newItem => !curItems.includes(newItem))
+				.forEach(newItem => this.addNewPicker(newItem));
 
 		// Reorder to match the new list.
+		this.itemPickerPairs = newValue.map(item => this.itemPickerPairs.find(ipp => ipp.item == item)!);
+
+		// Reorder item picker elements in the DOM if necessary.
+		const curPickers = Array.from(this.itemsDiv.children);
+		if (!curPickers.every((picker, i) => picker == this.itemPickerPairs[i].picker)) {
+			this.itemPickerPairs.forEach(ipp => ipp.picker.remove());
+			this.itemPickerPairs.forEach(ipp => this.itemsDiv.appendChild(ipp.picker));
+		}
+	}
+
+	private addNewPicker(item: ItemType) {
+		const itemPicker = this.config.newItemPicker(item);
+		this.itemsDiv.appendChild(itemPicker);
+
+		this.itemPickerPairs.push({ item: item, picker: itemPicker });
 	}
 }
