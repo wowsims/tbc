@@ -147,10 +147,6 @@ func (warlock *Warlock) registerCurseOfAgonySpell() {
 				}
 			}
 		})
-		// Make sure a hit of this spell deactivates any active amp curse
-		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			warlock.AmplifyCurseAura.Deactivate(sim)
-		}
 	}
 	warlock.CurseOfAgony = warlock.RegisterSpell(core.SpellConfig{
 		ActionID:     actionID,
@@ -167,8 +163,15 @@ func (warlock *Warlock) registerCurseOfAgonySpell() {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
-			OnSpellHitDealt:  applyDotOnLanded(&warlock.CurseOfAgonyDot),
-			ProcMask:         core.ProcMaskEmpty,
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					warlock.CurseOfAgonyDot.Apply(sim)
+				}
+				if warlock.AmplifyCurseAura.IsActive() {
+					warlock.AmplifyCurseAura.Deactivate(sim)
+				}
+			},
+			ProcMask: core.ProcMaskEmpty,
 		}),
 	})
 	warlock.CurseOfAgonyDot = core.NewDot(core.Dot{
@@ -212,10 +215,6 @@ func (warlock *Warlock) registerCurseOfDoomSpell() {
 				}
 			}
 		})
-		// Make sure a hit of this spell deactivates any active amp curse
-		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			warlock.AmplifyCurseAura.Deactivate(sim)
-		}
 	}
 
 	warlock.CurseOfDoom = warlock.RegisterSpell(core.SpellConfig{
@@ -237,8 +236,15 @@ func (warlock *Warlock) registerCurseOfDoomSpell() {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
-			OnSpellHitDealt:  applyDotOnLanded(&warlock.CurseOfDoomDot),
-			ProcMask:         core.ProcMaskEmpty,
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					warlock.CurseOfDoomDot.Apply(sim)
+				}
+				if warlock.AmplifyCurseAura.IsActive() {
+					warlock.AmplifyCurseAura.Deactivate(sim)
+				}
+			},
+			ProcMask: core.ProcMaskEmpty,
 		}),
 	})
 
