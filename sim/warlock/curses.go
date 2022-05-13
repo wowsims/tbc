@@ -164,10 +164,9 @@ func (warlock *Warlock) registerCurseOfAgonySpell() {
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
-					return
+				if spellEffect.Landed() {
+					warlock.CurseOfAgonyDot.Apply(sim)
 				}
-				warlock.CurseOfAgonyDot.Apply(sim)
 				if warlock.AmplifyCurseAura.IsActive() {
 					warlock.AmplifyCurseAura.Deactivate(sim)
 				}
@@ -238,10 +237,9 @@ func (warlock *Warlock) registerCurseOfDoomSpell() {
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-				if !spellEffect.Landed() {
-					return
+				if spellEffect.Landed() {
+					warlock.CurseOfDoomDot.Apply(sim)
 				}
-				warlock.CurseOfDoomDot.Apply(sim)
 				if warlock.AmplifyCurseAura.IsActive() {
 					warlock.AmplifyCurseAura.Deactivate(sim)
 				}
