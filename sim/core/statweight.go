@@ -114,11 +114,11 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 			// For spell/melee hit, always pick the direction which is gauranteed to
 			// not run into a hit cap.
 			if baseStats[v] < 80 {
-				statModsHigh[v] = 10
-				statModsLow[v] = 10
+				statModsHigh[v] = statMod
+				statModsLow[v] = statMod
 			} else {
-				statModsHigh[v] = -10
-				statModsLow[v] = -10
+				statModsHigh[v] = -statMod
+				statModsLow[v] = -statMod
 			}
 		} else {
 			statModsHigh[v] = statMod
