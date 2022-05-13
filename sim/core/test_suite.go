@@ -43,7 +43,7 @@ func (testSuite *IndividualTestSuite) TestStatWeights(testName string, swr *prot
 	testSuite.testNames = append(testSuite.testNames, testName)
 
 	result := StatWeights(swr)
-	weights := stats.FromFloatArray(result.Weights)
+	weights := stats.FromFloatArray(result.Dps.Weights)
 
 	testSuite.testResults.StatWeightsResults[testName] = &proto.StatWeightsTestResult{
 		Weights: weights[:],
