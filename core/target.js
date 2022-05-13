@@ -11,18 +11,22 @@ export class Target {
         this.level = Mechanics.BOSS_LEVEL;
         this.mobType = MobType.MobTypeDemon;
         this.stats = new Stats();
+        this.swingSpeed = 0;
+        this.minBaseDamage = 0;
         this.debuffs = Debuffs.create();
         this.levelChangeEmitter = new TypedEvent();
-        this.statsChangeEmitter = new TypedEvent();
         this.mobTypeChangeEmitter = new TypedEvent();
+        this.propChangeEmitter = new TypedEvent();
+        this.statsChangeEmitter = new TypedEvent();
         this.debuffsChangeEmitter = new TypedEvent();
         // Emits when any of the above emitters emit.
         this.changeEmitter = new TypedEvent();
         this.sim = sim;
         [
             this.levelChangeEmitter,
-            this.statsChangeEmitter,
             this.mobTypeChangeEmitter,
+            this.propChangeEmitter,
+            this.statsChangeEmitter,
             this.debuffsChangeEmitter,
         ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
         this.changeEmitter.on(eventID => this.sim.encounter?.changeEmitter.emit(eventID));
@@ -36,15 +40,6 @@ export class Target {
         this.level = newLevel;
         this.levelChangeEmitter.emit(eventID);
     }
-    getStats() {
-        return this.stats;
-    }
-    setStats(eventID, newStats) {
-        if (newStats.equals(this.stats))
-            return;
-        this.stats = newStats;
-        this.statsChangeEmitter.emit(eventID);
-    }
     getMobType() {
         return this.mobType;
     }
@@ -53,6 +48,33 @@ export class Target {
             return;
         this.mobType = newMobType;
         this.mobTypeChangeEmitter.emit(eventID);
+    }
+    getSwingSpeed() {
+        return this.swingSpeed;
+    }
+    setSwingSpeed(eventID, newSwingSpeed) {
+        if (newSwingSpeed == this.swingSpeed)
+            return;
+        this.swingSpeed = newSwingSpeed;
+        this.propChangeEmitter.emit(eventID);
+    }
+    getMinBaseDamage() {
+        return this.minBaseDamage;
+    }
+    setMinBaseDamage(eventID, newMinBaseDamage) {
+        if (newMinBaseDamage == this.minBaseDamage)
+            return;
+        this.minBaseDamage = newMinBaseDamage;
+        this.propChangeEmitter.emit(eventID);
+    }
+    getStats() {
+        return this.stats;
+    }
+    setStats(eventID, newStats) {
+        if (newStats.equals(this.stats))
+            return;
+        this.stats = newStats;
+        this.statsChangeEmitter.emit(eventID);
     }
     getDebuffs() {
         // Make a defensive copy
@@ -68,8 +90,10 @@ export class Target {
     toProto() {
         return TargetProto.create({
             level: this.level,
-            stats: this.stats.asArray(),
             mobType: this.mobType,
+            swingSpeed: this.getSwingSpeed(),
+            minBaseDamage: this.getMinBaseDamage(),
+            stats: this.stats.asArray(),
             debuffs: this.debuffs,
         });
     }
@@ -80,8 +104,10 @@ export class Target {
                 stats = stats.withStat(Stat.StatArmor, proto.armor);
             }
             this.setLevel(eventID, proto.level);
-            this.setStats(eventID, stats);
             this.setMobType(eventID, proto.mobType);
+            this.setSwingSpeed(eventID, proto.swingSpeed);
+            this.setMinBaseDamage(eventID, proto.minBaseDamage);
+            this.setStats(eventID, stats);
             this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
         });
     }
@@ -89,6 +115,8 @@ export class Target {
         return TargetProto.create({
             level: Mechanics.BOSS_LEVEL,
             mobType: MobType.MobTypeDemon,
+            swingSpeed: 2,
+            minBaseDamage: 5000,
             stats: Stats.fromMap({
                 [Stat.StatArmor]: 7683,
                 [Stat.StatBlockValue]: 54,

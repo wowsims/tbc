@@ -1031,6 +1031,10 @@ input, select {
   align-items: center;
 }
 
+.target-picker-section .input-label-div {
+  white-space: nowrap;
+}
+
 .popup {
   margin: 0 !important;
   position: absolute !important;

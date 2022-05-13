@@ -2125,12 +2125,14 @@ class Target$Type extends MessageType {
             { no: 4, name: "level", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "mob_type", kind: "enum", T: () => ["proto.MobType", MobType] },
             { no: 5, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 7, name: "min_base_damage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 8, name: "swing_speed", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 6, name: "tank_index", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "debuffs", kind: "message", T: () => Debuffs }
         ]);
     }
     create(value) {
-        const message = { armor: 0, level: 0, mobType: 0, stats: [], tankIndex: 0 };
+        const message = { armor: 0, level: 0, mobType: 0, stats: [], minBaseDamage: 0, swingSpeed: 0, tankIndex: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -2156,6 +2158,12 @@ class Target$Type extends MessageType {
                             message.stats.push(reader.double());
                     else
                         message.stats.push(reader.double());
+                    break;
+                case /* double min_base_damage */ 7:
+                    message.minBaseDamage = reader.double();
+                    break;
+                case /* double swing_speed */ 8:
+                    message.swingSpeed = reader.double();
                     break;
                 case /* int32 tank_index */ 6:
                     message.tankIndex = reader.int32();
@@ -2191,6 +2199,12 @@ class Target$Type extends MessageType {
                 writer.double(message.stats[i]);
             writer.join();
         }
+        /* double min_base_damage = 7; */
+        if (message.minBaseDamage !== 0)
+            writer.tag(7, WireType.Bit64).double(message.minBaseDamage);
+        /* double swing_speed = 8; */
+        if (message.swingSpeed !== 0)
+            writer.tag(8, WireType.Bit64).double(message.swingSpeed);
         /* int32 tank_index = 6; */
         if (message.tankIndex !== 0)
             writer.tag(6, WireType.Varint).int32(message.tankIndex);

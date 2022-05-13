@@ -460,6 +460,14 @@ export interface Target {
      */
     stats: number[];
     /**
+     * @generated from protobuf field: double min_base_damage = 7;
+     */
+    minBaseDamage: number;
+    /**
+     * @generated from protobuf field: double swing_speed = 8;
+     */
+    swingSpeed: number;
+    /**
      * Index in Raid.tanks indicating the player tanking this mob.
      * -1 or invalid index indicates not being tanked.
      *
