@@ -127,22 +127,10 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 	statModsLow[referenceStat] = defaultStatMod
 	statModsHigh[referenceStat] = defaultStatMod
 
-	for _, v := range statsToWeigh {
+	for _, stat := range statsToWeigh {
 		statMod := defaultStatMod
-		if v == stats.SpellHit || v == stats.MeleeHit {
-			// For spell/melee hit, always pick the direction which is gauranteed to
-			// not run into a hit cap.
-			if baseStats[v] < 80 {
-				statModsHigh[v] = statMod
-				statModsLow[v] = statMod
-			} else {
-				statModsHigh[v] = -statMod
-				statModsLow[v] = -statMod
-			}
-		} else {
-			statModsHigh[v] = statMod
-			statModsLow[v] = -statMod
-		}
+		statModsHigh[stat] = statMod
+		statModsLow[stat] = -statMod
 	}
 
 	for stat, _ := range statModsLow {
@@ -159,18 +147,33 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 
 	waitGroup.Wait()
 
+	for _, stat := range statsToWeigh {
+		if stat == stats.SpellHit || stat == stats.MeleeHit {
+			// Check for hard caps.
+			if resultHigh.Dps.Weights[stat] < 0.05 {
+				statModsHigh[stat] = 0
+			} else if baseStats[stat] > 80 {
+				// For spell/melee hit, don't use the high comparison if we might be anywhere
+				// remotely close to cap.
+				resultHigh.Dps.Weights[stat] = resultLow.Dps.Weights[stat]
+				statModsHigh[stat] = statModsLow[stat]
+			}
+		}
+	}
+
 	result := StatWeightsResult{}
 	for statIdx, _ := range statModsLow {
 		stat := stats.Stat(statIdx)
-		if statModsLow[stat] == 0 {
+		if statModsLow[stat] == 0 || statModsHigh[stat] == 0 {
 			continue
 		}
+
 		result.Dps.Weights[stat] = (resultLow.Dps.Weights[stat] + resultHigh.Dps.Weights[stat]) / 2
 	}
 
 	for statIdx, _ := range statModsLow {
 		stat := stats.Stat(statIdx)
-		if statModsLow[stat] == 0 {
+		if statModsLow[stat] == 0 || statModsHigh[stat] == 0 {
 			continue
 		}
 
