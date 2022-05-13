@@ -490,6 +490,9 @@ message Target {
 		MobType mob_type = 3;
     repeated double stats = 5;
 
+		double min_base_damage = 7;
+		double swing_speed = 8;
+
 		// Index in Raid.tanks indicating the player tanking this mob.
 		// -1 or invalid index indicates not being tanked.
     int32 tank_index = 6;

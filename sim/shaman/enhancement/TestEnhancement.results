@@ -965,8 +965,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1443.6405548669109
-  tps: 1027.597664439062
+  dps: 1374.8957665399148
+  tps: 978.6644423229163
  }
 }
 dps_results: {
@@ -993,8 +993,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 708.2140271242513
-  tps: 510.9776600438716
+  dps: 674.4895496421441
+  tps: 486.6453905179728
  }
 }
 dps_results: {

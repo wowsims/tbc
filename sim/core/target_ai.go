@@ -14,15 +14,18 @@ func (target *Target) initialize(config *proto.Target) {
 	if config == nil || target.CurrentTarget == nil {
 		return
 	}
-	target.EnableAutoAttacks(target, AutoAttackOptions{
-		MainHand: Weapon{
-			BaseDamageMin:  4192.05,
-			SwingSpeed:     2,
-			SwingDuration:  time.Second * 2,
-			CritMultiplier: 2,
-		},
-		AutoSwingMelee: true,
-	})
+
+	if config.SwingSpeed > 0 {
+		target.EnableAutoAttacks(target, AutoAttackOptions{
+			MainHand: Weapon{
+				BaseDamageMin:  config.MinBaseDamage,
+				SwingSpeed:     config.SwingSpeed,
+				SwingDuration:  time.Duration(float64(time.Second) * config.SwingSpeed),
+				CritMultiplier: 2,
+			},
+			AutoSwingMelee: true,
+		})
+	}
 
 	//target.gcdAction = &PendingAction{
 	//	Priority: ActionPriorityGCD,
