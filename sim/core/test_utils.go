@@ -31,20 +31,30 @@ var AverageDefaultSimTestOptions = &proto.SimOptions{
 const ShortDuration = 60
 const LongDuration = 300
 
-func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
-	var NoDebuffTarget = &proto.Target{
-		Level:   73,
-		Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
-		MobType: proto.MobType_MobTypeBeast,
-		Debuffs: &proto.Debuffs{},
-	}
+var DefaultTargetProto = proto.Target{
+	Level: 73,
+	Stats: stats.Stats{
+		stats.Armor:       7684,
+		stats.AttackPower: 320,
+		stats.BlockValue:  54,
+	}.ToFloatArray(),
+	MobType:       proto.MobType_MobTypeDemon,
+	SwingSpeed:    2,
+	MinBaseDamage: 4192.05,
+}
 
-	var FullDebuffTarget = &proto.Target{
-		Level:   73,
-		Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
-		MobType: proto.MobType_MobTypeDemon,
-		Debuffs: debuffs,
-	}
+func NewDefaultTargetWithDebuffs(debuffs *proto.Debuffs) *proto.Target {
+	var target = &proto.Target{}
+	*target = DefaultTargetProto
+	target.Debuffs = debuffs
+	return target
+}
+
+func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
+	var NoDebuffTarget = &proto.Target{}
+	*NoDebuffTarget = DefaultTargetProto
+
+	var FullDebuffTarget = NewDefaultTargetWithDebuffs(debuffs)
 
 	multipleFullDebuffTargets := []*proto.Target{}
 	for i := 0; i < 20; i++ {
@@ -94,17 +104,14 @@ func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
 }
 
 func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs, variation float64) *proto.Encounter {
+	var FullDebuffTarget = NewDefaultTargetWithDebuffs(debuffs)
+
 	return &proto.Encounter{
 		Duration:          LongDuration,
 		DurationVariation: variation,
 		ExecuteProportion: 0.2,
 		Targets: []*proto.Target{
-			&proto.Target{
-				Level:   73,
-				Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
-				MobType: proto.MobType_MobTypeDemon,
-				Debuffs: debuffs,
-			},
+			FullDebuffTarget,
 		},
 	}
 }

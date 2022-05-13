@@ -190,6 +190,25 @@ class TargetPicker extends Component {
 				},
 			});
 		});
+
+		new NumberPicker(section3, modTarget, {
+			label: 'Swing Speed',
+			labelTooltip: 'Time in seconds between auto attacks. Set to 0 to disable auto attacks.',
+			changedEvent: (target: Target) => target.propChangeEmitter,
+			getValue: (target: Target) => target.getSwingSpeed(),
+			setValue: (eventID: EventID, target: Target, newValue: number) => {
+				target.setSwingSpeed(eventID, newValue);
+			},
+		});
+		new NumberPicker(section3, modTarget, {
+			label: 'Min Base Damage',
+			labelTooltip: 'Base damage for auto attacks, i.e. lowest roll with 0 AP against a 0-armor Player.',
+			changedEvent: (target: Target) => target.propChangeEmitter,
+			getValue: (target: Target) => target.getMinBaseDamage(),
+			setValue: (eventID: EventID, target: Target, newValue: number) => {
+				target.setMinBaseDamage(eventID, newValue);
+			},
+		});
 	}
 }
 

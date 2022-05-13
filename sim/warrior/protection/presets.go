@@ -1,9 +1,9 @@
 package protection
 
 import (
+	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var ImpaleProtTalents = &proto.WarriorTalents{
@@ -89,10 +89,7 @@ var FullDebuffs = &proto.Debuffs{
 	ScorpidSting:              true,
 }
 
-var FullDebuffTarget = &proto.Target{
-	Debuffs: FullDebuffs,
-	Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
-}
+var FullDebuffTarget = core.NewDefaultTargetWithDebuffs(FullDebuffs)
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{

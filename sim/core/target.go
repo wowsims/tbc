@@ -67,12 +67,6 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	if options.Stats != nil {
 		copy(unitStats[:], options.Stats[:])
 	}
-	if unitStats[stats.BlockValue] == 0 {
-		unitStats[stats.BlockValue] = 54 // Not thoroughly tested for non-bosses.
-	}
-	if unitStats[stats.AttackPower] == 0 {
-		unitStats[stats.AttackPower] = 320
-	}
 
 	target := &Target{
 		Unit: Unit{

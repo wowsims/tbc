@@ -1243,8 +1243,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-Adaptive-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1506.34361838124
-  tps: 1257.3129726212346
+  dps: 1434.6129698868954
+  tps: 1197.4409263059374
  }
 }
 dps_results: {
@@ -1271,8 +1271,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-Adaptive-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 754.3264687716396
-  tps: 622.5272087145948
+  dps: 718.4061607348953
+  tps: 592.8830559186619
  }
 }
 dps_results: {
@@ -1299,8 +1299,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcast-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1515.3435023614618
-  tps: 1265.3958352960747
+  dps: 1443.1842879632966
+  tps: 1205.1388907581663
  }
 }
 dps_results: {
@@ -1327,8 +1327,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcast-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 631.7564351004497
-  tps: 529.121745421656
+  dps: 601.6727953337618
+  tps: 503.92547183014835
  }
 }
 dps_results: {
@@ -1355,8 +1355,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcastNoBuffs-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1308.7011792153876
-  tps: 1093.8633528507232
+  dps: 1246.3820754432268
+  tps: 1041.774621762593
  }
 }
 dps_results: {
@@ -1383,8 +1383,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-CLOnClearcastNoBuffs-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 504.682388967107
-  tps: 423.3663857550294
+  dps: 480.64989425438745
+  tps: 403.20608167145656
  }
 }
 dps_results: {
@@ -1411,8 +1411,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-Fixed3LBCL-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1453.1951017643003
-  tps: 1213.2079599756007
+  dps: 1383.9953350136193
+  tps: 1155.436152357715
  }
 }
 dps_results: {
@@ -1439,8 +1439,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-Fixed3LBCL-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 696.0350835194539
-  tps: 579.6176069805738
+  dps: 662.8905557328134
+  tps: 552.0167685529274
  }
 }
 dps_results: {
@@ -1467,8 +1467,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-LBOnly-FullBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 1461.2714518667249
-  tps: 1203.0479927398508
+  dps: 1391.6870970159277
+  tps: 1145.7599930855722
  }
 }
 dps_results: {
@@ -1495,8 +1495,8 @@ dps_results: {
 dps_results: {
  key: "TestElemental-Settings-Troll10-P1-LBOnly-NoBuffs-LongSingleTargetNoDebuffs"
  value: {
-  dps: 747.4770656761602
-  tps: 615.7038827024791
+  dps: 711.882919691581
+  tps: 586.3846501928372
  }
 }
 dps_results: {
