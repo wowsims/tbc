@@ -167,7 +167,7 @@ func (warlock *Warlock) registerCurseOfAgonySpell() {
 				if spellEffect.Landed() {
 					warlock.CurseOfAgonyDot.Apply(sim)
 				}
-				if warlock.AmplifyCurseAura.IsActive() {
+				if warlock.AmplifyCurseAura != nil && warlock.AmplifyCurseAura.IsActive() {
 					warlock.AmplifyCurseAura.Deactivate(sim)
 				}
 			},
@@ -240,7 +240,7 @@ func (warlock *Warlock) registerCurseOfDoomSpell() {
 				if spellEffect.Landed() {
 					warlock.CurseOfDoomDot.Apply(sim)
 				}
-				if warlock.AmplifyCurseAura.IsActive() {
+				if warlock.AmplifyCurseAura != nil && warlock.AmplifyCurseAura.IsActive() {
 					warlock.AmplifyCurseAura.Deactivate(sim)
 				}
 			},
