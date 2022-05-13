@@ -198,6 +198,16 @@ enum GemColor {
     GemColorPrismatic = 8;
 }
 
+enum SpellSchool {
+    SpellSchoolPhysical = 0;
+    SpellSchoolArcane = 1;
+    SpellSchoolFire = 2;
+    SpellSchoolFrost = 3;
+    SpellSchoolHoly = 4;
+    SpellSchoolNature = 5;
+    SpellSchoolShadow = 6;
+}
+
 enum TristateEffect {
     TristateEffectMissing = 0;
     TristateEffectRegular = 1;
@@ -490,8 +500,14 @@ message Target {
 		MobType mob_type = 3;
     repeated double stats = 5;
 
+		// Auto attack parameters.
 		double min_base_damage = 7;
 		double swing_speed = 8;
+		bool dual_wield = 9;
+		bool dual_wield_penalty = 10;
+		bool can_crush = 11;
+		bool parry_haste = 12;
+		SpellSchool spell_school = 13; // Allows elemental attacks.
 
 		// Index in Raid.tanks indicating the player tanking this mob.
 		// -1 or invalid index indicates not being tanked.

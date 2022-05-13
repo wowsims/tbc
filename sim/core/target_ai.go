@@ -16,15 +16,20 @@ func (target *Target) initialize(config *proto.Target) {
 	}
 
 	if config.SwingSpeed > 0 {
-		target.EnableAutoAttacks(target, AutoAttackOptions{
+		aaOptions := AutoAttackOptions{
 			MainHand: Weapon{
 				BaseDamageMin:  config.MinBaseDamage,
 				SwingSpeed:     config.SwingSpeed,
 				SwingDuration:  time.Duration(float64(time.Second) * config.SwingSpeed),
 				CritMultiplier: 2,
+				SpellSchool:    SpellSchoolFromProto(config.SpellSchool),
 			},
 			AutoSwingMelee: true,
-		})
+		}
+		if config.DualWield {
+			aaOptions.OffHand = aaOptions.MainHand
+		}
+		target.EnableAutoAttacks(target, aaOptions)
 	}
 
 	//target.gcdAction = &PendingAction{

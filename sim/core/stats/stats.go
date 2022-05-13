@@ -465,6 +465,8 @@ type PseudoStats struct {
 	CanParry bool
 	CanCrush bool
 
+	ParryHaste bool
+
 	BonusMeleeAttackPower  float64 // Imp Hunters mark, EW
 	BonusRangedAttackPower float64 // Hunters mark, EW
 	BonusCritRating        float64 // Imp Judgement of the Crusader
