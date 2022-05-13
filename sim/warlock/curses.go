@@ -141,7 +141,6 @@ func (warlock *Warlock) registerCurseOfAgonySpell() {
 		effect.BaseDamage = core.WrapBaseDamageConfig(effect.BaseDamage, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
 			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 				if warlock.AmplifyCurseAura.IsActive() {
-					warlock.AmplifyCurseAura.Deactivate(sim)
 					return oldCalculator(sim, hitEffect, spell) * 1.5
 				} else {
 					return oldCalculator(sim, hitEffect, spell)
@@ -164,8 +163,16 @@ func (warlock *Warlock) registerCurseOfAgonySpell() {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
-			OnSpellHitDealt:  applyDotOnLanded(&warlock.CurseOfAgonyDot),
-			ProcMask:         core.ProcMaskEmpty,
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+				warlock.CurseOfAgonyDot.Apply(sim)
+				if warlock.AmplifyCurseAura.IsActive() {
+					warlock.AmplifyCurseAura.Deactivate(sim)
+				}
+			},
+			ProcMask: core.ProcMaskEmpty,
 		}),
 	})
 	warlock.CurseOfAgonyDot = core.NewDot(core.Dot{
@@ -203,7 +210,6 @@ func (warlock *Warlock) registerCurseOfDoomSpell() {
 		effect.BaseDamage = core.WrapBaseDamageConfig(effect.BaseDamage, func(oldCalculator core.BaseDamageCalculator) core.BaseDamageCalculator {
 			return func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 				if warlock.AmplifyCurseAura.IsActive() {
-					warlock.AmplifyCurseAura.Deactivate(sim)
 					return oldCalculator(sim, hitEffect, spell) * 1.5
 				} else {
 					return oldCalculator(sim, hitEffect, spell)
@@ -231,8 +237,16 @@ func (warlock *Warlock) registerCurseOfDoomSpell() {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
-			OnSpellHitDealt:  applyDotOnLanded(&warlock.CurseOfDoomDot),
-			ProcMask:         core.ProcMaskEmpty,
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+				warlock.CurseOfDoomDot.Apply(sim)
+				if warlock.AmplifyCurseAura.IsActive() {
+					warlock.AmplifyCurseAura.Deactivate(sim)
+				}
+			},
+			ProcMask: core.ProcMaskEmpty,
 		}),
 	})
 
