@@ -38,9 +38,12 @@ var DefaultTargetProto = proto.Target{
 		stats.AttackPower: 320,
 		stats.BlockValue:  54,
 	}.ToFloatArray(),
-	MobType:       proto.MobType_MobTypeDemon,
+	MobType: proto.MobType_MobTypeDemon,
+
 	SwingSpeed:    2,
 	MinBaseDamage: 4192.05,
+	CanCrush:      true,
+	ParryHaste:    true,
 }
 
 func NewDefaultTargetWithDebuffs(debuffs *proto.Debuffs) *proto.Target {

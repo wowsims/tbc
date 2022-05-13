@@ -294,6 +294,8 @@ func (character *Character) Finalize() {
 	character.StatDependencyManager.Finalize()
 	character.stats = character.ApplyStatDependencies(character.stats)
 
+	character.PseudoStats.ParryHaste = character.PseudoStats.CanParry
+
 	character.Unit.finalize()
 
 	character.majorCooldownManager.finalize(character)
