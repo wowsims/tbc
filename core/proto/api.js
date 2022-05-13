@@ -1781,6 +1781,53 @@ export const StatWeightsRequest = new StatWeightsRequest$Type();
 class StatWeightsResult$Type extends MessageType {
     constructor() {
         super("proto.StatWeightsResult", [
+            { no: 1, name: "dps", kind: "message", T: () => StatWeightValues }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.StatWeightValues dps */ 1:
+                    message.dps = StatWeightValues.internalBinaryRead(reader, reader.uint32(), options, message.dps);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.StatWeightValues dps = 1; */
+        if (message.dps)
+            StatWeightValues.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.StatWeightsResult
+ */
+export const StatWeightsResult = new StatWeightsResult$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class StatWeightValues$Type extends MessageType {
+    constructor() {
+        super("proto.StatWeightValues", [
             { no: 1, name: "weights", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 2, name: "weights_stdev", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "ep_values", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
@@ -1874,9 +1921,9 @@ class StatWeightsResult$Type extends MessageType {
     }
 }
 /**
- * @generated MessageType for protobuf message proto.StatWeightsResult
+ * @generated MessageType for protobuf message proto.StatWeightValues
  */
-export const StatWeightsResult = new StatWeightsResult$Type();
+export const StatWeightValues = new StatWeightValues$Type();
 // @generated message type with reflection information, may provide speed optimized methods
 class AsyncAPIResult$Type extends MessageType {
     constructor() {

@@ -30,20 +30,21 @@ class StatWeightsResultsManager {
     }
     setSimResult(iterations, epStats, epReferenceStat, result) {
         if (epReferenceStat == Stat.StatSpellPower) {
-            result.epValues.forEach((value, index) => {
+            // Values for a school's power should never exceed the value for regular spell power.
+            result.dps.epValues.forEach((value, index) => {
                 if (index == Stat.StatArcaneSpellPower ||
                     index == Stat.StatFireSpellPower ||
                     index == Stat.StatFrostSpellPower ||
                     index == Stat.StatHolySpellPower ||
                     index == Stat.StatNatureSpellPower ||
                     index == Stat.StatShadowSpellPower) {
-                    if (value > result.epValues[epReferenceStat]) {
-                        const diff = value - result.epValues[epReferenceStat];
-                        result.epValues[index] = result.epValues[epReferenceStat];
-                        result.epValuesStdev[index] -= diff;
-                        const wdiff = result.weights[index] - result.weights[epReferenceStat];
-                        result.weights[index] = result.weights[epReferenceStat];
-                        result.weightsStdev[index] -= wdiff;
+                    if (value > result.dps.epValues[Stat.StatSpellPower]) {
+                        const diff = value - result.dps.epValues[Stat.StatSpellPower];
+                        result.dps.epValues[index] = result.dps.epValues[Stat.StatSpellPower];
+                        result.dps.epValuesStdev[index] -= diff;
+                        const wdiff = result.dps.weights[index] - result.dps.weights[Stat.StatSpellPower];
+                        result.dps.weights[index] = result.dps.weights[Stat.StatSpellPower];
+                        result.dps.weightsStdev[index] -= wdiff;
                     }
                 }
             });
@@ -57,10 +58,10 @@ class StatWeightsResultsManager {
 				<table class="results-ep-table">
 				` + epStats.map(stat => `<tr>
 							<td>${statNames[stat]}:</td>
-							<td>${result.weights[stat].toFixed(2)}</td>
-							<td>${stDevToConf90(result.weightsStdev[stat], iterations).toFixed(2)}</td>
-							<td>${result.epValues[stat].toFixed(2)}</td>
-							<td>${stDevToConf90(result.epValuesStdev[stat], iterations).toFixed(2)}</td>
+							<td>${result.dps.weights[stat].toFixed(2)}</td>
+							<td>${stDevToConf90(result.dps.weightsStdev[stat], iterations).toFixed(2)}</td>
+							<td>${result.dps.epValues[stat].toFixed(2)}</td>
+							<td>${stDevToConf90(result.dps.epValuesStdev[stat], iterations).toFixed(2)}</td>
 							</tr>`)
             .join('')
             + '</table></div>');

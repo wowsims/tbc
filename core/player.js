@@ -143,7 +143,7 @@ export class Player {
     }
     async computeStatWeights(eventID, epStats, epReferenceStat, onProgress) {
         const result = await this.sim.statWeights(this, epStats, epReferenceStat, onProgress);
-        this.setEpWeights(eventID, new Stats(result.epValues));
+        this.setEpWeights(eventID, new Stats(result.dps.epValues));
         return result;
     }
     getCurrentStats() {

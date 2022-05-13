@@ -664,6 +664,15 @@ export interface StatWeightsRequest {
  */
 export interface StatWeightsResult {
     /**
+     * @generated from protobuf field: proto.StatWeightValues dps = 1;
+     */
+    dps?: StatWeightValues;
+}
+/**
+ * @generated from protobuf message proto.StatWeightValues
+ */
+export interface StatWeightValues {
+    /**
      * @generated from protobuf field: repeated double weights = 1;
      */
     weights: number[];
@@ -998,6 +1007,16 @@ declare class StatWeightsResult$Type extends MessageType<StatWeightsResult> {
  * @generated MessageType for protobuf message proto.StatWeightsResult
  */
 export declare const StatWeightsResult: StatWeightsResult$Type;
+declare class StatWeightValues$Type extends MessageType<StatWeightValues> {
+    constructor();
+    create(value?: PartialMessage<StatWeightValues>): StatWeightValues;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: StatWeightValues): StatWeightValues;
+    internalBinaryWrite(message: StatWeightValues, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.StatWeightValues
+ */
+export declare const StatWeightValues: StatWeightValues$Type;
 declare class AsyncAPIResult$Type extends MessageType<AsyncAPIResult> {
     constructor();
     create(value?: PartialMessage<AsyncAPIResult>): AsyncAPIResult;
