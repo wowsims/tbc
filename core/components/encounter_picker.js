@@ -1,8 +1,10 @@
 import { EncounterType } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
+import { SpellSchool } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Target } from '/tbc/core/target.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
+import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { ListPicker } from '/tbc/core/components/list_picker.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
@@ -10,6 +12,7 @@ import { statNames } from '/tbc/core/proto_utils/names.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 import { Component } from './component.js';
 import { Popup } from './popup.js';
+import * as Mechanics from '/tbc/core/constants/mechanics.js';
 export class EncounterPicker extends Component {
     constructor(parent, modEncounter, config) {
         super(parent, 'encounter-picker-root');
@@ -151,6 +154,20 @@ class TargetPicker extends Component {
                 target.setMobType(eventID, newValue);
             },
         });
+        new EnumPicker(section1, modTarget, {
+            label: 'Tanked By',
+            values: [
+                { name: 'None', value: -1 },
+                { name: 'Main Tank', value: 0 },
+                { name: 'Tank 2', value: 1 },
+                { name: 'Tank 3', value: 2 },
+            ],
+            changedEvent: (target) => target.propChangeEmitter,
+            getValue: (target) => target.getTankIndex(),
+            setValue: (eventID, target, newValue) => {
+                target.setTankIndex(eventID, newValue);
+            },
+        });
         ALL_TARGET_STATS.forEach(stat => {
             new NumberPicker(section2, modTarget, {
                 label: statNames[stat],
@@ -177,6 +194,52 @@ class TargetPicker extends Component {
             getValue: (target) => target.getMinBaseDamage(),
             setValue: (eventID, target, newValue) => {
                 target.setMinBaseDamage(eventID, newValue);
+            },
+        });
+        new BooleanPicker(section3, modTarget, {
+            label: 'Dual Wield',
+            labelTooltip: 'Uses 2 separate weapons to attack.',
+            changedEvent: (target) => target.propChangeEmitter,
+            getValue: (target) => target.getDualWield(),
+            setValue: (eventID, target, newValue) => {
+                target.setDualWield(eventID, newValue);
+            },
+        });
+        new BooleanPicker(section3, modTarget, {
+            label: 'Can Crush',
+            labelTooltip: 'Whether crushing blows should be included in the attack table. Only applies to level 73 enemies.',
+            changedEvent: (target) => target.changeEmitter,
+            getValue: (target) => target.getCanCrush(),
+            setValue: (eventID, target, newValue) => {
+                target.setCanCrush(eventID, newValue);
+            },
+            enableWhen: (target) => target.getLevel() == Mechanics.BOSS_LEVEL,
+        });
+        new BooleanPicker(section3, modTarget, {
+            label: 'Parry Haste',
+            labelTooltip: 'Whether this enemy will gain parry haste when parrying attacks.',
+            changedEvent: (target) => target.propChangeEmitter,
+            getValue: (target) => target.getParryHaste(),
+            setValue: (eventID, target, newValue) => {
+                target.setParryHaste(eventID, newValue);
+            },
+        });
+        new EnumPicker(section3, modTarget, {
+            label: 'Spell School',
+            labelTooltip: 'Type of damage caused by auto attacks. This is usually Physical, but some enemies have elemental attacks.',
+            values: [
+                { name: 'Physical', value: SpellSchool.SpellSchoolPhysical },
+                { name: 'Arcane', value: SpellSchool.SpellSchoolArcane },
+                { name: 'Fire', value: SpellSchool.SpellSchoolFire },
+                { name: 'Frost', value: SpellSchool.SpellSchoolFrost },
+                { name: 'Holy', value: SpellSchool.SpellSchoolHoly },
+                { name: 'Nature', value: SpellSchool.SpellSchoolNature },
+                { name: 'Shadow', value: SpellSchool.SpellSchoolShadow },
+            ],
+            changedEvent: (target) => target.levelChangeEmitter,
+            getValue: (target) => target.getSpellSchool(),
+            setValue: (eventID, target, newValue) => {
+                target.setSpellSchool(eventID, newValue);
             },
         });
     }

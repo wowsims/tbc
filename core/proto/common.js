@@ -706,6 +706,40 @@ export var GemColor;
     GemColor[GemColor["GemColorPrismatic"] = 8] = "GemColorPrismatic";
 })(GemColor || (GemColor = {}));
 /**
+ * @generated from protobuf enum proto.SpellSchool
+ */
+export var SpellSchool;
+(function (SpellSchool) {
+    /**
+     * @generated from protobuf enum value: SpellSchoolPhysical = 0;
+     */
+    SpellSchool[SpellSchool["SpellSchoolPhysical"] = 0] = "SpellSchoolPhysical";
+    /**
+     * @generated from protobuf enum value: SpellSchoolArcane = 1;
+     */
+    SpellSchool[SpellSchool["SpellSchoolArcane"] = 1] = "SpellSchoolArcane";
+    /**
+     * @generated from protobuf enum value: SpellSchoolFire = 2;
+     */
+    SpellSchool[SpellSchool["SpellSchoolFire"] = 2] = "SpellSchoolFire";
+    /**
+     * @generated from protobuf enum value: SpellSchoolFrost = 3;
+     */
+    SpellSchool[SpellSchool["SpellSchoolFrost"] = 3] = "SpellSchoolFrost";
+    /**
+     * @generated from protobuf enum value: SpellSchoolHoly = 4;
+     */
+    SpellSchool[SpellSchool["SpellSchoolHoly"] = 4] = "SpellSchoolHoly";
+    /**
+     * @generated from protobuf enum value: SpellSchoolNature = 5;
+     */
+    SpellSchool[SpellSchool["SpellSchoolNature"] = 5] = "SpellSchoolNature";
+    /**
+     * @generated from protobuf enum value: SpellSchoolShadow = 6;
+     */
+    SpellSchool[SpellSchool["SpellSchoolShadow"] = 6] = "SpellSchoolShadow";
+})(SpellSchool || (SpellSchool = {}));
+/**
  * @generated from protobuf enum proto.TristateEffect
  */
 export var TristateEffect;
@@ -2127,12 +2161,17 @@ class Target$Type extends MessageType {
             { no: 5, name: "stats", kind: "scalar", repeat: 1 /*RepeatType.PACKED*/, T: 1 /*ScalarType.DOUBLE*/ },
             { no: 7, name: "min_base_damage", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 8, name: "swing_speed", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
+            { no: 9, name: "dual_wield", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 10, name: "dual_wield_penalty", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 11, name: "can_crush", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 12, name: "parry_haste", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 13, name: "spell_school", kind: "enum", T: () => ["proto.SpellSchool", SpellSchool] },
             { no: 6, name: "tank_index", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "debuffs", kind: "message", T: () => Debuffs }
         ]);
     }
     create(value) {
-        const message = { armor: 0, level: 0, mobType: 0, stats: [], minBaseDamage: 0, swingSpeed: 0, tankIndex: 0 };
+        const message = { armor: 0, level: 0, mobType: 0, stats: [], minBaseDamage: 0, swingSpeed: 0, dualWield: false, dualWieldPenalty: false, canCrush: false, parryHaste: false, spellSchool: 0, tankIndex: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -2164,6 +2203,21 @@ class Target$Type extends MessageType {
                     break;
                 case /* double swing_speed */ 8:
                     message.swingSpeed = reader.double();
+                    break;
+                case /* bool dual_wield */ 9:
+                    message.dualWield = reader.bool();
+                    break;
+                case /* bool dual_wield_penalty */ 10:
+                    message.dualWieldPenalty = reader.bool();
+                    break;
+                case /* bool can_crush */ 11:
+                    message.canCrush = reader.bool();
+                    break;
+                case /* bool parry_haste */ 12:
+                    message.parryHaste = reader.bool();
+                    break;
+                case /* proto.SpellSchool spell_school */ 13:
+                    message.spellSchool = reader.int32();
                     break;
                 case /* int32 tank_index */ 6:
                     message.tankIndex = reader.int32();
@@ -2205,6 +2259,21 @@ class Target$Type extends MessageType {
         /* double swing_speed = 8; */
         if (message.swingSpeed !== 0)
             writer.tag(8, WireType.Bit64).double(message.swingSpeed);
+        /* bool dual_wield = 9; */
+        if (message.dualWield !== false)
+            writer.tag(9, WireType.Varint).bool(message.dualWield);
+        /* bool dual_wield_penalty = 10; */
+        if (message.dualWieldPenalty !== false)
+            writer.tag(10, WireType.Varint).bool(message.dualWieldPenalty);
+        /* bool can_crush = 11; */
+        if (message.canCrush !== false)
+            writer.tag(11, WireType.Varint).bool(message.canCrush);
+        /* bool parry_haste = 12; */
+        if (message.parryHaste !== false)
+            writer.tag(12, WireType.Varint).bool(message.parryHaste);
+        /* proto.SpellSchool spell_school = 13; */
+        if (message.spellSchool !== 0)
+            writer.tag(13, WireType.Varint).int32(message.spellSchool);
         /* int32 tank_index = 6; */
         if (message.tankIndex !== 0)
             writer.tag(6, WireType.Varint).int32(message.tankIndex);

@@ -460,6 +460,8 @@ export interface Target {
      */
     stats: number[];
     /**
+     * Auto attack parameters.
+     *
      * @generated from protobuf field: double min_base_damage = 7;
      */
     minBaseDamage: number;
@@ -467,6 +469,26 @@ export interface Target {
      * @generated from protobuf field: double swing_speed = 8;
      */
     swingSpeed: number;
+    /**
+     * @generated from protobuf field: bool dual_wield = 9;
+     */
+    dualWield: boolean;
+    /**
+     * @generated from protobuf field: bool dual_wield_penalty = 10;
+     */
+    dualWieldPenalty: boolean;
+    /**
+     * @generated from protobuf field: bool can_crush = 11;
+     */
+    canCrush: boolean;
+    /**
+     * @generated from protobuf field: bool parry_haste = 12;
+     */
+    parryHaste: boolean;
+    /**
+     * @generated from protobuf field: proto.SpellSchool spell_school = 13;
+     */
+    spellSchool: SpellSchool;
     /**
      * Index in Raid.tanks indicating the player tanking this mob.
      * -1 or invalid index indicates not being tanked.
@@ -1476,6 +1498,39 @@ export declare enum GemColor {
      * @generated from protobuf enum value: GemColorPrismatic = 8;
      */
     GemColorPrismatic = 8
+}
+/**
+ * @generated from protobuf enum proto.SpellSchool
+ */
+export declare enum SpellSchool {
+    /**
+     * @generated from protobuf enum value: SpellSchoolPhysical = 0;
+     */
+    SpellSchoolPhysical = 0,
+    /**
+     * @generated from protobuf enum value: SpellSchoolArcane = 1;
+     */
+    SpellSchoolArcane = 1,
+    /**
+     * @generated from protobuf enum value: SpellSchoolFire = 2;
+     */
+    SpellSchoolFire = 2,
+    /**
+     * @generated from protobuf enum value: SpellSchoolFrost = 3;
+     */
+    SpellSchoolFrost = 3,
+    /**
+     * @generated from protobuf enum value: SpellSchoolHoly = 4;
+     */
+    SpellSchoolHoly = 4,
+    /**
+     * @generated from protobuf enum value: SpellSchoolNature = 5;
+     */
+    SpellSchoolNature = 5,
+    /**
+     * @generated from protobuf enum value: SpellSchoolShadow = 6;
+     */
+    SpellSchoolShadow = 6
 }
 /**
  * @generated from protobuf enum proto.TristateEffect
