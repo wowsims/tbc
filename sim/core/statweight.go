@@ -11,11 +11,30 @@ import (
 	googleProto "google.golang.org/protobuf/proto"
 )
 
-type StatWeightsResult struct {
+type StatWeightValues struct {
 	Weights       stats.Stats
 	WeightsStdev  stats.Stats
 	EpValues      stats.Stats
 	EpValuesStdev stats.Stats
+}
+
+func (swv StatWeightValues) ToProto() *proto.StatWeightValues {
+	return &proto.StatWeightValues{
+		Weights:       swv.Weights[:],
+		WeightsStdev:  swv.WeightsStdev[:],
+		EpValues:      swv.EpValues[:],
+		EpValuesStdev: swv.EpValuesStdev[:],
+	}
+}
+
+type StatWeightsResult struct {
+	Dps StatWeightValues
+}
+
+func (swr StatWeightsResult) ToProto() *proto.StatWeightsResult {
+	return &proto.StatWeightsResult{
+		Dps: swr.Dps.ToProto(),
+	}
 }
 
 func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, referenceStat stats.Stat, progress chan *proto.ProgressMetrics) StatWeightsResult {
@@ -92,10 +111,10 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 		dpsDiff := (dpsMetrics.Avg - baselineDpsMetrics.Avg) / value
 
 		if isLow {
-			resultLow.Weights[stat] = dpsDiff
+			resultLow.Dps.Weights[stat] = dpsDiff
 			dpsHistsLow[stat] = dpsMetrics.Hist
 		} else {
-			resultHigh.Weights[stat] = dpsDiff
+			resultHigh.Dps.Weights[stat] = dpsDiff
 			dpsHistsHigh[stat] = dpsMetrics.Hist
 		}
 	}
@@ -146,7 +165,7 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 		if statModsLow[stat] == 0 {
 			continue
 		}
-		result.Weights[stat] = (resultLow.Weights[stat] + resultHigh.Weights[stat]) / 2
+		result.Dps.Weights[stat] = (resultLow.Dps.Weights[stat] + resultHigh.Dps.Weights[stat]) / 2
 	}
 
 	for statIdx, _ := range statModsLow {
@@ -155,15 +174,15 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 			continue
 		}
 
-		result.EpValues[stat] = result.Weights[stat] / result.Weights[referenceStat]
+		result.Dps.EpValues[stat] = result.Dps.Weights[stat] / result.Dps.Weights[referenceStat]
 
 		weightStdevLow := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsLow[stat], dpsHistsLow[stat], baselineDpsMetrics.Hist, nil, statModsLow[referenceStat])
 		weightStdevHigh := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsHigh[stat], dpsHistsHigh[stat], baselineDpsMetrics.Hist, nil, statModsHigh[referenceStat])
-		result.WeightsStdev[stat] = (weightStdevLow + weightStdevHigh) / 2
+		result.Dps.WeightsStdev[stat] = (weightStdevLow + weightStdevHigh) / 2
 
 		epStdevLow := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsLow[stat], dpsHistsLow[stat], baselineDpsMetrics.Hist, dpsHistsLow[referenceStat], statModsLow[referenceStat])
 		epStdevHigh := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsHigh[stat], dpsHistsHigh[stat], baselineDpsMetrics.Hist, dpsHistsHigh[referenceStat], statModsHigh[referenceStat])
-		result.EpValuesStdev[stat] = (epStdevLow + epStdevHigh) / 2
+		result.Dps.EpValuesStdev[stat] = (epStdevLow + epStdevHigh) / 2
 	}
 
 	return result

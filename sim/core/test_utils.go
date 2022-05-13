@@ -141,7 +141,7 @@ func StatWeightsTest(label string, t *testing.T, _swr *proto.StatWeightsRequest,
 	swr.SimOptions.Iterations = 5000
 
 	result := StatWeights(swr)
-	resultWeights := stats.FromFloatArray(result.Weights)
+	resultWeights := stats.FromFloatArray(result.Dps.Weights)
 
 	const tolerance = 0.05
 	if !resultWeights.EqualsWithTolerance(expectedStatWeights, tolerance) {

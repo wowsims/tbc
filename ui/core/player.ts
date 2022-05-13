@@ -225,7 +225,7 @@ export class Player<SpecType extends Spec> {
 
 	async computeStatWeights(eventID: EventID, epStats: Array<Stat>, epReferenceStat: Stat, onProgress: Function): Promise<StatWeightsResult> {
 		const result = await this.sim.statWeights(this, epStats, epReferenceStat, onProgress);
-		this.setEpWeights(eventID, new Stats(result.epValues));
+		this.setEpWeights(eventID, new Stats(result.dps!.epValues));
 		return result;
 	}
 

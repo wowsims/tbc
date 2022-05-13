@@ -265,10 +265,13 @@ message StatWeightsRequest {
     Stat ep_reference_stat = 7;
 }
 message StatWeightsResult {
-    repeated double weights = 1;
-    repeated double weights_stdev = 2;
-    repeated double ep_values = 3;
-    repeated double ep_values_stdev = 4;
+	StatWeightValues dps = 1;
+}
+message StatWeightValues {
+	repeated double weights = 1;
+	repeated double weights_stdev = 2;
+	repeated double ep_values = 3;
+	repeated double ep_values_stdev = 4;
 }
 
 message AsyncAPIResult {
