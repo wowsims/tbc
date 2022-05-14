@@ -1781,7 +1781,9 @@ export const StatWeightsRequest = new StatWeightsRequest$Type();
 class StatWeightsResult$Type extends MessageType {
     constructor() {
         super("proto.StatWeightsResult", [
-            { no: 1, name: "dps", kind: "message", T: () => StatWeightValues }
+            { no: 1, name: "dps", kind: "message", T: () => StatWeightValues },
+            { no: 2, name: "tps", kind: "message", T: () => StatWeightValues },
+            { no: 3, name: "dtps", kind: "message", T: () => StatWeightValues }
         ]);
     }
     create(value) {
@@ -1799,6 +1801,12 @@ class StatWeightsResult$Type extends MessageType {
                 case /* proto.StatWeightValues dps */ 1:
                     message.dps = StatWeightValues.internalBinaryRead(reader, reader.uint32(), options, message.dps);
                     break;
+                case /* proto.StatWeightValues tps */ 2:
+                    message.tps = StatWeightValues.internalBinaryRead(reader, reader.uint32(), options, message.tps);
+                    break;
+                case /* proto.StatWeightValues dtps */ 3:
+                    message.dtps = StatWeightValues.internalBinaryRead(reader, reader.uint32(), options, message.dtps);
+                    break;
                 default:
                     let u = options.readUnknownField;
                     if (u === "throw")
@@ -1814,6 +1822,12 @@ class StatWeightsResult$Type extends MessageType {
         /* proto.StatWeightValues dps = 1; */
         if (message.dps)
             StatWeightValues.internalBinaryWrite(message.dps, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.StatWeightValues tps = 2; */
+        if (message.tps)
+            StatWeightValues.internalBinaryWrite(message.tps, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.StatWeightValues dtps = 3; */
+        if (message.dtps)
+            StatWeightValues.internalBinaryWrite(message.dtps, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

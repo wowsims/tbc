@@ -667,6 +667,14 @@ export interface StatWeightsResult {
      * @generated from protobuf field: proto.StatWeightValues dps = 1;
      */
     dps?: StatWeightValues;
+    /**
+     * @generated from protobuf field: proto.StatWeightValues tps = 2;
+     */
+    tps?: StatWeightValues;
+    /**
+     * @generated from protobuf field: proto.StatWeightValues dtps = 3;
+     */
+    dtps?: StatWeightValues;
 }
 /**
  * @generated from protobuf message proto.StatWeightValues
