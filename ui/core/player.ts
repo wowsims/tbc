@@ -44,7 +44,6 @@ import {
 	getMetaGemEffectEP,
 	newRaidTarget,
 	raceToFaction,
-	specEPTransforms,
 	specToClass,
 	specToEligibleRaces,
 	specTypeFunctions,
@@ -88,7 +87,6 @@ export class Player<SpecType extends Spec> {
 	readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
 
 	private epWeights: Stats = new Stats();
-	private epWeightsForCalc: Stats = new Stats();
 	private currentStats: PlayerStats = PlayerStats.create();
 
 	readonly nameChangeEmitter = new TypedEvent<void>('PlayerName');
@@ -215,7 +213,6 @@ export class Player<SpecType extends Spec> {
 
 	setEpWeights(eventID: EventID, newEpWeights: Stats) {
 		this.epWeights = newEpWeights;
-		this.epWeightsForCalc = specEPTransforms[this.spec](this.epWeights);
 		this.epWeightsChangeEmitter.emit(eventID);
 
 		this.gemEPCache = new Map();
@@ -485,7 +482,7 @@ export class Player<SpecType extends Spec> {
 		if (stats == undefined) {
 			return 0;
 		}
-		return stats.computeEP(this.epWeightsForCalc);
+		return stats.computeEP(this.epWeights);
 	}
 
 	computeGemEP(gem: Gem): number {
@@ -544,7 +541,7 @@ export class Player<SpecType extends Spec> {
 				itemStats = itemStats.withStat(Stat.StatMeleeCrit, itemStats.getStat(Stat.StatMeleeCrit) + 24);
 			}
 		}
-		let ep = itemStats.computeEP(this.epWeightsForCalc);
+		let ep = itemStats.computeEP(this.epWeights);
 
 		// unique items are slightly worse than non-unique because you can have only one.
 		if (item.unique) {
