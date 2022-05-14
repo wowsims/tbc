@@ -8,6 +8,7 @@ import { Player } from '/tbc/core/player.js';
 import { stDevToConf90 } from '/tbc/core/utils.js';
 import { BooleanPicker } from '/tbc/core/components/boolean_picker.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
+import { ResultsViewer } from '/tbc/core/components/results_viewer.js';
 import { getEnumValues } from '/tbc/core/utils.js';
 
 import { Popup } from './popup.js';
@@ -15,7 +16,7 @@ import { Popup } from './popup.js';
 declare var tippy: any;
 
 export function addStatWeightsAction(simUI: IndividualSimUI<any>, epStats: Array<Stat>, epReferenceStat: Stat) {
-	simUI.addAction('EP WEIGHTS', 'ep-weights-action', () => {
+	simUI.addAction('STAT WEIGHTS', 'ep-weights-action', () => {
 		new EpWeightsMenu(simUI, epStats, epReferenceStat);
 	});
 }
@@ -25,6 +26,7 @@ class EpWeightsMenu extends Popup {
 	private readonly tableContainer: HTMLElement;
 	private readonly tableBody: HTMLElement;
 	private readonly tableHeader: HTMLElement;
+	private readonly resultsViewer: ResultsViewer;
 
 	private statsType: string;
 	private epStats: Array<Stat>;
@@ -39,15 +41,19 @@ class EpWeightsMenu extends Popup {
 
 		this.rootElem.classList.add('ep-weights-menu');
 		this.rootElem.innerHTML = `
-			<div class="ep-weights-actions">
-				<button class="sim-button calc-weights">CALCULATE EP</button>
-				<div class="ep-weights-options">
-					<select class="ep-type-select">
-						<option value="ep">EP</option>
-						<option value="weight">DPS</option>
-					</select>
+			<div class="ep-weights-header">
+				<div class="ep-weights-actions">
+					<button class="sim-button calc-weights">CALCULATE</button>
+					<div class="ep-weights-options">
+						<select class="ep-type-select">
+							<option value="ep">EP</option>
+							<option value="weight">Weights</option>
+						</select>
+					</div>
+					<div class="show-all-stats-container">
+					</div>
 				</div>
-				<div class="show-all-stats-container">
+				<div class="ep-weights-results">
 				</div>
 			</div>
 			<div class="ep-weights-table">
@@ -72,6 +78,9 @@ class EpWeightsMenu extends Popup {
 		this.tableBody = this.rootElem.querySelector('#ep-tbody') as HTMLElement;
 		this.tableHeader = this.rootElem.querySelector('#ep-tbody > tr') as HTMLElement;
 
+		const resultsViewerElem = this.rootElem.getElementsByClassName('ep-weights-results')[0] as HTMLElement;
+		this.resultsViewer = new ResultsViewer(resultsViewerElem);
+
 		const updateType = () => {
 			if (this.statsType == 'ep') {
 				this.tableContainer.classList.remove('stats-type-weight');
@@ -92,11 +101,12 @@ class EpWeightsMenu extends Popup {
 
 		const calcButton = this.rootElem.getElementsByClassName('calc-weights')[0] as HTMLElement;
 		calcButton.addEventListener('click', async event => {
-			this.simUI.setResultsPending();
+			this.resultsViewer.setPending();
 			const iterations = this.simUI.sim.getIterations();
 			const result = await this.simUI.player.computeStatWeights(TypedEvent.nextEventID(), this.epStats, this.epReferenceStat, (progress: ProgressMetrics) => {
 				this.setSimProgress(progress);
 			});
+			this.resultsViewer.hideAll();
 			this.simUI.prevEpIterations = iterations;
 			this.simUI.prevEpSimResult = result;
 			this.preprocessResults(result);
@@ -104,7 +114,11 @@ class EpWeightsMenu extends Popup {
 		});
 
 		const colActionButtons = Array.from(this.rootElem.getElementsByClassName('col-action')) as Array<HTMLSelectElement>;
-		const makeUpdateWeights = (button: HTMLElement, tooltip: string, weightsFunc: () => Array<number>) => {
+		const makeUpdateWeights = (button: HTMLElement, labelTooltip: string, tooltip: string, weightsFunc: () => Array<number>) => {
+			tippy(button.previousSibling, {
+				'content': labelTooltip,
+				'allowHTML': true,
+			});
 			tippy(button, {
 				'content': tooltip,
 				'allowHTML': true,
@@ -113,13 +127,13 @@ class EpWeightsMenu extends Popup {
 				this.simUI.player.setEpWeights(TypedEvent.nextEventID(), new Stats(weightsFunc()));
 			});
 		};
-		makeUpdateWeights(colActionButtons[0], 'Copy to Current EP', () => this.getPrevSimResult().dps!.weights);
-		makeUpdateWeights(colActionButtons[1], 'Copy to Current EP', () => this.getPrevSimResult().dps!.epValues);
-		makeUpdateWeights(colActionButtons[2], 'Copy to Current EP', () => this.getPrevSimResult().tps!.weights);
-		makeUpdateWeights(colActionButtons[3], 'Copy to Current EP', () => this.getPrevSimResult().tps!.epValues);
-		makeUpdateWeights(colActionButtons[4], 'Copy to Current EP', () => this.getPrevSimResult().dtps!.weights);
-		makeUpdateWeights(colActionButtons[5], 'Copy to Current EP', () => this.getPrevSimResult().dtps!.epValues);
-		makeUpdateWeights(colActionButtons[6], 'Restore Default EP', () => this.simUI.individualConfig.defaults.epWeights.asArray());
+		makeUpdateWeights(colActionButtons[0], 'Per-point increase in DPS (Damage Per Second) for each stat.', 'Copy to Current EP', () => this.getPrevSimResult().dps!.weights);
+		makeUpdateWeights(colActionButtons[1], `EP (Equivalency Points) for DPS (Damage Per Second) for each stat. Normalized by ${statNames[this.epReferenceStat]}.`, 'Copy to Current EP', () => this.getPrevSimResult().dps!.epValues);
+		makeUpdateWeights(colActionButtons[2], 'Per-point increase in TPS (Threat Per Second) for each stat.', 'Copy to Current EP', () => this.getPrevSimResult().tps!.weights);
+		makeUpdateWeights(colActionButtons[3], `EP (Equivalency Points) for TPS (Threat Per Second) for each stat. Normalized by ${statNames[this.epReferenceStat]}.`, 'Copy to Current EP', () => this.getPrevSimResult().tps!.epValues);
+		makeUpdateWeights(colActionButtons[4], 'Per-point increase in DTPS (Damage Taken Per Second) for each stat.', 'Copy to Current EP', () => this.getPrevSimResult().dtps!.weights);
+		makeUpdateWeights(colActionButtons[5], `EP (Equivalency Points) for DTPS (Damage Taken Per Second) for each stat. Normalized by ${statNames[Stat.StatArmor]}.`, 'Copy to Current EP', () => this.getPrevSimResult().dtps!.epValues);
+		makeUpdateWeights(colActionButtons[6], 'Current EP Weights. Used to sort the gear selector menus.', 'Restore Default EP', () => this.simUI.individualConfig.defaults.epWeights.asArray());
 
 		const showAllStatsContainer = this.rootElem.getElementsByClassName('show-all-stats-container')[0] as HTMLElement;
 		new BooleanPicker(showAllStatsContainer, this, {
@@ -141,7 +155,7 @@ class EpWeightsMenu extends Popup {
 	}
 
 	setSimProgress(progress: ProgressMetrics) {
-		this.simUI.setResultsContent(`
+		this.resultsViewer.setContent(`
   <div class="results-sim">
   			<div class=""> ${progress.completedSims} / ${progress.totalSims}<br>simulations complete</div>
   			<div class="">

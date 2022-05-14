@@ -11,6 +11,7 @@ import { ItemSpec } from '/tbc/core/proto/common.js';
 import { ItemType } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
@@ -272,6 +273,9 @@ export class Sim {
 			console.warn('Trying to get stat weights without a party!');
 			return StatWeightsResult.create();
 		} else {
+			const tanks = this.raid.getTanks().map(tank => tank.targetIndex).includes(player.getRaidIndex())
+					? [RaidTarget.create({ targetIndex: 0 })]
+					: [];
 			const request = StatWeightsRequest.create({
 				player: player.toProto(),
 				raidBuffs: this.raid.getBuffs(),
@@ -282,6 +286,7 @@ export class Sim {
 					randomSeed: BigInt(this.nextRngSeed()),
 					debug: false,
 				}),
+				tanks: tanks,
 
 				statsToWeigh: epStats,
 				epReferenceStat: epReferenceStat,

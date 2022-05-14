@@ -125,6 +125,11 @@ input, select {
 	color: var(--sidebar-text-color);
 }
 
+.results-sim {
+	color: var(--sidebar-text-color);
+	text-shadow: 0 0 10px var(--sidebar-highlight-color);
+}
+
 .sim-main {
   height: 100%;
   width: 80%;
