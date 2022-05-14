@@ -146,6 +146,7 @@ class EpWeightsMenu extends Popup {
 				} else {
 					this.tableContainer.classList.remove('show-all-stats');
 				}
+				this.applyAlternatingColors();
 			},
 		});
 
@@ -199,6 +200,8 @@ class EpWeightsMenu extends Popup {
 			}
 			this.tableBody.appendChild(row);
 		});
+
+		this.applyAlternatingColors();
 	}
 
 	private makeTableRow(stat: Stat, iterations: number, result: StatWeightsResult): HTMLElement {
@@ -226,6 +229,18 @@ class EpWeightsMenu extends Popup {
 		});
 
 		return row;
+	}
+
+	private applyAlternatingColors() {
+		(Array.from(this.tableBody.childNodes) as Array<HTMLElement>)
+		.filter(row => window.getComputedStyle(row).getPropertyValue('display') != 'none')
+		.forEach((row, i) => {
+			if (i % 2 == 0) {
+				row.classList.remove('odd');
+			} else {
+				row.classList.add('odd');
+			}
+		});
 	}
 
 	private getPrevSimResult(): StatWeightsResult {

@@ -50,6 +50,11 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 
 	raidProto := SinglePlayerRaidProto(swr.Player, swr.PartyBuffs, swr.RaidBuffs)
 	raidProto.Tanks = swr.Tanks
+
+	// Set a RNG seed so that hard-capped effects always give a result of 0.
+	simOptions := swr.SimOptions
+	simOptions.RandomSeed = 1
+
 	baseStatsResult := ComputeStats(&proto.ComputeStatsRequest{
 		Raid: raidProto,
 	})
@@ -58,7 +63,7 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 	baseSimRequest := &proto.RaidSimRequest{
 		Raid:       raidProto,
 		Encounter:  swr.Encounter,
-		SimOptions: swr.SimOptions,
+		SimOptions: simOptions,
 	}
 	baselineResult := RunRaidSim(baseSimRequest)
 	baselineDpsMetrics := baselineResult.RaidMetrics.Parties[0].Players[0].Dps
@@ -154,6 +159,9 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 
 	for _, stat := range statsToWeigh {
 		statMod := defaultStatMod
+		if stat == stats.SpellHit || stat == stats.MeleeHit || stat == stats.Expertise {
+			statMod = 15
+		}
 		statModsHigh[stat] = statMod
 		statModsLow[stat] = -statMod
 	}
@@ -172,14 +180,44 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 
 	waitGroup.Wait()
 
+	melee2HHitCap := 9 * MeleeHitRatingPerHitChance
+	if swr.Encounter.Targets[0].Debuffs.FaerieFire == proto.TristateEffect_TristateEffectImproved {
+		melee2HHitCap -= 3 * MeleeHitRatingPerHitChance
+	}
+
 	for _, stat := range statsToWeigh {
-		if stat == stats.SpellHit || stat == stats.MeleeHit {
-			// Check for hard caps.
-			if resultHigh.Dps.Weights[stat] < 0.05 {
+		// Check for hard caps.
+		if stat == stats.SpellHit || stat == stats.MeleeHit || stat == stats.Expertise {
+			if resultHigh.Dps.Weights[stat] < 0.1 {
 				statModsHigh[stat] = 0
-			} else if baseStats[stat] > 80 {
-				// For spell/melee hit, don't use the high comparison if we might be anywhere
-				// remotely close to cap.
+				continue
+			}
+		}
+
+		// For spell/melee hit, only use the direction facing away from the nearest soft/hard cap.
+		if stat == stats.SpellHit {
+			if baseStats[stat] > 80 {
+				statModsHigh[stat] = statModsLow[stat]
+				resultHigh.Dps.Weights[stat] = resultLow.Dps.Weights[stat]
+				resultHigh.Tps.Weights[stat] = resultLow.Tps.Weights[stat]
+				resultHigh.Dtps.Weights[stat] = resultLow.Dtps.Weights[stat]
+			}
+		} else if stat == stats.MeleeHit {
+			if baseStats[stat] > 30 {
+				if baseStats[stat] < melee2HHitCap || baseStats[stat] > melee2HHitCap+30 {
+					statModsHigh[stat] = statModsLow[stat]
+					resultHigh.Dps.Weights[stat] = resultLow.Dps.Weights[stat]
+					resultHigh.Tps.Weights[stat] = resultLow.Tps.Weights[stat]
+					resultHigh.Dtps.Weights[stat] = resultLow.Dtps.Weights[stat]
+				} else {
+					statModsLow[stat] = statModsHigh[stat]
+					resultLow.Dps.Weights[stat] = resultHigh.Dps.Weights[stat]
+					resultLow.Tps.Weights[stat] = resultHigh.Tps.Weights[stat]
+					resultLow.Dtps.Weights[stat] = resultHigh.Dtps.Weights[stat]
+				}
+			}
+		} else if stat == stats.Expertise {
+			if baseStats[stat] > 20 {
 				statModsHigh[stat] = statModsLow[stat]
 				resultHigh.Dps.Weights[stat] = resultLow.Dps.Weights[stat]
 				resultHigh.Tps.Weights[stat] = resultLow.Tps.Weights[stat]

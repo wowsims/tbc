@@ -38,7 +38,7 @@
 .results-ep-table tr {
 	background-color: #111218;
 }
-.results-ep-table tr:nth-child(even) {
+.results-ep-table tr.odd {
   background: #222;
 }
 .results-ep-table tr:hover {
