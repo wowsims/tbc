@@ -1,5 +1,5 @@
 import { Stat } from '/tbc/core/proto/common.js';
-import { statNames } from '/tbc/core/proto_utils/names.js';
+import { statNames, statOrder } from '/tbc/core/proto_utils/names.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -32,7 +32,7 @@ export class CharacterStats extends Component {
 
 	constructor(parent: HTMLElement, player: Player<any>, stats: Array<Stat>, modifyDisplayStats?: (player: Player<any>, stats: Stats) => Stats, statBreakdowns?: (player: Player<any>, stats: Stats) => Partial<Record<Stat, StatBreakdown>>) {
 		super(parent, 'character-stats-root');
-		this.stats = stats;
+		this.stats = statOrder.filter(stat => stats.includes(stat));
 		this.player = player;
 		this.modifyDisplayStats = modifyDisplayStats;
 		this.statBreakdowns = statBreakdowns;
