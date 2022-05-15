@@ -260,12 +260,15 @@ message StatWeightsRequest {
     PartyBuffs party_buffs = 3;
     Encounter encounter = 4;
 		SimOptions sim_options = 5;
+		repeated RaidTarget tanks = 8;
 
     repeated Stat stats_to_weigh = 6;
     Stat ep_reference_stat = 7;
 }
 message StatWeightsResult {
 	StatWeightValues dps = 1;
+	StatWeightValues tps = 2;
+	StatWeightValues dtps = 3;
 }
 message StatWeightValues {
 	repeated double weights = 1;

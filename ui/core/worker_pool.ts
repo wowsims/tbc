@@ -49,6 +49,7 @@ export class WorkerPool {
 	}
 
 	async statWeightsAsync(request: StatWeightsRequest, onProgress: Function): Promise<StatWeightsResult> {
+		console.log('Stat weights request: ' + StatWeightsRequest.toJsonString(request));
 		const worker = this.getLeastBusyWorker();
 		const id = worker.makeTaskId();
 		// Add handler for the progress events
@@ -57,6 +58,7 @@ export class WorkerPool {
 		// Now start the async sim
 		const resultData = await worker.doApiCall('statWeightsAsync', StatWeightsRequest.toBinary(request), id);
 		const result = ProgressMetrics.fromBinary(resultData)
+		console.log('Stat weights result: ' + StatWeightsResult.toJsonString(result.finalWeightResult!));
 		return result.finalWeightResult!;
 	}
 

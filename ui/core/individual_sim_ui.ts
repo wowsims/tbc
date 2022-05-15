@@ -55,7 +55,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { nameToShattFaction, SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { Stat } from '/tbc/core/proto/common.js';
-import { StatWeightsRequest } from '/tbc/core/proto/api.js';
+import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Target } from './target.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
@@ -240,6 +240,9 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 	private settingsMuuri: any;
 
+	prevEpIterations: number;
+	prevEpSimResult: StatWeightsResult | null;
+
 	constructor(parentElem: HTMLElement, player: Player<SpecType>, config: IndividualSimUIConfig<SpecType>) {
 		super(parentElem, player.sim, {
 			spec: player.spec,
@@ -250,6 +253,9 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.individualConfig = config;
 		this.raidSimResultsManager = null;
 		this.settingsMuuri = null;
+		this.prevEpIterations = 0;
+		this.prevEpSimResult = null;
+
 		if (!launchedSpecs.includes(this.player.spec)) {
 			this.addWarning({
 				updateOn: new TypedEvent<void>(),
@@ -257,6 +263,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 				getContent: () => 'This sim is still under development.',
 			});
 		}
+
 		this.addWarning({
 			updateOn: this.player.gearChangeEmitter,
 			shouldDisplay: () => this.player.getGear().hasInactiveMetaGem(),
