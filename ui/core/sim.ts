@@ -331,6 +331,9 @@ export class Sim {
 	getAllPresetEncounters(): Array<PresetEncounter> {
 		return Object.values(this.presetEncounters);
 	}
+	getAllPresetTargets(): Array<PresetTarget> {
+		return Object.values(this.presetTargets);
+	}
 
 	getPhase(): number {
 		return this.phase;

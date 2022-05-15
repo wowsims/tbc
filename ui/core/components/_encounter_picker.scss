@@ -53,3 +53,7 @@
 .target-picker-section .input-label-div {
 	white-space: nowrap;
 }
+
+.npc-picker .enum-picker-selector {
+	max-width: max(15vw, 200px);
+}

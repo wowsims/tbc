@@ -247,6 +247,12 @@ export class Target {
 		});
 	}
 
+	clone(eventID: EventID): Target {
+		const newTarget = new Target(this.sim);
+		newTarget.fromProto(eventID, this.toProto());
+		return newTarget;
+	}
+
 	static defaultProto(): TargetProto {
 		return TargetProto.create({
 			level: Mechanics.BOSS_LEVEL,
