@@ -10,6 +10,10 @@ export const GREATER_INSCRIPTION_OF_DISCIPLINE = 28886;
 enchantDescriptions.set(GREATER_INSCRIPTION_OF_DISCIPLINE, '+18 Spell Damage and +10 Spell Crit Rating');
 export const GREATER_INSCRIPTION_OF_THE_ORB = 28909;
 enchantDescriptions.set(GREATER_INSCRIPTION_OF_THE_ORB, '+15 Spell Crit Rating and +12 Spell Damage');
+export const GREATER_INSCRIPTION_OF_THE_BLADE = 28910;
+enchantDescriptions.set(GREATER_INSCRIPTION_OF_THE_BLADE, '+15 Crit Rating and +20 Attack Power');
+export const GREATER_INSCRIPTION_OF_THE_KNIGHT = 28911;
+enchantDescriptions.set(GREATER_INSCRIPTION_OF_THE_KNIGHT, '+15 Defense Rating and +10 Dodge Rating');
 export const POWER_OF_THE_SCOURGE = 23545;
 enchantDescriptions.set(POWER_OF_THE_SCOURGE, '+15 Spell Damage and +14 Spell Crit Rating');
 export const GREATER_INSCRIPTION_OF_VENGEANCE = 28888;
@@ -33,6 +37,8 @@ enchantDescriptions.set(CHEST_RESTORE_MANA_PRIME, '+6 Mana Per 5 Sec.');
 // Wrist
 export const WRIST_ASSAULT = 34002;
 enchantDescriptions.set(WRIST_ASSAULT, '+24 Attack Power');
+export const WRIST_FORTITUDE = 22533;
+enchantDescriptions.set(WRIST_FORTITUDE, '+12 Stamina');
 export const WRIST_SPELLPOWER = 22534;
 enchantDescriptions.set(WRIST_SPELLPOWER, '+15 Spell Damage');
 export const WRIST_BRAWN = 27899;
@@ -40,6 +46,8 @@ enchantDescriptions.set(WRIST_BRAWN, '+12 Strength');
 // Gloves
 export const GLOVES_MAJOR_AGILITY = 33152;
 enchantDescriptions.set(GLOVES_MAJOR_AGILITY, '+15 Agility');
+export const GLOVES_THREAT = 33153;
+enchantDescriptions.set(GLOVES_THREAT, '+2% Threat');
 export const GLOVES_SPELLPOWER = 28272;
 enchantDescriptions.set(GLOVES_SPELLPOWER, '+20 Spell Damage');
 export const GLOVES_SPELLSTRIKE = 28271;
@@ -53,6 +61,8 @@ export const MYSTIC_SPELLTHREAD = 24273;
 enchantDescriptions.set(MYSTIC_SPELLTHREAD, '+25 Spell Damage and +15 Stamina');
 export const NETHERCOBRA_LEG_ARMOR = 29535;
 enchantDescriptions.set(NETHERCOBRA_LEG_ARMOR, '+50 Attack Power and +12 Crit Rating');
+export const NETHERCLEFT_LEG_ARMOR = 29536;
+enchantDescriptions.set(NETHERCLEFT_LEG_ARMOR, '+40 Stamina and +12 Agility');
 // Feet
 export const BOARS_SPEED = 35297;
 enchantDescriptions.set(BOARS_SPEED, 'Minor Speed and +9 Stamina');
@@ -86,6 +96,8 @@ enchantDescriptions.set(MONGOOSE, 'Mongoose');
 // Shield
 export const SHIELD_INTELLECT = 22539;
 enchantDescriptions.set(SHIELD_INTELLECT, '+12 Intellect');
+export const SHIELD_MAJOR_STAMINA = 28282;
+enchantDescriptions.set(SHIELD_MAJOR_STAMINA, '+18 Stamina');
 // Ring
 export const RING_SPELLPOWER = 22536;
 enchantDescriptions.set(RING_SPELLPOWER, '+12 Spell Damage');

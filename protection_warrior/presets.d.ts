@@ -13,7 +13,22 @@ export declare const P1_BALANCED_PRESET: {
     tooltip: string;
     gear: EquipmentSpec;
 };
+export declare const P2_BALANCED_PRESET: {
+    name: string;
+    tooltip: string;
+    gear: EquipmentSpec;
+};
+export declare const P3_BALANCED_PRESET: {
+    name: string;
+    tooltip: string;
+    gear: EquipmentSpec;
+};
 export declare const P4_BALANCED_PRESET: {
+    name: string;
+    tooltip: string;
+    gear: EquipmentSpec;
+};
+export declare const P5_BALANCED_PRESET: {
     name: string;
     tooltip: string;
     gear: EquipmentSpec;

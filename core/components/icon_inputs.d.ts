@@ -28,6 +28,7 @@ export declare const AtieshWarlock: IndividualSimIconPickerConfig<Party, number>
 export declare const Bloodlust: IndividualSimIconPickerConfig<Party, number>;
 export declare const BraidedEterniumChain: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const ChainOfTheTwilightOwl: IndividualSimIconPickerConfig<Party, boolean>;
+export declare const CommandingShout: IndividualSimIconPickerConfig<Party, number>;
 export declare const DevotionAura: IndividualSimIconPickerConfig<Party, number>;
 export declare const DraeneiRacialCaster: IndividualSimIconPickerConfig<Party, boolean>;
 export declare const DraeneiRacialMelee: IndividualSimIconPickerConfig<Party, boolean>;

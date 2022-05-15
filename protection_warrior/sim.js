@@ -69,14 +69,21 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                 gear: Presets.P1_BALANCED_PRESET.gear,
                 // Default EP weights for sorting gear in the gear picker.
                 epWeights: Stats.fromMap({
-                    [Stat.StatStrength]: 2.5,
-                    [Stat.StatAgility]: 1.75,
-                    [Stat.StatAttackPower]: 1,
-                    [Stat.StatExpertise]: 3.75,
-                    [Stat.StatMeleeHit]: 1.5,
-                    [Stat.StatMeleeCrit]: 2.5,
-                    [Stat.StatMeleeHaste]: 3,
-                    [Stat.StatArmorPenetration]: 0.5,
+                    [Stat.StatArmor]: 0.05,
+                    [Stat.StatStamina]: 1,
+                    [Stat.StatStrength]: 0.33,
+                    [Stat.StatAgility]: 0.6,
+                    [Stat.StatAttackPower]: 0.06,
+                    [Stat.StatExpertise]: 0.67,
+                    [Stat.StatMeleeHit]: 0.67,
+                    [Stat.StatMeleeCrit]: 0.28,
+                    [Stat.StatMeleeHaste]: 0.21,
+                    [Stat.StatArmorPenetration]: 0.19,
+                    [Stat.StatBlock]: 0.35,
+                    [Stat.StatBlockValue]: 0.59,
+                    [Stat.StatDodge]: 0.7,
+                    [Stat.StatParry]: 0.58,
+                    [Stat.StatDefense]: 0.8,
                 }),
                 // Default consumes settings.
                 consumes: Presets.DefaultConsumes,
@@ -88,7 +95,10 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                 specOptions: Presets.DefaultOptions,
                 // Default raid/party buffs settings.
                 raidBuffs: RaidBuffs.create({
+                    powerWordFortitude: TristateEffect.TristateEffectRegular,
+                    shadowProtection: true,
                     giftOfTheWild: TristateEffect.TristateEffectImproved,
+                    thorns: TristateEffect.TristateEffectImproved,
                 }),
                 partyBuffs: PartyBuffs.create({
                     bloodlust: 1,
@@ -130,6 +140,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                 IconInputs.GraceOfAirTotem,
                 IconInputs.WindfuryTotem,
                 IconInputs.BattleShout,
+                IconInputs.CommandingShout,
                 IconInputs.LeaderOfThePack,
                 IconInputs.FerociousInspiration,
                 IconInputs.TrueshotAura,
@@ -215,6 +226,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
             // Inputs to include in the 'Other' section on the settings tab.
             otherInputs: {
                 inputs: [
+                    ProtectionWarriorInputs.StartingRage,
                     ProtectionWarriorInputs.ShoutPicker,
                     ProtectionWarriorInputs.PrecastShout,
                     ProtectionWarriorInputs.PrecastShoutWithSapphire,
@@ -245,7 +257,10 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                 // Preset gear configurations that the user can quickly select.
                 gear: [
                     Presets.P1_BALANCED_PRESET,
+                    Presets.P2_BALANCED_PRESET,
+                    Presets.P3_BALANCED_PRESET,
                     Presets.P4_BALANCED_PRESET,
+                    Presets.P5_BALANCED_PRESET,
                 ],
             },
         });
