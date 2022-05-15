@@ -85,6 +85,8 @@ func (ret *RetributionPaladin) Initialize() {
 		ret.RegisterConsecrationSpell(4)
 	case proto.RetributionPaladin_Rotation_Rank1:
 		ret.RegisterConsecrationSpell(1)
+	default:
+		ret.RegisterConsecrationSpell(6)
 	}
 
 	ret.DelayDPSCooldownsForArmorDebuffs()

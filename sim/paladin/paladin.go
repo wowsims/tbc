@@ -62,6 +62,8 @@ func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 		paladin.PaladinAura == proto.PaladinAura_RetributionAura,
 		paladin.Talents.ImprovedRetributionAura == 2))
 
+	// This ignores the case of 1 talent in Imp Sanc Aura
+	// Nobody should ever want to do that though
 	partyBuffs.SanctityAura = core.MaxTristate(partyBuffs.SanctityAura, core.MakeTristateValue(
 		paladin.Talents.SanctityAura && paladin.PaladinAura == proto.PaladinAura_SanctityAura,
 		paladin.Talents.ImprovedSanctityAura == 2))

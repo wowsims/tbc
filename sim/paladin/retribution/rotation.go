@@ -89,12 +89,20 @@ func (ret *RetributionPaladin) mainRotation(sim *core.Simulation) {
 	possibleTwist := timeTilNextSwing > spellGCD+gcdCD
 	willTwist := possibleTwist && (nextSwingAt+spellGCD <= nextCrusaderStrikeCD+ret.crusaderStrikeDelay)
 
+	willCS := timeTilNextSwing > crusaderStrikeCD
+	noNakedSwing := (!willCS && gcdCD < timeTilNextSwing) ||
+		(willCS && gcdCD+spellGCD < timeTilNextSwing)
+	noCSClip := gcdCD+spellGCD < crusaderStrikeCD
+	noTwistClip := gcdCD+spellGCD*2 < timeTilNextSwing+weaponSpeed
+
 	// Use Judgement if we will prep Seal of Command
 	// TO-DO: Add more aggressive judgment logic
 	// Should judge on crusader strike swings as well if we have enough time to refresh seal
-	if judgementCD == 0 && sobActive && willTwist {
-		ret.JudgementOfBlood.Cast(sim, target)
-		sobActive = false
+	if judgementCD == 0 && sobActive {
+		if willTwist || (willCS && noNakedSwing) || (!willCS && noCSClip && noTwistClip && noNakedSwing) {
+			ret.JudgementOfBlood.Cast(sim, target)
+			sobActive = false
+		}
 	}
 
 	// Judgement can affect active seals and CDs
@@ -111,8 +119,9 @@ func (ret *RetributionPaladin) mainRotation(sim *core.Simulation) {
 		} else if willTwist && !socActive && (nextJudgementCD > latestTwistStart) {
 			// Prep seal of command
 			ret.SealOfCommand.Cast(sim, nil)
-		} else if !sobActive && !socActive && !willTwist {
+		} else if !sobActive && !socActive && !willTwist && noCSClip && noNakedSwing {
 			// If no seal is active, cast Seal of Blood
+			// As long as it won't clip CS and we won't swingNaked
 			ret.SealOfBlood.Cast(sim, nil)
 		} else if !willTwist && !socActive &&
 			timeTilNextSwing+weaponSpeed > spellGCD*2 &&
@@ -130,6 +139,8 @@ func (ret *RetributionPaladin) mainRotation(sim *core.Simulation) {
 		ret.GCD.ReadyAt(),
 		ret.JudgementOfWisdom.CD.ReadyAt(),
 		ret.CrusaderStrike.CD.ReadyAt(),
+		ret.Exorcism.CD.ReadyAt(),
+		ret.Consecration.CD.ReadyAt(),
 	}
 
 	ret.waitUntilNextEvent(sim, events)
