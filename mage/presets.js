@@ -1363,7 +1363,7 @@ export const P5_FIRE_PRESET = {
 			"id": 34204
 		},
 		{
-			"id": 34210,
+			"id": 31059,
 			"enchant": 28886,
 			"gems": [
 				32196,
@@ -1469,7 +1469,7 @@ export const P5_FROST_PRESET = {
 			"id": 34204
 		},
 		{
-			"id": 34210,
+			"id": 31059,
 			"enchant": 28886,
 			"gems": [
 				32196,
