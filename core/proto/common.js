@@ -1180,20 +1180,6 @@ export var MobType;
     MobType[MobType["MobTypeUndead"] = 8] = "MobTypeUndead";
 })(MobType || (MobType = {}));
 /**
- * @generated from protobuf enum proto.EncounterType
- */
-export var EncounterType;
-(function (EncounterType) {
-    /**
-     * @generated from protobuf enum value: EncounterTypeSimple = 0;
-     */
-    EncounterType[EncounterType["EncounterTypeSimple"] = 0] = "EncounterTypeSimple";
-    /**
-     * @generated from protobuf enum value: EncounterTypeCustom = 1;
-     */
-    EncounterType[EncounterType["EncounterTypeCustom"] = 1] = "EncounterTypeCustom";
-})(EncounterType || (EncounterType = {}));
-/**
  * Extra enum for describing which items are eligible for an enchant, when
  * ItemType alone is not enough.
  *
@@ -2155,6 +2141,8 @@ export const Debuffs = new Debuffs$Type();
 class Target$Type extends MessageType {
     constructor() {
         super("proto.Target", [
+            { no: 14, name: "id", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 15, name: "name", kind: "scalar", T: 9 /*ScalarType.STRING*/ },
             { no: 1, name: "armor", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 4, name: "level", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 3, name: "mob_type", kind: "enum", T: () => ["proto.MobType", MobType] },
@@ -2165,13 +2153,14 @@ class Target$Type extends MessageType {
             { no: 10, name: "dual_wield_penalty", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 11, name: "can_crush", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 12, name: "parry_haste", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 16, name: "suppress_dodge", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 13, name: "spell_school", kind: "enum", T: () => ["proto.SpellSchool", SpellSchool] },
             { no: 6, name: "tank_index", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "debuffs", kind: "message", T: () => Debuffs }
         ]);
     }
     create(value) {
-        const message = { armor: 0, level: 0, mobType: 0, stats: [], minBaseDamage: 0, swingSpeed: 0, dualWield: false, dualWieldPenalty: false, canCrush: false, parryHaste: false, spellSchool: 0, tankIndex: 0 };
+        const message = { id: 0, name: "", armor: 0, level: 0, mobType: 0, stats: [], minBaseDamage: 0, swingSpeed: 0, dualWield: false, dualWieldPenalty: false, canCrush: false, parryHaste: false, suppressDodge: false, spellSchool: 0, tankIndex: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -2182,6 +2171,12 @@ class Target$Type extends MessageType {
         while (reader.pos < end) {
             let [fieldNo, wireType] = reader.tag();
             switch (fieldNo) {
+                case /* int32 id */ 14:
+                    message.id = reader.int32();
+                    break;
+                case /* string name */ 15:
+                    message.name = reader.string();
+                    break;
                 case /* double armor */ 1:
                     message.armor = reader.double();
                     break;
@@ -2216,6 +2211,9 @@ class Target$Type extends MessageType {
                 case /* bool parry_haste */ 12:
                     message.parryHaste = reader.bool();
                     break;
+                case /* bool suppress_dodge */ 16:
+                    message.suppressDodge = reader.bool();
+                    break;
                 case /* proto.SpellSchool spell_school */ 13:
                     message.spellSchool = reader.int32();
                     break;
@@ -2237,6 +2235,12 @@ class Target$Type extends MessageType {
         return message;
     }
     internalBinaryWrite(message, writer, options) {
+        /* int32 id = 14; */
+        if (message.id !== 0)
+            writer.tag(14, WireType.Varint).int32(message.id);
+        /* string name = 15; */
+        if (message.name !== "")
+            writer.tag(15, WireType.LengthDelimited).string(message.name);
         /* double armor = 1; */
         if (message.armor !== 0)
             writer.tag(1, WireType.Bit64).double(message.armor);
@@ -2271,6 +2275,9 @@ class Target$Type extends MessageType {
         /* bool parry_haste = 12; */
         if (message.parryHaste !== false)
             writer.tag(12, WireType.Varint).bool(message.parryHaste);
+        /* bool suppress_dodge = 16; */
+        if (message.suppressDodge !== false)
+            writer.tag(16, WireType.Varint).bool(message.suppressDodge);
         /* proto.SpellSchool spell_school = 13; */
         if (message.spellSchool !== 0)
             writer.tag(13, WireType.Varint).int32(message.spellSchool);
@@ -2297,12 +2304,11 @@ class Encounter$Type extends MessageType {
             { no: 1, name: "duration", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 4, name: "duration_variation", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
             { no: 3, name: "execute_proportion", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ },
-            { no: 5, name: "type", kind: "enum", T: () => ["proto.EncounterType", EncounterType] },
             { no: 2, name: "targets", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => Target }
         ]);
     }
     create(value) {
-        const message = { duration: 0, durationVariation: 0, executeProportion: 0, type: 0, targets: [] };
+        const message = { duration: 0, durationVariation: 0, executeProportion: 0, targets: [] };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -2321,9 +2327,6 @@ class Encounter$Type extends MessageType {
                     break;
                 case /* double execute_proportion */ 3:
                     message.executeProportion = reader.double();
-                    break;
-                case /* proto.EncounterType type */ 5:
-                    message.type = reader.int32();
                     break;
                 case /* repeated proto.Target targets */ 2:
                     message.targets.push(Target.internalBinaryRead(reader, reader.uint32(), options));
@@ -2349,9 +2352,6 @@ class Encounter$Type extends MessageType {
         /* double execute_proportion = 3; */
         if (message.executeProportion !== 0)
             writer.tag(3, WireType.Bit64).double(message.executeProportion);
-        /* proto.EncounterType type = 5; */
-        if (message.type !== 0)
-            writer.tag(5, WireType.Varint).int32(message.type);
         /* repeated proto.Target targets = 2; */
         for (let i = 0; i < message.targets.length; i++)
             Target.internalBinaryWrite(message.targets[i], writer.tag(2, WireType.LengthDelimited).fork(), options).join();

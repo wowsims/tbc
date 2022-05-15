@@ -5,7 +5,7 @@ import { Potions } from '/tbc/core/proto/common.js';
 import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
-import { Target } from '/tbc/core/target.js';
+import { Raid } from '/tbc/core/raid.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 export declare function makeShow1hWeaponsSelector(parent: HTMLElement, sim: Sim): BooleanPicker<Sim>;
@@ -84,38 +84,38 @@ export declare const ShadowPriestDPS: {
 };
 export declare const ISBUptime: {
     type: "number";
-    getModObject: (simUI: IndividualSimUI<any>) => Target;
+    getModObject: (simUI: IndividualSimUI<any>) => Raid;
     config: {
         extraCssClasses: string[];
         label: string;
         labelTooltip: string;
-        changedEvent: (target: Target) => TypedEvent<void>;
-        getValue: (target: Target) => number;
-        setValue: (eventID: EventID, target: Target, newValue: number) => void;
+        changedEvent: (raid: Raid) => TypedEvent<void>;
+        getValue: (raid: Raid) => number;
+        setValue: (eventID: EventID, raid: Raid, newValue: number) => void;
     };
 };
 export declare const ExposeWeaknessUptime: {
     type: "number";
-    getModObject: (simUI: IndividualSimUI<any>) => Target;
+    getModObject: (simUI: IndividualSimUI<any>) => Raid;
     config: {
         extraCssClasses: string[];
         label: string;
         labelTooltip: string;
-        changedEvent: (target: Target) => TypedEvent<void>;
-        getValue: (target: Target) => number;
-        setValue: (eventID: EventID, target: Target, newValue: number) => void;
+        changedEvent: (raid: Raid) => TypedEvent<void>;
+        getValue: (raid: Raid) => number;
+        setValue: (eventID: EventID, raid: Raid, newValue: number) => void;
     };
 };
 export declare const ExposeWeaknessHunterAgility: {
     type: "number";
-    getModObject: (simUI: IndividualSimUI<any>) => Target;
+    getModObject: (simUI: IndividualSimUI<any>) => Raid;
     config: {
         extraCssClasses: string[];
         label: string;
         labelTooltip: string;
-        changedEvent: (target: Target) => TypedEvent<void>;
-        getValue: (target: Target) => number;
-        setValue: (eventID: EventID, target: Target, newValue: number) => void;
+        changedEvent: (raid: Raid) => TypedEvent<void>;
+        getValue: (raid: Raid) => number;
+        setValue: (eventID: EventID, raid: Raid, newValue: number) => void;
     };
 };
 export declare const SnapshotImprovedStrengthOfEarthTotem: {

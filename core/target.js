@@ -1,4 +1,3 @@
-import { Debuffs } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
 import { SpellSchool } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -9,6 +8,8 @@ import { TypedEvent } from './typed_event.js';
 // Manages all the settings for a single Target.
 export class Target {
     constructor(sim) {
+        this.id = 0;
+        this.name = '';
         this.level = Mechanics.BOSS_LEVEL;
         this.mobType = MobType.MobTypeDemon;
         this.tankIndex = 0;
@@ -17,25 +18,45 @@ export class Target {
         this.minBaseDamage = 0;
         this.dualWield = false;
         this.canCrush = true;
+        this.suppressDodge = false;
         this.parryHaste = true;
         this.spellSchool = SpellSchool.SpellSchoolPhysical;
-        this.debuffs = Debuffs.create();
+        this.idChangeEmitter = new TypedEvent();
+        this.nameChangeEmitter = new TypedEvent();
         this.levelChangeEmitter = new TypedEvent();
         this.mobTypeChangeEmitter = new TypedEvent();
         this.propChangeEmitter = new TypedEvent();
         this.statsChangeEmitter = new TypedEvent();
-        this.debuffsChangeEmitter = new TypedEvent();
         // Emits when any of the above emitters emit.
         this.changeEmitter = new TypedEvent();
         this.sim = sim;
         [
+            this.idChangeEmitter,
+            this.nameChangeEmitter,
             this.levelChangeEmitter,
             this.mobTypeChangeEmitter,
             this.propChangeEmitter,
             this.statsChangeEmitter,
-            this.debuffsChangeEmitter,
         ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
         this.changeEmitter.on(eventID => this.sim.encounter?.changeEmitter.emit(eventID));
+    }
+    getId() {
+        return this.id;
+    }
+    setId(eventID, newId) {
+        if (newId == this.id)
+            return;
+        this.id = newId;
+        this.idChangeEmitter.emit(eventID);
+    }
+    getName() {
+        return this.name;
+    }
+    setName(eventID, newName) {
+        if (newName == this.name)
+            return;
+        this.name = newName;
+        this.nameChangeEmitter.emit(eventID);
     }
     getLevel() {
         return this.level;
@@ -100,6 +121,15 @@ export class Target {
         this.canCrush = newCanCrush;
         this.propChangeEmitter.emit(eventID);
     }
+    getSuppressDodge() {
+        return this.suppressDodge;
+    }
+    setSuppressDodge(eventID, newSuppressDodge) {
+        if (newSuppressDodge == this.suppressDodge)
+            return;
+        this.suppressDodge = newSuppressDodge;
+        this.propChangeEmitter.emit(eventID);
+    }
     getParryHaste() {
         return this.parryHaste;
     }
@@ -127,19 +157,16 @@ export class Target {
         this.stats = newStats;
         this.statsChangeEmitter.emit(eventID);
     }
-    getDebuffs() {
-        // Make a defensive copy
-        return Debuffs.clone(this.debuffs);
+    matchesPreset(preset) {
+        return TargetProto.equals(this.toProto(), preset.target);
     }
-    setDebuffs(eventID, newDebuffs) {
-        if (Debuffs.equals(this.debuffs, newDebuffs))
-            return;
-        // Make a defensive copy
-        this.debuffs = Debuffs.clone(newDebuffs);
-        this.debuffsChangeEmitter.emit(eventID);
+    applyPreset(eventID, preset) {
+        this.fromProto(eventID, preset.target || TargetProto.create());
     }
     toProto() {
         return TargetProto.create({
+            id: this.getId(),
+            name: this.getName(),
             level: this.getLevel(),
             mobType: this.getMobType(),
             tankIndex: this.getTankIndex(),
@@ -147,10 +174,10 @@ export class Target {
             minBaseDamage: this.getMinBaseDamage(),
             dualWield: this.getDualWield(),
             canCrush: this.getCanCrush(),
+            suppressDodge: this.getSuppressDodge(),
             parryHaste: this.getParryHaste(),
             spellSchool: this.getSpellSchool(),
             stats: this.stats.asArray(),
-            debuffs: this.debuffs,
         });
     }
     fromProto(eventID, proto) {
@@ -159,6 +186,8 @@ export class Target {
             if (proto.armor) {
                 stats = stats.withStat(Stat.StatArmor, proto.armor);
             }
+            this.setId(eventID, proto.id);
+            this.setName(eventID, proto.name);
             this.setLevel(eventID, proto.level);
             this.setMobType(eventID, proto.mobType);
             this.setTankIndex(eventID, proto.tankIndex);
@@ -166,11 +195,16 @@ export class Target {
             this.setMinBaseDamage(eventID, proto.minBaseDamage);
             this.setDualWield(eventID, proto.dualWield);
             this.setCanCrush(eventID, proto.canCrush);
+            this.setSuppressDodge(eventID, proto.suppressDodge);
             this.setParryHaste(eventID, proto.parryHaste);
             this.setSpellSchool(eventID, proto.spellSchool);
             this.setStats(eventID, stats);
-            this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
         });
+    }
+    clone(eventID) {
+        const newTarget = new Target(this.sim);
+        newTarget.fromProto(eventID, this.toProto());
+        return newTarget;
     }
     static defaultProto() {
         return TargetProto.create({
@@ -181,6 +215,7 @@ export class Target {
             minBaseDamage: 5000,
             dualWield: false,
             canCrush: true,
+            suppressDodge: false,
             parryHaste: true,
             spellSchool: SpellSchool.SpellSchoolPhysical,
             stats: Stats.fromMap({

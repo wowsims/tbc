@@ -1,5 +1,4 @@
 import { Enchant } from '/tbc/core/proto/common.js';
-import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Gem } from '/tbc/core/proto/common.js';
 import { GemColor } from '/tbc/core/proto/common.js';
@@ -8,6 +7,7 @@ import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
+import { PresetEncounter, PresetTarget } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
 import { StatWeightsRequest, StatWeightsResult } from '/tbc/core/proto/api.js';
 import { SimSettings as SimSettingsProto } from '/tbc/core/proto/ui.js';
@@ -41,6 +41,8 @@ export declare class Sim {
     private items;
     private enchants;
     private gems;
+    private presetEncounters;
+    private presetTargets;
     readonly iterationsChangeEmitter: TypedEvent<void>;
     readonly phaseChangeEmitter: TypedEvent<void>;
     readonly fixedRngSeedChangeEmitter: TypedEvent<void>;
@@ -56,13 +58,10 @@ export declare class Sim {
     private readonly _initPromise;
     private lastUsedRngSeed;
     private modifyRaidProto;
-    private modifyEncounterProto;
     constructor();
     waitForInit(): Promise<void>;
     setModifyRaidProto(newModFn: (raidProto: RaidProto) => void): void;
     getModifiedRaidProto(): RaidProto;
-    setModifyEncounterProto(newModFn: (encounterProto: EncounterProto) => void): void;
-    getModifiedEncounterProto(): EncounterProto;
     private makeRaidSimRequest;
     runRaidSim(eventID: EventID, onProgress: Function): Promise<SimResult>;
     runRaidSimWithLogs(eventID: EventID): Promise<SimResult>;
@@ -73,6 +72,10 @@ export declare class Sim {
     getEnchantFlexible(id: number): Enchant | null;
     getGems(socketColor: GemColor | undefined): Array<Gem>;
     getMatchingGems(socketColor: GemColor): Array<Gem>;
+    getPresetEncounter(path: string): PresetEncounter | null;
+    getPresetTarget(path: string): PresetTarget | null;
+    getAllPresetEncounters(): Array<PresetEncounter>;
+    getAllPresetTargets(): Array<PresetTarget>;
     getPhase(): number;
     setPhase(eventID: EventID, newPhase: number): void;
     getFixedRngSeed(): number;

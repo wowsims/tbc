@@ -15,6 +15,7 @@ import { Encounter } from './common.js';
 import { Player } from './api.js';
 import { PartyBuffs } from './common.js';
 import { RaidTarget } from './common.js';
+import { Debuffs } from './common.js';
 import { RaidBuffs } from './common.js';
 /**
  * @generated from protobuf enum proto.Blessings
@@ -123,6 +124,7 @@ class IndividualSimSettings$Type extends MessageType {
         super("proto.IndividualSimSettings", [
             { no: 5, name: "settings", kind: "message", T: () => SimSettings },
             { no: 1, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
+            { no: 8, name: "debuffs", kind: "message", T: () => Debuffs },
             { no: 7, name: "tanks", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => RaidTarget },
             { no: 2, name: "party_buffs", kind: "message", T: () => PartyBuffs },
             { no: 3, name: "player", kind: "message", T: () => Player },
@@ -147,6 +149,9 @@ class IndividualSimSettings$Type extends MessageType {
                     break;
                 case /* proto.RaidBuffs raid_buffs */ 1:
                     message.raidBuffs = RaidBuffs.internalBinaryRead(reader, reader.uint32(), options, message.raidBuffs);
+                    break;
+                case /* proto.Debuffs debuffs */ 8:
+                    message.debuffs = Debuffs.internalBinaryRead(reader, reader.uint32(), options, message.debuffs);
                     break;
                 case /* repeated proto.RaidTarget tanks */ 7:
                     message.tanks.push(RaidTarget.internalBinaryRead(reader, reader.uint32(), options));
@@ -185,6 +190,9 @@ class IndividualSimSettings$Type extends MessageType {
         /* proto.RaidBuffs raid_buffs = 1; */
         if (message.raidBuffs)
             RaidBuffs.internalBinaryWrite(message.raidBuffs, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Debuffs debuffs = 8; */
+        if (message.debuffs)
+            Debuffs.internalBinaryWrite(message.debuffs, writer.tag(8, WireType.LengthDelimited).fork(), options).join();
         /* repeated proto.RaidTarget tanks = 7; */
         for (let i = 0; i < message.tanks.length; i++)
             RaidTarget.internalBinaryWrite(message.tanks[i], writer.tag(7, WireType.LengthDelimited).fork(), options).join();
@@ -282,6 +290,7 @@ class SavedSettings$Type extends MessageType {
         super("proto.SavedSettings", [
             { no: 1, name: "raid_buffs", kind: "message", T: () => RaidBuffs },
             { no: 2, name: "party_buffs", kind: "message", T: () => PartyBuffs },
+            { no: 7, name: "debuffs", kind: "message", T: () => Debuffs },
             { no: 3, name: "player_buffs", kind: "message", T: () => IndividualBuffs },
             { no: 4, name: "consumes", kind: "message", T: () => Consumes },
             { no: 5, name: "race", kind: "enum", T: () => ["proto.Race", Race] },
@@ -305,6 +314,9 @@ class SavedSettings$Type extends MessageType {
                     break;
                 case /* proto.PartyBuffs party_buffs */ 2:
                     message.partyBuffs = PartyBuffs.internalBinaryRead(reader, reader.uint32(), options, message.partyBuffs);
+                    break;
+                case /* proto.Debuffs debuffs */ 7:
+                    message.debuffs = Debuffs.internalBinaryRead(reader, reader.uint32(), options, message.debuffs);
                     break;
                 case /* proto.IndividualBuffs player_buffs */ 3:
                     message.playerBuffs = IndividualBuffs.internalBinaryRead(reader, reader.uint32(), options, message.playerBuffs);
@@ -336,6 +348,9 @@ class SavedSettings$Type extends MessageType {
         /* proto.PartyBuffs party_buffs = 2; */
         if (message.partyBuffs)
             PartyBuffs.internalBinaryWrite(message.partyBuffs, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.Debuffs debuffs = 7; */
+        if (message.debuffs)
+            Debuffs.internalBinaryWrite(message.debuffs, writer.tag(7, WireType.LengthDelimited).fork(), options).join();
         /* proto.IndividualBuffs player_buffs = 3; */
         if (message.playerBuffs)
             IndividualBuffs.internalBinaryWrite(message.playerBuffs, writer.tag(3, WireType.LengthDelimited).fork(), options).join();

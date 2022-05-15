@@ -173,7 +173,7 @@ export const ShadowPriestDPS = {
 };
 export const ISBUptime = {
     type: 'number',
-    getModObject: (simUI) => simUI.sim.encounter.primaryTarget,
+    getModObject: (simUI) => simUI.sim.raid,
     config: {
         extraCssClasses: [
             'isb-uptime-picker',
@@ -181,18 +181,18 @@ export const ISBUptime = {
         ],
         label: 'Improved Shadowbolt Uptime %',
         labelTooltip: "Uptime for the Improved Shadowbolt debuff, applied by 1 or more warlocks in your raid.",
-        changedEvent: (target) => target.debuffsChangeEmitter,
-        getValue: (target) => Math.round(target.getDebuffs().isbUptime * 100),
-        setValue: (eventID, target, newValue) => {
-            const newDebuffs = target.getDebuffs();
+        changedEvent: (raid) => raid.debuffsChangeEmitter,
+        getValue: (raid) => Math.round(raid.getDebuffs().isbUptime * 100),
+        setValue: (eventID, raid, newValue) => {
+            const newDebuffs = raid.getDebuffs();
             newDebuffs.isbUptime = newValue / 100;
-            target.setDebuffs(eventID, newDebuffs);
+            raid.setDebuffs(eventID, newDebuffs);
         },
     },
 };
 export const ExposeWeaknessUptime = {
     type: 'number',
-    getModObject: (simUI) => simUI.sim.encounter.primaryTarget,
+    getModObject: (simUI) => simUI.sim.raid,
     config: {
         extraCssClasses: [
             'expose-weakness-uptime-picker',
@@ -200,18 +200,18 @@ export const ExposeWeaknessUptime = {
         ],
         label: 'Expose Weakness Uptime %',
         labelTooltip: 'Uptime for the Expose Weakness debuff, applied by 1 or more Survival hunters in your raid.',
-        changedEvent: (target) => target.debuffsChangeEmitter,
-        getValue: (target) => Math.round(target.getDebuffs().exposeWeaknessUptime * 100),
-        setValue: (eventID, target, newValue) => {
-            const newDebuffs = target.getDebuffs();
+        changedEvent: (raid) => raid.debuffsChangeEmitter,
+        getValue: (raid) => Math.round(raid.getDebuffs().exposeWeaknessUptime * 100),
+        setValue: (eventID, raid, newValue) => {
+            const newDebuffs = raid.getDebuffs();
             newDebuffs.exposeWeaknessUptime = newValue / 100;
-            target.setDebuffs(eventID, newDebuffs);
+            raid.setDebuffs(eventID, newDebuffs);
         },
     },
 };
 export const ExposeWeaknessHunterAgility = {
     type: 'number',
-    getModObject: (simUI) => simUI.sim.encounter.primaryTarget,
+    getModObject: (simUI) => simUI.sim.raid,
     config: {
         extraCssClasses: [
             'expose-weakness-hunter-agility-picker',
@@ -219,12 +219,12 @@ export const ExposeWeaknessHunterAgility = {
         ],
         label: 'EW Hunter Agility',
         labelTooltip: 'The amount of agility on the Expose Weakness hunter.',
-        changedEvent: (target) => target.debuffsChangeEmitter,
-        getValue: (target) => Math.round(target.getDebuffs().exposeWeaknessHunterAgility),
-        setValue: (eventID, target, newValue) => {
-            const newDebuffs = target.getDebuffs();
+        changedEvent: (raid) => raid.debuffsChangeEmitter,
+        getValue: (raid) => Math.round(raid.getDebuffs().exposeWeaknessHunterAgility),
+        setValue: (eventID, raid, newValue) => {
+            const newDebuffs = raid.getDebuffs();
             newDebuffs.exposeWeaknessHunterAgility = newValue;
-            target.setDebuffs(eventID, newDebuffs);
+            raid.setDebuffs(eventID, newDebuffs);
         },
     },
 };
@@ -338,6 +338,7 @@ export const TankAssignment = {
             { name: 'Main Tank', value: 0 },
             { name: 'Tank 2', value: 1 },
             { name: 'Tank 3', value: 2 },
+            { name: 'Tank 4', value: 3 },
         ],
         changedEvent: (player) => player.getRaid().tanksChangeEmitter,
         getValue: (player) => player.getRaid().getTanks().findIndex(tank => RaidTarget.equals(tank, player.makeRaidTarget())),

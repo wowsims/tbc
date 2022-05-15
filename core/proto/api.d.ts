@@ -5,12 +5,14 @@ import type { IBinaryReader } from "@protobuf-ts/runtime";
 import type { PartialMessage } from "@protobuf-ts/runtime";
 import { MessageType } from "@protobuf-ts/runtime";
 import { Stat } from "./common";
+import { Target } from "./common";
 import { Gem } from "./common";
 import { Enchant } from "./common";
 import { Item } from "./common";
 import { Encounter } from "./common";
 import { ActionID } from "./common";
 import { RaidTarget } from "./common";
+import { Debuffs } from "./common";
 import { RaidBuffs } from "./common";
 import { PartyBuffs } from "./common";
 import { Cooldowns } from "./common";
@@ -195,6 +197,13 @@ export interface Raid {
      * @generated from protobuf field: proto.RaidBuffs buffs = 2;
      */
     buffs?: RaidBuffs;
+    /**
+     * Extra debuffs provided by buff bots in this raid.
+     * This is also used for debuffs in the individual sims.
+     *
+     * @generated from protobuf field: proto.Debuffs debuffs = 5;
+     */
+    debuffs?: Debuffs;
     /**
      * Players who will be tanking mobs.
      *
@@ -554,6 +563,36 @@ export interface GearListResult {
      * @generated from protobuf field: repeated proto.Gem gems = 3;
      */
     gems: Gem[];
+    /**
+     * @generated from protobuf field: repeated proto.PresetEncounter encounters = 4;
+     */
+    encounters: PresetEncounter[];
+}
+/**
+ * @generated from protobuf message proto.PresetTarget
+ */
+export interface PresetTarget {
+    /**
+     * @generated from protobuf field: string path = 1;
+     */
+    path: string;
+    /**
+     * @generated from protobuf field: proto.Target target = 2;
+     */
+    target?: Target;
+}
+/**
+ * @generated from protobuf message proto.PresetEncounter
+ */
+export interface PresetEncounter {
+    /**
+     * @generated from protobuf field: string path = 1;
+     */
+    path: string;
+    /**
+     * @generated from protobuf field: repeated proto.PresetTarget targets = 2;
+     */
+    targets: PresetTarget[];
 }
 /**
  * RPC ComputeStats
@@ -642,6 +681,10 @@ export interface StatWeightsRequest {
      * @generated from protobuf field: proto.PartyBuffs party_buffs = 3;
      */
     partyBuffs?: PartyBuffs;
+    /**
+     * @generated from protobuf field: proto.Debuffs debuffs = 9;
+     */
+    debuffs?: Debuffs;
     /**
      * @generated from protobuf field: proto.Encounter encounter = 4;
      */
@@ -949,6 +992,26 @@ declare class GearListResult$Type extends MessageType<GearListResult> {
  * @generated MessageType for protobuf message proto.GearListResult
  */
 export declare const GearListResult: GearListResult$Type;
+declare class PresetTarget$Type extends MessageType<PresetTarget> {
+    constructor();
+    create(value?: PartialMessage<PresetTarget>): PresetTarget;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PresetTarget): PresetTarget;
+    internalBinaryWrite(message: PresetTarget, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.PresetTarget
+ */
+export declare const PresetTarget: PresetTarget$Type;
+declare class PresetEncounter$Type extends MessageType<PresetEncounter> {
+    constructor();
+    create(value?: PartialMessage<PresetEncounter>): PresetEncounter;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: PresetEncounter): PresetEncounter;
+    internalBinaryWrite(message: PresetEncounter, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.PresetEncounter
+ */
+export declare const PresetEncounter: PresetEncounter$Type;
 declare class ComputeStatsRequest$Type extends MessageType<ComputeStatsRequest> {
     constructor();
     create(value?: PartialMessage<ComputeStatsRequest>): ComputeStatsRequest;

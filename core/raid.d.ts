@@ -1,4 +1,5 @@
 import { Class } from '/tbc/core/proto/common.js';
+import { Debuffs } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
@@ -9,10 +10,12 @@ import { Sim } from './sim.js';
 export declare const MAX_NUM_PARTIES = 5;
 export declare class Raid {
     private buffs;
+    private debuffs;
     private tanks;
     private staggerStormstrikes;
     readonly compChangeEmitter: TypedEvent<void>;
     readonly buffsChangeEmitter: TypedEvent<void>;
+    readonly debuffsChangeEmitter: TypedEvent<void>;
     readonly tanksChangeEmitter: TypedEvent<void>;
     readonly staggerStormstrikesChangeEmitter: TypedEvent<void>;
     readonly changeEmitter: TypedEvent<void>;
@@ -30,6 +33,8 @@ export declare class Raid {
     getClassCount(playerClass: Class): number;
     getBuffs(): RaidBuffs;
     setBuffs(eventID: EventID, newBuffs: RaidBuffs): void;
+    getDebuffs(): Debuffs;
+    setDebuffs(eventID: EventID, newDebuffs: Debuffs): void;
     getTanks(): Array<RaidTarget>;
     setTanks(eventID: EventID, newTanks: Array<RaidTarget>): void;
     getStaggerStormstrikes(): boolean;

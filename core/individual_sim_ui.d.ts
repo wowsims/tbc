@@ -33,7 +33,6 @@ import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { StatWeightsResult } from '/tbc/core/proto/api.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { Target } from './target.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 export declare type IndividualSimIconPickerConfig<ModObject, ValueType> = (IconPickerConfig<ModObject, ValueType> | IconEnumPickerConfig<ModObject, ValueType>) & {
     exclusivityTags?: Array<ExclusivityTag>;
@@ -96,7 +95,7 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
     raidBuffInputs: Array<IndividualSimIconPickerConfig<Raid, any>>;
     partyBuffInputs: Array<IndividualSimIconPickerConfig<Party, any>>;
     playerBuffInputs: Array<IndividualSimIconPickerConfig<Player<any>, any>>;
-    debuffInputs: Array<IndividualSimIconPickerConfig<Target, any>>;
+    debuffInputs: Array<IndividualSimIconPickerConfig<Raid, any>>;
     rotationInputs: InputSection;
     otherInputs?: InputSection;
     consumeOptions?: ConsumeOptions;

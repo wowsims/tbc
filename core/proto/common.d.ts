@@ -442,6 +442,16 @@ export interface Debuffs {
  */
 export interface Target {
     /**
+     * The in-game NPC ID.
+     *
+     * @generated from protobuf field: int32 id = 14;
+     */
+    id: number;
+    /**
+     * @generated from protobuf field: string name = 15;
+     */
+    name: string;
+    /**
      * TODO: Deprecate this after 1 month (2022/6/6)
      *
      * @generated from protobuf field: double armor = 1;
@@ -486,6 +496,10 @@ export interface Target {
      */
     parryHaste: boolean;
     /**
+     * @generated from protobuf field: bool suppress_dodge = 16;
+     */
+    suppressDodge: boolean;
+    /**
      * @generated from protobuf field: proto.SpellSchool spell_school = 13;
      */
     spellSchool: SpellSchool;
@@ -497,6 +511,8 @@ export interface Target {
      */
     tankIndex: number;
     /**
+     * TODO: Deprecate after 1 month (2022/06/14).
+     *
      * @generated from protobuf field: proto.Debuffs debuffs = 2;
      */
     debuffs?: Debuffs;
@@ -523,10 +539,6 @@ export interface Encounter {
      * @generated from protobuf field: double execute_proportion = 3;
      */
     executeProportion: number;
-    /**
-     * @generated from protobuf field: proto.EncounterType type = 5;
-     */
-    type: EncounterType;
     /**
      * If type != Simple or Custom, then this may be empty.
      *
@@ -1957,19 +1969,6 @@ export declare enum MobType {
      * @generated from protobuf enum value: MobTypeUndead = 8;
      */
     MobTypeUndead = 8
-}
-/**
- * @generated from protobuf enum proto.EncounterType
- */
-export declare enum EncounterType {
-    /**
-     * @generated from protobuf enum value: EncounterTypeSimple = 0;
-     */
-    EncounterTypeSimple = 0,
-    /**
-     * @generated from protobuf enum value: EncounterTypeCustom = 1;
-     */
-    EncounterTypeCustom = 1
 }
 /**
  * Extra enum for describing which items are eligible for an enchant, when

@@ -44,7 +44,6 @@ export class RaidSimUI extends SimUI {
         this.config = config;
         this.sim.raid.compChangeEmitter.on(eventID => this.compChangeEmitter.emit(eventID));
         this.sim.setModifyRaidProto(raidProto => this.modifyRaidProto(raidProto));
-        this.sim.setModifyEncounterProto(encounterProto => this.modifyEncounterProto(encounterProto));
         [
             this.compChangeEmitter,
             this.sim.changeEmitter,
@@ -173,7 +172,6 @@ export class RaidSimUI extends SimUI {
                 Stat.StatShadowResistance,
             ],
             showExecuteProportion: true,
-            showNumTargets: true,
         });
         const savedEncounterManager = new SavedDataManager(this.rootElem.getElementsByClassName('saved-encounter-manager')[0], this.sim.encounter, {
             label: 'Encounter',
@@ -246,12 +244,6 @@ export class RaidSimUI extends SimUI {
                     playerProtos.forEach(playerProto => playerProto.buffs.blessingOfWisdom = TristateEffect.TristateEffectImproved);
                 }
             });
-        });
-    }
-    modifyEncounterProto(encounterProto) {
-        // Invoke all the buff bot callbacks.
-        this.getBuffBots().forEach(buffBot => {
-            buffBot.settings.modifyEncounterProto(buffBot, encounterProto);
         });
     }
     getCurrentData() {

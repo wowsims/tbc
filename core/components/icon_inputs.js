@@ -217,12 +217,12 @@ function makeBooleanDebuffInput(id, debuffsFieldName, exclusivityTags) {
         id: id,
         states: 2,
         exclusivityTags: exclusivityTags,
-        changedEvent: (target) => target.debuffsChangeEmitter,
-        getValue: (target) => target.getDebuffs()[debuffsFieldName],
-        setValue: (eventID, target, newValue) => {
-            const newDebuffs = target.getDebuffs();
+        changedEvent: (raid) => raid.debuffsChangeEmitter,
+        getValue: (raid) => raid.getDebuffs()[debuffsFieldName],
+        setValue: (eventID, raid, newValue) => {
+            const newDebuffs = raid.getDebuffs();
             newDebuffs[debuffsFieldName] = newValue;
-            target.setDebuffs(eventID, newDebuffs);
+            raid.setDebuffs(eventID, newDebuffs);
         },
     };
 }
@@ -231,12 +231,12 @@ function makeTristateDebuffInput(id, impId, debuffsFieldName) {
         id: id,
         states: 3,
         improvedId: impId,
-        changedEvent: (target) => target.debuffsChangeEmitter,
-        getValue: (target) => target.getDebuffs()[debuffsFieldName],
-        setValue: (eventID, target, newValue) => {
-            const newDebuffs = target.getDebuffs();
+        changedEvent: (raid) => raid.debuffsChangeEmitter,
+        getValue: (raid) => raid.getDebuffs()[debuffsFieldName],
+        setValue: (eventID, raid, newValue) => {
+            const newDebuffs = raid.getDebuffs();
             newDebuffs[debuffsFieldName] = newValue;
-            target.setDebuffs(eventID, newDebuffs);
+            raid.setDebuffs(eventID, newDebuffs);
         },
     };
 }

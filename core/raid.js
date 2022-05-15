@@ -1,3 +1,4 @@
+import { Debuffs } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { RaidBuffs } from '/tbc/core/proto/common.js';
@@ -10,11 +11,13 @@ export const MAX_NUM_PARTIES = 5;
 export class Raid {
     constructor(sim) {
         this.buffs = RaidBuffs.create();
+        this.debuffs = Debuffs.create();
         this.tanks = [];
         this.staggerStormstrikes = false;
         // Emits when a raid member is added/removed/moved.
         this.compChangeEmitter = new TypedEvent();
         this.buffsChangeEmitter = new TypedEvent();
+        this.debuffsChangeEmitter = new TypedEvent();
         this.tanksChangeEmitter = new TypedEvent();
         this.staggerStormstrikesChangeEmitter = new TypedEvent();
         this.sim = sim;
@@ -27,6 +30,7 @@ export class Raid {
         this.changeEmitter = TypedEvent.onAny([
             this.compChangeEmitter,
             this.buffsChangeEmitter,
+            this.debuffsChangeEmitter,
             this.tanksChangeEmitter,
         ], 'RaidChange');
     }
@@ -76,6 +80,17 @@ export class Raid {
         this.buffs = RaidBuffs.clone(newBuffs);
         this.buffsChangeEmitter.emit(eventID);
     }
+    getDebuffs() {
+        // Make a defensive copy
+        return Debuffs.clone(this.debuffs);
+    }
+    setDebuffs(eventID, newDebuffs) {
+        if (Debuffs.equals(this.debuffs, newDebuffs))
+            return;
+        // Make a defensive copy
+        this.debuffs = Debuffs.clone(newDebuffs);
+        this.debuffsChangeEmitter.emit(eventID);
+    }
     getTanks() {
         // Make a defensive copy
         return this.tanks.map(tank => RaidTarget.clone(tank));
@@ -99,14 +114,16 @@ export class Raid {
     toProto(forExport) {
         return RaidProto.create({
             parties: this.parties.map(party => party.toProto(forExport)),
-            buffs: this.buffs,
-            tanks: this.tanks,
-            staggerStormstrikes: this.staggerStormstrikes,
+            buffs: this.getBuffs(),
+            debuffs: this.getDebuffs(),
+            tanks: this.getTanks(),
+            staggerStormstrikes: this.getStaggerStormstrikes(),
         });
     }
     fromProto(eventID, proto) {
         TypedEvent.freezeAllAndDo(() => {
             this.setBuffs(eventID, proto.buffs || RaidBuffs.create());
+            this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
             this.setStaggerStormstrikes(eventID, proto.staggerStormstrikes);
             this.setTanks(eventID, proto.tanks);
             for (let i = 0; i < MAX_NUM_PARTIES; i++) {

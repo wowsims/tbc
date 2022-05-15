@@ -62,7 +62,7 @@ export class RogueSimUI extends IndividualSimUI {
                 Stat.StatExpertise,
             ],
             modifyDisplayStats: (player, stats) => {
-                const hasImpFF = player.sim.encounter.primaryTarget.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
+                const hasImpFF = player.sim.raid.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
                 if (hasImpFF) {
                     stats = stats.withStat(Stat.StatMeleeHit, stats.getStat(Stat.StatMeleeHit)
                         + 3 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE);
@@ -71,7 +71,7 @@ export class RogueSimUI extends IndividualSimUI {
             },
             statBreakdowns: (player, stats) => {
                 const totalHit = stats.getStat(Stat.StatMeleeHit);
-                const hasImpFF = player.sim.encounter.primaryTarget.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
+                const hasImpFF = player.sim.raid.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
                 const debuffsHit = hasImpFF ? 3 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE : 0;
                 const talentsHit = player.getTalents().precision * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE;
                 const consumesHit = player.getConsumes().food == Food.FoodSpicyHotTalbuk ? 20 : 0;
@@ -241,8 +241,6 @@ export class RogueSimUI extends IndividualSimUI {
                 ],
                 // Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
                 showExecuteProportion: false,
-                // Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
-                showNumTargets: true,
             },
             // If true, the talents on the talents tab will not be individually modifiable by the user.
             // Note that the use can still pick between preset talents, if there is more than 1.

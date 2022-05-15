@@ -2,6 +2,7 @@ export declare function equalsOrBothNull<T>(a: T, b: T, comparator?: (_a: NonNul
 export declare function stringComparator(a: string, b: string): number;
 export declare function sum(arr: Array<number>): number;
 export declare function maxIndex(arr: Array<number>): number | null;
+export declare function swap<T>(arr: Array<T>, i: number, j: number): void;
 export declare function arrayEquals<T>(a: Array<T>, b: Array<T>, comparator?: (a: T, b: T) => boolean): boolean;
 export declare function intersection<T>(a: Array<T>, b: Array<T>): Array<T>;
 export declare function distinct<T>(arr: Array<T>, comparator?: (a: T, b: T) => boolean): Array<T>;
