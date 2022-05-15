@@ -40,6 +40,7 @@ func NewRetributionPaladin(character core.Character, options proto.Player) *Retr
 		hasteLeeway:         time.Duration(retOptions.Options.HasteLeewayMs) * time.Millisecond,
 		judgement:           retOptions.Options.Judgement,
 	}
+	ret.PaladinAura = retOptions.Options.Aura
 
 	// Convert DTPS option to bonus MP5
 	spAtt := retOptions.Options.DamageTakenPerSecond * 5.0 / 10.0

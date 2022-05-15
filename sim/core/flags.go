@@ -1,5 +1,6 @@
 package core
 
+import "github.com/wowsims/tbc/sim/core/proto"
 import "github.com/wowsims/tbc/sim/core/stats"
 
 type ProcMask uint32
@@ -103,6 +104,7 @@ const (
 
 	// These bits are set by the crit and damage rolls.
 	OutcomeCrit
+	OutcomeCrush
 	OutcomePartial1_4 // 1/4 of the spell was resisted.
 	OutcomePartial2_4 // 2/4 of the spell was resisted.
 	OutcomePartial3_4 // 3/4 of the spell was resisted.
@@ -110,7 +112,7 @@ const (
 
 const (
 	OutcomePartial = OutcomePartial1_4 | OutcomePartial2_4 | OutcomePartial3_4
-	OutcomeLanded  = OutcomeHit | OutcomeCrit | OutcomeGlance | OutcomeBlock
+	OutcomeLanded  = OutcomeHit | OutcomeCrit | OutcomeCrush | OutcomeGlance | OutcomeBlock
 )
 
 func (ho HitOutcome) String() string {
@@ -132,6 +134,8 @@ func (ho HitOutcome) String() string {
 		return "Crit" + ho.PartialResistString()
 	} else if ho.Matches(OutcomeHit) {
 		return "Hit" + ho.PartialResistString()
+	} else if ho.Matches(OutcomeCrush) {
+		return "Crush"
 	} else {
 		return "Empty"
 	}
@@ -178,6 +182,24 @@ const (
 
 type SpellSchool byte
 
+const (
+	SpellSchoolNone     SpellSchool = 0
+	SpellSchoolPhysical SpellSchool = 1 << iota
+	SpellSchoolArcane
+	SpellSchoolFire
+	SpellSchoolFrost
+	SpellSchoolHoly
+	SpellSchoolNature
+	SpellSchoolShadow
+
+	SpellSchoolMagic = SpellSchoolArcane | SpellSchoolFire | SpellSchoolFrost | SpellSchoolHoly | SpellSchoolNature | SpellSchoolShadow
+)
+
+// Returns whether there is any overlap between the given masks.
+func (ss SpellSchool) Matches(other SpellSchool) bool {
+	return (ss & other) != 0
+}
+
 func (ss SpellSchool) Stat() stats.Stat {
 	switch ss {
 	case SpellSchoolArcane:
@@ -220,23 +242,26 @@ func (ss SpellSchool) ResistanceStat() stats.Stat {
 	return 0
 }
 
-// Returns whether there is any overlap between the given masks.
-func (ss SpellSchool) Matches(other SpellSchool) bool {
-	return (ss & other) != 0
+func SpellSchoolFromProto(p proto.SpellSchool) SpellSchool {
+	switch p {
+	case proto.SpellSchool_SpellSchoolPhysical:
+		return SpellSchoolPhysical
+	case proto.SpellSchool_SpellSchoolArcane:
+		return SpellSchoolArcane
+	case proto.SpellSchool_SpellSchoolFire:
+		return SpellSchoolFire
+	case proto.SpellSchool_SpellSchoolFrost:
+		return SpellSchoolFrost
+	case proto.SpellSchool_SpellSchoolHoly:
+		return SpellSchoolHoly
+	case proto.SpellSchool_SpellSchoolNature:
+		return SpellSchoolNature
+	case proto.SpellSchool_SpellSchoolShadow:
+		return SpellSchoolShadow
+	default:
+		return SpellSchoolPhysical
+	}
 }
-
-const (
-	SpellSchoolNone     SpellSchool = 0
-	SpellSchoolPhysical SpellSchool = 1 << iota
-	SpellSchoolArcane
-	SpellSchoolFire
-	SpellSchoolFrost
-	SpellSchoolHoly
-	SpellSchoolNature
-	SpellSchoolShadow
-
-	SpellSchoolMagic = SpellSchoolArcane | SpellSchoolFire | SpellSchoolFrost | SpellSchoolHoly | SpellSchoolNature | SpellSchoolShadow
-)
 
 /*
 outcome roll hit/miss/crit/glance (assigns Outcome mask) -> If Hit, Crit Roll -> damage (applies metrics) -> trigger proc

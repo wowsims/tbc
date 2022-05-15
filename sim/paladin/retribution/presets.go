@@ -32,6 +32,7 @@ var defaultRetRotation = &proto.RetributionPaladin_Rotation{
 
 var defaultRetOptions = &proto.RetributionPaladin_Options{
 	Judgement:             proto.RetributionPaladin_Options_Crusader,
+	Aura:                  proto.PaladinAura_SanctityAura,
 	CrusaderStrikeDelayMs: 1700,
 	HasteLeewayMs:         100,
 	DamageTakenPerSecond:  0,

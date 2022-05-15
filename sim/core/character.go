@@ -67,7 +67,7 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 			Level:       CharacterLevel,
 			auraTracker: newAuraTracker(),
 			PseudoStats: stats.NewPseudoStats(),
-			Metrics:     NewCharacterMetrics(),
+			Metrics:     NewUnitMetrics(),
 		},
 
 		Name:         player.Name,
@@ -101,6 +101,11 @@ func NewCharacter(party *Party, partyIndex int, player proto.Player) Character {
 	character.AddStats(bonusStats)
 	character.addUniversalStatDependencies()
 
+	if weapon := character.Equip[proto.ItemSlot_ItemSlotOffHand]; weapon.ID != 0 {
+		if weapon.WeaponType == proto.WeaponType_WeaponTypeShield {
+			character.PseudoStats.CanBlock = true
+		}
+	}
 	character.PseudoStats.InFrontOfTarget = player.InFrontOfTarget
 	character.addEffectPets()
 
@@ -267,8 +272,18 @@ func (character *Character) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 	}
 }
 
-func (character *Character) initialize() {
+func (character *Character) initialize(agent Agent) {
 	character.majorCooldownManager.initialize(character)
+
+	character.gcdAction = &PendingAction{
+		Priority: ActionPriorityGCD,
+		OnAction: func(sim *Simulation) {
+			character.TryUseCooldowns(sim)
+			if character.GCD.IsReady(sim) {
+				agent.OnGCDReady(sim)
+			}
+		},
+	}
 }
 
 func (character *Character) Finalize() {
@@ -278,6 +293,8 @@ func (character *Character) Finalize() {
 
 	character.StatDependencyManager.Finalize()
 	character.stats = character.ApplyStatDependencies(character.stats)
+
+	character.PseudoStats.ParryHaste = character.PseudoStats.CanParry
 
 	character.Unit.finalize()
 
@@ -289,22 +306,19 @@ func (character *Character) init(sim *Simulation, agent Agent) {
 }
 
 func (character *Character) reset(sim *Simulation, agent Agent) {
+	character.ExpectedBonusMana = 0
 	character.majorCooldownManager.reset(sim)
 	character.Unit.reset(sim, agent)
 
-	character.ExpectedBonusMana = 0
-	character.UpdateManaRegenRates()
+	if character.Type == PlayerUnit {
+		character.SetGCDTimer(sim, 0)
+	}
 
-	character.energyBar.reset(sim)
-	character.rageBar.reset(sim)
-
-	character.AutoAttacks.reset(sim)
+	agent.Reset(sim)
 
 	for _, petAgent := range character.Pets {
 		petAgent.GetPet().reset(sim, petAgent)
 	}
-
-	agent.Reset(sim)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
@@ -321,6 +335,11 @@ func (character *Character) advance(sim *Simulation, elapsedTime time.Duration) 
 func (character *Character) HasTrinketEquipped(itemID int32) bool {
 	return character.Equip[items.ItemSlotTrinket1].ID == itemID ||
 		character.Equip[items.ItemSlotTrinket2].ID == itemID
+}
+
+func (character *Character) HasRingEquipped(itemID int32) bool {
+	return character.Equip[items.ItemSlotFinger1].ID == itemID ||
+		character.Equip[items.ItemSlotFinger2].ID == itemID
 }
 
 func (character *Character) HasMetaGemEquipped(gemID int32) bool {

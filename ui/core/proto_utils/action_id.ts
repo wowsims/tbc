@@ -65,6 +65,10 @@ export class ActionId {
 				baseName = 'Refund';
 				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/inv_misc_coin_01.jpg';
 				break;
+			case OtherAction.OtherActionDamageTaken:
+				baseName = 'Damage Taken';
+				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/inv_sword_04.jpg';
+				break;
 		}
 		this.baseName = baseName;
 		this.name = name || baseName;

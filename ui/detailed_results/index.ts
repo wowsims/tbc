@@ -5,6 +5,7 @@ import { SimResult, SimResultFilter } from '/tbc/core/proto_utils/sim_result.js'
 import { SimResultData } from './result_component.js';
 import { ResultsFilter } from './results_filter.js';
 import { CastMetricsTable } from './cast_metrics.js';
+import { DtpsMeleeMetricsTable } from './dtps_melee_metrics.js';
 import { MeleeMetricsTable } from './melee_metrics.js';
 import { SpellMetricsTable } from './spell_metrics.js';
 import { ResourceMetricsTable } from './resource_metrics.js';
@@ -61,6 +62,7 @@ const layoutHTML = `
 		<li class="tabs-filler">
 		</li>
 		<li class="dr-tab-tab active"><a data-toggle="tab" href="#damageTab">DAMAGE</a></li>
+		<li class="dr-tab-tab"><a data-toggle="tab" href="#damageTakenTab">DAMAGE TAKEN</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#buffsTab">BUFFS</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#debuffsTab">DEBUFFS</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#castsTab">CASTS</a></li>
@@ -84,6 +86,18 @@ const layoutHTML = `
 				</div>
 			</div>
 			<div class="dr-row dps-histogram">
+			</div>
+		</div>
+		<div id="damageTakenTab" class="tab-pane dr-tab-content damage-taken-content fade">
+			<div class="dr-row single-player-only">
+				<div class="dtps-melee-metrics">
+				</div>
+			</div>
+			<div class="dr-row single-player-only">
+				<div class="dtps-spell-metrics">
+				</div>
+			</div>
+			<div class="dr-row damage-taken-histogram single-player-only">
 			</div>
 		</div>
 		<div id="buffsTab" class="tab-pane dr-tab-content buffs-content fade">
@@ -148,6 +162,8 @@ const debuffAuraMetrics = new AuraMetricsTable({
 	colorSettings: colorSettings,
 }, true);
 const dpsHistogram = new DpsHistogram({ parent: document.body.getElementsByClassName('dps-histogram')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
+
+const dtpsMeleeMetrics = new DtpsMeleeMetricsTable({ parent: document.body.getElementsByClassName('dtps-melee-metrics')[0] as HTMLElement, resultsEmitter: resultsEmitter, colorSettings: colorSettings });
 
 const timeline = new Timeline({
 	parent: document.body.getElementsByClassName('timeline')[0] as HTMLElement,

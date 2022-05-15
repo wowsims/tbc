@@ -93,7 +93,6 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 					[Stat.StatAgility]: 1.88,
 					[Stat.StatIntellect]: 0,
 					[Stat.StatAttackPower]: 1,
-					[Stat.StatMeleeHit]: 5.38,
 					[Stat.StatMeleeCrit]: 1.98,
 					[Stat.StatExpertise]: 4.70,
 					[Stat.StatMeleeHaste]: 3.27,
@@ -240,6 +239,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					RetributionPaladinInputs.AuraSelection,
 					RetributionPaladinInputs.JudgementSelection,
 					RetributionPaladinInputs.CrusaderStrikeDelayMS,
 					RetributionPaladinInputs.DamgeTakenPerSecond,

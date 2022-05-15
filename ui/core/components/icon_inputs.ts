@@ -40,6 +40,9 @@ import {
 export const ArcaneBrilliance = makeBooleanRaidBuffInput(ActionId.fromSpellId(27127), 'arcaneBrilliance');
 export const DivineSpirit = makeTristateRaidBuffInput(ActionId.fromSpellId(25312), ActionId.fromSpellId(33182), 'divineSpirit', ['Spirit']);
 export const GiftOfTheWild = makeTristateRaidBuffInput(ActionId.fromSpellId(26991), ActionId.fromSpellId(17055), 'giftOfTheWild');
+export const Thorns = makeTristateRaidBuffInput(ActionId.fromSpellId(26992), ActionId.fromSpellId(16840), 'thorns');
+export const PowerWordFortitude = makeTristateRaidBuffInput(ActionId.fromSpellId(25389), ActionId.fromSpellId(14767), 'powerWordFortitude');
+export const ShadowProtection = makeBooleanRaidBuffInput(ActionId.fromSpellId(39374), 'shadowProtection');
 
 // Party Buffs
 export const AtieshMage = makeMultistatePartyBuffInput(ActionId.fromSpellId(28142), 5, 'atieshMage');
@@ -47,6 +50,7 @@ export const AtieshWarlock = makeMultistatePartyBuffInput(ActionId.fromSpellId(2
 export const Bloodlust = makeMultistatePartyBuffInput(ActionId.fromSpellId(2825), 11, 'bloodlust');
 export const BraidedEterniumChain = makeBooleanPartyBuffInput(ActionId.fromSpellId(31025), 'braidedEterniumChain');
 export const ChainOfTheTwilightOwl = makeBooleanPartyBuffInput(ActionId.fromSpellId(31035), 'chainOfTheTwilightOwl');
+export const DevotionAura = makeTristatePartyBuffInput(ActionId.fromSpellId(27149), ActionId.fromSpellId(20142), 'devotionAura');
 export const DraeneiRacialCaster = makeBooleanPartyBuffInput(ActionId.fromSpellId(28878), 'draeneiRacialCaster');
 export const DraeneiRacialMelee = makeBooleanPartyBuffInput(ActionId.fromSpellId(6562), 'draeneiRacialMelee');
 export const EyeOfTheNight = makeBooleanPartyBuffInput(ActionId.fromSpellId(31033), 'eyeOfTheNight');
@@ -56,10 +60,12 @@ export const LeaderOfThePack = makeTristatePartyBuffInput(ActionId.fromSpellId(1
 export const ManaSpringTotem = makeTristatePartyBuffInput(ActionId.fromSpellId(25570), ActionId.fromSpellId(16208), 'manaSpringTotem');
 export const ManaTideTotem = makeMultistatePartyBuffInput(ActionId.fromSpellId(16190), 5, 'manaTideTotems');
 export const MoonkinAura = makeTristatePartyBuffInput(ActionId.fromSpellId(24907), ActionId.fromItemId(32387), 'moonkinAura');
+export const RetributionAura = makeTristatePartyBuffInput(ActionId.fromSpellId(27150), ActionId.fromSpellId(20092), 'retributionAura');
 export const SanctityAura = makeTristatePartyBuffInput(ActionId.fromSpellId(20218), ActionId.fromSpellId(31870), 'sanctityAura');
 export const TotemOfWrath = makeMultistatePartyBuffInput(ActionId.fromSpellId(30706), 5, 'totemOfWrath');
 export const TrueshotAura = makeBooleanPartyBuffInput(ActionId.fromSpellId(27066), 'trueshotAura');
 export const WrathOfAirTotem = makeTristatePartyBuffInput(ActionId.fromSpellId(3738), ActionId.fromSpellId(37212), 'wrathOfAirTotem');
+export const BloodPact = makeTristatePartyBuffInput(ActionId.fromSpellId(27268), ActionId.fromSpellId(18696), 'bloodPact');
 
 export const DrumsOfBattleBuff = makeEnumValuePartyBuffInput(ActionId.fromItemId(185848), 'drums', Drums.DrumsOfBattle, ['Drums']);
 export const DrumsOfRestorationBuff = makeEnumValuePartyBuffInput(ActionId.fromItemId(185850), 'drums', Drums.DrumsOfRestoration, ['Drums']);
@@ -89,6 +95,12 @@ export const ExposeArmor = makeTristateDebuffInput(ActionId.fromSpellId(26866), 
 export const SunderArmor = makeBooleanDebuffInput(ActionId.fromSpellId(25225), 'sunderArmor');
 export const WintersChill = makeBooleanDebuffInput(ActionId.fromSpellId(28595), 'wintersChill');
 export const GiftOfArthas = makeBooleanDebuffInput(ActionId.fromSpellId(11374), 'giftOfArthas');
+export const DemoralizingRoar = makeTristateDebuffInput(ActionId.fromSpellId(26998), ActionId.fromSpellId(16862), 'demoralizingRoar');
+export const DemoralizingShout = makeTristateDebuffInput(ActionId.fromSpellId(25203), ActionId.fromSpellId(12879), 'demoralizingShout');
+export const ThunderClap = makeTristateDebuffInput(ActionId.fromSpellId(25264), ActionId.fromSpellId(12666), 'thunderClap');
+export const InsectSwarm = makeBooleanDebuffInput(ActionId.fromSpellId(27013), 'insectSwarm');
+export const ScorpidSting = makeBooleanDebuffInput(ActionId.fromSpellId(3043), 'scorpidSting');
+export const ShadowEmbrace = makeBooleanDebuffInput(ActionId.fromSpellId(32394), 'shadowEmbrace');
 
 // Consumes
 export const SuperSapper = makeBooleanConsumeInput(ActionId.fromItemId(23827), 'superSapper', [], onSetExplosives);
@@ -99,6 +111,7 @@ export const KiblersBits = makeEnumValueConsumeInput(ActionId.fromItemId(33874),
 export const ScrollOfAgilityV = makeEnumValueConsumeInput(ActionId.fromItemId(27498), 'scrollOfAgility', 5);
 export const ScrollOfSpiritV = makeEnumValueConsumeInput(ActionId.fromItemId(27501), 'scrollOfSpirit', 5, ['Spirit']);
 export const ScrollOfStrengthV = makeEnumValueConsumeInput(ActionId.fromItemId(27503), 'scrollOfStrength', 5);
+export const ScrollOfProtectionV = makeEnumValueConsumeInput(ActionId.fromItemId(27500), 'scrollOfProtection', 5);
 
 export const PetScrollOfAgilityV = makeEnumValueConsumeInput(ActionId.fromItemId(27498), 'petScrollOfAgility', 5);
 export const PetScrollOfStrengthV = makeEnumValueConsumeInput(ActionId.fromItemId(27503), 'petScrollOfStrength', 5);
@@ -404,6 +417,8 @@ export const makePotionsInput = makeConsumeInputFactory('defaultPotion', [
 	{ actionId: ActionId.fromItemId(22832), value: Potions.SuperManaPotion },
 	{ actionId: ActionId.fromItemId(31677), value: Potions.FelManaPotion },
 	{ actionId: ActionId.fromItemId(22828), value: Potions.InsaneStrengthPotion },
+	{ actionId: ActionId.fromItemId(22849), value: Potions.IronshieldPotion },
+	{ actionId: ActionId.fromItemId(22837), value: Potions.HeroicPotion },
 ] as Array<IconEnumValueConfig<Player<any>, Potions>>);
 
 export const makeConjuredInput = makeConsumeInputFactory('defaultConjured', [
@@ -419,6 +434,7 @@ export const makeFlasksInput = makeConsumeInputFactory('flask', [
 	{ actionId: ActionId.fromItemId(22866), value: Flask.FlaskOfPureDeath },
 	{ actionId: ActionId.fromItemId(22854), value: Flask.FlaskOfRelentlessAssault },
 	{ actionId: ActionId.fromItemId(13512), value: Flask.FlaskOfSupremePower },
+	{ actionId: ActionId.fromItemId(22851), value: Flask.FlaskOfFortification },
 ] as Array<IconEnumValueConfig<Player<any>, Flask>>, (eventID: EventID, player: Player<any>, newValue: Flask) => {
 	if (newValue) {
 		const newConsumes = player.getConsumes();
@@ -436,6 +452,7 @@ export const makeBattleElixirsInput = makeConsumeInputFactory('battleElixir', [
 	{ actionId: ActionId.fromItemId(22827), value: BattleElixir.ElixirOfMajorFrostPower },
 	{ actionId: ActionId.fromItemId(22835), value: BattleElixir.ElixirOfMajorShadowPower },
 	{ actionId: ActionId.fromItemId(22824), value: BattleElixir.ElixirOfMajorStrength },
+	{ actionId: ActionId.fromItemId(28104), value: BattleElixir.ElixirOfMastery },
 	{ actionId: ActionId.fromItemId(13452), value: BattleElixir.ElixirOfTheMongoose },
 	{ actionId: ActionId.fromItemId(31679), value: BattleElixir.FelStrengthElixir },
 ] as Array<IconEnumValueConfig<Player<any>, BattleElixir>>, (eventID: EventID, player: Player<any>, newValue: BattleElixir) => {
@@ -447,7 +464,11 @@ export const makeBattleElixirsInput = makeConsumeInputFactory('battleElixir', [
 });
 
 export const makeGuardianElixirsInput = makeConsumeInputFactory('guardianElixir', [
+	{ actionId: ActionId.fromItemId(9088), value: GuardianElixir.GiftOfArthas },
 	{ actionId: ActionId.fromItemId(32067), value: GuardianElixir.ElixirOfDraenicWisdom },
+	{ actionId: ActionId.fromItemId(32068), value: GuardianElixir.ElixirOfIronskin },
+	{ actionId: ActionId.fromItemId(22834), value: GuardianElixir.ElixirOfMajorDefense },
+	{ actionId: ActionId.fromItemId(32062), value: GuardianElixir.ElixirOfMajorFortitude },
 	{ actionId: ActionId.fromItemId(22840), value: GuardianElixir.ElixirOfMajorMageblood },
 ] as Array<IconEnumValueConfig<Player<any>, GuardianElixir>>, (eventID: EventID, player: Player<any>, newValue: GuardianElixir) => {
 	if (newValue) {
@@ -464,6 +485,7 @@ export const makeFoodInput = makeConsumeInputFactory('food', [
 	{ actionId: ActionId.fromItemId(27658), value: Food.FoodRoastedClefthoof },
 	{ actionId: ActionId.fromItemId(33872), value: Food.FoodSpicyHotTalbuk },
 	{ actionId: ActionId.fromItemId(33825), value: Food.FoodSkullfishSoup },
+	{ actionId: ActionId.fromItemId(33052), value: Food.FoodFishermansFeast },
 ] as Array<IconEnumValueConfig<Player<any>, Food>>);
 
 export const makeAlcoholInput = makeConsumeInputFactory('alchohol', [

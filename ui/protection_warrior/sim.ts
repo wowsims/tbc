@@ -54,6 +54,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 				Stat.StatMeleeHit,
 				Stat.StatMeleeCrit,
 				Stat.StatMeleeHaste,
+				Stat.StatArmor,
 				Stat.StatArmorPenetration,
 				Stat.StatDefense,
 				Stat.StatBlock,
@@ -67,6 +68,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
 				Stat.StatHealth,
+				Stat.StatArmor,
 				Stat.StatStamina,
 				Stat.StatStrength,
 				Stat.StatAgility,
@@ -140,7 +142,10 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 			],
 			// IconInputs to include in the 'Other Buffs' section on the settings tab.
 			raidBuffInputs: [
+				IconInputs.PowerWordFortitude,
+				IconInputs.ShadowProtection,
 				IconInputs.GiftOfTheWild,
+				IconInputs.Thorns,
 			],
 			partyBuffInputs: [
 				IconInputs.DrumsOfBattleBuff,
@@ -152,9 +157,12 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 				IconInputs.LeaderOfThePack,
 				IconInputs.FerociousInspiration,
 				IconInputs.TrueshotAura,
+				IconInputs.DevotionAura,
+				IconInputs.RetributionAura,
 				IconInputs.SanctityAura,
 				IconInputs.DraeneiRacialMelee,
 				IconInputs.BraidedEterniumChain,
+				IconInputs.BloodPact,
 			],
 			playerBuffInputs: [
 				IconInputs.BlessingOfKings,
@@ -173,31 +181,47 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 				IconInputs.ExposeArmor,
 				IconInputs.CurseOfRecklessness,
 				IconInputs.GiftOfArthas,
+				IconInputs.DemoralizingRoar,
+				IconInputs.DemoralizingShout,
+				IconInputs.ThunderClap,
+				IconInputs.ShadowEmbrace,
+				IconInputs.InsectSwarm,
+				IconInputs.ScorpidSting,
 			],
 			// Which options are selectable in the 'Consumes' section.
 			consumeOptions: {
 				potions: [
+					Potions.IronshieldPotion,
 					Potions.HastePotion,
+					Potions.MightyRagePotion,
+					Potions.InsaneStrengthPotion,
 				],
 				conjured: [
 					Conjured.ConjuredFlameCap,
 				],
 				flasks: [
 					Flask.FlaskOfRelentlessAssault,
+					Flask.FlaskOfFortification,
 				],
 				battleElixirs: [
 					BattleElixir.ElixirOfDemonslaying,
 					BattleElixir.ElixirOfMajorStrength,
 					BattleElixir.ElixirOfMajorAgility,
 					BattleElixir.ElixirOfTheMongoose,
+					BattleElixir.ElixirOfMastery,
 				],
 				guardianElixirs: [
+					GuardianElixir.ElixirOfMajorFortitude,
+					GuardianElixir.ElixirOfMajorDefense,
+					GuardianElixir.ElixirOfIronskin,
+					GuardianElixir.GiftOfArthas,
 				],
 				food: [
 					Food.FoodRoastedClefthoof,
 					Food.FoodGrilledMudfish,
 					Food.FoodSpicyHotTalbuk,
 					Food.FoodRavagerDog,
+					Food.FoodFishermansFeast,
 				],
 				alcohol: [
 				],
@@ -208,6 +232,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 				other: [
 					IconInputs.ScrollOfAgilityV,
 					IconInputs.ScrollOfStrengthV,
+					IconInputs.ScrollOfProtectionV,
 				],
 			},
 			// Inputs to include in the 'Rotation' section on the settings tab.

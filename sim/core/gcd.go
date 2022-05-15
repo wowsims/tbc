@@ -5,19 +5,6 @@ import (
 	"time"
 )
 
-func (unit *Unit) newGCDAction(sim *Simulation, agent Agent) *PendingAction {
-	return &PendingAction{
-		Priority: ActionPriorityGCD,
-		OnAction: func(sim *Simulation) {
-			character := agent.GetCharacter()
-			character.TryUseCooldowns(sim)
-			if character.GCD.IsReady(sim) {
-				agent.OnGCDReady(sim)
-			}
-		},
-	}
-}
-
 // Note that this is only used when the hardcast and GCD actions
 func (unit *Unit) newHardcastAction(sim *Simulation) {
 	if unit.hardcastAction != nil {
@@ -54,15 +41,10 @@ func (unit *Unit) SetGCDTimer(sim *Simulation, gcdReadyAt time.Duration) {
 	sim.AddPendingAction(unit.gcdAction)
 }
 
-func (unit *Unit) EnableGCDTimer(sim *Simulation, agent Agent) {
-	unit.gcdAction = unit.newGCDAction(sim, agent)
-}
-
 // Call this to stop the GCD loop for a unit.
 // This is mostly used for pets that get summoned / expire.
 func (unit *Unit) CancelGCDTimer(sim *Simulation) {
 	unit.gcdAction.Cancel(sim)
-	unit.gcdAction = nil
 }
 
 func (unit *Unit) IsWaiting() bool {

@@ -1,9 +1,9 @@
 package protection
 
 import (
+	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var ImpaleProtTalents = &proto.WarriorTalents{
@@ -41,6 +41,7 @@ var PlayerOptionsBasic = &proto.Player_ProtectionWarrior{
 var warriorRotation = &proto.ProtectionWarrior_Rotation{
 	DemoShout:       proto.ProtectionWarrior_Rotation_DemoShoutMaintain,
 	ThunderClap:     proto.ProtectionWarrior_Rotation_ThunderClapMaintain,
+	ShieldBlock:     proto.ProtectionWarrior_Rotation_ShieldBlockToProcRevenge,
 	HsRageThreshold: 30,
 }
 
@@ -56,6 +57,7 @@ var warriorOptions = &proto.ProtectionWarrior_Options{
 var FullRaidBuffs = &proto.RaidBuffs{
 	ArcaneBrilliance: true,
 	GiftOfTheWild:    proto.TristateEffect_TristateEffectImproved,
+	Thorns:           proto.TristateEffect_TristateEffectImproved,
 }
 var FullPartyBuffs = &proto.PartyBuffs{
 	Bloodlust:            1,
@@ -73,19 +75,21 @@ var FullIndividualBuffs = &proto.IndividualBuffs{
 	UnleashedRage:   true,
 }
 
-var FullConsumes = &proto.Consumes{}
+var FullConsumes = &proto.Consumes{
+	BattleElixir:   proto.BattleElixir_ElixirOfMastery,
+	GuardianElixir: proto.GuardianElixir_GiftOfArthas,
+}
 
 var FullDebuffs = &proto.Debuffs{
 	BloodFrenzy:               true,
 	FaerieFire:                proto.TristateEffect_TristateEffectImproved,
 	ImprovedSealOfTheCrusader: true,
 	Misery:                    true,
+	ShadowEmbrace:             true,
+	ScorpidSting:              true,
 }
 
-var FullDebuffTarget = &proto.Target{
-	Debuffs: FullDebuffs,
-	Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
-}
+var FullDebuffTarget = core.NewDefaultTargetWithDebuffs(FullDebuffs)
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{

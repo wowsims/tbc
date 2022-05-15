@@ -411,6 +411,7 @@ type CharacterSuiteConfig struct {
 	Consumes    *proto.Consumes
 	Debuffs     *proto.Debuffs
 
+	IsTank          bool
 	InFrontOfTarget bool
 
 	OtherRaces       []proto.Race
@@ -441,6 +442,9 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 		config.SpecOptions.SpecOptions)
 
 	defaultRaid := SinglePlayerRaidProto(defaultPlayer, config.PartyBuffs, config.RaidBuffs)
+	if config.IsTank {
+		defaultRaid.Tanks = append(defaultRaid.Tanks, &proto.RaidTarget{TargetIndex: 0})
+	}
 
 	generator := &CombinedTestGenerator{
 		subgenerators: []SubGenerator{
@@ -516,6 +520,7 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 					PartyBuffs: config.PartyBuffs,
 					Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs, 0),
 					SimOptions: StatWeightsDefaultSimTestOptions,
+					Tanks:      defaultRaid.Tanks,
 
 					StatsToWeigh:    config.StatsToWeigh,
 					EpReferenceStat: config.EPReferenceStat,

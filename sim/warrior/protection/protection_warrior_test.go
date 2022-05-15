@@ -29,6 +29,7 @@ func TestProtectionWarrior(t *testing.T) {
 		Consumes:    FullConsumes,
 		Debuffs:     FullDebuffs,
 
+		IsTank:          true,
 		InFrontOfTarget: true,
 
 		ItemFilter: core.ItemFilter{
@@ -41,6 +42,15 @@ func TestProtectionWarrior(t *testing.T) {
 				proto.WeaponType_WeaponTypeDagger,
 				proto.WeaponType_WeaponTypeFist,
 			},
+		},
+
+		EPReferenceStat: proto.Stat_StatAttackPower,
+		StatsToWeigh: []proto.Stat{
+			proto.Stat_StatStrength,
+			proto.Stat_StatAttackPower,
+			proto.Stat_StatArmor,
+			proto.Stat_StatDodge,
+			proto.Stat_StatBlockValue,
 		},
 	}))
 }

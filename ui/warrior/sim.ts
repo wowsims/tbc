@@ -44,15 +44,6 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
 			],
-			warnings: [
-				(simUI: IndividualSimUI<Spec.SpecWarrior>) => {
-					return {
-						updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter]),
-						shouldDisplay: () => true,
-						getContent: () => 'This sim is newly released, and there are likely a few bugs. Please let us know if you encounter any issues!',
-					};
-				},
-			],
 
 			// All stats for which EP should be calculated.
 			epStats: [

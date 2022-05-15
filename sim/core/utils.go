@@ -111,6 +111,16 @@ func GetTristateValueFloat(effect proto.TristateEffect, regularValue float64, im
 	}
 }
 
+func MakeTristateValue(hasRegular bool, hasImproved bool) proto.TristateEffect {
+	if !hasRegular {
+		return proto.TristateEffect_TristateEffectMissing
+	} else if !hasImproved {
+		return proto.TristateEffect_TristateEffectRegular
+	} else {
+		return proto.TristateEffect_TristateEffectImproved
+	}
+}
+
 func hash(s string) uint32 {
 	h := fnv.New32a()
 	h.Write([]byte(s))
@@ -134,6 +144,14 @@ func TernaryInt32(condition bool, val1 int32, val2 int32) int32 {
 }
 
 func TernaryFloat64(condition bool, val1 float64, val2 float64) float64 {
+	if condition {
+		return val1
+	} else {
+		return val2
+	}
+}
+
+func TernaryDuration(condition bool, val1 time.Duration, val2 time.Duration) time.Duration {
 	if condition {
 		return val1
 	} else {

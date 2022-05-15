@@ -178,6 +178,7 @@ func NewCLOnClearcastRotation() *CLOnClearcastRotation {
 type AdaptiveRotation struct {
 	manaTracker common.ManaSpendingRateTracker
 
+	hasClearcasting bool
 	baseRotation    Rotation // The rotation used most of the time
 	surplusRotation Rotation // The rotation used when we have extra mana
 }
@@ -222,21 +223,27 @@ func (rotation *AdaptiveRotation) GetPresimOptions() *core.PresimOptions {
 		},
 
 		OnPresimResult: func(presimResult proto.UnitMetrics, iterations int32, duration time.Duration) bool {
-			if float64(presimResult.SecondsOomAvg) >= 0.03*duration.Seconds() {
+			if !rotation.hasClearcasting {
 				rotation.baseRotation = NewLBOnlyRotation()
-				rotation.surplusRotation = NewCLOnClearcastRotation()
-			} else {
-				rotation.baseRotation = NewCLOnClearcastRotation()
 				rotation.surplusRotation = NewCLOnCDRotation()
+			} else {
+				if float64(presimResult.SecondsOomAvg) >= 0.03*duration.Seconds() {
+					rotation.baseRotation = NewLBOnlyRotation()
+					rotation.surplusRotation = NewCLOnClearcastRotation()
+				} else {
+					rotation.baseRotation = NewCLOnClearcastRotation()
+					rotation.surplusRotation = NewCLOnCDRotation()
+				}
 			}
 			return true
 		},
 	}
 }
 
-func NewAdaptiveRotation() *AdaptiveRotation {
+func NewAdaptiveRotation(talents *proto.ShamanTalents) *AdaptiveRotation {
 	return &AdaptiveRotation{
-		manaTracker: common.NewManaSpendingRateTracker(),
+		hasClearcasting: talents.ElementalFocus,
+		manaTracker:     common.NewManaSpendingRateTracker(),
 	}
 }
 

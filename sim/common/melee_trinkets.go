@@ -18,6 +18,7 @@ func init() {
 	core.AddItemEffect(28830, ApplyDragonspineTrophy)
 	core.AddItemEffect(30627, ApplyTsunamiTalisman)
 	core.AddItemEffect(31857, ApplyDarkmoonCardWrath)
+	core.AddItemEffect(31858, ApplyDarkmoonCardVengeance)
 	core.AddItemEffect(32505, ApplyMadnessOfTheBetrayer)
 	core.AddItemEffect(32654, ApplyCrystalforgedTrinket)
 	core.AddItemEffect(34427, ApplyBlackenedNaaruSliver)
@@ -384,6 +385,39 @@ func ApplyDarkmoonCardWrath(agent core.Agent) {
 			} else {
 				procAura.Activate(sim)
 				procAura.AddStack(sim)
+			}
+		},
+	})
+}
+
+func ApplyDarkmoonCardVengeance(agent core.Agent) {
+	character := agent.GetCharacter()
+	actionID := core.ActionID{ItemID: 31858}
+
+	procChance := 0.1
+	procSpell := character.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolHoly,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
+			IsPhantom:        true,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigRoll(95, 115),
+			OutcomeApplier: character.OutcomeFuncAlwaysHit(),
+		}),
+	})
+
+	character.RegisterAura(core.Aura{
+		Label:    "DMC Vengeance",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Landed() && sim.RandomFloat("DMC Vengeance") < procChance {
+				procSpell.Cast(sim, spell.Unit)
 			}
 		},
 	})

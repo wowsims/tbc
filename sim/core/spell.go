@@ -28,6 +28,7 @@ type SpellMetrics struct {
 	Misses             int32
 	Hits               int32
 	Crits              int32
+	Crushes            int32
 	Dodges             int32
 	Glances            int32
 	Parries            int32

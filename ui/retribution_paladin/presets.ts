@@ -9,8 +9,13 @@ import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
-import { RetributionPaladin_Rotation as RetributionPaladinRotation, RetributionPaladin_Options as RetributionPaladinOptions } from '/tbc/core/proto/paladin.js';
-import { RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank, RetributionPaladin_Options_Judgement as Judgement } from '/tbc/core/proto/paladin.js';
+import {
+	PaladinAura as PaladinAura,
+	RetributionPaladin_Rotation as RetributionPaladinRotation,
+	RetributionPaladin_Options as RetributionPaladinOptions,
+	RetributionPaladin_Rotation_ConsecrationRank as ConsecrationRank,
+	RetributionPaladin_Options_Judgement as Judgement,
+} from '/tbc/core/proto/paladin.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
@@ -39,6 +44,7 @@ export const DefaultRotation = RetributionPaladinRotation.create({
 });
 
 export const DefaultOptions = RetributionPaladinOptions.create({
+	aura: PaladinAura.SanctityAura,
 	judgement: Judgement.Crusader,
 	crusaderStrikeDelayMs: 1700,
 	hasteLeewayMs: 0,

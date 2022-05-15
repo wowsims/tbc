@@ -249,13 +249,13 @@ func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Spe
 
 	spellEffect.Damage *= target.PseudoStats.DamageTakenMultiplier
 	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
+		if spellEffect.IsPeriodic {
+			spellEffect.Damage *= target.PseudoStats.PeriodicPhysicalDamageTakenMultiplier
+		}
 		if spellEffect.BaseDamage.TargetSpellCoefficient > 0 {
 			spellEffect.Damage += target.PseudoStats.BonusPhysicalDamageTaken
 		}
 		spellEffect.Damage *= target.PseudoStats.PhysicalDamageTakenMultiplier
-		if spellEffect.IsPeriodic {
-			spellEffect.Damage *= target.PseudoStats.PeriodicPhysicalDamageTakenMultiplier
-		}
 	} else if spell.SpellSchool.Matches(SpellSchoolArcane) {
 		spellEffect.Damage *= target.PseudoStats.ArcaneDamageTakenMultiplier
 	} else if spell.SpellSchool.Matches(SpellSchoolFire) {

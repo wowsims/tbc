@@ -19,16 +19,20 @@ func (warlock *Warlock) registerShadowboltSpell() {
 		OutcomeApplier:       warlock.OutcomeFuncMagicHitAndCrit(warlock.SpellCritMultiplier(1, core.TernaryFloat64(warlock.Talents.Ruin, 1, 0))),
 	}
 	// Don't add ISB debuff aura if the target is initialized with the 'estimated ISB uptime' debuff.
-	if warlock.Talents.ImprovedShadowBolt > 0 && (!warlock.Env.Encounter.Targets[0].HasAura("Improved Shadow Bolt") || warlock.Env.Encounter.Targets[0].GetAura("Improved Shadow Bolt").MaxStacks != 0) {
-		warlock.ImpShadowboltAura = core.ImprovedShadowBoltAura(warlock.CurrentTarget, warlock.Talents.ImprovedShadowBolt, 0)
-		effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
-				return
+	if warlock.Talents.ImprovedShadowBolt > 0 {
+		existingAura := warlock.Env.Encounter.Targets[0].GetAurasWithTag("ImprovedShadowBolt")
+
+		if len(existingAura) == 0 || existingAura[0].Duration != core.NeverExpires {
+			warlock.ImpShadowboltAura = core.ImprovedShadowBoltAura(warlock.CurrentTarget, warlock.Talents.ImprovedShadowBolt, 0)
+			effect.OnSpellHitDealt = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
+					return
+				}
+				if !warlock.ImpShadowboltAura.IsActive() {
+					warlock.ImpShadowboltAura.Activate(sim)
+				}
+				warlock.ImpShadowboltAura.SetStacks(sim, 4)
 			}
-			if !warlock.ImpShadowboltAura.IsActive() {
-				warlock.ImpShadowboltAura.Activate(sim)
-			}
-			warlock.ImpShadowboltAura.SetStacks(sim, 4)
 		}
 	}
 

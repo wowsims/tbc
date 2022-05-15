@@ -39,6 +39,11 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 			character.AddStats(stats.Stats{
 				stats.SpellPower: 70,
 			})
+		case proto.Flask_FlaskOfFortification:
+			character.AddStats(stats.Stats{
+				stats.Health:  500,
+				stats.Defense: 10,
+			})
 		}
 	} else {
 		switch consumes.BattleElixir {
@@ -73,6 +78,14 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 			character.AddStats(stats.Stats{
 				stats.Strength: 35,
 			})
+		case proto.BattleElixir_ElixirOfMastery:
+			character.AddStats(stats.Stats{
+				stats.Stamina:   15,
+				stats.Strength:  15,
+				stats.Agility:   15,
+				stats.Intellect: 15,
+				stats.Spirit:    15,
+			})
 		case proto.BattleElixir_ElixirOfTheMongoose:
 			character.AddStats(stats.Stats{
 				stats.Agility:   25,
@@ -92,9 +105,46 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 				stats.Intellect: 30,
 				stats.Spirit:    30,
 			})
+		case proto.GuardianElixir_ElixirOfIronskin:
+			character.AddStats(stats.Stats{
+				stats.Resilience: 30,
+			})
+		case proto.GuardianElixir_ElixirOfMajorDefense:
+			character.AddStats(stats.Stats{
+				stats.Armor: 550,
+			})
+		case proto.GuardianElixir_ElixirOfMajorFortitude:
+			character.AddStats(stats.Stats{
+				stats.Health: 250,
+			})
 		case proto.GuardianElixir_ElixirOfMajorMageblood:
 			character.AddStats(stats.Stats{
-				stats.MP5: 16.0,
+				stats.MP5: 16,
+			})
+		case proto.GuardianElixir_GiftOfArthas:
+			character.AddStats(stats.Stats{
+				stats.ShadowResistance: 10,
+			})
+
+			var debuffAuras []*Aura
+			for _, target := range character.Env.Encounter.Targets {
+				debuffAuras = append(debuffAuras, GiftOfArthasAura(&target.Unit))
+			}
+
+			character.RegisterAura(Aura{
+				Label:    "Gift of Arthas",
+				ActionID: ActionID{SpellID: 11374},
+				Duration: NeverExpires,
+				OnReset: func(aura *Aura, sim *Simulation) {
+					aura.Activate(sim)
+				},
+				OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+					if spellEffect.Landed() &&
+						spell.SpellSchool == SpellSchoolPhysical &&
+						sim.RandomFloat("Gift of Arthas") < 0.3 {
+						debuffAuras[spell.Unit.Index].Activate(sim)
+					}
+				},
 			})
 		}
 	}
@@ -132,6 +182,11 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 			stats.MeleeHit: 20,
 			stats.Spirit:   20,
 		})
+	case proto.Food_FoodFishermansFeast:
+		character.AddStats(stats.Stats{
+			stats.Stamina: 30,
+			stats.Spirit:  20,
+		})
 	}
 
 	switch consumes.Alchohol {
@@ -145,8 +200,12 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 	// Scrolls
 	character.AddStat(stats.Agility, []float64{0, 5, 9, 13, 17, 20}[consumes.ScrollOfAgility])
 	character.AddStat(stats.Strength, []float64{0, 5, 9, 13, 17, 20}[consumes.ScrollOfStrength])
-	// Doesn't stack with DS
+	if !character.HasRingEquipped(29297) {
+		// Proc from Band of Eternal Defender removes scroll.
+		character.AddStat(stats.Armor, []float64{0, 60, 120, 180, 240, 300}[consumes.ScrollOfProtection])
+	}
 	if raidBuffs.DivineSpirit == proto.TristateEffect_TristateEffectMissing {
+		// Doesn't stack with DS
 		character.AddStat(stats.Spirit, []float64{0, 3, 7, 11, 15, 30}[consumes.ScrollOfSpirit])
 	}
 
@@ -612,7 +671,7 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 			})
 	} else if potionType == proto.Potions_MightyRagePotion {
 		actionID := ActionID{ItemID: 13442}
-		aura := character.NewTemporaryStatsAura("Mighty Rage Potion", actionID, stats.Stats{stats.Strength: 20}, time.Second*15)
+		aura := character.NewTemporaryStatsAura("Mighty Rage Potion", actionID, stats.Stats{stats.Strength: 60}, time.Second*15)
 		return MajorCooldown{
 				Type: CooldownTypeDPS,
 				CanActivate: func(sim *Simulation, character *Character) bool {
@@ -689,6 +748,56 @@ func makePotionActivation(potionType proto.Potions, character *Character, potion
 	} else if potionType == proto.Potions_InsaneStrengthPotion {
 		actionID := ActionID{ItemID: 22828}
 		aura := character.NewTemporaryStatsAura("Insane Strength Potion", actionID, stats.Stats{stats.Strength: 120, stats.Defense: -75}, time.Second*15)
+		return MajorCooldown{
+				Type: CooldownTypeDPS,
+				CanActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+				ShouldActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+			},
+			character.RegisterSpell(SpellConfig{
+				ActionID:    actionID,
+				SpellExtras: SpellExtrasNoOnCastComplete,
+				Cast: CastConfig{
+					CD: Cooldown{
+						Timer:    potionCD,
+						Duration: time.Minute * 2,
+					},
+				},
+				ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
+					aura.Activate(sim)
+				},
+			})
+	} else if potionType == proto.Potions_IronshieldPotion {
+		actionID := ActionID{ItemID: 22849}
+		aura := character.NewTemporaryStatsAura("Ironshield Potion", actionID, stats.Stats{stats.Armor: 2500}, time.Minute*2)
+		return MajorCooldown{
+				Type: CooldownTypeDPS,
+				CanActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+				ShouldActivate: func(sim *Simulation, character *Character) bool {
+					return true
+				},
+			},
+			character.RegisterSpell(SpellConfig{
+				ActionID:    actionID,
+				SpellExtras: SpellExtrasNoOnCastComplete,
+				Cast: CastConfig{
+					CD: Cooldown{
+						Timer:    potionCD,
+						Duration: time.Minute * 2,
+					},
+				},
+				ApplyEffects: func(sim *Simulation, _ *Unit, _ *Spell) {
+					aura.Activate(sim)
+				},
+			})
+	} else if potionType == proto.Potions_HeroicPotion {
+		actionID := ActionID{ItemID: 22837}
+		aura := character.NewTemporaryStatsAura("Heroic Potion", actionID, stats.Stats{stats.Strength: 70, stats.Health: 700}, time.Second*15)
 		return MajorCooldown{
 				Type: CooldownTypeDPS,
 				CanActivate: func(sim *Simulation, character *Character) bool {

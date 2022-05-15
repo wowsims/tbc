@@ -9,6 +9,7 @@ message PriestTalents {
 		// Discipline
 		int32 wand_specialization = 1;
 		int32 silent_resolve = 31;
+		int32 improved_power_word_fortitude = 34;
 		bool inner_focus = 2;
 		int32 meditation = 3;
 		int32 mental_agility = 4;

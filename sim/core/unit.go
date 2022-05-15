@@ -72,7 +72,7 @@ type Unit struct {
 	AutoAttacks AutoAttacks
 
 	// Statistics describing the results of the sim.
-	Metrics CharacterMetrics
+	Metrics UnitMetrics
 
 	cdTimers []*Timer
 
@@ -323,6 +323,8 @@ func (unit *Unit) finalize() {
 	unit.initialCastSpeed = unit.CastSpeed
 	unit.initialMeleeSwingSpeed = unit.SwingSpeed()
 	unit.initialRangedSwingSpeed = unit.RangedSwingSpeed()
+
+	unit.applyParryHaste()
 }
 
 func (unit *Unit) init(sim *Simulation) {
@@ -338,9 +340,12 @@ func (unit *Unit) reset(sim *Simulation, agent Agent) {
 		spell.reset(sim)
 	}
 
-	if agent != nil {
-		unit.gcdAction = unit.newGCDAction(sim, agent)
-	}
+	unit.UpdateManaRegenRates()
+
+	unit.energyBar.reset(sim)
+	unit.rageBar.reset(sim)
+
+	unit.AutoAttacks.reset(sim)
 }
 
 // Advance moves time forward counting down auras, CDs, mana regen, etc
@@ -361,6 +366,5 @@ func (unit *Unit) doneIteration(sim *Simulation) {
 	for _, spell := range unit.Spellbook {
 		spell.doneIteration()
 	}
-	unit.Metrics.doneIteration(sim.Duration.Seconds())
 	unit.resetCDs(sim)
 }

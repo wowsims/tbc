@@ -102,6 +102,9 @@ message TargetedActionMetrics {
 		// # of times this action was a critical strike.
     int32 crits = 3;
 
+		// # of times this action was a crushing blow.
+    int32 crushes = 11;
+
 		// # of times this action was a Miss or Resist.
     int32 misses = 4;
 
@@ -168,6 +171,7 @@ message UnitMetrics {
 
 		DistributionMetrics dps = 1;
 		DistributionMetrics threat = 8;
+		DistributionMetrics dtps = 11;
 
     // average seconds spent oom per iteration
     double seconds_oom_avg = 3; 
@@ -256,15 +260,21 @@ message StatWeightsRequest {
     PartyBuffs party_buffs = 3;
     Encounter encounter = 4;
 		SimOptions sim_options = 5;
+		repeated RaidTarget tanks = 8;
 
     repeated Stat stats_to_weigh = 6;
     Stat ep_reference_stat = 7;
 }
 message StatWeightsResult {
-    repeated double weights = 1;
-    repeated double weights_stdev = 2;
-    repeated double ep_values = 3;
-    repeated double ep_values_stdev = 4;
+	StatWeightValues dps = 1;
+	StatWeightValues tps = 2;
+	StatWeightValues dtps = 3;
+}
+message StatWeightValues {
+	repeated double weights = 1;
+	repeated double weights_stdev = 2;
+	repeated double ep_values = 3;
+	repeated double ep_values_stdev = 4;
 }
 
 message AsyncAPIResult {
