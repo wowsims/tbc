@@ -45,7 +45,6 @@ export declare class Player<SpecType extends Spec> {
     private talents;
     readonly specTypeFunctions: SpecTypeFunctions<SpecType>;
     private epWeights;
-    private epWeightsForCalc;
     private currentStats;
     readonly nameChangeEmitter: TypedEvent<void>;
     readonly buffsChangeEmitter: TypedEvent<void>;

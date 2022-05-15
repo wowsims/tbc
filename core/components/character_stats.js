@@ -1,5 +1,5 @@
 import { Stat } from '/tbc/core/proto/common.js';
-import { statNames } from '/tbc/core/proto_utils/names.js';
+import { statNames, statOrder } from '/tbc/core/proto_utils/names.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import * as Mechanics from '/tbc/core/constants/mechanics.js';
@@ -15,7 +15,7 @@ const spellPowerTypeStats = [
 export class CharacterStats extends Component {
     constructor(parent, player, stats, modifyDisplayStats, statBreakdowns) {
         super(parent, 'character-stats-root');
-        this.stats = stats;
+        this.stats = statOrder.filter(stat => stats.includes(stat));
         this.player = player;
         this.modifyDisplayStats = modifyDisplayStats;
         this.statBreakdowns = statBreakdowns;

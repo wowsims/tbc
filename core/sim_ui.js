@@ -1,5 +1,6 @@
 import { Component } from '/tbc/core/components/component.js';
 import { NumberPicker } from '/tbc/core/components/number_picker.js';
+import { ResultsViewer } from '/tbc/core/components/results_viewer.js';
 import { Title } from '/tbc/core/components/title.js';
 import { TypedEvent } from './typed_event.js';
 // Shared UI for all individual sims and the raid sim.
@@ -55,9 +56,8 @@ export class SimUI extends Component {
                 interactive: true,
             });
         }
-        this.resultsPendingElem = this.rootElem.getElementsByClassName('results-pending')[0];
-        this.resultsContentElem = this.rootElem.getElementsByClassName('results-content')[0];
-        this.hideAllResults();
+        const resultsViewerElem = this.rootElem.getElementsByClassName('sim-sidebar-results')[0];
+        this.resultsViewer = new ResultsViewer(resultsViewerElem);
         const titleElem = this.rootElem.getElementsByClassName('sim-sidebar-title')[0];
         const title = new Title(titleElem, config.spec);
         const simActionsContainer = this.rootElem.getElementsByClassName('sim-sidebar-actions')[0];
@@ -157,19 +157,6 @@ export class SimUI extends Component {
         elem.classList.add('sim-top-bar-item');
         topBar.appendChild(elem);
     }
-    hideAllResults() {
-        this.resultsContentElem.style.display = 'none';
-        this.resultsPendingElem.style.display = 'none';
-    }
-    setResultsPending() {
-        this.resultsContentElem.style.display = 'none';
-        this.resultsPendingElem.style.display = 'initial';
-    }
-    setResultsContent(innerHTML) {
-        this.resultsContentElem.innerHTML = innerHTML;
-        this.resultsContentElem.style.display = 'initial';
-        this.resultsPendingElem.style.display = 'none';
-    }
     updateWarnings() {
         const activeWarnings = this.warnings.filter(warning => warning.shouldDisplay());
         const warningsElem = document.getElementsByClassName('warnings')[0];
@@ -201,22 +188,22 @@ export class SimUI extends Component {
         return this.rootElem.classList.contains('individual-sim-ui');
     }
     async runSim(onProgress) {
-        this.setResultsPending();
+        this.resultsViewer.setPending();
         try {
             const result = await this.sim.runRaidSim(TypedEvent.nextEventID(), onProgress);
         }
         catch (e) {
-            this.hideAllResults();
+            this.resultsViewer.hideAll();
             alert(e);
         }
     }
     async runSimOnce() {
-        this.setResultsPending();
+        this.resultsViewer.setPending();
         try {
             const result = await this.sim.runRaidSimWithLogs(TypedEvent.nextEventID());
         }
         catch (e) {
-            this.hideAllResults();
+            this.resultsViewer.hideAll();
             alert(e);
         }
     }
@@ -226,13 +213,7 @@ const simHTML = `
   <section class="sim-sidebar">
     <div class="sim-sidebar-title"></div>
     <div class="sim-sidebar-actions within-raid-sim-hide"></div>
-    <div class="sim-sidebar-results within-raid-sim-hide">
-      <div class="results-pending">
-        <div class="loader"></div>
-      </div>
-      <div class="results-content">
-      </div>
-		</div>
+    <div class="sim-sidebar-results within-raid-sim-hide"></div>
     <div class="sim-sidebar-footer"></div>
   </section>
   <section class="sim-main">

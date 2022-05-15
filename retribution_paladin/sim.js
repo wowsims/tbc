@@ -85,7 +85,6 @@ export class RetributionPaladinSimUI extends IndividualSimUI {
                     [Stat.StatAgility]: 1.88,
                     [Stat.StatIntellect]: 0,
                     [Stat.StatAttackPower]: 1,
-                    [Stat.StatMeleeHit]: 5.38,
                     [Stat.StatMeleeCrit]: 1.98,
                     [Stat.StatExpertise]: 4.70,
                     [Stat.StatMeleeHaste]: 3.27,

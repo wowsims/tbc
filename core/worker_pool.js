@@ -2,7 +2,7 @@ import { REPO_NAME } from '/tbc/core/constants/other.js';
 import { ComputeStatsRequest, ComputeStatsResult } from './proto/api.js';
 import { GearListRequest, GearListResult } from './proto/api.js';
 import { RaidSimRequest, RaidSimResult, ProgressMetrics } from './proto/api.js';
-import { StatWeightsRequest } from './proto/api.js';
+import { StatWeightsRequest, StatWeightsResult } from './proto/api.js';
 const SIM_WORKER_URL = `/${REPO_NAME}/sim_worker.js`;
 export class WorkerPool {
     constructor(numWorkers) {
@@ -27,6 +27,7 @@ export class WorkerPool {
         return ComputeStatsResult.fromBinary(result);
     }
     async statWeightsAsync(request, onProgress) {
+        console.log('Stat weights request: ' + StatWeightsRequest.toJsonString(request));
         const worker = this.getLeastBusyWorker();
         const id = worker.makeTaskId();
         // Add handler for the progress events
@@ -34,6 +35,7 @@ export class WorkerPool {
         // Now start the async sim
         const resultData = await worker.doApiCall('statWeightsAsync', StatWeightsRequest.toBinary(request), id);
         const result = ProgressMetrics.fromBinary(resultData);
+        console.log('Stat weights result: ' + StatWeightsResult.toJsonString(result.finalWeightResult));
         return result.finalWeightResult;
     }
     async raidSimAsync(request, onProgress) {

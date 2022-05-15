@@ -27,7 +27,7 @@ export class RaidSimResultsManager {
         ].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
     }
     setSimProgress(progress) {
-        this.simUI.setResultsContent(`
+        this.simUI.resultsViewer.setContent(`
 			<div class="results-sim">
 					<div class="results-sim-dps">
 						<span class="topline-result-avg">${progress.dps.toFixed(2)}</span>
@@ -50,7 +50,7 @@ export class RaidSimResultsManager {
         };
         this.currentChangeEmitter.emit(eventID);
         const dpsMetrics = simResult.raidMetrics.dps;
-        this.simUI.setResultsContent(`
+        this.simUI.resultsViewer.setContent(`
       <div class="results-sim">
 				${RaidSimResultsManager.makeToplineResultsContent(simResult, this.simUI.isIndividualSim())}
 				<div class="results-sim-reference">
@@ -69,13 +69,13 @@ export class RaidSimResultsManager {
       </div>
     `);
         if (!this.simUI.isIndividualSim()) {
-            Array.from(this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-diff-separator')).forEach(e => e.remove());
-            Array.from(this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-tps-diff')).forEach(e => e.remove());
-            Array.from(this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-dtps-diff')).forEach(e => e.remove());
+            Array.from(this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-diff-separator')).forEach(e => e.remove());
+            Array.from(this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-tps-diff')).forEach(e => e.remove());
+            Array.from(this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-dtps-diff')).forEach(e => e.remove());
         }
-        const simReferenceElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference')[0];
-        const simReferenceDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-diff')[0];
-        const simReferenceSetButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-set-reference')[0];
+        const simReferenceElem = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference')[0];
+        const simReferenceDiffElem = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-diff')[0];
+        const simReferenceSetButton = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-set-reference')[0];
         simReferenceSetButton.addEventListener('click', event => {
             this.referenceData = this.currentData;
             this.referenceChangeEmitter.emit(TypedEvent.nextEventID());
@@ -85,7 +85,7 @@ export class RaidSimResultsManager {
             'content': 'Use as reference',
             'allowHTML': true,
         });
-        const simReferenceSwapButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-swap')[0];
+        const simReferenceSwapButton = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-swap')[0];
         simReferenceSwapButton.addEventListener('click', event => {
             TypedEvent.freezeAllAndDo(() => {
                 if (this.currentData && this.referenceData) {
@@ -105,7 +105,7 @@ export class RaidSimResultsManager {
             'content': 'Swap reference with current',
             'allowHTML': true,
         });
-        const simReferenceDeleteButton = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-delete')[0];
+        const simReferenceDeleteButton = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-delete')[0];
         simReferenceDeleteButton.addEventListener('click', event => {
             this.referenceData = null;
             this.referenceChangeEmitter.emit(TypedEvent.nextEventID());
@@ -118,8 +118,8 @@ export class RaidSimResultsManager {
         this.updateReference();
     }
     updateReference() {
-        const simReferenceElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference')[0];
-        const simReferenceDpsDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-dps-diff')[0];
+        const simReferenceElem = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference')[0];
+        const simReferenceDpsDiffElem = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-dps-diff')[0];
         if (!this.referenceData || !this.currentData) {
             simReferenceElem.classList.remove('has-reference');
             return;
@@ -129,8 +129,8 @@ export class RaidSimResultsManager {
         const referenceDpsMetrics = this.referenceData.simResult.raidMetrics.dps;
         formatDeltaTextElem(simReferenceDpsDiffElem, referenceDpsMetrics.avg, currentDpsMetrics.avg, 2);
         if (this.simUI.isIndividualSim()) {
-            const simReferenceTpsDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-tps-diff')[0];
-            const simReferenceDtpsDiffElem = this.simUI.resultsContentElem.getElementsByClassName('results-sim-reference-dtps-diff')[0];
+            const simReferenceTpsDiffElem = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-tps-diff')[0];
+            const simReferenceDtpsDiffElem = this.simUI.resultsViewer.contentElem.getElementsByClassName('results-sim-reference-dtps-diff')[0];
             const curPlayerMetrics = this.currentData.simResult.getPlayers()[0];
             const refPlayerMetrics = this.referenceData.simResult.getPlayers()[0];
             formatDeltaTextElem(simReferenceTpsDiffElem, refPlayerMetrics.tps.avg, curPlayerMetrics.tps.avg, 2);

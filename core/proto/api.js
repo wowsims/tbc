@@ -1689,12 +1689,13 @@ class StatWeightsRequest$Type extends MessageType {
             { no: 3, name: "party_buffs", kind: "message", T: () => PartyBuffs },
             { no: 4, name: "encounter", kind: "message", T: () => Encounter },
             { no: 5, name: "sim_options", kind: "message", T: () => SimOptions },
+            { no: 8, name: "tanks", kind: "message", repeat: 1 /*RepeatType.PACKED*/, T: () => RaidTarget },
             { no: 6, name: "stats_to_weigh", kind: "enum", repeat: 1 /*RepeatType.PACKED*/, T: () => ["proto.Stat", Stat] },
             { no: 7, name: "ep_reference_stat", kind: "enum", T: () => ["proto.Stat", Stat] }
         ]);
     }
     create(value) {
-        const message = { statsToWeigh: [], epReferenceStat: 0 };
+        const message = { tanks: [], statsToWeigh: [], epReferenceStat: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1719,6 +1720,9 @@ class StatWeightsRequest$Type extends MessageType {
                     break;
                 case /* proto.SimOptions sim_options */ 5:
                     message.simOptions = SimOptions.internalBinaryRead(reader, reader.uint32(), options, message.simOptions);
+                    break;
+                case /* repeated proto.RaidTarget tanks */ 8:
+                    message.tanks.push(RaidTarget.internalBinaryRead(reader, reader.uint32(), options));
                     break;
                 case /* repeated proto.Stat stats_to_weigh */ 6:
                     if (wireType === WireType.LengthDelimited)
@@ -1757,6 +1761,9 @@ class StatWeightsRequest$Type extends MessageType {
         /* proto.SimOptions sim_options = 5; */
         if (message.simOptions)
             SimOptions.internalBinaryWrite(message.simOptions, writer.tag(5, WireType.LengthDelimited).fork(), options).join();
+        /* repeated proto.RaidTarget tanks = 8; */
+        for (let i = 0; i < message.tanks.length; i++)
+            RaidTarget.internalBinaryWrite(message.tanks[i], writer.tag(8, WireType.LengthDelimited).fork(), options).join();
         /* repeated proto.Stat stats_to_weigh = 6; */
         if (message.statsToWeigh.length) {
             writer.tag(6, WireType.LengthDelimited).fork();

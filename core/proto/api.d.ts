@@ -651,6 +651,10 @@ export interface StatWeightsRequest {
      */
     simOptions?: SimOptions;
     /**
+     * @generated from protobuf field: repeated proto.RaidTarget tanks = 8;
+     */
+    tanks: RaidTarget[];
+    /**
      * @generated from protobuf field: repeated proto.Stat stats_to_weigh = 6;
      */
     statsToWeigh: Stat[];

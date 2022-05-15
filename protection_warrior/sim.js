@@ -33,6 +33,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                 Stat.StatMeleeHit,
                 Stat.StatMeleeCrit,
                 Stat.StatMeleeHaste,
+                Stat.StatArmor,
                 Stat.StatArmorPenetration,
                 Stat.StatDefense,
                 Stat.StatBlock,

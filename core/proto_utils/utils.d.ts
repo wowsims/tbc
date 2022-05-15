@@ -88,7 +88,6 @@ export declare function withSpecProto<SpecType extends Spec>(spec: Spec, player:
 export declare function playerToSpec(player: Player): Spec;
 export declare function isSharpWeaponType(weaponType: WeaponType): boolean;
 export declare function isBluntWeaponType(weaponType: WeaponType): boolean;
-export declare const specEPTransforms: Record<Spec, (epWeights: Stats) => Stats>;
 export declare function getMetaGemEffectEP(spec: Spec, gem: Gem, playerStats: Stats): number;
 export declare function canEquipItem(item: Item, spec: Spec, slot: ItemSlot | undefined): boolean;
 export declare function getEligibleItemSlots(item: Item): Array<ItemSlot>;

@@ -7,6 +7,7 @@ export declare const raceNames: Record<Race, string>;
 export declare function nameToRace(name: string): Race;
 export declare const classNames: Record<Class, string>;
 export declare function nameToClass(name: string): Class;
+export declare const statOrder: Array<Stat>;
 export declare const statNames: Record<Stat, string>;
 export declare const slotNames: Record<ItemSlot, string>;
 export declare const resourceNames: Record<ResourceType, string>;

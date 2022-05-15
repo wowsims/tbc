@@ -1,4 +1,5 @@
 import { Component } from '/tbc/core/components/component.js';
+import { ResultsViewer } from '/tbc/core/components/results_viewer.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Sim } from './sim.js';
 import { EventID, TypedEvent } from './typed_event.js';
@@ -15,17 +16,13 @@ export declare abstract class SimUI extends Component {
     readonly sim: Sim;
     readonly isWithinRaidSim: boolean;
     readonly changeEmitter: TypedEvent<void>;
-    readonly resultsPendingElem: HTMLElement;
-    readonly resultsContentElem: HTMLElement;
+    readonly resultsViewer: ResultsViewer;
     private warnings;
     private warningsTippy;
     constructor(parentElem: HTMLElement, sim: Sim, config: SimUIConfig);
     addAction(name: string, cssClass: string, actFn: () => void): void;
     addTab(title: string, cssClass: string, innerHTML: string): void;
     addToolbarItem(elem: HTMLElement): void;
-    hideAllResults(): void;
-    setResultsPending(): void;
-    setResultsContent(innerHTML: string): void;
     private updateWarnings;
     addWarning(warning: SimWarning): void;
     abstract getStorageKey(postfix: string): string;

@@ -3,5 +3,4 @@ import { Popup } from './popup.js';
 export declare class SettingsMenu extends Popup {
     private readonly simUI;
     constructor(parent: HTMLElement, simUI: SimUI);
-    private setupEpWeightsSettings;
 }

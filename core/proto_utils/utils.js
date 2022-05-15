@@ -958,47 +958,6 @@ export function isBluntWeaponType(weaponType) {
         WeaponType.WeaponTypeStaff,
     ].includes(weaponType);
 }
-export const specEPTransforms = {
-    [Spec.SpecBalanceDruid]: (epWeights) => {
-        return epWeights.withStat(Stat.StatSpellHit, 0);
-    },
-    [Spec.SpecElementalShaman]: (epWeights) => {
-        return epWeights.withStat(Stat.StatSpellHit, 0);
-    },
-    [Spec.SpecEnhancementShaman]: (epWeights) => {
-        return epWeights;
-    },
-    [Spec.SpecFeralDruid]: (epWeights) => {
-        return epWeights;
-    },
-    [Spec.SpecHunter]: (epWeights) => {
-        return epWeights;
-    },
-    [Spec.SpecMage]: (epWeights) => {
-        return epWeights.withStat(Stat.StatSpellHit, 0);
-    },
-    [Spec.SpecRogue]: (epWeights) => {
-        return epWeights;
-    },
-    [Spec.SpecRetributionPaladin]: (epWeights) => {
-        return epWeights.withStat(Stat.StatMeleeHit, 0);
-    },
-    [Spec.SpecShadowPriest]: (epWeights) => {
-        return epWeights.withStat(Stat.StatSpellHit, 0);
-    },
-    [Spec.SpecWarlock]: (epWeights) => {
-        return epWeights.withStat(Stat.StatSpellHit, 0);
-    },
-    [Spec.SpecWarrior]: (epWeights) => {
-        return epWeights;
-    },
-    [Spec.SpecProtectionWarrior]: (epWeights) => {
-        return epWeights;
-    },
-    [Spec.SpecSmitePriest]: (epWeights) => {
-        return epWeights;
-    },
-};
 // Custom functions for determining the EP value of meta gem effects.
 // Default meta effect EP value is 0, so just handle the ones relevant to your spec.
 const metaGemEffectEPs = {

@@ -13,7 +13,7 @@ import { talentStringToProto } from '/tbc/core/talents/factory.js';
 import { Gear } from '/tbc/core/proto_utils/gear.js';
 import { gemMatchesSocket, } from '/tbc/core/proto_utils/gems.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
-import { canEquipEnchant, canEquipItem, classColors, emptyRaidTarget, getEligibleItemSlots, getTalentTree, getTalentTreeIcon, getMetaGemEffectEP, newRaidTarget, raceToFaction, specEPTransforms, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
+import { canEquipEnchant, canEquipItem, classColors, emptyRaidTarget, getEligibleItemSlots, getTalentTree, getTalentTreeIcon, getMetaGemEffectEP, newRaidTarget, raceToFaction, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto, } from '/tbc/core/proto_utils/utils.js';
 import { TypedEvent } from './typed_event.js';
 import { MAX_PARTY_SIZE } from './party.js';
 import { sum } from './utils.js';
@@ -33,7 +33,6 @@ export class Player {
         this.enchantEPCache = new Map();
         this.talents = null;
         this.epWeights = new Stats();
-        this.epWeightsForCalc = new Stats();
         this.currentStats = PlayerStats.create();
         this.nameChangeEmitter = new TypedEvent('PlayerName');
         this.buffsChangeEmitter = new TypedEvent('PlayerBuffs');
@@ -135,7 +134,6 @@ export class Player {
     }
     setEpWeights(eventID, newEpWeights) {
         this.epWeights = newEpWeights;
-        this.epWeightsForCalc = specEPTransforms[this.spec](this.epWeights);
         this.epWeightsChangeEmitter.emit(eventID);
         this.gemEPCache = new Map();
         this.itemEPCache = new Map();
@@ -143,7 +141,6 @@ export class Player {
     }
     async computeStatWeights(eventID, epStats, epReferenceStat, onProgress) {
         const result = await this.sim.statWeights(this, epStats, epReferenceStat, onProgress);
-        this.setEpWeights(eventID, new Stats(result.dps.epValues));
         return result;
     }
     getCurrentStats() {
@@ -363,7 +360,7 @@ export class Player {
         if (stats == undefined) {
             return 0;
         }
-        return stats.computeEP(this.epWeightsForCalc);
+        return stats.computeEP(this.epWeights);
     }
     computeGemEP(gem) {
         if (this.gemEPCache.has(gem.id)) {
@@ -415,7 +412,7 @@ export class Player {
                 itemStats = itemStats.withStat(Stat.StatMeleeCrit, itemStats.getStat(Stat.StatMeleeCrit) + 24);
             }
         }
-        let ep = itemStats.computeEP(this.epWeightsForCalc);
+        let ep = itemStats.computeEP(this.epWeights);
         // unique items are slightly worse than non-unique because you can have only one.
         if (item.unique) {
             ep -= 0.01;

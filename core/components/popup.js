@@ -8,6 +8,9 @@ export class Popup extends Component {
         this.rootElem.style.setProperty('--theme-color-primary', computedStyles.getPropertyValue('--theme-color-primary').trim());
         this.rootElem.style.setProperty('--theme-color-background', computedStyles.getPropertyValue('--theme-color-background').trim());
         this.rootElem.style.setProperty('--theme-color-background-raw', computedStyles.getPropertyValue('--theme-color-background-raw').trim());
+        if (parent.closest('.hide-threat-metrics')) {
+            this.rootElem.classList.add('hide-threat-metrics');
+        }
         $(this.rootElem).bPopup({
             onClose: () => this.rootElem.remove(),
         });

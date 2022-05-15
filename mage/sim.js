@@ -65,7 +65,6 @@ export class MageSimUI extends IndividualSimUI {
                     [Stat.StatArcaneSpellPower]: 0.78,
                     [Stat.StatFireSpellPower]: 0,
                     [Stat.StatFrostSpellPower]: 0.21,
-                    [Stat.StatSpellHit]: 0.5,
                     [Stat.StatSpellCrit]: 0.77,
                     [Stat.StatSpellHaste]: 0.84,
                     [Stat.StatMP5]: 0.61,

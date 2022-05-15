@@ -1,4 +1,4 @@
-import { statNames } from '/tbc/core/proto_utils/names.js';
+import { statNames, statOrder } from '/tbc/core/proto_utils/names.js';
 import { Component } from './component.js';
 import { NumberPicker } from './number_picker.js';
 export class BonusStatsPicker extends Component {
@@ -13,7 +13,7 @@ export class BonusStatsPicker extends Component {
             'allowHTML': true,
         });
         this.rootElem.appendChild(label);
-        this.statPickers = this.stats.map(stat => new NumberPicker(this.rootElem, player, {
+        this.statPickers = statOrder.filter(stat => this.stats.includes(stat)).map(stat => new NumberPicker(this.rootElem, player, {
             label: statNames[stat],
             changedEvent: (player) => player.bonusStatsChangeEmitter,
             getValue: (player) => player.getBonusStats().getStat(stat),

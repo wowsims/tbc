@@ -24,26 +24,6 @@
   font-size: 14px;
 }
 
-.balance-druid-sim-ui .results-ep-table tr td:nth-child(1) {
-  font-size: 12px;
-}
-
-.balance-druid-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
-  font-size: 12px;
-}
-
-.balance-druid-sim-ui .results-ep-table tr td:nth-child(2):after {
-  font-size: 11px;
-}
-
-.balance-druid-sim-ui .results-ep-table tr td:nth-child(4):after {
-  font-size: 11px;
-}
-
-.balance-druid-sim-ui .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
-  font-size: 10px;
-}
-
 :root {
   --theme-color-primary: DarkSlateGrey;
   --theme-color-background: DarkSlateGrey;
@@ -617,7 +597,7 @@ input, select {
   color: var(--sidebar-text-color);
 }
 
-.results-sim, .results-ep-table {
+.results-sim {
   color: var(--sidebar-text-color);
   text-shadow: 0 0 10px var(--sidebar-highlight-color);
 }
@@ -2413,52 +2393,116 @@ input, select {
   font-weight: bold;
 }
 
+.ep-weights-header {
+  display: flex;
+}
+
+.ep-weights-actions {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.ep-weights-actions > * {
+  margin: 10px 20px;
+}
+
+.ep-weights-results {
+  position: relative;
+  width: 50%;
+}
+
+.ep-weights-results .results-viewer {
+  margin: 0 !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+.show-all-stats-container .boolean-picker-input {
+  width: auto;
+}
+
+.ep-weights-table {
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
 .results-ep-table {
   margin: auto;
+  color: white;
+}
+
+.results-ep-table tr {
+  background-color: #111218;
+}
+
+.results-ep-table tr.odd {
+  background: #222;
+}
+
+.results-ep-table tr:hover {
+  background: #333;
+}
+
+.ep-weights-table:not(.show-all-stats) .non-ep-stat {
+  display: none;
+}
+
+.results-ep-table .col-action {
+  color: var(--theme-color-primary);
+  margin: 0 3px;
+  cursor: pointer;
+}
+
+.results-ep-table .col-action:hover {
+  text-shadow: 0 0 3px white, 0 0 3px white, 0 0 3px white;
+}
+
+.results-ep-table td, .results-ep-table th {
+  padding: 2px 20px;
+  white-space: nowrap;
 }
 
 .results-ep-table td {
-  padding: 3px;
-}
-
-.results-ep-table tr td:nth-child(1) {
   text-align: right;
   font-size: 14px;
-  font-weight: 700;
 }
 
-.results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
+.results-ep-table td input {
+  text-align: right;
+}
+
+.results-ep-table th {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.results-ep-table td:nth-child(1) {
   text-align: left;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
 }
 
-.results-ep-table tr td:nth-child(2):after {
-  content: " DPS";
-  font-size: 13px;
-}
-
-.results-ep-table tr td:nth-child(4):after {
-  content: " EP";
-  font-size: 13px;
-}
-
-.results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
+.stdev-cell span:nth-child(2) {
   text-align: left;
   font-size: 12px;
   font-weight: 700;
 }
 
-.results-ep-table tr td:nth-child(3):before, .results-ep-table tr td:nth-child(5):before {
+.stdev-cell span:nth-child(2):before {
   content: " ±";
   padding: 1px;
 }
 
-.stats-type-ep .results-ep-table tr td:nth-child(2), .stats-type-ep .results-ep-table tr td:nth-child(3) {
+.stats-type-ep .type-weight {
   display: none;
 }
 
-.stats-type-dps .results-ep-table tr td:nth-child(4), .stats-type-dps .results-ep-table tr td:nth-child(5) {
+.stats-type-weight .type-ep {
   display: none;
 }
 
@@ -2990,26 +3034,6 @@ input, select {
   font-size: 11px;
 }
 
-.hunter-sim-ui .results-ep-table tr td:nth-child(1) {
-  font-size: 11px;
-}
-
-.hunter-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
-  font-size: 11px;
-}
-
-.hunter-sim-ui .results-ep-table tr td:nth-child(2):after {
-  font-size: 11px;
-}
-
-.hunter-sim-ui .results-ep-table tr td:nth-child(4):after {
-  font-size: 11px;
-}
-
-.hunter-sim-ui .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
-  font-size: 10px;
-}
-
 .mage-sim-ui {
   --theme-color-primary: #10abb5;
   --theme-color-background: #101a20;
@@ -3099,26 +3123,6 @@ input, select {
   font-size: 11px;
 }
 
-.enhancement-shaman-sim-ui .results-ep-table tr td:nth-child(1) {
-  font-size: 11px;
-}
-
-.enhancement-shaman-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
-  font-size: 11px;
-}
-
-.enhancement-shaman-sim-ui .results-ep-table tr td:nth-child(2):after {
-  font-size: 11px;
-}
-
-.enhancement-shaman-sim-ui .results-ep-table tr td:nth-child(4):after {
-  font-size: 11px;
-}
-
-.enhancement-shaman-sim-ui .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
-  font-size: 10px;
-}
-
 .totem-dropdowns-container {
   display: flex;
   justify-content: space-around;
@@ -3155,26 +3159,6 @@ input, select {
   font-size: 11px;
 }
 
-.rogue-sim-ui .results-ep-table tr td:nth-child(1) {
-  font-size: 11px;
-}
-
-.rogue-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
-  font-size: 11px;
-}
-
-.rogue-sim-ui .results-ep-table tr td:nth-child(2):after {
-  font-size: 11px;
-}
-
-.rogue-sim-ui .results-ep-table tr td:nth-child(4):after {
-  font-size: 11px;
-}
-
-.rogue-sim-ui .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
-  font-size: 10px;
-}
-
 .shadow-priest-sim-ui {
   --theme-color-primary: #9b57f7;
   --theme-color-background: #1d1726;
@@ -3200,26 +3184,6 @@ input, select {
   font-size: 14px;
 }
 
-.shadow-priest-sim-ui .results-ep-table tr td:nth-child(1) {
-  font-size: 12px;
-}
-
-.shadow-priest-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
-  font-size: 12px;
-}
-
-.shadow-priest-sim-ui .results-ep-table tr td:nth-child(2):after {
-  font-size: 11px;
-}
-
-.shadow-priest-sim-ui .results-ep-table tr td:nth-child(4):after {
-  font-size: 11px;
-}
-
-.shadow-priest-sim-ui .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
-  font-size: 10px;
-}
-
 .smite-priest-sim-ui {
   --theme-color-primary: #908986;
   --theme-color-background: #1d1726;
@@ -3243,26 +3207,6 @@ input, select {
 
 .smite-priest-sim-ui .character-stats-table-row {
   font-size: 14px;
-}
-
-.smite-priest-sim-ui .results-ep-table tr td:nth-child(1) {
-  font-size: 12px;
-}
-
-.smite-priest-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
-  font-size: 12px;
-}
-
-.smite-priest-sim-ui .results-ep-table tr td:nth-child(2):after {
-  font-size: 11px;
-}
-
-.smite-priest-sim-ui .results-ep-table tr td:nth-child(4):after {
-  font-size: 11px;
-}
-
-.smite-priest-sim-ui .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
-  font-size: 10px;
 }
 
 .warrior-sim-ui {
@@ -3309,26 +3253,6 @@ input, select {
 
 .retribution-paladin-sim-ui .character-stats-table-row {
   font-size: 11px;
-}
-
-.retribution-paladin-sim-ui .results-ep-table tr td:nth-child(1) {
-  font-size: 11px;
-}
-
-.retribution-paladin-sim-ui .results-ep-table tr td:nth-child(2), .results-ep-table tr td:nth-child(4) {
-  font-size: 11px;
-}
-
-.retribution-paladin-sim-ui .results-ep-table tr td:nth-child(2):after {
-  font-size: 11px;
-}
-
-.retribution-paladin-sim-ui .results-ep-table tr td:nth-child(4):after {
-  font-size: 11px;
-}
-
-.retribution-paladin-sim-ui .results-ep-table tr td:nth-child(3), .results-ep-table tr td:nth-child(5) {
-  font-size: 10px;
 }
 
 .assigned-buff-player {

@@ -79,6 +79,8 @@ export class IndividualSimUI extends SimUI {
         this.individualConfig = config;
         this.raidSimResultsManager = null;
         this.settingsMuuri = null;
+        this.prevEpIterations = 0;
+        this.prevEpSimResult = null;
         if (!launchedSpecs.includes(this.player.spec)) {
             this.addWarning({
                 updateOn: new TypedEvent(),

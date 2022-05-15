@@ -31,6 +31,7 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { SpecOptions } from '/tbc/core/proto_utils/utils.js';
 import { SpecRotation } from '/tbc/core/proto_utils/utils.js';
 import { Stat } from '/tbc/core/proto/common.js';
+import { StatWeightsResult } from '/tbc/core/proto/api.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Target } from './target.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
@@ -132,6 +133,8 @@ export declare abstract class IndividualSimUI<SpecType extends Spec> extends Sim
     private readonly exclusivityMap;
     private raidSimResultsManager;
     private settingsMuuri;
+    prevEpIterations: number;
+    prevEpSimResult: StatWeightsResult | null;
     constructor(parentElem: HTMLElement, player: Player<SpecType>, config: IndividualSimUIConfig<SpecType>);
     private loadSettings;
     private addSidebarComponents;
