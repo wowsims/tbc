@@ -1,4 +1,3 @@
-import { EncounterType } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
 import { SpellSchool } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -20,7 +19,6 @@ import * as Mechanics from '/tbc/core/constants/mechanics.js';
 
 export interface EncounterPickerConfig {
 	simpleTargetStats?: Array<Stat>;
-	showNumTargets: boolean;
 	showExecuteProportion: boolean;
 }
 
@@ -67,22 +65,9 @@ export class EncounterPicker extends Component {
 				});
 			});
 		}
-
-		if (config.showNumTargets) {
-			new NumberPicker(this.rootElem, modEncounter, {
-				label: '# of Targets',
-				changedEvent: (encounter: Encounter) => encounter.changeEmitter,
-				getValue: (encounter: Encounter) => encounter.getNumTargets(),
-				setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
-					encounter.setNumTargets(eventID, newValue);
-				},
-				enableWhen: (encounter: Encounter) => encounter.getType() == EncounterType.EncounterTypeSimple,
-			});
-		}
 		
-		// Simple/Custom/Preset [Edit Button]
 		const advancedButton = document.createElement('button');
-		advancedButton.classList.add('sim-button', 'advanced-button', 'experimental');
+		advancedButton.classList.add('sim-button', 'advanced-button');
 		advancedButton.textContent = 'ADVANCED';
 		advancedButton.addEventListener('click', () => new AdvancedEncounterPicker(this.rootElem, modEncounter));
 		this.rootElem.appendChild(advancedButton);
@@ -107,22 +92,25 @@ class AdvancedEncounterPicker extends Popup {
 
 		this.addCloseButton();
 
+		const presetEncounters = this.encounter.sim.getAllPresetEncounters();
+
 		const encounterTypeContainer = this.rootElem.getElementsByClassName('encounter-type')[0] as HTMLElement;
 		new EnumPicker<Encounter>(encounterTypeContainer, this.encounter, {
 			label: 'ENCOUNTER',
 			values: [
-				{ name: 'Simple', value: EncounterType.EncounterTypeSimple },
-				{ name: 'Custom', value: EncounterType.EncounterTypeCustom },
-			].concat((getEnumValues(EncounterType) as Array<EncounterType>).filter(val => ![EncounterType.EncounterTypeSimple, EncounterType.EncounterTypeCustom].includes(val)).map((val, i) => {
+				{ name: 'Custom', value: -1 },
+			].concat(presetEncounters.map((pe, i) => {
 				return {
-					name: '',
-					value: val,
+					name: pe.path,
+					value: i,
 				};
 			})),
-			changedEvent: (encounter: Encounter) => encounter.typeChangeEmitter,
-			getValue: (encounter: Encounter) => encounter.getType(),
+			changedEvent: (encounter: Encounter) => encounter.changeEmitter,
+			getValue: (encounter: Encounter) => presetEncounters.findIndex(pe => encounter.matchesPreset(pe)),
 			setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
-				encounter.setType(eventID, newValue);
+				if (newValue != -1) {
+					encounter.applyPreset(eventID, presetEncounters[newValue]);
+				}
 			},
 		});
 
@@ -142,6 +130,7 @@ class AdvancedEncounterPicker extends Popup {
 				encounter.setTargets(eventID, newValue);
 			},
 			newItem: () => Target.fromDefaults(TypedEvent.nextEventID(), this.encounter.sim),
+			copyItem: (oldItem: Target) => oldItem.clone(TypedEvent.nextEventID()),
 			newItemPicker: (parent: HTMLElement, target: Target) => new TargetPicker(parent, target),
 		});
 	}
@@ -155,9 +144,33 @@ class TargetPicker extends Component {
 			<div class="target-picker-section target-picker-section2"></div>
 			<div class="target-picker-section target-picker-section3"></div>
 		`;
+
+		const encounter = modTarget.sim.encounter;
 		const section1 = this.rootElem.getElementsByClassName('target-picker-section1')[0] as HTMLElement;
 		const section2 = this.rootElem.getElementsByClassName('target-picker-section2')[0] as HTMLElement;
 		const section3 = this.rootElem.getElementsByClassName('target-picker-section3')[0] as HTMLElement;
+
+		const presetTargets = modTarget.sim.getAllPresetTargets();
+		new EnumPicker<Target>(section1, modTarget, {
+			extraCssClasses: ['npc-picker'],
+			label: 'NPC',
+			labelTooltip: 'Selects a preset NPC configuration.',
+			values: [
+				{ name: 'Custom', value: -1 },
+			].concat(presetTargets.map((pe, i) => {
+				return {
+					name: pe.path,
+					value: i,
+				};
+			})),
+			changedEvent: (target: Target) => target.changeEmitter,
+			getValue: (target: Target) => presetTargets.findIndex(pe => target.matchesPreset(pe)),
+			setValue: (eventID: EventID, target: Target, newValue: number) => {
+				if (newValue != -1) {
+					target.applyPreset(eventID, presetTargets[newValue]);
+				}
+			},
+		});
 
 		new EnumPicker<Target>(section1, modTarget, {
 			label: 'Level',
@@ -184,6 +197,7 @@ class TargetPicker extends Component {
 		});
 		new EnumPicker<Target>(section1, modTarget, {
 			label: 'Tanked By',
+			labelTooltip: 'Determines which player in the raid this enemy will attack. If no player is assigned to the specified tank slot, this enemy will not attack.',
 			values: [
 				{ name: 'None', value: -1 },
 				{ name: 'Main Tank', value: 0 },
@@ -197,9 +211,11 @@ class TargetPicker extends Component {
 			},
 		});
 
-		ALL_TARGET_STATS.forEach(stat => {
+		ALL_TARGET_STATS.forEach(statData => {
+			const stat = statData.stat;
 			new NumberPicker(section2, modTarget, {
 				label: statNames[stat],
+				labelTooltip: statData.tooltip,
 				changedEvent: (target: Target) => target.statsChangeEmitter,
 				getValue: (target: Target) => target.getStats().getStat(stat),
 				setValue: (eventID: EventID, target: Target, newValue: number) => {
@@ -246,6 +262,16 @@ class TargetPicker extends Component {
 			enableWhen: (target: Target) => target.getLevel() == Mechanics.BOSS_LEVEL,
 		});
 		new BooleanPicker(section3, modTarget, {
+			label: 'Suppress Dodge',
+			labelTooltip: 'Reduces the chance for this enemy\'s attacks to be dodged by 20% and be missed by 5%. All Sunwell Plateau bosses have this.',
+			changedEvent: (target: Target) => target.changeEmitter,
+			getValue: (target: Target) => target.getSuppressDodge(),
+			setValue: (eventID: EventID, target: Target, newValue: boolean) => {
+				target.setSuppressDodge(eventID, newValue);
+			},
+			enableWhen: (target: Target) => target.getLevel() == Mechanics.BOSS_LEVEL,
+		});
+		new BooleanPicker(section3, modTarget, {
 			label: 'Parry Haste',
 			labelTooltip: 'Whether this enemy will gain parry haste when parrying attacks.',
 			changedEvent: (target: Target) => target.propChangeEmitter,
@@ -266,7 +292,7 @@ class TargetPicker extends Component {
 				{ name: 'Nature', value: SpellSchool.SpellSchoolNature },
 				{ name: 'Shadow', value: SpellSchool.SpellSchoolShadow },
 			],
-			changedEvent: (target: Target) => target.levelChangeEmitter,
+			changedEvent: (target: Target) => target.propChangeEmitter,
 			getValue: (target: Target) => target.getSpellSchool(),
 			setValue: (eventID: EventID, target: Target, newValue: number) => {
 				target.setSpellSchool(eventID, newValue);
@@ -278,6 +304,7 @@ class TargetPicker extends Component {
 function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, showExecuteProportion: boolean) {
 	new NumberPicker(rootElem, encounter, {
 		label: 'Duration',
+		labelTooltip: 'The fight length for each sim iteration, in seconds.',
 		changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
 		getValue: (encounter: Encounter) => encounter.getDuration(),
 		setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
@@ -286,6 +313,7 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 	});
 	new NumberPicker(rootElem, encounter, {
 		label: 'Duration +/-',
+		labelTooltip: 'Adds a random amount of time, in seconds, between [value, -1 * value] to each sim iteration. For example, setting Duration to 180 and Duration +/- to 10 will result in random durations between 170s and 190s.',
 		changedEvent: (encounter: Encounter) => encounter.durationChangeEmitter,
 		getValue: (encounter: Encounter) => encounter.getDurationVariation(),
 		setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
@@ -306,15 +334,16 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 	}
 }
 
-const ALL_TARGET_STATS: Array<Stat> = [
-	Stat.StatArmor,
-	Stat.StatArcaneResistance,
-	Stat.StatFireResistance,
-	Stat.StatFrostResistance,
-	Stat.StatNatureResistance,
-	Stat.StatShadowResistance,
-	Stat.StatAttackPower,
-	Stat.StatBlockValue,
+const ALL_TARGET_STATS: Array<{ stat: Stat, tooltip: string}> = [
+	{ stat: Stat.StatHealth, tooltip: 'Not currently used anywhere.' },
+	{ stat: Stat.StatArmor, tooltip: '' },
+	{ stat: Stat.StatArcaneResistance, tooltip: '' },
+	{ stat: Stat.StatFireResistance, tooltip: '' },
+	{ stat: Stat.StatFrostResistance, tooltip: '' },
+	{ stat: Stat.StatNatureResistance, tooltip: '' },
+	{ stat: Stat.StatShadowResistance, tooltip: '' },
+	{ stat: Stat.StatAttackPower, tooltip: '' },
+	{ stat: Stat.StatBlockValue, tooltip: '' },
 ];
 
 const mobTypeEnumValues = [

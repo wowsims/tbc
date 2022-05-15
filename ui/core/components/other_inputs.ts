@@ -9,6 +9,8 @@ import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
+import { Encounter } from '/tbc/core/encounter.js';
+import { Raid } from '/tbc/core/raid.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -190,7 +192,7 @@ export const ShadowPriestDPS = {
 
 export const ISBUptime = {
 	type: 'number' as const,
-	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.encounter.primaryTarget,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.raid,
 	config: {
 		extraCssClasses: [
 			'isb-uptime-picker',
@@ -198,19 +200,19 @@ export const ISBUptime = {
 		],
 		label: 'Improved Shadowbolt Uptime %',
 		labelTooltip: "Uptime for the Improved Shadowbolt debuff, applied by 1 or more warlocks in your raid.",
-		changedEvent: (target: Target) => target.debuffsChangeEmitter,
-		getValue: (target: Target) => Math.round(target.getDebuffs().isbUptime * 100),
-		setValue: (eventID: EventID, target: Target, newValue: number) => {
-			const newDebuffs = target.getDebuffs();
+		changedEvent: (raid: Raid) => raid.debuffsChangeEmitter,
+		getValue: (raid: Raid) => Math.round(raid.getDebuffs().isbUptime * 100),
+		setValue: (eventID: EventID, raid: Raid, newValue: number) => {
+			const newDebuffs = raid.getDebuffs();
 			newDebuffs.isbUptime = newValue / 100;
-			target.setDebuffs(eventID, newDebuffs);
+			raid.setDebuffs(eventID, newDebuffs);
 		},
 	},
 };
 
 export const ExposeWeaknessUptime = {
 	type: 'number' as const,
-	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.encounter.primaryTarget,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.raid,
 	config: {
 		extraCssClasses: [
 			'expose-weakness-uptime-picker',
@@ -218,19 +220,19 @@ export const ExposeWeaknessUptime = {
 		],
 		label: 'Expose Weakness Uptime %',
 		labelTooltip: 'Uptime for the Expose Weakness debuff, applied by 1 or more Survival hunters in your raid.',
-		changedEvent: (target: Target) => target.debuffsChangeEmitter,
-		getValue: (target: Target) => Math.round(target.getDebuffs().exposeWeaknessUptime * 100),
-		setValue: (eventID: EventID, target: Target, newValue: number) => {
-			const newDebuffs = target.getDebuffs();
+		changedEvent: (raid: Raid) => raid.debuffsChangeEmitter,
+		getValue: (raid: Raid) => Math.round(raid.getDebuffs().exposeWeaknessUptime * 100),
+		setValue: (eventID: EventID, raid: Raid, newValue: number) => {
+			const newDebuffs = raid.getDebuffs();
 			newDebuffs.exposeWeaknessUptime = newValue / 100;
-			target.setDebuffs(eventID, newDebuffs);
+			raid.setDebuffs(eventID, newDebuffs);
 		},
 	},
 };
 
 export const ExposeWeaknessHunterAgility = {
 	type: 'number' as const,
-	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.encounter.primaryTarget,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.raid,
 	config: {
 		extraCssClasses: [
 			'expose-weakness-hunter-agility-picker',
@@ -238,12 +240,12 @@ export const ExposeWeaknessHunterAgility = {
 		],
 		label: 'EW Hunter Agility',
 		labelTooltip: 'The amount of agility on the Expose Weakness hunter.',
-		changedEvent: (target: Target) => target.debuffsChangeEmitter,
-		getValue: (target: Target) => Math.round(target.getDebuffs().exposeWeaknessHunterAgility),
-		setValue: (eventID: EventID, target: Target, newValue: number) => {
-			const newDebuffs = target.getDebuffs();
+		changedEvent: (raid: Raid) => raid.debuffsChangeEmitter,
+		getValue: (raid: Raid) => Math.round(raid.getDebuffs().exposeWeaknessHunterAgility),
+		setValue: (eventID: EventID, raid: Raid, newValue: number) => {
+			const newDebuffs = raid.getDebuffs();
 			newDebuffs.exposeWeaknessHunterAgility = newValue;
-			target.setDebuffs(eventID, newDebuffs);
+			raid.setDebuffs(eventID, newDebuffs);
 		},
 	},
 };
@@ -363,6 +365,7 @@ export const TankAssignment = {
 			{ name: 'Main Tank', value: 0 },
 			{ name: 'Tank 2', value: 1 },
 			{ name: 'Tank 3', value: 2 },
+			{ name: 'Tank 4', value: 3 },
 		],
 		changedEvent: (player: Player<any>) => player.getRaid()!.tanksChangeEmitter,
 		getValue: (player: Player<any>) => player.getRaid()!.getTanks().findIndex(tank => RaidTarget.equals(tank, player.makeRaidTarget())),

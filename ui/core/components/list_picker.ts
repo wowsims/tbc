@@ -1,11 +1,14 @@
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
-import { arrayEquals } from '/tbc/core/utils.js';
+import { arrayEquals, swap } from '/tbc/core/utils.js';
 
 import { Input, InputConfig } from './input.js';
+
+declare var tippy: any;
 
 export interface ListPickerConfig<ModObject, ItemType> extends InputConfig<ModObject, Array<ItemType>> {
 	itemLabel: string,
 	newItem: () => ItemType,
+	copyItem: (oldItem: ItemType) => ItemType,
 	newItemPicker: (parent: HTMLElement, item: ItemType) => void,
 }
 
@@ -35,8 +38,8 @@ export class ListPicker<ModObject, ItemType> extends Input<ModObject, Array<Item
 		const newItemButton = this.rootElem.getElementsByClassName('list-picker-new-button')[0] as HTMLElement;
 		newItemButton.addEventListener('click', event => {
 			const newItem = this.config.newItem();
-			this.addNewPicker(newItem);
-			this.inputChanged(TypedEvent.nextEventID());
+			const newList = this.config.getValue(this.modObject).concat([newItem]);
+			this.config.setValue(TypedEvent.nextEventID(), this.modObject, newList);
 		});
 
 		this.init();
@@ -78,21 +81,87 @@ export class ListPicker<ModObject, ItemType> extends Input<ModObject, Array<Item
 		itemContainer.classList.add('list-picker-item-container');
 		itemContainer.innerHTML = `
 			<div class="list-picker-item-header">
+				<span class="list-picker-item-up fa fa-angle-up"></span>
+				<span class="list-picker-item-down fa fa-angle-down"></span>
+				<span class="list-picker-item-copy fa fa-copy"></span>
 				<span class="list-picker-item-delete fa fa-times"></span>
 			</div>
 			<div class="list-picker-item">
 			</div>
 		`;
 
+		const upButton = itemContainer.getElementsByClassName('list-picker-item-up')[0] as HTMLElement;
+		upButton.addEventListener('click', event => {
+			const index = this.itemPickerPairs.findIndex(ipp => ipp.item == item);
+			if (index == -1) {
+				console.error('Could not find list picker item!');
+				return;
+			}
+			if (index == 0) {
+				return;
+			}
+
+			const newList = this.config.getValue(this.modObject);
+			swap(newList, index, index - 1);
+			this.config.setValue(TypedEvent.nextEventID(), this.modObject, newList);
+		});
+		tippy(upButton, {
+			'content': `Move Up`,
+			'allowHTML': true,
+		});
+
+		const downButton = itemContainer.getElementsByClassName('list-picker-item-down')[0] as HTMLElement;
+		downButton.addEventListener('click', event => {
+			const index = this.itemPickerPairs.findIndex(ipp => ipp.item == item);
+			if (index == -1) {
+				console.error('Could not find list picker item!');
+				return;
+			}
+			if (index == this.itemPickerPairs.length - 1) {
+				return;
+			}
+
+			const newList = this.config.getValue(this.modObject);
+			swap(newList, index, index + 1);
+			this.config.setValue(TypedEvent.nextEventID(), this.modObject, newList);
+		});
+		tippy(downButton, {
+			'content': `Move Down`,
+			'allowHTML': true,
+		});
+
+		const copyButton = itemContainer.getElementsByClassName('list-picker-item-copy')[0] as HTMLElement;
+		copyButton.addEventListener('click', event => {
+			const index = this.itemPickerPairs.findIndex(ipp => ipp.item == item);
+			if (index == -1) {
+				console.error('Could not find list picker item!');
+				return;
+			}
+
+			const copiedItem = this.config.copyItem(item);
+			const newList = this.config.getValue(this.modObject).concat([copiedItem]);
+			this.config.setValue(TypedEvent.nextEventID(), this.modObject, newList);
+		});
+		tippy(copyButton, {
+			'content': `Copy to New ${this.config.itemLabel}`,
+			'allowHTML': true,
+		});
+
 		const deleteButton = itemContainer.getElementsByClassName('list-picker-item-delete')[0] as HTMLElement;
 		deleteButton.addEventListener('click', event => {
 			const index = this.itemPickerPairs.findIndex(ipp => ipp.item == item);
 			if (index == -1) {
+				console.error('Could not find list picker item!');
 				return;
 			}
-			this.itemPickerPairs[index].picker.remove();
-			this.itemPickerPairs.splice(index, 1);
-			this.inputChanged(TypedEvent.nextEventID());
+
+			const newList = this.config.getValue(this.modObject);
+			newList.splice(index, 1);
+			this.config.setValue(TypedEvent.nextEventID(), this.modObject, newList);
+		});
+		tippy(deleteButton, {
+			'content': `Delete`,
+			'allowHTML': true,
 		});
 
 		const itemElem = itemContainer.getElementsByClassName('list-picker-item')[0] as HTMLElement;

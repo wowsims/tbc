@@ -23,6 +23,7 @@ import { Player } from '/tbc/core/player.js';
 import { Raid } from '/tbc/core/raid.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
+import { Encounter } from '/tbc/core/encounter.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { ExclusivityTag } from '/tbc/core/individual_sim_ui.js';
@@ -251,32 +252,32 @@ function makeMultistateIndividualBuffInput(id: ActionId, numStates: number, buff
 	}
 }
 
-function makeBooleanDebuffInput(id: ActionId, debuffsFieldName: keyof Debuffs, exclusivityTags?: Array<ExclusivityTag>): IndividualSimIconPickerConfig<Target, boolean> {
+function makeBooleanDebuffInput(id: ActionId, debuffsFieldName: keyof Debuffs, exclusivityTags?: Array<ExclusivityTag>): IndividualSimIconPickerConfig<Raid, boolean> {
 	return {
 		id: id,
 		states: 2,
 		exclusivityTags: exclusivityTags,
-		changedEvent: (target: Target) => target.debuffsChangeEmitter,
-		getValue: (target: Target) => target.getDebuffs()[debuffsFieldName] as boolean,
-		setValue: (eventID: EventID, target: Target, newValue: boolean) => {
-			const newDebuffs = target.getDebuffs();
+		changedEvent: (raid: Raid) => raid.debuffsChangeEmitter,
+		getValue: (raid: Raid) => raid.getDebuffs()[debuffsFieldName] as boolean,
+		setValue: (eventID: EventID, raid: Raid, newValue: boolean) => {
+			const newDebuffs = raid.getDebuffs();
 			(newDebuffs[debuffsFieldName] as boolean) = newValue;
-			target.setDebuffs(eventID, newDebuffs);
+			raid.setDebuffs(eventID, newDebuffs);
 		},
 	}
 }
 
-function makeTristateDebuffInput(id: ActionId, impId: ActionId, debuffsFieldName: keyof Debuffs): IndividualSimIconPickerConfig<Target, number> {
+function makeTristateDebuffInput(id: ActionId, impId: ActionId, debuffsFieldName: keyof Debuffs): IndividualSimIconPickerConfig<Raid, number> {
 	return {
 		id: id,
 		states: 3,
 		improvedId: impId,
-		changedEvent: (target: Target) => target.debuffsChangeEmitter,
-		getValue: (target: Target) => target.getDebuffs()[debuffsFieldName] as number,
-		setValue: (eventID: EventID, target: Target, newValue: number) => {
-			const newDebuffs = target.getDebuffs();
+		changedEvent: (raid: Raid) => raid.debuffsChangeEmitter,
+		getValue: (raid: Raid) => raid.getDebuffs()[debuffsFieldName] as number,
+		setValue: (eventID: EventID, raid: Raid, newValue: number) => {
+			const newDebuffs = raid.getDebuffs();
 			(newDebuffs[debuffsFieldName] as number) = newValue;
-			target.setDebuffs(eventID, newDebuffs);
+			raid.setDebuffs(eventID, newDebuffs);
 		},
 	}
 }

@@ -4,6 +4,7 @@ import (
 	_ "github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/druid/balance"
 	"github.com/wowsims/tbc/sim/druid/feral"
+	_ "github.com/wowsims/tbc/sim/encounters"
 	"github.com/wowsims/tbc/sim/hunter"
 	"github.com/wowsims/tbc/sim/mage"
 	"github.com/wowsims/tbc/sim/paladin/retribution"

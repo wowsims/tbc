@@ -3,7 +3,6 @@ package enhancement
 import (
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var BasicRaidBuffs = &proto.RaidBuffs{}
@@ -89,11 +88,6 @@ var FullConsumes = &proto.Consumes{
 	DefaultConjured: proto.Conjured_ConjuredFlameCap,
 }
 
-var NoDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{},
-	Stats:   stats.Stats{stats.Armor: 6700}.ToFloatArray(),
-}
-
 var FullDebuffs = &proto.Debuffs{
 	BloodFrenzy:                 true,
 	ExposeArmor:                 proto.TristateEffect_TristateEffectImproved,
@@ -103,11 +97,6 @@ var FullDebuffs = &proto.Debuffs{
 	Misery:                      true,
 	ExposeWeaknessUptime:        0.8,
 	ExposeWeaknessHunterAgility: 800,
-}
-
-var FullDebuffTarget = &proto.Target{
-	Debuffs: FullDebuffs,
-	Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 }
 
 var Phase2Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{

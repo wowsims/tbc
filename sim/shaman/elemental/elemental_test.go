@@ -73,11 +73,12 @@ func BenchmarkSimulate(b *testing.B) {
 				Buffs:     FullIndividualBuffs,
 			},
 			FullPartyBuffs,
-			FullRaidBuffs),
+			FullRaidBuffs,
+			FullDebuffs),
 		Encounter: &proto.Encounter{
 			Duration: 300,
 			Targets: []*proto.Target{
-				FullDebuffTarget,
+				core.NewDefaultTarget(),
 			},
 		},
 		SimOptions: core.AverageDefaultSimTestOptions,

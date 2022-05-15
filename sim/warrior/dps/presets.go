@@ -3,7 +3,6 @@ package dps
 import (
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var PlayerOptionsArmsSlam = &proto.Player_Warrior{
@@ -133,11 +132,6 @@ var FullDebuffs = &proto.Debuffs{
 	ImprovedSealOfTheCrusader: true,
 	JudgementOfWisdom:         true,
 	Misery:                    true,
-}
-
-var FullDebuffTarget = &proto.Target{
-	Debuffs: FullDebuffs,
-	Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 }
 
 var FuryP1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{

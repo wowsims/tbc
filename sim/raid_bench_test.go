@@ -276,6 +276,12 @@ func BenchmarkSimulate(b *testing.B) {
 			Buffs: &proto.RaidBuffs{
 				GiftOfTheWild: proto.TristateEffect_TristateEffectImproved,
 			},
+			Debuffs: &proto.Debuffs{
+				JudgementOfWisdom:         true,
+				ImprovedSealOfTheCrusader: true,
+				CurseOfElements:           proto.TristateEffect_TristateEffectImproved,
+				IsbUptime:                 0.2,
+			},
 		},
 		Encounter: &proto.Encounter{
 			Duration:          180,
@@ -284,12 +290,6 @@ func BenchmarkSimulate(b *testing.B) {
 				{
 					Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 					MobType: proto.MobType_MobTypeDemon,
-					Debuffs: &proto.Debuffs{
-						JudgementOfWisdom:         true,
-						ImprovedSealOfTheCrusader: true,
-						CurseOfElements:           proto.TristateEffect_TristateEffectImproved,
-						IsbUptime:                 0.2,
-					},
 				},
 			},
 		},

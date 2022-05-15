@@ -11,7 +11,9 @@ import (
  * Returns all items, enchants, and gems recognized by the sim.
  */
 func GetGearList(request *proto.GearListRequest) *proto.GearListResult {
-	result := &proto.GearListResult{}
+	result := &proto.GearListResult{
+		Encounters: presetEncounters[:],
+	}
 
 	for i := range items.Items {
 		item := items.Items[i]

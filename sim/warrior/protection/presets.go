@@ -1,7 +1,6 @@
 package protection
 
 import (
-	"github.com/wowsims/tbc/sim/core"
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
@@ -88,8 +87,6 @@ var FullDebuffs = &proto.Debuffs{
 	ShadowEmbrace:             true,
 	ScorpidSting:              true,
 }
-
-var FullDebuffTarget = core.NewDefaultTargetWithDebuffs(FullDebuffs)
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	{

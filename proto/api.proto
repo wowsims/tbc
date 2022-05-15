@@ -63,6 +63,10 @@ message Raid {
 
 		RaidBuffs buffs = 2;
 
+		// Extra debuffs provided by buff bots in this raid.
+		// This is also used for debuffs in the individual sims.
+		Debuffs debuffs = 5;
+
 		// Players who will be tanking mobs.
 		repeated RaidTarget tanks = 4;
 
@@ -227,6 +231,15 @@ message GearListResult {
     repeated Item items = 1;
     repeated Enchant enchants = 2;
     repeated Gem gems = 3;
+		repeated PresetEncounter encounters = 4;
+}
+message PresetTarget {
+	string path = 1;
+	Target target = 2;
+}
+message PresetEncounter {
+	string path = 1;
+	repeated PresetTarget targets = 2;
 }
 
 // RPC ComputeStats
@@ -258,6 +271,7 @@ message StatWeightsRequest {
     Player player = 1;
     RaidBuffs raid_buffs = 2;
     PartyBuffs party_buffs = 3;
+    Debuffs debuffs = 9;
     Encounter encounter = 4;
 		SimOptions sim_options = 5;
 		repeated RaidTarget tanks = 8;
