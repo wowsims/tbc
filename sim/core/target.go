@@ -25,9 +25,6 @@ func NewEncounter(options proto.Encounter) Encounter {
 
 	for targetIndex, targetOptions := range options.Targets {
 		target := NewTarget(*targetOptions, int32(targetIndex))
-		if options.Debuffs != nil && targetIndex == 0 {
-			applyDebuffEffects(&target.Unit, *options.Debuffs)
-		}
 		encounter.Targets = append(encounter.Targets, target)
 	}
 	if len(encounter.Targets) == 0 {

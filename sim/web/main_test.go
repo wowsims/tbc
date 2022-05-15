@@ -80,7 +80,8 @@ func TestIndividualSim(t *testing.T) {
 				Spec:      basicSpec,
 			},
 			&proto.PartyBuffs{},
-			&proto.RaidBuffs{}),
+			&proto.RaidBuffs{},
+			&proto.Debuffs{}),
 		Encounter: &proto.Encounter{
 			Duration: 120,
 			Targets: []*proto.Target{

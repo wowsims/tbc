@@ -48,7 +48,7 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 		swr.Player.BonusStats = make([]float64, stats.Len)
 	}
 
-	raidProto := SinglePlayerRaidProto(swr.Player, swr.PartyBuffs, swr.RaidBuffs)
+	raidProto := SinglePlayerRaidProto(swr.Player, swr.PartyBuffs, swr.RaidBuffs, swr.Debuffs)
 	raidProto.Tanks = swr.Tanks
 
 	// Set a RNG seed so that hard-capped effects always give a result of 0.
@@ -181,7 +181,7 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 	waitGroup.Wait()
 
 	melee2HHitCap := 9 * MeleeHitRatingPerHitChance
-	if swr.Encounter.Debuffs.FaerieFire == proto.TristateEffect_TristateEffectImproved {
+	if swr.Debuffs.FaerieFire == proto.TristateEffect_TristateEffectImproved {
 		melee2HHitCap -= 3 * MeleeHitRatingPerHitChance
 	}
 

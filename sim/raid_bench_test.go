@@ -276,16 +276,16 @@ func BenchmarkSimulate(b *testing.B) {
 			Buffs: &proto.RaidBuffs{
 				GiftOfTheWild: proto.TristateEffect_TristateEffectImproved,
 			},
-		},
-		Encounter: &proto.Encounter{
-			Duration:          180,
-			ExecuteProportion: 0.1,
 			Debuffs: &proto.Debuffs{
 				JudgementOfWisdom:         true,
 				ImprovedSealOfTheCrusader: true,
 				CurseOfElements:           proto.TristateEffect_TristateEffectImproved,
 				IsbUptime:                 0.2,
 			},
+		},
+		Encounter: &proto.Encounter{
+			Duration:          180,
+			ExecuteProportion: 0.1,
 			Targets: []*proto.Target{
 				{
 					Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),

@@ -893,21 +893,14 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-FullBuffs-LongSingleTargetFullDebuffs"
+ key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-FullBuffs-LongSingleTarget"
  value: {
   dps: 2048.26466079378
   tps: 1433.7852625556466
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-FullBuffs-LongSingleTargetNoDebuffs"
- value: {
-  dps: 1280.3374007066097
-  tps: 896.2361804946272
- }
-}
-dps_results: {
- key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-FullBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-FullBuffs-ShortSingleTarget"
  value: {
   dps: 2602.8504067952626
   tps: 1821.9952847566838
@@ -916,29 +909,22 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1004.9710735669046
-  tps: 1004.9710735669046
+  dps: 595.5582403078752
+  tps: 595.5582403078752
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-NoBuffs-LongSingleTargetFullDebuffs"
- value: {
-  dps: 1004.9710735669046
-  tps: 1004.9710735669046
- }
-}
-dps_results: {
- key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-NoBuffs-LongSingleTargetNoDebuffs"
+ key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-NoBuffs-LongSingleTarget"
  value: {
   dps: 595.5582403078752
   tps: 595.5582403078752
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-NoBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestRetribution-Settings-BloodElf-P4-Retribution Paladin-NoBuffs-ShortSingleTarget"
  value: {
-  dps: 1244.0355341119687
-  tps: 1244.0355341119687
+  dps: 894.8311729237328
+  tps: 894.8311729237328
  }
 }
 dps_results: {
@@ -949,21 +935,14 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-FullBuffs-LongSingleTargetFullDebuffs"
+ key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-FullBuffs-LongSingleTarget"
  value: {
   dps: 2049.0444240590864
   tps: 1434.331096841361
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-FullBuffs-LongSingleTargetNoDebuffs"
- value: {
-  dps: 1272.7927744458675
-  tps: 890.9549421121076
- }
-}
-dps_results: {
- key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-FullBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-FullBuffs-ShortSingleTarget"
  value: {
   dps: 2602.718773745937
   tps: 1821.9031416221553
@@ -972,29 +951,22 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-NoBuffs-LongMultiTarget"
  value: {
-  dps: 998.3603778618442
-  tps: 998.3603778618442
+  dps: 601.4585021929242
+  tps: 601.4585021929242
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-NoBuffs-LongSingleTargetFullDebuffs"
- value: {
-  dps: 998.3603778618442
-  tps: 998.3603778618442
- }
-}
-dps_results: {
- key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-NoBuffs-LongSingleTargetNoDebuffs"
+ key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-NoBuffs-LongSingleTarget"
  value: {
   dps: 601.4585021929242
   tps: 601.4585021929242
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-NoBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestRetribution-Settings-Draenei-P4-Retribution Paladin-NoBuffs-ShortSingleTarget"
  value: {
-  dps: 1241.511854862669
-  tps: 1241.511854862669
+  dps: 920.3927846371115
+  tps: 920.3927846371115
  }
 }
 dps_results: {
@@ -1005,21 +977,14 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-FullBuffs-LongSingleTargetFullDebuffs"
+ key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-FullBuffs-LongSingleTarget"
  value: {
   dps: 2049.481511585722
   tps: 1434.6370581100057
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-FullBuffs-LongSingleTargetNoDebuffs"
- value: {
-  dps: 1289.8406821290193
-  tps: 902.8884774903133
- }
-}
-dps_results: {
- key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-FullBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-FullBuffs-ShortSingleTarget"
  value: {
   dps: 2603.0023280213877
   tps: 1822.1016296149712
@@ -1028,29 +993,22 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-NoBuffs-LongMultiTarget"
  value: {
-  dps: 997.2612860240332
-  tps: 997.2612860240332
+  dps: 592.9430535604714
+  tps: 592.9430535604714
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-NoBuffs-LongSingleTargetFullDebuffs"
- value: {
-  dps: 997.2612860240332
-  tps: 997.2612860240332
- }
-}
-dps_results: {
- key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-NoBuffs-LongSingleTargetNoDebuffs"
+ key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-NoBuffs-LongSingleTarget"
  value: {
   dps: 592.9430535604714
   tps: 592.9430535604714
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-NoBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestRetribution-Settings-Dwarf-P4-Retribution Paladin-NoBuffs-ShortSingleTarget"
  value: {
-  dps: 1242.1179530959737
-  tps: 1242.1179530959737
+  dps: 899.8663172564198
+  tps: 899.8663172564198
  }
 }
 dps_results: {
@@ -1061,21 +1019,14 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-Human-P4-Retribution Paladin-FullBuffs-LongSingleTargetFullDebuffs"
+ key: "TestRetribution-Settings-Human-P4-Retribution Paladin-FullBuffs-LongSingleTarget"
  value: {
   dps: 2084.775801775813
   tps: 1459.3430612430693
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-Human-P4-Retribution Paladin-FullBuffs-LongSingleTargetNoDebuffs"
- value: {
-  dps: 1307.9340772143794
-  tps: 915.5538540500652
- }
-}
-dps_results: {
- key: "TestRetribution-Settings-Human-P4-Retribution Paladin-FullBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestRetribution-Settings-Human-P4-Retribution Paladin-FullBuffs-ShortSingleTarget"
  value: {
   dps: 2664.638645446846
   tps: 1865.2470518127927
@@ -1084,29 +1035,22 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Settings-Human-P4-Retribution Paladin-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1017.1723128556289
-  tps: 1017.1723128556289
+  dps: 609.3748397907899
+  tps: 609.3748397907899
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-Human-P4-Retribution Paladin-NoBuffs-LongSingleTargetFullDebuffs"
- value: {
-  dps: 1017.1723128556289
-  tps: 1017.1723128556289
- }
-}
-dps_results: {
- key: "TestRetribution-Settings-Human-P4-Retribution Paladin-NoBuffs-LongSingleTargetNoDebuffs"
+ key: "TestRetribution-Settings-Human-P4-Retribution Paladin-NoBuffs-LongSingleTarget"
  value: {
   dps: 609.3748397907899
   tps: 609.3748397907899
  }
 }
 dps_results: {
- key: "TestRetribution-Settings-Human-P4-Retribution Paladin-NoBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestRetribution-Settings-Human-P4-Retribution Paladin-NoBuffs-ShortSingleTarget"
  value: {
-  dps: 1262.1924315663478
-  tps: 1262.1924315663478
+  dps: 914.6518920662041
+  tps: 914.6518920662041
  }
 }
 dps_results: {

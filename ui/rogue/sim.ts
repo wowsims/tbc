@@ -82,7 +82,7 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 				Stat.StatExpertise,
 			],
 			modifyDisplayStats: (player: Player<Spec.SpecRogue>, stats: Stats) => {
-				const hasImpFF = player.sim.encounter.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
+				const hasImpFF = player.sim.raid.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
 				if (hasImpFF) {
 					stats = stats.withStat(Stat.StatMeleeHit,
 						stats.getStat(Stat.StatMeleeHit)
@@ -93,7 +93,7 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 			statBreakdowns: (player: Player<Spec.SpecRogue>, stats: Stats) => {
 				const totalHit = stats.getStat(Stat.StatMeleeHit);
 
-				const hasImpFF = player.sim.encounter.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
+				const hasImpFF = player.sim.raid.getDebuffs().faerieFire == TristateEffect.TristateEffectImproved;
 				const debuffsHit = hasImpFF ? 3 * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE : 0;
 
 				const talentsHit = player.getTalents().precision * Mechanics.MELEE_HIT_RATING_PER_HIT_CHANCE;

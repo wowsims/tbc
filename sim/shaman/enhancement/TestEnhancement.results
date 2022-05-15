@@ -900,21 +900,14 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestEnhancement-Settings-Orc-P2-Basic-FullBuffs-LongSingleTargetFullDebuffs"
+ key: "TestEnhancement-Settings-Orc-P2-Basic-FullBuffs-LongSingleTarget"
  value: {
   dps: 1976.4197089135653
   tps: 1394.494559873544
  }
 }
 dps_results: {
- key: "TestEnhancement-Settings-Orc-P2-Basic-FullBuffs-LongSingleTargetNoDebuffs"
- value: {
-  dps: 1383.8540754519709
-  tps: 985.9859252933483
- }
-}
-dps_results: {
- key: "TestEnhancement-Settings-Orc-P2-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestEnhancement-Settings-Orc-P2-Basic-FullBuffs-ShortSingleTarget"
  value: {
   dps: 2193.200888912164
   tps: 1532.1464255215321
@@ -923,29 +916,22 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1738.4207617126795
-  tps: 725.7184519419715
+  dps: 1179.7718771120956
+  tps: 493.49883860228124
  }
 }
 dps_results: {
- key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongSingleTargetFullDebuffs"
- value: {
-  dps: 1019.0727867784399
-  tps: 728.246171476116
- }
-}
-dps_results: {
- key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongSingleTargetNoDebuffs"
+ key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-LongSingleTarget"
  value: {
   dps: 681.9357200834763
   tps: 492.03810651088554
  }
 }
 dps_results: {
- key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestEnhancement-Settings-Orc-P2-Basic-NoBuffs-ShortSingleTarget"
  value: {
-  dps: 1161.0660737433607
-  tps: 807.682094558943
+  dps: 886.2082600295648
+  tps: 617.3753844425804
  }
 }
 dps_results: {
@@ -956,21 +942,14 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestEnhancement-Settings-Troll10-P2-Basic-FullBuffs-LongSingleTargetFullDebuffs"
+ key: "TestEnhancement-Settings-Troll10-P2-Basic-FullBuffs-LongSingleTarget"
  value: {
   dps: 1965.3641058226003
   tps: 1385.9987672993718
  }
 }
 dps_results: {
- key: "TestEnhancement-Settings-Troll10-P2-Basic-FullBuffs-LongSingleTargetNoDebuffs"
- value: {
-  dps: 1374.8957665399148
-  tps: 978.6644423229163
- }
-}
-dps_results: {
- key: "TestEnhancement-Settings-Troll10-P2-Basic-FullBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestEnhancement-Settings-Troll10-P2-Basic-FullBuffs-ShortSingleTarget"
  value: {
   dps: 2171.5067198045276
   tps: 1519.4522143713052
@@ -979,29 +958,22 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1722.5504730558664
-  tps: 717.9591313769412
+  dps: 1165.0724162844974
+  tps: 482.4913070483349
  }
 }
 dps_results: {
- key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-LongSingleTargetFullDebuffs"
- value: {
-  dps: 1010.4098651787687
-  tps: 720.423074058253
- }
-}
-dps_results: {
- key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-LongSingleTargetNoDebuffs"
+ key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-LongSingleTarget"
  value: {
   dps: 674.4895496421441
   tps: 486.6453905179728
  }
 }
 dps_results: {
- key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestEnhancement-Settings-Troll10-P2-Basic-NoBuffs-ShortSingleTarget"
  value: {
-  dps: 1153.915932816501
-  tps: 800.9841903025552
+  dps: 872.3455784347448
+  tps: 606.1809818019157
  }
 }
 dps_results: {

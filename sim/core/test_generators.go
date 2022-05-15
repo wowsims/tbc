@@ -57,6 +57,7 @@ type BuffsCombo struct {
 	Label    string
 	Raid     *proto.RaidBuffs
 	Party    *proto.PartyBuffs
+	Debuffs  *proto.Debuffs
 	Player   *proto.IndividualBuffs
 	Consumes *proto.Consumes
 }
@@ -131,7 +132,8 @@ func (combos *SettingsCombos) GetTest(testIdx int) (string, *proto.ComputeStatsR
 				//},
 			}, specOptionsCombo.SpecOptions),
 			buffsCombo.Party,
-			buffsCombo.Raid),
+			buffsCombo.Raid,
+			buffsCombo.Debuffs),
 		Encounter:  encounterCombo.Encounter,
 		SimOptions: combos.SimOptions,
 	}
@@ -279,6 +281,7 @@ type ItemsTestGenerator struct {
 	Player     *proto.Player
 	PartyBuffs *proto.PartyBuffs
 	RaidBuffs  *proto.RaidBuffs
+	Debuffs    *proto.Debuffs
 	Encounter  *proto.Encounter
 	SimOptions *proto.SimOptions
 
@@ -359,7 +362,8 @@ func (generator *ItemsTestGenerator) GetTest(testIdx int) (string, *proto.Comput
 		Raid: SinglePlayerRaidProto(
 			playerCopy,
 			generator.PartyBuffs,
-			generator.RaidBuffs),
+			generator.RaidBuffs,
+			generator.Debuffs),
 		Encounter:  generator.Encounter,
 		SimOptions: generator.SimOptions,
 	}
@@ -441,7 +445,7 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 		},
 		config.SpecOptions.SpecOptions)
 
-	defaultRaid := SinglePlayerRaidProto(defaultPlayer, config.PartyBuffs, config.RaidBuffs)
+	defaultRaid := SinglePlayerRaidProto(defaultPlayer, config.PartyBuffs, config.RaidBuffs, config.Debuffs)
 	if config.IsTank {
 		defaultRaid.Tanks = append(defaultRaid.Tanks, &proto.RaidTarget{TargetIndex: 0})
 	}
@@ -472,6 +476,7 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 							Label:    "FullBuffs",
 							Raid:     config.RaidBuffs,
 							Party:    config.PartyBuffs,
+							Debuffs:  config.Debuffs,
 							Player:   config.PlayerBuffs,
 							Consumes: config.Consumes,
 						},
@@ -486,7 +491,8 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 					Player:     defaultPlayer,
 					RaidBuffs:  config.RaidBuffs,
 					PartyBuffs: config.PartyBuffs,
-					Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs, 0),
+					Debuffs:    config.Debuffs,
+					Encounter:  MakeSingleTargetEncounter(0),
 					SimOptions: DefaultSimTestOptions,
 					ItemFilter: config.ItemFilter,
 				},
@@ -503,7 +509,7 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 			Name: "Default",
 			Request: &proto.RaidSimRequest{
 				Raid:       newRaid,
-				Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs, 0),
+				Encounter:  MakeSingleTargetEncounter(0),
 				SimOptions: DefaultSimTestOptions,
 			},
 		},
@@ -518,7 +524,8 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 					Player:     defaultPlayer,
 					RaidBuffs:  config.RaidBuffs,
 					PartyBuffs: config.PartyBuffs,
-					Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs, 0),
+					Debuffs:    config.Debuffs,
+					Encounter:  MakeSingleTargetEncounter(0),
 					SimOptions: StatWeightsDefaultSimTestOptions,
 					Tanks:      defaultRaid.Tanks,
 
@@ -539,7 +546,7 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 				Name: "DPS",
 				Request: &proto.RaidSimRequest{
 					Raid:       newRaid,
-					Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs, 0),
+					Encounter:  MakeSingleTargetEncounter(0),
 					SimOptions: DefaultSimTestOptions,
 				},
 			},
@@ -554,7 +561,7 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 			Name: "Default",
 			Request: &proto.RaidSimRequest{
 				Raid:       defaultRaid,
-				Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs, 5),
+				Encounter:  MakeSingleTargetEncounter(5),
 				SimOptions: AverageDefaultSimTestOptions,
 			},
 		},

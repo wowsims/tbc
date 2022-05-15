@@ -252,32 +252,32 @@ function makeMultistateIndividualBuffInput(id: ActionId, numStates: number, buff
 	}
 }
 
-function makeBooleanDebuffInput(id: ActionId, debuffsFieldName: keyof Debuffs, exclusivityTags?: Array<ExclusivityTag>): IndividualSimIconPickerConfig<Encounter, boolean> {
+function makeBooleanDebuffInput(id: ActionId, debuffsFieldName: keyof Debuffs, exclusivityTags?: Array<ExclusivityTag>): IndividualSimIconPickerConfig<Raid, boolean> {
 	return {
 		id: id,
 		states: 2,
 		exclusivityTags: exclusivityTags,
-		changedEvent: (encounter: Encounter) => encounter.debuffsChangeEmitter,
-		getValue: (encounter: Encounter) => encounter.getDebuffs()[debuffsFieldName] as boolean,
-		setValue: (eventID: EventID, encounter: Encounter, newValue: boolean) => {
-			const newDebuffs = encounter.getDebuffs();
+		changedEvent: (raid: Raid) => raid.debuffsChangeEmitter,
+		getValue: (raid: Raid) => raid.getDebuffs()[debuffsFieldName] as boolean,
+		setValue: (eventID: EventID, raid: Raid, newValue: boolean) => {
+			const newDebuffs = raid.getDebuffs();
 			(newDebuffs[debuffsFieldName] as boolean) = newValue;
-			encounter.setDebuffs(eventID, newDebuffs);
+			raid.setDebuffs(eventID, newDebuffs);
 		},
 	}
 }
 
-function makeTristateDebuffInput(id: ActionId, impId: ActionId, debuffsFieldName: keyof Debuffs): IndividualSimIconPickerConfig<Encounter, number> {
+function makeTristateDebuffInput(id: ActionId, impId: ActionId, debuffsFieldName: keyof Debuffs): IndividualSimIconPickerConfig<Raid, number> {
 	return {
 		id: id,
 		states: 3,
 		improvedId: impId,
-		changedEvent: (encounter: Encounter) => encounter.debuffsChangeEmitter,
-		getValue: (encounter: Encounter) => encounter.getDebuffs()[debuffsFieldName] as number,
-		setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
-			const newDebuffs = encounter.getDebuffs();
+		changedEvent: (raid: Raid) => raid.debuffsChangeEmitter,
+		getValue: (raid: Raid) => raid.getDebuffs()[debuffsFieldName] as number,
+		setValue: (eventID: EventID, raid: Raid, newValue: number) => {
+			const newDebuffs = raid.getDebuffs();
 			(newDebuffs[debuffsFieldName] as number) = newValue;
-			encounter.setDebuffs(eventID, newDebuffs);
+			raid.setDebuffs(eventID, newDebuffs);
 		},
 	}
 }

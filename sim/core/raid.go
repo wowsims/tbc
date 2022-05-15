@@ -304,7 +304,7 @@ func (raid *Raid) GetStats() *proto.RaidStats {
 	return raidStats
 }
 
-func SinglePlayerRaidProto(player *proto.Player, partyBuffs *proto.PartyBuffs, raidBuffs *proto.RaidBuffs) *proto.Raid {
+func SinglePlayerRaidProto(player *proto.Player, partyBuffs *proto.PartyBuffs, raidBuffs *proto.RaidBuffs, debuffs *proto.Debuffs) *proto.Raid {
 	return &proto.Raid{
 		Parties: []*proto.Party{
 			&proto.Party{
@@ -314,7 +314,8 @@ func SinglePlayerRaidProto(player *proto.Player, partyBuffs *proto.PartyBuffs, r
 				Buffs: partyBuffs,
 			},
 		},
-		Buffs: raidBuffs,
+		Buffs:   raidBuffs,
+		Debuffs: debuffs,
 	}
 }
 

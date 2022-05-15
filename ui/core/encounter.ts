@@ -1,4 +1,3 @@
-import { Debuffs } from '/tbc/core/proto/common.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -19,12 +18,10 @@ export class Encounter {
 	private durationVariation: number = 5;
 	private executeProportion: number = 0.2;
 	private targets: Array<Target>;
-	private debuffs: Debuffs = Debuffs.create();
 
 	readonly targetsChangeEmitter = new TypedEvent<void>();
 	readonly durationChangeEmitter = new TypedEvent<void>();
 	readonly executeProportionChangeEmitter = new TypedEvent<void>();
-	readonly debuffsChangeEmitter = new TypedEvent<void>();
 
 	// Emits when any of the above emitters emit.
 	readonly changeEmitter = new TypedEvent<void>();
@@ -37,7 +34,6 @@ export class Encounter {
 			this.targetsChangeEmitter,
 			this.durationChangeEmitter,
 			this.executeProportionChangeEmitter,
-			this.debuffsChangeEmitter,
 		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
 	}
 
@@ -76,20 +72,6 @@ export class Encounter {
 
 		this.executeProportion = newExecuteProportion;
 		this.executeProportionChangeEmitter.emit(eventID);
-	}
-
-	getDebuffs(): Debuffs {
-		// Make a defensive copy
-		return Debuffs.clone(this.debuffs);
-	}
-
-	setDebuffs(eventID: EventID, newDebuffs: Debuffs) {
-		if (Debuffs.equals(this.debuffs, newDebuffs))
-			return;
-
-		// Make a defensive copy
-		this.debuffs = Debuffs.clone(newDebuffs);
-		this.debuffsChangeEmitter.emit(eventID);
 	}
 
 	getNumTargets(): number {
@@ -135,20 +117,14 @@ export class Encounter {
 			durationVariation: this.durationVariation,
 			executeProportion: this.executeProportion,
 			targets: this.targets.map(target => target.toProto()),
-			debuffs: this.getDebuffs(),
 		});
 	}
 
 	fromProto(eventID: EventID, proto: EncounterProto) {
 		TypedEvent.freezeAllAndDo(() => {
-			if (proto.targets[0] && proto.targets[0].debuffs) {
-				proto.debuffs = proto.targets[0].debuffs;
-				proto.targets[0].debuffs = undefined;
-			}
 			this.setDuration(eventID, proto.duration);
 			this.setDurationVariation(eventID, proto.durationVariation);
 			this.setExecuteProportion(eventID, proto.executeProportion);
-			this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
 
 			if (proto.targets.length > 0) {
 				this.setTargets(eventID, proto.targets.map(targetProto => {

@@ -108,7 +108,6 @@ export class Sim {
 
 	// These callbacks are needed so we can apply BuffBot modifications automatically before sending requests.
 	private modifyRaidProto: ((raidProto: RaidProto) => void) = () => { };
-	private modifyEncounterProto: ((encounterProto: EncounterProto) => void) = () => { };
 
 	constructor() {
 		this.workerPool = new WorkerPool(3);
@@ -172,22 +171,13 @@ export class Sim {
 		return raidProto;
 	}
 
-	setModifyEncounterProto(newModFn: (encounterProto: EncounterProto) => void) {
-		this.modifyEncounterProto = newModFn;
-	}
-	getModifiedEncounterProto(): EncounterProto {
-		const encounterProto = this.encounter.toProto();
-		this.modifyEncounterProto(encounterProto);
-		return encounterProto;
-	}
-
 	private makeRaidSimRequest(debug: boolean): RaidSimRequest {
 		const raid = this.getModifiedRaidProto();
-		const encounter = this.getModifiedEncounterProto();
+		const encounter = this.encounter.toProto();
 		const hunters = raid.parties.map(party => party.players).flat().filter(player => player.name && playerToSpec(player) == Spec.SpecHunter);
 		if (hunters.some(hunter => (specTypeFunctions[Spec.SpecHunter]!.talentsFromPlayer(hunter) as SpecTalents<Spec.SpecHunter>).exposeWeakness > 0)) {
-			if (encounter.debuffs) {
-				encounter.debuffs.exposeWeaknessUptime = 0;
+			if (raid.debuffs) {
+				raid.debuffs.exposeWeaknessUptime = 0;
 			}
 		}
 

@@ -732,21 +732,14 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-LongSingleTargetFullDebuffs"
+ key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-LongSingleTarget"
  value: {
   dps: 1221.9303243578852
   tps: 855.5081781420522
  }
 }
 dps_results: {
- key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-LongSingleTargetNoDebuffs"
- value: {
-  dps: 1070.893261202672
-  tps: 749.0344300469756
- }
-}
-dps_results: {
- key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-ShortSingleTarget"
  value: {
   dps: 1440.8302257488376
   tps: 1022.989460281675
@@ -755,29 +748,22 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-NoBuffs-LongMultiTarget"
  value: {
-  dps: 609.673884414219
-  tps: 432.86845793409543
+  dps: 531.4706340569721
+  tps: 377.3441501804501
  }
 }
 dps_results: {
- key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-NoBuffs-LongSingleTargetFullDebuffs"
- value: {
-  dps: 609.673884414219
-  tps: 432.86845793409543
- }
-}
-dps_results: {
- key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-NoBuffs-LongSingleTargetNoDebuffs"
+ key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-NoBuffs-LongSingleTarget"
  value: {
   dps: 531.4706340569721
   tps: 377.3441501804501
  }
 }
 dps_results: {
- key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-NoBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-NoBuffs-ShortSingleTarget"
  value: {
-  dps: 637.2492738912943
-  tps: 452.44698446281893
+  dps: 550.6044329731533
+  tps: 390.9291474109388
  }
 }
 dps_results: {
@@ -788,21 +774,14 @@ dps_results: {
  }
 }
 dps_results: {
- key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-LongSingleTargetFullDebuffs"
+ key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-LongSingleTarget"
  value: {
   dps: 1221.736594375278
   tps: 855.3706298544014
  }
 }
 dps_results: {
- key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-LongSingleTargetNoDebuffs"
- value: {
-  dps: 1074.1509419493104
-  tps: 751.4073805013415
- }
-}
-dps_results: {
- key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-ShortSingleTarget"
  value: {
   dps: 1441.0579228430593
   tps: 1023.1511252185721
@@ -811,29 +790,22 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-NoBuffs-LongMultiTarget"
  value: {
-  dps: 609.6480589924706
-  tps: 432.8501218846541
+  dps: 531.3332847153338
+  tps: 377.2466321478867
  }
 }
 dps_results: {
- key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-NoBuffs-LongSingleTargetFullDebuffs"
- value: {
-  dps: 609.6480589924706
-  tps: 432.8501218846541
- }
-}
-dps_results: {
- key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-NoBuffs-LongSingleTargetNoDebuffs"
+ key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-NoBuffs-LongSingleTarget"
  value: {
   dps: 531.3332847153338
   tps: 377.2466321478867
  }
 }
 dps_results: {
- key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-NoBuffs-ShortSingleTargetFullDebuffs"
+ key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-NoBuffs-ShortSingleTarget"
  value: {
-  dps: 636.7694501580655
-  tps: 452.1063096122267
+  dps: 550.418089298495
+  tps: 390.7968434019316
  }
 }
 dps_results: {

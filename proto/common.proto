@@ -529,8 +529,6 @@ message Encounter {
 
 		// If type != Simple or Custom, then this may be empty.
     repeated Target targets = 2;
-
-		Debuffs debuffs = 5;
 }
 
 message ItemSpec {

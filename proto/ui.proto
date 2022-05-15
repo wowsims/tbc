@@ -18,6 +18,7 @@ message SimSettings {
 message IndividualSimSettings {
 	SimSettings settings = 5;
 	RaidBuffs raid_buffs = 1;
+	Debuffs debuffs = 8;
 	repeated RaidTarget tanks = 7;
 	PartyBuffs party_buffs = 2;
 	Player player = 3;
@@ -35,6 +36,7 @@ message SavedGearSet {
 message SavedSettings {
 	RaidBuffs raid_buffs = 1;
 	PartyBuffs party_buffs = 2;
+	Debuffs debuffs = 7;
 	IndividualBuffs player_buffs = 3;
 	Consumes consumes = 4;
 	Race race = 5;

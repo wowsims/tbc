@@ -62,32 +62,20 @@ func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
 
 	return []EncounterCombo{
 		EncounterCombo{
-			Label: "LongSingleTargetNoDebuffs",
-			Encounter: &proto.Encounter{
-				Duration:          LongDuration,
-				ExecuteProportion: 0.2,
-				Targets: []*proto.Target{
-					DefaultTarget,
-				},
-			},
-		},
-		EncounterCombo{
-			Label: "ShortSingleTargetFullDebuffs",
+			Label: "ShortSingleTarget",
 			Encounter: &proto.Encounter{
 				Duration:          ShortDuration,
 				ExecuteProportion: 0.2,
-				Debuffs:           debuffs,
 				Targets: []*proto.Target{
 					DefaultTarget,
 				},
 			},
 		},
 		EncounterCombo{
-			Label: "LongSingleTargetFullDebuffs",
+			Label: "LongSingleTarget",
 			Encounter: &proto.Encounter{
 				Duration:          LongDuration,
 				ExecuteProportion: 0.2,
-				Debuffs:           debuffs,
 				Targets: []*proto.Target{
 					DefaultTarget,
 				},
@@ -98,23 +86,19 @@ func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
 			Encounter: &proto.Encounter{
 				Duration:          LongDuration,
 				ExecuteProportion: 0.2,
-				Debuffs:           debuffs,
 				Targets:           multipleTargets,
 			},
 		},
 	}
 }
 
-func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs, variation float64) *proto.Encounter {
-	var FullDebuffTarget = NewDefaultTarget()
-
+func MakeSingleTargetEncounter(variation float64) *proto.Encounter {
 	return &proto.Encounter{
 		Duration:          LongDuration,
 		DurationVariation: variation,
 		ExecuteProportion: 0.2,
-		Debuffs:           debuffs,
 		Targets: []*proto.Target{
-			FullDebuffTarget,
+			NewDefaultTarget(),
 		},
 	}
 }
