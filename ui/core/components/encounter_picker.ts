@@ -211,9 +211,11 @@ class TargetPicker extends Component {
 			},
 		});
 
-		ALL_TARGET_STATS.forEach(stat => {
+		ALL_TARGET_STATS.forEach(statData => {
+			const stat = statData.stat;
 			new NumberPicker(section2, modTarget, {
 				label: statNames[stat],
+				labelTooltip: statData.tooltip,
 				changedEvent: (target: Target) => target.statsChangeEmitter,
 				getValue: (target: Target) => target.getStats().getStat(stat),
 				setValue: (eventID: EventID, target: Target, newValue: number) => {
@@ -332,15 +334,16 @@ function addEncounterFieldPickers(rootElem: HTMLElement, encounter: Encounter, s
 	}
 }
 
-const ALL_TARGET_STATS: Array<Stat> = [
-	Stat.StatArmor,
-	Stat.StatArcaneResistance,
-	Stat.StatFireResistance,
-	Stat.StatFrostResistance,
-	Stat.StatNatureResistance,
-	Stat.StatShadowResistance,
-	Stat.StatAttackPower,
-	Stat.StatBlockValue,
+const ALL_TARGET_STATS: Array<{ stat: Stat, tooltip: string}> = [
+	{ stat: Stat.StatHealth, tooltip: 'Not currently used anywhere.' },
+	{ stat: Stat.StatArmor, tooltip: '' },
+	{ stat: Stat.StatArcaneResistance, tooltip: '' },
+	{ stat: Stat.StatFireResistance, tooltip: '' },
+	{ stat: Stat.StatFrostResistance, tooltip: '' },
+	{ stat: Stat.StatNatureResistance, tooltip: '' },
+	{ stat: Stat.StatShadowResistance, tooltip: '' },
+	{ stat: Stat.StatAttackPower, tooltip: '' },
+	{ stat: Stat.StatBlockValue, tooltip: '' },
 ];
 
 const mobTypeEnumValues = [
