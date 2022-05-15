@@ -26,6 +26,25 @@ import { SimUI } from '../core/sim_ui.js';
 // Configuration for spec-specific UI elements on the settings tab.
 // These don't need to be in a separate file but it keeps things cleaner.
 
+export const StartingRage = {
+	type: 'number' as const,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+	config: {
+		extraCssClasses: [
+			'starting-rage-picker',
+		],
+		label: 'Starting Rage',
+		labelTooltip: 'Initial rage at the start of each iteration.',
+		changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => player.specOptionsChangeEmitter,
+		getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getSpecOptions().startingRage,
+		setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
+			const newOptions = player.getSpecOptions();
+			newOptions.startingRage = newValue;
+			player.setSpecOptions(eventID, newOptions);
+		},
+	},
+};
+
 export const ShoutPicker = {
 	type: 'enum' as const, cssClass: 'shout-picker',
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
@@ -109,6 +128,37 @@ export const PrecastShoutWithT2 = {
 export const ProtectionWarriorRotationConfig = {
 	inputs: [
 		{
+			type: 'boolean' as const,
+			cssClass: 'cleave-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Use Cleave',
+				labelTooltip: 'Use Cleave instead of Heroic Strike.',
+				changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getRotation().useCleave,
+				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.useCleave = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'number' as const, cssClass: 'heroic-strike-threshold-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'HS Threshold',
+				labelTooltip: 'Heroic Strike or Cleave when rage is above:',
+				changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getRotation().hsRageThreshold,
+				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.hsRageThreshold = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
 			type: 'enum' as const, cssClass: 'demo-shout-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
@@ -162,21 +212,6 @@ export const ProtectionWarriorRotationConfig = {
 				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
 					const newRotation = player.getRotation();
 					newRotation.shieldBlock = newValue;
-					player.setRotation(eventID, newRotation);
-				},
-			},
-		},
-		{
-			type: 'number' as const, cssClass: 'heroic-strike-threshold-picker',
-			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-			config: {
-				label: 'HS Threshold',
-				labelTooltip: 'Heroic Strike when rage is above:',
-				changedEvent: (player: Player<Spec.SpecProtectionWarrior>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecProtectionWarrior>) => player.getRotation().hsRageThreshold,
-				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionWarrior>, newValue: number) => {
-					const newRotation = player.getRotation();
-					newRotation.hsRageThreshold = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},
