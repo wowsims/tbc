@@ -520,6 +520,7 @@ func FullCharacterTestSuiteGenerator(config CharacterSuiteConfig) TestGenerator 
 					PartyBuffs: config.PartyBuffs,
 					Encounter:  MakeSingleTargetFullDebuffEncounter(config.Debuffs, 0),
 					SimOptions: StatWeightsDefaultSimTestOptions,
+					Tanks:      defaultRaid.Tanks,
 
 					StatsToWeigh:    config.StatsToWeigh,
 					EpReferenceStat: config.EPReferenceStat,

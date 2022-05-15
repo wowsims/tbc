@@ -11,6 +11,8 @@ import (
 	googleProto "google.golang.org/protobuf/proto"
 )
 
+const DTPSReferenceStat = stats.Armor
+
 type StatWeightValues struct {
 	Weights       stats.Stats
 	WeightsStdev  stats.Stats
@@ -47,6 +49,12 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 	}
 
 	raidProto := SinglePlayerRaidProto(swr.Player, swr.PartyBuffs, swr.RaidBuffs)
+	raidProto.Tanks = swr.Tanks
+
+	// Set a RNG seed so that hard-capped effects always give a result of 0.
+	simOptions := swr.SimOptions
+	simOptions.RandomSeed = 1
+
 	baseStatsResult := ComputeStats(&proto.ComputeStatsRequest{
 		Raid: raidProto,
 	})
@@ -55,7 +63,7 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 	baseSimRequest := &proto.RaidSimRequest{
 		Raid:       raidProto,
 		Encounter:  swr.Encounter,
-		SimOptions: swr.SimOptions,
+		SimOptions: simOptions,
 	}
 	baselineResult := RunRaidSim(baseSimRequest)
 	baselineDpsMetrics := baselineResult.RaidMetrics.Parties[0].Players[0].Dps
@@ -151,6 +159,9 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 
 	for _, stat := range statsToWeigh {
 		statMod := defaultStatMod
+		if stat == stats.SpellHit || stat == stats.MeleeHit || stat == stats.Expertise {
+			statMod = 15
+		}
 		statModsHigh[stat] = statMod
 		statModsLow[stat] = -statMod
 	}
@@ -169,14 +180,44 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 
 	waitGroup.Wait()
 
+	melee2HHitCap := 9 * MeleeHitRatingPerHitChance
+	if swr.Encounter.Targets[0].Debuffs.FaerieFire == proto.TristateEffect_TristateEffectImproved {
+		melee2HHitCap -= 3 * MeleeHitRatingPerHitChance
+	}
+
 	for _, stat := range statsToWeigh {
-		if stat == stats.SpellHit || stat == stats.MeleeHit {
-			// Check for hard caps.
-			if resultHigh.Dps.Weights[stat] < 0.05 {
+		// Check for hard caps.
+		if stat == stats.SpellHit || stat == stats.MeleeHit || stat == stats.Expertise {
+			if resultHigh.Dps.Weights[stat] < 0.1 {
 				statModsHigh[stat] = 0
-			} else if baseStats[stat] > 80 {
-				// For spell/melee hit, don't use the high comparison if we might be anywhere
-				// remotely close to cap.
+				continue
+			}
+		}
+
+		// For spell/melee hit, only use the direction facing away from the nearest soft/hard cap.
+		if stat == stats.SpellHit {
+			if baseStats[stat] > 80 {
+				statModsHigh[stat] = statModsLow[stat]
+				resultHigh.Dps.Weights[stat] = resultLow.Dps.Weights[stat]
+				resultHigh.Tps.Weights[stat] = resultLow.Tps.Weights[stat]
+				resultHigh.Dtps.Weights[stat] = resultLow.Dtps.Weights[stat]
+			}
+		} else if stat == stats.MeleeHit {
+			if baseStats[stat] > 30 {
+				if baseStats[stat] < melee2HHitCap || baseStats[stat] > melee2HHitCap+30 {
+					statModsHigh[stat] = statModsLow[stat]
+					resultHigh.Dps.Weights[stat] = resultLow.Dps.Weights[stat]
+					resultHigh.Tps.Weights[stat] = resultLow.Tps.Weights[stat]
+					resultHigh.Dtps.Weights[stat] = resultLow.Dtps.Weights[stat]
+				} else {
+					statModsLow[stat] = statModsHigh[stat]
+					resultLow.Dps.Weights[stat] = resultHigh.Dps.Weights[stat]
+					resultLow.Tps.Weights[stat] = resultHigh.Tps.Weights[stat]
+					resultLow.Dtps.Weights[stat] = resultHigh.Dtps.Weights[stat]
+				}
+			}
+		} else if stat == stats.Expertise {
+			if baseStats[stat] > 20 {
 				statModsHigh[stat] = statModsLow[stat]
 				resultHigh.Dps.Weights[stat] = resultLow.Dps.Weights[stat]
 				resultHigh.Tps.Weights[stat] = resultLow.Tps.Weights[stat]
@@ -205,7 +246,9 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 
 		result.Dps.EpValues[stat] = result.Dps.Weights[stat] / result.Dps.Weights[referenceStat]
 		result.Tps.EpValues[stat] = result.Tps.Weights[stat] / result.Tps.Weights[referenceStat]
-		result.Dtps.EpValues[stat] = result.Dtps.Weights[stat] / result.Dtps.Weights[referenceStat]
+		if result.Dtps.Weights[DTPSReferenceStat] != 0 {
+			result.Dtps.EpValues[stat] = result.Dtps.Weights[stat] / result.Dtps.Weights[DTPSReferenceStat]
+		}
 
 		dpsWeightStdevLow := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsLow[stat], dpsHistsLow[stat], baselineDpsMetrics.Hist, nil, statModsLow[referenceStat])
 		dpsWeightStdevHigh := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsHigh[stat], dpsHistsHigh[stat], baselineDpsMetrics.Hist, nil, statModsHigh[referenceStat])
@@ -223,13 +266,15 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 		tpsEpStdevHigh := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsHigh[stat], tpsHistsHigh[stat], baselineTpsMetrics.Hist, tpsHistsHigh[referenceStat], statModsHigh[referenceStat])
 		result.Tps.EpValuesStdev[stat] = (tpsEpStdevLow + tpsEpStdevHigh) / 2
 
-		dtpsWeightStdevLow := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsLow[stat], dtpsHistsLow[stat], baselineDtpsMetrics.Hist, nil, statModsLow[referenceStat])
-		dtpsWeightStdevHigh := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsHigh[stat], dtpsHistsHigh[stat], baselineDtpsMetrics.Hist, nil, statModsHigh[referenceStat])
+		dtpsWeightStdevLow := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsLow[stat], dtpsHistsLow[stat], baselineDtpsMetrics.Hist, nil, statModsLow[DTPSReferenceStat])
+		dtpsWeightStdevHigh := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsHigh[stat], dtpsHistsHigh[stat], baselineDtpsMetrics.Hist, nil, statModsHigh[DTPSReferenceStat])
 		result.Dtps.WeightsStdev[stat] = (dtpsWeightStdevLow + dtpsWeightStdevHigh) / 2
 
-		dtpsEpStdevLow := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsLow[stat], dtpsHistsLow[stat], baselineDtpsMetrics.Hist, dtpsHistsLow[referenceStat], statModsLow[referenceStat])
-		dtpsEpStdevHigh := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsHigh[stat], dtpsHistsHigh[stat], baselineDtpsMetrics.Hist, dtpsHistsHigh[referenceStat], statModsHigh[referenceStat])
-		result.Dtps.EpValuesStdev[stat] = (dtpsEpStdevLow + dtpsEpStdevHigh) / 2
+		if result.Dtps.Weights[DTPSReferenceStat] != 0 {
+			dtpsEpStdevLow := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsLow[stat], dtpsHistsLow[stat], baselineDtpsMetrics.Hist, dtpsHistsLow[DTPSReferenceStat], statModsLow[DTPSReferenceStat])
+			dtpsEpStdevHigh := computeStDevFromHists(swr.SimOptions.Iterations/2, statModsHigh[stat], dtpsHistsHigh[stat], baselineDtpsMetrics.Hist, dtpsHistsHigh[DTPSReferenceStat], statModsHigh[DTPSReferenceStat])
+			result.Dtps.EpValuesStdev[stat] = (dtpsEpStdevLow + dtpsEpStdevHigh) / 2
+		}
 	}
 
 	return result
