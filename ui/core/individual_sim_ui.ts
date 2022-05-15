@@ -374,16 +374,16 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		this.addToolbarItem(newIndividualImporters(this));
 		this.addToolbarItem(newIndividualExporters(this));
 
-		const settingsMenu = document.createElement('span');
-		settingsMenu.classList.add('fas', 'fa-cog');
-		tippy(settingsMenu, {
-			'content': 'Settings',
+		const optionsMenu = document.createElement('span');
+		optionsMenu.classList.add('fas', 'fa-cog');
+		tippy(optionsMenu, {
+			'content': 'Options',
 			'allowHTML': true,
 		});
-		settingsMenu.addEventListener('click', event => {
+		optionsMenu.addEventListener('click', event => {
 			new SettingsMenu(this.rootElem, this);
 		});
-		this.addToolbarItem(settingsMenu);
+		this.addToolbarItem(optionsMenu);
 	}
 
 	private addGearTab() {

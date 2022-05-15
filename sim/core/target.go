@@ -85,7 +85,9 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	if target.Level == 0 {
 		target.Level = 73
 	}
-	target.stats[stats.MeleeCrit] = UnitLevelFloat64(target.Level, 0.05, 0.052, 0.054, 0.056) * MeleeCritRatingPerCritChance
+	if target.stats[stats.MeleeCrit] == 0 {
+		target.stats[stats.MeleeCrit] = UnitLevelFloat64(target.Level, 0.05, 0.052, 0.054, 0.056) * MeleeCritRatingPerCritChance
+	}
 
 	target.PseudoStats.CanBlock = true
 	target.PseudoStats.CanParry = true

@@ -365,6 +365,7 @@ export const TankAssignment = {
 			{ name: 'Main Tank', value: 0 },
 			{ name: 'Tank 2', value: 1 },
 			{ name: 'Tank 3', value: 2 },
+			{ name: 'Tank 4', value: 3 },
 		],
 		changedEvent: (player: Player<any>) => player.getRaid()!.tanksChangeEmitter,
 		getValue: (player: Player<any>) => player.getRaid()!.getTanks().findIndex(tank => RaidTarget.equals(tank, player.makeRaidTarget())),

@@ -30,7 +30,7 @@ export class SettingsMenu extends Popup {
 
 		this.rootElem.innerHTML = `
 			<div class="settings-menu-title">
-				<span>SETTINGS</span>
+				<span>OPTIONS</span>
 			</div>
 			<div class="settings-menu-content">
 				<div class="settings-menu-content-left">
