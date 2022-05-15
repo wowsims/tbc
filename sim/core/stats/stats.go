@@ -431,6 +431,7 @@ type PseudoStats struct {
 
 	DisableDWMissPenalty bool    // Used by Heroic Strike and Cleave
 	IncreasedMissChance  float64 // Insect Swarm and Scorpid Sting
+	DodgeReduction       float64 // Used by Warrior talent 'Weapon Mastery' and SWP boss auras.
 
 	MobTypeAttackPower float64 // Bonus AP against mobs of the current type.
 	MobTypeSpellPower  float64 // Bonus SP against mobs of the current type.
@@ -438,7 +439,6 @@ type PseudoStats struct {
 	// For Human and Orc weapon racials
 	BonusMHExpertiseRating float64
 	BonusOHExpertiseRating float64
-	DodgeReduction         float64 // Used by Warrior talent 'Weapon Mastery'
 
 	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
 

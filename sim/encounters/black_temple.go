@@ -6,7 +6,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func init() {
+func registerBlackTemple() {
 	const bossPrefix = "Black Temple"
 
 	AddSingleTargetBossEncounter(core.PresetTarget{
@@ -386,7 +386,7 @@ func init() {
 		},
 	})
 
-	core.AddPresetTarget(core.PresetTarget{
+	AddSingleTargetBossEncounter(core.PresetTarget{
 		PathPrefix: bossPrefix,
 		Config: proto.Target{
 			Id:        22997,
@@ -410,12 +410,5 @@ func init() {
 			DualWield:        false,
 			DualWieldPenalty: false,
 		},
-	})
-}
-
-func AddSingleTargetBossEncounter(presetTarget core.PresetTarget) {
-	core.AddPresetTarget(presetTarget)
-	core.AddPresetEncounter(presetTarget.Config.Name, []string{
-		presetTarget.Path(),
 	})
 }

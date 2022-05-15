@@ -426,7 +426,8 @@ func (spellEffect *SpellEffect) applyEnemyAttackTableBlock(spell *Spell, unit *U
 func (spellEffect *SpellEffect) applyEnemyAttackTableDodge(spell *Spell, unit *Unit, attackTable *AttackTable, roll float64, chance *float64) bool {
 	dodgeChance := attackTable.BaseDodgeChance +
 		spellEffect.Target.stats[stats.Dodge]/DodgeRatingPerDodgeChance/100 +
-		spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction
+		spellEffect.Target.stats[stats.Defense]*DefenseRatingToChanceReduction -
+		unit.PseudoStats.DodgeReduction
 	*chance += MaxFloat(0, dodgeChance)
 
 	if roll < *chance {

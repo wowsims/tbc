@@ -89,6 +89,12 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 		target.stats[stats.MeleeCrit] = UnitLevelFloat64(target.Level, 0.05, 0.052, 0.054, 0.056) * MeleeCritRatingPerCritChance
 	}
 
+	if target.Level == 73 && options.SuppressDodge {
+		// Sunwell boss Dodge Suppression. -20% dodge and -5% miss chance.
+		target.PseudoStats.DodgeReduction += 0.2
+		target.PseudoStats.IncreasedMissChance -= 0.05
+	}
+
 	target.PseudoStats.CanBlock = true
 	target.PseudoStats.CanParry = true
 	target.PseudoStats.ParryHaste = options.ParryHaste
