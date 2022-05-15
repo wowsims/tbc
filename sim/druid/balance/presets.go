@@ -58,10 +58,6 @@ var FullDebuffs = &proto.Debuffs{
 	CurseOfElements:   proto.TristateEffect_TristateEffectImproved,
 }
 
-var FullDebuffTarget = &proto.Target{
-	Debuffs: FullDebuffs,
-}
-
 var PlayerOptionsAdaptive = &proto.Player_BalanceDruid{
 	BalanceDruid: &proto.BalanceDruid{
 		Talents: StandardTalents,

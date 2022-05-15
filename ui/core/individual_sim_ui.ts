@@ -187,7 +187,7 @@ export interface IndividualSimUIConfig<SpecType extends Spec> {
 	raidBuffInputs: Array<IndividualSimIconPickerConfig<Raid, any>>,
 	partyBuffInputs: Array<IndividualSimIconPickerConfig<Party, any>>,
 	playerBuffInputs: Array<IndividualSimIconPickerConfig<Player<any>, any>>,
-	debuffInputs: Array<IndividualSimIconPickerConfig<Target, any>>;
+	debuffInputs: Array<IndividualSimIconPickerConfig<Encounter, any>>;
 	rotationInputs: InputSection;
 	otherInputs?: InputSection;
 	consumeOptions?: ConsumeOptions;
@@ -579,7 +579,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 		const debuffsSection = this.rootElem.getElementsByClassName('debuffs-section')[0] as HTMLElement;
 		configureIconSection(
 			debuffsSection,
-			this.individualConfig.debuffInputs.map(iconInput => new IndividualSimIconPicker(debuffsSection, this.sim.encounter.primaryTarget, iconInput, this)),
+			this.individualConfig.debuffInputs.map(iconInput => new IndividualSimIconPicker(debuffsSection, this.sim.encounter, iconInput, this)),
 			Tooltips.DEBUFFS_SECTION);
 
 		if (this.individualConfig.consumeOptions?.potions.length) {
@@ -904,7 +904,7 @@ export abstract class IndividualSimUI<SpecType extends Spec> extends SimUI {
 
 			if (!this.isWithinRaidSim) {
 				this.sim.encounter.applyDefaults(eventID);
-				this.sim.encounter.primaryTarget.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
+				this.sim.encounter.setDebuffs(eventID, this.individualConfig.defaults.debuffs);
 				this.sim.applyDefaults(eventID, tankSpec);
 
 				if (tankSpec) {

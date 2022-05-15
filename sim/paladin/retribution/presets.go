@@ -3,7 +3,6 @@ package retribution
 import (
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var defaultRetTalents = &proto.PaladinTalents{
@@ -78,11 +77,6 @@ var FullConsumes = &proto.Consumes{
 	SuperSapper:     true,
 }
 
-var NoDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{},
-	Stats:   stats.Stats{stats.Armor: 7700}.ToFloatArray(),
-}
-
 var FullDebuffs = &proto.Debuffs{
 	JudgementOfWisdom:           true,
 	Misery:                      true,
@@ -95,11 +89,6 @@ var FullDebuffs = &proto.Debuffs{
 	HuntersMark:                 proto.TristateEffect_TristateEffectImproved,
 	ExposeWeaknessUptime:        1,
 	ExposeWeaknessHunterAgility: 800,
-}
-
-var FullDebuffTarget = &proto.Target{
-	Debuffs: FullDebuffs,
-	Stats:   stats.Stats{stats.Armor: 7700}.ToFloatArray(),
 }
 
 var Phase4Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{

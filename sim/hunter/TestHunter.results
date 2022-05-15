@@ -923,8 +923,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1790.3578949768716
-  tps: 1351.6059781806873
+  dps: 1745.1551564510423
+  tps: 1310.6121228316304
  }
 }
 dps_results: {
@@ -951,8 +951,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1103.3216027944459
-  tps: 869.4607548896868
+  dps: 1041.0661291965616
+  tps: 813.6384462637892
  }
 }
 dps_results: {
@@ -979,8 +979,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-French-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1749.8170576263324
-  tps: 1302.0619121884913
+  dps: 1701.4641720359652
+  tps: 1256.6731579292766
  }
 }
 dps_results: {
@@ -1007,8 +1007,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-French-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1009.7810138920514
-  tps: 778.5900269685131
+  dps: 967.6807336132515
+  tps: 740.2933160287258
  }
 }
 dps_results: {
@@ -1035,8 +1035,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-MeleeWeave-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1998.4470826404297
-  tps: 1545.05100286565
+  dps: 1958.7282549528286
+  tps: 1504.8361735837661
  }
 }
 dps_results: {
@@ -1063,8 +1063,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-MeleeWeave-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1185.2753370299477
-  tps: 944.047454408727
+  dps: 1129.0352254479483
+  tps: 894.5709346753604
  }
 }
 dps_results: {
@@ -1091,8 +1091,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-SV-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1796.4254562378235
-  tps: 1530.01936243696
+  dps: 1761.8630211408474
+  tps: 1495.3278141532874
  }
 }
 dps_results: {
@@ -1119,8 +1119,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Dwarf-P1-SV-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1062.5067047484858
-  tps: 910.0963115245394
+  dps: 1013.494897713165
+  tps: 863.0372421324319
  }
 }
 dps_results: {
@@ -1147,8 +1147,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1832.6490022053817
-  tps: 1370.7275978787243
+  dps: 1791.1186306328057
+  tps: 1325.0667377226566
  }
 }
 dps_results: {
@@ -1175,8 +1175,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1122.5550732115491
-  tps: 876.2553901196483
+  dps: 1065.7393769468667
+  tps: 825.1790976129315
  }
 }
 dps_results: {
@@ -1203,8 +1203,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-French-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1787.1318401621015
-  tps: 1313.9246090457311
+  dps: 1741.57767718602
+  tps: 1271.3352638871359
  }
 }
 dps_results: {
@@ -1231,8 +1231,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-French-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1032.8787517633316
-  tps: 788.2685951794338
+  dps: 985.6371185550887
+  tps: 747.7525077684559
  }
 }
 dps_results: {
@@ -1259,8 +1259,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-MeleeWeave-FullBuffs-LongMultiTarget"
  value: {
-  dps: 2052.6570528405705
-  tps: 1572.0424350852065
+  dps: 2005.2824105129123
+  tps: 1527.0350634306765
  }
 }
 dps_results: {
@@ -1287,8 +1287,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-MeleeWeave-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1208.760167475925
-  tps: 954.9561359472548
+  dps: 1154.7396497841205
+  tps: 903.9245301669112
  }
 }
 dps_results: {
@@ -1315,8 +1315,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1824.7538346504107
-  tps: 1545.0186676065266
+  dps: 1796.996897999351
+  tps: 1515.0938157327496
  }
 }
 dps_results: {
@@ -1343,8 +1343,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-Settings-Orc-P1-SV-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1078.785810704904
-  tps: 918.8092269707763
+  dps: 1035.101153174462
+  tps: 876.9803349350129
  }
 }
 dps_results: {

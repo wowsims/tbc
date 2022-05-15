@@ -35,8 +35,8 @@ export class ListPicker<ModObject, ItemType> extends Input<ModObject, Array<Item
 		const newItemButton = this.rootElem.getElementsByClassName('list-picker-new-button')[0] as HTMLElement;
 		newItemButton.addEventListener('click', event => {
 			const newItem = this.config.newItem();
-			this.addNewPicker(newItem);
-			this.inputChanged(TypedEvent.nextEventID());
+			const newList = this.config.getValue(this.modObject).concat([newItem]);
+			this.config.setValue(TypedEvent.nextEventID(), this.modObject, newList);
 		});
 
 		this.init();
@@ -88,11 +88,13 @@ export class ListPicker<ModObject, ItemType> extends Input<ModObject, Array<Item
 		deleteButton.addEventListener('click', event => {
 			const index = this.itemPickerPairs.findIndex(ipp => ipp.item == item);
 			if (index == -1) {
+				console.error('Could not find list picker item!');
 				return;
 			}
-			this.itemPickerPairs[index].picker.remove();
-			this.itemPickerPairs.splice(index, 1);
-			this.inputChanged(TypedEvent.nextEventID());
+
+			const newList = this.config.getValue(this.modObject);
+			newList.splice(index, 1);
+			this.config.setValue(TypedEvent.nextEventID(), this.modObject, newList);
 		});
 
 		const itemElem = itemContainer.getElementsByClassName('list-picker-item')[0] as HTMLElement;

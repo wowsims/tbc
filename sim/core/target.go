@@ -25,6 +25,9 @@ func NewEncounter(options proto.Encounter) Encounter {
 
 	for targetIndex, targetOptions := range options.Targets {
 		target := NewTarget(*targetOptions, int32(targetIndex))
+		if options.Debuffs != nil && targetIndex == 0 {
+			applyDebuffEffects(&target.Unit, *options.Debuffs)
+		}
 		encounter.Targets = append(encounter.Targets, target)
 	}
 	if len(encounter.Targets) == 0 {
@@ -93,10 +96,6 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	target.PseudoStats.InFrontOfTarget = true
 	if target.Level == 73 && options.CanCrush {
 		target.PseudoStats.CanCrush = true
-	}
-
-	if options.Debuffs != nil {
-		applyDebuffEffects(&target.Unit, *options.Debuffs)
 	}
 
 	return target

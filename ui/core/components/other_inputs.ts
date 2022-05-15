@@ -9,6 +9,7 @@ import { Party } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { Target } from '/tbc/core/target.js';
+import { Encounter } from '/tbc/core/encounter.js';
 import { SimUI } from '/tbc/core/sim_ui.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
@@ -190,7 +191,7 @@ export const ShadowPriestDPS = {
 
 export const ISBUptime = {
 	type: 'number' as const,
-	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.encounter.primaryTarget,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.encounter,
 	config: {
 		extraCssClasses: [
 			'isb-uptime-picker',
@@ -198,19 +199,19 @@ export const ISBUptime = {
 		],
 		label: 'Improved Shadowbolt Uptime %',
 		labelTooltip: "Uptime for the Improved Shadowbolt debuff, applied by 1 or more warlocks in your raid.",
-		changedEvent: (target: Target) => target.debuffsChangeEmitter,
-		getValue: (target: Target) => Math.round(target.getDebuffs().isbUptime * 100),
-		setValue: (eventID: EventID, target: Target, newValue: number) => {
-			const newDebuffs = target.getDebuffs();
+		changedEvent: (encounter: Encounter) => encounter.debuffsChangeEmitter,
+		getValue: (encounter: Encounter) => Math.round(encounter.getDebuffs().isbUptime * 100),
+		setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+			const newDebuffs = encounter.getDebuffs();
 			newDebuffs.isbUptime = newValue / 100;
-			target.setDebuffs(eventID, newDebuffs);
+			encounter.setDebuffs(eventID, newDebuffs);
 		},
 	},
 };
 
 export const ExposeWeaknessUptime = {
 	type: 'number' as const,
-	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.encounter.primaryTarget,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.encounter,
 	config: {
 		extraCssClasses: [
 			'expose-weakness-uptime-picker',
@@ -218,19 +219,19 @@ export const ExposeWeaknessUptime = {
 		],
 		label: 'Expose Weakness Uptime %',
 		labelTooltip: 'Uptime for the Expose Weakness debuff, applied by 1 or more Survival hunters in your raid.',
-		changedEvent: (target: Target) => target.debuffsChangeEmitter,
-		getValue: (target: Target) => Math.round(target.getDebuffs().exposeWeaknessUptime * 100),
-		setValue: (eventID: EventID, target: Target, newValue: number) => {
-			const newDebuffs = target.getDebuffs();
+		changedEvent: (encounter: Encounter) => encounter.debuffsChangeEmitter,
+		getValue: (encounter: Encounter) => Math.round(encounter.getDebuffs().exposeWeaknessUptime * 100),
+		setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+			const newDebuffs = encounter.getDebuffs();
 			newDebuffs.exposeWeaknessUptime = newValue / 100;
-			target.setDebuffs(eventID, newDebuffs);
+			encounter.setDebuffs(eventID, newDebuffs);
 		},
 	},
 };
 
 export const ExposeWeaknessHunterAgility = {
 	type: 'number' as const,
-	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.encounter.primaryTarget,
+	getModObject: (simUI: IndividualSimUI<any>) => simUI.sim.encounter,
 	config: {
 		extraCssClasses: [
 			'expose-weakness-hunter-agility-picker',
@@ -238,12 +239,12 @@ export const ExposeWeaknessHunterAgility = {
 		],
 		label: 'EW Hunter Agility',
 		labelTooltip: 'The amount of agility on the Expose Weakness hunter.',
-		changedEvent: (target: Target) => target.debuffsChangeEmitter,
-		getValue: (target: Target) => Math.round(target.getDebuffs().exposeWeaknessHunterAgility),
-		setValue: (eventID: EventID, target: Target, newValue: number) => {
-			const newDebuffs = target.getDebuffs();
+		changedEvent: (encounter: Encounter) => encounter.debuffsChangeEmitter,
+		getValue: (encounter: Encounter) => Math.round(encounter.getDebuffs().exposeWeaknessHunterAgility),
+		setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
+			const newDebuffs = encounter.getDebuffs();
 			newDebuffs.exposeWeaknessHunterAgility = newValue;
-			target.setDebuffs(eventID, newDebuffs);
+			encounter.setDebuffs(eventID, newDebuffs);
 		},
 	},
 };

@@ -881,8 +881,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1773.8662525554987
-  tps: 1247.4167308113592
+  dps: 1705.4196121506338
+  tps: 1198.8196161239055
  }
 }
 dps_results: {
@@ -909,8 +909,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 904.7373527381328
-  tps: 642.3635204440741
+  dps: 874.8058573395745
+  tps: 621.1121587110975
  }
 }
 dps_results: {
@@ -937,8 +937,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1851.826209751705
-  tps: 1302.814239243466
+  dps: 1780.9548139179208
+  tps: 1252.4955482014798
  }
 }
 dps_results: {
@@ -965,8 +965,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-NoBuffs-LongMultiTarget"
  value: {
-  dps: 991.4470978585875
-  tps: 703.9274394795971
+  dps: 958.4123906153706
+  tps: 680.4727973369133
  }
 }
 dps_results: {
@@ -993,8 +993,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1796.1085037623968
-  tps: 1263.2298038483586
+  dps: 1726.4704494434084
+  tps: 1213.7867852818754
  }
 }
 dps_results: {
@@ -1021,8 +1021,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 918.0916297878182
-  tps: 651.845057149351
+  dps: 887.2596162106586
+  tps: 629.9543275095681
  }
 }
 dps_results: {
@@ -1049,8 +1049,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1871.3455640499287
-  tps: 1316.6351071809186
+  dps: 1798.3980621859407
+  tps: 1264.842380857487
  }
 }
 dps_results: {
@@ -1077,8 +1077,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1005.5126201915674
-  tps: 713.9139603360127
+  dps: 971.8351448721997
+  tps: 690.002952859262
  }
 }
 dps_results: {

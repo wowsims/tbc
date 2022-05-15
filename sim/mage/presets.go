@@ -220,10 +220,6 @@ var FullDebuffs = &proto.Debuffs{
 	Misery:                    true,
 }
 
-var FullDebuffTarget = &proto.Target{
-	Debuffs: FullDebuffs,
-}
-
 var P1FireGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	items.ItemStringSpec{
 		Name:    "Collar of the Aldor",

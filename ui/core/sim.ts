@@ -15,6 +15,7 @@ import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
+import { PresetEncounter, PresetTarget } from '/tbc/core/proto/api.js';
 import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { GearListRequest, GearListResult } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
@@ -80,6 +81,8 @@ export class Sim {
 	private items: Record<number, Item> = {};
 	private enchants: Record<number, Enchant> = {};
 	private gems: Record<number, Gem> = {};
+	private presetEncounters: Record<string, PresetEncounter> = {};
+	private presetTargets: Record<string, PresetTarget> = {};
 
 	readonly iterationsChangeEmitter = new TypedEvent<void>();
 	readonly phaseChangeEmitter = new TypedEvent<void>();
@@ -114,6 +117,8 @@ export class Sim {
 			result.items.forEach(item => this.items[item.id] = item);
 			result.enchants.forEach(enchant => this.enchants[enchant.id] = enchant);
 			result.gems.forEach(gem => this.gems[gem.id] = gem);
+			result.encounters.forEach(encounter => this.presetEncounters[encounter.path] = encounter);
+			result.encounters.map(e => e.targets).flat().forEach(target => this.presetTargets[target.path] = target);
 		});
 
 		this.raid = new Raid(this);
@@ -181,11 +186,9 @@ export class Sim {
 		const encounter = this.getModifiedEncounterProto();
 		const hunters = raid.parties.map(party => party.players).flat().filter(player => player.name && playerToSpec(player) == Spec.SpecHunter);
 		if (hunters.some(hunter => (specTypeFunctions[Spec.SpecHunter]!.talentsFromPlayer(hunter) as SpecTalents<Spec.SpecHunter>).exposeWeakness > 0)) {
-			encounter.targets.forEach(target => {
-				if (target.debuffs) {
-					target.debuffs.exposeWeaknessUptime = 0;
-				}
-			});
+			if (encounter.debuffs) {
+				encounter.debuffs.exposeWeaknessUptime = 0;
+			}
 		}
 
 		return RaidSimRequest.create({
@@ -327,6 +330,16 @@ export class Sim {
 
 	getMatchingGems(socketColor: GemColor): Array<Gem> {
 		return Object.values(this.gems).filter(gem => gemMatchesSocket(gem, socketColor));
+	}
+
+	getPresetEncounter(path: string): PresetEncounter | null {
+		return this.presetEncounters[path] || null;
+	}
+	getPresetTarget(path: string): PresetTarget | null {
+		return this.presetTargets[path] || null;
+	}
+	getAllPresetEncounters(): Array<PresetEncounter> {
+		return Object.values(this.presetEncounters);
 	}
 
 	getPhase(): number {

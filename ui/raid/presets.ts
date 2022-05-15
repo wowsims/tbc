@@ -686,6 +686,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/ability_racial_bearform.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			raidProto.buffs!.giftOfTheWild = Math.max(raidProto.buffs!.giftOfTheWild, TristateEffect.TristateEffectRegular);
+			raidProto.buffs!.thorns = Math.max(raidProto.buffs!.thorns, TristateEffect.TristateEffectRegular);
 			partyProto.buffs!.leaderOfThePack = Math.max(partyProto.buffs!.leaderOfThePack, TristateEffect.TristateEffectRegular);
 
 			const innervateIndex = buffBot.getInnervateAssignment().targetIndex;
@@ -699,7 +700,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 			}
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			encounterProto.targets[0].debuffs!.faerieFire = Math.max(encounterProto.targets[0].debuffs!.faerieFire, TristateEffect.TristateEffectRegular);
+			encounterProto.debuffs!.faerieFire = Math.max(encounterProto.debuffs!.faerieFire, TristateEffect.TristateEffectRegular);
 		},
 	},
 	{
@@ -711,6 +712,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_healingtouch.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			raidProto.buffs!.giftOfTheWild = TristateEffect.TristateEffectImproved;
+			raidProto.buffs!.thorns = Math.max(raidProto.buffs!.thorns, TristateEffect.TristateEffectRegular);
 
 			const innervateIndex = buffBot.getInnervateAssignment().targetIndex;
 			if (innervateIndex != NO_TARGET) {
@@ -734,6 +736,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_faeriefire.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			raidProto.buffs!.giftOfTheWild = TristateEffect.TristateEffectImproved;
+			raidProto.buffs!.thorns = TristateEffect.TristateEffectImproved;
 
 			const innervateIndex = buffBot.getInnervateAssignment().targetIndex;
 			if (innervateIndex != NO_TARGET) {
@@ -746,7 +749,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 			}
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			encounterProto.targets[0].debuffs!.faerieFire = TristateEffect.TristateEffectImproved;
+			encounterProto.debuffs!.faerieFire = TristateEffect.TristateEffectImproved;
 		},
 	},
 	{
@@ -787,7 +790,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 			// Do nothing, blessings are handled elswhere.
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			encounterProto.targets[0].debuffs!.judgementOfWisdom = true;
+			encounterProto.debuffs!.judgementOfWisdom = true;
 		},
 	},
 	{
@@ -801,7 +804,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 			// Do nothing, blessings are handled elswhere.
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			encounterProto.targets[0].debuffs!.improvedSealOfTheCrusader = true;
+			encounterProto.debuffs!.improvedSealOfTheCrusader = true;
 		},
 	},
 	{
@@ -867,7 +870,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			const debuffs = encounterProto.targets[0].debuffs!;
+			const debuffs = encounterProto.debuffs!;
 			debuffs.curseOfElements = Math.max(debuffs.curseOfElements, TristateEffect.TristateEffectRegular);
 			debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
 		},
@@ -883,7 +886,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			const debuffs = encounterProto.targets[0].debuffs!;
+			const debuffs = encounterProto.debuffs!;
 			debuffs.curseOfElements = TristateEffect.TristateEffectImproved;
 			debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
 		},
@@ -899,7 +902,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			const debuffs = encounterProto.targets[0].debuffs!;
+			const debuffs = encounterProto.debuffs!;
 			debuffs.curseOfRecklessness = true;
 			debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
 		},
@@ -916,7 +919,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 			partyProto.buffs!.battleShout = TristateEffect.TristateEffectImproved;
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			const debuffs = encounterProto.targets[0].debuffs!;
+			const debuffs = encounterProto.debuffs!;
 			debuffs.sunderArmor = true;
 			debuffs.bloodFrenzy = true;
 		},
@@ -933,7 +936,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 			partyProto.buffs!.battleShout = TristateEffect.TristateEffectImproved;
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			const debuffs = encounterProto.targets[0].debuffs!;
+			const debuffs = encounterProto.debuffs!;
 			debuffs.sunderArmor = true;
 		},
 	},
@@ -947,7 +950,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 		},
 		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			const debuffs = encounterProto.targets[0].debuffs!;
+			const debuffs = encounterProto.debuffs!;
 			debuffs.sunderArmor = true;
 		},
 	},

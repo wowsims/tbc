@@ -1,8 +1,10 @@
+import { Debuffs } from '/tbc/core/proto/common.js';
 import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
-import { EncounterType } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
+import { PresetEncounter } from '/tbc/core/proto/api.js';
+import { PresetTarget } from '/tbc/core/proto/api.js';
 import { Target } from '/tbc/core/target.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 
@@ -13,18 +15,16 @@ import { EventID, TypedEvent } from './typed_event.js';
 export class Encounter {
 	readonly sim: Sim;
 
-	private type: EncounterType = EncounterType.EncounterTypeSimple;
 	private duration: number = 180;
 	private durationVariation: number = 5;
-	private numTargets: number = 1;
 	private executeProportion: number = 0.2;
 	private targets: Array<Target>;
+	private debuffs: Debuffs = Debuffs.create();
 
 	readonly targetsChangeEmitter = new TypedEvent<void>();
-	readonly typeChangeEmitter = new TypedEvent<void>();
 	readonly durationChangeEmitter = new TypedEvent<void>();
-	readonly numTargetsChangeEmitter = new TypedEvent<void>();
 	readonly executeProportionChangeEmitter = new TypedEvent<void>();
+	readonly debuffsChangeEmitter = new TypedEvent<void>();
 
 	// Emits when any of the above emitters emit.
 	readonly changeEmitter = new TypedEvent<void>();
@@ -35,26 +35,14 @@ export class Encounter {
 
 		[
 			this.targetsChangeEmitter,
-			this.typeChangeEmitter,
 			this.durationChangeEmitter,
-			this.numTargetsChangeEmitter,
 			this.executeProportionChangeEmitter,
+			this.debuffsChangeEmitter,
 		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
 	}
 
 	get primaryTarget(): Target {
 		return this.targets[0];
-	}
-
-	getType(): EncounterType {
-		return this.type;
-	}
-	setType(eventID: EventID, newType: EncounterType) {
-		if (newType == this.type)
-			return;
-
-		this.type = newType;
-		this.typeChangeEmitter.emit(eventID);
 	}
 
 	getDurationVariation(): number {
@@ -90,68 +78,79 @@ export class Encounter {
 		this.executeProportionChangeEmitter.emit(eventID);
 	}
 
-	getNumTargets(): number {
-		return this.numTargets;
+	getDebuffs(): Debuffs {
+		// Make a defensive copy
+		return Debuffs.clone(this.debuffs);
 	}
-	setNumTargets(eventID: EventID, newNumTargets: number) {
-		if (newNumTargets == this.numTargets)
+
+	setDebuffs(eventID: EventID, newDebuffs: Debuffs) {
+		if (Debuffs.equals(this.debuffs, newDebuffs))
 			return;
 
-		this.numTargets = newNumTargets;
-		this.numTargetsChangeEmitter.emit(eventID);
+		// Make a defensive copy
+		this.debuffs = Debuffs.clone(newDebuffs);
+		this.debuffsChangeEmitter.emit(eventID);
+	}
+
+	getNumTargets(): number {
+		return this.targets.length;
 	}
 
 	getTargets(): Array<Target> {
 		return this.targets.slice();
 	}
 	setTargets(eventID: EventID, newTargets: Array<Target>) {
-		if (newTargets.length == 0) {
-			newTargets = [Target.fromDefaults(eventID, this.sim)];
-		}
-		if (newTargets.length == this.targets.length && newTargets.every((target, i) => TargetProto.equals(target.toProto(), this.targets[i].toProto()))) {
-			return;
-		}
-
 		TypedEvent.freezeAllAndDo(() => {
-			if (newTargets.length != this.targets.length) {
-				this.numTargets = newTargets.length;
-				this.numTargetsChangeEmitter.emit(eventID);
+			if (newTargets.length == 0) {
+				newTargets = [Target.fromDefaults(eventID, this.sim)];
 			}
+			if (newTargets.length == this.targets.length && newTargets.every((target, i) => TargetProto.equals(target.toProto(), this.targets[i].toProto()))) {
+				return;
+			}
+
 			this.targets = newTargets;
 			this.targetsChangeEmitter.emit(eventID);
 		});
 	}
 
-	toProto(): EncounterProto {
-		const numTargets = Math.max(1, this.numTargets);
-		let targetProtos = [];
-		if (this.getType() == EncounterType.EncounterTypeSimple) {
-			for (let i = 0; i < numTargets; i++) {
-				targetProtos.push(this.primaryTarget.toProto());
-			}
-		} else {
-			targetProtos = this.targets.map(target => target.toProto());
-		}
+	matchesPreset(preset: PresetEncounter): boolean {
+		return preset.targets.length == this.targets.length && this.targets.every((t, i) => t.matchesPreset(preset.targets[i]));
+	}
 
+	applyPreset(eventID: EventID, preset: PresetEncounter) {
+		TypedEvent.freezeAllAndDo(() => {
+			let newTargets = this.targets.slice(0, preset.targets.length);
+			while (newTargets.length < preset.targets.length) {
+				newTargets.push(new Target(this.sim));
+			}
+
+			newTargets.forEach((nt, i) => nt.applyPreset(eventID, preset.targets[i]));
+			this.setTargets(eventID, newTargets);
+		});
+	}
+
+	toProto(): EncounterProto {
 		return EncounterProto.create({
-			type: this.type,
 			duration: this.duration,
 			durationVariation: this.durationVariation,
 			executeProportion: this.executeProportion,
-			targets: targetProtos,
+			targets: this.targets.map(target => target.toProto()),
+			debuffs: this.getDebuffs(),
 		});
 	}
 
 	fromProto(eventID: EventID, proto: EncounterProto) {
 		TypedEvent.freezeAllAndDo(() => {
-			this.setType(eventID, proto.type);
+			if (proto.targets[0] && proto.targets[0].debuffs) {
+				proto.debuffs = proto.targets[0].debuffs;
+				proto.targets[0].debuffs = undefined;
+			}
 			this.setDuration(eventID, proto.duration);
 			this.setDurationVariation(eventID, proto.durationVariation);
 			this.setExecuteProportion(eventID, proto.executeProportion);
-			this.setNumTargets(eventID, Math.max(1, proto.targets.length));
+			this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
 
 			if (proto.targets.length > 0) {
-				this.primaryTarget.fromProto(eventID, proto.targets[0]);
 				this.setTargets(eventID, proto.targets.map(targetProto => {
 					const target = new Target(this.sim);
 					target.fromProto(eventID, targetProto);

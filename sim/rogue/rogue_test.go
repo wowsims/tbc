@@ -44,36 +44,35 @@ func TestRogue(t *testing.T) {
 }
 
 func TestMutilate(t *testing.T) {
-        core.RunTestSuite(t, t.Name(), core.FullCharacterTestSuiteGenerator(core.CharacterSuiteConfig{
-                Class: proto.Class_ClassRogue,
+	core.RunTestSuite(t, t.Name(), core.FullCharacterTestSuiteGenerator(core.CharacterSuiteConfig{
+		Class: proto.Class_ClassRogue,
 
-                Race:       proto.Race_RaceHuman,
-                OtherRaces: []proto.Race{proto.Race_RaceBloodElf},
+		Race:       proto.Race_RaceHuman,
+		OtherRaces: []proto.Race{proto.Race_RaceBloodElf},
 
-                GearSet: core.GearSetCombo{Label: "P1 Mutilate", GearSet: MutilateP1Gear},
+		GearSet: core.GearSetCombo{Label: "P1 Mutilate", GearSet: MutilateP1Gear},
 
-                SpecOptions: core.SpecOptionsCombo{Label: "Mutilate", SpecOptions: PlayerOptionsMutilate},
+		SpecOptions: core.SpecOptionsCombo{Label: "Mutilate", SpecOptions: PlayerOptionsMutilate},
 
-                RaidBuffs:   FullRaidBuffs,
-                PartyBuffs:  FullPartyBuffs,
-                PlayerBuffs: FullIndividualBuffs,
-                Consumes:    FullConsumes,
-                Debuffs:     FullDebuffs,
+		RaidBuffs:   FullRaidBuffs,
+		PartyBuffs:  FullPartyBuffs,
+		PlayerBuffs: FullIndividualBuffs,
+		Consumes:    FullConsumes,
+		Debuffs:     FullDebuffs,
 
-                ItemFilter: core.ItemFilter{
-                        ArmorType: proto.ArmorType_ArmorTypeLeather,
-                        RangedWeaponTypes: []proto.RangedWeaponType{
-                                proto.RangedWeaponType_RangedWeaponTypeBow,
-                                proto.RangedWeaponType_RangedWeaponTypeCrossbow,
-                                proto.RangedWeaponType_RangedWeaponTypeGun,
-                        },
+		ItemFilter: core.ItemFilter{
+			ArmorType: proto.ArmorType_ArmorTypeLeather,
+			RangedWeaponTypes: []proto.RangedWeaponType{
+				proto.RangedWeaponType_RangedWeaponTypeBow,
+				proto.RangedWeaponType_RangedWeaponTypeCrossbow,
+				proto.RangedWeaponType_RangedWeaponTypeGun,
+			},
 			WeaponTypes: []proto.WeaponType{
 				proto.WeaponType_WeaponTypeDagger,
 			},
-                },
-        }))
+		},
+	}))
 }
-
 
 func BenchmarkSimulate(b *testing.B) {
 	rsr := &proto.RaidSimRequest{
@@ -90,8 +89,9 @@ func BenchmarkSimulate(b *testing.B) {
 			FullRaidBuffs),
 		Encounter: &proto.Encounter{
 			Duration: 300,
+			Debuffs:  FullDebuffs,
 			Targets: []*proto.Target{
-				FullDebuffTarget,
+				core.NewDefaultTarget(),
 			},
 		},
 		SimOptions: core.AverageDefaultSimTestOptions,

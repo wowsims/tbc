@@ -52,10 +52,6 @@ var FullDebuffs = &proto.Debuffs{
 	CurseOfElements:   proto.TristateEffect_TristateEffectImproved,
 }
 
-var FullDebuffTarget = &proto.Target{
-	Debuffs: FullDebuffs,
-}
-
 var PlayerOptionsBasic = &proto.Player_ShadowPriest{
 	ShadowPriest: &proto.ShadowPriest{
 		Talents: StandardTalents,

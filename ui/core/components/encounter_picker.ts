@@ -1,4 +1,3 @@
-import { EncounterType } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
 import { SpellSchool } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
@@ -20,7 +19,6 @@ import * as Mechanics from '/tbc/core/constants/mechanics.js';
 
 export interface EncounterPickerConfig {
 	simpleTargetStats?: Array<Stat>;
-	showNumTargets: boolean;
 	showExecuteProportion: boolean;
 }
 
@@ -67,22 +65,9 @@ export class EncounterPicker extends Component {
 				});
 			});
 		}
-
-		if (config.showNumTargets) {
-			new NumberPicker(this.rootElem, modEncounter, {
-				label: '# of Targets',
-				changedEvent: (encounter: Encounter) => encounter.changeEmitter,
-				getValue: (encounter: Encounter) => encounter.getNumTargets(),
-				setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
-					encounter.setNumTargets(eventID, newValue);
-				},
-				enableWhen: (encounter: Encounter) => encounter.getType() == EncounterType.EncounterTypeSimple,
-			});
-		}
 		
-		// Simple/Custom/Preset [Edit Button]
 		const advancedButton = document.createElement('button');
-		advancedButton.classList.add('sim-button', 'advanced-button', 'experimental');
+		advancedButton.classList.add('sim-button', 'advanced-button');
 		advancedButton.textContent = 'ADVANCED';
 		advancedButton.addEventListener('click', () => new AdvancedEncounterPicker(this.rootElem, modEncounter));
 		this.rootElem.appendChild(advancedButton);
@@ -107,22 +92,25 @@ class AdvancedEncounterPicker extends Popup {
 
 		this.addCloseButton();
 
+		const presetEncounters = this.encounter.sim.getAllPresetEncounters();
+
 		const encounterTypeContainer = this.rootElem.getElementsByClassName('encounter-type')[0] as HTMLElement;
 		new EnumPicker<Encounter>(encounterTypeContainer, this.encounter, {
 			label: 'ENCOUNTER',
 			values: [
-				{ name: 'Simple', value: EncounterType.EncounterTypeSimple },
-				{ name: 'Custom', value: EncounterType.EncounterTypeCustom },
-			].concat((getEnumValues(EncounterType) as Array<EncounterType>).filter(val => ![EncounterType.EncounterTypeSimple, EncounterType.EncounterTypeCustom].includes(val)).map((val, i) => {
+				{ name: 'Custom', value: -1 },
+			].concat(presetEncounters.map((pe, i) => {
 				return {
-					name: '',
-					value: val,
+					name: pe.path,
+					value: i,
 				};
 			})),
-			changedEvent: (encounter: Encounter) => encounter.typeChangeEmitter,
-			getValue: (encounter: Encounter) => encounter.getType(),
+			changedEvent: (encounter: Encounter) => encounter.changeEmitter,
+			getValue: (encounter: Encounter) => presetEncounters.findIndex(pe => encounter.matchesPreset(pe)),
 			setValue: (eventID: EventID, encounter: Encounter, newValue: number) => {
-				encounter.setType(eventID, newValue);
+				if (newValue != -1) {
+					encounter.applyPreset(eventID, presetEncounters[newValue]);
+				}
 			},
 		});
 

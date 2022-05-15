@@ -1,8 +1,8 @@
-import { Debuffs } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
 import { SpellSchool } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
+import { PresetTarget } from '/tbc/core/proto/api.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 
 import * as Mechanics from '/tbc/core/constants/mechanics.js';
@@ -17,6 +17,8 @@ import { wait } from './utils.js';
 export class Target {
 	readonly sim: Sim;
 
+	private id: number = 0;
+	private name: string = '';
 	private level: number = Mechanics.BOSS_LEVEL;
 	private mobType: MobType = MobType.MobTypeDemon;
 	private tankIndex: number = 0;
@@ -29,13 +31,12 @@ export class Target {
 	private parryHaste: boolean = true;
 	private spellSchool: SpellSchool = SpellSchool.SpellSchoolPhysical;
 
-	private debuffs: Debuffs = Debuffs.create();
-
+	readonly idChangeEmitter = new TypedEvent<void>();
+	readonly nameChangeEmitter = new TypedEvent<void>();
 	readonly levelChangeEmitter = new TypedEvent<void>();
 	readonly mobTypeChangeEmitter = new TypedEvent<void>();
 	readonly propChangeEmitter = new TypedEvent<void>();
 	readonly statsChangeEmitter = new TypedEvent<void>();
-	readonly debuffsChangeEmitter = new TypedEvent<void>();
 
 	// Emits when any of the above emitters emit.
 	readonly changeEmitter = new TypedEvent<void>();
@@ -44,14 +45,39 @@ export class Target {
 		this.sim = sim;
 
 		[
+			this.idChangeEmitter,
+			this.nameChangeEmitter,
 			this.levelChangeEmitter,
 			this.mobTypeChangeEmitter,
 			this.propChangeEmitter,
 			this.statsChangeEmitter,
-			this.debuffsChangeEmitter,
 		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
 
 		this.changeEmitter.on(eventID => this.sim.encounter?.changeEmitter.emit(eventID));
+	}
+
+	getId(): number {
+		return this.id;
+	}
+
+	setId(eventID: EventID, newId: number) {
+		if (newId == this.id)
+			return;
+
+		this.id = newId;
+		this.idChangeEmitter.emit(eventID);
+	}
+
+	getName(): string {
+		return this.name;
+	}
+
+	setName(eventID: EventID, newName: string) {
+		if (newName == this.name)
+			return;
+
+		this.name = newName;
+		this.nameChangeEmitter.emit(eventID);
 	}
 
 	getLevel(): number {
@@ -174,22 +200,18 @@ export class Target {
 		this.statsChangeEmitter.emit(eventID);
 	}
 
-	getDebuffs(): Debuffs {
-		// Make a defensive copy
-		return Debuffs.clone(this.debuffs);
+	matchesPreset(preset: PresetTarget): boolean {
+		return TargetProto.equals(this.toProto(), preset.target);
 	}
 
-	setDebuffs(eventID: EventID, newDebuffs: Debuffs) {
-		if (Debuffs.equals(this.debuffs, newDebuffs))
-			return;
-
-		// Make a defensive copy
-		this.debuffs = Debuffs.clone(newDebuffs);
-		this.debuffsChangeEmitter.emit(eventID);
+	applyPreset(eventID: EventID, preset: PresetTarget) {
+		this.fromProto(eventID, preset.target || TargetProto.create());
 	}
 
 	toProto(): TargetProto {
 		return TargetProto.create({
+			id: this.getId(),
+			name: this.getName(),
 			level: this.getLevel(),
 			mobType: this.getMobType(),
 			tankIndex: this.getTankIndex(),
@@ -200,7 +222,6 @@ export class Target {
 			parryHaste: this.getParryHaste(),
 			spellSchool: this.getSpellSchool(),
 			stats: this.stats.asArray(),
-			debuffs: this.debuffs,
 		});
 	}
 
@@ -211,6 +232,8 @@ export class Target {
 				stats = stats.withStat(Stat.StatArmor, proto.armor);
 			}
 
+			this.setId(eventID, proto.id);
+			this.setName(eventID, proto.name);
 			this.setLevel(eventID, proto.level);
 			this.setMobType(eventID, proto.mobType);
 			this.setTankIndex(eventID, proto.tankIndex);
@@ -221,7 +244,6 @@ export class Target {
 			this.setParryHaste(eventID, proto.parryHaste);
 			this.setSpellSchool(eventID, proto.spellSchool);
 			this.setStats(eventID, stats);
-			this.setDebuffs(eventID, proto.debuffs || Debuffs.create());
 		});
 	}
 

@@ -181,7 +181,7 @@ func CalcStatWeight(swr proto.StatWeightsRequest, statsToWeigh []stats.Stat, ref
 	waitGroup.Wait()
 
 	melee2HHitCap := 9 * MeleeHitRatingPerHitChance
-	if swr.Encounter.Targets[0].Debuffs.FaerieFire == proto.TristateEffect_TristateEffectImproved {
+	if swr.Encounter.Debuffs.FaerieFire == proto.TristateEffect_TristateEffectImproved {
 		melee2HHitCap -= 3 * MeleeHitRatingPerHitChance
 	}
 

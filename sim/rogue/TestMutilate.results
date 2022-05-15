@@ -727,8 +727,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-BloodElf-P1 Mutilate-Mutilate-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1299.1666586686958
-  tps: 910.3892620104633
+  dps: 1293.0867231588752
+  tps: 906.072507798491
  }
 }
 dps_results: {
@@ -783,8 +783,8 @@ dps_results: {
 dps_results: {
  key: "TestMutilate-Settings-Human-P1 Mutilate-Mutilate-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1299.0253439518438
-  tps: 910.2889285614982
+  dps: 1292.945408442023
+  tps: 905.9721743495259
  }
 }
 dps_results: {

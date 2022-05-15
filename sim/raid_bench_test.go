@@ -280,16 +280,16 @@ func BenchmarkSimulate(b *testing.B) {
 		Encounter: &proto.Encounter{
 			Duration:          180,
 			ExecuteProportion: 0.1,
+			Debuffs: &proto.Debuffs{
+				JudgementOfWisdom:         true,
+				ImprovedSealOfTheCrusader: true,
+				CurseOfElements:           proto.TristateEffect_TristateEffectImproved,
+				IsbUptime:                 0.2,
+			},
 			Targets: []*proto.Target{
 				{
 					Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 					MobType: proto.MobType_MobTypeDemon,
-					Debuffs: &proto.Debuffs{
-						JudgementOfWisdom:         true,
-						ImprovedSealOfTheCrusader: true,
-						CurseOfElements:           proto.TristateEffect_TristateEffectImproved,
-						IsbUptime:                 0.2,
-					},
 				},
 			},
 		},

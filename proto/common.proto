@@ -487,12 +487,11 @@ enum MobType {
     MobTypeUndead = 8;
 }
 
-enum EncounterType {
-	EncounterTypeSimple = 0;
-	EncounterTypeCustom = 1;
-}
-
 message Target {
+		// The in-game NPC ID.
+		int32 id = 14;
+		string name = 15;
+
 		// TODO: Deprecate this after 1 month (2022/6/6)
 		double armor = 1;
 
@@ -513,6 +512,7 @@ message Target {
 		// -1 or invalid index indicates not being tanked.
     int32 tank_index = 6;
 
+		//TODO: Deprecate after 1 month (2022/06/14).
 		Debuffs debuffs = 2;
 }
 
@@ -527,10 +527,10 @@ message Encounter {
     // Fury, etc.
     double execute_proportion = 3;
 
-		EncounterType type = 5;
-
 		// If type != Simple or Custom, then this may be empty.
     repeated Target targets = 2;
+
+		Debuffs debuffs = 5;
 }
 
 message ItemSpec {
