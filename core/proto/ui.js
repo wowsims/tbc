@@ -42,6 +42,10 @@ export var Blessings;
      * @generated from protobuf enum value: BlessingOfWisdom = 4;
      */
     Blessings[Blessings["BlessingOfWisdom"] = 4] = "BlessingOfWisdom";
+    /**
+     * @generated from protobuf enum value: BlessingOfSanctuary = 5;
+     */
+    Blessings[Blessings["BlessingOfSanctuary"] = 5] = "BlessingOfSanctuary";
 })(Blessings || (Blessings = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class SimSettings$Type extends MessageType {

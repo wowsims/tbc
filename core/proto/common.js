@@ -1635,6 +1635,7 @@ class IndividualBuffs$Type extends MessageType {
         super("proto.IndividualBuffs", [
             { no: 1, name: "blessing_of_kings", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 8, name: "blessing_of_salvation", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 9, name: "blessing_of_sanctuary", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "blessing_of_wisdom", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 3, name: "blessing_of_might", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
             { no: 4, name: "shadow_priest_dps", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -1644,7 +1645,7 @@ class IndividualBuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { blessingOfKings: false, blessingOfSalvation: false, blessingOfWisdom: 0, blessingOfMight: 0, shadowPriestDps: 0, unleashedRage: false, innervates: 0, powerInfusions: 0 };
+        const message = { blessingOfKings: false, blessingOfSalvation: false, blessingOfSanctuary: false, blessingOfWisdom: 0, blessingOfMight: 0, shadowPriestDps: 0, unleashedRage: false, innervates: 0, powerInfusions: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1660,6 +1661,9 @@ class IndividualBuffs$Type extends MessageType {
                     break;
                 case /* bool blessing_of_salvation */ 8:
                     message.blessingOfSalvation = reader.bool();
+                    break;
+                case /* bool blessing_of_sanctuary */ 9:
+                    message.blessingOfSanctuary = reader.bool();
                     break;
                 case /* proto.TristateEffect blessing_of_wisdom */ 2:
                     message.blessingOfWisdom = reader.int32();
@@ -1697,6 +1701,9 @@ class IndividualBuffs$Type extends MessageType {
         /* bool blessing_of_salvation = 8; */
         if (message.blessingOfSalvation !== false)
             writer.tag(8, WireType.Varint).bool(message.blessingOfSalvation);
+        /* bool blessing_of_sanctuary = 9; */
+        if (message.blessingOfSanctuary !== false)
+            writer.tag(9, WireType.Varint).bool(message.blessingOfSanctuary);
         /* proto.TristateEffect blessing_of_wisdom = 2; */
         if (message.blessingOfWisdom !== 0)
             writer.tag(2, WireType.Varint).int32(message.blessingOfWisdom);

@@ -154,6 +154,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
             playerBuffInputs: [
                 IconInputs.BlessingOfKings,
                 IconInputs.BlessingOfMight,
+                IconInputs.BlessingOfSanctuary,
                 IconInputs.BlessingOfSalvation,
                 IconInputs.UnleashedRage,
             ],

@@ -206,6 +206,10 @@ export interface IndividualBuffs {
      */
     blessingOfSalvation: boolean;
     /**
+     * @generated from protobuf field: bool blessing_of_sanctuary = 9;
+     */
+    blessingOfSanctuary: boolean;
+    /**
      * @generated from protobuf field: proto.TristateEffect blessing_of_wisdom = 2;
      */
     blessingOfWisdom: TristateEffect;

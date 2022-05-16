@@ -50,6 +50,7 @@ export declare const DrumsOfRestorationBuff: IndividualSimIconPickerConfig<Party
 export declare const BlessingOfKings: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BlessingOfMight: IndividualSimIconPickerConfig<Player<any>, number>;
 export declare const BlessingOfSalvation: IndividualSimIconPickerConfig<Player<any>, boolean>;
+export declare const BlessingOfSanctuary: IndividualSimIconPickerConfig<Player<any>, boolean>;
 export declare const BlessingOfWisdom: IndividualSimIconPickerConfig<Player<any>, number>;
 export declare const Innervate: IndividualSimIconPickerConfig<Player<any>, number>;
 export declare const PowerInfusion: IndividualSimIconPickerConfig<Player<any>, number>;

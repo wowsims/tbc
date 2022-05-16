@@ -333,7 +333,11 @@ export declare enum Blessings {
     /**
      * @generated from protobuf enum value: BlessingOfWisdom = 4;
      */
-    BlessingOfWisdom = 4
+    BlessingOfWisdom = 4,
+    /**
+     * @generated from protobuf enum value: BlessingOfSanctuary = 5;
+     */
+    BlessingOfSanctuary = 5
 }
 declare class SimSettings$Type extends MessageType<SimSettings> {
     constructor();
