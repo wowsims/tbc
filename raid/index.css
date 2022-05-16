@@ -139,7 +139,7 @@
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: block !important;
+  display: flex !important;
 }
 
 .dropdown-option-container:hover {
@@ -267,7 +267,7 @@
 }
 
 .sim-title-dropdown {
-  width: 100%;
+  position: fixed !important;
 }
 
 .sim-title-button .sim-title-dropdown-option-container {
@@ -419,7 +419,7 @@
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: block !important;
+  display: flex !important;
 }
 
 .dropdown-option-container:hover {
@@ -1214,7 +1214,7 @@ input, select {
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: block !important;
+  display: flex !important;
 }
 
 .dropdown-option-container:hover {
@@ -1626,7 +1626,7 @@ input, select {
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: block !important;
+  display: flex !important;
 }
 
 .dropdown-option-container:hover {
@@ -1982,7 +1982,7 @@ input, select {
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: block !important;
+  display: flex !important;
 }
 
 .dropdown-option-container:hover {
@@ -2359,7 +2359,7 @@ input, select {
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: block !important;
+  display: flex !important;
 }
 
 .dropdown-option-container:hover {
@@ -2640,7 +2640,7 @@ input, select {
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: block !important;
+  display: flex !important;
 }
 
 .dropdown-option-container:hover {

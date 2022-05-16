@@ -9,31 +9,25 @@ export class Title extends Component {
         this.rootElem.classList.add('dropdown-root');
         this.rootElem.innerHTML = `
 			<div class="dropdown-button sim-title-button"></div>
-			<div class="dropdown-panel sim-title-dropdown within-raid-sim-hide"></div>
+			<div class="dropdown-panel sim-title-dropdown within-raid-sim-hide">
+				<div class="dropdown-panel-column"></div>
+				<div class="dropdown-panel-column"></div>
+			</div>
     `;
         this.buttonElem = this.rootElem.getElementsByClassName('sim-title-button')[0];
-        this.dropdownElem = this.rootElem.getElementsByClassName('sim-title-dropdown')[0];
+        const dropdownColumns = Array.from(this.rootElem.getElementsByClassName('dropdown-panel-column'));
         this.buttonElem.addEventListener('click', event => {
             event.preventDefault();
         });
-        const orderedLaunchedSpecs = naturalSpecOrder.filter(spec => launchedSpecs.includes(spec));
-        let currentOption = null;
-        let otherOptions = [];
-        if (currentSpec == null) {
-            currentOption = this.makeOptionData(null, true);
-            otherOptions = orderedLaunchedSpecs.map(spec => this.makeOptionData(spec, false));
-        }
-        else {
-            currentOption = this.makeOptionData(currentSpec, true);
-            otherOptions = orderedLaunchedSpecs
-                .filter(spec => spec != currentSpec)
-                .map(spec => this.makeOptionData(spec, false))
-                .concat([this.makeOptionData(null, false)]);
-        }
+        const orderedLaunchedSpecs = naturalSpecOrder
+            .filter(spec => launchedSpecs.includes(spec))
+            .concat([null]); // Null represents the raid sim.
+        const currentOption = this.makeOptionData(currentSpec, true);
+        const otherOptions = orderedLaunchedSpecs.map(spec => this.makeOptionData(spec, false));
         this.buttonElem.appendChild(Title.makeOptionElem(currentOption));
         const isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
         if (!isWithinRaidSim) {
-            otherOptions.forEach(option => this.dropdownElem.appendChild(this.makeOption(option)));
+            otherOptions.forEach((option, i) => dropdownColumns[i % 2].appendChild(this.makeOption(option)));
         }
     }
     makeOptionData(spec, isButton) {

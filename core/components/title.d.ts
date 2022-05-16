@@ -8,7 +8,6 @@ export interface SimLinkOption {
 }
 export declare class Title extends Component {
     private readonly buttonElem;
-    private readonly dropdownElem;
     constructor(parent: HTMLElement, currentSpec: Spec | null);
     private makeOptionData;
     private makeOption;
