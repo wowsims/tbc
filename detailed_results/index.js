@@ -51,7 +51,7 @@ const layoutHTML = `
 		<li class="tabs-filler">
 		</li>
 		<li class="dr-tab-tab active"><a data-toggle="tab" href="#damageTab">DAMAGE</a></li>
-		<li class="dr-tab-tab"><a data-toggle="tab" href="#damageTakenTab">DAMAGE TAKEN</a></li>
+		<li class="dr-tab-tab threat-metrics"><a data-toggle="tab" href="#damageTakenTab">DAMAGE TAKEN</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#buffsTab">BUFFS</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#debuffsTab">DEBUFFS</a></li>
 		<li class="dr-tab-tab"><a data-toggle="tab" href="#castsTab">CASTS</a></li>

@@ -907,6 +907,10 @@ export var WeaponImbue;
      */
     WeaponImbue[WeaponImbue["WeaponImbueSuperiorWizardOil"] = 4] = "WeaponImbueSuperiorWizardOil";
     /**
+     * @generated from protobuf enum value: WeaponImbueRighteousWeaponCoating = 12;
+     */
+    WeaponImbue[WeaponImbue["WeaponImbueRighteousWeaponCoating"] = 12] = "WeaponImbueRighteousWeaponCoating";
+    /**
      * @generated from protobuf enum value: WeaponImbueRogueDeadlyPoison = 10;
      */
     WeaponImbue[WeaponImbue["WeaponImbueRogueDeadlyPoison"] = 10] = "WeaponImbueRogueDeadlyPoison";

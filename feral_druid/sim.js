@@ -193,6 +193,7 @@ export class FeralDruidSimUI extends IndividualSimUI {
                 ],
                 weaponImbues: [
                     WeaponImbue.WeaponImbueAdamantiteWeightstone,
+                    WeaponImbue.WeaponImbueRighteousWeaponCoating,
                 ],
                 other: [
                     IconInputs.ScrollOfAgilityV,

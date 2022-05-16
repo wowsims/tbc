@@ -215,6 +215,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                 weaponImbues: [
                     WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
                     WeaponImbue.WeaponImbueAdamantiteWeightstone,
+                    WeaponImbue.WeaponImbueRighteousWeaponCoating,
                 ],
                 other: [
                     IconInputs.ScrollOfAgilityV,

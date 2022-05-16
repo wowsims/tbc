@@ -1710,6 +1710,10 @@ export declare enum WeaponImbue {
      */
     WeaponImbueSuperiorWizardOil = 4,
     /**
+     * @generated from protobuf enum value: WeaponImbueRighteousWeaponCoating = 12;
+     */
+    WeaponImbueRighteousWeaponCoating = 12,
+    /**
      * @generated from protobuf enum value: WeaponImbueRogueDeadlyPoison = 10;
      */
     WeaponImbueRogueDeadlyPoison = 10,

@@ -219,6 +219,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI {
                     WeaponImbue.WeaponImbueAdamantiteWeightstone,
                     WeaponImbue.WeaponImbueBrilliantWizardOil,
                     WeaponImbue.WeaponImbueSuperiorWizardOil,
+                    WeaponImbue.WeaponImbueRighteousWeaponCoating,
                 ],
                 other: [
                     IconInputs.ScrollOfStrengthV,
