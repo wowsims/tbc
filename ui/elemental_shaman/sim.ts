@@ -75,6 +75,7 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 			epReferenceStat: Stat.StatSpellPower,
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
+				Stat.StatHealth,
 				Stat.StatStamina,
 				Stat.StatIntellect,
 				Stat.StatSpellPower,
@@ -220,6 +221,7 @@ export class ElementalShamanSimUI extends IndividualSimUI<Spec.SpecElementalSham
 					OtherInputs.ShadowPriestDPS,
 					OtherInputs.StartingPotion,
 					OtherInputs.NumStartingPotions,
+					OtherInputs.TankAssignment,
 				],
 			},
 			customSections: [

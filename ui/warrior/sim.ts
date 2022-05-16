@@ -60,6 +60,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 			epReferenceStat: Stat.StatAttackPower,
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
+				Stat.StatHealth,
 				Stat.StatStamina,
 				Stat.StatStrength,
 				Stat.StatAgility,
@@ -217,6 +218,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
+					OtherInputs.TankAssignment,
 					OtherInputs.InFrontOfTarget,
 				],
 			},
