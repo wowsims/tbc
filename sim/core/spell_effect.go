@@ -248,6 +248,7 @@ func (spellEffect *SpellEffect) applyTargetModifiers(sim *Simulation, spell *Spe
 	target := spellEffect.Target
 
 	spellEffect.Damage *= target.PseudoStats.DamageTakenMultiplier
+	spellEffect.Damage = MaxFloat(0, spellEffect.Damage+target.PseudoStats.BonusDamageTaken)
 	if spell.SpellSchool.Matches(SpellSchoolPhysical) {
 		if spellEffect.IsPeriodic {
 			spellEffect.Damage *= target.PseudoStats.PeriodicPhysicalDamageTakenMultiplier

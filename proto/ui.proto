@@ -67,6 +67,7 @@ enum Blessings {
 	BlessingOfMight = 2;
 	BlessingOfSalvation = 3;
 	BlessingOfWisdom = 4;
+	BlessingOfSanctuary = 5;
 }
 
 message BlessingsAssignment {
