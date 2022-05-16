@@ -9,18 +9,82 @@ import (
 )
 
 func (paladin *Paladin) ApplyTalents() {
-	paladin.applyConviction()
+	paladin.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*float64(paladin.Talents.SanctifiedSeals))
+	paladin.AddStat(stats.SpellCrit, core.SpellCritRatingPerCritChance*float64(paladin.Talents.SanctifiedSeals))
+	paladin.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*float64(paladin.Talents.Precision))
+	paladin.AddStat(stats.SpellHit, core.SpellHitRatingPerHitChance*float64(paladin.Talents.Precision))
+	paladin.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*float64(paladin.Talents.Conviction))
+	paladin.AddStat(stats.Parry, core.ParryRatingPerParryChance*1*float64(paladin.Talents.Deflection))
+	paladin.AddStat(stats.Armor, paladin.Equip.Stats()[stats.Armor]*0.02*float64(paladin.Talents.Toughness))
+	paladin.AddStat(stats.Defense, core.DefenseRatingPerDefense*4*float64(paladin.Talents.Anticipation))
+
+	spellWardingMultiplier := 1 - 0.02*float64(paladin.Talents.SpellWarding)
+	paladin.PseudoStats.ArcaneDamageTakenMultiplier *= spellWardingMultiplier
+	paladin.PseudoStats.FireDamageTakenMultiplier *= spellWardingMultiplier
+	paladin.PseudoStats.FrostDamageTakenMultiplier *= spellWardingMultiplier
+	paladin.PseudoStats.HolyDamageTakenMultiplier *= spellWardingMultiplier
+	paladin.PseudoStats.NatureDamageTakenMultiplier *= spellWardingMultiplier
+	paladin.PseudoStats.ShadowDamageTakenMultiplier *= spellWardingMultiplier
+
+	if paladin.Talents.DivineStrength > 0 {
+		bonus := 1 + 0.02*float64(paladin.Talents.DivineStrength)
+		paladin.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Strength,
+			ModifiedStat: stats.Strength,
+			Modifier: func(str float64, _ float64) float64 {
+				return str * bonus
+			},
+		})
+	}
+	if paladin.Talents.DivineIntellect > 0 {
+		bonus := 1 + 0.02*float64(paladin.Talents.DivineIntellect)
+		paladin.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Intellect,
+			ModifiedStat: stats.Intellect,
+			Modifier: func(intellect float64, _ float64) float64 {
+				return intellect * bonus
+			},
+		})
+	}
+
+	if paladin.Talents.ShieldSpecialization > 0 {
+		bonus := 1 + 0.1*float64(paladin.Talents.ShieldSpecialization)
+		paladin.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.BlockValue,
+			ModifiedStat: stats.BlockValue,
+			Modifier: func(bv float64, _ float64) float64 {
+				return bv * bonus
+			},
+		})
+	}
+
+	if paladin.Talents.SacredDuty > 0 {
+		bonus := 1 + 0.03*float64(paladin.Talents.SacredDuty)
+		paladin.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Stamina,
+			ModifiedStat: stats.Stamina,
+			Modifier: func(stam float64, _ float64) float64 {
+				return stam * bonus
+			},
+		})
+	}
+
+	if paladin.Talents.CombatExpertise > 0 {
+		paladin.AddStat(stats.Expertise, core.ExpertisePerQuarterPercentReduction*1*float64(paladin.Talents.CombatExpertise))
+		bonus := 1 + 0.02*float64(paladin.Talents.CombatExpertise)
+		paladin.AddStatDependency(stats.StatDependency{
+			SourceStat:   stats.Stamina,
+			ModifiedStat: stats.Stamina,
+			Modifier: func(stam float64, _ float64) float64 {
+				return stam * bonus
+			},
+		})
+	}
+
 	paladin.applyCrusade()
+	paladin.applyOneHandedWeaponSpecialization()
 	paladin.applyTwoHandedWeaponSpecialization()
 	paladin.applyVengeance()
-	paladin.applySanctifiedSeals()
-	paladin.applyPrecision()
-	paladin.applyDivineStrength()
-	paladin.applyDivineIntellect()
-}
-
-func (paladin *Paladin) applyConviction() {
-	paladin.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*float64(paladin.Talents.Conviction))
 }
 
 func (paladin *Paladin) applyCrusade() {
@@ -57,6 +121,17 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecializationToSpell(spellEffect *c
 	}
 }
 
+func (paladin *Paladin) applyOneHandedWeaponSpecialization() {
+	if paladin.Talents.OneHandedWeaponSpecialization == 0 {
+		return
+	}
+	if paladin.Equip[proto.ItemSlot_ItemSlotMainHand].HandType == proto.HandType_HandTypeTwoHand {
+		return
+	}
+
+	paladin.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + 0.01*float64(paladin.Talents.OneHandedWeaponSpecialization)
+}
+
 // I don't know if the new stack of vengeance applies to the crit that triggered it or not
 // Need to check this
 func (paladin *Paladin) applyVengeance() {
@@ -89,24 +164,4 @@ func (paladin *Paladin) applyVengeance() {
 			}
 		},
 	})
-}
-
-func (paladin *Paladin) applySanctifiedSeals() {
-	paladin.AddStat(stats.MeleeCrit, core.MeleeCritRatingPerCritChance*float64(paladin.Talents.SanctifiedSeals))
-	paladin.AddStat(stats.SpellCrit, core.SpellCritRatingPerCritChance*float64(paladin.Talents.SanctifiedSeals))
-}
-
-func (paladin *Paladin) applyPrecision() {
-	paladin.AddStat(stats.MeleeHit, core.MeleeHitRatingPerHitChance*float64(paladin.Talents.Precision))
-	paladin.AddStat(stats.SpellHit, core.SpellHitRatingPerHitChance*float64(paladin.Talents.Precision))
-}
-
-func (paladin *Paladin) applyDivineStrength() {
-	bonusStr := paladin.GetStat(stats.Strength) * 0.02 * float64(paladin.Talents.DivineStrength)
-	paladin.AddStat(stats.Strength, bonusStr)
-}
-
-func (paladin *Paladin) applyDivineIntellect() {
-	bonusInt := paladin.GetStat(stats.Intellect) * 0.02 * float64(paladin.Talents.DivineIntellect)
-	paladin.AddStat(stats.Intellect, bonusInt)
 }
