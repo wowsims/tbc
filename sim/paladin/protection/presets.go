@@ -12,31 +12,31 @@ var defaultProtTalents = &proto.PaladinTalents{
 	BlessingOfKings:               true,
 	ImprovedRighteousFury:         3,
 	Anticipation:                  5,
-	SpellWarding:                  2,
-	BlessingofSanctuary:           true,
+	BlessingOfSanctuary:           true,
+	Reckoning:                     4,
 	SacredDuty:                    2,
 	OneHandedWeaponSpecialization: 5,
 	HolyShield:                    true,
 	ImprovedHolyShield:            2,
 	CombatExpertise:               5,
-	Benediction:                   5,
-	ImprovedJudgement:             2,
-	Deflection:                    5,
-	Conviction:                    2,
-	PursuitofJustice:              3,
-	Crusade:                       3,
-	SanctityAura:                  true,
+	AvengersShield:                true,
+
+	Benediction:       5,
+	ImprovedJudgement: 2,
+	Deflection:        5,
+	PursuitOfJustice:  3,
+	Crusade:           3,
 }
 
 var defaultProtRotation = &proto.ProtectionPaladin_Rotation{
 	ConsecrationRank: proto.ProtectionPaladin_Rotation_None,
 	UseExorcism:      false,
-	UseHammerofWrath: false,
+	UseHammerOfWrath: false,
 }
 
 var defaultProtOptions = &proto.ProtectionPaladin_Options{
 	PrimaryJudgement: proto.ProtectionPaladin_Options_Righteousness,
-	BuffJudgement:    proto.ProtectionPaladin_Options_Wisdom,
+	BuffJudgement:    proto.PaladinJudgement_JudgementOfWisdom,
 }
 
 var DefaultOptions = &proto.Player_ProtectionPaladin{
@@ -48,9 +48,9 @@ var DefaultOptions = &proto.Player_ProtectionPaladin{
 }
 
 var FullRaidBuffs = &proto.RaidBuffs{
-	ArcaneBrilliance:  true,
-	GiftOfTheWild:     proto.TristateEffect_TristateEffectImproved,
-	PrayerofFortitude: true,
+	ArcaneBrilliance:   true,
+	GiftOfTheWild:      proto.TristateEffect_TristateEffectImproved,
+	PowerWordFortitude: proto.TristateEffect_TristateEffectRegular,
 }
 var FullPartyBuffs = &proto.PartyBuffs{
 	MoonkinAura:     proto.TristateEffect_TristateEffectRegular,
@@ -59,10 +59,10 @@ var FullPartyBuffs = &proto.PartyBuffs{
 	ManaSpringTotem: proto.TristateEffect_TristateEffectRegular,
 }
 var FullIndividualBuffs = &proto.IndividualBuffs{
-	BlessingOfKings:     true,
-	BlessingOfWisdom:    proto.TristateEffect_TristateEffectImproved,
-	BlessingofSanctuary: true,
-	BlessingOfMight:     proto.TristateEffect_TristateEffectImproved,
+	BlessingOfKings: true,
+	//BlessingOfSanctuary: true,
+	BlessingOfWisdom: proto.TristateEffect_TristateEffectImproved,
+	BlessingOfMight:  proto.TristateEffect_TristateEffectImproved,
 }
 
 var FullConsumes = &proto.Consumes{
