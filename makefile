@@ -11,7 +11,7 @@ else
 endif
 
 # Make everything. Keep this first so it's the default rule.
-$(OUT_DIR): ui_shared balance_druid elemental_shaman enhancement_shaman feral_druid hunter mage rogue shadow_priest warlock warrior protection_warrior retribution_paladin smite_priest raid
+$(OUT_DIR): ui_shared balance_druid elemental_shaman enhancement_shaman feral_druid hunter mage rogue retribution_paladin protection_paladin shadow_priest smite_priest warlock warrior protection_warrior raid
 
 # Add new sim rules here! Don't forget to add it as a dependency to the default rule above.
 balance_druid: $(OUT_DIR)/balance_druid/index.js $(OUT_DIR)/balance_druid/index.css $(OUT_DIR)/balance_druid/index.html
@@ -21,12 +21,13 @@ feral_druid: $(OUT_DIR)/feral_druid/index.js $(OUT_DIR)/feral_druid/index.css $(
 hunter: $(OUT_DIR)/hunter/index.js $(OUT_DIR)/hunter/index.css $(OUT_DIR)/hunter/index.html
 mage: $(OUT_DIR)/mage/index.js $(OUT_DIR)/mage/index.css $(OUT_DIR)/mage/index.html
 rogue: $(OUT_DIR)/rogue/index.js $(OUT_DIR)/rogue/index.css $(OUT_DIR)/rogue/index.html
+retribution_paladin: $(OUT_DIR)/retribution_paladin/index.js $(OUT_DIR)/retribution_paladin/index.css $(OUT_DIR)/retribution_paladin/index.html
+protection_paladin: $(OUT_DIR)/protection_paladin/index.js $(OUT_DIR)/protection_paladin/index.css $(OUT_DIR)/protection_paladin/index.html
 shadow_priest: $(OUT_DIR)/shadow_priest/index.js $(OUT_DIR)/shadow_priest/index.css $(OUT_DIR)/shadow_priest/index.html
 smite_priest: $(OUT_DIR)/smite_priest/index.js $(OUT_DIR)/smite_priest/index.css $(OUT_DIR)/smite_priest/index.html
 warlock: $(OUT_DIR)/warlock/index.js $(OUT_DIR)/warlock/index.css $(OUT_DIR)/warlock/index.html
 warrior: $(OUT_DIR)/warrior/index.js $(OUT_DIR)/warrior/index.css $(OUT_DIR)/warrior/index.html
 protection_warrior: $(OUT_DIR)/protection_warrior/index.js $(OUT_DIR)/protection_warrior/index.css $(OUT_DIR)/protection_warrior/index.html
-retribution_paladin: $(OUT_DIR)/retribution_paladin/index.js $(OUT_DIR)/retribution_paladin/index.css $(OUT_DIR)/retribution_paladin/index.html
 
 
 raid: $(OUT_DIR)/raid/index.js $(OUT_DIR)/raid/index.css $(OUT_DIR)/raid/index.html

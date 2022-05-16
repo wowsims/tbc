@@ -903,6 +903,7 @@ export function isDualWieldSpec(spec: Spec): boolean {
 }
 
 const tankSpecs: Array<Spec> = [
+	Spec.SpecProtectionPaladin,
 	Spec.SpecProtectionWarrior,
 ];
 export function isTankSpec(spec: Spec): boolean {
