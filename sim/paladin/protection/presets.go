@@ -29,9 +29,8 @@ var defaultProtTalents = &proto.PaladinTalents{
 }
 
 var defaultProtRotation = &proto.ProtectionPaladin_Rotation{
-	ConsecrationRank: proto.ProtectionPaladin_Rotation_None,
+	ConsecrationRank: 6,
 	UseExorcism:      false,
-	UseHammerOfWrath: false,
 }
 
 var defaultProtOptions = &proto.ProtectionPaladin_Options{

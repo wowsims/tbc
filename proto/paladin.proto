@@ -113,30 +113,23 @@ message RetributionPaladin {
 
 message ProtectionPaladin {
 	message Rotation {
-		enum ConsecrationRank {
-			None = 0;
-			Rank1 = 1;
-			Rank3 = 2;
-			Rank4 = 3;
-			Rank6 = 4;
-		}
-		ConsecrationRank consecration_rank = 1;
+		int32 consecration_rank = 1;
 		bool use_exorcism = 2;
-		bool use_hammer_of_wrath = 3;
 	}
 	Rotation rotation = 1;
 
 	PaladinTalents talents = 2;
 
 	message Options {
+		PaladinAura aura = 1;
+
 		enum PrimaryJudgement {
 			Vengeance = 0;
 			Righteousness = 1;
 			Twist = 2;
 		}
-		PrimaryJudgement primary_judgement = 1;
-		PaladinJudgement buff_judgement = 2;
-		double damage_taken_per_second = 3;
+		PrimaryJudgement primary_judgement = 2;
+		PaladinJudgement buff_judgement = 3;
 	}
 	Options options = 3;
 }
