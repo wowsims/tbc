@@ -108,7 +108,7 @@ var Phase4Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 		},
 	},
 	{
-		Name: "The Darkener's Grasph",
+		Name: "The Darkener's Grasp",
 	},
 	{
 		Name:    "Lightbringer Shoulderguards",
@@ -133,11 +133,11 @@ var Phase4Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	},
 	{
 		Name:    "The Seeker's Wristguards",
-		Enchant: "Enchant Bracer - Spellpower",
+		Enchant: "Bracer - Spellpower",
 	},
 	{
 		Name:    "Lightbringer Handguards",
-		Enchant: "Enchant Gloves - Threat",
+		Enchant: "Gloves - Threat",
 		Gems: []string{
 			"Glowing Shadowsong Amethyst",
 		},
@@ -166,11 +166,11 @@ var Phase4Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	},
 	{
 		Name:    "Band of the Eternal Sage",
-		Enchant: "Enchant Ring - Spellpower",
+		Enchant: "Ring - Spellpower",
 	},
 	{
 		Name:    "Ashyen's Gift",
-		Enchant: "Enchant Ring - Spellpower",
+		Enchant: "Ring - Spellpower",
 	},
 	{
 		Name: "Hex Shrunken Head",
@@ -180,11 +180,11 @@ var Phase4Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	},
 	{
 		Name:    "Tempest of Chaos",
-		Enchant: "Enchant Weapon - Major Spellpower",
+		Enchant: "Weapon - Major Spellpower",
 	},
 	{
-		Name:    "Bullwark of Azzinoth",
-		Enchant: "Enchant Shield - Major Stamina",
+		Name:    "Bulwark of Azzinoth",
+		Enchant: "Shield - Major Stamina",
 	},
 	{
 		Name: "Libram of Divine Purpose",
