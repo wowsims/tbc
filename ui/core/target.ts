@@ -27,6 +27,7 @@ export class Target {
 	private swingSpeed: number = 0;
 	private minBaseDamage: number = 0;
 	private dualWield: boolean = false;
+	private dualWieldPenalty: boolean = false;
 	private canCrush: boolean = true;
 	private suppressDodge: boolean = false;
 	private parryHaste: boolean = true;
@@ -153,6 +154,18 @@ export class Target {
 		this.propChangeEmitter.emit(eventID);
 	}
 
+	getDualWieldPenalty(): boolean {
+		return this.dualWieldPenalty;
+	}
+
+	setDualWieldPenalty(eventID: EventID, newDualWieldPenalty: boolean) {
+		if (newDualWieldPenalty == this.dualWieldPenalty)
+			return;
+
+		this.dualWieldPenalty = newDualWieldPenalty;
+		this.propChangeEmitter.emit(eventID);
+	}
+
 	getCanCrush(): boolean {
 		return this.canCrush;
 	}
@@ -231,6 +244,7 @@ export class Target {
 			swingSpeed: this.getSwingSpeed(),
 			minBaseDamage: this.getMinBaseDamage(),
 			dualWield: this.getDualWield(),
+			dualWieldPenalty: this.getDualWieldPenalty(),
 			canCrush: this.getCanCrush(),
 			suppressDodge: this.getSuppressDodge(),
 			parryHaste: this.getParryHaste(),
@@ -254,6 +268,7 @@ export class Target {
 			this.setSwingSpeed(eventID, proto.swingSpeed);
 			this.setMinBaseDamage(eventID, proto.minBaseDamage);
 			this.setDualWield(eventID, proto.dualWield);
+			this.setDualWieldPenalty(eventID, proto.dualWieldPenalty);
 			this.setCanCrush(eventID, proto.canCrush);
 			this.setSuppressDodge(eventID, proto.suppressDodge);
 			this.setParryHaste(eventID, proto.parryHaste);
@@ -276,6 +291,7 @@ export class Target {
 			swingSpeed: 2,
 			minBaseDamage: 5000,
 			dualWield: false,
+			dualWieldPenalty: false,
 			canCrush: true,
 			suppressDodge: false,
 			parryHaste: true,

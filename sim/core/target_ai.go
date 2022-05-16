@@ -29,6 +29,9 @@ func (target *Target) initialize(config *proto.Target) {
 		}
 		if config.DualWield {
 			aaOptions.OffHand = aaOptions.MainHand
+			if !config.DualWieldPenalty {
+				target.PseudoStats.DisableDWMissPenalty = true
+			}
 		}
 		target.EnableAutoAttacks(target, aaOptions)
 	}

@@ -254,6 +254,16 @@ class TargetPicker extends Component {
 			},
 		});
 		new BooleanPicker(section3, modTarget, {
+			label: 'DW Miss Penalty',
+			labelTooltip: 'Enables the Dual Wield Miss Penalty (+19% chance to miss) if dual wielding. Bosses in Hyjal/BT/SWP usually have this disabled to stop tanks from avoidance stacking.',
+			changedEvent: (target: Target) => target.changeEmitter,
+			getValue: (target: Target) => target.getDualWieldPenalty(),
+			setValue: (eventID: EventID, target: Target, newValue: boolean) => {
+				target.setDualWieldPenalty(eventID, newValue);
+			},
+			enableWhen: (target: Target) => target.getDualWield(),
+		});
+		new BooleanPicker(section3, modTarget, {
 			label: 'Can Crush',
 			labelTooltip: 'Whether crushing blows should be included in the attack table. Only applies to level 73 enemies.',
 			changedEvent: (target: Target) => target.changeEmitter,
