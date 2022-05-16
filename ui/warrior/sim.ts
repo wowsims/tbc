@@ -200,6 +200,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 					WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
 					WeaponImbue.WeaponImbueElementalSharpeningStone,
+					WeaponImbue.WeaponImbueRighteousWeaponCoating,
 				],
 				other: [
 					IconInputs.ScrollOfAgilityV,

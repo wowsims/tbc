@@ -227,6 +227,7 @@ export class EnhancementShamanSimUI extends IndividualSimUI<Spec.SpecEnhancement
 					WeaponImbue.WeaponImbueShamanFlametongue,
 					WeaponImbue.WeaponImbueShamanFrostbrand,
 					WeaponImbue.WeaponImbueShamanRockbiter,
+					WeaponImbue.WeaponImbueRighteousWeaponCoating,
 				],
 				other: [
 					IconInputs.ScrollOfStrengthV,

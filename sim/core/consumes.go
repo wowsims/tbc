@@ -269,6 +269,37 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 			stats.SpellPower:   42,
 			stats.HealingPower: 42,
 		})
+	} else if imbue == proto.WeaponImbue_WeaponImbueRighteousWeaponCoating {
+		procAura := character.NewTemporaryStatsAura("RighteousWeaponCoating", ActionID{ItemID: 34539}, stats.Stats{stats.AttackPower: 300, stats.RangedAttackPower: 300}, time.Second*10)
+		ppmm := character.AutoAttacks.NewPPMManager(10.0)
+
+		icd := Cooldown{
+			Timer:    character.NewTimer(),
+			Duration: time.Second * 45,
+		}
+
+		character.GetOrRegisterAura(Aura{
+			Label:    "Band of the Eternal Champion",
+			Duration: NeverExpires,
+			OnReset: func(aura *Aura, sim *Simulation) {
+				aura.Activate(sim)
+			},
+			OnSpellHitDealt: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+				// mask 340
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+					return
+				}
+				if !icd.IsReady(sim) {
+					return
+				}
+				if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(ProcMaskRanged), "Righteous Weapon Coating") {
+					return
+				}
+
+				icd.Use(sim)
+				procAura.Activate(sim)
+			},
+		})
 	}
 }
 

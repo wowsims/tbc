@@ -207,6 +207,7 @@ export class HunterSimUI extends IndividualSimUI<Spec.SpecHunter> {
 				weaponImbues: [
 					WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
+					WeaponImbue.WeaponImbueRighteousWeaponCoating,
 				],
 				pet: [
 					IconInputs.KiblersBits,
