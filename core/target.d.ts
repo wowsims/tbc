@@ -16,6 +16,7 @@ export declare class Target {
     private swingSpeed;
     private minBaseDamage;
     private dualWield;
+    private dualWieldPenalty;
     private canCrush;
     private suppressDodge;
     private parryHaste;
@@ -44,6 +45,8 @@ export declare class Target {
     setMinBaseDamage(eventID: EventID, newMinBaseDamage: number): void;
     getDualWield(): boolean;
     setDualWield(eventID: EventID, newDualWield: boolean): void;
+    getDualWieldPenalty(): boolean;
+    setDualWieldPenalty(eventID: EventID, newDualWieldPenalty: boolean): void;
     getCanCrush(): boolean;
     setCanCrush(eventID: EventID, newCanCrush: boolean): void;
     getSuppressDodge(): boolean;
