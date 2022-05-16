@@ -174,6 +174,7 @@ class TargetPicker extends Component {
                 { name: 'Main Tank', value: 0 },
                 { name: 'Tank 2', value: 1 },
                 { name: 'Tank 3', value: 2 },
+                { name: 'Tank 4', value: 3 },
             ],
             changedEvent: (target) => target.propChangeEmitter,
             getValue: (target) => target.getTankIndex(),
