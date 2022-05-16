@@ -334,59 +334,30 @@ export interface ProtectionPaladin {
  */
 export interface ProtectionPaladin_Rotation {
     /**
-     * @generated from protobuf field: proto.ProtectionPaladin.Rotation.ConsecrationRank consecration_rank = 1;
+     * @generated from protobuf field: int32 consecration_rank = 1;
      */
-    consecrationRank: ProtectionPaladin_Rotation_ConsecrationRank;
+    consecrationRank: number;
     /**
      * @generated from protobuf field: bool use_exorcism = 2;
      */
     useExorcism: boolean;
-    /**
-     * @generated from protobuf field: bool use_hammer_of_wrath = 3;
-     */
-    useHammerOfWrath: boolean;
-}
-/**
- * @generated from protobuf enum proto.ProtectionPaladin.Rotation.ConsecrationRank
- */
-export declare enum ProtectionPaladin_Rotation_ConsecrationRank {
-    /**
-     * @generated from protobuf enum value: None = 0;
-     */
-    None = 0,
-    /**
-     * @generated from protobuf enum value: Rank1 = 1;
-     */
-    Rank1 = 1,
-    /**
-     * @generated from protobuf enum value: Rank3 = 2;
-     */
-    Rank3 = 2,
-    /**
-     * @generated from protobuf enum value: Rank4 = 3;
-     */
-    Rank4 = 3,
-    /**
-     * @generated from protobuf enum value: Rank6 = 4;
-     */
-    Rank6 = 4
 }
 /**
  * @generated from protobuf message proto.ProtectionPaladin.Options
  */
 export interface ProtectionPaladin_Options {
     /**
-     * @generated from protobuf field: proto.ProtectionPaladin.Options.PrimaryJudgement primary_judgement = 1;
+     * @generated from protobuf field: proto.PaladinAura aura = 1;
+     */
+    aura: PaladinAura;
+    /**
+     * @generated from protobuf field: proto.ProtectionPaladin.Options.PrimaryJudgement primary_judgement = 2;
      */
     primaryJudgement: ProtectionPaladin_Options_PrimaryJudgement;
     /**
-     * @generated from protobuf field: proto.PaladinJudgement buff_judgement = 2;
+     * @generated from protobuf field: proto.PaladinJudgement buff_judgement = 3;
      */
     buffJudgement: PaladinJudgement;
-    /**
-     * @generated from protobuf field: double damage_taken_per_second = 3;
-     */
-    damageTakenPerSecond: number;
 }
 /**
  * @generated from protobuf enum proto.ProtectionPaladin.Options.PrimaryJudgement

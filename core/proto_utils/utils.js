@@ -694,6 +694,7 @@ export function isDualWieldSpec(spec) {
     return dualWieldSpecs.includes(spec);
 }
 const tankSpecs = [
+    Spec.SpecProtectionPaladin,
     Spec.SpecProtectionWarrior,
 ];
 export function isTankSpec(spec) {

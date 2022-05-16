@@ -245,7 +245,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                     Stat.StatArmor,
                 ],
                 // Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
-                showExecuteProportion: true,
+                showExecuteProportion: false,
             },
             // If true, the talents on the talents tab will not be individually modifiable by the user.
             // Note that the use can still pick between preset talents, if there is more than 1.
