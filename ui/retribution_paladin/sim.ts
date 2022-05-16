@@ -67,6 +67,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			epReferenceStat: Stat.StatAttackPower,
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
+				Stat.StatHealth,
 				Stat.StatStamina,
 				Stat.StatStrength,
 				Stat.StatAgility,
@@ -246,6 +247,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.ISBUptime,
+					OtherInputs.TankAssignment,
 					OtherInputs.InFrontOfTarget,
 				],
 			},
