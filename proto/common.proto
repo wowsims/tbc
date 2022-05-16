@@ -258,6 +258,7 @@ enum WeaponImbue {
 	WeaponImbueElementalSharpeningStone = 2;
 	WeaponImbueBrilliantWizardOil = 3;
 	WeaponImbueSuperiorWizardOil = 4;
+	WeaponImbueRighteousWeaponCoating = 12;
 
 	WeaponImbueRogueDeadlyPoison = 10;
 	WeaponImbueRogueInstantPoison = 11;

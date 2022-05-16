@@ -268,6 +268,7 @@ export class ProtectionPaladinSimUI extends IndividualSimUI<Spec.SpecProtectionP
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
 					WeaponImbue.WeaponImbueBrilliantWizardOil,
 					WeaponImbue.WeaponImbueSuperiorWizardOil,
+					WeaponImbue.WeaponImbueRighteousWeaponCoating,
 				],
 				other: [
 					IconInputs.ScrollOfStrengthV,

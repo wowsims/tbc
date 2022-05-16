@@ -243,6 +243,7 @@ export class RogueSimUI extends IndividualSimUI<Spec.SpecRogue> {
 					WeaponImbue.WeaponImbueRogueInstantPoison,
 					WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
+					WeaponImbue.WeaponImbueRighteousWeaponCoating,
 				],
 				other: [
 					IconInputs.ScrollOfAgilityV,
