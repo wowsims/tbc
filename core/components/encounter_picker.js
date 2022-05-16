@@ -115,7 +115,7 @@ class TargetPicker extends Component {
         this.rootElem.innerHTML = `
 			<div class="target-picker-section target-picker-section1"></div>
 			<div class="target-picker-section target-picker-section2"></div>
-			<div class="target-picker-section target-picker-section3"></div>
+			<div class="target-picker-section target-picker-section3 threat-metrics"></div>
 		`;
         const encounter = modTarget.sim.encounter;
         const section1 = this.rootElem.getElementsByClassName('target-picker-section1')[0];
@@ -166,6 +166,7 @@ class TargetPicker extends Component {
             },
         });
         new EnumPicker(section1, modTarget, {
+            extraCssClasses: ['threat-metrics'],
             label: 'Tanked By',
             labelTooltip: 'Determines which player in the raid this enemy will attack. If no player is assigned to the specified tank slot, this enemy will not attack.',
             values: [
@@ -183,6 +184,7 @@ class TargetPicker extends Component {
         ALL_TARGET_STATS.forEach(statData => {
             const stat = statData.stat;
             new NumberPicker(section2, modTarget, {
+                extraCssClasses: statData.extraCssClasses,
                 label: statNames[stat],
                 labelTooltip: statData.tooltip,
                 changedEvent: (target) => target.statsChangeEmitter,
@@ -300,15 +302,15 @@ function addEncounterFieldPickers(rootElem, encounter, showExecuteProportion) {
     }
 }
 const ALL_TARGET_STATS = [
-    { stat: Stat.StatHealth, tooltip: 'Not currently used anywhere.' },
-    { stat: Stat.StatArmor, tooltip: '' },
-    { stat: Stat.StatArcaneResistance, tooltip: '' },
-    { stat: Stat.StatFireResistance, tooltip: '' },
-    { stat: Stat.StatFrostResistance, tooltip: '' },
-    { stat: Stat.StatNatureResistance, tooltip: '' },
-    { stat: Stat.StatShadowResistance, tooltip: '' },
-    { stat: Stat.StatAttackPower, tooltip: '' },
-    { stat: Stat.StatBlockValue, tooltip: '' },
+    { stat: Stat.StatHealth, tooltip: 'Not currently used anywhere.', extraCssClasses: [] },
+    { stat: Stat.StatArmor, tooltip: '', extraCssClasses: [] },
+    { stat: Stat.StatArcaneResistance, tooltip: '', extraCssClasses: [] },
+    { stat: Stat.StatFireResistance, tooltip: '', extraCssClasses: [] },
+    { stat: Stat.StatFrostResistance, tooltip: '', extraCssClasses: [] },
+    { stat: Stat.StatNatureResistance, tooltip: '', extraCssClasses: [] },
+    { stat: Stat.StatShadowResistance, tooltip: '', extraCssClasses: [] },
+    { stat: Stat.StatAttackPower, tooltip: '', extraCssClasses: ['threat-metrics'] },
+    { stat: Stat.StatBlockValue, tooltip: '', extraCssClasses: ['threat-metrics'] },
 ];
 const mobTypeEnumValues = [
     { name: 'None', value: MobType.MobTypeUnknown },

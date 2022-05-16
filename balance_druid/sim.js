@@ -43,6 +43,7 @@ export class BalanceDruidSimUI extends IndividualSimUI {
             epReferenceStat: Stat.StatSpellPower,
             // Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
             displayStats: [
+                Stat.StatHealth,
                 Stat.StatStamina,
                 Stat.StatIntellect,
                 Stat.StatSpirit,
@@ -186,6 +187,7 @@ export class BalanceDruidSimUI extends IndividualSimUI {
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,
                     OtherInputs.SnapshotImprovedWrathOfAirTotem,
+                    OtherInputs.TankAssignment,
                 ],
             },
             encounterPicker: {
