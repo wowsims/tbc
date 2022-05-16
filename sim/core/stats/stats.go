@@ -473,6 +473,7 @@ type PseudoStats struct {
 	BonusFrostCritRating   float64 // Winter's Chill
 	BonusMeleeHitRating    float64 // Imp FF
 
+	BonusDamageTaken         float64 // Blessing of Sanctuary
 	BonusPhysicalDamageTaken float64 // Hemo, Gift of Arthas, etc
 	BonusHolyDamageTaken     float64 // Judgement of the Crusader
 

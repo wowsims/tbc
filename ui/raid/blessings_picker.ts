@@ -99,6 +99,7 @@ export class BlessingsPicker extends Component {
 						{ actionId: ActionId.fromSpellId(25895), value: Blessings.BlessingOfSalvation },
 						{ actionId: ActionId.fromSpellId(27141), value: Blessings.BlessingOfMight },
 						{ actionId: ActionId.fromSpellId(27143), value: Blessings.BlessingOfWisdom },
+						{ actionId: ActionId.fromSpellId(27169), value: Blessings.BlessingOfSanctuary },
 					],
 					equals: (a: Blessings, b: Blessings) => a == b,
 					zeroValue: Blessings.BlessingUnknown,

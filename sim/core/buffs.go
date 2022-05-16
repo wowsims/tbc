@@ -126,6 +126,10 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 	if individualBuffs.BlessingOfSalvation {
 		character.PseudoStats.ThreatMultiplier *= 0.7
 	}
+	if individualBuffs.BlessingOfSanctuary {
+		character.PseudoStats.BonusDamageTaken -= 80
+		BlessingOfSanctuaryAura(character)
+	}
 
 	character.AddStats(stats.Stats{
 		stats.Armor: GetTristateValueFloat(partyBuffs.DevotionAura, 861, 1205),
@@ -370,6 +374,38 @@ func ThornsAura(character *Character, points int32) *Aura {
 		},
 		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 			if spellEffect.Landed() && spell.SpellSchool == SpellSchoolPhysical {
+				procSpell.Cast(sim, spell.Unit)
+			}
+		},
+	})
+}
+
+func BlessingOfSanctuaryAura(character *Character) *Aura {
+	actionID := ActionID{SpellID: 27169}
+
+	procSpell := character.RegisterSpell(SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: SpellSchoolHoly,
+		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
+			ProcMask:         ProcMaskEmpty,
+			IsPhantom:        true,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     BaseDamageConfigFlat(46),
+			OutcomeApplier: character.OutcomeFuncAlwaysHit(),
+		}),
+	})
+
+	return character.RegisterAura(Aura{
+		Label:    "Blessing of Sanctuary",
+		ActionID: actionID,
+		Duration: NeverExpires,
+		OnReset: func(aura *Aura, sim *Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if spellEffect.Outcome.Matches(OutcomeBlock) {
 				procSpell.Cast(sim, spell.Unit)
 			}
 		},

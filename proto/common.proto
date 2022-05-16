@@ -396,6 +396,7 @@ enum StrengthOfEarthType {
 message IndividualBuffs {
     bool blessing_of_kings = 1;
     bool blessing_of_salvation = 8;
+    bool blessing_of_sanctuary = 9;
     TristateEffect blessing_of_wisdom = 2;
     TristateEffect blessing_of_might = 3;
 
