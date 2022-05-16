@@ -188,6 +188,7 @@ export class Sim {
                 player: player.toProto(),
                 raidBuffs: this.raid.getBuffs(),
                 partyBuffs: player.getParty().getBuffs(),
+                debuffs: this.raid.getDebuffs(),
                 encounter: this.encounter.toProto(),
                 simOptions: SimOptions.create({
                     iterations: this.getIterations(),
