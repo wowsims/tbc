@@ -24,6 +24,7 @@ import { ElementalShaman } from "./shaman";
 import { Rogue } from "./rogue";
 import { SmitePriest } from "./priest";
 import { ShadowPriest } from "./priest";
+import { ProtectionPaladin } from "./paladin";
 import { RetributionPaladin } from "./paladin";
 import { Mage } from "./mage";
 import { Hunter } from "./hunter";
@@ -106,6 +107,12 @@ export interface Player {
          * @generated from protobuf field: proto.RetributionPaladin retribution_paladin = 9;
          */
         retributionPaladin: RetributionPaladin;
+    } | {
+        oneofKind: "protectionPaladin";
+        /**
+         * @generated from protobuf field: proto.ProtectionPaladin protection_paladin = 25;
+         */
+        protectionPaladin: ProtectionPaladin;
     } | {
         oneofKind: "shadowPriest";
         /**

@@ -851,6 +851,10 @@ export declare enum Spec {
      */
     SpecMage = 2,
     /**
+     * @generated from protobuf enum value: SpecProtectionPaladin = 13;
+     */
+    SpecProtectionPaladin = 13,
+    /**
      * @generated from protobuf enum value: SpecRetributionPaladin = 3;
      */
     SpecRetributionPaladin = 3,

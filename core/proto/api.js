@@ -23,6 +23,7 @@ import { ElementalShaman } from './shaman.js';
 import { Rogue } from './rogue.js';
 import { SmitePriest } from './priest.js';
 import { ShadowPriest } from './priest.js';
+import { ProtectionPaladin } from './paladin.js';
 import { RetributionPaladin } from './paladin.js';
 import { Mage } from './mage.js';
 import { Hunter } from './hunter.js';
@@ -81,6 +82,7 @@ class Player$Type extends MessageType {
             { no: 7, name: "hunter", kind: "message", oneof: "spec", T: () => Hunter },
             { no: 8, name: "mage", kind: "message", oneof: "spec", T: () => Mage },
             { no: 9, name: "retribution_paladin", kind: "message", oneof: "spec", T: () => RetributionPaladin },
+            { no: 25, name: "protection_paladin", kind: "message", oneof: "spec", T: () => ProtectionPaladin },
             { no: 10, name: "shadow_priest", kind: "message", oneof: "spec", T: () => ShadowPriest },
             { no: 20, name: "smite_priest", kind: "message", oneof: "spec", T: () => SmitePriest },
             { no: 11, name: "rogue", kind: "message", oneof: "spec", T: () => Rogue },
@@ -162,6 +164,12 @@ class Player$Type extends MessageType {
                     message.spec = {
                         oneofKind: "retributionPaladin",
                         retributionPaladin: RetributionPaladin.internalBinaryRead(reader, reader.uint32(), options, message.spec.retributionPaladin)
+                    };
+                    break;
+                case /* proto.ProtectionPaladin protection_paladin */ 25:
+                    message.spec = {
+                        oneofKind: "protectionPaladin",
+                        protectionPaladin: ProtectionPaladin.internalBinaryRead(reader, reader.uint32(), options, message.spec.protectionPaladin)
                     };
                     break;
                 case /* proto.ShadowPriest shadow_priest */ 10:
@@ -276,6 +284,9 @@ class Player$Type extends MessageType {
         /* proto.RetributionPaladin retribution_paladin = 9; */
         if (message.spec.oneofKind === "retributionPaladin")
             RetributionPaladin.internalBinaryWrite(message.spec.retributionPaladin, writer.tag(9, WireType.LengthDelimited).fork(), options).join();
+        /* proto.ProtectionPaladin protection_paladin = 25; */
+        if (message.spec.oneofKind === "protectionPaladin")
+            ProtectionPaladin.internalBinaryWrite(message.spec.protectionPaladin, writer.tag(25, WireType.LengthDelimited).fork(), options).join();
         /* proto.ShadowPriest shadow_priest = 10; */
         if (message.spec.oneofKind === "shadowPriest")
             ShadowPriest.internalBinaryWrite(message.spec.shadowPriest, writer.tag(10, WireType.LengthDelimited).fork(), options).join();

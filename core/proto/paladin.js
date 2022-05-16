@@ -44,6 +44,50 @@ export var RetributionPaladin_Options_Judgement;
     RetributionPaladin_Options_Judgement[RetributionPaladin_Options_Judgement["Crusader"] = 2] = "Crusader";
 })(RetributionPaladin_Options_Judgement || (RetributionPaladin_Options_Judgement = {}));
 /**
+ * @generated from protobuf enum proto.ProtectionPaladin.Rotation.ConsecrationRank
+ */
+export var ProtectionPaladin_Rotation_ConsecrationRank;
+(function (ProtectionPaladin_Rotation_ConsecrationRank) {
+    /**
+     * @generated from protobuf enum value: None = 0;
+     */
+    ProtectionPaladin_Rotation_ConsecrationRank[ProtectionPaladin_Rotation_ConsecrationRank["None"] = 0] = "None";
+    /**
+     * @generated from protobuf enum value: Rank1 = 1;
+     */
+    ProtectionPaladin_Rotation_ConsecrationRank[ProtectionPaladin_Rotation_ConsecrationRank["Rank1"] = 1] = "Rank1";
+    /**
+     * @generated from protobuf enum value: Rank3 = 2;
+     */
+    ProtectionPaladin_Rotation_ConsecrationRank[ProtectionPaladin_Rotation_ConsecrationRank["Rank3"] = 2] = "Rank3";
+    /**
+     * @generated from protobuf enum value: Rank4 = 3;
+     */
+    ProtectionPaladin_Rotation_ConsecrationRank[ProtectionPaladin_Rotation_ConsecrationRank["Rank4"] = 3] = "Rank4";
+    /**
+     * @generated from protobuf enum value: Rank6 = 4;
+     */
+    ProtectionPaladin_Rotation_ConsecrationRank[ProtectionPaladin_Rotation_ConsecrationRank["Rank6"] = 4] = "Rank6";
+})(ProtectionPaladin_Rotation_ConsecrationRank || (ProtectionPaladin_Rotation_ConsecrationRank = {}));
+/**
+ * @generated from protobuf enum proto.ProtectionPaladin.Options.PrimaryJudgement
+ */
+export var ProtectionPaladin_Options_PrimaryJudgement;
+(function (ProtectionPaladin_Options_PrimaryJudgement) {
+    /**
+     * @generated from protobuf enum value: Vengeance = 0;
+     */
+    ProtectionPaladin_Options_PrimaryJudgement[ProtectionPaladin_Options_PrimaryJudgement["Vengeance"] = 0] = "Vengeance";
+    /**
+     * @generated from protobuf enum value: Righteousness = 1;
+     */
+    ProtectionPaladin_Options_PrimaryJudgement[ProtectionPaladin_Options_PrimaryJudgement["Righteousness"] = 1] = "Righteousness";
+    /**
+     * @generated from protobuf enum value: Twist = 2;
+     */
+    ProtectionPaladin_Options_PrimaryJudgement[ProtectionPaladin_Options_PrimaryJudgement["Twist"] = 2] = "Twist";
+})(ProtectionPaladin_Options_PrimaryJudgement || (ProtectionPaladin_Options_PrimaryJudgement = {}));
+/**
  * @generated from protobuf enum proto.PaladinAura
  */
 export var PaladinAura;
@@ -65,6 +109,36 @@ export var PaladinAura;
      */
     PaladinAura[PaladinAura["RetributionAura"] = 3] = "RetributionAura";
 })(PaladinAura || (PaladinAura = {}));
+/**
+ * @generated from protobuf enum proto.PaladinJudgement
+ */
+export var PaladinJudgement;
+(function (PaladinJudgement) {
+    /**
+     * @generated from protobuf enum value: NoPaladinJudgement = 0;
+     */
+    PaladinJudgement[PaladinJudgement["NoPaladinJudgement"] = 0] = "NoPaladinJudgement";
+    /**
+     * @generated from protobuf enum value: JudgementOfWisdom = 1;
+     */
+    PaladinJudgement[PaladinJudgement["JudgementOfWisdom"] = 1] = "JudgementOfWisdom";
+    /**
+     * @generated from protobuf enum value: JudgementOfLight = 2;
+     */
+    PaladinJudgement[PaladinJudgement["JudgementOfLight"] = 2] = "JudgementOfLight";
+    /**
+     * @generated from protobuf enum value: JudgementOfCrusader = 3;
+     */
+    PaladinJudgement[PaladinJudgement["JudgementOfCrusader"] = 3] = "JudgementOfCrusader";
+    /**
+     * @generated from protobuf enum value: JudgementOfVengeance = 4;
+     */
+    PaladinJudgement[PaladinJudgement["JudgementOfVengeance"] = 4] = "JudgementOfVengeance";
+    /**
+     * @generated from protobuf enum value: JudgementOfRighteousness = 5;
+     */
+    PaladinJudgement[PaladinJudgement["JudgementOfRighteousness"] = 5] = "JudgementOfRighteousness";
+})(PaladinJudgement || (PaladinJudgement = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class PaladinTalents$Type extends MessageType {
     constructor() {
@@ -652,3 +726,186 @@ class RetributionPaladin_Options$Type extends MessageType {
  * @generated MessageType for protobuf message proto.RetributionPaladin.Options
  */
 export const RetributionPaladin_Options = new RetributionPaladin_Options$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ProtectionPaladin$Type extends MessageType {
+    constructor() {
+        super("proto.ProtectionPaladin", [
+            { no: 1, name: "rotation", kind: "message", T: () => ProtectionPaladin_Rotation },
+            { no: 2, name: "talents", kind: "message", T: () => PaladinTalents },
+            { no: 3, name: "options", kind: "message", T: () => ProtectionPaladin_Options }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.ProtectionPaladin.Rotation rotation */ 1:
+                    message.rotation = ProtectionPaladin_Rotation.internalBinaryRead(reader, reader.uint32(), options, message.rotation);
+                    break;
+                case /* proto.PaladinTalents talents */ 2:
+                    message.talents = PaladinTalents.internalBinaryRead(reader, reader.uint32(), options, message.talents);
+                    break;
+                case /* proto.ProtectionPaladin.Options options */ 3:
+                    message.options = ProtectionPaladin_Options.internalBinaryRead(reader, reader.uint32(), options, message.options);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.ProtectionPaladin.Rotation rotation = 1; */
+        if (message.rotation)
+            ProtectionPaladin_Rotation.internalBinaryWrite(message.rotation, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.PaladinTalents talents = 2; */
+        if (message.talents)
+            PaladinTalents.internalBinaryWrite(message.talents, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.ProtectionPaladin.Options options = 3; */
+        if (message.options)
+            ProtectionPaladin_Options.internalBinaryWrite(message.options, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.ProtectionPaladin
+ */
+export const ProtectionPaladin = new ProtectionPaladin$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ProtectionPaladin_Rotation$Type extends MessageType {
+    constructor() {
+        super("proto.ProtectionPaladin.Rotation", [
+            { no: 1, name: "consecration_rank", kind: "enum", T: () => ["proto.ProtectionPaladin.Rotation.ConsecrationRank", ProtectionPaladin_Rotation_ConsecrationRank] },
+            { no: 2, name: "use_exorcism", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 3, name: "use_hammer_of_wrath", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+        ]);
+    }
+    create(value) {
+        const message = { consecrationRank: 0, useExorcism: false, useHammerOfWrath: false };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.ProtectionPaladin.Rotation.ConsecrationRank consecration_rank */ 1:
+                    message.consecrationRank = reader.int32();
+                    break;
+                case /* bool use_exorcism */ 2:
+                    message.useExorcism = reader.bool();
+                    break;
+                case /* bool use_hammer_of_wrath */ 3:
+                    message.useHammerOfWrath = reader.bool();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.ProtectionPaladin.Rotation.ConsecrationRank consecration_rank = 1; */
+        if (message.consecrationRank !== 0)
+            writer.tag(1, WireType.Varint).int32(message.consecrationRank);
+        /* bool use_exorcism = 2; */
+        if (message.useExorcism !== false)
+            writer.tag(2, WireType.Varint).bool(message.useExorcism);
+        /* bool use_hammer_of_wrath = 3; */
+        if (message.useHammerOfWrath !== false)
+            writer.tag(3, WireType.Varint).bool(message.useHammerOfWrath);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.ProtectionPaladin.Rotation
+ */
+export const ProtectionPaladin_Rotation = new ProtectionPaladin_Rotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class ProtectionPaladin_Options$Type extends MessageType {
+    constructor() {
+        super("proto.ProtectionPaladin.Options", [
+            { no: 1, name: "primary_judgement", kind: "enum", T: () => ["proto.ProtectionPaladin.Options.PrimaryJudgement", ProtectionPaladin_Options_PrimaryJudgement] },
+            { no: 2, name: "buff_judgement", kind: "enum", T: () => ["proto.PaladinJudgement", PaladinJudgement] },
+            { no: 3, name: "damage_taken_per_second", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
+        ]);
+    }
+    create(value) {
+        const message = { primaryJudgement: 0, buffJudgement: 0, damageTakenPerSecond: 0 };
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.ProtectionPaladin.Options.PrimaryJudgement primary_judgement */ 1:
+                    message.primaryJudgement = reader.int32();
+                    break;
+                case /* proto.PaladinJudgement buff_judgement */ 2:
+                    message.buffJudgement = reader.int32();
+                    break;
+                case /* double damage_taken_per_second */ 3:
+                    message.damageTakenPerSecond = reader.double();
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.ProtectionPaladin.Options.PrimaryJudgement primary_judgement = 1; */
+        if (message.primaryJudgement !== 0)
+            writer.tag(1, WireType.Varint).int32(message.primaryJudgement);
+        /* proto.PaladinJudgement buff_judgement = 2; */
+        if (message.buffJudgement !== 0)
+            writer.tag(2, WireType.Varint).int32(message.buffJudgement);
+        /* double damage_taken_per_second = 3; */
+        if (message.damageTakenPerSecond !== 0)
+            writer.tag(3, WireType.Bit64).double(message.damageTakenPerSecond);
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.ProtectionPaladin.Options
+ */
+export const ProtectionPaladin_Options = new ProtectionPaladin_Options$Type();

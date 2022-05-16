@@ -313,6 +313,99 @@ export declare enum RetributionPaladin_Options_Judgement {
     Crusader = 2
 }
 /**
+ * @generated from protobuf message proto.ProtectionPaladin
+ */
+export interface ProtectionPaladin {
+    /**
+     * @generated from protobuf field: proto.ProtectionPaladin.Rotation rotation = 1;
+     */
+    rotation?: ProtectionPaladin_Rotation;
+    /**
+     * @generated from protobuf field: proto.PaladinTalents talents = 2;
+     */
+    talents?: PaladinTalents;
+    /**
+     * @generated from protobuf field: proto.ProtectionPaladin.Options options = 3;
+     */
+    options?: ProtectionPaladin_Options;
+}
+/**
+ * @generated from protobuf message proto.ProtectionPaladin.Rotation
+ */
+export interface ProtectionPaladin_Rotation {
+    /**
+     * @generated from protobuf field: proto.ProtectionPaladin.Rotation.ConsecrationRank consecration_rank = 1;
+     */
+    consecrationRank: ProtectionPaladin_Rotation_ConsecrationRank;
+    /**
+     * @generated from protobuf field: bool use_exorcism = 2;
+     */
+    useExorcism: boolean;
+    /**
+     * @generated from protobuf field: bool use_hammer_of_wrath = 3;
+     */
+    useHammerOfWrath: boolean;
+}
+/**
+ * @generated from protobuf enum proto.ProtectionPaladin.Rotation.ConsecrationRank
+ */
+export declare enum ProtectionPaladin_Rotation_ConsecrationRank {
+    /**
+     * @generated from protobuf enum value: None = 0;
+     */
+    None = 0,
+    /**
+     * @generated from protobuf enum value: Rank1 = 1;
+     */
+    Rank1 = 1,
+    /**
+     * @generated from protobuf enum value: Rank3 = 2;
+     */
+    Rank3 = 2,
+    /**
+     * @generated from protobuf enum value: Rank4 = 3;
+     */
+    Rank4 = 3,
+    /**
+     * @generated from protobuf enum value: Rank6 = 4;
+     */
+    Rank6 = 4
+}
+/**
+ * @generated from protobuf message proto.ProtectionPaladin.Options
+ */
+export interface ProtectionPaladin_Options {
+    /**
+     * @generated from protobuf field: proto.ProtectionPaladin.Options.PrimaryJudgement primary_judgement = 1;
+     */
+    primaryJudgement: ProtectionPaladin_Options_PrimaryJudgement;
+    /**
+     * @generated from protobuf field: proto.PaladinJudgement buff_judgement = 2;
+     */
+    buffJudgement: PaladinJudgement;
+    /**
+     * @generated from protobuf field: double damage_taken_per_second = 3;
+     */
+    damageTakenPerSecond: number;
+}
+/**
+ * @generated from protobuf enum proto.ProtectionPaladin.Options.PrimaryJudgement
+ */
+export declare enum ProtectionPaladin_Options_PrimaryJudgement {
+    /**
+     * @generated from protobuf enum value: Vengeance = 0;
+     */
+    Vengeance = 0,
+    /**
+     * @generated from protobuf enum value: Righteousness = 1;
+     */
+    Righteousness = 1,
+    /**
+     * @generated from protobuf enum value: Twist = 2;
+     */
+    Twist = 2
+}
+/**
  * @generated from protobuf enum proto.PaladinAura
  */
 export declare enum PaladinAura {
@@ -332,6 +425,35 @@ export declare enum PaladinAura {
      * @generated from protobuf enum value: RetributionAura = 3;
      */
     RetributionAura = 3
+}
+/**
+ * @generated from protobuf enum proto.PaladinJudgement
+ */
+export declare enum PaladinJudgement {
+    /**
+     * @generated from protobuf enum value: NoPaladinJudgement = 0;
+     */
+    NoPaladinJudgement = 0,
+    /**
+     * @generated from protobuf enum value: JudgementOfWisdom = 1;
+     */
+    JudgementOfWisdom = 1,
+    /**
+     * @generated from protobuf enum value: JudgementOfLight = 2;
+     */
+    JudgementOfLight = 2,
+    /**
+     * @generated from protobuf enum value: JudgementOfCrusader = 3;
+     */
+    JudgementOfCrusader = 3,
+    /**
+     * @generated from protobuf enum value: JudgementOfVengeance = 4;
+     */
+    JudgementOfVengeance = 4,
+    /**
+     * @generated from protobuf enum value: JudgementOfRighteousness = 5;
+     */
+    JudgementOfRighteousness = 5
 }
 declare class PaladinTalents$Type extends MessageType<PaladinTalents> {
     constructor();
@@ -373,4 +495,34 @@ declare class RetributionPaladin_Options$Type extends MessageType<RetributionPal
  * @generated MessageType for protobuf message proto.RetributionPaladin.Options
  */
 export declare const RetributionPaladin_Options: RetributionPaladin_Options$Type;
+declare class ProtectionPaladin$Type extends MessageType<ProtectionPaladin> {
+    constructor();
+    create(value?: PartialMessage<ProtectionPaladin>): ProtectionPaladin;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ProtectionPaladin): ProtectionPaladin;
+    internalBinaryWrite(message: ProtectionPaladin, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.ProtectionPaladin
+ */
+export declare const ProtectionPaladin: ProtectionPaladin$Type;
+declare class ProtectionPaladin_Rotation$Type extends MessageType<ProtectionPaladin_Rotation> {
+    constructor();
+    create(value?: PartialMessage<ProtectionPaladin_Rotation>): ProtectionPaladin_Rotation;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ProtectionPaladin_Rotation): ProtectionPaladin_Rotation;
+    internalBinaryWrite(message: ProtectionPaladin_Rotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.ProtectionPaladin.Rotation
+ */
+export declare const ProtectionPaladin_Rotation: ProtectionPaladin_Rotation$Type;
+declare class ProtectionPaladin_Options$Type extends MessageType<ProtectionPaladin_Options> {
+    constructor();
+    create(value?: PartialMessage<ProtectionPaladin_Options>): ProtectionPaladin_Options;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: ProtectionPaladin_Options): ProtectionPaladin_Options;
+    internalBinaryWrite(message: ProtectionPaladin_Options, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.ProtectionPaladin.Options
+ */
+export declare const ProtectionPaladin_Options: ProtectionPaladin_Options$Type;
 export {};
