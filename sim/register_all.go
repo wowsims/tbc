@@ -7,6 +7,7 @@ import (
 	_ "github.com/wowsims/tbc/sim/encounters"
 	"github.com/wowsims/tbc/sim/hunter"
 	"github.com/wowsims/tbc/sim/mage"
+	protectionPaladin "github.com/wowsims/tbc/sim/paladin/protection"
 	"github.com/wowsims/tbc/sim/paladin/retribution"
 	"github.com/wowsims/tbc/sim/priest/shadow"
 	"github.com/wowsims/tbc/sim/priest/smite"
@@ -37,6 +38,7 @@ func RegisterAll() {
 	dpsWarrior.RegisterDpsWarrior()
 	protectionWarrior.RegisterProtectionWarrior()
 	retribution.RegisterRetributionPaladin()
+	protectionPaladin.RegisterProtectionPaladin()
 	smite.RegisterSmitePriest()
 	warlock.RegisterWarlock()
 }

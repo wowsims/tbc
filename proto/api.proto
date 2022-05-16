@@ -30,10 +30,11 @@ message Player {
 
     oneof spec {
         BalanceDruid balance_druid = 6;
-				FeralDruid feral_druid = 22;
+	      FeralDruid feral_druid = 22;
         Hunter hunter = 7;
         Mage mage = 8;
         RetributionPaladin retribution_paladin = 9;
+        ProtectionPaladin protection_paladin = 23;
         ShadowPriest shadow_priest = 10;
         SmitePriest smite_priest = 20;
         Rogue rogue = 11;
