@@ -69,6 +69,15 @@ enum PaladinAura {
 	RetributionAura = 3;
 }
 
+enum PaladinJudgement {
+	NoPaladinJudgement = 0;
+	JudgementOfWisdom = 1;
+	JudgementOfLight = 2;
+	JudgementOfCrusader = 3;
+	JudgementOfVengeance = 4;
+	JudgementOfRighteousness = 5;
+}
+
 message RetributionPaladin {
     message Rotation {
 			enum ConsecrationRank {
@@ -100,4 +109,34 @@ message RetributionPaladin {
 			double damage_taken_per_second = 4;
     }
     Options options = 3;
+}
+
+message ProtectionPaladin {
+	message Rotation {
+		enum ConsecrationRank {
+			None = 0;
+			Rank1 = 1;
+			Rank3 = 2;
+			Rank4 = 3;
+			Rank6 = 4;
+		}
+		ConsecrationRank consecration_rank = 1;
+		bool use_exorcism = 2;
+		bool use_hammer_of_wrath = 3;
+	}
+	Rotation rotation = 1;
+
+	PaladinTalents talents = 2;
+
+	message Options {
+		enum PrimaryJudgement {
+			Vengeance = 0;
+			Righteousness = 1;
+			Twist = 2;
+		}
+		PrimaryJudgement primary_judgement = 1;
+		PaladinJudgement buff_judgement = 2;
+		double damage_taken_per_second = 3;
+	}
+	Options options = 3;
 }

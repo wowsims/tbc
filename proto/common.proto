@@ -10,6 +10,7 @@ enum Spec {
     SpecFeralDruid = 12;
     SpecHunter = 8;
     SpecMage = 2;
+    SpecProtectionPaladin = 13;
     SpecRetributionPaladin = 3;
     SpecRogue = 7;
     SpecShadowPriest = 4;
