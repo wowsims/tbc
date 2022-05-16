@@ -243,6 +243,7 @@
 
 .sim-title-dropdown {
   position: fixed !important;
+  z-index: 9999 !important;
 }
 
 .sim-title-button .sim-title-dropdown-option-container {
