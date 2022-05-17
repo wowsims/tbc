@@ -6,6 +6,11 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+const (
+	SpellFlagSeal      = core.SpellExtrasAgentReserved1
+	SpellFlagJudgement = core.SpellExtrasAgentReserved2
+)
+
 type Paladin struct {
 	core.Character
 
