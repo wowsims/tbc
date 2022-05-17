@@ -221,6 +221,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRetribution-AllItems-CrystalforgeArmor"
+ value: {
+  dps: 1490.9856604022693
+  tps: 1043.6899622815884
+ }
+}
+dps_results: {
  key: "TestRetribution-AllItems-CrystalforgeBattlegear"
  value: {
   dps: 1814.9359487024237
@@ -480,6 +487,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRetribution-AllItems-JusticarArmor"
+ value: {
+  dps: 1524.0128789786731
+  tps: 1066.8090152850707
+ }
+}
+dps_results: {
  key: "TestRetribution-AllItems-JusticarBattlegear"
  value: {
   dps: 1770.6726134359353
@@ -498,6 +512,13 @@ dps_results: {
  value: {
   dps: 2048.3614459674313
   tps: 1433.8530121772017
+ }
+}
+dps_results: {
+ key: "TestRetribution-AllItems-LightbringerArmor"
+ value: {
+  dps: 1301.6990074914108
+  tps: 911.1893052439873
  }
 }
 dps_results: {
