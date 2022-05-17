@@ -67,6 +67,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestProtection-AllItems-AshtongueTalismanofZeal-32489"
+ value: {
+  dps: 206.79469266020115
+  tps: 320.830305382363
+ }
+}
+dps_results: {
  key: "TestProtection-AllItems-BadgeofTenacity-32658"
  value: {
   dps: 197.3542384557726
@@ -377,8 +384,8 @@ dps_results: {
 dps_results: {
  key: "TestProtection-AllItems-EyeofMagtheridon-28789"
  value: {
-  dps: 200.40679248943476
-  tps: 318.01941965141805
+  dps: 205.5970163816098
+  tps: 328.07807355445306
  }
 }
 dps_results: {
@@ -827,6 +834,13 @@ dps_results: {
  value: {
   dps: 209.5561096036013
   tps: 328.2116491958412
+ }
+}
+dps_results: {
+ key: "TestProtection-AllItems-TomeofFieryRedemption-30447"
+ value: {
+  dps: 203.13781270876774
+  tps: 323.3121368364853
  }
 }
 dps_results: {
