@@ -18,15 +18,6 @@ func (paladin *Paladin) canJudgement(sim *core.Simulation) bool {
 }
 
 func (paladin *Paladin) registerJudgementOfBloodSpell(cdTimer *core.Timer) {
-	var loaAura *core.Aura
-	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27484 {
-		loaAura = paladin.NewTemporaryStatsAura(
-			"Libram of Avengement",
-			core.ActionID{SpellID: 34260},
-			stats.Stats{stats.MeleeCrit: 53, stats.SpellCrit: 53},
-			time.Second*5)
-	}
-
 	effect := core.SpellEffect{
 		ProcMask: core.ProcMaskMeleeOrRangedSpecial,
 
@@ -41,9 +32,6 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(cdTimer *core.Timer) {
 			paladin.sanctifiedJudgement(sim, paladin.SealOfBlood.DefaultCast.Cost)
 			paladin.SealOfBloodAura.Deactivate(sim)
 			paladin.CurrentSeal = nil
-			if loaAura != nil {
-				loaAura.Activate(sim)
-			}
 
 			// Add mana from Spiritual Attunement
 			// 33% of damage is self-inflicted, 10% of self-inflicted damage is returned as mana
@@ -56,6 +44,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(cdTimer *core.Timer) {
 	paladin.JudgementOfBlood = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 31898},
 		SpellSchool: core.SpellSchoolHoly,
+		SpellExtras: SpellFlagJudgement,
 
 		ResourceType: stats.Mana,
 		BaseCost:     JudgementManaCost,
@@ -95,6 +84,7 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(cdTimer *core.Timer)
 	paladin.JudgementOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27159},
 		SpellSchool: core.SpellSchoolHoly,
+		SpellExtras: SpellFlagJudgement,
 
 		ResourceType: stats.Mana,
 		BaseCost:     JudgementManaCost,
@@ -141,6 +131,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(cdTimer *core.Timer) {
 	paladin.JudgementOfWisdom = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27164},
 		SpellSchool: core.SpellSchoolHoly,
+		SpellExtras: SpellFlagJudgement,
 
 		ResourceType: stats.Mana,
 		BaseCost:     JudgementManaCost,
@@ -179,19 +170,11 @@ func (paladin *Paladin) CanJudgementOfWisdom(sim *core.Simulation) bool {
 }
 
 func (paladin *Paladin) registerJudgementOfRighteousnessSpell(cdTimer *core.Timer) {
-	var loaAura *core.Aura
-	if paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27484 {
-		loaAura = paladin.NewTemporaryStatsAura(
-			"Libram of Avengement",
-			core.ActionID{SpellID: 34260},
-			stats.Stats{stats.MeleeCrit: 53, stats.SpellCrit: 53},
-			time.Second*5)
-	}
-
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfRighteousness = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27157},
 		SpellSchool: core.SpellSchoolHoly,
+		SpellExtras: SpellFlagJudgement,
 
 		ResourceType: stats.Mana,
 		BaseCost:     JudgementManaCost,
@@ -209,6 +192,7 @@ func (paladin *Paladin) registerJudgementOfRighteousnessSpell(cdTimer *core.Time
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskMeleeOrRangedSpecial,
 
+			BonusSpellPower:  core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 33504, 94, 0),
 			BonusCritRating:  3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism),
 			DamageMultiplier: 1 + 0.03*float64(paladin.Talents.ImprovedSealOfRighteousness),
 			ThreatMultiplier: 1,
@@ -220,9 +204,6 @@ func (paladin *Paladin) registerJudgementOfRighteousnessSpell(cdTimer *core.Time
 				paladin.sanctifiedJudgement(sim, paladin.SealOfRighteousness.DefaultCast.Cost)
 				paladin.SealOfRighteousnessAura.Deactivate(sim)
 				paladin.CurrentSeal = nil
-				if loaAura != nil {
-					loaAura.Activate(sim)
-				}
 			},
 		}),
 	})

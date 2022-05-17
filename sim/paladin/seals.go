@@ -59,7 +59,8 @@ func (paladin *Paladin) setupSealOfBlood() {
 	baseCost := 210.0
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfBlood = paladin.RegisterSpell(core.SpellConfig{
-		ActionID: core.ActionID{SpellID: 31892},
+		ActionID:    core.ActionID{SpellID: 31892},
+		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -134,7 +135,8 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	baseCost := 65.0
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfCommand = paladin.RegisterSpell(core.SpellConfig{
-		ActionID: core.ActionID{SpellID: 20375},
+		ActionID:    core.ActionID{SpellID: 20375},
+		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -184,7 +186,8 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 	baseCost := 210.0
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -217,7 +220,8 @@ func (paladin *Paladin) setupSealOfWisdom() {
 	baseCost := 270.0
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfWisdom = paladin.RegisterSpell(core.SpellConfig{
-		ActionID: actionID,
+		ActionID:    actionID,
+		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,
@@ -243,8 +247,10 @@ func (paladin *Paladin) setupSealOfRighteousness() {
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:         core.ProcMaskEmpty,
-			IsPhantom:        true,
+			ProcMask:  core.ProcMaskEmpty,
+			IsPhantom: true,
+
+			BonusSpellPower:  core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 33504, 94, 0),
 			DamageMultiplier: 1 + 0.03*float64(paladin.Talents.ImprovedSealOfRighteousness),
 			ThreatMultiplier: 1,
 
@@ -271,7 +277,8 @@ func (paladin *Paladin) setupSealOfRighteousness() {
 	baseCost := 260.0 - paladin.sealCostReduction()
 
 	paladin.SealOfRighteousness = paladin.RegisterSpell(core.SpellConfig{
-		ActionID: spellActionID,
+		ActionID:    spellActionID,
+		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
 		BaseCost:     baseCost,

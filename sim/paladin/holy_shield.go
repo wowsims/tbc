@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -26,16 +27,18 @@ func (paladin *Paladin) registerHolyShieldSpell() {
 		}),
 	})
 
+	blockBonus := 30*core.BlockRatingPerBlockChance + core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 29388, 42, 0)
+
 	holyShieldAura := paladin.RegisterAura(core.Aura{
 		Label:     "Holy Shield",
 		ActionID:  actionID,
 		Duration:  time.Second * 10,
 		MaxStacks: numCharges,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
-			paladin.AddStatDynamic(sim, stats.Block, 30*core.BlockRatingPerBlockChance)
+			paladin.AddStatDynamic(sim, stats.Block, blockBonus)
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-			paladin.AddStatDynamic(sim, stats.Block, -30*core.BlockRatingPerBlockChance)
+			paladin.AddStatDynamic(sim, stats.Block, -blockBonus)
 		},
 		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.Outcome.Matches(core.OutcomeBlock) {

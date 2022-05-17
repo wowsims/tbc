@@ -125,8 +125,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 2044.6581670572532
-  tps: 1431.2607169400778
+  dps: 2044.6549873005556
+  tps: 1431.2584911103886
  }
 }
 dps_results: {
@@ -433,8 +433,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-HandofJustice-11815"
  value: {
-  dps: 2058.8502174940363
-  tps: 1441.195152245826
+  dps: 2058.6365890554966
+  tps: 1441.0456123388485
  }
 }
 dps_results: {
@@ -629,8 +629,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 2025.0017364904684
-  tps: 1417.5012155433276
+  dps: 2024.9739673803901
+  tps: 1417.4817771662729
  }
 }
 dps_results: {
@@ -727,8 +727,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-StormGauntlets-12632"
  value: {
-  dps: 1996.044146294717
-  tps: 1397.2309024063009
+  dps: 1996.040423177189
+  tps: 1397.228296224032
  }
 }
 dps_results: {
@@ -820,6 +820,13 @@ dps_results: {
  value: {
   dps: 2014.7749122585506
   tps: 1410.3424385809851
+ }
+}
+dps_results: {
+ key: "TestRetribution-AllItems-TomeoftheLightbringer-32368"
+ value: {
+  dps: 2062.8708252811857
+  tps: 1444.0095776968303
  }
 }
 dps_results: {
