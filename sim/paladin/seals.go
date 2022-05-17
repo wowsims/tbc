@@ -15,7 +15,7 @@ const SealDuration = time.Second * 30
 func (paladin *Paladin) setupSealOfBlood() {
 	effect := core.SpellEffect{
 		IsPhantom:        true,
-		DamageMultiplier: 1,
+		DamageMultiplier: 1 + core.TernaryFloat64(ItemSetJusticarArmor.CharacterHasSetBonus(&paladin.Character, 2), 0.1, 0),
 		ThreatMultiplier: 1,
 
 		// should deal 35% weapon deamage
@@ -250,8 +250,10 @@ func (paladin *Paladin) setupSealOfRighteousness() {
 			ProcMask:  core.ProcMaskEmpty,
 			IsPhantom: true,
 
-			BonusSpellPower:  core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 33504, 94, 0),
-			DamageMultiplier: 1 + 0.03*float64(paladin.Talents.ImprovedSealOfRighteousness),
+			BonusSpellPower: core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 33504, 94, 0),
+			DamageMultiplier: 1 +
+				0.03*float64(paladin.Talents.ImprovedSealOfRighteousness) +
+				core.TernaryFloat64(ItemSetJusticarArmor.CharacterHasSetBonus(&paladin.Character, 2), 0.1, 0),
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
