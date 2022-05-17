@@ -294,6 +294,7 @@ var allowList = map[int]bool{
 	19808: true, // Rockhide Strongfish
 	20966: true, // Jade Pendant of Blasting
 	22395: true, // Totem of Rage
+	23836: true, // Goblin Rocket Launcher
 	24114: true, // Braided Eternium Chain
 	27947: true, // Totem of Impact
 	28041: true, // Bladefist's Breadth

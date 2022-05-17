@@ -16,16 +16,19 @@ type Paladin struct {
 	CurrentSeal      *core.Aura
 	CurrentJudgement *core.Aura
 
-	Consecration           *core.Spell
-	CrusaderStrike         *core.Spell
-	Exorcism               *core.Spell
-	JudgementOfBlood       *core.Spell
-	JudgementOfTheCrusader *core.Spell
-	JudgementOfWisdom      *core.Spell
-	SealOfBlood            *core.Spell
-	SealOfCommand          *core.Spell
-	SealOfTheCrusader      *core.Spell
-	SealOfWisdom           *core.Spell
+	Consecration             *core.Spell
+	CrusaderStrike           *core.Spell
+	Exorcism                 *core.Spell
+	HolyShield               *core.Spell
+	JudgementOfBlood         *core.Spell
+	JudgementOfTheCrusader   *core.Spell
+	JudgementOfWisdom        *core.Spell
+	JudgementOfRighteousness *core.Spell
+	SealOfBlood              *core.Spell
+	SealOfCommand            *core.Spell
+	SealOfTheCrusader        *core.Spell
+	SealOfWisdom             *core.Spell
+	SealOfRighteousness      *core.Spell
 
 	ConsecrationDot *core.Dot
 
@@ -35,6 +38,7 @@ type Paladin struct {
 	SealOfCommandAura          *core.Aura
 	SealOfTheCrusaderAura      *core.Aura
 	SealOfWisdomAura           *core.Aura
+	SealOfRighteousnessAura    *core.Aura
 }
 
 // Implemented by each Paladin spec.
@@ -71,12 +75,16 @@ func (paladin *Paladin) Initialize() {
 	paladin.setupSealOfBlood()
 	paladin.setupSealOfTheCrusader()
 	paladin.setupSealOfWisdom()
+	paladin.setupSealOfRighteousness()
 	paladin.setupJudgementRefresh()
 
 	paladin.registerCrusaderStrikeSpell()
 	paladin.registerExorcismSpell()
+	paladin.registerHolyShieldSpell()
 	paladin.registerJudgements()
 	paladin.registerAvengingWrathCD()
+
+	paladin.registerSpiritualAttunement()
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {

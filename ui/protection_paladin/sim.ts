@@ -137,16 +137,12 @@ export class ProtectionPaladinSimUI extends IndividualSimUI<Spec.SpecProtectionP
 					bloodlust: 1,
 					drums: Drums.DrumsOfBattle,
 					manaSpringTotem: TristateEffect.TristateEffectRegular,
-					strengthOfEarthTotem: StrengthOfEarthType.EnhancingTotems,
-					windfuryTotemRank: 5,
-					graceOfAirTotem: TristateEffect.TristateEffectImproved,
-					battleShout: TristateEffect.TristateEffectImproved,
-					windfuryTotemIwt: 2,
+					wrathOfAirTotem: TristateEffect.TristateEffectRegular,
 				}),
 				individualBuffs: IndividualBuffs.create({
 					blessingOfKings: true,
+					blessingOfSanctuary: true,
 					blessingOfMight: TristateEffect.TristateEffectImproved,
-					blessingOfSalvation: true,
 					unleashedRage: true,
 				}),
 				debuffs: Debuffs.create({

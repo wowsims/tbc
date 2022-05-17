@@ -81,10 +81,102 @@ func (paladin *Paladin) ApplyTalents() {
 		})
 	}
 
+	paladin.applyRedoubt()
+	paladin.applyReckoning()
 	paladin.applyCrusade()
 	paladin.applyOneHandedWeaponSpecialization()
 	paladin.applyTwoHandedWeaponSpecialization()
 	paladin.applyVengeance()
+}
+
+func (paladin *Paladin) applyRedoubt() {
+	if paladin.Talents.Redoubt == 0 {
+		return
+	}
+
+	actionID := core.ActionID{SpellID: 20137}
+
+	bonusBlockRating := 6 * core.BlockRatingPerBlockChance * float64(paladin.Talents.Redoubt)
+
+	procAura := paladin.RegisterAura(core.Aura{
+		Label:     "Redoubt Proc",
+		ActionID:  actionID,
+		Duration:  time.Second * 10,
+		MaxStacks: 5,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			paladin.AddStatDynamic(sim, stats.Block, bonusBlockRating)
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			paladin.AddStatDynamic(sim, stats.Block, -bonusBlockRating)
+		},
+		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Outcome.Matches(core.OutcomeBlock) {
+				aura.RemoveStack(sim)
+			}
+		},
+	})
+
+	paladin.RegisterAura(core.Aura{
+		Label:    "Redoubt",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				if sim.RandomFloat("Redoubt") < 0.1 {
+					procAura.Activate(sim)
+					procAura.SetStacks(sim, 5)
+				}
+			}
+		},
+	})
+}
+
+func (paladin *Paladin) applyReckoning() {
+	if paladin.Talents.Reckoning == 0 {
+		return
+	}
+
+	actionID := core.ActionID{SpellID: 20182}
+	procChance := 0.02 * float64(paladin.Talents.Reckoning)
+
+	var reckoningSpell *core.Spell
+
+	procAura := paladin.RegisterAura(core.Aura{
+		Label:     "Reckoning Proc",
+		ActionID:  actionID,
+		Duration:  time.Second * 8,
+		MaxStacks: 4,
+		OnInit: func(aura *core.Aura, sim *core.Simulation) {
+			reckoningSpell = paladin.GetOrRegisterSpell(core.SpellConfig{
+				ActionID:    actionID,
+				SpellSchool: core.SpellSchoolPhysical,
+				SpellExtras: core.SpellExtrasMeleeMetrics,
+
+				ApplyEffects: core.ApplyEffectFuncDirectDamage(paladin.AutoAttacks.MHEffect),
+			})
+		},
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell == paladin.AutoAttacks.MHAuto {
+				reckoningSpell.Cast(sim, spellEffect.Target)
+			}
+		},
+	})
+
+	paladin.RegisterAura(core.Aura{
+		Label:    "Reckoning",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if sim.RandomFloat("Redoubt") < procChance {
+				procAura.Activate(sim)
+				procAura.SetStacks(sim, 4)
+			}
+		},
+	})
 }
 
 func (paladin *Paladin) applyCrusade() {
@@ -116,7 +208,8 @@ func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
 }
 
 func (paladin *Paladin) applyTwoHandedWeaponSpecializationToSpell(spellEffect *core.SpellEffect) {
-	if paladin.GetMHWeapon().HandType == proto.HandType_HandTypeTwoHand {
+	mhWeapon := paladin.GetMHWeapon()
+	if mhWeapon != nil && mhWeapon.HandType == proto.HandType_HandTypeTwoHand {
 		spellEffect.DamageMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization))
 	}
 }

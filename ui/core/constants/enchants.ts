@@ -29,8 +29,12 @@ export const SUBTLETY = 33150;
 enchantDescriptions.set(SUBTLETY, '2% Reduced Threat');
 export const CLOAK_GREATER_AGILITY = 34004;
 enchantDescriptions.set(CLOAK_GREATER_AGILITY, '+12 Agility');
+export const STEELWEAVE = 35756;
+enchantDescriptions.set(STEELWEAVE, '+12 Defense');
 
 // Chest
+export const CHEST_EXCEPTIONAL_HEALTH = 27957;
+enchantDescriptions.set(CHEST_EXCEPTIONAL_HEALTH, '+150 Health');
 export const CHEST_MAJOR_SPIRIT = 33990;
 enchantDescriptions.set(CHEST_MAJOR_SPIRIT, '+15 Spirit');
 export const CHEST_EXCEPTIONAL_MANA = 22546;

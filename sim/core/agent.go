@@ -101,6 +101,13 @@ func (actionID ActionID) String() string {
 	return sb.String()
 }
 
+// Returns a new ActionID with the corresponding Tag value.
+func (actionID ActionID) WithTag(tag int32) ActionID {
+	newID := actionID
+	newID.Tag = tag
+	return newID
+}
+
 func (actionID ActionID) ToProto() *proto.ActionID {
 	protoID := &proto.ActionID{
 		Tag: actionID.Tag,
