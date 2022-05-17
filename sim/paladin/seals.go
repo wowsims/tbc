@@ -235,8 +235,62 @@ func (paladin *Paladin) setupSealOfWisdom() {
 	})
 }
 
+func (paladin *Paladin) setupSealOfRighteousness() {
+	procActionID := core.ActionID{SpellID: 27156}
+	sorProc := paladin.RegisterSpell(core.SpellConfig{
+		ActionID:    procActionID,
+		SpellSchool: core.SpellSchoolHoly,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
+			IsPhantom:        true,
+			DamageMultiplier: 1 + 0.03*float64(paladin.Talents.ImprovedSealOfRighteousness),
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 0.35, false),
+			OutcomeApplier: paladin.OutcomeFuncAlwaysHit(),
+		}),
+	})
+
+	spellActionID := core.ActionID{SpellID: 27155}
+	paladin.SealOfRighteousnessAura = paladin.RegisterAura(core.Aura{
+		Label:    "Seal of Righteousness",
+		Tag:      "Seal",
+		ActionID: spellActionID,
+		Duration: SealDuration,
+
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) || spellEffect.IsPhantom {
+				return
+			}
+			sorProc.Cast(sim, spellEffect.Target)
+		},
+	})
+
+	baseCost := 260.0 - paladin.sealCostReduction()
+
+	paladin.SealOfRighteousness = paladin.RegisterSpell(core.SpellConfig{
+		ActionID: spellActionID,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost * (1 - 0.03*float64(paladin.Talents.Benediction)),
+				GCD:  core.GCDDefault,
+			},
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+			paladin.UpdateSeal(sim, paladin.SealOfRighteousnessAura)
+		},
+	})
+}
+
 func (paladin *Paladin) UpdateSeal(sim *core.Simulation, newSeal *core.Aura) {
-	if paladin.CurrentSeal == paladin.SealOfCommandAura {
+	if paladin.SealOfCommandAura != nil && paladin.CurrentSeal == paladin.SealOfCommandAura {
 		// Technically the current expiration could be shorter than 0.4 seconds
 		// TO-DO: Lookup behavior when seal of command is twisted at shorter than 0.4 seconds duration
 		expiresAt := sim.CurrentTime + TwistWindow

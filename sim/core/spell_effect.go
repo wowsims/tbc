@@ -67,8 +67,12 @@ func (spellEffect *SpellEffect) Landed() bool {
 	return spellEffect.Outcome.Matches(OutcomeLanded)
 }
 
-func (spellEffect *SpellEffect) TotalThreatMultiplier(unit *Unit) float64 {
-	return spellEffect.ThreatMultiplier * unit.PseudoStats.ThreatMultiplier
+func (spellEffect *SpellEffect) TotalThreatMultiplier(spell *Spell) float64 {
+	multiplier := spellEffect.ThreatMultiplier * spell.Unit.PseudoStats.ThreatMultiplier
+	if spell.SpellSchool == SpellSchoolHoly {
+		multiplier *= spell.Unit.PseudoStats.HolySpellThreatMultiplier
+	}
+	return multiplier
 }
 
 func (spellEffect *SpellEffect) MeleeAttackPower(unit *Unit) float64 {
@@ -173,9 +177,9 @@ func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spe
 	spellEffect.OutcomeApplier(sim, spell, spellEffect, attackTable)
 }
 
-func (spellEffect *SpellEffect) calcThreat(unit *Unit) float64 {
+func (spellEffect *SpellEffect) calcThreat(spell *Spell) float64 {
 	if spellEffect.Landed() {
-		return (spellEffect.Damage + spellEffect.FlatThreatBonus) * spellEffect.TotalThreatMultiplier(unit)
+		return (spellEffect.Damage + spellEffect.FlatThreatBonus) * spellEffect.TotalThreatMultiplier(spell)
 	} else {
 		return 0
 	}
@@ -183,13 +187,13 @@ func (spellEffect *SpellEffect) calcThreat(unit *Unit) float64 {
 
 func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell) {
 	spell.SpellMetrics[spellEffect.Target.Index].TotalDamage += spellEffect.Damage
-	spell.SpellMetrics[spellEffect.Target.Index].TotalThreat += spellEffect.calcThreat(spell.Unit)
+	spell.SpellMetrics[spellEffect.Target.Index].TotalThreat += spellEffect.calcThreat(spell)
 
 	if sim.Log != nil {
 		if spellEffect.IsPeriodic {
-			spell.Unit.Log(sim, "%s tick %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Unit))
+			spell.Unit.Log(sim, "%s tick %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell))
 		} else {
-			spell.Unit.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell.Unit))
+			spell.Unit.Log(sim, "%s %s. (Threat: %0.3f)", spell.ActionID, spellEffect, spellEffect.calcThreat(spell))
 		}
 	}
 

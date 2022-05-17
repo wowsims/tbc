@@ -51,8 +51,6 @@ type ProtectionPaladin struct {
 
 	Rotation proto.ProtectionPaladin_Rotation
 	Options  proto.ProtectionPaladin_Options
-
-	openerCompleted bool
 }
 
 func (prot *ProtectionPaladin) GetPaladin() *paladin.Paladin {
@@ -61,18 +59,19 @@ func (prot *ProtectionPaladin) GetPaladin() *paladin.Paladin {
 
 func (prot *ProtectionPaladin) Initialize() {
 	prot.Paladin.Initialize()
+	prot.ActivateRighteousFury()
+
+	switch prot.Rotation.ConsecrationRank {
+	case 6:
+		prot.RegisterConsecrationSpell(6)
+	case 4:
+		prot.RegisterConsecrationSpell(4)
+	case 1:
+		prot.RegisterConsecrationSpell(1)
+	}
 }
 
 func (prot *ProtectionPaladin) Reset(sim *core.Simulation) {
 	prot.Paladin.Reset(sim)
-
-	switch prot.Options.BuffJudgement {
-	case proto.PaladinJudgement_JudgementOfWisdom:
-		prot.UpdateSeal(sim, prot.SealOfWisdomAura)
-	case proto.PaladinJudgement_JudgementOfCrusader:
-		prot.UpdateSeal(sim, prot.SealOfTheCrusaderAura)
-	}
-
-	prot.AutoAttacks.CancelAutoSwing(sim)
-	prot.openerCompleted = false
+	prot.UpdateSeal(sim, prot.SealOfRighteousnessAura)
 }

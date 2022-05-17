@@ -73,11 +73,6 @@ var FullConsumes = &proto.Consumes{
 	MainHandImbue:      proto.WeaponImbue_WeaponImbueSuperiorWizardOil,
 }
 
-var NoDebuffTarget = &proto.Target{
-	Debuffs: &proto.Debuffs{},
-	Armor:   7700,
-}
-
 var FullDebuffs = &proto.Debuffs{
 	JudgementOfWisdom:           true,
 	Misery:                      true,
@@ -92,100 +87,95 @@ var FullDebuffs = &proto.Debuffs{
 	ExposeWeaknessHunterAgility: 800,
 }
 
-var FullDebuffTarget = &proto.Target{
-	Debuffs: FullDebuffs,
-	Armor:   7700,
-}
-
-var Phase4Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+var Phase4Gear = items.EquipmentSpecFromJsonString(`{"items": [
 	{
-		Name:    "Faceplate of the Impenetrable",
-		Enchant: "Glyph of Power",
-		Gems: []string{
-			"Powerful Earthstorm Diamond",
-			"Veiled Pyrestone",
-		},
+		"id": 32521,
+		"enchant": 29191,
+		"gems": [
+			25896,
+			32196
+		]
 	},
 	{
-		Name: "The Darkener's Grasp",
+		"id": 32362
 	},
 	{
-		Name:    "Lightbringer Shoulderguards",
-		Enchant: "Greater Inscription of the Knight",
-		Gems: []string{
-			"Glowing Shadowsong Amethyst",
-			"Glowing Shadowsong Amethyst",
-		},
+		"id": 30998,
+		"enchant": 28911,
+		"gems": [
+			32200,
+			32196
+		]
 	},
 	{
-		Name:    "Phoenix-Wing Cloak",
-		Enchant: "Enchant Cloak - Dodge",
+		"id": 33593,
+		"enchant": 33148
 	},
 	{
-		Name:    "Lightbringer Chestguard",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Glowing Shadowsong Amethyst",
-			"Veiled Pyrestone",
-			"Veiled Pyrestone",
-		},
+		"id": 30991,
+		"enchant": 27957,
+		"gems": [
+			32196,
+			32196,
+			32221
+		]
 	},
 	{
-		Name:    "The Seeker's Wristguards",
-		Enchant: "Bracer - Spellpower",
+		"id": 32232,
+		"enchant": 22534
 	},
 	{
-		Name:    "Lightbringer Handguards",
-		Enchant: "Gloves - Threat",
-		Gems: []string{
-			"Glowing Shadowsong Amethyst",
-		},
+		"id": 30985,
+		"enchant": 33153,
+		"gems": [
+			32196
+		]
 	},
 	{
-		Name: "Girdle of the Protector",
-		Gems: []string{
-			"Glowing Shadowsong Amethyst",
-			"Veiled Pyrestone",
-		},
+		"id": 32342,
+		"gems": [
+			32200,
+			32200
+		]
 	},
 	{
-		Name:    "Lightbringer Legguards",
-		Enchant: "Runic Spellthread",
-		Gems: []string{
-			"Glowing Shadowsong Amethyst",
-		},
+		"id": 30995,
+		"enchant": 24274,
+		"gems": [
+			32200
+		]
 	},
 	{
-		Name:    "Sabatons of the Righteous Defender",
-		Enchant: "Enchant Boots - Fortitude",
-		Gems: []string{
-			"Glowing Shadowsong Amethyst",
-			"Glowing Shadowsong Amethyst",
-		},
+		"id": 32245,
+		"enchant": 35297,
+		"gems": [
+			32200,
+			32200
+		]
 	},
 	{
-		Name:    "Band of the Eternal Sage",
-		Enchant: "Ring - Spellpower",
+		"id": 32261,
+		"enchant": 22536
 	},
 	{
-		Name:    "Ashyen's Gift",
-		Enchant: "Ring - Spellpower",
+		"id": 29172,
+		"enchant": 22536
 	},
 	{
-		Name: "Hex Shrunken Head",
+		"id": 31858
 	},
 	{
-		Name: "Dark Iron Smoking Pipe",
+		"id": 33829
 	},
 	{
-		Name:    "Tempest of Chaos",
-		Enchant: "Weapon - Major Spellpower",
+		"id": 30910,
+		"enchant": 22555
 	},
 	{
-		Name:    "Bulwark of Azzinoth",
-		Enchant: "Shield - Major Stamina",
+		"id": 32375,
+		"enchant": 28282
 	},
 	{
-		Name: "Libram of Divine Purpose",
-	},
-})
+		"id": 33504
+	}
+]}`)

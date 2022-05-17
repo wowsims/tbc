@@ -141,7 +141,7 @@ func (ret *RetributionPaladin) useFillers(sim *core.Simulation, target *core.Uni
 	// If the target is a demon and exorcism is up, cast exorcism
 	// Only cast exorcism when above 40% mana
 	if ret.Rotation.UseExorcism &&
-		target.MobType == proto.MobType_MobTypeDemon &&
+		ret.CanExorcism(target) &&
 		ret.Exorcism.IsReady(sim) &&
 		ret.CurrentMana() > ret.MaxMana()*0.4 {
 
