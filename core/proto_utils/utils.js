@@ -90,7 +90,7 @@ export const specIconsLarge = {
     [Spec.SpecMage]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_magicalsentry.jpg',
     [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/classicon_rogue.jpg',
     [Spec.SpecRetributionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_auraoflight.jpg',
-    [Spec.SpecProtectionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_auraoflight.jpg',
+    [Spec.SpecProtectionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_devotionaura.jpg',
     [Spec.SpecShadowPriest]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_shadowwordpain.jpg',
     [Spec.SpecWarlock]: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_metamorphosis.jpg',
     [Spec.SpecWarrior]: 'https://wow.zamimg.com/images/wow/icons/large/ability_warrior_innerrage.jpg',
@@ -154,7 +154,7 @@ export const titleIcons = {
     [Spec.SpecMage]: '/tbc/assets/mage_icon.png',
     [Spec.SpecRogue]: '/tbc/assets/rogue_icon.png',
     [Spec.SpecRetributionPaladin]: '/tbc/assets/retribution_icon.png',
-    [Spec.SpecProtectionPaladin]: '/tbc/assets/retribution_icon.png',
+    [Spec.SpecProtectionPaladin]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_devotionaura.jpg',
     [Spec.SpecShadowPriest]: '/tbc/assets/shadow_priest_icon.png',
     [Spec.SpecWarlock]: '/tbc/assets/warlock_icon.png',
     [Spec.SpecWarrior]: '/tbc/assets/warrior_icon.png',
@@ -371,24 +371,24 @@ export const specTypeFunctions = {
         rotationCopy: (a) => ProtectionPaladinRotation.clone(a),
         rotationToJson: (a) => ProtectionPaladinRotation.toJson(a),
         rotationFromJson: (obj) => ProtectionPaladinRotation.fromJson(obj),
-        rotationFromPlayer: (player) => player.spec.oneofKind == 'retributionPaladin'
-            ? player.spec.retributionPaladin.rotation || ProtectionPaladinRotation.create()
+        rotationFromPlayer: (player) => player.spec.oneofKind == 'protectionPaladin'
+            ? player.spec.protectionPaladin.rotation || ProtectionPaladinRotation.create()
             : ProtectionPaladinRotation.create(),
         talentsCreate: () => PaladinTalents.create(),
         talentsEquals: (a, b) => PaladinTalents.equals(a, b),
         talentsCopy: (a) => PaladinTalents.clone(a),
         talentsToJson: (a) => PaladinTalents.toJson(a),
         talentsFromJson: (obj) => PaladinTalents.fromJson(obj),
-        talentsFromPlayer: (player) => player.spec.oneofKind == 'retributionPaladin'
-            ? player.spec.retributionPaladin.talents || PaladinTalents.create()
+        talentsFromPlayer: (player) => player.spec.oneofKind == 'protectionPaladin'
+            ? player.spec.protectionPaladin.talents || PaladinTalents.create()
             : PaladinTalents.create(),
         optionsCreate: () => ProtectionPaladinOptions.create(),
         optionsEquals: (a, b) => ProtectionPaladinOptions.equals(a, b),
         optionsCopy: (a) => ProtectionPaladinOptions.clone(a),
         optionsToJson: (a) => ProtectionPaladinOptions.toJson(a),
         optionsFromJson: (obj) => ProtectionPaladinOptions.fromJson(obj),
-        optionsFromPlayer: (player) => player.spec.oneofKind == 'retributionPaladin'
-            ? player.spec.retributionPaladin.options || ProtectionPaladinOptions.create()
+        optionsFromPlayer: (player) => player.spec.oneofKind == 'protectionPaladin'
+            ? player.spec.protectionPaladin.options || ProtectionPaladinOptions.create()
             : ProtectionPaladinOptions.create(),
     },
     [Spec.SpecRogue]: {

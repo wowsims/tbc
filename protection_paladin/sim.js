@@ -1,4 +1,4 @@
-import { RaidBuffs, StrengthOfEarthType } from '/tbc/core/proto/common.js';
+import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
@@ -128,16 +128,12 @@ export class ProtectionPaladinSimUI extends IndividualSimUI {
                     bloodlust: 1,
                     drums: Drums.DrumsOfBattle,
                     manaSpringTotem: TristateEffect.TristateEffectRegular,
-                    strengthOfEarthTotem: StrengthOfEarthType.EnhancingTotems,
-                    windfuryTotemRank: 5,
-                    graceOfAirTotem: TristateEffect.TristateEffectImproved,
-                    battleShout: TristateEffect.TristateEffectImproved,
-                    windfuryTotemIwt: 2,
+                    wrathOfAirTotem: TristateEffect.TristateEffectRegular,
                 }),
                 individualBuffs: IndividualBuffs.create({
                     blessingOfKings: true,
+                    blessingOfSanctuary: true,
                     blessingOfMight: TristateEffect.TristateEffectImproved,
-                    blessingOfSalvation: true,
                     unleashedRage: true,
                 }),
                 debuffs: Debuffs.create({

@@ -58,7 +58,7 @@ export const AuraSelection = {
             { name: 'None', value: PaladinAura.NoPaladinAura },
             { name: 'Sanctity Aura', value: PaladinAura.SanctityAura },
             { name: 'Devotion Aura', value: PaladinAura.DevotionAura },
-            { name: 'Protection Aura', value: PaladinAura.RetributionAura },
+            { name: 'Retribution Aura', value: PaladinAura.RetributionAura },
         ],
         changedEvent: (player) => player.specOptionsChangeEmitter,
         getValue: (player) => player.getSpecOptions().aura,
