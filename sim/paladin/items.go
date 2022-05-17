@@ -1,6 +1,7 @@
 package paladin
 
 import (
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
@@ -17,6 +18,8 @@ func init() {
 
 	core.AddItemEffect(27484, ApplyLibramOfAvengement)
 	core.AddItemEffect(32368, ApplyTomeOfTheLightbringer)
+	core.AddItemEffect(30447, ApplyTomeOfFieryRedemption)
+	core.AddItemEffect(32489, ApplyAshtongueTalismanOfZeal)
 }
 
 var ItemSetJusticarBattlegear = core.ItemSet{
@@ -178,6 +181,76 @@ func ApplyTomeOfTheLightbringer(agent core.Agent) {
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell.SpellExtras.Matches(SpellFlagJudgement) {
 				procAura.Activate(sim)
+			}
+		},
+	})
+}
+
+func ApplyTomeOfFieryRedemption(agent core.Agent) {
+	paladin := agent.(PaladinAgent).GetPaladin()
+	procAura := paladin.NewTemporaryStatsAura("Tome of Fiery Redemption Proc", core.ActionID{ItemID: 30447}, stats.Stats{stats.SpellPower: 290}, time.Second*15)
+
+	icd := core.Cooldown{
+		Timer:    paladin.NewTimer(),
+		Duration: time.Second * 45,
+	}
+
+	paladin.RegisterAura(core.Aura{
+		Label:    "Tome of Fiery Redemption",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+			if !spell.SpellExtras.Matches(SpellFlagSeal|SpellFlagJudgement) && spell.SpellSchool != core.SpellSchoolPhysical {
+				return
+			}
+			if !icd.IsReady(sim) || sim.RandomFloat("TomeOfFieryRedemption") > 0.15 {
+				return
+			}
+			icd.Use(sim)
+
+			procAura.Activate(sim)
+		},
+	})
+}
+
+func ApplyAshtongueTalismanOfZeal(agent core.Agent) {
+	paladin := agent.(PaladinAgent).GetPaladin()
+	actionID := core.ActionID{ItemID: 32489}
+
+	dotSpell := paladin.RegisterSpell(core.SpellConfig{
+		ActionID: actionID,
+	})
+
+	target := paladin.CurrentTarget
+	judgementDot := core.NewDot(core.Dot{
+		Spell: dotSpell,
+		Aura: target.RegisterAura(core.Aura{
+			Label:    "AshtongueTalismanOfZeal-" + strconv.Itoa(int(paladin.Index)),
+			ActionID: actionID,
+		}),
+		NumberOfTicks: 4,
+		TickLength:    time.Second * 2,
+		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigFlat(480 / 4),
+			OutcomeApplier: paladin.OutcomeFuncTick(),
+			IsPeriodic:     true,
+		}),
+	})
+
+	paladin.RegisterAura(core.Aura{
+		Label:    "Ashtongue Talisman of Zeal",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell.SpellExtras.Matches(SpellFlagJudgement) && sim.RandomFloat("AshtongueTalismanOfZeal") < 0.5 {
+				judgementDot.Apply(sim)
 			}
 		},
 	})
