@@ -88,7 +88,9 @@ func (enh *EnhancementShaman) SetupRotationSchedule() {
 	} else if enh.Consumes.Drums == proto.Drums_DrumsOfWar {
 		enh.scheduler.ScheduleMCD(enh.GetCharacter(), core.DrumsOfWarActionID)
 	}
-	enh.scheduler.ScheduleMCD(enh.GetCharacter(), enh.BloodlustActionID())
+	if enh.SelfBuffs.Bloodlust {
+		enh.scheduler.ScheduleMCD(enh.GetCharacter(), enh.BloodlustActionID())
+	}
 
 	scheduleTotem := func(duration time.Duration, prioritizeEarlier bool, precast bool, tryCast func(sim *core.Simulation) (bool, float64)) {
 		totemAction := common.ScheduledAbility{
