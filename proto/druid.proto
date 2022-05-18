@@ -113,6 +113,8 @@ message FeralDruid {
 
 message FeralTankDruid {
   message Rotation {
+		// Minimum rage to queue HS or Cleave.
+		int32 maul_rage_threshold = 1;
   }
   Rotation rotation = 1;
 
@@ -120,6 +122,8 @@ message FeralTankDruid {
 
   message Options {
     RaidTarget innervate_target = 1;
+
+		double starting_rage = 2;
   }
   Options options = 3;
 }

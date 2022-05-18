@@ -11,8 +11,8 @@ type Druid struct {
 	SelfBuffs
 	Talents proto.DruidTalents
 
+	Form        DruidForm
 	RebirthUsed bool
-	CatForm     bool
 
 	FaerieFire  *core.Spell
 	Hurricane   *core.Spell
@@ -92,13 +92,13 @@ func (druid *Druid) Reset(sim *core.Simulation) {
 	druid.RebirthUsed = false
 }
 
-func New(char core.Character, selfBuffs SelfBuffs, talents proto.DruidTalents) *Druid {
+func New(char core.Character, form DruidForm, selfBuffs SelfBuffs, talents proto.DruidTalents) *Druid {
 	druid := &Druid{
 		Character:   char,
 		SelfBuffs:   selfBuffs,
 		Talents:     talents,
+		Form:        form,
 		RebirthUsed: false,
-		CatForm:     false,
 	}
 	druid.EnableManaBar()
 

@@ -36,10 +36,8 @@ func NewFeralDruid(character core.Character, options proto.Player) *FeralDruid {
 		selfBuffs.InnervateTarget.TargetIndex = -1
 	}
 
-	druid := druid.New(character, selfBuffs, *feralOptions.Talents)
-	druid.CatForm = true
 	cat := &FeralDruid{
-		Druid:    druid,
+		Druid:    druid.New(character, druid.Cat, selfBuffs, *feralOptions.Talents),
 		Rotation: *feralOptions.Rotation,
 	}
 

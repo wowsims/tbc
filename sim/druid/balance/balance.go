@@ -34,9 +34,8 @@ func NewBalanceDruid(character core.Character, options proto.Player) *BalanceDru
 		selfBuffs.InnervateTarget.TargetIndex = -1
 	}
 
-	druid := druid.New(character, selfBuffs, *balanceOptions.Talents)
 	moonkin := &BalanceDruid{
-		Druid:           druid,
+		Druid:           druid.New(character, druid.Moonkin, selfBuffs, *balanceOptions.Talents),
 		primaryRotation: *balanceOptions.Rotation,
 		useBattleRes:    balanceOptions.Options.BattleRes,
 	}
