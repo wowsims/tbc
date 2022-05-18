@@ -323,6 +323,8 @@ func (unit *Unit) finalize() {
 	unit.initialCastSpeed = unit.CastSpeed
 	unit.initialMeleeSwingSpeed = unit.SwingSpeed()
 	unit.initialRangedSwingSpeed = unit.RangedSwingSpeed()
+
+	unit.applyParryHaste()
 }
 
 func (unit *Unit) init(sim *Simulation) {

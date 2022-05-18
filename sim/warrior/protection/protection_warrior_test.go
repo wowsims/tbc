@@ -43,6 +43,15 @@ func TestProtectionWarrior(t *testing.T) {
 				proto.WeaponType_WeaponTypeFist,
 			},
 		},
+
+		EPReferenceStat: proto.Stat_StatAttackPower,
+		StatsToWeigh: []proto.Stat{
+			proto.Stat_StatStrength,
+			proto.Stat_StatAttackPower,
+			proto.Stat_StatArmor,
+			proto.Stat_StatDodge,
+			proto.Stat_StatBlockValue,
+		},
 	}))
 }
 
@@ -60,11 +69,12 @@ func BenchmarkSimulate(b *testing.B) {
 				InFrontOfTarget: true,
 			},
 			FullPartyBuffs,
-			FullRaidBuffs),
+			FullRaidBuffs,
+			FullDebuffs),
 		Encounter: &proto.Encounter{
 			Duration: 300,
 			Targets: []*proto.Target{
-				FullDebuffTarget,
+				core.NewDefaultTarget(),
 			},
 		},
 		SimOptions: core.AverageDefaultSimTestOptions,

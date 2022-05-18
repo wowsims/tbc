@@ -3,7 +3,6 @@ package feral
 import (
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var StandardTalents = &proto.DruidTalents{
@@ -71,11 +70,6 @@ var FullDebuffs = &proto.Debuffs{
 	HuntersMark:                 proto.TristateEffect_TristateEffectImproved,
 	ExposeWeaknessUptime:        1.0,
 	ExposeWeaknessHunterAgility: 1000,
-}
-
-var FullDebuffTarget = &proto.Target{
-	Debuffs: FullDebuffs,
-	Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 }
 
 var PlayerOptionsBiteweave = &proto.Player_FeralDruid{

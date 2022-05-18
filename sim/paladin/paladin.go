@@ -6,24 +6,34 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
+const (
+	SpellFlagSeal      = core.SpellExtrasAgentReserved1
+	SpellFlagJudgement = core.SpellExtrasAgentReserved2
+)
+
 type Paladin struct {
 	core.Character
+
+	PaladinAura proto.PaladinAura
 
 	Talents proto.PaladinTalents
 
 	CurrentSeal      *core.Aura
 	CurrentJudgement *core.Aura
 
-	Consecration           *core.Spell
-	CrusaderStrike         *core.Spell
-	Exorcism               *core.Spell
-	JudgementOfBlood       *core.Spell
-	JudgementOfTheCrusader *core.Spell
-	JudgementOfWisdom      *core.Spell
-	SealOfBlood            *core.Spell
-	SealOfCommand          *core.Spell
-	SealOfTheCrusader      *core.Spell
-	SealOfWisdom           *core.Spell
+	Consecration             *core.Spell
+	CrusaderStrike           *core.Spell
+	Exorcism                 *core.Spell
+	HolyShield               *core.Spell
+	JudgementOfBlood         *core.Spell
+	JudgementOfTheCrusader   *core.Spell
+	JudgementOfWisdom        *core.Spell
+	JudgementOfRighteousness *core.Spell
+	SealOfBlood              *core.Spell
+	SealOfCommand            *core.Spell
+	SealOfTheCrusader        *core.Spell
+	SealOfWisdom             *core.Spell
+	SealOfRighteousness      *core.Spell
 
 	ConsecrationDot *core.Dot
 
@@ -33,6 +43,7 @@ type Paladin struct {
 	SealOfCommandAura          *core.Aura
 	SealOfTheCrusaderAura      *core.Aura
 	SealOfWisdomAura           *core.Aura
+	SealOfRighteousnessAura    *core.Aura
 }
 
 // Implemented by each Paladin spec.
@@ -52,18 +63,33 @@ func (paladin *Paladin) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 }
 
 func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
+	partyBuffs.DevotionAura = core.MaxTristate(partyBuffs.DevotionAura, core.MakeTristateValue(
+		paladin.PaladinAura == proto.PaladinAura_DevotionAura,
+		paladin.Talents.ImprovedDevotionAura == 5))
+
+	partyBuffs.RetributionAura = core.MaxTristate(partyBuffs.RetributionAura, core.MakeTristateValue(
+		paladin.PaladinAura == proto.PaladinAura_RetributionAura,
+		paladin.Talents.ImprovedRetributionAura == 2))
+
+	partyBuffs.SanctityAura = core.MaxTristate(partyBuffs.SanctityAura, core.MakeTristateValue(
+		paladin.Talents.SanctityAura && paladin.PaladinAura == proto.PaladinAura_SanctityAura,
+		paladin.Talents.ImprovedSanctityAura == 2))
 }
 
 func (paladin *Paladin) Initialize() {
 	paladin.setupSealOfBlood()
 	paladin.setupSealOfTheCrusader()
 	paladin.setupSealOfWisdom()
+	paladin.setupSealOfRighteousness()
 	paladin.setupJudgementRefresh()
 
 	paladin.registerCrusaderStrikeSpell()
 	paladin.registerExorcismSpell()
+	paladin.registerHolyShieldSpell()
 	paladin.registerJudgements()
 	paladin.registerAvengingWrathCD()
+
+	paladin.registerSpiritualAttunement()
 }
 
 func (paladin *Paladin) Reset(sim *core.Simulation) {

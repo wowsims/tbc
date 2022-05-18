@@ -56,6 +56,13 @@ func (env *Environment) construct(raidProto proto.Raid, encounterProto proto.Enc
 		unit.Env = env
 		unit.CurrentTarget = &env.Encounter.Targets[0].Unit
 	}
+
+	// Apply extra debuffs from raid.
+	if raidProto.Debuffs != nil && len(env.Encounter.Targets) > 0 {
+		applyDebuffEffects(&env.Encounter.Targets[0].Unit, *raidProto.Debuffs)
+	}
+
+	// Assign target or target using Tanks field.
 	for _, target := range env.Encounter.Targets {
 		target.Env = env
 		if target.Index < int32(len(encounterProto.Targets)) {

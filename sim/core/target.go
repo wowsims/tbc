@@ -67,15 +67,6 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	if options.Stats != nil {
 		copy(unitStats[:], options.Stats[:])
 	}
-	if unitStats[stats.BlockValue] == 0 {
-		unitStats[stats.BlockValue] = 54 // Not thoroughly tested for non-bosses.
-	}
-	if unitStats[stats.AttackPower] == 0 {
-		unitStats[stats.AttackPower] = 320
-	}
-	if unitStats[stats.Armor] == 0 {
-		unitStats[stats.Armor] = 7684
-	}
 
 	target := &Target{
 		Unit: Unit{
@@ -94,17 +85,22 @@ func NewTarget(options proto.Target, targetIndex int32) *Target {
 	if target.Level == 0 {
 		target.Level = 73
 	}
-	target.stats[stats.MeleeCrit] = UnitLevelFloat64(target.Level, 0.05, 0.052, 0.054, 0.056) * MeleeCritRatingPerCritChance
+	if target.stats[stats.MeleeCrit] == 0 {
+		target.stats[stats.MeleeCrit] = UnitLevelFloat64(target.Level, 0.05, 0.052, 0.054, 0.056) * MeleeCritRatingPerCritChance
+	}
+
+	if target.Level == 73 && options.SuppressDodge {
+		// Sunwell boss Dodge Suppression. -20% dodge and -5% miss chance.
+		target.PseudoStats.DodgeReduction += 0.2
+		target.PseudoStats.IncreasedMissChance -= 0.05
+	}
 
 	target.PseudoStats.CanBlock = true
 	target.PseudoStats.CanParry = true
+	target.PseudoStats.ParryHaste = options.ParryHaste
 	target.PseudoStats.InFrontOfTarget = true
-	if target.Level == 73 {
+	if target.Level == 73 && options.CanCrush {
 		target.PseudoStats.CanCrush = true
-	}
-
-	if options.Debuffs != nil {
-		applyDebuffEffects(&target.Unit, *options.Debuffs)
 	}
 
 	return target

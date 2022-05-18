@@ -30,10 +30,12 @@ message Player {
 
     oneof spec {
         BalanceDruid balance_druid = 6;
-				FeralDruid feral_druid = 22;
+	      FeralDruid feral_druid = 22;
+	      FeralTankDruid feral_tank_druid = 26;
         Hunter hunter = 7;
         Mage mage = 8;
         RetributionPaladin retribution_paladin = 9;
+        ProtectionPaladin protection_paladin = 25;
         ShadowPriest shadow_priest = 10;
         SmitePriest smite_priest = 20;
         Rogue rogue = 11;
@@ -62,6 +64,10 @@ message Raid {
     repeated Party parties = 1; 
 
 		RaidBuffs buffs = 2;
+
+		// Extra debuffs provided by buff bots in this raid.
+		// This is also used for debuffs in the individual sims.
+		Debuffs debuffs = 5;
 
 		// Players who will be tanking mobs.
 		repeated RaidTarget tanks = 4;
@@ -227,6 +233,15 @@ message GearListResult {
     repeated Item items = 1;
     repeated Enchant enchants = 2;
     repeated Gem gems = 3;
+		repeated PresetEncounter encounters = 4;
+}
+message PresetTarget {
+	string path = 1;
+	Target target = 2;
+}
+message PresetEncounter {
+	string path = 1;
+	repeated PresetTarget targets = 2;
 }
 
 // RPC ComputeStats
@@ -258,17 +273,24 @@ message StatWeightsRequest {
     Player player = 1;
     RaidBuffs raid_buffs = 2;
     PartyBuffs party_buffs = 3;
+    Debuffs debuffs = 9;
     Encounter encounter = 4;
 		SimOptions sim_options = 5;
+		repeated RaidTarget tanks = 8;
 
     repeated Stat stats_to_weigh = 6;
     Stat ep_reference_stat = 7;
 }
 message StatWeightsResult {
-    repeated double weights = 1;
-    repeated double weights_stdev = 2;
-    repeated double ep_values = 3;
-    repeated double ep_values_stdev = 4;
+	StatWeightValues dps = 1;
+	StatWeightValues tps = 2;
+	StatWeightValues dtps = 3;
+}
+message StatWeightValues {
+	repeated double weights = 1;
+	repeated double weights_stdev = 2;
+	repeated double ep_values = 3;
+	repeated double ep_values_stdev = 4;
 }
 
 message AsyncAPIResult {

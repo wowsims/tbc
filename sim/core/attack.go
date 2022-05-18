@@ -23,6 +23,7 @@ type Weapon struct {
 	NormalizedSwingSpeed float64
 	SwingDuration        time.Duration // Duration between 2 swings.
 	CritMultiplier       float64
+	SpellSchool          SpellSchool
 }
 
 func newWeaponFromUnarmed(critMultiplier float64) Weapon {
@@ -81,6 +82,14 @@ func (character *Character) WeaponFromRanged(critMultiplier float64) Weapon {
 		return newWeaponFromItem(*weapon, critMultiplier)
 	} else {
 		return Weapon{}
+	}
+}
+
+func (weapon Weapon) GetSpellSchool() SpellSchool {
+	if weapon.SpellSchool == SpellSchoolNone {
+		return SpellSchoolPhysical
+	} else {
+		return weapon.SpellSchool
 	}
 }
 
@@ -246,7 +255,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 
 	aa.MHAuto = aa.unit.GetOrRegisterSpell(SpellConfig{
 		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 1},
-		SpellSchool: SpellSchoolPhysical,
+		SpellSchool: aa.MH.GetSpellSchool(),
 		SpellExtras: SpellExtrasMeleeMetrics,
 
 		ApplyEffects: ApplyEffectFuncDirectDamage(aa.MHEffect),
@@ -254,7 +263,7 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 
 	aa.OHAuto = aa.unit.GetOrRegisterSpell(SpellConfig{
 		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionAttack, Tag: 2},
-		SpellSchool: SpellSchoolPhysical,
+		SpellSchool: aa.OH.GetSpellSchool(),
 		SpellExtras: SpellExtrasMeleeMetrics,
 
 		ApplyEffects: ApplyEffectFuncDirectDamage(aa.OHEffect),
@@ -291,8 +300,15 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 		// properly at the start.
 		aa.previousMHSwingAt = time.Second * -1
 
-		delay := time.Duration(sim.RandomFloat("SwingResetDelay") * float64(aa.MH.SwingDuration/2))
-		isMHDelay := sim.RandomFloat("SwingResetWeapon") < 0.5
+		var delay time.Duration
+		var isMHDelay bool
+		if aa.unit.Type == EnemyUnit {
+			delay = time.Duration(float64(aa.MH.SwingDuration / 2))
+			isMHDelay = false
+		} else {
+			delay = time.Duration(sim.RandomFloat("SwingResetDelay") * float64(aa.MH.SwingDuration/2))
+			isMHDelay = sim.RandomFloat("SwingResetWeapon") < 0.5
+		}
 
 		if isMHDelay {
 			aa.MainhandSwingAt = delay
@@ -630,4 +646,41 @@ func (aa *AutoAttacks) NewPPMManager(ppm float64) PPMManager {
 		ohProcChance:     (aa.OH.SwingSpeed * ppm) / 60.0,
 		rangedProcChance: (aa.Ranged.SwingSpeed * ppm) / 60.0,
 	}
+}
+
+func (unit *Unit) applyParryHaste() {
+	if !unit.PseudoStats.ParryHaste || !unit.AutoAttacks.IsEnabled() {
+		return
+	}
+
+	unit.RegisterAura(Aura{
+		Label:    "Parry Haste",
+		Duration: NeverExpires,
+		OnReset: func(aura *Aura, sim *Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if !spellEffect.Outcome.Matches(OutcomeParry) {
+				return
+			}
+
+			remainingTime := aura.Unit.AutoAttacks.MainhandSwingAt - sim.CurrentTime
+			swingSpeed := aura.Unit.AutoAttacks.MainhandSwingSpeed()
+			minRemainingTime := time.Duration(float64(swingSpeed) * 0.2) // 20% of Swing Speed
+			defaultReduction := minRemainingTime * 2                     // 40% of Swing Speed
+
+			if remainingTime <= minRemainingTime {
+				return
+			}
+
+			parryHasteReduction := MinDuration(defaultReduction, remainingTime-minRemainingTime)
+			newReadyAt := aura.Unit.AutoAttacks.MainhandSwingAt - parryHasteReduction
+			if sim.Log != nil {
+				aura.Unit.Log(sim, "MH Swing reduced by %s due to parry haste, will now occur at %s", parryHasteReduction, newReadyAt)
+			}
+
+			aura.Unit.AutoAttacks.MainhandSwingAt = newReadyAt
+			aura.Unit.AutoAttacks.resetAutoSwing(sim)
+		},
+	})
 }

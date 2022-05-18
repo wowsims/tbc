@@ -125,10 +125,6 @@ var FullDebuffs = &proto.Debuffs{
 	Misery:                    true,
 }
 
-var FullDebuffTarget = &proto.Target{
-	Debuffs: FullDebuffs,
-}
-
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
 	items.ItemStringSpec{
 		Name:    "Cyclone Faceguard",

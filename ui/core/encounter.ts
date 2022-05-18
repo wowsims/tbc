@@ -2,6 +2,8 @@ import { Encounter as EncounterProto } from '/tbc/core/proto/common.js';
 import { MobType } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Target as TargetProto } from '/tbc/core/proto/common.js';
+import { PresetEncounter } from '/tbc/core/proto/api.js';
+import { PresetTarget } from '/tbc/core/proto/api.js';
 import { Target } from '/tbc/core/target.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 
@@ -10,16 +12,15 @@ import { EventID, TypedEvent } from './typed_event.js';
 
 // Manages all the settings for an Encounter.
 export class Encounter {
-	private readonly sim: Sim;
+	readonly sim: Sim;
 
 	private duration: number = 180;
 	private durationVariation: number = 5;
-	private numTargets: number = 1;
 	private executeProportion: number = 0.2;
-	readonly primaryTarget: Target;
+	private targets: Array<Target>;
 
+	readonly targetsChangeEmitter = new TypedEvent<void>();
 	readonly durationChangeEmitter = new TypedEvent<void>();
-	readonly numTargetsChangeEmitter = new TypedEvent<void>();
 	readonly executeProportionChangeEmitter = new TypedEvent<void>();
 
 	// Emits when any of the above emitters emit.
@@ -27,14 +28,17 @@ export class Encounter {
 
 	constructor(sim: Sim) {
 		this.sim = sim;
-		this.primaryTarget = new Target(sim);
+		this.targets = [Target.fromDefaults(TypedEvent.nextEventID(), sim)];
 
 		[
+			this.targetsChangeEmitter,
 			this.durationChangeEmitter,
-			this.numTargetsChangeEmitter,
 			this.executeProportionChangeEmitter,
-			this.primaryTarget.changeEmitter,
 		].forEach(emitter => emitter.on(eventID => this.changeEmitter.emit(eventID)));
+	}
+
+	get primaryTarget(): Target {
+		return this.targets[0];
 	}
 
 	getDurationVariation(): number {
@@ -71,28 +75,48 @@ export class Encounter {
 	}
 
 	getNumTargets(): number {
-		return this.numTargets;
+		return this.targets.length;
 	}
-	setNumTargets(eventID: EventID, newNumTargets: number) {
-		if (newNumTargets == this.numTargets)
-			return;
 
-		this.numTargets = newNumTargets;
-		this.numTargetsChangeEmitter.emit(eventID);
+	getTargets(): Array<Target> {
+		return this.targets.slice();
+	}
+	setTargets(eventID: EventID, newTargets: Array<Target>) {
+		TypedEvent.freezeAllAndDo(() => {
+			if (newTargets.length == 0) {
+				newTargets = [Target.fromDefaults(eventID, this.sim)];
+			}
+			if (newTargets.length == this.targets.length && newTargets.every((target, i) => TargetProto.equals(target.toProto(), this.targets[i].toProto()))) {
+				return;
+			}
+
+			this.targets = newTargets;
+			this.targetsChangeEmitter.emit(eventID);
+		});
+	}
+
+	matchesPreset(preset: PresetEncounter): boolean {
+		return preset.targets.length == this.targets.length && this.targets.every((t, i) => t.matchesPreset(preset.targets[i]));
+	}
+
+	applyPreset(eventID: EventID, preset: PresetEncounter) {
+		TypedEvent.freezeAllAndDo(() => {
+			let newTargets = this.targets.slice(0, preset.targets.length);
+			while (newTargets.length < preset.targets.length) {
+				newTargets.push(new Target(this.sim));
+			}
+
+			newTargets.forEach((nt, i) => nt.applyPreset(eventID, preset.targets[i]));
+			this.setTargets(eventID, newTargets);
+		});
 	}
 
 	toProto(): EncounterProto {
-		const numTargets = Math.max(1, this.numTargets);
-		const targetProtos = [];
-		for (let i = 0; i < numTargets; i++) {
-			targetProtos.push(this.primaryTarget.toProto());
-		}
-
 		return EncounterProto.create({
 			duration: this.duration,
 			durationVariation: this.durationVariation,
 			executeProportion: this.executeProportion,
-			targets: targetProtos,
+			targets: this.targets.map(target => target.toProto()),
 		});
 	}
 
@@ -101,10 +125,15 @@ export class Encounter {
 			this.setDuration(eventID, proto.duration);
 			this.setDurationVariation(eventID, proto.durationVariation);
 			this.setExecuteProportion(eventID, proto.executeProportion);
-			this.setNumTargets(eventID, proto.targets.length);
 
 			if (proto.targets.length > 0) {
-				this.primaryTarget.fromProto(eventID, proto.targets[0]);
+				this.setTargets(eventID, proto.targets.map(targetProto => {
+					const target = new Target(this.sim);
+					target.fromProto(eventID, targetProto);
+					return target;
+				}));
+			} else {
+				this.setTargets(eventID, [ Target.fromDefaults(eventID, this.sim) ]);
 			}
 		});
 	}
@@ -114,11 +143,7 @@ export class Encounter {
 			duration: 180,
 			durationVariation: 5,
 			executeProportion: 0.2,
-			targets: [TargetProto.create({
-				level: 73,
-				stats: new Stats().withStat(Stat.StatArmor, 7684).asArray(),
-				mobType: MobType.MobTypeDemon,
-			})],
+			targets: [ Target.defaultProto() ],
 		}));
 	}
 }

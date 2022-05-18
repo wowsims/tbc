@@ -31,54 +31,53 @@ var AverageDefaultSimTestOptions = &proto.SimOptions{
 const ShortDuration = 60
 const LongDuration = 300
 
+var DefaultTargetProto = proto.Target{
+	Level: 73,
+	Stats: stats.Stats{
+		stats.Armor:       7684,
+		stats.AttackPower: 320,
+		stats.BlockValue:  54,
+	}.ToFloatArray(),
+	MobType: proto.MobType_MobTypeDemon,
+
+	SwingSpeed:    2,
+	MinBaseDamage: 4192.05,
+	CanCrush:      true,
+	ParryHaste:    true,
+}
+
+func NewDefaultTarget() *proto.Target {
+	var target = &proto.Target{}
+	*target = DefaultTargetProto
+	return target
+}
+
 func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
-	var NoDebuffTarget = &proto.Target{
-		Level:   73,
-		Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
-		MobType: proto.MobType_MobTypeBeast,
-		Debuffs: &proto.Debuffs{},
-	}
+	var DefaultTarget = NewDefaultTarget()
 
-	var FullDebuffTarget = &proto.Target{
-		Level:   73,
-		Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
-		MobType: proto.MobType_MobTypeDemon,
-		Debuffs: debuffs,
-	}
-
-	multipleFullDebuffTargets := []*proto.Target{}
+	multipleTargets := []*proto.Target{}
 	for i := 0; i < 20; i++ {
-		multipleFullDebuffTargets = append(multipleFullDebuffTargets, FullDebuffTarget)
+		multipleTargets = append(multipleTargets, DefaultTarget)
 	}
 
 	return []EncounterCombo{
 		EncounterCombo{
-			Label: "LongSingleTargetNoDebuffs",
-			Encounter: &proto.Encounter{
-				Duration:          LongDuration,
-				ExecuteProportion: 0.2,
-				Targets: []*proto.Target{
-					NoDebuffTarget,
-				},
-			},
-		},
-		EncounterCombo{
-			Label: "ShortSingleTargetFullDebuffs",
+			Label: "ShortSingleTarget",
 			Encounter: &proto.Encounter{
 				Duration:          ShortDuration,
 				ExecuteProportion: 0.2,
 				Targets: []*proto.Target{
-					FullDebuffTarget,
+					DefaultTarget,
 				},
 			},
 		},
 		EncounterCombo{
-			Label: "LongSingleTargetFullDebuffs",
+			Label: "LongSingleTarget",
 			Encounter: &proto.Encounter{
 				Duration:          LongDuration,
 				ExecuteProportion: 0.2,
 				Targets: []*proto.Target{
-					FullDebuffTarget,
+					DefaultTarget,
 				},
 			},
 		},
@@ -87,24 +86,19 @@ func MakeDefaultEncounterCombos(debuffs *proto.Debuffs) []EncounterCombo {
 			Encounter: &proto.Encounter{
 				Duration:          LongDuration,
 				ExecuteProportion: 0.2,
-				Targets:           multipleFullDebuffTargets,
+				Targets:           multipleTargets,
 			},
 		},
 	}
 }
 
-func MakeSingleTargetFullDebuffEncounter(debuffs *proto.Debuffs, variation float64) *proto.Encounter {
+func MakeSingleTargetEncounter(variation float64) *proto.Encounter {
 	return &proto.Encounter{
 		Duration:          LongDuration,
 		DurationVariation: variation,
 		ExecuteProportion: 0.2,
 		Targets: []*proto.Target{
-			&proto.Target{
-				Level:   73,
-				Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
-				MobType: proto.MobType_MobTypeDemon,
-				Debuffs: debuffs,
-			},
+			NewDefaultTarget(),
 		},
 	}
 }
@@ -131,7 +125,7 @@ func StatWeightsTest(label string, t *testing.T, _swr *proto.StatWeightsRequest,
 	swr.SimOptions.Iterations = 5000
 
 	result := StatWeights(swr)
-	resultWeights := stats.FromFloatArray(result.Weights)
+	resultWeights := stats.FromFloatArray(result.Dps.Weights)
 
 	const tolerance = 0.05
 	if !resultWeights.EqualsWithTolerance(expectedStatWeights, tolerance) {

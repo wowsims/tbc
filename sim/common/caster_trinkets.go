@@ -118,6 +118,15 @@ func ApplyEyeOfMagtheridon(agent core.Agent) {
 			}
 			procAura.Activate(sim)
 		},
+		OnPeriodicDamageDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+				return
+			}
+			if !spellEffect.Outcome.Matches(core.OutcomeMiss) {
+				return
+			}
+			procAura.Activate(sim)
+		},
 	})
 }
 

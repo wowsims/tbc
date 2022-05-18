@@ -11,7 +11,9 @@ import (
  * Returns all items, enchants, and gems recognized by the sim.
  */
 func GetGearList(request *proto.GearListRequest) *proto.GearListResult {
-	result := &proto.GearListResult{}
+	result := &proto.GearListResult{
+		Encounters: presetEncounters[:],
+	}
 
 	for i := range items.Items {
 		item := items.Items[i]
@@ -48,12 +50,7 @@ func StatWeights(request *proto.StatWeightsRequest) *proto.StatWeightsResult {
 
 	result := CalcStatWeight(*request, statsToWeigh, stats.Stat(request.EpReferenceStat), nil)
 
-	return &proto.StatWeightsResult{
-		Weights:       result.Weights[:],
-		WeightsStdev:  result.WeightsStdev[:],
-		EpValues:      result.EpValues[:],
-		EpValuesStdev: result.EpValuesStdev[:],
-	}
+	return result.ToProto()
 }
 
 func StatWeightsAsync(request *proto.StatWeightsRequest, progress chan *proto.ProgressMetrics) {
@@ -61,12 +58,7 @@ func StatWeightsAsync(request *proto.StatWeightsRequest, progress chan *proto.Pr
 	go func() {
 		result := CalcStatWeight(*request, statsToWeigh, stats.Stat(request.EpReferenceStat), progress)
 		progress <- &proto.ProgressMetrics{
-			FinalWeightResult: &proto.StatWeightsResult{
-				Weights:       result.Weights[:],
-				WeightsStdev:  result.WeightsStdev[:],
-				EpValues:      result.EpValues[:],
-				EpValuesStdev: result.EpValuesStdev[:],
-			},
+			FinalWeightResult: result.ToProto(),
 		}
 	}()
 }

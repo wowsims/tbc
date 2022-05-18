@@ -46,6 +46,11 @@ func (druid *Druid) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 	if druid.Talents.ImprovedMarkOfTheWild == 5 { // probably could work on actually calculating the fraction effect later if we care.
 		raidBuffs.GiftOfTheWild = proto.TristateEffect_TristateEffectImproved
 	}
+
+	raidBuffs.Thorns = core.MaxTristate(raidBuffs.Thorns, proto.TristateEffect_TristateEffectRegular)
+	if druid.Talents.Brambles == 3 {
+		raidBuffs.Thorns = proto.TristateEffect_TristateEffectImproved
+	}
 }
 
 const ravenGoddessItemID = 32387

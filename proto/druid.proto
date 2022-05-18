@@ -27,6 +27,9 @@ message DruidTalents {
 		// Feral Combat
     int32 ferocity = 17;
     int32 feral_aggresion = 18;
+		int32 feral_instinct = 41;
+		int32 thick_hide = 42;
+		int32 feral_swiftness = 43;
     int32 sharpened_claws = 19;
     int32 shredding_attacks = 20;
     int32 predatory_strikes = 21;
@@ -70,6 +73,7 @@ message BalanceDruid {
 		bool hurricane = 5;
   }
   Rotation rotation = 1;
+
   DruidTalents talents = 2;
 
   message Options {
@@ -97,11 +101,25 @@ message FeralDruid {
     bool ripweave = 8;
   }
   Rotation rotation = 1;
+
   DruidTalents talents = 2;
 
   message Options {
     RaidTarget innervate_target = 1;
     int32 latency_ms = 2;
+  }
+  Options options = 3;
+}
+
+message FeralTankDruid {
+  message Rotation {
+  }
+  Rotation rotation = 1;
+
+  DruidTalents talents = 2;
+
+  message Options {
+    RaidTarget innervate_target = 1;
   }
   Options options = 3;
 }

@@ -18,7 +18,8 @@
 }
 
 .sim-title-dropdown {
-	width: 100%;
+	position: fixed !important;
+	z-index: 9999 !important;
 }
 
 .sim-title-button .sim-title-dropdown-option-container {

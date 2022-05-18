@@ -8,8 +8,10 @@ enum Spec {
     SpecElementalShaman = 1;
     SpecEnhancementShaman = 9;
     SpecFeralDruid = 12;
+    SpecFeralTankDruid = 14;
     SpecHunter = 8;
     SpecMage = 2;
+    SpecProtectionPaladin = 13;
     SpecRetributionPaladin = 3;
     SpecRogue = 7;
     SpecShadowPriest = 4;
@@ -198,6 +200,16 @@ enum GemColor {
     GemColorPrismatic = 8;
 }
 
+enum SpellSchool {
+    SpellSchoolPhysical = 0;
+    SpellSchoolArcane = 1;
+    SpellSchoolFire = 2;
+    SpellSchoolFrost = 3;
+    SpellSchoolHoly = 4;
+    SpellSchoolNature = 5;
+    SpellSchoolShadow = 6;
+}
+
 enum TristateEffect {
     TristateEffectMissing = 0;
     TristateEffectRegular = 1;
@@ -227,6 +239,8 @@ enum Potions {
 	MightyRagePotion = 4;
 	FelManaPotion = 5;
 	InsaneStrengthPotion = 6;
+	IronshieldPotion = 7;
+	HeroicPotion = 8;
 }
 
 enum Conjured {
@@ -245,6 +259,7 @@ enum WeaponImbue {
 	WeaponImbueElementalSharpeningStone = 2;
 	WeaponImbueBrilliantWizardOil = 3;
 	WeaponImbueSuperiorWizardOil = 4;
+	WeaponImbueRighteousWeaponCoating = 12;
 
 	WeaponImbueRogueDeadlyPoison = 10;
 	WeaponImbueRogueInstantPoison = 11;
@@ -262,6 +277,7 @@ enum Flask {
 	FlaskOfPureDeath = 3;
 	FlaskOfRelentlessAssault = 4;
 	FlaskOfSupremePower = 5;
+	FlaskOfFortification = 6;
 }
 
 enum BattleElixir {
@@ -273,6 +289,7 @@ enum BattleElixir {
 	ElixirOfMajorFrostPower = 5;
 	ElixirOfMajorShadowPower = 6;
 	ElixirOfMajorStrength = 7;
+	ElixirOfMastery = 10;
 	ElixirOfTheMongoose = 8;
 	FelStrengthElixir = 9;
 }
@@ -280,7 +297,11 @@ enum BattleElixir {
 enum GuardianElixir {
 	GuardianElixirUnknown = 0;
 	ElixirOfDraenicWisdom = 1;
+	ElixirOfIronskin = 5;
+	ElixirOfMajorDefense = 6;
+	ElixirOfMajorFortitude = 4;
 	ElixirOfMajorMageblood = 2;
+	GiftOfArthas = 3;
 }
 
 enum Food {
@@ -291,6 +312,7 @@ enum Food {
 	FoodRoastedClefthoof = 4;
 	FoodSkullfishSoup = 5;
 	FoodSpicyHotTalbuk = 6;
+	FoodFishermansFeast = 7;
 }
 
 enum PetFood {
@@ -306,8 +328,11 @@ enum Alchohol {
 // Buffs that affect the entire raid.
 message RaidBuffs {
     bool arcane_brilliance = 1;
+    TristateEffect power_word_fortitude = 7;
+    bool shadow_protection = 8;
     TristateEffect divine_spirit = 4;
     TristateEffect gift_of_the_wild = 5;
+		TristateEffect thorns = 6;
 }
 
 // Buffs that affect a single party.
@@ -315,9 +340,12 @@ message PartyBuffs {
     int32 bloodlust = 1;
 		int32 ferocious_inspiration = 22; // Number of BM hunters in party.
 
+    TristateEffect blood_pact = 34;
     TristateEffect moonkin_aura = 2;
     TristateEffect leader_of_the_pack = 19;
     TristateEffect sanctity_aura = 20;
+    TristateEffect devotion_aura = 35;
+    TristateEffect retribution_aura = 36;
     bool trueshot_aura = 21;
     bool draenei_racial_melee = 3;
     bool draenei_racial_caster = 4;
@@ -370,6 +398,7 @@ enum StrengthOfEarthType {
 message IndividualBuffs {
     bool blessing_of_kings = 1;
     bool blessing_of_salvation = 8;
+    bool blessing_of_sanctuary = 9;
     TristateEffect blessing_of_wisdom = 2;
     TristateEffect blessing_of_might = 3;
 
@@ -399,6 +428,7 @@ message Consumes {
     int32 scroll_of_agility = 44;
     int32 scroll_of_strength = 43;
     int32 scroll_of_spirit = 45;
+    int32 scroll_of_protection = 53;
 
     int32 pet_scroll_of_agility = 46;
     int32 pet_scroll_of_strength = 47;
@@ -429,17 +459,24 @@ message Debuffs {
     bool improved_scorch = 6;
     bool winters_chill = 7;
 
-    bool blood_frenzy = 8; // Blood Frenzy: +4% phy dmg
-    bool gift_of_arthas = 17; // Gift of Arthas: +8 phy dmg
+    bool blood_frenzy = 8;
+    bool gift_of_arthas = 17;
     bool mangle = 16;
-    TristateEffect expose_armor = 9; // Expose Armor (If you have a rogue):    5 points: 2050 armor / imp 5 points: 3075 armor
-    TristateEffect faerie_fire = 10; // Faerie Fire: -610 armor / imp 3% hit
-    bool sunder_armor = 11; // Number of stacks of sunder armor: -520 armor per stack, 5 max
-    bool curse_of_recklessness = 12; // -800 armor
+    TristateEffect expose_armor = 9;
+    TristateEffect faerie_fire = 10;
+    bool sunder_armor = 11;
+    bool curse_of_recklessness = 12;
 
 		TristateEffect hunters_mark = 15;
 		double expose_weakness_uptime = 13;
 		double expose_weakness_hunter_agility = 14;
+
+		TristateEffect demoralizing_roar = 19;
+		TristateEffect demoralizing_shout = 20;
+		TristateEffect thunder_clap = 21;
+		bool insect_swarm = 22;
+		bool scorpid_sting = 23;
+		bool shadow_embrace = 24;
 }
 
 enum MobType {
@@ -455,6 +492,10 @@ enum MobType {
 }
 
 message Target {
+		// The in-game NPC ID.
+		int32 id = 14;
+		string name = 15;
+
 		// TODO: Deprecate this after 1 month (2022/6/6)
 		double armor = 1;
 
@@ -462,10 +503,21 @@ message Target {
 		MobType mob_type = 3;
     repeated double stats = 5;
 
+		// Auto attack parameters.
+		double min_base_damage = 7;
+		double swing_speed = 8;
+		bool dual_wield = 9;
+		bool dual_wield_penalty = 10;
+		bool can_crush = 11;
+		bool parry_haste = 12;
+		bool suppress_dodge = 16;
+		SpellSchool spell_school = 13; // Allows elemental attacks.
+
 		// Index in Raid.tanks indicating the player tanking this mob.
 		// -1 or invalid index indicates not being tanked.
     int32 tank_index = 6;
 
+		//TODO: Deprecate after 1 month (2022/06/14).
 		Debuffs debuffs = 2;
 }
 
@@ -480,6 +532,7 @@ message Encounter {
     // Fury, etc.
     double execute_proportion = 3;
 
+		// If type != Simple or Custom, then this may be empty.
     repeated Target targets = 2;
 }
 

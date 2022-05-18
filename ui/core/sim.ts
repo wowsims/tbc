@@ -11,9 +11,11 @@ import { ItemSpec } from '/tbc/core/proto/common.js';
 import { ItemType } from '/tbc/core/proto/common.js';
 import { Item } from '/tbc/core/proto/common.js';
 import { Race } from '/tbc/core/proto/common.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
+import { PresetEncounter, PresetTarget } from '/tbc/core/proto/api.js';
 import { ComputeStatsRequest, ComputeStatsResult } from '/tbc/core/proto/api.js';
 import { GearListRequest, GearListResult } from '/tbc/core/proto/api.js';
 import { RaidSimRequest, RaidSimResult } from '/tbc/core/proto/api.js';
@@ -79,6 +81,8 @@ export class Sim {
 	private items: Record<number, Item> = {};
 	private enchants: Record<number, Enchant> = {};
 	private gems: Record<number, Gem> = {};
+	private presetEncounters: Record<string, PresetEncounter> = {};
+	private presetTargets: Record<string, PresetTarget> = {};
 
 	readonly iterationsChangeEmitter = new TypedEvent<void>();
 	readonly phaseChangeEmitter = new TypedEvent<void>();
@@ -104,7 +108,6 @@ export class Sim {
 
 	// These callbacks are needed so we can apply BuffBot modifications automatically before sending requests.
 	private modifyRaidProto: ((raidProto: RaidProto) => void) = () => { };
-	private modifyEncounterProto: ((encounterProto: EncounterProto) => void) = () => { };
 
 	constructor() {
 		this.workerPool = new WorkerPool(3);
@@ -113,6 +116,8 @@ export class Sim {
 			result.items.forEach(item => this.items[item.id] = item);
 			result.enchants.forEach(enchant => this.enchants[enchant.id] = enchant);
 			result.gems.forEach(gem => this.gems[gem.id] = gem);
+			result.encounters.forEach(encounter => this.presetEncounters[encounter.path] = encounter);
+			result.encounters.map(e => e.targets).flat().forEach(target => this.presetTargets[target.path] = target);
 		});
 
 		this.raid = new Raid(this);
@@ -166,25 +171,14 @@ export class Sim {
 		return raidProto;
 	}
 
-	setModifyEncounterProto(newModFn: (encounterProto: EncounterProto) => void) {
-		this.modifyEncounterProto = newModFn;
-	}
-	getModifiedEncounterProto(): EncounterProto {
-		const encounterProto = this.encounter.toProto();
-		this.modifyEncounterProto(encounterProto);
-		return encounterProto;
-	}
-
 	private makeRaidSimRequest(debug: boolean): RaidSimRequest {
 		const raid = this.getModifiedRaidProto();
-		const encounter = this.getModifiedEncounterProto();
+		const encounter = this.encounter.toProto();
 		const hunters = raid.parties.map(party => party.players).flat().filter(player => player.name && playerToSpec(player) == Spec.SpecHunter);
 		if (hunters.some(hunter => (specTypeFunctions[Spec.SpecHunter]!.talentsFromPlayer(hunter) as SpecTalents<Spec.SpecHunter>).exposeWeakness > 0)) {
-			encounter.targets.forEach(target => {
-				if (target.debuffs) {
-					target.debuffs.exposeWeaknessUptime = 0;
-				}
-			});
+			if (raid.debuffs) {
+				raid.debuffs.exposeWeaknessUptime = 0;
+			}
 		}
 
 		return RaidSimRequest.create({
@@ -272,16 +266,21 @@ export class Sim {
 			console.warn('Trying to get stat weights without a party!');
 			return StatWeightsResult.create();
 		} else {
+			const tanks = this.raid.getTanks().map(tank => tank.targetIndex).includes(player.getRaidIndex())
+					? [RaidTarget.create({ targetIndex: 0 })]
+					: [];
 			const request = StatWeightsRequest.create({
 				player: player.toProto(),
 				raidBuffs: this.raid.getBuffs(),
 				partyBuffs: player.getParty()!.getBuffs(),
+				debuffs: this.raid.getDebuffs(),
 				encounter: this.encounter.toProto(),
 				simOptions: SimOptions.create({
 					iterations: this.getIterations(),
 					randomSeed: BigInt(this.nextRngSeed()),
 					debug: false,
 				}),
+				tanks: tanks,
 
 				statsToWeigh: epStats,
 				epReferenceStat: epReferenceStat,
@@ -322,6 +321,19 @@ export class Sim {
 
 	getMatchingGems(socketColor: GemColor): Array<Gem> {
 		return Object.values(this.gems).filter(gem => gemMatchesSocket(gem, socketColor));
+	}
+
+	getPresetEncounter(path: string): PresetEncounter | null {
+		return this.presetEncounters[path] || null;
+	}
+	getPresetTarget(path: string): PresetTarget | null {
+		return this.presetTargets[path] || null;
+	}
+	getAllPresetEncounters(): Array<PresetEncounter> {
+		return Object.values(this.presetEncounters);
+	}
+	getAllPresetTargets(): Array<PresetTarget> {
+		return Object.values(this.presetTargets);
 	}
 
 	getPhase(): number {

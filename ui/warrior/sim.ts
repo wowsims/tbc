@@ -44,15 +44,6 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
 			],
-			warnings: [
-				(simUI: IndividualSimUI<Spec.SpecWarrior>) => {
-					return {
-						updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter]),
-						shouldDisplay: () => true,
-						getContent: () => 'This sim is newly released, and there are likely a few bugs. Please let us know if you encounter any issues!',
-					};
-				},
-			],
 
 			// All stats for which EP should be calculated.
 			epStats: [
@@ -69,6 +60,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 			epReferenceStat: Stat.StatAttackPower,
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
+				Stat.StatHealth,
 				Stat.StatStamina,
 				Stat.StatStrength,
 				Stat.StatAgility,
@@ -208,6 +200,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 					WeaponImbue.WeaponImbueAdamantiteSharpeningStone,
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
 					WeaponImbue.WeaponImbueElementalSharpeningStone,
+					WeaponImbue.WeaponImbueRighteousWeaponCoating,
 				],
 				other: [
 					IconInputs.ScrollOfAgilityV,
@@ -226,6 +219,7 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
+					OtherInputs.TankAssignment,
 					OtherInputs.InFrontOfTarget,
 				],
 			},
@@ -236,8 +230,6 @@ export class WarriorSimUI extends IndividualSimUI<Spec.SpecWarrior> {
 				],
 				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
 				showExecuteProportion: true,
-				// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
-				showNumTargets: true,
 			},
 
 			// If true, the talents on the talents tab will not be individually modifiable by the user.

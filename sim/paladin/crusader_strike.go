@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -38,7 +39,7 @@ func (paladin *Paladin) registerCrusaderStrikeSpell() {
 			ThreatMultiplier: 1,
 
 			// maybe this isn't the one that should be set to 1.1
-			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, 1.1, true),
+			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 31033, 36, 0), 1.1, true),
 			OutcomeApplier: paladin.OutcomeFuncMeleeSpecialHitAndCrit(paladin.DefaultMeleeCritMultiplier()),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {

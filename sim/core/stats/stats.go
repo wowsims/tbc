@@ -429,7 +429,9 @@ type PseudoStats struct {
 	BonusMHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
 	BonusOHCritRating     float64 // Talents, e.g. Rogue Dagger specialization
 
-	DisableDWMissPenalty bool // Used by Heroic Strike and Cleave
+	DisableDWMissPenalty bool    // Used by Heroic Strike and Cleave
+	IncreasedMissChance  float64 // Insect Swarm and Scorpid Sting
+	DodgeReduction       float64 // Used by Warrior talent 'Weapon Mastery' and SWP boss auras.
 
 	MobTypeAttackPower float64 // Bonus AP against mobs of the current type.
 	MobTypeSpellPower  float64 // Bonus SP against mobs of the current type.
@@ -437,9 +439,9 @@ type PseudoStats struct {
 	// For Human and Orc weapon racials
 	BonusMHExpertiseRating float64
 	BonusOHExpertiseRating float64
-	DodgeReduction         float64 // Used by Warrior talent 'Weapon Mastery'
 
-	ThreatMultiplier float64 // Modulates the threat generated. Affected by things like salv.
+	ThreatMultiplier          float64 // Modulates the threat generated. Affected by things like salv.
+	HolySpellThreatMultiplier float64 // Righteous Fury
 
 	DamageDealtMultiplier       float64 // All damage
 	RangedDamageDealtMultiplier float64
@@ -464,12 +466,15 @@ type PseudoStats struct {
 	CanParry bool
 	CanCrush bool
 
+	ParryHaste bool
+
 	BonusMeleeAttackPower  float64 // Imp Hunters mark, EW
 	BonusRangedAttackPower float64 // Hunters mark, EW
 	BonusCritRating        float64 // Imp Judgement of the Crusader
 	BonusFrostCritRating   float64 // Winter's Chill
 	BonusMeleeHitRating    float64 // Imp FF
 
+	BonusDamageTaken         float64 // Blessing of Sanctuary
 	BonusPhysicalDamageTaken float64 // Hemo, Gift of Arthas, etc
 	BonusHolyDamageTaken     float64 // Judgement of the Crusader
 
@@ -494,7 +499,9 @@ func NewPseudoStats() PseudoStats {
 		MeleeSpeedMultiplier: 1,
 		//RangedSpeedMultiplier: 1, // Leave at 0 so we can use this to ignore ranged stuff for non-hunters.
 		SpiritRegenMultiplier: 1,
-		ThreatMultiplier:      1,
+
+		ThreatMultiplier:          1,
+		HolySpellThreatMultiplier: 1,
 
 		DamageDealtMultiplier:       1,
 		RangedDamageDealtMultiplier: 1,

@@ -19,7 +19,12 @@ export class NumberPicker<ModObject> extends Input<ModObject, number> {
 		this.float = config.float || false;
 
 		this.inputElem = document.createElement('input');
-		this.inputElem.type = 'number';
+		if (this.float) {
+			this.inputElem.type = 'text';
+			this.inputElem.inputMode = 'numeric';
+		} else {
+			this.inputElem.type = 'number';
+		}
 		this.inputElem.classList.add('number-picker-input');
 		this.rootElem.appendChild(this.inputElem);
 

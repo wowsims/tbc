@@ -3,7 +3,6 @@ package rogue
 import (
 	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
-	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 var CombatTalents = &proto.RogueTalents{
@@ -137,11 +136,6 @@ var FullDebuffs = &proto.Debuffs{
 	FaerieFire:                proto.TristateEffect_TristateEffectImproved,
 	ImprovedSealOfTheCrusader: true,
 	Misery:                    true,
-}
-
-var FullDebuffTarget = &proto.Target{
-	Debuffs: FullDebuffs,
-	Stats:   stats.Stats{stats.Armor: 7684}.ToFloatArray(),
 }
 
 var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{

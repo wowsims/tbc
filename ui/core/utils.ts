@@ -29,6 +29,11 @@ export function maxIndex(arr: Array<number>): number | null {
 	return arr.reduce((cur, v, i, arr) => v > arr[cur] ? i : cur, 0);
 }
 
+// Swaps two elements in the given array.
+export function swap<T>(arr: Array<T>, i: number, j: number) {
+	[arr[i], arr[j]] = [arr[j], arr[i]];
+}
+
 // Returns a new array containing only elements present in both a and b.
 export function arrayEquals<T>(a: Array<T>, b: Array<T>, comparator?: (a: T, b: T) => boolean): boolean {
 	comparator = comparator || ((a: T, b: T) => a == b);
@@ -121,9 +126,9 @@ export function downloadString(data: string, fileName: string) {
 	downloadAnchorNode.remove();
 }
 
-export function formatDeltaTextElem(elem: HTMLElement, before: number, after: number) {
+export function formatDeltaTextElem(elem: HTMLElement, before: number, after: number, precision: number) {
 	const delta = after - before;
-	const deltaStr = delta.toFixed(2);
+	const deltaStr = delta.toFixed(precision);
 	if (delta >= 0) {
 		elem.textContent = '+' + deltaStr;
 		elem.classList.remove('negative');

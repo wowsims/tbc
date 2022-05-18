@@ -165,7 +165,7 @@ $sim-transitions: .2s ease-in;
 }
 
 .dropdown-root:hover .dropdown-panel {
-	display: block !important;
+	display: flex !important;
 }
 
 .dropdown-option-container:hover {

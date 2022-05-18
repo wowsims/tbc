@@ -30,7 +30,7 @@ export class SettingsMenu extends Popup {
 
 		this.rootElem.innerHTML = `
 			<div class="settings-menu-title">
-				<span>SETTINGS</span>
+				<span>OPTIONS</span>
 			</div>
 			<div class="settings-menu-content">
 				<div class="settings-menu-content-left">
@@ -99,39 +99,5 @@ export class SettingsMenu extends Popup {
 				sim.setShowExperimental(eventID, newValue);
 			},
 		});
-
-		this.setupEpWeightsSettings();
-	}
-
-	private setupEpWeightsSettings() {
-		const sectionRoot = this.rootElem.getElementsByClassName('settings-menu-ep-weights')[0] as HTMLElement;
-
-		if (!(this.simUI instanceof IndividualSimUI) || this.simUI.isWithinRaidSim) {
-			sectionRoot.classList.add('hide');
-			return;
-		}
-		const individualSimUI = this.simUI as IndividualSimUI<any>;
-
-		const label = document.createElement('span');
-		label.classList.add('ep-weights-label');
-		label.textContent = 'EP Weights';
-		tippy(label, {
-			'content': 'EP Weights for sorting the item selector.',
-			'allowHTML': true,
-		});
-		sectionRoot.appendChild(label);
-
-		//const epStats = this.simUI.individualConfig.epStats;
-		const epStats = (getEnumValues(Stat) as Array<Stat>).filter(stat => ![Stat.StatMana, Stat.StatEnergy, Stat.StatRage].includes(stat));
-		const weightPickers = epStats.map(stat => new NumberPicker(sectionRoot, individualSimUI.player, {
-			float: true,
-			label: statNames[stat],
-			changedEvent: (player: Player<any>) => player.epWeightsChangeEmitter,
-			getValue: (player: Player<any>) => player.getEpWeights().getStat(stat),
-			setValue: (eventID: EventID, player: Player<any>, newValue: number) => {
-				const epWeights = player.getEpWeights().withStat(stat, newValue);
-				player.setEpWeights(eventID, epWeights);
-			},
-		}));
 	}
 }

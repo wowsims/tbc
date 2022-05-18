@@ -6,6 +6,7 @@ import (
 
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 var ByName = map[string]Item{}
@@ -347,6 +348,15 @@ func EquipmentSpecFromStrings(itemStringSpecs []ItemStringSpec) *proto.Equipment
 		eq.Items[i] = itemSpec
 	}
 	return eq
+}
+func EquipmentSpecFromJsonString(jsonString string) *proto.EquipmentSpec {
+	es := &proto.EquipmentSpec{}
+
+	data := []byte(jsonString)
+	if err := protojson.Unmarshal(data, es); err != nil {
+		panic(err)
+	}
+	return es
 }
 
 func (equipment Equipment) Clone() Equipment {

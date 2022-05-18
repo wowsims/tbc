@@ -294,6 +294,8 @@ func (character *Character) Finalize() {
 	character.StatDependencyManager.Finalize()
 	character.stats = character.ApplyStatDependencies(character.stats)
 
+	character.PseudoStats.ParryHaste = character.PseudoStats.CanParry
+
 	character.Unit.finalize()
 
 	character.majorCooldownManager.finalize(character)
@@ -333,6 +335,11 @@ func (character *Character) advance(sim *Simulation, elapsedTime time.Duration) 
 func (character *Character) HasTrinketEquipped(itemID int32) bool {
 	return character.Equip[items.ItemSlotTrinket1].ID == itemID ||
 		character.Equip[items.ItemSlotTrinket2].ID == itemID
+}
+
+func (character *Character) HasRingEquipped(itemID int32) bool {
+	return character.Equip[items.ItemSlotFinger1].ID == itemID ||
+		character.Equip[items.ItemSlotFinger2].ID == itemID
 }
 
 func (character *Character) HasMetaGemEquipped(gemID int32) bool {

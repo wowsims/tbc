@@ -92,7 +92,6 @@ export interface BuffBotSettings {
 
 	// Callback to apply buffs from this buff bot.
 	modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => void,
-	modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => void,
 }
 
 export const playerPresets: Array<PresetSpecSettings<any>> = [
@@ -686,6 +685,8 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/ability_racial_bearform.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			raidProto.buffs!.giftOfTheWild = Math.max(raidProto.buffs!.giftOfTheWild, TristateEffect.TristateEffectRegular);
+			raidProto.buffs!.thorns = Math.max(raidProto.buffs!.thorns, TristateEffect.TristateEffectRegular);
+			raidProto.debuffs!.faerieFire = Math.max(raidProto.debuffs!.faerieFire, TristateEffect.TristateEffectRegular);
 			partyProto.buffs!.leaderOfThePack = Math.max(partyProto.buffs!.leaderOfThePack, TristateEffect.TristateEffectRegular);
 
 			const innervateIndex = buffBot.getInnervateAssignment().targetIndex;
@@ -698,9 +699,6 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 				}
 			}
 		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			encounterProto.targets[0].debuffs!.faerieFire = Math.max(encounterProto.targets[0].debuffs!.faerieFire, TristateEffect.TristateEffectRegular);
-		},
 	},
 	{
 		// The value of this field must never change, to preserve local storage data.
@@ -711,6 +709,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_healingtouch.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			raidProto.buffs!.giftOfTheWild = TristateEffect.TristateEffectImproved;
+			raidProto.buffs!.thorns = Math.max(raidProto.buffs!.thorns, TristateEffect.TristateEffectRegular);
 
 			const innervateIndex = buffBot.getInnervateAssignment().targetIndex;
 			if (innervateIndex != NO_TARGET) {
@@ -721,8 +720,6 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 					playerProto.buffs.innervates++;
 				}
 			}
-		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
 		},
 	},
 	{
@@ -734,6 +731,8 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_faeriefire.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			raidProto.buffs!.giftOfTheWild = TristateEffect.TristateEffectImproved;
+			raidProto.buffs!.thorns = TristateEffect.TristateEffectImproved;
+			raidProto.debuffs!.faerieFire = TristateEffect.TristateEffectImproved;
 
 			const innervateIndex = buffBot.getInnervateAssignment().targetIndex;
 			if (innervateIndex != NO_TARGET) {
@@ -744,9 +743,6 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 					playerProto.buffs.innervates++;
 				}
 			}
-		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			encounterProto.targets[0].debuffs!.faerieFire = TristateEffect.TristateEffectImproved;
 		},
 	},
 	{
@@ -760,8 +756,6 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			raidProto.buffs!.arcaneBrilliance = true;
 		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-		},
 	},
 	{
 		// The value of this field must never change, to preserve local storage data.
@@ -773,8 +767,6 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			// Do nothing, blessings are handled elswhere.
 		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-		},
 	},
 	{
 		// The value of this field must never change, to preserve local storage data.
@@ -784,10 +776,8 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		tooltip: 'JoW Paladin: Adds a set of blessings and Judgement of Wisdom.',
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_righteousnessaura.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
-			// Do nothing, blessings are handled elswhere.
-		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			encounterProto.targets[0].debuffs!.judgementOfWisdom = true;
+			// Blessings are handled elswhere.
+			raidProto.debuffs!.judgementOfWisdom = true;
 		},
 	},
 	{
@@ -798,10 +788,8 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		tooltip: 'JoC Paladin: Adds a set of blessings and Improved Judgement of the Crusader (+3% crit).',
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_holysmite.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
-			// Do nothing, blessings are handled elswhere.
-		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			encounterProto.targets[0].debuffs!.improvedSealOfTheCrusader = true;
+			// Blessings are handled elswhere.
+			raidProto.debuffs!.improvedSealOfTheCrusader = true;
 		},
 	},
 	{
@@ -812,8 +800,6 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		tooltip: 'Holy Priest: Doesn\'t contribute to DPS, just fills a raid slot.',
 		iconUrl: talentTreeIcons[Class.ClassPriest][1],
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
-		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
 		},
 	},
 	{
@@ -836,8 +822,6 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 				}
 			}
 		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-		},
 	},
 	{
 		// The value of this field must never change, to preserve local storage data.
@@ -853,8 +837,6 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 			partyProto.buffs!.manaTideTotems++;
 			partyProto.buffs!.drums = Drums.DrumsOfBattle;
 		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-		},
 	},
 	{
 		// The value of this field must never change, to preserve local storage data.
@@ -865,9 +847,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		tooltip: 'CoE Warlock: Adds Curse of Elements (regular). Also adds +20% uptime to ISB.',
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_chilltouch.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
-		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			const debuffs = encounterProto.targets[0].debuffs!;
+			const debuffs = raidProto.debuffs!;
 			debuffs.curseOfElements = Math.max(debuffs.curseOfElements, TristateEffect.TristateEffectRegular);
 			debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
 		},
@@ -881,9 +861,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		tooltip: 'Afflication Warlock: Adds Curse of Elements (improved). Also adds +20% uptime to ISB.',
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_curseofachimonde.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
-		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			const debuffs = encounterProto.targets[0].debuffs!;
+			const debuffs = raidProto.debuffs!;
 			debuffs.curseOfElements = TristateEffect.TristateEffectImproved;
 			debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
 		},
@@ -897,9 +875,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		tooltip: 'CoR Warlock: Adds Curse of Recklessness. Also adds +20% uptime to ISB.',
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_shadow_unholystrength.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
-		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			const debuffs = encounterProto.targets[0].debuffs!;
+			const debuffs = raidProto.debuffs!;
 			debuffs.curseOfRecklessness = true;
 			debuffs.isbUptime = Math.min(1.0, debuffs.isbUptime + 0.2);
 		},
@@ -914,9 +890,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/medium/ability_warrior_savageblow.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			partyProto.buffs!.battleShout = TristateEffect.TristateEffectImproved;
-		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			const debuffs = encounterProto.targets[0].debuffs!;
+			const debuffs = raidProto.debuffs!;
 			debuffs.sunderArmor = true;
 			debuffs.bloodFrenzy = true;
 		},
@@ -931,9 +905,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/medium/ability_warrior_innerrage.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
 			partyProto.buffs!.battleShout = TristateEffect.TristateEffectImproved;
-		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			const debuffs = encounterProto.targets[0].debuffs!;
+			const debuffs = raidProto.debuffs!;
 			debuffs.sunderArmor = true;
 		},
 	},
@@ -945,9 +917,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		tooltip: 'Prot Warrior: Adds Sunder Armor.',
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/medium/inv_shield_06.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
-		},
-		modifyEncounterProto: (buffBot: BuffBot, encounterProto: EncounterProto) => {
-			const debuffs = encounterProto.targets[0].debuffs!;
+			const debuffs = raidProto.debuffs!;
 			debuffs.sunderArmor = true;
 		},
 	},

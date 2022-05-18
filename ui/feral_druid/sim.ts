@@ -63,6 +63,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 			epReferenceStat: Stat.StatAttackPower,
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
+				Stat.StatHealth,
 				Stat.StatStrength,
 				Stat.StatAgility,
 				Stat.StatIntellect,
@@ -212,6 +213,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 				],
 				weaponImbues: [
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
+					WeaponImbue.WeaponImbueRighteousWeaponCoating,
 				],
 				other: [
 					IconInputs.ScrollOfAgilityV,
@@ -229,6 +231,7 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.SnapshotBsSolarianSapphire,
+					OtherInputs.TankAssignment,
 					OtherInputs.InFrontOfTarget,
 				],
 			},
@@ -239,8 +242,6 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 				],
 				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
 				showExecuteProportion: false,
-				// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
-				showNumTargets: false,
 			},
 
 			// If true, the talents on the talents tab will not be individually modifiable by the user.

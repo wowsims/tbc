@@ -67,6 +67,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			epReferenceStat: Stat.StatAttackPower,
 			// Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
 			displayStats: [
+				Stat.StatHealth,
 				Stat.StatStamina,
 				Stat.StatStrength,
 				Stat.StatAgility,
@@ -93,7 +94,6 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 					[Stat.StatAgility]: 1.88,
 					[Stat.StatIntellect]: 0,
 					[Stat.StatAttackPower]: 1,
-					[Stat.StatMeleeHit]: 5.38,
 					[Stat.StatMeleeCrit]: 1.98,
 					[Stat.StatExpertise]: 4.70,
 					[Stat.StatMeleeHaste]: 3.27,
@@ -229,6 +229,7 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 					WeaponImbue.WeaponImbueAdamantiteWeightstone,
 					WeaponImbue.WeaponImbueBrilliantWizardOil,
 					WeaponImbue.WeaponImbueSuperiorWizardOil,
+					WeaponImbue.WeaponImbueRighteousWeaponCoating,
 				],
 				other: [
 					IconInputs.ScrollOfStrengthV,
@@ -240,12 +241,15 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 			// Inputs to include in the 'Other' section on the settings tab.
 			otherInputs: {
 				inputs: [
+					RetributionPaladinInputs.AuraSelection,
 					RetributionPaladinInputs.JudgementSelection,
 					RetributionPaladinInputs.CrusaderStrikeDelayMS,
 					RetributionPaladinInputs.DamgeTakenPerSecond,
 					OtherInputs.ExposeWeaknessUptime,
 					OtherInputs.ExposeWeaknessHunterAgility,
 					OtherInputs.ISBUptime,
+					OtherInputs.SnapshotImprovedStrengthOfEarthTotem,
+					OtherInputs.TankAssignment,
 					OtherInputs.InFrontOfTarget,
 				],
 			},
@@ -256,8 +260,6 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				],
 				// Whether to include 'Execute Duration (%)' in the 'Encounter' section of the settings tab.
 				showExecuteProportion: false,
-				// Whether to include 'Num Targets' in the 'Encounter' section of the settings tab.
-				showNumTargets: true,
 			},
 
 			// If true, the talents on the talents tab will not be individually modifiable by the user.
