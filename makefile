@@ -11,13 +11,14 @@ else
 endif
 
 # Make everything. Keep this first so it's the default rule.
-$(OUT_DIR): ui_shared balance_druid elemental_shaman enhancement_shaman feral_druid hunter mage rogue retribution_paladin protection_paladin shadow_priest smite_priest warlock warrior protection_warrior raid
+$(OUT_DIR): ui_shared balance_druid feral_druid feral_tank_druid elemental_shaman enhancement_shaman hunter mage rogue retribution_paladin protection_paladin shadow_priest smite_priest warlock warrior protection_warrior raid
 
 # Add new sim rules here! Don't forget to add it as a dependency to the default rule above.
 balance_druid: $(OUT_DIR)/balance_druid/index.js $(OUT_DIR)/balance_druid/index.css $(OUT_DIR)/balance_druid/index.html
+feral_druid: $(OUT_DIR)/feral_druid/index.js $(OUT_DIR)/feral_druid/index.css $(OUT_DIR)/feral_druid/index.html
+feral_tank_druid: $(OUT_DIR)/feral_tank_druid/index.js $(OUT_DIR)/feral_tank_druid/index.css $(OUT_DIR)/feral_tank_druid/index.html
 elemental_shaman: $(OUT_DIR)/elemental_shaman/index.js $(OUT_DIR)/elemental_shaman/index.css $(OUT_DIR)/elemental_shaman/index.html
 enhancement_shaman: $(OUT_DIR)/enhancement_shaman/index.js $(OUT_DIR)/enhancement_shaman/index.css $(OUT_DIR)/enhancement_shaman/index.html
-feral_druid: $(OUT_DIR)/feral_druid/index.js $(OUT_DIR)/feral_druid/index.css $(OUT_DIR)/feral_druid/index.html
 hunter: $(OUT_DIR)/hunter/index.js $(OUT_DIR)/hunter/index.css $(OUT_DIR)/hunter/index.html
 mage: $(OUT_DIR)/mage/index.js $(OUT_DIR)/mage/index.css $(OUT_DIR)/mage/index.html
 rogue: $(OUT_DIR)/rogue/index.js $(OUT_DIR)/rogue/index.css $(OUT_DIR)/rogue/index.html
