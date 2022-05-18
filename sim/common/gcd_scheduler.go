@@ -216,6 +216,9 @@ func (gs *GCDScheduler) ScheduleGroup(newAbilities []ScheduledAbility) time.Dura
 // character's managed cooldowns.
 func (gs *GCDScheduler) ScheduleMCD(character *core.Character, mcdID core.ActionID) {
 	mcd := character.GetInitialMajorCooldown(mcdID)
+	if mcd.Spell == nil {
+		panic("No spell for MCD: " + mcdID.String())
+	}
 	if !mcd.Spell.ActionID.SameAction(mcdID) {
 		return
 	}
