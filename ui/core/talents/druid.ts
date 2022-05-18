@@ -243,7 +243,7 @@ export const druidTalentsConfig: TalentsConfig<Spec.SpecBalanceDruid> = newTalen
 				maxPoints: 5,
 			},
 			{
-				//fieldName: 'feralInstinct',
+				fieldName: 'feralInstinct',
 				location: {
 					rowIdx: 1,
 					colIdx: 0,
@@ -261,7 +261,7 @@ export const druidTalentsConfig: TalentsConfig<Spec.SpecBalanceDruid> = newTalen
 				maxPoints: 2,
 			},
 			{
-				//fieldName: 'thickHide',
+				fieldName: 'thickHide',
 				location: {
 					rowIdx: 1,
 					colIdx: 2,
@@ -270,7 +270,7 @@ export const druidTalentsConfig: TalentsConfig<Spec.SpecBalanceDruid> = newTalen
 				maxPoints: 3,
 			},
 			{
-				//fieldName: 'feralSwiftness',
+				fieldName: 'feralSwiftness',
 				location: {
 					rowIdx: 2,
 					colIdx: 0,
