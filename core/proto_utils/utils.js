@@ -23,7 +23,7 @@ import { Blessings } from '/tbc/core/proto/ui.js';
 import { BlessingsAssignment } from '/tbc/core/proto/ui.js';
 import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
-import { BalanceDruid, FeralDruid, BalanceDruid_Rotation as BalanceDruidRotation, FeralDruid_Rotation as FeralDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions, FeralDruid_Options as FeralDruidOptions } from '/tbc/core/proto/druid.js';
+import { BalanceDruid, FeralDruid, FeralTankDruid, BalanceDruid_Rotation as BalanceDruidRotation, FeralDruid_Rotation as FeralDruidRotation, FeralTankDruid_Rotation as FeralTankDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions, FeralDruid_Options as FeralDruidOptions, FeralTankDruid_Options as FeralTankDruidOptions } from '/tbc/core/proto/druid.js';
 import { ElementalShaman, EnhancementShaman_Rotation as EnhancementShamanRotation, ElementalShaman_Rotation as ElementalShamanRotation, ShamanTalents, ElementalShaman_Options as ElementalShamanOptions, EnhancementShaman_Options as EnhancementShamanOptions, EnhancementShaman } from '/tbc/core/proto/shaman.js';
 import { Hunter, Hunter_Rotation as HunterRotation, HunterTalents, Hunter_Options as HunterOptions } from '/tbc/core/proto/hunter.js';
 import { Mage, Mage_Rotation as MageRotation, MageTalents, Mage_Options as MageOptions } from '/tbc/core/proto/mage.js';
@@ -40,6 +40,7 @@ export const NUM_SPECS = getEnumValues(Spec).length;
 export const naturalSpecOrder = [
     Spec.SpecBalanceDruid,
     Spec.SpecFeralDruid,
+    Spec.SpecFeralTankDruid,
     Spec.SpecHunter,
     Spec.SpecMage,
     Spec.SpecRetributionPaladin,
@@ -58,6 +59,7 @@ export const specNames = {
     [Spec.SpecElementalShaman]: 'Elemental Shaman',
     [Spec.SpecEnhancementShaman]: 'Enhancement Shaman',
     [Spec.SpecFeralDruid]: 'Feral Druid',
+    [Spec.SpecFeralTankDruid]: 'Feral Tank Druid',
     [Spec.SpecHunter]: 'Hunter',
     [Spec.SpecMage]: 'Mage',
     [Spec.SpecRogue]: 'Rogue',
@@ -86,6 +88,7 @@ export const specIconsLarge = {
     [Spec.SpecElementalShaman]: 'https://wow.zamimg.com/images/wow/icons/large/spell_nature_lightning.jpg',
     [Spec.SpecEnhancementShaman]: 'https://wow.zamimg.com/images/wow/icons/large/ability_shaman_stormstrike.jpg',
     [Spec.SpecFeralDruid]: 'https://wow.zamimg.com/images/wow/icons/large/ability_druid_catform.jpg',
+    [Spec.SpecFeralTankDruid]: 'https://wow.zamimg.com/images/wow/icons/large/ability_racial_bearform.jpg',
     [Spec.SpecHunter]: 'https://wow.zamimg.com/images/wow/icons/large/ability_marksmanship.jpg',
     [Spec.SpecMage]: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_magicalsentry.jpg',
     [Spec.SpecRogue]: 'https://wow.zamimg.com/images/wow/icons/large/classicon_rogue.jpg',
@@ -150,6 +153,7 @@ export const titleIcons = {
     [Spec.SpecElementalShaman]: '/tbc/assets/elemental_shaman_icon.png',
     [Spec.SpecEnhancementShaman]: '/tbc/assets/enhancement_shaman_icon.png',
     [Spec.SpecFeralDruid]: 'https://wow.zamimg.com/images/wow/icons/large/ability_druid_catform.jpg',
+    [Spec.SpecFeralTankDruid]: 'https://wow.zamimg.com/images/wow/icons/large/ability_druid_bearform.jpg',
     [Spec.SpecHunter]: '/tbc/assets/hunter_icon.png',
     [Spec.SpecMage]: '/tbc/assets/mage_icon.png',
     [Spec.SpecRogue]: '/tbc/assets/rogue_icon.png',
@@ -286,6 +290,32 @@ export const specTypeFunctions = {
         optionsFromPlayer: (player) => player.spec.oneofKind == 'feralDruid'
             ? player.spec.feralDruid.options || FeralDruidOptions.create()
             : FeralDruidOptions.create(),
+    },
+    [Spec.SpecFeralTankDruid]: {
+        rotationCreate: () => FeralTankDruidRotation.create(),
+        rotationEquals: (a, b) => FeralTankDruidRotation.equals(a, b),
+        rotationCopy: (a) => FeralTankDruidRotation.clone(a),
+        rotationToJson: (a) => FeralTankDruidRotation.toJson(a),
+        rotationFromJson: (obj) => FeralTankDruidRotation.fromJson(obj),
+        rotationFromPlayer: (player) => player.spec.oneofKind == 'feralTankDruid'
+            ? player.spec.feralTankDruid.rotation || FeralTankDruidRotation.create()
+            : FeralTankDruidRotation.create(),
+        talentsCreate: () => DruidTalents.create(),
+        talentsEquals: (a, b) => DruidTalents.equals(a, b),
+        talentsCopy: (a) => DruidTalents.clone(a),
+        talentsToJson: (a) => DruidTalents.toJson(a),
+        talentsFromJson: (obj) => DruidTalents.fromJson(obj),
+        talentsFromPlayer: (player) => player.spec.oneofKind == 'feralTankDruid'
+            ? player.spec.feralTankDruid.talents || DruidTalents.create()
+            : DruidTalents.create(),
+        optionsCreate: () => FeralTankDruidOptions.create(),
+        optionsEquals: (a, b) => FeralTankDruidOptions.equals(a, b),
+        optionsCopy: (a) => FeralTankDruidOptions.clone(a),
+        optionsToJson: (a) => FeralTankDruidOptions.toJson(a),
+        optionsFromJson: (obj) => FeralTankDruidOptions.fromJson(obj),
+        optionsFromPlayer: (player) => player.spec.oneofKind == 'feralTankDruid'
+            ? player.spec.feralTankDruid.options || FeralTankDruidOptions.create()
+            : FeralTankDruidOptions.create(),
     },
     [Spec.SpecHunter]: {
         rotationCreate: () => HunterRotation.create(),
@@ -573,6 +603,7 @@ export const specToClass = {
     [Spec.SpecElementalShaman]: Class.ClassShaman,
     [Spec.SpecEnhancementShaman]: Class.ClassShaman,
     [Spec.SpecFeralDruid]: Class.ClassDruid,
+    [Spec.SpecFeralTankDruid]: Class.ClassDruid,
     [Spec.SpecHunter]: Class.ClassHunter,
     [Spec.SpecMage]: Class.ClassMage,
     [Spec.SpecRogue]: Class.ClassRogue,
@@ -666,6 +697,7 @@ export const specToEligibleRaces = {
     [Spec.SpecElementalShaman]: shamanRaces,
     [Spec.SpecEnhancementShaman]: shamanRaces,
     [Spec.SpecFeralDruid]: druidRaces,
+    [Spec.SpecFeralTankDruid]: druidRaces,
     [Spec.SpecHunter]: hunterRaces,
     [Spec.SpecMage]: mageRaces,
     [Spec.SpecRetributionPaladin]: paladinRaces,
@@ -694,6 +726,7 @@ export function isDualWieldSpec(spec) {
     return dualWieldSpecs.includes(spec);
 }
 const tankSpecs = [
+    Spec.SpecFeralTankDruid,
     Spec.SpecProtectionPaladin,
     Spec.SpecProtectionWarrior,
 ];
@@ -707,6 +740,7 @@ export const specToLocalStorageKey = {
     [Spec.SpecElementalShaman]: '__elemental_shaman',
     [Spec.SpecEnhancementShaman]: '__enhacement_shaman',
     [Spec.SpecFeralDruid]: '__feral_druid',
+    [Spec.SpecFeralTankDruid]: '__feral_tank_druid',
     [Spec.SpecHunter]: '__hunter',
     [Spec.SpecMage]: '__mage',
     [Spec.SpecRetributionPaladin]: '__retribution_paladin',
@@ -756,6 +790,16 @@ export function withSpecProto(spec, player, rotation, talents, specOptions) {
             copy.spec = {
                 oneofKind: 'feralDruid',
                 feralDruid: FeralDruid.create({
+                    rotation: rotation,
+                    talents: talents,
+                    options: specOptions,
+                }),
+            };
+            return copy;
+        case Spec.SpecFeralTankDruid:
+            copy.spec = {
+                oneofKind: 'feralTankDruid',
+                feralTankDruid: FeralTankDruid.create({
                     rotation: rotation,
                     talents: talents,
                     options: specOptions,
@@ -1182,6 +1226,7 @@ export function makeDefaultBlessings(numPaladins) {
     return makeBlessingsAssignments(numPaladins, [
         { spec: Spec.SpecBalanceDruid, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
         { spec: Spec.SpecFeralDruid, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight, Blessings.BlessingOfWisdom] },
+        { spec: Spec.SpecFeralTankDruid, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfMight, Blessings.BlessingOfSanctuary] },
         { spec: Spec.SpecHunter, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfMight, Blessings.BlessingOfWisdom] },
         { spec: Spec.SpecMage, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },
         { spec: Spec.SpecRetributionPaladin, blessings: [Blessings.BlessingOfKings, Blessings.BlessingOfMight, Blessings.BlessingOfSalvation, Blessings.BlessingOfWisdom] },

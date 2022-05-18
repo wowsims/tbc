@@ -70,6 +70,9 @@ class DruidTalents$Type extends MessageType {
             { no: 16, name: "force_of_nature", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 17, name: "ferocity", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 18, name: "feral_aggresion", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 41, name: "feral_instinct", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 42, name: "thick_hide", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
+            { no: 43, name: "feral_swiftness", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 19, name: "sharpened_claws", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 20, name: "shredding_attacks", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 21, name: "predatory_strikes", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
@@ -95,7 +98,7 @@ class DruidTalents$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { starlightWrath: 0, focusedStarlight: 0, improvedMoonfire: 0, brambles: 0, insectSwarm: false, vengeance: 0, lunarGuidance: 0, naturesGrace: false, moonglow: 0, moonfury: 0, balanceOfPower: 0, dreamstate: 0, moonkinForm: false, improvedFaerieFire: 0, wrathOfCenarius: 0, forceOfNature: false, ferocity: 0, feralAggresion: 0, sharpenedClaws: 0, shreddingAttacks: 0, predatoryStrikes: 0, primalFury: 0, savageFury: 0, faerieFire: false, heartOfTheWild: 0, survivalOfTheFittest: 0, leaderOfThePack: false, improvedLeaderOfThePack: 0, predatoryInstincts: 0, mangle: false, improvedMarkOfTheWild: 0, furor: 0, naturalist: 0, naturalShapeshifter: 0, intensity: 0, subtlety: 0, omenOfClarity: false, naturesSwiftness: false, livingSpirit: 0, naturalPerfection: 0 };
+        const message = { starlightWrath: 0, focusedStarlight: 0, improvedMoonfire: 0, brambles: 0, insectSwarm: false, vengeance: 0, lunarGuidance: 0, naturesGrace: false, moonglow: 0, moonfury: 0, balanceOfPower: 0, dreamstate: 0, moonkinForm: false, improvedFaerieFire: 0, wrathOfCenarius: 0, forceOfNature: false, ferocity: 0, feralAggresion: 0, feralInstinct: 0, thickHide: 0, feralSwiftness: 0, sharpenedClaws: 0, shreddingAttacks: 0, predatoryStrikes: 0, primalFury: 0, savageFury: 0, faerieFire: false, heartOfTheWild: 0, survivalOfTheFittest: 0, leaderOfThePack: false, improvedLeaderOfThePack: 0, predatoryInstincts: 0, mangle: false, improvedMarkOfTheWild: 0, furor: 0, naturalist: 0, naturalShapeshifter: 0, intensity: 0, subtlety: 0, omenOfClarity: false, naturesSwiftness: false, livingSpirit: 0, naturalPerfection: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -159,6 +162,15 @@ class DruidTalents$Type extends MessageType {
                     break;
                 case /* int32 feral_aggresion */ 18:
                     message.feralAggresion = reader.int32();
+                    break;
+                case /* int32 feral_instinct */ 41:
+                    message.feralInstinct = reader.int32();
+                    break;
+                case /* int32 thick_hide */ 42:
+                    message.thickHide = reader.int32();
+                    break;
+                case /* int32 feral_swiftness */ 43:
+                    message.feralSwiftness = reader.int32();
                     break;
                 case /* int32 sharpened_claws */ 19:
                     message.sharpenedClaws = reader.int32();
@@ -292,6 +304,15 @@ class DruidTalents$Type extends MessageType {
         /* int32 feral_aggresion = 18; */
         if (message.feralAggresion !== 0)
             writer.tag(18, WireType.Varint).int32(message.feralAggresion);
+        /* int32 feral_instinct = 41; */
+        if (message.feralInstinct !== 0)
+            writer.tag(41, WireType.Varint).int32(message.feralInstinct);
+        /* int32 thick_hide = 42; */
+        if (message.thickHide !== 0)
+            writer.tag(42, WireType.Varint).int32(message.thickHide);
+        /* int32 feral_swiftness = 43; */
+        if (message.feralSwiftness !== 0)
+            writer.tag(43, WireType.Varint).int32(message.feralSwiftness);
         /* int32 sharpened_claws = 19; */
         if (message.sharpenedClaws !== 0)
             writer.tag(19, WireType.Varint).int32(message.sharpenedClaws);
@@ -769,3 +790,137 @@ class FeralDruid_Options$Type extends MessageType {
  * @generated MessageType for protobuf message proto.FeralDruid.Options
  */
 export const FeralDruid_Options = new FeralDruid_Options$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class FeralTankDruid$Type extends MessageType {
+    constructor() {
+        super("proto.FeralTankDruid", [
+            { no: 1, name: "rotation", kind: "message", T: () => FeralTankDruid_Rotation },
+            { no: 2, name: "talents", kind: "message", T: () => DruidTalents },
+            { no: 3, name: "options", kind: "message", T: () => FeralTankDruid_Options }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.FeralTankDruid.Rotation rotation */ 1:
+                    message.rotation = FeralTankDruid_Rotation.internalBinaryRead(reader, reader.uint32(), options, message.rotation);
+                    break;
+                case /* proto.DruidTalents talents */ 2:
+                    message.talents = DruidTalents.internalBinaryRead(reader, reader.uint32(), options, message.talents);
+                    break;
+                case /* proto.FeralTankDruid.Options options */ 3:
+                    message.options = FeralTankDruid_Options.internalBinaryRead(reader, reader.uint32(), options, message.options);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.FeralTankDruid.Rotation rotation = 1; */
+        if (message.rotation)
+            FeralTankDruid_Rotation.internalBinaryWrite(message.rotation, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        /* proto.DruidTalents talents = 2; */
+        if (message.talents)
+            DruidTalents.internalBinaryWrite(message.talents, writer.tag(2, WireType.LengthDelimited).fork(), options).join();
+        /* proto.FeralTankDruid.Options options = 3; */
+        if (message.options)
+            FeralTankDruid_Options.internalBinaryWrite(message.options, writer.tag(3, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.FeralTankDruid
+ */
+export const FeralTankDruid = new FeralTankDruid$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class FeralTankDruid_Rotation$Type extends MessageType {
+    constructor() {
+        super("proto.FeralTankDruid.Rotation", []);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        return target ?? this.create();
+    }
+    internalBinaryWrite(message, writer, options) {
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.FeralTankDruid.Rotation
+ */
+export const FeralTankDruid_Rotation = new FeralTankDruid_Rotation$Type();
+// @generated message type with reflection information, may provide speed optimized methods
+class FeralTankDruid_Options$Type extends MessageType {
+    constructor() {
+        super("proto.FeralTankDruid.Options", [
+            { no: 1, name: "innervate_target", kind: "message", T: () => RaidTarget }
+        ]);
+    }
+    create(value) {
+        const message = {};
+        Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
+        if (value !== undefined)
+            reflectionMergePartial(this, message, value);
+        return message;
+    }
+    internalBinaryRead(reader, length, options, target) {
+        let message = target ?? this.create(), end = reader.pos + length;
+        while (reader.pos < end) {
+            let [fieldNo, wireType] = reader.tag();
+            switch (fieldNo) {
+                case /* proto.RaidTarget innervate_target */ 1:
+                    message.innervateTarget = RaidTarget.internalBinaryRead(reader, reader.uint32(), options, message.innervateTarget);
+                    break;
+                default:
+                    let u = options.readUnknownField;
+                    if (u === "throw")
+                        throw new globalThis.Error(`Unknown field ${fieldNo} (wire type ${wireType}) for ${this.typeName}`);
+                    let d = reader.skip(wireType);
+                    if (u !== false)
+                        (u === true ? UnknownFieldHandler.onRead : u)(this.typeName, message, fieldNo, wireType, d);
+            }
+        }
+        return message;
+    }
+    internalBinaryWrite(message, writer, options) {
+        /* proto.RaidTarget innervate_target = 1; */
+        if (message.innervateTarget)
+            RaidTarget.internalBinaryWrite(message.innervateTarget, writer.tag(1, WireType.LengthDelimited).fork(), options).join();
+        let u = options.writeUnknownFields;
+        if (u !== false)
+            (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);
+        return writer;
+    }
+}
+/**
+ * @generated MessageType for protobuf message proto.FeralTankDruid.Options
+ */
+export const FeralTankDruid_Options = new FeralTankDruid_Options$Type();

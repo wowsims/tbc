@@ -28,6 +28,7 @@ import { ProtectionPaladin } from "./paladin";
 import { RetributionPaladin } from "./paladin";
 import { Mage } from "./mage";
 import { Hunter } from "./hunter";
+import { FeralTankDruid } from "./druid";
 import { FeralDruid } from "./druid";
 import { BalanceDruid } from "./druid";
 import { IndividualBuffs } from "./common";
@@ -89,6 +90,12 @@ export interface Player {
          * @generated from protobuf field: proto.FeralDruid feral_druid = 22;
          */
         feralDruid: FeralDruid;
+    } | {
+        oneofKind: "feralTankDruid";
+        /**
+         * @generated from protobuf field: proto.FeralTankDruid feral_tank_druid = 26;
+         */
+        feralTankDruid: FeralTankDruid;
     } | {
         oneofKind: "hunter";
         /**

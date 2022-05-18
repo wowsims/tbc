@@ -847,6 +847,10 @@ export declare enum Spec {
      */
     SpecFeralDruid = 12,
     /**
+     * @generated from protobuf enum value: SpecFeralTankDruid = 14;
+     */
+    SpecFeralTankDruid = 14,
+    /**
      * @generated from protobuf enum value: SpecHunter = 8;
      */
     SpecHunter = 8,

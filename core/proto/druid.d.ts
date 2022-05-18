@@ -86,6 +86,18 @@ export interface DruidTalents {
      */
     feralAggresion: number;
     /**
+     * @generated from protobuf field: int32 feral_instinct = 41;
+     */
+    feralInstinct: number;
+    /**
+     * @generated from protobuf field: int32 thick_hide = 42;
+     */
+    thickHide: number;
+    /**
+     * @generated from protobuf field: int32 feral_swiftness = 43;
+     */
+    feralSwiftness: number;
+    /**
      * @generated from protobuf field: int32 sharpened_claws = 19;
      */
     sharpenedClaws: number;
@@ -340,6 +352,37 @@ export interface FeralDruid_Options {
      */
     latencyMs: number;
 }
+/**
+ * @generated from protobuf message proto.FeralTankDruid
+ */
+export interface FeralTankDruid {
+    /**
+     * @generated from protobuf field: proto.FeralTankDruid.Rotation rotation = 1;
+     */
+    rotation?: FeralTankDruid_Rotation;
+    /**
+     * @generated from protobuf field: proto.DruidTalents talents = 2;
+     */
+    talents?: DruidTalents;
+    /**
+     * @generated from protobuf field: proto.FeralTankDruid.Options options = 3;
+     */
+    options?: FeralTankDruid_Options;
+}
+/**
+ * @generated from protobuf message proto.FeralTankDruid.Rotation
+ */
+export interface FeralTankDruid_Rotation {
+}
+/**
+ * @generated from protobuf message proto.FeralTankDruid.Options
+ */
+export interface FeralTankDruid_Options {
+    /**
+     * @generated from protobuf field: proto.RaidTarget innervate_target = 1;
+     */
+    innervateTarget?: RaidTarget;
+}
 declare class DruidTalents$Type extends MessageType<DruidTalents> {
     constructor();
     create(value?: PartialMessage<DruidTalents>): DruidTalents;
@@ -410,4 +453,34 @@ declare class FeralDruid_Options$Type extends MessageType<FeralDruid_Options> {
  * @generated MessageType for protobuf message proto.FeralDruid.Options
  */
 export declare const FeralDruid_Options: FeralDruid_Options$Type;
+declare class FeralTankDruid$Type extends MessageType<FeralTankDruid> {
+    constructor();
+    create(value?: PartialMessage<FeralTankDruid>): FeralTankDruid;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: FeralTankDruid): FeralTankDruid;
+    internalBinaryWrite(message: FeralTankDruid, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.FeralTankDruid
+ */
+export declare const FeralTankDruid: FeralTankDruid$Type;
+declare class FeralTankDruid_Rotation$Type extends MessageType<FeralTankDruid_Rotation> {
+    constructor();
+    create(value?: PartialMessage<FeralTankDruid_Rotation>): FeralTankDruid_Rotation;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: FeralTankDruid_Rotation): FeralTankDruid_Rotation;
+    internalBinaryWrite(message: FeralTankDruid_Rotation, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.FeralTankDruid.Rotation
+ */
+export declare const FeralTankDruid_Rotation: FeralTankDruid_Rotation$Type;
+declare class FeralTankDruid_Options$Type extends MessageType<FeralTankDruid_Options> {
+    constructor();
+    create(value?: PartialMessage<FeralTankDruid_Options>): FeralTankDruid_Options;
+    internalBinaryRead(reader: IBinaryReader, length: number, options: BinaryReadOptions, target?: FeralTankDruid_Options): FeralTankDruid_Options;
+    internalBinaryWrite(message: FeralTankDruid_Options, writer: IBinaryWriter, options: BinaryWriteOptions): IBinaryWriter;
+}
+/**
+ * @generated MessageType for protobuf message proto.FeralTankDruid.Options
+ */
+export declare const FeralTankDruid_Options: FeralTankDruid_Options$Type;
 export {};
