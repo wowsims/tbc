@@ -11,22 +11,29 @@ type Druid struct {
 	SelfBuffs
 	Talents proto.DruidTalents
 
-	Form        DruidForm
-	RebirthUsed bool
+	Form              DruidForm
+	RebirthUsed       bool
+	MaulRageThreshold float64
 
 	FaerieFire  *core.Spell
 	Hurricane   *core.Spell
 	InsectSwarm *core.Spell
+	Lacerate    *core.Spell
+	Mangle      *core.Spell
+	Maul        *core.Spell
 	Moonfire    *core.Spell
 	Rebirth     *core.Spell
 	Starfire6   *core.Spell
 	Starfire8   *core.Spell
+	Swipe       *core.Spell
 	Wrath       *core.Spell
 
 	InsectSwarmDot *core.Dot
+	LacerateDot    *core.Dot
 	MoonfireDot    *core.Dot
 
 	FaerieFireAura       *core.Aura
+	MaulQueueAura        *core.Aura
 	NaturesGraceProcAura *core.Aura
 	NaturesSwiftnessAura *core.Aura
 }
@@ -74,6 +81,15 @@ func (druid *Druid) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 			}
 		}
 	}
+}
+
+func (druid *Druid) MeleeCritMultiplier() float64 {
+	// Assumes that Predatory Instincts is a primary rather than secondary modifier for now, but this needs to confirmed!
+	primaryModifier := 1.0
+	if druid.Form.Matches(Cat | Bear) {
+		primaryModifier = 1 + 0.02*float64(druid.Talents.PredatoryInstincts)
+	}
+	return druid.Character.MeleeCritMultiplier(primaryModifier, 0)
 }
 
 func (druid *Druid) Initialize() {

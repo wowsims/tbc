@@ -51,9 +51,8 @@ func NewFeralTankDruid(character core.Character, options proto.Player) *FeralTan
 		}
 	})
 
-	// Set up base paw weapon. Assume that Predatory Instincts is a primary rather than secondary modifier for now, but this needs to confirmed!
-	primaryModifier := 1 + 0.02*float64(bear.Talents.PredatoryInstincts)
-	critMultiplier := bear.MeleeCritMultiplier(primaryModifier, 0)
+	// Set up base paw weapon.
+	critMultiplier := bear.MeleeCritMultiplier()
 	basePaw := core.Weapon{
 		BaseDamageMin:        43.5,
 		BaseDamageMax:        66.5,

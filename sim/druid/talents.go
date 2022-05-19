@@ -13,7 +13,7 @@ func (druid *Druid) ApplyTalents() {
 
 	druid.AddStat(stats.SpellHit, float64(druid.Talents.BalanceOfPower)*2*core.SpellHitRatingPerHitChance)
 
-	if druid.FormMatches(Cat) {
+	if druid.Form.Matches(Cat) {
 		druid.AddStat(stats.AttackPower, float64(druid.Talents.PredatoryStrikes)*0.5*70)
 		druid.AddStat(stats.MeleeCrit, float64(druid.Talents.SharpenedClaws)*2*core.MeleeCritRatingPerCritChance)
 	}
@@ -54,7 +54,7 @@ func (druid *Druid) ApplyTalents() {
 			},
 		})
 
-		if druid.FormMatches(Cat) {
+		if druid.Form.Matches(Cat) {
 			druid.AddStatDependency(stats.StatDependency{
 				SourceStat:   stats.AttackPower,
 				ModifiedStat: stats.AttackPower,

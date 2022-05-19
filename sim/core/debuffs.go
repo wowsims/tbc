@@ -312,6 +312,7 @@ func MangleAura(target *Unit) *Aura {
 	return target.GetOrRegisterAura(Aura{
 		Label:    "Mangle",
 		ActionID: ActionID{SpellID: 33876},
+		Duration: time.Second * 12,
 		OnGain: func(aura *Aura, sim *Simulation) {
 			aura.Unit.PseudoStats.PeriodicPhysicalDamageTakenMultiplier *= 1.3
 		},
