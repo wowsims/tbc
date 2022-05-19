@@ -403,6 +403,7 @@ const specNames: Record<string, Spec> = {
 	'Enhancement': Spec.SpecEnhancementShaman,
   	// 'Feral': Spec.SpecFeralDruid,
 	// 'Warden': Spec.SpecFeralTankDruid,
+	// 'Guardian': Spec.SpecFeralTankDruid,
 	'Survival': Spec.SpecHunter,
 	'BeastMastery': Spec.SpecHunter,
 	'Arcane': Spec.SpecMage,
@@ -431,6 +432,7 @@ const buffBotNames: Record<string, string> = {
 	'JusticarPaladin': 'JoW Paladin',
 	'ProtectionWarrior': 'Prot Warrior',
 	'WardenDruid': 'Bear',
+	'GuardianDruid': 'Bear',
 
 	// Healers
 	'HolyPaladin': 'Paladin',
