@@ -1,13 +1,13 @@
 import { Exporter } from '/tbc/core/components/exporters.js';
 import { Importer } from '/tbc/core/components/importers.js';
-import { RaidSimSettings } from '/tbc/core/proto/ui.js';
+import { BuffBot, RaidSimSettings } from '/tbc/core/proto/ui.js';
 import { Party, Player, Raid, TargetedActionMetrics } from '../core/proto/api.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 
 import { RaidSimUI } from './raid_sim_ui.js';
-import { Encounter, EquipmentSpec, Gem, ItemSpec, MobType, Spec, Target } from '../core/proto/common.js';
+import { Class, Encounter, EquipmentSpec, Gem, ItemSpec, MobType, RaidTarget, Spec, Target } from '../core/proto/common.js';
 import { nameToClass } from '../core/proto_utils/names.js';
-import { Faction, raceToFaction, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto } from '../core/proto_utils/utils.js';
+import { Faction, makeDefaultBlessings, raceToFaction, specToClass, specToEligibleRaces, specTypeFunctions, withSpecProto } from '../core/proto_utils/utils.js';
 import { BalanceDruid, BalanceDruid_Rotation_PrimarySpell, FeralDruid } from '../core/proto/druid.js';
 import { ElementalShaman, EnhancementShaman } from '../core/proto/shaman.js';
 import { Hunter } from '../core/proto/hunter.js';
@@ -18,7 +18,7 @@ import { ShadowPriest, SmitePriest } from '../core/proto/priest.js';
 import { Warlock } from '../core/proto/warlock.js';
 import { ProtectionWarrior, Warrior } from '../core/proto/warrior.js';
 import { gemMatchesSocket } from '../core/proto_utils/gems.js';
-import { playerPresets } from './presets.js';
+import { buffBotPresets, playerPresets, BuffBotSettings } from './presets.js';
 import { talentStringToProto } from '../core/talents/factory.js';
 
 declare var $: any;
@@ -39,16 +39,19 @@ export function newRaidImporters(simUI: RaidSimUI): HTMLElement {
 	});
 
 	const menuElem = importSettings.getElementsByClassName('dropdown-menu')[0] as HTMLElement;
-	const addMenuItem = (label: string, onClick: () => void) => {
+	const addMenuItem = (label: string, experimental: boolean, onClick: () => void) => {
 		const itemElem = document.createElement('span');
 		itemElem.classList.add('dropdown-item');
 		itemElem.textContent = label;
 		itemElem.addEventListener('click', onClick);
 		menuElem.appendChild(itemElem);
+		if (experimental) {
+			itemElem.classList.add('experimental');
+		}
 	};
 
-	addMenuItem('Json', () => new RaidJsonImporter(menuElem, simUI));
-	addMenuItem('WCL', () => new RaidWCLImporter(menuElem, simUI));
+	addMenuItem('Json', false, () => new RaidJsonImporter(menuElem, simUI));
+	addMenuItem('WCL', true, () => new RaidWCLImporter(menuElem, simUI));
 
 	return importSettings;
 }
@@ -125,10 +128,15 @@ class RaidWCLImporter extends Importer {
 		this.simUI = simUI;
 		this.descriptionElem.innerHTML = `
 			<p>
-				Import entire raid from a WCL report
+				WARNING: THIS IS EXPERIMENTAL
 			</p>
 			<p>
-				To import, paste the WCL report and fight link (https://classic.warcraftlogs.com/reports/REPORTID#fight=FIGHTID)
+				Import entire raid from a WCL report.
+				The players will be out of order and any specs not implemented will not be imported.
+			</p>
+			<p>
+				To import, paste the WCL report and fight link (https://classic.warcraftlogs.com/reports/REPORTID#fight=FIGHTID).
+				Include the fight ID or else first found fight will be used.
 			</p>
 		`;
 	}
@@ -141,7 +149,16 @@ class RaidWCLImporter extends Importer {
 
 		const url = new URL(importLink);
 		var reportID = url.pathname.split("reports/")[1];
-		var fightID = url.hash.split("=")[1];
+		var hashVals = url.hash.replace("#", "").split("&");
+		var fightID = "0";
+		hashVals.forEach(val => {
+			var parts = val.split("=");
+			if (parts.length < 2 || parts[0] != "fight") {
+				return;
+			}
+			fightID = parts[1];
+		});
+		
 		var settings = RaidSimSettings.create();
 		var raid = Raid.create();
 		raid.parties = new Array<Party>();
@@ -154,8 +171,16 @@ class RaidWCLImporter extends Importer {
 		target.level = 73;
 		target.mobType = MobType.MobTypeDemon;
 
+		var buffBots = new Array<BuffBot>();
+
 		encounter.targets.push(target)
 		settings.encounter = encounter;
+
+		var numPaladins = 0;
+		var numPlayers = 0;
+
+		// Raid index of players that recieved innervates
+		var wclIDtoRaidIndex = new Map<number, number>();
 
 		fetch("https://classic.warcraftlogs.com/oauth/token", {
 			"method": "POST",
@@ -172,11 +197,12 @@ class RaidWCLImporter extends Importer {
 					"Content-Type": "application/json",
 					"Authorization": "Bearer " + data.access_token,
 				},
-				"body": `{"query":"{reportData { report(code: \\"${reportID}\\") { guild { name faction {id} } playerDetails(fightIDs: [${fightID}], endTime: 99999999)  events(fightIDs: [${fightID}], dataType:CombatantInfo, endTime: 99999999) {data}  fights(fightIDs: [31]) { startTime endTime }}}}"}`
+				"body": `{"query":"{reportData { report(code: \\"${reportID}\\") { guild { name faction {id} } playerDetails(fightIDs: [${fightID}], endTime: 99999999)  events(fightIDs: [${fightID}], dataType:CombatantInfo, endTime: 99999999) {data}  fights(fightIDs: [${fightID}]) { startTime endTime } buffs: events(fightIDs: [${fightID}], dataType:Buffs, endTime: 99999999, abilityID: 29166){ data }}}}"}`
 			}).then(response => {
 				console.log(response);
 				return response.json()
 			}).then(data => {
+
 				var playerDetails = new Map<Number, any>();
 
 				encounter.duration = (data.data.reportData.report.fights[0].endTime - data.data.reportData.report.fights[0].startTime) / 1000;
@@ -195,7 +221,38 @@ class RaidWCLImporter extends Importer {
 					var player = Player.create();
 					var details = playerDetails.get(info.sourceID);
 					var spec = specNames[details.specs[0].spec];
+
+					if (details.type == "Paladin") {
+						numPaladins++;
+					}
+
+					// If we couldn't find the type, check buff bots.
 					if (spec == null || spec == undefined) {
+						var botID = buffBotNames[details.specs[0].spec+details.type];
+						if (botID == null || botID == undefined) {
+							console.log("Spec Not Implemented: ", details.specs[0].spec+details.type);
+							return;
+						}
+
+						// Insert bot!
+						var bot = BuffBot.create();
+						bot.id = botID;
+						bot.raidIndex = numPlayers;
+						buffBots.push(bot);
+						wclIDtoRaidIndex.set(info.sourceID, numPlayers);
+
+						numPlayers++;
+						// For now, insert a placeholder for the bot. It will get overwritten later I think.
+						raid.parties[currentParty].players.push(player);
+						if (raid.parties[currentParty].players.length == 5) {
+							currentParty++;
+						}
+						if (raid.parties.length <= currentParty) {
+							if (currentParty == 5) {
+								return;
+							}
+							raid.parties.push(Party.create());
+						}
 						return;
 					}
 
@@ -204,11 +261,12 @@ class RaidWCLImporter extends Importer {
 					if (matchingPresets.length == 0) {
 						return;
 					} else if (matchingPresets.length > 1) {
-						// TODO: match the imported talents with the presets to find closest match.
 						var distance = 100;
+						// Search talents and find the preset that the players talents most closely match.
 						matchingPresets.forEach((preset, i) => {
 							var presetTalents = [0,0,0];
 							var talentIdx = 0;
+							// First sum up the number of talents per tree for preset.
 							Array.from(preset.talents).forEach((v) => {
 								if (v == '-') {
 									talentIdx+=1;
@@ -216,9 +274,12 @@ class RaidWCLImporter extends Importer {
 								}
 								presetTalents[talentIdx] += parseInt(v)
 							});
+							// Diff the distance to the preset.
 							var newDistance = Math.abs(info.talents[0].id - presetTalents[0]) + Math.abs(info.talents[1].id - presetTalents[1]) + Math.abs(info.talents[2].id - presetTalents[2]);
+							// If this is the best distance, assign this preset.
 							if (newDistance < distance) {
 								presetIdx = i;
+								distance = newDistance;
 							}
 						})
 					}
@@ -234,12 +295,18 @@ class RaidWCLImporter extends Importer {
 					player.equipment = EquipmentSpec.create();
 					player.equipment.items = new Array<ItemSpec>();
 
-					// If we couldn't find the type, skip
-					if (!player.spec || player.spec.oneofKind == undefined) {
-						// TODO: lookup buffbot types
-						return;
+					// Default to UI setting
+					var faction = this.simUI.raidPicker?.getCurrentFaction();
+
+					// If defined in log, use that faction.
+					if (data.data.reportData.report.guild != null && data.data.reportData.report.guild != undefined) {
+						faction = data.data.reportData.report.guild.faction.id as Faction;
 					}
-					const faction = data.data.reportData.report.guild.faction.id as Faction;
+
+					// Fallback if UI is broken and log has no faction.
+					if (faction == undefined) {
+						faction = Faction.Horde;
+					}
 					player.race = matchingPreset.defaultFactionRaces[faction];
 
 					(info.gear as Array<any>).forEach(gear => {
@@ -258,6 +325,8 @@ class RaidWCLImporter extends Importer {
 						player.equipment!.items.push(item);
 					});
 					
+					wclIDtoRaidIndex.set(info.sourceID, numPlayers);
+					numPlayers++;
 					raid.parties[currentParty].players.push(player);
 					if (raid.parties[currentParty].players.length == 5) {
 						currentParty++;
@@ -268,13 +337,56 @@ class RaidWCLImporter extends Importer {
 						}
 						raid.parties.push(Party.create());
 					}
-
-
-					// TODO: paladin blessing picker needs to be setup.
-					// TODO: innervate setup
 				});
 
+				(data.data.reportData.report.buffs.data as Array<any>).forEach(buff => {
+					if (buff.type == "removebuff") {
+						return;
+					}
+
+					// Innervate!
+					if (buff.abilityGameID == 29166) {
+						// Find if target is a player.
+						// If so, find source, could be a player or a buffbot.
+						// Apply innervate.
+						var sourceID = wclIDtoRaidIndex.get(buff.sourceID)!;
+						var targetID = wclIDtoRaidIndex.get(buff.targetID)!;
+						var source = settings.raid!.parties[Math.floor(sourceID/5)].players[sourceID%5];
+						var target = settings.raid!.parties[Math.floor(targetID/5)].players[targetID%5];
+						if (target.class == undefined) {
+							// Target is not a player
+							return;
+						}
+						if (source.class != Class.ClassDruid) {
+							// its a buffbot
+							buffBots.forEach(bot => {
+								if (bot.raidIndex == sourceID) {
+									// Found our buffer
+									bot.innervateAssignment = RaidTarget.create();
+									bot.innervateAssignment.targetIndex = targetID;
+									return;
+								}
+							});
+						} else {
+							// Assign player sources
+							if (source.spec.oneofKind == "balanceDruid") {
+								source.spec.balanceDruid.options!.innervateTarget = RaidTarget.create();
+								source.spec.balanceDruid.options!.innervateTarget.targetIndex = targetID;
+							} else if (source.spec.oneofKind == "feralDruid") {
+								source.spec.feralDruid.options!.innervateTarget = RaidTarget.create();
+								source.spec.feralDruid.options!.innervateTarget.targetIndex = targetID;
+							} else if (source.spec.oneofKind == "feralTankDruid") {
+								source.spec.feralTankDruid.options!.innervateTarget = RaidTarget.create();
+								source.spec.feralTankDruid.options!.innervateTarget.targetIndex = targetID;
+							}
+						}
+					}
+				});
+
+				this.simUI.clearRaid(TypedEvent.nextEventID());
+				settings.blessings = makeDefaultBlessings(numPaladins);
 				this.simUI.fromProto(TypedEvent.nextEventID(), settings);
+				this.simUI.setBuffBots(TypedEvent.nextEventID(), buffBots);
 				this.close();
 			}).catch(err => {
 				console.error(err);
@@ -289,7 +401,8 @@ const specNames: Record<string, Spec> = {
 	'Balance': Spec.SpecBalanceDruid,
 	'Elemental': Spec.SpecElementalShaman,
 	'Enhancement': Spec.SpecEnhancementShaman,
-  	'Feral': Spec.SpecFeralDruid,
+  	// 'Feral': Spec.SpecFeralDruid,
+	// 'Warden': Spec.SpecFeralTankDruid,
 	'Survival': Spec.SpecHunter,
 	'BeastMastery': Spec.SpecHunter,
 	'Arcane': Spec.SpecMage,
@@ -306,5 +419,23 @@ const specNames: Record<string, Spec> = {
 	'Demonology': Spec.SpecWarlock,
 	'Arms': Spec.SpecWarrior,
 	'Fury': Spec.SpecWarrior,
-	'Protection': Spec.SpecProtectionWarrior,
+	// 'Protection': Spec.SpecProtectionWarrior,
+};
+
+// Maps WCL spec+type to internal buff bot IDs.
+const buffBotNames: Record<string, string> = {
+	// DPS
+	'FeralDruid': 'Bear',
+
+	// Tank
+	'JusticarPaladin': 'JoW Paladin',
+	'ProtectionWarrior': 'Prot Warrior',
+	'WardenDruid': 'Bear',
+
+	// Healers
+	'HolyPaladin': 'Paladin',
+	'HolyPriest': 'Holy Priest',
+	'DisciplinePriest': 'Divine Spirit Priest',
+	'RestorationDruid': 'Resto Druid',
+	'RestorationShaman': 'Resto Shaman',
 };

@@ -8,6 +8,7 @@ import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
 import { Blessings } from '/tbc/core/proto/ui.js';
 import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
+import { BuffBot as BuffBotProto } from '/tbc/core/proto/ui.js';
 import { RaidSimSettings } from '/tbc/core/proto/ui.js';
 import { SavedEncounter } from '/tbc/core/proto/ui.js';
 import { SavedRaid } from '/tbc/core/proto/ui.js';
@@ -47,7 +48,7 @@ const extraKnownIssues = [
 export class RaidSimUI extends SimUI {
 	private readonly config: RaidSimConfig;
 	private raidSimResultsManager: RaidSimResultsManager | null = null;
-	private raidPicker: RaidPicker | null = null;
+	public raidPicker: RaidPicker | null = null;
 	private blessingsPicker: BlessingsPicker | null = null;
 
 	// Emits when the raid comp changes. Includes changes to buff bots.
@@ -318,6 +319,10 @@ export class RaidSimUI extends SimUI {
 		return this.raidPicker!.getBuffBots();
 	}
 
+	setBuffBots(eventID: EventID, buffBotProtos: BuffBotProto[]): void {
+		this.raidPicker!.setBuffBots(eventID, buffBotProtos);
+	}
+
 	getPlayersAndBuffBots(): Array<Player<any> | BuffBot | null> {
 		const players = this.sim.raid.getPlayers();
 		const buffBots = this.getBuffBots();
@@ -358,6 +363,10 @@ export class RaidSimUI extends SimUI {
 			this.raidPicker!.setBuffBots(eventID, settings.buffBots);
 			this.blessingsPicker!.setAssignments(eventID, settings.blessings || BlessingsAssignments.create());
 		});
+	}
+
+	clearRaid(eventID: EventID) {
+		this.sim.raid.clearRaid(eventID);
 	}
 
 	// Returns the actual key to use for local storage, based on the given key part and the site context.

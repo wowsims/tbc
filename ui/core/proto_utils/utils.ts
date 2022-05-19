@@ -1495,6 +1495,10 @@ export function makeBlessingsAssignments(numPaladins: number, data: Array<{ spec
 		const spec = data[i].spec;
 		const blessings = data[i].blessings;
 		for (let j = 0; j < blessings.length; j++) {
+			if (j >= assignments.paladins.length) {
+				// Can't assign more blessings since we ran out of paladins
+				break
+			}
 			assignments.paladins[j].blessings[spec] = blessings[j];
 		}
 	}
