@@ -466,6 +466,7 @@ func (spellEffect *SpellEffect) applyEnemyAttackTableCrit(spell *Spell, unit *Un
 	critChance := critRating / (MeleeCritRatingPerCritChance * 100)
 	critChance -= spellEffect.Target.stats[stats.Defense] * DefenseRatingToChanceReduction
 	critChance -= spellEffect.Target.stats[stats.Resilience] / ResilienceRatingPerCritReductionChance / 100
+	critChance -= spellEffect.Target.PseudoStats.ReducedCritTakenChance
 	*chance += MaxFloat(0, critChance)
 
 	if roll < *chance {

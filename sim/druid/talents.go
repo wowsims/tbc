@@ -13,10 +13,15 @@ func (druid *Druid) ApplyTalents() {
 
 	druid.AddStat(stats.SpellHit, float64(druid.Talents.BalanceOfPower)*2*core.SpellHitRatingPerHitChance)
 
-	if druid.CatForm {
+	if druid.Form.Matches(Bear | Cat) {
 		druid.AddStat(stats.AttackPower, float64(druid.Talents.PredatoryStrikes)*0.5*70)
 		druid.AddStat(stats.MeleeCrit, float64(druid.Talents.SharpenedClaws)*2*core.MeleeCritRatingPerCritChance)
 	}
+	if druid.Form.Matches(Bear) {
+		druid.PseudoStats.ThreatMultiplier *= 1 + 0.05*float64(druid.Talents.FeralInstinct)
+		druid.AddStat(stats.Dodge, core.DodgeRatingPerDodgeChance*2*float64(druid.Talents.FeralSwiftness))
+	}
+	druid.AddStat(stats.Armor, druid.Equip.Stats()[stats.Armor]*(0.1/3)*float64(druid.Talents.ThickHide))
 
 	if druid.Talents.LunarGuidance > 0 {
 		bonus := (0.25 / 3) * float64(druid.Talents.LunarGuidance)
@@ -54,12 +59,20 @@ func (druid *Druid) ApplyTalents() {
 			},
 		})
 
-		if druid.CatForm {
+		if druid.Form.Matches(Cat) {
 			druid.AddStatDependency(stats.StatDependency{
 				SourceStat:   stats.AttackPower,
 				ModifiedStat: stats.AttackPower,
 				Modifier: func(attackPower float64, _ float64) float64 {
 					return attackPower + attackPower*0.5*bonus
+				},
+			})
+		} else if druid.Form.Matches(Bear) {
+			druid.AddStatDependency(stats.StatDependency{
+				SourceStat:   stats.Stamina,
+				ModifiedStat: stats.Stamina,
+				Modifier: func(stamina float64, _ float64) float64 {
+					return stamina + stamina*bonus
 				},
 			})
 		}
@@ -102,6 +115,7 @@ func (druid *Druid) ApplyTalents() {
 				return stat + stat*bonus
 			},
 		})
+		druid.PseudoStats.ReducedCritTakenChance += 0.01 * float64(druid.Talents.SurvivalOfTheFittest)
 	}
 
 	if druid.Talents.LivingSpirit > 0 {
@@ -116,6 +130,8 @@ func (druid *Druid) ApplyTalents() {
 	}
 
 	druid.AddStat(stats.SpellCrit, float64(druid.Talents.NaturalPerfection)*1*core.SpellCritRatingPerCritChance)
+	druid.applyPrimalFury()
+	druid.applyOmenOfClarity()
 }
 
 func (druid *Druid) setupNaturesGrace() {
@@ -207,4 +223,76 @@ func (druid *Druid) applyNaturesSwiftness(cast *core.Cast) {
 	if druid.NaturesSwiftnessAura != nil && druid.NaturesSwiftnessAura.IsActive() {
 		cast.CastTime = 0
 	}
+}
+
+func (druid *Druid) applyPrimalFury() {
+	if druid.Talents.PrimalFury == 0 {
+		return
+	}
+
+	procChance := 0.5 * float64(druid.Talents.PrimalFury)
+	actionID := core.ActionID{SpellID: 37117}
+
+	if druid.Form.Matches(Bear) {
+		druid.RegisterAura(core.Aura{
+			Label:    "Primal Fury",
+			Duration: core.NeverExpires,
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Activate(sim)
+			},
+			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Outcome.Matches(core.OutcomeCrit) {
+					if procChance == 1 || sim.RandomFloat("Primal Fury") < procChance {
+						druid.AddRage(sim, 5, actionID)
+					}
+				}
+			},
+		})
+	} else if druid.Form.Matches(Cat) {
+		// TODO
+	}
+}
+
+func (druid *Druid) applyOmenOfClarity() {
+	if !druid.Talents.OmenOfClarity {
+		return
+	}
+
+	ppmm := druid.AutoAttacks.NewPPMManager(2.0)
+
+	clearcastingAura := druid.RegisterAura(core.Aura{
+		Label:    "Clearcasting",
+		ActionID: core.ActionID{SpellID: 16870},
+		Duration: time.Second * 15,
+		OnGain: func(aura *core.Aura, sim *core.Simulation) {
+			druid.PseudoStats.NoCost = true
+		},
+		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+			druid.PseudoStats.NoCost = false
+		},
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			// This check is used as a proxy, not sure if it will exactly match the list here:
+			// https://tbc.wowhead.com/spell=16870
+			if spell.DefaultCast.Cost > 0 {
+				aura.Deactivate(sim)
+			}
+		},
+	})
+
+	druid.RegisterAura(core.Aura{
+		Label:    "Omen of Clarity",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+				return
+			}
+			if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Omen of Clarity") {
+				return
+			}
+			clearcastingAura.Activate(sim)
+		},
+	})
 }

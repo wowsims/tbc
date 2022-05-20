@@ -26,7 +26,7 @@ message DruidTalents {
 
 		// Feral Combat
     int32 ferocity = 17;
-    int32 feral_aggresion = 18;
+    int32 feral_aggression = 18;
 		int32 feral_instinct = 41;
 		int32 thick_hide = 42;
 		int32 feral_swiftness = 43;
@@ -86,9 +86,9 @@ message BalanceDruid {
 message FeralDruid {
   message Rotation {
     enum FinishingMove {
-	Rip = 0;
-	Bite = 1;
-	None = 2;
+			Rip = 0;
+			Bite = 1;
+			None = 2;
     }
 
     FinishingMove finishing_move = 1;
@@ -113,6 +113,10 @@ message FeralDruid {
 
 message FeralTankDruid {
   message Rotation {
+		// Minimum rage to queue HS or Cleave.
+		int32 maul_rage_threshold = 1;
+		bool maintain_demoralizing_roar = 2;
+		bool maintain_faerie_fire = 3;
   }
   Rotation rotation = 1;
 
@@ -120,6 +124,8 @@ message FeralTankDruid {
 
   message Options {
     RaidTarget innervate_target = 1;
+
+		double starting_rage = 2;
   }
   Options options = 3;
 }

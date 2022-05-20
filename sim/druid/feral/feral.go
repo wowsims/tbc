@@ -36,10 +36,8 @@ func NewFeralDruid(character core.Character, options proto.Player) *FeralDruid {
 		selfBuffs.InnervateTarget.TargetIndex = -1
 	}
 
-	druid := druid.New(character, selfBuffs, *feralOptions.Talents)
-	druid.CatForm = true
 	cat := &FeralDruid{
-		Druid:    druid,
+		Druid:    druid.New(character, druid.Cat, selfBuffs, *feralOptions.Talents),
 		Rotation: *feralOptions.Rotation,
 	}
 
@@ -53,19 +51,16 @@ func NewFeralDruid(character core.Character, options proto.Player) *FeralDruid {
 		}
 	})
 
-	// Set up base paw weapon. Assume that Predatory Instincts is a primary rather than secondary modifier for now, but this needs to confirmed!
-	primaryModifier := 1 + 0.02*float64(cat.Talents.PredatoryInstincts)
-	critMultiplier := cat.MeleeCritMultiplier(primaryModifier, 0)
-	basePaw := core.Weapon{
-		BaseDamageMin:        43.5,
-		BaseDamageMax:        66.5,
-		SwingSpeed:           1.0,
-		NormalizedSwingSpeed: 1.0,
-		SwingDuration:        time.Duration(1.0 * float64(time.Second)),
-		CritMultiplier:       critMultiplier,
-	}
 	cat.EnableAutoAttacks(cat, core.AutoAttackOptions{
-		MainHand:       basePaw,
+		// Base paw weapon.
+		MainHand: core.Weapon{
+			BaseDamageMin:        43.5,
+			BaseDamageMax:        66.5,
+			SwingSpeed:           1.0,
+			NormalizedSwingSpeed: 1.0,
+			SwingDuration:        time.Second,
+			CritMultiplier:       cat.MeleeCritMultiplier(),
+		},
 		AutoSwingMelee: true,
 	})
 

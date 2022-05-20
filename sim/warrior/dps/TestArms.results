@@ -543,6 +543,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestArms-AllItems-ManualCrowdPummeler-9449"
+ value: {
+  dps: 486.17287374008794
+  tps: 414.40221851378095
+ }
+}
+dps_results: {
  key: "TestArms-AllItems-MarkoftheChampion-23206"
  value: {
   dps: 696.8360921789182

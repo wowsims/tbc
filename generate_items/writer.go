@@ -287,6 +287,7 @@ var denyListNameRegexes = []*regexp.Regexp{
 
 // allowList allows overriding to allow an item
 var allowList = map[int]bool{
+	9449:  true, // Manual Crowd Pummeler
 	11815: true, // Hand of Justice
 	12632: true, // Storm Gauntlets
 	17111: true, // Blazefury Medallion

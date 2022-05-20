@@ -353,7 +353,11 @@ func (generator *ItemsTestGenerator) GetTest(testIdx int) (string, *proto.Comput
 		label = strings.ReplaceAll(testSet.Name, " ", "")
 	} else {
 		testMetaGem := generator.metagems[testIdx-len(generator.items)-len(generator.sets)]
-		equipment[proto.ItemSlot_ItemSlotHead].Gems[generator.metaSocketIdx] = testMetaGem
+		headItem := &equipment[proto.ItemSlot_ItemSlotHead]
+		for len(headItem.Gems) <= generator.metaSocketIdx {
+			headItem.Gems = append(headItem.Gems, items.Gem{})
+		}
+		headItem.Gems[generator.metaSocketIdx] = testMetaGem
 		label = strings.ReplaceAll(testMetaGem.Name, " ", "")
 	}
 	playerCopy.Equipment = equipment.ToEquipmentSpecProto()

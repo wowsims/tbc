@@ -49,7 +49,7 @@ func (druid *Druid) registerMoonfireSpell() {
 			Label:    "Moonfire-" + strconv.Itoa(int(druid.Index)),
 			ActionID: actionID,
 		}),
-		NumberOfTicks: 4 + core.TernaryInt(ItemSetThunderheart.CharacterHasSetBonus(&druid.Character, 2), 1, 0),
+		NumberOfTicks: 4 + core.TernaryInt(ItemSetThunderheartRegalia.CharacterHasSetBonus(&druid.Character, 2), 1, 0),
 		TickLength:    time.Second * 3,
 		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
 			DamageMultiplier: 1 * (1 + 0.05*float64(druid.Talents.ImprovedMoonfire)) * (1 + 0.02*float64(druid.Talents.Moonfury)),

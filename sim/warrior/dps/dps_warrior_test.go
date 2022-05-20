@@ -79,7 +79,7 @@ func BenchmarkSimulate(b *testing.B) {
 		Raid: core.SinglePlayerRaidProto(
 			&proto.Player{
 				Race:      proto.Race_RaceOrc,
-				Class:     proto.Class_ClassHunter,
+				Class:     proto.Class_ClassWarrior,
 				Equipment: FuryP1Gear,
 				Consumes:  FullConsumes,
 				Spec:      PlayerOptionsFury,

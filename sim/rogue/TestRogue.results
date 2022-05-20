@@ -501,6 +501,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRogue-AllItems-ManualCrowdPummeler-9449"
+ value: {
+  dps: 766.4485679848435
+  tps: 532.1760906346034
+ }
+}
+dps_results: {
  key: "TestRogue-AllItems-MarkoftheChampion-23206"
  value: {
   dps: 1411.5315499650628

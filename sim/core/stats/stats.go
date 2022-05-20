@@ -468,6 +468,8 @@ type PseudoStats struct {
 
 	ParryHaste bool
 
+	ReducedCritTakenChance float64 // Reduces chance to be crit.
+
 	BonusMeleeAttackPower  float64 // Imp Hunters mark, EW
 	BonusRangedAttackPower float64 // Hunters mark, EW
 	BonusCritRating        float64 // Imp Judgement of the Crusader

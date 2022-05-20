@@ -4,6 +4,7 @@ import (
 	_ "github.com/wowsims/tbc/sim/common"
 	"github.com/wowsims/tbc/sim/druid/balance"
 	"github.com/wowsims/tbc/sim/druid/feral"
+	feralTank "github.com/wowsims/tbc/sim/druid/tank"
 	_ "github.com/wowsims/tbc/sim/encounters"
 	"github.com/wowsims/tbc/sim/hunter"
 	"github.com/wowsims/tbc/sim/mage"
@@ -29,6 +30,7 @@ func RegisterAll() {
 
 	balance.RegisterBalanceDruid()
 	feral.RegisterFeralDruid()
+	feralTank.RegisterFeralTankDruid()
 	elemental.RegisterElementalShaman()
 	enhancement.RegisterEnhancementShaman()
 	hunter.RegisterHunter()
