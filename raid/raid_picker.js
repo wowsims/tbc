@@ -3,9 +3,10 @@ import { Component } from '/tbc/core/components/component.js';
 import { EnumPicker } from '/tbc/core/components/enum_picker.js';
 import { MAX_PARTY_SIZE } from '/tbc/core/party.js';
 import { Player } from '/tbc/core/player.js';
+import { Player as PlayerProto } from '/tbc/core/proto/api.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { Faction } from '/tbc/core/proto_utils/utils.js';
+import { Faction, playerToSpec } from '/tbc/core/proto_utils/utils.js';
 import { classColors } from '/tbc/core/proto_utils/utils.js';
 import { isTankSpec } from '/tbc/core/proto_utils/utils.js';
 import { specToClass } from '/tbc/core/proto_utils/utils.js';
@@ -236,12 +237,16 @@ export class PlayerPicker extends Component {
                 event.preventDefault();
                 return;
             }
+            event.dataTransfer.dropEffect = 'move';
+            event.dataTransfer.effectAllowed = 'all';
             const iconSrc = this.iconElem.src;
             const dragImage = new Image();
             dragImage.src = iconSrc;
             event.dataTransfer.setDragImage(dragImage, 30, 30);
-            event.dataTransfer.setData("text/plain", iconSrc);
-            event.dataTransfer.dropEffect = 'move';
+            if (this.player instanceof Player) {
+                var playerDataProto = this.player.toProto(true);
+                event.dataTransfer.setData("text/plain", btoa(String.fromCharCode(...PlayerProto.toBinary(playerDataProto))));
+            }
             this.raidPicker.setDragPlayer(this.player, this.raidIndex, type);
         };
         this.labelElem.ondragstart = event => {
@@ -252,7 +257,7 @@ export class PlayerPicker extends Component {
         };
         const copyElem = this.rootElem.getElementsByClassName('player-copy')[0];
         tippy(copyElem, {
-            'content': 'Copy',
+            'content': 'Drag to Copy',
             'allowHTML': true,
         });
         copyElem.ondragstart = event => {
@@ -260,7 +265,7 @@ export class PlayerPicker extends Component {
         };
         const deleteElem = this.rootElem.getElementsByClassName('player-delete')[0];
         tippy(deleteElem, {
-            'content': 'Delete',
+            'content': 'Click to Delete',
             'allowHTML': true,
         });
         deleteElem.addEventListener('click', event => {
@@ -283,12 +288,13 @@ export class PlayerPicker extends Component {
             event.preventDefault();
         };
         this.rootElem.ondrop = event => {
+            var dropData = event.dataTransfer.getData("text/plain");
             event.preventDefault();
             dragEnterCounter = 0;
             this.rootElem.classList.remove('dragto');
             const eventID = TypedEvent.nextEventID();
             TypedEvent.freezeAllAndDo(() => {
-                if (this.raidPicker.currentDragPlayer == null) {
+                if (this.raidPicker.currentDragPlayer == null && dropData.length == 0) {
                     return;
                 }
                 if (this.raidPicker.currentDragPlayerFromIndex == this.raidIndex) {
@@ -300,11 +306,26 @@ export class PlayerPicker extends Component {
                     const fromPlayerPicker = this.raidPicker.getPlayerPicker(this.raidPicker.currentDragPlayerFromIndex);
                     if (dragType == DragType.Swap) {
                         fromPlayerPicker.setPlayer(eventID, this.player, dragType);
-                        fromPlayerPicker.iconElem.src = this.iconElem.src;
+                        var myicon = this.iconElem.src;
+                        this.iconElem.src = fromPlayerPicker.iconElem.src;
+                        fromPlayerPicker.iconElem.src = myicon;
                     }
                     else if (dragType == DragType.Move) {
+                        this.iconElem.src = fromPlayerPicker.iconElem.src;
                         fromPlayerPicker.setPlayer(eventID, null, dragType);
                     }
+                }
+                else if (this.raidPicker.currentDragPlayer == null) {
+                    // This would be a copy from another window.
+                    const binary = atob(dropData);
+                    const bytes = new Uint8Array(binary.length);
+                    for (let i = 0; i < bytes.length; i++) {
+                        bytes[i] = binary.charCodeAt(i);
+                    }
+                    const playerProto = PlayerProto.fromBinary(bytes);
+                    var localPlayer = new Player(playerToSpec(playerProto), this.raidPicker.raidSimUI.sim);
+                    localPlayer.fromProto(eventID, playerProto);
+                    this.raidPicker.currentDragPlayer = localPlayer;
                 }
                 if (dragType == DragType.Copy) {
                     this.setPlayer(eventID, this.raidPicker.currentDragPlayer.clone(eventID), dragType);
@@ -312,7 +333,11 @@ export class PlayerPicker extends Component {
                 else {
                     this.setPlayer(eventID, this.raidPicker.currentDragPlayer, dragType);
                 }
-                this.iconElem.src = event.dataTransfer.getData('text/plain');
+                if (this.iconElem.src == "") {
+                    this.iconElem.src = playerPresets.filter(preset => {
+                        return preset.spec == localPlayer.spec;
+                    })[0].iconUrl;
+                }
                 this.raidPicker.clearDragPlayer();
             });
         };
@@ -522,7 +547,7 @@ class NewPlayerPicker extends Component {
                         const dragImage = new Image();
                         dragImage.src = matchingPreset.iconUrl;
                         event.dataTransfer.setDragImage(dragImage, 30, 30);
-                        event.dataTransfer.setData("text/plain", matchingPreset.iconUrl);
+                        event.dataTransfer.setData("text/plain", "");
                         event.dataTransfer.dropEffect = 'copy';
                         const newPlayer = new Player(matchingPreset.spec, this.raidPicker.raid.sim);
                         newPlayer.setRace(eventID, matchingPreset.defaultFactionRaces[this.raidPicker.getCurrentFaction()]);
@@ -578,7 +603,7 @@ class NewPlayerPicker extends Component {
                     const dragImage = new Image();
                     dragImage.src = matchingBuffBot.iconUrl;
                     event.dataTransfer.setDragImage(dragImage, 30, 30);
-                    event.dataTransfer.setData("text/plain", matchingBuffBot.iconUrl);
+                    event.dataTransfer.setData("text/plain", "");
                     event.dataTransfer.dropEffect = 'copy';
                     this.raidPicker.setDragPlayer(new BuffBot(matchingBuffBot.buffBotId, this.raidPicker.raidSimUI.sim), NEW_PLAYER, DragType.New);
                 };

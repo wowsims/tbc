@@ -115,6 +115,7 @@
 
 .dropdown-root:hover .dropdown-panel {
   display: flex !important;
+  flex-direction: column;
 }
 
 .dropdown-option-container:hover {
@@ -396,6 +397,7 @@
 
 .dropdown-root:hover .dropdown-panel {
   display: flex !important;
+  flex-direction: column;
 }
 
 .dropdown-option-container:hover {
@@ -877,6 +879,7 @@ input, select {
 
 .dropdown-root:hover .dropdown-panel {
   display: flex !important;
+  flex-direction: column;
 }
 
 .dropdown-option-container:hover {
@@ -1088,6 +1091,7 @@ input, select {
 
 .dropdown-root:hover .dropdown-panel {
   display: flex !important;
+  flex-direction: column;
 }
 
 .dropdown-option-container:hover {
@@ -1530,6 +1534,7 @@ input, select {
 
 .dropdown-root:hover .dropdown-panel {
   display: flex !important;
+  flex-direction: column;
 }
 
 .dropdown-option-container:hover {

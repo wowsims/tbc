@@ -270,6 +270,9 @@ export class RaidSimUI extends SimUI {
     getBuffBots() {
         return this.raidPicker.getBuffBots();
     }
+    setBuffBots(eventID, buffBotProtos) {
+        this.raidPicker.setBuffBots(eventID, buffBotProtos);
+    }
     getPlayersAndBuffBots() {
         const players = this.sim.raid.getPlayers();
         const buffBots = this.getBuffBots();
@@ -305,6 +308,9 @@ export class RaidSimUI extends SimUI {
             this.raidPicker.setBuffBots(eventID, settings.buffBots);
             this.blessingsPicker.setAssignments(eventID, settings.blessings || BlessingsAssignments.create());
         });
+    }
+    clearRaid(eventID) {
+        this.sim.raid.clearRaid(eventID);
     }
     // Returns the actual key to use for local storage, based on the given key part and the site context.
     getStorageKey(keyPart) {

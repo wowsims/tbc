@@ -54,7 +54,6 @@ export class Party {
         }
         TypedEvent.freezeAllAndDo(() => {
             const oldPlayer = this.players[playerIndex];
-            this.players[playerIndex] = newPlayer;
             if (oldPlayer != null) {
                 oldPlayer.changeEmitter.off(this.playerChangeListener);
                 oldPlayer.setParty(null);
@@ -64,8 +63,12 @@ export class Party {
                 if (newPlayerOldParty) {
                     newPlayerOldParty.setPlayer(eventID, newPlayer.getPartyIndex(), null);
                 }
+                this.players[playerIndex] = newPlayer;
                 newPlayer.changeEmitter.on(this.playerChangeListener);
                 newPlayer.setParty(this);
+            }
+            else {
+                this.players[playerIndex] = null;
             }
             this.compChangeEmitter.emit(eventID);
         });
