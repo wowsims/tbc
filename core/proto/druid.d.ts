@@ -82,9 +82,9 @@ export interface DruidTalents {
      */
     ferocity: number;
     /**
-     * @generated from protobuf field: int32 feral_aggresion = 18;
+     * @generated from protobuf field: int32 feral_aggression = 18;
      */
-    feralAggresion: number;
+    feralAggression: number;
     /**
      * @generated from protobuf field: int32 feral_instinct = 41;
      */
@@ -373,6 +373,20 @@ export interface FeralTankDruid {
  * @generated from protobuf message proto.FeralTankDruid.Rotation
  */
 export interface FeralTankDruid_Rotation {
+    /**
+     * Minimum rage to queue HS or Cleave.
+     *
+     * @generated from protobuf field: int32 maul_rage_threshold = 1;
+     */
+    maulRageThreshold: number;
+    /**
+     * @generated from protobuf field: bool maintain_demoralizing_roar = 2;
+     */
+    maintainDemoralizingRoar: boolean;
+    /**
+     * @generated from protobuf field: bool maintain_faerie_fire = 3;
+     */
+    maintainFaerieFire: boolean;
 }
 /**
  * @generated from protobuf message proto.FeralTankDruid.Options
@@ -382,6 +396,10 @@ export interface FeralTankDruid_Options {
      * @generated from protobuf field: proto.RaidTarget innervate_target = 1;
      */
     innervateTarget?: RaidTarget;
+    /**
+     * @generated from protobuf field: double starting_rage = 2;
+     */
+    startingRage: number;
 }
 declare class DruidTalents$Type extends MessageType<DruidTalents> {
     constructor();

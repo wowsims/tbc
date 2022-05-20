@@ -227,7 +227,7 @@ export const druidTalentsConfig = newTalentsConfig([
                 maxPoints: 5,
             },
             {
-                fieldName: 'feralAggresion',
+                fieldName: 'feralAggression',
                 location: {
                     rowIdx: 0,
                     colIdx: 2,
