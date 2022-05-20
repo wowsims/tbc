@@ -68,6 +68,7 @@ func (warrior *Warrior) ApplyTalents() {
 	warrior.applyOneHandedWeaponSpecialization()
 	warrior.applyTwoHandedWeaponSpecialization()
 	warrior.applyWeaponSpecializations()
+	warrior.applyBloodFrenzy()
 	warrior.applyUnbridledWrath()
 	warrior.applyFlurry()
 	warrior.applyShieldSpecialization()
@@ -90,7 +91,22 @@ func (warrior *Warrior) applyAngerManagement() {
 	})
 }
 
+func (warrior *Warrior) applyBloodFrenzy() {
+	if warrior.Talents.BloodFrenzy == 0 {
+		return
+	}
+
+	for i := int32(0); i < warrior.Env.GetNumTargets(); i++ {
+		target := warrior.Env.GetTargetUnit(i)
+		warrior.BloodFrenzyAuras = append(warrior.BloodFrenzyAuras, core.BloodFrenzyAura(target, warrior.Talents.BloodFrenzy))
+	}
+}
+
 func (warrior *Warrior) procBloodFrenzy(sim *core.Simulation, effect *core.SpellEffect, dur time.Duration) {
+	if warrior.Talents.BloodFrenzy == 0 {
+		return
+	}
+
 	aura := warrior.BloodFrenzyAuras[effect.Target.Index]
 	aura.Duration = dur
 	aura.Activate(sim)
