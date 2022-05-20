@@ -15,23 +15,25 @@ type Druid struct {
 	RebirthUsed       bool
 	MaulRageThreshold float64
 
-	FaerieFire  *core.Spell
-	Hurricane   *core.Spell
-	InsectSwarm *core.Spell
-	Lacerate    *core.Spell
-	Mangle      *core.Spell
-	Maul        *core.Spell
-	Moonfire    *core.Spell
-	Rebirth     *core.Spell
-	Starfire6   *core.Spell
-	Starfire8   *core.Spell
-	Swipe       *core.Spell
-	Wrath       *core.Spell
+	DemoralizingRoar *core.Spell
+	FaerieFire       *core.Spell
+	Hurricane        *core.Spell
+	InsectSwarm      *core.Spell
+	Lacerate         *core.Spell
+	Mangle           *core.Spell
+	Maul             *core.Spell
+	Moonfire         *core.Spell
+	Rebirth          *core.Spell
+	Starfire6        *core.Spell
+	Starfire8        *core.Spell
+	Swipe            *core.Spell
+	Wrath            *core.Spell
 
 	InsectSwarmDot *core.Dot
 	LacerateDot    *core.Dot
 	MoonfireDot    *core.Dot
 
+	DemoralizingRoarAura *core.Aura
 	FaerieFireAura       *core.Aura
 	MaulQueueAura        *core.Aura
 	NaturesGraceProcAura *core.Aura
@@ -63,7 +65,7 @@ func (druid *Druid) AddRaidBuffs(raidBuffs *proto.RaidBuffs) {
 const ravenGoddessItemID = 32387
 
 func (druid *Druid) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
-	if druid.Talents.MoonkinForm { // assume if you have moonkin talent you are using it.
+	if druid.Form.Matches(Moonkin) && druid.Talents.MoonkinForm {
 		partyBuffs.MoonkinAura = core.MaxTristate(partyBuffs.MoonkinAura, proto.TristateEffect_TristateEffectRegular)
 		for _, e := range druid.Equip {
 			if e.ID == ravenGoddessItemID {
@@ -72,7 +74,7 @@ func (druid *Druid) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 			}
 		}
 	}
-	if druid.Talents.LeaderOfThePack {
+	if druid.Form.Matches(Cat|Bear) && druid.Talents.LeaderOfThePack {
 		partyBuffs.LeaderOfThePack = core.MaxTristate(partyBuffs.LeaderOfThePack, proto.TristateEffect_TristateEffectRegular)
 		for _, e := range druid.Equip {
 			if e.ID == ravenGoddessItemID {
@@ -102,6 +104,15 @@ func (druid *Druid) Initialize() {
 	druid.Starfire6 = druid.newStarfireSpell(6)
 	druid.registerWrathSpell()
 	druid.registerInnervateCD()
+}
+
+// Separate so this can be omitted for other specs.
+func (druid *Druid) RegisterBearSpells(maulRageThreshold float64) {
+	druid.registerMangleSpell()
+	druid.registerMaulSpell(maulRageThreshold)
+	druid.registerLacerateSpell()
+	druid.registerSwipeSpell()
+	druid.registerDemoralizingRoarSpell()
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {

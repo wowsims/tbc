@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -51,6 +52,14 @@ func (druid *Druid) registerLacerateSpell() {
 		}),
 	})
 
+	tickDamage := 155.0 / 5
+	if ItemSetNordrassilHarness.CharacterHasSetBonus(&druid.Character, 4) {
+		tickDamage += 15
+	}
+	if druid.Equip[items.ItemSlotRanged].ID == 27744 { // Idol of Ursoc
+		tickDamage += 8
+	}
+
 	target := druid.CurrentTarget
 	dotAura := target.RegisterAura(core.Aura{
 		Label:     "Lacerate-" + strconv.Itoa(int(druid.Index)),
@@ -68,8 +77,12 @@ func (druid *Druid) registerLacerateSpell() {
 			ThreatMultiplier: 1,
 			IsPeriodic:       true,
 			IsPhantom:        true,
-			BaseDamage:       core.MultiplyByStacks(core.BaseDamageConfigFlat(155/5), dotAura),
+			BaseDamage:       core.MultiplyByStacks(core.BaseDamageConfigFlat(tickDamage), dotAura),
 			OutcomeApplier:   druid.OutcomeFuncTick(),
 		})),
 	})
+}
+
+func (druid *Druid) CanLacerate(sim *core.Simulation) bool {
+	return druid.CurrentRage() >= druid.Lacerate.DefaultCast.Cost
 }

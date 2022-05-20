@@ -10,7 +10,7 @@ import (
 
 func init() {
 	// Proc effects. Keep these in order by item ID.
-	core.AddItemEffect(12632, ApplyStormGauntlets)
+	core.AddItemEffect(9449, ApplyManualCrowdPummeler)
 	core.AddItemEffect(17111, ApplyBlazefuryMedallion)
 	core.AddItemEffect(17112, ApplyEmpyreanDemolisher)
 	core.AddItemEffect(23541, ApplyKhoriumChampion)
@@ -101,6 +101,13 @@ func ApplyShatteredSunPendantofMight(agent core.Agent) {
 			}
 		},
 	})
+}
+
+func ApplyManualCrowdPummeler(agent core.Agent) {
+	character := agent.GetCharacter()
+
+	// Assumes that the user will swap pummelers to have the buff for the whole fight.
+	character.AddStat(stats.MeleeHaste, 500)
 }
 
 func ApplyStormGauntlets(agent core.Agent) {

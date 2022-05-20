@@ -6,7 +6,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (druid *Druid) RegisterMaulSpell(rageThreshold float64) {
+func (druid *Druid) registerMaulSpell(rageThreshold float64) {
 	cost := 15.0 - float64(druid.Talents.Ferocity)
 	refundAmount := cost * 0.8
 
@@ -85,6 +85,6 @@ func (druid *Druid) TryMaul(sim *core.Simulation, mhSwingSpell *core.Spell) *cor
 	return druid.Maul
 }
 
-func (druid *Druid) ShouldMaul(sim *core.Simulation) bool {
+func (druid *Druid) ShouldQueueMaul(sim *core.Simulation) bool {
 	return druid.CurrentRage() >= druid.MaulRageThreshold
 }

@@ -9,21 +9,26 @@ import (
 
 func init() {
 	core.AddItemEffect(30664, ApplyLivingRootoftheWildheart)
-	core.AddItemEffect(33510, ApplyIdoloftheUnseenMoon)
 	core.AddItemEffect(32486, ApplyAshtongueTalisman)
+	core.AddItemEffect(32257, ApplyIdolOfTheWhiteStag)
+	core.AddItemEffect(33509, ApplyIdolOfTerror)
+	core.AddItemEffect(33510, ApplyIdolOfTheUnseenMoon)
 
-	core.AddItemSet(&ItemSetMalorne)
-	core.AddItemSet(&ItemSetNordrassil)
-	core.AddItemSet(&ItemSetThunderheart)
+	core.AddItemSet(&ItemSetMalorneRegalia)
+	core.AddItemSet(&ItemSetMalorneHarness)
+	core.AddItemSet(&ItemSetNordrassilRegalia)
+	core.AddItemSet(&ItemSetNordrassilHarness)
+	core.AddItemSet(&ItemSetThunderheartRegalia)
+	core.AddItemSet(&ItemSetThunderheartHarness)
 }
 
-var ItemSetMalorne = core.ItemSet{
-	Name: "Malorne Raiment",
+var ItemSetMalorneRegalia = core.ItemSet{
+	Name: "Malorne Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
 			druid := agent.(DruidAgent).GetDruid()
 			druid.RegisterAura(core.Aura{
-				Label:    "Malorne Raiment 2pc",
+				Label:    "Malorne Regalia 2pc",
 				Duration: core.NeverExpires,
 				OnReset: func(aura *core.Aura, sim *core.Simulation) {
 					aura.Activate(sim)
@@ -48,7 +53,45 @@ var ItemSetMalorne = core.ItemSet{
 	},
 }
 
-var ItemSetNordrassil = core.ItemSet{
+var ItemSetMalorneHarness = core.ItemSet{
+	Name: "Malorne Harness",
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			druid := agent.(DruidAgent).GetDruid()
+
+			procChance := 0.04
+
+			druid.RegisterAura(core.Aura{
+				Label:    "Malorne 4pc",
+				Duration: core.NeverExpires,
+				OnReset: func(aura *core.Aura, sim *core.Simulation) {
+					aura.Activate(sim)
+				},
+				OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+					if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+						if sim.RandomFloat("Malorne 2pc") < procChance {
+							if druid.Form.Matches(Bear) {
+								druid.AddRage(sim, 10, core.ActionID{SpellID: 37306})
+							} else if druid.Form.Matches(Cat) {
+								druid.AddEnergy(sim, 20, core.ActionID{SpellID: 37311})
+							}
+						}
+					}
+				},
+			})
+		},
+		4: func(agent core.Agent) {
+			druid := agent.(DruidAgent).GetDruid()
+			if druid.Form.Matches(Bear) {
+				druid.AddStat(stats.Armor, 1400)
+			} else if druid.Form.Matches(Cat) {
+				druid.AddStat(stats.Strength, 30)
+			}
+		},
+	},
+}
+
+var ItemSetNordrassilRegalia = core.ItemSet{
 	Name: "Nordrassil Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		4: func(agent core.Agent) {
@@ -57,7 +100,16 @@ var ItemSetNordrassil = core.ItemSet{
 	},
 }
 
-var ItemSetThunderheart = core.ItemSet{
+var ItemSetNordrassilHarness = core.ItemSet{
+	Name: "Nordrassil Harness",
+	Bonuses: map[int32]core.ApplyEffect{
+		4: func(agent core.Agent) {
+			// Implemented in lacerate.go.
+		},
+	},
+}
+
+var ItemSetThunderheartRegalia = core.ItemSet{
 	Name: "Thunderheart Regalia",
 	Bonuses: map[int32]core.ApplyEffect{
 		2: func(agent core.Agent) {
@@ -69,10 +121,31 @@ var ItemSetThunderheart = core.ItemSet{
 	},
 }
 
+var ItemSetThunderheartHarness = core.ItemSet{
+	Name: "Thunderheart Harness",
+	Bonuses: map[int32]core.ApplyEffect{
+		2: func(agent core.Agent) {
+			// Implemented in mangle.go.
+		},
+		4: func(agent core.Agent) {
+			// Implemented in swipe.go.
+		},
+	},
+}
+
 func ApplyLivingRootoftheWildheart(agent core.Agent) {
 	druid := agent.(DruidAgent).GetDruid()
 
-	procAura := druid.NewTemporaryStatsAura("Living Root Proc", core.ActionID{ItemID: 30664}, stats.Stats{stats.SpellPower: 209}, time.Second*15)
+	var procAura *core.Aura
+	if druid.Form.Matches(Moonkin) {
+		procAura = druid.NewTemporaryStatsAura("Living Root Moonkin Proc", core.ActionID{SpellID: 37343}, stats.Stats{stats.SpellPower: 209}, time.Second*15)
+	} else if druid.Form.Matches(Bear) {
+		procAura = druid.NewTemporaryStatsAura("Living Root Bear Proc", core.ActionID{SpellID: 37340}, stats.Stats{stats.Armor: 4070}, time.Second*15)
+	} else if druid.Form.Matches(Cat) {
+		procAura = druid.NewTemporaryStatsAura("Living Root Cat Proc", core.ActionID{SpellID: 37341}, stats.Stats{stats.Strength: 64}, time.Second*15)
+	} else {
+		return
+	}
 
 	druid.RegisterAura(core.Aura{
 		Label:    "Living Root of the Wildheart",
@@ -81,18 +154,116 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 			aura.Activate(sim)
 		},
 		OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
-			// technically only works while in moonkin form... but i think we can assume thats always true.
-			if druid.Talents.MoonkinForm {
-				if sim.RandomFloat("Living Root of the Wildheart") > 0.03 {
-					return
+			if druid.Form.Matches(Moonkin) && sim.RandomFloat("Living Root of the Wildheart") < 0.03 {
+				procAura.Activate(sim)
+			}
+		},
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+				return
+			}
+			if sim.RandomFloat("Living Root of the Wildheart") > 0.03 {
+				return
+			}
+
+			procAura.Activate(sim)
+		},
+	})
+}
+
+func ApplyAshtongueTalisman(agent core.Agent) {
+	druid := agent.(DruidAgent).GetDruid()
+
+	// Not in the game yet so cant test; this logic assumes that:
+	// - does not affect the starfire which procs it
+	// - can proc off of any completed cast, not just hits
+	actionID := core.ActionID{ItemID: 32486}
+
+	var procAura *core.Aura
+	if druid.Form.Matches(Moonkin) {
+		procAura = druid.NewTemporaryStatsAura("Ashtongue Talisman Proc", actionID, stats.Stats{stats.SpellPower: 150}, time.Second*8)
+	} else if druid.Form.Matches(Bear | Cat) {
+		procAura = druid.NewTemporaryStatsAura("Ashtongue Talisman Proc", actionID, stats.Stats{stats.Strength: 140}, time.Second*8)
+	} else {
+		return
+	}
+
+	druid.RegisterAura(core.Aura{
+		Label:    "Ashtongue Talisman",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell == druid.Starfire8 || spell == druid.Starfire6 {
+				if sim.RandomFloat("Ashtongue Talisman") < 0.25 {
+					procAura.Activate(sim)
 				}
+			} else if druid.Mangle != nil && spell == druid.Mangle {
+				if sim.RandomFloat("Ashtongue Talisman") < 0.4 {
+					procAura.Activate(sim)
+				}
+			}
+		},
+	})
+}
+
+func ApplyIdolOfTheWhiteStag(agent core.Agent) {
+	druid := agent.(DruidAgent).GetDruid()
+
+	actionID := core.ActionID{ItemID: 32257}
+	procAura := druid.NewTemporaryStatsAura("Idol of the White Stag Proc", actionID, stats.Stats{stats.AttackPower: 94}, time.Second*20)
+
+	druid.RegisterAura(core.Aura{
+		Label:    "Idol of the White Stag",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell == druid.Mangle && druid.Mangle != nil {
 				procAura.Activate(sim)
 			}
 		},
 	})
 }
 
-func ApplyIdoloftheUnseenMoon(agent core.Agent) {
+func ApplyIdolOfTerror(agent core.Agent) {
+	druid := agent.(DruidAgent).GetDruid()
+
+	actionID := core.ActionID{ItemID: 33509}
+	procAura := druid.NewTemporaryStatsAura("Idol of Terror Proc", actionID, stats.Stats{stats.Agility: 65}, time.Second*10)
+
+	procChance := 0.85
+	icd := core.Cooldown{
+		Timer:    druid.NewTimer(),
+		Duration: time.Second * 10,
+	}
+
+	druid.RegisterAura(core.Aura{
+		Label:    "Idol of Terror",
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spell != druid.Mangle || druid.Mangle == nil {
+				return
+			}
+			if !icd.IsReady(sim) {
+				return
+			}
+			if sim.RandomFloat("Idol of Terror") > procChance {
+				return
+			}
+
+			icd.Use(sim)
+			procAura.Activate(sim)
+		},
+	})
+}
+
+func ApplyIdolOfTheUnseenMoon(agent core.Agent) {
 	druid := agent.(DruidAgent).GetDruid()
 
 	actionID := core.ActionID{ItemID: 33510}
@@ -107,32 +278,6 @@ func ApplyIdoloftheUnseenMoon(agent core.Agent) {
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spell == druid.Moonfire {
 				if sim.RandomFloat("Idol of the Unseen Moon") > 0.5 {
-					return
-				}
-				procAura.Activate(sim)
-			}
-		},
-	})
-}
-
-func ApplyAshtongueTalisman(agent core.Agent) {
-	druid := agent.(DruidAgent).GetDruid()
-
-	// Not in the game yet so cant test; this logic assumes that:
-	// - does not affect the starfire which procs it
-	// - can proc off of any completed cast, not just hits
-	actionID := core.ActionID{ItemID: 32486}
-	procAura := druid.NewTemporaryStatsAura("Ashtongue Talisman Proc", actionID, stats.Stats{stats.SpellPower: 150}, time.Second*8)
-
-	druid.RegisterAura(core.Aura{
-		Label:    "Ashtongue Talisman",
-		Duration: core.NeverExpires,
-		OnReset: func(aura *core.Aura, sim *core.Simulation) {
-			aura.Activate(sim)
-		},
-		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spell == druid.Starfire8 || spell == druid.Starfire6 {
-				if sim.RandomFloat("Ashtongue Talisman") > 0.25 {
 					return
 				}
 				procAura.Activate(sim)

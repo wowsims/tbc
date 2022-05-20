@@ -459,6 +459,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestSmite-AllItems-ManualCrowdPummeler-9449"
+ value: {
+  dps: 872.8307266905014
+  tps: 837.1827043220142
+ }
+}
+dps_results: {
  key: "TestSmite-AllItems-MarkoftheChampion-23206"
  value: {
   dps: 987.347932561469

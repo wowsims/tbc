@@ -8,7 +8,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (druid *Druid) registerMangleSpell(cdTimer *core.Timer) {
+func (druid *Druid) registerMangleSpell() {
 	if !druid.Talents.Mangle {
 		return
 	}
@@ -33,7 +33,7 @@ func (druid *Druid) registerMangleSpell(cdTimer *core.Timer) {
 			},
 			IgnoreHaste: true,
 			CD: core.Cooldown{
-				Timer:    cdTimer,
+				Timer:    druid.NewTimer(),
 				Duration: time.Second * 6,
 			},
 		},
@@ -42,7 +42,7 @@ func (druid *Druid) registerMangleSpell(cdTimer *core.Timer) {
 			ProcMask: core.ProcMaskMeleeMHSpecial,
 
 			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			ThreatMultiplier: 1 + core.TernaryFloat64(druid.Form.Matches(Bear) && ItemSetThunderheartHarness.CharacterHasSetBonus(&druid.Character, 2), 0.15, 0),
 
 			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 155, 1.15, true),
 			OutcomeApplier: druid.OutcomeFuncMeleeSpecialHitAndCrit(druid.MeleeCritMultiplier()),

@@ -357,12 +357,14 @@ func WintersChillAura(target *Unit, startingStacks int32) *Aura {
 	})
 }
 
+var FaerieFireAuraTag = "Faerie Fire"
+
 func FaerieFireAura(target *Unit, level int32) *Aura {
 	const armorReduction = 610
 
 	return target.GetOrRegisterAura(Aura{
 		Label:    "Faerie Fire-" + strconv.Itoa(int(level)),
-		Tag:      "Faerie Fire",
+		Tag:      FaerieFireAuraTag,
 		ActionID: ActionID{SpellID: 26993},
 		Duration: time.Second * 40,
 		Priority: float64(level),

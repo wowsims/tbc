@@ -597,6 +597,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestProtectionWarrior-AllItems-ManualCrowdPummeler-9449"
+ value: {
+  dps: 454.14866732717485
+  tps: 808.7105550912456
+ }
+}
+dps_results: {
  key: "TestProtectionWarrior-AllItems-MarkoftheChampion-23206"
  value: {
   dps: 491.08773636668053
@@ -797,13 +804,6 @@ dps_results: {
  value: {
   dps: 458.112830418437
   tps: 803.3603822683029
- }
-}
-dps_results: {
- key: "TestProtectionWarrior-AllItems-StormGauntlets-12632"
- value: {
-  dps: 465.23704985678575
-  tps: 796.9864843688607
  }
 }
 dps_results: {

@@ -89,7 +89,7 @@ func (moonkin *BalanceDruid) GetDpsRotationHierarchy(baseRotation proto.BalanceD
 	currentRotation.PrimarySpell = proto.BalanceDruid_Rotation_Starfire6
 	rotations = append(rotations, currentRotation)
 
-	if druid.ItemSetNordrassil.CharacterHasSetBonus(&moonkin.Character, 4) {
+	if druid.ItemSetNordrassilRegalia.CharacterHasSetBonus(&moonkin.Character, 4) {
 		currentRotation.Moonfire = false
 		currentRotation.InsectSwarm = true
 		rotations = append(rotations, currentRotation)

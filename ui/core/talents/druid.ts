@@ -234,7 +234,7 @@ export const druidTalentsConfig: TalentsConfig<Spec.SpecBalanceDruid> = newTalen
 				maxPoints: 5,
 			},
 			{
-				fieldName: 'feralAggresion',
+				fieldName: 'feralAggression',
 				location: {
 					rowIdx: 0,
 					colIdx: 2,

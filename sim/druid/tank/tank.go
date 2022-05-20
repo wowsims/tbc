@@ -51,18 +51,16 @@ func NewFeralTankDruid(character core.Character, options proto.Player) *FeralTan
 		}
 	})
 
-	// Set up base paw weapon.
-	critMultiplier := bear.MeleeCritMultiplier()
-	basePaw := core.Weapon{
-		BaseDamageMin:        43.5,
-		BaseDamageMax:        66.5,
-		SwingSpeed:           1.0,
-		NormalizedSwingSpeed: 1.0,
-		SwingDuration:        time.Duration(1.0 * float64(time.Second)),
-		CritMultiplier:       critMultiplier,
-	}
 	bear.EnableAutoAttacks(bear, core.AutoAttackOptions{
-		MainHand:       basePaw,
+		// Base paw weapon.
+		MainHand: core.Weapon{
+			BaseDamageMin:        43.5,
+			BaseDamageMax:        66.5,
+			SwingSpeed:           2.5,
+			NormalizedSwingSpeed: 2.5,
+			SwingDuration:        time.Millisecond * 2500,
+			CritMultiplier:       bear.MeleeCritMultiplier(),
+		},
 		AutoSwingMelee: true,
 	})
 
@@ -96,4 +94,9 @@ type FeralTankDruid struct {
 
 func (bear *FeralTankDruid) GetDruid() *druid.Druid {
 	return bear.Druid
+}
+
+func (bear *FeralTankDruid) Initialize() {
+	bear.Druid.Initialize()
+	bear.RegisterBearSpells(float64(bear.Rotation.MaulRageThreshold))
 }
