@@ -133,6 +133,7 @@ class RaidWCLImporter extends Importer {
 			<p>
 				Import entire raid from a WCL report.
 				The players will be out of order and any specs not implemented will not be imported.
+				If there are blank spots in the raid, just re-import.
 			</p>
 			<p>
 				To import, paste the WCL report and fight link (https://classic.warcraftlogs.com/reports/REPORTID#fight=FIGHTID).
@@ -143,10 +144,6 @@ class RaidWCLImporter extends Importer {
 
 	onImport(importLink: string) {
 		// TODO: validate link so we dont get a crash
-		if (!importLink) {
-			importLink = "https://classic.warcraftlogs.com/reports/HmXdtqRTwFchK89j#fight=31";
-		}
-
 		const url = new URL(importLink);
 		var reportID = url.pathname.split("reports/")[1];
 		var hashVals = url.hash.replace("#", "").split("&");
@@ -166,6 +163,7 @@ class RaidWCLImporter extends Importer {
 		var encounter = Encounter.create();
 		encounter.targets = new Array<Target>();
 		var target = Target.create();
+
 		// TODO: look up target in WCL data.
 		target.armor = 7700;
 		target.level = 73;
@@ -382,9 +380,9 @@ class RaidWCLImporter extends Importer {
 						}
 					}
 				});
+				settings.blessings = makeDefaultBlessings(numPaladins);
 
 				this.simUI.clearRaid(TypedEvent.nextEventID());
-				settings.blessings = makeDefaultBlessings(numPaladins);
 				this.simUI.fromProto(TypedEvent.nextEventID(), settings);
 				this.simUI.setBuffBots(TypedEvent.nextEventID(), buffBots);
 				this.close();
