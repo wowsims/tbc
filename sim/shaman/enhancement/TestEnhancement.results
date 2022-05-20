@@ -718,6 +718,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestEnhancement-AllItems-StormGauntlets-12632"
+ value: {
+  dps: 1821.981007685862
+  tps: 1281.0397048446998
+ }
+}
+dps_results: {
  key: "TestEnhancement-AllItems-StrengthoftheClefthoof"
  value: {
   dps: 1665.8306754622422

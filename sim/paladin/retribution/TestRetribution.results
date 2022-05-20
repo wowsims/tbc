@@ -760,6 +760,13 @@ dps_results: {
  }
 }
 dps_results: {
+ key: "TestRetribution-AllItems-StormGauntlets-12632"
+ value: {
+  dps: 1996.040423177189
+  tps: 1397.228296224032
+ }
+}
+dps_results: {
  key: "TestRetribution-AllItems-StrengthoftheClefthoof"
  value: {
   dps: 1762.1577275180211
