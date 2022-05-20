@@ -131,13 +131,14 @@ class RaidWCLImporter extends Importer {
 				WARNING: THIS IS EXPERIMENTAL
 			</p>
 			<p>
-				Import entire raid from a WCL report.
-				The players will be out of order and any specs not implemented will not be imported.
-				If there are blank spots in the raid, just re-import.
+				Import entire raid from a WCL report.<br>
+				The players will be out of order and any specs not implemented will not be imported.<br>
+				If there are blank spots in the raid, just re-import.<br>
+				Do not use the 'IMPORT FROM FILE' button, it won't work.<br>
 			</p>
 			<p>
-				To import, paste the WCL report and fight link (https://classic.warcraftlogs.com/reports/REPORTID#fight=FIGHTID).
-				Include the fight ID or else first found fight will be used.
+				To import, paste the WCL report and fight link (https://classic.warcraftlogs.com/reports/REPORTID#fight=FIGHTID).<br>
+				Include the fight ID or else first found fight will be used.<br>
 			</p>
 		`;
 	}
