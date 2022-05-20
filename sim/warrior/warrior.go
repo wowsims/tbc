@@ -129,12 +129,6 @@ func (warrior *Warrior) Initialize() {
 	warrior.SunderArmor = warrior.newSunderArmorSpell(false)
 	warrior.SunderArmorDevastate = warrior.newSunderArmorSpell(true)
 
-	warrior.BloodFrenzyAuras = nil
-	for i := int32(0); i < warrior.Env.GetNumTargets(); i++ {
-		target := warrior.Env.GetTargetUnit(i)
-		warrior.BloodFrenzyAuras = append(warrior.BloodFrenzyAuras, core.BloodFrenzyAura(target, warrior.Talents.BloodFrenzy))
-	}
-
 	warrior.shoutDuration = time.Duration(float64(time.Minute*2) * (1 + 0.1*float64(warrior.Talents.BoomingVoice)))
 
 	warrior.registerBloodrageCD()
