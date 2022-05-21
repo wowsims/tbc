@@ -377,6 +377,35 @@ export declare enum ProtectionPaladin_Options_PrimaryJudgement {
     Twist = 2
 }
 /**
+ * @generated from protobuf enum proto.Blessings
+ */
+export declare enum Blessings {
+    /**
+     * @generated from protobuf enum value: BlessingUnknown = 0;
+     */
+    BlessingUnknown = 0,
+    /**
+     * @generated from protobuf enum value: BlessingOfKings = 1;
+     */
+    BlessingOfKings = 1,
+    /**
+     * @generated from protobuf enum value: BlessingOfMight = 2;
+     */
+    BlessingOfMight = 2,
+    /**
+     * @generated from protobuf enum value: BlessingOfSalvation = 3;
+     */
+    BlessingOfSalvation = 3,
+    /**
+     * @generated from protobuf enum value: BlessingOfWisdom = 4;
+     */
+    BlessingOfWisdom = 4,
+    /**
+     * @generated from protobuf enum value: BlessingOfSanctuary = 5;
+     */
+    BlessingOfSanctuary = 5
+}
+/**
  * @generated from protobuf enum proto.PaladinAura
  */
 export declare enum PaladinAura {

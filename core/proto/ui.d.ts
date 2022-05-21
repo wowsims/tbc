@@ -7,6 +7,7 @@ import { MessageType } from "@protobuf-ts/runtime";
 import { RaidSimResult } from "./api";
 import { RaidSimRequest } from "./api";
 import { Raid } from "./api";
+import { Blessings } from "./paladin";
 import { Cooldowns } from "./common";
 import { Race } from "./common";
 import { Consumes } from "./common";
@@ -309,35 +310,6 @@ export interface DetailedResultsUpdate {
     } | {
         oneofKind: undefined;
     };
-}
-/**
- * @generated from protobuf enum proto.Blessings
- */
-export declare enum Blessings {
-    /**
-     * @generated from protobuf enum value: BlessingUnknown = 0;
-     */
-    BlessingUnknown = 0,
-    /**
-     * @generated from protobuf enum value: BlessingOfKings = 1;
-     */
-    BlessingOfKings = 1,
-    /**
-     * @generated from protobuf enum value: BlessingOfMight = 2;
-     */
-    BlessingOfMight = 2,
-    /**
-     * @generated from protobuf enum value: BlessingOfSalvation = 3;
-     */
-    BlessingOfSalvation = 3,
-    /**
-     * @generated from protobuf enum value: BlessingOfWisdom = 4;
-     */
-    BlessingOfWisdom = 4,
-    /**
-     * @generated from protobuf enum value: BlessingOfSanctuary = 5;
-     */
-    BlessingOfSanctuary = 5
 }
 declare class SimSettings$Type extends MessageType<SimSettings> {
     constructor();

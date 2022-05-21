@@ -9,7 +9,7 @@ import { Race } from '/tbc/core/proto/common.js';
 import { RaidTarget } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { WeaponType } from '/tbc/core/proto/common.js';
-import { Blessings } from '/tbc/core/proto/ui.js';
+import { Blessings } from '/tbc/core/proto/paladin.js';
 import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 import { Stats } from './stats.js';
 import { BalanceDruid, FeralDruid, FeralTankDruid, BalanceDruid_Rotation as BalanceDruidRotation, FeralDruid_Rotation as FeralDruidRotation, FeralTankDruid_Rotation as FeralTankDruidRotation, DruidTalents, BalanceDruid_Options as BalanceDruidOptions, FeralDruid_Options as FeralDruidOptions, FeralTankDruid_Options as FeralTankDruidOptions } from '/tbc/core/proto/druid.js';

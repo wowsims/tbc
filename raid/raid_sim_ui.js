@@ -3,7 +3,7 @@ import { SimUI } from '/tbc/core/sim_ui.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TypedEvent } from '/tbc/core/typed_event.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
-import { Blessings } from '/tbc/core/proto/ui.js';
+import { Blessings } from '/tbc/core/proto/paladin.js';
 import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 import { RaidSimSettings } from '/tbc/core/proto/ui.js';
 import { SavedEncounter } from '/tbc/core/proto/ui.js';
@@ -22,8 +22,10 @@ import { addRaidSimAction } from '/tbc/core/components/raid_sim_action.js';
 import { AssignmentsPicker } from './assignments_picker.js';
 import { BlessingsPicker } from './blessings_picker.js';
 import { RaidPicker } from './raid_picker.js';
+import { TanksPicker } from './tanks_picker.js';
 import { implementedSpecs } from './presets.js';
 import { newRaidExporters, newRaidImporters } from './import_export.js';
+import * as Tooltips from '/tbc/core/constants/tooltips.js';
 const extraKnownIssues = [
     'We\'re still missing implementations for many specs. If you\'d like to help us out, check out our <a href="https://github.com/wowsims/tbc">Github project</a> or <a href="https://discord.gg/jJMPr9JWwx">join our discord</a>!',
 ];
@@ -42,6 +44,7 @@ export class RaidSimUI extends SimUI {
         this.referenceChangeEmitter = new TypedEvent();
         this.rootElem.classList.add('raid-sim-ui');
         this.config = config;
+        this.settingsMuuri = null;
         this.sim.raid.compChangeEmitter.on(eventID => this.compChangeEmitter.emit(eventID));
         this.sim.setModifyRaidProto(raidProto => this.modifyRaidProto(raidProto));
         [
@@ -55,6 +58,7 @@ export class RaidSimUI extends SimUI {
         this.addSettingsTab();
         this.addDetailedResultsTab();
         this.addLogTab();
+        this.changeEmitter.on(() => this.recomputeSettingsLayout());
     }
     loadSettings() {
         const initEventID = TypedEvent.nextEventID();
@@ -138,19 +142,21 @@ export class RaidSimUI extends SimUI {
     addSettingsTab() {
         this.addTab('SETTINGS', 'raid-settings-tab', `
 			<div class="raid-settings-sections">
-				<div class="raid-settings-section-container">
+				<div class="settings-section-container raid-settings-section-container">
 					<fieldset class="settings-section raid-encounter-section">
 						<legend>Encounter</legend>
 					</fieldset>
 				</div>
-				<div class="blessings-section-container">
+				<div class="settings-section-container blessings-section-container">
 					<fieldset class="settings-section blessings-section">
 						<legend>Blessings</legend>
 					</fieldset>
 				</div>
-				<div class="assignments-section-container">
+				<div class="settings-section-container assignments-section-container">
 				</div>
-				<div class="raid-settings-section-container">
+				<div class="settings-section-container tanks-section-container">
+				</div>
+				<div class="settings-section-container raid-settings-section-container">
 					<fieldset class="settings-section other-options-section">
 						<legend>Other Options</legend>
 					</fieldset>
@@ -181,9 +187,16 @@ export class RaidSimUI extends SimUI {
         this.sim.waitForInit().then(() => {
             savedEncounterManager.loadUserData();
         });
-        this.blessingsPicker = new BlessingsPicker(this.rootElem.getElementsByClassName('blessings-section')[0], this);
+        const blessingsSection = this.rootElem.getElementsByClassName('blessings-section')[0];
+        this.blessingsPicker = new BlessingsPicker(blessingsSection, this);
         this.blessingsPicker.changeEmitter.on(eventID => this.changeEmitter.emit(eventID));
+        tippy(blessingsSection, {
+            content: Tooltips.BLESSINGS_SECTION,
+            allowHTML: true,
+            placement: 'left',
+        });
         const assignmentsPicker = new AssignmentsPicker(this.rootElem.getElementsByClassName('assignments-section-container')[0], this);
+        const tanksPicker = new TanksPicker(this.rootElem.getElementsByClassName('tanks-section-container')[0], this);
         const otherOptionsSectionElem = this.rootElem.getElementsByClassName('other-options-section')[0];
         new BooleanPicker(otherOptionsSectionElem, this.sim.raid, {
             label: 'Stagger Stormstrikes',
@@ -193,6 +206,18 @@ export class RaidSimUI extends SimUI {
             setValue: (eventID, raid, newValue) => {
                 raid.setStaggerStormstrikes(eventID, newValue);
             },
+        });
+        // Init Muuri layout only when settings tab is clicked, because it needs the elements
+        // to be shown so it can calculate sizes.
+        this.rootElem.getElementsByClassName('raid-settings-tab-tab')[0].addEventListener('click', event => {
+            if (this.settingsMuuri == null) {
+                setTimeout(() => {
+                    this.settingsMuuri = new Muuri('.raid-settings-sections');
+                }, 200); // Magic amount of time before Muuri init seems to work
+            }
+            setTimeout(() => {
+                this.recomputeSettingsLayout();
+            }, 200);
         });
     }
     addDetailedResultsTab() {
@@ -208,6 +233,12 @@ export class RaidSimUI extends SimUI {
 			</div>
 		`);
         const logRunner = new LogRunner(this.rootElem.getElementsByClassName('log-runner')[0], this);
+    }
+    recomputeSettingsLayout() {
+        if (this.settingsMuuri) {
+            //this.settingsMuuri.refreshItems();
+        }
+        window.dispatchEvent(new Event('resize'));
     }
     modifyRaidProto(raidProto) {
         // Invoke all the buff bot callbacks.
@@ -237,6 +268,12 @@ export class RaidSimUI extends SimUI {
                 }
                 else if (paladin.blessings[spec] == Blessings.BlessingOfWisdom) {
                     playerProtos.forEach(playerProto => playerProto.buffs.blessingOfWisdom = TristateEffect.TristateEffectImproved);
+                }
+                else if (paladin.blessings[spec] == Blessings.BlessingOfSalvation) {
+                    playerProtos.forEach(playerProto => playerProto.buffs.blessingOfSalvation = true);
+                }
+                else if (paladin.blessings[spec] == Blessings.BlessingOfSanctuary) {
+                    playerProtos.forEach(playerProto => playerProto.buffs.blessingOfSanctuary = true);
                 }
             });
         });
@@ -305,7 +342,7 @@ export class RaidSimUI extends SimUI {
         });
     }
     clearRaid(eventID) {
-        this.sim.raid.clearRaid(eventID);
+        this.sim.raid.clear(eventID);
     }
     // Returns the actual key to use for local storage, based on the given key part and the site context.
     getStorageKey(keyPart) {

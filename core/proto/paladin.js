@@ -62,6 +62,36 @@ export var ProtectionPaladin_Options_PrimaryJudgement;
     ProtectionPaladin_Options_PrimaryJudgement[ProtectionPaladin_Options_PrimaryJudgement["Twist"] = 2] = "Twist";
 })(ProtectionPaladin_Options_PrimaryJudgement || (ProtectionPaladin_Options_PrimaryJudgement = {}));
 /**
+ * @generated from protobuf enum proto.Blessings
+ */
+export var Blessings;
+(function (Blessings) {
+    /**
+     * @generated from protobuf enum value: BlessingUnknown = 0;
+     */
+    Blessings[Blessings["BlessingUnknown"] = 0] = "BlessingUnknown";
+    /**
+     * @generated from protobuf enum value: BlessingOfKings = 1;
+     */
+    Blessings[Blessings["BlessingOfKings"] = 1] = "BlessingOfKings";
+    /**
+     * @generated from protobuf enum value: BlessingOfMight = 2;
+     */
+    Blessings[Blessings["BlessingOfMight"] = 2] = "BlessingOfMight";
+    /**
+     * @generated from protobuf enum value: BlessingOfSalvation = 3;
+     */
+    Blessings[Blessings["BlessingOfSalvation"] = 3] = "BlessingOfSalvation";
+    /**
+     * @generated from protobuf enum value: BlessingOfWisdom = 4;
+     */
+    Blessings[Blessings["BlessingOfWisdom"] = 4] = "BlessingOfWisdom";
+    /**
+     * @generated from protobuf enum value: BlessingOfSanctuary = 5;
+     */
+    Blessings[Blessings["BlessingOfSanctuary"] = 5] = "BlessingOfSanctuary";
+})(Blessings || (Blessings = {}));
+/**
  * @generated from protobuf enum proto.PaladinAura
  */
 export var PaladinAura;

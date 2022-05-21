@@ -136,7 +136,7 @@ export class Raid {
             }
         });
     }
-    clearRaid(eventID) {
+    clear(eventID) {
         TypedEvent.freezeAllAndDo(() => {
             for (let i = 0; i < MAX_NUM_PARTIES; i++) {
                 this.parties[i].clear(eventID);

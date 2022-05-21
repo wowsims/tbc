@@ -41,5 +41,5 @@ export declare class Raid {
     setStaggerStormstrikes(eventID: EventID, newValue: boolean): void;
     toProto(forExport?: boolean): RaidProto;
     fromProto(eventID: EventID, proto: RaidProto): void;
-    clearRaid(eventID: EventID): void;
+    clear(eventID: EventID): void;
 }

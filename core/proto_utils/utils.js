@@ -19,7 +19,7 @@ import { RangedWeaponType } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { WeaponType } from '/tbc/core/proto/common.js';
-import { Blessings } from '/tbc/core/proto/ui.js';
+import { Blessings } from '/tbc/core/proto/paladin.js';
 import { BlessingsAssignment } from '/tbc/core/proto/ui.js';
 import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
