@@ -203,11 +203,6 @@ export class RaidSimUI extends SimUI {
 		new EncounterPicker(encounterSectionElem, this.sim.encounter, {
 			simpleTargetStats: [
 				Stat.StatArmor,
-				Stat.StatArcaneResistance,
-				Stat.StatFireResistance,
-				Stat.StatFrostResistance,
-				Stat.StatNatureResistance,
-				Stat.StatShadowResistance,
 			],
 			showExecuteProportion: true,
 		});
