@@ -67,6 +67,9 @@ func NewFeralTankDruid(character core.Character, options proto.Player) *FeralTan
 		},
 	})
 
+	// Prevents Windfury from applying.
+	bear.HasMHWeaponImbue = true
+
 	bear.PseudoStats.ThreatMultiplier *= 1.3 + 0.05*float64(bear.Talents.FeralInstinct)
 
 	// Bear Form adds 210 AP (3 * Level).
