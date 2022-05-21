@@ -77,12 +77,28 @@ export const FeralTankDruidRotationConfig = {
             getModObject: (simUI) => simUI.player,
             config: {
                 label: 'Maintain Demo Roar',
-                labelTooltip: 'Keep Demo Roar active on the primary target. If a stronger debuff is active, will not cast.',
+                labelTooltip: 'Keep Demoralizing Roar active on the primary target. If a stronger debuff is active, will not cast.',
                 changedEvent: (player) => player.rotationChangeEmitter,
                 getValue: (player) => player.getRotation().maintainDemoralizingRoar,
                 setValue: (eventID, player, newValue) => {
                     const newRotation = player.getRotation();
                     newRotation.maintainDemoralizingRoar = newValue;
+                    player.setRotation(eventID, newRotation);
+                },
+            },
+        },
+        {
+            type: 'boolean',
+            cssClass: 'maintain-faerie-fire-picker',
+            getModObject: (simUI) => simUI.player,
+            config: {
+                label: 'Maintain Faerie Fire',
+                labelTooltip: 'Keep Faerie Fire active on the primary target. If a stronger debuff is active, will not cast.',
+                changedEvent: (player) => player.rotationChangeEmitter,
+                getValue: (player) => player.getRotation().maintainFaerieFire,
+                setValue: (eventID, player, newValue) => {
+                    const newRotation = player.getRotation();
+                    newRotation.maintainFaerieFire = newValue;
                     player.setRotation(eventID, newRotation);
                 },
             },

@@ -24,9 +24,10 @@ export const DemoRoarTalents = {
 };
 export const DefaultRotation = DruidRotation.create({
     maulRageThreshold: 50,
-    maintainDemoralizingRoar: true,
     swipe: Swipe.SwipeWithEnoughAP,
     swipeApThreshold: 2700,
+    maintainDemoralizingRoar: true,
+    maintainFaerieFire: true,
 });
 export const DefaultOptions = DruidOptions.create({
     innervateTarget: RaidTarget.create({
