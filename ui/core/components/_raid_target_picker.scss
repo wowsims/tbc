@@ -8,6 +8,10 @@
 		0 0 3px black;
 }
 
+.raid-target-picker-dropdown {
+	grid-template-columns: repeat(2, 1fr);
+}
+
 .raid-target-picker-option {
 	height: 30px;
 }

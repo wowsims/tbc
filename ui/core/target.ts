@@ -289,7 +289,7 @@ export class Target {
 			mobType: MobType.MobTypeDemon,
 			tankIndex: 0,
 			swingSpeed: 2,
-			minBaseDamage: 5000,
+			minBaseDamage: 10000,
 			dualWield: false,
 			dualWieldPenalty: false,
 			canCrush: true,
