@@ -38,15 +38,6 @@ export class RetributionPaladinSimUI extends IndividualSimUI<Spec.SpecRetributio
 				<p>Seal of Command aura will log at expiring at a longer duration than 400ms when changing seals.\
 				However, the 400ms duration is correctly calculated internally for determining procs and damage.</p>"
 			],
-			warnings: [
-				(simUI: IndividualSimUI<Spec.SpecRetributionPaladin>) => {
-					return {
-						updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter]),
-						shouldDisplay: () => true,
-						getContent: () => 'This sim is newly released, and there are likely a few bugs. Please let us know if you encounter any issues!',
-					};
-				},
-			],
 
 			// All stats for which EP should be calculated.
 			epStats: [

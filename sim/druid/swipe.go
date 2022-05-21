@@ -2,11 +2,17 @@ package druid
 
 import (
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func (druid *Druid) registerSwipeSpell() {
 	cost := 20.0 - float64(druid.Talents.Ferocity)
+
+	baseDamage := 84.0
+	if druid.Equip[items.ItemSlotRanged].ID == 23198 { // Idol of Brutality
+		baseDamage += 10
+	}
 
 	baseEffect := core.SpellEffect{
 		ProcMask: core.ProcMaskMeleeMHSpecial,
@@ -16,7 +22,7 @@ func (druid *Druid) registerSwipeSpell() {
 
 		BaseDamage: core.BaseDamageConfig{
 			Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
-				return 84 + 0.07*hitEffect.MeleeAttackPower(spell.Unit)
+				return baseDamage + 0.07*hitEffect.MeleeAttackPower(spell.Unit)
 			},
 			TargetSpellCoefficient: 1,
 		},

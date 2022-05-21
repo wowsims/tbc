@@ -2,6 +2,7 @@ package druid
 
 import (
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
@@ -9,6 +10,11 @@ import (
 func (druid *Druid) registerMaulSpell(rageThreshold float64) {
 	cost := 15.0 - float64(druid.Talents.Ferocity)
 	refundAmount := cost * 0.8
+
+	baseDamage := 176.0
+	if druid.Equip[items.ItemSlotRanged].ID == 23198 { // Idol of Brutality
+		baseDamage += 50
+	}
 
 	druid.Maul = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 26996},
@@ -31,7 +37,7 @@ func (druid *Druid) registerMaulSpell(rageThreshold float64) {
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  344,
 
-			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 176, 1, true),
+			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, baseDamage, 1, true),
 			OutcomeApplier: druid.OutcomeFuncMeleeSpecialHitAndCrit(druid.MeleeCritMultiplier()),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
