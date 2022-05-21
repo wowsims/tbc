@@ -114,8 +114,7 @@
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: flex !important;
-  flex-direction: column;
+  display: grid !important;
 }
 
 .dropdown-option-container:hover {
@@ -245,6 +244,8 @@
 .sim-title-dropdown {
   position: fixed !important;
   z-index: 9999 !important;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-flow: column;
 }
 
 .sim-title-button .sim-title-dropdown-option-container {
@@ -396,8 +397,7 @@
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: flex !important;
-  flex-direction: column;
+  display: grid !important;
 }
 
 .dropdown-option-container:hover {
@@ -831,10 +831,6 @@ input, select {
   display: inline-block;
 }
 
-.cooldown-action-picker .dropdown-panel-column {
-  background-color: transparent;
-}
-
 .delete-cooldown {
   color: red;
   margin: 3px;
@@ -1192,8 +1188,7 @@ input, select {
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: flex !important;
-  flex-direction: column;
+  display: grid !important;
 }
 
 .dropdown-option-container:hover {
@@ -1605,8 +1600,7 @@ input, select {
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: flex !important;
-  flex-direction: column;
+  display: grid !important;
 }
 
 .dropdown-option-container:hover {
@@ -1962,8 +1956,7 @@ input, select {
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: flex !important;
-  flex-direction: column;
+  display: grid !important;
 }
 
 .dropdown-option-container:hover {
@@ -2097,6 +2090,10 @@ input, select {
   margin: 2px;
   color: white;
   text-shadow: 0 0 3px black, 0 0 3px black, 0 0 3px black;
+}
+
+.raid-target-picker-dropdown {
+  grid-template-columns: repeat(2, 1fr);
 }
 
 .raid-target-picker-option {
@@ -2340,8 +2337,7 @@ input, select {
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: flex !important;
-  flex-direction: column;
+  display: grid !important;
 }
 
 .dropdown-option-container:hover {
@@ -2622,8 +2618,7 @@ input, select {
 }
 
 .dropdown-root:hover .dropdown-panel {
-  display: flex !important;
-  flex-direction: column;
+  display: grid !important;
 }
 
 .dropdown-option-container:hover {

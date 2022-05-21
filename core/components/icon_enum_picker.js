@@ -29,21 +29,11 @@ export class IconEnumPicker extends Input {
         this.buttonElem.addEventListener('touchend', event => {
             event.preventDefault();
         });
-        let columns = [];
-        for (let i = 0; i < this.config.numColumns; i++) {
-            const column = document.createElement('div');
-            column.classList.add('dropdown-panel-column', 'icon-enum-picker-column');
-            dropdownElem.appendChild(column);
-            columns.push(column);
-        }
-        const numOptions = config.values.length;
-        const maxOptionsPerColumn = Math.ceil(numOptions / this.config.numColumns);
+        dropdownElem.style.gridTemplateColumns = `repeat(${this.config.numColumns}, 1fr)`;
         config.values.forEach((valueConfig, i) => {
-            const colIdx = Math.floor(i / maxOptionsPerColumn);
-            const column = columns[colIdx];
             const optionContainer = document.createElement('div');
             optionContainer.classList.add('dropdown-option-container');
-            column.appendChild(optionContainer);
+            dropdownElem.appendChild(optionContainer);
             const option = document.createElement('a');
             option.classList.add('dropdown-option', 'icon-enum-picker-option');
             optionContainer.appendChild(option);

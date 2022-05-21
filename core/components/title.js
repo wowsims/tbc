@@ -9,25 +9,23 @@ export class Title extends Component {
         this.rootElem.classList.add('dropdown-root');
         this.rootElem.innerHTML = `
 			<div class="dropdown-button sim-title-button"></div>
-			<div class="dropdown-panel sim-title-dropdown within-raid-sim-hide">
-				<div class="dropdown-panel-column"></div>
-				<div class="dropdown-panel-column"></div>
-			</div>
+			<div class="dropdown-panel sim-title-dropdown within-raid-sim-hide"></div>
     `;
         this.buttonElem = this.rootElem.getElementsByClassName('sim-title-button')[0];
-        const dropdownColumns = Array.from(this.rootElem.getElementsByClassName('dropdown-panel-column'));
+        const dropdownPanel = this.rootElem.getElementsByClassName('dropdown-panel')[0];
         this.buttonElem.addEventListener('click', event => {
             event.preventDefault();
         });
         const orderedLaunchedSpecs = naturalSpecOrder
             .filter(spec => launchedSpecs.includes(spec))
             .concat([null]); // Null represents the raid sim.
+        dropdownPanel.style.gridTemplateRows = `repeat(${Math.ceil(orderedLaunchedSpecs.length / 2)}, 1fr)`;
         const currentOption = this.makeOptionData(currentSpec, true);
         const otherOptions = orderedLaunchedSpecs.map(spec => this.makeOptionData(spec, false));
         this.buttonElem.appendChild(Title.makeOptionElem(currentOption));
         const isWithinRaidSim = this.rootElem.closest('.within-raid-sim') != null;
         if (!isWithinRaidSim) {
-            otherOptions.forEach((option, i) => dropdownColumns[i % 2].appendChild(this.makeOption(option)));
+            otherOptions.forEach((option, i) => dropdownPanel.appendChild(this.makeOption(option)));
         }
     }
     makeOptionData(spec, isButton) {
