@@ -56,6 +56,7 @@ export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid
 				Stat.StatStrength,
 				Stat.StatAgility,
 				Stat.StatAttackPower,
+				Stat.StatFeralAttackPower,
 				Stat.StatExpertise,
 				Stat.StatMeleeHit,
 				Stat.StatMeleeCrit,
@@ -102,6 +103,7 @@ export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid
 					[Stat.StatStrength]: 2.266,
 					[Stat.StatAgility]: 4.6,
 					[Stat.StatAttackPower]: 1,
+					[Stat.StatFeralAttackPower]: 1,
 					[Stat.StatExpertise]: 7.3,
 					[Stat.StatMeleeHit]: 3.5,
 					[Stat.StatMeleeCrit]: 1.0,
@@ -282,10 +284,15 @@ export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid
 				// Preset talents that the user can quickly select.
 				talents: [
 					Presets.StandardTalents,
+					Presets.DemoRoarTalents,
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
+					Presets.P1_PRESET,
+					Presets.P2_PRESET,
+					Presets.P3_PRESET,
 					Presets.P4_PRESET,
+					Presets.P5_PRESET,
 				],
 			},
 		});
