@@ -387,6 +387,31 @@ export interface FeralTankDruid_Rotation {
      * @generated from protobuf field: bool maintain_faerie_fire = 3;
      */
     maintainFaerieFire: boolean;
+    /**
+     * @generated from protobuf field: proto.FeralTankDruid.Rotation.Swipe swipe = 4;
+     */
+    swipe: FeralTankDruid_Rotation_Swipe;
+    /**
+     * @generated from protobuf field: double swipe_ap_threshold = 5;
+     */
+    swipeApThreshold: number;
+}
+/**
+ * @generated from protobuf enum proto.FeralTankDruid.Rotation.Swipe
+ */
+export declare enum FeralTankDruid_Rotation_Swipe {
+    /**
+     * @generated from protobuf enum value: SwipeNone = 0;
+     */
+    SwipeNone = 0,
+    /**
+     * @generated from protobuf enum value: SwipeWithEnoughAP = 1;
+     */
+    SwipeWithEnoughAP = 1,
+    /**
+     * @generated from protobuf enum value: SwipeSpam = 2;
+     */
+    SwipeSpam = 2
 }
 /**
  * @generated from protobuf message proto.FeralTankDruid.Options

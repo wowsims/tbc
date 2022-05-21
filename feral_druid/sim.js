@@ -118,8 +118,8 @@ export class FeralDruidSimUI extends IndividualSimUI {
                     sunderArmor: true,
                     curseOfRecklessness: true,
                     huntersMark: TristateEffect.TristateEffectImproved,
-                    exposeWeaknessUptime: 1.0,
-                    exposeWeaknessHunterAgility: 1000,
+                    exposeWeaknessUptime: 0.95,
+                    exposeWeaknessHunterAgility: 1200,
                 }),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.

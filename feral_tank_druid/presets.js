@@ -1,12 +1,14 @@
 import { Consumes } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Conjured } from '/tbc/core/proto/common.js';
-import { WeaponImbue } from '/tbc/core/proto/common.js';
-import { FeralTankDruid_Rotation as DruidRotation, FeralTankDruid_Options as DruidOptions } from '/tbc/core/proto/druid.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
+import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
+import { FeralTankDruid_Rotation as DruidRotation, FeralTankDruid_Rotation_Swipe as Swipe, FeralTankDruid_Options as DruidOptions } from '/tbc/core/proto/druid.js';
 import * as Enchants from '/tbc/core/constants/enchants.js';
 import * as Gems from '/tbc/core/proto_utils/gems.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
@@ -19,16 +21,27 @@ export const StandardTalents = {
     name: 'Standard',
     data: '-503032132322105301251-05503301',
 };
-export const DefaultRotation = DruidRotation.create({});
-export const DefaultOptions = DruidOptions.create({});
+export const DefaultRotation = DruidRotation.create({
+    maulRageThreshold: 50,
+    maintainDemoralizingRoar: true,
+    swipe: Swipe.SwipeWithEnoughAP,
+    swipeApThreshold: 2700,
+});
+export const DefaultOptions = DruidOptions.create({
+    innervateTarget: RaidTarget.create({
+        targetIndex: NO_TARGET,
+    }),
+    startingRage: 20,
+});
 export const DefaultConsumes = Consumes.create({
     battleElixir: BattleElixir.ElixirOfMajorAgility,
+    guardianElixir: GuardianElixir.GiftOfArthas,
     food: Food.FoodGrilledMudfish,
-    mainHandImbue: WeaponImbue.WeaponImbueAdamantiteWeightstone,
     defaultPotion: Potions.HastePotion,
-    defaultConjured: Conjured.ConjuredDarkRune,
+    defaultConjured: Conjured.ConjuredFlameCap,
     scrollOfAgility: 5,
     scrollOfStrength: 5,
+    scrollOfProtection: 5,
 });
 export const P4_PRESET = {
     name: 'P4 Preset',

@@ -48,6 +48,24 @@ export var FeralDruid_Rotation_FinishingMove;
      */
     FeralDruid_Rotation_FinishingMove[FeralDruid_Rotation_FinishingMove["None"] = 2] = "None";
 })(FeralDruid_Rotation_FinishingMove || (FeralDruid_Rotation_FinishingMove = {}));
+/**
+ * @generated from protobuf enum proto.FeralTankDruid.Rotation.Swipe
+ */
+export var FeralTankDruid_Rotation_Swipe;
+(function (FeralTankDruid_Rotation_Swipe) {
+    /**
+     * @generated from protobuf enum value: SwipeNone = 0;
+     */
+    FeralTankDruid_Rotation_Swipe[FeralTankDruid_Rotation_Swipe["SwipeNone"] = 0] = "SwipeNone";
+    /**
+     * @generated from protobuf enum value: SwipeWithEnoughAP = 1;
+     */
+    FeralTankDruid_Rotation_Swipe[FeralTankDruid_Rotation_Swipe["SwipeWithEnoughAP"] = 1] = "SwipeWithEnoughAP";
+    /**
+     * @generated from protobuf enum value: SwipeSpam = 2;
+     */
+    FeralTankDruid_Rotation_Swipe[FeralTankDruid_Rotation_Swipe["SwipeSpam"] = 2] = "SwipeSpam";
+})(FeralTankDruid_Rotation_Swipe || (FeralTankDruid_Rotation_Swipe = {}));
 // @generated message type with reflection information, may provide speed optimized methods
 class DruidTalents$Type extends MessageType {
     constructor() {
@@ -857,11 +875,13 @@ class FeralTankDruid_Rotation$Type extends MessageType {
         super("proto.FeralTankDruid.Rotation", [
             { no: 1, name: "maul_rage_threshold", kind: "scalar", T: 5 /*ScalarType.INT32*/ },
             { no: 2, name: "maintain_demoralizing_roar", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
-            { no: 3, name: "maintain_faerie_fire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ }
+            { no: 3, name: "maintain_faerie_fire", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 4, name: "swipe", kind: "enum", T: () => ["proto.FeralTankDruid.Rotation.Swipe", FeralTankDruid_Rotation_Swipe] },
+            { no: 5, name: "swipe_ap_threshold", kind: "scalar", T: 1 /*ScalarType.DOUBLE*/ }
         ]);
     }
     create(value) {
-        const message = { maulRageThreshold: 0, maintainDemoralizingRoar: false, maintainFaerieFire: false };
+        const message = { maulRageThreshold: 0, maintainDemoralizingRoar: false, maintainFaerieFire: false, swipe: 0, swipeApThreshold: 0 };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -880,6 +900,12 @@ class FeralTankDruid_Rotation$Type extends MessageType {
                     break;
                 case /* bool maintain_faerie_fire */ 3:
                     message.maintainFaerieFire = reader.bool();
+                    break;
+                case /* proto.FeralTankDruid.Rotation.Swipe swipe */ 4:
+                    message.swipe = reader.int32();
+                    break;
+                case /* double swipe_ap_threshold */ 5:
+                    message.swipeApThreshold = reader.double();
                     break;
                 default:
                     let u = options.readUnknownField;
@@ -902,6 +928,12 @@ class FeralTankDruid_Rotation$Type extends MessageType {
         /* bool maintain_faerie_fire = 3; */
         if (message.maintainFaerieFire !== false)
             writer.tag(3, WireType.Varint).bool(message.maintainFaerieFire);
+        /* proto.FeralTankDruid.Rotation.Swipe swipe = 4; */
+        if (message.swipe !== 0)
+            writer.tag(4, WireType.Varint).int32(message.swipe);
+        /* double swipe_ap_threshold = 5; */
+        if (message.swipeApThreshold !== 0)
+            writer.tag(5, WireType.Bit64).double(message.swipeApThreshold);
         let u = options.writeUnknownFields;
         if (u !== false)
             (u == true ? UnknownFieldHandler.onWrite : u)(this.typeName, message, writer);

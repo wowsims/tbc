@@ -243,7 +243,7 @@ class TargetPicker extends Component {
             enableWhen: (target) => target.getLevel() == Mechanics.BOSS_LEVEL,
         });
         new BooleanPicker(section3, modTarget, {
-            label: 'Suppress Dodge',
+            label: 'Sunwell Radiance',
             labelTooltip: 'Reduces the chance for this enemy\'s attacks to be dodged by 20% and be missed by 5%. All Sunwell Plateau bosses have this.',
             changedEvent: (target) => target.changeEmitter,
             getValue: (target) => target.getSuppressDodge(),

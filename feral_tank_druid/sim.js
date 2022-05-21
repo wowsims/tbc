@@ -2,14 +2,11 @@ import { RaidBuffs } from '/tbc/core/proto/common.js';
 import { PartyBuffs } from '/tbc/core/proto/common.js';
 import { IndividualBuffs } from '/tbc/core/proto/common.js';
 import { Debuffs } from '/tbc/core/proto/common.js';
-import { RaidTarget } from '/tbc/core/proto/common.js';
-import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { TristateEffect } from '/tbc/core/proto/common.js';
 import { StrengthOfEarthType } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
-import { Alchohol } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -17,8 +14,6 @@ import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { Conjured } from '/tbc/core/proto/common.js';
 import { Drums } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
-import { WeaponImbue } from '/tbc/core/proto/common.js';
-import { FeralTankDruid_Options as DruidOptions } from '/tbc/core/proto/druid.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
 import * as DruidInputs from './inputs.js';
@@ -34,45 +29,59 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
                 Stat.StatStrength,
                 Stat.StatAgility,
                 Stat.StatAttackPower,
-                Stat.StatFeralAttackPower,
+                Stat.StatExpertise,
                 Stat.StatMeleeHit,
                 Stat.StatMeleeCrit,
                 Stat.StatMeleeHaste,
+                Stat.StatArmor,
                 Stat.StatArmorPenetration,
-                Stat.StatExpertise,
+                Stat.StatDefense,
+                Stat.StatBlock,
+                Stat.StatBlockValue,
+                Stat.StatDodge,
+                Stat.StatParry,
+                Stat.StatResilience,
             ],
             // Reference stat against which to calculate EP. I think all classes use either spell power or attack power.
             epReferenceStat: Stat.StatAttackPower,
             // Which stats to display in the Character Stats section, at the bottom of the left-hand sidebar.
             displayStats: [
                 Stat.StatHealth,
+                Stat.StatArmor,
+                Stat.StatStamina,
                 Stat.StatStrength,
                 Stat.StatAgility,
-                Stat.StatIntellect,
-                Stat.StatSpirit,
                 Stat.StatAttackPower,
+                Stat.StatExpertise,
                 Stat.StatMeleeHit,
                 Stat.StatMeleeCrit,
                 Stat.StatMeleeHaste,
                 Stat.StatArmorPenetration,
-                Stat.StatExpertise,
-                Stat.StatMana,
-                Stat.StatMP5,
+                Stat.StatDefense,
+                Stat.StatBlock,
+                Stat.StatBlockValue,
+                Stat.StatDodge,
+                Stat.StatParry,
+                Stat.StatResilience,
             ],
             defaults: {
                 // Default equipped gear.
                 gear: Presets.P4_PRESET.gear,
                 // Default EP weights for sorting gear in the gear picker.
                 epWeights: Stats.fromMap({
+                    [Stat.StatArmor]: 0.59,
+                    [Stat.StatStamina]: 3.05,
                     [Stat.StatStrength]: 2.266,
-                    [Stat.StatAgility]: 3.5,
+                    [Stat.StatAgility]: 4.6,
                     [Stat.StatAttackPower]: 1,
-                    [Stat.StatFeralAttackPower]: 1,
-                    [Stat.StatMeleeHit]: 3.2,
-                    [Stat.StatMeleeCrit]: 2.37,
-                    [Stat.StatMeleeHaste]: 1.36,
-                    [Stat.StatArmorPenetration]: 0.47,
-                    [Stat.StatExpertise]: 3.2,
+                    [Stat.StatExpertise]: 7.3,
+                    [Stat.StatMeleeHit]: 3.5,
+                    [Stat.StatMeleeCrit]: 1.0,
+                    [Stat.StatMeleeHaste]: 1.6,
+                    [Stat.StatArmorPenetration]: 0.34,
+                    [Stat.StatDefense]: 2.2,
+                    [Stat.StatDodge]: 1.7,
+                    [Stat.StatResilience]: 1.7,
                 }),
                 // Default consumes settings.
                 consumes: Presets.DefaultConsumes,
@@ -81,20 +90,17 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
                 // Default talents.
                 talents: Presets.StandardTalents.data,
                 // Default spec-specific settings.
-                specOptions: DruidOptions.create({
-                    innervateTarget: RaidTarget.create({
-                        targetIndex: NO_TARGET, // In an individual sim the 0-indexed player is ourself.
-                    }),
-                }),
+                specOptions: Presets.DefaultOptions,
                 // Default raid/party buffs settings.
                 raidBuffs: RaidBuffs.create({
-                    arcaneBrilliance: true,
+                    powerWordFortitude: TristateEffect.TristateEffectRegular,
+                    shadowProtection: true,
                     giftOfTheWild: TristateEffect.TristateEffectImproved,
+                    thorns: TristateEffect.TristateEffectImproved,
                 }),
                 partyBuffs: PartyBuffs.create({
                     drums: Drums.DrumsOfBattle,
                     bloodlust: 1,
-                    manaSpringTotem: TristateEffect.TristateEffectRegular,
                     braidedEterniumChain: true,
                     graceOfAirTotem: TristateEffect.TristateEffectImproved,
                     strengthOfEarthTotem: StrengthOfEarthType.EnhancingTotems,
@@ -108,93 +114,108 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
                     unleashedRage: true,
                 }),
                 debuffs: Debuffs.create({
-                    judgementOfWisdom: true,
                     improvedSealOfTheCrusader: true,
                     bloodFrenzy: true,
-                    giftOfArthas: true,
                     exposeArmor: TristateEffect.TristateEffectImproved,
                     faerieFire: TristateEffect.TristateEffectImproved,
                     sunderArmor: true,
                     curseOfRecklessness: true,
                     huntersMark: TristateEffect.TristateEffectImproved,
-                    exposeWeaknessUptime: 1.0,
-                    exposeWeaknessHunterAgility: 1000,
+                    exposeWeaknessUptime: 0.95,
+                    exposeWeaknessHunterAgility: 1200,
+                    thunderClap: TristateEffect.TristateEffectImproved,
+                    demoralizingShout: TristateEffect.TristateEffectImproved,
                 }),
             },
             // IconInputs to include in the 'Self Buffs' section on the settings tab.
             selfBuffInputs: [],
             // IconInputs to include in the 'Other Buffs' section on the settings tab.
             raidBuffInputs: [
-                IconInputs.ArcaneBrilliance,
-                IconInputs.DivineSpirit,
+                IconInputs.PowerWordFortitude,
+                IconInputs.ShadowProtection,
                 IconInputs.GiftOfTheWild,
+                IconInputs.Thorns,
             ],
             partyBuffInputs: [
                 IconInputs.DrumsOfBattleBuff,
                 IconInputs.Bloodlust,
                 IconInputs.StrengthOfEarthTotem,
                 IconInputs.GraceOfAirTotem,
-                IconInputs.ManaSpringTotem,
                 IconInputs.BattleShout,
-                IconInputs.BraidedEterniumChain,
+                IconInputs.CommandingShout,
                 IconInputs.DraeneiRacialMelee,
                 IconInputs.FerociousInspiration,
+                IconInputs.DevotionAura,
+                IconInputs.RetributionAura,
                 IconInputs.SanctityAura,
                 IconInputs.TrueshotAura,
+                IconInputs.BraidedEterniumChain,
+                IconInputs.BloodPact,
             ],
             playerBuffInputs: [
                 IconInputs.BlessingOfKings,
-                IconInputs.BlessingOfWisdom,
                 IconInputs.BlessingOfMight,
+                IconInputs.BlessingOfSanctuary,
                 IconInputs.UnleashedRage,
             ],
             // IconInputs to include in the 'Debuffs' section on the settings tab.
             debuffInputs: [
-                IconInputs.JudgementOfWisdom,
-                IconInputs.ImprovedSealOfTheCrusader,
                 IconInputs.BloodFrenzy,
+                IconInputs.Mangle,
+                IconInputs.ImprovedSealOfTheCrusader,
                 IconInputs.HuntersMark,
-                IconInputs.CurseOfRecklessness,
                 IconInputs.FaerieFire,
-                IconInputs.ExposeArmor,
                 IconInputs.SunderArmor,
+                IconInputs.ExposeArmor,
+                IconInputs.CurseOfRecklessness,
                 IconInputs.GiftOfArthas,
+                IconInputs.DemoralizingRoar,
+                IconInputs.DemoralizingShout,
+                IconInputs.ThunderClap,
+                IconInputs.ShadowEmbrace,
+                IconInputs.InsectSwarm,
+                IconInputs.ScorpidSting,
             ],
             // Which options are selectable in the 'Consumes' section.
             consumeOptions: {
                 potions: [
-                    Potions.SuperManaPotion,
-                    Potions.FelManaPotion,
+                    Potions.IronshieldPotion,
                     Potions.HastePotion,
+                    Potions.InsaneStrengthPotion,
                 ],
                 conjured: [
-                    Conjured.ConjuredDarkRune,
+                    Conjured.ConjuredFlameCap,
                 ],
                 flasks: [
                     Flask.FlaskOfRelentlessAssault,
+                    Flask.FlaskOfFortification,
                 ],
                 battleElixirs: [
-                    BattleElixir.ElixirOfMajorAgility,
                     BattleElixir.ElixirOfDemonslaying,
+                    BattleElixir.ElixirOfMajorStrength,
+                    BattleElixir.ElixirOfMajorAgility,
+                    BattleElixir.ElixirOfTheMongoose,
+                    BattleElixir.ElixirOfMastery,
                 ],
                 guardianElixirs: [
-                    GuardianElixir.ElixirOfDraenicWisdom,
-                    GuardianElixir.ElixirOfMajorMageblood,
+                    GuardianElixir.ElixirOfMajorFortitude,
+                    GuardianElixir.ElixirOfMajorDefense,
+                    GuardianElixir.ElixirOfIronskin,
+                    GuardianElixir.GiftOfArthas,
                 ],
                 food: [
+                    Food.FoodRoastedClefthoof,
                     Food.FoodGrilledMudfish,
                     Food.FoodSpicyHotTalbuk,
+                    Food.FoodRavagerDog,
+                    Food.FoodFishermansFeast,
                 ],
-                alcohol: [
-                    Alchohol.AlchoholKreegsStoutBeatdown,
-                ],
-                weaponImbues: [
-                    WeaponImbue.WeaponImbueAdamantiteWeightstone,
-                    WeaponImbue.WeaponImbueRighteousWeaponCoating,
-                ],
+                alcohol: [],
+                weaponImbues: [],
                 other: [
                     IconInputs.ScrollOfAgilityV,
                     IconInputs.ScrollOfStrengthV,
+                    IconInputs.ScrollOfProtectionV,
                 ],
             },
             // Inputs to include in the 'Rotation' section on the settings tab.
@@ -202,6 +223,7 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
             // Inputs to include in the 'Other' section on the settings tab.
             otherInputs: {
                 inputs: [
+                    DruidInputs.StartingRage,
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,
                     OtherInputs.ExposeWeaknessUptime,
