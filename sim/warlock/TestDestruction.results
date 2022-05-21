@@ -49,7 +49,7 @@ dps_results: {
  key: "TestDestruction-AllItems-BracingEarthstormDiamond"
  value: {
   dps: 1726.8795061471826
-  tps: 1094.3914594673986
+  tps: 1094.3914594673984
  }
 }
 dps_results: {
@@ -63,7 +63,7 @@ dps_results: {
  key: "TestDestruction-AllItems-ChaoticSkyfireDiamond"
  value: {
   dps: 1727.5585468416796
-  tps: 1094.7742290832857
+  tps: 1094.7742290832855
  }
 }
 dps_results: {
@@ -77,7 +77,7 @@ dps_results: {
  key: "TestDestruction-AllItems-EmberSkyfireDiamond"
  value: {
   dps: 1726.209141420696
-  tps: 1093.9620447861364
+  tps: 1093.9620447861362
  }
 }
 dps_results: {
@@ -98,7 +98,7 @@ dps_results: {
  key: "TestDestruction-AllItems-ImbuedUnstableDiamond"
  value: {
   dps: 1726.209141420696
-  tps: 1093.9620447861364
+  tps: 1093.9620447861362
  }
 }
 dps_results: {
@@ -112,7 +112,7 @@ dps_results: {
  key: "TestDestruction-AllItems-MaleficRaiment"
  value: {
   dps: 1520.2921969543206
-  tps: 963.7568124707809
+  tps: 963.7568124707807
  }
 }
 dps_results: {
@@ -154,7 +154,7 @@ dps_results: {
  key: "TestDestruction-AllItems-SwiftStarfireDiamond"
  value: {
   dps: 1728.7124941351296
-  tps: 1095.5349954716582
+  tps: 1095.534995471658
  }
 }
 dps_results: {
@@ -189,7 +189,7 @@ dps_results: {
  key: "TestDestruction-Average-Default"
  value: {
   dps: 1721.941291131497
-  tps: 1091.253936439244
+  tps: 1091.2539364392435
  }
 }
 dps_results: {
@@ -245,14 +245,14 @@ dps_results: {
  key: "TestDestruction-Settings-Gnome-P4-Destro Warlock-FullBuffs-LongMultiTarget"
  value: {
   dps: 1738.286969249982
-  tps: 1101.6179757971481
+  tps: 1101.617975797148
  }
 }
 dps_results: {
  key: "TestDestruction-Settings-Gnome-P4-Destro Warlock-FullBuffs-LongSingleTarget"
  value: {
   dps: 1738.286969249982
-  tps: 1101.6179757971481
+  tps: 1101.617975797148
  }
 }
 dps_results: {
