@@ -8,10 +8,8 @@ import (
 )
 
 func (druid *Druid) ApplyTalents() {
-	druid.setupNaturesGrace()
-	druid.registerNaturesSwiftnessCD()
-
 	druid.AddStat(stats.SpellHit, float64(druid.Talents.BalanceOfPower)*2*core.SpellHitRatingPerHitChance)
+	druid.AddStat(stats.SpellCrit, float64(druid.Talents.NaturalPerfection)*1*core.SpellCritRatingPerCritChance)
 	druid.PseudoStats.SpiritRegenRateCasting = float64(druid.Talents.Intensity) * 0.1
 	druid.PseudoStats.ThreatMultiplier *= 1 - 0.04*float64(druid.Talents.Subtlety)
 	druid.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + 0.02*float64(druid.Talents.Naturalist)
@@ -19,11 +17,13 @@ func (druid *Druid) ApplyTalents() {
 	if druid.Form.Matches(Bear | Cat) {
 		druid.AddStat(stats.AttackPower, float64(druid.Talents.PredatoryStrikes)*0.5*float64(core.CharacterLevel))
 		druid.AddStat(stats.MeleeCrit, float64(druid.Talents.SharpenedClaws)*2*core.MeleeCritRatingPerCritChance)
-	}
-	if druid.Form.Matches(Bear) {
 		druid.AddStat(stats.Dodge, core.DodgeRatingPerDodgeChance*2*float64(druid.Talents.FeralSwiftness))
 	}
-	druid.AddStat(stats.Armor, druid.Equip.Stats()[stats.Armor]*(0.1/3)*float64(druid.Talents.ThickHide))
+	if druid.Form.Matches(Bear) {
+		druid.AddStat(stats.Armor, druid.Equip.Stats()[stats.Armor]*(0.5/3)*float64(druid.Talents.ThickHide))
+	} else {
+		druid.AddStat(stats.Armor, druid.Equip.Stats()[stats.Armor]*(0.1/3)*float64(druid.Talents.ThickHide))
+	}
 
 	if druid.Talents.LunarGuidance > 0 {
 		bonus := (0.25 / 3) * float64(druid.Talents.LunarGuidance)
@@ -127,7 +127,8 @@ func (druid *Druid) ApplyTalents() {
 		})
 	}
 
-	druid.AddStat(stats.SpellCrit, float64(druid.Talents.NaturalPerfection)*1*core.SpellCritRatingPerCritChance)
+	druid.setupNaturesGrace()
+	druid.registerNaturesSwiftnessCD()
 	druid.applyPrimalFury()
 	druid.applyOmenOfClarity()
 }

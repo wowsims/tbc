@@ -176,6 +176,7 @@ func init() {
 		stats.SpellCrit:   40.66,                                    // 3.29% chance to crit shown on naked character screen
 		stats.AttackPower: -20,                                      // accounts for the fact that the first 20 points in Str only provide 1 AP rather than 2
 		stats.MeleeCrit:   0.96 * core.MeleeCritRatingPerCritChance, // 3.56% chance to crit shown on naked character screen
+		stats.Dodge:       -1.87 * core.DodgeRatingPerDodgeChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceNightElf, Class: proto.Class_ClassDruid}] = stats.Stats{
 		stats.Health:      3434, // 4254 health shown on naked character
@@ -188,6 +189,7 @@ func init() {
 		stats.SpellCrit:   40.60,                                    // 3.35% chance to crit shown on naked character screen
 		stats.AttackPower: -20,                                      // accounts for the fact that the first 20 points in Str only provide 1 AP rather than 2
 		stats.MeleeCrit:   0.96 * core.MeleeCritRatingPerCritChance, // 3.96% chance to crit shown on naked character screen
+		stats.Dodge:       -1.87 * core.DodgeRatingPerDodgeChance,
 	}
 }
 

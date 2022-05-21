@@ -77,6 +77,7 @@ var ItemDeclarationOverrides = []ItemDeclaration{
 	{ /** Vindicator's Pendant of Reprieve */ ID: 35317, Phase: 4},
 	{ /** Vindicator's Pendant of Subjugation */ ID: 35319, Phase: 4},
 	{ /** Twinblade of the Pheonix */ ID: 29993, Stats: Stats{proto.Stat_StatRangedAttackPower: 108}},
+	{ /** Pillar of Ferocity */ ID: 30883, Stats: Stats{proto.Stat_StatArmor: 550}},
 	// Badge Vendor is probably phase 4
 	{ /** Nyn'jah's Tabi Boots */ ID: 33222, Phase: 4},
 
