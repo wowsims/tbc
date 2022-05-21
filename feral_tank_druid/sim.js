@@ -7,6 +7,7 @@ import { TristateEffect } from '/tbc/core/proto/common.js';
 import { StrengthOfEarthType } from '/tbc/core/proto/common.js';
 import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
 import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
@@ -16,6 +17,7 @@ import { Drums } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import * as IconInputs from '/tbc/core/components/icon_inputs.js';
 import * as OtherInputs from '/tbc/core/components/other_inputs.js';
+import * as Tooltips from '/tbc/core/constants/tooltips.js';
 import * as DruidInputs from './inputs.js';
 import * as Presets from './presets.js';
 export class FeralTankDruidSimUI extends IndividualSimUI {
@@ -24,11 +26,21 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
             cssClass: 'feral-tank-druid-sim-ui',
             // List any known bugs / issues here and they'll be shown on the site.
             knownIssues: [],
+            warnings: [
+                (simUI) => {
+                    return {
+                        updateOn: new TypedEvent(),
+                        shouldDisplay: () => true,
+                        getContent: () => Tooltips.NEWLY_RELEASED_WARNING,
+                    };
+                },
+            ],
             // All stats for which EP should be calculated.
             epStats: [
                 Stat.StatStrength,
                 Stat.StatAgility,
                 Stat.StatAttackPower,
+                Stat.StatFeralAttackPower,
                 Stat.StatExpertise,
                 Stat.StatMeleeHit,
                 Stat.StatMeleeCrit,
@@ -74,6 +86,7 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
                     [Stat.StatStrength]: 2.266,
                     [Stat.StatAgility]: 4.6,
                     [Stat.StatAttackPower]: 1,
+                    [Stat.StatFeralAttackPower]: 1,
                     [Stat.StatExpertise]: 7.3,
                     [Stat.StatMeleeHit]: 3.5,
                     [Stat.StatMeleeCrit]: 1.0,
@@ -248,10 +261,15 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
                 // Preset talents that the user can quickly select.
                 talents: [
                     Presets.StandardTalents,
+                    Presets.DemoRoarTalents,
                 ],
                 // Preset gear configurations that the user can quickly select.
                 gear: [
+                    Presets.P1_PRESET,
+                    Presets.P2_PRESET,
+                    Presets.P3_PRESET,
                     Presets.P4_PRESET,
+                    Presets.P5_PRESET,
                 ],
             },
         });

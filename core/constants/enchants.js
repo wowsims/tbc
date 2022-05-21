@@ -5,6 +5,7 @@ export const GLYPH_OF_POWER = 29191;
 enchantDescriptions.set(GLYPH_OF_POWER, '+22 Spell Damage and +14 Spell Hit Rating');
 export const GLYPH_OF_FEROCITY = 29192;
 enchantDescriptions.set(GLYPH_OF_FEROCITY, '+34 Attack Power and +16 Hit Rating');
+enchantDescriptions.set(29193, '+18 Stamina and +20 Resilience');
 // Shoulder
 export const GREATER_INSCRIPTION_OF_DISCIPLINE = 28886;
 enchantDescriptions.set(GREATER_INSCRIPTION_OF_DISCIPLINE, '+18 Spell Damage and +10 Spell Crit Rating');
