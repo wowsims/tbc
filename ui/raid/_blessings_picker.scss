@@ -11,21 +11,12 @@
 .blessings-table-body {
 }
 
-.blessings-table-label-cell {
-	font-size: 20px;
-	font-weight: 700;
-	color: #f58cba;
-}
-
 // Filters create their own stacking contexts which messes with z-ordering,
 // so we have to apply this to the individual elements rather than the row.
-.blessings-table-row:not(.paladin-active) .blessings-table-label-cell {
+.blessings-table-cell:not(.paladin-active) .dropdown-option {
 	filter: grayscale(1);
 }
-.blessings-table-row:not(.paladin-active) .dropdown-option {
-	filter: grayscale(1);
-}
-.blessings-table-row:not(.paladin-active) .dropdown-button {
+.blessings-table-cell:not(.paladin-active) .dropdown-button {
 	filter: grayscale(1);
 }
 

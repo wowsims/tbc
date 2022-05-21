@@ -62,6 +62,15 @@ message PaladinTalents {
 	bool crusader_strike = 33;
 }
 
+enum Blessings {
+	BlessingUnknown = 0;
+	BlessingOfKings = 1;
+	BlessingOfMight = 2;
+	BlessingOfSalvation = 3;
+	BlessingOfWisdom = 4;
+	BlessingOfSanctuary = 5;
+}
+
 enum PaladinAura {
 	NoPaladinAura = 0;
 	SanctityAura = 1;
