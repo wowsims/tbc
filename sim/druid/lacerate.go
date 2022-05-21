@@ -16,6 +16,16 @@ func (druid *Druid) registerLacerateSpell() {
 	cost := 15.0 - float64(druid.Talents.ShreddingAttacks)
 	refundAmount := cost * 0.8
 
+	tickDamage := 155.0 / 5
+	if ItemSetNordrassilHarness.CharacterHasSetBonus(&druid.Character, 4) {
+		tickDamage += 15
+	}
+	if druid.Equip[items.ItemSlotRanged].ID == 27744 { // Idol of Ursoc
+		tickDamage += 8
+	}
+
+	mangleAura := core.MangleAura(druid.CurrentTarget)
+
 	druid.Lacerate = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolPhysical,
@@ -34,8 +44,20 @@ func (druid *Druid) registerLacerateSpell() {
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
-			OutcomeApplier:   druid.OutcomeFuncMeleeSpecialHit(),
+			ThreatMultiplier: 0.5,
+
+			BaseDamage: core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					if mangleAura.IsActive() {
+						return tickDamage * 1.3
+					} else {
+						return tickDamage
+					}
+				},
+				TargetSpellCoefficient: 0,
+			},
+			OutcomeApplier: druid.OutcomeFuncMeleeSpecialHit(),
+
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
 					if druid.LacerateDot.IsActive() {
@@ -52,16 +74,7 @@ func (druid *Druid) registerLacerateSpell() {
 		}),
 	})
 
-	tickDamage := 155.0 / 5
-	if ItemSetNordrassilHarness.CharacterHasSetBonus(&druid.Character, 4) {
-		tickDamage += 15
-	}
-	if druid.Equip[items.ItemSlotRanged].ID == 27744 { // Idol of Ursoc
-		tickDamage += 8
-	}
-
-	target := druid.CurrentTarget
-	dotAura := target.RegisterAura(core.Aura{
+	dotAura := druid.CurrentTarget.RegisterAura(core.Aura{
 		Label:     "Lacerate-" + strconv.Itoa(int(druid.Index)),
 		ActionID:  actionID,
 		MaxStacks: 5,

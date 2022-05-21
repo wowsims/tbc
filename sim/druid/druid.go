@@ -153,6 +153,14 @@ func New(char core.Character, form DruidForm, selfBuffs SelfBuffs, talents proto
 		},
 	})
 
+	druid.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Agility,
+		ModifiedStat: stats.Dodge,
+		Modifier: func(agility float64, dodge float64) float64 {
+			return dodge + (agility/14.7059)*core.DodgeRatingPerDodgeChance
+		},
+	})
+
 	return druid
 }
 

@@ -1,18 +1,22 @@
 import { Consumes } from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
+import { GuardianElixir } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ItemSpec } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { Conjured } from '/tbc/core/proto/common.js';
+import { RaidTarget } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
 import { Faction } from '/tbc/core/proto_utils/utils.js';
+import { NO_TARGET } from '/tbc/core/proto_utils/utils.js';
 import { Player } from '/tbc/core/player.js';
 
 import {
 	DruidTalents as DruidTalents,
 	FeralTankDruid,
 	FeralTankDruid_Rotation as DruidRotation,
+	FeralTankDruid_Rotation_Swipe as Swipe,
 	FeralTankDruid_Options as DruidOptions
 } from '/tbc/core/proto/druid.js';
 
@@ -32,19 +36,28 @@ export const StandardTalents = {
 };
 
 export const DefaultRotation = DruidRotation.create({
+	maulRageThreshold: 50,
+	maintainDemoralizingRoar: true,
+	swipe: Swipe.SwipeWithEnoughAP,
+	swipeApThreshold: 2700,
 });
 
 export const DefaultOptions = DruidOptions.create({
+	innervateTarget: RaidTarget.create({
+		targetIndex: NO_TARGET,
+	}),
+	startingRage: 20,
 });
 
 export const DefaultConsumes = Consumes.create({
 	battleElixir: BattleElixir.ElixirOfMajorAgility,
+	guardianElixir: GuardianElixir.GiftOfArthas,
 	food: Food.FoodGrilledMudfish,
-	mainHandImbue: WeaponImbue.WeaponImbueAdamantiteWeightstone,
 	defaultPotion: Potions.HastePotion,
-	defaultConjured: Conjured.ConjuredDarkRune,
+	defaultConjured: Conjured.ConjuredFlameCap,
 	scrollOfAgility: 5,
 	scrollOfStrength: 5,
+	scrollOfProtection: 5,
 });
 
 export const P4_PRESET = {
