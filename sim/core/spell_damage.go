@@ -132,9 +132,6 @@ func BaseDamageFuncMeleeWeapon(hand Hand, normalized bool, flatBonus float64, we
 				if includeBonusWeaponDamage {
 					damage += hitEffect.BonusWeaponDamage(spell.Unit)
 				}
-				if sim.Log != nil && spell.ActionID.SpellID == 33987 {
-					sim.Log("Mangle debug: AP = %0.02f, speed = %0.02f, mult = %0.02f", hitEffect.MeleeAttackPower(spell.Unit)+hitEffect.MeleeAttackPowerOnTarget(), spell.Unit.AutoAttacks.MH.SwingSpeed, weaponMultiplier)
-				}
 				return damage * weaponMultiplier
 			}
 		} else {
