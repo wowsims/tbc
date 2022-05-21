@@ -3,7 +3,7 @@ import { IconEnumPicker } from '/tbc/core/components/icon_enum_picker.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { Class } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
-import { Blessings } from '/tbc/core/proto/ui.js';
+import { Blessings } from '/tbc/core/proto/paladin.js';
 import { BlessingsAssignment } from '/tbc/core/proto/ui.js';
 import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 import { ActionId } from '/tbc/core/proto_utils/action_id.js';
@@ -28,6 +28,7 @@ export class BlessingsPicker extends Component {
 	readonly changeEmitter: TypedEvent<void> = new TypedEvent<void>();
 
 	private readonly rows: Array<HTMLTableRowElement>;
+	private readonly cols: Array<Array<HTMLElement>>;
 
 	private assignments: BlessingsAssignments;
 
@@ -38,11 +39,6 @@ export class BlessingsPicker extends Component {
 
 		this.rootElem.innerHTML = `
 		<table class="blessings-table">
-			<thead class="blessings-table-header">
-				<tr class="blessings-table-header-row">
-					<th class="blessings-table-header-cell"></th>
-				</tr>
-			</thead>
 			<tbody class="blessings-table-body">
 			</tbody>
 		</table>
@@ -51,43 +47,38 @@ export class BlessingsPicker extends Component {
 		const headerRow = this.rootElem.getElementsByClassName('blessings-table-header-row')[0] as HTMLTableRowElement;
 		const bodyElem = this.rootElem.getElementsByClassName('blessings-table-body')[0] as HTMLTableSectionElement;
 
-		naturalSpecOrder.forEach(spec => {
-			if (!implementedSpecs.includes(spec)) {
-				return;
-			}
+		const specs = naturalSpecOrder.filter(spec => implementedSpecs.includes(spec));
+		const paladinIndexes = [...Array(MAX_PALADINS).keys()];
 
-			const cell = document.createElement('th');
-			cell.classList.add('blessings-table-header-cell');
-			headerRow.appendChild(cell);
+		this.cols = [];
+		this.rows = specs.map(spec => {
+			const row = document.createElement('tr');
+			row.classList.add('blessings-table-row');
+			bodyElem.appendChild(row);
+
+			const headerCell = document.createElement('th');
+			headerCell.classList.add('blessings-table-header-cell');
+			row.appendChild(headerCell);
 
 			const icon = document.createElement('img');
 			icon.src = titleIcons[spec];
-			cell.appendChild(icon);
+			headerCell.appendChild(icon);
 
 			tippy(icon, {
 				'content': specNames[spec],
 				'allowHTML': true,
 			});
-		});
 
-		this.rows = [...Array(MAX_PALADINS).keys()].map(rowIndex => {
-			const row = document.createElement('tr');
-			row.classList.add('blessings-table-row');
-			bodyElem.appendChild(row);
-
-			const cell = document.createElement('td');
-			cell.classList.add('blessings-table-cell', 'blessings-table-label-cell');
-			cell.textContent = 'Paladin ' + (rowIndex + 1);
-			row.appendChild(cell);
-
-			naturalSpecOrder.forEach(spec => {
-				if (!implementedSpecs.includes(spec)) {
-					return;
-				}
-
+			paladinIndexes.forEach(paladinIdx => {
 				const cell = document.createElement('td');
 				cell.classList.add('blessings-table-cell');
 				row.appendChild(cell);
+
+				if (!this.cols[paladinIdx]) {
+					this.cols.push([]);
+				}
+				this.cols[paladinIdx].push(cell);
+
 				const blessingPicker = new IconEnumPicker(cell, this, {
 					extraCssClasses: [
 						'blessing-picker',
@@ -104,11 +95,11 @@ export class BlessingsPicker extends Component {
 					equals: (a: Blessings, b: Blessings) => a == b,
 					zeroValue: Blessings.BlessingUnknown,
 					changedEvent: (picker: BlessingsPicker) => picker.changeEmitter,
-					getValue: (picker: BlessingsPicker) => picker.assignments.paladins[rowIndex]?.blessings[spec] || Blessings.BlessingUnknown,
+					getValue: (picker: BlessingsPicker) => picker.assignments.paladins[paladinIdx]?.blessings[spec] || Blessings.BlessingUnknown,
 					setValue: (eventID: EventID, picker: BlessingsPicker, newValue: number) => {
-						const currentValue = picker.assignments.paladins[rowIndex].blessings[spec];
+						const currentValue = picker.assignments.paladins[paladinIdx].blessings[spec];
 						if (currentValue != newValue) {
-							picker.assignments.paladins[rowIndex].blessings[spec] = newValue;
+							picker.assignments.paladins[paladinIdx].blessings[spec] = newValue;
 							this.changeEmitter.emit(eventID);
 						}
 					},
@@ -128,10 +119,10 @@ export class BlessingsPicker extends Component {
 		numPaladins = Math.min(numPaladins, MAX_PALADINS);
 
 		for (let i = 0; i < numPaladins; i++) {
-			this.rows[i].classList.add('paladin-active');
+			this.cols[i].forEach(elem => elem.classList.add('paladin-active'));
 		}
-		for (let i = numPaladins; i < this.rows.length; i++) {
-			this.rows[i].classList.remove('paladin-active');
+		for (let i = numPaladins; i < MAX_PALADINS; i++) {
+			this.cols[i].forEach(elem => elem.classList.remove('paladin-active'));
 		}
 	}
 

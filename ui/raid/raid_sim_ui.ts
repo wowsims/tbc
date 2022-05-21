@@ -6,7 +6,7 @@ import { SimUI } from '/tbc/core/sim_ui.js';
 import { Stat } from '/tbc/core/proto/common.js';
 import { EventID, TypedEvent } from '/tbc/core/typed_event.js';
 import { Raid as RaidProto } from '/tbc/core/proto/api.js';
-import { Blessings } from '/tbc/core/proto/ui.js';
+import { Blessings } from '/tbc/core/proto/paladin.js';
 import { BlessingsAssignments } from '/tbc/core/proto/ui.js';
 import { BuffBot as BuffBotProto } from '/tbc/core/proto/ui.js';
 import { RaidSimSettings } from '/tbc/core/proto/ui.js';
@@ -32,9 +32,13 @@ import { AssignmentsPicker } from './assignments_picker.js';
 import { BlessingsPicker } from './blessings_picker.js';
 import { BuffBot } from './buff_bot.js';
 import { RaidPicker } from './raid_picker.js';
+import { TanksPicker } from './tanks_picker.js';
 import { implementedSpecs } from './presets.js';
 import { newRaidExporters, newRaidImporters } from './import_export.js';
 
+import * as Tooltips from '/tbc/core/constants/tooltips.js';
+
+declare var Muuri: any;
 declare var tippy: any;
 
 export interface RaidSimConfig {
@@ -57,6 +61,8 @@ export class RaidSimUI extends SimUI {
 
 	readonly referenceChangeEmitter = new TypedEvent<void>();
 
+	private settingsMuuri: any;
+
 	constructor(parentElem: HTMLElement, config: RaidSimConfig) {
 		super(parentElem, new Sim(), {
 			spec: null,
@@ -65,6 +71,7 @@ export class RaidSimUI extends SimUI {
 		this.rootElem.classList.add('raid-sim-ui');
 
 		this.config = config;
+		this.settingsMuuri = null;
 
 		this.sim.raid.compChangeEmitter.on(eventID => this.compChangeEmitter.emit(eventID));
 		this.sim.setModifyRaidProto(raidProto => this.modifyRaidProto(raidProto));
@@ -82,6 +89,8 @@ export class RaidSimUI extends SimUI {
 		this.addSettingsTab();
 		this.addDetailedResultsTab();
 		this.addLogTab();
+
+		this.changeEmitter.on(() => this.recomputeSettingsLayout());
 	}
 
 	private loadSettings() {
@@ -175,19 +184,21 @@ export class RaidSimUI extends SimUI {
 	private addSettingsTab() {
 		this.addTab('SETTINGS', 'raid-settings-tab', `
 			<div class="raid-settings-sections">
-				<div class="raid-settings-section-container">
+				<div class="settings-section-container raid-settings-section-container">
 					<fieldset class="settings-section raid-encounter-section">
 						<legend>Encounter</legend>
 					</fieldset>
 				</div>
-				<div class="blessings-section-container">
+				<div class="settings-section-container blessings-section-container">
 					<fieldset class="settings-section blessings-section">
 						<legend>Blessings</legend>
 					</fieldset>
 				</div>
-				<div class="assignments-section-container">
+				<div class="settings-section-container assignments-section-container">
 				</div>
-				<div class="raid-settings-section-container">
+				<div class="settings-section-container tanks-section-container">
+				</div>
+				<div class="settings-section-container raid-settings-section-container">
 					<fieldset class="settings-section other-options-section">
 						<legend>Other Options</legend>
 					</fieldset>
@@ -220,9 +231,17 @@ export class RaidSimUI extends SimUI {
 			savedEncounterManager.loadUserData();
 		});
 
-		this.blessingsPicker = new BlessingsPicker(this.rootElem.getElementsByClassName('blessings-section')[0] as HTMLElement, this);
+		const blessingsSection = this.rootElem.getElementsByClassName('blessings-section')[0] as HTMLElement;
+		this.blessingsPicker = new BlessingsPicker(blessingsSection, this);
 		this.blessingsPicker.changeEmitter.on(eventID => this.changeEmitter.emit(eventID));
+		tippy(blessingsSection, {
+			content: Tooltips.BLESSINGS_SECTION,
+			allowHTML: true,
+			placement: 'left',
+		});
+
 		const assignmentsPicker = new AssignmentsPicker(this.rootElem.getElementsByClassName('assignments-section-container')[0] as HTMLElement, this);
+		const tanksPicker = new TanksPicker(this.rootElem.getElementsByClassName('tanks-section-container')[0] as HTMLElement, this);
 
 		const otherOptionsSectionElem = this.rootElem.getElementsByClassName('other-options-section')[0] as HTMLElement;
 		new BooleanPicker(otherOptionsSectionElem, this.sim.raid, {
@@ -233,6 +252,20 @@ export class RaidSimUI extends SimUI {
 			setValue: (eventID: EventID, raid: Raid, newValue: boolean) => {
 				raid.setStaggerStormstrikes(eventID, newValue);
 			},
+		});
+
+		// Init Muuri layout only when settings tab is clicked, because it needs the elements
+		// to be shown so it can calculate sizes.
+		(this.rootElem.getElementsByClassName('raid-settings-tab-tab')[0] as HTMLElement)!.addEventListener('click', event => {
+			if (this.settingsMuuri == null) {
+				setTimeout(() => {
+					this.settingsMuuri = new Muuri('.raid-settings-sections');
+				}, 200); // Magic amount of time before Muuri init seems to work
+			}
+
+			setTimeout(() => {
+				this.recomputeSettingsLayout();
+			}, 200);
 		});
 	}
 
@@ -252,6 +285,13 @@ export class RaidSimUI extends SimUI {
 		`);
 
 		const logRunner = new LogRunner(this.rootElem.getElementsByClassName('log-runner')[0] as HTMLElement, this);
+	}
+
+	private recomputeSettingsLayout() {
+		if (this.settingsMuuri) {
+			//this.settingsMuuri.refreshItems();
+		}
+		window.dispatchEvent(new Event('resize'));
 	}
 
 	private modifyRaidProto(raidProto: RaidProto) {
@@ -283,6 +323,10 @@ export class RaidSimUI extends SimUI {
 					playerProtos.forEach(playerProto => playerProto.buffs!.blessingOfMight = TristateEffect.TristateEffectImproved);
 				} else if (paladin.blessings[spec] == Blessings.BlessingOfWisdom) {
 					playerProtos.forEach(playerProto => playerProto.buffs!.blessingOfWisdom = TristateEffect.TristateEffectImproved);
+				} else if (paladin.blessings[spec] == Blessings.BlessingOfSalvation) {
+					playerProtos.forEach(playerProto => playerProto.buffs!.blessingOfSalvation = true);
+				} else if (paladin.blessings[spec] == Blessings.BlessingOfSanctuary) {
+					playerProtos.forEach(playerProto => playerProto.buffs!.blessingOfSanctuary = true);
 				}
 			});
 		});
@@ -361,7 +405,7 @@ export class RaidSimUI extends SimUI {
 	}
 
 	clearRaid(eventID: EventID) {
-		this.sim.raid.clearRaid(eventID);
+		this.sim.raid.clear(eventID);
 	}
 
 	// Returns the actual key to use for local storage, based on the given key part and the site context.

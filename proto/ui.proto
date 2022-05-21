@@ -5,6 +5,7 @@ option go_package = "./proto";
 
 import "api.proto";
 import "common.proto";
+import "paladin.proto";
 
 message SimSettings {
 	int32 iterations = 1;
@@ -59,15 +60,6 @@ message BuffBot {
 
 	// The assigned player to PI. Only used for disc priest buffbots.
 	RaidTarget power_infusion_assignment = 4;
-}
-
-enum Blessings {
-	BlessingUnknown = 0;
-	BlessingOfKings = 1;
-	BlessingOfMight = 2;
-	BlessingOfSalvation = 3;
-	BlessingOfWisdom = 4;
-	BlessingOfSanctuary = 5;
 }
 
 message BlessingsAssignment {

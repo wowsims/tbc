@@ -797,9 +797,11 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		buffBotId: 'Holy Priest',
 		spec: Spec.SpecShadowPriest,
 		name: 'Holy Priest',
-		tooltip: 'Holy Priest: Doesn\'t contribute to DPS, just fills a raid slot.',
+		tooltip: 'Holy Priest: Adds Improved PW Fortitude and Shadow Protection.',
 		iconUrl: talentTreeIcons[Class.ClassPriest][1],
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
+			raidProto.buffs!.shadowProtection = true;
+			raidProto.buffs!.powerWordFortitude = TristateEffect.TristateEffectImproved;
 		},
 	},
 	{
@@ -807,9 +809,11 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		buffBotId: 'Divine Spirit Priest',
 		spec: Spec.SpecShadowPriest,
 		name: 'Disc Priest',
-		tooltip: 'Disc Priest: Adds Improved Divine Spirit and a Power Infusion.',
+		tooltip: 'Disc Priest: Adds Improved PW Fort, Shadow Protection, Improved Divine Spirit and a Power Infusion.',
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/medium/spell_holy_powerinfusion.jpg',
 		modifyRaidProto: (buffBot: BuffBot, raidProto: RaidProto, partyProto: PartyProto) => {
+			raidProto.buffs!.shadowProtection = true;
+			raidProto.buffs!.powerWordFortitude = TristateEffect.TristateEffectImproved;
 			raidProto.buffs!.divineSpirit = TristateEffect.TristateEffectImproved;
 
 			const powerInfusionIndex = buffBot.getPowerInfusionAssignment().targetIndex;
