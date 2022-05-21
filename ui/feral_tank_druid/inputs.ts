@@ -95,12 +95,28 @@ export const FeralTankDruidRotationConfig = {
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Maintain Demo Roar',
-				labelTooltip: 'Keep Demo Roar active on the primary target. If a stronger debuff is active, will not cast.',
+				labelTooltip: 'Keep Demoralizing Roar active on the primary target. If a stronger debuff is active, will not cast.',
 				changedEvent: (player: Player<Spec.SpecFeralTankDruid>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecFeralTankDruid>) => player.getRotation().maintainDemoralizingRoar,
 				setValue: (eventID: EventID, player: Player<Spec.SpecFeralTankDruid>, newValue: boolean) => {
 					const newRotation = player.getRotation();
 					newRotation.maintainDemoralizingRoar = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
+			type: 'boolean' as const,
+			cssClass: 'maintain-faerie-fire-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Maintain Faerie Fire',
+				labelTooltip: 'Keep Faerie Fire active on the primary target. If a stronger debuff is active, will not cast.',
+				changedEvent: (player: Player<Spec.SpecFeralTankDruid>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecFeralTankDruid>) => player.getRotation().maintainFaerieFire,
+				setValue: (eventID: EventID, player: Player<Spec.SpecFeralTankDruid>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.maintainFaerieFire = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 			},
