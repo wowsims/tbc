@@ -45,13 +45,15 @@ func (druid *Druid) registerLacerateSpell() {
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			DamageMultiplier: 1,
 			ThreatMultiplier: 0.5,
+			FlatThreatBonus:  267,
 
 			BaseDamage: core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					damage := tickDamage + 0.01*hitEffect.MeleeAttackPower(spell.Unit)
 					if mangleAura.IsActive() {
-						return tickDamage * 1.3
+						return damage * 1.3
 					} else {
-						return tickDamage
+						return damage
 					}
 				},
 				TargetSpellCoefficient: 0,
@@ -90,8 +92,13 @@ func (druid *Druid) registerLacerateSpell() {
 			ThreatMultiplier: 1,
 			IsPeriodic:       true,
 			IsPhantom:        true,
-			BaseDamage:       core.MultiplyByStacks(core.BaseDamageConfigFlat(tickDamage), dotAura),
-			OutcomeApplier:   druid.OutcomeFuncTick(),
+			BaseDamage: core.MultiplyByStacks(core.BaseDamageConfig{
+				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
+					return tickDamage + 0.01*hitEffect.MeleeAttackPower(spell.Unit)
+				},
+				TargetSpellCoefficient: 0,
+			}, dotAura),
+			OutcomeApplier: druid.OutcomeFuncTick(),
 		})),
 	})
 }

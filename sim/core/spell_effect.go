@@ -67,12 +67,20 @@ func (spellEffect *SpellEffect) Landed() bool {
 	return spellEffect.Outcome.Matches(OutcomeLanded)
 }
 
-func (spellEffect *SpellEffect) TotalThreatMultiplier(spell *Spell) float64 {
-	multiplier := spellEffect.ThreatMultiplier * spell.Unit.PseudoStats.ThreatMultiplier
+func (spell *Spell) TotalThreatMultiplier() float64 {
+	multiplier := spell.Unit.PseudoStats.ThreatMultiplier
 	if spell.SpellSchool == SpellSchoolHoly {
 		multiplier *= spell.Unit.PseudoStats.HolySpellThreatMultiplier
 	}
 	return multiplier
+}
+
+func (spellEffect *SpellEffect) calcThreat(spell *Spell) float64 {
+	if spellEffect.Landed() {
+		return (spellEffect.Damage*spellEffect.ThreatMultiplier + spellEffect.FlatThreatBonus) * spell.TotalThreatMultiplier()
+	} else {
+		return 0
+	}
 }
 
 func (spellEffect *SpellEffect) MeleeAttackPower(unit *Unit) float64 {
@@ -175,14 +183,6 @@ func (spellEffect *SpellEffect) calcDamageTargetOnly(sim *Simulation, spell *Spe
 	spellEffect.applyResistances(sim, spell, attackTable)
 	spellEffect.applyTargetModifiers(sim, spell)
 	spellEffect.OutcomeApplier(sim, spell, spellEffect, attackTable)
-}
-
-func (spellEffect *SpellEffect) calcThreat(spell *Spell) float64 {
-	if spellEffect.Landed() {
-		return (spellEffect.Damage + spellEffect.FlatThreatBonus) * spellEffect.TotalThreatMultiplier(spell)
-	} else {
-		return 0
-	}
 }
 
 func (spellEffect *SpellEffect) finalize(sim *Simulation, spell *Spell) {

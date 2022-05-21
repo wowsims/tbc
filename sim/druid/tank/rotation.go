@@ -35,6 +35,10 @@ func (bear *FeralTankDruid) doRotation(sim *core.Simulation) {
 		}
 	}
 
+	if bear.GCD.IsReady(sim) && !bear.Mangle.IsReady(sim) && bear.Rotation.Swipe != proto.FeralTankDruid_Rotation_SwipeSpam {
+		bear.WaitUntil(sim, bear.Mangle.ReadyAt())
+	}
+
 	bear.tryQueueMaul(sim)
 }
 
