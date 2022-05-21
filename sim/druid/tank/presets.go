@@ -19,11 +19,12 @@ var StandardTalents = &proto.DruidTalents{
 	ImprovedLeaderOfThePack: 2,
 	PredatoryInstincts:      5,
 	Mangle:                  true,
-	Furor:                   5,
-	Naturalist:              5,
-	NaturalShapeshifter:     3,
-	Intensity:               3,
-	OmenOfClarity:           true,
+
+	Furor:               5,
+	Naturalist:          5,
+	NaturalShapeshifter: 3,
+	Intensity:           3,
+	OmenOfClarity:       true,
 }
 
 var PlayerOptionsDefault = &proto.Player_FeralTankDruid{
@@ -31,8 +32,14 @@ var PlayerOptionsDefault = &proto.Player_FeralTankDruid{
 		Talents: StandardTalents,
 		Options: &proto.FeralTankDruid_Options{
 			InnervateTarget: &proto.RaidTarget{TargetIndex: -1}, // no Innervate
+			StartingRage:    20,
 		},
-		Rotation: &proto.FeralTankDruid_Rotation{},
+		Rotation: &proto.FeralTankDruid_Rotation{
+			MaulRageThreshold:        50,
+			MaintainDemoralizingRoar: true,
+			Swipe:                    proto.FeralTankDruid_Rotation_SwipeWithEnoughAP,
+			SwipeApThreshold:         2700,
+		},
 	},
 }
 

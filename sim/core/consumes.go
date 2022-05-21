@@ -131,9 +131,24 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 				debuffAuras = append(debuffAuras, GiftOfArthasAura(&target.Unit))
 			}
 
+			actionID := ActionID{SpellID: 11374}
+			goaProc := character.RegisterSpell(SpellConfig{
+				ActionID: actionID,
+				ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
+					IsPhantom:        true,
+					ThreatMultiplier: 1,
+					FlatThreatBonus:  90,
+
+					OutcomeApplier: character.OutcomeFuncAlwaysHit(),
+					OnSpellHitDealt: func(sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+						debuffAuras[spell.Unit.Index].Activate(sim)
+					},
+				}),
+			})
+
 			character.RegisterAura(Aura{
 				Label:    "Gift of Arthas",
-				ActionID: ActionID{SpellID: 11374},
+				ActionID: actionID,
 				Duration: NeverExpires,
 				OnReset: func(aura *Aura, sim *Simulation) {
 					aura.Activate(sim)
@@ -142,7 +157,7 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 					if spellEffect.Landed() &&
 						spell.SpellSchool == SpellSchoolPhysical &&
 						sim.RandomFloat("Gift of Arthas") < 0.3 {
-						debuffAuras[spell.Unit.Index].Activate(sim)
+						goaProc.Cast(sim, spellEffect.Target)
 					}
 				},
 			})

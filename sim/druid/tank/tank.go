@@ -54,23 +54,31 @@ func NewFeralTankDruid(character core.Character, options proto.Player) *FeralTan
 	bear.EnableAutoAttacks(bear, core.AutoAttackOptions{
 		// Base paw weapon.
 		MainHand: core.Weapon{
-			BaseDamageMin:        43.5,
-			BaseDamageMax:        66.5,
+			BaseDamageMin:        130 - 27,
+			BaseDamageMax:        130 + 27,
 			SwingSpeed:           2.5,
 			NormalizedSwingSpeed: 2.5,
 			SwingDuration:        time.Millisecond * 2500,
 			CritMultiplier:       bear.MeleeCritMultiplier(),
 		},
 		AutoSwingMelee: true,
+		ReplaceMHSwing: func(sim *core.Simulation, mhSwingSpell *core.Spell) *core.Spell {
+			return bear.TryMaul(sim, mhSwingSpell)
+		},
 	})
 
-	// bear Form adds (2 x Level) AP + 1 AP per Agi
-	bear.AddStat(stats.AttackPower, 140)
+	bear.PseudoStats.ThreatMultiplier *= 1.3 + 0.05*float64(bear.Talents.FeralInstinct)
+
+	// Bear Form adds 210 AP (3 * Level).
+	bear.AddStat(stats.AttackPower, 3*float64(core.CharacterLevel))
+
+	// Dire Bear Form bonuses.
+	bear.AddStat(stats.Armor, bear.Equip.Stats()[stats.Armor]*4)
 	bear.AddStatDependency(stats.StatDependency{
-		SourceStat:   stats.Agility,
-		ModifiedStat: stats.AttackPower,
-		Modifier: func(agility float64, attackPower float64) float64 {
-			return attackPower + agility*1
+		SourceStat:   stats.Stamina,
+		ModifiedStat: stats.Stamina,
+		Modifier: func(stamina float64, _ float64) float64 {
+			return stamina * 1.25
 		},
 	})
 

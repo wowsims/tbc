@@ -42,7 +42,8 @@ func (druid *Druid) registerMangleSpell() {
 			ProcMask: core.ProcMaskMeleeMHSpecial,
 
 			DamageMultiplier: 1,
-			ThreatMultiplier: 1 + core.TernaryFloat64(druid.Form.Matches(Bear) && ItemSetThunderheartHarness.CharacterHasSetBonus(&druid.Character, 2), 0.15, 0),
+			ThreatMultiplier: (1.5 / 1.15) *
+				core.TernaryFloat64(druid.Form.Matches(Bear) && ItemSetThunderheartHarness.CharacterHasSetBonus(&druid.Character, 2), 1.15, 1),
 
 			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 155, 1.15, true),
 			OutcomeApplier: druid.OutcomeFuncMeleeSpecialHitAndCrit(druid.MeleeCritMultiplier()),

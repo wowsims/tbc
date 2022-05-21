@@ -12,7 +12,7 @@ func (druid *Druid) registerDemoralizingRoarSpell() {
 
 	baseEffect := core.SpellEffect{
 		ThreatMultiplier: 1,
-		FlatThreatBonus:  56,
+		FlatThreatBonus:  62 * 2,
 		OutcomeApplier:   druid.OutcomeFuncMagicHit(),
 	}
 

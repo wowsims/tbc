@@ -16,6 +16,7 @@ export class ToplineResults extends ResultComponent {
 
 		const noManaSpecs = [
 			Spec.SpecFeralDruid,
+			Spec.SpecFeralTankDruid,
 			Spec.SpecRogue,
 			Spec.SpecWarrior,
 			Spec.SpecProtectionWarrior,

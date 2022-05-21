@@ -137,8 +137,8 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 	  				sunderArmor: true,
 	  				curseOfRecklessness: true,
 	  				huntersMark: TristateEffect.TristateEffectImproved,
-	  				exposeWeaknessUptime: 1.0,
-	  				exposeWeaknessHunterAgility: 1000,
+	  				exposeWeaknessUptime: 0.95,
+	  				exposeWeaknessHunterAgility: 1200,
 				}),
 			},
 

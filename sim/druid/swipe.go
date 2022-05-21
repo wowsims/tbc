@@ -51,6 +51,6 @@ func (druid *Druid) registerSwipeSpell() {
 	})
 }
 
-func (druid *Druid) CanSwipe(sim *core.Simulation) bool {
+func (druid *Druid) CanSwipe() bool {
 	return druid.CurrentRage() >= druid.Swipe.DefaultCast.Cost
 }
