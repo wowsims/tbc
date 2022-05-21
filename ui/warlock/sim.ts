@@ -40,9 +40,9 @@ export class WarlockSimUI extends IndividualSimUI<Spec.SpecWarlock> {
 			warnings: [
 				(simUI: IndividualSimUI<Spec.SpecWarlock>) => {
 					return {
-						updateOn: TypedEvent.onAny([simUI.player.rotationChangeEmitter]),
+						updateOn: new TypedEvent(),
 						shouldDisplay: () => true,
-						getContent: () => 'This sim is newly released, and there are likely a few bugs. Please let us know if you encounter any issues!',
+						getContent: () => Tooltips.NEWLY_RELEASED_WARNING,
 					};
 				},
 			],

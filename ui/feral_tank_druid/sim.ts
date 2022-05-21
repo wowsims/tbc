@@ -17,6 +17,7 @@ import { Stats } from '/tbc/core/proto_utils/stats.js';
 import { Player } from '/tbc/core/player.js';
 import { Sim } from '/tbc/core/sim.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { TypedEvent } from '/tbc/core/typed_event.js';
 
 import { Alchohol} from '/tbc/core/proto/common.js';
 import { BattleElixir } from '/tbc/core/proto/common.js';
@@ -49,6 +50,15 @@ export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid
 			cssClass: 'feral-tank-druid-sim-ui',
 			// List any known bugs / issues here and they'll be shown on the site.
 			knownIssues: [
+			],
+			warnings: [
+				(simUI: IndividualSimUI<Spec.SpecFeralTankDruid>) => {
+					return {
+						updateOn: new TypedEvent(),
+						shouldDisplay: () => true,
+						getContent: () => Tooltips.NEWLY_RELEASED_WARNING,
+					};
+				},
 			],
 
 			// All stats for which EP should be calculated.
