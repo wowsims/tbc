@@ -3,6 +3,7 @@ import { NumberPicker } from '/tbc/core/components/number_picker.js';
 import { ResultsViewer } from '/tbc/core/components/results_viewer.js';
 import { Title } from '/tbc/core/components/title.js';
 import { TypedEvent } from './typed_event.js';
+const noticeText = 'We are looking for help migrating our sims to Wrath of the Lich King. If you\'d like to participate in a fun side project working with an open-source community please <a href="https://discord.gg/jJMPr9JWwx" target="_blank">join our discord!</a>';
 // Shared UI for all individual sims and the raid sim.
 export class SimUI extends Component {
     constructor(parentElem, sim, config) {
@@ -36,6 +37,17 @@ export class SimUI extends Component {
         };
         updateShowExperimental();
         this.sim.showExperimentalChangeEmitter.on(updateShowExperimental);
+        const noticesElem = document.getElementsByClassName('notices')[0];
+        if (noticeText) {
+            tippy(noticesElem, {
+                content: noticeText,
+                allowHTML: true,
+                interactive: true,
+            });
+        }
+        else {
+            noticesElem.remove();
+        }
         this.warnings = [];
         const warningsElem = document.getElementsByClassName('warnings')[0];
         this.warningsTippy = tippy(warningsElem, {
@@ -220,6 +232,7 @@ const simHTML = `
 		<div class="sim-toolbar">
 			<ul class="sim-tabs nav nav-tabs">
 				<li class="sim-top-bar">
+					<span class="notices fas fa-exclamation-circle"></span>
 					<span class="warnings fa fa-exclamation-triangle"></span>
 					<div class="known-issues">Known Issues</div>
 				</li>
