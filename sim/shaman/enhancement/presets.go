@@ -99,93 +99,88 @@ var FullDebuffs = &proto.Debuffs{
 	ExposeWeaknessHunterAgility: 800,
 }
 
-var Phase2Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+var Phase2Gear = items.EquipmentSpecFromJsonString(`{"items": [
 	{
-		Name:    "Cataclysm Helm",
-		Enchant: "Glyph of Ferocity",
-		Gems: []string{
-			"Relentless Earthstorm Diamond",
-			"Bold Living Ruby",
-		},
-	},
-	{
-		Name: "Telonicus's Pendant of Mayhem",
+		"id": 30190,
+		"enchant": 29192,
+		"gems": [
+			32409,
+			24058
+		]
 	},
 	{
-		Name:    "Shoulderpads of the Stranger",
-		Enchant: "Greater Inscription of Vengeance",
-		Gems: []string{
-			"Bold Living Ruby",
-		},
+		"id": 30017
 	},
 	{
-		Name: "Thalassian Wildercloak",
+		"id": 30055,
+		"enchant": 28888,
+		"gems": [
+			24027
+		]
 	},
 	{
-		Name:    "Cataclysm Chestplate",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Bold Living Ruby",
-			"Sovereign Nightseye",
-			"Inscribed Noble Topaz",
-		},
+		"id": 29994,
+		"enchant": 34004
 	},
 	{
-		Name:    "True-Aim Stalker Bands",
-		Enchant: "Bracer - Brawn",
-		Gems: []string{
-			"Bold Living Ruby",
-		},
+		"id": 30185,
+		"enchant": 24003,
+		"gems": [
+			24027,
+			24054,
+			24058
+		]
 	},
 	{
-		Name:    "Cataclysm Gauntlets",
-		Enchant: "Gloves - Major Strength",
+		"id": 30091,
+		"enchant": 27899,
+		"gems": [
+			24027
+		]
 	},
 	{
-		Name: "Belt of One-Hundred Deaths",
-		Gems: []string{
-			"Bold Living Ruby",
-			"Sovereign Nightseye",
-		},
+		"id": 30189,
+		"enchant": 33995
 	},
 	{
-		Name:    "Cataclysm Legplates",
-		Enchant: "Nethercobra Leg Armor",
-		Gems: []string{
-			"Bold Living Ruby",
-		},
+		"id": 30106,
+		"gems": [
+			24027,
+			24054
+		]
 	},
 	{
-		Name:    "Boots of Utter Darkness",
-		Enchant: "Enchant Boots - Cat's Swiftness",
+		"id": 30192,
+		"enchant": 29535,
+		"gems": [
+			24027
+		]
 	},
 	{
-		Name: "Ring of Lethality",
+		"id": 30039,
+		"enchant": 28279
 	},
 	{
-		Name: "Band of the Ranger-General",
+		"id": 29997
 	},
 	{
-		Name: "Dragonspine Trophy",
+		"id": 30052
 	},
 	{
-		Name: "Bloodlust Brooch",
+		"id": 28830
 	},
 	{
-		Name:    "Talon of the Phoenix",
-		Enchant: "Weapon - Mongoose",
+		"id": 29383
 	},
 	{
-		Name:    "Rod of the Sun King",
-		Enchant: "Weapon - Mongoose",
+		"id": 32944,
+		"enchant": 22559
 	},
 	{
-		Name: "Totem of the Astral Winds",
+		"id": 29996,
+		"enchant": 22559
 	},
-})
-
-var PreRaidGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
-	items.ItemStringSpec{
-		Name: "Gladiator's Cleaver",
-	},
-})
+	{
+		"id": 27815
+	}
+]}`)

@@ -1,6 +1,7 @@
 package warlock
 
 import (
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/proto"
 )
 
@@ -85,96 +86,95 @@ var FullDebuffs = &proto.Debuffs{
 	ExposeWeaknessHunterAgility: 800,
 }
 
-var Phase4Gear = &proto.EquipmentSpec{
-	Items: []*proto.ItemSpec{
-		{
-			Id:      31051,
-			Enchant: 29191,
-			Gems: []int32{
-				32218,
-				34220,
-			},
-		},
-		{
-			Id: 33281,
-		},
-		{
-			Id:      31054,
-			Enchant: 28886,
-			Gems: []int32{
-				32215,
-				32218,
-			},
-		},
-		{
-			Id:      32524,
-			Enchant: 33150,
-		},
-		{
-			Id:      30107,
-			Enchant: 24003,
-			Gems: []int32{
-				32196,
-				32196,
-				32196,
-			},
-		},
-		{
-			Id:      32586,
-			Enchant: 22534,
-		},
-		{
-			Id:      31050,
-			Enchant: 28272,
-			Gems: []int32{
-				32196,
-			},
-		},
-		{
-			Id: 30888,
-			Gems: []int32{
-				32196,
-				32196,
-			},
-		},
-		{
-			Id:      31053,
-			Enchant: 24274,
-			Gems: []int32{
-				32196,
-			},
-		},
-		{
-			Id:      32239,
-			Enchant: 35297,
-			Gems: []int32{
-				32218,
-				32215,
-			},
-		},
-		{
-			Id:      32527,
-			Enchant: 22536,
-		},
-		{
-			Id:      33497,
-			Enchant: 22536,
-		},
-		{
-			Id: 32483,
-		},
-		{
-			Id: 33829,
-		},
-		{
-			Id:      32374,
-			Enchant: 22560,
-		},
-		{
-			Id: 33192,
-			Gems: []int32{
-				32215,
-			},
-		},
+var Phase4Gear = items.EquipmentSpecFromJsonString(`{"items": [
+	{
+		"id": 31051,
+		"enchant": 29191,
+		"gems": [
+		34220,
+		32218
+		]
 	},
-}
+	{
+		"id": 33281
+	},
+	{
+		"id": 31054,
+		"enchant": 28886,
+		"gems": [
+		32215,
+		32218
+		]
+	},
+	{
+		"id": 32524,
+		"enchant": 33150
+	},
+	{
+		"id": 30107,
+		"enchant": 24003,
+		"gems": [
+		32196,
+		32196,
+		32196
+		]
+	},
+	{
+		"id": 32586,
+		"enchant": 22534
+	},
+	{
+		"id": 31050,
+		"enchant": 28272,
+		"gems": [
+		32196
+		]
+	},
+	{
+		"id": 30888,
+		"gems": [
+		32196,
+		32196
+		]
+	},
+	{
+		"id": 31053,
+		"enchant": 24274,
+		"gems": [
+		32196
+		]
+	},
+	{
+		"id": 32239,
+		"enchant": 35297,
+		"gems": [
+		32218,
+		32215
+		]
+	},
+	{
+		"id": 32527,
+		"enchant": 22536
+	},
+	{
+		"id": 33497,
+		"enchant": 22536
+	},
+	{
+		"id": 32483
+	},
+	{
+		"id": 33829
+	},
+	{
+		"id": 32374,
+		"enchant": 22561
+	},
+	{},
+	{
+		"id": 33192,
+		"gems": [
+		32215
+		]
+	}
+]}`)

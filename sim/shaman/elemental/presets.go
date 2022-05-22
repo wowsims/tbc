@@ -125,95 +125,100 @@ var FullDebuffs = &proto.Debuffs{
 	Misery:                    true,
 }
 
-var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
-	items.ItemStringSpec{
-		Name:    "Cyclone Faceguard",
-		Enchant: "Glyph of Power",
-		Gems: []string{
-			"Chaotic Skyfire Diamond",
-			"Potent Noble Topaz",
-		},
+var P1Gear = items.EquipmentSpecFromJsonString(`{"items": [
+	{
+		"id": 29035,
+		"enchant": 29191,
+		"gems": [
+			34220,
+			24059
+		]
 	},
-	items.ItemStringSpec{
-		Name: "Adornment of Stolen Souls",
+	{
+		"id": 28762
 	},
-	items.ItemStringSpec{
-		Name:    "Cyclone Shoulderguards",
-		Enchant: "Greater Inscription of Discipline",
-		Gems: []string{
-			"Potent Noble Topaz",
-			"Potent Noble Topaz",
-		},
+	{
+		"id": 29037,
+		"enchant": 28886,
+		"gems": [
+			24059,
+			24059
+		]
 	},
-	items.ItemStringSpec{
-		Name: "Ruby Drape of the Mysticant",
+	{
+		"id": 28797,
+		"enchant": 33150
 	},
-	items.ItemStringSpec{
-		Name:    "Netherstrike Breastplate",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+	{
+		"id": 29519,
+		"enchant": 24003,
+		"gems": [
+			24030,
+			24030,
+			24030
+		]
 	},
-	items.ItemStringSpec{
-		Name:    "Netherstrike Bracers",
-		Enchant: "Bracer - Spellpower",
-		Gems: []string{
-			"Potent Noble Topaz",
-		},
+	{
+		"id": 29521,
+		"enchant": 22534,
+		"gems": [
+			24059
+		]
 	},
-	items.ItemStringSpec{
-		Name:    "Soul-Eater's Handwraps",
-		Enchant: "Gloves - Major Spellpower",
-		Gems: []string{
-			"Potent Noble Topaz",
-			"Glowing Nightseye",
-		},
+	{
+		"id": 28780,
+		"enchant": 28272,
+		"gems": [
+			24059,
+			24056
+		]
 	},
-	items.ItemStringSpec{
-		Name: "Netherstrike Belt",
-		Gems: []string{
-			"Glowing Nightseye",
-			"Potent Noble Topaz",
-		},
+	{
+		"id": 29520,
+		"gems": [
+			24056,
+			24059
+		]
 	},
-	items.ItemStringSpec{
-		Name:    "Stormsong Kilt",
-		Enchant: "Runic Spellthread",
-		Gems: []string{
-			"Potent Noble Topaz",
-			"Runed Living Ruby",
-			"Glowing Nightseye",
-		},
+	{
+		"id": 24262,
+		"enchant": 24274,
+		"gems": [
+			24030,
+			24030,
+			24030
+		]
 	},
-	items.ItemStringSpec{
-		Name: "Windshear Boots",
+	{
+		"id": 28517,
+		"enchant": 35297,
+		"gems": [
+			24030,
+			24030
+		]
 	},
-	items.ItemStringSpec{
-		Name:    "Ring of Unrelenting Storms",
-		Enchant: "Ring - Spellpower",
+	{
+		"id": 30667,
+		"enchant": 22536
 	},
-	items.ItemStringSpec{
-		Name:    "Ring of Recurrence",
-		Enchant: "Ring - Spellpower",
+	{
+		"id": 28753,
+		"enchant": 22536
 	},
-	items.ItemStringSpec{
-		Name: "The Lightning Capacitor",
+	{
+		"id": 29370
 	},
-	items.ItemStringSpec{
-		Name: "Icon of the Silver Crescent",
+	{
+		"id": 28785
 	},
-	items.ItemStringSpec{
-		Name: "Totem of the Void",
+	{
+		"id": 28770,
+		"enchant": 22555
 	},
-	items.ItemStringSpec{
-		Name:    "Nathrezim Mindblade",
-		Enchant: "Weapon - Major Spellpower",
+	{
+		"id": 29273
 	},
-	items.ItemStringSpec{
-		Name:    "Mazthoril Honor Shield",
-		Enchant: "Shield - Intellect",
-	},
-})
+	{
+		"id": 28248
+	}
+]}`)

@@ -113,177 +113,182 @@ var PlayerOptionsAOE = &proto.Player_BalanceDruid{
 	},
 }
 
-var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+var P1Gear = items.EquipmentSpecFromJsonString(`{"items": [
 	{
-		Name:    "Antlers of Malorne",
-		Enchant: "Glyph of Power",
-		Gems: []string{
-			"Potent Noble Topaz",
-			"Chaotic Skyfire Diamond",
-		},
+		"id": 29093,
+		"enchant": 29191,
+		"gems": [
+			24030,
+			34220
+		]
 	},
 	{
-		Name: "Adornment of Stolen Souls",
+		"id": 28762
 	},
 	{
-		Name:    "Pauldrons of Malorne",
-		Enchant: "Greater Inscription of Discipline",
-		Gems: []string{
-			"Glowing Nightseye",
-			"Potent Noble Topaz",
-		},
+		"id": 29095,
+		"enchant": 28886,
+		"gems": [
+			24056,
+			24059
+		]
 	},
 	{
-		Name: "Ruby Drape of the Mysticant",
+		"id": 28766,
+		"enchant": 33150
 	},
 	{
-		Name:    "Spellfire Robe",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Potent Noble Topaz",
-			"Glowing Nightseye",
-		},
+		"id": 21848,
+		"enchant": 24003,
+		"gems": [
+			24059,
+			24056
+		]
 	},
 	{
-		Name:    "Bracers of Havok",
-		Enchant: "Bracer - Spellpower",
-		Gems: []string{
-			"Potent Noble Topaz",
-		},
+		"id": 24250,
+		"enchant": 22534,
+		"gems": [
+			31867
+		]
 	},
 	{
-		Name:    "Spellfire Gloves",
-		Enchant: "Gloves - Major Spellpower",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 21847,
+		"enchant": 28272,
+		"gems": [
+			31867,
+			31867
+		]
 	},
 	{
-		Name: "Spellfire Belt",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 21846,
+		"gems": [
+			31867,
+			31867
+		]
 	},
 	{
-		Name:    "Spellstrike Pants",
-		Enchant: "Runic Spellthread",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 24262,
+		"enchant": 24274,
+		"gems": [
+			31867,
+			31867,
+			31867
+		]
 	},
 	{
-		Name: "Boots of Foretelling",
+		"id": 28517,
+		"enchant": 35297,
+		"gems": [
+			31867,
+			24059
+		]
 	},
 	{
-		Name:    "Violet Signet of the Archmage",
-		Enchant: "Ring - Spellpower",
+		"id": 28753,
+		"enchant": 22536
 	},
 	{
-		Name:    "Ring of Recurrence",
-		Enchant: "Ring - Spellpower",
+		"id": 28793,
+		"enchant": 22536
 	},
 	{
-		Name: "Quagmirran's Eye",
+		"id": 29370
 	},
 	{
-		Name: "Icon of the Silver Crescent",
+		"id": 27683
 	},
 	{
-		Name: "Ivory Idol of the Moongoddess",
+		"id": 28770,
+		"enchant": 22560
 	},
 	{
-		Name:    "Nathrezim Mindblade",
-		Enchant: "Weapon - Major Spellpower",
+		"id": 29271
 	},
 	{
-		Name: "Talisman of Kalecgos",
-	},
-})
-
-var P2Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+		"id": 27518
+	}
+]}`)
+var P2Gear = items.EquipmentSpecFromJsonString(`{"items": [
 	{
-		Name:    "Nordrassil Headpiece",
-		Enchant: "Glyph of Power",
-		Gems: []string{
-			"Potent Noble Topaz",
-			"Chaotic Skyfire Diamond",
-		},
-	},
-	{
-		Name: "The Sun King's Talisman",
+		"id": 30233,
+		"enchant": 29191,
+		"gems": [
+			24059,
+			34220
+		]
 	},
 	{
-		Name:    "Nordrassil Wrath-Mantle",
-		Enchant: "Greater Inscription of Discipline",
-		Gems: []string{
-			"Glowing Nightseye",
-			"Potent Noble Topaz",
-		},
+		"id": 30015
 	},
 	{
-		Name: "Brute Cloak of the Ogre-Magi",
+		"id": 30235,
+		"enchant": 28886,
+		"gems": [
+			24056,
+			24059
+		]
 	},
 	{
-		Name:    "Nordrassil Chestpiece",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 28797,
+		"enchant": 33150
 	},
 	{
-		Name:    "Mindstorm Wristbands",
-		Enchant: "Bracer - Spellpower",
+		"id": 30231,
+		"enchant": 24003,
+		"gems": [
+			24030,
+			24030,
+			24030
+		]
 	},
 	{
-		Name:    "Spellfire Gloves",
-		Enchant: "Gloves - Major Spellpower",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 29918,
+		"enchant": 22534
 	},
 	{
-		Name: "Belt of Blasting",
-		Gems: []string{
-			"Glowing Nightseye",
-			"Potent Noble Topaz",
-		},
+		"id": 30232,
+		"enchant": 28272
 	},
 	{
-		Name:    "Nordrassil Wrath-Kilt",
-		Enchant: "Runic Spellthread",
-		Gems: []string{
-			"Runed Living Ruby",
-		},
+		"id": 30038,
+		"gems": [
+			24056,
+			24059
+		]
 	},
 	{
-		Name: "Boots of Blasting",
+		"id": 24262,
+		"enchant": 24274,
+		"gems": [
+			24030,
+			24030,
+			24030
+		]
 	},
 	{
-		Name:    "Band of Eternity",
-		Enchant: "Ring - Spellpower",
+		"id": 30067,
+		"enchant": 35297
 	},
 	{
-		Name:    "Ring of Recurrence",
-		Enchant: "Ring - Spellpower",
+		"id": 28753,
+		"enchant": 22536
 	},
 	{
-		Name: "Quagmirran's Eye",
+		"id": 29302,
+		"enchant": 22536
 	},
 	{
-		Name: "Icon of the Silver Crescent",
+		"id": 29370
 	},
 	{
-		Name: "Idol of the Raven Goddess",
+		"id": 27683
 	},
 	{
-		Name:    "The Nexus Key",
-		Enchant: "Weapon - Major Spellpower",
+		"id": 29988,
+		"enchant": 22560
 	},
-})
+	{
+		"id": 32387
+	}
+]}`)

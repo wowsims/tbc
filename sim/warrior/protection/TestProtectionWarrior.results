@@ -137,22 +137,22 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BandoftheEternalChampion-29301"
  value: {
-  dps: 484.426236444353
-  tps: 1002.2173006555197
+  dps: 501.7718760229007
+  tps: 1038.285813112917
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BandoftheEternalDefender-29297"
  value: {
-  dps: 472.6526065052471
-  tps: 982.9826487077003
+  dps: 487.75160006542757
+  tps: 1013.0120340495597
  }
 }
 dps_results: {
  key: "TestProtectionWarrior-AllItems-BandoftheEternalSage-29305"
  value: {
-  dps: 468.80225769292645
-  tps: 977.1509868346533
+  dps: 483.84540645710126
+  tps: 1007.0965084531886
  }
 }
 dps_results: {
@@ -914,8 +914,8 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-TheTwinStars"
  value: {
-  dps: 460.5016529718331
-  tps: 962.5230636080205
+  dps: 475.33441757126764
+  tps: 992.5020699208409
  }
 }
 dps_results: {

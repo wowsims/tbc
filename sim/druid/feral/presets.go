@@ -92,93 +92,89 @@ var PlayerOptionsBiteweave = &proto.Player_FeralDruid{
 	},
 }
 
-var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+var P1Gear = items.EquipmentSpecFromJsonString(`{"items": [
 	{
-		Name:    "Wolfshead Helm",
-		Enchant: "Glyph of Ferocity",
+		"id": 8345,
+		"enchant": 29192
 	},
 	{
-		Name: "Braided Eternium Chain",
+		"id": 29381
 	},
 	{
-		Name:    "Mantle of Malorne",
-		Enchant: "Might of the Scourge",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-		},
+		"id": 29100,
+		"enchant": 28888,
+		"gems": [
+			24028,
+			24028
+		]
 	},
 	{
-		Name:    "Vengeance Wrap",
-		Enchant: "Enchant Cloak - Greater Agility",
-		Gems: []string{
-			"Delicate Living Ruby",
-		},
+		"id": 28672,
+		"enchant": 34004
 	},
 	{
-		Name:    "Breastplate of Malorne",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-		},
+		"id": 29096,
+		"enchant": 24003,
+		"gems": [
+			24028,
+			24028,
+			24028
+		]
 	},
 	{
-		Name:    "Nightfall Wristguards",
-		Enchant: "Bracer - Brawn",
+		"id": 29246,
+		"enchant": 27899
 	},
 	{
-		Name:    "Gloves of Dexterous Manipulation",
-		Enchant: "Gloves - Major Agility",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-		},
+		"id": 28506,
+		"gems": [
+			24028,
+			24028
+		]
 	},
 	{
-		Name: "Girdle of Treachery",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-		},
+		"id": 28750,
+		"gems": [
+			24028,
+			24028
+		]
 	},
 	{
-		Name:    "Skulker's Greaves",
-		Enchant: "Nethercobra Leg Armor",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-		},
+		"id": 28741,
+		"enchant": 29535,
+		"gems": [
+			24028,
+			24028,
+			24028
+		]
 	},
 	{
-		Name:    "Edgewalker Longboots",
-		Enchant: "Enchant Boots - Cat's Swiftness",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-		},
+		"id": 28545,
+		"enchant": 28279,
+		"gems": [
+			24028,
+			24028
+		]
 	},
 	{
-		Name:    "Ring of the Recalcitrant",
-		Enchant: "Ring - Striking",
+		"id": 28649,
+		"enchant": 22535
 	},
 	{
-		Name:    "Shapeshifter's Signet",
-		Enchant: "Ring - Striking",
+		"id": 30834,
+		"enchant": 22535
 	},
 	{
-		Name: "Dragonspine Trophy",
+		"id": 28830
 	},
 	{
-		Name: "Bloodlust Brooch",
+		"id": 29383
 	},
 	{
-		Name: "Everbloom Idol",
+		"id": 28658,
+		"enchant": 22556
 	},
 	{
-		Name:    "Gladiator's Maul",
-		Enchant: "2H Weapon - Major Agility",
-	},
-})
+		"id": 29390
+	}
+]}`)

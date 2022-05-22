@@ -220,100 +220,101 @@ var FullDebuffs = &proto.Debuffs{
 	Misery:                    true,
 }
 
-var P1FireGear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
-	items.ItemStringSpec{
-		Name:    "Collar of the Aldor",
-		Enchant: "Glyph of Power",
-		Gems: []string{
-			"Chaotic Skyfire Diamond",
-			"Glowing Nightseye",
-		},
+var P1FireGear = items.EquipmentSpecFromJsonString(`{"items": [
+	{
+		"id": 29076,
+		"enchant": 29191,
+		"gems": [
+			34220,
+			24056
+		]
 	},
-	items.ItemStringSpec{
-		Name: "Brooch of Heightened Potential",
+	{
+		"id": 28134
 	},
-	items.ItemStringSpec{
-		Name:    "Pauldrons of the Aldor",
-		Enchant: "Greater Inscription of Discipline",
-		Gems: []string{
-			"Veiled Noble Topaz",
-			"Runed Living Ruby",
-		},
+	{
+		"id": 29079,
+		"enchant": 28886,
+		"gems": [
+			31867,
+			24030
+		]
 	},
-	items.ItemStringSpec{
-		Name: "Ruby Drape of the Mysticant",
+	{
+		"id": 28766,
+		"enchant": 33150
 	},
-	items.ItemStringSpec{
-		Name:    "Spellfire Robe",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Veiled Noble Topaz",
-			"Veiled Noble Topaz",
-			"Veiled Noble Topaz",
-		},
+	{
+		"id": 21848,
+		"enchant": 24003,
+		"gems": [
+			31867,
+			31867
+		]
 	},
-	items.ItemStringSpec{
-		Name:    "General's Silk Cuffs",
-		Enchant: "Bracer - Spellpower",
-		Gems: []string{
-			"Veiled Noble Topaz",
-		},
+	{
+		"id": 28411,
+		"enchant": 22534,
+		"gems": [
+			31867
+		]
 	},
-	items.ItemStringSpec{
-		Name:    "Spellfire Gloves",
-		Enchant: "Gloves - Major Spellpower",
-		Gems: []string{
-			"Veiled Noble Topaz",
-			"Glowing Nightseye",
-		},
+	{
+		"id": 21847,
+		"enchant": 28272,
+		"gems": [
+			31867,
+			24056
+		]
 	},
-	items.ItemStringSpec{
-		Name: "Spellfire Belt",
-		Gems: []string{
-			"Veiled Noble Topaz",
-			"Veiled Noble Topaz",
-		},
+	{
+		"id": 21846,
+		"gems": [
+			31867,
+			31867
+		]
 	},
-	items.ItemStringSpec{
-		Name:    "Spellstrike Pants",
-		Enchant: "Runic Spellthread",
-		Gems: []string{
-			"Veiled Noble Topaz",
-			"Veiled Noble Topaz",
-			"Veiled Noble Topaz",
-		},
+	{
+		"id": 24262,
+		"enchant": 24274,
+		"gems": [
+			31867,
+			31867,
+			31867
+		]
 	},
-	items.ItemStringSpec{
-		Name: "Boots of Foretelling",
-		Gems: []string{
-			"Veiled Noble Topaz",
-			"Veiled Noble Topaz",
-		},
+	{
+		"id": 28517,
+		"enchant": 35297,
+		"gems": [
+			31867,
+			31867
+		]
 	},
-	items.ItemStringSpec{
-		Name:    "Band of Crimson Fury",
-		Enchant: "Ring - Spellpower",
+	{
+		"id": 28793,
+		"enchant": 22536
 	},
-	items.ItemStringSpec{
-		Name:    "Ashyen's Gift",
-		Enchant: "Ring - Spellpower",
+	{
+		"id": 29172,
+		"enchant": 22536
 	},
-	items.ItemStringSpec{
-		Name: "Quagmirran's Eye",
+	{
+		"id": 29370
 	},
-	items.ItemStringSpec{
-		Name: "Icon of the Silver Crescent",
+	{
+		"id": 27683
 	},
-	items.ItemStringSpec{
-		Name: "Tirisfal Wand of Ascendancy",
+	{
+		"id": 28802,
+		"enchant": 22560
 	},
-	items.ItemStringSpec{
-		Name:    "Bloodmaw Magus-Blade",
-		Enchant: "Sunfire",
+	{
+		"id": 29270
 	},
-	items.ItemStringSpec{
-		Name: "Flametongue Seal",
-	},
-})
+	{
+		"id": 28673
+	}
+]}`)
 var P1FrostGear = P1FireGear
 var P1ArcaneGear = P1FireGear

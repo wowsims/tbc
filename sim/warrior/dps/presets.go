@@ -134,99 +134,103 @@ var FullDebuffs = &proto.Debuffs{
 	Misery:                    true,
 }
 
-var FuryP1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+var FuryP1Gear = items.EquipmentSpecFromJsonString(`{"items": [
 	{
-		Name:    "Warbringer Battle-Helm",
-		Enchant: "Glyph of Ferocity",
-		Gems: []string{
-			"Relentless Earthstorm Diamond",
-			"Smooth Dawnstone",
-		},
+		"id": 29021,
+		"enchant": 29192,
+		"gems": [
+			32409,
+			24048
+		]
 	},
 	{
-		Name: "Choker of Vile Intent",
+		"id": 29381
 	},
 	{
-		Name:    "Warbringer Shoulderplates",
-		Enchant: "Greater Inscription of Vengeance",
-		Gems: []string{
-			"Smooth Dawnstone",
-			"Jagged Talasite",
-		},
+		"id": 29023,
+		"enchant": 28888,
+		"gems": [
+			24048,
+			24067
+		]
 	},
 	{
-		Name: "Vengeance Wrap",
+		"id": 24259,
+		"enchant": 34004,
+		"gems": [
+			24058
+		]
 	},
 	{
-		Name:    "Warbringer Breastplate",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Smooth Dawnstone",
-			"Smooth Dawnstone",
-			"Smooth Dawnstone",
-		},
+		"id": 29019,
+		"enchant": 24003,
+		"gems": [
+			24048,
+			24048,
+			24048
+		]
 	},
 	{
-		Name:    "Bladespire Warbands",
-		Enchant: "Bracer - Brawn",
-		Gems: []string{
-			"Jagged Talasite",
-			"Inscribed Noble Topaz",
-		},
+		"id": 28795,
+		"enchant": 27899,
+		"gems": [
+			24067,
+			24058
+		]
 	},
 	{
-		Name:    "Gauntlets of Martial Perfection",
-		Enchant: "Gloves - Major Strength",
-		Gems: []string{
-			"Jagged Talasite",
-			"Smooth Dawnstone",
-		},
+		"id": 28824,
+		"enchant": 33995,
+		"gems": [
+			24067,
+			24048
+		]
 	},
 	{
-		Name: "Girdle of the Endless Pit",
-		Gems: []string{
-			"Inscribed Noble Topaz",
-			"Jagged Talasite",
-		},
+		"id": 28779,
+		"gems": [
+			24058,
+			24067
+		]
 	},
 	{
-		Name:    "Skulker's Greaves",
-		Enchant: "Nethercobra Leg Armor",
-		Gems: []string{
-			"Smooth Dawnstone",
-			"Smooth Dawnstone",
-			"Smooth Dawnstone",
-		},
+		"id": 28741,
+		"enchant": 29535,
+		"gems": [
+			24048,
+			24048,
+			24048
+		]
 	},
 	{
-		Name:    "Ironstriders of Urgency",
-		Enchant: "Enchant Boots - Cat's Swiftness",
-		Gems: []string{
-			"Inscribed Noble Topaz",
-			"Smooth Dawnstone",
-		},
+		"id": 28608,
+		"enchant": 28279,
+		"gems": [
+			24058,
+			24048
+		]
 	},
 	{
-		Name: "Ring of a Thousand Marks",
+		"id": 28757
 	},
 	{
-		Name: "Shapeshifter's Signet",
+		"id": 30834
 	},
 	{
-		Name: "Dragonspine Trophy",
+		"id": 29383
 	},
 	{
-		Name: "Bloodlust Brooch",
+		"id": 28830
 	},
 	{
-		Name:    "Dragonmaw",
-		Enchant: "Weapon - Mongoose",
+		"id": 28438,
+		"enchant": 22559
 	},
 	{
-		Name:    "Spiteblade",
-		Enchant: "Weapon - Mongoose",
+		"id": 28729,
+		"enchant": 22559
 	},
 	{
-		Name: "Mama's Insurance",
-	},
-})
+		"id": 30279
+	}
+]}`)
