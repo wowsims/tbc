@@ -62,6 +62,11 @@ func (moonkin *BalanceDruid) GetDruid() *druid.Druid {
 	return moonkin.Druid
 }
 
+func (moonkin *BalanceDruid) Initialize() {
+	moonkin.Druid.Initialize()
+	moonkin.RegisterBalanceSpells()
+}
+
 func (moonkin *BalanceDruid) Reset(sim *core.Simulation) {
 	if moonkin.useSurplusRotation {
 		moonkin.manaTracker.Reset()

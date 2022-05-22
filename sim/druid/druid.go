@@ -17,6 +17,7 @@ type Druid struct {
 
 	DemoralizingRoar *core.Spell
 	FaerieFire       *core.Spell
+	FerociousBite    *core.Spell
 	Hurricane        *core.Spell
 	InsectSwarm      *core.Spell
 	Lacerate         *core.Spell
@@ -24,6 +25,7 @@ type Druid struct {
 	Maul             *core.Spell
 	Moonfire         *core.Spell
 	Rebirth          *core.Spell
+	Rip              *core.Spell
 	Starfire6        *core.Spell
 	Starfire8        *core.Spell
 	Swipe            *core.Spell
@@ -32,9 +34,11 @@ type Druid struct {
 	InsectSwarmDot *core.Dot
 	LacerateDot    *core.Dot
 	MoonfireDot    *core.Dot
+	RipDot         *core.Dot
 
 	DemoralizingRoarAura *core.Aura
 	FaerieFireAura       *core.Aura
+	MangleAura           *core.Aura
 	MaulQueueAura        *core.Aura
 	NaturesGraceProcAura *core.Aura
 	NaturesSwiftnessAura *core.Aura
@@ -96,23 +100,31 @@ func (druid *Druid) MeleeCritMultiplier() float64 {
 
 func (druid *Druid) Initialize() {
 	druid.registerFaerieFireSpell()
-	druid.registerHurricaneSpell()
-	druid.registerInsectSwarmSpell()
-	druid.registerMoonfireSpell()
 	druid.registerRebirthSpell()
-	druid.Starfire8 = druid.newStarfireSpell(8)
-	druid.Starfire6 = druid.newStarfireSpell(6)
-	druid.registerWrathSpell()
 	druid.registerInnervateCD()
 }
 
-// Separate so this can be omitted for other specs.
+func (druid *Druid) RegisterBalanceSpells() {
+	druid.registerHurricaneSpell()
+	druid.registerInsectSwarmSpell()
+	druid.registerMoonfireSpell()
+	druid.Starfire8 = druid.newStarfireSpell(8)
+	druid.Starfire6 = druid.newStarfireSpell(6)
+	druid.registerWrathSpell()
+}
+
 func (druid *Druid) RegisterBearSpells(maulRageThreshold float64) {
-	druid.registerMangleSpell()
+	druid.registerMangleBearSpell()
 	druid.registerMaulSpell(maulRageThreshold)
 	druid.registerLacerateSpell()
 	druid.registerSwipeSpell()
 	druid.registerDemoralizingRoarSpell()
+}
+
+func (druid *Druid) RegisterCatSpells() {
+	druid.registerFerociousBiteSpell()
+	druid.registerMangleCatSpell()
+	druid.registerRipSpell()
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {

@@ -26,7 +26,7 @@ func (bear *FeralTankDruid) doRotation(sim *core.Simulation) {
 			if bear.CanSwipe() {
 				bear.Swipe.Cast(sim, bear.CurrentTarget)
 			}
-		} else if bear.CanMangle(sim) {
+		} else if bear.CanMangleBear(sim) {
 			bear.Mangle.Cast(sim, bear.CurrentTarget)
 		} else if bear.shouldSwipe(sim) {
 			bear.Swipe.Cast(sim, bear.CurrentTarget)

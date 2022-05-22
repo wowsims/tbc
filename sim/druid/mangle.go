@@ -8,15 +8,15 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (druid *Druid) registerMangleSpell() {
+func (druid *Druid) registerMangleBearSpell() {
 	if !druid.Talents.Mangle {
 		return
 	}
 
+	druid.MangleAura = core.MangleAura(druid.CurrentTarget)
+
 	cost := 20.0 - float64(druid.Talents.Ferocity)
 	refundAmount := cost * 0.8
-
-	debuff := core.MangleAura(druid.CurrentTarget)
 
 	druid.Mangle = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 33987},
@@ -50,7 +50,7 @@ func (druid *Druid) registerMangleSpell() {
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
-					debuff.Activate(sim)
+					druid.MangleAura.Activate(sim)
 				} else {
 					druid.AddRage(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
 				}
@@ -59,6 +59,57 @@ func (druid *Druid) registerMangleSpell() {
 	})
 }
 
-func (druid *Druid) CanMangle(sim *core.Simulation) bool {
+func (druid *Druid) registerMangleCatSpell() {
+	if !druid.Talents.Mangle {
+		return
+	}
+
+	druid.MangleAura = core.MangleAura(druid.CurrentTarget)
+
+	cost := 20.0 - float64(druid.Talents.Ferocity) - core.TernaryFloat64(ItemSetThunderheartHarness.CharacterHasSetBonus(&druid.Character, 2), 5.0, 0)
+	refundAmount := cost * 0.8
+
+	druid.Mangle = druid.RegisterSpell(core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: 33983},
+		SpellSchool: core.SpellSchoolPhysical,
+		SpellExtras: core.SpellExtrasMeleeMetrics,
+
+		ResourceType: stats.Energy,
+		BaseCost:     cost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: cost,
+				GCD:  time.Second,
+			},
+			IgnoreHaste: true,
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask: core.ProcMaskMeleeMHSpecial,
+
+			DamageMultiplier: 1 + 0.1*float64(druid.Talents.SavageFury),
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 264/1.6, 1.6, true),
+			OutcomeApplier: druid.OutcomeFuncMeleeSpecialHitAndCrit(druid.MeleeCritMultiplier()),
+
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if spellEffect.Landed() {
+					druid.AddComboPoints(sim, 1, spell.ActionID)
+					druid.MangleAura.Activate(sim)
+				} else {
+					druid.AddEnergy(sim, refundAmount, core.ActionID{OtherID: proto.OtherAction_OtherActionRefund})
+				}
+			},
+		}),
+	})
+}
+
+func (druid *Druid) CanMangleBear(sim *core.Simulation) bool {
 	return druid.Mangle != nil && druid.CurrentRage() >= druid.Mangle.DefaultCast.Cost && druid.Mangle.IsReady(sim)
+}
+
+func (druid *Druid) CanMangleCat() bool {
+	return druid.Mangle != nil && druid.CurrentEnergy() >= druid.Mangle.DefaultCast.Cost
 }

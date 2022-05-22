@@ -26,6 +26,26 @@ var StandardTalents = &proto.DruidTalents{
 	OmenOfClarity:           true,
 }
 
+var PlayerOptionsBiteweave = &proto.Player_FeralDruid{
+	FeralDruid: &proto.FeralDruid{
+		Talents: StandardTalents,
+		Options: &proto.FeralDruid_Options{
+			InnervateTarget: &proto.RaidTarget{TargetIndex: -1}, // no Innervate
+			LatencyMs:       100,
+		},
+		Rotation: &proto.FeralDruid_Rotation{
+			FinishingMove: proto.FeralDruid_Rotation_Rip,
+			MangleTrick:   true,
+			Biteweave:     true,
+			MangleBot:     false,
+			RipCp:         5,
+			BiteCp:        5,
+			RakeTrick:     false,
+			Ripweave:      false,
+		},
+	},
+}
+
 var FullRaidBuffs = &proto.RaidBuffs{
 	ArcaneBrilliance: true,
 	GiftOfTheWild:    proto.TristateEffect_TristateEffectImproved,
@@ -70,26 +90,6 @@ var FullDebuffs = &proto.Debuffs{
 	HuntersMark:                 proto.TristateEffect_TristateEffectImproved,
 	ExposeWeaknessUptime:        1.0,
 	ExposeWeaknessHunterAgility: 1000,
-}
-
-var PlayerOptionsBiteweave = &proto.Player_FeralDruid{
-	FeralDruid: &proto.FeralDruid{
-		Talents: StandardTalents,
-		Options: &proto.FeralDruid_Options{
-			InnervateTarget: &proto.RaidTarget{TargetIndex: -1}, // no Innervate
-			LatencyMs:       100,
-		},
-		Rotation: &proto.FeralDruid_Rotation{
-			FinishingMove: proto.FeralDruid_Rotation_Rip,
-			MangleTrick:   true,
-			Biteweave:     true,
-			MangleBot:     false,
-			RipCp:         5,
-			BiteCp:        5,
-			RakeTrick:     false,
-			Ripweave:      false,
-		},
-	},
 }
 
 var P1Gear = items.EquipmentSpecFromJsonString(`{"items": [
