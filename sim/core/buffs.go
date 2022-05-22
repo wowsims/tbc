@@ -20,6 +20,7 @@ func applyBuffEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs proto.P
 
 	gotwAmount := GetTristateValueFloat(raidBuffs.GiftOfTheWild, 14.0, 18.0)
 	character.AddStats(stats.Stats{
+		stats.Armor:     GetTristateValueFloat(raidBuffs.GiftOfTheWild, 340, 459),
 		stats.Stamina:   gotwAmount,
 		stats.Agility:   gotwAmount,
 		stats.Strength:  gotwAmount,

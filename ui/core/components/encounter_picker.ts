@@ -275,16 +275,6 @@ class TargetPicker extends Component {
 			enableWhen: (target: Target) => target.getLevel() == Mechanics.BOSS_LEVEL,
 		});
 		new BooleanPicker(section3, modTarget, {
-			label: 'Sunwell Radiance',
-			labelTooltip: 'Reduces the chance for this enemy\'s attacks to be dodged by 20% and be missed by 5%. All Sunwell Plateau bosses have this.',
-			changedEvent: (target: Target) => target.changeEmitter,
-			getValue: (target: Target) => target.getSuppressDodge(),
-			setValue: (eventID: EventID, target: Target, newValue: boolean) => {
-				target.setSuppressDodge(eventID, newValue);
-			},
-			enableWhen: (target: Target) => target.getLevel() == Mechanics.BOSS_LEVEL,
-		});
-		new BooleanPicker(section3, modTarget, {
 			label: 'Parry Haste',
 			labelTooltip: 'Whether this enemy will gain parry haste when parrying attacks.',
 			changedEvent: (target: Target) => target.propChangeEmitter,
@@ -310,6 +300,16 @@ class TargetPicker extends Component {
 			setValue: (eventID: EventID, target: Target, newValue: number) => {
 				target.setSpellSchool(eventID, newValue);
 			},
+		});
+		new BooleanPicker(section3, modTarget, {
+			label: 'Sunwell Radiance',
+			labelTooltip: 'Reduces the chance for this enemy\'s attacks to be dodged by 20% and be missed by 5%. All Sunwell Plateau bosses have this.',
+			changedEvent: (target: Target) => target.changeEmitter,
+			getValue: (target: Target) => target.getSuppressDodge(),
+			setValue: (eventID: EventID, target: Target, newValue: boolean) => {
+				target.setSuppressDodge(eventID, newValue);
+			},
+			enableWhen: (target: Target) => target.getLevel() == Mechanics.BOSS_LEVEL,
 		});
 	}
 }
