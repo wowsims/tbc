@@ -316,15 +316,15 @@ func (generator *ItemsTestGenerator) init() {
 	generator.sets = generator.ItemFilter.FindAllSets()
 
 	baseEquipment := items.ProtoToEquipment(*generator.Player.Equipment)
-	metaSocketIdx := -1
+	generator.metaSocketIdx = -1
 	for i, socketColor := range baseEquipment[proto.ItemSlot_ItemSlotHead].GemSockets {
 		if socketColor == proto.GemColor_GemColorMeta {
-			metaSocketIdx = i
+			generator.metaSocketIdx = i
 			break
 		}
 	}
-	if metaSocketIdx == -1 {
-		panic("Please use a base head item with a meta socket so we can test meta effects!")
+	if generator.metaSocketIdx == -1 {
+		return
 	}
 	generator.metagems = generator.ItemFilter.FindAllMetaGems()
 }

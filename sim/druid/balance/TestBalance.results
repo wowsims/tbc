@@ -160,8 +160,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-BracingEarthstormDiamond"
  value: {
-  dps: 1307.135924030057
-  tps: 1284.4428055494557
+  dps: 1284.934857652523
+  tps: 1262.6857604994725
  }
 }
 dps_results: {
@@ -181,15 +181,15 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-BrutalEarthstormDiamond"
  value: {
-  dps: 1301.3646146791434
-  tps: 1278.786922385561
+  dps: 1279.2920178085349
+  tps: 1257.1557774523646
  }
 }
 dps_results: {
  key: "TestBalance-AllItems-ChaoticSkyfireDiamond"
  value: {
-  dps: 1303.4662989191434
-  tps: 1280.8465729407608
+  dps: 1309.5178648313058
+  tps: 1286.7771075346798
  }
 }
 dps_results: {
@@ -258,8 +258,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-DestructiveSkyfireDiamond"
  value: {
-  dps: 1308.6504938135633
-  tps: 1285.9270839372923
+  dps: 1285.8662520831397
+  tps: 1263.5985270414774
  }
 }
 dps_results: {
@@ -293,8 +293,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-EmberSkyfireDiamond"
  value: {
-  dps: 1310.821250312991
-  tps: 1288.0544253067314
+  dps: 1291.7757379240504
+  tps: 1269.3898231655692
  }
 }
 dps_results: {
@@ -314,8 +314,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-EnigmaticSkyfireDiamond"
  value: {
-  dps: 1301.3646146791434
-  tps: 1278.786922385561
+  dps: 1279.2920178085349
+  tps: 1257.1557774523646
  }
 }
 dps_results: {
@@ -328,8 +328,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-EternalEarthstormDiamond"
  value: {
-  dps: 1301.3646146791434
-  tps: 1278.786922385561
+  dps: 1279.2920178085349
+  tps: 1257.1557774523646
  }
 }
 dps_results: {
@@ -426,15 +426,15 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-ImbuedUnstableDiamond"
  value: {
-  dps: 1310.342207002786
-  tps: 1287.5849628627295
+  dps: 1288.0697686769602
+  tps: 1265.7579733034208
  }
 }
 dps_results: {
  key: "TestBalance-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 1304.596655596506
-  tps: 1281.9543224845763
+  dps: 1287.0492237703502
+  tps: 1264.7578392949436
  }
 }
 dps_results: {
@@ -510,8 +510,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 1324.343106625302
-  tps: 1301.3058444927956
+  dps: 1305.2258715069702
+  tps: 1282.570954076831
  }
 }
 dps_results: {
@@ -531,15 +531,15 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-PotentUnstableDiamond"
  value: {
-  dps: 1301.3646146791434
-  tps: 1278.786922385561
+  dps: 1279.2920178085349
+  tps: 1257.1557774523646
  }
 }
 dps_results: {
  key: "TestBalance-AllItems-PowerfulEarthstormDiamond"
  value: {
-  dps: 1301.3646146791434
-  tps: 1278.786922385561
+  dps: 1279.2920178085349
+  tps: 1257.1557774523646
  }
 }
 dps_results: {
@@ -552,8 +552,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-RelentlessEarthstormDiamond"
  value: {
-  dps: 1301.3646146791434
-  tps: 1278.786922385561
+  dps: 1302.2361047056056
+  tps: 1279.6409826114934
  }
 }
 dps_results: {
@@ -671,22 +671,22 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-SwiftSkyfireDiamond"
  value: {
-  dps: 1301.3646146791434
-  tps: 1278.786922385561
+  dps: 1279.2920178085349
+  tps: 1257.1557774523646
  }
 }
 dps_results: {
  key: "TestBalance-AllItems-SwiftStarfireDiamond"
  value: {
-  dps: 1309.0596938136941
-  tps: 1286.3280999374208
+  dps: 1286.8158042671855
+  tps: 1264.529088181841
  }
 }
 dps_results: {
  key: "TestBalance-AllItems-SwiftWindfireDiamond"
  value: {
-  dps: 1301.3646146791434
-  tps: 1278.786922385561
+  dps: 1279.2920178085349
+  tps: 1257.1557774523646
  }
 }
 dps_results: {
@@ -699,8 +699,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-TenaciousEarthstormDiamond"
  value: {
-  dps: 1301.3646146791434
-  tps: 1278.786922385561
+  dps: 1279.2920178085349
+  tps: 1257.1557774523646
  }
 }
 dps_results: {
@@ -755,8 +755,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-ThunderingSkyfireDiamond"
  value: {
-  dps: 1301.3646146791434
-  tps: 1278.786922385561
+  dps: 1279.2920178085349
+  tps: 1257.1557774523646
  }
 }
 dps_results: {

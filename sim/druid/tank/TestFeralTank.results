@@ -160,8 +160,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-BracingEarthstormDiamond"
  value: {
-  dps: 861.9324366367786
-  tps: 1308.154209050886
+  dps: 850.5387273508522
+  tps: 1290.2917047744659
  }
 }
 dps_results: {
@@ -181,15 +181,15 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-BrutalEarthstormDiamond"
  value: {
-  dps: 863.656408112505
-  tps: 1310.1130806375875
+  dps: 853.5499280800655
+  tps: 1296.0944366428596
  }
 }
 dps_results: {
  key: "TestFeralTank-AllItems-ChaoticSkyfireDiamond"
  value: {
-  dps: 861.9324366367786
-  tps: 1308.154209050886
+  dps: 862.883965464706
+  tps: 1310.8337776097978
  }
 }
 dps_results: {
@@ -258,8 +258,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-DestructiveSkyfireDiamond"
  value: {
-  dps: 861.9324366367786
-  tps: 1308.154209050886
+  dps: 850.5387273508522
+  tps: 1290.2917047744659
  }
 }
 dps_results: {
@@ -286,8 +286,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-EmberSkyfireDiamond"
  value: {
-  dps: 861.9324366367786
-  tps: 1308.154209050886
+  dps: 850.5387273508522
+  tps: 1290.2917047744659
  }
 }
 dps_results: {
@@ -307,8 +307,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-EnigmaticSkyfireDiamond"
  value: {
-  dps: 868.5431599156176
-  tps: 1319.676361111772
+  dps: 847.65288098905
+  tps: 1288.7051513848785
  }
 }
 dps_results: {
@@ -321,8 +321,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-EternalEarthstormDiamond"
  value: {
-  dps: 861.9324366367786
-  tps: 1308.154209050886
+  dps: 850.5387273508522
+  tps: 1290.2917047744659
  }
 }
 dps_results: {
@@ -426,15 +426,15 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-ImbuedUnstableDiamond"
  value: {
-  dps: 861.9324366367786
-  tps: 1308.154209050886
+  dps: 850.5387273508522
+  tps: 1290.2917047744659
  }
 }
 dps_results: {
  key: "TestFeralTank-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 861.9324366367786
-  tps: 1308.154209050886
+  dps: 850.5387273508522
+  tps: 1290.2917047744659
  }
 }
 dps_results: {
@@ -510,8 +510,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 861.9324366367786
-  tps: 1308.154209050886
+  dps: 850.5387273508522
+  tps: 1290.2917047744659
  }
 }
 dps_results: {
@@ -531,15 +531,15 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-PotentUnstableDiamond"
  value: {
-  dps: 869.6427184360108
-  tps: 1319.612406722606
+  dps: 852.3844567951396
+  tps: 1290.9570767869427
  }
 }
 dps_results: {
  key: "TestFeralTank-AllItems-PowerfulEarthstormDiamond"
  value: {
-  dps: 861.9324366367786
-  tps: 1308.154209050886
+  dps: 850.5387273508522
+  tps: 1290.2917047744659
  }
 }
 dps_results: {
@@ -559,8 +559,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-RelentlessEarthstormDiamond"
  value: {
-  dps: 868.5431599156176
-  tps: 1319.676361111772
+  dps: 865.271939997261
+  tps: 1314.1863197089142
  }
 }
 dps_results: {
@@ -678,22 +678,22 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-SwiftSkyfireDiamond"
  value: {
-  dps: 869.6427184360108
-  tps: 1319.612406722606
+  dps: 852.3844567951396
+  tps: 1290.9570767869427
  }
 }
 dps_results: {
  key: "TestFeralTank-AllItems-SwiftStarfireDiamond"
  value: {
-  dps: 861.9324366367786
-  tps: 1308.154209050886
+  dps: 850.5387273508522
+  tps: 1290.2917047744659
  }
 }
 dps_results: {
  key: "TestFeralTank-AllItems-SwiftWindfireDiamond"
  value: {
-  dps: 870.0789153300148
-  tps: 1319.2151651043825
+  dps: 854.1747457670682
+  tps: 1297.8961995546217
  }
 }
 dps_results: {
@@ -706,8 +706,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-TenaciousEarthstormDiamond"
  value: {
-  dps: 861.9324366367786
-  tps: 1308.154209050886
+  dps: 850.5387273508522
+  tps: 1290.2917047744659
  }
 }
 dps_results: {
@@ -762,8 +762,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-ThunderingSkyfireDiamond"
  value: {
-  dps: 867.3709600070632
-  tps: 1315.9526945283637
+  dps: 852.4173402502096
+  tps: 1296.6305697774521
  }
 }
 dps_results: {

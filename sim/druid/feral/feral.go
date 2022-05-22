@@ -92,9 +92,23 @@ type FeralDruid struct {
 	*druid.Druid
 
 	Rotation proto.FeralDruid_Rotation
+
+	readyToShift   bool
+	waitingForTick bool
 }
 
-// GetDruid is to implement druid.Agent (supports nordrassil set bonus)
 func (cat *FeralDruid) GetDruid() *druid.Druid {
 	return cat.Druid
+}
+
+func (cat *FeralDruid) Initialize() {
+	cat.Druid.Initialize()
+	cat.RegisterCatSpells()
+	cat.DelayDPSCooldownsForArmorDebuffs()
+}
+
+func (cat *FeralDruid) Reset(sim *core.Simulation) {
+	cat.Druid.Reset(sim)
+	cat.readyToShift = false
+	cat.waitingForTick = false
 }
