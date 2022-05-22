@@ -21,10 +21,11 @@ func (cat *FeralDruid) doRotation(sim *core.Simulation) {
 
 	if cat.shouldRip(sim, energy, comboPoints) {
 		cat.Rip.Cast(sim, cat.CurrentTarget)
-	} else if (!cat.MangleAura.IsActive() || cat.PseudoStats.InFrontOfTarget) && cat.CanMangleCat() {
+	} else if !cat.MangleAura.IsActive() && cat.CanMangleCat() {
 		cat.Mangle.Cast(sim, cat.CurrentTarget)
-	} else {
-		// TODO Use shred here instead.
+	} else if cat.CanShred() {
+		cat.Shred.Cast(sim, cat.CurrentTarget)
+	} else if cat.PseudoStats.InFrontOfTarget && cat.CanMangleCat() {
 		cat.Mangle.Cast(sim, cat.CurrentTarget)
 	}
 }
