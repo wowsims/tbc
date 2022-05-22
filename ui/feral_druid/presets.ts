@@ -51,96 +51,463 @@ export const DefaultConsumes = Consumes.create({
 	scrollOfStrength: 5,
 });
 
+export const P1_PRESET = {
+	name: 'P1 Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 8345,
+			"enchant": 29192
+		},
+		{
+			"id": 29381
+		},
+		{
+			"id": 29100,
+			"enchant": 28888,
+			"gems": [
+				24028,
+				24028
+			]
+		},
+		{
+			"id": 28672,
+			"enchant": 34004
+		},
+		{
+			"id": 29096,
+			"enchant": 24003,
+			"gems": [
+				24028,
+				24028,
+				24028
+			]
+		},
+		{
+			"id": 29246,
+			"enchant": 27899
+		},
+		{
+			"id": 28506,
+			"gems": [
+				24028,
+				24028
+			]
+		},
+		{
+			"id": 28750,
+			"gems": [
+				24028,
+				24028
+			]
+		},
+		{
+			"id": 28741,
+			"enchant": 29535,
+			"gems": [
+				24028,
+				24028,
+				24028
+			]
+		},
+		{
+			"id": 28545,
+			"enchant": 28279,
+			"gems": [
+				24028,
+				24028
+			]
+		},
+		{
+			"id": 28649,
+			"enchant": 22535
+		},
+		{
+			"id": 30834,
+			"enchant": 22535
+		},
+		{
+			"id": 28830
+		},
+		{
+			"id": 29383
+		},
+		{
+			"id": 28658,
+			"enchant": 22556
+		},
+		{
+			"id": 29390
+		}
+	]}`),
+};
+
+export const P2_PRESET = {
+	name: 'P2 Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 8345,
+			"enchant": 29192
+		},
+		{
+			"id": 30017
+		},
+		{
+			"id": 29100,
+			"enchant": 28888,
+			"gems": [
+				24028,
+				24028
+			]
+		},
+		{
+			"id": 29994,
+			"enchant": 34004
+		},
+		{
+			"id": 29096,
+			"enchant": 24003,
+			"gems": [
+				24028,
+				24028,
+				24028
+			]
+		},
+		{
+			"id": 29966,
+			"enchant": 27899,
+			"gems": [
+				24028
+			]
+		},
+		{
+			"id": 29947,
+			"enchant": 19445
+		},
+		{
+			"id": 30106,
+			"gems": [
+				24028,
+				30549
+			]
+		},
+		{
+			"id": 29995,
+			"enchant": 29535
+		},
+		{
+			"id": 28545,
+			"enchant": 28279,
+			"gems": [
+				24028,
+				24028
+			]
+		},
+		{
+			"id": 30052,
+			"enchant": 22535
+		},
+		{
+			"id": 29997,
+			"enchant": 22535
+		},
+		{
+			"id": 30627
+		},
+		{
+			"id": 29383
+		},
+		{
+			"id": 32014,
+			"enchant": 22556
+		},
+		{
+			"id": 29390
+		}
+	]}`),
+};
+
+export const P3_PRESET = {
+	name: 'P3 Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 8345,
+			"enchant": 29192
+		},
+		{
+			"id": 32260
+		},
+		{
+			"id": 31048,
+			"enchant": 23548,
+			"gems": [
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 29994,
+			"enchant": 34004
+		},
+		{
+			"id": 31042,
+			"enchant": 24003,
+			"gems": [
+				32194,
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 33881,
+			"enchant": 27899,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 31034,
+			"enchant": 19445,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 30106,
+			"gems": [
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 31044,
+			"enchant": 29535,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 32366,
+			"enchant": 28279,
+			"gems": [
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 32335,
+			"enchant": 22538
+		},
+		{
+			"id": 29301,
+			"enchant": 22538
+		},
+		{
+			"id": 30627
+		},
+		{
+			"id": 29383
+		},
+		{
+			"id": 33716,
+			"enchant": 22556
+		},
+		{
+			"id": 32387
+		}
+	]}`),
+};
+
 export const P4_PRESET = {
 	name: 'P4 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-	gear: EquipmentSpec.create({
-		items: [
-			ItemSpec.create({
-				id: 8345, // Wolfshead Helm
-				enchant: Enchants.GLYPH_OF_FEROCITY,
-			}),
-			ItemSpec.create({
-				id: 24114, // Braided Eternium Chain
-			}),
-			ItemSpec.create({
-				id: 31048, // Thunderheart Pauldrons
-				enchant: Enchants.MIGHT_OF_THE_SCOURGE,
-				gems: [
-					Gems.DELICATE_CRIMSON_SPINEL,
-					Gems.DELICATE_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 29994, // Thalassian Wildercloak
-				enchant: Enchants.CLOAK_GREATER_AGILITY,
-			}),
-			ItemSpec.create({
-				id: 31042, // Thunderheart Chestguard
-				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
-				gems: [
-					Gems.DELICATE_CRIMSON_SPINEL,
-					Gems.DELICATE_CRIMSON_SPINEL,
-					Gems.DELICATE_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 33881, // Vindicator's Dragonhide Bracers
-				enchant: Enchants.WRIST_BRAWN,
-				gems: [
-					Gems.DELICATE_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 31034, // Thunderheart Gauntlets
-				enchant: Enchants.GLOVES_MAJOR_AGILITY,
-				gems: [
-					Gems.DELICATE_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 30106, // Belt of One-Hundred Deaths
-				gems: [
-					Gems.DELICATE_CRIMSON_SPINEL,
-					Gems.DELICATE_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 31044, // Thunderheart Leggings
-				enchant: Enchants.NETHERCOBRA_LEG_ARMOR,
-				gems: [
-					Gems.DELICATE_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 32366, // Shadowmaster's Boots
-				enchant: Enchants.FEET_CATS_SWIFTNESS,
-				gems: [
-					Gems.DELICATE_CRIMSON_SPINEL,
-					Gems.DELICATE_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 29301, // Band of the Eternal Champion
-				enchant: Enchants.RING_STATS,
-			}),
-			ItemSpec.create({
-				id: 33496, // Signet of Primal Wrath
-				enchant: Enchants.RING_STATS,
-			}),
-			ItemSpec.create({
-				id: 30627, // Tsunami Talisman
-			}),
-			ItemSpec.create({
-				id: 33831, // Berserker's Call
-			}),
-			ItemSpec.create({
-				id: 33716, // Vengeful Gladiator's Staff
-				enchant: Enchants.WEAPON_2H_MAJOR_AGILITY,
-			}),
-			ItemSpec.create({
-				id: 32387, // Idol of the Raven Goddess
-			}),
-		],
-	}),
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 8345,
+			"enchant": 29192
+		},
+		{
+			"id": 24114
+		},
+		{
+			"id": 31048,
+			"enchant": 23548,
+			"gems": [
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 29994,
+			"enchant": 34004
+		},
+		{
+			"id": 31042,
+			"enchant": 24003,
+			"gems": [
+				32194,
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 33881,
+			"enchant": 27899,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 31034,
+			"enchant": 33152,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 30106,
+			"gems": [
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 31044,
+			"enchant": 29535,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 32366,
+			"enchant": 28279,
+			"gems": [
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 29301,
+			"enchant": 22538
+		},
+		{
+			"id": 33496,
+			"enchant": 22538
+		},
+		{
+			"id": 30627
+		},
+		{
+			"id": 33831
+		},
+		{
+			"id": 33716,
+			"enchant": 22556
+		},
+		{
+			"id": 32387
+		}
+	]}`),
+};
+
+export const P5_PRESET = {
+	name: 'P5 Preset',
+	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 32235,
+			"enchant": 29192,
+			"gems": [
+				32409,
+				32194
+			]
+		},
+		{
+			"id": 34177
+		},
+		{
+			"id": 31048,
+			"enchant": 23548,
+			"gems": [
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 34241,
+			"enchant": 34004,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 34397,
+			"enchant": 24003,
+			"gems": [
+				32226,
+				32226,
+				32194
+			]
+		},
+		{
+			"id": 34444,
+			"enchant": 27899,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 34370,
+			"enchant": 19445,
+			"gems": [
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 34556,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 34188,
+			"enchant": 29535,
+			"gems": [
+				32194,
+				32194,
+				32194
+			]
+		},
+		{
+			"id": 34573,
+			"enchant": 28279,
+			"gems": [
+				32194
+			]
+		},
+		{
+			"id": 34887,
+			"enchant": 22538
+		},
+		{
+			"id": 34189,
+			"enchant": 22538
+		},
+		{
+			"id": 34472
+		},
+		{
+			"id": 34427
+		},
+		{
+			"id": 34198,
+			"enchant": 22556
+		},
+		{
+			"id": 32387
+		}
+	]}`),
 };
