@@ -3019,7 +3019,7 @@ input, select {
 }
 
 .feral-druid-sim-ui .debuffs-section {
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .feral-druid-sim-ui .character-stats-table-row {

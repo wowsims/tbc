@@ -817,6 +817,11 @@ const DEFAULT_ACTION_CATEGORY = 3;
 const idToCategoryMap = {
     [OtherAction.OtherActionAttack]: 0,
     [OtherAction.OtherActionShoot]: 0.5,
+    // Druid
+    [26996]: 0.1,
+    [33987]: MELEE_ACTION_CATEGORY + 0.1,
+    [33745]: MELEE_ACTION_CATEGORY + 0.2,
+    [26997]: MELEE_ACTION_CATEGORY + 0.3,
     // Hunter
     [27014]: 0.1,
     // Rogue

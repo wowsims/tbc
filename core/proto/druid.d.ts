@@ -302,25 +302,21 @@ export interface FeralDruid_Rotation {
      */
     biteweave: boolean;
     /**
-     * @generated from protobuf field: bool mangle_bot = 4;
+     * @generated from protobuf field: bool ripweave = 8;
      */
-    mangleBot: boolean;
+    ripweave: boolean;
     /**
-     * @generated from protobuf field: int32 rip_cp = 5;
+     * @generated from protobuf field: int32 rip_min_combo_points = 5;
      */
-    ripCp: number;
+    ripMinComboPoints: number;
     /**
-     * @generated from protobuf field: int32 bite_cp = 6;
+     * @generated from protobuf field: int32 bite_min_combo_points = 6;
      */
-    biteCp: number;
+    biteMinComboPoints: number;
     /**
      * @generated from protobuf field: bool rake_trick = 7;
      */
     rakeTrick: boolean;
-    /**
-     * @generated from protobuf field: bool ripweave = 8;
-     */
-    ripweave: boolean;
 }
 /**
  * @generated from protobuf enum proto.FeralDruid.Rotation.FinishingMove
