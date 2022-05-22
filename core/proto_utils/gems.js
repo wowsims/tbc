@@ -79,40 +79,6 @@ metaGemActiveConditions.set(TENACIOUS_EARTHSTORM_DIAMOND, (numRed, numYellow, nu
 export const THUNDERING_SKYFIRE_DIAMOND = 32410;
 metaGemConditionDescriptions.set(THUNDERING_SKYFIRE_DIAMOND, 'Requires at least 2 Red Gems, at least 2 Yellow Gems, and at least 2 Blue Gems');
 metaGemActiveConditions.set(THUNDERING_SKYFIRE_DIAMOND, (numRed, numYellow, numBlue) => numYellow >= 2 && numRed >= 2 && numBlue >= 2);
-// Orange
-export const GLINTING_NOBLE_TOPAZ = 24061;
-export const GLINTING_PYRESTONE = 32220;
-export const INSCRIBED_NOBLE_TOPAZ = 24058;
-export const INSCRIBED_PYRESTONE = 32217;
-export const POTENT_NOBLE_TOPAZ = 24059;
-export const POTENT_PYRESTONE = 32218;
-export const VEILED_NOBLE_TOPAZ = 31867;
-export const VEILED_PYRESTONE = 32221;
-export const WICKED_NOBLE_TOPAZ = 31868;
-export const WICKED_PYRESTONE = 32222;
-// Purple
-export const GLOWING_NIGHTSEYE = 24056;
-export const GLOWING_SHADOWSONG_AMETHYST = 32215;
-export const SHIFTING_NIGHTSEYE = 24055;
-export const SHIFTING_SHADOWSONG_AMETHYST = 32212;
-export const SOVEREIGN_NIGHTSEYE = 24054;
-export const SOVEREIGN_SHADOWSONG_AMETHYST = 32211;
-// Red
-export const BOLD_CRIMSON_SPINEL = 32193;
-export const BOLD_LIVING_RUBY = 24027;
-export const DELICATE_CRIMSON_SPINEL = 32194;
-export const DELICATE_LIVING_RUBY = 24028;
-export const RUNED_CRIMSON_SPINEL = 32196;
-export const RUNED_LIVING_RUBY = 24030;
-export const RUNED_ORNATE_RUBY = 28118;
-// Yellow
-export const BRILLIANT_DAWNSTONE = 24047;
-export const BRILLIANT_LIONSEYE = 32204;
-export const RIGID_DAWNSTONE = 24051;
-export const RIGID_LIONSEYE = 32206;
-// Green
-export const JAGGED_SEASPRAY_EMERALD = 32226;
-export const JAGGED_TALASITE = 24067;
 const gemSocketCssClasses = {
     [GemColor.GemColorBlue]: 'socket-color-blue',
     [GemColor.GemColorMeta]: 'socket-color-meta',
