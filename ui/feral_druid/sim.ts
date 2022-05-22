@@ -255,7 +255,11 @@ export class FeralDruidSimUI extends IndividualSimUI<Spec.SpecFeralDruid> {
 				],
 				// Preset gear configurations that the user can quickly select.
 				gear: [
+					Presets.P1_PRESET,
+					Presets.P2_PRESET,
+					Presets.P3_PRESET,
 					Presets.P4_PRESET,
+					Presets.P5_PRESET,
 				],
 			},
 		});
