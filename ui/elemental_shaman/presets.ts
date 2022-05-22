@@ -62,290 +62,284 @@ export const DefaultConsumes = Consumes.create({
 export const P1_PRESET = {
 	name: 'P1 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-	gear: EquipmentSpec.create({
-		items: [
-			ItemSpec.create({
-				id: 29035, // Cyclone Faceguard
-				enchant: Enchants.GLYPH_OF_POWER,
-				gems: [
-					Gems.CHAOTIC_SKYFIRE_DIAMOND,
-					Gems.POTENT_NOBLE_TOPAZ,
-				],
-			}),
-			ItemSpec.create({
-				id: 28762, // Adornment of Stolen Souls
-			}),
-			ItemSpec.create({
-				id: 29037, // Cyclone Shoulderguards
-				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
-				gems: [
-					Gems.POTENT_NOBLE_TOPAZ,
-					Gems.POTENT_NOBLE_TOPAZ,
-				],
-			}),
-			ItemSpec.create({
-				id: 28797, // Brute Cloak of the Ogre-Magi
-				enchant: Enchants.SUBTLETY,
-			}),
-			ItemSpec.create({
-				id: 29519, // Netherstrike Breastplate
-				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 29521, // Netherstrike Bracers
-				enchant: Enchants.WRIST_SPELLPOWER,
-				gems: [
-					Gems.POTENT_NOBLE_TOPAZ,
-				],
-			}),
-			ItemSpec.create({
-				id: 28780, // Soul-Eaters's Handwraps
-				enchant: Enchants.GLOVES_SPELLPOWER,
-				gems: [
-					Gems.POTENT_NOBLE_TOPAZ,
-					Gems.GLOWING_NIGHTSEYE,
-				],
-			}),
-			ItemSpec.create({
-				id: 29520, // Netherstrike Belt
-				gems: [
-					Gems.GLOWING_NIGHTSEYE,
-					Gems.POTENT_NOBLE_TOPAZ,
-				],
-			}),
-			ItemSpec.create({
-				id: 24262, // Spellstrike Pants
-				enchant: Enchants.RUNIC_SPELLTHREAD,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 28517, // Boots of Foretelling
-				enchant: Enchants.BOARS_SPEED,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 30667, // Ring of Unrelenting Storms
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 28753, // Ring of Recurrence
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 29370, // Icon of the Silver Crescent
-			}),
-			ItemSpec.create({
-				id: 28785, // Lightning Capacitor
-			}),
-			ItemSpec.create({
-				id: 28770, // Nathrezim Mindblade
-				enchant: Enchants.WEAPON_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 29273, // Khadgar's Knapsack
-			}),
-			ItemSpec.create({
-				id: 28248, // Totem of the Void
-			}),
-		],
-	}),
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 29035,
+			"enchant": 29191,
+			"gems": [
+				34220,
+				24059
+			]
+		},
+		{
+			"id": 28762
+		},
+		{
+			"id": 29037,
+			"enchant": 28886,
+			"gems": [
+				24059,
+				24059
+			]
+		},
+		{
+			"id": 28797,
+			"enchant": 33150
+		},
+		{
+			"id": 29519,
+			"enchant": 24003,
+			"gems": [
+				24030,
+				24030,
+				24030
+			]
+		},
+		{
+			"id": 29521,
+			"enchant": 22534,
+			"gems": [
+				24059
+			]
+		},
+		{
+			"id": 28780,
+			"enchant": 28272,
+			"gems": [
+				24059,
+				24056
+			]
+		},
+		{
+			"id": 29520,
+			"gems": [
+				24056,
+				24059
+			]
+		},
+		{
+			"id": 24262,
+			"enchant": 24274,
+			"gems": [
+				24030,
+				24030,
+				24030
+			]
+		},
+		{
+			"id": 28517,
+			"enchant": 35297,
+			"gems": [
+				24030,
+				24030
+			]
+		},
+		{
+			"id": 30667,
+			"enchant": 22536
+		},
+		{
+			"id": 28753,
+			"enchant": 22536
+		},
+		{
+			"id": 29370
+		},
+		{
+			"id": 28785
+		},
+		{
+			"id": 28770,
+			"enchant": 22555
+		},
+		{
+			"id": 29273
+		},
+		{
+			"id": 28248
+		}
+	]}`),
 };
 
 export const P2_PRESET = {
 	name: 'P2 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-	gear: EquipmentSpec.create({
-		items: [
-			ItemSpec.create({
-				id: 29035, // Cyclone Faceguard
-				enchant: Enchants.GLYPH_OF_POWER,
-				gems: [
-					Gems.CHAOTIC_SKYFIRE_DIAMOND,
-					Gems.POTENT_NOBLE_TOPAZ,
-				],
-			}),
-			ItemSpec.create({
-				id: 30015, // The Sun King's Talisman
-			}),
-			ItemSpec.create({
-				id: 29037, // Cyclone Shoulderguards
-				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
-				gems: [
-					Gems.POTENT_NOBLE_TOPAZ,
-					Gems.POTENT_NOBLE_TOPAZ,
-				],
-			}),
-			ItemSpec.create({
-				id: 28797, // Brute Cloak of the Ogre-Magi
-				enchant: Enchants.SUBTLETY,
-			}),
-			ItemSpec.create({
-				id: 30169, // Cataclysm Chestpiece
-				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
-				gems: [
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-					Gems.RUNED_LIVING_RUBY,
-				],
-			}),
-			ItemSpec.create({
-				id: 29918, // Mindstorm Wristbands
-				enchant: Enchants.WRIST_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 28780, // Soul-Eaters's Handwraps
-				enchant: Enchants.GLOVES_SPELLPOWER,
-				gems: [
-					Gems.POTENT_NOBLE_TOPAZ,
-					Gems.GLOWING_NIGHTSEYE,
-				],
-			}),
-			ItemSpec.create({
-				id: 30038, // Belt of Blasting
-				gems: [
-					Gems.GLOWING_NIGHTSEYE,
-					Gems.POTENT_NOBLE_TOPAZ,
-				],
-			}),
-			ItemSpec.create({
-				id: 30172, // Cataclysm Leggings
-				enchant: Enchants.RUNIC_SPELLTHREAD,
-				gems: [
-					Gems.POTENT_NOBLE_TOPAZ,
-				],
-			}),
-			ItemSpec.create({
-				id: 30067, // Velvet Boots of the Guardian
-				enchant: Enchants.BOARS_SPEED,
-			}),
-			ItemSpec.create({
-				id: 30667, // Ring of Unrelenting Storms
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 30109, // Ring of Endless Coils
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 29370, // Icon of the Silver Crescent
-			}),
-			ItemSpec.create({
-				id: 28785, // Lightning Capacitor
-			}),
-			ItemSpec.create({
-				id: 29988, // The Nexus Key
-				enchant: Enchants.WEAPON_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 28248, // Totem of the Void
-			}),
-		],
-	}),
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 29035,
+			"enchant": 29191,
+			"gems": [
+				34220,
+				24059
+			]
+		},
+		{
+			"id": 30015
+		},
+		{
+			"id": 29037,
+			"enchant": 28886,
+			"gems": [
+				24059,
+				24059
+			]
+		},
+		{
+			"id": 28797,
+			"enchant": 33150
+		},
+		{
+			"id": 30169,
+			"enchant": 24003,
+			"gems": [
+				24030,
+				24030,
+				24030
+			]
+		},
+		{
+			"id": 29918,
+			"enchant": 22534
+		},
+		{
+			"id": 28780,
+			"enchant": 28272,
+			"gems": [
+				24059,
+				24056
+			]
+		},
+		{
+			"id": 30038,
+			"gems": [
+				24056,
+				24059
+			]
+		},
+		{
+			"id": 30172,
+			"enchant": 24274,
+			"gems": [
+				24059
+			]
+		},
+		{
+			"id": 30067,
+			"enchant": 35297
+		},
+		{
+			"id": 30667,
+			"enchant": 22536
+		},
+		{
+			"id": 30109,
+			"enchant": 22536
+		},
+		{
+			"id": 29370
+		},
+		{
+			"id": 28785
+		},
+		{
+			"id": 29988,
+			"enchant": 22555
+		},
+		{
+			"id": 28248
+		}
+	]}`),
 };
 
 export const P3_PRESET = {
 	name: 'P3 Preset',
 	tooltip: Tooltips.BASIC_BIS_DISCLAIMER,
-	gear: EquipmentSpec.create({
-		items: [
-			ItemSpec.create({
-				id: 31014, // Skyshatter Headguard
-				enchant: Enchants.GLYPH_OF_POWER,
-				gems: [
-					Gems.CHAOTIC_SKYFIRE_DIAMOND,
-					Gems.GLOWING_SHADOWSONG_AMETHYST,
-				],
-			}),
-			ItemSpec.create({
-				id: 30015, // The Sun King's Talisman
-			}),
-			ItemSpec.create({
-				id: 31023, // Skyshatter Mantle
-				enchant: Enchants.GREATER_INSCRIPTION_OF_DISCIPLINE,
-				gems: [
-					Gems.GLOWING_SHADOWSONG_AMETHYST,
-					Gems.POTENT_PYRESTONE,
-				],
-			}),
-			ItemSpec.create({
-				id: 32331, // Cloak of the Illidari Council
-				enchant: Enchants.SUBTLETY,
-			}),
-			ItemSpec.create({
-				id: 31017, // Skyshatter Breastplate
-				enchant: Enchants.CHEST_EXCEPTIONAL_STATS,
-				gems: [
-					Gems.RUNED_CRIMSON_SPINEL,
-					Gems.RUNED_CRIMSON_SPINEL,
-					Gems.RUNED_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 32586, // Bracers of Nimble Thought
-				enchant: Enchants.WRIST_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 31008, // Skyshatter Gauntlets
-				enchant: Enchants.GLOVES_SPELLPOWER,
-				gems: [
-					Gems.POTENT_PYRESTONE,
-				],
-			}),
-			ItemSpec.create({
-				id: 32276, // Flashfire Girdle
-			}),
-			ItemSpec.create({
-				id: 30916, // Leggings of Channeled Elements
-				enchant: Enchants.RUNIC_SPELLTHREAD,
-				gems: [
-					Gems.RUNED_CRIMSON_SPINEL,
-					Gems.RUNED_CRIMSON_SPINEL,
-					Gems.RUNED_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 32352, // Naturewarden's Treads
-				enchant: Enchants.BOARS_SPEED,
-				gems: [
-					Gems.RUNED_CRIMSON_SPINEL,
-					Gems.RUNED_CRIMSON_SPINEL,
-				],
-			}),
-			ItemSpec.create({
-				id: 32527, // Ring of Ancient Knowledge
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 29305, // Band of the Eternal Sage
-				enchant: Enchants.RING_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 32483, // The Skull Of Guldan
-			}),
-			ItemSpec.create({
-				id: 28785, // Lightning Capacitor
-			}),
-			ItemSpec.create({
-				id: 32374, // Zhar'doom, Greatstaff of the Devourer
-				enchant: Enchants.WEAPON_SPELLPOWER,
-			}),
-			ItemSpec.create({
-				id: 32330, // Totem of Ancestral Guidance
-			}),
-		],
-	}),
+	gear: EquipmentSpec.fromJsonString(`{"items": [
+		{
+			"id": 31014,
+			"enchant": 29191,
+			"gems": [
+				34220,
+				32215
+			]
+		},
+		{
+			"id": 30015
+		},
+		{
+			"id": 31023,
+			"enchant": 28886,
+			"gems": [
+				32215,
+				32218
+			]
+		},
+		{
+			"id": 32331,
+			"enchant": 33150
+		},
+		{
+			"id": 31017,
+			"enchant": 24003,
+			"gems": [
+				32196,
+				32196,
+				32196
+			]
+		},
+		{
+			"id": 32586,
+			"enchant": 22534
+		},
+		{
+			"id": 31008,
+			"enchant": 28272,
+			"gems": [
+				32218
+			]
+		},
+		{
+			"id": 32276
+		},
+		{
+			"id": 30916,
+			"enchant": 24274,
+			"gems": [
+				32196,
+				32196,
+				32196
+			]
+		},
+		{
+			"id": 32352,
+			"enchant": 35297,
+			"gems": [
+				32196,
+				32196
+			]
+		},
+		{
+			"id": 32527,
+			"enchant": 22536
+		},
+		{
+			"id": 29305,
+			"enchant": 22536
+		},
+		{
+			"id": 32483
+		},
+		{
+			"id": 28785
+		},
+		{
+			"id": 32374,
+			"enchant": 22555
+		},
+		{
+			"id": 32330
+		}
+	]}`),
 };
 
 export const P4_PRESET = {
