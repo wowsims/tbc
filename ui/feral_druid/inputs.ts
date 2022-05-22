@@ -146,10 +146,10 @@ export const FeralDruidRotationConfig = {
 					},
 				],
 				changedEvent: (player: Player<Spec.SpecFeralDruid>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecFeralDruid>) => player.getRotation().ripCp,
+				getValue: (player: Player<Spec.SpecFeralDruid>) => player.getRotation().ripMinComboPoints,
 				setValue: (eventID: EventID, player: Player<Spec.SpecFeralDruid>, newValue: number) => {
 					const newRotation = player.getRotation();
-					newRotation.ripCp = newValue;
+					newRotation.ripMinComboPoints = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 				enableWhen: (player: Player<Spec.SpecFeralDruid>) => (player.getRotation().finishingMove == FinishingMove.Rip) || (player.getRotation().ripweave && (player.getRotation().finishingMove != FinishingMove.None)),
@@ -173,10 +173,10 @@ export const FeralDruidRotationConfig = {
 					},
 				],
 				changedEvent: (player: Player<Spec.SpecFeralDruid>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecFeralDruid>) => player.getRotation().biteCp,
+				getValue: (player: Player<Spec.SpecFeralDruid>) => player.getRotation().biteMinComboPoints,
 				setValue: (eventID: EventID, player: Player<Spec.SpecFeralDruid>, newValue: number) => {
 					const newRotation = player.getRotation();
-					newRotation.biteCp = newValue;
+					newRotation.biteMinComboPoints = newValue;
 					player.setRotation(eventID, newRotation);
 				},
 				enableWhen: (player: Player<Spec.SpecFeralDruid>) => (player.getRotation().finishingMove == FinishingMove.Bite) || (player.getRotation().biteweave && (player.getRotation().finishingMove != FinishingMove.None)),
@@ -217,24 +217,6 @@ export const FeralDruidRotationConfig = {
 					player.setRotation(eventID, newRotation);
 				},
 				enableWhen: (player: Player<Spec.SpecFeralDruid>) => numThunderheartPieces(player) < 2,
-			},
-		},
-		{
-			type: 'boolean' as const,
-			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
-			config: {
-				extraCssClasses: [
-					'mangle-bot-picker',
-				],
-				label: 'Mangle maintained by bear tank',
-				labelTooltip: 'Assume 100% uptime of the Mangle debuff from an additional Feral tank in the raid.',
-				changedEvent: (player: Player<Spec.SpecFeralDruid>) => player.rotationChangeEmitter,
-				getValue: (player: Player<Spec.SpecFeralDruid>) => player.getRotation().mangleBot,
-				setValue: (eventID: EventID, player: Player<Spec.SpecFeralDruid>, newValue: boolean) => {
-					const newRotation = player.getRotation();
-					newRotation.mangleBot = newValue;
-					player.setRotation(eventID, newRotation);
-				},
 			},
 		},
 	],

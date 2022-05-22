@@ -237,7 +237,7 @@ func NewAttackTable(attacker *Unit, defender *Unit) *AttackTable {
 		table.BaseSpellMissChance = 0.05
 		table.BaseMissChance = UnitLevelFloat64(attacker.Level, 0.05, 0.048, 0.046, 0.044)
 		table.BaseBlockChance = UnitLevelFloat64(attacker.Level, 0.05, 0.048, 0.046, 0.044)
-		table.BaseDodgeChance = UnitLevelFloat64(attacker.Level, 0.008, 0.006, 0.004, 0.002)
+		table.BaseDodgeChance = UnitLevelFloat64(attacker.Level, 0, -0.002, -0.004, -0.006)
 		table.BaseParryChance = UnitLevelFloat64(attacker.Level, 0.05, 0.048, 0.046, 0.044)
 	}
 

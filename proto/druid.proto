@@ -94,11 +94,10 @@ message FeralDruid {
     FinishingMove finishing_move = 1;
     bool mangle_trick = 2;
     bool biteweave = 3;
-    bool mangle_bot = 4;
-    int32 rip_cp = 5;
-    int32 bite_cp = 6;
-    bool rake_trick = 7;
     bool ripweave = 8;
+    int32 rip_min_combo_points = 5;
+    int32 bite_min_combo_points = 6;
+    bool rake_trick = 7;
   }
   Rotation rotation = 1;
 

@@ -11,7 +11,9 @@ type Druid struct {
 	SelfBuffs
 	Talents proto.DruidTalents
 
-	Form              DruidForm
+	StartingForm DruidForm
+	Form         DruidForm
+
 	RebirthUsed       bool
 	MaulRageThreshold float64
 
@@ -24,6 +26,7 @@ type Druid struct {
 	Mangle           *core.Spell
 	Maul             *core.Spell
 	Moonfire         *core.Spell
+	Powershift       *core.Spell
 	Rebirth          *core.Spell
 	Rip              *core.Spell
 	Shred            *core.Spell
@@ -125,21 +128,23 @@ func (druid *Druid) RegisterBearSpells(maulRageThreshold float64) {
 func (druid *Druid) RegisterCatSpells() {
 	druid.registerFerociousBiteSpell()
 	druid.registerMangleCatSpell()
+	druid.registerPowershiftSpell()
 	druid.registerRipSpell()
 	druid.registerShredSpell()
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {
+	druid.Form = druid.StartingForm
 	druid.RebirthUsed = false
 }
 
 func New(char core.Character, form DruidForm, selfBuffs SelfBuffs, talents proto.DruidTalents) *Druid {
 	druid := &Druid{
-		Character:   char,
-		SelfBuffs:   selfBuffs,
-		Talents:     talents,
-		Form:        form,
-		RebirthUsed: false,
+		Character:    char,
+		SelfBuffs:    selfBuffs,
+		Talents:      talents,
+		StartingForm: form,
+		Form:         form,
 	}
 	druid.EnableManaBar()
 

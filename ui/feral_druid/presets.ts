@@ -31,9 +31,8 @@ export const DefaultRotation = FeralDruidRotation.create({
 	finishingMove: FinishingMove.Rip,
 	mangleTrick: true,
 	biteweave: true,
-	mangleBot: false,
-	ripCp: 5,
-	biteCp: 5,
+	ripMinComboPoints: 5,
+	biteMinComboPoints: 5,
 	rakeTrick: false,
 	ripweave: false,
 });
