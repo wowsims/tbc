@@ -143,5 +143,5 @@ func TestBasicRaid(t *testing.T) {
 		SimOptions: SimOptions,
 	}
 
-	core.RaidSimTest("P1 ST", t, rsr, 6206.13)
+	core.RaidSimTest("P1 ST", t, rsr, 6362.55)
 }

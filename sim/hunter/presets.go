@@ -164,92 +164,96 @@ var FullDebuffs = &proto.Debuffs{
 	Misery:                    true,
 }
 
-var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+var P1Gear = items.EquipmentSpecFromJsonString(`{"items": [
 	{
-		Name:    "Beast Lord Helm",
-		Enchant: "Glyph of Ferocity",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Relentless Earthstorm Diamond",
-		},
+		"id": 28275,
+		"enchant": 29192,
+		"gems": [
+			24028,
+			32409
+		]
 	},
 	{
-		Name: "Choker of Vile Intent",
+		"id": 29381
 	},
 	{
-		Name:    "Beast Lord Mantle",
-		Enchant: "Greater Inscription of Vengeance",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-		},
+		"id": 27801,
+		"enchant": 28888,
+		"gems": [
+			31868,
+			24028
+		]
 	},
 	{
-		Name: "Vengeance Wrap",
+		"id": 24259,
+		"enchant": 34004,
+		"gems": [
+			24028
+		]
 	},
 	{
-		Name:    "Beast Lord Cuirass",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-		},
+		"id": 28228,
+		"enchant": 24003,
+		"gems": [
+			24028,
+			24028,
+			24055
+		]
 	},
 	{
-		Name:    "Nightfall Wristguards",
-		Enchant: "Bracer - Assault",
+		"id": 29246,
+		"enchant": 34002
 	},
 	{
-		Name:    "Beast Lord Handguards",
-		Enchant: "Gloves - Major Agility",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-		},
+		"id": 27474,
+		"enchant": 33152,
+		"gems": [
+			24028,
+			24028
+		]
 	},
 	{
-		Name: "Gronn-Stitched Girdle",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-		},
+		"id": 28828,
+		"gems": [
+			24055,
+			31868
+		]
 	},
 	{
-		Name:    "Scaled Greaves of the Marksman",
-		Enchant: "Nethercobra Leg Armor",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-		},
+		"id": 30739,
+		"enchant": 29535,
+		"gems": [
+			24028,
+			24028,
+			24028
+		]
 	},
 	{
-		Name:    "Edgewalker Longboots",
-		Enchant: "Enchant Boots - Cat's Swiftness",
-		Gems: []string{
-			"Delicate Living Ruby",
-			"Delicate Living Ruby",
-		},
+		"id": 28545,
+		"enchant": 28279,
+		"gems": [
+			24028,
+			24061
+		]
 	},
 	{
-		Name: "Ring of a Thousand Marks",
+		"id": 28757
 	},
 	{
-		Name: "Ring of the Recalcitrant",
+		"id": 28791
 	},
 	{
-		Name: "Dragonspine Trophy",
+		"id": 28830
 	},
 	{
-		Name: "Bloodlust Brooch",
+		"id": 29383
 	},
 	{
-		Name:    "Mooncleaver",
-		Enchant: "2H Weapon - Major Agility",
+		"id": 28435,
+		"enchant": 22556
 	},
 	{
-		Name:    "Sunfury Bow of the Phoenix",
-		Enchant: "Stabilized Eternium Scope",
-	},
-})
+		"id": 28772,
+		"enchant": 23766
+	}
+]}`)

@@ -88,97 +88,97 @@ var FullDebuffs = &proto.Debuffs{
 	ScorpidSting:              true,
 }
 
-var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+var P1Gear = items.EquipmentSpecFromJsonString(`{"items": [
 	{
-		Name:    "Warbringer Greathelm",
-		Enchant: "Glyph of Ferocity",
-		Gems: []string{
-			"Powerful Earthstorm Diamond",
-			"Solid Star of Elune",
-		},
+		"id": 29011,
+		"enchant": 29192,
+		"gems": [
+			25896,
+			24033
+		]
 	},
 	{
-		Name: "Pendant of Triumph",
-		Gems: []string{
-			"Steady Talasite",
-		},
+		"id": 28244,
+		"gems": [
+			33782
+		]
 	},
 	{
-		Name:    "Warbringer Shoulderplates",
-		Enchant: "Greater Inscription of the Knight",
-		Gems: []string{
-			"Solid Star of Elune",
-			"Solid Star of Elune",
-		},
+		"id": 29023,
+		"enchant": 28911,
+		"gems": [
+			24033,
+			24033
+		]
 	},
 	{
-		Name:    "Drape of the Dark Reavers",
-		Enchant: "Enchant Cloak - Greater Agility",
+		"id": 28672,
+		"enchant": 34004
 	},
 	{
-		Name:    "Warbringer Chestguard",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Solid Star of Elune",
-			"Solid Star of Elune",
-			"Solid Star of Elune",
-		},
+		"id": 29012,
+		"enchant": 24003,
+		"gems": [
+			24033,
+			24033,
+			24033
+		]
 	},
 	{
-		Name:    "Marshal's Plate Bracers",
-		Enchant: "Bracer - Fortitude",
-		Gems: []string{
-			"Steady Talasite",
-		},
+		"id": 28996,
+		"enchant": 22533,
+		"gems": [
+			33782
+		]
 	},
 	{
-		Name:    "Grips of Deftness",
-		Enchant: "Gloves - Threat",
+		"id": 30644,
+		"enchant": 33153
 	},
 	{
-		Name: "Marshal's Plate Belt",
+		"id": 28995
 	},
 	{
-		Name:    "Wrynn Dynasty Greaves",
-		Enchant: "Nethercleft Leg Armor",
-		Gems: []string{
-			"Solid Star of Elune",
-			"Solid Star of Elune",
-			"Solid Star of Elune",
-		},
+		"id": 28621,
+		"enchant": 29536,
+		"gems": [
+			24033,
+			24033,
+			24033
+		]
 	},
 	{
-		Name:    "Battlescar Boots",
-		Enchant: "Enchant Boots - Boar's Speed",
-		Gems: []string{
-			"Solid Star of Elune",
-			"Solid Star of Elune",
-		},
+		"id": 28747,
+		"enchant": 35297,
+		"gems": [
+			24033,
+			24033
+		]
 	},
 	{
-		Name: "Violet Signet of the Great Protector",
+		"id": 30834
 	},
 	{
-		Name: "Shapeshifter's Signet",
+		"id": 29279
 	},
 	{
-		Name: "Icon of Unyielding Courage",
+		"id": 28121
 	},
 	{
-		Name: "Gnomeregan Auto-Blocker 600",
+		"id": 29387
 	},
 	{
-		Name:    "King's Defender",
-		Enchant: "Weapon - Mongoose",
+		"id": 28749,
+		"enchant": 22559
 	},
 	{
-		Name:    "Aldori Legacy Defender",
-		Enchant: "Shield - Major Stamina",
-		Gems: []string{
-			"Solid Star of Elune",
-		},
+		"id": 28825,
+		"enchant": 28282,
+		"gems": [
+			24033
+		]
 	},
 	{
-		Name: "Shuriken of Negation",
-	},
-})
+		"id": 28826
+	}
+]}`)

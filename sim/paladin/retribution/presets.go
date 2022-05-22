@@ -91,87 +91,87 @@ var FullDebuffs = &proto.Debuffs{
 	ExposeWeaknessHunterAgility: 800,
 }
 
-var Phase4Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+var Phase4Gear = items.EquipmentSpecFromJsonString(`{"items": [
 	{
-		Name:    "Cursed Vision of Sargeras",
-		Enchant: "Glyph of Ferocity",
-		Gems: []string{
-			"Relentless Earthstorm Diamond",
-			"Bold Crimson Spinel",
-		},
+		"id": 32235,
+		"enchant": 29192,
+		"gems": [
+			32409,
+			32193
+		]
 	},
 	{
-		Name: "Pendant of the Perilous",
+		"id": 30022
 	},
 	{
-		Name:    "Shoulderpads of the Stranger",
-		Enchant: "Greater Inscription of Vengeance",
-		Gems: []string{
-			"Bold Crimson Spinel",
-		},
+		"id": 30055,
+		"enchant": 28888,
+		"gems": [
+			32193
+		]
 	},
 	{
-		Name:    "Cloak of Fiends",
-		Enchant: "Enchant Cloak - Greater Agility",
+		"id": 33590,
+		"enchant": 34004
 	},
 	{
-		Name:    "Midnight Chestguard",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Bold Crimson Spinel",
-			"Sovereign Shadowsong Amethyst",
-			"Inscribed Pyrestone",
-		},
+		"id": 30905,
+		"enchant": 24003,
+		"gems": [
+			32211,
+			32193,
+			32217
+		]
 	},
 	{
-		Name:    "Bindings of Lightning Reflexes",
-		Enchant: "Bracer - Brawn",
+		"id": 32574,
+		"enchant": 27899
 	},
 	{
-		Name:    "Gloves of the Searing Grip",
-		Enchant: "Gloves - Major Strength",
+		"id": 29947,
+		"enchant": 33995
 	},
 	{
-		Name: "Belt of One-Hundred Deaths",
-		Gems: []string{
-			"Bold Crimson Spinel",
-			"Sovereign Shadowsong Amethyst",
-		},
+		"id": 30106,
+		"gems": [
+			32193,
+			32211
+		]
 	},
 	{
-		Name:    "Bow-stitched Leggings",
-		Enchant: "Nethercobra Leg Armor",
-		Gems: []string{
-			"Bold Crimson Spinel",
-			"Bold Crimson Spinel",
-			"Bold Crimson Spinel",
-		},
+		"id": 30900,
+		"enchant": 29535,
+		"gems": [
+			32193,
+			32193,
+			32193
+		]
 	},
 	{
-		Name:    "Shadowmaster's Boots",
-		Enchant: "Enchant Boots - Dexterity",
-		Gems: []string{
-			"Bold Crimson Spinel",
-			"Inscribed Pyrestone",
-		},
+		"id": 32366,
+		"enchant": 22544,
+		"gems": [
+			32193,
+			32217
+		]
 	},
 	{
-		Name: "Shapeshifter's Signet",
+		"id": 32526
 	},
 	{
-		Name: "Band of Devastation",
+		"id": 30834
 	},
 	{
-		Name: "Dragonspine Trophy",
+		"id": 33831
 	},
 	{
-		Name: "Berserker's Call",
+		"id": 28830
 	},
 	{
-		Name:    "Torch of the Damned",
-		Enchant: "Weapon - Mongoose",
+		"id": 32332,
+		"enchant": 22559
 	},
 	{
-		Name: "Libram of Avengement",
-	},
-})
+		"id": 27484
+	}
+]}`)

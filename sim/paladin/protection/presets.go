@@ -87,6 +87,8 @@ var FullDebuffs = &proto.Debuffs{
 	ExposeWeaknessHunterAgility: 800,
 }
 
+var P1Gear = items.EquipmentSpecFromJsonString(`{"items": [
+]}`)
 var Phase4Gear = items.EquipmentSpecFromJsonString(`{"items": [
 	{
 		"id": 32521,

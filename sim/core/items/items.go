@@ -2,7 +2,6 @@ package items
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/wowsims/tbc/sim/core/proto"
 	"github.com/wowsims/tbc/sim/core/stats"
@@ -315,40 +314,6 @@ type ItemStringSpec struct {
 	Gems    []string
 }
 
-func EquipmentSpecFromStrings(itemStringSpecs []ItemStringSpec) *proto.EquipmentSpec {
-	eq := &proto.EquipmentSpec{
-		Items: make([]*proto.ItemSpec, len(itemStringSpecs)),
-	}
-
-	for i, itemStringSpec := range itemStringSpecs {
-		item := ByName[itemStringSpec.Name]
-		if item.ID == 0 {
-			log.Fatalf("Item not found: %#v", itemStringSpec)
-		}
-		itemSpec := &proto.ItemSpec{
-			Id: item.ID,
-		}
-
-		if itemStringSpec.Enchant != "" {
-			enchant := EnchantsByName[itemStringSpec.Enchant]
-			if enchant.ID == 0 {
-				log.Fatalf("Enchant not found: %s", itemStringSpec.Enchant)
-			}
-			itemSpec.Enchant = enchant.ID
-		}
-
-		for _, gemName := range itemStringSpec.Gems {
-			gem := GemsByName[gemName]
-			if gem.ID == 0 {
-				log.Fatalf("Gem not found: %s", gemName)
-			}
-			itemSpec.Gems = append(itemSpec.Gems, gem.ID)
-		}
-
-		eq.Items[i] = itemSpec
-	}
-	return eq
-}
 func EquipmentSpecFromJsonString(jsonString string) *proto.EquipmentSpec {
 	es := &proto.EquipmentSpec{}
 

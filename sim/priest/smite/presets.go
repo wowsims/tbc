@@ -63,175 +63,196 @@ var PlayerOptionsBasic = &proto.Player_SmitePriest{
 	},
 }
 
-var P1Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+var P1Gear = items.EquipmentSpecFromJsonString(`{"items": [
 	{
-		Name:    "Spellstrike Hood",
-		Enchant: "Glyph of Power",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 24266,
+		"enchant": 29191,
+		"gems": [
+			28118,
+			24030,
+			24030
+		]
 	},
 	{
-		Name: "Ritssyn's Lost Pendant",
+		"id": 28530
 	},
 	{
-		Name:    "Frozen Shadoweave Shoulders",
-		Enchant: "Greater Inscription of Discipline",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 29060,
+		"enchant": 28886,
+		"gems": [
+			24030,
+			24030
+		]
 	},
 	{
-		Name: "Shadow-Cloak of Dalaran",
+		"id": 28766,
+		"enchant": 33150
 	},
 	{
-		Name:    "Frozen Shadoweave Robe",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 29056,
+		"enchant": 24003,
+		"gems": [
+			24030,
+			24030,
+			24030
+		]
 	},
 	{
-		Name:    "Bracers of Havok",
-		Enchant: "Bracer - Spellpower",
+		"id": 24250,
+		"enchant": 22534,
+		"gems": [
+			24030
+		]
 	},
 	{
-		Name:    "Handwraps of Flowing Thought",
-		Enchant: "Gloves - Major Spellpower",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 30725,
+		"enchant": 28272,
+		"gems": [
+			24030,
+			24030
+		]
 	},
 	{
-		Name: "Belt of Divine Inspiration",
+		"id": 24256,
+		"gems": [
+			24030,
+			24030
+		]
 	},
 	{
-		Name:    "Spellstrike Pants",
-		Enchant: "Runic Spellthread",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 30734,
+		"enchant": 24274,
+		"gems": [
+			24030,
+			24030,
+			24030
+		]
 	},
 	{
-		Name: "Frozen Shadoweave Boots",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 28517,
+		"enchant": 35297,
+		"gems": [
+			24030,
+			24030
+		]
 	},
 	{
-		Name: "Cobalt Band of Tyrigosa",
+		"id": 28793,
+		"enchant": 22536
 	},
 	{
-		Name: "Band of Crimson Fury",
+		"id": 29172,
+		"enchant": 22536
 	},
 	{
-		Name: "Eye of Magtheridon",
+		"id": 27683
 	},
 	{
-		Name: "Icon of the Silver Crescent",
+		"id": 29370
 	},
 	{
-		Name: "The Black Stalk",
+		"id": 30723,
+		"enchant": 22555,
+		"gems": [
+			30564,
+			31867
+		]
 	},
 	{
-		Name:    "Nathrezim Mindblade",
-		Enchant: "Weapon - Major Spellpower",
+		"id": 28734
 	},
 	{
-		Name: "Orb of the Soul-Eater",
-	},
-})
-
-var P3Gear = items.EquipmentSpecFromStrings([]items.ItemStringSpec{
+		"id": 28673
+	}
+]}`)
+var P3Gear = items.EquipmentSpecFromJsonString(`{"items": [
 	{
-		Name:    "Hood of Absolution",
-		Enchant: "Glyph of Power",
-		Gems: []string{
-			"Mystical Skyfire Diamond",
-			"Glowing Nightseye",
-		},
-	},
-	{
-		Name: "Ritssyn's Lost Pendant",
+		"id": 32525,
+		"enchant": 29191,
+		"gems": [
+			34220,
+			30600
+		]
 	},
 	{
-		Name:    "Shoulderpads of Absolution",
-		Enchant: "Greater Inscription of Discipline",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 32349
 	},
 	{
-		Name: "Nethervoid Cloak",
+		"id": 31070,
+		"enchant": 28886,
+		"gems": [
+			32218,
+			32215
+		]
 	},
 	{
-		Name:    "Shroud of Absolution",
-		Enchant: "Chest - Exceptional Stats",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 32524,
+		"enchant": 33150
 	},
 	{
-		Name:    "Bracers of Nimble Thought",
-		Enchant: "Bracer - Spellpower",
+		"id": 30107,
+		"enchant": 33990,
+		"gems": [
+			32196,
+			32196,
+			32196
+		]
 	},
 	{
-		Name:    "Handguards of Absolution",
-		Enchant: "Gloves - Major Spellpower",
-		Gems: []string{
-			"Runed Living Ruby",
-		},
+		"id": 32586,
+		"enchant": 22534
 	},
 	{
-		Name: "Waistwrap of Infinity",
+		"id": 31061,
+		"enchant": 28272,
+		"gems": [
+			32196
+		]
 	},
 	{
-		Name:    "Leggings of Channeled Elements",
-		Enchant: "Runic Spellthread",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 30038,
+		"gems": [
+			32196,
+			32196
+		]
 	},
 	{
-		Name: "Slippers of the Seacaller",
-		Gems: []string{
-			"Runed Living Ruby",
-			"Runed Living Ruby",
-		},
+		"id": 30916,
+		"enchant": 24274,
+		"gems": [
+			32196,
+			32196,
+			32196
+		]
 	},
 	{
-		Name: "Ring of Ancient Knowledge",
+		"id": 32239,
+		"enchant": 35297,
+		"gems": [
+			32196,
+			32196
+		]
 	},
 	{
-		Name: "Ring of Ancient Knowledge",
+		"id": 32527,
+		"enchant": 22536
 	},
 	{
-		Name: "The Skull of Gul'dan",
+		"id": 32247,
+		"enchant": 22536
 	},
 	{
-		Name: "Icon of the Silver Crescent",
+		"id": 29370
 	},
 	{
-		Name: "Wand of the Forgotten Star",
+		"id": 32483
 	},
 	{
-		Name:    "The Maelstrom's Fury",
-		Enchant: "Weapon - Major Spellpower",
+		"id": 32374,
+		"enchant": 22555
 	},
+	{},
 	{
-		Name: "Orb of the Soul-Eater",
-	},
-})
+		"id": 29982
+	}
+]}`)
