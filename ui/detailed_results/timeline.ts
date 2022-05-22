@@ -907,6 +907,12 @@ const idToCategoryMap: Record<number, number> = {
 	[OtherAction.OtherActionAttack]: 0,
 	[OtherAction.OtherActionShoot]: 0.5,
 
+	// Druid
+	[26996]: 0.1, // Maul
+	[33987]: MELEE_ACTION_CATEGORY + 0.1, // Mangle (Bear)
+	[33745]: MELEE_ACTION_CATEGORY + 0.2, // Lacerate
+	[26997]: MELEE_ACTION_CATEGORY + 0.3, // Swipe
+
 	// Hunter
 	[27014]: 0.1, // Raptor Strike
 
