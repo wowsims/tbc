@@ -33,7 +33,7 @@ character_stats_results: {
   final_stats: 377.308
   final_stats: 77
   final_stats: 304
-  final_stats: 247
+  final_stats: 259.300015
   final_stats: 148.269
   final_stats: 0
   final_stats: 18314.942000000003
@@ -909,17 +909,17 @@ dps_results: {
 dps_results: {
  key: "TestProtection-Average-Default"
  value: {
-  dps: 573.8533926635536
-  tps: 1057.7360980944268
-  dtps: 588.5335631196384
+  dps: 573.6479242480794
+  tps: 1057.2847998556647
+  dtps: 577.8443826299742
  }
 }
 dps_results: {
  key: "TestProtection-SelfDrums-DPS"
  value: {
-  dps: 574.4423293871337
-  tps: 1058.1850673191052
-  dtps: 594.5856371250229
+  dps: 571.9898294420202
+  tps: 1053.5246637514624
+  dtps: 576.6255732836412
  }
 }
 dps_results: {
@@ -1009,8 +1009,8 @@ dps_results: {
 dps_results: {
  key: "TestProtection-SwitchInFrontOfTarget-Default"
  value: {
-  dps: 584.6381957805621
-  tps: 1055.0085298018896
-  dtps: 577.7631538037881
+  dps: 583.4715035706506
+  tps: 1053.356443766066
+  dtps: 563.3821789559389
  }
 }

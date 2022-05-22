@@ -357,6 +357,7 @@ export const TankAssignment = {
 	config: {
 		extraCssClasses: [
 			'tank-selector',
+			'threat-metrics',
 		],
 		label: 'Tank Assignment',
 		labelTooltip: 'Determines which mobs will be tanked. Most mobs default to targeting the Main Tank, but in preset multi-target encounters this is not always true.',

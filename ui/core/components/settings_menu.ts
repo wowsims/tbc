@@ -81,7 +81,8 @@ export class SettingsMenu extends Popup {
 
 		const showThreatMetrics = this.rootElem.getElementsByClassName('show-threat-metrics-picker')[0] as HTMLElement;
 		new BooleanPicker(showThreatMetrics, this.simUI.sim, {
-			label: 'Show Threat Metrics',
+			label: 'Show Threat/Tank Options',
+			labelTooltip: 'Shows all options and metrics relevant to tanks, like TPS/DTPS.',
 			changedEvent: (sim: Sim) => sim.showThreatMetricsChangeEmitter,
 			getValue: (sim: Sim) => sim.getShowThreatMetrics(),
 			setValue: (eventID: EventID, sim: Sim, newValue: boolean) => {

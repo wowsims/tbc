@@ -151,6 +151,7 @@ func init() {
 		stats.Agility:     79,
 		stats.MeleeCrit:   14.35,
 		stats.SpellCrit:   73.69,
+		stats.Dodge:       0.65 * core.DodgeRatingPerDodgeChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDraenei, Class: proto.Class_ClassPaladin}] = stats.Stats{
 		stats.Health:      3197,
@@ -163,6 +164,7 @@ func init() {
 		stats.Agility:     74,
 		stats.MeleeCrit:   14.35,
 		stats.SpellCrit:   73.69,
+		stats.Dodge:       0.65 * core.DodgeRatingPerDodgeChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceHuman, Class: proto.Class_ClassPaladin}] = stats.Stats{
 		stats.Health:      3197,
@@ -175,6 +177,7 @@ func init() {
 		stats.Agility:     77,
 		stats.MeleeCrit:   14.35,
 		stats.SpellCrit:   73.69,
+		stats.Dodge:       0.65 * core.DodgeRatingPerDodgeChance,
 	}
 	core.BaseStats[core.BaseStatsKey{Race: proto.Race_RaceDwarf, Class: proto.Class_ClassPaladin}] = stats.Stats{
 		stats.Health:      3197,
@@ -187,5 +190,6 @@ func init() {
 		stats.Agility:     73,
 		stats.MeleeCrit:   14.35,
 		stats.SpellCrit:   73.69,
+		stats.Dodge:       0.65 * core.DodgeRatingPerDodgeChance,
 	}
 }
