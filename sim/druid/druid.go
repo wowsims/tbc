@@ -26,6 +26,7 @@ type Druid struct {
 	Moonfire         *core.Spell
 	Rebirth          *core.Spell
 	Rip              *core.Spell
+	Shred            *core.Spell
 	Starfire6        *core.Spell
 	Starfire8        *core.Spell
 	Swipe            *core.Spell
@@ -125,6 +126,7 @@ func (druid *Druid) RegisterCatSpells() {
 	druid.registerFerociousBiteSpell()
 	druid.registerMangleCatSpell()
 	druid.registerRipSpell()
+	druid.registerShredSpell()
 }
 
 func (druid *Druid) Reset(sim *core.Simulation) {

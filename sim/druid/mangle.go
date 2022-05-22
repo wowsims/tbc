@@ -66,7 +66,7 @@ func (druid *Druid) registerMangleCatSpell() {
 
 	druid.MangleAura = core.MangleAura(druid.CurrentTarget)
 
-	cost := 20.0 - float64(druid.Talents.Ferocity) - core.TernaryFloat64(ItemSetThunderheartHarness.CharacterHasSetBonus(&druid.Character, 2), 5.0, 0)
+	cost := 45.0 - float64(druid.Talents.Ferocity) - core.TernaryFloat64(ItemSetThunderheartHarness.CharacterHasSetBonus(&druid.Character, 2), 5.0, 0)
 	refundAmount := cost * 0.8
 
 	druid.Mangle = druid.RegisterSpell(core.SpellConfig{

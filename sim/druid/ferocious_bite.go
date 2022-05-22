@@ -4,13 +4,18 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
-	"github.com/wowsims/tbc/sim/core/proto"
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
 func (druid *Druid) registerFerociousBiteSpell() {
 	actionID := core.ActionID{SpellID: 24248}
 	baseCost := 35.0
+
+	dmgPerComboPoint := 169.0
+	if druid.Equip[items.ItemSlotRanged].ID == 25667 { // Idol of the Beast
+		dmgPerComboPoint += 14
+	}
 
 	druid.FerociousBite = druid.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
@@ -39,7 +44,7 @@ func (druid *Druid) registerFerociousBiteSpell() {
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 					comboPoints := float64(druid.ComboPoints())
 					excessEnergy := druid.CurrentEnergy() - spell.DefaultCast.Cost
-					base := 57.0 + 169.0*comboPoints + 4.1*excessEnergy
+					base := 57.0 + dmgPerComboPoint*comboPoints + 4.1*excessEnergy
 					roll := sim.RandomFloat("Ferocious Bite") * 66.0
 					return base + roll + hitEffect.MeleeAttackPower(spell.Unit)*0.05*comboPoints
 				},
@@ -54,8 +59,4 @@ func (druid *Druid) registerFerociousBiteSpell() {
 			},
 		}),
 	})
-}
-
-func (druid *Druid) ShouldCastBite(sim *core.Simulation, rotation proto.FeralDruid_Rotation) bool {
-	return false
 }

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/wowsims/tbc/sim/core"
+	"github.com/wowsims/tbc/sim/core/items"
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
@@ -59,15 +60,20 @@ func (druid *Druid) registerRipSpell() {
 				comboPoints := druid.ComboPoints()
 				attackPower := hitEffect.MeleeAttackPower(spell.Unit)
 
+				bonusTickDamage := 0.0
+				if druid.Equip[items.ItemSlotRanged].ID == 28372 { // Idol of Feral Shadows
+					bonusTickDamage += 7 * float64(comboPoints)
+				}
+
 				if comboPoints < 3 {
 					panic("Only 3-5 CP Rips are supported at present.")
 				}
 				if comboPoints == 3 {
-					return (990 + 0.18*attackPower) / 6
+					return (990+0.18*attackPower)/6 + bonusTickDamage
 				} else if comboPoints == 4 {
-					return (1272 + 0.24*attackPower) / 6
+					return (1272+0.24*attackPower)/6 + bonusTickDamage
 				} else { // 5
-					return (1554 + 0.24*attackPower) / 6
+					return (1554+0.24*attackPower)/6 + bonusTickDamage
 				}
 			}, 0),
 			OutcomeApplier: druid.OutcomeFuncTick(),
