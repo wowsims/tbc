@@ -35,7 +35,7 @@ var Enchants = []Enchant{
 	{ID: 34004, EffectID: 368, Name: "Enchant Cloak - Greater Agility", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Agility: 12}, ItemType: proto.ItemType_ItemTypeBack},
 	{ID: 28274, EffectID: 2938, Name: "Enchant Cloak - Spell Penetration", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.SpellPenetration: 20}, ItemType: proto.ItemType_ItemTypeBack},
 	{ID: 28277, EffectID: 1441, Name: "Enchant Cloak - Greater Shadow Resistance", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.ShadowResistance: 15}, ItemType: proto.ItemType_ItemTypeBack},
-	{ID: 35756, EffectID: 2648, Name: "Enchant Cloak - Steelweave", Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.Defense: 12}, ItemType: proto.ItemType_ItemTypeBack},
+	{ID: 35756, EffectID: 2648, Name: "Enchant Cloak - Steelweave", Phase: 5, Quality: proto.ItemQuality_ItemQualityRare, Bonus: stats.Stats{stats.Defense: 12}, ItemType: proto.ItemType_ItemTypeBack},
 
 	// Chest
 	{ID: 27957, EffectID: 2659, Name: "Chest - Exceptional Health", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Health: 150}, ItemType: proto.ItemType_ItemTypeChest},
