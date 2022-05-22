@@ -192,6 +192,8 @@ export class MageSimUI extends IndividualSimUI {
                     OtherInputs.ShadowPriestDPS,
                     OtherInputs.StartingPotion,
                     OtherInputs.NumStartingPotions,
+                    OtherInputs.StartingConjured,
+                    OtherInputs.NumStartingConjured,
                     OtherInputs.SnapshotImprovedWrathOfAirTotem,
                     OtherInputs.TankAssignment,
                 ],
