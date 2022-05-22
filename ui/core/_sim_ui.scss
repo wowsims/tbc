@@ -218,6 +218,16 @@ input, select {
 	background-color: #2a2c3b;
 }
 
+.notices {
+	font-size: 30px;
+	color: blue;
+	margin: 0 20px;
+	text-shadow:
+			0 0 10px white,
+			0 0 10px white,
+			0 0 10px white;
+}
+
 .warnings {
 	font-size: 30px;
 	color: yellow;

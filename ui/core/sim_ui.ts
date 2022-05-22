@@ -13,6 +13,8 @@ import { EventID, TypedEvent } from './typed_event.js';
 declare var tippy: any;
 declare var pako: any;
 
+const noticeText = 'We are looking for help migrating our sims to Wrath of the Lich King. If you\'d like to participate in a fun side project working with an open-source community please <a href="https://discord.gg/jJMPr9JWwx" target="_blank">join our discord!</a>';
+
 // Config for displaying a warning to the user whenever a condition is met.
 export interface SimWarning {
 	updateOn: TypedEvent<any>,
@@ -72,6 +74,17 @@ export abstract class SimUI extends Component {
 		};
 		updateShowExperimental();
 		this.sim.showExperimentalChangeEmitter.on(updateShowExperimental);
+
+		const noticesElem = document.getElementsByClassName('notices')[0] as HTMLElement;
+		if (noticeText) {
+			tippy(noticesElem, {
+				content: noticeText,
+				allowHTML: true,
+				interactive: true,
+			});
+		} else {
+			noticesElem.remove();
+		}
 
 		this.warnings = [];
 		const warningsElem = document.getElementsByClassName('warnings')[0] as HTMLElement;
@@ -285,6 +298,7 @@ const simHTML = `
 		<div class="sim-toolbar">
 			<ul class="sim-tabs nav nav-tabs">
 				<li class="sim-top-bar">
+					<span class="notices fas fa-exclamation-circle"></span>
 					<span class="warnings fa fa-exclamation-triangle"></span>
 					<div class="known-issues">Known Issues</div>
 				</li>
