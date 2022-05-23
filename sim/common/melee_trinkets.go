@@ -100,7 +100,7 @@ func ApplyHandOfJustice(agent core.Agent) {
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// https://tbc.wowhead.com/spell=15600/hand-of-justice, proc mask = 20.
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
 
@@ -227,7 +227,7 @@ func ApplyHourglassUnraveller(agent core.Agent) {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellEffect.IsPhantom {
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				return
 			}
 			if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
@@ -254,7 +254,6 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 		SpellSchool: core.SpellSchoolNature,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskEmpty,
-			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
@@ -273,7 +272,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// mask 340
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
 			if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "RomulosPoisonVial") {
@@ -303,7 +302,7 @@ func ApplyDragonspineTrophy(agent core.Agent) {
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// mask: 340
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
 			if !icd.IsReady(sim) {
@@ -336,7 +335,7 @@ func ApplyTsunamiTalisman(agent core.Agent) {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellEffect.IsPhantom {
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				return
 			}
 			if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
@@ -377,7 +376,7 @@ func ApplyDarkmoonCardWrath(agent core.Agent) {
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// mask 340
-			if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
 
@@ -401,7 +400,6 @@ func ApplyDarkmoonCardVengeance(agent core.Agent) {
 		SpellSchool: core.SpellSchoolHoly,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskEmpty,
-			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
@@ -438,7 +436,7 @@ func ApplyMadnessOfTheBetrayer(agent core.Agent) {
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// mask 340
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
 			if !ppmm.Proc(sim, spellEffect.IsMH(), spellEffect.ProcMask.Matches(core.ProcMaskRanged), "Madness of the Betrayer") {
@@ -487,7 +485,7 @@ func ApplyBlackenedNaaruSliver(agent core.Agent) {
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// mask 340
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
 			if !icd.IsReady(sim) {
@@ -520,7 +518,7 @@ func ApplyShardOfContempt(agent core.Agent) {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
 			if !icd.IsReady(sim) {

@@ -105,7 +105,6 @@ func (paladin *Paladin) registerJudgementOfTheCrusaderSpell(cdTimer *core.Timer)
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			IsPhantom:      true,
 			ProcMask:       core.ProcMaskEmpty,
 			OutcomeApplier: paladin.OutcomeFuncAlwaysHit(),
 

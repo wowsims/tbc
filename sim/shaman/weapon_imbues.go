@@ -20,7 +20,7 @@ func (shaman *Shaman) newWindfuryImbueSpell(isMH bool) *core.Spell {
 
 	baseEffect := core.SpellEffect{
 		BonusAttackPower: apBonus,
-		IsPhantom:        true,
+		ProcMask:         core.ProcMaskEmpty,
 		DamageMultiplier: 1.0,
 		ThreatMultiplier: core.TernaryFloat64(shaman.Talents.SpiritWeapons, 0.7, 1),
 		OutcomeApplier:   shaman.OutcomeFuncMeleeSpecialHitAndCrit(shaman.DefaultMeleeCritMultiplier()),
@@ -29,11 +29,9 @@ func (shaman *Shaman) newWindfuryImbueSpell(isMH bool) *core.Spell {
 	weaponDamageMultiplier := 1 + math.Round(float64(shaman.Talents.ElementalWeapons)*13.33)/100
 	if isMH {
 		actionID.Tag = 1
-		baseEffect.ProcMask = core.ProcMaskMeleeMHSpecial
 		baseEffect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.MainHand, false, 0, weaponDamageMultiplier, true)
 	} else {
 		actionID.Tag = 2
-		baseEffect.ProcMask = core.ProcMaskMeleeOHSpecial
 		baseEffect.BaseDamage = core.BaseDamageConfigMeleeWeapon(core.OffHand, false, 0, weaponDamageMultiplier, true)
 
 		// For whatever reason, OH penalty does not apply to the bonus AP from WF OH
@@ -81,7 +79,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// ProcMask: 20
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
 
@@ -108,7 +106,7 @@ func (shaman *Shaman) ApplyWindfuryImbue(mh bool, oh bool) {
 
 func (shaman *Shaman) newFlametongueImbueSpell(isMH bool) *core.Spell {
 	effect := core.SpellEffect{
-		IsPhantom:           true,
+		ProcMask:            core.ProcMaskEmpty,
 		BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
 
 		DamageMultiplier: 1 + 0.05*float64(shaman.Talents.ElementalWeapons),
@@ -150,7 +148,7 @@ func (shaman *Shaman) ApplyFlametongueImbue(mh bool, oh bool) {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
 
@@ -174,7 +172,7 @@ func (shaman *Shaman) newFrostbrandImbueSpell(isMH bool) *core.Spell {
 		SpellSchool: core.SpellSchoolFrost,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			IsPhantom:           true,
+			ProcMask:            core.ProcMaskEmpty,
 			BonusSpellHitRating: float64(shaman.Talents.ElementalPrecision) * 2 * core.SpellHitRatingPerHitChance,
 
 			DamageMultiplier: 1 + 0.05*float64(shaman.Talents.ElementalWeapons),
@@ -202,7 +200,7 @@ func (shaman *Shaman) ApplyFrostbrandImbue(mh bool, oh bool) {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
 

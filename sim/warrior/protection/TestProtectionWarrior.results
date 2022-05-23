@@ -347,8 +347,8 @@ dps_results: {
 dps_results: {
  key: "TestProtectionWarrior-AllItems-Despair-28573"
  value: {
-  dps: 591.5355365696665
-  tps: 1221.5128204818384
+  dps: 590.8359980725736
+  tps: 1218.9040224079954
  }
 }
 dps_results: {

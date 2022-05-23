@@ -50,7 +50,7 @@ func (druid *Druid) registerFaerieFireSpell() {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:         core.ProcMaskEmpty,
+			ProcMask:         core.ProcMaskSpellDamage,
 			ThreatMultiplier: 1,
 			FlatThreatBonus:  66 * 2,
 			OutcomeApplier:   druid.OutcomeFuncMagicHit(),

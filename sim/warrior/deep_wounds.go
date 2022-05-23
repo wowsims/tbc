@@ -48,7 +48,6 @@ func (warrior *Warrior) applyDeepWounds() {
 						DamageMultiplier: 0.2 * float64(warrior.Talents.DeepWounds),
 						ThreatMultiplier: 1,
 						IsPeriodic:       true,
-						IsPhantom:        true,
 						BaseDamage:       core.BaseDamageConfigFlat(tickDamage),
 						OutcomeApplier:   warrior.OutcomeFuncTick(),
 					})),

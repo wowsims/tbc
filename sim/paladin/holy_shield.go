@@ -19,7 +19,6 @@ func (paladin *Paladin) registerHolyShieldSpell() {
 		SpellSchool: core.SpellSchoolHoly,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskEmpty,
-			IsPhantom:        true,
 			DamageMultiplier: 1 + 0.1*float64(paladin.Talents.ImprovedHolyShield),
 			ThreatMultiplier: 1.35,
 

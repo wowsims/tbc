@@ -159,10 +159,7 @@ func (shaman *Shaman) applyElementalDevastation() {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-				return
-			}
-			if spellEffect.IsPhantom {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskSpellDamage) {
 				return
 			}
 			if !spellEffect.Outcome.Matches(core.OutcomeCrit) {

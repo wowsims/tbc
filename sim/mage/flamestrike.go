@@ -12,7 +12,7 @@ func (mage *Mage) registerFlamestrikeSpell() {
 	baseCost := 1175.0
 
 	applyAOEDamage := core.ApplyEffectFuncAOEDamageCapped(mage.Env, 7830, core.SpellEffect{
-		ProcMask:            core.ProcMaskEmpty,
+		ProcMask:            core.ProcMaskSpellDamage,
 		BonusSpellHitRating: float64(mage.Talents.ElementalPrecision) * 1 * core.SpellHitRatingPerHitChance,
 
 		BonusSpellCritRating: 0 +

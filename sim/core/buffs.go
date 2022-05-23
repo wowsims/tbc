@@ -325,7 +325,6 @@ func RetributionAura(character *Character, points int32) *Aura {
 		SpellSchool: SpellSchoolHoly,
 		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 			ProcMask:         ProcMaskEmpty,
-			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
@@ -357,7 +356,6 @@ func ThornsAura(character *Character, points int32) *Aura {
 		SpellSchool: SpellSchoolNature,
 		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 			ProcMask:         ProcMaskEmpty,
-			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
@@ -389,7 +387,6 @@ func BlessingOfSanctuaryAura(character *Character) *Aura {
 		SpellSchool: SpellSchoolHoly,
 		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 			ProcMask:         ProcMaskEmpty,
-			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 

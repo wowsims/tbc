@@ -159,7 +159,7 @@ func ApplyLivingRootoftheWildheart(agent core.Agent) {
 			}
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
 			if sim.RandomFloat("Living Root of the Wildheart") > 0.03 {

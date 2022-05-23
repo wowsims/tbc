@@ -148,7 +148,6 @@ var ItemSetFistsOfFury = core.ItemSet{
 				SpellSchool: core.SpellSchoolFire,
 				ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 					ProcMask:         core.ProcMaskEmpty,
-					IsPhantom:        true,
 					DamageMultiplier: 1,
 					ThreatMultiplier: 1,
 
@@ -237,7 +236,7 @@ var ItemSetTwinBladesOfAzzinoth = core.ItemSet{
 					}
 
 					// https://tbc.wowhead.com/spell=41434/the-twin-blades-of-azzinoth, proc mask = 20.
-					if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+					if !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 						return
 					}
 

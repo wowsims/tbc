@@ -166,12 +166,13 @@ func JudgementOfWisdomAura(target *Unit) *Aura {
 		ActionID: actionID,
 		Duration: time.Second * 20,
 		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
-			// TODO: This check is purely to maintain behavior during refactoring. Should be removed when possible.
+			if spellEffect.ProcMask.Matches(ProcMaskEmpty) {
+				return // Phantom spells (Romulo's, Lightning Capacitor, etc) don't proc JoW.
+			}
+
+			// Melee claim that wisdom can proc on misses.
 			if !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) && !spellEffect.Landed() {
 				return
-			}
-			if spellEffect.IsPhantom {
-				return // Phantom spells (Romulo's, Lightning Capacitor, etc) don't proc JoW.
 			}
 
 			unit := spell.Unit
@@ -265,7 +266,7 @@ func ImprovedShadowBoltAura(target *Unit, points int32, uptime float64) *Aura {
 			if spell.SpellSchool != SpellSchoolShadow {
 				return
 			}
-			if !spellEffect.Landed() || spellEffect.Damage == 0 || spellEffect.IsPhantom || spellEffect.ProcMask == 0 {
+			if !spellEffect.Landed() || spellEffect.Damage == 0 || !spellEffect.ProcMask.Matches(ProcMaskSpellDamage) {
 				return
 			}
 			aura.RemoveStack(sim)

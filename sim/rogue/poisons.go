@@ -23,10 +23,9 @@ func (rogue *Rogue) registerDeadlyPoisonSpell() {
 		SpellSchool: core.SpellSchoolNature,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:            core.ProcMaskSpellDamage,
+			ProcMask:            core.ProcMaskEmpty,
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
 			ThreatMultiplier:    1,
-			IsPhantom:           true,
 			OutcomeApplier:      rogue.OutcomeFuncMagicHit(),
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
@@ -59,7 +58,6 @@ func (rogue *Rogue) registerDeadlyPoisonSpell() {
 			DamageMultiplier: 1 + 0.04*float64(rogue.Talents.VilePoisons),
 			ThreatMultiplier: 1,
 			IsPeriodic:       true,
-			IsPhantom:        true,
 			BaseDamage:       core.MultiplyByStacks(core.BaseDamageConfigFlat(180/4), dotAura),
 			OutcomeApplier:   rogue.OutcomeFuncTick(),
 		})),
@@ -84,7 +82,7 @@ func (rogue *Rogue) applyDeadlyPoison(hasWFTotem bool) {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) {
 				return
 			}
 			if sim.RandomFloat("Deadly Poison") > procChance {
@@ -102,8 +100,7 @@ func (rogue *Rogue) registerInstantPoisonSpell() {
 		SpellSchool: core.SpellSchoolNature,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:            core.ProcMaskSpellDamage,
-			IsPhantom:           true,
+			ProcMask:            core.ProcMaskEmpty,
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
 			ThreatMultiplier:    1,
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
@@ -131,7 +128,7 @@ func (rogue *Rogue) applyInstantPoison(hasWFTotem bool) {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) {
 				return
 			}
 			if sim.RandomFloat("Instant Poison") > procChance {

@@ -18,7 +18,6 @@ func ApplyTheLightningCapacitor(agent core.Agent) {
 		SpellSchool: core.SpellSchoolNature,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskEmpty,
-			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
