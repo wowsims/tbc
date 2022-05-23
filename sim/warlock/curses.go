@@ -44,6 +44,7 @@ func (warlock *Warlock) registerCurseOfElementsSpell() {
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
 			OnSpellHitDealt:  applyAuraOnLanded(warlock.CurseOfElementsAura),
+			ProcMask:         core.ProcMaskEmpty,
 		}),
 	})
 }
@@ -76,6 +77,7 @@ func (warlock *Warlock) registerCurseOfRecklessnessSpell() {
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
 			OnSpellHitDealt:  applyAuraOnLanded(warlock.CurseOfRecklessnessAura),
+			ProcMask:         core.ProcMaskEmpty,
 		}),
 	})
 }
@@ -111,6 +113,7 @@ func (warlock *Warlock) registerCurseOfTonguesSpell() {
 			FlatThreatBonus:  0, // TODO
 			OutcomeApplier:   warlock.OutcomeFuncMagicHit(),
 			OnSpellHitDealt:  applyAuraOnLanded(warlock.CurseOfTonguesAura),
+			ProcMask:         core.ProcMaskEmpty,
 		}),
 	})
 }
