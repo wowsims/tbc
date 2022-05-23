@@ -685,8 +685,8 @@ dps_results: {
 dps_results: {
  key: "TestFire-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 1598.9573416293476
-  tps: 1303.2197897265241
+  dps: 1582.8822587988807
+  tps: 1291.1169356602957
  }
 }
 dps_results: {

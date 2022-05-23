@@ -285,7 +285,7 @@ func (druid *Druid) applyOmenOfClarity() {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
 			if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Omen of Clarity") {

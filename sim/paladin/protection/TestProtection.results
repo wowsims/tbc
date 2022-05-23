@@ -272,8 +272,8 @@ dps_results: {
 dps_results: {
  key: "TestProtection-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 207.63781614384814
-  tps: 327.093536346253
+  dps: 202.72764058638612
+  tps: 317.57761611589194
  }
 }
 dps_results: {
@@ -293,8 +293,8 @@ dps_results: {
 dps_results: {
  key: "TestProtection-AllItems-Despair-28573"
  value: {
-  dps: 231.09092738510117
-  tps: 330.16632994806923
+  dps: 231.0523860297554
+  tps: 330.26032641179046
  }
 }
 dps_results: {
@@ -839,8 +839,8 @@ dps_results: {
 dps_results: {
  key: "TestProtection-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 209.5561096036013
-  tps: 328.2116491958412
+  dps: 207.44660130229047
+  tps: 324.37744213286396
  }
 }
 dps_results: {

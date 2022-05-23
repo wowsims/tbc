@@ -61,7 +61,6 @@ func ApplyShatteredSunPendantofMight(agent core.Agent) {
 			SpellSchool: core.SpellSchoolArcane,
 			ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 				ProcMask:         core.ProcMaskEmpty,
-				IsPhantom:        true,
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 				BaseDamage:       core.BaseDamageConfigRoll(333, 367),
@@ -119,7 +118,6 @@ func ApplyStormGauntlets(agent core.Agent) {
 		SpellSchool: core.SpellSchoolNature,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskEmpty,
-			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
@@ -136,7 +134,7 @@ func ApplyStormGauntlets(agent core.Agent) {
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// https://tbc.wowhead.com/spell=16615/add-lightning-dam-weap-03, proc mask = 20.
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
 
@@ -153,7 +151,6 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 		SpellSchool: core.SpellSchoolFire,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskEmpty,
-			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
@@ -170,7 +167,7 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// https://tbc.wowhead.com/spell=7711/add-fire-dam-weap-02, proc mask = 20.
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
 
@@ -405,10 +402,7 @@ func ApplyDespair(agent core.Agent) {
 		SpellSchool: core.SpellSchoolPhysical,
 		SpellExtras: core.SpellExtrasIgnoreResists,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			// TODO: This should be removed once we have an attack mask.
-			//  This is only set here to correctly calculate damage.
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			IsPhantom:        true,
+			ProcMask:         core.ProcMaskEmpty,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
@@ -459,8 +453,7 @@ func ApplyTheDecapitator(agent core.Agent) {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:         core.ProcMaskMeleeMHSpecial,
-			IsPhantom:        true,
+			ProcMask:         core.ProcMaskEmpty,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
@@ -484,7 +477,6 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskEmpty,
-			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigRoll(285, 315),
@@ -565,7 +557,7 @@ func ApplyBandOfTheEternalChampion(agent core.Agent) {
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			// mask 340
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
 				return
 			}
 			if !icd.IsReady(sim) {
@@ -621,7 +613,7 @@ func ApplyHeartrazor(agent core.Agent) {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) {
 				return
 			}
 
@@ -783,7 +775,6 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskEmpty,
-			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagic(48, 54, 1),
@@ -870,7 +861,7 @@ func ApplyBlinkstrike(agent core.Agent) {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(procMask) {
 				return
 			}
 
@@ -940,7 +931,6 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskEmpty,
-			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigFlat(20),
@@ -953,7 +943,7 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		ActionID: core.ActionID{SpellID: 40291},
 		Duration: time.Second * 6,
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
 				return
 			}
 

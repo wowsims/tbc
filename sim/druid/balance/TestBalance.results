@@ -615,8 +615,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-ShatteredSunPendantofAcumen-34678"
  value: {
-  dps: 1310.3356159542857
-  tps: 1287.5785036351997
+  dps: 1310.5538466923958
+  tps: 1287.7923697585477
  }
 }
 dps_results: {
@@ -762,8 +762,8 @@ dps_results: {
 dps_results: {
  key: "TestBalance-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 1299.335945227769
-  tps: 1276.798826323213
+  dps: 1299.8090978703742
+  tps: 1277.262515912966
  }
 }
 dps_results: {

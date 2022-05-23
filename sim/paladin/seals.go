@@ -15,7 +15,6 @@ const SealDuration = time.Second * 30
 func (paladin *Paladin) setupSealOfBlood() {
 	effect := core.SpellEffect{
 		ProcMask:         core.ProcMaskEmpty,
-		IsPhantom:        true,
 		DamageMultiplier: 1 + core.TernaryFloat64(ItemSetJusticarArmor.CharacterHasSetBonus(&paladin.Character, 2), 0.1, 0),
 		ThreatMultiplier: 1,
 
@@ -50,7 +49,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 		Duration: SealDuration,
 
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) {
 				return
 			}
 			sobProc.Cast(sim, spellEffect.Target)
@@ -116,7 +115,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 		ActionID: procActionID,
 		Duration: SealDuration,
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) {
 				return
 			}
 
@@ -248,8 +247,7 @@ func (paladin *Paladin) setupSealOfRighteousness() {
 		SpellExtras: core.SpellExtrasMeleeMetrics,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:  core.ProcMaskEmpty,
-			IsPhantom: true,
+			ProcMask: core.ProcMaskEmpty,
 
 			BonusSpellPower: core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 33504, 94, 0),
 			DamageMultiplier: 1 +
@@ -270,7 +268,7 @@ func (paladin *Paladin) setupSealOfRighteousness() {
 		Duration: SealDuration,
 
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(core.ProcMaskMeleeWhiteHit) {
 				return
 			}
 			sorProc.Cast(sim, spellEffect.Target)

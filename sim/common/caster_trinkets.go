@@ -84,10 +84,10 @@ func ApplyShiffarsNexusHorn(agent core.Agent) {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskSpellDamage) {
 				return
 			}
-			if !icd.IsReady(sim) || !spellEffect.Outcome.Matches(core.OutcomeCrit) || spellEffect.IsPhantom {
+			if !icd.IsReady(sim) || !spellEffect.Outcome.Matches(core.OutcomeCrit) {
 				return
 			}
 			if sim.RandomFloat("Shiffar's Nexus-Horn") > 0.2 {
@@ -146,10 +146,10 @@ func ApplySextantOfUnstableCurrents(agent core.Agent) {
 			aura.Activate(sim)
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+			if !spellEffect.ProcMask.Matches(core.ProcMaskSpellDamage) {
 				return
 			}
-			if !spellEffect.Outcome.Matches(core.OutcomeCrit) || !icd.IsReady(sim) || spellEffect.IsPhantom {
+			if !spellEffect.Outcome.Matches(core.OutcomeCrit) || !icd.IsReady(sim) {
 				return
 			}
 			if sim.RandomFloat("Sextant of Unstable Currents") > 0.2 {
@@ -200,13 +200,10 @@ func ApplyDarkmoonCardCrusade(agent core.Agent) {
 		},
 		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if spellEffect.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
-				if spellEffect.IsPhantom {
-					return
-				}
 				apAura.Activate(sim)
 				apAura.AddStack(sim)
 				apAura.Refresh(sim)
-			} else {
+			} else if spellEffect.ProcMask.Matches(core.ProcMaskSpellDamage) {
 				if !spellEffect.Landed() {
 					return
 				}

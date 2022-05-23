@@ -33,7 +33,6 @@ func ApplyShatteredSunPendantofAcumen(agent core.Agent) {
 			SpellSchool: core.SpellSchoolArcane,
 			ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 				ProcMask:         core.ProcMaskEmpty,
-				IsPhantom:        true,
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 				BaseDamage:       core.BaseDamageConfigRoll(333, 367),

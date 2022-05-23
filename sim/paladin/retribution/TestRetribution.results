@@ -265,8 +265,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 2059.503423009507
-  tps: 1441.652396106655
+  dps: 2048.2189396880626
+  tps: 1433.7532577816435
  }
 }
 dps_results: {
@@ -293,8 +293,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-Despair-28573"
  value: {
-  dps: 1878.463743583552
-  tps: 1314.9246205084858
+  dps: 1882.1615433360348
+  tps: 1317.5130803352251
  }
 }
 dps_results: {
@@ -314,8 +314,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-DoomplateBattlegear"
  value: {
-  dps: 1709.4161712780096
-  tps: 1196.5913198946066
+  dps: 1716.2107499851418
+  tps: 1201.3475249895987
  }
 }
 dps_results: {
@@ -391,8 +391,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-FaithinFelsteel"
  value: {
-  dps: 1693.463227251258
-  tps: 1185.4242590758806
+  dps: 1692.192956428311
+  tps: 1184.5350694998172
  }
 }
 dps_results: {
@@ -426,8 +426,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-FlameGuard"
  value: {
-  dps: 1603.8298838811388
-  tps: 1122.6809187167971
+  dps: 1600.4574839080358
+  tps: 1120.3202387356253
  }
 }
 dps_results: {
@@ -510,8 +510,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-KhoriumChampion-23541"
  value: {
-  dps: 1833.5164300902327
-  tps: 1283.4615010631628
+  dps: 1832.7333718544216
+  tps: 1282.9133602980949
  }
 }
 dps_results: {
@@ -538,15 +538,15 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-LionheartChampion-28429"
  value: {
-  dps: 1933.6410375600794
-  tps: 1353.5487262920556
+  dps: 1932.6560325922735
+  tps: 1352.8592228145912
  }
 }
 dps_results: {
  key: "TestRetribution-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 1974.55303323768
-  tps: 1382.1871232663761
+  dps: 1973.79876753169
+  tps: 1381.6591372721834
  }
 }
 dps_results: {
@@ -720,8 +720,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
-  dps: 2006.4391959448926
-  tps: 1404.5074371614246
+  dps: 2006.366926069682
+  tps: 1404.456848248777
  }
 }
 dps_results: {
@@ -769,8 +769,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-StrengthoftheClefthoof"
  value: {
-  dps: 1762.1577275180211
-  tps: 1233.5104092626148
+  dps: 1764.2815188897505
+  tps: 1234.997063222825
  }
 }
 dps_results: {
@@ -811,8 +811,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-TheDecapitator-28767"
  value: {
-  dps: 2118.2833144240835
-  tps: 1482.7983200968586
+  dps: 2110.678064300126
+  tps: 1477.474645010088
  }
 }
 dps_results: {
@@ -888,8 +888,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-WastewalkerArmor"
  value: {
-  dps: 1699.9668325630662
-  tps: 1189.9767827941455
+  dps: 1696.9179764926887
+  tps: 1187.8425835448813
  }
 }
 dps_results: {
@@ -923,8 +923,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-Average-Default"
  value: {
-  dps: 2084.3337227752963
-  tps: 1459.0336059427084
+  dps: 2083.50702753415
+  tps: 1458.4549192739044
  }
 }
 dps_results: {
@@ -1105,7 +1105,7 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-SwitchInFrontOfTarget-Default"
  value: {
-  dps: 1804.1656311249683
-  tps: 1262.9159417874778
+  dps: 1814.6543024530524
+  tps: 1270.2580117171362
  }
 }

@@ -244,8 +244,8 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 1625.691418950387
-  tps: 1300.1229048195355
+  dps: 1624.4922540785315
+  tps: 1299.1597497667915
  }
 }
 dps_results: {
@@ -531,8 +531,8 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-Serpent-CoilBraid-30720"
  value: {
-  dps: 1588.0582177922947
-  tps: 1269.2182391966414
+  dps: 1592.9787662480946
+  tps: 1273.5178385693869
  }
 }
 dps_results: {

@@ -293,8 +293,8 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-Despair-28573"
  value: {
-  dps: 769.3701676498137
-  tps: 642.5603284906324
+  dps: 770.493905927266
+  tps: 644.7127014638464
  }
 }
 dps_results: {

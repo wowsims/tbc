@@ -25,7 +25,7 @@ func (warlock *Warlock) registerCorruptionSpell() {
 			},
 		},
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:        core.ProcMaskEmpty, // no damage done by application.
+			ProcMask:        core.ProcMaskSpellDamage,
 			OutcomeApplier:  warlock.OutcomeFuncMagicHit(),
 			OnSpellHitDealt: applyDotOnLanded(&warlock.CorruptionDot),
 		}),
@@ -42,12 +42,12 @@ func (warlock *Warlock) registerCorruptionSpell() {
 		NumberOfTicks: 6,
 		TickLength:    time.Second * 3,
 		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			ProcMask:         core.ProcMaskPeriodicDamage,
 			DamageMultiplier: 1 * (1 + 0.02*float64(warlock.Talents.ShadowMastery)) * (1 + 0.01*float64(warlock.Talents.Contagion)),
 			ThreatMultiplier: 1 - 0.05*float64(warlock.Talents.ImprovedDrainSoul),
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(900/6, spellCoefficient),
 			OutcomeApplier:   warlock.OutcomeFuncTick(),
 			IsPeriodic:       true,
-			ProcMask:         core.ProcMaskPeriodicDamage,
 		}),
 	})
 }

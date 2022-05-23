@@ -90,7 +90,6 @@ func (druid *Druid) registerLacerateSpell() {
 		TickLength:    time.Second * 3,
 		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskPeriodicDamage,
-			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			IsPeriodic:       true,

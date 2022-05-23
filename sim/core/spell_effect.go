@@ -42,11 +42,6 @@ type SpellEffect struct {
 	// TODO: Should be able to remove this after refactoring is done.
 	IsPeriodic bool
 
-	// Whether this is a phantom cast. Phantom casts are usually casts triggered by some effect,
-	// like The Lightning Capacitor or Shaman Flametongue Weapon. Many on-hit effects do not
-	// proc from phantom casts, only regular casts.
-	IsPhantom bool
-
 	// Controls which effects can proc from this effect.
 	ProcMask ProcMask
 
@@ -66,6 +61,9 @@ type SpellEffect struct {
 func (spellEffect *SpellEffect) Validate() {
 	if spellEffect.ProcMask == ProcMaskUnknown {
 		panic("SpellEffects must set a ProcMask!")
+	}
+	if spellEffect.ProcMask.Matches(ProcMaskEmpty) && spellEffect.ProcMask != ProcMaskEmpty {
+		panic("ProcMaskEmpty must be exclusive!")
 	}
 }
 

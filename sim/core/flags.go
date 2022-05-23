@@ -69,6 +69,8 @@ const (
 	// Equivalent to in-game mask of 340.
 	ProcMaskMeleeOrRanged = ProcMaskMelee | ProcMaskRanged
 
+	ProcMaskDirect = ProcMaskMelee | ProcMaskRanged | ProcMaskSpellDamage
+
 	ProcMaskTwoRoll = ProcMaskRanged | ProcMaskMeleeSpecial
 )
 

@@ -136,7 +136,6 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 				ActionID: actionID,
 				ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 					ProcMask:         ProcMaskEmpty,
-					IsPhantom:        true,
 					ThreatMultiplier: 1,
 					FlatThreatBonus:  90,
 
@@ -286,7 +285,7 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 			stats.HealingPower: 42,
 		})
 	} else if imbue == proto.WeaponImbue_WeaponImbueRighteousWeaponCoating {
-		procAura := character.NewTemporaryStatsAura("RighteousWeaponCoating", ActionID{ItemID: 34539}, stats.Stats{stats.AttackPower: 300, stats.RangedAttackPower: 300}, time.Second*10)
+		procAura := character.NewTemporaryStatsAura("RighteousWeaponCoatingProc", ActionID{ItemID: 34539}, stats.Stats{stats.AttackPower: 300, stats.RangedAttackPower: 300}, time.Second*10)
 		ppmm := character.AutoAttacks.NewPPMManager(10.0)
 
 		icd := Cooldown{
@@ -295,14 +294,14 @@ func addImbueStats(character *Character, imbue proto.WeaponImbue) {
 		}
 
 		character.GetOrRegisterAura(Aura{
-			Label:    "Band of the Eternal Champion",
+			Label:    "Righteous Weapon Coating",
 			Duration: NeverExpires,
 			OnReset: func(aura *Aura, sim *Simulation) {
 				aura.Activate(sim)
 			},
 			OnSpellHitDealt: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
 				// mask 340
-				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+				if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskDirect) {
 					return
 				}
 				if !icd.IsReady(sim) {
@@ -1004,7 +1003,6 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 			SpellSchool: SpellSchoolFire,
 			ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 				ProcMask:         ProcMaskEmpty,
-				IsPhantom:        true,
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 
@@ -1016,7 +1014,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 		const procChance = 0.185
 		flameCapAura := character.NewTemporaryStatsAura("Flame Cap", actionID, stats.Stats{stats.FireSpellPower: 80}, time.Minute)
 		flameCapAura.OnSpellHitDealt = func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
-			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) || spellEffect.IsPhantom {
+			if !spellEffect.Landed() || !spellEffect.ProcMask.Matches(ProcMaskMeleeOrRanged) {
 				return
 			}
 			if sim.RandomFloat("Flame Cap Melee") > procChance {
