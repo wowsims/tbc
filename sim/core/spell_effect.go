@@ -63,6 +63,12 @@ type SpellEffect struct {
 	PreoutcomeDamage float64 // Damage done by this cast.
 }
 
+func (spellEffect *SpellEffect) Validate() {
+	if spellEffect.ProcMask == ProcMaskUnknown {
+		panic("SpellEffects must set a ProcMask!")
+	}
+}
+
 func (spellEffect *SpellEffect) Landed() bool {
 	return spellEffect.Outcome.Matches(OutcomeLanded)
 }

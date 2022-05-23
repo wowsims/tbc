@@ -64,6 +64,7 @@ func (mage *Mage) registerPyroblastSpell() {
 		NumberOfTicks: 4,
 		TickLength:    time.Second * 3,
 		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			ProcMask:         core.ProcMaskPeriodicDamage,
 			DamageMultiplier: mage.spellDamageMultiplier * (1 + 0.02*float64(mage.Talents.FirePower)),
 
 			ThreatMultiplier: 1 - 0.05*float64(mage.Talents.BurningSoul),

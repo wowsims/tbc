@@ -50,6 +50,7 @@ func (paladin *Paladin) RegisterConsecrationSpell(rank int32) {
 		NumberOfTicks: 8,
 		TickLength:    time.Second * 1,
 		TickEffects: core.TickFuncAOESnapshot(paladin.Env, core.SpellEffect{
+			ProcMask:        core.ProcMaskPeriodicDamage,
 			BonusSpellPower: core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 27917, 47, 0),
 
 			DamageMultiplier: 1 *

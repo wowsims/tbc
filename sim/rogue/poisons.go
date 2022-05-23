@@ -23,6 +23,7 @@ func (rogue *Rogue) registerDeadlyPoisonSpell() {
 		SpellSchool: core.SpellSchoolNature,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:            core.ProcMaskSpellDamage,
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
 			ThreatMultiplier:    1,
 			IsPhantom:           true,
@@ -54,6 +55,7 @@ func (rogue *Rogue) registerDeadlyPoisonSpell() {
 		NumberOfTicks: 4,
 		TickLength:    time.Second * 3,
 		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskPeriodicDamage,
 			DamageMultiplier: 1 + 0.04*float64(rogue.Talents.VilePoisons),
 			ThreatMultiplier: 1,
 			IsPeriodic:       true,
@@ -100,6 +102,7 @@ func (rogue *Rogue) registerInstantPoisonSpell() {
 		SpellSchool: core.SpellSchoolNature,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:            core.ProcMaskSpellDamage,
 			IsPhantom:           true,
 			DamageMultiplier:    1 + 0.04*float64(rogue.Talents.VilePoisons),
 			ThreatMultiplier:    1,

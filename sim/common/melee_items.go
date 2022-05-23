@@ -118,6 +118,7 @@ func ApplyStormGauntlets(agent core.Agent) {
 		ActionID:    core.ActionID{ItemID: 12632},
 		SpellSchool: core.SpellSchoolNature,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
 			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
@@ -151,6 +152,7 @@ func ApplyBlazefuryMedallion(agent core.Agent) {
 		ActionID:    core.ActionID{ItemID: 17111},
 		SpellSchool: core.SpellSchoolFire,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
 			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
@@ -481,10 +483,10 @@ func ApplyGlaiveOfThePit(agent core.Agent) {
 		ActionID:    core.ActionID{SpellID: 34696},
 		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
 			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
-			ProcMask:         core.ProcMaskEmpty,
 			BaseDamage:       core.BaseDamageConfigRoll(285, 315),
 			OutcomeApplier:   character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
@@ -780,10 +782,10 @@ func ApplyBladeOfUnquenchedThirst(agent core.Agent) {
 		ActionID:    core.ActionID{ItemID: 31193},
 		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
 			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
-			ProcMask:         core.ProcMaskEmpty,
 			BaseDamage:       core.BaseDamageConfigMagic(48, 54, 1),
 			OutcomeApplier:   character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),
@@ -937,10 +939,10 @@ func ApplySyphonOfTheNathrezim(agent core.Agent) {
 		ActionID:    core.ActionID{SpellID: 40291},
 		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
 			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
-			ProcMask:         core.ProcMaskEmpty,
 			BaseDamage:       core.BaseDamageConfigFlat(20),
 			OutcomeApplier:   character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),

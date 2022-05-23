@@ -192,6 +192,7 @@ func (spell *Spell) applyEffects(sim *Simulation, target *Unit) {
 }
 
 func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
+	baseEffect.Validate()
 	if baseEffect.BaseDamage.Calculator == nil {
 		// Just a hit check.
 		return func(sim *Simulation, target *Unit, spell *Spell) {
@@ -218,6 +219,7 @@ func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
 }
 
 func ApplyEffectFuncDirectDamageTargetModifiersOnly(baseEffect SpellEffect) ApplySpellEffects {
+	baseEffect.Validate()
 	return func(sim *Simulation, target *Unit, spell *Spell) {
 		effect := &baseEffect
 		effect.Target = target
@@ -230,6 +232,10 @@ func ApplyEffectFuncDirectDamageTargetModifiersOnly(baseEffect SpellEffect) Appl
 }
 
 func ApplyEffectFuncDamageMultiple(baseEffects []SpellEffect) ApplySpellEffects {
+	for _, effect := range baseEffects {
+		effect.Validate()
+	}
+
 	if len(baseEffects) == 0 {
 		panic("Multiple damage requires hits")
 	} else if len(baseEffects) == 1 {
@@ -251,6 +257,10 @@ func ApplyEffectFuncDamageMultiple(baseEffects []SpellEffect) ApplySpellEffects 
 	}
 }
 func ApplyEffectFuncDamageMultipleTargeted(baseEffects []SpellEffect) ApplySpellEffects {
+	for _, effect := range baseEffects {
+		effect.Validate()
+	}
+
 	if len(baseEffects) == 0 {
 		panic("Multiple damage requires hits")
 	} else if len(baseEffects) == 1 {
@@ -273,6 +283,7 @@ func ApplyEffectFuncDamageMultipleTargeted(baseEffects []SpellEffect) ApplySpell
 	}
 }
 func ApplyEffectFuncAOEDamage(env *Environment, baseEffect SpellEffect) ApplySpellEffects {
+	baseEffect.Validate()
 	numHits := env.GetNumTargets()
 	effects := make([]SpellEffect, numHits)
 	for i := int32(0); i < numHits; i++ {
@@ -314,6 +325,7 @@ func applyAOECap(effects []SpellEffect, outcomeMultipliers []float64, aoeCap flo
 	}
 }
 func ApplyEffectFuncAOEDamageCapped(env *Environment, aoeCap float64, baseEffect SpellEffect) ApplySpellEffects {
+	baseEffect.Validate()
 	numHits := env.GetNumTargets()
 	if numHits == 0 {
 		return nil
@@ -333,6 +345,10 @@ func ApplyEffectFuncAOEDamageCapped(env *Environment, aoeCap float64, baseEffect
 }
 
 func ApplyEffectFuncMultipleDamageCapped(baseEffects []SpellEffect, aoeCap float64) ApplySpellEffects {
+	for _, effect := range baseEffects {
+		effect.Validate()
+	}
+
 	outcomeMultipliers := make([]float64, len(baseEffects))
 	return func(sim *Simulation, _ *Unit, spell *Spell) {
 		for i := range baseEffects {

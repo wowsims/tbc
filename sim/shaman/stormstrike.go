@@ -36,6 +36,7 @@ func (shaman *Shaman) stormstrikeDebuffAura(target *core.Unit) *core.Aura {
 
 func (shaman *Shaman) newStormstrikeHitSpell(isMH bool) *core.Spell {
 	effect := core.SpellEffect{
+		ProcMask:         core.ProcMaskEmpty,
 		DamageMultiplier: 1,
 		ThreatMultiplier: core.TernaryFloat64(shaman.Talents.SpiritWeapons, 0.7, 1),
 		OutcomeApplier:   shaman.OutcomeFuncMeleeSpecialCritOnly(shaman.DefaultMeleeCritMultiplier()),
@@ -96,8 +97,11 @@ func (shaman *Shaman) registerStormstrikeSpell() {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
 			ThreatMultiplier: 1,
-			OutcomeApplier:   shaman.OutcomeFuncMeleeSpecialHit(),
+
+			OutcomeApplier: shaman.OutcomeFuncMeleeSpecialHit(),
+
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
 					return

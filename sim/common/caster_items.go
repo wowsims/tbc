@@ -148,9 +148,9 @@ func ApplyTimbals(agent core.Agent) {
 		ActionID:    core.ActionID{SpellID: 45055},
 		SpellSchool: core.SpellSchoolShadow,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
-			ProcMask:         core.ProcMaskEmpty,
 			BaseDamage:       core.BaseDamageConfigRoll(285, 475),
 			OutcomeApplier:   character.OutcomeFuncMagicHitAndCrit(character.DefaultSpellCritMultiplier()),
 		}),

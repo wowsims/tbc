@@ -48,274 +48,274 @@ character_stats_results: {
 dps_results: {
  key: "TestArms-AllItems-AbacusofViolentOdds-28288"
  value: {
-  dps: 688.9026418739668
-  tps: 581.3433118971678
+  dps: 685.0441054445741
+  tps: 578.4321474678884
  }
 }
 dps_results: {
  key: "TestArms-AllItems-AdamantineFigurine-27891"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-AncientAqirArtifact-33830"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-AshtongueTalismanofValor-32485"
  value: {
-  dps: 672.0652838462862
-  tps: 567.2509649164067
+  dps: 672.9338341432974
+  tps: 568.2735520410278
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BadgeofTenacity-32658"
  value: {
-  dps: 678.7081123992433
-  tps: 573.7315715632074
+  dps: 671.6586144127633
+  tps: 567.757120314316
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BadgeoftheSwarmguard-21670"
  value: {
-  dps: 676.8664788567409
-  tps: 571.7226521785874
+  dps: 675.4566514300469
+  tps: 570.2908763735732
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BandoftheEternalChampion-29301"
  value: {
-  dps: 706.0911495490394
-  tps: 595.5615660102466
+  dps: 710.2279581471734
+  tps: 598.859444140696
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BandoftheEternalDefender-29297"
  value: {
-  dps: 688.9513459776202
-  tps: 580.8764145698123
+  dps: 692.125327860914
+  tps: 583.8130336631056
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BandoftheEternalSage-29305"
  value: {
-  dps: 688.9647044488654
-  tps: 580.8951164295555
+  dps: 692.1325585930558
+  tps: 583.826833331566
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Berserker'sCall-33831"
  value: {
-  dps: 688.2195315409596
-  tps: 580.7385231568564
+  dps: 692.9636416736108
+  tps: 585.2510021067822
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BlackenedNaaruSliver-34427"
  value: {
-  dps: 708.5296768937958
-  tps: 598.0790217224366
+  dps: 712.733158067864
+  tps: 601.6123882186947
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BlackoutTruncheon-27901"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Bladefist'sBreadth-28041"
  value: {
-  dps: 682.1887950624313
-  tps: 576.0558807589935
+  dps: 682.1600173599869
+  tps: 576.123788894393
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BladeofUnquenchedThirst-31193"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 683.2667625658605
-  tps: 577.4026988453124
+  dps: 742.3852500695399
+  tps: 626.1835698705007
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Blinkstrike-31332"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BoldArmor"
  value: {
-  dps: 531.441523920897
-  tps: 449.1601981257172
+  dps: 530.279764002789
+  tps: 447.1659257222451
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BracingEarthstormDiamond"
  value: {
-  dps: 685.2519703387999
-  tps: 578.7481383320568
+  dps: 685.5855036282045
+  tps: 578.372255056832
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BraidedEterniumChain-24114"
  value: {
-  dps: 702.0904290807231
-  tps: 592.6160952165789
+  dps: 709.8483606510651
+  tps: 599.1362366463047
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BroochoftheImmortalKing-32534"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BrutalEarthstormDiamond"
  value: {
-  dps: 679.7334198127307
-  tps: 573.5430927101169
+  dps: 687.2280481311662
+  tps: 580.2093976132219
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BulwarkofKings-28484"
  value: {
-  dps: 696.3171289420904
-  tps: 587.9311028267551
+  dps: 706.5403472991122
+  tps: 596.2248867579547
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BulwarkoftheAncientKings-28485"
  value: {
-  dps: 703.0732419560184
-  tps: 593.704238004086
+  dps: 701.5349577251013
+  tps: 591.9816765839054
  }
 }
 dps_results: {
  key: "TestArms-AllItems-BurningRage"
  value: {
-  dps: 628.6783411950233
-  tps: 529.7012508086617
+  dps: 628.7591091489775
+  tps: 529.6028375249739
  }
 }
 dps_results: {
  key: "TestArms-AllItems-ChaoticSkyfireDiamond"
  value: {
-  dps: 696.4228448877515
-  tps: 588.1634238381694
+  dps: 699.6597533477162
+  tps: 590.7084980008249
  }
 }
 dps_results: {
  key: "TestArms-AllItems-CloakofDarkness-33122"
  value: {
-  dps: 693.244866796469
-  tps: 585.587416251772
+  dps: 699.3027463307059
+  tps: 589.8648480286464
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Coren'sLuckyCoin-38289"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-CoreofAr'kelos-29776"
  value: {
-  dps: 682.4706382916825
-  tps: 576.7370702769421
+  dps: 682.8540506242749
+  tps: 576.5103342690211
  }
 }
 dps_results: {
  key: "TestArms-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 679.4350926708893
-  tps: 573.603448659424
+  dps: 678.0346738774738
+  tps: 572.7318213249332
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Dabiri'sEnigma-30300"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-DarkIronSmokingPipe-38290"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-DarkmoonCard:Crusade-31856"
  value: {
-  dps: 686.7011440299241
-  tps: 579.5097214062688
+  dps: 688.0007655986429
+  tps: 580.882432537733
  }
 }
 dps_results: {
  key: "TestArms-AllItems-DarkmoonCard:Vengeance-31858"
  value: {
-  dps: 665.3190081952391
-  tps: 562.4958372256339
+  dps: 669.8684521005522
+  tps: 565.7504184900732
  }
 }
 dps_results: {
  key: "TestArms-AllItems-DarkmoonCard:Wrath-31857"
  value: {
-  dps: 676.0853165920246
-  tps: 571.2113397275135
+  dps: 675.9861902285269
+  tps: 571.142743001637
  }
 }
 dps_results: {
  key: "TestArms-AllItems-DesolationBattlegear"
  value: {
-  dps: 563.7044655881032
-  tps: 475.487787776396
+  dps: 568.6374432143508
+  tps: 479.9461020593267
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Despair-28573"
  value: {
-  dps: 769.454481169045
-  tps: 643.2201068042114
+  dps: 769.3701676498137
+  tps: 642.5603284906324
  }
 }
 dps_results: {
  key: "TestArms-AllItems-DestroyerArmor"
  value: {
-  dps: 547.6412184386155
-  tps: 462.2909399489025
+  dps: 542.1981975991578
+  tps: 457.69328301223294
  }
 }
 dps_results: {
  key: "TestArms-AllItems-DestroyerBattlegear"
  value: {
-  dps: 647.1526015134734
-  tps: 543.2277078051329
+  dps: 648.771696039515
+  tps: 544.4151289048477
  }
 }
 dps_results: {
  key: "TestArms-AllItems-DestructiveSkyfireDiamond"
  value: {
-  dps: 685.2580980779031
-  tps: 578.7603938102634
+  dps: 685.5855036282045
+  tps: 578.379608343756
  }
 }
 dps_results: {
@@ -328,218 +328,218 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-DoomplateBattlegear"
  value: {
-  dps: 576.6591656324755
-  tps: 486.41548858850297
+  dps: 576.6086711177043
+  tps: 485.8077615819818
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Dragonstrike-28439"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-AllItems-EmberSkyfireDiamond"
  value: {
-  dps: 685.2519703387999
-  tps: 578.7481383320568
+  dps: 685.5855036282045
+  tps: 578.372255056832
  }
 }
 dps_results: {
  key: "TestArms-AllItems-EmptyMugofDirebrew-38287"
  value: {
-  dps: 684.8189443774181
-  tps: 578.486992004246
+  dps: 688.782933377254
+  tps: 581.5224407051018
  }
 }
 dps_results: {
  key: "TestArms-AllItems-EmpyreanDemolisher-17112"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-AllItems-EnigmaticSkyfireDiamond"
  value: {
-  dps: 682.5166946168526
-  tps: 576.3788498330887
+  dps: 690.6192428790808
+  tps: 583.072818063879
  }
 }
 dps_results: {
  key: "TestArms-AllItems-EssenceoftheMartyr-29376"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-EternalEarthstormDiamond"
  value: {
-  dps: 685.2519703387999
-  tps: 578.7481383320568
+  dps: 685.5855036282045
+  tps: 578.372255056832
  }
 }
 dps_results: {
  key: "TestArms-AllItems-EyeofMagtheridon-28789"
  value: {
-  dps: 665.3190081952391
-  tps: 562.4958372256339
+  dps: 669.8684521005522
+  tps: 565.7504184900732
  }
 }
 dps_results: {
  key: "TestArms-AllItems-FaithinFelsteel"
  value: {
-  dps: 555.8007467680221
-  tps: 470.60734139701833
+  dps: 561.0223456372723
+  tps: 475.17691561463323
  }
 }
 dps_results: {
  key: "TestArms-AllItems-FelstalkerArmor"
  value: {
-  dps: 657.2493048810006
-  tps: 555.5083646928778
+  dps: 658.4841445586286
+  tps: 555.9629848362882
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Figurine-LivingRubySerpent-24126"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Figurine-NightseyePanther-24128"
  value: {
-  dps: 683.2281190226001
-  tps: 576.9612012438603
+  dps: 680.8088528079772
+  tps: 575.1344031906453
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Figurine-ShadowsongPanther-35702"
  value: {
-  dps: 687.9004781734021
-  tps: 580.3507624847606
+  dps: 689.4817721652348
+  tps: 582.2185768163832
  }
 }
 dps_results: {
  key: "TestArms-AllItems-FlameGuard"
  value: {
-  dps: 532.6945074463758
-  tps: 449.99310694248675
+  dps: 531.5643047447815
+  tps: 448.7305561733457
  }
 }
 dps_results: {
  key: "TestArms-AllItems-GnomereganAuto-Blocker600-29387"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-HandofJustice-11815"
  value: {
-  dps: 679.1433304470103
-  tps: 573.4243270172356
+  dps: 682.4703235367783
+  tps: 576.5947269784723
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Heartrazor-29962"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-AllItems-HexShrunkenHead-33829"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-HourglassoftheUnraveller-28034"
  value: {
-  dps: 684.301029246055
-  tps: 577.7098959348255
+  dps: 684.4904668014351
+  tps: 578.5329557069558
  }
 }
 dps_results: {
  key: "TestArms-AllItems-IconofUnyieldingCourage-28121"
  value: {
-  dps: 680.7890043003003
-  tps: 574.9269460825582
+  dps: 685.3126174332072
+  tps: 578.9753751355795
  }
 }
 dps_results: {
  key: "TestArms-AllItems-IconoftheSilverCrescent-29370"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-ImbuedUnstableDiamond"
  value: {
-  dps: 685.2519703387999
-  tps: 578.7481383320568
+  dps: 685.5855036282045
+  tps: 578.372255056832
  }
 }
 dps_results: {
  key: "TestArms-AllItems-InsightfulEarthstormDiamond"
  value: {
-  dps: 685.2519703387999
-  tps: 578.7481383320568
+  dps: 685.5855036282045
+  tps: 578.372255056832
  }
 }
 dps_results: {
  key: "TestArms-AllItems-KhoriumChampion-23541"
  value: {
-  dps: 736.1965140971348
-  tps: 616.46712274202
+  dps: 732.0071969036669
+  tps: 613.5060953057381
  }
 }
 dps_results: {
  key: "TestArms-AllItems-KissoftheSpider-22954"
  value: {
-  dps: 684.1185873932903
-  tps: 577.9115874368566
+  dps: 681.5854428696503
+  tps: 575.6562511573533
  }
 }
 dps_results: {
  key: "TestArms-AllItems-LionheartChampion-28429"
  value: {
-  dps: 786.2870508064784
-  tps: 658.0682655116017
+  dps: 785.3233738482331
+  tps: 656.5980649646211
  }
 }
 dps_results: {
  key: "TestArms-AllItems-LionheartExecutioner-28430"
  value: {
-  dps: 816.5028913576134
-  tps: 683.1743642814617
+  dps: 814.2748744408397
+  tps: 681.3017577248196
  }
 }
 dps_results: {
  key: "TestArms-AllItems-MadnessoftheBetrayer-32505"
  value: {
-  dps: 691.8771984919674
-  tps: 583.918408287861
+  dps: 692.1393853103723
+  tps: 584.0631840187087
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Mana-EtchedRegalia"
  value: {
-  dps: 475.3387467008704
-  tps: 402.170696221334
+  dps: 476.5467774905764
+  tps: 402.9344690609326
  }
 }
 dps_results: {
@@ -552,176 +552,176 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-MarkoftheChampion-23206"
  value: {
-  dps: 696.6190498465679
-  tps: 588.1069556706584
+  dps: 691.2047749088941
+  tps: 583.7597411904057
  }
 }
 dps_results: {
  key: "TestArms-AllItems-MarkoftheChampion-23207"
  value: {
-  dps: 665.3190081952391
-  tps: 562.4958372256339
+  dps: 669.8684521005522
+  tps: 565.7504184900732
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Moroes'LuckyPocketWatch-28528"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-MysticalSkyfireDiamond"
  value: {
-  dps: 683.1866958412002
-  tps: 576.669148777094
+  dps: 682.253414881252
+  tps: 576.4847335551888
  }
 }
 dps_results: {
  key: "TestArms-AllItems-NetherscaleArmor"
  value: {
-  dps: 671.1315308798933
-  tps: 566.8409364693907
+  dps: 678.6133257376989
+  tps: 572.888965819418
  }
 }
 dps_results: {
  key: "TestArms-AllItems-NetherstrikeArmor"
  value: {
-  dps: 608.0046211635406
-  tps: 514.3019735437156
+  dps: 609.5142610741378
+  tps: 515.8959532574038
  }
 }
 dps_results: {
  key: "TestArms-AllItems-OnslaughtArmor"
  value: {
-  dps: 450.9685291004194
-  tps: 383.29220363729553
+  dps: 456.31065982137187
+  tps: 387.5227368626944
  }
 }
 dps_results: {
  key: "TestArms-AllItems-OnslaughtBattlegear"
  value: {
-  dps: 709.2871345079955
-  tps: 597.4313637000807
+  dps: 704.7344319670062
+  tps: 594.6629487924619
  }
 }
 dps_results: {
  key: "TestArms-AllItems-PotentUnstableDiamond"
  value: {
-  dps: 685.0507564716291
-  tps: 578.1202743013932
+  dps: 690.976124538669
+  tps: 583.3407281376245
  }
 }
 dps_results: {
  key: "TestArms-AllItems-PowerfulEarthstormDiamond"
  value: {
-  dps: 685.2519703387999
-  tps: 578.7481383320568
+  dps: 685.5855036282045
+  tps: 578.372255056832
  }
 }
 dps_results: {
  key: "TestArms-AllItems-PrimalIntent"
  value: {
-  dps: 681.4634446174205
-  tps: 575.7656519294889
+  dps: 685.3648858047177
+  tps: 578.6014870070837
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Quagmirran'sEye-27683"
  value: {
-  dps: 665.607300989558
-  tps: 561.9798471273588
+  dps: 663.6116752086309
+  tps: 560.3949640876259
  }
 }
 dps_results: {
  key: "TestArms-AllItems-RelentlessEarthstormDiamond"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-AllItems-RobeoftheElderScribes-28602"
  value: {
-  dps: 661.3485082272626
-  tps: 558.5421692889432
+  dps: 667.5734948859841
+  tps: 564.0158439811504
  }
 }
 dps_results: {
  key: "TestArms-AllItems-RodoftheSunKing-29996"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 688.7313541207374
-  tps: 581.0598134936732
+  dps: 694.7729274338509
+  tps: 586.0577236089789
  }
 }
 dps_results: {
  key: "TestArms-AllItems-ScarabofDisplacement-30629"
  value: {
-  dps: 656.7350416384638
-  tps: 555.0883655945873
+  dps: 659.2949060096402
+  tps: 556.8673979113352
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Scryer'sBloodgem-29132"
  value: {
-  dps: 663.5938487871476
-  tps: 560.8349835178551
+  dps: 667.8982934210015
+  tps: 563.9522605082541
  }
 }
 dps_results: {
  key: "TestArms-AllItems-SextantofUnstableCurrents-30626"
  value: {
-  dps: 665.3494998250171
-  tps: 562.5458787942472
+  dps: 669.9048051435669
+  tps: 565.8045452056565
  }
 }
 dps_results: {
  key: "TestArms-AllItems-ShadowmoonInsignia-32501"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-ShardofContempt-34472"
  value: {
-  dps: 692.2476796203188
-  tps: 585.7657735772999
+  dps: 698.7659544745648
+  tps: 591.4686274409695
  }
 }
 dps_results: {
  key: "TestArms-AllItems-ShatteredSunPendantofAcumen-34678"
  value: {
-  dps: 678.8867255507205
-  tps: 573.1267010527118
+  dps: 678.5526672404017
+  tps: 572.7219306995128
  }
 }
 dps_results: {
  key: "TestArms-AllItems-ShatteredSunPendantofMight-34679"
  value: {
-  dps: 701.8013171252948
-  tps: 592.0605552990128
+  dps: 706.5199422354176
+  tps: 596.484921407893
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Shiffar'sNexus-Horn-28418"
  value: {
-  dps: 665.3348055066475
-  tps: 562.5253067485295
+  dps: 669.897574411425
+  tps: 565.7907455371958
  }
 }
 dps_results: {
  key: "TestArms-AllItems-ShiftingNaaruSliver-34429"
  value: {
-  dps: 664.5206302360351
-  tps: 561.0031810264276
+  dps: 664.9858408870816
+  tps: 561.5707007710905
  }
 }
 dps_results: {
@@ -734,85 +734,85 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-Slayer'sCrest-23041"
  value: {
-  dps: 685.5063193337674
-  tps: 579.1078796991926
+  dps: 686.4006650142131
+  tps: 579.582829942883
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Sorcerer'sAlchemistStone-35749"
  value: {
-  dps: 665.3190081952391
-  tps: 562.4958372256339
+  dps: 669.8684521005522
+  tps: 565.7504184900732
  }
 }
 dps_results: {
  key: "TestArms-AllItems-SpellstrikeInfusion"
  value: {
-  dps: 575.5846772252781
-  tps: 487.4212831990503
+  dps: 581.5205306546379
+  tps: 492.1682677013118
  }
 }
 dps_results: {
  key: "TestArms-AllItems-StormGauntlets-12632"
  value: {
-  dps: 669.9249167158217
-  tps: 565.9299324569375
+  dps: 723.3928354270417
+  tps: 610.5326243694079
  }
 }
 dps_results: {
  key: "TestArms-AllItems-StrengthoftheClefthoof"
  value: {
-  dps: 597.3223745550989
-  tps: 505.26501466413566
+  dps: 596.6604657366934
+  tps: 504.5858484535724
  }
 }
 dps_results: {
  key: "TestArms-AllItems-SwiftSkyfireDiamond"
  value: {
-  dps: 685.0507564716291
-  tps: 578.1202743013932
+  dps: 690.976124538669
+  tps: 583.3407281376245
  }
 }
 dps_results: {
  key: "TestArms-AllItems-SwiftStarfireDiamond"
  value: {
-  dps: 685.2519703387999
-  tps: 578.7481383320568
+  dps: 685.5855036282045
+  tps: 578.372255056832
  }
 }
 dps_results: {
  key: "TestArms-AllItems-SwiftWindfireDiamond"
  value: {
-  dps: 683.6752077005556
-  tps: 577.0806442726757
+  dps: 690.381840876926
+  tps: 582.8427836022996
  }
 }
 dps_results: {
  key: "TestArms-AllItems-SyphonoftheNathrezim-32262"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-AllItems-TenaciousEarthstormDiamond"
  value: {
-  dps: 685.2519703387999
-  tps: 578.7481383320568
+  dps: 685.5855036282045
+  tps: 578.372255056832
  }
 }
 dps_results: {
  key: "TestArms-AllItems-TheBladefist-29348"
  value: {
-  dps: 646.9212086783905
-  tps: 547.1073998564684
+  dps: 645.7840393399952
+  tps: 546.3242090119724
  }
 }
 dps_results: {
  key: "TestArms-AllItems-TheDecapitator-28767"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
@@ -825,99 +825,99 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-TheLightningCapacitor-28785"
  value: {
-  dps: 665.3190081952391
-  tps: 562.4958372256339
+  dps: 669.8684521005522
+  tps: 565.7504184900732
  }
 }
 dps_results: {
  key: "TestArms-AllItems-TheNightBlade-31331"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-AllItems-TheRestrainedEssenceofSapphiron-23046"
  value: {
-  dps: 659.881988620401
-  tps: 557.3430896091745
+  dps: 668.603262661409
+  tps: 565.2248689633833
  }
 }
 dps_results: {
  key: "TestArms-AllItems-TheSkullofGul'dan-32483"
  value: {
-  dps: 667.5719013227317
-  tps: 564.019085178407
+  dps: 669.9633529006285
+  tps: 566.0287785924104
  }
 }
 dps_results: {
  key: "TestArms-AllItems-TheTwinBladesofAzzinoth"
  value: {
-  dps: 803.7439306757472
-  tps: 676.4211926598308
+  dps: 804.0620197724228
+  tps: 676.7245061028361
  }
 }
 dps_results: {
  key: "TestArms-AllItems-TheTwinStars"
  value: {
-  dps: 668.6699799919708
-  tps: 564.3412415260746
+  dps: 666.6741004037752
+  tps: 562.4905492062127
  }
 }
 dps_results: {
  key: "TestArms-AllItems-ThunderingSkyfireDiamond"
  value: {
-  dps: 688.632553821374
-  tps: 580.8782603724414
+  dps: 691.0522215509462
+  tps: 583.4114590199428
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 664.4925850249766
-  tps: 561.514628987721
+  dps: 670.4828597450173
+  tps: 566.2672728113465
  }
 }
 dps_results: {
  key: "TestArms-AllItems-TsunamiTalisman-30627"
  value: {
-  dps: 687.8531455639734
-  tps: 580.7244458070089
+  dps: 692.0164367916476
+  tps: 584.0986270356144
  }
 }
 dps_results: {
  key: "TestArms-AllItems-WarbringerArmor"
  value: {
-  dps: 521.6815480097013
-  tps: 440.3462438571472
+  dps: 519.7948208424903
+  tps: 438.8492359514765
  }
 }
 dps_results: {
  key: "TestArms-AllItems-WarbringerBattlegear"
  value: {
-  dps: 614.2900785989585
-  tps: 519.5596623807569
+  dps: 618.2727960071101
+  tps: 523.0935943293366
  }
 }
 dps_results: {
  key: "TestArms-AllItems-WarpSlicer-30311"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-AllItems-WastewalkerArmor"
  value: {
-  dps: 576.2716021667806
-  tps: 486.1383256786558
+  dps: 580.7193776851443
+  tps: 489.8152412703619
  }
 }
 dps_results: {
  key: "TestArms-AllItems-WindhawkArmor"
  value: {
-  dps: 607.9960545842741
-  tps: 514.2863036892805
+  dps: 609.5009026028926
+  tps: 515.8772513976604
  }
 }
 dps_results: {
@@ -930,112 +930,112 @@ dps_results: {
 dps_results: {
  key: "TestArms-AllItems-WrathofSpellfire"
  value: {
-  dps: 606.1276385356545
-  tps: 512.9690234137067
+  dps: 605.6934033451682
+  tps: 512.725608184323
  }
 }
 dps_results: {
  key: "TestArms-AllItems-Xi'ri'sGift-29179"
  value: {
-  dps: 670.6056376140954
-  tps: 565.9293467963046
+  dps: 665.5029475304244
+  tps: 562.0315772209678
  }
 }
 dps_results: {
  key: "TestArms-Average-Default"
  value: {
-  dps: 698.4957220405072
-  tps: 589.6649064210347
+  dps: 699.8656103226413
+  tps: 590.7728239339431
  }
 }
 dps_results: {
  key: "TestArms-Settings-Human-Arms P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1117.1236057249234
-  tps: 993.148568063124
+  dps: 1178.4056839256127
+  tps: 1044.6092693268092
  }
 }
 dps_results: {
  key: "TestArms-Settings-Human-Arms P1-Basic-FullBuffs-LongSingleTarget"
  value: {
-  dps: 699.8870402111928
-  tps: 591.1078269795236
+  dps: 705.277510603801
+  tps: 595.6281269270474
  }
 }
 dps_results: {
  key: "TestArms-Settings-Human-Arms P1-Basic-FullBuffs-ShortSingleTarget"
  value: {
-  dps: 844.8467561534177
-  tps: 713.1946583846268
+  dps: 856.9943055071889
+  tps: 724.0156504213443
  }
 }
 dps_results: {
  key: "TestArms-Settings-Human-Arms P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 845.1880293770088
-  tps: 763.8571972923268
+  dps: 891.834008400859
+  tps: 801.3766546673376
  }
 }
 dps_results: {
  key: "TestArms-Settings-Human-Arms P1-Basic-NoBuffs-LongSingleTarget"
  value: {
-  dps: 503.4562764136021
-  tps: 428.004983733686
+  dps: 506.213212599182
+  tps: 430.35374338631357
  }
 }
 dps_results: {
  key: "TestArms-Settings-Human-Arms P1-Basic-NoBuffs-ShortSingleTarget"
  value: {
-  dps: 629.3775741221722
-  tps: 533.7332128090908
+  dps: 616.19610343495
+  tps: 522.3176172501952
  }
 }
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1126.797165685252
-  tps: 999.6784756297644
+  dps: 1176.581296329764
+  tps: 1041.7087532373087
  }
 }
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-FullBuffs-LongSingleTarget"
  value: {
-  dps: 696.9672603848195
-  tps: 588.2772782723646
+  dps: 700.5550085168782
+  tps: 591.3731088565938
  }
 }
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-FullBuffs-ShortSingleTarget"
  value: {
-  dps: 851.93453775649
-  tps: 719.8662381577608
+  dps: 857.4002938212903
+  tps: 726.0030852704392
  }
 }
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 844.7412817525172
-  tps: 761.4273067343518
+  dps: 888.2859898577277
+  tps: 798.1346159851913
  }
 }
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-NoBuffs-LongSingleTarget"
  value: {
-  dps: 508.3815151096626
-  tps: 431.8807912512551
+  dps: 507.648470450432
+  tps: 431.01374657669845
  }
 }
 dps_results: {
  key: "TestArms-Settings-Orc-Arms P1-Basic-NoBuffs-ShortSingleTarget"
  value: {
-  dps: 646.9089326454878
-  tps: 548.2206334440395
+  dps: 634.5123003523195
+  tps: 537.0780752085294
  }
 }
 dps_results: {
  key: "TestArms-SwitchInFrontOfTarget-Default"
  value: {
-  dps: 597.2810936211163
-  tps: 505.2126531518994
+  dps: 599.1970554636599
+  tps: 506.72910914591057
  }
 }

@@ -22,6 +22,7 @@ func (warrior *Warrior) registerThunderClapSpell() {
 	}
 
 	baseEffect := core.SpellEffect{
+		ProcMask:         core.ProcMaskSpellDamage,
 		DamageMultiplier: impTCDamageMult,
 		ThreatMultiplier: 1.75,
 		BaseDamage:       core.BaseDamageConfigFlat(123),

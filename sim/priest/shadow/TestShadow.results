@@ -153,8 +153,8 @@ dps_results: {
 dps_results: {
  key: "TestShadow-AllItems-BladeofUnquenchedThirst-31193"
  value: {
-  dps: 1555.7013247313955
-  tps: 1158.6863466599427
+  dps: 1562.6881253734452
+  tps: 1166.3024381013256
  }
 }
 dps_results: {
@@ -580,8 +580,8 @@ dps_results: {
 dps_results: {
  key: "TestShadow-AllItems-ShatteredSunPendantofAcumen-34678"
  value: {
-  dps: 1550.8755967071263
-  tps: 1155.0921444274675
+  dps: 1553.805655104709
+  tps: 1157.274451921987
  }
 }
 dps_results: {

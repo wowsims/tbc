@@ -11,6 +11,7 @@ func (druid *Druid) registerDemoralizingRoarSpell() {
 	cost := 10.0
 
 	baseEffect := core.SpellEffect{
+		ProcMask:         core.ProcMaskEmpty,
 		ThreatMultiplier: 1,
 		FlatThreatBonus:  62 * 2,
 		OutcomeApplier:   druid.OutcomeFuncMagicHit(),
