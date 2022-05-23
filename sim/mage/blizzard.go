@@ -20,6 +20,7 @@ func (mage *Mage) registerBlizzardSpell() {
 		TickLength:          time.Second * 1,
 		AffectedByCastSpeed: true,
 		TickEffects: core.TickFuncAOESnapshotCapped(mage.Env, 3620, core.SpellEffect{
+			ProcMask: core.ProcMaskPeriodicDamage,
 			DamageMultiplier: mage.spellDamageMultiplier *
 				(1 + 0.02*float64(mage.Talents.PiercingIce)) *
 				(1 + 0.01*float64(mage.Talents.ArcticWinds)),

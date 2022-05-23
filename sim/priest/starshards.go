@@ -24,7 +24,7 @@ func (priest *Priest) registerStarshardsSpell() {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
-			ProcMask:         core.ProcMaskEmpty,
+			ProcMask:         core.ProcMaskSpellDamage,
 			ThreatMultiplier: 1,
 			OutcomeApplier:   priest.OutcomeFuncMagicHit(),
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -47,6 +47,7 @@ func (priest *Priest) registerStarshardsSpell() {
 		TickLength:    time.Second * 3,
 
 		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			ProcMask:         core.ProcMaskPeriodicDamage,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			IsPeriodic:       true,

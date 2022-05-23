@@ -52,6 +52,7 @@ func (druid *Druid) registerMoonfireSpell() {
 		NumberOfTicks: 4 + core.TernaryInt(ItemSetThunderheartRegalia.CharacterHasSetBonus(&druid.Character, 2), 1, 0),
 		TickLength:    time.Second * 3,
 		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			ProcMask:         core.ProcMaskPeriodicDamage,
 			DamageMultiplier: 1 * (1 + 0.05*float64(druid.Talents.ImprovedMoonfire)) * (1 + 0.02*float64(druid.Talents.Moonfury)),
 			ThreatMultiplier: 1,
 			BaseDamage:       core.BaseDamageConfigMagicNoRoll(600/4, 0.13),

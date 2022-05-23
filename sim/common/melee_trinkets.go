@@ -253,6 +253,7 @@ func ApplyRomulosPoisonVial(agent core.Agent) {
 		ActionID:    core.ActionID{ItemID: 28579},
 		SpellSchool: core.SpellSchoolNature,
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
 			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,

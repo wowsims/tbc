@@ -135,6 +135,7 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 			goaProc := character.RegisterSpell(SpellConfig{
 				ActionID: actionID,
 				ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
+					ProcMask:         ProcMaskEmpty,
 					IsPhantom:        true,
 					ThreatMultiplier: 1,
 					FlatThreatBonus:  90,
@@ -1002,6 +1003,7 @@ func makeConjuredActivation(conjuredType proto.Conjured, character *Character) (
 			ActionID:    actionID,
 			SpellSchool: SpellSchoolFire,
 			ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
+				ProcMask:         ProcMaskEmpty,
 				IsPhantom:        true,
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
@@ -1154,6 +1156,7 @@ func (character *Character) newBasicExplosiveSpellConfig(actionID ActionID, minD
 		},
 
 		ApplyEffects: ApplyEffectFuncAOEDamage(character.Env, SpellEffect{
+			ProcMask: ProcMaskEmpty,
 			// Explosives always have 1% resist chance, so just give them hit cap.
 			BonusSpellHitRating: 100 * SpellHitRatingPerHitChance,
 

@@ -14,6 +14,7 @@ const SealDuration = time.Second * 30
 // Handles the cast, gcd, deducts the mana cost
 func (paladin *Paladin) setupSealOfBlood() {
 	effect := core.SpellEffect{
+		ProcMask:         core.ProcMaskEmpty,
 		IsPhantom:        true,
 		DamageMultiplier: 1 + core.TernaryFloat64(ItemSetJusticarArmor.CharacterHasSetBonus(&paladin.Character, 2), 0.1, 0),
 		ThreatMultiplier: 1,

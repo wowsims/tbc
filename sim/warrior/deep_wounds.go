@@ -44,6 +44,7 @@ func (warrior *Warrior) applyDeepWounds() {
 					NumberOfTicks: 4,
 					TickLength:    time.Second * 3,
 					TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+						ProcMask:         core.ProcMaskPeriodicDamage,
 						DamageMultiplier: 0.2 * float64(warrior.Talents.DeepWounds),
 						ThreatMultiplier: 1,
 						IsPeriodic:       true,

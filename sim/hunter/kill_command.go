@@ -48,6 +48,7 @@ func (hunter *Hunter) registerKillCommandSpell() {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
 			ThreatMultiplier: 1,
 			OutcomeApplier:   hunter.OutcomeFuncAlwaysHit(),
 

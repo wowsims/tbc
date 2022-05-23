@@ -22,6 +22,7 @@ func (warrior *Warrior) registerSweepingStrikesCD() {
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamageTargetModifiersOnly(core.SpellEffect{
 			// No proc mask, so it won't proc itself.
+			ProcMask: core.ProcMaskEmpty,
 
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
@@ -55,7 +56,9 @@ func (warrior *Warrior) registerSweepingStrikesCD() {
 
 			ssHit.Cast(sim, warrior.Env.NextTargetUnit(spellEffect.Target))
 			ssHit.SpellMetrics[spellEffect.Target.Index].Casts--
-			aura.RemoveStack(sim)
+			if aura.GetStacks() > 0 {
+				aura.RemoveStack(sim)
+			}
 		},
 	})
 

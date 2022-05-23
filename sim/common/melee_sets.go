@@ -147,6 +147,7 @@ var ItemSetFistsOfFury = core.ItemSet{
 				ActionID:    core.ActionID{SpellID: 41989},
 				SpellSchool: core.SpellSchoolFire,
 				ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+					ProcMask:         core.ProcMaskEmpty,
 					IsPhantom:        true,
 					DamageMultiplier: 1,
 					ThreatMultiplier: 1,

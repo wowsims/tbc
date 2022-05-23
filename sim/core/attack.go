@@ -269,27 +269,29 @@ func (aa *AutoAttacks) reset(sim *Simulation) {
 		ApplyEffects: ApplyEffectFuncDirectDamage(aa.OHEffect),
 	})
 
-	aa.RangedAuto = aa.unit.GetOrRegisterSpell(SpellConfig{
-		ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
-		SpellSchool: SpellSchoolPhysical,
-		SpellExtras: SpellExtrasMeleeMetrics,
+	if aa.RangedEffect.ProcMask != ProcMaskUnknown {
+		aa.RangedAuto = aa.unit.GetOrRegisterSpell(SpellConfig{
+			ActionID:    ActionID{OtherID: proto.OtherAction_OtherActionShoot},
+			SpellSchool: SpellSchoolPhysical,
+			SpellExtras: SpellExtrasMeleeMetrics,
 
-		Cast: CastConfig{
-			DefaultCast: Cast{
-				CastTime: 1, // Dummy non-zero value so the optimization doesnt remove the cast time.
+			Cast: CastConfig{
+				DefaultCast: Cast{
+					CastTime: 1, // Dummy non-zero value so the optimization doesnt remove the cast time.
+				},
+				ModifyCast: func(_ *Simulation, _ *Spell, cast *Cast) {
+					cast.CastTime = aa.RangedSwingWindup()
+				},
+				IgnoreHaste: true,
+				AfterCast: func(sim *Simulation, spell *Spell) {
+					aa.RangedSwingInProgress = false
+					aa.agent.OnAutoAttack(sim, aa.RangedAuto)
+				},
 			},
-			ModifyCast: func(_ *Simulation, _ *Spell, cast *Cast) {
-				cast.CastTime = aa.RangedSwingWindup()
-			},
-			IgnoreHaste: true,
-			AfterCast: func(sim *Simulation, spell *Spell) {
-				aa.RangedSwingInProgress = false
-				aa.agent.OnAutoAttack(sim, aa.RangedAuto)
-			},
-		},
 
-		ApplyEffects: ApplyEffectFuncDirectDamage(aa.RangedEffect),
-	})
+			ApplyEffects: ApplyEffectFuncDirectDamage(aa.RangedEffect),
+		})
+	}
 
 	aa.MainhandSwingAt = 0
 	aa.OffhandSwingAt = 0

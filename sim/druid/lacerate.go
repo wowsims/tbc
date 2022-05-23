@@ -43,6 +43,7 @@ func (druid *Druid) registerLacerateSpell() {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskMeleeMHSpecial,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 0.5,
 			FlatThreatBonus:  267,
@@ -88,10 +89,11 @@ func (druid *Druid) registerLacerateSpell() {
 		NumberOfTicks: 5,
 		TickLength:    time.Second * 3,
 		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskPeriodicDamage,
+			IsPhantom:        true,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 			IsPeriodic:       true,
-			IsPhantom:        true,
 			BaseDamage: core.MultiplyByStacks(core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
 					return tickDamage + 0.01*hitEffect.MeleeAttackPower(spell.Unit)

@@ -66,6 +66,8 @@ func (mage *Mage) registerFireballSpell() {
 		NumberOfTicks: 4,
 		TickLength:    time.Second * 2,
 		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			ProcMask: core.ProcMaskPeriodicDamage,
+
 			DamageMultiplier: mage.spellDamageMultiplier *
 				(1 + 0.02*float64(mage.Talents.FirePower)) *
 				core.TernaryFloat64(ItemSetTempestRegalia.CharacterHasSetBonus(&mage.Character, 4), 1.05, 1),

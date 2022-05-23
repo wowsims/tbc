@@ -28,6 +28,7 @@ func (priest *Priest) registerVampiricTouchSpell() {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:            core.ProcMaskSpellDamage,
 			BonusSpellHitRating: float64(priest.Talents.ShadowFocus) * 2 * core.SpellHitRatingPerHitChance,
 			ThreatMultiplier:    1 - 0.08*float64(priest.Talents.ShadowAffinity),
 			OutcomeApplier:      priest.OutcomeFuncMagicHit(),
@@ -36,7 +37,6 @@ func (priest *Priest) registerVampiricTouchSpell() {
 					priest.VampiricTouchDot.Apply(sim)
 				}
 			},
-			ProcMask: core.ProcMaskEmpty,
 		}),
 	})
 

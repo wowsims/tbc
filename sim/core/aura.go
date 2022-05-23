@@ -3,6 +3,7 @@ package core
 import (
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/wowsims/tbc/sim/core/proto"
@@ -143,7 +144,7 @@ func (aura *Aura) GetStacks() int32 {
 
 func (aura *Aura) SetStacks(sim *Simulation, newStacks int32) {
 	if newStacks < 0 {
-		panic("SetStacks newStacks cannot be negative")
+		panic("SetStacks newStacks cannot be negative but is " + strconv.Itoa(int(newStacks)))
 	}
 	if aura.MaxStacks == 0 {
 		panic("MaxStacks required to set Aura stacks: " + aura.Label)

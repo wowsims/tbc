@@ -179,6 +179,7 @@ func (hp *HunterPet) newLightningBreath(isPrimary bool) PetAbility {
 			},
 
 			ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+				ProcMask:         core.ProcMaskSpellDamage,
 				DamageMultiplier: 1,
 				ThreatMultiplier: 1,
 				BaseDamage:       core.BaseDamageConfigMagic(80, 93, 0.05),

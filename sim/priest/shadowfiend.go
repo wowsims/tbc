@@ -63,6 +63,7 @@ func (priest *Priest) registerShadowfiendSpell() {
 		TickLength:    time.Millisecond * 1500,
 
 		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			ProcMask: core.ProcMaskEmpty,
 			DamageMultiplier: 1 *
 				(1 + float64(priest.Talents.Darkness)*0.02) *
 				core.TernaryFloat64(priest.Talents.Shadowform, 1.15, 1),

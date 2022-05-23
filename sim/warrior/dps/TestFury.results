@@ -146,8 +146,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-BlazefuryMedallion-17111"
  value: {
-  dps: 899.6101523902369
-  tps: 679.2782599098897
+  dps: 926.0596181545975
+  tps: 700.3470977271807
  }
 }
 dps_results: {
@@ -657,8 +657,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-Romulo'sPoisonVial-28579"
  value: {
-  dps: 898.7607719949157
-  tps: 677.1953966822537
+  dps: 899.1015125352636
+  tps: 677.9778828912957
  }
 }
 dps_results: {
@@ -755,8 +755,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-StormGauntlets-12632"
  value: {
-  dps: 881.215958032746
-  tps: 665.8436959494231
+  dps: 903.0846163502578
+  tps: 683.0595484798673
  }
 }
 dps_results: {
@@ -874,8 +874,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-AllItems-Timbal'sFocusingCrystal-34470"
  value: {
-  dps: 879.0088387959415
-  tps: 662.6250340344383
+  dps: 883.361080338648
+  tps: 666.5078814803558
  }
 }
 dps_results: {
@@ -951,8 +951,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-Settings-Human-Fury P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1486.352215282285
-  tps: 1140.290058936304
+  dps: 1489.1095784949098
+  tps: 1142.8383741731475
  }
 }
 dps_results: {
@@ -972,8 +972,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-Settings-Human-Fury P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1077.7014833709013
-  tps: 826.2139009943711
+  dps: 1086.5844727224362
+  tps: 832.8000714721135
  }
 }
 dps_results: {
@@ -993,8 +993,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-Settings-Orc-Fury P1-Basic-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1483.903232614048
-  tps: 1137.8189979550016
+  dps: 1483.2450685495899
+  tps: 1137.9864024524625
  }
 }
 dps_results: {
@@ -1014,8 +1014,8 @@ dps_results: {
 dps_results: {
  key: "TestFury-Settings-Orc-Fury P1-Basic-NoBuffs-LongMultiTarget"
  value: {
-  dps: 1081.554358362183
-  tps: 828.1980831608207
+  dps: 1102.269033807891
+  tps: 844.8897708064577
  }
 }
 dps_results: {

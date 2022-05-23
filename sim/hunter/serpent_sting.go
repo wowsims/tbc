@@ -28,6 +28,7 @@ func (hunter *Hunter) registerSerpentStingSpell() {
 		},
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskRangedSpecial,
 			ThreatMultiplier: 1,
 			OutcomeApplier:   hunter.OutcomeFuncRangedHit(),
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
@@ -48,6 +49,7 @@ func (hunter *Hunter) registerSerpentStingSpell() {
 		NumberOfTicks: 5,
 		TickLength:    time.Second * 3,
 		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			ProcMask:         core.ProcMaskPeriodicDamage,
 			DamageMultiplier: 1 + 0.06*float64(hunter.Talents.ImprovedStings),
 			ThreatMultiplier: 1,
 			IsPeriodic:       true,

@@ -80,6 +80,7 @@ func (gft *GnomishFlameTurret) registerFlameCannonSpell() {
 		},
 
 		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
+			ProcMask:         ProcMaskSpellDamage,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
