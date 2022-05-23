@@ -21,6 +21,7 @@ func init() {
 	core.AddItemEffect(33150, ApplyBackSubtlety)
 	core.AddItemEffect(33153, ApplyGlovesThreat)
 	core.AddItemEffect(33307, ApplyExecutioner)
+	core.AddItemEffect(35498, ApplyDeathfrost)
 }
 
 // TODO: Crusader, Mongoose, and Executioner could also be modelled as AddWeaponEffect instead
@@ -206,6 +207,83 @@ func ApplyExecutioner(agent core.Agent) {
 
 			if ppmm.Proc(sim, spellEffect.IsMH(), false, "Executioner") {
 				procAura.Activate(sim)
+			}
+		},
+	})
+}
+
+// https://web.archive.org/web/20100702102132/http://elitistjerks.com/f15/t27347-deathfrost_its_mechanics/p2/#post789470
+func ApplyDeathfrost(agent core.Agent) {
+	character := agent.GetCharacter()
+	mh := character.Equip[proto.ItemSlot_ItemSlotMainHand].Enchant.ID == 35498
+	oh := character.Equip[proto.ItemSlot_ItemSlotOffHand].Enchant.ID == 35498
+	if !mh && !oh {
+		return
+	}
+
+	actionID := core.ActionID{SpellID: 46579}
+	if spell := character.GetSpell(actionID); spell != nil {
+		// This function gets called twice when dual wielding this enchant, but we
+		// handle both in one call.
+		return
+	}
+
+	procSpell := character.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolFrost,
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:         core.ProcMaskEmpty,
+			DamageMultiplier: 1,
+			ThreatMultiplier: 1,
+
+			BaseDamage:     core.BaseDamageConfigFlat(150),
+			OutcomeApplier: character.OutcomeFuncMagicCrit(character.DefaultSpellCritMultiplier()),
+		}),
+	})
+
+	if mh {
+		applyDeathfrostForWeapon(character, procSpell, true)
+	}
+	if oh {
+		applyDeathfrostForWeapon(character, procSpell, false)
+	}
+}
+func applyDeathfrostForWeapon(character *core.Character, procSpell *core.Spell, isMH bool) {
+	ppmm := character.AutoAttacks.NewPPMManager(2.15)
+	icd := core.Cooldown{
+		Timer:    character.NewTimer(),
+		Duration: time.Second * 25,
+	}
+
+	label := "Deathfrost-"
+	if isMH {
+		label += "MH"
+	} else {
+		label += "OH"
+	}
+
+	character.GetOrRegisterAura(core.Aura{
+		Label:    label,
+		Duration: core.NeverExpires,
+		OnReset: func(aura *core.Aura, sim *core.Simulation) {
+			aura.Activate(sim)
+		},
+		OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Damage == 0 {
+				return
+			}
+
+			if spellEffect.ProcMask.Matches(core.ProcMaskMelee) {
+				if !ppmm.Proc(sim, spellEffect.IsMH(), false, "Deathfrost") {
+					return
+				}
+				procSpell.Cast(sim, spellEffect.Target)
+			} else if spellEffect.ProcMask.Matches(core.ProcMaskSpellDamage) {
+				if !icd.IsReady(sim) || sim.RandomFloat("Deathfrost") > 0.5 {
+					return
+				}
+				icd.Use(sim)
+				procSpell.Cast(sim, spellEffect.Target)
 			}
 		},
 	})
