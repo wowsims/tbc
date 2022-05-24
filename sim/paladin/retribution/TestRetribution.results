@@ -118,8 +118,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-BlackoutTruncheon-27901"
  value: {
-  dps: 2098.3221295356034
-  tps: 1468.8254906749228
+  dps: 2096.8603039594263
+  tps: 1467.8022127715979
  }
 }
 dps_results: {
@@ -321,22 +321,22 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-Dragonmaw-28438"
  value: {
-  dps: 2134.496952579269
-  tps: 1494.1478668054885
+  dps: 2104.972225347446
+  tps: 1473.4805577432123
  }
 }
 dps_results: {
  key: "TestRetribution-AllItems-Dragonstrike-28439"
  value: {
-  dps: 2126.8332539161065
-  tps: 1488.783277741274
+  dps: 2088.6783690664724
+  tps: 1462.0748583465297
  }
 }
 dps_results: {
  key: "TestRetribution-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 2132.4315975029745
-  tps: 1492.702118252082
+  dps: 2091.347327618384
+  tps: 1463.9431293328682
  }
 }
 dps_results: {
@@ -356,8 +356,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-EmpyreanDemolisher-17112"
  value: {
-  dps: 2130.794722977978
-  tps: 1491.5563060845845
+  dps: 2086.3456632733555
+  tps: 1460.441964291349
  }
 }
 dps_results: {
@@ -881,8 +881,8 @@ dps_results: {
 dps_results: {
  key: "TestRetribution-AllItems-WarpSlicer-30311"
  value: {
-  dps: 2451.057725772496
-  tps: 1715.7404080407473
+  dps: 2399.054716749218
+  tps: 1679.3383017244525
  }
 }
 dps_results: {

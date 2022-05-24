@@ -146,8 +146,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-BlackoutTruncheon-27901"
  value: {
-  dps: 1625.7439002684184
-  tps: 1162.0085428142354
+  dps: 1616.7519648957252
+  tps: 1156.646577107274
  }
 }
 dps_results: {
@@ -160,8 +160,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-BladeofUnquenchedThirst-31193"
  value: {
-  dps: 1622.7597049567676
-  tps: 1161.5832727655206
+  dps: 1622.7527188915442
+  tps: 1161.7375738331
  }
 }
 dps_results: {
@@ -174,8 +174,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-Blinkstrike-31332"
  value: {
-  dps: 1619.5822086442483
-  tps: 1158.9173333995175
+  dps: 1616.7519648957252
+  tps: 1156.646577107274
  }
 }
 dps_results: {
@@ -321,22 +321,22 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-Dragonmaw-28438"
  value: {
-  dps: 1623.7780839132383
-  tps: 1164.8198582684456
+  dps: 1616.7519648957252
+  tps: 1156.646577107274
  }
 }
 dps_results: {
  key: "TestHunter-AllItems-Dragonstrike-28439"
  value: {
-  dps: 1623.21330540118
-  tps: 1163.5194778428638
+  dps: 1616.7519648957252
+  tps: 1156.646577107274
  }
 }
 dps_results: {
  key: "TestHunter-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 1623.5143628380665
-  tps: 1162.2443323603375
+  dps: 1616.7519648957252
+  tps: 1156.646577107274
  }
 }
 dps_results: {
@@ -356,8 +356,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-EmpyreanDemolisher-17112"
  value: {
-  dps: 1627.8118376240711
-  tps: 1166.079581138907
+  dps: 1616.7519648957252
+  tps: 1156.646577107274
  }
 }
 dps_results: {
@@ -447,8 +447,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-Heartrazor-29962"
  value: {
-  dps: 1636.4641659556153
-  tps: 1173.0566038404138
+  dps: 1632.463341221043
+  tps: 1169.7106982329385
  }
 }
 dps_results: {
@@ -825,8 +825,8 @@ dps_results: {
 dps_results: {
  key: "TestHunter-AllItems-TheNightBlade-31331"
  value: {
-  dps: 1620.7611464341371
-  tps: 1160.6557586456865
+  dps: 1616.7519648957252
+  tps: 1156.646577107274
  }
 }
 dps_results: {
