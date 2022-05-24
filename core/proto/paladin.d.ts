@@ -334,13 +334,21 @@ export interface ProtectionPaladin {
  */
 export interface ProtectionPaladin_Rotation {
     /**
-     * @generated from protobuf field: int32 consecration_rank = 1;
+     * @generated from protobuf field: bool prioritize_holy_shield = 1;
+     */
+    prioritizeHolyShield: boolean;
+    /**
+     * @generated from protobuf field: int32 consecration_rank = 2;
      */
     consecrationRank: number;
     /**
-     * @generated from protobuf field: bool use_exorcism = 2;
+     * @generated from protobuf field: bool use_exorcism = 3;
      */
     useExorcism: boolean;
+    /**
+     * @generated from protobuf field: proto.PaladinJudgement maintain_judgement = 4;
+     */
+    maintainJudgement: PaladinJudgement;
 }
 /**
  * @generated from protobuf message proto.ProtectionPaladin.Options
@@ -351,30 +359,9 @@ export interface ProtectionPaladin_Options {
      */
     aura: PaladinAura;
     /**
-     * @generated from protobuf field: proto.ProtectionPaladin.Options.PrimaryJudgement primary_judgement = 2;
+     * @generated from protobuf field: bool use_avenging_wrath = 2;
      */
-    primaryJudgement: ProtectionPaladin_Options_PrimaryJudgement;
-    /**
-     * @generated from protobuf field: proto.PaladinJudgement buff_judgement = 3;
-     */
-    buffJudgement: PaladinJudgement;
-}
-/**
- * @generated from protobuf enum proto.ProtectionPaladin.Options.PrimaryJudgement
- */
-export declare enum ProtectionPaladin_Options_PrimaryJudgement {
-    /**
-     * @generated from protobuf enum value: Vengeance = 0;
-     */
-    Vengeance = 0,
-    /**
-     * @generated from protobuf enum value: Righteousness = 1;
-     */
-    Righteousness = 1,
-    /**
-     * @generated from protobuf enum value: Twist = 2;
-     */
-    Twist = 2
+    useAvengingWrath: boolean;
 }
 /**
  * @generated from protobuf enum proto.Blessings
@@ -403,7 +390,11 @@ export declare enum Blessings {
     /**
      * @generated from protobuf enum value: BlessingOfSanctuary = 5;
      */
-    BlessingOfSanctuary = 5
+    BlessingOfSanctuary = 5,
+    /**
+     * @generated from protobuf enum value: BlessingOfLight = 6;
+     */
+    BlessingOfLight = 6
 }
 /**
  * @generated from protobuf enum proto.PaladinAura

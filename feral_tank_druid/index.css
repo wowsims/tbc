@@ -3019,7 +3019,7 @@ input, select {
 }
 
 .feral-tank-druid-sim-ui .debuffs-section {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .feral-tank-druid-sim-ui .character-stats-table-row {

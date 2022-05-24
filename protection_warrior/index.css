@@ -3016,7 +3016,7 @@ input, select {
 }
 
 .protection-warrior-sim-ui .debuffs-section {
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .protection-warrior-sim-ui .character-stats-table-row {

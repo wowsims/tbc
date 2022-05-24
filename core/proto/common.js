@@ -1953,6 +1953,7 @@ class Debuffs$Type extends MessageType {
     constructor() {
         super("proto.Debuffs", [
             { no: 1, name: "judgement_of_wisdom", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
+            { no: 25, name: "judgement_of_light", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 2, name: "improved_seal_of_the_crusader", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 3, name: "misery", kind: "scalar", T: 8 /*ScalarType.BOOL*/ },
             { no: 4, name: "curse_of_elements", kind: "enum", T: () => ["proto.TristateEffect", TristateEffect] },
@@ -1979,7 +1980,7 @@ class Debuffs$Type extends MessageType {
         ]);
     }
     create(value) {
-        const message = { judgementOfWisdom: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, shadowWeaving: false, improvedScorch: false, wintersChill: false, bloodFrenzy: false, giftOfArthas: false, mangle: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false, huntersMark: 0, exposeWeaknessUptime: 0, exposeWeaknessHunterAgility: 0, demoralizingRoar: 0, demoralizingShout: 0, thunderClap: 0, insectSwarm: false, scorpidSting: false, shadowEmbrace: false };
+        const message = { judgementOfWisdom: false, judgementOfLight: false, improvedSealOfTheCrusader: false, misery: false, curseOfElements: 0, isbUptime: 0, shadowWeaving: false, improvedScorch: false, wintersChill: false, bloodFrenzy: false, giftOfArthas: false, mangle: false, exposeArmor: 0, faerieFire: 0, sunderArmor: false, curseOfRecklessness: false, huntersMark: 0, exposeWeaknessUptime: 0, exposeWeaknessHunterAgility: 0, demoralizingRoar: 0, demoralizingShout: 0, thunderClap: 0, insectSwarm: false, scorpidSting: false, shadowEmbrace: false };
         Object.defineProperty(message, MESSAGE_TYPE, { enumerable: false, value: this });
         if (value !== undefined)
             reflectionMergePartial(this, message, value);
@@ -1992,6 +1993,9 @@ class Debuffs$Type extends MessageType {
             switch (fieldNo) {
                 case /* bool judgement_of_wisdom */ 1:
                     message.judgementOfWisdom = reader.bool();
+                    break;
+                case /* bool judgement_of_light */ 25:
+                    message.judgementOfLight = reader.bool();
                     break;
                 case /* bool improved_seal_of_the_crusader */ 2:
                     message.improvedSealOfTheCrusader = reader.bool();
@@ -2077,6 +2081,9 @@ class Debuffs$Type extends MessageType {
         /* bool judgement_of_wisdom = 1; */
         if (message.judgementOfWisdom !== false)
             writer.tag(1, WireType.Varint).bool(message.judgementOfWisdom);
+        /* bool judgement_of_light = 25; */
+        if (message.judgementOfLight !== false)
+            writer.tag(25, WireType.Varint).bool(message.judgementOfLight);
         /* bool improved_seal_of_the_crusader = 2; */
         if (message.improvedSealOfTheCrusader !== false)
             writer.tag(2, WireType.Varint).bool(message.improvedSealOfTheCrusader);

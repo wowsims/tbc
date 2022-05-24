@@ -4,7 +4,7 @@ import { Flask } from '/tbc/core/proto/common.js';
 import { Food } from '/tbc/core/proto/common.js';
 import { Potions } from '/tbc/core/proto/common.js';
 import { WeaponImbue } from '/tbc/core/proto/common.js';
-import { PaladinAura as PaladinAura, PaladinJudgement as PaladinJudgement, ProtectionPaladin_Rotation as ProtectionPaladinRotation, ProtectionPaladin_Options as ProtectionPaladinOptions, ProtectionPaladin_Options_PrimaryJudgement as PrimaryJudgement, } from '/tbc/core/proto/paladin.js';
+import { PaladinAura as PaladinAura, PaladinJudgement as PaladinJudgement, ProtectionPaladin_Rotation as ProtectionPaladinRotation, ProtectionPaladin_Options as ProtectionPaladinOptions, } from '/tbc/core/proto/paladin.js';
 import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // Preset options for this spec.
 // Eventually we will import these values for the raid sim too, so its good to
@@ -20,13 +20,13 @@ export const AvengersShieldTalents = {
     data: '-0530513050000142521051-052050003003',
 };
 export const DefaultRotation = ProtectionPaladinRotation.create({
+    prioritizeHolyShield: true,
     consecrationRank: 6,
     useExorcism: false,
+    maintainJudgement: PaladinJudgement.JudgementOfWisdom,
 });
 export const DefaultOptions = ProtectionPaladinOptions.create({
     aura: PaladinAura.SanctityAura,
-    primaryJudgement: PrimaryJudgement.Righteousness,
-    buffJudgement: PaladinJudgement.JudgementOfWisdom,
 });
 export const DefaultConsumes = Consumes.create({
     flask: Flask.FlaskOfBlindingLight,

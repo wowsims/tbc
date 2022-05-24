@@ -163,6 +163,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
                 IconInputs.BloodFrenzy,
                 IconInputs.Mangle,
                 IconInputs.ImprovedSealOfTheCrusader,
+                IconInputs.JudgementOfLight,
                 IconInputs.HuntersMark,
                 IconInputs.FaerieFire,
                 IconInputs.SunderArmor,

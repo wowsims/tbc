@@ -60,6 +60,7 @@ export declare const HuntersMark: IndividualSimIconPickerConfig<Raid, number>;
 export declare const ImprovedScorch: IndividualSimIconPickerConfig<Raid, boolean>;
 export declare const ImprovedSealOfTheCrusader: IndividualSimIconPickerConfig<Raid, boolean>;
 export declare const JudgementOfWisdom: IndividualSimIconPickerConfig<Raid, boolean>;
+export declare const JudgementOfLight: IndividualSimIconPickerConfig<Raid, boolean>;
 export declare const Mangle: IndividualSimIconPickerConfig<Raid, boolean>;
 export declare const Misery: IndividualSimIconPickerConfig<Raid, boolean>;
 export declare const ShadowWeaving: IndividualSimIconPickerConfig<Raid, boolean>;

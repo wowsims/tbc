@@ -349,6 +349,10 @@ export interface Debuffs {
      */
     judgementOfWisdom: boolean;
     /**
+     * @generated from protobuf field: bool judgement_of_light = 25;
+     */
+    judgementOfLight: boolean;
+    /**
      * @generated from protobuf field: bool improved_seal_of_the_crusader = 2;
      */
     improvedSealOfTheCrusader: boolean;
