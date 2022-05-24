@@ -69,6 +69,7 @@ enum Blessings {
 	BlessingOfSalvation = 3;
 	BlessingOfWisdom = 4;
 	BlessingOfSanctuary = 5;
+	BlessingOfLight = 6;
 }
 
 enum PaladinAura {
@@ -122,8 +123,10 @@ message RetributionPaladin {
 
 message ProtectionPaladin {
 	message Rotation {
-		int32 consecration_rank = 1;
-		bool use_exorcism = 2;
+		bool prioritize_holy_shield = 1;
+		int32 consecration_rank = 2;
+		bool use_exorcism = 3;
+		PaladinJudgement maintain_judgement = 4;
 	}
 	Rotation rotation = 1;
 
@@ -131,14 +134,7 @@ message ProtectionPaladin {
 
 	message Options {
 		PaladinAura aura = 1;
-
-		enum PrimaryJudgement {
-			Vengeance = 0;
-			Righteousness = 1;
-			Twist = 2;
-		}
-		PrimaryJudgement primary_judgement = 2;
-		PaladinJudgement buff_judgement = 3;
+		bool use_avenging_wrath = 2;
 	}
 	Options options = 3;
 }

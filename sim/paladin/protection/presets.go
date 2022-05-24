@@ -29,13 +29,13 @@ var defaultProtTalents = &proto.PaladinTalents{
 }
 
 var defaultProtRotation = &proto.ProtectionPaladin_Rotation{
-	ConsecrationRank: 6,
-	UseExorcism:      false,
+	ConsecrationRank:  6,
+	UseExorcism:       false,
+	MaintainJudgement: proto.PaladinJudgement_JudgementOfWisdom,
 }
 
 var defaultProtOptions = &proto.ProtectionPaladin_Options{
-	PrimaryJudgement: proto.ProtectionPaladin_Options_Righteousness,
-	BuffJudgement:    proto.PaladinJudgement_JudgementOfWisdom,
+	Aura: proto.PaladinAura_RetributionAura,
 }
 
 var DefaultOptions = &proto.Player_ProtectionPaladin{
@@ -74,7 +74,6 @@ var FullConsumes = &proto.Consumes{
 }
 
 var FullDebuffs = &proto.Debuffs{
-	JudgementOfWisdom:           true,
 	Misery:                      true,
 	CurseOfElements:             proto.TristateEffect_TristateEffectImproved,
 	IsbUptime:                   1,

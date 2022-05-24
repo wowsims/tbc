@@ -7,9 +7,29 @@ import (
 )
 
 func (prot *ProtectionPaladin) OnGCDReady(sim *core.Simulation) {
+	if prot.CurrentSeal == prot.SealOfWisdomAura && prot.JudgementOfWisdom.IsReady(sim) {
+		prot.JudgementOfWisdom.Cast(sim, prot.CurrentTarget)
+		if prot.JudgementOfWisdomAura.IsActive() {
+			prot.SealOfRighteousness.Cast(sim, nil)
+		} else {
+			// Re-cast seal of wisdom if we missed.
+			prot.SealOfWisdom.Cast(sim, nil)
+		}
+		return
+	} else if prot.CurrentSeal == prot.SealOfLightAura && prot.JudgementOfLight.IsReady(sim) {
+		prot.JudgementOfLight.Cast(sim, prot.CurrentTarget)
+		if prot.JudgementOfLightAura.IsActive() {
+			prot.SealOfRighteousness.Cast(sim, nil)
+		} else {
+			// Re-cast seal of wisdom if we missed.
+			prot.SealOfLight.Cast(sim, nil)
+		}
+		return
+	}
+
 	if prot.CurrentSeal == nil {
 		prot.SealOfRighteousness.Cast(sim, nil)
-	} else if prot.HolyShield.IsReady(sim) {
+	} else if prot.Rotation.PrioritizeHolyShield && prot.HolyShield.IsReady(sim) {
 		prot.HolyShield.Cast(sim, nil)
 	} else if prot.Consecration != nil && prot.Consecration.IsReady(sim) {
 		prot.Consecration.Cast(sim, nil)
@@ -18,6 +38,8 @@ func (prot *ProtectionPaladin) OnGCDReady(sim *core.Simulation) {
 		prot.SealOfRighteousness.Cast(sim, nil)
 	} else if prot.shouldExorcism(sim) {
 		prot.Exorcism.Cast(sim, prot.CurrentTarget)
+	} else if !prot.Rotation.PrioritizeHolyShield && prot.HolyShield.IsReady(sim) {
+		prot.HolyShield.Cast(sim, nil)
 	} else {
 		prot.WaitUntil(sim, prot.nextCDAt(sim))
 	}

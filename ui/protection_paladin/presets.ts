@@ -14,7 +14,6 @@ import {
 	PaladinJudgement as PaladinJudgement,
 	ProtectionPaladin_Rotation as ProtectionPaladinRotation,
 	ProtectionPaladin_Options as ProtectionPaladinOptions,
-	ProtectionPaladin_Options_PrimaryJudgement as PrimaryJudgement,
 } from '/tbc/core/proto/paladin.js';
 
 import * as Enchants from '/tbc/core/constants/enchants.js';
@@ -38,14 +37,14 @@ export const AvengersShieldTalents = {
 };
 
 export const DefaultRotation = ProtectionPaladinRotation.create({
+	prioritizeHolyShield: true,
 	consecrationRank: 6,
 	useExorcism: false,
+	maintainJudgement: PaladinJudgement.JudgementOfWisdom,
 });
 
 export const DefaultOptions = ProtectionPaladinOptions.create({
 	aura: PaladinAura.SanctityAura,
-	primaryJudgement: PrimaryJudgement.Righteousness,
-	buffJudgement: PaladinJudgement.JudgementOfWisdom,
 });
 
 export const DefaultConsumes = Consumes.create({

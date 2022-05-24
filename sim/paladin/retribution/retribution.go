@@ -73,6 +73,7 @@ func (ret *RetributionPaladin) GetPaladin() *paladin.Paladin {
 
 func (ret *RetributionPaladin) Initialize() {
 	ret.Paladin.Initialize()
+	ret.RegisterAvengingWrathCD()
 
 	// Setup Seal of Command after autos are enabled so that the PPM works
 	ret.SetupSealOfCommand()
