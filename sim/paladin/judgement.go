@@ -169,6 +169,52 @@ func (paladin *Paladin) CanJudgementOfWisdom(sim *core.Simulation) bool {
 	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfWisdomAura
 }
 
+func (paladin *Paladin) registerJudgementOfLightSpell(cdTimer *core.Timer) {
+	paladin.JudgementOfLightAura = core.JudgementOfLightAura(paladin.CurrentTarget)
+
+	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
+	paladin.JudgementOfLight = paladin.RegisterSpell(core.SpellConfig{
+		ActionID:    core.ActionID{SpellID: 27163},
+		SpellSchool: core.SpellSchoolHoly,
+		SpellExtras: SpellFlagJudgement,
+
+		ResourceType: stats.Mana,
+		BaseCost:     JudgementManaCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: baseCost - JudgementManaCost*(0.03*float64(paladin.Talents.Benediction)),
+			},
+			CD: core.Cooldown{
+				Timer:    cdTimer,
+				Duration: JudgementCDTime - (time.Second * time.Duration(paladin.Talents.ImprovedJudgement)),
+			},
+			OnCastComplete: func(sim *core.Simulation, spell *core.Spell) {
+				paladin.sanctifiedJudgement(sim, paladin.SealOfLight.DefaultCast.Cost)
+				paladin.SealOfLightAura.Deactivate(sim)
+				paladin.CurrentSeal = nil
+			},
+		},
+
+		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
+			ProcMask:       core.ProcMaskEmpty,
+			OutcomeApplier: paladin.OutcomeFuncMagicHit(),
+
+			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+				if !spellEffect.Landed() {
+					return
+				}
+				paladin.JudgementOfLightAura.Activate(sim)
+				paladin.CurrentJudgement = paladin.JudgementOfLightAura
+			},
+		}),
+	})
+}
+
+func (paladin *Paladin) CanJudgementOfLight(sim *core.Simulation) bool {
+	return paladin.canJudgement(sim) && paladin.CurrentSeal == paladin.SealOfLightAura
+}
+
 func (paladin *Paladin) registerJudgementOfRighteousnessSpell(cdTimer *core.Timer) {
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfRighteousness = paladin.RegisterSpell(core.SpellConfig{
@@ -259,5 +305,6 @@ func (paladin *Paladin) registerJudgements() {
 	paladin.registerJudgementOfBloodSpell(cdTimer)
 	paladin.registerJudgementOfTheCrusaderSpell(cdTimer)
 	paladin.registerJudgementOfWisdomSpell(cdTimer)
+	paladin.registerJudgementOfLightSpell(cdTimer)
 	paladin.registerJudgementOfRighteousnessSpell(cdTimer)
 }

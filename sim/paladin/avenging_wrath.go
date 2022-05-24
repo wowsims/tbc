@@ -7,7 +7,7 @@ import (
 	"github.com/wowsims/tbc/sim/core/stats"
 )
 
-func (paladin *Paladin) registerAvengingWrathCD() {
+func (paladin *Paladin) RegisterAvengingWrathCD() {
 	actionID := core.ActionID{SpellID: 31884}
 
 	aura := paladin.RegisterAura(core.Aura{

@@ -408,6 +408,16 @@ func ApplyDarkmoonCardVengeance(agent core.Agent) {
 		}),
 	})
 
+	// Can also proc when the player's melee attacks trigger a Seal of Light proc.
+	var onSpellHitDealt core.OnSpellHit
+	if character.CurrentTarget.HasAura(core.JudgementOfLightAuraLabel) {
+		onSpellHitDealt = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
+			if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMelee) && sim.RandomFloat("DMC Vengeance") < procChance/2 {
+				procSpell.Cast(sim, spell.Unit)
+			}
+		}
+	}
+
 	character.RegisterAura(core.Aura{
 		Label:    "DMC Vengeance",
 		Duration: core.NeverExpires,
@@ -419,6 +429,7 @@ func ApplyDarkmoonCardVengeance(agent core.Agent) {
 				procSpell.Cast(sim, spell.Unit)
 			}
 		},
+		OnSpellHitDealt: onSpellHitDealt,
 	})
 }
 

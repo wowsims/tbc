@@ -88,6 +88,7 @@ export const HuntersMark = makeTristateDebuffInput(ActionId.fromSpellId(14325), 
 export const ImprovedScorch = makeBooleanDebuffInput(ActionId.fromSpellId(12873), 'improvedScorch');
 export const ImprovedSealOfTheCrusader = makeBooleanDebuffInput(ActionId.fromSpellId(20337), 'improvedSealOfTheCrusader');
 export const JudgementOfWisdom = makeBooleanDebuffInput(ActionId.fromSpellId(27164), 'judgementOfWisdom');
+export const JudgementOfLight = makeBooleanDebuffInput(ActionId.fromSpellId(27163), 'judgementOfLight');
 export const Mangle = makeBooleanDebuffInput(ActionId.fromSpellId(33876), 'mangle');
 export const Misery = makeBooleanDebuffInput(ActionId.fromSpellId(33195), 'misery');
 export const ShadowWeaving = makeBooleanDebuffInput(ActionId.fromSpellId(15334), 'shadowWeaving');

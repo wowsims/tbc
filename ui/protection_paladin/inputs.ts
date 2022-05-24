@@ -2,13 +2,13 @@ import { Spec } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 import { EventID } from '/tbc/core/typed_event.js';
 import { IndividualSimUI } from '/tbc/core/individual_sim_ui.js';
+import { ActionId } from '/tbc/core/proto_utils/action_id.js';
 
 import {
 	PaladinAura as PaladinAura,
 	PaladinJudgement as PaladinJudgement,
 	ProtectionPaladin_Rotation as ProtectionPaladinRotation,
 	ProtectionPaladin_Options as ProtectionPaladinOptions,
-	ProtectionPaladin_Options_PrimaryJudgement as PrimaryJudgement,
 } from '/tbc/core/proto/paladin.js';
 
 // Configuration for spec-specific UI elements on the settings tab.
@@ -45,11 +45,26 @@ export const ProtectionPaladinRotationConfig = {
 			},
 		},
 		{
+			type: 'boolean' as const, cssClass: 'prioritize-holy-shield-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Prio Holy Shield',
+				labelTooltip: 'Uses Holy Shield as the highest priority spell. This is usually done when tanking a boss that can crush.',
+				changedEvent: (player: Player<Spec.SpecProtectionPaladin>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecProtectionPaladin>) => player.getRotation().prioritizeHolyShield,
+				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionPaladin>, newValue: boolean) => {
+					const newRotation = player.getRotation();
+					newRotation.prioritizeHolyShield = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
+		{
 			type: 'boolean' as const, cssClass: 'exorcism-picker',
 			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 			config: {
 				label: 'Use Exorcism',
-				labelTooltip: 'Use Exorcism during filler spell windows. Will only be used if the boss mob type is Undead or Demon.',
+				labelTooltip: 'Includes Exorcism in the rotation. Will only be used if the primary target is an Undead or Demon type.',
 				changedEvent: (player: Player<Spec.SpecProtectionPaladin>) => player.rotationChangeEmitter,
 				getValue: (player: Player<Spec.SpecProtectionPaladin>) => player.getRotation().useExorcism,
 				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionPaladin>, newValue: boolean) => {
@@ -58,7 +73,26 @@ export const ProtectionPaladinRotationConfig = {
 					player.setRotation(eventID, newRotation);
 				},
 			},
-		}
+		},
+		{
+			type: 'enum' as const, cssClass: 'mantain-judgement-picker',
+			getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
+			config: {
+				label: 'Maintain Judgement',
+				values: [
+					{ name: 'None', value: PaladinJudgement.NoPaladinJudgement },
+					{ name: 'Wisdom', value: PaladinJudgement.JudgementOfWisdom },
+					{ name: 'Light', value: PaladinJudgement.JudgementOfLight },
+				],
+				changedEvent: (player: Player<Spec.SpecProtectionPaladin>) => player.rotationChangeEmitter,
+				getValue: (player: Player<Spec.SpecProtectionPaladin>) => player.getRotation().maintainJudgement,
+				setValue: (eventID: EventID, player: Player<Spec.SpecProtectionPaladin>, newValue: number) => {
+					const newRotation = player.getRotation();
+					newRotation.maintainJudgement = newValue;
+					player.setRotation(eventID, newRotation);
+				},
+			},
+		},
 	],
 }
 
@@ -83,28 +117,17 @@ export const AuraSelection = {
 	},
 }
 
-export const PrimaryJudgementSelection = {
-	type: 'enum' as const, cssClass: 'judgement-picker',
+export const UseAvengingWrath = {
+	type: 'boolean' as const, cssClass: 'use-avenging-wrath-picker',
 	getModObject: (simUI: IndividualSimUI<any>) => simUI.player,
 	config: {
-		label: 'Primary Judgement',
-		values: [
-			{
-				name: 'Vengeance', value: PrimaryJudgement.Vengeance,
-			},
-			{
-				name: 'Righteousness', value: PrimaryJudgement.Righteousness,
-			},
-			{
-				name: 'Twist', value: PrimaryJudgement.Twist,
-			},
-		],
+		label: 'Use Avenging Wrath',
 		changedEvent: (player: Player<Spec.SpecProtectionPaladin>) => player.specOptionsChangeEmitter,
-		getValue: (player: Player<Spec.SpecProtectionPaladin>) => player.getSpecOptions().primaryJudgement,
-		setValue: (eventID: EventID, player: Player<Spec.SpecProtectionPaladin>, newValue: number) => {
+		getValue: (player: Player<Spec.SpecProtectionPaladin>) => player.getSpecOptions().useAvengingWrath,
+		setValue: (eventID: EventID, player: Player<Spec.SpecProtectionPaladin>, newValue: boolean) => {
 			const newOptions = player.getSpecOptions();
-			newOptions.primaryJudgement = newValue;
+			newOptions.useAvengingWrath = newValue;
 			player.setSpecOptions(eventID, newOptions);
 		},
 	},
-}
+};

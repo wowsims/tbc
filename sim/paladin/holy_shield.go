@@ -29,13 +29,14 @@ func (paladin *Paladin) registerHolyShieldSpell() {
 
 	blockBonus := 30*core.BlockRatingPerBlockChance + core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 29388, 42, 0)
 
-	holyShieldAura := paladin.RegisterAura(core.Aura{
+	paladin.HolyShieldAura = paladin.RegisterAura(core.Aura{
 		Label:     "Holy Shield",
 		ActionID:  actionID,
 		Duration:  time.Second * 10,
 		MaxStacks: numCharges,
 		OnGain: func(aura *core.Aura, sim *core.Simulation) {
 			paladin.AddStatDynamic(sim, stats.Block, blockBonus)
+			aura.SetStacks(sim, numCharges)
 		},
 		OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 			paladin.AddStatDynamic(sim, stats.Block, -blockBonus)
@@ -69,8 +70,7 @@ func (paladin *Paladin) registerHolyShieldSpell() {
 		},
 
 		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
-			holyShieldAura.Activate(sim)
-			holyShieldAura.SetStacks(sim, numCharges)
+			paladin.HolyShieldAura.Activate(sim)
 		},
 	})
 }

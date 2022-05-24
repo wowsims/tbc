@@ -239,6 +239,37 @@ func (paladin *Paladin) setupSealOfWisdom() {
 	})
 }
 
+func (paladin *Paladin) setupSealOfLight() {
+	actionID := core.ActionID{SpellID: 27160}
+	paladin.SealOfLightAura = paladin.RegisterAura(core.Aura{
+		Label:    "Seal of Light",
+		Tag:      "Seal",
+		ActionID: actionID,
+		Duration: SealDuration,
+	})
+
+	baseCost := 280.0
+	cost := baseCost - paladin.sealCostReduction()
+	paladin.SealOfLight = paladin.RegisterSpell(core.SpellConfig{
+		ActionID:    actionID,
+		SpellExtras: SpellFlagSeal,
+
+		ResourceType: stats.Mana,
+		BaseCost:     baseCost,
+
+		Cast: core.CastConfig{
+			DefaultCast: core.Cast{
+				Cost: cost - baseCost*(0.03*float64(paladin.Talents.Benediction)),
+				GCD:  core.GCDDefault,
+			},
+		},
+
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+			paladin.UpdateSeal(sim, paladin.SealOfLightAura)
+		},
+	})
+}
+
 func (paladin *Paladin) setupSealOfRighteousness() {
 	procActionID := core.ActionID{SpellID: 27156}
 	sorProc := paladin.RegisterSpell(core.SpellConfig{

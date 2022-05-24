@@ -28,21 +28,26 @@ type Paladin struct {
 	JudgementOfBlood         *core.Spell
 	JudgementOfTheCrusader   *core.Spell
 	JudgementOfWisdom        *core.Spell
+	JudgementOfLight         *core.Spell
 	JudgementOfRighteousness *core.Spell
 	SealOfBlood              *core.Spell
 	SealOfCommand            *core.Spell
 	SealOfTheCrusader        *core.Spell
 	SealOfWisdom             *core.Spell
+	SealOfLight              *core.Spell
 	SealOfRighteousness      *core.Spell
 
 	ConsecrationDot *core.Dot
 
+	HolyShieldAura             *core.Aura
 	JudgementOfTheCrusaderAura *core.Aura
 	JudgementOfWisdomAura      *core.Aura
+	JudgementOfLightAura       *core.Aura
 	SealOfBloodAura            *core.Aura
 	SealOfCommandAura          *core.Aura
 	SealOfTheCrusaderAura      *core.Aura
 	SealOfWisdomAura           *core.Aura
+	SealOfLightAura            *core.Aura
 	SealOfRighteousnessAura    *core.Aura
 }
 
@@ -80,6 +85,7 @@ func (paladin *Paladin) Initialize() {
 	paladin.setupSealOfBlood()
 	paladin.setupSealOfTheCrusader()
 	paladin.setupSealOfWisdom()
+	paladin.setupSealOfLight()
 	paladin.setupSealOfRighteousness()
 	paladin.setupJudgementRefresh()
 
@@ -87,7 +93,6 @@ func (paladin *Paladin) Initialize() {
 	paladin.registerExorcismSpell()
 	paladin.registerHolyShieldSpell()
 	paladin.registerJudgements()
-	paladin.registerAvengingWrathCD()
 
 	paladin.registerSpiritualAttunement()
 }
@@ -133,6 +138,14 @@ func NewPaladin(character core.Character, talents proto.PaladinTalents) *Paladin
 		ModifiedStat: stats.MeleeCrit,
 		Modifier: func(agility float64, meleeCrit float64) float64 {
 			return meleeCrit + (agility/25)*core.MeleeCritRatingPerCritChance
+		},
+	})
+
+	paladin.AddStatDependency(stats.StatDependency{
+		SourceStat:   stats.Agility,
+		ModifiedStat: stats.Dodge,
+		Modifier: func(agility float64, dodge float64) float64 {
+			return dodge + (agility/25)*core.DodgeRatingPerDodgeChance
 		},
 	})
 

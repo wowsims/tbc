@@ -20,6 +20,9 @@ func applyDebuffEffects(target *Unit, debuffs proto.Debuffs) {
 	if debuffs.JudgementOfWisdom {
 		MakePermanent(JudgementOfWisdomAura(target))
 	}
+	if debuffs.JudgementOfLight {
+		MakePermanent(JudgementOfLightAura(target))
+	}
 
 	if debuffs.ImprovedSealOfTheCrusader {
 		MakePermanent(JudgementOfTheCrusaderAura(target, 3, 0, 1.0))
@@ -178,6 +181,27 @@ func JudgementOfWisdomAura(target *Unit) *Aura {
 			unit := spell.Unit
 			if unit.HasManaBar() {
 				unit.AddMana(sim, mana, actionID, false)
+			}
+
+			if spell.ActionID.SpellID == 35395 {
+				aura.Refresh(sim)
+			}
+		},
+	})
+}
+
+var JudgementOfLightAuraLabel = "Judgement of Light"
+
+func JudgementOfLightAura(target *Unit) *Aura {
+	actionID := ActionID{SpellID: 27163}
+
+	return target.GetOrRegisterAura(Aura{
+		Label:    JudgementOfLightAuraLabel,
+		ActionID: actionID,
+		Duration: time.Second * 20,
+		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {
+			if !spellEffect.ProcMask.Matches(ProcMaskMelee) || !spellEffect.Landed() {
+				return
 			}
 
 			if spell.ActionID.SpellID == 35395 {
