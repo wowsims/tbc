@@ -153,8 +153,8 @@ dps_results: {
 dps_results: {
  key: "TestShadow-AllItems-BladeofUnquenchedThirst-31193"
  value: {
-  dps: 1562.6881253734452
-  tps: 1166.3024381013256
+  dps: 1555.7013247313955
+  tps: 1158.6863466599427
  }
 }
 dps_results: {

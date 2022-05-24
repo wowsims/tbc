@@ -125,8 +125,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-BlackoutTruncheon-27901"
  value: {
-  dps: 867.4968046918643
-  tps: 1319.1682089652563
+  dps: 875.6880573787553
+  tps: 1331.473317314058
  }
 }
 dps_results: {
@@ -139,8 +139,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-BladeofUnquenchedThirst-31193"
  value: {
-  dps: 872.1012666757601
-  tps: 1326.2402805790744
+  dps: 872.808265746235
+  tps: 1326.6133626491594
  }
 }
 dps_results: {
@@ -265,22 +265,22 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-Dragonmaw-28438"
  value: {
-  dps: 871.7451994068804
-  tps: 1326.4155891346447
+  dps: 875.6880573787553
+  tps: 1331.473317314058
  }
 }
 dps_results: {
  key: "TestFeralTank-AllItems-Dragonstrike-28439"
  value: {
-  dps: 872.1274765933671
-  tps: 1326.9311211331906
+  dps: 875.6880573787553
+  tps: 1331.473317314058
  }
 }
 dps_results: {
  key: "TestFeralTank-AllItems-DrakefistHammer-28437"
  value: {
-  dps: 876.429601808436
-  tps: 1333.032848979001
+  dps: 875.6880573787553
+  tps: 1331.473317314058
  }
 }
 dps_results: {
@@ -300,8 +300,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-EmpyreanDemolisher-17112"
  value: {
-  dps: 872.9533012504914
-  tps: 1326.5517752838691
+  dps: 875.6880573787553
+  tps: 1331.473317314058
  }
 }
 dps_results: {
@@ -573,8 +573,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-RodoftheSunKing-29996"
  value: {
-  dps: 879.7840471499098
-  tps: 1335.8827777197114
+  dps: 877.9774263317918
+  tps: 1334.290415596005
  }
 }
 dps_results: {
@@ -720,8 +720,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-TheNightBlade-31331"
  value: {
-  dps: 869.4515633436665
-  tps: 1322.6889734792771
+  dps: 875.6880573787553
+  tps: 1331.473317314058
  }
 }
 dps_results: {

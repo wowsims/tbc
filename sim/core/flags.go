@@ -39,8 +39,10 @@ func (pm ProcMask) Matches(other ProcMask) bool {
 
 // Single-bit masks. These don't need to match Blizzard's values.
 const (
+	// Default value is invalid, to force authors to think about proc masks.
 	ProcMaskUnknown ProcMask = 0
-	ProcMaskEmpty   ProcMask = 1 << iota
+
+	ProcMaskEmpty ProcMask = 1 << iota
 	ProcMaskMeleeMHAuto
 	ProcMaskMeleeOHAuto
 	ProcMaskMeleeMHSpecial
@@ -75,7 +77,7 @@ const (
 )
 
 func GetMeleeProcMaskForHands(mh bool, oh bool) ProcMask {
-	mask := ProcMaskEmpty
+	mask := ProcMaskUnknown
 	if mh {
 		mask |= ProcMaskMeleeMH
 	}
