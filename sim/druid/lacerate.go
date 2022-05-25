@@ -66,6 +66,7 @@ func (druid *Druid) registerLacerateSpell() {
 					if druid.LacerateDot.IsActive() {
 						druid.LacerateDot.Refresh(sim)
 						druid.LacerateDot.AddStack(sim)
+						druid.LacerateDot.TakeSnapshot(sim)
 					} else {
 						druid.LacerateDot.Apply(sim)
 						druid.LacerateDot.SetStacks(sim, 1)
