@@ -18,7 +18,9 @@ func (bear *FeralTankDruid) OnAutoAttack(sim *core.Simulation, spell *core.Spell
 
 func (bear *FeralTankDruid) doRotation(sim *core.Simulation) {
 	if bear.GCD.IsReady(sim) {
-		if bear.Rotation.MaintainFaerieFire && bear.ShouldFaerieFire(sim) {
+		if bear.shouldSaveLacerateStacks(sim) && bear.CanLacerate(sim) {
+			bear.Lacerate.Cast(sim, bear.CurrentTarget)
+		} else if bear.Rotation.MaintainFaerieFire && bear.ShouldFaerieFire(sim) {
 			bear.FaerieFire.Cast(sim, bear.CurrentTarget)
 		} else if bear.shouldDemoRoar(sim) {
 			bear.DemoralizingRoar.Cast(sim, bear.CurrentTarget)
@@ -42,13 +44,18 @@ func (bear *FeralTankDruid) doRotation(sim *core.Simulation) {
 	bear.tryQueueMaul(sim)
 }
 
+func (bear *FeralTankDruid) shouldSaveLacerateStacks(sim *core.Simulation) bool {
+	return bear.LacerateDot.GetStacks() == 5 &&
+		bear.LacerateDot.RemainingDuration(sim) <= time.Millisecond*1500
+}
+
 func (bear *FeralTankDruid) shouldSwipe(sim *core.Simulation) bool {
 	ap := bear.GetStat(stats.AttackPower) + bear.PseudoStats.MobTypeAttackPower + bear.CurrentTarget.PseudoStats.BonusMeleeAttackPower
 
 	return bear.Rotation.Swipe == proto.FeralTankDruid_Rotation_SwipeWithEnoughAP &&
 		bear.CanSwipe() &&
 		bear.LacerateDot.GetStacks() == 5 &&
-		bear.LacerateDot.RemainingDuration(sim) > time.Second*3 &&
+		bear.LacerateDot.RemainingDuration(sim) > time.Millisecond*3000 &&
 		ap >= float64(bear.Rotation.SwipeApThreshold)
 }
 
