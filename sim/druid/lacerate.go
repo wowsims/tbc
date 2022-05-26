@@ -59,7 +59,7 @@ func (druid *Druid) registerLacerateSpell() {
 				},
 				TargetSpellCoefficient: 0,
 			},
-			OutcomeApplier: druid.OutcomeFuncMeleeSpecialHit(),
+			OutcomeApplier: druid.OutcomeFuncMeleeSpecialHitAndCrit(druid.MeleeCritMultiplier()),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if spellEffect.Landed() {
