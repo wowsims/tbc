@@ -92,7 +92,7 @@ func (druid *Druid) registerLacerateSpell() {
 		TickEffects: core.TickFuncApplyEffects(core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskPeriodicDamage,
 			DamageMultiplier: 1,
-			ThreatMultiplier: 1,
+			ThreatMultiplier: 0.5,
 			IsPeriodic:       true,
 			BaseDamage: core.MultiplyByStacks(core.BaseDamageConfig{
 				Calculator: func(sim *core.Simulation, hitEffect *core.SpellEffect, spell *core.Spell) float64 {
