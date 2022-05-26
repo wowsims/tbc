@@ -197,7 +197,7 @@ export class DamageDealtLog extends SimLog {
         return `${this.toStringPrefix()} ${this.actionId.name} ${this.resultString()} (${this.threat.toFixed(2)} Threat)`;
     }
     static parse(params) {
-        const match = params.raw.match(/] (.*?) (tick )?((Miss)|(Hit)|(Crit)|(Crush)|(Glance)|(Dodge)|(Parry)|(Block)|(CriticalBlock))( \((\d+)% Resist\))?( for (\d+\.\d+) damage)?/);
+        const match = params.raw.match(/] (.*?) (tick )?((Miss)|(Hit)|(CriticalBlock)|(Crit)|(Crush)|(Glance)|(Dodge)|(Parry)|(Block))( \((\d+)% Resist\))?( for (\d+\.\d+) damage)?/);
         if (match) {
             return ActionId.fromLogString(match[1]).fill(params.source?.index).then(cause => {
                 params.actionId = cause;
