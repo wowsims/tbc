@@ -170,12 +170,12 @@ func (unit *Unit) OutcomeFuncMeleeSpecialHitAndCrit(critMultiplier float64) Outc
 			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, attackTable, roll, &chance) &&
 				(spell.SpellExtras.Matches(SpellExtrasCannotBeDodged) || !spellEffect.applyAttackTableDodge(spell, unit, attackTable, roll, &chance)) &&
 				!spellEffect.applyAttackTableParry(spell, unit, attackTable, roll, &chance) {
-				if !spellEffect.applyAttackTableCritSeparateRoll(sim, spell, attackTable, critMultiplier) {
+				if spellEffect.applyAttackTableCritSeparateRoll(sim, spell, attackTable, critMultiplier) {
+					spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance)
+				} else {
 					if !spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance) {
 						spellEffect.applyAttackTableHit(spell)
 					}
-				} else {
-					spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance)
 				}
 			}
 		}
@@ -235,12 +235,12 @@ func (unit *Unit) OutcomeFuncRangedHitAndCrit(critMultiplier float64) OutcomeApp
 			chance := 0.0
 
 			if !spellEffect.applyAttackTableMissNoDWPenalty(spell, unit, attackTable, roll, &chance) {
-				if !spellEffect.applyAttackTableCritSeparateRoll(sim, spell, attackTable, critMultiplier) {
+				if spellEffect.applyAttackTableCritSeparateRoll(sim, spell, attackTable, critMultiplier) {
+					spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance)
+				} else {
 					if !spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance) {
 						spellEffect.applyAttackTableHit(spell)
 					}
-				} else {
-					spellEffect.applyAttackTableBlock(spell, unit, attackTable, roll, &chance)
 				}
 			}
 		}
