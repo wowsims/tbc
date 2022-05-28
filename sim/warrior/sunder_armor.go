@@ -61,6 +61,7 @@ func (warrior *Warrior) newSunderArmorSpell(isDevastateEffect bool) *core.Spell 
 		effect.OnInit = func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if warrior.SunderArmorAura.GetStacks() == 5 {
 				spellEffect.ThreatMultiplier = 0
+				spellEffect.FlatThreatBonus = 0
 			}
 		}
 	}
