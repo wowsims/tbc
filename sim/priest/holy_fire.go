@@ -52,6 +52,7 @@ func (priest *Priest) registerHolyFireSpell() {
 		NumberOfTicks: 5,
 		TickLength:    time.Second * 2,
 		TickEffects: core.TickFuncSnapshot(target, core.SpellEffect{
+			ProcMask:         core.ProcMaskPeriodicDamage,
 			DamageMultiplier: 1 + 0.05*float64(priest.Talents.SearingLight),
 			ThreatMultiplier: 1 - 0.04*float64(priest.Talents.SilentResolve),
 
