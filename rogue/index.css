@@ -505,6 +505,7 @@ input, select {
 .sim-sidebar-title, .sim-toolbar {
   min-height: 60px;
   border-bottom: 1px solid white;
+  display: flex;
 }
 
 .sim-title-root {
@@ -569,6 +570,7 @@ input, select {
 
 .sim-sidebar-actions, .sim-sidebar-footer {
   margin: 0 !important;
+  display: flex;
 }
 
 .iterations-label {
