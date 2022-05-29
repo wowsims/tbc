@@ -44,7 +44,7 @@ func (warrior *Warrior) registerMortalStrikeSpell(cdTimer *core.Timer) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 210, 1, true),
-			OutcomeApplier: warrior.OutcomeFuncMeleeSpecialHitAndCrit(warrior.critMultiplier(true)),
+			OutcomeApplier: warrior.OutcomeFuncMeleeWeaponSpecialHitAndCrit(warrior.critMultiplier(true)),
 
 			OnInit: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if warrior.StanceMatches(DefensiveStance) {
