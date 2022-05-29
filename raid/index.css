@@ -3261,6 +3261,31 @@ input, select {
   grid-template-columns: repeat(3, 1fr);
 }
 
+.protection-warrior-sim-ui {
+  --theme-color-primary: #745221;
+  --theme-color-background: #1c1408;
+  --theme-color-background-raw: 28, 20, 8;
+  --theme-background-image: url("/tbc/assets/protection_warrior_background.jpg");
+  --theme-background-opacity: 0.95;
+  --main-text-color: White;
+}
+
+.protection-warrior-sim-ui .self-buffs-section {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.protection-warrior-sim-ui .buffs-section {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.protection-warrior-sim-ui .debuffs-section {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.protection-warrior-sim-ui .character-stats-table-row {
+  font-size: 11px;
+}
+
 .retribution-paladin-sim-ui {
   --theme-color-primary: #cc48a4;
   --theme-color-background: rgb(20, 13, 18);

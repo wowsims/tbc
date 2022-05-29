@@ -13,5 +13,6 @@ export const launchedSpecs = [
     Spec.SpecElementalShaman,
     Spec.SpecEnhancementShaman,
     Spec.SpecWarrior,
+    Spec.SpecProtectionWarrior,
     Spec.SpecWarlock
 ];

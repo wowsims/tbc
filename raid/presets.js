@@ -17,6 +17,7 @@ import * as RoguePresets from '/tbc/rogue/presets.js';
 import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
 import * as SmitePriestPresets from '/tbc/smite_priest/presets.js';
 import * as WarriorPresets from '/tbc/warrior/presets.js';
+import * as ProtectionWarriorPresets from '/tbc/protection_warrior/presets.js';
 import * as RetributionPaladinPresets from '/tbc/retribution_paladin/presets.js';
 import * as WarlockPresets from '/tbc/warlock/presets.js';
 import { BalanceDruidSimUI } from '/tbc/balance_druid/sim.js';
@@ -28,6 +29,7 @@ import { RogueSimUI } from '/tbc/rogue/sim.js';
 import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
 import { SmitePriestSimUI } from '/tbc/smite_priest/sim.js';
 import { WarriorSimUI } from '/tbc/warrior/sim.js';
+import { ProtectionWarriorSimUI } from '/tbc/protection_warrior/sim.js';
 import { WarlockSimUI } from '/tbc/warlock/sim.js';
 import { RetributionPaladinSimUI } from '/tbc/retribution_paladin/sim.js';
 export const specSimFactories = {
@@ -40,6 +42,7 @@ export const specSimFactories = {
     [Spec.SpecShadowPriest]: (parentElem, player) => new ShadowPriestSimUI(parentElem, player),
     [Spec.SpecSmitePriest]: (parentElem, player) => new SmitePriestSimUI(parentElem, player),
     [Spec.SpecWarrior]: (parentElem, player) => new WarriorSimUI(parentElem, player),
+    [Spec.SpecProtectionWarrior]: (parentElem, player) => new ProtectionWarriorSimUI(parentElem, player),
     [Spec.SpecWarlock]: (parentElem, player) => new WarlockSimUI(parentElem, player),
     [Spec.SpecRetributionPaladin]: (parentElem, player) => new RetributionPaladinSimUI(parentElem, player),
 };
@@ -493,6 +496,38 @@ export const playerPresets = [
         iconUrl: talentTreeIcons[Class.ClassWarrior][1],
     },
     {
+        spec: Spec.SpecProtectionWarrior,
+        rotation: ProtectionWarriorPresets.DefaultRotation,
+        talents: ProtectionWarriorPresets.ImpaleProtTalents.data,
+        specOptions: ProtectionWarriorPresets.DefaultOptions,
+        consumes: ProtectionWarriorPresets.DefaultConsumes,
+        defaultName: 'Prot Warrior',
+        defaultFactionRaces: {
+            [Faction.Unknown]: Race.RaceUnknown,
+            [Faction.Alliance]: Race.RaceHuman,
+            [Faction.Horde]: Race.RaceOrc,
+        },
+        defaultGear: {
+            [Faction.Unknown]: {},
+            [Faction.Alliance]: {
+                1: ProtectionWarriorPresets.P1_BALANCED_PRESET.gear,
+                2: ProtectionWarriorPresets.P2_BALANCED_PRESET.gear,
+                3: ProtectionWarriorPresets.P3_BALANCED_PRESET.gear,
+                4: ProtectionWarriorPresets.P4_BALANCED_PRESET.gear,
+                5: ProtectionWarriorPresets.P5_BALANCED_PRESET.gear,
+            },
+            [Faction.Horde]: {
+                1: ProtectionWarriorPresets.P1_BALANCED_PRESET.gear,
+                2: ProtectionWarriorPresets.P2_BALANCED_PRESET.gear,
+                3: ProtectionWarriorPresets.P3_BALANCED_PRESET.gear,
+                4: ProtectionWarriorPresets.P4_BALANCED_PRESET.gear,
+                5: ProtectionWarriorPresets.P5_BALANCED_PRESET.gear,
+            },
+        },
+        tooltip: 'Protection Warrior',
+        iconUrl: talentTreeIcons[Class.ClassWarrior][2],
+    },
+    {
         spec: Spec.SpecRetributionPaladin,
         rotation: RetributionPaladinPresets.DefaultRotation,
         talents: RetributionPaladinPresets.RetKingsPaladinTalents.data,
@@ -859,6 +894,7 @@ export const buffBotPresets = [
     {
         // The value of this field must never change, to preserve local storage data.
         buffBotId: 'Prot Warrior',
+        deprecated: true,
         spec: Spec.SpecWarrior,
         name: 'Prot Warrior',
         tooltip: 'Prot Warrior: Adds Sunder Armor.',
