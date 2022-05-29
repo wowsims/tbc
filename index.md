@@ -12,4 +12,5 @@ Live sims:
  - [Enhancement Shaman](https://wowsims.github.io/tbc/enhancement_shaman/ "https://wowsims.github.io/tbc/enhancement_shaman/")
  - [Warlock](https://wowsims.github.io/tbc/warlock/ "https://wowsims.github.io/tbc/warlock/")
  - [Warrior](https://wowsims.github.io/tbc/warrior/ "https://wowsims.github.io/tbc/warrior/")
+ - [Protection Warrior](https://wowsims.github.io/tbc/protection_warrior/ "https://wowsims.github.io/tbc/protection_warrior/")
  - [Raid Sim](https://wowsims.github.io/tbc/raid/ "https://wowsims.github.io/tbc/raid/")
