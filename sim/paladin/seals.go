@@ -59,6 +59,7 @@ func (paladin *Paladin) setupSealOfBlood() {
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfBlood = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 31892},
+		SpellSchool: core.SpellSchoolHoly,
 		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
@@ -71,7 +72,8 @@ func (paladin *Paladin) setupSealOfBlood() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			spell.ApplyAOEThreat(64)
 			paladin.UpdateSeal(sim, paladin.SealOfBloodAura)
 		},
 	})
@@ -133,6 +135,7 @@ func (paladin *Paladin) SetupSealOfCommand() {
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfCommand = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 20375},
+		SpellSchool: core.SpellSchoolHoly,
 		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
@@ -145,7 +148,8 @@ func (paladin *Paladin) SetupSealOfCommand() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			spell.ApplyAOEThreat(70)
 			paladin.UpdateSeal(sim, paladin.SealOfCommandAura)
 		},
 	})
@@ -184,6 +188,7 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfTheCrusader = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolHoly,
 		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
@@ -196,7 +201,8 @@ func (paladin *Paladin) setupSealOfTheCrusader() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			spell.ApplyAOEThreat(61)
 			paladin.UpdateSeal(sim, paladin.SealOfTheCrusaderAura)
 		},
 	})
@@ -218,6 +224,7 @@ func (paladin *Paladin) setupSealOfWisdom() {
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfWisdom = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolHoly,
 		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
@@ -230,7 +237,8 @@ func (paladin *Paladin) setupSealOfWisdom() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			spell.ApplyAOEThreat(68)
 			paladin.UpdateSeal(sim, paladin.SealOfWisdomAura)
 		},
 	})
@@ -249,6 +257,7 @@ func (paladin *Paladin) setupSealOfLight() {
 	cost := baseCost - paladin.sealCostReduction()
 	paladin.SealOfLight = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
+		SpellSchool: core.SpellSchoolHoly,
 		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
@@ -261,7 +270,8 @@ func (paladin *Paladin) setupSealOfLight() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			spell.ApplyAOEThreat(69)
 			paladin.UpdateSeal(sim, paladin.SealOfLightAura)
 		},
 	})
@@ -340,7 +350,8 @@ func (paladin *Paladin) setupSealOfRighteousness() {
 			},
 		},
 
-		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, _ *core.Spell) {
+		ApplyEffects: func(sim *core.Simulation, _ *core.Unit, spell *core.Spell) {
+			spell.ApplyAOEThreat(66)
 			paladin.UpdateSeal(sim, paladin.SealOfRighteousnessAura)
 		},
 	})
