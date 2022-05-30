@@ -161,6 +161,6 @@ func (rb *rageBar) doneIteration() {
 		}
 
 		rageGainSpell.SpellMetrics[0].Casts += resourceMetrics.EventsForCurrentIteration()
-		rageGainSpell.ApplyAOEThreat(resourceMetrics.ActualGainForCurrentIteration() * ThreatPerRageGained)
+		rageGainSpell.ApplyAOEThreatIgnoreMultipliers(resourceMetrics.ActualGainForCurrentIteration() * ThreatPerRageGained)
 	}
 }
