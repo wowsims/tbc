@@ -244,8 +244,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-AllItems-DarkmoonCard:Vengeance-31858"
  value: {
-  dps: 926.491032577478
-  tps: 1306.2190866616847
+  dps: 929.9793549754656
+  tps: 1310.947301081491
  }
 }
 dps_results: {

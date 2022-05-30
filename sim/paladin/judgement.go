@@ -243,7 +243,7 @@ func (paladin *Paladin) registerJudgementOfRighteousnessSpell(cdTimer *core.Time
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigMagic(225, 246, 0.728),
-			OutcomeApplier: paladin.OutcomeFuncMagicCrit(paladin.SpellCritMultiplier()),
+			OutcomeApplier: paladin.OutcomeFuncMagicHitAndCritBinary(paladin.SpellCritMultiplier()),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				paladin.sanctifiedJudgement(sim, paladin.SealOfRighteousness.DefaultCast.Cost)

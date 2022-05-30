@@ -272,8 +272,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-DarkmoonCard:Vengeance-31858"
  value: {
-  dps: 1923.235311220869
-  tps: 1422.8636910135892
+  dps: 1923.5763594113323
+  tps: 1423.2047392040529
  }
 }
 dps_results: {
