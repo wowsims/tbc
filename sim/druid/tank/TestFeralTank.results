@@ -818,17 +818,17 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-Average-Default"
  value: {
-  dps: 959.3399036489926
-  tps: 1403.0059785508085
-  dtps: 570.0219702886191
+  dps: 958.7621253849078
+  tps: 1402.5996528367805
+  dtps: 569.9906738321988
  }
 }
 dps_results: {
  key: "TestFeralTank-SelfDrums-DPS"
  value: {
-  dps: 959.0947638945538
-  tps: 1406.4525710355915
-  dtps: 565.2871789716877
+  dps: 960.3554972725972
+  tps: 1406.5467405947784
+  dtps: 564.4926639825379
  }
 }
 dps_results: {
@@ -876,8 +876,8 @@ dps_results: {
 dps_results: {
  key: "TestFeralTank-SwitchInFrontOfTarget-Default"
  value: {
-  dps: 1118.7923568019226
-  tps: 1635.4888891115395
-  dtps: 528.2172815919419
+  dps: 1122.4243176482853
+  tps: 1640.571034721124
+  dtps: 528.1821613586346
  }
 }

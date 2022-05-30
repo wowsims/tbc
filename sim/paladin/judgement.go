@@ -151,7 +151,7 @@ func (paladin *Paladin) registerJudgementOfWisdomSpell(cdTimer *core.Timer) {
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:       core.ProcMaskEmpty,
-			OutcomeApplier: paladin.OutcomeFuncMagicHit(),
+			OutcomeApplier: paladin.OutcomeFuncAlwaysHit(),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
@@ -197,7 +197,7 @@ func (paladin *Paladin) registerJudgementOfLightSpell(cdTimer *core.Timer) {
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:       core.ProcMaskEmpty,
-			OutcomeApplier: paladin.OutcomeFuncMagicHit(),
+			OutcomeApplier: paladin.OutcomeFuncAlwaysHit(),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				if !spellEffect.Landed() {
@@ -219,7 +219,7 @@ func (paladin *Paladin) registerJudgementOfRighteousnessSpell(cdTimer *core.Time
 	paladin.JudgementOfRighteousness = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    core.ActionID{SpellID: 27157},
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: SpellFlagJudgement,
+		SpellExtras: SpellFlagJudgement | core.SpellExtrasBinary,
 
 		ResourceType: stats.Mana,
 		BaseCost:     JudgementManaCost,
@@ -243,7 +243,7 @@ func (paladin *Paladin) registerJudgementOfRighteousnessSpell(cdTimer *core.Time
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigMagic(225, 246, 0.728),
-			OutcomeApplier: paladin.OutcomeFuncMeleeSpecialCritOnly(paladin.MeleeCritMultiplier()),
+			OutcomeApplier: paladin.OutcomeFuncMagicCrit(paladin.SpellCritMultiplier()),
 
 			OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 				paladin.sanctifiedJudgement(sim, paladin.SealOfRighteousness.DefaultCast.Cost)

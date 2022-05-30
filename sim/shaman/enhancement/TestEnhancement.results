@@ -370,8 +370,8 @@ dps_results: {
 dps_results: {
  key: "TestEnhancement-AllItems-EyeofMagtheridon-28789"
  value: {
-  dps: 1935.390049311693
-  tps: 1430.1606479174197
+  dps: 1926.0880193309347
+  tps: 1422.8676575615814
  }
 }
 dps_results: {

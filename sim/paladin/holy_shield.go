@@ -17,13 +17,15 @@ func (paladin *Paladin) registerHolyShieldSpell() {
 	procSpell := paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID.WithTag(1),
 		SpellSchool: core.SpellSchoolHoly,
+		SpellExtras: core.SpellExtrasBinary,
+
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask:         core.ProcMaskEmpty,
 			DamageMultiplier: 1 + 0.1*float64(paladin.Talents.ImprovedHolyShield),
 			ThreatMultiplier: 1.35,
 
 			BaseDamage:     core.BaseDamageConfigMagicNoRoll(damage, 0.05),
-			OutcomeApplier: paladin.OutcomeFuncAlwaysHit(),
+			OutcomeApplier: paladin.OutcomeFuncMagicHitBinary(),
 		}),
 	})
 
