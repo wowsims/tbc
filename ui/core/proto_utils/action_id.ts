@@ -46,6 +46,14 @@ export class ActionId {
 				baseName = 'Focus Tick';
 				iconUrl = resourceTypeToIcon[ResourceType.ResourceTypeFocus];
 				break;
+			case OtherAction.OtherActionManaGain:
+				baseName = 'Mana Gain';
+				iconUrl = resourceTypeToIcon[ResourceType.ResourceTypeMana];
+				break;
+			case OtherAction.OtherActionRageGain:
+				baseName = 'Rage Gain';
+				iconUrl = resourceTypeToIcon[ResourceType.ResourceTypeRage];
+				break;
 			case OtherAction.OtherActionAttack:
 				name = 'Attack';
 				iconUrl = 'https://wow.zamimg.com/images/wow/icons/large/inv_sword_04.jpg';

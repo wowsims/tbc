@@ -146,6 +146,9 @@ type ResourceMetrics struct {
 	Events     int32
 	Gain       float64
 	ActualGain float64
+
+	EventsFromPreviousIterations     int32
+	ActualGainFromPreviousIterations float64
 }
 
 func (resourceMetrics *ResourceMetrics) ToProto(actionID ActionID, resourceType proto.ResourceType) *proto.ResourceMetrics {
@@ -157,6 +160,17 @@ func (resourceMetrics *ResourceMetrics) ToProto(actionID ActionID, resourceType 
 		Gain:       resourceMetrics.Gain,
 		ActualGain: resourceMetrics.ActualGain,
 	}
+}
+
+func (resourceMetrics *ResourceMetrics) reset() {
+	resourceMetrics.EventsFromPreviousIterations = resourceMetrics.Events
+	resourceMetrics.ActualGainFromPreviousIterations = resourceMetrics.ActualGain
+}
+func (resourceMetrics *ResourceMetrics) EventsForCurrentIteration() int32 {
+	return resourceMetrics.Events - resourceMetrics.EventsFromPreviousIterations
+}
+func (resourceMetrics *ResourceMetrics) ActualGainForCurrentIteration() float64 {
+	return resourceMetrics.ActualGain - resourceMetrics.ActualGainFromPreviousIterations
 }
 
 func (unitMetrics *UnitMetrics) AddResourceEvent(actionID ActionID, resourceType proto.ResourceType, gain float64, actualGain float64) {
@@ -227,6 +241,10 @@ func (unitMetrics *UnitMetrics) reset() {
 	unitMetrics.threat.reset()
 	unitMetrics.dtps.reset()
 	unitMetrics.CharacterIterationMetrics = CharacterIterationMetrics{}
+
+	for _, resourceMetrics := range unitMetrics.resources {
+		resourceMetrics.reset()
+	}
 }
 
 // This should be called when a Sim iteration is complete.

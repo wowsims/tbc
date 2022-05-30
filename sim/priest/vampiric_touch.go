@@ -63,3 +63,28 @@ func (priest *Priest) registerVampiricTouchSpell() {
 		}),
 	})
 }
+
+func (priest *Priest) ApplyVampiricTouchManaReturn(sim *core.Simulation, damage float64) {
+	if damage <= 0 || !priest.VampiricTouchDot.IsActive() {
+		return
+	}
+
+	amount := damage * 0.05
+	totalActualGain := 0.0
+	for _, partyMember := range priest.Party.Players {
+		character := partyMember.GetCharacter()
+		if character.HasManaBar() {
+			totalActualGain += core.MinFloat(amount, character.MaxMana()-character.CurrentMana())
+			character.AddMana(sim, amount, priest.VampiricTouch.ActionID, false)
+		}
+	}
+	for _, petAgent := range priest.Party.Pets {
+		pet := petAgent.GetPet()
+		if pet.IsEnabled() && pet.Character.HasManaBar() {
+			totalActualGain += core.MinFloat(amount, pet.Character.MaxMana()-pet.Character.CurrentMana())
+			pet.Character.AddMana(sim, amount, priest.VampiricTouch.ActionID, false)
+		}
+	}
+
+	priest.VampiricTouch.ApplyAOEThreat(totalActualGain * core.ThreatPerManaGained)
+}
