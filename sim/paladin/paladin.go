@@ -82,6 +82,9 @@ func (paladin *Paladin) AddPartyBuffs(partyBuffs *proto.PartyBuffs) {
 }
 
 func (paladin *Paladin) Initialize() {
+	// Update auto crit multipliers now that we have the targets.
+	paladin.AutoAttacks.MHEffect.OutcomeApplier = paladin.OutcomeFuncMeleeWhite(paladin.MeleeCritMultiplier())
+
 	paladin.setupSealOfBlood()
 	paladin.setupSealOfTheCrusader()
 	paladin.setupSealOfWisdom()
