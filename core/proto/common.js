@@ -1022,6 +1022,10 @@ export var BattleElixir;
      * @generated from protobuf enum value: FelStrengthElixir = 9;
      */
     BattleElixir[BattleElixir["FelStrengthElixir"] = 9] = "FelStrengthElixir";
+    /**
+     * @generated from protobuf enum value: GreaterArcaneElixir = 11;
+     */
+    BattleElixir[BattleElixir["GreaterArcaneElixir"] = 11] = "GreaterArcaneElixir";
 })(BattleElixir || (BattleElixir = {}));
 /**
  * @generated from protobuf enum proto.GuardianElixir
