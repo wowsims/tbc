@@ -403,7 +403,7 @@ func ApplyDarkmoonCardVengeance(agent core.Agent) {
 			ThreatMultiplier: 1,
 
 			BaseDamage:     core.BaseDamageConfigRoll(95, 115),
-			OutcomeApplier: character.OutcomeFuncAlwaysHit(),
+			OutcomeApplier: character.OutcomeFuncCritFixedChance(0.03, character.DefaultMeleeCritMultiplier()),
 		}),
 	})
 

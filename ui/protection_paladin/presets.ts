@@ -26,14 +26,19 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 
 // Default talents. Uses the wowhead calculator format, make the talents on
 // https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
+export const AvengersShieldTalents = {
+	name: 'Avenger\'s Shield',
+	data: '-0530513050000142521051-052050003003',
+};
+
+export const ArdentDefenderTalents = {
+	name: 'Ardent Defender',
+	data: '-0530503150000152521551-05205',
+};
+
 export const SanctityTalents = {
 	name: 'Sanctity',
 	data: '-053050305000013252105-05205011300301',
-};
-
-export const AvengersShieldTalents = {
-	name: 'Sanctity',
-	data: '-0530513050000142521051-052050003003',
 };
 
 export const DefaultRotation = ProtectionPaladinRotation.create({

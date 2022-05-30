@@ -26,11 +26,12 @@ import * as EnhancementShamanPresets from '/tbc/enhancement_shaman/presets.js';
 import * as HunterPresets from '/tbc/hunter/presets.js';
 import * as MagePresets from '/tbc/mage/presets.js';
 import * as RoguePresets from '/tbc/rogue/presets.js';
+import * as RetributionPaladinPresets from '/tbc/retribution_paladin/presets.js';
+import * as ProtectionPaladinPresets from '/tbc/protection_paladin/presets.js';
 import * as ShadowPriestPresets from '/tbc/shadow_priest/presets.js';
 import * as SmitePriestPresets from '/tbc/smite_priest/presets.js';
 import * as WarriorPresets from '/tbc/warrior/presets.js';
 import * as ProtectionWarriorPresets from '/tbc/protection_warrior/presets.js';
-import * as RetributionPaladinPresets from '/tbc/retribution_paladin/presets.js';
 import * as WarlockPresets from '/tbc/warlock/presets.js';
 
 
@@ -40,12 +41,13 @@ import { ElementalShamanSimUI } from '/tbc/elemental_shaman/sim.js';
 import { HunterSimUI } from '/tbc/hunter/sim.js';
 import { MageSimUI } from '/tbc/mage/sim.js';
 import { RogueSimUI } from '/tbc/rogue/sim.js';
+import { RetributionPaladinSimUI } from '/tbc/retribution_paladin/sim.js';
+import { ProtectionPaladinSimUI } from '/tbc/protection_paladin/sim.js';
 import { ShadowPriestSimUI } from '/tbc/shadow_priest/sim.js';
 import { SmitePriestSimUI } from '/tbc/smite_priest/sim.js';
 import { WarriorSimUI } from '/tbc/warrior/sim.js';
 import { ProtectionWarriorSimUI } from '/tbc/protection_warrior/sim.js';
 import { WarlockSimUI } from '/tbc/warlock/sim.js';
-import { RetributionPaladinSimUI } from '/tbc/retribution_paladin/sim.js';
 
 export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, player: Player<any>) => IndividualSimUI<any>>> = {
 	[Spec.SpecBalanceDruid]: (parentElem: HTMLElement, player: Player<any>) => new BalanceDruidSimUI(parentElem, player),
@@ -54,12 +56,13 @@ export const specSimFactories: Partial<Record<Spec, (parentElem: HTMLElement, pl
 	[Spec.SpecHunter]: (parentElem: HTMLElement, player: Player<any>) => new HunterSimUI(parentElem, player),
 	[Spec.SpecMage]: (parentElem: HTMLElement, player: Player<any>) => new MageSimUI(parentElem, player),
 	[Spec.SpecRogue]: (parentElem: HTMLElement, player: Player<any>) => new RogueSimUI(parentElem, player),
+	[Spec.SpecRetributionPaladin]: (parentElem: HTMLElement, player: Player<any>) => new RetributionPaladinSimUI(parentElem, player),
+	[Spec.SpecProtectionPaladin]: (parentElem: HTMLElement, player: Player<any>) => new ProtectionPaladinSimUI(parentElem, player),
 	[Spec.SpecShadowPriest]: (parentElem: HTMLElement, player: Player<any>) => new ShadowPriestSimUI(parentElem, player),
 	[Spec.SpecSmitePriest]: (parentElem: HTMLElement, player: Player<any>) => new SmitePriestSimUI(parentElem, player),
 	[Spec.SpecWarrior]: (parentElem: HTMLElement, player: Player<any>) => new WarriorSimUI(parentElem, player),
 	[Spec.SpecProtectionWarrior]: (parentElem: HTMLElement, player: Player<any>) => new ProtectionWarriorSimUI(parentElem, player),
 	[Spec.SpecWarlock]: (parentElem: HTMLElement, player: Player<any>) => new WarlockSimUI(parentElem, player),
-	[Spec.SpecRetributionPaladin]: (parentElem: HTMLElement, player: Player<any>) => new RetributionPaladinSimUI(parentElem, player),
 };
 
 // Configuration necessary for creating new players.
@@ -611,6 +614,38 @@ export const playerPresets: Array<PresetSpecSettings<any>> = [
 		iconUrl: talentTreeIcons[Class.ClassPaladin][2],
 	},
 	{
+		spec: Spec.SpecProtectionPaladin,
+		rotation: ProtectionPaladinPresets.DefaultRotation,
+		talents: ProtectionPaladinPresets.SanctityTalents.data,
+		specOptions: ProtectionPaladinPresets.DefaultOptions,
+		consumes: ProtectionPaladinPresets.DefaultConsumes,
+		defaultName: 'Prot Paladin',
+		defaultFactionRaces: {
+			[Faction.Unknown]: Race.RaceUnknown,
+			[Faction.Alliance]: Race.RaceHuman,
+			[Faction.Horde]: Race.RaceBloodElf,
+		},
+		defaultGear: {
+			[Faction.Unknown]: {},
+			[Faction.Alliance]: {
+				1: ProtectionPaladinPresets.P1_PRESET.gear,
+				2: ProtectionPaladinPresets.P2_PRESET.gear,
+				3: ProtectionPaladinPresets.P3_PRESET.gear,
+				4: ProtectionPaladinPresets.P4_PRESET.gear,
+				5: ProtectionPaladinPresets.P5_PRESET.gear,
+			},
+			[Faction.Horde]: {
+				1: ProtectionPaladinPresets.P1_PRESET.gear,
+				2: ProtectionPaladinPresets.P2_PRESET.gear,
+				3: ProtectionPaladinPresets.P3_PRESET.gear,
+				4: ProtectionPaladinPresets.P4_PRESET.gear,
+				5: ProtectionPaladinPresets.P5_PRESET.gear,
+			},
+		},
+		tooltip: 'Protection Paladin',
+		iconUrl: talentTreeIcons[Class.ClassPaladin][1],
+	},
+	{
 		spec: Spec.SpecWarlock,
 		rotation: WarlockPresets.DefaultRotation,
 		talents: WarlockPresets.DestructionTalents.data,
@@ -819,6 +854,7 @@ export const buffBotPresets: Array<BuffBotSettings> = [
 		// The value of this field must never change, to preserve local storage data.
 		buffBotId: 'JoC Paladin',
 		spec: Spec.SpecRetributionPaladin,
+		deprecated: true,
 		name: 'JoC Paladin',
 		tooltip: 'JoC Paladin: Adds a set of blessings and Improved Judgement of the Crusader (+3% crit).',
 		iconUrl: 'https://wow.zamimg.com/images/wow/icons/large/spell_holy_holysmite.jpg',
