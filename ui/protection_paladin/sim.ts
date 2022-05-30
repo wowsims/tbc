@@ -236,9 +236,9 @@ export class ProtectionPaladinSimUI extends IndividualSimUI<Spec.SpecProtectionP
 					Flask.FlaskOfRelentlessAssault,
 				],
 				battleElixirs: [
+					BattleElixir.GreaterArcaneElixir,
 					BattleElixir.ElixirOfMastery,
 					BattleElixir.ElixirOfDemonslaying,
-					BattleElixir.ElixirOfMajorStrength,
 					BattleElixir.ElixirOfMajorAgility,
 					BattleElixir.ElixirOfTheMongoose,
 				],

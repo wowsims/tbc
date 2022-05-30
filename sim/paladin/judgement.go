@@ -237,7 +237,7 @@ func (paladin *Paladin) registerJudgementOfRighteousnessSpell(cdTimer *core.Time
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskMeleeOrRangedSpecial,
 
-			BonusSpellPower:  core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 33504, 94, 0),
+			BonusSpellPower:  core.TernaryFloat64(paladin.Equip[proto.ItemSlot_ItemSlotRanged].ID == 33504, 94.0, 0),
 			BonusCritRating:  3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism),
 			DamageMultiplier: 1 + 0.03*float64(paladin.Talents.ImprovedSealOfRighteousness),
 			ThreatMultiplier: 1,

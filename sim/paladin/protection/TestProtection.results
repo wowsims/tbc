@@ -909,16 +909,16 @@ dps_results: {
 dps_results: {
  key: "TestProtection-Average-Default"
  value: {
-  dps: 597.281834482324
-  tps: 1102.8716499031814
+  dps: 604.0094914903079
+  tps: 1115.9055597348447
   dtps: 520.4946497996624
  }
 }
 dps_results: {
  key: "TestProtection-SelfDrums-DPS"
  value: {
-  dps: 596.9264607379836
-  tps: 1101.081473203768
+  dps: 603.9364036390662
+  tps: 1114.614261395552
   dtps: 522.7602586409668
  }
 }
@@ -1009,8 +1009,8 @@ dps_results: {
 dps_results: {
  key: "TestProtection-SwitchInFrontOfTarget-Default"
  value: {
-  dps: 620.0416296345225
-  tps: 1127.717660499044
+  dps: 626.7582058672832
+  tps: 1140.9362690539183
   dtps: 501.51711485178805
  }
 }
