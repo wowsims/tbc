@@ -277,32 +277,30 @@ func (shaman *Shaman) applyUnleashedRage() {
 
 	bonusCoeff := 0.02 * float64(level)
 	var currentAPBonuses []float64
-	var urAuras []*core.Aura
+	var urAuras = make([]*core.Aura, len(shaman.Party.PlayersAndPets))
+
+	for i, playerOrPet := range shaman.Party.PlayersAndPets {
+		char := playerOrPet.GetCharacter()
+		idx := i
+		urAuras[i] = char.GetOrRegisterAura(core.Aura{
+			Label:    "Unleahed Rage Proc",
+			ActionID: core.ActionID{SpellID: 30811},
+			Duration: time.Second * 10,
+			OnGain: func(aura *core.Aura, sim *core.Simulation) {
+				buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: currentAPBonuses[idx]})
+				char.AddStatsDynamic(sim, buffs)
+			},
+			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+				buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: currentAPBonuses[idx]})
+				unbuffs := buffs.Multiply(-1)
+				char.AddStatsDynamic(sim, unbuffs)
+			},
+		})
+	}
 
 	shaman.RegisterAura(core.Aura{
 		Label:    "Unleashed Rage",
 		Duration: core.NeverExpires,
-		OnInit: func(aura *core.Aura, sim *core.Simulation) {
-			urAuras = make([]*core.Aura, len(shaman.Party.PlayersAndPets))
-			for i, playerOrPet := range shaman.Party.PlayersAndPets {
-				char := playerOrPet.GetCharacter()
-				idx := i
-				urAuras[i] = char.GetOrRegisterAura(core.Aura{
-					Label:    "Unleahed Rage Proc",
-					ActionID: core.ActionID{SpellID: 30811},
-					Duration: time.Second * 10,
-					OnGain: func(aura *core.Aura, sim *core.Simulation) {
-						buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: currentAPBonuses[idx]})
-						char.AddStatsDynamic(sim, buffs)
-					},
-					OnExpire: func(aura *core.Aura, sim *core.Simulation) {
-						buffs := char.ApplyStatDependencies(stats.Stats{stats.AttackPower: currentAPBonuses[idx]})
-						unbuffs := buffs.Multiply(-1)
-						char.AddStatsDynamic(sim, unbuffs)
-					},
-				})
-			}
-		},
 		OnReset: func(aura *core.Aura, sim *core.Simulation) {
 			currentAPBonuses = make([]float64, len(shaman.Party.PlayersAndPets))
 			aura.Activate(sim)
