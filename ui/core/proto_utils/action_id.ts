@@ -170,6 +170,11 @@ export class ActionId {
 			case 'Lightning Bolt':
 				if (this.tag) name += ' (LO)';
 				break;
+			case 'Holy Shield':
+				if (this.tag == 1) {
+					name += ' (Proc)';
+				}
+				break;
 			// For targetted buffs, tag is the source player's raid index or -1 if none.
 			case 'Bloodlust':
 			case 'Ferocious Inspiration':

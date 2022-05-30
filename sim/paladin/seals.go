@@ -293,7 +293,6 @@ func (paladin *Paladin) setupSealOfRighteousness() {
 	sorProc := paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    procActionID,
 		SpellSchool: core.SpellSchoolHoly,
-		SpellExtras: core.SpellExtrasMeleeMetrics,
 
 		ApplyEffects: core.ApplyEffectFuncDirectDamage(core.SpellEffect{
 			ProcMask: core.ProcMaskEmpty,

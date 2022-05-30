@@ -97,6 +97,10 @@ func applyConsumeEffects(agent Agent, raidBuffs proto.RaidBuffs, partyBuffs prot
 				stats.RangedAttackPower: 90,
 				stats.Stamina:           -10,
 			})
+		case proto.BattleElixir_GreaterArcaneElixir:
+			character.AddStats(stats.Stats{
+				stats.SpellPower: 35,
+			})
 		}
 
 		switch consumes.GuardianElixir {
