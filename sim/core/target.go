@@ -206,6 +206,7 @@ type AttackTable struct {
 	PartialResistShadowRollThreshold50 float64
 
 	BinaryArcaneHitChance float64
+	BinaryHolyHitChance   float64
 	BinaryFireHitChance   float64
 	BinaryFrostHitChance  float64
 	BinaryNatureHitChance float64

@@ -321,8 +321,8 @@ dps_results: {
 dps_results: {
  key: "TestFrost-AllItems-EyeofMagtheridon-28789"
  value: {
-  dps: 1615.3208454659436
-  tps: 1318.9243350689026
+  dps: 1611.0765225214234
+  tps: 1315.416117479078
  }
 }
 dps_results: {

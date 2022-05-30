@@ -323,13 +323,15 @@ func RetributionAura(character *Character, points int32) *Aura {
 	procSpell := character.RegisterSpell(SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: SpellSchoolHoly,
+		SpellExtras: SpellExtrasBinary,
+
 		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 			ProcMask:         ProcMaskEmpty,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
 			BaseDamage:     BaseDamageConfigFlat(26 * (1 + 0.25*float64(points))),
-			OutcomeApplier: character.OutcomeFuncAlwaysHit(),
+			OutcomeApplier: character.OutcomeFuncMagicHitBinary(),
 		}),
 	})
 
@@ -354,13 +356,15 @@ func ThornsAura(character *Character, points int32) *Aura {
 	procSpell := character.RegisterSpell(SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: SpellSchoolNature,
+		SpellExtras: SpellExtrasBinary,
+
 		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 			ProcMask:         ProcMaskEmpty,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
 			BaseDamage:     BaseDamageConfigFlat(25 * (1 + 0.25*float64(points))),
-			OutcomeApplier: character.OutcomeFuncAlwaysHit(),
+			OutcomeApplier: character.OutcomeFuncMagicHitBinary(),
 		}),
 	})
 
@@ -385,13 +389,15 @@ func BlessingOfSanctuaryAura(character *Character) *Aura {
 	procSpell := character.RegisterSpell(SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: SpellSchoolHoly,
+		SpellExtras: SpellExtrasBinary,
+
 		ApplyEffects: ApplyEffectFuncDirectDamage(SpellEffect{
 			ProcMask:         ProcMaskEmpty,
 			DamageMultiplier: 1,
 			ThreatMultiplier: 1,
 
 			BaseDamage:     BaseDamageConfigFlat(46),
-			OutcomeApplier: character.OutcomeFuncAlwaysHit(),
+			OutcomeApplier: character.OutcomeFuncMagicHitBinary(),
 		}),
 	})
 

@@ -321,8 +321,8 @@ dps_results: {
 dps_results: {
  key: "TestArcane-AllItems-EyeofMagtheridon-28789"
  value: {
-  dps: 1363.554376188852
-  tps: 1371.0695015064887
+  dps: 1363.3237629050925
+  tps: 1370.8565398253195
  }
 }
 dps_results: {
