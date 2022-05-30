@@ -17,6 +17,8 @@ type ItemDeclaration struct {
 type ItemData struct {
 	Declaration ItemDeclaration
 	Response    WowheadItemResponse
+
+	QualityModifier float64
 }
 
 type GemDeclaration struct {

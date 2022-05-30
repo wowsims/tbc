@@ -38,7 +38,11 @@ func (war *DpsWarrior) doRotation(sim *core.Simulation) {
 
 	if war.shouldSunder(sim) {
 		war.castSlamAt = 0
-		war.SunderArmor.Cast(sim, war.CurrentTarget)
+		if war.Talents.Devastate {
+			war.Devastate.Cast(sim, war.CurrentTarget)
+		} else {
+			war.SunderArmor.Cast(sim, war.CurrentTarget)
+		}
 		war.tryQueueHsCleave(sim)
 		return
 	}
@@ -101,6 +105,8 @@ func (war *DpsWarrior) normalRotation(sim *core.Simulation, highPrioSpellsOnly b
 			war.Bloodthirst.Cast(sim, war.CurrentTarget)
 		} else if war.CanMortalStrike(sim) {
 			war.MortalStrike.Cast(sim, war.CurrentTarget)
+		} else if war.CanShieldSlam(sim) {
+			war.ShieldSlam.Cast(sim, war.CurrentTarget)
 		} else if !war.Rotation.PrioritizeWw && war.CanWhirlwind(sim) {
 			war.Whirlwind.Cast(sim, war.CurrentTarget)
 		} else if !highPrioSpellsOnly {
