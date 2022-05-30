@@ -287,6 +287,7 @@ func (paladin *Paladin) setupSealOfRighteousness() {
 		baseCoeff = 1.2
 		spCoeff = 0.108
 	}
+	spCoeff *= paladin.AutoAttacks.MH.SwingSpeed
 	flatBonusDamage := baseCoeff * 28.72464 * paladin.AutoAttacks.MH.SwingSpeed
 	if mhWeapon != nil {
 		flatBonusDamage += -mhWeapon.QualityModifier * paladin.AutoAttacks.MH.SwingSpeed * 0.03
