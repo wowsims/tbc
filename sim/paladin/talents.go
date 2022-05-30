@@ -84,8 +84,7 @@ func (paladin *Paladin) ApplyTalents() {
 	paladin.applyRedoubt()
 	paladin.applyReckoning()
 	paladin.applyCrusade()
-	paladin.applyOneHandedWeaponSpecialization()
-	paladin.applyTwoHandedWeaponSpecialization()
+	paladin.applyWeaponSpecialization()
 	paladin.applyVengeance()
 }
 
@@ -195,34 +194,21 @@ func (paladin *Paladin) applyCrusade() {
 
 // Affects all physical damage or spells that can be rolled as physical
 // It affects white, Windfury, Crusader Strike, Seals, and Judgement of Command / Blood
-func (paladin *Paladin) applyTwoHandedWeaponSpecialization() {
-	if paladin.Talents.TwoHandedWeaponSpecialization == 0 {
-		return
-	}
-
+func (paladin *Paladin) applyWeaponSpecialization() {
 	// This impacts Crusader Strike, Melee Attacks, WF attacks
 	// Seals + Judgements need to be implemented separately
-	if paladin.GetMHWeapon().HandType == proto.HandType_HandTypeTwoHand {
-		paladin.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization)) // assume multiplicative scaling
-	}
+	paladin.PseudoStats.PhysicalDamageDealtMultiplier *= paladin.WeaponSpecializationMultiplier()
 }
-
-func (paladin *Paladin) applyTwoHandedWeaponSpecializationToSpell(spellEffect *core.SpellEffect) {
+func (paladin *Paladin) WeaponSpecializationMultiplier() float64 {
 	mhWeapon := paladin.GetMHWeapon()
-	if mhWeapon != nil && mhWeapon.HandType == proto.HandType_HandTypeTwoHand {
-		spellEffect.DamageMultiplier *= 1 + (0.02 * float64(paladin.Talents.TwoHandedWeaponSpecialization))
+	if mhWeapon == nil {
+		return 1
 	}
-}
-
-func (paladin *Paladin) applyOneHandedWeaponSpecialization() {
-	if paladin.Talents.OneHandedWeaponSpecialization == 0 {
-		return
+	if mhWeapon.HandType == proto.HandType_HandTypeTwoHand {
+		return 1 + 0.02*float64(paladin.Talents.TwoHandedWeaponSpecialization)
+	} else {
+		return 1 + 0.01*float64(paladin.Talents.OneHandedWeaponSpecialization)
 	}
-	if paladin.Equip[proto.ItemSlot_ItemSlotMainHand].HandType == proto.HandType_HandTypeTwoHand {
-		return
-	}
-
-	paladin.PseudoStats.PhysicalDamageDealtMultiplier *= 1 + 0.01*float64(paladin.Talents.OneHandedWeaponSpecialization)
 }
 
 // I don't know if the new stack of vengeance applies to the crit that triggered it or not

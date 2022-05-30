@@ -22,7 +22,7 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(cdTimer *core.Timer) {
 		ProcMask: core.ProcMaskMeleeOrRangedSpecial,
 
 		BonusCritRating:  3 * core.MeleeCritRatingPerCritChance * float64(paladin.Talents.Fanaticism),
-		DamageMultiplier: 1,
+		DamageMultiplier: paladin.WeaponSpecializationMultiplier(),
 		ThreatMultiplier: 1,
 
 		BaseDamage:     core.BaseDamageConfigMagic(295, 325, 0.429),
@@ -38,7 +38,6 @@ func (paladin *Paladin) registerJudgementOfBloodSpell(cdTimer *core.Timer) {
 			paladin.AddMana(sim, spellEffect.Damage*0.33*0.1, core.ActionID{SpellID: 33776}, false)
 		},
 	}
-	paladin.applyTwoHandedWeaponSpecializationToSpell(&effect)
 
 	baseCost := core.TernaryFloat64(ItemSetCrystalforgeBattlegear.CharacterHasSetBonus(&paladin.Character, 2), JudgementManaCost-35, JudgementManaCost)
 	paladin.JudgementOfBlood = paladin.RegisterSpell(core.SpellConfig{
