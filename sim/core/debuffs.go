@@ -160,12 +160,14 @@ func ShadowWeavingAura(target *Unit, startingStacks int32) *Aura {
 	})
 }
 
+var JudgementOfWisdomAuraLabel = "Judgement of Wisdom"
+
 func JudgementOfWisdomAura(target *Unit) *Aura {
 	const mana = 74 / 2 // 50% proc
 	actionID := ActionID{SpellID: 27164}
 
 	return target.GetOrRegisterAura(Aura{
-		Label:    "Judgement of Wisdom",
+		Label:    JudgementOfWisdomAuraLabel,
 		ActionID: actionID,
 		Duration: time.Second * 20,
 		OnSpellHitTaken: func(aura *Aura, sim *Simulation, spell *Spell, spellEffect *SpellEffect) {

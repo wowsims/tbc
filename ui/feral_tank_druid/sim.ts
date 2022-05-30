@@ -204,8 +204,9 @@ export class FeralTankDruidSimUI extends IndividualSimUI<Spec.SpecFeralTankDruid
 			debuffInputs: [
 				IconInputs.BloodFrenzy,
 				IconInputs.Mangle,
-				IconInputs.JudgementOfLight,
 				IconInputs.ImprovedSealOfTheCrusader,
+				IconInputs.JudgementOfLight,
+				IconInputs.JudgementOfWisdom,
 				IconInputs.HuntersMark,
 				IconInputs.FaerieFire,
 				IconInputs.SunderArmor,

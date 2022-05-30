@@ -394,7 +394,6 @@ func ApplyDarkmoonCardVengeance(agent core.Agent) {
 	character := agent.GetCharacter()
 	actionID := core.ActionID{ItemID: 31858}
 
-	procChance := 0.1
 	procSpell := character.RegisterSpell(core.SpellConfig{
 		ActionID:    actionID,
 		SpellSchool: core.SpellSchoolHoly,
@@ -408,11 +407,24 @@ func ApplyDarkmoonCardVengeance(agent core.Agent) {
 		}),
 	})
 
+	// Normal proc chance.
+	procChance := 0.1
+
+	// JoL and JoW procs can activate this effect. JoL and JoW both have a 50% chance
+	// to proc so just add them.
+	procChanceOnHitDealt := 0.0
+	if character.CurrentTarget.HasAura(core.JudgementOfLightAuraLabel) {
+		procChanceOnHitDealt += procChance / 2
+	}
+	if character.CurrentTarget.HasAura(core.JudgementOfWisdomAuraLabel) {
+		procChanceOnHitDealt += procChance / 2
+	}
+
 	// Can also proc when the player's melee attacks trigger a Seal of Light proc.
 	var onSpellHitDealt core.OnSpellHit
-	if character.CurrentTarget.HasAura(core.JudgementOfLightAuraLabel) {
+	if procChanceOnHitDealt > 0 {
 		onSpellHitDealt = func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
-			if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMelee) && sim.RandomFloat("DMC Vengeance") < procChance/2 {
+			if spellEffect.Landed() && spellEffect.ProcMask.Matches(core.ProcMaskMelee) && sim.RandomFloat("DMC Vengeance") < procChanceOnHitDealt {
 				procSpell.Cast(sim, spell.Unit)
 			}
 		}

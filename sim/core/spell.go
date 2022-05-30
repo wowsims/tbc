@@ -191,6 +191,15 @@ func (spell *Spell) applyEffects(sim *Simulation, target *Unit) {
 	spell.ApplyEffects(sim, target, spell)
 }
 
+func (spell *Spell) ApplyAOEThreat(threatAmount float64) {
+	threatAmount *= spell.TotalThreatMultiplier()
+
+	numTargets := spell.Unit.Env.GetNumTargets()
+	for i := int32(0); i < numTargets; i++ {
+		spell.SpellMetrics[i].TotalThreat += threatAmount
+	}
+}
+
 func ApplyEffectFuncDirectDamage(baseEffect SpellEffect) ApplySpellEffects {
 	baseEffect.Validate()
 	if baseEffect.BaseDamage.Calculator == nil {
