@@ -106,6 +106,10 @@ func (rogue *Rogue) ApplyFinisher(sim *core.Simulation, actionID core.ActionID) 
 }
 
 func (rogue *Rogue) Initialize() {
+	// Update auto crit multipliers now that we have the targets.
+	rogue.AutoAttacks.MHEffect.OutcomeApplier = rogue.OutcomeFuncMeleeWhite(rogue.MeleeCritMultiplier(true, false))
+	rogue.AutoAttacks.OHEffect.OutcomeApplier = rogue.OutcomeFuncMeleeWhite(rogue.MeleeCritMultiplier(false, false))
+
 	rogue.registerBackstabSpell()
 	rogue.registerDeadlyPoisonSpell()
 	rogue.registerEnvenom()
@@ -157,8 +161,8 @@ func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.disabledMCDs = rogue.DisableAllEnabledCooldowns(core.CooldownTypeUnknown)
 }
 
-func (rogue *Rogue) critMultiplier(isMH bool, applyLethality bool) float64 {
-	primaryModifier := 1.0
+func (rogue *Rogue) MeleeCritMultiplier(isMH bool, applyLethality bool) float64 {
+	primaryModifier := rogue.murderMultiplier()
 	secondaryModifier := 0.0
 
 	isMace := false
@@ -179,7 +183,10 @@ func (rogue *Rogue) critMultiplier(isMH bool, applyLethality bool) float64 {
 		secondaryModifier += 0.06 * float64(rogue.Talents.Lethality)
 	}
 
-	return rogue.MeleeCritMultiplier(primaryModifier, secondaryModifier)
+	return rogue.Character.MeleeCritMultiplier(primaryModifier, secondaryModifier)
+}
+func (rogue *Rogue) SpellCritMultiplier() float64 {
+	return rogue.Character.SpellCritMultiplier(rogue.murderMultiplier(), 0)
 }
 
 func NewRogue(character core.Character, options proto.Player) *Rogue {
@@ -239,8 +246,8 @@ func NewRogue(character core.Character, options proto.Player) *Rogue {
 	})
 
 	rogue.EnableAutoAttacks(rogue, core.AutoAttackOptions{
-		MainHand:       rogue.WeaponFromMainHand(rogue.critMultiplier(true, false)),
-		OffHand:        rogue.WeaponFromOffHand(rogue.critMultiplier(false, false)),
+		MainHand:       rogue.WeaponFromMainHand(0), // Set crit multiplier later when we have targets.
+		OffHand:        rogue.WeaponFromOffHand(0),  // Set crit multiplier later when we have targets.
 		AutoSwingMelee: true,
 	})
 

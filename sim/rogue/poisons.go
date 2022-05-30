@@ -105,7 +105,7 @@ func (rogue *Rogue) registerInstantPoisonSpell() {
 			ThreatMultiplier:    1,
 			BonusSpellHitRating: 5 * core.SpellHitRatingPerHitChance * float64(rogue.Talents.MasterPoisoner),
 			BaseDamage:          core.BaseDamageConfigRoll(146, 194),
-			OutcomeApplier:      rogue.OutcomeFuncMagicHitAndCrit(rogue.DefaultSpellCritMultiplier()),
+			OutcomeApplier:      rogue.OutcomeFuncMagicHitAndCrit(rogue.SpellCritMultiplier()),
 		}),
 	})
 }
