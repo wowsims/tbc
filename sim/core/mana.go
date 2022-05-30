@@ -110,7 +110,7 @@ func (unit *Unit) doneIterationMana() {
 		}
 
 		manaGainSpell.SpellMetrics[0].Casts += resourceMetrics.EventsForCurrentIteration()
-		manaGainSpell.ApplyAOEThreat(resourceMetrics.ActualGainForCurrentIteration() * ThreatPerManaGained)
+		manaGainSpell.ApplyAOEThreatIgnoreMultipliers(resourceMetrics.ActualGainForCurrentIteration() * ThreatPerManaGained)
 	}
 }
 
