@@ -88,6 +88,11 @@ type Item struct {
 	Ilvl       int32
 	SetName    string // Empty string if not part of a set.
 
+	// Hidden variable used for a few obscure mechanics (Seal of Righteousness).
+	// Intuitively, this is a measure of the difference between the expected stats
+	// and the actual stats of an item, e.g. decreased weapon DPS on caster weapons.
+	QualityModifier float64
+
 	GemSockets  []proto.GemColor
 	SocketBonus stats.Stats
 

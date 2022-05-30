@@ -37,11 +37,13 @@ func main() {
 	writeGemFile(*outDir, gemsData)
 
 	itemDeclarations := getItemDeclarations()
+	qualityModifiers := getItemQualityModifiers()
 	itemsData := make([]ItemData, len(itemDeclarations))
 	for idx, itemDeclaration := range itemDeclarations {
 		itemData := ItemData{
-			Declaration: itemDeclaration,
-			Response:    getWowheadItemResponse(itemDeclaration.ID, tooltipsDB),
+			Declaration:     itemDeclaration,
+			Response:        getWowheadItemResponse(itemDeclaration.ID, tooltipsDB),
+			QualityModifier: qualityModifiers[itemDeclaration.ID],
 		}
 		//fmt.Printf("\n\n%+v\n", itemData.Response)
 		itemsData[idx] = itemData
@@ -171,6 +173,43 @@ func getWowheadTooltipsDB() map[int]string {
 	}
 
 	return db
+}
+
+func getItemQualityModifiers() map[int]float64 {
+	file, err := os.Open("./assets/item_data/quality_modifiers.csv")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	qualityMods := make(map[int]float64)
+	scanner := bufio.NewScanner(file)
+	i := 0
+	for scanner.Scan() {
+		i++
+		if i == 1 {
+			// Ignore first line
+			continue
+		}
+
+		line := scanner.Text()
+
+		itemIDStr := line[:strings.Index(line, ",")]
+		itemID, err := strconv.Atoi(itemIDStr)
+		if err != nil {
+			log.Fatal("Invalid item ID: " + itemIDStr)
+		}
+
+		qualityModStr := line[strings.LastIndex(line, ",")+1:]
+		qualityMod, err := strconv.ParseFloat(qualityModStr, 64)
+		if err != nil {
+			log.Fatal("Invalid quality mod: ", qualityModStr)
+		}
+
+		qualityMods[itemID] = qualityMod
+	}
+
+	return qualityMods
 }
 
 func readCsvFile(filePath string) [][]string {

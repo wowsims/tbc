@@ -125,7 +125,7 @@ var Items = []Item{
 			fmt.Printf("Missing ilvl: %s", itemData.Response.Name)
 		}
 
-		file.WriteString(fmt.Sprintf("\t%s,\n", itemToGoString(itemData.Declaration, itemData.Response)))
+		file.WriteString(fmt.Sprintf("\t%s,\n", itemToGoString(itemData)))
 	}
 
 	file.WriteString("}\n")
@@ -156,15 +156,15 @@ func gemToGoString(gemDeclaration GemDeclaration, gemResponse WowheadItemRespons
 	return gemStr
 }
 
-func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemResponse) string {
+func itemToGoString(itemData ItemData) string {
 	itemStr := "{"
 
-	itemStr += fmt.Sprintf("Name:\"%s\", ", strings.ReplaceAll(itemResponse.Name, "\"", "\\\""))
-	itemStr += fmt.Sprintf("ID:%d, ", itemDeclaration.ID)
+	itemStr += fmt.Sprintf("Name:\"%s\", ", strings.ReplaceAll(itemData.Response.Name, "\"", "\\\""))
+	itemStr += fmt.Sprintf("ID:%d, ", itemData.Declaration.ID)
 
-	classAllowlist := itemResponse.GetClassAllowlist()
-	if len(itemDeclaration.ClassAllowlist) > 0 {
-		classAllowlist = itemDeclaration.ClassAllowlist
+	classAllowlist := itemData.Response.GetClassAllowlist()
+	if len(itemData.Declaration.ClassAllowlist) > 0 {
+		classAllowlist = itemData.Declaration.ClassAllowlist
 	}
 	if len(classAllowlist) > 0 {
 		itemStr += "ClassAllowlist: []proto.Class{"
@@ -174,58 +174,62 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 		itemStr += "}, "
 	}
 
-	itemStr += fmt.Sprintf("Type:proto.ItemType_%s, ", itemResponse.GetItemType().String())
+	itemStr += fmt.Sprintf("Type:proto.ItemType_%s, ", itemData.Response.GetItemType().String())
 
-	armorType := itemResponse.GetArmorType()
+	armorType := itemData.Response.GetArmorType()
 	if armorType != proto.ArmorType_ArmorTypeUnknown {
 		itemStr += fmt.Sprintf("ArmorType:proto.ArmorType_%s, ", armorType.String())
 	}
 
-	weaponType := itemResponse.GetWeaponType()
+	weaponType := itemData.Response.GetWeaponType()
 	if weaponType != proto.WeaponType_WeaponTypeUnknown {
 		itemStr += fmt.Sprintf("WeaponType:proto.WeaponType_%s, ", weaponType.String())
 
-		handType := itemResponse.GetHandType()
-		if itemDeclaration.HandType != proto.HandType_HandTypeUnknown {
-			handType = itemDeclaration.HandType
+		handType := itemData.Response.GetHandType()
+		if itemData.Declaration.HandType != proto.HandType_HandTypeUnknown {
+			handType = itemData.Declaration.HandType
 		}
 		if handType == proto.HandType_HandTypeUnknown {
-			panic("Unknown hand type for item: " + itemResponse.Tooltip)
+			panic("Unknown hand type for item: " + itemData.Response.Tooltip)
 		}
 		itemStr += fmt.Sprintf("HandType:proto.HandType_%s, ", handType.String())
 	} else {
-		rangedWeaponType := itemResponse.GetRangedWeaponType()
+		rangedWeaponType := itemData.Response.GetRangedWeaponType()
 		if rangedWeaponType != proto.RangedWeaponType_RangedWeaponTypeUnknown {
 			itemStr += fmt.Sprintf("RangedWeaponType:proto.RangedWeaponType_%s, ", rangedWeaponType.String())
 		}
 	}
 
-	min, max := itemResponse.GetWeaponDamage()
+	min, max := itemData.Response.GetWeaponDamage()
 	if min != 0 && max != 0 {
 		itemStr += fmt.Sprintf("WeaponDamageMin: %0.1f, ", min)
 		itemStr += fmt.Sprintf("WeaponDamageMax: %0.1f, ", max)
 	}
-	speed := itemResponse.GetWeaponSpeed()
+	speed := itemData.Response.GetWeaponSpeed()
 	if speed != 0 {
 		itemStr += fmt.Sprintf("SwingSpeed: %0.2f, ", speed)
 	}
 
-	phase := itemDeclaration.Phase
+	phase := itemData.Declaration.Phase
 	if phase == 0 {
-		phase = itemResponse.GetPhase()
+		phase = itemData.Response.GetPhase()
 	}
 	itemStr += fmt.Sprintf("Phase:%d, ", phase)
-	itemStr += fmt.Sprintf("Quality:proto.ItemQuality_%s, ", proto.ItemQuality(itemResponse.Quality).String())
+	itemStr += fmt.Sprintf("Quality:proto.ItemQuality_%s, ", proto.ItemQuality(itemData.Response.Quality).String())
 
-	if itemResponse.GetUnique() {
+	if itemData.Response.GetUnique() {
 		itemStr += fmt.Sprintf("Unique:true, ")
 	}
 
-	itemStr += fmt.Sprintf("Ilvl:%d, ", itemResponse.GetItemLevel())
+	itemStr += fmt.Sprintf("Ilvl:%d, ", itemData.Response.GetItemLevel())
 
-	itemStr += fmt.Sprintf("Stats: %s, ", statsToGoString(itemResponse.GetStats(), itemDeclaration.Stats))
+	if itemData.QualityModifier != 0 {
+		itemStr += fmt.Sprintf("QualityModifier:%0.03f, ", itemData.QualityModifier)
+	}
 
-	gemSockets := itemResponse.GetGemSockets()
+	itemStr += fmt.Sprintf("Stats: %s, ", statsToGoString(itemData.Response.GetStats(), itemData.Declaration.Stats))
+
+	gemSockets := itemData.Response.GetGemSockets()
 	if len(gemSockets) > 0 {
 		itemStr += "GemSockets: []proto.GemColor{"
 		for _, gemColor := range gemSockets {
@@ -234,9 +238,9 @@ func itemToGoString(itemDeclaration ItemDeclaration, itemResponse WowheadItemRes
 		itemStr += "}, "
 	}
 
-	itemStr += fmt.Sprintf("SocketBonus: %s", statsToGoString(itemResponse.GetSocketBonus(), Stats{}))
+	itemStr += fmt.Sprintf("SocketBonus: %s", statsToGoString(itemData.Response.GetSocketBonus(), Stats{}))
 
-	setName := itemResponse.GetItemSetName()
+	setName := itemData.Response.GetItemSetName()
 	if setName != "" {
 		itemStr += fmt.Sprintf(", SetName: \"%s\"", setName)
 	}
