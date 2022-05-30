@@ -27,7 +27,7 @@ func (rogue *Rogue) newMutilateHitSpell(isMH bool) *core.Spell {
 		ThreatMultiplier: 1,
 
 		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.MainHand, true, 101, 1, true),
-		OutcomeApplier: rogue.OutcomeFuncMeleeSpecialCritOnly(rogue.critMultiplier(isMH, true)),
+		OutcomeApplier: rogue.OutcomeFuncMeleeSpecialCritOnly(rogue.MeleeCritMultiplier(isMH, true)),
 
 		OnSpellHitDealt: func(sim *core.Simulation, spell *core.Spell, spellEffect *core.SpellEffect) {
 			if isMH {
