@@ -105,6 +105,7 @@ export declare class UnitMetrics {
     get secondsOomAvg(): number;
     get totalDamage(): number;
     getPlayerAndPetActions(): Array<ActionMetrics>;
+    private getActionsForDisplay;
     getMeleeActions(): Array<ActionMetrics>;
     getSpellActions(): Array<ActionMetrics>;
     getResourceMetrics(resourceType: ResourceType): Array<ResourceMetrics>;

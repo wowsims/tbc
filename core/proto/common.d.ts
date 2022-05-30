@@ -2041,6 +2041,18 @@ export declare enum OtherAction {
      */
     OtherActionFocusRegen = 6,
     /**
+     * For threat generated from mana gains.
+     *
+     * @generated from protobuf enum value: OtherActionManaGain = 10;
+     */
+    OtherActionManaGain = 10,
+    /**
+     * For threat generated from rage gains.
+     *
+     * @generated from protobuf enum value: OtherActionRageGain = 11;
+     */
+    OtherActionRageGain = 11,
+    /**
      * A white hit, can be main hand or off hand.
      *
      * @generated from protobuf enum value: OtherActionAttack = 3;

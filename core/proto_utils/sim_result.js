@@ -206,11 +206,14 @@ export class UnitMetrics {
     getPlayerAndPetActions() {
         return this.actions.concat(this.pets.map(pet => pet.getPlayerAndPetActions()).flat());
     }
+    getActionsForDisplay() {
+        return this.actions.filter(e => e.hitAttempts != 0 || e.tps != 0 || e.dps != 0);
+    }
     getMeleeActions() {
-        return this.actions.filter(e => e.hitAttempts != 0 && e.isMeleeAction);
+        return this.getActionsForDisplay().filter(e => e.isMeleeAction);
     }
     getSpellActions() {
-        return this.actions.filter(e => e.hitAttempts != 0 && !e.isMeleeAction);
+        return this.getActionsForDisplay().filter(e => !e.isMeleeAction);
     }
     getResourceMetrics(resourceType) {
         return this.resources.filter(resource => resource.type == resourceType);
@@ -541,46 +544,48 @@ export class TargetedActionMetrics {
             + this.data.hits;
     }
     get avgHit() {
-        return this.data.damage / this.landedHitsRaw;
+        const lhr = this.landedHitsRaw;
+        return lhr == 0 ? 0 : this.data.damage / lhr;
     }
     get avgHitThreat() {
-        return this.data.threat / this.landedHitsRaw;
+        const lhr = this.landedHitsRaw;
+        return lhr == 0 ? 0 : this.data.threat / lhr;
     }
     get critPercent() {
-        return (this.data.crits / this.hitAttempts) * 100;
+        return (this.data.crits / (this.hitAttempts || 1)) * 100;
     }
     get crushPercent() {
-        return (this.data.crushes / this.hitAttempts) * 100;
+        return (this.data.crushes / (this.hitAttempts || 1)) * 100;
     }
     get misses() {
         return this.data.misses / this.iterations;
     }
     get missPercent() {
-        return (this.data.misses / this.hitAttempts) * 100;
+        return (this.data.misses / (this.hitAttempts || 1)) * 100;
     }
     get dodges() {
         return this.data.dodges / this.iterations;
     }
     get dodgePercent() {
-        return (this.data.dodges / this.hitAttempts) * 100;
+        return (this.data.dodges / (this.hitAttempts || 1)) * 100;
     }
     get parries() {
         return this.data.parries / this.iterations;
     }
     get parryPercent() {
-        return (this.data.parries / this.hitAttempts) * 100;
+        return (this.data.parries / (this.hitAttempts || 1)) * 100;
     }
     get blocks() {
         return this.data.blocks / this.iterations;
     }
     get blockPercent() {
-        return (this.data.blocks / this.hitAttempts) * 100;
+        return (this.data.blocks / (this.hitAttempts || 1)) * 100;
     }
     get glances() {
         return this.data.glances / this.iterations;
     }
     get glancePercent() {
-        return (this.data.glances / this.hitAttempts) * 100;
+        return (this.data.glances / (this.hitAttempts || 1)) * 100;
     }
     // Merges an array of metrics into a single metric.
     static merge(actions) {

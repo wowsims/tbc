@@ -1244,6 +1244,18 @@ export var OtherAction;
      */
     OtherAction[OtherAction["OtherActionFocusRegen"] = 6] = "OtherActionFocusRegen";
     /**
+     * For threat generated from mana gains.
+     *
+     * @generated from protobuf enum value: OtherActionManaGain = 10;
+     */
+    OtherAction[OtherAction["OtherActionManaGain"] = 10] = "OtherActionManaGain";
+    /**
+     * For threat generated from rage gains.
+     *
+     * @generated from protobuf enum value: OtherActionRageGain = 11;
+     */
+    OtherAction[OtherAction["OtherActionRageGain"] = 11] = "OtherActionRageGain";
+    /**
      * A white hit, can be main hand or off hand.
      *
      * @generated from protobuf enum value: OtherActionAttack = 3;

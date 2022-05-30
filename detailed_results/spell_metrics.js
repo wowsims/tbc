@@ -76,6 +76,11 @@ export class SpellMetricsTable extends MetricsTable {
             },
         ]);
     }
+    customizeRowElem(action, rowElem) {
+        if (action.hitAttempts == 0 && action.dps == 0) {
+            rowElem.classList.add('threat-metrics');
+        }
+    }
     getGroupedMetrics(resultData) {
         const players = resultData.result.getPlayers(resultData.filter);
         if (players.length != 1) {
