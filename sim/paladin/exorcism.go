@@ -37,7 +37,7 @@ func (paladin *Paladin) registerExorcismSpell() {
 			BaseDamage: core.BaseDamageConfigMagic(521, 579, 1),
 			// look up crit multiplier in the future
 			// TODO: What is this 0.25?
-			OutcomeApplier: paladin.OutcomeFuncMagicHitAndCrit(paladin.SpellCritMultiplier(1, 0.25)),
+			OutcomeApplier: paladin.OutcomeFuncMagicHitAndCrit(paladin.SpellCritMultiplier()),
 		}),
 	})
 }

@@ -40,7 +40,7 @@ func NewProtectionPaladin(character core.Character, options proto.Player) *Prote
 	prot.PaladinAura = protOptions.Options.Aura
 
 	prot.EnableAutoAttacks(prot, core.AutoAttackOptions{
-		MainHand:       prot.WeaponFromMainHand(prot.DefaultMeleeCritMultiplier()),
+		MainHand:       prot.WeaponFromMainHand(0), // Set crit multiplier later when we have targets.
 		AutoSwingMelee: true,
 	})
 
