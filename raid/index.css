@@ -3190,6 +3190,56 @@ input, select {
   font-size: 11px;
 }
 
+.retribution-paladin-sim-ui {
+  --theme-color-primary: #cc48a4;
+  --theme-color-background: rgb(20, 13, 18);
+  --theme-color-background-raw: 20, 13, 18;
+  --theme-background-image: url("/tbc/assets/retribution_paladin.jpg");
+  --theme-background-opacity: 0.95;
+  --main-text-color: White;
+}
+
+.retribution-paladin-sim-ui .self-buffs-section {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.retribution-paladin-sim-ui .buffs-section {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.retribution-paladin-sim-ui .debuffs-section {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.retribution-paladin-sim-ui .character-stats-table-row {
+  font-size: 11px;
+}
+
+.protection-paladin-sim-ui {
+  --theme-color-primary: #cc48a4;
+  --theme-color-background: rgb(20, 13, 18);
+  --theme-color-background-raw: 20, 13, 18;
+  --theme-background-image: url("/tbc/assets/prot_paladin.png");
+  --theme-background-opacity: 0.95;
+  --main-text-color: White;
+}
+
+.protection-paladin-sim-ui .self-buffs-section {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.protection-paladin-sim-ui .buffs-section {
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.protection-paladin-sim-ui .debuffs-section {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.protection-paladin-sim-ui .character-stats-table-row {
+  font-size: 10px;
+}
+
 .shadow-priest-sim-ui {
   --theme-color-primary: #9b57f7;
   --theme-color-background: #1d1726;
@@ -3283,31 +3333,6 @@ input, select {
 }
 
 .protection-warrior-sim-ui .character-stats-table-row {
-  font-size: 11px;
-}
-
-.retribution-paladin-sim-ui {
-  --theme-color-primary: #cc48a4;
-  --theme-color-background: rgb(20, 13, 18);
-  --theme-color-background-raw: 20, 13, 18;
-  --theme-background-image: url("/tbc/assets/retribution_paladin.jpg");
-  --theme-background-opacity: 0.95;
-  --main-text-color: White;
-}
-
-.retribution-paladin-sim-ui .self-buffs-section {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.retribution-paladin-sim-ui .buffs-section {
-  grid-template-columns: repeat(7, 1fr);
-}
-
-.retribution-paladin-sim-ui .debuffs-section {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.retribution-paladin-sim-ui .character-stats-table-row {
   font-size: 11px;
 }
 

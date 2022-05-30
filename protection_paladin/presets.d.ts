@@ -3,11 +3,15 @@ import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { Spec } from '/tbc/core/proto/common.js';
 import { Player } from '/tbc/core/player.js';
 import { ProtectionPaladin_Rotation as ProtectionPaladinRotation, ProtectionPaladin_Options as ProtectionPaladinOptions } from '/tbc/core/proto/paladin.js';
-export declare const SanctityTalents: {
+export declare const AvengersShieldTalents: {
     name: string;
     data: string;
 };
-export declare const AvengersShieldTalents: {
+export declare const ArdentDefenderTalents: {
+    name: string;
+    data: string;
+};
+export declare const SanctityTalents: {
     name: string;
     data: string;
 };

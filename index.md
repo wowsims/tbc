@@ -5,6 +5,7 @@ Live sims:
  - [Hunter](https://wowsims.github.io/tbc/hunter/ "https://wowsims.github.io/tbc/hunter/")
  - [Mage](https://wowsims.github.io/tbc/mage/ "https://wowsims.github.io/tbc/mage/")
  - [Retribution Paladin](https://wowsims.github.io/tbc/retribution_paladin/ "https://wowsims.github.io/tbc/retribution_paladin/")
+ - [Protection Paladin](https://wowsims.github.io/tbc/protection_paladin/ "https://wowsims.github.io/tbc/protection_paladin/")
  - [Shadow Priest](https://wowsims.github.io/tbc/shadow_priest/ "https://wowsims.github.io/tbc/shadow_priest/")
  - [Smite Priest](https://wowsims.github.io/tbc/smite_priest/ "https://wowsims.github.io/tbc/smite_priest/")
  - [Rogue](https://wowsims.github.io/tbc/rogue/ "https://wowsims.github.io/tbc/rogue/")

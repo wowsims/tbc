@@ -291,8 +291,9 @@ export class ProtectionPaladinSimUI extends IndividualSimUI {
             presets: {
                 // Preset talents that the user can quickly select.
                 talents: [
-                    Presets.SanctityTalents,
+                    Presets.ArdentDefenderTalents,
                     Presets.AvengersShieldTalents,
+                    Presets.SanctityTalents,
                 ],
                 // Preset gear configurations that the user can quickly select.
                 gear: [
