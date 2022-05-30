@@ -77,7 +77,7 @@ func (unit *Unit) OutcomeFuncMagicHitAndCritBinary(critMultiplier float64) Outco
 
 func (unit *Unit) OutcomeFuncCritFixedChance(critChance float64, critMultiplier float64) OutcomeApplier {
 	return func(sim *Simulation, spell *Spell, spellEffect *SpellEffect, attackTable *AttackTable) {
-		if spellEffect.fixedCritCheck(sim, spell, critChance) {
+		if spellEffect.fixedCritCheck(sim, critChance) {
 			spellEffect.Outcome = OutcomeCrit
 			spell.SpellMetrics[spellEffect.Target.Index].Crits++
 			spellEffect.Damage *= critMultiplier
@@ -324,7 +324,7 @@ func (spellEffect *SpellEffect) magicHitCheckBinary(sim *Simulation, spell *Spel
 	return sim.RandomFloat("Magical Hit Roll") > missChance
 }
 
-func (spellEffect *SpellEffect) fixedCritCheck(sim *Simulation, spell *Spell, critChance float64) bool {
+func (spellEffect *SpellEffect) fixedCritCheck(sim *Simulation, critChance float64) bool {
 	return sim.RandomFloat("Fixed Crit Roll") < critChance
 }
 
