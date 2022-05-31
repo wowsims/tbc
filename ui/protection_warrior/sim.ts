@@ -226,6 +226,7 @@ export class ProtectionWarriorSimUI extends IndividualSimUI<Spec.SpecProtectionW
 				flasks: [
 					Flask.FlaskOfRelentlessAssault,
 					Flask.FlaskOfFortification,
+					Flask.FlaskOfChromaticWonder,
 				],
 				battleElixirs: [
 					BattleElixir.ElixirOfDemonslaying,

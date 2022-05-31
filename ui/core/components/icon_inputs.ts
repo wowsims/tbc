@@ -439,6 +439,7 @@ export const makeFlasksInput = makeConsumeInputFactory('flask', [
 	{ actionId: ActionId.fromItemId(22854), value: Flask.FlaskOfRelentlessAssault },
 	{ actionId: ActionId.fromItemId(13512), value: Flask.FlaskOfSupremePower },
 	{ actionId: ActionId.fromItemId(22851), value: Flask.FlaskOfFortification },
+	{ actionId: ActionId.fromItemId(33208), value: Flask.FlaskOfChromaticWonder },
 ] as Array<IconEnumValueConfig<Player<any>, Flask>>, (eventID: EventID, player: Player<any>, newValue: Flask) => {
 	if (newValue) {
 		const newConsumes = player.getConsumes();

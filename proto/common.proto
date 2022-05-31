@@ -278,6 +278,7 @@ enum Flask {
 	FlaskOfRelentlessAssault = 4;
 	FlaskOfSupremePower = 5;
 	FlaskOfFortification = 6;
+	FlaskOfChromaticWonder = 7;
 }
 
 enum BattleElixir {
