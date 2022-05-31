@@ -916,6 +916,11 @@ const idToCategoryMap: Record<number, number> = {
 	// Hunter
 	[27014]: 0.1, // Raptor Strike
 
+	// Paladin
+	[27156]: 0.1, // Seal of Righteousness Proc
+	[20182]: 0.2, // Reckoning
+	[27179]: SPELL_ACTION_CATEGORY + 0.1, // Holy Shield
+
 	// Rogue
 	[6774]: MELEE_ACTION_CATEGORY + 0.1, // Slice and Dice
 	[26866]: MELEE_ACTION_CATEGORY + 0.2, // Expose Armor
@@ -952,6 +957,11 @@ const idToCategoryMap: Record<number, number> = {
 	[71]:   DEFAULT_ACTION_CATEGORY + 0.1, // Defensive Stance
 	[2457]: DEFAULT_ACTION_CATEGORY + 0.1, // Battle Stance
 	[2458]: DEFAULT_ACTION_CATEGORY + 0.1, // Berserker Stance
+
+	// Generic
+	[26992]: SPELL_ACTION_CATEGORY + 0.91, // Thorns
+	[27150]: SPELL_ACTION_CATEGORY + 0.92, // Retribution Aura
+	[27169]: SPELL_ACTION_CATEGORY + 0.93, // Blessing of Sanctuary
 };
 
 const idsToGroupForRotation: Array<number> = [
