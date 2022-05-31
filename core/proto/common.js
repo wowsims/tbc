@@ -972,6 +972,10 @@ export var Flask;
      * @generated from protobuf enum value: FlaskOfFortification = 6;
      */
     Flask[Flask["FlaskOfFortification"] = 6] = "FlaskOfFortification";
+    /**
+     * @generated from protobuf enum value: FlaskOfChromaticWonder = 7;
+     */
+    Flask[Flask["FlaskOfChromaticWonder"] = 7] = "FlaskOfChromaticWonder";
 })(Flask || (Flask = {}));
 /**
  * @generated from protobuf enum proto.BattleElixir

@@ -204,6 +204,7 @@ export class FeralTankDruidSimUI extends IndividualSimUI {
                 flasks: [
                     Flask.FlaskOfRelentlessAssault,
                     Flask.FlaskOfFortification,
+                    Flask.FlaskOfChromaticWonder,
                 ],
                 battleElixirs: [
                     BattleElixir.ElixirOfDemonslaying,

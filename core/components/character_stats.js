@@ -92,6 +92,18 @@ export class CharacterStats extends Component {
         else if (stat == Stat.StatExpertise) {
             displayStr += ` (${(Math.floor(rawValue / Mechanics.EXPERTISE_PER_QUARTER_PERCENT_REDUCTION)).toFixed(0)})`;
         }
+        else if (stat == Stat.StatDefense) {
+            displayStr += ` (${(Mechanics.CHARACTER_LEVEL * 5 + rawValue / Mechanics.DEFENSE_RATING_PER_DEFENSE).toFixed(1)})`;
+        }
+        else if (stat == Stat.StatBlock) {
+            displayStr += ` (${(rawValue / Mechanics.BLOCK_RATING_PER_BLOCK_CHANCE).toFixed(2)}%)`;
+        }
+        else if (stat == Stat.StatDodge) {
+            displayStr += ` (${(rawValue / Mechanics.DODGE_RATING_PER_DODGE_CHANCE).toFixed(2)}%)`;
+        }
+        else if (stat == Stat.StatParry) {
+            displayStr += ` (${(rawValue / Mechanics.PARRY_RATING_PER_PARRY_CHANCE).toFixed(2)}%)`;
+        }
         return displayStr;
     }
 }

@@ -1777,7 +1777,11 @@ export declare enum Flask {
     /**
      * @generated from protobuf enum value: FlaskOfFortification = 6;
      */
-    FlaskOfFortification = 6
+    FlaskOfFortification = 6,
+    /**
+     * @generated from protobuf enum value: FlaskOfChromaticWonder = 7;
+     */
+    FlaskOfChromaticWonder = 7
 }
 /**
  * @generated from protobuf enum proto.BattleElixir
