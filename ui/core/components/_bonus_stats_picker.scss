@@ -12,6 +12,15 @@
   align-items: center;
 }
 
+.bonus-stats-root .input-label-div {
+	margin: 1px;
+}
+
+.bonus-stats-root .number-picker-input {
+	margin: 1px;
+	padding: 1px;
+}
+
 .bonus-stats-root .number-picker-root.positive .input-label {
 	font-weight: bold;
 	text-shadow: 2px 2px 3px black;

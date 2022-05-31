@@ -83,7 +83,7 @@ func registerSunwellPlateau() {
 			}.ToFloatArray(),
 
 			SpellSchool:      proto.SpellSchool_SpellSchoolPhysical,
-			SwingSpeed:       2.0,
+			SwingSpeed:       1.0,
 			MinBaseDamage:    18338.5,
 			CanCrush:         false,
 			SuppressDodge:    true,
@@ -164,7 +164,7 @@ func registerSunwellPlateau() {
 			}.ToFloatArray(),
 
 			SpellSchool:      proto.SpellSchool_SpellSchoolPhysical,
-			SwingSpeed:       2.0,
+			SwingSpeed:       1.5,
 			MinBaseDamage:    18338.5,
 			CanCrush:         false,
 			SuppressDodge:    true,
