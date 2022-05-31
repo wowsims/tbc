@@ -824,6 +824,10 @@ const idToCategoryMap = {
     [26997]: MELEE_ACTION_CATEGORY + 0.3,
     // Hunter
     [27014]: 0.1,
+    // Paladin
+    [27156]: 0.1,
+    [20182]: 0.2,
+    [27179]: SPELL_ACTION_CATEGORY + 0.1,
     // Rogue
     [6774]: MELEE_ACTION_CATEGORY + 0.1,
     [26866]: MELEE_ACTION_CATEGORY + 0.2,
@@ -857,7 +861,11 @@ const idToCategoryMap = {
     [25236]: MELEE_ACTION_CATEGORY + 0.5,
     [71]: DEFAULT_ACTION_CATEGORY + 0.1,
     [2457]: DEFAULT_ACTION_CATEGORY + 0.1,
-    [2458]: DEFAULT_ACTION_CATEGORY + 0.1, // Berserker Stance
+    [2458]: DEFAULT_ACTION_CATEGORY + 0.1,
+    // Generic
+    [26992]: SPELL_ACTION_CATEGORY + 0.91,
+    [27150]: SPELL_ACTION_CATEGORY + 0.92,
+    [27169]: SPELL_ACTION_CATEGORY + 0.93, // Blessing of Sanctuary
 };
 const idsToGroupForRotation = [
     6774,
