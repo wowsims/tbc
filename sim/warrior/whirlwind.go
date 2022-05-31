@@ -28,7 +28,7 @@ func (warrior *Warrior) registerWhirlwindSpell() {
 		DamageMultiplier: 1,
 		ThreatMultiplier: 1.25,
 
-		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.OffHand, true, 0, 1, true),
+		BaseDamage:     core.BaseDamageConfigMeleeWeapon(core.OffHand, true, 0, 1+0.05*float64(warrior.Talents.DualWieldSpecialization), true),
 		OutcomeApplier: warrior.OutcomeFuncMeleeWeaponSpecialHitAndCrit(warrior.critMultiplier(true)),
 	}
 
