@@ -27,7 +27,7 @@ func registerSunwellPlateau() {
 
 			SpellSchool:      proto.SpellSchool_SpellSchoolPhysical,
 			SwingSpeed:       2.0,
-			MinBaseDamage:    16301,
+			MinBaseDamage:    14135,
 			CanCrush:         false,
 			SuppressDodge:    true,
 			ParryHaste:       true,
@@ -53,7 +53,7 @@ func registerSunwellPlateau() {
 
 			SpellSchool:      proto.SpellSchool_SpellSchoolPhysical,
 			SwingSpeed:       2.0,
-			MinBaseDamage:    16301,
+			MinBaseDamage:    14135,
 			CanCrush:         false,
 			SuppressDodge:    true,
 			ParryHaste:       true,
@@ -84,7 +84,7 @@ func registerSunwellPlateau() {
 
 			SpellSchool:      proto.SpellSchool_SpellSchoolPhysical,
 			SwingSpeed:       1.0,
-			MinBaseDamage:    18338.5,
+			MinBaseDamage:    17250,
 			CanCrush:         false,
 			SuppressDodge:    true,
 			ParryHaste:       false,
@@ -111,7 +111,7 @@ func registerSunwellPlateau() {
 
 			SpellSchool:      proto.SpellSchool_SpellSchoolPhysical,
 			SwingSpeed:       2.0,
-			MinBaseDamage:    15281.85,
+			MinBaseDamage:    13793.85,
 			CanCrush:         false,
 			SuppressDodge:    true,
 			ParryHaste:       true,
@@ -138,7 +138,7 @@ func registerSunwellPlateau() {
 
 			SpellSchool:      proto.SpellSchool_SpellSchoolPhysical,
 			SwingSpeed:       2.0,
-			MinBaseDamage:    12690,
+			MinBaseDamage:    14127.7,
 			CanCrush:         true,
 			SuppressDodge:    true,
 			ParryHaste:       true,
