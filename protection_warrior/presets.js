@@ -11,6 +11,14 @@ import * as Tooltips from '/tbc/core/constants/tooltips.js';
 // keep them in a separate file.
 // Default talents. Uses the wowhead calculator format, make the talents on
 // https://tbc.wowhead.com/talent-calc and copy the numbers in the url.
+export const StandardTalents = {
+    name: 'Standard',
+    data: '350003011-05-0055511033010103501351',
+};
+export const ImpDemoTalents = {
+    name: 'Imp Demo',
+    data: '340003-055-0055511033010101501351',
+};
 export const ImpaleProtTalents = {
     name: 'Impale Prot',
     data: '35000301302-03-0055511033010101501351',

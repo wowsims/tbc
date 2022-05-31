@@ -268,6 +268,8 @@ export class ProtectionWarriorSimUI extends IndividualSimUI {
             presets: {
                 // Preset talents that the user can quickly select.
                 talents: [
+                    Presets.StandardTalents,
+                    Presets.ImpDemoTalents,
                     Presets.ImpaleProtTalents,
                 ],
                 // Preset gear configurations that the user can quickly select.

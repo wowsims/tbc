@@ -1,6 +1,14 @@
 import { Consumes } from '/tbc/core/proto/common.js';
 import { EquipmentSpec } from '/tbc/core/proto/common.js';
 import { ProtectionWarrior_Rotation as ProtectionWarriorRotation, ProtectionWarrior_Options as ProtectionWarriorOptions } from '/tbc/core/proto/warrior.js';
+export declare const StandardTalents: {
+    name: string;
+    data: string;
+};
+export declare const ImpDemoTalents: {
+    name: string;
+    data: string;
+};
 export declare const ImpaleProtTalents: {
     name: string;
     data: string;
