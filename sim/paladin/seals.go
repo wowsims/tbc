@@ -339,6 +339,7 @@ func (paladin *Paladin) setupSealOfRighteousness() {
 
 	paladin.SealOfRighteousness = paladin.RegisterSpell(core.SpellConfig{
 		ActionID:    spellActionID,
+		SpellSchool: core.SpellSchoolHoly,
 		SpellExtras: SpellFlagSeal,
 
 		ResourceType: stats.Mana,
