@@ -21,7 +21,7 @@ character_stats_results: {
   final_stats: 0
   final_stats: 2717.958
   final_stats: 370.85
-  final_stats: 708.904016
+  final_stats: 708.9040160000001
   final_stats: 0
   final_stats: 0
   final_stats: 73.1
@@ -174,8 +174,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-BraidedEterniumChain-24114"
  value: {
-  dps: 1437.6187235230664
-  tps: 1008.6465086411904
+  dps: 1437.568495756084
+  tps: 1008.6108469266328
  }
 }
 dps_results: {
@@ -188,8 +188,8 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-BrutalEarthstormDiamond"
  value: {
-  dps: 1413.2533701813695
-  tps: 991.3357049005435
+  dps: 1413.2176597826467
+  tps: 991.3103505174504
  }
 }
 dps_results: {
@@ -203,7 +203,7 @@ dps_results: {
  key: "TestRogue-AllItems-ChaoticSkyfireDiamond"
  value: {
   dps: 1426.4355268365061
-  tps: 1000.6950361256904
+  tps: 1000.6950361256902
  }
 }
 dps_results: {
@@ -224,14 +224,14 @@ dps_results: {
  key: "TestRogue-AllItems-CoreofAr'kelos-29776"
  value: {
   dps: 1389.7356801990763
-  tps: 974.6990499709278
+  tps: 974.6990499709282
  }
 }
 dps_results: {
  key: "TestRogue-AllItems-CrystalforgedTrinket-32654"
  value: {
-  dps: 1391.8943178449406
-  tps: 976.2316826994916
+  dps: 1391.7967170378981
+  tps: 976.1623861264916
  }
 }
 dps_results: {
@@ -391,7 +391,7 @@ dps_results: {
 dps_results: {
  key: "TestRogue-AllItems-GlaiveofthePit-28774"
  value: {
-  dps: 916.9803113297015
+  dps: 916.9803113297014
   tps: 639.0185441851781
  }
 }
@@ -511,7 +511,7 @@ dps_results: {
  key: "TestRogue-AllItems-MarkoftheChampion-23206"
  value: {
   dps: 1408.9535786190597
-  tps: 988.2618222420969
+  tps: 988.2618222420966
  }
 }
 dps_results: {
@@ -546,7 +546,7 @@ dps_results: {
  key: "TestRogue-AllItems-PotentUnstableDiamond"
  value: {
   dps: 1412.1009566984003
-  tps: 990.517491327635
+  tps: 990.5174913276347
  }
 }
 dps_results: {
@@ -707,7 +707,7 @@ dps_results: {
  key: "TestRogue-AllItems-SwiftSkyfireDiamond"
  value: {
   dps: 1412.1009566984003
-  tps: 990.517491327635
+  tps: 990.5174913276347
  }
 }
 dps_results: {
@@ -882,7 +882,7 @@ dps_results: {
  key: "TestRogue-SelfDrums-DPS"
  value: {
   dps: 1430.1324784465653
-  tps: 1003.3443976660673
+  tps: 1003.3443976660669
  }
 }
 dps_results: {
@@ -930,22 +930,22 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1836.4038534747262
-  tps: 1291.8405580785352
+  dps: 1836.0557752009183
+  tps: 1291.593422504132
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-LongSingleTarget"
  value: {
-  dps: 1495.612023822582
-  tps: 1049.8793158920396
+  dps: 1495.279822862582
+  tps: 1049.6434532104397
  }
 }
 dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-FullBuffs-ShortSingleTarget"
  value: {
-  dps: 1837.5726117791921
-  tps: 1304.6765543632264
+  dps: 1837.4552581791922
+  tps: 1304.5932333072265
  }
 }
 dps_results: {
@@ -959,7 +959,7 @@ dps_results: {
  key: "TestRogue-Settings-BloodElf-P1-Hemo-NoBuffs-LongSingleTarget"
  value: {
   dps: 651.9908825618418
-  tps: 462.9135266189075
+  tps: 462.9135266189076
  }
 }
 dps_results: {
@@ -1014,29 +1014,29 @@ dps_results: {
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-LongMultiTarget"
  value: {
-  dps: 1859.8127089486634
-  tps: 1308.3805726697867
+  dps: 1859.4445607084529
+  tps: 1308.1191874192377
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-LongSingleTarget"
  value: {
-  dps: 1507.8807415615395
-  tps: 1058.5425807599026
+  dps: 1507.56345004154
+  tps: 1058.3173037807023
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-FullBuffs-ShortSingleTarget"
  value: {
-  dps: 1852.8582154849707
-  tps: 1315.5293329943293
+  dps: 1852.7991018849707
+  tps: 1315.4873623383291
  }
 }
 dps_results: {
  key: "TestRogue-Settings-Human-P1-Hemo-NoBuffs-LongMultiTarget"
  value: {
   dps: 778.5351796676144
-  tps: 552.759977564006
+  tps: 552.7599775640061
  }
 }
 dps_results: {
