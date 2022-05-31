@@ -155,7 +155,7 @@ func (rogue *Rogue) Reset(sim *core.Simulation) {
 	rogue.plan = PlanOpener
 	rogue.doneSND = false
 
-	permaEA := rogue.ExposeArmorAura.ExpiresAt() == core.NeverExpires
+	permaEA := rogue.ExposeArmorAura.Duration == core.NeverExpires
 	rogue.doneEA = !rogue.Rotation.MaintainExposeArmor || permaEA
 
 	rogue.disabledMCDs = rogue.DisableAllEnabledCooldowns(core.CooldownTypeUnknown)
