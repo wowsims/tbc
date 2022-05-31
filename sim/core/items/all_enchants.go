@@ -44,6 +44,7 @@ var Enchants = []Enchant{
 	{ID: 28270, EffectID: 2933, Name: "Chest - Major Resilience", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Resilience: 15}, ItemType: proto.ItemType_ItemTypeChest},
 	{ID: 33990, EffectID: 1144, Name: "Chest - Major Spirit", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Spirit: 15}, ItemType: proto.ItemType_ItemTypeChest},
 	{ID: 33991, EffectID: 3150, Name: "Chest - Restore Mana Prime", IsSpellID: true, Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.MP5: 6}, ItemType: proto.ItemType_ItemTypeChest},
+	{ID: 35500, EffectID: 1950, Name: "Chest - Defense", Phase: 5, Quality: proto.ItemQuality_ItemQualityCommon, Bonus: stats.Stats{stats.Defense: 15}, ItemType: proto.ItemType_ItemTypeChest},
 
 	// Wrist
 	{ID: 22533, EffectID: 2649, Name: "Bracer - Fortitude", Quality: proto.ItemQuality_ItemQualityUncommon, Bonus: stats.Stats{stats.Stamina: 12}, ItemType: proto.ItemType_ItemTypeWrist},
